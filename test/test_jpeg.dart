@@ -18,5 +18,4 @@ main() {
   Io.File fp = new Io.File('res/test-cat-eye04.jpg');
   fp.createSync(recursive: true);
   fp.writeAsBytesSync(bytes);
-
 }
