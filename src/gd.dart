@@ -8,7 +8,9 @@ library gd;
 
 import 'dart:typed_data' as Data;
 
+part 'color.dart';
 part 'image.dart';
 part 'jpeg_decoder.dart';
 part 'jpeg_encoder.dart';
+part 'tga_encoder.dart';
 part '_byte_buffer.dart';

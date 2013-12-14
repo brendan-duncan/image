@@ -2,6 +2,9 @@ part of gd;
 
 /**
  * Decode a jpeg encoded image.
+ *
+ * Derived from:
+ * https://github.com/notmasteryet/jpgjs
  */
 class JpegDecoder {
   Image decode(List<int> data) {
@@ -301,7 +304,7 @@ class JpegDecoder {
           for (x = 0; x < width; x++) {
             Y = data[i++];
 
-            imageDataArray[j++] = Image.color(Y, Y, Y, 255);
+            imageDataArray[j++] = color(Y, Y, Y, 255);
           }
         }
         break;
@@ -312,7 +315,7 @@ class JpegDecoder {
             G = data[i++];
             B = data[i++];
 
-            int c = Image.color(R, G, B, 255);
+            int c = color(R, G, B, 255);
             imageDataArray[j++] = c;
           }
         }
@@ -329,7 +332,7 @@ class JpegDecoder {
             G = 255 - clampTo8bit(M * (1 - K / 255) + K);
             B = 255 - clampTo8bit(Y * (1 - K / 255) + K);
 
-            imageDataArray[j++] = Image.color(R, G, B, 255);
+            imageDataArray[j++] = color(R, G, B, 255);
           }
         }
         break;

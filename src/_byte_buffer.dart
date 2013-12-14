@@ -38,6 +38,10 @@ class _ByteBuffer {
     buffer.add(value & 0xFF);
   }
 
+  void writeBytes(List<int> bytes) {
+    buffer.addAll(bytes);
+  }
+
   void writeBits(bs) {
     var value = bs[0];
     var posval = bs[1] - 1;

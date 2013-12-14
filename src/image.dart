@@ -74,25 +74,6 @@ class Image {
     buffer[y * width + x] = color;
   }
 
-  static int color(int r, int g, int b, [int a = 255]) {
-    return ((r & 0xFF) << 24) |
-           ((g & 0xFF) << 16) |
-           ((b & 0xFF) << 8) |
-           (a & 0xFF);
-  }
-
-  static int red(int c) =>
-      (c >> 24) & 0xFF;
-
-  static int green(int c) =>
-      (c >> 16) & 0xFF;
-
-  static int blue(int c) =>
-      (c >> 8) & 0xFF;
-
-  static int alpha(int c) =>
-      c & 0xFF;
-
   void setPixelRGBA(int x, int y, int r, int g, int b, [int a = 255]) {
     buffer[y * width + x] = color(r, g, b, a);
   }
