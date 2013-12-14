@@ -1,6 +1,9 @@
 import 'dart:io' as Io;
-import '../src/gd.dart' as Gd;
+import '../lib/gd.dart' as Gd;
 
+/**
+ * Load a JPEG file and save out a resized thumbnail.
+ */
 main() {
   Io.File file = new Io.File('res/cat-eye04.jpg');
   file.openSync();
@@ -17,7 +20,7 @@ main() {
   Gd.JpegEncoder jpegEncode = new Gd.JpegEncoder(100);
   var jpeg = jpegEncode.encode(thumbnail);
 
-  Io.File fp = new Io.File('res/test-cat-eye04.jpg');
+  Io.File fp = new Io.File('res/thumbnail-cat-eye04.jpg');
   fp.createSync(recursive: true);
   fp.writeAsBytesSync(jpeg);
 }
