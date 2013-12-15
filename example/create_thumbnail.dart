@@ -1,5 +1,5 @@
 import 'dart:io' as Io;
-import '../lib/gd.dart' as Gd;
+import '../lib/image.dart';
 
 /**
  * Load a JPEG file and save out a resized thumbnail.
@@ -12,12 +12,12 @@ main() {
     return;
   }
 
-  Gd.JpegDecoder jpegDecode = new Gd.JpegDecoder();
-  Gd.Image image = jpegDecode.decode(bytes);
+  var jpegDecode = new JpegDecoder();
+  var image = jpegDecode.decode(bytes);
 
-  Gd.Image thumbnail = image.resized(image.width ~/ 2, image.height ~/ 2);
+  var thumbnail = image.resized(image.width ~/ 2, image.height ~/ 2);
 
-  Gd.JpegEncoder jpegEncode = new Gd.JpegEncoder(100);
+  var jpegEncode = new JpegEncoder(100);
   var jpeg = jpegEncode.encode(thumbnail);
 
   Io.File fp = new Io.File('res/thumbnail-cat-eye04.jpg');

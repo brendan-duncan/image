@@ -1,26 +1,25 @@
 part of image;
 
 /**
- * An image buffer.
+ * A 32-bit image buffer where pixels are encoded into 32-bit unsigned ints.
+ * You can use the methods in color to encode/decode the RGBA channels of a
+ * color for a pixel.
  */
 class Image {
-  static const int RGB = 3;
-  static const int RGBA = 4;
-
   final int width;
   final int height;
-  final int bytesPerPixel;
-  /// Pixels are encoded into 4-byte integers.
+  /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
+  /// channel.
   final Data.Uint32List buffer;
 
   /**
    * Create an image with the given dimensions and format.
    */
-  Image(int width, int height, this.bytesPerPixel) :
+  Image(int width, int height) :
     this.width = width,
     this.height = height,
     buffer = new Data.Uint32List(width * height) {
-      if (width <= 0 || height <= 0 || bytesPerPixel < 3 || bytesPerPixel > 4) {
+      if (width <= 0 || height <= 0) {
         throw new Exception('Invalid image format');
       }
     }
@@ -31,7 +30,6 @@ class Image {
   Image.from(Image other) :
     width = other.width,
     height = other.height,
-    bytesPerPixel = other.bytesPerPixel,
     buffer = new Data.Uint32List.fromList(other.buffer);
 
 
@@ -44,7 +42,7 @@ class Image {
       throw new Exception('Invalid size');
     }
 
-    Image newImage = new Image(width, height, bytesPerPixel);
+    Image newImage = new Image(width, height);
 
     double dy = this.height / height;
     double dx = this.width / width;

@@ -1,1 +1,4 @@
 pubspec.lock
+example/packages/
+example/res/packages/
+packages/

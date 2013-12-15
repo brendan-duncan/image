@@ -11,10 +11,10 @@ class JpegDecoder {
     _ByteBuffer bytes = new _ByteBuffer.fromList(data);
 
     prepareComponents(_JpegFrame frame) {
-      var maxH = 0;
-      var maxV = 0;
+      int maxH = 0;
+      int maxV = 0;
       _JpegComponent component;
-      var componentId;
+      int componentId;
 
       for (componentId in frame.components.keys) {
         component = frame.components[componentId];
@@ -26,18 +26,18 @@ class JpegDecoder {
         }
       }
 
-      var mcusPerLine = (frame.samplesPerLine / 8 / maxH).ceil();
-      var mcusPerColumn = (frame.scanLines / 8 / maxV).ceil();
+      int mcusPerLine = (frame.samplesPerLine / 8 / maxH).ceil();
+      int mcusPerColumn = (frame.scanLines / 8 / maxV).ceil();
 
       for (componentId in frame.components.keys) {
         component = frame.components[componentId];
-        var blocksPerLine = ((frame.samplesPerLine / 8).ceil() * component.h / maxH).ceil();
-        var blocksPerColumn = ((frame.scanLines / 8).ceil() * component.v / maxV).ceil();
-        var blocksPerLineForMcu = mcusPerLine * component.h;
-        var blocksPerColumnForMcu = mcusPerColumn * component.v;
-        var blocks = [];
+        int blocksPerLine = ((frame.samplesPerLine / 8).ceil() * component.h / maxH).ceil();
+        int blocksPerColumn = ((frame.scanLines / 8).ceil() * component.v / maxV).ceil();
+        int blocksPerLineForMcu = mcusPerLine * component.h;
+        int blocksPerColumnForMcu = mcusPerColumn * component.v;
+        List blocks = [];
         for (var i = 0; i < blocksPerColumnForMcu; i++) {
-          var row = [];
+          List row = [];
           for (var j = 0; j < blocksPerLineForMcu; j++) {
             row.add(new Data.Int32List(64));
           }
@@ -66,7 +66,7 @@ class JpegDecoder {
     var fileMarker = bytes.readUint16();
 
     if (fileMarker != 0xFFD8) { // SOI (Start of Image)
-      throw "SOI not found";
+      throw 'SOI not found';
     }
 
     fileMarker = bytes.readUint16();
@@ -139,7 +139,7 @@ class JpegDecoder {
                 tableData[z] = bytes.readUint16();
               }
             } else {
-              throw "DQT: invalid table spec";
+              throw 'DQT: invalid table spec';
             }
             var i = quantizationTableSpec & 15;
             if (quantizationTables.length <= i) {
@@ -239,18 +239,18 @@ class JpegDecoder {
             bytes.position -= 3;
             break;
           }
-          throw "unknown JPEG marker " + fileMarker;
+          throw 'unknown JPEG marker ' + fileMarker;
       }
       fileMarker = bytes.readUint16();
     }
 
     if (frames.length != 1) {
-      throw "only single frame JPEGs supported";
+      throw 'only single frame JPEGs supported';
     }
 
     int width = frame.samplesPerLine;
     int height = frame.scanLines;
-    Image image = new Image(width, height, Image.RGB);
+    Image image = new Image(width, height);
 
     var jpeg = {
       'jfif': jfif,
@@ -607,7 +607,7 @@ class JpegDecoder {
               }
             } else {
               if (s != 1) {
-                throw "invalid ACn encoding";
+                throw 'invalid ACn encoding';
               }
               successiveACNextValue = receiveAndExtend(s);
               successiveACState = r != 0 ? 2 : 3;
@@ -725,7 +725,7 @@ class JpegDecoder {
       bitsCount = 0;
       marker = (bytes.peakAtOffset(0) << 8) | bytes.peakAtOffset(1);
       if (marker <= 0xFF00) {
-        throw "marker was not found";
+        throw 'marker was not found';
       }
 
       if (marker >= 0xFFD0 && marker <= 0xFFD7) { // RSTx
