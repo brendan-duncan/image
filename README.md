@@ -6,7 +6,7 @@ manipulate, and save various image file formats.
 Simple usage example to load a jpeg, resize it, and save it as a jpeg.
 
     import 'dart:io' as Io;
-    import 'package:dart_image/image.dart' as Image;
+    import 'package:dart_image/image.dart';
     main() {
       Io.File file = new Io.File('res/cat-eye04.jpg');
       file.openSync();
@@ -15,12 +15,12 @@ Simple usage example to load a jpeg, resize it, and save it as a jpeg.
         return;
       }
     
-      var jpegDecode = new Image.JpegDecoder();
+      var jpegDecode = new JpegDecoder();
       var image = jpegDecode.decode(bytes);
     
       var thumbnail = image.resized(image.width ~/ 2, image.height ~/ 2);
     
-      var jpegEncode = new Image.JpegEncoder(100);
+      var jpegEncode = new JpegEncoder(100);
       var jpeg = jpegEncode.encode(thumbnail);
     
       Io.File fp = new Io.File('res/thumbnail-cat-eye04.jpg');
