@@ -1,4 +1,5 @@
-name: dart_gd
+name: dart_image
 author: Brendan Duncan
 version: 1.0.0
-description: The GD library aims to provide similar functionality for server-side programs that the PHP GD library provides for image io and manipulation.  It can encode/decode various image formats and provides basic image drawing and manipulation functions.
+homepage: http://bitbucket.org/brendan_duncan/dart_image
+description: The image library aims to provide server-side programs the ability to load, manipulate, and save various image file formats.

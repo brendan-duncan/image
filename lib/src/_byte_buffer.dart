@@ -1,4 +1,4 @@
-part of gd;
+part of image;
 
 class _ByteBuffer {
   final List<int> buffer;

@@ -1,4 +1,4 @@
-part of gd;
+part of image;
 
 /**
  * An image buffer.

@@ -1,4 +1,4 @@
-part of gd;
+part of image;
 
 /**
  * Encode a TGA image.  Used for debugging since TGA format isn't used much

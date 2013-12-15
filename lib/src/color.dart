@@ -1,4 +1,4 @@
-part of gd;
+part of image;
 
 int color(int r, int g, int b, [int a = 255]) {
   return ((r & 0xFF) << 24) |
