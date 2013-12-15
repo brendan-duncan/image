@@ -1,5 +1,5 @@
 name: dart_image
-author: Brendan Duncan
+author: Brendan Duncan (brendanduncan@gmail.com)
 version: 1.0.0
 homepage: http://bitbucket.org/brendan_duncan/dart_image
 description: The image library aims to provide server-side programs the ability to load, manipulate, and save various image file formats.

@@ -2,7 +2,7 @@
  * The image library aims to provide server-side programs the ability to load,
  * manipulate, and save various image file formats.
  */
-library image;
+library dart_image;
 
 import 'dart:typed_data' as Data;
 

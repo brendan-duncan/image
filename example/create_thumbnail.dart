@@ -1,5 +1,5 @@
 import 'dart:io' as Io;
-import '../lib/image.dart';
+import 'package:dart_image/dart_image.dart';
 
 /**
  * Load a JPEG file and save out a resized thumbnail.

@@ -1,4 +1,4 @@
-part of image;
+part of dart_image;
 
 /**
  * Encode a TGA image.  Used for debugging since TGA format isn't used much

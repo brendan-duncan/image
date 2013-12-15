@@ -1,4 +1,4 @@
-part of image;
+part of dart_image;
 
 /**
  * Encode a jpeg image.
