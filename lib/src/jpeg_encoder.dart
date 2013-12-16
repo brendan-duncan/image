@@ -74,9 +74,9 @@ class JpegEncoder {
           }
 
           int c = image.getPixel(x2, y2);
-          int r = red(c);
-          int g = green(c);
-          int b = blue(c);
+          int r = getRed(c);
+          int g = getGreen(c);
+          int b = getBlue(c);
 
           // calculate YUV values
           YDU[pos] = ((RGB_YUV_TABLE[r] +

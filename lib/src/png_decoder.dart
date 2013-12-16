@@ -4,6 +4,12 @@ part of dart_image;
  * Decode a PNG encoded image.
  */
 class PngDecoder {
+  static const int FILTER_NONE = 0;
+  static const int FILTER_SUB = 1;
+  static const int FILTER_UP = 2;
+  static const int FILTER_AVERAGE = 3;
+  static const int FILTER_PAETH = 4;
+
   Image decode(List<int> data) {
     _ByteBuffer bytes = new _ByteBuffer.fromList(data);
 
@@ -26,15 +32,21 @@ class PngDecoder {
     }
 
     // Chunk Types:
+    //
+    // Primary chunks
+    //
     // IHDR must be the first chunk; it contains the image's width, height,
-    //      and bit depth.[10]
+    //      and bit depth.
     // PLTE contains the palette; list of colors.
     // IDAT contains the image, which may be split among multiple IDAT chunks.
     //      Such splitting increases filesize slightly, but makes it possible
     //      to generate a PNG in a streaming manner. The IDAT chunk contains
     //      the actual image data, which is the output stream of the
-    //       compression algorithm.[11]
+    //       compression algorithm.
     // IEND marks the image end.
+    //
+    // Secondary chunks
+    //
     // bKGD gives the default background color. It is intended for use when
     //      there is no better choice available, such as in standalone image
     //      viewers (but not web browsers; see below for more details).
@@ -63,7 +75,6 @@ class PngDecoder {
     while (true) {
       int chunkSize = bytes.readUInt32();
       String section = new String.fromCharCodes(bytes.readBytes(4));
-
       switch (section) {
         case 'IHDR':
           header = new _PngHeader();
@@ -74,6 +85,16 @@ class PngDecoder {
           header.compressionMethod = bytes.readByte();
           header.filterMethod = bytes.readByte();
           header.interlaceMethod = bytes.readByte();
+
+          if (header.bits != 8) {
+            throw 'Only 24-bit or 32-bit PNG images supported.';
+          }
+          if (header.colorType != 2 && header.colorType != 6) {
+            throw 'Only RGB or RGBA PNG images supported.';
+          }
+          if (header.interlaceMethod != 0) {
+            throw 'Only non-interlaced PNG images supported.';
+          }
 
           int format = (header.colorType == 2) ? Image.RGB : Image.RGBA;
           image = new Image(header.width, header.height, format);
@@ -141,7 +162,7 @@ class PngDecoder {
       }
 
       // CRC
-      bytes.skip(4);
+      int crc = bytes.readUInt32();
 
       if (bytes.isEOF) {
         throw 'Incomplete or corrupt PNG file';
@@ -166,68 +187,68 @@ class PngDecoder {
     while (!bytes.isEOF) {
       int code = bytes.readByte();
       switch (code) {
-        case 0: // None
+        case FILTER_NONE:
           for (int i = 0; i < header.width; i++) {
-            image.buffer[pi++] = colorFromList(bytes.readBytes(pixelBytes));
+            image.buffer[pi++] = getColorFromList(bytes.readBytes(pixelBytes));
           }
           break;
-        case 1: // Sub
+        case FILTER_SUB:
           for (int i = 0; i < header.width; i++) {
-            int x = colorFromList(bytes.readBytes(pixelBytes));
+            int x = getColorFromList(bytes.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image.buffer[pi - 1];
-            image.buffer[pi++] = color((red(x) + red(a)) % 256,
-                                       (green(x) + green(a)) % 256,
-                                       (blue(x) + blue(a)) % 256,
-                                       (alpha(x) + alpha(a)) % 256);
+            image.buffer[pi++] = getColor((getRed(x) + getRed(a)) % 256,
+                                          (getGreen(x) + getGreen(a)) % 256,
+                                          (getBlue(x) + getBlue(a)) % 256,
+                                          (getAlpha(x) + getAlpha(a)) % 256);
           }
           break;
-        case 2: // Up
+        case FILTER_UP:
           for (int i = 0; i < header.width; i++) {
-            int x = colorFromList(bytes.readBytes(pixelBytes));
+            int x = getColorFromList(bytes.readBytes(pixelBytes));
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
-            image.buffer[pi++] = color((red(x) + red(b)) % 256,
-                                       (green(x) + green(b)) % 256,
-                                       (blue(x) + blue(b)) % 256,
-                                       (alpha(x) + alpha(b)) % 256);
+            image.buffer[pi++] = getColor((getRed(x) + getRed(b)) % 256,
+                                          (getGreen(x) + getGreen(b)) % 256,
+                                          (getBlue(x) + getBlue(b)) % 256,
+                                          (getAlpha(x) + getAlpha(b)) % 256);
           }
           break;
-        case 3: // Average
+        case FILTER_AVERAGE:
           for (int i = 0; i < header.width; i++) {
-            int x = colorFromList(bytes.readBytes(pixelBytes));
+            int x = getColorFromList(bytes.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image.buffer[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
-            int ra = red(a);
-            int rb = red(b);
-            int ga = green(a);
-            int gb = green(b);
-            int ba = blue(a);
-            int bb = blue(b);
-            int aa = alpha(a);
-            int ab = alpha(b);
-            image.buffer[pi++] = color((red(x) + ((ra + rb) ~/ 2)) % 256,
-                                       (green(x) + ((ga + gb) ~/ 2)) % 256,
-                                       (blue(x) + ((ba + bb) ~/ 2)) % 256,
-                                       (alpha(x) + ((aa + ab) ~/ 2)) % 256);
+            int ra = getRed(a);
+            int rb = getRed(b);
+            int ga = getGreen(a);
+            int gb = getGreen(b);
+            int ba = getBlue(a);
+            int bb = getBlue(b);
+            int aa = getAlpha(a);
+            int ab = getAlpha(b);
+            image.buffer[pi++] = getColor((getRed(x) + ((ra + rb) ~/ 2)) % 256,
+                                          (getGreen(x) + ((ga + gb) ~/ 2)) % 256,
+                                          (getBlue(x) + ((ba + bb) ~/ 2)) % 256,
+                                          (getAlpha(x) + ((aa + ab) ~/ 2)) % 256);
           }
           break;
-        case 4: // Paeth
+        case FILTER_PAETH:
           for (int i = 0; i < header.width; i++) {
-            int x = colorFromList(bytes.readBytes(pixelBytes));
+            int x = getColorFromList(bytes.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image.buffer[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             int c = (i == 0 || row == 0) ? 0 : image.getPixel(i - 1, row - 1);
-            int ra = red(a);
-            int rb = red(b);
-            int rc = red(c);
-            int ga = green(a);
-            int gb = green(b);
-            int gc = green(c);
-            int ba = blue(a);
-            int bb = blue(b);
-            int bc = blue(c);
-            int aa = alpha(a);
-            int ab = alpha(b);
-            int ac = alpha(c);
+            int ra = getRed(a);
+            int rb = getRed(b);
+            int rc = getRed(c);
+            int ga = getGreen(a);
+            int gb = getGreen(b);
+            int gc = getGreen(c);
+            int ba = getBlue(a);
+            int bb = getBlue(b);
+            int bc = getBlue(c);
+            int aa = getAlpha(a);
+            int ab = getAlpha(b);
+            int ac = getAlpha(c);
 
             int pr = ra + rb - rc;
             int pg = ga + gb - gc;
@@ -283,10 +304,10 @@ class PngDecoder {
               apaeth = ac;
             }
 
-            image.buffer[pi++] = color((red(x) + rpaeth) % 256,
-                                       (green(x) + gpaeth) % 256,
-                                       (blue(x) + bpaeth) % 256,
-                                       (alpha(x) + apaeth) % 256);
+            image.buffer[pi++] = getColor((getRed(x) + rpaeth) % 256,
+                                          (getGreen(x) + gpaeth) % 256,
+                                          (getBlue(x) + bpaeth) % 256,
+                                          (getAlpha(x) + apaeth) % 256);
           }
           break;
         default:

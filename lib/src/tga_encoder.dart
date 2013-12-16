@@ -25,9 +25,9 @@ class TgaEncoder {
     for (int y = image.height - 1; y >= 0; --y) {
       for (int x = 0; x < image.width; ++x) {
         int c = image.getPixel(x, y);
-        int r = red(c);
-        int g = green(c);
-        int b = blue(c);
+        int r = getRed(c);
+        int g = getGreen(c);
+        int b = getBlue(c);
         out.writeByte(b);
         out.writeByte(g);
         out.writeByte(r);

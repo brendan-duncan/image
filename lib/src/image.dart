@@ -78,6 +78,6 @@ class Image {
   }
 
   void setPixelRGBA(int x, int y, int r, int g, int b, [int a = 255]) {
-    buffer[y * width + x] = color(r, g, b, a);
+    buffer[y * width + x] = getColor(r, g, b, a);
   }
 }

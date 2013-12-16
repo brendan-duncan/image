@@ -8,9 +8,6 @@ main() {
   Io.File file = new Io.File('res/cat-eye04.jpg');
   file.openSync();
   var bytes = file.readAsBytesSync();
-  if (bytes == null) {
-    return;
-  }
 
   var jpegDecode = new JpegDecoder();
   var image = jpegDecode.decode(bytes);
@@ -47,11 +44,24 @@ main() {
   if (bytes == null) {
     return;
   }
-
   image = pngDecode.decode(bytes);
 
   jpeg = jpegEncode.encode(image);
   fp = new Io.File('res/out-alpha_edge.jpg');
   fp.createSync(recursive: true);
   fp.writeAsBytesSync(jpeg);
+
+  var pngEncode = new PngEncoder();
+  var png = pngEncode.encode(image);
+  fp = new Io.File('res/out-alpha_edge.png');
+  fp.createSync(recursive: true);
+  fp.writeAsBytesSync(png);
+
+  file = new Io.File('res/out-alpha_edge.png');
+  file.openSync();
+  bytes = file.readAsBytesSync();
+  if (bytes == null) {
+    return;
+  }
+  image = pngDecode.decode(bytes);
 }
