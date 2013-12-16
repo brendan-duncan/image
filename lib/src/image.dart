@@ -6,8 +6,12 @@ part of dart_image;
  * color for a pixel.
  */
 class Image {
+  static const int RGB = 3;
+  static const int RGBA = 4;
+
   final int width;
   final int height;
+  final int format;
   /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
   /// channel.
   final Data.Uint32List buffer;
@@ -15,7 +19,7 @@ class Image {
   /**
    * Create an image with the given dimensions and format.
    */
-  Image(int width, int height) :
+  Image(int width, int height, this.format) :
     this.width = width,
     this.height = height,
     buffer = new Data.Uint32List(width * height) {
@@ -30,6 +34,7 @@ class Image {
   Image.from(Image other) :
     width = other.width,
     height = other.height,
+    format = other.format,
     buffer = new Data.Uint32List.fromList(other.buffer);
 
 
@@ -42,7 +47,7 @@ class Image {
       throw new Exception('Invalid size');
     }
 
-    Image newImage = new Image(width, height);
+    Image newImage = new Image(width, height, format);
 
     double dy = this.height / height;
     double dx = this.width / width;

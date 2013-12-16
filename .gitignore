@@ -2,3 +2,6 @@ pubspec.lock
 example/packages/
 example/res/packages/
 packages/
+example/res/out-alpha_edge.jpg
+example/res/out-trees.jpg
+example/res/thumbnail-cat-eye04.jpg

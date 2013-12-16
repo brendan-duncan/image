@@ -23,4 +23,35 @@ main() {
   Io.File fp = new Io.File('res/thumbnail-cat-eye04.jpg');
   fp.createSync(recursive: true);
   fp.writeAsBytesSync(jpeg);
+
+  var pngDecode = new PngDecoder();
+
+  file = new Io.File('res/trees.png');
+  file.openSync();
+  bytes = file.readAsBytesSync();
+  if (bytes == null) {
+    return;
+  }
+
+  image = pngDecode.decode(bytes);
+
+  jpeg = jpegEncode.encode(image);
+  fp = new Io.File('res/out-trees.jpg');
+  fp.createSync(recursive: true);
+  fp.writeAsBytesSync(jpeg);
+
+
+  file = new Io.File('res/alpha_edge.png');
+  file.openSync();
+  bytes = file.readAsBytesSync();
+  if (bytes == null) {
+    return;
+  }
+
+  image = pngDecode.decode(bytes);
+
+  jpeg = jpegEncode.encode(image);
+  fp = new Io.File('res/out-alpha_edge.jpg');
+  fp.createSync(recursive: true);
+  fp.writeAsBytesSync(jpeg);
 }

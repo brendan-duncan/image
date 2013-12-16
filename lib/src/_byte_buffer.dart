@@ -13,14 +13,34 @@ class _ByteBuffer {
 
   int get length => buffer.length;
 
+  bool get isEOF => position >= buffer.length;
+
   int readByte() {
     return buffer[position++];
+  }
+
+  List<int> readBytes(int count) {
+    List<int> bytes = buffer.sublist(position, position + count);
+    position += bytes.length;
+    return bytes;
+  }
+
+  void skip(int count) {
+    position += count;
   }
 
   int readUint16() {
     int value = (buffer[position] << 8) | buffer[position + 1];
     position += 2;
     return value;
+  }
+
+  int readUInt32() {
+    int b1 = buffer[position++];
+    int b2 = buffer[position++];
+    int b3 = buffer[position++];
+    int b4 = buffer[position++];
+    return (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
   }
 
   List<int> readBlock() {
@@ -64,7 +84,14 @@ class _ByteBuffer {
     }
   }
 
-  writeWord(int value) {
+  writeUint16(int value) {
+    writeByte((value >> 8) & 0xFF);
+    writeByte((value) & 0xFF);
+  }
+
+  void writeUint32(int value) {
+    writeByte((value >> 24) & 0xFF);
+    writeByte((value >> 16) & 0xFF);
     writeByte((value >> 8) & 0xFF);
     writeByte((value) & 0xFF);
   }

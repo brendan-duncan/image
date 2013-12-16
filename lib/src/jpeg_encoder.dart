@@ -1,7 +1,7 @@
 part of dart_image;
 
 /**
- * Encode a jpeg image.
+ * Encode an image to the JPEG format.
  *
  * Derived from:
  * https://github.com/owencm/javascript-jpeg-encoder
@@ -36,7 +36,7 @@ class JpegEncoder {
     _ByteBuffer out = new _ByteBuffer();
 
     // Add JPEG headers
-    out.writeWord(0xFFD8); // SOI
+    out.writeUint16(0xFFD8); // SOI
     _writeAPP0(out);
     _writeDQT(out);
     _writeSOF0(out, image.width, image.height);
@@ -111,7 +111,7 @@ class JpegEncoder {
       out.writeBits(fillbits);
     }
 
-    out.writeWord(0xFFD9); //EOI
+    out.writeUint16(0xFFD9); //EOI
 
     return out.buffer;
   }
@@ -457,8 +457,8 @@ class JpegEncoder {
   }
 
   void _writeAPP0(_ByteBuffer out) {
-    out.writeWord(0xFFE0); // marker
-    out.writeWord(16); // length
+    out.writeUint16(0xFFE0); // marker
+    out.writeUint16(16); // length
     out.writeByte(0x4A); // J
     out.writeByte(0x46); // F
     out.writeByte(0x49); // I
@@ -467,18 +467,18 @@ class JpegEncoder {
     out.writeByte(1); // versionhi
     out.writeByte(1); // versionlo
     out.writeByte(0); // xyunits
-    out.writeWord(1); // xdensity
-    out.writeWord(1); // ydensity
+    out.writeUint16(1); // xdensity
+    out.writeUint16(1); // ydensity
     out.writeByte(0); // thumbnwidth
     out.writeByte(0); // thumbnheight
   }
 
   void _writeSOF0(_ByteBuffer out, int width, int height) {
-    out.writeWord(0xFFC0); // marker
-    out.writeWord(17);   // length, truecolor YUV JPG
+    out.writeUint16(0xFFC0); // marker
+    out.writeUint16(17);   // length, truecolor YUV JPG
     out.writeByte(8);    // precision
-    out.writeWord(height);
-    out.writeWord(width);
+    out.writeUint16(height);
+    out.writeUint16(width);
     out.writeByte(3);    // nrofcomponents
     out.writeByte(1);    // IdY
     out.writeByte(0x11); // HVY
@@ -492,8 +492,8 @@ class JpegEncoder {
   }
 
   void _writeDQT(_ByteBuffer out) {
-    out.writeWord(0xFFDB); // marker
-    out.writeWord(132); // length
+    out.writeUint16(0xFFDB); // marker
+    out.writeUint16(132); // length
     out.writeByte(0);
     for (int i = 0; i < 64; i++) {
       out.writeByte(YTable[i]);
@@ -505,8 +505,8 @@ class JpegEncoder {
   }
 
   void _writeDHT(_ByteBuffer out) {
-    out.writeWord(0xFFC4); // marker
-    out.writeWord(0x01A2); // length
+    out.writeUint16(0xFFC4); // marker
+    out.writeUint16(0x01A2); // length
 
     out.writeByte(0); // HTYDCinfo
     for (int i = 0; i < 16; i++) {
@@ -542,8 +542,8 @@ class JpegEncoder {
   }
 
   _writeSOS(_ByteBuffer out) {
-    out.writeWord(0xFFDA); // marker
-    out.writeWord(12); // length
+    out.writeUint16(0xFFDA); // marker
+    out.writeUint16(12); // length
     out.writeByte(3); // nrofcomponents
     out.writeByte(1); // IdY
     out.writeByte(0); // HTY

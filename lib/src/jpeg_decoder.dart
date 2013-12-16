@@ -10,7 +10,7 @@ class JpegDecoder {
   Image decode(List<int> data) {
     _ByteBuffer bytes = new _ByteBuffer.fromList(data);
 
-    prepareComponents(_JpegFrame frame) {
+    void prepareComponents(_JpegFrame frame) {
       int maxH = 0;
       int maxV = 0;
       _JpegComponent component;
@@ -250,7 +250,7 @@ class JpegDecoder {
 
     int width = frame.samplesPerLine;
     int height = frame.scanLines;
-    Image image = new Image(width, height);
+    Image image = new Image(width, height, Image.RGB);
 
     var jpeg = {
       'jfif': jfif,
