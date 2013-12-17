@@ -5,7 +5,7 @@ import 'package:dart_image/dart_image.dart';
  * Load a JPEG file and save out a resized thumbnail.
  */
 main() {
-  Io.File file = new Io.File('res/diamond_plate_texture.jpg');
+  Io.File file = new Io.File('res/cat-eye04.jpg');
   file.openSync();
   var bytes = file.readAsBytesSync();
 
@@ -17,7 +17,7 @@ main() {
   var jpegEncode = new JpegEncoder(100);
   var jpeg = jpegEncode.encode(thumbnail);
 
-  Io.File fp = new Io.File('res/thumbnail-diamond_plate_texture.jpg');
+  Io.File fp = new Io.File('res/thumbnail-cat-eye04.jpg');
   fp.createSync(recursive: true);
   fp.writeAsBytesSync(jpeg);
 
