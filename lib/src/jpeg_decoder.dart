@@ -263,7 +263,7 @@ class JpegDecoder {
       components.add({
         'scaleX': component.h / frame.maxH,
         'scaleY': component.v / frame.maxV,
-        'lines': buildComponentData(frame, component)
+        'lines': _buildComponentData(frame, component)
       });
     }
     jpeg['components'] = components;
@@ -311,9 +311,9 @@ class JpegDecoder {
             Y = data[i++];
             K = data[i++];
 
-            R = 255 - clampTo8bit(C * (1 - K / 255) + K);
-            G = 255 - clampTo8bit(M * (1 - K / 255) + K);
-            B = 255 - clampTo8bit(Y * (1 - K / 255) + K);
+            R = 255 - _clampTo8bit(C * (1 - K / 255) + K);
+            G = 255 - _clampTo8bit(M * (1 - K / 255) + K);
+            B = 255 - _clampTo8bit(Y * (1 - K / 255) + K);
 
             imageDataArray[j++] = getColor(R, G, B, 255);
           }
@@ -395,9 +395,9 @@ class JpegDecoder {
               Cb = component2Line[(x * component2['scaleX'] * scaleX).toInt()];
               Cr = component3Line[(x * component3['scaleX'] * scaleX).toInt()];
 
-              R = clampTo8bit(Y + 1.402 * (Cr - 128));
-              G = clampTo8bit(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
-              B = clampTo8bit(Y + 1.772 * (Cb - 128));
+              R = _clampTo8bit(Y + 1.402 * (Cr - 128));
+              G = _clampTo8bit(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
+              B = _clampTo8bit(Y + 1.772 * (Cb - 128));
             }
 
             data[offset++] = R.toInt();
@@ -438,9 +438,9 @@ class JpegDecoder {
               Cr = component3Line[0 | (x * component3['scaleX'] * scaleX)];
               K = component4Line[0 | (x * component4['scaleX'] * scaleX)];
 
-              C = 255 - clampTo8bit(Y + 1.402 * (Cr - 128));
-              M = 255 - clampTo8bit(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
-              Ye = 255 - clampTo8bit(Y + 1.772 * (Cb - 128));
+              C = 255 - _clampTo8bit(Y + 1.402 * (Cr - 128));
+              M = 255 - _clampTo8bit(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
+              Ye = 255 - _clampTo8bit(Y + 1.772 * (Cb - 128));
             }
             data[offset++] = C;
             data[offset++] = M;
@@ -491,7 +491,7 @@ class JpegDecoder {
       return bitsData >> 7;
     }
 
-    int decodeHuffman(tree) {
+    int _decodeHuffman(tree) {
       var node = tree;
       int bit;
       while ((bit = readBit()) != null) {
@@ -504,7 +504,7 @@ class JpegDecoder {
       return null;
     }
 
-    int receive(length) {
+    int _receive(length) {
       int  n = 0;
       while (length > 0) {
         int bit = readBit();
@@ -517,21 +517,21 @@ class JpegDecoder {
       return n;
     }
 
-    receiveAndExtend(int length) {
-      int n = receive(length);
+    int _receiveAndExtend(int length) {
+      int n = _receive(length);
       if (n >= 1 << (length - 1)) {
         return n;
       }
       return n + (-1 << length) + 1;
     }
 
-    void decodeBaseline(_JpegComponent component, List zz) {
-      int t = decodeHuffman(component.huffmanTableDC);
-      int diff = t == 0 ? 0 : receiveAndExtend(t);
+    void _decodeBaseline(_JpegComponent component, List zz) {
+      int t = _decodeHuffman(component.huffmanTableDC);
+      int diff = t == 0 ? 0 : _receiveAndExtend(t);
       zz[0] = (component.pred += diff);
       int k = 1;
       while (k < 64) {
-        var rs = decodeHuffman(component.huffmanTableAC);
+        var rs = _decodeHuffman(component.huffmanTableAC);
         int s = rs & 15;
         int r = rs >> 4;
         if (s == 0) {
@@ -542,24 +542,24 @@ class JpegDecoder {
         }
         k += r;
         int z = _dctZigZag[k];
-        zz[z] = receiveAndExtend(s);
+        zz[z] = _receiveAndExtend(s);
         k++;
       }
     }
 
-    void decodeDCFirst(_JpegComponent component, List zz) {
-      var t = decodeHuffman(component.huffmanTableDC);
-      int diff = (t == 0) ? 0 : (receiveAndExtend(t) << successive);
+    void _decodeDCFirst(_JpegComponent component, List zz) {
+      var t = _decodeHuffman(component.huffmanTableDC);
+      int diff = (t == 0) ? 0 : (_receiveAndExtend(t) << successive);
       zz[0] = (component.pred += diff);
     }
 
-    void decodeDCSuccessive(_JpegComponent component, List zz) {
+    void _decodeDCSuccessive(_JpegComponent component, List zz) {
       zz[0] |= readBit() << successive;
     }
 
     int eobrun = 0;
 
-    void decodeACFirst(_JpegComponent component, List zz) {
+    void _decodeACFirst(_JpegComponent component, List zz) {
       if (eobrun > 0) {
         eobrun--;
         return;
@@ -567,11 +567,11 @@ class JpegDecoder {
       int k = spectralStart;
       int e = spectralEnd;
       while (k <= e) {
-        int rs = decodeHuffman(component.huffmanTableAC);
+        int rs = _decodeHuffman(component.huffmanTableAC);
         int s = rs & 15, r = rs >> 4;
         if (s == 0) {
           if (r < 15) {
-            eobrun = receive(r) + (1 << r) - 1;
+            eobrun = _receive(r) + (1 << r) - 1;
             break;
           }
           k += 16;
@@ -579,14 +579,14 @@ class JpegDecoder {
         }
         k += r;
         int z = _dctZigZag[k];
-        zz[z] = receiveAndExtend(s) * (1 << successive);
+        zz[z] = _receiveAndExtend(s) * (1 << successive);
         k++;
       }
     }
 
     int successiveACState = 0, successiveACNextValue;
 
-    void decodeACSuccessive(_JpegComponent component, zz) {
+    void _decodeACSuccessive(_JpegComponent component, zz) {
       int k = spectralStart;
       int e = spectralEnd;
       int r = 0;
@@ -594,12 +594,12 @@ class JpegDecoder {
         int z = _dctZigZag[k];
         switch (successiveACState) {
           case 0: // initial state
-            int rs = decodeHuffman(component.huffmanTableAC);
+            int rs = _decodeHuffman(component.huffmanTableAC);
             int s = rs & 15;
             int r = rs >> 4;
             if (s == 0) {
               if (r < 15) {
-                eobrun = receive(r) + (1 << r);
+                eobrun = _receive(r) + (1 << r);
                 successiveACState = 4;
               } else {
                 r = 16;
@@ -609,7 +609,7 @@ class JpegDecoder {
               if (s != 1) {
                 throw 'invalid ACn encoding';
               }
-              successiveACNextValue = receiveAndExtend(s);
+              successiveACNextValue = _receiveAndExtend(s);
               successiveACState = r != 0 ? 2 : 3;
             }
             continue;
@@ -648,18 +648,19 @@ class JpegDecoder {
       }
     }
 
-    void decodeMcu(_JpegComponent component, decode, mcu, row, col) {
-      var mcuRow = (mcu / mcusPerLine).toInt();
-      var mcuCol = mcu % mcusPerLine;
-      var blockRow = mcuRow * component.v + row;
-      var blockCol = mcuCol * component.h + col;
-      decode(component, component.blocks[blockRow][blockCol]);
+    void _decodeMcu(_JpegComponent component, decodeFn,
+                    int mcu, int row, int col) {
+      int mcuRow = (mcu / mcusPerLine).toInt();
+      int mcuCol = mcu % mcusPerLine;
+      int blockRow = mcuRow * component.v + row;
+      int blockCol = mcuCol * component.h + col;
+      decodeFn(component, component.blocks[blockRow][blockCol]);
     }
 
-    void decodeBlock(_JpegComponent component, decode, mcu) {
-      var blockRow = (mcu / component.blocksPerLine).toInt();
-      var blockCol = mcu % component.blocksPerLine;
-      decode(component, component.blocks[blockRow][blockCol]);
+    void _decodeBlock(_JpegComponent component, decodeFn, int mcu) {
+      int blockRow = mcu ~/ component.blocksPerLine;
+      int blockCol = mcu % component.blocksPerLine;
+      decodeFn(component, component.blocks[blockRow][blockCol]);
     }
 
     int componentsLength = components.length;
@@ -669,12 +670,12 @@ class JpegDecoder {
 
     if (progressive) {
       if (spectralStart == 0) {
-        decodeFn = successivePrev == 0 ? decodeDCFirst : decodeDCSuccessive;
+        decodeFn = successivePrev == 0 ? _decodeDCFirst : _decodeDCSuccessive;
       } else {
-        decodeFn = successivePrev == 0 ? decodeACFirst : decodeACSuccessive;
+        decodeFn = successivePrev == 0 ? _decodeACFirst : _decodeACSuccessive;
       }
     } else {
-      decodeFn = decodeBaseline;
+      decodeFn = _decodeBaseline;
     }
 
     int mcu = 0;
@@ -702,7 +703,7 @@ class JpegDecoder {
       if (componentsLength == 1) {
         component = components[0];
         for (n = 0; n < resetInterval; n++) {
-          decodeBlock(component, decodeFn, mcu);
+          _decodeBlock(component, decodeFn, mcu);
           mcu++;
         }
       } else {
@@ -713,7 +714,7 @@ class JpegDecoder {
             v = component.v;
             for (j = 0; j < v; j++) {
               for (k = 0; k < h; k++) {
-                decodeMcu(component, decodeFn, mcu, j, k);
+                _decodeMcu(component, decodeFn, mcu, j, k);
               }
             }
           }
@@ -736,7 +737,7 @@ class JpegDecoder {
     }
   }
 
-  List buildComponentData(_JpegFrame frame, _JpegComponent component) {
+  List _buildComponentData(_JpegFrame frame, _JpegComponent component) {
     List lines = [];
     int blocksPerLine = component.blocksPerLine;
     int blocksPerColumn = component.blocksPerColumn;
@@ -928,7 +929,7 @@ class JpegDecoder {
     return lines;
   }
 
-  int clampTo8bit(num a) {
+  int _clampTo8bit(num a) {
     int i = a.toInt();
     return i < 0 ? 0 : i > 255 ? 255 : i;
   }
