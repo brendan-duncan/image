@@ -7,52 +7,11 @@ part of dart_image;
  * https://github.com/notmasteryet/jpgjs
  */
 class JpegDecoder {
+  Stopwatch timer = new Stopwatch();
+
   Image decode(List<int> data) {
+    timer.start();
     _ByteBuffer bytes = new _ByteBuffer.fromList(data);
-
-    void prepareComponents(_JpegFrame frame) {
-      int maxH = 0;
-      int maxV = 0;
-      _JpegComponent component;
-      int componentId;
-
-      for (componentId in frame.components.keys) {
-        component = frame.components[componentId];
-        if (maxH < component.h) {
-          maxH = component.h;
-        }
-        if (maxV < component.v) {
-          maxV = component.v;
-        }
-      }
-
-      int mcusPerLine = (frame.samplesPerLine / 8 / maxH).ceil();
-      int mcusPerColumn = (frame.scanLines / 8 / maxV).ceil();
-
-      for (componentId in frame.components.keys) {
-        component = frame.components[componentId];
-        int blocksPerLine = ((frame.samplesPerLine / 8).ceil() * component.h / maxH).ceil();
-        int blocksPerColumn = ((frame.scanLines / 8).ceil() * component.v / maxV).ceil();
-        int blocksPerLineForMcu = mcusPerLine * component.h;
-        int blocksPerColumnForMcu = mcusPerColumn * component.v;
-        List blocks = [];
-        for (var i = 0; i < blocksPerColumnForMcu; i++) {
-          List row = [];
-          for (var j = 0; j < blocksPerLineForMcu; j++) {
-            row.add(new Data.Int32List(64));
-          }
-          blocks.add(row);
-        }
-        component.blocksPerLine = blocksPerLine;
-        component.blocksPerColumn = blocksPerColumn;
-        component.blocks = blocks;
-      }
-
-      frame.maxH = maxH;
-      frame.maxV = maxV;
-      frame.mcusPerLine = mcusPerLine;
-      frame.mcusPerColumn = mcusPerColumn;
-    }
 
     var jfif = null;
     var adobe = null;
@@ -63,14 +22,15 @@ class JpegDecoder {
     List<_JpegFrame> frames = [];
     var huffmanTablesAC = [];
     var huffmanTablesDC = [];
-    var fileMarker = bytes.readUint16();
 
+    var fileMarker = bytes.readUint16();
     if (fileMarker != 0xFFD8) { // SOI (Start of Image)
       throw 'SOI not found';
     }
 
+    Duration t1, t2;
     fileMarker = bytes.readUint16();
-    while (fileMarker != 0xFFD9) { // EOI (End of image)
+    while (fileMarker != 0xFFD9 && !bytes.isEOF) { // EOI (End of image)
       int i, j, l;
       switch(fileMarker) {
         case 0xFFE0: // APP0 (Application Specific)
@@ -90,12 +50,15 @@ class JpegDecoder {
         case 0xFFEE: // APP14
         case 0xFFEF: // APP15
         case 0xFFFE: // COM (Comment)
+          t1 = timer.elapsed;
           var appData = bytes.readBlock();
 
           if (fileMarker == 0xFFE0) {
             // 'JFIF\x00'
             if (appData[0] == 0x4A && appData[1] == 0x46 &&
                 appData[2] == 0x49 && appData[3] == 0x46 && appData[4] == 0) {
+              List<int> thumbData = appData.sublist(14,
+                                           14 + 3 * appData[12] * appData[13]);
               jfif = {
                 'version': { 'major': appData[5], 'minor': appData[6] },
                 'densityUnits': appData[7],
@@ -103,15 +66,17 @@ class JpegDecoder {
                 'yDensity': (appData[10] << 8) | appData[11],
                 'thumbWidth': appData[12],
                 'thumbHeight': appData[13],
-                'thumbData': appData.sublist(14, 14 + 3 * appData[12] * appData[13])
+                'thumbData': thumbData
               };
             }
           }
 
           // TODO APP1 - Exif
           if (fileMarker == 0xFFEE) {
-            if (appData[0] == 0x41 && appData[1] == 0x64 && appData[2] == 0x6F &&
-              appData[3] == 0x62 && appData[4] == 0x65 && appData[5] == 0) { // 'Adobe\x00'
+            // 'Adobe\x00'
+            if (appData[0] == 0x41 && appData[1] == 0x64 &&
+                appData[2] == 0x6F && appData[3] == 0x62 &&
+                appData[4] == 0x65 && appData[5] == 0) {
               adobe = {
                 'version': appData[6],
                 'flags0': (appData[7] << 8) | appData[8],
@@ -120,14 +85,17 @@ class JpegDecoder {
               };
             }
           }
+
+          t2 = timer.elapsed;
           break;
 
         case 0xFFDB: // DQT (Define Quantization Tables)
-          var quantizationTablesLength = bytes.readUint16();
-          var quantizationTablesEnd = quantizationTablesLength + bytes.position - 2;
+          t1 = timer.elapsed;
+          int quantizationTablesLength = bytes.readUint16();
+          int quantizationTablesEnd = quantizationTablesLength + bytes.position - 2;
           while (bytes.position < quantizationTablesEnd) {
-            var quantizationTableSpec = bytes.readByte();
-            var tableData = new Data.Int32List(64);
+            int quantizationTableSpec = bytes.readByte();
+            Data.Int32List tableData = new Data.Int32List(64);
             if ((quantizationTableSpec >> 4) == 0) { // 8 bit values
               for (j = 0; j < 64; j++) {
                 int z = _dctZigZag[j];
@@ -141,17 +109,19 @@ class JpegDecoder {
             } else {
               throw 'DQT: invalid table spec';
             }
-            var i = quantizationTableSpec & 15;
+            int i = quantizationTableSpec & 15;
             if (quantizationTables.length <= i) {
               quantizationTables.length = i + 1;
             }
             quantizationTables[i] = tableData;
           }
+          t2 = timer.elapsed;
           break;
 
         case 0xFFC0: // SOF0 (Start of Frame, Baseline DCT)
         case 0xFFC1: // SOF1 (Start of Frame, Extended DCT)
         case 0xFFC2: // SOF2 (Start of Frame, Progressive DCT)
+          t1 = timer.elapsed;
           bytes.readUint16(); // skip data length
           frame = new _JpegFrame();
 
@@ -168,19 +138,21 @@ class JpegDecoder {
           for (i = 0; i < componentsCount; i++) {
             componentId = bytes.readByte();
             int x = bytes.readByte();
-            var h = x >> 4;
-            var v = x & 15;
-            var qId = bytes.readByte();
+            int h = x >> 4;
+            int v = x & 15;
+            int qId = bytes.readByte();
             frame.componentsOrder.add(componentId);
             frame.components[componentId] =
                 new _JpegComponent(h, v, quantizationTables[qId]);
           }
-          prepareComponents(frame);
+          _prepareComponents(frame);
           frames.add(frame);
+          t2 = timer.elapsed;
           break;
 
         case 0xFFC4: // DHT (Define Huffman Tables)
-          var huffmanLength = bytes.readUint16();
+          t1 = timer.elapsed;
+          int huffmanLength = bytes.readUint16();
           for (i = 2; i < huffmanLength;) {
             var huffmanTableSpec = bytes.readByte();
             var codeLengths = new Data.Uint8List(16);
@@ -202,33 +174,37 @@ class JpegDecoder {
             l[huffmanTableSpec & 15] =
               _buildHuffmanTable(codeLengths, huffmanValues);
           }
+          t2 = timer.elapsed;
           break;
 
         case 0xFFDD: // DRI (Define Restart Interval)
+          t1 = timer.elapsed;
           bytes.readUint16(); // skip data length
           resetInterval = bytes.readUint16();
+          t2 = timer.elapsed;
           break;
 
         case 0xFFDA: // SOS (Start of Scan)
-          var scanLength = bytes.readUint16();
-          var selectorsCount = bytes.readByte();
-          var components = [];
-          _JpegComponent component;
+          t1 = timer.elapsed;
+          int scanLength = bytes.readUint16();
+          int selectorsCount = bytes.readByte();
+          List components = new List(selectorsCount);
           for (i = 0; i < selectorsCount; i++) {
-            component = frame.components[bytes.readByte()];
+            _JpegComponent component = frame.components[bytes.readByte()];
             int tableSpec = bytes.readByte();
             component.huffmanTableDC = huffmanTablesDC[tableSpec >> 4];
             component.huffmanTableAC = huffmanTablesAC[tableSpec & 15];
-            components.add(component);
+            components[i] = component;
           }
-          var spectralStart = bytes.readByte();
-          var spectralEnd = bytes.readByte();
-          var successiveApproximation = bytes.readByte();
+          int spectralStart = bytes.readByte();
+          int spectralEnd = bytes.readByte();
+          int successiveApproximation = bytes.readByte();
           _decodeScan(bytes,
                       frame, components, resetInterval,
                       spectralStart, spectralEnd,
                       successiveApproximation >> 4,
                       successiveApproximation & 15);
+          t2 = timer.elapsed;
           break;
         default:
           if (bytes.peakAtOffset(-3) == 0xFF &&
@@ -241,6 +217,7 @@ class JpegDecoder {
           }
           throw 'unknown JPEG marker ' + fileMarker;
       }
+
       fileMarker = bytes.readUint16();
     }
 
@@ -257,7 +234,7 @@ class JpegDecoder {
       'adobe': adobe
     };
 
-    var components = [];
+    List components = [];
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
       var component = frame.components[frame.componentsOrder[i]];
       components.add({
@@ -268,19 +245,19 @@ class JpegDecoder {
     }
     jpeg['components'] = components;
 
-    copyToImage(jpeg, image);
+    _copyToImage(jpeg, image);
 
     return image;
   }
 
-  void copyToImage(Map jpeg, Image imageData) {
-    var width = imageData.width;
-    var height = imageData.height;
-    var imageDataArray = imageData.buffer;
-    var data = getData(width, height, jpeg);
-    var i = 0, j = 0, x, y;
-    var Y, K, C, M, R, G, B;
-    var components = jpeg['components'];
+  void _copyToImage(Map jpeg, Image imageData) {
+    int width = imageData.width;
+    int height = imageData.height;
+    Data.Uint32List imageDataArray = imageData.buffer;
+    Data.Uint8List data = _getData(width, height, jpeg);
+    int i = 0, j = 0, x, y;
+    int Y, K, C, M, R, G, B;
+    List components = jpeg['components'];
 
     switch (components.length) {
       case 1:
@@ -311,9 +288,9 @@ class JpegDecoder {
             Y = data[i++];
             K = data[i++];
 
-            R = 255 - _clampTo8bit(C * (1 - K / 255) + K);
-            G = 255 - _clampTo8bit(M * (1 - K / 255) + K);
-            B = 255 - _clampTo8bit(Y * (1 - K / 255) + K);
+            R = 255 - _clamp(C * (1 - K / 255) + K);
+            G = 255 - _clamp(M * (1 - K / 255) + K);
+            B = 255 - _clamp(Y * (1 - K / 255) + K);
 
             imageDataArray[j++] = getColor(R, G, B, 255);
           }
@@ -324,7 +301,7 @@ class JpegDecoder {
     }
   }
 
-  Data.Uint8List getData(int width, int height, Map jpeg) {
+  Data.Uint8List _getData(int width, int height, Map jpeg) {
     num scaleX = 1;
     num scaleY = 1;
     List components = jpeg['components'];
@@ -340,9 +317,10 @@ class JpegDecoder {
     int x, y;
     int offset = 0;
     int Y, Cb, Cr, K, C, M, Ye, R, G, B;
-    var colorTransform;
-    var dataLength = width * height * components.length;
-    var data = new Data.Uint8List(dataLength);
+    bool colorTransform = false;
+    int dataLength = width * height * components.length;
+    Data.Uint8List data = new Data.Uint8List(dataLength);
+
     switch (components.length) {
       case 1:
         component1 = components[0];
@@ -381,46 +359,62 @@ class JpegDecoder {
         component1 = components[0];
         component2 = components[1];
         component3 = components[2];
+
+        num sy1 = component1['scaleY'] * scaleY;
+        num sy2 = component2['scaleY'] * scaleY;
+        num sy3 = component3['scaleY'] * scaleY;
+        num sx1 = component1['scaleX'] * scaleX;
+        num sx2 = component2['scaleX'] * scaleX;
+        num sx3 = component3['scaleX'] * scaleX;
+
+        var lines1 = component1['lines'];
+        var lines2 = component2['lines'];
+        var lines3 = component3['lines'];
+
         for (y = 0; y < height; y++) {
-          component1Line = component1['lines'][(y * component1['scaleY'] * scaleY).toInt()];
-          component2Line = component2['lines'][(y * component2['scaleY'] * scaleY).toInt()];
-          component3Line = component3['lines'][(y * component3['scaleY'] * scaleY).toInt()];
+          component1Line = lines1[(y * sy1).toInt()];
+          component2Line = lines2[(y * sy2).toInt()];
+          component3Line = lines3[(y * sy3).toInt()];
           for (x = 0; x < width; x++) {
             if (!colorTransform) {
-              R = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
-              G = component2Line[(x * component2['scaleX'] * scaleX).toInt()];
-              B = component3Line[(x * component3['scaleX'] * scaleX).toInt()];
+              R = component1Line[(x * sx1).toInt()];
+              G = component2Line[(x * sx2).toInt()];
+              B = component3Line[(x * sx3).toInt()];
             } else {
-              Y = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
-              Cb = component2Line[(x * component2['scaleX'] * scaleX).toInt()];
-              Cr = component3Line[(x * component3['scaleX'] * scaleX).toInt()];
+              Y = component1Line[(x * sx1).toInt()];
+              Cb = component2Line[(x * sx2).toInt()];
+              Cr = component3Line[(x * sx3).toInt()];
 
-              R = _clampTo8bit(Y + 1.402 * (Cr - 128));
-              G = _clampTo8bit(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
-              B = _clampTo8bit(Y + 1.772 * (Cb - 128));
+              R = _clamp(Y + 1.402 * (Cr - 128));
+              G = _clamp(Y - 0.3441363 * (Cb - 128) -
+                               0.71413636 * (Cr - 128));
+              B = _clamp(Y + 1.772 * (Cb - 128));
             }
 
-            data[offset++] = R.toInt();
-            data[offset++] = G.toInt();
-            data[offset++] = B.toInt();
+            data[offset++] = R;
+            data[offset++] = G;
+            data[offset++] = B;
           }
         }
         break;
       case 4:
-        if (adobe == null)
+        if (adobe == null) {
           throw 'Unsupported color mode (4 components)';
+        }
         // The default transform for four components is false
         colorTransform = false;
         // The adobe transform marker overrides any previous setting
-        if (adobe['transformCode'])
+        if (adobe['transformCode']) {
           colorTransform = true;
-        /*else if (typeof this.colorTransform !== 'undefined')
-          colorTransform = !!this.colorTransform;*/
+        } /*else if (typeof this.colorTransform !== 'undefined') {
+          colorTransform = !!this.colorTransform;
+        }*/
 
         component1 = components[0];
         component2 = components[1];
         component3 = components[2];
         component4 = components[3];
+
         for (y = 0; y < height; y++) {
           component1Line = component1['lines'][0 | (y * component1['scaleY'] * scaleY)];
           component2Line = component2['lines'][0 | (y * component2['scaleY'] * scaleY)];
@@ -438,9 +432,9 @@ class JpegDecoder {
               Cr = component3Line[0 | (x * component3['scaleX'] * scaleX)];
               K = component4Line[0 | (x * component4['scaleX'] * scaleX)];
 
-              C = 255 - _clampTo8bit(Y + 1.402 * (Cr - 128));
-              M = 255 - _clampTo8bit(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
-              Ye = 255 - _clampTo8bit(Y + 1.772 * (Cb - 128));
+              C = 255 - _clamp(Y + 1.402 * (Cr - 128));
+              M = 255 - _clamp(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
+              Ye = 255 - _clamp(Y + 1.772 * (Cb - 128));
             }
             data[offset++] = C;
             data[offset++] = M;
@@ -455,24 +449,70 @@ class JpegDecoder {
     return data;
   }
 
+  void _prepareComponents(_JpegFrame frame) {
+    int maxH = 0;
+    int maxV = 0;
+
+    for (int componentId in frame.components.keys) {
+      _JpegComponent component = frame.components[componentId];
+      if (maxH < component.h) {
+        maxH = component.h;
+      }
+      if (maxV < component.v) {
+        maxV = component.v;
+      }
+    }
+
+    int mcusPerLine = (frame.samplesPerLine / 8 / maxH).ceil();
+    int mcusPerColumn = (frame.scanLines / 8 / maxV).ceil();
+
+    for (int componentId in frame.components.keys) {
+      _JpegComponent component = frame.components[componentId];
+      int blocksPerLine = ((frame.samplesPerLine / 8).ceil() * component.h / maxH).ceil();
+      int blocksPerColumn = ((frame.scanLines / 8).ceil() * component.v / maxV).ceil();
+      int blocksPerLineForMcu = mcusPerLine * component.h;
+      int blocksPerColumnForMcu = mcusPerColumn * component.v;
+
+      List blocks = new List(blocksPerColumnForMcu);
+      for (var i = 0; i < blocksPerColumnForMcu; i++) {
+        List row = new List(blocksPerLineForMcu);
+        for (var j = 0; j < blocksPerLineForMcu; j++) {
+          row[j] = new Data.Int32List(64);
+        }
+        blocks[i] = row;
+      }
+
+      component.blocksPerLine = blocksPerLine;
+      component.blocksPerColumn = blocksPerColumn;
+      component.blocks = blocks;
+    }
+
+    frame.maxH = maxH;
+    frame.maxV = maxV;
+    frame.mcusPerLine = mcusPerLine;
+    frame.mcusPerColumn = mcusPerColumn;
+  }
+
   int _decodeScan(_ByteBuffer bytes,
                   _JpegFrame frame,
-                  components,
-                  resetInterval,
-                  spectralStart, spectralEnd,
-                  successivePrev, successive) {
-    var precision = frame.precision;
-    var samplesPerLine = frame.samplesPerLine;
-    var scanLines = frame.scanLines;
-    var mcusPerLine = frame.mcusPerLine;
-    var progressive = frame.progressive;
-    var maxH = frame.maxH;
-    var maxV = frame.maxV;
+                  List components,
+                  int resetInterval,
+                  int spectralStart,
+                  int spectralEnd,
+                  int successivePrev,
+                  int successive) {
+    int precision = frame.precision;
+    int samplesPerLine = frame.samplesPerLine;
+    int scanLines = frame.scanLines;
+    int mcusPerLine = frame.mcusPerLine;
+    bool progressive = frame.progressive;
+    int maxH = frame.maxH;
+    int maxV = frame.maxV;
 
     int bitsData = 0;
     int bitsCount = 0;
 
-    int readBit() {
+    int _readBit() {
       if (bitsCount > 0) {
         bitsCount--;
         return (bitsData >> bitsCount) & 1;
@@ -494,7 +534,7 @@ class JpegDecoder {
     int _decodeHuffman(tree) {
       var node = tree;
       int bit;
-      while ((bit = readBit()) != null) {
+      while ((bit = _readBit()) != null) {
         node = node[bit];
         if (node is num) {
           return node.toInt();
@@ -504,10 +544,10 @@ class JpegDecoder {
       return null;
     }
 
-    int _receive(length) {
+    int _receive(int length) {
       int  n = 0;
       while (length > 0) {
-        int bit = readBit();
+        int bit = _readBit();
         if (bit == null) {
           return null;
         }
@@ -554,7 +594,7 @@ class JpegDecoder {
     }
 
     void _decodeDCSuccessive(_JpegComponent component, List zz) {
-      zz[0] |= readBit() << successive;
+      zz[0] |= _readBit() << successive;
     }
 
     int eobrun = 0;
@@ -616,7 +656,7 @@ class JpegDecoder {
           case 1: // skipping r zero items
           case 2:
             if (zz[z]) {
-              zz[z] += (readBit() << successive);
+              zz[z] += (_readBit() << successive);
             } else {
               r--;
               if (r == 0) {
@@ -626,7 +666,7 @@ class JpegDecoder {
             break;
           case 3: // set value for a zero item
             if (zz[z]) {
-              zz[z] += (readBit() << successive);
+              zz[z] += (_readBit() << successive);
             } else {
               zz[z] = successiveACNextValue << successive;
               successiveACState = 0;
@@ -634,7 +674,7 @@ class JpegDecoder {
             break;
           case 4: // eob
             if (zz[z]) {
-              zz[z] += (readBit() << successive);
+              zz[z] += (_readBit() << successive);
             }
             break;
         }
@@ -650,7 +690,7 @@ class JpegDecoder {
 
     void _decodeMcu(_JpegComponent component, decodeFn,
                     int mcu, int row, int col) {
-      int mcuRow = (mcu / mcusPerLine).toInt();
+      int mcuRow = (mcu ~/ mcusPerLine);
       int mcuCol = mcu % mcusPerLine;
       int blockRow = mcuRow * component.v + row;
       int blockCol = mcuCol * component.h + col;
@@ -665,7 +705,6 @@ class JpegDecoder {
 
     int componentsLength = components.length;
     _JpegComponent component;
-    int i, j, k, n;
     var decodeFn;
 
     if (progressive) {
@@ -695,25 +734,25 @@ class JpegDecoder {
     int h, v;
     while (mcu < mcuExpected) {
       // reset interval stuff
-      for (i = 0; i < componentsLength; i++) {
+      for (int i = 0; i < componentsLength; i++) {
         components[i].pred = 0;
       }
       eobrun = 0;
 
       if (componentsLength == 1) {
         component = components[0];
-        for (n = 0; n < resetInterval; n++) {
+        for (int n = 0; n < resetInterval; n++) {
           _decodeBlock(component, decodeFn, mcu);
           mcu++;
         }
       } else {
-        for (n = 0; n < resetInterval; n++) {
-          for (i = 0; i < componentsLength; i++) {
+        for (int n = 0; n < resetInterval; n++) {
+          for (int i = 0; i < componentsLength; i++) {
             component = components[i];
             h = component.h;
             v = component.v;
-            for (j = 0; j < v; j++) {
-              for (k = 0; k < h; k++) {
+            for (int j = 0; j < v; j++) {
+              for (int k = 0; k < h; k++) {
                 _decodeMcu(component, decodeFn, mcu, j, k);
               }
             }
@@ -737,199 +776,214 @@ class JpegDecoder {
     }
   }
 
-  List _buildComponentData(_JpegFrame frame, _JpegComponent component) {
-    List lines = [];
+  List<List<int>> _buildComponentData(_JpegFrame frame,
+                                      _JpegComponent component) {
+    Duration t1 = timer.elapsed;
     int blocksPerLine = component.blocksPerLine;
     int blocksPerColumn = component.blocksPerColumn;
     int samplesPerLine = blocksPerLine << 3;
     Data.Int32List R = new Data.Int32List(64);
     Data.Uint8List r = new Data.Uint8List(64);
+    List<Data.Uint8List> lines = new List(blocksPerColumn * 8);
 
-    // A port of poppler's IDCT method which in turn is taken from:
-    //   Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
-    //   "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
-    //   IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989,
-    //   988-991.
-    void quantizeAndInverse(List zz, List dataOut, List dataIn) {
-      List qt = component.quantizationTable;
-      int v0, v1, v2, v3, v4, v5, v6, v7, t;
-      List p = dataIn;
-      int i;
-
-      // dequant
-      for (i = 0; i < 64; i++) {
-        p[i] = zz[i] * qt[i];
-      }
-
-      // inverse DCT on rows
-      for (i = 0; i < 8; ++i) {
-        int row = 8 * i;
-
-        // check for all-zero AC coefficients
-        if (p[1 + row] == 0 && p[2 + row] == 0 && p[3 + row] == 0 &&
-            p[4 + row] == 0 && p[5 + row] == 0 && p[6 + row] == 0 &&
-            p[7 + row] == 0) {
-          t = (_dctSqrt2 * p[0 + row] + 512).toInt() >> 10;
-          p[0 + row] = t;
-          p[1 + row] = t;
-          p[2 + row] = t;
-          p[3 + row] = t;
-          p[4 + row] = t;
-          p[5 + row] = t;
-          p[6 + row] = t;
-          p[7 + row] = t;
-          continue;
-        }
-
-        // stage 4
-        v0 = (_dctSqrt2 * p[0 + row] + 128).toInt() >> 8;
-        v1 = (_dctSqrt2 * p[4 + row] + 128).toInt() >> 8;
-        v2 = p[2 + row];
-        v3 = p[6 + row];
-        v4 = (_dctSqrt1d2 * (p[1 + row] - p[7 + row]) + 128).toInt() >> 8;
-        v7 = (_dctSqrt1d2 * (p[1 + row] + p[7 + row]) + 128).toInt() >> 8;
-        v5 = p[3 + row] << 4;
-        v6 = p[5 + row] << 4;
-
-        // stage 3
-        t = (v0 - v1+ 1) >> 1;
-        v0 = (v0 + v1 + 1) >> 1;
-        v1 = t;
-        t = (v2 * _dctSin6 + v3 * _dctCos6 + 128) >> 8;
-        v2 = (v2 * _dctCos6 - v3 * _dctSin6 + 128) >> 8;
-        v3 = t;
-        t = (v4 - v6 + 1) >> 1;
-        v4 = (v4 + v6 + 1) >> 1;
-        v6 = t;
-        t = (v7 + v5 + 1) >> 1;
-        v5 = (v7 - v5 + 1) >> 1;
-        v7 = t;
-
-        // stage 2
-        t = (v0 - v3 + 1) >> 1;
-        v0 = (v0 + v3 + 1) >> 1;
-        v3 = t;
-        t = (v1 - v2 + 1) >> 1;
-        v1 = (v1 + v2 + 1) >> 1;
-        v2 = t;
-        t = (v4 * _dctSin3 + v7 * _dctCos3 + 2048) >> 12;
-        v4 = (v4 * _dctCos3 - v7 * _dctSin3 + 2048) >> 12;
-        v7 = t;
-        t = (v5 * _dctSin1 + v6 * _dctCos1 + 2048) >> 12;
-        v5 = (v5 * _dctCos1 - v6 * _dctSin1 + 2048) >> 12;
-        v6 = t;
-
-        // stage 1
-        p[0 + row] = v0 + v7;
-        p[7 + row] = v0 - v7;
-        p[1 + row] = v1 + v6;
-        p[6 + row] = v1 - v6;
-        p[2 + row] = v2 + v5;
-        p[5 + row] = v2 - v5;
-        p[3 + row] = v3 + v4;
-        p[4 + row] = v3 - v4;
-      }
-
-      // inverse DCT on columns
-      for (i = 0; i < 8; ++i) {
-        int col = i;
-
-        // check for all-zero AC coefficients
-        if (p[1*8 + col] == 0 && p[2*8 + col] == 0 && p[3*8 + col] == 0 &&
-            p[4*8 + col] == 0 && p[5*8 + col] == 0 && p[6*8 + col] == 0 &&
-            p[7*8 + col] == 0) {
-          t = (_dctSqrt2 * dataIn[i+0] + 8192).toInt() >> 14;
-          p[0*8 + col] = t;
-          p[1*8 + col] = t;
-          p[2*8 + col] = t;
-          p[3*8 + col] = t;
-          p[4*8 + col] = t;
-          p[5*8 + col] = t;
-          p[6*8 + col] = t;
-          p[7*8 + col] = t;
-          continue;
-        }
-
-        // stage 4
-        v0 = (_dctSqrt2 * p[0*8 + col] + 2048).toInt() >> 12;
-        v1 = (_dctSqrt2 * p[4*8 + col] + 2048).toInt() >> 12;
-        v2 = p[2*8 + col];
-        v3 = p[6*8 + col];
-        v4 = (_dctSqrt1d2 * (p[1*8 + col] - p[7*8 + col]) + 2048).toInt() >> 12;
-        v7 = (_dctSqrt1d2 * (p[1*8 + col] + p[7*8 + col]) + 2048).toInt() >> 12;
-        v5 = p[3*8 + col];
-        v6 = p[5*8 + col];
-
-        // stage 3
-        t = (v0 - v1 + 1) >> 1;
-        v0 = (v0 + v1 + 1) >> 1;
-        v1 = t;
-        t = (v2 * _dctSin6 + v3 * _dctCos6 + 2048) >> 12;
-        v2 = (v2 * _dctCos6 - v3 * _dctSin6 + 2048) >> 12;
-        v3 = t;
-        t = (v4 - v6 + 1) >> 1;
-        v4 = (v4 + v6 + 1) >> 1;
-        v6 = t;
-        t = (v7 + v5 + 1) >> 1;
-        v5 = (v7 - v5 + 1) >> 1;
-        v7 = t;
-
-        // stage 2
-        t = (v0 - v3 + 1) >> 1;
-        v0 = (v0 + v3 + 1) >> 1;
-        v3 = t;
-        t = (v1 - v2 + 1) >> 1;
-        v1 = (v1 + v2 + 1) >> 1;
-        v2 = t;
-        t = (v4 * _dctSin3 + v7 * _dctCos3 + 2048) >> 12;
-        v4 = (v4 * _dctCos3 - v7 * _dctSin3 + 2048) >> 12;
-        v7 = t;
-        t = (v5 * _dctSin1 + v6 * _dctCos1 + 2048) >> 12;
-        v5 = (v5 * _dctCos1 - v6 * _dctSin1 + 2048) >> 12;
-        v6 = t;
-
-        // stage 1
-        p[0 * 8 + col] = v0 + v7;
-        p[7 * 8 + col] = v0 - v7;
-        p[1 * 8 + col] = v1 + v6;
-        p[6 * 8 + col] = v1 - v6;
-        p[2 * 8 + col] = v2 + v5;
-        p[5 * 8 + col] = v2 - v5;
-        p[3 * 8 + col] = v3 + v4;
-        p[4 * 8 + col] = v3 - v4;
-      }
-
-      // convert to 8-bit integers
-      for (i = 0; i < 64; ++i) {
-        var sample = 128 + ((p[i] + 8) >> 4);
-        dataOut[i] = sample < 0 ? 0 : sample > 0xFF ? 0xFF : sample;
-      }
-    }
-
-    int i, j;
+    int l = 0;
     for (int blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
       int scanLine = blockRow << 3;
-      for (i = 0; i < 8; i++) {
-        lines.add(new Data.Uint8List(samplesPerLine));
+      for (int i = 0; i < 8; i++) {
+        lines[l++] = new Data.Uint8List(samplesPerLine);
       }
 
       for (int blockCol = 0; blockCol < blocksPerLine; blockCol++) {
-        quantizeAndInverse(component.blocks[blockRow][blockCol], r, R);
+        _quantizeAndInverse(component, component.blocks[blockRow][blockCol],
+                            r, R);
 
         int offset = 0;
         int sample = blockCol << 3;
-        for (j = 0; j < 8; j++) {
-          List line = lines[scanLine + j];
-          for (i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++) {
+          Data.Uint8List line = lines[scanLine + j];
+          for (int i = 0; i < 8; i++) {
             line[sample + i] = r[offset++];
+          }
         }
       }
     }
+    Duration t2 = timer.elapsed;
 
     return lines;
   }
 
-  int _clampTo8bit(num a) {
+  // A port of poppler's IDCT method which in turn is taken from:
+  //   Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
+  //   "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
+  //   IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989,
+  //   988-991.
+  void _quantizeAndInverse(_JpegComponent component,
+                           Data.Int32List zz,
+                           Data.Uint8List dataOut,
+                           Data.Int32List dataIn) {
+    List qt = component.quantizationTable;
+    Data.Int32List p = dataIn;
+
+    // dequant
+    for (int i = 0; i < 64; i++) {
+      p[i] = zz[i] * qt[i];
+    }
+
+
+    // inverse DCT on rows
+    int row = 0;
+    for (int i = 0; i < 8; ++i, row += 8) {
+      // check for all-zero AC coefficients
+      if (p[1 + row] == 0 &&
+          p[2 + row] == 0 &&
+          p[3 + row] == 0 &&
+          p[4 + row] == 0 &&
+          p[5 + row] == 0 &&
+          p[6 + row] == 0 &&
+          p[7 + row] == 0) {
+        int t = (_dctSqrt2 * p[0 + row] + 512) >> 10;
+        p.fillRange(row + 1, row + 7, t);
+        /*p[0 + row] = t;
+        p[1 + row] = t;
+        p[2 + row] = t;
+        p[3 + row] = t;
+        p[4 + row] = t;
+        p[5 + row] = t;
+        p[6 + row] = t;
+        p[7 + row] = t;*/
+        continue;
+      }
+
+      // stage 4
+      int v0 = (_dctSqrt2 * p[0 + row] + 128) >> 8;
+      int v1 = (_dctSqrt2 * p[4 + row] + 128) >> 8;
+      int v2 = p[2 + row];
+      int v3 = p[6 + row];
+      int v4 = (_dctSqrt1d2 * (p[1 + row] - p[7 + row]) + 128) >> 8;
+      int v7 = (_dctSqrt1d2 * (p[1 + row] + p[7 + row]) + 128) >> 8;
+      int v5 = p[3 + row] << 4;
+      int v6 = p[5 + row] << 4;
+
+      // stage 3
+      int t = (v0 - v1+ 1) >> 1;
+      v0 = (v0 + v1 + 1) >> 1;
+      v1 = t;
+      t = (v2 * _dctSin6 + v3 * _dctCos6 + 128) >> 8;
+      v2 = (v2 * _dctCos6 - v3 * _dctSin6 + 128) >> 8;
+      v3 = t;
+      t = (v4 - v6 + 1) >> 1;
+      v4 = (v4 + v6 + 1) >> 1;
+      v6 = t;
+      t = (v7 + v5 + 1) >> 1;
+      v5 = (v7 - v5 + 1) >> 1;
+      v7 = t;
+
+      // stage 2
+      t = (v0 - v3 + 1) >> 1;
+      v0 = (v0 + v3 + 1) >> 1;
+      v3 = t;
+      t = (v1 - v2 + 1) >> 1;
+      v1 = (v1 + v2 + 1) >> 1;
+      v2 = t;
+      t = (v4 * _dctSin3 + v7 * _dctCos3 + 2048) >> 12;
+      v4 = (v4 * _dctCos3 - v7 * _dctSin3 + 2048) >> 12;
+      v7 = t;
+      t = (v5 * _dctSin1 + v6 * _dctCos1 + 2048) >> 12;
+      v5 = (v5 * _dctCos1 - v6 * _dctSin1 + 2048) >> 12;
+      v6 = t;
+
+      // stage 1
+      p[0 + row] = v0 + v7;
+      p[7 + row] = v0 - v7;
+      p[1 + row] = v1 + v6;
+      p[6 + row] = v1 - v6;
+      p[2 + row] = v2 + v5;
+      p[5 + row] = v2 - v5;
+      p[3 + row] = v3 + v4;
+      p[4 + row] = v3 - v4;
+    }
+
+    // inverse DCT on columns
+    for (int i = 0; i < 8; ++i) {
+      int col = i;
+
+      // check for all-zero AC coefficients
+      if (p[1 * 8 + col] == 0 &&
+          p[2 * 8 + col] == 0 &&
+          p[3 * 8 + col] == 0 &&
+          p[4 * 8 + col] == 0 &&
+          p[5 * 8 + col] == 0 &&
+          p[6 * 8 + col] == 0 &&
+          p[7 * 8 + col] == 0) {
+        int t = (_dctSqrt2 * dataIn[i] + 8192) >> 14;
+        p[0 * 8 + col] = t;
+        p[1 * 8 + col] = t;
+        p[2 * 8 + col] = t;
+        p[3 * 8 + col] = t;
+        p[4 * 8 + col] = t;
+        p[5 * 8 + col] = t;
+        p[6 * 8 + col] = t;
+        p[7 * 8 + col] = t;
+        continue;
+      }
+
+      // stage 4
+      int v0 = (_dctSqrt2 * p[0 * 8 + col] + 2048) >> 12;
+      int v1 = (_dctSqrt2 * p[4 * 8 + col] + 2048) >> 12;
+      int v2 = p[2 * 8 + col];
+      int v3 = p[6 * 8 + col];
+      int v4 = (_dctSqrt1d2 * (p[1 * 8 + col] - p[7*8 + col]) + 2048) >> 12;
+      int v7 = (_dctSqrt1d2 * (p[1 * 8 + col] + p[7*8 + col]) + 2048) >> 12;
+      int v5 = p[3 * 8 + col];
+      int v6 = p[5 * 8 + col];
+
+      // stage 3
+      int t = (v0 - v1 + 1) >> 1;
+      v0 = (v0 + v1 + 1) >> 1;
+      v1 = t;
+      t = (v2 * _dctSin6 + v3 * _dctCos6 + 2048) >> 12;
+      v2 = (v2 * _dctCos6 - v3 * _dctSin6 + 2048) >> 12;
+      v3 = t;
+      t = (v4 - v6 + 1) >> 1;
+      v4 = (v4 + v6 + 1) >> 1;
+      v6 = t;
+      t = (v7 + v5 + 1) >> 1;
+      v5 = (v7 - v5 + 1) >> 1;
+      v7 = t;
+
+      // stage 2
+      t = (v0 - v3 + 1) >> 1;
+      v0 = (v0 + v3 + 1) >> 1;
+      v3 = t;
+      t = (v1 - v2 + 1) >> 1;
+      v1 = (v1 + v2 + 1) >> 1;
+      v2 = t;
+      t = (v4 * _dctSin3 + v7 * _dctCos3 + 2048) >> 12;
+      v4 = (v4 * _dctCos3 - v7 * _dctSin3 + 2048) >> 12;
+      v7 = t;
+      t = (v5 * _dctSin1 + v6 * _dctCos1 + 2048) >> 12;
+      v5 = (v5 * _dctCos1 - v6 * _dctSin1 + 2048) >> 12;
+      v6 = t;
+
+      // stage 1
+      p[0 * 8 + col] = v0 + v7;
+      p[7 * 8 + col] = v0 - v7;
+      p[1 * 8 + col] = v1 + v6;
+      p[6 * 8 + col] = v1 - v6;
+      p[2 * 8 + col] = v2 + v5;
+      p[5 * 8 + col] = v2 - v5;
+      p[3 * 8 + col] = v3 + v4;
+      p[4 * 8 + col] = v3 - v4;
+    }
+
+    // convert to 8-bit integers
+    for (int i = 0; i < 64; ++i) {
+      int sample = 128 + ((p[i] + 8) >> 4);
+      dataOut[i] = sample < 0 ? 0 : sample > 0xFF ? 0xFF : sample;
+    }
+  }
+
+  int _clamp(num a) {
     int i = a.toInt();
     return i < 0 ? 0 : i > 255 ? 255 : i;
   }
@@ -1004,14 +1058,14 @@ class JpegDecoder {
       55, 62,
       63 ];
 
-  static const int _dctCos1  =  4017;   // cos(pi/16)
+  static const int _dctCos1  =  4017;  // cos(pi/16)
   static const int _dctSin1  =  799;   // sin(pi/16)
-  static const int _dctCos3  =  3406;   // cos(3*pi/16)
-  static const int _dctSin3  =  2276;   // sin(3*pi/16)
-  static const int _dctCos6  =  1567;   // cos(6*pi/16)
-  static const int _dctSin6  =  3784;   // sin(6*pi/16)
-  static const int _dctSqrt2 =  5793;   // sqrt(2)
-  static const int _dctSqrt1d2 = 2896;  // sqrt(2) / 2
+  static const int _dctCos3  =  3406;  // cos(3*pi/16)
+  static const int _dctSin3  =  2276;  // sin(3*pi/16)
+  static const int _dctCos6  =  1567;  // cos(6*pi/16)
+  static const int _dctSin6  =  3784;  // sin(6*pi/16)
+  static const int _dctSqrt2 =  5793;  // sqrt(2)
+  static const int _dctSqrt1d2 = 2896; // sqrt(2) / 2
 }
 
 
