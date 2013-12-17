@@ -10,18 +10,18 @@ class JpegDecoder {
   Stopwatch timer = new Stopwatch();
 
   Image decode(List<int> data) {
+    //print(MAX_INT);
     timer.start();
     _ByteBuffer bytes = new _ByteBuffer.fromList(data);
 
-    var jfif = null;
-    var adobe = null;
-    var pixels = null;
+    Map jfif = null;
+    Map adobe = null;
     _JpegFrame frame;
-    var resetInterval;
-    var quantizationTables = [];
+    int resetInterval;
+    List quantizationTables = [];
     List<_JpegFrame> frames = [];
-    var huffmanTablesAC = [];
-    var huffmanTablesDC = [];
+    List huffmanTablesAC = [];
+    List huffmanTablesDC = [];
 
     var fileMarker = bytes.readUint16();
     if (fileMarker != 0xFFD8) { // SOI (Start of Image)
@@ -51,10 +51,10 @@ class JpegDecoder {
         case 0xFFEF: // APP15
         case 0xFFFE: // COM (Comment)
           t1 = timer.elapsed;
-          var appData = bytes.readBlock();
+          List<int> appData = bytes.readBlock();
 
           if (fileMarker == 0xFFE0) {
-            // 'JFIF\x00'
+            // 'JFIF\0'
             if (appData[0] == 0x4A && appData[1] == 0x46 &&
                 appData[2] == 0x49 && appData[3] == 0x46 && appData[4] == 0) {
               List<int> thumbData = appData.sublist(14,
@@ -73,7 +73,7 @@ class JpegDecoder {
 
           // TODO APP1 - Exif
           if (fileMarker == 0xFFEE) {
-            // 'Adobe\x00'
+            // 'Adobe\0'
             if (appData[0] == 0x41 && appData[1] == 0x64 &&
                 appData[2] == 0x6F && appData[3] == 0x62 &&
                 appData[4] == 0x65 && appData[5] == 0) {
@@ -87,6 +87,7 @@ class JpegDecoder {
           }
 
           t2 = timer.elapsed;
+          //print('[A] ${t2 - t1}');
           break;
 
         case 0xFFDB: // DQT (Define Quantization Tables)
@@ -109,6 +110,7 @@ class JpegDecoder {
             } else {
               throw 'DQT: invalid table spec';
             }
+
             int i = quantizationTableSpec & 15;
             if (quantizationTables.length <= i) {
               quantizationTables.length = i + 1;
@@ -116,6 +118,7 @@ class JpegDecoder {
             quantizationTables[i] = tableData;
           }
           t2 = timer.elapsed;
+          //print('[B] ${t2 - t1}');
           break;
 
         case 0xFFC0: // SOF0 (Start of Frame, Baseline DCT)
@@ -131,10 +134,10 @@ class JpegDecoder {
           frame.scanLines = bytes.readUint16();
           frame.samplesPerLine = bytes.readUint16();
 
-          var componentsCount = bytes.readByte();
-          var componentId;
-          var maxH = 0;
-          var maxV = 0;
+          int componentsCount = bytes.readByte();
+          int componentId;
+          int maxH = 0;
+          int maxV = 0;
           for (i = 0; i < componentsCount; i++) {
             componentId = bytes.readByte();
             int x = bytes.readByte();
@@ -148,6 +151,7 @@ class JpegDecoder {
           _prepareComponents(frame);
           frames.add(frame);
           t2 = timer.elapsed;
+          //print('[C] ${t2 - t1}');
           break;
 
         case 0xFFC4: // DHT (Define Huffman Tables)
@@ -175,6 +179,7 @@ class JpegDecoder {
               _buildHuffmanTable(codeLengths, huffmanValues);
           }
           t2 = timer.elapsed;
+          //print('[D] ${t2 - t1}');
           break;
 
         case 0xFFDD: // DRI (Define Restart Interval)
@@ -182,6 +187,7 @@ class JpegDecoder {
           bytes.readUint16(); // skip data length
           resetInterval = bytes.readUint16();
           t2 = timer.elapsed;
+          //print('[E] ${t2 - t1}');
           break;
 
         case 0xFFDA: // SOS (Start of Scan)
@@ -205,6 +211,7 @@ class JpegDecoder {
                       successiveApproximation >> 4,
                       successiveApproximation & 15);
           t2 = timer.elapsed;
+          //print('[F] ${t2 - t1}');
           break;
         default:
           if (bytes.peakAtOffset(-3) == 0xFF &&
@@ -246,6 +253,7 @@ class JpegDecoder {
     jpeg['components'] = components;
 
     _copyToImage(jpeg, image);
+    //print('[Total] ${timer.elapsed}');
 
     return image;
   }
@@ -288,9 +296,9 @@ class JpegDecoder {
             Y = data[i++];
             K = data[i++];
 
-            R = 255 - _clamp(C * (1 - K / 255) + K);
-            G = 255 - _clamp(M * (1 - K / 255) + K);
-            B = 255 - _clamp(Y * (1 - K / 255) + K);
+            R = 255 - _clamp(C * (1 - K ~/ 255) + K);
+            G = 255 - _clamp(M * (1 - K ~/ 255) + K);
+            B = 255 - _clamp(Y * (1 - K ~/ 255) + K);
 
             imageDataArray[j++] = getColor(R, G, B, 255);
           }
@@ -385,10 +393,10 @@ class JpegDecoder {
               Cb = component2Line[(x * sx2).toInt()];
               Cr = component3Line[(x * sx3).toInt()];
 
-              R = _clamp(Y + 1.402 * (Cr - 128));
-              G = _clamp(Y - 0.3441363 * (Cb - 128) -
-                               0.71413636 * (Cr - 128));
-              B = _clamp(Y + 1.772 * (Cb - 128));
+              R = _clamp((Y + 1.402 * (Cr - 128)).toInt());
+              G = _clamp((Y - 0.3441363 * (Cb - 128) -
+                         0.71413636 * (Cr - 128)).toInt());
+              B = _clamp((Y + 1.772 * (Cb - 128)).toInt());
             }
 
             data[offset++] = R;
@@ -432,9 +440,9 @@ class JpegDecoder {
               Cr = component3Line[0 | (x * component3['scaleX'] * scaleX)];
               K = component4Line[0 | (x * component4['scaleX'] * scaleX)];
 
-              C = 255 - _clamp(Y + 1.402 * (Cr - 128));
-              M = 255 - _clamp(Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128));
-              Ye = 255 - _clamp(Y + 1.772 * (Cb - 128));
+              C = 255 - _clamp((Y + 1.402 * (Cr - 128)).toInt());
+              M = 255 - _clamp((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128)).toInt());
+              Ye = 255 - _clamp((Y + 1.772 * (Cb - 128)).toInt());
             }
             data[offset++] = C;
             data[offset++] = M;
@@ -474,9 +482,9 @@ class JpegDecoder {
       int blocksPerColumnForMcu = mcusPerColumn * component.v;
 
       List blocks = new List(blocksPerColumnForMcu);
-      for (var i = 0; i < blocksPerColumnForMcu; i++) {
+      for (int i = 0; i < blocksPerColumnForMcu; i++) {
         List row = new List(blocksPerLineForMcu);
-        for (var j = 0; j < blocksPerLineForMcu; j++) {
+        for (int j = 0; j < blocksPerLineForMcu; j++) {
           row[j] = new Data.Int32List(64);
         }
         blocks[i] = row;
@@ -524,7 +532,6 @@ class JpegDecoder {
         if (nextByte != 0) {
           throw 'unexpected marker: ' + ((bitsData << 8) | nextByte).toString();
         }
-        // unstuff 0
       }
 
       bitsCount = 7;
@@ -551,7 +558,7 @@ class JpegDecoder {
         if (bit == null) {
           return null;
         }
-        n = (n << 1) | bit;
+        n = ((n << 1) | bit);
         length--;
       }
       return n;
@@ -568,7 +575,8 @@ class JpegDecoder {
     void _decodeBaseline(_JpegComponent component, List zz) {
       int t = _decodeHuffman(component.huffmanTableDC);
       int diff = t == 0 ? 0 : _receiveAndExtend(t);
-      zz[0] = (component.pred += diff);
+      component.pred += diff;
+      zz[0] = component.pred;
       int k = 1;
       while (k < 64) {
         var rs = _decodeHuffman(component.huffmanTableAC);
@@ -588,13 +596,14 @@ class JpegDecoder {
     }
 
     void _decodeDCFirst(_JpegComponent component, List zz) {
-      var t = _decodeHuffman(component.huffmanTableDC);
+      int t = _decodeHuffman(component.huffmanTableDC);
       int diff = (t == 0) ? 0 : (_receiveAndExtend(t) << successive);
-      zz[0] = (component.pred += diff);
+      component.pred += diff;
+      zz[0] = component.pred;
     }
 
     void _decodeDCSuccessive(_JpegComponent component, List zz) {
-      zz[0] |= _readBit() << successive;
+      zz[0] = (zz[0] | (_readBit() << successive));
     }
 
     int eobrun = 0;
@@ -611,7 +620,7 @@ class JpegDecoder {
         int s = rs & 15, r = rs >> 4;
         if (s == 0) {
           if (r < 15) {
-            eobrun = _receive(r) + (1 << r) - 1;
+            eobrun = (_receive(r) + (1 << r) - 1);
             break;
           }
           k += 16;
@@ -619,7 +628,7 @@ class JpegDecoder {
         }
         k += r;
         int z = _dctZigZag[k];
-        zz[z] = _receiveAndExtend(s) * (1 << successive);
+        zz[z] = (_receiveAndExtend(s) * (1 << successive));
         k++;
       }
     }
@@ -639,7 +648,7 @@ class JpegDecoder {
             int r = rs >> 4;
             if (s == 0) {
               if (r < 15) {
-                eobrun = _receive(r) + (1 << r);
+                eobrun = (_receive(r) + (1 << r));
                 successiveACState = 4;
               } else {
                 r = 16;
@@ -668,7 +677,7 @@ class JpegDecoder {
             if (zz[z]) {
               zz[z] += (_readBit() << successive);
             } else {
-              zz[z] = successiveACNextValue << successive;
+              zz[z] = (successiveACNextValue << successive);
               successiveACState = 0;
             }
             break;
@@ -722,9 +731,9 @@ class JpegDecoder {
     int mcuExpected;
 
     if (componentsLength == 1) {
-      mcuExpected = components[0].blocksPerLine * components[0].blocksPerColumn;
+      mcuExpected = (components[0].blocksPerLine * components[0].blocksPerColumn);
     } else {
-      mcuExpected = mcusPerLine * frame.mcusPerColumn;
+      mcuExpected = (mcusPerLine * frame.mcusPerColumn);
     }
 
     if (resetInterval == null || resetInterval == 0) {
@@ -763,7 +772,7 @@ class JpegDecoder {
 
       // find marker
       bitsCount = 0;
-      marker = (bytes.peakAtOffset(0) << 8) | bytes.peakAtOffset(1);
+      marker = (((bytes.peakAtOffset(0) << 8) | bytes.peakAtOffset(1)));
       if (marker <= 0xFF00) {
         throw 'marker was not found';
       }
@@ -781,11 +790,12 @@ class JpegDecoder {
     Duration t1 = timer.elapsed;
     int blocksPerLine = component.blocksPerLine;
     int blocksPerColumn = component.blocksPerColumn;
-    int samplesPerLine = blocksPerLine << 3;
+    int samplesPerLine = (blocksPerLine << 3);
     Data.Int32List R = new Data.Int32List(64);
     Data.Uint8List r = new Data.Uint8List(64);
     List<Data.Uint8List> lines = new List(blocksPerColumn * 8);
 
+    //print('$blocksPerColumn $blocksPerLine');
     int l = 0;
     for (int blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
       int scanLine = blockRow << 3;
@@ -794,11 +804,12 @@ class JpegDecoder {
       }
 
       for (int blockCol = 0; blockCol < blocksPerLine; blockCol++) {
-        _quantizeAndInverse(component, component.blocks[blockRow][blockCol],
+        _quantizeAndInverse(component.quantizationTable,
+                            component.blocks[blockRow][blockCol],
                             r, R);
 
         int offset = 0;
-        int sample = blockCol << 3;
+        int sample = (blockCol << 3);
         for (int j = 0; j < 8; j++) {
           Data.Uint8List line = lines[scanLine + j];
           for (int i = 0; i < 8; i++) {
@@ -808,6 +819,7 @@ class JpegDecoder {
       }
     }
     Duration t2 = timer.elapsed;
+    //print('[G] ${t2 - t1}');
 
     return lines;
   }
@@ -817,18 +829,16 @@ class JpegDecoder {
   //   "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
   //   IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989,
   //   988-991.
-  void _quantizeAndInverse(_JpegComponent component,
+  void _quantizeAndInverse(Data.Int32List quantizationTable,
                            Data.Int32List zz,
                            Data.Uint8List dataOut,
                            Data.Int32List dataIn) {
-    List qt = component.quantizationTable;
     Data.Int32List p = dataIn;
 
-    // dequant
+    // de-quantize
     for (int i = 0; i < 64; i++) {
-      p[i] = zz[i] * qt[i];
+      p[i] = (zz[i] * quantizationTable[i]);
     }
-
 
     // inverse DCT on rows
     int row = 0;
@@ -841,66 +851,58 @@ class JpegDecoder {
           p[5 + row] == 0 &&
           p[6 + row] == 0 &&
           p[7 + row] == 0) {
-        int t = (_dctSqrt2 * p[0 + row] + 512) >> 10;
-        p.fillRange(row + 1, row + 7, t);
-        /*p[0 + row] = t;
-        p[1 + row] = t;
-        p[2 + row] = t;
-        p[3 + row] = t;
-        p[4 + row] = t;
-        p[5 + row] = t;
-        p[6 + row] = t;
-        p[7 + row] = t;*/
+        int t = ((_dctSqrt2 * p[0 + row] + 512) >> 10);
+        p.fillRange(row, row + 8, t);
         continue;
       }
 
       // stage 4
-      int v0 = (_dctSqrt2 * p[0 + row] + 128) >> 8;
-      int v1 = (_dctSqrt2 * p[4 + row] + 128) >> 8;
+      int v0 = ((_dctSqrt2 * p[0 + row] + 128) >> 8);
+      int v1 = ((_dctSqrt2 * p[4 + row] + 128) >> 8);
       int v2 = p[2 + row];
       int v3 = p[6 + row];
-      int v4 = (_dctSqrt1d2 * (p[1 + row] - p[7 + row]) + 128) >> 8;
-      int v7 = (_dctSqrt1d2 * (p[1 + row] + p[7 + row]) + 128) >> 8;
-      int v5 = p[3 + row] << 4;
-      int v6 = p[5 + row] << 4;
+      int v4 = ((_dctSqrt1d2 * (p[1 + row] - p[7 + row]) + 128) >> 8);
+      int v7 = ((_dctSqrt1d2 * (p[1 + row] + p[7 + row]) + 128) >> 8);
+      int v5 = (p[3 + row] << 4);
+      int v6 = (p[5 + row] << 4);
 
       // stage 3
-      int t = (v0 - v1+ 1) >> 1;
-      v0 = (v0 + v1 + 1) >> 1;
+      int t = ((v0 - v1+ 1) >> 1);
+      v0 = ((v0 + v1 + 1) >> 1);
       v1 = t;
-      t = (v2 * _dctSin6 + v3 * _dctCos6 + 128) >> 8;
-      v2 = (v2 * _dctCos6 - v3 * _dctSin6 + 128) >> 8;
+      t = ((v2 * _dctSin6 + v3 * _dctCos6 + 128) >> 8);
+      v2 = ((v2 * _dctCos6 - v3 * _dctSin6 + 128) >> 8);
       v3 = t;
-      t = (v4 - v6 + 1) >> 1;
-      v4 = (v4 + v6 + 1) >> 1;
+      t = ((v4 - v6 + 1) >> 1);
+      v4 = ((v4 + v6 + 1) >> 1);
       v6 = t;
-      t = (v7 + v5 + 1) >> 1;
-      v5 = (v7 - v5 + 1) >> 1;
+      t = ((v7 + v5 + 1) >> 1);
+      v5 = ((v7 - v5 + 1) >> 1);
       v7 = t;
 
       // stage 2
-      t = (v0 - v3 + 1) >> 1;
-      v0 = (v0 + v3 + 1) >> 1;
+      t = ((v0 - v3 + 1) >> 1);
+      v0 = ((v0 + v3 + 1) >> 1);
       v3 = t;
-      t = (v1 - v2 + 1) >> 1;
-      v1 = (v1 + v2 + 1) >> 1;
+      t = ((v1 - v2 + 1) >> 1);
+      v1 = ((v1 + v2 + 1) >> 1);
       v2 = t;
-      t = (v4 * _dctSin3 + v7 * _dctCos3 + 2048) >> 12;
-      v4 = (v4 * _dctCos3 - v7 * _dctSin3 + 2048) >> 12;
+      t = ((v4 * _dctSin3 + v7 * _dctCos3 + 2048) >> 12);
+      v4 = ((v4 * _dctCos3 - v7 * _dctSin3 + 2048) >> 12);
       v7 = t;
-      t = (v5 * _dctSin1 + v6 * _dctCos1 + 2048) >> 12;
-      v5 = (v5 * _dctCos1 - v6 * _dctSin1 + 2048) >> 12;
+      t = ((v5 * _dctSin1 + v6 * _dctCos1 + 2048) >> 12);
+      v5 = ((v5 * _dctCos1 - v6 * _dctSin1 + 2048) >> 12);
       v6 = t;
 
       // stage 1
-      p[0 + row] = v0 + v7;
-      p[7 + row] = v0 - v7;
-      p[1 + row] = v1 + v6;
-      p[6 + row] = v1 - v6;
-      p[2 + row] = v2 + v5;
-      p[5 + row] = v2 - v5;
-      p[3 + row] = v3 + v4;
-      p[4 + row] = v3 - v4;
+      p[0 + row] = (v0 + v7);
+      p[7 + row] = (v0 - v7);
+      p[1 + row] = (v1 + v6);
+      p[6 + row] = (v1 - v6);
+      p[2 + row] = (v2 + v5);
+      p[5 + row] = (v2 - v5);
+      p[3 + row] = (v3 + v4);
+      p[4 + row] = (v3 - v4);
     }
 
     // inverse DCT on columns
@@ -915,7 +917,7 @@ class JpegDecoder {
           p[5 * 8 + col] == 0 &&
           p[6 * 8 + col] == 0 &&
           p[7 * 8 + col] == 0) {
-        int t = (_dctSqrt2 * dataIn[i] + 8192) >> 14;
+        int t = ((_dctSqrt2 * dataIn[i] + 8192) >> 14);
         p[0 * 8 + col] = t;
         p[1 * 8 + col] = t;
         p[2 * 8 + col] = t;
@@ -928,63 +930,63 @@ class JpegDecoder {
       }
 
       // stage 4
-      int v0 = (_dctSqrt2 * p[0 * 8 + col] + 2048) >> 12;
-      int v1 = (_dctSqrt2 * p[4 * 8 + col] + 2048) >> 12;
+      int v0 = ((_dctSqrt2 * p[0 * 8 + col] + 2048) >> 12);
+      int v1 = ((_dctSqrt2 * p[4 * 8 + col] + 2048) >> 12);
       int v2 = p[2 * 8 + col];
       int v3 = p[6 * 8 + col];
-      int v4 = (_dctSqrt1d2 * (p[1 * 8 + col] - p[7*8 + col]) + 2048) >> 12;
-      int v7 = (_dctSqrt1d2 * (p[1 * 8 + col] + p[7*8 + col]) + 2048) >> 12;
+      int v4 = ((_dctSqrt1d2 * (p[1 * 8 + col] - p[7*8 + col]) + 2048) >> 12);
+      int v7 = ((_dctSqrt1d2 * (p[1 * 8 + col] + p[7*8 + col]) + 2048) >> 12);
       int v5 = p[3 * 8 + col];
       int v6 = p[5 * 8 + col];
 
       // stage 3
-      int t = (v0 - v1 + 1) >> 1;
-      v0 = (v0 + v1 + 1) >> 1;
+      int t = ((v0 - v1 + 1) >> 1);
+      v0 = ((v0 + v1 + 1) >> 1);
       v1 = t;
-      t = (v2 * _dctSin6 + v3 * _dctCos6 + 2048) >> 12;
-      v2 = (v2 * _dctCos6 - v3 * _dctSin6 + 2048) >> 12;
+      t = ((v2 * _dctSin6 + v3 * _dctCos6 + 2048) >> 12);
+      v2 = ((v2 * _dctCos6 - v3 * _dctSin6 + 2048) >> 12);
       v3 = t;
-      t = (v4 - v6 + 1) >> 1;
-      v4 = (v4 + v6 + 1) >> 1;
+      t = ((v4 - v6 + 1) >> 1);
+      v4 = ((v4 + v6 + 1) >> 1);
       v6 = t;
-      t = (v7 + v5 + 1) >> 1;
-      v5 = (v7 - v5 + 1) >> 1;
+      t = ((v7 + v5 + 1) >> 1);
+      v5 = ((v7 - v5 + 1) >> 1);
       v7 = t;
 
       // stage 2
-      t = (v0 - v3 + 1) >> 1;
-      v0 = (v0 + v3 + 1) >> 1;
+      t = ((v0 - v3 + 1) >> 1);
+      v0 = ((v0 + v3 + 1) >> 1);
       v3 = t;
-      t = (v1 - v2 + 1) >> 1;
-      v1 = (v1 + v2 + 1) >> 1;
+      t = ((v1 - v2 + 1) >> 1);
+      v1 = ((v1 + v2 + 1) >> 1);
       v2 = t;
-      t = (v4 * _dctSin3 + v7 * _dctCos3 + 2048) >> 12;
-      v4 = (v4 * _dctCos3 - v7 * _dctSin3 + 2048) >> 12;
+      t = ((v4 * _dctSin3 + v7 * _dctCos3 + 2048) >> 12);
+      v4 = ((v4 * _dctCos3 - v7 * _dctSin3 + 2048) >> 12);
       v7 = t;
-      t = (v5 * _dctSin1 + v6 * _dctCos1 + 2048) >> 12;
-      v5 = (v5 * _dctCos1 - v6 * _dctSin1 + 2048) >> 12;
+      t = ((v5 * _dctSin1 + v6 * _dctCos1 + 2048) >> 12);
+      v5 = ((v5 * _dctCos1 - v6 * _dctSin1 + 2048) >> 12);
       v6 = t;
 
       // stage 1
-      p[0 * 8 + col] = v0 + v7;
-      p[7 * 8 + col] = v0 - v7;
-      p[1 * 8 + col] = v1 + v6;
-      p[6 * 8 + col] = v1 - v6;
-      p[2 * 8 + col] = v2 + v5;
-      p[5 * 8 + col] = v2 - v5;
-      p[3 * 8 + col] = v3 + v4;
-      p[4 * 8 + col] = v3 - v4;
+      p[0 * 8 + col] = (v0 + v7);
+      p[7 * 8 + col] = (v0 - v7);
+      p[1 * 8 + col] = (v1 + v6);
+      p[6 * 8 + col] = (v1 - v6);
+      p[2 * 8 + col] = (v2 + v5);
+      p[5 * 8 + col] = (v2 - v5);
+      p[3 * 8 + col] = (v3 + v4);
+      p[4 * 8 + col] = (v3 - v4);
     }
 
     // convert to 8-bit integers
     for (int i = 0; i < 64; ++i) {
-      int sample = 128 + ((p[i] + 8) >> 4);
+      int sample = (128 + ((p[i] + 8) >> 4));
       dataOut[i] = sample < 0 ? 0 : sample > 0xFF ? 0xFF : sample;
     }
   }
 
-  int _clamp(num a) {
-    int i = a.toInt();
+  int _clamp(int a) {
+    int i = a;//.toInt();
     return i < 0 ? 0 : i > 255 ? 255 : i;
   }
 
@@ -1028,7 +1030,8 @@ class JpegDecoder {
 
       if (i + 1 < length) {
         // p here points to last code
-        q = {'children': [], 'index': 0};
+        q = { 'children': [],
+              'index': 0 };
         code.add(q);
         if (p['children'].length <= p['index']) {
           p['children'].length = p['index'] + 1;
@@ -1058,13 +1061,13 @@ class JpegDecoder {
       55, 62,
       63 ];
 
-  static const int _dctCos1  =  4017;  // cos(pi/16)
-  static const int _dctSin1  =  799;   // sin(pi/16)
-  static const int _dctCos3  =  3406;  // cos(3*pi/16)
-  static const int _dctSin3  =  2276;  // sin(3*pi/16)
-  static const int _dctCos6  =  1567;  // cos(6*pi/16)
-  static const int _dctSin6  =  3784;  // sin(6*pi/16)
-  static const int _dctSqrt2 =  5793;  // sqrt(2)
+  static const int _dctCos1  = 4017;  // cos(pi/16)
+  static const int _dctSin1  = 799;   // sin(pi/16)
+  static const int _dctCos3  = 3406;  // cos(3*pi/16)
+  static const int _dctSin3  = 2276;  // sin(3*pi/16)
+  static const int _dctCos6  = 1567;  // cos(6*pi/16)
+  static const int _dctSin6  = 3784;  // sin(6*pi/16)
+  static const int _dctSqrt2 = 5793;  // sqrt(2)
   static const int _dctSqrt1d2 = 2896; // sqrt(2) / 2
 }
 
@@ -1086,7 +1089,7 @@ class _JpegFrame {
 class _JpegComponent {
   int h;
   int v;
-  List quantizationTable;
+  Data.Int32List quantizationTable;
   int blocksPerLine;
   int blocksPerColumn;
   List blocks;
