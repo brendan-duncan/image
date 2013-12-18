@@ -10,7 +10,7 @@ class JpegDecoder {
   Stopwatch timer = new Stopwatch();
 
   Image decode(List<int> data) {
-    //print(MAX_INT);
+    print(MAX_INT);
     timer.start();
     _ByteBuffer bytes = new _ByteBuffer.fromList(data);
 
@@ -87,7 +87,7 @@ class JpegDecoder {
           }
 
           t2 = timer.elapsed;
-          //print('[A] ${t2 - t1}');
+          print('[A] ${t2 - t1}');
           break;
 
         case 0xFFDB: // DQT (Define Quantization Tables)
@@ -118,7 +118,7 @@ class JpegDecoder {
             quantizationTables[i] = tableData;
           }
           t2 = timer.elapsed;
-          //print('[B] ${t2 - t1}');
+          print('[B] ${t2 - t1}');
           break;
 
         case 0xFFC0: // SOF0 (Start of Frame, Baseline DCT)
@@ -151,20 +151,26 @@ class JpegDecoder {
           _prepareComponents(frame);
           frames.add(frame);
           t2 = timer.elapsed;
-          //print('[C] ${t2 - t1}');
+          print('[C] ${t2 - t1}');
           break;
 
         case 0xFFC4: // DHT (Define Huffman Tables)
           t1 = timer.elapsed;
           int huffmanLength = bytes.readUint16();
+          print('length: $huffmanLength');
+
           for (i = 2; i < huffmanLength;) {
-            var huffmanTableSpec = bytes.readByte();
-            var codeLengths = new Data.Uint8List(16);
-            var codeLengthSum = 0;
+            int huffmanTableSpec = bytes.readByte();
+            print('spec: $huffmanTableSpec');
+
+            Data.Uint8List codeLengths = new Data.Uint8List(16);
+            int codeLengthSum = 0;
             for (j = 0; j < 16; j++) {
-              codeLengthSum += (codeLengths[j] = bytes.readByte());
+              codeLengths[j] = bytes.readByte();
+              codeLengthSum += codeLengths[j];
             }
-            var huffmanValues = new Data.Uint8List(codeLengthSum);
+
+            Data.Uint8List huffmanValues = new Data.Uint8List(codeLengthSum);
             for (j = 0; j < codeLengthSum; j++) {
               huffmanValues[j] = bytes.readByte();
             }
@@ -172,14 +178,16 @@ class JpegDecoder {
 
             var l = ((huffmanTableSpec >> 4) == 0 ?
               huffmanTablesDC : huffmanTablesAC);
+
             if (l.length <= huffmanTableSpec & 15) {
               l.length = (huffmanTableSpec & 15) + 1;
             }
+
             l[huffmanTableSpec & 15] =
               _buildHuffmanTable(codeLengths, huffmanValues);
           }
           t2 = timer.elapsed;
-          //print('[D] ${t2 - t1}');
+          print('[D] ${t2 - t1}');
           break;
 
         case 0xFFDD: // DRI (Define Restart Interval)
@@ -187,7 +195,7 @@ class JpegDecoder {
           bytes.readUint16(); // skip data length
           resetInterval = bytes.readUint16();
           t2 = timer.elapsed;
-          //print('[E] ${t2 - t1}');
+          print('[E] ${t2 - t1}');
           break;
 
         case 0xFFDA: // SOS (Start of Scan)
@@ -198,8 +206,13 @@ class JpegDecoder {
           for (i = 0; i < selectorsCount; i++) {
             _JpegComponent component = frame.components[bytes.readByte()];
             int tableSpec = bytes.readByte();
-            component.huffmanTableDC = huffmanTablesDC[tableSpec >> 4];
-            component.huffmanTableAC = huffmanTablesAC[tableSpec & 15];
+            print('spec $tableSpec');
+            if (huffmanTablesDC.length > (tableSpec >> 4)) {
+              component.huffmanTableDC = huffmanTablesDC[tableSpec >> 4];
+            }
+            if (huffmanTablesAC.length > (tableSpec & 15)) {
+              component.huffmanTableAC = huffmanTablesAC[tableSpec & 15];
+            }
             components[i] = component;
           }
           int spectralStart = bytes.readByte();
@@ -211,7 +224,7 @@ class JpegDecoder {
                       successiveApproximation >> 4,
                       successiveApproximation & 15);
           t2 = timer.elapsed;
-          //print('[F] ${t2 - t1}');
+          print('[F] ${t2 - t1}');
           break;
         default:
           if (bytes.peakAtOffset(-3) == 0xFF &&
@@ -222,7 +235,8 @@ class JpegDecoder {
             bytes.position -= 3;
             break;
           }
-          throw 'unknown JPEG marker ' + fileMarker;
+
+          throw 'unknown JPEG marker ' + fileMarker.toRadixString(16);
       }
 
       fileMarker = bytes.readUint16();
@@ -253,7 +267,7 @@ class JpegDecoder {
     jpeg['components'] = components;
 
     _copyToImage(jpeg, image);
-    //print('[Total] ${timer.elapsed}');
+    print('[Total] ${timer.elapsed}');
 
     return image;
   }
@@ -664,7 +678,7 @@ class JpegDecoder {
             continue;
           case 1: // skipping r zero items
           case 2:
-            if (zz[z]) {
+            if (zz[z] != 0) {
               zz[z] += (_readBit() << successive);
             } else {
               r--;
@@ -674,7 +688,7 @@ class JpegDecoder {
             }
             break;
           case 3: // set value for a zero item
-            if (zz[z]) {
+            if (zz[z] != 0) {
               zz[z] += (_readBit() << successive);
             } else {
               zz[z] = (successiveACNextValue << successive);
@@ -682,7 +696,7 @@ class JpegDecoder {
             }
             break;
           case 4: // eob
-            if (zz[z]) {
+            if (zz[z] != 0) {
               zz[z] += (_readBit() << successive);
             }
             break;
@@ -774,7 +788,7 @@ class JpegDecoder {
       bitsCount = 0;
       marker = (((bytes.peakAtOffset(0) << 8) | bytes.peakAtOffset(1)));
       if (marker <= 0xFF00) {
-        throw 'marker was not found';
+        //throw 'marker was not found';
       }
 
       if (marker >= 0xFFD0 && marker <= 0xFFD7) { // RSTx
@@ -795,7 +809,7 @@ class JpegDecoder {
     Data.Uint8List r = new Data.Uint8List(64);
     List<Data.Uint8List> lines = new List(blocksPerColumn * 8);
 
-    //print('$blocksPerColumn $blocksPerLine');
+    print('$blocksPerColumn $blocksPerLine');
     int l = 0;
     for (int blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
       int scanLine = blockRow << 3;
@@ -819,7 +833,7 @@ class JpegDecoder {
       }
     }
     Duration t2 = timer.elapsed;
-    //print('[G] ${t2 - t1}');
+    print('[G] ${t2 - t1}');
 
     return lines;
   }
