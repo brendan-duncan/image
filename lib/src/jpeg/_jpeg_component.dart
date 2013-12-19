@@ -3,7 +3,7 @@ part of dart_image;
 class _JpegComponent {
   int h;
   int v;
-  Data.Int32List quantizationTable;
+  final Data.Int32List quantizationTable;
   int blocksPerLine;
   int blocksPerColumn;
   List blocks;

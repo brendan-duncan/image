@@ -1,7 +1,7 @@
 part of dart_image;
 
 class _ByteBuffer {
-  final List<int> buffer;
+  List<int> buffer;
   int position = 0;
 
   _ByteBuffer() :
@@ -10,6 +10,11 @@ class _ByteBuffer {
 
   _ByteBuffer.fromList(this.buffer) :
     position = 0;
+
+  void resetTo(List<int> buffer) {
+    this.buffer = buffer;
+    position = 0;
+  }
 
   int get length => buffer.length;
 
@@ -43,12 +48,6 @@ class _ByteBuffer {
     return (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
   }
 
-  List<int> readBlock() {
-    int length = readUint16();
-    List<int> array = buffer.sublist(position, position + length - 2);
-    position += array.length;
-    return array;
-  }
 
   int peakAtOffset(int offset) {
     return buffer[position + offset];
@@ -62,7 +61,7 @@ class _ByteBuffer {
     buffer.addAll(bytes);
   }
 
-  void writeBits(bs) {
+  void writeBits(List bs) {
     var value = bs[0];
     var posval = bs[1] - 1;
     while (posval >= 0) {

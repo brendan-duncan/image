@@ -189,7 +189,8 @@ class _JpegData {
 
     marker = _nextMarker();
     while (marker != _Jpeg.M_EOI && !fp.isEOF) { // EOI (End of image)
-      switch(marker) {
+      _ByteBuffer block = _readBlock();
+      switch (marker) {
         case _Jpeg.M_APP0:
         case _Jpeg.M_APP1:
         case _Jpeg.M_APP2:
@@ -207,17 +208,20 @@ class _JpegData {
         case _Jpeg.M_APP14:
         case _Jpeg.M_APP15:
         case _Jpeg.M_COM:
-          _readAppData(marker);
+          print('M_APP${marker - _Jpeg.M_APP0} ${block.length}');
+          _readAppData(marker, block);
           break;
 
         case _Jpeg.M_DQT: // DQT (Define Quantization Tables)
-          _readDQT();
+          print('M_DQT ${block.length}');
+          _readDQT(block);
           break;
 
         case _Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
         case _Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
         case _Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
-          _readFrame(marker);
+          print('M_SOF${marker - _Jpeg.M_SOF0} ${block.length}');
+          _readFrame(marker, block);
           break;
 
         case _Jpeg.M_SOF3:
@@ -235,44 +239,63 @@ class _JpegData {
           break;
 
         case _Jpeg.M_DHT: // DHT (Define Huffman Tables)
-          _readDHT();
+          print('M_DHT ${block.length}');
+          _readDHT(block);
           break;
 
         case _Jpeg.M_DRI: // DRI (Define Restart Interval)
-          _readDRI();
+          print('M_DRI ${block.length}');
+          _readDRI(block);
           break;
 
         case _Jpeg.M_SOS: // SOS (Start of Scan)
-          _readSOS();
+          print('M_SOS ${block.length}');
+          _readSOS(block);
           break;
 
         default:
           if (fp.peakAtOffset(-3) == 0xFF &&
               fp.peakAtOffset(-2) >= 0xC0 &&
               fp.peakAtOffset(-2) <= 0xFE) {
+            print('INCORRECT CODING');
             // could be incorrect encoding -- last 0xFF byte of the previous
             // block was eaten by the encoder
             fp.position -= 3;
             break;
           }
 
-          throw 'unknown JPEG marker ' + marker.toRadixString(16);
+          if (marker != 0) {
+            throw 'unknown JPEG marker ' + marker.toRadixString(16);
+          }
+          break;
       }
 
       marker = _nextMarker();
     }
   }
 
+  _ByteBuffer _readBlock() {
+    int length = fp.readUint16();
+    if (length < 2) {
+      throw 'Invalid Block';
+    }
+    List<int> array = fp.readBytes(length - 2);
+    return new _ByteBuffer.fromList(array);
+  }
+
   int _nextMarker() {
     int b = fp.readByte();
+    while (b != 0xff && !fp.isEOF) {
+      b = fp.readByte();
+    }
     if (b != 0xff) {
       throw 'Invalid Marker ${b.toRadixString(16)}';
     }
     return fp.readByte();
   }
 
-  void _readAppData(int marker) {
-    List<int> appData = fp.readBlock();
+  void _readAppData(int marker, _ByteBuffer block) {
+    List<int> appData = block.buffer;
 
     if (marker == _Jpeg.M_APP0) {
       // 'JFIF\0'
@@ -305,13 +328,9 @@ class _JpegData {
     }
   }
 
-  void _readDQT() {
-    int length = fp.readUint16();
-
-    length -= 2;
-
-    while (length > 0) {
-      int n = fp.readByte();
+  void _readDQT(_ByteBuffer block) {
+    while (!block.isEOF) {
+      int n = block.readByte();
       int prec = n >> 4;
       n &= 0x0F;
 
@@ -327,49 +346,41 @@ class _JpegData {
       for (int i = 0; i < _Jpeg.DCTSIZE2; i++) {
         int tmp;
         if (prec != 0) {
-          tmp = fp.readUint16();
+          tmp = block.readUint16();
         } else {
-          tmp = fp.readByte();
+          tmp = block.readByte();
         }
 
         tableData[_Jpeg.dctNaturalOrder[i]] = tmp;
       }
-
-      length -= _Jpeg.DCTSIZE2 + 1;
-      if (prec != 0) {
-        length -= _Jpeg.DCTSIZE2;
-      }
     }
 
-    if (length != 0) {
+    if (!block.isEOF) {
       throw 'Bad length for DQT block';
     }
   }
 
-  void _readFrame(int marker) {
+  void _readFrame(int marker, _ByteBuffer block) {
     if (frame != null) {
       throw 'Duplicate Frame';
     }
 
-    int length = fp.readUint16(); // skip data length
     frame = new _JpegFrame();
 
     frame.extended = (marker == _Jpeg.M_SOF1);
     frame.progressive = (marker == _Jpeg.M_SOF2);
-    frame.precision = fp.readByte();
-    frame.scanLines = fp.readUint16();
-    frame.samplesPerLine = fp.readUint16();
+    frame.precision = block.readByte();
+    frame.scanLines = block.readUint16();
+    frame.samplesPerLine = block.readUint16();
 
-    int numComponents = fp.readByte();
-
-    length -= 8;
+    int numComponents = block.readByte();
 
     for (int i = 0; i < numComponents; i++) {
-      int componentId = fp.readByte();
-      int x = fp.readByte();
+      int componentId = block.readByte();
+      int x = block.readByte();
       int h = (x >> 4) & 15;
       int v = x & 15;
-      int qId = fp.readByte();
+      int qId = block.readByte();
       frame.componentsOrder.add(componentId);
       frame.components[componentId] =
           new _JpegComponent(h, v, quantizationTables[qId]);
@@ -379,27 +390,21 @@ class _JpegData {
     frames.add(frame);
   }
 
-  void _readDHT() {
-    int length = fp.readUint16();
-    length -= 2;
-
-    while (length > 16) {
-      int index = fp.readByte();
+  void _readDHT(_ByteBuffer block) {
+    while (!block.isEOF) {
+      int index = block.readByte();
 
       Data.Uint8List bits = new Data.Uint8List(16);
       int count = 0;
       for (int j = 0; j < 16; j++) {
-        bits[j] = fp.readByte();
+        bits[j] = block.readByte();
         count += bits[j];
       }
 
-      length -= 17;
-
       Data.Uint8List huffmanValues = new Data.Uint8List(count);
       for (int j = 0; j < count; j++) {
-        huffmanValues[j] = fp.readByte();
+        huffmanValues[j] = block.readByte();
       }
-      length -= count;
 
       var ht;
       if (index & 0x10 != 0) { // AC table definition
@@ -417,23 +422,21 @@ class _JpegData {
     }
   }
 
-  void _readDRI() {
-    int length = fp.readUint16(); // skip data length
-    resetInterval = fp.readUint16();
+  void _readDRI(_ByteBuffer block) {
+    resetInterval = block.readUint16();
   }
 
-  void _readSOS() {
-    int length = fp.readUint16();
-    int n = fp.readByte();
+  void _readSOS(_ByteBuffer block) {
+    int n = block.readByte();
 
-    if (length != (n * 2 + 6) || n < 1 || n > _Jpeg.MAX_COMPS_IN_SCAN) {
+    if (n < 1 || n > _Jpeg.MAX_COMPS_IN_SCAN) {
       throw 'Invalid SOS block';
     }
 
     List components = new List(n);
     for (int i = 0; i < n; i++) {
-      int id = fp.readByte();
-      int c = fp.readByte();
+      int id = block.readByte();
+      int c = block.readByte();
 
       if (!frame.components.containsKey(id)) {
         throw 'Invalid Component in SOS block';
@@ -453,9 +456,9 @@ class _JpegData {
       }
     }
 
-    int spectralStart = fp.readByte();
-    int spectralEnd = fp.readByte();
-    int successiveApproximation = fp.readByte();
+    int spectralStart = block.readByte();
+    int spectralEnd = block.readByte();
+    int successiveApproximation = block.readByte();
 
     int Ah = (successiveApproximation >> 4) & 15;
     int Al = successiveApproximation & 15;
