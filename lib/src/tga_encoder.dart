@@ -4,7 +4,7 @@ part of dart_image;
  * Encode a TGA image.  Used for debugging since TGA format isn't used much
  * these days.
  */
-class TgaEncoder {
+class TgaEncoder extends Encoder {
   TgaEncoder() {
   }
 

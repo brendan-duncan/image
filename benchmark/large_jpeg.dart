@@ -21,8 +21,7 @@ class LargeJpegBenchmark extends BenchmarkBase {
   }
 
   void setup() {
-    Io.File file = new Io.File('res/abstract.jpg');
-    //Io.File file = new Io.File('res/diamond_plate_texture.jpg');
+    Io.File file = new Io.File('res/diamond_plate_texture.jpg');
     file.openSync();
 
     jpegBytes = file.readAsBytesSync();

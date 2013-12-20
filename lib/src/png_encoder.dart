@@ -3,7 +3,7 @@ part of dart_image;
 /**
  * Encode an image to the PNG format.
  */
-class PngEncoder {
+class PngEncoder extends Encoder {
   static const int FILTER_NONE = 0;
   static const int FILTER_SUB = 1;
   static const int FILTER_UP = 2;

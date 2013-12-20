@@ -6,7 +6,7 @@ part of dart_image;
  * Derived from:
  * https://github.com/owencm/javascript-jpeg-encoder
  */
-class JpegEncoder {
+class JpegEncoder extends Encoder {
   JpegEncoder([int quality = 100]) {
     _initHuffmanTbl();
     _initCategoryNumber();

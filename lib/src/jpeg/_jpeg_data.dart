@@ -15,6 +15,7 @@ class _JpegData {
 
   _JpegData(List<int> data) :
     fp = new _ByteBuffer.fromList(data) {
+
     _read();
 
     if (frames.length != 1) {
@@ -184,7 +185,7 @@ class _JpegData {
   void _read() {
     int marker = _nextMarker();
     if (marker != _Jpeg.M_SOI) { // SOI (Start of Image)
-      throw 'SOI not found';
+      throw 'Start Of Image marker not found.';
     }
 
     marker = _nextMarker();
@@ -208,19 +209,16 @@ class _JpegData {
         case _Jpeg.M_APP14:
         case _Jpeg.M_APP15:
         case _Jpeg.M_COM:
-          print('M_APP${marker - _Jpeg.M_APP0} ${block.length}');
           _readAppData(marker, block);
           break;
 
         case _Jpeg.M_DQT: // DQT (Define Quantization Tables)
-          print('M_DQT ${block.length}');
           _readDQT(block);
           break;
 
         case _Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
         case _Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
         case _Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
-          print('M_SOF${marker - _Jpeg.M_SOF0} ${block.length}');
           _readFrame(marker, block);
           break;
 
@@ -239,17 +237,14 @@ class _JpegData {
           break;
 
         case _Jpeg.M_DHT: // DHT (Define Huffman Tables)
-          print('M_DHT ${block.length}');
           _readDHT(block);
           break;
 
         case _Jpeg.M_DRI: // DRI (Define Restart Interval)
-          print('M_DRI ${block.length}');
           _readDRI(block);
           break;
 
         case _Jpeg.M_SOS: // SOS (Start of Scan)
-          print('M_SOS ${block.length}');
           _readSOS(block);
           break;
 
@@ -274,6 +269,14 @@ class _JpegData {
     }
   }
 
+  void _skipBlock() {
+    int length = fp.readUint16();
+    if (length < 2) {
+      throw 'Invalid Block';
+    }
+    fp.position += length - 2;
+  }
+
   _ByteBuffer _readBlock() {
     int length = fp.readUint16();
     if (length < 2) {
@@ -284,15 +287,19 @@ class _JpegData {
   }
 
   int _nextMarker() {
-    int b = fp.readByte();
-    if (b != 0xff) {
-      throw 'Invalid Marker ${b.toRadixString(16)}';
-    }
-    b = fp.readByte();
-    while (b == 0xff) {
-      b = fp.readByte();
-    }
-    return b;
+    int c = 0;
+
+    do {
+      do {
+        c = fp.readByte();
+      } while (c != 0xff && !fp.isEOF);
+
+      do {
+        c = fp.readByte();
+      } while (c == 0xff && !fp.isEOF);
+    } while (c == 0 && !fp.isEOF);
+
+    return c;
   }
 
   void _readAppData(int marker, _ByteBuffer block) {

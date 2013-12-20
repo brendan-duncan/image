@@ -6,7 +6,7 @@ part of dart_image;
  * Derived from:
  * https://github.com/notmasteryet/jpgjs
  */
-class JpegDecoder {
+class JpegDecoder extends Decoder {
   Image decode(List<int> data) {
     _JpegData jpeg = new _JpegData(data);
 
