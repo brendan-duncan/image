@@ -265,7 +265,7 @@ class _JpegData {
           }
 
           if (marker != 0) {
-            throw 'unknown JPEG marker ' + marker.toRadixString(16);
+            throw 'Unknown JPEG marker ' + marker.toRadixString(16);
           }
           break;
       }
@@ -285,13 +285,14 @@ class _JpegData {
 
   int _nextMarker() {
     int b = fp.readByte();
-    while (b != 0xff && !fp.isEOF) {
-      b = fp.readByte();
-    }
     if (b != 0xff) {
       throw 'Invalid Marker ${b.toRadixString(16)}';
     }
-    return fp.readByte();
+    b = fp.readByte();
+    while (b == 0xff) {
+      b = fp.readByte();
+    }
+    return b;
   }
 
   void _readAppData(int marker, _ByteBuffer block) {
