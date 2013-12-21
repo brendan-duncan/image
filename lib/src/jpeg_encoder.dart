@@ -33,22 +33,22 @@ class JpegEncoder extends Encoder {
   }
 
   List<int> encode(Image image) {
-    _ByteBuffer out = new _ByteBuffer();
+    _ByteBuffer fp = new _ByteBuffer();
 
     // Add JPEG headers
-    out.writeUint16(0xFFD8); // SOI
-    _writeAPP0(out);
-    _writeDQT(out);
-    _writeSOF0(out, image.width, image.height);
-    _writeDHT(out);
-    _writeSOS(out);
+    _writeMarker(fp, _Jpeg.M_SOI);
+    _writeAPP0(fp);
+    _writeDQT(fp);
+    _writeSOF0(fp, image.width, image.height);
+    _writeDHT(fp);
+    _writeSOS(fp);
 
     // Encode 8x8 macroblocks
     int DCY = 0;
     int DCU = 0;
     int DCV = 0;
 
-    out.resetBits();
+    fp.resetBits();
 
     int width = image.width;
     int height = image.height;
@@ -92,9 +92,9 @@ class JpegEncoder extends Encoder {
                        RGB_YUV_TABLE[(b + 1792)]) >> 16) - 128.0;
         }
 
-        DCY = _processDU(out, YDU, fdtbl_Y, DCY, YDC_HT, YAC_HT);
-        DCU = _processDU(out, UDU, fdtbl_UV, DCU, UVDC_HT, UVAC_HT);
-        DCV = _processDU(out, VDU, fdtbl_UV, DCV, UVDC_HT, UVAC_HT);
+        DCY = _processDU(fp, YDU, fdtbl_Y, DCY, YDC_HT, YAC_HT);
+        DCU = _processDU(fp, UDU, fdtbl_UV, DCU, UVDC_HT, UVAC_HT);
+        DCV = _processDU(fp, VDU, fdtbl_UV, DCV, UVDC_HT, UVAC_HT);
 
         x += 8;
       }
@@ -105,15 +105,20 @@ class JpegEncoder extends Encoder {
     ////////////////////////////////////////////////////////////////
 
     // Do the bit alignment of the EOI marker
-    if (out._bytepos >= 0) {
-      final fillbits = [(1 << (out._bytepos + 1)) - 1,
-                        out._bytepos + 1];
-      out.writeBits(fillbits);
+    if (fp._bytepos >= 0) {
+      final fillbits = [(1 << (fp._bytepos + 1)) - 1,
+                        fp._bytepos + 1];
+      fp.writeBits(fillbits);
     }
 
-    out.writeUint16(0xFFD9); //EOI
+    _writeMarker(fp, _Jpeg.M_EOI);
 
-    return out.buffer;
+    return fp.buffer;
+  }
+
+  void _writeMarker(_ByteBuffer fp, int marker) {
+    fp.writeByte(0xff);
+    fp.writeByte(marker & 0xff);
   }
 
   final YTable = new List(64);
@@ -136,16 +141,6 @@ class JpegEncoder extends Encoder {
   final charLookupTable = new List(256);
   final RGB_YUV_TABLE = new List(2048);
   int currentQuality;
-
-  static const List<int> ZigZag = const [
-      0, 1, 5, 6, 14, 15, 27, 28,
-      2, 4, 7, 13, 16, 26, 29, 42,
-      3, 8, 12, 17, 25, 30, 41, 43,
-      9, 11, 18, 24, 31, 40, 44, 53,
-      10, 19, 23, 32, 39, 45, 52, 54,
-      20, 22, 33, 38, 46, 51, 55, 60,
-      21, 34, 37, 47, 50, 56, 59, 61,
-      35, 36, 48, 49, 57, 58, 62, 63 ];
 
   static const List<int> std_dc_luminance_nrcodes = const [
       0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 ];
@@ -229,7 +224,7 @@ class JpegEncoder extends Encoder {
       } else if (t > 255) {
         t = 255;
       }
-      YTable[ZigZag[i]] = t;
+      YTable[_Jpeg.dctZigZag[i]] = t;
     }
 
     const List<int> UVQT = const [
@@ -249,7 +244,7 @@ class JpegEncoder extends Encoder {
       } else if (u > 255) {
         u = 255;
       }
-      UVTable[ZigZag[j]] = u;
+      UVTable[_Jpeg.dctZigZag[j]] = u;
     }
 
     const List<double> aasf = const [
@@ -259,8 +254,8 @@ class JpegEncoder extends Encoder {
     int k = 0;
     for (int row = 0; row < 8; row++) {
       for (int col = 0; col < 8; col++) {
-        fdtbl_Y[k] = (1.0 / (YTable [ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
-        fdtbl_UV[k] = (1.0 / (UVTable[ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+        fdtbl_Y[k] = (1.0 / (YTable [_Jpeg.dctZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+        fdtbl_UV[k] = (1.0 / (UVTable[_Jpeg.dctZigZag[k]] * aasf[row] * aasf[col] * 8.0));
         k++;
       }
     }
@@ -457,7 +452,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeAPP0(_ByteBuffer out) {
-    out.writeUint16(0xFFE0); // marker
+    _writeMarker(out, _Jpeg.M_APP0);
     out.writeUint16(16); // length
     out.writeByte(0x4A); // J
     out.writeByte(0x46); // F
@@ -474,7 +469,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeSOF0(_ByteBuffer out, int width, int height) {
-    out.writeUint16(0xFFC0); // marker
+    _writeMarker(out, _Jpeg.M_SOF0);
     out.writeUint16(17);   // length, truecolor YUV JPG
     out.writeByte(8);    // precision
     out.writeUint16(height);
@@ -492,7 +487,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeDQT(_ByteBuffer out) {
-    out.writeUint16(0xFFDB); // marker
+    _writeMarker(out, _Jpeg.M_DQT);
     out.writeUint16(132); // length
     out.writeByte(0);
     for (int i = 0; i < 64; i++) {
@@ -505,7 +500,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeDHT(_ByteBuffer out) {
-    out.writeUint16(0xFFC4); // marker
+    _writeMarker(out, _Jpeg.M_DHT);
     out.writeUint16(0x01A2); // length
 
     out.writeByte(0); // HTYDCinfo
@@ -542,7 +537,7 @@ class JpegEncoder extends Encoder {
   }
 
   _writeSOS(_ByteBuffer out) {
-    out.writeUint16(0xFFDA); // marker
+    _writeMarker(out, _Jpeg.M_SOS);
     out.writeUint16(12); // length
     out.writeByte(3); // nrofcomponents
     out.writeByte(1); // IdY
@@ -568,7 +563,7 @@ class JpegEncoder extends Encoder {
 
     // ZigZag reorder
     for (int j = 0; j < I64; ++j) {
-      DU[ZigZag[j]] = DU_DCT[j];
+      DU[_Jpeg.dctZigZag[j]] = DU_DCT[j];
     }
 
     int Diff = DU[0] - DC;
