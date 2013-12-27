@@ -126,13 +126,12 @@ class PngDecoder extends Decoder {
               break;
           }
           break;
-        case 'tEXt':
-          /*List<int> text = bytes.readBytes(chunkSize);
+        /*case 'tEXt':
+          List<int> text = bytes.readBytes(chunkSize);
           String key = new String.fromCharCodes(text);
           print(key);
           text[key] = String.fromCharCode.apply(String, text.slice(index + 1));
-          */
-          break;
+          break;*/
         case 'IEND':
           // End of the image.
           switch (header.colorType) {
