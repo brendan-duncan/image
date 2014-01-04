@@ -5,7 +5,7 @@ part of image;
  */
 class PngDecoder {
   Image decode(List<int> data) {
-    Arc.InputBuffer bytes = new Arc.InputBuffer(data,
+    Arc.InputBuffer input = new Arc.InputBuffer(data,
         byteOrder: Arc.BIG_ENDIAN);
 
     _PngHeader header;
@@ -18,7 +18,7 @@ class PngDecoder {
     String colorSpace;
     Image image;
 
-    List<int> pngHeader = bytes.readBytes(8);
+    List<int> pngHeader = input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
@@ -68,19 +68,19 @@ class PngDecoder {
     //      regarded as fully transparent.
     // zTXt contains compressed text with the same limits as tEXt.
     while (true) {
-      int chunkSize = bytes.readUint32();
-      String section = new String.fromCharCodes(bytes.readBytes(4));
+      int chunkSize = input.readUint32();
+      String section = new String.fromCharCodes(input.readBytes(4));
 
       switch (section) {
         case 'IHDR':
           header = new _PngHeader();
-          header.width = bytes.readUint32();
-          header.height = bytes.readUint32();
-          header.bits = bytes.readByte();
-          header.colorType = bytes.readByte();
-          header.compressionMethod = bytes.readByte();
-          header.filterMethod = bytes.readByte();
-          header.interlaceMethod = bytes.readByte();
+          header.width = input.readUint32();
+          header.height = input.readUint32();
+          header.bits = input.readByte();
+          header.colorType = input.readByte();
+          header.compressionMethod = input.readByte();
+          header.filterMethod = input.readByte();
+          header.interlaceMethod = input.readByte();
 
           if (header.bits != 8) {
             throw new ImageException('Only 24-bit or 32-bit PNG images supported.');
@@ -96,7 +96,7 @@ class PngDecoder {
           image = new Image(header.width, header.height, format);
           break;
         case 'IDAT':
-          List<int> data = bytes.readBytes(chunkSize);
+          List<int> data = input.readBytes(chunkSize);
           imageData.addAll(data);
           break;
         case 'IEND':
@@ -119,7 +119,7 @@ class PngDecoder {
           colorSpace = (colors == 1) ? 'DeviceGray' : 'DeviceRGB';
           break;
         default:
-          bytes.skip(chunkSize);
+          input.skip(chunkSize);
           break;
       }
 
@@ -128,9 +128,9 @@ class PngDecoder {
       }
 
       // CRC
-      int crc = bytes.readUint32();
+      input.readUint32();
 
-      if (bytes.isEOF) {
+      if (input.isEOF) {
         throw new ImageException('Incomplete or corrupt PNG file');
       }
     }
@@ -139,13 +139,9 @@ class PngDecoder {
       throw new ImageException('Incomplete or corrupt PNG file');
     }
 
-    // PNG's are stored in big-endian byte order.
-    Arc.InputBuffer imageInput = new Arc.InputBuffer(imageData,
-                                                     byteOrder: Arc.BIG_ENDIAN);
+    List<int> uncompressed = new Arc.ZLibDecoder().decode(imageData);
 
-    List<int> uncompressed = new Arc.ZLibDecoder().decode(imageInput);
-
-    bytes = new Arc.InputBuffer(uncompressed);
+    input = new Arc.InputBuffer(uncompressed, byteOrder: Arc.BIG_ENDIAN);
 
     int pixelBytes = pixelBitlength ~/ 8;
 
@@ -153,17 +149,17 @@ class PngDecoder {
     // Unfilter the image now.
     int pi = 0;
     int row = 0;
-    while (!bytes.isEOF) {
-      int code = bytes.readByte();
+    while (!input.isEOF) {
+      int code = input.readByte();
       switch (code) {
         case FILTER_NONE:
           for (int i = 0; i < header.width; i++) {
-            image.buffer[pi++] = getColorFromList(bytes.readBytes(pixelBytes));
+            image.buffer[pi++] = getColorFromList(input.readBytes(pixelBytes));
           }
           break;
         case FILTER_SUB:
           for (int i = 0; i < header.width; i++) {
-            int x = getColorFromList(bytes.readBytes(pixelBytes));
+            int x = getColorFromList(input.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image.buffer[pi - 1];
             image.buffer[pi++] = getColor((getRed(x) + getRed(a)) % 256,
                                           (getGreen(x) + getGreen(a)) % 256,
@@ -173,7 +169,7 @@ class PngDecoder {
           break;
         case FILTER_UP:
           for (int i = 0; i < header.width; i++) {
-            int x = getColorFromList(bytes.readBytes(pixelBytes));
+            int x = getColorFromList(input.readBytes(pixelBytes));
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             image.buffer[pi++] = getColor((getRed(x) + getRed(b)) % 256,
                                           (getGreen(x) + getGreen(b)) % 256,
@@ -183,7 +179,7 @@ class PngDecoder {
           break;
         case FILTER_AVERAGE:
           for (int i = 0; i < header.width; i++) {
-            int x = getColorFromList(bytes.readBytes(pixelBytes));
+            int x = getColorFromList(input.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image.buffer[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             int ra = getRed(a);
@@ -202,7 +198,7 @@ class PngDecoder {
           break;
         case FILTER_PAETH:
           for (int i = 0; i < header.width; i++) {
-            int x = getColorFromList(bytes.readBytes(pixelBytes));
+            int x = getColorFromList(input.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image.buffer[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             int c = (i == 0 || row == 0) ? 0 : image.getPixel(i - 1, row - 1);

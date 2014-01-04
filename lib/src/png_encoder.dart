@@ -12,16 +12,17 @@ class PngEncoder {
   static const int FILTER_AGRESSIVE = 5;
 
   int filter;
+  int deflateMode;
 
-  PngEncoder([this.filter = FILTER_AGRESSIVE]) {
+  PngEncoder({this.filter: FILTER_PAETH, this.deflateMode}) {
     _initCrcTable();
   }
 
   List<int> encode(Image image) {
-    Arc.OutputBuffer out = new Arc.OutputBuffer(byteOrder: Arc.BIG_ENDIAN);
+    Arc.OutputBuffer output = new Arc.OutputBuffer(byteOrder: Arc.BIG_ENDIAN);
 
     // PNG file signature
-    out.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+    output.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
     // IHDR chunk
     Arc.OutputBuffer chunk = new Arc.OutputBuffer(byteOrder: Arc.BIG_ENDIAN);
@@ -32,22 +33,21 @@ class PngEncoder {
     chunk.writeByte(0); // compression method
     chunk.writeByte(0); // filter method
     chunk.writeByte(0); // interlace method
-    _writeChunk(out, 'IHDR', chunk.getBytes());
+    _writeChunk(output, 'IHDR', chunk.getBytes());
 
-    // Include room for the filter bytes.
-    final List<int> filteredImage = new List<int>((image.width *
-                                                   image.height *
-                                                   image.format) +
-                                                   image.height);
+    // Include room for the filter bytes (1 byte per row).
+    List<int> filteredImage = new List<int>((image.width * image.height *
+                                             image.format) + image.height);
     _filter(image, filteredImage);
 
-    var compressed = new Arc.ZLibEncoder().encode(filteredImage);
+    List<int> compressed = new Arc.ZLibEncoder().encode(filteredImage,
+                                                      deflateMode: deflateMode);
 
-    _writeChunk(out, 'IDAT', compressed);
+    _writeChunk(output, 'IDAT', compressed);
 
-    _writeChunk(out, 'IEND', []);
+    _writeChunk(output, 'IEND', []);
 
-    return out.getBytes();
+    return output.getBytes();
   }
 
   void _writeChunk(Arc.OutputBuffer out, String type, List<int> chunk) {
