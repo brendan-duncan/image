@@ -1,8 +1,8 @@
-part of dart_image;
+part of image;
 
 
 class _JpegScan {
-  _ByteBuffer fp;
+  Arc.InputBuffer fp;
   _JpegFrame frame;
   int precision;
   int samplesPerLine;
@@ -96,8 +96,8 @@ class _JpegScan {
 
       // find marker
       bitsCount = 0;
-      int marker = (((fp.peakAtOffset(0) << 8) | fp.peakAtOffset(1)));
-      if (marker <= 0xFF00) {
+      int marker = (((fp.buffer[fp.position] << 8) | fp.buffer[fp.position + 1]));
+      if (marker <= 0xff00) {
         //throw 'marker was not found';
       }
 
@@ -116,7 +116,7 @@ class _JpegScan {
     }
 
     bitsData = fp.readByte();
-    if (bitsData == 0xFF) {
+    if (bitsData == 0xff) {
       int nextByte = fp.readByte();
       if (nextByte != 0) {
         throw 'unexpected marker: ' +

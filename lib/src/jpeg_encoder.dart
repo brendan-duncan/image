@@ -1,4 +1,4 @@
-part of dart_image;
+part of image;
 
 /**
  * Encode an image to the JPEG format.
@@ -6,8 +6,8 @@ part of dart_image;
  * Derived from:
  * https://github.com/owencm/javascript-jpeg-encoder
  */
-class JpegEncoder extends Encoder {
-  JpegEncoder([int quality = 100]) {
+class JpegEncoder {
+  JpegEncoder({int quality: 100}) {
     _initHuffmanTbl();
     _initCategoryNumber();
     _initRGBYUVTable();
@@ -33,7 +33,7 @@ class JpegEncoder extends Encoder {
   }
 
   List<int> encode(Image image) {
-    _ByteBuffer fp = new _ByteBuffer();
+    Arc.OutputBuffer fp = new Arc.OutputBuffer(byteOrder: Arc.BIG_ENDIAN);
 
     // Add JPEG headers
     _writeMarker(fp, _Jpeg.M_SOI);
@@ -48,7 +48,7 @@ class JpegEncoder extends Encoder {
     int DCU = 0;
     int DCV = 0;
 
-    fp.resetBits();
+    _resetBits();
 
     int width = image.width;
     int height = image.height;
@@ -105,18 +105,18 @@ class JpegEncoder extends Encoder {
     ////////////////////////////////////////////////////////////////
 
     // Do the bit alignment of the EOI marker
-    if (fp._bytepos >= 0) {
-      final fillbits = [(1 << (fp._bytepos + 1)) - 1,
-                        fp._bytepos + 1];
-      fp.writeBits(fillbits);
+    if (_bytepos >= 0) {
+      final fillbits = [(1 << (_bytepos + 1)) - 1,
+                        _bytepos + 1];
+      _writeBits(fp, fillbits);
     }
 
     _writeMarker(fp, _Jpeg.M_EOI);
 
-    return fp.buffer;
+    return fp.getBytes();
   }
 
-  void _writeMarker(_ByteBuffer fp, int marker) {
+  void _writeMarker(Arc.OutputBuffer fp, int marker) {
     fp.writeByte(0xff);
     fp.writeByte(marker & 0xff);
   }
@@ -451,7 +451,7 @@ class JpegEncoder extends Encoder {
     return outputfDCTQuant;
   }
 
-  void _writeAPP0(_ByteBuffer out) {
+  void _writeAPP0(Arc.OutputBuffer out) {
     _writeMarker(out, _Jpeg.M_APP0);
     out.writeUint16(16); // length
     out.writeByte(0x4A); // J
@@ -468,7 +468,7 @@ class JpegEncoder extends Encoder {
     out.writeByte(0); // thumbnheight
   }
 
-  void _writeSOF0(_ByteBuffer out, int width, int height) {
+  void _writeSOF0(Arc.OutputBuffer out, int width, int height) {
     _writeMarker(out, _Jpeg.M_SOF0);
     out.writeUint16(17);   // length, truecolor YUV JPG
     out.writeByte(8);    // precision
@@ -486,7 +486,7 @@ class JpegEncoder extends Encoder {
     out.writeByte(1);    // QTV
   }
 
-  void _writeDQT(_ByteBuffer out) {
+  void _writeDQT(Arc.OutputBuffer out) {
     _writeMarker(out, _Jpeg.M_DQT);
     out.writeUint16(132); // length
     out.writeByte(0);
@@ -499,7 +499,7 @@ class JpegEncoder extends Encoder {
     }
   }
 
-  void _writeDHT(_ByteBuffer out) {
+  void _writeDHT(Arc.OutputBuffer out) {
     _writeMarker(out, _Jpeg.M_DHT);
     out.writeUint16(0x01A2); // length
 
@@ -536,7 +536,7 @@ class JpegEncoder extends Encoder {
     }
   }
 
-  _writeSOS(_ByteBuffer out) {
+  _writeSOS(Arc.OutputBuffer out) {
     _writeMarker(out, _Jpeg.M_SOS);
     out.writeUint16(12); // length
     out.writeByte(3); // nrofcomponents
@@ -551,7 +551,7 @@ class JpegEncoder extends Encoder {
     out.writeByte(0); // Bf
   }
 
-  int _processDU(_ByteBuffer out, List<double> CDU, List<double> fdtbl,
+  int _processDU(Arc.OutputBuffer out, List<double> CDU, List<double> fdtbl,
                  int DC, HTDC, HTAC) {
     List EOB = HTAC[0x00];
     List M16zeroes = HTAC[0xF0];
@@ -570,11 +570,11 @@ class JpegEncoder extends Encoder {
     DC = DU[0];
     // Encode DC
     if (Diff == 0) {
-      out.writeBits(HTDC[0]); // Diff might be 0
+      _writeBits(out, HTDC[0]); // Diff might be 0
     } else {
       pos = 32767 + Diff;
-      out.writeBits(HTDC[category[pos]]);
-      out.writeBits(bitcode[pos]);
+      _writeBits(out, HTDC[category[pos]]);
+      _writeBits(out, bitcode[pos]);
     }
 
     // Encode ACs
@@ -582,7 +582,7 @@ class JpegEncoder extends Encoder {
     for (; (end0pos > 0) && (DU[end0pos] == 0); end0pos--) {};
     //end0pos = first element in reverse order !=0
     if ( end0pos == 0) {
-      out.writeBits(EOB);
+      _writeBits(out, EOB);
       return DC;
     }
 
@@ -596,20 +596,50 @@ class JpegEncoder extends Encoder {
       if (nrzeroes >= I16) {
         lng = nrzeroes >> 4;
         for (int nrmarker = 1; nrmarker <= lng; ++nrmarker) {
-          out.writeBits(M16zeroes);
+          _writeBits(out, M16zeroes);
         }
         nrzeroes = nrzeroes & 0xF;
       }
       pos = 32767 + DU[i];
-      out.writeBits(HTAC[(nrzeroes << 4) + category[pos]]);
-      out.writeBits(bitcode[pos]);
+      _writeBits(out, HTAC[(nrzeroes << 4) + category[pos]]);
+      _writeBits(out, bitcode[pos]);
       i++;
     }
 
     if (end0pos != I63) {
-      out.writeBits(EOB);
+      _writeBits(out, EOB);
     }
 
     return DC;
   }
+
+  void _writeBits(Arc.OutputBuffer out, List<int> bits) {
+    int value = bits[0];
+    int posval = bits[1] - 1;
+    while (posval >= 0) {
+      if ((value & (1 << posval)) != 0) {
+        _bytenew |= (1 << _bytepos);
+      }
+      posval--;
+      _bytepos--;
+      if (_bytepos < 0) {
+        if (_bytenew == 0xff) {
+          out.writeByte(0xff);
+          out.writeByte(0);
+        } else {
+          out.writeByte(_bytenew);
+        }
+        _bytepos = 7;
+        _bytenew = 0;
+      }
+    }
+  }
+
+  void _resetBits() {
+    _bytenew = 0;
+    _bytepos = 7;
+  }
+
+  int _bytenew = 0;
+  int _bytepos = 7;
 }

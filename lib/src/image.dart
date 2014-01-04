@@ -1,4 +1,4 @@
-part of dart_image;
+part of image;
 
 /**
  * A 32-bit image buffer where pixels are encoded into 32-bit unsigned ints.

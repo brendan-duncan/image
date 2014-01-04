@@ -1,7 +1,7 @@
-part of dart_image;
+part of image;
 
 class _JpegData {
-  _ByteBuffer fp;
+  Arc.InputBuffer fp;
   _JpegJfif jfif;
   _JpegAdobe adobe;
   _JpegFrame frame;
@@ -14,7 +14,7 @@ class _JpegData {
   List components = [];
 
   _JpegData(List<int> data) :
-    fp = new _ByteBuffer.fromList(data) {
+    fp = new Arc.InputBuffer(data, byteOrder: Arc.BIG_ENDIAN) {
 
     _read();
 
@@ -190,7 +190,7 @@ class _JpegData {
 
     marker = _nextMarker();
     while (marker != _Jpeg.M_EOI && !fp.isEOF) { // EOI (End of image)
-      _ByteBuffer block = _readBlock();
+      Arc.InputBuffer block = _readBlock();
       switch (marker) {
         case _Jpeg.M_APP0:
         case _Jpeg.M_APP1:
@@ -249,10 +249,9 @@ class _JpegData {
           break;
 
         default:
-          if (fp.peakAtOffset(-3) == 0xFF &&
-              fp.peakAtOffset(-2) >= 0xC0 &&
-              fp.peakAtOffset(-2) <= 0xFE) {
-            print('INCORRECT CODING');
+          if (fp.buffer[fp.position - 3] == 0xFF &&
+              fp.buffer[fp.position - 2] >= 0xC0 &&
+                  fp.buffer[fp.position - 2] <= 0xFE) {
             // could be incorrect encoding -- last 0xFF byte of the previous
             // block was eaten by the encoder
             fp.position -= 3;
@@ -277,13 +276,13 @@ class _JpegData {
     fp.position += length - 2;
   }
 
-  _ByteBuffer _readBlock() {
+  Arc.InputBuffer _readBlock() {
     int length = fp.readUint16();
     if (length < 2) {
       throw 'Invalid Block';
     }
     List<int> array = fp.readBytes(length - 2);
-    return new _ByteBuffer.fromList(array);
+    return new Arc.InputBuffer(array, byteOrder: Arc.BIG_ENDIAN);
   }
 
   int _nextMarker() {
@@ -302,7 +301,7 @@ class _JpegData {
     return c;
   }
 
-  void _readAppData(int marker, _ByteBuffer block) {
+  void _readAppData(int marker, Arc.InputBuffer block) {
     List<int> appData = block.buffer;
 
     if (marker == _Jpeg.M_APP0) {
@@ -336,7 +335,7 @@ class _JpegData {
     }
   }
 
-  void _readDQT(_ByteBuffer block) {
+  void _readDQT(Arc.InputBuffer block) {
     while (!block.isEOF) {
       int n = block.readByte();
       int prec = n >> 4;
@@ -368,7 +367,7 @@ class _JpegData {
     }
   }
 
-  void _readFrame(int marker, _ByteBuffer block) {
+  void _readFrame(int marker, Arc.InputBuffer block) {
     if (frame != null) {
       throw 'Duplicate Frame';
     }
@@ -398,7 +397,7 @@ class _JpegData {
     frames.add(frame);
   }
 
-  void _readDHT(_ByteBuffer block) {
+  void _readDHT(Arc.InputBuffer block) {
     while (!block.isEOF) {
       int index = block.readByte();
 
@@ -430,11 +429,11 @@ class _JpegData {
     }
   }
 
-  void _readDRI(_ByteBuffer block) {
+  void _readDRI(Arc.InputBuffer block) {
     resetInterval = block.readUint16();
   }
 
-  void _readSOS(_ByteBuffer block) {
+  void _readSOS(Arc.InputBuffer block) {
     int n = block.readByte();
 
     if (n < 1 || n > _Jpeg.MAX_COMPS_IN_SCAN) {

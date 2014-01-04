@@ -1,15 +1,11 @@
-part of dart_image;
+part of image;
 
 /**
- * Encode a TGA image.  Used for debugging since TGA format isn't used much
- * these days.
+ * Encode a Targa TGA image.  This only supports the 24-bit uncompressed format.
  */
-class TgaEncoder extends Encoder {
-  TgaEncoder() {
-  }
-
+class TgaEncoder {
   List<int> encode(Image image) {
-    _ByteBuffer out = new _ByteBuffer();
+    Arc.OutputBuffer out = new Arc.OutputBuffer(byteOrder: Arc.BIG_ENDIAN);
 
     List<int> header = new List<int>(18);
     header.fillRange(0, 18, 0);
@@ -34,6 +30,6 @@ class TgaEncoder extends Encoder {
       }
     }
 
-    return out.buffer;
+    return out.getBytes();
   }
 }

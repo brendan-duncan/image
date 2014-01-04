@@ -1,4 +1,4 @@
-part of dart_image;
+part of image;
 
 int getColor(int r, int g, int b, [int a = 255]) {
   return ((r & 0xFF) << 24) |

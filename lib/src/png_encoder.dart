@@ -1,9 +1,9 @@
-part of dart_image;
+part of image;
 
 /**
  * Encode an image to the PNG format.
  */
-class PngEncoder extends Encoder {
+class PngEncoder {
   static const int FILTER_NONE = 0;
   static const int FILTER_SUB = 1;
   static const int FILTER_UP = 2;
@@ -18,13 +18,13 @@ class PngEncoder extends Encoder {
   }
 
   List<int> encode(Image image) {
-    _ByteBuffer out = new _ByteBuffer();
+    Arc.OutputBuffer out = new Arc.OutputBuffer(byteOrder: Arc.BIG_ENDIAN);
 
     // PNG file signature
     out.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
     // IHDR chunk
-    _ByteBuffer chunk = new _ByteBuffer();
+    Arc.OutputBuffer chunk = new Arc.OutputBuffer(byteOrder: Arc.BIG_ENDIAN);
     chunk.writeUint32(image.width);
     chunk.writeUint32(image.height);
     chunk.writeByte(8);
@@ -32,26 +32,25 @@ class PngEncoder extends Encoder {
     chunk.writeByte(0); // compression method
     chunk.writeByte(0); // filter method
     chunk.writeByte(0); // interlace method
-    _writeChunk(out, 'IHDR', chunk.buffer);
+    _writeChunk(out, 'IHDR', chunk.getBytes());
 
     // Include room for the filter bytes.
     final List<int> filteredImage = new List<int>((image.width *
                                                    image.height *
                                                    image.format) +
-                                                  image.height);
+                                                   image.height);
     _filter(image, filteredImage);
 
-    var zlib = new Io.ZLibEncoder();
-    var compressed = zlib.convert(filteredImage);
+    var compressed = new Arc.ZLibEncoder().encode(filteredImage);
 
     _writeChunk(out, 'IDAT', compressed);
 
     _writeChunk(out, 'IEND', []);
 
-    return out.buffer;
+    return out.getBytes();
   }
 
-  void _writeChunk(_ByteBuffer out, String type, List<int> chunk) {
+  void _writeChunk(Arc.OutputBuffer out, String type, List<int> chunk) {
     out.writeUint32(chunk.length);
     out.writeBytes(type.codeUnits);
     out.writeBytes(chunk);

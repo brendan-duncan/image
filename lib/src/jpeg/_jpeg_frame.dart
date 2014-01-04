@@ -1,4 +1,4 @@
-part of dart_image;
+part of image;
 
 class _JpegFrame {
   bool extended;

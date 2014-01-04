@@ -1,29 +1,42 @@
-#dart_image - Image and graphics library for server side applications.
+# image
 
-The image library aims to provide server-side programs the ability to load,
-manipulate, and save various image file formats.
+##Overview
 
-Simple usage example to load a jpeg, resize it, and save it as a jpeg.
+A Dart library to encode and decode various image formats.
+
+The library has no reliance on `dart:io`, so it can be used for both server and
+web applications. The image library currently supports the following decoders:
+
+- PNG
+- JPG 
+
+And the following encoders:
+
+- PNG
+- JPG
+- TGA
+
+##Sample
+
+Load a jpeg, resize it, and save it as a png.
 
     import 'dart:io' as Io;
-    import 'package:dart_image/dart_image.dart';
+    import 'package:image/image.dart';
     main() {
       Io.File file = new Io.File('res/cat-eye04.jpg');
-      file.openSync();
       var bytes = file.readAsBytesSync();
       if (bytes == null) {
         return;
       }
     
-      var jpegDecode = new JpegDecoder();
-      var image = jpegDecode.decode(bytes);
+      var image = new JpegDecoder().decode(bytes);
     
       var thumbnail = image.resized(image.width ~/ 2, image.height ~/ 2);
     
-      var jpegEncode = new JpegEncoder(100);
-      var jpeg = jpegEncode.encode(thumbnail);
+      var png = new PngEncoder().encode(thumbnail);
     
-      Io.File fp = new Io.File('res/thumbnail-cat-eye04.jpg');
+      Io.File fp = new Io.File('out/thumbnail-cat-eye04.png');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(jpeg);
+      fp.writeAsBytesSync(png);
     }
+

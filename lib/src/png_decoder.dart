@@ -1,17 +1,12 @@
-part of dart_image;
+part of image;
 
 /**
  * Decode a PNG encoded image.
  */
-class PngDecoder extends Decoder {
-  static const int FILTER_NONE = 0;
-  static const int FILTER_SUB = 1;
-  static const int FILTER_UP = 2;
-  static const int FILTER_AVERAGE = 3;
-  static const int FILTER_PAETH = 4;
-
+class PngDecoder {
   Image decode(List<int> data) {
-    _ByteBuffer bytes = new _ByteBuffer.fromList(data);
+    Arc.InputBuffer bytes = new Arc.InputBuffer(data,
+        byteOrder: Arc.BIG_ENDIAN);
 
     _PngHeader header;
     List<int> palette;
@@ -27,7 +22,7 @@ class PngDecoder extends Decoder {
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
-        throw 'Invalid PNG file';
+        throw new ImageException('Invalid PNG file');
       }
     }
 
@@ -73,13 +68,14 @@ class PngDecoder extends Decoder {
     //      regarded as fully transparent.
     // zTXt contains compressed text with the same limits as tEXt.
     while (true) {
-      int chunkSize = bytes.readUInt32();
+      int chunkSize = bytes.readUint32();
       String section = new String.fromCharCodes(bytes.readBytes(4));
+
       switch (section) {
         case 'IHDR':
           header = new _PngHeader();
-          header.width = bytes.readUInt32();
-          header.height = bytes.readUInt32();
+          header.width = bytes.readUint32();
+          header.height = bytes.readUint32();
           header.bits = bytes.readByte();
           header.colorType = bytes.readByte();
           header.compressionMethod = bytes.readByte();
@@ -87,51 +83,22 @@ class PngDecoder extends Decoder {
           header.interlaceMethod = bytes.readByte();
 
           if (header.bits != 8) {
-            throw 'Only 24-bit or 32-bit PNG images supported.';
+            throw new ImageException('Only 24-bit or 32-bit PNG images supported.');
           }
           if (header.colorType != 2 && header.colorType != 6) {
-            throw 'Only RGB or RGBA PNG images supported.';
+            throw new ImageException('Only RGB or RGBA PNG images supported.');
           }
           if (header.interlaceMethod != 0) {
-            throw 'Only non-interlaced PNG images supported.';
+            throw new ImageException('Only non-interlaced PNG images supported.');
           }
 
           int format = (header.colorType == 2) ? Image.RGB : Image.RGBA;
           image = new Image(header.width, header.height, format);
           break;
-        case 'PLTE':
-          palette = bytes.readBytes(chunkSize);
-          break;
         case 'IDAT':
-          var data = bytes.readBytes(chunkSize);
+          List<int> data = bytes.readBytes(chunkSize);
           imageData.addAll(data);
           break;
-        case 'tRNS':
-          transparency = new _PngTransparency();
-          switch (header.colorType) {
-            case 3: // Indexed
-              transparency.indexed = bytes.readBytes(chunkSize);
-              if (transparency.indexed.length < 255) {
-                int num = 255 - transparency.indexed.length;
-                for (int i = 0; i < num; ++i) {
-                  transparency.indexed.add(255);
-                }
-              }
-              break;
-            case 0: // Grayscale
-              transparency.grayscale = bytes.readBytes(chunkSize)[0];
-              break;
-            case 2: // Truecolor (RGB)
-              transparency.rgb = bytes.readBytes(chunkSize);
-              break;
-          }
-          break;
-        /*case 'tEXt':
-          List<int> text = bytes.readBytes(chunkSize);
-          String key = new String.fromCharCodes(text);
-          print(key);
-          text[key] = String.fromCharCode.apply(String, text.slice(index + 1));
-          break;*/
         case 'IEND':
           // End of the image.
           switch (header.colorType) {
@@ -161,21 +128,24 @@ class PngDecoder extends Decoder {
       }
 
       // CRC
-      int crc = bytes.readUInt32();
+      int crc = bytes.readUint32();
 
       if (bytes.isEOF) {
-        throw 'Incomplete or corrupt PNG file';
+        throw new ImageException('Incomplete or corrupt PNG file');
       }
     }
 
     if (header == null) {
-      throw 'Incomplete or corrupt PNG file';
+      throw new ImageException('Incomplete or corrupt PNG file');
     }
 
-    var zlib = new Io.ZLibDecoder();
-    List<int> uncompressed = zlib.convert(imageData);
+    // PNG's are stored in big-endian byte order.
+    Arc.InputBuffer imageInput = new Arc.InputBuffer(imageData,
+                                                     byteOrder: Arc.BIG_ENDIAN);
 
-    bytes = new _ByteBuffer.fromList(uncompressed);
+    List<int> uncompressed = new Arc.ZLibDecoder().decode(imageInput);
+
+    bytes = new Arc.InputBuffer(uncompressed);
 
     int pixelBytes = pixelBitlength ~/ 8;
 
@@ -310,13 +280,19 @@ class PngDecoder extends Decoder {
           }
           break;
         default:
-          throw 'Invalid filter value';
+          throw new ImageException('Invalid filter value');
       }
       row++;
     }
 
     return image;
   }
+
+  static const int FILTER_NONE = 0;
+  static const int FILTER_SUB = 1;
+  static const int FILTER_UP = 2;
+  static const int FILTER_AVERAGE = 3;
+  static const int FILTER_PAETH = 4;
 }
 
 class _PngHeader {
