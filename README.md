@@ -8,7 +8,8 @@ The library has no reliance on `dart:io`, so it can be used for both server and
 web applications. The image library currently supports the following decoders:
 
 - PNG
-- JPG 
+- JPG
+- TGA
 
 And the following encoders:
 
