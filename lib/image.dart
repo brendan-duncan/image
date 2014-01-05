@@ -4,9 +4,11 @@
  */
 library image;
 
+import 'dart:async' as Async;
 import 'dart:typed_data' as Data;
 
 import 'package:archive/archive.dart' as Arc;
+import 'package:xml/xml.dart';
 
 part 'src/jpeg/_jpeg.dart';
 part 'src/jpeg/_jpeg_adobe.dart';
@@ -16,6 +18,7 @@ part 'src/jpeg/_jpeg_frame.dart';
 part 'src/jpeg/_jpeg_jfif.dart';
 part 'src/jpeg/_jpeg_scan.dart';
 
+part 'src/bitmap_font.dart';
 part 'src/color.dart';
 part 'src/image.dart';
 part 'src/image_exception.dart';
