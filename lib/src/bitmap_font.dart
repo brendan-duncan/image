@@ -37,7 +37,7 @@ class BitmapFont {
       font = new BitmapFont();
     }
 
-    Arc.Archive arc = new Arc.ZipDecoder().decode(fileData);
+    Arc.Archive arc = new Arc.ZipDecoder().decodeBytes(fileData);
 
     Arc.File font_xml = _findFile(arc, 'font.fnt');
     Arc.File font_png = _findFile(arc, 'font.png');

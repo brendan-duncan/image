@@ -139,7 +139,7 @@ class PngDecoder {
       throw new ImageException('Incomplete or corrupt PNG file');
     }
 
-    List<int> uncompressed = new Arc.ZLibDecoder().decode(imageData);
+    List<int> uncompressed = new Arc.ZLibDecoder().decodeBytes(imageData);
 
     input = new Arc.InputBuffer(uncompressed, byteOrder: Arc.BIG_ENDIAN);
 

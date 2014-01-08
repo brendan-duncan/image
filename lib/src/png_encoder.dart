@@ -12,9 +12,9 @@ class PngEncoder {
   static const int FILTER_AGRESSIVE = 5;
 
   int filter;
-  int deflateMode;
+  int level;
 
-  PngEncoder({this.filter: FILTER_PAETH, this.deflateMode}) {
+  PngEncoder({this.filter: FILTER_PAETH, this.level}) {
     _initCrcTable();
   }
 
@@ -41,7 +41,7 @@ class PngEncoder {
     _filter(image, filteredImage);
 
     List<int> compressed = new Arc.ZLibEncoder().encode(filteredImage,
-                                                      deflateMode: deflateMode);
+                                                        level: level);
 
     _writeChunk(output, 'IDAT', compressed);
 
