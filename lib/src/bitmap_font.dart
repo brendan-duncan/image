@@ -2,36 +2,45 @@ part of image;
 
 // TODO under construction...
 class BitmapFont {
-  // enum Format
-  static const int BLACK_AND_WHITE = 0;
-  static const int GRAYSCALE = 1;
-  static const int RGBA = 2;
+  // info
+  String face = '';
+  int size = 0;
+  bool bold = false;
+  bool italic = false;
+  String charset = '';
+  String unicode = '';
+  int stretchH = 0;
+  bool smooth = false;
+  bool antialias = false;
+  List<int> padding = [];
+  List<int> spacing = [];
+  bool outline = false;
+  // common
+  int lineHeight = 0;
+  int base = 0;
+  num scaleW = 0;
+  num scaleH = 0;
+  int pages = 0;
+  bool packed = false;
 
-  String face;
-  int size;
-  bool bold;
-  bool italic;
-  String charset;
-  String unicode;
-  int stretchH;
-  bool smooth;
-  bool antiAlias;
-  List<int> padding;
-  List<int> spacing;
-  bool outline;
-
-  int format = GRAYSCALE;
   Map<int, BitmapFontCharacter> characters = {};
+  Map<int, Map<int, int>> kernings = {};
 
-  BitmapFont() {
-  }
-
-  // Load a bitmap font from a zip file containing a .fnt xml file and
-  // .png font image.
+  /**
+   * Load a bitmap font from a zip file containing a .fnt xml file and
+   * .png font image.
+   */
   BitmapFont.fromZipFile(List<int> fileData) {
     Arc.Archive arc = new Arc.ZipDecoder().decodeBytes(fileData);
 
-    Arc.File font_xml = _findFile(arc, 'font.fnt');
+    Arc.File font_xml;
+    for (int i = 0; i < arc.numberOfFiles(); ++i) {
+      if (arc.fileName(i).endsWith('.fnt')) {
+        font_xml = arc.files[i];
+        break;
+      }
+    }
+
     if (font_xml == null) {
       throw new ImageException('Invalid font archive');
     }
@@ -47,9 +56,77 @@ class BitmapFont {
 
     for (XmlElement c in xml.children) {
       if (c.name == 'info') {
-
+        for (String a in c.attributes.keys) {
+          switch (a) {
+            case 'face':
+              face = c.attributes[a];
+              break;
+            case 'size':
+              size = int.parse(c.attributes[a]);
+              break;
+            case 'bold':
+              bold = (int.parse(c.attributes[a]) == 1);
+              break;
+            case 'italic':
+              italic = (int.parse(c.attributes[a]) == 1);
+              break;
+            case 'charset':
+              charset = c.attributes[a];
+              break;
+            case 'unicode':
+              unicode = c.attributes[a];
+              break;
+            case 'stretchH':
+              stretchH = int.parse(c.attributes[a]);
+              break;
+            case 'smooth':
+              smooth = (int.parse(c.attributes[a]) == 1);
+              break;
+            case 'antialias':
+              antialias = (int.parse(c.attributes[a]) == 1);
+              break;
+            case 'padding':
+              List<String> tk = c.attributes[a].split(',');
+              padding = [];
+              for (String t in tk) {
+                padding.add(int.parse(t));
+              }
+              break;
+            case 'spacing':
+              List<String> tk = c.attributes[a].split(',');
+              spacing = [];
+              for (String t in tk) {
+                spacing.add(int.parse(t));
+              }
+              break;
+            case 'outline':
+              outline = (int.parse(c.attributes[a]) == 1);
+              break;
+          }
+        }
       } else if (c.name == 'common') {
-
+        for (String a in c.attributes.keys) {
+          switch (a) {
+            case 'lineHeight':
+              lineHeight = int.parse(c.attributes[a]);
+              break;
+            case 'base':
+              base = int.parse(c.attributes[a]);
+              break;
+            case 'scaleW':
+              scaleW = num.parse(c.attributes[a]);
+              break;
+            case 'scaleH':
+              scaleH = num.parse(c.attributes[a]);
+              break;
+            case 'pages':
+              pages = int.parse(c.attributes[a]);
+              break;
+            case 'packed':
+              packed = (int.parse(c.attributes[a]) == 1);
+              break;
+          }
+        }
       } else if (c.name == 'pages') {
         int count = c.children.length;
         if (c.attributes.containsKey('count')) {
@@ -102,20 +179,21 @@ class BitmapFont {
 
           Image fontImage = fontPages[page];
 
-          BitmapFontCharacter ch = new BitmapFontCharacter(id, width, height);
+          BitmapFontCharacter ch = new BitmapFontCharacter(id, width, height,
+              xoffset, yoffset, xadvance, page, chnl);
+
+          characters[id] = ch;
 
           int x2 = x + width;
           int y2 = y + height;
           int pi = 0;
-          var rgbaBuffer = ch.rgbaBuffer;
+          var rgbaBuffer = ch.uint32Data;
           for (int yi = y; yi < y2; ++yi) {
             for (int xi = x; xi < x2; ++xi) {
               int p = fontImage.getPixel(xi, yi);
               rgbaBuffer[pi++] = p;
             }
           }
-
-          characters[id] = ch;
         }
       } else if (c.name == 'kernings') {
         int count = c.children.length;
@@ -129,8 +207,57 @@ class BitmapFont {
 
         for (int ci = 0; ci < count; ++ci) {
           XmlElement kerning = c.children[ci];
+          int first = int.parse(kerning.attributes['first']);
+          int second = int.parse(kerning.attributes['second']);
+          int amount = int.parse(kerning.attributes['amount']);
+
+          if (!kernings.containsKey(first)) {
+            kernings[first] = {};
+          }
+          kernings[first][second] = amount;
         }
       }
+    }
+  }
+
+  bool drawChar(Image image, int c, int x, int y) {
+    if (!characters.containsKey(c)) {
+      return false;
+    }
+
+    BitmapFontCharacter ch = characters[c];
+    int x2 = x + ch.width;
+    int y2 = y + ch.height;
+    int pi = 0;
+    for (int yi = y; yi < y2; ++yi) {
+      for (int xi = x; xi < x2; ++xi) {
+        int p = ch.uint32Data[pi++];
+        image.setPixelBlend(xi, yi, p);
+      }
+    }
+  }
+
+  bool drawString(Image image, String s, int x, int y) {
+    List<int> chars = s.codeUnits;
+    for (int c in chars) {
+      if (!characters.containsKey(c)) {
+        x += base ~/ 2;
+        continue;
+      }
+
+      BitmapFontCharacter ch = characters[c];
+
+      int x2 = x + ch.width;
+      int y2 = y + ch.height;
+      int pi = 0;
+      for (int yi = y; yi < y2; ++yi) {
+        for (int xi = x; xi < x2; ++xi) {
+          int p = ch.uint32Data[pi++];
+          image.setPixelBlend(xi + ch.xoffset, yi + ch.yoffset, p);
+        }
+      }
+
+      x += ch.xadvance;
     }
   }
 
@@ -150,13 +277,27 @@ class BitmapFontCharacter {
   final int id;
   final int width;
   final int height;
+  final int xoffset;
+  final int yoffset;
+  final int xadvance;
+  final int page;
+  final int channel;
   final Data.TypedData data;
 
-  BitmapFontCharacter(this.id, int width, int height, {int format: RGBA}) :
+  BitmapFontCharacter(this.id, int width, int height,
+                      this.xoffset, this.yoffset, this.xadvance, this.page,
+                      this.channel, {int format: RGBA}) :
     this.width = width,
     this.height = height,
     data = format == RGBA ? new Data.Uint32List(width * height) :
            throw new ImageException('Invalid Character Format');
 
-  Data.Uint32List get rgbaBuffer => data;
+  Data.Uint32List get uint32Data => data;
+
+  String toString() {
+    Map x = {'id': id, 'width': width, 'height': height, 'xoffset': xoffset,
+             'yoffset': yoffset, 'xadvance': xadvance, 'page': page,
+             'channel': channel};
+    return 'Character $x';
+  }
 }

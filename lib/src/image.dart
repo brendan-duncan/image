@@ -77,6 +77,22 @@ class Image {
     buffer[y * width + x] = color;
   }
 
+  /**
+   * Set the pixel with alpha blending.
+   */
+  void setPixelBlend(int x, int y, int color) {
+    int pi = y * width +x;
+    int alpha = getAlpha(color);
+    int colora = buffer[pi];
+
+    int rb1 = ((0xff - alpha) * (colora & 0xff00ff00)) >> 8;
+    int rb2 = (alpha * (color & 0xff00ff00)) >> 8;
+    int g1  = ((0xff - alpha) * (colora & 0x00ff0000)) >> 8;
+    int g2  = (alpha * (color & 0x00ff0000)) >> 8;
+
+    buffer[pi] = (((rb1 | rb2) & 0xff00ff00) + ((g1 | g2) & 0x00ff0000)) | 0xff;
+  }
+
   void setPixelRGBA(int x, int y, int r, int g, int b, [int a = 255]) {
     buffer[y * width + x] = getColor(r, g, b, a);
   }
