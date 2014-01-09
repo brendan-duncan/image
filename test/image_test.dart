@@ -4,6 +4,7 @@ import 'dart:io' as Io;
 import 'package:image/image.dart';
 import 'package:unittest/unittest.dart';
 
+part 'font_test.dart';
 part 'jpeg_test.dart';
 part 'png_test.dart';
 part 'tga_test.dart';
@@ -12,4 +13,5 @@ void main() {
   defineTgaTests();
   defineJpegTests();
   definePngTests();
+  defineFontTests();
 }

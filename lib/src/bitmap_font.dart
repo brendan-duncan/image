@@ -28,32 +28,110 @@ class BitmapFont {
 
   // Load a bitmap font from a zip file containing a .fnt xml file and
   // .png font image.
-  BitmapFont.fromFile(List<int> fileData) {
-    loadFromFile(fileData, this);
-  }
-
-  static BitmapFont loadFromFile(List<int> fileData, [BitmapFont font]) {
-    if (font == null) {
-      font = new BitmapFont();
-    }
-
+  BitmapFont.fromZipFile(List<int> fileData) {
     Arc.Archive arc = new Arc.ZipDecoder().decodeBytes(fileData);
 
     Arc.File font_xml = _findFile(arc, 'font.fnt');
-    Arc.File font_png = _findFile(arc, 'font.png');
-    if (font_xml == null || font_png == null) {
+    if (font_xml == null) {
       throw new ImageException('Invalid font archive');
-      return null;
     }
 
     String xml_str = new String.fromCharCodes(font_xml.content);
     XmlElement xml = XML.parse(xml_str);
 
-    Image png = new PngDecoder().decode(font_png.content);
+    if (xml == null || xml.name != 'font') {
+      throw new ImageException('Invalid font XML');
+    }
 
-    //...
+    Map<int, Image> fontPages = {};
 
-    return font;
+    for (XmlElement c in xml.children) {
+      if (c.name == 'info') {
+
+      } else if (c.name == 'common') {
+
+      } else if (c.name == 'pages') {
+        int count = c.children.length;
+        if (c.attributes.containsKey('count')) {
+          count = int.parse(c.attributes['count']);
+        }
+        for (int ci = 0; ci < count; ++ci) {
+          XmlElement page = c.children[ci];
+          int id = int.parse(page.attributes['id']);
+          String filename = page.attributes['file'];
+
+          if (fontPages.containsKey(id)) {
+            throw new ImageException('Duplicate font page id found: $id.');
+          }
+
+          Arc.File imageFile = _findFile(arc, filename);
+          if (imageFile == null) {
+            throw new ImageException('Font zip missing font page image $filename');
+          }
+
+          Image image = new PngDecoder().decode(imageFile.content);
+
+          fontPages[id] = image;
+        }
+      } else if (c.name == 'chars') {
+        int count = c.children.length;
+        if (c.attributes.containsKey('count')) {
+          count = int.parse(c.attributes['count']);
+        }
+
+        if (count > c.children.length) {
+          throw new ImageException('Invalid font XML');
+        }
+
+        for (int ci = 0; ci < count; ++ci) {
+          XmlElement char = c.children[ci];
+          int id = int.parse(char.attributes['id']);
+          int x = int.parse(char.attributes['x']);
+          int y = int.parse(char.attributes['y']);
+          int width = int.parse(char.attributes['width']);
+          int height = int.parse(char.attributes['height']);
+          int xoffset = int.parse(char.attributes['xoffset']);
+          int yoffset = int.parse(char.attributes['yoffset']);
+          int xadvance = int.parse(char.attributes['xadvance']);
+          int page = int.parse(char.attributes['page']);
+          int chnl = int.parse(char.attributes['chnl']);
+
+          if (!fontPages.containsKey(page)) {
+            throw new ImageException('Missing page image: $page');
+          }
+
+          Image fontImage = fontPages[page];
+
+          BitmapFontCharacter ch = new BitmapFontCharacter(id, width, height);
+
+          int x2 = x + width;
+          int y2 = y + height;
+          int pi = 0;
+          var rgbaBuffer = ch.rgbaBuffer;
+          for (int yi = y; yi < y2; ++yi) {
+            for (int xi = x; xi < x2; ++xi) {
+              int p = fontImage.getPixel(xi, yi);
+              rgbaBuffer[pi++] = p;
+            }
+          }
+
+          characters[id] = ch;
+        }
+      } else if (c.name == 'kernings') {
+        int count = c.children.length;
+        if (c.attributes.containsKey('count')) {
+          count = int.parse(c.attributes['count']);
+        }
+
+        if (count > c.children.length) {
+          throw new ImageException('Invalid font XML');
+        }
+
+        for (int ci = 0; ci < count; ++ci) {
+          XmlElement kerning = c.children[ci];
+        }
+      }
+    }
   }
 
   static Arc.File _findFile(Arc.Archive arc, String filename) {
@@ -67,8 +145,18 @@ class BitmapFont {
 }
 
 class BitmapFontCharacter {
-  String id;
-  int width;
-  int height;
-  Data.TypedData data;
+  static const int RGBA = 0;
+
+  final int id;
+  final int width;
+  final int height;
+  final Data.TypedData data;
+
+  BitmapFontCharacter(this.id, int width, int height, {int format: RGBA}) :
+    this.width = width,
+    this.height = height,
+    data = format == RGBA ? new Data.Uint32List(width * height) :
+           throw new ImageException('Invalid Character Format');
+
+  Data.Uint32List get rgbaBuffer => data;
 }
