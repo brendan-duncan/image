@@ -24,7 +24,7 @@ class Image {
     this.height = height,
     buffer = new Data.Uint32List(width * height) {
       if (width <= 0 || height <= 0) {
-        throw new Exception('Invalid image format');
+        throw new ImageException('Invalid image format');
       }
     }
 
@@ -40,8 +40,9 @@ class Image {
   /**
    * Create an image from [bytes].
    *
-   * [bytes] should be in RGBA format with a byte [0,255] for each channel.
-   * The length of [bytes] should be 4 * (width * height).
+   * [bytes] should be in RGB<A> format with a byte [0,255] for each channel.
+   * The length of [bytes] should be <3|4> * (width * height).
+   * [format] determines if there are 3 or 4 channels per pixel.
    *
    * For example, given an Html Canvas, you could create an image:
    * var bytes = canvas.getContext('2d').getImageData(0, 0,
@@ -55,13 +56,15 @@ class Image {
     // Create a uint32 view of the byte buffer.
     buffer = new Data.Uint32List(width * height) {
     if (width <= 0 || height <= 0 || buffer.length != (width * height)) {
-      throw new Exception('Invalid image format');
+      throw new ImageException('Invalid image format');
     }
     // It would be nice if we could just create a Uint32List.view for the byte
     // buffer, but the channels would be in reverse order (endianness problem).
     final int len = buffer.length;
-    for (int i = 0, j = 0; i < len; ++i, j += 4) {
-      buffer[i] = getColor(bytes[j], bytes[j + 1], bytes[j + 2], bytes[j + 3]);
+    final int inc = format == RGBA ? 4 : 3;
+    for (int i = 0, j = 0; i < len; ++i, j += inc) {
+      int a = format == RGBA ? bytes[j + 3] : 0xff;
+      buffer[i] = getColor(bytes[j], bytes[j + 1], bytes[j + 2], a);
     }
   }
 
