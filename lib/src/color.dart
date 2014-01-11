@@ -32,10 +32,11 @@ int getAlpha(int c) =>
     c & 0xFF;
 
 /**
- * Composite the color [src] onto the color [dst].
+ * Composite the color [src] onto the color [dst].  The [src] alpha is
+ * scaled by [fraction], for anti-aliasing.
  */
-int alphaBlendColors(int dst, int src) {
-  double a = getAlpha(src) / 255.0;
+int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
+  double a = (getAlpha(src) / 255.0) * (fraction / 255.0);
   int sr = (getRed(src) * a).toInt();
   int sg = (getGreen(src) * a).toInt();
   int sb = (getBlue(src) * a).toInt();

@@ -42,11 +42,15 @@ Load a jpeg, resize it, and save it as a png:
 - Image **copyInto**(Image dst, Image src, int dst_x, int dst_y, int src_x, int src_y, int dst_w, int dst_h, int src_w, int src_h);
 - Image **copyResize**(Image src, int width, [int height = -1]);
 - Image **drawChar**(Image image, BitmapFont font, int x, int y, String string, {int color: 0xffffffff});
+- Image **drawLine**(Image image, int x1, int y1, int x2, int y2, int color,
+                     {bool antialias: false, num thickness: 1});
 - Image **drawString**(Image image, BitmapFont font, int x, int y, String string, {int color: 0xffffffff});
+- Image **dropShadow**(Image src, int hshadow, int vshadow, int blur,
+                   {int shadowColor: 0x000000a0});
 - Image **edgeDetectQuick**(Image src);
 - Image **emboss**(Image src);             
 - Image **fill**(Image image, int color);
-- Image **fillRectangle**(Image src, int x, int y, int w, int h, int color);
+- Image **fillRect**(Image src, int x, int y, int w, int h, int color);
 - Image **flip**(Image src, int mode);
 - int **getAlpha**(int c);
 - int **getColor**(int r, int g, int b, [int a = 255]);

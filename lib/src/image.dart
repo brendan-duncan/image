@@ -48,7 +48,10 @@ class Image {
    * Get the pixel from the given [x], [y] coordinate.
    */
   int getPixel(int x, int y) =>
-    boundsSafe(x, y) ? buffer[y * width + x] : 0;
+    boundsSafe(x, y) ?
+      format == RGBA ?
+        buffer[y * width + x] :
+        buffer[y * width + x] | 0xff : 0;
 
   /**
    * Set the pixel at the given [x], [y] coordinate to the [color].
@@ -62,11 +65,11 @@ class Image {
   /**
    * Set the pixel with alpha blending.
    */
-  void setPixelBlend(int x, int y, int color) {
+  void setPixelBlend(int x, int y, int color, [int fraction = 0xff]) {
     if (boundsSafe(x, y)) {
       int pi = y * width + x;
       int dst = buffer[pi];
-      buffer[pi] = alphaBlendColors(dst, color);
+      buffer[pi] = alphaBlendColors(dst, color, fraction);
     }
   }
 

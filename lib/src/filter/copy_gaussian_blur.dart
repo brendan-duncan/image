@@ -1,91 +1,91 @@
 part of image;
 
-Map<int, List<double>> _gaussianCache = {};
+Map<int, List<double>> _gaussianKernelCache = {};
 
 /**
  *
  */
 Image copyGaussianBlur(Image src, int radius) {
-  /*if (radius == 3) {
-    const List<double> filter = const[
-        1.0, 2.0, 1.0,
-        2.0, 4.0, 0.0,
-        1.0, 2.0, 1.0];
+  List<double> kernel;
 
-    return convolution(new Image.from(src), filter, 16, 0);
-  }*/
-
-  List<double> coefficients;
-
-  if (_gaussianCache.containsKey(radius)) {
-    coefficients = _gaussianCache[radius];
+  if (_gaussianKernelCache.containsKey(radius)) {
+    kernel = _gaussianKernelCache[radius];
   } else {
     // Compute coefficients
-    double sigma = (2.0 / 3.0) * radius;
+    double sigma = radius * (2.0 / 3.0);
     double s = 2.0 * sigma * sigma;
+
     int count = 2 * radius + 1;
-    coefficients = new List<double>(count);
+    kernel = new List<double>(count);
+
     double sum = 0.0;
     for (int x = -radius; x <= radius; ++x) {
       double c = Math.exp(-(x * x) / s);
       sum += c;
-      coefficients[x + radius] = c;
+      kernel[x + radius] = c;
     }
     // Normalize the coefficients
     for (int i = 0; i < count; ++i) {
-      coefficients[i] /= sum;
+      kernel[i] /= sum;
     }
 
-    _gaussianCache[radius] = coefficients;
+    _gaussianKernelCache[radius] = kernel;
   }
+
 
   // Apply the filter horizontally
   Image tmp = new Image.from(src);
-  _gaussianApplyCoeffs(src, tmp, coefficients, radius, true);
+  _gaussianApplyCoeffs(src, tmp, kernel, radius, true);
 
   // Apply the filter vertically
   Image result = new Image.from(tmp);
-  _gaussianApplyCoeffs(tmp, result, coefficients, radius, false);
+  _gaussianApplyCoeffs(tmp, result, kernel, radius, false);
 
   return result;
 }
 
-void _gaussianApplyCoeffs(Image src, Image dst, List<double> coeffs,
+void _gaussianApplyCoeffs(Image src, Image dst, List<double> kernel,
                           int radius, bool horizontal) {
-  int numLines;
-  int lineLen;
   if (horizontal) {
-    numLines = src.height;
-    lineLen = src.width;
+    for (int y = 0; y < src.height; ++y) {
+      _gaussianApplyCoeffsLine(src, dst, y, src.width, kernel, radius,
+          horizontal);
+    }
   } else {
-    numLines = src.width;
-    lineLen = src.height;
-  }
-
-  for (int line = 0; line < numLines; line++) {
-    _gaussianApplyCoeffsLine(src, dst, line, lineLen, coeffs, radius,
-                             horizontal);
+    for (int x = 0; x < src.width; ++x) {
+      _gaussianApplyCoeffsLine(src, dst, x, src.height, kernel, radius,
+          horizontal);
+    }
   }
 }
 
 int _gaussianReflect(int max, int x) {
-  if (x < 0) return -x;
-  if (x >= max) return max - (x - max) - 1;
+  if (x < 0) {
+    return -x;
+  }
+  if (x >= max) {
+    return max - (x - max) - 1;
+  }
   return x;
 }
 
-void _gaussianApplyCoeffsLine(Image src, Image dst, int line, int linelen,
-                              List<double> coeffs, int radius,
+void _gaussianApplyCoeffsLine(Image src, Image dst,
+                              int y, int width,
+                              List<double> kernel, int radius,
                               bool horizontal) {
-  for (int ndx = 0; ndx < linelen; ndx++) {
-    double r = 0.0, g = 0.0, b = 0.0, a = 0.0;
+  for (int x = 0; x < width; x++) {
+    double r = 0.0;
+    double g = 0.0;
+    double b = 0.0;
+    double a = 0.0;
 
-    for (int cndx = -radius; cndx <= radius; cndx++) {
-      double coeff = coeffs[cndx + radius];
-      int rndx = _gaussianReflect(linelen, ndx + cndx);
+    for (int j = -radius, j2 = 0; j <= radius; ++j, ++j2) {
+      double coeff = kernel[j2];
+      int gr = _gaussianReflect(width, x + j);
 
-      int sc = (horizontal) ? src.getPixel(rndx, line) :
-               src.getPixel(line, rndx);
+      int sc = (horizontal) ?
+               src.getPixel(gr, y) :
+               src.getPixel(y, gr);
 
       r += coeff * getRed(sc);
       g += coeff * getGreen(sc);
@@ -99,9 +99,9 @@ void _gaussianApplyCoeffsLine(Image src, Image dst, int line, int linelen,
                      (a > 255.0 ? 255.0 : a).toInt());
 
     if (horizontal) {
-      dst.setPixel(ndx, line, c);
+      dst.setPixel(x, y, c);
     } else {
-      dst.setPixel(line, ndx, c);
+      dst.setPixel(y, x, c);
     }
   }
 }

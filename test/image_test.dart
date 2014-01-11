@@ -36,12 +36,24 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(f));
     });
 
-    test('fillRectanlge', () {
+    test('fillRect', () {
       Image f = new Image.from(image);
       int c = getColor(128, 255, 128, 255);
-      fillRectangle(f, 50, 50, 100, 100, c);
+      fillRect(f, 50, 50, 100, 100, c);
       // Save the image as a PNG.
-      Io.File fp = new Io.File('out/fillRectanlge.png');
+      Io.File fp = new Io.File('out/fillRect.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('drawLine', () {
+      Image f = new Image.from(image);
+      int c1 = getColor(128, 255, 128, 255);
+      drawLine(f, 0, 0, f.width, f.height, c1, thickness: 3);
+      int c2 = getColor(255, 128, 128, 255);
+      drawLine(f, f.width, 0, 0, f.height, c2, thickness: 5, antialias: true);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/drawLine.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
     });
@@ -93,7 +105,7 @@ void defineImageTests() {
 
     test('gaussianBlur', () {
       Image f = new Image.from(image);
-      Image g = copyGaussianBlur(f, 5);
+      Image g = copyGaussianBlur(f, 10);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/gaussianBlur.png');
       fp.createSync(recursive: true);
@@ -159,6 +171,26 @@ void defineImageTests() {
       Io.File fp = new Io.File('out/smooth.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('copyInto', () {
+      Image s = new Image.from(image);
+      Image d = new Image(image.width + 20, image.height + 20, image.format);
+      fill(d, 0xff0000ff);
+      copyInto(d, s, dstX: 10, dstY: 10);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/copyInto.png')
+                         ..createSync(recursive: true)
+                         ..writeAsBytesSync(writePng(d));
+    });
+
+    test('dropShadow', () {
+      Image s = new Image.from(image);
+      Image d = dropShadow(s, 3, 3, 10);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/dropShadow.png')
+                         ..createSync(recursive: true)
+                         ..writeAsBytesSync(writePng(d));
     });
   });
 }

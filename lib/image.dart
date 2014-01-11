@@ -26,9 +26,12 @@ part 'src/formats/tga_decoder.dart';
 part 'src/formats/tga_encoder.dart';
 
 part 'src/draw/draw_char.dart';
+part 'src/draw/draw_line.dart';
 part 'src/draw/draw_string.dart';
 part 'src/draw/fill.dart';
-part 'src/draw/fill_rectangle.dart';
+part 'src/draw/fill_rect.dart';
+
+part 'src/effects/drop_shadow.dart';
 
 part 'src/filter/brightness.dart';
 part 'src/filter/color_offset.dart';
@@ -48,6 +51,8 @@ part 'src/transform/copy_into.dart';
 part 'src/transform/copy_crop.dart';
 part 'src/transform/flip.dart';
 part 'src/transform/copy_resize.dart';
+
+part 'src/util/clip_line.dart';
 
 part 'src/bitmap_font.dart';
 part 'src/color.dart';
