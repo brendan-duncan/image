@@ -31,8 +31,7 @@ Load a jpeg, resize it, and save it as a png:
             ..writeAsBytesSync(writePng(thumbnail));
     }
 
-##Functions
-- int **alphaBlendColors**(int dst, int src);
+##Image Functions
 - Image **brightness**(Image src, int brightness);
 - Image **colorOffset**(Image src, int red, int green, int blue, int alpha);
 - Image **contrast**(Image src, num contrast);
@@ -52,12 +51,6 @@ Load a jpeg, resize it, and save it as a png:
 - Image **fill**(Image image, int color);
 - Image **fillRect**(Image src, int x, int y, int w, int h, int color);
 - Image **flip**(Image src, int mode);
-- int **getAlpha**(int c);
-- int **getColor**(int r, int g, int b, [int a = 255]);
-- int **getColorFromList**(List<int> rgba);
-- int **getBlue**(int c);
-- int **getGreen**(int c);
-- int **getRed**(int c);
 - Image **grayscale**(Image src);
 - Image **invert**(Image src);
 - Image **meanRemoval**(Image src);
