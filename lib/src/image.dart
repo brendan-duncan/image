@@ -69,6 +69,27 @@ class Image {
   }
 
   /**
+   * Get the RGBA bytes from the image.
+   *
+   * For example, given an Html Canvas, you could draw this image into the
+   * canvas:
+   * canvas.getContext('2d').putImageData(image.getBytes());
+   */
+  List<int> getBytes() {
+    Data.Uint8List bytes = new Data.Uint8List(width * height * 4);
+    final int len = buffer.length;
+    final int inc = 4;
+    for (int i = 0, j = 0; i < len; ++i, j += inc) {
+      int c = buffer[i];
+      bytes[j] = getRed(c);
+      bytes[j + 1] = getGreen(c);
+      bytes[j + 2] = getBlue(c);
+      bytes[j + 3] = format == RGBA ? getAlpha(c) : 0xff;
+    }
+    return bytes;
+  }
+
+  /**
    * Is the given pixel coordinates within the resolution of the image.
    */
   bool boundsSafe(int x, int y) {
