@@ -38,6 +38,24 @@ class Image {
     buffer = new Data.Uint32List.fromList(other.buffer);
 
   /**
+   * Create an image from bytes.
+   *
+   * For example, given an Html Canvas, you could create an image:
+   * var bytes = canvas.getContext('2d').getImageData(0, 0,
+   *   canvas.width, canvas.height);
+   * Image image = new Image.fromBytes(canvas.width, canvas.height, bytes);
+   */
+  Image.fromBytes(int width, int height, List<int> bytes,
+                  [this.format = RGBA]) :
+    this.width = width,
+    this.height = height,
+    buffer = new Data.Uint32List.fromList(bytes) {
+    if (width <= 0 || height <= 0 || buffer.length != (width * height)) {
+      throw new Exception('Invalid image format');
+    }
+  }
+
+  /**
    * Is the given pixel coordinates within the resolution of the image.
    */
   bool boundsSafe(int x, int y) {
