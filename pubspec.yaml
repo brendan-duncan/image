@@ -1,8 +1,8 @@
 name: image
 author: Brendan Duncan <brendanduncan@gmail.com>
-version: 1.1.0
+version: 1.1.1
 homepage: http://bitbucket.org/brendan_duncan/image
-description: The image library aims to provide server and web apps the ability to load, manipulate, and save various image file formats.  *previously called dart_image*
+description: Provides server and web apps the ability to load, manipulate, and save various image file formats.  *previously called dart_image*
 dependencies:
   archive: '>=1.0.6'
   xml: any
