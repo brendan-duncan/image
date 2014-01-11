@@ -67,6 +67,9 @@ You ca
 
   _Adjust the brightness of the image._
   
+- Image **bumpToNormal**(Image src, {double strength: 2.0});
+  _Generate a normal map from a heightfield bump image._
+  
 - Image **colorOffset**(Image src, int red, int green, int blue, int alpha);
 
   _Apply an offset to the colors of the image._
