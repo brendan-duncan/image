@@ -3,30 +3,31 @@ part of image_test;
 
 void defineFontTests() {
   group('bitmapFont', () {
-    test('fromZipFile', () {
-      Io.File fp = new Io.File('res/test.zip');
-      List<int> zip = fp.readAsBytesSync();
+    test('zip/xml', () {
+      List<int> fontZip = new Io.File('res/test.zip').readAsBytesSync();
+      BitmapFont font = readFontZip(fontZip);
 
-      BitmapFont font = new BitmapFont.fromZipFile(zip);
+      Image image = readPng(new Io.File('res/trees.png').readAsBytesSync());
 
-      fp = new Io.File('res/font.zip');
-      zip = fp.readAsBytesSync();
+      drawString(image, font, 10, 50, 'Testing Font 1: Hello World');
 
-      BitmapFont font2 = new BitmapFont.fromZipFile(zip);
+      new Io.File('out/font_zip_xml.jpg')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writeJpg(image));
+    });
 
-      fp = new Io.File('res/trees.png');
-      List<int> png = fp.readAsBytesSync();
+    test('zip/text', () {
+      List<int> fontZip = new Io.File('res/test_text.zip').readAsBytesSync();
+      BitmapFont font = readFontZip(fontZip);
 
-      Image image = new PngDecoder().decode(png);
+      Image image = readPng(new Io.File('res/trees.png').readAsBytesSync());
 
-      font.drawString(image, 'Testing Font 1: Hello World', 10, 50);
+      drawString(image, font, 10, 50, 'Testing Font 2: Hello World',
+          color: getColor(255, 0, 0, 128));
 
-      font2.drawString(image, 'Testing Font 2: Hello World', 10, 100);
-
-      List<int> jpg = new JpegEncoder().encode(image);
-      Io.File out = new Io.File('out/font.jpg');
-      out.createSync(recursive: true);
-      out.writeAsBytesSync(jpg);
+      new Io.File('out/font_zip_text.jpg')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writeJpg(image));
     });
   });
 }

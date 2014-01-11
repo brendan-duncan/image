@@ -19,25 +19,20 @@ And the following encoders:
 
 ##Sample
 
-Load a jpeg, resize it, and save it as a png.
-
+Load a jpeg, resize it, and save it as a png:
     import 'dart:io' as Io;
     import 'package:image/image.dart';
-    main() {
-      Io.File file = new Io.File('res/cat-eye04.jpg');
-      var bytes = file.readAsBytesSync();
-      if (bytes == null) {
-        return;
-      }
+    void main() {
+      // Read a jpeg image from file.
+      Io.File file = new Io.File('res/cat-eye04.jpg');    
+      Image image = readJpg(ile.readAsBytesSync());
+
+      // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
+      Image thumbnail = resize(120);
     
-      var image = new JpegDecoder().decode(bytes);
-    
-      var thumbnail = image.resized(image.width ~/ 2, image.height ~/ 2);
-    
-      var png = new PngEncoder().encode(thumbnail);
-    
+      // Save the thumbnail as a PNG.
       Io.File fp = new Io.File('out/thumbnail-cat-eye04.png');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(png);
+      fp.writeAsBytesSync(writePng(thumbnail));
     }
 

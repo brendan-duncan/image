@@ -1,5 +1,10 @@
 part of image;
 
+const int RED = 0;
+const int GREEN = 1;
+const int BLUE = 2;
+const int ALPHA = 3;
+
 int getColor(int r, int g, int b, [int a = 255]) {
   return ((r & 0xFF) << 24) |
          ((g & 0xFF) << 16) |
@@ -25,3 +30,21 @@ int getBlue(int c) =>
 
 int getAlpha(int c) =>
     c & 0xFF;
+
+/**
+ * Composite the color [src] onto the color [dst].
+ */
+int alphaBlendColors(int dst, int src) {
+  double a = getAlpha(src) / 255.0;
+  int sr = (getRed(src) * a).toInt();
+  int sg = (getGreen(src) * a).toInt();
+  int sb = (getBlue(src) * a).toInt();
+  int sa = (getAlpha(src) * a).toInt();
+
+  int dr = (getRed(dst) * (1.0 - a)).toInt();
+  int dg = (getGreen(dst) * (1.0 - a)).toInt();
+  int db = (getBlue(dst) * (1.0 - a)).toInt();
+  int da = (getAlpha(dst) * (1.0 - a)).toInt();
+
+  return getColor(sr + dr, sg + dg, sb + db, sa + da);
+}

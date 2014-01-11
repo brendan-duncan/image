@@ -19,7 +19,7 @@ class Image {
   /**
    * Create an image with the given dimensions and format.
    */
-  Image(int width, int height, this.format) :
+  Image(int width, int height, [this.format = RGBA]) :
     this.width = width,
     this.height = height,
     buffer = new Data.Uint32List(width * height) {
@@ -37,63 +37,45 @@ class Image {
     format = other.format,
     buffer = new Data.Uint32List.fromList(other.buffer);
 
-
   /**
-   * Returns a resized copy of the image.  This currently does not do any
-   * interpolation or multi-sampling.
+   * Is the given pixel coordinates within the resolution of the image.
    */
-  Image resized(int width, int height) {
-    if (width <= 0 || height <= 0) {
-      throw new Exception('Invalid size');
-    }
-
-    Image newImage = new Image(width, height, format);
-
-    double dy = this.height / height;
-    double dx = this.width / width;
-
-    // Copy the pixels from this image to the new image.
-    for (int y = 0; y < height; ++y) {
-      int y2 = (y * dy).toInt();
-      for (int x = 0; x < width; ++x) {
-        int x2 = (x * dx).toInt();
-        newImage.setPixel(x, y, getPixel(x2, y2));
-      }
-    }
-
-    return newImage;
+  bool boundsSafe(int x, int y) {
+    return x >= 0 && x < width && y >= 0 && y < height;
   }
 
   /**
    * Get the pixel from the given [x], [y] coordinate.
    */
   int getPixel(int x, int y) =>
-    buffer[y * width + x];
+    boundsSafe(x, y) ? buffer[y * width + x] : 0;
 
   /**
    * Set the pixel at the given [x], [y] coordinate to the [color].
    */
   void setPixel(int x, int y, int color) {
-    buffer[y * width + x] = color;
+    if (boundsSafe(x, y)) {
+      buffer[y * width + x] = color;
+    }
   }
 
   /**
    * Set the pixel with alpha blending.
    */
   void setPixelBlend(int x, int y, int color) {
-    int pi = y * width +x;
-    int alpha = getAlpha(color);
-    int colora = buffer[pi];
-
-    int rb1 = ((0xff - alpha) * (colora & 0xff00ff00)) >> 8;
-    int rb2 = (alpha * (color & 0xff00ff00)) >> 8;
-    int g1  = ((0xff - alpha) * (colora & 0x00ff0000)) >> 8;
-    int g2  = (alpha * (color & 0x00ff0000)) >> 8;
-
-    buffer[pi] = (((rb1 | rb2) & 0xff00ff00) + ((g1 | g2) & 0x00ff0000)) | 0xff;
+    if (boundsSafe(x, y)) {
+      int pi = y * width + x;
+      int dst = buffer[pi];
+      buffer[pi] = alphaBlendColors(dst, color);
+    }
   }
 
+  /**
+   * Set the color of a pixel with no blending.
+   */
   void setPixelRGBA(int x, int y, int r, int g, int b, [int a = 255]) {
-    buffer[y * width + x] = getColor(r, g, b, a);
+    if (boundsSafe(x, y)) {
+      buffer[y * width + x] = getColor(r, g, b, a);
+    }
   }
 }

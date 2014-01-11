@@ -1,6 +1,13 @@
 part of image;
 
-// TODO under construction...
+BitmapFont readFontZip(List<int> bytes) =>
+    new BitmapFont.fromZip(bytes);
+
+
+BitmapFont readFont(String fnt, Image page) =>
+    new BitmapFont.fromFnt(fnt, page);
+
+
 class BitmapFont {
   // info
   String face = '';
@@ -27,33 +34,77 @@ class BitmapFont {
   Map<int, Map<int, int>> kernings = {};
 
   /**
+   * Load a bitmap font from a .fnt file and a .png font image.
+   */
+  BitmapFont.fromFnt(String fnt, Image page) {
+    Map<int, Image> fontPages = { 0: page };
+
+    XmlElement xml;
+
+    if (fnt.startsWith('<font>')) {
+      xml = XML.parse(fnt);
+      if (xml == null || xml.name != 'font') {
+        throw new ImageException('Invalid font XML');
+      }
+    } else {
+      xml = _parseTextFnt(fnt);
+    }
+
+    _parseFnt(xml, fontPages);
+  }
+
+  /**
    * Load a bitmap font from a zip file containing a .fnt xml file and
    * .png font image.
    */
-  BitmapFont.fromZipFile(List<int> fileData) {
+  BitmapFont.fromZip(List<int> fileData) {
     Arc.Archive arc = new Arc.ZipDecoder().decodeBytes(fileData);
 
-    Arc.File font_xml;
+    Arc.File font_file;
     for (int i = 0; i < arc.numberOfFiles(); ++i) {
       if (arc.fileName(i).endsWith('.fnt')) {
-        font_xml = arc.files[i];
+        font_file = arc.files[i];
         break;
       }
     }
 
-    if (font_xml == null) {
+    if (font_file == null) {
       throw new ImageException('Invalid font archive');
     }
 
-    String xml_str = new String.fromCharCodes(font_xml.content);
-    XmlElement xml = XML.parse(xml_str);
+    String font_str = new String.fromCharCodes(font_file.content);
+    XmlElement xml;
 
-    if (xml == null || xml.name != 'font') {
-      throw new ImageException('Invalid font XML');
+    if (font_str.startsWith('<font>')) {
+      xml = XML.parse(font_str);
+      if (xml == null || xml.name != 'font') {
+        throw new ImageException('Invalid font XML');
+      }
+    } else {
+      xml = _parseTextFnt(font_str);
     }
 
-    Map<int, Image> fontPages = {};
+    _parseFnt(xml, {}, arc);
+  }
 
+  /**
+   * Get the amount the writer x position should advance after drawing the
+   * character [ch].
+   */
+  int characterXAdvance(String ch) {
+    if (ch.isEmpty) {
+      return 0;
+    }
+    int c = ch.codeUnits[0];
+    if (!characters.containsKey(ch)) {
+      return base ~/ 2;
+    }
+    return characters[c].xadvance;
+  }
+
+
+  void _parseFnt(XmlElement xml, Map<int, Image> fontPages,
+                 [Arc.Archive arc]) {
     for (XmlElement c in xml.children) {
       if (c.name == 'info') {
         for (String a in c.attributes.keys) {
@@ -141,14 +192,16 @@ class BitmapFont {
             throw new ImageException('Duplicate font page id found: $id.');
           }
 
-          Arc.File imageFile = _findFile(arc, filename);
-          if (imageFile == null) {
-            throw new ImageException('Font zip missing font page image $filename');
+          if (arc != null) {
+            Arc.File imageFile = _findFile(arc, filename);
+            if (imageFile == null) {
+              throw new ImageException('Font zip missing font page image $filename');
+            }
+
+            Image image = new PngDecoder().decode(imageFile.content);
+
+            fontPages[id] = image;
           }
-
-          Image image = new PngDecoder().decode(imageFile.content);
-
-          fontPages[id] = image;
         }
       } else if (c.name == 'chars') {
         int count = c.children.length;
@@ -220,44 +273,80 @@ class BitmapFont {
     }
   }
 
-  bool drawChar(Image image, int c, int x, int y) {
-    if (!characters.containsKey(c)) {
-      return false;
-    }
+  XmlElement _parseTextFnt(String content) {
+    XmlElement xml = new XmlElement('font');
 
-    BitmapFontCharacter ch = characters[c];
-    int x2 = x + ch.width;
-    int y2 = y + ch.height;
-    int pi = 0;
-    for (int yi = y; yi < y2; ++yi) {
-      for (int xi = x; xi < x2; ++xi) {
-        int p = ch.uint32Data[pi++];
-        image.setPixelBlend(xi, yi, p);
-      }
-    }
-  }
+    XmlElement info = new XmlElement('info');
+    xml.addChild(info);
 
-  bool drawString(Image image, String s, int x, int y) {
-    List<int> chars = s.codeUnits;
-    for (int c in chars) {
-      if (!characters.containsKey(c)) {
-        x += base ~/ 2;
+    XmlElement common = new XmlElement('common');
+    xml.addChild(common);
+
+    XmlElement pages = new XmlElement('pages');
+    xml.addChild(pages);
+
+    XmlElement chars = new XmlElement('chars');
+    xml.addChild(chars);
+
+    XmlElement kernings = new XmlElement('kernings');
+    xml.addChild(kernings);
+
+    List<String> lines = content.split('\n');
+
+    for (String line in lines) {
+      if (line.isEmpty) {
         continue;
       }
 
-      BitmapFontCharacter ch = characters[c];
+      List<String> tk = line.split(' ');
+      switch (tk[0]) {
+        case 'info':
+          _parseParameters(info, tk);
+          break;
+        case 'common':
+          _parseParameters(common, tk);
+          break;
+        case 'page':
+          XmlElement page = new XmlElement('page');
+          _parseParameters(page, tk);
+          pages.addChild(page);
+          break;
+        case 'chars':
+          _parseParameters(chars, tk);
+          break;
+        case 'char':
+          XmlElement char = new XmlElement('char');
+          _parseParameters(char, tk);
+          chars.addChild(char);
+          break;
+        case 'kernings':
+          _parseParameters(kernings, tk);
+          break;
+        case 'kerning':
+          XmlElement kerning = new XmlElement('kerning');
+          _parseParameters(kerning, tk);
+          kernings.addChild(kerning);
+          break;
+      }
+    }
 
-      int x2 = x + ch.width;
-      int y2 = y + ch.height;
-      int pi = 0;
-      for (int yi = y; yi < y2; ++yi) {
-        for (int xi = x; xi < x2; ++xi) {
-          int p = ch.uint32Data[pi++];
-          image.setPixelBlend(xi + ch.xoffset, yi + ch.yoffset, p);
-        }
+    return xml;
+  }
+
+  void _parseParameters(XmlElement xml, List<String> tk) {
+    for (int ti = 1; ti < tk.length; ++ti) {
+      if (tk[ti].isEmpty) {
+        continue;
+      }
+      List<String> atk = tk[ti].split('=');
+      if (atk.length != 2) {
+        continue;
       }
 
-      x += ch.xadvance;
+      // Remove all " characters
+      atk[1] = atk[1].replaceAll('"', '');
+
+      xml.attributes[atk[0]] = atk[1];
     }
   }
 
