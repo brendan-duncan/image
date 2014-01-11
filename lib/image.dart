@@ -39,7 +39,7 @@ part 'src/filter/emboss.dart';
 part 'src/filter/copy_gaussian_blur.dart';
 part 'src/filter/grayscale.dart';
 part 'src/filter/mean_removal.dart';
-part 'src/filter/negate.dart';
+part 'src/filter/invert.dart';
 part 'src/filter/pixelate.dart';
 part 'src/filter/remap_colors.dart';
 part 'src/filter/smooth.dart';

@@ -120,7 +120,7 @@ void defineImageTests() {
 
     test('negate', () {
       Image f = new Image.from(image);
-      negate(f);
+      invert(f);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/negate.png');
       fp.createSync(recursive: true);
