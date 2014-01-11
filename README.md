@@ -26,7 +26,7 @@ Load a jpeg, resize it, and save it as a png:
     void main() {
       // Read a jpeg image from file.
       Io.File file = new Io.File('res/cat-eye04.jpg');    
-      Image image = readJpg(ile.readAsBytesSync());
+      Image image = readJpg(file.readAsBytesSync());
 
       // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
       Image thumbnail = resize(image, 120);
