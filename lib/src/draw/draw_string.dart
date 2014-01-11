@@ -1,7 +1,9 @@
 part of image;
 
 /**
- * Draw a string horizontally into [image].
+ * Draw a string horizontally into [image].  You can load your own font,
+ * or use one of the existing ones such as: [arial_14], [arial_24],
+ * or [arial_48].
  */
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
                  {int color: 0xffffffff}) {

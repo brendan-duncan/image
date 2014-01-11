@@ -8,6 +8,11 @@ BitmapFont readFont(String fnt, Image page) =>
     new BitmapFont.fromFnt(fnt, page);
 
 
+/**
+ * A bitmap font that can be used with draw_string and draw_char functions.
+ * You can generate a font files from a program
+ * like: http://kvazars.com/littera
+ */
 class BitmapFont {
   // info
   String face = '';

@@ -29,5 +29,38 @@ void defineFontTests() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(writeJpg(image));
     });
+
+    test('arial_14', () {
+      Image image = readPng(new Io.File('res/trees.png').readAsBytesSync());
+
+      drawString(image, arial_14, 10, 50, 'Testing Arial 14: Hello World',
+          color: getColor(255, 0, 0, 128));
+
+      new Io.File('out/font_arial_14.jpg')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writeJpg(image));
+    });
+
+    test('arial_24', () {
+      Image image = readPng(new Io.File('res/trees.png').readAsBytesSync());
+
+      drawString(image, arial_24, 10, 50, 'Testing Arial 24: Hello World',
+          color: getColor(255, 0, 0, 128));
+
+      new Io.File('out/font_arial_24.jpg')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writeJpg(image));
+    });
+
+    test('arial_48', () {
+      Image image = readPng(new Io.File('res/trees.png').readAsBytesSync());
+
+      drawString(image, arial_48, 10, 50, 'Testing Arial 48: Hello World',
+          color: getColor(255, 0, 0, 128));
+
+      new Io.File('out/font_arial_48.jpg')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writeJpg(image));
+    });
   });
 }

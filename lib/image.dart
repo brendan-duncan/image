@@ -47,6 +47,10 @@ part 'src/filter/pixelate.dart';
 part 'src/filter/remap_colors.dart';
 part 'src/filter/smooth.dart';
 
+part 'src/fonts/arial_14.dart';
+part 'src/fonts/arial_24.dart';
+part 'src/fonts/arial_48.dart';
+
 part 'src/transform/copy_into.dart';
 part 'src/transform/copy_crop.dart';
 part 'src/transform/flip.dart';
