@@ -34,6 +34,7 @@ part 'src/draw/fill_rect.dart';
 part 'src/effects/drop_shadow.dart';
 
 part 'src/filter/brightness.dart';
+part 'src/filter/bump_to_normal.dart';
 part 'src/filter/color_offset.dart';
 part 'src/filter/contrast.dart';
 part 'src/filter/convolution.dart';
