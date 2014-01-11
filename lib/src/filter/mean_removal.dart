@@ -1,7 +1,7 @@
 part of image;
 
 /**
- *
+ * Apply a mean-removal convolution filter.
  */
 Image meanRemoval(Image src) {
   const List<double> filter = const[

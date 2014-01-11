@@ -1,5 +1,13 @@
 part of image;
 
+/**
+ * Create a drop-shadow effect for the image.
+ *
+ * TODO this is just doing a rectangle shadow; use the src image to crete the
+ * shadow.
+ *
+ * TODO support different directions of shadows (0 or negative h/vshadow).
+ */
 Image dropShadow(Image src, int hshadow, int vshadow, int blur,
                  {int shadowColor: 0x000000a0}) {
   int dw = src.width + hshadow + (blur + 5);

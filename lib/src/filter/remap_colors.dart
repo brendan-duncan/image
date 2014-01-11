@@ -3,7 +3,9 @@ part of image;
 /**
  * Remap the color channels of the image.
  * [red], [green], [blue] and [alpha] should be set to one of the following:
- * [RED], [GREEN], [BLUE] or [ALPHA].
+ * [RED], [GREEN], [BLUE] or [ALPHA].  For example,
+ * remapColors(src, red: GREEN, green: RED);
+ * will swap the red and green channels of the image.
  */
 Image remapColors(Image src,
    {int red: RED,

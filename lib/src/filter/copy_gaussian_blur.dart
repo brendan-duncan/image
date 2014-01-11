@@ -1,12 +1,14 @@
 part of image;
 
-Map<int, List<double>> _gaussianKernelCache = {};
+Map<int, SeperableKernel> _gaussianKernelCache = {};
 
 /**
+ * Apply gaussian blur to the [src] image.
  *
+ * A new image is returned.
  */
 Image copyGaussianBlur(Image src, int radius) {
-  List<double> kernel;
+  SeperableKernel kernel;
 
   if (_gaussianKernelCache.containsKey(radius)) {
     kernel = _gaussianKernelCache[radius];
@@ -15,8 +17,7 @@ Image copyGaussianBlur(Image src, int radius) {
     double sigma = radius * (2.0 / 3.0);
     double s = 2.0 * sigma * sigma;
 
-    int count = 2 * radius + 1;
-    kernel = new List<double>(count);
+    kernel = new SeperableKernel(radius);
 
     double sum = 0.0;
     for (int x = -radius; x <= radius; ++x) {
@@ -25,26 +26,17 @@ Image copyGaussianBlur(Image src, int radius) {
       kernel[x + radius] = c;
     }
     // Normalize the coefficients
-    for (int i = 0; i < count; ++i) {
-      kernel[i] /= sum;
-    }
+    kernel.scaleCoefficients(1.0 / sum);
 
+    // Cache the kernel for this radius so we don't have to recompute it
+    // next time.
     _gaussianKernelCache[radius] = kernel;
   }
 
-
-  // Apply the filter horizontally
-  Image tmp = new Image.from(src);
-  _gaussianApplyCoeffs(src, tmp, kernel, radius, true);
-
-  // Apply the filter vertically
-  Image result = new Image.from(tmp);
-  _gaussianApplyCoeffs(tmp, result, kernel, radius, false);
-
-  return result;
+  return seperableConvolution(src, kernel);
 }
 
-void _gaussianApplyCoeffs(Image src, Image dst, List<double> kernel,
+/*void _gaussianApplyCoeffs(Image src, Image dst, List<double> kernel,
                           int radius, bool horizontal) {
   if (horizontal) {
     for (int y = 0; y < src.height; ++y) {
@@ -104,4 +96,4 @@ void _gaussianApplyCoeffsLine(Image src, Image dst,
       dst.setPixel(y, x, c);
     }
   }
-}
+}*/

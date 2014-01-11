@@ -1,7 +1,7 @@
 part of image;
 
 /**
- * Draw a single character horizontally into [image].
+ * Draw a single character from [strong] horizontally into [image].
  */
 Image drawChar(Image image, BitmapFont font, int x, int y, String string,
                {int color: 0xffffffff}) {

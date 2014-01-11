@@ -3,8 +3,12 @@ part of image;
 /**
  * Apply a convolution filter to the [src] image.  [filter] should be a
  * list of 9 doubles (3x3 matrix).
+ *
+ * The rgb channels will be divided by [filterDiv] and add [offset], allowing
+ * filters to normalize and offset the filtered pixel value.
  */
-Image convolution(Image src, List<num> filter, num filterDiv, num offset) {
+Image convolution(Image src, List<num> filter,
+                  [num filterDiv = 1.0, num offset = 0.0]) {
   Image tmp = new Image.from(src);
 
   for (int y = 0; y < src.height; ++y) {

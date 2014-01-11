@@ -1,10 +1,16 @@
 part of image;
 
-Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
+/**
+ * Draw a line into [image].
+ *
+ * If [antialias] is true then the line is drawn with smooth edges.
+ * [thickness] determines how thick the line should be drawn, in pixels.
+ */
+Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
                {bool antialias: false, num thickness: 1}) {
   List<int> line = [x1, y1, x2, y2];
-  if (!clipLine(line, [0, 0, src.width - 1, src.height - 1])) {
-    return src;
+  if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
+    return image;
   }
 
   x1 = line[0];
@@ -17,21 +23,21 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
 
   // Drawing a single point.
   if (dx == 0 && dy == 0) {
-    src.setPixelBlend(x1, y1, color);
-    return src;
+    image.setPixelBlend(x1, y1, color);
+    return image;
   }
 
   // Axis-aligned lines
   if (dx == 0) {
     for (int y = y1; y <= y2; ++y) {
-      src.setPixelBlend(x1, y, color);
+      image.setPixelBlend(x1, y, color);
     }
-    return src;
+    return image;
   } else if (dy == 0) {
     for (int x = x1; x <= x2; ++x) {
-      src.setPixelBlend(x, y1, color);
+      image.setPixelBlend(x, y1, color);
     }
-    return src;
+    return image;
   }
 
   // 16-bit unsigned int xor.
@@ -76,7 +82,7 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
       // Set up line thickness
       int wstart = (y - wid / 2).toInt();
       for (int w = wstart; w < wstart + wid; w++) {
-        src.setPixelBlend(x, w, color);
+        image.setPixelBlend(x, w, color);
       }
 
       if (((y2 - y1) * ydirflag) > 0) {
@@ -90,7 +96,7 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
           }
           wstart = (y - wid / 2).toInt();
           for (int w = wstart; w < wstart + wid; w++) {
-            src.setPixelBlend(x, w, color);
+            image.setPixelBlend(x, w, color);
           }
         }
       } else {
@@ -104,7 +110,7 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
           }
           wstart = (y - wid / 2).toInt();
           for (int w = wstart; w < wstart + wid; w++) {
-            src.setPixelBlend(x, w, color);
+            image.setPixelBlend(x, w, color);
           }
         }
       }
@@ -142,7 +148,7 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
       // Set up line thickness
       int wstart = (x - wid / 2).toInt();
       for (int w = wstart; w < wstart + wid; w++) {
-        src.setPixelBlend(w, y, color);
+        image.setPixelBlend(w, y, color);
       }
 
       if (((x2 - x1) * xdirflag) > 0) {
@@ -156,7 +162,7 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
           }
           wstart = (x - wid / 2).toInt();
           for (int w = wstart; w < wstart + wid; w++) {
-            src.setPixelBlend(w, y, color);
+            image.setPixelBlend(w, y, color);
           }
         }
       } else {
@@ -170,13 +176,13 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
           }
           wstart = (x - wid / 2).toInt();
           for (int w = wstart; w < wstart + wid; w++) {
-            src.setPixelBlend(w, y, color);
+            image.setPixelBlend(w, y, color);
           }
         }
       }
     }
 
-    return src;
+    return image;
   }
 
   // Antialias Line
@@ -214,8 +220,8 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
     for (int x = x1 ; x <= x2; x++) {
       int wstart = (y - wid ~/ 2);
       for (int w = wstart; w < wstart + wid; w++) {
-        src.setPixelBlend(x, w, color, (frac >> 8) & 0xff);
-        src.setPixelBlend(x, w + 1, color, (_xor(frac) >> 8) & 0xff);
+        image.setPixelBlend(x, w, color, (frac >> 8) & 0xff);
+        image.setPixelBlend(x, w + 1, color, (_xor(frac) >> 8) & 0xff);
       }
 
       frac += inc;
@@ -246,8 +252,8 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
     for (int y = y1 ; y <= y2; y++) {
       int wstart = (x - wid ~/ 2);
       for (int w = wstart; w < wstart + wid; w++) {
-        src.setPixelBlend(w, y, color, (frac >> 8) & 0xff);
-        src.setPixelBlend(w + 1, y, color, (_xor(frac) >> 8) & 0xff);
+        image.setPixelBlend(w, y, color, (frac >> 8) & 0xff);
+        image.setPixelBlend(w + 1, y, color, (_xor(frac) >> 8) & 0xff);
       }
 
       frac += inc;
@@ -261,5 +267,5 @@ Image drawLine(Image src, int x1, int y1, int x2, int y2, int color,
     }
   }
 
-  return src;
+  return image;
 }

@@ -46,6 +46,8 @@ part 'src/filter/mean_removal.dart';
 part 'src/filter/invert.dart';
 part 'src/filter/pixelate.dart';
 part 'src/filter/remap_colors.dart';
+part 'src/filter/seperable_convolution.dart';
+part 'src/filter/seperable_kernel.dart';
 part 'src/filter/smooth.dart';
 
 part 'src/fonts/arial_14.dart';

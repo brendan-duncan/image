@@ -1,7 +1,7 @@
 part of image;
 
 /**
- *
+ * Apply an edge-detect convolution filter.
  */
 Image edgeDetectQuick(Image src) {
   const List<double> filter = const[

@@ -1,7 +1,7 @@
 part of image;
 
 /**
- *
+ * Apply an emboss convolution filter.
  */
 Image emboss(Image src) {
   const List<double> filter = const[
