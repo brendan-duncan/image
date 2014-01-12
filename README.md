@@ -1,5 +1,7 @@
 # image
 
+[![Build Status](https://drone.io/bitbucket.org/brendan_duncan/image/status.png)](https://drone.io/bitbucket.org/brendan_duncan/image/latest)
+
 ##Overview
 
 A Dart library to encode and decode various image formats.
