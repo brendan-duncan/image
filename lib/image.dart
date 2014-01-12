@@ -30,6 +30,7 @@ part 'src/draw/draw_circle.dart';
 part 'src/draw/draw_line.dart';
 part 'src/filter/noise.dart';
 part 'src/draw/draw_pixel.dart';
+part 'src/draw/draw_rect.dart';
 part 'src/draw/draw_string.dart';
 part 'src/draw/fill.dart';
 part 'src/draw/fill_rect.dart';
