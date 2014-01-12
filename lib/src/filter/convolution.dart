@@ -1,8 +1,8 @@
 part of image;
 
 /**
- * Apply a convolution filter to the [src] image.  [filter] should be a
- * list of 9 doubles (3x3 matrix).
+ * Apply a 3x3 convolution filter to the [src] image.  [filter] should be a
+ * list of 9 doubles.
  *
  * The rgb channels will be divided by [filterDiv] and add [offset], allowing
  * filters to normalize and offset the filtered pixel value.

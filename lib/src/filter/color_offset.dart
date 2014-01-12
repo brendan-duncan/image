@@ -18,11 +18,6 @@ Image colorOffset(Image src, int red, int green, int blue, int alpha) {
     b = b + blue;
     a = a + alpha;
 
-    r = (r > 255) ? 255 : ((r < 0) ? 0 : r);
-    g = (g > 255) ? 255 : ((g < 0) ? 0 : g);
-    b = (b > 255) ? 255 : ((b < 0) ? 0 : b);
-    a = (a > 255) ? 255 : ((a < 0) ? 0 : a);
-
     src.buffer[i] = getColor(r, g, b, a);
   }
 

@@ -39,7 +39,7 @@ void defineImageTests() {
     test('fillRect', () {
       Image f = new Image.from(image);
       int c = getColor(128, 255, 128, 255);
-      fillRect(f, 50, 50, 100, 100, c);
+      fillRect(f, 50, 50, 150, 150, c);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/fillRect.png');
       fp.createSync(recursive: true);

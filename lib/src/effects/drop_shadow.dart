@@ -18,8 +18,8 @@ Image dropShadow(Image src, int hshadow, int vshadow, int blur,
   fill(dst, 0xffffff00);
 
   fillRect(dst, hshadow, vshadow,
-           src.width + hshadow,
-           src.height + vshadow,
+           src.width + hshadow * 2,
+           src.height + vshadow * 2,
            shadowColor);
 
   gaussianBlur(dst, blur ~/ 2);

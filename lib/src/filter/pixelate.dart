@@ -16,13 +16,15 @@ Image pixelate(Image src, int blockSize, {int mode: PIXELATE_UPPERLEFT}) {
     return src;
   }
 
+  int bs = blockSize - 1;
+
   switch (mode) {
     case PIXELATE_UPPERLEFT:
       for (int y = 0; y < src.height; y += blockSize) {
         for (int x = 0; x < src.width; x += blockSize) {
           if (src.boundsSafe(x, y)) {
             int c = src.getPixel(x, y);
-            fillRect(src, x, y, blockSize, blockSize, c);
+            fillRect(src, x, y, x + bs, y + bs, c);
           }
         }
       }
@@ -52,7 +54,7 @@ Image pixelate(Image src, int blockSize, {int mode: PIXELATE_UPPERLEFT}) {
 
           if (total > 0) {
             int c = getColor(r ~/ total, g ~/ total, b ~/ total, a ~/ total);
-            fillRect(src, x, y, blockSize, blockSize, c);
+            fillRect(src, x, y, x + bs, y + bs, c);
           }
         }
       }
