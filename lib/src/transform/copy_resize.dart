@@ -6,7 +6,7 @@ part of image;
  * ratio of [src] and [width].
  */
 Image copyResize(Image src, int width, [int height = -1,
-                 int interpolation = CUBIC]) {
+                 int interpolation = LINEAR]) {
   if (height < 0) {
     height = (width * (src.height / src.width)).toInt();
   }

@@ -11,7 +11,7 @@ class Image {
 
   final int width;
   final int height;
-  final int format;
+  int _format;
   /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
   /// channel.
   final Data.Uint32List buffer;
@@ -19,7 +19,7 @@ class Image {
   /**
    * Create an image with the given dimensions and format.
    */
-  Image(int width, int height, [this.format = RGBA]) :
+  Image(int width, int height, [this._format = RGBA]) :
     this.width = width,
     this.height = height,
     buffer = new Data.Uint32List(width * height) {
@@ -34,7 +34,7 @@ class Image {
   Image.from(Image other) :
     width = other.width,
     height = other.height,
-    format = other.format,
+    _format = other._format,
     buffer = new Data.Uint32List.fromList(other.buffer);
 
   /**
@@ -50,7 +50,7 @@ class Image {
    * Image image = new Image.fromBytes(canvas.width, canvas.height, bytes);
    */
   Image.fromBytes(int width, int height, List<int> bytes,
-                  [this.format = RGBA]) :
+                  [this._format = RGBA]) :
     this.width = width,
     this.height = height,
     // Create a uint32 view of the byte buffer.
@@ -61,9 +61,9 @@ class Image {
     // It would be nice if we could just create a Uint32List.view for the byte
     // buffer, but the channels would be in reverse order (endianness problem).
     final int len = buffer.length;
-    final int inc = format == RGBA ? 4 : 3;
+    final int inc = _format == RGBA ? 4 : 3;
     for (int i = 0, j = 0; i < len; ++i, j += inc) {
-      int a = format == RGBA ? bytes[j + 3] : 0xff;
+      int a = _format == RGBA ? bytes[j + 3] : 0xff;
       buffer[i] = getColor(bytes[j], bytes[j + 1], bytes[j + 2], a);
     }
   }
@@ -89,15 +89,35 @@ class Image {
       bytes[j] = getRed(c);
       bytes[j + 1] = getGreen(c);
       bytes[j + 2] = getBlue(c);
-      bytes[j + 3] = format == RGBA ? getAlpha(c) : 0xff;
+      bytes[j + 3] = _format == RGBA ? getAlpha(c) : 0xff;
     }
     return bytes;
+  }
+
+  int get format => _format;
+
+  /**
+   * Change the format of the image.
+   */
+  void set format(int f) {
+    if (f == _format) {
+      return;
+    }
+    _format = f;
+    if (_format == RGBA) {
+      int len = buffer.length;
+      // If we convert from RGB to RGBA, make sure the alpha
+      // channel is set.
+      for (int i = 0; i < len; ++i) {
+        buffer[i] |= 0xff;
+      }
+    }
   }
 
   /**
    * How many color channels does the image have?
    */
-  int get numChannels => format;
+  int get numChannels => _format;
 
   /**
    * Set all of the pixels of the image to the given [color].
@@ -297,7 +317,7 @@ class Image {
    */
   int getPixel(int x, int y) =>
     boundsSafe(x, y) ?
-      format == RGBA ?
+      _format == RGBA ?
         buffer[y * width + x] :
         buffer[y * width + x] | 0xff : 0;
 
@@ -327,9 +347,7 @@ class Image {
         _linear(getRed(Icc), getRed(Inc), getRed(Icn), getRed(Inn)),
         _linear(getGreen(Icc), getGreen(Inc), getGreen(Icn), getGreen(Inn)),
         _linear(getBlue(Icc), getBlue(Inc), getBlue(Icn), getBlue(Inn)),
-        format == RGBA ?
-          _linear(getAlpha(Icc), getAlpha(Inc), getAlpha(Icn), getAlpha(Inn)) :
-          255);
+        _linear(getAlpha(Icc), getAlpha(Inc), getAlpha(Icn), getAlpha(Inn)));
   }
 
   /**
@@ -362,9 +380,7 @@ class Image {
     double Ip0 = _cubic(dx, getRed(Ipp), getRed(Icp), getRed(Inp), getRed(Iap));
     double Ip1 = _cubic(dx, getGreen(Ipp), getGreen(Icp), getGreen(Inp), getGreen(Iap));
     double Ip2 = _cubic(dx, getBlue(Ipp), getBlue(Icp), getBlue(Inp), getBlue(Iap));
-    double Ip3 = format == RGBA ?
-                 _cubic(dx, getAlpha(Ipp), getAlpha(Icp), getAlpha(Inp), getAlpha(Iap)) :
-                 255.0;
+    double Ip3 = _cubic(dx, getAlpha(Ipp), getAlpha(Icp), getAlpha(Inp), getAlpha(Iap));
 
     int Ipc = getPixel(px, y);
     int Icc = getPixel(x, y);
@@ -373,9 +389,7 @@ class Image {
     double Ic0 = _cubic(dx, getRed(Ipc), getRed(Icc), getRed(Inc), getRed(Iac));
     double Ic1 = _cubic(dx, getGreen(Ipc), getGreen(Icc), getGreen(Inc), getGreen(Iac));
     double Ic2 = _cubic(dx, getBlue(Ipc), getBlue(Icc), getBlue(Inc), getBlue(Iac));
-    double Ic3 = format == RGBA ?
-                 _cubic(dx, getAlpha(Ipc), getAlpha(Icc), getAlpha(Inc), getAlpha(Iac)) :
-                 255.0;
+    double Ic3 = _cubic(dx, getAlpha(Ipc), getAlpha(Icc), getAlpha(Inc), getAlpha(Iac));
 
     int Ipn = getPixel(px, ny);
     int Icn = getPixel(x, ny);
@@ -384,9 +398,7 @@ class Image {
     double In0 = _cubic(dx, getRed(Ipn), getRed(Icn), getRed(Inn), getRed(Ian));
     double In1 = _cubic(dx, getGreen(Ipn), getGreen(Icn), getGreen(Inn), getGreen(Ian));
     double In2 = _cubic(dx, getBlue(Ipn), getBlue(Icn), getBlue(Inn), getBlue(Ian));
-    double In3 = format == RGBA ?
-                 _cubic(dx, getAlpha(Ipn), getAlpha(Icn), getAlpha(Inn), getAlpha(Ian)) :
-                 255.0;
+    double In3 = _cubic(dx, getAlpha(Ipn), getAlpha(Icn), getAlpha(Inn), getAlpha(Ian));
 
     int Ipa = getPixel(px, ay);
     int Ica = getPixel(x, ay);
@@ -395,14 +407,12 @@ class Image {
     double Ia0 = _cubic(dx, getRed(Ipa), getRed(Ica), getRed(Ina), getRed(Iaa));
     double Ia1 = _cubic(dx, getGreen(Ipa), getGreen(Ica), getGreen(Ina), getGreen(Iaa));
     double Ia2 = _cubic(dx, getBlue(Ipa), getBlue(Ica), getBlue(Ina), getBlue(Iaa));
-    double Ia3 = format == RGBA ?
-                 _cubic(dx, getAlpha(Ipa), getAlpha(Ica), getAlpha(Ina), getAlpha(Iaa)) :
-                 255.0;
+    double Ia3 = _cubic(dx, getAlpha(Ipa), getAlpha(Ica), getAlpha(Ina), getAlpha(Iaa));
 
     double c0 = _cubic(dy, Ip0, Ic0, In0, Ia0);
     double c1 = _cubic(dy, Ip1, Ic1, In1, Ia1);
     double c2 = _cubic(dy, Ip2, Ic2, In2, Ia2);
-    double c3 = format == RGBA ? _cubic(dy, Ip3, Ic3, In3, Ia3) : 255.0;
+    double c3 = _cubic(dy, Ip3, Ic3, In3, Ia3);
 
     return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
   }

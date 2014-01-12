@@ -17,7 +17,7 @@ part of image;
  */
 Image copyInto(Image dst, Image src,
                {int dstX, int dstY, int srcX, int srcY,
-                int srcW, int srcH, bool blend: false}) {
+                int srcW, int srcH, bool blend: true}) {
   if (dstX == null) {
     dstX = 0;
   }

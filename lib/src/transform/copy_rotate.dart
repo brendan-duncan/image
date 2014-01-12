@@ -58,7 +58,7 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
   double dw2 = 0.5 * (ux + vx);
   double dh2 = 0.5 * (uy + vy);
 
-  Image dst = new Image((ux + vx).toInt(), (uy + vy).toInt(), src.format);
+  Image dst = new Image((ux + vx).toInt(), (uy + vy).toInt(), Image.RGBA);
 
   switch (interpolation) {
     case CUBIC: // Cubic interpolation.
