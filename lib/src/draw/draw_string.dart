@@ -32,7 +32,7 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     int pi = 0;
     for (int yi = y; yi < y2; ++yi) {
       for (int xi = x; xi < x2; ++xi) {
-        int p = ch.uint32Data[pi++];
+        int p = ch.image[pi++];
         p = getColor((getRed(p) * dr).toInt(),
                      (getGreen(p) * dg).toInt(),
                      (getBlue(p) * db).toInt(),

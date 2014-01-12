@@ -245,11 +245,10 @@ class BitmapFont {
           int x2 = x + width;
           int y2 = y + height;
           int pi = 0;
-          var rgbaBuffer = ch.uint32Data;
+          Image image = ch.image;
           for (int yi = y; yi < y2; ++yi) {
             for (int xi = x; xi < x2; ++xi) {
-              int p = fontImage.getPixel(xi, yi);
-              rgbaBuffer[pi++] = p;
+              image[pi++] = fontImage.getPixel(xi, yi);
             }
           }
         }
@@ -366,8 +365,6 @@ class BitmapFont {
 }
 
 class BitmapFontCharacter {
-  static const int RGBA = 0;
-
   final int id;
   final int width;
   final int height;
@@ -376,17 +373,14 @@ class BitmapFontCharacter {
   final int xadvance;
   final int page;
   final int channel;
-  final Data.TypedData data;
+  final Image image;
 
   BitmapFontCharacter(this.id, int width, int height,
                       this.xoffset, this.yoffset, this.xadvance, this.page,
-                      this.channel, {int format: RGBA}) :
+                      this.channel) :
     this.width = width,
     this.height = height,
-    data = format == RGBA ? new Data.Uint32List(width * height) :
-           throw new ImageException('Invalid Character Format');
-
-  Data.Uint32List get uint32Data => data;
+    image = new Image(width, height);
 
   String toString() {
     Map x = {'id': id, 'width': width, 'height': height, 'xoffset': xoffset,

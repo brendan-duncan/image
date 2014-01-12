@@ -22,11 +22,7 @@ class Image {
   Image(int width, int height, [this._format = RGBA]) :
     this.width = width,
     this.height = height,
-    buffer = new Data.Uint32List(width * height) {
-    if (width <= 0 || height <= 0) {
-      throw new ImageException('Invalid image format');
-    }
-  }
+    buffer = new Data.Uint32List(width * height);
 
   /**
    * Create a copy of the image [other].
@@ -55,9 +51,6 @@ class Image {
     this.height = height,
     // Create a uint32 view of the byte buffer.
     buffer = new Data.Uint32List(width * height) {
-    if (width <= 0 || height <= 0 || buffer.length != (width * height)) {
-      throw new ImageException('Invalid image format');
-    }
     // It would be nice if we could just create a Uint32List.view for the byte
     // buffer, but the channels would be in reverse order (endianness problem).
     final int len = buffer.length;
