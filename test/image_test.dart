@@ -86,15 +86,16 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(i1));
     });
 
-    test('drawLine/drawCricle', () {
+    test('draw shapes', () {
       Image f = new Image.from(image);
       int c1 = getColor(128, 255, 128, 255);
       drawLine(f, 0, 0, f.width, f.height, c1, thickness: 3);
       int c2 = getColor(255, 128, 128, 255);
       drawLine(f, f.width, 0, 0, f.height, c2, thickness: 5, antialias: true);
       drawCircle(f, 100, 100, 50, c1);
+      drawRect(f, 50, 50, 150, 150, c2);
       // Save the image as a PNG.
-      Io.File fp = new Io.File('out/drawLine.png');
+      Io.File fp = new Io.File('out/drawShapes.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
     });
