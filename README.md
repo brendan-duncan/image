@@ -117,8 +117,7 @@ Create an image, draw some text, save it as a png:
 
   _Draw a single pixel into the image, applying alpha and opacity blending._
   
-- Image **drawRect**(Image image, int x1, int y1, int x2, int y2, int color,
-                     {num thickness: 1});
+- Image **drawRect**(Image image, int x1, int y1, int x2, int y2, int color);
                      
   _Draw a rectangle._
   
