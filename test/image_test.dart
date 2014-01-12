@@ -20,13 +20,13 @@ void main() {
 
 void defineImageTests() {
   group('image', () {
-    Io.File file = new Io.File('res/trees.png');
-    Image image = readPng(file.readAsBytesSync());
+    Image image = readPng(new Io.File('res/trees.png').readAsBytesSync());
+    Image image2 = readPng(new Io.File('res/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       Image f = new Image(10, 10);
       int c = getColor(128, 255, 128, 255);
-      fill(f, c);
+      f.fill(c);
       for (int i = 0; i < f.buffer.length; ++i) {
         expect(f.buffer[i], equals(c));
       }
@@ -44,6 +44,46 @@ void defineImageTests() {
       Io.File fp = new Io.File('out/fillRect.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('add', () {
+      Image i1 = new Image.from(image);
+      Image i2 = new Image.from(image2);
+      i1 += i2;
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/add.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(i1));
+    });
+
+    test('sub', () {
+      Image i1 = new Image.from(image);
+      Image i2 = new Image.from(image2);
+      i1 -= i2;
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/sub.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(i1));
+    });
+
+    test('or', () {
+      Image i1 = new Image.from(image);
+      Image i2 = new Image.from(image2);
+      i1 |= i2;
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/or.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(i1));
+    });
+
+    test('and', () {
+      Image i1 = new Image.from(image);
+      Image i2 = new Image.from(image2);
+      i1 &= i2;
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/and.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(i1));
     });
 
     test('drawLine/drawCricle', () {
@@ -64,6 +104,15 @@ void defineImageTests() {
       brightness(f, 100);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/brightness.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('copyResize', () {
+      Image f = new Image.from(image);
+      f = copyResize(f, 100);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/copyResize.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
     });
@@ -217,6 +266,42 @@ void defineImageTests() {
       Io.File fp = new Io.File('out/remapColors.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('rotate_90', () {
+      Image f = new Image.from(image);
+      Image r = copyRotate(f, 90);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/rotate_90.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(r));
+    });
+
+    test('rotate_180', () {
+      Image f = new Image.from(image);
+      Image r = copyRotate(f, 180);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/rotate_180.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(r));
+    });
+
+    test('rotate_270', () {
+      Image f = new Image.from(image);
+      Image r = copyRotate(f, 270);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/rotate_270.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(r));
+    });
+
+    test('rotate_45', () {
+      Image f = new Image.from(image);
+      Image r = copyRotate(f, 45);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/rotate_45.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(r));
     });
 
     test('smooth', () {

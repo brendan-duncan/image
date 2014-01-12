@@ -60,10 +60,12 @@ part 'src/fonts/arial_48.dart';
 
 part 'src/transform/copy_into.dart';
 part 'src/transform/copy_crop.dart';
-part 'src/transform/flip.dart';
 part 'src/transform/copy_resize.dart';
+part 'src/transform/copy_rotate.dart';
+part 'src/transform/flip.dart';
 
 part 'src/util/clip_line.dart';
+part 'src/util/interpolation.dart';
 part 'src/util/min_max.dart';
 part 'src/util/random.dart';
 

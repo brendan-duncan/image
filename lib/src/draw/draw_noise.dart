@@ -38,21 +38,21 @@ Image drawNoise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
     case NOISE_GAUSSIAN:
       for (int i = 0; i < len; ++i) {
         int c = image[i];
-        int r = (red(c) + nsigma * grand(random)).toInt();
-        int g = (green(c) + nsigma * grand(random)).toInt();
-        int b = (blue(c) + nsigma * grand(random)).toInt();
-        int a = alpha(c);
-        image[i] = color(r, g, b, a);
+        int r = (getRed(c) + nsigma * grand(random)).toInt();
+        int g = (getGreen(c) + nsigma * grand(random)).toInt();
+        int b = (getBlue(c) + nsigma * grand(random)).toInt();
+        int a = getAlpha(c);
+        image[i] = getColor(r, g, b, a);
       }
       break;
     case NOISE_UNIFORM :
       for (int i = 0; i < len; ++i) {
         int c = image[i];
-        int r = (red(c) + nsigma * crand(random)).toInt();
-        int g = (green(c) + nsigma * crand(random)).toInt();
-        int b = (blue(c) + nsigma * crand(random)).toInt();
-        int a = alpha(c);
-        image[i] = color(r, g, b, a);
+        int r = (getRed(c) + nsigma * crand(random)).toInt();
+        int g = (getGreen(c) + nsigma * crand(random)).toInt();
+        int b = (getBlue(c) + nsigma * crand(random)).toInt();
+        int a = getAlpha(c);
+        image[i] = getColor(r, g, b, a);
       }
       break;
     case NOISE_SALT_PEPPER:
@@ -69,19 +69,19 @@ Image drawNoise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
           int r = (random.nextDouble() < 0.5 ? M : m);
           int g = (random.nextDouble() < 0.5 ? M : m);
           int b = (random.nextDouble() < 0.5 ? M : m);
-          int a = alpha(c);
-          image[i] = color(r, g, b, a);
+          int a = getAlpha(c);
+          image[i] = getColor(r, g, b, a);
         }
       }
       break;
     case NOISE_POISSON:
       for (int i = 0; i < len; ++i) {
         int c = image[i];
-        int r = prand(random, red(c).toDouble());
-        int g = prand(random, green(c).toDouble());
-        int b = prand(random, blue(c).toDouble());
-        int a = alpha(c);
-        image[i] = color(r, g, b, a);
+        int r = prand(random, getRed(c).toDouble());
+        int g = prand(random, getGreen(c).toDouble());
+        int b = prand(random, getBlue(c).toDouble());
+        int a = getAlpha(c);
+        image[i] = getColor(r, g, b, a);
       }
       break;
     case NOISE_RICE:
@@ -89,26 +89,26 @@ Image drawNoise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
       for (int i = 0; i < len; ++i) {
         int c = image[i];
 
-        double val0 = red(c) / sqrt2;
+        double val0 = getRed(c) / sqrt2;
         double re = (val0 + nsigma * grand(random));
         double im = (val0 + nsigma * grand(random));
         double val = Math.sqrt(re * re + im * im);
         int r = val.toInt();
 
-        val0 = green(c) / sqrt2;
+        val0 = getGreen(c) / sqrt2;
         re = (val0 + nsigma * grand(random));
         im = (val0 + nsigma * grand(random));
         val = Math.sqrt(re * re + im * im);
         int g = val.toInt();
 
-        val0 = blue(c) / sqrt2;
+        val0 = getBlue(c) / sqrt2;
         re = (val0 + nsigma * grand(random));
         im = (val0 + nsigma * grand(random));
         val = Math.sqrt(re * re + im * im);
         int b = val.toInt();
 
-        int a = alpha(c);
-        image[i] = color(r, g, b, a);
+        int a = getAlpha(c);
+        image[i] = getColor(r, g, b, a);
       }
       break;
     default :

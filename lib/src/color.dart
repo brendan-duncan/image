@@ -23,11 +23,6 @@ int getColor(int r, int g, int b, [int a = 255]) {
 }
 
 /**
- * Get the color with the given [r],[g],[b], and [a] components.
- */
-int color(int r, int g, int b, [int a = 255]) => getColor(r, g, b, a);
-
-/**
  * Get the color with the list of components.
  */
 int getColorFromList(List<int> rgba) {
@@ -38,15 +33,31 @@ int getColorFromList(List<int> rgba) {
 }
 
 /**
+ * Get the channel from the color.
+ */
+int getChannel(int c, int ch) =>
+    ch == 0 ? getRed(c) :
+    ch == 1 ? getGreen(c) :
+    ch == 2 ? getBlue(c) :
+    getAlpha(c);
+
+int setChannel(int c, int ch, int v) =>
+    ch == 0 ? setRed(c, v) :
+    ch == 1 ? setGreen(c, v) :
+    ch == 2 ? setBlue(c, v) :
+    setAlpha(c, v);
+
+/**
  * Get the red component from the color.
  */
 int getRed(int c) =>
     (c >> 24) & 0xff;
 
 /**
- * Get the red component from the color.
+ * Set the red component of the color.
  */
-int red(int c) => getRed(c);
+int setRed(int c, int v) =>
+    (c & 0x00ffffff) | (_clamp255(v) << 24);
 
 /**
  * Get the green component from the color.
@@ -55,9 +66,10 @@ int getGreen(int c) =>
     (c >> 16) & 0xff;
 
 /**
- * Get the green component from the color.
+ * Set the green component of the color.
  */
-int green(int c) => getGreen(c);
+int setGreen(int c, int v) =>
+    (c & 0xff00ffff) | (_clamp255(v) << 16);
 
 /**
  * Get the blue component from the color.
@@ -66,9 +78,10 @@ int getBlue(int c) =>
     (c >> 8) & 0xff;
 
 /**
- * Get the blue component from the color.
+ * Set the blue component of the color.
  */
-int blue(int c) => getBlue(c);
+int setBlue(int c, int v) =>
+    (c & 0xffff00ff) | (_clamp255(v) << 8);
 
 /**
  * Get the alpha component from the color.
@@ -77,9 +90,10 @@ int getAlpha(int c) =>
     c & 0xff;
 
 /**
- * Get the alpha component from the color.
+ * Set the alpha component of the color.
  */
-int alpha(int c) => getAlpha(c);
+int setAlpha(int c, int v) =>
+    (c & 0xffffff00) | (_clamp255(v));
 
 /**
  *
@@ -87,17 +101,17 @@ int alpha(int c) => getAlpha(c);
  * scaled by [fraction], for anti-aliasing.
  */
 int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
-  double a = (alpha(src) / 255.0) * (fraction / 255.0);
+  double a = (getAlpha(src) / 255.0) * (fraction / 255.0);
 
-  int sr = (red(src) * a).toInt();
-  int sg = (green(src) * a).toInt();
-  int sb = (blue(src) * a).toInt();
-  int sa = (alpha(src) * a).toInt();
+  int sr = (getRed(src) * a).toInt();
+  int sg = (getGreen(src) * a).toInt();
+  int sb = (getBlue(src) * a).toInt();
+  int sa = (getAlpha(src) * a).toInt();
 
-  int dr = (red(dst) * (1.0 - a)).toInt();
-  int dg = (green(dst) * (1.0 - a)).toInt();
-  int db = (blue(dst) * (1.0 - a)).toInt();
-  int da = (alpha(dst) * (1.0 - a)).toInt();
+  int dr = (getRed(dst) * (1.0 - a)).toInt();
+  int dg = (getGreen(dst) * (1.0 - a)).toInt();
+  int db = (getBlue(dst) * (1.0 - a)).toInt();
+  int da = (getAlpha(dst) * (1.0 - a)).toInt();
 
-  return color(sr + dr, sg + dg, sb + db, sa + da);
+  return getColor(sr + dr, sg + dg, sb + db, sa + da);
 }

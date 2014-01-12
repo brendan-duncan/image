@@ -95,9 +95,13 @@ You ca
 
   _Copy an area of src into dst.
   
-- Image **copyResize**(Image src, int width, [int height = -1]);
+- Image **copyResize**(Image src, int width, [int height = -1, int interpolation = LINEAR]);
 
   _Create a resized copy of the image._
+  
+- Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
+
+  _Returns a copy of the [src] image, rotated by [angle] degrees._
   
 - Image **drawChar**(Image image, BitmapFont font, int x, int y, String string, {int color: 0xffffffff});
 

@@ -95,6 +95,11 @@ class Image {
   }
 
   /**
+   * How many color channels does the image have?
+   */
+  int get numChannels => format;
+
+  /**
    * Set all of the pixels of the image to the given [color].
    */
   Image fill(int color) {
@@ -295,6 +300,112 @@ class Image {
       format == RGBA ?
         buffer[y * width + x] :
         buffer[y * width + x] | 0xff : 0;
+
+  /**
+   * Get the pixel using linear interpolation for non-integer pixel
+   * coordinates.
+   */
+  int getPixelLinear(num fx, num fy) {
+    int x = fx.toInt() - (fx >= 0 ? 0 : 1);
+    int nx = x + 1;
+    int y = fy.toInt() - (fy >= 0 ? 0 : 1);
+    int ny = y + 1;
+    double dx = fx - x;
+    double dy = fy - y;
+
+    int _linear(int Icc, int Inc, int Icn, int Inn) {
+      return (Icc + dx * (Inc - Icc + dy * (Icc + Inn - Icn - Inc)) +
+              dy * (Icn - Icc)).toInt();
+    }
+
+    int Icc = getPixel(x, y);
+    int Inc = getPixel(nx, y);
+    int Icn = getPixel(x, ny);
+    int Inn = getPixel(nx, ny);
+
+    return getColor(
+        _linear(getRed(Icc), getRed(Inc), getRed(Icn), getRed(Inn)),
+        _linear(getGreen(Icc), getGreen(Inc), getGreen(Icn), getGreen(Inn)),
+        _linear(getBlue(Icc), getBlue(Inc), getBlue(Icn), getBlue(Inn)),
+        format == RGBA ?
+          _linear(getAlpha(Icc), getAlpha(Inc), getAlpha(Icn), getAlpha(Inn)) :
+          255);
+  }
+
+  /**
+   * Get the pixel using cubic interpolation for non-integer pixel
+   * coordinates.
+   */
+  int getPixelCubic(num fx, num fy) {
+    int x = fx.toInt() - (fx >= 0.0 ? 0 : 1);
+    int px = x - 1;
+    int nx = x + 1;
+    int ax = x + 2;
+    int y = fy.toInt() - (fy >= 0.0 ? 0 : 1);
+    int py = y - 1;
+    int ny = y + 1;
+    int ay = y + 2;
+
+    double dx = fx - x;
+    double dy = fy - y;
+
+    double _cubic(double dx, num Ipp, num Icp, num Inp, num Iap) {
+      return Icp + 0.5 * (dx * (-Ipp + Inp) +
+             dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
+             dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
+    }
+
+    int Ipp = getPixel(px, py);
+    int Icp = getPixel(x, py);
+    int Inp = getPixel(nx, py);
+    int Iap = getPixel(ax, py);
+    double Ip0 = _cubic(dx, getRed(Ipp), getRed(Icp), getRed(Inp), getRed(Iap));
+    double Ip1 = _cubic(dx, getGreen(Ipp), getGreen(Icp), getGreen(Inp), getGreen(Iap));
+    double Ip2 = _cubic(dx, getBlue(Ipp), getBlue(Icp), getBlue(Inp), getBlue(Iap));
+    double Ip3 = format == RGBA ?
+                 _cubic(dx, getAlpha(Ipp), getAlpha(Icp), getAlpha(Inp), getAlpha(Iap)) :
+                 255.0;
+
+    int Ipc = getPixel(px, y);
+    int Icc = getPixel(x, y);
+    int Inc = getPixel(nx, y);
+    int Iac = getPixel(ax, y);
+    double Ic0 = _cubic(dx, getRed(Ipc), getRed(Icc), getRed(Inc), getRed(Iac));
+    double Ic1 = _cubic(dx, getGreen(Ipc), getGreen(Icc), getGreen(Inc), getGreen(Iac));
+    double Ic2 = _cubic(dx, getBlue(Ipc), getBlue(Icc), getBlue(Inc), getBlue(Iac));
+    double Ic3 = format == RGBA ?
+                 _cubic(dx, getAlpha(Ipc), getAlpha(Icc), getAlpha(Inc), getAlpha(Iac)) :
+                 255.0;
+
+    int Ipn = getPixel(px, ny);
+    int Icn = getPixel(x, ny);
+    int Inn = getPixel(nx, ny);
+    int Ian = getPixel(ax, ny);
+    double In0 = _cubic(dx, getRed(Ipn), getRed(Icn), getRed(Inn), getRed(Ian));
+    double In1 = _cubic(dx, getGreen(Ipn), getGreen(Icn), getGreen(Inn), getGreen(Ian));
+    double In2 = _cubic(dx, getBlue(Ipn), getBlue(Icn), getBlue(Inn), getBlue(Ian));
+    double In3 = format == RGBA ?
+                 _cubic(dx, getAlpha(Ipn), getAlpha(Icn), getAlpha(Inn), getAlpha(Ian)) :
+                 255.0;
+
+    int Ipa = getPixel(px, ay);
+    int Ica = getPixel(x, ay);
+    int Ina = getPixel(nx, ay);
+    int Iaa = getPixel(ax, ay);
+    double Ia0 = _cubic(dx, getRed(Ipa), getRed(Ica), getRed(Ina), getRed(Iaa));
+    double Ia1 = _cubic(dx, getGreen(Ipa), getGreen(Ica), getGreen(Ina), getGreen(Iaa));
+    double Ia2 = _cubic(dx, getBlue(Ipa), getBlue(Ica), getBlue(Ina), getBlue(Iaa));
+    double Ia3 = format == RGBA ?
+                 _cubic(dx, getAlpha(Ipa), getAlpha(Ica), getAlpha(Ina), getAlpha(Iaa)) :
+                 255.0;
+
+    double c0 = _cubic(dy, Ip0, Ic0, In0, Ia0);
+    double c1 = _cubic(dy, Ip1, Ic1, In1, Ia1);
+    double c2 = _cubic(dy, Ip2, Ic2, In2, Ia2);
+    double c3 = format == RGBA ? _cubic(dy, Ip3, Ic3, In3, Ia3) : 255.0;
+
+    return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
+  }
 
   /**
    * Set the pixel at the given [x], [y] coordinate to the [color].

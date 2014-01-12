@@ -8,15 +8,15 @@ part of image;
  */
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
                  {int color: 0xffffffff}) {
-  int ca = alpha(color);
+  int ca = getAlpha(color);
   if (ca == 0) {
     return image;
   }
 
   double da = ca / 255.0;
-  double dr = red(color) / 255.0;
-  double dg = green(color) / 255.0;
-  double db = blue(color) / 255.0;
+  double dr = getRed(color) / 255.0;
+  double dg = getGreen(color) / 255.0;
+  double db = getBlue(color) / 255.0;
 
   List<int> chars = string.codeUnits;
   for (int c in chars) {
@@ -33,10 +33,10 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     for (int yi = y; yi < y2; ++yi) {
       for (int xi = x; xi < x2; ++xi) {
         int p = ch.uint32Data[pi++];
-        p = getColor((red(p) * dr).toInt(),
-                     (green(p) * dg).toInt(),
-                     (blue(p) * db).toInt(),
-                     (alpha(p) * da).toInt());
+        p = getColor((getRed(p) * dr).toInt(),
+                     (getGreen(p) * dg).toInt(),
+                     (getBlue(p) * db).toInt(),
+                     (getAlpha(p) * da).toInt());
 
         drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, p);
       }
