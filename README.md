@@ -62,7 +62,6 @@ Create an image, draw some text, save it as a png:
             ..writeAsBytesSync(png);
     }
 
-You ca
     
 ##Image Functions
 - Image **brightness**(Image src, int brightness);
@@ -139,7 +138,7 @@ You ca
 
   _Fill the image with the given color._
   
-- Image **fillRect**(Image src, int x, int y, int w, int h, int color);
+- Image **fillRect**(Image src, int x1, int y1, int x2, int y2, int color);
 
   _Fill a rectangle with the given color._
   
