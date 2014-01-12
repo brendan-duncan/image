@@ -88,9 +88,9 @@ Create an image, draw some text, save it as a png:
 
   _Create a cropped copy of the image._
 
-- Image **copyInto**(Image dst, Image src, int dst_x, int dst_y, int src_x, int src_y, int dst_w, int dst_h, int src_w, int src_h);
+- Image **copyInto**(Image dst, Image src, [int dst_x, int dst_y, int src_x, int src_y, int dst_w, int dst_h, int src_w, int src_h]);
 
-  _Copy an area of src into dst.
+  _Copy an area of the src image into dst._
   
 - Image **copyResize**(Image src, int width, [int height = -1, int interpolation = LINEAR]);
 
