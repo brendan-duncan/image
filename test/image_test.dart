@@ -46,12 +46,13 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(f));
     });
 
-    test('drawLine', () {
+    test('drawLine/drawCricle', () {
       Image f = new Image.from(image);
       int c1 = getColor(128, 255, 128, 255);
       drawLine(f, 0, 0, f.width, f.height, c1, thickness: 3);
       int c2 = getColor(255, 128, 128, 255);
       drawLine(f, f.width, 0, 0, f.height, c2, thickness: 5, antialias: true);
+      drawCircle(f, 100, 100, 50, c1);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/drawLine.png');
       fp.createSync(recursive: true);
@@ -121,6 +122,15 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(f));
     });
 
+    test('invert', () {
+      Image f = new Image.from(image);
+      invert(f);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/invert.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
     test('meanRemoval', () {
       Image f = new Image.from(image);
       meanRemoval(f);
@@ -130,11 +140,56 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(f));
     });
 
-    test('negate', () {
+    test('NOISE_GAUSSIAN', () {
       Image f = new Image.from(image);
-      invert(f);
+      drawNoise(f, 10.0, type:NOISE_GAUSSIAN);
       // Save the image as a PNG.
-      Io.File fp = new Io.File('out/negate.png');
+      Io.File fp = new Io.File('out/noise_gaussian.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('NOISE_UNIFORM', () {
+      Image f = new Image.from(image);
+      drawNoise(f, 10.0, type:NOISE_UNIFORM);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/noise_uniform.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('NOISE_SALT_PEPPER', () {
+      Image f = new Image.from(image);
+      drawNoise(f, 10.0, type:NOISE_SALT_PEPPER);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/noise_salt_pepper.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('NOISE_POISSON', () {
+      Image f = new Image.from(image);
+      drawNoise(f, 10.0, type:NOISE_POISSON);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/noise_poisson.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('NOISE_RICE', () {
+      Image f = new Image.from(image);
+      drawNoise(f, 10.0, type:NOISE_RICE);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/noise_rice.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('normalize', () {
+      Image f = new Image.from(image);
+      normalize(f, 100, 255);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/normalize.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
     });

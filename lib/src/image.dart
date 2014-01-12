@@ -23,10 +23,10 @@ class Image {
     this.width = width,
     this.height = height,
     buffer = new Data.Uint32List(width * height) {
-      if (width <= 0 || height <= 0) {
-        throw new ImageException('Invalid image format');
-      }
+    if (width <= 0 || height <= 0) {
+      throw new ImageException('Invalid image format');
     }
+  }
 
   /**
    * Create a copy of the image [other].
@@ -69,6 +69,11 @@ class Image {
   }
 
   /**
+   * Clone this image.
+   */
+  Image clone() => new Image.from(this);
+
+  /**
    * Get the RGBA bytes from the image.
    *
    * For example, given an Html Canvas, you could draw this image into the
@@ -90,6 +95,192 @@ class Image {
   }
 
   /**
+   * Set all of the pixels of the image to the given [color].
+   */
+  Image fill(int color) {
+    buffer.fillRange(0, buffer.length, color);
+    return this;
+  }
+
+  /**
+   * Add the colors of [other] to the pixels of this image.
+   */
+  Image operator+(Image other) {
+    int h = Math.min(height, other.height);
+    int w = Math.min(width, other.width);
+    for (int y = 0; y < h; ++y) {
+      for (int x = 0; x < w; ++x) {
+        int c1 = getPixel(x, y);
+        int r1 = getRed(c1);
+        int g1 = getGreen(c1);
+        int b1 = getBlue(c1);
+        int a1 = getAlpha(c1);
+
+        int c2 = other.getPixel(x, y);
+        int r2 = getRed(c2);
+        int g2 = getGreen(c2);
+        int b2 = getBlue(c2);
+        int a2 = getAlpha(c2);
+
+        setPixel(x, y, getColor(r1 + r2, g1 + g2, b1 + b2, a1 + a2));
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Subtract the colors of [other] from the pixels of this image.
+   */
+  Image operator-(Image other) {
+    int h = Math.min(height, other.height);
+    int w = Math.min(width, other.width);
+    for (int y = 0; y < h; ++y) {
+      for (int x = 0; x < w; ++x) {
+        int c1 = getPixel(x, y);
+        int r1 = getRed(c1);
+        int g1 = getGreen(c1);
+        int b1 = getBlue(c1);
+        int a1 = getAlpha(c1);
+
+        int c2 = other.getPixel(x, y);
+        int r2 = getRed(c2);
+        int g2 = getGreen(c2);
+        int b2 = getBlue(c2);
+        int a2 = getAlpha(c2);
+
+        setPixel(x, y, getColor(r1 - r2, g1 - g2, b1 - b2, a1 - a2));
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Multiply the colors of [other] with the pixels of this image.
+   */
+  Image operator*(Image other) {
+    int h = Math.min(height, other.height);
+    int w = Math.min(width, other.width);
+    for (int y = 0; y < h; ++y) {
+      for (int x = 0; x < w; ++x) {
+        int c1 = getPixel(x, y);
+        int r1 = getRed(c1);
+        int g1 = getGreen(c1);
+        int b1 = getBlue(c1);
+        int a1 = getAlpha(c1);
+
+        int c2 = other.getPixel(x, y);
+        int r2 = getRed(c2);
+        int g2 = getGreen(c2);
+        int b2 = getBlue(c2);
+        int a2 = getAlpha(c2);
+
+        setPixel(x, y, getColor(r1 * r2, g1 * g2, b1 * b2, a1 * a2));
+      }
+    }
+    return this;
+  }
+
+  /**
+   * OR the colors of [other] to the pixels of this image.
+   */
+  Image operator|(Image other) {
+    int h = Math.min(height, other.height);
+    int w = Math.min(width, other.width);
+    for (int y = 0; y < h; ++y) {
+      for (int x = 0; x < w; ++x) {
+        int c1 = getPixel(x, y);
+        int r1 = getRed(c1);
+        int g1 = getGreen(c1);
+        int b1 = getBlue(c1);
+        int a1 = getAlpha(c1);
+
+        int c2 = other.getPixel(x, y);
+        int r2 = getRed(c2);
+        int g2 = getGreen(c2);
+        int b2 = getBlue(c2);
+        int a2 = getAlpha(c2);
+
+        setPixel(x, y, getColor(r1 | r2, g1 | g2, b1 | b2, a1 | a2));
+      }
+    }
+    return this;
+  }
+
+  /**
+   * AND the colors of [other] with the pixels of this image.
+   */
+  Image operator&(Image other) {
+    int h = Math.min(height, other.height);
+    int w = Math.min(width, other.width);
+    for (int y = 0; y < h; ++y) {
+      for (int x = 0; x < w; ++x) {
+        int c1 = getPixel(x, y);
+        int r1 = getRed(c1);
+        int g1 = getGreen(c1);
+        int b1 = getBlue(c1);
+        int a1 = getAlpha(c1);
+
+        int c2 = other.getPixel(x, y);
+        int r2 = getRed(c2);
+        int g2 = getGreen(c2);
+        int b2 = getBlue(c2);
+        int a2 = getAlpha(c2);
+
+        setPixel(x, y, getColor(r1 & r2, g1 & g2, b1 & b2, a1 & a2));
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Modula the colors of [other] with the pixels of this image.
+   */
+  Image operator%(Image other) {
+    int h = Math.min(height, other.height);
+    int w = Math.min(width, other.width);
+    for (int y = 0; y < h; ++y) {
+      for (int x = 0; x < w; ++x) {
+        int c1 = getPixel(x, y);
+        int r1 = getRed(c1);
+        int g1 = getGreen(c1);
+        int b1 = getBlue(c1);
+        int a1 = getAlpha(c1);
+
+        int c2 = other.getPixel(x, y);
+        int r2 = getRed(c2);
+        int g2 = getGreen(c2);
+        int b2 = getBlue(c2);
+        int a2 = getAlpha(c2);
+
+        setPixel(x, y, getColor(r1 % r2, g1 % g2, b1 % b2, a1 % a2));
+      }
+    }
+    return this;
+  }
+
+  /**
+   * The size of the image buffer.
+   */
+  int get length => buffer.length;
+
+  /**
+   * Get a pixel from the buffer.
+   */
+  int operator[](int index) => buffer[index];
+
+  /**
+   * Set a pixel in the buffer.
+   */
+  void operator[]=(int index, int color) {
+    buffer[index] = color;
+  }
+
+  /**
+   * Get the buffer index for the [x], [y] pixel coordinates.
+   */
+  int index(int x, int y) => y * width + x;
+
+  /**
    * Is the given pixel coordinates within the resolution of the image.
    */
   bool boundsSafe(int x, int y) {
@@ -107,6 +298,9 @@ class Image {
 
   /**
    * Set the pixel at the given [x], [y] coordinate to the [color].
+   *
+   * This simply replaces the existing color, it does not do any alpha
+   * blending.  Use [drawPixel] for that.
    */
   void setPixel(int x, int y, int color) {
     if (boundsSafe(x, y)) {
@@ -115,20 +309,13 @@ class Image {
   }
 
   /**
-   * Set the pixel with alpha blending.
+   * Set the pixel at the given [x], [y] coordinate to the color
+   * [r], [g], [b], [a].
+   *
+   * This simply replaces the existing color, it does not do any alpha
+   * blending.  Use [drawPixel] for that.
    */
-  void setPixelBlend(int x, int y, int color, [int fraction = 0xff]) {
-    if (boundsSafe(x, y)) {
-      int pi = y * width + x;
-      int dst = buffer[pi];
-      buffer[pi] = alphaBlendColors(dst, color, fraction);
-    }
-  }
-
-  /**
-   * Set the color of a pixel with no blending.
-   */
-  void setPixelRGBA(int x, int y, int r, int g, int b, [int a = 255]) {
+  void setPixelRGBA(int x, int y, int r, int g, int b, [int a = 0xff]) {
     if (boundsSafe(x, y)) {
       buffer[y * width + x] = getColor(r, g, b, a);
     }

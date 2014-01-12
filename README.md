@@ -103,10 +103,22 @@ You ca
 
   _Draw a single character with the given font._
   
+- Image **drawCircle**(Image image, int x0, int y0, int radius, int color);
+  
+  _Draw a circle._
+  
 - Image **drawLine**(Image image, int x1, int y1, int x2, int y2, int color,
                      {bool antialias: false, num thickness: 1});
                      
   _Draw a line._
+  
+- Image **drawNoise**(Image image, double sigma, {int type: NOISE_GAUSSIAN, Math.Random random});
+
+  _Add random noise to pixel values._
+  
+- Image **drawPixel**(Image image, int x, int y, int color, [int opacity = 0xff]);
+
+  _Draw a single pixel into the image, applying alpha and opacity blending._
   
 - Image **drawString**(Image image, BitmapFont font, int x, int y, String string, {int color: 0xffffffff});
 
@@ -148,6 +160,10 @@ You ca
 - Image **meanRemoval**(Image src);
 
   _Apply MeanRemoval convolution filter to the image._
+  
+- Image **normalize**(Image src, int minValue, int maxValue);
+
+  _Linearly normalize the pixel values of the image._
   
 - Image **pixelate**(Image src, int blockSize, {int mode: PIXELATE_UPPERLEFT});
 

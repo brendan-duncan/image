@@ -26,7 +26,10 @@ part 'src/formats/tga_decoder.dart';
 part 'src/formats/tga_encoder.dart';
 
 part 'src/draw/draw_char.dart';
+part 'src/draw/draw_circle.dart';
 part 'src/draw/draw_line.dart';
+part 'src/draw/draw_noise.dart';
+part 'src/draw/draw_pixel.dart';
 part 'src/draw/draw_string.dart';
 part 'src/draw/fill.dart';
 part 'src/draw/fill_rect.dart';
@@ -38,12 +41,13 @@ part 'src/filter/bump_to_normal.dart';
 part 'src/filter/color_offset.dart';
 part 'src/filter/contrast.dart';
 part 'src/filter/convolution.dart';
+part 'src/filter/copy_gaussian_blur.dart';
 part 'src/filter/edge_detect_quick.dart';
 part 'src/filter/emboss.dart';
-part 'src/filter/copy_gaussian_blur.dart';
 part 'src/filter/grayscale.dart';
-part 'src/filter/mean_removal.dart';
 part 'src/filter/invert.dart';
+part 'src/filter/mean_removal.dart';
+part 'src/filter/normalize.dart';
 part 'src/filter/pixelate.dart';
 part 'src/filter/remap_colors.dart';
 part 'src/filter/seperable_convolution.dart';
@@ -60,6 +64,8 @@ part 'src/transform/flip.dart';
 part 'src/transform/copy_resize.dart';
 
 part 'src/util/clip_line.dart';
+part 'src/util/min_max.dart';
+part 'src/util/random.dart';
 
 part 'src/bitmap_font.dart';
 part 'src/color.dart';

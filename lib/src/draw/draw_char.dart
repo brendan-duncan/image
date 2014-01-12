@@ -17,7 +17,7 @@ Image drawChar(Image image, BitmapFont font, int x, int y, String string,
   for (int yi = y; yi < y2; ++yi) {
     for (int xi = x; xi < x2; ++xi) {
       int p = ch.uint32Data[pi++];
-      image.setPixelBlend(xi, yi, p);
+      drawPixel(image, xi, yi, p);
     }
   }
 
