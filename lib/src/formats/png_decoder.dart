@@ -154,33 +154,33 @@ class PngDecoder {
       switch (code) {
         case FILTER_NONE:
           for (int i = 0; i < header.width; i++) {
-            image.buffer[pi++] = getColorFromList(input.readBytes(pixelBytes));
+            image[pi++] = getColorFromList(input.readBytes(pixelBytes));
           }
           break;
         case FILTER_SUB:
           for (int i = 0; i < header.width; i++) {
             int x = getColorFromList(input.readBytes(pixelBytes));
-            int a = (i == 0) ? 0 : image.buffer[pi - 1];
-            image.buffer[pi++] = getColor((getRed(x) + getRed(a)) % 256,
-                                          (getGreen(x) + getGreen(a)) % 256,
-                                          (getBlue(x) + getBlue(a)) % 256,
-                                          (getAlpha(x) + getAlpha(a)) % 256);
+            int a = (i == 0) ? 0 : image[pi - 1];
+            image[pi++] = getColor((getRed(x) + getRed(a)) % 256,
+                                   (getGreen(x) + getGreen(a)) % 256,
+                                   (getBlue(x) + getBlue(a)) % 256,
+                                   (getAlpha(x) + getAlpha(a)) % 256);
           }
           break;
         case FILTER_UP:
           for (int i = 0; i < header.width; i++) {
             int x = getColorFromList(input.readBytes(pixelBytes));
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
-            image.buffer[pi++] = getColor((getRed(x) + getRed(b)) % 256,
-                                          (getGreen(x) + getGreen(b)) % 256,
-                                          (getBlue(x) + getBlue(b)) % 256,
-                                          (getAlpha(x) + getAlpha(b)) % 256);
+            image[pi++] = getColor((getRed(x) + getRed(b)) % 256,
+                                   (getGreen(x) + getGreen(b)) % 256,
+                                   (getBlue(x) + getBlue(b)) % 256,
+                                   (getAlpha(x) + getAlpha(b)) % 256);
           }
           break;
         case FILTER_AVERAGE:
           for (int i = 0; i < header.width; i++) {
             int x = getColorFromList(input.readBytes(pixelBytes));
-            int a = (i == 0) ? 0 : image.buffer[pi - 1];
+            int a = (i == 0) ? 0 : image[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             int ra = getRed(a);
             int rb = getRed(b);
@@ -190,16 +190,16 @@ class PngDecoder {
             int bb = getBlue(b);
             int aa = getAlpha(a);
             int ab = getAlpha(b);
-            image.buffer[pi++] = getColor((getRed(x) + ((ra + rb) ~/ 2)) % 256,
-                                          (getGreen(x) + ((ga + gb) ~/ 2)) % 256,
-                                          (getBlue(x) + ((ba + bb) ~/ 2)) % 256,
-                                          (getAlpha(x) + ((aa + ab) ~/ 2)) % 256);
+            image[pi++] = getColor((getRed(x) + ((ra + rb) ~/ 2)) % 256,
+                                   (getGreen(x) + ((ga + gb) ~/ 2)) % 256,
+                                   (getBlue(x) + ((ba + bb) ~/ 2)) % 256,
+                                   (getAlpha(x) + ((aa + ab) ~/ 2)) % 256);
           }
           break;
         case FILTER_PAETH:
           for (int i = 0; i < header.width; i++) {
             int x = getColorFromList(input.readBytes(pixelBytes));
-            int a = (i == 0) ? 0 : image.buffer[pi - 1];
+            int a = (i == 0) ? 0 : image[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             int c = (i == 0 || row == 0) ? 0 : image.getPixel(i - 1, row - 1);
             int ra = getRed(a);
@@ -269,10 +269,10 @@ class PngDecoder {
               apaeth = ac;
             }
 
-            image.buffer[pi++] = getColor((getRed(x) + rpaeth) % 256,
-                                          (getGreen(x) + gpaeth) % 256,
-                                          (getBlue(x) + bpaeth) % 256,
-                                          (getAlpha(x) + apaeth) % 256);
+            image[pi++] = getColor((getRed(x) + rpaeth) % 256,
+                                   (getGreen(x) + gpaeth) % 256,
+                                   (getBlue(x) + bpaeth) % 256,
+                                   (getAlpha(x) + apaeth) % 256);
           }
           break;
         default:

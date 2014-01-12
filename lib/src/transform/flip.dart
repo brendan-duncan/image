@@ -36,9 +36,9 @@ Image flipVertical(Image src) {
     int y1 = y * w;
     int y2 = (h - 1 - y) * w;
     for (int x = 0; x < w; ++x) {
-      int t = src.buffer[y1 + x];
-      src.buffer[y2 + x] = src.buffer[y1 + x];
-      src.buffer[y1 + x] = t;
+      int t = src[y1 + x];
+      src[y2 + x] = src[y1 + x];
+      src[y1 + x] = t;
     }
   }
   return src;
@@ -52,9 +52,9 @@ Image flipHorizontal(Image src) {
     int y1 = y * w;
     for (int x = 0; x < w2; ++x) {
       int x2 = (w - 1 - x);
-      int t = src.buffer[y1 + x];
-      src.buffer[y1 + x2] = src.buffer[y1 + x];
-      src.buffer[y1 + x2] = t;
+      int t = src[y1 + x];
+      src[y1 + x2] = src[y1 + x];
+      src[y1 + x2] = t;
     }
   }
   return src;

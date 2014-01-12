@@ -27,8 +27,8 @@ void defineImageTests() {
       Image f = new Image(10, 10);
       int c = getColor(128, 255, 128, 255);
       f.fill(c);
-      for (int i = 0; i < f.buffer.length; ++i) {
-        expect(f.buffer[i], equals(c));
+      for (int i = 0; i < f.length; ++i) {
+        expect(f[i], equals(c));
       }
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/fill.png');

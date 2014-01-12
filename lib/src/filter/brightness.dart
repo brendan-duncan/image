@@ -15,9 +15,9 @@ Image brightness(Image src, int brightness) {
     return src;
   }
 
-  int np = src.buffer.length;
+  int np = src.length;
   for (int i = 0; i < np; ++i) {
-    int c = src.buffer[i];
+    int c = src[i];
     int r = getRed(c);
     int g = getGreen(c);
     int b = getBlue(c);
@@ -27,7 +27,7 @@ Image brightness(Image src, int brightness) {
     g = g + brightness;
     b = b + brightness;
 
-    src.buffer[i] = getColor(r, g, b, a);
+    src[i] = getColor(r, g, b, a);
   }
 
   return src;

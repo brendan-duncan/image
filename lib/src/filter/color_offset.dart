@@ -5,9 +5,9 @@ part of image;
  * colors, a per-channel brightness.
  */
 Image colorOffset(Image src, int red, int green, int blue, int alpha) {
-  int np = src.buffer.length;
+  int np = src.length;
   for (int i = 0; i < np; ++i) {
-    int c = src.buffer[i];
+    int c = src[i];
     int r = getRed(c);
     int g = getGreen(c);
     int b = getBlue(c);
@@ -18,7 +18,7 @@ Image colorOffset(Image src, int red, int green, int blue, int alpha) {
     b = b + blue;
     a = a + alpha;
 
-    src.buffer[i] = getColor(r, g, b, a);
+    src[i] = getColor(r, g, b, a);
   }
 
   return src;

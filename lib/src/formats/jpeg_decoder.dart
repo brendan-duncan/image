@@ -25,7 +25,6 @@ class JpegDecoder {
   void _copyToImage(_JpegData jpeg, Image imageData) {
     int width = imageData.width;
     int height = imageData.height;
-    Data.Uint32List imageDataArray = imageData.buffer;
     Data.Uint8List data = jpeg.getData(width, height);
     List components = jpeg.components;
 
@@ -36,7 +35,7 @@ class JpegDecoder {
         for (int y = 0; y < height; y++) {
           for (int x = 0; x < width; x++) {
             int Y = data[i++];
-            imageDataArray[j++] = getColor(Y, Y, Y, 255);
+            imageData[j++] = getColor(Y, Y, Y, 255);
           }
         }
         break;
@@ -48,7 +47,7 @@ class JpegDecoder {
             int B = data[i++];
 
             int c = getColor(R, G, B, 255);
-            imageDataArray[j++] = c;
+            imageData[j++] = c;
           }
         }
         break;
@@ -64,7 +63,7 @@ class JpegDecoder {
             int G = 255 - _clamp(M * (1 - K ~/ 255) + K);
             int B = 255 - _clamp(Y * (1 - K ~/ 255) + K);
 
-            imageDataArray[j++] = getColor(R, G, B, 255);
+            imageData[j++] = getColor(R, G, B, 255);
           }
         }
         break;

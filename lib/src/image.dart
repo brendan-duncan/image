@@ -6,15 +6,15 @@ part of image;
  * color for a pixel.
  */
 class Image {
+  /// 24-bit RGB image.
   static const int RGB = 3;
+  /// 32-bit RGBA image.
   static const int RGBA = 4;
 
+  /// Width of the image.
   final int width;
+  /// Height of the image.
   final int height;
-  int _format;
-  /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
-  /// channel.
-  final Data.Uint32List buffer;
 
   /**
    * Create an image with the given dimensions and format.
@@ -22,7 +22,7 @@ class Image {
   Image(int width, int height, [this._format = RGBA]) :
     this.width = width,
     this.height = height,
-    buffer = new Data.Uint32List(width * height);
+    _data = new Data.Uint32List(width * height);
 
   /**
    * Create a copy of the image [other].
@@ -31,7 +31,7 @@ class Image {
     width = other.width,
     height = other.height,
     _format = other._format,
-    buffer = new Data.Uint32List.fromList(other.buffer);
+    _data = new Data.Uint32List.fromList(other._data);
 
   /**
    * Create an image from [bytes].
@@ -50,14 +50,14 @@ class Image {
     this.width = width,
     this.height = height,
     // Create a uint32 view of the byte buffer.
-    buffer = new Data.Uint32List(width * height) {
+    _data = new Data.Uint32List(width * height) {
     // It would be nice if we could just create a Uint32List.view for the byte
     // buffer, but the channels would be in reverse order (endianness problem).
-    final int len = buffer.length;
+    final int len = _data.length;
     final int inc = _format == RGBA ? 4 : 3;
     for (int i = 0, j = 0; i < len; ++i, j += inc) {
       int a = _format == RGBA ? bytes[j + 3] : 0xff;
-      buffer[i] = getColor(bytes[j], bytes[j + 1], bytes[j + 2], a);
+      _data[i] = getColor(bytes[j], bytes[j + 1], bytes[j + 2], a);
     }
   }
 
@@ -75,10 +75,10 @@ class Image {
    */
   List<int> getBytes() {
     Data.Uint8List bytes = new Data.Uint8List(width * height * 4);
-    final int len = buffer.length;
+    final int len = _data.length;
     final int inc = 4;
     for (int i = 0, j = 0; i < len; ++i, j += inc) {
-      int c = buffer[i];
+      int c = _data[i];
       bytes[j] = getRed(c);
       bytes[j + 1] = getGreen(c);
       bytes[j + 2] = getBlue(c);
@@ -98,11 +98,11 @@ class Image {
     }
     _format = f;
     if (_format == RGBA) {
-      int len = buffer.length;
+      int len = _data.length;
       // If we convert from RGB to RGBA, make sure the alpha
       // channel is set.
       for (int i = 0; i < len; ++i) {
-        buffer[i] |= 0xff;
+        _data[i] |= 0xff;
       }
     }
   }
@@ -116,7 +116,7 @@ class Image {
    * Set all of the pixels of the image to the given [color].
    */
   Image fill(int color) {
-    buffer.fillRange(0, buffer.length, color);
+    _data.fillRange(0, _data.length, color);
     return this;
   }
 
@@ -279,18 +279,18 @@ class Image {
   /**
    * The size of the image buffer.
    */
-  int get length => buffer.length;
+  int get length => _data.length;
 
   /**
    * Get a pixel from the buffer.
    */
-  int operator[](int index) => buffer[index];
+  int operator[](int index) => _data[index];
 
   /**
    * Set a pixel in the buffer.
    */
   void operator[]=(int index, int color) {
-    buffer[index] = color;
+    _data[index] = color;
   }
 
   /**
@@ -311,8 +311,8 @@ class Image {
   int getPixel(int x, int y) =>
     boundsSafe(x, y) ?
       _format == RGBA ?
-        buffer[y * width + x] :
-        buffer[y * width + x] | 0xff : 0;
+      _data[y * width + x] :
+      _data[y * width + x] | 0xff : 0;
 
   /**
    * Get the pixel using linear interpolation for non-integer pixel
@@ -418,7 +418,7 @@ class Image {
    */
   void setPixel(int x, int y, int color) {
     if (boundsSafe(x, y)) {
-      buffer[y * width + x] = color;
+      _data[y * width + x] = color;
     }
   }
 
@@ -431,7 +431,13 @@ class Image {
    */
   void setPixelRGBA(int x, int y, int r, int g, int b, [int a = 0xff]) {
     if (boundsSafe(x, y)) {
-      buffer[y * width + x] = getColor(r, g, b, a);
+      _data[y * width + x] = getColor(r, g, b, a);
     }
   }
+
+  /// Format of the image.
+  int _format;
+  /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
+  /// channel.
+  final Data.Uint32List _data;
 }

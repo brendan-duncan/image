@@ -12,10 +12,10 @@ Image remapColors(Image src,
     int green: GREEN,
     int blue: BLUE,
     int alpha: ALPHA}) {
-  int np = src.buffer.length;
+  int np = src.length;
   List<int> l = [0, 0, 0, 0];
   for (int i = 0; i < np; ++i) {
-    int c = src.buffer[i];
+    int c = src[i];
     int r = getRed(c);
     int g = getGreen(c);
     int b = getBlue(c);
@@ -26,7 +26,7 @@ Image remapColors(Image src,
     l[blue] = b;
     l[alpha] = a;
 
-    src.buffer[i] = getColor(l[0], l[1], l[2], l[3]);
+    src[i] = getColor(l[0], l[1], l[2], l[3]);
   }
 
   return src;
