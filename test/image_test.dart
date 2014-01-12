@@ -173,7 +173,7 @@ void defineImageTests() {
 
     test('NOISE_GAUSSIAN', () {
       Image f = new Image.from(image);
-      drawNoise(f, 10.0, type:NOISE_GAUSSIAN);
+      noise(f, 10.0, type:NOISE_GAUSSIAN);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_gaussian.png');
       fp.createSync(recursive: true);
@@ -182,7 +182,7 @@ void defineImageTests() {
 
     test('NOISE_UNIFORM', () {
       Image f = new Image.from(image);
-      drawNoise(f, 10.0, type:NOISE_UNIFORM);
+      noise(f, 10.0, type:NOISE_UNIFORM);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_uniform.png');
       fp.createSync(recursive: true);
@@ -191,7 +191,7 @@ void defineImageTests() {
 
     test('NOISE_SALT_PEPPER', () {
       Image f = new Image.from(image);
-      drawNoise(f, 10.0, type:NOISE_SALT_PEPPER);
+      noise(f, 10.0, type:NOISE_SALT_PEPPER);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_salt_pepper.png');
       fp.createSync(recursive: true);
@@ -200,7 +200,7 @@ void defineImageTests() {
 
     test('NOISE_POISSON', () {
       Image f = new Image.from(image);
-      drawNoise(f, 10.0, type:NOISE_POISSON);
+      noise(f, 10.0, type:NOISE_POISSON);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_poisson.png');
       fp.createSync(recursive: true);
@@ -209,7 +209,7 @@ void defineImageTests() {
 
     test('NOISE_RICE', () {
       Image f = new Image.from(image);
-      drawNoise(f, 10.0, type:NOISE_RICE);
+      noise(f, 10.0, type:NOISE_RICE);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_rice.png');
       fp.createSync(recursive: true);

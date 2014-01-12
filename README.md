@@ -113,10 +113,6 @@ Create an image, draw some text, save it as a png:
                      
   _Draw a line._
   
-- Image **drawNoise**(Image image, double sigma, {int type: NOISE_GAUSSIAN, Math.Random random});
-
-  _Add random noise to pixel values._
-  
 - Image **drawPixel**(Image image, int x, int y, int color, [int opacity = 0xff]);
 
   _Draw a single pixel into the image, applying alpha and opacity blending._
@@ -157,6 +153,10 @@ Create an image, draw some text, save it as a png:
 - Image **invert**(Image src);
 
   _Inver the colors of the image._
+
+- Image **noise**(Image image, double sigma, {int type: NOISE_GAUSSIAN, Math.Random random});
+
+  _Add random noise to pixel values._
 
 - Image **normalize**(Image src, int minValue, int maxValue);
 

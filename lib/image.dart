@@ -28,7 +28,7 @@ part 'src/formats/tga_encoder.dart';
 part 'src/draw/draw_char.dart';
 part 'src/draw/draw_circle.dart';
 part 'src/draw/draw_line.dart';
-part 'src/draw/draw_noise.dart';
+part 'src/filter/noise.dart';
 part 'src/draw/draw_pixel.dart';
 part 'src/draw/draw_string.dart';
 part 'src/draw/fill.dart';

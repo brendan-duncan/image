@@ -9,7 +9,7 @@ const int NOISE_RICE = 4;
 /**
  * Add random noise to pixel values.
  */
-Image drawNoise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
+Image noise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
   Math.Random random}) {
   if (random == null) {
     random = new Math.Random();
