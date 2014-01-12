@@ -11,9 +11,8 @@ Image seperableConvolution(Image src, SeperableKernel kernel) {
   Image tmp = new Image.from(src);
   kernel.apply(src, tmp, horizontal: true);
 
-  // Apply the filter vertically
-  Image result = new Image.from(tmp);
-  kernel.apply(tmp, result, horizontal: false);
+  // Apply the filter vertically, applying back to the original image.
+  kernel.apply(tmp, src, horizontal: false);
 
-  return result;
+  return src;
 }

@@ -155,11 +155,11 @@ void defineImageTests() {
 
     test('gaussianBlur', () {
       Image f = new Image.from(image);
-      Image g = copyGaussianBlur(f, 10);
+      gaussianBlur(f, 10);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/gaussianBlur.png');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(g));
+      fp.writeAsBytesSync(writePng(f));
     });
 
     test('grayscale', () {

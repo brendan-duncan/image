@@ -22,7 +22,7 @@ Image dropShadow(Image src, int hshadow, int vshadow, int blur,
            src.height + vshadow,
            shadowColor);
 
-  dst = copyGaussianBlur(dst, blur ~/ 2);
+  gaussianBlur(dst, blur ~/ 2);
 
   copyInto(dst, src);
 

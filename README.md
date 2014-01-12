@@ -51,7 +51,7 @@ Create an image, draw some text, save it as a png:
       drawLine(image, 0, 0, 320, 240, getColor(255, 0, 0), thickness: 3);
       
       // Blur the image
-      image = copyGaussianBlur(image, 10);
+      gaussianBlur(image, 10);
       
       // Generate a PNG
       List<int> png = writePng(image);
@@ -88,11 +88,7 @@ You ca
 - Image **copyCrop**(Image src, int x, int y, int w, int h);
 
   _Create a cropped copy of the image._
-  
-- Image **copyGaussianBlur**(Image src, int radius);
 
-  _Create a blurred copy of the image._
-  
 - Image **copyInto**(Image dst, Image src, int dst_x, int dst_y, int src_x, int src_y, int dst_w, int dst_h, int src_w, int src_h);
 
   _Copy an area of src into dst.
@@ -154,6 +150,10 @@ You ca
 - Image **flip**(Image src, int mode);
 
   _Flip the image with FLIP_HORIZONTAL, FLIP_VERTICAL, or FLIP_BOTH._
+  
+- Image **gaussianBlur**(Image src, int radius);
+
+  _Blur the image._
   
 - Image **grayscale**(Image src);
 
