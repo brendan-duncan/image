@@ -170,10 +170,10 @@ class BitmapFont {
               base = int.parse(c.attributes[a]);
               break;
             case 'scaleW':
-              scaleW = num.parse(c.attributes[a]);
+              scaleW = int.parse(c.attributes[a]);
               break;
             case 'scaleH':
-              scaleH = num.parse(c.attributes[a]);
+              scaleH = int.parse(c.attributes[a]);
               break;
             case 'pages':
               pages = int.parse(c.attributes[a]);
