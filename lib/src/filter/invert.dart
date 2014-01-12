@@ -11,7 +11,6 @@ Image invert(Image src) {
     int g = getGreen(c);
     int b = getBlue(c);
     int a = getAlpha(c);
-
     src[i] = getColor(255 - r, 255 - g, 255 - b, a);
   }
 

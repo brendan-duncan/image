@@ -1,7 +1,8 @@
 part of image;
 
 /**
- * Linearly normalize the colors of the image.
+ * Linearly normalize the colors of the image.  All color values will be mapped
+ * to the range [minValue], [maxValue] inclusive.
  */
 Image normalize(Image image, int minValue, int maxValue) {
   int A = minValue < maxValue ? minValue : maxValue;

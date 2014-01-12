@@ -280,8 +280,7 @@ void defineImageTests() {
 
     test('rotate_45', () {
       Image f = new Image.from(image);
-      Image r = copyRotate(f, 45);
-      copyInto(f, r);
+      f = copyRotate(f, 45);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/rotate_45.png');
       fp.createSync(recursive: true);
@@ -302,6 +301,7 @@ void defineImageTests() {
       Image d = new Image(image.width + 20, image.height + 20, image.format);
       fill(d, 0xff0000ff);
       copyInto(d, s, dstX: 10, dstY: 10);
+      copyInto(d, image2, dstX: 10, dstY: 10);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/copyInto.png')
                          ..createSync(recursive: true)

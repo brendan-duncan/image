@@ -60,34 +60,13 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
 
   Image dst = new Image((ux + vx).toInt(), (uy + vy).toInt(), Image.RGBA);
 
-  switch (interpolation) {
-    case CUBIC: // Cubic interpolation.
-      for (int y = 0; y < dst.height; ++y) {
-        for (int x = 0; x < dst.width; ++x) {
-          int c = src.getPixelCubic(w2 + (x - dw2) * ca + (y - dh2) * sa,
-                                    h2 - (x - dw2) * sa + (y - dh2) * ca);
-          dst.setPixel(x, y, c);
-        }
-      }
-      break;
-    case LINEAR: // Linear interpolation.
-      for (int y = 0; y < dst.height; ++y) {
-        for (int x = 0; x < dst.width; ++x) {
-          int c = src.getPixelLinear(w2 + (x - dw2) * ca + (y - dh2) * sa,
-                                     h2 - (x - dw2) * sa + (y - dh2) * ca);
-          dst.setPixel(x, y, c);
-        }
-      }
-      break;
-    default: // Nearest-neighbor interpolation.
-      for (int y = 0; y < dst.height; ++y) {
-        for (int x = 0; x < dst.width; ++x) {
-          int c = src.getPixel((w2 + (x - dw2) * ca + (y - dh2) * sa).toInt(),
-                               (h2 - (x - dw2) * sa + (y - dh2) * ca).toInt());
-          dst.setPixel(x, y, c);
-        }
-      }
-      break;
+  for (int y = 0; y < dst.height; ++y) {
+    for (int x = 0; x < dst.width; ++x) {
+      int c = src.getPixelInterpolate(w2 + (x - dw2) * ca + (y - dh2) * sa,
+                                      h2 - (x - dw2) * sa + (y - dh2) * ca,
+                                      interpolation);
+      dst.setPixel(x, y, c);
+    }
   }
 
   return dst;

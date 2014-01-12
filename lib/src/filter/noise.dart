@@ -111,8 +111,6 @@ Image noise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
         image[i] = getColor(r, g, b, a);
       }
       break;
-    default :
-      throw new ImageException('Invalid noise type ${type}');
   }
 
   return image;

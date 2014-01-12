@@ -315,6 +315,19 @@ class Image {
       _data[y * width + x] | 0xff : 0;
 
   /**
+   * Get the pixel using the given [interpolation] type for non-integer pixel
+   * coordinates.
+   */
+  int getPixelInterpolate(num fx, num fy, [int interpolation = LINEAR]) {
+    if (interpolation == CUBIC) {
+      return getPixelCubic(fx, fy);
+    } else if (interpolation == LINEAR) {
+      return getPixelLinear(fx, fy);
+    }
+    return getPixel(fx.toInt(), fy.toInt());
+  }
+
+  /**
    * Get the pixel using linear interpolation for non-integer pixel
    * coordinates.
    */
