@@ -128,13 +128,9 @@ You ca
   
 - Image **dropShadow**(Image src, int hshadow, int vshadow, int blur,
                    {int shadowColor: 0x000000a0});
-                   
-  _Create a drop-shadow effect._
-  
-- Image **edgeDetectQuick**(Image src);
 
-  _Apply the EdgeDetect convolution filter._
-  
+  _Create a drop-shadow effect._
+
 - Image **emboss**(Image src);
 
   _Apply the Emboss convolution filter._
@@ -158,15 +154,11 @@ You ca
 - Image **grayscale**(Image src);
 
   _Convert the colors of the image to grayscale._
-  
+
 - Image **invert**(Image src);
 
   _Inver the colors of the image._
-  
-- Image **meanRemoval**(Image src);
 
-  _Apply MeanRemoval convolution filter to the image._
-  
 - Image **normalize**(Image src, int minValue, int maxValue);
 
   _Linearly normalize the pixel values of the image._
@@ -198,7 +190,7 @@ You ca
 - Image **remapColors**(Image src, {int red: RED, int green: GREEN, int blue: BLUE, int alpha: ALPHA});
 
   _Remap the color channels of an image._
-  
+
 - Image **smooth**(Image src, num w);
 
   _Apply a smooth convolution filter to the image._

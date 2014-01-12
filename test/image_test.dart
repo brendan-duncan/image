@@ -135,15 +135,6 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(f));
     });
 
-    test('edgeDetectQuick', () {
-      Image f = new Image.from(image);
-      edgeDetectQuick(f);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/edgeDetectQuick.png');
-      fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
-    });
-
     test('emboss', () {
       Image f = new Image.from(image);
       emboss(f);
@@ -176,15 +167,6 @@ void defineImageTests() {
       invert(f);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/invert.png');
-      fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
-    });
-
-    test('meanRemoval', () {
-      Image f = new Image.from(image);
-      meanRemoval(f);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/meanRemoval.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
     });
