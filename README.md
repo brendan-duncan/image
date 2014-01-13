@@ -1,6 +1,6 @@
 # image
 
-[![Build Status](https://drone.io/bitbucket.org/brendan_duncan/image/status.png)](https://drone.io/bitbucket.org/brendan_duncan/image/latest)
+[![Build Status](https://drone.io/github.com/brendan-duncan/image/status.png)](https://drone.io/github.com/brendan-duncan/image/latest)
 
 ##Overview
 
