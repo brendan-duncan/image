@@ -4,6 +4,7 @@ const int RED = 0;
 const int GREEN = 1;
 const int BLUE = 2;
 const int ALPHA = 3;
+const int LUMINANCE = 4;
 
 int _clamp(int x, int a, int b) =>
   (x < a) ? a :
@@ -116,4 +117,14 @@ int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
   int da = (getAlpha(dst) * (1.0 - a)).toInt();
 
   return getColor(sr + dr, sg + dg, sb + db, sa + da);
+}
+
+/**
+ * Get the luminance (grayscale) value of the color [c].
+ */
+int luminance(int c) {
+  int r = getRed(c);
+  int g = getGreen(c);
+  int b = getBlue(c);
+  return (0.299 * r + 0.587 * g + 0.114 * b).toInt();
 }

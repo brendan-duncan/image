@@ -12,21 +12,21 @@ Image remapColors(Image src,
     int green: GREEN,
     int blue: BLUE,
     int alpha: ALPHA}) {
-  int np = src.length;
-  List<int> l = [0, 0, 0, 0];
+  final int np = src.length;
+  List<int> l = [0, 0, 0, 0, 0];
   for (int i = 0; i < np; ++i) {
     int c = src[i];
-    int r = getRed(c);
-    int g = getGreen(c);
-    int b = getBlue(c);
-    int a = getAlpha(c);
+    l[0] = getRed(c);
+    l[1] = getGreen(c);
+    l[2] = getBlue(c);
+    l[3] = getAlpha(c);
 
-    l[red] = r;
-    l[green] = g;
-    l[blue] = b;
-    l[alpha] = a;
+    if (red == LUMINANCE || green == LUMINANCE || blue == LUMINANCE ||
+        alpha == LUMINANCE) {
+      l[4] = luminance(c);
+    }
 
-    src[i] = getColor(l[0], l[1], l[2], l[3]);
+    src[i] = getColor(l[red], l[green], l[blue], l[alpha]);
   }
 
   return src;

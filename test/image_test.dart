@@ -240,7 +240,8 @@ void defineImageTests() {
 
     test('remapColors', () {
       Image f = new Image.from(image);
-      remapColors(f, red: GREEN, green: RED);
+      f.format = Image.RGBA;
+      remapColors(f, red: GREEN, green: RED, alpha: LUMINANCE);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/remapColors.png');
       fp.createSync(recursive: true);
