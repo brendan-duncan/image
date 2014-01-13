@@ -53,14 +53,8 @@ class Image {
     this.width = width,
     this.height = height,
     // Create a uint32 view of the byte buffer.
-    // TODO This assumes the system architecture is little-endian...
+    // This assumes the system architecture is little-endian...
     _data = new Data.Uint32List.view(new Data.Uint8List.fromList(bytes).buffer) {
-    /*final int len = _data.length;
-    final int inc = _format == RGBA ? 4 : 3;
-    for (int i = 0, j = 0; i < len; ++i, j += inc) {
-      int a = _format == RGBA ? bytes[j + 3] : 0xff;
-      _data[i] = getColor(bytes[j], bytes[j + 1], bytes[j + 2], a);
-    }*/
   }
 
   /**
@@ -69,26 +63,16 @@ class Image {
   Image clone() => new Image.from(this);
 
   /**
-   * Get the RGBA bytes from the image.
+   * Get the RGBA bytes from the image.  You can use this to access the
+   * RGBA color channels directly, or to pass it to something like an
+   * Html canvas context.
    *
    * For example, given an Html Canvas, you could draw this image into the
    * canvas:
    * canvas.getContext('2d').putImageData(image.getBytes());
    */
-  List<int> getBytes() {
-    Data.Uint8List bytes = new Data.Uint8List.view(_data.buffer);
-    /*Data.Uint8List bytes = new Data.Uint8List(width * height * 4);
-    final int len = _data.length;
-    final int inc = 4;
-    for (int i = 0, j = 0; i < len; ++i, j += inc) {
-      int c = _data[i];
-      bytes[j] = getRed(c);
-      bytes[j + 1] = getGreen(c);
-      bytes[j + 2] = getBlue(c);
-      bytes[j + 3] = _format == RGBA ? getAlpha(c) : 0xff;
-    }*/
-    return bytes;
-  }
+  List<int> getBytes() =>
+    new Data.Uint8List.view(_data.buffer);
 
   int get format => _format;
 
