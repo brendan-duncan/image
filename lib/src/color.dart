@@ -122,7 +122,7 @@ int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
 /**
  * Get the luminance (grayscale) value of the color [c].
  */
-int luminance(int c) {
+int getLuminance(int c) {
   int r = getRed(c);
   int g = getGreen(c);
   int b = getBlue(c);

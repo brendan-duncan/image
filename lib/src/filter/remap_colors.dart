@@ -23,7 +23,7 @@ Image remapColors(Image src,
 
     if (red == LUMINANCE || green == LUMINANCE || blue == LUMINANCE ||
         alpha == LUMINANCE) {
-      l[4] = luminance(c);
+      l[4] = getLuminance(c);
     }
 
     src[i] = getColor(l[red], l[green], l[blue], l[alpha]);

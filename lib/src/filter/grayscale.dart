@@ -8,7 +8,7 @@ Image grayscale(Image src) {
   for (int i = 0; i < np; ++i) {
     int c = src[i];
     int a = getAlpha(c);
-    int l = luminance(c);
+    int l = getLuminance(c);
     src[i] = getColor(l, l, l, a);
   }
 
