@@ -4,6 +4,9 @@ part of image;
  * A 32-bit image buffer where pixels are encoded into 32-bit unsigned ints.
  * You can use the methods in color to encode/decode the RGBA channels of a
  * color for a pixel.
+ *
+ * Pixels are stored in 32-bit unsigned integers in little-endian format:
+ * aabbggrr.
  */
 class Image {
   /// 24-bit RGB image.
@@ -50,15 +53,14 @@ class Image {
     this.width = width,
     this.height = height,
     // Create a uint32 view of the byte buffer.
-    _data = new Data.Uint32List(width * height) {
-    // It would be nice if we could just create a Uint32List.view for the byte
-    // buffer, but the channels would be in reverse order (endianness problem).
-    final int len = _data.length;
+    // TODO This assumes the system architecture is little-endian...
+    _data = new Data.Uint32List.view(new Data.Uint8List.fromList(bytes).buffer) {
+    /*final int len = _data.length;
     final int inc = _format == RGBA ? 4 : 3;
     for (int i = 0, j = 0; i < len; ++i, j += inc) {
       int a = _format == RGBA ? bytes[j + 3] : 0xff;
       _data[i] = getColor(bytes[j], bytes[j + 1], bytes[j + 2], a);
-    }
+    }*/
   }
 
   /**
@@ -74,7 +76,8 @@ class Image {
    * canvas.getContext('2d').putImageData(image.getBytes());
    */
   List<int> getBytes() {
-    Data.Uint8List bytes = new Data.Uint8List(width * height * 4);
+    Data.Uint8List bytes = new Data.Uint8List.view(_data.buffer);
+    /*Data.Uint8List bytes = new Data.Uint8List(width * height * 4);
     final int len = _data.length;
     final int inc = 4;
     for (int i = 0, j = 0; i < len; ++i, j += inc) {
@@ -83,7 +86,7 @@ class Image {
       bytes[j + 1] = getGreen(c);
       bytes[j + 2] = getBlue(c);
       bytes[j + 3] = _format == RGBA ? getAlpha(c) : 0xff;
-    }
+    }*/
     return bytes;
   }
 
@@ -312,7 +315,7 @@ class Image {
     boundsSafe(x, y) ?
       _format == RGBA ?
       _data[y * width + x] :
-      _data[y * width + x] | 0xff : 0;
+      _data[y * width + x] | 0xff000000 : 0;
 
   /**
    * Get the pixel using the given [interpolation] type for non-integer pixel

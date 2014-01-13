@@ -24,12 +24,8 @@ void defineImageTests() {
     Image image2 = readPng(new Io.File('res/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
-      Image f = new Image(10, 10);
-      int c = getColor(128, 255, 128, 255);
-      f.fill(c);
-      for (int i = 0; i < f.length; ++i) {
-        expect(f[i], equals(c));
-      }
+      Image f = new Image(10, 10, Image.RGB);
+      f.fill(getColor(128, 0, 0, 255));
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/fill.png');
       fp.createSync(recursive: true);

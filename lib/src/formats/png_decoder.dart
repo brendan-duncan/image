@@ -154,12 +154,12 @@ class PngDecoder {
       switch (code) {
         case FILTER_NONE:
           for (int i = 0; i < header.width; i++) {
-            image[pi++] = getColorFromList(input.readBytes(pixelBytes));
+            image[pi++] = _getColorFromList(input.readBytes(pixelBytes));
           }
           break;
         case FILTER_SUB:
           for (int i = 0; i < header.width; i++) {
-            int x = getColorFromList(input.readBytes(pixelBytes));
+            int x = _getColorFromList(input.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image[pi - 1];
             image[pi++] = getColor((getRed(x) + getRed(a)) % 256,
                                    (getGreen(x) + getGreen(a)) % 256,
@@ -169,7 +169,7 @@ class PngDecoder {
           break;
         case FILTER_UP:
           for (int i = 0; i < header.width; i++) {
-            int x = getColorFromList(input.readBytes(pixelBytes));
+            int x = _getColorFromList(input.readBytes(pixelBytes));
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             image[pi++] = getColor((getRed(x) + getRed(b)) % 256,
                                    (getGreen(x) + getGreen(b)) % 256,
@@ -179,7 +179,7 @@ class PngDecoder {
           break;
         case FILTER_AVERAGE:
           for (int i = 0; i < header.width; i++) {
-            int x = getColorFromList(input.readBytes(pixelBytes));
+            int x = _getColorFromList(input.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             int ra = getRed(a);
@@ -198,7 +198,7 @@ class PngDecoder {
           break;
         case FILTER_PAETH:
           for (int i = 0; i < header.width; i++) {
-            int x = getColorFromList(input.readBytes(pixelBytes));
+            int x = _getColorFromList(input.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             int c = (i == 0 || row == 0) ? 0 : image.getPixel(i - 1, row - 1);
@@ -282,6 +282,19 @@ class PngDecoder {
     }
 
     return image;
+  }
+
+  /**
+   * Get the color with the list of components.
+   */
+  int _getColorFromList(List<int> rgba) {
+    if (rgba.length == 4) {
+      return getColor(rgba[0], rgba[1], rgba[2], rgba[3]);
+    } else if (rgba.length == 3) {
+      return getColor(rgba[0], rgba[1], rgba[2], 255);
+    } else {
+      throw new ImageException('Invalid number of components in color list');
+    }
   }
 
   static const int FILTER_NONE = 0;

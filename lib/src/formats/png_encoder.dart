@@ -90,9 +90,10 @@ class PngEncoder {
   int _filterNone(Image image, int oi, int row, List<int> out) {
     out[oi++] = FILTER_NONE;
     for (int x = 0; x < image.width; ++x) {
-      out[oi++] = getRed(image.getPixel(x, row));
-      out[oi++] = getGreen(image.getPixel(x, row));
-      out[oi++] = getBlue(image.getPixel(x, row));
+      int c = image.getPixel(x, row);
+      out[oi++] = getRed(c);
+      out[oi++] = getGreen(c);
+      out[oi++] = getBlue(c);
       if (image.format == Image.RGBA) {
         out[oi++] = getAlpha(image.getPixel(x, row));
       }
@@ -122,7 +123,6 @@ class PngEncoder {
       out[oi++] = ((r - ar)) & 0xff;
       out[oi++] = ((g - ag)) & 0xff;
       out[oi++] = ((b - ab)) & 0xff;
-
       if (image.format == Image.RGBA) {
         int aa = getAlpha(image.getPixel(x - 1, row));
         int a = getAlpha(image.getPixel(x, row));
@@ -148,7 +148,6 @@ class PngEncoder {
       out[oi++] = (xr - br) & 0xff;
       out[oi++] = (xg - bg) & 0xff;
       out[oi++] = (xb - bb) & 0xff;
-
       if (image.format == Image.RGBA) {
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
         int xa = getAlpha(image.getPixel(x, row));
@@ -178,7 +177,6 @@ class PngEncoder {
       out[oi++] = (xr - ((ar + br) >> 1)) & 0xff;
       out[oi++] = (xg - ((ag + bg) >> 1)) & 0xff;
       out[oi++] = (xb - ((ab + bb) >> 1)) & 0xff;
-
       if (image.format == Image.RGBA) {
         int aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
@@ -227,11 +225,9 @@ class PngEncoder {
       int pg = _paethPredictor(ag, bg, cg);
       int pb = _paethPredictor(ab, bb, cb);
 
-
       out[oi++] = (xr - pr) & 0xff;
       out[oi++] = (xg - pg) & 0xff;
       out[oi++] = (xb - pb) & 0xff;
-
       if (image.format == Image.RGBA) {
         int aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
