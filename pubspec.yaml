@@ -1,9 +1,9 @@
 name: image
 author: Brendan Duncan <brendanduncan@gmail.com>
-version: 1.1.3
-homepage: http://bitbucket.org/brendan_duncan/image
+version: 1.1.4
+homepage: https://github.com/brendan-duncan/image
 description: Provides server and web apps the ability to load, manipulate, and save images with various image file formats.  *previously called dart_image*
-documentation: https://bitbucket.org/brendan_duncan/image/wiki/Home
+documentation: https://github.com/brendan-duncan/image/wiki/Home
 dependencies:
   archive: '>=1.0.6'
   xml: any
