@@ -1,7 +1,8 @@
 part of image;
 
 /**
- * Draw a string horizontally into [image].
+ * Draw a string horizontally into [image] horizontally into [image] at position
+ * [x],[y] with the given [color].
  *
  * You can load your own font, or use one of the existing ones
  * such as: [arial_14], [arial_24], or [arial_48].

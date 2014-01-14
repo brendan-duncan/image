@@ -1,7 +1,7 @@
 part of image;
 
 /**
- * Invert [src] image.
+ * Invert the colors of the [src] image.
  */
 Image invert(Image src) {
   int np = src.length;

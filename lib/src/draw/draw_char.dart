@@ -1,11 +1,12 @@
 part of image;
 
 /**
- * Draw a single character from [strong] horizontally into [image].
+ * Draw a single character from [char] horizontally into [image] at position
+ * [x],[y] with the given [color].
  */
-Image drawChar(Image image, BitmapFont font, int x, int y, String string,
+Image drawChar(Image image, BitmapFont font, int x, int y, String char,
                {int color: 0xffffffff}) {
-  int c = string.codeUnits[0];
+  int c = char.codeUnits[0];
   if (!font.characters.containsKey(c)) {
     return image;
   }

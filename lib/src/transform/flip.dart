@@ -28,6 +28,9 @@ Image flip(Image src, int mode) {
   return src;
 }
 
+/**
+ * Flip the [src] image vertically.
+ */
 Image flipVertical(Image src) {
   int w = src.width;
   int h = src.height;
@@ -44,6 +47,9 @@ Image flipVertical(Image src) {
   return src;
 }
 
+/**
+ * Flip the src image horizontally.
+ */
 Image flipHorizontal(Image src) {
   int w = src.width;
   int h = src.height;

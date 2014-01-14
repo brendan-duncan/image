@@ -1,7 +1,8 @@
 part of image;
 
 /**
- * Fill a rectangle in the image [src] with the [color].
+ * Fill a rectangle in the image [src] with the given [color] with the corners
+ * [x1],[y1] and [x2],[y2].
  */
 Image fillRect(Image src, int x1, int y1, int x2, int y2, int color) {
   int x0 = Math.min(x1, x2);

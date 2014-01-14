@@ -7,7 +7,8 @@ const int NOISE_POISSON = 3;
 const int NOISE_RICE = 4;
 
 /**
- * Add random noise to pixel values.
+ * Add random noise to pixel values.  [sigma] determines how strong the effect
+ * should be.
  */
 Image noise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
   Math.Random random}) {

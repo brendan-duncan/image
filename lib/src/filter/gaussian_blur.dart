@@ -3,9 +3,15 @@ part of image;
 Map<int, SeperableKernel> _gaussianKernelCache = {};
 
 /**
- * Apply gaussian blur to the [src] image.
+ * Apply gaussian blur to the [src] image.  [radius] determines how many pixels
+ * away from the current pixel should contribute to the blur, where 0 is no
+ * blur and the larger the radius, the stronger the blur.
  */
 Image gaussianBlur(Image src, int radius) {
+  if (radius <= 0) {
+    return src;
+  }
+
   SeperableKernel kernel;
 
   if (_gaussianKernelCache.containsKey(radius)) {

@@ -9,7 +9,7 @@ BitmapFont readFont(String fnt, Image page) =>
 
 
 /**
- * A bitmap font that can be used with draw_string and draw_char functions.
+ * A bitmap font that can be used with [drawString] and [drawChar] functions.
  * You can generate a font files from a program
  * like: http://kvazars.com/littera
  */
