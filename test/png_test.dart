@@ -2,41 +2,96 @@ part of image_test;
 
 void definePngTests() {
   group('png', () {
-    List<int> bytes;
-    Image image;
-    List<int> png;
-    Image image2;
-
-    test('decode', () {
-      Io.File file = new Io.File('res/trees.png');
-      bytes = file.readAsBytesSync();
-
+    test('png_32', () {
       // Decode the image from file.
-      image = new PngDecoder().decode(bytes);
-      expect(image.width, equals(400));
-      expect(image.height, equals(533));
+      List<int> bytes = new Io.File('res/png_32.png').readAsBytesSync();
+      Image image = new PngDecoder().decode(bytes);
+      expect(image.width, equals(64));
+      expect(image.height, equals(64));
+      expect(image.format, Image.RGBA);
     });
+
+    test('png_24', () {
+      // Decode the image from file.
+      List<int> bytes = new Io.File('res/png_24.png').readAsBytesSync();
+      Image image = new PngDecoder().decode(bytes);
+      expect(image.width, equals(64));
+      expect(image.height, equals(64));
+      expect(image.format, Image.RGB);
+    });
+
+    /*test('png_8', () {
+      // Decode the image from file.
+      List<int> bytes = new Io.File('res/png_8.png').readAsBytesSync();
+      Image image = new PngDecoder().decode(bytes);
+      expect(image.width, equals(64));
+      expect(image.height, equals(64));
+      expect(image.format, Image.RGB);
+    });
+
+    test('png_32_int', () {
+      // Decode the image from file.
+      List<int> bytes = new Io.File('res/png_32_int.png').readAsBytesSync();
+      Image image = new PngDecoder().decode(bytes);
+      expect(image.width, equals(64));
+      expect(image.height, equals(64));
+      expect(image.format, Image.RGBA);
+    });
+
+    test('png_24_int', () {
+      // Decode the image from file.
+      List<int> bytes = new Io.File('res/png_24_int.png').readAsBytesSync();
+      Image image = new PngDecoder().decode(bytes);
+      expect(image.width, equals(64));
+      expect(image.height, equals(64));
+      expect(image.format, Image.RGB);
+    });
+
+    test('png_8_int', () {
+      // Decode the image from file.
+      List<int> bytes = new Io.File('res/png_8_int.png').readAsBytesSync();
+      Image image = new PngDecoder().decode(bytes);
+      expect(image.width, equals(64));
+      expect(image.height, equals(64));
+      expect(image.format, Image.RGB);
+    });
+
+    test('png_8_trans', () {
+      // Decode the image from file.
+      List<int> bytes = new Io.File('res/png_8_trans.png').readAsBytesSync();
+      Image image = new PngDecoder().decode(bytes);
+      expect(image.width, equals(64));
+      expect(image.height, equals(64));
+      expect(image.format, Image.RGBA);
+    });
+
+    test('png_8_trans_int', () {
+      // Decode the image from file.
+      List<int> bytes = new Io.File('res/png_8_trans_int.png').readAsBytesSync();
+      Image image = new PngDecoder().decode(bytes);
+      expect(image.width, equals(64));
+      expect(image.height, equals(64));
+      expect(image.format, Image.RGBA);
+    });*/
+
 
     test('encode', () {
-      png = new TgaEncoder().encode(image);
-      Io.File file = new Io.File('out/trees.tga');
-      file.createSync(recursive: true);
-      file.writeAsBytesSync(png);
+      Image image = new Image(64, 64);
+      image.fill(getColor(100, 200, 255));
 
       // Encode the image to PNG
-      png = new PngEncoder().encode(image);
+      List<int> png = new PngEncoder().encode(image);
 
-      file = new Io.File('out/trees.png');
-      file.createSync(recursive: true);
-      file.writeAsBytesSync(png);
+      new Io.File('out/encode.png')
+            .writeAsBytesSync(png);
     });
 
-    test('decode2', () {
-      // Decode the encoded PNG
-      image2 = new PngDecoder().decode(png);
+    test('decode', () {
+      List<int> bytes = new Io.File('out/encode.png').readAsBytesSync();
+      Image image = new PngDecoder().decode(bytes);
 
-      expect(image2.width, equals(400));
-      expect(image2.height, equals(533));
+      expect(image.width, equals(64));
+      expect(image.height, equals(64));
     });
   });
 }
