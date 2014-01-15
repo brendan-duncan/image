@@ -200,7 +200,7 @@ Create an image, draw some text, save it as a png:
 
   _Apply a smooth convolution filter to the image._
   
-- Image trim(Image src, {int mode: TRIM_TRANSPARENT, sides: TRIM_ALL});
+- Image **trim**(Image src, {int mode: TRIM_TRANSPARENT, sides: TRIM_ALL});
 
   _Automatically crops the image by finding the corners of the image that
   meet the [mode] criteria (not transparent or a different color)._  
