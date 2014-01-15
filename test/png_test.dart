@@ -56,22 +56,30 @@ void definePngTests() {
       //      interlacing:
       //        n - non-interlaced
       //        i - interlaced
-      String name = f.path.split('/').last;
-      test('png/$name', () {
+      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+
+      test('PNG $name', () {
         Io.File file = f;
+        //
+
         try {
+        // x* png's are corrupted and are supposed to crash.
+        if (name.startsWith('x')) {
+          try {
+            Image image = new PngDecoder().decode(file.readAsBytesSync());
+            throw new ImageException('This image should not have loaded: $name.');
+          } catch (e) {
+            print('$name: $e');
+          }
+        } else {
           Image image = new PngDecoder().decode(file.readAsBytesSync());
           List<int> png = new PngEncoder().encode(image);
           new Io.File('out/png/${name}')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
+        }
         } catch (e) {
-          // 'x*' images are supposed to fail.
-          if (!name.startsWith('x')) {
-            // Catch the exception for now since I know these tests don't
-            // pass
-            print(file.path.split('/').last + ': ' + e.toString());
-          }
+          print('$name: $e');
         }
       });
     });

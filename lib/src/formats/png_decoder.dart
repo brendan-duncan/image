@@ -16,6 +16,7 @@ class PngDecoder {
     bool hasAlphaChannel;
     int pixelBitlength;
     Image image;
+    int format;
 
     List<int> pngHeader = input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
@@ -81,18 +82,17 @@ class PngDecoder {
           header.filterMethod = input.readByte();
           header.interlaceMethod = input.readByte();
 
-          if (header.bits != 8) {
-            throw new ImageException('Only 8 bits-per-pixel PNG images supported: ${header.bits}');
-          }
-          if (![0, 2, 3, 4, 6].contains(header.colorType)) {
-            throw new ImageException('Invalid PNG Color Type: ${header.colorType}.');
-          }
-          if (header.interlaceMethod != 0) {
-            throw new ImageException('Only non-interlaced PNG images supported.');
+          if (![8, 16].contains(header.bits)) {
+            throw new ImageException('Unsuported bit depth: ${header.bits}.');
           }
 
-          int format = (header.colorType == 2) ? Image.RGB : Image.RGBA;
-          image = new Image(header.width, header.height, format);
+          if (![0, 2, 3, 4, 6].contains(header.colorType)) {
+            throw new ImageException('Unsupported color type: ${header.colorType}.');
+          }
+
+          if (header.interlaceMethod != 0) {
+            throw new ImageException('Unsupported interlace method: ${header.interlaceMethod}.');
+          }
           break;
         case 'PLTE':
           palette = input.readBytes(chunkSize);
@@ -107,20 +107,27 @@ class PngDecoder {
         case 'IEND':
           // End of the image.
           switch (header.colorType) {
-            case 0:
-            case 3:
-            case 4:
+            case GRAYSCALE:
+            case INDEXED:
+            case GRAYSCALE_ALPHA:
               colors = 1;
               break;
-            case 2:
-            case 6:
+            case RGB:
+            case RGBA:
               colors = 3;
               break;
           }
 
-          hasAlphaChannel = header.colorType == 4 || header.colorType == 6;
+          hasAlphaChannel = header.colorType == GRAYSCALE_ALPHA ||
+                            header.colorType == RGBA;
           colors = colors + (hasAlphaChannel ? 1 : 0);
           pixelBitlength = header.bits * colors;
+
+          if (hasAlphaChannel || transparency != null) {
+            format = Image.RGBA;
+          } else {
+            format = Image.RGB;
+          }
           break;
         default:
           input.skip(chunkSize);
@@ -143,6 +150,8 @@ class PngDecoder {
       throw new ImageException('Incomplete or corrupt PNG file');
     }
 
+    image = new Image(header.width, header.height, format);
+
     List<int> uncompressed = new Arc.ZLibDecoder().decodeBytes(imageData);
 
     input = new Arc.InputBuffer(uncompressed, byteOrder: Arc.BIG_ENDIAN);
@@ -154,22 +163,137 @@ class PngDecoder {
      */
     int _getColor(List<int> c) {
       switch (header.colorType) {
-        case 0:
-          return getColor(c[0], c[0], c[0], 255);
-        case 2:
-          return getColor(c[0], c[1], c[2], 255);
-        case 3:
-          int i = c[0] * 3;
-          return getColor(palette[i],
-                          palette[i + 1],
-                          palette[i + 2],
-                          255);
-        case 4:
-          return getColor(c[0], c[0], c[0], c[1]);
-        case 6:
-          return getColor(c[0], c[1], c[2], c[3]);
+        case GRAYSCALE:
+          int g0;
+          int g;
+          switch (header.bits) {
+            case 1:
+              break;
+            case 2:
+              break;
+            case 4:
+              break;
+            case 8:
+              g0 = g = c[0];
+              break;
+            case 16:
+              g0 = ((c[0] & 0xff) << 8) | (c[1] & 0xff);
+              g = ((g0 / 0xffff) * 0xff).toInt();
+              break;
+          }
+          if (transparency != null) {
+            int a = ((transparency[0] & 0xff) << 24) | (transparency[1] & 0xff);
+            if (g0 == a) {
+              return getColor(g, g, g, 0);
+            }
+          }
+          return getColor(g, g, g, 255);
+        case RGB:
+          int r, g, b;
+          int r0, g0, b0;
+          switch (header.bits) {
+            case 1:
+              break;
+            case 2:
+              break;
+            case 4:
+              break;
+            case 8:
+              r0 = r = c[0];
+              g0 = g = c[1];
+              b0 = b = c[2];
+              break;
+            case 16:
+              r0 = ((c[0] & 0xff) << 8) | (c[1] & 0xff);
+              r = ((r0 / 0xffff) * 0xff).toInt();
+
+              g0 = ((c[2] & 0xff) << 8) | (c[3] & 0xff);
+              g = ((g0 / 0xffff) * 0xff).toInt();
+
+              b0 = ((c[4] & 0xff) << 8) | (c[5] & 0xff);
+              b = ((b0 / 0xffff) * 0xff).toInt();
+              break;
+          }
+
+          if (transparency != null) {
+            int tr = ((transparency[0] & 0xff) << 8) | (transparency[1] & 0xff);
+            int tg = ((transparency[2] & 0xff) << 8) | (transparency[3] & 0xff);
+            int tb = ((transparency[4] & 0xff) << 8) | (transparency[5] & 0xff);
+            if (r0 == tr && g0 == tg && b0 == tb) {
+              return getColor(r, g, b, 0);
+            }
+          }
+
+          return getColor(r, g, b, 255);
+        case INDEXED:
+          int i = c[0];
+          int p = i * 3;
+          int a = transparency != null && i < transparency.length ?
+                  transparency[i] : 255;
+          if (p >= palette.length) {
+            return getColor(255, 255, 255, a);
+          }
+          return getColor(palette[p],
+                          palette[p + 1],
+                          palette[p + 2],
+                          a);
+        case GRAYSCALE_ALPHA:
+          int g, a;
+          switch (header.bits) {
+            case 1:
+              break;
+            case 2:
+              break;
+            case 4:
+              break;
+            case 8:
+              g = c[0];
+              a = c[1];
+              break;
+            case 16:
+              int g0 = ((c[0] & 0xff) << 8) | (c[1] & 0xff);
+              g = ((g0 / 0xffff) * 0xff).toInt();
+
+              int a0 = ((c[2] & 0xff) << 8) | (c[3] & 0xff);
+              a = ((a0 / 0xffff) * 0xff).toInt();
+              break;
+          }
+
+          return getColor(g, g, g, a);
+        case RGBA:
+          int r, g, b, a;
+          switch (header.bits) {
+            case 1:
+              break;
+            case 2:
+              break;
+            case 4:
+              break;
+            case 8:
+              r = c[0];
+              g = c[1];
+              b = c[2];
+              a = c[3];
+              break;
+            case 16:
+              int r0 = ((c[0] & 0xff) << 8) | (c[1] & 0xff);
+              r = ((r0 / 0xffff) * 0xff).toInt();
+
+              int g0 = ((c[2] & 0xff) << 8) | (c[3] & 0xff);
+              g = ((g0 / 0xffff) * 0xff).toInt();
+
+              int b0 = ((c[4] & 0xff) << 8) | (c[5] & 0xff);
+              b = ((b0 / 0xffff) * 0xff).toInt();
+
+              int a0 = ((c[6] & 0xff) << 8) | (c[7] & 0xff);
+              a = ((a0 / 0xffff) * 0xff).toInt();
+              break;
+          }
+
+          return getColor(r, g, b, a);
       }
-      throw new ImageException('Invalid number of components in color list');
+
+      throw new ImageException('Invalid color type: ${header.colorType}.');
     }
 
     // Before the image is compressed, it is filtered to improve compression.
@@ -310,6 +434,12 @@ class PngDecoder {
 
     return image;
   }
+
+  static const int GRAYSCALE = 0;
+  static const int RGB = 2;
+  static const int INDEXED = 3;
+  static const int GRAYSCALE_ALPHA = 4;
+  static const int RGBA = 6;
 
   static const int FILTER_NONE = 0;
   static const int FILTER_SUB = 1;
