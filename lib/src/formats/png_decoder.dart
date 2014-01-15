@@ -10,12 +10,11 @@ class PngDecoder {
 
     _PngHeader header;
     List<int> palette;
+    List<int> transparency;
     List<int> imageData = [];
-    _PngTransparency transparency;
     int colors;
     bool hasAlphaChannel;
     int pixelBitlength;
-    String colorSpace;
     Image image;
 
     List<int> pngHeader = input.readBytes(8);
@@ -83,10 +82,10 @@ class PngDecoder {
           header.interlaceMethod = input.readByte();
 
           if (header.bits != 8) {
-            throw new ImageException('Only 24-bit or 32-bit PNG images supported.');
+            throw new ImageException('Only 8 bits-per-pixel PNG images supported: ${header.bits}');
           }
-          if (header.colorType != 2 && header.colorType != 6) {
-            throw new ImageException('Only RGB or RGBA PNG images supported.');
+          if (![0, 2, 3, 4, 6].contains(header.colorType)) {
+            throw new ImageException('Invalid PNG Color Type: ${header.colorType}.');
           }
           if (header.interlaceMethod != 0) {
             throw new ImageException('Only non-interlaced PNG images supported.');
@@ -94,6 +93,12 @@ class PngDecoder {
 
           int format = (header.colorType == 2) ? Image.RGB : Image.RGBA;
           image = new Image(header.width, header.height, format);
+          break;
+        case 'PLTE':
+          palette = input.readBytes(chunkSize);
+          break;
+        case 'tRNS':
+          transparency = input.readBytes(chunkSize);
           break;
         case 'IDAT':
           List<int> data = input.readBytes(chunkSize);
@@ -116,7 +121,6 @@ class PngDecoder {
           hasAlphaChannel = header.colorType == 4 || header.colorType == 6;
           colors = colors + (hasAlphaChannel ? 1 : 0);
           pixelBitlength = header.bits * colors;
-          colorSpace = (colors == 1) ? 'DeviceGray' : 'DeviceRGB';
           break;
         default:
           input.skip(chunkSize);
@@ -145,6 +149,29 @@ class PngDecoder {
 
     int pixelBytes = pixelBitlength ~/ 8;
 
+    /**
+     * Get the color with the list of components.
+     */
+    int _getColor(List<int> c) {
+      switch (header.colorType) {
+        case 0:
+          return getColor(c[0], c[0], c[0], 255);
+        case 2:
+          return getColor(c[0], c[1], c[2], 255);
+        case 3:
+          int i = c[0] * 3;
+          return getColor(palette[i],
+                          palette[i + 1],
+                          palette[i + 2],
+                          255);
+        case 4:
+          return getColor(c[0], c[0], c[0], c[1]);
+        case 6:
+          return getColor(c[0], c[1], c[2], c[3]);
+      }
+      throw new ImageException('Invalid number of components in color list');
+    }
+
     // Before the image is compressed, it is filtered to improve compression.
     // Unfilter the image now.
     int pi = 0;
@@ -154,12 +181,12 @@ class PngDecoder {
       switch (code) {
         case FILTER_NONE:
           for (int i = 0; i < header.width; i++) {
-            image[pi++] = _getColorFromList(input.readBytes(pixelBytes));
+            image[pi++] = _getColor(input.readBytes(pixelBytes));
           }
           break;
         case FILTER_SUB:
           for (int i = 0; i < header.width; i++) {
-            int x = _getColorFromList(input.readBytes(pixelBytes));
+            int x = _getColor(input.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image[pi - 1];
             image[pi++] = getColor((getRed(x) + getRed(a)) % 256,
                                    (getGreen(x) + getGreen(a)) % 256,
@@ -169,7 +196,7 @@ class PngDecoder {
           break;
         case FILTER_UP:
           for (int i = 0; i < header.width; i++) {
-            int x = _getColorFromList(input.readBytes(pixelBytes));
+            int x = _getColor(input.readBytes(pixelBytes));
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             image[pi++] = getColor((getRed(x) + getRed(b)) % 256,
                                    (getGreen(x) + getGreen(b)) % 256,
@@ -179,7 +206,7 @@ class PngDecoder {
           break;
         case FILTER_AVERAGE:
           for (int i = 0; i < header.width; i++) {
-            int x = _getColorFromList(input.readBytes(pixelBytes));
+            int x = _getColor(input.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             int ra = getRed(a);
@@ -198,7 +225,7 @@ class PngDecoder {
           break;
         case FILTER_PAETH:
           for (int i = 0; i < header.width; i++) {
-            int x = _getColorFromList(input.readBytes(pixelBytes));
+            int x = _getColor(input.readBytes(pixelBytes));
             int a = (i == 0) ? 0 : image[pi - 1];
             int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
             int c = (i == 0 || row == 0) ? 0 : image.getPixel(i - 1, row - 1);
@@ -284,19 +311,6 @@ class PngDecoder {
     return image;
   }
 
-  /**
-   * Get the color with the list of components.
-   */
-  int _getColorFromList(List<int> rgba) {
-    if (rgba.length == 4) {
-      return getColor(rgba[0], rgba[1], rgba[2], rgba[3]);
-    } else if (rgba.length == 3) {
-      return getColor(rgba[0], rgba[1], rgba[2], 255);
-    } else {
-      throw new ImageException('Invalid number of components in color list');
-    }
-  }
-
   static const int FILTER_NONE = 0;
   static const int FILTER_SUB = 1;
   static const int FILTER_UP = 2;
@@ -312,10 +326,4 @@ class _PngHeader {
   int compressionMethod;
   int filterMethod;
   int interlaceMethod;
-}
-
-class _PngTransparency {
-  int grayscale;
-  List<int> rgb;
-  List<int> indexed;
 }

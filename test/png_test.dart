@@ -8,7 +8,6 @@ void definePngTests() {
 
       // Encode the image to PNG
       List<int> png = new PngEncoder().encode(image);
-
       new Io.File('out/encode.png')
             .writeAsBytesSync(png);
     });
@@ -62,10 +61,17 @@ void definePngTests() {
         Io.File file = f;
         try {
           Image image = new PngDecoder().decode(file.readAsBytesSync());
+          List<int> png = new PngEncoder().encode(image);
+          new Io.File('out/png/${name}')
+                ..createSync(recursive: true)
+                ..writeAsBytesSync(png);
         } catch (e) {
-          // Catch the exception for now since I know these tests don't
-          // pass
-          print(file.path.split('/').last + ': ' + e.toString());
+          // 'x*' images are supposed to fail.
+          if (!name.startsWith('x')) {
+            // Catch the exception for now since I know these tests don't
+            // pass
+            print(file.path.split('/').last + ': ' + e.toString());
+          }
         }
       });
     });
