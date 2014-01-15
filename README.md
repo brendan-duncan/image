@@ -14,7 +14,7 @@ formats:
 - JPG
 - TGA
 
-##Documentation(https://github.com/brendan-duncan/image/wiki)
+##[Documentation](https://github.com/brendan-duncan/image/wiki)
 
 ##Samples
 
