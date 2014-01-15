@@ -42,6 +42,18 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(f));
     });
 
+    test('copyInto', () {
+      Image s = new Image.from(image);
+      Image d = new Image(image.width + 20, image.height + 20, image.format);
+      fill(d, 0xff0000ff);
+      copyInto(d, s, dstX: 10, dstY: 10);
+      copyInto(d, image2, dstX: 10, dstY: 10);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/copyInto.png')
+                         ..createSync(recursive: true)
+                         ..writeAsBytesSync(writePng(d));
+    });
+
     test('add', () {
       Image i1 = new Image.from(image);
       Image i2 = new Image.from(image2);
@@ -293,16 +305,14 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(f));
     });
 
-    test('copyInto', () {
-      Image s = new Image.from(image);
-      Image d = new Image(image.width + 20, image.height + 20, image.format);
-      fill(d, 0xff0000ff);
-      copyInto(d, s, dstX: 10, dstY: 10);
-      copyInto(d, image2, dstX: 10, dstY: 10);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/copyInto.png')
+    test('trim', () {
+      Image image = readPng(new Io.File('res/trim.png').readAsBytesSync());
+      Image trimmed = trim(image, mode: TRIM_TRANSPARENT);
+      expect(trimmed.width, equals(64));
+      expect(trimmed.height, equals(56));
+      Io.File fp = new Io.File('out/trim.png')
                          ..createSync(recursive: true)
-                         ..writeAsBytesSync(writePng(d));
+                         ..writeAsBytesSync(writePng(trimmed));
     });
 
     test('dropShadow', () {
