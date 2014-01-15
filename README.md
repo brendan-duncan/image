@@ -205,14 +205,14 @@ Create an image, draw some text, save it as a png:
   _Automatically crops the image by finding the corners of the image that
   meet the [mode] criteria (not transparent or a different color)._  
   
-- List<int> **writeJpg**(Image image, {int quality: 100});
+- List **writeJpg**(Image image, {int quality: 100});
 
   _Generate JPG formatted data for the given image._
   
-- List<int> **writePng**(Image image, {int level: 6});
+- List **writePng**(Image image, {int level: 6});
 
   _Generate PNG formatted data for the given image._
   
-- List<int> **writeTga**(Image image);
+- List **writeTga**(Image image);
 
   _Generate TGA formatted data for the given image._

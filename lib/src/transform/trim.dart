@@ -11,21 +11,10 @@ const int TRIM_RIGHT = 8;
 const int TRIM_ALL = TRIM_TOP | TRIM_BOTTOM | TRIM_LEFT | TRIM_RIGHT;
 
 /**
- * Automatically crops the image by finding the corners of the image that
- * meet the [mode] criteria (not transparent or a different color).
- *
- * [mode] can be either [TRIM_TRANSPARENT], [TRIM_TOP_LEFT_CORNER] or
- * [TRIM_BOTTOM_RIGHT_CORNER].
- *
- * [sides] can be used to control which sides of the image get trimmed,
- * and can be any combination of [TRIM_TOP], [TRIM_BOTTOM], [TRIM_LEFT],
- * and [TRIM_RIGHT].
+ * Find the crop area to be used by the trim function.  Returns the
+ * coordinates as [x, y, width, height].
  */
-Image trim(Image src, {int mode: TRIM_TRANSPARENT, sides: TRIM_ALL}) {
-  if (mode == TRIM_TRANSPARENT && src.format == Image.RGB) {
-    return new Image.from(src);
-  }
-
+List<int> findTrim(Image src, {int mode: TRIM_TRANSPARENT, sides: TRIM_ALL}) {
   int h = src.height;
   int w = src.width;
 
@@ -79,8 +68,30 @@ Image trim(Image src, {int mode: TRIM_TRANSPARENT, sides: TRIM_ALL}) {
   w = 1 + xmax - xmin; // Image width in pixels
   h = 1 + ymax - ymin; // Image height in pixels
 
-  Image dst = new Image(w, h, Image.RGBA);
-  copyInto(dst, src, srcX: xmin, srcY: ymin, srcW: w, srcH: h, blend: false);
+  return [xmin, ymin, w, h];
+}
+
+/**
+ * Automatically crops the image by finding the corners of the image that
+ * meet the [mode] criteria (not transparent or a different color).
+ *
+ * [mode] can be either [TRIM_TRANSPARENT], [TRIM_TOP_LEFT_CORNER] or
+ * [TRIM_BOTTOM_RIGHT_CORNER].
+ *
+ * [sides] can be used to control which sides of the image get trimmed,
+ * and can be any combination of [TRIM_TOP], [TRIM_BOTTOM], [TRIM_LEFT],
+ * and [TRIM_RIGHT].
+ */
+Image trim(Image src, {int mode: TRIM_TRANSPARENT, sides: TRIM_ALL}) {
+  if (mode == TRIM_TRANSPARENT && src.format == Image.RGB) {
+    return new Image.from(src);
+  }
+
+  List<int> crop = findTrim(src, mode: mode, sides: sides);
+
+  Image dst = new Image(crop[2], crop[3], Image.RGBA);
+  copyInto(dst, src, srcX: crop[0], srcY: crop[1],
+           srcW: crop[2], srcH: crop[3], blend: false);
 
   return dst;
 }
