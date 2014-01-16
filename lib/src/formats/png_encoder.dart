@@ -58,14 +58,8 @@ class PngEncoder {
 
   void _filter(Image image, List<int> out) {
     int oi = 0;
-    // TODO if FILTER_AGGRESSIVE, then every N rows, compare the compression
-    // level of each filter type and pick the most compressed filter.
-    int lastFilter = (filter != FILTER_AGRESSIVE) ? filter : FILTER_PAETH;
     for (int y = 0; y < image.height; ++y) {
-      switch (lastFilter) {
-        case FILTER_NONE:
-          oi = _filterNone(image, oi, y, out);
-          break;
+      switch (filter) {
         case FILTER_SUB:
           oi = _filterSub(image, oi, y, out);
           break;
@@ -76,6 +70,11 @@ class PngEncoder {
           oi = _filterAverage(image, oi, y, out);
           break;
         case FILTER_PAETH:
+          oi = _filterPaeth(image, oi, y, out);
+          break;
+        case FILTER_AGRESSIVE:
+          // TODO Apply all five filters and select the filter that produces
+          // the smallest sum of absolute values per row.
           oi = _filterPaeth(image, oi, y, out);
           break;
         default:

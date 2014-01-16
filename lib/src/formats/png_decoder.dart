@@ -218,13 +218,6 @@ class PngDecoder {
       colorLut[i] = c;
     }
 
-    int numChannels = (header.colorType == GRAYSCALE) ? 1 :
-      (header.colorType == GRAYSCALE_ALPHA ||
-      header.colorType == RGBA) ? 4 : 3;
-    if (transparency != null) {
-      numChannels++;
-    }
-
     /**
      * Read the next pixel from the input stream.
      */
@@ -494,49 +487,54 @@ class PngDecoder {
       throw new ImageException('Invalid color type: ${header.colorType}.');
     }
 
-    int bpp = (header.colorType == GRAYSCALE_ALPHA) ? 2 :
-              (header.colorType == RGB) ? 3 :
-              (header.colorType == RGBA) ? 4 : 1;
+    int channels = (header.colorType == GRAYSCALE_ALPHA) ? 2 :
+                   (header.colorType == RGB) ? 3 :
+                   (header.colorType == RGBA) ? 4 : 1;
 
-    final int lineSize = ((header.width * header.bits + 7)) ~/ 8 * bpp;
+    final int pixel_depth = channels * header.bits;
 
-    final List<int> line = new List<int>.filled(lineSize, 0);
+    final int rowBytes = (((header.width * pixel_depth + 7)) >> 3);
+    final int bpp = (pixel_depth + 7) >> 3;
+
+    final List<int> line = new List<int>.filled(rowBytes, 0);
     final List<List<int>> inData = [line, line];
 
     // Before the image is compressed, it was filtered to improve compression.
-    // Unfilter the image now.
+    // Reverse the filter now.
     int pi = 0;
-    for (int row = 0, id = 0; row < header.height; ++row, id = 1 - id) {
+    for (int y = 0, ri = 0; y < header.height; ++y, ri = 1 - ri) {
       int filterType = input.readByte();
-      inData[id] = input.readBytes(lineSize);
+      inData[ri] = input.readBytes(rowBytes);
+      List<int> row = inData[ri];
+      List<int> prevRow = inData[1 - ri];
 
       switch (filterType) {
         case FILTER_NONE:
           break;
         case FILTER_SUB:
-          for (int i = bpp; i < lineSize; ++i) {
-            inData[id][i] = (inData[id][i] + inData[id][i - bpp]) & 0xff;
+          for (int x = bpp; x < rowBytes; ++x) {
+            row[x] = (row[x] + row[x - bpp]) & 0xff;
           }
           break;
         case FILTER_UP:
-          if (row > 0) {
-            for (int i = 0; i < lineSize; ++i) {
-              inData[id][i] = (inData[id][i] + inData[1 - id][i]) & 0xff;
+          if (y > 0) {
+            for (int x = 0; x < rowBytes; ++x) {
+              row[x] = (row[x] + prevRow[x]) & 0xff;
             }
           }
           break;
         case FILTER_AVERAGE:
-          for (int i = 0; i < lineSize; ++i) {
-            int a = (i < bpp) ? 0 : inData[id][i - bpp];
-            int b = (row == 0) ? 0 : inData[1 - id][i];
-            inData[id][i] = (inData[id][i] + ((a + b) >> 1)) & 0xff;
+          for (int x = 0; x < rowBytes; ++x) {
+            int a = (x < bpp) ? 0 : row[x - bpp];
+            int b = (y == 0) ? 0 : prevRow[x];
+            row[x] = (row[x] + ((a + b) >> 1)) & 0xff;
           }
           break;
         case FILTER_PAETH:
-          for (int i = 0; i < lineSize; ++i) {
-            int a = (i < bpp) ? 0 : inData[id][i - bpp];
-            int b = (row == 0) ? 0 : inData[1 - id][i];
-            int c = (i < bpp || row == 0) ? 0 : inData[1 - id][i - bpp];
+          for (int x = 0; x < rowBytes; ++x) {
+            int a = (x < bpp) ? 0 : row[x - bpp];
+            int b = (y == 0) ? 0 : prevRow[x];
+            int c = (x < bpp || y == 0) ? 0 : prevRow[x - bpp];
 
             int p = a + b - c;
 
@@ -553,7 +551,7 @@ class PngDecoder {
               paeth = c;
             }
 
-            inData[id][i] = (inData[id][i] + paeth) & 0xff;
+            row[x] = (row[x] + paeth) & 0xff;
           }
           break;
         default:
@@ -562,7 +560,7 @@ class PngDecoder {
 
       _resetBits();
 
-      Arc.InputBuffer rowInput = new Arc.InputBuffer(inData[id]);
+      Arc.InputBuffer rowInput = new Arc.InputBuffer(inData[ri], byteOrder: Arc.BIG_ENDIAN);
 
       final List<int> pixel = [0, 0, 0, 0];
 

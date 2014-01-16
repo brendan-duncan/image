@@ -61,7 +61,7 @@ void definePngTests() {
       test('PNG $name', () {
         Io.File file = f;
 
-        try {
+        //try {
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
           try {
@@ -77,9 +77,9 @@ void definePngTests() {
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
         }
-        } catch (e) {
+        /*} catch (e) {
           print('$name: $e');
-        }
+        }*/
       });
     });
   });
