@@ -12,11 +12,9 @@ class PngDecoder {
     List<int> palette;
     List<int> transparency;
     List<int> imageData = [];
-    int colors;
-    bool hasAlphaChannel;
-    int pixelBitlength;
     Image image;
     int format;
+    double gamma;
 
     List<int> pngHeader = input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
@@ -73,64 +71,120 @@ class PngDecoder {
 
       switch (section) {
         case 'IHDR':
+          Arc.InputBuffer hdr = new Arc.InputBuffer(input.readBytes(chunkSize),
+                                                    byteOrder: Arc.BIG_ENDIAN);
           header = new _PngHeader();
-          header.width = input.readUint32();
-          header.height = input.readUint32();
-          header.bits = input.readByte();
-          header.colorType = input.readByte();
-          header.compressionMethod = input.readByte();
-          header.filterMethod = input.readByte();
-          header.interlaceMethod = input.readByte();
+          header.width = hdr.readUint32();
+          header.height = hdr.readUint32();
+          header.bits = hdr.readByte();
+          header.colorType = hdr.readByte();
+          header.compressionMethod = hdr.readByte();
+          header.filterMethod = hdr.readByte();
+          header.interlaceMethod = hdr.readByte();
 
-          if (![8, 16].contains(header.bits)) {
-            throw new ImageException('Unsuported bit depth: ${header.bits}.');
+          // Validate some of the info in the header to make sure we support
+          // the proposed image data.
+          if (![GRAYSCALE, RGB, INDEXED, GRAYSCALE_ALPHA, RGBA].contains(header.colorType)) {
+            throw new ImageException('Unsupported color type: ${header.colorType}.');
           }
 
-          if (![0, 2, 3, 4, 6].contains(header.colorType)) {
-            throw new ImageException('Unsupported color type: ${header.colorType}.');
+          if (header.filterMethod != 0) {
+            throw new ImageException('Unsupported filter method: ${header.filterMethod}');
+          }
+
+          switch (header.colorType) {
+            case GRAYSCALE:
+              if (![1, 2, 4, 8, 16].contains(header.bits)) {
+                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              }
+              break;
+            case RGB:
+              if (![8, 16].contains(header.bits)) {
+                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              }
+              break;
+            case INDEXED:
+              if (![1, 2, 4, 8].contains(header.bits)) {
+                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              }
+              break;
+            case GRAYSCALE_ALPHA:
+              if (![8, 16].contains(header.bits)) {
+                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              }
+              break;
+            case RGBA:
+              if (![8, 16].contains(header.bits)) {
+                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              }
+              break;
           }
 
           if (header.interlaceMethod != 0) {
             throw new ImageException('Unsupported interlace method: ${header.interlaceMethod}.');
           }
+
+          int crc = input.readUint32();
+          int computedCrc = _crc(section, hdr.buffer);
+          if (crc != computedCrc) {
+            throw new ImageException('Invalid $section checksum');
+          }
           break;
         case 'PLTE':
           palette = input.readBytes(chunkSize);
+          int crc = input.readUint32();
+          int computedCrc = _crc(section, palette);
+          if (crc != computedCrc) {
+            throw new ImageException('Invalid $section checksum');
+          }
           break;
         case 'tRNS':
           transparency = input.readBytes(chunkSize);
+          int crc = input.readUint32();
+          int computedCrc = _crc(section, transparency);
+          if (crc != computedCrc) {
+            throw new ImageException('Invalid $section checksum');
+          }
           break;
         case 'IDAT':
           List<int> data = input.readBytes(chunkSize);
           imageData.addAll(data);
+          int crc = input.readUint32();
+          int computedCrc = _crc(section, data);
+          if (crc != computedCrc) {
+            throw new ImageException('Invalid $section checksum');
+          }
           break;
         case 'IEND':
           // End of the image.
-          switch (header.colorType) {
-            case GRAYSCALE:
-            case INDEXED:
-            case GRAYSCALE_ALPHA:
-              colors = 1;
-              break;
-            case RGB:
-            case RGBA:
-              colors = 3;
-              break;
-          }
-
-          hasAlphaChannel = header.colorType == GRAYSCALE_ALPHA ||
-                            header.colorType == RGBA;
-          colors = colors + (hasAlphaChannel ? 1 : 0);
-          pixelBitlength = header.bits * colors;
-
-          if (hasAlphaChannel || transparency != null) {
+          if (header.colorType == GRAYSCALE_ALPHA ||
+              header.colorType == RGBA || transparency != null) {
             format = Image.RGBA;
           } else {
             format = Image.RGB;
           }
+          // CRC
+          input.skip(4);
+          break;
+        case 'gAMA':
+          if (chunkSize != 4) {
+            throw new ImageException('Invalid gAMA chunk');
+          }
+          int gammaInt = input.readUint32();
+          int crc = input.readUint32();
+          // A gamma of 1.0 doesn't have any affect, so pretend we didn't get
+          // a gamma in that case.
+          if (gammaInt != 100000) {
+            gamma = gammaInt / 100000.0;
+          }
           break;
         default:
+          if (header.bits == 16 && header.colorType == GRAYSCALE) {
+            print('**** Unhandled Chunk: $section ${chunkSize}');
+          }
           input.skip(chunkSize);
+          // CRC
+          input.skip(4);
           break;
       }
 
@@ -138,8 +192,6 @@ class PngDecoder {
         break;
       }
 
-      // CRC
-      input.readUint32();
 
       if (input.isEOF) {
         throw new ImageException('Incomplete or corrupt PNG file');
@@ -156,139 +208,285 @@ class PngDecoder {
 
     input = new Arc.InputBuffer(uncompressed, byteOrder: Arc.BIG_ENDIAN);
 
-    int pixelBytes = pixelBitlength ~/ 8;
+    // Set up a LUT to transform colors for gamma correction.
+    List<int> colorLut = new List<int>(256);
+    for (int i = 0; i < 256; ++i) {
+      int c = i;
+      if (gamma != null) {
+        c = getGamma(c, gamma);
+      }
+      colorLut[i] = c;
+    }
+
+    int numChannels = (header.colorType == GRAYSCALE) ? 1 :
+      (header.colorType == GRAYSCALE_ALPHA ||
+      header.colorType == RGBA) ? 4 : 3;
+    if (transparency != null) {
+      numChannels++;
+    }
+
+    /**
+     * Read the next pixel from the input stream.
+     */
+    void _readPixel(Arc.InputBuffer input, List<int> pixel) {
+      switch (header.colorType) {
+        case GRAYSCALE:
+          switch (header.bits) {
+            case 1:
+            case 2:
+            case 4:
+              pixel[0] = _readBits(input, header.bits);
+              break;
+            case 8:
+              pixel[0] = input.readByte();
+              break;
+            case 16:
+              pixel[0] = input.readUint16();
+              break;
+          }
+          return;
+        case RGB:
+          switch (header.bits) {
+            case 1:
+            case 2:
+            case 4:
+              pixel[0] = _readBits(input, header.bits);
+              pixel[1] = _readBits(input, header.bits);
+              pixel[2] = _readBits(input, header.bits);
+              break;
+            case 8:
+              pixel[0] = input.readByte();
+              pixel[1] = input.readByte();
+              pixel[2] = input.readByte();
+              break;
+            case 16:
+              pixel[0] = input.readUint16();
+              pixel[1] = input.readUint16();
+              pixel[2] = input.readUint16();
+              break;
+          }
+          return;
+        case INDEXED:
+          switch (header.bits) {
+            case 1:
+            case 2:
+            case 4:
+              pixel[0] = _readBits(input, header.bits);
+              break;
+            case 8:
+              pixel[0] = input.readByte();
+              break;
+          }
+          return;
+        case GRAYSCALE_ALPHA:
+          switch (header.bits) {
+            case 1:
+            case 2:
+            case 4:
+              pixel[0] = _readBits(input, header.bits);
+              pixel[1] = _readBits(input, header.bits);
+              break;
+            case 8:
+              pixel[0] = input.readByte();
+              pixel[1] = input.readByte();
+              break;
+            case 16:
+              pixel[0] = input.readUint16();
+              pixel[1] = input.readUint16();
+              break;
+          }
+          return;
+        case RGBA:
+          switch (header.bits) {
+            case 1:
+            case 2:
+            case 4:
+              pixel[0] = _readBits(input, header.bits);
+              pixel[1] = _readBits(input, header.bits);
+              pixel[2] = _readBits(input, header.bits);
+              pixel[3] = _readBits(input, header.bits);
+              break;
+            case 8:
+              pixel[0] = input.readByte();
+              pixel[1] = input.readByte();
+              pixel[2] = input.readByte();
+              pixel[3] = input.readByte();
+              break;
+            case 16:
+              pixel[0] = input.readUint16();
+              pixel[1] = input.readUint16();
+              pixel[2] = input.readUint16();
+              pixel[3] = input.readUint16();
+              break;
+          }
+          return;
+      }
+
+      throw new ImageException('Invalid color type: ${header.colorType}.');
+    }
 
     /**
      * Get the color with the list of components.
      */
-    int _getColor(List<int> c) {
+    int _getColor(List<int> raw) {
       switch (header.colorType) {
         case GRAYSCALE:
-          int g0;
           int g;
           switch (header.bits) {
             case 1:
+              g = _convert1to8(raw[0]);
               break;
             case 2:
+              g = _convert2to8(raw[0]);
               break;
             case 4:
+              g = _convert4to8(raw[0]);
               break;
             case 8:
-              g0 = g = c[0];
+              g = raw[0];
               break;
             case 16:
-              g0 = ((c[0] & 0xff) << 8) | (c[1] & 0xff);
-              g = ((g0 / 0xffff) * 0xff).toInt();
+              g = _convert16to8(raw[0]);
               break;
           }
+
+          g = colorLut[g];
+
           if (transparency != null) {
             int a = ((transparency[0] & 0xff) << 24) | (transparency[1] & 0xff);
-            if (g0 == a) {
+            if (raw[0] == a) {
               return getColor(g, g, g, 0);
             }
           }
+
           return getColor(g, g, g, 255);
         case RGB:
           int r, g, b;
-          int r0, g0, b0;
           switch (header.bits) {
             case 1:
+              r = _convert1to8(raw[0]);
+              g = _convert1to8(raw[1]);
+              b = _convert1to8(raw[2]);
               break;
             case 2:
+              r = _convert2to8(raw[0]);
+              g = _convert2to8(raw[1]);
+              b = _convert2to8(raw[2]);
               break;
             case 4:
+              r = _convert4to8(raw[0]);
+              g = _convert4to8(raw[1]);
+              b = _convert4to8(raw[2]);
               break;
             case 8:
-              r0 = r = c[0];
-              g0 = g = c[1];
-              b0 = b = c[2];
+              r = raw[0];
+              g = raw[1];
+              b = raw[2];
               break;
             case 16:
-              r0 = ((c[0] & 0xff) << 8) | (c[1] & 0xff);
-              r = ((r0 / 0xffff) * 0xff).toInt();
-
-              g0 = ((c[2] & 0xff) << 8) | (c[3] & 0xff);
-              g = ((g0 / 0xffff) * 0xff).toInt();
-
-              b0 = ((c[4] & 0xff) << 8) | (c[5] & 0xff);
-              b = ((b0 / 0xffff) * 0xff).toInt();
+              r = _convert16to8(raw[0]);
+              g = _convert16to8(raw[1]);
+              b = _convert16to8(raw[2]);
               break;
           }
+
+          r = colorLut[r];
+          g = colorLut[g];
+          b = colorLut[b];
 
           if (transparency != null) {
             int tr = ((transparency[0] & 0xff) << 8) | (transparency[1] & 0xff);
             int tg = ((transparency[2] & 0xff) << 8) | (transparency[3] & 0xff);
             int tb = ((transparency[4] & 0xff) << 8) | (transparency[5] & 0xff);
-            if (r0 == tr && g0 == tg && b0 == tb) {
+            if (raw[0] == tr && raw[1] == tg && raw[2] == tb) {
               return getColor(r, g, b, 0);
             }
           }
 
           return getColor(r, g, b, 255);
         case INDEXED:
-          int i = c[0];
-          int p = i * 3;
-          int a = transparency != null && i < transparency.length ?
-                  transparency[i] : 255;
+          int p = raw[0] * 3;
+
+          int a = transparency != null &&
+                  raw[0] < transparency.length ? transparency[raw[0]] : 255;
+
           if (p >= palette.length) {
             return getColor(255, 255, 255, a);
           }
-          return getColor(palette[p],
-                          palette[p + 1],
-                          palette[p + 2],
-                          a);
+
+          int r = colorLut[palette[p]];
+          int g = colorLut[palette[p + 1]];
+          int b = colorLut[palette[p + 2]];
+
+          return getColor(r, g, b, a);
         case GRAYSCALE_ALPHA:
           int g, a;
           switch (header.bits) {
             case 1:
+              g = _convert1to8(raw[0]);
+              a = _convert1to8(raw[1]);
               break;
             case 2:
+              g = _convert2to8(raw[0]);
+              a = _convert2to8(raw[1]);
               break;
             case 4:
+              g = _convert4to8(raw[0]);
+              a = _convert4to8(raw[1]);
               break;
             case 8:
-              g = c[0];
-              a = c[1];
+              g = raw[0];
+              a = raw[1];
               break;
             case 16:
-              int g0 = ((c[0] & 0xff) << 8) | (c[1] & 0xff);
-              g = ((g0 / 0xffff) * 0xff).toInt();
-
-              int a0 = ((c[2] & 0xff) << 8) | (c[3] & 0xff);
-              a = ((a0 / 0xffff) * 0xff).toInt();
+              g = _convert16to8(raw[0]);
+              a = _convert16to8(raw[1]);
               break;
           }
+
+          g = colorLut[g];
+          a = colorLut[a];
 
           return getColor(g, g, g, a);
         case RGBA:
           int r, g, b, a;
           switch (header.bits) {
             case 1:
+              r = _convert1to8(raw[0]);
+              g = _convert1to8(raw[1]);
+              b = _convert1to8(raw[2]);
+              a = _convert1to8(raw[3]);
               break;
             case 2:
+              r = _convert2to8(raw[0]);
+              g = _convert2to8(raw[1]);
+              b = _convert2to8(raw[2]);
+              a = _convert2to8(raw[3]);
               break;
             case 4:
+              r = _convert4to8(raw[0]);
+              g = _convert4to8(raw[1]);
+              b = _convert4to8(raw[2]);
+              a = _convert4to8(raw[3]);
               break;
             case 8:
-              r = c[0];
-              g = c[1];
-              b = c[2];
-              a = c[3];
+              r = raw[0];
+              g = raw[1];
+              b = raw[2];
+              a = raw[3];
               break;
             case 16:
-              int r0 = ((c[0] & 0xff) << 8) | (c[1] & 0xff);
-              r = ((r0 / 0xffff) * 0xff).toInt();
-
-              int g0 = ((c[2] & 0xff) << 8) | (c[3] & 0xff);
-              g = ((g0 / 0xffff) * 0xff).toInt();
-
-              int b0 = ((c[4] & 0xff) << 8) | (c[5] & 0xff);
-              b = ((b0 / 0xffff) * 0xff).toInt();
-
-              int a0 = ((c[6] & 0xff) << 8) | (c[7] & 0xff);
-              a = ((a0 / 0xffff) * 0xff).toInt();
+              r = _convert16to8(raw[0]);
+              g = _convert16to8(raw[1]);
+              b = _convert16to8(raw[2]);
+              a = _convert16to8(raw[3]);
               break;
           }
+
+          r = colorLut[r];
+          g = colorLut[g];
+          b = colorLut[b];
+          a = colorLut[a];
 
           return getColor(r, g, b, a);
       }
@@ -296,143 +494,154 @@ class PngDecoder {
       throw new ImageException('Invalid color type: ${header.colorType}.');
     }
 
-    // Before the image is compressed, it is filtered to improve compression.
+    int bpp = (header.colorType == GRAYSCALE_ALPHA) ? 2 :
+              (header.colorType == RGB) ? 3 :
+              (header.colorType == RGBA) ? 4 : 1;
+
+    final int lineSize = ((header.width * header.bits + 7)) ~/ 8 * bpp;
+
+    final List<int> line = new List<int>.filled(lineSize, 0);
+    final List<List<int>> inData = [line, line];
+
+    // Before the image is compressed, it was filtered to improve compression.
     // Unfilter the image now.
     int pi = 0;
-    int row = 0;
-    while (!input.isEOF) {
-      int code = input.readByte();
-      switch (code) {
+    for (int row = 0, id = 0; row < header.height; ++row, id = 1 - id) {
+      int filterType = input.readByte();
+      inData[id] = input.readBytes(lineSize);
+
+      switch (filterType) {
         case FILTER_NONE:
-          for (int i = 0; i < header.width; i++) {
-            image[pi++] = _getColor(input.readBytes(pixelBytes));
-          }
           break;
         case FILTER_SUB:
-          for (int i = 0; i < header.width; i++) {
-            int x = _getColor(input.readBytes(pixelBytes));
-            int a = (i == 0) ? 0 : image[pi - 1];
-            image[pi++] = getColor((getRed(x) + getRed(a)) % 256,
-                                   (getGreen(x) + getGreen(a)) % 256,
-                                   (getBlue(x) + getBlue(a)) % 256,
-                                   (getAlpha(x) + getAlpha(a)) % 256);
+          for (int i = bpp; i < lineSize; ++i) {
+            inData[id][i] = (inData[id][i] + inData[id][i - bpp]) & 0xff;
           }
           break;
         case FILTER_UP:
-          for (int i = 0; i < header.width; i++) {
-            int x = _getColor(input.readBytes(pixelBytes));
-            int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
-            image[pi++] = getColor((getRed(x) + getRed(b)) % 256,
-                                   (getGreen(x) + getGreen(b)) % 256,
-                                   (getBlue(x) + getBlue(b)) % 256,
-                                   (getAlpha(x) + getAlpha(b)) % 256);
+          if (row > 0) {
+            for (int i = 0; i < lineSize; ++i) {
+              inData[id][i] = (inData[id][i] + inData[1 - id][i]) & 0xff;
+            }
           }
           break;
         case FILTER_AVERAGE:
-          for (int i = 0; i < header.width; i++) {
-            int x = _getColor(input.readBytes(pixelBytes));
-            int a = (i == 0) ? 0 : image[pi - 1];
-            int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
-            int ra = getRed(a);
-            int rb = getRed(b);
-            int ga = getGreen(a);
-            int gb = getGreen(b);
-            int ba = getBlue(a);
-            int bb = getBlue(b);
-            int aa = getAlpha(a);
-            int ab = getAlpha(b);
-            image[pi++] = getColor((getRed(x) + ((ra + rb) ~/ 2)) % 256,
-                                   (getGreen(x) + ((ga + gb) ~/ 2)) % 256,
-                                   (getBlue(x) + ((ba + bb) ~/ 2)) % 256,
-                                   (getAlpha(x) + ((aa + ab) ~/ 2)) % 256);
+          for (int i = 0; i < lineSize; ++i) {
+            int a = (i < bpp) ? 0 : inData[id][i - bpp];
+            int b = (row == 0) ? 0 : inData[1 - id][i];
+            inData[id][i] = (inData[id][i] + ((a + b) >> 1)) & 0xff;
           }
           break;
         case FILTER_PAETH:
-          for (int i = 0; i < header.width; i++) {
-            int x = _getColor(input.readBytes(pixelBytes));
-            int a = (i == 0) ? 0 : image[pi - 1];
-            int b = (row == 0) ? 0 : image.getPixel(i, row - 1);
-            int c = (i == 0 || row == 0) ? 0 : image.getPixel(i - 1, row - 1);
-            int ra = getRed(a);
-            int rb = getRed(b);
-            int rc = getRed(c);
-            int ga = getGreen(a);
-            int gb = getGreen(b);
-            int gc = getGreen(c);
-            int ba = getBlue(a);
-            int bb = getBlue(b);
-            int bc = getBlue(c);
-            int aa = getAlpha(a);
-            int ab = getAlpha(b);
-            int ac = getAlpha(c);
+          for (int i = 0; i < lineSize; ++i) {
+            int a = (i < bpp) ? 0 : inData[id][i - bpp];
+            int b = (row == 0) ? 0 : inData[1 - id][i];
+            int c = (i < bpp || row == 0) ? 0 : inData[1 - id][i - bpp];
 
-            int pr = ra + rb - rc;
-            int pg = ga + gb - gc;
-            int pb = ba + bb - bc;
-            int pa = aa + ab - ac;
+            int p = a + b - c;
 
-            int pra = (pr - ra).abs();
-            int prb = (pr - rb).abs();
-            int prc = (pr - rc).abs();
+            int pa = (p - a).abs();
+            int pb = (p - b).abs();
+            int pc = (p - c).abs();
 
-            int rpaeth = 0;
-            if (pra <= prb && pra <= prc) {
-              rpaeth = ra;
-            } else if (prb <= prc) {
-              rpaeth = rb;
+            int paeth = 0;
+            if (pa <= pb && pa <= pc) {
+              paeth = a;
+            } else if (pb <= pc) {
+              paeth = b;
             } else {
-              rpaeth = rc;
+              paeth = c;
             }
 
-            int pga = (pg - ga).abs();
-            int pgb = (pg - gb).abs();
-            int pgc = (pg - gc).abs();
-            int gpaeth = 0;
-            if (pga <= pgb && pga <= pgc) {
-              gpaeth = ga;
-            } else if (pgb <= pgc) {
-              gpaeth = gb;
-            } else {
-              gpaeth = gc;
-            }
-
-            int pba = (pb - ba).abs();
-            int pbb = (pb - bb).abs();
-            int pbc = (pb - bc).abs();
-            int bpaeth = 0;
-            if (pba <= pbb && pba <= pbc) {
-              bpaeth = ba;
-            } else if (pbb <= pbc) {
-              bpaeth = bb;
-            } else {
-              bpaeth = bc;
-            }
-
-            int paa = (pa - aa).abs();
-            int pab = (pa - ab).abs();
-            int pac = (pa - ac).abs();
-            int apaeth = 0;
-            if (paa <= pab && paa <= pac) {
-              apaeth = aa;
-            } else if (pab <= pac) {
-              apaeth = ab;
-            } else {
-              apaeth = ac;
-            }
-
-            image[pi++] = getColor((getRed(x) + rpaeth) % 256,
-                                   (getGreen(x) + gpaeth) % 256,
-                                   (getBlue(x) + bpaeth) % 256,
-                                   (getAlpha(x) + apaeth) % 256);
+            inData[id][i] = (inData[id][i] + paeth) & 0xff;
           }
           break;
         default:
-          throw new ImageException('Invalid filter value');
+          throw new ImageException('Invalid filter value: ${filterType}');
       }
-      row++;
+
+      _resetBits();
+
+      Arc.InputBuffer rowInput = new Arc.InputBuffer(inData[id]);
+
+      final List<int> pixel = [0, 0, 0, 0];
+
+      for (int i = 0; i < header.width; i++) {
+        _readPixel(rowInput, pixel);
+        image[pi++] = _getColor(pixel);
+      }
     }
 
     return image;
+  }
+
+  int _convert16to8(int c) {
+    return c >> 8;
+  }
+
+  int _convert1to8(int c) {
+    return (c == 0) ? 0 : 255;
+  }
+
+  int _convert2to8(int c) {
+    return c * 85;
+  }
+
+  int _convert4to8(int c) {
+    return c << 4;
+  }
+
+  /**
+   * Return the CRC of the bytes
+   */
+  int _crc(String type, List<int> bytes) {
+    int crc = Arc.getCrc32(type.codeUnits);
+    return Arc.getCrc32(bytes, crc);
+  }
+
+  int _bitBuffer = 0;
+  int _bitBufferLen = 0;
+
+  void _resetBits() {
+    _bitBuffer = 0;
+    _bitBufferLen = 0;
+  }
+
+  /**
+   * Read a number of bits from the input stream.
+   */
+  int _readBits(Arc.InputBuffer input, int numBits) {
+    if (numBits == 0) {
+      return 0;
+    }
+
+    // not enough buffer
+    while (_bitBufferLen < numBits) {
+      if (input.isEOF) {
+        throw new ImageException('Invalid PNG data.');
+      }
+
+      // input byte
+      int octet = input.readByte();
+
+      // concat octet
+      _bitBuffer = octet << _bitBufferLen;
+      _bitBufferLen += 8;
+    }
+
+    // output byte
+    int mask = (numBits == 1) ? 1 :
+               (numBits == 2) ? 3 :
+               (numBits == 4) ? 0xf :
+               (numBits == 8) ? 0xff :
+               (numBits == 16) ? 0xffff : 0;
+
+    int octet = (_bitBuffer >> (_bitBufferLen - numBits)) & mask;
+
+    //_bitBuffer >>= numBits;
+    _bitBufferLen -= numBits;
+
+    return octet;
   }
 
   static const int GRAYSCALE = 0;

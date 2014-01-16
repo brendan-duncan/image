@@ -14,9 +14,7 @@ class PngEncoder {
   int filter;
   int level;
 
-  PngEncoder({this.filter: FILTER_PAETH, this.level}) {
-    _initCrcTable();
-  }
+  PngEncoder({this.filter: FILTER_PAETH, this.level});
 
   List<int> encode(Image image) {
     Arc.OutputBuffer output = new Arc.OutputBuffer(byteOrder: Arc.BIG_ENDIAN);
@@ -242,37 +240,11 @@ class PngEncoder {
   }
 
   /**
-   * Make the table for a fast CRC.
-   */
-  void _initCrcTable() {
-    for (int n = 0; n < 256; n++) {
-      int c = n;
-      for (int k = 0; k < 8; k++) {
-        if ((c & 1) != 0) {
-          c = 0xedb88320 ^ (c >> 1);
-        } else {
-          c = c >> 1;
-        }
-      }
-      _crcTable[n] = c;
-    }
-  }
-
-  /**
    * Return the CRC of the bytes
    */
   int _crc(String type, List<int> bytes) {
-    int crc = 0xffffffff;
-
-    for (int b in type.codeUnits) {
-      crc = _crcTable[(crc ^ b) & 0xff] ^ (crc >> 8);
-    }
-
-    for (int b in bytes) {
-      crc = _crcTable[(crc ^ b) & 0xff] ^ (crc >> 8);
-    }
-
-    return crc ^ 0xffffffff;
+    int crc = Arc.getCrc32(type.codeUnits);
+    return Arc.getCrc32(bytes, crc);
   }
 
   // Table of CRCs of all 8-bit messages.

@@ -60,7 +60,6 @@ void definePngTests() {
 
       test('PNG $name', () {
         Io.File file = f;
-        //
 
         try {
         // x* png's are corrupted and are supposed to crash.
@@ -69,7 +68,7 @@ void definePngTests() {
             Image image = new PngDecoder().decode(file.readAsBytesSync());
             throw new ImageException('This image should not have loaded: $name.');
           } catch (e) {
-            print('$name: $e');
+            //print('$name: $e');
           }
         } else {
           Image image = new PngDecoder().decode(file.readAsBytesSync());

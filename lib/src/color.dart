@@ -21,10 +21,6 @@ int getColor(int r, int g, int b, [int a = 255]) {
          (_clamp255(b) << 16) |
          (_clamp255(g) << 8) |
          _clamp255(r);
-  /*return (_clamp255(r) << 24) |
-         (_clamp255(g) << 16) |
-         (_clamp255(b) << 8) |
-         _clamp255(a);*/
 }
 
 /**
@@ -47,56 +43,48 @@ int setChannel(int c, int ch, int v) =>
  */
 int getRed(int c) =>
     (c) & 0xff;
-    //(c >> 24) & 0xff;
 
 /**
  * Set the red component of the color.
  */
 int setRed(int c, int v) =>
     (c & 0xffffff00) | (_clamp255(v));
-    //(c & 0x00ffffff) | (_clamp255(v) << 24);
 
 /**
  * Get the green component from the color.
  */
 int getGreen(int c) =>
     (c >> 8) & 0xff;
-    //(c >> 16) & 0xff;
 
 /**
  * Set the green component of the color.
  */
 int setGreen(int c, int v) =>
     (c & 0xffff00ff) | (_clamp255(v) << 8);
-    //(c & 0xff00ffff) | (_clamp255(v) << 16);
 
 /**
  * Get the blue component from the color.
  */
 int getBlue(int c) =>
     (c >> 16) & 0xff;
-    //(c >> 8) & 0xff;
 
 /**
  * Set the blue component of the color.
  */
 int setBlue(int c, int v) =>
     (c & 0xff00ffff) | (_clamp255(v) << 16);
-    //(c & 0xffff00ff) | (_clamp255(v) << 8);
 
 /**
  * Get the alpha component from the color.
  */
 int getAlpha(int c) =>
     (c >> 24) & 0xff;
-    //c & 0xff;
 
 /**
  * Set the alpha component of the color.
  */
 int setAlpha(int c, int v) =>
     (c & 0x00ffffff) | (_clamp255(v) << 24);
-    //(c & 0xffffff00) | (_clamp255(v));
 
 /**
  *
@@ -127,4 +115,8 @@ int getLuminance(int c) {
   int g = getGreen(c);
   int b = getBlue(c);
   return (0.299 * r + 0.587 * g + 0.114 * b).toInt();
+}
+
+int getGamma(int c, double gamma) {
+  return (Math.pow((c / 255.0), gamma) * 255.0).toInt();
 }
