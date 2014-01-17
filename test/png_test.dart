@@ -78,15 +78,11 @@ void definePngTests() {
           // TODO interlaced png is still a work in progress and some of the
           // test images are still crashing.  No need to invalidate the entire
           // unit test because of this.
-          try {
           Image image = new PngDecoder().decode(file.readAsBytesSync());
           List<int> png = new PngEncoder().encode(image);
           new Io.File('out/png/${name}')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
-          } catch (e) {
-            print('$name: $e');
-          }
         }
       });
     });
