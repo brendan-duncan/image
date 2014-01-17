@@ -18,6 +18,14 @@ void definePngTests() {
 
       expect(image.width, equals(64));
       expect(image.height, equals(64));
+      var c = getColor(100, 200, 255);
+      for (int i = 0, len = image.length; i < len; ++i) {
+        expect(image[i], equals(c));
+      }
+
+      List<int> png = new PngEncoder().encode(image);
+      new Io.File('out/decode.png')
+            .writeAsBytesSync(png);
     });
 
     Io.File script = new Io.File(Io.Platform.script.toFilePath());

@@ -3,8 +3,7 @@ part of image_test;
 void defineJpegTests() {
   group('jpeg', () {
     test('decode/encode', () {
-      Io.File file = new Io.File('res/cat-eye04.jpg');
-      var bytes = file.readAsBytesSync();
+      var bytes = new Io.File('res/cat-eye04.jpg').readAsBytesSync();
 
       // Decode the image from file.
       var image = new JpegDecoder().decode(bytes);

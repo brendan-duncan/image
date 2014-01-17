@@ -83,7 +83,8 @@ class PngDecoder {
 
           // Validate some of the info in the header to make sure we support
           // the proposed image data.
-          if (![GRAYSCALE, RGB, INDEXED, GRAYSCALE_ALPHA, RGBA].contains(header.colorType)) {
+          if (![GRAYSCALE, RGB, INDEXED,
+                GRAYSCALE_ALPHA, RGBA].contains(header.colorType)) {
             throw new ImageException('Unsupported color type: ${header.colorType}.');
           }
 
@@ -182,7 +183,6 @@ class PngDecoder {
       if (chunkType == 'IEND') {
         break;
       }
-
 
       if (input.isEOF) {
         throw new ImageException('Incomplete or corrupt PNG file');
@@ -312,7 +312,10 @@ class PngDecoder {
 
     final int pixelDepth = channels * header.bits;
 
-    final int rowBytes = (((header.width * pixelDepth + 7)) >> 3);
+    final int w = header.width;
+    final int h = header.height;
+
+    final int rowBytes = (((w * pixelDepth + 7)) >> 3);
     final int bpp = (pixelDepth + 7) >> 3;
 
     final List<int> line = new List<int>.filled(rowBytes, 0);
@@ -320,8 +323,7 @@ class PngDecoder {
 
     final List<int> pixel = [0, 0, 0, 0];
 
-    int pi = 0;
-    for (int y = 0, ri = 0; y < header.height; ++y, ri = 1 - ri) {
+    for (int y = 0, pi = 0, ri = 0; y < h; ++y, ri = 1 - ri) {
       int filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes);
 
@@ -339,7 +341,7 @@ class PngDecoder {
       Arc.InputBuffer rowInput = new Arc.InputBuffer(inData[ri],
                                                      byteOrder: Arc.BIG_ENDIAN);
 
-      for (int x = 0; x < header.width; x++) {
+      for (int x = 0; x < w; ++x) {
         _readPixel(rowInput, pixel);
         image[pi++] = _getColor(pixel);
       }
@@ -363,17 +365,17 @@ class PngDecoder {
         }
         break;
       case FILTER_AVERAGE:
-        for (int x = bpp; x < rowBytes; ++x) {
-          int a = row[x - bpp];
+        for (int x = 0; x < rowBytes; ++x) {
+          int a = x < bpp ? 0 : row[x - bpp];
           int b = prevRow[x];
           row[x] = (row[x] + ((a + b) >> 1)) & 0xff;
         }
         break;
       case FILTER_PAETH:
-        for (int x = bpp; x < rowBytes; ++x) {
-          int a = row[x - bpp];
+        for (int x = 0; x < rowBytes; ++x) {
+          int a = x < bpp ? 0 : row[x - bpp];
           int b = prevRow[x];
-          int c = prevRow[x - bpp];
+          int c = x < bpp ? 0 : prevRow[x - bpp];
 
           int p = a + b - c;
 
