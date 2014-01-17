@@ -10,21 +10,6 @@ import 'dart:typed_data' as Data;
 import 'package:archive/archive.dart' as Arc;
 import 'package:xml/xml.dart';
 
-part 'src/formats/jpeg/_jpeg.dart';
-part 'src/formats/jpeg/_jpeg_adobe.dart';
-part 'src/formats/jpeg/_jpeg_component.dart';
-part 'src/formats/jpeg/_jpeg_data.dart';
-part 'src/formats/jpeg/_jpeg_frame.dart';
-part 'src/formats/jpeg/_jpeg_jfif.dart';
-part 'src/formats/jpeg/_jpeg_scan.dart';
-part 'src/formats/formats.dart';
-part 'src/formats/jpeg_decoder.dart';
-part 'src/formats/jpeg_encoder.dart';
-part 'src/formats/png_decoder.dart';
-part 'src/formats/png_encoder.dart';
-part 'src/formats/tga_decoder.dart';
-part 'src/formats/tga_encoder.dart';
-
 part 'src/draw/draw_char.dart';
 part 'src/draw/draw_circle.dart';
 part 'src/draw/draw_line.dart';
@@ -56,6 +41,21 @@ part 'src/filter/smooth.dart';
 part 'src/fonts/arial_14.dart';
 part 'src/fonts/arial_24.dart';
 part 'src/fonts/arial_48.dart';
+
+part 'src/formats/jpeg/_jpeg.dart';
+part 'src/formats/jpeg/_jpeg_adobe.dart';
+part 'src/formats/jpeg/_jpeg_component.dart';
+part 'src/formats/jpeg/_jpeg_data.dart';
+part 'src/formats/jpeg/_jpeg_frame.dart';
+part 'src/formats/jpeg/_jpeg_jfif.dart';
+part 'src/formats/jpeg/_jpeg_scan.dart';
+part 'src/formats/formats.dart';
+part 'src/formats/jpeg_decoder.dart';
+part 'src/formats/jpeg_encoder.dart';
+part 'src/formats/png_decoder.dart';
+part 'src/formats/png_encoder.dart';
+part 'src/formats/tga_decoder.dart';
+part 'src/formats/tga_encoder.dart';
 
 part 'src/transform/copy_into.dart';
 part 'src/transform/copy_crop.dart';
