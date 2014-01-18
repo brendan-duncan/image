@@ -1,19 +1,108 @@
 part of image;
 
 class WebPDecoder {
-  WebPFeatures getInfo(List<int> bytes) {
+  /**
+   * Validate the file is a WebP image and get information about it.
+   * If the file is not a valid WebP image, null is returned.
+   */
+  WebPData getInfo(List<int> bytes) {
+    // WebP is stored in little-endian byte order.
     Arc.InputBuffer input = new Arc.InputBuffer(bytes);
 
-    WebPFeatures features = new WebPFeatures();
-
-    if (!_getInfo(input, features)) {
+    WebPData data = new WebPData();
+    if (!_getInfo(input, data)) {
       return null;
     }
 
-    return features;
+    return data;
   }
 
-  bool _getInfo(Arc.InputBuffer input, WebPFeatures features) {
+  /**
+   * Decode a WebP formatted file stored in [bytes] into an Image.
+   * If it's not a valid webp file, null is returned.
+   * If the webp file stores animated frames, only the first image will
+   * be returned.  Use [decodeAnimation] to decode the full animation.
+   */
+  Image decodeImage(List<int> bytes) {
+    // WebP is stored in little-endian byte order.
+    Arc.InputBuffer input = new Arc.InputBuffer(bytes);
+
+    WebPData data = new WebPData();
+    if (!_getInfo(input, data)) {
+      return null;
+    }
+
+    if (data._animPositions.isNotEmpty) {
+      for (int i = 0, len = data._animPositions.length; i < len; ++i) {
+        input.position = data._animPositions[i];
+        Image image = new Image(data.width, data.height);
+        _decodeAnimFrame(input, data, image);
+        return image;
+      }
+    } else {
+      input.position = data._vp8Position;
+      if (data.format == WebP.FORMAT_LOSSLESS) {
+        Image image = new Image(data.width, data.height);
+        _decodeVp8l(input, data, image);
+        return image;
+      } else if (data.format == WebP.FORMAT_LOSSY) {
+        Image image = new Image(data.width, data.height);
+        _decodeVp8(input, data, image);
+        return image;
+      }
+    }
+
+    return null;
+  }
+
+  Animation decodeAnimation(List<int> bytes) {
+    // WebP is stored in little-endian byte order.
+    Arc.InputBuffer input = new Arc.InputBuffer(bytes);
+
+    WebPData data = new WebPData();
+    if (!_getInfo(input, data)) {
+      return null;
+    }
+
+    Animation anim = new Animation();
+    anim.loopCount = data.animLoopCount;
+
+    if (data._animPositions.isNotEmpty) {
+      for (int i = 0, len = data._animPositions.length; i < len; ++i) {
+        input.position = data._animPositions[i];
+        Image image = new Image(data.width, data.height);
+        _decodeAnimFrame(input, data, image);
+        anim.frames.add(image);
+      }
+    } else {
+      input.position = data._vp8Position;
+      if (data.format == WebP.FORMAT_LOSSLESS) {
+        Image image = new Image(data.width, data.height);
+        _decodeVp8l(input, data, image);
+        anim.frames.add(image);
+      } else if (data.format == WebP.FORMAT_LOSSY) {
+        Image image = new Image(data.width, data.height);
+        _decodeVp8(input, data, image);
+        anim.frames.add(image);
+      }
+    }
+
+    return anim;
+  }
+
+  void _decodeAnimFrame(Arc.InputBuffer input, WebPData data, Image image) {
+
+  }
+
+  void _decodeVp8l(Arc.InputBuffer input, WebPData data, Image image) {
+
+  }
+
+  void _decodeVp8(Arc.InputBuffer input, WebPData data, Image image) {
+
+  }
+
+  bool _getInfo(Arc.InputBuffer input, WebPData data) {
     // Validate the webp format header
     String tag = input.readString(4);
     if (tag != 'RIFF') {
@@ -37,35 +126,66 @@ class WebPDecoder {
 
       switch (tag) {
         case 'VP8X':
-          if (!_getVp8xInfo(input, features)) {
+          if (!_getVp8xInfo(input, data)) {
             return false;
           }
           break;
         case 'VP8 ':
-          if (!_getVp8Info(input, features)) {
+          data._vp8Position = input.position;
+          data._vp8Size = size;
+          if (!_getVp8Info(input, data)) {
             return false;
           }
           found = true;
           break;
         case 'VP8L':
-          if (!_getVp8lInfo(input, features)) {
+          data._vp8Position = input.position;
+          data._vp8Size = size;
+          if (!_getVp8lInfo(input, data)) {
             return false;
           }
           found = true;
           break;
+        case 'ALPH':
+          data._alphaPosition = input.position;
+          data._alphaSize = size;
+          input.skip(diskSize);
+          break;
+        case 'ANIM':
+          if (!_getAnimInfo(input, data)) {
+            return false;
+          }
+          break;
+        case 'ANIMF':
+          data._animPositions.add(input.position);
+          data._animSizes.add(size);
+          input.skip(diskSize);
+          break;
+        case 'ICCP':
+          data.iccp = input.readString(size);
+          break;
+        case 'EXIF':
+          data.exif = input.readString(size);
+          break;
+        case 'XMP ':
+          data.xmp = input.readString(size);
+          break;
         default:
+          print('UNKNOWN WEBP TAG: $tag');
           input.skip(diskSize);
           break;
       }
 
       int remainder = diskSize - (input.position - p);
-      input.skip(remainder);
+      if (remainder > 0) {
+        input.skip(remainder);
+      }
     }
 
-    return features.format != 0;
+    return data.format != 0;
   }
 
-  bool _getVp8xInfo(Arc.InputBuffer input, WebPFeatures features) {
+  bool _getVp8xInfo(Arc.InputBuffer input, WebPData data) {
     if (input.readBits(2) != 0) {
       return false;
     }
@@ -83,22 +203,28 @@ class WebPDecoder {
     int w = input.readUint24() + 1;
     int h = input.readUint24() + 1;
 
-    features.width = w;
-    features.height = h;
-    features.hasAnimation = a != 0;
-    features.hasAlpha = alpha != 0;
+    data.width = w;
+    data.height = h;
+    data.hasAnimation = a != 0;
+    data.hasAlpha = alpha != 0;
 
     return true;
   }
 
-  bool _getVp8Info(Arc.InputBuffer input, WebPFeatures features) {
-    features.format = 1;
+  bool _getAnimInfo(Arc.InputBuffer input, WebPData data) {
+    data.animBackgroundColor = input.readUint32();
+    data.animLoopCount = input.readUint16();
+    return true;
+  }
+
+  bool _getVp8Info(Arc.InputBuffer input, WebPData data) {
+    data.format = WebP.FORMAT_LOSSY;
     // Check the signature
     //int signature = input.readUint24();
     return true;
   }
 
-  bool _getVp8lInfo(Arc.InputBuffer input, WebPFeatures features) {
+  bool _getVp8lInfo(Arc.InputBuffer input, WebPData data) {
     int signature = input.readByte();
     if (signature != WebP.VP8L_MAGIC_BYTE) {
       return false;
@@ -106,10 +232,10 @@ class WebPDecoder {
 
     int w = input.readUint32();
 
-    features.format = 2;
-    features.width = (w & 0x3FFF) + 1;
-    features.height = ((w >> 14) & 0x3FFF) + 1;
-    features.hasAlpha = ((w >> 28) & 0x1) != 0;
+    data.format = WebP.FORMAT_LOSSLESS;
+    data.width = (w & 0x3FFF) + 1;
+    data.height = ((w >> 14) & 0x3FFF) + 1;
+    data.hasAlpha = ((w >> 28) & 0x1) != 0;
     int version = ((w >> 29) & 0x3);
     if (version != 0) {
       return false;

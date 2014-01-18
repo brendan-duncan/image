@@ -72,6 +72,7 @@ part 'src/util/interpolation.dart';
 part 'src/util/min_max.dart';
 part 'src/util/random.dart';
 
+part 'src/animation.dart';
 part 'src/bitmap_font.dart';
 part 'src/color.dart';
 part 'src/image.dart';

@@ -16,18 +16,18 @@ void defineWebPTests() {
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
 
-        WebPFeatures features = new WebPDecoder().getInfo(bytes);
-        if (features == null) {
+        WebPData data = new WebPDecoder().getInfo(bytes);
+        if (data == null) {
           throw new ImageException('Unable to parse WebP info.');
         }
 
         print('$name');
-        print('    format: ${features.format}');
-        print('    width: ${features.width}');
-        print('    height: ${features.height}');
-        print('    format: ${features.format}');
-        print('    hasAlpha: ${features.hasAlpha}');
-        print('    hasAnimation: ${features.hasAnimation}');
+        print('    format: ${data.format}');
+        print('    width: ${data.width}');
+        print('    height: ${data.height}');
+        print('    format: ${data.format}');
+        print('    hasAlpha: ${data.hasAlpha}');
+        print('    hasAnimation: ${data.hasAnimation}');
       });
     }
   });
