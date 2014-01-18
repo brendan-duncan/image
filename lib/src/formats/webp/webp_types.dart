@@ -12,7 +12,7 @@ class WebPFeatures {
   /// True if the bitstream contains an alpha channel.
   bool hasAlpha = false;
   /// True if the bitstream is an animation.
-  bool hasAanimation = false;
+  bool hasAnimation = false;
   /// 0 = undefined (/mixed), 1 = lossy, 2 = lossless
   int format = 0;
 }

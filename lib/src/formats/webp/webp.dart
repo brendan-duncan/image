@@ -6,19 +6,6 @@ class WebP {
   static const int FORMAT_LOSSY = 1;
   static const int FORMAT_LOSSLESS = 2;
 
-  // enum VP8StatusCode
-  static const int VP8_STATUS_OK = 0;
-  static const int VP8_STATUS_OUT_OF_MEMORY = 1;
-  static const int VP8_STATUS_INVALID_PARAM = 2;
-  static const int VP8_STATUS_BITSTREAM_ERROR = 3;
-  static const int VP8_STATUS_UNSUPPORTED_FEATURE = 4;
-  static const int VP8_STATUS_SUSPENDED = 5;
-  static const int VP8_STATUS_USER_ABORT = 6;
-  static const int VP8_STATUS_NOT_ENOUGH_DATA = 7;
-
-  // Create fourcc of the chunk from the chunk tag characters.
-  int MKFOURCC(a, b, c, d) => ((a) | (b) << 8 | (c) << 16 | (d) << 24);
-
   // VP8 related static constants.
   static const int VP8_SIGNATURE = 0x9d012a; // Signature in VP8 data.
   // max size of mode partition
@@ -105,14 +92,4 @@ class WebP {
   // Maximum chunk payload is such that adding the header and padding won't
   // overflow a uint32.
   static const int MAX_CHUNK_PAYLOAD = 0xfffffff6;
-
-
-  // VP8X Feature Flags.
-  // enum WebPFeatureFlags
-  static const int FRAGMENTS_FLAG  = 0x00000001;
-  static const int ANIMATION_FLAG  = 0x00000002;
-  static const int XMP_FLAG = 0x00000004;
-  static const int EXIF_FLAG = 0x00000008;
-  static const int ALPHA_FLAG = 0x00000010;
-  static const int ICCP_FLAG = 0x00000020;
 }
