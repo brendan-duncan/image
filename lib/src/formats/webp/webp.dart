@@ -1,10 +1,25 @@
-library webp;
+part of image;
 
 class WebP {
-  // Create fourcc of the chunk from the chunk tag characters.
-  static int MKFOURCC(a, b, c, d) => ((a) | (b) << 8 | (c) << 16 | (d) << 24);
+  // enum Format
+  static const int FORMAT_UNDEFINED = 0;
+  static const int FORMAT_LOSSY = 1;
+  static const int FORMAT_LOSSLESS = 2;
 
-  // VP8 related constants.
+  // enum VP8StatusCode
+  static const int VP8_STATUS_OK = 0;
+  static const int VP8_STATUS_OUT_OF_MEMORY = 1;
+  static const int VP8_STATUS_INVALID_PARAM = 2;
+  static const int VP8_STATUS_BITSTREAM_ERROR = 3;
+  static const int VP8_STATUS_UNSUPPORTED_FEATURE = 4;
+  static const int VP8_STATUS_SUSPENDED = 5;
+  static const int VP8_STATUS_USER_ABORT = 6;
+  static const int VP8_STATUS_NOT_ENOUGH_DATA = 7;
+
+  // Create fourcc of the chunk from the chunk tag characters.
+  int MKFOURCC(a, b, c, d) => ((a) | (b) << 8 | (c) << 16 | (d) << 24);
+
+  // VP8 related static constants.
   static const int VP8_SIGNATURE = 0x9d012a; // Signature in VP8 data.
   // max size of mode partition
   static const int VP8_MAX_PARTITION0_SIZE = (1 << 19);
@@ -13,7 +28,7 @@ class WebP {
   // Size of the frame header within VP8 data.
   static const int VP8_FRAME_HEADER_SIZE = 10;
 
-  // VP8L related constants.
+  // VP8L related static constants.
   static const int VP8L_SIGNATURE_SIZE = 1; // VP8L signature size.
   static const int VP8L_MAGIC_BYTE = 0x2f;   // VP8L signature byte.
   // Number of bits used to store width and height.
@@ -52,13 +67,13 @@ class WebP {
   static const int SUBTRACT_GREEN = 2;
   static const int COLOR_INDEXING_TRANSFORM = 3;
 
-  // Alpha related constants.
+  // Alpha related static constants.
   static const int ALPHA_HEADER_LEN = 1;
   static const int ALPHA_NO_COMPRESSION = 0;
   static const int ALPHA_LOSSLESS_COMPRESSION = 1;
   static const int ALPHA_PREPROCESSED_LEVELS = 1;
 
-  // Mux related constants.
+  // Mux related static constants.
   // Size of a chunk tag (e.g. "VP8L").
   static const int TAG_SIZE = 4;
   // Size needed to store chunk's size.
@@ -90,4 +105,14 @@ class WebP {
   // Maximum chunk payload is such that adding the header and padding won't
   // overflow a uint32.
   static const int MAX_CHUNK_PAYLOAD = 0xfffffff6;
+
+
+  // VP8X Feature Flags.
+  // enum WebPFeatureFlags
+  static const int FRAGMENTS_FLAG  = 0x00000001;
+  static const int ANIMATION_FLAG  = 0x00000002;
+  static const int XMP_FLAG = 0x00000004;
+  static const int EXIF_FLAG = 0x00000008;
+  static const int ALPHA_FLAG = 0x00000010;
+  static const int ICCP_FLAG = 0x00000020;
 }

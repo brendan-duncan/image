@@ -5,7 +5,7 @@ homepage: https://github.com/brendan-duncan/image
 description: Provides server and web apps the ability to load, manipulate, and save images with various image file formats including PNG and JPG.
 documentation: https://github.com/brendan-duncan/image/wiki
 dependencies:
-  archive: '>=1.0.6'
+  archive: '>=1.0.9'
   xml: any
 dev_dependencies:
   unittest: any

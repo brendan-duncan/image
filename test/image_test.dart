@@ -8,13 +8,15 @@ part 'font_test.dart';
 part 'jpeg_test.dart';
 part 'png_test.dart';
 part 'tga_test.dart';
+part 'webp_test.dart';
 
 void main() {
-  defineTgaTests();
-  defineJpegTests();
-  definePngTests();
-  defineFontTests();
-  defineImageTests();
+  //defineTgaTests();
+  //defineJpegTests();
+  //definePngTests();
+  defineWebPTests();
+  //defineFontTests();
+  //defineImageTests();
 }
 
 
