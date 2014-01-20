@@ -33,7 +33,7 @@ class JpegEncoder {
   }
 
   List<int> encode(Image image) {
-    Arc.OutputBuffer fp = new Arc.OutputBuffer(byteOrder: Arc.BIG_ENDIAN);
+    Arc.OutputStream fp = new Arc.OutputStream(byteOrder: Arc.BIG_ENDIAN);
 
     // Add JPEG headers
     _writeMarker(fp, _Jpeg.M_SOI);
@@ -116,7 +116,7 @@ class JpegEncoder {
     return fp.getBytes();
   }
 
-  void _writeMarker(Arc.OutputBuffer fp, int marker) {
+  void _writeMarker(Arc.OutputStream fp, int marker) {
     fp.writeByte(0xff);
     fp.writeByte(marker & 0xff);
   }
@@ -451,7 +451,7 @@ class JpegEncoder {
     return outputfDCTQuant;
   }
 
-  void _writeAPP0(Arc.OutputBuffer out) {
+  void _writeAPP0(Arc.OutputStream out) {
     _writeMarker(out, _Jpeg.M_APP0);
     out.writeUint16(16); // length
     out.writeByte(0x4A); // J
@@ -468,7 +468,7 @@ class JpegEncoder {
     out.writeByte(0); // thumbnheight
   }
 
-  void _writeSOF0(Arc.OutputBuffer out, int width, int height) {
+  void _writeSOF0(Arc.OutputStream out, int width, int height) {
     _writeMarker(out, _Jpeg.M_SOF0);
     out.writeUint16(17);   // length, truecolor YUV JPG
     out.writeByte(8);    // precision
@@ -486,7 +486,7 @@ class JpegEncoder {
     out.writeByte(1);    // QTV
   }
 
-  void _writeDQT(Arc.OutputBuffer out) {
+  void _writeDQT(Arc.OutputStream out) {
     _writeMarker(out, _Jpeg.M_DQT);
     out.writeUint16(132); // length
     out.writeByte(0);
@@ -499,7 +499,7 @@ class JpegEncoder {
     }
   }
 
-  void _writeDHT(Arc.OutputBuffer out) {
+  void _writeDHT(Arc.OutputStream out) {
     _writeMarker(out, _Jpeg.M_DHT);
     out.writeUint16(0x01A2); // length
 
@@ -536,7 +536,7 @@ class JpegEncoder {
     }
   }
 
-  _writeSOS(Arc.OutputBuffer out) {
+  _writeSOS(Arc.OutputStream out) {
     _writeMarker(out, _Jpeg.M_SOS);
     out.writeUint16(12); // length
     out.writeByte(3); // nrofcomponents
@@ -551,7 +551,7 @@ class JpegEncoder {
     out.writeByte(0); // Bf
   }
 
-  int _processDU(Arc.OutputBuffer out, List<double> CDU, List<double> fdtbl,
+  int _processDU(Arc.OutputStream out, List<double> CDU, List<double> fdtbl,
                  int DC, HTDC, HTAC) {
     List EOB = HTAC[0x00];
     List M16zeroes = HTAC[0xF0];
@@ -613,7 +613,7 @@ class JpegEncoder {
     return DC;
   }
 
-  void _writeBits(Arc.OutputBuffer out, List<int> bits) {
+  void _writeBits(Arc.OutputStream out, List<int> bits) {
     int value = bits[0];
     int posval = bits[1] - 1;
     while (posval >= 0) {

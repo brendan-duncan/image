@@ -11,7 +11,7 @@ class PngDecoder {
   double gamma;
 
   Image decode(List<int> data) {
-    Arc.InputBuffer input = new Arc.InputBuffer(data,
+    Arc.InputStream input = new Arc.InputStream(data,
         byteOrder: Arc.BIG_ENDIAN);
 
     List<int> imageData = [];
@@ -70,7 +70,7 @@ class PngDecoder {
       String chunkType = new String.fromCharCodes(input.readBytes(4));
       switch (chunkType) {
         case 'IHDR':
-          Arc.InputBuffer hdr = new Arc.InputBuffer(input.readBytes(chunkSize),
+          Arc.InputStream hdr = new Arc.InputStream(input.readBytes(chunkSize),
                                                     byteOrder: Arc.BIG_ENDIAN);
           header = new _PngHeader();
           header.width = hdr.readUint32();
@@ -184,7 +184,7 @@ class PngDecoder {
         break;
       }
 
-      if (input.isEOF) {
+      if (input.isEOS) {
         throw new ImageException('Incomplete or corrupt PNG file');
       }
     }
@@ -206,7 +206,7 @@ class PngDecoder {
     List<int> uncompressed = new Arc.ZLibDecoder().decodeBytes(imageData);
 
     // input is the decompressed data.
-    input = new Arc.InputBuffer(uncompressed, byteOrder: Arc.BIG_ENDIAN);
+    input = new Arc.InputStream(uncompressed, byteOrder: Arc.BIG_ENDIAN);
 
     // Set up a LUT to transform colors for gamma correction.
     colorLut = new List<int>(256);
@@ -245,7 +245,7 @@ class PngDecoder {
   /**
    * Process a pass of an interlaced image.
    */
-  void _processPass(Arc.InputBuffer input, Image image,
+  void _processPass(Arc.InputStream input, Image image,
                     int xOffset, int yOffset, int xStep, int yStep,
                     int passWidth, int passHeight) {
     final int channels = (header.colorType == GRAYSCALE_ALPHA) ? 2 :
@@ -278,7 +278,7 @@ class PngDecoder {
       // reset the bit stream counter.
       _resetBits();
 
-      Arc.InputBuffer rowInput = new Arc.InputBuffer(row,
+      Arc.InputStream rowInput = new Arc.InputStream(row,
           byteOrder: Arc.BIG_ENDIAN);
 
       final int blockHeight = xStep;
@@ -305,7 +305,7 @@ class PngDecoder {
     }
   }
 
-  void _process(Arc.InputBuffer input, Image image) {
+  void _process(Arc.InputStream input, Image image) {
     final int channels = (header.colorType == GRAYSCALE_ALPHA) ? 2 :
       (header.colorType == RGB) ? 3 :
         (header.colorType == RGBA) ? 4 : 1;
@@ -338,7 +338,7 @@ class PngDecoder {
       // reset the bit stream counter.
       _resetBits();
 
-      Arc.InputBuffer rowInput = new Arc.InputBuffer(inData[ri],
+      Arc.InputStream rowInput = new Arc.InputStream(inData[ri],
                                                      byteOrder: Arc.BIG_ENDIAN);
 
       for (int x = 0; x < w; ++x) {
@@ -435,7 +435,7 @@ class PngDecoder {
   /**
    * Read a number of bits from the input stream.
    */
-  int _readBits(Arc.InputBuffer input, int numBits) {
+  int _readBits(Arc.InputStream input, int numBits) {
     if (numBits == 0) {
       return 0;
     }
@@ -450,7 +450,7 @@ class PngDecoder {
 
     // not enough buffer
     while (_bitBufferLen < numBits) {
-      if (input.isEOF) {
+      if (input.isEOS) {
         throw new ImageException('Invalid PNG data.');
       }
 
@@ -479,7 +479,7 @@ class PngDecoder {
   /**
    * Read the next pixel from the input stream.
    */
-  void _readPixel(Arc.InputBuffer input, List<int> pixel) {
+  void _readPixel(Arc.InputStream input, List<int> pixel) {
     switch (header.colorType) {
       case GRAYSCALE:
         pixel[0] = _readBits(input, header.bits);

@@ -2,7 +2,7 @@ part of image;
 
 
 class _JpegScan {
-  Arc.InputBuffer fp;
+  Arc.InputStream fp;
   _JpegFrame frame;
   int precision;
   int samplesPerLine;

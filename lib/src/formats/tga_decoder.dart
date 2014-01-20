@@ -5,7 +5,7 @@ part of image;
  */
 class TgaDecoder {
   Image decode(List<int> data) {
-    Arc.InputBuffer input = new Arc.InputBuffer(data,
+    Arc.InputStream input = new Arc.InputStream(data,
         byteOrder: Arc.BIG_ENDIAN);
 
     List<int> header = input.readBytes(18);

@@ -7,7 +7,7 @@ class WebPDecoder {
    */
   WebPData getInfo(List<int> bytes) {
     // WebP is stored in little-endian byte order.
-    Arc.InputBuffer input = new Arc.InputBuffer(bytes);
+    Arc.InputStream input = new Arc.InputStream(bytes);
 
     WebPData data = new WebPData();
     if (!_getInfo(input, data)) {
@@ -25,7 +25,7 @@ class WebPDecoder {
    */
   Image decodeImage(List<int> bytes) {
     // WebP is stored in little-endian byte order.
-    Arc.InputBuffer input = new Arc.InputBuffer(bytes);
+    Arc.InputStream input = new Arc.InputStream(bytes);
 
     WebPData data = new WebPData();
     if (!_getInfo(input, data)) {
@@ -35,20 +35,14 @@ class WebPDecoder {
     if (data._animPositions.isNotEmpty) {
       for (int i = 0, len = data._animPositions.length; i < len; ++i) {
         input.position = data._animPositions[i];
-        Image image = new Image(data.width, data.height);
-        _decodeAnimFrame(input, data, image);
-        return image;
+        return new WebPFrame().decode(input, data);
       }
     } else {
       input.position = data._vp8Position;
       if (data.format == WebP.FORMAT_LOSSLESS) {
-        Image image = new Image(data.width, data.height);
-        _decodeVp8l(input, data, image);
-        return image;
+        return new Vp8l(input, data).decode();
       } else if (data.format == WebP.FORMAT_LOSSY) {
-        Image image = new Image(data.width, data.height);
-        _decodeVp8(input, data, image);
-        return image;
+        return new Vp8().decode(input, data);
       }
     }
 
@@ -57,7 +51,7 @@ class WebPDecoder {
 
   Animation decodeAnimation(List<int> bytes) {
     // WebP is stored in little-endian byte order.
-    Arc.InputBuffer input = new Arc.InputBuffer(bytes);
+    Arc.InputStream input = new Arc.InputStream(bytes);
 
     WebPData data = new WebPData();
     if (!_getInfo(input, data)) {
@@ -70,39 +64,24 @@ class WebPDecoder {
     if (data._animPositions.isNotEmpty) {
       for (int i = 0, len = data._animPositions.length; i < len; ++i) {
         input.position = data._animPositions[i];
-        Image image = new Image(data.width, data.height);
-        _decodeAnimFrame(input, data, image);
-        anim.frames.add(image);
+        Image image = new WebPFrame().decode(input, data);
+        anim.addFrame(image);
       }
     } else {
       input.position = data._vp8Position;
       if (data.format == WebP.FORMAT_LOSSLESS) {
-        Image image = new Image(data.width, data.height);
-        _decodeVp8l(input, data, image);
-        anim.frames.add(image);
+        Image image = new Vp8l(input, data).decode();
+        anim.addFrame(image);
       } else if (data.format == WebP.FORMAT_LOSSY) {
-        Image image = new Image(data.width, data.height);
-        _decodeVp8(input, data, image);
-        anim.frames.add(image);
+        Image image = new Vp8().decode(input, data);
+        anim.addFrame(image);
       }
     }
 
     return anim;
   }
 
-  void _decodeAnimFrame(Arc.InputBuffer input, WebPData data, Image image) {
-
-  }
-
-  void _decodeVp8l(Arc.InputBuffer input, WebPData data, Image image) {
-
-  }
-
-  void _decodeVp8(Arc.InputBuffer input, WebPData data, Image image) {
-
-  }
-
-  bool _getInfo(Arc.InputBuffer input, WebPData data) {
+  bool _getInfo(Arc.InputStream input, WebPData data) {
     // Validate the webp format header
     String tag = input.readString(4);
     if (tag != 'RIFF') {
@@ -117,7 +96,7 @@ class WebPDecoder {
     }
 
     bool found = false;
-    while (!input.isEOF && !found) {
+    while (!input.isEOS && !found) {
       tag = input.readString(4);
       int size = input.readUint32();
       // For odd sized chunks, there's a 1 byte padding at the end.
@@ -185,7 +164,7 @@ class WebPDecoder {
     return data.format != 0;
   }
 
-  bool _getVp8xInfo(Arc.InputBuffer input, WebPData data) {
+  bool _getVp8xInfo(Arc.InputStream input, WebPData data) {
     if (input.readBits(2) != 0) {
       return false;
     }
@@ -211,20 +190,20 @@ class WebPDecoder {
     return true;
   }
 
-  bool _getAnimInfo(Arc.InputBuffer input, WebPData data) {
+  bool _getAnimInfo(Arc.InputStream input, WebPData data) {
     data.animBackgroundColor = input.readUint32();
     data.animLoopCount = input.readUint16();
     return true;
   }
 
-  bool _getVp8Info(Arc.InputBuffer input, WebPData data) {
+  bool _getVp8Info(Arc.InputStream input, WebPData data) {
     data.format = WebP.FORMAT_LOSSY;
     // Check the signature
     //int signature = input.readUint24();
     return true;
   }
 
-  bool _getVp8lInfo(Arc.InputBuffer input, WebPData data) {
+  bool _getVp8lInfo(Arc.InputStream input, WebPData data) {
     int signature = input.readByte();
     if (signature != WebP.VP8L_MAGIC_BYTE) {
       return false;
