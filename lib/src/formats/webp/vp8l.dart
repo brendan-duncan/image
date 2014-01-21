@@ -53,12 +53,12 @@ class Vp8l {
     _pixels = new Data.Uint32List(totalNumPixels);
     _argbCache = numPixels + cacheTopPixels;
 
+    image = new Image(webp.width, webp.height);
+
     if (!_decodeImageData(_pixels, webp.width, webp.height,
                           webp.height, _processRows)) {
       return null;
     }
-
-    image = new Image(webp.width, webp.height);
 
     return image;
   }
@@ -315,7 +315,7 @@ class Vp8l {
    * last call.
    */
   void _processRows(int row) {
-    final int rows = webp.width * _lastRow; // offset into _pixels
+    int rows = webp.width * _lastRow; // offset into _pixels
     final int numRows = row - _lastRow;
 
     if (numRows <= 0) {
@@ -323,6 +323,16 @@ class Vp8l {
     }
 
     _applyInverseTransforms(numRows, rows);
+
+    for (int y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
+      for (int x = 0; x < webp.width; ++x, ++pi) {
+        int c = _pixels[pi];
+        image.setPixel(x, dy, getColor(getGreen(c),
+                                       getBlue(c),
+                                       getAlpha(c),
+                                       getRed(c)));
+      }
+    }
 
     // Emit output.
     /*{
