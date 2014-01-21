@@ -15,18 +15,6 @@ class WebP {
   // Size of the frame header within VP8 data.
   static const int VP8_FRAME_HEADER_SIZE = 10;
 
-  // VP8L related static constants.
-  static const int VP8L_SIGNATURE_SIZE = 1; // VP8L signature size.
-  static const int VP8L_MAGIC_BYTE = 0x2f;   // VP8L signature byte.
-  // Number of bits used to store width and height.
-  static const int VP8L_IMAGE_SIZE_BITS = 14;
-
-  // 3 bits reserved for version.
-  static const int VP8L_VERSION_BITS = 3;
-  static const int VP8L_VERSION = 0; // version 0
-  // Size of the VP8L frame header.
-  static const int VP8L_FRAME_HEADER_SIZE = 5;
-
   static const int MAX_PALETTE_SIZE = 256;
   static const int MAX_CACHE_BITS = 11;
   static const int HUFFMAN_CODES_PER_META_CODE = 5;

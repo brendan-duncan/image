@@ -9,12 +9,29 @@ class WebPDecoder {
     // WebP is stored in little-endian byte order.
     Arc.InputStream input = new Arc.InputStream(bytes);
 
-    WebPData data = new WebPData();
-    if (!_getInfo(input, data)) {
+    WebPData webp = new WebPData();
+    if (!_getInfo(input, webp)) {
       return null;
     }
 
-    return data;
+    switch (webp.format) {
+      case WebP.FORMAT_LOSSLESS:
+        input.position = webp._vp8Position;
+        Vp8l vp8l = new Vp8l(input, webp);
+        if (!vp8l.decodeHeader()) {
+          return null;
+        }
+        return webp;
+      case WebP.FORMAT_LOSSY:
+        input.position = webp._vp8Position;
+        Vp8 vp8 = new Vp8(input, webp);
+        if (!vp8.decodeHeader()) {
+          return null;
+        }
+        return webp;
+    }
+
+    return null;
   }
 
   /**
@@ -27,22 +44,26 @@ class WebPDecoder {
     // WebP is stored in little-endian byte order.
     Arc.InputStream input = new Arc.InputStream(bytes);
 
-    WebPData data = new WebPData();
-    if (!_getInfo(input, data)) {
+    WebPData webp = new WebPData();
+    if (!_getInfo(input, webp)) {
       return null;
     }
 
-    if (data._animPositions.isNotEmpty) {
-      for (int i = 0, len = data._animPositions.length; i < len; ++i) {
-        input.position = data._animPositions[i];
-        return new WebPFrame().decode(input, data);
+    if (webp.format == 0) {
+      return null;
+    }
+
+    if (webp._animPositions.isNotEmpty) {
+      for (int i = 0, len = webp._animPositions.length; i < len; ++i) {
+        input.position = webp._animPositions[i];
+        return new WebPFrame(input, webp).decode();
       }
     } else {
-      input.position = data._vp8Position;
-      if (data.format == WebP.FORMAT_LOSSLESS) {
-        return new Vp8l(input, data).decode();
-      } else if (data.format == WebP.FORMAT_LOSSY) {
-        return new Vp8().decode(input, data);
+      input.position = webp._vp8Position;
+      if (webp.format == WebP.FORMAT_LOSSLESS) {
+        return new Vp8l(input, webp).decode();
+      } else if (webp.format == WebP.FORMAT_LOSSY) {
+        return new Vp8(input, webp).decode();
       }
     }
 
@@ -64,7 +85,7 @@ class WebPDecoder {
     if (data._animPositions.isNotEmpty) {
       for (int i = 0, len = data._animPositions.length; i < len; ++i) {
         input.position = data._animPositions[i];
-        Image image = new WebPFrame().decode(input, data);
+        Image image = new WebPFrame(input, data).decode();
         anim.addFrame(image);
       }
     } else {
@@ -73,7 +94,7 @@ class WebPDecoder {
         Image image = new Vp8l(input, data).decode();
         anim.addFrame(image);
       } else if (data.format == WebP.FORMAT_LOSSY) {
-        Image image = new Vp8().decode(input, data);
+        Image image = new Vp8(input, data).decode();
         anim.addFrame(image);
       }
     }
@@ -81,7 +102,7 @@ class WebPDecoder {
     return anim;
   }
 
-  bool _getInfo(Arc.InputStream input, WebPData data) {
+  bool _getInfo(Arc.InputStream input, WebPData webp) {
     // Validate the webp format header
     String tag = input.readString(4);
     if (tag != 'RIFF') {
@@ -105,49 +126,45 @@ class WebPDecoder {
 
       switch (tag) {
         case 'VP8X':
-          if (!_getVp8xInfo(input, data)) {
+          if (!_getVp8xInfo(input, webp)) {
             return false;
           }
           break;
         case 'VP8 ':
-          data._vp8Position = input.position;
-          data._vp8Size = size;
-          if (!_getVp8Info(input, data)) {
-            return false;
-          }
+          webp._vp8Position = input.position;
+          webp._vp8Size = size;
+          webp.format = WebP.FORMAT_LOSSY;
           found = true;
           break;
         case 'VP8L':
-          data._vp8Position = input.position;
-          data._vp8Size = size;
-          if (!_getVp8lInfo(input, data)) {
-            return false;
-          }
+          webp._vp8Position = input.position;
+          webp._vp8Size = size;
+          webp.format = WebP.FORMAT_LOSSLESS;
           found = true;
           break;
         case 'ALPH':
-          data._alphaPosition = input.position;
-          data._alphaSize = size;
+          webp._alphaPosition = input.position;
+          webp._alphaSize = size;
           input.skip(diskSize);
           break;
         case 'ANIM':
-          if (!_getAnimInfo(input, data)) {
+          if (!_getAnimInfo(input, webp)) {
             return false;
           }
           break;
         case 'ANIMF':
-          data._animPositions.add(input.position);
-          data._animSizes.add(size);
+          webp._animPositions.add(input.position);
+          webp._animSizes.add(size);
           input.skip(diskSize);
           break;
         case 'ICCP':
-          data.iccp = input.readString(size);
+          webp.iccp = input.readString(size);
           break;
         case 'EXIF':
-          data.exif = input.readString(size);
+          webp.exif = input.readString(size);
           break;
         case 'XMP ':
-          data.xmp = input.readString(size);
+          webp.xmp = input.readString(size);
           break;
         default:
           print('UNKNOWN WEBP TAG: $tag');
@@ -161,7 +178,7 @@ class WebPDecoder {
       }
     }
 
-    return data.format != 0;
+    return webp.format != 0;
   }
 
   bool _getVp8xInfo(Arc.InputStream input, WebPData data) {
@@ -193,33 +210,6 @@ class WebPDecoder {
   bool _getAnimInfo(Arc.InputStream input, WebPData data) {
     data.animBackgroundColor = input.readUint32();
     data.animLoopCount = input.readUint16();
-    return true;
-  }
-
-  bool _getVp8Info(Arc.InputStream input, WebPData data) {
-    data.format = WebP.FORMAT_LOSSY;
-    // Check the signature
-    //int signature = input.readUint24();
-    return true;
-  }
-
-  bool _getVp8lInfo(Arc.InputStream input, WebPData data) {
-    int signature = input.readByte();
-    if (signature != WebP.VP8L_MAGIC_BYTE) {
-      return false;
-    }
-
-    int w = input.readUint32();
-
-    data.format = WebP.FORMAT_LOSSLESS;
-    data.width = (w & 0x3FFF) + 1;
-    data.height = ((w >> 14) & 0x3FFF) + 1;
-    data.hasAlpha = ((w >> 28) & 0x1) != 0;
-    int version = ((w >> 29) & 0x3);
-    if (version != 0) {
-      return false;
-    }
-
     return true;
   }
 }

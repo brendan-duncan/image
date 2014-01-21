@@ -36,6 +36,16 @@ void defineWebPTests() {
     Io.File script = new Io.File(Io.Platform.script.toFilePath());
     String path = script.parent.path + '/res/webp';
 
+    /*test('lossless', () {
+      List<int> bytes = new Io.File(path + '/1_webp_ll.webp').readAsBytesSync();
+      Image image = new WebPDecoder().decodeImage(bytes);
+
+      List<int> png = new PngEncoder().encode(image);
+      new Io.File('out/webp/1_webp_ll.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(png);
+    });*/
+
     Io.Directory dir = new Io.Directory(path);
     List files = dir.listSync();
     for (var f in files) {
@@ -46,7 +56,6 @@ void defineWebPTests() {
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
-
         Image image = new WebPDecoder().decodeImage(bytes);
         if (image == null) {
           throw new ImageException('Unable to decode WebP Image: $name.');

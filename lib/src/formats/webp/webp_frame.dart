@@ -4,9 +4,14 @@ part of image;
  * Decodes a frame from a WebP animation.
  */
 class WebPFrame {
-  Image decode(Arc.InputStream input, WebPData data) {
-    Image image = new Image(data.width, data.height);
+  Arc.InputStream input;
+  WebPData webp;
 
+  WebPFrame(Arc.InputStream input, this.webp) :
+    this.input = input;
+
+  Image decode() {
+    Image image = new Image(webp.width, webp.height);
     return image;
   }
 }

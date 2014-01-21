@@ -8,16 +8,16 @@ class _HuffmanTree {
   static const int HUFF_LUT = (1 << HUFF_LUT_BITS);
   // Fast lookup for short bit lengths.
   Data.Uint8List lutBits = new Data.Uint8List(HUFF_LUT);
-  Data.Uint16List lutSymbol = new Data.Uint16List(HUFF_LUT);
-  Data.Uint16List lutJump = new Data.Uint16List(HUFF_LUT);
+  Data.Int16List lutSymbol = new Data.Int16List(HUFF_LUT);
+  Data.Int16List lutJump = new Data.Int16List(HUFF_LUT);
 
   /// all the nodes, starting at root, stored as a single int array, where
   /// each node occupies two ints as [symbol, children].
-  Data.Uint32List tree;
+  Data.Int32List tree;
   /// max number of nodes
-  int maxNodes;
+  int maxNodes = 0;
   /// number of currently occupied nodes
-  int numNodes;
+  int numNodes = 0;
 
   _HuffmanTree([int numLeaves = 0]) {
     _init(numLeaves);
@@ -29,7 +29,7 @@ class _HuffmanTree {
     }
 
     maxNodes = (numLeaves << 1) - 1;
-    tree = new Data.Uint32List(maxNodes * 2);
+    tree = new Data.Int32List(maxNodes << 1);
     tree[1] = -1;
     numNodes = 1;
     lutBits.fillRange(0, lutBits.length, 255);
@@ -38,12 +38,11 @@ class _HuffmanTree {
   }
 
   bool buildImplicit(List<int> codeLengths, int codeLengthsSize) {
-    int symbol;
     int numSymbols = 0;
     int rootSymbol = 0;
 
     // Find out number of symbols and the root symbol.
-    for (symbol = 0; symbol < codeLengthsSize; ++symbol) {
+    for (int symbol = 0; symbol < codeLengthsSize; ++symbol) {
       if (codeLengths[symbol] > 0) {
         // Note: code length = 0 indicates non-existent symbol.
         ++numSymbols;
@@ -70,14 +69,14 @@ class _HuffmanTree {
     // Normal case.
 
     // Get Huffman codes from the code lengths.
-    Data.Uint32List codes = new Data.Uint32List(codeLengthsSize);
+    Data.Int32List codes = new Data.Int32List(codeLengthsSize);
 
     if (!_huffmanCodeLengthsToCodes(codeLengths, codeLengthsSize, codes)) {
       return false;
     }
 
     // Add symbols one-by-one.
-    for (symbol = 0; symbol < codeLengthsSize; ++symbol) {
+    for (int symbol = 0; symbol < codeLengthsSize; ++symbol) {
       if (codeLengths[symbol] > 0) {
         if (!_addSymbol(symbol, codes[symbol], codeLengths[symbol])) {
           return false;
@@ -119,31 +118,31 @@ class _HuffmanTree {
    * input.fillBitWindow() needs to be called at minimum every second call
    * to ReadSymbol, in order to pre-fetch enough bits.
    */
-  int readSymbol(Arc.InputStream input) {
+  int readSymbol(VP8LBitReader br) {
     int node = 0;
-    int bits = _prefetchBits(input);
-    int bitpos = input.bitBufferLen;
+    int bits = br.prefetchBits();
+    int newBitPos = br.bitPos;
     // Check if we find the bit combination from the Huffman lookup table.
     int lut_ix = bits & (HUFF_LUT - 1);
-    int lut_bits = this.lutBits[lut_ix];
+    int lut_bits = lutBits[lut_ix];
 
     if (lut_bits <= HUFF_LUT_BITS) {
-      input.bitBufferLen += lut_bits;
+      br.setBitPos(br.bitPos + lut_bits);
       return this.lutSymbol[lut_ix];
     }
 
     node += this.lutJump[lut_ix];
-    bitpos += HUFF_LUT_BITS;
+    newBitPos += HUFF_LUT_BITS;
     bits >>= HUFF_LUT_BITS;
 
     // Decode the value from a binary tree.
     do {
       node = _nextNode(node, bits & 1);
       bits >>= 1;
-      ++bitpos;
+      ++newBitPos;
     } while (_nodeIsNotLeaf(node));
 
-    input.bitBufferLen = bitpos;
+    br.setBitPos(newBitPos);
 
     return _nodeSymbol(node);
   }
@@ -251,11 +250,11 @@ class _HuffmanTree {
                                   List<int> huffCodes) {
     int symbol;
     int codeLen;
-    Data.Uint32List codeLengthHist =
-        new Data.Uint32List(WebP.MAX_ALLOWED_CODE_LENGTH + 1);
+    Data.Int32List codeLengthHist =
+        new Data.Int32List(WebP.MAX_ALLOWED_CODE_LENGTH + 1);
     int currCode;
-    Data.Uint32List nextCodes =
-        new Data.Uint32List(WebP.MAX_ALLOWED_CODE_LENGTH + 1);
+    Data.Int32List nextCodes =
+        new Data.Int32List(WebP.MAX_ALLOWED_CODE_LENGTH + 1);
     int maxCodeLength = 0;
 
     // Calculate max code length.
@@ -314,6 +313,12 @@ class _HuffmanTree {
 class _HTreeGroup {
   final List<_HuffmanTree> htrees =
       new List<_HuffmanTree>(WebP.HUFFMAN_CODES_PER_META_CODE);
+
+  _HTreeGroup() {
+    for (int i = 0, len = htrees.length; i < len; ++i) {
+      htrees[i] = new _HuffmanTree();
+    }
+  }
 
   _HuffmanTree operator[](int index) {
     if (htrees[index] == null) {

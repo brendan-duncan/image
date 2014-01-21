@@ -4,9 +4,18 @@ part of image;
  * WebP lossy format.
  */
 class Vp8 {
-  Image decode(Arc.InputStream input, WebPData data) {
-    Image image = new Image(data.width, data.height);
+  Arc.InputStream input;
+  WebPData webp;
 
+  Vp8(Arc.InputStream input, this.webp) :
+    this.input = input;
+
+  bool decodeHeader() {
+    return true;
+  }
+
+  Image decode() {
+    Image image = new Image(webp.width, webp.height);
     return image;
   }
 }
