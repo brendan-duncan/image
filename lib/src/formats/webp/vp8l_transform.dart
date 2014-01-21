@@ -26,30 +26,94 @@ class VP8LTransform {
           int end = start + width;
           int offset = rowsOut + (rowEnd - rowStart - 1) * width;
           pixels.setRange(start, end, pixels, offset);
-          /*memcpy(rowsOut - width, rowsOut + (row_end - row_start - 1) * width,
-              width * sizeof(*rowsOut));*/
         }
         break;
       case WebP.CROSS_COLOR_TRANSFORM:
-        //ColorSpaceInverseTransform(transform, row_start, row_end, rowsOut);
+        _colorSpaceInverseTransform(pixels, rowStart, rowEnd, rowsOut);
         break;
       case WebP.COLOR_INDEXING_TRANSFORM:
-        /*if (rowsIn == rowsOut && transform.bits > 0) {
+        if (rowsIn == rowsOut && bits > 0) {
           // Move packed pixels to the end of unpacked region, so that unpacking
           // can occur seamlessly.
           // Also, note that this is the only transform that applies on
           // the effective width of VP8LSubSampleSize(xsize_, bits_). All other
           // transforms work on effective width of xsize_.
-          const int out_stride = (row_end - row_start) * width;
-          const int in_stride = (row_end - row_start) *
-              VP8LSubSampleSize(transform->xsize_, transform->bits_);
-          uint32_t* const src = rowsOut + out_stride - in_stride;
-          memmove(src, rowsOut, in_stride * sizeof(*src));
-          ColorIndexInverseTransform(transform, row_start, row_end, src, rowsOut);
+          final int outStride = (rowEnd - rowStart) * width;
+          final int inStride = (rowEnd - rowStart) *
+                                Vp8l._subSampleSize(xsize, bits);
+
+          int src = rowsOut + outStride - inStride;
+          pixels.setRange(src, src + inStride, pixels, rowsOut);
+          //memmove(src, rowsOut, inStride * sizeof(*src));
+
+          _colorIndexInverseTransform(pixels, rowStart, rowEnd, src, rowsOut);
         } else {
-          ColorIndexInverseTransform(transform, row_start, row_end, rowsIn, rowsOut);
-        }*/
+          _colorIndexInverseTransform(pixels, rowStart, rowEnd, rowsIn, rowsOut);
+        }
         break;
+    }
+  }
+
+  void _colorIndexInverseTransform(Data.Uint32List pixels,
+                 int yStart, int yEnd, int src, int dst) {
+    /*const int bits_per_pixel = 8 >> transform->bits_;
+    const int width = transform->xsize_;
+    const uint32_t* const color_map = transform->data_;
+    if (bits_per_pixel < 8) {
+      const int pixels_per_byte = 1 << transform->bits_;
+      const int count_mask = pixels_per_byte - 1;
+      const uint32_t bit_mask = (1 << bits_per_pixel) - 1;
+      for (y = y_start; y < y_end; ++y) {
+        uint32_t packed_pixels = 0;
+        int x;
+        for (x = 0; x < width; ++x) {
+          /* We need to load fresh 'packed_pixels' once every                */
+          /* 'pixels_per_byte' increments of x. Fortunately, pixels_per_byte */
+          /* is a power of 2, so can just use a mask for that, instead of    */
+          /* decrementing a counter.                                         */
+          if ((x & count_mask) == 0) packed_pixels = GET_INDEX(*src++);
+          *dst++ = GET_VALUE(color_map[packed_pixels & bit_mask]);
+          packed_pixels >>= bits_per_pixel;
+        }
+      }
+    } else {
+      for (y = y_start; y < y_end; ++y) {
+        int x;
+        for (x = 0; x < width; ++x) {
+          *dst++ = GET_VALUE(color_map[GET_INDEX(*src++)]);
+        }
+      }
+    }*/
+  }
+
+  /**
+   * Color space inverse transform.
+   */
+  void _colorSpaceInverseTransform(Data.Uint32List pixels,
+                                   int yStart, int yEnd, int data) {
+    final int width = xsize;
+    final int mask = (1 << bits) - 1;
+    final int tilesPerRow = Vp8l._subSampleSize(width, bits);
+    int y = yStart;
+    int predRow = (y >> bits) * tilesPerRow; //this.data +
+
+    while (y < yEnd) {
+      int pred = predRow; // this.data+
+      _VP8LMultipliers m = new _VP8LMultipliers();
+
+      for (int x = 0; x < width; ++x) {
+        if ((x & mask) == 0) {
+          m.colorCode = this.data[pred++];
+        }
+        pixels[data + x] = m.transformColor(pixels[data + x], true);
+      }
+
+      data += width;
+      ++y;
+
+      if ((y & mask) == 0) {
+        predRow += tilesPerRow;;
+      }
     }
   }
 
@@ -73,7 +137,7 @@ class VP8LTransform {
     {
       int y = yStart;
       final int mask = (1 << bits) - 1;
-      final int tilesPerRow = _subSampleSize(width, bits);
+      final int tilesPerRow = Vp8l._subSampleSize(width, bits);
       int predModeBase = (y >> bits) * tilesPerRow; //this.data +
 
       while (y < yEnd) {
@@ -116,5 +180,67 @@ class VP8LTransform {
       redBlue &= 0x00ff00ff;
       pixels[data++] = (argb & 0xff00ff00) | redBlue;
     }
+  }
+}
+
+class _VP8LMultipliers {
+  final Data.Uint8List data = new Data.Uint8List(3);
+
+  // Note: the members are uint8_t, so that any negative values are
+  // automatically converted to "mod 256" values.
+  int get greenToRed => data[0];
+
+  set greenToRed(int m) => data[0] = m;
+
+  int get greenToBlue => data[1];
+
+  set greenToBlue(int m) => data[1] = m;
+
+  int get redToBlue => data[2];
+
+  set redToBlue(int m) => data[2] = m;
+
+  void clear() {
+    data[0] = 0;
+    data[1] = 0;
+    data[2] = 0;
+  }
+
+  void set colorCode(int colorCode) {
+    data[0] = (colorCode >>  0) & 0xff;
+    data[1] = (colorCode >>  8) & 0xff;
+    data[2] = (colorCode >> 16) & 0xff;
+  }
+
+  int get colorCode => 0xff000000 |
+      (data[2] << 16) |
+      (data[1] << 8) |
+      data[0];
+
+  int transformColor(int argb, bool inverse) {
+    final int green = argb >> 8;
+    final int red = argb >> 16;
+    int newRed = red;
+    int newBlue = argb;
+
+    if (inverse) {
+      newRed += colorTransformDelta(greenToRed, green);
+      newRed &= 0xff;
+      newBlue += colorTransformDelta(greenToBlue, green);
+      newBlue += colorTransformDelta(redToBlue, newRed);
+      newBlue &= 0xff;
+    } else {
+      newRed -= colorTransformDelta(greenToRed, green);
+      newRed &= 0xff;
+      newBlue -= colorTransformDelta(greenToBlue, green);
+      newBlue -= colorTransformDelta(redToBlue, red);
+      newBlue &= 0xff;
+    }
+
+    return (argb & 0xff00ff00) | (newRed << 16) | (newBlue);
+  }
+
+  int colorTransformDelta(int colorPred, int color) {
+    return (colorPred * color) >> 5;
   }
 }

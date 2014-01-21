@@ -573,7 +573,7 @@ class Vp8l {
   /**
    * Computes sampled size of 'size' when sampling using 'sampling bits'.
    */
-  int _subSampleSize(int size, int samplingBits) {
+  static int _subSampleSize(int size, int samplingBits) {
     return (size + (1 << samplingBits) - 1) >> samplingBits;
   }
 
