@@ -36,7 +36,7 @@ void defineWebPTests() {
     Io.File script = new Io.File(Io.Platform.script.toFilePath());
     String path = script.parent.path + '/res/webp';
 
-    test('lossless', () {
+    /*test('lossless', () {
       List<int> bytes = new Io.File(path + '/1_webp_ll.webp').readAsBytesSync();
       Image image = new WebPDecoder().decodeImage(bytes);
 
@@ -44,9 +44,9 @@ void defineWebPTests() {
       new Io.File('out/webp/1_webp_ll.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
-    });
+    });*/
 
-    /*Io.Directory dir = new Io.Directory(path);
+    Io.Directory dir = new Io.Directory(path);
     List files = dir.listSync();
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.webp')) {
@@ -66,6 +66,6 @@ void defineWebPTests() {
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
       });
-    }*/
+    }
   });
 }

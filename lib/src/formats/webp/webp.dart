@@ -28,56 +28,31 @@ class WebP {
   static const int NUM_DISTANCE_CODES = 40;
   static const int CODE_LENGTH_CODES = 19;
 
-  static const int MIN_HUFFMAN_BITS = 2;  // min number of Huffman bits
-  static const int MAX_HUFFMAN_BITS = 9;  // max number of Huffman bits
-
-  // The bit to be written when next data to be read is a transform.
-  static const int TRANSFORM_PRESENT = 1;
-  // Maximum number of allowed transform in a bitstream.
-  static const int NUM_TRANSFORMS = 4;
-
   // enum VP8LImageTransformType
   static const int PREDICTOR_TRANSFORM  = 0;
   static const int CROSS_COLOR_TRANSFORM = 1;
   static const int SUBTRACT_GREEN = 2;
   static const int COLOR_INDEXING_TRANSFORM = 3;
-
-  // Alpha related static constants.
-  static const int ALPHA_HEADER_LEN = 1;
-  static const int ALPHA_NO_COMPRESSION = 0;
-  static const int ALPHA_LOSSLESS_COMPRESSION = 1;
-  static const int ALPHA_PREPROCESSED_LEVELS = 1;
-
-  // Mux related static constants.
-  // Size of a chunk tag (e.g. "VP8L").
-  static const int TAG_SIZE = 4;
-  // Size needed to store chunk's size.
-  static const int CHUNK_SIZE_BYTES = 4;
-  // Size of a chunk header.
-  static const int CHUNK_HEADER_SIZE = 8;
-  // Size of the RIFF header ("RIFFnnnnWEBP").
-  static const int RIFF_HEADER_SIZE = 12;
-  // Size of an ANMF chunk.
-  static const int ANMF_CHUNK_SIZE = 16;
-  // Size of an ANIM chunk.
-  static const int ANIM_CHUNK_SIZE = 6;
-  // Size of a FRGM chunk.
-  static const int FRGM_CHUNK_SIZE = 6;
-  // Size of a VP8X chunk.
-  static const int VP8X_CHUNK_SIZE = 10;
-
-  // 24-bit max for VP8X width/height.
-  static const int MAX_CANVAS_SIZE = (1 << 24);
-  // 32-bit max for width x height.
-  static const int MAX_IMAGE_AREA = (1 << 32);
-  // maximum value for loop-count
-  static const int MAX_LOOP_COUNT = (1 << 16);
-  // maximum duration
-  static const int MAX_DURATION = (1 << 24);
-  // maximum frame/fragment x/y offset
-  static const int MAX_POSITION_OFFSET = (1 << 24);
-
-  // Maximum chunk payload is such that adding the header and padding won't
-  // overflow a uint32.
-  static const int MAX_CHUNK_PAYLOAD = 0xfffffff6;
 }
+
+/**
+ * Binary conversion of a uint8 to an int8.  This is equivalent in C to
+ * typecasting an unsigned char to a char.
+ */
+int _uint8ToInt8(int d) {
+  d &= 0xff;
+  return (d < 128) ? d : -(256 - d);
+}
+
+/**
+ * Binary conversion of an int32 to a uint32. This is equivalent in C to
+ * typecasting an int to an unsigned int.
+ */
+int _int32ToUint32(int d) {
+  _int32ToUint32_int32[0] = d;
+  return _int32ToUint32_uint32[0];
+}
+
+final Data.Int32List _int32ToUint32_int32 = new Data.Int32List(1);
+final Data.Uint32List _int32ToUint32_uint32 =
+    new Data.Uint32List.view(_int32ToUint32_int32.buffer);

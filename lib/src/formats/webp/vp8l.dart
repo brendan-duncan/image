@@ -12,7 +12,8 @@ class Vp8l {
   Vp8l(Arc.InputStream input, WebPData webp) :
     this.input = input,
     this.webp = webp,
-    this.br = new VP8LBitReader(input);
+    this.br = new VP8LBitReader(input) {
+  }
 
   bool decodeHeader() {
     int signature = br.readBits(8);
@@ -324,49 +325,26 @@ class Vp8l {
 
     _applyInverseTransforms(numRows, rows);
 
+    // TODO A significant optimization would be to not use _pixels and store
+    // the decoded image directly into image, and store the colors in RGBA
+    // order instead of ARGB.
+    int count = 0;
+    int di = rows;
     for (int y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
       for (int x = 0; x < webp.width; ++x, ++pi) {
         int c = _pixels[pi];
-        image.setPixel(x, dy, getColor(getGreen(c),
-                                       getBlue(c),
-                                       getAlpha(c),
-                                       getRed(c)));
+
+        int r = getRed(c);
+        int g = getGreen(c);
+        int b = getBlue(c);
+        int a = getAlpha(c);
+        // rearrange the ARGB webp color to RGBA image color.
+        image.setPixel(x, dy, getColor(b, g, r, a));
       }
     }
 
-    // Emit output.
-    /*{
-      //uint8_t rows_data = (uint8_t*)dec->argb_cache_;
-      //const int in_stride = io->width * sizeof(uint32_t);  // in unit of RGBA
-      if (!_setCropWindow(io, dec->last_row_, row, &rows_data, in_stride)) {
-        // Nothing to output (this time).
-      } else {
-        //const WebPDecBuffer* const output = dec->output_;
-        if (output->colorspace < MODE_YUV) {  // convert to RGBA
-          const WebPRGBABuffer* const buf = &output->u.RGBA;
-
-          uint8_t* const rgba = buf->rgba + dec->last_out_row_ * buf->stride;
-
-          final int numRowsOut = io->use_scaling ?
-              EmitRescaledRowsRGBA(dec, rows_data, in_stride, io->mb_h,
-                                   rgba, buf->stride) :
-              _emitRows(output->colorspace, rows_data, in_stride,
-                       io->mb_w, io->mb_h, rgba, buf->stride);
-          // Update 'last_out_row_'.
-          _lastOutRow += numRowsOut;
-        } else {                              // convert to YUVA
-          dec->last_out_row_ = io->use_scaling ?
-              EmitRescaledRowsYUVA(dec, rows_data, in_stride, io->mb_h) :
-              EmitRowsYUVA(dec, rows_data, in_stride, io->mb_w, io->mb_h);
-        }
-
-        assert(dec->last_out_row_ <= output->height);
-      }
-    }*/
-
     // Update 'last_row_'.
     _lastRow = row;
-    //assert(dec->last_row_ <= dec->height_);
   }
 
   void _applyInverseTransforms(int numRows, int rows) {

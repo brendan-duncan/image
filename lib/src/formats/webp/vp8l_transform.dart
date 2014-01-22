@@ -121,6 +121,7 @@ class VP8LTransform {
         if ((x & mask) == 0) {
           m.colorCode = this.data[pred++];
         }
+
         pixels[data + x] = m.transformColor(pixels[data + x], true);
       }
 
@@ -166,7 +167,8 @@ class VP8LTransform {
       var predFunc = PREDICTORS[(this.data[predModeSrc++] >> 8) & 0xf];
       for (int x = 1; x < width; ++x) {
         if ((x & mask) == 0) {    // start of tile. Read predictor function.
-          predFunc = PREDICTORS[((this.data[predModeSrc++]) >> 8) & 0xf];
+          int k = ((this.data[predModeSrc++]) >> 8) & 0xf;
+          predFunc = PREDICTORS[k];
         }
         int pred = predFunc(pixels, pixels[data + x - 1], data + x - width);
         _addPixelsEq(pixels, data + x, pred);
@@ -219,12 +221,13 @@ class VP8LTransform {
   }
 
   static int _clip255(int a) {
+    a = _int32ToUint32(a);
     if (a < 256) {
       return a;
     }
     // return 0, when a is a negative integer.
     // return 255, when a is positive.
-    return ~a >> 24;
+    return _int32ToUint32(~a) >> 24;
   }
 
   static int _addSubtractComponentFull(int a, int b, int c) {
@@ -362,8 +365,8 @@ class _VP8LMultipliers {
   }
 
   void set colorCode(int colorCode) {
-    data[0] = (colorCode >>  0) & 0xff;
-    data[1] = (colorCode >>  8) & 0xff;
+    data[0] = (colorCode >> 0) & 0xff;
+    data[1] = (colorCode >> 8) & 0xff;
     data[2] = (colorCode >> 16) & 0xff;
   }
 
@@ -372,6 +375,7 @@ class _VP8LMultipliers {
       (data[1] << 8) |
       data[0];
 
+
   int transformColor(int argb, bool inverse) {
     final int green = argb >> 8;
     final int red = argb >> 16;
@@ -379,10 +383,11 @@ class _VP8LMultipliers {
     int newBlue = argb;
 
     if (inverse) {
-      newRed += colorTransformDelta(greenToRed, green);
+      int g = colorTransformDelta(greenToRed, green);
+      newRed = (newRed + g) & 0xffffffff;
       newRed &= 0xff;
-      newBlue += colorTransformDelta(greenToBlue, green);
-      newBlue += colorTransformDelta(redToBlue, newRed);
+      newBlue = (newBlue + colorTransformDelta(greenToBlue, green)) & 0xffffffff;
+      newBlue = (newBlue + colorTransformDelta(redToBlue, newRed)) & 0xffffffff;
       newBlue &= 0xff;
     } else {
       newRed -= colorTransformDelta(greenToRed, green);
@@ -392,10 +397,10 @@ class _VP8LMultipliers {
       newBlue &= 0xff;
     }
 
-    return (argb & 0xff00ff00) | (newRed << 16) | (newBlue);
+    return (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | (newBlue);
   }
 
   int colorTransformDelta(int colorPred, int color) {
-    return (colorPred * color) >> 5;
+    return _int32ToUint32(_uint8ToInt8(colorPred) * _uint8ToInt8(color)) >> 5;
   }
 }
