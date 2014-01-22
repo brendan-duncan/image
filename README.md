@@ -14,6 +14,9 @@ formats:
 - JPG
 - TGA
 
+Work in progress:
+- WebP (decoding of lossless format)
+
 ##[Documentation](https://github.com/brendan-duncan/image/wiki)
 
 ##Samples
