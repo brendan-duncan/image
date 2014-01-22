@@ -312,6 +312,255 @@ class Vp8l {
   }
 
   /**
+   * Special row-processing that only stores the alpha data.
+   */
+  void _extractAlphaRows(int row) {
+    final int numRows = row - _lastRow;
+    /*const uint32_t* const in = dec->pixels_ + dec->width_ * dec->last_row_;
+
+    if (num_rows <= 0) return;  // Nothing to be done.
+    ApplyInverseTransforms(dec, num_rows, in);
+
+    // Extract alpha (which is stored in the green plane).
+    {
+      const int width = dec->io_->width;      // the final width (!= dec->width_)
+      const int cache_pixs = width * num_rows;
+      uint8_t* const dst = (uint8_t*)dec->io_->opaque + width * dec->last_row_;
+      const uint32_t* const src = dec->argb_cache_;
+      int i;
+      for (i = 0; i < cache_pixs; ++i) dst[i] = (src[i] >> 8) & 0xff;
+    }
+    dec->last_row_ = dec->last_out_row_ = row;*/
+  }
+
+  int _decompressAlphaRows(int row, int numRows) {
+    /*const int width = dec->pic_hdr_.width_;
+    const int height = dec->pic_hdr_.height_;
+
+    if (row < 0 || num_rows <= 0 || row + num_rows > height) {
+      return NULL;    // sanity check.
+    }
+
+    if (row == 0) {
+      // Initialize decoding.
+      assert(dec->alpha_plane_ != NULL);
+      dec->alph_dec_ = ALPHNew();
+      if (dec->alph_dec_ == NULL) return NULL;
+      if (!ALPHInit(dec->alph_dec_, dec->alpha_data_, dec->alpha_data_size_,
+          width, height, dec->alpha_plane_)) {
+        ALPHDelete(dec->alph_dec_);
+        dec->alph_dec_ = NULL;
+        return NULL;
+      }
+    }
+
+    if (!dec->is_alpha_decoded_) {
+      int ok = 0;
+      assert(dec->alph_dec_ != NULL);
+      ok = ALPHDecode(dec, row, num_rows);
+      if (!ok || dec->is_alpha_decoded_) {
+        ALPHDelete(dec->alph_dec_);
+        dec->alph_dec_ = NULL;
+      }
+      if (!ok) return NULL;  // Error.
+    }
+
+    // Return a pointer to the current decoded row.
+    return dec->alpha_plane_ + row * width;*/
+    return 0;
+  }
+
+
+  bool _readAlpha(Arc.InputStream input, int blockSize, int width, int height,
+                  Data.Uint8List output) {
+
+    _alpha = new WebPAlpha(width, height);
+
+    if (!_alpha.init(input, blockSize, output)) {
+      return false;
+    }
+
+    if (_alpha.method != WebPAlpha.ALPHA_NO_COMPRESSION) {
+      return _decodeAlphaHeader(input, output);
+    }
+
+    return true;
+  }
+
+  bool _decodeAlphaHeader(Arc.InputStream input, Data.Uint8List output) {
+    _opaque = output;
+    /*int ok = 0;
+    VP8LDecoder* dec;
+    VP8Io* io;
+    assert(alph_dec != NULL);
+    alph_dec->vp8l_dec_ = VP8LNew();
+    if (alph_dec->vp8l_dec_ == NULL) return 0;
+    dec = alph_dec->vp8l_dec_;
+
+    dec->width_ = alph_dec->width_;
+    dec->height_ = alph_dec->height_;
+    dec->io_ = &alph_dec->io_;
+    io = dec->io_;
+
+    VP8InitIo(io);
+    WebPInitCustomIo(NULL, io);  // Just a sanity Init. io won't be used.
+    io->opaque = output;
+    io->width = alph_dec->width_;
+    io->height = alph_dec->height_;
+
+    dec->status_ = VP8_STATUS_OK;
+    VP8LInitBitReader(&dec->br_, data, data_size);
+
+    dec->action_ = READ_HDR;
+    if (!DecodeImageStream(alph_dec->width_, alph_dec->height_, 1, dec, NULL)) {
+      goto Err;
+    }
+
+    // Special case: if alpha data uses only the color indexing transform and
+    // doesn't use color cache (a frequent case), we will use DecodeAlphaData()
+    // method that only needs allocation of 1 byte per pixel (alpha channel).
+    if (dec->next_transform_ == 1 &&
+        dec->transforms_[0].type_ == COLOR_INDEXING_TRANSFORM &&
+        Is8bOptimizable(&dec->hdr_)) {
+      alph_dec->use_8b_decode = 1;
+      ok = AllocateInternalBuffers8b(dec);
+    } else {
+      // Allocate internal buffers (note that dec->width_ may have changed here).
+      alph_dec->use_8b_decode = 0;
+      ok = AllocateInternalBuffers32b(dec, alph_dec->width_);
+    }
+
+    if (!ok) goto Err;
+
+    dec->action_ = READ_DATA;
+    return 1;
+
+    Err:
+      VP8LDelete(alph_dec->vp8l_dec_);
+    alph_dec->vp8l_dec_ = NULL;
+    return 0;*/
+    return false;
+  }
+
+  bool _decodeAlphaImageStream(int lastRow) {
+    /*VP8LDecoder* const dec = alph_dec->vp8l_dec_;
+    // Decode (with special row processing).
+    return _use8bDecode ?
+        _decodeAlphaData((uint8_t*)dec->pixels_, dec->width_, dec->height_,
+            last_row) :
+              DecodeImageData(dec, dec->pixels_, dec->width_, dec->height_,
+                  last_row, _extractAlphaRows);*/
+    return false;
+  }
+
+
+  bool _decodeAlphaData(int data, int width, int height, int lastRow) {
+    int row = _lastPixel ~/ width;
+    int col = _lastPixel % width;
+
+    _HTreeGroup htreeGroup = _getHtreeGroupForPos(col, row);
+    int pos = _lastPixel; // current position
+    final int end = width * height; // End of data
+    final int last = width * _lastRow; // Last pixel to decode
+    final int lenCodeLimit = WebP.NUM_LITERAL_CODES + WebP.NUM_LENGTH_CODES;
+    final int mask = _huffmanMask;
+
+    while (!br.isEOS && pos < last) {
+      int code;
+      // Only update when changing tile.
+      if ((col & mask) == 0) {
+        htreeGroup = _getHtreeGroupForPos(col, row);
+      }
+
+      br.fillBitWindow();
+
+      code = htreeGroup.htrees[_GREEN].readSymbol(br);
+
+      if (code < WebP.NUM_LITERAL_CODES) {  // Literal
+        _pixels[data + pos] = code;
+        ++pos;
+        ++col;
+        if (col >= width) {
+          col = 0;
+          ++row;
+          if (row % _NUM_ARGB_CACHE_ROWS == 0) {
+            _extractPalettedAlphaRows(row);
+          }
+        }
+      } else if (code < lenCodeLimit) {  // Backward reference
+        int distCode, dist;
+        final int lengthSym = code - WebP.NUM_LITERAL_CODES;
+        final int length = _getCopyLength(lengthSym);
+        final int distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
+
+        br.fillBitWindow();
+
+        distCode = _getCopyDistance(distSymbol);
+        dist = _planeCodeToDistance(width, distCode);
+
+        if (pos >= dist && end - pos >= length) {
+          int i;
+          for (i = 0; i < length; ++i) {
+            _pixels[data + pos + i] = _pixels[data + pos + i - dist];
+          }
+        } else {
+          _lastPixel = pos;
+          return true;
+        }
+
+        pos += length;
+        col += length;
+
+        while (col >= width) {
+          col -= width;
+          ++row;
+          if (row % _NUM_ARGB_CACHE_ROWS == 0) {
+            _extractPalettedAlphaRows(row);
+          }
+        }
+
+        if (pos < last && (col & mask)) {
+          htreeGroup = _getHtreeGroupForPos(col, row);
+        }
+      } else {  // Not reached
+        return false;
+      }
+    }
+
+    // Process the remaining rows corresponding to last row-block.
+    _extractPalettedAlphaRows(row);
+
+    _lastPixel = pos;
+
+    return true;
+  }
+
+  void _extractPalettedAlphaRows(int row) {
+    final int numRows = row - _lastRow;
+    final pIn = webp.width * _lastRow;
+    if (numRows > 0) {
+      _applyInverseTransformsAlpha(numRows, pIn);
+    }
+    _lastRow = row;
+  }
+
+  /**
+   * Special method for paletted alpha data.
+   */
+  void _applyInverseTransformsAlpha(int numRows, int rows) {
+    final int startRow = _lastRow;
+    final int endRow = startRow + numRows;
+    int rowsIn = rows;
+    int rowsOut = webp.width * startRow; // (uint8_t*)_opaque +*/
+    VP8LTransform transform = _transforms[0];
+
+    Data.Uint8List inData = new Data.Uint8List.view(_pixels.buffer);
+
+    transform.colorIndexInverseTransformAlpha(startRow, endRow,
+        inData, rowsIn, _opaque, rowsOut);
+  }
+
+  /**
    * Processes (transforms, scales & color-converts) the rows decoded after the
    * last call.
    */
@@ -360,7 +609,8 @@ class Vp8l {
 
     while (n-- > 0) {
       VP8LTransform transform = _transforms[n];
-      transform.inverseTransform(startRow, endRow, _pixels, rowsIn, rowsOut);
+      transform.inverseTransform(startRow, endRow, _pixels, rowsIn,
+                                 _pixels, rowsOut);
       rowsIn = rowsOut;
     }
   }
@@ -671,5 +921,9 @@ class Vp8l {
 
   Data.Uint32List _pixels;
   int _argbCache;
+
+  WebPAlpha _alpha;
+
+  Data.Uint8List _opaque;
 }
 

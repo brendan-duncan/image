@@ -121,6 +121,7 @@ class WebPDecoder {
     bool found = false;
     while (!input.isEOS && !found) {
       tag = input.readString(4);
+      //print('    $tag');
       int size = input.readUint32();
       // For odd sized chunks, there's a 1 byte padding at the end.
       int diskSize = ((size + 1) >> 1) << 1;
@@ -184,7 +185,7 @@ class WebPDecoder {
     return webp.format != 0;
   }
 
-  bool _getVp8xInfo(Arc.InputStream input, WebPData data) {
+  bool _getVp8xInfo(Arc.InputStream input, WebPData webp) {
     if (input.readBits(2) != 0) {
       return false;
     }
@@ -202,10 +203,10 @@ class WebPDecoder {
     int w = input.readUint24() + 1;
     int h = input.readUint24() + 1;
 
-    data.width = w;
-    data.height = h;
-    data.hasAnimation = a != 0;
-    data.hasAlpha = alpha != 0;
+    webp.width = w;
+    webp.height = h;
+    webp.hasAnimation = a != 0;
+    webp.hasAlpha = alpha != 0;
 
     return true;
   }

@@ -8,28 +8,30 @@ class VP8LTransform {
   int bits = 0;
 
   void inverseTransform(int rowStart, int rowEnd,
-                        Data.Uint32List pixels,
-                        int rowsIn, int rowsOut) {
+                        Data.Uint32List inData,
+                        int rowsIn,
+                        Data.Uint32List outData,
+                        int rowsOut) {
     final int width = xsize;
 
     switch (type) {
       case WebP.SUBTRACT_GREEN:
-        _addGreenToBlueAndRed(pixels, rowsOut,
-                              rowsOut + (rowEnd - rowStart) * width);
+        addGreenToBlueAndRed(outData, rowsOut,
+                             rowsOut + (rowEnd - rowStart) * width);
         break;
       case WebP.PREDICTOR_TRANSFORM:
-        _predictorInverseTransform(pixels, rowStart, rowEnd, rowsOut);
+        predictorInverseTransform(rowStart, rowEnd, outData, rowsOut);
         if (rowEnd != ysize) {
           // The last predicted row in this iteration will be the top-pred row
           // for the first row in next iteration.
           int start = rowsOut - width;
           int end = start + width;
           int offset = rowsOut + (rowEnd - rowStart - 1) * width;
-          pixels.setRange(start, end, pixels, offset);
+          outData.setRange(start, end, inData, offset);
         }
         break;
       case WebP.CROSS_COLOR_TRANSFORM:
-        _colorSpaceInverseTransform(pixels, rowStart, rowEnd, rowsOut);
+        colorSpaceInverseTransform(rowStart, rowEnd, outData, rowsOut);
         break;
       case WebP.COLOR_INDEXING_TRANSFORM:
         if (rowsIn == rowsOut && bits > 0) {
@@ -43,14 +45,178 @@ class VP8LTransform {
                                 Vp8l._subSampleSize(xsize, bits);
 
           int src = rowsOut + outStride - inStride;
-          pixels.setRange(src, src + inStride, pixels, rowsOut);
-          //memmove(src, rowsOut, inStride * sizeof(*src));
+          outData.setRange(src, src + inStride, inData, rowsOut);
 
-          _colorIndexInverseTransform(pixels, rowStart, rowEnd, src, rowsOut);
+          colorIndexInverseTransform(rowStart, rowEnd, inData, src,
+                                      outData, rowsOut);
         } else {
-          _colorIndexInverseTransform(pixels, rowStart, rowEnd, rowsIn, rowsOut);
+          colorIndexInverseTransform(rowStart, rowEnd, inData, rowsIn,
+                                      outData, rowsOut);
         }
         break;
+    }
+  }
+
+  void colorIndexInverseTransformAlpha(int yStart, int yEnd,
+                                       Data.Uint8List inData, int src,
+                                       Data.Uint8List outData, int dst) {
+    final int bitsPerPixel = 8 >> bits;
+    final int width = xsize;
+    Data.Uint32List colorMap = this.data;
+    if (bitsPerPixel < 8) {
+      final int pixelsPerByte = 1 << bits;
+      final int countMask = pixelsPerByte - 1;
+      final bit_mask = (1 << bitsPerPixel) - 1;
+      for (int y = yStart; y < yEnd; ++y) {
+        int packed_pixels = 0;
+        for (int x = 0; x < width; ++x) {
+          // We need to load fresh 'packed_pixels' once every
+          // 'pixels_per_byte' increments of x. Fortunately, pixels_per_byte
+          // is a power of 2, so can just use a mask for that, instead of
+          // decrementing a counter.
+          if ((x & countMask) == 0) {
+            packed_pixels = _getAlphaIndex(inData[src++]);
+          }
+          outData[dst++] = _getAlphaValue(colorMap[packed_pixels & bit_mask]);
+          packed_pixels >>= bitsPerPixel;
+        }
+      }
+    } else {
+      for (int y = yStart; y < yEnd; ++y) {
+        for (int x = 0; x < width; ++x) {
+          int index = _getAlphaIndex(inData[src++]);
+          outData[dst++] = _getAlphaValue(colorMap[index]);
+        }
+      }
+    }
+  }
+
+  void colorIndexInverseTransform(int yStart, int yEnd,
+                                  Data.Uint32List inData, int src,
+                                  Data.Uint32List outData, int dst) {
+    final int bitsPerPixel = 8 >> bits;
+    final int width = xsize;
+    Data.Uint32List colorMap = this.data;
+    if (bitsPerPixel < 8) {
+      final int pixelsPerByte = 1 << bits;
+      final int countMask = pixelsPerByte - 1;
+      final bit_mask = (1 << bitsPerPixel) - 1;
+      for (int y = yStart; y < yEnd; ++y) {
+        int packed_pixels = 0;
+        for (int x = 0; x < width; ++x) {
+          // We need to load fresh 'packed_pixels' once every
+          // 'pixels_per_byte' increments of x. Fortunately, pixels_per_byte
+          // is a power of 2, so can just use a mask for that, instead of
+          // decrementing a counter.
+          if ((x & countMask) == 0) {
+            packed_pixels = _getARGBIndex(inData[src++]);
+          }
+          outData[dst++] = _getARGBValue(colorMap[packed_pixels & bit_mask]);
+          packed_pixels >>= bitsPerPixel;
+        }
+      }
+    } else {
+      for (int y = yStart; y < yEnd; ++y) {
+        for (int x = 0; x < width; ++x) {
+          outData[dst++] = _getARGBValue(colorMap[_getARGBIndex(inData[src++])]);
+        }
+      }
+    }
+  }
+
+  /**
+   * Color space inverse transform.
+   */
+  void colorSpaceInverseTransform(int yStart, int yEnd, Data.Uint32List outData,
+                                  int data) {
+    final int width = xsize;
+    final int mask = (1 << bits) - 1;
+    final int tilesPerRow = Vp8l._subSampleSize(width, bits);
+    int y = yStart;
+    int predRow = (y >> bits) * tilesPerRow; //this.data +
+
+    while (y < yEnd) {
+      int pred = predRow; // this.data+
+      _VP8LMultipliers m = new _VP8LMultipliers();
+
+      for (int x = 0; x < width; ++x) {
+        if ((x & mask) == 0) {
+          m.colorCode = this.data[pred++];
+        }
+
+        outData[data + x] = m.transformColor(outData[data + x], true);
+      }
+
+      data += width;
+      ++y;
+
+      if ((y & mask) == 0) {
+        predRow += tilesPerRow;;
+      }
+    }
+  }
+
+  /**
+   * Inverse prediction.
+   */
+  void predictorInverseTransform(int yStart, int yEnd, Data.Uint32List outData,
+                                 int data) {
+    final int width = xsize;
+    if (yStart == 0) {  // First Row follows the L (mode=1) mode.
+      final int pred0 = _predictor0(outData, outData[data - 1], 0);
+      _addPixelsEq(outData, data, pred0);
+      for (int x = 1; x < width; ++x) {
+        final int pred1 = _predictor1(outData, outData[data + x - 1], 0);
+        _addPixelsEq(outData, data + x, pred1);
+      }
+      data += width;
+      ++yStart;
+    }
+
+    int y = yStart;
+    final int mask = (1 << bits) - 1;
+    final int tilesPerRow = Vp8l._subSampleSize(width, bits);
+    int predModeBase = (y >> bits) * tilesPerRow; //this.data +
+
+    while (y < yEnd) {
+      final int pred2 = _predictor2(outData, outData[data - 1], data - width);
+      int predModeSrc = predModeBase; //this.data +
+
+      // First pixel follows the T (mode=2) mode.
+      _addPixelsEq(outData, data, pred2);
+
+      // .. the rest:
+      var predFunc = PREDICTORS[(this.data[predModeSrc++] >> 8) & 0xf];
+      for (int x = 1; x < width; ++x) {
+        if ((x & mask) == 0) {    // start of tile. Read predictor function.
+          int k = ((this.data[predModeSrc++]) >> 8) & 0xf;
+          predFunc = PREDICTORS[k];
+        }
+        int pred = predFunc(outData, outData[data + x - 1], data + x - width);
+        _addPixelsEq(outData, data + x, pred);
+      }
+
+      data += width;
+      ++y;
+
+      if ((y & mask) == 0) {   // Use the same mask, since tiles are squares.
+        predModeBase += tilesPerRow;
+      }
+    }
+  }
+
+  /**
+   * Add green to blue and red channels (i.e. perform the inverse transform of
+   * 'subtract green').
+   */
+  void addGreenToBlueAndRed(Data.Uint32List pixels, int data, int dataEnd) {
+    while (data < dataEnd) {
+      final int argb = pixels[data];
+      final int green = ((argb >> 8) & 0xff);
+      int redBlue = (argb & 0x00ff00ff);
+      redBlue += (green << 16) | green;
+      redBlue &= 0x00ff00ff;
+      pixels[data++] = (argb & 0xff00ff00) | redBlue;
     }
   }
 
@@ -68,134 +234,6 @@ class VP8LTransform {
 
   static int _getAlphaValue(int val) {
     return (val >> 8) & 0xff;
-  }
-
-  void _colorIndexInverseTransform(Data.Uint32List pixels,
-                 int yStart, int yEnd, int src, int dst) {
-    final int bitsPerPixel = 8 >> bits;
-    final int width = xsize;
-    Data.Uint32List colorMap = this.data;
-    if (bitsPerPixel < 8) {
-      final int pixelsPerByte = 1 << bits;
-      final int countMask = pixelsPerByte - 1;
-      final bit_mask = (1 << bitsPerPixel) - 1;
-      for (int y = yStart; y < yEnd; ++y) {
-        int packed_pixels = 0;
-        for (int x = 0; x < width; ++x) {
-          // We need to load fresh 'packed_pixels' once every
-          // 'pixels_per_byte' increments of x. Fortunately, pixels_per_byte
-          // is a power of 2, so can just use a mask for that, instead of
-          // decrementing a counter.
-          if ((x & countMask) == 0) {
-            packed_pixels = _getARGBIndex(pixels[src++]);
-          }
-          pixels[dst++] = _getARGBValue(colorMap[packed_pixels & bit_mask]);
-          packed_pixels >>= bitsPerPixel;
-        }
-      }
-    } else {
-      for (int y = yStart; y < yEnd; ++y) {
-        for (int x = 0; x < width; ++x) {
-          pixels[dst++] = _getARGBValue(colorMap[_getARGBIndex(pixels[src++])]);
-        }
-      }
-    }
-  }
-
-  /**
-   * Color space inverse transform.
-   */
-  void _colorSpaceInverseTransform(Data.Uint32List pixels,
-                                   int yStart, int yEnd, int data) {
-    final int width = xsize;
-    final int mask = (1 << bits) - 1;
-    final int tilesPerRow = Vp8l._subSampleSize(width, bits);
-    int y = yStart;
-    int predRow = (y >> bits) * tilesPerRow; //this.data +
-
-    while (y < yEnd) {
-      int pred = predRow; // this.data+
-      _VP8LMultipliers m = new _VP8LMultipliers();
-
-      for (int x = 0; x < width; ++x) {
-        if ((x & mask) == 0) {
-          m.colorCode = this.data[pred++];
-        }
-
-        pixels[data + x] = m.transformColor(pixels[data + x], true);
-      }
-
-      data += width;
-      ++y;
-
-      if ((y & mask) == 0) {
-        predRow += tilesPerRow;;
-      }
-    }
-  }
-
-  /**
-   * Inverse prediction.
-   */
-  void _predictorInverseTransform(Data.Uint32List pixels,
-                                  int yStart, int yEnd, int data) {
-    final int width = xsize;
-    if (yStart == 0) {  // First Row follows the L (mode=1) mode.
-      final int pred0 = _predictor0(pixels, pixels[data - 1], 0);
-      _addPixelsEq(pixels, data, pred0);
-      for (int x = 1; x < width; ++x) {
-        final int pred1 = _predictor1(pixels, pixels[data + x - 1], 0);
-        _addPixelsEq(pixels, data + x, pred1);
-      }
-      data += width;
-      ++yStart;
-    }
-
-    int y = yStart;
-    final int mask = (1 << bits) - 1;
-    final int tilesPerRow = Vp8l._subSampleSize(width, bits);
-    int predModeBase = (y >> bits) * tilesPerRow; //this.data +
-
-    while (y < yEnd) {
-      final int pred2 = _predictor2(pixels, pixels[data - 1], data - width);
-      int predModeSrc = predModeBase; //this.data +
-
-      // First pixel follows the T (mode=2) mode.
-      _addPixelsEq(pixels, data, pred2);
-
-      // .. the rest:
-      var predFunc = PREDICTORS[(this.data[predModeSrc++] >> 8) & 0xf];
-      for (int x = 1; x < width; ++x) {
-        if ((x & mask) == 0) {    // start of tile. Read predictor function.
-          int k = ((this.data[predModeSrc++]) >> 8) & 0xf;
-          predFunc = PREDICTORS[k];
-        }
-        int pred = predFunc(pixels, pixels[data + x - 1], data + x - width);
-        _addPixelsEq(pixels, data + x, pred);
-      }
-
-      data += width;
-      ++y;
-
-      if ((y & mask) == 0) {   // Use the same mask, since tiles are squares.
-        predModeBase += tilesPerRow;
-      }
-    }
-  }
-
-  /**
-   * Add green to blue and red channels (i.e. perform the inverse transform of
-   * 'subtract green').
-   */
-  void _addGreenToBlueAndRed(Data.Uint32List pixels, int data, int dataEnd) {
-    while (data < dataEnd) {
-      final int argb = pixels[data];
-      final int green = ((argb >> 8) & 0xff);
-      int redBlue = (argb & 0x00ff00ff);
-      redBlue += (green << 16) | green;
-      redBlue &= 0x00ff00ff;
-      pixels[data++] = (argb & 0xff00ff00) | redBlue;
-    }
   }
 
   /**

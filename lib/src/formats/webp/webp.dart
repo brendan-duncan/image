@@ -2,7 +2,6 @@ part of image;
 
 class WebP {
   // VP8 related static constants.
-  static const int VP8_SIGNATURE = 0x9d012a; // Signature in VP8 data.
   // max size of mode partition
   static const int VP8_MAX_PARTITION0_SIZE = (1 << 19);
   // max size for token partition
@@ -28,6 +27,15 @@ class WebP {
   static const int CROSS_COLOR_TRANSFORM = 1;
   static const int SUBTRACT_GREEN = 2;
   static const int COLOR_INDEXING_TRANSFORM = 3;
+
+  // Filters.
+  static const int FILTER_NONE = 0;
+  static const int FILTER_HORIZONTAL = 1;
+  static const int FILTER_VERTICAL = 2;
+  static const int FILTER_GRADIENT = 3;
+  static const int FILTER_LAST = FILTER_GRADIENT + 1;  // end marker
+  static const int FILTER_BEST = 5;
+  static const int FILTER_FAST = 6;
 }
 
 /**

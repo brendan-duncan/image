@@ -55,6 +55,7 @@ part 'src/formats/webp/vp8l_bit_reader.dart';
 part 'src/formats/webp/vp8l_color_cache.dart';
 part 'src/formats/webp/vp8l_transform.dart';
 part 'src/formats/webp/webp.dart';
+part 'src/formats/webp/webp_alpha.dart';
 part 'src/formats/webp/webp_data.dart';
 part 'src/formats/webp/webp_frame.dart';
 part 'src/formats/webp/webp_huffman.dart';
