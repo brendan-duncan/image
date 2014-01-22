@@ -18,7 +18,7 @@ void defineWebPTests() {
 
         WebPData data = new WebPDecoder().getInfo(bytes);
         if (data == null) {
-          throw new ImageException('Unable to parse WebP info.');
+          throw new ImageException('Unable to parse WebP info: $name.');
         }
 
         print('$name');
@@ -35,16 +35,6 @@ void defineWebPTests() {
   group('WebP/decodeImage', () {
     Io.File script = new Io.File(Io.Platform.script.toFilePath());
     String path = script.parent.path + '/res/webp';
-
-    /*test('lossless', () {
-      List<int> bytes = new Io.File(path + '/1_webp_ll.webp').readAsBytesSync();
-      Image image = new WebPDecoder().decodeImage(bytes);
-
-      List<int> png = new PngEncoder().encode(image);
-      new Io.File('out/webp/1_webp_ll.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(png);
-    });*/
 
     Io.Directory dir = new Io.Directory(path);
     List files = dir.listSync();

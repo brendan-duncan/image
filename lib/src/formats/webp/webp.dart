@@ -1,11 +1,6 @@
 part of image;
 
 class WebP {
-  // enum Format
-  static const int FORMAT_UNDEFINED = 0;
-  static const int FORMAT_LOSSY = 1;
-  static const int FORMAT_LOSSLESS = 2;
-
   // VP8 related static constants.
   static const int VP8_SIGNATURE = 0x9d012a; // Signature in VP8 data.
   // max size of mode partition

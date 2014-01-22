@@ -15,14 +15,16 @@ class WebPDecoder {
     }
 
     switch (webp.format) {
-      case WebP.FORMAT_LOSSLESS:
+      case WebPData.FORMAT_ANIMATED:
+        return webp;
+      case WebPData.FORMAT_LOSSLESS:
         input.position = webp._vp8Position;
         Vp8l vp8l = new Vp8l(input, webp);
         if (!vp8l.decodeHeader()) {
           return null;
         }
         return webp;
-      case WebP.FORMAT_LOSSY:
+      case WebPData.FORMAT_LOSSY:
         input.position = webp._vp8Position;
         Vp8 vp8 = new Vp8(input, webp);
         if (!vp8.decodeHeader()) {
@@ -60,9 +62,9 @@ class WebPDecoder {
       }
     } else {
       input.position = webp._vp8Position;
-      if (webp.format == WebP.FORMAT_LOSSLESS) {
+      if (webp.format == WebPData.FORMAT_LOSSLESS) {
         return new Vp8l(input, webp).decode();
-      } else if (webp.format == WebP.FORMAT_LOSSY) {
+      } else if (webp.format == WebPData.FORMAT_LOSSY) {
         return new Vp8(input, webp).decode();
       }
     }
@@ -90,10 +92,10 @@ class WebPDecoder {
       }
     } else {
       input.position = data._vp8Position;
-      if (data.format == WebP.FORMAT_LOSSLESS) {
+      if (data.format == WebPData.FORMAT_LOSSLESS) {
         Image image = new Vp8l(input, data).decode();
         anim.addFrame(image);
-      } else if (data.format == WebP.FORMAT_LOSSY) {
+      } else if (data.format == WebPData.FORMAT_LOSSY) {
         Image image = new Vp8(input, data).decode();
         anim.addFrame(image);
       }
@@ -133,13 +135,13 @@ class WebPDecoder {
         case 'VP8 ':
           webp._vp8Position = input.position;
           webp._vp8Size = size;
-          webp.format = WebP.FORMAT_LOSSY;
+          webp.format = WebPData.FORMAT_LOSSY;
           found = true;
           break;
         case 'VP8L':
           webp._vp8Position = input.position;
           webp._vp8Size = size;
-          webp.format = WebP.FORMAT_LOSSLESS;
+          webp.format = WebPData.FORMAT_LOSSLESS;
           found = true;
           break;
         case 'ALPH':
@@ -148,11 +150,12 @@ class WebPDecoder {
           input.skip(diskSize);
           break;
         case 'ANIM':
+          webp.format = WebPData.FORMAT_ANIMATED;
           if (!_getAnimInfo(input, webp)) {
             return false;
           }
           break;
-        case 'ANIMF':
+        case 'ANMF':
           webp._animPositions.add(input.position);
           webp._animSizes.add(size);
           input.skip(diskSize);

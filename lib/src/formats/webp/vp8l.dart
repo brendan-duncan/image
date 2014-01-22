@@ -21,7 +21,7 @@ class Vp8l {
       return false;
     }
 
-    webp.format = WebP.FORMAT_LOSSLESS;
+    webp.format = WebPData.FORMAT_LOSSLESS;
     webp.width = br.readBits(14) + 1;
     webp.height = br.readBits(14) + 1;
     webp.hasAlpha = br.readBits(1) != 0;
