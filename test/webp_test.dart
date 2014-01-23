@@ -1,12 +1,18 @@
 part of image_test;
 
 void defineWebPTests() {
-  group('WebP/getInfo', () {
-    Io.File script = new Io.File(Io.Platform.script.toFilePath());
-    String path = script.parent.path + '/res/webp';
+  Io.File script = new Io.File(Io.Platform.script.toFilePath());
+  String path = script.parent.path + '/res/webp';
 
-    Io.Directory dir = new Io.Directory(path);
-    List files = dir.listSync();
+  Io.Directory dir = new Io.Directory(path);
+  List files = dir.listSync();
+
+  /*Io.File file = new Io.File(path + '/1_webp_a.webp');
+  List<int> bytes = file.readAsBytesSync();
+  Image image = new WebPDecoder().decodeImage(bytes);
+  print('${image.width} ${image.height}');*/
+
+  group('WebP/getInfo', () {
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.webp')) {
         return;
@@ -33,17 +39,6 @@ void defineWebPTests() {
   });
 
   group('WebP/decodeImage', () {
-    Io.File script = new Io.File(Io.Platform.script.toFilePath());
-    String path = script.parent.path + '/res/webp';
-
-    /*test('1_webp_a', () {
-      Io.File file = new Io.File(path + '/1_webp_a.webp');
-      List<int> bytes = file.readAsBytesSync();
-      Image image = new WebPDecoder().decodeImage(bytes);
-    });*/
-
-    Io.Directory dir = new Io.Directory(path);
-    List files = dir.listSync();
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.webp')) {
         return;

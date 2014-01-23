@@ -18,7 +18,7 @@ class VP8BitReader {
   int getValue(int bits) {
     int v = 0;
     while (bits-- > 0) {
-      v |= _getBits(0x80) << bits;
+      v |= getBits(0x80) << bits;
     }
     return v;
   }
@@ -32,7 +32,7 @@ class VP8BitReader {
     return getValue(1);
   }
 
-  int _getBits(int prob) {
+  int getBits(int prob) {
     final int split = (_range * prob) >> 8;
     final int bit = _bitUpdate(split);
     if (_range <= 0x7e) {

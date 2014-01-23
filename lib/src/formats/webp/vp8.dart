@@ -44,54 +44,11 @@ class VP8 {
   }
 
   Image decode() {
-    if (!decodeHeader()) {
+    if (!_getHeaders()) {
       return null;
     }
 
-    _picHeader.width = webp.width;
-    _picHeader.height = webp.height;
-    _picHeader.xscale = (webp.width >> 8) >> 6;
-    _picHeader.yscale = (webp.height >> 8) >> 6;
-
-    _mbWidth = (webp.width + 15) >> 4;
-    _mbHeight = (webp.height + 15) >> 4;
-
-    _probabilities = new VP8Proba();
-
-    _segmentHeader.useSegment = false;
-    _segmentHeader.updateMap = false;
-    _segmentHeader.absoluteDelta = true;
-    _segmentHeader.quantizer.fillRange(0, _segmentHeader.quantizer.length, 0);
-    _segmentHeader.filterStrength.fillRange(0,
-        _segmentHeader.filterStrength.length, 0);
-    _segment = 0;
-
-    br = new VP8BitReader(input.subset(null, _frameHeader.partitionLength));
-    input.skip(_frameHeader.partitionLength);
-
-    _picHeader.colorspace = br.getBit();
-    _picHeader.clampType = br.getBit();
-
-    if (!_parseSegmentHeader(_segmentHeader, _probabilities)) {
-      return null;
-    }
-
-    // Filter specs
-    /*if (!_parseFilterHeader()) {
-      return null;
-    }
-
-    if (!_parsePartitions(input)) {
-      return null;
-    }
-
-    // quantizer change
-    _parseQuant();
-
-    // Frame buffer marking
-    br.getBit();   // ignore the value of update_proba_
-
-    _parseProba();*/
+    output = new Image(webp.width, webp.height);
 
     // Finish setting up the decoding parameter.
     /*if (!_enterCritical()) {
@@ -108,9 +65,62 @@ class VP8 {
       return null;
     }*/
 
-    Image image = new Image(webp.width, webp.height);
+    return output;
+  }
 
-    return image;
+  bool _getHeaders() {
+    if (!decodeHeader()) {
+      return false;
+    }
+
+    _probabilities = new VP8Proba();
+    for (int i = 0; i < NUM_MB_SEGMENTS; ++i) {
+      _dqm[i] = new VP8QuantMatrix();
+    }
+
+    _picHeader.width = webp.width;
+    _picHeader.height = webp.height;
+    _picHeader.xscale = (webp.width >> 8) >> 6;
+    _picHeader.yscale = (webp.height >> 8) >> 6;
+
+    _cropTop = 0;
+    _cropLeft = 0;
+    _cropRight = webp.width;
+    _cropBottom = webp.height;
+
+    _mbWidth = (webp.width + 15) >> 4;
+    _mbHeight = (webp.height + 15) >> 4;
+
+    _segment = 0;
+
+    br = new VP8BitReader(input.subset(null, _frameHeader.partitionLength));
+    input.skip(_frameHeader.partitionLength);
+
+    _picHeader.colorspace = br.getBit();
+    _picHeader.clampType = br.getBit();
+
+    if (!_parseSegmentHeader(_segmentHeader, _probabilities)) {
+      return false;
+    }
+
+    // Filter specs
+    if (!_parseFilterHeader()) {
+      return false;
+    }
+
+    if (!_parsePartitions(input)) {
+      return false;
+    }
+
+    // quantizer change
+    _parseQuant();
+
+    // Frame buffer marking
+    br.getBit();   // ignore the value of update_proba_
+
+    _parseProba();
+
+    return true;
   }
 
   bool _parseSegmentHeader(VP8SegmentHeader hdr, VP8Proba proba) {
@@ -119,15 +129,15 @@ class VP8 {
       hdr.updateMap = br.getBit() != 0;
       if (br.getBit() != 0) {   // update data
         hdr.absoluteDelta = br.getBit() != 0;
-        for (int s = 0; s < VP8.NUM_MB_SEGMENTS; ++s) {
+        for (int s = 0; s < NUM_MB_SEGMENTS; ++s) {
           hdr.quantizer[s] = br.getBit() != 0 ? br.getSignedValue(7) : 0;
         }
-        for (int s = 0; s < VP8.NUM_MB_SEGMENTS; ++s) {
+        for (int s = 0; s < NUM_MB_SEGMENTS; ++s) {
           hdr.filterStrength[s] = br.getBit() != 0 ? br.getSignedValue(6) : 0;
         }
       }
       if (hdr.updateMap) {
-        for (int s = 0; s < VP8.MB_FEATURE_TREE_PROBS; ++s) {
+        for (int s = 0; s < MB_FEATURE_TREE_PROBS; ++s) {
           proba.segments[s] = br.getBit() != 0 ? br.getValue(8) : 255;
         }
       }
@@ -138,10 +148,152 @@ class VP8 {
     return true;
   }
 
+  bool _parseFilterHeader() {
+    VP8FilterHeader hdr = _filterHeader;
+    hdr.simple = br.getBit() != 0;
+    hdr.level = br.getValue(6);
+    hdr.sharpness = br.getValue(3);
+    hdr.useLfDelta = br.getBit() != 0;
+    if (hdr.useLfDelta) {
+      if (br.getBit() != 0) {   // update lf-delta?
+        for (int i = 0; i < NUM_REF_LF_DELTAS; ++i) {
+          if (br.getBit() != 0) {
+            hdr.refLfDelta[i] = br.getSignedValue(6);
+          }
+        }
+
+        for (int i = 0; i < NUM_MODE_LF_DELTAS; ++i) {
+          if (br.getBit() != 0) {
+            hdr.modeLfDelta[i] = br.getSignedValue(6);
+          }
+        }
+      }
+    }
+
+    _filterType = (hdr.level == 0) ? 0 : hdr.simple ? 1 : 2;
+
+    return true;
+  }
+
+  /**
+   * This function returns VP8_STATUS_SUSPENDED if we don't have all the
+   * necessary data in 'buf'.
+   * This case is not necessarily an error (for incremental decoding).
+   * Still, no bitreader is ever initialized to make it possible to read
+   * unavailable memory.
+   * If we don't even have the partitions' sizes, than VP8_STATUS_NOT_ENOUGH_DATA
+   * is returned, and this is an unrecoverable error.
+   * If the partitions were positioned ok, VP8_STATUS_OK is returned.
+   */
+  bool _parsePartitions(Arc.InputStream input) {
+    int sz = 0;
+    int bufEnd = input.remainder;
+
+    _numPartitions = 1 << br.getValue(2);
+    int lastPart = _numPartitions - 1;
+    int partStart = lastPart * 3;
+    if (bufEnd < partStart) {
+      // we can't even read the sizes with sz[]! That's a failure.
+      return false;
+    }
+
+    for (int p = 0; p < lastPart; ++p) {
+      List<int> szb = input.peekBytes(3, sz);
+      final int psize = szb[0] | (szb[1] << 8) | (szb[2] << 16);
+      int partEnd = partStart + psize;
+      if (partEnd > bufEnd) {
+        partEnd = bufEnd;
+      }
+
+      Arc.InputStream pin = input.subset(partStart, partEnd - partStart);
+      _partitions[p] = new VP8BitReader(pin);
+      partStart = partEnd;
+      sz += 3;
+    }
+
+    Arc.InputStream pin = input.subset(partStart, bufEnd - partStart);
+    _partitions[lastPart] = new VP8BitReader(pin);
+
+    // Init is ok, but there's not enough data
+    return (partStart < bufEnd) ? true : false;
+  }
+
+  void _parseQuant() {
+    final int base_q0 = br.getValue(7);
+    final int dqy1_dc = br.getBit() != 0 ? br.getSignedValue(4) : 0;
+    final int dqy2_dc = br.getBit() != 0 ? br.getSignedValue(4) : 0;
+    final int dqy2_ac = br.getBit() != 0 ? br.getSignedValue(4) : 0;
+    final int dquv_dc = br.getBit() != 0 ? br.getSignedValue(4) : 0;
+    final int dquv_ac = br.getBit() != 0 ? br.getSignedValue(4) : 0;
+
+    VP8SegmentHeader hdr = _segmentHeader;
+
+    for (int i = 0; i < NUM_MB_SEGMENTS; ++i) {
+      int q;
+      if (hdr.useSegment) {
+        q = hdr.quantizer[i];
+        if (!hdr.absoluteDelta) {
+          q += base_q0;
+        }
+      } else {
+        if (i > 0) {
+          _dqm[i] = _dqm[0];
+          continue;
+        } else {
+          q = base_q0;
+        }
+      }
+
+      VP8QuantMatrix m = _dqm[i];
+      m.y1Mat[0] = DC_TABLE[_clip(q + dqy1_dc, 127)];
+      m.y1Mat[1] = AC_TABLE[_clip(q + 0,       127)];
+
+      m.y2Mat[0] = DC_TABLE[_clip(q + dqy2_dc, 127)] * 2;
+      // For all x in [0..284], x*155/100 is bitwise equal to (x*101581) >> 16.
+      // The smallest precision for that is '(x*6349) >> 12' but 16 is a good
+      // word size.
+      m.y2Mat[1] = (AC_TABLE[_clip(q + dqy2_ac, 127)] * 101581) >> 16;
+      if (m.y2Mat[1] < 8) {
+        m.y2Mat[1] = 8;
+      }
+
+      m.uvMat[0] = DC_TABLE[_clip(q + dquv_dc, 117)];
+      m.uvMat[1] = AC_TABLE[_clip(q + dquv_ac, 127)];
+
+      m.uvQuant = q + dquv_ac;   // for dithering strength evaluation
+    }
+  }
+
+  void _parseProba() {
+    VP8Proba proba = _probabilities;
+
+    for (int t = 0; t < NUM_TYPES; ++t) {
+      for (int b = 0; b < NUM_BANDS; ++b) {
+        for (int c = 0; c < NUM_CTX; ++c) {
+          for (int p = 0; p < NUM_PROBAS; ++p) {
+            final int v = br.getBits(COEFFS_UPDATE_PROBA[t][b][c][p]) != 0 ?
+                br.getValue(8) : COEFFS_PROBA_0[t][b][c][p];
+                proba.bands[t][b].probas[c][p] = v;
+          }
+        }
+      }
+    }
+
+    _useSkipProbabilities = br.getBit() != 0;
+    if (_useSkipProbabilities) {
+      _skipProb = br.getValue(8);
+    }
+  }
+
   /**
    * Finish setting up the decoding parameter once user's setup() is called.
    */
   bool _enterCritical() {
+    _fStrengths = new List<List<VP8FInfo>>(NUM_MB_SEGMENTS);
+    for (int i = 0; i < NUM_MB_SEGMENTS; ++i) {
+      _fStrengths[i] = new List<VP8FInfo>(2);
+    }
+
     // Define the area where we can skip in-loop filtering, in case of cropping.
     //
     // 'Simple' filter reads two luma samples outside of the macroblock
@@ -151,34 +303,100 @@ class VP8 {
     // Means: there's a dependency chain that goes all the way up to the
     // top-left corner of the picture (MB #0). We must filter all the previous
     // macroblocks.
-    /*{
-      final int extra_pixels = kFilterExtraRows[dec->filter_type_];
-      if (dec->filter_type_ == 2) {
+    {
+      final int extraPixels = FILTER_EXTRA_ROWS[_filterType];
+      if (_filterType == 2) {
         // For complex filter, we need to preserve the dependency chain.
-        dec->tl_mb_x_ = 0;
-        dec->tl_mb_y_ = 0;
+        _tlMbX = 0;
+        _tlMbY = 0;
       } else {
         // For simple filter, we can filter only the cropped region.
         // We include 'extra_pixels' on the other side of the boundary, since
         // vertical or horizontal filtering of the previous macroblock can
         // modify some abutting pixels.
-        dec->tl_mb_x_ = (io->crop_left - extra_pixels) >> 4;
-        dec->tl_mb_y_ = (io->crop_top - extra_pixels) >> 4;
-        if (dec->tl_mb_x_ < 0) dec->tl_mb_x_ = 0;
-        if (dec->tl_mb_y_ < 0) dec->tl_mb_y_ = 0;
+        _tlMbX = (_cropLeft - extraPixels) >> 4;
+        _tlMbY = (_cropTop - extraPixels) >> 4;
+        if (_tlMbX < 0) {
+          _tlMbX = 0;
+        }
+        if (_tlMbY < 0) {
+          _tlMbY = 0;
+        }
       }
       // We need some 'extra' pixels on the right/bottom.
-      dec->br_mb_y_ = (io->crop_bottom + 15 + extra_pixels) >> 4;
-      dec->br_mb_x_ = (io->crop_right + 15 + extra_pixels) >> 4;
-      if (dec->br_mb_x_ > dec->mb_w_) {
-        dec->br_mb_x_ = dec->mb_w_;
+      _brMbY = (_cropBottom + 15 + extraPixels) >> 4;
+      _brMbX = (_cropRight + 15 + extraPixels) >> 4;
+      if (_brMbX > _mbWidth) {
+        _brMbX = _mbWidth;
       }
-      if (dec->br_mb_y_ > dec->mb_h_) {
-        dec->br_mb_y_ = dec->mb_h_;
+      if (_brMbY > _mbHeight) {
+        _brMbY = _mbHeight;
       }
     }
-    _precomputeFilterStrengths();*/
+
+    _precomputeFilterStrengths();
     return true;
+  }
+
+  /**
+   * Precompute the filtering strength for each segment and each i4x4/i16x16
+   * mode.
+   */
+  void _precomputeFilterStrengths() {
+    if (_filterType > 0) {
+      VP8FilterHeader hdr = _filterHeader;
+      for (int s = 0; s < NUM_MB_SEGMENTS; ++s) {
+        // First, compute the initial level
+        int baseLevel;
+        if (_segmentHeader.useSegment) {
+          baseLevel = _segmentHeader.filterStrength[s];
+          if (!_segmentHeader.absoluteDelta) {
+            baseLevel += hdr.level;
+          }
+        } else {
+          baseLevel = hdr.level;
+        }
+
+        for (int i4x4 = 0; i4x4 <= 1; ++i4x4) {
+          VP8FInfo info = _fStrengths[s][i4x4];
+          int level = baseLevel;
+          if (hdr.useLfDelta) {
+            level += hdr.refLfDelta[0];
+            if (i4x4 != 0) {
+              level += hdr.modeLfDelta[0];
+            }
+          }
+
+          level = (level < 0) ? 0 : (level > 63) ? 63 : level;
+          if (level > 0) {
+            int ilevel = level;
+            if (hdr.sharpness > 0) {
+              if (hdr.sharpness > 4) {
+                ilevel >>= 2;
+              } else {
+                ilevel >>= 1;
+              }
+
+              if (ilevel > 9 - hdr.sharpness) {
+                ilevel = 9 - hdr.sharpness;
+              }
+            }
+
+            if (ilevel < 1) {
+              ilevel = 1;
+            }
+
+            info.fInnerlevel = ilevel;
+            info.fLimit = 2 * level + ilevel;
+            info.hevThresh = (level >= 40) ? 2 : (level >= 15) ? 1 : 0;
+          } else {
+            info.fLimit = 0;  // no filtering
+          }
+
+          info.fInner = i4x4;
+        }
+      }
+    }
   }
 
   bool _initFrame() {
@@ -215,11 +433,18 @@ class VP8 {
   // Main data source
   VP8BitReader br;
 
+  Image output;
+
   // headers
   VP8FrameHeader _frameHeader = new VP8FrameHeader();
   VP8PictureHeader _picHeader = new VP8PictureHeader();
-  VP8FilterHeader  _filterHeader = new VP8FilterHeader();
+  VP8FilterHeader _filterHeader = new VP8FilterHeader();
   VP8SegmentHeader _segmentHeader = new VP8SegmentHeader();
+
+  int _cropLeft;
+  int _cropRight;
+  int _cropTop;
+  int _cropBottom;
 
   /// Width in macroblock units.
   int _mbWidth;
@@ -242,7 +467,7 @@ class VP8 {
   VP8Random _ditheringRand; // random generator for dithering
 
   // dequantization (one set of DC/AC dequant factor per segment)
-  List<VP8QuantMatrix> dqm = new List<VP8QuantMatrix>(NUM_MB_SEGMENTS);
+  List<VP8QuantMatrix> _dqm = new List<VP8QuantMatrix>(NUM_MB_SEGMENTS);
 
   // probabilities
   VP8Proba _probabilities;
@@ -279,7 +504,8 @@ class VP8 {
 
   // Per macroblock non-persistent infos.
   /// current position, in macroblock units
-  int _mbX, _mbY;
+  int _mbX;
+  int _mbY;
   /// parsed reconstruction data
   VP8MBData _mbData;
 
@@ -287,7 +513,7 @@ class VP8 {
   /// 0=off, 1=simple, 2=complex
   int _filterType;
   /// precalculated per-segment/type
-  List<VP8FInfo> _fStrengths = new List<VP8FInfo>(NUM_MB_SEGMENTS * 2);
+  List<List<VP8FInfo>> _fStrengths;
 
   // Alpha
   /// alpha-plane decoder object
@@ -304,6 +530,324 @@ class VP8 {
   /// compressed layer data (if present)
   Data.Uint8List _layerData;
 
+  static int _clip(int v, int M) {
+    return v < 0 ? 0 : v > M ? M : v;
+  }
+
+  static const List COEFFS_PROBA_0 = const [
+  const [ const [ const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ]
+    ],
+    const [ const [ 253, 136, 254, 255, 228, 219, 128, 128, 128, 128, 128 ],
+      const [ 189, 129, 242, 255, 227, 213, 255, 219, 128, 128, 128 ],
+      const [ 106, 126, 227, 252, 214, 209, 255, 255, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 98, 248, 255, 236, 226, 255, 255, 128, 128, 128 ],
+      const [ 181, 133, 238, 254, 221, 234, 255, 154, 128, 128, 128 ],
+      const [ 78, 134, 202, 247, 198, 180, 255, 219, 128, 128, 128 ],
+    ],
+    const [ const [ 1, 185, 249, 255, 243, 255, 128, 128, 128, 128, 128 ],
+      const [ 184, 150, 247, 255, 236, 224, 128, 128, 128, 128, 128 ],
+      const [ 77, 110, 216, 255, 236, 230, 128, 128, 128, 128, 128 ],
+    ],
+    const [ const [ 1, 101, 251, 255, 241, 255, 128, 128, 128, 128, 128 ],
+      const [ 170, 139, 241, 252, 236, 209, 255, 255, 128, 128, 128 ],
+      const [ 37, 116, 196, 243, 228, 255, 255, 255, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 204, 254, 255, 245, 255, 128, 128, 128, 128, 128 ],
+      const [ 207, 160, 250, 255, 238, 128, 128, 128, 128, 128, 128 ],
+      const [ 102, 103, 231, 255, 211, 171, 128, 128, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 152, 252, 255, 240, 255, 128, 128, 128, 128, 128 ],
+      const [ 177, 135, 243, 255, 234, 225, 128, 128, 128, 128, 128 ],
+      const [ 80, 129, 211, 255, 194, 224, 128, 128, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 246, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 255, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ]
+    ]
+  ],
+  const [ const [ const [ 198, 35, 237, 223, 193, 187, 162, 160, 145, 155, 62 ],
+      const [ 131, 45, 198, 221, 172, 176, 220, 157, 252, 221, 1 ],
+      const [ 68, 47, 146, 208, 149, 167, 221, 162, 255, 223, 128 ]
+    ],
+    const [ const [ 1, 149, 241, 255, 221, 224, 255, 255, 128, 128, 128 ],
+      const [ 184, 141, 234, 253, 222, 220, 255, 199, 128, 128, 128 ],
+      const [ 81, 99, 181, 242, 176, 190, 249, 202, 255, 255, 128 ]
+    ],
+    const [ const [ 1, 129, 232, 253, 214, 197, 242, 196, 255, 255, 128 ],
+      const [ 99, 121, 210, 250, 201, 198, 255, 202, 128, 128, 128 ],
+      const [ 23, 91, 163, 242, 170, 187, 247, 210, 255, 255, 128 ]
+    ],
+    const [ const [ 1, 200, 246, 255, 234, 255, 128, 128, 128, 128, 128 ],
+      const [ 109, 178, 241, 255, 231, 245, 255, 255, 128, 128, 128 ],
+      const [ 44, 130, 201, 253, 205, 192, 255, 255, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 132, 239, 251, 219, 209, 255, 165, 128, 128, 128 ],
+      const [ 94, 136, 225, 251, 218, 190, 255, 255, 128, 128, 128 ],
+      const [ 22, 100, 174, 245, 186, 161, 255, 199, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 182, 249, 255, 232, 235, 128, 128, 128, 128, 128 ],
+      const [ 124, 143, 241, 255, 227, 234, 128, 128, 128, 128, 128 ],
+      const [ 35, 77, 181, 251, 193, 211, 255, 205, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 157, 247, 255, 236, 231, 255, 255, 128, 128, 128 ],
+      const [ 121, 141, 235, 255, 225, 227, 255, 255, 128, 128, 128 ],
+      const [ 45, 99, 188, 251, 195, 217, 255, 224, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 1, 251, 255, 213, 255, 128, 128, 128, 128, 128 ],
+      const [ 203, 1, 248, 255, 255, 128, 128, 128, 128, 128, 128 ],
+      const [ 137, 1, 177, 255, 224, 255, 128, 128, 128, 128, 128 ]
+    ]
+  ],
+  const [ const [ const [ 253, 9, 248, 251, 207, 208, 255, 192, 128, 128, 128 ],
+      const [ 175, 13, 224, 243, 193, 185, 249, 198, 255, 255, 128 ],
+      const [ 73, 17, 171, 221, 161, 179, 236, 167, 255, 234, 128 ]
+    ],
+    const [ const [ 1, 95, 247, 253, 212, 183, 255, 255, 128, 128, 128 ],
+      const [ 239, 90, 244, 250, 211, 209, 255, 255, 128, 128, 128 ],
+      const [ 155, 77, 195, 248, 188, 195, 255, 255, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 24, 239, 251, 218, 219, 255, 205, 128, 128, 128 ],
+      const [ 201, 51, 219, 255, 196, 186, 128, 128, 128, 128, 128 ],
+      const [ 69, 46, 190, 239, 201, 218, 255, 228, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 191, 251, 255, 255, 128, 128, 128, 128, 128, 128 ],
+      const [ 223, 165, 249, 255, 213, 255, 128, 128, 128, 128, 128 ],
+      const [ 141, 124, 248, 255, 255, 128, 128, 128, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 16, 248, 255, 255, 128, 128, 128, 128, 128, 128 ],
+      const [ 190, 36, 230, 255, 236, 255, 128, 128, 128, 128, 128 ],
+      const [ 149, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 226, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 247, 192, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 240, 128, 255, 128, 128, 128, 128, 128, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 134, 252, 255, 255, 128, 128, 128, 128, 128, 128 ],
+      const [ 213, 62, 250, 255, 255, 128, 128, 128, 128, 128, 128 ],
+      const [ 55, 93, 255, 128, 128, 128, 128, 128, 128, 128, 128 ]
+    ],
+    const [ const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ]
+    ]
+  ],
+  const [ const [ const [ 202, 24, 213, 235, 186, 191, 220, 160, 240, 175, 255 ],
+      const [ 126, 38, 182, 232, 169, 184, 228, 174, 255, 187, 128 ],
+      const [ 61, 46, 138, 219, 151, 178, 240, 170, 255, 216, 128 ]
+    ],
+    const [ const [ 1, 112, 230, 250, 199, 191, 247, 159, 255, 255, 128 ],
+      const [ 166, 109, 228, 252, 211, 215, 255, 174, 128, 128, 128 ],
+      const [ 39, 77, 162, 232, 172, 180, 245, 178, 255, 255, 128 ]
+    ],
+    const [ const [ 1, 52, 220, 246, 198, 199, 249, 220, 255, 255, 128 ],
+      const [ 124, 74, 191, 243, 183, 193, 250, 221, 255, 255, 128 ],
+      const [ 24, 71, 130, 219, 154, 170, 243, 182, 255, 255, 128 ]
+    ],
+    const [ const [ 1, 182, 225, 249, 219, 240, 255, 224, 128, 128, 128 ],
+      const [ 149, 150, 226, 252, 216, 205, 255, 171, 128, 128, 128 ],
+      const [ 28, 108, 170, 242, 183, 194, 254, 223, 255, 255, 128 ]
+    ],
+    const [ const [ 1, 81, 230, 252, 204, 203, 255, 192, 128, 128, 128 ],
+      const [ 123, 102, 209, 247, 188, 196, 255, 233, 128, 128, 128 ],
+      const [ 20, 95, 153, 243, 164, 173, 255, 203, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 222, 248, 255, 216, 213, 128, 128, 128, 128, 128 ],
+      const [ 168, 175, 246, 252, 235, 205, 255, 255, 128, 128, 128 ],
+      const [ 47, 116, 215, 255, 211, 212, 255, 255, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 121, 236, 253, 212, 214, 255, 255, 128, 128, 128 ],
+      const [ 141, 84, 213, 252, 201, 202, 255, 219, 128, 128, 128 ],
+      const [ 42, 80, 160, 240, 162, 185, 255, 205, 128, 128, 128 ]
+    ],
+    const [ const [ 1, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 244, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
+      const [ 238, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ]
+    ]
+  ] ];
+
+
+  static const List COEFFS_UPDATE_PROBA = const [
+    const [ const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 176, 246, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 223, 241, 252, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 249, 253, 253, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 244, 252, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 234, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 253, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 246, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 239, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 254, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 248, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 251, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 251, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 254, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 254, 253, 255, 254, 255, 255, 255, 255, 255, 255 ],
+      const [ 250, 255, 254, 255, 254, 255, 255, 255, 255, 255, 255 ],
+      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ]
+    ],
+    const [ const [ const [ 217, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 225, 252, 241, 253, 255, 255, 254, 255, 255, 255, 255 ],
+      const [ 234, 250, 241, 250, 253, 255, 253, 254, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 223, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 238, 253, 254, 254, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 248, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 249, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 253, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 247, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 252, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 253, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 254, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 250, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ]
+    ],
+    const [ const [ const [ 186, 251, 250, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 234, 251, 244, 254, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 251, 251, 243, 253, 254, 255, 254, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 236, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 251, 253, 253, 254, 254, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 254, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 254, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ]
+    ],
+    const [ const [ const [ 248, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 250, 254, 252, 254, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 248, 254, 249, 253, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 253, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 246, 253, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 252, 254, 251, 254, 254, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 254, 252, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 248, 254, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 253, 255, 254, 254, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 251, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 245, 251, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 253, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 251, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 252, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 252, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 249, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 255, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 250, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ],
+    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
+      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    ] ] ];
+
+  // Paragraph 14.1
+  static const List<int> DC_TABLE = const [ // uint8
+      4,     5,   6,   7,   8,   9,  10,  10,
+      11,   12,  13,  14,  15,  16,  17,  17,
+      18,   19,  20,  20,  21,  21,  22,  22,
+      23,   23,  24,  25,  25,  26,  27,  28,
+      29,   30,  31,  32,  33,  34,  35,  36,
+      37,   37,  38,  39,  40,  41,  42,  43,
+      44,   45,  46,  46,  47,  48,  49,  50,
+      51,   52,  53,  54,  55,  56,  57,  58,
+      59,   60,  61,  62,  63,  64,  65,  66,
+      67,   68,  69,  70,  71,  72,  73,  74,
+      75,   76,  76,  77,  78,  79,  80,  81,
+      82,   83,  84,  85,  86,  87,  88,  89,
+      91,   93,  95,  96,  98, 100, 101, 102,
+      104, 106, 108, 110, 112, 114, 116, 118,
+      122, 124, 126, 128, 130, 132, 134, 136,
+      138, 140, 143, 145, 148, 151, 154, 157];
+
+  static const List<int> AC_TABLE = const [ // uint16
+       4,     5,   6,   7,   8,   9,  10,  11,
+       12,   13,  14,  15,  16,  17,  18,  19,
+       20,   21,  22,  23,  24,  25,  26,  27,
+       28,   29,  30,  31,  32,  33,  34,  35,
+       36,   37,  38,  39,  40,  41,  42,  43,
+       44,   45,  46,  47,  48,  49,  50,  51,
+       52,   53,  54,  55,  56,  57,  58,  60,
+       62,   64,  66,  68,  70,  72,  74,  76,
+       78,   80,  82,  84,  86,  88,  90,  92,
+       94,   96,  98, 100, 102, 104, 106, 108,
+       110, 112, 114, 116, 119, 122, 125, 128,
+       131, 134, 137, 140, 143, 146, 149, 152,
+       155, 158, 161, 164, 167, 170, 173, 177,
+       181, 185, 189, 193, 197, 201, 205, 209,
+       213, 217, 221, 225, 229, 234, 239, 245,
+       249, 254, 259, 264, 269, 274, 279, 284];
+
+  /**
+   * FILTER_EXTRA_ROWS = How many extra lines are needed on the MB boundary
+   * for caching, given a filtering level.
+   * Simple filter:  up to 2 luma samples are read and 1 is written.
+   * Complex filter: up to 4 luma samples are read and 3 are written. Same for
+   *               U/V, so it's 8 samples total (because of the 2x upsampling).
+   */
+  static const List<int> FILTER_EXTRA_ROWS = const [ 0, 2, 8 ];
+
   static const int VP8_SIGNATURE = 0x2a019d;
 
   static const int MB_FEATURE_TREE_PROBS = 3;
@@ -318,206 +862,3 @@ class VP8 {
   static const int NUM_PROBAS = 11;
 }
 
-class VP8FrameHeader {
-  bool keyFrame;
-  int profile; // uint8
-  int show; // uint8
-  int partitionLength; // uint32
-}
-
-class VP8PictureHeader {
-  int width; // uint16
-  int height; // uint16
-  int xscale; // uint8
-  int yscale; // uint8
-  int colorspace; // uint8, 0 = YCbCr
-  int clampType; // uint8
-}
-
-/**
- * Segment features
- */
-class VP8SegmentHeader {
-  bool useSegment;
-  bool updateMap; // whether to update the segment map or not
-  bool absoluteDelta; // absolute or delta values for quantizer and filter
-  /// quantization changes
-  Data.Int8List quantizer = new Data.Int8List(VP8.NUM_MB_SEGMENTS);
-  /// filter strength for segments
-  Data.Int8List filterStrength = new Data.Int8List(VP8.NUM_MB_SEGMENTS);
-}
-
-/**
- * All the probas associated to one band
- */
-class VP8BandProbas {
-  Data.Uint8List probas = new Data.Uint8List(VP8.NUM_PROBAS * VP8.NUM_CTX);
-}
-
-/**
- * Struct collecting all frame-persistent probabilities.
- */
-class VP8Proba {
-  Data.Uint8List segments = new Data.Uint8List(VP8.MB_FEATURE_TREE_PROBS);
-  /// Type: 0:Intra16-AC  1:Intra16-DC   2:Chroma   3:Intra4
-  List<List<VP8BandProbas>> bands = new List(VP8.NUM_TYPES);
-
-  VP8Proba() {
-    for (int i = 0; i < VP8.NUM_TYPES; ++i) {
-      bands[i] = new List<VP8BandProbas>(VP8.NUM_BANDS);
-      for (int j = 0; j < VP8.NUM_BANDS; ++j) {
-        bands[i][j] = new VP8BandProbas();
-      }
-    }
-
-    segments.fillRange(0, segments.length, 255);
-  }
-}
-
-/**
- * Filter parameters
- */
-class VP8FilterHeader {
-  bool simple; // 0=complex, 1=simple
-  int level; // [0..63]
-  int sharpness; // [0..7]
-  int useLfDelta;
-  Data.Int32List refLfDelta = new Data.Int32List(VP8.NUM_REF_LF_DELTAS);
-  Data.Int32List modeLfDelta = new Data.Int32List(VP8.NUM_MODE_LF_DELTAS);
-}
-
-//------------------------------------------------------------------------------
-// Informations about the macroblocks.
-
-/**
- * filter specs
- */
-class VP8FInfo {
-  int fLimit; // uint8_t, filter limit in [3..189], or 0 if no filtering
-  int fInnerlevel; // uint8_t, inner limit in [1..63]
-  int fInner; // uint8_t, do inner filtering?
-  int hevThresh; // uint8_t, high edge variance threshold in [0..2]
-}
-
-/**
- * Top/Left Contexts used for syntax-parsing
- */
-class VP8MB{
-  int nz; // uint8_t, non-zero AC/DC coeffs (4bit for luma + 4bit for chroma)
-  int nzDc; // uint8_t, non-zero DC coeff (1bit)
-}
-
-/**
- * Dequantization matrices
- */
-class VP8QuantMatrix {
-  Data.Int32List y1Mat = new Data.Int32List(2);
-  Data.Int32List y2Mat = new Data.Int32List(2);
-  Data.Int32List uvMat = new Data.Int32List(2);
-
-  int uvQuant; // U/V quantizer value
-  int dither; // dithering amplitude (0 = off, max=255)
-}
-
-/**
- * Data needed to reconstruct a macroblock
- */
-class VP8MBData {
-  /// 384 coeffs = (16+4+4) * 4*4
-  Data.Int16List coeffs = new Data.Int16List(384);
-  bool isIntra4x4; // true if intra4x4
-  /// one 16x16 mode (#0) or sixteen 4x4 modes
-  Data.Uint8List imodes = new Data.Uint8List(16);
-  /// chroma prediction mode
-  int uvmode;
-  // bit-wise info about the content of each sub-4x4 blocks (in decoding order).
-  // Each of the 4x4 blocks for y/u/v is associated with a 2b code according to:
-  //   code=0 -> no coefficient
-  //   code=1 -> only DC
-  //   code=2 -> first three coefficients are non-zero
-  //   code=3 -> more than three coefficients are non-zero
-  // This allows to call specialized transform functions.
-  int nonZeroY;
-  int nonZeroUV;
-  /// uint8_t, local dithering strength (deduced from non_zero_*)
-  int dither;
-}
-
-/**
- * Saved top samples, per macroblock. Fits into a cache-line.
- */
-class VP8TopSamples {
-  Data.Uint8List y = new Data.Uint8List(16);
-  Data.Uint8List u = new Data.Uint8List(8);
-  Data.Uint8List v = new Data.Uint8List(8);
-}
-
-class VP8Random {
-  int _index1;
-  int _index2;
-  Data.Uint32List _table = new Data.Uint32List(RANDOM_TABLE_SIZE);
-  int _amplitude;
-
-  /**
-   * Initializes random generator with an amplitude 'dithering' in range [0..1].
-   */
-  VP8Random(double dithering) {
-    _table.setRange(0, RANDOM_TABLE_SIZE, _RANDOM_TABLE);
-    _index1 = 0;
-    _index2 = 31;
-    _amplitude = (dithering < 0.0) ? 0 :
-                 (dithering > 1.0) ? (1 << RANDOM_DITHER_FIX) :
-                 ((1 << RANDOM_DITHER_FIX) * dithering).toInt();
-  }
-
-  /**
-   * Returns a centered pseudo-random number with 'num_bits' amplitude.
-   * (uses D.Knuth's Difference-based random generator).
-   * 'amp' is in RANDOM_DITHER_FIX fixed-point precision.
-   */
-  int randomBits2(int numBits, int amp) {
-    int diff = _table[_index1] - _table[_index2];
-    if (diff < 0) {
-      diff += (1 << 31);
-    }
-
-    _table[_index1] = diff;
-
-    if (++_index1 == RANDOM_TABLE_SIZE) {
-      _index1 = 0;
-    }
-    if (++_index2 == RANDOM_TABLE_SIZE) {
-      _index2 = 0;
-    }
-
-    // sign-extend, 0-center
-    diff = (diff << 1) >> (32 - numBits);
-    // restrict range
-    diff = (diff * amp) >> RANDOM_DITHER_FIX;
-    // shift back to 0.5-center
-    diff += 1 << (numBits - 1);
-
-    return diff;
-  }
-
-  int randomBits(int numBits) {
-    return randomBits2(numBits, _amplitude);
-  }
-
-  /// fixed-point precision for dithering
-  static const int RANDOM_DITHER_FIX = 8;
-  static const int RANDOM_TABLE_SIZE = 55;
-
-  // 31b-range values
-  static const List<int> _RANDOM_TABLE = const [
-    0x0de15230, 0x03b31886, 0x775faccb, 0x1c88626a, 0x68385c55, 0x14b3b828,
-    0x4a85fef8, 0x49ddb84b, 0x64fcf397, 0x5c550289, 0x4a290000, 0x0d7ec1da,
-    0x5940b7ab, 0x5492577d, 0x4e19ca72, 0x38d38c69, 0x0c01ee65, 0x32a1755f,
-    0x5437f652, 0x5abb2c32, 0x0faa57b1, 0x73f533e7, 0x685feeda, 0x7563cce2,
-    0x6e990e83, 0x4730a7ed, 0x4fc0d9c6, 0x496b153c, 0x4f1403fa, 0x541afb0c,
-    0x73990b32, 0x26d7cb1c, 0x6fcc3706, 0x2cbb77d8, 0x75762f2a, 0x6425ccdd,
-    0x24b35461, 0x0a7d8715, 0x220414a8, 0x141ebf67, 0x56b41583, 0x73e502e3,
-    0x44cab16f, 0x28264d42, 0x73baaefb, 0x0a50ebed, 0x1d6ab6fb, 0x0d3ad40b,
-    0x35db3b68, 0x2b081e83, 0x77ce6b95, 0x5181e5f0, 0x78853bbc, 0x009f9494,
-    0x27e5ed3c];
-}
