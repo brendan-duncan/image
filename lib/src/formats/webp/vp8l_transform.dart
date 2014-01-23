@@ -42,7 +42,7 @@ class VP8LTransform {
           // transforms work on effective width of xsize_.
           final int outStride = (rowEnd - rowStart) * width;
           final int inStride = (rowEnd - rowStart) *
-                                Vp8l._subSampleSize(xsize, bits);
+                                VP8L._subSampleSize(xsize, bits);
 
           int src = rowsOut + outStride - inStride;
           outData.setRange(src, src + inStride, inData, rowsOut);
@@ -131,7 +131,7 @@ class VP8LTransform {
                                   int data) {
     final int width = xsize;
     final int mask = (1 << bits) - 1;
-    final int tilesPerRow = Vp8l._subSampleSize(width, bits);
+    final int tilesPerRow = VP8L._subSampleSize(width, bits);
     int y = yStart;
     int predRow = (y >> bits) * tilesPerRow; //this.data +
 
@@ -175,7 +175,7 @@ class VP8LTransform {
 
     int y = yStart;
     final int mask = (1 << bits) - 1;
-    final int tilesPerRow = Vp8l._subSampleSize(width, bits);
+    final int tilesPerRow = VP8L._subSampleSize(width, bits);
     int predModeBase = (y >> bits) * tilesPerRow; //this.data +
 
     while (y < yEnd) {

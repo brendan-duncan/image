@@ -19,14 +19,14 @@ class WebPDecoder {
         return webp;
       case WebPData.FORMAT_LOSSLESS:
         input.position = webp._vp8Position;
-        Vp8l vp8l = new Vp8l(input, webp);
+        VP8L vp8l = new VP8L(input, webp);
         if (!vp8l.decodeHeader()) {
           return null;
         }
         return webp;
       case WebPData.FORMAT_LOSSY:
         input.position = webp._vp8Position;
-        Vp8 vp8 = new Vp8(input, webp);
+        VP8 vp8 = new VP8(input, webp);
         if (!vp8.decodeHeader()) {
           return null;
         }
@@ -57,15 +57,17 @@ class WebPDecoder {
 
     if (webp._animPositions.isNotEmpty) {
       for (int i = 0, len = webp._animPositions.length; i < len; ++i) {
-        input.position = webp._animPositions[i];
-        return new WebPFrame(input, webp).decode();
+        int dp = webp._animPositions[i];
+        int ds = webp._animSizes[i];
+        Arc.InputStream data = input.subset(dp, ds);
+        return new WebPFrame(data, webp).decode();
       }
     } else {
-      input.position = webp._vp8Position;
+      Arc.InputStream data = input.subset(webp._vp8Position, webp._vp8Size);
       if (webp.format == WebPData.FORMAT_LOSSLESS) {
-        return new Vp8l(input, webp).decode();
+        return new VP8L(data, webp).decode();
       } else if (webp.format == WebPData.FORMAT_LOSSY) {
-        return new Vp8(input, webp).decode();
+        return new VP8(data, webp).decode();
       }
     }
 
@@ -93,10 +95,10 @@ class WebPDecoder {
     } else {
       input.position = data._vp8Position;
       if (data.format == WebPData.FORMAT_LOSSLESS) {
-        Image image = new Vp8l(input, data).decode();
+        Image image = new VP8L(input, data).decode();
         anim.addFrame(image);
       } else if (data.format == WebPData.FORMAT_LOSSY) {
-        Image image = new Vp8(input, data).decode();
+        Image image = new VP8(input, data).decode();
         anim.addFrame(image);
       }
     }

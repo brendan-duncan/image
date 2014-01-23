@@ -7,6 +7,7 @@ class VP8BitReader {
   int _range; // current range minus 1. In [127, 254] interval.
   int _value; // current value
   int _bits; // number of valid bits left
+  bool _eof = false;
 
   VP8BitReader(this.input) {
     _range = 255 - 1;
@@ -17,18 +18,9 @@ class VP8BitReader {
   int getValue(int bits) {
     int v = 0;
     while (bits-- > 0) {
-      v |= getBits(0x80) << bits;
+      v |= _getBits(0x80) << bits;
     }
     return v;
-  }
-
-  int getBits(int prob) {
-    final int split = (_range * prob) >> 8;
-    final int bit = _bitUpdate(split);
-    if (_range <= 0x7e) {
-      _shift();
-    }
-    return bit;
   }
 
   int getSignedValue(int bits) {
@@ -40,8 +32,18 @@ class VP8BitReader {
     return getValue(1);
   }
 
+  int _getBits(int prob) {
+    final int split = (_range * prob) >> 8;
+    final int bit = _bitUpdate(split);
+    if (_range <= 0x7e) {
+      _shift();
+    }
+    return bit;
+  }
+
   int _bitUpdate(int split) {
-    if (_bits < 0) {  // Make sure we have a least BITS bits in 'value_'
+    // Make sure we have a least BITS bits in 'value_'
+    if (_bits < 0) {
       _loadNewBytes();
     }
 
@@ -65,13 +67,27 @@ class VP8BitReader {
 
   void _loadNewBytes() {
     // Read 'BITS' bits at a time if possible.
-    if (!input.isEOS) {
+    if (input.remainder >= 1) {
       // convert memory type to register type (with some zero'ing!)
       int bits = input.readByte();
-      _value = bits | (_value << (BITS));
+      _value = bits | (_value << BITS);
       _bits += (BITS);
     } else {
-      //_loadFinalBytes();    // no need to be inlined
+      _loadFinalBytes();    // no need to be inlined
+    }
+  }
+
+  void _loadFinalBytes() {
+    // Only read 8bits at a time
+    if (!input.isEOS) {
+      _value = input.readByte() | (_value << 8);
+      _bits += 8;
+    } else if (!_eof) {
+      // These are not strictly needed, but it makes the behaviour
+      // consistent for both USE_RIGHT_JUSTIFY and !USE_RIGHT_JUSTIFY.
+      _value <<= 8;
+      _bits += 8;
+      _eof = true;
     }
   }
 

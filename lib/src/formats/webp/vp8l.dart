@@ -3,13 +3,13 @@ part of image;
 /**
  * WebP lossless format.
  */
-class Vp8l {
+class VP8L {
   Arc.InputStream input;
   VP8LBitReader br;
   WebPData webp;
   Image image;
 
-  Vp8l(Arc.InputStream input, WebPData webp) :
+  VP8L(Arc.InputStream input, WebPData webp) :
     this.input = input,
     this.webp = webp,
     this.br = new VP8LBitReader(input) {
