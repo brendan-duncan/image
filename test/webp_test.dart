@@ -36,6 +36,12 @@ void defineWebPTests() {
     Io.File script = new Io.File(Io.Platform.script.toFilePath());
     String path = script.parent.path + '/res/webp';
 
+    /*test('1_webp_a', () {
+      Io.File file = new Io.File(path + '/1_webp_a.webp');
+      List<int> bytes = file.readAsBytesSync();
+      Image image = new WebPDecoder().decodeImage(bytes);
+    });*/
+
     Io.Directory dir = new Io.Directory(path);
     List files = dir.listSync();
     for (var f in files) {

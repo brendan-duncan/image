@@ -72,12 +72,12 @@ class VP8 {
     _picHeader.colorspace = br.getBit();
     _picHeader.clampType = br.getBit();
 
-    /*if (!_parseSegmentHeader(_segmentHeader, _probabilities)) {
+    if (!_parseSegmentHeader(_segmentHeader, _probabilities)) {
       return null;
     }
 
     // Filter specs
-    if (!_parseFilterHeader()) {
+    /*if (!_parseFilterHeader()) {
       return null;
     }
 
@@ -111,6 +111,31 @@ class VP8 {
     Image image = new Image(webp.width, webp.height);
 
     return image;
+  }
+
+  bool _parseSegmentHeader(VP8SegmentHeader hdr, VP8Proba proba) {
+    hdr.useSegment = br.getBit() != 0;
+    if (hdr.useSegment) {
+      hdr.updateMap = br.getBit() != 0;
+      if (br.getBit() != 0) {   // update data
+        hdr.absoluteDelta = br.getBit() != 0;
+        for (int s = 0; s < VP8.NUM_MB_SEGMENTS; ++s) {
+          hdr.quantizer[s] = br.getBit() != 0 ? br.getSignedValue(7) : 0;
+        }
+        for (int s = 0; s < VP8.NUM_MB_SEGMENTS; ++s) {
+          hdr.filterStrength[s] = br.getBit() != 0 ? br.getSignedValue(6) : 0;
+        }
+      }
+      if (hdr.updateMap) {
+        for (int s = 0; s < VP8.MB_FEATURE_TREE_PROBS; ++s) {
+          proba.segments[s] = br.getBit() != 0 ? br.getValue(8) : 255;
+        }
+      }
+    } else {
+      hdr.updateMap = false;
+    }
+
+    return true;
   }
 
   /**
