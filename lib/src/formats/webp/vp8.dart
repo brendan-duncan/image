@@ -51,12 +51,12 @@ class VP8 {
     output = new Image(webp.width, webp.height);
 
     // Finish setting up the decoding parameter.
-    /*if (!_enterCritical()) {
+    if (!_enterCritical()) {
       return null;
     }
 
     // Will allocate memory and prepare everything.
-    if (!_initFrame()) {
+    /*if (!_initFrame()) {
       return null;
     }
 
@@ -291,7 +291,7 @@ class VP8 {
   bool _enterCritical() {
     _fStrengths = new List<List<VP8FInfo>>(NUM_MB_SEGMENTS);
     for (int i = 0; i < NUM_MB_SEGMENTS; ++i) {
-      _fStrengths[i] = new List<VP8FInfo>(2);
+      _fStrengths[i] = [new VP8FInfo(), new VP8FInfo()];
     }
 
     // Define the area where we can skip in-loop filtering, in case of cropping.
