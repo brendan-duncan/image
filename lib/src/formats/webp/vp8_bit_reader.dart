@@ -18,21 +18,21 @@ class VP8BitReader {
   int getValue(int bits) {
     int v = 0;
     while (bits-- > 0) {
-      v |= getBits(0x80) << bits;
+      v |= getBit(0x80) << bits;
     }
     return v;
   }
 
   int getSignedValue(int bits) {
     final int value = getValue(bits);
-    return getBit() == 1 ? -value : value;
+    return get() == 1 ? -value : value;
   }
 
-  int getBit() {
+  int get() {
     return getValue(1);
   }
 
-  int getBits(int prob) {
+  int getBit(int prob) {
     final int split = (_range * prob) >> 8;
     final int bit = _bitUpdate(split);
     if (_range <= 0x7e) {

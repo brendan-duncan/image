@@ -56,14 +56,14 @@ class VP8 {
     }
 
     // Will allocate memory and prepare everything.
-    /*if (!_initFrame()) {
+    if (!_initFrame()) {
       return null;
     }
 
     // Main decoding loop
     if (!_parseFrame()) {
       return null;
-    }*/
+    }
 
     return output;
   }
@@ -73,7 +73,7 @@ class VP8 {
       return false;
     }
 
-    _probabilities = new VP8Proba();
+    _proba = new VP8Proba();
     for (int i = 0; i < NUM_MB_SEGMENTS; ++i) {
       _dqm[i] = new VP8QuantMatrix();
     }
@@ -96,10 +96,10 @@ class VP8 {
     br = new VP8BitReader(input.subset(null, _frameHeader.partitionLength));
     input.skip(_frameHeader.partitionLength);
 
-    _picHeader.colorspace = br.getBit();
-    _picHeader.clampType = br.getBit();
+    _picHeader.colorspace = br.get();
+    _picHeader.clampType = br.get();
 
-    if (!_parseSegmentHeader(_segmentHeader, _probabilities)) {
+    if (!_parseSegmentHeader(_segmentHeader, _proba)) {
       return false;
     }
 
@@ -116,7 +116,7 @@ class VP8 {
     _parseQuant();
 
     // Frame buffer marking
-    br.getBit();   // ignore the value of update_proba_
+    br.get();   // ignore the value of update_proba_
 
     _parseProba();
 
@@ -124,21 +124,21 @@ class VP8 {
   }
 
   bool _parseSegmentHeader(VP8SegmentHeader hdr, VP8Proba proba) {
-    hdr.useSegment = br.getBit() != 0;
+    hdr.useSegment = br.get() != 0;
     if (hdr.useSegment) {
-      hdr.updateMap = br.getBit() != 0;
-      if (br.getBit() != 0) {   // update data
-        hdr.absoluteDelta = br.getBit() != 0;
+      hdr.updateMap = br.get() != 0;
+      if (br.get() != 0) {   // update data
+        hdr.absoluteDelta = br.get() != 0;
         for (int s = 0; s < NUM_MB_SEGMENTS; ++s) {
-          hdr.quantizer[s] = br.getBit() != 0 ? br.getSignedValue(7) : 0;
+          hdr.quantizer[s] = br.get() != 0 ? br.getSignedValue(7) : 0;
         }
         for (int s = 0; s < NUM_MB_SEGMENTS; ++s) {
-          hdr.filterStrength[s] = br.getBit() != 0 ? br.getSignedValue(6) : 0;
+          hdr.filterStrength[s] = br.get() != 0 ? br.getSignedValue(6) : 0;
         }
       }
       if (hdr.updateMap) {
         for (int s = 0; s < MB_FEATURE_TREE_PROBS; ++s) {
-          proba.segments[s] = br.getBit() != 0 ? br.getValue(8) : 255;
+          proba.segments[s] = br.get() != 0 ? br.getValue(8) : 255;
         }
       }
     } else {
@@ -150,20 +150,20 @@ class VP8 {
 
   bool _parseFilterHeader() {
     VP8FilterHeader hdr = _filterHeader;
-    hdr.simple = br.getBit() != 0;
+    hdr.simple = br.get() != 0;
     hdr.level = br.getValue(6);
     hdr.sharpness = br.getValue(3);
-    hdr.useLfDelta = br.getBit() != 0;
+    hdr.useLfDelta = br.get() != 0;
     if (hdr.useLfDelta) {
-      if (br.getBit() != 0) {   // update lf-delta?
+      if (br.get() != 0) {   // update lf-delta?
         for (int i = 0; i < NUM_REF_LF_DELTAS; ++i) {
-          if (br.getBit() != 0) {
+          if (br.get() != 0) {
             hdr.refLfDelta[i] = br.getSignedValue(6);
           }
         }
 
         for (int i = 0; i < NUM_MODE_LF_DELTAS; ++i) {
-          if (br.getBit() != 0) {
+          if (br.get() != 0) {
             hdr.modeLfDelta[i] = br.getSignedValue(6);
           }
         }
@@ -220,11 +220,11 @@ class VP8 {
 
   void _parseQuant() {
     final int base_q0 = br.getValue(7);
-    final int dqy1_dc = br.getBit() != 0 ? br.getSignedValue(4) : 0;
-    final int dqy2_dc = br.getBit() != 0 ? br.getSignedValue(4) : 0;
-    final int dqy2_ac = br.getBit() != 0 ? br.getSignedValue(4) : 0;
-    final int dquv_dc = br.getBit() != 0 ? br.getSignedValue(4) : 0;
-    final int dquv_ac = br.getBit() != 0 ? br.getSignedValue(4) : 0;
+    final int dqy1_dc = br.get() != 0 ? br.getSignedValue(4) : 0;
+    final int dqy2_dc = br.get() != 0 ? br.getSignedValue(4) : 0;
+    final int dqy2_ac = br.get() != 0 ? br.getSignedValue(4) : 0;
+    final int dquv_dc = br.get() != 0 ? br.getSignedValue(4) : 0;
+    final int dquv_ac = br.get() != 0 ? br.getSignedValue(4) : 0;
 
     VP8SegmentHeader hdr = _segmentHeader;
 
@@ -265,13 +265,13 @@ class VP8 {
   }
 
   void _parseProba() {
-    VP8Proba proba = _probabilities;
+    VP8Proba proba = _proba;
 
     for (int t = 0; t < NUM_TYPES; ++t) {
       for (int b = 0; b < NUM_BANDS; ++b) {
         for (int c = 0; c < NUM_CTX; ++c) {
           for (int p = 0; p < NUM_PROBAS; ++p) {
-            final int v = br.getBits(COEFFS_UPDATE_PROBA[t][b][c][p]) != 0 ?
+            final int v = br.getBit(COEFFS_UPDATE_PROBA[t][b][c][p]) != 0 ?
                 br.getValue(8) : COEFFS_PROBA_0[t][b][c][p];
                 proba.bands[t][b].probas[c][p] = v;
           }
@@ -279,9 +279,9 @@ class VP8 {
       }
     }
 
-    _useSkipProbabilities = br.getBit() != 0;
-    if (_useSkipProbabilities) {
-      _skipProb = br.getValue(8);
+    _useSkipProba = br.get() != 0;
+    if (_useSkipProba) {
+      _skipP = br.getValue(8);
     }
   }
 
@@ -293,6 +293,8 @@ class VP8 {
     for (int i = 0; i < NUM_MB_SEGMENTS; ++i) {
       _fStrengths[i] = [new VP8FInfo(), new VP8FInfo()];
     }
+
+    _intraT = new Data.Uint8List(4 * _mbWidth);
 
     // Define the area where we can skip in-loop filtering, in case of cropping.
     //
@@ -334,7 +336,19 @@ class VP8 {
       }
     }
 
+    _mbInfo = new List<VP8MB>(_mbWidth + 1);
+    _mbData = new List<VP8MBData>(_mbWidth);
+    _fInfo = new List<VP8FInfo>(_mbWidth);
+
+    for (int i = 0; i < _mbWidth; ++i) {
+      _mbInfo[i] = new VP8MB();
+      _mbData[i] = new VP8MBData();
+      _fInfo[i] = new VP8FInfo();
+    }
+    _mbInfo[_mbWidth] = new VP8MB();
+
     _precomputeFilterStrengths();
+
     return true;
   }
 
@@ -401,7 +415,7 @@ class VP8 {
 
   bool _initFrame() {
     // Init critical function pointers and look-up tables.
-    //_dspInit();
+    _dsp = new DSP();
     return true;
   }
 
@@ -426,14 +440,320 @@ class VP8 {
     return true;
   }
 
-  bool _decodeMB(VP8BitReader br) {
+  bool _decodeMB(VP8BitReader tokenBr) {
+    VP8MB left = _mbInfo[0];
+    VP8MB mb = _mbInfo[1 + _mbX];
+    VP8MBData block = _mbData[_mbX];
+    bool skip;
 
+    // Note: we don't save segment map (yet), as we don't expect
+    // to decode more than 1 keyframe.
+    if (_segmentHeader.updateMap) {
+      // Hardcoded tree parsing
+      _segment = br.getBit(_proba.segments[0]) == 0 ?
+            br.getBit(_proba.segments[1]) :
+            2 + br.getBit(_proba.segments[2]);
+    }
+
+    skip = _useSkipProba ? br.getBit(_skipP) != 0 : false;
+
+    _parseIntraMode();
+
+    if (skip == 0) {
+      skip = _parseResiduals(mb, tokenBr);
+    } else {
+      left.nz = mb.nz = 0;
+      if (!block.isIntra4x4) {
+        left.nzDc = mb.nzDc = 0;
+      }
+      block.nonZeroY = 0;
+      block.nonZeroUV = 0;
+    }
+
+    if (_filterType > 0) {  // store filter info
+      VP8FInfo finfo = _fInfo[_mbX];
+      finfo = _fStrengths[_segment][block.isIntra4x4 ? 1 : 0];
+      finfo.fInner |= !skip ? 1 : 0;
+    }
+
+    return true;
+  }
+
+  bool _parseResiduals(VP8MB mb, VP8BitReader tokenBr) {
+    var bands = _proba.bands;
+    List<VP8BandProbas> acProba;
+    VP8QuantMatrix q = _dqm[_segment];
+    VP8MBData block = _mbData[_mbX];
+    VP8List dst = new VP8List(block.coeffs);
+    int di = 0;
+    VP8MB leftMb = _mbInfo[0];
+    int tnz, lnz;
+    int non_zero_y = 0;
+    int non_zero_uv = 0;
+    int out_t_nz, out_l_nz;
+    int first;
+
+    dst.buffer.fillRange(0, dst.length, 384);
+
+    if (!block.isIntra4x4) {    // parse DC
+      VP8List dc = new VP8List(new Data.Int16List(16));
+      final int ctx = mb.nzDc + leftMb.nzDc;
+      final int nz = _getCoeffs(tokenBr, bands[1], ctx, q.y2Mat, 0, dc);
+      mb.nzDc = leftMb.nzDc = (nz > 0) ? 1 : 0;
+      if (nz > 1) {   // more than just the DC -> perform the full transform
+        _transformWHT(dc, dst);
+      } else {        // only DC is non-zero -> inlined simplified transform
+        final int dc0 = (dc[0] + 3) >> 3;
+        for (int i = 0; i < 16 * 16; i += 16) {
+          dst[i] = dc0;
+        }
+      }
+
+      first = 1;
+      acProba = bands[0];
+    } else {
+      first = 0;
+      acProba = bands[3];
+    }
+
+    tnz = mb.nz & 0x0f;
+    lnz = leftMb.nz & 0x0f;
+    for (int y = 0; y < 4; ++y) {
+      int l = lnz & 1;
+      int nz_coeffs = 0;
+      for (int x = 0; x < 4; ++x) {
+        final int ctx = l + (tnz & 1);
+        final int nz = _getCoeffs(tokenBr, acProba, ctx, q.y1Mat, first, dst);
+        l = (nz > first) ? 1 : 0;
+        tnz = (tnz >> 1) | (l << 7);
+        nz_coeffs = _nzCodeBits(nz_coeffs, nz, dst[0] != 0 ? 1 : 0);
+        dst += 16;
+      }
+
+      tnz >>= 4;
+      lnz = (lnz >> 1) | (l << 7);
+      non_zero_y = (non_zero_y << 8) | nz_coeffs;
+    }
+    out_t_nz = tnz;
+    out_l_nz = lnz >> 4;
+
+    for (int ch = 0; ch < 4; ch += 2) {
+      int nz_coeffs = 0;
+      tnz = mb.nz >> (4 + ch);
+      lnz = leftMb.nz >> (4 + ch);
+      for (int y = 0; y < 2; ++y) {
+        int l = lnz & 1;
+        for (int x = 0; x < 2; ++x) {
+          final int ctx = l + (tnz & 1);
+          final int nz = _getCoeffs(tokenBr, bands[2], ctx, q.uvMat, 0, dst);
+          l = (nz > 0) ? 1 : 0;
+          tnz = (tnz >> 1) | (l << 3);
+          nz_coeffs = _nzCodeBits(nz_coeffs, nz, dst[0] != 0 ? 1 : 0);
+          dst += 16;
+        }
+
+        tnz >>= 2;
+        lnz = (lnz >> 1) | (l << 5);
+      }
+
+      // Note: we don't really need the per-4x4 details for U/V blocks.
+      non_zero_uv |= nz_coeffs << (4 * ch);
+      out_t_nz |= (tnz << 4) << ch;
+      out_l_nz |= (lnz & 0xf0) << ch;
+    }
+
+    mb.nz = out_t_nz;
+    leftMb.nz = out_l_nz;
+
+    block.nonZeroY = non_zero_y;
+    block.nonZeroUV = non_zero_uv;
+
+    // We look at the mode-code of each block and check if some blocks have less
+    // than three non-zero coeffs (code < 2). This is to avoid dithering flat and
+    // empty blocks.
+    block.dither = (non_zero_uv & 0xaaaa) != 0 ? 0 : q.dither;
+
+    // will be used for further optimization
+    return (non_zero_y | non_zero_uv) == 0;
+  }
+
+  void _transformWHT(VP8List src, VP8List out) {
+    Data.Int32List tmp = new Data.Int32List(16);
+
+    int oi = 0;
+    for (int i = 0; i < 4; ++i) {
+      final int a0 = src[0 + i] + src[12 + i];
+      final int a1 = src[4 + i] + src[ 8 + i];
+      final int a2 = src[4 + i] - src[ 8 + i];
+      final int a3 = src[0 + i] - src[12 + i];
+      tmp[0  + i] = a0 + a1;
+      tmp[8  + i] = a0 - a1;
+      tmp[4  + i] = a3 + a2;
+      tmp[12 + i] = a3 - a2;
+    }
+
+    for (int i = 0; i < 4; ++i) {
+      final int dc = tmp[0 + i * 4] + 3;    // w/ rounder
+      final int a0 = dc             + tmp[3 + i * 4];
+      final int a1 = tmp[1 + i * 4] + tmp[2 + i * 4];
+      final int a2 = tmp[1 + i * 4] - tmp[2 + i * 4];
+      final int a3 = dc             - tmp[3 + i * 4];
+      out[oi + 0] = (a0 + a1) >> 3;
+      out[oi + 16] = (a3 + a2) >> 3;
+      out[oi + 32] = (a0 - a1) >> 3;
+      out[oi + 48] = (a3 - a2) >> 3;
+
+      oi += 64;
+    }
+  }
+
+  int _nzCodeBits(int nz_coeffs, int nz, int dc_nz) {
+    nz_coeffs <<= 2;
+    nz_coeffs |= (nz > 3) ? 3 : (nz > 1) ? 2 : dc_nz;
+    return nz_coeffs;
+  }
+
+  static const List<int> kBands = const [
+     0, 1, 2, 3, 6, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7,
+     0]; // extra entry as sentinel
+
+  static const List<int> kCat3 = const [ 173, 148, 140 ];
+  static const List<int> kCat4 = const [ 176, 155, 140, 135 ];
+  static const List<int> kCat5 = const [ 180, 157, 141, 134, 130 ];
+  static const List<int> kCat6 = const [ 254, 254, 243, 230, 196, 177, 153,
+                                         140, 133, 130, 129 ];
+  static const List<List<int>> kCat3456 = const [ kCat3, kCat4, kCat5, kCat6 ];
+  static const List<int> kZigzag = const [ 0, 1, 4, 8,  5, 2, 3, 6,  9, 12,
+                                           13, 10,  7, 11, 14, 15 ];
+
+  // See section 13-2: http://tools.ietf.org/html/rfc6386#section-13.2
+  int _getLargeValue(VP8BitReader br, List<int> p) {
+    int v;
+    if (br.getBit(p[3]) == 0) {
+      if (br.getBit(p[4]) == 0) {
+        v = 2;
+      } else {
+        v = 3 + br.getBit(p[5]);
+      }
+    } else {
+      if (br.getBit(p[6]) == 0) {
+        if (br.getBit(p[7]) == 0) {
+          v = 5 + br.getBit(159);
+        } else {
+          v = 7 + 2 * br.getBit(165);
+          v += br.getBit(145);
+        }
+      } else {
+        final int bit1 = br.getBit(p[8]);
+        final int bit0 = br.getBit(p[9 + bit1]);
+        final int cat = 2 * bit1 + bit0;
+        v = 0;
+        List<int> tab = kCat3456[cat];
+        for (int i = 0, len = tab.length; i < len; ++i) {
+          v += v + br.getBit(tab[i]);
+        }
+        v += 3 + (8 << cat);
+      }
+    }
+    return v;
+  }
+
+
+  /**
+   * Returns the position of the last non-zero coeff plus one
+   */
+  int _getCoeffs(VP8BitReader br, List<VP8BandProbas> prob,
+                 int ctx, List<int> dq, int n, VP8List out) {
+    // n is either 0 or 1 here. kBands[n] is not necessary for extracting '*p'.
+    List<int> p = prob[n].probas[ctx];
+    for (; n < 16; ++n) {
+      if (br.getBit(p[0]) == 0) {
+        return n;  // previous coeff was last non-zero coeff
+      }
+
+      while (br.getBit(p[1]) == 0) { // sequence of zero coeffs
+        p = prob[kBands[++n]].probas[0];
+        if (n == 16) {
+          return 16;
+        }
+      }
+
+      { // non zero coeff
+        List<Data.Uint8List> p_ctx = prob[kBands[n + 1]].probas;
+        int v;
+        if (br.getBit(p[2]) == 0) {
+          v = 1;
+          p = p_ctx[1];
+        } else {
+          v = _getLargeValue(br, p);
+          p = p_ctx[2];
+        }
+
+        out[kZigzag[n]] = br.getSignedValue(v) * dq[n > 0 ? 1 : 0];
+      }
+    }
+    return 16;
+  }
+
+  void _parseIntraMode() {
+    int ti = 4 * _mbX;
+    int li = 0;
+    Data.Uint8List top = _intraT;
+    Data.Uint8List left = _intraL;
+
+    VP8MBData block = _mbData[_mbX];
+
+    // decide for B_PRED first
+    block.isIntra4x4 = br.getBit(145) == 0;
+    if (!block.isIntra4x4) {
+      // Hardcoded 16x16 intra-mode decision tree.
+      final int ymode =
+          br.getBit(156) != 0 ?
+              (br.getBit(128) != 0 ? TM_PRED : H_PRED) :
+              (br.getBit(163) != 0 ? V_PRED : DC_PRED);
+      block.imodes[0] = ymode;
+
+      top.fillRange(ti, ti + 4, ymode);
+      left.fillRange(li, li + 4, ymode);
+    } else {
+      Data.Uint8List modes = block.imodes;
+      int mi = 0;
+      for (int y = 0; y < 4; ++y) {
+        int ymode = left[y];
+        int x;
+        for (x = 0; x < 4; ++x) {
+          List<int> prob = kBModesProba[top[x]][ymode];
+
+          // Generic tree-parsing
+          int i = kYModesIntra4[br.getBit(prob[0])];
+
+          while (i > 0) {
+            i = kYModesIntra4[2 * i + br.getBit(prob[i])];
+          }
+
+          ymode = -i;
+          top[x] = ymode;
+        }
+
+        modes.setRange(mi, mi + 4, top);
+
+        mi += 4;
+        left[y] = ymode;
+      }
+    }
+
+    // Hardcoded UVMode decision tree
+    block.uvmode = br.getBit(142) == 0 ? DC_PRED
+        : br.getBit(114) == 0 ? V_PRED
+            : br.getBit(183) != 0 ? TM_PRED : H_PRED;
   }
 
   // Main data source
   VP8BitReader br;
 
   Image output;
+
+  DSP _dsp;
 
   // headers
   VP8FrameHeader _frameHeader = new VP8FrameHeader();
@@ -470,9 +790,9 @@ class VP8 {
   List<VP8QuantMatrix> _dqm = new List<VP8QuantMatrix>(NUM_MB_SEGMENTS);
 
   // probabilities
-  VP8Proba _probabilities;
-  bool _useSkipProbabilities;
-  int _skipProb;
+  VP8Proba _proba;
+  bool _useSkipProba;
+  int _skipP;
 
   // Boundary data cache and persistent buffers.
   /// top intra modes values: 4 * _mbWidth
@@ -486,9 +806,9 @@ class VP8 {
   VP8TopSamples _yuvT;
 
   /// contextual macroblock info (mb_w_ + 1)
-  VP8MB _mbInfo;
+  List<VP8MB> _mbInfo;
   /// filter strength info
-  VP8FInfo _fInfo;
+  List<VP8FInfo> _fInfo;
   /// main block for Y/U/V (size = YUV_SIZE)
   Data.Uint8List _yuvBlock;
 
@@ -504,10 +824,10 @@ class VP8 {
 
   // Per macroblock non-persistent infos.
   /// current position, in macroblock units
-  int _mbX;
-  int _mbY;
+  int _mbX = 0;
+  int _mbY = 0;
   /// parsed reconstruction data
-  VP8MBData _mbData;
+  List<VP8MBData> _mbData;
 
   // Filtering side-info
   /// 0=off, 1=simple, 2=complex
@@ -533,6 +853,119 @@ class VP8 {
   static int _clip(int v, int M) {
     return v < 0 ? 0 : v > M ? M : v;
   }
+
+  static const List<int> kYModesIntra4 = const [
+    -B_DC_PRED, 1,
+    -B_TM_PRED, 2,
+    -B_VE_PRED, 3,
+    4, 6,
+    -B_HE_PRED, 5,
+    -B_RD_PRED, -B_VR_PRED,
+    -B_LD_PRED, 7,
+    -B_VL_PRED, 8,
+    -B_HD_PRED, -B_HU_PRED ];
+
+  static const List<List<List<int>>> kBModesProba = const [
+     const [ const [ 231, 120, 48, 89, 115, 113, 120, 152, 112 ],
+       const [ 152, 179, 64, 126, 170, 118, 46, 70, 95 ],
+       const [ 175, 69, 143, 80, 85, 82, 72, 155, 103 ],
+       const [ 56, 58, 10, 171, 218, 189, 17, 13, 152 ],
+       const [ 114, 26, 17, 163, 44, 195, 21, 10, 173 ],
+       const [ 121, 24, 80, 195, 26, 62, 44, 64, 85 ],
+       const [ 144, 71, 10, 38, 171, 213, 144, 34, 26 ],
+       const [ 170, 46, 55, 19, 136, 160, 33, 206, 71 ],
+       const [ 63, 20, 8, 114, 114, 208, 12, 9, 226 ],
+       const [ 81, 40, 11, 96, 182, 84, 29, 16, 36 ] ],
+       const [ const [ 134, 183, 89, 137, 98, 101, 106, 165, 148 ],
+         const [ 72, 187, 100, 130, 157, 111, 32, 75, 80 ],
+         const [ 66, 102, 167, 99, 74, 62, 40, 234, 128 ],
+         const [ 41, 53, 9, 178, 241, 141, 26, 8, 107 ],
+         const [ 74, 43, 26, 146, 73, 166, 49, 23, 157 ],
+         const [ 65, 38, 105, 160, 51, 52, 31, 115, 128 ],
+         const [ 104, 79, 12, 27, 217, 255, 87, 17, 7 ],
+         const [ 87, 68, 71, 44, 114, 51, 15, 186, 23 ],
+         const [ 47, 41, 14, 110, 182, 183, 21, 17, 194 ],
+         const [ 66, 45, 25, 102, 197, 189, 23, 18, 22 ] ],
+         const [ const [ 88, 88, 147, 150, 42, 46, 45, 196, 205 ],
+           const [ 43, 97, 183, 117, 85, 38, 35, 179, 61 ],
+           const [ 39, 53, 200, 87, 26, 21, 43, 232, 171 ],
+           const [ 56, 34, 51, 104, 114, 102, 29, 93, 77 ],
+           const [ 39, 28, 85, 171, 58, 165, 90, 98, 64 ],
+           const [ 34, 22, 116, 206, 23, 34, 43, 166, 73 ],
+           const [ 107, 54, 32, 26, 51, 1, 81, 43, 31 ],
+           const [ 68, 25, 106, 22, 64, 171, 36, 225, 114 ],
+           const [ 34, 19, 21, 102, 132, 188, 16, 76, 124 ],
+           const [ 62, 18, 78, 95, 85, 57, 50, 48, 51 ] ],
+           const [ const [ 193, 101, 35, 159, 215, 111, 89, 46, 111 ],
+             const [ 60, 148, 31, 172, 219, 228, 21, 18, 111 ],
+             const [ 112, 113, 77, 85, 179, 255, 38, 120, 114 ],
+             const [ 40, 42, 1, 196, 245, 209, 10, 25, 109 ],
+             const [ 88, 43, 29, 140, 166, 213, 37, 43, 154 ],
+             const [ 61, 63, 30, 155, 67, 45, 68, 1, 209 ],
+             const [ 100, 80, 8, 43, 154, 1, 51, 26, 71 ],
+             const [ 142, 78, 78, 16, 255, 128, 34, 197, 171 ],
+             const [ 41, 40, 5, 102, 211, 183, 4, 1, 221 ],
+             const [ 51, 50, 17, 168, 209, 192, 23, 25, 82 ] ],
+             const [ const [ 138, 31, 36, 171, 27, 166, 38, 44, 229 ],
+               const [ 67, 87, 58, 169, 82, 115, 26, 59, 179 ],
+               const [ 63, 59, 90, 180, 59, 166, 93, 73, 154 ],
+               const [ 40, 40, 21, 116, 143, 209, 34, 39, 175 ],
+               const [ 47, 15, 16, 183, 34, 223, 49, 45, 183 ],
+               const [ 46, 17, 33, 183, 6, 98, 15, 32, 183 ],
+               const [ 57, 46, 22, 24, 128, 1, 54, 17, 37 ],
+               const [ 65, 32, 73, 115, 28, 128, 23, 128, 205 ],
+               const [ 40, 3, 9, 115, 51, 192, 18, 6, 223 ],
+               const [ 87, 37, 9, 115, 59, 77, 64, 21, 47 ] ],
+               const [ const [ 104, 55, 44, 218, 9, 54, 53, 130, 226 ],
+                 const [ 64, 90, 70, 205, 40, 41, 23, 26, 57 ],
+                 const [ 54, 57, 112, 184, 5, 41, 38, 166, 213 ],
+                 const [ 30, 34, 26, 133, 152, 116, 10, 32, 134 ],
+                 const [ 39, 19, 53, 221, 26, 114, 32, 73, 255 ],
+                 const [ 31, 9, 65, 234, 2, 15, 1, 118, 73 ],
+                 const [ 75, 32, 12, 51, 192, 255, 160, 43, 51 ],
+                 const [ 88, 31, 35, 67, 102, 85, 55, 186, 85 ],
+                 const [ 56, 21, 23, 111, 59, 205, 45, 37, 192 ],
+                 const [ 55, 38, 70, 124, 73, 102, 1, 34, 98 ] ],
+                 const [ const [ 125, 98, 42, 88, 104, 85, 117, 175, 82 ],
+                   const [ 95, 84, 53, 89, 128, 100, 113, 101, 45 ],
+                   const [ 75, 79, 123, 47, 51, 128, 81, 171, 1 ],
+                   const [ 57, 17, 5, 71, 102, 57, 53, 41, 49 ],
+                   const [ 38, 33, 13, 121, 57, 73, 26, 1, 85 ],
+                   const [ 41, 10, 67, 138, 77, 110, 90, 47, 114 ],
+                   const [ 115, 21, 2, 10, 102, 255, 166, 23, 6 ],
+                   const [ 101, 29, 16, 10, 85, 128, 101, 196, 26 ],
+                   const [ 57, 18, 10, 102, 102, 213, 34, 20, 43 ],
+                   const [ 117, 20, 15, 36, 163, 128, 68, 1, 26 ] ],
+                   const [ const [ 102, 61, 71, 37, 34, 53, 31, 243, 192 ],
+                     const [ 69, 60, 71, 38, 73, 119, 28, 222, 37 ],
+                     const [ 68, 45, 128, 34, 1, 47, 11, 245, 171 ],
+                     const [ 62, 17, 19, 70, 146, 85, 55, 62, 70 ],
+                     const [ 37, 43, 37, 154, 100, 163, 85, 160, 1 ],
+                     const [ 63, 9, 92, 136, 28, 64, 32, 201, 85 ],
+                     const [ 75, 15, 9, 9, 64, 255, 184, 119, 16 ],
+                     const [ 86, 6, 28, 5, 64, 255, 25, 248, 1 ],
+                     const [ 56, 8, 17, 132, 137, 255, 55, 116, 128 ],
+                     const [ 58, 15, 20, 82, 135, 57, 26, 121, 40 ] ],
+                     const [ const [ 164, 50, 31, 137, 154, 133, 25, 35, 218 ],
+                       const [ 51, 103, 44, 131, 131, 123, 31, 6, 158 ],
+                       const [ 86, 40, 64, 135, 148, 224, 45, 183, 128 ],
+                       const [ 22, 26, 17, 131, 240, 154, 14, 1, 209 ],
+                       const [ 45, 16, 21, 91, 64, 222, 7, 1, 197 ],
+                       const [ 56, 21, 39, 155, 60, 138, 23, 102, 213 ],
+                       const [ 83, 12, 13, 54, 192, 255, 68, 47, 28 ],
+                       const [ 85, 26, 85, 85, 128, 128, 32, 146, 171 ],
+                       const [ 18, 11, 7, 63, 144, 171, 4, 4, 246 ],
+                       const [ 35, 27, 10, 146, 174, 171, 12, 26, 128 ] ],
+                       const [ const [ 190, 80, 35, 99, 180, 80, 126, 54, 45 ],
+                         const [ 85, 126, 47, 87, 176, 51, 41, 20, 32 ],
+                         const [ 101, 75, 128, 139, 118, 146, 116, 128, 85 ],
+                         const [ 56, 41, 15, 176, 236, 85, 37, 9, 62 ],
+                         const [ 71, 30, 17, 119, 118, 255, 17, 18, 138 ],
+                         const [ 101, 38, 60, 138, 55, 70, 43, 26, 142 ],
+                         const [ 146, 36, 19, 30, 171, 255, 97, 27, 20 ],
+                         const [ 138, 45, 61, 62, 219, 1, 81, 188, 64 ],
+                         const [ 32, 41, 20, 117, 151, 142, 20, 21, 163 ],
+                         const [ 112, 19, 12, 61, 195, 128, 48, 4, 24 ] ] ];
 
   static const List COEFFS_PROBA_0 = const [
   const [ const [ const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ],
@@ -855,10 +1288,50 @@ class VP8 {
   static const int NUM_REF_LF_DELTAS = 4;
   static const int NUM_MODE_LF_DELTAS = 4;    // I4x4, ZERO, *, SPLIT
   static const int MAX_NUM_PARTITIONS = 8;
+
+  static const int B_DC_PRED = 0;   // 4x4 modes
+  static const int B_TM_PRED = 1;
+  static const int B_VE_PRED = 2;
+  static const int B_HE_PRED = 3;
+  static const int B_RD_PRED = 4;
+  static const int B_VR_PRED = 5;
+  static const int B_LD_PRED = 6;
+  static const int B_VL_PRED = 7;
+  static const int B_HD_PRED = 8;
+  static const int B_HU_PRED = 9;
+  static const int NUM_BMODES = B_HU_PRED + 1 - B_DC_PRED;
+
+  static const int DC_PRED = B_DC_PRED;
+  static const int V_PRED = B_VE_PRED;
+  static const int H_PRED = B_HE_PRED;
+  static const int TM_PRED = B_TM_PRED;
+  static const int B_PRED = NUM_BMODES;
+
   // Probabilities
   static const int NUM_TYPES = 4;
   static const int NUM_BANDS = 8;
   static const int NUM_CTX = 3;
   static const int NUM_PROBAS = 11;
+
+  static const int BPS = 32; // this is the common stride used by yuv[]
+  static const int YUV_SIZE = (BPS * 17 + BPS * 9);
+  static const int Y_SIZE = (BPS * 17);
+  static const int Y_OFF = (BPS * 1 + 8);
+  static const int U_OFF = (Y_OFF + BPS * 16 + BPS);
+  static const int V_OFF = (U_OFF + 16);
 }
 
+class VP8List {
+  List<int> buffer;
+  int offset;
+
+  VP8List(this.buffer, [this.offset = 0]);
+
+  operator+(int add) => offset += add;
+
+  int operator[](int index) => buffer[offset + index];
+
+  operator[]=(int index, int value) => buffer[offset + index] = value;
+
+  int get length => buffer.length - offset;
+}
