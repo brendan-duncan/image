@@ -371,11 +371,11 @@ class VP8 {
     _cacheV = new VP8List(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
                           extra_uv);
 
-    tmpY = new Data.Uint8List(_mbWidth);
+    _tmpY = new Data.Uint8List(_mbWidth);
 
     final int uvWidth = (_mbWidth + 1) >> 1;
-    tmpU = new Data.Uint8List(uvWidth);
-    tmpV = new Data.Uint8List(uvWidth);
+    _tmpU = new Data.Uint8List(uvWidth);
+    _tmpV = new Data.Uint8List(uvWidth);
 
     // Define the area where we can skip in-loop filtering, in case of cropping.
     //
@@ -847,7 +847,7 @@ class VP8 {
     return true;
   }
 
-  /*int _clip8(int v) {
+  int _clip8(int v) {
     return ((v & ~YUV_MASK2) == 0) ? (v >> YUV_FIX2) : (v < 0) ? 0 : 255;
   }
 
@@ -863,20 +863,86 @@ class VP8 {
     return _clip8(kYScale * y + kUToB * u + kBCst);
   }
 
-  static void _yuvToRgb(int y, int u, int v, uint8_t* const rgb) {
+  void _yuvToRgb(int y, int u, int v, VP8List rgb) {
     rgb[0] = _yuvToR(y, v);
     rgb[1] = _yuvToG(y, u, v);
-    rgb[2] = _yvToB(y, u);
+    rgb[2] = _yuvToB(y, u);
   }
 
-  static void _yuvToRgba(uint8_t y, uint8_t u, uint8_t v, uint8_t* const rgba) {
+  void _yuvToRgba(int y, int u, int v, VP8List rgba) {
     _yuvToRgb(y, u, v, rgba);
     rgba[3] = 0xff;
-  }*/
+  }
+
+  //#define UPSAMPLE_FUNC(FUNC_NAME, FUNC, XSTEP)
+  void _upsample(VP8List topY, VP8List bottomY,
+                 VP8List topU, VP8List topV,
+                 VP8List curU, VP8List curV,
+                 VP8List topDst, VP8List bottomDst, int len) {
+
+    int LOAD_UV(int u, int v) => ((u) | ((v) << 16));
+
+    final int last_pixel_pair = (len - 1) >> 1;
+    int tl_uv = LOAD_UV(topU[0], topV[0]); // top-left sample
+    int l_uv  = LOAD_UV(curU[0], curV[0]); // left-sample
+
+    final int uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
+    _yuvToRgba(topY[0], uv0 & 0xff, (uv0 >> 16), topDst);
+
+    if (bottomY != null) {
+      final int uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
+      _yuvToRgba(bottomY[0], uv0 & 0xff, (uv0 >> 16), bottomDst);
+    }
+
+    for (int x = 1; x <= last_pixel_pair; ++x) {
+      final int t_uv = LOAD_UV(topU[x], topV[x]); // top sample
+      final int uv   = LOAD_UV(curU[x], curV[x]); // sample
+      // precompute invariant values associated with first and second diagonals
+      final int avg = tl_uv + t_uv + l_uv + uv + 0x00080008;
+      final int diag_12 = (avg + 2 * (t_uv + l_uv)) >> 3;
+      final int diag_03 = (avg + 2 * (tl_uv + uv)) >> 3;
+
+      final int uv0 = (diag_12 + tl_uv) >> 1;
+      final int uv1 = (diag_03 + t_uv) >> 1;
+
+      _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
+          topDst + (2 * x - 1) * 4);
+
+      _yuvToRgba(topY[2 * x - 0], uv1 & 0xff, (uv1 >> 16),
+              topDst + (2 * x - 0) * 4);
+
+      if (bottomY != null) {
+        final int uv0 = (diag_03 + l_uv) >> 1;
+        final int uv1 = (diag_12 + uv) >> 1;
+
+        _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
+            bottomDst + (2 * x - 1) * 4);
+
+        _yuvToRgba(bottomY[2 * x + 0], uv1 & 0xff, (uv1 >> 16),
+                bottomDst + (2 * x + 0) * 4);
+      }
+
+      tl_uv = t_uv;
+      l_uv = uv;
+    }
+
+    if ((len & 1) == 0) {
+      final int uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
+      _yuvToRgba(topY[len - 1], uv0 & 0xff, (uv0 >> 16),
+           topDst + (len - 1) * 4);
+    }
+
+    if (bottomY != null) {
+      final int uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
+      _yuvToRgba(bottomY[len - 1], uv0 & 0xff, (uv0 >> 16),
+           bottomDst + (len - 1) * 4);
+    }
+  }
+
 
   int _emitFancyRGB(int mbY, int mbW, int mbH) {
     int numLinesOut = mbH;   // a priori guess
-    /*int dst = mbY * webp.width;
+    VP8List dst = new VP8List(output.getBytes(), mbY * webp.width);
     VP8List curY = new VP8List(_y);
     VP8List curU = new VP8List(_u);
     VP8List curV = new VP8List(_v);
@@ -884,19 +950,18 @@ class VP8 {
     final int yEnd = mbY + mbH;
     final int uvW = (mbW + 1) >> 1;
     final int stride = webp.width * 4;
-    //WebPUpsampleLinePairFunc upsample = WebPUpsamplers[p->output->colorspace];
-    //const uint8_t* top_u = p->tmp_u;
-    //const uint8_t* top_v = p->tmp_v;
+    VP8List topU = new VP8List(_tmpU);
+    VP8List topV = new VP8List(_tmpV);
 
     if (y == 0) {
       // First line is special cased. We mirror the u/v samples at boundary.
-      upsample(cur_y, NULL, cur_u, cur_v, cur_u, cur_v, dst, NULL, mb_w);
+      _upsample(curY, null, curU, curV, curU, curV, dst, null, mbW);
     } else {
       // We can finish the left-over line from previous call.
-      upsample(p->tmp_y, curY, topU, topV, curU, curV,
-               dst - stride, dst, mbW);
+      _upsample(new VP8List(_tmpY), curY, topU, topV, curU, curV,
+                new VP8List(dst, -stride), dst, mbW);
       ++numLinesOut;
-    }*/
+    }
 
     // Loop over each output pairs of row.
     /*for (; y + 2 < y_end; y += 2) {
@@ -1342,9 +1407,9 @@ class VP8 {
   int _cacheYStride;
   int _cacheUVStride;
 
-  Data.Uint8List tmpY;
-  Data.Uint8List tmpU;
-  Data.Uint8List tmpV;
+  Data.Uint8List _tmpY;
+  Data.Uint8List _tmpU;
+  Data.Uint8List _tmpV;
 
   VP8List _y;
   VP8List _u;
@@ -1859,4 +1924,23 @@ class VP8 {
   static const int Y_OFF = (BPS * 1 + 8);
   static const int U_OFF = (Y_OFF + BPS * 16 + BPS);
   static const int V_OFF = (U_OFF + 16);
+
+  static const int YUV_FIX = 16; // fixed-point precision for RGB->YUV
+  static const int YUV_HALF = 1 << (YUV_FIX - 1);
+  static const int YUV_MASK = (256 << YUV_FIX) - 1;
+  static const int YUV_RANGE_MIN = -227; // min value of r/g/b output
+  static const int YUV_RANGE_MAX = 256 + 226; // max value of r/g/b output
+  static const int YUV_FIX2 = 14; // fixed-point precision for YUV->RGB
+  static const int YUV_HALF2 = 1 << (YUV_FIX2 - 1);
+  static const int YUV_MASK2 = (256 << YUV_FIX2) - 1;
+
+  // These constants are 14b fixed-point version of ITU-R BT.601 constants.
+  static const int kYScale = 19077;    // 1.164 = 255 / 219
+  static const int kVToR = 26149;    // 1.596 = 255 / 112 * 0.701
+  static const int kUToG = 6419;    // 0.391 = 255 / 112 * 0.886 * 0.114 / 0.587
+  static const int kVToG = 13320;    // 0.813 = 255 / 112 * 0.701 * 0.299 / 0.587
+  static const int kUToB = 33050;    // 2.018 = 255 / 112 * 0.886
+  static const int kRCst = (-kYScale * 16 - kVToR * 128 + YUV_HALF2);
+  static const int kGCst = (-kYScale * 16 + kUToG * 128 + kVToG * 128 + YUV_HALF2);
+  static const int kBCst = (-kYScale * 16 - kUToB * 128 + YUV_HALF2);
 }
