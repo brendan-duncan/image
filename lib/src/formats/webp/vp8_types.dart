@@ -83,8 +83,8 @@ class VP8FilterHeader {
  */
 class VP8FInfo {
   int fLimit; // uint8_t, filter limit in [3..189], or 0 if no filtering
-  int fInnerlevel; // uint8_t, inner limit in [1..63]
-  int fInner; // uint8_t, do inner filtering?
+  int fInnerLevel; // uint8_t, inner limit in [1..63]
+  bool fInner; // uint8_t, do inner filtering?
   int hevThresh; // uint8_t, high edge variance threshold in [0..2]
 }
 

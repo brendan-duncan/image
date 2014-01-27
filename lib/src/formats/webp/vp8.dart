@@ -50,11 +50,6 @@ class VP8 {
 
     output = new Image(webp.width, webp.height);
 
-    // Finish setting up the decoding parameter.
-    if (!_enterCritical()) {
-      return null;
-    }
-
     // Will allocate memory and prepare everything.
     if (!_initFrame()) {
       return null;
@@ -266,7 +261,6 @@ class VP8 {
 
   void _parseProba() {
     VP8Proba proba = _proba;
-
     for (int t = 0; t < NUM_TYPES; ++t) {
       for (int b = 0; b < NUM_BANDS; ++b) {
         for (int c = 0; c < NUM_CTX; ++c) {
@@ -286,15 +280,102 @@ class VP8 {
   }
 
   /**
-   * Finish setting up the decoding parameter once user's setup() is called.
+   * Precompute the filtering strength for each segment and each i4x4/i16x16
+   * mode.
    */
-  bool _enterCritical() {
+  void _precomputeFilterStrengths() {
+    if (_filterType > 0) {
+      VP8FilterHeader hdr = _filterHeader;
+      for (int s = 0; s < NUM_MB_SEGMENTS; ++s) {
+        // First, compute the initial level
+        int baseLevel;
+        if (_segmentHeader.useSegment) {
+          baseLevel = _segmentHeader.filterStrength[s];
+          if (!_segmentHeader.absoluteDelta) {
+            baseLevel += hdr.level;
+          }
+        } else {
+          baseLevel = hdr.level;
+        }
+
+        for (int i4x4 = 0; i4x4 <= 1; ++i4x4) {
+          VP8FInfo info = _fStrengths[s][i4x4];
+          int level = baseLevel;
+          if (hdr.useLfDelta) {
+            level += hdr.refLfDelta[0];
+            if (i4x4 != 0) {
+              level += hdr.modeLfDelta[0];
+            }
+          }
+
+          level = (level < 0) ? 0 : (level > 63) ? 63 : level;
+          if (level > 0) {
+            int ilevel = level;
+            if (hdr.sharpness > 0) {
+              if (hdr.sharpness > 4) {
+                ilevel >>= 2;
+              } else {
+                ilevel >>= 1;
+              }
+
+              if (ilevel > 9 - hdr.sharpness) {
+                ilevel = 9 - hdr.sharpness;
+              }
+            }
+
+            if (ilevel < 1) {
+              ilevel = 1;
+            }
+
+            info.fInnerLevel = ilevel;
+            info.fLimit = 2 * level + ilevel;
+            info.hevThresh = (level >= 40) ? 2 : (level >= 15) ? 1 : 0;
+          } else {
+            info.fLimit = 0;  // no filtering
+          }
+
+          info.fInner = i4x4 != 0;
+        }
+      }
+    }
+  }
+
+  bool _initFrame() {
     _fStrengths = new List<List<VP8FInfo>>(NUM_MB_SEGMENTS);
     for (int i = 0; i < NUM_MB_SEGMENTS; ++i) {
       _fStrengths[i] = [new VP8FInfo(), new VP8FInfo()];
     }
 
+    _yuvT = new List<VP8TopSamples>(_mbWidth);
+    for (int i = 0; i < _mbWidth; ++i) {
+      _yuvT[i] = new VP8TopSamples();
+    }
+
+    _yuvBlock = new Data.Uint8List(YUV_SIZE);
+
     _intraT = new Data.Uint8List(4 * _mbWidth);
+
+    _cacheYStride = 16 * _mbWidth;
+    _cacheUVStride = 8 * _mbWidth;
+
+    final int extra_rows = FILTER_EXTRA_ROWS[_filterType];
+    final int extra_y = extra_rows * _cacheYStride;
+    final int extra_uv = (extra_rows ~/ 2) * _cacheUVStride;
+
+    _cacheY = new VP8List(new Data.Uint8List(16 * _cacheYStride + extra_y),
+                          extra_y);
+
+    _cacheU = new VP8List(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
+                          extra_uv);
+
+    _cacheV = new VP8List(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
+                          extra_uv);
+
+    tmpY = new Data.Uint8List(_mbWidth);
+
+    final int uvWidth = (_mbWidth + 1) >> 1;
+    tmpU = new Data.Uint8List(uvWidth);
+    tmpV = new Data.Uint8List(uvWidth);
 
     // Define the area where we can skip in-loop filtering, in case of cropping.
     //
@@ -349,71 +430,6 @@ class VP8 {
 
     _precomputeFilterStrengths();
 
-    return true;
-  }
-
-  /**
-   * Precompute the filtering strength for each segment and each i4x4/i16x16
-   * mode.
-   */
-  void _precomputeFilterStrengths() {
-    if (_filterType > 0) {
-      VP8FilterHeader hdr = _filterHeader;
-      for (int s = 0; s < NUM_MB_SEGMENTS; ++s) {
-        // First, compute the initial level
-        int baseLevel;
-        if (_segmentHeader.useSegment) {
-          baseLevel = _segmentHeader.filterStrength[s];
-          if (!_segmentHeader.absoluteDelta) {
-            baseLevel += hdr.level;
-          }
-        } else {
-          baseLevel = hdr.level;
-        }
-
-        for (int i4x4 = 0; i4x4 <= 1; ++i4x4) {
-          VP8FInfo info = _fStrengths[s][i4x4];
-          int level = baseLevel;
-          if (hdr.useLfDelta) {
-            level += hdr.refLfDelta[0];
-            if (i4x4 != 0) {
-              level += hdr.modeLfDelta[0];
-            }
-          }
-
-          level = (level < 0) ? 0 : (level > 63) ? 63 : level;
-          if (level > 0) {
-            int ilevel = level;
-            if (hdr.sharpness > 0) {
-              if (hdr.sharpness > 4) {
-                ilevel >>= 2;
-              } else {
-                ilevel >>= 1;
-              }
-
-              if (ilevel > 9 - hdr.sharpness) {
-                ilevel = 9 - hdr.sharpness;
-              }
-            }
-
-            if (ilevel < 1) {
-              ilevel = 1;
-            }
-
-            info.fInnerlevel = ilevel;
-            info.fLimit = 2 * level + ilevel;
-            info.hevThresh = (level >= 40) ? 2 : (level >= 15) ? 1 : 0;
-          } else {
-            info.fLimit = 0;  // no filtering
-          }
-
-          info.fInner = i4x4;
-        }
-      }
-    }
-  }
-
-  bool _initFrame() {
     // Init critical function pointers and look-up tables.
     _dsp = new DSP();
     return true;
@@ -429,16 +445,521 @@ class VP8 {
         }
       }
 
-      /*_initScanline(); // Prepare for next scanline
+      // Prepare for next scanline
+      VP8MB left = _mbInfo[0];
+      left.nz = 0;
+      left.nzDc = 0;
+      _intraL.fillRange(0, _intraL.length, B_DC_PRED);
+      _mbX = 0;
 
       // Reconstruct, filter and emit the row.
       if (!_processRow()) {
         return false;
-      }*/
+      }
     }
 
     return true;
   }
+
+  bool _processRow() {
+    _filterRow = (_filterType > 0) && (_mbY >= _tlMbY) && (_mbY <= _brMbY);
+
+    _reconstructRow();
+
+    return _finishRow();
+  }
+
+  void _reconstructRow() {
+    int mb_y = _mbY;
+    VP8List y_dst = new VP8List(_yuvBlock, Y_OFF);
+    VP8List u_dst = new VP8List(_yuvBlock, U_OFF);
+    VP8List v_dst = new VP8List(_yuvBlock, V_OFF);
+
+    for (int mb_x = 0; mb_x < _mbWidth; ++mb_x) {
+      VP8MBData block = _mbData[mb_x];
+
+      // Rotate in the left samples from previously decoded block. We move four
+      // pixels at a time for alignment reason, and because of in-loop filter.
+      if (mb_x > 0) {
+        for (int j = -1; j < 16; ++j) {
+          int s = y_dst.offset + (j * BPS - 4);
+          int s2 = y_dst.offset + (j * BPS + 12);
+          y_dst.buffer.setRange(s, s + 4, y_dst.buffer, s2);
+        }
+
+        for (int j = -1; j < 8; ++j) {
+          int u_s = u_dst.offset + (j * BPS - 4);
+          int u_s2 = u_dst.offset + (j * BPS + 4);
+          u_dst.buffer.setRange(u_s, u_s + 4, u_dst.buffer, u_s2);
+
+          int v_s = v_dst.offset + (j * BPS - 4);
+          int v_s2 = v_dst.offset + (j * BPS + 4);
+          v_dst.buffer.setRange(v_s, v_s + 4, v_dst.buffer, v_s2);
+        }
+      } else {
+        for (int j = 0; j < 16; ++j) {
+          y_dst[j * BPS - 1] = 129;
+        }
+
+        for (int j = 0; j < 8; ++j) {
+          u_dst[j * BPS - 1] = 129;
+          v_dst[j * BPS - 1] = 129;
+        }
+
+        // Init top-left sample on left column too
+        if (mb_y > 0) {
+          y_dst[-1 - BPS] = u_dst[-1 - BPS] = v_dst[-1 - BPS] = 129;
+        }
+      }
+
+      // bring top samples into the cache
+      VP8TopSamples top_yuv = _yuvT[mb_x];
+      Data.Int16List coeffs = block.coeffs;
+      int bits = block.nonZeroY;
+
+      if (mb_y > 0) {
+        y_dst.buffer.setRange(y_dst.offset - BPS, (y_dst.offset - BPS) + 16,
+                               top_yuv.y);
+
+        u_dst.buffer.setRange(u_dst.offset - BPS, (u_dst.offset - BPS) + 8,
+            top_yuv.u);
+
+        v_dst.buffer.setRange(v_dst.offset - BPS, (v_dst.offset - BPS) + 8,
+            top_yuv.v);
+      } else if (mb_x == 0) {
+        // we only need to do this init once at block (0,0).
+        // Afterward, it remains valid for the whole topmost row.
+        y_dst.buffer.fillRange(y_dst.offset - BPS - 1,
+            (y_dst.offset - BPS - 1) + (16 + 4 + 1), 127);
+
+        u_dst.buffer.fillRange(u_dst.offset - BPS - 1,
+            (u_dst.offset - BPS - 1) + (8 + 1), 127);
+
+        v_dst.buffer.fillRange(v_dst.offset - BPS - 1,
+            (v_dst.offset - BPS - 1) + (8 + 1), 127);
+      }
+
+      // predict and add residuals
+      if (block.isIntra4x4) {   // 4x4
+        int top_right = y_dst.offset - BPS + 16;
+
+        if (mb_y > 0) {
+          if (mb_x >= _mbWidth - 1) { // on rightmost border
+            y_dst.buffer.fillRange(top_right, top_right + 4, top_yuv.y[15]);
+          } else {
+            y_dst.buffer.setRange(top_right, top_right + 4, top_yuv.y);
+          }
+        }
+
+        // replicate the top-right pixels below
+        int p = _yuvBlock[top_right];
+        _yuvBlock[top_right + BPS] = p;
+        _yuvBlock[top_right + 2 * BPS] = p;
+        _yuvBlock[top_right + 3 * BPS] = p;
+
+        // predict and add residuals for all 4x4 blocks in turn.
+        for (int n = 0; n < 16; ++n, bits <<= 2) {
+          VP8List dst = new VP8List(y_dst, kScan[n]);
+          DSP.PredLuma4[block.imodes[n]](dst);
+          _doTransform(bits, new Data.Int16List.view(coeffs.buffer, n * 16),
+                       dst.toUint8List());
+        }
+      } else { // 16x16
+        int predFunc = _checkMode(mb_x, mb_y, block.imodes[0]);
+
+        DSP.PredLuma16[predFunc](y_dst);
+        if (bits != 0) {
+          for (int n = 0; n < 16; ++n, bits <<= 2) {
+            _doTransform(bits, new Data.Int16List.view(coeffs.buffer, n * 16),
+                         y_dst.toUint8List(kScan[n]));
+          }
+        }
+      }
+
+      // Chroma
+      int bits_uv = block.nonZeroUV;
+      int pred_func = _checkMode(mb_x, mb_y, block.uvmode);
+      DSP.PredChroma8[pred_func](u_dst);
+      DSP.PredChroma8[pred_func](v_dst);
+
+      Data.Int16List c1 = new Data.Int16List.view(coeffs.buffer, 16 * 16);
+      _doUVTransform(bits_uv, c1, u_dst.toUint8List());
+
+      Data.Int16List c2 = new Data.Int16List.view(coeffs.buffer, 20 * 16);
+      _doUVTransform(bits_uv >> 8, c2, v_dst.toUint8List());
+
+      // stash away top samples for next block
+      if (mb_y < _mbHeight - 1) {
+        top_yuv.y.setRange(0, 16, y_dst.toUint8List(), 15 * BPS);
+        top_yuv.u.setRange(0, 8, u_dst.toUint8List(), 7 * BPS);
+        top_yuv.v.setRange(0, 8, v_dst.toUint8List(), 7 * BPS);
+      }
+
+      // Transfer reconstructed samples from yuv_b_ cache to final destination.
+      int y_offset = 0;//cache_id * 16 * _cacheYStride;
+      int uv_offset = 0;//cache_id * 8 * _cacheUVStride;
+      int y_out = mb_x * 16 + y_offset; // dec->cache_y_ +
+      int u_out = mb_x * 8 + uv_offset; // dec->cache_u_ +
+      int v_out = mb_x * 8 + uv_offset; // _dec->cache_v_ +
+
+      for (int j = 0; j < 16; ++j) {
+        int start = y_out + j * _cacheYStride;
+        _cacheY.setRange(start, 16, y_dst, j * BPS);
+      }
+
+      for (int j = 0; j < 8; ++j) {
+        int start = u_out + j * _cacheUVStride;
+        _cacheY.setRange(start, 8, u_dst, j * BPS);
+
+        start = v_out + j * _cacheUVStride;
+        _cacheV.setRange(start, 8, v_dst, j * BPS);
+      }
+    }
+  }
+
+  static const List<int> kScan = const [
+    0 +  0 * BPS,  4 +  0 * BPS, 8 +  0 * BPS, 12 +  0 * BPS,
+    0 +  4 * BPS,  4 +  4 * BPS, 8 +  4 * BPS, 12 +  4 * BPS,
+    0 +  8 * BPS,  4 +  8 * BPS, 8 +  8 * BPS, 12 +  8 * BPS,
+    0 + 12 * BPS,  4 + 12 * BPS, 8 + 12 * BPS, 12 + 12 * BPS ];
+
+  static int _checkMode(int mb_x, int mb_y, int mode) {
+    if (mode == B_DC_PRED) {
+      if (mb_x == 0) {
+        return (mb_y == 0) ? B_DC_PRED_NOTOPLEFT : B_DC_PRED_NOLEFT;
+      } else {
+        return (mb_y == 0) ? B_DC_PRED_NOTOP : B_DC_PRED;
+      }
+    }
+    return mode;
+  }
+
+  void _doTransform(int bits, Data.Int16List src, Data.Uint8List dst) {
+    switch (bits >> 30) {
+      case 3:
+        _dsp.transform(src, dst, false);
+        break;
+      case 2:
+        _dsp.transformAC3(src, dst);
+        break;
+      case 1:
+        _dsp.transformDC(src, dst);
+        break;
+      default:
+        break;
+    }
+  }
+
+  void _doUVTransform(int bits, Data.Int16List src, Data.Uint8List dst) {
+    if (bits & 0xff != 0) { // any non-zero coeff at all?
+      if (bits & 0xaa != 0) { // any non-zero AC coefficient?
+        // note we don't use the AC3 variant for U/V
+        _dsp.transformUV(src, dst);
+      } else {
+        _dsp.transformDCUV(src, dst);
+      }
+    }
+  }
+
+  // vertical position of a MB
+  int MACROBLOCK_VPOS(int mb_y) => ((mb_y) * 16);
+
+  /**
+   * kFilterExtraRows[] = How many extra lines are needed on the MB boundary
+   * for caching, given a filtering level.
+   * Simple filter:  up to 2 luma samples are read and 1 is written.
+   * Complex filter: up to 4 luma samples are read and 3 are written. Same for
+   *                U/V, so it's 8 samples total (because of the 2x upsampling).
+   */
+  static const List<int> kFilterExtraRows = const [ 0, 2, 8 ];
+
+  void _doFilter(int mbX, int mbY) {
+    final int yBps = _cacheYStride;
+    VP8FInfo fInfo = _fInfo[mbX];
+    VP8List yDst = new VP8List(_cacheY, mbX * 16);
+    final int ilevel = fInfo.fInnerLevel;
+    final int limit = fInfo.fLimit;
+    if (limit == 0) {
+      return;
+    }
+
+    if (_filterType == 1) {   // simple
+      if (mbX > 0) {
+        //VP8SimpleHFilter16(yDst, yBps, limit + 4);
+      }
+      if (fInfo.fInner) {
+        //VP8SimpleHFilter16i(yDst, yBps, limit);
+      }
+      if (mbY > 0) {
+        //VP8SimpleVFilter16(yDst, yBps, limit + 4);
+      }
+      if (fInfo.fInner) {
+        //VP8SimpleVFilter16i(yDst, yBps, limit);
+      }
+    } else {    // complex
+      final int uvBps = _cacheUVStride;
+      VP8List uDst = new VP8List(_cacheU, mbX * 8);
+      VP8List vDst = new VP8List(_cacheV, mbX * 8);
+
+      final int hevThresh = fInfo.hevThresh;
+      if (mbX > 0) {
+        //VP8HFilter16(yDst, yBps, limit + 4, ilevel, hevThresh);
+        //VP8HFilter8(uDst, vDst, uvBps, limit + 4, ilevel, hevThresh);
+      }
+      if (fInfo.fInner) {
+        //VP8HFilter16i(yDst, yBps, limit, ilevel, hevThresh);
+        //VP8HFilter8i(uDst, vDst, uvBps, limit, ilevel, hevThresh);
+      }
+      if (mbY > 0) {
+        //VP8VFilter16(yDst, yBps, limit + 4, ilevel, hevThresh);
+        //VP8VFilter8(uDst, vDst, uvBps, limit + 4, ilevel, hevThresh);
+      }
+      if (fInfo.fInner) {
+        //VP8VFilter16i(yDst, yBps, limit, ilevel, hevThresh);
+        //VP8VFilter8i(uDst, vDst, uvBps, limit, ilevel, hevThresh);
+      }
+    }
+  }
+
+  /**
+   * Filter the decoded macroblock row (if needed)
+   */
+  void _doFilterRow() {
+    final int mbY = _mbY;
+    for (int mbX = _tlMbX; mbX < _brMbX; ++mbX) {
+      _doFilter(mbX, mbY);
+    }
+  }
+
+  void _ditherRow() {
+  }
+
+  /**
+   * This function is called after a row of macroblocks is finished decoding.
+   * It also takes into account the following restrictions:
+   *
+   * * In case of in-loop filtering, we must hold off sending some of the bottom
+   *    pixels as they are yet unfiltered. They will be when the next macroblock
+   *    row is decoded. Meanwhile, we must preserve them by rotating them in the
+   *    cache area. This doesn't hold for the very bottom row of the uncropped
+   *    picture of course.
+   *  * we must clip the remaining pixels against the cropping area. The VP8Io
+   *    struct must have the following fields set correctly before calling put():
+   */
+  bool _finishRow() {
+    final int extraYRows = kFilterExtraRows[_filterType];
+    final int ySize = extraYRows * _cacheYStride;
+    final int uvSize = (extraYRows ~/ 2) * _cacheUVStride;
+    final int yOffset = 0;
+    final int uvOffset = 0;
+    VP8List yDst = new VP8List(_cacheY, -ySize + yOffset);
+    VP8List uDst = new VP8List(_cacheU, -uvSize + uvOffset);
+    VP8List vDst = new VP8List(_cacheV, -uvSize + uvOffset);
+    final int mbY = _mbY;
+    final bool isFirstRow = (mbY == 0);
+    final bool isLastRow = (mbY >= _brMbY - 1);
+
+    /*if (_filterRow) {
+      _doFilterRow();
+    }
+
+    if (_dither) {
+      _ditherRow();
+    }
+
+    int yStart = MACROBLOCK_VPOS(mbY);
+    int yEnd = MACROBLOCK_VPOS(mbY + 1);
+
+    if (!isFirstRow) {
+      yStart -= extraYRows;
+      _y = yDst;
+      _u = uDst;
+      _v = vDst;
+    } else {
+      _y = new VP8List(_cacheY, yOffset);
+      _u = new VP8List(_cacheU, uvOffset);
+      _v = new VP8List(_cacheV, uvOffset);
+    }
+
+    if (!isLastRow) {
+      yEnd -= extraYRows;
+    }
+
+    if (yEnd > _cropBottom) {
+      yEnd = _cropBottom;    // make sure we don't overflow on last row.
+    }
+
+    if (_alphaData != null && yStart < yEnd) {
+      _a = _decompressAlphaRows(yStart, yEnd - yStart);
+      if (_a == null) {
+        return false;
+      }
+    }
+
+    if (yStart < _cropTop) {
+      final int deltaY = _cropTop - yStart;
+      yStart = _cropTop;
+
+      _y.offset += _cacheYStride * deltaY;
+      _u.offset += _cacheUVStride * (deltaY >> 1);
+      _v.offset += _cacheUVStride * (deltaY >> 1);
+
+      if (_a != null) {
+        _a.offset += webp.width * deltaY;
+      }
+    }
+
+    if (yStart < yEnd) {
+      _y.offset += _cropLeft;
+      _u.offset += _cropLeft >> 1;
+      _v.offset += _cropLeft >> 1;
+      if (_a != null) {
+        _a += _cropLeft;
+      }
+
+      _put(yStart - _cropTop, _cropRight - _cropLeft, yEnd - yStart);
+    }
+
+    // rotate top samples if needed
+    if (!isLastRow) {
+      _cacheY.setRange(-ySize, ySize, yDst, 16 * _cacheYStride);
+      _cacheU.setRange(-uvSize, uvSize, uDst, 8 * _cacheUVStride);
+      _cacheV.setRange(-uvSize, uvSize, vDst, 8 * _cacheUVStride);
+    }*/
+
+    return true;
+  }
+
+  bool _put(int mbY, int mbW, int mbH) {
+    //WebPDecParams* const p = (WebPDecParams*)io->opaque;
+
+    if (mbW <= 0 || mbH <= 0) {
+      return false;
+    }
+
+    int numLinesOut = _emitFancyRGB(mbY, mbW, mbH);
+    /*if (p->emit_alpha != NULL) {
+      p->emit_alpha(io, p);
+    }*/
+
+    //_lastY += numLinesOut;
+
+    return true;
+  }
+
+  /*int _clip8(int v) {
+    return ((v & ~YUV_MASK2) == 0) ? (v >> YUV_FIX2) : (v < 0) ? 0 : 255;
+  }
+
+  int _yuvToR(int y, int v) {
+    return _clip8(kYScale * y + kVToR * v + kRCst);
+  }
+
+  int _yuvToG(int y, int u, int v) {
+    return _clip8(kYScale * y - kUToG * u - kVToG * v + kGCst);
+  }
+
+  int _yuvToB(int y, int u) {
+    return _clip8(kYScale * y + kUToB * u + kBCst);
+  }
+
+  static void _yuvToRgb(int y, int u, int v, uint8_t* const rgb) {
+    rgb[0] = _yuvToR(y, v);
+    rgb[1] = _yuvToG(y, u, v);
+    rgb[2] = _yvToB(y, u);
+  }
+
+  static void _yuvToRgba(uint8_t y, uint8_t u, uint8_t v, uint8_t* const rgba) {
+    _yuvToRgb(y, u, v, rgba);
+    rgba[3] = 0xff;
+  }*/
+
+  int _emitFancyRGB(int mbY, int mbW, int mbH) {
+    int numLinesOut = mbH;   // a priori guess
+    /*int dst = mbY * webp.width;
+    VP8List curY = new VP8List(_y);
+    VP8List curU = new VP8List(_u);
+    VP8List curV = new VP8List(_v);
+    int y = mbY;
+    final int yEnd = mbY + mbH;
+    final int uvW = (mbW + 1) >> 1;
+    final int stride = webp.width * 4;
+    //WebPUpsampleLinePairFunc upsample = WebPUpsamplers[p->output->colorspace];
+    //const uint8_t* top_u = p->tmp_u;
+    //const uint8_t* top_v = p->tmp_v;
+
+    if (y == 0) {
+      // First line is special cased. We mirror the u/v samples at boundary.
+      upsample(cur_y, NULL, cur_u, cur_v, cur_u, cur_v, dst, NULL, mb_w);
+    } else {
+      // We can finish the left-over line from previous call.
+      upsample(p->tmp_y, curY, topU, topV, curU, curV,
+               dst - stride, dst, mbW);
+      ++numLinesOut;
+    }*/
+
+    // Loop over each output pairs of row.
+    /*for (; y + 2 < y_end; y += 2) {
+      top_u = cur_u;
+      top_v = cur_v;
+      cur_u += io->uv_stride;
+      cur_v += io->uv_stride;
+      dst += 2 * buf->stride;
+      cur_y += 2 * io->y_stride;
+      upsample(cur_y - io->y_stride, cur_y,
+          top_u, top_v, cur_u, cur_v,
+          dst - buf->stride, dst, mb_w);
+    }
+
+    // move to last row
+    cur_y += io->y_stride;
+    if (io->crop_top + y_end < io->crop_bottom) {
+      // Save the unfinished samples for next call (as we're not done yet).
+      memcpy(p->tmp_y, cur_y, mb_w * sizeof(*p->tmp_y));
+      memcpy(p->tmp_u, cur_u, uv_w * sizeof(*p->tmp_u));
+      memcpy(p->tmp_v, cur_v, uv_w * sizeof(*p->tmp_v));
+      // The fancy upsampler leaves a row unfinished behind
+      // (except for the very last row)
+      num_lines_out--;
+    } else {
+      // Process the very last row of even-sized picture
+      if (!(y_end & 1)) {
+        upsample(cur_y, NULL, cur_u, cur_v, cur_u, cur_v,
+            dst + buf->stride, NULL, mb_w);
+      }
+    }*/
+
+    return numLinesOut;
+  }
+
+  VP8List _decompressAlphaRows(int row, int numRows) {
+    final int width = webp.width;
+    final int height = webp.height;
+
+    /*if (row < 0 || numRows <= 0 || row + numRows > height) {
+      return null;    // sanity check.
+    }
+
+    if (row == 0) {
+      // Initialize decoding.
+      if (_alphaPlane == null) {
+        return null;
+      }
+
+      _alpha = new WebPAlpha(_alphaData, _alphaData.length,
+                             width, height, _alphaPlane);
+
+    if (!_isAlphaDecoded) {
+      int ok = 0;
+      if (!_alpha.decode(row, numRows)) {
+        return null;
+      }
+    }*/
+
+    // Return a pointer to the current decoded row.
+    return new VP8List(_alphaPlane, row * width);
+  }
+
 
   bool _decodeMB(VP8BitReader tokenBr) {
     VP8MB left = _mbInfo[0];
@@ -473,7 +994,7 @@ class VP8 {
     if (_filterType > 0) {  // store filter info
       VP8FInfo finfo = _fInfo[_mbX];
       finfo = _fStrengths[_segment][block.isIntra4x4 ? 1 : 0];
-      finfo.fInner |= !skip ? 1 : 0;
+      finfo.fInner = finfo.fInner || !skip;
     }
 
     return true;
@@ -626,7 +1147,9 @@ class VP8 {
   static const List<int> kZigzag = const [ 0, 1, 4, 8,  5, 2, 3, 6,  9, 12,
                                            13, 10,  7, 11, 14, 15 ];
 
-  // See section 13-2: http://tools.ietf.org/html/rfc6386#section-13.2
+  /**
+   * See section 13-2: http://tools.ietf.org/html/rfc6386#section-13.2
+   */
   int _getLargeValue(VP8BitReader br, List<int> p) {
     int v;
     if (br.getBit(p[3]) == 0) {
@@ -720,22 +1243,22 @@ class VP8 {
       int mi = 0;
       for (int y = 0; y < 4; ++y) {
         int ymode = left[y];
-        int x;
-        for (x = 0; x < 4; ++x) {
-          List<int> prob = kBModesProba[top[x]][ymode];
+        for (int x = 0; x < 4; ++x) {
+          List<int> prob = kBModesProba[top[ti + x]][ymode];
 
           // Generic tree-parsing
-          int i = kYModesIntra4[br.getBit(prob[0])];
+          int b = br.getBit(prob[0]);
+          int i = kYModesIntra4[b];
 
           while (i > 0) {
             i = kYModesIntra4[2 * i + br.getBit(prob[i])];
           }
 
           ymode = -i;
-          top[x] = ymode;
+          top[ti + x] = ymode;
         }
 
-        modes.setRange(mi, mi + 4, top);
+        modes.setRange(mi, mi + 4, top, ti);
 
         mi += 4;
         left[y] = ymode;
@@ -783,7 +1306,7 @@ class VP8 {
   List<VP8BitReader> _partitions = new List<VP8BitReader>(MAX_NUM_PARTITIONS);
 
   // Dithering strength, deduced from decoding options
-  bool _dither; // whether to use dithering or not
+  bool _dither = false; // whether to use dithering or not
   VP8Random _ditheringRand; // random generator for dithering
 
   // dequantization (one set of DC/AC dequant factor per segment)
@@ -803,7 +1326,7 @@ class VP8 {
   /// uint8, segment of the currently parsed block
   int _segment;
   /// top y/u/v samples
-  VP8TopSamples _yuvT;
+  List<VP8TopSamples> _yuvT;
 
   /// contextual macroblock info (mb_w_ + 1)
   List<VP8MB> _mbInfo;
@@ -813,11 +1336,20 @@ class VP8 {
   Data.Uint8List _yuvBlock;
 
   /// macroblock row for storing unfiltered samples
-  Data.Uint8List _cacheY;
-  Data.Uint8List _cacheU;
-  Data.Uint8List _cacheV;
+  VP8List _cacheY;
+  VP8List _cacheU;
+  VP8List _cacheV;
   int _cacheYStride;
-  int _cacheUvStride;
+  int _cacheUVStride;
+
+  Data.Uint8List tmpY;
+  Data.Uint8List tmpU;
+  Data.Uint8List tmpV;
+
+  VP8List _y;
+  VP8List _u;
+  VP8List _v;
+  VP8List _a;
 
   /// main memory chunk for the above data. Persistent.
   Data.Uint8List _mem;
@@ -830,6 +1362,7 @@ class VP8 {
   List<VP8MBData> _mbData;
 
   // Filtering side-info
+  bool _filterRow;
   /// 0=off, 1=simple, 2=complex
   int _filterType;
   /// precalculated per-segment/type
@@ -1301,11 +1834,18 @@ class VP8 {
   static const int B_HU_PRED = 9;
   static const int NUM_BMODES = B_HU_PRED + 1 - B_DC_PRED;
 
+  // Luma16 or UV modes
   static const int DC_PRED = B_DC_PRED;
   static const int V_PRED = B_VE_PRED;
   static const int H_PRED = B_HE_PRED;
   static const int TM_PRED = B_TM_PRED;
   static const int B_PRED = NUM_BMODES;
+
+  // special modes
+  static const int B_DC_PRED_NOTOP = 4;
+  static const int B_DC_PRED_NOLEFT = 5;
+  static const int B_DC_PRED_NOTOPLEFT = 6;
+  static const int NUM_B_DC_MODES = 7;
 
   // Probabilities
   static const int NUM_TYPES = 4;
@@ -1319,19 +1859,4 @@ class VP8 {
   static const int Y_OFF = (BPS * 1 + 8);
   static const int U_OFF = (Y_OFF + BPS * 16 + BPS);
   static const int V_OFF = (U_OFF + 16);
-}
-
-class VP8List {
-  List<int> buffer;
-  int offset;
-
-  VP8List(this.buffer, [this.offset = 0]);
-
-  operator+(int add) => offset += add;
-
-  int operator[](int index) => buffer[offset + index];
-
-  operator[]=(int index, int value) => buffer[offset + index] = value;
-
-  int get length => buffer.length - offset;
 }

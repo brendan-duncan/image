@@ -7,7 +7,7 @@ void defineWebPTests() {
   Io.Directory dir = new Io.Directory(path);
   List files = dir.listSync();
 
-  /*Io.File file = new Io.File(path + '/1.webp');
+  /*Io.File file = new Io.File(path + '/3_webp_a.webp');
   List<int> bytes = file.readAsBytesSync();
   Image image = new WebPDecoder().decodeImage(bytes);
   print('${image.width} ${image.height}');*/

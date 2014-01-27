@@ -52,6 +52,7 @@ part 'src/formats/jpeg/_jpeg_scan.dart';
 part 'src/formats/webp/dsp.dart';
 part 'src/formats/webp/vp8.dart';
 part 'src/formats/webp/vp8_bit_reader.dart';
+part 'src/formats/webp/vp8_list.dart';
 part 'src/formats/webp/vp8_types.dart';
 part 'src/formats/webp/vp8l.dart';
 part 'src/formats/webp/vp8l_bit_reader.dart';

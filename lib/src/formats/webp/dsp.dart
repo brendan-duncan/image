@@ -3,20 +3,6 @@ part of image;
 class DSP {
   DSP() {
     _initTables();
-
-    /*
-    VP8VFilter16 = VFilter16;
-    VP8HFilter16 = HFilter16;
-    VP8VFilter8 = VFilter8;
-    VP8HFilter8 = HFilter8;
-    VP8VFilter16i = VFilter16i;
-    VP8HFilter16i = HFilter16i;
-    VP8VFilter8i = VFilter8i;
-    VP8HFilter8i = HFilter8i;
-    VP8SimpleVFilter16 = SimpleVFilter16;
-    VP8SimpleHFilter16 = SimpleHFilter16;
-    VP8SimpleVFilter16i = SimpleVFilter16i;
-    VP8SimpleHFilter16i = SimpleHFilter16i;*/
   }
 
   void transformOne(Data.Int16List src, Data.Uint8List dst) {
@@ -68,7 +54,7 @@ class DSP {
     }
   }
 
-  void TransformUV(Data.Int16List src, Data.Uint8List dst) {
+  void transformUV(Data.Int16List src, Data.Uint8List dst) {
     transform(src, dst, true);
     transform(new Data.Int16List.view(src.buffer, 2 * 16),
               new Data.Uint8List.view(dst.buffer, 4 * VP8.BPS), true);
@@ -116,88 +102,303 @@ class DSP {
     _store2(dst, 3, a - d4, d1, c1);
   }
 
-  // on macroblock edges
-  /*void vfilter16(Data.Uint8List p, int stride, int thresh, int ithresh,
-                 int hev_thresh) {
-    filterLoop26(p, stride, 1, 16, thresh, ithresh, hev_thresh);
-  }
+  static int AVG3(a, b, c) => (((a) + 2 * (b) + (c) + 2) >> 2);
+  static int AVG2(a, b) => (((a) + (b) + 1) >> 1);
 
-  void hfilter16(Data.Uint8List p, int stride, int thresh, int ithresh,
-                 int hev_thresh) {
-    filterLoop26(p, 1, stride, 16, thresh, ithresh, hev_thresh);
-  }
+  static void VE4(VP8List dst) { // vertical
+    int top = -VP8.BPS; // dst +
+    final List<int> vals = [
+       AVG3(dst[top - 1], dst[top],     dst[top + 1]),
+       AVG3(dst[top],     dst[top + 1], dst[top + 2]),
+       AVG3(dst[top + 1], dst[top + 2], dst[top + 3]),
+       AVG3(dst[top + 2], dst[top + 3], dst[top + 4])];
 
-  // on three inner edges
-  void vfilter16i(Data.Uint8List p, int stride,
-                  int thresh, int ithresh, int hev_thresh) {
-    for (int k = 3; k > 0; --k) {
-      p += 4 * stride;
-      filterLoop24(p, stride, 1, 16, thresh, ithresh, hev_thresh);
+    for (int i = 0; i < 4; ++i) {
+      dst.setRange(i * VP8.BPS, 4, vals);
     }
   }
 
-  void hfilter16i(Data.Uint8List p, int stride,
-                  int thresh, int ithresh, int hev_thresh) {
-    for (int k = 3; k > 0; --k) {
-      p += 4;
-      filterLoop24(p, 1, stride, 16, thresh, ithresh, hev_thresh);
+  static void HE4(VP8List dst) { // horizontal
+    final int A = dst[-1 - VP8.BPS];
+    final int B = dst[-1];
+    final int C = dst[-1 + VP8.BPS];
+    final int D = dst[-1 + 2 * VP8.BPS];
+    final int E = dst[-1 + 3 * VP8.BPS];
+    Data.Uint32List d32 = new Data.Uint32List.view(dst.buffer);
+    d32[0] = 0x01010101 * AVG3(A, B, C);
+    d32[1 * VP8.BPS] = 0x01010101 * AVG3(B, C, D);
+    d32[2 * VP8.BPS] = 0x01010101 * AVG3(C, D, E);
+    d32[3 * VP8.BPS] = 0x01010101 * AVG3(D, E, E);
+  }
+
+  static void DC4(VP8List dst) {   // DC
+    int dc = 4;
+    for (int i = 0; i < 4; ++i) {
+      dc += dst[i - VP8.BPS] + dst[-1 + i * VP8.BPS];
+    }
+    dc >>= 3;
+    for (int i = 0; i < 4; ++i) {
+      dst.fillRange(i * VP8.BPS, 4, dc);
     }
   }
 
-  // 8-pixels wide variant, for chroma filtering
-  void vfilter8(Data.Uint8List u, Data.Uint8List v, int stride,
-                int thresh, int ithresh, int hev_thresh) {
-    filterLoop26(u, stride, 1, 8, thresh, ithresh, hev_thresh);
-    filterLoop26(v, stride, 1, 8, thresh, ithresh, hev_thresh);
-  }
+  static void trueMotion(VP8List dst, int size) {
+    int di = 0;
+    int top = -VP8.BPS; // dst +
+    int clip0 = 255 - dst[top - 1]; // clip1 +
 
-  void hfilter8(Data.Uint8List u, Data.Uint8List v, int stride,
-                int thresh, int ithresh, int hev_thresh) {
-    filterLoop26(u, 1, stride, 8, thresh, ithresh, hev_thresh);
-    filterLoop26(v, 1, stride, 8, thresh, ithresh, hev_thresh);
-  }
-
-  void vfilter8i(Data.Uint8List u, Data.Uint8List v, int stride,
-                 int thresh, int ithresh, int hev_thresh) {
-    filterLoop24(u + 4 * stride, stride, 1, 8, thresh, ithresh, hev_thresh);
-    filterLoop24(v + 4 * stride, stride, 1, 8, thresh, ithresh, hev_thresh);
-  }
-
-  void hfilter8i(Data.Uint8List u, Data.Uint8List v, int stride,
-                 int thresh, int ithresh, int hev_thresh) {
-    filterLoop24(u + 4, 1, stride, 8, thresh, ithresh, hev_thresh);
-    filterLoop24(v + 4, 1, stride, 8, thresh, ithresh, hev_thresh);
-  }
-
-  void filterLoop26(Data.Uint8List p,
-                    int hstride, int vstride, int size,
-                    int thresh, int ithresh, int hev_thresh) {
-    while (size-- > 0) {
-      if (needs_filter2(p, hstride, thresh, ithresh)) {
-        if (hev(p, hstride, hev_thresh)) {
-          do_filter2(p, hstride);
-        } else {
-          doFilter6(p, hstride);
-        }
+    for (int y = 0; y < size; ++y) {
+      int clip = clip0 + dst[-1];
+      for (int x = 0; x < size; ++x) {
+        dst[di + x] = clip1[clip + dst[top + x]];
       }
-      p += vstride;
+
+      di += VP8.BPS;
     }
   }
 
-  void filterLoop24(Data.Uint8List p,
-                    int hstride, int vstride, int size,
-                    int thresh, int ithresh, int hev_thresh) {
-    while (size-- > 0) {
-      if (needs_filter2(p, hstride, thresh, ithresh)) {
-        if (hev(p, hstride, hev_thresh)) {
-          doFilter2(p, hstride);
-        } else {
-          doFilter4(p, hstride);
-        }
-      }
-      p += vstride;
+  static void TM4(VP8List dst) {
+    trueMotion(dst, 4);
+  }
+
+  static void TM8uv(VP8List dst) {
+    trueMotion(dst, 8);
+  }
+
+  static void TM16(VP8List dst) {
+    trueMotion(dst, 16);
+  }
+
+  static int DST(x, y) => x + y * VP8.BPS;
+
+  static void RD4(VP8List dst) {   // Down-right
+    final int I = dst[-1 + 0 * VP8.BPS];
+    final int J = dst[-1 + 1 * VP8.BPS];
+    final int K = dst[-1 + 2 * VP8.BPS];
+    final int L = dst[-1 + 3 * VP8.BPS];
+    final int X = dst[-1 - VP8.BPS];
+    final int A = dst[0 - VP8.BPS];
+    final int B = dst[1 - VP8.BPS];
+    final int C = dst[2 - VP8.BPS];
+    final int D = dst[3 - VP8.BPS];
+
+    dst[DST(0, 3)] = AVG3(J, K, L);
+    dst[DST(0, 2)] = dst[DST(1, 3)] = AVG3(I, J, K);
+    dst[DST(0, 1)] = dst[DST(1, 2)] = dst[DST(2, 3)] = AVG3(X, I, J);
+    dst[DST(0, 0)] = dst[DST(1, 1)] = dst[DST(2, 2)] = dst[DST(3, 3)] = AVG3(A, X, I);
+    dst[DST(1, 0)] = dst[DST(2, 1)] = dst[DST(3, 2)] = AVG3(B, A, X);
+    dst[DST(2, 0)] = dst[DST(3, 1)] = AVG3(C, B, A);
+    dst[DST(3, 0)] = AVG3(D, C, B);
+  }
+
+  static void LD4(VP8List dst) {   // Down-Left
+    final int A = dst[0 - VP8.BPS];
+    final int B = dst[1 - VP8.BPS];
+    final int C = dst[2 - VP8.BPS];
+    final int D = dst[3 - VP8.BPS];
+    final int E = dst[4 - VP8.BPS];
+    final int F = dst[5 - VP8.BPS];
+    final int G = dst[6 - VP8.BPS];
+    final int H = dst[7 - VP8.BPS];
+    dst[DST(0, 0)] = AVG3(A, B, C);
+    dst[DST(1, 0)] = dst[DST(0, 1)] = AVG3(B, C, D);
+    dst[DST(2, 0)] = dst[DST(1, 1)] = dst[DST(0, 2)] = AVG3(C, D, E);
+    dst[DST(3, 0)] = dst[DST(2, 1)] = dst[DST(1, 2)] = dst[DST(0, 3)] = AVG3(D, E, F);
+    dst[DST(3, 1)] = dst[DST(2, 2)] = dst[DST(1, 3)] = AVG3(E, F, G);
+    dst[DST(3, 2)] = dst[DST(2, 3)] = AVG3(F, G, H);
+    dst[DST(3, 3)] = AVG3(G, H, H);
+  }
+
+  static void VR4(VP8List dst) {   // Vertical-Right
+    final int I = dst[-1 + 0 * VP8.BPS];
+    final int J = dst[-1 + 1 * VP8.BPS];
+    final int K = dst[-1 + 2 * VP8.BPS];
+    final int X = dst[-1 - VP8.BPS];
+    final int A = dst[0 - VP8.BPS];
+    final int B = dst[1 - VP8.BPS];
+    final int C = dst[2 - VP8.BPS];
+    final int D = dst[3 - VP8.BPS];
+    dst[DST(0, 0)] = dst[DST(1, 2)] = AVG2(X, A);
+    dst[DST(1, 0)] = dst[DST(2, 2)] = AVG2(A, B);
+    dst[DST(2, 0)] = dst[DST(3, 2)] = AVG2(B, C);
+    dst[DST(3, 0)] = AVG2(C, D);
+
+    dst[DST(0, 3)] = AVG3(K, J, I);
+    dst[DST(0, 2)] = AVG3(J, I, X);
+    dst[DST(0, 1)] = dst[DST(1, 3)] = AVG3(I, X, A);
+    dst[DST(1, 1)] = dst[DST(2, 3)] = AVG3(X, A, B);
+    dst[DST(2, 1)] = dst[DST(3, 3)] = AVG3(A, B, C);
+    dst[DST(3, 1)] = AVG3(B, C, D);
+  }
+
+  static void VL4(VP8List dst) {   // Vertical-Left
+    final int A = dst[0 - VP8.BPS];
+    final int B = dst[1 - VP8.BPS];
+    final int C = dst[2 - VP8.BPS];
+    final int D = dst[3 - VP8.BPS];
+    final int E = dst[4 - VP8.BPS];
+    final int F = dst[5 - VP8.BPS];
+    final int G = dst[6 - VP8.BPS];
+    final int H = dst[7 - VP8.BPS];
+    dst[DST(0, 0)] = AVG2(A, B);
+    dst[DST(1, 0)] = dst[DST(0, 2)] = AVG2(B, C);
+    dst[DST(2, 0)] = dst[DST(1, 2)] = AVG2(C, D);
+    dst[DST(3, 0)] = dst[DST(2, 2)] = AVG2(D, E);
+
+    dst[DST(0, 1)] = AVG3(A, B, C);
+    dst[DST(1, 1)] = dst[DST(0, 3)] = AVG3(B, C, D);
+    dst[DST(2, 1)] = dst[DST(1, 3)] = AVG3(C, D, E);
+    dst[DST(3, 1)] = dst[DST(2, 3)] = AVG3(D, E, F);
+    dst[DST(3, 2)] = AVG3(E, F, G);
+    dst[DST(3, 3)] = AVG3(F, G, H);
+  }
+
+  static void HU4(VP8List dst) {   // Horizontal-Up
+    final int I = dst[-1 + 0 * VP8.BPS];
+    final int J = dst[-1 + 1 * VP8.BPS];
+    final int K = dst[-1 + 2 * VP8.BPS];
+    final int L = dst[-1 + 3 * VP8.BPS];
+    dst[DST(0, 0)] = AVG2(I, J);
+    dst[DST(2, 0)] = dst[DST(0, 1)] = AVG2(J, K);
+    dst[DST(2, 1)] = dst[DST(0, 2)] = AVG2(K, L);
+    dst[DST(1, 0)] = AVG3(I, J, K);
+    dst[DST(3, 0)] = dst[DST(1, 1)] = AVG3(J, K, L);
+    dst[DST(3, 1)] = dst[DST(1, 2)] = AVG3(K, L, L);
+    dst[DST(3, 2)] = dst[DST(2, 2)] = dst[DST(0, 3)] = dst[DST(1, 3)] =
+                     dst[DST(2, 3)] = dst[DST(3, 3)] = L;
+  }
+
+  static void HD4(VP8List dst) {  // Horizontal-Down
+    final int I = dst[-1 + 0 * VP8.BPS];
+    final int J = dst[-1 + 1 * VP8.BPS];
+    final int K = dst[-1 + 2 * VP8.BPS];
+    final int L = dst[-1 + 3 * VP8.BPS];
+    final int X = dst[-1 - VP8.BPS];
+    final int A = dst[0 - VP8.BPS];
+    final int B = dst[1 - VP8.BPS];
+    final int C = dst[2 - VP8.BPS];
+
+    dst[DST(0, 0)] = dst[DST(2, 1)] = AVG2(I, X);
+    dst[DST(0, 1)] = dst[DST(2, 2)] = AVG2(J, I);
+    dst[DST(0, 2)] = dst[DST(2, 3)] = AVG2(K, J);
+    dst[DST(0, 3)] = AVG2(L, K);
+
+    dst[DST(3, 0)] = AVG3(A, B, C);
+    dst[DST(2, 0)] = AVG3(X, A, B);
+    dst[DST(1, 0)] = dst[DST(3, 1)] = AVG3(I, X, A);
+    dst[DST(1, 1)] = dst[DST(3, 2)] = AVG3(J, I, X);
+    dst[DST(1, 2)] = dst[DST(3, 3)] = AVG3(K, J, I);
+    dst[DST(1, 3)] = AVG3(L, K, J);
+  }
+
+  static void VE16(VP8List dst) { // vertical
+    for (int j = 0; j < 16; ++j) {
+      dst.setRange(j * VP8.BPS, 16, dst, -VP8.BPS);
     }
-  }*/
+  }
+
+  static void HE16(VP8List dst) { // horizontal
+    int di = 0;
+    for (int j = 16; j > 0; --j) {
+      dst.fillRange(di, 16, dst[di - 1]);
+      di += VP8.BPS;
+    }
+  }
+
+  static void Put16(int v, VP8List dst) {
+    for (int j = 0; j < 16; ++j) {
+      dst.fillRange(j * VP8.BPS, 16, v);
+    }
+  }
+
+  static void DC16(VP8List dst) { // DC
+    int DC = 16;
+    for (int j = 0; j < 16; ++j) {
+      DC += dst[-1 + j * VP8.BPS] + dst[j - VP8.BPS];
+    }
+    Put16(DC >> 5, dst);
+  }
+
+  // DC with top samples not available
+  static void DC16NoTop(VP8List dst) {
+    int DC = 8;
+    for (int j = 0; j < 16; ++j) {
+      DC += dst[-1 + j * VP8.BPS];
+    }
+    Put16(DC >> 4, dst);
+  }
+
+  // DC with left samples not available
+  static void DC16NoLeft(VP8List dst) {
+    int DC = 8;
+    for (int i = 0; i < 16; ++i) {
+      DC += dst[i - VP8.BPS];
+    }
+    Put16(DC >> 4, dst);
+  }
+
+  // DC with no top and left samples
+  static void DC16NoTopLeft(VP8List dst) {
+    Put16(0x80, dst);
+  }
+
+  static void VE8uv(VP8List dst) {    // vertical
+    for (int j = 0; j < 8; ++j) {
+      dst.setRange(j * VP8.BPS, 8, dst, -VP8.BPS);
+    }
+  }
+
+  static void HE8uv(VP8List dst) {    // horizontal
+    int di = 0;
+    for (int j = 0; j < 8; ++j) {
+      dst.fillRange(di, 8, dst[-1]);
+      di += VP8.BPS;
+    }
+  }
+
+// helper for chroma-DC predictions
+  static void Put8x8uv(int value, VP8List dst) {
+    for (int j = 0; j < 8; ++j) {
+      dst.fillRange(j * VP8.BPS, 8, value);
+    }
+  }
+
+  static void DC8uv(VP8List dst) {     // DC
+    int dc0 = 8;
+    for (int i = 0; i < 8; ++i) {
+      dc0 += dst[i - VP8.BPS] + dst[-1 + i * VP8.BPS];
+    }
+    Put8x8uv(dc0 >> 4, dst);
+  }
+
+  static void DC8uvNoLeft(VP8List dst) {   // DC with no left samples
+    int dc0 = 4;
+    for (int i = 0; i < 8; ++i) {
+      dc0 += dst[i - VP8.BPS];
+    }
+    Put8x8uv(dc0 >> 3, dst);
+  }
+
+  static void DC8uvNoTop(VP8List dst) {  // DC with no top samples
+    int dc0 = 4;
+    for (int i = 0; i < 8; ++i) {
+      dc0 += dst[-1 + i * VP8.BPS];
+    }
+    Put8x8uv(dc0 >> 3, dst);
+  }
+
+  static void DC8uvNoTopLeft(VP8List dst) {    // DC with nothing
+    Put8x8uv(0x80, dst);
+  }
+
+  static const List PredLuma4 = const [
+      DC4, TM4, VE4, HE4, RD4, VR4, LD4, VL4, HD4, HU4 ];
+
+  static const List PredLuma16 = const [
+      DC16, TM16, VE16, HE16, DC16NoTop, DC16NoLeft, DC16NoTopLeft ];
+
+  static const List PredChroma8 = const [
+      DC8uv, TM8uv, VE8uv, HE8uv, DC8uvNoTop, DC8uvNoLeft, DC8uvNoTopLeft ];
 
 
   static const int kC1 = 20091 + (1 << 16);
