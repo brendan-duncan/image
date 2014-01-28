@@ -336,11 +336,15 @@ class DSP {
     final int D = dst[-1 + 2 * VP8.BPS];
     final int E = dst[-1 + 3 * VP8.BPS];
 
-    Data.Uint32List d32 = dst.toUint32List();
-    d32[0] = 0x01010101 * AVG3(A, B, C);
-    d32[1 * VP8.BPS] = 0x01010101 * AVG3(B, C, D);
-    d32[2 * VP8.BPS] = 0x01010101 * AVG3(C, D, E);
-    d32[3 * VP8.BPS] = 0x01010101 * AVG3(D, E, E);
+    MemPtr d2 = new MemPtr(dst);
+
+    d2.toUint32List()[0] = 0x01010101 * AVG3(A, B, C);
+    d2.offset += VP8.BPS;
+    d2.toUint32List()[0] = 0x01010101 * AVG3(B, C, D);
+    d2.offset += VP8.BPS;
+    d2.toUint32List()[0] = 0x01010101 * AVG3(C, D, E);
+    d2.offset += VP8.BPS;
+    d2.toUint32List()[0] = 0x01010101 * AVG3(D, E, E);
   }
 
   static void DC4(MemPtr dst) {   // DC
@@ -660,7 +664,9 @@ class DSP {
   }
 
   static int _clip8b(int v) {
-    return ((v & ~0xff) == 0) ? v : (v < 0) ? 0 : 255;
+    int b = ((v & ~0xff) == 0) ? v : (v < 0) ? 0 : 255;
+    //print(b);
+    return b;
   }
 
   static bool _tablesInitialized = false;

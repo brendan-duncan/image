@@ -851,7 +851,6 @@ class VP8 {
   }
 
   void _yuvToRgba(int y, int u, int v, MemPtr rgba) {
-    //print('$y $u $v');
     _yuvToRgb(y, u, v, rgba);
     rgba[3] = 0xff;
   }
@@ -876,7 +875,6 @@ class VP8 {
     }
 
     for (int x = 1; x <= lastPixelPair; ++x) {
-      //print('@X: $x');
       final int t_uv = LOAD_UV(topU[x], topV[x]); // top sample
       final int uv   = LOAD_UV(curU[x], curV[x]); // sample
       // precompute invariant values associated with first and second diagonals
@@ -935,7 +933,6 @@ class VP8 {
     MemPtr topU = new MemPtr(_tmpU);
     MemPtr topV = new MemPtr(_tmpV);
 
-    //print('@$y');
     if (y == 0) {
       // First line is special cased. We mirror the u/v samples at boundary.
       _upsample(curY, null, curU, curV, curU, curV, dst, null, mbW);
