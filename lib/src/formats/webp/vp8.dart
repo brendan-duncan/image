@@ -668,16 +668,16 @@ class VP8 {
 
     if (_filterType == 1) {   // simple
       if (mbX > 0) {
-        //VP8SimpleHFilter16(yDst, yBps, limit + 4);
+        _dsp.simpleHFilter16(yDst, yBps, limit + 4);
       }
       if (fInfo.fInner) {
-        //VP8SimpleHFilter16i(yDst, yBps, limit);
+        _dsp.simpleHFilter16i(yDst, yBps, limit);
       }
       if (mbY > 0) {
-        //VP8SimpleVFilter16(yDst, yBps, limit + 4);
+        _dsp.simpleVFilter16(yDst, yBps, limit + 4);
       }
       if (fInfo.fInner) {
-        //VP8SimpleVFilter16i(yDst, yBps, limit);
+        _dsp.simpleVFilter16i(yDst, yBps, limit);
       }
     } else {    // complex
       final int uvBps = _cacheUVStride;
@@ -686,20 +686,20 @@ class VP8 {
 
       final int hevThresh = fInfo.hevThresh;
       if (mbX > 0) {
-        //VP8HFilter16(yDst, yBps, limit + 4, ilevel, hevThresh);
-        //VP8HFilter8(uDst, vDst, uvBps, limit + 4, ilevel, hevThresh);
+        _dsp.hFilter16(yDst, yBps, limit + 4, ilevel, hevThresh);
+        _dsp.hFilter8(uDst, vDst, uvBps, limit + 4, ilevel, hevThresh);
       }
       if (fInfo.fInner) {
-        //VP8HFilter16i(yDst, yBps, limit, ilevel, hevThresh);
-        //VP8HFilter8i(uDst, vDst, uvBps, limit, ilevel, hevThresh);
+        _dsp.hFilter16i(yDst, yBps, limit, ilevel, hevThresh);
+        _dsp.hFilter8i(uDst, vDst, uvBps, limit, ilevel, hevThresh);
       }
       if (mbY > 0) {
-        //VP8VFilter16(yDst, yBps, limit + 4, ilevel, hevThresh);
-        //VP8VFilter8(uDst, vDst, uvBps, limit + 4, ilevel, hevThresh);
+        _dsp.vFilter16(yDst, yBps, limit + 4, ilevel, hevThresh);
+        _dsp.vFilter8(uDst, vDst, uvBps, limit + 4, ilevel, hevThresh);
       }
       if (fInfo.fInner) {
-        //VP8VFilter16i(yDst, yBps, limit, ilevel, hevThresh);
-        //VP8VFilter8i(uDst, vDst, uvBps, limit, ilevel, hevThresh);
+        _dsp.vFilter16i(yDst, yBps, limit, ilevel, hevThresh);
+        _dsp.vFilter8i(uDst, vDst, uvBps, limit, ilevel, hevThresh);
       }
     }
   }

@@ -5,6 +5,222 @@ class DSP {
     _initTables();
   }
 
+  void simpleVFilter16(MemPtr p, int stride, int thresh) {
+    MemPtr p2 = new MemPtr(p);
+    for (int i = 0; i < 16; ++i) {
+      p2.offset = p.offset + i;
+      if (_needsFilter(p2, stride, thresh)) {
+        _doFilter2(p2, stride);
+      }
+    }
+  }
+
+  void simpleHFilter16(MemPtr p, int stride, int thresh) {
+    MemPtr p2 = new MemPtr(p);
+    for (int i = 0; i < 16; ++i) {
+      p2.offset = p.offset + i * stride;
+      if (_needsFilter(p2, 1, thresh)) {
+        _doFilter2(p2, 1);
+      }
+    }
+  }
+
+  void simpleVFilter16i(MemPtr p, int stride, int thresh) {
+    MemPtr p2 = new MemPtr(p);
+    for (int k = 3; k > 0; --k) {
+      p2.offset += 4 * stride;
+      simpleVFilter16(p2, stride, thresh);
+    }
+  }
+
+  void simpleHFilter16i(MemPtr p, int stride, int thresh) {
+    MemPtr p2 = new MemPtr(p);
+    for (int k = 3; k > 0; --k) {
+      p2.offset += 4;
+      simpleHFilter16(p2, stride, thresh);
+    }
+  }
+
+  // on macroblock edges
+  void vFilter16(MemPtr p, int stride, int thresh, int ithresh,
+                 int hev_thresh) {
+    _filterLoop26(p, stride, 1, 16, thresh, ithresh, hev_thresh);
+  }
+
+  void hFilter16(MemPtr p, int stride, int thresh, int ithresh,
+                 int hev_thresh) {
+    _filterLoop26(p, 1, stride, 16, thresh, ithresh, hev_thresh);
+  }
+
+  // on three inner edges
+  void vFilter16i(MemPtr p, int stride, int thresh, int ithresh,
+                  int hev_thresh) {
+    MemPtr p2 = new MemPtr(p);
+    for (int k = 3; k > 0; --k) {
+      p2.offset += 4 * stride;
+      _filterLoop24(p2, stride, 1, 16, thresh, ithresh, hev_thresh);
+    }
+  }
+
+  void hFilter16i(MemPtr p, int stride, int thresh, int ithresh,
+                  int hev_thresh) {
+    MemPtr p2 = new MemPtr(p);
+    for (int k = 3; k > 0; --k) {
+      p2.offset += 4;
+      _filterLoop24(p2, 1, stride, 16, thresh, ithresh, hev_thresh);
+    }
+  }
+
+  /**
+   * 8-pixels wide variant, for chroma filtering
+   */
+  void vFilter8(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
+                int hev_thresh) {
+    _filterLoop26(u, stride, 1, 8, thresh, ithresh, hev_thresh);
+    _filterLoop26(v, stride, 1, 8, thresh, ithresh, hev_thresh);
+  }
+
+  void hFilter8(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
+                int hev_thresh) {
+    _filterLoop26(u, 1, stride, 8, thresh, ithresh, hev_thresh);
+    _filterLoop26(v, 1, stride, 8, thresh, ithresh, hev_thresh);
+  }
+
+  void vFilter8i(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
+                 int hev_thresh) {
+    MemPtr u2 = new MemPtr(u, 4 * stride);
+    MemPtr v2 = new MemPtr(v, 4 * stride);
+    _filterLoop24(u2, stride, 1, 8, thresh, ithresh, hev_thresh);
+    _filterLoop24(v2, stride, 1, 8, thresh, ithresh, hev_thresh);
+  }
+
+  void hFilter8i(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
+                 int hev_thresh) {
+    MemPtr u2 = new MemPtr(u, 4);
+    MemPtr v2 = new MemPtr(v, 4);
+    _filterLoop24(u2, 1, stride, 8, thresh, ithresh, hev_thresh);
+    _filterLoop24(v2, 1, stride, 8, thresh, ithresh, hev_thresh);
+  }
+
+  void _filterLoop26(MemPtr p, int hstride, int vstride, int size,
+                     int thresh, int ithresh, int hev_thresh) {
+    MemPtr p2 = new MemPtr(p);
+    while (size-- > 0) {
+      if (_needsFilter2(p2, hstride, thresh, ithresh)) {
+        if (_hev(p2, hstride, hev_thresh)) {
+          _doFilter2(p2, hstride);
+        } else {
+          _doFilter6(p2, hstride);
+        }
+      }
+      p2.offset += vstride;
+    }
+  }
+
+  void _filterLoop24(MemPtr p, int hstride, int vstride, int size,
+                     int thresh, int ithresh, int hev_thresh) {
+    MemPtr p2 = new MemPtr(p);
+    while (size-- > 0) {
+      if (_needsFilter2(p2, hstride, thresh, ithresh)) {
+        if (_hev(p2, hstride, hev_thresh)) {
+          _doFilter2(p2, hstride);
+        } else {
+          _doFilter4(p2, hstride);
+        }
+      }
+      p2.offset += vstride;
+    }
+  }
+
+  /**
+   * 4 pixels in, 2 pixels out
+   */
+  void _doFilter2(MemPtr p, int step) {
+    final int p1 = p[-2 * step];
+    final int p0 = p[-step];
+    final int q0 = p[0];
+    final int q1 = p[step];
+    final int a = 3 * (q0 - p0) + sclip1[1020 + p1 - q1];
+    final int a1 = sclip2[112 + ((a + 4) >> 3)];
+    final int a2 = sclip2[112 + ((a + 3) >> 3)];
+    p[-step] = clip1[255 + p0 + a2];
+    p[0] = clip1[255 + q0 - a1];
+  }
+
+  /**
+   * 4 pixels in, 4 pixels out
+   */
+  void _doFilter4(MemPtr p, int step) {
+    final int p1 = p[-2 * step];
+    final int p0 = p[-step];
+    final int q0 = p[0];
+    final int q1 = p[step];
+    final int a = 3 * (q0 - p0);
+    final int a1 = sclip2[112 + ((a + 4) >> 3)];
+    final int a2 = sclip2[112 + ((a + 3) >> 3)];
+    final int a3 = (a1 + 1) >> 1;
+    p[-2 * step] = clip1[255 + p1 + a3];
+    p[-step] = clip1[255 + p0 + a2];
+    p[0] = clip1[255 + q0 - a1];
+    p[step] = clip1[255 + q1 - a3];
+  }
+
+  /**
+   * 6 pixels in, 6 pixels out
+   */
+  void _doFilter6(MemPtr p, int step) {
+    final int p2 = p[-3 * step];
+    final int p1 = p[-2 * step];
+    final int p0 = p[-step];
+    final int q0 = p[0];
+    final int q1 = p[step];
+    final int q2 = p[2 * step];
+    final int a = sclip1[1020 + 3 * (q0 - p0) + sclip1[1020 + p1 - q1]];
+    final int a1 = (27 * a + 63) >> 7;  // eq. to ((3 * a + 7) * 9) >> 7
+    final int a2 = (18 * a + 63) >> 7;  // eq. to ((2 * a + 7) * 9) >> 7
+    final int a3 = (9  * a + 63) >> 7;  // eq. to ((1 * a + 7) * 9) >> 7
+    p[-3 * step] = clip1[255 + p2 + a3];
+    p[-2 * step] = clip1[255 + p1 + a2];
+    p[-step] = clip1[255 + p0 + a1];
+    p[0] = clip1[255 + q0 - a1];
+    p[step] = clip1[255 + q1 - a2];
+    p[2 * step] = clip1[255 + q2 - a3];
+  }
+
+  bool _hev(MemPtr p, int step, int thresh) {
+    final int p1 = p[-2 * step];
+    final int p0 = p[-step];
+    final int q0 = p[0];
+    final int q1 = p[step];
+    return (abs0[255 + p1 - p0] > thresh) || (abs0[255 + q1 - q0] > thresh);
+  }
+
+  bool _needsFilter(MemPtr p, int step, int thresh) {
+    final int p1 = p[-2 * step];
+    final int p0 = p[-step];
+    final int q0 = p[0];
+    final int q1 = p[step];
+    return (2 * abs0[255 + p0 - q0] + abs1[255 + p1 - q1]) <= thresh;
+  }
+
+  bool _needsFilter2(MemPtr p, int step, int t, int it) {
+    final int p3 = p[-4 * step];
+    final int p2 = p[-3 * step];
+    final int p1 = p[-2 * step];
+    final int p0 = p[-step];
+    final int q0 = p[0];
+    final int q1 = p[step];
+    final int q2 = p[2 * step];
+    final int q3 = p[3 * step];
+    if ((2 * abs0[255 + p0 - q0] + abs1[255 + p1 - q1]) > t) {
+      return false;
+    }
+
+    return abs0[255 + p3 - p2] <= it && abs0[255 + p2 - p1] <= it &&
+           abs0[255 + p1 - p0] <= it && abs0[255 + q3 - q2] <= it &&
+           abs0[255 + q2 - q1] <= it && abs0[255 + q1 - q0] <= it;
+  }
+
   void transformOne(MemPtr src, MemPtr dst) {
     Data.Int16List C = new Data.Int16List(4 * 4);
     int si = 0;
