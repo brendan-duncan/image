@@ -82,18 +82,18 @@ class VP8FilterHeader {
  * filter specs
  */
 class VP8FInfo {
-  int fLimit; // uint8_t, filter limit in [3..189], or 0 if no filtering
-  int fInnerLevel; // uint8_t, inner limit in [1..63]
-  bool fInner; // uint8_t, do inner filtering?
-  int hevThresh; // uint8_t, high edge variance threshold in [0..2]
+  int fLimit = 0; // uint8_t, filter limit in [3..189], or 0 if no filtering
+  int fInnerLevel = 0; // uint8_t, inner limit in [1..63]
+  bool fInner = false; // uint8_t, do inner filtering?
+  int hevThresh = 0; // uint8_t, high edge variance threshold in [0..2]
 }
 
 /**
  * Top/Left Contexts used for syntax-parsing
  */
 class VP8MB{
-  int nz; // uint8_t, non-zero AC/DC coeffs (4bit for luma + 4bit for chroma)
-  int nzDc; // uint8_t, non-zero DC coeff (1bit)
+  int nz = 0; // uint8_t, non-zero AC/DC coeffs (4bit for luma + 4bit for chroma)
+  int nzDc = 0; // uint8_t, non-zero DC coeff (1bit)
 }
 
 /**

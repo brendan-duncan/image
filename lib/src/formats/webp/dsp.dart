@@ -5,7 +5,7 @@ class DSP {
     _initTables();
   }
 
-  void transformOne(Data.Int16List src, Data.Uint8List dst) {
+  void transformOne(MemPtr src, MemPtr dst) {
     Data.Int16List C = new Data.Int16List(4 * 4);
     int si = 0;
     int di = 0;
@@ -46,21 +46,19 @@ class DSP {
   }
 
 
-  void transform(Data.Int16List src, Data.Uint8List dst, bool doTwo) {
+  void transform(MemPtr src, MemPtr dst, bool doTwo) {
     transformOne(src, dst);
     if (doTwo) {
-      transformOne(new Data.Int16List.view(src.buffer, 16),
-                   new Data.Uint8List.view(dst.buffer, 4));
+      transformOne(new MemPtr(src, 16), new MemPtr(dst, 4));
     }
   }
 
-  void transformUV(Data.Int16List src, Data.Uint8List dst) {
+  void transformUV(MemPtr src, MemPtr dst) {
     transform(src, dst, true);
-    transform(new Data.Int16List.view(src.buffer, 2 * 16),
-              new Data.Uint8List.view(dst.buffer, 4 * VP8.BPS), true);
+    transform(new MemPtr(src, 2 * 16), new MemPtr(dst, 4 * VP8.BPS), true);
   }
 
-  void transformDC(Data.Int16List src, Data.Uint8List dst) {
+  void transformDC(MemPtr src, MemPtr dst) {
     final int DC = src[0] + 4;
     for (int j = 0; j < 4; ++j) {
       for (int i = 0; i < 4; ++i) {
@@ -69,28 +67,25 @@ class DSP {
     }
   }
 
-  void transformDCUV(Data.Int16List src, Data.Uint8List dst) {
+  void transformDCUV(MemPtr src, MemPtr dst) {
     if (src[0 * 16] != 0) {
       transformDC(src, dst);
     }
     if (src[1 * 16] != 0) {
-      transformDC(new Data.Int16List.view(src.buffer, 1 * 16),
-                  new Data.Uint8List.view(dst.buffer, 4));
+      transformDC(new MemPtr(src, 1 * 16), new MemPtr(dst, 4));
     }
     if (src[2 * 16] != 0) {
-      transformDC(new Data.Int16List.view(src.buffer, 2 * 16),
-                  new Data.Uint8List.view(dst.buffer, 4 * VP8.BPS));
+      transformDC(new MemPtr(src, 2 * 16), new MemPtr(dst, 4 * VP8.BPS));
     }
     if (src[3 * 16] != 0) {
-      transformDC(new Data.Int16List.view(src.buffer, 3 * 16),
-                  new Data.Uint8List.view(dst.buffer, 4 * VP8.BPS + 4));
+      transformDC(new MemPtr(src, 3 * 16), new MemPtr(dst, 4 * VP8.BPS + 4));
     }
   }
 
   /**
    * Simplified transform when only in[0], in[1] and in[4] are non-zero
    */
-  void transformAC3(Data.Int16List src, Data.Uint8List dst) {
+  void transformAC3(MemPtr src, MemPtr dst) {
     final int a = src[0] + 4;
     final int c4 = _mul(src[4], kC2);
     final int d4 = _mul(src[4], kC1);
@@ -105,7 +100,7 @@ class DSP {
   static int AVG3(a, b, c) => (((a) + 2 * (b) + (c) + 2) >> 2);
   static int AVG2(a, b) => (((a) + (b) + 1) >> 1);
 
-  static void VE4(VP8List dst) { // vertical
+  static void VE4(MemPtr dst) { // vertical
     int top = -VP8.BPS; // dst +
     final List<int> vals = [
        AVG3(dst[top - 1], dst[top],     dst[top + 1]),
@@ -114,35 +109,36 @@ class DSP {
        AVG3(dst[top + 2], dst[top + 3], dst[top + 4])];
 
     for (int i = 0; i < 4; ++i) {
-      dst.setRange(i * VP8.BPS, 4, vals);
+      dst.memcpy(i * VP8.BPS, 4, vals);
     }
   }
 
-  static void HE4(VP8List dst) { // horizontal
+  static void HE4(MemPtr dst) { // horizontal
     final int A = dst[-1 - VP8.BPS];
     final int B = dst[-1];
     final int C = dst[-1 + VP8.BPS];
     final int D = dst[-1 + 2 * VP8.BPS];
     final int E = dst[-1 + 3 * VP8.BPS];
-    Data.Uint32List d32 = new Data.Uint32List.view(dst.buffer);
+
+    Data.Uint32List d32 = dst.toUint32List();
     d32[0] = 0x01010101 * AVG3(A, B, C);
     d32[1 * VP8.BPS] = 0x01010101 * AVG3(B, C, D);
     d32[2 * VP8.BPS] = 0x01010101 * AVG3(C, D, E);
     d32[3 * VP8.BPS] = 0x01010101 * AVG3(D, E, E);
   }
 
-  static void DC4(VP8List dst) {   // DC
+  static void DC4(MemPtr dst) {   // DC
     int dc = 4;
     for (int i = 0; i < 4; ++i) {
       dc += dst[i - VP8.BPS] + dst[-1 + i * VP8.BPS];
     }
     dc >>= 3;
     for (int i = 0; i < 4; ++i) {
-      dst.fillRange(i * VP8.BPS, 4, dc);
+      dst.memset(i * VP8.BPS, 4, dc);
     }
   }
 
-  static void trueMotion(VP8List dst, int size) {
+  static void trueMotion(MemPtr dst, int size) {
     int di = 0;
     int top = -VP8.BPS; // dst +
     int clip0 = 255 - dst[top - 1]; // clip1 +
@@ -157,21 +153,21 @@ class DSP {
     }
   }
 
-  static void TM4(VP8List dst) {
+  static void TM4(MemPtr dst) {
     trueMotion(dst, 4);
   }
 
-  static void TM8uv(VP8List dst) {
+  static void TM8uv(MemPtr dst) {
     trueMotion(dst, 8);
   }
 
-  static void TM16(VP8List dst) {
+  static void TM16(MemPtr dst) {
     trueMotion(dst, 16);
   }
 
   static int DST(x, y) => x + y * VP8.BPS;
 
-  static void RD4(VP8List dst) {   // Down-right
+  static void RD4(MemPtr dst) {   // Down-right
     final int I = dst[-1 + 0 * VP8.BPS];
     final int J = dst[-1 + 1 * VP8.BPS];
     final int K = dst[-1 + 2 * VP8.BPS];
@@ -191,7 +187,7 @@ class DSP {
     dst[DST(3, 0)] = AVG3(D, C, B);
   }
 
-  static void LD4(VP8List dst) {   // Down-Left
+  static void LD4(MemPtr dst) {   // Down-Left
     final int A = dst[0 - VP8.BPS];
     final int B = dst[1 - VP8.BPS];
     final int C = dst[2 - VP8.BPS];
@@ -209,7 +205,7 @@ class DSP {
     dst[DST(3, 3)] = AVG3(G, H, H);
   }
 
-  static void VR4(VP8List dst) {   // Vertical-Right
+  static void VR4(MemPtr dst) {   // Vertical-Right
     final int I = dst[-1 + 0 * VP8.BPS];
     final int J = dst[-1 + 1 * VP8.BPS];
     final int K = dst[-1 + 2 * VP8.BPS];
@@ -231,7 +227,7 @@ class DSP {
     dst[DST(3, 1)] = AVG3(B, C, D);
   }
 
-  static void VL4(VP8List dst) {   // Vertical-Left
+  static void VL4(MemPtr dst) {   // Vertical-Left
     final int A = dst[0 - VP8.BPS];
     final int B = dst[1 - VP8.BPS];
     final int C = dst[2 - VP8.BPS];
@@ -253,7 +249,7 @@ class DSP {
     dst[DST(3, 3)] = AVG3(F, G, H);
   }
 
-  static void HU4(VP8List dst) {   // Horizontal-Up
+  static void HU4(MemPtr dst) {   // Horizontal-Up
     final int I = dst[-1 + 0 * VP8.BPS];
     final int J = dst[-1 + 1 * VP8.BPS];
     final int K = dst[-1 + 2 * VP8.BPS];
@@ -268,7 +264,7 @@ class DSP {
                      dst[DST(2, 3)] = dst[DST(3, 3)] = L;
   }
 
-  static void HD4(VP8List dst) {  // Horizontal-Down
+  static void HD4(MemPtr dst) {  // Horizontal-Down
     final int I = dst[-1 + 0 * VP8.BPS];
     final int J = dst[-1 + 1 * VP8.BPS];
     final int K = dst[-1 + 2 * VP8.BPS];
@@ -291,27 +287,27 @@ class DSP {
     dst[DST(1, 3)] = AVG3(L, K, J);
   }
 
-  static void VE16(VP8List dst) { // vertical
+  static void VE16(MemPtr dst) { // vertical
     for (int j = 0; j < 16; ++j) {
-      dst.setRange(j * VP8.BPS, 16, dst, -VP8.BPS);
+      dst.memcpy(j * VP8.BPS, 16, dst, -VP8.BPS);
     }
   }
 
-  static void HE16(VP8List dst) { // horizontal
+  static void HE16(MemPtr dst) { // horizontal
     int di = 0;
     for (int j = 16; j > 0; --j) {
-      dst.fillRange(di, 16, dst[di - 1]);
+      dst.memset(di, 16, dst[di - 1]);
       di += VP8.BPS;
     }
   }
 
-  static void Put16(int v, VP8List dst) {
+  static void Put16(int v, MemPtr dst) {
     for (int j = 0; j < 16; ++j) {
-      dst.fillRange(j * VP8.BPS, 16, v);
+      dst.memset(j * VP8.BPS, 16, v);
     }
   }
 
-  static void DC16(VP8List dst) { // DC
+  static void DC16(MemPtr dst) { // DC
     int DC = 16;
     for (int j = 0; j < 16; ++j) {
       DC += dst[-1 + j * VP8.BPS] + dst[j - VP8.BPS];
@@ -320,7 +316,7 @@ class DSP {
   }
 
   // DC with top samples not available
-  static void DC16NoTop(VP8List dst) {
+  static void DC16NoTop(MemPtr dst) {
     int DC = 8;
     for (int j = 0; j < 16; ++j) {
       DC += dst[-1 + j * VP8.BPS];
@@ -329,7 +325,7 @@ class DSP {
   }
 
   // DC with left samples not available
-  static void DC16NoLeft(VP8List dst) {
+  static void DC16NoLeft(MemPtr dst) {
     int DC = 8;
     for (int i = 0; i < 16; ++i) {
       DC += dst[i - VP8.BPS];
@@ -338,32 +334,32 @@ class DSP {
   }
 
   // DC with no top and left samples
-  static void DC16NoTopLeft(VP8List dst) {
+  static void DC16NoTopLeft(MemPtr dst) {
     Put16(0x80, dst);
   }
 
-  static void VE8uv(VP8List dst) {    // vertical
+  static void VE8uv(MemPtr dst) {    // vertical
     for (int j = 0; j < 8; ++j) {
-      dst.setRange(j * VP8.BPS, 8, dst, -VP8.BPS);
+      dst.memcpy(j * VP8.BPS, 8, dst, -VP8.BPS);
     }
   }
 
-  static void HE8uv(VP8List dst) {    // horizontal
+  static void HE8uv(MemPtr dst) {    // horizontal
     int di = 0;
     for (int j = 0; j < 8; ++j) {
-      dst.fillRange(di, 8, dst[-1]);
+      dst.memset(di, 8, dst[di - 1]);
       di += VP8.BPS;
     }
   }
 
 // helper for chroma-DC predictions
-  static void Put8x8uv(int value, VP8List dst) {
+  static void Put8x8uv(int value, MemPtr dst) {
     for (int j = 0; j < 8; ++j) {
-      dst.fillRange(j * VP8.BPS, 8, value);
+      dst.memset(j * VP8.BPS, 8, value);
     }
   }
 
-  static void DC8uv(VP8List dst) {     // DC
+  static void DC8uv(MemPtr dst) {     // DC
     int dc0 = 8;
     for (int i = 0; i < 8; ++i) {
       dc0 += dst[i - VP8.BPS] + dst[-1 + i * VP8.BPS];
@@ -371,7 +367,7 @@ class DSP {
     Put8x8uv(dc0 >> 4, dst);
   }
 
-  static void DC8uvNoLeft(VP8List dst) {   // DC with no left samples
+  static void DC8uvNoLeft(MemPtr dst) {   // DC with no left samples
     int dc0 = 4;
     for (int i = 0; i < 8; ++i) {
       dc0 += dst[i - VP8.BPS];
@@ -379,7 +375,7 @@ class DSP {
     Put8x8uv(dc0 >> 3, dst);
   }
 
-  static void DC8uvNoTop(VP8List dst) {  // DC with no top samples
+  static void DC8uvNoTop(MemPtr dst) {  // DC with no top samples
     int dc0 = 4;
     for (int i = 0; i < 8; ++i) {
       dc0 += dst[-1 + i * VP8.BPS];
@@ -387,7 +383,7 @@ class DSP {
     Put8x8uv(dc0 >> 3, dst);
   }
 
-  static void DC8uvNoTopLeft(VP8List dst) {    // DC with nothing
+  static void DC8uvNoTopLeft(MemPtr dst) {    // DC with nothing
     Put8x8uv(0x80, dst);
   }
 
@@ -406,11 +402,11 @@ class DSP {
 
   static int _mul(int a, int b) => ((a * b) >> 16);
 
-  static void _store(Data.Uint8List dst, int di, int x, int y, int v) {
+  static void _store(MemPtr dst, int di, int x, int y, int v) {
     dst[di + x + y * VP8.BPS] = _clip8b(dst[di + x + y * VP8.BPS] + (v >> 3));
   }
 
-  static void _store2(Data.Uint8List dst, int y, int dc, int d, int c) {
+  static void _store2(MemPtr dst, int y, int dc, int d, int c) {
     _store(dst, 0, 0, y, dc + (d));
     _store(dst, 0, 1, y, dc + (c));
     _store(dst, 0, 2, y, dc - (c));

@@ -206,7 +206,8 @@ class VP8 {
       sz += 3;
     }
 
-    Arc.InputStream pin = input.subset(partStart, bufEnd - partStart);
+    Arc.InputStream pin = input.subset(input.position + partStart,
+                                       bufEnd - partStart);
     _partitions[lastPart] = new VP8BitReader(pin);
 
     // Init is ok, but there's not enough data
@@ -362,20 +363,20 @@ class VP8 {
     final int extra_y = extra_rows * _cacheYStride;
     final int extra_uv = (extra_rows ~/ 2) * _cacheUVStride;
 
-    _cacheY = new VP8List(new Data.Uint8List(16 * _cacheYStride + extra_y),
+    _cacheY = new MemPtr(new Data.Uint8List(16 * _cacheYStride + extra_y),
                           extra_y);
 
-    _cacheU = new VP8List(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
+    _cacheU = new MemPtr(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
                           extra_uv);
 
-    _cacheV = new VP8List(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
+    _cacheV = new MemPtr(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
                           extra_uv);
 
-    _tmpY = new Data.Uint8List(_mbWidth);
+    _tmpY = new MemPtr(new Data.Uint8List(webp.width));
 
-    final int uvWidth = (_mbWidth + 1) >> 1;
-    _tmpU = new Data.Uint8List(uvWidth);
-    _tmpV = new Data.Uint8List(uvWidth);
+    final int uvWidth = (webp.width + 1) >> 1;
+    _tmpU = new MemPtr(new Data.Uint8List(uvWidth));
+    _tmpV = new MemPtr(new Data.Uint8List(uvWidth));
 
     // Define the area where we can skip in-loop filtering, in case of cropping.
     //
@@ -424,7 +425,6 @@ class VP8 {
     for (int i = 0; i < _mbWidth; ++i) {
       _mbInfo[i] = new VP8MB();
       _mbData[i] = new VP8MBData();
-      _fInfo[i] = new VP8FInfo();
     }
     _mbInfo[_mbWidth] = new VP8MB();
 
@@ -471,9 +471,9 @@ class VP8 {
 
   void _reconstructRow() {
     int mb_y = _mbY;
-    VP8List y_dst = new VP8List(_yuvBlock, Y_OFF);
-    VP8List u_dst = new VP8List(_yuvBlock, U_OFF);
-    VP8List v_dst = new VP8List(_yuvBlock, V_OFF);
+    MemPtr y_dst = new MemPtr(_yuvBlock, Y_OFF);
+    MemPtr u_dst = new MemPtr(_yuvBlock, U_OFF);
+    MemPtr v_dst = new MemPtr(_yuvBlock, V_OFF);
 
     for (int mb_x = 0; mb_x < _mbWidth; ++mb_x) {
       VP8MBData block = _mbData[mb_x];
@@ -482,19 +482,12 @@ class VP8 {
       // pixels at a time for alignment reason, and because of in-loop filter.
       if (mb_x > 0) {
         for (int j = -1; j < 16; ++j) {
-          int s = y_dst.offset + (j * BPS - 4);
-          int s2 = y_dst.offset + (j * BPS + 12);
-          y_dst.buffer.setRange(s, s + 4, y_dst.buffer, s2);
+          y_dst.memcpy(j * BPS - 4, 4, y_dst, j * BPS + 12);
         }
 
         for (int j = -1; j < 8; ++j) {
-          int u_s = u_dst.offset + (j * BPS - 4);
-          int u_s2 = u_dst.offset + (j * BPS + 4);
-          u_dst.buffer.setRange(u_s, u_s + 4, u_dst.buffer, u_s2);
-
-          int v_s = v_dst.offset + (j * BPS - 4);
-          int v_s2 = v_dst.offset + (j * BPS + 4);
-          v_dst.buffer.setRange(v_s, v_s + 4, v_dst.buffer, v_s2);
+          u_dst.memcpy(j * BPS - 4, 4, u_dst, j * BPS + 4);
+          v_dst.memcpy(j * BPS - 4, 4, v_dst, j * BPS + 4);
         }
       } else {
         for (int j = 0; j < 16; ++j) {
@@ -518,60 +511,50 @@ class VP8 {
       int bits = block.nonZeroY;
 
       if (mb_y > 0) {
-        y_dst.buffer.setRange(y_dst.offset - BPS, (y_dst.offset - BPS) + 16,
-                               top_yuv.y);
-
-        u_dst.buffer.setRange(u_dst.offset - BPS, (u_dst.offset - BPS) + 8,
-            top_yuv.u);
-
-        v_dst.buffer.setRange(v_dst.offset - BPS, (v_dst.offset - BPS) + 8,
-            top_yuv.v);
+        y_dst.memcpy(-BPS, 16, top_yuv.y);
+        u_dst.memcpy(-BPS, 8, top_yuv.u);
+        v_dst.memcpy(-BPS, 8, top_yuv.v);
       } else if (mb_x == 0) {
         // we only need to do this init once at block (0,0).
         // Afterward, it remains valid for the whole topmost row.
-        y_dst.buffer.fillRange(y_dst.offset - BPS - 1,
-            (y_dst.offset - BPS - 1) + (16 + 4 + 1), 127);
-
-        u_dst.buffer.fillRange(u_dst.offset - BPS - 1,
-            (u_dst.offset - BPS - 1) + (8 + 1), 127);
-
-        v_dst.buffer.fillRange(v_dst.offset - BPS - 1,
-            (v_dst.offset - BPS - 1) + (8 + 1), 127);
+        y_dst.memset(-BPS - 1, 16 + 4 + 1, 127);
+        u_dst.memset(-BPS - 1, 8 + 1, 127);
+        v_dst.memset(-BPS - 1, 8 + 1, 127);
       }
 
       // predict and add residuals
       if (block.isIntra4x4) {   // 4x4
-        int top_right = y_dst.offset - BPS + 16;
+        MemPtr topRight = new MemPtr(y_dst, -BPS + 16);
+        Data.Uint32List topRight32 = topRight.toUint32List();
 
         if (mb_y > 0) {
           if (mb_x >= _mbWidth - 1) { // on rightmost border
-            y_dst.buffer.fillRange(top_right, top_right + 4, top_yuv.y[15]);
+            topRight.memset(0, 4, top_yuv.y[15]);
           } else {
-            y_dst.buffer.setRange(top_right, top_right + 4, top_yuv.y);
+            topRight.memcpy(0, 4, top_yuv.y);
           }
         }
 
         // replicate the top-right pixels below
-        int p = _yuvBlock[top_right];
-        _yuvBlock[top_right + BPS] = p;
-        _yuvBlock[top_right + 2 * BPS] = p;
-        _yuvBlock[top_right + 3 * BPS] = p;
+        int p = topRight32[0];
+        topRight32[3 * BPS] = p;
+        topRight32[2 * BPS] = p;
+        topRight32[BPS] = p;
 
         // predict and add residuals for all 4x4 blocks in turn.
-        for (int n = 0; n < 16; ++n, bits <<= 2) {
-          VP8List dst = new VP8List(y_dst, kScan[n]);
+        for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
+          MemPtr dst = new MemPtr(y_dst, kScan[n]);
           DSP.PredLuma4[block.imodes[n]](dst);
-          _doTransform(bits, new Data.Int16List.view(coeffs.buffer, n * 16),
-                       dst.toUint8List());
+          _doTransform(bits, new MemPtr(coeffs, n * 16), dst);
         }
       } else { // 16x16
         int predFunc = _checkMode(mb_x, mb_y, block.imodes[0]);
 
         DSP.PredLuma16[predFunc](y_dst);
         if (bits != 0) {
-          for (int n = 0; n < 16; ++n, bits <<= 2) {
-            _doTransform(bits, new Data.Int16List.view(coeffs.buffer, n * 16),
-                         y_dst.toUint8List(kScan[n]));
+          for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
+            _doTransform(bits, new MemPtr(coeffs, n * 16),
+                         new MemPtr(y_dst, kScan[n]));
           }
         }
       }
@@ -582,11 +565,11 @@ class VP8 {
       DSP.PredChroma8[pred_func](u_dst);
       DSP.PredChroma8[pred_func](v_dst);
 
-      Data.Int16List c1 = new Data.Int16List.view(coeffs.buffer, 16 * 16);
-      _doUVTransform(bits_uv, c1, u_dst.toUint8List());
+      MemPtr c1 = new MemPtr(coeffs, 16 * 16);
+      _doUVTransform(bits_uv, c1, u_dst);
 
-      Data.Int16List c2 = new Data.Int16List.view(coeffs.buffer, 20 * 16);
-      _doUVTransform(bits_uv >> 8, c2, v_dst.toUint8List());
+      MemPtr c2 = new MemPtr(coeffs, 20 * 16);
+      _doUVTransform(bits_uv >> 8, c2, v_dst);
 
       // stash away top samples for next block
       if (mb_y < _mbHeight - 1) {
@@ -604,15 +587,15 @@ class VP8 {
 
       for (int j = 0; j < 16; ++j) {
         int start = y_out + j * _cacheYStride;
-        _cacheY.setRange(start, 16, y_dst, j * BPS);
+        _cacheY.memcpy(start, 16, y_dst, j * BPS);
       }
 
       for (int j = 0; j < 8; ++j) {
         int start = u_out + j * _cacheUVStride;
-        _cacheY.setRange(start, 8, u_dst, j * BPS);
+        _cacheU.memcpy(start, 8, u_dst, j * BPS);
 
         start = v_out + j * _cacheUVStride;
-        _cacheV.setRange(start, 8, v_dst, j * BPS);
+        _cacheV.memcpy(start, 8, v_dst, j * BPS);
       }
     }
   }
@@ -634,7 +617,7 @@ class VP8 {
     return mode;
   }
 
-  void _doTransform(int bits, Data.Int16List src, Data.Uint8List dst) {
+  void _doTransform(int bits, MemPtr src, MemPtr dst) {
     switch (bits >> 30) {
       case 3:
         _dsp.transform(src, dst, false);
@@ -650,7 +633,7 @@ class VP8 {
     }
   }
 
-  void _doUVTransform(int bits, Data.Int16List src, Data.Uint8List dst) {
+  void _doUVTransform(int bits, MemPtr src, MemPtr dst) {
     if (bits & 0xff != 0) { // any non-zero coeff at all?
       if (bits & 0xaa != 0) { // any non-zero AC coefficient?
         // note we don't use the AC3 variant for U/V
@@ -676,7 +659,7 @@ class VP8 {
   void _doFilter(int mbX, int mbY) {
     final int yBps = _cacheYStride;
     VP8FInfo fInfo = _fInfo[mbX];
-    VP8List yDst = new VP8List(_cacheY, mbX * 16);
+    MemPtr yDst = new MemPtr(_cacheY, mbX * 16);
     final int ilevel = fInfo.fInnerLevel;
     final int limit = fInfo.fLimit;
     if (limit == 0) {
@@ -698,8 +681,8 @@ class VP8 {
       }
     } else {    // complex
       final int uvBps = _cacheUVStride;
-      VP8List uDst = new VP8List(_cacheU, mbX * 8);
-      VP8List vDst = new VP8List(_cacheV, mbX * 8);
+      MemPtr uDst = new MemPtr(_cacheU, mbX * 8);
+      MemPtr vDst = new MemPtr(_cacheV, mbX * 8);
 
       final int hevThresh = fInfo.hevThresh;
       if (mbX > 0) {
@@ -752,14 +735,14 @@ class VP8 {
     final int uvSize = (extraYRows ~/ 2) * _cacheUVStride;
     final int yOffset = 0;
     final int uvOffset = 0;
-    VP8List yDst = new VP8List(_cacheY, -ySize + yOffset);
-    VP8List uDst = new VP8List(_cacheU, -uvSize + uvOffset);
-    VP8List vDst = new VP8List(_cacheV, -uvSize + uvOffset);
+    MemPtr yDst = new MemPtr(_cacheY, -ySize + yOffset);
+    MemPtr uDst = new MemPtr(_cacheU, -uvSize + uvOffset);
+    MemPtr vDst = new MemPtr(_cacheV, -uvSize + uvOffset);
     final int mbY = _mbY;
     final bool isFirstRow = (mbY == 0);
     final bool isLastRow = (mbY >= _brMbY - 1);
 
-    /*if (_filterRow) {
+    if (_filterRow) {
       _doFilterRow();
     }
 
@@ -776,9 +759,9 @@ class VP8 {
       _u = uDst;
       _v = vDst;
     } else {
-      _y = new VP8List(_cacheY, yOffset);
-      _u = new VP8List(_cacheU, uvOffset);
-      _v = new VP8List(_cacheV, uvOffset);
+      _y = new MemPtr(_cacheY, yOffset);
+      _u = new MemPtr(_cacheU, uvOffset);
+      _v = new MemPtr(_cacheV, uvOffset);
     }
 
     if (!isLastRow) {
@@ -814,7 +797,7 @@ class VP8 {
       _u.offset += _cropLeft >> 1;
       _v.offset += _cropLeft >> 1;
       if (_a != null) {
-        _a += _cropLeft;
+        _a.offset += _cropLeft;
       }
 
       _put(yStart - _cropTop, _cropRight - _cropLeft, yEnd - yStart);
@@ -822,17 +805,15 @@ class VP8 {
 
     // rotate top samples if needed
     if (!isLastRow) {
-      _cacheY.setRange(-ySize, ySize, yDst, 16 * _cacheYStride);
-      _cacheU.setRange(-uvSize, uvSize, uDst, 8 * _cacheUVStride);
-      _cacheV.setRange(-uvSize, uvSize, vDst, 8 * _cacheUVStride);
-    }*/
+      _cacheY.memcpy(-ySize, ySize, yDst, 16 * _cacheYStride);
+      _cacheU.memcpy(-uvSize, uvSize, uDst, 8 * _cacheUVStride);
+      _cacheV.memcpy(-uvSize, uvSize, vDst, 8 * _cacheUVStride);
+    }
 
     return true;
   }
 
   bool _put(int mbY, int mbW, int mbH) {
-    //WebPDecParams* const p = (WebPDecParams*)io->opaque;
-
     if (mbW <= 0 || mbH <= 0) {
       return false;
     }
@@ -863,26 +844,26 @@ class VP8 {
     return _clip8(kYScale * y + kUToB * u + kBCst);
   }
 
-  void _yuvToRgb(int y, int u, int v, VP8List rgb) {
+  void _yuvToRgb(int y, int u, int v, MemPtr rgb) {
     rgb[0] = _yuvToR(y, v);
     rgb[1] = _yuvToG(y, u, v);
     rgb[2] = _yuvToB(y, u);
   }
 
-  void _yuvToRgba(int y, int u, int v, VP8List rgba) {
+  void _yuvToRgba(int y, int u, int v, MemPtr rgba) {
+    //print('$y $u $v');
     _yuvToRgb(y, u, v, rgba);
     rgba[3] = 0xff;
   }
 
-  //#define UPSAMPLE_FUNC(FUNC_NAME, FUNC, XSTEP)
-  void _upsample(VP8List topY, VP8List bottomY,
-                 VP8List topU, VP8List topV,
-                 VP8List curU, VP8List curV,
-                 VP8List topDst, VP8List bottomDst, int len) {
-
+  void _upsample(MemPtr topY, MemPtr bottomY,
+                 MemPtr topU, MemPtr topV,
+                 MemPtr curU, MemPtr curV,
+                 MemPtr topDst, MemPtr bottomDst,
+                 int len) {
     int LOAD_UV(int u, int v) => ((u) | ((v) << 16));
 
-    final int last_pixel_pair = (len - 1) >> 1;
+    final int lastPixelPair = (len - 1) >> 1;
     int tl_uv = LOAD_UV(topU[0], topV[0]); // top-left sample
     int l_uv  = LOAD_UV(curU[0], curV[0]); // left-sample
 
@@ -894,7 +875,8 @@ class VP8 {
       _yuvToRgba(bottomY[0], uv0 & 0xff, (uv0 >> 16), bottomDst);
     }
 
-    for (int x = 1; x <= last_pixel_pair; ++x) {
+    for (int x = 1; x <= lastPixelPair; ++x) {
+      //print('@X: $x');
       final int t_uv = LOAD_UV(topU[x], topV[x]); // top sample
       final int uv   = LOAD_UV(curU[x], curV[x]); // sample
       // precompute invariant values associated with first and second diagonals
@@ -906,20 +888,20 @@ class VP8 {
       final int uv1 = (diag_03 + t_uv) >> 1;
 
       _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
-          topDst + (2 * x - 1) * 4);
+          new MemPtr(topDst, (2 * x - 1) * 4));
 
       _yuvToRgba(topY[2 * x - 0], uv1 & 0xff, (uv1 >> 16),
-              topDst + (2 * x - 0) * 4);
+              new MemPtr(topDst, (2 * x - 0) * 4));
 
       if (bottomY != null) {
         final int uv0 = (diag_03 + l_uv) >> 1;
         final int uv1 = (diag_12 + uv) >> 1;
 
         _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
-            bottomDst + (2 * x - 1) * 4);
+            new MemPtr(bottomDst, (2 * x - 1) * 4));
 
         _yuvToRgba(bottomY[2 * x + 0], uv1 & 0xff, (uv1 >> 16),
-                bottomDst + (2 * x + 0) * 4);
+                new MemPtr(bottomDst, (2 * x + 0) * 4));
       }
 
       tl_uv = t_uv;
@@ -929,75 +911,76 @@ class VP8 {
     if ((len & 1) == 0) {
       final int uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
       _yuvToRgba(topY[len - 1], uv0 & 0xff, (uv0 >> 16),
-           topDst + (len - 1) * 4);
+           new MemPtr(topDst, (len - 1) * 4));
     }
 
     if (bottomY != null) {
       final int uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
       _yuvToRgba(bottomY[len - 1], uv0 & 0xff, (uv0 >> 16),
-           bottomDst + (len - 1) * 4);
+           new MemPtr(bottomDst, (len - 1) * 4));
     }
   }
 
 
   int _emitFancyRGB(int mbY, int mbW, int mbH) {
     int numLinesOut = mbH;   // a priori guess
-    VP8List dst = new VP8List(output.getBytes(), mbY * webp.width);
-    VP8List curY = new VP8List(_y);
-    VP8List curU = new VP8List(_u);
-    VP8List curV = new VP8List(_v);
+    MemPtr dst = new MemPtr(output.getBytes(), mbY * webp.width * 4);
+    MemPtr curY = new MemPtr(_y);
+    MemPtr curU = new MemPtr(_u);
+    MemPtr curV = new MemPtr(_v);
     int y = mbY;
     final int yEnd = mbY + mbH;
     final int uvW = (mbW + 1) >> 1;
     final int stride = webp.width * 4;
-    VP8List topU = new VP8List(_tmpU);
-    VP8List topV = new VP8List(_tmpV);
+    MemPtr topU = new MemPtr(_tmpU);
+    MemPtr topV = new MemPtr(_tmpV);
 
+    //print('@$y');
     if (y == 0) {
       // First line is special cased. We mirror the u/v samples at boundary.
       _upsample(curY, null, curU, curV, curU, curV, dst, null, mbW);
     } else {
       // We can finish the left-over line from previous call.
-      _upsample(new VP8List(_tmpY), curY, topU, topV, curU, curV,
-                new VP8List(dst, -stride), dst, mbW);
+      _upsample(new MemPtr(_tmpY), curY, topU, topV, curU, curV,
+                new MemPtr(dst, -stride), dst, mbW);
       ++numLinesOut;
     }
 
     // Loop over each output pairs of row.
-    /*for (; y + 2 < y_end; y += 2) {
-      top_u = cur_u;
-      top_v = cur_v;
-      cur_u += io->uv_stride;
-      cur_v += io->uv_stride;
-      dst += 2 * buf->stride;
-      cur_y += 2 * io->y_stride;
-      upsample(cur_y - io->y_stride, cur_y,
-          top_u, top_v, cur_u, cur_v,
-          dst - buf->stride, dst, mb_w);
+    for (; y + 2 < yEnd; y += 2) {
+      topU = curU;
+      topV = curV;
+      curU.offset += _cacheUVStride;
+      curV.offset += _cacheUVStride;
+      dst.offset += 2 * stride;
+      curY.offset += 2 * _cacheYStride;
+      _upsample(new MemPtr(curY, -_cacheYStride), curY,
+          topU, topV, curU, curV,
+          new MemPtr(dst, -stride), dst, mbW);
     }
 
     // move to last row
-    cur_y += io->y_stride;
-    if (io->crop_top + y_end < io->crop_bottom) {
+    curY.offset += _cacheYStride;
+    if (_cropTop + yEnd < _cropBottom) {
       // Save the unfinished samples for next call (as we're not done yet).
-      memcpy(p->tmp_y, cur_y, mb_w * sizeof(*p->tmp_y));
-      memcpy(p->tmp_u, cur_u, uv_w * sizeof(*p->tmp_u));
-      memcpy(p->tmp_v, cur_v, uv_w * sizeof(*p->tmp_v));
+      _tmpY.memcpy(0, mbW, curY);
+      _tmpU.memcpy(0, uvW, curU);
+      _tmpV.memcpy(0, uvW, curV);
       // The fancy upsampler leaves a row unfinished behind
       // (except for the very last row)
-      num_lines_out--;
+      numLinesOut--;
     } else {
       // Process the very last row of even-sized picture
-      if (!(y_end & 1)) {
-        upsample(cur_y, NULL, cur_u, cur_v, cur_u, cur_v,
-            dst + buf->stride, NULL, mb_w);
+      if ((yEnd & 1) == 0) {
+        _upsample(curY, null, curU, curV, curU, curV,
+            new MemPtr(dst, stride), null, mbW);
       }
-    }*/
+    }
 
     return numLinesOut;
   }
 
-  VP8List _decompressAlphaRows(int row, int numRows) {
+  MemPtr _decompressAlphaRows(int row, int numRows) {
     final int width = webp.width;
     final int height = webp.height;
 
@@ -1022,7 +1005,7 @@ class VP8 {
     }*/
 
     // Return a pointer to the current decoded row.
-    return new VP8List(_alphaPlane, row * width);
+    return new MemPtr(_alphaPlane, row * width);
   }
 
 
@@ -1045,7 +1028,7 @@ class VP8 {
 
     _parseIntraMode();
 
-    if (skip == 0) {
+    if (!skip) {
       skip = _parseResiduals(mb, tokenBr);
     } else {
       left.nz = mb.nz = 0;
@@ -1057,8 +1040,8 @@ class VP8 {
     }
 
     if (_filterType > 0) {  // store filter info
+      _fInfo[_mbX] = _fStrengths[_segment][block.isIntra4x4 ? 1 : 0];
       VP8FInfo finfo = _fInfo[_mbX];
-      finfo = _fStrengths[_segment][block.isIntra4x4 ? 1 : 0];
       finfo.fInner = finfo.fInner || !skip;
     }
 
@@ -1070,19 +1053,21 @@ class VP8 {
     List<VP8BandProbas> acProba;
     VP8QuantMatrix q = _dqm[_segment];
     VP8MBData block = _mbData[_mbX];
-    VP8List dst = new VP8List(block.coeffs);
+    MemPtr dst = new MemPtr(block.coeffs);
     int di = 0;
     VP8MB leftMb = _mbInfo[0];
-    int tnz, lnz;
-    int non_zero_y = 0;
-    int non_zero_uv = 0;
-    int out_t_nz, out_l_nz;
+    int tnz;
+    int lnz;
+    int nonZeroY = 0;
+    int nonZeroUV = 0;
+    int outTopNz;
+    int outLeftNz;
     int first;
 
-    dst.buffer.fillRange(0, dst.length, 384);
+    dst.memset(0, dst.length, 0);
 
     if (!block.isIntra4x4) {    // parse DC
-      VP8List dc = new VP8List(new Data.Int16List(16));
+      MemPtr dc = new MemPtr(new Data.Int16List(16));
       final int ctx = mb.nzDc + leftMb.nzDc;
       final int nz = _getCoeffs(tokenBr, bands[1], ctx, q.y2Mat, 0, dc);
       mb.nzDc = leftMb.nzDc = (nz > 0) ? 1 : 0;
@@ -1106,25 +1091,25 @@ class VP8 {
     lnz = leftMb.nz & 0x0f;
     for (int y = 0; y < 4; ++y) {
       int l = lnz & 1;
-      int nz_coeffs = 0;
+      int nzCoeffs = 0;
       for (int x = 0; x < 4; ++x) {
         final int ctx = l + (tnz & 1);
         final int nz = _getCoeffs(tokenBr, acProba, ctx, q.y1Mat, first, dst);
         l = (nz > first) ? 1 : 0;
         tnz = (tnz >> 1) | (l << 7);
-        nz_coeffs = _nzCodeBits(nz_coeffs, nz, dst[0] != 0 ? 1 : 0);
-        dst += 16;
+        nzCoeffs = _nzCodeBits(nzCoeffs, nz, dst[0] != 0 ? 1 : 0);
+        dst.offset += 16;
       }
 
       tnz >>= 4;
       lnz = (lnz >> 1) | (l << 7);
-      non_zero_y = (non_zero_y << 8) | nz_coeffs;
+      nonZeroY = (nonZeroY << 8) | nzCoeffs;
     }
-    out_t_nz = tnz;
-    out_l_nz = lnz >> 4;
+    outTopNz = tnz;
+    outLeftNz = lnz >> 4;
 
     for (int ch = 0; ch < 4; ch += 2) {
-      int nz_coeffs = 0;
+      int nzCoeffs = 0;
       tnz = mb.nz >> (4 + ch);
       lnz = leftMb.nz >> (4 + ch);
       for (int y = 0; y < 2; ++y) {
@@ -1134,8 +1119,8 @@ class VP8 {
           final int nz = _getCoeffs(tokenBr, bands[2], ctx, q.uvMat, 0, dst);
           l = (nz > 0) ? 1 : 0;
           tnz = (tnz >> 1) | (l << 3);
-          nz_coeffs = _nzCodeBits(nz_coeffs, nz, dst[0] != 0 ? 1 : 0);
-          dst += 16;
+          nzCoeffs = _nzCodeBits(nzCoeffs, nz, dst[0] != 0 ? 1 : 0);
+          dst.offset += 16;
         }
 
         tnz >>= 2;
@@ -1143,27 +1128,27 @@ class VP8 {
       }
 
       // Note: we don't really need the per-4x4 details for U/V blocks.
-      non_zero_uv |= nz_coeffs << (4 * ch);
-      out_t_nz |= (tnz << 4) << ch;
-      out_l_nz |= (lnz & 0xf0) << ch;
+      nonZeroUV |= nzCoeffs << (4 * ch);
+      outTopNz |= (tnz << 4) << ch;
+      outLeftNz |= (lnz & 0xf0) << ch;
     }
 
-    mb.nz = out_t_nz;
-    leftMb.nz = out_l_nz;
+    mb.nz = outTopNz;
+    leftMb.nz = outLeftNz;
 
-    block.nonZeroY = non_zero_y;
-    block.nonZeroUV = non_zero_uv;
+    block.nonZeroY = nonZeroY;
+    block.nonZeroUV = nonZeroUV;
 
     // We look at the mode-code of each block and check if some blocks have less
     // than three non-zero coeffs (code < 2). This is to avoid dithering flat and
     // empty blocks.
-    block.dither = (non_zero_uv & 0xaaaa) != 0 ? 0 : q.dither;
+    block.dither = (nonZeroUV & 0xaaaa) != 0 ? 0 : q.dither;
 
     // will be used for further optimization
-    return (non_zero_y | non_zero_uv) == 0;
+    return (nonZeroY | nonZeroUV) == 0;
   }
 
-  void _transformWHT(VP8List src, VP8List out) {
+  void _transformWHT(MemPtr src, MemPtr out) {
     Data.Int32List tmp = new Data.Int32List(16);
 
     int oi = 0;
@@ -1251,7 +1236,7 @@ class VP8 {
    * Returns the position of the last non-zero coeff plus one
    */
   int _getCoeffs(VP8BitReader br, List<VP8BandProbas> prob,
-                 int ctx, List<int> dq, int n, VP8List out) {
+                 int ctx, List<int> dq, int n, MemPtr out) {
     // n is either 0 or 1 here. kBands[n] is not necessary for extracting '*p'.
     List<int> p = prob[n].probas[ctx];
     for (; n < 16; ++n) {
@@ -1277,7 +1262,7 @@ class VP8 {
           p = p_ctx[2];
         }
 
-        out[kZigzag[n]] = br.getSignedValue(v) * dq[n > 0 ? 1 : 0];
+        out[kZigzag[n]] = br.getSigned(v) * dq[n > 0 ? 1 : 0];
       }
     }
     return 16;
@@ -1401,20 +1386,20 @@ class VP8 {
   Data.Uint8List _yuvBlock;
 
   /// macroblock row for storing unfiltered samples
-  VP8List _cacheY;
-  VP8List _cacheU;
-  VP8List _cacheV;
+  MemPtr _cacheY;
+  MemPtr _cacheU;
+  MemPtr _cacheV;
   int _cacheYStride;
   int _cacheUVStride;
 
-  Data.Uint8List _tmpY;
-  Data.Uint8List _tmpU;
-  Data.Uint8List _tmpV;
+  MemPtr _tmpY;
+  MemPtr _tmpU;
+  MemPtr _tmpV;
 
-  VP8List _y;
-  VP8List _u;
-  VP8List _v;
-  VP8List _a;
+  MemPtr _y;
+  MemPtr _u;
+  MemPtr _v;
+  MemPtr _a;
 
   /// main memory chunk for the above data. Persistent.
   Data.Uint8List _mem;

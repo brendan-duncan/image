@@ -23,6 +23,13 @@ class VP8BitReader {
     return v;
   }
 
+  int getSigned(int v) {
+    final int split = (_range >> 1);
+    final int bit = _bitUpdate(split);
+    _shift();
+    return bit != 0 ? -v : v;
+  }
+
   int getSignedValue(int bits) {
     final int value = getValue(bits);
     return get() == 1 ? -value : value;
