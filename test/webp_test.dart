@@ -7,31 +7,6 @@ void defineWebPTests() {
   Io.Directory dir = new Io.Directory(path);
   List files = dir.listSync();
 
-  Io.File file = new Io.File(path + '/1.webp');
-  List<int> bytes = file.readAsBytesSync();
-  Image image = new WebPDecoder().decodeImage(bytes);
-  List<int> png = new PngEncoder().encode(image);
-  new Io.File('out/webp/decode.png')
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(png);
-
-  // Validate decoding.
-  /*file = new Io.File(path + '/1.png');
-  bytes = file.readAsBytesSync();
-  Image debugImage = new PngDecoder().decode(bytes);
-  bool found = false;
-  for (int y = 0; y < debugImage.height && !found; ++y) {
-    for (int x = 0; x < debugImage.width; ++x) {
-      int dc = debugImage.getPixel(x, y);
-      int c = image.getPixel(x, y);
-      if (c != dc) {
-        found = true;
-        print('!$x $y : ${c.toRadixString(16)} ${dc.toRadixString(16)}');
-        break;
-      }
-    }
-  }*/
-
   group('WebP/getInfo', () {
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.webp')) {
@@ -59,6 +34,29 @@ void defineWebPTests() {
   });
 
   group('WebP/decodeImage', () {
+    /*test('decode', () {
+      Io.File file = new Io.File(path + '/1b.webp');
+      List<int> bytes = file.readAsBytesSync();
+      Image image = new WebPDecoder().decodeImage(bytes);
+      List<int> png = new PngEncoder().encode(image);
+      new Io.File('out/webp/decode.png')
+      ..createSync(recursive: true)
+        ..writeAsBytesSync(png);
+
+      // Validate decoding.
+      file = new Io.File(path + '/1b.png');
+      bytes = file.readAsBytesSync();
+      Image debugImage = new PngDecoder().decode(bytes);
+      bool found = false;
+      for (int y = 0; y < debugImage.height && !found; ++y) {
+        for (int x = 0; x < debugImage.width; ++x) {
+          int dc = debugImage.getPixel(x, y);
+          int c = image.getPixel(x, y);
+          expect(c, equals(dc));
+        }
+      }
+    });*/
+
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.webp')) {
         continue;

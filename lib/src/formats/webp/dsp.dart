@@ -128,6 +128,7 @@ class DSP {
           _doFilter4(p2, hstride);
         }
       }
+      //print(' ${p2[0]}');
       p2.offset += vstride;
     }
   }
@@ -664,9 +665,7 @@ class DSP {
   }
 
   static int _clip8b(int v) {
-    int b = ((v & ~0xff) == 0) ? v : (v < 0) ? 0 : 255;
-    //print(b);
-    return b;
+    return ((v & ~0xff) == 0) ? v : (v < 0) ? 0 : 255;
   }
 
   static bool _tablesInitialized = false;

@@ -462,11 +462,10 @@ class VP8 {
   }
 
   bool _processRow() {
-    _filterRow = (_filterType > 0) && (_mbY >= _tlMbY) && (_mbY <= _brMbY);
-
     _reconstructRow();
 
-    return _finishRow();
+    bool useFilter = (_filterType > 0) && (_mbY >= _tlMbY) && (_mbY <= _brMbY);
+    return _finishRow(useFilter);
   }
 
   void _reconstructRow() {
@@ -598,12 +597,6 @@ class VP8 {
         start = v_out + j * _cacheUVStride;
         _cacheV.memcpy(start, 8, v_dst, j * BPS);
       }
-
-      /*if (mb_y == 4) {
-        for (int i = y_out; i < 2240; ++i) {
-          print(_cacheY[i]);
-        }
-      }*/
     }
   }
 
@@ -714,10 +707,9 @@ class VP8 {
   /**
    * Filter the decoded macroblock row (if needed)
    */
-  void _doFilterRow() {
-    final int mbY = _mbY;
+  void _filterRow() {
     for (int mbX = _tlMbX; mbX < _brMbX; ++mbX) {
-      _doFilter(mbX, mbY);
+      _doFilter(mbX, _mbY);
     }
   }
 
@@ -737,7 +729,7 @@ class VP8 {
    *  * we must clip the remaining pixels against the cropping area. The VP8Io
    *    struct must have the following fields set correctly before calling put():
    */
-  bool _finishRow() {
+  bool _finishRow(bool useFilter) {
     final int extraYRows = kFilterExtraRows[_filterType];
     final int ySize = extraYRows * _cacheYStride;
     final int uvSize = (extraYRows ~/ 2) * _cacheUVStride;
@@ -750,8 +742,8 @@ class VP8 {
     final bool isFirstRow = (mbY == 0);
     final bool isLastRow = (mbY >= _brMbY - 1);
 
-    if (_filterRow) {
-      _doFilterRow();
+    if (useFilter) {
+      _filterRow();
     }
 
     if (_dither) {
@@ -763,9 +755,9 @@ class VP8 {
 
     if (!isFirstRow) {
       yStart -= extraYRows;
-      _y = yDst;
-      _u = uDst;
-      _v = vDst;
+      _y = new MemPtr(yDst);
+      _u = new MemPtr(uDst);
+      _v = new MemPtr(vDst);
     } else {
       _y = new MemPtr(_cacheY, yOffset);
       _u = new MemPtr(_cacheU, uvOffset);
@@ -952,9 +944,11 @@ class VP8 {
     }
 
     // Loop over each output pairs of row.
+    topU = new MemPtr(curU);
+    topV = new MemPtr(curV);
     for (; y + 2 < yEnd; y += 2) {
-      topU = curU;
-      topV = curV;
+      topU.offset = curU.offset;
+      topV.offset = curV.offset;
       curU.offset += _cacheUVStride;
       curV.offset += _cacheUVStride;
       dst.offset += 2 * stride;
@@ -1416,8 +1410,6 @@ class VP8 {
   /// parsed reconstruction data
   List<VP8MBData> _mbData;
 
-  // Filtering side-info
-  bool _filterRow;
   /// 0=off, 1=simple, 2=complex
   int _filterType;
   /// precalculated per-segment/type
