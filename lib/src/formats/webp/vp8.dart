@@ -938,7 +938,7 @@ class VP8 {
       _upsample(curY, null, curU, curV, curU, curV, dst, null, mbW);
     } else {
       // We can finish the left-over line from previous call.
-      _upsample(new MemPtr(_tmpY), curY, topU, topV, curU, curV,
+      _upsample(_tmpY, curY, topU, topV, curU, curV,
                 new MemPtr(dst, -stride), dst, mbW);
       ++numLinesOut;
     }
@@ -1184,8 +1184,7 @@ class VP8 {
   }
 
   static const List<int> kBands = const [
-     0, 1, 2, 3, 6, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7,
-     0]; // extra entry as sentinel
+     0, 1, 2, 3, 6, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 0];
 
   static const List<int> kCat3 = const [ 173, 148, 140 ];
   static const List<int> kCat4 = const [ 176, 155, 140, 135 ];

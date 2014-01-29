@@ -128,7 +128,6 @@ class DSP {
           _doFilter4(p2, hstride);
         }
       }
-      //print(' ${p2[0]}');
       p2.offset += vstride;
     }
   }
