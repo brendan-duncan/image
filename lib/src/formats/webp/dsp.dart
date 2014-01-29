@@ -222,7 +222,7 @@ class DSP {
   }
 
   void transformOne(MemPtr src, MemPtr dst) {
-    Data.Int16List C = new Data.Int16List(4 * 4);
+    Data.Int32List C = new Data.Int32List(4 * 4);
     int si = 0;
     int di = 0;
     int tmp = 0;
@@ -364,7 +364,7 @@ class DSP {
     int clip0 = 255 - dst[top - 1]; // clip1 +
 
     for (int y = 0; y < size; ++y) {
-      int clip = clip0 + dst[-1];
+      int clip = clip0 + dst[di - 1];
       for (int x = 0; x < size; ++x) {
         dst[di + x] = clip1[clip + dst[top + x]];
       }

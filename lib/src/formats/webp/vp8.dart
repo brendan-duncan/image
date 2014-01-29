@@ -544,7 +544,9 @@ class VP8 {
         // predict and add residuals for all 4x4 blocks in turn.
         for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
           MemPtr dst = new MemPtr(y_dst, kScan[n]);
+
           DSP.PredLuma4[block.imodes[n]](dst);
+
           _doTransform(bits, new MemPtr(coeffs, n * 16), dst);
         }
       } else { // 16x16
@@ -553,8 +555,9 @@ class VP8 {
         DSP.PredLuma16[predFunc](y_dst);
         if (bits != 0) {
           for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
-            _doTransform(bits, new MemPtr(coeffs, n * 16),
-                         new MemPtr(y_dst, kScan[n]));
+            MemPtr dst = new MemPtr(y_dst, kScan[n]);
+
+            _doTransform(bits, new MemPtr(coeffs, n * 16), dst);
           }
         }
       }
@@ -579,11 +582,9 @@ class VP8 {
       }
 
       // Transfer reconstructed samples from yuv_b_ cache to final destination.
-      int y_offset = 0;//cache_id * 16 * _cacheYStride;
-      int uv_offset = 0;//cache_id * 8 * _cacheUVStride;
-      int y_out = mb_x * 16 + y_offset; // dec->cache_y_ +
-      int u_out = mb_x * 8 + uv_offset; // dec->cache_u_ +
-      int v_out = mb_x * 8 + uv_offset; // _dec->cache_v_ +
+      int y_out = mb_x * 16; // dec->cache_y_ +
+      int u_out = mb_x * 8; // dec->cache_u_ +
+      int v_out = mb_x * 8; // _dec->cache_v_ +
 
       for (int j = 0; j < 16; ++j) {
         int start = y_out + j * _cacheYStride;
@@ -597,6 +598,12 @@ class VP8 {
         start = v_out + j * _cacheUVStride;
         _cacheV.memcpy(start, 8, v_dst, j * BPS);
       }
+
+      /*if (mb_y == 4) {
+        for (int i = y_out; i < 2240; ++i) {
+          print(_cacheY[i]);
+        }
+      }*/
     }
   }
 
@@ -716,6 +723,7 @@ class VP8 {
 
   void _ditherRow() {
   }
+
 
   /**
    * This function is called after a row of macroblocks is finished decoding.

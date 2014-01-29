@@ -15,10 +15,27 @@ void defineWebPTests() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
+  // Validate decoding.
+  /*file = new Io.File(path + '/1.png');
+  bytes = file.readAsBytesSync();
+  Image debugImage = new PngDecoder().decode(bytes);
+  bool found = false;
+  for (int y = 0; y < debugImage.height && !found; ++y) {
+    for (int x = 0; x < debugImage.width; ++x) {
+      int dc = debugImage.getPixel(x, y);
+      int c = image.getPixel(x, y);
+      if (c != dc) {
+        found = true;
+        print('!$x $y : ${c.toRadixString(16)} ${dc.toRadixString(16)}');
+        break;
+      }
+    }
+  }*/
+
   group('WebP/getInfo', () {
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.webp')) {
-        return;
+        continue;
       }
 
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
@@ -44,7 +61,7 @@ void defineWebPTests() {
   group('WebP/decodeImage', () {
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.webp')) {
-        return;
+        continue;
       }
 
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
