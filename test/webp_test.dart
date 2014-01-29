@@ -34,17 +34,17 @@ void defineWebPTests() {
   });
 
   group('WebP/decodeImage', () {
-    /*test('decode', () {
-      Io.File file = new Io.File(path + '/1b.webp');
+    test('validate', () {
+      Io.File file = new Io.File(path + '/2b.webp');
       List<int> bytes = file.readAsBytesSync();
       Image image = new WebPDecoder().decodeImage(bytes);
       List<int> png = new PngEncoder().encode(image);
       new Io.File('out/webp/decode.png')
-      ..createSync(recursive: true)
-        ..writeAsBytesSync(png);
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(png);
 
       // Validate decoding.
-      file = new Io.File(path + '/1b.png');
+      file = new Io.File(path + '/2b.png');
       bytes = file.readAsBytesSync();
       Image debugImage = new PngDecoder().decode(bytes);
       bool found = false;
@@ -55,7 +55,7 @@ void defineWebPTests() {
           expect(c, equals(dc));
         }
       }
-    });*/
+    });
 
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.webp')) {

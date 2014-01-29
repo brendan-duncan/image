@@ -457,6 +457,7 @@ class VP8 {
         return false;
       }
     }
+    //print(_dbg);
 
     return true;
   }
@@ -530,7 +531,7 @@ class VP8 {
           if (mb_x >= _mbWidth - 1) { // on rightmost border
             topRight.memset(0, 4, top_yuv.y[15]);
           } else {
-            topRight.memcpy(0, 4, top_yuv.y);
+            topRight.memcpy(0, 4, _yuvT[mb_x + 1].y);
           }
         }
 
@@ -844,14 +845,19 @@ class VP8 {
     return _clip8(kYScale * y + kUToB * u + kBCst);
   }
 
+  List<int> _dbg = [];
+  int _dbgI = 0;
+
   void _yuvToRgb(int y, int u, int v, MemPtr rgb) {
     rgb[0] = _yuvToR(y, v);
     rgb[1] = _yuvToG(y, u, v);
     rgb[2] = _yuvToB(y, u);
+    _dbg.add(y);
   }
 
   void _yuvToRgba(int y, int u, int v, MemPtr rgba) {
     _yuvToRgb(y, u, v, rgba);
+    _dbgI++;
     rgba[3] = 0xff;
   }
 
@@ -882,8 +888,8 @@ class VP8 {
       final int diag_12 = (avg + 2 * (t_uv + l_uv)) >> 3;
       final int diag_03 = (avg + 2 * (tl_uv + uv)) >> 3;
 
-      final int uv0 = (diag_12 + tl_uv) >> 1;
-      final int uv1 = (diag_03 + t_uv) >> 1;
+      int uv0 = (diag_12 + tl_uv) >> 1;
+      int uv1 = (diag_03 + t_uv) >> 1;
 
       _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
           new MemPtr(topDst, (2 * x - 1) * 4));
@@ -892,13 +898,13 @@ class VP8 {
               new MemPtr(topDst, (2 * x - 0) * 4));
 
       if (bottomY != null) {
-        final int uv0 = (diag_03 + l_uv) >> 1;
-        final int uv1 = (diag_12 + uv) >> 1;
+        uv0 = (diag_03 + l_uv) >> 1;
+        uv1 = (diag_12 + uv) >> 1;
 
         _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
             new MemPtr(bottomDst, (2 * x - 1) * 4));
 
-        _yuvToRgba(bottomY[2 * x + 0], uv1 & 0xff, (uv1 >> 16),
+        _yuvToRgba(bottomY[2 * x], uv1 & 0xff, (uv1 >> 16),
                 new MemPtr(bottomDst, (2 * x + 0) * 4));
       }
 
@@ -910,12 +916,12 @@ class VP8 {
       final int uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
       _yuvToRgba(topY[len - 1], uv0 & 0xff, (uv0 >> 16),
            new MemPtr(topDst, (len - 1) * 4));
-    }
 
-    if (bottomY != null) {
-      final int uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
-      _yuvToRgba(bottomY[len - 1], uv0 & 0xff, (uv0 >> 16),
-           new MemPtr(bottomDst, (len - 1) * 4));
+      if (bottomY != null) {
+        final int uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
+        _yuvToRgba(bottomY[len - 1], uv0 & 0xff, (uv0 >> 16),
+             new MemPtr(bottomDst, (len - 1) * 4));
+      }
     }
   }
 
@@ -944,8 +950,8 @@ class VP8 {
     }
 
     // Loop over each output pairs of row.
-    topU = new MemPtr(curU);
-    topV = new MemPtr(curV);
+    topU.buffer = curU.buffer;
+    topV.buffer = curV.buffer;
     for (; y + 2 < yEnd; y += 2) {
       topU.offset = curU.offset;
       topV.offset = curV.offset;
