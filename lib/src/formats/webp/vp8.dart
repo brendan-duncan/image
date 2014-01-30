@@ -927,9 +927,9 @@ class VP8 {
       return;
     }
 
-    MemPtr alpha = new MemPtr(_a);
-    MemPtr dst = new MemPtr(output.getBytes());
+    /*MemPtr alpha = new MemPtr(_a);
     final int stride = webp.width * 4;
+    MemPtr dst = new MemPtr(output.getBytes(), mbY * stride);
     int alphaMask = 0xff;
 
     int startY = mbY;
@@ -954,15 +954,17 @@ class VP8 {
     }
 
     for (int j = 0; j < numRows; ++j) {
-      for (int i = 0; i < mbW; ++i) {
-        final int alphaValue = alpha[i];
-        dst[4 * i] = alphaValue;
-        alphaMask &= alphaValue;
+      if (j + mbY >= webp.height) {
+        break;
+      }
+      for (int x = 0; x < mbW; ++x) {
+        final int alphaValue = alpha[x];
+        dst[4 * x] = alphaValue & 0xff;
       }
 
       alpha.offset += webp.width;
       dst.offset += stride;
-    }
+    }*/
   }
 
 
