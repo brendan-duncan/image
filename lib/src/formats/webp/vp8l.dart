@@ -75,8 +75,9 @@ class VP8L {
   bool _allocateInternalBuffers8b() {
     final int totalNumPixels = webp.width * webp.height;
     _argbCache = 0;
-    _pixels8 = new Data.Uint8List(totalNumPixels);
-    _pixels = _pixels8;
+    var pixels32 = new Data.Uint32List(totalNumPixels);
+    _pixels = pixels32;
+    _pixels8 = new Data.Uint8List.view(pixels32);
     return true;
   }
 
@@ -190,7 +191,7 @@ class VP8L {
     return data;
   }
 
-  bool _decodeImageData(Data.Uint32List data, int width, int height,
+  bool _decodeImageData(data, int width, int height,
                         int lastRow, processFunc) {
     int row = _lastPixel ~/ width;
     int col = _lastPixel % width;

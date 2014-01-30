@@ -1,5 +1,158 @@
 part of image_test;
 
+const Map _webp_tests = const {
+'1.webp': const {
+  'format': 1,
+  'width': 550,
+  'height': 368,
+  'hasAlpha': false,
+  'hasAnimation': false },
+'1_webp_a.webp': const {
+  'format': 1,
+  'width': 400,
+  'height': 301,
+  'hasAlpha': true,
+  'hasAnimation': false },
+'1_webp_ll.webp': const {
+    'format': 2,
+    'width': 400,
+    'height': 301,
+    'hasAlpha': true,
+    'hasAnimation': false },
+'2.webp': const {
+    'format': 1,
+    'width': 550,
+    'height': 404,
+    'hasAlpha': false,
+    'hasAnimation': false },
+'2b.webp': const {
+    'format': 1,
+    'width': 75,
+    'height': 55,
+    'hasAlpha': false,
+    'hasAnimation': false },
+'2_webp_a.webp': const {
+    'format': 1,
+    'width': 386,
+    'height': 395,
+    'hasAlpha': true,
+    'hasAnimation': false },
+'2_webp_ll.webp': const {
+    'format': 2,
+    'width': 386,
+    'height': 395,
+    'hasAlpha': true,
+    'hasAnimation': false },
+'3.webp': const {
+    'format': 1,
+    'width': 1280,
+    'height': 720,
+    'hasAlpha': false,
+    'hasAnimation': false },
+'3_webp_a.webp': const {
+    'format': 1,
+    'width': 800,
+    'height': 600,
+    'hasAlpha': true,
+    'hasAnimation': false },
+'3_webp_ll.webp': const {
+    'format': 2,
+    'width': 800,
+    'height': 600,
+    'hasAlpha': true,
+    'hasAnimation': false },
+'4.webp': const {
+    'format': 1,
+    'width': 1024,
+    'height': 772,
+    'hasAlpha': false,
+    'hasAnimation': false },
+'4_webp_a.webp': const {
+    'format': 1,
+    'width': 421,
+    'height': 163,
+    'hasAlpha': true,
+    'hasAnimation': false },
+'4_webp_ll.webp': const {
+    'format': 2,
+    'width': 421,
+    'height': 163,
+    'hasAlpha': true,
+    'hasAnimation': false },
+'5.webp': const {
+    'format': 1,
+    'width': 1024,
+    'height': 752,
+    'hasAlpha': false,
+    'hasAnimation': false },
+'5_webp_a.webp': const {
+    'format': 1,
+    'width': 300,
+    'height': 300,
+    'hasAlpha': true,
+    'hasAnimation': false },
+'5_webp_ll.webp': const {
+    'format': 2,
+    'width': 300,
+    'height': 300,
+    'hasAlpha': true,
+    'hasAnimation': false },
+'BladeRunner.webp': const {
+    'format': 3,
+    'width': 500,
+    'height': 224,
+    'hasAlpha': true,
+    'hasAnimation': true },
+'BladeRunner_lossy.webp': const {
+    'format': 3,
+    'width': 500,
+    'height': 224,
+    'hasAlpha': true,
+    'hasAnimation': true },
+'Contact.webp': const {
+    'format': 3,
+    'width': 500,
+    'height': 219,
+    'hasAlpha': true,
+    'hasAnimation': true },
+'Contact_lossy.webp': const {
+    'format': 3,
+    'width': 500,
+    'height': 219,
+    'hasAlpha': true,
+    'hasAnimation': true },
+'GenevaDrive.webp': const {
+    'format': 3,
+    'width': 320,
+    'height': 240,
+    'hasAlpha': true,
+    'hasAnimation': true },
+'GenevaDrive_lossy.webp': const {
+    'format': 3,
+    'width': 320,
+    'height': 240,
+    'hasAlpha': true,
+    'hasAnimation': true },
+'red.webp': const {
+    'format': 1,
+    'width': 32,
+    'height': 32,
+    'hasAlpha': false,
+    'hasAnimation': false },
+'SteamEngine.webp': const {
+    'format': 3,
+    'width': 320,
+    'height': 240,
+    'hasAlpha': true,
+    'hasAnimation': true },
+'SteamEngine_lossy.webp': const {
+    'format': 3,
+    'width': 320,
+    'height': 240,
+    'hasAlpha': true,
+    'hasAnimation': true }
+};
+
 void defineWebPTests() {
   Io.File script = new Io.File(Io.Platform.script.toFilePath());
   String path = script.parent.path + '/res/webp';
@@ -22,24 +175,24 @@ void defineWebPTests() {
           throw new ImageException('Unable to parse WebP info: $name.');
         }
 
-        print('$name');
-        print('    format: ${data.format}');
-        print('    width: ${data.width}');
-        print('    height: ${data.height}');
-        print('    format: ${data.format}');
-        print('    hasAlpha: ${data.hasAlpha}');
-        print('    hasAnimation: ${data.hasAnimation}');
+        if (_webp_tests.containsKey(name)) {
+          expect(data.format, equals(_webp_tests[name]['format']));
+          expect(data.width, equals(_webp_tests[name]['width']));
+          expect(data.height, equals(_webp_tests[name]['height']));
+          expect(data.hasAlpha, equals(_webp_tests[name]['hasAlpha']));
+          expect(data.hasAnimation, equals(_webp_tests[name]['hasAnimation']));
+        }
       });
     }
   });
 
-  /*Io.File file = new Io.File(path + '/4_webp_a.webp');
+  Io.File file = new Io.File(path + '/4_webp_a.webp');
   List<int> bytes = file.readAsBytesSync();
   Image image = new WebPDecoder().decodeImage(bytes);
   List<int> png = new PngEncoder().encode(image);
   new Io.File('out/webp/alpha.png')
         ..createSync(recursive: true)
-        ..writeAsBytesSync(png);*/
+        ..writeAsBytesSync(png);
 
   group('WebP/decodeImage', () {
     test('validate', () {

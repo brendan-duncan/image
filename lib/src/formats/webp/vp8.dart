@@ -461,7 +461,6 @@ class VP8 {
         return false;
       }
     }
-    //print(_dbg);
 
     return true;
   }
@@ -777,6 +776,7 @@ class VP8 {
       yEnd = _cropBottom;    // make sure we don't overflow on last row.
     }
 
+    _a = null;
     if (_alphaData != null && yStart < yEnd) {
       _a = _decompressAlphaRows(yStart, yEnd - yStart);
       if (_a == null) {
@@ -847,19 +847,14 @@ class VP8 {
     return _clip8(kYScale * y + kUToB * u + kBCst);
   }
 
-  List<int> _dbg = [];
-  int _dbgI = 0;
-
   void _yuvToRgb(int y, int u, int v, MemPtr rgb) {
     rgb[0] = _yuvToR(y, v);
     rgb[1] = _yuvToG(y, u, v);
     rgb[2] = _yuvToB(y, u);
-    _dbg.add(y);
   }
 
   void _yuvToRgba(int y, int u, int v, MemPtr rgba) {
     _yuvToRgb(y, u, v, rgba);
-    _dbgI++;
     rgba[3] = 0xff;
   }
 
@@ -928,40 +923,46 @@ class VP8 {
   }
 
   void _emitAlphaRGB(int mbY, int mbW, int mbH) {
-    if (_alphaPlane == null) {
+    if (_a == null) {
       return;
     }
 
+    MemPtr alpha = new MemPtr(_a);
+    MemPtr dst = new MemPtr(output.getBytes());
+    final int stride = webp.width * 4;
+    int alphaMask = 0xff;
 
-    /*const uint8_t* alpha = io->a;
-    if (alpha != NULL) {
-      const int mb_w = io->mb_w;
-      const WEBP_CSP_MODE colorspace = p->output->colorspace;
-      const int alpha_first =
-          (colorspace == MODE_ARGB || colorspace == MODE_Argb);
-      const WebPRGBABuffer* const buf = &p->output->u.RGBA;
-      int num_rows;
-      const int start_y = GetAlphaSourceRow(io, &alpha, &num_rows);
-      uint8_t* const base_rgba = buf->rgba + start_y * buf->stride;
-      uint8_t* dst = base_rgba + (alpha_first ? 0 : 3);
-      uint32_t alpha_mask = 0xff;
-      int i, j;
+    int startY = mbY;
+    int numRows = mbH;
 
-      for (j = 0; j < num_rows; ++j) {
-        for (i = 0; i < mb_w; ++i) {
-          const uint32_t alpha_value = alpha[i];
-          dst[4 * i] = alpha_value;
-          alpha_mask &= alpha_value;
-        }
-        alpha += io->width;
-        dst += buf->stride;
+    // Compensate for the 1-line delay of the fancy upscaler.
+    // This is similar to EmitFancyRGB().
+    if (startY == 0) {
+      // We don't process the last row yet. It'll be done during the next call.
+      --numRows;
+    } else {
+      --startY;
+      // Fortunately, *alpha data is persistent, so we can go back
+      // one row and finish alpha blending, now that the fancy upscaler
+      // completed the YUV->RGB interpolation.
+      alpha.offset -= webp.width;
+    }
+
+    if (_cropTop + mbY + mbH == _cropBottom) {
+      // If it's the very last call, we process all the remaining rows!
+      numRows = _cropBottom - _cropTop - startY;
+    }
+
+    for (int j = 0; j < numRows; ++j) {
+      for (int i = 0; i < mbW; ++i) {
+        final int alphaValue = alpha[i];
+        dst[4 * i] = alphaValue;
+        alphaMask &= alphaValue;
       }
-      // alpha_mask is < 0xff if there's non-trivial alpha to premultiply with.
-      if (alpha_mask != 0xff && WebPIsPremultipliedMode(colorspace)) {
-        WebPApplyAlphaMultiply(base_rgba, alpha_first,
-            mb_w, num_rows, buf->stride);
-      }
-    }*/
+
+      alpha.offset += webp.width;
+      dst.offset += stride;
+    }
   }
 
 
@@ -1035,6 +1036,9 @@ class VP8 {
     if (row == 0) {
       _alphaPlane = new Data.Uint8List(width * height);
       _alpha = new WebPAlpha(_alphaData, width, height);
+    }
+
+    if (!_alpha.isAlphaDecoded) {
       if (!_alpha.decode(row, numRows, _alphaPlane)) {
         return null;
       }
