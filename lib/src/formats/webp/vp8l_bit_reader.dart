@@ -15,7 +15,7 @@ class VP8LBitReader {
    * Return the prefetched bits, so they can be looked up.
    */
   int prefetchBits() {
-    return buffer >> bitPos;
+    return (buffer >> bitPos) & 0xffffffff;
   }
 
   /**

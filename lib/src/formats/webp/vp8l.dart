@@ -75,9 +75,8 @@ class VP8L {
   bool _allocateInternalBuffers8b() {
     final int totalNumPixels = webp.width * webp.height;
     _argbCache = 0;
-    var pixels32 = new Data.Uint32List(totalNumPixels);
-    _pixels = pixels32;
-    _pixels8 = new Data.Uint8List.view(pixels32);
+    _pixels8 = new Data.Uint8List(totalNumPixels);
+    _pixels = new Data.Uint32List.view(_pixels8.buffer);
     return true;
   }
 
@@ -378,45 +377,6 @@ class VP8L {
     _lastRow = row;
   }
 
-  int _decompressAlphaRows(int row, int numRows) {
-    final int width = webp.width;
-    final int height = webp.height;
-
-    if (row < 0 || numRows <= 0 || row + numRows > height) {
-      return 0;    // sanity check.
-    }
-
-    /*if (row == 0) {
-      // Initialize decoding.
-      assert(dec->alpha_plane_ != NULL);
-      dec->alph_dec_ = ALPHNew();
-      if (dec->alph_dec_ == NULL) return NULL;
-      if (!ALPHInit(dec->alph_dec_, dec->alpha_data_, dec->alpha_data_size_,
-          width, height, dec->alpha_plane_)) {
-        ALPHDelete(dec->alph_dec_);
-        dec->alph_dec_ = NULL;
-        return NULL;
-      }
-    }
-
-    if (!dec->is_alpha_decoded_) {
-      int ok = 0;
-      assert(dec->alph_dec_ != NULL);
-      ok = ALPHDecode(dec, row, num_rows);
-      if (!ok || dec->is_alpha_decoded_) {
-        ALPHDelete(dec->alph_dec_);
-        dec->alph_dec_ = NULL;
-      }
-      if (!ok) {
-        return 0;
-      }
-    }*/
-
-    // Return a pointer to the current decoded row.
-    return row * width;
-  }
-
-
   bool _decodeAlphaData(int data, int width, int height, int lastRow) {
     int row = _lastPixel ~/ width;
     int col = _lastPixel % width;
@@ -424,12 +384,11 @@ class VP8L {
     _HTreeGroup htreeGroup = _getHtreeGroupForPos(col, row);
     int pos = _lastPixel; // current position
     final int end = width * height; // End of data
-    final int last = width * _lastRow; // Last pixel to decode
+    final int last = width * lastRow; // Last pixel to decode
     final int lenCodeLimit = WebP.NUM_LITERAL_CODES + WebP.NUM_LENGTH_CODES;
     final int mask = _huffmanMask;
 
     while (!br.isEOS && pos < last) {
-      int code;
       // Only update when changing tile.
       if ((col & mask) == 0) {
         htreeGroup = _getHtreeGroupForPos(col, row);
@@ -437,10 +396,10 @@ class VP8L {
 
       br.fillBitWindow();
 
-      code = htreeGroup.htrees[_GREEN].readSymbol(br);
+      int code = htreeGroup.htrees[_GREEN].readSymbol(br);
 
       if (code < WebP.NUM_LITERAL_CODES) {  // Literal
-        _pixels[data + pos] = code;
+        _pixels8[data + pos] = code;
         ++pos;
         ++col;
         if (col >= width) {
@@ -451,20 +410,18 @@ class VP8L {
           }
         }
       } else if (code < lenCodeLimit) {  // Backward reference
-        int distCode, dist;
         final int lengthSym = code - WebP.NUM_LITERAL_CODES;
         final int length = _getCopyLength(lengthSym);
         final int distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
 
         br.fillBitWindow();
 
-        distCode = _getCopyDistance(distSymbol);
-        dist = _planeCodeToDistance(width, distCode);
+        int distCode = _getCopyDistance(distSymbol);
+        int dist = _planeCodeToDistance(width, distCode);
 
         if (pos >= dist && end - pos >= length) {
-          int i;
-          for (i = 0; i < length; ++i) {
-            _pixels[data + pos + i] = _pixels[data + pos + i - dist];
+          for (int i = 0; i < length; ++i) {
+            _pixels8[data + pos + i] = _pixels8[data + pos + i - dist];
           }
         } else {
           _lastPixel = pos;
@@ -482,7 +439,7 @@ class VP8L {
           }
         }
 
-        if (pos < last && (col & mask)) {
+        if (pos < last && (col & mask) != 0) {
           htreeGroup = _getHtreeGroupForPos(col, row);
         }
       } else {  // Not reached
@@ -497,6 +454,8 @@ class VP8L {
 
     return true;
   }
+
+  int __count = 0;
 
   void _extractPalettedAlphaRows(int row) {
     final int numRows = row - _lastRow;
@@ -779,8 +738,6 @@ class VP8L {
   bool _expandColorMap(int numColors, VP8LTransform transform) {
     final int finalNumColors = 1 << (8 >> transform.bits);
     Data.Uint32List newColorMap = new Data.Uint32List(finalNumColors);
-
-
     Data.Uint8List data = new Data.Uint8List.view(transform.data.buffer);
     Data.Uint8List newData = new Data.Uint8List.view(newColorMap.buffer);
 
@@ -794,8 +751,8 @@ class VP8L {
       newData[i] = (data[i] + newData[i - 4]) & 0xff;
     }
 
-    for (; i < 4 * finalNumColors; ++i) {
-      newData[i] = 0;  // black tail.
+    for (len = 4 * finalNumColors; i < len; ++i) {
+      newData[i] = 0;
     }
 
     transform.data = newColorMap;
@@ -826,7 +783,6 @@ class VP8L {
   static const int _DIST = 4;
 
   static const int _NUM_ARGB_CACHE_ROWS = 16;
-  //final Data.Uint32List _cache;
 
   static const int _NUM_CODE_LENGTH_CODES = 19;
 
@@ -876,7 +832,7 @@ class VP8L {
   List<VP8LTransform> _transforms = [];
   int _transformsSeen = 0;
 
-  List<int> _pixels;
+  Data.Uint32List _pixels;
   Data.Uint8List _pixels8;
   int _argbCache;
 

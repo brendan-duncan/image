@@ -10,11 +10,6 @@ class WebPAlpha {
   int preProcessing = 0;
   int rsrv = 1;
   bool isAlphaDecoded = false;
-  /// Although alpha channel
-  /// requires only 1 byte per
-  /// pixel, sometimes VP8LDecoder may need to allocate
-  /// 4 bytes per pixel internally during decode.
-  bool use8bDecode = false;
 
   WebPAlpha(this.input, this.width, this.height) {
     int b = input.readByte();
@@ -99,7 +94,7 @@ class WebPAlpha {
   bool _decodeAlphaImageStream(int lastRow, Data.Uint8List output) {
     _vp8l._opaque = output;
     // Decode (with special row processing).
-    return use8bDecode ?
+    return _use8bDecode ?
         _vp8l._decodeAlphaData(0, width, height, lastRow) :
         _vp8l._decodeImageData(_vp8l._pixels, width, height,
                                lastRow, _vp8l._extractAlphaRows);
@@ -131,6 +126,10 @@ class WebPAlpha {
   }
 
   VP8L _vp8l;
+  /// Although alpha channel
+  /// requires only 1 byte per
+  /// pixel, sometimes VP8LDecoder may need to allocate
+  /// 4 bytes per pixel internally during decode.
   bool _use8bDecode = false;
 
   // Alpha related constants.
