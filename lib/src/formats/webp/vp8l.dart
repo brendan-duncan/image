@@ -43,16 +43,7 @@ class VP8L {
 
     _decodeImageStream(webp.width, webp.height, true);
 
-    final int numPixels = webp.width * webp.height;
-    // Scratch buffer corresponding to top-prediction row for transforming the
-    // first row in the row-blocks. Not needed for paletted alpha.
-    final int cacheTopPixels = webp.width;
-    // Scratch buffer for temporary BGRA storage. Not needed for paletted alpha.
-    final int cachePixels = webp.width * _NUM_ARGB_CACHE_ROWS;
-    final int totalNumPixels = numPixels + cacheTopPixels + cachePixels;
-
-    _pixels = new Data.Uint32List(totalNumPixels);
-    _argbCache = numPixels + cacheTopPixels;
+    _allocateInternalBuffers32b();
 
     image = new Image(webp.width, webp.height);
 
@@ -62,6 +53,31 @@ class VP8L {
     }
 
     return image;
+  }
+
+  bool _allocateInternalBuffers32b() {
+    final int numPixels = webp.width * webp.height;
+    // Scratch buffer corresponding to top-prediction row for transforming the
+    // first row in the row-blocks. Not needed for paletted alpha.
+    final int cacheTopPixels = webp.width;
+    // Scratch buffer for temporary BGRA storage. Not needed for paletted alpha.
+    final int cachePixels = webp.width * _NUM_ARGB_CACHE_ROWS;
+    final int totalNumPixels = numPixels + cacheTopPixels + cachePixels;
+
+    var pixels32 = new Data.Uint32List(totalNumPixels);
+    _pixels = pixels32;
+    _pixels8 = new Data.Uint8List.view(pixels32);
+    _argbCache = numPixels + cacheTopPixels;
+
+    return true;
+  }
+
+  bool _allocateInternalBuffers8b() {
+    final int totalNumPixels = webp.width * webp.height;
+    _argbCache = 0;
+    _pixels8 = new Data.Uint8List(totalNumPixels);
+    _pixels = _pixels8;
+    return true;
   }
 
   bool _readTransform(List<int> transformSize) {
@@ -312,6 +328,31 @@ class VP8L {
   }
 
   /**
+   * Row-processing for the special case when alpha data contains only one
+   * transform (color indexing), and trivial non-green literals.
+   */
+  bool _is8bOptimizable() {
+    if (_colorCacheSize > 0) {
+      return false;
+    }
+    // When the Huffman tree contains only one symbol, we can skip the
+    // call to ReadSymbol() for red/blue/alpha channels.
+    for (int i = 0; i < _numHtreeGroups; ++i) {
+      List<_HuffmanTree> htrees = _htreeGroups[i].htrees;
+      if (htrees[_RED].numNodes > 1) {
+        return false;
+      }
+      if (htrees[_BLUE].numNodes > 1) {
+        return false;
+      }
+      if (htrees[_ALPHA].numNodes > 1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Special row-processing that only stores the alpha data.
    */
   void _extractAlphaRows(int row) {
@@ -368,89 +409,6 @@ class VP8L {
     // Return a pointer to the current decoded row.
     return dec->alpha_plane_ + row * width;*/
     return 0;
-  }
-
-
-  bool _readAlpha(Arc.InputStream input, int blockSize, int width, int height,
-                  Data.Uint8List output) {
-
-    _alpha = new WebPAlpha(width, height);
-
-    if (!_alpha.init(input, blockSize, output)) {
-      return false;
-    }
-
-    if (_alpha.method != WebPAlpha.ALPHA_NO_COMPRESSION) {
-      return _decodeAlphaHeader(input, output);
-    }
-
-    return true;
-  }
-
-  bool _decodeAlphaHeader(Arc.InputStream input, Data.Uint8List output) {
-    _opaque = output;
-    /*int ok = 0;
-    VP8LDecoder* dec;
-    VP8Io* io;
-    assert(alph_dec != NULL);
-    alph_dec->vp8l_dec_ = VP8LNew();
-    if (alph_dec->vp8l_dec_ == NULL) return 0;
-    dec = alph_dec->vp8l_dec_;
-
-    dec->width_ = alph_dec->width_;
-    dec->height_ = alph_dec->height_;
-    dec->io_ = &alph_dec->io_;
-    io = dec->io_;
-
-    VP8InitIo(io);
-    WebPInitCustomIo(NULL, io);  // Just a sanity Init. io won't be used.
-    io->opaque = output;
-    io->width = alph_dec->width_;
-    io->height = alph_dec->height_;
-
-    dec->status_ = VP8_STATUS_OK;
-    VP8LInitBitReader(&dec->br_, data, data_size);
-
-    dec->action_ = READ_HDR;
-    if (!DecodeImageStream(alph_dec->width_, alph_dec->height_, 1, dec, NULL)) {
-      goto Err;
-    }
-
-    // Special case: if alpha data uses only the color indexing transform and
-    // doesn't use color cache (a frequent case), we will use DecodeAlphaData()
-    // method that only needs allocation of 1 byte per pixel (alpha channel).
-    if (dec->next_transform_ == 1 &&
-        dec->transforms_[0].type_ == COLOR_INDEXING_TRANSFORM &&
-        Is8bOptimizable(&dec->hdr_)) {
-      alph_dec->use_8b_decode = 1;
-      ok = AllocateInternalBuffers8b(dec);
-    } else {
-      // Allocate internal buffers (note that dec->width_ may have changed here).
-      alph_dec->use_8b_decode = 0;
-      ok = AllocateInternalBuffers32b(dec, alph_dec->width_);
-    }
-
-    if (!ok) goto Err;
-
-    dec->action_ = READ_DATA;
-    return 1;
-
-    Err:
-      VP8LDelete(alph_dec->vp8l_dec_);
-    alph_dec->vp8l_dec_ = NULL;
-    return 0;*/
-    return false;
-  }
-
-  bool _decodeAlphaImageStream(int lastRow) {
-    /*VP8LDecoder* const dec = alph_dec->vp8l_dec_;
-    // Decode (with special row processing).
-    return _use8bDecode ?
-        _decodeAlphaData((uint8_t*)dec->pixels_, dec->width_, dec->height_,
-            last_row) :
-              DecodeImageData(dec, dec->pixels_, dec->width_, dec->height_,
-                  last_row, _extractAlphaRows);*/
-    return false;
   }
 
 
@@ -554,10 +512,8 @@ class VP8L {
     int rowsOut = webp.width * startRow; // (uint8_t*)_opaque +*/
     VP8LTransform transform = _transforms[0];
 
-    Data.Uint8List inData = new Data.Uint8List.view(_pixels.buffer);
-
     transform.colorIndexInverseTransformAlpha(startRow, endRow,
-        inData, rowsIn, _opaque, rowsOut);
+        _pixels8, rowsIn, _opaque, rowsOut);
   }
 
   /**
@@ -919,10 +875,9 @@ class VP8L {
   List<VP8LTransform> _transforms = [];
   int _transformsSeen = 0;
 
-  Data.Uint32List _pixels;
+  List<int> _pixels;
+  Data.Uint8List _pixels8;
   int _argbCache;
-
-  WebPAlpha _alpha;
 
   Data.Uint8List _opaque;
 }

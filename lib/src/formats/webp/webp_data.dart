@@ -27,7 +27,7 @@ class WebPData {
   int animBackgroundColor = 0;
   int animLoopCount = 0;
 
-  int _alphaPosition;
+  Arc.InputStream _alphaData;
   int _alphaSize;
   int _vp8Position;
   int _vp8Size;

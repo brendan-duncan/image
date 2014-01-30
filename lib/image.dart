@@ -60,6 +60,7 @@ part 'src/formats/webp/vp8l_transform.dart';
 part 'src/formats/webp/webp.dart';
 part 'src/formats/webp/webp_alpha.dart';
 part 'src/formats/webp/webp_data.dart';
+part 'src/formats/webp/webp_filters.dart';
 part 'src/formats/webp/webp_frame.dart';
 part 'src/formats/webp/webp_huffman.dart';
 part 'src/formats/webp/webp_decoder.dart';

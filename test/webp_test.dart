@@ -33,6 +33,14 @@ void defineWebPTests() {
     }
   });
 
+  /*Io.File file = new Io.File(path + '/4_webp_a.webp');
+  List<int> bytes = file.readAsBytesSync();
+  Image image = new WebPDecoder().decodeImage(bytes);
+  List<int> png = new PngEncoder().encode(image);
+  new Io.File('out/webp/alpha.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(png);*/
+
   group('WebP/decodeImage', () {
     test('validate', () {
       Io.File file = new Io.File(path + '/2b.webp');

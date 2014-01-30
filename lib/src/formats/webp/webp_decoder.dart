@@ -148,7 +148,9 @@ class WebPDecoder {
           found = true;
           break;
         case 'ALPH':
-          webp._alphaPosition = input.position;
+          webp._alphaData = new Arc.InputStream(input.buffer,
+              byteOrder: input.byteOrder);
+          webp._alphaData.position = input.position;
           webp._alphaSize = size;
           input.skip(diskSize);
           break;

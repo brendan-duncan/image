@@ -342,6 +342,10 @@ class VP8 {
   }
 
   bool _initFrame() {
+    if (webp.hasAlpha) {
+      _alphaData = webp._alphaData;
+    }
+
     _fStrengths = new List<List<VP8FInfo>>(NUM_MB_SEGMENTS);
     for (int i = 0; i < NUM_MB_SEGMENTS; ++i) {
       _fStrengths[i] = [new VP8FInfo(), new VP8FInfo()];
@@ -989,25 +993,17 @@ class VP8 {
     final int width = webp.width;
     final int height = webp.height;
 
-    /*if (row < 0 || numRows <= 0 || row + numRows > height) {
+    if (row < 0 || numRows <= 0 || row + numRows > height) {
       return null;    // sanity check.
     }
 
     if (row == 0) {
-      // Initialize decoding.
-      if (_alphaPlane == null) {
+      _alphaPlane = new Data.Uint8List(width * height);
+      _alpha = new WebPAlpha(_alphaData, width, height);
+      if (!_alpha.decode(row, numRows, _alphaPlane)) {
         return null;
       }
-
-      _alpha = new WebPAlpha(_alphaData, _alphaData.length,
-                             width, height, _alphaPlane);
-
-    if (!_isAlphaDecoded) {
-      int ok = 0;
-      if (!_alpha.decode(row, numRows)) {
-        return null;
-      }
-    }*/
+    }
 
     // Return a pointer to the current decoded row.
     return new MemPtr(_alphaPlane, row * width);
@@ -1424,7 +1420,7 @@ class VP8 {
   /// alpha-plane decoder object
   WebPAlpha _alpha;
   /// compressed alpha data (if present)
-  Data.Uint8List _alphaData;
+  Arc.InputStream _alphaData;
   /// true if alpha_data_ is decoded in alpha_plane_
   int _isAlphaDecoded;
   /// output. Persistent, contains the whole data.
