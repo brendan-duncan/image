@@ -824,9 +824,7 @@ class VP8 {
     }
 
     int numLinesOut = _emitFancyRGB(mbY, mbW, mbH);
-    /*if (p->emit_alpha != NULL) {
-      p->emit_alpha(io, p);
-    }*/
+    _emitAlphaRGB(mbY, mbW, mbH);
 
     //_lastY += numLinesOut;
 
@@ -927,6 +925,43 @@ class VP8 {
              new MemPtr(bottomDst, (len - 1) * 4));
       }
     }
+  }
+
+  void _emitAlphaRGB(int mbY, int mbW, int mbH) {
+    if (_alphaPlane == null) {
+      return;
+    }
+
+
+    /*const uint8_t* alpha = io->a;
+    if (alpha != NULL) {
+      const int mb_w = io->mb_w;
+      const WEBP_CSP_MODE colorspace = p->output->colorspace;
+      const int alpha_first =
+          (colorspace == MODE_ARGB || colorspace == MODE_Argb);
+      const WebPRGBABuffer* const buf = &p->output->u.RGBA;
+      int num_rows;
+      const int start_y = GetAlphaSourceRow(io, &alpha, &num_rows);
+      uint8_t* const base_rgba = buf->rgba + start_y * buf->stride;
+      uint8_t* dst = base_rgba + (alpha_first ? 0 : 3);
+      uint32_t alpha_mask = 0xff;
+      int i, j;
+
+      for (j = 0; j < num_rows; ++j) {
+        for (i = 0; i < mb_w; ++i) {
+          const uint32_t alpha_value = alpha[i];
+          dst[4 * i] = alpha_value;
+          alpha_mask &= alpha_value;
+        }
+        alpha += io->width;
+        dst += buf->stride;
+      }
+      // alpha_mask is < 0xff if there's non-trivial alpha to premultiply with.
+      if (alpha_mask != 0xff && WebPIsPremultipliedMode(colorspace)) {
+        WebPApplyAlphaMultiply(base_rgba, alpha_first,
+            mb_w, num_rows, buf->stride);
+      }
+    }*/
   }
 
 

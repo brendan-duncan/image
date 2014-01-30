@@ -64,7 +64,7 @@ class WebPAlpha {
       output.setRange(offset, numPixels, input.buffer,
           input.position + offset);
     } else {  // alph_dec->method_ == ALPHA_LOSSLESS_COMPRESSION
-      if (!_decodeAlphaImageStream(row + numRows)) {
+      if (!_decodeAlphaImageStream(row + numRows, output)) {
         return false;
       }
     }
@@ -96,13 +96,13 @@ class WebPAlpha {
   }
 
 
-  bool _decodeAlphaImageStream(int lastRow) {
+  bool _decodeAlphaImageStream(int lastRow, Data.Uint8List output) {
+    _vp8l._opaque = output;
     // Decode (with special row processing).
     return use8bDecode ?
         _vp8l._decodeAlphaData(0, width, height, lastRow) :
         _vp8l._decodeImageData(_vp8l._pixels, width, height, lastRow,
                                _vp8l._extractAlphaRows);
-
   }
 
   bool _decodeAlphaHeader() {

@@ -357,32 +357,35 @@ class VP8L {
    */
   void _extractAlphaRows(int row) {
     final int numRows = row - _lastRow;
-    /*const uint32_t* const in = dec->pixels_ + dec->width_ * dec->last_row_;
+    if (numRows <= 0) {
+      return;  // Nothing to be done.
+    }
 
-    if (num_rows <= 0) return;  // Nothing to be done.
-    ApplyInverseTransforms(dec, num_rows, in);
+    _applyInverseTransforms(numRows, webp.width * _lastRow);
 
     // Extract alpha (which is stored in the green plane).
-    {
-      const int width = dec->io_->width;      // the final width (!= dec->width_)
-      const int cache_pixs = width * num_rows;
-      uint8_t* const dst = (uint8_t*)dec->io_->opaque + width * dec->last_row_;
-      const uint32_t* const src = dec->argb_cache_;
-      int i;
-      for (i = 0; i < cache_pixs; ++i) dst[i] = (src[i] >> 8) & 0xff;
+    final int width = webp.width;      // the final width (!= dec->width_)
+    final int cachePixs = width * numRows;
+
+    final int di = width * _lastRow;
+    MemPtr src = new MemPtr(_pixels, _argbCache);
+
+    for (int i = 0; i < cachePixs; ++i) {
+      _opaque[di + i] = (src[i] >> 8) & 0xff;
     }
-    dec->last_row_ = dec->last_out_row_ = row;*/
+
+    _lastRow = row;
   }
 
   int _decompressAlphaRows(int row, int numRows) {
-    /*const int width = dec->pic_hdr_.width_;
-    const int height = dec->pic_hdr_.height_;
+    final int width = webp.width;
+    final int height = webp.height;
 
-    if (row < 0 || num_rows <= 0 || row + num_rows > height) {
-      return NULL;    // sanity check.
+    if (row < 0 || numRows <= 0 || row + numRows > height) {
+      return 0;    // sanity check.
     }
 
-    if (row == 0) {
+    /*if (row == 0) {
       // Initialize decoding.
       assert(dec->alpha_plane_ != NULL);
       dec->alph_dec_ = ALPHNew();
@@ -403,12 +406,13 @@ class VP8L {
         ALPHDelete(dec->alph_dec_);
         dec->alph_dec_ = NULL;
       }
-      if (!ok) return NULL;  // Error.
-    }
+      if (!ok) {
+        return 0;
+      }
+    }*/
 
     // Return a pointer to the current decoded row.
-    return dec->alpha_plane_ + row * width;*/
-    return 0;
+    return row * width;
   }
 
 
@@ -530,9 +534,6 @@ class VP8L {
 
     _applyInverseTransforms(numRows, rows);
 
-    // TODO A significant optimization would be to not use _pixels and store
-    // the decoded image directly into image, and store the colors in RGBA
-    // order instead of ARGB.
     int count = 0;
     int di = rows;
     for (int y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
@@ -548,7 +549,6 @@ class VP8L {
       }
     }
 
-    // Update 'last_row_'.
     _lastRow = row;
   }
 

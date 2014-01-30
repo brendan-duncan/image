@@ -19,102 +19,116 @@ class WebPFilters {
 
   static void horizontalFilter(Data.Uint8List data, int width, int height,
                                int stride, Data.Uint8List filteredData) {
-    _doHorizontalFilter(data, width, height, stride, 0, height, 0,
+    _doHorizontalFilter(data, width, height, stride, 0, height, false,
                         filteredData);
   }
 
   static void horizontalUnfilter(int width, int height, int stride, int row,
                                  int numRows, Data.Uint8List data) {
-    _doHorizontalFilter(data, width, height, stride, row, numRows, 1, data);
+    _doHorizontalFilter(data, width, height, stride, row, numRows, true, data);
   }
 
   static void verticalFilter(Data.Uint8List data, int width, int height,
                              int stride, Data.Uint8List filteredData) {
-    _doVerticalFilter(data, width, height, stride, 0, height, 0, filteredData);
+    _doVerticalFilter(data, width, height, stride, 0, height, false,
+                      filteredData);
   }
 
   static void verticalUnfilter(int width, int height, int stride, int row,
                                int num_rows, Data.Uint8List data) {
-    _doVerticalFilter(data, width, height, stride, row, num_rows, 1, data);
+    _doVerticalFilter(data, width, height, stride, row, num_rows, true, data);
   }
 
   static void gradientFilter(Data.Uint8List data, int width, int height,
-                             int stride, Data.Uint8List filtered_data) {
-    _doGradientFilter(data, width, height, stride, 0, height, 0, filtered_data);
+                             int stride, Data.Uint8List filteredData) {
+    _doGradientFilter(data, width, height, stride, 0, height, false,
+                      filteredData);
   }
 
   static void gradientUnfilter(int width, int height, int stride, int row,
                                int num_rows, Data.Uint8List data) {
-    _doGradientFilter(data, width, height, stride, row, num_rows, 1, data);
+    _doGradientFilter(data, width, height, stride, row, num_rows, true, data);
+  }
+
+  static void _predictLine(MemPtr src, MemPtr pred, MemPtr dst, int length,
+                           bool inverse) {
+    if (inverse) {
+      for (int i = 0; i < length; ++i) {
+        dst[i] = src[i] + pred[i];
+      }
+    } else {
+      for (int i = 0; i < length; ++i) {
+        dst[i] = src[i] - pred[i];
+      }
+    }
   }
 
   static void _doHorizontalFilter(Data.Uint8List src,
                                   int width, int height, int stride,
-                                  int row, int num_rows,
-                                  int inverse, Data.Uint8List out) {
-    /*const uint8_t* preds;
-    const size_t start_offset = row * stride;
-    const int last_row = row + num_rows;
-    SANITY_CHECK(in, out);
-    in += start_offset;
-    out += start_offset;
-    preds = inverse ? out : in;
+                                  int row, int numRows,
+                                  bool inverse, Data.Uint8List out) {
+    final int startOffset = row * stride;
+    final int lastRow = row + numRows;
+    MemPtr s = new MemPtr(src, startOffset);
+    MemPtr o = new MemPtr(src, startOffset);
+    MemPtr preds = new MemPtr(inverse ? o : s);
 
     if (row == 0) {
       // Leftmost pixel is the same as input for topmost scanline.
-      out[0] = in[0];
-      PredictLine(in + 1, preds, out + 1, width - 1, inverse);
+      o[0] = s[0];
+      _predictLine(new MemPtr(s, 1), preds,
+                   new MemPtr(o, 1), width - 1, inverse);
       row = 1;
-      preds += stride;
-      in += stride;
-      out += stride;
+      preds.offset += stride;
+      s.offset += stride;
+      o.offset += stride;
     }
 
     // Filter line-by-line.
-    while (row < last_row) {
+    while (row < lastRow) {
       // Leftmost pixel is predicted from above.
-      PredictLine(in, preds - stride, out, 1, inverse);
-      PredictLine(in + 1, preds, out + 1, width - 1, inverse);
+      _predictLine(s, new MemPtr(preds, -stride), o, 1, inverse);
+      _predictLine(new MemPtr(s, 1), preds, new MemPtr(o, 1),
+                   width - 1, inverse);
       ++row;
-      preds += stride;
-      in += stride;
-      out += stride;
-    }*/
+      preds.offset += stride;
+      s.offset += stride;
+      o.offset += stride;
+    }
   }
 
   static void _doVerticalFilter(Data.Uint8List src,
                                int width, int height, int stride,
-                               int row, int num_rows,
-                               int inverse, Data.Uint8List out) {
-    /*const uint8_t* preds;
-    const size_t start_offset = row * stride;
-    const int last_row = row + num_rows;
-    SANITY_CHECK(in, out);
-    in += start_offset;
-    out += start_offset;
-    preds = inverse ? out : in;
+                               int row, int numRows,
+                               bool inverse, Data.Uint8List out) {
+    final int startOffset = row * stride;
+    final int last_row = row + numRows;
+    MemPtr s = new MemPtr(src, startOffset);
+    MemPtr o = new MemPtr(out, startOffset);
+    MemPtr preds = new MemPtr(inverse ? o : s);
 
     if (row == 0) {
       // Very first top-left pixel is copied.
-      out[0] = in[0];
+      o[0] = s[0];
       // Rest of top scan-line is left-predicted.
-      PredictLine(in + 1, preds, out + 1, width - 1, inverse);
+      _predictLine(new MemPtr(s, 1), preds, new MemPtr(o, 1), width - 1,
+                   inverse);
       row = 1;
-      in += stride;
-      out += stride;
+      s.offset += stride;
+      o.offset += stride;
     } else {
       // We are starting from in-between. Make sure 'preds' points to prev row.
-      preds -= stride;
+      preds.offset -= stride;
     }
 
     // Filter line-by-line.
     while (row < last_row) {
-      PredictLine(in, preds, out, width, inverse);
+      _predictLine(s, preds, o, width, inverse);
       ++row;
-      preds += stride;
-      in += stride;
-      out += stride;
-    }*/
+      preds.offset += stride;
+      s.offset += stride;
+      o.offset += stride;
+    }
   }
 
   static int _gradientPredictor(int a, int b, int c) {
@@ -124,41 +138,39 @@ class WebPFilters {
 
   static void _doGradientFilter(Data.Uint8List src,
                                 int width, int height, int stride,
-                                int row, int num_rows,
-                                int inverse, Data.Uint8List out) {
-    /*const uint8_t* preds;
-    const size_t start_offset = row * stride;
-    const int last_row = row + num_rows;
-    SANITY_CHECK(in, out);
-    in += start_offset;
-    out += start_offset;
-    preds = inverse ? out : in;
+                                int row, int numRows,
+                                bool inverse, Data.Uint8List out) {
+    final int startOffset = row * stride;
+    final int lastRow = row + numRows;
+    MemPtr s = new MemPtr(src, startOffset);
+    MemPtr o = new MemPtr(out, startOffset);
+    MemPtr preds = new MemPtr(inverse ? o : s);
 
     // left prediction for top scan-line
     if (row == 0) {
-      out[0] = in[0];
-      PredictLine(in + 1, preds, out + 1, width - 1, inverse);
+      o[0] = s[0];
+      _predictLine(new MemPtr(s, 1), preds, new MemPtr(o, 1),
+                   width - 1, inverse);
       row = 1;
-      preds += stride;
-      in += stride;
-      out += stride;
+      preds.offset += stride;
+      s.offset += stride;
+      o.offset += stride;
     }
 
     // Filter line-by-line.
-    while (row < last_row) {
-      int w;
+    while (row < lastRow) {
       // leftmost pixel: predict from above.
-      PredictLine(in, preds - stride, out, 1, inverse);
-      for (w = 1; w < width; ++w) {
-        const int pred = GradientPredictor(preds[w - 1],
+      _predictLine(s, new MemPtr(preds, -stride), o, 1, inverse);
+      for (int w = 1; w < width; ++w) {
+        final int pred = _gradientPredictor(preds[w - 1],
             preds[w - stride],
             preds[w - stride - 1]);
-        out[w] = in[w] + (inverse ? pred : -pred);
+        o[w] = s[w] + (inverse ? pred : -pred);
       }
       ++row;
-      preds += stride;
-      in += stride;
-      out += stride;
-    }*/
+      preds.offset += stride;
+      s.offset += stride;
+      o.offset += stride;
+    }
   }
 }
