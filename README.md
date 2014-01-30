@@ -21,20 +21,19 @@ Decoding Only (for now):
 
 ##Samples
 
-Load a jpeg, resize it, and save it as a png:
+Load a WebP image, resize it, and save it as a png:
 
     import 'dart:io' as Io;
     import 'package:image/image.dart';
     void main() {
       // Read a jpeg image from file.
-      Image image = readJpg(new Io.File('res/cat-eye04.jpg').readAsBytesSync());
+      Image image = readWebP(new Io.File('test.webp').readAsBytesSync());
 
       // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
       Image thumbnail = copyResize(image, 120);
     
       // Save the thumbnail as a PNG.
-      new Io.File('out/thumbnail-cat-eye04.png')
-            ..createSync(recursive: true)
+      new Io.File('thumbnail.png')
             ..writeAsBytesSync(writePng(thumbnail));
     }
 
