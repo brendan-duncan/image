@@ -4,7 +4,7 @@ part of image;
 /**
  * Features gathered from the bitstream
  */
-class WebPData {
+class WebPInfo {
   // enum Format
   static const int FORMAT_UNDEFINED = 0;
   static const int FORMAT_LOSSY = 1;

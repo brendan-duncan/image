@@ -2,6 +2,15 @@ part of image;
 
 
 class WebPFilters {
+  // Filters.
+  static const int FILTER_NONE = 0;
+  static const int FILTER_HORIZONTAL = 1;
+  static const int FILTER_VERTICAL = 2;
+  static const int FILTER_GRADIENT = 3;
+  static const int FILTER_LAST = FILTER_GRADIENT + 1;  // end marker
+  static const int FILTER_BEST = 5;
+  static const int FILTER_FAST = 6;
+
   static const List FILTERS = const [
       null,              // WEBP_FILTER_NONE
       horizontalFilter,  // WEBP_FILTER_HORIZONTAL

@@ -6,10 +6,10 @@ part of image;
 class VP8L {
   Arc.InputStream input;
   VP8LBitReader br;
-  WebPData webp;
+  WebPInfo webp;
   Image image;
 
-  VP8L(Arc.InputStream input, WebPData webp) :
+  VP8L(Arc.InputStream input, WebPInfo webp) :
     this.input = input,
     this.webp = webp,
     this.br = new VP8LBitReader(input) {
@@ -21,7 +21,7 @@ class VP8L {
       return false;
     }
 
-    webp.format = WebPData.FORMAT_LOSSLESS;
+    webp.format = WebPInfo.FORMAT_LOSSLESS;
     webp.width = br.readBits(14) + 1;
     webp.height = br.readBits(14) + 1;
     webp.hasAlpha = br.readBits(1) != 0;
@@ -99,14 +99,14 @@ class VP8L {
     transform.ysize = transformSize[1];
 
     switch (type) {
-      case WebP.PREDICTOR_TRANSFORM:
-      case WebP.CROSS_COLOR_TRANSFORM:
+      case VP8LTransform.PREDICTOR_TRANSFORM:
+      case VP8LTransform.CROSS_COLOR_TRANSFORM:
         transform.bits = br.readBits(3) + 2;
         transform.data = _decodeImageStream(
                 _subSampleSize(transform.xsize, transform.bits),
                 _subSampleSize(transform.ysize, transform.bits), false);
         break;
-      case WebP.COLOR_INDEXING_TRANSFORM:
+      case VP8LTransform.COLOR_INDEXING_TRANSFORM:
         final int numColors = br.readBits(8) + 1;
         final int bits = (numColors > 16) ? 0 :
                          (numColors > 4) ? 1 :
@@ -116,7 +116,7 @@ class VP8L {
         transform.data = _decodeImageStream(numColors, 1, false);
         ok = _expandColorMap(numColors, transform);
         break;
-      case WebP.SUBTRACT_GREEN:
+      case VP8LTransform.SUBTRACT_GREEN:
         break;
       default:
         throw new ImageException('Invalid WebP tranform type: $type');
@@ -145,7 +145,7 @@ class VP8L {
     // Color cache
     if (br.readBits(1) != 0) {
       colorCacheBits = br.readBits(4);
-      bool ok = (colorCacheBits >= 1 && colorCacheBits <= WebP.MAX_CACHE_BITS);
+      bool ok = (colorCacheBits >= 1 && colorCacheBits <= MAX_CACHE_BITS);
       if (!ok) {
         throw new ImageException('Invalid Color Cache');
       }
@@ -202,7 +202,7 @@ class VP8L {
     int srcEnd = width * height; // End of data
     int srcLast = width * lastRow; // Last pixel to decode
 
-    const int lenCodeLimit = WebP.NUM_LITERAL_CODES + WebP.NUM_LENGTH_CODES;
+    const int lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
     final int colorCacheLimit = lenCodeLimit + _colorCacheSize;
 
     VP8LColorCache colorCache = (_colorCacheSize > 0) ? _colorCache : null;
@@ -219,7 +219,7 @@ class VP8L {
       br.fillBitWindow();
       int code = htreeGroup.htrees[_GREEN].readSymbol(br);
 
-      if (code < WebP.NUM_LITERAL_CODES) {  // Literal
+      if (code < NUM_LITERAL_CODES) {  // Literal
         int red = htreeGroup.htrees[_RED].readSymbol(br);
         int green = code;
         br.fillBitWindow();
@@ -246,7 +246,7 @@ class VP8L {
           }
         }
       } else if (code < lenCodeLimit) {  // Backward reference
-        final int lengthSym = code - WebP.NUM_LITERAL_CODES;
+        final int lengthSym = code - NUM_LITERAL_CODES;
         final int length = _getCopyLength(lengthSym);
         final int distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
 
@@ -385,7 +385,7 @@ class VP8L {
     int pos = _lastPixel; // current position
     final int end = width * height; // End of data
     final int last = width * lastRow; // Last pixel to decode
-    final int lenCodeLimit = WebP.NUM_LITERAL_CODES + WebP.NUM_LENGTH_CODES;
+    final int lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
     final int mask = _huffmanMask;
 
     while (!br.isEOS && pos < last) {
@@ -398,7 +398,7 @@ class VP8L {
 
       int code = htreeGroup.htrees[_GREEN].readSymbol(br);
 
-      if (code < WebP.NUM_LITERAL_CODES) {  // Literal
+      if (code < NUM_LITERAL_CODES) {  // Literal
         _pixels8[data + pos] = code;
         ++pos;
         ++col;
@@ -410,7 +410,7 @@ class VP8L {
           }
         }
       } else if (code < lenCodeLimit) {  // Backward reference
-        final int lengthSym = code - WebP.NUM_LITERAL_CODES;
+        final int lengthSym = code - NUM_LITERAL_CODES;
         final int length = _getCopyLength(lengthSym);
         final int distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
 
@@ -563,7 +563,7 @@ class VP8L {
     for (int i = 0; i < numHtreeGroups; ++i) {
       htreeGroups[i] = new _HTreeGroup();
 
-      for (int j = 0; j < WebP.HUFFMAN_CODES_PER_META_CODE; ++j) {
+      for (int j = 0; j < HUFFMAN_CODES_PER_META_CODE; ++j) {
         int alphabetSize = ALPHABET_SIZE[j];
         if (j == 0 && colorCacheBits > 0) {
           alphabetSize += 1 << colorCacheBits;
@@ -642,7 +642,7 @@ class VP8L {
     bool ok = false;
     int symbol;
     int max_symbol;
-    int prev_code_len = WebP.DEFAULT_CODE_LENGTH;
+    int prev_code_len = DEFAULT_CODE_LENGTH;
     _HuffmanTree tree = new _HuffmanTree();
 
     if (!tree.buildImplicit(codeLengthCodeLengths, _NUM_CODE_LENGTH_CODES)) {
@@ -810,9 +810,9 @@ class VP8L {
   static const List<int> _CODE_LENGTH_REPEAT_OFFSETS = const [ 3, 3, 11 ];
 
   static const List<int> ALPHABET_SIZE = const [
-    WebP.NUM_LITERAL_CODES + WebP.NUM_LENGTH_CODES,
-    WebP.NUM_LITERAL_CODES, WebP.NUM_LITERAL_CODES,
-    WebP.NUM_LITERAL_CODES, WebP.NUM_DISTANCE_CODES];
+    NUM_LITERAL_CODES + NUM_LENGTH_CODES,
+    NUM_LITERAL_CODES, NUM_LITERAL_CODES,
+    NUM_LITERAL_CODES, NUM_DISTANCE_CODES];
 
   static const int VP8L_MAGIC_BYTE = 0x2f;
   static const int VP8L_VERSION = 0;
@@ -837,5 +837,17 @@ class VP8L {
   int _argbCache;
 
   Data.Uint8List _opaque;
+
+  static const int ARGB_BLACK = 0xff000000;
+  static const int MAX_CACHE_BITS = 11;
+  static const int HUFFMAN_CODES_PER_META_CODE = 5;
+
+  static const int DEFAULT_CODE_LENGTH = 8;
+  static const int MAX_ALLOWED_CODE_LENGTH = 15;
+
+  static const int NUM_LITERAL_CODES = 256;
+  static const int NUM_LENGTH_CODES = 24;
+  static const int NUM_DISTANCE_CODES = 40;
+  static const int CODE_LENGTH_CODES = 19;
 }
 

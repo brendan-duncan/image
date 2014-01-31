@@ -37,7 +37,7 @@ class WebPAlpha {
   bool get isValid {
     if (method < ALPHA_NO_COMPRESSION ||
         method > ALPHA_LOSSLESS_COMPRESSION ||
-        filter >= WebP.FILTER_LAST ||
+        filter >= WebPFilters.FILTER_LAST ||
         preProcessing > ALPHA_PREPROCESSED_LEVELS ||
         rsrv != 0) {
       return false;
@@ -101,7 +101,7 @@ class WebPAlpha {
   }
 
   bool _decodeAlphaHeader() {
-    WebPData webp = new WebPData();
+    WebPInfo webp = new WebPInfo();
     webp.width = width;
     webp.height = height;
 
@@ -113,7 +113,7 @@ class WebPAlpha {
     // doesn't use color cache (a frequent case), we will use DecodeAlphaData()
     // method that only needs allocation of 1 byte per pixel (alpha channel).
     if (_vp8l._transforms.length == 1 &&
-        _vp8l._transforms[0].type == WebP.COLOR_INDEXING_TRANSFORM &&
+        _vp8l._transforms[0].type == VP8LTransform.COLOR_INDEXING_TRANSFORM &&
         _vp8l._is8bOptimizable()) {
       _use8bDecode = true;
       _vp8l._allocateInternalBuffers8b();

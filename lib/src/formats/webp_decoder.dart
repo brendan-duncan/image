@@ -1,39 +1,42 @@
 part of image;
 
+/**
+ * Decode a WebP formatted image. This supports lossless (vp8l), lossy (vp8),
+ * lossy+alpha, and animated WebP images.
+ */
 class WebPDecoder {
-  WebPData webp;
-  Arc.InputStream input;
+  WebPInfo webp;
 
   /**
    * Validate the file is a WebP image and get information about it.
    * If the file is not a valid WebP image, null is returned.
    */
-  WebPData getInfo(List<int> bytes) {
+  WebPInfo getInfo(List<int> bytes) {
     // WebP is stored in little-endian byte order.
-    input = new Arc.InputStream(bytes);
+    _input = new Arc.InputStream(bytes);
 
-    if (!_getHeader(input)) {
+    if (!_getHeader(_input)) {
       return null;
     }
 
-    webp = new WebPData();
-    if (!_getInfo(input, webp)) {
+    webp = new WebPInfo();
+    if (!_getInfo(_input, webp)) {
       return null;
     }
 
     switch (webp.format) {
-      case WebPData.FORMAT_ANIMATED:
+      case WebPInfo.FORMAT_ANIMATED:
         return webp;
-      case WebPData.FORMAT_LOSSLESS:
-        input.position = webp._vp8Position;
-        VP8L vp8l = new VP8L(input, webp);
+      case WebPInfo.FORMAT_LOSSLESS:
+        _input.position = webp._vp8Position;
+        VP8L vp8l = new VP8L(_input, webp);
         if (!vp8l.decodeHeader()) {
           return null;
         }
         return webp;
-      case WebPData.FORMAT_LOSSY:
-        input.position = webp._vp8Position;
-        VP8 vp8 = new VP8(input, webp);
+      case WebPInfo.FORMAT_LOSSY:
+        _input.position = webp._vp8Position;
+        VP8 vp8 = new VP8(_input, webp);
         if (!vp8.decodeHeader()) {
           return null;
         }
@@ -44,7 +47,7 @@ class WebPDecoder {
   }
 
   Image decodeFrame(int frame) {
-    if (input == null || webp == null) {
+    if (_input == null || webp == null) {
       return null;
     }
 
@@ -54,17 +57,17 @@ class WebPDecoder {
 
     if (webp.hasAnimation) {
       WebPFrame f = webp.frames[frame];
-      Arc.InputStream frameData = input.subset(f._framePosition,
+      Arc.InputStream frameData = _input.subset(f._framePosition,
           f._frameSize);
 
       return _decodeFrame(frameData, frame: frame);
     }
 
-    if (webp.format == WebPData.FORMAT_LOSSLESS) {
-      Arc.InputStream data = input.subset(webp._vp8Position, webp._vp8Size);
+    if (webp.format == WebPInfo.FORMAT_LOSSLESS) {
+      Arc.InputStream data = _input.subset(webp._vp8Position, webp._vp8Size);
       return new VP8L(data, webp).decode();
-    } else if (webp.format == WebPData.FORMAT_LOSSY) {
-      Arc.InputStream data = input.subset(webp._vp8Position, webp._vp8Size);
+    } else if (webp.format == WebPInfo.FORMAT_LOSSY) {
+      Arc.InputStream data = _input.subset(webp._vp8Position, webp._vp8Size);
       return new VP8(data, webp).decode();
     }
 
@@ -87,6 +90,10 @@ class WebPDecoder {
     return _decodeFrame(input, frame: frame);
   }
 
+  /**
+   * Decode all of the frames of an animated webp. For single image webps,
+   * this will return an animation with a single frame.
+   */
   Animation decodeAnimation(List<int> bytes) {
     if (getInfo(bytes) == null) {
       return null;
@@ -133,8 +140,9 @@ class WebPDecoder {
     return anim;
   }
 
+
   Image _decodeFrame(Arc.InputStream input, {int frame: 0}) {
-    WebPData webp = new WebPData();
+    WebPInfo webp = new WebPInfo();
     if (!_getInfo(input, webp)) {
       return null;
     }
@@ -154,9 +162,9 @@ class WebPDecoder {
       return _decodeFrame(frameData, frame: frame);
     } else {
       Arc.InputStream data = input.subset(webp._vp8Position, webp._vp8Size);
-      if (webp.format == WebPData.FORMAT_LOSSLESS) {
+      if (webp.format == WebPInfo.FORMAT_LOSSLESS) {
         return new VP8L(data, webp).decode();
-      } else if (webp.format == WebPData.FORMAT_LOSSY) {
+      } else if (webp.format == WebPInfo.FORMAT_LOSSY) {
         return new VP8(data, webp).decode();
       }
     }
@@ -181,7 +189,7 @@ class WebPDecoder {
     return true;
   }
 
-  bool _getInfo(Arc.InputStream input, WebPData webp) {
+  bool _getInfo(Arc.InputStream input, WebPInfo webp) {
     bool found = false;
     while (!input.isEOS && !found) {
       String tag = input.readString(4);
@@ -199,13 +207,13 @@ class WebPDecoder {
         case 'VP8 ':
           webp._vp8Position = input.position;
           webp._vp8Size = size;
-          webp.format = WebPData.FORMAT_LOSSY;
+          webp.format = WebPInfo.FORMAT_LOSSY;
           found = true;
           break;
         case 'VP8L':
           webp._vp8Position = input.position;
           webp._vp8Size = size;
-          webp.format = WebPData.FORMAT_LOSSLESS;
+          webp.format = WebPInfo.FORMAT_LOSSLESS;
           found = true;
           break;
         case 'ALPH':
@@ -216,7 +224,7 @@ class WebPDecoder {
           input.skip(diskSize);
           break;
         case 'ANIM':
-          webp.format = WebPData.FORMAT_ANIMATED;
+          webp.format = WebPInfo.FORMAT_ANIMATED;
           if (!_getAnimInfo(input, webp)) {
             return false;
           }
@@ -250,7 +258,7 @@ class WebPDecoder {
     return webp.format != 0;
   }
 
-  bool _getVp8xInfo(Arc.InputStream input, WebPData webp) {
+  bool _getVp8xInfo(Arc.InputStream input, WebPInfo webp) {
     if (input.readBits(2) != 0) {
       return false;
     }
@@ -276,7 +284,7 @@ class WebPDecoder {
     return true;
   }
 
-  bool _getAnimInfo(Arc.InputStream input, WebPData webp) {
+  bool _getAnimInfo(Arc.InputStream input, WebPInfo webp) {
     int c = input.readUint32();
     webp.animLoopCount = input.readUint16();
 
@@ -289,7 +297,7 @@ class WebPDecoder {
     return true;
   }
 
-  bool _getAnimFrameInfo(Arc.InputStream input, WebPData webp, int size) {
+  bool _getAnimFrameInfo(Arc.InputStream input, WebPInfo webp, int size) {
     WebPFrame frame = new WebPFrame(input, size);
     if (!frame.isValid) {
       return false;
@@ -297,4 +305,6 @@ class WebPDecoder {
     webp.frames.add(frame);
     return true;
   }
+
+  Arc.InputStream _input;
 }

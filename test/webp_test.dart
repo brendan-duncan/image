@@ -18,7 +18,7 @@ void defineWebPTests() {
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
 
-        WebPData data = new WebPDecoder().getInfo(bytes);
+        WebPInfo data = new WebPDecoder().getInfo(bytes);
         if (data == null) {
           throw new ImageException('Unable to parse WebP info: $name.');
         }

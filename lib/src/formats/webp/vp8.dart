@@ -5,7 +5,7 @@ part of image;
  */
 class VP8 {
   Arc.InputStream input;
-  WebPData webp;
+  WebPInfo webp;
 
   VP8(Arc.InputStream input, this.webp) :
     this.input = input {
@@ -435,7 +435,7 @@ class VP8 {
     _precomputeFilterStrengths();
 
     // Init critical function pointers and look-up tables.
-    _dsp = new DSP();
+    _dsp = new VP8Filter();
     return true;
   }
 
@@ -548,14 +548,14 @@ class VP8 {
         for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
           MemPtr dst = new MemPtr(y_dst, kScan[n]);
 
-          DSP.PredLuma4[block.imodes[n]](dst);
+          VP8Filter.PredLuma4[block.imodes[n]](dst);
 
           _doTransform(bits, new MemPtr(coeffs, n * 16), dst);
         }
       } else { // 16x16
         int predFunc = _checkMode(mb_x, mb_y, block.imodes[0]);
 
-        DSP.PredLuma16[predFunc](y_dst);
+        VP8Filter.PredLuma16[predFunc](y_dst);
         if (bits != 0) {
           for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
             MemPtr dst = new MemPtr(y_dst, kScan[n]);
@@ -568,8 +568,8 @@ class VP8 {
       // Chroma
       int bits_uv = block.nonZeroUV;
       int pred_func = _checkMode(mb_x, mb_y, block.uvmode);
-      DSP.PredChroma8[pred_func](u_dst);
-      DSP.PredChroma8[pred_func](v_dst);
+      VP8Filter.PredChroma8[pred_func](u_dst);
+      VP8Filter.PredChroma8[pred_func](v_dst);
 
       MemPtr c1 = new MemPtr(coeffs, 16 * 16);
       _doUVTransform(bits_uv, c1, u_dst);
@@ -1363,7 +1363,7 @@ class VP8 {
 
   Image output;
 
-  DSP _dsp;
+  VP8Filter _dsp;
 
   // headers
   VP8FrameHeader _frameHeader = new VP8FrameHeader();

@@ -1,6 +1,12 @@
 part of image;
 
 class VP8LTransform {
+  // enum VP8LImageTransformType
+  static const int PREDICTOR_TRANSFORM  = 0;
+  static const int CROSS_COLOR_TRANSFORM = 1;
+  static const int SUBTRACT_GREEN = 2;
+  static const int COLOR_INDEXING_TRANSFORM = 3;
+
   int type = 0;
   int xsize = 0;
   int ysize = 0;
@@ -15,11 +21,11 @@ class VP8LTransform {
     final int width = xsize;
 
     switch (type) {
-      case WebP.SUBTRACT_GREEN:
+      case SUBTRACT_GREEN:
         addGreenToBlueAndRed(outData, rowsOut,
                              rowsOut + (rowEnd - rowStart) * width);
         break;
-      case WebP.PREDICTOR_TRANSFORM:
+      case PREDICTOR_TRANSFORM:
         predictorInverseTransform(rowStart, rowEnd, outData, rowsOut);
         if (rowEnd != ysize) {
           // The last predicted row in this iteration will be the top-pred row
@@ -30,10 +36,10 @@ class VP8LTransform {
           outData.setRange(start, end, inData, offset);
         }
         break;
-      case WebP.CROSS_COLOR_TRANSFORM:
+      case CROSS_COLOR_TRANSFORM:
         colorSpaceInverseTransform(rowStart, rowEnd, outData, rowsOut);
         break;
-      case WebP.COLOR_INDEXING_TRANSFORM:
+      case COLOR_INDEXING_TRANSFORM:
         if (rowsIn == rowsOut && bits > 0) {
           // Move packed pixels to the end of unpacked region, so that unpacking
           // can occur seamlessly.
@@ -316,7 +322,7 @@ class VP8LTransform {
   // Predictors
 
   static int _predictor0(Data.Uint32List pixels, int left, int top) {
-    return WebP.ARGB_BLACK;
+    return VP8L.ARGB_BLACK;
   }
 
   static int _predictor1(Data.Uint32List pixels, int left, int top) {
@@ -442,3 +448,26 @@ class _VP8LMultipliers {
     return _int32ToUint32(_uint8ToInt8(colorPred) * _uint8ToInt8(color)) >> 5;
   }
 }
+
+/**
+ * Binary conversion of a uint8 to an int8.  This is equivalent in C to
+ * typecasting an unsigned char to a char.
+ */
+int _uint8ToInt8(int d) {
+  d &= 0xff; // clamp to 8-bit
+  return (d < 128) ? d : -(256 - d);
+}
+
+/**
+ * Binary conversion of an int32 to a uint32. This is equivalent in C to
+ * typecasting an int to an unsigned int.
+ */
+int _int32ToUint32(int d) {
+  _int32ToUint32_int32[0] = d;
+  return _int32ToUint32_uint32[0];
+}
+
+final Data.Int32List _int32ToUint32_int32 = new Data.Int32List(1);
+
+final Data.Uint32List _int32ToUint32_uint32 =
+    new Data.Uint32List.view(_int32ToUint32_int32.buffer);

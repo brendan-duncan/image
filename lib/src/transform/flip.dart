@@ -1,14 +1,15 @@
 part of image;
 
-const int FLIP_HORIZONTAL = 0;
-const int FLIP_VERTICAL = 1;
-const int FLIP_BOTH = 2;
+const int FLIP_HORIZONTAL = 1;
+const int FLIP_VERTICAL = 2;
+const int FLIP_BOTH = 3;
 
 /**
- * Flips the [src] image using the given [mode].
+ * Flips the [src] image using the given [mode], which can be one of:
+ * [FLIP_HORIZONTAL], [FLIP_VERTICAL], or [FLIP_BOTH].
  */
 Image flip(Image src, int mode) {
-  if (mode < 0 || mode > 2) {
+  if (mode < 1 || mode > 3) {
     return src;
   }
 

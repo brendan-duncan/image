@@ -251,10 +251,10 @@ class _HuffmanTree {
     int symbol;
     int codeLen;
     Data.Int32List codeLengthHist =
-        new Data.Int32List(WebP.MAX_ALLOWED_CODE_LENGTH + 1);
+        new Data.Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
     int currCode;
     Data.Int32List nextCodes =
-        new Data.Int32List(WebP.MAX_ALLOWED_CODE_LENGTH + 1);
+        new Data.Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
     int maxCodeLength = 0;
 
     // Calculate max code length.
@@ -264,7 +264,7 @@ class _HuffmanTree {
       }
     }
 
-    if (maxCodeLength > WebP.MAX_ALLOWED_CODE_LENGTH) {
+    if (maxCodeLength > VP8L.MAX_ALLOWED_CODE_LENGTH) {
       return false;
     }
 
@@ -312,7 +312,7 @@ class _HuffmanTree {
  */
 class _HTreeGroup {
   final List<_HuffmanTree> htrees =
-      new List<_HuffmanTree>(WebP.HUFFMAN_CODES_PER_META_CODE);
+      new List<_HuffmanTree>(VP8L.HUFFMAN_CODES_PER_META_CODE);
 
   _HTreeGroup() {
     for (int i = 0, len = htrees.length; i < len; ++i) {
