@@ -21,6 +21,26 @@ Image decodeNamedImage(List<int> bytes, String name) {
   return null;
 }
 
+/**
+ * Identify the format of the image and encode it with the appropriate
+ * encoder.
+ */
+List<int> encodeNamedImage(Image image, String name) {
+  String n = name.toLowerCase();
+  if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
+    return encodeJpg(image);
+  }
+  if (n.endsWith('.png')) {
+    return encodePng(image);
+  }
+  if (n.endsWith('.tga')) {
+    return encodeTga(image);
+  }
+  /*if (n.endsWith('.webp')) {
+    return encodeWebP(image);
+  }*/
+  return null;
+}
 
 /**
  * Decode a JPG formatted image.
