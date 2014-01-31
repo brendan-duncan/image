@@ -1,5 +1,26 @@
 part of image;
 
+/**
+ * Identify the format of the image and decode it with the appropriate
+ * decoder.
+ */
+Image decodeNamedImage(List<int> bytes, String name) {
+  String n = name.toLowerCase();
+  if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
+    return decodeJpg(bytes);
+  }
+  if (n.endsWith('.png')) {
+    return decodePng(bytes);
+  }
+  if (n.endsWith('.tga')) {
+    return decodeTga(bytes);
+  }
+  if (n.endsWith('.webp')) {
+    return decodeWebP(bytes);
+  }
+  return null;
+}
+
 
 /**
  * Decode a JPG formatted image.
