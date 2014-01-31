@@ -54,8 +54,7 @@ class Image {
     this.height = height,
     // Create a uint32 view of the byte buffer.
     // This assumes the system architecture is little-endian...
-    _data = new Data.Uint32List.view(new Data.Uint8List.fromList(bytes).buffer) {
-  }
+    _data = new Data.Uint32List.view(new Data.Uint8List.fromList(bytes).buffer);
 
   /**
    * Clone this image.
@@ -74,28 +73,27 @@ class Image {
   List<int> getBytes() =>
     new Data.Uint8List.view(_data.buffer);
 
+  /**
+   * Get the format of the image, either [RGB] or [RGBA].
+   */
   int get format => _format;
 
   /**
-   * Change the format of the image.
+   * Set the format of the image, either [RGB] or [RGBA].
    */
   void set format(int f) {
     if (f == _format) {
       return;
     }
-    _format = f;
-    if (_format == RGBA) {
-      int len = _data.length;
-      // If we convert from RGB to RGBA, make sure the alpha
-      // channel is set.
-      for (int i = 0; i < len; ++i) {
-        _data[i] |= 0xff;
-      }
+    if (f != RGB && f != RGBA) {
+      throw new ImageException('Invalid image format: $f');
     }
+    _format = f;
   }
 
   /**
-   * How many color channels does the image have?
+   * How many color channels does the image have, 3 or 4?
+   * Note that internally, images always have 4 8-bit channels.
    */
   int get numChannels => _format;
 
