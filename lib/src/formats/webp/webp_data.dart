@@ -21,16 +21,23 @@ class WebPData {
   bool hasAnimation = false;
   /// 0 = undefined (/mixed), 1 = lossy, 2 = lossless, 3 = animated
   int format = FORMAT_UNDEFINED;
+  /// ICCP data string.
   String iccp = '';
+  /// EXIF data string.
   String exif = '';
+  /// XMP data string.
   String xmp = '';
+  /// The color to use for the animation background.
   int animBackgroundColor = 0;
+  /// How many times the animation should loop.
   int animLoopCount = 0;
+  /// Information about each animation frame.
+  List<WebPFrame> frames = [];
+
+  int get numFrames => frames.length;
 
   Arc.InputStream _alphaData;
   int _alphaSize;
   int _vp8Position;
   int _vp8Size;
-  List<int> _animPositions = [];
-  List<int> _animSizes = [];
 }

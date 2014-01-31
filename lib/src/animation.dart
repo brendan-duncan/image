@@ -6,16 +6,19 @@ class Animation {
   int backgroundColor = 0xffffffff;
   List<AnimationFrame> frames = [];
 
-  void addFrame(Image image, [int disposalMethod = AnimationFrame.RETAIN]) {
-    frames.add(new AnimationFrame(image, disposalMethod));
+  int get numFrames => frames.length;
+
+  AnimationFrame operator[](int index) => frames[index];
+
+  void addFrame(Image image, [int duration = 80]) {
+    frames.add(new AnimationFrame(image, duration));
   }
 }
 
 class AnimationFrame {
-  static const int RETAIN = 0;
-  static const int CLEAR = 1;
   Image image;
-  int disposalMethod = RETAIN;
+  // duration of the frame, in milliseconds.
+  int duration;
 
-  AnimationFrame(this.image, this.disposalMethod);
+  AnimationFrame(this.image, this.duration);
 }
