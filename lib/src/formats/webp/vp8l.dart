@@ -165,6 +165,8 @@ class VP8L {
       _colorCacheSize = 0;
     }
 
+    webp.width = transformXsize;
+    webp.height = transformYsize;
     final int numBits = _huffmanSubsampleBits;
     _huffmanXsize = _subSampleSize(transformXsize, numBits);
     _huffmanMask = (numBits == 0) ? ~0 : (1 << numBits) - 1;
@@ -377,7 +379,7 @@ class VP8L {
     _lastRow = row;
   }
 
-  bool _decodeAlphaData(int data, int width, int height, int lastRow) {
+  bool _decodeAlphaData(int width, int height, int lastRow) {
     int row = _lastPixel ~/ width;
     int col = _lastPixel % width;
 
@@ -397,9 +399,8 @@ class VP8L {
       br.fillBitWindow();
 
       int code = htreeGroup.htrees[_GREEN].readSymbol(br);
-
       if (code < NUM_LITERAL_CODES) {  // Literal
-        _pixels8[data + pos] = code;
+        _pixels8[pos] = code;
         ++pos;
         ++col;
         if (col >= width) {
@@ -421,7 +422,7 @@ class VP8L {
 
         if (pos >= dist && end - pos >= length) {
           for (int i = 0; i < length; ++i) {
-            _pixels8[data + pos + i] = _pixels8[data + pos + i - dist];
+            _pixels8[pos + i] = _pixels8[pos + i - dist];
           }
         } else {
           _lastPixel = pos;
@@ -455,11 +456,9 @@ class VP8L {
     return true;
   }
 
-  int __count = 0;
-
   void _extractPalettedAlphaRows(int row) {
     final int numRows = row - _lastRow;
-    final pIn = webp.width * _lastRow;
+    MemPtr pIn = new MemPtr(_pixels8, webp.width * _lastRow);
     if (numRows > 0) {
       _applyInverseTransformsAlpha(numRows, pIn);
     }
@@ -469,15 +468,13 @@ class VP8L {
   /**
    * Special method for paletted alpha data.
    */
-  void _applyInverseTransformsAlpha(int numRows, int rows) {
+  void _applyInverseTransformsAlpha(int numRows, MemPtr rows) {
     final int startRow = _lastRow;
     final int endRow = startRow + numRows;
-    int rowsIn = rows;
-    int rowsOut = webp.width * startRow; // (uint8_t*)_opaque +*/
+    MemPtr rowsOut = new MemPtr(_opaque, _ioWidth * startRow);
     VP8LTransform transform = _transforms[0];
 
-    transform.colorIndexInverseTransformAlpha(startRow, endRow,
-        _pixels8, rowsIn, _opaque, rowsOut);
+    transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);
   }
 
   /**
@@ -837,6 +834,9 @@ class VP8L {
   int _argbCache;
 
   Data.Uint8List _opaque;
+
+  int _ioWidth;
+  int _ioHeight;
 
   static const int ARGB_BLACK = 0xff000000;
   static const int MAX_CACHE_BITS = 11;

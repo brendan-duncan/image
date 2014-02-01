@@ -64,8 +64,7 @@ class VP8LTransform {
   }
 
   void colorIndexInverseTransformAlpha(int yStart, int yEnd,
-                                       Data.Uint8List inData, int src,
-                                       Data.Uint8List outData, int dst) {
+                                       MemPtr src, MemPtr dst) {
     final int bitsPerPixel = 8 >> bits;
     final int width = xsize;
     Data.Uint32List colorMap = this.data;
@@ -81,17 +80,22 @@ class VP8LTransform {
           // is a power of 2, so can just use a mask for that, instead of
           // decrementing a counter.
           if ((x & countMask) == 0) {
-            packed_pixels = _getAlphaIndex(inData[src++]);
+            packed_pixels = _getAlphaIndex(src[0]);
+            src.offset++;
           }
-          outData[dst++] = _getAlphaValue(colorMap[packed_pixels & bit_mask]);
+          int p = _getAlphaValue(colorMap[packed_pixels & bit_mask]);;
+          dst[0] = p;
+          dst.offset++;
           packed_pixels >>= bitsPerPixel;
         }
       }
     } else {
       for (int y = yStart; y < yEnd; ++y) {
         for (int x = 0; x < width; ++x) {
-          int index = _getAlphaIndex(inData[src++]);
-          outData[dst++] = _getAlphaValue(colorMap[index]);
+          int index = _getAlphaIndex(src[0]);
+          src.offset++;
+          dst[0] = _getAlphaValue(colorMap[index]);
+          dst.offset++;
         }
       }
     }

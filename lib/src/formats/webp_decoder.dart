@@ -255,6 +255,14 @@ class WebPDecoder {
       }
     }
 
+    /**
+     * The alpha flag might not have been set, but it does in fact have alpha
+     * if there is an ALPH chunk.
+     */
+    if (!webp.hasAlpha) {
+      webp.hasAlpha = webp._alphaData != null;
+    }
+
     return webp.format != 0;
   }
 

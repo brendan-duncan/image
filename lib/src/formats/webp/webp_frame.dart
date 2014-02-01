@@ -21,8 +21,8 @@ class WebPFrame {
   bool clearFrame;
 
   WebPFrame(Arc.InputStream input, int size) {
-    x = input.readUint24();
-    y = input.readUint24();
+    x = input.readUint24() * 2;
+    y = input.readUint24() * 2;
     width = input.readUint24() + 1;
     height = input.readUint24() + 1;
     duration = input.readUint24();

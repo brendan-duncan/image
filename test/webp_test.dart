@@ -34,14 +34,23 @@ void defineWebPTests() {
     }
   });
 
-  /*Io.File file = new Io.File(path + '/BladeRunner.webp');
-  List<int> bytes = file.readAsBytesSync();
+  /*List<int> bytes = new Io.File(path + '/GenevaDrive.webp')
+                          .readAsBytesSync();
+
+  WebPDecoder dec = new WebPDecoder();
+  WebPInfo info = dec.getInfo(bytes);
+
+  for (int i = 0; i < info.numFrames; ++i) {
+    Image frame = dec.decodeFrame(i);
+      new Io.File('out/webp/anim_$i.png')
+            ..writeAsBytesSync(encodePng(frame));
+  }
+
   Animation anim = new WebPDecoder().decodeAnimation(bytes);
   for (int i = 0; i < anim.numFrames; ++i) {
     AnimationFrame frame = anim[i];
     List<int> png = new PngEncoder().encode(frame.image);
-    new Io.File('out/webp/anim_$i.png')
-          ..createSync(recursive: true)
+    new Io.File('out/webp/comp_$i.png')
           ..writeAsBytesSync(png);
   }*/
 

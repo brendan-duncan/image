@@ -342,7 +342,7 @@ class VP8 {
   }
 
   bool _initFrame() {
-    if (webp.hasAlpha) {
+    if (webp._alphaData != null) {
       _alphaData = webp._alphaData;
     }
 
@@ -1045,7 +1045,6 @@ class VP8 {
     // Return a pointer to the current decoded row.
     return new MemPtr(_alphaPlane, row * width);
   }
-
 
   bool _decodeMB(VP8BitReader tokenBr) {
     VP8MB left = _mbInfo[0];

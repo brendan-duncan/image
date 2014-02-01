@@ -95,8 +95,8 @@ class WebPAlpha {
     _vp8l._opaque = output;
     // Decode (with special row processing).
     return _use8bDecode ?
-        _vp8l._decodeAlphaData(0, width, height, lastRow) :
-        _vp8l._decodeImageData(_vp8l._pixels, width, height,
+        _vp8l._decodeAlphaData(_vp8l.webp.width, _vp8l.webp.height, lastRow) :
+        _vp8l._decodeImageData(_vp8l._pixels, _vp8l.webp.width, _vp8l.webp.height,
                                lastRow, _vp8l._extractAlphaRows);
   }
 
@@ -106,6 +106,8 @@ class WebPAlpha {
     webp.height = height;
 
     _vp8l = new VP8L(input, webp);
+    _vp8l._ioWidth = width;
+    _vp8l._ioHeight = height;
 
     _vp8l._decodeImageStream(webp.width, webp.height, true);
 
