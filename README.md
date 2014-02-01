@@ -7,7 +7,9 @@
 A Dart library to encode and decode various image formats.
 
 The library has no reliance on `dart:io`, so it can be used for both server and
-web applications. The image library currently supports the following 
+web applications. 
+
+The image library currently supports decoding and encoding the following 
 formats:
 
 - PNG
@@ -15,7 +17,7 @@ formats:
 - TGA
 
 Decoding Only (for now):
-- WebP
+- WebP (including animation)
 
 ##[Documentation](https://github.com/brendan-duncan/image/wiki)
 
