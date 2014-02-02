@@ -6,6 +6,6 @@ homepage: https://github.com/brendan-duncan/image
 documentation: https://github.com/brendan-duncan/image/wiki
 dependencies:
   archive: '>=1.0.10'
-  xml: any
+  xml: '>=0.9.5'
 dev_dependencies:
   unittest: any
