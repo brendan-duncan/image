@@ -288,17 +288,20 @@ class WebPDecoder extends Decoder {
   }
 
   bool _getVp8xInfo(Arc.InputStream input, WebPInfo webp) {
-    if (input.readBits(2) != 0) {
+    int b = input.readByte();
+    if ((b & 0xc0) != 0) {
       return false;
     }
-    int icc = input.readBits(1);
-    int alpha = input.readBits(1);
-    int exif = input.readBits(1);
-    int xmp = input.readBits(1);
-    int a = input.readBits(1);
-    if (input.readBits(1) != 0) {
+    int icc = (b >> 5) & 0x1;
+    int alpha = (b >> 4) & 0x1;
+    int exif = (b >> 3) & 0x1;
+    int xmp = (b >> 2) & 0x1;
+    int a = (b >> 1) & 0x1;
+
+    if (b & 0x1 != 0) {
       return false;
     }
+
     if (input.readUint24() != 0) {
       return false;
     }

@@ -370,7 +370,7 @@ class VP8L {
     final int cachePixs = width * numRows;
 
     final int di = width * _lastRow;
-    MemPtr src = new MemPtr(_pixels, _argbCache);
+    Arc.MemPtr src = new Arc.MemPtr(_pixels, _argbCache);
 
     for (int i = 0; i < cachePixs; ++i) {
       _opaque[di + i] = (src[i] >> 8) & 0xff;
@@ -458,7 +458,7 @@ class VP8L {
 
   void _extractPalettedAlphaRows(int row) {
     final int numRows = row - _lastRow;
-    MemPtr pIn = new MemPtr(_pixels8, webp.width * _lastRow);
+    Arc.MemPtr pIn = new Arc.MemPtr(_pixels8, webp.width * _lastRow);
     if (numRows > 0) {
       _applyInverseTransformsAlpha(numRows, pIn);
     }
@@ -468,10 +468,10 @@ class VP8L {
   /**
    * Special method for paletted alpha data.
    */
-  void _applyInverseTransformsAlpha(int numRows, MemPtr rows) {
+  void _applyInverseTransformsAlpha(int numRows, Arc.MemPtr rows) {
     final int startRow = _lastRow;
     final int endRow = startRow + numRows;
-    MemPtr rowsOut = new MemPtr(_opaque, _ioWidth * startRow);
+    Arc.MemPtr rowsOut = new Arc.MemPtr(_opaque, _ioWidth * startRow);
     VP8LTransform transform = _transforms[0];
 
     transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);

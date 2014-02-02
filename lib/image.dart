@@ -85,7 +85,6 @@ part 'src/transform/trim.dart';
 
 part 'src/util/clip_line.dart';
 part 'src/util/interpolation.dart';
-part 'src/util/mem_ptr.dart';
 part 'src/util/min_max.dart';
 part 'src/util/random.dart';
 

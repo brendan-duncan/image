@@ -1,14 +1,27 @@
 part of image;
 
 class VP8LBitReader {
+  //Arc.InputStream _input;
+  //Data.Uint32List _buffer = new Data.Uint32List(2);
+  int _bitPos = 0;
   Arc.InputStream input;
   int buffer = 0; // pre-fetched bits
   int bitPos = 0; // current bit-reading position in val_
 
   VP8LBitReader(this.input) {
-    for (int i = 0; i < VALUE_SIZE; ++i) {
-      buffer |= input.readByte() << (8 * i);
-    }
+    //_input = new Arc.InputStream(input.buffer, byteOrder: input.byteOrder);
+    //_input.position = input.position;
+
+    // TODO javascript is not producint the correct value for here.
+    // Can this be rewritten to a 32-bit buffer?
+    buffer += input.readByte() << (8 * 0);
+    buffer += input.readByte() << (8 * 1);
+    buffer += input.readByte() << (8 * 2);
+    buffer += input.readByte() << (8 * 3);
+    buffer += input.readByte() << (8 * 4);
+    buffer += input.readByte() << (8 * 5);
+    buffer += input.readByte() << (8 * 6);
+    buffer += input.readByte() << (8 * 7);
   }
 
   /**
@@ -33,29 +46,20 @@ class VP8LBitReader {
    */
   void fillBitWindow() {
     if (bitPos >= WBITS) {
-      /*#if (defined(__x86_64__) || defined(_M_X64))
-        buffer >>= WBITS;
-        bitPos -= WBITS;
-        // The expression below needs a little-endian arch to work correctly.
-        // This gives a large speedup for decoding speed.
-        buffer |= *(const vp8l_val_t*)(br->buf_ + br->pos_) << (LBITS - WBITS);
-        br->pos_ += LOG8_WBITS;
-        return;
-      #endif*/
-      _shiftBytes(); // Slow path.
+      _shiftBytes();
     }
   }
 
   /**
    * Reads the specified number of bits from Read Buffer.
    */
-  int readBits(int n_bits) {
+  int readBits(int numBits) {
     // Flag an error if end_of_stream or n_bits is more than allowed limit.
-    if (!isEOS && n_bits < MAX_NUM_BIT_READ) {
-      final int val = (buffer >> bitPos) & BIT_MASK[n_bits];
-      bitPos += n_bits;
+    if (!isEOS && numBits < MAX_NUM_BIT_READ) {
+      final int value = (buffer >> bitPos) & BIT_MASK[numBits];
+      bitPos += numBits;
       _shiftBytes();
-      return val;
+      return value;
     } else {
       throw new ImageException('Not enough data in input.');
     }

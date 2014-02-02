@@ -64,7 +64,7 @@ class VP8LTransform {
   }
 
   void colorIndexInverseTransformAlpha(int yStart, int yEnd,
-                                       MemPtr src, MemPtr dst) {
+                                           Arc.MemPtr src, Arc.MemPtr dst) {
     final int bitsPerPixel = 8 >> bits;
     final int width = xsize;
     Data.Uint32List colorMap = this.data;

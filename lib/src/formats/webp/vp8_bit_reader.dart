@@ -74,7 +74,7 @@ class VP8BitReader {
 
   void _loadNewBytes() {
     // Read 'BITS' bits at a time if possible.
-    if (input.remainder >= 1) {
+    if (input.length >= 1) {
       // convert memory type to register type (with some zero'ing!)
       int bits = input.readByte();
       _value = bits | (_value << BITS);

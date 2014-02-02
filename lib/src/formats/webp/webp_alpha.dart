@@ -21,7 +21,7 @@ class WebPAlpha {
     if (isValid) {
       if (method == ALPHA_NO_COMPRESSION) {
         final int alphaDecodedSize = width * height;
-        if (input.remainder < alphaDecodedSize) {
+        if (input.length < alphaDecodedSize) {
           rsrv = 1;
         }
       } else if (method == ALPHA_LOSSLESS_COMPRESSION) {

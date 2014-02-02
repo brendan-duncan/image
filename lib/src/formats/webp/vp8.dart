@@ -182,7 +182,7 @@ class VP8 {
    */
   bool _parsePartitions(Arc.InputStream input) {
     int sz = 0;
-    int bufEnd = input.remainder;
+    int bufEnd = input.length;
 
     _numPartitions = 1 << br.getValue(2);
     int lastPart = _numPartitions - 1;
@@ -367,20 +367,20 @@ class VP8 {
     final int extra_y = extra_rows * _cacheYStride;
     final int extra_uv = (extra_rows ~/ 2) * _cacheUVStride;
 
-    _cacheY = new MemPtr(new Data.Uint8List(16 * _cacheYStride + extra_y),
+    _cacheY = new Arc.MemPtr(new Data.Uint8List(16 * _cacheYStride + extra_y),
                           extra_y);
 
-    _cacheU = new MemPtr(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
+    _cacheU = new Arc.MemPtr(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
                           extra_uv);
 
-    _cacheV = new MemPtr(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
+    _cacheV = new Arc.MemPtr(new Data.Uint8List(8 * _cacheUVStride + extra_uv),
                           extra_uv);
 
-    _tmpY = new MemPtr(new Data.Uint8List(webp.width));
+    _tmpY = new Arc.MemPtr(new Data.Uint8List(webp.width));
 
     final int uvWidth = (webp.width + 1) >> 1;
-    _tmpU = new MemPtr(new Data.Uint8List(uvWidth));
-    _tmpV = new MemPtr(new Data.Uint8List(uvWidth));
+    _tmpU = new Arc.MemPtr(new Data.Uint8List(uvWidth));
+    _tmpV = new Arc.MemPtr(new Data.Uint8List(uvWidth));
 
     // Define the area where we can skip in-loop filtering, in case of cropping.
     //
@@ -474,9 +474,9 @@ class VP8 {
 
   void _reconstructRow() {
     int mb_y = _mbY;
-    MemPtr y_dst = new MemPtr(_yuvBlock, Y_OFF);
-    MemPtr u_dst = new MemPtr(_yuvBlock, U_OFF);
-    MemPtr v_dst = new MemPtr(_yuvBlock, V_OFF);
+    Arc.MemPtr y_dst = new Arc.MemPtr(_yuvBlock, Y_OFF);
+    Arc.MemPtr u_dst = new Arc.MemPtr(_yuvBlock, U_OFF);
+    Arc.MemPtr v_dst = new Arc.MemPtr(_yuvBlock, V_OFF);
 
     for (int mb_x = 0; mb_x < _mbWidth; ++mb_x) {
       VP8MBData block = _mbData[mb_x];
@@ -527,7 +527,7 @@ class VP8 {
 
       // predict and add residuals
       if (block.isIntra4x4) {   // 4x4
-        MemPtr topRight = new MemPtr(y_dst, -BPS + 16);
+        Arc.MemPtr topRight = new Arc.MemPtr(y_dst, -BPS + 16);
         Data.Uint32List topRight32 = topRight.toUint32List();
 
         if (mb_y > 0) {
@@ -546,11 +546,11 @@ class VP8 {
 
         // predict and add residuals for all 4x4 blocks in turn.
         for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
-          MemPtr dst = new MemPtr(y_dst, kScan[n]);
+          Arc.MemPtr dst = new Arc.MemPtr(y_dst, kScan[n]);
 
           VP8Filter.PredLuma4[block.imodes[n]](dst);
 
-          _doTransform(bits, new MemPtr(coeffs, n * 16), dst);
+          _doTransform(bits, new Arc.MemPtr(coeffs, n * 16), dst);
         }
       } else { // 16x16
         int predFunc = _checkMode(mb_x, mb_y, block.imodes[0]);
@@ -558,9 +558,9 @@ class VP8 {
         VP8Filter.PredLuma16[predFunc](y_dst);
         if (bits != 0) {
           for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
-            MemPtr dst = new MemPtr(y_dst, kScan[n]);
+            Arc.MemPtr dst = new Arc.MemPtr(y_dst, kScan[n]);
 
-            _doTransform(bits, new MemPtr(coeffs, n * 16), dst);
+            _doTransform(bits, new Arc.MemPtr(coeffs, n * 16), dst);
           }
         }
       }
@@ -571,10 +571,10 @@ class VP8 {
       VP8Filter.PredChroma8[pred_func](u_dst);
       VP8Filter.PredChroma8[pred_func](v_dst);
 
-      MemPtr c1 = new MemPtr(coeffs, 16 * 16);
+      Arc.MemPtr c1 = new Arc.MemPtr(coeffs, 16 * 16);
       _doUVTransform(bits_uv, c1, u_dst);
 
-      MemPtr c2 = new MemPtr(coeffs, 20 * 16);
+      Arc.MemPtr c2 = new Arc.MemPtr(coeffs, 20 * 16);
       _doUVTransform(bits_uv >> 8, c2, v_dst);
 
       // stash away top samples for next block
@@ -621,7 +621,7 @@ class VP8 {
     return mode;
   }
 
-  void _doTransform(int bits, MemPtr src, MemPtr dst) {
+  void _doTransform(int bits, Arc.MemPtr src, Arc.MemPtr dst) {
     switch (bits >> 30) {
       case 3:
         _dsp.transform(src, dst, false);
@@ -637,7 +637,7 @@ class VP8 {
     }
   }
 
-  void _doUVTransform(int bits, MemPtr src, MemPtr dst) {
+  void _doUVTransform(int bits, Arc.MemPtr src, Arc.MemPtr dst) {
     if (bits & 0xff != 0) { // any non-zero coeff at all?
       if (bits & 0xaa != 0) { // any non-zero AC coefficient?
         // note we don't use the AC3 variant for U/V
@@ -663,7 +663,7 @@ class VP8 {
   void _doFilter(int mbX, int mbY) {
     final int yBps = _cacheYStride;
     VP8FInfo fInfo = _fInfo[mbX];
-    MemPtr yDst = new MemPtr(_cacheY, mbX * 16);
+    Arc.MemPtr yDst = new Arc.MemPtr(_cacheY, mbX * 16);
     final int ilevel = fInfo.fInnerLevel;
     final int limit = fInfo.fLimit;
     if (limit == 0) {
@@ -685,8 +685,8 @@ class VP8 {
       }
     } else {    // complex
       final int uvBps = _cacheUVStride;
-      MemPtr uDst = new MemPtr(_cacheU, mbX * 8);
-      MemPtr vDst = new MemPtr(_cacheV, mbX * 8);
+      Arc.MemPtr uDst = new Arc.MemPtr(_cacheU, mbX * 8);
+      Arc.MemPtr vDst = new Arc.MemPtr(_cacheV, mbX * 8);
 
       final int hevThresh = fInfo.hevThresh;
       if (mbX > 0) {
@@ -739,9 +739,9 @@ class VP8 {
     final int uvSize = (extraYRows ~/ 2) * _cacheUVStride;
     final int yOffset = 0;
     final int uvOffset = 0;
-    MemPtr yDst = new MemPtr(_cacheY, -ySize + yOffset);
-    MemPtr uDst = new MemPtr(_cacheU, -uvSize + uvOffset);
-    MemPtr vDst = new MemPtr(_cacheV, -uvSize + uvOffset);
+    Arc.MemPtr yDst = new Arc.MemPtr(_cacheY, -ySize + yOffset);
+    Arc.MemPtr uDst = new Arc.MemPtr(_cacheU, -uvSize + uvOffset);
+    Arc.MemPtr vDst = new Arc.MemPtr(_cacheV, -uvSize + uvOffset);
     final int mbY = _mbY;
     final bool isFirstRow = (mbY == 0);
     final bool isLastRow = (mbY >= _brMbY - 1);
@@ -759,13 +759,13 @@ class VP8 {
 
     if (!isFirstRow) {
       yStart -= extraYRows;
-      _y = new MemPtr(yDst);
-      _u = new MemPtr(uDst);
-      _v = new MemPtr(vDst);
+      _y = new Arc.MemPtr(yDst);
+      _u = new Arc.MemPtr(uDst);
+      _v = new Arc.MemPtr(vDst);
     } else {
-      _y = new MemPtr(_cacheY, yOffset);
-      _u = new MemPtr(_cacheU, uvOffset);
-      _v = new MemPtr(_cacheV, uvOffset);
+      _y = new Arc.MemPtr(_cacheY, yOffset);
+      _u = new Arc.MemPtr(_cacheU, uvOffset);
+      _v = new Arc.MemPtr(_cacheV, uvOffset);
     }
 
     if (!isLastRow) {
@@ -847,21 +847,21 @@ class VP8 {
     return _clip8(kYScale * y + kUToB * u + kBCst);
   }
 
-  void _yuvToRgb(int y, int u, int v, MemPtr rgb) {
+  void _yuvToRgb(int y, int u, int v, Arc.MemPtr rgb) {
     rgb[0] = _yuvToR(y, v);
     rgb[1] = _yuvToG(y, u, v);
     rgb[2] = _yuvToB(y, u);
   }
 
-  void _yuvToRgba(int y, int u, int v, MemPtr rgba) {
+  void _yuvToRgba(int y, int u, int v, Arc.MemPtr rgba) {
     _yuvToRgb(y, u, v, rgba);
     rgba[3] = 0xff;
   }
 
-  void _upsample(MemPtr topY, MemPtr bottomY,
-                 MemPtr topU, MemPtr topV,
-                 MemPtr curU, MemPtr curV,
-                 MemPtr topDst, MemPtr bottomDst,
+  void _upsample(Arc.MemPtr topY, Arc.MemPtr bottomY,
+                 Arc.MemPtr topU, Arc.MemPtr topV,
+                 Arc.MemPtr curU, Arc.MemPtr curV,
+                 Arc.MemPtr topDst, Arc.MemPtr bottomDst,
                  int len) {
     int LOAD_UV(int u, int v) => ((u) | ((v) << 16));
 
@@ -889,20 +889,20 @@ class VP8 {
       int uv1 = (diag_03 + t_uv) >> 1;
 
       _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
-          new MemPtr(topDst, (2 * x - 1) * 4));
+          new Arc.MemPtr(topDst, (2 * x - 1) * 4));
 
       _yuvToRgba(topY[2 * x - 0], uv1 & 0xff, (uv1 >> 16),
-              new MemPtr(topDst, (2 * x - 0) * 4));
+              new Arc.MemPtr(topDst, (2 * x - 0) * 4));
 
       if (bottomY != null) {
         uv0 = (diag_03 + l_uv) >> 1;
         uv1 = (diag_12 + uv) >> 1;
 
         _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
-            new MemPtr(bottomDst, (2 * x - 1) * 4));
+            new Arc.MemPtr(bottomDst, (2 * x - 1) * 4));
 
         _yuvToRgba(bottomY[2 * x], uv1 & 0xff, (uv1 >> 16),
-                new MemPtr(bottomDst, (2 * x + 0) * 4));
+                new Arc.MemPtr(bottomDst, (2 * x + 0) * 4));
       }
 
       tl_uv = t_uv;
@@ -912,12 +912,12 @@ class VP8 {
     if ((len & 1) == 0) {
       final int uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
       _yuvToRgba(topY[len - 1], uv0 & 0xff, (uv0 >> 16),
-           new MemPtr(topDst, (len - 1) * 4));
+           new Arc.MemPtr(topDst, (len - 1) * 4));
 
       if (bottomY != null) {
         final int uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
         _yuvToRgba(bottomY[len - 1], uv0 & 0xff, (uv0 >> 16),
-             new MemPtr(bottomDst, (len - 1) * 4));
+             new Arc.MemPtr(bottomDst, (len - 1) * 4));
       }
     }
   }
@@ -928,7 +928,7 @@ class VP8 {
     }
 
     final int stride = webp.width * 4;
-    MemPtr alpha = new MemPtr(_a);
+    Arc.MemPtr alpha = new Arc.MemPtr(_a);
     int startY = mbY;
     int numRows = mbH;
 
@@ -945,7 +945,7 @@ class VP8 {
       alpha.offset -= webp.width;
     }
 
-    MemPtr dst = new MemPtr(output.getBytes(), startY * stride + 3);
+    Arc.MemPtr dst = new Arc.MemPtr(output.getBytes(), startY * stride + 3);
 
     if (_cropTop + mbY + mbH == _cropBottom) {
       // If it's the very last call, we process all the remaining rows!
@@ -966,16 +966,16 @@ class VP8 {
 
   int _emitFancyRGB(int mbY, int mbW, int mbH) {
     int numLinesOut = mbH;   // a priori guess
-    MemPtr dst = new MemPtr(output.getBytes(), mbY * webp.width * 4);
-    MemPtr curY = new MemPtr(_y);
-    MemPtr curU = new MemPtr(_u);
-    MemPtr curV = new MemPtr(_v);
+    Arc.MemPtr dst = new Arc.MemPtr(output.getBytes(), mbY * webp.width * 4);
+    Arc.MemPtr curY = new Arc.MemPtr(_y);
+    Arc.MemPtr curU = new Arc.MemPtr(_u);
+    Arc.MemPtr curV = new Arc.MemPtr(_v);
     int y = mbY;
     final int yEnd = mbY + mbH;
     final int uvW = (mbW + 1) >> 1;
     final int stride = webp.width * 4;
-    MemPtr topU = new MemPtr(_tmpU);
-    MemPtr topV = new MemPtr(_tmpV);
+    Arc.MemPtr topU = new Arc.MemPtr(_tmpU);
+    Arc.MemPtr topV = new Arc.MemPtr(_tmpV);
 
     if (y == 0) {
       // First line is special cased. We mirror the u/v samples at boundary.
@@ -983,7 +983,7 @@ class VP8 {
     } else {
       // We can finish the left-over line from previous call.
       _upsample(_tmpY, curY, topU, topV, curU, curV,
-                new MemPtr(dst, -stride), dst, mbW);
+                new Arc.MemPtr(dst, -stride), dst, mbW);
       ++numLinesOut;
     }
 
@@ -997,9 +997,9 @@ class VP8 {
       curV.offset += _cacheUVStride;
       dst.offset += 2 * stride;
       curY.offset += 2 * _cacheYStride;
-      _upsample(new MemPtr(curY, -_cacheYStride), curY,
+      _upsample(new Arc.MemPtr(curY, -_cacheYStride), curY,
           topU, topV, curU, curV,
-          new MemPtr(dst, -stride), dst, mbW);
+          new Arc.MemPtr(dst, -stride), dst, mbW);
     }
 
     // move to last row
@@ -1016,14 +1016,14 @@ class VP8 {
       // Process the very last row of even-sized picture
       if ((yEnd & 1) == 0) {
         _upsample(curY, null, curU, curV, curU, curV,
-            new MemPtr(dst, stride), null, mbW);
+            new Arc.MemPtr(dst, stride), null, mbW);
       }
     }
 
     return numLinesOut;
   }
 
-  MemPtr _decompressAlphaRows(int row, int numRows) {
+  Arc.MemPtr _decompressAlphaRows(int row, int numRows) {
     final int width = webp.width;
     final int height = webp.height;
 
@@ -1043,7 +1043,7 @@ class VP8 {
     }
 
     // Return a pointer to the current decoded row.
-    return new MemPtr(_alphaPlane, row * width);
+    return new Arc.MemPtr(_alphaPlane, row * width);
   }
 
   bool _decodeMB(VP8BitReader tokenBr) {
@@ -1090,7 +1090,7 @@ class VP8 {
     List<VP8BandProbas> acProba;
     VP8QuantMatrix q = _dqm[_segment];
     VP8MBData block = _mbData[_mbX];
-    MemPtr dst = new MemPtr(block.coeffs);
+    Arc.MemPtr dst = new Arc.MemPtr(block.coeffs);
     int di = 0;
     VP8MB leftMb = _mbInfo[0];
     int tnz;
@@ -1104,7 +1104,7 @@ class VP8 {
     dst.memset(0, dst.length, 0);
 
     if (!block.isIntra4x4) {    // parse DC
-      MemPtr dc = new MemPtr(new Data.Int16List(16));
+      Arc.MemPtr dc = new Arc.MemPtr(new Data.Int16List(16));
       final int ctx = mb.nzDc + leftMb.nzDc;
       final int nz = _getCoeffs(tokenBr, bands[1], ctx, q.y2Mat, 0, dc);
       mb.nzDc = leftMb.nzDc = (nz > 0) ? 1 : 0;
@@ -1185,7 +1185,7 @@ class VP8 {
     return (nonZeroY | nonZeroUV) == 0;
   }
 
-  void _transformWHT(MemPtr src, MemPtr out) {
+  void _transformWHT(Arc.MemPtr src, Arc.MemPtr out) {
     Data.Int32List tmp = new Data.Int32List(16);
 
     int oi = 0;
@@ -1272,7 +1272,7 @@ class VP8 {
    * Returns the position of the last non-zero coeff plus one
    */
   int _getCoeffs(VP8BitReader br, List<VP8BandProbas> prob,
-                 int ctx, List<int> dq, int n, MemPtr out) {
+                 int ctx, List<int> dq, int n, Arc.MemPtr out) {
     // n is either 0 or 1 here. kBands[n] is not necessary for extracting '*p'.
     List<int> p = prob[n].probas[ctx];
     for (; n < 16; ++n) {
@@ -1422,20 +1422,20 @@ class VP8 {
   Data.Uint8List _yuvBlock;
 
   /// macroblock row for storing unfiltered samples
-  MemPtr _cacheY;
-  MemPtr _cacheU;
-  MemPtr _cacheV;
+  Arc.MemPtr _cacheY;
+  Arc.MemPtr _cacheU;
+  Arc.MemPtr _cacheV;
   int _cacheYStride;
   int _cacheUVStride;
 
-  MemPtr _tmpY;
-  MemPtr _tmpU;
-  MemPtr _tmpV;
+  Arc.MemPtr _tmpY;
+  Arc.MemPtr _tmpU;
+  Arc.MemPtr _tmpV;
 
-  MemPtr _y;
-  MemPtr _u;
-  MemPtr _v;
-  MemPtr _a;
+  Arc.MemPtr _y;
+  Arc.MemPtr _u;
+  Arc.MemPtr _v;
+  Arc.MemPtr _a;
 
   /// main memory chunk for the above data. Persistent.
   Data.Uint8List _mem;

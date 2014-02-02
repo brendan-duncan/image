@@ -298,13 +298,6 @@ class _HuffmanTree {
 
     return true;
   }
-
-  /**
-   * Return the prefetched bits, so they can be looked up.
-   */
-  int _prefetchBits(Arc.InputStream input) {
-    return (input.bitBuffer >> input.bitBufferLen);
-  }
 }
 
 /**

@@ -16,8 +16,8 @@ void main() {
   defineTgaTests();
   defineJpegTests();
   definePngTests();
-  defineWebPTests();
   defineFontTests();
+  defineWebPTests();
   defineImageTests();
 }
 
