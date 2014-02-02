@@ -24,8 +24,8 @@ void main() {
 
 void defineImageTests() {
   group('image', () {
-    Image image = readPng(new Io.File('res/trees.png').readAsBytesSync());
-    Image image2 = readPng(new Io.File('res/alpha_edge.png').readAsBytesSync());
+    Image image = readPng(new Io.File('res/png/trees.png').readAsBytesSync());
+    Image image2 = readPng(new Io.File('res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       Image f = new Image(10, 10, Image.RGB);
@@ -310,7 +310,7 @@ void defineImageTests() {
     });
 
     test('trim', () {
-      Image image = readPng(new Io.File('res/trim.png').readAsBytesSync());
+      Image image = readPng(new Io.File('res/png/trim.png').readAsBytesSync());
       Image trimmed = trim(image, mode: TRIM_TRANSPARENT);
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));

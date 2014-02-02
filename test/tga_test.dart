@@ -1,9 +1,35 @@
 part of image_test;
 
 void defineTgaTests() {
-  group('tga', () {
+  Io.File script = new Io.File(Io.Platform.script.toFilePath());
+  String path = script.parent.path + '/res/tga';
+
+  Io.Directory dir = new Io.Directory(path);
+  List files = dir.listSync();
+
+  group('TGA', () {
+    for (var f in files) {
+      if (f is! Io.File || !f.path.endsWith('.tga')) {
+        continue;
+      }
+
+      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      test('$name', () {
+        List<int> bytes = f.readAsBytesSync();
+        Image image = new TgaDecoder().decodeImage(bytes);
+        if (image == null) {
+          throw new ImageException('Unable to decode TGA Image: $name.');
+        }
+
+        List<int> png = new PngEncoder().encode(image);
+        new Io.File('out/tga/${name}.png')
+              ..createSync(recursive: true)
+              ..writeAsBytesSync(png);
+      });
+    }
+
     test('decode/encode', () {
-      List<int> bytes = new Io.File('res/trees.tga').readAsBytesSync();
+      List<int> bytes = new Io.File('res/tga/trees.tga').readAsBytesSync();
 
       // Decode the image from file.
       Image image = new TgaDecoder().decodeImage(bytes);

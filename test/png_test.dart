@@ -1,7 +1,7 @@
 part of image_test;
 
 void definePngTests() {
-  group('png', () {
+  group('PNG', () {
     test('encode', () {
       Image image = new Image(64, 64);
       image.fill(getColor(100, 200, 255));

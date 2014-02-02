@@ -1,9 +1,35 @@
 part of image_test;
 
 void defineJpegTests() {
-  group('jpeg', () {
+  Io.File script = new Io.File(Io.Platform.script.toFilePath());
+  String path = script.parent.path + '/res/jpg';
+
+  Io.Directory dir = new Io.Directory(path);
+  List files = dir.listSync();
+
+  group('JPEG', () {
+    for (var f in files) {
+      if (f is! Io.File || !f.path.endsWith('.jpg')) {
+        continue;
+      }
+
+      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      test('$name', () {
+        List<int> bytes = f.readAsBytesSync();
+        Image image = new JpegDecoder().decodeImage(bytes);
+        if (image == null) {
+          throw new ImageException('Unable to decode JPEG Image: $name.');
+        }
+
+        List<int> png = new PngEncoder().encode(image);
+        new Io.File('out/jpg/${name}.png')
+              ..createSync(recursive: true)
+              ..writeAsBytesSync(png);
+      });
+    }
+
     test('decode/encode', () {
-      List<int> bytes = new Io.File('res/cat-eye04.jpg').readAsBytesSync();
+      List<int> bytes = new Io.File('res/jpg/cat-eye04.jpg').readAsBytesSync();
 
       // Decode the image from file.
       Image image = new JpegDecoder().decodeImage(bytes);
