@@ -17,7 +17,9 @@ formats:
 - TGA
 
 Decoding Only (for now):
+
 - WebP (including animation)
+- Gif (including animation)
 
 ##[Documentation](https://github.com/brendan-duncan/image/wiki)
 

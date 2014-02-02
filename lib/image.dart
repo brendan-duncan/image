@@ -42,6 +42,9 @@ part 'src/fonts/arial_14.dart';
 part 'src/fonts/arial_24.dart';
 part 'src/fonts/arial_48.dart';
 
+part 'src/formats/gif/gif_color_map.dart';
+part 'src/formats/gif/gif_image_desc.dart';
+part 'src/formats/gif/gif_info.dart';
 part 'src/formats/jpeg/_jpeg.dart';
 part 'src/formats/jpeg/_jpeg_adobe.dart';
 part 'src/formats/jpeg/_jpeg_component.dart';
@@ -63,6 +66,7 @@ part 'src/formats/webp/webp_frame.dart';
 part 'src/formats/webp/webp_huffman.dart';
 part 'src/formats/webp/webp_info.dart';
 part 'src/formats/formats.dart';
+part 'src/formats/gif_decoder.dart';
 part 'src/formats/jpeg_decoder.dart';
 part 'src/formats/jpeg_encoder.dart';
 part 'src/formats/png_decoder.dart';

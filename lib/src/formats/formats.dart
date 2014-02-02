@@ -18,6 +18,9 @@ Image decodeNamedImage(List<int> bytes, String name) {
   if (n.endsWith('.webp')) {
     return decodeWebP(bytes);
   }
+  if (n.endsWith('.gif')) {
+    return decodeGif(bytes);
+  }
   return null;
 }
 
@@ -38,6 +41,9 @@ List<int> encodeNamedImage(Image image, String name) {
   }
   /*if (n.endsWith('.webp')) {
     return encodeWebP(image);
+  }*/
+  /*if (n.endsWith('.gif')) {
+    return encodeGif(image);
   }*/
   return null;
 }
@@ -129,3 +135,11 @@ Image decodeWebP(List<int> bytes) {
  * Renamed to [decodeWebP], left for backward compatibility.
  */
 Image readWebP(List<int> bytes) => decodeWebP(bytes);
+
+/**
+ * Decode a Gif formatted image (first frame for animations).
+ */
+Image decodeGif(List<int> bytes) {
+  return new GifDecoder().decodeImage(bytes);
+}
+
