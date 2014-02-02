@@ -13,12 +13,12 @@ part 'webp_test.dart';
 
 void main() {
   defineGifTests();
-  //defineTgaTests();
-  //defineJpegTests();
-  //definePngTests();
-  //defineWebPTests();
-  //defineFontTests();
-  //defineImageTests();
+  defineTgaTests();
+  defineJpegTests();
+  definePngTests();
+  defineWebPTests();
+  defineFontTests();
+  defineImageTests();
 }
 
 

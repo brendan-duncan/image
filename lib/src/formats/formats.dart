@@ -132,9 +132,12 @@ Image decodeWebP(List<int> bytes) {
 }
 
 /**
- * Renamed to [decodeWebP], left for backward compatibility.
+ * Decode an animated WebP file.  If the webp isn't animated, the animation
+ * will contain a single frame with the webp's image.
  */
-Image readWebP(List<int> bytes) => decodeWebP(bytes);
+Animation decodeWebPAnimation(List<int> bytes) {
+  return new WebPDecoder().decodeAnimation(bytes);
+}
 
 /**
  * Decode a Gif formatted image (first frame for animations).
@@ -143,3 +146,10 @@ Image decodeGif(List<int> bytes) {
   return new GifDecoder().decodeImage(bytes);
 }
 
+/**
+ * Decode an animated Gif file.  If the gif isn't animated, the animation
+ * will contain a single frame with the gif's image.
+ */
+Animation decodeGifAnimation(List<int> bytes) {
+  return new GifDecoder().decodeAnimation(bytes);
+}
