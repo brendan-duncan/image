@@ -1,9 +1,9 @@
 part of image;
 
 
-class _JpegScan {
-  Arc.InputStream fp;
-  _JpegFrame frame;
+class JpegScan {
+  Arc.InputStream input;
+  JpegFrame frame;
   int precision;
   int samplesPerLine;
   int scanLines;
@@ -24,9 +24,9 @@ class _JpegScan {
   int successiveACState = 0;
   int successiveACNextValue;
 
-  _JpegScan(this.fp, this.frame, this.components,
-            this.resetInterval, this.spectralStart, this.spectralEnd,
-            this.successivePrev, this.successive) {
+  JpegScan(this.input, this.frame, this.components,
+           this.resetInterval, this.spectralStart, this.spectralEnd,
+           this.successivePrev, this.successive) {
     precision = frame.precision;
     samplesPerLine = frame.samplesPerLine;
     scanLines = frame.scanLines;
@@ -38,7 +38,7 @@ class _JpegScan {
 
   void decode() {
     int componentsLength = components.length;
-    _JpegComponent component;
+    JpegComponent component;
     var decodeFn;
 
     if (progressive) {
@@ -96,15 +96,14 @@ class _JpegScan {
 
       // find marker
       bitsCount = 0;
-      int marker = (((fp.buffer[fp.position] << 8) | fp.buffer[fp.position + 1]));
-      if (marker <= 0xff00) {
-        //throw 'marker was not found';
-      }
-
-      if (marker >= _Jpeg.M_RST0 && marker <= _Jpeg.M_RST7) {
-        fp.position += 2;
-      } else {
-        break;
+      int m1 = input.buffer[input.position];
+      int m2 = input.buffer[input.position + 1];
+      if (m1 == 0xff) {
+        if (m2 >= Jpeg.M_RST0 && m2 <= Jpeg.M_RST7) {
+          input.position += 2;
+        } else {
+          break;
+        }
       }
     }
   }
@@ -115,12 +114,12 @@ class _JpegScan {
       return (bitsData >> bitsCount) & 1;
     }
 
-    bitsData = fp.readByte();
+    bitsData = input.readByte();
     if (bitsData == 0xff) {
-      int nextByte = fp.readByte();
+      int nextByte = input.readByte();
       if (nextByte != 0) {
-        throw 'unexpected marker: ' +
-              ((bitsData << 8) | nextByte).toRadixString(16);
+        throw new ImageException('unexpected marker: ' +
+              ((bitsData << 8) | nextByte).toRadixString(16));
       }
     }
 
@@ -162,7 +161,7 @@ class _JpegScan {
     return n + (-1 << length) + 1;
   }
 
-  void _decodeBaseline(_JpegComponent component, List zz) {
+  void _decodeBaseline(JpegComponent component, List zz) {
     int t = _decodeHuffman(component.huffmanTableDC);
     int diff = t == 0 ? 0 : _receiveAndExtend(t);
     component.pred += diff;
@@ -179,24 +178,24 @@ class _JpegScan {
         continue;
       }
       k += r;
-      int z = _Jpeg.dctNaturalOrder[k];
+      int z = Jpeg.dctNaturalOrder[k];
       zz[z] = _receiveAndExtend(s);
       k++;
     }
   }
 
-  void _decodeDCFirst(_JpegComponent component, List zz) {
+  void _decodeDCFirst(JpegComponent component, List zz) {
     int t = _decodeHuffman(component.huffmanTableDC);
     int diff = (t == 0) ? 0 : (_receiveAndExtend(t) << successive);
     component.pred += diff;
     zz[0] = component.pred;
   }
 
-  void _decodeDCSuccessive(_JpegComponent component, List zz) {
+  void _decodeDCSuccessive(JpegComponent component, List zz) {
     zz[0] = (zz[0] | (_readBit() << successive));
   }
 
-  void _decodeACFirst(_JpegComponent component, List zz) {
+  void _decodeACFirst(JpegComponent component, List zz) {
     if (eobrun > 0) {
       eobrun--;
       return;
@@ -216,18 +215,18 @@ class _JpegScan {
         continue;
       }
       k += r;
-      int z = _Jpeg.dctNaturalOrder[k];
+      int z = Jpeg.dctNaturalOrder[k];
       zz[z] = (_receiveAndExtend(s) * (1 << successive));
       k++;
     }
   }
 
-  void _decodeACSuccessive(_JpegComponent component, zz) {
+  void _decodeACSuccessive(JpegComponent component, zz) {
     int k = spectralStart;
     int e = spectralEnd;
     int r = 0;
     while (k <= e) {
-      int z = _Jpeg.dctNaturalOrder[k];
+      int z = Jpeg.dctNaturalOrder[k];
       switch (successiveACState) {
         case 0: // initial state
           int rs = _decodeHuffman(component.huffmanTableAC);
@@ -243,7 +242,7 @@ class _JpegScan {
             }
           } else {
             if (s != 1) {
-              throw 'invalid ACn encoding';
+              throw new ImageException('invalid ACn encoding');
             }
             successiveACNextValue = _receiveAndExtend(s);
             successiveACState = r != 0 ? 2 : 3;
@@ -284,7 +283,7 @@ class _JpegScan {
     }
   }
 
-  void _decodeMcu(_JpegComponent component, decodeFn,
+  void _decodeMcu(JpegComponent component, decodeFn,
                   int mcu, int row, int col) {
     int mcuRow = (mcu ~/ mcusPerLine);
     int mcuCol = mcu % mcusPerLine;
@@ -293,7 +292,7 @@ class _JpegScan {
     decodeFn(component, component.blocks[blockRow][blockCol]);
   }
 
-  void _decodeBlock(_JpegComponent component, decodeFn, int mcu) {
+  void _decodeBlock(JpegComponent component, decodeFn, int mcu) {
     int blockRow = mcu ~/ component.blocksPerLine;
     int blockCol = mcu % component.blocksPerLine;
     decodeFn(component, component.blocks[blockRow][blockCol]);

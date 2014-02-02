@@ -1,6 +1,6 @@
 part of image;
 
-class _JpegAdobe {
+class JpegAdobe {
   int version;
   int flags0;
   int flags1;

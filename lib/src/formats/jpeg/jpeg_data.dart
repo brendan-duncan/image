@@ -1,23 +1,23 @@
 part of image;
 
-class _JpegData {
-  Arc.InputStream fp;
-  _JpegJfif jfif;
-  _JpegAdobe adobe;
-  _JpegFrame frame;
+class JpegData {
+  Arc.InputStream input;
+  JpegJfif jfif;
+  JpegAdobe adobe;
+  JpegFrame frame;
   int resetInterval;
-  List quantizationTables = new List(_Jpeg.NUM_QUANT_TBLS);
-  List<_JpegFrame> frames = [];
-  List huffmanTablesAC = [];
-  List huffmanTablesDC = [];
+  final List quantizationTables = new List(Jpeg.NUM_QUANT_TBLS);
+  final List<JpegFrame> frames = [];
+  final List huffmanTablesAC = [];
+  final List huffmanTablesDC = [];
+  final List<Map> components = [];
 
-  List components = [];
-
-  bool validate(List<int> data) {
-    fp = new Arc.InputStream(data, byteOrder: Arc.BIG_ENDIAN);
+  bool validate(List<int> bytes) {
+    Arc.InputStream input = new Arc.InputStream(bytes,
+                                                byteOrder: Arc.BIG_ENDIAN);
 
     int marker = _nextMarker();
-    if (marker != _Jpeg.M_SOI) { // SOI (Start of Image)
+    if (marker != Jpeg.M_SOI) {
       return false;
     }
 
@@ -25,67 +25,67 @@ class _JpegData {
     bool hasSOS = false;
 
     marker = _nextMarker();
-    while (marker != _Jpeg.M_EOI && !fp.isEOS) { // EOI (End of image)
+    while (marker != Jpeg.M_EOI && !input.isEOS) { // EOI (End of image)
       _skipBlock();
       switch (marker) {
-        case _Jpeg.M_APP0:
-        case _Jpeg.M_APP1:
-        case _Jpeg.M_APP2:
-        case _Jpeg.M_APP3:
-        case _Jpeg.M_APP4:
-        case _Jpeg.M_APP5:
-        case _Jpeg.M_APP6:
-        case _Jpeg.M_APP7:
-        case _Jpeg.M_APP8:
-        case _Jpeg.M_APP9:
-        case _Jpeg.M_APP10:
-        case _Jpeg.M_APP11:
-        case _Jpeg.M_APP12:
-        case _Jpeg.M_APP13:
-        case _Jpeg.M_APP14:
-        case _Jpeg.M_APP15:
-        case _Jpeg.M_COM:
+        case Jpeg.M_APP0:
+        case Jpeg.M_APP1:
+        case Jpeg.M_APP2:
+        case Jpeg.M_APP3:
+        case Jpeg.M_APP4:
+        case Jpeg.M_APP5:
+        case Jpeg.M_APP6:
+        case Jpeg.M_APP7:
+        case Jpeg.M_APP8:
+        case Jpeg.M_APP9:
+        case Jpeg.M_APP10:
+        case Jpeg.M_APP11:
+        case Jpeg.M_APP12:
+        case Jpeg.M_APP13:
+        case Jpeg.M_APP14:
+        case Jpeg.M_APP15:
+        case Jpeg.M_COM:
           break;
 
-        case _Jpeg.M_DQT: // DQT (Define Quantization Tables)
+        case Jpeg.M_DQT: // DQT (Define Quantization Tables)
           break;
 
-        case _Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
-        case _Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
-        case _Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
+        case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
+        case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
+        case Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
           hasSOF = true;
           break;
 
-        case _Jpeg.M_SOF3:
-        case _Jpeg.M_SOF5:
-        case _Jpeg.M_SOF6:
-        case _Jpeg.M_SOF7:
-        case _Jpeg.M_JPG:
-        case _Jpeg.M_SOF9:
-        case _Jpeg.M_SOF10:
-        case _Jpeg.M_SOF11:
-        case _Jpeg.M_SOF13:
-        case _Jpeg.M_SOF14:
-        case _Jpeg.M_SOF15:
+        case Jpeg.M_SOF3:
+        case Jpeg.M_SOF5:
+        case Jpeg.M_SOF6:
+        case Jpeg.M_SOF7:
+        case Jpeg.M_JPG:
+        case Jpeg.M_SOF9:
+        case Jpeg.M_SOF10:
+        case Jpeg.M_SOF11:
+        case Jpeg.M_SOF13:
+        case Jpeg.M_SOF14:
+        case Jpeg.M_SOF15:
           break;
 
-        case _Jpeg.M_DHT: // DHT (Define Huffman Tables)
+        case Jpeg.M_DHT: // DHT (Define Huffman Tables)
           break;
 
-        case _Jpeg.M_DRI: // DRI (Define Restart Interval)
+        case Jpeg.M_DRI: // DRI (Define Restart Interval)
           break;
 
-        case _Jpeg.M_SOS: // SOS (Start of Scan)
+        case Jpeg.M_SOS: // SOS (Start of Scan)
           hasSOS = true;
           break;
 
         default:
-          if (fp.buffer[fp.position - 3] == 0xFF &&
-              fp.buffer[fp.position - 2] >= 0xC0 &&
-                  fp.buffer[fp.position - 2] <= 0xFE) {
+          if (input.buffer[input.position - 3] == 0xFF &&
+              input.buffer[input.position - 2] >= 0xC0 &&
+              input.buffer[input.position - 2] <= 0xFE) {
             // could be incorrect encoding -- last 0xFF byte of the previous
             // block was eaten by the encoder
-            fp.position -= 3;
+            input.position -= 3;
             break;
           }
 
@@ -101,17 +101,17 @@ class _JpegData {
     return hasSOF && hasSOS;
   }
 
-  void read(List<int> data) {
-    fp = new Arc.InputStream(data, byteOrder: Arc.BIG_ENDIAN);
+  void read(List<int> bytes) {
+    input = new Arc.InputStream(bytes, byteOrder: Arc.BIG_ENDIAN);
 
     _read();
 
     if (frames.length != 1) {
-      throw 'Only single frame JPEGs supported';
+      throw new ImageException('Only single frame JPEGs supported');
     }
 
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
-      var component = frame.components[frame.componentsOrder[i]];
+      JpegComponent component = frame.components[frame.componentsOrder[i]];
       components.add({
         'scaleX': component.h / frame.maxH,
         'scaleY': component.v / frame.maxV,
@@ -127,15 +127,14 @@ class _JpegData {
   Data.Uint8List getData(int width, int height) {
     num scaleX = 1;
     num scaleY = 1;
-    var component1;
-    var component2;
-    var component3;
-    var component4;
-    var component1Line;
-    var component2Line;
-    var component3Line;
-    var component4Line;
-    int x, y;
+    Map component1;
+    Map component2;
+    Map component3;
+    Map component4;
+    Data.Uint8List component1Line;
+    Data.Uint8List component2Line;
+    Data.Uint8List component3Line;
+    Data.Uint8List component4Line;
     int offset = 0;
     int Y, Cb, Cr, K, C, M, Ye, R, G, B;
     bool colorTransform = false;
@@ -145,10 +144,10 @@ class _JpegData {
     switch (components.length) {
       case 1:
         component1 = components[0];
-        for (y = 0; y < height; y++) {
-          component1Line = component1.lines[(y * component1.scaleY * scaleY).toInt()];
-          for (x = 0; x < width; x++) {
-            Y = component1Line[(x * component1.scaleX * scaleX).toInt()];
+        for (int y = 0; y < height; y++) {
+          component1Line = component1['lines'][(y * component1['scaleY'] * scaleY).toInt()];
+          for (int x = 0; x < width; x++) {
+            Y = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
             data[offset++] = Y;
           }
         }
@@ -157,13 +156,13 @@ class _JpegData {
         // PDF might compress two component data in custom colorspace
         component1 = components[0];
         component2 = components[1];
-        for (y = 0; y < height; y++) {
-          component1Line = component1.lines[0 | (y * component1.scaleY * scaleY)];
-          component2Line = component2.lines[0 | (y * component2.scaleY * scaleY)];
-          for (x = 0; x < width; x++) {
-            Y = component1Line[(x * component1.scaleX * scaleX).toInt()];
+        for (int y = 0; y < height; y++) {
+          component1Line = component1['lines'][0 | (y * component1['scaleY'] * scaleY)];
+          component2Line = component2['lines'][0 | (y * component2['scaleY'] * scaleY)];
+          for (int x = 0; x < width; x++) {
+            Y = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
             data[offset++] = Y;
-            Y = component2Line[(x * component2.scaleX * scaleX).toInt()];
+            Y = component2Line[(x * component2['scaleX'] * scaleX).toInt()];
             data[offset++] = Y;
           }
         }
@@ -188,15 +187,15 @@ class _JpegData {
         num sx2 = component2['scaleX'] * scaleX;
         num sx3 = component3['scaleX'] * scaleX;
 
-        var lines1 = component1['lines'];
-        var lines2 = component2['lines'];
-        var lines3 = component3['lines'];
+        List<Data.Uint8List> lines1 = component1['lines'];
+        List<Data.Uint8List> lines2 = component2['lines'];
+        List<Data.Uint8List> lines3 = component3['lines'];
 
-        for (y = 0; y < height; y++) {
+        for (int y = 0; y < height; y++) {
           component1Line = lines1[(y * sy1).toInt()];
           component2Line = lines2[(y * sy2).toInt()];
           component3Line = lines3[(y * sy3).toInt()];
-          for (x = 0; x < width; x++) {
+          for (int x = 0; x < width; x++) {
             if (!colorTransform) {
               R = component1Line[(x * sx1).toInt()];
               G = component2Line[(x * sx2).toInt()];
@@ -220,7 +219,7 @@ class _JpegData {
         break;
       case 4:
         if (adobe == null) {
-          throw 'Unsupported color mode (4 components)';
+          throw new ImageException('Unsupported color mode (4 components)');
         }
         // The default transform for four components is false
         colorTransform = false;
@@ -236,12 +235,12 @@ class _JpegData {
         component3 = components[2];
         component4 = components[3];
 
-        for (y = 0; y < height; y++) {
+        for (int y = 0; y < height; y++) {
           component1Line = component1['lines'][0 | (y * component1['scaleY'] * scaleY)];
           component2Line = component2['lines'][0 | (y * component2['scaleY'] * scaleY)];
           component3Line = component3['lines'][0 | (y * component3['scaleY'] * scaleY)];
           component4Line = component4['lines'][0 | (y * component4['scaleY'] * scaleY)];
-          for (x = 0; x < width; x++) {
+          for (int x = 0; x < width; x++) {
             if (!colorTransform) {
               C = component1Line[0 | (x * component1['scaleX'] * scaleX)];
               M = component2Line[0 | (x * component2['scaleX'] * scaleX)];
@@ -265,89 +264,90 @@ class _JpegData {
         }
         break;
       default:
-        throw 'Unsupported color mode';
+        throw new ImageException('Unsupported color mode');
     }
     return data;
   }
 
   void _read() {
     int marker = _nextMarker();
-    if (marker != _Jpeg.M_SOI) { // SOI (Start of Image)
-      throw 'Start Of Image marker not found.';
+    if (marker != Jpeg.M_SOI) { // SOI (Start of Image)
+      throw new ImageException('Start Of Image marker not found.');
     }
 
     marker = _nextMarker();
-    while (marker != _Jpeg.M_EOI && !fp.isEOS) { // EOI (End of image)
+    while (marker != Jpeg.M_EOI && !input.isEOS) {
       Arc.InputStream block = _readBlock();
       switch (marker) {
-        case _Jpeg.M_APP0:
-        case _Jpeg.M_APP1:
-        case _Jpeg.M_APP2:
-        case _Jpeg.M_APP3:
-        case _Jpeg.M_APP4:
-        case _Jpeg.M_APP5:
-        case _Jpeg.M_APP6:
-        case _Jpeg.M_APP7:
-        case _Jpeg.M_APP8:
-        case _Jpeg.M_APP9:
-        case _Jpeg.M_APP10:
-        case _Jpeg.M_APP11:
-        case _Jpeg.M_APP12:
-        case _Jpeg.M_APP13:
-        case _Jpeg.M_APP14:
-        case _Jpeg.M_APP15:
-        case _Jpeg.M_COM:
+        case Jpeg.M_APP0:
+        case Jpeg.M_APP1:
+        case Jpeg.M_APP2:
+        case Jpeg.M_APP3:
+        case Jpeg.M_APP4:
+        case Jpeg.M_APP5:
+        case Jpeg.M_APP6:
+        case Jpeg.M_APP7:
+        case Jpeg.M_APP8:
+        case Jpeg.M_APP9:
+        case Jpeg.M_APP10:
+        case Jpeg.M_APP11:
+        case Jpeg.M_APP12:
+        case Jpeg.M_APP13:
+        case Jpeg.M_APP14:
+        case Jpeg.M_APP15:
+        case Jpeg.M_COM:
           _readAppData(marker, block);
           break;
 
-        case _Jpeg.M_DQT: // DQT (Define Quantization Tables)
+        case Jpeg.M_DQT: // DQT (Define Quantization Tables)
           _readDQT(block);
           break;
 
-        case _Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
-        case _Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
-        case _Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
+        case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
+        case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
+        case Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
           _readFrame(marker, block);
           break;
 
-        case _Jpeg.M_SOF3:
-        case _Jpeg.M_SOF5:
-        case _Jpeg.M_SOF6:
-        case _Jpeg.M_SOF7:
-        case _Jpeg.M_JPG:
-        case _Jpeg.M_SOF9:
-        case _Jpeg.M_SOF10:
-        case _Jpeg.M_SOF11:
-        case _Jpeg.M_SOF13:
-        case _Jpeg.M_SOF14:
-        case _Jpeg.M_SOF15:
-          throw 'Unhandled frame type ${marker.toRadixString(16)}';
+        case Jpeg.M_SOF3:
+        case Jpeg.M_SOF5:
+        case Jpeg.M_SOF6:
+        case Jpeg.M_SOF7:
+        case Jpeg.M_JPG:
+        case Jpeg.M_SOF9:
+        case Jpeg.M_SOF10:
+        case Jpeg.M_SOF11:
+        case Jpeg.M_SOF13:
+        case Jpeg.M_SOF14:
+        case Jpeg.M_SOF15:
+          throw new ImageException('Unhandled frame type ${marker.toRadixString(16)}');
           break;
 
-        case _Jpeg.M_DHT: // DHT (Define Huffman Tables)
+        case Jpeg.M_DHT: // DHT (Define Huffman Tables)
           _readDHT(block);
           break;
 
-        case _Jpeg.M_DRI: // DRI (Define Restart Interval)
+        case Jpeg.M_DRI: // DRI (Define Restart Interval)
           _readDRI(block);
           break;
 
-        case _Jpeg.M_SOS: // SOS (Start of Scan)
+        case Jpeg.M_SOS: // SOS (Start of Scan)
           _readSOS(block);
           break;
 
         default:
-          if (fp.buffer[fp.position - 3] == 0xFF &&
-              fp.buffer[fp.position - 2] >= 0xC0 &&
-                  fp.buffer[fp.position - 2] <= 0xFE) {
+          if (input.buffer[input.position - 3] == 0xFF &&
+              input.buffer[input.position - 2] >= 0xC0 &&
+              input.buffer[input.position - 2] <= 0xFE) {
             // could be incorrect encoding -- last 0xFF byte of the previous
             // block was eaten by the encoder
-            fp.position -= 3;
+            input.position -= 3;
             break;
           }
 
           if (marker != 0) {
-            throw 'Unknown JPEG marker ' + marker.toRadixString(16);
+            throw new ImageException('Unknown JPEG marker ' +
+                marker.toRadixString(16));
           }
           break;
       }
@@ -357,19 +357,19 @@ class _JpegData {
   }
 
   void _skipBlock() {
-    int length = fp.readUint16();
+    int length = input.readUint16();
     if (length < 2) {
-      throw 'Invalid Block';
+      throw new ImageException('Invalid Block');
     }
-    fp.position += length - 2;
+    input.position += length - 2;
   }
 
   Arc.InputStream _readBlock() {
-    int length = fp.readUint16();
+    int length = input.readUint16();
     if (length < 2) {
-      throw 'Invalid Block';
+      throw new ImageException('Invalid Block');
     }
-    List<int> array = fp.readBytes(length - 2);
+    List<int> array = input.readBytes(length - 2);
     return new Arc.InputStream(array, byteOrder: Arc.BIG_ENDIAN);
   }
 
@@ -378,13 +378,13 @@ class _JpegData {
 
     do {
       do {
-        c = fp.readByte();
-      } while (c != 0xff && !fp.isEOS);
+        c = input.readByte();
+      } while (c != 0xff && !input.isEOS);
 
       do {
-        c = fp.readByte();
-      } while (c == 0xff && !fp.isEOS);
-    } while (c == 0 && !fp.isEOS);
+        c = input.readByte();
+      } while (c == 0xff && !input.isEOS);
+    } while (c == 0 && !input.isEOS);
 
     return c;
   }
@@ -392,11 +392,11 @@ class _JpegData {
   void _readAppData(int marker, Arc.InputStream block) {
     List<int> appData = block.buffer;
 
-    if (marker == _Jpeg.M_APP0) {
+    if (marker == Jpeg.M_APP0) {
       // 'JFIF\0'
       if (appData[0] == 0x4A && appData[1] == 0x46 &&
           appData[2] == 0x49 && appData[3] == 0x46 && appData[4] == 0) {
-        jfif = new _JpegJfif();
+        jfif = new JpegJfif();
         jfif.majorVersion = appData[5];
         jfif.minorVersion = appData[6];
         jfif.densityUnits = appData[7];
@@ -409,12 +409,12 @@ class _JpegData {
       }
     }
 
-    if (marker == _Jpeg.M_APP14) {
+    if (marker == Jpeg.M_APP14) {
       // 'Adobe\0'
       if (appData[0] == 0x41 && appData[1] == 0x64 &&
           appData[2] == 0x6F && appData[3] == 0x62 &&
           appData[4] == 0x65 && appData[5] == 0) {
-        adobe = new _JpegAdobe();
+        adobe = new JpegAdobe();
         adobe.version = appData[6];
         adobe.flags0 = (appData[7] << 8) | appData[8];
         adobe.flags1 = (appData[9] << 8) | appData[10];
@@ -429,8 +429,8 @@ class _JpegData {
       int prec = n >> 4;
       n &= 0x0F;
 
-      if (n >= _Jpeg.NUM_QUANT_TBLS) {
-        throw 'Invalid number of quantization tables';
+      if (n >= Jpeg.NUM_QUANT_TBLS) {
+        throw new ImageException('Invalid number of quantization tables');
       }
 
       if (quantizationTables[n] == null) {
@@ -438,7 +438,7 @@ class _JpegData {
       }
 
       Data.Int32List tableData = quantizationTables[n];
-      for (int i = 0; i < _Jpeg.DCTSIZE2; i++) {
+      for (int i = 0; i < Jpeg.DCTSIZE2; i++) {
         int tmp;
         if (prec != 0) {
           tmp = block.readUint16();
@@ -446,24 +446,23 @@ class _JpegData {
           tmp = block.readByte();
         }
 
-        tableData[_Jpeg.dctNaturalOrder[i]] = tmp;
+        tableData[Jpeg.dctNaturalOrder[i]] = tmp;
       }
     }
 
     if (!block.isEOS) {
-      throw 'Bad length for DQT block';
+      throw new ImageException('Bad length for DQT block');
     }
   }
 
   void _readFrame(int marker, Arc.InputStream block) {
     if (frame != null) {
-      throw 'Duplicate Frame';
+      throw new ImageException('Duplicate JPG frame data found.');
     }
 
-    frame = new _JpegFrame();
-
-    frame.extended = (marker == _Jpeg.M_SOF1);
-    frame.progressive = (marker == _Jpeg.M_SOF2);
+    frame = new JpegFrame();
+    frame.extended = (marker == Jpeg.M_SOF1);
+    frame.progressive = (marker == Jpeg.M_SOF2);
     frame.precision = block.readByte();
     frame.scanLines = block.readUint16();
     frame.samplesPerLine = block.readUint16();
@@ -478,7 +477,7 @@ class _JpegData {
       int qId = block.readByte();
       frame.componentsOrder.add(componentId);
       frame.components[componentId] =
-          new _JpegComponent(h, v, quantizationTables[qId]);
+          new JpegComponent(h, v, quantizationTables, qId);
     }
 
     frame.prepare();
@@ -501,7 +500,7 @@ class _JpegData {
         huffmanValues[j] = block.readByte();
       }
 
-      var ht;
+      List ht;
       if (index & 0x10 != 0) { // AC table definition
         index -= 0x10;
         ht = huffmanTablesAC;
@@ -524,8 +523,8 @@ class _JpegData {
   void _readSOS(Arc.InputStream block) {
     int n = block.readByte();
 
-    if (n < 1 || n > _Jpeg.MAX_COMPS_IN_SCAN) {
-      throw 'Invalid SOS block';
+    if (n < 1 || n > Jpeg.MAX_COMPS_IN_SCAN) {
+      throw new ImageException('Invalid SOS block');
     }
 
     List components = new List(n);
@@ -534,10 +533,10 @@ class _JpegData {
       int c = block.readByte();
 
       if (!frame.components.containsKey(id)) {
-        throw 'Invalid Component in SOS block';
+        throw new ImageException('Invalid Component in SOS block');
       }
 
-      _JpegComponent component = frame.components[id];
+      JpegComponent component = frame.components[id];
       components[i] = component;
 
       int dc_tbl_no = (c >> 4) & 15;
@@ -558,7 +557,7 @@ class _JpegData {
     int Ah = (successiveApproximation >> 4) & 15;
     int Al = successiveApproximation & 15;
 
-    new _JpegScan(fp, frame, components, resetInterval,
+    new JpegScan(input, frame, components, resetInterval,
                   spectralStart, spectralEnd, Ah, Al).decode();
   }
 
@@ -616,8 +615,8 @@ class _JpegData {
     return code[0]['children'];
   }
 
-  List<Data.Uint8List> _buildComponentData(_JpegFrame frame,
-                                           _JpegComponent component) {
+  List<Data.Uint8List> _buildComponentData(JpegFrame frame,
+                                           JpegComponent component) {
     int blocksPerLine = component.blocksPerLine;
     int blocksPerColumn = component.blocksPerColumn;
     int samplesPerLine = (blocksPerLine << 3);
@@ -651,11 +650,12 @@ class _JpegData {
     return lines;
   }
 
-// A port of poppler's IDCT method which in turn is taken from:
-  //   Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
-  //   "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
-  //   IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989,
-  //   988-991.
+  /**
+   * A port of poppler's IDCT method which in turn is taken from:
+   * Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
+   * "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
+   * IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
+   */
   void _quantizeAndInverse(Data.Int32List quantizationTable,
                            Data.Int32List zz,
                            Data.Uint8List dataOut,
@@ -678,18 +678,18 @@ class _JpegData {
           p[5 + row] == 0 &&
           p[6 + row] == 0 &&
           p[7 + row] == 0) {
-        int t = ((_Jpeg.dctSqrt2 * p[0 + row] + 512) >> 10);
+        int t = ((Jpeg.dctSqrt2 * p[0 + row] + 512) >> 10);
         p.fillRange(row, row + 8, t);
         continue;
       }
 
       // stage 4
-      int v0 = ((_Jpeg.dctSqrt2 * p[0 + row] + 128) >> 8);
-      int v1 = ((_Jpeg.dctSqrt2 * p[4 + row] + 128) >> 8);
+      int v0 = ((Jpeg.dctSqrt2 * p[0 + row] + 128) >> 8);
+      int v1 = ((Jpeg.dctSqrt2 * p[4 + row] + 128) >> 8);
       int v2 = p[2 + row];
       int v3 = p[6 + row];
-      int v4 = ((_Jpeg.dctSqrt1d2 * (p[1 + row] - p[7 + row]) + 128) >> 8);
-      int v7 = ((_Jpeg.dctSqrt1d2 * (p[1 + row] + p[7 + row]) + 128) >> 8);
+      int v4 = ((Jpeg.dctSqrt1d2 * (p[1 + row] - p[7 + row]) + 128) >> 8);
+      int v7 = ((Jpeg.dctSqrt1d2 * (p[1 + row] + p[7 + row]) + 128) >> 8);
       int v5 = (p[3 + row] << 4);
       int v6 = (p[5 + row] << 4);
 
@@ -697,8 +697,8 @@ class _JpegData {
       int t = ((v0 - v1+ 1) >> 1);
       v0 = ((v0 + v1 + 1) >> 1);
       v1 = t;
-      t = ((v2 * _Jpeg.dctSin6 + v3 * _Jpeg.dctCos6 + 128) >> 8);
-      v2 = ((v2 * _Jpeg.dctCos6 - v3 * _Jpeg.dctSin6 + 128) >> 8);
+      t = ((v2 * Jpeg.dctSin6 + v3 * Jpeg.dctCos6 + 128) >> 8);
+      v2 = ((v2 * Jpeg.dctCos6 - v3 * Jpeg.dctSin6 + 128) >> 8);
       v3 = t;
       t = ((v4 - v6 + 1) >> 1);
       v4 = ((v4 + v6 + 1) >> 1);
@@ -714,11 +714,11 @@ class _JpegData {
       t = ((v1 - v2 + 1) >> 1);
       v1 = ((v1 + v2 + 1) >> 1);
       v2 = t;
-      t = ((v4 * _Jpeg.dctSin3 + v7 * _Jpeg.dctCos3 + 2048) >> 12);
-      v4 = ((v4 * _Jpeg.dctCos3 - v7 * _Jpeg.dctSin3 + 2048) >> 12);
+      t = ((v4 * Jpeg.dctSin3 + v7 * Jpeg.dctCos3 + 2048) >> 12);
+      v4 = ((v4 * Jpeg.dctCos3 - v7 * Jpeg.dctSin3 + 2048) >> 12);
       v7 = t;
-      t = ((v5 * _Jpeg.dctSin1 + v6 * _Jpeg.dctCos1 + 2048) >> 12);
-      v5 = ((v5 * _Jpeg.dctCos1 - v6 * _Jpeg.dctSin1 + 2048) >> 12);
+      t = ((v5 * Jpeg.dctSin1 + v6 * Jpeg.dctCos1 + 2048) >> 12);
+      v5 = ((v5 * Jpeg.dctCos1 - v6 * Jpeg.dctSin1 + 2048) >> 12);
       v6 = t;
 
       // stage 1
@@ -744,7 +744,7 @@ class _JpegData {
           p[5 * 8 + col] == 0 &&
           p[6 * 8 + col] == 0 &&
           p[7 * 8 + col] == 0) {
-        int t = ((_Jpeg.dctSqrt2 * dataIn[i] + 8192) >> 14);
+        int t = ((Jpeg.dctSqrt2 * dataIn[i] + 8192) >> 14);
         p[0 * 8 + col] = t;
         p[1 * 8 + col] = t;
         p[2 * 8 + col] = t;
@@ -757,12 +757,12 @@ class _JpegData {
       }
 
       // stage 4
-      int v0 = ((_Jpeg.dctSqrt2 * p[0 * 8 + col] + 2048) >> 12);
-      int v1 = ((_Jpeg.dctSqrt2 * p[4 * 8 + col] + 2048) >> 12);
+      int v0 = ((Jpeg.dctSqrt2 * p[0 * 8 + col] + 2048) >> 12);
+      int v1 = ((Jpeg.dctSqrt2 * p[4 * 8 + col] + 2048) >> 12);
       int v2 = p[2 * 8 + col];
       int v3 = p[6 * 8 + col];
-      int v4 = ((_Jpeg.dctSqrt1d2 * (p[1 * 8 + col] - p[7*8 + col]) + 2048) >> 12);
-      int v7 = ((_Jpeg.dctSqrt1d2 * (p[1 * 8 + col] + p[7*8 + col]) + 2048) >> 12);
+      int v4 = ((Jpeg.dctSqrt1d2 * (p[1 * 8 + col] - p[7*8 + col]) + 2048) >> 12);
+      int v7 = ((Jpeg.dctSqrt1d2 * (p[1 * 8 + col] + p[7*8 + col]) + 2048) >> 12);
       int v5 = p[3 * 8 + col];
       int v6 = p[5 * 8 + col];
 
@@ -770,8 +770,8 @@ class _JpegData {
       int t = ((v0 - v1 + 1) >> 1);
       v0 = ((v0 + v1 + 1) >> 1);
       v1 = t;
-      t = ((v2 * _Jpeg.dctSin6 + v3 * _Jpeg.dctCos6 + 2048) >> 12);
-      v2 = ((v2 * _Jpeg.dctCos6 - v3 * _Jpeg.dctSin6 + 2048) >> 12);
+      t = ((v2 * Jpeg.dctSin6 + v3 * Jpeg.dctCos6 + 2048) >> 12);
+      v2 = ((v2 * Jpeg.dctCos6 - v3 * Jpeg.dctSin6 + 2048) >> 12);
       v3 = t;
       t = ((v4 - v6 + 1) >> 1);
       v4 = ((v4 + v6 + 1) >> 1);
@@ -787,11 +787,11 @@ class _JpegData {
       t = ((v1 - v2 + 1) >> 1);
       v1 = ((v1 + v2 + 1) >> 1);
       v2 = t;
-      t = ((v4 * _Jpeg.dctSin3 + v7 * _Jpeg.dctCos3 + 2048) >> 12);
-      v4 = ((v4 * _Jpeg.dctCos3 - v7 * _Jpeg.dctSin3 + 2048) >> 12);
+      t = ((v4 * Jpeg.dctSin3 + v7 * Jpeg.dctCos3 + 2048) >> 12);
+      v4 = ((v4 * Jpeg.dctCos3 - v7 * Jpeg.dctSin3 + 2048) >> 12);
       v7 = t;
-      t = ((v5 * _Jpeg.dctSin1 + v6 * _Jpeg.dctCos1 + 2048) >> 12);
-      v5 = ((v5 * _Jpeg.dctCos1 - v6 * _Jpeg.dctSin1 + 2048) >> 12);
+      t = ((v5 * Jpeg.dctSin1 + v6 * Jpeg.dctCos1 + 2048) >> 12);
+      v5 = ((v5 * Jpeg.dctCos1 - v6 * Jpeg.dctSin1 + 2048) >> 12);
       v6 = t;
 
       // stage 1

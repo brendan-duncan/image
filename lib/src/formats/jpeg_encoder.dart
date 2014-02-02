@@ -36,7 +36,7 @@ class JpegEncoder {
     Arc.OutputStream fp = new Arc.OutputStream(byteOrder: Arc.BIG_ENDIAN);
 
     // Add JPEG headers
-    _writeMarker(fp, _Jpeg.M_SOI);
+    _writeMarker(fp, Jpeg.M_SOI);
     _writeAPP0(fp);
     _writeDQT(fp);
     _writeSOF0(fp, image.width, image.height);
@@ -111,7 +111,7 @@ class JpegEncoder {
       _writeBits(fp, fillbits);
     }
 
-    _writeMarker(fp, _Jpeg.M_EOI);
+    _writeMarker(fp, Jpeg.M_EOI);
 
     return fp.getBytes();
   }
@@ -224,7 +224,7 @@ class JpegEncoder {
       } else if (t > 255) {
         t = 255;
       }
-      YTable[_Jpeg.dctZigZag[i]] = t;
+      YTable[Jpeg.dctZigZag[i]] = t;
     }
 
     const List<int> UVQT = const [
@@ -244,7 +244,7 @@ class JpegEncoder {
       } else if (u > 255) {
         u = 255;
       }
-      UVTable[_Jpeg.dctZigZag[j]] = u;
+      UVTable[Jpeg.dctZigZag[j]] = u;
     }
 
     const List<double> aasf = const [
@@ -254,8 +254,8 @@ class JpegEncoder {
     int k = 0;
     for (int row = 0; row < 8; row++) {
       for (int col = 0; col < 8; col++) {
-        fdtbl_Y[k] = (1.0 / (YTable [_Jpeg.dctZigZag[k]] * aasf[row] * aasf[col] * 8.0));
-        fdtbl_UV[k] = (1.0 / (UVTable[_Jpeg.dctZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+        fdtbl_Y[k] = (1.0 / (YTable [Jpeg.dctZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+        fdtbl_UV[k] = (1.0 / (UVTable[Jpeg.dctZigZag[k]] * aasf[row] * aasf[col] * 8.0));
         k++;
       }
     }
@@ -452,7 +452,7 @@ class JpegEncoder {
   }
 
   void _writeAPP0(Arc.OutputStream out) {
-    _writeMarker(out, _Jpeg.M_APP0);
+    _writeMarker(out, Jpeg.M_APP0);
     out.writeUint16(16); // length
     out.writeByte(0x4A); // J
     out.writeByte(0x46); // F
@@ -469,7 +469,7 @@ class JpegEncoder {
   }
 
   void _writeSOF0(Arc.OutputStream out, int width, int height) {
-    _writeMarker(out, _Jpeg.M_SOF0);
+    _writeMarker(out, Jpeg.M_SOF0);
     out.writeUint16(17);   // length, truecolor YUV JPG
     out.writeByte(8);    // precision
     out.writeUint16(height);
@@ -487,7 +487,7 @@ class JpegEncoder {
   }
 
   void _writeDQT(Arc.OutputStream out) {
-    _writeMarker(out, _Jpeg.M_DQT);
+    _writeMarker(out, Jpeg.M_DQT);
     out.writeUint16(132); // length
     out.writeByte(0);
     for (int i = 0; i < 64; i++) {
@@ -500,7 +500,7 @@ class JpegEncoder {
   }
 
   void _writeDHT(Arc.OutputStream out) {
-    _writeMarker(out, _Jpeg.M_DHT);
+    _writeMarker(out, Jpeg.M_DHT);
     out.writeUint16(0x01A2); // length
 
     out.writeByte(0); // HTYDCinfo
@@ -537,7 +537,7 @@ class JpegEncoder {
   }
 
   _writeSOS(Arc.OutputStream out) {
-    _writeMarker(out, _Jpeg.M_SOS);
+    _writeMarker(out, Jpeg.M_SOS);
     out.writeUint16(12); // length
     out.writeByte(3); // nrofcomponents
     out.writeByte(1); // IdY
@@ -563,7 +563,7 @@ class JpegEncoder {
 
     // ZigZag reorder
     for (int j = 0; j < I64; ++j) {
-      DU[_Jpeg.dctZigZag[j]] = DU_DCT[j];
+      DU[Jpeg.dctZigZag[j]] = DU_DCT[j];
     }
 
     int Diff = DU[0] - DC;

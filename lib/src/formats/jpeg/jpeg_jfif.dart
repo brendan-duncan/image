@@ -1,6 +1,6 @@
 part of image;
 
-class _JpegJfif {
+class JpegJfif {
   int majorVersion;
   int minorVersion;
   int densityUnits;

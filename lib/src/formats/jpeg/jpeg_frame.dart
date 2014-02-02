@@ -1,6 +1,6 @@
 part of image;
 
-class _JpegFrame {
+class JpegFrame {
   bool extended;
   bool progressive;
   int precision;
@@ -10,12 +10,12 @@ class _JpegFrame {
   int maxV = 0;
   int mcusPerLine;
   int mcusPerColumn;
-  final Map components = {};
-  final List componentsOrder = new List<int>();
+  final Map<int, JpegComponent> components = {};
+  final List<int> componentsOrder = new List<int>();
 
   void prepare() {
     for (int componentId in components.keys) {
-      _JpegComponent component = components[componentId];
+      JpegComponent component = components[componentId];
       if (maxH < component.h) {
         maxH = component.h;
       }
@@ -28,7 +28,7 @@ class _JpegFrame {
     mcusPerColumn = (scanLines / 8 / maxV).ceil();
 
     for (int componentId in components.keys) {
-      _JpegComponent component = components[componentId];
+      JpegComponent component = components[componentId];
       int blocksPerLine = ((samplesPerLine / 8).ceil() *
                            component.h / maxH).ceil();
       int blocksPerColumn = ((scanLines / 8).ceil() *

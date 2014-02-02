@@ -10,11 +10,11 @@ class JpegDecoder extends Decoder {
   bool isValidFile(List<int> data) {
     Arc.InputStream input = new Arc.InputStream(data,
         byteOrder: Arc.BIG_ENDIAN);
-    return new _JpegData().validate(data);
+    return new JpegData().validate(data);
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {
-    _JpegData jpeg = new _JpegData();
+    JpegData jpeg = new JpegData();
     jpeg.read(data);
 
     if (jpeg.frames.length != 1) {
@@ -40,7 +40,7 @@ class JpegDecoder extends Decoder {
     return anim;
   }
 
-  void _copyToImage(_JpegData jpeg, Image imageData) {
+  void _copyToImage(JpegData jpeg, Image imageData) {
     int width = imageData.width;
     int height = imageData.height;
     Data.Uint8List data = jpeg.getData(width, height);
