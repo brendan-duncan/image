@@ -9,3 +9,7 @@ example/res/out-alpha_edge.png
 example/res/thumbnail-diamond_plate_texture.jpg
 test/out/
 lib/docs/
+example/webp_viewer.dart.js
+example/webp_viewer.dart.js.deps
+example/webp_viewer.dart.js.map
+example/webp_viewer.dart.precompiled.js
