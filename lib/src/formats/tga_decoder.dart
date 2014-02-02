@@ -40,9 +40,9 @@ class TgaDecoder extends Decoder {
     Image image = new Image(w, h, Image.RGB);
     for (int y = image.height - 1; y >= 0; --y) {
       for (int x = 0; x < image.width; ++x) {
-        int r = input.readByte();
-        int g = input.readByte();
         int b = input.readByte();
+        int g = input.readByte();
+        int r = input.readByte();
         image.setPixel(x, y, getColor(r, g, b));
       }
     }
