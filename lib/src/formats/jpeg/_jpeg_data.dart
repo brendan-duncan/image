@@ -13,8 +13,96 @@ class _JpegData {
 
   List components = [];
 
-  _JpegData(List<int> data) :
-    fp = new Arc.InputStream(data, byteOrder: Arc.BIG_ENDIAN) {
+  bool validate(List<int> data) {
+    fp = new Arc.InputStream(data, byteOrder: Arc.BIG_ENDIAN);
+
+    int marker = _nextMarker();
+    if (marker != _Jpeg.M_SOI) { // SOI (Start of Image)
+      return false;
+    }
+
+    bool hasSOF = false;
+    bool hasSOS = false;
+
+    marker = _nextMarker();
+    while (marker != _Jpeg.M_EOI && !fp.isEOS) { // EOI (End of image)
+      _skipBlock();
+      switch (marker) {
+        case _Jpeg.M_APP0:
+        case _Jpeg.M_APP1:
+        case _Jpeg.M_APP2:
+        case _Jpeg.M_APP3:
+        case _Jpeg.M_APP4:
+        case _Jpeg.M_APP5:
+        case _Jpeg.M_APP6:
+        case _Jpeg.M_APP7:
+        case _Jpeg.M_APP8:
+        case _Jpeg.M_APP9:
+        case _Jpeg.M_APP10:
+        case _Jpeg.M_APP11:
+        case _Jpeg.M_APP12:
+        case _Jpeg.M_APP13:
+        case _Jpeg.M_APP14:
+        case _Jpeg.M_APP15:
+        case _Jpeg.M_COM:
+          break;
+
+        case _Jpeg.M_DQT: // DQT (Define Quantization Tables)
+          break;
+
+        case _Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
+        case _Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
+        case _Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
+          hasSOF = true;
+          break;
+
+        case _Jpeg.M_SOF3:
+        case _Jpeg.M_SOF5:
+        case _Jpeg.M_SOF6:
+        case _Jpeg.M_SOF7:
+        case _Jpeg.M_JPG:
+        case _Jpeg.M_SOF9:
+        case _Jpeg.M_SOF10:
+        case _Jpeg.M_SOF11:
+        case _Jpeg.M_SOF13:
+        case _Jpeg.M_SOF14:
+        case _Jpeg.M_SOF15:
+          break;
+
+        case _Jpeg.M_DHT: // DHT (Define Huffman Tables)
+          break;
+
+        case _Jpeg.M_DRI: // DRI (Define Restart Interval)
+          break;
+
+        case _Jpeg.M_SOS: // SOS (Start of Scan)
+          hasSOS = true;
+          break;
+
+        default:
+          if (fp.buffer[fp.position - 3] == 0xFF &&
+              fp.buffer[fp.position - 2] >= 0xC0 &&
+                  fp.buffer[fp.position - 2] <= 0xFE) {
+            // could be incorrect encoding -- last 0xFF byte of the previous
+            // block was eaten by the encoder
+            fp.position -= 3;
+            break;
+          }
+
+          if (marker != 0) {
+            return false;
+          }
+          break;
+      }
+
+      marker = _nextMarker();
+    }
+
+    return hasSOF && hasSOS;
+  }
+
+  void read(List<int> data) {
+    fp = new Arc.InputStream(data, byteOrder: Arc.BIG_ENDIAN);
 
     _read();
 

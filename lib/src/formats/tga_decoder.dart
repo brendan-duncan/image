@@ -1,10 +1,28 @@
 part of image;
 
 /**
- * Decode a Targa TGA image.  This only supports the 24-bit uncompressed format.
+ * Decode a Targa TGA image. This only supports the 24-bit uncompressed format.
  */
-class TgaDecoder {
-  Image decode(List<int> data) {
+class TgaDecoder extends Decoder {
+  /**
+   * Is the given file a valid Targa image?
+   */
+  bool isValidFile(List<int> data) {
+    Arc.InputStream input = new Arc.InputStream(data,
+        byteOrder: Arc.BIG_ENDIAN);
+
+    List<int> header = input.readBytes(18);
+    if (header[2] != 2) {
+      return false;
+    }
+    if (header[16] != 24) {
+      return false;
+    }
+
+    return true;
+  }
+
+  Image decodeImage(List<int> data, {int frame: 0}) {
     Arc.InputStream input = new Arc.InputStream(data,
         byteOrder: Arc.BIG_ENDIAN);
 
@@ -30,5 +48,17 @@ class TgaDecoder {
     }
 
     return image;
+  }
+
+  Animation decodeAnimation(List<int> data) {
+    Image image = decodeImage(data);
+    if (image == null) {
+      return null;
+    }
+
+    Animation anim = new Animation();
+    anim.addFrame(image);
+
+    return anim;
   }
 }

@@ -2,13 +2,20 @@ part of image;
 
 /**
  * Decode a jpeg encoded image.
- *
- * Derived from:
- * https://github.com/notmasteryet/jpgjs
  */
-class JpegDecoder {
-  Image decode(List<int> data) {
-    _JpegData jpeg = new _JpegData(data);
+class JpegDecoder extends Decoder {
+  /**
+   * Is the given file a valid JPEG image?
+   */
+  bool isValidFile(List<int> data) {
+    Arc.InputStream input = new Arc.InputStream(data,
+        byteOrder: Arc.BIG_ENDIAN);
+    return new _JpegData().validate(data);
+  }
+
+  Image decodeImage(List<int> data, {int frame: 0}) {
+    _JpegData jpeg = new _JpegData();
+    jpeg.read(data);
 
     if (jpeg.frames.length != 1) {
       throw 'only single frame JPEGs supported';
@@ -21,6 +28,17 @@ class JpegDecoder {
     return image;
   }
 
+  Animation decodeAnimation(List<int> data) {
+    Image image = decodeImage(data);
+    if (image == null) {
+      return null;
+    }
+
+    Animation anim = new Animation();
+    anim.addFrame(image);
+
+    return anim;
+  }
 
   void _copyToImage(_JpegData jpeg, Image imageData) {
     int width = imageData.width;
@@ -76,4 +94,3 @@ class JpegDecoder {
     return i < 0 ? 0 : i > 255 ? 255 : i;
   }
 }
-

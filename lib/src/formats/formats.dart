@@ -52,7 +52,7 @@ List<int> encodeNamedImage(Image image, String name) {
  * Decode a JPG formatted image.
  */
 Image decodeJpg(List<int> bytes)  {
-  return new JpegDecoder().decode(bytes);
+  return new JpegDecoder().decodeImage(bytes);
 }
 
 /**
@@ -79,7 +79,7 @@ List<int> writeJpg(Image image, {int quality: 100}) =>
  * Decode a PNG formatted image.
  */
 Image decodePng(List<int> bytes) {
-  return new PngDecoder().decode(bytes);
+  return new PngDecoder().decodeImage(bytes);
 }
 
 /**
@@ -104,7 +104,7 @@ List<int> writePng(Image image, {int level: 6}) =>
  * Decode a Targa formatted image.
  */
 Image decodeTga(List<int> bytes) {
-  return new TgaDecoder().decode(bytes);
+  return new TgaDecoder().decodeImage(bytes);
 }
 
 /**

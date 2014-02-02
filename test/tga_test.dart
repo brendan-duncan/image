@@ -6,7 +6,7 @@ void defineTgaTests() {
       List<int> bytes = new Io.File('res/trees.tga').readAsBytesSync();
 
       // Decode the image from file.
-      Image image = new TgaDecoder().decode(bytes);
+      Image image = new TgaDecoder().decodeImage(bytes);
       expect(image.width, equals(400));
       expect(image.height, equals(533));
 
@@ -18,7 +18,7 @@ void defineTgaTests() {
                           ..writeAsBytesSync(tga);
 
       // Decode the encoded image, make sure it's the same as the original.
-      Image image2 = new TgaDecoder().decode(tga);
+      Image image2 = new TgaDecoder().decodeImage(tga);
       expect(image2.width, equals(400));
       expect(image2.height, equals(533));
     });

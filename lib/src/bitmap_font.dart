@@ -203,7 +203,7 @@ class BitmapFont {
               throw new ImageException('Font zip missing font page image $filename');
             }
 
-            Image image = new PngDecoder().decode(imageFile.content);
+            Image image = new PngDecoder().decodeImage(imageFile.content);
 
             fontPages[id] = image;
           }

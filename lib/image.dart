@@ -65,6 +65,7 @@ part 'src/formats/webp/webp_filters.dart';
 part 'src/formats/webp/webp_frame.dart';
 part 'src/formats/webp/webp_huffman.dart';
 part 'src/formats/webp/webp_info.dart';
+part 'src/formats/decoder.dart';
 part 'src/formats/formats.dart';
 part 'src/formats/gif_decoder.dart';
 part 'src/formats/jpeg_decoder.dart';

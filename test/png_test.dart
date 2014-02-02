@@ -14,7 +14,7 @@ void definePngTests() {
 
     test('decode', () {
       List<int> bytes = new Io.File('out/encode.png').readAsBytesSync();
-      Image image = new PngDecoder().decode(bytes);
+      Image image = new PngDecoder().decodeImage(bytes);
 
       expect(image.width, equals(64));
       expect(image.height, equals(64));
@@ -70,12 +70,12 @@ void definePngTests() {
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
           try {
-            Image image = new PngDecoder().decode(file.readAsBytesSync());
+            Image image = new PngDecoder().decodeImage(file.readAsBytesSync());
             throw new ImageException('This image should not have loaded: $name.');
           } catch (e) {
           }
         } else {
-          Image image = new PngDecoder().decode(file.readAsBytesSync());
+          Image image = new PngDecoder().decodeImage(file.readAsBytesSync());
           List<int> png = new PngEncoder().encode(image);
           new Io.File('out/png/${name}')
                 ..createSync(recursive: true)

@@ -67,7 +67,7 @@ void defineWebPTests() {
       // Validate decoding.
       file = new Io.File(path + '/2b.png');
       bytes = file.readAsBytesSync();
-      Image debugImage = new PngDecoder().decode(bytes);
+      Image debugImage = new PngDecoder().decodeImage(bytes);
       bool found = false;
       for (int y = 0; y < debugImage.height && !found; ++y) {
         for (int x = 0; x < debugImage.width; ++x) {

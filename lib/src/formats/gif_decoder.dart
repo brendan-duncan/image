@@ -1,105 +1,41 @@
 part of image;
 
-class GifDecoder {
-  GifInfo gif;
+/**
+ * A decoder for the GIF image format.  This supports both single frame and
+ * animated GIF files, and transparency.
+ */
+class GifDecoder extends Decoder {
+  GifInfo info;
 
-  /* GIF Format
-   *
-   * GIF Header
-   * Offset   Length   Contents
-   *   0      3 bytes  "GIF"
-   *   3      3 bytes  "87a" or "89a"
-   *   6      2 bytes  <Logical Screen Width>
-   *   8      2 bytes  <Logical Screen Height>
-   *  10      1 byte   bit 0:    Global Color Table Flag (GCTF)
-   *                   bit 1..3: Color Resolution
-   *                   bit 4:    Sort Flag to Global Color Table
-   *                   bit 5..7: Size of Global Color Table: 2^(1+n)
-   *  11      1 byte   <Background Color Index>
-   *  12      1 byte   <Pixel Aspect Ratio>
-   *  13      ? bytes  <Global Color Table(0..255 x 3 bytes) if GCTF is one>
-   *          ? bytes  <Blocks>
-   *          1 bytes  <Trailer> (0x3b)
-   *
-   * Image Block
-   * Offset   Length   Contents
-   *   0      1 byte   Image Separator (0x2c)
-   *   1      2 bytes  Image Left Position
-   *   3      2 bytes  Image Top Position
-   *   5      2 bytes  Image Width
-   *   7      2 bytes  Image Height
-   *   8      1 byte   bit 0:    Local Color Table Flag (LCTF)
-   *                   bit 1:    Interlace Flag
-   *                   bit 2:    Sort Flag
-   *                   bit 2..3: Reserved
-   *                   bit 4..7: Size of Local Color Table: 2^(1+n)
-   *          ? bytes  Local Color Table(0..255 x 3 bytes) if LCTF is one
-   *          1 byte   LZW Minimum Code Size
-   * [ // Blocks
-   *          1 byte   Block Size (s)
-   *          (s)bytes  Image Data
-   * ]*
-   *          1 byte   Block Terminator(0x00)
-   *
-   * Graphic Control Extension Block
-   * Offset   Length   Contents
-   *   0      1 byte   Extension Introducer (0x21)
-   *   1      1 byte   Graphic Control Label (0xf9)
-   *   2      1 byte   Block Size (0x04)
-   *   3      1 byte   bit 0..2: Reserved
-   *                   bit 3..5: Disposal Method
-   *                   bit 6:    User Input Flag
-   *                   bit 7:    Transparent Color Flag
-   *   4      2 bytes  Delay Time (1/100ths of a second)
-   *   6      1 byte   Transparent Color Index
-   *   7      1 byte   Block Terminator(0x00)
-   *
-   * Comment Extension Block
-   * Offset   Length   Contents
-   *   0      1 byte   Extension Introducer (0x21)
-   *   1      1 byte   Comment Label (0xfe)
-   * [
-   *          1 byte   Block Size (s)
-   *         (s)bytes  Comment Data
-   * ]*
-   *          1 byte   Block Terminator(0x00)
-   *
-   * Plain Text Extension Block
-   * Offset   Length   Contents
-   *   0      1 byte   Extension Introducer (0x21)
-   *   1      1 byte   Plain Text Label (0x01)
-   *   2      1 byte   Block Size (0x0c)
-   *   3      2 bytes  Text Grid Left Position
-   *   5      2 bytes  Text Grid Top Position
-   *   7      2 bytes  Text Grid Width
-   *   9      2 bytes  Text Grid Height
-   *  10      1 byte   Character Cell Width(
-   *  11      1 byte   Character Cell Height
-   *  12      1 byte   Text Foreground Color Index(
-   *  13      1 byte   Text Background Color Index(
-   *  [
-   *          1 byte   Block Size (s)
-   *         (s)bytes  Plain Text Data
-   *  ]*
-   *          1 byte   Block Terminator(0x00)
-   *
-   * Application Extension Block
-   * Offset   Length   Contents
-   *   0      1 byte   Extension Introducer (0x21)
-   *   1      1 byte   Application Label (0xff)
-   *   2      1 byte   Block Size (0x0b)
-   *   3      8 bytes  Application Identifire
-   * [
-   *          1 byte   Block Size (s)
-   *         (s)bytes  Application Data
-   * ]*
-   *          1 byte   Block Terminator(0x00)
+  GifDecoder([List<int> bytes]) {
+    if (bytes != null) {
+      getInfo(bytes);
+    }
+  }
+
+  /**
+   * Is the given file a valid WebP image?
    */
+  bool isValidFile(List<int> data) {
+    return getInfo(data) != null;
+  }
 
+  /**
+   * How many frames are available to decode?
+   *
+   * You should have prepared the decoder by either passing the file bytes
+   * to the constructor, or calling getInfo.
+   */
+  int get numFrames => (info != null) ? info.numFrames : 0;
+
+  /**
+   * Validate the file is a Gif image and get information about it.
+   * If the file is not a valid Gif image, null is returned.
+   */
   GifInfo getInfo(List<int> bytes) {
     _input = new Arc.InputStream(bytes);
 
-    gif = new GifInfo();
+    info = new GifInfo();
     if (!_getInfo()) {
       return null;
     }
@@ -112,7 +48,7 @@ class GifDecoder {
           if (gifImage == null) {
             return null;
           }
-          gif.frames.add(gifImage);
+          info.frames.add(gifImage);
           break;
         case EXTENSION_RECORD_TYPE:
           int extCode = _input.readByte();
@@ -140,39 +76,39 @@ class GifDecoder {
               if (transparentFlag != 0) {
                 if (gifImage.colorMap != null) {
                   gifImage.colorMap.transparent = transparent;
-                } else if (gif.globalColorMap != null) {
-                  gif.globalColorMap.transparent = transparent;
+                } else if (info.globalColorMap != null) {
+                  info.globalColorMap.transparent = transparent;
                 }
               }
 
-              gif.frames.add(gifImage);
+              info.frames.add(gifImage);
             }
           } else {
             _skipRemainder();
           }
           break;
         case TERMINATE_RECORD_TYPE:
-          return gif;
+          return info;
         default:
           return null;
       }
     }
 
-    return gif;
+    return info;
   }
 
   Image decodeFrame(int frame) {
-    if (_input == null || gif == null) {
+    if (_input == null || info == null) {
       return null;
     }
 
-    if (frame >= gif.frames.length || frame < 0) {
+    if (frame >= info.frames.length || frame < 0) {
       return null;
     }
 
-    _input.position = gif.frames[frame]._inputPosition;
+    _input.position = info.frames[frame]._inputPosition;
 
-    return _decodeImage(gif.frames[frame]);
+    return _decodeImage(info.frames[frame]);
   }
 
   Image decodeImage(List<int> bytes, {int frame: 0}) {
@@ -193,15 +129,15 @@ class GifDecoder {
 
     Animation anim = new Animation();
 
-    Image lastImage = new Image(gif.width, gif.height);
-    for (int i = 0; i < gif.numFrames; ++i) {
+    Image lastImage = new Image(info.width, info.height);
+    for (int i = 0; i < info.numFrames; ++i) {
       if (lastImage == null) {
-        lastImage = new Image(gif.width, gif.height);
+        lastImage = new Image(info.width, info.height);
       } else {
         lastImage = new Image.from(lastImage);
       }
 
-      GifImageDesc frame = gif.frames[i];
+      GifImageDesc frame = info.frames[i];
       Image image = decodeFrame(i);
       if (image == null) {
         return null;
@@ -209,11 +145,11 @@ class GifDecoder {
 
       GifColorMap colorMap = (frame.colorMap != null) ?
                               frame.colorMap :
-                              gif.globalColorMap;
+                                info.globalColorMap;
 
       if (lastImage != null) {
         if (frame.clearFrame) {
-          lastImage.fill(colorMap.color(gif.backgroundColor));
+          lastImage.fill(colorMap.color(info.backgroundColor));
         }
         copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
       } else {
@@ -264,14 +200,14 @@ class GifDecoder {
     int width = gifImage.width;
     int height = gifImage.height;
 
-    if (gifImage.x + width > gif.width ||
-        gifImage.y + height > gif.height) {
+    if (gifImage.x + width > info.width ||
+        gifImage.y + height > info.height) {
       return null;
     }
 
     GifColorMap colorMap = (gifImage.colorMap != null) ?
                            gifImage.colorMap :
-                           gif.globalColorMap;
+                             info.globalColorMap;
 
     _pixelCount = width * height;
 
@@ -316,32 +252,32 @@ class GifDecoder {
       return false;
     }
 
-    gif.width = _input.readUint16();
-    gif.height = _input.readUint16();
+    info.width = _input.readUint16();
+    info.height = _input.readUint16();
 
     int b = _input.readByte();
-    gif.colorResolution = (((b & 0x70) + 1) >> 4) + 1;
+    info.colorResolution = (((b & 0x70) + 1) >> 4) + 1;
 
     int bitsPerPixel = (b & 0x07) + 1;
 
-    gif.backgroundColor = _input.readByte();
+    info.backgroundColor = _input.readByte();
 
     _input.skip(1);
 
     // Is there a global color map?
     if (b & 0x80 != 0) {
-      gif.globalColorMap = new GifColorMap(1 << bitsPerPixel);
+      info.globalColorMap = new GifColorMap(1 << bitsPerPixel);
 
       // Get the global color map:
-      for (int i = 0; i < gif.globalColorMap.numColors; ++i) {
+      for (int i = 0; i < info.globalColorMap.numColors; ++i) {
         int r = _input.readByte();
         int g = _input.readByte();
         int b = _input.readByte();
-        gif.globalColorMap.setColor(i, r, g, b);
+        info.globalColorMap.setColor(i, r, g, b);
       }
     }
 
-    gif.isGif89 = tag == GIF89_STAMP;
+    info.isGif89 = tag == GIF89_STAMP;
 
     return true;
   }

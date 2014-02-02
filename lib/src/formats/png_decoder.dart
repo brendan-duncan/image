@@ -3,14 +3,31 @@ part of image;
 /**
  * Decode a PNG encoded image.
  */
-class PngDecoder {
+class PngDecoder extends Decoder {
   _PngHeader header;
   List<int> palette;
   List<int> transparency;
   List<int> colorLut;
   double gamma;
 
-  Image decode(List<int> data) {
+  /**
+   * Is the given file a valid PNG image?
+   */
+  bool isValidFile(List<int> data) {
+    Arc.InputStream input = new Arc.InputStream(data,
+        byteOrder: Arc.BIG_ENDIAN);
+    List<int> pngHeader = input.readBytes(8);
+    const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
+    for (int i = 0; i < 8; ++i) {
+      if (pngHeader[i] != PNG_HEADER[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  Image decodeImage(List<int> data, {int frame: 0}) {
     Arc.InputStream input = new Arc.InputStream(data,
         byteOrder: Arc.BIG_ENDIAN);
 
@@ -240,6 +257,18 @@ class PngDecoder {
     }
 
     return image;
+  }
+
+  Animation decodeAnimation(List<int> data) {
+    Image image = decodeImage(data);
+    if (image == null) {
+      return null;
+    }
+
+    Animation anim = new Animation();
+    anim.addFrame(image);
+
+    return anim;
   }
 
   /**

@@ -4,8 +4,29 @@ part of image;
  * Decode a WebP formatted image. This supports lossless (vp8l), lossy (vp8),
  * lossy+alpha, and animated WebP images.
  */
-class WebPDecoder {
-  WebPInfo webp;
+class WebPDecoder extends Decoder {
+  WebPInfo info;
+
+  WebPDecoder([List<int> bytes]) {
+    if (bytes != null) {
+      getInfo(bytes);
+    }
+  }
+
+  /**
+   * Is the given file a valid WebP image?
+   */
+  bool isValidFile(List<int> data) {
+    return getInfo(data) != null;
+  }
+
+  /**
+   * How many frames are available to decode?
+   *
+   * You should have prepared the decoder by either passing the file bytes
+   * to the constructor, or calling getInfo.
+   */
+  int get numFrames => (info != null) ? info.numFrames : 0;
 
   /**
    * Validate the file is a WebP image and get information about it.
@@ -19,56 +40,56 @@ class WebPDecoder {
       return null;
     }
 
-    webp = new WebPInfo();
-    if (!_getInfo(_input, webp)) {
+    info = new WebPInfo();
+    if (!_getInfo(_input, info)) {
       return null;
     }
 
-    switch (webp.format) {
+    switch (info.format) {
       case WebPInfo.FORMAT_ANIMATED:
-        return webp;
+        return info;
       case WebPInfo.FORMAT_LOSSLESS:
-        _input.position = webp._vp8Position;
-        VP8L vp8l = new VP8L(_input, webp);
+        _input.position = info._vp8Position;
+        VP8L vp8l = new VP8L(_input, info);
         if (!vp8l.decodeHeader()) {
           return null;
         }
-        return webp;
+        return info;
       case WebPInfo.FORMAT_LOSSY:
-        _input.position = webp._vp8Position;
-        VP8 vp8 = new VP8(_input, webp);
+        _input.position = info._vp8Position;
+        VP8 vp8 = new VP8(_input, info);
         if (!vp8.decodeHeader()) {
           return null;
         }
-        return webp;
+        return info;
     }
 
     return null;
   }
 
   Image decodeFrame(int frame) {
-    if (_input == null || webp == null) {
+    if (_input == null || info == null) {
       return null;
     }
 
-    if (frame >= webp.frames.length || frame < 0) {
+    if (frame >= info.frames.length || frame < 0) {
       return null;
     }
 
-    if (webp.hasAnimation) {
-      WebPFrame f = webp.frames[frame];
+    if (info.hasAnimation) {
+      WebPFrame f = info.frames[frame];
       Arc.InputStream frameData = _input.subset(f._framePosition,
           f._frameSize);
 
       return _decodeFrame(frameData, frame: frame);
     }
 
-    if (webp.format == WebPInfo.FORMAT_LOSSLESS) {
-      Arc.InputStream data = _input.subset(webp._vp8Position, webp._vp8Size);
-      return new VP8L(data, webp).decode();
-    } else if (webp.format == WebPInfo.FORMAT_LOSSY) {
-      Arc.InputStream data = _input.subset(webp._vp8Position, webp._vp8Size);
-      return new VP8(data, webp).decode();
+    if (info.format == WebPInfo.FORMAT_LOSSLESS) {
+      Arc.InputStream data = _input.subset(info._vp8Position, info._vp8Size);
+      return new VP8L(data, info).decode();
+    } else if (info.format == WebPInfo.FORMAT_LOSSY) {
+      Arc.InputStream data = _input.subset(info._vp8Position, info._vp8Size);
+      return new VP8(data, info).decode();
     }
 
     return null;
@@ -100,18 +121,18 @@ class WebPDecoder {
     }
 
     Animation anim = new Animation();
-    anim.loopCount = webp.animLoopCount;
+    anim.loopCount = info.animLoopCount;
 
-    if (webp.hasAnimation) {
-      Image lastImage = new Image(webp.width, webp.height);
-      for (int i = 0; i < webp.numFrames; ++i) {
+    if (info.hasAnimation) {
+      Image lastImage = new Image(info.width, info.height);
+      for (int i = 0; i < info.numFrames; ++i) {
         if (lastImage == null) {
-          lastImage = new Image(webp.width, webp.height);
+          lastImage = new Image(info.width, info.height);
         } else {
           lastImage = new Image.from(lastImage);
         }
 
-        WebPFrame frame = webp.frames[i];
+        WebPFrame frame = info.frames[i];
         Image image = decodeFrame(i);
         if (image == null) {
           return null;
@@ -119,7 +140,7 @@ class WebPDecoder {
 
         if (lastImage != null) {
           if (frame.clearFrame) {
-            lastImage.fill(webp.animBackgroundColor);
+            lastImage.fill(info.animBackgroundColor);
           }
           copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
         } else {
