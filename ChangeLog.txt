@@ -1,0 +1,9 @@
+v 1.1.8 - February 01, 2014
+
+- Added GIF decoding support, including animated gifs.
+
+
+v 1.1.7 - January 28, 2014
+
+- Added WebP decoding support, included animated WebP.
+
