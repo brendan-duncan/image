@@ -166,8 +166,6 @@ class VP8LTransform {
     }
   }
 
-  static bool __debug = false;
-
   /**
    * Inverse prediction.
    */
@@ -189,11 +187,6 @@ class VP8LTransform {
     final int mask = (1 << bits) - 1;
     final int tilesPerRow = VP8L._subSampleSize(width, bits);
     int predModeBase = (y >> bits) * tilesPerRow; //this.data +
-    /*if (yStart == 144) {
-      print('    ${mask.toRadixString(16)}');
-      print('    $tilesPerRow');
-      print('    $predModeBase');
-    }*/
 
     while (y < yEnd) {
       final int pred2 = _predictor2(outData, outData[data - 1], data - width);
@@ -211,22 +204,9 @@ class VP8LTransform {
           int k = ((this.data[predModeSrc++]) >> 8) & 0xf;
           predFunc = PREDICTORS[k];
         }
-        // dart2js is starting to diverge at x=3,y=100
-        /*if (x == 3 && y >= 80 && y <= 100) {
-          __debug = true;
-          print('!');
-        }
-        if (__debug) {
-          print('[$y]');
-        }*/
         int d = outData[data + x - 1];
         int pred = predFunc(outData, d, data + x - width);
         _addPixelsEq(outData, data + x, pred);
-        /*if (__debug) {
-          __debug = false;
-          print('    ${pred}');
-          print('    @${outData[data + 3].toRadixString(16)}');
-        }*/
       }
 
       data += width;
@@ -298,7 +278,7 @@ class VP8LTransform {
     }
     // return 0, when a is a negative integer.
     // return 255, when a is positive.
-    return _int32ToUint32(~a) >> 24;
+    return _int32ToUint32((-a - 1)) >> 24;
   }
 
   static int _addSubtractComponentFull(int a, int b, int c) {
@@ -306,7 +286,6 @@ class VP8LTransform {
   }
 
   static int _clampedAddSubtractFull(int c0, int c1, int c2) {
-    //if (__debug) print('_clampedAddSubtractFull $c0 $c1 $c2');
     final int a = _addSubtractComponentFull(c0 >> 24, c1 >> 24, c2 >> 24);
     final int r = _addSubtractComponentFull((c0 >> 16) & 0xff,
         (c1 >> 16) & 0xff,
@@ -319,16 +298,17 @@ class VP8LTransform {
   }
 
   static int _addSubtractComponentHalf(int a, int b) {
-    return _clip255(a + (a - b) ~/ 2);
+    int c = a + (a - b) ~/ 2;
+    int d = _clip255(c);
+    return d;
   }
 
   static int _clampedAddSubtractHalf(int c0, int c1, int c2) {
-    //if (__debug) print('_clampedAddSubtractHalf $c0 $c1 $c2');
-    final int ave = _average2(c0, c1);
-    final int a = _addSubtractComponentHalf(ave >> 24, c2 >> 24);
-    final int r = _addSubtractComponentHalf((ave >> 16) & 0xff, (c2 >> 16) & 0xff);
-    final int g = _addSubtractComponentHalf((ave >> 8) & 0xff, (c2 >> 8) & 0xff);
-    final int b = _addSubtractComponentHalf((ave >> 0) & 0xff, (c2 >> 0) & 0xff);
+    final int avg = _average2(c0, c1);
+    final int a = _addSubtractComponentHalf(avg >> 24, c2 >> 24);
+    final int r = _addSubtractComponentHalf((avg >> 16) & 0xff, (c2 >> 16) & 0xff);
+    final int g = _addSubtractComponentHalf((avg >> 8) & 0xff, (c2 >> 8) & 0xff);
+    final int b = _addSubtractComponentHalf((avg >> 0) & 0xff, (c2 >> 0) & 0xff);
     return (a << 24) | (r << 16) | (g << 8) | b;
   }
 
@@ -351,100 +331,58 @@ class VP8LTransform {
   // Predictors
 
   static int _predictor0(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-      print('PRED0');
-    }
     return VP8L.ARGB_BLACK;
   }
 
   static int _predictor1(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-      print('PRED1 $left');
-    }
     return left;
   }
 
   static int _predictor2(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED2');
-        }
     return pixels[top];
   }
 
   static int _predictor3(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED3');
-        }
     return pixels[top + 1];
   }
 
   static int _predictor4(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED4');
-        }
     return pixels[top -1];
   }
 
   static int _predictor5(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED5');
-        }
     return _average3(left, pixels[top], pixels[top + 1]);
   }
 
   static int _predictor6(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED6');
-        }
     return _average2(left, pixels[top - 1]);
   }
 
   static int _predictor7(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED7');
-        }
     return _average2(left, pixels[top]);
   }
 
   static int _predictor8(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED8');
-        }
     return _average2(pixels[top -1], pixels[top]);
   }
 
   static int _predictor9(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED9');
-        }
     return _average2(pixels[top], pixels[top + 1]);
   }
 
   static int _predictor10(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED10');
-        }
     return _average4(left, pixels[top -1], pixels[top], pixels[top + 1]);
   }
 
   static int _predictor11(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED11');
-        }
     return _select(pixels[top], left, pixels[top - 1]);
   }
 
   static int _predictor12(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED12');
-        }
     return _clampedAddSubtractFull(left, pixels[top], pixels[top - 1]);
   }
 
   static int _predictor13(Data.Uint32List pixels, int left, int top) {
-    if (__debug) {
-          print('PRED13');
-        }
     return _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
   }
 
