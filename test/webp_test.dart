@@ -51,7 +51,7 @@ void defineWebPTests() {
   }*/
 
   group('WebP/decodeImage', () {
-    test('validate', () {
+    /*test('validate', () {
       Io.File file = new Io.File(path + '/2b.webp');
       List<int> bytes = file.readAsBytesSync();
       Image image = new WebPDecoder().decodeImage(bytes);
@@ -72,7 +72,7 @@ void defineWebPTests() {
           expect(c, equals(dc));
         }
       }
-    });
+    });*/
 
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.webp')) {
