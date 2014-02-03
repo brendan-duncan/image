@@ -34,19 +34,17 @@ void defineWebPTests() {
     }
   });
 
-  /*List<int> bytes = new Io.File(path + '/GenevaDrive.webp')
+  List<int> bytes = new Io.File(path + '/1_webp_ll.webp')
                           .readAsBytesSync();
+  Image image = new WebPDecoder().decodeImage(bytes);
+  List<int> png = new PngEncoder().encode(image);
+  new Io.File('out/webp/decode.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(png);
 
-  WebPDecoder dec = new WebPDecoder();
-  WebPInfo info = dec.getInfo(bytes);
 
-  for (int i = 0; i < info.numFrames; ++i) {
-    Image frame = dec.decodeFrame(i);
-      new Io.File('out/webp/anim_$i.png')
-            ..writeAsBytesSync(encodePng(frame));
-  }
 
-  Animation anim = new WebPDecoder().decodeAnimation(bytes);
+  /*Animation anim = new WebPDecoder().decodeAnimation(bytes);
   for (int i = 0; i < anim.numFrames; ++i) {
     AnimationFrame frame = anim[i];
     List<int> png = new PngEncoder().encode(frame.image);

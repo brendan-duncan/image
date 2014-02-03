@@ -127,7 +127,7 @@ class _HuffmanTree {
     int lut_bits = lutBits[lut_ix];
 
     if (lut_bits <= HUFF_LUT_BITS) {
-      br.setBitPos(br.bitPos + lut_bits);
+      br.bitPos = br.bitPos + lut_bits;
       return this.lutSymbol[lut_ix];
     }
 
@@ -142,7 +142,7 @@ class _HuffmanTree {
       ++newBitPos;
     } while (_nodeIsNotLeaf(node));
 
-    br.setBitPos(newBitPos);
+    br.bitPos = newBitPos;
 
     return _nodeSymbol(node);
   }
