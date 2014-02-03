@@ -64,9 +64,9 @@ class VP8L {
     final int cachePixels = webp.width * _NUM_ARGB_CACHE_ROWS;
     final int totalNumPixels = numPixels + cacheTopPixels + cachePixels;
 
-    var pixels32 = new Data.Uint32List(totalNumPixels);
+    Data.Uint32List pixels32 = new Data.Uint32List(totalNumPixels);
     _pixels = pixels32;
-    _pixels8 = new Data.Uint8List.view(pixels32);
+    _pixels8 = new Data.Uint8List.view(pixels32.buffer);
     _argbCache = numPixels + cacheTopPixels;
 
     return true;
