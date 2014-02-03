@@ -34,15 +34,13 @@ void defineWebPTests() {
     }
   });
 
-  List<int> bytes = new Io.File(path + '/1_webp_ll.webp')
+  /*List<int> bytes = new Io.File(path + '/1_webp_ll.webp')
                           .readAsBytesSync();
   Image image = new WebPDecoder().decodeImage(bytes);
   List<int> png = new PngEncoder().encode(image);
   new Io.File('out/webp/decode.png')
         ..createSync(recursive: true)
-        ..writeAsBytesSync(png);
-
-
+        ..writeAsBytesSync(png);*/
 
   /*Animation anim = new WebPDecoder().decodeAnimation(bytes);
   for (int i = 0; i < anim.numFrames; ++i) {

@@ -228,7 +228,8 @@ class VP8L {
         int blue = htreeGroup.htrees[_BLUE].readSymbol(br);
         int alpha = htreeGroup.htrees[_ALPHA].readSymbol(br);
 
-        data[src] = (alpha << 24) | (red << 16) | (green << 8) | blue;
+        int c = (alpha << 24) | (red << 16) | (green << 8) | blue;
+        data[src] = c;
 
         ++src;
         ++col;
@@ -481,6 +482,7 @@ class VP8L {
    * Processes (transforms, scales & color-converts) the rows decoded after the
    * last call.
    */
+  static int __count = 0;
   void _processRows(int row) {
     int rows = webp.width * _lastRow; // offset into _pixels
     final int numRows = row - _lastRow;
@@ -496,7 +498,6 @@ class VP8L {
     for (int y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
       for (int x = 0; x < webp.width; ++x, ++pi) {
         int c = _pixels[pi];
-
         int r = getRed(c);
         int g = getGreen(c);
         int b = getBlue(c);

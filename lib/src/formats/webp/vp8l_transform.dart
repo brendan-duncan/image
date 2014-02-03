@@ -166,6 +166,8 @@ class VP8LTransform {
     }
   }
 
+  static bool __debug = false;
+
   /**
    * Inverse prediction.
    */
@@ -187,6 +189,11 @@ class VP8LTransform {
     final int mask = (1 << bits) - 1;
     final int tilesPerRow = VP8L._subSampleSize(width, bits);
     int predModeBase = (y >> bits) * tilesPerRow; //this.data +
+    /*if (yStart == 144) {
+      print('    ${mask.toRadixString(16)}');
+      print('    $tilesPerRow');
+      print('    $predModeBase');
+    }*/
 
     while (y < yEnd) {
       final int pred2 = _predictor2(outData, outData[data - 1], data - width);
@@ -196,14 +203,30 @@ class VP8LTransform {
       _addPixelsEq(outData, data, pred2);
 
       // .. the rest:
-      var predFunc = PREDICTORS[(this.data[predModeSrc++] >> 8) & 0xf];
+      int k = (this.data[predModeSrc++] >> 8) & 0xf;
+
+      var predFunc = PREDICTORS[k];
       for (int x = 1; x < width; ++x) {
         if ((x & mask) == 0) {    // start of tile. Read predictor function.
           int k = ((this.data[predModeSrc++]) >> 8) & 0xf;
           predFunc = PREDICTORS[k];
         }
-        int pred = predFunc(outData, outData[data + x - 1], data + x - width);
+        // dart2js is starting to diverge at x=3,y=100
+        /*if (x == 3 && y >= 80 && y <= 100) {
+          __debug = true;
+          print('!');
+        }
+        if (__debug) {
+          print('[$y]');
+        }*/
+        int d = outData[data + x - 1];
+        int pred = predFunc(outData, d, data + x - width);
         _addPixelsEq(outData, data + x, pred);
+        /*if (__debug) {
+          __debug = false;
+          print('    ${pred}');
+          print('    @${outData[data + 3].toRadixString(16)}');
+        }*/
       }
 
       data += width;
@@ -283,6 +306,7 @@ class VP8LTransform {
   }
 
   static int _clampedAddSubtractFull(int c0, int c1, int c2) {
+    //if (__debug) print('_clampedAddSubtractFull $c0 $c1 $c2');
     final int a = _addSubtractComponentFull(c0 >> 24, c1 >> 24, c2 >> 24);
     final int r = _addSubtractComponentFull((c0 >> 16) & 0xff,
         (c1 >> 16) & 0xff,
@@ -299,6 +323,7 @@ class VP8LTransform {
   }
 
   static int _clampedAddSubtractHalf(int c0, int c1, int c2) {
+    //if (__debug) print('_clampedAddSubtractHalf $c0 $c1 $c2');
     final int ave = _average2(c0, c1);
     final int a = _addSubtractComponentHalf(ave >> 24, c2 >> 24);
     final int r = _addSubtractComponentHalf((ave >> 16) & 0xff, (c2 >> 16) & 0xff);
@@ -326,58 +351,100 @@ class VP8LTransform {
   // Predictors
 
   static int _predictor0(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+      print('PRED0');
+    }
     return VP8L.ARGB_BLACK;
   }
 
   static int _predictor1(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+      print('PRED1 $left');
+    }
     return left;
   }
 
   static int _predictor2(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED2');
+        }
     return pixels[top];
   }
 
   static int _predictor3(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED3');
+        }
     return pixels[top + 1];
   }
 
   static int _predictor4(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED4');
+        }
     return pixels[top -1];
   }
 
   static int _predictor5(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED5');
+        }
     return _average3(left, pixels[top], pixels[top + 1]);
   }
 
   static int _predictor6(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED6');
+        }
     return _average2(left, pixels[top - 1]);
   }
 
   static int _predictor7(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED7');
+        }
     return _average2(left, pixels[top]);
   }
 
   static int _predictor8(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED8');
+        }
     return _average2(pixels[top -1], pixels[top]);
   }
 
   static int _predictor9(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED9');
+        }
     return _average2(pixels[top], pixels[top + 1]);
   }
 
   static int _predictor10(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED10');
+        }
     return _average4(left, pixels[top -1], pixels[top], pixels[top + 1]);
   }
 
   static int _predictor11(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED11');
+        }
     return _select(pixels[top], left, pixels[top - 1]);
   }
 
   static int _predictor12(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED12');
+        }
     return _clampedAddSubtractFull(left, pixels[top], pixels[top - 1]);
   }
 
   static int _predictor13(Data.Uint32List pixels, int left, int top) {
+    if (__debug) {
+          print('PRED13');
+        }
     return _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
   }
 
@@ -423,12 +490,11 @@ class _VP8LMultipliers {
       (data[1] << 8) |
       data[0];
 
-
   int transformColor(int argb, bool inverse) {
-    final int green = argb >> 8;
-    final int red = argb >> 16;
+    final int green = (argb >> 8) & 0xff;
+    final int red = (argb >> 16) & 0xff;
     int newRed = red;
-    int newBlue = argb;
+    int newBlue = argb & 0xff;
 
     if (inverse) {
       int g = colorTransformDelta(greenToRed, green);
@@ -445,11 +511,18 @@ class _VP8LMultipliers {
       newBlue &= 0xff;
     }
 
-    return (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | (newBlue);
+    int c = (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | (newBlue);
+    return c;
   }
 
   int colorTransformDelta(int colorPred, int color) {
-    return _int32ToUint32(_uint8ToInt8(colorPred) * _uint8ToInt8(color)) >> 5;
+    // There's a bug in dart2js (issue 16497) that requires I do this a bit
+    // convoluted to avoid having the optimizer butcher the code.
+    int a = _uint8ToInt8(colorPred);
+    _uint8ToInt8_uint8_[0] = color;
+    int b = _uint8ToInt8_int8_[0];
+    int d = _int32ToUint32(a * b);
+    return d >> 5;
   }
 }
 
@@ -458,8 +531,8 @@ class _VP8LMultipliers {
  * typecasting an unsigned char to a char.
  */
 int _uint8ToInt8(int d) {
-  d &= 0xff; // clamp to 8-bit
-  return (d < 128) ? d : -(256 - d);
+  _uint8ToInt8_uint8[0] = d;
+  return _uint8ToInt8_int8[0];
 }
 
 /**
@@ -471,7 +544,14 @@ int _int32ToUint32(int d) {
   return _int32ToUint32_uint32[0];
 }
 
-final Data.Int32List _int32ToUint32_int32 = new Data.Int32List(1);
+final Data.Uint8List _uint8ToInt8_uint8 = new Data.Uint8List(1);
+final Data.Int8List _uint8ToInt8_int8 =
+    new Data.Int8List.view(_uint8ToInt8_uint8.buffer);
 
+final Data.Uint8List _uint8ToInt8_uint8_ = new Data.Uint8List(1);
+final Data.Int8List _uint8ToInt8_int8_ =
+    new Data.Int8List.view(_uint8ToInt8_uint8_.buffer);
+
+final Data.Int32List _int32ToUint32_int32 = new Data.Int32List(1);
 final Data.Uint32List _int32ToUint32_uint32 =
     new Data.Uint32List.view(_int32ToUint32_int32.buffer);
