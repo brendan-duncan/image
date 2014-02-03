@@ -271,19 +271,24 @@ class VP8LTransform {
     return _average2(_average2(a0, a1), _average2(a2, a3));
   }
 
+  /**
+   * Return 0, when a is a negative integer.
+   * Return 255, when a is positive.
+   */
   static int _clip255(int a) {
-    a = _int32ToUint32(a);
-    if (a < 256) {
-      return a;
+    if (a < 0) {
+      return 0;
     }
-    // return 0, when a is a negative integer.
-    // return 255, when a is positive.
-    return _int32ToUint32((-a - 1)) >> 24;
+    if (a > 255) {
+      return 255;
+    }
+    return a;
   }
 
   static int _addSubtractComponentFull(int a, int b, int c) {
     return _clip255(a + b - c);
   }
+
 
   static int _clampedAddSubtractFull(int c0, int c1, int c2) {
     final int a = _addSubtractComponentFull(c0 >> 24, c1 >> 24, c2 >> 24);
@@ -298,9 +303,7 @@ class VP8LTransform {
   }
 
   static int _addSubtractComponentHalf(int a, int b) {
-    int c = a + (a - b) ~/ 2;
-    int d = _clip255(c);
-    return d;
+    return _clip255(a + (a - b) ~/ 2);
   }
 
   static int _clampedAddSubtractHalf(int c0, int c1, int c2) {
