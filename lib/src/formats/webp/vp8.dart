@@ -8,8 +8,7 @@ class VP8 {
   WebPInfo webp;
 
   VP8(Arc.InputStream input, this.webp) :
-    this.input = input {
-  }
+    this.input = input;
 
   bool decodeHeader() {
     int bits = input.readUint24();
@@ -402,8 +401,8 @@ class VP8 {
         // We include 'extra_pixels' on the other side of the boundary, since
         // vertical or horizontal filtering of the previous macroblock can
         // modify some abutting pixels.
-        _tlMbX = (_cropLeft - extraPixels) >> 4;
-        _tlMbY = (_cropTop - extraPixels) >> 4;
+        _tlMbX = (_cropLeft - extraPixels) ~/ 16;
+        _tlMbY = (_cropTop - extraPixels) ~/ 16;
         if (_tlMbX < 0) {
           _tlMbX = 0;
         }
@@ -411,9 +410,10 @@ class VP8 {
           _tlMbY = 0;
         }
       }
+
       // We need some 'extra' pixels on the right/bottom.
-      _brMbY = (_cropBottom + 15 + extraPixels) >> 4;
-      _brMbX = (_cropRight + 15 + extraPixels) >> 4;
+      _brMbY = (_cropBottom + 15 + extraPixels) ~/ 16;
+      _brMbX = (_cropRight + 15 + extraPixels) ~/ 16;
       if (_brMbX > _mbWidth) {
         _brMbX = _mbWidth;
       }
@@ -649,7 +649,7 @@ class VP8 {
   }
 
   // vertical position of a MB
-  int MACROBLOCK_VPOS(int mb_y) => ((mb_y) * 16);
+  int MACROBLOCK_VPOS(int mb_y) => mb_y * 16;
 
   /**
    * kFilterExtraRows[] = How many extra lines are needed on the MB boundary
@@ -737,14 +737,14 @@ class VP8 {
     final int extraYRows = kFilterExtraRows[_filterType];
     final int ySize = extraYRows * _cacheYStride;
     final int uvSize = (extraYRows ~/ 2) * _cacheUVStride;
-    final int yOffset = 0;
-    final int uvOffset = 0;
-    Arc.MemPtr yDst = new Arc.MemPtr(_cacheY, -ySize + yOffset);
-    Arc.MemPtr uDst = new Arc.MemPtr(_cacheU, -uvSize + uvOffset);
-    Arc.MemPtr vDst = new Arc.MemPtr(_cacheV, -uvSize + uvOffset);
+    Arc.MemPtr yDst = new Arc.MemPtr(_cacheY, -ySize);
+    Arc.MemPtr uDst = new Arc.MemPtr(_cacheU, -uvSize);
+    Arc.MemPtr vDst = new Arc.MemPtr(_cacheV, -uvSize);
     final int mbY = _mbY;
     final bool isFirstRow = (mbY == 0);
     final bool isLastRow = (mbY >= _brMbY - 1);
+    int yStart = MACROBLOCK_VPOS(mbY);
+    int yEnd = MACROBLOCK_VPOS(mbY + 1);
 
     if (useFilter) {
       _filterRow();
@@ -754,18 +754,15 @@ class VP8 {
       _ditherRow();
     }
 
-    int yStart = MACROBLOCK_VPOS(mbY);
-    int yEnd = MACROBLOCK_VPOS(mbY + 1);
-
     if (!isFirstRow) {
       yStart -= extraYRows;
       _y = new Arc.MemPtr(yDst);
       _u = new Arc.MemPtr(uDst);
       _v = new Arc.MemPtr(vDst);
     } else {
-      _y = new Arc.MemPtr(_cacheY, yOffset);
-      _u = new Arc.MemPtr(_cacheU, uvOffset);
-      _v = new Arc.MemPtr(_cacheV, uvOffset);
+      _y = new Arc.MemPtr(_cacheY);
+      _u = new Arc.MemPtr(_cacheU);
+      _v = new Arc.MemPtr(_cacheV);
     }
 
     if (!isLastRow) {
@@ -832,7 +829,8 @@ class VP8 {
   }
 
   int _clip8(int v) {
-    return ((v & ~YUV_MASK2) == 0) ? (v >> YUV_FIX2) : (v < 0) ? 0 : 255;
+    int d = ((v & XOR_YUV_MASK2) == 0) ? (v >> YUV_FIX2) : (v < 0) ? 0 : 255;
+    return d;
   }
 
   int _yuvToR(int y, int v) {
@@ -1952,6 +1950,7 @@ class VP8 {
   static const int YUV_FIX2 = 14; // fixed-point precision for YUV->RGB
   static const int YUV_HALF2 = 1 << (YUV_FIX2 - 1);
   static const int YUV_MASK2 = (256 << YUV_FIX2) - 1;
+  static const int XOR_YUV_MASK2 = (-YUV_MASK2 - 1);
 
   // These constants are 14b fixed-point version of ITU-R BT.601 constants.
   static const int kYScale = 19077;    // 1.164 = 255 / 219
