@@ -141,8 +141,8 @@ class VP8Filter {
     final int q0 = p[0];
     final int q1 = p[step];
     final int a = 3 * (q0 - p0) + sclip1[1020 + p1 - q1];
-    final int a1 = sclip2[112 + ((a + 4) ~/ 8)];
-    final int a2 = sclip2[112 + ((a + 3) ~/ 8)];
+    final int a1 = sclip2[112 + _shiftR((a + 4), 3)];
+    final int a2 = sclip2[112 + _shiftR((a + 3), 3)];
     p[-step] = clip1[255 + p0 + a2];
     p[0] = clip1[255 + q0 - a1];
   }
@@ -156,9 +156,9 @@ class VP8Filter {
     final int q0 = p[0];
     final int q1 = p[step];
     final int a = 3 * (q0 - p0);
-    final int a1 = sclip2[112 + ((a + 4) ~/ 8)];
-    final int a2 = sclip2[112 + ((a + 3) ~/ 8)];
-    final int a3 = (a1 + 1) ~/ 2;
+    final int a1 = sclip2[112 + _shiftR((a + 4), 3)];
+    final int a2 = sclip2[112 + _shiftR((a + 3), 3)];
+    final int a3 = _shiftR(a1 + 1, 1);
     p[-2 * step] = clip1[255 + p1 + a3];
     p[-step] = clip1[255 + p0 + a2];
     p[0] = clip1[255 + q0 - a1];
@@ -176,9 +176,9 @@ class VP8Filter {
     final int q1 = p[step];
     final int q2 = p[2 * step];
     final int a = sclip1[1020 + 3 * (q0 - p0) + sclip1[1020 + p1 - q1]];
-    final int a1 = (27 * a + 63) ~/ 128;  // eq. to ((3 * a + 7) * 9) >> 7
-    final int a2 = (18 * a + 63) ~/ 128;  // eq. to ((2 * a + 7) * 9) >> 7
-    final int a3 = (9  * a + 63) ~/ 128;  // eq. to ((1 * a + 7) * 9) >> 7
+    final int a1 = _shiftR(27 * a + 63, 7); // eq. to ((3 * a + 7) * 9) >> 7
+    final int a2 = _shiftR(18 * a + 63, 7); // eq. to ((2 * a + 7) * 9) >> 7
+    final int a3 = _shiftR(9  * a + 63, 7); // eq. to ((1 * a + 7) * 9) >> 7
     p[-3 * step] = clip1[255 + p2 + a3];
     p[-2 * step] = clip1[255 + p1 + a2];
     p[-step] = clip1[255 + p0 + a1];
@@ -313,10 +313,10 @@ class VP8Filter {
     _store2(dst, 3, a - d4, d1, c1);
   }
 
-  static int AVG3(a, b, c) => (((a) + 2 * (b) + (c) + 2) ~/ 4);
-  static int AVG2(a, b) => (((a) + (b) + 1) ~/ 2);
+  static int AVG3(a, b, c) => _shiftR(((a) + 2 * (b) + (c) + 2), 2);
+  static int AVG2(a, b) => _shiftR(((a) + (b) + 1), 1);
 
-  static void VE4(Arc.MemPtr dst) { // vertical
+  static void VE4(Arc.MemPtr dst) {
     int top = -VP8.BPS; // dst +
     final List<int> vals = [
        AVG3(dst[top - 1], dst[top],     dst[top + 1]),
@@ -329,7 +329,7 @@ class VP8Filter {
     }
   }
 
-  static void HE4(Arc.MemPtr dst) { // horizontal
+  static void HE4(Arc.MemPtr dst) {
     final int A = dst[-1 - VP8.BPS];
     final int B = dst[-1];
     final int C = dst[-1 + VP8.BPS];
@@ -657,15 +657,7 @@ class VP8Filter {
 
   static int _mul(int a, int b) {
     int c = a * b;
-    // dart2js doesn't support binary operations on negative numbers
-    // (issue https://code.google.com/p/dart/issues/detail?id=16506)
-    // so the special case has been added to circumvent the problem by
-    // flipping the signs a few times and compensating.
-    if (c < 0) {
-      return -((-c) >> 16) - 1;
-    }
-
-    return c >> 16;
+    return _shiftR(c, 16);
   }
 
   static void _store(Arc.MemPtr dst, int di, int x, int y, int v) {
@@ -712,6 +704,24 @@ class VP8Filter {
   static int _clip8b(int v) {
     return ((v & -256) == 0) ? v : (v < 0) ? 0 : 255;
   }
+
+  static int __maxN = 0;
+
+  static int _shiftR(int v, int n) {
+    if (v >= 0) {
+      return v >> n;
+    }
+
+    // dart2js can't handle binary operations on negative numbers, so
+    // until that issue is fixed (issues 16506, 1533), we'll have to do it
+    // the slow way.
+    return (v / _SHIFT_BITS[n]).floor();
+  }
+
+  static const List<int> _SHIFT_BITS = const [
+    1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384,
+    32768, 65536];
+
 
   static bool _tablesInitialized = false;
 }
