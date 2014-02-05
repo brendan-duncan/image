@@ -8,4 +8,5 @@ dependencies:
   archive: '>=1.0.11'
   xml: '>=0.9.5'
 dev_dependencies:
+  crypto: '>=0.9.0 <1.0.0'
   unittest: any
