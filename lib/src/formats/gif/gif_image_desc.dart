@@ -10,7 +10,7 @@ class GifImageDesc {
   int duration = 80;
   bool clearFrame = true;
 
-  GifImageDesc(Arc.InputStream input) {
+  GifImageDesc(InputStream input) {
     x = input.readUint16();
     y = input.readUint16();
     width = input.readUint16();

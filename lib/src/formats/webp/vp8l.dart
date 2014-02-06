@@ -4,12 +4,12 @@ part of image;
  * WebP lossless format.
  */
 class VP8L {
-  Arc.InputStream input;
+  InputStream input;
   VP8LBitReader br;
   WebPInfo webp;
   Image image;
 
-  VP8L(Arc.InputStream input, WebPInfo webp) :
+  VP8L(InputStream input, WebPInfo webp) :
     this.input = input,
     this.webp = webp,
     this.br = new VP8LBitReader(input) {
@@ -64,9 +64,9 @@ class VP8L {
     final int cachePixels = webp.width * _NUM_ARGB_CACHE_ROWS;
     final int totalNumPixels = numPixels + cacheTopPixels + cachePixels;
 
-    Data.Uint32List pixels32 = new Data.Uint32List(totalNumPixels);
+    Uint32List pixels32 = new Uint32List(totalNumPixels);
     _pixels = pixels32;
-    _pixels8 = new Data.Uint8List.view(pixels32.buffer);
+    _pixels8 = new Uint8List.view(pixels32.buffer);
     _argbCache = numPixels + cacheTopPixels;
 
     return true;
@@ -75,8 +75,8 @@ class VP8L {
   bool _allocateInternalBuffers8b() {
     final int totalNumPixels = webp.width * webp.height;
     _argbCache = 0;
-    _pixels8 = new Data.Uint8List(totalNumPixels);
-    _pixels = new Data.Uint32List.view(_pixels8.buffer);
+    _pixels8 = new Uint8List(totalNumPixels);
+    _pixels = new Uint32List.view(_pixels8.buffer);
     return true;
   }
 
@@ -125,7 +125,7 @@ class VP8L {
     return ok;
   }
 
-  Data.Uint32List _decodeImageStream(int xsize, int ysize, bool isLevel0) {
+  Uint32List _decodeImageStream(int xsize, int ysize, bool isLevel0) {
     int transformXsize = xsize;
     int transformYsize = ysize;
     int colorCacheBits = 0;
@@ -178,7 +178,7 @@ class VP8L {
     }
 
     final int totalSize = transformXsize * transformYsize;
-    Data.Uint32List data = new Data.Uint32List(totalSize);
+    Uint32List data = new Uint32List(totalSize);
 
     // Use the Huffman trees to decode the LZ77 encoded data.
     if (!_decodeImageData(data, transformXsize, transformYsize,
@@ -371,7 +371,7 @@ class VP8L {
     final int cachePixs = width * numRows;
 
     final int di = width * _lastRow;
-    Arc.MemPtr src = new Arc.MemPtr(_pixels, _argbCache);
+    MemPtr src = new MemPtr(_pixels, _argbCache);
 
     for (int i = 0; i < cachePixs; ++i) {
       _opaque[di + i] = (src[i] >> 8) & 0xff;
@@ -459,7 +459,7 @@ class VP8L {
 
   void _extractPalettedAlphaRows(int row) {
     final int numRows = row - _lastRow;
-    Arc.MemPtr pIn = new Arc.MemPtr(_pixels8, webp.width * _lastRow);
+    MemPtr pIn = new MemPtr(_pixels8, webp.width * _lastRow);
     if (numRows > 0) {
       _applyInverseTransformsAlpha(numRows, pIn);
     }
@@ -469,10 +469,10 @@ class VP8L {
   /**
    * Special method for paletted alpha data.
    */
-  void _applyInverseTransformsAlpha(int numRows, Arc.MemPtr rows) {
+  void _applyInverseTransformsAlpha(int numRows, MemPtr rows) {
     final int startRow = _lastRow;
     final int endRow = startRow + numRows;
-    Arc.MemPtr rowsOut = new Arc.MemPtr(_opaque, _ioWidth * startRow);
+    MemPtr rowsOut = new MemPtr(_opaque, _ioWidth * startRow);
     VP8LTransform transform = _transforms[0];
 
     transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);
@@ -531,7 +531,7 @@ class VP8L {
 
   bool _readHuffmanCodes(int xsize, int ysize, int colorCacheBits,
                          bool allowRecursion) {
-    Data.Uint32List huffmanImage;
+    Uint32List huffmanImage;
     int numHtreeGroups = 1;
 
     if (allowRecursion && br.readBits(1) != 0) {
@@ -610,15 +610,15 @@ class VP8L {
                               alphabetSize, numSymbols);
     } else {
       // Decode Huffman-coded code lengths.
-      Data.Int32List codeLengthCodeLengths =
-          new Data.Int32List(_NUM_CODE_LENGTH_CODES);
+      Int32List codeLengthCodeLengths =
+          new Int32List(_NUM_CODE_LENGTH_CODES);
 
       final int numCodes = br.readBits(4) + 4;
       if (numCodes > _NUM_CODE_LENGTH_CODES) {
         return false;
       }
 
-      Data.Int32List codeLengths = new Data.Int32List(alphabetSize);
+      Int32List codeLengths = new Int32List(alphabetSize);
 
       for (int i = 0; i < numCodes; ++i) {
         codeLengthCodeLengths[_CODE_LENGTH_CODE_ORDER[i]] = br.readBits(3);
@@ -735,9 +735,9 @@ class VP8L {
    */
   bool _expandColorMap(int numColors, VP8LTransform transform) {
     final int finalNumColors = 1 << (8 >> transform.bits);
-    Data.Uint32List newColorMap = new Data.Uint32List(finalNumColors);
-    Data.Uint8List data = new Data.Uint8List.view(transform.data.buffer);
-    Data.Uint8List newData = new Data.Uint8List.view(newColorMap.buffer);
+    Uint32List newColorMap = new Uint32List(finalNumColors);
+    Uint8List data = new Uint8List.view(transform.data.buffer);
+    Uint8List newData = new Uint8List.view(newColorMap.buffer);
 
     newColorMap[0] = transform.data[0];
 
@@ -758,7 +758,7 @@ class VP8L {
     return true;
   }
 
-  int _getMetaIndex(Data.Uint32List image, int xsize, int bits, int x, int y) {
+  int _getMetaIndex(Uint32List image, int xsize, int bits, int x, int y) {
     if (bits == 0) {
       return 0;
     }
@@ -824,17 +824,17 @@ class VP8L {
   int _huffmanMask = 0;
   int _huffmanSubsampleBits = 0;
   int _huffmanXsize = 0;
-  Data.Uint32List _huffmanImage;
+  Uint32List _huffmanImage;
   int _numHtreeGroups = 0;
   List<_HTreeGroup> _htreeGroups = [];
   List<VP8LTransform> _transforms = [];
   int _transformsSeen = 0;
 
-  Data.Uint32List _pixels;
-  Data.Uint8List _pixels8;
+  Uint32List _pixels;
+  Uint8List _pixels8;
   int _argbCache;
 
-  Data.Uint8List _opaque;
+  Uint8List _opaque;
 
   int _ioWidth;
   int _ioHeight;

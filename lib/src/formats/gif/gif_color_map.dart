@@ -4,11 +4,11 @@ class GifColorMap {
   int bitsPerPixel;
   int numColors;
   int transparent;
-  final Data.Uint8List colors;
+  final Uint8List colors;
 
   GifColorMap(int numColors) :
     this.numColors = numColors,
-    colors = new Data.Uint8List(numColors * 3) {
+    colors = new Uint8List(numColors * 3) {
     bitsPerPixel = _bitSize(numColors);
   }
 

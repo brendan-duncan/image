@@ -5,7 +5,7 @@ part of image;
  */
 class TgaEncoder {
   List<int> encode(Image image) {
-    Arc.OutputStream out = new Arc.OutputStream(byteOrder: Arc.BIG_ENDIAN);
+    OutputStream out = new OutputStream(byteOrder: BIG_ENDIAN);
 
     List<int> header = new List<int>(18);
     header.fillRange(0, 18, 0);

@@ -1,7 +1,7 @@
 part of image;
 
 class JpegData {
-  Arc.InputStream input;
+  InputStream input;
   JpegJfif jfif;
   JpegAdobe adobe;
   JpegFrame frame;
@@ -13,8 +13,8 @@ class JpegData {
   final List<Map> components = [];
 
   bool validate(List<int> bytes) {
-    Arc.InputStream input = new Arc.InputStream(bytes,
-                                                byteOrder: Arc.BIG_ENDIAN);
+    InputStream input = new InputStream(bytes,
+                                                byteOrder: BIG_ENDIAN);
 
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
@@ -102,7 +102,7 @@ class JpegData {
   }
 
   void read(List<int> bytes) {
-    input = new Arc.InputStream(bytes, byteOrder: Arc.BIG_ENDIAN);
+    input = new InputStream(bytes, byteOrder: BIG_ENDIAN);
 
     _read();
 
@@ -124,22 +124,22 @@ class JpegData {
 
   int get height => frame.scanLines;
 
-  Data.Uint8List getData(int width, int height) {
+  Uint8List getData(int width, int height) {
     num scaleX = 1;
     num scaleY = 1;
     Map component1;
     Map component2;
     Map component3;
     Map component4;
-    Data.Uint8List component1Line;
-    Data.Uint8List component2Line;
-    Data.Uint8List component3Line;
-    Data.Uint8List component4Line;
+    Uint8List component1Line;
+    Uint8List component2Line;
+    Uint8List component3Line;
+    Uint8List component4Line;
     int offset = 0;
     int Y, Cb, Cr, K, C, M, Ye, R, G, B;
     bool colorTransform = false;
     int dataLength = width * height * components.length;
-    Data.Uint8List data = new Data.Uint8List(dataLength);
+    Uint8List data = new Uint8List(dataLength);
 
     switch (components.length) {
       case 1:
@@ -187,9 +187,9 @@ class JpegData {
         num sx2 = component2['scaleX'] * scaleX;
         num sx3 = component3['scaleX'] * scaleX;
 
-        List<Data.Uint8List> lines1 = component1['lines'];
-        List<Data.Uint8List> lines2 = component2['lines'];
-        List<Data.Uint8List> lines3 = component3['lines'];
+        List<Uint8List> lines1 = component1['lines'];
+        List<Uint8List> lines2 = component2['lines'];
+        List<Uint8List> lines3 = component3['lines'];
 
         for (int y = 0; y < height; y++) {
           component1Line = lines1[(y * sy1).toInt()];
@@ -277,7 +277,7 @@ class JpegData {
 
     marker = _nextMarker();
     while (marker != Jpeg.M_EOI && !input.isEOS) {
-      Arc.InputStream block = _readBlock();
+      InputStream block = _readBlock();
       switch (marker) {
         case Jpeg.M_APP0:
         case Jpeg.M_APP1:
@@ -364,13 +364,13 @@ class JpegData {
     input.position += length - 2;
   }
 
-  Arc.InputStream _readBlock() {
+  InputStream _readBlock() {
     int length = input.readUint16();
     if (length < 2) {
       throw new ImageException('Invalid Block');
     }
     List<int> array = input.readBytes(length - 2);
-    return new Arc.InputStream(array, byteOrder: Arc.BIG_ENDIAN);
+    return new InputStream(array, byteOrder: BIG_ENDIAN);
   }
 
   int _nextMarker() {
@@ -389,7 +389,7 @@ class JpegData {
     return c;
   }
 
-  void _readAppData(int marker, Arc.InputStream block) {
+  void _readAppData(int marker, InputStream block) {
     List<int> appData = block.buffer;
 
     if (marker == Jpeg.M_APP0) {
@@ -423,7 +423,7 @@ class JpegData {
     }
   }
 
-  void _readDQT(Arc.InputStream block) {
+  void _readDQT(InputStream block) {
     while (!block.isEOS) {
       int n = block.readByte();
       int prec = n >> 4;
@@ -434,10 +434,10 @@ class JpegData {
       }
 
       if (quantizationTables[n] == null) {
-        quantizationTables[n] = new Data.Int32List(64);;
+        quantizationTables[n] = new Int32List(64);;
       }
 
-      Data.Int32List tableData = quantizationTables[n];
+      Int32List tableData = quantizationTables[n];
       for (int i = 0; i < Jpeg.DCTSIZE2; i++) {
         int tmp;
         if (prec != 0) {
@@ -455,7 +455,7 @@ class JpegData {
     }
   }
 
-  void _readFrame(int marker, Arc.InputStream block) {
+  void _readFrame(int marker, InputStream block) {
     if (frame != null) {
       throw new ImageException('Duplicate JPG frame data found.');
     }
@@ -484,18 +484,18 @@ class JpegData {
     frames.add(frame);
   }
 
-  void _readDHT(Arc.InputStream block) {
+  void _readDHT(InputStream block) {
     while (!block.isEOS) {
       int index = block.readByte();
 
-      Data.Uint8List bits = new Data.Uint8List(16);
+      Uint8List bits = new Uint8List(16);
       int count = 0;
       for (int j = 0; j < 16; j++) {
         bits[j] = block.readByte();
         count += bits[j];
       }
 
-      Data.Uint8List huffmanValues = new Data.Uint8List(count);
+      Uint8List huffmanValues = new Uint8List(count);
       for (int j = 0; j < count; j++) {
         huffmanValues[j] = block.readByte();
       }
@@ -516,11 +516,11 @@ class JpegData {
     }
   }
 
-  void _readDRI(Arc.InputStream block) {
+  void _readDRI(InputStream block) {
     resetInterval = block.readUint16();
   }
 
-  void _readSOS(Arc.InputStream block) {
+  void _readSOS(InputStream block) {
     int n = block.readByte();
 
     if (n < 1 || n > Jpeg.MAX_COMPS_IN_SCAN) {
@@ -615,20 +615,20 @@ class JpegData {
     return code[0]['children'];
   }
 
-  List<Data.Uint8List> _buildComponentData(JpegFrame frame,
+  List<Uint8List> _buildComponentData(JpegFrame frame,
                                            JpegComponent component) {
     int blocksPerLine = component.blocksPerLine;
     int blocksPerColumn = component.blocksPerColumn;
     int samplesPerLine = (blocksPerLine << 3);
-    Data.Int32List R = new Data.Int32List(64);
-    Data.Uint8List r = new Data.Uint8List(64);
-    List<Data.Uint8List> lines = new List(blocksPerColumn * 8);
+    Int32List R = new Int32List(64);
+    Uint8List r = new Uint8List(64);
+    List<Uint8List> lines = new List(blocksPerColumn * 8);
 
     int l = 0;
     for (int blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
       int scanLine = blockRow << 3;
       for (int i = 0; i < 8; i++) {
-        lines[l++] = new Data.Uint8List(samplesPerLine);
+        lines[l++] = new Uint8List(samplesPerLine);
       }
 
       for (int blockCol = 0; blockCol < blocksPerLine; blockCol++) {
@@ -639,7 +639,7 @@ class JpegData {
         int offset = 0;
         int sample = (blockCol << 3);
         for (int j = 0; j < 8; j++) {
-          Data.Uint8List line = lines[scanLine + j];
+          Uint8List line = lines[scanLine + j];
           for (int i = 0; i < 8; i++) {
             line[sample + i] = r[offset++];
           }
@@ -656,11 +656,11 @@ class JpegData {
    * "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
    * IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
    */
-  void _quantizeAndInverse(Data.Int32List quantizationTable,
-                           Data.Int32List zz,
-                           Data.Uint8List dataOut,
-                           Data.Int32List dataIn) {
-    Data.Int32List p = dataIn;
+  void _quantizeAndInverse(Int32List quantizationTable,
+                           Int32List zz,
+                           Uint8List dataOut,
+                           Int32List dataIn) {
+    Int32List p = dataIn;
 
     // de-quantize
     for (int i = 0; i < 64; i++) {

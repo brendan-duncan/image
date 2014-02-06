@@ -26,19 +26,19 @@ class VP8SegmentHeader {
   /// absolute or delta values for quantizer and filter
   bool absoluteDelta = true;
   /// quantization changes
-  Data.Int8List quantizer = new Data.Int8List(VP8.NUM_MB_SEGMENTS);
+  Int8List quantizer = new Int8List(VP8.NUM_MB_SEGMENTS);
   /// filter strength for segments
-  Data.Int8List filterStrength = new Data.Int8List(VP8.NUM_MB_SEGMENTS);
+  Int8List filterStrength = new Int8List(VP8.NUM_MB_SEGMENTS);
 }
 
 /**
  * All the probas associated to one band
  */
 class VP8BandProbas {
-  List<Data.Uint8List> probas = new List<Data.Uint8List>(VP8.NUM_CTX);
+  List<Uint8List> probas = new List<Uint8List>(VP8.NUM_CTX);
   VP8BandProbas() {
     for (int i = 0; i < VP8.NUM_CTX; ++i) {
-      probas[i] = new Data.Uint8List(VP8.NUM_PROBAS);
+      probas[i] = new Uint8List(VP8.NUM_PROBAS);
     }
   }
 }
@@ -47,7 +47,7 @@ class VP8BandProbas {
  * Struct collecting all frame-persistent probabilities.
  */
 class VP8Proba {
-  Data.Uint8List segments = new Data.Uint8List(VP8.MB_FEATURE_TREE_PROBS);
+  Uint8List segments = new Uint8List(VP8.MB_FEATURE_TREE_PROBS);
   /// Type: 0:Intra16-AC  1:Intra16-DC   2:Chroma   3:Intra4
   List<List<VP8BandProbas>> bands = new List(VP8.NUM_TYPES);
 
@@ -71,8 +71,8 @@ class VP8FilterHeader {
   int level; // [0..63]
   int sharpness; // [0..7]
   bool useLfDelta;
-  Data.Int32List refLfDelta = new Data.Int32List(VP8.NUM_REF_LF_DELTAS);
-  Data.Int32List modeLfDelta = new Data.Int32List(VP8.NUM_MODE_LF_DELTAS);
+  Int32List refLfDelta = new Int32List(VP8.NUM_REF_LF_DELTAS);
+  Int32List modeLfDelta = new Int32List(VP8.NUM_MODE_LF_DELTAS);
 }
 
 //------------------------------------------------------------------------------
@@ -100,9 +100,9 @@ class VP8MB{
  * Dequantization matrices
  */
 class VP8QuantMatrix {
-  Data.Int32List y1Mat = new Data.Int32List(2);
-  Data.Int32List y2Mat = new Data.Int32List(2);
-  Data.Int32List uvMat = new Data.Int32List(2);
+  Int32List y1Mat = new Int32List(2);
+  Int32List y2Mat = new Int32List(2);
+  Int32List uvMat = new Int32List(2);
 
   int uvQuant; // U/V quantizer value
   int dither; // dithering amplitude (0 = off, max=255)
@@ -113,10 +113,10 @@ class VP8QuantMatrix {
  */
 class VP8MBData {
   /// 384 coeffs = (16+4+4) * 4*4
-  Data.Int16List coeffs = new Data.Int16List(384);
+  Int16List coeffs = new Int16List(384);
   bool isIntra4x4; // true if intra4x4
   /// one 16x16 mode (#0) or sixteen 4x4 modes
-  Data.Uint8List imodes = new Data.Uint8List(16);
+  Uint8List imodes = new Uint8List(16);
   /// chroma prediction mode
   int uvmode;
   // bit-wise info about the content of each sub-4x4 blocks (in decoding order).
@@ -136,15 +136,15 @@ class VP8MBData {
  * Saved top samples, per macroblock. Fits into a cache-line.
  */
 class VP8TopSamples {
-  Data.Uint8List y = new Data.Uint8List(16);
-  Data.Uint8List u = new Data.Uint8List(8);
-  Data.Uint8List v = new Data.Uint8List(8);
+  Uint8List y = new Uint8List(16);
+  Uint8List u = new Uint8List(8);
+  Uint8List v = new Uint8List(8);
 }
 
 class VP8Random {
   int _index1;
   int _index2;
-  Data.Uint32List _table = new Data.Uint32List(RANDOM_TABLE_SIZE);
+  Uint32List _table = new Uint32List(RANDOM_TABLE_SIZE);
   int _amplitude;
 
   /**

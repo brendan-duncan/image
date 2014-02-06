@@ -7,13 +7,13 @@ class _HuffmanTree {
   static const int HUFF_LUT_BITS = 7;
   static const int HUFF_LUT = (1 << HUFF_LUT_BITS);
   // Fast lookup for short bit lengths.
-  Data.Uint8List lutBits = new Data.Uint8List(HUFF_LUT);
-  Data.Int16List lutSymbol = new Data.Int16List(HUFF_LUT);
-  Data.Int16List lutJump = new Data.Int16List(HUFF_LUT);
+  Uint8List lutBits = new Uint8List(HUFF_LUT);
+  Int16List lutSymbol = new Int16List(HUFF_LUT);
+  Int16List lutJump = new Int16List(HUFF_LUT);
 
   /// all the nodes, starting at root, stored as a single int array, where
   /// each node occupies two ints as [symbol, children].
-  Data.Int32List tree;
+  Int32List tree;
   /// max number of nodes
   int maxNodes = 0;
   /// number of currently occupied nodes
@@ -29,7 +29,7 @@ class _HuffmanTree {
     }
 
     maxNodes = (numLeaves << 1) - 1;
-    tree = new Data.Int32List(maxNodes << 1);
+    tree = new Int32List(maxNodes << 1);
     tree[1] = -1;
     numNodes = 1;
     lutBits.fillRange(0, lutBits.length, 255);
@@ -69,7 +69,7 @@ class _HuffmanTree {
     // Normal case.
 
     // Get Huffman codes from the code lengths.
-    Data.Int32List codes = new Data.Int32List(codeLengthsSize);
+    Int32List codes = new Int32List(codeLengthsSize);
 
     if (!_huffmanCodeLengthsToCodes(codeLengths, codeLengthsSize, codes)) {
       return false;
@@ -250,11 +250,11 @@ class _HuffmanTree {
                                   List<int> huffCodes) {
     int symbol;
     int codeLen;
-    Data.Int32List codeLengthHist =
-        new Data.Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    Int32List codeLengthHist =
+        new Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
     int currCode;
-    Data.Int32List nextCodes =
-        new Data.Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    Int32List nextCodes =
+        new Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
     int maxCodeLength = 0;
 
     // Calculate max code length.

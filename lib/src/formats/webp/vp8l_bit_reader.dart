@@ -4,7 +4,7 @@ class VP8LBitReader {
   int bitPos = 0;
 
   VP8LBitReader(this._input) {
-    _buffer8 = new Data.Uint8List.view(_buffer.buffer);
+    _buffer8 = new Uint8List.view(_buffer.buffer);
     _buffer8[0] = _input.readByte();
     _buffer8[1] = _input.readByte();
     _buffer8[2] = _input.readByte();
@@ -73,9 +73,9 @@ class VP8LBitReader {
     }
   }
 
-  Arc.InputStream _input;
-  Data.Uint32List _buffer = new Data.Uint32List(2);
-  Data.Uint8List _buffer8;
+  InputStream _input;
+  Uint32List _buffer = new Uint32List(2);
+  Uint8List _buffer8;
 
   /// The number of bytes used for the bit buffer.
   static const int VALUE_SIZE = 8;

@@ -17,13 +17,13 @@ class PngEncoder {
   PngEncoder({this.filter: FILTER_PAETH, this.level});
 
   List<int> encode(Image image) {
-    Arc.OutputStream output = new Arc.OutputStream(byteOrder: Arc.BIG_ENDIAN);
+    OutputStream output = new OutputStream(byteOrder: BIG_ENDIAN);
 
     // PNG file signature
     output.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
     // IHDR chunk
-    Arc.OutputStream chunk = new Arc.OutputStream(byteOrder: Arc.BIG_ENDIAN);
+    OutputStream chunk = new OutputStream(byteOrder: BIG_ENDIAN);
     chunk.writeUint32(image.width);
     chunk.writeUint32(image.height);
     chunk.writeByte(8);
@@ -38,7 +38,7 @@ class PngEncoder {
                                              image.format) + image.height);
     _filter(image, filteredImage);
 
-    List<int> compressed = new Arc.ZLibEncoder().encode(filteredImage,
+    List<int> compressed = new ZLibEncoder().encode(filteredImage,
                                                         level: level);
 
     _writeChunk(output, 'IDAT', compressed);
@@ -48,7 +48,7 @@ class PngEncoder {
     return output.getBytes();
   }
 
-  void _writeChunk(Arc.OutputStream out, String type, List<int> chunk) {
+  void _writeChunk(OutputStream out, String type, List<int> chunk) {
     out.writeUint32(chunk.length);
     out.writeBytes(type.codeUnits);
     out.writeBytes(chunk);
@@ -242,8 +242,8 @@ class PngEncoder {
    * Return the CRC of the bytes
    */
   int _crc(String type, List<int> bytes) {
-    int crc = Arc.getCrc32(type.codeUnits);
-    return Arc.getCrc32(bytes, crc);
+    int crc = getCrc32(type.codeUnits);
+    return getCrc32(bytes, crc);
   }
 
   // Table of CRCs of all 8-bit messages.

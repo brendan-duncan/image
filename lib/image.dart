@@ -5,9 +5,9 @@
 library image;
 
 import 'dart:math' as Math;
-import 'dart:typed_data' as Data;
+import 'dart:typed_data';
 
-import 'package:archive/archive.dart' as Arc;
+import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 
 part 'src/draw/draw_char.dart';

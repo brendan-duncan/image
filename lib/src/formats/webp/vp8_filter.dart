@@ -5,8 +5,8 @@ class VP8Filter {
     _initTables();
   }
 
-  void simpleVFilter16(Arc.MemPtr p, int stride, int thresh) {
-    Arc.MemPtr p2 = new Arc.MemPtr(p);
+  void simpleVFilter16(MemPtr p, int stride, int thresh) {
+    MemPtr p2 = new MemPtr(p);
     for (int i = 0; i < 16; ++i) {
       p2.offset = p.offset + i;
       if (_needsFilter(p2, stride, thresh)) {
@@ -15,8 +15,8 @@ class VP8Filter {
     }
   }
 
-  void simpleHFilter16(Arc.MemPtr p, int stride, int thresh) {
-    Arc.MemPtr p2 = new Arc.MemPtr(p);
+  void simpleHFilter16(MemPtr p, int stride, int thresh) {
+    MemPtr p2 = new MemPtr(p);
     for (int i = 0; i < 16; ++i) {
       p2.offset = p.offset + i * stride;
       if (_needsFilter(p2, 1, thresh)) {
@@ -25,16 +25,16 @@ class VP8Filter {
     }
   }
 
-  void simpleVFilter16i(Arc.MemPtr p, int stride, int thresh) {
-    Arc.MemPtr p2 = new Arc.MemPtr(p);
+  void simpleVFilter16i(MemPtr p, int stride, int thresh) {
+    MemPtr p2 = new MemPtr(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4 * stride;
       simpleVFilter16(p2, stride, thresh);
     }
   }
 
-  void simpleHFilter16i(Arc.MemPtr p, int stride, int thresh) {
-    Arc.MemPtr p2 = new Arc.MemPtr(p);
+  void simpleHFilter16i(MemPtr p, int stride, int thresh) {
+    MemPtr p2 = new MemPtr(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4;
       simpleHFilter16(p2, stride, thresh);
@@ -42,29 +42,29 @@ class VP8Filter {
   }
 
   // on macroblock edges
-  void vFilter16(Arc.MemPtr p, int stride, int thresh, int ithresh,
+  void vFilter16(MemPtr p, int stride, int thresh, int ithresh,
                  int hev_thresh) {
     _filterLoop26(p, stride, 1, 16, thresh, ithresh, hev_thresh);
   }
 
-  void hFilter16(Arc.MemPtr p, int stride, int thresh, int ithresh,
+  void hFilter16(MemPtr p, int stride, int thresh, int ithresh,
                  int hev_thresh) {
     _filterLoop26(p, 1, stride, 16, thresh, ithresh, hev_thresh);
   }
 
   // on three inner edges
-  void vFilter16i(Arc.MemPtr p, int stride, int thresh, int ithresh,
+  void vFilter16i(MemPtr p, int stride, int thresh, int ithresh,
                   int hev_thresh) {
-    Arc.MemPtr p2 = new Arc.MemPtr(p);
+    MemPtr p2 = new MemPtr(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4 * stride;
       _filterLoop24(p2, stride, 1, 16, thresh, ithresh, hev_thresh);
     }
   }
 
-  void hFilter16i(Arc.MemPtr p, int stride, int thresh, int ithresh,
+  void hFilter16i(MemPtr p, int stride, int thresh, int ithresh,
                   int hev_thresh) {
-    Arc.MemPtr p2 = new Arc.MemPtr(p);
+    MemPtr p2 = new MemPtr(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4;
       _filterLoop24(p2, 1, stride, 16, thresh, ithresh, hev_thresh);
@@ -74,37 +74,37 @@ class VP8Filter {
   /**
    * 8-pixels wide variant, for chroma filtering
    */
-  void vFilter8(Arc.MemPtr u, Arc.MemPtr v, int stride, int thresh, int ithresh,
+  void vFilter8(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
                 int hev_thresh) {
     _filterLoop26(u, stride, 1, 8, thresh, ithresh, hev_thresh);
     _filterLoop26(v, stride, 1, 8, thresh, ithresh, hev_thresh);
   }
 
-  void hFilter8(Arc.MemPtr u, Arc.MemPtr v, int stride, int thresh, int ithresh,
+  void hFilter8(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
                 int hev_thresh) {
     _filterLoop26(u, 1, stride, 8, thresh, ithresh, hev_thresh);
     _filterLoop26(v, 1, stride, 8, thresh, ithresh, hev_thresh);
   }
 
-  void vFilter8i(Arc.MemPtr u, Arc.MemPtr v, int stride, int thresh, int ithresh,
+  void vFilter8i(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
                  int hev_thresh) {
-    Arc.MemPtr u2 = new Arc.MemPtr(u, 4 * stride);
-    Arc.MemPtr v2 = new Arc.MemPtr(v, 4 * stride);
+    MemPtr u2 = new MemPtr(u, 4 * stride);
+    MemPtr v2 = new MemPtr(v, 4 * stride);
     _filterLoop24(u2, stride, 1, 8, thresh, ithresh, hev_thresh);
     _filterLoop24(v2, stride, 1, 8, thresh, ithresh, hev_thresh);
   }
 
-  void hFilter8i(Arc.MemPtr u, Arc.MemPtr v, int stride, int thresh, int ithresh,
+  void hFilter8i(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
                  int hev_thresh) {
-    Arc.MemPtr u2 = new Arc.MemPtr(u, 4);
-    Arc.MemPtr v2 = new Arc.MemPtr(v, 4);
+    MemPtr u2 = new MemPtr(u, 4);
+    MemPtr v2 = new MemPtr(v, 4);
     _filterLoop24(u2, 1, stride, 8, thresh, ithresh, hev_thresh);
     _filterLoop24(v2, 1, stride, 8, thresh, ithresh, hev_thresh);
   }
 
-  void _filterLoop26(Arc.MemPtr p, int hstride, int vstride, int size,
+  void _filterLoop26(MemPtr p, int hstride, int vstride, int size,
                      int thresh, int ithresh, int hev_thresh) {
-    Arc.MemPtr p2 = new Arc.MemPtr(p);
+    MemPtr p2 = new MemPtr(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
         if (_hev(p2, hstride, hev_thresh)) {
@@ -117,9 +117,9 @@ class VP8Filter {
     }
   }
 
-  void _filterLoop24(Arc.MemPtr p, int hstride, int vstride, int size,
+  void _filterLoop24(MemPtr p, int hstride, int vstride, int size,
                      int thresh, int ithresh, int hev_thresh) {
-    Arc.MemPtr p2 = new Arc.MemPtr(p);
+    MemPtr p2 = new MemPtr(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
         if (_hev(p2, hstride, hev_thresh)) {
@@ -135,7 +135,7 @@ class VP8Filter {
   /**
    * 4 pixels in, 2 pixels out
    */
-  void _doFilter2(Arc.MemPtr p, int step) {
+  void _doFilter2(MemPtr p, int step) {
     final int p1 = p[-2 * step];
     final int p0 = p[-step];
     final int q0 = p[0];
@@ -150,7 +150,7 @@ class VP8Filter {
   /**
    * 4 pixels in, 4 pixels out
    */
-  void _doFilter4(Arc.MemPtr p, int step) {
+  void _doFilter4(MemPtr p, int step) {
     final int p1 = p[-2 * step];
     final int p0 = p[-step];
     final int q0 = p[0];
@@ -168,7 +168,7 @@ class VP8Filter {
   /**
    * 6 pixels in, 6 pixels out
    */
-  void _doFilter6(Arc.MemPtr p, int step) {
+  void _doFilter6(MemPtr p, int step) {
     final int p2 = p[-3 * step];
     final int p1 = p[-2 * step];
     final int p0 = p[-step];
@@ -187,7 +187,7 @@ class VP8Filter {
     p[2 * step] = clip1[255 + q2 - a3];
   }
 
-  bool _hev(Arc.MemPtr p, int step, int thresh) {
+  bool _hev(MemPtr p, int step, int thresh) {
     final int p1 = p[-2 * step];
     final int p0 = p[-step];
     final int q0 = p[0];
@@ -195,7 +195,7 @@ class VP8Filter {
     return (abs0[255 + p1 - p0] > thresh) || (abs0[255 + q1 - q0] > thresh);
   }
 
-  bool _needsFilter(Arc.MemPtr p, int step, int thresh) {
+  bool _needsFilter(MemPtr p, int step, int thresh) {
     final int p1 = p[-2 * step];
     final int p0 = p[-step];
     final int q0 = p[0];
@@ -203,7 +203,7 @@ class VP8Filter {
     return (2 * abs0[255 + p0 - q0] + abs1[255 + p1 - q1]) <= thresh;
   }
 
-  bool _needsFilter2(Arc.MemPtr p, int step, int t, int it) {
+  bool _needsFilter2(MemPtr p, int step, int t, int it) {
     final int p3 = p[-4 * step];
     final int p2 = p[-3 * step];
     final int p1 = p[-2 * step];
@@ -221,8 +221,8 @@ class VP8Filter {
            abs0[255 + q2 - q1] <= it && abs0[255 + q1 - q0] <= it;
   }
 
-  void transformOne(Arc.MemPtr src, Arc.MemPtr dst) {
-    Data.Int32List C = new Data.Int32List(4 * 4);
+  void transformOne(MemPtr src, MemPtr dst) {
+    Int32List C = new Int32List(4 * 4);
     int si = 0;
     int di = 0;
     int tmp = 0;
@@ -262,19 +262,19 @@ class VP8Filter {
   }
 
 
-  void transform(Arc.MemPtr src, Arc.MemPtr dst, bool doTwo) {
+  void transform(MemPtr src, MemPtr dst, bool doTwo) {
     transformOne(src, dst);
     if (doTwo) {
-      transformOne(new Arc.MemPtr(src, 16), new Arc.MemPtr(dst, 4));
+      transformOne(new MemPtr(src, 16), new MemPtr(dst, 4));
     }
   }
 
-  void transformUV(Arc.MemPtr src, Arc.MemPtr dst) {
+  void transformUV(MemPtr src, MemPtr dst) {
     transform(src, dst, true);
-    transform(new Arc.MemPtr(src, 2 * 16), new Arc.MemPtr(dst, 4 * VP8.BPS), true);
+    transform(new MemPtr(src, 2 * 16), new MemPtr(dst, 4 * VP8.BPS), true);
   }
 
-  void transformDC(Arc.MemPtr src, Arc.MemPtr dst) {
+  void transformDC(MemPtr src, MemPtr dst) {
     final int DC = src[0] + 4;
     for (int j = 0; j < 4; ++j) {
       for (int i = 0; i < 4; ++i) {
@@ -283,25 +283,25 @@ class VP8Filter {
     }
   }
 
-  void transformDCUV(Arc.MemPtr src, Arc.MemPtr dst) {
+  void transformDCUV(MemPtr src, MemPtr dst) {
     if (src[0 * 16] != 0) {
       transformDC(src, dst);
     }
     if (src[1 * 16] != 0) {
-      transformDC(new Arc.MemPtr(src, 1 * 16), new Arc.MemPtr(dst, 4));
+      transformDC(new MemPtr(src, 1 * 16), new MemPtr(dst, 4));
     }
     if (src[2 * 16] != 0) {
-      transformDC(new Arc.MemPtr(src, 2 * 16), new Arc.MemPtr(dst, 4 * VP8.BPS));
+      transformDC(new MemPtr(src, 2 * 16), new MemPtr(dst, 4 * VP8.BPS));
     }
     if (src[3 * 16] != 0) {
-      transformDC(new Arc.MemPtr(src, 3 * 16), new Arc.MemPtr(dst, 4 * VP8.BPS + 4));
+      transformDC(new MemPtr(src, 3 * 16), new MemPtr(dst, 4 * VP8.BPS + 4));
     }
   }
 
   /**
    * Simplified transform when only in[0], in[1] and in[4] are non-zero
    */
-  void transformAC3(Arc.MemPtr src, Arc.MemPtr dst) {
+  void transformAC3(MemPtr src, MemPtr dst) {
     final int a = src[0] + 4;
     final int c4 = _mul(src[4], kC2);
     final int d4 = _mul(src[4], kC1);
@@ -316,7 +316,7 @@ class VP8Filter {
   static int AVG3(a, b, c) => _shiftR(((a) + 2 * (b) + (c) + 2), 2);
   static int AVG2(a, b) => _shiftR(((a) + (b) + 1), 1);
 
-  static void VE4(Arc.MemPtr dst) {
+  static void VE4(MemPtr dst) {
     int top = -VP8.BPS; // dst +
     final List<int> vals = [
        AVG3(dst[top - 1], dst[top],     dst[top + 1]),
@@ -329,14 +329,14 @@ class VP8Filter {
     }
   }
 
-  static void HE4(Arc.MemPtr dst) {
+  static void HE4(MemPtr dst) {
     final int A = dst[-1 - VP8.BPS];
     final int B = dst[-1];
     final int C = dst[-1 + VP8.BPS];
     final int D = dst[-1 + 2 * VP8.BPS];
     final int E = dst[-1 + 3 * VP8.BPS];
 
-    Arc.MemPtr d2 = new Arc.MemPtr(dst);
+    MemPtr d2 = new MemPtr(dst);
 
     d2.toUint32List()[0] = 0x01010101 * AVG3(A, B, C);
     d2.offset += VP8.BPS;
@@ -347,7 +347,7 @@ class VP8Filter {
     d2.toUint32List()[0] = 0x01010101 * AVG3(D, E, E);
   }
 
-  static void DC4(Arc.MemPtr dst) {   // DC
+  static void DC4(MemPtr dst) {   // DC
     int dc = 4;
     for (int i = 0; i < 4; ++i) {
       dc += dst[i - VP8.BPS] + dst[-1 + i * VP8.BPS];
@@ -358,7 +358,7 @@ class VP8Filter {
     }
   }
 
-  static void trueMotion(Arc.MemPtr dst, int size) {
+  static void trueMotion(MemPtr dst, int size) {
     int di = 0;
     int top = -VP8.BPS; // dst +
     int clip0 = 255 - dst[top - 1]; // clip1 +
@@ -373,15 +373,15 @@ class VP8Filter {
     }
   }
 
-  static void TM4(Arc.MemPtr dst) {
+  static void TM4(MemPtr dst) {
     trueMotion(dst, 4);
   }
 
-  static void TM8uv(Arc.MemPtr dst) {
+  static void TM8uv(MemPtr dst) {
     trueMotion(dst, 8);
   }
 
-  static void TM16(Arc.MemPtr dst) {
+  static void TM16(MemPtr dst) {
     trueMotion(dst, 16);
   }
 
@@ -390,7 +390,7 @@ class VP8Filter {
   /**
    * Down-right
    */
-  static void RD4(Arc.MemPtr dst) {
+  static void RD4(MemPtr dst) {
     final int I = dst[-1 + 0 * VP8.BPS];
     final int J = dst[-1 + 1 * VP8.BPS];
     final int K = dst[-1 + 2 * VP8.BPS];
@@ -413,7 +413,7 @@ class VP8Filter {
   /**
    * Down-Left
    */
-  static void LD4(Arc.MemPtr dst) {
+  static void LD4(MemPtr dst) {
     final int A = dst[0 - VP8.BPS];
     final int B = dst[1 - VP8.BPS];
     final int C = dst[2 - VP8.BPS];
@@ -434,7 +434,7 @@ class VP8Filter {
   /**
    * Vertical-Right
    */
-  static void VR4(Arc.MemPtr dst) {
+  static void VR4(MemPtr dst) {
     final int I = dst[-1 + 0 * VP8.BPS];
     final int J = dst[-1 + 1 * VP8.BPS];
     final int K = dst[-1 + 2 * VP8.BPS];
@@ -459,7 +459,7 @@ class VP8Filter {
   /**
    * Vertical-Left
    */
-  static void VL4(Arc.MemPtr dst) {
+  static void VL4(MemPtr dst) {
     final int A = dst[0 - VP8.BPS];
     final int B = dst[1 - VP8.BPS];
     final int C = dst[2 - VP8.BPS];
@@ -484,7 +484,7 @@ class VP8Filter {
   /**
    * Horizontal-Up
    */
-  static void HU4(Arc.MemPtr dst) {
+  static void HU4(MemPtr dst) {
     final int I = dst[-1 + 0 * VP8.BPS];
     final int J = dst[-1 + 1 * VP8.BPS];
     final int K = dst[-1 + 2 * VP8.BPS];
@@ -502,7 +502,7 @@ class VP8Filter {
   /**
    * Horizontal-Down
    */
-  static void HD4(Arc.MemPtr dst) {
+  static void HD4(MemPtr dst) {
     final int I = dst[-1 + 0 * VP8.BPS];
     final int J = dst[-1 + 1 * VP8.BPS];
     final int K = dst[-1 + 2 * VP8.BPS];
@@ -525,13 +525,13 @@ class VP8Filter {
     dst[DST(1, 3)] = AVG3(L, K, J);
   }
 
-  static void VE16(Arc.MemPtr dst) { // vertical
+  static void VE16(MemPtr dst) { // vertical
     for (int j = 0; j < 16; ++j) {
       dst.memcpy(j * VP8.BPS, 16, dst, -VP8.BPS);
     }
   }
 
-  static void HE16(Arc.MemPtr dst) { // horizontal
+  static void HE16(MemPtr dst) { // horizontal
     int di = 0;
     for (int j = 16; j > 0; --j) {
       dst.memset(di, 16, dst[di - 1]);
@@ -539,13 +539,13 @@ class VP8Filter {
     }
   }
 
-  static void Put16(int v, Arc.MemPtr dst) {
+  static void Put16(int v, MemPtr dst) {
     for (int j = 0; j < 16; ++j) {
       dst.memset(j * VP8.BPS, 16, v);
     }
   }
 
-  static void DC16(Arc.MemPtr dst) { // DC
+  static void DC16(MemPtr dst) { // DC
     int DC = 16;
     for (int j = 0; j < 16; ++j) {
       DC += dst[-1 + j * VP8.BPS] + dst[j - VP8.BPS];
@@ -556,7 +556,7 @@ class VP8Filter {
   /**
    * DC with top samples not available
    */
-  static void DC16NoTop(Arc.MemPtr dst) {
+  static void DC16NoTop(MemPtr dst) {
     int DC = 8;
     for (int j = 0; j < 16; ++j) {
       DC += dst[-1 + j * VP8.BPS];
@@ -567,7 +567,7 @@ class VP8Filter {
   /**
    * DC with left samples not available
    */
-  static void DC16NoLeft(Arc.MemPtr dst) {
+  static void DC16NoLeft(MemPtr dst) {
     int DC = 8;
     for (int i = 0; i < 16; ++i) {
       DC += dst[i - VP8.BPS];
@@ -578,17 +578,17 @@ class VP8Filter {
   /**
    * DC with no top and left samples
    */
-  static void DC16NoTopLeft(Arc.MemPtr dst) {
+  static void DC16NoTopLeft(MemPtr dst) {
     Put16(0x80, dst);
   }
 
-  static void VE8uv(Arc.MemPtr dst) {
+  static void VE8uv(MemPtr dst) {
     for (int j = 0; j < 8; ++j) {
       dst.memcpy(j * VP8.BPS, 8, dst, -VP8.BPS);
     }
   }
 
-  static void HE8uv(Arc.MemPtr dst) {
+  static void HE8uv(MemPtr dst) {
     int di = 0;
     for (int j = 0; j < 8; ++j) {
       dst.memset(di, 8, dst[di - 1]);
@@ -599,13 +599,13 @@ class VP8Filter {
   /**
    * helper for chroma-DC predictions
    */
-  static void Put8x8uv(int value, Arc.MemPtr dst) {
+  static void Put8x8uv(int value, MemPtr dst) {
     for (int j = 0; j < 8; ++j) {
       dst.memset(j * VP8.BPS, 8, value);
     }
   }
 
-  static void DC8uv(Arc.MemPtr dst) {
+  static void DC8uv(MemPtr dst) {
     int dc0 = 8;
     for (int i = 0; i < 8; ++i) {
       dc0 += dst[i - VP8.BPS] + dst[-1 + i * VP8.BPS];
@@ -616,7 +616,7 @@ class VP8Filter {
   /**
    * DC with no left samples
    */
-  static void DC8uvNoLeft(Arc.MemPtr dst) {
+  static void DC8uvNoLeft(MemPtr dst) {
     int dc0 = 4;
     for (int i = 0; i < 8; ++i) {
       dc0 += dst[i - VP8.BPS];
@@ -627,7 +627,7 @@ class VP8Filter {
   /**
    * DC with no top samples
    */
-  static void DC8uvNoTop(Arc.MemPtr dst) {
+  static void DC8uvNoTop(MemPtr dst) {
     int dc0 = 4;
     for (int i = 0; i < 8; ++i) {
       dc0 += dst[-1 + i * VP8.BPS];
@@ -638,7 +638,7 @@ class VP8Filter {
   /**
    * DC with nothing
    */
-  static void DC8uvNoTopLeft(Arc.MemPtr dst) {
+  static void DC8uvNoTopLeft(MemPtr dst) {
     Put8x8uv(0x80, dst);
   }
 
@@ -660,11 +660,11 @@ class VP8Filter {
     return _shiftR(c, 16);
   }
 
-  static void _store(Arc.MemPtr dst, int di, int x, int y, int v) {
+  static void _store(MemPtr dst, int di, int x, int y, int v) {
     dst[di + x + y * VP8.BPS] = _clip8b(dst[di + x + y * VP8.BPS] + (v >> 3));
   }
 
-  static void _store2(Arc.MemPtr dst, int y, int dc, int d, int c) {
+  static void _store2(MemPtr dst, int y, int dc, int d, int c) {
     _store(dst, 0, 0, y, dc + d);
     _store(dst, 0, 1, y, dc + c);
     _store(dst, 0, 2, y, dc - c);
@@ -672,15 +672,15 @@ class VP8Filter {
   }
 
   /// abs(i)
-  static Data.Uint8List abs0 = new Data.Uint8List(255 + 255 + 1);
+  static Uint8List abs0 = new Uint8List(255 + 255 + 1);
   /// abs(i)>>1
-  static Data.Uint8List abs1 = new Data.Uint8List(255 + 255 + 1);
+  static Uint8List abs1 = new Uint8List(255 + 255 + 1);
   /// clips [-1020, 1020] to [-128, 127]
-  static Data.Int8List sclip1 = new Data.Int8List(1020 + 1020 + 1);
+  static Int8List sclip1 = new Int8List(1020 + 1020 + 1);
   /// clips [-112, 112] to [-16, 15]
-  static Data.Int8List sclip2 = new Data.Int8List(112 + 112 + 1);
+  static Int8List sclip2 = new Int8List(112 + 112 + 1);
   /// clips [-255,510] to [0,255]
-  static Data.Uint8List clip1 = new Data.Uint8List(255 + 510 + 1);
+  static Uint8List clip1 = new Uint8List(255 + 510 + 1);
 
   static void _initTables() {
     if (!_tablesInitialized) {

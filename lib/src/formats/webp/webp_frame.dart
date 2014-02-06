@@ -20,7 +20,7 @@ class WebPFrame {
   /// frame is left and the next frame drawn over it.
   bool clearFrame;
 
-  WebPFrame(Arc.InputStream input, int size) {
+  WebPFrame(InputStream input, int size) {
     x = input.readUint24() * 2;
     y = input.readUint24() * 2;
     width = input.readUint24() + 1;

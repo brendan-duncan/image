@@ -34,7 +34,7 @@ class WebPDecoder extends Decoder {
    */
   WebPInfo getInfo(List<int> bytes) {
     // WebP is stored in little-endian byte order.
-    _input = new Arc.InputStream(bytes);
+    _input = new InputStream(bytes);
 
     if (!_getHeader(_input)) {
       return null;
@@ -78,17 +78,17 @@ class WebPDecoder extends Decoder {
 
     if (info.hasAnimation) {
       WebPFrame f = info.frames[frame];
-      Arc.InputStream frameData = _input.subset(f._framePosition,
+      InputStream frameData = _input.subset(f._framePosition,
           f._frameSize);
 
       return _decodeFrame(frameData, frame: frame);
     }
 
     if (info.format == WebPInfo.FORMAT_LOSSLESS) {
-      Arc.InputStream data = _input.subset(info._vp8Position, info._vp8Size);
+      InputStream data = _input.subset(info._vp8Position, info._vp8Size);
       return new VP8L(data, info).decode();
     } else if (info.format == WebPInfo.FORMAT_LOSSY) {
-      Arc.InputStream data = _input.subset(info._vp8Position, info._vp8Size);
+      InputStream data = _input.subset(info._vp8Position, info._vp8Size);
       return new VP8(data, info).decode();
     }
 
@@ -103,7 +103,7 @@ class WebPDecoder extends Decoder {
    */
   Image decodeImage(List<int> bytes, {int frame: 0}) {
     // WebP is stored in little-endian byte order.
-    Arc.InputStream input = new Arc.InputStream(bytes);
+    InputStream input = new InputStream(bytes);
     if (!_getHeader(input)) {
       return null;
     }
@@ -162,7 +162,7 @@ class WebPDecoder extends Decoder {
   }
 
 
-  Image _decodeFrame(Arc.InputStream input, {int frame: 0}) {
+  Image _decodeFrame(InputStream input, {int frame: 0}) {
     WebPInfo webp = new WebPInfo();
     if (!_getInfo(input, webp)) {
       return null;
@@ -177,12 +177,12 @@ class WebPDecoder extends Decoder {
         return null;
       }
       WebPFrame f = webp.frames[frame];
-      Arc.InputStream frameData = input.subset(f._framePosition,
+      InputStream frameData = input.subset(f._framePosition,
                                                f._frameSize);
 
       return _decodeFrame(frameData, frame: frame);
     } else {
-      Arc.InputStream data = input.subset(webp._vp8Position, webp._vp8Size);
+      InputStream data = input.subset(webp._vp8Position, webp._vp8Size);
       if (webp.format == WebPInfo.FORMAT_LOSSLESS) {
         return new VP8L(data, webp).decode();
       } else if (webp.format == WebPInfo.FORMAT_LOSSY) {
@@ -193,7 +193,7 @@ class WebPDecoder extends Decoder {
     return null;
   }
 
-  bool _getHeader(Arc.InputStream input) {
+  bool _getHeader(InputStream input) {
     // Validate the webp format header
     String tag = input.readString(4);
     if (tag != 'RIFF') {
@@ -210,7 +210,7 @@ class WebPDecoder extends Decoder {
     return true;
   }
 
-  bool _getInfo(Arc.InputStream input, WebPInfo webp) {
+  bool _getInfo(InputStream input, WebPInfo webp) {
     bool found = false;
     while (!input.isEOS && !found) {
       String tag = input.readString(4);
@@ -238,7 +238,7 @@ class WebPDecoder extends Decoder {
           found = true;
           break;
         case 'ALPH':
-          webp._alphaData = new Arc.InputStream(input.buffer,
+          webp._alphaData = new InputStream(input.buffer,
               byteOrder: input.byteOrder);
           webp._alphaData.position = input.position;
           webp._alphaSize = size;
@@ -287,7 +287,7 @@ class WebPDecoder extends Decoder {
     return webp.format != 0;
   }
 
-  bool _getVp8xInfo(Arc.InputStream input, WebPInfo webp) {
+  bool _getVp8xInfo(InputStream input, WebPInfo webp) {
     int b = input.readByte();
     if ((b & 0xc0) != 0) {
       return false;
@@ -316,7 +316,7 @@ class WebPDecoder extends Decoder {
     return true;
   }
 
-  bool _getAnimInfo(Arc.InputStream input, WebPInfo webp) {
+  bool _getAnimInfo(InputStream input, WebPInfo webp) {
     int c = input.readUint32();
     webp.animLoopCount = input.readUint16();
 
@@ -329,7 +329,7 @@ class WebPDecoder extends Decoder {
     return true;
   }
 
-  bool _getAnimFrameInfo(Arc.InputStream input, WebPInfo webp, int size) {
+  bool _getAnimFrameInfo(InputStream input, WebPInfo webp, int size) {
     WebPFrame frame = new WebPFrame(input, size);
     if (!frame.isValid) {
       return false;
@@ -338,5 +338,5 @@ class WebPDecoder extends Decoder {
     return true;
   }
 
-  Arc.InputStream _input;
+  InputStream _input;
 }

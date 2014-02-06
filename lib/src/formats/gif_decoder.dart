@@ -33,7 +33,7 @@ class GifDecoder extends Decoder {
    * If the file is not a valid Gif image, null is returned.
    */
   GifInfo getInfo(List<int> bytes) {
-    _input = new Arc.InputStream(bytes);
+    _input = new InputStream(bytes);
 
     info = new GifInfo();
     if (!_getInfo()) {
@@ -212,7 +212,7 @@ class GifDecoder extends Decoder {
     _pixelCount = width * height;
 
     Image image = new Image(width, height);
-    Data.Uint8List line = new Data.Uint8List(width);
+    Uint8List line = new Uint8List(width);
 
     if (gifImage.interlaced) {
       int row = gifImage.y;
@@ -238,7 +238,7 @@ class GifDecoder extends Decoder {
   }
 
   void _updateImage(Image image, int y, GifColorMap colorMap,
-                    Data.Uint8List line) {
+                    Uint8List line) {
     if (colorMap != null) {
       for (int x = 0, width = line.length; x < width; ++x) {
         image.setPixel(x, y, colorMap.color(line[x]));
@@ -282,7 +282,7 @@ class GifDecoder extends Decoder {
     return true;
   }
 
-  bool _getLine(Data.Uint8List line) {
+  bool _getLine(Uint8List line) {
     _pixelCount -= line.length;
 
     if (!_decompressLine(line)) {
@@ -323,7 +323,7 @@ class GifDecoder extends Decoder {
    * This routine can be called few times (one per scan line, for example), in
    * order the complete the whole image.
    */
-  bool _decompressLine(Data.Uint8List line) {
+  bool _decompressLine(Uint8List line) {
     if (_stackPtr > LZ_MAX_CODE) {
       return false;
     }
@@ -488,7 +488,7 @@ class GifDecoder extends Decoder {
    * If image is defective, we might loop here forever, so we limit the loops to
    * the maximum possible if image O.k. - LZ_MAX_CODE times.
    */
-  int _getPrefixChar(Data.Uint32List prefix, int code, int clearCode) {
+  int _getPrefixChar(Uint32List prefix, int code, int clearCode) {
     int i = 0;
     while (code > clearCode && i++ <= LZ_MAX_CODE) {
       if (code > LZ_MAX_CODE) {
@@ -532,17 +532,17 @@ class GifDecoder extends Decoder {
   }
 
   void _initDecode() {
-    _buffer = new Data.Uint8List(256);
-    _stack = new Data.Uint8List(LZ_MAX_CODE);
-    _suffix = new Data.Uint8List(LZ_MAX_CODE + 1);
-    _prefix = new Data.Uint32List(LZ_MAX_CODE + 1);
+    _buffer = new Uint8List(256);
+    _stack = new Uint8List(LZ_MAX_CODE);
+    _suffix = new Uint8List(LZ_MAX_CODE + 1);
+    _prefix = new Uint32List(LZ_MAX_CODE + 1);
   }
 
-  Arc.InputStream _input;
-  Data.Uint8List _buffer;
-  Data.Uint8List _stack;
-  Data.Uint8List _suffix;
-  Data.Uint32List _prefix;
+  InputStream _input;
+  Uint8List _buffer;
+  Uint8List _stack;
+  Uint8List _suffix;
+  Uint32List _prefix;
   int _bitsPerPixel;
   int _pixelCount;
   int _currentShiftDWord;

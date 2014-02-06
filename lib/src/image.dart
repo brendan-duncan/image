@@ -25,7 +25,7 @@ class Image {
   Image(int width, int height, [this._format = RGBA]) :
     this.width = width,
     this.height = height,
-    _data = new Data.Uint32List(width * height);
+    _data = new Uint32List(width * height);
 
   /**
    * Create a copy of the image [other].
@@ -34,7 +34,7 @@ class Image {
     width = other.width,
     height = other.height,
     _format = other._format,
-    _data = new Data.Uint32List.fromList(other._data);
+    _data = new Uint32List.fromList(other._data);
 
   /**
    * Create an image from [bytes].
@@ -54,7 +54,7 @@ class Image {
     this.height = height,
     // Create a uint32 view of the byte buffer.
     // This assumes the system architecture is little-endian...
-    _data = new Data.Uint32List.view(new Data.Uint8List.fromList(bytes).buffer);
+    _data = new Uint32List.view(new Uint8List.fromList(bytes).buffer);
 
   /**
    * Clone this image.
@@ -71,7 +71,7 @@ class Image {
    * canvas.getContext('2d').putImageData(image.getBytes());
    */
   List<int> getBytes() =>
-    new Data.Uint8List.view(_data.buffer);
+    new Uint8List.view(_data.buffer);
 
   /**
    * Get the format of the image, either [RGB] or [RGBA].
@@ -437,5 +437,5 @@ class Image {
   int _format;
   /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
   /// channel.
-  final Data.Uint32List _data;
+  final Uint32List _data;
 }

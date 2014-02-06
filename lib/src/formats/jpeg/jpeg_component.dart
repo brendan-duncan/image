@@ -3,7 +3,7 @@ part of image;
 class JpegComponent {
   int h;
   int v;
-  final List<Data.Int32List> quantizationTableList;
+  final List<Int32List> quantizationTableList;
   int quantizationIndex;
   int blocksPerLine;
   int blocksPerColumn;
@@ -15,6 +15,6 @@ class JpegComponent {
   JpegComponent(this.h, this.v, this.quantizationTableList,
       this.quantizationIndex);
 
-  Data.Int32List get quantizationTable =>
+  Int32List get quantizationTable =>
       quantizationTableList[quantizationIndex];
 }

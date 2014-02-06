@@ -14,8 +14,8 @@ class PngDecoder extends Decoder {
    * Is the given file a valid PNG image?
    */
   bool isValidFile(List<int> data) {
-    Arc.InputStream input = new Arc.InputStream(data,
-        byteOrder: Arc.BIG_ENDIAN);
+    InputStream input = new InputStream(data,
+        byteOrder: BIG_ENDIAN);
     List<int> pngHeader = input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
@@ -28,8 +28,8 @@ class PngDecoder extends Decoder {
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {
-    Arc.InputStream input = new Arc.InputStream(data,
-        byteOrder: Arc.BIG_ENDIAN);
+    InputStream input = new InputStream(data,
+        byteOrder: BIG_ENDIAN);
 
     List<int> imageData = [];
 
@@ -87,8 +87,8 @@ class PngDecoder extends Decoder {
       String chunkType = new String.fromCharCodes(input.readBytes(4));
       switch (chunkType) {
         case 'IHDR':
-          Arc.InputStream hdr = new Arc.InputStream(input.readBytes(chunkSize),
-                                                    byteOrder: Arc.BIG_ENDIAN);
+          InputStream hdr = new InputStream(input.readBytes(chunkSize),
+                                                    byteOrder: BIG_ENDIAN);
           header = new _PngHeader();
           header.width = hdr.readUint32();
           header.height = hdr.readUint32();
@@ -220,10 +220,10 @@ class PngDecoder extends Decoder {
 
     Image image = new Image(header.width, header.height, format);
 
-    List<int> uncompressed = new Arc.ZLibDecoder().decodeBytes(imageData);
+    List<int> uncompressed = new ZLibDecoder().decodeBytes(imageData);
 
     // input is the decompressed data.
-    input = new Arc.InputStream(uncompressed, byteOrder: Arc.BIG_ENDIAN);
+    input = new InputStream(uncompressed, byteOrder: BIG_ENDIAN);
 
     // Set up a LUT to transform colors for gamma correction.
     colorLut = new List<int>(256);
@@ -274,7 +274,7 @@ class PngDecoder extends Decoder {
   /**
    * Process a pass of an interlaced image.
    */
-  void _processPass(Arc.InputStream input, Image image,
+  void _processPass(InputStream input, Image image,
                     int xOffset, int yOffset, int xStep, int yStep,
                     int passWidth, int passHeight) {
     final int channels = (header.colorType == GRAYSCALE_ALPHA) ? 2 :
@@ -307,8 +307,8 @@ class PngDecoder extends Decoder {
       // reset the bit stream counter.
       _resetBits();
 
-      Arc.InputStream rowInput = new Arc.InputStream(row,
-          byteOrder: Arc.BIG_ENDIAN);
+      InputStream rowInput = new InputStream(row,
+          byteOrder: BIG_ENDIAN);
 
       final int blockHeight = xStep;
       final int blockWidth = xStep - xOffset;
@@ -334,7 +334,7 @@ class PngDecoder extends Decoder {
     }
   }
 
-  void _process(Arc.InputStream input, Image image) {
+  void _process(InputStream input, Image image) {
     final int channels = (header.colorType == GRAYSCALE_ALPHA) ? 2 :
       (header.colorType == RGB) ? 3 :
         (header.colorType == RGBA) ? 4 : 1;
@@ -367,8 +367,8 @@ class PngDecoder extends Decoder {
       // reset the bit stream counter.
       _resetBits();
 
-      Arc.InputStream rowInput = new Arc.InputStream(inData[ri],
-                                                     byteOrder: Arc.BIG_ENDIAN);
+      InputStream rowInput = new InputStream(inData[ri],
+                                                     byteOrder: BIG_ENDIAN);
 
       for (int x = 0; x < w; ++x) {
         _readPixel(rowInput, pixel);
@@ -449,8 +449,8 @@ class PngDecoder extends Decoder {
    * Return the CRC of the bytes
    */
   int _crc(String type, List<int> bytes) {
-    int crc = Arc.getCrc32(type.codeUnits);
-    return Arc.getCrc32(bytes, crc);
+    int crc = getCrc32(type.codeUnits);
+    return getCrc32(bytes, crc);
   }
 
   int _bitBuffer = 0;
@@ -464,7 +464,7 @@ class PngDecoder extends Decoder {
   /**
    * Read a number of bits from the input stream.
    */
-  int _readBits(Arc.InputStream input, int numBits) {
+  int _readBits(InputStream input, int numBits) {
     if (numBits == 0) {
       return 0;
     }
@@ -508,7 +508,7 @@ class PngDecoder extends Decoder {
   /**
    * Read the next pixel from the input stream.
    */
-  void _readPixel(Arc.InputStream input, List<int> pixel) {
+  void _readPixel(InputStream input, List<int> pixel) {
     switch (header.colorType) {
       case GRAYSCALE:
         pixel[0] = _readBits(input, header.bits);

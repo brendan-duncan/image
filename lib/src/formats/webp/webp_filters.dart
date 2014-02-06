@@ -26,40 +26,40 @@ class WebPFilters {
       gradientUnfilter     // WEBP_FILTER_GRADIENT
   ];
 
-  static void horizontalFilter(Data.Uint8List data, int width, int height,
-                               int stride, Data.Uint8List filteredData) {
+  static void horizontalFilter(Uint8List data, int width, int height,
+                               int stride, Uint8List filteredData) {
     _doHorizontalFilter(data, width, height, stride, 0, height, false,
                         filteredData);
   }
 
   static void horizontalUnfilter(int width, int height, int stride, int row,
-                                 int numRows, Data.Uint8List data) {
+                                 int numRows, Uint8List data) {
     _doHorizontalFilter(data, width, height, stride, row, numRows, true, data);
   }
 
-  static void verticalFilter(Data.Uint8List data, int width, int height,
-                             int stride, Data.Uint8List filteredData) {
+  static void verticalFilter(Uint8List data, int width, int height,
+                             int stride, Uint8List filteredData) {
     _doVerticalFilter(data, width, height, stride, 0, height, false,
                       filteredData);
   }
 
   static void verticalUnfilter(int width, int height, int stride, int row,
-                               int num_rows, Data.Uint8List data) {
+                               int num_rows, Uint8List data) {
     _doVerticalFilter(data, width, height, stride, row, num_rows, true, data);
   }
 
-  static void gradientFilter(Data.Uint8List data, int width, int height,
-                             int stride, Data.Uint8List filteredData) {
+  static void gradientFilter(Uint8List data, int width, int height,
+                             int stride, Uint8List filteredData) {
     _doGradientFilter(data, width, height, stride, 0, height, false,
                       filteredData);
   }
 
   static void gradientUnfilter(int width, int height, int stride, int row,
-                               int num_rows, Data.Uint8List data) {
+                               int num_rows, Uint8List data) {
     _doGradientFilter(data, width, height, stride, row, num_rows, true, data);
   }
 
-  static void _predictLine(Arc.MemPtr src, Arc.MemPtr pred, Arc.MemPtr dst, int length,
+  static void _predictLine(MemPtr src, MemPtr pred, MemPtr dst, int length,
                            bool inverse) {
     if (inverse) {
       for (int i = 0; i < length; ++i) {
@@ -72,21 +72,21 @@ class WebPFilters {
     }
   }
 
-  static void _doHorizontalFilter(Data.Uint8List src,
+  static void _doHorizontalFilter(Uint8List src,
                                   int width, int height, int stride,
                                   int row, int numRows,
-                                  bool inverse, Data.Uint8List out) {
+                                  bool inverse, Uint8List out) {
     final int startOffset = row * stride;
     final int lastRow = row + numRows;
-    Arc.MemPtr s = new Arc.MemPtr(src, startOffset);
-    Arc.MemPtr o = new Arc.MemPtr(src, startOffset);
-    Arc.MemPtr preds = new Arc.MemPtr(inverse ? o : s);
+    MemPtr s = new MemPtr(src, startOffset);
+    MemPtr o = new MemPtr(src, startOffset);
+    MemPtr preds = new MemPtr(inverse ? o : s);
 
     if (row == 0) {
       // Leftmost pixel is the same as input for topmost scanline.
       o[0] = s[0];
-      _predictLine(new Arc.MemPtr(s, 1), preds,
-                   new Arc.MemPtr(o, 1), width - 1, inverse);
+      _predictLine(new MemPtr(s, 1), preds,
+                   new MemPtr(o, 1), width - 1, inverse);
       row = 1;
       preds.offset += stride;
       s.offset += stride;
@@ -96,8 +96,8 @@ class WebPFilters {
     // Filter line-by-line.
     while (row < lastRow) {
       // Leftmost pixel is predicted from above.
-      _predictLine(s, new Arc.MemPtr(preds, -stride), o, 1, inverse);
-      _predictLine(new Arc.MemPtr(s, 1), preds, new Arc.MemPtr(o, 1),
+      _predictLine(s, new MemPtr(preds, -stride), o, 1, inverse);
+      _predictLine(new MemPtr(s, 1), preds, new MemPtr(o, 1),
                    width - 1, inverse);
       ++row;
       preds.offset += stride;
@@ -106,21 +106,21 @@ class WebPFilters {
     }
   }
 
-  static void _doVerticalFilter(Data.Uint8List src,
+  static void _doVerticalFilter(Uint8List src,
                                int width, int height, int stride,
                                int row, int numRows,
-                               bool inverse, Data.Uint8List out) {
+                               bool inverse, Uint8List out) {
     final int startOffset = row * stride;
     final int last_row = row + numRows;
-    Arc.MemPtr s = new Arc.MemPtr(src, startOffset);
-    Arc.MemPtr o = new Arc.MemPtr(out, startOffset);
-    Arc.MemPtr preds = new Arc.MemPtr(inverse ? o : s);
+    MemPtr s = new MemPtr(src, startOffset);
+    MemPtr o = new MemPtr(out, startOffset);
+    MemPtr preds = new MemPtr(inverse ? o : s);
 
     if (row == 0) {
       // Very first top-left pixel is copied.
       o[0] = s[0];
       // Rest of top scan-line is left-predicted.
-      _predictLine(new Arc.MemPtr(s, 1), preds, new Arc.MemPtr(o, 1), width - 1,
+      _predictLine(new MemPtr(s, 1), preds, new MemPtr(o, 1), width - 1,
                    inverse);
       row = 1;
       s.offset += stride;
@@ -145,20 +145,20 @@ class WebPFilters {
     return ((g & ~0xff) == 0) ? g : (g < 0) ? 0 : 255;  // clip to 8bit
   }
 
-  static void _doGradientFilter(Data.Uint8List src,
+  static void _doGradientFilter(Uint8List src,
                                 int width, int height, int stride,
                                 int row, int numRows,
-                                bool inverse, Data.Uint8List out) {
+                                bool inverse, Uint8List out) {
     final int startOffset = row * stride;
     final int lastRow = row + numRows;
-    Arc.MemPtr s = new Arc.MemPtr(src, startOffset);
-    Arc.MemPtr o = new Arc.MemPtr(out, startOffset);
-    Arc.MemPtr preds = new Arc.MemPtr(inverse ? o : s);
+    MemPtr s = new MemPtr(src, startOffset);
+    MemPtr o = new MemPtr(out, startOffset);
+    MemPtr preds = new MemPtr(inverse ? o : s);
 
     // left prediction for top scan-line
     if (row == 0) {
       o[0] = s[0];
-      _predictLine(new Arc.MemPtr(s, 1), preds, new Arc.MemPtr(o, 1),
+      _predictLine(new MemPtr(s, 1), preds, new MemPtr(o, 1),
                    width - 1, inverse);
       row = 1;
       preds.offset += stride;
@@ -169,7 +169,7 @@ class WebPFilters {
     // Filter line-by-line.
     while (row < lastRow) {
       // leftmost pixel: predict from above.
-      _predictLine(s, new Arc.MemPtr(preds, -stride), o, 1, inverse);
+      _predictLine(s, new MemPtr(preds, -stride), o, 1, inverse);
       for (int w = 1; w < width; ++w) {
         final int pred = _gradientPredictor(preds[w - 1],
             preds[w - stride],

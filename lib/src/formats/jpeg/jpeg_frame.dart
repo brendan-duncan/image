@@ -40,7 +40,7 @@ class JpegFrame {
       for (int i = 0; i < blocksPerColumnForMcu; i++) {
         List row = new List(blocksPerLineForMcu);
         for (int j = 0; j < blocksPerLineForMcu; j++) {
-          row[j] = new Data.Int32List(64);
+          row[j] = new Int32List(64);
         }
         blocks[i] = row;
       }

@@ -2,7 +2,7 @@ part of image;
 
 
 class WebPAlpha {
-  Arc.InputStream input;
+  InputStream input;
   int width = 0;
   int height = 0;
   int method = 0;
@@ -45,7 +45,7 @@ class WebPAlpha {
     return true;
   }
 
-  bool decode(int row, int numRows, Data.Uint8List output) {
+  bool decode(int row, int numRows, Uint8List output) {
     if (!isValid) {
       return false;
     }
@@ -81,7 +81,7 @@ class WebPAlpha {
     return true;
   }
 
-  bool _dequantizeLevels(Data.Uint8List data, int width, int height,
+  bool _dequantizeLevels(Uint8List data, int width, int height,
                          int row, int num_rows) {
     if (data == null || width <= 0 || height <= 0 || row < 0 || num_rows < 0 ||
         row + num_rows > height) {
@@ -91,7 +91,7 @@ class WebPAlpha {
   }
 
 
-  bool _decodeAlphaImageStream(int lastRow, Data.Uint8List output) {
+  bool _decodeAlphaImageStream(int lastRow, Uint8List output) {
     _vp8l._opaque = output;
     // Decode (with special row processing).
     return _use8bDecode ?

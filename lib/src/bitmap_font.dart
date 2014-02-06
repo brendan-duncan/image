@@ -63,9 +63,9 @@ class BitmapFont {
    * .png font image.
    */
   BitmapFont.fromZip(List<int> fileData) {
-    Arc.Archive arc = new Arc.ZipDecoder().decodeBytes(fileData);
+    Archive arc = new ZipDecoder().decodeBytes(fileData);
 
-    Arc.File font_file;
+    ArchiveFile font_file;
     for (int i = 0; i < arc.numberOfFiles(); ++i) {
       if (arc.fileName(i).endsWith('.fnt')) {
         font_file = arc.files[i];
@@ -109,7 +109,7 @@ class BitmapFont {
 
 
   void _parseFnt(XmlElement xml, Map<int, Image> fontPages,
-                 [Arc.Archive arc]) {
+                 [Archive arc]) {
     for (XmlElement c in xml.children) {
       if (c.name == 'info') {
         for (String a in c.attributes.keys) {
@@ -198,7 +198,7 @@ class BitmapFont {
           }
 
           if (arc != null) {
-            Arc.File imageFile = _findFile(arc, filename);
+            ArchiveFile imageFile = _findFile(arc, filename);
             if (imageFile == null) {
               throw new ImageException('Font zip missing font page image $filename');
             }
@@ -354,9 +354,9 @@ class BitmapFont {
     }
   }
 
-  static Arc.File _findFile(Arc.Archive arc, String filename) {
-    for (Arc.File f in arc.files) {
-      if (f.filename == filename) {
+  static ArchiveFile _findFile(Archive arc, String filename) {
+    for (ArchiveFile f in arc.files) {
+      if (f.name == filename) {
         return f;
       }
     }

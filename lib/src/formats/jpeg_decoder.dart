@@ -8,8 +8,7 @@ class JpegDecoder extends Decoder {
    * Is the given file a valid JPEG image?
    */
   bool isValidFile(List<int> data) {
-    Arc.InputStream input = new Arc.InputStream(data,
-        byteOrder: Arc.BIG_ENDIAN);
+    InputStream input = new InputStream(data, byteOrder: BIG_ENDIAN);
     return new JpegData().validate(data);
   }
 
@@ -43,7 +42,7 @@ class JpegDecoder extends Decoder {
   void _copyToImage(JpegData jpeg, Image imageData) {
     int width = imageData.width;
     int height = imageData.height;
-    Data.Uint8List data = jpeg.getData(width, height);
+    Uint8List data = jpeg.getData(width, height);
     List components = jpeg.components;
 
     int i = 0;

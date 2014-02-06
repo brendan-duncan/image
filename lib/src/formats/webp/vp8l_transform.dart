@@ -10,13 +10,13 @@ class VP8LTransform {
   int type = 0;
   int xsize = 0;
   int ysize = 0;
-  Data.Uint32List data;
+  Uint32List data;
   int bits = 0;
 
   void inverseTransform(int rowStart, int rowEnd,
-                        Data.Uint32List inData,
+                        Uint32List inData,
                         int rowsIn,
-                        Data.Uint32List outData,
+                        Uint32List outData,
                         int rowsOut) {
     final int width = xsize;
 
@@ -64,10 +64,10 @@ class VP8LTransform {
   }
 
   void colorIndexInverseTransformAlpha(int yStart, int yEnd,
-                                           Arc.MemPtr src, Arc.MemPtr dst) {
+                                           MemPtr src, MemPtr dst) {
     final int bitsPerPixel = 8 >> bits;
     final int width = xsize;
-    Data.Uint32List colorMap = this.data;
+    Uint32List colorMap = this.data;
     if (bitsPerPixel < 8) {
       final int pixelsPerByte = 1 << bits;
       final int countMask = pixelsPerByte - 1;
@@ -102,11 +102,11 @@ class VP8LTransform {
   }
 
   void colorIndexInverseTransform(int yStart, int yEnd,
-                                  Data.Uint32List inData, int src,
-                                  Data.Uint32List outData, int dst) {
+                                  Uint32List inData, int src,
+                                  Uint32List outData, int dst) {
     final int bitsPerPixel = 8 >> bits;
     final int width = xsize;
-    Data.Uint32List colorMap = this.data;
+    Uint32List colorMap = this.data;
     if (bitsPerPixel < 8) {
       final int pixelsPerByte = 1 << bits;
       final int countMask = pixelsPerByte - 1;
@@ -137,7 +137,7 @@ class VP8LTransform {
   /**
    * Color space inverse transform.
    */
-  void colorSpaceInverseTransform(int yStart, int yEnd, Data.Uint32List outData,
+  void colorSpaceInverseTransform(int yStart, int yEnd, Uint32List outData,
                                   int data) {
     final int width = xsize;
     final int mask = (1 << bits) - 1;
@@ -169,7 +169,7 @@ class VP8LTransform {
   /**
    * Inverse prediction.
    */
-  void predictorInverseTransform(int yStart, int yEnd, Data.Uint32List outData,
+  void predictorInverseTransform(int yStart, int yEnd, Uint32List outData,
                                  int data) {
     final int width = xsize;
     if (yStart == 0) {  // First Row follows the L (mode=1) mode.
@@ -222,7 +222,7 @@ class VP8LTransform {
    * Add green to blue and red channels (i.e. perform the inverse transform of
    * 'subtract green').
    */
-  void addGreenToBlueAndRed(Data.Uint32List pixels, int data, int dataEnd) {
+  void addGreenToBlueAndRed(Uint32List pixels, int data, int dataEnd) {
     while (data < dataEnd) {
       final int argb = pixels[data];
       final int green = ((argb >> 8) & 0xff);
@@ -252,7 +252,7 @@ class VP8LTransform {
   /**
    * In-place sum of each component with mod 256.
    */
-  static void _addPixelsEq(Data.Uint32List pixels, int a, int b) {
+  static void _addPixelsEq(Uint32List pixels, int a, int b) {
     int pa = pixels[a];
     final int alphaAndGreen = (pa & 0xff00ff00) + (b & 0xff00ff00);
     final int redAndBlue = (pa & 0x00ff00ff) + (b & 0x00ff00ff);
@@ -333,59 +333,59 @@ class VP8LTransform {
   //--------------------------------------------------------------------------
   // Predictors
 
-  static int _predictor0(Data.Uint32List pixels, int left, int top) {
+  static int _predictor0(Uint32List pixels, int left, int top) {
     return VP8L.ARGB_BLACK;
   }
 
-  static int _predictor1(Data.Uint32List pixels, int left, int top) {
+  static int _predictor1(Uint32List pixels, int left, int top) {
     return left;
   }
 
-  static int _predictor2(Data.Uint32List pixels, int left, int top) {
+  static int _predictor2(Uint32List pixels, int left, int top) {
     return pixels[top];
   }
 
-  static int _predictor3(Data.Uint32List pixels, int left, int top) {
+  static int _predictor3(Uint32List pixels, int left, int top) {
     return pixels[top + 1];
   }
 
-  static int _predictor4(Data.Uint32List pixels, int left, int top) {
+  static int _predictor4(Uint32List pixels, int left, int top) {
     return pixels[top -1];
   }
 
-  static int _predictor5(Data.Uint32List pixels, int left, int top) {
+  static int _predictor5(Uint32List pixels, int left, int top) {
     return _average3(left, pixels[top], pixels[top + 1]);
   }
 
-  static int _predictor6(Data.Uint32List pixels, int left, int top) {
+  static int _predictor6(Uint32List pixels, int left, int top) {
     return _average2(left, pixels[top - 1]);
   }
 
-  static int _predictor7(Data.Uint32List pixels, int left, int top) {
+  static int _predictor7(Uint32List pixels, int left, int top) {
     return _average2(left, pixels[top]);
   }
 
-  static int _predictor8(Data.Uint32List pixels, int left, int top) {
+  static int _predictor8(Uint32List pixels, int left, int top) {
     return _average2(pixels[top -1], pixels[top]);
   }
 
-  static int _predictor9(Data.Uint32List pixels, int left, int top) {
+  static int _predictor9(Uint32List pixels, int left, int top) {
     return _average2(pixels[top], pixels[top + 1]);
   }
 
-  static int _predictor10(Data.Uint32List pixels, int left, int top) {
+  static int _predictor10(Uint32List pixels, int left, int top) {
     return _average4(left, pixels[top -1], pixels[top], pixels[top + 1]);
   }
 
-  static int _predictor11(Data.Uint32List pixels, int left, int top) {
+  static int _predictor11(Uint32List pixels, int left, int top) {
     return _select(pixels[top], left, pixels[top - 1]);
   }
 
-  static int _predictor12(Data.Uint32List pixels, int left, int top) {
+  static int _predictor12(Uint32List pixels, int left, int top) {
     return _clampedAddSubtractFull(left, pixels[top], pixels[top - 1]);
   }
 
-  static int _predictor13(Data.Uint32List pixels, int left, int top) {
+  static int _predictor13(Uint32List pixels, int left, int top) {
     return _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
   }
 
@@ -398,7 +398,7 @@ class VP8LTransform {
 }
 
 class _VP8LMultipliers {
-  final Data.Uint8List data = new Data.Uint8List(3);
+  final Uint8List data = new Uint8List(3);
 
   // Note: the members are uint8_t, so that any negative values are
   // automatically converted to "mod 256" values.
@@ -485,14 +485,14 @@ int _int32ToUint32(int d) {
   return _int32ToUint32_uint32[0];
 }
 
-final Data.Uint8List _uint8ToInt8_uint8 = new Data.Uint8List(1);
-final Data.Int8List _uint8ToInt8_int8 =
-    new Data.Int8List.view(_uint8ToInt8_uint8.buffer);
+final Uint8List _uint8ToInt8_uint8 = new Uint8List(1);
+final Int8List _uint8ToInt8_int8 =
+    new Int8List.view(_uint8ToInt8_uint8.buffer);
 
-final Data.Uint8List _uint8ToInt8_uint8_ = new Data.Uint8List(1);
-final Data.Int8List _uint8ToInt8_int8_ =
-    new Data.Int8List.view(_uint8ToInt8_uint8_.buffer);
+final Uint8List _uint8ToInt8_uint8_ = new Uint8List(1);
+final Int8List _uint8ToInt8_int8_ =
+    new Int8List.view(_uint8ToInt8_uint8_.buffer);
 
-final Data.Int32List _int32ToUint32_int32 = new Data.Int32List(1);
-final Data.Uint32List _int32ToUint32_uint32 =
-    new Data.Uint32List.view(_int32ToUint32_int32.buffer);
+final Int32List _int32ToUint32_int32 = new Int32List(1);
+final Uint32List _int32ToUint32_uint32 =
+    new Uint32List.view(_int32ToUint32_int32.buffer);

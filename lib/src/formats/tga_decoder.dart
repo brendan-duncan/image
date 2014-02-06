@@ -8,8 +8,8 @@ class TgaDecoder extends Decoder {
    * Is the given file a valid Targa image?
    */
   bool isValidFile(List<int> data) {
-    Arc.InputStream input = new Arc.InputStream(data,
-        byteOrder: Arc.BIG_ENDIAN);
+    InputStream input = new InputStream(data,
+        byteOrder: BIG_ENDIAN);
 
     List<int> header = input.readBytes(18);
     if (header[2] != 2) {
@@ -23,8 +23,8 @@ class TgaDecoder extends Decoder {
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {
-    Arc.InputStream input = new Arc.InputStream(data,
-        byteOrder: Arc.BIG_ENDIAN);
+    InputStream input = new InputStream(data,
+        byteOrder: BIG_ENDIAN);
 
     List<int> header = input.readBytes(18);
     if (header[2] != 2) {
