@@ -87,6 +87,7 @@ part 'src/transform/copy_rotate.dart';
 part 'src/transform/flip.dart';
 part 'src/transform/trim.dart';
 
+part 'src/util/bit_operators.dart';
 part 'src/util/clip_line.dart';
 part 'src/util/interpolation.dart';
 part 'src/util/min_max.dart';
