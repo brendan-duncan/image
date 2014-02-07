@@ -38,8 +38,7 @@ class GifColorMap {
   int alpha(int color) => (color == transparent) ? 0 : 255;
 
   int _bitSize(int n) {
-    int i;
-    for (i = 1; i <= 8; i++) {
+    for (int i = 1; i <= 8; i++) {
       if ((1 << i) >= n) {
         return i;
       }

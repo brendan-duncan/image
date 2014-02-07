@@ -69,6 +69,7 @@ part 'src/formats/webp/webp_info.dart';
 part 'src/formats/decoder.dart';
 part 'src/formats/formats.dart';
 part 'src/formats/gif_decoder.dart';
+part 'src/formats/gif_encoder.dart';
 part 'src/formats/jpeg_decoder.dart';
 part 'src/formats/jpeg_encoder.dart';
 part 'src/formats/png_decoder.dart';
