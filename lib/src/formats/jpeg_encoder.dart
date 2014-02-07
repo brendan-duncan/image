@@ -6,7 +6,7 @@ part of image;
  * Derived from:
  * https://github.com/owencm/javascript-jpeg-encoder
  */
-class JpegEncoder {
+class JpegEncoder extends Encoder {
   JpegEncoder({int quality: 100}) {
     _initHuffmanTbl();
     _initCategoryNumber();
@@ -32,7 +32,7 @@ class JpegEncoder {
     currentQuality = quality;
   }
 
-  List<int> encode(Image image) {
+  List<int> encodeImage(Image image) {
     OutputStream fp = new OutputStream(byteOrder: BIG_ENDIAN);
 
     // Add JPEG headers

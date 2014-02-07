@@ -3,7 +3,7 @@ part of image;
 /**
  * Encode an image to the PNG format.
  */
-class PngEncoder {
+class PngEncoder extends Encoder {
   static const int FILTER_NONE = 0;
   static const int FILTER_SUB = 1;
   static const int FILTER_UP = 2;
@@ -16,7 +16,7 @@ class PngEncoder {
 
   PngEncoder({this.filter: FILTER_PAETH, this.level});
 
-  List<int> encode(Image image) {
+  List<int> encodeImage(Image image) {
     OutputStream output = new OutputStream(byteOrder: BIG_ENDIAN);
 
     // PNG file signature

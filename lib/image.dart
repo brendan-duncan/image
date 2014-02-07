@@ -4,6 +4,7 @@
  */
 library image;
 
+import 'dart:collection';
 import 'dart:math' as Math;
 import 'dart:typed_data';
 
@@ -67,6 +68,7 @@ part 'src/formats/webp/webp_frame.dart';
 part 'src/formats/webp/webp_huffman.dart';
 part 'src/formats/webp/webp_info.dart';
 part 'src/formats/decoder.dart';
+part 'src/formats/encoder.dart';
 part 'src/formats/formats.dart';
 part 'src/formats/gif_decoder.dart';
 part 'src/formats/gif_encoder.dart';

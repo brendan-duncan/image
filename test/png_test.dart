@@ -7,7 +7,7 @@ void definePngTests() {
       image.fill(getColor(100, 200, 255));
 
       // Encode the image to PNG
-      List<int> png = new PngEncoder().encode(image);
+      List<int> png = new PngEncoder().encodeImage(image);
       new Io.File('out/encode.png')
             .writeAsBytesSync(png);
     });
@@ -23,7 +23,7 @@ void definePngTests() {
         expect(image[i], equals(c));
       }
 
-      List<int> png = new PngEncoder().encode(image);
+      List<int> png = new PngEncoder().encodeImage(image);
       new Io.File('out/decode.png')
             .writeAsBytesSync(png);
     });
@@ -76,7 +76,7 @@ void definePngTests() {
           }
         } else {
           Image image = new PngDecoder().decodeImage(file.readAsBytesSync());
-          List<int> png = new PngEncoder().encode(image);
+          List<int> png = new PngEncoder().encodeImage(image);
           new Io.File('out/png/${name}')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);

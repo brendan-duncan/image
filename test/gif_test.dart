@@ -73,4 +73,23 @@ void defineGifTests() {
       });
     }
   });
+
+  group('Gif/encodeImage', () {
+    List<int> bytes = new Io.File('res/jpg/jpeg444.jpg').readAsBytesSync();
+    Image image = new JpegDecoder().decodeImage(bytes);
+
+    List<int> gif = new GifEncoder().encodeImage(image);
+    new Io.File('out/gif/jpeg444.gif')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(gif);
+  });
+
+  group('Gif/encodeAnimation', () {
+    List<int> bytes = new Io.File(path + '/cars.gif').readAsBytesSync();
+    Animation anim = new GifDecoder().decodeAnimation(bytes);
+    List<int> gif = new GifEncoder().encodeAnimation(anim);
+    new Io.File('out/gif/cars.gif')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(gif);
+  });
 }

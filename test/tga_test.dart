@@ -21,7 +21,7 @@ void defineTgaTests() {
           throw new ImageException('Unable to decode TGA Image: $name.');
         }
 
-        List<int> png = new PngEncoder().encode(image);
+        List<int> png = new PngEncoder().encodeImage(image);
         new Io.File('out/tga/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
@@ -37,7 +37,7 @@ void defineTgaTests() {
       expect(image.height, equals(533));
 
       // Encode the image as a tga
-      List<int> tga = new TgaEncoder().encode(image);
+      List<int> tga = new TgaEncoder().encodeImage(image);
 
       Io.File out = new Io.File('out/trees.tga')
                           ..createSync(recursive: true)

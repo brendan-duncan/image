@@ -55,7 +55,7 @@ void defineWebPTests() {
       Io.File file = new Io.File(path + '/2b.webp');
       List<int> bytes = file.readAsBytesSync();
       Image image = new WebPDecoder().decodeImage(bytes);
-      List<int> png = new PngEncoder().encode(image);
+      List<int> png = new PngEncoder().encodeImage(image);
       new Io.File('out/webp/decode.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
@@ -87,7 +87,7 @@ void defineWebPTests() {
           throw new ImageException('Unable to decode WebP Image: $name.');
         }
 
-        List<int> png = new PngEncoder().encode(image);
+        List<int> png = new PngEncoder().encodeImage(image);
         new Io.File('out/webp/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);

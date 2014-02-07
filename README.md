@@ -15,11 +15,12 @@ formats:
 - PNG
 - JPG
 - TGA
+- GIF
 
 Decoding Only (for now):
 
 - WebP (including animation)
-- GIF (including animation)
+
 
 ##[Documentation](https://github.com/brendan-duncan/image/wiki)
 

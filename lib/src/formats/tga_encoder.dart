@@ -3,8 +3,8 @@ part of image;
 /**
  * Encode a Targa TGA image.  This only supports the 24-bit uncompressed format.
  */
-class TgaEncoder {
-  List<int> encode(Image image) {
+class TgaEncoder extends Encoder {
+  List<int> encodeImage(Image image) {
     OutputStream out = new OutputStream(byteOrder: BIG_ENDIAN);
 
     List<int> header = new List<int>(18);

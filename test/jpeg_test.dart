@@ -21,7 +21,7 @@ void defineJpegTests() {
           throw new ImageException('Unable to decode JPEG Image: $name.');
         }
 
-        List<int> png = new PngEncoder().encode(image);
+        List<int> png = new PngEncoder().encodeImage(image);
         new Io.File('out/jpg/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
@@ -37,7 +37,7 @@ void defineJpegTests() {
       expect(image.height, equals(562));
 
       // Encode the image to Jpeg
-      List<int> jpg = new JpegEncoder().encode(image);
+      List<int> jpg = new JpegEncoder().encodeImage(image);
 
       // Decode the encoded jpg.
       Image image2 = new JpegDecoder().decodeImage(jpg);
