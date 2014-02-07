@@ -309,6 +309,15 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(f));
     });
 
+    test('quantize', () {
+      Image f = new Image.from(image);
+      quantize(f);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/quantize.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
     test('trim', () {
       Image image = readPng(new Io.File('res/png/trim.png').readAsBytesSync());
       Image trimmed = trim(image, mode: TRIM_TRANSPARENT);

@@ -33,6 +33,7 @@ part 'src/filter/grayscale.dart';
 part 'src/filter/invert.dart';
 part 'src/filter/normalize.dart';
 part 'src/filter/pixelate.dart';
+part 'src/filter/quantize.dart';
 part 'src/filter/remap_colors.dart';
 part 'src/filter/seperable_convolution.dart';
 part 'src/filter/seperable_kernel.dart';
@@ -86,6 +87,7 @@ part 'src/transform/trim.dart';
 part 'src/util/clip_line.dart';
 part 'src/util/interpolation.dart';
 part 'src/util/min_max.dart';
+part 'src/util/neural_quantizer.dart';
 part 'src/util/random.dart';
 
 part 'src/animation.dart';
