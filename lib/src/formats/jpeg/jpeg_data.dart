@@ -13,8 +13,7 @@ class JpegData {
   final List<Map> components = [];
 
   bool validate(List<int> bytes) {
-    InputStream input = new InputStream(bytes,
-                                                byteOrder: BIG_ENDIAN);
+    InputStream input = new InputStream(bytes, byteOrder: BIG_ENDIAN);
 
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
