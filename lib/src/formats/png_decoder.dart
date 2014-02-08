@@ -230,7 +230,7 @@ class PngDecoder extends Decoder {
     for (int i = 0; i < 256; ++i) {
       int c = i;
       if (gamma != null) {
-        c = getGamma(c, gamma);
+        c = (Math.pow((c / 255.0), gamma) * 255.0).toInt();
       }
       colorLut[i] = c;
     }

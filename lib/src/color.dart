@@ -1,10 +1,16 @@
 part of image;
 
+/// Red channel of a color.
 const int RED = 0;
+/// Green channel of a color.
 const int GREEN = 1;
+/// Blue channel of a color.
 const int BLUE = 2;
+/// Alpha channel of a color.
 const int ALPHA = 3;
+/// Luminance of a color.
 const int LUMINANCE = 4;
+
 
 int _clamp(int x, int a, int b) =>
   (x < a) ? a :
@@ -14,7 +20,7 @@ int _clamp(int x, int a, int b) =>
 int _clamp255(int x) => _clamp(x, 0, 255);
 
 /**
- * Get the color with the given [r],[g],[b], and [a] components.
+ * Get the color with the given [r], [g], [b], and [a] components.
  */
 int getColor(int r, int g, int b, [int a = 255]) {
   return (_clamp255(a) << 24) |
@@ -24,75 +30,85 @@ int getColor(int r, int g, int b, [int a = 255]) {
 }
 
 /**
- * Get the channel from the color.
+ * Get the [channel] from the [color].
  */
-int getChannel(int c, int ch) =>
-    ch == 0 ? getRed(c) :
-    ch == 1 ? getGreen(c) :
-    ch == 2 ? getBlue(c) :
-    getAlpha(c);
-
-int setChannel(int c, int ch, int v) =>
-    ch == 0 ? setRed(c, v) :
-    ch == 1 ? setGreen(c, v) :
-    ch == 2 ? setBlue(c, v) :
-    setAlpha(c, v);
+int getChannel(int color, int channel) =>
+    channel == 0 ? getRed(color) :
+    channel == 1 ? getGreen(color) :
+    channel == 2 ? getBlue(color) :
+    getAlpha(color);
 
 /**
- * Get the red component from the color.
+ * Returns a new color, where the given [color]'s [channel] has been
+ * replaced with the given [value].
  */
-int getRed(int c) =>
-    (c) & 0xff;
+int setChannel(int color, int channel, int value) =>
+    channel == 0 ? setRed(color, value) :
+    channel == 1 ? setGreen(color, value) :
+    channel == 2 ? setBlue(color, value) :
+    setAlpha(color, value);
 
 /**
- * Set the red component of the color.
+ * Get the red channel from the [color].
  */
-int setRed(int c, int v) =>
-    (c & 0xffffff00) | (_clamp255(v));
+int getRed(int color) =>
+    (color) & 0xff;
 
 /**
- * Get the green component from the color.
+ * Returns a new color where the red channel of [color] has been replaced
+ * by [value].
  */
-int getGreen(int c) =>
-    (c >> 8) & 0xff;
+int setRed(int color, int value) =>
+    (color & 0xffffff00) | (_clamp255(value));
 
 /**
- * Set the green component of the color.
+ * Get the green channel from the [color].
  */
-int setGreen(int c, int v) =>
-    (c & 0xffff00ff) | (_clamp255(v) << 8);
+int getGreen(int color) =>
+    (color >> 8) & 0xff;
 
 /**
- * Get the blue component from the color.
+ * Returns a new color where the green channel of [color] has been replaced
+ * by [value].
  */
-int getBlue(int c) =>
-    (c >> 16) & 0xff;
+int setGreen(int color, int value) =>
+    (color & 0xffff00ff) | (_clamp255(value) << 8);
 
 /**
- * Set the blue component of the color.
+ * Get the blue channel from the [color].
  */
-int setBlue(int c, int v) =>
-    (c & 0xff00ffff) | (_clamp255(v) << 16);
+int getBlue(int color) =>
+    (color >> 16) & 0xff;
 
 /**
- * Get the alpha component from the color.
+ * Returns a new color where the blue channel of [color] has been replaced
+ * by [value].
  */
-int getAlpha(int c) =>
-    (c >> 24) & 0xff;
+int setBlue(int color, int value) =>
+    (color & 0xff00ffff) | (_clamp255(value) << 16);
 
 /**
- * Set the alpha component of the color.
+ * Get the alpha channel from the [color].
  */
-int setAlpha(int c, int v) =>
-    (c & 0x00ffffff) | (_clamp255(v) << 24);
+int getAlpha(int color) =>
+    (color >> 24) & 0xff;
 
 /**
- *
- * Composite the color [src] onto the color [dst].  The [src] alpha is
- * scaled by [fraction], for anti-aliasing.
+ * Returns a new color where the alpha channel of [color] has been replaced
+ * by [value].
+ */
+int setAlpha(int color, int value) =>
+    (color & 0x00ffffff) | (_clamp255(value) << 24);
+
+/**
+ * Returns a new color of [src] alpha-blended onto [dst]. The opacity of [src]
+ * is additionally scaled by [fraction] / 255.
  */
 int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
-  double a = (getAlpha(src) / 255.0) * (fraction / 255.0);
+  double a = (getAlpha(src) / 255.0);
+  if (fraction != 0xff) {
+    a *= (fraction / 255.0);
+  }
 
   int sr = (getRed(src) * a).toInt();
   int sg = (getGreen(src) * a).toInt();
@@ -108,15 +124,11 @@ int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
 }
 
 /**
- * Get the luminance (grayscale) value of the color [c].
+ * Returns the luminance (grayscale) value of the [color].
  */
-int getLuminance(int c) {
-  int r = getRed(c);
-  int g = getGreen(c);
-  int b = getBlue(c);
+int getLuminance(int color) {
+  int r = getRed(color);
+  int g = getGreen(color);
+  int b = getBlue(color);
   return (0.299 * r + 0.587 * g + 0.114 * b).toInt();
-}
-
-int getGamma(int c, double gamma) {
-  return (Math.pow((c / 255.0), gamma) * 255.0).toInt();
 }

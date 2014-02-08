@@ -1,7 +1,10 @@
 part of image;
 
+/// Flip the image horizontally.
 const int FLIP_HORIZONTAL = 1;
+/// Flip the image vertically.
 const int FLIP_VERTICAL = 2;
+/// Flip the image both horizontally and vertically.
 const int FLIP_BOTH = 3;
 
 /**

@@ -6,7 +6,7 @@ part of image;
  * color for a pixel.
  *
  * Pixels are stored in 32-bit unsigned integers in little-endian format:
- * aabbggrr.
+ * aabbggrr.  This is to be consistent with HTML canvas data.
  */
 class Image {
   /// 24-bit RGB image.

@@ -1,11 +1,19 @@
 part of image;
 
+/**
+ * Decode a [BitmapFont] from the contents of a zip file that stores the
+ * .fnt font definition and associated PNG images.
+ */
 BitmapFont readFontZip(List<int> bytes) =>
     new BitmapFont.fromZip(bytes);
 
 
-BitmapFont readFont(String fnt, Image page) =>
-    new BitmapFont.fromFnt(fnt, page);
+/**
+ * Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
+ * and an [Image] that stores the font [map].
+ */
+BitmapFont readFont(String font, Image map) =>
+    new BitmapFont.fromFnt(font, map);
 
 
 /**
@@ -39,7 +47,8 @@ class BitmapFont {
   Map<int, Map<int, int>> kernings = {};
 
   /**
-   * Load a bitmap font from a .fnt file and a .png font image.
+   * Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
+   * and an [Image] that stores the font [map].
    */
   BitmapFont.fromFnt(String fnt, Image page) {
     Map<int, Image> fontPages = { 0: page };
@@ -59,8 +68,8 @@ class BitmapFont {
   }
 
   /**
-   * Load a bitmap font from a zip file containing a .fnt xml file and
-   * .png font image.
+   * Decode a [BitmapFont] from the contents of a zip file that stores the
+   * .fnt font definition and associated PNG images.
    */
   BitmapFont.fromZip(List<int> fileData) {
     Archive arc = new ZipDecoder().decodeBytes(fileData);

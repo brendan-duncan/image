@@ -1,13 +1,23 @@
 part of image;
 
+/// Trim an image to the top-left and bottom-right most non-transparent pixels.
 const int TRIM_TRANSPARENT = 0;
+/// Trim an image to the top-left and bottom-right most pixels that are not the
+/// same as the top-left most pixel of the image.
 const int TRIM_TOP_LEFT_COLOR = 1;
+/// Trim an image to the top-left and bottom-right most pixels that are not the
+/// same as the bottom-right most pixel of the image.
 const int TRIM_BOTTOM_RIGHT_COLOR = 2;
 
+/// Trim the image down from the top
 const int TRIM_TOP = 1;
+/// Trim the image up from the bottom.
 const int TRIM_BOTTOM = 2;
+/// Trim the left edge of the image.
 const int TRIM_LEFT = 4;
+/// Trim the right edge of the image.
 const int TRIM_RIGHT = 8;
+/// Trim all edges of the image.
 const int TRIM_ALL = TRIM_TOP | TRIM_BOTTOM | TRIM_LEFT | TRIM_RIGHT;
 
 /**

@@ -2,7 +2,7 @@ part of image;
 
 /**
  * Find the minimum and maximum color value in the image.
- * Returns a list as [min, max].
+ * Returns a list as <[min], [max]>.
  */
 List<int> minMax(Image image) {
   int min = 255;

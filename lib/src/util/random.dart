@@ -23,7 +23,7 @@ double grand(Math.Random rand) {
 }
 
 /**
- * Return a random variable following a Poisson distribution of parameter z.
+ * Return a random variable following a Poisson distribution of parameter [z].
  */
 int prand(Math.Random rand, double z) {
   if (z <= 1.0e-10) {
