@@ -807,7 +807,7 @@ class JpegData {
 
     // convert to 8-bit integers
     for (int i = 0; i < 64; ++i) {
-      int sample = (128 + (_shiftR(p[i] + 8), 4));
+      int sample = (128 + _shiftR((p[i] + 8), 4));
       dataOut[i] = sample < 0 ? 0 : sample > 0xFF ? 0xFF : sample;
     }
   }
