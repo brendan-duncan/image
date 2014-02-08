@@ -18,7 +18,8 @@ void main() {
   // The list of images we'll be decoding, representing a wide range
   // of formats and sub-formats.
   List<String> images = ['1.webp', '1_webp_ll.webp', '3_webp_a.webp',
-                         'abstract.jpg', 'cars.gif', 'trees.png'];
+                         'abstract.jpg', 'cars.gif', 'trees.png',
+                         'BladeRunner_lossy.webp'];
 
   for (String name in images) {
     // Use an AJAX request to get the image file from disk.
