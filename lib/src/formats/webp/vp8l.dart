@@ -75,7 +75,9 @@ class VP8L {
   bool _allocateInternalBuffers8b() {
     final int totalNumPixels = webp.width * webp.height;
     _argbCache = 0;
-    _pixels8 = new Uint8List(totalNumPixels);
+    // pad the byteBuffer to a multiple of 4
+    int n = totalNumPixels + (4 - (totalNumPixels % 4));
+    _pixels8 = new Uint8List(n);
     _pixels = new Uint32List.view(_pixels8.buffer);
     return true;
   }
