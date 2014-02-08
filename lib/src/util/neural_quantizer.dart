@@ -321,7 +321,7 @@ class NeuralQuantizer {
 
       i++;
       if (i % delta == 0) {
-        alpha -= alpha / alphadec;
+        alpha -= alpha ~/ alphadec;
         biasRadius -= biasRadius ~/ RADIUS_DEC;
         rad = biasRadius >> RADIUS_BIAS_SHIFT;
         if (rad <= 1) {
