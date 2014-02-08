@@ -150,7 +150,7 @@ class WebPDecoder extends Decoder {
         anim.addFrame(lastImage, frame.duration);
       }
     } else {
-      Image image = decodeFrame(0);
+      Image image = decodeImage(bytes);
       if (image == null) {
         return null;
       }

@@ -13,3 +13,7 @@ example/webp_viewer.dart.js
 example/webp_viewer.dart.js.deps
 example/webp_viewer.dart.js.map
 example/webp_viewer.dart.precompiled.js
+example/test_formats.dart.js
+example/test_formats.dart.js.deps
+example/test_formats.dart.js.map
+example/test_formats.dart.precompiled.js

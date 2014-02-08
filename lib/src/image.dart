@@ -68,7 +68,9 @@ class Image {
    *
    * For example, given an Html Canvas, you could draw this image into the
    * canvas:
-   * canvas.getContext('2d').putImageData(image.getBytes());
+   * Html.ImageData d = context2D.createImageData(image.width, image.height);
+   * d.data.setRange(0, image.length, image.getBytes());
+   * context2D.putImageData(data, 0, 0);
    */
   List<int> getBytes() =>
     new Uint8List.view(_data.buffer);

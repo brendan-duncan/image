@@ -1,6 +1,30 @@
 part of image;
 
 /**
+ * Return the [Decoder] that can decode image with the given [name],
+ * by looking at the file extension.
+ */
+Decoder getDecoderForNamedImage(String name) {
+  String n = name.toLowerCase();
+  if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
+    return new JpegDecoder();
+  }
+  if (n.endsWith('.png')) {
+    return new PngDecoder();
+  }
+  if (n.endsWith('.tga')) {
+    return new TgaDecoder();
+  }
+  if (n.endsWith('.webp')) {
+    return new WebPDecoder();
+  }
+  if (n.endsWith('.gif')) {
+    return new GifDecoder();
+  }
+  return null;
+}
+
+/**
  * Identify the format of the image and decode it with the appropriate
  * decoder.
  */
