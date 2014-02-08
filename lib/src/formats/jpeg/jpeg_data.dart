@@ -320,7 +320,6 @@ class JpegData {
         case Jpeg.M_SOF14:
         case Jpeg.M_SOF15:
           throw new ImageException('Unhandled frame type ${marker.toRadixString(16)}');
-          break;
 
         case Jpeg.M_DHT: // DHT (Define Huffman Tables)
           _readDHT(block);
