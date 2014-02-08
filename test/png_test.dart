@@ -31,7 +31,10 @@ void definePngTests() {
     Io.File script = new Io.File(Io.Platform.script.toFilePath());
     String path = script.parent.path + '/res/png';
 
-    new Io.Directory(path).list().listen((f) {
+    Io.Directory dir = new Io.Directory(path);
+    List files = dir.listSync();
+
+    for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.png')) {
         return;
       }
@@ -82,6 +85,6 @@ void definePngTests() {
                 ..writeAsBytesSync(png);
         }
       });
-    });
+    }
   });
 }
