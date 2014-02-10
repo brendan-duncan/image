@@ -9,7 +9,7 @@ class WebPDecoder extends Decoder {
 
   WebPDecoder([List<int> bytes]) {
     if (bytes != null) {
-      getInfo(bytes);
+      startDecode(bytes);
     }
   }
 
@@ -17,7 +17,7 @@ class WebPDecoder extends Decoder {
    * Is the given file a valid WebP image?
    */
   bool isValidFile(List<int> data) {
-    return getInfo(data) != null;
+    return startDecode(data) != null;
   }
 
   /**
@@ -32,7 +32,7 @@ class WebPDecoder extends Decoder {
    * Validate the file is a WebP image and get information about it.
    * If the file is not a valid WebP image, null is returned.
    */
-  WebPInfo getInfo(List<int> bytes) {
+  WebPInfo startDecode(List<int> bytes) {
     // WebP is stored in little-endian byte order.
     _input = new InputStream(bytes);
 
@@ -47,6 +47,7 @@ class WebPDecoder extends Decoder {
 
     switch (info.format) {
       case WebPInfo.FORMAT_ANIMATED:
+        info.numFrames = info.frames.length;
         return info;
       case WebPInfo.FORMAT_LOSSLESS:
         _input.position = info._vp8Position;
@@ -54,6 +55,7 @@ class WebPDecoder extends Decoder {
         if (!vp8l.decodeHeader()) {
           return null;
         }
+        info.numFrames = info.frames.length;
         return info;
       case WebPInfo.FORMAT_LOSSY:
         _input.position = info._vp8Position;
@@ -61,6 +63,7 @@ class WebPDecoder extends Decoder {
         if (!vp8.decodeHeader()) {
           return null;
         }
+        info.numFrames = info.frames.length;
         return info;
     }
 
@@ -116,7 +119,7 @@ class WebPDecoder extends Decoder {
    * this will return an animation with a single frame.
    */
   Animation decodeAnimation(List<int> bytes) {
-    if (getInfo(bytes) == null) {
+    if (startDecode(bytes) == null) {
       return null;
     }
 
@@ -140,7 +143,7 @@ class WebPDecoder extends Decoder {
 
         if (lastImage != null) {
           if (frame.clearFrame) {
-            lastImage.fill(info.animBackgroundColor);
+            lastImage.fill(info.backgroundColor);
           }
           copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
         } else {
@@ -325,7 +328,7 @@ class WebPDecoder extends Decoder {
     int r = getGreen(c);
     int g = getBlue(c);
     int b = getAlpha(c);
-    webp.animBackgroundColor = getColor(r, g, b, a);
+    webp.backgroundColor = getColor(r, g, b, a);
     return true;
   }
 

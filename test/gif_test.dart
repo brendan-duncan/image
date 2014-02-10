@@ -17,7 +17,7 @@ void defineGifTests() {
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
 
-        GifInfo data = new GifDecoder().getInfo(bytes);
+        GifInfo data = new GifDecoder().startDecode(bytes);
         if (data == null) {
           throw new ImageException('Unable to parse Gif info: $name.');
         }

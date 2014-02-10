@@ -4,11 +4,7 @@ part of image;
  * Decode a PNG encoded image.
  */
 class PngDecoder extends Decoder {
-  _PngHeader header;
-  List<int> palette;
-  List<int> transparency;
-  List<int> colorLut;
-  double gamma;
+  PngInfo info;
 
   /**
    * Is the given file a valid PNG image?
@@ -27,173 +23,118 @@ class PngDecoder extends Decoder {
     return true;
   }
 
-  Image decodeImage(List<int> data, {int frame: 0}) {
-    InputStream input = new InputStream(data,
-        byteOrder: BIG_ENDIAN);
 
-    List<int> imageData = [];
+  /**
+   * Start decoding the data as an animation sequence, but don't actually
+   * process the frames until they are requested with decodeFrame.
+   */
+  DecodeInfo startDecode(List<int> data) {
+    _input = new InputStream(data, byteOrder: BIG_ENDIAN);
 
-    List<int> pngHeader = input.readBytes(8);
+    List<int> pngHeader = _input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
-        throw new ImageException('Invalid PNG file');
+        return null;
       }
     }
 
-    // Chunk Types:
-    //
-    // Primary chunks
-    //
-    // IHDR must be the first chunk; it contains the image's width, height,
-    //      and bit depth.
-    // PLTE contains the palette; list of colors.
-    // IDAT contains the image, which may be split among multiple IDAT chunks.
-    //      Such splitting increases filesize slightly, but makes it possible
-    //      to generate a PNG in a streaming manner. The IDAT chunk contains
-    //      the actual image data, which is the output stream of the
-    //       compression algorithm.
-    // IEND marks the image end.
-    //
-    // Secondary chunks
-    //
-    // bKGD gives the default background color. It is intended for use when
-    //      there is no better choice available, such as in standalone image
-    //      viewers (but not web browsers; see below for more details).
-    // cHRM gives the chromaticity coordinates of the display primaries and
-    //      white point.
-    // gAMA specifies gamma.
-    // hIST can store the histogram, or total amount of each color in the image.
-    // iCCP is an ICC color profile.
-    // iTXt contains UTF-8 text, compressed or not, with an optional language
-    //      tag. iTXt chunk with the keyword 'XML:com.adobe.xmp' can contain
-    //      Extensible Metadata Platform (XMP).
-    // pHYs holds the intended pixel size and/or aspect ratio of the image.
-    // sBIT (significant bits) indicates the color-accuracy of the source data.
-    // sPLT suggests a palette to use if the full range of colors is
-    //      unavailable.
-    // sRGB indicates that the standard sRGB color space is used.
-    // sTER stereo-image indicator chunk for stereoscopic images.[13]
-    // tEXt can store text that can be represented in ISO/IEC 8859-1, with one
-    //      name=value pair for each chunk.
-    // tIME stores the time that the image was last changed.
-    // tRNS contains transparency information. For indexed images, it stores
-    //      alpha channel values for one or more palette entries. For truecolor
-    //      and grayscale images, it stores a single pixel value that is to be
-    //      regarded as fully transparent.
-    // zTXt contains compressed text with the same limits as tEXt.
     while (true) {
-      int chunkSize = input.readUint32();
-      String chunkType = new String.fromCharCodes(input.readBytes(4));
+      int chunkSize = _input.readUint32();
+      String chunkType = new String.fromCharCodes(_input.readBytes(4));
       switch (chunkType) {
         case 'IHDR':
-          InputStream hdr = new InputStream(input.readBytes(chunkSize),
-                                                    byteOrder: BIG_ENDIAN);
-          header = new _PngHeader();
-          header.width = hdr.readUint32();
-          header.height = hdr.readUint32();
-          header.bits = hdr.readByte();
-          header.colorType = hdr.readByte();
-          header.compressionMethod = hdr.readByte();
-          header.filterMethod = hdr.readByte();
-          header.interlaceMethod = hdr.readByte();
+          InputStream hdr = new InputStream(_input.readBytes(chunkSize),
+                                             byteOrder: BIG_ENDIAN);
+          info = new PngInfo();
+          info.width = hdr.readUint32();
+          info.height = hdr.readUint32();
+          info.bits = hdr.readByte();
+          info.colorType = hdr.readByte();
+          info.compressionMethod = hdr.readByte();
+          info.filterMethod = hdr.readByte();
+          info.interlaceMethod = hdr.readByte();
 
           // Validate some of the info in the header to make sure we support
           // the proposed image data.
           if (![GRAYSCALE, RGB, INDEXED,
-                GRAYSCALE_ALPHA, RGBA].contains(header.colorType)) {
-            throw new ImageException('Unsupported color type: ${header.colorType}.');
+                GRAYSCALE_ALPHA, RGBA].contains(info.colorType)) {
+            return null;
           }
 
-          if (header.filterMethod != 0) {
-            throw new ImageException('Unsupported filter method: ${header.filterMethod}');
+          if (info.filterMethod != 0) {
+            return null;
           }
 
-          switch (header.colorType) {
+          switch (info.colorType) {
             case GRAYSCALE:
-              if (![1, 2, 4, 8, 16].contains(header.bits)) {
-                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              if (![1, 2, 4, 8, 16].contains(info.bits)) {
+                return null;
               }
               break;
             case RGB:
-              if (![8, 16].contains(header.bits)) {
-                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              if (![8, 16].contains(info.bits)) {
+                return null;
               }
               break;
             case INDEXED:
-              if (![1, 2, 4, 8].contains(header.bits)) {
-                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              if (![1, 2, 4, 8].contains(info.bits)) {
+                return null;
               }
               break;
             case GRAYSCALE_ALPHA:
-              if (![8, 16].contains(header.bits)) {
-                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              if (![8, 16].contains(info.bits)) {
+                return null;
               }
               break;
             case RGBA:
-              if (![8, 16].contains(header.bits)) {
-                throw new ImageException('Unsuported bit depth: ${header.bits}.');
+              if (![8, 16].contains(info.bits)) {
+                return null;
               }
               break;
           }
 
-          int crc = input.readUint32();
+          int crc = _input.readUint32();
           int computedCrc = _crc(chunkType, hdr.buffer);
           if (crc != computedCrc) {
             throw new ImageException('Invalid $chunkType checksum');
           }
           break;
         case 'PLTE':
-          palette = input.readBytes(chunkSize);
-          int crc = input.readUint32();
-          int computedCrc = _crc(chunkType, palette);
+          info.palette = _input.readBytes(chunkSize);
+          int crc = _input.readUint32();
+          int computedCrc = _crc(chunkType, info.palette);
           if (crc != computedCrc) {
             throw new ImageException('Invalid $chunkType checksum');
           }
           break;
         case 'tRNS':
-          transparency = input.readBytes(chunkSize);
-          int crc = input.readUint32();
-          int computedCrc = _crc(chunkType, transparency);
-          if (crc != computedCrc) {
-            throw new ImageException('Invalid $chunkType checksum');
-          }
-          break;
-        case 'IDAT':
-          List<int> data = input.readBytes(chunkSize);
-          imageData.addAll(data);
-          int crc = input.readUint32();
-          int computedCrc = _crc(chunkType, data);
+          info.transparency = _input.readBytes(chunkSize);
+          int crc = _input.readUint32();
+          int computedCrc = _crc(chunkType, info.transparency);
           if (crc != computedCrc) {
             throw new ImageException('Invalid $chunkType checksum');
           }
           break;
         case 'IEND':
           // End of the image.
-          // CRC
-          input.skip(4);
+          _input.skip(4); // CRC
           break;
         case 'gAMA':
           if (chunkSize != 4) {
             throw new ImageException('Invalid gAMA chunk');
           }
-          int gammaInt = input.readUint32();
-          int crc = input.readUint32();
+          int gammaInt = _input.readUint32();
+          int crc = _input.readUint32();
           // A gamma of 1.0 doesn't have any affect, so pretend we didn't get
           // a gamma in that case.
           if (gammaInt != 100000) {
-            gamma = gammaInt / 100000.0;
-          } /*else {
-            // TODO It seems viewers use a gamma of 0.75 when the gamma is
-            // 10000, is it correct to do this?
-            gamma = 0.75;
-          }*/
+            info.gamma = gammaInt / 100000.0;
+          }
           break;
         default:
-          //print('Unhandled CHUNK $chunkType');
-          input.skip(chunkSize);
-          // CRC
-          input.skip(4);
+          _input.skip(chunkSize);
+          _input.skip(4); // CRC
           break;
       }
 
@@ -201,50 +142,99 @@ class PngDecoder extends Decoder {
         break;
       }
 
-      if (input.isEOS) {
+      if (_input.isEOS) {
+        return null;
+      }
+    }
+
+    return info;
+  }
+
+  /**
+   * PNG only supports 1 frame (until APNG decoded is added).
+   */
+  int numFrames() => info != null ? 1 : 0;
+
+  /**
+   * Decode the frame (assuming [startDecode] has already been called).
+   */
+  Image decodeFrame(int frame) {
+    if (info == null || frame != 0) {
+      return null;
+    }
+
+    _input.position = 8;
+
+    List<int> imageData = [];
+
+    while (true) {
+      int chunkSize = _input.readUint32();
+      String chunkType = new String.fromCharCodes(_input.readBytes(4));
+      switch (chunkType) {
+        case 'IDAT':
+          List<int> data = _input.readBytes(chunkSize);
+          imageData.addAll(data);
+          int crc = _input.readUint32();
+          int computedCrc = _crc(chunkType, data);
+          if (crc != computedCrc) {
+            throw new ImageException('Invalid $chunkType checksum');
+          }
+          break;
+        default:
+          _input.skip(chunkSize);
+          // CRC
+          _input.skip(4);
+          break;
+      }
+
+      if (chunkType == 'IEND') {
+        break;
+      }
+
+      if (_input.isEOS) {
         throw new ImageException('Incomplete or corrupt PNG file');
       }
     }
 
-    if (header == null) {
+    if (info == null) {
       throw new ImageException('Incomplete or corrupt PNG file');
     }
 
     int format;
-    if (header.colorType == GRAYSCALE_ALPHA ||
-        header.colorType == RGBA || transparency != null) {
+    if (info.colorType == GRAYSCALE_ALPHA ||
+        info.colorType == RGBA || info.transparency != null) {
       format = Image.RGBA;
     } else {
       format = Image.RGB;
     }
 
-    Image image = new Image(header.width, header.height, format);
+    Image image = new Image(info.width, info.height, format);
 
     List<int> uncompressed = new ZLibDecoder().decodeBytes(imageData);
 
     // input is the decompressed data.
-    input = new InputStream(uncompressed, byteOrder: BIG_ENDIAN);
+    InputStream input = new InputStream(uncompressed, byteOrder: BIG_ENDIAN);
 
     // Set up a LUT to transform colors for gamma correction.
-    colorLut = new List<int>(256);
+    info.colorLut = new List<int>(256);
     for (int i = 0; i < 256; ++i) {
       int c = i;
-      if (gamma != null) {
-        c = (Math.pow((c / 255.0), gamma) * 255.0).toInt();
+      if (info.gamma != null) {
+        c = (Math.pow((c / 255.0), info.gamma) * 255.0).toInt();
       }
-      colorLut[i] = c;
+      info.colorLut[i] = c;
     }
 
     // Apply the LUT to the palette, if necessary.
-    if (palette != null && gamma != null) {
-      for (int i = 0; i < palette.length; ++i) {
-        palette[i] = colorLut[palette[i]];
+    if (info.palette != null && info.gamma != null) {
+      for (int i = 0; i < info.palette.length; ++i) {
+        info.palette[i] = info.colorLut[info.palette[i]];
       }
     }
 
-    int w = header.width;
-    int h = header.height;
-    if (header.interlaceMethod != 0) {
+    int w = info.width;
+    int h = info.height;
+    if (info.interlaceMethod != 0) {
       _processPass(input, image, 0, 0, 8, 8, (w + 7) >> 3, (h + 7) >> 3);
       _processPass(input, image, 4, 0, 8, 8, (w + 3) >> 3, (h + 7) >> 3);
       _processPass(input, image, 0, 4, 4, 8, (w + 3) >> 2, (h + 3) >> 3);
@@ -257,6 +247,13 @@ class PngDecoder extends Decoder {
     }
 
     return image;
+  }
+
+  Image decodeImage(List<int> data, {int frame: 0}) {
+    if (startDecode(data) == null) {
+      return null;
+    }
+    return decodeFrame(frame);
   }
 
   Animation decodeAnimation(List<int> data) {
@@ -277,11 +274,11 @@ class PngDecoder extends Decoder {
   void _processPass(InputStream input, Image image,
                     int xOffset, int yOffset, int xStep, int yStep,
                     int passWidth, int passHeight) {
-    final int channels = (header.colorType == GRAYSCALE_ALPHA) ? 2 :
-      (header.colorType == RGB) ? 3 :
-        (header.colorType == RGBA) ? 4 : 1;
+    final int channels = (info.colorType == GRAYSCALE_ALPHA) ? 2 :
+      (info.colorType == RGB) ? 3 :
+        (info.colorType == RGBA) ? 4 : 1;
 
-    final int pixelDepth = channels * header.bits;
+    final int pixelDepth = channels * info.bits;
     final int bpp = (pixelDepth + 7) >> 3;
     final int rowBytes = (pixelDepth * passWidth + 7) >> 3;
 
@@ -313,7 +310,7 @@ class PngDecoder extends Decoder {
       final int blockHeight = xStep;
       final int blockWidth = xStep - xOffset;
 
-      int yMax = Math.min(dstY + blockHeight, header.height);
+      int yMax = Math.min(dstY + blockHeight, info.height);
 
       for (int srcX = 0, dstX = xOffset; srcX < passWidth;
            ++srcX, dstX += xStep) {
@@ -322,7 +319,7 @@ class PngDecoder extends Decoder {
         image.setPixel(dstX, dstY, c);
 
         if (blockWidth > 1 || blockHeight > 1) {
-          int xMax = Math.min(dstX + blockWidth, header.width);
+          int xMax = Math.min(dstX + blockWidth, info.width);
           int xPixels = xMax - dstX;
           for (int i = 0; i < blockHeight; ++i) {
             for (int j = 0; j < blockWidth; ++j) {
@@ -335,14 +332,14 @@ class PngDecoder extends Decoder {
   }
 
   void _process(InputStream input, Image image) {
-    final int channels = (header.colorType == GRAYSCALE_ALPHA) ? 2 :
-      (header.colorType == RGB) ? 3 :
-        (header.colorType == RGBA) ? 4 : 1;
+    final int channels = (info.colorType == GRAYSCALE_ALPHA) ? 2 :
+      (info.colorType == RGB) ? 3 :
+        (info.colorType == RGBA) ? 4 : 1;
 
-    final int pixelDepth = channels * header.bits;
+    final int pixelDepth = channels * info.bits;
 
-    final int w = header.width;
-    final int h = header.height;
+    final int w = info.width;
+    final int h = info.height;
 
     final int rowBytes = (((w * pixelDepth + 7)) >> 3);
     final int bpp = (pixelDepth + 7) >> 3;
@@ -509,41 +506,41 @@ class PngDecoder extends Decoder {
    * Read the next pixel from the input stream.
    */
   void _readPixel(InputStream input, List<int> pixel) {
-    switch (header.colorType) {
+    switch (info.colorType) {
       case GRAYSCALE:
-        pixel[0] = _readBits(input, header.bits);
+        pixel[0] = _readBits(input, info.bits);
         return;
       case RGB:
-        pixel[0] = _readBits(input, header.bits);
-        pixel[1] = _readBits(input, header.bits);
-        pixel[2] = _readBits(input, header.bits);
+        pixel[0] = _readBits(input, info.bits);
+        pixel[1] = _readBits(input, info.bits);
+        pixel[2] = _readBits(input, info.bits);
         return;
       case INDEXED:
-        pixel[0] = _readBits(input, header.bits);
+        pixel[0] = _readBits(input, info.bits);
         return;
       case GRAYSCALE_ALPHA:
-        pixel[0] = _readBits(input, header.bits);
-        pixel[1] = _readBits(input, header.bits);
+        pixel[0] = _readBits(input, info.bits);
+        pixel[1] = _readBits(input, info.bits);
         return;
       case RGBA:
-        pixel[0] = _readBits(input, header.bits);
-        pixel[1] = _readBits(input, header.bits);
-        pixel[2] = _readBits(input, header.bits);
-        pixel[3] = _readBits(input, header.bits);
+        pixel[0] = _readBits(input, info.bits);
+        pixel[1] = _readBits(input, info.bits);
+        pixel[2] = _readBits(input, info.bits);
+        pixel[3] = _readBits(input, info.bits);
         return;
     }
 
-    throw new ImageException('Invalid color type: ${header.colorType}.');
+    throw new ImageException('Invalid color type: ${info.colorType}.');
   }
 
   /**
    * Get the color with the list of components.
    */
   int _getColor(List<int> raw) {
-    switch (header.colorType) {
+    switch (info.colorType) {
       case GRAYSCALE:
         int g;
-        switch (header.bits) {
+        switch (info.bits) {
           case 1:
             g = _convert1to8(raw[0]);
             break;
@@ -561,10 +558,11 @@ class PngDecoder extends Decoder {
             break;
         }
 
-        g = colorLut[g];
+        g = info.colorLut[g];
 
-        if (transparency != null) {
-          int a = ((transparency[0] & 0xff) << 24) | (transparency[1] & 0xff);
+        if (info.transparency != null) {
+          int a = ((info.transparency[0] & 0xff) << 24) |
+              (info.transparency[1] & 0xff);
           if (raw[0] == a) {
             return getColor(g, g, g, 0);
           }
@@ -573,7 +571,7 @@ class PngDecoder extends Decoder {
         return getColor(g, g, g, 255);
       case RGB:
         int r, g, b;
-        switch (header.bits) {
+        switch (info.bits) {
           case 1:
             r = _convert1to8(raw[0]);
             g = _convert1to8(raw[1]);
@@ -601,14 +599,17 @@ class PngDecoder extends Decoder {
             break;
         }
 
-        r = colorLut[r];
-        g = colorLut[g];
-        b = colorLut[b];
+        r = info.colorLut[r];
+        g = info.colorLut[g];
+        b = info.colorLut[b];
 
-        if (transparency != null) {
-          int tr = ((transparency[0] & 0xff) << 8) | (transparency[1] & 0xff);
-          int tg = ((transparency[2] & 0xff) << 8) | (transparency[3] & 0xff);
-          int tb = ((transparency[4] & 0xff) << 8) | (transparency[5] & 0xff);
+        if (info.transparency != null) {
+          int tr = ((info.transparency[0] & 0xff) << 8) |
+              (info.transparency[1] & 0xff);
+          int tg = ((info.transparency[2] & 0xff) << 8) |
+              (info.transparency[3] & 0xff);
+          int tb = ((info.transparency[4] & 0xff) << 8) |
+              (info.transparency[5] & 0xff);
           if (raw[0] == tr && raw[1] == tg && raw[2] == tb) {
             return getColor(r, g, b, 0);
           }
@@ -618,21 +619,21 @@ class PngDecoder extends Decoder {
       case INDEXED:
         int p = raw[0] * 3;
 
-        int a = transparency != null &&
-            raw[0] < transparency.length ? transparency[raw[0]] : 255;
+        int a = info.transparency != null &&
+            raw[0] < info.transparency.length ? info.transparency[raw[0]] : 255;
 
-        if (p >= palette.length) {
+        if (p >= info.palette.length) {
           return getColor(255, 255, 255, a);
         }
 
-        int r = colorLut[palette[p]];
-        int g = colorLut[palette[p + 1]];
-        int b = colorLut[palette[p + 2]];
+        int r = info.colorLut[info.palette[p]];
+        int g = info.colorLut[info.palette[p + 1]];
+        int b = info.colorLut[info.palette[p + 2]];
 
         return getColor(r, g, b, a);
       case GRAYSCALE_ALPHA:
         int g, a;
-        switch (header.bits) {
+        switch (info.bits) {
           case 1:
             g = _convert1to8(raw[0]);
             a = _convert1to8(raw[1]);
@@ -655,13 +656,13 @@ class PngDecoder extends Decoder {
             break;
         }
 
-        g = colorLut[g];
-        a = colorLut[a];
+        g = info.colorLut[g];
+        a = info.colorLut[a];
 
         return getColor(g, g, g, a);
       case RGBA:
         int r, g, b, a;
-        switch (header.bits) {
+        switch (info.bits) {
           case 1:
             r = _convert1to8(raw[0]);
             g = _convert1to8(raw[1]);
@@ -694,16 +695,18 @@ class PngDecoder extends Decoder {
             break;
         }
 
-        r = colorLut[r];
-        g = colorLut[g];
-        b = colorLut[b];
-        a = colorLut[a];
+        r = info.colorLut[r];
+        g = info.colorLut[g];
+        b = info.colorLut[b];
+        a = info.colorLut[a];
 
         return getColor(r, g, b, a);
     }
 
-    throw new ImageException('Invalid color type: ${header.colorType}.');
+    throw new ImageException('Invalid color type: ${info.colorType}.');
   }
+
+  InputStream _input;
 
   static const int GRAYSCALE = 0;
   static const int RGB = 2;
@@ -716,14 +719,4 @@ class PngDecoder extends Decoder {
   static const int FILTER_UP = 2;
   static const int FILTER_AVERAGE = 3;
   static const int FILTER_PAETH = 4;
-}
-
-class _PngHeader {
-  int width;
-  int height;
-  int bits;
-  int colorType;
-  int compressionMethod;
-  int filterMethod;
-  int interlaceMethod;
 }

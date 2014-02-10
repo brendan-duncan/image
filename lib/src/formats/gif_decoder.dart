@@ -9,7 +9,7 @@ class GifDecoder extends Decoder {
 
   GifDecoder([List<int> bytes]) {
     if (bytes != null) {
-      getInfo(bytes);
+      startDecode(bytes);
     }
   }
 
@@ -17,7 +17,7 @@ class GifDecoder extends Decoder {
    * Is the given file a valid WebP image?
    */
   bool isValidFile(List<int> data) {
-    return getInfo(data) != null;
+    return startDecode(data) != null;
   }
 
   /**
@@ -32,7 +32,7 @@ class GifDecoder extends Decoder {
    * Validate the file is a Gif image and get information about it.
    * If the file is not a valid Gif image, null is returned.
    */
-  GifInfo getInfo(List<int> bytes) {
+  GifInfo startDecode(List<int> bytes) {
     _input = new InputStream(bytes);
 
     info = new GifInfo();
@@ -88,12 +88,14 @@ class GifDecoder extends Decoder {
           }
           break;
         case TERMINATE_RECORD_TYPE:
+          info.numFrames = info.frames.length;
           return info;
         default:
           return null;
       }
     }
 
+    info.numFrames = info.frames.length;
     return info;
   }
 
@@ -112,7 +114,7 @@ class GifDecoder extends Decoder {
   }
 
   Image decodeImage(List<int> bytes, {int frame: 0}) {
-    if (getInfo(bytes) == null) {
+    if (startDecode(bytes) == null) {
       return null;
     }
     return decodeFrame(frame);
@@ -123,7 +125,7 @@ class GifDecoder extends Decoder {
    * this will return an animation with a single frame.
    */
   Animation decodeAnimation(List<int> bytes) {
-    if (getInfo(bytes) == null) {
+    if (startDecode(bytes) == null) {
       return null;
     }
 

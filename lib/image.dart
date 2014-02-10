@@ -54,6 +54,7 @@ part 'src/formats/jpeg/jpeg_data.dart';
 part 'src/formats/jpeg/jpeg_frame.dart';
 part 'src/formats/jpeg/jpeg_jfif.dart';
 part 'src/formats/jpeg/jpeg_scan.dart';
+part 'src/formats/png/png_info.dart';
 part 'src/formats/webp/vp8.dart';
 part 'src/formats/webp/vp8_bit_reader.dart';
 part 'src/formats/webp/vp8_filter.dart';
