@@ -16,8 +16,12 @@ class WebPDecoder extends Decoder {
   /**
    * Is the given file a valid WebP image?
    */
-  bool isValidFile(List<int> data) {
-    return startDecode(data) != null;
+  bool isValidFile(List<int> bytes) {
+    _input = new InputStream(bytes);
+    if (!_getHeader(_input)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -33,7 +37,6 @@ class WebPDecoder extends Decoder {
    * If the file is not a valid WebP image, null is returned.
    */
   WebPInfo startDecode(List<int> bytes) {
-    // WebP is stored in little-endian byte order.
     _input = new InputStream(bytes);
 
     if (!_getHeader(_input)) {

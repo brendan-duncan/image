@@ -13,7 +13,7 @@ class JpegData {
   final List<Map> components = [];
 
   bool validate(List<int> bytes) {
-    InputStream input = new InputStream(bytes, byteOrder: BIG_ENDIAN);
+    input = new InputStream(bytes, byteOrder: BIG_ENDIAN);
 
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
@@ -27,70 +27,13 @@ class JpegData {
     while (marker != Jpeg.M_EOI && !input.isEOS) { // EOI (End of image)
       _skipBlock();
       switch (marker) {
-        case Jpeg.M_APP0:
-        case Jpeg.M_APP1:
-        case Jpeg.M_APP2:
-        case Jpeg.M_APP3:
-        case Jpeg.M_APP4:
-        case Jpeg.M_APP5:
-        case Jpeg.M_APP6:
-        case Jpeg.M_APP7:
-        case Jpeg.M_APP8:
-        case Jpeg.M_APP9:
-        case Jpeg.M_APP10:
-        case Jpeg.M_APP11:
-        case Jpeg.M_APP12:
-        case Jpeg.M_APP13:
-        case Jpeg.M_APP14:
-        case Jpeg.M_APP15:
-        case Jpeg.M_COM:
-          break;
-
-        case Jpeg.M_DQT: // DQT (Define Quantization Tables)
-          break;
-
         case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
         case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
         case Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
           hasSOF = true;
           break;
-
-        case Jpeg.M_SOF3:
-        case Jpeg.M_SOF5:
-        case Jpeg.M_SOF6:
-        case Jpeg.M_SOF7:
-        case Jpeg.M_JPG:
-        case Jpeg.M_SOF9:
-        case Jpeg.M_SOF10:
-        case Jpeg.M_SOF11:
-        case Jpeg.M_SOF13:
-        case Jpeg.M_SOF14:
-        case Jpeg.M_SOF15:
-          break;
-
-        case Jpeg.M_DHT: // DHT (Define Huffman Tables)
-          break;
-
-        case Jpeg.M_DRI: // DRI (Define Restart Interval)
-          break;
-
         case Jpeg.M_SOS: // SOS (Start of Scan)
           hasSOS = true;
-          break;
-
-        default:
-          if (input.buffer[input.position - 3] == 0xFF &&
-              input.buffer[input.position - 2] >= 0xC0 &&
-              input.buffer[input.position - 2] <= 0xFE) {
-            // could be incorrect encoding -- last 0xFF byte of the previous
-            // block was eaten by the encoder
-            input.position -= 3;
-            break;
-          }
-
-          if (marker != 0) {
-            return false;
-          }
           break;
       }
 

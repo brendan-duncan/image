@@ -1,6 +1,39 @@
 part of image;
 
 /**
+ * Find a [Decoder] that is able to decode the given image [data].
+ * Use this is you don't know the type of image it is.
+ */
+Decoder findDecoderForData(List<int> data) {
+  // The various decoders will be creating a Uint8List for their InputStream
+  // if the data isn't already that type, so do it once here to avoid having to
+  // do it multiple times.
+  Uint8List bytes = new Uint8List.fromList(data);
+
+  JpegDecoder jpg = new JpegDecoder();
+  if (jpg.isValidFile(bytes)) {
+    return jpg;
+  }
+
+  PngDecoder png = new PngDecoder();
+  if (png.isValidFile(bytes)) {
+    return png;
+  }
+
+  GifDecoder gif = new GifDecoder();
+  if (gif.isValidFile(bytes)) {
+    return gif;
+  }
+
+  WebPDecoder webp = new WebPDecoder();
+  if (webp.isValidFile(bytes)) {
+    return webp;
+  }
+
+  return null;
+}
+
+/**
  * Return the [Decoder] that can decode image with the given [name],
  * by looking at the file extension.
  */

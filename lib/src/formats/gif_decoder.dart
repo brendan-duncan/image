@@ -16,8 +16,10 @@ class GifDecoder extends Decoder {
   /**
    * Is the given file a valid WebP image?
    */
-  bool isValidFile(List<int> data) {
-    return startDecode(data) != null;
+  bool isValidFile(List<int> bytes) {
+    _input = new InputStream(bytes);
+    info = new GifInfo();
+    return _getInfo();
   }
 
   /**

@@ -41,10 +41,8 @@ void main() {
         var c = new Html.CanvasElement();
         Html.document.body.append(c);
 
-        // Find the best decoder for the image.  Currently, the extension
-        // of the file name is used.  A better method would actually look
-        // at the bytes of the file to find the correct format.
-        Decoder decoder = getDecoderForNamedImage(name);
+        // Find the best decoder for the image.
+        Decoder decoder = findDecoderForData(bytes);
         if (decoder == null) {
           return;
         }
