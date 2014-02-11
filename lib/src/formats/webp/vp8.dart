@@ -975,6 +975,11 @@ class VP8 {
     MemPtr topU = new MemPtr(_tmpU);
     MemPtr topV = new MemPtr(_tmpV);
 
+    if (webp.progressCallback != null) {
+      webp.progressCallback(webp._frame, webp._numFrames,
+                            y, webp.height);
+    }
+
     if (y == 0) {
       // First line is special cased. We mirror the u/v samples at boundary.
       _upsample(curY, null, curU, curV, curU, curV, dst, null, mbW);

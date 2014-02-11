@@ -15,10 +15,18 @@ class DecodeInfo {
 }
 
 /**
+ * A callback called during the decoding process.
+ */
+typedef void ProgressCallback(int frame, int numFrames,
+                              int progress, int total);
+
+/**
  * Base class for image format decoders.  Images are always decoded to 24-bit
  * or 32-bit images, regardless of the format type.
  */
 abstract class Decoder {
+  ProgressCallback progressCallback;
+
   /**
    * A light-weight function to test if the given file is able to be decoded
    * by this Decoder.

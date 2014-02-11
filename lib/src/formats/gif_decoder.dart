@@ -91,6 +91,7 @@ class GifDecoder extends Decoder {
           break;
         case TERMINATE_RECORD_TYPE:
           info.numFrames = info.frames.length;
+          _numFrames = info.numFrames;
           return info;
         default:
           return null;
@@ -98,6 +99,7 @@ class GifDecoder extends Decoder {
     }
 
     info.numFrames = info.frames.length;
+    _numFrames = info.numFrames;
     return info;
   }
 
@@ -110,6 +112,7 @@ class GifDecoder extends Decoder {
       return null;
     }
 
+    _frame = frame;
     _input.position = info.frames[frame]._inputPosition;
 
     return _decodeImage(info.frames[frame]);
@@ -119,6 +122,8 @@ class GifDecoder extends Decoder {
     if (startDecode(bytes) == null) {
       return null;
     }
+    _frame = 0;
+    _numFrames = 1;
     return decodeFrame(frame);
   }
 
@@ -135,6 +140,7 @@ class GifDecoder extends Decoder {
 
     Image lastImage = new Image(info.width, info.height);
     for (int i = 0; i < info.numFrames; ++i) {
+      _frame = i;
       if (lastImage == null) {
         lastImage = new Image(info.width, info.height);
       } else {
@@ -220,9 +226,12 @@ class GifDecoder extends Decoder {
 
     if (gifImage.interlaced) {
       int row = gifImage.y;
-      for (int i = 0; i < 4; ++i) {
+      for (int i = 0, j = 0; i < 4; ++i) {
         for (int y = row + INTERLACED_OFFSET[i]; y < row + height;
-             y += INTERLACED_JUMP[i]) {
+             y += INTERLACED_JUMP[i], ++j) {
+          if (progressCallback != null) {
+            progressCallback(_frame, _numFrames, j, height);
+          }
           if (!_getLine(line)) {
             return null;
           }
@@ -231,6 +240,9 @@ class GifDecoder extends Decoder {
       }
     } else {
       for (int y = 0; y < height; ++y) {
+        if (progressCallback != null) {
+          progressCallback(_frame, _numFrames, y, height);
+        }
         if (!_getLine(line)) {
           return null;
         }
@@ -543,6 +555,8 @@ class GifDecoder extends Decoder {
   }
 
   InputStream _input;
+  int _frame;
+  int _numFrames;
   Uint8List _buffer;
   Uint8List _stack;
   Uint8List _suffix;

@@ -1,6 +1,7 @@
 part of image;
 
 class JpegData {
+  ProgressCallback progressCallback;
   InputStream input;
   JpegJfif jfif;
   JpegAdobe adobe;
@@ -52,12 +53,19 @@ class JpegData {
       throw new ImageException('Only single frame JPEGs supported');
     }
 
+    _progressTotal = 0;
+    _progress = 0;
+    for (int i = 0; i < frame.componentsOrder.length; ++i) {
+      JpegComponent component = frame.components[frame.componentsOrder[i]];
+      _progressTotal += component.blocksPerColumn;
+    }
+
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
       JpegComponent component = frame.components[frame.componentsOrder[i]];
       components.add({
         'scaleX': component.h / frame.maxH,
-        'scaleY': component.v / frame.maxV,
-        'lines': _buildComponentData(frame, component)
+      'scaleY': component.v / frame.maxV,
+      'lines': _buildComponentData(frame, component)
       });
     }
   }
@@ -280,9 +288,7 @@ class JpegData {
           break;
 
         default:
-          if (input.buffer[input.position - 3] == 0xFF &&
-              input.buffer[input.position - 2] >= 0xC0 &&
-              input.buffer[input.position - 2] <= 0xFE) {
+          if (input[-3] == 0xff && input[-2] >= 0xc0 && input[-2] <= 0xfe) {
             // could be incorrect encoding -- last 0xFF byte of the previous
             // block was eaten by the encoder
             input.position -= 3;
@@ -560,9 +566,9 @@ class JpegData {
   }
 
   List<Uint8List> _buildComponentData(JpegFrame frame,
-                                           JpegComponent component) {
-    int blocksPerLine = component.blocksPerLine;
-    int blocksPerColumn = component.blocksPerColumn;
+                                      JpegComponent component) {
+    final int blocksPerLine = component.blocksPerLine;
+    final int blocksPerColumn = component.blocksPerColumn;
     int samplesPerLine = _shiftL(blocksPerLine, 3);
     Int32List R = new Int32List(64);
     Uint8List r = new Uint8List(64);
@@ -570,6 +576,9 @@ class JpegData {
 
     int l = 0;
     for (int blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
+      if (progressCallback != null) {
+        progressCallback(0, 1, _progress++, _progressTotal);
+      }
       int scanLine = _shiftL(blockRow, 3);
       for (int i = 0; i < 8; i++) {
         lines[l++] = new Uint8List(samplesPerLine);
@@ -638,7 +647,7 @@ class JpegData {
       int v6 = _shiftL(p[5 + row], 4);
 
       // stage 3
-      int t = _shiftR((v0 - v1+ 1), 1);
+      int t = _shiftR((v0 - v1 + 1), 1);
       v0 = _shiftR((v0 + v1 + 1), 1);
       v1 = t;
       t = _shiftR((v2 * Jpeg.dctSin6 + v3 * Jpeg.dctCos6 + 128), 8);
@@ -705,8 +714,8 @@ class JpegData {
       int v1 = _shiftR((Jpeg.dctSqrt2 * p[4 * 8 + col] + 2048), 12);
       int v2 = p[2 * 8 + col];
       int v3 = p[6 * 8 + col];
-      int v4 = _shiftR((Jpeg.dctSqrt1d2 * (p[1 * 8 + col] - p[7*8 + col]) + 2048), 12);
-      int v7 = _shiftR((Jpeg.dctSqrt1d2 * (p[1 * 8 + col] + p[7*8 + col]) + 2048), 12);
+      int v4 = _shiftR((Jpeg.dctSqrt1d2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048), 12);
+      int v7 = _shiftR((Jpeg.dctSqrt1d2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048), 12);
       int v5 = p[3 * 8 + col];
       int v6 = p[5 * 8 + col];
 
@@ -751,14 +760,16 @@ class JpegData {
 
     // convert to 8-bit integers
     for (int i = 0; i < 64; ++i) {
-      int sample = (128 + _shiftR((p[i] + 8), 4));
-      dataOut[i] = sample < 0 ? 0 : sample > 0xFF ? 0xFF : sample;
+      dataOut[i] = _clamp(128 + _shiftR((p[i] + 8), 4));
     }
   }
 
   int _clamp(int i) {
     return i < 0 ? 0 : i > 255 ? 255 : i;
   }
+
+  int _progressTotal = 0;
+    int _progress = 0;
 
   static const List<int> Y16 = const [
         0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240,

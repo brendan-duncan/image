@@ -14,10 +14,11 @@ class JpegDecoder extends Decoder {
 
   Image decodeImage(List<int> data, {int frame: 0}) {
     JpegData jpeg = new JpegData();
+    jpeg.progressCallback = progressCallback;
     jpeg.read(data);
 
     if (jpeg.frames.length != 1) {
-      throw 'only single frame JPEGs supported';
+      throw new ImageException('only single frame JPEGs supported');
     }
 
     Image image = new Image(jpeg.width, jpeg.height, Image.RGB);

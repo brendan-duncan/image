@@ -48,6 +48,8 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
+    info.progressCallback = progressCallback;
+
     switch (info.format) {
       case WebPInfo.FORMAT_ANIMATED:
         info.numFrames = info.frames.length;
@@ -78,11 +80,11 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
-    if (frame >= info.frames.length || frame < 0) {
-      return null;
-    }
-
     if (info.hasAnimation) {
+      if (frame >= info.frames.length || frame < 0) {
+        return null;
+      }
+
       WebPFrame f = info.frames[frame];
       InputStream frameData = _input.subset(f._framePosition,
           f._frameSize);
@@ -108,23 +110,22 @@ class WebPDecoder extends Decoder {
    * be returned.  Use [decodeAnimation] to decode the full animation.
    */
   Image decodeImage(List<int> bytes, {int frame: 0}) {
-    // WebP is stored in little-endian byte order.
-    InputStream input = new InputStream(bytes);
-    if (!_getHeader(input)) {
-      return null;
-    }
-
-    return _decodeFrame(input, frame: frame);
+    startDecode(bytes);
+    info._frame = 0;
+    info._numFrames = 1;
+    return decodeFrame(frame);
   }
 
   /**
    * Decode all of the frames of an animated webp. For single image webps,
    * this will return an animation with a single frame.
    */
-  Animation decodeAnimation(List<int> bytes) {
+Animation decodeAnimation(List<int> bytes) {
     if (startDecode(bytes) == null) {
       return null;
     }
+
+    info._numFrames = info.numFrames;
 
     Animation anim = new Animation();
     anim.loopCount = info.animLoopCount;
@@ -132,6 +133,7 @@ class WebPDecoder extends Decoder {
     if (info.hasAnimation) {
       Image lastImage = new Image(info.width, info.height);
       for (int i = 0; i < info.numFrames; ++i) {
+        info._frame = i;
         if (lastImage == null) {
           lastImage = new Image(info.width, info.height);
         } else {
@@ -177,6 +179,10 @@ class WebPDecoder extends Decoder {
     if (webp.format == 0) {
       return null;
     }
+
+    webp._frame = info._frame;
+    webp._numFrames = info._numFrames;
+    webp.progressCallback = progressCallback;
 
     if (webp.hasAnimation) {
       if (frame >= webp.frames.length || frame < 0) {

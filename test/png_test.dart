@@ -36,7 +36,7 @@ void definePngTests() {
 
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.png')) {
-        return;
+        continue;
       }
 
       // PngSuite File naming convention:

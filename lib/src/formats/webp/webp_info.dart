@@ -28,6 +28,10 @@ class WebPInfo extends DecodeInfo {
   /// Information about each animation frame.
   List<WebPFrame> frames = [];
 
+  ProgressCallback progressCallback;
+  int _frame;
+  int _numFrames;
+
   InputStream _alphaData;
   int _alphaSize;
   int _vp8Position;

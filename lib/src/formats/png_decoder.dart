@@ -260,6 +260,7 @@ class PngDecoder extends Decoder {
 
     int w = info.width;
     int h = info.height;
+    _progressY = 0;
     if (info.interlaceMethod != 0) {
       _processPass(input, image, 0, 0, 8, 8, (w + 7) >> 3, (h + 7) >> 3);
       _processPass(input, image, 4, 0, 8, 8, (w + 3) >> 3, (h + 7) >> 3);
@@ -315,7 +316,10 @@ class PngDecoder extends Decoder {
 
     int pi = 0;
     for (int srcY = 0, dstY = yOffset, ri = 0;
-         srcY < passHeight; ++srcY, dstY += yStep, ri = 1 - ri) {
+         srcY < passHeight; ++srcY, dstY += yStep, ri = 1 - ri, _progressY++) {
+      if (progressCallback != null) {
+        progressCallback(0, 1, _progressY, info.height);
+      }
       int filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes);
 
@@ -376,6 +380,9 @@ class PngDecoder extends Decoder {
     final List<int> pixel = [0, 0, 0, 0];
 
     for (int y = 0, pi = 0, ri = 0; y < h; ++y, ri = 1 - ri) {
+      if (progressCallback != null) {
+        progressCallback(0, 1, y, h);
+      }
       int filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes);
 
@@ -733,6 +740,7 @@ class PngDecoder extends Decoder {
   }
 
   InputStream _input;
+  int _progressY;
 
   static const int GRAYSCALE = 0;
   static const int RGB = 2;
