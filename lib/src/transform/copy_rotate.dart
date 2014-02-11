@@ -21,7 +21,6 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
           }
         }
         return dst;
-        break;
       case 2: // 180 deg.
         Image dst = new Image(src.width, src.height, src.format);
         for (int y = 0; y < dst.height; ++y) {
@@ -30,7 +29,6 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
           }
         }
         return dst;
-        break;
       case 3: // 270 deg.
         Image dst = new Image(src.height, src.width, src.format);
         for (int y = 0; y < dst.height; ++y) {
@@ -39,7 +37,6 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
           }
         }
         return dst;
-        break;
       default: // 0 deg.
         return new Image.from(src);
     }
