@@ -34,4 +34,6 @@ Image normalize(Image image, int minValue, int maxValue) {
       image[i] = getColor(r, g, b, a);
     }
   }
+
+  return image;
 }

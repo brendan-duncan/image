@@ -14,4 +14,6 @@ Image fillRect(Image src, int x1, int y1, int x2, int y2, int color) {
       drawPixel(src, sx, sy, color);
     }
   }
+
+  return src;
 }
