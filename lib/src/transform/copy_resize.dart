@@ -12,7 +12,7 @@ Image copyResize(Image src, int width, [int height = -1,
   }
 
   if (width <= 0 || height <= 0) {
-    throw new Exception('Invalid size');
+    throw new ImageException('Invalid size');
   }
 
   Image newImage = new Image(width, height, src.format);
