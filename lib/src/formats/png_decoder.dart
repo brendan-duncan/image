@@ -125,12 +125,38 @@ class PngDecoder extends Decoder {
             throw new ImageException('Invalid gAMA chunk');
           }
           int gammaInt = _input.readUint32();
-          int crc = _input.readUint32();
+          _input.skip(4); // CRC
           // A gamma of 1.0 doesn't have any affect, so pretend we didn't get
           // a gamma in that case.
           if (gammaInt != 100000) {
             info.gamma = gammaInt / 100000.0;
           }
+          break;
+        case 'acTL': // Animation control chunk
+          info.numFrames = _input.readUint32();
+          info.repeat = _input.readUint32();
+          _input.skip(4); // CRC
+          break;
+        case 'fcTL': // Frame control chunk
+          PngFrame frame = new PngFrame();
+          info.frames.add(frame);
+          frame.sequenceNumber = _input.readUint32();
+          frame.width = _input.readUint32();
+          frame.height = _input.readUint32();
+          frame.xOffset = _input.readUint32();
+          frame.yOffset = _input.readUint32();
+          frame.delayNum = _input.readUint16();
+          frame.delayDen = _input.readUint16();
+          frame.dispose = _input.readByte();
+          frame.blend = _input.readByte();
+          _input.skip(4); // CRC
+          break;
+        case 'fdAT':
+          int sequenceNumber = _input.readUint32();
+          info.frames.last._framePosition = _input.position;
+          info.frames.last._frameSize = chunkSize - 8;
+          _input.skip(chunkSize - 4);
+          _input.skip(4); // CRC
           break;
         default:
           _input.skip(chunkSize);

@@ -10,4 +10,11 @@ class PngInfo extends DecodeInfo {
   List<int> transparency;
   List<int> colorLut;
   double gamma;
+
+  // APNG extensions
+  int numFrames;
+  int repeat;
+  List<PngFrame> frames = [];
+
+  bool get isAnimated => numFrames != null && frames.isNotEmpty;
 }
