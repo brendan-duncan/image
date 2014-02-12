@@ -29,7 +29,7 @@ void defineImageTests() {
 
     test('fill', () {
       Image f = new Image(10, 10, Image.RGB);
-      f.fill(getColor(128, 0, 0, 255));
+      f.fill(getColor(128, 64, 32, 255));
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/fill.png');
       fp.createSync(recursive: true);

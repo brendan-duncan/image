@@ -5,20 +5,12 @@ part of image;
  * colors, a per-channel brightness.
  */
 Image colorOffset(Image src, int red, int green, int blue, int alpha) {
-  int np = src.length;
-  for (int i = 0; i < np; ++i) {
-    int c = src[i];
-    int r = getRed(c);
-    int g = getGreen(c);
-    int b = getBlue(c);
-    int a = getAlpha(c);
-
-    r = r + red;
-    g = g + green;
-    b = b + blue;
-    a = a + alpha;
-
-    src[i] = getColor(r, g, b, a);
+  Uint8List pixels = src.getBytes();
+  for (int i = 0, len = pixels.length; i < len; i += 4) {
+    pixels[i] = _clamp255(pixels[i] + red);
+    pixels[i + 1] = _clamp255(pixels[i + 1] + green);
+    pixels[i + 2] = _clamp255(pixels[i + 2] + blue);
+    pixels[i + 3] = _clamp255(pixels[i + 3] + alpha);
   }
 
   return src;

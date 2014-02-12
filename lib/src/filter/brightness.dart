@@ -7,27 +7,15 @@ part of image;
  * of every pixel.
  */
 Image brightness(Image src, int brightness) {
-  if (src == null || (brightness < -255 || brightness > 255)) {
+  if (src == null || brightness == 0) {
     return src;
   }
 
-  if (brightness == 0) {
-    return src;
-  }
-
-  int np = src.length;
-  for (int i = 0; i < np; ++i) {
-    int c = src[i];
-    int r = getRed(c);
-    int g = getGreen(c);
-    int b = getBlue(c);
-    int a = getAlpha(c);
-
-    r = r + brightness;
-    g = g + brightness;
-    b = b + brightness;
-
-    src[i] = getColor(r, g, b, a);
+  Uint8List pixels = src.getBytes();
+  for (int i = 0, len = pixels.length; i < len; i += 4) {
+    pixels[i] = _clamp255(pixels[i] + brightness);
+    pixels[i + 1] = _clamp255(pixels[i + 1] + brightness);
+    pixels[i + 2] = _clamp255(pixels[i + 2] + brightness);
   }
 
   return src;

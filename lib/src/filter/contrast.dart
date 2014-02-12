@@ -1,5 +1,8 @@
 part of image;
 
+num _lastContrast;
+Uint8List _contrast;
+
 /**
  * Set the [contrast] level for the image [src].
  *
@@ -12,22 +15,23 @@ Image contrast(Image src, num contrast) {
     return src;
   }
 
-  contrast = contrast / 100.0;
-  contrast = contrast * contrast;
+  if (contrast != _lastContrast) {
+    _lastContrast = contrast;
 
-  int np = src.length;
-  for (int i = 0; i < np; ++i) {
-    int c = src[i];
-    int r = getRed(c);
-    int g = getGreen(c);
-    int b = getBlue(c);
-    int a = getAlpha(c);
+    contrast = contrast / 100.0;
+    contrast = contrast * contrast;
+    _contrast = new Uint8List(256);
+    for (int i = 0; i < 256; ++i) {
+      _contrast[i] =
+          _clamp255((((((i / 255.0) - 0.5) * contrast) + 0.5) * 255.0).toInt());
+    }
+  }
 
-    r = (((((r / 255.0) - 0.5) * contrast) + 0.5) * 255.0).toInt();
-    g = (((((g / 255.0) - 0.5) * contrast) + 0.5) * 255.0).toInt();
-    b = (((((b / 255.0) - 0.5) * contrast) + 0.5) * 255.0).toInt();
-
-    src[i] = getColor(r, g, b, a);
+  Uint8List p = src.getBytes();
+  for (int i = 0, len = p.length; i < len; i += 4) {
+    p[i] = _contrast[p[i]];
+    p[i + 1] = _contrast[p[i + 1]];
+    p[i + 2] = _contrast[p[i + 2]];
   }
 
   return src;

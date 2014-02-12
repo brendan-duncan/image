@@ -4,13 +4,12 @@ part of image;
  * Convert the image to grayscale.
  */
 Image grayscale(Image src) {
-  final int np = src.length;
-  for (int i = 0; i < np; ++i) {
-    int c = src[i];
-    int a = getAlpha(c);
-    int l = getLuminance(c);
-    src[i] = getColor(l, l, l, a);
+  Uint8List p = src.getBytes();
+  for (int i = 0, len = p.length; i < len; i += 4) {
+    int l = getLuminanceRGB(p[i], p[i + 1], p[i + 2]);
+    p[i] = l;
+    p[i + 1] = l;
+    p[i + 2] = l;
   }
-
   return src;
 }
