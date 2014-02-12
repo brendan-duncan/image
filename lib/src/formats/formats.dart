@@ -140,6 +140,13 @@ Image decodePng(List<int> bytes) {
 }
 
 /**
+ * Decode a PNG formatted animation.
+ */
+Animation decodePngAnimation(List<int> bytes) {
+  return new PngDecoder().decodeAnimation(bytes);
+}
+
+/**
  * Renamed to [decodePng], left for backward compatibility.
  */
 Image readPng(List<int> bytes) => decodePng(bytes);
