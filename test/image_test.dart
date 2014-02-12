@@ -12,12 +12,12 @@ part 'tga_test.dart';
 part 'webp_test.dart';
 
 void main() {
-  /*defineGifTests();
+  defineGifTests();
   defineTgaTests();
   defineJpegTests();
   definePngTests();
   defineFontTests();
-  defineWebPTests();*/
+  defineWebPTests();
   defineImageTests();
 }
 
