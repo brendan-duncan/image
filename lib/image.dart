@@ -39,7 +39,9 @@ part 'src/filter/remap_colors.dart';
 part 'src/filter/scale_rgba.dart';
 part 'src/filter/seperable_convolution.dart';
 part 'src/filter/seperable_kernel.dart';
+part 'src/filter/sepia.dart';
 part 'src/filter/smooth.dart';
+part 'src/filter/vignette.dart';
 
 part 'src/fonts/arial_14.dart';
 part 'src/fonts/arial_24.dart';

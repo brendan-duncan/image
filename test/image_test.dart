@@ -12,12 +12,12 @@ part 'tga_test.dart';
 part 'webp_test.dart';
 
 void main() {
-  defineGifTests();
+  /*defineGifTests();
   defineTgaTests();
   defineJpegTests();
   definePngTests();
   defineFontTests();
-  defineWebPTests();
+  defineWebPTests();*/
   defineImageTests();
 }
 
@@ -305,6 +305,24 @@ void defineImageTests() {
       smooth(f, 10);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/smooth.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('sepia', () {
+      Image f = new Image.from(image);
+      sepia(f);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/sepia.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('vignette', () {
+      Image f = new Image.from(image);
+      vignette(f);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/vignette.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
     });
