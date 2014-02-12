@@ -1,3 +1,10 @@
+v 1.1.9 -
+
+- Added APNG animated PNG decoding support.
+- Improved JPEG decoding performance
+- Various bug fixes
+
+
 v 1.1.8 - February 01, 2014
 
 - Added GIF decoding support, including animated gifs.

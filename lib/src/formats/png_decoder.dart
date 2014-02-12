@@ -40,6 +40,8 @@ class PngDecoder extends Decoder {
     }
 
     while (true) {
+      int inputPos = _input.position;
+
       int chunkSize = _input.readUint32();
       String chunkType = new String.fromCharCodes(_input.readBytes(4));
       switch (chunkType) {
@@ -132,6 +134,11 @@ class PngDecoder extends Decoder {
             info.gamma = gammaInt / 100000.0;
           }
           break;
+        case 'IDAT':
+          info._idat.add(inputPos);
+          _input.skip(chunkSize);
+          _input.skip(4); // CRC
+          break;
         case 'acTL': // Animation control chunk
           info.numFrames = _input.readUint32();
           info.repeat = _input.readUint32();
@@ -153,9 +160,12 @@ class PngDecoder extends Decoder {
           break;
         case 'fdAT':
           int sequenceNumber = _input.readUint32();
-          info.frames.last._framePosition = _input.position;
-          info.frames.last._frameSize = chunkSize - 8;
+          info.frames.last._fdat.add(inputPos);
           _input.skip(chunkSize - 4);
+          _input.skip(4); // CRC
+          break;
+        case 'bKGD':
+          _input.skip(chunkSize);
           _input.skip(4); // CRC
           break;
         default:
@@ -177,53 +187,55 @@ class PngDecoder extends Decoder {
   }
 
   /**
-   * PNG only supports 1 frame (until APNG decoded is added).
+   * The number of frames that can be decoded.
    */
-  int numFrames() => info != null ? 1 : 0;
+  int numFrames() => info != null ? info.numFrames : 0;
 
   /**
    * Decode the frame (assuming [startDecode] has already been called).
    */
   Image decodeFrame(int frame) {
-    if (info == null || frame != 0) {
+    if (info == null) {
       return null;
     }
 
-    _input.position = 8;
-
     List<int> imageData = [];
 
-    while (true) {
-      int chunkSize = _input.readUint32();
-      String chunkType = new String.fromCharCodes(_input.readBytes(4));
-      switch (chunkType) {
-        case 'IDAT':
-          List<int> data = _input.readBytes(chunkSize);
-          imageData.addAll(data);
-          int crc = _input.readUint32();
-          int computedCrc = _crc(chunkType, data);
-          if (crc != computedCrc) {
-            throw new ImageException('Invalid $chunkType checksum');
-          }
-          break;
-        default:
-          _input.skip(chunkSize);
-          // CRC
-          _input.skip(4);
-          break;
+    int width = info.width;
+    int height = info.height;
+
+    if (!info.isAnimated || frame == 0) {
+      for (int i = 0, len = info._idat.length; i < len; ++i) {
+        _input.position = info._idat[i];
+        int chunkSize = _input.readUint32();
+        String chunkType = new String.fromCharCodes(_input.readBytes(4));
+        List<int> data = _input.readBytes(chunkSize);
+        imageData.addAll(data);
+        int crc = _input.readUint32();
+        int computedCrc = _crc(chunkType, data);
+        if (crc != computedCrc) {
+          throw new ImageException('Invalid $chunkType checksum');
+        }
+      }
+    } else {
+      if (frame < 0 || frame >= info.frames.length) {
+        throw new ImageException('Invalid Frame Number: $frame');
       }
 
-      if (chunkType == 'IEND') {
-        break;
+      PngFrame f = info.frames[frame];
+      width = f.width;
+      height = f.height;
+      for (int i = 0; i < f._fdat.length; ++i) {
+        _input.position = f._fdat[i];
+        int chunkSize = _input.readUint32();
+        String chunkType = new String.fromCharCodes(_input.readBytes(4));
+        _input.skip(4); // sequence number
+        List<int> data = _input.readBytes(chunkSize);
+        imageData.addAll(data);
       }
 
-      if (_input.isEOS) {
-        throw new ImageException('Incomplete or corrupt PNG file');
-      }
-    }
-
-    if (info == null) {
-      throw new ImageException('Incomplete or corrupt PNG file');
+      _frame = frame;
+      _numFrames = info.numFrames;
     }
 
     int format;
@@ -234,32 +246,40 @@ class PngDecoder extends Decoder {
       format = Image.RGB;
     }
 
-    Image image = new Image(info.width, info.height, format);
+    Image image = new Image(width, height, format);
 
     List<int> uncompressed = new ZLibDecoder().decodeBytes(imageData);
 
     // input is the decompressed data.
     InputStream input = new InputStream(uncompressed, byteOrder: BIG_ENDIAN);
+    _resetBits();
 
     // Set up a LUT to transform colors for gamma correction.
-    info.colorLut = new List<int>(256);
-    for (int i = 0; i < 256; ++i) {
-      int c = i;
-      if (info.gamma != null) {
-        c = (Math.pow((c / 255.0), info.gamma) * 255.0).toInt();
+    if (info.colorLut == null) {
+      info.colorLut = new List<int>(256);
+      for (int i = 0; i < 256; ++i) {
+        int c = i;
+        if (info.gamma != null) {
+          c = (Math.pow((c / 255.0), info.gamma) * 255.0).toInt();
+        }
+        info.colorLut[i] = c;
       }
-      info.colorLut[i] = c;
+
+      // Apply the LUT to the palette, if necessary.
+      if (info.palette != null && info.gamma != null) {
+        for (int i = 0; i < info.palette.length; ++i) {
+          info.palette[i] = info.colorLut[info.palette[i]];
+        }
+      }
     }
 
-    // Apply the LUT to the palette, if necessary.
-    if (info.palette != null && info.gamma != null) {
-      for (int i = 0; i < info.palette.length; ++i) {
-        info.palette[i] = info.colorLut[info.palette[i]];
-      }
-    }
+    int origW = info.width;
+    int origH = info.height;
+    info.width = width;
+    info.height = height;
 
-    int w = info.width;
-    int h = info.height;
+    int w = width;
+    int h = height;
     _progressY = 0;
     if (info.interlaceMethod != 0) {
       _processPass(input, image, 0, 0, 8, 8, (w + 7) >> 3, (h + 7) >> 3);
@@ -273,6 +293,9 @@ class PngDecoder extends Decoder {
       _process(input, image);
     }
 
+    info.width = origW;
+    info.height = origH;
+
     return image;
   }
 
@@ -284,13 +307,49 @@ class PngDecoder extends Decoder {
   }
 
   Animation decodeAnimation(List<int> data) {
-    Image image = decodeImage(data);
-    if (image == null) {
+    if (startDecode(data) == null) {
       return null;
     }
 
     Animation anim = new Animation();
-    anim.addFrame(image);
+
+    if (!info.isAnimated) {
+      Image image = decodeFrame(0);
+      anim.addFrame(image);
+      return anim;
+    }
+
+    int dispose = PngFrame.APNG_DISPOSE_OP_BACKGROUND;
+    Image lastImage = new Image(info.width, info.height);
+    for (int i = 0; i < info.numFrames; ++i) {
+      //_frame = i;
+      if (lastImage == null) {
+        lastImage = new Image(info.width, info.height);
+      } else {
+        lastImage = new Image.from(lastImage);
+      }
+
+      PngFrame frame = info.frames[i];
+      Image image = decodeFrame(i);
+      if (image == null) {
+        continue;
+      }
+
+      if (lastImage != null) {
+        if (dispose == PngFrame.APNG_DISPOSE_OP_BACKGROUND ||
+            dispose == PngFrame.APNG_DISPOSE_OP_PREVIOUS) {
+          lastImage.fill(info.backgroundColor);
+        }
+        copyInto(lastImage, image, dstX: frame.xOffset, dstY: frame.yOffset,
+                 blend: frame.blend == PngFrame.APNG_BLEND_OP_OVER);
+      } else {
+        lastImage = image;
+      }
+
+      anim.addFrame(lastImage);
+
+      dispose = frame.dispose;
+    }
 
     return anim;
   }
@@ -363,8 +422,8 @@ class PngDecoder extends Decoder {
 
   void _process(InputStream input, Image image) {
     final int channels = (info.colorType == GRAYSCALE_ALPHA) ? 2 :
-      (info.colorType == RGB) ? 3 :
-        (info.colorType == RGBA) ? 4 : 1;
+                         (info.colorType == RGB) ? 3 :
+                         (info.colorType == RGBA) ? 4 : 1;
 
     final int pixelDepth = channels * info.bits;
 
@@ -381,7 +440,7 @@ class PngDecoder extends Decoder {
 
     for (int y = 0, pi = 0, ri = 0; y < h; ++y, ri = 1 - ri) {
       if (progressCallback != null) {
-        progressCallback(0, 1, y, h);
+        progressCallback(_frame, _numFrames, y, h);
       }
       int filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes);
@@ -741,6 +800,8 @@ class PngDecoder extends Decoder {
 
   InputStream _input;
   int _progressY;
+  int _frame = 0;
+  int _numFrames = 1;
 
   static const int GRAYSCALE = 0;
   static const int RGB = 2;

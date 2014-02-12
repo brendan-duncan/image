@@ -166,7 +166,8 @@ class GifDecoder extends Decoder {
         lastImage = image;
       }
 
-      anim.addFrame(lastImage, frame.duration);
+      lastImage.duration = frame.duration;
+      anim.addFrame(lastImage);
     }
 
     return anim;

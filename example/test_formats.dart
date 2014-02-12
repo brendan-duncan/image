@@ -19,7 +19,7 @@ void main() {
   // of formats and sub-formats.
   List<String> images = ['1.webp', '1_webp_ll.webp', '3_webp_a.webp',
                          'puppies.jpg', 'cars.gif', 'trees.png',
-                         'BladeRunner_lossy.webp'];
+                         'animated.png', 'BladeRunner_lossy.webp'];
 
   for (String name in images) {
     // Use an AJAX request to get the image file from disk.
@@ -56,7 +56,7 @@ void main() {
 
         // If it's a single image, dump the decoded image into the canvas.
         if (anim.length == 1) {
-          Image image = anim.frames[0].image;
+          Image image = anim.frames[0];
           c.width = image.width;
           c.height = image.height;
 
@@ -75,14 +75,14 @@ void main() {
         // [Animation], and using a hard-coded delay instead.
 
         // Setup the canvas size to the size of the first image.
-        c.width = anim.frames[0].image.width;
-        c.height = anim.frames[0].image.height;
+        c.width = anim.frames[0].width;
+        c.height = anim.frames[0].height;
         // Create a buffer that the canvas can draw.
         Html.ImageData d = c.context2D.createImageData(c.width, c.height);
 
         int frame = 0;
-        new Async.Timer.periodic(new Duration(milliseconds: 80), (t) {
-          Image image = anim.frames[frame++].image;
+        new Async.Timer.periodic(new Duration(milliseconds: 40), (t) {
+          Image image = anim.frames[frame++];
           if (frame >= anim.numFrames) {
             frame = 0;
           }

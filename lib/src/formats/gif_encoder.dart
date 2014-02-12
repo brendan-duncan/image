@@ -81,8 +81,8 @@ class GifEncoder extends Encoder {
    * Encode an animation.
    */
   List<int> encodeAnimation(Animation anim) {
-    for (AnimationFrame f in anim) {
-      addFrame(f.image, duration: f.duration);
+    for (Image f in anim) {
+      addFrame(f, duration: f.duration);
     }
     return finish();
   }

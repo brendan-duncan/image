@@ -14,10 +14,25 @@ class Image {
   /// 32-bit RGBA image.
   static const int RGBA = 4;
 
+  static const int DISPOSE_NONE = 0;
+  static const int DISPOSE_CLEAR = 1;
+  static const int BLEND_SOURCE = 0;
+  static const int BLEND_OVER = 1;
+
   /// Width of the image.
   final int width;
   /// Height of the image.
   final int height;
+  /// x position at which to render the frame.
+  int xOffset = 0;
+  /// x position at which to render the frame.
+  int yOffset = 0;
+  /// How long this frame should be displayed, in milliseconds.
+  /// A duration of 0 indicates no delay and the next frame will be drawn
+  /// as quickly as it can.
+  int duration = 0;
+  int disposeMethod = DISPOSE_CLEAR;
+  int blendMethod = BLEND_OVER;
 
   /**
    * Create an image with the given dimensions and format.
@@ -33,6 +48,11 @@ class Image {
   Image.from(Image other) :
     width = other.width,
     height = other.height,
+    xOffset = other.xOffset,
+    yOffset = other.yOffset,
+    duration = other.duration,
+    disposeMethod = other.disposeMethod,
+    blendMethod = other.blendMethod,
     _format = other._format,
     _data = new Uint32List.fromList(other._data);
 

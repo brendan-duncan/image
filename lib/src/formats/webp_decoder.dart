@@ -155,7 +155,8 @@ Animation decodeAnimation(List<int> bytes) {
           lastImage = image;
         }
 
-        anim.addFrame(lastImage, frame.duration);
+        lastImage.duration = frame.duration;
+        anim.addFrame(lastImage);
       }
     } else {
       Image image = decodeImage(bytes);

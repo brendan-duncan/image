@@ -49,7 +49,7 @@ void defineGifTests() {
   List<int> bytes = new Io.File(path + '/cars.gif').readAsBytesSync();
   Animation anim = new GifDecoder().decodeAnimation(bytes);
   for (int i = 0; i < anim.numFrames; ++i) {
-    Image image = anim[i].image;
+    Image image = anim[i];
     new Io.File('out/gif/anim_$i.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(image));

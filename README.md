@@ -12,14 +12,14 @@ web applications.
 The image library currently supports decoding and encoding the following 
 formats:
 
-- PNG
+- PNG / Animated APNG
 - JPG
 - TGA
-- GIF
+- GIF / Animated GIF
 
-Decoding Only (for now):
+Decoding Only:
 
-- WebP (including animation)
+- WebP / Animated WebP
 
 
 ##[Documentation](https://github.com/brendan-duncan/image/wiki)

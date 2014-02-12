@@ -66,5 +66,5 @@ abstract class Decoder {
    * is returned, which provides the image, and top-left coordinates of the
    * image, as animated frames may only occupy a subset of the canvas.
    */
-  //AnimationFrame decodeFrame(int frame);
+  //Image decodeFrame(int frame);
 }

@@ -78,11 +78,20 @@ void definePngTests() {
           } catch (e) {
           }
         } else {
-          Image image = new PngDecoder().decodeImage(file.readAsBytesSync());
-          List<int> png = new PngEncoder().encodeImage(image);
-          new Io.File('out/png/${name}')
-                ..createSync(recursive: true)
-                ..writeAsBytesSync(png);
+          Animation anim = new PngDecoder().decodeAnimation(file.readAsBytesSync());
+          if (anim.length == 1) {
+            List<int> png = new PngEncoder().encodeImage(anim[0]);
+            new Io.File('out/png/${name}')
+                  ..createSync(recursive: true)
+                  ..writeAsBytesSync(png);
+          } else {
+            for (int i = 0; i < anim.length; ++i) {
+              List<int> png = new PngEncoder().encodeImage(anim[i]);
+              new Io.File('out/png/${name}-$i.png')
+                    ..createSync(recursive: true)
+                    ..writeAsBytesSync(png);
+            }
+          }
         }
       });
     }
