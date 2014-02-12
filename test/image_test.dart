@@ -12,12 +12,12 @@ part 'tga_test.dart';
 part 'webp_test.dart';
 
 void main() {
-  /*defineGifTests();
+  defineGifTests();
   defineTgaTests();
   defineJpegTests();
   definePngTests();
   defineFontTests();
-  defineWebPTests();*/
+  defineWebPTests();
   defineImageTests();
 }
 
@@ -27,7 +27,7 @@ void defineImageTests() {
     Image image = readPng(new Io.File('res/png/trees.png').readAsBytesSync());
     Image image2 = readPng(new Io.File('res/png/alpha_edge.png').readAsBytesSync());
 
-    /*test('fill', () {
+    test('fill', () {
       Image f = new Image(10, 10, Image.RGB);
       f.fill(getColor(128, 0, 0, 255));
       // Save the image as a PNG.
@@ -326,7 +326,7 @@ void defineImageTests() {
       Io.File fp = new Io.File('out/trim.png')
                          ..createSync(recursive: true)
                          ..writeAsBytesSync(writePng(trimmed));
-    });*/
+    });
 
     test('dropShadow', () {
       Image s = new Image.from(image2);
