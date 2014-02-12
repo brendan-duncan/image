@@ -5,6 +5,9 @@ void defineTgaTests() {
   String path = script.parent.path + '/res/tga';
 
   Io.Directory dir = new Io.Directory(path);
+  if (!dir.existsSync()) {
+    return;
+  }
   List files = dir.listSync();
 
   group('TGA', () {

@@ -29,12 +29,12 @@ void defineJpegTests() {
     }
 
     test('decode/encode', () {
-      List<int> bytes = new Io.File('res/jpg/cat-eye04.jpg').readAsBytesSync();
+      List<int> bytes = new Io.File('res/jpg/testimg.jpg').readAsBytesSync();
 
       // Decode the image from file.
       Image image = new JpegDecoder().decodeImage(bytes);
-      expect(image.width, equals(602));
-      expect(image.height, equals(562));
+      expect(image.width, equals(227));
+      expect(image.height, equals(149));
 
       // Encode the image to Jpeg
       List<int> jpg = new JpegEncoder().encodeImage(image);
@@ -43,8 +43,8 @@ void defineJpegTests() {
       Image image2 = new JpegDecoder().decodeImage(jpg);
 
       // We can't exactly do a byte-level comparison since Jpeg is lossy.
-      expect(image2.width, equals(602));
-      expect(image2.height, equals(562));
+      expect(image2.width, equals(227));
+      expect(image2.height, equals(149));
     });
   });
 }
