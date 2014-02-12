@@ -2,8 +2,6 @@ part of image;
 
 /**
  * Create a drop-shadow effect for the image.
- *
- * TODO this is incomplete and needs to be finished.
  */
 Image dropShadow(Image src, int hShadow, int vShadow, int blur,
                  {int shadowColor: 0xa0000000}) {
