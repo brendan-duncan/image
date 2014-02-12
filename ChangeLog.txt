@@ -1,4 +1,4 @@
-v 1.1.9 -
+v 1.1.10 - February 11, 2014
 
 - Added APNG animated PNG decoding support.
 - Improved JPEG decoding performance
