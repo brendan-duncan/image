@@ -5,23 +5,56 @@ part of image;
  *
  * TODO this is incomplete and needs to be finished.
  */
-Image dropShadow(Image src, int hshadow, int vshadow, int blur,
+Image dropShadow(Image src, int hShadow, int vShadow, int blur,
                  {int shadowColor: 0xa0000000}) {
-  int dw = src.width + hshadow + (blur + 5);
-  int dh = src.height + vshadow + (blur + 5);
+  if (blur < 0) {
+    blur = 0;
+  }
 
-  Image dst = new Image(dw, dh, Image.RGBA);
+  int shadowWidth = src.width + blur * 2;
+  int shadowHeight = src.height + blur * 2;
+  int shadowOffsetX = -blur;
+  int shadowOffsetY = -blur;
 
-  fill(dst, 0xffffff00);
+  int newImageWidth = shadowWidth;
+  int newImageHeight = shadowHeight;
+  int imageOffsetX = 0;
+  int imageOffsetY = 0;
 
-  fillRect(dst, hshadow, vshadow,
-           src.width + hshadow * 2,
-           src.height + vshadow * 2,
-           shadowColor);
+  if (shadowOffsetX + hShadow < 0) {
+    imageOffsetX = -(shadowOffsetX + hShadow);
+    shadowOffsetX = -shadowOffsetX;
+    newImageWidth = imageOffsetX;
+  }
 
-  gaussianBlur(dst, blur ~/ 2);
+  if (shadowOffsetY + vShadow < 0) {
+    imageOffsetY = -(shadowOffsetY + vShadow);
+    shadowOffsetY = -shadowOffsetY;
+    newImageHeight += imageOffsetY;
+  }
 
-  copyInto(dst, src);
+  if (shadowWidth + shadowOffsetX + hShadow > newImageWidth) {
+    newImageWidth = shadowWidth + shadowOffsetX + hShadow;
+  }
+
+  if (shadowHeight + shadowOffsetY + vShadow > newImageHeight) {
+    newImageHeight = shadowHeight + shadowOffsetY + vShadow;
+  }
+
+  Image dst = new Image(newImageWidth, newImageHeight);
+  dst.fill(0x00ffffff);
+
+  copyInto(dst, src, dstX: shadowOffsetX, dstY: shadowOffsetY);
+
+  remapColors(dst, red: ALPHA, green: ALPHA, blue: ALPHA);
+
+  scaleRGBA(dst, getRed(shadowColor), getGreen(shadowColor),
+            getBlue(shadowColor), getAlpha(shadowColor));
+
+  gaussianBlur(dst, blur);
+
+
+  copyInto(dst, src, dstX: imageOffsetX, dstY: imageOffsetY);
 
   return dst;
 }

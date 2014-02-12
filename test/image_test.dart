@@ -12,12 +12,12 @@ part 'tga_test.dart';
 part 'webp_test.dart';
 
 void main() {
-  defineGifTests();
+  /*defineGifTests();
   defineTgaTests();
   defineJpegTests();
   definePngTests();
   defineFontTests();
-  defineWebPTests();
+  defineWebPTests();*/
   defineImageTests();
 }
 
@@ -27,7 +27,7 @@ void defineImageTests() {
     Image image = readPng(new Io.File('res/png/trees.png').readAsBytesSync());
     Image image2 = readPng(new Io.File('res/png/alpha_edge.png').readAsBytesSync());
 
-    test('fill', () {
+    /*test('fill', () {
       Image f = new Image(10, 10, Image.RGB);
       f.fill(getColor(128, 0, 0, 255));
       // Save the image as a PNG.
@@ -326,15 +326,46 @@ void defineImageTests() {
       Io.File fp = new Io.File('out/trim.png')
                          ..createSync(recursive: true)
                          ..writeAsBytesSync(writePng(trimmed));
-    });
+    });*/
 
     test('dropShadow', () {
-      Image s = new Image.from(image);
-      Image d = dropShadow(s, 3, 3, 10);
+      Image s = new Image.from(image2);
+      Image d = dropShadow(s, 5, 5, 10);
       // Save the image as a PNG.
-      Io.File fp = new Io.File('out/dropShadow.png')
-                         ..createSync(recursive: true)
-                         ..writeAsBytesSync(writePng(d));
+      new Io.File('out/dropShadow.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writePng(d));
+
+      s = new Image.from(image2);
+      d = dropShadow(s, -5, 5, 10);
+      // Save the image as a PNG.
+      new Io.File('out/dropShadow-2.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writePng(d));
+
+      s = new Image.from(image2);
+      d = dropShadow(s, 5, -5, 10);
+      // Save the image as a PNG.
+      new Io.File('out/dropShadow-3.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writePng(d));
+
+      s = new Image.from(image2);
+      d = dropShadow(s, -5, -5, 10);
+      // Save the image as a PNG.
+      new Io.File('out/dropShadow-4.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writePng(d));
+
+      s = new Image(256, 256);
+      s.fill(0);
+      drawString(s, arial_48, 30, 100, 'Shadow',
+                color: getColor(255, 0, 0));
+      d = dropShadow(s, -3, -3, 5);
+      // Save the image as a PNG.
+      new Io.File('out/dropShadow-5.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(writePng(d));
     });
   });
 }
