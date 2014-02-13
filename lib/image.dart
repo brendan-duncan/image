@@ -59,6 +59,8 @@ part 'src/formats/jpeg/jpeg_jfif.dart';
 part 'src/formats/jpeg/jpeg_scan.dart';
 part 'src/formats/png/png_frame.dart';
 part 'src/formats/png/png_info.dart';
+part 'src/formats/tiff/tiff_directory.dart';
+part 'src/formats/tiff/tiff_info.dart';
 part 'src/formats/webp/vp8.dart';
 part 'src/formats/webp/vp8_bit_reader.dart';
 part 'src/formats/webp/vp8_filter.dart';
@@ -83,6 +85,7 @@ part 'src/formats/png_decoder.dart';
 part 'src/formats/png_encoder.dart';
 part 'src/formats/tga_decoder.dart';
 part 'src/formats/tga_encoder.dart';
+part 'src/formats/tiff_decoder.dart';
 part 'src/formats/webp_decoder.dart';
 
 part 'src/transform/copy_into.dart';

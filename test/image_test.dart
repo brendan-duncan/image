@@ -9,11 +9,13 @@ part 'gif_test.dart';
 part 'jpeg_test.dart';
 part 'png_test.dart';
 part 'tga_test.dart';
+part 'tiff_test.dart';
 part 'webp_test.dart';
 
 void main() {
   defineGifTests();
   defineTgaTests();
+  defineTiffTests();
   defineJpegTests();
   definePngTests();
   defineFontTests();
