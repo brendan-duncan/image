@@ -2,6 +2,7 @@ part of image;
 
 /**
  * Decode a Targa TGA image. This only supports the 24-bit uncompressed format.
+ * TODO add more TGA support.
  */
 class TgaDecoder extends Decoder {
   /**
@@ -23,15 +24,14 @@ class TgaDecoder extends Decoder {
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {
-    InputStream input = new InputStream(data,
-        byteOrder: BIG_ENDIAN);
+    InputStream input = new InputStream(data, byteOrder: BIG_ENDIAN);
 
     List<int> header = input.readBytes(18);
     if (header[2] != 2) {
-      throw new ImageException('Unsupported color format');
+      throw new ImageException('Unsupported color format: ${header[2]}');
     }
-    if (header[16] != 24) {
-      throw new ImageException('Only 24-bit images are supported.');
+    if (header[16] != 24 && header[16] != 32) {
+      throw new ImageException('Unsupported pixel format: ${header[16]}.');
     }
 
     int w = (header[12] & 0xff) | ((header[13] & 0xff) << 8);

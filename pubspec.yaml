@@ -1,11 +1,11 @@
 name: image
-version: 1.1.10
+version: 1.1.11
 author: Brendan Duncan <brendanduncan@gmail.com>
 description: Provides server and web apps the ability to load, manipulate, and save images with various image file formats including PNG, JPEG, GIF and WebP.
 homepage: https://github.com/brendan-duncan/image
 documentation: https://github.com/brendan-duncan/image/wiki
 dependencies:
-  archive: '>=1.0.13'
+  archive: '>=1.0.14'
   xml: '>=0.9.5'
 dev_dependencies:
   crypto: '>=0.9.0 <1.0.0'

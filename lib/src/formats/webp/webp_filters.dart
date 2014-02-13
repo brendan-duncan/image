@@ -80,13 +80,13 @@ class WebPFilters {
     final int lastRow = row + numRows;
     MemPtr s = new MemPtr(src, startOffset);
     MemPtr o = new MemPtr(src, startOffset);
-    MemPtr preds = new MemPtr(inverse ? o : s);
+    MemPtr preds = new MemPtr.from(inverse ? o : s);
 
     if (row == 0) {
       // Leftmost pixel is the same as input for topmost scanline.
       o[0] = s[0];
-      _predictLine(new MemPtr(s, 1), preds,
-                   new MemPtr(o, 1), width - 1, inverse);
+      _predictLine(new MemPtr.from(s, 1), preds,
+                   new MemPtr.from(o, 1), width - 1, inverse);
       row = 1;
       preds.offset += stride;
       s.offset += stride;
@@ -96,8 +96,8 @@ class WebPFilters {
     // Filter line-by-line.
     while (row < lastRow) {
       // Leftmost pixel is predicted from above.
-      _predictLine(s, new MemPtr(preds, -stride), o, 1, inverse);
-      _predictLine(new MemPtr(s, 1), preds, new MemPtr(o, 1),
+      _predictLine(s, new MemPtr.from(preds, -stride), o, 1, inverse);
+      _predictLine(new MemPtr.from(s, 1), preds, new MemPtr.from(o, 1),
                    width - 1, inverse);
       ++row;
       preds.offset += stride;
@@ -114,13 +114,14 @@ class WebPFilters {
     final int last_row = row + numRows;
     MemPtr s = new MemPtr(src, startOffset);
     MemPtr o = new MemPtr(out, startOffset);
-    MemPtr preds = new MemPtr(inverse ? o : s);
+    MemPtr preds = new MemPtr.from(inverse ? o : s);
 
     if (row == 0) {
       // Very first top-left pixel is copied.
       o[0] = s[0];
       // Rest of top scan-line is left-predicted.
-      _predictLine(new MemPtr(s, 1), preds, new MemPtr(o, 1), width - 1,
+      _predictLine(new MemPtr.from(s, 1), preds,
+                   new MemPtr.from(o, 1), width - 1,
                    inverse);
       row = 1;
       s.offset += stride;
@@ -153,12 +154,12 @@ class WebPFilters {
     final int lastRow = row + numRows;
     MemPtr s = new MemPtr(src, startOffset);
     MemPtr o = new MemPtr(out, startOffset);
-    MemPtr preds = new MemPtr(inverse ? o : s);
+    MemPtr preds = new MemPtr.from(inverse ? o : s);
 
     // left prediction for top scan-line
     if (row == 0) {
       o[0] = s[0];
-      _predictLine(new MemPtr(s, 1), preds, new MemPtr(o, 1),
+      _predictLine(new MemPtr.from(s, 1), preds, new MemPtr.from(o, 1),
                    width - 1, inverse);
       row = 1;
       preds.offset += stride;
@@ -169,7 +170,7 @@ class WebPFilters {
     // Filter line-by-line.
     while (row < lastRow) {
       // leftmost pixel: predict from above.
-      _predictLine(s, new MemPtr(preds, -stride), o, 1, inverse);
+      _predictLine(s, new MemPtr.from(preds, -stride), o, 1, inverse);
       for (int w = 1; w < width; ++w) {
         final int pred = _gradientPredictor(preds[w - 1],
             preds[w - stride],

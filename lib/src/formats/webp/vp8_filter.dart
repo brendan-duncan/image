@@ -6,7 +6,7 @@ class VP8Filter {
   }
 
   void simpleVFilter16(MemPtr p, int stride, int thresh) {
-    MemPtr p2 = new MemPtr(p);
+    MemPtr p2 = new MemPtr.from(p);
     for (int i = 0; i < 16; ++i) {
       p2.offset = p.offset + i;
       if (_needsFilter(p2, stride, thresh)) {
@@ -16,7 +16,7 @@ class VP8Filter {
   }
 
   void simpleHFilter16(MemPtr p, int stride, int thresh) {
-    MemPtr p2 = new MemPtr(p);
+    MemPtr p2 = new MemPtr.from(p);
     for (int i = 0; i < 16; ++i) {
       p2.offset = p.offset + i * stride;
       if (_needsFilter(p2, 1, thresh)) {
@@ -26,7 +26,7 @@ class VP8Filter {
   }
 
   void simpleVFilter16i(MemPtr p, int stride, int thresh) {
-    MemPtr p2 = new MemPtr(p);
+    MemPtr p2 = new MemPtr.from(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4 * stride;
       simpleVFilter16(p2, stride, thresh);
@@ -34,7 +34,7 @@ class VP8Filter {
   }
 
   void simpleHFilter16i(MemPtr p, int stride, int thresh) {
-    MemPtr p2 = new MemPtr(p);
+    MemPtr p2 = new MemPtr.from(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4;
       simpleHFilter16(p2, stride, thresh);
@@ -55,7 +55,7 @@ class VP8Filter {
   // on three inner edges
   void vFilter16i(MemPtr p, int stride, int thresh, int ithresh,
                   int hev_thresh) {
-    MemPtr p2 = new MemPtr(p);
+    MemPtr p2 = new MemPtr.from(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4 * stride;
       _filterLoop24(p2, stride, 1, 16, thresh, ithresh, hev_thresh);
@@ -64,7 +64,7 @@ class VP8Filter {
 
   void hFilter16i(MemPtr p, int stride, int thresh, int ithresh,
                   int hev_thresh) {
-    MemPtr p2 = new MemPtr(p);
+    MemPtr p2 = new MemPtr.from(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4;
       _filterLoop24(p2, 1, stride, 16, thresh, ithresh, hev_thresh);
@@ -88,23 +88,23 @@ class VP8Filter {
 
   void vFilter8i(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
                  int hev_thresh) {
-    MemPtr u2 = new MemPtr(u, 4 * stride);
-    MemPtr v2 = new MemPtr(v, 4 * stride);
+    MemPtr u2 = new MemPtr.from(u, 4 * stride);
+    MemPtr v2 = new MemPtr.from(v, 4 * stride);
     _filterLoop24(u2, stride, 1, 8, thresh, ithresh, hev_thresh);
     _filterLoop24(v2, stride, 1, 8, thresh, ithresh, hev_thresh);
   }
 
   void hFilter8i(MemPtr u, MemPtr v, int stride, int thresh, int ithresh,
                  int hev_thresh) {
-    MemPtr u2 = new MemPtr(u, 4);
-    MemPtr v2 = new MemPtr(v, 4);
+    MemPtr u2 = new MemPtr.from(u, 4);
+    MemPtr v2 = new MemPtr.from(v, 4);
     _filterLoop24(u2, 1, stride, 8, thresh, ithresh, hev_thresh);
     _filterLoop24(v2, 1, stride, 8, thresh, ithresh, hev_thresh);
   }
 
   void _filterLoop26(MemPtr p, int hstride, int vstride, int size,
                      int thresh, int ithresh, int hev_thresh) {
-    MemPtr p2 = new MemPtr(p);
+    MemPtr p2 = new MemPtr.from(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
         if (_hev(p2, hstride, hev_thresh)) {
@@ -119,7 +119,7 @@ class VP8Filter {
 
   void _filterLoop24(MemPtr p, int hstride, int vstride, int size,
                      int thresh, int ithresh, int hev_thresh) {
-    MemPtr p2 = new MemPtr(p);
+    MemPtr p2 = new MemPtr.from(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
         if (_hev(p2, hstride, hev_thresh)) {
@@ -265,13 +265,14 @@ class VP8Filter {
   void transform(MemPtr src, MemPtr dst, bool doTwo) {
     transformOne(src, dst);
     if (doTwo) {
-      transformOne(new MemPtr(src, 16), new MemPtr(dst, 4));
+      transformOne(new MemPtr.from(src, 16), new MemPtr.from(dst, 4));
     }
   }
 
   void transformUV(MemPtr src, MemPtr dst) {
     transform(src, dst, true);
-    transform(new MemPtr(src, 2 * 16), new MemPtr(dst, 4 * VP8.BPS), true);
+    transform(new MemPtr.from(src, 2 * 16),
+              new MemPtr.from(dst, 4 * VP8.BPS), true);
   }
 
   void transformDC(MemPtr src, MemPtr dst) {
@@ -288,13 +289,15 @@ class VP8Filter {
       transformDC(src, dst);
     }
     if (src[1 * 16] != 0) {
-      transformDC(new MemPtr(src, 1 * 16), new MemPtr(dst, 4));
+      transformDC(new MemPtr.from(src, 1 * 16), new MemPtr.from(dst, 4));
     }
     if (src[2 * 16] != 0) {
-      transformDC(new MemPtr(src, 2 * 16), new MemPtr(dst, 4 * VP8.BPS));
+      transformDC(new MemPtr.from(src, 2 * 16),
+                  new MemPtr.from(dst, 4 * VP8.BPS));
     }
     if (src[3 * 16] != 0) {
-      transformDC(new MemPtr(src, 3 * 16), new MemPtr(dst, 4 * VP8.BPS + 4));
+      transformDC(new MemPtr.from(src, 3 * 16),
+                  new MemPtr.from(dst, 4 * VP8.BPS + 4));
     }
   }
 
@@ -336,7 +339,7 @@ class VP8Filter {
     final int D = dst[-1 + 2 * VP8.BPS];
     final int E = dst[-1 + 3 * VP8.BPS];
 
-    MemPtr d2 = new MemPtr(dst);
+    MemPtr d2 = new MemPtr.from(dst);
 
     d2.toUint32List()[0] = 0x01010101 * AVG3(A, B, C);
     d2.offset += VP8.BPS;

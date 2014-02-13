@@ -527,7 +527,7 @@ class VP8 {
 
       // predict and add residuals
       if (block.isIntra4x4) {   // 4x4
-        MemPtr topRight = new MemPtr(y_dst, -BPS + 16);
+        MemPtr topRight = new MemPtr.from(y_dst, -BPS + 16);
         Uint32List topRight32 = topRight.toUint32List();
 
         if (mb_y > 0) {
@@ -546,7 +546,7 @@ class VP8 {
 
         // predict and add residuals for all 4x4 blocks in turn.
         for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
-          MemPtr dst = new MemPtr(y_dst, kScan[n]);
+          MemPtr dst = new MemPtr.from(y_dst, kScan[n]);
 
           VP8Filter.PredLuma4[block.imodes[n]](dst);
 
@@ -558,7 +558,7 @@ class VP8 {
         VP8Filter.PredLuma16[predFunc](y_dst);
         if (bits != 0) {
           for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
-            MemPtr dst = new MemPtr(y_dst, kScan[n]);
+            MemPtr dst = new MemPtr.from(y_dst, kScan[n]);
 
             _doTransform(bits, new MemPtr(coeffs, n * 16), dst);
           }
@@ -663,7 +663,7 @@ class VP8 {
   void _doFilter(int mbX, int mbY) {
     final int yBps = _cacheYStride;
     VP8FInfo fInfo = _fInfo[mbX];
-    MemPtr yDst = new MemPtr(_cacheY, mbX * 16);
+    MemPtr yDst = new MemPtr.from(_cacheY, mbX * 16);
     final int ilevel = fInfo.fInnerLevel;
     final int limit = fInfo.fLimit;
     if (limit == 0) {
@@ -685,8 +685,8 @@ class VP8 {
       }
     } else {    // complex
       final int uvBps = _cacheUVStride;
-      MemPtr uDst = new MemPtr(_cacheU, mbX * 8);
-      MemPtr vDst = new MemPtr(_cacheV, mbX * 8);
+      MemPtr uDst = new MemPtr.from(_cacheU, mbX * 8);
+      MemPtr vDst = new MemPtr.from(_cacheV, mbX * 8);
 
       final int hevThresh = fInfo.hevThresh;
       if (mbX > 0) {
@@ -737,9 +737,9 @@ class VP8 {
     final int extraYRows = kFilterExtraRows[_filterType];
     final int ySize = extraYRows * _cacheYStride;
     final int uvSize = (extraYRows ~/ 2) * _cacheUVStride;
-    MemPtr yDst = new MemPtr(_cacheY, -ySize);
-    MemPtr uDst = new MemPtr(_cacheU, -uvSize);
-    MemPtr vDst = new MemPtr(_cacheV, -uvSize);
+    MemPtr yDst = new MemPtr.from(_cacheY, -ySize);
+    MemPtr uDst = new MemPtr.from(_cacheU, -uvSize);
+    MemPtr vDst = new MemPtr.from(_cacheV, -uvSize);
     final int mbY = _mbY;
     final bool isFirstRow = (mbY == 0);
     final bool isLastRow = (mbY >= _brMbY - 1);
@@ -756,13 +756,13 @@ class VP8 {
 
     if (!isFirstRow) {
       yStart -= extraYRows;
-      _y = new MemPtr(yDst);
-      _u = new MemPtr(uDst);
-      _v = new MemPtr(vDst);
+      _y = new MemPtr.from(yDst);
+      _u = new MemPtr.from(uDst);
+      _v = new MemPtr.from(vDst);
     } else {
-      _y = new MemPtr(_cacheY);
-      _u = new MemPtr(_cacheU);
-      _v = new MemPtr(_cacheV);
+      _y = new MemPtr.from(_cacheY);
+      _u = new MemPtr.from(_cacheU);
+      _v = new MemPtr.from(_cacheV);
     }
 
     if (!isLastRow) {
@@ -887,20 +887,20 @@ class VP8 {
       int uv1 = (diag_03 + t_uv) >> 1;
 
       _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
-          new MemPtr(topDst, (2 * x - 1) * 4));
+          new MemPtr.from(topDst, (2 * x - 1) * 4));
 
       _yuvToRgba(topY[2 * x - 0], uv1 & 0xff, (uv1 >> 16),
-              new MemPtr(topDst, (2 * x - 0) * 4));
+              new MemPtr.from(topDst, (2 * x - 0) * 4));
 
       if (bottomY != null) {
         uv0 = (diag_03 + l_uv) >> 1;
         uv1 = (diag_12 + uv) >> 1;
 
         _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
-            new MemPtr(bottomDst, (2 * x - 1) * 4));
+            new MemPtr.from(bottomDst, (2 * x - 1) * 4));
 
         _yuvToRgba(bottomY[2 * x], uv1 & 0xff, (uv1 >> 16),
-                new MemPtr(bottomDst, (2 * x + 0) * 4));
+                new MemPtr.from(bottomDst, (2 * x + 0) * 4));
       }
 
       tl_uv = t_uv;
@@ -910,12 +910,12 @@ class VP8 {
     if ((len & 1) == 0) {
       final int uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
       _yuvToRgba(topY[len - 1], uv0 & 0xff, (uv0 >> 16),
-           new MemPtr(topDst, (len - 1) * 4));
+           new MemPtr.from(topDst, (len - 1) * 4));
 
       if (bottomY != null) {
         final int uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
         _yuvToRgba(bottomY[len - 1], uv0 & 0xff, (uv0 >> 16),
-             new MemPtr(bottomDst, (len - 1) * 4));
+             new MemPtr.from(bottomDst, (len - 1) * 4));
       }
     }
   }
@@ -926,7 +926,7 @@ class VP8 {
     }
 
     final int stride = webp.width * 4;
-    MemPtr alpha = new MemPtr(_a);
+    MemPtr alpha = new MemPtr.from(_a);
     int startY = mbY;
     int numRows = mbH;
 
@@ -965,15 +965,15 @@ class VP8 {
   int _emitFancyRGB(int mbY, int mbW, int mbH) {
     int numLinesOut = mbH;   // a priori guess
     MemPtr dst = new MemPtr(output.getBytes(), mbY * webp.width * 4);
-    MemPtr curY = new MemPtr(_y);
-    MemPtr curU = new MemPtr(_u);
-    MemPtr curV = new MemPtr(_v);
+    MemPtr curY = new MemPtr.from(_y);
+    MemPtr curU = new MemPtr.from(_u);
+    MemPtr curV = new MemPtr.from(_v);
     int y = mbY;
     final int yEnd = mbY + mbH;
     final int uvW = (mbW + 1) >> 1;
     final int stride = webp.width * 4;
-    MemPtr topU = new MemPtr(_tmpU);
-    MemPtr topV = new MemPtr(_tmpV);
+    MemPtr topU = new MemPtr.from(_tmpU);
+    MemPtr topV = new MemPtr.from(_tmpV);
 
     if (webp.progressCallback != null) {
       webp.progressCallback(webp._frame, webp._numFrames,
@@ -986,7 +986,7 @@ class VP8 {
     } else {
       // We can finish the left-over line from previous call.
       _upsample(_tmpY, curY, topU, topV, curU, curV,
-                new MemPtr(dst, -stride), dst, mbW);
+                new MemPtr.from(dst, -stride), dst, mbW);
       ++numLinesOut;
     }
 
@@ -1000,9 +1000,9 @@ class VP8 {
       curV.offset += _cacheUVStride;
       dst.offset += 2 * stride;
       curY.offset += 2 * _cacheYStride;
-      _upsample(new MemPtr(curY, -_cacheYStride), curY,
+      _upsample(new MemPtr.from(curY, -_cacheYStride), curY,
           topU, topV, curU, curV,
-          new MemPtr(dst, -stride), dst, mbW);
+          new MemPtr.from(dst, -stride), dst, mbW);
     }
 
     // move to last row
@@ -1019,7 +1019,7 @@ class VP8 {
       // Process the very last row of even-sized picture
       if ((yEnd & 1) == 0) {
         _upsample(curY, null, curU, curV, curU, curV,
-            new MemPtr(dst, stride), null, mbW);
+            new MemPtr.from(dst, stride), null, mbW);
       }
     }
 
