@@ -1,11 +1,6 @@
 part of image;
 
-
 int _shiftR(int v, int n) {
-  /*if (v >= 0) {
-    return v >> n;
-  }*/
-
   // dart2js can't handle binary operations on negative numbers, so
   // until that issue is fixed (issues 16506, 1533), we'll have to do it
   // the slow way.
@@ -13,10 +8,6 @@ int _shiftR(int v, int n) {
 }
 
 int _shiftL(int v, int n) {
-  /*if (v >= 0) {
-    return v << n;
-  }*/
-
   // dart2js can't handle binary operations on negative numbers, so
   // until that issue is fixed (issues 16506, 1533), we'll have to do it
   // the slow way.

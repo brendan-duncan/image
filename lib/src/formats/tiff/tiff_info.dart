@@ -5,5 +5,5 @@ class TiffInfo extends DecodeInfo {
   int signature;
 
   int ifdOffset;
-  List<TiffDirectory> directories = [];
+  List<TiffImage> images = [];
 }
