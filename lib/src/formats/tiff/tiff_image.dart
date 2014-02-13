@@ -10,29 +10,41 @@ class TiffImage {
   int samplesPerPixel;
   int imageType = TYPE_UNSUPPORTED;
   bool isWhiteZero = false;
-  int predictor;
+  int predictor = 1;
   int chromaSubH;
   int chromaSubV;
+  bool tiled = false;
+  int tileWidth;
+  int tileHeight;
+  List<int> tileOffsets;
+  List<int> tileByteCounts;
+  int tilesX;
+  int tilesY;
+  int tileSize;
+  int fillOrder;
+  int t4Options;
+  int t6Options;
+  Image image;
 
-  TiffImage(MemPtr p2) {
-    MemPtr p3 = new MemPtr.from(p2);
+  TiffImage(MemPtr p) {
+    MemPtr p3 = new MemPtr.from(p);
 
-    int numDirEntries = p2.readUint16();
+    int numDirEntries = p.readUint16();
     for (int i = 0; i < numDirEntries; ++i) {
       TiffEntry entry = new TiffEntry();
 
-      entry.tag = p2.readUint16();
-      entry.type = p2.readUint16();
-      entry.numValues = p2.readUint32();
+      entry.tag = p.readUint16();
+      entry.type = p.readUint16();
+      entry.numValues = p.readUint32();
 
       // The value for the tag is either stored in another location,
       // or within the tag itself (if the size fits in 4 bytes).
       // We're not reading the data here, just storing offsets.
       if (entry.numValues * entry.typeSize > 4) {
-        entry.valueOffset = p2.readUint32();
+        entry.valueOffset = p.readUint32();
       } else {
-        entry.valueOffset = p2.offset;
-        p2.offset += 4;
+        entry.valueOffset = p.offset;
+        p.offset += 4;
       }
 
       tags[entry.tag] = entry;
@@ -128,28 +140,9 @@ class TiffImage {
     }
   }
 
-  int _readTag(MemPtr p, int type, [int defaultValue = 0]) {
-    if (!hasTag(type)) {
-      return defaultValue;
-    }
-    return tags[type].readValue(p);
-  }
-
-  List<int> _readTagList(MemPtr p, int type) {
-    if (!hasTag(type)) {
-      return null;
-    }
-    return tags[type].readValues(p);
-  }
-
   Image decode(MemPtr p) {
     int extraSamples = _readTag(p, TAG_EXTRA_SAMPLES, 0);
 
-    bool tiled = false;
-    int tileWidth;
-    int tileHeight;
-    List<int> tileOffsets;
-    List<int> tileByteCounts;
     if (hasTag(TAG_TILE_OFFSETS)) {
       tiled = true;
       // Image is in tiled format
@@ -180,19 +173,88 @@ class TiffImage {
     }
 
     // Calculate number of tiles and the tileSize in bytes
-    int tilesX = (width + tileWidth - 1) ~/ tileWidth;
-    int tilesY = (height + tileHeight - 1) ~/ tileHeight;
-    int tileSize = tileWidth * tileHeight * samplesPerPixel;
+    tilesX = (width + tileWidth - 1) ~/ tileWidth;
+    tilesY = (height + tileHeight - 1) ~/ tileHeight;
+    tileSize = tileWidth * tileHeight * samplesPerPixel;
 
-    int fillOrder = _readTag(p, TAG_FILL_ORDER, 1);
+    fillOrder = _readTag(p, TAG_FILL_ORDER, 1);
+    t4Options = 0;
+    t6Options = 0;
 
-    return null;
+    image = new Image(width, height);
+
+    for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
+      for (int tileX = 0; tileX < tilesX; ++tileX, ++ti) {
+        _decodeTile(p, tileX, tileY);
+      }
+    }
+
+    return image;
   }
 
   bool hasTag(int tag) => tags.containsKey(tag);
 
+  void _decodeTile(MemPtr p, int tileX, int tileY) {
+    int tileIndex = tileY * tilesX + tileX;
+    p.offset = tileOffsets[tileIndex];
+
+    int outX = tileX * tileWidth;
+    int outY = tileY * tileHeight;
+
+    int byteCount = tileByteCounts[tileIndex];
+
+    // Read the data, uncompressing as needed. There are four cases:
+    // bilevel, palette-RGB, 4-bit grayscale, and everything else.
+    if (imageType == TYPE_BILEVEL) {
+      /*if (compression == COMP_PACKBITS) {
+        List<int> data = p.readBytes(byteCount);
+
+        // Since the decompressed data will still be packed
+        // 8 pixels into 1 byte, calculate bytesInThisTile
+        int bytesInThisTile;
+        if ((tileWidth % 8) == 0) {
+          bytesInThisTile = (tileWidth ~/ 8) * tileHeight;
+        } else {
+          bytesInThisTile = (tileWidth ~/ 8 + 1) * tileHeight;
+        }
+        _decodePackbits(data, bytesInThisTile, bdata);
+      } else if (compression == COMP_LZW) {
+        List<int> data = p.readBytes(byteCount);
+        lzwDecoder.decode(data, bdata, tileHeight);
+      } else if (compression == COMP_FAX_G3_1D) {
+        List<int> data = p.readBytes(byteCount);
+        decoder.decode1D(bdata, data, 0, tileHeight);
+      } else if (compression == COMP_FAX_G3_2D) {
+        List<int> data = p.readBytes(byteCount);
+        decoder.decode2D(bdata, data, 0, tileHeight, tiffT4Options);
+      } else if (compression == COMP_FAX_G4_2D) {
+        List<int> data = p.readBytes(byteCount);
+        decoder.decodeT6(bdata, data, 0, tileHeight, tiffT6Options);
+      } else if (compression == COMP_DEFLATE) {
+        List<int> data = p.readBytes(byteCount);
+        inflate(data, bdata);
+      } else if (compression == COMP_NONE) {
+        bdata = p.readBytes(byteCount);
+      }*/
+    }
+  }
+
+  int _readTag(MemPtr p, int type, [int defaultValue = 0]) {
+    if (!hasTag(type)) {
+      return defaultValue;
+    }
+    return tags[type].readValue(p);
+  }
+
+  List<int> _readTagList(MemPtr p, int type) {
+    if (!hasTag(type)) {
+      return null;
+    }
+    return tags[type].readValues(p);
+  }
+
   // Compression types
-  static final int COMP_NONE = 1;
+  static const int COMP_NONE = 1;
   static const int COMP_FAX_G3_1D = 2;
   static const int COMP_FAX_G3_2D = 3;
   static const int COMP_FAX_G4_2D = 4;
@@ -250,6 +312,8 @@ class TiffImage {
   static const int TAG_STRIP_BYTE_COUNTS = 279;
   static const int TAG_STRIP_OFFSETS = 273;
   static const int TAG_SUBFILE_TYPE = 255;
+  static const int TAG_T4_OPTIONS = 292;
+  static const int TAG_T6_OPTIONS = 293;
   static const int TAG_THRESHOLDING = 263;
   static const int TAG_TILE_WIDTH  = 322;
   static const int TAG_TILE_LENGTH = 323;

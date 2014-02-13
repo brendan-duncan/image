@@ -28,7 +28,7 @@ class TiffDecoder extends Decoder {
       print('  imageType: ${d.imageType}');
     }
 
-    return null;
+    return info.images[frame].decode(ptr);
   }
 
   Animation decodeAnimation(List<int> data) {
