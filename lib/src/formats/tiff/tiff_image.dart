@@ -26,8 +26,8 @@ class TiffImage {
   int t6Options;
   Image image;
 
-  TiffImage(MemPtr p) {
-    MemPtr p3 = new MemPtr.from(p);
+  TiffImage(Buffer p) {
+    Buffer p3 = new Buffer.from(p);
 
     int numDirEntries = p.readUint16();
     for (int i = 0; i < numDirEntries; ++i) {
@@ -140,7 +140,7 @@ class TiffImage {
     }
   }
 
-  Image decode(MemPtr p) {
+  Image decode(Buffer p) {
     int extraSamples = _readTag(p, TAG_EXTRA_SAMPLES, 0);
 
     if (hasTag(TAG_TILE_OFFSETS)) {
@@ -194,7 +194,15 @@ class TiffImage {
 
   bool hasTag(int tag) => tags.containsKey(tag);
 
-  void _decodeTile(MemPtr p, int tileX, int tileY) {
+  void _decodeTile(Buffer p, int tileX, int tileY) {
+    // Read the data, uncompressing as needed. There are four cases:
+    // bilevel, palette-RGB, 4-bit grayscale, and everything else.
+    if (imageType == TYPE_BILEVEL) {
+      _decodeBilevelTile(p, tileX, tileY);
+    }
+  }
+
+  void _decodeBilevelTile(Buffer p, int tileX, int tileY) {
     int tileIndex = tileY * tilesX + tileX;
     p.offset = tileOffsets[tileIndex];
 
@@ -203,50 +211,102 @@ class TiffImage {
 
     int byteCount = tileByteCounts[tileIndex];
 
-    // Read the data, uncompressing as needed. There are four cases:
-    // bilevel, palette-RGB, 4-bit grayscale, and everything else.
-    if (imageType == TYPE_BILEVEL) {
-      /*if (compression == COMP_PACKBITS) {
-        List<int> data = p.readBytes(byteCount);
+    Buffer bdata;
+    if (compression == COMP_PACKBITS) {
+      // Since the decompressed data will still be packed
+      // 8 pixels into 1 byte, calculate bytesInThisTile
+      int bytesInThisTile;
+      if ((tileWidth % 8) == 0) {
+        bytesInThisTile = (tileWidth ~/ 8) * tileHeight;
+      } else {
+        bytesInThisTile = (tileWidth ~/ 8 + 1) * tileHeight;
+      }
+      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      _decodePackbits(p, bytesInThisTile, bdata.data);
 
-        // Since the decompressed data will still be packed
-        // 8 pixels into 1 byte, calculate bytesInThisTile
-        int bytesInThisTile;
-        if ((tileWidth % 8) == 0) {
-          bytesInThisTile = (tileWidth ~/ 8) * tileHeight;
+    } else if (compression == COMP_LZW) {
+      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      TiffLZWDecoder decoder = new TiffLZWDecoder(tileWidth, predictor,
+                                                  samplesPerPixel);
+      decoder.decode(new Buffer.from(p, 0, byteCount), bdata.data, tileHeight);
+
+    } else if (compression == COMP_FAX_G3_1D) {
+      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      //decoder.decode1D(bdata, data, 0, tileHeight);
+
+    } else if (compression == COMP_FAX_G3_2D) {
+      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      //decoder.decode2D(bdata, data, 0, tileHeight, tiffT4Options);
+
+    } else if (compression == COMP_FAX_G4_2D) {
+      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      //decoder.decodeT6(bdata, data, 0, tileHeight, tiffT6Options);
+
+    } else if (compression == COMP_ZIP) {
+      List<int> data = p.toList(0, byteCount);
+      List<int> outData = new ZLibDecoder().decodeBytes(data);
+      bdata = new Buffer(outData);
+
+    } else if (compression == COMP_DEFLATE) {
+      List<int> data = p.toList(0, byteCount);
+      List<int> outData = new Inflate(data).getBytes();
+      bdata = new Buffer(outData);
+
+    } else if (compression == COMP_NONE) {
+      bdata = p;
+    }
+
+    TiffBitReader br = new TiffBitReader(bdata);
+    final int white = isWhiteZero ? 0xff000000 : 0xffffffff;
+    final int black = isWhiteZero ? 0xffffffff : 0xff000000;
+
+    for (int y = 0, py = outY; y < tileHeight; ++y, ++py) {
+      for (int x = 0, px = outX; x < tileWidth; ++x, ++px) {
+        if (br.readBits(1) == 0) {
+          image.setPixel(px, py, black);
         } else {
-          bytesInThisTile = (tileWidth ~/ 8 + 1) * tileHeight;
+          image.setPixel(px, py, white);
         }
-        _decodePackbits(data, bytesInThisTile, bdata);
-      } else if (compression == COMP_LZW) {
-        List<int> data = p.readBytes(byteCount);
-        lzwDecoder.decode(data, bdata, tileHeight);
-      } else if (compression == COMP_FAX_G3_1D) {
-        List<int> data = p.readBytes(byteCount);
-        decoder.decode1D(bdata, data, 0, tileHeight);
-      } else if (compression == COMP_FAX_G3_2D) {
-        List<int> data = p.readBytes(byteCount);
-        decoder.decode2D(bdata, data, 0, tileHeight, tiffT4Options);
-      } else if (compression == COMP_FAX_G4_2D) {
-        List<int> data = p.readBytes(byteCount);
-        decoder.decodeT6(bdata, data, 0, tileHeight, tiffT6Options);
-      } else if (compression == COMP_DEFLATE) {
-        List<int> data = p.readBytes(byteCount);
-        inflate(data, bdata);
-      } else if (compression == COMP_NONE) {
-        bdata = p.readBytes(byteCount);
-      }*/
+      }
+      br.flushByte();
     }
   }
 
-  int _readTag(MemPtr p, int type, [int defaultValue = 0]) {
+  /**
+   * Uncompress packbits compressed image data.
+   */
+  void _decodePackbits(Buffer data, int arraySize, List<int> dst) {
+    int srcCount = 0;
+    int dstCount = 0;
+
+    while (dstCount < arraySize) {
+      int b = data[srcCount++];
+      if (b >= 0 && b <= 127) {
+        // literal run packet
+        for (int i = 0; i < (b + 1); ++i) {
+          dst[dstCount++] = data[srcCount++];
+        }
+      } else if (b <= -1 && b >= -127) {
+        // 2 byte encoded run packet
+        int repeat = data[srcCount++];
+        for (int i = 0; i < (-b + 1); ++i) {
+          dst[dstCount++] = repeat;
+        }
+      } else {
+        // no-op packet. Do nothing
+        srcCount++;
+      }
+    }
+  }
+
+  int _readTag(Buffer p, int type, [int defaultValue = 0]) {
     if (!hasTag(type)) {
       return defaultValue;
     }
     return tags[type].readValue(p);
   }
 
-  List<int> _readTagList(MemPtr p, int type) {
+  List<int> _readTagList(Buffer p, int type) {
     if (!hasTag(type)) {
       return null;
     }
@@ -261,6 +321,7 @@ class TiffImage {
   static const int COMP_LZW = 5;
   static const int COMP_JPEG_OLD  = 6;
   static const int COMP_JPEG_TTN2 = 7;
+  static const int COMP_ZIP = 8;
   static const int COMP_PACKBITS = 32773;
   static const int COMP_DEFLATE = 32946;
 

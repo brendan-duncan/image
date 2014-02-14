@@ -6,11 +6,11 @@ class TiffDecoder extends Decoder {
    * Is the given file a valid TIFF image?
    */
   bool isValidFile(List<int> data) {
-    return _readHeader(new MemPtr(data)) != null;
+    return _readHeader(new Buffer(data)) != null;
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {
-    MemPtr ptr = new MemPtr(data);
+    Buffer ptr = new Buffer(data);
 
     TiffInfo info = _readHeader(ptr);
     if (info == null) {
@@ -46,7 +46,7 @@ class TiffDecoder extends Decoder {
   /**
    * Read the TIFF header and IFD blocks.
    */
-  TiffInfo _readHeader(MemPtr p) {
+  TiffInfo _readHeader(Buffer p) {
     TiffInfo info = new TiffInfo();
     info.byteOrder = p.readUint16();
     if (info.byteOrder != TIFF_LITTLE_ENDIAN &&
@@ -68,7 +68,7 @@ class TiffDecoder extends Decoder {
     int offset = p.readUint32();
     info.ifdOffset = offset;
 
-    MemPtr p2 = new MemPtr.from(p);
+    Buffer p2 = new Buffer.from(p);
     p2.offset = offset;
 
     while (offset != 0) {

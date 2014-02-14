@@ -12,7 +12,8 @@ void defineTiffTests() {
 
   group('TIFF', () {
     for (var f in files) {
-      if (f is! Io.File || !f.path.endsWith('.tif')) {
+      if (f is! Io.File ||
+          (!f.path.endsWith('.tif') && !f.path.endsWith('.tiff'))) {
         continue;
       }
 
@@ -22,14 +23,14 @@ void defineTiffTests() {
         print('===============================');
         print(name);
         Image image = new TiffDecoder().decodeImage(bytes);
-        /*if (image == null) {
+        if (image == null) {
           throw new ImageException('Unable to decode TIFF Image: $name.');
         }
 
         List<int> png = new PngEncoder().encodeImage(image);
         new Io.File('out/tif/${name}.png')
               ..createSync(recursive: true)
-              ..writeAsBytesSync(png);*/
+              ..writeAsBytesSync(png);
       });
     }
   });
