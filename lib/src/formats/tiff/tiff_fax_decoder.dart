@@ -181,557 +181,548 @@ class TiffFaxDecoder {
     currChangingElems[changingElemSize++] = bitOffset;
   }
 
-      // Two-dimensional decoding methods
+  /**
+   * Two-dimensional decoding methods
+   */
 
-      /*void decode2D(byte[] buffer,
-                           byte compData[],
-                           int startX,
-                           int height,
-                           long tiffT4Options) {
+  void decode2D(Buffer out, Buffer compData, int startX, int height,
+                int tiffT4Options) {
     this.data = compData;
     compression = 3;
 
     bitPointer = 0;
     bytePointer = 0;
 
-          int scanlineStride = (w + 7)/8;
+    int scanlineStride = (width + 7) ~/ 8;
 
     int a0, a1, b1, b2;
-          int[] b = new int[2];
+    List<int> b = new List<int>(2);
     int entry, code, bits;
-    boolean isWhite;
+    bool isWhite;
     int currIndex = 0;
-    int temp[];
+    List<int> temp;
 
     // fillBits - dealt with this in readEOL
     // 1D/2D encoding - dealt with this in readEOL
 
     // uncompressedMode - haven't dealt with this yet.
 
-
-    oneD = (int)(tiffT4Options & 0x01);
-    uncompressedMode = (int)((tiffT4Options & 0x02) >> 1);
-    fillBits = (int)((tiffT4Options & 0x04) >> 2);
+    oneD = (tiffT4Options & 0x01);
+    uncompressedMode = ((tiffT4Options & 0x02) >> 1);
+    fillBits = ((tiffT4Options & 0x04) >> 2);
 
     // The data must start with an EOL code
-    if (readEOL() != 1) {
-        throw new Error("TIFFFaxDecoder3");
+    if (_readEOL() != 1) {
+      throw new ImageException("TIFFFaxDecoder3");
     }
 
-          int lineOffset = 0;
-          int bitOffset;
+    int lineOffset = 0;
+    int bitOffset;
 
     // Then the 1D encoded scanline data will occur, changing elements
     // array gets set.
-    decodeNextScanline(buffer, lineOffset, startX);
-          lineOffset += scanlineStride;
+    _decodeNextScanline(out, lineOffset, startX);
+    lineOffset += scanlineStride;
 
     for (int lines = 1; lines < height; lines++) {
+      // Every line must begin with an EOL followed by a bit which
+      // indicates whether the following scanline is 1D or 2D encoded.
+      if (_readEOL() == 0) {
+        // 2D encoded scanline follows
 
-              // Every line must begin with an EOL followed by a bit which
-              // indicates whether the following scanline is 1D or 2D encoded.
-        if (readEOL() == 0) {
-      // 2D encoded scanline follows
+        // Initialize previous scanlines changing elements, and
+        // initialize current scanline's changing elements array
+        temp = prevChangingElems;
+        prevChangingElems = currChangingElems;
+        currChangingElems = temp;
+        currIndex = 0;
 
-      // Initialize previous scanlines changing elements, and
-      // initialize current scanline's changing elements array
-      temp = prevChangingElems;
-      prevChangingElems = currChangingElems;
-      currChangingElems = temp;
-      currIndex = 0;
+        // a0 has to be set just before the start of this scanline.
+        a0 = -1;
+        isWhite = true;
+        bitOffset = startX;
 
-      // a0 has to be set just before the start of this scanline.
-      a0 = -1;
-      isWhite = true;
-      bitOffset = startX;
+        lastChangingElement = 0;
 
-                  lastChangingElement = 0;
-
-      while (bitOffset < w) {
+        while (bitOffset < width) {
           // Get the next changing element
-          getNextChangingElement(a0, isWhite, b);
+          _getNextChangingElement(a0, isWhite, b);
 
           b1 = b[0];
           b2 = b[1];
 
           // Get the next seven bits
-          entry = nextLesserThan8Bits(7);
+          entry = _nextLesserThan8Bits(7);
 
           // Run these through the 2DCodes table
-          entry = (int)(twoDCodes[entry] & 0xff);
+          entry = (TWO_D_CODES[entry] & 0xff);
 
           // Get the code and the number of bits used up
-          code = (entry & 0x78) >>> 3;
+          code = (entry & 0x78) >> 3;
           bits = entry & 0x07;
 
           if (code == 0) {
-                          if (!isWhite) {
-                              setToBlack(buffer, lineOffset, bitOffset,
-                                         b2 - bitOffset);
-                          }
-        bitOffset = a0 = b2;
+            if (!isWhite) {
+              _setToBlack(out, lineOffset, bitOffset, b2 - bitOffset);
+            }
+            bitOffset = a0 = b2;
 
-        // Set pointer to consume the correct number of bits.
-        updatePointer(7 - bits);
+            // Set pointer to consume the correct number of bits.
+            _updatePointer(7 - bits);
           } else if (code == 1) {
-        // Horizontal
-        updatePointer(7 - bits);
+            // Horizontal
+            _updatePointer(7 - bits);
 
-        // identify the next 2 codes.
-        int number;
-        if (isWhite) {
-            number = decodeWhiteCodeWord();
-                              bitOffset += number;
-            currChangingElems[currIndex++] = bitOffset;
+            // identify the next 2 codes.
+            int number;
+            if (isWhite) {
+              number = _decodeWhiteCodeWord();
+              bitOffset += number;
+              currChangingElems[currIndex++] = bitOffset;
 
-            number = decodeBlackCodeWord();
-                              setToBlack(buffer, lineOffset, bitOffset, number);
-            bitOffset += number;
-            currChangingElems[currIndex++] = bitOffset;
-        } else {
-            number = decodeBlackCodeWord();
-                              setToBlack(buffer, lineOffset, bitOffset, number);
-                              bitOffset += number;
-            currChangingElems[currIndex++] = bitOffset;
+              number = _decodeBlackCodeWord();
+              _setToBlack(out, lineOffset, bitOffset, number);
+              bitOffset += number;
+              currChangingElems[currIndex++] = bitOffset;
+            } else {
+              number = _decodeBlackCodeWord();
+              _setToBlack(out, lineOffset, bitOffset, number);
+              bitOffset += number;
+              currChangingElems[currIndex++] = bitOffset;
 
-            number = decodeWhiteCodeWord();
-            bitOffset += number;
-            currChangingElems[currIndex++] = bitOffset;
-        }
+              number = _decodeWhiteCodeWord();
+              bitOffset += number;
+              currChangingElems[currIndex++] = bitOffset;
+            }
 
-        a0 = bitOffset;
+            a0 = bitOffset;
           } else if (code <= 8) {
-        // Vertical
-        a1 = b1 + (code - 5);
+            // Vertical
+            a1 = b1 + (code - 5);
 
-        currChangingElems[currIndex++] = a1;
+            currChangingElems[currIndex++] = a1;
 
-        // We write the current color till a1 - 1 pos,
-        // since a1 is where the next color starts
-                          if (!isWhite) {
-                              setToBlack(buffer, lineOffset, bitOffset,
-                                         a1 - bitOffset);
-                          }
-                          bitOffset = a0 = a1;
-                          isWhite = !isWhite;
+            // We write the current color till a1 - 1 pos,
+            // since a1 is where the next color starts
+            if (!isWhite) {
+              _setToBlack(out, lineOffset, bitOffset, a1 - bitOffset);
+            }
+            bitOffset = a0 = a1;
+            isWhite = !isWhite;
 
-                          updatePointer(7 - bits);
+            _updatePointer(7 - bits);
           } else {
-        throw new Error("TIFFFaxDecoder4");
+            throw new ImageException("TIFFFaxDecoder4");
           }
-      }
-
-      // Add the changing element beyond the current scanline for the
-      // other color too
-      currChangingElems[currIndex++] = bitOffset;
-      changingElemSize = currIndex;
-        } else {
-      // 1D encoded scanline follows
-      decodeNextScanline(buffer, lineOffset, startX);
         }
 
-              lineOffset += scanlineStride;
-          }
+        // Add the changing element beyond the current scanline for the
+        // other color too
+        currChangingElems[currIndex++] = bitOffset;
+        changingElemSize = currIndex;
+      } else {
+        // 1D encoded scanline follows
+        _decodeNextScanline(out, lineOffset, startX);
       }
 
-      synchronized void decodeT6(byte[] buffer,
-                                        byte[] compData,
-                                        int startX,
-                                        int height,
-                                        long tiffT6Options) {
+      lineOffset += scanlineStride;
+    }
+  }
+
+  void decodeT6(Buffer out, Buffer compData, int startX, int height,
+                int tiffT6Options) {
     this.data = compData;
     compression = 4;
 
     bitPointer = 0;
     bytePointer = 0;
 
-          int scanlineStride = (w + 7)/8;
+    int scanlineStride = (width + 7) ~/ 8;
 
     int a0, a1, b1, b2;
     int entry, code, bits;
-    boolean isWhite;
+    bool isWhite;
     int currIndex;
-    int temp[];
+    List<int> temp;
 
-          // Return values from getNextChangingElement
-          int[] b = new int[2];
+    // Return values from getNextChangingElement
+    List<int> b = new List<int>(2);
 
     // uncompressedMode - have written some code for this, but this
     // has not been tested due to lack of test images using this optional
 
-    uncompressedMode = (int)((tiffT6Options & 0x02) >> 1);
+    uncompressedMode = ((tiffT6Options & 0x02) >> 1);
 
-          // Local cached reference
-          int[] cce = currChangingElems;
+    // Local cached reference
+    List<int> cce = currChangingElems;
 
     // Assume invisible preceding row of all white pixels and insert
     // both black and white changing elements beyond the end of this
     // imaginary scanline.
     changingElemSize = 0;
-    cce[changingElemSize++] = w;
-    cce[changingElemSize++] = w;
+    cce[changingElemSize++] = width;
+    cce[changingElemSize++] = width;
 
-          int lineOffset = 0;
-          int bitOffset;
+    int lineOffset = 0;
+    int bitOffset;
 
     for (int lines = 0; lines < height; lines++) {
-        // a0 has to be set just before the start of the scanline.
-        a0 = -1;
-        isWhite = true;
+      // a0 has to be set just before the start of the scanline.
+      a0 = -1;
+      isWhite = true;
 
-        // Assign the changing elements of the previous scanline to
-        // prevChangingElems and start putting this new scanline's
-        // changing elements into the currChangingElems.
-        temp = prevChangingElems;
-        prevChangingElems = currChangingElems;
-        cce = currChangingElems = temp;
-        currIndex = 0;
+      // Assign the changing elements of the previous scanline to
+      // prevChangingElems and start putting this new scanline's
+      // changing elements into the currChangingElems.
+      temp = prevChangingElems;
+      prevChangingElems = currChangingElems;
+      cce = currChangingElems = temp;
+      currIndex = 0;
 
-        // Start decoding the scanline at startX in the raster
-              bitOffset = startX;
+      // Start decoding the scanline at startX in the raster
+      bitOffset = startX;
 
-              // Reset search start position for getNextChangingElement
-              lastChangingElement = 0;
+      // Reset search start position for getNextChangingElement
+      lastChangingElement = 0;
 
-        // Till one whole scanline is decoded
-        while (bitOffset < w) {
-      // Get the next changing element
-                  getNextChangingElement(a0, isWhite, b);
-      b1 = b[0];
-      b2 = b[1];
+      // Till one whole scanline is decoded
+      while (bitOffset < width) {
+        // Get the next changing element
+        _getNextChangingElement(a0, isWhite, b);
+        b1 = b[0];
+        b2 = b[1];
 
-      // Get the next seven bits
-      entry = nextLesserThan8Bits(7);
-      // Run these through the 2DCodes table
-      entry = (int)(twoDCodes[entry] & 0xff);
+        // Get the next seven bits
+        entry = _nextLesserThan8Bits(7);
+        // Run these through the 2DCodes table
+        entry = (TWO_D_CODES[entry] & 0xff);
 
-      // Get the code and the number of bits used up
-      code = (entry & 0x78) >>> 3;
-      bits = entry & 0x07;
+        // Get the code and the number of bits used up
+        code = (entry & 0x78) >> 3;
+        bits = entry & 0x07;
 
-      if (code == 0) { // Pass
-                      // We always assume WhiteIsZero format for fax.
-                      if (!isWhite) {
-                          setToBlack(buffer, lineOffset, bitOffset,
-                                     b2 - bitOffset);
-                      }
-                      bitOffset = a0 = b2;
+        if (code == 0) { // Pass
+          // We always assume WhiteIsZero format for fax.
+          if (!isWhite) {
+            _setToBlack(out, lineOffset, bitOffset, b2 - bitOffset);
+          }
+          bitOffset = a0 = b2;
 
           // Set pointer to only consume the correct number of bits.
-          updatePointer(7 - bits);
-      } else if (code == 1) { // Horizontal
+          _updatePointer(7 - bits);
+        } else if (code == 1) { // Horizontal
           // Set pointer to only consume the correct number of bits.
-          updatePointer(7 - bits);
+          _updatePointer(7 - bits);
 
           // identify the next 2 alternating color codes.
           int number;
           if (isWhite) {
-        // Following are white and black runs
-        number = decodeWhiteCodeWord();
-                          bitOffset += number;
-        cce[currIndex++] = bitOffset;
+            // Following are white and black runs
+            number = _decodeWhiteCodeWord();
+            bitOffset += number;
+            cce[currIndex++] = bitOffset;
 
-        number = decodeBlackCodeWord();
-                          setToBlack(buffer, lineOffset, bitOffset, number);
-                          bitOffset += number;
-        cce[currIndex++] = bitOffset;
+            number = _decodeBlackCodeWord();
+            _setToBlack(out, lineOffset, bitOffset, number);
+            bitOffset += number;
+            cce[currIndex++] = bitOffset;
           } else {
-        // First a black run and then a white run follows
-        number = decodeBlackCodeWord();
-                          setToBlack(buffer, lineOffset, bitOffset, number);
-                          bitOffset += number;
-        cce[currIndex++] = bitOffset;
+            // First a black run and then a white run follows
+            number = _decodeBlackCodeWord();
+            _setToBlack(out, lineOffset, bitOffset, number);
+            bitOffset += number;
+            cce[currIndex++] = bitOffset;
 
-        number = decodeWhiteCodeWord();
-                          bitOffset += number;
-        cce[currIndex++] = bitOffset;
+            number = _decodeWhiteCodeWord();
+            bitOffset += number;
+            cce[currIndex++] = bitOffset;
           }
 
           a0 = bitOffset;
-      } else if (code <= 8) { // Vertical
+        } else if (code <= 8) { // Vertical
           a1 = b1 + (code - 5);
           cce[currIndex++] = a1;
 
           // We write the current color till a1 - 1 pos,
           // since a1 is where the next color starts
-                      if (!isWhite) {
-                          setToBlack(buffer, lineOffset, bitOffset,
-                                     a1 - bitOffset);
-                      }
-                      bitOffset = a0 = a1;
-                      isWhite = !isWhite;
+          if (!isWhite) {
+            _setToBlack(out, lineOffset, bitOffset,
+            a1 - bitOffset);
+          }
+          bitOffset = a0 = a1;
+          isWhite = !isWhite;
 
-          updatePointer(7 - bits);
+          _updatePointer(7 - bits);
       } else if (code == 11) {
-          if (nextLesserThan8Bits(3) != 7) {
-        throw new Error("TIFFFaxDecoder5");
+          if (_nextLesserThan8Bits(3) != 7) {
+            throw new ImageException("TIFFFaxDecoder5");
           }
 
           int zeros = 0;
-          boolean exit = false;
+          bool exit = false;
 
           while (!exit) {
-        while (nextLesserThan8Bits(1) != 1) {
-            zeros++;
-        }
-
-        if (zeros > 5) {
-            // Exit code
-
-            // Zeros before exit code
-            zeros = zeros - 6;
-
-            if (!isWhite && (zeros > 0)) {
-          cce[currIndex++] = bitOffset;
+            while (_nextLesserThan8Bits(1) != 1) {
+              zeros++;
             }
 
-            // Zeros before the exit code
-                              bitOffset += zeros;
-            if (zeros > 0) {
-          // Some zeros have been written
-          isWhite = true;
-            }
+            if (zeros > 5) {
+              // Exit code
 
-            // Read in the bit which specifies the color of
-            // the following run
-            if (nextLesserThan8Bits(1) == 0) {
-          if (!isWhite) {
-              cce[currIndex++] = bitOffset;
-          }
-          isWhite = true;
-            } else {
-          if (isWhite) {
-              cce[currIndex++] = bitOffset;
-          }
-          isWhite = false;
-            }
+              // Zeros before exit code
+              zeros = zeros - 6;
 
-            exit = true;
-        }
-
-                          if (zeros == 5) {
-            if (!isWhite) {
+              if (!isWhite && (zeros > 0)) {
                 cce[currIndex++] = bitOffset;
+              }
+
+              // Zeros before the exit code
+              bitOffset += zeros;
+              if (zeros > 0) {
+                // Some zeros have been written
+                isWhite = true;
+              }
+
+              // Read in the bit which specifies the color of
+              // the following run
+              if (_nextLesserThan8Bits(1) == 0) {
+                if (!isWhite) {
+                  cce[currIndex++] = bitOffset;
+                }
+                isWhite = true;
+              } else {
+                if (isWhite) {
+                  cce[currIndex++] = bitOffset;
+                }
+                isWhite = false;
+              }
+
+              exit = true;
             }
-                              bitOffset += zeros;
 
-            // Last thing written was white
-            isWhite = true;
-        } else {
-                              bitOffset += zeros;
+            if (zeros == 5) {
+              if (!isWhite) {
+                cce[currIndex++] = bitOffset;
+              }
+              bitOffset += zeros;
 
-            cce[currIndex++] = bitOffset;
-                              setToBlack(buffer, lineOffset, bitOffset, 1);
-                              ++bitOffset;
+              // Last thing written was white
+              isWhite = true;
+            } else {
+              bitOffset += zeros;
 
-            // Last thing written was black
-            isWhite = false;
-        }
+              cce[currIndex++] = bitOffset;
+              _setToBlack(out, lineOffset, bitOffset, 1);
+              ++bitOffset;
 
+              // Last thing written was black
+              isWhite = false;
+            }
           }
-      } else {
-          throw new Error("TIFFFaxDecoder5");
-      }
+        } else {
+          throw new ImageException("TIFFFaxDecoder5");
         }
-
-        // Add the changing element beyond the current scanline for the
-        // other color too
-        cce[currIndex++] = bitOffset;
-
-        // Number of changing elements in this scanline.
-        changingElemSize = currIndex;
-
-              lineOffset += scanlineStride;
-    }
       }
 
+      // Add the changing element beyond the current scanline for the
+      // other color too
+      cce[currIndex++] = bitOffset;
+
+      // Number of changing elements in this scanline.
+      changingElemSize = currIndex;
+
+      lineOffset += scanlineStride;
+    }
+  }
 
 
-      // Returns run length
-       int decodeWhiteCodeWord() {
+
+  /**
+   * Returns run length
+   */
+  int _decodeWhiteCodeWord() {
     int current, entry, bits, isT, twoBits, code = -1;
-          int runLength = 0;
-    boolean isWhite = true;
+    int runLength = 0;
+    bool isWhite = true;
 
     while (isWhite) {
-        current = nextNBits(10);
-        entry = white[current];
-
-        // Get the 3 fields from the entry
-        isT = entry & 0x0001;
-        bits = (entry >>> 1) & 0x0f;
-
-        if (bits == 12) {           // Additional Make up code
-      // Get the next 2 bits
-      twoBits = nextLesserThan8Bits(2);
-      // Consolidate the 2 new bits and last 2 bits into 4 bits
-      current = ((current << 2) & 0x000c) | twoBits;
-      entry = additionalMakeup[current];
-      bits = (entry >>> 1) & 0x07;     // 3 bits 0000 0111
-      code = (entry >>> 4) & 0x0fff;   // 12 bits
-                  runLength += code;
-      updatePointer(4 - bits);
-        } else if (bits == 0) {     // ERROR
-      throw new Error("TIFFFaxDecoder0");
-        } else if (bits == 15) {    // EOL
-      throw new Error("TIFFFaxDecoder1");
-        } else {
-      // 11 bits - 0000 0111 1111 1111 = 0x07ff
-      code = (entry >>> 5) & 0x07ff;
-                  runLength += code;
-      updatePointer(10 - bits);
-      if (isT == 0) {
-          isWhite = false;
-      }
-        }
-    }
-
-    return runLength;
-      }
-
-      // Returns run length
-       int decodeBlackCodeWord() {
-    int current, entry, bits, isT, code = -1;
-          int runLength = 0;
-    boolean isWhite = false;
-
-    while (!isWhite) {
-        current = nextLesserThan8Bits(4);
-        entry = initBlack[current];
-
-        // Get the 3 fields from the entry
-        isT = entry & 0x0001;
-        bits = (entry >>> 1) & 0x000f;
-        code = (entry >>> 5) & 0x07ff;
-
-        if (code == 100) {
-      current = nextNBits(9);
-      entry = black[current];
+      current = _nextNBits(10);
+      entry = WHITE[current];
 
       // Get the 3 fields from the entry
       isT = entry & 0x0001;
-      bits = (entry >>> 1) & 0x000f;
-      code = (entry >>> 5) & 0x07ff;
+      bits = (entry >> 1) & 0x0f;
 
-      if (bits == 12) {
-          // Additional makeup codes
-          updatePointer(5);
-          current = nextLesserThan8Bits(4);
-          entry = additionalMakeup[current];
-          bits = (entry >>> 1) & 0x07;     // 3 bits 0000 0111
-          code  = (entry >>> 4) & 0x0fff;  // 12 bits
-                      runLength += code;
-
-          updatePointer(4 - bits);
-      } else if (bits == 15) {
-          // EOL code
-          throw new Error("TIFFFaxDecoder2");
+      if (bits == 12) {           // Additional Make up code
+        // Get the next 2 bits
+        twoBits = _nextLesserThan8Bits(2);
+        // Consolidate the 2 new bits and last 2 bits into 4 bits
+        current = ((current << 2) & 0x000c) | twoBits;
+        entry = ADDITIONAL_MAKEUP[current];
+        bits = (entry >> 1) & 0x07;     // 3 bits 0000 0111
+        code = (entry >> 4) & 0x0fff;   // 12 bits
+        runLength += code;
+        _updatePointer(4 - bits);
+      } else if (bits == 0) {     // ERROR
+        throw new ImageException("TIFFFaxDecoder0");
+      } else if (bits == 15) {    // EOL
+        throw new ImageException("TIFFFaxDecoder1");
       } else {
-                      runLength += code;
-          updatePointer(9 - bits);
-          if (isT == 0) {
-        isWhite = true;
-          }
-      }
-        } else if (code == 200) {
-      // Is a Terminating code
-      current = nextLesserThan8Bits(2);
-      entry = twoBitBlack[current];
-      code = (entry >>> 5) & 0x07ff;
-                  runLength += code;
-      bits = (entry >>> 1) & 0x0f;
-      updatePointer(2 - bits);
-      isWhite = true;
-        } else {
-      // Is a Terminating code
-                  runLength += code;
-      updatePointer(4 - bits);
-      isWhite = true;
+        // 11 bits - 0000 0111 1111 1111 = 0x07ff
+        code = (entry >> 5) & 0x07ff;
+        runLength += code;
+        _updatePointer(10 - bits);
+        if (isT == 0) {
+          isWhite = false;
         }
+      }
     }
 
     return runLength;
-      }
+  }
 
-       int readEOL() {
+  /**
+   * Returns run length
+   */
+  int _decodeBlackCodeWord() {
+    int current, entry, bits, isT, code = -1;
+    int runLength = 0;
+    bool isWhite = false;
+
+    while (!isWhite) {
+      current = _nextLesserThan8Bits(4);
+      entry = INIT_BLACK[current];
+
+      // Get the 3 fields from the entry
+      isT = entry & 0x0001;
+      bits = (entry >> 1) & 0x000f;
+      code = (entry >> 5) & 0x07ff;
+
+      if (code == 100) {
+        current = _nextNBits(9);
+        entry = BLACK[current];
+
+        // Get the 3 fields from the entry
+        isT = entry & 0x0001;
+        bits = (entry >> 1) & 0x000f;
+        code = (entry >> 5) & 0x07ff;
+
+        if (bits == 12) {
+          // Additional makeup codes
+          _updatePointer(5);
+          current = _nextLesserThan8Bits(4);
+          entry = ADDITIONAL_MAKEUP[current];
+          bits = (entry >> 1) & 0x07;     // 3 bits 0000 0111
+          code  = (entry >> 4) & 0x0fff;  // 12 bits
+          runLength += code;
+
+          _updatePointer(4 - bits);
+        } else if (bits == 15) {
+          // EOL code
+          throw new ImageException("TIFFFaxDecoder2");
+        } else {
+          runLength += code;
+          _updatePointer(9 - bits);
+          if (isT == 0) {
+            isWhite = true;
+          }
+        }
+      } else if (code == 200) {
+        // Is a Terminating code
+        current = _nextLesserThan8Bits(2);
+        entry = TWO_BIT_BLACK[current];
+        code = (entry >> 5) & 0x07ff;
+        runLength += code;
+        bits = (entry >> 1) & 0x0f;
+        _updatePointer(2 - bits);
+        isWhite = true;
+      } else {
+        // Is a Terminating code
+        runLength += code;
+        _updatePointer(4 - bits);
+        isWhite = true;
+      }
+    }
+
+    return runLength;
+  }
+
+  int _readEOL() {
     if (fillBits == 0) {
-        if (nextNBits(12) != 1) {
-      throw new Error("TIFFFaxDecoder6");
-        }
+      if (_nextNBits(12) != 1) {
+        throw new ImageException("TIFFFaxDecoder6");
+      }
     } else if (fillBits == 1) {
+      // First EOL code word xxxx 0000 0000 0001 will occur
+      // As many fill bits will be present as required to make
+      // the EOL code of 12 bits end on a byte boundary.
+      int bitsLeft = 8 - bitPointer;
 
-        // First EOL code word xxxx 0000 0000 0001 will occur
-        // As many fill bits will be present as required to make
-        // the EOL code of 12 bits end on a byte boundary.
-
-        int bitsLeft = 8 - bitPointer;
-
-        if (nextNBits(bitsLeft) != 0) {
-          throw new Error("TIFFFaxDecoder8");
-        }
-
-        // If the number of bitsLeft is less than 8, then to have a 12
-        // bit EOL sequence, two more bytes are certainly going to be
-        // required. The first of them has to be all zeros, so ensure
-        // that.
-        if (bitsLeft < 4) {
-      if (nextNBits(8) != 0) {
-          throw new Error("TIFFFaxDecoder8");
+      if (_nextNBits(bitsLeft) != 0) {
+        throw new ImageException("TIFFFaxDecoder8");
       }
+
+      // If the number of bitsLeft is less than 8, then to have a 12
+      // bit EOL sequence, two more bytes are certainly going to be
+      // required. The first of them has to be all zeros, so ensure
+      // that.
+      if (bitsLeft < 4) {
+        if (_nextNBits(8) != 0) {
+          throw new ImageException("TIFFFaxDecoder8");
         }
-
-        // There might be a random number of fill bytes with 0s, so
-        // loop till the EOL of 0000 0001 is found, as long as all
-        // the bytes preceding it are 0's.
-        int n;
-        while ((n = nextNBits(8)) != 1) {
-
-      // If not all zeros
-      if (n != 0) {
-          throw new Error("TIFFFaxDecoder8");
       }
+
+      // There might be a random number of fill bytes with 0s, so
+      // loop till the EOL of 0000 0001 is found, as long as all
+      // the bytes preceding it are 0's.
+      int n;
+      while ((n = _nextNBits(8)) != 1) {
+        // If not all zeros
+        if (n != 0) {
+          throw new ImageException("TIFFFaxDecoder8");
         }
+      }
     }
 
     // If one dimensional encoding mode, then always return 1
     if (oneD == 0) {
-        return 1;
+      return 1;
     } else {
-        // Otherwise for 2D encoding mode,
-        // The next one bit signifies 1D/2D encoding of next line.
-        return nextLesserThan8Bits(1);
+      // Otherwise for 2D encoding mode,
+      // The next one bit signifies 1D/2D encoding of next line.
+      return _nextLesserThan8Bits(1);
     }
+  }
+
+  void _getNextChangingElement(int a0, bool isWhite, List<int> ret) {
+    // Local copies of instance variables
+    List<int> pce = this.prevChangingElems;
+    int ces = this.changingElemSize;
+
+    // If the previous match was at an odd element, we still
+    // have to search the preceeding element.
+    // int start = lastChangingElement & ~0x1;
+    int start = lastChangingElement > 0 ? lastChangingElement - 1 : 0;
+    if (isWhite) {
+      start &= ~0x1; // Search even numbered elements
+    } else {
+      start |= 0x1; // Search odd numbered elements
+    }
+
+    int i = start;
+    for (; i < ces; i += 2) {
+      int temp = pce[i];
+      if (temp > a0) {
+        lastChangingElement = i;
+        ret[0] = temp;
+        break;
       }
+    }
 
-       void getNextChangingElement(int a0, boolean isWhite, int[] ret) {
-          // Local copies of instance variables
-          int[] pce = this.prevChangingElems;
-          int ces = this.changingElemSize;
-
-          // If the previous match was at an odd element, we still
-          // have to search the preceeding element.
-          // int start = lastChangingElement & ~0x1;
-          int start = lastChangingElement > 0 ? lastChangingElement - 1 : 0;
-          if (isWhite) {
-              start &= ~0x1; // Search even numbered elements
-          } else {
-              start |= 0x1; // Search odd numbered elements
-          }
-
-          int i = start;
-          for (; i < ces; i += 2) {
-              int temp = pce[i];
-              if (temp > a0) {
-                  lastChangingElement = i;
-                  ret[0] = temp;
-                  break;
-              }
-          }
-
-          if (i + 1 < ces) {
-              ret[1] = pce[i + 1];
-          }
-      }*/
+    if (i + 1 < ces) {
+      ret[1] = pce[i + 1];
+    }
+  }
 
   void _setToBlack(Buffer buffer, int lineOffset, int bitOffset, int numBits) {
     int bitNum = 8 * lineOffset + bitOffset;
@@ -768,97 +759,94 @@ class TiffFaxDecoder {
   }
 
   int _nextNBits(int bitsToGet) {
-    return 0;
-    /*byte b, next, next2next;
+    int b, next, next2next;
     int l = data.length - 1;
-          int bp = this.bytePointer;
+    int bp = this.bytePointer;
 
     if (fillOrder == 1) {
-        b = data[bp];
+      b = data[bp];
 
-        if (bp == l) {
-      next = 0x00;
-      next2next = 0x00;
-        } else if ((bp + 1) == l) {
-      next = data[bp + 1];
-      next2next = 0x00;
-        } else {
-      next = data[bp + 1];
-      next2next = data[bp + 2];
-        }
+      if (bp == l) {
+        next = 0x00;
+        next2next = 0x00;
+      } else if ((bp + 1) == l) {
+        next = data[bp + 1];
+        next2next = 0x00;
+      } else {
+        next = data[bp + 1];
+        next2next = data[bp + 2];
+      }
     } else if (fillOrder == 2) {
-        b = flipTable[data[bp] & 0xff];
+      b = FLIP_TABLE[data[bp] & 0xff];
 
-        if (bp == l) {
-      next = 0x00;
-      next2next = 0x00;
-        } else if ((bp + 1) == l) {
-      next = flipTable[data[bp + 1] & 0xff];
-      next2next = 0x00;
-        } else {
-      next = flipTable[data[bp + 1] & 0xff];
-      next2next = flipTable[data[bp + 2] & 0xff];
-        }
+      if (bp == l) {
+        next = 0x00;
+        next2next = 0x00;
+      } else if ((bp + 1) == l) {
+        next = FLIP_TABLE[data[bp + 1] & 0xff];
+        next2next = 0x00;
+      } else {
+        next = FLIP_TABLE[data[bp + 1] & 0xff];
+        next2next = FLIP_TABLE[data[bp + 2] & 0xff];
+      }
     } else {
-        throw new Error("TIFFFaxDecoder7");
+      throw new ImageException("TIFFFaxDecoder7");
     }
 
     int bitsLeft = 8 - bitPointer;
     int bitsFromNextByte = bitsToGet - bitsLeft;
     int bitsFromNext2NextByte = 0;
     if (bitsFromNextByte > 8) {
-        bitsFromNext2NextByte = bitsFromNextByte - 8;
-        bitsFromNextByte = 8;
+      bitsFromNext2NextByte = bitsFromNextByte - 8;
+      bitsFromNextByte = 8;
     }
 
     bytePointer++;
 
-    int i1 = (b & table1[bitsLeft]) << (bitsToGet - bitsLeft);
-    int i2 = (next & table2[bitsFromNextByte]) >>> (8 - bitsFromNextByte);
+    int i1 = (b & TABLE1[bitsLeft]) << (bitsToGet - bitsLeft);
+    int i2 = (next & TABLE2[bitsFromNextByte]) >> (8 - bitsFromNextByte);
 
     int i3 = 0;
     if (bitsFromNext2NextByte != 0) {
-        i2 <<= bitsFromNext2NextByte;
-        i3 = (next2next & table2[bitsFromNext2NextByte]) >>>
-      (8 - bitsFromNext2NextByte);
-        i2 |= i3;
-        bytePointer++;
-        bitPointer = bitsFromNext2NextByte;
-    } else {
-        if (bitsFromNextByte == 8) {
-      bitPointer = 0;
+      i2 <<= bitsFromNext2NextByte;
+      i3 = (next2next & TABLE2[bitsFromNext2NextByte]) >>
+           (8 - bitsFromNext2NextByte);
+      i2 |= i3;
       bytePointer++;
-        } else {
-      bitPointer = bitsFromNextByte;
-        }
+      bitPointer = bitsFromNext2NextByte;
+    } else {
+      if (bitsFromNextByte == 8) {
+        bitPointer = 0;
+        bytePointer++;
+      } else {
+        bitPointer = bitsFromNextByte;
+      }
     }
 
-    int i = i1 | i2;
-    return i;*/
+    return i1 | i2;
   }
 
   int _nextLesserThan8Bits(int bitsToGet) {
-    return 0;
-    /*byte b, next;
+    int b, next;
     int l = data.length - 1;
-          int bp = this.bytePointer;
+    int bp = this.bytePointer;
 
     if (fillOrder == 1) {
-        b = data[bp];
-        if (bp == l) {
-      next = 0x00;
-        } else {
-      next = data[bp + 1];
-        }
+      b = data[bp];
+      if (bp == l) {
+        next = 0x00;
+      } else {
+        next = data[bp + 1];
+      }
     } else if (fillOrder == 2) {
-        b = flipTable[data[bp] & 0xff];
-        if (bp == l) {
-      next = 0x00;
-        } else {
-      next = flipTable[data[bp + 1] & 0xff];
-        }
+      b = FLIP_TABLE[data[bp] & 0xff];
+      if (bp == l) {
+        next = 0x00;
+      } else {
+        next = FLIP_TABLE[data[bp + 1] & 0xff];
+      }
     } else {
-        throw new Error("TIFFFaxDecoder7");
+      throw new ImageException("TIFFFaxDecoder7");
     }
 
     int bitsLeft = 8 - bitPointer;
@@ -867,22 +855,22 @@ class TiffFaxDecoder {
     int shift = bitsLeft - bitsToGet;
     int i1, i2;
     if (shift >= 0) {
-        i1 = (b & table1[bitsLeft]) >>> shift;
-        bitPointer += bitsToGet;
-        if (bitPointer == 8) {
-      bitPointer = 0;
-      bytePointer++;
-        }
-    } else {
-        i1 = (b & table1[bitsLeft]) << (-shift);
-        i2 = (next & table2[bitsFromNextByte]) >>> (8 - bitsFromNextByte);
-
-        i1 |= i2;
+      i1 = (b & TABLE1[bitsLeft]) >> shift;
+      bitPointer += bitsToGet;
+      if (bitPointer == 8) {
+        bitPointer = 0;
         bytePointer++;
-        bitPointer = bitsFromNextByte;
+      }
+    } else {
+      i1 = (b & TABLE1[bitsLeft]) << (-shift);
+      i2 = (next & TABLE2[bitsFromNextByte]) >> (8 - bitsFromNextByte);
+
+      i1 |= i2;
+      bytePointer++;
+      bitPointer = bitsFromNextByte;
     }
 
-    return i1;*/
+    return i1;
   }
 
   /**
@@ -899,7 +887,9 @@ class TiffFaxDecoder {
     }
   }
 
-  // Move to the next byte boundary
+  /**
+   * Move to the next byte boundary
+   */
   bool _advancePointer() {
     if (bitPointer != 0) {
       bytePointer++;
@@ -1225,14 +1215,14 @@ class TiffFaxDecoder {
     // 1016 - 1023
     232,    232,    232,    232,    232,    232,    232,    232];
 
-  // Additional make up codes for both White and Black runs
+  /// Additional make up codes for both White and Black runs
   static const List<int> ADDITIONAL_MAKEUP = const [
-    28679,  28679,  31752,  32777,
-    33801,  34825,  35849,  36873,
-    29703,  29703,  30727,  30727,
-    37897,  38921,  39945,  40969 ];
+    28679, 28679, 31752, -32759,
+    -31735, -30711, -29687, -28663,
+    29703, 29703, 30727, 30727,
+    -27639, -26615, -25591, -24567];
 
-  // Initial black run look up table, uses the first 4 bits of a code
+  /// Initial black run look up table, uses the first 4 bits of a code
   static const List<int> INIT_BLACK = const [
     // 0 - 7
     3226,  6412,    200,    168,    38,     38,    134,    134,

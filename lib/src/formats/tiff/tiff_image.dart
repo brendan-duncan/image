@@ -178,8 +178,8 @@ class TiffImage {
     tileSize = tileWidth * tileHeight * samplesPerPixel;
 
     fillOrder = _readTag(p, TAG_FILL_ORDER, 1);
-    t4Options = 0;
-    t6Options = 0;
+    t4Options = _readTag(p, TAG_T4_OPTIONS, 0);
+    t6Options = _readTag(p, TAG_T6_OPTIONS, 0);
 
     image = new Image(width, height);
 
@@ -232,15 +232,18 @@ class TiffImage {
 
     } else if (compression == COMP_FAX_G3_1D) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
-      //decoder.decode1D(bdata, data, 0, tileHeight);
+      new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
+          decode1D(bdata, p, 0, tileHeight);
 
     } else if (compression == COMP_FAX_G3_2D) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
-      //decoder.decode2D(bdata, data, 0, tileHeight, tiffT4Options);
+      new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
+                decode2D(bdata, p, 0, tileHeight, t4Options);
 
     } else if (compression == COMP_FAX_G4_2D) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
-      //decoder.decodeT6(bdata, data, 0, tileHeight, tiffT6Options);
+      new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
+          decodeT6(bdata, p, 0, tileHeight, t6Options);
 
     } else if (compression == COMP_ZIP) {
       List<int> data = p.toList(0, byteCount);
