@@ -1,49 +1,33 @@
 part of image;
 
-
-class TiffLZWDecoder {
-  int tableIndex;
-  int bitsToGet = 9;
-  int bytePointer;
-  int bitPointer;
-  int dstIndex;
-  int width;
-  int height;
-  int predictor;
-  int samplesPerPixel;
-  int nextData = 0;
-  int nextBits = 0;
-  Buffer data;
-  List<Uint8List> stringTable;
-  List<int> out;
-  int outIndex;
-
-  static const List<int> AND_TABLE = const [511, 1023, 2047, 4095];
-
-  TiffLZWDecoder(this.width, this.predictor, this.samplesPerPixel);
-
-  bool decode(Buffer p, List<int> out, int height) {
+/**
+ * TODO this is very slow!  Switch to link-list method GifDecoder is using,
+ * or, better yet, abstract the LzwDecoder and add to archive.
+ */
+class LzwDecoder {
+  void decode(Buffer p, List<int> out) {
     this.out = out;
+    int outLen = out.length;
     outIndex = 0;
     data = p;
+
     if (data[0] == 0x00 && data[1] == 0x01) {
-      throw new ImageException("TIFFLZWDecoder0");
+      throw new ImageException("Invalid LZW Data");
     }
 
     _initializeStringTable();
 
     bytePointer = 0;
     bitPointer = 0;
-    dstIndex = 0;
-
     nextData = 0;
     nextBits = 0;
 
     int code;
     int oldCode = 0;
-    Uint8List string;
+    List<int> string;
 
-    while (((code = _getNextCode()) != 257) && dstIndex != out.length) {
+    code = _getNextCode();
+    while ((code != 257) && outIndex != outLen) {
       if (code == 256) {
         _initializeStringTable();
         code = _getNextCode();
@@ -51,7 +35,7 @@ class TiffLZWDecoder {
           break;
         }
 
-        _writeString(stringTable[code]);
+        out[outIndex++] = code;
         oldCode = code;
       } else {
         if (code < tableIndex) {
@@ -67,37 +51,23 @@ class TiffLZWDecoder {
           oldCode = code;
         }
       }
-    }
 
-    // Horizontal Differencing Predictor
-    if (predictor == 2) {
-      int count;
-      for (int j = 0; j < height; j++) {
-        count = samplesPerPixel * (j * width + 1);
-        for (int i = samplesPerPixel; i < width * samplesPerPixel; i++) {
-          out[count] += out[count - samplesPerPixel];
-          count++;
-        }
-      }
+      code = _getNextCode();
     }
-
-    return true;
   }
 
   /**
    * Write out the string just uncompressed.
    */
-  void _writeString(Uint8List string) {
-    for (int i = 0; i < string.length; i++) {
+  void _writeString(List<int> string) {
+    for (int i = 0, len = string.length; i < len; i++) {
       out[outIndex++] = string[i];
     }
   }
 
-  void _addStringToTable(Uint8List oldString, int newString) {
-    int length = oldString.length;
-    Uint8List string = new Uint8List(length + 1);
-    string.setRange(0, length, oldString);
-    string[length] = newString;
+  void _addStringToTable(List<int> string, int newString) {
+    string = new List<int>.from(string);
+    string.add(newString);
 
     // Add this new String to the table
     stringTable[tableIndex++] = string;
@@ -111,7 +81,7 @@ class TiffLZWDecoder {
     }
   }
 
-  void _addNewStringToTable(Uint8List string) {
+  void _addNewStringToTable(List<int> string) {
     // Add this new String to the table
     stringTable[tableIndex++] = string;
 
@@ -127,11 +97,9 @@ class TiffLZWDecoder {
   /**
    * Append [newString] to the end of [oldString].
    */
-  Uint8List _composeString(Uint8List oldString, int newString) {
-    int length = oldString.length;
-    Uint8List string = new Uint8List(length + 1);
-    string.setRange(0, length, oldString);
-    string[length] = newString;
+  List<int> _composeString(List<int> string, int newString) {
+    string = new List<int>.from(string);
+    string.add(newString);
     return string;
   }
 
@@ -167,13 +135,27 @@ class TiffLZWDecoder {
    * Initialize the string table.
    */
   void _initializeStringTable() {
-    stringTable = new List<Uint8List>(4096);
+    stringTable = new List<List<int>>(LZ_MAX_CODE + 1);
     for (int i = 0; i < 256; i++) {
-      Uint8List l = new Uint8List(1);
-      l[0] = i;
-      stringTable[i] = l;
+      stringTable[i] = [i];
     }
     tableIndex = 258;
     bitsToGet = 9;
   }
+
+  int tableIndex;
+  int bitsToGet = 9;
+  int bytePointer = 0;
+  int bitPointer = 0;
+  int nextData = 0;
+  int nextBits = 0;
+  Buffer data;
+
+  List<List<int>> stringTable;
+  List<int> out;
+  int outIndex;
+
+  static const int LZ_MAX_CODE = 4095;
+  static const int NO_SUCH_CODE = 4098;
+  static const List<int> AND_TABLE = const [511, 1023, 2047, 4095];
 }

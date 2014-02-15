@@ -24,6 +24,7 @@ class TiffImage {
   int fillOrder;
   int t4Options;
   int t6Options;
+  int extraSamples;
   Image image;
 
   TiffImage(Buffer p) {
@@ -69,6 +70,47 @@ class TiffImage {
     if (photometricType == 0) {
       isWhiteZero = true;
     }
+
+    // TODO use strip offsets/counts.
+    if (hasTag(TAG_TILE_OFFSETS)) {
+      tiled = true;
+      // Image is in tiled format
+      tileWidth = _readTag(p3, TAG_TILE_WIDTH);
+      tileHeight = _readTag(p3, TAG_TILE_LENGTH);
+      tileOffsets = _readTagList(p3, TAG_TILE_OFFSETS);
+      tileByteCounts = _readTagList(p3, TAG_TILE_BYTE_COUNTS);
+    } else {
+      tiled = false;
+
+      tileWidth = _readTag(p3, TAG_TILE_WIDTH, width);
+      if (!hasTag(TAG_ROWS_PER_STRIP)) {
+        tileHeight = _readTag(p3, TAG_TILE_LENGTH, height);
+      } else {
+        int l = _readTag(p3, TAG_ROWS_PER_STRIP);
+        int infinity = 1;
+        infinity = (infinity << 32) - 1;
+        if (l == infinity) {
+          // 2^32 - 1 (effectively infinity, entire image is 1 strip)
+          tileHeight = height;
+        } else {
+          tileHeight = l;
+        }
+      }
+
+      tileOffsets = _readTagList(p3, TAG_STRIP_OFFSETS);
+      tileByteCounts = _readTagList(p3, TAG_STRIP_BYTE_COUNTS);
+    }
+
+    // Calculate number of tiles and the tileSize in bytes
+    tilesX = (width + tileWidth - 1) ~/ tileWidth;
+    tilesY = (height + tileHeight - 1) ~/ tileHeight;
+    tileSize = tileWidth * tileHeight * samplesPerPixel;
+
+    fillOrder = _readTag(p3, TAG_FILL_ORDER, 1);
+    t4Options = _readTag(p3, TAG_T4_OPTIONS, 0);
+    t6Options = _readTag(p3, TAG_T6_OPTIONS, 0);
+    extraSamples = _readTag(p3, TAG_EXTRA_SAMPLES, 0);
+
 
     // Determine which kind of image we are dealing with.
     switch (photometricType) {
@@ -141,46 +183,6 @@ class TiffImage {
   }
 
   Image decode(Buffer p) {
-    int extraSamples = _readTag(p, TAG_EXTRA_SAMPLES, 0);
-
-    if (hasTag(TAG_TILE_OFFSETS)) {
-      tiled = true;
-      // Image is in tiled format
-      tileWidth = _readTag(p, TAG_TILE_WIDTH);
-      tileHeight = _readTag(p, TAG_TILE_LENGTH);
-      tileOffsets = _readTagList(p, TAG_TILE_OFFSETS);
-      tileByteCounts = _readTagList(p, TAG_TILE_BYTE_COUNTS);
-    } else {
-      tiled = false;
-
-      tileWidth = _readTag(p, TAG_TILE_WIDTH, width);
-      if (!hasTag(TAG_ROWS_PER_STRIP)) {
-        tileHeight = _readTag(p, TAG_TILE_LENGTH, height);
-      } else {
-        int l = _readTag(p, TAG_ROWS_PER_STRIP);
-        int infinity = 1;
-        infinity = (infinity << 32) - 1;
-        if (l == infinity) {
-          // 2^32 - 1 (effectively infinity, entire image is 1 strip)
-          tileHeight = height;
-        } else {
-          tileHeight = l;
-        }
-      }
-
-      tileOffsets = _readTagList(p, TAG_STRIP_OFFSETS);
-      tileByteCounts = _readTagList(p, TAG_STRIP_BYTE_COUNTS);
-    }
-
-    // Calculate number of tiles and the tileSize in bytes
-    tilesX = (width + tileWidth - 1) ~/ tileWidth;
-    tilesY = (height + tileHeight - 1) ~/ tileHeight;
-    tileSize = tileWidth * tileHeight * samplesPerPixel;
-
-    fillOrder = _readTag(p, TAG_FILL_ORDER, 1);
-    t4Options = _readTag(p, TAG_T4_OPTIONS, 0);
-    t6Options = _readTag(p, TAG_T6_OPTIONS, 0);
-
     image = new Image(width, height);
 
     for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
@@ -199,7 +201,73 @@ class TiffImage {
     // bilevel, palette-RGB, 4-bit grayscale, and everything else.
     if (imageType == TYPE_BILEVEL) {
       _decodeBilevelTile(p, tileX, tileY);
+      return;
     }
+
+
+    int tileIndex = tileY * tilesX + tileX;
+    p.offset = tileOffsets[tileIndex];
+
+    int outX = tileX * tileWidth;
+    int outY = tileY * tileHeight;
+
+    int byteCount = tileByteCounts[tileIndex];
+    int bytesInThisTile = tileWidth * tileHeight * samplesPerPixel;
+
+    Buffer bdata;
+    if (bitsPerSample == 8) {
+      if (compression == COMP_NONE) {
+        bdata = p;
+
+      } else if (compression == COMP_LZW) {
+        bdata = new Buffer(new Uint8List(bytesInThisTile));
+        /*LzwDecoder decoder = new LzwDecoder();
+        decoder.decode(new Buffer.from(p, 0, byteCount), bdata.data);
+        // Horizontal Differencing Predictor
+        if (predictor == 2) {
+          int count;
+          for (int j = 0; j < height; j++) {
+            count = samplesPerPixel * (j * width + 1);
+            for (int i = samplesPerPixel; i < width * samplesPerPixel; i++) {
+              bdata[count] += bdata[count - samplesPerPixel];
+              count++;
+            }
+          }
+        }*/
+
+      } else if (compression == COMP_PACKBITS) {
+        bdata = new Buffer(new Uint8List(bytesInThisTile));
+        _decodePackbits(p, bytesInThisTile, bdata.data);
+
+      } else if (compression == COMP_DEFLATE) {
+        List<int> data = p.toList(0, byteCount);
+        List<int> outData = new Inflate(data).getBytes();
+        bdata = new Buffer(outData);
+
+      } else if (compression == COMP_ZIP) {
+        List<int> data = p.toList(0, byteCount);
+        List<int> outData = new ZLibDecoder().decodeBytes(data);
+        bdata = new Buffer(outData);
+      }
+
+      for (int y = 0, py = outY, pi = 0; y < tileHeight; ++y, ++py) {
+        for (int x = 0, px = outX; x < tileWidth; ++x, ++px) {
+          if (samplesPerPixel == 3) {
+            int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], 255);
+            image.setPixel(px, py, c);
+          } else {
+            int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], bdata[pi++]);
+            image.setPixel(px, py, c);
+          }
+        }
+      }
+    } else {
+      throw new ImageException('Unsupported bitsPerSample: $bitsPerSample');
+    }
+  }
+
+  void _decodeRGBTile(Buffer p, int tileX, int tileY) {
+
   }
 
   void _decodeBilevelTile(Buffer p, int tileX, int tileY) {
@@ -226,9 +294,21 @@ class TiffImage {
 
     } else if (compression == COMP_LZW) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
-      TiffLZWDecoder decoder = new TiffLZWDecoder(tileWidth, predictor,
-                                                  samplesPerPixel);
-      decoder.decode(new Buffer.from(p, 0, byteCount), bdata.data, tileHeight);
+
+      LzwDecoder decoder = new LzwDecoder();
+      decoder.decode(new Buffer.from(p, 0, byteCount), bdata.data);
+
+      // Horizontal Differencing Predictor
+      if (predictor == 2) {
+        int count;
+        for (int j = 0; j < height; j++) {
+          count = samplesPerPixel * (j * width + 1);
+          for (int i = samplesPerPixel; i < width * samplesPerPixel; i++) {
+            bdata[count] += bdata[count - samplesPerPixel];
+            count++;
+          }
+        }
+      }
 
     } else if (compression == COMP_FAX_G3_1D) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));

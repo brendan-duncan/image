@@ -26,6 +26,7 @@ class TiffDecoder extends Decoder {
       print('  bitsPerSample: ${d.bitsPerSample}');
       print('  samplesPerPixel: ${d.samplesPerPixel}');
       print('  imageType: ${d.imageType}');
+      print('  isTiled: ${d.tiled}');
     }
 
     return info.images[frame].decode(ptr);
@@ -87,5 +88,4 @@ class TiffDecoder extends Decoder {
   static const int TIFF_SIGNATURE = 42;
   static const int TIFF_LITTLE_ENDIAN = 0x4949;
   static const int TIFF_BIG_ENDIAN = 0x4d4d;
-
 }

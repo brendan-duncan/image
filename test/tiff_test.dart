@@ -18,10 +18,10 @@ void defineTiffTests() {
       }
 
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
+
       test('$name', () {
-        List<int> bytes = f.readAsBytesSync();
-        print('===============================');
         print(name);
+        List<int> bytes = f.readAsBytesSync();
         Image image = new TiffDecoder().decodeImage(bytes);
         if (image == null) {
           throw new ImageException('Unable to decode TIFF Image: $name.');
