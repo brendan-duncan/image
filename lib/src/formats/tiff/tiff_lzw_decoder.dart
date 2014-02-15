@@ -1,9 +1,5 @@
 part of image;
 
-/**
- * TODO this is very slow!  Switch to link-list method GifDecoder is using,
- * or, better yet, abstract the LzwDecoder and add to archive.
- */
 class LzwDecoder {
   void decode(Buffer p, List<int> out) {
     this.out = out;
@@ -12,7 +8,7 @@ class LzwDecoder {
     data = p;
 
     if (data[0] == 0x00 && data[1] == 0x01) {
-      throw new ImageException("Invalid LZW Data");
+      throw new ImageException('Invalid LZW Data');
     }
 
     _initializeStringTable();
@@ -38,16 +34,21 @@ class LzwDecoder {
         out[outIndex++] = code;
         oldCode = code;
       } else {
-        if (code < tableIndex) {
-          string = stringTable[code];
-          _writeString(string);
-          _addStringToTable(stringTable[oldCode], string[0]);
+        if (code < _tableIndex) {
+          _getString(code);
+          for (int i = _bufferLength - 1; i >= 0; --i) {
+            out[outIndex++] = _buffer[i];
+          }
+          _addString(oldCode, _buffer[_bufferLength - 1]);
           oldCode = code;
         } else {
-          string = stringTable[oldCode];
-          string = _composeString(string, string[0]);
-          _writeString(string);
-          _addNewStringToTable(string);
+          _getString(oldCode);
+          for (int i = _bufferLength - 1; i >= 0; --i) {
+            out[outIndex++] = _buffer[i];
+          }
+          out[outIndex++] = _buffer[_bufferLength - 1];
+          _addString(oldCode, _buffer[_bufferLength - 1]);
+
           oldCode = code;
         }
       }
@@ -56,51 +57,29 @@ class LzwDecoder {
     }
   }
 
-  /**
-   * Write out the string just uncompressed.
-   */
-  void _writeString(List<int> string) {
-    for (int i = 0, len = string.length; i < len; i++) {
-      out[outIndex++] = string[i];
-    }
-  }
+  void _addString(int string, int newString) {
+    _table[_tableIndex] = newString;
+    _prefix[_tableIndex] = string;
+    _tableIndex++;
 
-  void _addStringToTable(List<int> string, int newString) {
-    string = new List<int>.from(string);
-    string.add(newString);
-
-    // Add this new String to the table
-    stringTable[tableIndex++] = string;
-
-    if (tableIndex == 511) {
+    if (_tableIndex == 511) {
       bitsToGet = 10;
-    } else if (tableIndex == 1023) {
+    } else if (_tableIndex == 1023) {
       bitsToGet = 11;
-    } else if (tableIndex == 2047) {
+    } else if (_tableIndex == 2047) {
       bitsToGet = 12;
     }
   }
 
-  void _addNewStringToTable(List<int> string) {
-    // Add this new String to the table
-    stringTable[tableIndex++] = string;
-
-    if (tableIndex == 511) {
-      bitsToGet = 10;
-    } else if (tableIndex == 1023) {
-      bitsToGet = 11;
-    } else if (tableIndex == 2047) {
-      bitsToGet = 12;
+  void _getString(int code) {
+    _bufferLength = 0;
+    int c = code;
+    _buffer[_bufferLength++] = _table[c];
+    c = _prefix[c];
+    while (c != NO_SUCH_CODE) {
+      _buffer[_bufferLength++] = _table[c];
+      c = _prefix[c];
     }
-  }
-
-  /**
-   * Append [newString] to the end of [oldString].
-   */
-  List<int> _composeString(List<int> string, int newString) {
-    string = new List<int>.from(string);
-    string.add(newString);
-    return string;
   }
 
   /**
@@ -135,15 +114,19 @@ class LzwDecoder {
    * Initialize the string table.
    */
   void _initializeStringTable() {
-    stringTable = new List<List<int>>(LZ_MAX_CODE + 1);
+    _table = new Uint8List(LZ_MAX_CODE + 1);
+    _prefix = new Uint32List(LZ_MAX_CODE + 1);
+    _prefix.fillRange(0, _prefix.length, NO_SUCH_CODE);
+
     for (int i = 0; i < 256; i++) {
-      stringTable[i] = [i];
+      _table[i] = i;
     }
-    tableIndex = 258;
+
     bitsToGet = 9;
+
+    _tableIndex = 258;
   }
 
-  int tableIndex;
   int bitsToGet = 9;
   int bytePointer = 0;
   int bitPointer = 0;
@@ -151,9 +134,14 @@ class LzwDecoder {
   int nextBits = 0;
   Buffer data;
 
-  List<List<int>> stringTable;
   List<int> out;
   int outIndex;
+
+  Uint8List _buffer = new Uint8List(256);
+  Uint8List _table;
+  Uint32List _prefix;
+  int _tableIndex;
+  int _bufferLength;
 
   static const int LZ_MAX_CODE = 4095;
   static const int NO_SUCH_CODE = 4098;

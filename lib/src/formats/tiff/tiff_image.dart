@@ -204,7 +204,6 @@ class TiffImage {
       return;
     }
 
-
     int tileIndex = tileY * tilesX + tileX;
     p.offset = tileOffsets[tileIndex];
 
@@ -221,19 +220,21 @@ class TiffImage {
 
       } else if (compression == COMP_LZW) {
         bdata = new Buffer(new Uint8List(bytesInThisTile));
-        /*LzwDecoder decoder = new LzwDecoder();
+        LzwDecoder decoder = new LzwDecoder();
         decoder.decode(new Buffer.from(p, 0, byteCount), bdata.data);
+
         // Horizontal Differencing Predictor
         if (predictor == 2) {
           int count;
-          for (int j = 0; j < height; j++) {
-            count = samplesPerPixel * (j * width + 1);
-            for (int i = samplesPerPixel; i < width * samplesPerPixel; i++) {
+          for (int j = 0; j < tileHeight; j++) {
+            count = samplesPerPixel * (j * tileWidth + 1);
+            for (int i = samplesPerPixel, len = tileWidth * samplesPerPixel;
+                 i < len; i++) {
               bdata[count] += bdata[count - samplesPerPixel];
               count++;
             }
           }
-        }*/
+        }
 
       } else if (compression == COMP_PACKBITS) {
         bdata = new Buffer(new Uint8List(bytesInThisTile));
