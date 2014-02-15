@@ -468,7 +468,7 @@ class GifDecoder extends Decoder {
   int _decompressInput() {
     int code;
 
-    /* The image can't contain more than LZ_BITS per code. */
+    // The image can't contain more than LZ_BITS per code.
     if (_runningBits > LZ_BITS) {
       return null;
     }
@@ -538,7 +538,7 @@ class GifDecoder extends Decoder {
       _buffer.setRange(1, 1 + _buffer[0], _input.readBytes(_buffer[0]));
 
       nextByte = _buffer[1];
-      _buffer[1] = 2;    // We use now the second place as last char read!
+      _buffer[1] = 2; // We use now the second place as last char read!
       _buffer[0]--;
     } else {
       nextByte = _buffer[_buffer[1]++];
