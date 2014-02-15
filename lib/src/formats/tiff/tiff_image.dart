@@ -184,13 +184,11 @@ class TiffImage {
 
   Image decode(Buffer p) {
     image = new Image(width, height);
-
     for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
       for (int tileX = 0; tileX < tilesX; ++tileX, ++ti) {
         _decodeTile(p, tileX, tileY);
       }
     }
-
     return image;
   }
 
@@ -267,9 +265,6 @@ class TiffImage {
     }
   }
 
-  void _decodeRGBTile(Buffer p, int tileX, int tileY) {
-
-  }
 
   void _decodeBilevelTile(Buffer p, int tileX, int tileY) {
     int tileIndex = tileY * tilesX + tileX;

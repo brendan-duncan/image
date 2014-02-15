@@ -2,57 +2,59 @@ part of image;
 
 class LzwDecoder {
   void decode(Buffer p, List<int> out) {
-    this.out = out;
+    this._out = out;
     int outLen = out.length;
-    outIndex = 0;
-    data = p;
+    _outPointer = 0;
+    _data = p.data;
+    _dataLength = _data.length;
+    _bytePointer = p.offset;
 
-    if (data[0] == 0x00 && data[1] == 0x01) {
+    if (_data[0] == 0x00 && _data[1] == 0x01) {
       throw new ImageException('Invalid LZW Data');
     }
 
     _initializeStringTable();
 
-    bytePointer = 0;
-    bitPointer = 0;
-    nextData = 0;
-    nextBits = 0;
+    _bitPointer = 0;
+    _nextData = 0;
+    _nextBits = 0;
 
-    int code;
     int oldCode = 0;
-    List<int> string;
+    int num = 0;
 
-    code = _getNextCode();
-    while ((code != 257) && outIndex != outLen) {
+    int code = _getNextCode();
+    while ((code != 257) && _outPointer < outLen) {
       if (code == 256) {
         _initializeStringTable();
+        num++;
         code = _getNextCode();
         if (code == 257) {
           break;
         }
 
-        out[outIndex++] = code;
+        _out[_outPointer++] = code;
         oldCode = code;
       } else {
         if (code < _tableIndex) {
           _getString(code);
           for (int i = _bufferLength - 1; i >= 0; --i) {
-            out[outIndex++] = _buffer[i];
+            _out[_outPointer++] = _buffer[i];
           }
           _addString(oldCode, _buffer[_bufferLength - 1]);
           oldCode = code;
         } else {
           _getString(oldCode);
           for (int i = _bufferLength - 1; i >= 0; --i) {
-            out[outIndex++] = _buffer[i];
+            _out[_outPointer++] = _buffer[i];
           }
-          out[outIndex++] = _buffer[_bufferLength - 1];
+          _out[_outPointer++] = _buffer[_bufferLength - 1];
           _addString(oldCode, _buffer[_bufferLength - 1]);
 
           oldCode = code;
         }
       }
 
+      num++;
       code = _getNextCode();
     }
   }
@@ -63,11 +65,11 @@ class LzwDecoder {
     _tableIndex++;
 
     if (_tableIndex == 511) {
-      bitsToGet = 10;
+      _bitsToGet = 10;
     } else if (_tableIndex == 1023) {
-      bitsToGet = 11;
+      _bitsToGet = 11;
     } else if (_tableIndex == 2047) {
-      bitsToGet = 12;
+      _bitsToGet = 12;
     }
   }
 
@@ -86,26 +88,20 @@ class LzwDecoder {
    * Returns the next 9, 10, 11 or 12 bits
    */
   int _getNextCode() {
-    // Attempt to get the next code. The exception is caught to make
-    // this robust to cases wherein the EndOfInformation code has been
-    // omitted from a strip. Examples of such cases have been observed
-    // in practice.
-    if (data.isEOS) {
+    if (_bytePointer >= _dataLength) {
       return 257;
     }
-    nextData = (nextData << 8) | (data[bytePointer++] & 0xff);
-    nextBits += 8;
 
-    if (nextBits < bitsToGet) {
-      if (data.isEOS) {
+    while (_nextBits < _bitsToGet) {
+      if (_bytePointer >= _dataLength) {
         return 257;
       }
-      nextData = (nextData << 8) | (data[bytePointer++] & 0xff);
-      nextBits += 8;
+      _nextData = (((_nextData << 8) + _data[_bytePointer++])) & 0xffffffff;
+      _nextBits += 8;
     }
 
-    int code = (nextData >> (nextBits - bitsToGet)) & AND_TABLE[bitsToGet - 9];
-    nextBits -= bitsToGet;
+    _nextBits -= _bitsToGet;
+    int code = (_nextData >> _nextBits) & AND_TABLE[_bitsToGet - 9];
 
     return code;
   }
@@ -122,20 +118,21 @@ class LzwDecoder {
       _table[i] = i;
     }
 
-    bitsToGet = 9;
+    _bitsToGet = 9;
 
     _tableIndex = 258;
   }
 
-  int bitsToGet = 9;
-  int bytePointer = 0;
-  int bitPointer = 0;
-  int nextData = 0;
-  int nextBits = 0;
-  Buffer data;
+  int _bitsToGet = 9;
+  int _bytePointer = 0;
+  int _bitPointer = 0;
+  int _nextData = 0;
+  int _nextBits = 0;
+  Uint8List _data;
+  int _dataLength;
 
-  List<int> out;
-  int outIndex;
+  List<int> _out;
+  int _outPointer;
 
   Uint8List _buffer = new Uint8List(256);
   Uint8List _table;

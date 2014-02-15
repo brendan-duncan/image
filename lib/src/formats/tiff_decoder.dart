@@ -10,23 +10,11 @@ class TiffDecoder extends Decoder {
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {
-    Buffer ptr = new Buffer(data);
+    Buffer ptr = new Buffer(new Uint8List.fromList(data));
 
     TiffInfo info = _readHeader(ptr);
     if (info == null) {
       return null;
-    }
-
-    for (TiffImage d in info.images) {
-      print('IMAGE');
-      print('  width: ${d.width}');
-      print('  height: ${d.height}');
-      print('  photometricType: ${d.photometricType}');
-      print('  compression: ${d.compression}');
-      print('  bitsPerSample: ${d.bitsPerSample}');
-      print('  samplesPerPixel: ${d.samplesPerPixel}');
-      print('  imageType: ${d.imageType}');
-      print('  isTiled: ${d.tiled}');
     }
 
     return info.images[frame].decode(ptr);
