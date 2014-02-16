@@ -28,6 +28,7 @@ class LzwDecoder {
         _initializeStringTable();
         num++;
         code = _getNextCode();
+        _bufferLength = 0;
         if (code == 257) {
           break;
         }
@@ -134,7 +135,7 @@ class LzwDecoder {
   List<int> _out;
   int _outPointer;
 
-  Uint8List _buffer = new Uint8List(256);
+  Uint8List _buffer = new Uint8List(4096);
   Uint8List _table;
   Uint32List _prefix;
   int _tableIndex;

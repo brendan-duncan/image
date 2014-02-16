@@ -260,7 +260,8 @@ class TiffImage {
         List<int> data = p.toList(0, byteCount);
         JpegData jpeg = new JpegData();
         jpeg.read(data);
-        print('!!!!');
+        _jpegToImage(jpeg, image, outX, outY, tileWidth, tileHeight);
+        return;
       } else {
         throw new ImageException('Unsupported Compression Type: $compression');
       }
@@ -285,6 +286,60 @@ class TiffImage {
     }
   }
 
+  void _jpegToImage(JpegData jpeg, Image image, int outX, int outY,
+                    int tileWidth, int tileHeight) {
+    int width = tileWidth;
+    int height = tileHeight;
+    Uint8List data = jpeg.getData(width, height);
+    List components = jpeg.components;
+
+    int i = 0;
+    int j = 0;
+    switch (components.length) {
+      case 1: // Luminance
+        for (int y = 0; y < height; y++) {
+          for (int x = 0; x < width; x++) {
+            int Y = data[i++];
+            image.setPixel(x + outX, y + outY, getColor(Y, Y, Y, 255));
+          }
+        }
+        break;
+      case 3: // RGB
+        for (int y = 0; y < height; y++) {
+          for (int x = 0; x < width; x++) {
+            int R = data[i++];
+            int G = data[i++];
+            int B = data[i++];
+
+            int c = getColor(R, G, B, 255);
+            image.setPixel(x + outX, y + outY, c);
+          }
+        }
+        break;
+      case 4: // CMYK
+        for (int y = 0; y < height; y++) {
+          for (int x = 0; x < width; x++) {
+            int C = data[i++];
+            int M = data[i++];
+            int Y = data[i++];
+            int K = data[i++];
+
+            int R = 255 - _clamp(C * (1 - K ~/ 255) + K);
+            int G = 255 - _clamp(M * (1 - K ~/ 255) + K);
+            int B = 255 - _clamp(Y * (1 - K ~/ 255) + K);
+
+            image.setPixel(x + outX, y + outY, getColor(R, G, B, 255));
+          }
+        }
+        break;
+      default:
+        throw 'Unsupported color mode';
+    }
+  }
+
+  int _clamp(int i) {
+    return i < 0 ? 0 : i > 255 ? 255 : i;
+  }
 
   void _decodeBilevelTile(Buffer p, int tileX, int tileY) {
     int tileIndex = tileY * tilesX + tileX;
