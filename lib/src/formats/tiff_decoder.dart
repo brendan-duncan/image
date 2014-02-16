@@ -62,6 +62,9 @@ class TiffDecoder extends Decoder {
 
     while (offset != 0) {
       TiffImage img = new TiffImage(p2);
+      if (!img.isValid) {
+        break;
+      }
       info.images.add(img);
 
       offset = p2.readUint32();;

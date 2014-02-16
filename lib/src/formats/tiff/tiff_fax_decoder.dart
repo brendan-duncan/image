@@ -348,9 +348,6 @@ class TiffFaxDecoder {
     // Return values from getNextChangingElement
     List<int> b = new List<int>(2);
 
-    // uncompressedMode - have written some code for this, but this
-    // has not been tested due to lack of test images using this optional
-
     uncompressedMode = ((tiffT6Options & 0x02) >> 1);
 
     // Local cached reference
@@ -453,7 +450,7 @@ class TiffFaxDecoder {
           isWhite = !isWhite;
 
           _updatePointer(7 - bits);
-      } else if (code == 11) {
+        } else if (code == 11) {
           if (_nextLesserThan8Bits(3) != 7) {
             throw new ImageException("TIFFFaxDecoder5");
           }
@@ -520,7 +517,7 @@ class TiffFaxDecoder {
             }
           }
         } else {
-          throw new ImageException("TIFFFaxDecoder5");
+          throw new ImageException("TIFFFaxDecoder5 $code");
         }
       }
 

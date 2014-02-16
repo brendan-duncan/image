@@ -67,11 +67,15 @@ class TiffImage {
       }
     }
 
+    if (width == null || height == null || samplesPerPixel == null ||
+        bitsPerSample == null || compression == null) {
+      return;
+    }
+
     if (photometricType == 0) {
       isWhiteZero = true;
     }
 
-    // TODO use strip offsets/counts.
     if (hasTag(TAG_TILE_OFFSETS)) {
       tiled = true;
       // Image is in tiled format
@@ -182,6 +186,11 @@ class TiffImage {
     }
   }
 
+  bool get isValid => width != null && height != null &&
+                      samplesPerPixel != null &&
+                      bitsPerSample != null &&
+                      compression != null;
+
   Image decode(Buffer p) {
     image = new Image(width, height);
     for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
@@ -247,6 +256,17 @@ class TiffImage {
         List<int> data = p.toList(0, byteCount);
         List<int> outData = new ZLibDecoder().decodeBytes(data);
         bdata = new Buffer(outData);
+      } else if (compression == COMP_JPEG_OLD) {
+        List<int> data = p.toList(0, byteCount);
+        JpegData jpeg = new JpegData();
+        jpeg.read(data);
+        print('!!!!');
+      } else {
+        throw new ImageException('Unsupported Compression Type: $compression');
+      }
+
+      if (bdata == null) {
+        return;
       }
 
       for (int y = 0, py = outY, pi = 0; y < tileHeight; ++y, ++py) {
@@ -287,7 +307,6 @@ class TiffImage {
       }
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
       _decodePackbits(p, bytesInThisTile, bdata.data);
-
     } else if (compression == COMP_LZW) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
 
@@ -305,34 +324,43 @@ class TiffImage {
           }
         }
       }
-
     } else if (compression == COMP_FAX_G3_1D) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
-      new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
-          decode1D(bdata, p, 0, tileHeight);
-
+      try {
+        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
+            decode1D(bdata, p, 0, tileHeight);
+      } catch (_) {
+      }
     } else if (compression == COMP_FAX_G3_2D) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
-      new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
-                decode2D(bdata, p, 0, tileHeight, t4Options);
-
+      try {
+        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
+            decode2D(bdata, p, 0, tileHeight, t4Options);
+      } catch (_) {
+      }
     } else if (compression == COMP_FAX_G4_2D) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
-      new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
-          decodeT6(bdata, p, 0, tileHeight, t6Options);
-
+      try {
+        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
+            decodeT6(bdata, p, 0, tileHeight, t6Options);
+      } catch (_) {
+      }
     } else if (compression == COMP_ZIP) {
       List<int> data = p.toList(0, byteCount);
       List<int> outData = new ZLibDecoder().decodeBytes(data);
       bdata = new Buffer(outData);
-
     } else if (compression == COMP_DEFLATE) {
       List<int> data = p.toList(0, byteCount);
       List<int> outData = new Inflate(data).getBytes();
       bdata = new Buffer(outData);
-
     } else if (compression == COMP_NONE) {
       bdata = p;
+    } else {
+      throw new ImageException('Unsupported Compression Type: $compression');
+    }
+
+    if (bdata == null) {
+      return;
     }
 
     TiffBitReader br = new TiffBitReader(bdata);
@@ -394,9 +422,9 @@ class TiffImage {
 
   // Compression types
   static const int COMP_NONE = 1;
-  static const int COMP_FAX_G3_1D = 2;
-  static const int COMP_FAX_G3_2D = 3;
-  static const int COMP_FAX_G4_2D = 4;
+  static const int COMP_FAX_G3_1D = 2; // CCITT modified Huffman RLE
+  static const int COMP_FAX_G3_2D = 3; // CCITT Group 3 fax encoding
+  static const int COMP_FAX_G4_2D = 4; // CCITT Group 4 fax encoding
   static const int COMP_LZW = 5;
   static const int COMP_JPEG_OLD  = 6;
   static const int COMP_JPEG_TTN2 = 7;
