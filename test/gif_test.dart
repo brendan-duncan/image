@@ -21,27 +21,6 @@ void defineGifTests() {
         if (data == null) {
           throw new ImageException('Unable to parse Gif info: $name.');
         }
-
-        /*print(name);
-        print('  width: ${data.width}');
-        print('  height: ${data.height}');
-        print('  colorResolution: ${data.colorResolution}');
-        print('  backgroundColor: ${data.backgroundColor}');
-        if (data.globalColorMap != null) {
-          print('    colorMap: ${data.globalColorMap.numColors}');
-        }
-        print('  frames: ${data.frames.length}');
-        for (int i = 0, len = data.frames.length; i < len; ++i) {
-          print('    $i:');
-          print('      x: ${data.frames[i].x}');
-          print('      y: ${data.frames[i].y}');
-          print('      width: ${data.frames[i].width}');
-          print('      height: ${data.frames[i].height}');
-          if (data.frames[i].colorMap != null) {
-            print('      ColorMap: ${data.frames[i].colorMap.numColors}');
-          }
-        }
-        print('    isGif89: ${data.isGif89}');*/
       });
     }
   });

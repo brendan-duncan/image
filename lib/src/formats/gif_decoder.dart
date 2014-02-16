@@ -42,60 +42,63 @@ class GifDecoder extends Decoder {
       return null;
     }
 
-    while (!_input.isEOS) {
-      int recordType = _input.readByte();
-      switch (recordType) {
-        case IMAGE_DESC_RECORD_TYPE:
-          GifImageDesc gifImage = _skipImage();
-          if (gifImage == null) {
-            return null;
-          }
-          info.frames.add(gifImage);
-          break;
-        case EXTENSION_RECORD_TYPE:
-          int extCode = _input.readByte();
-          if (extCode == GRAPHIC_CONTROL_EXT) {
-            int blockSize =  _input.readByte();
-            int b = _input.readByte();
-            int duration = _input.readUint16();
-            int transparent = _input.readByte();
-            int endBlock = _input.readByte();
-            int disposalMethod = (b >> 3) & 0x7;
-            int userInput = (b >> 1) & 0x1;
-            int transparentFlag = b & 0x1;
-
-            recordType = _input.peekBytes(1)[0];
-            if (recordType == IMAGE_DESC_RECORD_TYPE) {
-              _input.skip(1);
-              GifImageDesc gifImage = _skipImage();
-              if (gifImage == null) {
-                return null;
-              }
-
-              gifImage.duration = duration;
-              gifImage.clearFrame = disposalMethod == 2;
-
-              if (transparentFlag != 0) {
-                if (gifImage.colorMap != null) {
-                  gifImage.colorMap.transparent = transparent;
-                } else if (info.globalColorMap != null) {
-                  info.globalColorMap.transparent = transparent;
-                }
-              }
-
-              info.frames.add(gifImage);
+    try {
+      while (!_input.isEOS) {
+        int recordType = _input.readByte();
+        switch (recordType) {
+          case IMAGE_DESC_RECORD_TYPE:
+            GifImageDesc gifImage = _skipImage();
+            if (gifImage == null) {
+              return info;
             }
-          } else {
-            _skipRemainder();
-          }
-          break;
-        case TERMINATE_RECORD_TYPE:
-          info.numFrames = info.frames.length;
-          _numFrames = info.numFrames;
-          return info;
-        default:
-          return null;
+            info.frames.add(gifImage);
+            break;
+          case EXTENSION_RECORD_TYPE:
+            int extCode = _input.readByte();
+            if (extCode == GRAPHIC_CONTROL_EXT) {
+              int blockSize =  _input.readByte();
+              int b = _input.readByte();
+              int duration = _input.readUint16();
+              int transparent = _input.readByte();
+              int endBlock = _input.readByte();
+              int disposalMethod = (b >> 3) & 0x7;
+              int userInput = (b >> 1) & 0x1;
+              int transparentFlag = b & 0x1;
+
+              recordType = _input.peekBytes(1)[0];
+              if (recordType == IMAGE_DESC_RECORD_TYPE) {
+                _input.skip(1);
+                GifImageDesc gifImage = _skipImage();
+                if (gifImage == null) {
+                  return info;
+                }
+
+                gifImage.duration = duration;
+                gifImage.clearFrame = disposalMethod == 2;
+
+                if (transparentFlag != 0) {
+                  if (gifImage.colorMap != null) {
+                    gifImage.colorMap.transparent = transparent;
+                  } else if (info.globalColorMap != null) {
+                    info.globalColorMap.transparent = transparent;
+                  }
+                }
+
+                info.frames.add(gifImage);
+              }
+            } else {
+              _skipRemainder();
+            }
+            break;
+          case TERMINATE_RECORD_TYPE:
+            info.numFrames = info.frames.length;
+            _numFrames = info.numFrames;
+            return info;
+          default:
+            break;
+        }
       }
+    } catch (error) {
     }
 
     info.numFrames = info.frames.length;
@@ -174,6 +177,9 @@ class GifDecoder extends Decoder {
   }
 
   GifImageDesc _skipImage() {
+    if (_input.isEOS) {
+      return null;
+    }
     GifImageDesc gifImage = new GifImageDesc(_input);
     _input.skip(1);
     _skipRemainder();
@@ -234,7 +240,7 @@ class GifDecoder extends Decoder {
             progressCallback(_frame, _numFrames, j, height);
           }
           if (!_getLine(line)) {
-            return null;
+            return image;
           }
           _updateImage(image, y, colorMap, line);
         }
@@ -245,7 +251,7 @@ class GifDecoder extends Decoder {
           progressCallback(_frame, _numFrames, y, height);
         }
         if (!_getLine(line)) {
-          return null;
+          return image;
         }
         _updateImage(image, y, colorMap, line);
       }
