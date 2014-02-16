@@ -442,7 +442,7 @@ class TiffImage {
     int dstCount = 0;
 
     while (dstCount < arraySize) {
-      int b = data[srcCount++];
+      int b = _uint8ToInt8(data[srcCount++]);
       if (b >= 0 && b <= 127) {
         // literal run packet
         for (int i = 0; i < (b + 1); ++i) {
@@ -460,6 +460,15 @@ class TiffImage {
       }
     }
   }
+
+  static int _uint8ToInt8(int d) {
+    _uint8ToInt8_uint8[0] = d;
+    return _uint8ToInt8_int8[0];
+  }
+
+  static final Uint8List _uint8ToInt8_uint8 = new Uint8List(1);
+  static final Int8List _uint8ToInt8_int8 =
+      new Int8List.view(_uint8ToInt8_uint8.buffer);
 
   int _readTag(Buffer p, int type, [int defaultValue = 0]) {
     if (!hasTag(type)) {
