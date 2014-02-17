@@ -34,8 +34,9 @@ class PngEncoder extends Encoder {
     _writeChunk(output, 'IHDR', chunk.getBytes());
 
     // Include room for the filter bytes (1 byte per row).
-    List<int> filteredImage = new List<int>((image.width * image.height *
-                                             image.format) + image.height);
+    List<int> filteredImage = new Uint8List((image.width * image.height *
+        image.format) + image.height);
+
     _filter(image, filteredImage);
 
     List<int> compressed = new ZLibEncoder().encode(filteredImage,
