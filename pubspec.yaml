@@ -5,7 +5,7 @@ description: Provides server and web apps the ability to load, manipulate, and s
 homepage: https://github.com/brendan-duncan/image
 documentation: https://github.com/brendan-duncan/image/wiki
 dependencies:
-  archive: '>=1.0.14'
+  archive: '>=1.0.15'
   xml: '>=0.9.5'
 dev_dependencies:
   crypto: '>=0.9.0 <1.0.0'
