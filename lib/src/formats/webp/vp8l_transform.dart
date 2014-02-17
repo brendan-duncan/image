@@ -460,39 +460,9 @@ class _VP8LMultipliers {
     // There's a bug in dart2js (issue 16497) that requires I do this a bit
     // convoluted to avoid having the optimizer butcher the code.
     int a = _uint8ToInt8(colorPred);
-    _uint8ToInt8_uint8_[0] = color;
-    int b = _uint8ToInt8_int8_[0];
+    int b = _uint8ToInt8(color);
     int d = _int32ToUint32(a * b);
     return d >> 5;
   }
 }
 
-/**
- * Binary conversion of a uint8 to an int8.  This is equivalent in C to
- * typecasting an unsigned char to a char.
- */
-int _uint8ToInt8(int d) {
-  _uint8ToInt8_uint8[0] = d;
-  return _uint8ToInt8_int8[0];
-}
-
-/**
- * Binary conversion of an int32 to a uint32. This is equivalent in C to
- * typecasting an int to an unsigned int.
- */
-int _int32ToUint32(int d) {
-  _int32ToUint32_int32[0] = d;
-  return _int32ToUint32_uint32[0];
-}
-
-final Uint8List _uint8ToInt8_uint8 = new Uint8List(1);
-final Int8List _uint8ToInt8_int8 =
-    new Int8List.view(_uint8ToInt8_uint8.buffer);
-
-final Uint8List _uint8ToInt8_uint8_ = new Uint8List(1);
-final Int8List _uint8ToInt8_int8_ =
-    new Int8List.view(_uint8ToInt8_uint8_.buffer);
-
-final Int32List _int32ToUint32_int32 = new Int32List(1);
-final Uint32List _int32ToUint32_uint32 =
-    new Uint32List.view(_int32ToUint32_int32.buffer);
