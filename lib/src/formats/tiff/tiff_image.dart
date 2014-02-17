@@ -5,9 +5,9 @@ class TiffImage {
   int width;
   int height;
   int photometricType;
-  int compression;
+  int compression = 1;
   int bitsPerSample = 1;
-  int samplesPerPixel;
+  int samplesPerPixel = 1;
   int imageType = TYPE_UNSUPPORTED;
   bool isWhiteZero = false;
   int predictor = 1;
@@ -21,10 +21,17 @@ class TiffImage {
   int tilesX;
   int tilesY;
   int tileSize;
-  int fillOrder;
-  int t4Options;
-  int t6Options;
+  int fillOrder = 1;
+  int t4Options = 0;
+  int t6Options = 0;
   int extraSamples;
+  List<int> colorMap;
+  /// Starting index in the [colorMap] for the red channel.
+  int colorMapRed;
+  /// Starting index in the [colorMap] for the green channel.
+  int colorMapGreen;
+  /// Starting index in the [colorMap] for the blue channel.
+  int colorMapBlue;
   Image image;
 
   TiffImage(Buffer p) {
@@ -32,11 +39,10 @@ class TiffImage {
 
     int numDirEntries = p.readUint16();
     for (int i = 0; i < numDirEntries; ++i) {
-      TiffEntry entry = new TiffEntry();
-
-      entry.tag = p.readUint16();
-      entry.type = p.readUint16();
-      entry.numValues = p.readUint32();
+      int tag = p.readUint16();
+      int type = p.readUint16();
+      int numValues = p.readUint32();
+      TiffEntry entry = new TiffEntry(tag, type, numValues);
 
       // The value for the tag is either stored in another location,
       // or within the tag itself (if the size fits in 4 bytes).
@@ -50,9 +56,9 @@ class TiffImage {
 
       tags[entry.tag] = entry;
 
-      if (entry.tag == TAG_WIDTH) {
+      if (entry.tag == TAG_IMAGE_WIDTH) {
         width = entry.readValue(p3);
-      } else if (entry.tag == TAG_LENGTH) {
+      } else if (entry.tag == TAG_IMAGE_LENGTH) {
         height = entry.readValue(p3);
       } else if (entry.tag == TAG_PHOTOMETRIC_INTERPRETATION) {
         photometricType = entry.readValue(p3);
@@ -64,12 +70,24 @@ class TiffImage {
         samplesPerPixel = entry.readValue(p3);
       } else if (entry.tag == TAG_PREDICTOR) {
         predictor = entry.readValue(p3);
+      } else if (entry.tag == TAG_COLOR_MAP) {
+        List<int> palette =
+        colorMap = entry.readValues(p3);
+        colorMapRed = 0;
+        colorMapGreen = colorMap.length ~/ 3;
+        colorMapBlue = colorMapGreen * 2;
       }
     }
 
-    if (width == null || height == null || samplesPerPixel == null ||
+    if (width == null || height == null ||
         bitsPerSample == null || compression == null) {
       return;
+    }
+
+    if (colorMap != null && bitsPerSample == 8) {
+      for (int i = 0, len = colorMap.length; i < len; ++i) {
+        colorMap[i] >>= 8;
+      }
     }
 
     if (photometricType == 0) {
@@ -115,7 +133,6 @@ class TiffImage {
     t6Options = _readTag(p3, TAG_T6_OPTIONS, 0);
     extraSamples = _readTag(p3, TAG_EXTRA_SAMPLES, 0);
 
-
     // Determine which kind of image we are dealing with.
     switch (photometricType) {
       case 0: // WhiteIsZero
@@ -158,7 +175,7 @@ class TiffImage {
         }
         break;
       case 6: // YCbCr
-        if (compression == COMP_JPEG_TTN2 &&
+        if (compression == COMPRESSION_JPEG &&
             bitsPerSample == 8 && samplesPerPixel == 3) {
           imageType = TYPE_RGB;
         } else {
@@ -219,17 +236,22 @@ class TiffImage {
 
     int byteCount = tileByteCounts[tileIndex];
     int bytesInThisTile = tileWidth * tileHeight * samplesPerPixel;
+    if (bitsPerSample == 16) {
+      bytesInThisTile *= 2;
+    }
 
     Buffer bdata;
-    if (bitsPerSample == 8) {
-      if (compression == COMP_NONE) {
+    if (bitsPerSample == 8 || bitsPerSample == 16) {
+      if (compression == COMPRESSION_NONE) {
         bdata = p;
 
-      } else if (compression == COMP_LZW) {
+      } else if (compression == COMPRESSION_LZW) {
         bdata = new Buffer(new Uint8List(bytesInThisTile));
         LzwDecoder decoder = new LzwDecoder();
-        decoder.decode(new Buffer.from(p, 0, byteCount), bdata.data);
-
+        try {
+          decoder.decode(new Buffer.from(p, 0, byteCount), bdata.data);
+        } catch (e) {
+        }
         // Horizontal Differencing Predictor
         if (predictor == 2) {
           int count;
@@ -242,21 +264,20 @@ class TiffImage {
             }
           }
         }
-
-      } else if (compression == COMP_PACKBITS) {
+      } else if (compression == COMPRESSION_PACKBITS) {
         bdata = new Buffer(new Uint8List(bytesInThisTile));
         _decodePackbits(p, bytesInThisTile, bdata.data);
 
-      } else if (compression == COMP_DEFLATE) {
+      } else if (compression == COMPRESSION_DEFLATE) {
         List<int> data = p.toList(0, byteCount);
         List<int> outData = new Inflate(data).getBytes();
         bdata = new Buffer(outData);
 
-      } else if (compression == COMP_ZIP) {
+      } else if (compression == COMPRESSION_ZIP) {
         List<int> data = p.toList(0, byteCount);
         List<int> outData = new ZLibDecoder().decodeBytes(data);
         bdata = new Buffer(outData);
-      } else if (compression == COMP_JPEG_OLD) {
+      } else if (compression == COMPRESSION_OLD_JPEG) {
         List<int> data = p.toList(0, byteCount);
         JpegData jpeg = new JpegData();
         jpeg.read(data);
@@ -270,12 +291,29 @@ class TiffImage {
         return;
       }
 
-      for (int y = 0, py = outY, pi = 0; y < tileHeight; ++y, ++py) {
-        for (int x = 0, px = outX; x < tileWidth; ++x, ++px) {
-          if (samplesPerPixel == 3) {
+      int pi = 0;
+      for (int y = 0, py = outY; y < tileHeight && py < height; ++y, ++py) {
+        for (int x = 0, px = outX; x < tileWidth && px < width; ++x, ++px) {
+          if (samplesPerPixel == 1) {
+            int gray = bdata[pi++];
+            int c;
+            if (photometricType == 3 && colorMap != null) {
+              c = getColor(colorMap[colorMapRed + gray],
+                           colorMap[colorMapGreen + gray],
+                           colorMap[colorMapBlue + gray]);
+            } else {
+              c = getColor(gray, gray, gray, 255);
+            }
+            image.setPixel(px, py, c);
+          } else if (samplesPerPixel == 2) {
+            int gray = bdata[pi++];
+            int alpha = bdata[pi++];
+            int c = getColor(gray, gray, gray, alpha);
+            image.setPixel(px, py, c);
+          } else if (samplesPerPixel == 3) {
             int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], 255);
             image.setPixel(px, py, c);
-          } else {
+          } else if (samplesPerPixel >= 4){
             int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], bdata[pi++]);
             image.setPixel(px, py, c);
           }
@@ -351,7 +389,7 @@ class TiffImage {
     int byteCount = tileByteCounts[tileIndex];
 
     Buffer bdata;
-    if (compression == COMP_PACKBITS) {
+    if (compression == COMPRESSION_PACKBITS) {
       // Since the decompressed data will still be packed
       // 8 pixels into 1 byte, calculate bytesInThisTile
       int bytesInThisTile;
@@ -362,7 +400,7 @@ class TiffImage {
       }
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
       _decodePackbits(p, bytesInThisTile, bdata.data);
-    } else if (compression == COMP_LZW) {
+    } else if (compression == COMPRESSION_LZW) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
 
       LzwDecoder decoder = new LzwDecoder();
@@ -379,36 +417,36 @@ class TiffImage {
           }
         }
       }
-    } else if (compression == COMP_FAX_G3_1D) {
+    } else if (compression == COMPRESSION_CCITT_RLE) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
       try {
         new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
             decode1D(bdata, p, 0, tileHeight);
       } catch (_) {
       }
-    } else if (compression == COMP_FAX_G3_2D) {
+    } else if (compression == COMPRESSION_CCITT_FAX3) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
       try {
         new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
             decode2D(bdata, p, 0, tileHeight, t4Options);
       } catch (_) {
       }
-    } else if (compression == COMP_FAX_G4_2D) {
+    } else if (compression == COMPRESSION_CCITT_FAX4) {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
       try {
         new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
             decodeT6(bdata, p, 0, tileHeight, t6Options);
       } catch (_) {
       }
-    } else if (compression == COMP_ZIP) {
+    } else if (compression == COMPRESSION_ZIP) {
       List<int> data = p.toList(0, byteCount);
       List<int> outData = new ZLibDecoder().decodeBytes(data);
       bdata = new Buffer(outData);
-    } else if (compression == COMP_DEFLATE) {
+    } else if (compression == COMPRESSION_DEFLATE) {
       List<int> data = p.toList(0, byteCount);
       List<int> outData = new Inflate(data).getBytes();
       bdata = new Buffer(outData);
-    } else if (compression == COMP_NONE) {
+    } else if (compression == COMPRESSION_NONE) {
       bdata = p;
     } else {
       throw new ImageException('Unsupported Compression Type: $compression');
@@ -461,15 +499,6 @@ class TiffImage {
     }
   }
 
-  static int _uint8ToInt8(int d) {
-    _uint8ToInt8_uint8[0] = d;
-    return _uint8ToInt8_int8[0];
-  }
-
-  static final Uint8List _uint8ToInt8_uint8 = new Uint8List(1);
-  static final Int8List _uint8ToInt8_int8 =
-      new Int8List.view(_uint8ToInt8_uint8.buffer);
-
   int _readTag(Buffer p, int type, [int defaultValue = 0]) {
     if (!hasTag(type)) {
       return defaultValue;
@@ -485,16 +514,30 @@ class TiffImage {
   }
 
   // Compression types
-  static const int COMP_NONE = 1;
-  static const int COMP_FAX_G3_1D = 2; // CCITT modified Huffman RLE
-  static const int COMP_FAX_G3_2D = 3; // CCITT Group 3 fax encoding
-  static const int COMP_FAX_G4_2D = 4; // CCITT Group 4 fax encoding
-  static const int COMP_LZW = 5;
-  static const int COMP_JPEG_OLD  = 6;
-  static const int COMP_JPEG_TTN2 = 7;
-  static const int COMP_ZIP = 8;
-  static const int COMP_PACKBITS = 32773;
-  static const int COMP_DEFLATE = 32946;
+  static const int COMPRESSION_NONE = 1;
+  static const int COMPRESSION_CCITT_RLE = 2;
+  static const int COMPRESSION_CCITT_FAX3 = 3;
+  static const int COMPRESSION_CCITT_FAX4 = 4;
+  static const int COMPRESSION_LZW = 5;
+  static const int COMPRESSION_OLD_JPEG = 6;
+  static const int COMPRESSION_JPEG = 7;
+  static const int COMPRESSION_NEXT = 32766;
+  static const int COMPRESSION_CCITT_RLEW = 32771;
+  static const int COMPRESSION_PACKBITS = 32773;
+  static const int COMPRESSION_THUNDERSCAN = 32809;
+  static const int COMPRESSION_IT8CTPAD = 32895;
+  static const int COMPRESSION_IT8LW = 32896;
+  static const int COMPRESSION_IT8MP = 32897;
+  static const int COMPRESSION_IT8BL = 32898;
+  static const int COMPRESSION_PIXARFILM = 32908;
+  static const int COMPRESSION_PIXARLOG = 32909;
+  static const int COMPRESSION_DEFLATE = 32946;
+  static const int COMPRESSION_ZIP = 8;
+  static const int COMPRESSION_DCS = 32947;
+  static const int COMPRESSION_JBIG = 34661;
+  static const int COMPRESSION_SGILOG = 34676;
+  static const int COMPRESSION_SGILOG24 = 34677;
+  static const int COMPRESSION_JP2000 = 34712;
 
   // Image types
   static const int TYPE_UNSUPPORTED = -1;
@@ -524,9 +567,11 @@ class TiffImage {
   static const int TAG_GRAY_RESPONSE_CURVE = 291;
   static const int TAG_GRAY_RESPONSE_UNIT = 290;
   static const int TAG_HOST_COMPUTER = 316;
+  static const int TAG_ICC_PROFILE = 34675;
   static const int TAG_IMAGE_DESCRIPTION = 270;
+  static const int TAG_IMAGE_LENGTH = 257;
+  static const int TAG_IMAGE_WIDTH = 256;
   static const int TAG_IPTC = 33723;
-  static const int TAG_LENGTH = 257;
   static const int TAG_MAKE = 271;
   static const int TAG_MAX_SAMPLE_VALUE = 281;
   static const int TAG_MIN_SAMPLE_VALUE = 280;
@@ -551,11 +596,63 @@ class TiffImage {
   static const int TAG_TILE_LENGTH = 323;
   static const int TAG_TILE_OFFSETS = 324;
   static const int TAG_TILE_BYTE_COUNTS = 325;
-  static const int TAG_WIDTH = 256;
   static const int TAG_XMP = 700;
   static const int TAG_X_RESOLUTION = 282;
   static const int TAG_Y_RESOLUTION = 283;
   static const int TAG_YCBCR_COEFFICIENTS = 529;
   static const int TAG_YCBCR_SUBSAMPLING = 530;
   static const int TAG_YCBCR_POSITIONING = 531;
+
+  static const Map<int, String> TAG_NAME = const {
+    TAG_ARTIST: 'artist',
+    TAG_BITS_PER_SAMPLE: 'bitsPerSample',
+    TAG_CELL_LENGTH: 'cellLength',
+    TAG_CELL_WIDTH: 'cellWidth',
+    TAG_COLOR_MAP: 'colorMap',
+    TAG_COMPRESSION: 'compression',
+    TAG_DATE_TIME: 'dateTime',
+    TAG_EXIF_IFD: 'exifIFD',
+    TAG_EXTRA_SAMPLES: 'extraSamples',
+    TAG_FILL_ORDER: 'fillOrder',
+    TAG_FREE_BYTE_COUNTS: 'freeByteCounts',
+    TAG_FREE_OFFSETS: 'freeOffsets',
+    TAG_GRAY_RESPONSE_CURVE: 'grayResponseCurve',
+    TAG_GRAY_RESPONSE_UNIT: 'grayResponseUnit',
+    TAG_HOST_COMPUTER: 'hostComputer',
+    TAG_ICC_PROFILE: 'iccProfile',
+    TAG_IMAGE_DESCRIPTION: 'imageDescription',
+    TAG_IMAGE_LENGTH: 'imageLength',
+    TAG_IMAGE_WIDTH: 'imageWidth',
+    TAG_IPTC: 'iptc',
+    TAG_MAKE: 'make',
+    TAG_MAX_SAMPLE_VALUE: 'maxSampleValue',
+    TAG_MIN_SAMPLE_VALUE: 'minSampleValue',
+    TAG_MODEL: 'model',
+    TAG_NEW_SUBFILE_TYPE: 'newSubfileType',
+    TAG_ORIENTATION: 'orientation',
+    TAG_PHOTOMETRIC_INTERPRETATION: 'photometricInterpretation',
+    TAG_PHOTOSHOP: 'photoshop',
+    TAG_PLANAR_CONFIGURATION: 'planarConfiguration',
+    TAG_PREDICTOR: 'predictor',
+    TAG_RESOLUTION_UNIT: 'resolutionUnit',
+    TAG_ROWS_PER_STRIP: 'rowsPerStrip',
+    TAG_SAMPLES_PER_PIXEL: 'samplesPerPixel',
+    TAG_SOFTWARE: 'software',
+    TAG_STRIP_BYTE_COUNTS: 'stripByteCounts',
+    TAG_STRIP_OFFSETS: 'stropOffsets',
+    TAG_SUBFILE_TYPE: 'subfileType',
+    TAG_T4_OPTIONS: 't4Options',
+    TAG_T6_OPTIONS: 't6Options',
+    TAG_THRESHOLDING: 'thresholding',
+    TAG_TILE_WIDTH: 'tileWidth',
+    TAG_TILE_LENGTH: 'tileLength',
+    TAG_TILE_OFFSETS: 'tileOffsets',
+    TAG_TILE_BYTE_COUNTS: 'tileByteCounts',
+    TAG_XMP: 'xmp',
+    TAG_X_RESOLUTION: 'xResolution',
+    TAG_Y_RESOLUTION: 'yResolution',
+    TAG_YCBCR_COEFFICIENTS: 'yCbCrCoefficients',
+    TAG_YCBCR_SUBSAMPLING: 'yCbCrSubsampling',
+    TAG_YCBCR_POSITIONING: 'yCbCrPositioning'
+  };
 }

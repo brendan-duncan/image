@@ -6,7 +6,18 @@ class TiffEntry {
   int numValues;
   int valueOffset;
 
-  int get typeSize => SIZE_OF_TYPE[type];
+  TiffEntry(this.tag, this.type, this.numValues);
+
+  String toString() {
+    if (TiffImage.TAG_NAME.containsKey(tag)) {
+      return '${TiffImage.TAG_NAME[tag]}: $type $numValues';
+    }
+    return '<$tag>: $type $numValues';
+  }
+
+  bool get isValid => type < 13 && type > 0;
+
+  int get typeSize => isValid ? SIZE_OF_TYPE[type] : 0;
 
   bool get isString => type == TYPE_ASCII;
 
@@ -44,6 +55,9 @@ class TiffEntry {
       case TYPE_RATIONAL:
         int num = p.readUint32();
         int den = p.readUint32();
+        if (den == 0) {
+          return 0;
+        }
         return num / den;
       case TYPE_SBYTE:
         throw new ImageException('Unhandled value type: SBYTE');
@@ -89,5 +103,6 @@ class TiffEntry {
       4, //  9 = slong
       8, // 10 = srational
       4, // 11 = float
-      8];  // 12 = double
+      8, // 12 = double
+      0];
 }

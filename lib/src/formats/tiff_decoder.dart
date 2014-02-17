@@ -2,11 +2,23 @@ part of image;
 
 
 class TiffDecoder extends Decoder {
+  TiffInfo info;
+
   /**
    * Is the given file a valid TIFF image?
    */
   bool isValidFile(List<int> data) {
     return _readHeader(new Buffer(data)) != null;
+  }
+
+  /**
+   * Validate the file is a Gif image and get information about it.
+   * If the file is not a valid Gif image, null is returned.
+   */
+  TiffInfo startDecode(List<int> bytes) {
+    Buffer ptr = new Buffer(new Uint8List.fromList(bytes));
+    info = _readHeader(ptr);
+    return info;
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {
@@ -45,8 +57,10 @@ class TiffDecoder extends Decoder {
 
     if (info.byteOrder == TIFF_BIG_ENDIAN) {
       p.byteOrder = BIG_ENDIAN;
+      info.byteOrder = BIG_ENDIAN;
     } else {
       p.byteOrder = LITTLE_ENDIAN;
+      info.byteOrder = LITTLE_ENDIAN;
     }
 
     info.signature = p.readUint16();
@@ -61,19 +75,28 @@ class TiffDecoder extends Decoder {
     p2.offset = offset;
 
     while (offset != 0) {
-      TiffImage img = new TiffImage(p2);
-      if (!img.isValid) {
+      TiffImage img;
+      try {
+        img = new TiffImage(p2);
+        if (!img.isValid) {
+          break;
+        }
+      } catch (error) {
         break;
       }
       info.images.add(img);
+      if (info.images.length == 1) {
+        info.width = info.images[0].width;
+        info.height = info.images[0].height;
+      }
 
-      offset = p2.readUint32();;
+      offset = p2.readUint32();
       if (offset != 0) {
         p2.offset = offset;
       }
     }
 
-    return info;
+    return info.images.length > 0 ? info : null;
   }
 
   static const int TIFF_SIGNATURE = 42;
