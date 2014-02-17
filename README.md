@@ -20,6 +20,7 @@ formats:
 Decoding Only:
 
 - WebP / Animated WebP
+- TIFF
 
 
 ##[Documentation](https://github.com/brendan-duncan/image/wiki)

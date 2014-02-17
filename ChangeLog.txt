@@ -1,3 +1,8 @@
+v 1.1.13 - February 16, 2014
+
+- Added TIFF decoder
+
+
 v 1.1.10 - February 11, 2014
 
 - Added APNG animated PNG decoding support.
