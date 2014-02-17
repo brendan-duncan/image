@@ -30,6 +30,11 @@ Decoder findDecoderForData(List<int> data) {
     return webp;
   }
 
+  TiffDecoder tiff = new TiffDecoder();
+  if (tiff.isValidFile(bytes)) {
+    return tiff;
+  }
+
   return null;
 }
 
@@ -54,6 +59,9 @@ Decoder getDecoderForNamedImage(String name) {
   if (n.endsWith('.gif')) {
     return new GifDecoder();
   }
+  if (n.endsWith('.tif') || n.endsWith('.tiff')) {
+    return new TiffDecoder();
+  }
   return null;
 }
 
@@ -76,6 +84,9 @@ Image decodeNamedImage(List<int> bytes, String name) {
     return decodeWebP(bytes);
   }
   if (n.endsWith('.gif')) {
+    return decodeGif(bytes);
+  }
+  if (n.endsWith('.tif') || n.endsWith('.tiff')) {
     return decodeGif(bytes);
   }
   return null;
@@ -230,4 +241,20 @@ List<int> encodeGif(Image image) {
  */
 List<int> encodeGifAnimation(Animation anim) {
   return new GifEncoder().encodeAnimation(anim);
+}
+
+/**
+ * Decode a TIFF formatted image.
+ */
+Image decodeTiff(List<int> bytes) {
+  return new TiffDecoder().decodeImage(bytes);
+}
+
+/**
+ * Decode an multi-image (animated) TIFF file.  If the tiff doesn't have
+ * multiple images, the animation will contain a single frame with the tiff's
+ * image.
+ */
+Animation decodeTiffAnimation(List<int> bytes) {
+  return new TiffDecoder().decodeAnimation(bytes);
 }
