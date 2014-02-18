@@ -16,11 +16,37 @@ class TiffDecoder extends Decoder {
    * If the file is not a valid Gif image, null is returned.
    */
   TiffInfo startDecode(List<int> bytes) {
-    Buffer ptr = new Buffer(new Uint8List.fromList(bytes));
-    info = _readHeader(ptr);
+    _input = new Buffer(new Uint8List.fromList(bytes));
+    info = _readHeader(_input);
     return info;
   }
 
+  /**
+   * How many frames are available to be decoded.  [startDecode] should have
+   * been called first. Non animated image files will have a single frame.
+   */
+  int numFrames() => info != null ? info.images.length : 0;
+
+  /**
+   * Decode a single frame from the data stat was set with [startDecode].
+   * If [frame] is out of the range of available frames, null is returned.
+   * Non animated image files will only have [frame] 0.  An [AnimationFrame]
+   * is returned, which provides the image, and top-left coordinates of the
+   * image, as animated frames may only occupy a subset of the canvas.
+   */
+  Image decodeFrame(int frame) {
+    if (info == null) {
+      return null;
+    }
+
+    return info.images[frame].decode(_input);
+  }
+
+  /**
+   * Decode the file and extract a single image from it.  If the file is
+   * animated, the specified [frame] will be decoded.  If there was a problem
+   * decoding the file, null is returned.
+   */
   Image decodeImage(List<int> data, {int frame: 0}) {
     Buffer ptr = new Buffer(new Uint8List.fromList(data));
 
@@ -32,14 +58,24 @@ class TiffDecoder extends Decoder {
     return info.images[frame].decode(ptr);
   }
 
+  /**
+   * Decode all of the frames from an animation.  If the file is not an
+   * animation, a single frame animation is returned.  If there was a problem
+   * decoding the file, null is returned.
+   */
   Animation decodeAnimation(List<int> data) {
-    Image image = decodeImage(data);
-    if (image == null) {
+    if (startDecode(data) == null) {
       return null;
     }
 
     Animation anim = new Animation();
-    anim.addFrame(image);
+    for (int i = 0, len = numFrames(); i < len; ++i) {
+      Image image = decodeFrame(i);
+      if (i == null) {
+        continue;
+      }
+      anim.addFrame(image);
+    }
 
     return anim;
   }
@@ -98,6 +134,8 @@ class TiffDecoder extends Decoder {
 
     return info.images.length > 0 ? info : null;
   }
+
+  Buffer _input;
 
   static const int TIFF_SIGNATURE = 42;
   static const int TIFF_LITTLE_ENDIAN = 0x4949;
