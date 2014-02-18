@@ -7,8 +7,43 @@ typedef void ProgressCallback(int frame, int numFrames,
                               int progress, int total);
 
 /**
- * Base class for image format decoders.  Images are always decoded to 24-bit
- * or 32-bit images, regardless of the format type.
+ * Base class for image format decoders.
+ *
+ * Image pixels are stored as 32-bit unsigned ints, so all formats, regardless
+ * of their encoded color resolutions, decode to 32-bit RGBA images.  Encoders
+ * can reduce the color resolution back down to their required formats.
+ *
+ * Some image formats support multiple frames, often for encoding animation.
+ * In such cases, the [decodeImage] method will decode the first (or otherwise
+ * specified with the [frame] parameter) frame of the file.  [decodeAnimation]
+ * will decode all frames from the image.  [startDecode] will initiate
+ * decoding of the file, and [decodeFrame] will then decode a specific frame
+ * from the file, allowing for animations to be decoded one frame at a time.
+ * Some formats, such as TIFF, may store multiple frames, but their use of
+ * frames is for multiple page documents and not animation.  The terms
+ * 'animation' and 'frames' simply refer to 'pages' in this case.
+ *
+ * If an image file does not have multiple frames, [decodeAnimation] and
+ * [startDecode]/[decodeFrame] will return the single image of the
+ * file. As such, if you are not sure if a file is animated or not, you can
+ * use the animated functions and process it as a single frame image if it
+ * has only 1 frame, and as an animation if it has more than 1 frame.
+ *
+ * Most animated formats do not store full images for frames, but rather
+ * some frames will store full images and others will store partial 'change'
+ * images. For these files, [decodeAnimation] will always return all images
+ * fully composited, meaning full frame images.  Decoding frames individually
+ * using [startDecode] and [decodeFrame] will return the potentially partial
+ * image.  In this case, the [DecodeInfo] returned by [startDecode] will include
+ * the width and height resolution of the animation canvas, and each [Image]
+ * returned by [decodeFrame] will have x, y, width and height properties
+ * indicating where in the canvas the frame image should be drawn.  It will
+ * also have a disposeMethod property that specifies what should be done to
+ * the canvas prior to drawing the frame: [Image.DISPOSE_NONE] indicates the
+ * canvas should be left alone; [Image.DISPOSE_CLEAR] indicates the canvas
+ * should be cleared.  For partial frame images,[Image.DISPOSE_NONE] is used
+ * so that the partial-frame is drawn on top of the previous frame, applying
+ * it's changes to the image.
  */
 abstract class Decoder {
   ProgressCallback progressCallback;
