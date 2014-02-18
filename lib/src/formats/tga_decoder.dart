@@ -5,14 +5,17 @@ part of image;
  * TODO add more TGA support.
  */
 class TgaDecoder extends Decoder {
+  TgaInfo info;
+  Buffer input;
+
   /**
    * Is the given file a valid Targa image?
    */
   bool isValidFile(List<int> data) {
-    InputStream input = new InputStream(data,
+    Buffer input = new Buffer(data,
         byteOrder: BIG_ENDIAN);
 
-    List<int> header = input.readBytes(18);
+    Buffer header = input.readBytes(18);
     if (header[2] != 2) {
       return false;
     }
@@ -23,21 +26,34 @@ class TgaDecoder extends Decoder {
     return true;
   }
 
-  Image decodeImage(List<int> data, {int frame: 0}) {
-    InputStream input = new InputStream(data, byteOrder: BIG_ENDIAN);
+  DecodeInfo startDecode(List<int> data) {
+    info = new TgaInfo();
+    input = new Buffer(data, byteOrder: BIG_ENDIAN);
 
-    List<int> header = input.readBytes(18);
+    Buffer header = input.readBytes(18);
     if (header[2] != 2) {
-      throw new ImageException('Unsupported color format: ${header[2]}');
+      return null;
     }
-    if (header[16] != 24 && header[16] != 32) {
-      throw new ImageException('Unsupported pixel format: ${header[16]}.');
+    if (header[16] != 24) {
+      return null;
     }
 
-    int w = (header[12] & 0xff) | ((header[13] & 0xff) << 8);
-    int h = (header[14] & 0xff) | ((header[15] & 0xff) << 8);
+    info.width = (header[12] & 0xff) | ((header[13] & 0xff) << 8);
+    info.height = (header[14] & 0xff) | ((header[15] & 0xff) << 8);
+    info.imageOffset = input.offset;
 
-    Image image = new Image(w, h, Image.RGB);
+    return info;
+  }
+
+  int numFrames() => info != null ? 1 : 0;
+
+  Image decodeFrame(int frame) {
+    if (info == null) {
+      return null;
+    }
+
+    input.offset = info.imageOffset;
+    Image image = new Image(info.width, info.height, Image.RGB);
     for (int y = image.height - 1; y >= 0; --y) {
       if (progressCallback != null) {
         progressCallback(0, 1, y - image.height - 1, image.height);
@@ -51,6 +67,14 @@ class TgaDecoder extends Decoder {
     }
 
     return image;
+  }
+
+  Image decodeImage(List<int> data, {int frame: 0}) {
+    if (startDecode(data) == null) {
+      return null;
+    }
+
+    return decodeFrame(frame);
   }
 
   Animation decodeAnimation(List<int> data) {

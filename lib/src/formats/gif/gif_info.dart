@@ -5,4 +5,6 @@ class GifInfo extends DecodeInfo {
   GifColorMap globalColorMap;
   bool isGif89 = false;
   List<GifImageDesc> frames = [];
+
+  int get numFrames => frames.length;
 }

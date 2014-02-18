@@ -1,20 +1,6 @@
 part of image;
 
 /**
- * Provides information about the image being decoded.
- */
-class DecodeInfo {
-  /// The width of the image canvas.
-  int width;
-  /// The height of the image canvas.
-  int height;
-  /// The suggested background color of the canvas.
-  int backgroundColor;
-  /// The number of frames that can be decoded.
-  int numFrames = 1;
-}
-
-/**
  * A callback called during the decoding process.
  */
 typedef void ProgressCallback(int frame, int numFrames,
@@ -51,13 +37,13 @@ abstract class Decoder {
    * Start decoding the data as an animation sequence, but don't actually
    * process the frames until they are requested with decodeFrame.
    */
-  //DecodeInfo startDecode(List<int> bytes);
+  DecodeInfo startDecode(List<int> bytes);
 
   /**
    * How many frames are available to be decoded.  [startDecode] should have
    * been called first. Non animated image files will have a single frame.
    */
-  //int numFrames();
+  int numFrames();
 
   /**
    * Decode a single frame from the data stat was set with [startDecode].
@@ -66,5 +52,5 @@ abstract class Decoder {
    * is returned, which provides the image, and top-left coordinates of the
    * image, as animated frames may only occupy a subset of the canvas.
    */
-  //Image decodeFrame(int frame);
+  Image decodeFrame(int frame);
 }

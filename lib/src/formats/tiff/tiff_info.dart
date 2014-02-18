@@ -6,4 +6,6 @@ class TiffInfo extends DecodeInfo {
 
   int ifdOffset;
   List<TiffImage> images = [];
+
+  int get numFrames => images.length;
 }

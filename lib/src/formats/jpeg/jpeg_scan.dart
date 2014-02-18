@@ -96,8 +96,8 @@ class JpegScan {
 
       // find marker
       bitsCount = 0;
-      int m1 = input.buffer[input.position];
-      int m2 = input.buffer[input.position + 1];
+      int m1 = input[0];
+      int m2 = input[1];
       if (m1 == 0xff) {
         if (m2 >= Jpeg.M_RST0 && m2 <= Jpeg.M_RST7) {
           input.position += 2;

@@ -30,7 +30,7 @@ class WebPDecoder extends Decoder {
    * You should have prepared the decoder by either passing the file bytes
    * to the constructor, or calling getInfo.
    */
-  int get numFrames => (info != null) ? info.numFrames : 0;
+  int numFrames() => (info != null) ? info.numFrames : 0;
 
   /**
    * Validate the file is a WebP image and get information about it.
@@ -52,7 +52,6 @@ class WebPDecoder extends Decoder {
 
     switch (info.format) {
       case WebPInfo.FORMAT_ANIMATED:
-        info.numFrames = info.frames.length;
         return info;
       case WebPInfo.FORMAT_LOSSLESS:
         _input.position = info._vp8Position;
@@ -60,7 +59,6 @@ class WebPDecoder extends Decoder {
         if (!vp8l.decodeHeader()) {
           return null;
         }
-        info.numFrames = info.frames.length;
         return info;
       case WebPInfo.FORMAT_LOSSY:
         _input.position = info._vp8Position;
@@ -68,7 +66,6 @@ class WebPDecoder extends Decoder {
         if (!vp8.decodeHeader()) {
           return null;
         }
-        info.numFrames = info.frames.length;
         return info;
     }
 

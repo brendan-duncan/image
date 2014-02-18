@@ -1,6 +1,6 @@
 part of image;
 
-class JpegData {
+class JpegData  {
   ProgressCallback progressCallback;
   InputStream input;
   JpegJfif jfif;
@@ -42,6 +42,50 @@ class JpegData {
     }
 
     return hasSOF && hasSOS;
+  }
+
+  JpegInfo readInfo(List<int> bytes) {
+    input = new InputStream(bytes, byteOrder: BIG_ENDIAN);
+
+    int marker = _nextMarker();
+    if (marker != Jpeg.M_SOI) {
+      return null;
+    }
+
+    JpegInfo info;
+
+    bool hasSOF = false;
+    bool hasSOS = false;
+
+    marker = _nextMarker();
+    while (marker != Jpeg.M_EOI && !input.isEOS) { // EOI (End of image)
+      switch (marker) {
+        case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
+        case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
+        case Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
+          hasSOF = true;
+          _readFrame(marker, _readBlock());
+          break;
+        case Jpeg.M_SOS: // SOS (Start of Scan)
+          hasSOS = true;
+          _skipBlock();
+          break;
+        default:
+          _skipBlock();
+          break;
+      }
+
+      marker = _nextMarker();
+    }
+
+    if (frame != null) {
+      info.width = frame.samplesPerLine;
+      info.height = frame.scanLines;
+    }
+    frame = null;
+    frames.clear();
+
+    return (hasSOF && hasSOS) ? info : null;
   }
 
   void read(List<int> bytes) {
@@ -107,8 +151,8 @@ class JpegData {
         component1 = components[0];
         component2 = components[1];
         for (int y = 0; y < height; y++) {
-          component1Line = component1['lines'][0 | (y * component1['scaleY'] * scaleY)];
-          component2Line = component2['lines'][0 | (y * component2['scaleY'] * scaleY)];
+          component1Line = component1['lines'][(y * component1['scaleY'] * scaleY)];
+          component2Line = component2['lines'][(y * component2['scaleY'] * scaleY)];
           for (int x = 0; x < width; x++) {
             Y = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
             data[offset++] = Y;
@@ -161,11 +205,6 @@ class JpegData {
               data[offset++] = (R > 0) ? _clamp(R >> 4) : 0;
               data[offset++] = (G > 0) ? _clamp(G >> 4) : 0;
               data[offset++] = (B > 0) ? _clamp(B >> 4) : 0;
-
-              /*data[offset++] = _clamp((Y + 1.402 * (Cr - 128)).toInt());
-              data[offset++] = _clamp((Y - 0.3441363 * (Cb - 128) -
-                         0.71413636 * (Cr - 128)).toInt());
-              data[offset++] = _clamp((Y + 1.772 * (Cb - 128)).toInt());*/
             }
           }
         }
@@ -189,21 +228,21 @@ class JpegData {
         component4 = components[3];
 
         for (int y = 0; y < height; y++) {
-          component1Line = component1['lines'][0 | (y * component1['scaleY'] * scaleY)];
-          component2Line = component2['lines'][0 | (y * component2['scaleY'] * scaleY)];
-          component3Line = component3['lines'][0 | (y * component3['scaleY'] * scaleY)];
-          component4Line = component4['lines'][0 | (y * component4['scaleY'] * scaleY)];
+          component1Line = component1['lines'][(y * component1['scaleY'] * scaleY)];
+          component2Line = component2['lines'][(y * component2['scaleY'] * scaleY)];
+          component3Line = component3['lines'][(y * component3['scaleY'] * scaleY)];
+          component4Line = component4['lines'][(y * component4['scaleY'] * scaleY)];
           for (int x = 0; x < width; x++) {
             if (!colorTransform) {
-              C = component1Line[0 | (x * component1['scaleX'] * scaleX)];
-              M = component2Line[0 | (x * component2['scaleX'] * scaleX)];
-              Ye = component3Line[0 | (x * component3['scaleX'] * scaleX)];
-              K = component4Line[0 | (x * component4['scaleX'] * scaleX)];
+              C = component1Line[(x * component1['scaleX'] * scaleX)];
+              M = component2Line[(x * component2['scaleX'] * scaleX)];
+              Ye = component3Line[(x * component3['scaleX'] * scaleX)];
+              K = component4Line[(x * component4['scaleX'] * scaleX)];
             } else {
-              Y = component1Line[0 | (x * component1['scaleX'] * scaleX)];
-              Cb = component2Line[0 | (x * component2['scaleX'] * scaleX)];
-              Cr = component3Line[0 | (x * component3['scaleX'] * scaleX)];
-              K = component4Line[0 | (x * component4['scaleX'] * scaleX)];
+              Y = component1Line[(x * component1['scaleX'] * scaleX)];
+              Cb = component2Line[(x * component2['scaleX'] * scaleX)];
+              Cr = component3Line[(x * component3['scaleX'] * scaleX)];
+              K = component4Line[(x * component4['scaleX'] * scaleX)];
 
               C = 255 - _clamp((Y + 1.402 * (Cr - 128)).toInt());
               M = 255 - _clamp((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128)).toInt());
@@ -319,8 +358,7 @@ class JpegData {
     if (length < 2) {
       throw new ImageException('Invalid Block');
     }
-    List<int> array = input.readBytes(length - 2);
-    return new InputStream(array, byteOrder: BIG_ENDIAN);
+    return new InputStream(input.readBytes(length - 2), byteOrder: BIG_ENDIAN);
   }
 
   int _nextMarker() {

@@ -249,7 +249,8 @@ class TiffImage {
         bdata = new Buffer(new Uint8List(bytesInThisTile));
         LzwDecoder decoder = new LzwDecoder();
         try {
-          decoder.decode(new Buffer.from(p, 0, byteCount), bdata.data);
+          decoder.decode(new Buffer.from(p, offset: 0, length: byteCount),
+                         bdata.data);
         } catch (e) {
         }
         // Horizontal Differencing Predictor
@@ -404,7 +405,7 @@ class TiffImage {
       bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
 
       LzwDecoder decoder = new LzwDecoder();
-      decoder.decode(new Buffer.from(p, 0, byteCount), bdata.data);
+      decoder.decode(new Buffer.from(p, length: byteCount), bdata.data);
 
       // Horizontal Differencing Predictor
       if (predictor == 2) {

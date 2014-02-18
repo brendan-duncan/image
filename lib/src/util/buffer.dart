@@ -11,8 +11,8 @@ class Buffer {
   int offset;
   int byteOrder;
 
-  Buffer(List<int> buffer, [this.offset = 0, int length = -1,
-         this.byteOrder = LITTLE_ENDIAN]) :
+  Buffer(List<int> buffer, {this.offset: 0, int length: -1,
+         this.byteOrder: LITTLE_ENDIAN}) :
     data = buffer,
     start = 0,
     end = (length < 0 || length > buffer.length) ? buffer.length :
@@ -20,7 +20,7 @@ class Buffer {
     offset += start;
   }
 
-  Buffer.from(Buffer other, [this.offset = 0, int length = -1]) :
+  Buffer.from(Buffer other, {this.offset: 0, int length: -1}) :
     data = other.data,
     start = other.offset,
     end = (length < 0) ? other.data.length :
@@ -84,7 +84,7 @@ class Buffer {
    * Read [count] bytes from the buffer.
    */
   Buffer readBytes(int count) {
-    Buffer out = new Buffer.from(this, offset, count);
+    Buffer out = new Buffer.from(this, offset: offset, length: count);
     offset += out.length;
     return out;
   }

@@ -4,12 +4,42 @@ part of image;
  * Decode a jpeg encoded image.
  */
 class JpegDecoder extends Decoder {
+  JpegInfo info;
+  Buffer input;
+
   /**
    * Is the given file a valid JPEG image?
    */
   bool isValidFile(List<int> data) {
-    InputStream input = new InputStream(data, byteOrder: BIG_ENDIAN);
+    Buffer input = new Buffer(data, byteOrder: BIG_ENDIAN);
     return new JpegData().validate(data);
+  }
+
+  DecodeInfo startDecode(List<int> data) {
+    input = new Buffer(data, byteOrder: BIG_ENDIAN);
+    info = new JpegData().readInfo(data);
+    return info;
+  }
+
+  int numFrames() => info == null ? 0 : info.numFrames;
+
+  Image decodeFrame(int frame) {
+    if (input == null) {
+      return null;
+    }
+    JpegData jpeg = new JpegData();
+    jpeg.progressCallback = progressCallback;
+    jpeg.read(input.data);
+
+    if (jpeg.frames.length != 1) {
+      throw new ImageException('only single frame JPEGs supported');
+    }
+
+    Image image = new Image(jpeg.width, jpeg.height, Image.RGB);
+
+    _copyToImage(jpeg, image);
+
+    return image;
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {

@@ -28,7 +28,7 @@ class GifDecoder extends Decoder {
    * You should have prepared the decoder by either passing the file bytes
    * to the constructor, or calling getInfo.
    */
-  int get numFrames => (info != null) ? info.numFrames : 0;
+  int numFrames() => (info != null) ? info.numFrames : 0;
 
   /**
    * Validate the file is a Gif image and get information about it.
@@ -91,7 +91,6 @@ class GifDecoder extends Decoder {
             }
             break;
           case TERMINATE_RECORD_TYPE:
-            info.numFrames = info.frames.length;
             _numFrames = info.numFrames;
             return info;
           default:
@@ -101,7 +100,6 @@ class GifDecoder extends Decoder {
     } catch (error) {
     }
 
-    info.numFrames = info.frames.length;
     _numFrames = info.numFrames;
     return info;
   }
