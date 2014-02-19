@@ -65,6 +65,8 @@ class JpegDecoder extends Decoder {
     }
 
     Animation anim = new Animation();
+    anim.width = image.width;
+    anim.height = image.height;
     anim.addFrame(image);
 
     return anim;

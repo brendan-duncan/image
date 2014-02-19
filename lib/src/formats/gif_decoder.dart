@@ -138,6 +138,8 @@ class GifDecoder extends Decoder {
     }
 
     Animation anim = new Animation();
+    anim.width = info.width;
+    anim.height = info.height;
 
     Image lastImage = new Image(info.width, info.height);
     for (int i = 0; i < info.numFrames; ++i) {

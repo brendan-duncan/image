@@ -69,6 +69,8 @@ class TiffDecoder extends Decoder {
     }
 
     Animation anim = new Animation();
+    anim.width = info.width;
+    anim.height = info.height;
     for (int i = 0, len = numFrames(); i < len; ++i) {
       Image image = decodeFrame(i);
       if (i == null) {

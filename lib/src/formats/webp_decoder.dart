@@ -125,6 +125,8 @@ Animation decodeAnimation(List<int> bytes) {
     info._numFrames = info.numFrames;
 
     Animation anim = new Animation();
+    anim.width = info.width;
+    anim.height = info.height;
     anim.loopCount = info.animLoopCount;
 
     if (info.hasAnimation) {

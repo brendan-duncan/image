@@ -312,6 +312,8 @@ class PngDecoder extends Decoder {
     }
 
     Animation anim = new Animation();
+    anim.width = info.width;
+    anim.height = info.height;
 
     if (!info.isAnimated) {
       Image image = decodeFrame(0);
