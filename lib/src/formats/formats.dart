@@ -39,8 +39,34 @@ Decoder findDecoderForData(List<int> data) {
 }
 
 /**
+ * Decode the given image file bytes by first identifying the format of the
+ * file and using that decoder to decode the file into a single frame [Image].
+ */
+Image decodeImage(List<int> data) {
+  Decoder decoder = findDecoderForData(data);
+  if (decoder == null) {
+    return null;
+  }
+  return decoder.decodeImage(data);
+}
+
+/**
+ * Decode the given image file bytes by first identifying the format of the
+ * file and using that decoder to decode the file into an [Animation]
+ * containing one or more [Image] frames.
+ */
+Animation decodeAnimation(List<int> data) {
+  Decoder decoder = findDecoderForData(data);
+  if (decoder == null) {
+    return null;
+  }
+  return decoder.decodeAnimation(data);
+}
+
+/**
  * Return the [Decoder] that can decode image with the given [name],
- * by looking at the file extension.
+ * by looking at the file extension.  See also [findDecoderForData] to
+ * determine the decoder to use given the bytes of the file.
  */
 Decoder getDecoderForNamedImage(String name) {
   String n = name.toLowerCase();
@@ -66,35 +92,34 @@ Decoder getDecoderForNamedImage(String name) {
 }
 
 /**
- * Identify the format of the image and decode it with the appropriate
- * decoder.
+ * Identify the format of the image using the file extension of the given
+ * [name], and decode the given file [bytes] to an [Animation] with one or more
+ * [Image] frames.  See also [decodeAnimation].
+ */
+Animation decodeNamedAnimation(List<int> bytes, String name) {
+  Decoder decoder = getDecoderForNamedImage(name);
+  if (decoder == null) {
+    return null;
+  }
+  return decoder.decodeAnimation(bytes);
+}
+
+/**
+ * Identify the format of the image using the file extension of the given
+ * [name], and decode the given file [bytes] to a single frame [Image].  See
+ * also [decodeImage].
  */
 Image decodeNamedImage(List<int> bytes, String name) {
-  String n = name.toLowerCase();
-  if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
-    return decodeJpg(bytes);
+  Decoder decoder = getDecoderForNamedImage(name);
+  if (decoder == null) {
+    return null;
   }
-  if (n.endsWith('.png')) {
-    return decodePng(bytes);
-  }
-  if (n.endsWith('.tga')) {
-    return decodeTga(bytes);
-  }
-  if (n.endsWith('.webp')) {
-    return decodeWebP(bytes);
-  }
-  if (n.endsWith('.gif')) {
-    return decodeGif(bytes);
-  }
-  if (n.endsWith('.tif') || n.endsWith('.tiff')) {
-    return decodeGif(bytes);
-  }
-  return null;
+  return decoder.decodeImage(bytes);
 }
 
 /**
  * Identify the format of the image and encode it with the appropriate
- * encoder.
+ * [Encoder].
  */
 List<int> encodeNamedImage(Image image, String name) {
   String n = name.toLowerCase();
