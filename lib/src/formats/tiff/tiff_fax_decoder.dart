@@ -9,7 +9,7 @@ class TiffFaxDecoder {
   int changingElemSize = 0;
   List<int> prevChangingElems;
   List<int> currChangingElems;
-  Buffer data;
+  _Buffer data;
   int bitPointer;
   int bytePointer;
 
@@ -31,7 +31,7 @@ class TiffFaxDecoder {
   /**
    * One-dimensional decoding methods
    */
-  void decode1D(Buffer out, Buffer compData, int startX, int height) {
+  void decode1D(_Buffer out, _Buffer compData, int startX, int height) {
     this.data = compData;
     bitPointer = 0;
     bytePointer = 0;
@@ -45,7 +45,7 @@ class TiffFaxDecoder {
     }
   }
 
-  void _decodeNextScanline(Buffer buffer, int lineOffset, int bitOffset) {
+  void _decodeNextScanline(_Buffer buffer, int lineOffset, int bitOffset) {
     int bits = 0, code = 0, isT = 0;
     int current, entry, twoBits;
     bool isWhite = true;
@@ -185,7 +185,7 @@ class TiffFaxDecoder {
    * Two-dimensional decoding methods
    */
 
-  void decode2D(Buffer out, Buffer compData, int startX, int height,
+  void decode2D(_Buffer out, _Buffer compData, int startX, int height,
                 int tiffT4Options) {
     this.data = compData;
     compression = 3;
@@ -329,7 +329,7 @@ class TiffFaxDecoder {
     }
   }
 
-  void decodeT6(Buffer out, Buffer compData, int startX, int height,
+  void decodeT6(_Buffer out, _Buffer compData, int startX, int height,
                 int tiffT6Options) {
     this.data = compData;
     compression = 4;
@@ -721,7 +721,7 @@ class TiffFaxDecoder {
     }
   }
 
-  void _setToBlack(Buffer buffer, int lineOffset, int bitOffset, int numBits) {
+  void _setToBlack(_Buffer buffer, int lineOffset, int bitOffset, int numBits) {
     int bitNum = 8 * lineOffset + bitOffset;
     int lastBit = bitNum + numBits;
 

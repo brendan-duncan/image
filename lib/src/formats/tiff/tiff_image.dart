@@ -34,8 +34,8 @@ class TiffImage {
   int colorMapBlue;
   Image image;
 
-  TiffImage(Buffer p) {
-    Buffer p3 = new Buffer.from(p);
+  TiffImage(_Buffer p) {
+    _Buffer p3 = new _Buffer.from(p);
 
     int numDirEntries = p.readUint16();
     for (int i = 0; i < numDirEntries; ++i) {
@@ -208,7 +208,7 @@ class TiffImage {
                       bitsPerSample != null &&
                       compression != null;
 
-  Image decode(Buffer p) {
+  Image decode(_Buffer p) {
     image = new Image(width, height);
     for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
       for (int tileX = 0; tileX < tilesX; ++tileX, ++ti) {
@@ -220,7 +220,7 @@ class TiffImage {
 
   bool hasTag(int tag) => tags.containsKey(tag);
 
-  void _decodeTile(Buffer p, int tileX, int tileY) {
+  void _decodeTile(_Buffer p, int tileX, int tileY) {
     // Read the data, uncompressing as needed. There are four cases:
     // bilevel, palette-RGB, 4-bit grayscale, and everything else.
     if (imageType == TYPE_BILEVEL) {
@@ -240,16 +240,16 @@ class TiffImage {
       bytesInThisTile *= 2;
     }
 
-    Buffer bdata;
+    _Buffer bdata;
     if (bitsPerSample == 8 || bitsPerSample == 16) {
       if (compression == COMPRESSION_NONE) {
         bdata = p;
 
       } else if (compression == COMPRESSION_LZW) {
-        bdata = new Buffer(new Uint8List(bytesInThisTile));
+        bdata = new _Buffer(new Uint8List(bytesInThisTile));
         LzwDecoder decoder = new LzwDecoder();
         try {
-          decoder.decode(new Buffer.from(p, offset: 0, length: byteCount),
+          decoder.decode(new _Buffer.from(p, offset: 0, length: byteCount),
                          bdata.data);
         } catch (e) {
         }
@@ -266,18 +266,18 @@ class TiffImage {
           }
         }
       } else if (compression == COMPRESSION_PACKBITS) {
-        bdata = new Buffer(new Uint8List(bytesInThisTile));
+        bdata = new _Buffer(new Uint8List(bytesInThisTile));
         _decodePackbits(p, bytesInThisTile, bdata.data);
 
       } else if (compression == COMPRESSION_DEFLATE) {
         List<int> data = p.toList(0, byteCount);
         List<int> outData = new Inflate(data).getBytes();
-        bdata = new Buffer(outData);
+        bdata = new _Buffer(outData);
 
       } else if (compression == COMPRESSION_ZIP) {
         List<int> data = p.toList(0, byteCount);
         List<int> outData = new ZLibDecoder().decodeBytes(data);
-        bdata = new Buffer(outData);
+        bdata = new _Buffer(outData);
       } else if (compression == COMPRESSION_OLD_JPEG) {
         List<int> data = p.toList(0, byteCount);
         JpegData jpeg = new JpegData();
@@ -380,7 +380,7 @@ class TiffImage {
     return i < 0 ? 0 : i > 255 ? 255 : i;
   }
 
-  void _decodeBilevelTile(Buffer p, int tileX, int tileY) {
+  void _decodeBilevelTile(_Buffer p, int tileX, int tileY) {
     int tileIndex = tileY * tilesX + tileX;
     p.offset = tileOffsets[tileIndex];
 
@@ -389,7 +389,7 @@ class TiffImage {
 
     int byteCount = tileByteCounts[tileIndex];
 
-    Buffer bdata;
+    _Buffer bdata;
     if (compression == COMPRESSION_PACKBITS) {
       // Since the decompressed data will still be packed
       // 8 pixels into 1 byte, calculate bytesInThisTile
@@ -399,13 +399,13 @@ class TiffImage {
       } else {
         bytesInThisTile = (tileWidth ~/ 8 + 1) * tileHeight;
       }
-      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      bdata = new _Buffer(new Uint8List(tileWidth * tileHeight));
       _decodePackbits(p, bytesInThisTile, bdata.data);
     } else if (compression == COMPRESSION_LZW) {
-      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      bdata = new _Buffer(new Uint8List(tileWidth * tileHeight));
 
       LzwDecoder decoder = new LzwDecoder();
-      decoder.decode(new Buffer.from(p, length: byteCount), bdata.data);
+      decoder.decode(new _Buffer.from(p, length: byteCount), bdata.data);
 
       // Horizontal Differencing Predictor
       if (predictor == 2) {
@@ -419,21 +419,21 @@ class TiffImage {
         }
       }
     } else if (compression == COMPRESSION_CCITT_RLE) {
-      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      bdata = new _Buffer(new Uint8List(tileWidth * tileHeight));
       try {
         new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
             decode1D(bdata, p, 0, tileHeight);
       } catch (_) {
       }
     } else if (compression == COMPRESSION_CCITT_FAX3) {
-      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      bdata = new _Buffer(new Uint8List(tileWidth * tileHeight));
       try {
         new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
             decode2D(bdata, p, 0, tileHeight, t4Options);
       } catch (_) {
       }
     } else if (compression == COMPRESSION_CCITT_FAX4) {
-      bdata = new Buffer(new Uint8List(tileWidth * tileHeight));
+      bdata = new _Buffer(new Uint8List(tileWidth * tileHeight));
       try {
         new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
             decodeT6(bdata, p, 0, tileHeight, t6Options);
@@ -442,11 +442,11 @@ class TiffImage {
     } else if (compression == COMPRESSION_ZIP) {
       List<int> data = p.toList(0, byteCount);
       List<int> outData = new ZLibDecoder().decodeBytes(data);
-      bdata = new Buffer(outData);
+      bdata = new _Buffer(outData);
     } else if (compression == COMPRESSION_DEFLATE) {
       List<int> data = p.toList(0, byteCount);
       List<int> outData = new Inflate(data).getBytes();
-      bdata = new Buffer(outData);
+      bdata = new _Buffer(outData);
     } else if (compression == COMPRESSION_NONE) {
       bdata = p;
     } else {
@@ -476,7 +476,7 @@ class TiffImage {
   /**
    * Uncompress packbits compressed image data.
    */
-  void _decodePackbits(Buffer data, int arraySize, List<int> dst) {
+  void _decodePackbits(_Buffer data, int arraySize, List<int> dst) {
     int srcCount = 0;
     int dstCount = 0;
 
@@ -500,14 +500,14 @@ class TiffImage {
     }
   }
 
-  int _readTag(Buffer p, int type, [int defaultValue = 0]) {
+  int _readTag(_Buffer p, int type, [int defaultValue = 0]) {
     if (!hasTag(type)) {
       return defaultValue;
     }
     return tags[type].readValue(p);
   }
 
-  List<int> _readTagList(Buffer p, int type) {
+  List<int> _readTagList(_Buffer p, int type) {
     if (!hasTag(type)) {
       return null;
     }

@@ -2,7 +2,7 @@ part of image;
 
 
 class JpegScan {
-  InputStream input;
+  _Buffer input;
   JpegFrame frame;
   int precision;
   int samplesPerLine;
@@ -100,7 +100,7 @@ class JpegScan {
       int m2 = input[1];
       if (m1 == 0xff) {
         if (m2 >= Jpeg.M_RST0 && m2 <= Jpeg.M_RST7) {
-          input.position += 2;
+          input.offset += 2;
         } else {
           break;
         }

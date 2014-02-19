@@ -2,7 +2,7 @@ part of image;
 
 class JpegData  {
   ProgressCallback progressCallback;
-  InputStream input;
+  _Buffer input;
   JpegJfif jfif;
   JpegAdobe adobe;
   JpegFrame frame;
@@ -14,7 +14,7 @@ class JpegData  {
   final List<Map> components = [];
 
   bool validate(List<int> bytes) {
-    input = new InputStream(bytes, byteOrder: BIG_ENDIAN);
+    input = new _Buffer(bytes, byteOrder: BIG_ENDIAN);
 
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
@@ -45,7 +45,7 @@ class JpegData  {
   }
 
   JpegInfo readInfo(List<int> bytes) {
-    input = new InputStream(bytes, byteOrder: BIG_ENDIAN);
+    input = new _Buffer(bytes, byteOrder: BIG_ENDIAN);
 
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
@@ -89,7 +89,7 @@ class JpegData  {
   }
 
   void read(List<int> bytes) {
-    input = new InputStream(bytes, byteOrder: BIG_ENDIAN);
+    input = new _Buffer(bytes, byteOrder: BIG_ENDIAN);
 
     _read();
 
@@ -108,8 +108,8 @@ class JpegData  {
       JpegComponent component = frame.components[frame.componentsOrder[i]];
       components.add({
         'scaleX': component.h / frame.maxH,
-      'scaleY': component.v / frame.maxV,
-      'lines': _buildComponentData(frame, component)
+        'scaleY': component.v / frame.maxV,
+        'lines': _buildComponentData(frame, component)
       });
     }
   }
@@ -269,7 +269,7 @@ class JpegData  {
 
     marker = _nextMarker();
     while (marker != Jpeg.M_EOI && !input.isEOS) {
-      InputStream block = _readBlock();
+      _Buffer block = _readBlock();
       switch (marker) {
         case Jpeg.M_APP0:
         case Jpeg.M_APP1:
@@ -330,7 +330,7 @@ class JpegData  {
           if (input[-3] == 0xff && input[-2] >= 0xc0 && input[-2] <= 0xfe) {
             // could be incorrect encoding -- last 0xFF byte of the previous
             // block was eaten by the encoder
-            input.position -= 3;
+            input.offset -= 3;
             break;
           }
 
@@ -350,15 +350,15 @@ class JpegData  {
     if (length < 2) {
       throw new ImageException('Invalid Block');
     }
-    input.position += length - 2;
+    input.offset += length - 2;
   }
 
-  InputStream _readBlock() {
+  _Buffer _readBlock() {
     int length = input.readUint16();
     if (length < 2) {
       throw new ImageException('Invalid Block');
     }
-    return new InputStream(input.readBytes(length - 2), byteOrder: BIG_ENDIAN);
+    return input.readBytes(length - 2);//new InputStream(input.readBytes(length - 2), byteOrder: BIG_ENDIAN);
   }
 
   int _nextMarker() {
@@ -377,8 +377,8 @@ class JpegData  {
     return c;
   }
 
-  void _readAppData(int marker, InputStream block) {
-    List<int> appData = block.buffer;
+  void _readAppData(int marker, _Buffer block) {
+    _Buffer appData = block;//.buffer;
 
     if (marker == Jpeg.M_APP0) {
       // 'JFIF\0'
@@ -393,7 +393,7 @@ class JpegData  {
         jfif.thumbWidth = appData[12];
         jfif.thumbHeight = appData[13];
         int thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
-        jfif.thumbData = appData.sublist(14, 14 + thumbSize);
+        jfif.thumbData = appData.subset(14 + thumbSize, offset: 14);
       }
     }
 
@@ -411,7 +411,7 @@ class JpegData  {
     }
   }
 
-  void _readDQT(InputStream block) {
+  void _readDQT(_Buffer block) {
     while (!block.isEOS) {
       int n = block.readByte();
       int prec = _shiftR(n, 4);
@@ -443,7 +443,7 @@ class JpegData  {
     }
   }
 
-  void _readFrame(int marker, InputStream block) {
+  void _readFrame(int marker, _Buffer block) {
     if (frame != null) {
       throw new ImageException('Duplicate JPG frame data found.');
     }
@@ -472,7 +472,7 @@ class JpegData  {
     frames.add(frame);
   }
 
-  void _readDHT(InputStream block) {
+  void _readDHT(_Buffer block) {
     while (!block.isEOS) {
       int index = block.readByte();
 
@@ -504,11 +504,11 @@ class JpegData  {
     }
   }
 
-  void _readDRI(InputStream block) {
+  void _readDRI(_Buffer block) {
     resetInterval = block.readUint16();
   }
 
-  void _readSOS(InputStream block) {
+  void _readSOS(_Buffer block) {
     int n = block.readByte();
 
     if (n < 1 || n > Jpeg.MAX_COMPS_IN_SCAN) {

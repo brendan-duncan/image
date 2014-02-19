@@ -8,7 +8,7 @@ class TiffDecoder extends Decoder {
    * Is the given file a valid TIFF image?
    */
   bool isValidFile(List<int> data) {
-    return _readHeader(new Buffer(data)) != null;
+    return _readHeader(new _Buffer(data)) != null;
   }
 
   /**
@@ -16,7 +16,7 @@ class TiffDecoder extends Decoder {
    * If the file is not a valid Gif image, null is returned.
    */
   TiffInfo startDecode(List<int> bytes) {
-    _input = new Buffer(new Uint8List.fromList(bytes));
+    _input = new _Buffer(new Uint8List.fromList(bytes));
     info = _readHeader(_input);
     return info;
   }
@@ -48,7 +48,7 @@ class TiffDecoder extends Decoder {
    * decoding the file, null is returned.
    */
   Image decodeImage(List<int> data, {int frame: 0}) {
-    Buffer ptr = new Buffer(new Uint8List.fromList(data));
+    _Buffer ptr = new _Buffer(new Uint8List.fromList(data));
 
     TiffInfo info = _readHeader(ptr);
     if (info == null) {
@@ -86,7 +86,7 @@ class TiffDecoder extends Decoder {
   /**
    * Read the TIFF header and IFD blocks.
    */
-  TiffInfo _readHeader(Buffer p) {
+  TiffInfo _readHeader(_Buffer p) {
     TiffInfo info = new TiffInfo();
     info.byteOrder = p.readUint16();
     if (info.byteOrder != TIFF_LITTLE_ENDIAN &&
@@ -110,7 +110,7 @@ class TiffDecoder extends Decoder {
     int offset = p.readUint32();
     info.ifdOffset = offset;
 
-    Buffer p2 = new Buffer.from(p);
+    _Buffer p2 = new _Buffer.from(p);
     p2.offset = offset;
 
     while (offset != 0) {
@@ -138,7 +138,7 @@ class TiffDecoder extends Decoder {
     return info.images.length > 0 ? info : null;
   }
 
-  Buffer _input;
+  _Buffer _input;
 
   static const int TIFF_SIGNATURE = 42;
   static const int TIFF_LITTLE_ENDIAN = 0x4949;

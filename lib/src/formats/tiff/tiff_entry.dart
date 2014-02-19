@@ -21,12 +21,12 @@ class TiffEntry {
 
   bool get isString => type == TYPE_ASCII;
 
-  readValue(Buffer p) {
+  readValue(_Buffer p) {
     p.offset = valueOffset;
     return _readValue(p);
   }
 
-  List readValues(Buffer p) {
+  List readValues(_Buffer p) {
     p.offset = valueOffset;
     List values = [];
     for (int i = 0; i < numValues; ++i) {
@@ -35,7 +35,7 @@ class TiffEntry {
     return values;
   }
 
-  String readString(Buffer p) {
+  String readString(_Buffer p) {
     if (type != TYPE_ASCII) {
       throw new ImageException('readString requires ASCII entity');
     }
@@ -43,7 +43,7 @@ class TiffEntry {
     return new String.fromCharCodes(readValues(p));
   }
 
-  _readValue(Buffer p) {
+  _readValue(_Buffer p) {
     switch (type) {
       case TYPE_BYTE:
       case TYPE_ASCII:

@@ -6,16 +6,16 @@ part of image;
  */
 class TgaDecoder extends Decoder {
   TgaInfo info;
-  Buffer input;
+  _Buffer input;
 
   /**
    * Is the given file a valid Targa image?
    */
   bool isValidFile(List<int> data) {
-    Buffer input = new Buffer(data,
+    _Buffer input = new _Buffer(data,
         byteOrder: BIG_ENDIAN);
 
-    Buffer header = input.readBytes(18);
+    _Buffer header = input.readBytes(18);
     if (header[2] != 2) {
       return false;
     }
@@ -28,9 +28,9 @@ class TgaDecoder extends Decoder {
 
   DecodeInfo startDecode(List<int> data) {
     info = new TgaInfo();
-    input = new Buffer(data, byteOrder: BIG_ENDIAN);
+    input = new _Buffer(data, byteOrder: BIG_ENDIAN);
 
-    Buffer header = input.readBytes(18);
+    _Buffer header = input.readBytes(18);
     if (header[2] != 2) {
       return null;
     }

@@ -1,7 +1,7 @@
 part of image;
 
 class LzwDecoder {
-  void decode(Buffer p, List<int> out) {
+  void decode(_Buffer p, List<int> out) {
     this._out = out;
     int outLen = out.length;
     _outPointer = 0;

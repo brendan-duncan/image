@@ -4,23 +4,23 @@ part of image;
  * A helper class to work with List and TypedData in a way similar to pointers
  * in C.
  */
-class Buffer {
+class _Buffer {
   final List<int> data;
   final int start;
   final int end;
   int offset;
   int byteOrder;
 
-  Buffer(List<int> buffer, {this.offset: 0, int length: -1,
+  _Buffer(List<int> bytes, {this.offset: 0, int length: -1,
          this.byteOrder: LITTLE_ENDIAN}) :
-    data = buffer,
+    data = bytes is Uint8List ? bytes : new Uint8List.fromList(bytes),
     start = 0,
-    end = (length < 0 || length > buffer.length) ? buffer.length :
+    end = (length < 0 || length > bytes.length) ? bytes.length :
           length {
     offset += start;
   }
 
-  Buffer.from(Buffer other, {this.offset: 0, int length: -1}) :
+  _Buffer.from(_Buffer other, {this.offset: 0, int length: -1}) :
     data = other.data,
     start = other.offset,
     end = (length < 0) ? other.data.length :
@@ -55,8 +55,8 @@ class Buffer {
    * relative to the current offset of this Buffer, and [count] is the length
    * of the new Buffer.
    */
-  Buffer subset(int count, {int offset: 0}) {
-    Buffer out = new Buffer.from(this, offset: this.offset + offset,
+  _Buffer subset(int count, {int offset: 0}) {
+    _Buffer out = new _Buffer.from(this, offset: this.offset + offset,
                                  length: count);
     return out;
   }
@@ -67,7 +67,7 @@ class Buffer {
    * the offset in [other] to start reading.
    */
   void memcpy(int start, int length, other, [int offset = 0]) {
-    if (other is Buffer) {
+    if (other is _Buffer) {
       data.setRange(this.offset + start, this.offset + start + length,
                     other.data, other.offset + offset);
     } else {
@@ -94,8 +94,8 @@ class Buffer {
   /**
    * Read [count] bytes from the buffer.
    */
-  Buffer readBytes(int count) {
-    Buffer out = new Buffer.from(this, length: count);
+  _Buffer readBytes(int count) {
+    _Buffer out = new _Buffer.from(this, length: count);
     offset += out.length;
     return out;
   }
@@ -174,6 +174,9 @@ class Buffer {
   }
 
   List<int> toList([int offset = 0, int length = 0]) {
+    if (data is Uint8List) {
+      return toUint8List(offset, length);
+    }
     int s = start + this.offset + offset;
     int e = (length <= 0) ? end : s + length;
     return data.sublist(s, e);

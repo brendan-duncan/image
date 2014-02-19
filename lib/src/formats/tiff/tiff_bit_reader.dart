@@ -1,7 +1,7 @@
 part of image;
 
 class TiffBitReader {
-  Buffer input;
+  _Buffer input;
 
   TiffBitReader(this.input);
 

@@ -5,18 +5,18 @@ part of image;
  */
 class JpegDecoder extends Decoder {
   JpegInfo info;
-  Buffer input;
+  _Buffer input;
 
   /**
    * Is the given file a valid JPEG image?
    */
   bool isValidFile(List<int> data) {
-    Buffer input = new Buffer(data, byteOrder: BIG_ENDIAN);
+    _Buffer input = new _Buffer(data, byteOrder: BIG_ENDIAN);
     return new JpegData().validate(data);
   }
 
   DecodeInfo startDecode(List<int> data) {
-    input = new Buffer(data, byteOrder: BIG_ENDIAN);
+    input = new _Buffer(data, byteOrder: BIG_ENDIAN);
     info = new JpegData().readInfo(data);
     return info;
   }
