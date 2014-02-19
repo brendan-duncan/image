@@ -83,9 +83,9 @@ Image adjustColor(Image src, {int blacks, int whites, int mids,
     if (saturation != null) {
       double lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
 
-      r = lum * saturation + r * invSaturation;
-      g = lum * saturation + g * invSaturation;
-      b = lum * saturation + b * invSaturation;
+      r = lum * invSaturation + r * saturation;
+      g = lum * invSaturation + g * saturation;
+      b = lum * invSaturation + b * saturation;
     }
 
     if (contrast != null) {
