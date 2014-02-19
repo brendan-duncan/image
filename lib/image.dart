@@ -42,6 +42,7 @@ part 'src/filter/seperable_convolution.dart';
 part 'src/filter/seperable_kernel.dart';
 part 'src/filter/sepia.dart';
 part 'src/filter/smooth.dart';
+part 'src/filter/sobel.dart';
 part 'src/filter/vignette.dart';
 
 part 'src/fonts/arial_14.dart';
