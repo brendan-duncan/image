@@ -150,6 +150,33 @@ void defineImageTests() {
       fp.writeAsBytesSync(writePng(f));
     });
 
+    test('adjustColor:saturation', () {
+      Image f = new Image.from(image);
+      adjustColor(f, saturation: 0.25);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/adjustColor_saturation.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('adjustColor:gamma', () {
+      Image f = new Image.from(image);
+      adjustColor(f, gamma: 1.0 / 2.2);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/adjustColor_gamma.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('adjustColor:hue', () {
+      Image f = new Image.from(image);
+      adjustColor(f, hue: 75.0, gamma: 0.75, amount: 0.35);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/adjustColor_hue.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
     test('emboss', () {
       Image f = new Image.from(image);
       emboss(f);
