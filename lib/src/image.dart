@@ -6,7 +6,17 @@ part of image;
  * color for a pixel.
  *
  * Pixels are stored in 32-bit unsigned integers in little-endian format:
- * aabbggrr.  This is to be consistent with HTML canvas data.
+ * aabbggrr.  This is to be consistent with HTML canvas data.  You can use
+ * [getBytes] to access the pixel at the byte (channel) level, where there
+ * are four bytes per pixel in red, green, blue, and alpha order.
+ *
+ * If this image is a frame of an animation as decoded by the [decodeFrame]
+ * method of [Decoder], then the [xOffset], [yOffset], [width] and [height]
+ * coordinates determine area of the canvas this image should be drawn into,
+ * as some frames of an animation only modify part of the canvas (recording
+ * the part of the frame that actually changes).  The [decodeAnimation] method
+ * will always return the fully composed animation, so these coordinate
+ * properties are not used.
  */
 class Image {
   /// 24-bit RGB image.
@@ -14,9 +24,16 @@ class Image {
   /// 32-bit RGBA image.
   static const int RGBA = 4;
 
+  /// When drawing this frame, the canvas should be left as it is.
   static const int DISPOSE_NONE = 0;
+  /// When drawing this frame, the canvas should be cleared first.
   static const int DISPOSE_CLEAR = 1;
+
+  /// No alpha blending should be done when drawing this frame (replace
+  /// pixels in canvas).
   static const int BLEND_SOURCE = 0;
+  /// Alpha blending should be used when drawing this frame (composited over
+  /// the current canvas image).
   static const int BLEND_OVER = 1;
 
   /// Width of the image.
@@ -25,13 +42,16 @@ class Image {
   final int height;
   /// x position at which to render the frame.
   int xOffset = 0;
-  /// x position at which to render the frame.
+  /// y position at which to render the frame.
   int yOffset = 0;
   /// How long this frame should be displayed, in milliseconds.
   /// A duration of 0 indicates no delay and the next frame will be drawn
   /// as quickly as it can.
   int duration = 0;
+  /// Defines what should be done to the canvas when drawing this frame.
   int disposeMethod = DISPOSE_CLEAR;
+  /// Defines the blending method (alpha compositing) to use when drawing this
+  /// frame.
   int blendMethod = BLEND_OVER;
 
   /**

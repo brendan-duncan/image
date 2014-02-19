@@ -1,14 +1,20 @@
 part of image;
 
+/// Gaussian noise type used by [noise].
 const int NOISE_GAUSSIAN = 0;
+/// Uniform noise type used by [noise].
 const int NOISE_UNIFORM = 1;
+/// Salt&Pepper noise type used by [noise].
 const int NOISE_SALT_PEPPER = 2;
+/// Poisson noise type used by [noise].
 const int NOISE_POISSON = 3;
+/// Rice noise type used by [noise].
 const int NOISE_RICE = 4;
 
 /**
  * Add random noise to pixel values.  [sigma] determines how strong the effect
- * should be.
+ * should be.  [type] should be one of the following: [NOISE_GAUSSIAN],
+ * [NOISE_UNIFORM], [NOISE_SALT_PEPPER], [NOISE_POISSON], or [NOISE_RICE].
  */
 Image noise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
   Math.Random random}) {

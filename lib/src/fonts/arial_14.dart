@@ -1,5 +1,8 @@
 part of image;
 
+/**
+ * 14px Arial font for use with [drawString] and [drawChar].
+ */
 final BitmapFont arial_14 = new BitmapFont.fromZip(_ARIAL_14);
 
 const List<int> _ARIAL_14 = const [

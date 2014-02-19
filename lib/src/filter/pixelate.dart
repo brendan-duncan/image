@@ -1,8 +1,9 @@
 part of image;
 
-/// Use the top-left pixel of a block for the block color.
+/// Use the top-left pixel of a block for the block color, used by [pixelate].
 const int PIXELATE_UPPERLEFT = 0;
-/// Use the average of the pixels within a block for the block color.
+/// Use the average of the pixels within a block for the block color, used by
+/// [pixelate].
 const int PIXELATE_AVERAGE = 1;
 
 /**
@@ -10,7 +11,7 @@ const int PIXELATE_AVERAGE = 1;
  *
  * [blockSize] determines the size of the pixelated blocks.
  * If [mode] is [PIXELATE_UPPERLEFT] then the upper-left corner of the block
- * will be used for the block color.  Otherwise if [mode] is PIXELATE_AVERAGE,
+ * will be used for the block color. Otherwise if [mode] is [PIXELATE_AVERAGE],
  * the average of all the pixels in the block will be used for the block color.
  */
 Image pixelate(Image src, int blockSize, {int mode: PIXELATE_UPPERLEFT}) {
