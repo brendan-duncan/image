@@ -51,6 +51,17 @@ class Buffer {
   operator[]=(int index, int value) => data[offset + index] = value;
 
   /**
+   * Returns a Buffer that is a subset of this Buffer.  The given [offset] is
+   * relative to the current offset of this Buffer, and [count] is the length
+   * of the new Buffer.
+   */
+  Buffer subset(int count, {int offset: 0}) {
+    Buffer out = new Buffer.from(this, offset: this.offset + offset,
+                                 length: count);
+    return out;
+  }
+
+  /**
    * Copy data from [other] to this buffer, at [start] offset from the
    * current read position, and [length] number of bytes.  [offset] is
    * the offset in [other] to start reading.
@@ -84,7 +95,7 @@ class Buffer {
    * Read [count] bytes from the buffer.
    */
   Buffer readBytes(int count) {
-    Buffer out = new Buffer.from(this, offset: offset, length: count);
+    Buffer out = new Buffer.from(this, length: count);
     offset += out.length;
     return out;
   }
