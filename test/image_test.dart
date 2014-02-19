@@ -26,7 +26,7 @@ void main() {
 
 void defineImageTests() {
   group('image', () {
-    Image image = readPng(new Io.File('res/png/trees.png').readAsBytesSync());
+    Image image = readJpg(new Io.File('res/jpg/big_buck_bunny.jpg').readAsBytesSync());
     Image image2 = readPng(new Io.File('res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
@@ -152,7 +152,7 @@ void defineImageTests() {
 
     test('adjustColor:saturation', () {
       Image f = new Image.from(image);
-      adjustColor(f, saturation: 0.25);
+      adjustColor(f, saturation: 0.35);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/adjustColor_saturation.png');
       fp.createSync(recursive: true);
@@ -182,6 +182,15 @@ void defineImageTests() {
       emboss(f);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/emboss.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(f));
+    });
+
+    test('sobel', () {
+      Image f = new Image.from(image);
+      sobel(f, amount: 0.75);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/sobel.png');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writePng(f));
     });
