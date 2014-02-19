@@ -2,11 +2,46 @@ part of image;
 
 /**
  * Adjust the color of the [src] image using varous color transformations.
+ *
+ * [blacks] defines the black level of the image, as a color.
+ *
+ * [whites] defines the white level of the image, as a color.
+ *
+ * [mids] defines the mid level of hte image, as a color.
+ *
+ * [contrast] increases (> 1) / decreases (< 1) the contrast of the image by
+ * pushing colors away/toward neutral gray, where at 0.0 the image is entirely
+ * neutral gray (0 contrast), 1.0, the image is not adjusted and > 1.0 the
+ * image increases contrast.
+ *
+ * [saturation] increases (> 1) / decreases (< 1) the saturation of the image
+ * by pushing colors away/toward their grayscale value, where 0.0 is grayscale
+ * and 1.0 is the original image, and > 1.0 the image becomes more saturated.
+ *
+ * [brightness] is a constant scalar of the image colors.  At [0.0] the image
+ * is black, 1.0 unmodified, and > 1.0 the image becomes brighter.
+ *
+ * [gamma] is an exponental scalar of the image colors.  At < 1.0 the image
+ * becomes brighter, and > 1.0 the image becomes darker.  A [gamma] of 1/2.2
+ * will convert the image colors to linear color space.
+ *
+ * [exposure] is an exponental scalar of the image as rgb * pow(2, exposure).
+ *
+ * [hue] shifts the hue component of the image colors in degrees.  A [hue] of
+ * 0 will have no affect, and a [hue] of 45 will shift the hue of all colors
+ * by 45 degrees.
+ *
+ * [amount] controls how much affect this filter has on the [src] image, where
+ * 0.0 has no effect and 1.0 has full effect.
  */
 Image adjustColor(Image src, {int blacks, int whites, int mids,
                   double contrast, double saturation, double brightness,
                   double gamma, double exposure, double hue,
                   double amount}) {
+  if (amount == 0.0) {
+    return src;
+  }
+
   const double DEG_TO_RAD = 0.0174532925;
   const double avgLumR = 0.5;
   const double avgLumG = 0.5;

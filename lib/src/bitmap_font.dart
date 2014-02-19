@@ -22,7 +22,6 @@ BitmapFont readFont(String font, Image map) =>
  * like: http://kvazars.com/littera
  */
 class BitmapFont {
-  // info
   String face = '';
   int size = 0;
   bool bold = false;
@@ -35,7 +34,6 @@ class BitmapFont {
   List<int> padding = [];
   List<int> spacing = [];
   bool outline = false;
-  // common
   int lineHeight = 0;
   int base = 0;
   num scaleW = 0;
@@ -373,6 +371,9 @@ class BitmapFont {
   }
 }
 
+/**
+ * A single character in a [BitmapFont].
+ */
 class BitmapFontCharacter {
   final int id;
   final int width;
