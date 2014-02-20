@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>filter_lab</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="res/filter_lab.css" />
+  </head>
+
+  <body>
+    <div id="toolbar">
+      <h1>Dart Image: Filter Lab</h1>
+    </div>
+    <div id="sidebar"></div>
+    <div id="editor">
+      <div class="contents">
+        <canvas id="filter_canvas"></canvas>
+      </div>
+    </div>
+    <div id="fade"></div>
+    <div id="dialog"></div>
+
+    <script type="application/dart" src="filter_lab.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>
