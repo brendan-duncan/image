@@ -27,6 +27,7 @@ void main() {
 void defineImageTests() {
   group('image', () {
     Image image = readJpg(new Io.File('res/jpg/big_buck_bunny.jpg').readAsBytesSync());
+    image = copyResize(image, 400);
     Image image2 = readPng(new Io.File('res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
@@ -188,7 +189,7 @@ void defineImageTests() {
 
     test('sobel', () {
       Image f = new Image.from(image);
-      sobel(f, amount: 0.75);
+      sobel(f);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/sobel.png');
       fp.createSync(recursive: true);
