@@ -14,7 +14,7 @@ Image remapColors(Image src,
     int alpha: ALPHA}) {
 
   List<int> l = [0, 0, 0, 0, 0];
-  Uint8List p = src.getBytes();
+  var p = src.getBytes();
   for (int i = 0, len = p.length; i < len; i += 4) {
     l[0] = p[i];
     l[1] = p[i + 1];

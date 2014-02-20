@@ -11,7 +11,7 @@ Image brightness(Image src, int brightness) {
     return src;
   }
 
-  Uint8List pixels = src.getBytes();
+  var pixels = src.getBytes();
   for (int i = 0, len = pixels.length; i < len; i += 4) {
     pixels[i] = _clamp255(pixels[i] + brightness);
     pixels[i + 1] = _clamp255(pixels[i + 1] + brightness);

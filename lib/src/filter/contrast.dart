@@ -27,7 +27,7 @@ Image contrast(Image src, num contrast) {
     }
   }
 
-  Uint8List p = src.getBytes();
+  var p = src.getBytes();
   for (int i = 0, len = p.length; i < len; i += 4) {
     p[i] = _contrast[p[i]];
     p[i + 1] = _contrast[p[i + 1]];

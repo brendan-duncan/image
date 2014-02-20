@@ -5,7 +5,7 @@ part of image;
  * colors, a per-channel brightness.
  */
 Image colorOffset(Image src, int red, int green, int blue, int alpha) {
-  Uint8List pixels = src.getBytes();
+  var pixels = src.getBytes();
   for (int i = 0, len = pixels.length; i < len; i += 4) {
     pixels[i] = _clamp255(pixels[i] + red);
     pixels[i + 1] = _clamp255(pixels[i + 1] + green);

@@ -5,12 +5,12 @@ part of image;
  *
  * [amount] controls the strength of the effect, in the range 0.0 - 1.0.
  */
-Image sepia(Image src, {num amount: 0.6}) {
+Image sepia(Image src, {num amount: 1.0}) {
   if (amount == 0) {
     return src;
   }
 
-  Uint8List p = src.getBytes();
+  var p = src.getBytes();
   for (int i = 0, len = p.length; i < len; i += 4) {
     int r = p[i];
     int g = p[i + 1];

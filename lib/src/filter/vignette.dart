@@ -16,7 +16,7 @@ Image vignette(Image src, {double start: 0.3, double end: 0.75,
   final int h = src.height - 1;
   final int w = src.width - 1;
   double invAmt = 1.0 - amount;
-  Uint8List p = src.getBytes();
+  var p = src.getBytes();
   for (int y = 0, i = 0; y <= h; ++y) {
     double dy = 0.5 - (y / h);
     for (int x = 0; x <= w; ++x, i += 4) {

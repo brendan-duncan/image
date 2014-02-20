@@ -85,7 +85,7 @@ class Image {
    *
    * For example, given an Html Canvas, you could create an image:
    * var bytes = canvas.getContext('2d').getImageData(0, 0,
-   *   canvas.width, canvas.height);
+   *   canvas.width, canvas.height).data;
    * Image image = new Image.fromBytes(canvas.width, canvas.height, bytes);
    */
   Image.fromBytes(int width, int height, List<int> bytes,
@@ -94,7 +94,10 @@ class Image {
     this.height = height,
     // Create a uint32 view of the byte buffer.
     // This assumes the system architecture is little-endian...
-    _data = new Uint32List.view(new Uint8List.fromList(bytes).buffer);
+    _data = bytes is Uint8List ? new Uint32List.view(bytes.buffer) :
+            bytes is Uint8ClampedList ? new Uint32List.view(bytes.buffer) :
+            bytes is Uint32List ? new Uint32List.view(bytes.buffer) :
+            new Uint32List.view(new Uint8List.fromList(bytes).buffer);
 
   /**
    * Clone this image.
@@ -112,7 +115,7 @@ class Image {
    * d.data.setRange(0, image.length, image.getBytes());
    * context2D.putImageData(data, 0, 0);
    */
-  List<int> getBytes() =>
+  Uint8List getBytes() =>
     new Uint8List.view(_data.buffer);
 
   /**

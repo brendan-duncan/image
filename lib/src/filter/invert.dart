@@ -4,7 +4,7 @@ part of image;
  * Invert the colors of the [src] image.
  */
 Image invert(Image src) {
-  Uint8List p = src.getBytes();
+  var p = src.getBytes();
   for (int i = 0, len = p.length; i < len; i += 4) {
     p[i] = 255 - p[i];
     p[i + 1] = 255 - p[i + 1];

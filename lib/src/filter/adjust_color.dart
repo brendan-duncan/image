@@ -18,7 +18,7 @@ part of image;
  * by pushing colors away/toward their grayscale value, where 0.0 is grayscale
  * and 1.0 is the original image, and > 1.0 the image becomes more saturated.
  *
- * [brightness] is a constant scalar of the image colors.  At [0.0] the image
+ * [brightness] is a constant scalar of the image colors.  At 0 the image
  * is black, 1.0 unmodified, and > 1.0 the image becomes brighter.
  *
  * [gamma] is an exponental scalar of the image colors.  At < 1.0 the image
@@ -26,6 +26,8 @@ part of image;
  * will convert the image colors to linear color space.
  *
  * [exposure] is an exponental scalar of the image as rgb * pow(2, exposure).
+ * At 0, the image is unmodified; as the exposure increases, the image
+ * brightens.
  *
  * [hue] shifts the hue component of the image colors in degrees.  A [hue] of
  * 0 will have no affect, and a [hue] of 45 will shift the hue of all colors
@@ -109,7 +111,7 @@ Image adjustColor(Image src, {int blacks, int whites, int mids,
       b = Math.pow((b + bb) * wb, mb);
     }
 
-    if (brightness != null) {
+    if (brightness != null && brightness != 1.0) {
       r *= brightness;
       g *= brightness;
       b *= brightness;
@@ -124,9 +126,9 @@ Image adjustColor(Image src, {int blacks, int whites, int mids,
     }
 
     if (contrast != null) {
-      r = avgLumR * contrast + r * invContrast;
-      g = avgLumG * contrast + g * invContrast;
-      b = avgLumB * contrast + b * invContrast;
+      r = avgLumR * invContrast + r * contrast;
+      g = avgLumG * invContrast + g * contrast;
+      b = avgLumB * invContrast + b * contrast;
     }
 
     if (gamma != null) {
@@ -141,7 +143,7 @@ Image adjustColor(Image src, {int blacks, int whites, int mids,
       b = b * exposure;
     }
 
-    if (hue != null) {
+    if (hue != null && hue != 0.0) {
       double hr = r * hueR + g * hueG + b * hueB;
       double hg = r * hueB + g * hueR + b * hueG;
       double hb = r * hueG + g * hueB + b * hueR;
