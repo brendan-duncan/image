@@ -3,6 +3,7 @@ import 'package:image/image.dart';
 
 Html.ImageData filterImageData;
 Html.CanvasElement canvas;
+Html.DivElement logDiv;
 Image origImage;
 
 void _addControl(String label, String value, Html.DivElement parent,
@@ -26,18 +27,6 @@ void _addControl(String label, String value, Html.DivElement parent,
 }
 
 
-void applySepia(double amount) {
-  Image image = new Image.from(origImage);
-  image = sepia(image, amount: amount);
-
-  // Fill the buffer with our image data.
-  filterImageData.data.setRange(0, filterImageData.data.length,
-                                image.getBytes());
-  // Draw the buffer onto the canvas.
-  canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
-  canvas.context2D.putImageData(filterImageData, 0, 0);
-}
-
 void testSepia() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
   sidebar.children.clear();
@@ -46,18 +35,28 @@ void testSepia() {
   label.text = 'Sepia';
   sidebar.children.add(label);
 
-  _addControl('Amount', '1.0', sidebar, (v) {
-    applySepia(v);
+  double amount = 1.0;
+
+  void _apply() {
+    Image image = new Image.from(origImage);
+    image = sepia(image, amount: amount);
+
+    // Fill the buffer with our image data.
+    filterImageData.data.setRange(0, filterImageData.data.length,
+                                  image.getBytes());
+    // Draw the buffer onto the canvas.
+    canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.context2D.putImageData(filterImageData, 0, 0);
+  }
+
+  _addControl('Amount', amount.toString(), sidebar, (v) {
+    amount = v;
+    _apply();
   });
 
-  applySepia(1.0);
+  _apply();
 }
 
-void applyAdjustColor(double contrast, double saturation, double brightness,
-                      double gamma, double exposure, double hue,
-                      double amount) {
-
-}
 
 void testAdjustColor() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
@@ -76,10 +75,14 @@ void testAdjustColor() {
   double amount = 1.0;
 
   void _apply() {
+    Stopwatch t = new Stopwatch();
+
     Image image = new Image.from(origImage);
+    t.start();
     image = adjustColor(image, contrast: contrast, saturation: saturation,
         brightness: brightness, gamma: gamma, exposure: exposure,
         hue: hue, amount: amount);
+    t.stop();
 
     // Fill the buffer with our image data.
     filterImageData.data.setRange(0, filterImageData.data.length,
@@ -87,6 +90,9 @@ void testAdjustColor() {
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
+
+    logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
+    print(t.elapsedMilliseconds / 1000.0);
   }
 
   _addControl('Contrast', contrast.toString(), sidebar, (v) {
@@ -129,6 +135,7 @@ void testAdjustColor() {
 
 void main() {
   canvas = Html.document.querySelector('#filter_canvas');
+  logDiv = Html.document.querySelector('#log');
 
   Html.ImageElement img = new Html.ImageElement();
   img.src = 'res/big_buck_bunny.jpg';
