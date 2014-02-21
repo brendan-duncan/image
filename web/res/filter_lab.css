@@ -101,6 +101,15 @@ body {
   margin-top: 5px;
 }
 
+label {
+  margin-right: 5px;
+}
+
+input {
+  border-radius: 8px;
+  padding-left: 3px;
+}
+
 #toolbar .button {
     float: left;
     line-height: 27px;
