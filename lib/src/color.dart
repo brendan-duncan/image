@@ -12,9 +12,9 @@ const int ALPHA = 3;
 const int LUMINANCE = 4;
 
 
-int _clamp(int x, int a, int b) => (x < a) ? a : (x > b) ? b : x;
+int _clamp(int x, int a, int b) => x.clamp(a, b);
 
-int _clamp255(int x) => (x < 0) ? 0 : (x > 255) ? 255 : x;
+int _clamp255(int x) => x.clamp(0, 255);
 
 /**
  * Get the color with the given [r], [g], [b], and [a] components.
