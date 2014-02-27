@@ -25,6 +25,12 @@ Decoding Only:
 
 ##[Documentation](https://github.com/brendan-duncan/image/wiki)
 
+##[API](http://brendan-duncan.github.io/#image/image)
+
+##[Examples](https://github.com/brendan-duncan/image/wiki/Examples)
+
+##Format Decoding Functions##
+
 ##Samples
 
 Load a WebP image, resize it, and save it as a png:
