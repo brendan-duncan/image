@@ -53,6 +53,9 @@ class Image {
   /// Defines the blending method (alpha compositing) to use when drawing this
   /// frame.
   int blendMethod = BLEND_OVER;
+  /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
+  /// channel.
+  final Uint32List data;
 
   /**
    * Create an image with the given dimensions and format.
@@ -60,7 +63,7 @@ class Image {
   Image(int width, int height, [this._format = RGBA]) :
     this.width = width,
     this.height = height,
-    _data = new Uint32List(width * height);
+    data = new Uint32List(width * height);
 
   /**
    * Create a copy of the image [other].
@@ -74,7 +77,7 @@ class Image {
     disposeMethod = other.disposeMethod,
     blendMethod = other.blendMethod,
     _format = other._format,
-    _data = new Uint32List.fromList(other._data);
+    data = new Uint32List.fromList(other.data);
 
   /**
    * Create an image from [bytes].
@@ -94,7 +97,7 @@ class Image {
     this.height = height,
     // Create a uint32 view of the byte buffer.
     // This assumes the system architecture is little-endian...
-    _data = bytes is Uint8List ? new Uint32List.view(bytes.buffer) :
+    data = bytes is Uint8List ? new Uint32List.view(bytes.buffer) :
             bytes is Uint8ClampedList ? new Uint32List.view(bytes.buffer) :
             bytes is Uint32List ? new Uint32List.view(bytes.buffer) :
             new Uint32List.view(new Uint8List.fromList(bytes).buffer);
@@ -116,7 +119,7 @@ class Image {
    * context2D.putImageData(data, 0, 0);
    */
   Uint8List getBytes() =>
-    new Uint8List.view(_data.buffer);
+    new Uint8List.view(data.buffer);
 
   /**
    * Get the format of the image, either [RGB] or [RGBA].
@@ -124,7 +127,9 @@ class Image {
   int get format => _format;
 
   /**
-   * Set the format of the image, either [RGB] or [RGBA].
+   * Set the format of the image, either [RGB] or [RGBA].  The format is used
+   * for informational purposes and has no effect on the actual stored data,
+   * which is always in 4-byte RGBA format.
    */
   void set format(int f) {
     if (f == _format) {
@@ -146,7 +151,7 @@ class Image {
    * Set all of the pixels of the image to the given [color].
    */
   Image fill(int color) {
-    _data.fillRange(0, _data.length, color);
+    data.fillRange(0, data.length, color);
     return this;
   }
 
@@ -309,18 +314,18 @@ class Image {
   /**
    * The size of the image buffer.
    */
-  int get length => _data.length;
+  int get length => data.length;
 
   /**
    * Get a pixel from the buffer.
    */
-  int operator[](int index) => _data[index];
+  int operator[](int index) => data[index];
 
   /**
    * Set a pixel in the buffer.
    */
   void operator[]=(int index, int color) {
-    _data[index] = color;
+    data[index] = color;
   }
 
   /**
@@ -341,8 +346,8 @@ class Image {
   int getPixel(int x, int y) =>
     boundsSafe(x, y) ?
       _format == RGBA ?
-      _data[y * width + x] :
-      _data[y * width + x] | 0xff000000 : 0;
+      data[y * width + x] :
+      data[y * width + x] | 0xff000000 : 0;
 
   /**
    * Get the pixel using the given [interpolation] type for non-integer pixel
@@ -461,7 +466,7 @@ class Image {
    */
   void setPixel(int x, int y, int color) {
     if (boundsSafe(x, y)) {
-      _data[y * width + x] = color;
+      data[y * width + x] = color;
     }
   }
 
@@ -474,13 +479,10 @@ class Image {
    */
   void setPixelRGBA(int x, int y, int r, int g, int b, [int a = 0xff]) {
     if (boundsSafe(x, y)) {
-      _data[y * width + x] = getColor(r, g, b, a);
+      data[y * width + x] = getColor(r, g, b, a);
     }
   }
 
   /// Format of the image.
   int _format;
-  /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
-  /// channel.
-  final Uint32List _data;
 }
