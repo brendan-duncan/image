@@ -24,8 +24,8 @@ const List<int> _SHIFT_BITS = const [
  * typecasting an unsigned char to a char.
  */
 int _uint8ToInt8(int d) {
-  _uint8ToInt8_uint8[0] = d;
-  return _uint8ToInt8_int8[0];
+  __uint8[0] = d;
+  return __uint8ToInt8[0];
 }
 
 /**
@@ -33,8 +33,8 @@ int _uint8ToInt8(int d) {
  * typecasting an unsigned short to a short.
  */
 int _uint16ToInt16(int d) {
-  _uint16ToInt16_uint16[0] = d;
-  return _uint16ToInt16_int16[0];
+  __uint16[0] = d;
+  return __uint16ToInt16[0];
 }
 
 /**
@@ -42,8 +42,17 @@ int _uint16ToInt16(int d) {
  * typecasting an unsigned int to signed int.
  */
 int _uint32ToInt32(int d) {
-  _uint32ToInt32_uint32[0] = d;
-  return _uint32ToInt32_int32[0];
+  __uint32[0] = d;
+  return __uint32ToInt32[0];
+}
+
+/**
+ * Binary conversion of a uint32 to an float32.  This is equivalent in C to
+ * typecasting an unsigned int to float.
+ */
+double _uint32ToFloat32(int d) {
+  __uint32[0] = d;
+  return __uint32ToFloat32[0];
 }
 
 /**
@@ -51,22 +60,31 @@ int _uint32ToInt32(int d) {
  * typecasting an int to an unsigned int.
  */
 int _int32ToUint32(int d) {
-  _int32ToUint32_int32[0] = d;
-  return _int32ToUint32_uint32[0];
+  __int32[0] = d;
+  return __int32ToUint32[0];
 }
 
-final Uint8List _uint8ToInt8_uint8 = new Uint8List(1);
-final Int8List _uint8ToInt8_int8 =
-    new Int8List.view(_uint8ToInt8_uint8.buffer);
+/**
+ * Binary conversion of a float32 to an uint32.  This is equivalent in C to
+ * typecasting a float to unsigned int.
+ */
+int _float32ToUint32(double d) {
+  __float32[0] = d;
+  return __float32ToUint32[0];
+}
 
-final Uint16List _uint16ToInt16_uint16 = new Uint16List(1);
-final Int16List _uint16ToInt16_int16 =
-    new Int16List.view(_uint16ToInt16_uint16.buffer);
+final Uint8List __uint8 = new Uint8List(1);
+final Int8List __uint8ToInt8 = new Int8List.view(__uint8.buffer);
 
-final Uint32List _uint32ToInt32_uint32 = new Uint32List(1);
-final Int32List _uint32ToInt32_int32 =
-    new Int32List.view(_uint16ToInt16_uint16.buffer);
+final Uint16List __uint16 = new Uint16List(1);
+final Int16List __uint16ToInt16 = new Int16List.view(__uint16.buffer);
 
-final Int32List _int32ToUint32_int32 = new Int32List(1);
-final Uint32List _int32ToUint32_uint32 =
-    new Uint32List.view(_int32ToUint32_int32.buffer);
+final Uint32List __uint32 = new Uint32List(1);
+final Int32List __uint32ToInt32 = new Int32List.view(__uint32.buffer);
+final Float32List __uint32ToFloat32 = new Float32List.view(__uint32.buffer);
+
+final Int32List __int32 = new Int32List(1);
+final Uint32List __int32ToUint32 = new Uint32List.view(__int32.buffer);
+
+final Float32List __float32 = new Float32List(1);
+final Uint32List __float32ToUint32 = new Uint32List.view(__float32.buffer);

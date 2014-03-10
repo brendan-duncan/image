@@ -49,6 +49,8 @@ part 'src/fonts/arial_14.dart';
 part 'src/fonts/arial_24.dart';
 part 'src/fonts/arial_48.dart';
 
+part 'src/formats/exr/half.dart';
+part 'src/formats/exr/imf_input_file.dart';
 part 'src/formats/gif/gif_color_map.dart';
 part 'src/formats/gif/gif_image_desc.dart';
 part 'src/formats/gif/gif_info.dart';
