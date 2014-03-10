@@ -114,7 +114,7 @@ class GifDecoder extends Decoder {
     }
 
     _frame = frame;
-    _input.position = info.frames[frame]._inputPosition;
+    _input.offset = info.frames[frame]._inputPosition;
 
     return _decodeImage(info.frames[frame]);
   }
@@ -541,7 +541,8 @@ class GifDecoder extends Decoder {
         return null;
       }
 
-      _buffer.setRange(1, 1 + _buffer[0], _input.readBytes(_buffer[0]));
+      _buffer.setRange(1, 1 + _buffer[0],
+          _input.readBytes(_buffer[0]).toUint8List());
 
       nextByte = _buffer[1];
       _buffer[1] = 2; // We use now the second place as last char read!

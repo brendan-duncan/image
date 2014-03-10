@@ -192,7 +192,7 @@ class VP8 {
     }
 
     for (int p = 0; p < lastPart; ++p) {
-      List<int> szb = input.peekBytes(3, sz);
+      InputStream szb = input.peekBytes(3, sz);
       final int psize = szb[0] | (szb[1] << 8) | (szb[2] << 16);
       int partEnd = partStart + psize;
       if (partEnd > bufEnd) {

@@ -12,7 +12,7 @@ class PngDecoder extends Decoder {
   bool isValidFile(List<int> data) {
     InputStream input = new InputStream(data,
         byteOrder: BIG_ENDIAN);
-    List<int> pngHeader = input.readBytes(8);
+    InputStream pngHeader = input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
@@ -31,7 +31,7 @@ class PngDecoder extends Decoder {
   DecodeInfo startDecode(List<int> data) {
     _input = new InputStream(data, byteOrder: BIG_ENDIAN);
 
-    List<int> pngHeader = _input.readBytes(8);
+    InputStream pngHeader = _input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
@@ -43,7 +43,7 @@ class PngDecoder extends Decoder {
       int inputPos = _input.position;
 
       int chunkSize = _input.readUint32();
-      String chunkType = new String.fromCharCodes(_input.readBytes(4));
+      String chunkType = _input.readString(4);
       switch (chunkType) {
         case 'IHDR':
           InputStream hdr = new InputStream(_input.readBytes(chunkSize),
@@ -103,7 +103,7 @@ class PngDecoder extends Decoder {
           }
           break;
         case 'PLTE':
-          info.palette = _input.readBytes(chunkSize);
+          info.palette = _input.readBytes(chunkSize).toUint8List();
           int crc = _input.readUint32();
           int computedCrc = _crc(chunkType, info.palette);
           if (crc != computedCrc) {
@@ -111,7 +111,7 @@ class PngDecoder extends Decoder {
           }
           break;
         case 'tRNS':
-          info.transparency = _input.readBytes(chunkSize);
+          info.transparency = _input.readBytes(chunkSize).toUint8List();
           int crc = _input.readUint32();
           int computedCrc = _crc(chunkType, info.transparency);
           if (crc != computedCrc) {
@@ -206,10 +206,10 @@ class PngDecoder extends Decoder {
 
     if (!info.isAnimated || frame == 0) {
       for (int i = 0, len = info._idat.length; i < len; ++i) {
-        _input.position = info._idat[i];
+        _input.offset = info._idat[i];
         int chunkSize = _input.readUint32();
-        String chunkType = new String.fromCharCodes(_input.readBytes(4));
-        List<int> data = _input.readBytes(chunkSize);
+        String chunkType = _input.readString(4);
+        List<int> data = _input.readBytes(chunkSize).toUint8List();
         imageData.addAll(data);
         int crc = _input.readUint32();
         int computedCrc = _crc(chunkType, data);
@@ -226,11 +226,11 @@ class PngDecoder extends Decoder {
       width = f.width;
       height = f.height;
       for (int i = 0; i < f._fdat.length; ++i) {
-        _input.position = f._fdat[i];
+        _input.offset = f._fdat[i];
         int chunkSize = _input.readUint32();
-        String chunkType = new String.fromCharCodes(_input.readBytes(4));
+        String chunkType = _input.readString(4);
         _input.skip(4); // sequence number
-        List<int> data = _input.readBytes(chunkSize);
+        List<int> data = _input.readBytes(chunkSize).toUint8List();
         imageData.addAll(data);
       }
 
@@ -382,7 +382,7 @@ class PngDecoder extends Decoder {
         progressCallback(0, 1, _progressY, info.height);
       }
       int filterType = input.readByte();
-      inData[ri] = input.readBytes(rowBytes);
+      inData[ri] = input.readBytes(rowBytes).toUint8List();
 
       final List<int> row = inData[ri];
       final List<int> prevRow = inData[1 - ri];
@@ -445,7 +445,7 @@ class PngDecoder extends Decoder {
         progressCallback(_frame, _numFrames, y, h);
       }
       int filterType = input.readByte();
-      inData[ri] = input.readBytes(rowBytes);
+      inData[ri] = input.readBytes(rowBytes).toUint8List();
 
       List<int> row = inData[ri];
       List<int> prevRow = inData[1 - ri];

@@ -54,14 +54,14 @@ class WebPDecoder extends Decoder {
       case WebPInfo.FORMAT_ANIMATED:
         return info;
       case WebPInfo.FORMAT_LOSSLESS:
-        _input.position = info._vp8Position;
+        _input.offset = info._vp8Position;
         VP8L vp8l = new VP8L(_input, info);
         if (!vp8l.decodeHeader()) {
           return null;
         }
         return info;
       case WebPInfo.FORMAT_LOSSY:
-        _input.position = info._vp8Position;
+        _input.offset = info._vp8Position;
         VP8 vp8 = new VP8(_input, info);
         if (!vp8.decodeHeader()) {
           return null;
@@ -252,7 +252,7 @@ Animation decodeAnimation(List<int> bytes) {
         case 'ALPH':
           webp._alphaData = new InputStream(input.buffer,
               byteOrder: input.byteOrder);
-          webp._alphaData.position = input.position;
+          webp._alphaData.offset = input.offset;
           webp._alphaSize = size;
           input.skip(diskSize);
           break;
