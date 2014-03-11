@@ -5,7 +5,7 @@ part of image;
  */
 class TgaEncoder extends Encoder {
   List<int> encodeImage(Image image) {
-    OutputStream out = new OutputStream(byteOrder: BIG_ENDIAN);
+    OutputBuffer out = new OutputBuffer(bigEndian: true);
 
     List<int> header = new List<int>(18);
     header.fillRange(0, 18, 0);

@@ -2,12 +2,12 @@ part of image;
 
 
 class ImfInputFile {
-  InputStream input;
+  InputBuffer input;
   int version;
   int flags;
 
   ImfInputFile(List<int> bytes) {
-    input = new InputStream(bytes);
+    input = new InputBuffer(bytes);
 
     _readMagicNumberAndVersionField(input);
 
@@ -32,7 +32,7 @@ class ImfInputFile {
   }
 
 
-  void _readMagicNumberAndVersionField(InputStream input) {
+  void _readMagicNumberAndVersionField(InputBuffer input) {
     int magic = input.readUint32();
     int versionFlags = input.readUint32();
 

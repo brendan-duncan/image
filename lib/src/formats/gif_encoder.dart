@@ -9,7 +9,7 @@ class GifEncoder extends Encoder {
 
   void addFrame(Image image, {int duration}) {
     if (output == null) {
-      output = new OutputStream();
+      output = new OutputBuffer();
 
       if (duration != null) {
         this.delay = duration;
@@ -327,7 +327,7 @@ class GifEncoder extends Encoder {
   Uint8List _block;
   int _blockSize;
 
-  OutputStream output;
+  OutputBuffer output;
 
   static const String GIF89_STAMP = 'GIF89a';
 

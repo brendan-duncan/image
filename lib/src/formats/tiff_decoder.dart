@@ -8,7 +8,7 @@ class TiffDecoder extends Decoder {
    * Is the given file a valid TIFF image?
    */
   bool isValidFile(List<int> data) {
-    return _readHeader(new _Buffer(data)) != null;
+    return _readHeader(new InputBuffer(data)) != null;
   }
 
   /**
@@ -16,7 +16,7 @@ class TiffDecoder extends Decoder {
    * If the file is not a valid Gif image, null is returned.
    */
   TiffInfo startDecode(List<int> bytes) {
-    _input = new _Buffer(new Uint8List.fromList(bytes));
+    _input = new InputBuffer(new Uint8List.fromList(bytes));
     info = _readHeader(_input);
     return info;
   }
@@ -48,7 +48,7 @@ class TiffDecoder extends Decoder {
    * decoding the file, null is returned.
    */
   Image decodeImage(List<int> data, {int frame: 0}) {
-    _Buffer ptr = new _Buffer(new Uint8List.fromList(data));
+    InputBuffer ptr = new InputBuffer(new Uint8List.fromList(data));
 
     TiffInfo info = _readHeader(ptr);
     if (info == null) {
@@ -86,20 +86,20 @@ class TiffDecoder extends Decoder {
   /**
    * Read the TIFF header and IFD blocks.
    */
-  TiffInfo _readHeader(_Buffer p) {
+  TiffInfo _readHeader(InputBuffer p) {
     TiffInfo info = new TiffInfo();
-    info.byteOrder = p.readUint16();
-    if (info.byteOrder != TIFF_LITTLE_ENDIAN &&
-        info.byteOrder != TIFF_BIG_ENDIAN) {
+    int byteOrder = p.readUint16();
+    if (byteOrder != TIFF_LITTLE_ENDIAN &&
+        byteOrder != TIFF_BIG_ENDIAN) {
       return null;
     }
 
-    if (info.byteOrder == TIFF_BIG_ENDIAN) {
-      p.byteOrder = BIG_ENDIAN;
-      info.byteOrder = BIG_ENDIAN;
+    if (byteOrder == TIFF_BIG_ENDIAN) {
+      p.bigEndian = true;
+      info.bigEndian = true;
     } else {
-      p.byteOrder = LITTLE_ENDIAN;
-      info.byteOrder = LITTLE_ENDIAN;
+      p.bigEndian = false;
+      info.bigEndian = false;
     }
 
     info.signature = p.readUint16();
@@ -110,7 +110,7 @@ class TiffDecoder extends Decoder {
     int offset = p.readUint32();
     info.ifdOffset = offset;
 
-    _Buffer p2 = new _Buffer.from(p);
+    InputBuffer p2 = new InputBuffer.from(p);
     p2.offset = offset;
 
     while (offset != 0) {
@@ -138,7 +138,7 @@ class TiffDecoder extends Decoder {
     return info.images.length > 0 ? info : null;
   }
 
-  _Buffer _input;
+  InputBuffer _input;
 
   static const int TIFF_SIGNATURE = 42;
   static const int TIFF_LITTLE_ENDIAN = 0x4949;

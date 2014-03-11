@@ -73,7 +73,7 @@ class VP8LBitReader {
     }
   }
 
-  InputStream _input;
+  InputBuffer _input;
   Uint32List _buffer = new Uint32List(2);
   Uint8List _buffer8;
 

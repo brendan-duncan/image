@@ -34,7 +34,7 @@ class WebPInfo extends DecodeInfo {
   int _frame;
   int _numFrames;
 
-  InputStream _alphaData;
+  InputBuffer _alphaData;
   int _alphaSize;
   int _vp8Position;
   int _vp8Size;

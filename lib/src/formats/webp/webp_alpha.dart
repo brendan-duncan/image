@@ -2,7 +2,7 @@ part of image;
 
 
 class WebPAlpha {
-  InputStream input;
+  InputBuffer input;
   int width = 0;
   int height = 0;
   int method = 0;

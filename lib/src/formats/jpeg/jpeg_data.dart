@@ -2,7 +2,7 @@ part of image;
 
 class JpegData  {
   ProgressCallback progressCallback;
-  _Buffer input;
+  InputBuffer input;
   JpegJfif jfif;
   JpegAdobe adobe;
   JpegFrame frame;
@@ -14,7 +14,7 @@ class JpegData  {
   final List<Map> components = [];
 
   bool validate(List<int> bytes) {
-    input = new _Buffer(bytes, byteOrder: BIG_ENDIAN);
+    input = new InputBuffer(bytes, bigEndian: true);
 
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
@@ -45,7 +45,7 @@ class JpegData  {
   }
 
   JpegInfo readInfo(List<int> bytes) {
-    input = new _Buffer(bytes, byteOrder: BIG_ENDIAN);
+    input = new InputBuffer(bytes, bigEndian: true);
 
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
@@ -89,7 +89,7 @@ class JpegData  {
   }
 
   void read(List<int> bytes) {
-    input = new _Buffer(bytes, byteOrder: BIG_ENDIAN);
+    input = new InputBuffer(bytes, bigEndian: true);
 
     _read();
 
@@ -269,7 +269,7 @@ class JpegData  {
 
     marker = _nextMarker();
     while (marker != Jpeg.M_EOI && !input.isEOS) {
-      _Buffer block = _readBlock();
+      InputBuffer block = _readBlock();
       switch (marker) {
         case Jpeg.M_APP0:
         case Jpeg.M_APP1:
@@ -353,7 +353,7 @@ class JpegData  {
     input.offset += length - 2;
   }
 
-  _Buffer _readBlock() {
+  InputBuffer _readBlock() {
     int length = input.readUint16();
     if (length < 2) {
       throw new ImageException('Invalid Block');
@@ -377,8 +377,8 @@ class JpegData  {
     return c;
   }
 
-  void _readAppData(int marker, _Buffer block) {
-    _Buffer appData = block;//.buffer;
+  void _readAppData(int marker, InputBuffer block) {
+    InputBuffer appData = block;//.buffer;
 
     if (marker == Jpeg.M_APP0) {
       // 'JFIF\0'
@@ -411,7 +411,7 @@ class JpegData  {
     }
   }
 
-  void _readDQT(_Buffer block) {
+  void _readDQT(InputBuffer block) {
     while (!block.isEOS) {
       int n = block.readByte();
       int prec = _shiftR(n, 4);
@@ -443,7 +443,7 @@ class JpegData  {
     }
   }
 
-  void _readFrame(int marker, _Buffer block) {
+  void _readFrame(int marker, InputBuffer block) {
     if (frame != null) {
       throw new ImageException('Duplicate JPG frame data found.');
     }
@@ -472,7 +472,7 @@ class JpegData  {
     frames.add(frame);
   }
 
-  void _readDHT(_Buffer block) {
+  void _readDHT(InputBuffer block) {
     while (!block.isEOS) {
       int index = block.readByte();
 
@@ -504,11 +504,11 @@ class JpegData  {
     }
   }
 
-  void _readDRI(_Buffer block) {
+  void _readDRI(InputBuffer block) {
     resetInterval = block.readUint16();
   }
 
-  void _readSOS(_Buffer block) {
+  void _readSOS(InputBuffer block) {
     int n = block.readByte();
 
     if (n < 1 || n > Jpeg.MAX_COMPS_IN_SCAN) {

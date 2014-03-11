@@ -4,12 +4,12 @@ part of image;
  * WebP lossless format.
  */
 class VP8L {
-  InputStream input;
+  InputBuffer input;
   VP8LBitReader br;
   WebPInfo webp;
   Image image;
 
-  VP8L(InputStream input, WebPInfo webp) :
+  VP8L(InputBuffer input, WebPInfo webp) :
     this.input = input,
     this.webp = webp,
     this.br = new VP8LBitReader(input) {
@@ -373,7 +373,7 @@ class VP8L {
     final int cachePixs = width * numRows;
 
     final int di = width * _lastRow;
-    MemPtr src = new MemPtr(_pixels, _argbCache);
+    InputBuffer src = new InputBuffer(_pixels, offset: _argbCache);
 
     for (int i = 0; i < cachePixs; ++i) {
       _opaque[di + i] = (src[i] >> 8) & 0xff;
@@ -461,7 +461,7 @@ class VP8L {
 
   void _extractPalettedAlphaRows(int row) {
     final int numRows = row - _lastRow;
-    MemPtr pIn = new MemPtr(_pixels8, webp.width * _lastRow);
+    InputBuffer pIn = new InputBuffer(_pixels8, offset: webp.width * _lastRow);
     if (numRows > 0) {
       _applyInverseTransformsAlpha(numRows, pIn);
     }
@@ -471,10 +471,10 @@ class VP8L {
   /**
    * Special method for paletted alpha data.
    */
-  void _applyInverseTransformsAlpha(int numRows, MemPtr rows) {
+  void _applyInverseTransformsAlpha(int numRows, InputBuffer rows) {
     final int startRow = _lastRow;
     final int endRow = startRow + numRows;
-    MemPtr rowsOut = new MemPtr(_opaque, _ioWidth * startRow);
+    InputBuffer rowsOut = new InputBuffer(_opaque, offset: _ioWidth * startRow);
     VP8LTransform transform = _transforms[0];
 
     transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);

@@ -10,9 +10,8 @@ class PngDecoder extends Decoder {
    * Is the given file a valid PNG image?
    */
   bool isValidFile(List<int> data) {
-    InputStream input = new InputStream(data,
-        byteOrder: BIG_ENDIAN);
-    InputStream pngHeader = input.readBytes(8);
+    InputBuffer input = new InputBuffer(data, bigEndian: true);
+    InputBuffer pngHeader = input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
@@ -29,9 +28,9 @@ class PngDecoder extends Decoder {
    * process the frames until they are requested with decodeFrame.
    */
   DecodeInfo startDecode(List<int> data) {
-    _input = new InputStream(data, byteOrder: BIG_ENDIAN);
+    _input = new InputBuffer(data, bigEndian: true);
 
-    InputStream pngHeader = _input.readBytes(8);
+    InputBuffer pngHeader = _input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
@@ -41,13 +40,12 @@ class PngDecoder extends Decoder {
 
     while (true) {
       int inputPos = _input.position;
-
       int chunkSize = _input.readUint32();
       String chunkType = _input.readString(4);
       switch (chunkType) {
         case 'IHDR':
-          InputStream hdr = new InputStream(_input.readBytes(chunkSize),
-                                             byteOrder: BIG_ENDIAN);
+          InputBuffer hdr = new InputBuffer.from(_input.readBytes(chunkSize));
+          List<int> hdrBytes = hdr.toUint8List();
           info = new PngInfo();
           info.width = hdr.readUint32();
           info.height = hdr.readUint32();
@@ -97,7 +95,7 @@ class PngDecoder extends Decoder {
           }
 
           int crc = _input.readUint32();
-          int computedCrc = _crc(chunkType, hdr.buffer);
+          int computedCrc = _crc(chunkType, hdrBytes);
           if (crc != computedCrc) {
             throw new ImageException('Invalid $chunkType checksum');
           }
@@ -251,7 +249,7 @@ class PngDecoder extends Decoder {
     List<int> uncompressed = new ZLibDecoder().decodeBytes(imageData);
 
     // input is the decompressed data.
-    InputStream input = new InputStream(uncompressed, byteOrder: BIG_ENDIAN);
+    InputBuffer input = new InputBuffer(uncompressed, bigEndian: true);
     _resetBits();
 
     // Set up a LUT to transform colors for gamma correction.
@@ -359,7 +357,7 @@ class PngDecoder extends Decoder {
   /**
    * Process a pass of an interlaced image.
    */
-  void _processPass(InputStream input, Image image,
+  void _processPass(InputBuffer input, Image image,
                     int xOffset, int yOffset, int xStep, int yStep,
                     int passWidth, int passHeight) {
     final int channels = (info.colorType == GRAYSCALE_ALPHA) ? 2 :
@@ -395,8 +393,7 @@ class PngDecoder extends Decoder {
       // reset the bit stream counter.
       _resetBits();
 
-      InputStream rowInput = new InputStream(row,
-          byteOrder: BIG_ENDIAN);
+      InputBuffer rowInput = new InputBuffer(row, bigEndian: true);
 
       final int blockHeight = xStep;
       final int blockWidth = xStep - xOffset;
@@ -422,7 +419,7 @@ class PngDecoder extends Decoder {
     }
   }
 
-  void _process(InputStream input, Image image) {
+  void _process(InputBuffer input, Image image) {
     final int channels = (info.colorType == GRAYSCALE_ALPHA) ? 2 :
                          (info.colorType == RGB) ? 3 :
                          (info.colorType == RGBA) ? 4 : 1;
@@ -458,8 +455,7 @@ class PngDecoder extends Decoder {
       // reset the bit stream counter.
       _resetBits();
 
-      InputStream rowInput = new InputStream(inData[ri],
-                                                     byteOrder: BIG_ENDIAN);
+      InputBuffer rowInput = new InputBuffer(inData[ri], bigEndian: true);
 
       for (int x = 0; x < w; ++x) {
         _readPixel(rowInput, pixel);
@@ -555,7 +551,7 @@ class PngDecoder extends Decoder {
   /**
    * Read a number of bits from the input stream.
    */
-  int _readBits(InputStream input, int numBits) {
+  int _readBits(InputBuffer input, int numBits) {
     if (numBits == 0) {
       return 0;
     }
@@ -599,7 +595,7 @@ class PngDecoder extends Decoder {
   /**
    * Read the next pixel from the input stream.
    */
-  void _readPixel(InputStream input, List<int> pixel) {
+  void _readPixel(InputBuffer input, List<int> pixel) {
     switch (info.colorType) {
       case GRAYSCALE:
         pixel[0] = _readBits(input, info.bits);
@@ -800,7 +796,7 @@ class PngDecoder extends Decoder {
     throw new ImageException('Invalid color type: ${info.colorType}.');
   }
 
-  InputStream _input;
+  InputBuffer _input;
   int _progressY;
   int _frame = 0;
   int _numFrames = 1;

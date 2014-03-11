@@ -17,7 +17,7 @@ class GifDecoder extends Decoder {
    * Is the given file a valid WebP image?
    */
   bool isValidFile(List<int> bytes) {
-    _input = new InputStream(bytes);
+    _input = new InputBuffer(bytes);
     info = new GifInfo();
     return _getInfo();
   }
@@ -35,7 +35,7 @@ class GifDecoder extends Decoder {
    * If the file is not a valid Gif image, null is returned.
    */
   GifInfo startDecode(List<int> bytes) {
-    _input = new InputStream(bytes);
+    _input = new InputBuffer(bytes);
 
     info = new GifInfo();
     if (!_getInfo()) {
@@ -562,7 +562,7 @@ class GifDecoder extends Decoder {
     _prefix = new Uint32List(LZ_MAX_CODE + 1);
   }
 
-  InputStream _input;
+  InputBuffer _input;
   int _frame;
   int _numFrames;
   Uint8List _buffer;

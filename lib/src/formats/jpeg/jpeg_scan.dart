@@ -2,7 +2,7 @@ part of image;
 
 
 class JpegScan {
-  _Buffer input;
+  InputBuffer input;
   JpegFrame frame;
   int precision;
   int samplesPerLine;

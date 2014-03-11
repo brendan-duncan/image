@@ -1,7 +1,7 @@
 part of image;
 
 class VP8BitReader {
-  InputStream input;
+  InputBuffer input;
 
   // boolean decoder
   int _range; // current range minus 1. In [127, 254] interval.

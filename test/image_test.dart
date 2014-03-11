@@ -14,11 +14,11 @@ part 'tiff_test.dart';
 part 'webp_test.dart';
 
 void main() {
+  defineJpegTests();
+  definePngTests();
   defineGifTests();
   defineTgaTests();
   defineTiffTests();
-  defineJpegTests();
-  definePngTests();
   defineFontTests();
   defineWebPTests();
   defineImageTests();

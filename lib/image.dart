@@ -107,11 +107,12 @@ part 'src/transform/flip.dart';
 part 'src/transform/trim.dart';
 
 part 'src/util/bit_operators.dart';
-part 'src/util/buffer.dart';
 part 'src/util/clip_line.dart';
+part 'src/util/input_buffer.dart';
 part 'src/util/interpolation.dart';
 part 'src/util/min_max.dart';
 part 'src/util/neural_quantizer.dart';
+part 'src/util/output_buffer.dart';
 part 'src/util/random.dart';
 
 part 'src/animation.dart';

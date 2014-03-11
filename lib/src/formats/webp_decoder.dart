@@ -17,7 +17,7 @@ class WebPDecoder extends Decoder {
    * Is the given file a valid WebP image?
    */
   bool isValidFile(List<int> bytes) {
-    _input = new InputStream(bytes);
+    _input = new InputBuffer(bytes);
     if (!_getHeader(_input)) {
       return false;
     }
@@ -37,7 +37,7 @@ class WebPDecoder extends Decoder {
    * If the file is not a valid WebP image, null is returned.
    */
   WebPInfo startDecode(List<int> bytes) {
-    _input = new InputStream(bytes);
+    _input = new InputBuffer(bytes);
 
     if (!_getHeader(_input)) {
       return null;
@@ -83,17 +83,19 @@ class WebPDecoder extends Decoder {
       }
 
       WebPFrame f = info.frames[frame];
-      InputStream frameData = _input.subset(f._framePosition,
-          f._frameSize);
+      InputBuffer frameData = _input.subset(f._frameSize,
+                                            position: f._framePosition);
 
       return _decodeFrame(frameData, frame: frame);
     }
 
     if (info.format == WebPInfo.FORMAT_LOSSLESS) {
-      InputStream data = _input.subset(info._vp8Position, info._vp8Size);
+      InputBuffer data = _input.subset(info._vp8Size,
+                                       position: info._vp8Position);
       return new VP8L(data, info).decode();
     } else if (info.format == WebPInfo.FORMAT_LOSSY) {
-      InputStream data = _input.subset(info._vp8Position, info._vp8Size);
+      InputBuffer data = _input.subset(info._vp8Size,
+                                       position: info._vp8Position);
       return new VP8(data, info).decode();
     }
 
@@ -170,7 +172,7 @@ Animation decodeAnimation(List<int> bytes) {
   }
 
 
-  Image _decodeFrame(InputStream input, {int frame: 0}) {
+  Image _decodeFrame(InputBuffer input, {int frame: 0}) {
     WebPInfo webp = new WebPInfo();
     if (!_getInfo(input, webp)) {
       return null;
@@ -189,12 +191,13 @@ Animation decodeAnimation(List<int> bytes) {
         return null;
       }
       WebPFrame f = webp.frames[frame];
-      InputStream frameData = input.subset(f._framePosition,
-                                               f._frameSize);
+      InputBuffer frameData = input.subset(f._frameSize,
+                                           position: f._framePosition);
 
       return _decodeFrame(frameData, frame: frame);
     } else {
-      InputStream data = input.subset(webp._vp8Position, webp._vp8Size);
+      InputBuffer data = input.subset(webp._vp8Size,
+                                      position: webp._vp8Position);
       if (webp.format == WebPInfo.FORMAT_LOSSLESS) {
         return new VP8L(data, webp).decode();
       } else if (webp.format == WebPInfo.FORMAT_LOSSY) {
@@ -205,7 +208,7 @@ Animation decodeAnimation(List<int> bytes) {
     return null;
   }
 
-  bool _getHeader(InputStream input) {
+  bool _getHeader(InputBuffer input) {
     // Validate the webp format header
     String tag = input.readString(4);
     if (tag != 'RIFF') {
@@ -222,7 +225,7 @@ Animation decodeAnimation(List<int> bytes) {
     return true;
   }
 
-  bool _getInfo(InputStream input, WebPInfo webp) {
+  bool _getInfo(InputBuffer input, WebPInfo webp) {
     bool found = false;
     while (!input.isEOS && !found) {
       String tag = input.readString(4);
@@ -250,8 +253,8 @@ Animation decodeAnimation(List<int> bytes) {
           found = true;
           break;
         case 'ALPH':
-          webp._alphaData = new InputStream(input.buffer,
-              byteOrder: input.byteOrder);
+          webp._alphaData = new InputBuffer(input.buffer,
+                                            bigEndian: input.bigEndian);
           webp._alphaData.offset = input.offset;
           webp._alphaSize = size;
           input.skip(diskSize);
@@ -299,7 +302,7 @@ Animation decodeAnimation(List<int> bytes) {
     return webp.format != 0;
   }
 
-  bool _getVp8xInfo(InputStream input, WebPInfo webp) {
+  bool _getVp8xInfo(InputBuffer input, WebPInfo webp) {
     int b = input.readByte();
     if ((b & 0xc0) != 0) {
       return false;
@@ -328,7 +331,7 @@ Animation decodeAnimation(List<int> bytes) {
     return true;
   }
 
-  bool _getAnimInfo(InputStream input, WebPInfo webp) {
+  bool _getAnimInfo(InputBuffer input, WebPInfo webp) {
     int c = input.readUint32();
     webp.animLoopCount = input.readUint16();
 
@@ -341,7 +344,7 @@ Animation decodeAnimation(List<int> bytes) {
     return true;
   }
 
-  bool _getAnimFrameInfo(InputStream input, WebPInfo webp, int size) {
+  bool _getAnimFrameInfo(InputBuffer input, WebPInfo webp, int size) {
     WebPFrame frame = new WebPFrame(input, size);
     if (!frame.isValid) {
       return false;
@@ -350,5 +353,5 @@ Animation decodeAnimation(List<int> bytes) {
     return true;
   }
 
-  InputStream _input;
+  InputBuffer _input;
 }

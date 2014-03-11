@@ -33,7 +33,7 @@ class JpegEncoder extends Encoder {
   }
 
   List<int> encodeImage(Image image) {
-    OutputStream fp = new OutputStream(byteOrder: BIG_ENDIAN);
+    OutputBuffer fp = new OutputBuffer(bigEndian: true);
 
     // Add JPEG headers
     _writeMarker(fp, Jpeg.M_SOI);
@@ -116,7 +116,7 @@ class JpegEncoder extends Encoder {
     return fp.getBytes();
   }
 
-  void _writeMarker(OutputStream fp, int marker) {
+  void _writeMarker(OutputBuffer fp, int marker) {
     fp.writeByte(0xff);
     fp.writeByte(marker & 0xff);
   }
@@ -451,7 +451,7 @@ class JpegEncoder extends Encoder {
     return outputfDCTQuant;
   }
 
-  void _writeAPP0(OutputStream out) {
+  void _writeAPP0(OutputBuffer out) {
     _writeMarker(out, Jpeg.M_APP0);
     out.writeUint16(16); // length
     out.writeByte(0x4A); // J
@@ -468,7 +468,7 @@ class JpegEncoder extends Encoder {
     out.writeByte(0); // thumbnheight
   }
 
-  void _writeSOF0(OutputStream out, int width, int height) {
+  void _writeSOF0(OutputBuffer out, int width, int height) {
     _writeMarker(out, Jpeg.M_SOF0);
     out.writeUint16(17);   // length, truecolor YUV JPG
     out.writeByte(8);    // precision
@@ -486,7 +486,7 @@ class JpegEncoder extends Encoder {
     out.writeByte(1);    // QTV
   }
 
-  void _writeDQT(OutputStream out) {
+  void _writeDQT(OutputBuffer out) {
     _writeMarker(out, Jpeg.M_DQT);
     out.writeUint16(132); // length
     out.writeByte(0);
@@ -499,7 +499,7 @@ class JpegEncoder extends Encoder {
     }
   }
 
-  void _writeDHT(OutputStream out) {
+  void _writeDHT(OutputBuffer out) {
     _writeMarker(out, Jpeg.M_DHT);
     out.writeUint16(0x01A2); // length
 
@@ -536,7 +536,7 @@ class JpegEncoder extends Encoder {
     }
   }
 
-  _writeSOS(OutputStream out) {
+  _writeSOS(OutputBuffer out) {
     _writeMarker(out, Jpeg.M_SOS);
     out.writeUint16(12); // length
     out.writeByte(3); // nrofcomponents
@@ -551,7 +551,7 @@ class JpegEncoder extends Encoder {
     out.writeByte(0); // Bf
   }
 
-  int _processDU(OutputStream out, List<double> CDU, List<double> fdtbl,
+  int _processDU(OutputBuffer out, List<double> CDU, List<double> fdtbl,
                  int DC, HTDC, HTAC) {
     List EOB = HTAC[0x00];
     List M16zeroes = HTAC[0xF0];
@@ -613,7 +613,7 @@ class JpegEncoder extends Encoder {
     return DC;
   }
 
-  void _writeBits(OutputStream out, List<int> bits) {
+  void _writeBits(OutputBuffer out, List<int> bits) {
     int value = bits[0];
     int posval = bits[1] - 1;
     while (posval >= 0) {

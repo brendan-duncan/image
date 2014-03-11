@@ -17,13 +17,13 @@ class PngEncoder extends Encoder {
   PngEncoder({this.filter: FILTER_PAETH, this.level});
 
   List<int> encodeImage(Image image) {
-    OutputStream output = new OutputStream(byteOrder: BIG_ENDIAN);
+    OutputBuffer output = new OutputBuffer(bigEndian: true);
 
     // PNG file signature
     output.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
     // IHDR chunk
-    OutputStream chunk = new OutputStream(byteOrder: BIG_ENDIAN);
+    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
     chunk.writeUint32(image.width);
     chunk.writeUint32(image.height);
     chunk.writeByte(8);
@@ -49,7 +49,7 @@ class PngEncoder extends Encoder {
     return output.getBytes();
   }
 
-  void _writeChunk(OutputStream out, String type, List<int> chunk) {
+  void _writeChunk(OutputBuffer out, String type, List<int> chunk) {
     out.writeUint32(chunk.length);
     out.writeBytes(type.codeUnits);
     out.writeBytes(chunk);

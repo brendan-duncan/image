@@ -5,18 +5,18 @@ part of image;
  */
 class JpegDecoder extends Decoder {
   JpegInfo info;
-  _Buffer input;
+  InputBuffer input;
 
   /**
    * Is the given file a valid JPEG image?
    */
   bool isValidFile(List<int> data) {
-    _Buffer input = new _Buffer(data, byteOrder: BIG_ENDIAN);
+    InputBuffer input = new InputBuffer(data, bigEndian: true);
     return new JpegData().validate(data);
   }
 
   DecodeInfo startDecode(List<int> data) {
-    input = new _Buffer(data, byteOrder: BIG_ENDIAN);
+    input = new InputBuffer(data, bigEndian: true);
     info = new JpegData().readInfo(data);
     return info;
   }
@@ -29,7 +29,7 @@ class JpegDecoder extends Decoder {
     }
     JpegData jpeg = new JpegData();
     jpeg.progressCallback = progressCallback;
-    jpeg.read(input.data);
+    jpeg.read(input.buffer);
 
     if (jpeg.frames.length != 1) {
       throw new ImageException('only single frame JPEGs supported');

@@ -29,7 +29,7 @@ void defineTiffTests() {
         print(name);
         print('  width: ${info.width}');
         print('  height: ${info.height}');
-        print('  byteOrder: ${info.byteOrder}');
+        print('  bigEndian: ${info.bigEndian}');
         print('  images: ${info.images.length}');
         for (int i = 0; i < info.images.length; ++i) {
           print('  image[$i]');

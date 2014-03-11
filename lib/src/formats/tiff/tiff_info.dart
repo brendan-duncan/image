@@ -1,7 +1,7 @@
 part of image;
 
 class TiffInfo extends DecodeInfo {
-  int byteOrder;
+  bool bigEndian;
   int signature;
 
   int ifdOffset;
