@@ -1,4 +1,3 @@
-library webp_viewer;
 import 'dart:html' as Html;
 import 'package:crypto/crypto.dart';
 import 'package:image/image.dart';
