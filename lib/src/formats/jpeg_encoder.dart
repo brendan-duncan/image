@@ -53,30 +53,32 @@ class JpegEncoder extends Encoder {
     int width = image.width;
     int height = image.height;
 
+    Uint8List imageData = image.getBytes();
+    int quadWidth = width * 4;
+    int tripleWidth = width * 3;
+    bool first = true;
+
     int y = 0;
     while (y < height) {
-      int sx = width * y;
       int x = 0;
-      while (x < width) {
-        int start = sx + x;
+      while (x < quadWidth) {
+        int start = quadWidth * y + x;
         for (int pos = 0; pos < 64; pos++) {
           int row = pos >> 3; // / 8
-          int col = (pos & 7); // % 8
+          int col = (pos & 7) * 4; // % 8
+          int p = start + (row * quadWidth) + col;
 
-          int x2 = x + col;
-          if (x2 >= width) {
-            x2 = (x + col) - width;
+          if (y + row >= height) { // padding bottom
+            p -= (quadWidth * (y + 1 + row - height));
           }
 
-          int y2 = y + row;
-          if (y2 >= height) {
-            y2 = (y + row) - height;
+          if (x + col >= quadWidth) { // padding right
+            p -= ((x + col) - quadWidth + 4);
           }
 
-          int c = image.getPixel(x2, y2);
-          int r = getRed(c);
-          int g = getGreen(c);
-          int b = getBlue(c);
+          int r = imageData[p++];
+          int g = imageData[p++];
+          int b = imageData[p++];
 
           // calculate YUV values
           YDU[pos] = ((RGB_YUV_TABLE[r] +
@@ -96,7 +98,7 @@ class JpegEncoder extends Encoder {
         DCU = _processDU(fp, UDU, fdtbl_UV, DCU, UVDC_HT, UVAC_HT);
         DCV = _processDU(fp, VDU, fdtbl_UV, DCV, UVDC_HT, UVAC_HT);
 
-        x += 8;
+        x += 32;
       }
 
       y += 8;
@@ -106,8 +108,7 @@ class JpegEncoder extends Encoder {
 
     // Do the bit alignment of the EOI marker
     if (_bytepos >= 0) {
-      final fillbits = [(1 << (_bytepos + 1)) - 1,
-                        _bytepos + 1];
+      final fillbits = [(1 << (_bytepos + 1)) - 1, _bytepos + 1];
       _writeBits(fp, fillbits);
     }
 
@@ -120,91 +121,6 @@ class JpegEncoder extends Encoder {
     fp.writeByte(0xff);
     fp.writeByte(marker & 0xff);
   }
-
-  final YTable = new List(64);
-  final UVTable = new List(64);
-  final fdtbl_Y = new List(64);
-  final fdtbl_UV = new List(64);
-  List YDC_HT;
-  List UVDC_HT;
-  List YAC_HT;
-  List UVAC_HT;
-
-  final bitcode = new List(65535);
-  final category = new List(65535);
-  final outputfDCTQuant = new List<int>(64);
-  final DU = new List(64);
-
-  final List<double> YDU = new List<double>(64);
-  final List<double> UDU = new List<double>(64);
-  final List<double> VDU = new List<double>(64);
-  final charLookupTable = new List(256);
-  final RGB_YUV_TABLE = new List(2048);
-  int currentQuality;
-
-  static const List<int> std_dc_luminance_nrcodes = const [
-      0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 ];
-
-  static const List<int> std_dc_luminance_values = const [
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
-
-  static const List<int> std_ac_luminance_nrcodes = const [
-      0, 0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 0x7d ];
-
-  static const List<int> std_ac_luminance_values = const [
-      0x01, 0x02, 0x03, 0x00, 0x04, 0x11, 0x05, 0x12,
-      0x21, 0x31, 0x41, 0x06, 0x13, 0x51, 0x61, 0x07,
-      0x22, 0x71, 0x14, 0x32, 0x81, 0x91, 0xa1, 0x08,
-      0x23, 0x42, 0xb1, 0xc1, 0x15, 0x52, 0xd1, 0xf0,
-      0x24, 0x33, 0x62, 0x72, 0x82, 0x09, 0x0a, 0x16,
-      0x17, 0x18, 0x19, 0x1a, 0x25, 0x26, 0x27, 0x28,
-      0x29, 0x2a, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39,
-      0x3a, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49,
-      0x4a, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59,
-      0x5a, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69,
-      0x6a, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79,
-      0x7a, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89,
-      0x8a, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98,
-      0x99, 0x9a, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7,
-      0xa8, 0xa9, 0xaa, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6,
-      0xb7, 0xb8, 0xb9, 0xba, 0xc2, 0xc3, 0xc4, 0xc5,
-      0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xd2, 0xd3, 0xd4,
-      0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xe1, 0xe2,
-      0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea,
-      0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8,
-      0xf9, 0xfa ];
-
-  static const List<int> std_dc_chrominance_nrcodes = const [
-      0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 ];
-
-  static const List<int> std_dc_chrominance_values = const [
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
-
-  static const List<int> std_ac_chrominance_nrcodes = const [
-      0, 0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 0x77 ];
-
-  static const List<int> std_ac_chrominance_values = const [
-      0x00, 0x01, 0x02, 0x03, 0x11, 0x04, 0x05, 0x21,
-      0x31, 0x06, 0x12, 0x41, 0x51, 0x07, 0x61, 0x71,
-      0x13, 0x22, 0x32, 0x81, 0x08, 0x14, 0x42, 0x91,
-      0xa1, 0xb1, 0xc1, 0x09, 0x23, 0x33, 0x52, 0xf0,
-      0x15, 0x62, 0x72, 0xd1, 0x0a, 0x16, 0x24, 0x34,
-      0xe1, 0x25, 0xf1, 0x17, 0x18, 0x19, 0x1a, 0x26,
-      0x27, 0x28, 0x29, 0x2a, 0x35, 0x36, 0x37, 0x38,
-      0x39, 0x3a, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
-      0x49, 0x4a, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
-      0x59, 0x5a, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68,
-      0x69, 0x6a, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
-      0x79, 0x7a, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
-      0x88, 0x89, 0x8a, 0x92, 0x93, 0x94, 0x95, 0x96,
-      0x97, 0x98, 0x99, 0x9a, 0xa2, 0xa3, 0xa4, 0xa5,
-      0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xb2, 0xb3, 0xb4,
-      0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xc2, 0xc3,
-      0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xd2,
-      0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda,
-      0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9,
-      0xea, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8,
-      0xf9, 0xfa ];
 
   void _initQuantTables(int sf) {
     const List<int> YQT = const [
@@ -224,7 +140,7 @@ class JpegEncoder extends Encoder {
       } else if (t > 255) {
         t = 255;
       }
-      YTable[Jpeg.dctZigZag[i]] = t;
+      YTable[ZIGZAG[i]] = t;
     }
 
     const List<int> UVQT = const [
@@ -244,7 +160,7 @@ class JpegEncoder extends Encoder {
       } else if (u > 255) {
         u = 255;
       }
-      UVTable[Jpeg.dctZigZag[j]] = u;
+      UVTable[ZIGZAG[j]] = u;
     }
 
     const List<double> aasf = const [
@@ -254,8 +170,8 @@ class JpegEncoder extends Encoder {
     int k = 0;
     for (int row = 0; row < 8; row++) {
       for (int col = 0; col < 8; col++) {
-        fdtbl_Y[k] = (1.0 / (YTable [Jpeg.dctZigZag[k]] * aasf[row] * aasf[col] * 8.0));
-        fdtbl_UV[k] = (1.0 / (UVTable[Jpeg.dctZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+        fdtbl_Y[k] = (1.0 / (YTable[ZIGZAG[k]] * aasf[row] * aasf[col] * 8.0));
+        fdtbl_UV[k] = (1.0 / (UVTable[ZIGZAG[k]] * aasf[row] * aasf[col] * 8.0));
         k++;
       }
     }
@@ -281,14 +197,14 @@ class JpegEncoder extends Encoder {
   }
 
   void _initHuffmanTbl() {
-    YDC_HT = _computeHuffmanTbl(std_dc_luminance_nrcodes,
-                                std_dc_luminance_values);
-    UVDC_HT = _computeHuffmanTbl(std_dc_chrominance_nrcodes,
-                                 std_dc_chrominance_values);
-    YAC_HT = _computeHuffmanTbl(std_ac_luminance_nrcodes,
-                                std_ac_luminance_values);
-    UVAC_HT = _computeHuffmanTbl(std_ac_chrominance_nrcodes,
-                                 std_ac_chrominance_values);
+    YDC_HT = _computeHuffmanTbl(STD_DC_LUMINANCE_NR_CODES,
+                                STD_DC_LUMINANCE_VALUES);
+    UVDC_HT = _computeHuffmanTbl(STD_DC_CHROMINANCE_NR_CODES,
+                                 STD_DC_CHROMINANCE_VALUES);
+    YAC_HT = _computeHuffmanTbl(STD_AC_LUMINANCE_NR_CODES,
+                                STD_AC_LUMINANCE_VALUES);
+    UVAC_HT = _computeHuffmanTbl(STD_AC_CHROMINANCE_NR_CODES,
+                                 STD_AC_CHROMINANCE_VALUES);
   }
 
   void _initCategoryNumber() {
@@ -444,8 +360,8 @@ class JpegEncoder extends Encoder {
       // Apply the quantization and scaling factor & Round to nearest integer
       double fDCTQuant = data[i] * fdtbl[i];
       outputfDCTQuant[i] = (fDCTQuant > 0.0) ?
-                           ((fDCTQuant + 0.5).floor()) :
-                           ((fDCTQuant - 0.5).floor());
+                           ((fDCTQuant + 0.5).toInt()) :
+                           ((fDCTQuant - 0.5).toInt());
     }
 
     return outputfDCTQuant;
@@ -458,7 +374,7 @@ class JpegEncoder extends Encoder {
     out.writeByte(0x46); // F
     out.writeByte(0x49); // I
     out.writeByte(0x46); // F
-    out.writeByte(0); // = "JFIF",'\0'
+    out.writeByte(0); // '\0'
     out.writeByte(1); // versionhi
     out.writeByte(1); // versionlo
     out.writeByte(0); // xyunits
@@ -505,38 +421,38 @@ class JpegEncoder extends Encoder {
 
     out.writeByte(0); // HTYDCinfo
     for (int i = 0; i < 16; i++) {
-      out.writeByte(std_dc_luminance_nrcodes[i + 1]);
+      out.writeByte(STD_DC_LUMINANCE_NR_CODES[i + 1]);
     }
     for (int j = 0; j <= 11; j++) {
-      out.writeByte(std_dc_luminance_values[j]);
+      out.writeByte(STD_DC_LUMINANCE_VALUES[j]);
     }
 
     out.writeByte(0x10); // HTYACinfo
     for (int k = 0; k < 16; k++) {
-      out.writeByte(std_ac_luminance_nrcodes[k + 1]);
+      out.writeByte(STD_AC_LUMINANCE_NR_CODES[k + 1]);
     }
     for (int l = 0; l <= 161; l++) {
-      out.writeByte(std_ac_luminance_values[l]);
+      out.writeByte(STD_AC_LUMINANCE_VALUES[l]);
     }
 
     out.writeByte(1); // HTUDCinfo
     for (int m = 0; m < 16; m++) {
-      out.writeByte(std_dc_chrominance_nrcodes[m + 1]);
+      out.writeByte(STD_DC_CHROMINANCE_NR_CODES[m + 1]);
     }
     for (int n = 0; n <= 11; n++) {
-      out.writeByte(std_dc_chrominance_values[n]);
+      out.writeByte(STD_DC_CHROMINANCE_VALUES[n]);
     }
 
     out.writeByte(0x11); // HTUACinfo
     for (int o = 0; o < 16; o++) {
-      out.writeByte(std_ac_chrominance_nrcodes[o + 1]);
+      out.writeByte(STD_AC_CHROMINANCE_NR_CODES[o + 1]);
     }
     for (int p = 0; p <= 161; p++) {
-      out.writeByte(std_ac_chrominance_values[p]);
+      out.writeByte(STD_AC_CHROMINANCE_VALUES[p]);
     }
   }
 
-  _writeSOS(OutputBuffer out) {
+  void _writeSOS(OutputBuffer out) {
     _writeMarker(out, Jpeg.M_SOS);
     out.writeUint16(12); // length
     out.writeByte(3); // nrofcomponents
@@ -559,11 +475,11 @@ class JpegEncoder extends Encoder {
     const I16 = 16;
     const I63 = 63;
     const I64 = 64;
-    List DU_DCT = _fDCTQuant(CDU, fdtbl);
+    List<int> DU_DCT = _fDCTQuant(CDU, fdtbl);
 
     // ZigZag reorder
     for (int j = 0; j < I64; ++j) {
-      DU[Jpeg.dctZigZag[j]] = DU_DCT[j];
+      DU[ZIGZAG[j]] = DU_DCT[j];
     }
 
     int Diff = DU[0] - DC;
@@ -639,6 +555,100 @@ class JpegEncoder extends Encoder {
     _bytenew = 0;
     _bytepos = 7;
   }
+
+  final YTable = new Uint8List(64);
+  final UVTable = new Uint8List(64);
+  final fdtbl_Y = new Float32List(64);
+  final fdtbl_UV = new Float32List(64);
+  List YDC_HT;
+  List UVDC_HT;
+  List YAC_HT;
+  List UVAC_HT;
+
+  final bitcode = new List(65535);
+  final category = new List(65535);
+  final outputfDCTQuant = new List<int>(64);
+  final DU = new List(64);
+
+  final Float32List YDU = new Float32List(64);
+  final Float32List UDU = new Float32List(64);
+  final Float32List VDU = new Float32List(64);
+  final Int32List RGB_YUV_TABLE = new Int32List(2048);
+  int currentQuality;
+
+  static const List<int> ZIGZAG = const [
+       0, 1, 5, 6,14,15,27,28,
+       2, 4, 7,13,16,26,29,42,
+       3, 8,12,17,25,30,41,43,
+       9,11,18,24,31,40,44,53,
+      10,19,23,32,39,45,52,54,
+      20,22,33,38,46,51,55,60,
+      21,34,37,47,50,56,59,61,
+      35,36,48,49,57,58,62,63 ];
+
+  static const List<int> STD_DC_LUMINANCE_NR_CODES = const [
+      0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 ];
+
+  static const List<int> STD_DC_LUMINANCE_VALUES = const [
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
+
+  static const List<int> STD_AC_LUMINANCE_NR_CODES = const [
+      0, 0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 0x7d ];
+
+  static const List<int> STD_AC_LUMINANCE_VALUES = const [
+      0x01, 0x02, 0x03, 0x00, 0x04, 0x11, 0x05, 0x12,
+      0x21, 0x31, 0x41, 0x06, 0x13, 0x51, 0x61, 0x07,
+      0x22, 0x71, 0x14, 0x32, 0x81, 0x91, 0xa1, 0x08,
+      0x23, 0x42, 0xb1, 0xc1, 0x15, 0x52, 0xd1, 0xf0,
+      0x24, 0x33, 0x62, 0x72, 0x82, 0x09, 0x0a, 0x16,
+      0x17, 0x18, 0x19, 0x1a, 0x25, 0x26, 0x27, 0x28,
+      0x29, 0x2a, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39,
+      0x3a, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49,
+      0x4a, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59,
+      0x5a, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69,
+      0x6a, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79,
+      0x7a, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89,
+      0x8a, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98,
+      0x99, 0x9a, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7,
+      0xa8, 0xa9, 0xaa, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6,
+      0xb7, 0xb8, 0xb9, 0xba, 0xc2, 0xc3, 0xc4, 0xc5,
+      0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xd2, 0xd3, 0xd4,
+      0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xe1, 0xe2,
+      0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea,
+      0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8,
+      0xf9, 0xfa ];
+
+  static const List<int> STD_DC_CHROMINANCE_NR_CODES = const [
+      0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 ];
+
+  static const List<int> STD_DC_CHROMINANCE_VALUES = const [
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
+
+  static const List<int> STD_AC_CHROMINANCE_NR_CODES = const [
+      0, 0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 0x77 ];
+
+  static const List<int> STD_AC_CHROMINANCE_VALUES = const [
+      0x00, 0x01, 0x02, 0x03, 0x11, 0x04, 0x05, 0x21,
+      0x31, 0x06, 0x12, 0x41, 0x51, 0x07, 0x61, 0x71,
+      0x13, 0x22, 0x32, 0x81, 0x08, 0x14, 0x42, 0x91,
+      0xa1, 0xb1, 0xc1, 0x09, 0x23, 0x33, 0x52, 0xf0,
+      0x15, 0x62, 0x72, 0xd1, 0x0a, 0x16, 0x24, 0x34,
+      0xe1, 0x25, 0xf1, 0x17, 0x18, 0x19, 0x1a, 0x26,
+      0x27, 0x28, 0x29, 0x2a, 0x35, 0x36, 0x37, 0x38,
+      0x39, 0x3a, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
+      0x49, 0x4a, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
+      0x59, 0x5a, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68,
+      0x69, 0x6a, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
+      0x79, 0x7a, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
+      0x88, 0x89, 0x8a, 0x92, 0x93, 0x94, 0x95, 0x96,
+      0x97, 0x98, 0x99, 0x9a, 0xa2, 0xa3, 0xa4, 0xa5,
+      0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xb2, 0xb3, 0xb4,
+      0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xc2, 0xc3,
+      0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xd2,
+      0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda,
+      0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9,
+      0xea, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8,
+      0xf9, 0xfa ];
 
   int _bytenew = 0;
   int _bytepos = 7;
