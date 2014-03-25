@@ -1,3 +1,8 @@
+v 1.1.16 - March 24, 2014
+
+- Fix JPEG encoder for compression quality < 100.
+
+
 v 1.1.15 - March 10, 2014
 
 - Update to new version of archive.
