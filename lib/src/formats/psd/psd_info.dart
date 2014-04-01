@@ -27,29 +27,10 @@ class PsdInfo extends DecodeInfo {
   PsdInfo(List<int> bytes) {
     input = new InputBuffer(bytes, bigEndian: true);
 
-    signature = input.readUint32();
-    version = input.readUint16();
-
-    // version should be 1 (2 for PSB files).
-    if (version != 1) {
-      signature = 0;
+    _readHeader();
+    if (!isValid) {
       return;
     }
-
-    // padding should be all 0's
-    InputBuffer padding = input.readBytes(6);
-    for (int i = 0; i < 6; ++i) {
-      if (padding[i] != 0) {
-        signature = 0;
-        return;
-      }
-    }
-
-    channels = input.readUint16();
-    height = input.readUint32();
-    width = input.readUint32();
-    depth = input.readUint16();
-    colorMode = input.readUint16();
 
     int len = input.readUint32();
     colorData = input.readBytes(len);
@@ -88,40 +69,67 @@ class PsdInfo extends DecodeInfo {
     return output;
   }
 
+  void _readHeader() {
+    signature = input.readUint32();
+    version = input.readUint16();
+
+    // version should be 1 (2 for PSB files).
+    if (version != 1) {
+      signature = 0;
+      return;
+    }
+
+    // padding should be all 0's
+    InputBuffer padding = input.readBytes(6);
+    for (int i = 0; i < 6; ++i) {
+      if (padding[i] != 0) {
+        signature = 0;
+        return;
+      }
+    }
+
+    channels = input.readUint16();
+    height = input.readUint32();
+    width = input.readUint32();
+    depth = input.readUint16();
+    colorMode = input.readUint16();
+  }
+
   void _readColorModeData() {
     // TODO support indexed and duotone images.
   }
 
   void _readImageResources() {
-    imageResourceData.reset();
+    imageResourceData.rewind();
     while (!imageResourceData.isEOS) {
       int blockSignature = imageResourceData.readUint32();
       int blockId = imageResourceData.readUint16();
+
       int len = imageResourceData.readByte();
       String blockName = imageResourceData.readString(len);
       // name string is padded to an even size
-      if (len & 1 != 1) {
+      if (len & 1 == 0) {
         imageResourceData.skip(1);
       }
 
       len = imageResourceData.readUint32();
       InputBuffer blockData = imageResourceData.readBytes(len);
       // blocks are padded to an even length.
-      if (len & 1 != 1) {
+      if (len & 1 == 1) {
         imageResourceData.skip(1);
       }
 
-      imageResourceData.skip(1);
-
-      print(blockSignature.toRadixString(16));
-      print(blockId.toRadixString(16));
-      print(blockName);
-      print(blockData.length);
+      if (blockSignature == RESOURCE_BLOCK_SIGNATURE) {
+        imageResources[blockId] = new PsdImageResource(blockId, blockName,
+                                                       blockData);
+      }
     }
   }
 
   // '8BIM'
   static const int RESOURCE_BLOCK_SIGNATURE = 0x3842494d;
+
+  Map<int, PsdImageResource> imageResources = {};
 
   /*0x03E8 (Obsolete--Photoshop 2.0 only ) Contains five 2-byte values: number of channels, rows, columns, depth, and mode
   0x03E9 Macintosh print manager print info record

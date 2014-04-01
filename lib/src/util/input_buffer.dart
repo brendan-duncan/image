@@ -47,7 +47,7 @@ class InputBuffer {
   /**
    * Reset to the beginning of the stream.
    */
-  void reset() {
+  void rewind() {
     offset = start;
   }
 

@@ -64,6 +64,7 @@ part 'src/formats/jpeg/jpeg_jfif.dart';
 part 'src/formats/jpeg/jpeg_scan.dart';
 part 'src/formats/png/png_frame.dart';
 part 'src/formats/png/png_info.dart';
+part 'src/formats/psd/psd_image_resource.dart';
 part 'src/formats/psd/psd_info.dart';
 part 'src/formats/tga/tga_info.dart';
 part 'src/formats/tiff/tiff_bit_reader.dart';
