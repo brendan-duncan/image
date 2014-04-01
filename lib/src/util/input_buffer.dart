@@ -182,6 +182,13 @@ class InputBuffer {
   }
 
   /**
+   * Read a 16-bit word from the stream.
+   */
+  int readInt16() {
+    return _uint16ToInt16(readUint16());
+  }
+
+  /**
    * Read a 24-bit word from the stream.
    */
   int readUint24() {
@@ -206,6 +213,13 @@ class InputBuffer {
       return (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
     }
     return (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
+  }
+
+  /**
+   * Read a signed 32-bit integer from the stream.
+   */
+  int readInt32() {
+    return _uint32ToInt32(readUint32());
   }
 
   /**
