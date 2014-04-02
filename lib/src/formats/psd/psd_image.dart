@@ -17,6 +17,8 @@ class PsdImage extends DecodeInfo {
   int channels;
   int depth;
   int colorMode;
+  bool hasAlpha = false;
+  bool hasMergedImage = true;
   List<PsdLayer> layers;
   List<PsdChannel> baseImage;
   Map<int, PsdImageResource> imageResources = {};
@@ -38,8 +40,7 @@ class PsdImage extends DecodeInfo {
     len = _input.readUint32();
     _layerAndMaskData = _input.readBytes(len);
 
-    len = _input.readUint32();
-    _imageData = _input.readBytes(len);
+    _imageData = _input.readBytes(_input.length);
   }
 
   bool get isValid => signature == SIGNATURE;
@@ -67,16 +68,8 @@ class PsdImage extends DecodeInfo {
 
     _readLayerAndMaskData();
 
-    bool hasMergeImage = true;
-    // 0x0421: (Photoshop 6.0) Version Info. 1 byte hasRealMergedData
-    if (imageResources.containsKey(0x0421)) {
-      if (imageResources[0x0421].data[0] == 0) {
-        hasMergeImage = false;
-      }
-    }
-
-    if (hasMergeImage) {
-      _readBaseLayer();
+    if (hasMergedImage) {
+      _readImageData();
     }
 
     _input = null;
@@ -98,6 +91,7 @@ class PsdImage extends DecodeInfo {
 
   Image renderImage() {
     Image output = new Image(width, height);
+    output.fill(0xffffffff);
 
     Uint8List pixels = output.getBytes();
 
@@ -107,7 +101,7 @@ class PsdImage extends DecodeInfo {
           int r = baseImage[0].data[si];
           int g = baseImage[1].data[si];
           int b = baseImage[2].data[si];
-          int a = baseImage[3].data[si];
+          int a = hasAlpha ? baseImage[3].data[si] : 255;
           pixels[di++] = r;
           pixels[di++] = g;
           pixels[di++] = b;
@@ -154,7 +148,8 @@ class PsdImage extends DecodeInfo {
 
   void _blend(int ar, int ag, int ab, int aa,
               int br, int bg, int bb, int ba,
-              int blendMode, double opacity, Uint8List pixels, int di) {
+              int blendMode, double opacity,
+              Uint8List pixels, int di) {
     int r = br;
     int g = bg;
     int b = bb;
@@ -278,12 +273,12 @@ class PsdImage extends DecodeInfo {
     r = ((ar * (1.0 - da)) + (r * da)).toInt();
     g = ((ag * (1.0 - da)) + (g * da)).toInt();
     b = ((ab * (1.0 - da)) + (b * da)).toInt();
-    a = ((aa * (1.0 - da)) + (a * da)).toInt();
+    //a = ((aa * (1.0 - da)) + (a * da)).toInt();
 
     pixels[di++] = r;
     pixels[di++] = g;
     pixels[di++] = b;
-    pixels[di++] = a;
+    pixels[di++] = aa;
   }
 
   static int _blendLighten(int a, int b) {
@@ -444,6 +439,11 @@ class PsdImage extends DecodeInfo {
       }
 
       if (blockSignature == RESOURCE_BLOCK_SIGNATURE) {
+        if (blockId == 0x0421) { // Version Info
+          int version = blockData.readInt32();
+          hasMergedImage = blockData.readByte() != 0;
+          blockData.rewind();
+        }
         imageResources[blockId] = new PsdImageResource(blockId, blockName,
                                                        blockData);
       }
@@ -485,7 +485,7 @@ class PsdImage extends DecodeInfo {
     }
   }
 
-  void _readBaseLayer() {
+  void _readImageData() {
     _imageData.rewind();
     const List<int> channelIds = const [PsdChannel.RED,
                                         PsdChannel.GREEN,
@@ -493,7 +493,6 @@ class PsdImage extends DecodeInfo {
                                         PsdChannel.ALPHA];
 
     int compression = _imageData.readUint16();
-    compression = compression == 1 ? 1 : 0;
 
     Uint16List lineLengths;
     if (compression == PsdChannel.COMPRESS_RLE) {
@@ -505,10 +504,10 @@ class PsdImage extends DecodeInfo {
     }
 
     baseImage = [];
+    int numChannels = 3 + (hasAlpha ? 1 : 0);
 
-    int planeNumber = 0;
-    for (int i = 0; i < channelIds.length; ++i) {
-      baseImage.add(new PsdChannel.base(_imageData, channelIds[i],
+    for (int i = 0; i < numChannels; ++i) {
+      baseImage.add(new PsdChannel.read(_imageData, channelIds[i],
                                         width, height, compression,
                                         lineLengths, i));
     }

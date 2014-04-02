@@ -19,7 +19,7 @@ class PsdChannel {
 
   PsdChannel(this.id, this.dataLength);
 
-  PsdChannel.base(InputBuffer input, this.id, int width, int height,
+  PsdChannel.read(InputBuffer input, this.id, int width, int height,
                   int compression, Uint16List lineLengths, int planeNumber) {
     readPlane(input, width, height, compression, lineLengths, planeNumber);
   }
