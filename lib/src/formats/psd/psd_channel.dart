@@ -54,7 +54,14 @@ class PsdChannel {
   }
 
   void _readPlaneUncompressed(InputBuffer input, int width, int height) {
-    InputBuffer imgData = input.readBytes(width * height);
+    int len = width * height;
+    if (len >= input.length) {
+      data = new Uint8List(len);
+      data.fillRange(0, len, 255);
+      return;
+    }
+
+    InputBuffer imgData = input.readBytes(len);
     data = imgData.toUint8List();
   }
 
