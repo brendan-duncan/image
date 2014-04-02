@@ -96,6 +96,7 @@ class PsdImage extends DecodeInfo {
     Uint8List pixels = output.getBytes();
 
     if (baseImage != null /*&& layers.isEmpty*/) {
+      bool hasAlpha = baseImage.length >= 4;
       for (int y = 0, di = 0, si = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x, ++si) {
           int r = baseImage[0].data[si];
@@ -509,11 +510,8 @@ class PsdImage extends DecodeInfo {
       }
     }
 
-    hasAlpha = true;
     baseImage = [];
-    int numChannels = 3 + (hasAlpha ? 1 : 0);
-
-    for (int i = 0; i < numChannels; ++i) {
+    for (int i = 0; i < channels; ++i) {
       baseImage.add(new PsdChannel.read(_imageData, channelIds[i],
                                         width, height, compression,
                                         lineLengths, i));
