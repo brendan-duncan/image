@@ -7,15 +7,20 @@ class PsdLayer {
   int right;
   int width;
   int height;
-  List<PsdChannel> channels;
   int blendMode;
   int opacity;
   int clipping;
   int flags;
-  InputBuffer extra;
   int compression;
+  String name;
+  List<PsdChannel> channels;
+  PsdMask mask;
+  PsdBlendingRanges blendingRanges;
+  Map<String, PsdLayerData> additionalData = {};
+  List<PsdLayer> children = [];
+  PsdLayer parent;
 
-  static const int SIGNATURE = 0x3842494d;
+  static const int SIGNATURE = 0x3842494d; // '8BIM'
 
   static const int BLEND_PASSTHROUGH = 0x70617373; // 'pass'
   static const int BLEND_NORMAL = 0x6e6f726d; // 'norm'
@@ -45,6 +50,12 @@ class PsdLayer {
   static const int BLEND_SATURATION = 0x73617420; // 'sat '
   static const int BLEND_COLOR = 0x636f6c72; // 'colr'
   static const int BLEND_LUMINOSITY = 0x6c756d20; // 'lum '
+
+  static const int FLAG_TRANSPARENCY_PROTECTED = 1;
+  static const int FLAG_VISIBLE = 2;
+  static const int FLAG_OBSOLETE = 4;
+  static const int FLAG_PHOTOSHOP_5 = 8;
+  static const int FLAG_PIXEL_DATA_IRRELEVANT_TO_APPEARANCE = 16;
 
 
   PsdLayer([InputBuffer input]) {
@@ -83,10 +94,70 @@ class PsdLayer {
       throw new ImageException('Invalid PSD layer data');
     }
 
-    int extraLen = input.readUint32();
-    extra = input.readBytes(extraLen);
+    int len = input.readUint32();
+    InputBuffer extra = input.readBytes(len);
+
+    if (len > 0) {
+      len = extra.readUint32();
+      if (len > 0) {
+        InputBuffer maskData = extra.readBytes(len);
+        mask = new PsdMask(maskData);
+      }
+
+      len = extra.readUint32();
+      if (len > 0) {
+        InputBuffer data = extra.readBytes(len);
+        blendingRanges = new PsdBlendingRanges(data);
+      }
+
+      len = extra.readByte();
+      name = extra.readString(len);
+      int padding = (((len + 1 + 3) & ~0x03) - 1) - len;
+      if (padding > 0) {
+        extra.skip(padding);
+      }
+
+      // Additional layer sections
+      while (!extra.isEOS) {
+        int sig = extra.readUint32();
+        if (sig != SIGNATURE) {
+          throw new ImageException('PSD invalid signature for layer additional '
+                                   'data: ${sig.toRadixString(16)}');
+        }
+
+        String tag = extra.readString(4);
+
+        len = extra.readUint32();
+        InputBuffer data = extra.readBytes(len);
+        if (len & 1 == 1) {
+          extra.skip(1);
+        }
+
+        additionalData[tag] = new PsdLayerData(tag, data);
+      }
+    }
   }
 
+  /**
+   * Is this layer visible?
+   */
+  bool isVisible() => flags & FLAG_VISIBLE != 0;
+
+  /**
+   * Is this layer a folder?
+   */
+  int type() {
+    if (additionalData.containsKey(PsdLayerSectionDivider.TAG)) {
+      PsdLayerSectionDivider section = additionalData[PsdLayerSectionDivider.TAG];
+      return section.type;
+    }
+    return PsdLayerSectionDivider.NORMAL;
+  }
+
+  /**
+   * Get the channel for the given [id].
+   * Returns null if the layer does not have the given channel.
+   */
   PsdChannel getChannel(int id) {
     for (int i = 0; i < channels.length; ++i) {
       if (channels[i].id == id) {

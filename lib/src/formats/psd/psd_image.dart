@@ -1,8 +1,7 @@
 part of image;
 
 class PsdImage extends DecodeInfo {
-  // SIGNATURE is '8BPS'
-  static const int SIGNATURE = 0x38425053;
+  static const int SIGNATURE = 0x38425053; // '8BPS'
 
   static const int COLORMODE_BITMAP = 0;
   static const int COLORMODE_GRAYSCALE = 1;
@@ -69,7 +68,7 @@ class PsdImage extends DecodeInfo {
     _readLayerAndMaskData();
 
     bool hasMergeImage = true;
-    // 0x0421: (Photoshop 6.0) Version Info. 4 bytes version, 1 byte hasRealMergedData
+    // 0x0421: (Photoshop 6.0) Version Info. 1 byte hasRealMergedData
     if (imageResources.containsKey(0x0421)) {
       if (imageResources[0x0421].data[0] == 0) {
         hasMergeImage = false;
@@ -119,6 +118,10 @@ class PsdImage extends DecodeInfo {
 
     for (int li = 0; li < layers.length; ++li) {
       PsdLayer layer = layers[li];
+      /*if (!layer.isVisible()) {
+        continue;
+      }*/
+
       PsdChannel red = layer.getChannel(PsdChannel.RED);
       PsdChannel green = layer.getChannel(PsdChannel.GREEN);
       PsdChannel blue = layer.getChannel(PsdChannel.BLUE);
@@ -159,43 +162,116 @@ class PsdImage extends DecodeInfo {
     double da = (ba / 255.0) * opacity;
 
     switch (blendMode) {
+      case PsdLayer.BLEND_PASSTHROUGH:
+        r = ar;
+        g = ag;
+        b = ab;
+        a = aa;
+        break;
+      case PsdLayer.BLEND_NORMAL:
+        break;
+      case PsdLayer.BLEND_DISSOLVE:
+        break;
+      case PsdLayer.BLEND_DARKEN:
+        r = _blendDarken(ar, br);
+        g = _blendDarken(ag, bg);
+        b = _blendDarken(ab, bb);
+        break;
+      case PsdLayer.BLEND_MULTIPLY:
+        r = _blendMultiply(ar, br);
+        g = _blendMultiply(ag, bg);
+        b = _blendMultiply(ab, bb);
+        break;
+      case PsdLayer.BLEND_COLOR_BURN:
+        r = _blendColorBurn(ar, br);
+        g = _blendColorBurn(ag, bg);
+        b = _blendColorBurn(ab, bb);
+        break;
+      case PsdLayer.BLEND_LINEAR_BURN:
+        r = _blendLinearBurn(ar, br);
+        g = _blendLinearBurn(ag, bg);
+        b = _blendLinearBurn(ab, bb);
+        break;
+      case PsdLayer.BLEND_DARKEN_COLOR:
+        break;
+      case PsdLayer.BLEND_LIGHTEN:
+        r = _blendLighten(ar, br);
+        g = _blendLighten(ag, bg);
+        b = _blendLighten(ab, bb);
+        break;
+      case PsdLayer.BLEND_SCREEN:
+        r = _blendScreen(ar, br);
+        g = _blendScreen(ag, bg);
+        b = _blendScreen(ab, bb);
+        break;
+      case PsdLayer.BLEND_COLOR_DODGE:
+        r = _blendColorDodge(ar, br);
+        g = _blendColorDodge(ag, bg);
+        b = _blendColorDodge(ab, bb);
+        break;
+      case PsdLayer.BLEND_LINEAR_DODGE:
+        r = _blendLinearDodge(ar, br);
+        g = _blendLinearDodge(ag, bg);
+        b = _blendLinearDodge(ab, bb);
+        break;
+      case PsdLayer.BLEND_LIGHTER_COLOR:
+        break;
       case PsdLayer.BLEND_OVERLAY:
-        double ard = ar / 255.0;
-        double agd = ag / 255.0;
-        double abd = ab / 255.0;
-        double aad = aa / 255.0;
-        double brd = br / 255.0;
-        double bgd = bg / 255.0;
-        double bbd = bb / 255.0;
-        double bad = ba / 255.0;
-
-        double _ra;
-        if (2.0 * ard < aad) {
-          _ra = 2.0 * brd * ard + brd * (1.0 - aad) + ard * (1.0 - bad);
-        } else {
-          _ra = bad * aad - 2.0 * (aad - ard) * (bad - brd) +
-                brd * (1.0 - aad) + ard * (1.0 - bad);
-        }
-
-        double _ga;
-        if (2.0 * agd < aad) {
-          _ga = 2.0 * bgd * agd + bgd * (1.0 - aad) + agd * (1.0 - bad);
-        } else {
-          _ga = bad * aad - 2.0 * (aad - agd) * (bad - bgd) +
-                bgd * (1.0 - aad) + agd * (1.0 - bad);
-        }
-
-        double _ba;
-        if (2.0 * abd < aad) {
-          _ba = 2.0 * bbd * abd + bbd * (1.0 - aad) + abd * (1.0 - bad);
-        } else {
-          _ba = bad * aad - 2.0 * (aad - abd) * (bad - bbd) +
-                bbd * (1.0 - aad) + abd * (1.0 - bad);
-        }
-
-        r = (_ra * 255.0).toInt();
-        g = (_ga * 255.0).toInt();
-        b = (_ba * 255.0).toInt();
+        r = _blendOverlay(ar, br, aa, ba);
+        g = _blendOverlay(ag, bg, aa, ba);
+        b = _blendOverlay(ab, bb, aa, ba);
+        break;
+      case PsdLayer.BLEND_SOFT_LIGHT:
+        r = _blendSoftLight(ar, br);
+        g = _blendSoftLight(ag, bg);
+        b = _blendSoftLight(ab, bb);
+        break;
+      case PsdLayer.BLEND_HARD_LIGHT:
+        r = _blendHardLight(ar, br);
+        g = _blendHardLight(ag, bg);
+        b = _blendHardLight(ab, bb);
+        break;
+      case PsdLayer.BLEND_VIVID_LIGHT:
+        r = _blendVividLight(ar, br);
+        g = _blendVividLight(ag, bg);
+        b = _blendVividLight(ab, bb);
+        break;
+      case PsdLayer.BLEND_LINEAR_LIGHT:
+        r = _blendLinearLight(ar, br);
+        g = _blendLinearLight(ag, bg);
+        b = _blendLinearLight(ab, bb);
+        break;
+      case PsdLayer.BLEND_PIN_LIGHT:
+        r = _blendPinLight(ar, br);
+        g = _blendPinLight(ag, bg);
+        b = _blendPinLight(ab, bb);
+        break;
+      case PsdLayer.BLEND_HARD_MIX:
+        r = _blendHardMix(ar, br);
+        g = _blendHardMix(ag, bg);
+        b = _blendHardMix(ab, bb);
+        break;
+      case PsdLayer.BLEND_DIFFERENCE:
+        r = _blendDifference(ar, br);
+        g = _blendDifference(ag, bg);
+        b = _blendDifference(ab, bb);
+        break;
+      case PsdLayer.BLEND_EXCLUSION:
+        r = _blendExclusion(ar, br);
+        g = _blendExclusion(ag, bg);
+        b = _blendExclusion(ab, bb);
+        break;
+      case PsdLayer.BLEND_SUBTRACT:
+        break;
+      case PsdLayer.BLEND_DIVIDE:
+        break;
+      case PsdLayer.BLEND_HUE:
+        break;
+      case PsdLayer.BLEND_SATURATION:
+        break;
+      case PsdLayer.BLEND_COLOR:
+        break;
+      case PsdLayer.BLEND_LUMINOSITY:
         break;
     }
 
@@ -208,6 +284,113 @@ class PsdImage extends DecodeInfo {
     pixels[di++] = g;
     pixels[di++] = b;
     pixels[di++] = a;
+  }
+
+  static int _blendLighten(int a, int b) {
+    return Math.max(a, b);
+  }
+
+  static int _blendDarken(int a, int b) {
+    return Math.min(a,  b);
+  }
+
+  static int _blendMultiply(int a, int b) {
+    return (a * b) >> 8;
+  }
+
+  static int _blendOverlay(int a, int b, int aAlpha, int bAlpha) {
+    double x = a / 255.0;
+    double y = b / 255.0;
+    double aa = aAlpha / 255.0;
+    double ba = bAlpha / 255.0;
+
+    double z;
+    if (2.0 * x < aa) {
+      z = 2.0 * y * x + y * (1.0 - aa) + x * (1.0 - ba);
+    } else {
+      z = ba * aa - 2.0 * (aa - x) * (ba - y) +
+          y * (1.0 - aa) + x * (1.0 - ba);
+    }
+
+    return (z * 255.0).toInt().clamp(0, 255);
+  }
+
+  static int _blendColorBurn(int a, int b) {
+    if (b == 0) {
+      return 0; // We don't want to divide by zero
+    }
+    int c = (255.0 * (1.0 - (1.0 - (a / 255.0)) / (b / 255.0))).toInt();
+    return c.clamp(0, 255);
+  }
+
+  static int _blendLinearBurn(int a, int b) {
+    return (a + b - 255).clamp(0, 255);
+  }
+
+  static int _blendScreen(int a, int b) {
+    return (255 - ((255 - b) * (255 - a))).clamp(0, 255);
+  }
+
+  static int _blendColorDodge(int a, int b) {
+    if (b == 255) {
+      return 255;
+    }
+    return (((a / 255) / (1.0 - (b / 255.0))) * 255.0).toInt().clamp(0, 255);
+  }
+
+  static int _blendLinearDodge(int a, int b) {
+    return (b + a > 255) ? 0xff : a + b;
+  }
+
+  static int _blendSoftLight(int a, int b) {
+    double aa = a / 255.0;
+    double bb = b / 255.0;
+    return (255.0 * ((1.0 - bb) * bb * aa +
+                     bb * (1.0 - (1.0 - bb) * (1.0 - aa)))).round();
+  }
+
+  static int _blendHardLight(int bottom, int top) {
+    double a = top / 255.0;
+    double b = bottom / 255.0;
+    if (b < 0.5) {
+      return (255.0 * 2.0 * a * b).round();
+    } else {
+      return (255.0 * (1.0 - 2.0 * (1.0 - a) * (1.0 - b))).round();
+    }
+  }
+
+  static int _blendVividLight(int bottom, int top) {
+    if ( top < 128) {
+      return _blendColorBurn(bottom, 2 * top);
+    } else {
+      return _blendColorDodge(bottom, 2 * (top - 128));
+    }
+  }
+
+  static int _blendLinearLight(int bottom, int top) {
+    if (top < 128) {
+      return _blendLinearBurn(bottom, 2 * top);
+    } else {
+      return _blendLinearDodge(bottom, 2 * (top - 128));
+    }
+  }
+
+  static int _blendPinLight(int bottom, int top) {
+    return (top < 128) ?
+           _blendDarken(bottom, 2 * top) :
+           _blendLighten(bottom, 2 * (top - 128));
+  }
+
+  static int _blendHardMix(int bottom, int top) {
+    return (top < 255 - bottom) ? 0 : 255;
+  }
+
+  static int _blendDifference(int bottom, int top) {
+    return (top - bottom).abs();
+  }
+
+  static int _blendExclusion(int bottom, int top) {
+    return (top + bottom - 2 * top * bottom / 255.0).round();
   }
 
   void _readHeader() {
@@ -285,6 +468,20 @@ class PsdImage extends DecodeInfo {
 
     for (int i = 0; i < layers.length; ++i) {
       layers[i].readImageData(_layerAndMaskData);
+    }
+
+    // Global layer mask info
+    len = _layerAndMaskData.readUint32();
+    if (len > 0) {
+      InputBuffer globalMaskData = _layerAndMaskData.readBytes(len);
+
+      int colorSpace = globalMaskData.readUint16();
+      int rc = globalMaskData.readUint16();
+      int gc = globalMaskData.readUint16();
+      int bc = globalMaskData.readUint16();
+      int ac = globalMaskData.readUint16();
+      int opacity = globalMaskData.readUint16(); // 0-100
+      int kind = globalMaskData.readByte();
     }
   }
 
