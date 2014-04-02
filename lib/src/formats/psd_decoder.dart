@@ -15,6 +15,17 @@ class PsdDecoder extends Decoder {
   }
 
   /**
+   * Decode a raw PSD image without rendering it to a flat image.
+   */
+  PsdImage decodePsd(List<int> bytes) {
+    PsdImage psd = new PsdImage(bytes);
+    if (!psd.decode()) {
+      return null;
+    }
+    return psd;
+  }
+
+  /**
    * Decode the file and extract a single image from it.  If the file is
    * animated, the specified [frame] will be decoded.  If there was a problem
    * decoding the file, null is returned.

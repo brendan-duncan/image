@@ -13,38 +13,34 @@ class PsdImage extends DecodeInfo {
   static const int COLORMODE_DUOTONE = 8;
   static const int COLORMODE_LAB = 9;
 
-  InputBuffer input;
   int signature;
   int version;
   int channels;
   int depth;
   int colorMode;
-  InputBuffer colorData;
-  InputBuffer imageResourceData;
-  InputBuffer layerAndMaskData;
-  InputBuffer imageData;
   List<PsdLayer> layers;
   List<PsdChannel> baseImage;
+  Map<int, PsdImageResource> imageResources = {};
 
   PsdImage(List<int> bytes) {
-    input = new InputBuffer(bytes, bigEndian: true);
+    _input = new InputBuffer(bytes, bigEndian: true);
 
     _readHeader();
     if (!isValid) {
       return;
     }
 
-    int len = input.readUint32();
-    colorData = input.readBytes(len);
+    int len = _input.readUint32();
+    _colorData = _input.readBytes(len);
 
-    len = input.readUint32();
-    imageResourceData = input.readBytes(len);
+    len = _input.readUint32();
+    _imageResourceData = _input.readBytes(len);
 
-    len = input.readUint32();
-    layerAndMaskData = input.readBytes(len);
+    len = _input.readUint32();
+    _layerAndMaskData = _input.readBytes(len);
 
-    len = input.readUint32();
-    imageData = input.readBytes(len);
+    len = _input.readUint32();
+    _imageData = _input.readBytes(len);
   }
 
   bool get isValid => signature == SIGNATURE;
@@ -57,7 +53,7 @@ class PsdImage extends DecodeInfo {
    * Use [renderImage] to render the output image.
    */
   bool decode() {
-    if (!isValid) {
+    if (!isValid || _input == null) {
       return false;
     }
 
@@ -72,7 +68,23 @@ class PsdImage extends DecodeInfo {
 
     _readLayerAndMaskData();
 
-    _readBaseLayer();
+    bool hasMergeImage = true;
+    // 0x0421: (Photoshop 6.0) Version Info. 4 bytes version, 1 byte hasRealMergedData
+    if (imageResources.containsKey(0x0421)) {
+      if (imageResources[0x0421].data[0] == 0) {
+        hasMergeImage = false;
+      }
+    }
+
+    if (hasMergeImage) {
+      _readBaseLayer();
+    }
+
+    _input = null;
+    _colorData = null;
+    _imageResourceData = null;
+    _layerAndMaskData = null;
+    _imageData = null;
 
     return true;
   }
@@ -90,16 +102,18 @@ class PsdImage extends DecodeInfo {
 
     Uint8List pixels = output.getBytes();
 
-    for (int y = 0, di = 0, si = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x, ++si) {
-        int r = baseImage[0].data[si];
-        int g = baseImage[1].data[si];
-        int b = baseImage[2].data[si];
-        int a = baseImage[3].data[si];
-        pixels[di++] = r;
-        pixels[di++] = g;
-        pixels[di++] = b;
-        pixels[di++] = a;
+    if (baseImage != null) {
+      for (int y = 0, di = 0, si = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x, ++si) {
+          int r = baseImage[0].data[si];
+          int g = baseImage[1].data[si];
+          int b = baseImage[2].data[si];
+          int a = baseImage[3].data[si];
+          pixels[di++] = r;
+          pixels[di++] = g;
+          pixels[di++] = b;
+          pixels[di++] = a;
+        }
       }
     }
 
@@ -197,8 +211,8 @@ class PsdImage extends DecodeInfo {
   }
 
   void _readHeader() {
-    signature = input.readUint32();
-    version = input.readUint16();
+    signature = _input.readUint32();
+    version = _input.readUint16();
 
     // version should be 1 (2 for PSB files).
     if (version != 1) {
@@ -207,7 +221,7 @@ class PsdImage extends DecodeInfo {
     }
 
     // padding should be all 0's
-    InputBuffer padding = input.readBytes(6);
+    InputBuffer padding = _input.readBytes(6);
     for (int i = 0; i < 6; ++i) {
       if (padding[i] != 0) {
         signature = 0;
@@ -215,11 +229,11 @@ class PsdImage extends DecodeInfo {
       }
     }
 
-    channels = input.readUint16();
-    height = input.readUint32();
-    width = input.readUint32();
-    depth = input.readUint16();
-    colorMode = input.readUint16();
+    channels = _input.readUint16();
+    height = _input.readUint32();
+    width = _input.readUint32();
+    depth = _input.readUint16();
+    colorMode = _input.readUint16();
   }
 
   void _readColorModeData() {
@@ -227,23 +241,23 @@ class PsdImage extends DecodeInfo {
   }
 
   void _readImageResources() {
-    imageResourceData.rewind();
-    while (!imageResourceData.isEOS) {
-      int blockSignature = imageResourceData.readUint32();
-      int blockId = imageResourceData.readUint16();
+    _imageResourceData.rewind();
+    while (!_imageResourceData.isEOS) {
+      int blockSignature = _imageResourceData.readUint32();
+      int blockId = _imageResourceData.readUint16();
 
-      int len = imageResourceData.readByte();
-      String blockName = imageResourceData.readString(len);
+      int len = _imageResourceData.readByte();
+      String blockName = _imageResourceData.readString(len);
       // name string is padded to an even size
       if (len & 1 == 0) {
-        imageResourceData.skip(1);
+        _imageResourceData.skip(1);
       }
 
-      len = imageResourceData.readUint32();
-      InputBuffer blockData = imageResourceData.readBytes(len);
+      len = _imageResourceData.readUint32();
+      InputBuffer blockData = _imageResourceData.readBytes(len);
       // blocks are padded to an even length.
       if (len & 1 == 1) {
-        imageResourceData.skip(1);
+        _imageResourceData.skip(1);
       }
 
       if (blockSignature == RESOURCE_BLOCK_SIGNATURE) {
@@ -254,41 +268,42 @@ class PsdImage extends DecodeInfo {
   }
 
   void _readLayerAndMaskData() {
-    layerAndMaskData.rewind();
-    int len = layerAndMaskData.readUint32();
+    _layerAndMaskData.rewind();
+    int len = _layerAndMaskData.readUint32();
     if ((len & 1) != 0) {
       len++;
     }
 
     layers = [];
     if (len > 0) {
-      int count = layerAndMaskData.readUint16();
+      int count = _layerAndMaskData.readUint16();
       for (int i = 0; i < count; ++i) {
-        PsdLayer layer = new PsdLayer(layerAndMaskData);
+        PsdLayer layer = new PsdLayer(_layerAndMaskData);
         layers.add(layer);
       }
     }
 
     for (int i = 0; i < layers.length; ++i) {
-      layers[i].readImageData(layerAndMaskData);
+      layers[i].readImageData(_layerAndMaskData);
     }
   }
 
   void _readBaseLayer() {
-    imageData.rewind();
+    _imageData.rewind();
     const List<int> channelIds = const [PsdChannel.RED,
                                         PsdChannel.GREEN,
                                         PsdChannel.BLUE,
                                         PsdChannel.ALPHA];
 
-    int compression = imageData.readUint16() == 1 ? 1 : 0;
+    int compression = _imageData.readUint16();
+    compression = compression == 1 ? 1 : 0;
 
     Uint16List lineLengths;
     if (compression == PsdChannel.COMPRESS_RLE) {
       int numLines = height * this.channels;
       lineLengths = new Uint16List(numLines);
       for (int i = 0; i < numLines; ++i) {
-        lineLengths[i] = imageData.readUint16();
+        lineLengths[i] = _imageData.readUint16();
       }
     }
 
@@ -296,12 +311,17 @@ class PsdImage extends DecodeInfo {
 
     int planeNumber = 0;
     for (int i = 0; i < channelIds.length; ++i) {
-      baseImage.add(new PsdChannel.base(imageData, channelIds[i], width, height,
-                                        compression, lineLengths, i));
+      baseImage.add(new PsdChannel.base(_imageData, channelIds[i],
+                                        width, height, compression,
+                                        lineLengths, i));
     }
   }
 
   static const int RESOURCE_BLOCK_SIGNATURE = 0x3842494d; // '8BIM'
 
-  Map<int, PsdImageResource> imageResources = {};
+  InputBuffer _input;
+  InputBuffer _colorData;
+  InputBuffer _imageResourceData;
+  InputBuffer _layerAndMaskData;
+  InputBuffer _imageData;
 }

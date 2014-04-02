@@ -14,9 +14,7 @@ class InputBuffer {
    * Create a InputStream for reading from a List<int>
    */
   InputBuffer(buffer, {this.bigEndian: false, int offset: 0, int length}) :
-    this.buffer = buffer is ByteBuffer ? new Uint8List.view(buffer) :
-                  buffer is ByteData ? new Uint8List.view(buffer.buffer) :
-                  buffer,
+    this.buffer = buffer,
     this.start = offset,
     this.offset = offset,
     this.end = (length == null ? buffer.length : offset + length);
