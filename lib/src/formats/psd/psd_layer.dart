@@ -5,6 +5,8 @@ class PsdLayer {
   int left;
   int bottom;
   int right;
+  int width;
+  int height;
   List<PsdChannel> channels;
   int blendMode;
   int opacity;
@@ -54,6 +56,8 @@ class PsdLayer {
     left = input.readUint32();
     bottom = input.readUint32();
     right = input.readUint32();
+    width = right - left;
+    height = bottom - top;
 
     channels = [];
     int numChannels = input.readUint16();
@@ -65,7 +69,8 @@ class PsdLayer {
 
     int sig = input.readUint32();
     if (sig != SIGNATURE) {
-      throw new ImageException('Invalid PSD layer signature: ${sig.toRadixString(16)}');
+      throw new ImageException('Invalid PSD layer signature: '
+                               '${sig.toRadixString(16)}');
     }
 
     blendMode = input.readUint32();
@@ -74,6 +79,9 @@ class PsdLayer {
     flags = input.readByte();
 
     int filler = input.readByte(); // should be 0
+    if (filler != 0) {
+      throw new ImageException('Invalid PSD layer data');
+    }
 
     int extraLen = input.readUint32();
     extra = input.readBytes(extraLen);
@@ -88,18 +96,35 @@ class PsdLayer {
     return null;
   }
 
-  int get width => right - left;
+  Image toImage() {
+    Image image = new Image(width, height);
 
-  int get height => bottom - top;
+    PsdChannel red = getChannel(PsdChannel.RED);
+    PsdChannel green = getChannel(PsdChannel.GREEN);
+    PsdChannel blue = getChannel(PsdChannel.BLUE);
+    PsdChannel alpha = getChannel(PsdChannel.ALPHA);
+
+    Uint8List pixels = image.getBytes();
+    for (int y = 0, di = 0, si = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x, di += 4) {
+        pixels[di] = (red != null) ? red.data[si] : 0;
+        pixels[di + 1] = (green != null) ? green.data[si] : 0;
+        pixels[di + 2] = (blue != null) ? blue.data[si] : 0;
+        pixels[di + 3] = (alpha != null) ? alpha.data[si] : 255;
+      }
+    }
+
+    return image;
+  }
 
   void readImageData(InputBuffer input) {
     for (int i = 0; i < channels.length; ++i) {
       PsdChannel channel = channels[i];
       switch (channel.id) {
-        case PsdChannel.CHANNEL_ALPHA:
-        case PsdChannel.CHANNEL_RED:
-        case PsdChannel.CHANNEL_GREEN:
-        case PsdChannel.CHANNEL_BLUE:
+        case PsdChannel.ALPHA:
+        case PsdChannel.RED:
+        case PsdChannel.GREEN:
+        case PsdChannel.BLUE:
           channel.readPlane(input, width, height);
           break;
         default:

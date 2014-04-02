@@ -11,7 +11,7 @@ void definePsdTests() {
 
     test('startDecode', () {
       PsdDecoder psd = new PsdDecoder();
-      PsdInfo info = psd.startDecode(layers_psd);
+      PsdImage info = psd.startDecode(layers_psd);
 
       expect(info.width, equals(512));
       expect(info.height, equals(256));

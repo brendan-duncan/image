@@ -1,10 +1,10 @@
 part of image;
 
 class PsdChannel {
-  static const int CHANNEL_ALPHA = -1;
-  static const int CHANNEL_RED = 0;
-  static const int CHANNEL_GREEN = 1;
-  static const int CHANNEL_BLUE = 2;
+  static const int ALPHA = -1;
+  static const int RED = 0;
+  static const int GREEN = 1;
+  static const int BLUE = 2;
 
   static const int COMPRESS_NONE = 0;
   static const int COMPRESS_RLE = 1;

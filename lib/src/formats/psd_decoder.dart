@@ -4,14 +4,14 @@ part of image;
  * Decode a Photoshop PSD image.
  */
 class PsdDecoder extends Decoder {
-  PsdInfo info;
+  PsdImage info;
 
   /**
    * A light-weight function to test if the given file is able to be decoded
    * by this Decoder.
    */
   bool isValidFile(List<int> bytes) {
-    return new PsdInfo(bytes).isValid;
+    return new PsdImage(bytes).isValid;
   }
 
   /**
@@ -54,7 +54,7 @@ class PsdDecoder extends Decoder {
    * process the frames until they are requested with decodeFrame.
    */
   DecodeInfo startDecode(List<int> bytes) {
-    info = new PsdInfo(bytes);
+    info = new PsdImage(bytes);
     return info;
   }
 
