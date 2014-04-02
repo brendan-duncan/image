@@ -6,7 +6,7 @@ homepage: https://github.com/brendan-duncan/image
 documentation: https://github.com/brendan-duncan/image/wiki
 dependencies:
   archive: '>=1.0.16 <1.1.0'
-  xml: '>=0.9.5'
+  xml: '>=0.9.5 <1.0.0'
 dev_dependencies:
   crypto: '>=0.9.0 <1.0.0'
   unittest: any

@@ -91,11 +91,11 @@ class PsdImage extends DecodeInfo {
 
   Image renderImage() {
     Image output = new Image(width, height);
-    output.fill(0xffffffff);
+    output.fill(0x00ffffff);
 
     Uint8List pixels = output.getBytes();
 
-    if (baseImage != null) {
+    if (baseImage != null /*&& layers.isEmpty*/) {
       for (int y = 0, di = 0, si = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x, ++si) {
           int r = baseImage[0].data[si];
@@ -108,6 +108,7 @@ class PsdImage extends DecodeInfo {
           pixels[di++] = a;
         }
       }
+      return output;
     }
 
     for (int li = 0; li < layers.length; ++li) {
@@ -273,12 +274,13 @@ class PsdImage extends DecodeInfo {
     r = ((ar * (1.0 - da)) + (r * da)).toInt();
     g = ((ag * (1.0 - da)) + (g * da)).toInt();
     b = ((ab * (1.0 - da)) + (b * da)).toInt();
+    a = Math.max(aa, bb);
     //a = ((aa * (1.0 - da)) + (a * da)).toInt();
 
     pixels[di++] = r;
     pixels[di++] = g;
     pixels[di++] = b;
-    pixels[di++] = aa;
+    pixels[di++] = a;
   }
 
   static int _blendLighten(int a, int b) {
@@ -459,7 +461,11 @@ class PsdImage extends DecodeInfo {
 
     layers = [];
     if (len > 0) {
-      int count = _layerAndMaskData.readUint16();
+      int count = _layerAndMaskData.readInt16();
+      if (count < 0) {
+        hasAlpha = true;
+        count = -count;
+      }
       for (int i = 0; i < count; ++i) {
         PsdLayer layer = new PsdLayer(_layerAndMaskData);
         layers.add(layer);
@@ -503,6 +509,7 @@ class PsdImage extends DecodeInfo {
       }
     }
 
+    hasAlpha = true;
     baseImage = [];
     int numChannels = 3 + (hasAlpha ? 1 : 0);
 

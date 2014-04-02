@@ -63,6 +63,10 @@ class PsdChannel {
     data = new Uint8List(width * height);
     int pos = 0;
     int lineIndex = planeNum * height;
+    if (lineIndex >= lineLengths.length) {
+      data.fillRange(0, data.length, 255);
+      return;
+    }
 
     for (int i = 0; i < height; ++i) {
       int len = lineLengths[lineIndex++];
