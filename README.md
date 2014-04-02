@@ -21,6 +21,7 @@ Decoding Only:
 
 - WebP / Animated WebP
 - TIFF
+- PSD
 
 
 ##[Documentation](https://github.com/brendan-duncan/image/wiki)
