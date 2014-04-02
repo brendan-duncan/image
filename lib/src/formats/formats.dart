@@ -35,6 +35,11 @@ Decoder findDecoderForData(List<int> data) {
     return tiff;
   }
 
+  PsdDecoder psd = new PsdDecoder();
+  if (psd.isValidFile(bytes)) {
+    return psd;
+  }
+
   return null;
 }
 
@@ -88,6 +93,9 @@ Decoder getDecoderForNamedImage(String name) {
   if (n.endsWith('.tif') || n.endsWith('.tiff')) {
     return new TiffDecoder();
   }
+  if (n.endsWith('.psd')) {
+    return new PsdDecoder();
+  }
   return null;
 }
 
@@ -132,9 +140,6 @@ List<int> encodeNamedImage(Image image, String name) {
   if (n.endsWith('.tga')) {
     return encodeTga(image);
   }
-  /*if (n.endsWith('.webp')) {
-    return encodeWebP(image);
-  }*/
   if (n.endsWith('.gif')) {
     return encodeGif(image);
   }
@@ -282,4 +287,11 @@ Image decodeTiff(List<int> bytes) {
  */
 Animation decodeTiffAnimation(List<int> bytes) {
   return new TiffDecoder().decodeAnimation(bytes);
+}
+
+/**
+ * Decode a Photoshop PSD formatted image.
+ */
+Image decodePsd(List<int> bytes) {
+  return new PsdDecoder().decodeImage(bytes);
 }
