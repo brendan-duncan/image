@@ -55,7 +55,7 @@ class PsdChannel {
 
   void _readPlaneUncompressed(InputBuffer input, int width, int height) {
     int len = width * height;
-    if (len >= input.length) {
+    if (len > input.length) {
       data = new Uint8List(len);
       data.fillRange(0, len, 255);
       return;

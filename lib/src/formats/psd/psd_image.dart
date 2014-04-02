@@ -274,7 +274,7 @@ class PsdImage extends DecodeInfo {
     r = ((ar * (1.0 - da)) + (r * da)).toInt();
     g = ((ag * (1.0 - da)) + (g * da)).toInt();
     b = ((ab * (1.0 - da)) + (b * da)).toInt();
-    a = Math.max(aa, bb);
+    a = aa;//Math.max(aa, bb);
     //a = ((aa * (1.0 - da)) + (a * da)).toInt();
 
     pixels[di++] = r;
