@@ -25,6 +25,11 @@ void definePsdTests() {
       Image image = psd.decodeImage(layers_psd);
       expect(image.width, equals(512));
       expect(image.height, equals(256));
+
+      List<int> png = new PngEncoder().encodeImage(image);
+      new Io.File('out/psd/layers.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(png);
     });
   });
 

@@ -75,6 +75,6 @@ class PsdDecoder extends Decoder {
     if (info == null) {
       return null;
     }
-    return info.decode();
+    return info.decodeImage();
   }
 }

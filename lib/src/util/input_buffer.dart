@@ -137,6 +137,10 @@ class InputBuffer {
     return buffer[offset++];
   }
 
+  int readInt8() {
+    return _uint8ToInt8(readByte());
+  }
+
   /**
    * Read [count] bytes from the stream.
    */

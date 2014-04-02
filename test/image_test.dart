@@ -17,8 +17,6 @@ part 'tiff_test.dart';
 part 'webp_test.dart';
 
 void main() {
-  defineExrTests();
-  definePsdTests();
   defineJpegTests();
   definePngTests();
   defineGifTests();
@@ -28,4 +26,6 @@ void main() {
   defineWebPTests();
   defineFilterTests();
   defineHalfTests();
+  defineExrTests();
+  definePsdTests();
 }
