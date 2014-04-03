@@ -63,10 +63,10 @@ class PsdLayer {
       return;
     }
 
-    top = input.readUint32();
-    left = input.readUint32();
-    bottom = input.readUint32();
-    right = input.readUint32();
+    top = input.readInt32();
+    left = input.readInt32();
+    bottom = input.readInt32();
+    right = input.readInt32();
     width = right - left;
     height = bottom - top;
 
