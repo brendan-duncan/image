@@ -30,7 +30,7 @@ Decoding Only:
 
 ##[Examples](https://github.com/brendan-duncan/image/wiki/Examples)
 
-##Format Decoding Functions##
+##[Format Decoding Functions] (https://github.com/brendan-duncan/image/wiki#format-decoding-functions)##
 
 ##Samples
 
