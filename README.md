@@ -40,7 +40,7 @@ Load a WebP image, resize it, and save it as a png:
     import 'package:image/image.dart';
     void main() {
       // Read a webp image from file.
-      Image image = decodeWebP(new Io.File('test.webp').readAsBytesSync());
+      Image image = decodeImage(new Io.File('test.webp').readAsBytesSync());
 
       // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
       Image thumbnail = copyResize(image, 120);
