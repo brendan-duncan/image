@@ -19,7 +19,7 @@ class PsdImage extends DecodeInfo {
   int colorMode;
   List<PsdLayer> layers;
   List<PsdChannel> mergeImageChannels;
-  Image mergeImage;
+  Image mergedImage;
   Map<int, PsdImageResource> imageResources = {};
   bool hasAlpha = false;
 
@@ -88,14 +88,14 @@ class PsdImage extends DecodeInfo {
   }
 
   Image renderImage() {
-    Image output = new Image(width, height);
-    output.fill(backgroundColor);
-
-    Uint8List pixels = output.getBytes();
-
-    if (mergeImage != null) {
-      return mergeImage;
+    if (mergedImage != null) {
+      return mergedImage;
     }
+
+    mergedImage = new Image(width, height);
+    mergedImage.fill(backgroundColor);
+
+    Uint8List pixels = mergedImage.getBytes();
 
     for (int li = 0; li < layers.length; ++li) {
       PsdLayer layer = layers[li];
@@ -103,34 +103,36 @@ class PsdImage extends DecodeInfo {
         continue;
       }
 
-      PsdChannel red = layer.getChannel(PsdChannel.RED);
-      PsdChannel green = layer.getChannel(PsdChannel.GREEN);
-      PsdChannel blue = layer.getChannel(PsdChannel.BLUE);
-      PsdChannel alpha = layer.getChannel(PsdChannel.ALPHA);
-
       double opacity = layer.opacity / 255.0;
       int blendMode = layer.blendMode;
 
-      for (int y = layer.top, si = 0; y < layer.bottom; ++y) {
-        int di = y * width * 4 + layer.left * 4;
-        for (int x = layer.left; x < layer.right; ++x, ++si, di += 4) {
-          int br = (red != null) ? red.data[si] : 0;
-          int bg = (green != null) ? green.data[si] : 0;
-          int bb = (blue != null) ? blue.data[si] : 0;
-          int ba = (alpha != null) ? alpha.data[si] : 255;
+      int ns = depth == 16 ? 2 : 1;
+      Uint8List srcP = layer.layerImage.getBytes();
 
-          int ar = pixels[di];
-          int ag = pixels[di + 1];
-          int ab = pixels[di + 2];
-          int aa = pixels[di + 3];
+      for (int y = 0, sy = layer.top, si = 0; y < layer.height; ++y, ++sy) {
+        int di = (layer.top + y) * width * 4 + layer.left * 4;
+        for (int x = 0, sx = layer.left; x < layer.width; ++x, ++sx) {
+          int br = srcP[si++];
+          int bg = srcP[si++];
+          int bb = srcP[si++];
+          int ba = srcP[si++];
 
-          _blend(ar, ag, ab, aa, br, bg, bb, ba, blendMode, opacity,
-                 pixels, di);
+          if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
+            int ar = pixels[di];
+            int ag = pixels[di + 1];
+            int ab = pixels[di + 2];
+            int aa = pixels[di + 3];
+
+            _blend(ar, ag, ab, aa, br, bg, bb, ba, blendMode, opacity,
+                   pixels, di);
+
+            di += 4;
+          }
         }
       }
     }
 
-    return output;
+    return mergedImage;
   }
 
   void _blend(int ar, int ag, int ab, int aa,
@@ -460,7 +462,7 @@ class PsdImage extends DecodeInfo {
     }
 
     for (int i = 0; i < layers.length; ++i) {
-      layers[i].readImageData(layerData, depth);
+      layers[i].readImageData(layerData, this);
     }
 
     // Global layer mask info
@@ -492,12 +494,12 @@ class PsdImage extends DecodeInfo {
 
     mergeImageChannels = [];
     for (int i = 0; i < channels; ++i) {
-      mergeImageChannels.add(new PsdChannel.read(_imageData, 0,
+      mergeImageChannels.add(new PsdChannel.read(_imageData, i == 3 ? -1 : i,
                                          width, height, depth, compression,
                                          lineLengths, i));
     }
 
-    mergeImage = createImageFromChannels(colorMode, depth,
+    mergedImage = createImageFromChannels(colorMode, depth,
                                          width, height,
                                          mergeImageChannels);
   }
@@ -507,12 +509,18 @@ class PsdImage extends DecodeInfo {
            ((data[si] << 8) | data[si + 1]) >> 8;
   }
 
-  Image createImageFromChannels(int colorMode, int bitDepth, int width,
-                                int height, List<PsdChannel> channels) {
+  static Image createImageFromChannels(int colorMode, int bitDepth, int width,
+                                       int height,
+                                       List<PsdChannel> channelList) {
     Image output = new Image(width, height);
     Uint8List pixels = output.getBytes();
 
-    int numChannels = channels.length;
+    Map<int, PsdChannel> channels = {};
+    for (PsdChannel ch in channelList) {
+      channels[ch.id] = ch;
+    }
+
+    int numChannels = channelList.length;
     int ns = (bitDepth == 8) ? 1 : (bitDepth == 16) ? 2 : -1;
     if (ns == -1) {
       throw new ImageException('PSD: unsupported bit depth: $bitDepth');
@@ -522,18 +530,18 @@ class PsdImage extends DecodeInfo {
       for (int x = 0; x < width; ++x, si += ns) {
         switch (colorMode) {
           case COLORMODE_RGB:
-            pixels[di++] = _ch(mergeImageChannels[0].data, si, ns);
-            pixels[di++] = _ch(mergeImageChannels[1].data, si, ns);
-            pixels[di++] = _ch(mergeImageChannels[2].data, si, ns);
+            pixels[di++] = _ch(channels[0].data, si, ns);
+            pixels[di++] = _ch(channels[1].data, si, ns);
+            pixels[di++] = _ch(channels[2].data, si, ns);
             pixels[di++] = numChannels >= 4 ?
-                           _ch(mergeImageChannels[3].data, si, ns) : 255;
+                           _ch(channels[-1].data, si, ns) : 255;
             break;
           case COLORMODE_LAB:
-            int L = _ch(mergeImageChannels[0].data, si, ns) * 100 >> 8;
-            int a = _ch(mergeImageChannels[1].data, si, ns) - 128;
-            int b = _ch(mergeImageChannels[2].data, si, ns) - 128;
+            int L = _ch(channels[0].data, si, ns) * 100 >> 8;
+            int a = _ch(channels[1].data, si, ns) - 128;
+            int b = _ch(channels[2].data, si, ns) - 128;
             int alpha = numChannels >= 4 ?
-                        _ch(mergeImageChannels[3].data, si, ns) : 255;
+                        _ch(channels[-1].data, si, ns) : 255;
             List<int> rgb = labToRGB(L, a, b);
             pixels[di++] = rgb[0];
             pixels[di++] = rgb[1];
@@ -541,21 +549,21 @@ class PsdImage extends DecodeInfo {
             pixels[di++] = alpha;
             break;
           case COLORMODE_GRAYSCALE:
-            int gray = _ch(mergeImageChannels[0].data, si, ns);
+            int gray = _ch(channels[0].data, si, ns);
             int alpha = numChannels >= 2 ?
-                       _ch(mergeImageChannels[1].data, si, ns) : 255;
+                       _ch(channels[-1].data, si, ns) : 255;
             pixels[di++] = gray;
             pixels[di++] = gray;
             pixels[di++] = gray;
             pixels[di++] = alpha;
             break;
           case COLORMODE_CMYK:
-            int c = _ch(mergeImageChannels[0].data, si, ns);
-            int m = _ch(mergeImageChannels[1].data, si, ns);
-            int y = _ch(mergeImageChannels[2].data, si, ns);
-            int k = _ch(mergeImageChannels[3].data, si, ns);
+            int c = _ch(channels[0].data, si, ns);
+            int m = _ch(channels[1].data, si, ns);
+            int y = _ch(channels[2].data, si, ns);
+            int k = _ch(channels[numChannels == 4 ? -1 : 3].data, si, ns);
             int alpha = numChannels >= 5 ?
-                        _ch(mergeImageChannels[4].data, si, ns) : 255;
+                        _ch(channels[-1].data, si, ns) : 255;
             List<int> rgb = cmykToRGB(255 - c, 255 - m, 255 - y, 255 - k);
             pixels[di++] = rgb[0];
             pixels[di++] = rgb[1];

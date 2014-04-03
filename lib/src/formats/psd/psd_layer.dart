@@ -19,6 +19,7 @@ class PsdLayer {
   Map<String, PsdLayerData> additionalData = {};
   List<PsdLayer> children = [];
   PsdLayer parent;
+  Image layerImage;
 
   static const int SIGNATURE = 0x3842494d; // '8BIM'
 
@@ -173,31 +174,12 @@ class PsdLayer {
     return null;
   }
 
-  Image toImage() {
-    Image image = new Image(width, height);
-
-    PsdChannel red = getChannel(PsdChannel.RED);
-    PsdChannel green = getChannel(PsdChannel.GREEN);
-    PsdChannel blue = getChannel(PsdChannel.BLUE);
-    PsdChannel alpha = getChannel(PsdChannel.ALPHA);
-
-    Uint8List pixels = image.getBytes();
-    for (int y = 0, di = 0, si = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x, di += 4) {
-        pixels[di] = (red != null) ? red.data[si] : 0;
-        pixels[di + 1] = (green != null) ? green.data[si] : 0;
-        pixels[di + 2] = (blue != null) ? blue.data[si] : 0;
-        pixels[di + 3] = (alpha != null) ? alpha.data[si] : 255;
-      }
-    }
-
-    return image;
-  }
-
-  void readImageData(InputBuffer input, int bitDepth) {
+  void readImageData(InputBuffer input, PsdImage psd) {
     for (int i = 0; i < channels.length; ++i) {
-      PsdChannel channel = channels[i];
-      channel.readPlane(input, width, height, bitDepth);
+      channels[i].readPlane(input, width, height, psd.depth);
     }
+
+    layerImage = PsdImage.createImageFromChannels(psd.colorMode, psd.depth,
+                                                  width, height, channels);
   }
 }

@@ -4,6 +4,7 @@ class PsdChannel {
   static const int RED = 0;
   static const int GREEN = 1;
   static const int BLUE = 2;
+  static const int BLACK = 3;
   static const int ALPHA = -1;
   static const int MASK = -2;
   static const int REAL_MASK = -3;
