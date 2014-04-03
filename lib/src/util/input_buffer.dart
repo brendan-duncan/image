@@ -227,6 +227,13 @@ class InputBuffer {
   }
 
   /**
+   * Read a 32-bit float.
+   */
+  double readFloat32() {
+    return _uint32ToFloat32(readUint32());
+  }
+
+  /**
    * Read a 64-bit word form the stream.
    */
   int readUint64() {
