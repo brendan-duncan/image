@@ -4,7 +4,7 @@ part of image;
 class ImfImage {
   int version;
   int flags;
-  List<ImfPart> headers = [];
+  List<ImfPart> parts = [];
 
   ImfImage(List<int> bytes) {
     InputBuffer input = new InputBuffer(bytes);
@@ -28,7 +28,7 @@ class ImfImage {
     if (!isMultiPart()) {
       ImfPart header = new ImfPart(isTiled(), input);
       if (header.isValid) {
-        headers.add(header);
+        parts.add(header);
       }
     } else {
       while (true) {
@@ -36,19 +36,19 @@ class ImfImage {
         if (!header.isValid) {
           break;
         }
-        headers.add(header);
+        parts.add(header);
       }
     }
 
-    if (headers.isEmpty) {
+    if (parts.isEmpty) {
       throw new ImageException('Error reading image header');
     }
 
-    for (ImfPart header in headers) {
+    for (ImfPart header in parts) {
       header.readOffsets(input);
     }
 
-    _readImage(input);
+    //_readImage(input);
   }
 
   bool isTiled()  {
@@ -70,16 +70,29 @@ class ImfImage {
 
   void _readImage(InputBuffer input) {
     final bool multiPart = isMultiPart();
-    /*for (int offset in offsets) {
-      input.offset = offset;
 
-      int partNum = 0;
-      if (multiPart) {
-        partNum = input.readUint32();
+    for (int partNum = 0; partNum < parts.length; ++partNum) {
+      ImfPart part = parts[partNum];
+      List<int> offsets = part.offsets;
+
+      InputBuffer imgData = new InputBuffer.from(input);
+      for (int offset in offsets) {
+        imgData.offset = offset;
+
+        if (multiPart) {
+          int p = imgData.readUint32();
+          if (p != partNum) {
+            throw new ImageException('Invalid Image Data');
+          }
+        }
+
+        int y = imgData.readInt32();
+        int dataSize = imgData.readInt32();
+        InputBuffer data = imgData.readBytes(dataSize);
+
+        print('$y: $dataSize');
       }
-
-      ImfHeader header = headers[partNum];
-    }*/
+    }
   }
 
 

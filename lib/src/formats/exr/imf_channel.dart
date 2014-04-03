@@ -7,9 +7,10 @@ class ImfChannel {
 
   String name;
   int type;
+  int size;
   bool pLinear;
-  int xSample;
-  int ySample;
+  int xSampling;
+  int ySampling;
 
   ImfChannel(InputBuffer input) {
     name = input.readString();
@@ -22,8 +23,22 @@ class ImfChannel {
     assert(i == 0 || i == 1);
     pLinear = i == 1;
     input.skip(3);
-    xSample = input.readUint32();
-    ySample = input.readUint32();
+    xSampling = input.readUint32();
+    ySampling = input.readUint32();
+
+    switch (type) {
+      case TYPE_UINT:
+        size = 4;
+        break;
+      case TYPE_HALF:
+        size = 2;
+        break;
+      case TYPE_FLOAT:
+        size = 4;
+        break;
+      default:
+        throw new ImageException('EXR Invalid pixel type: $type');
+    }
   }
 
   bool get isValid => name != null;

@@ -21,7 +21,10 @@ class ImfPart {
 
   Map<String, ImfAttribute> attributes = {};
   List<int> displayWindow;
-  List<int> dataWindow;
+  int top;
+  int left;
+  int bottom;
+  int right;
   int type;
   int width;
   int height;
@@ -33,6 +36,7 @@ class ImfPart {
   double screenWindowWidth = 1.0;
   List<int> offsets = [];
   List<ImfChannel> channels = [];
+  Uint32List bytesPerLine;
 
   ImfPart(bool tiled, InputBuffer input) {
     type = tiled ? ImfPart.TYPE_TILE : ImfPart.TYPE_SCANLINE;
@@ -49,10 +53,12 @@ class ImfPart {
 
       switch (name) {
         case 'dataWindow':
-          dataWindow = [value.readInt32(), value.readInt32(),
-                        value.readInt32(), value.readInt32()];
-          width = dataWindow[2] - dataWindow[0];
-          height = dataWindow[3] - dataWindow[1];
+          left = value.readInt32();
+          top = value.readInt32();
+          right = value.readInt32();
+          bottom = value.readInt32();
+          width = right - left;
+          height = bottom - top;
           break;
         case 'displayWindow':
           displayWindow = [value.readInt32(), value.readInt32(),
@@ -102,16 +108,35 @@ class ImfPart {
           break;
       }
     }
+
+    bytesPerLine = new Uint32List(height + 1);
+    int maxBytesPerLine = 0;
+    for (ImfChannel ch in channels) {
+      int nBytes = ch.size * (width + 1) ~/ ch.xSampling;
+      maxBytesPerLine = Math.max(maxBytesPerLine, nBytes);
+
+      for (int y = 0; y < height; ++y) {
+        if ((y + top) % ch.ySampling == 0) {
+          bytesPerLine[y] = nBytes;
+        }
+      }
+    }
+
+    int linesInBuffer = 1;
+    int lineBufferSize = maxBytesPerLine;
+    int numOffsets = (height + linesInBuffer) ~/ linesInBuffer;
+
+    offsets = new Uint32List(numOffsets);
   }
 
   bool get isValid => width != null;
 
 
   void readOffsets(InputBuffer input) {
-    int numOffsets = height;
-    offsets = new Uint32List(numOffsets);
+    int numOffsets = offsets.length;
     for (int i = 0; i < numOffsets; ++i) {
       offsets[i] = input.readUint64();
     }
+    print(offsets);
   }
 }
