@@ -17,11 +17,11 @@ class PsdImage extends DecodeInfo {
   int channels;
   int depth;
   int colorMode;
-  bool hasAlpha = false;
-  bool hasMergedImage = true;
   List<PsdLayer> layers;
-  List<PsdChannel> baseImage;
+  List<PsdChannel> mergeImageChannels;
+  Image mergeImage;
   Map<int, PsdImageResource> imageResources = {};
+  bool hasAlpha = false;
 
   PsdImage(List<int> bytes) {
     _input = new InputBuffer(bytes, bigEndian: true);
@@ -68,9 +68,7 @@ class PsdImage extends DecodeInfo {
 
     _readLayerAndMaskData();
 
-    if (hasMergedImage) {
-      _readImageData();
-    }
+    _readMergeImageData();
 
     _input = null;
     _colorData = null;
@@ -91,32 +89,19 @@ class PsdImage extends DecodeInfo {
 
   Image renderImage() {
     Image output = new Image(width, height);
-    output.fill(0x00ffffff);
+    output.fill(backgroundColor);
 
     Uint8List pixels = output.getBytes();
 
-    if (baseImage != null /*&& layers.isEmpty*/) {
-      bool hasAlpha = baseImage.length >= 4;
-      for (int y = 0, di = 0, si = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x, ++si) {
-          int r = baseImage[0].data[si];
-          int g = baseImage[1].data[si];
-          int b = baseImage[2].data[si];
-          int a = hasAlpha ? baseImage[3].data[si] : 255;
-          pixels[di++] = r;
-          pixels[di++] = g;
-          pixels[di++] = b;
-          pixels[di++] = a;
-        }
-      }
-      return output;
+    if (mergeImage != null) {
+      return mergeImage;
     }
 
     for (int li = 0; li < layers.length; ++li) {
       PsdLayer layer = layers[li];
-      /*if (!layer.isVisible()) {
+      if (!layer.isVisible()) {
         continue;
-      }*/
+      }
 
       PsdChannel red = layer.getChannel(PsdChannel.RED);
       PsdChannel green = layer.getChannel(PsdChannel.GREEN);
@@ -442,11 +427,6 @@ class PsdImage extends DecodeInfo {
       }
 
       if (blockSignature == RESOURCE_BLOCK_SIGNATURE) {
-        if (blockId == 0x0421) { // Version Info
-          int version = blockData.readInt32();
-          hasMergedImage = blockData.readByte() != 0;
-          blockData.rewind();
-        }
         imageResources[blockId] = new PsdImageResource(blockId, blockName,
                                                        blockData);
       }
@@ -460,45 +440,45 @@ class PsdImage extends DecodeInfo {
       len++;
     }
 
+    InputBuffer layerData = _layerAndMaskData.readBytes(len);
+
     layers = [];
     if (len > 0) {
-      int count = _layerAndMaskData.readInt16();
+      int count = layerData.readInt16();
+      // If it is a negative number, its absolute value is the number of
+      // layers and the first alpha channel contains the transparency data for
+      // the merged result.
       if (count < 0) {
         hasAlpha = true;
         count = -count;
       }
+
       for (int i = 0; i < count; ++i) {
-        PsdLayer layer = new PsdLayer(_layerAndMaskData);
+        PsdLayer layer = new PsdLayer(layerData);
         layers.add(layer);
       }
     }
 
     for (int i = 0; i < layers.length; ++i) {
-      layers[i].readImageData(_layerAndMaskData);
+      layers[i].readImageData(layerData, depth);
     }
 
     // Global layer mask info
     len = _layerAndMaskData.readUint32();
+    InputBuffer maskData = _layerAndMaskData.readBytes(len);
     if (len > 0) {
-      InputBuffer globalMaskData = _layerAndMaskData.readBytes(len);
-
-      int colorSpace = globalMaskData.readUint16();
-      int rc = globalMaskData.readUint16();
-      int gc = globalMaskData.readUint16();
-      int bc = globalMaskData.readUint16();
-      int ac = globalMaskData.readUint16();
-      int opacity = globalMaskData.readUint16(); // 0-100
-      int kind = globalMaskData.readByte();
+      int colorSpace = maskData.readUint16();
+      int rc = maskData.readUint16();
+      int gc = maskData.readUint16();
+      int bc = maskData.readUint16();
+      int ac = maskData.readUint16();
+      int opacity = maskData.readUint16(); // 0-100
+      int kind = maskData.readByte();
     }
   }
 
-  void _readImageData() {
+  void _readMergeImageData() {
     _imageData.rewind();
-    const List<int> channelIds = const [PsdChannel.RED,
-                                        PsdChannel.GREEN,
-                                        PsdChannel.BLUE,
-                                        PsdChannel.ALPHA];
-
     int compression = _imageData.readUint16();
 
     Uint16List lineLengths;
@@ -510,12 +490,85 @@ class PsdImage extends DecodeInfo {
       }
     }
 
-    baseImage = [];
+    mergeImageChannels = [];
     for (int i = 0; i < channels; ++i) {
-      baseImage.add(new PsdChannel.read(_imageData, channelIds[i],
-                                        width, height, compression,
-                                        lineLengths, i));
+      mergeImageChannels.add(new PsdChannel.read(_imageData, 0,
+                                         width, height, depth, compression,
+                                         lineLengths, i));
     }
+
+    mergeImage = createImageFromChannels(colorMode, depth,
+                                         width, height,
+                                         mergeImageChannels);
+  }
+
+  static int _ch(List<int> data, int si, int ns) {
+    return ns == 1 ? data[si] :
+           ((data[si] << 8) | data[si + 1]) >> 8;
+  }
+
+  Image createImageFromChannels(int colorMode, int bitDepth, int width,
+                                int height, List<PsdChannel> channels) {
+    Image output = new Image(width, height);
+    Uint8List pixels = output.getBytes();
+
+    int numChannels = channels.length;
+    int ns = (bitDepth == 8) ? 1 : (bitDepth == 16) ? 2 : -1;
+    if (ns == -1) {
+      throw new ImageException('PSD: unsupported bit depth: $bitDepth');
+    }
+
+    for (int y = 0, di = 0, si = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x, si += ns) {
+        switch (colorMode) {
+          case COLORMODE_RGB:
+            pixels[di++] = _ch(mergeImageChannels[0].data, si, ns);
+            pixels[di++] = _ch(mergeImageChannels[1].data, si, ns);
+            pixels[di++] = _ch(mergeImageChannels[2].data, si, ns);
+            pixels[di++] = numChannels >= 4 ?
+                           _ch(mergeImageChannels[3].data, si, ns) : 255;
+            break;
+          case COLORMODE_LAB:
+            int L = _ch(mergeImageChannels[0].data, si, ns) * 100 >> 8;
+            int a = _ch(mergeImageChannels[1].data, si, ns) - 128;
+            int b = _ch(mergeImageChannels[2].data, si, ns) - 128;
+            int alpha = numChannels >= 4 ?
+                        _ch(mergeImageChannels[3].data, si, ns) : 255;
+            List<int> rgb = labToRGB(L, a, b);
+            pixels[di++] = rgb[0];
+            pixels[di++] = rgb[1];
+            pixels[di++] = rgb[2];
+            pixels[di++] = alpha;
+            break;
+          case COLORMODE_GRAYSCALE:
+            int gray = _ch(mergeImageChannels[0].data, si, ns);
+            int alpha = numChannels >= 2 ?
+                       _ch(mergeImageChannels[1].data, si, ns) : 255;
+            pixels[di++] = gray;
+            pixels[di++] = gray;
+            pixels[di++] = gray;
+            pixels[di++] = alpha;
+            break;
+          case COLORMODE_CMYK:
+            int c = _ch(mergeImageChannels[0].data, si, ns);
+            int m = _ch(mergeImageChannels[1].data, si, ns);
+            int y = _ch(mergeImageChannels[2].data, si, ns);
+            int k = _ch(mergeImageChannels[3].data, si, ns);
+            int alpha = numChannels >= 5 ?
+                        _ch(mergeImageChannels[4].data, si, ns) : 255;
+            List<int> rgb = cmykToRGB(255 - c, 255 - m, 255 - y, 255 - k);
+            pixels[di++] = rgb[0];
+            pixels[di++] = rgb[1];
+            pixels[di++] = rgb[2];
+            pixels[di++] = alpha;
+            break;
+          default:
+            throw new ImageException('Unhandled color mode: $colorMode');
+        }
+      }
+    }
+
+    return output;
   }
 
   static const int RESOURCE_BLOCK_SIGNATURE = 0x3842494d; // '8BIM'

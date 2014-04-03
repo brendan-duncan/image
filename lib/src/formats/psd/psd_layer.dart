@@ -52,7 +52,7 @@ class PsdLayer {
   static const int BLEND_LUMINOSITY = 0x6c756d20; // 'lum '
 
   static const int FLAG_TRANSPARENCY_PROTECTED = 1;
-  static const int FLAG_VISIBLE = 2;
+  static const int FLAG_HIDDEN = 2;
   static const int FLAG_OBSOLETE = 4;
   static const int FLAG_PHOTOSHOP_5 = 8;
   static const int FLAG_PIXEL_DATA_IRRELEVANT_TO_APPEARANCE = 16;
@@ -98,21 +98,26 @@ class PsdLayer {
     InputBuffer extra = input.readBytes(len);
 
     if (len > 0) {
+      // Mask Data
       len = extra.readUint32();
+      assert(len == 0 || len == 20 || len == 36);
       if (len > 0) {
         InputBuffer maskData = extra.readBytes(len);
         mask = new PsdMask(maskData);
       }
 
+      // Layer Blending Ranges
       len = extra.readUint32();
       if (len > 0) {
         InputBuffer data = extra.readBytes(len);
         blendingRanges = new PsdBlendingRanges(data);
       }
 
+      // Layer name
       len = extra.readByte();
       name = extra.readString(len);
-      int padding = (((len + 1 + 3) & ~0x03) - 1) - len;
+      // Layer name is padded to a multiple of 4 bytes.
+      int padding = (4 - (len % 4)) - 1;
       if (padding > 0) {
         extra.skip(padding);
       }
@@ -129,6 +134,7 @@ class PsdLayer {
 
         len = extra.readUint32();
         InputBuffer data = extra.readBytes(len);
+        // pad to an even byte count.
         if (len & 1 == 1) {
           extra.skip(1);
         }
@@ -141,7 +147,7 @@ class PsdLayer {
   /**
    * Is this layer visible?
    */
-  bool isVisible() => flags & FLAG_VISIBLE != 0;
+  bool isVisible() => flags & FLAG_HIDDEN == 0;
 
   /**
    * Is this layer a folder?
@@ -188,19 +194,10 @@ class PsdLayer {
     return image;
   }
 
-  void readImageData(InputBuffer input) {
+  void readImageData(InputBuffer input, int bitDepth) {
     for (int i = 0; i < channels.length; ++i) {
       PsdChannel channel = channels[i];
-      switch (channel.id) {
-        case PsdChannel.ALPHA:
-        case PsdChannel.RED:
-        case PsdChannel.GREEN:
-        case PsdChannel.BLUE:
-          channel.readPlane(input, width, height);
-          break;
-        default:
-          break;
-      }
+      channel.readPlane(input, width, height, bitDepth);
     }
   }
 }

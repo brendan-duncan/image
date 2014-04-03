@@ -20,11 +20,13 @@ class PsdChannel {
   PsdChannel(this.id, this.dataLength);
 
   PsdChannel.read(InputBuffer input, this.id, int width, int height,
-                  int compression, Uint16List lineLengths, int planeNumber) {
-    readPlane(input, width, height, compression, lineLengths, planeNumber);
+                  int bitDepth, int compression, Uint16List lineLengths,
+                  int planeNumber) {
+    readPlane(input, width, height, bitDepth, compression, lineLengths,
+              planeNumber);
   }
 
-  void readPlane(InputBuffer input, int width, int height,
+  void readPlane(InputBuffer input, int width, int height, int bitDepth,
                  [int compression, Uint16List lineLengths, int planeNum = 0]) {
     if (compression == null) {
       compression = input.readUint16();
@@ -32,13 +34,14 @@ class PsdChannel {
 
     switch (compression) {
       case COMPRESS_NONE:
-        _readPlaneUncompressed(input, width, height);
+        _readPlaneUncompressed(input, width, height, bitDepth);
         break;
       case COMPRESS_RLE:
         if (lineLengths == null) {
           lineLengths = _readLineLengths(input, height);
         }
-        _readPlaneRleCompressed(input, width, height, lineLengths, planeNum);
+        _readPlaneRleCompressed(input, width, height, bitDepth, lineLengths,
+                                planeNum);
         break;
       default:
         throw new ImageException('Unsupported compression: $compression');
@@ -53,8 +56,12 @@ class PsdChannel {
     return lineLengths;
   }
 
-  void _readPlaneUncompressed(InputBuffer input, int width, int height) {
+  void _readPlaneUncompressed(InputBuffer input, int width, int height,
+                              int bitDepth) {
     int len = width * height;
+    if (bitDepth == 16) {
+      len *= 2;
+    }
     if (len > input.length) {
       data = new Uint8List(len);
       data.fillRange(0, len, 255);
@@ -66,8 +73,13 @@ class PsdChannel {
   }
 
   void _readPlaneRleCompressed(InputBuffer input, int width, int height,
-                               Uint16List lineLengths, int planeNum) {
-    data = new Uint8List(width * height);
+                               int bitDepth, Uint16List lineLengths,
+                               int planeNum) {
+    int len = width * height;
+    if (bitDepth == 16) {
+      len *= 2;
+    }
+    data = new Uint8List(len);
     int pos = 0;
     int lineIndex = planeNum * height;
     if (lineIndex >= lineLengths.length) {
