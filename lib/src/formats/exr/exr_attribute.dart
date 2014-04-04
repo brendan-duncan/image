@@ -1,10 +1,10 @@
 part of image;
 
-class ImfAttribute {
+class ExrAttribute {
   String name;
   String type;
   int size;
   InputBuffer value;
 
-  ImfAttribute(this.name, this.type, this.size, this.value);
+  ExrAttribute(this.name, this.type, this.size, this.value);
 }

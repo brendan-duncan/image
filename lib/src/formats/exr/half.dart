@@ -45,7 +45,11 @@ class Half {
   }
 
   Half.fromBits(int bits) :
-    _h = bits;
+    _h = bits {
+    if (_toFloatFloat32 == null) {
+      _initialize();
+    }
+  }
 
   double toDouble() => _toFloatFloat32[_h];
 

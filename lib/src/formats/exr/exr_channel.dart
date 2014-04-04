@@ -1,6 +1,6 @@
 part of image;
 
-class ImfChannel {
+class ExrChannel {
   static const int TYPE_UINT = 0;
   static const int TYPE_HALF = 1;
   static const int TYPE_FLOAT = 2;
@@ -12,7 +12,7 @@ class ImfChannel {
   int xSampling;
   int ySampling;
 
-  ImfChannel(InputBuffer input) {
+  ExrChannel(InputBuffer input) {
     name = input.readString();
     if (name == null || name.isEmpty) {
       name = null;

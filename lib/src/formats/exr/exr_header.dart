@@ -1,25 +1,16 @@
 part of image;
 
-class ImfPart {
+class ExrHeader {
   static const int TYPE_SCANLINE = 0;
   static const int TYPE_TILE = 1;
   static const int TYPE_DEEP_SCANLINE = 2;
   static const int TYPE_DEEP_TILE = 3;
 
-  static const int NO_COMPRESSION = 0;
-  static const int RLE_COMPRESSION = 1;
-  static const int ZIPS_COMPRESSION = 2;
-  static const int ZIP_COMPRESSION = 3;
-  static const int PIZ_COMPRESSION = 4;
-  static const int PXR24_COMPRESSION = 5;
-  static const int B44_COMPRESSION = 6;
-  static const int B44A_COMPRESSION = 7;
-
   static const int INCREASING_Y = 0;
   static const int DECREASING_Y = 1;
   static const int RANDOM_Y = 2;
 
-  Map<String, ImfAttribute> attributes = {};
+  Map<String, ExrAttribute> attributes = {};
   List<int> displayWindow;
   int top;
   int left;
@@ -29,17 +20,23 @@ class ImfPart {
   int width;
   int height;
   int lineOrder = INCREASING_Y;
-  int compression = NO_COMPRESSION;
+  int compressionType = ExrCompressor.NO_COMPRESSION;
   double pixelAspectRatio = 1.0;
   double screenWindowCenterX = 0.0;
   double screenWindowCenterY = 0.0;
   double screenWindowWidth = 1.0;
   List<int> offsets = [];
-  List<ImfChannel> channels = [];
+  List<ExrChannel> channels = [];
   Uint32List bytesPerLine;
+  ExrLineBuffer lineBuffer;
+  int linesInBuffer;
+  int lineBufferSize;
+  int nextLineBufferMinY;
+  Uint32List offsetInLineBuffer;
+  ExrFrameBuffer framebuffer = new ExrFrameBuffer();
 
-  ImfPart(bool tiled, InputBuffer input) {
-    type = tiled ? ImfPart.TYPE_TILE : ImfPart.TYPE_SCANLINE;
+  ExrHeader(bool tiled, InputBuffer input) {
+    type = tiled ? ExrHeader.TYPE_TILE : ExrHeader.TYPE_SCANLINE;
 
     while (true) {
       String name = input.readString();
@@ -65,8 +62,8 @@ class ImfPart {
                            value.readInt32(), value.readInt32()];
           break;
         case 'compression':
-          compression = value.readByte();
-          if (compression > 7) {
+          compressionType = value.readByte();
+          if (compressionType > 7) {
             throw new ImageException('EXR Invalid compression type');
           }
           break;
@@ -95,7 +92,7 @@ class ImfPart {
           break;
         case 'channels':
           while (true) {
-            ImfChannel channel = new ImfChannel(value);
+            ExrChannel channel = new ExrChannel(value);
             if (!channel.isValid) {
               break;
             }
@@ -104,28 +101,47 @@ class ImfPart {
           break;
         default:
           print(name);
-          attributes[name] = new ImfAttribute(name, type, size, value);
+          attributes[name] = new ExrAttribute(name, type, size, value);
           break;
       }
     }
 
     bytesPerLine = new Uint32List(height + 1);
-    int maxBytesPerLine = 0;
-    for (ImfChannel ch in channels) {
+    for (ExrChannel ch in channels) {
       int nBytes = ch.size * (width + 1) ~/ ch.xSampling;
-      maxBytesPerLine = Math.max(maxBytesPerLine, nBytes);
-
       for (int y = 0; y < height; ++y) {
         if ((y + top) % ch.ySampling == 0) {
-          bytesPerLine[y] = nBytes;
+          bytesPerLine[y] += nBytes;
         }
       }
     }
 
-    int linesInBuffer = 1;
-    int lineBufferSize = maxBytesPerLine;
-    int numOffsets = (height + linesInBuffer) ~/ linesInBuffer;
+    int maxBytesPerLine = 0;
+    for (int y = 0; y < height; ++y) {
+      maxBytesPerLine = Math.max(maxBytesPerLine, bytesPerLine[y]);
+    }
 
+    lineBuffer = new ExrLineBuffer(new ExrCompressor(compressionType,
+                                                     maxBytesPerLine,
+                                                     this));
+
+    linesInBuffer = lineBuffer.compressor.numScanLines();
+    lineBufferSize = maxBytesPerLine * linesInBuffer;
+
+    nextLineBufferMinY = top - 1;
+
+    offsetInLineBuffer = new Uint32List(bytesPerLine.length);
+
+    int offset = 0;
+    for (int i = 0; i <= bytesPerLine.length - 1; ++i) {
+      if (i % linesInBuffer == 0) {
+        offset = 0;
+      }
+      offsetInLineBuffer[i] = offset;
+      offset += bytesPerLine[i];
+    }
+
+    int numOffsets = (height + linesInBuffer) ~/ linesInBuffer;
     offsets = new Uint32List(numOffsets);
   }
 
@@ -137,6 +153,5 @@ class ImfPart {
     for (int i = 0; i < numOffsets; ++i) {
       offsets[i] = input.readUint64();
     }
-    print(offsets);
   }
 }
