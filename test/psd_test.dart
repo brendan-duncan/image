@@ -1,7 +1,56 @@
 part of image_test;
 
+
 void definePsdTests() {
-  List<int> layers_psd = new Io.File('res/psd/layers.psd').readAsBytesSync();
+  Io.File script = new Io.File(Io.Platform.script.toFilePath());
+  String path = script.parent.path + '/res/psd';
+
+  Io.Directory dir = new Io.Directory(path);
+  List files = dir.listSync();
+
+  for (var f in files) {
+    if (f is! Io.File || !f.path.endsWith('.psd')) {
+      continue;
+    }
+
+    String name = f.path.split(new RegExp(r'(/|\\)')).last;
+    print('Decoding $name');
+
+    PsdDecoder psd = new PsdDecoder();
+    Image img = psd.decodeImage(f.readAsBytesSync());
+
+    if (img != null) {
+      List<int> png = new PngEncoder().encodeImage(img);
+      new Io.File('out/psd/$name.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(png);
+    } else {
+      print('Unable to decode $name');
+    }
+  }
+
+  //PsdDecoder psd = new PsdDecoder();
+  //Image img = psd.decodeImage(new Io.File('res/psd/fence_01_01.psd').readAsBytesSync());
+  /*PsdImage psdImg = psd.decodePsd(new Io.File('res/psd/fence_01_01.psd').readAsBytesSync());
+  PsdLayer l = psdImg.layers[0];
+  PsdChannel ch = l.getChannel(PsdChannel.ALPHA);
+  Image img = new Image(l.width, l.height);
+  var p = img.getBytes();
+  for (int y = 0, si = 0, di = 0; y < l.height; ++y) {
+    for (int x = 0; x < l.width; ++x, ++si) {
+      int s = ch.data[si];
+      p[di++] = s;
+      p[di++] = s;
+      p[di++] = s;
+      p[di++] = 255;
+    }
+  }*/
+
+  /*List<int> png = new PngEncoder().encodeImage(img);
+  new Io.File('out/psd/fence_01_01.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(png);*/
+  /*List<int> layers_psd = new Io.File('res/psd/layers.psd').readAsBytesSync();
 
   List<int> bytes = new Io.File('res/psd/layers.png').readAsBytesSync();
   Image pngImage = new PngDecoder().decodeImage(bytes);
@@ -35,5 +84,5 @@ void definePsdTests() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
     });
-  });
+  });*/
 }

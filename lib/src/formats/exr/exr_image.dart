@@ -103,9 +103,6 @@ class ExrImage extends DecodeInfo {
       List<int> offsets = header.offsets;
       ExrFrameBuffer framebuffer = header.framebuffer;
 
-      int scanLineMin = header.top;
-      int scanLineMax = header.bottom;
-
       for (int ci = 0; ci < header.channels.length; ++ci) {
         ExrChannel ch = header.channels[ci];
         if (!framebuffer.contains(ch.name)) {
@@ -114,6 +111,10 @@ class ExrImage extends DecodeInfo {
           framebuffer[ch.name] = new ExrSlice(ch, header.width, header.height);
         }
       }
+
+      int scanLineMin = header.top;
+      int scanLineMax = header.bottom;
+      int linesInBuffer = header.linesInBuffer;
 
       lineBuffer.minY = header.top;
       lineBuffer.maxY = lineBuffer.minY + header.linesInBuffer - 1;
@@ -151,25 +152,16 @@ class ExrImage extends DecodeInfo {
         int len = uncompressedData.length;
         int numChannels = header.channels.length;
         int lineCount = 0;
-        while (si < len) {
+        for (int yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
+          si = header.offsetInLineBuffer[yy];
+
           for (int ci = 0; ci < numChannels; ++ci) {
             ExrChannel ch = header.channels[ci];
             Uint8List slice = framebuffer[ch.name].bytes;
-            for (int bi = 0; bi < ch.size; ++bi) {
-              slice[fbi[ci]++] = uncompressedData[si++];
-            }
-          }
-
-          xx++;
-          if (xx >= header.width) {
-            xx = 0;
-            yy++;
-            if (yy >= header.height) {
-              break;
-            }
-            lineCount++;
-            if (lineCount >= header.linesInBuffer) {
-              break;
+            for (int xx = 0; xx < header.width; ++xx) {
+              for (int bi = 0; bi < ch.size; ++bi) {
+                slice[fbi[ci]++] = uncompressedData[si++];
+              }
             }
           }
         }
