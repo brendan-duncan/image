@@ -1,7 +1,7 @@
 part of image;
 
 class ExrB44Compressor extends ExrCompressor {
-  ExrB44Compressor(ExrHeader header, this._maxScanLineSize, this._numScanLines,
+  ExrB44Compressor(ExrPart header, this._maxScanLineSize, this._numScanLines,
                    this._optFlatFields) :
     super._(header) {
   }
@@ -10,11 +10,11 @@ class ExrB44Compressor extends ExrCompressor {
 
 
   Uint8List compress(InputBuffer inPtr, int minY) {
-
+    throw new ImageException('B44 compression not yet supported.');
   }
 
   Uint8List uncompress(InputBuffer inPtr, int minY) {
-
+    throw new ImageException('B44 compression not yet supported.');
   }
 
   int _maxScanLineSize;

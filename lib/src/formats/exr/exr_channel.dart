@@ -5,6 +5,35 @@ class ExrChannel {
   static const int TYPE_HALF = 1;
   static const int TYPE_FLOAT = 2;
 
+  // Channel Names
+
+  /// Luminance
+  static const String Y = 'Y';
+  /// Chroma RY
+  static const String RY = 'RY';
+  /// Chroma BY
+  static const String BY = 'BY';
+  /// Red for colored mattes
+  static const String AR = 'AR';
+  /// Green for colored mattes
+  static const String AG = 'AG';
+  /// Blue for colored mattes
+  static const String AB = 'AB';
+  /// Distance of the front of a sample from the viewer
+  static const String Z = 'Z';
+  /// Distance of the back of a sample from the viewer
+  static const String ZBack = 'ZBack';
+  /// Alpha/opacity
+  static const String A = 'A';
+  /// Red value of a sample
+  static const String R = 'R';
+  /// Green value of a sample
+  static const String G = 'G';
+  /// Blue value of a sample
+  static const String B = 'B';
+  /// A numerical identifier for the object represented by a sample.
+  static const String ID = 'id';
+
   String name;
   int type;
   int size;

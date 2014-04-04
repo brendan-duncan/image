@@ -1,7 +1,7 @@
 part of image;
 
 class ExrPizCompressor extends ExrCompressor {
-  ExrPizCompressor(ExrHeader header, this._maxScanLineSize, this._numScanLines) :
+  ExrPizCompressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
     super._(header) {
   }
 
@@ -9,11 +9,11 @@ class ExrPizCompressor extends ExrCompressor {
 
 
   Uint8List compress(InputBuffer inPtr, int minY) {
-
+    throw new ImageException('Piz compression not yet supported.');
   }
 
   Uint8List uncompress(InputBuffer inPtr, int minY) {
-
+    throw new ImageException('Piz compression not yet supported.');
   }
 
   int _maxScanLineSize;

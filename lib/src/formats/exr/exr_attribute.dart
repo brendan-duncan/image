@@ -4,7 +4,7 @@ class ExrAttribute {
   String name;
   String type;
   int size;
-  InputBuffer value;
+  InputBuffer data;
 
-  ExrAttribute(this.name, this.type, this.size, this.value);
+  ExrAttribute(this.name, this.type, this.size, this.data);
 }

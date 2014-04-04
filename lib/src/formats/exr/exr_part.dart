@@ -1,6 +1,6 @@
 part of image;
 
-class ExrHeader {
+class ExrPart {
   static const int TYPE_SCANLINE = 0;
   static const int TYPE_TILE = 1;
   static const int TYPE_DEEP_SCANLINE = 2;
@@ -28,15 +28,16 @@ class ExrHeader {
   List<int> offsets = [];
   List<ExrChannel> channels = [];
   Uint32List bytesPerLine;
-  ExrLineBuffer lineBuffer;
+  ExrCompressor compressor;
+  //int format;
   int linesInBuffer;
   int lineBufferSize;
   int nextLineBufferMinY;
   Uint32List offsetInLineBuffer;
   ExrFrameBuffer framebuffer = new ExrFrameBuffer();
 
-  ExrHeader(bool tiled, InputBuffer input) {
-    type = tiled ? ExrHeader.TYPE_TILE : ExrHeader.TYPE_SCANLINE;
+  ExrPart(bool tiled, InputBuffer input) {
+    type = tiled ? ExrPart.TYPE_TILE : ExrPart.TYPE_SCANLINE;
 
     while (true) {
       String name = input.readString();
@@ -121,11 +122,9 @@ class ExrHeader {
       maxBytesPerLine = Math.max(maxBytesPerLine, bytesPerLine[y]);
     }
 
-    lineBuffer = new ExrLineBuffer(new ExrCompressor(compressionType,
-                                                     maxBytesPerLine,
-                                                     this));
+    compressor = new ExrCompressor(compressionType, maxBytesPerLine, this);
 
-    linesInBuffer = lineBuffer.compressor.numScanLines();
+    linesInBuffer = compressor.numScanLines();
     lineBufferSize = maxBytesPerLine * linesInBuffer;
 
     nextLineBufferMinY = top - 1;

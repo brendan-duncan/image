@@ -3,7 +3,7 @@ part of image;
 class ExrZipCompressor extends ExrCompressor {
   ZLibDecoder zlib = new ZLibDecoder();
 
-  ExrZipCompressor(ExrHeader header, this._maxScanLineSize, this._numScanLines) :
+  ExrZipCompressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
     super._(header) {
   }
 

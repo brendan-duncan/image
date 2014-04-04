@@ -23,20 +23,28 @@ class ExrDecoder extends Decoder {
 
     Image image = new Image(exrImage.width, exrImage.height);
     Uint8List pixels = image.getBytes();
+    ExrFrameBuffer fb = exrImage.getPart(0).framebuffer;
 
-    ExrSlice R = exrImage.part(0).framebuffer['R'];
-    ExrSlice G = exrImage.part(0).framebuffer['G'];
-    ExrSlice B = exrImage.part(0).framebuffer['B'];
+    if (fb.red == null || fb.green == null || fb.blue == null) {
+      throw new ImageException('Only RGB[A] images are currently supported.');
+    }
 
     for (int y = 0, di = 0; y < exrImage.height; ++y) {
       for (int x = 0; x < exrImage.width; ++x) {
-        double r = R.getPixel(x, y).toDouble();
-        double g = G.getPixel(x, y).toDouble();
-        double b = B.getPixel(x, y).toDouble();
+        double r = fb.red.getSample(x, y);
+        double g = fb.green.getSample(x, y);
+        double b = fb.blue.getSample(x, y);
+
         pixels[di++] = (r * 255.0).toInt().clamp(0, 255);
         pixels[di++] = (g * 255.0).toInt().clamp(0, 255);
         pixels[di++] = (b * 255.0).toInt().clamp(0, 255);
-        pixels[di++] = 255;
+
+        if (fb.alpha != null) {
+          double a = fb.alpha.getSample(x, y);
+          pixels[di++] = (a * 255.0).toInt().clamp(0, 255);
+        } else {
+          pixels[di++] = 255;
+        }
       }
     }
 

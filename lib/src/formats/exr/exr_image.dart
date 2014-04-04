@@ -4,7 +4,7 @@ part of image;
 class ExrImage extends DecodeInfo {
   int version;
   int flags;
-  List<ExrHeader> parts = [];
+  List<ExrPart> parts = [];
 
   ExrImage(List<int> bytes) {
     InputBuffer input = new InputBuffer(bytes);
@@ -25,13 +25,13 @@ class ExrImage extends DecodeInfo {
     }
 
     if (!isMultiPart()) {
-      ExrHeader header = new ExrHeader(isTiled(), input);
+      ExrPart header = new ExrPart(isTiled(), input);
       if (header.isValid) {
         parts.add(header);
       }
     } else {
       while (true) {
-        ExrHeader header = new ExrHeader(isTiled(), input);
+        ExrPart header = new ExrPart(isTiled(), input);
         if (!header.isValid) {
           break;
         }
@@ -43,7 +43,7 @@ class ExrImage extends DecodeInfo {
       throw new ImageException('Error reading image header');
     }
 
-    for (ExrHeader header in parts) {
+    for (ExrPart header in parts) {
       header.readOffsets(input);
     }
 
@@ -91,35 +91,34 @@ class ExrImage extends DecodeInfo {
 
   int numParts() => parts.length;
 
-  ExrHeader part(int i) => parts[i];
+  ExrPart getPart(int i) => parts[i];
 
   void _readImage(InputBuffer input) {
     final bool multiPart = isMultiPart();
 
     for (int hi = 0; hi < parts.length; ++hi) {
-      ExrHeader header = parts[hi];
-      ExrLineBuffer lineBuffer = header.lineBuffer;
-      ExrCompressor compressor = lineBuffer.compressor;
-      List<int> offsets = header.offsets;
-      ExrFrameBuffer framebuffer = header.framebuffer;
+      ExrPart part = parts[hi];
+      ExrCompressor compressor = part.compressor;
+      List<int> offsets = part.offsets;
+      ExrFrameBuffer framebuffer = part.framebuffer;
 
-      for (int ci = 0; ci < header.channels.length; ++ci) {
-        ExrChannel ch = header.channels[ci];
+      for (int ci = 0; ci < part.channels.length; ++ci) {
+        ExrChannel ch = part.channels[ci];
         if (!framebuffer.contains(ch.name)) {
-          width = header.width;
-          height = header.height;
-          framebuffer[ch.name] = new ExrSlice(ch, header.width, header.height);
+          width = part.width;
+          height = part.height;
+          framebuffer[ch.name] = new ExrSlice(ch, part.width, part.height);
         }
       }
 
-      int scanLineMin = header.top;
-      int scanLineMax = header.bottom;
-      int linesInBuffer = header.linesInBuffer;
+      int scanLineMin = part.top;
+      int scanLineMax = part.bottom;
+      int linesInBuffer = part.linesInBuffer;
 
-      lineBuffer.minY = header.top;
-      lineBuffer.maxY = lineBuffer.minY + header.linesInBuffer - 1;
+      int minY = part.top;
+      int maxY = minY + part.linesInBuffer - 1;
 
-      Uint32List fbi = new Uint32List(header.channels.length);
+      Uint32List fbi = new Uint32List(part.channels.length);
       int total = 0;
 
       int xx = 0;
@@ -142,23 +141,22 @@ class ExrImage extends DecodeInfo {
 
         Uint8List uncompressedData;
         if (compressor != null) {
-          lineBuffer.format = compressor.format();
-          uncompressedData = compressor.uncompress(data, lineBuffer.minY);
+          uncompressedData = compressor.uncompress(data, minY);
         } else {
           uncompressedData = data.toUint8List();
         }
 
         int si = 0;
         int len = uncompressedData.length;
-        int numChannels = header.channels.length;
+        int numChannels = part.channels.length;
         int lineCount = 0;
         for (int yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
-          si = header.offsetInLineBuffer[yy];
+          si = part.offsetInLineBuffer[yy];
 
           for (int ci = 0; ci < numChannels; ++ci) {
-            ExrChannel ch = header.channels[ci];
+            ExrChannel ch = part.channels[ci];
             Uint8List slice = framebuffer[ch.name].bytes;
-            for (int xx = 0; xx < header.width; ++xx) {
+            for (int xx = 0; xx < part.width; ++xx) {
               for (int bi = 0; bi < ch.size; ++bi) {
                 slice[fbi[ci]++] = uncompressedData[si++];
               }

@@ -19,10 +19,12 @@ class ExrSlice {
            new Uint32List.view(bytes.buffer);
   }
 
-  getPixel(int x, int y) {
+  /**
+   * Get the value of the sample for this slice at the coordinates [x],[y].
+   */
+  getSample(int x, int y) {
     int pi = y * width + x;
     return (channel.type == ExrChannel.TYPE_HALF) ?
-           new Half.fromBits(data[pi]) :
-           data[pi];
+           Half.HalfToDouble(data[pi]) : data[pi];
   }
 }

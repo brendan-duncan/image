@@ -51,6 +51,13 @@ class Half {
     }
   }
 
+  static HalfToDouble(int bits) {
+    if (_toFloatFloat32 == null) {
+      _initialize();
+    }
+    return _toFloatFloat32[bits];
+  }
+
   double toDouble() => _toFloatFloat32[_h];
 
   /**

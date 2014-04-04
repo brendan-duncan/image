@@ -13,7 +13,7 @@ abstract class ExrCompressor {
   static const int B44_COMPRESSION = 6;
   static const int B44A_COMPRESSION = 7;
 
-  factory ExrCompressor(int type, int maxScanLineSize, ExrHeader hdr) {
+  factory ExrCompressor(int type, int maxScanLineSize, ExrPart hdr) {
     switch (type) {
       case RLE_COMPRESSION:
         return new ExrRleCompressor(hdr, maxScanLineSize);
@@ -35,7 +35,7 @@ abstract class ExrCompressor {
   }
 
   factory ExrCompressor.tile(int type, int tileLineSize, int numTileLines,
-                             ExrHeader hdr) {
+                             ExrPart hdr) {
     switch (type) {
       case RLE_COMPRESSION:
         return new ExrRleCompressor(hdr, (tileLineSize * numTileLines));
@@ -73,5 +73,5 @@ abstract class ExrCompressor {
     return uncompress(inPtr, range[1]);
   }
 
-  ExrHeader _header;
+  ExrPart _header;
 }
