@@ -1,9 +1,6 @@
 part of image;
 
 abstract class ExrCompressor {
-  static const int NATIVE = 1;
-  static const int XDR = 0;
-
   static const int NO_COMPRESSION = 0;
   static const int RLE_COMPRESSION = 1;
   static const int ZIPS_COMPRESSION = 2;
@@ -59,18 +56,22 @@ abstract class ExrCompressor {
 
   int numScanLines();
 
-  int format() => XDR;
-
-  Uint8List compress(InputBuffer inPtr, int minY);
+  Uint8List compress(InputBuffer inPtr, int y);
 
   Uint8List compressTile(InputBuffer inPtr, List<int> range) {
     return compress(inPtr, range[1]);
   }
 
-  Uint8List uncompress(InputBuffer inPtr, int minY);
+  Uint8List uncompress(InputBuffer inPtr, int y);
 
   Uint8List uncompressTile(InputBuffer inPtr, List<int> range) {
     return uncompress(inPtr, range[1]);
+  }
+
+  int _numSamples(int s, int a, int b) {
+    int a1 = a ~/ s;
+    int b1 = b ~/ s;
+    return  b1 - a1 + ((a1 * s < a) ? 0: 1);
   }
 
   ExrPart _header;

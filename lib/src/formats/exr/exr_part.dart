@@ -1,43 +1,34 @@
 part of image;
 
 class ExrPart {
-  static const int TYPE_SCANLINE = 0;
-  static const int TYPE_TILE = 1;
-  static const int TYPE_DEEP_SCANLINE = 2;
-  static const int TYPE_DEEP_TILE = 3;
-
-  static const int INCREASING_Y = 0;
-  static const int DECREASING_Y = 1;
-  static const int RANDOM_Y = 2;
-
+  /// The framebuffer for this exr part.
+  ExrFrameBuffer framebuffer = new ExrFrameBuffer();
+  /// The channels present in this part.
+  List<ExrChannel> channels = [];
+  /// The extra attributes read from the part header.
   Map<String, ExrAttribute> attributes = {};
+  /// The display window (see the openexr documentation).
   List<int> displayWindow;
+  /// dataWindow top
   int top;
+  /// dataWindow left
   int left;
+  /// dataWindow bottom
   int bottom;
+  /// dataWindow right
   int right;
-  int type;
+  /// width of the data window
   int width;
+  /// Height of the data window
   int height;
-  int lineOrder = INCREASING_Y;
-  int compressionType = ExrCompressor.NO_COMPRESSION;
   double pixelAspectRatio = 1.0;
   double screenWindowCenterX = 0.0;
   double screenWindowCenterY = 0.0;
   double screenWindowWidth = 1.0;
-  List<int> offsets = [];
-  List<ExrChannel> channels = [];
-  Uint32List bytesPerLine;
-  ExrCompressor compressor;
-  //int format;
-  int linesInBuffer;
-  int lineBufferSize;
-  int nextLineBufferMinY;
-  Uint32List offsetInLineBuffer;
-  ExrFrameBuffer framebuffer = new ExrFrameBuffer();
+  Float32List chromaticities;
 
   ExrPart(bool tiled, InputBuffer input) {
-    type = tiled ? ExrPart.TYPE_TILE : ExrPart.TYPE_SCANLINE;
+    _type = tiled ? ExrPart.TYPE_TILE : ExrPart.TYPE_SCANLINE;
 
     while (true) {
       String name = input.readString();
@@ -50,6 +41,32 @@ class ExrPart {
       InputBuffer value = input.readBytes(size);
 
       switch (name) {
+        case 'channels':
+          while (true) {
+            ExrChannel channel = new ExrChannel(value);
+            if (!channel.isValid) {
+              break;
+            }
+            channels.add(channel);
+          }
+          break;
+        case 'chromaticities':
+          chromaticities = new Float32List(8);
+          chromaticities[0] = value.readFloat32();
+          chromaticities[1] = value.readFloat32();
+          chromaticities[2] = value.readFloat32();
+          chromaticities[3] = value.readFloat32();
+          chromaticities[4] = value.readFloat32();
+          chromaticities[5] = value.readFloat32();
+          chromaticities[6] = value.readFloat32();
+          chromaticities[7] = value.readFloat32();
+          break;
+        case 'compression':
+          _compressionType = value.readByte();
+          if (_compressionType > 7) {
+            throw new ImageException('EXR Invalid compression type');
+          }
+          break;
         case 'dataWindow':
           left = value.readInt32();
           top = value.readInt32();
@@ -62,24 +79,8 @@ class ExrPart {
           displayWindow = [value.readInt32(), value.readInt32(),
                            value.readInt32(), value.readInt32()];
           break;
-        case 'compression':
-          compressionType = value.readByte();
-          if (compressionType > 7) {
-            throw new ImageException('EXR Invalid compression type');
-          }
-          break;
-        case 'type':
-          String s = value.readString();
-          if (s == 'deepscanline') {
-            this.type = TYPE_DEEP_SCANLINE;
-          } else if (s == 'deeptile') {
-            this.type = TYPE_DEEP_TILE;
-          } else {
-            throw new ImageException('EXR Invalid type: $s');
-          }
-          break;
         case 'lineOrder':
-          lineOrder = value.readByte();
+          _lineOrder = value.readByte();
           break;
         case 'pixelAspectRatio':
           pixelAspectRatio = value.readFloat32();
@@ -91,13 +92,14 @@ class ExrPart {
         case 'screenWindowWidth':
           screenWindowWidth = value.readFloat32();
           break;
-        case 'channels':
-          while (true) {
-            ExrChannel channel = new ExrChannel(value);
-            if (!channel.isValid) {
-              break;
-            }
-            channels.add(channel);
+        case 'type':
+          String s = value.readString();
+          if (s == 'deepscanline') {
+            this._type = TYPE_DEEP_SCANLINE;
+          } else if (s == 'deeptile') {
+            this._type = TYPE_DEEP_TILE;
+          } else {
+            throw new ImageException('EXR Invalid type: $s');
           }
           break;
         default:
@@ -107,50 +109,69 @@ class ExrPart {
       }
     }
 
-    bytesPerLine = new Uint32List(height + 1);
+    _bytesPerLine = new Uint32List(height + 1);
     for (ExrChannel ch in channels) {
       int nBytes = ch.size * (width + 1) ~/ ch.xSampling;
       for (int y = 0; y < height; ++y) {
         if ((y + top) % ch.ySampling == 0) {
-          bytesPerLine[y] += nBytes;
+          _bytesPerLine[y] += nBytes;
         }
       }
     }
 
     int maxBytesPerLine = 0;
     for (int y = 0; y < height; ++y) {
-      maxBytesPerLine = Math.max(maxBytesPerLine, bytesPerLine[y]);
+      maxBytesPerLine = Math.max(maxBytesPerLine, _bytesPerLine[y]);
     }
 
-    compressor = new ExrCompressor(compressionType, maxBytesPerLine, this);
+    _compressor = new ExrCompressor(_compressionType, maxBytesPerLine, this);
 
-    linesInBuffer = compressor.numScanLines();
-    lineBufferSize = maxBytesPerLine * linesInBuffer;
+    _linesInBuffer = _compressor.numScanLines();
+    _lineBufferSize = maxBytesPerLine * _linesInBuffer;
 
-    nextLineBufferMinY = top - 1;
-
-    offsetInLineBuffer = new Uint32List(bytesPerLine.length);
+    _offsetInLineBuffer = new Uint32List(_bytesPerLine.length);
 
     int offset = 0;
-    for (int i = 0; i <= bytesPerLine.length - 1; ++i) {
-      if (i % linesInBuffer == 0) {
+    for (int i = 0; i <= _bytesPerLine.length - 1; ++i) {
+      if (i % _linesInBuffer == 0) {
         offset = 0;
       }
-      offsetInLineBuffer[i] = offset;
-      offset += bytesPerLine[i];
+      _offsetInLineBuffer[i] = offset;
+      offset += _bytesPerLine[i];
     }
 
-    int numOffsets = (height + linesInBuffer) ~/ linesInBuffer;
-    offsets = new Uint32List(numOffsets);
+    int numOffsets = (height + _linesInBuffer) ~/ _linesInBuffer;
+    _offsets = new Uint32List(numOffsets);
   }
 
+  /**
+   * Was this part successfully decoded?
+   */
   bool get isValid => width != null;
 
-
-  void readOffsets(InputBuffer input) {
-    int numOffsets = offsets.length;
+  void _readOffsets(InputBuffer input) {
+    int numOffsets = _offsets.length;
     for (int i = 0; i < numOffsets; ++i) {
-      offsets[i] = input.readUint64();
+      _offsets[i] = input.readUint64();
     }
   }
+
+  static const int TYPE_SCANLINE = 0;
+  static const int TYPE_TILE = 1;
+  static const int TYPE_DEEP_SCANLINE = 2;
+  static const int TYPE_DEEP_TILE = 3;
+
+  static const int INCREASING_Y = 0;
+  static const int DECREASING_Y = 1;
+  static const int RANDOM_Y = 2;
+
+  int _type;
+  int _lineOrder = INCREASING_Y;
+  int _compressionType = ExrCompressor.NO_COMPRESSION;
+  List<int> _offsets = [];
+  Uint32List _bytesPerLine;
+  ExrCompressor _compressor;
+  int _linesInBuffer;
+  int _lineBufferSize;
+  Uint32List _offsetInLineBuffer;
 }

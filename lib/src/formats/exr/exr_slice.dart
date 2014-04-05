@@ -1,10 +1,18 @@
 part of image;
 
+/**
+ * A slice contains channel data for an [ExrFrameBuffer].
+ */
 class ExrSlice {
+  /// The channel stored by this slice.
   final ExrChannel channel;
+  /// The raw data of the slice.
   final Uint8List bytes;
+  /// The width of the slice.
   int width;
+  /// The height of the slice.
   int height;
+  /// The channel-specific data view.
   var data;
 
   ExrSlice(ExrChannel ch, int width, int height) :
@@ -20,11 +28,28 @@ class ExrSlice {
   }
 
   /**
-   * Get the value of the sample for this slice at the coordinates [x],[y].
+   * Does this channel store floating-point data?
    */
-  getSample(int x, int y) {
+  bool get isFloat => channel.type != ExrChannel.TYPE_UINT;
+
+  /**
+   * Get the float value of the sample at the coordinates [x],[y].
+   * [Half] samples are converted to double.
+   * An exception will occur if the slice stores UINT data.
+   */
+  double getFloatSample(int x, int y) {
     int pi = y * width + x;
-    return (channel.type == ExrChannel.TYPE_HALF) ?
-           Half.HalfToDouble(data[pi]) : data[pi];
+    double s = (channel.type == ExrChannel.TYPE_HALF) ?
+               Half.HalfToDouble(data[pi]) : data[pi];
+    return s;
+  }
+
+  /**
+   * Get the int value of the sample at the coordinates [x],[y].
+   * An exception will occur if the slice stores FLOAT or HALF data.
+   */
+  int getIntSample(int x, int y) {
+    int pi = y * width + x;
+    return data[pi];
   }
 }

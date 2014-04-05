@@ -29,8 +29,9 @@ const int TRIM_RIGHT = 8;
 const int TRIM_ALL = TRIM_TOP | TRIM_BOTTOM | TRIM_LEFT | TRIM_RIGHT;
 
 /**
- * Find the crop area to be used by the trim function.  Returns the
- * coordinates as [x, y, width, height].
+ * Find the crop area to be used by the trim function. Returns the
+ * coordinates as [x, y, width, height]. You could pass these coordinates
+ * to the [copyCrop] function to crop the image.
  */
 List<int> findTrim(Image src, {int mode: TRIM_TRANSPARENT, sides: TRIM_ALL}) {
   int h = src.height;

@@ -9,11 +9,12 @@ class ExrZipCompressor extends ExrCompressor {
 
   int numScanLines() => _numScanLines;
 
-  Uint8List compress(InputBuffer input, int minY) {
+  Uint8List compress(InputBuffer input, int y) {
+    throw new ImageException('Zip compression not yet supported');
     return null;
   }
 
-  Uint8List uncompress(InputBuffer input, int minY) {
+  Uint8List uncompress(InputBuffer input, int y) {
     Uint8List data = zlib.decodeBytes(input.toUint8List());
 
     // Predictor

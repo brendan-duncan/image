@@ -2,8 +2,7 @@ part of image;
 
 
 class ExrImage extends DecodeInfo {
-  int version;
-  int flags;
+  /// An EXR image has one or more parts, each of which contains a framebuffer.
   List<ExrPart> parts = [];
 
   ExrImage(List<int> bytes) {
@@ -24,18 +23,18 @@ class ExrImage extends DecodeInfo {
                                'contains unrecognized flags.');
     }
 
-    if (!isMultiPart()) {
-      ExrPart header = new ExrPart(isTiled(), input);
-      if (header.isValid) {
-        parts.add(header);
+    if (!_isMultiPart()) {
+      ExrPart part = new ExrPart(_isTiled(), input);
+      if (part.isValid) {
+        parts.add(part);
       }
     } else {
       while (true) {
-        ExrPart header = new ExrPart(isTiled(), input);
-        if (!header.isValid) {
+        ExrPart part = new ExrPart(_isTiled(), input);
+        if (!part.isValid) {
           break;
         }
-        parts.add(header);
+        parts.add(part);
       }
     }
 
@@ -43,8 +42,8 @@ class ExrImage extends DecodeInfo {
       throw new ImageException('Error reading image header');
     }
 
-    for (ExrPart header in parts) {
-      header.readOffsets(input);
+    for (ExrPart part in parts) {
+      part._readOffsets(input);
     }
 
     _readImage(input);
@@ -52,7 +51,10 @@ class ExrImage extends DecodeInfo {
 
   int get numFrames => 1;
 
-  static bool isValid(List<int> bytes) {
+  /**
+   * Parse just enough of the file to identify that it's an EXR image.
+   */
+  static bool isValidFile(List<int> bytes) {
     InputBuffer input = new InputBuffer(bytes);
 
     int magic = input.readUint32();
@@ -73,15 +75,19 @@ class ExrImage extends DecodeInfo {
     return true;
   }
 
-  bool isTiled()  {
+  int numParts() => parts.length;
+
+  ExrPart getPart(int i) => parts[i];
+
+  bool _isTiled()  {
     return (flags & TILED_FLAG) != 0;
   }
 
-  bool isMultiPart() {
+  bool _isMultiPart() {
     return flags & MULTI_PART_FILE_FLAG != 0;
   }
 
-  bool isNonImage() {
+  bool _isNonImage() {
     return flags & NON_IMAGE_FLAG != 0;
   }
 
@@ -89,17 +95,13 @@ class ExrImage extends DecodeInfo {
     return (flags & ~ALL_FLAGS) == 0;
   }
 
-  int numParts() => parts.length;
-
-  ExrPart getPart(int i) => parts[i];
-
   void _readImage(InputBuffer input) {
-    final bool multiPart = isMultiPart();
+    final bool multiPart = _isMultiPart();
 
     for (int hi = 0; hi < parts.length; ++hi) {
       ExrPart part = parts[hi];
-      ExrCompressor compressor = part.compressor;
-      List<int> offsets = part.offsets;
+      ExrCompressor compressor = part._compressor;
+      List<int> offsets = part._offsets;
       ExrFrameBuffer framebuffer = part.framebuffer;
 
       for (int ci = 0; ci < part.channels.length; ++ci) {
@@ -113,10 +115,10 @@ class ExrImage extends DecodeInfo {
 
       int scanLineMin = part.top;
       int scanLineMax = part.bottom;
-      int linesInBuffer = part.linesInBuffer;
+      int linesInBuffer = part._linesInBuffer;
 
       int minY = part.top;
-      int maxY = minY + part.linesInBuffer - 1;
+      int maxY = minY + part._linesInBuffer - 1;
 
       Uint32List fbi = new Uint32List(part.channels.length);
       int total = 0;
@@ -141,7 +143,7 @@ class ExrImage extends DecodeInfo {
 
         Uint8List uncompressedData;
         if (compressor != null) {
-          uncompressedData = compressor.uncompress(data, minY);
+          uncompressedData = compressor.uncompress(data, yy);
         } else {
           uncompressedData = data.toUint8List();
         }
@@ -151,7 +153,7 @@ class ExrImage extends DecodeInfo {
         int numChannels = part.channels.length;
         int lineCount = 0;
         for (int yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
-          si = part.offsetInLineBuffer[yy];
+          si = part._offsetInLineBuffer[yy];
 
           for (int ci = 0; ci < numChannels; ++ci) {
             ExrChannel ch = part.channels[ci];
@@ -167,6 +169,8 @@ class ExrImage extends DecodeInfo {
     }
   }
 
+  int version;
+  int flags;
 
   /// The MAGIC number is stored in the first four bytes of every
   /// OpenEXR image file.  This can be used to quickly test whether

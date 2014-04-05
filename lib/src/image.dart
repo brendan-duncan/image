@@ -5,8 +5,8 @@ part of image;
  * You can use the methods in color to encode/decode the RGBA channels of a
  * color for a pixel.
  *
- * Pixels are stored in 32-bit unsigned integers in little-endian format:
- * aabbggrr.  This is to be consistent with HTML canvas data.  You can use
+ * Pixels are stored in 32-bit unsigned integers in aabbggrr format.
+ * This is to be consistent with HTML canvas data.  You can use
  * [getBytes] to access the pixel at the byte (channel) level, where there
  * are four bytes per pixel in red, green, blue, and alpha order.
  *

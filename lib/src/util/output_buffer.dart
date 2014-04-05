@@ -11,6 +11,10 @@ class OutputBuffer {
     _buffer = new Uint8List(size == null ? _BLOCK_SIZE : size),
     length = 0;
 
+  void rewind() {
+    length = 0;
+  }
+
   /**
    * Get the resulting bytes from the buffer.
    */

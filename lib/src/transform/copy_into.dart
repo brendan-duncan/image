@@ -4,7 +4,7 @@ part of image;
  * Copies a rectangular portion of one image to another image. [dst] is the
  * destination image, [src] is the source image identifier.
  *
- * In other words, copyResized() will take an rectangular area from src of
+ * In other words, copyInto will take an rectangular area from src of
  * width [src_w] and height [src_h] at position ([src_x],[src_y]) and place it
  * in a rectangular area of [dst] of width [dst_w] and height [dst_h] at
  * position ([dst_x],[dst_y]).
