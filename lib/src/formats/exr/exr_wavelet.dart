@@ -1,7 +1,7 @@
 part of image;
 
 class ExrWavelet {
-  static void decode(Uint8List input, int si, int nx, int ox, int ny, int oy,
+  static void decode(Uint16List input, int si, int nx, int ox, int ny, int oy,
                      int mx) {
     bool w14 = (mx < (1 << 14));
     int n = (nx > ny) ? ny : nx;
@@ -80,7 +80,7 @@ class ExrWavelet {
         if (nx & p != 0) {
           int p10 = px + oy1;
 
-          if (w14 != null) {
+          if (w14) {
             wdec14(input[px], input[p10], a_b);
             i00 = a_b[0];
             input[p10] = a_b[1];
@@ -128,8 +128,8 @@ class ExrWavelet {
   static const int MOD_MASK = (1 <<  NBITS) - 1;
 
   static void wdec14(int l, int h, List<int> a_b) {
-    int ls = l;
-    int hs = h;
+    int ls = _uint16ToInt16(l);
+    int hs = _uint16ToInt16(h);
 
     int hi = hs;
     int ai = ls + (hi & 1) + (hi >> 1);

@@ -12,7 +12,7 @@ class ExrPizCompressor extends ExrCompressor {
     }
 
     int tmpBufferSize = (_maxScanLineSize * _numScanLines) ~/ 2;
-    _tmpBuffer = new Uint8List(tmpBufferSize);
+    _tmpBuffer = new Uint16List(tmpBufferSize);
   }
 
   int numScanLines() => _numScanLines;
@@ -23,16 +23,26 @@ class ExrPizCompressor extends ExrCompressor {
   }
 
   Uint8List uncompress(InputBuffer inPtr, int y) {
+    int minX = 0;
+    int maxX = _header.width;
+    int minY = y;
+    int maxY = y + _header._linesInBuffer - 1;
+    if (maxY > _header.height) {
+      maxY = _header.height;
+    }
+
     int tmpBufferEnd = 0;
     List<ExrChannel> channels = _header.channels;
-    for (int i = 0; i < channels.length; ++i) {
+    final int numChannels = channels.length;
+
+    for (int i = 0; i < numChannels; ++i) {
       ExrChannel ch = channels[i];
       _PizChannelData cd = _channelData[i];
       cd.start = tmpBufferEnd;
       cd.end = cd.start;
 
-      cd.nx = _numSamples(ch.xSampling, 0, _header.width);
-      cd.ny = _numSamples(ch.ySampling, 0, _header._linesInBuffer);
+      cd.nx = _numSamples(ch.xSampling, minX, maxX);
+      cd.ny = _numSamples(ch.ySampling, minY, maxY);
       cd.ys = ch.ySampling;
 
       cd.size = ch.size ~/ 2; //2=size(HALF)
@@ -64,7 +74,7 @@ class ExrPizCompressor extends ExrCompressor {
     ExrHuffman.uncompress(inPtr, length, _tmpBuffer, tmpBufferEnd);
 
     // Wavelet decoding
-    for (int i = 0; i < channels.length; ++i) {
+    for (int i = 0; i < numChannels; ++i) {
       _PizChannelData cd = _channelData[i];
       for (int j = 0; j < cd.size; ++j) {
         ExrWavelet.decode(_tmpBuffer, cd.start + j, cd.nx, cd.size, cd.ny,
@@ -81,10 +91,10 @@ class ExrPizCompressor extends ExrCompressor {
     }
     _output.rewind();
 
+    int count = 0;
     // Rearrange the pixel data into the format expected by the caller.
-    //char *outEnd = _outBuffer;
-    for (int y = 0; y <= _numScanLines; ++y) {
-      for (int i = 0; i < channels.length; ++i) {
+    for (int y = minY; y <= maxY; ++y) {
+      for (int i = 0; i < numChannels; ++i) {
         _PizChannelData cd = _channelData[i];
 
         if ((y % cd.ys) != 0) {
@@ -92,10 +102,12 @@ class ExrPizCompressor extends ExrCompressor {
         }
 
         for (int x = cd.nx * cd.size; x > 0; --x) {
-          _output.writeByte(_tmpBuffer[cd.end++]);
+          _output.writeUint16(_tmpBuffer[cd.end++]);
         }
       }
     }
+
+    return _output.getBytes();
   }
 
   void _applyLut(List<int> lut, List<int> data, int nData) {
@@ -128,7 +140,7 @@ class ExrPizCompressor extends ExrCompressor {
   int _maxScanLineSize;
   int _numScanLines;
   List<_PizChannelData> _channelData;
-  Uint8List _tmpBuffer;
+  Uint16List _tmpBuffer;
 }
 
 class _PizChannelData {

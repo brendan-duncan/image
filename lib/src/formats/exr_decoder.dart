@@ -41,7 +41,7 @@ class ExrDecoder extends Decoder {
 
         if (fb.alpha != null) {
           double a = fb.alpha.getFloatSample(x, y);
-          pixels[di++] = (a * 255.0).toInt().clamp(0, 255);
+          pixels[di++] =  (a * 255.0).toInt().clamp(0, 255);
         } else {
           pixels[di++] = 255;
         }

@@ -154,10 +154,16 @@ class ExrImage extends DecodeInfo {
         int lineCount = 0;
         for (int yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
           si = part._offsetInLineBuffer[yy];
+          if (si >= len) {
+            break;
+          }
 
           for (int ci = 0; ci < numChannels; ++ci) {
             ExrChannel ch = part.channels[ci];
             Uint8List slice = framebuffer[ch.name].bytes;
+            if (si >= len) {
+              break;
+            }
             for (int xx = 0; xx < part.width; ++xx) {
               for (int bi = 0; bi < ch.size; ++bi) {
                 slice[fbi[ci]++] = uncompressedData[si++];

@@ -2,7 +2,7 @@ part of image;
 
 class ExrHuffman {
   static void uncompress(InputBuffer compressed, int nCompressed,
-                         Uint8List raw, int nRaw) {
+                         Uint16List raw, int nRaw) {
     if (nCompressed == 0) {
       if (nRaw != 0) {
         throw new ImageException('Incomplete huffman data');
@@ -45,17 +45,15 @@ class ExrHuffman {
 
   static void decode(List<int> hcode, List<ExrHufDec> hdecod,
                      InputBuffer input, int ni, int rlc, int no,
-                     Uint8List out) {
+                     Uint16List out) {
     List<int> c_lc = [0, 0];
-    int outb = 0;
     int ie = input.offset + (ni + 7) ~/ 8; // input byte size
-    int oe = 0;
+    int oi = 0;
 
     // Loop on input bytes
 
     while (input.offset < ie) {
-      c_lc[0] = (c_lc[0] << 8) | input.readByte();
-      c_lc[1] += 8;
+      getChar(c_lc, input);
 
       // Access decoding table
       while (c_lc[1] >= HUF_DECBITS) {
@@ -64,7 +62,7 @@ class ExrHuffman {
         if (pl.len != 0) {
           // Get short code
           c_lc[1] -= pl.len;
-          oe += getCode(pl.lit, rlc, c_lc, input, out, oe);
+          oi = getCode(pl.lit, rlc, c_lc, input, out, oi, no);
         } else {
           if (pl.p == null) {
             throw new ImageException("Error in Huffman-encoded data "
@@ -77,8 +75,7 @@ class ExrHuffman {
             int l = hufLength(hcode[pl.p[j]]);
 
             while (c_lc[1] < l && input.offset < ie) { // get more bits
-              c_lc[0] = (c_lc[0] << 8) | input.readByte();
-              c_lc[1] += 8;
+              getChar(c_lc, input);
             }
 
             if (c_lc[1] >= l) {
@@ -86,7 +83,7 @@ class ExrHuffman {
                   ((c_lc[0] >> (c_lc[1] - l)) & ((1 << l) - 1))) {
                 // Found : get long code
                 c_lc[1] -= l;
-                oe += getCode(pl.p[j], rlc, c_lc, input, out, oe);
+                oi = getCode(pl.p[j], rlc, c_lc, input, out, oi, no);
                 break;
               }
             }
@@ -110,48 +107,47 @@ class ExrHuffman {
 
       if (pl.len != 0) {
         c_lc[1] -= pl.len;
-        oe += getCode(pl.lit, rlc, c_lc, input, out, oe);
+        oi = getCode(pl.lit, rlc, c_lc, input, out, oi, no);
       } else {
         throw new ImageException("Error in Huffman-encoded data "
                                  "(invalid code).");
       }
     }
 
-    if (outb != no) {
+    if (oi != no) {
       throw new ImageException("Error in Huffman-encoded data "
                                "(decoded data are shorter than expected).");
     }
   }
 
   static int getCode(int po, int rlc, List<int> c_lc, InputBuffer input,
-                     Uint8List out, int oe) {
+                     Uint16List out, int oi, int oe) {
     if (po == rlc) {
       if (c_lc[1] < 8) {
-        c_lc[0] = (c_lc[0] << 8) | input.readByte();
-        c_lc[1] += 8;
+        getChar(c_lc, input);
       }
 
       c_lc[1] -= 8;
 
       int cs = (c_lc[0] >> c_lc[1]) & 0xff;
 
-      if (oe + cs > out.length) {
+      if (oi + cs > oe) {
         throw new ImageException("Error in Huffman-encoded data "
                                  "(decoded data are longer than expected).");
       }
 
-      int s = out[oe - 1];
+      int s = out[oi - 1];
 
       while (cs-- > 0) {
-        out[oe++] = s;
+        out[oi++] = s;
       }
-    } else if (oe < out.length) {
-      out[oe++] = po;
+    } else if (oi < oe) {
+      out[oi++] = po;
     } else {
       throw new ImageException("Error in Huffman-encoded data "
                                "(decoded data are longer than expected).");
     }
-    return oe;
+    return oi;
   }
 
 
@@ -308,10 +304,15 @@ class ExrHuffman {
     }
   }
 
+  static int getChar(List<int> c_lc, InputBuffer input) {
+    c_lc[0] = ((c_lc[0] << 8) | input.readByte()) & MASK_64;
+    c_lc[1] = (c_lc[1] + 8) & MASK_32;
+  }
+
   static int getBits(int nBits, List<int> c_lc, InputBuffer input) {
     while (c_lc[1] < nBits) {
-      c_lc[0] = (c_lc[0] << 8) | input.readByte();
-      c_lc[1] += 8;
+      c_lc[0] = ((c_lc[0] << 8) | input.readByte()) & MASK_64;
+      c_lc[1] = (c_lc[1] + 8) & MASK_32;
     }
 
     c_lc[1] -= nBits;
@@ -319,6 +320,8 @@ class ExrHuffman {
     return (c_lc[0] >> c_lc[1]) & ((1 << nBits) - 1);
   }
 
+  static const int MASK_32 = (1 << 32) - 1;
+  static const int MASK_64 = (1 << 64) - 1;
   static const int HUF_ENCBITS = 16;     // literal (value) bit length
   static const int HUF_DECBITS = 14;     // decoding bit size (>= 8)
 
