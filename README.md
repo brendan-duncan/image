@@ -13,15 +13,16 @@ The image library currently supports decoding and encoding the following
 formats:
 
 - PNG / Animated APNG
-- JPG
-- TGA
+- JPEG
+- Targa
 - GIF / Animated GIF
 
 Decoding Only:
 
 - WebP / Animated WebP
 - TIFF
-- PSD
+- Photoshop PSD
+- OpenEXR
 
 
 ##[Documentation](https://github.com/brendan-duncan/image/wiki)

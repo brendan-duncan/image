@@ -1,6 +1,11 @@
 part of image;
 
 /**
+ * Decode an OpenEXR formatted image.
+ *
+ * OpenEXR stores high dynamic range (HDR) images in floating-point channels.
+ * The HDR image is tone-mapped to a low dynamic range (LDR) for creating
+ * an [Image].
  */
 class ExrDecoder extends Decoder {
   ExrImage exrImage;

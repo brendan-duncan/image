@@ -40,6 +40,11 @@ Decoder findDecoderForData(List<int> data) {
     return psd;
   }
 
+  ExrDecoder exr = new ExrDecoder();
+  if (exr.isValidFile(bytes)) {
+    return exr;
+  }
+
   return null;
 }
 
@@ -95,6 +100,9 @@ Decoder getDecoderForNamedImage(String name) {
   }
   if (n.endsWith('.psd')) {
     return new PsdDecoder();
+  }
+  if (n.endsWith('.exr')) {
+    return new ExrDecoder();
   }
   return null;
 }
@@ -294,4 +302,12 @@ Animation decodeTiffAnimation(List<int> bytes) {
  */
 Image decodePsd(List<int> bytes) {
   return new PsdDecoder().decodeImage(bytes);
+}
+
+/**
+ * Decode an OpenEXR formatted image, tone-mapped using the
+ * given [exposure] to a low-dynamic-range [Image].
+ */
+Image decodeExr(List<int> bytes, {double exposure: 1.0}) {
+  return new ExrDecoder(exposure: exposure).decodeImage(bytes);
 }

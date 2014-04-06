@@ -103,7 +103,6 @@ class ExrPart {
           }
           break;
         default:
-          print(name);
           attributes[name] = new ExrAttribute(name, type, size, value);
           break;
       }
