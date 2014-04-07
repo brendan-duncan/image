@@ -19,10 +19,10 @@ class ExrPxr24Compressor extends ExrCompressor {
       throw new ImageException('Error decoding pxr24 compressed data');
     }
 
-    if (_outCache == null) {
-      _outCache = new OutputBuffer(size: _numScanLines * _maxScanLineSize);
+    if (_output == null) {
+      _output = new OutputBuffer(size: _numScanLines * _maxScanLineSize);
     }
-    _outCache.rewind();
+    _output.rewind();
 
     int tmpEnd = 0;
     List<int> ptr = [0, 0, 0, 0];
@@ -52,17 +52,45 @@ class ExrPxr24Compressor extends ExrCompressor {
     decodedHeight = (maxY - minY) + 1;
 
     int numChannels = _header.channels.length;
-    for (int yi = minY; yi < maxY; ++yi) {
+    for (int yi = minY; yi <= maxY; ++yi) {
 
       for (int ci = 0; ci < numChannels; ++ci) {
         ExrChannel ch = _header.channels[ci];
+        if ((y % ch.ySampling) != 0) {
+          continue;
+        }
+
         int n = _numSamples(ch.xSampling, minX, maxX);
         pixel[0] = 0;
 
         switch (ch.type) {
           case ExrChannel.TYPE_UINT:
+            ptr[0] = tmpEnd;
+            ptr[1] = ptr[0] + n;
+            ptr[2] = ptr[1] + n;
+            tmpEnd = ptr[2] + n;
+            for (int j = 0; j < n; ++j) {
+              int diff = (data[ptr[0]++] << 24) |
+                         (data[ptr[1]++] << 16) |
+                         (data[ptr[2]++] << 8);
+              pixel[0] += diff;
+              for (int k = 0; k < 4; ++k) {
+                _output.writeByte(pixelBytes[k]);
+              }
+            }
             break;
           case ExrChannel.TYPE_HALF:
+            ptr[0] = tmpEnd;
+            ptr[1] = ptr[0] + n;
+            tmpEnd = ptr[1] + n;
+            for (int j = 0; j < n; ++j) {
+              int diff = (data[ptr[0]++] << 8) | data[ptr[1]++];
+              pixel[0] += diff;
+
+              for (int k = 0; k < 2; ++k) {
+                _output.writeByte(pixelBytes[k]);
+              }
+            }
             break;
           case ExrChannel.TYPE_FLOAT:
             ptr[0] = tmpEnd;
@@ -75,7 +103,7 @@ class ExrPxr24Compressor extends ExrCompressor {
                          (data[ptr[2]++] << 8);
               pixel[0] += diff;
               for (int k = 0; k < 4; ++k) {
-                _outCache.writeByte(pixelBytes[k]);
+                _output.writeByte(pixelBytes[k]);
               }
             }
             break;
@@ -83,11 +111,11 @@ class ExrPxr24Compressor extends ExrCompressor {
       }
     }
 
-    return _outCache.getBytes();
+    return _output.getBytes();
   }
 
   ZLibDecoder _zlib = new ZLibDecoder();
   int _maxScanLineSize;
   int _numScanLines;
-  OutputBuffer _outCache;
+  OutputBuffer _output;
 }

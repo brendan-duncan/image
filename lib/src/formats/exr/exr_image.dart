@@ -165,7 +165,6 @@ class ExrImage extends DecodeInfo {
             uncompressedData = data.toUint8List();
           }
 
-
           int si = 0;
           int len = uncompressedData.length;
           int numChannels = part.channels.length;
@@ -183,9 +182,9 @@ class ExrImage extends DecodeInfo {
                 for (int bi = 0; bi < ch.size; ++bi) {
                   if (tx < part.width && ty < part.height) {
                     int di = (ty * part.width + tx) * ch.size + bi;
-                    if (si < uncompressedData.length) {
-                      slice[di] = uncompressedData[si++];
-                    }
+                    slice[di] = uncompressedData[si++];
+                  } else {
+                    si++;
                   }
                 }
               }
