@@ -304,7 +304,7 @@ class ExrHuffman {
     }
   }
 
-  static int getChar(List<int> c_lc, InputBuffer input) {
+  static void getChar(List<int> c_lc, InputBuffer input) {
     c_lc[0] = ((c_lc[0] << 8) | input.readByte()) & MASK_64;
     c_lc[1] = (c_lc[1] + 8) & MASK_32;
   }
