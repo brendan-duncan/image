@@ -7,12 +7,36 @@ class ExrRleCompressor extends ExrCompressor {
 
   int numScanLines() => 1;
 
-  Uint8List compress(InputBuffer inPtr, int y) {
+  Uint8List compress(InputBuffer inPtr, int x, int y,
+                     [int width, int height]) {
     throw new ImageException('Rle compression not yet supported.');
   }
 
-  Uint8List uncompress(InputBuffer inPtr, int y) {
+  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+                       [int width, int height]) {
     OutputBuffer out = new OutputBuffer(size: inPtr.length * 2);
+
+    if (width == null) {
+      width = _header.width;
+    }
+    if (height == null) {
+      height = _header._linesInBuffer;
+    }
+
+    int minX = x;
+    int maxX = x + width - 1;
+    int minY = y;
+    int maxY = y + height - 1;
+
+    if (maxX > _header.width) {
+      maxX = _header.width;
+    }
+    if (maxY > _header.height) {
+      maxY = _header.height;
+    }
+
+    decodedWidth = (maxX - minX) + 1;
+    decodedHeight = (maxY - minY) + 1;
 
     while (!inPtr.isEOS) {
       int n = inPtr.readInt8();

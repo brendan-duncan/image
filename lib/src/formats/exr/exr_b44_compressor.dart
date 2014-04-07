@@ -9,11 +9,13 @@ class ExrB44Compressor extends ExrCompressor {
   int numScanLines() => _numScanLines;
 
 
-  Uint8List compress(InputBuffer inPtr, int y) {
+  Uint8List compress(InputBuffer inPtr, int x, int y,
+                     [int width, int height]) {
     throw new ImageException('B44 compression not yet supported.');
   }
 
-  Uint8List uncompress(InputBuffer inPtr, int y) {
+  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+                       [int width, int height]) {
     throw new ImageException('B44 compression not yet supported.');
   }
 

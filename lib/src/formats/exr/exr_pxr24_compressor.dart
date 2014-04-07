@@ -7,11 +7,13 @@ class ExrPxr24Compressor extends ExrCompressor {
 
   int numScanLines() => _numScanLines;
 
-  Uint8List compress(InputBuffer inPtr, int y) {
+  Uint8List compress(InputBuffer inPtr, int x, int y,
+                     [int width, int height]) {
     throw new ImageException('Pxr24 compression not yet supported.');
   }
 
-  Uint8List uncompress(InputBuffer inPtr, int y) {
+  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+                       [int width, int height]) {
     List<int> data = _zlib.decodeBytes(inPtr.toUint8List());
     if (data == null) {
       throw new ImageException('Error decoding pxr24 compressed data');
@@ -27,15 +29,34 @@ class ExrPxr24Compressor extends ExrCompressor {
     Uint32List pixel = new Uint32List(1);
     Uint8List pixelBytes = new Uint8List.view(pixel.buffer);
 
+    if (width == null) {
+      width = _header.width;
+    }
+    if (height == null) {
+      height = _header._linesInBuffer;
+    }
+
+    int minX = x;
+    int maxX = x + width - 1;
+    int minY = y;
+    int maxY = y + height - 1;
+
+    if (maxX > _header.width) {
+      maxX = _header.width;
+    }
+    if (maxY > _header.height) {
+      maxY = _header.height;
+    }
+
+    decodedWidth = (maxX - minX) + 1;
+    decodedHeight = (maxY - minY) + 1;
+
     int numChannels = _header.channels.length;
-    for (int yi = 0; yi < _header._linesInBuffer; ++yi) {
-      if (y + yi >= _header.height) {
-        break;
-      }
+    for (int yi = minY; yi < maxY; ++yi) {
 
       for (int ci = 0; ci < numChannels; ++ci) {
         ExrChannel ch = _header.channels[ci];
-        int n = _numSamples(ch.xSampling, 0, _header.width);
+        int n = _numSamples(ch.xSampling, minX, maxX);
         pixel[0] = 0;
 
         switch (ch.type) {

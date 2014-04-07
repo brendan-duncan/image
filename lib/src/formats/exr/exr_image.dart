@@ -98,10 +98,8 @@ class ExrImage extends DecodeInfo {
   void _readImage(InputBuffer input) {
     final bool multiPart = _isMultiPart();
 
-    for (int hi = 0; hi < parts.length; ++hi) {
-      ExrPart part = parts[hi];
-      ExrCompressor compressor = part._compressor;
-      List<int> offsets = part._offsets;
+    for (int pi = 0; pi < parts.length; ++pi) {
+      ExrPart part = parts[pi];
       ExrFrameBuffer framebuffer = part.framebuffer;
 
       for (int ci = 0; ci < part.channels.length; ++ci) {
@@ -113,61 +111,152 @@ class ExrImage extends DecodeInfo {
         }
       }
 
-      int scanLineMin = part.top;
-      int scanLineMax = part.bottom;
-      int linesInBuffer = part._linesInBuffer;
+      if (part._tiled) {
+        _readTiledPart(pi, input);
+      } else {
+        _readScanlinePart(pi, input);
+      }
+    }
+  }
 
-      int minY = part.top;
-      int maxY = minY + part._linesInBuffer - 1;
+  void _readTiledPart(int pi, InputBuffer input) {
+    ExrPart part = parts[pi];
+    final bool multiPart = _isMultiPart();
+    ExrFrameBuffer framebuffer = part.framebuffer;
+    ExrCompressor compressor = part._compressor;
+    List<Uint32List> offsets = part._offsets;
+    Uint32List fbi = new Uint32List(part.channels.length);
 
-      Uint32List fbi = new Uint32List(part.channels.length);
-      int total = 0;
+    InputBuffer imgData = new InputBuffer.from(input);
+    for (int l = 0; l < offsets.length; ++l) {
+      for (int ty = 0, oi = 0; ty < part._numYTiles[l]; ++ty) {
+        for (int tx = 0; tx < part._numXTiles[l]; ++tx, ++oi) {
+          int offset = offsets[l][oi];
+          imgData.offset = offset;
 
-      int xx = 0;
-      int yy = 0;
+          if (multiPart) {
+            int p = imgData.readUint32();
+            if (p != pi) {
+              throw new ImageException('Invalid Image Data');
+            }
+          }
 
-      InputBuffer imgData = new InputBuffer.from(input);
-      for (int offset in offsets) {
-        imgData.offset = offset;
+          int tileX = imgData.readUint32();
+          int tileY = imgData.readUint32();
+          int levelX = imgData.readUint32();
+          int levelY = imgData.readUint32();
+          int dataSize = imgData.readUint32();
+          InputBuffer data = imgData.readBytes(dataSize);
 
-        if (multiPart) {
-          int p = imgData.readUint32();
-          if (p != hi) {
-            throw new ImageException('Invalid Image Data');
+          int ty = tileY * part._tileHeight;
+          int tx = tileX * part._tileWidth;
+
+          int tileWidth = compressor.decodedWidth;
+          int tileHeight = compressor.decodedHeight;
+
+          Uint8List uncompressedData;
+          if (compressor != null) {
+            uncompressedData = compressor.uncompress(data, tx, ty,
+                                                     part._tileWidth,
+                                                     part._tileHeight);
+            tileWidth = compressor.decodedWidth;
+            tileHeight = compressor.decodedHeight;
+          } else {
+            uncompressedData = data.toUint8List();
+          }
+
+
+          int si = 0;
+          int len = uncompressedData.length;
+          int numChannels = part.channels.length;
+          int lineCount = 0;
+          for (int yi = 0; yi < tileHeight && ty < height; ++yi, ++ty) {
+            for (int ci = 0; ci < numChannels; ++ci) {
+              ExrChannel ch = part.channels[ci];
+              Uint8List slice = framebuffer[ch.name].bytes;
+              if (si >= len) {
+                break;
+              }
+
+              int tx = tileX * part._tileWidth;
+              for (int xx = 0; xx < tileWidth; ++xx, ++tx) {
+                for (int bi = 0; bi < ch.size; ++bi) {
+                  if (tx < part.width && ty < part.height) {
+                    int di = (ty * part.width + tx) * ch.size + bi;
+                    if (si < uncompressedData.length) {
+                      slice[di] = uncompressedData[si++];
+                    }
+                  }
+                }
+              }
+            }
           }
         }
+      }
+    }
+  }
 
-        int y = imgData.readInt32();
-        int dataSize = imgData.readInt32();
-        InputBuffer data = imgData.readBytes(dataSize);
+  void _readScanlinePart(int pi, InputBuffer input) {
+    ExrPart part = parts[pi];
+    final bool multiPart = _isMultiPart();
+    ExrFrameBuffer framebuffer = part.framebuffer;
+    ExrCompressor compressor = part._compressor;
+    List<int> offsets = part._offsets[0];
 
-        Uint8List uncompressedData;
-        if (compressor != null) {
-          uncompressedData = compressor.uncompress(data, yy);
-        } else {
-          uncompressedData = data.toUint8List();
+    int scanLineMin = part.top;
+    int scanLineMax = part.bottom;
+    int linesInBuffer = part._linesInBuffer;
+
+    int minY = part.top;
+    int maxY = minY + part._linesInBuffer - 1;
+
+    Uint32List fbi = new Uint32List(part.channels.length);
+    int total = 0;
+
+    int xx = 0;
+    int yy = 0;
+
+    InputBuffer imgData = new InputBuffer.from(input);
+    for (int offset in offsets) {
+      imgData.offset = offset;
+
+      if (multiPart) {
+        int p = imgData.readUint32();
+        if (p != pi) {
+          throw new ImageException('Invalid Image Data');
+        }
+      }
+
+      int y = imgData.readInt32();
+      int dataSize = imgData.readInt32();
+      InputBuffer data = imgData.readBytes(dataSize);
+
+      Uint8List uncompressedData;
+      if (compressor != null) {
+        uncompressedData = compressor.uncompress(data, 0, yy);
+      } else {
+        uncompressedData = data.toUint8List();
+      }
+
+      int si = 0;
+      int len = uncompressedData.length;
+      int numChannels = part.channels.length;
+      int lineCount = 0;
+      for (int yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
+        si = part._offsetInLineBuffer[yy];
+        if (si >= len) {
+          break;
         }
 
-        int si = 0;
-        int len = uncompressedData.length;
-        int numChannels = part.channels.length;
-        int lineCount = 0;
-        for (int yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
-          si = part._offsetInLineBuffer[yy];
+        for (int ci = 0; ci < numChannels; ++ci) {
+          ExrChannel ch = part.channels[ci];
+          Uint8List slice = framebuffer[ch.name].bytes;
           if (si >= len) {
             break;
           }
-
-          for (int ci = 0; ci < numChannels; ++ci) {
-            ExrChannel ch = part.channels[ci];
-            Uint8List slice = framebuffer[ch.name].bytes;
-            if (si >= len) {
-              break;
-            }
-            for (int xx = 0; xx < part.width; ++xx) {
-              for (int bi = 0; bi < ch.size; ++bi) {
-                slice[fbi[ci]++] = uncompressedData[si++];
-              }
+          for (int xx = 0; xx < part.width; ++xx) {
+            for (int bi = 0; bi < ch.size; ++bi) {
+              slice[fbi[ci]++] = uncompressedData[si++];
             }
           }
         }
@@ -187,17 +276,17 @@ class ExrImage extends DecodeInfo {
   static const int EXR_VERSION = 2;
 
   /// File is tiled
-  static const int TILED_FLAG = 0x00000200;
+  static const int TILED_FLAG = 0x000002;
 
   /// File contains long attribute or channel names
-  static const int LONG_NAMES_FLAG = 0x00000400;
+  static const int LONG_NAMES_FLAG = 0x000004;
 
   /// File has at least one part which is not a regular scanline image or
   /// regular tiled image (that is, it is a deep format).
-  static const int NON_IMAGE_FLAG = 0x00000800;
+  static const int NON_IMAGE_FLAG = 0x000008;
 
   /// File has multiple parts.
-  static const int MULTI_PART_FILE_FLAG  = 0x00001000;
+  static const int MULTI_PART_FILE_FLAG = 0x000010;
 
   /// Bitwise OR of all supported flags.
   static const int ALL_FLAGS = TILED_FLAG | LONG_NAMES_FLAG;

@@ -10,22 +10,32 @@ abstract class ExrCompressor {
   static const int B44_COMPRESSION = 6;
   static const int B44A_COMPRESSION = 7;
 
-  factory ExrCompressor(int type, int maxScanLineSize, ExrPart hdr) {
+  int decodedWidth = 0;
+  int decodedHeight = 0;
+
+  factory ExrCompressor(int type, ExrPart hdr, int maxScanLineSize,
+                        [int numScanLines]) {
     switch (type) {
       case RLE_COMPRESSION:
         return new ExrRleCompressor(hdr, maxScanLineSize);
       case ZIPS_COMPRESSION:
-        return new ExrZipCompressor(hdr, maxScanLineSize, 1);
+        return new ExrZipCompressor(hdr, maxScanLineSize,
+                                    numScanLines == null ? 1 : numScanLines);
       case ZIP_COMPRESSION:
-        return new ExrZipCompressor(hdr, maxScanLineSize, 16);
+        return new ExrZipCompressor(hdr, maxScanLineSize,
+                                    numScanLines == null ? 16 : numScanLines);
       case PIZ_COMPRESSION:
-        return new ExrPizCompressor(hdr, maxScanLineSize, 32);
+        return new ExrPizCompressor(hdr, maxScanLineSize,
+                                    numScanLines == null ? 32 : numScanLines);
       case PXR24_COMPRESSION:
-        return new ExrPxr24Compressor(hdr, maxScanLineSize, 16);
+        return new ExrPxr24Compressor(hdr, maxScanLineSize,
+                                     numScanLines == null ? 16 : numScanLines);
       case B44_COMPRESSION:
-        return new ExrB44Compressor(hdr, maxScanLineSize, 32, false);
+        return new ExrB44Compressor(hdr, maxScanLineSize,
+                              numScanLines == null ? 32 : numScanLines, false);
       case B44A_COMPRESSION:
-        return new ExrB44Compressor(hdr, maxScanLineSize, 32, true);
+        return new ExrB44Compressor(hdr, maxScanLineSize,
+                              numScanLines == null ? 32 : numScanLines, true);
       default:
         throw new ImageException('Invalid compression type: $type');
     }
@@ -56,16 +66,14 @@ abstract class ExrCompressor {
 
   int numScanLines();
 
-  Uint8List compress(InputBuffer inPtr, int y);
-
-  Uint8List compressTile(InputBuffer inPtr, List<int> range) {
-    return compress(inPtr, range[1]);
+  Uint8List compress(InputBuffer inPtr, int x, int y,
+                     [int width, int height]) {
+    throw new ImageException('Unsupported compression type');
   }
 
-  Uint8List uncompress(InputBuffer inPtr, int y);
-
-  Uint8List uncompressTile(InputBuffer inPtr, List<int> range) {
-    return uncompress(inPtr, range[1]);
+  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+                       [int width, int height]) {
+    throw new ImageException('Unsupported compression type');
   }
 
   int _numSamples(int s, int a, int b) {

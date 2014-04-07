@@ -18,18 +18,34 @@ class ExrPizCompressor extends ExrCompressor {
   int numScanLines() => _numScanLines;
 
 
-  Uint8List compress(InputBuffer inPtr, int y) {
+  Uint8List compress(InputBuffer inPtr, int x, int y,
+                     [int width, int height]) {
     throw new ImageException('Piz compression not yet supported.');
   }
 
-  Uint8List uncompress(InputBuffer inPtr, int y) {
-    int minX = 0;
-    int maxX = _header.width;
+  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+                       [int width, int height]) {
+    if (width == null) {
+      width = _header.width;
+    }
+    if (height == null) {
+      height = _header._linesInBuffer;
+    }
+
+    int minX = x;
+    int maxX = x + width - 1;
     int minY = y;
-    int maxY = y + _header._linesInBuffer - 1;
+    int maxY = y + height - 1;
+
+    if (maxX > _header.width) {
+      maxX = _header.width;
+    }
     if (maxY > _header.height) {
       maxY = _header.height;
     }
+
+    decodedWidth = (maxX - minX) + 1;
+    decodedHeight = (maxY - minY) + 1;
 
     int tmpBufferEnd = 0;
     List<ExrChannel> channels = _header.channels;
