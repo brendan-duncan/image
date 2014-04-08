@@ -134,7 +134,7 @@ class ExrPart {
       _offsets = new List<Uint32List>(_numXLevels * _numYLevels);
       for (int ly = 0, l = 0; ly < _numYLevels; ++ly) {
         for (int lx = 0; lx < _numXLevels; ++lx, ++l) {
-          _offsets[l] = new Uint32List(_numXTiles[l] * _numYTiles[l]);
+          _offsets[l] = new Uint32List(_numXTiles[lx] * _numYTiles[ly]);
         }
       }
     } else {
