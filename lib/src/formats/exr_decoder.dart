@@ -23,7 +23,11 @@ class ExrDecoder extends Decoder {
   ExrImage exrImage;
   /// Exposure for tone-mapping the hdr image to an [Image], applied during
   /// [decodeFrame].
-  double exposure = 1.0;
+  double exposure;
+  double gamma;
+  bool reinhard;
+  double bloomAmount;
+  double bloomRadius;
 
   ExrDecoder({this.exposure: 1.0});
 
@@ -43,7 +47,7 @@ class ExrDecoder extends Decoder {
       return null;
     }
 
-    return gammaToneMap(exrImage.getPart(0).framebuffer);
+    return hdrToImage(exrImage.getPart(0).framebuffer, exposure: exposure);
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {

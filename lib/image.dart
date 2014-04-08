@@ -14,7 +14,6 @@ import 'package:xml/xml.dart';
 part 'src/draw/draw_char.dart';
 part 'src/draw/draw_circle.dart';
 part 'src/draw/draw_line.dart';
-part 'src/filter/noise.dart';
 part 'src/draw/draw_pixel.dart';
 part 'src/draw/draw_rect.dart';
 part 'src/draw/draw_string.dart';
@@ -33,6 +32,7 @@ part 'src/filter/emboss.dart';
 part 'src/filter/gaussian_blur.dart';
 part 'src/filter/grayscale.dart';
 part 'src/filter/invert.dart';
+part 'src/filter/noise.dart';
 part 'src/filter/normalize.dart';
 part 'src/filter/pixelate.dart';
 part 'src/filter/quantize.dart';
@@ -121,9 +121,13 @@ part 'src/formats/tiff_decoder.dart';
 part 'src/formats/webp_decoder.dart';
 part 'src/formats/webp_encoder.dart';
 
-part 'src/hdr/gamma_tone_map.dart';
+part 'src/hdr/half.dart';
+part 'src/hdr/hdr_bloom.dart';
+part 'src/hdr/hdr_gamma.dart';
 part 'src/hdr/hdr_image.dart';
 part 'src/hdr/hdr_slice.dart';
+part 'src/hdr/hdr_to_image.dart';
+part 'src/hdr/reinhard_tone_map.dart';
 
 part 'src/transform/copy_into.dart';
 part 'src/transform/copy_crop.dart';
@@ -134,7 +138,6 @@ part 'src/transform/trim.dart';
 
 part 'src/util/bit_operators.dart';
 part 'src/util/clip_line.dart';
-part 'src/util/half.dart';
 part 'src/util/input_buffer.dart';
 part 'src/util/interpolation.dart';
 part 'src/util/min_max.dart';

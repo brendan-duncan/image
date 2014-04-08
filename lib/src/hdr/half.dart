@@ -10,45 +10,8 @@ part of image;
  */
 class Half {
   Half([num f]) {
-    if (_toFloatFloat32 == null) {
-      _initialize();
-    }
-
     if (f != null) {
-      f = f.toDouble();
-      int x_i = _float32ToUint32(f);
-      if (f == 0.0) {
-        // Common special case - zero.
-        // Preserve the zero's sign bit.
-        _h = x_i >> 16;
-      } else {
-        // We extract the combined sign and exponent, e, from our
-        // floating-point number, f.  Then we convert e to the sign
-        // and exponent of the half number via a table lookup.
-        //
-        // For the most common case, where a normalized half is produced,
-        // the table lookup returns a non-zero value; in this case, all
-        // we have to do is round f's significand to 10 bits and combine
-        // the result with e.
-        //
-        // For all other cases (overflow, zeroes, denormalized numbers
-        // resulting from underflow, infinities and NANs), the table
-        // lookup returns zero, and we call a longer, non-inline function
-        // to do the float-to-half conversion.
-        int e = (x_i >> 23) & 0x000001ff;
-
-        e = _eLut[e];
-
-        if (e != 0) {
-          // Simple case - round the significand, m, to 10
-          // bits and combine it with the sign and exponent.
-          int m = x_i & 0x007fffff;
-          _h = e + ((m + 0x00000fff + ((m >> 13) & 1)) >> 13);
-        } else {
-          // Difficult case - call a function.
-          _h = _convert(x_i);
-        }
-      }
+      _h = DoubleToHalf(f);
     }
   }
 
@@ -64,6 +27,47 @@ class Half {
       _initialize();
     }
     return _toFloatFloat32[bits];
+  }
+
+  static int DoubleToHalf(num f) {
+    if (_toFloatFloat32 == null) {
+      _initialize();
+    }
+
+    f = f.toDouble();
+    int x_i = _float32ToUint32(f);
+    if (f == 0.0) {
+      // Common special case - zero.
+      // Preserve the zero's sign bit.
+      return x_i >> 16;
+    }
+
+    // We extract the combined sign and exponent, e, from our
+    // floating-point number, f.  Then we convert e to the sign
+    // and exponent of the half number via a table lookup.
+    //
+    // For the most common case, where a normalized half is produced,
+    // the table lookup returns a non-zero value; in this case, all
+    // we have to do is round f's significand to 10 bits and combine
+    // the result with e.
+    //
+    // For all other cases (overflow, zeroes, denormalized numbers
+    // resulting from underflow, infinities and NANs), the table
+    // lookup returns zero, and we call a longer, non-inline function
+    // to do the float-to-half conversion.
+    int e = (x_i >> 23) & 0x000001ff;
+
+    e = _eLut[e];
+
+    if (e != 0) {
+      // Simple case - round the significand, m, to 10
+      // bits and combine it with the sign and exponent.
+      int m = x_i & 0x007fffff;
+      return e + ((m + 0x00000fff + ((m >> 13) & 1)) >> 13);
+    }
+
+    // Difficult case - call a function.
+    return _convert(x_i);
   }
 
   double toDouble() => _toFloatFloat32[_h];
