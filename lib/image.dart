@@ -49,19 +49,16 @@ part 'src/fonts/arial_14.dart';
 part 'src/fonts/arial_24.dart';
 part 'src/fonts/arial_48.dart';
 
-part 'src/formats/exr/half.dart';
 part 'src/formats/exr/exr_attribute.dart';
 part 'src/formats/exr/exr_b44_compressor.dart';
 part 'src/formats/exr/exr_channel.dart';
 part 'src/formats/exr/exr_compressor.dart';
-part 'src/formats/exr/exr_framebuffer.dart';
 part 'src/formats/exr/exr_huffman.dart';
 part 'src/formats/exr/exr_image.dart';
 part 'src/formats/exr/exr_part.dart';
 part 'src/formats/exr/exr_piz_compressor.dart';
 part 'src/formats/exr/exr_pxr24_compressor.dart';
 part 'src/formats/exr/exr_rle_compressor.dart';
-part 'src/formats/exr/exr_slice.dart';
 part 'src/formats/exr/exr_wavelet.dart';
 part 'src/formats/exr/exr_zip_compressor.dart';
 part 'src/formats/gif/gif_color_map.dart';
@@ -124,6 +121,10 @@ part 'src/formats/tiff_decoder.dart';
 part 'src/formats/webp_decoder.dart';
 part 'src/formats/webp_encoder.dart';
 
+part 'src/hdr/gamma_tone_map.dart';
+part 'src/hdr/hdr_image.dart';
+part 'src/hdr/hdr_slice.dart';
+
 part 'src/transform/copy_into.dart';
 part 'src/transform/copy_crop.dart';
 part 'src/transform/copy_resize.dart';
@@ -133,6 +134,7 @@ part 'src/transform/trim.dart';
 
 part 'src/util/bit_operators.dart';
 part 'src/util/clip_line.dart';
+part 'src/util/half.dart';
 part 'src/util/input_buffer.dart';
 part 'src/util/interpolation.dart';
 part 'src/util/min_max.dart';
@@ -145,4 +147,3 @@ part 'src/bitmap_font.dart';
 part 'src/color.dart';
 part 'src/image.dart';
 part 'src/image_exception.dart';
-

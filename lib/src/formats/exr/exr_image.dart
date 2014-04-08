@@ -100,14 +100,15 @@ class ExrImage extends DecodeInfo {
 
     for (int pi = 0; pi < parts.length; ++pi) {
       ExrPart part = parts[pi];
-      ExrFrameBuffer framebuffer = part.framebuffer;
+      HdrImage framebuffer = part.framebuffer;
 
       for (int ci = 0; ci < part.channels.length; ++ci) {
         ExrChannel ch = part.channels[ci];
-        if (!framebuffer.contains(ch.name)) {
+        if (!framebuffer.hasChannel(ch.name)) {
           width = part.width;
           height = part.height;
-          framebuffer[ch.name] = new ExrSlice(ch, part.width, part.height);
+          framebuffer[ch.name] = new HdrSlice(ch.name, part.width, part.height,
+                                              ch.type);
         }
       }
 
@@ -122,7 +123,7 @@ class ExrImage extends DecodeInfo {
   void _readTiledPart(int pi, InputBuffer input) {
     ExrPart part = parts[pi];
     final bool multiPart = _isMultiPart();
-    ExrFrameBuffer framebuffer = part.framebuffer;
+    HdrImage framebuffer = part.framebuffer;
     ExrCompressor compressor = part._compressor;
     List<Uint32List> offsets = part._offsets;
     Uint32List fbi = new Uint32List(part.channels.length);
@@ -177,7 +178,7 @@ class ExrImage extends DecodeInfo {
             for (int yi = 0; yi < tileHeight && ty < height; ++yi, ++ty) {
               for (int ci = 0; ci < numChannels; ++ci) {
                 ExrChannel ch = part.channels[ci];
-                Uint8List slice = framebuffer[ch.name].bytes;
+                Uint8List slice = framebuffer[ch.name].getBytes();
                 if (si >= len) {
                   break;
                 }
@@ -204,7 +205,7 @@ class ExrImage extends DecodeInfo {
   void _readScanlinePart(int pi, InputBuffer input) {
     ExrPart part = parts[pi];
     final bool multiPart = _isMultiPart();
-    ExrFrameBuffer framebuffer = part.framebuffer;
+    HdrImage framebuffer = part.framebuffer;
     ExrCompressor compressor = part._compressor;
     List<int> offsets = part._offsets[0];
 
@@ -255,7 +256,7 @@ class ExrImage extends DecodeInfo {
 
         for (int ci = 0; ci < numChannels; ++ci) {
           ExrChannel ch = part.channels[ci];
-          Uint8List slice = framebuffer[ch.name].bytes;
+          Uint8List slice = framebuffer[ch.name].getBytes();
           if (si >= len) {
             break;
           }

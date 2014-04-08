@@ -1,9 +1,9 @@
 part of image;
 
 class ExrChannel {
-  static const int TYPE_UINT = 0;
-  static const int TYPE_HALF = 1;
-  static const int TYPE_FLOAT = 2;
+  static const int TYPE_UINT = HdrImage.UINT;
+  static const int TYPE_HALF = HdrImage.HALF;
+  static const int TYPE_FLOAT = HdrImage.FLOAT;
 
   // Channel Names
 

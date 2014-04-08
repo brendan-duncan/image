@@ -2,7 +2,7 @@ part of image;
 
 class ExrPart {
   /// The framebuffer for this exr part.
-  ExrFrameBuffer framebuffer = new ExrFrameBuffer();
+  HdrImage framebuffer = new HdrImage();
   /// The channels present in this part.
   List<ExrChannel> channels = [];
   /// The extra attributes read from the part header.
