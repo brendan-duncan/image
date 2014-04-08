@@ -4,20 +4,21 @@
 
 ##Overview
 
-A Dart library to encode and decode various image formats.
+A Dart library providing the ability to load, save and manipulate images in a variety of different file formats.
 
 The library has no reliance on `dart:io`, so it can be used for both server and
 web applications. 
 
-The image library currently supports decoding and encoding the following 
-formats:
+**Supported Image Formats:**
+
+Read/Write:
 
 - PNG / Animated APNG
 - JPEG
 - Targa
 - GIF / Animated GIF
 
-Decoding Only:
+Read Only:
 
 - WebP / Animated WebP
 - TIFF
