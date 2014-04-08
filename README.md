@@ -36,12 +36,14 @@ Read Only:
 
 ##Samples
 
-Load a WebP image, resize it, and save it as a png:
+Load an image, resize it, and save it as a png:
 
     import 'dart:io' as Io;
     import 'package:image/image.dart';
     void main() {
-      // Read a webp image from file.
+      // Read an image from file (webp in this case).
+      // decodeImage will identify the format of the image and use the appropriate
+      // decoder.
       Image image = decodeImage(new Io.File('test.webp').readAsBytesSync());
 
       // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
