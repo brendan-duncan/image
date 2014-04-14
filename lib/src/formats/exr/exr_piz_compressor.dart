@@ -38,10 +38,10 @@ class ExrPizCompressor extends ExrCompressor {
     int maxY = y + height - 1;
 
     if (maxX > _header.width) {
-      maxX = _header.width;
+      maxX = _header.width - 1;
     }
     if (maxY > _header.height) {
-      maxY = _header.height;
+      maxY = _header.height - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;

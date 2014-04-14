@@ -160,6 +160,13 @@ class ExrImage extends DecodeInfo {
             int tileWidth = compressor.decodedWidth;
             int tileHeight = compressor.decodedHeight;
 
+            if (tx + tileWidth > width) {
+              tileWidth = width - tx;
+            }
+            if (ty + tileHeight > height) {
+              tileHeight = height - ty;
+            }
+
             Uint8List uncompressedData;
             if (compressor != null) {
               uncompressedData = compressor.uncompress(data, tx, ty,

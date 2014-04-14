@@ -66,8 +66,8 @@ class ExrPart {
         case 'dataWindow':
           dataWindow = [value.readInt32(), value.readInt32(),
                         value.readInt32(), value.readInt32()];
-          width = dataWindow[2] - dataWindow[0];
-          height = dataWindow[3] - dataWindow[1];
+          width = (dataWindow[2] - dataWindow[0]) + 1;
+          height = (dataWindow[3] - dataWindow[1]) + 1;
           break;
         case 'displayWindow':
           displayWindow = [value.readInt32(), value.readInt32(),
@@ -140,7 +140,7 @@ class ExrPart {
     } else {
       _bytesPerLine = new Uint32List(height + 1);
       for (ExrChannel ch in channels) {
-        int nBytes = ch.size * (width + 1) ~/ ch.xSampling;
+        int nBytes = ch.size * width ~/ ch.xSampling;
         for (int y = 0; y < height; ++y) {
           if ((y + top) % ch.ySampling == 0) {
             _bytesPerLine[y] += nBytes;
@@ -169,7 +169,7 @@ class ExrPart {
         offset += _bytesPerLine[i];
       }
 
-      int numOffsets = (height + _linesInBuffer) ~/ _linesInBuffer;
+      int numOffsets = ((height + _linesInBuffer) ~/ _linesInBuffer) - 1;
       _offsets = [new Uint32List(numOffsets)];
     }
   }
@@ -219,16 +219,16 @@ class ExrPart {
         num = 1;
         break;
       case MIPMAP_LEVELS:
-        int w = maxX - minX + 1;
-        int h = maxY - minY + 1;
+        int w = (maxX - minX) + 1;
+        int h = (maxY - minY) + 1;
         num = _roundLog2(Math.max(w, h), _tileRoundingMode) + 1;
         break;
       case RIPMAP_LEVELS:
-        int h = maxY - minY + 1;
+        int h = (maxY - minY) + 1;
         num = _roundLog2(h, _tileRoundingMode) + 1;
         break;
       default:
-        throw new ImageException("Unknown LevelMode format.");
+        throw new ImageException('Unknown LevelMode format.');
     }
 
     return num;
@@ -303,7 +303,7 @@ class ExrPart {
       throw new ImageException('Argument not in valid range.');
     }
 
-    int a = max - min + 1;
+    int a = (max - min) + 1;
     int b = (1 << l);
     int size = a ~/ b;
 
