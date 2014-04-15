@@ -40,22 +40,40 @@ class ExrDecoder extends Decoder {
     return exrImage;
   }
 
-  int numFrames() => exrImage != null ? 1 : 0;
+  int numFrames() => exrImage != null ? exrImage.parts.length : 0;
 
   Image decodeFrame(int frame) {
     if (exrImage == null) {
       return null;
     }
 
-    return hdrToImage(exrImage.getPart(0).framebuffer, exposure: exposure);
+    return hdrToImage(exrImage.getPart(frame).framebuffer,
+                      exposure: exposure);
   }
 
-  Image decodeImage(List<int> data, {int frame: 0}) {
-    if (startDecode(data) == null) {
+  HdrImage decodeHdrFrame(int frame) {
+    if (exrImage == null) {
+      return null;
+    }
+    if (frame >= exrImage.parts.length) {
+      return null;
+    }
+    return exrImage.parts[frame].framebuffer;
+  }
+
+  Image decodeImage(List<int> bytes, {int frame: 0}) {
+    if (startDecode(bytes) == null) {
       return null;
     }
 
     return decodeFrame(frame);
+  }
+
+  HdrImage decodeHdrImage(List<int> bytes, {int frame: 0}) {
+    if (startDecode(bytes) == null) {
+      return null;
+    }
+    return decodeHdrFrame(frame);
   }
 
   Animation decodeAnimation(List<int> data) {

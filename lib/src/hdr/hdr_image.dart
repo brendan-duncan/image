@@ -38,14 +38,47 @@ class HdrImage {
   HdrImage.from(HdrImage other) {
     for (String ch in other.slices.keys) {
       HdrSlice slice = other.slices[ch];
-      addSlice(ch, new HdrSlice.from(slice));
+      addSlice(new HdrSlice.from(slice));
     }
   }
 
+  /**
+   * Create an HDR image from a LDR [Image] by transforming the channel values
+   * to the range [0, 1].
+   */
+  HdrImage.fromImage(Image other) {
+    addSlice(new HdrSlice(R, other.width, other.height, HALF));
+    addSlice(new HdrSlice(G, other.width, other.height, HALF));
+    addSlice(new HdrSlice(B, other.width, other.height, HALF));
+    if (other.format == Image.RGBA) {
+      addSlice(new HdrSlice(A, other.width, other.height, HALF));
+    }
+    Uint8List rgb = other.getBytes();
+    for (int y = 0, si = 0; y < other.height; ++y) {
+      for (int x = 0; x < other.width; ++x) {
+        red.setFloat(x, y, rgb[si++] / 255.0);
+        green.setFloat(x, y, rgb[si++] / 255.0);
+        blue.setFloat(x, y, rgb[si++] / 255.0);
+        if (alpha != null) {
+          alpha.setFloat(x, y, rgb[si++] / 255.0);
+        }
+      }
+    }
+  }
+
+  /**
+   * Does the image have any color channels?
+   */
   bool get hasColor => red != null || green != null || blue != null;
 
+  /**
+   * Does the image have an alpha channel?
+   */
   bool get hasAlpha => alpha != null;
 
+  /**
+   * Does the image have a depth channel?
+   */
   bool get hasDepth => depth != null;
 
   /**
@@ -58,50 +91,80 @@ class HdrImage {
    */
   int get height => slices.isEmpty ? 0 : slices.values.first.height;
 
+  /**
+   * Get the value of the red channel at the given pixel coordinates [x], [y].
+   */
   double getRed(int x, int y) {
     return red != null ? red.getFloat(x, y) : 0.0;
   }
 
+  /**
+   * Set the value of the red channel at the given pixel coordinates [x], [y].
+   */
   void setRed(int x, int y, double c) {
     if (red != null) {
       red.setFloat(x, y, c);
     }
   }
 
+  /**
+   * Get the value of the green channel at the given pixel coordinates [x], [y].
+   */
   double getGreen(int x, int y) {
     return green != null ? green.getFloat(x, y) : 0.0;
   }
 
+  /**
+   * Set the value of the green channel at the given pixel coordinates [x], [y].
+   */
   void setGreen(int x, int y, double c) {
     if (green != null) {
       green.setFloat(x, y, c);
     }
   }
 
+  /**
+   * Get the value of the blue channel at the given pixel coordinates [x], [y].
+   */
   double getBlue(int x, int y) {
     return blue != null ? blue.getFloat(x, y) : 0.0;
   }
 
+  /**
+   * Set the value of the blue channel at the given pixel coordinates [x], [y].
+   */
   void setBlue(int x, int y, double c) {
     if (blue != null) {
       blue.setFloat(x, y, c);
     }
   }
 
+  /**
+   * Get the value of the alpha channel at the given pixel coordinates [x], [y].
+   */
   double getAlpha(int x, int y) {
     return alpha != null ? alpha.getFloat(x, y) : 0.0;
   }
 
+  /**
+   * Set the value of the alpha channel at the given pixel coordinates [x], [y].
+   */
   void setAlpha(int x, int y, double c) {
     if (alpha != null) {
       alpha.setFloat(x, y, c);
     }
   }
 
+  /**
+   * Get the value of the depth channel at the given pixel coordinates [x], [y].
+   */
   double getDepth(int x, int y) {
     return depth != null ? depth.getFloat(x, y) : 0.0;
   }
 
+  /**
+   * Set the value of the depth channel at the given pixel coordinates [x], [y].
+   */
   void setDepth(int x, int y, double c) {
     if (depth != null) {
       depth.setFloat(x, y, c);
@@ -119,29 +182,26 @@ class HdrImage {
   HdrSlice operator[](String ch) => slices[ch];
 
   /**
-   * Add a slice to the framebuffer.
+   * Add a channel [slice] to the
    */
-  operator[]=(String ch, HdrSlice sl) {
-    addSlice(ch, sl);
-  }
-
-  void addSlice(String ch, HdrSlice sl) {
-    slices[ch] = sl;
+  void addSlice(HdrSlice slice) {
+    String ch = slice.name;
+    slices[ch] = slice;
     switch (ch) {
       case R:
-        red = sl;
+        red = slice;
         break;
       case G:
-        green = sl;
+        green = slice;
         break;
       case B:
-        blue = sl;
+        blue = slice;
         break;
       case A:
-        alpha = sl;
+        alpha = slice;
         break;
       case Z:
-        depth = sl;
+        depth = slice;
         break;
     }
   }

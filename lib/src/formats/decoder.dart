@@ -55,11 +55,27 @@ abstract class Decoder {
   bool isValidFile(List<int> bytes);
 
   /**
-   * Decode the file and extract a single image from it.  If the file is
-   * animated, the specified [frame] will be decoded.  If there was a problem
+   * Decode the file and extract a single image from it. If the file is
+   * animated, the specified [frame] will be decoded. If there was a problem
    * decoding the file, null is returned.
    */
   Image decodeImage(List<int> bytes, {int frame: 0});
+
+  /**
+   * Decode the file and extract a single High Dynamic Range (HDR) image from
+   * it. HDR images are stored in floating-poing values. If the format of the
+   * file does not support HDR images, the regular image will be converted to
+   * an HDR image as (color / 255). If the file is animated, the specified
+   * [frame] will be decoded. If there was a problem decoding the file, null is
+   * returned.
+   */
+  HdrImage decodeHdrImage(List<int> bytes, {int frame: 0}) {
+    Image img = decodeImage(bytes, frame: frame);
+    if (img == null) {
+      return null;
+    }
+    return new HdrImage.fromImage(img);
+  }
 
   /**
    * Decode all of the frames from an animation.  If the file is not an
@@ -81,11 +97,28 @@ abstract class Decoder {
   int numFrames();
 
   /**
-   * Decode a single frame from the data stat was set with [startDecode].
+   * Decode a single frame from the data that was set with [startDecode].
    * If [frame] is out of the range of available frames, null is returned.
-   * Non animated image files will only have [frame] 0.  An [AnimationFrame]
+   * Non animated image files will only have [frame] 0. An [Image]
    * is returned, which provides the image, and top-left coordinates of the
    * image, as animated frames may only occupy a subset of the canvas.
    */
   Image decodeFrame(int frame);
+
+  /**
+   * Decode a single high dynamic range (HDR) frame from the data that was set
+   * with [startDecode]. If the format of the file does not support HDR images,
+   * the regular image will be converted to an HDR image as (color / 255).
+   * If [frame] is out of the range of available frames, null is returned.
+   * Non animated image files will only have [frame] 0. An [Image]
+   * is returned, which provides the image, and top-left coordinates of the
+   * image, as animated frames may only occupy a subset of the canvas.
+   */
+  HdrImage decodeHdrFrame(int frame) {
+    Image img = decodeFrame(frame);
+    if (img == null) {
+      return null;
+    }
+    return new HdrImage.fromImage(img);
+  }
 }
