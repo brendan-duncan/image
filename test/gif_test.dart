@@ -25,16 +25,6 @@ void defineGifTests() {
     }
   });
 
-  List<int> bytes = new Io.File(path + '/cars.gif').readAsBytesSync();
-  Animation anim = new GifDecoder().decodeAnimation(bytes);
-  for (int i = 0; i < anim.numFrames; ++i) {
-    Image image = anim[i];
-    new Io.File('out/gif/anim_$i.png')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(encodePng(image));
-  }
-
-
   group('Gif/decodeImage', () {
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.gif')) {
@@ -59,15 +49,6 @@ void defineGifTests() {
 
     List<int> gif = new GifEncoder().encodeImage(image);
     new Io.File('out/gif/jpeg444.gif')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(gif);
-  });
-
-  group('Gif/encodeAnimation', () {
-    List<int> bytes = new Io.File(path + '/cars.gif').readAsBytesSync();
-    Animation anim = new GifDecoder().decodeAnimation(bytes);
-    List<int> gif = new GifEncoder().encodeAnimation(anim);
-    new Io.File('out/gif/cars.gif')
           ..createSync(recursive: true)
           ..writeAsBytesSync(gif);
   });
