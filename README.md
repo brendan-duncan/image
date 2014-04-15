@@ -32,7 +32,7 @@ Read Only:
 
 ##[Examples](https://github.com/brendan-duncan/image/wiki/Examples)
 
-##[Format Decoding Functions] (https://github.com/brendan-duncan/image/wiki#format-decoding-functions)
+##[Format Decoding Functions](https://github.com/brendan-duncan/image/wiki#format-decoding-functions)
 
 ##Samples
 
