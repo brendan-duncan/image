@@ -1,3 +1,8 @@
+v 1.1.19 - April 15, 2014
+
+- OpenEXR fixes.
+
+
 v 1.1.18 - April 06, 2014
 
 - Added OpenEXR format docoder.
