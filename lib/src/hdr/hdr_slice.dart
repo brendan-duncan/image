@@ -37,7 +37,7 @@ class HdrSlice {
   /**
    * Get the raw bytes of the data buffer.
    */
-  Uint8List getBytes() => new Uint8List.view(data);
+  Uint8List getBytes() => new Uint8List.view(data.buffer);
 
   /**
    * Does this channel store floating-point data?
