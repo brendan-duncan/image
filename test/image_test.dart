@@ -17,15 +17,15 @@ part 'tiff_test.dart';
 part 'webp_test.dart';
 
 void main() {
-  defineJpegTests();
+  /*defineJpegTests();
   definePngTests();
   defineGifTests();
   defineTgaTests();
-  defineTiffTests();
+  defineTiffTests();*/
   defineFontTests();
-  defineWebPTests();
+  /*defineWebPTests();
   defineFilterTests();
   defineHalfTests();
   defineExrTests();
-  definePsdTests();
+  definePsdTests();*/
 }

@@ -9,7 +9,7 @@ import 'dart:math' as Math;
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
-import 'package:xml/xml.dart';
+import 'package:xml/xml.dart' as XML;
 
 part 'src/draw/draw_char.dart';
 part 'src/draw/draw_circle.dart';

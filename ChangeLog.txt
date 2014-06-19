@@ -1,3 +1,8 @@
+v 1.1.21 - June 19, 2014
+
+- Add drawImage function
+- Update XML dependency to 2.0.0
+
 v 1.1.20 - April 26, 2014
 
 - Fix OpenEXR decoder for dart2js

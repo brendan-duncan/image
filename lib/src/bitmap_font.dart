@@ -51,11 +51,11 @@ class BitmapFont {
   BitmapFont.fromFnt(String fnt, Image page) {
     Map<int, Image> fontPages = { 0: page };
 
-    XmlElement xml;
+    XML.XmlDocument xml;
 
     if (fnt.startsWith('<font>')) {
       xml = XML.parse(fnt);
-      if (xml == null || xml.name != 'font') {
+      if (xml == null) {
         throw new ImageException('Invalid font XML');
       }
     } else {
@@ -85,11 +85,11 @@ class BitmapFont {
     }
 
     String font_str = new String.fromCharCodes(font_file.content);
-    XmlElement xml;
+    XML.XmlDocument xml;
 
     if (font_str.startsWith('<font>')) {
       xml = XML.parse(font_str);
-      if (xml == null || xml.name != 'font') {
+      if (xml == null) {
         throw new ImageException('Invalid font XML');
       }
     } else {
@@ -115,90 +115,98 @@ class BitmapFont {
   }
 
 
-  void _parseFnt(XmlElement xml, Map<int, Image> fontPages,
+  void _parseFnt(XML.XmlDocument xml, Map<int, Image> fontPages,
                  [Archive arc]) {
-    for (XmlElement c in xml.children) {
-      if (c.name == 'info') {
-        for (String a in c.attributes.keys) {
-          switch (a) {
+    if (xml.children.length != 1) {
+      throw new ImageException('Invalid font XML');
+    }
+
+    var font = xml.children[0];
+
+    for (var c in font.children) {
+      if (c is! XML.XmlElement) {
+        continue;
+      }
+      String name = c.name.toString();
+      if (name == 'info') {
+        for (XML.XmlAttribute a in c.attributes) {
+          switch (a.name.toString()) {
             case 'face':
-              face = c.attributes[a];
+              face = a.value;
               break;
             case 'size':
-              size = int.parse(c.attributes[a]);
+              size = int.parse(a.value);
               break;
             case 'bold':
-              bold = (int.parse(c.attributes[a]) == 1);
+              bold = (int.parse(a.value) == 1);
               break;
             case 'italic':
-              italic = (int.parse(c.attributes[a]) == 1);
+              italic = (int.parse(a.value) == 1);
               break;
             case 'charset':
-              charset = c.attributes[a];
+              charset = a.value;
               break;
             case 'unicode':
-              unicode = c.attributes[a];
+              unicode = a.value;
               break;
             case 'stretchH':
-              stretchH = int.parse(c.attributes[a]);
+              stretchH = int.parse(a.value);
               break;
             case 'smooth':
-              smooth = (int.parse(c.attributes[a]) == 1);
+              smooth = (int.parse(a.value) == 1);
               break;
             case 'antialias':
-              antialias = (int.parse(c.attributes[a]) == 1);
+              antialias = (int.parse(a.value) == 1);
               break;
             case 'padding':
-              List<String> tk = c.attributes[a].split(',');
+              List<String> tk = a.value.split(',');
               padding = [];
               for (String t in tk) {
                 padding.add(int.parse(t));
               }
               break;
             case 'spacing':
-              List<String> tk = c.attributes[a].split(',');
+              List<String> tk = a.value.split(',');
               spacing = [];
               for (String t in tk) {
                 spacing.add(int.parse(t));
               }
               break;
             case 'outline':
-              outline = (int.parse(c.attributes[a]) == 1);
+              outline = (int.parse(a.value) == 1);
               break;
           }
         }
-      } else if (c.name == 'common') {
-        for (String a in c.attributes.keys) {
-          switch (a) {
+      } else if (name == 'common') {
+        for (XML.XmlAttribute a in c.attributes) {
+          switch (a.name.toString()) {
             case 'lineHeight':
-              lineHeight = int.parse(c.attributes[a]);
+              lineHeight = int.parse(a.value);
               break;
             case 'base':
-              base = int.parse(c.attributes[a]);
+              base = int.parse(a.value);
               break;
             case 'scaleW':
-              scaleW = int.parse(c.attributes[a]);
+              scaleW = int.parse(a.value);
               break;
             case 'scaleH':
-              scaleH = int.parse(c.attributes[a]);
+              scaleH = int.parse(a.value);
               break;
             case 'pages':
-              pages = int.parse(c.attributes[a]);
+              pages = int.parse(a.value);
               break;
             case 'packed':
-              packed = (int.parse(c.attributes[a]) == 1);
+              packed = (int.parse(a.value) == 1);
               break;
           }
         }
-      } else if (c.name == 'pages') {
-        int count = c.children.length;
-        if (c.attributes.containsKey('count')) {
-          count = int.parse(c.attributes['count']);
-        }
-        for (int ci = 0; ci < count; ++ci) {
-          XmlElement page = c.children[ci];
-          int id = int.parse(page.attributes['id']);
-          String filename = page.attributes['file'];
+      } else if (name == 'pages') {
+        for (var page in c.children) {
+          if (page is! XML.XmlElement) {
+            continue;
+          }
+          int id = int.parse(page.getAttribute('id'));
+          String filename = page.getAttribute('file');
 
           if (fontPages.containsKey(id)) {
             throw new ImageException('Duplicate font page id found: $id.');
@@ -207,7 +215,8 @@ class BitmapFont {
           if (arc != null) {
             ArchiveFile imageFile = _findFile(arc, filename);
             if (imageFile == null) {
-              throw new ImageException('Font zip missing font page image $filename');
+              throw new ImageException('Font zip missing font page image '
+                                       '$filename');
             }
 
             Image image = new PngDecoder().decodeImage(imageFile.content);
@@ -215,28 +224,43 @@ class BitmapFont {
             fontPages[id] = image;
           }
         }
-      } else if (c.name == 'chars') {
-        int count = c.children.length;
-        if (c.attributes.containsKey('count')) {
-          count = int.parse(c.attributes['count']);
-        }
+      } else if (name == 'kernings') {
+        for (var kerning in c.children) {
+          if (kerning is! XML.XmlElement) {
+            continue;
+          }
+          int first = int.parse(kerning.getAttribute('first'));
+          int second = int.parse(kerning.getAttribute('second'));
+          int amount = int.parse(kerning.getAttribute('amount'));
 
-        if (count > c.children.length) {
-          throw new ImageException('Invalid font XML');
+          if (!kernings.containsKey(first)) {
+            kernings[first] = {};
+          }
+          kernings[first][second] = amount;
         }
+      }
+    }
 
-        for (int ci = 0; ci < count; ++ci) {
-          XmlElement char = c.children[ci];
-          int id = int.parse(char.attributes['id']);
-          int x = int.parse(char.attributes['x']);
-          int y = int.parse(char.attributes['y']);
-          int width = int.parse(char.attributes['width']);
-          int height = int.parse(char.attributes['height']);
-          int xoffset = int.parse(char.attributes['xoffset']);
-          int yoffset = int.parse(char.attributes['yoffset']);
-          int xadvance = int.parse(char.attributes['xadvance']);
-          int page = int.parse(char.attributes['page']);
-          int chnl = int.parse(char.attributes['chnl']);
+    for (var c in font.children) {
+      if (c is! XML.XmlElement) {
+        continue;
+      }
+      String name = c.name.toString();
+      if (name == 'chars') {
+        for (var char in c.children) {
+          if (char is! XML.XmlElement) {
+            continue;
+          }
+          int id = int.parse(char.getAttribute('id'));
+          int x = int.parse(char.getAttribute('x'));
+          int y = int.parse(char.getAttribute('y'));
+          int width = int.parse(char.getAttribute('width'));
+          int height = int.parse(char.getAttribute('height'));
+          int xoffset = int.parse(char.getAttribute('xoffset'));
+          int yoffset = int.parse(char.getAttribute('yoffset'));
+          int xadvance = int.parse(char.getAttribute('xadvance'));
+          int page = int.parse(char.getAttribute('page'));
+          int chnl = int.parse(char.getAttribute('chnl'));
 
           if (!fontPages.containsKey(page)) {
             throw new ImageException('Missing page image: $page');
@@ -248,6 +272,7 @@ class BitmapFont {
               xoffset, yoffset, xadvance, page, chnl);
 
           characters[id] = ch;
+          print('    CHAR $id : ${new String.fromCharCode(id)}');
 
           int x2 = x + width;
           int y2 = y + height;
@@ -259,48 +284,17 @@ class BitmapFont {
             }
           }
         }
-      } else if (c.name == 'kernings') {
-        int count = c.children.length;
-        if (c.attributes.containsKey('count')) {
-          count = int.parse(c.attributes['count']);
-        }
-
-        if (count > c.children.length) {
-          throw new ImageException('Invalid font XML');
-        }
-
-        for (int ci = 0; ci < count; ++ci) {
-          XmlElement kerning = c.children[ci];
-          int first = int.parse(kerning.attributes['first']);
-          int second = int.parse(kerning.attributes['second']);
-          int amount = int.parse(kerning.attributes['amount']);
-
-          if (!kernings.containsKey(first)) {
-            kernings[first] = {};
-          }
-          kernings[first][second] = amount;
-        }
       }
     }
   }
 
-  XmlElement _parseTextFnt(String content) {
-    XmlElement xml = new XmlElement('font');
-
-    XmlElement info = new XmlElement('info');
-    xml.addChild(info);
-
-    XmlElement common = new XmlElement('common');
-    xml.addChild(common);
-
-    XmlElement pages = new XmlElement('pages');
-    xml.addChild(pages);
-
-    XmlElement chars = new XmlElement('chars');
-    xml.addChild(chars);
-
-    XmlElement kernings = new XmlElement('kernings');
-    xml.addChild(kernings);
+  XML.XmlDocument _parseTextFnt(String content) {
+    var children = [];
+    var pageList = [];
+    var charList = [];
+    var kerningList = [];
+    var charsAttrs;
+    var kerningsAttrs;
 
     List<String> lines = content.split('\n');
 
@@ -312,39 +306,64 @@ class BitmapFont {
       List<String> tk = line.split(' ');
       switch (tk[0]) {
         case 'info':
-          _parseParameters(info, tk);
+          var attrs = _parseParameters(tk);
+          var info = new XML.XmlElement(new XML.XmlName('info'), attrs, []);
+          children.add(info);
           break;
         case 'common':
-          _parseParameters(common, tk);
+          var attrs = _parseParameters(tk);
+          var node = new XML.XmlElement(new XML.XmlName('common'), attrs, []);
+          children.add(node);
           break;
         case 'page':
-          XmlElement page = new XmlElement('page');
-          _parseParameters(page, tk);
-          pages.addChild(page);
+          var attrs = _parseParameters(tk);
+          var page = new XML.XmlElement(new XML.XmlName('page'), attrs, []);
+          pageList.add(page);
           break;
         case 'chars':
-          _parseParameters(chars, tk);
+          charsAttrs = _parseParameters(tk);
           break;
         case 'char':
-          XmlElement char = new XmlElement('char');
-          _parseParameters(char, tk);
-          chars.addChild(char);
+          var attrs = _parseParameters(tk);
+          var node = new XML.XmlElement(new XML.XmlName('char'), attrs, []);
+          charList.add(node);
           break;
         case 'kernings':
-          _parseParameters(kernings, tk);
+          kerningsAttrs = _parseParameters(tk);
           break;
         case 'kerning':
-          XmlElement kerning = new XmlElement('kerning');
-          _parseParameters(kerning, tk);
-          kernings.addChild(kerning);
+          var attrs = _parseParameters(tk);
+          var node = new XML.XmlElement(new XML.XmlName('kerning'), attrs, []);
+          kerningList.add(node);
           break;
       }
     }
 
-    return xml;
+    if (charsAttrs != null || charList.isNotEmpty) {
+      var node = new XML.XmlElement(new XML.XmlName('chars'), charsAttrs,
+          charList);
+      children.add(node);
+    }
+
+    if (kerningsAttrs != null || kerningList.isNotEmpty) {
+      var node = new XML.XmlElement(new XML.XmlName('kernings'), kerningsAttrs,
+          kerningList);
+      children.add(node);
+    }
+
+    if (pageList.isNotEmpty) {
+      var pages = new XML.XmlElement(new XML.XmlName('pages'), [], pageList);
+      children.add(pages);
+    }
+
+    var xml = new XML.XmlElement(new XML.XmlName('font'), [], children);
+    var doc = new XML.XmlDocument([xml]);
+
+    return doc;
   }
 
-  void _parseParameters(XmlElement xml, List<String> tk) {
+  List _parseParameters(List<String> tk) {
+    var params = [];
     for (int ti = 1; ti < tk.length; ++ti) {
       if (tk[ti].isEmpty) {
         continue;
@@ -357,8 +376,10 @@ class BitmapFont {
       // Remove all " characters
       atk[1] = atk[1].replaceAll('"', '');
 
-      xml.attributes[atk[0]] = atk[1];
+      var a = new XML.XmlAttribute(new XML.XmlName(atk[0]), atk[1]);
+      params.add(a);
     }
+    return params;
   }
 
   static ArchiveFile _findFile(Archive arc, String filename) {
