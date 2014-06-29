@@ -15,7 +15,15 @@ Image copyResize(Image src, int width, [int height = -1,
     throw new ImageException('Invalid size');
   }
 
-  Image newImage = new Image(width, height, src.format);
+  if (interpolation == LINEAR) {
+    src = new Image.from(src);
+    src = gaussianBlur(src, 2);
+  } else if (interpolation == CUBIC) {
+    src = new Image.from(src);
+    src = gaussianBlur(src, 3);
+  }
+
+  Image dst = new Image(width, height, src.format);
 
   double dy = src.height / height;
   double dx = src.width / width;
@@ -25,9 +33,9 @@ Image copyResize(Image src, int width, [int height = -1,
     double y2 = (y * dy);
     for (int x = 0; x < width; ++x) {
       double x2 = (x * dx);
-      newImage.setPixel(x, y, src.getPixelInterpolate(x2, y2, interpolation));
+      dst.setPixel(x, y, src.getPixelInterpolate(x2, y2, interpolation));
     }
   }
 
-  return newImage;
+  return dst;
 }
