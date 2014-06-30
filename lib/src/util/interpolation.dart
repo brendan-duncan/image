@@ -8,3 +8,5 @@ const int NEAREST = 0;
 const int LINEAR = 1;
 /// Cubic interpolation.
 const int CUBIC = 2;
+/// Averaging interpolation
+const int AVERAGE = 3;

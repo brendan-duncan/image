@@ -401,10 +401,10 @@ class Image {
     int ny = y + 1;
     int ay = y + 2;
 
-    double dx = fx - x;
-    double dy = fy - y;
+    var dx = fx - x;
+    var dy = fy - y;
 
-    double _cubic(double dx, num Ipp, num Icp, num Inp, num Iap) =>
+    double _cubic(num dx, num Ipp, num Icp, num Inp, num Iap) =>
         Icp + 0.5 * (dx * (-Ipp + Inp) +
         dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
         dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
