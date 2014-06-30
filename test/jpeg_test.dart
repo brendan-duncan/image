@@ -7,6 +7,9 @@ void defineJpegTests() {
   Io.Directory dir = new Io.Directory(path);
   List files = dir.listSync();
 
+  List<int> toRGB(int pixel) =>
+      [getRed(pixel), getGreen(pixel), getBlue(pixel)];
+
   group('JPEG', () {
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.jpg')) {
@@ -29,12 +32,24 @@ void defineJpegTests() {
     }
 
     test('decode/encode', () {
-      List<int> bytes = new Io.File('res/jpg/testimg.jpg').readAsBytesSync();
+      List<int> bytes = new Io.File('res/jpg/testimg.png').readAsBytesSync();
+      Image png = new PngDecoder().decodeImage(bytes);
+      expect(toRGB(png.getPixel(0, 0)), [48, 47, 45]);
+
+      bytes = new Io.File('res/jpg/testimg.jpg').readAsBytesSync();
 
       // Decode the image from file.
       Image image = new JpegDecoder().decodeImage(bytes);
       expect(image.width, equals(227));
       expect(image.height, equals(149));
+
+      /*for (int y = 0; y < image.height; ++y) {
+        for (int x = 0; x < image.width; ++x) {
+          expect(image.getPixel(x, y), equals(png.getPixel(x, y)),
+              reason: '$x $y : ${toRGB(image.getPixel(x, y))} != '
+                      '${toRGB(png.getPixel(x, y))}');
+        }
+      }*/
 
       // Encode the image to Jpeg
       List<int> jpg = new JpegEncoder().encodeImage(image);

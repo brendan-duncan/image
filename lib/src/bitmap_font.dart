@@ -272,7 +272,6 @@ class BitmapFont {
               xoffset, yoffset, xadvance, page, chnl);
 
           characters[id] = ch;
-          print('    CHAR $id : ${new String.fromCharCode(id)}');
 
           int x2 = x + width;
           int y2 = y + height;

@@ -358,7 +358,7 @@ class JpegData  {
     if (length < 2) {
       throw new ImageException('Invalid Block');
     }
-    return input.readBytes(length - 2);//new InputStream(input.readBytes(length - 2), byteOrder: BIG_ENDIAN);
+    return input.readBytes(length - 2);
   }
 
   int _nextMarker() {
@@ -641,6 +641,268 @@ class JpegData  {
     return lines;
   }
 
+  /*void _quantizeAndInverseTest(Int32List quantizationTable,
+                               Int32List coefBlock,
+                               Uint8List dataOut,
+                               Int32List dataIn) {
+    const CONST_BITS = 13;
+    const PASS1_BITS = 2;
+    const FIX_0_298631336 = 2446;  // FIX(0.298631336)
+    const FIX_0_390180644 = 3196;  // FIX(0.390180644)
+    const FIX_0_541196100 = 4433;  // FIX(0.541196100)
+    const FIX_0_765366865 = 6270;  // FIX(0.765366865)
+    const FIX_0_899976223 = 7373;  // FIX(0.899976223)
+    const FIX_1_175875602 = 9633;  // FIX(1.175875602)
+    const FIX_1_501321110 = 12299; // FIX(1.501321110)
+    const FIX_1_847759065 = 15137; // FIX(1.847759065)
+    const FIX_1_961570560 = 16069; // FIX(1.961570560)
+    const FIX_2_053119869 = 16819; // FIX(2.053119869)
+    const FIX_2_562915447 = 20995; // FIX(2.562915447)
+    const FIX_3_072711026 = 25172; // FIX(3.072711026)
+    const DCTSIZE = 8;
+    const MAXJSAMPLE = 255;
+    const RANGE_MASK = MAXJSAMPLE * 4 + 3; // 2 bits wider than legal samples
+
+    MULTIPLY(v, c) => v * c;
+    DEQUANTIZE(coef, quantval) => coef * quantval;
+    DESCALE(x, n) => _shiftR((x) + (1 << ((n) - 1)), n);
+
+    int tmp0, tmp1, tmp2, tmp3;
+    int tmp10, tmp11, tmp12, tmp13;
+    int z1, z2, z3, z4, z5;
+    int inptr;
+    int quantptr;
+    int wsptr;
+    int outptr;
+    //JSAMPLE *range_limit = IDCT_range_limit(cinfo);
+    int ctr;
+    Int32List workspace = dataIn;
+
+    // Pass 1: process columns from input, store into work array.
+    // Note results are scaled up by sqrt(8) compared to a true IDCT;
+    // furthermore, we scale the results by 2**PASS1_BITS.
+
+    inptr = 0;
+    quantptr = 0;
+    wsptr = 0;
+    for (ctr = DCTSIZE; ctr > 0; ctr--) {
+      // Due to quantization, we will usually find that many of the input
+      // coefficients are zero, especially the AC terms.  We can exploit this
+      // by short-circuiting the IDCT calculation for any column in which all
+      // the AC terms are zero.  In that case each output is equal to the
+      // DC coefficient (with scale factor as needed).
+      // With typical images and quantization tables, half or more of the
+      // column DCT calculations can be simplified this way.
+      if (coefBlock[inptr + DCTSIZE*1] == 0 &&
+          coefBlock[inptr + DCTSIZE*2] == 0 &&
+          coefBlock[inptr + DCTSIZE*3] == 0 &&
+          coefBlock[inptr + DCTSIZE*4] == 0 &&
+          coefBlock[inptr + DCTSIZE*5] == 0 &&
+          coefBlock[inptr + DCTSIZE*6] == 0 &&
+          coefBlock[inptr + DCTSIZE*7] == 0) {
+        // AC terms all zero
+        int dcval = DEQUANTIZE(coefBlock[inptr + DCTSIZE*0],
+            quantizationTable[quantptr + DCTSIZE*0]) << PASS1_BITS;
+
+        workspace[wsptr + DCTSIZE*0] = dcval;
+        workspace[wsptr + DCTSIZE*1] = dcval;
+        workspace[wsptr + DCTSIZE*2] = dcval;
+        workspace[wsptr + DCTSIZE*3] = dcval;
+        workspace[wsptr + DCTSIZE*4] = dcval;
+        workspace[wsptr + DCTSIZE*5] = dcval;
+        workspace[wsptr + DCTSIZE*6] = dcval;
+        workspace[wsptr + DCTSIZE*7] = dcval;
+
+        inptr++;      // advance pointers to next column
+        quantptr++;
+        wsptr++;
+        continue;
+      }
+
+      // Even part: reverse the even part of the forward DCT.
+      // The rotator is sqrt(2)*c(-6).
+
+      z2 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*2], quantizationTable[quantptr + DCTSIZE*2]);
+      z3 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*6], quantizationTable[quantptr + DCTSIZE*6]);
+
+      z1 = MULTIPLY(z2 + z3, FIX_0_541196100);
+      tmp2 = z1 + MULTIPLY(z3, -FIX_1_847759065);
+      tmp3 = z1 + MULTIPLY(z2, FIX_0_765366865);
+
+      z2 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*0], quantizationTable[quantptr + DCTSIZE*0]);
+      z3 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*4], quantizationTable[quantptr + DCTSIZE*4]);
+
+      tmp0 = (z2 + z3) << CONST_BITS;
+      tmp1 = (z2 - z3) << CONST_BITS;
+
+      tmp10 = tmp0 + tmp3;
+      tmp13 = tmp0 - tmp3;
+      tmp11 = tmp1 + tmp2;
+      tmp12 = tmp1 - tmp2;
+
+      // Odd part per figure 8; the matrix is unitary and hence its
+      // transpose is its inverse.  i0..i3 are y7,y5,y3,y1 respectively.
+      tmp0 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*7], quantizationTable[quantptr + DCTSIZE*7]);
+      tmp1 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*5], quantizationTable[quantptr + DCTSIZE*5]);
+      tmp2 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*3], quantizationTable[quantptr + DCTSIZE*3]);
+      tmp3 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*1], quantizationTable[quantptr + DCTSIZE*1]);
+
+      z1 = tmp0 + tmp3;
+      z2 = tmp1 + tmp2;
+      z3 = tmp0 + tmp2;
+      z4 = tmp1 + tmp3;
+      z5 = MULTIPLY(z3 + z4, FIX_1_175875602); // sqrt(2) * c3
+
+      tmp0 = MULTIPLY(tmp0, FIX_0_298631336); // sqrt(2) * (-c1+c3+c5-c7)
+      tmp1 = MULTIPLY(tmp1, FIX_2_053119869); // sqrt(2) * ( c1+c3-c5+c7)
+      tmp2 = MULTIPLY(tmp2, FIX_3_072711026); // sqrt(2) * ( c1+c3+c5-c7)
+      tmp3 = MULTIPLY(tmp3, FIX_1_501321110); // sqrt(2) * ( c1+c3-c5-c7)
+      z1 = MULTIPLY(z1, -FIX_0_899976223); // sqrt(2) * (c7-c3)
+      z2 = MULTIPLY(z2, -FIX_2_562915447); // sqrt(2) * (-c1-c3)
+      z3 = MULTIPLY(z3, -FIX_1_961570560); // sqrt(2) * (-c3-c5)
+      z4 = MULTIPLY(z4, -FIX_0_390180644); // sqrt(2) * (c5-c3)
+
+      z3 += z5;
+      z4 += z5;
+
+      tmp0 += z1 + z3;
+      tmp1 += z2 + z4;
+      tmp2 += z2 + z3;
+      tmp3 += z1 + z4;
+
+      // Final output stage: inputs are tmp10..tmp13, tmp0..tmp3
+
+      workspace[wsptr + DCTSIZE*0] = DESCALE(tmp10 + tmp3, CONST_BITS-PASS1_BITS);
+      workspace[wsptr + DCTSIZE*7] = DESCALE(tmp10 - tmp3, CONST_BITS-PASS1_BITS);
+      workspace[wsptr + DCTSIZE*1] = DESCALE(tmp11 + tmp2, CONST_BITS-PASS1_BITS);
+      workspace[wsptr + DCTSIZE*6] = DESCALE(tmp11 - tmp2, CONST_BITS-PASS1_BITS);
+      workspace[wsptr + DCTSIZE*2] = DESCALE(tmp12 + tmp1, CONST_BITS-PASS1_BITS);
+      workspace[wsptr + DCTSIZE*5] = DESCALE(tmp12 - tmp1, CONST_BITS-PASS1_BITS);
+      workspace[wsptr + DCTSIZE*3] = DESCALE(tmp13 + tmp0, CONST_BITS-PASS1_BITS);
+      workspace[wsptr + DCTSIZE*4] = DESCALE(tmp13 - tmp0, CONST_BITS-PASS1_BITS);
+
+      inptr++;      // advance pointers to next column
+      quantptr++;
+      wsptr++;
+    }
+
+    // Pass 2: process rows from work array, store into output array.
+    // Note that we must descale the results by a factor of 8 == 2**3,
+    // and also undo the PASS1_BITS scaling.
+
+    wsptr = 0;
+    for (ctr = 0; ctr < DCTSIZE; ctr++) {
+      int col = ctr;
+      outptr = output_buf[ctr] + output_col;
+      // Rows of zeroes can be exploited in the same way as we did with columns.
+      // However, the column calculation has created many nonzero AC terms, so
+      // the simplification applies less often (typically 5% to 10% of the time).
+      // On machines with very fast multiplication, it's possible that the
+      // test takes more time than it's worth.  In that case this section
+      // may be commented out.
+      //
+      if (workspace[wsptr + 1] == 0 &&
+          workspace[wsptr + 2] == 0 &&
+          workspace[wsptr + 3] == 0 &&
+          workspace[wsptr + 4] == 0 &&
+          workspace[wsptr + 5] == 0 &&
+          workspace[wsptr + 6] == 0 &&
+          workspace[wsptr + 7] == 0) {
+        // AC terms all zero
+        JSAMPLE dcval = range_limit[DESCALE(workspace[wsptr + 0], PASS1_BITS + 3)
+                                    & RANGE_MASK];
+
+        outptr[0] = dcval;
+        outptr[1] = dcval;
+        outptr[2] = dcval;
+        outptr[3] = dcval;
+        outptr[4] = dcval;
+        outptr[5] = dcval;
+        outptr[6] = dcval;
+        outptr[7] = dcval;
+
+        wsptr += DCTSIZE;   // advance pointer to next row
+        continue;
+      }
+
+      // Even part: reverse the even part of the forward DCT.
+      // The rotator is sqrt(2)*c(-6).
+
+      z2 = workspace[wsptr + 2];
+      z3 = workspace[wsptr + 6];
+
+      z1 = MULTIPLY(z2 + z3, FIX_0_541196100);
+      tmp2 = z1 + MULTIPLY(z3, - FIX_1_847759065);
+      tmp3 = z1 + MULTIPLY(z2, FIX_0_765366865);
+
+      tmp0 = (workspace[wsptr + 0] + workspace[wsptr + 4]) << CONST_BITS;
+      tmp1 = (workspace[wsptr + 0] - workspace[wsptr + 4]) << CONST_BITS;
+
+      tmp10 = tmp0 + tmp3;
+      tmp13 = tmp0 - tmp3;
+      tmp11 = tmp1 + tmp2;
+      tmp12 = tmp1 - tmp2;
+
+      // Odd part per figure 8; the matrix is unitary and hence its
+      // transpose is its inverse.  i0..i3 are y7,y5,y3,y1 respectively.
+
+      tmp0 = workspace[wsptr + 7];
+      tmp1 = workspace[wsptr + 5];
+      tmp2 = workspace[wsptr + 3];
+      tmp3 = workspace[wsptr + 1];
+
+      z1 = tmp0 + tmp3;
+      z2 = tmp1 + tmp2;
+      z3 = tmp0 + tmp2;
+      z4 = tmp1 + tmp3;
+      z5 = MULTIPLY(z3 + z4, FIX_1_175875602); // sqrt(2) * c3
+
+      tmp0 = MULTIPLY(tmp0, FIX_0_298631336); // sqrt(2) * (-c1+c3+c5-c7)
+      tmp1 = MULTIPLY(tmp1, FIX_2_053119869); // sqrt(2) * ( c1+c3-c5+c7)
+      tmp2 = MULTIPLY(tmp2, FIX_3_072711026); // sqrt(2) * ( c1+c3+c5-c7)
+      tmp3 = MULTIPLY(tmp3, FIX_1_501321110); // sqrt(2) * ( c1+c3-c5-c7)
+      z1 = MULTIPLY(z1, - FIX_0_899976223); // sqrt(2) * (c7-c3)
+      z2 = MULTIPLY(z2, - FIX_2_562915447); // sqrt(2) * (-c1-c3)
+      z3 = MULTIPLY(z3, - FIX_1_961570560); // sqrt(2) * (-c3-c5)
+      z4 = MULTIPLY(z4, - FIX_0_390180644); // sqrt(2) * (c5-c3)
+
+      z3 += z5;
+      z4 += z5;
+
+      tmp0 += z1 + z3;
+      tmp1 += z2 + z4;
+      tmp2 += z2 + z3;
+      tmp3 += z1 + z4;
+
+      // Final output stage: inputs are tmp10..tmp13, tmp0..tmp3
+
+      outptr[0] = rangeLimit[DESCALE(tmp10 + tmp3,
+              CONST_BITS+PASS1_BITS + 3) & RANGE_MASK];
+      outptr[7] = range_limit[DESCALE(tmp10 - tmp3,
+              CONST_BITS+PASS1_BITS+3)
+            & RANGE_MASK];
+      outptr[1] = range_limit[DESCALE(tmp11 + tmp2,
+              CONST_BITS+PASS1_BITS+3)
+            & RANGE_MASK];
+      outptr[6] = range_limit[DESCALE(tmp11 - tmp2,
+              CONST_BITS+PASS1_BITS+3)
+            & RANGE_MASK];
+      outptr[2] = range_limit[DESCALE(tmp12 + tmp1,
+              CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
+      outptr[5] = range_limit[DESCALE(tmp12 - tmp1,
+              CONST_BITS+PASS1_BITS+3)
+            & RANGE_MASK];
+      outptr[3] = range_limit[DESCALE(tmp13 + tmp0,
+              CONST_BITS+PASS1_BITS+3)
+            & RANGE_MASK];
+      outptr[4] = range_limit[DESCALE(tmp13 - tmp0,
+              CONST_BITS+PASS1_BITS+3)
+            & RANGE_MASK];
+
+      wsptr += DCTSIZE;   // advance pointer to next row
+    }
+  }*/
+
   /**
    * A port of poppler's IDCT method which in turn is taken from:
    * Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
@@ -648,14 +910,14 @@ class JpegData  {
    * IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
    */
   void _quantizeAndInverse(Int32List quantizationTable,
-                           Int32List zz,
+                           Int32List coefBlock,
                            Uint8List dataOut,
                            Int32List dataIn) {
     Int32List p = dataIn;
 
     // de-quantize
     for (int i = 0; i < 64; i++) {
-      p[i] = (zz[i] * quantizationTable[i]);
+      p[i] = (coefBlock[i] * quantizationTable[i]);
     }
 
     // inverse DCT on rows
@@ -807,7 +1069,7 @@ class JpegData  {
   }
 
   int _progressTotal = 0;
-    int _progress = 0;
+  int _progress = 0;
 
   static const List<int> Y16 = const [
         0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240,
@@ -831,6 +1093,7 @@ class JpegData  {
         3664, 3680, 3696, 3712, 3728, 3744, 3760, 3776, 3792, 3808, 3824, 3840,
         3856, 3872, 3888, 3904, 3920, 3936, 3952, 3968, 3984, 4000, 4016, 4032,
         4048, 4064, 4080];
+
     static const List<int> R_CR = const [
         -2872, -2849, -2827, -2804, -2782, -2760, -2737, -2715, -2692, -2670,
         -2647, -2625, -2603, -2580, -2558, -2535, -2513, -2490, -2468, -2446,
@@ -854,6 +1117,7 @@ class JpegData  {
         2086, 2108, 2131, 2153, 2175, 2198, 2220, 2243, 2265, 2288, 2310, 2332,
         2355, 2377, 2400, 2422, 2445, 2467, 2489, 2512, 2534, 2557, 2579, 2602,
         2624, 2646, 2669, 2691, 2714, 2736, 2759, 2781, 2804, 2826, 2848];
+
     static const List<int> G_CB = const [
         -705, -700, -694, -689, -683, -678, -672, -667, -661, -656, -650, -645,
         -639, -634, -628, -623, -617, -612, -606, -601, -595, -590, -584, -579,
@@ -874,6 +1138,7 @@ class JpegData  {
         484, 490, 495, 501, 506, 512, 517, 523, 528, 534, 539, 545, 550, 556, 561,
         567, 572, 578, 583, 589, 594, 600, 605, 611, 616, 622, 627, 633, 638, 644,
         649, 655, 660, 666, 671, 677, 682, 688, 693, 699];
+
     static const List<int> G_CR = const [
         -1463, -1452, -1440, -1429, -1417, -1406, -1394, -1383, -1372, -1360,
         -1349, -1337, -1326, -1315, -1303, -1292, -1280, -1269, -1257, -1246,
@@ -896,6 +1161,7 @@ class JpegData  {
         1142, 1154, 1165, 1176, 1188, 1199, 1211, 1222, 1234, 1245, 1256, 1268,
         1279, 1291, 1302, 1314, 1325, 1336, 1348, 1359, 1371, 1382, 1393, 1405,
         1416, 1428, 1439, 1451];
+
     static const List<int> B_CB = const [
         -3630, -3601, -3573, -3544, -3516, -3488, -3459, -3431, -3403, -3374,
         -3346, -3318, -3289, -3261, -3233, -3204, -3176, -3148, -3119, -3091,

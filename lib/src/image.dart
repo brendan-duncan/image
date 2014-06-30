@@ -336,18 +336,14 @@ class Image {
   /**
    * Is the given pixel coordinates within the resolution of the image.
    */
-  bool boundsSafe(int x, int y) {
-    return x >= 0 && x < width && y >= 0 && y < height;
-  }
+  bool boundsSafe(int x, int y) =>
+    x >= 0 && x < width && y >= 0 && y < height;
 
   /**
    * Get the pixel from the given [x], [y] coordinate.
    */
   int getPixel(int x, int y) =>
-    boundsSafe(x, y) ?
-      _format == RGBA ?
-      data[y * width + x] :
-      data[y * width + x] | 0xff000000 : 0;
+    boundsSafe(x, y) ? data[y * width + x] : 0;
 
   /**
    * Get the pixel using the given [interpolation] type for non-integer pixel
@@ -408,11 +404,10 @@ class Image {
     double dx = fx - x;
     double dy = fy - y;
 
-    double _cubic(double dx, num Ipp, num Icp, num Inp, num Iap) {
-      return Icp + 0.5 * (dx * (-Ipp + Inp) +
-             dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
-             dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
-    }
+    double _cubic(double dx, num Ipp, num Icp, num Inp, num Iap) =>
+        Icp + 0.5 * (dx * (-Ipp + Inp) +
+        dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
+        dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
 
     int Ipp = getPixel(px, py);
     int Icp = getPixel(x, py);

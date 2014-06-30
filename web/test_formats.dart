@@ -17,7 +17,7 @@ void main() {
 
   // The list of images we'll be decoding, representing a wide range
   // of formats and sub-formats.
-  List<String> images = ['1.webp', '1_webp_ll.webp', '3_webp_a.webp',
+  List<String> images = ['penguins.jpg', '1_webp_ll.webp', '1.webp', '3_webp_a.webp',
                          'puppies.jpg', 'cars.gif', 'trees.png',
                          'animated.png', 'BladeRunner_lossy.webp'];
 
@@ -57,13 +57,17 @@ void main() {
         // If it's a single image, dump the decoded image into the canvas.
         if (anim.length == 1) {
           Image image = anim.frames[0];
-          c.width = image.width;
-          c.height = image.height;
+
+          //Image newImage = copyResize(image, 2000, -1, CUBIC);
+          var newImage = image;
+
+          c.width = newImage.width;
+          c.height = newImage.height;
 
           // Create a buffer that the canvas can draw.
           Html.ImageData d = c.context2D.createImageData(c.width, c.height);
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length, image.getBytes());
+          d.data.setRange(0, d.data.length, newImage.getBytes());
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
 
