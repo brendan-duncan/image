@@ -641,268 +641,7 @@ class JpegData  {
     return lines;
   }
 
-  /*void _quantizeAndInverseTest(Int32List quantizationTable,
-                               Int32List coefBlock,
-                               Uint8List dataOut,
-                               Int32List dataIn) {
-    const CONST_BITS = 13;
-    const PASS1_BITS = 2;
-    const FIX_0_298631336 = 2446;  // FIX(0.298631336)
-    const FIX_0_390180644 = 3196;  // FIX(0.390180644)
-    const FIX_0_541196100 = 4433;  // FIX(0.541196100)
-    const FIX_0_765366865 = 6270;  // FIX(0.765366865)
-    const FIX_0_899976223 = 7373;  // FIX(0.899976223)
-    const FIX_1_175875602 = 9633;  // FIX(1.175875602)
-    const FIX_1_501321110 = 12299; // FIX(1.501321110)
-    const FIX_1_847759065 = 15137; // FIX(1.847759065)
-    const FIX_1_961570560 = 16069; // FIX(1.961570560)
-    const FIX_2_053119869 = 16819; // FIX(2.053119869)
-    const FIX_2_562915447 = 20995; // FIX(2.562915447)
-    const FIX_3_072711026 = 25172; // FIX(3.072711026)
-    const DCTSIZE = 8;
-    const MAXJSAMPLE = 255;
-    const RANGE_MASK = MAXJSAMPLE * 4 + 3; // 2 bits wider than legal samples
-
-    MULTIPLY(v, c) => v * c;
-    DEQUANTIZE(coef, quantval) => coef * quantval;
-    DESCALE(x, n) => _shiftR((x) + (1 << ((n) - 1)), n);
-
-    int tmp0, tmp1, tmp2, tmp3;
-    int tmp10, tmp11, tmp12, tmp13;
-    int z1, z2, z3, z4, z5;
-    int inptr;
-    int quantptr;
-    int wsptr;
-    int outptr;
-    //JSAMPLE *range_limit = IDCT_range_limit(cinfo);
-    int ctr;
-    Int32List workspace = dataIn;
-
-    // Pass 1: process columns from input, store into work array.
-    // Note results are scaled up by sqrt(8) compared to a true IDCT;
-    // furthermore, we scale the results by 2**PASS1_BITS.
-
-    inptr = 0;
-    quantptr = 0;
-    wsptr = 0;
-    for (ctr = DCTSIZE; ctr > 0; ctr--) {
-      // Due to quantization, we will usually find that many of the input
-      // coefficients are zero, especially the AC terms.  We can exploit this
-      // by short-circuiting the IDCT calculation for any column in which all
-      // the AC terms are zero.  In that case each output is equal to the
-      // DC coefficient (with scale factor as needed).
-      // With typical images and quantization tables, half or more of the
-      // column DCT calculations can be simplified this way.
-      if (coefBlock[inptr + DCTSIZE*1] == 0 &&
-          coefBlock[inptr + DCTSIZE*2] == 0 &&
-          coefBlock[inptr + DCTSIZE*3] == 0 &&
-          coefBlock[inptr + DCTSIZE*4] == 0 &&
-          coefBlock[inptr + DCTSIZE*5] == 0 &&
-          coefBlock[inptr + DCTSIZE*6] == 0 &&
-          coefBlock[inptr + DCTSIZE*7] == 0) {
-        // AC terms all zero
-        int dcval = DEQUANTIZE(coefBlock[inptr + DCTSIZE*0],
-            quantizationTable[quantptr + DCTSIZE*0]) << PASS1_BITS;
-
-        workspace[wsptr + DCTSIZE*0] = dcval;
-        workspace[wsptr + DCTSIZE*1] = dcval;
-        workspace[wsptr + DCTSIZE*2] = dcval;
-        workspace[wsptr + DCTSIZE*3] = dcval;
-        workspace[wsptr + DCTSIZE*4] = dcval;
-        workspace[wsptr + DCTSIZE*5] = dcval;
-        workspace[wsptr + DCTSIZE*6] = dcval;
-        workspace[wsptr + DCTSIZE*7] = dcval;
-
-        inptr++;      // advance pointers to next column
-        quantptr++;
-        wsptr++;
-        continue;
-      }
-
-      // Even part: reverse the even part of the forward DCT.
-      // The rotator is sqrt(2)*c(-6).
-
-      z2 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*2], quantizationTable[quantptr + DCTSIZE*2]);
-      z3 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*6], quantizationTable[quantptr + DCTSIZE*6]);
-
-      z1 = MULTIPLY(z2 + z3, FIX_0_541196100);
-      tmp2 = z1 + MULTIPLY(z3, -FIX_1_847759065);
-      tmp3 = z1 + MULTIPLY(z2, FIX_0_765366865);
-
-      z2 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*0], quantizationTable[quantptr + DCTSIZE*0]);
-      z3 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*4], quantizationTable[quantptr + DCTSIZE*4]);
-
-      tmp0 = (z2 + z3) << CONST_BITS;
-      tmp1 = (z2 - z3) << CONST_BITS;
-
-      tmp10 = tmp0 + tmp3;
-      tmp13 = tmp0 - tmp3;
-      tmp11 = tmp1 + tmp2;
-      tmp12 = tmp1 - tmp2;
-
-      // Odd part per figure 8; the matrix is unitary and hence its
-      // transpose is its inverse.  i0..i3 are y7,y5,y3,y1 respectively.
-      tmp0 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*7], quantizationTable[quantptr + DCTSIZE*7]);
-      tmp1 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*5], quantizationTable[quantptr + DCTSIZE*5]);
-      tmp2 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*3], quantizationTable[quantptr + DCTSIZE*3]);
-      tmp3 = DEQUANTIZE(coefBlock[inptr + DCTSIZE*1], quantizationTable[quantptr + DCTSIZE*1]);
-
-      z1 = tmp0 + tmp3;
-      z2 = tmp1 + tmp2;
-      z3 = tmp0 + tmp2;
-      z4 = tmp1 + tmp3;
-      z5 = MULTIPLY(z3 + z4, FIX_1_175875602); // sqrt(2) * c3
-
-      tmp0 = MULTIPLY(tmp0, FIX_0_298631336); // sqrt(2) * (-c1+c3+c5-c7)
-      tmp1 = MULTIPLY(tmp1, FIX_2_053119869); // sqrt(2) * ( c1+c3-c5+c7)
-      tmp2 = MULTIPLY(tmp2, FIX_3_072711026); // sqrt(2) * ( c1+c3+c5-c7)
-      tmp3 = MULTIPLY(tmp3, FIX_1_501321110); // sqrt(2) * ( c1+c3-c5-c7)
-      z1 = MULTIPLY(z1, -FIX_0_899976223); // sqrt(2) * (c7-c3)
-      z2 = MULTIPLY(z2, -FIX_2_562915447); // sqrt(2) * (-c1-c3)
-      z3 = MULTIPLY(z3, -FIX_1_961570560); // sqrt(2) * (-c3-c5)
-      z4 = MULTIPLY(z4, -FIX_0_390180644); // sqrt(2) * (c5-c3)
-
-      z3 += z5;
-      z4 += z5;
-
-      tmp0 += z1 + z3;
-      tmp1 += z2 + z4;
-      tmp2 += z2 + z3;
-      tmp3 += z1 + z4;
-
-      // Final output stage: inputs are tmp10..tmp13, tmp0..tmp3
-
-      workspace[wsptr + DCTSIZE*0] = DESCALE(tmp10 + tmp3, CONST_BITS-PASS1_BITS);
-      workspace[wsptr + DCTSIZE*7] = DESCALE(tmp10 - tmp3, CONST_BITS-PASS1_BITS);
-      workspace[wsptr + DCTSIZE*1] = DESCALE(tmp11 + tmp2, CONST_BITS-PASS1_BITS);
-      workspace[wsptr + DCTSIZE*6] = DESCALE(tmp11 - tmp2, CONST_BITS-PASS1_BITS);
-      workspace[wsptr + DCTSIZE*2] = DESCALE(tmp12 + tmp1, CONST_BITS-PASS1_BITS);
-      workspace[wsptr + DCTSIZE*5] = DESCALE(tmp12 - tmp1, CONST_BITS-PASS1_BITS);
-      workspace[wsptr + DCTSIZE*3] = DESCALE(tmp13 + tmp0, CONST_BITS-PASS1_BITS);
-      workspace[wsptr + DCTSIZE*4] = DESCALE(tmp13 - tmp0, CONST_BITS-PASS1_BITS);
-
-      inptr++;      // advance pointers to next column
-      quantptr++;
-      wsptr++;
-    }
-
-    // Pass 2: process rows from work array, store into output array.
-    // Note that we must descale the results by a factor of 8 == 2**3,
-    // and also undo the PASS1_BITS scaling.
-
-    wsptr = 0;
-    for (ctr = 0; ctr < DCTSIZE; ctr++) {
-      int col = ctr;
-      outptr = output_buf[ctr] + output_col;
-      // Rows of zeroes can be exploited in the same way as we did with columns.
-      // However, the column calculation has created many nonzero AC terms, so
-      // the simplification applies less often (typically 5% to 10% of the time).
-      // On machines with very fast multiplication, it's possible that the
-      // test takes more time than it's worth.  In that case this section
-      // may be commented out.
-      //
-      if (workspace[wsptr + 1] == 0 &&
-          workspace[wsptr + 2] == 0 &&
-          workspace[wsptr + 3] == 0 &&
-          workspace[wsptr + 4] == 0 &&
-          workspace[wsptr + 5] == 0 &&
-          workspace[wsptr + 6] == 0 &&
-          workspace[wsptr + 7] == 0) {
-        // AC terms all zero
-        JSAMPLE dcval = range_limit[DESCALE(workspace[wsptr + 0], PASS1_BITS + 3)
-                                    & RANGE_MASK];
-
-        outptr[0] = dcval;
-        outptr[1] = dcval;
-        outptr[2] = dcval;
-        outptr[3] = dcval;
-        outptr[4] = dcval;
-        outptr[5] = dcval;
-        outptr[6] = dcval;
-        outptr[7] = dcval;
-
-        wsptr += DCTSIZE;   // advance pointer to next row
-        continue;
-      }
-
-      // Even part: reverse the even part of the forward DCT.
-      // The rotator is sqrt(2)*c(-6).
-
-      z2 = workspace[wsptr + 2];
-      z3 = workspace[wsptr + 6];
-
-      z1 = MULTIPLY(z2 + z3, FIX_0_541196100);
-      tmp2 = z1 + MULTIPLY(z3, - FIX_1_847759065);
-      tmp3 = z1 + MULTIPLY(z2, FIX_0_765366865);
-
-      tmp0 = (workspace[wsptr + 0] + workspace[wsptr + 4]) << CONST_BITS;
-      tmp1 = (workspace[wsptr + 0] - workspace[wsptr + 4]) << CONST_BITS;
-
-      tmp10 = tmp0 + tmp3;
-      tmp13 = tmp0 - tmp3;
-      tmp11 = tmp1 + tmp2;
-      tmp12 = tmp1 - tmp2;
-
-      // Odd part per figure 8; the matrix is unitary and hence its
-      // transpose is its inverse.  i0..i3 are y7,y5,y3,y1 respectively.
-
-      tmp0 = workspace[wsptr + 7];
-      tmp1 = workspace[wsptr + 5];
-      tmp2 = workspace[wsptr + 3];
-      tmp3 = workspace[wsptr + 1];
-
-      z1 = tmp0 + tmp3;
-      z2 = tmp1 + tmp2;
-      z3 = tmp0 + tmp2;
-      z4 = tmp1 + tmp3;
-      z5 = MULTIPLY(z3 + z4, FIX_1_175875602); // sqrt(2) * c3
-
-      tmp0 = MULTIPLY(tmp0, FIX_0_298631336); // sqrt(2) * (-c1+c3+c5-c7)
-      tmp1 = MULTIPLY(tmp1, FIX_2_053119869); // sqrt(2) * ( c1+c3-c5+c7)
-      tmp2 = MULTIPLY(tmp2, FIX_3_072711026); // sqrt(2) * ( c1+c3+c5-c7)
-      tmp3 = MULTIPLY(tmp3, FIX_1_501321110); // sqrt(2) * ( c1+c3-c5-c7)
-      z1 = MULTIPLY(z1, - FIX_0_899976223); // sqrt(2) * (c7-c3)
-      z2 = MULTIPLY(z2, - FIX_2_562915447); // sqrt(2) * (-c1-c3)
-      z3 = MULTIPLY(z3, - FIX_1_961570560); // sqrt(2) * (-c3-c5)
-      z4 = MULTIPLY(z4, - FIX_0_390180644); // sqrt(2) * (c5-c3)
-
-      z3 += z5;
-      z4 += z5;
-
-      tmp0 += z1 + z3;
-      tmp1 += z2 + z4;
-      tmp2 += z2 + z3;
-      tmp3 += z1 + z4;
-
-      // Final output stage: inputs are tmp10..tmp13, tmp0..tmp3
-
-      outptr[0] = rangeLimit[DESCALE(tmp10 + tmp3,
-              CONST_BITS+PASS1_BITS + 3) & RANGE_MASK];
-      outptr[7] = range_limit[DESCALE(tmp10 - tmp3,
-              CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
-      outptr[1] = range_limit[DESCALE(tmp11 + tmp2,
-              CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
-      outptr[6] = range_limit[DESCALE(tmp11 - tmp2,
-              CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
-      outptr[2] = range_limit[DESCALE(tmp12 + tmp1,
-              CONST_BITS+PASS1_BITS+3) & RANGE_MASK];
-      outptr[5] = range_limit[DESCALE(tmp12 - tmp1,
-              CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
-      outptr[3] = range_limit[DESCALE(tmp13 + tmp0,
-              CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
-      outptr[4] = range_limit[DESCALE(tmp13 - tmp0,
-              CONST_BITS+PASS1_BITS+3)
-            & RANGE_MASK];
-
-      wsptr += DCTSIZE;   // advance pointer to next row
-    }
-  }*/
-
+  static Uint8List dctClip;
   /**
    * A port of poppler's IDCT method which in turn is taken from:
    * Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
@@ -914,6 +653,32 @@ class JpegData  {
                            Uint8List dataOut,
                            Int32List dataIn) {
     Int32List p = dataIn;
+
+    const int dctClipOffset = 256;
+    const int dctClipLength = 768;
+    if (dctClip == null) {
+      dctClip = new Uint8List(dctClipLength);
+      int i;
+      for (i = -256; i < 0; ++i) {
+        dctClip[dctClipOffset + i] = 0;
+      }
+      for (i = 0; i < 256; ++i) {
+        dctClip[dctClipOffset + i] = i;
+      }
+      for (i = 256; i < 512; ++i) {
+        dctClip[dctClipOffset + i] = 255;
+      }
+    }
+
+    // IDCT constants (20.12 fixed point format)
+    const int COS_1 = 4017;  // cos(pi/16)
+    const int SIN_1 = 799;   // sin(pi/16)
+    const int COS_3 = 3406;  // cos(3*pi/16)
+    const int SIN_3 = 2276;  // sin(3*pi/16)
+    const int COS_6 = 1567;  // cos(6*pi/16)
+    const int SIN_6 = 3784;  // sin(6*pi/16)
+    const int SQRT_2 = 5793;  // sqrt(2)
+    const int SQRT_1D2 = 2896; // sqrt(2) / 2
 
     // de-quantize
     for (int i = 0; i < 64; i++) {
@@ -931,18 +696,25 @@ class JpegData  {
           p[5 + row] == 0 &&
           p[6 + row] == 0 &&
           p[7 + row] == 0) {
-        int t = _shiftR((Jpeg.dctSqrt2 * p[0 + row] + 512), 10);
-        p.fillRange(row, row + 8, t);
+        int t = _shiftR((SQRT_2 * p[0 + row] + 512), 10);
+        p[row + 0] = t;
+        p[row + 1] = t;
+        p[row + 2] = t;
+        p[row + 3] = t;
+        p[row + 4] = t;
+        p[row + 5] = t;
+        p[row + 6] = t;
+        p[row + 7] = t;
         continue;
       }
 
       // stage 4
-      int v0 = _shiftR((Jpeg.dctSqrt2 * p[0 + row] + 128), 8);
-      int v1 = _shiftR((Jpeg.dctSqrt2 * p[4 + row] + 128), 8);
+      int v0 = _shiftR((SQRT_2 * p[0 + row] + 128), 8);
+      int v1 = _shiftR((SQRT_2 * p[4 + row] + 128), 8);
       int v2 = p[2 + row];
       int v3 = p[6 + row];
-      int v4 = _shiftR((Jpeg.dctSqrt1d2 * (p[1 + row] - p[7 + row]) + 128), 8);
-      int v7 = _shiftR((Jpeg.dctSqrt1d2 * (p[1 + row] + p[7 + row]) + 128), 8);
+      int v4 = _shiftR((SQRT_1D2 * (p[1 + row] - p[7 + row]) + 128), 8);
+      int v7 = _shiftR((SQRT_1D2 * (p[1 + row] + p[7 + row]) + 128), 8);
       int v5 = _shiftL(p[3 + row], 4);
       int v6 = _shiftL(p[5 + row], 4);
 
@@ -950,8 +722,8 @@ class JpegData  {
       int t = _shiftR((v0 - v1 + 1), 1);
       v0 = _shiftR((v0 + v1 + 1), 1);
       v1 = t;
-      t = _shiftR((v2 * Jpeg.dctSin6 + v3 * Jpeg.dctCos6 + 128), 8);
-      v2 = _shiftR((v2 * Jpeg.dctCos6 - v3 * Jpeg.dctSin6 + 128), 8);
+      t = _shiftR((v2 * SIN_6 + v3 * COS_6 + 128), 8);
+      v2 = _shiftR((v2 * COS_6 - v3 * SIN_6 + 128), 8);
       v3 = t;
       t = _shiftR((v4 - v6 + 1), 1);
       v4 = _shiftR((v4 + v6 + 1), 1);
@@ -967,11 +739,11 @@ class JpegData  {
       t = _shiftR((v1 - v2 + 1), 1);
       v1 = _shiftR((v1 + v2 + 1), 1);
       v2 = t;
-      t = _shiftR((v4 * Jpeg.dctSin3 + v7 * Jpeg.dctCos3 + 2048), 12);
-      v4 = _shiftR((v4 * Jpeg.dctCos3 - v7 * Jpeg.dctSin3 + 2048), 12);
+      t = _shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
+      v4 = _shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
       v7 = t;
-      t = _shiftR((v5 * Jpeg.dctSin1 + v6 * Jpeg.dctCos1 + 2048), 12);
-      v5 = _shiftR((v5 * Jpeg.dctCos1 - v6 * Jpeg.dctSin1 + 2048), 12);
+      t = _shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
+      v5 = _shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
       v6 = t;
 
       // stage 1
@@ -997,7 +769,7 @@ class JpegData  {
           p[5 * 8 + col] == 0 &&
           p[6 * 8 + col] == 0 &&
           p[7 * 8 + col] == 0) {
-        int t = _shiftR((Jpeg.dctSqrt2 * dataIn[i] + 8192), 14);
+        int t = _shiftR((SQRT_2 * dataIn[i] + 8192), 14);
         p[0 * 8 + col] = t;
         p[1 * 8 + col] = t;
         p[2 * 8 + col] = t;
@@ -1010,12 +782,12 @@ class JpegData  {
       }
 
       // stage 4
-      int v0 = _shiftR((Jpeg.dctSqrt2 * p[0 * 8 + col] + 2048), 12);
-      int v1 = _shiftR((Jpeg.dctSqrt2 * p[4 * 8 + col] + 2048), 12);
+      int v0 = _shiftR((SQRT_2 * p[0 * 8 + col] + 2048), 12);
+      int v1 = _shiftR((SQRT_2 * p[4 * 8 + col] + 2048), 12);
       int v2 = p[2 * 8 + col];
       int v3 = p[6 * 8 + col];
-      int v4 = _shiftR((Jpeg.dctSqrt1d2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048), 12);
-      int v7 = _shiftR((Jpeg.dctSqrt1d2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048), 12);
+      int v4 = _shiftR((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048), 12);
+      int v7 = _shiftR((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048), 12);
       int v5 = p[3 * 8 + col];
       int v6 = p[5 * 8 + col];
 
@@ -1023,8 +795,8 @@ class JpegData  {
       int t = _shiftR((v0 - v1 + 1), 1);
       v0 = _shiftR((v0 + v1 + 1), 1);
       v1 = t;
-      t = _shiftR((v2 * Jpeg.dctSin6 + v3 * Jpeg.dctCos6 + 2048), 12);
-      v2 = _shiftR((v2 * Jpeg.dctCos6 - v3 * Jpeg.dctSin6 + 2048), 12);
+      t = _shiftR((v2 * SIN_6 + v3 * COS_6 + 2048), 12);
+      v2 = _shiftR((v2 * COS_6 - v3 * SIN_6 + 2048), 12);
       v3 = t;
       t = _shiftR((v4 - v6 + 1), 1);
       v4 = _shiftR((v4 + v6 + 1), 1);
@@ -1040,11 +812,11 @@ class JpegData  {
       t = _shiftR((v1 - v2 + 1), 1);
       v1 = _shiftR((v1 + v2 + 1), 1);
       v2 = t;
-      t = _shiftR((v4 * Jpeg.dctSin3 + v7 * Jpeg.dctCos3 + 2048), 12);
-      v4 = _shiftR((v4 * Jpeg.dctCos3 - v7 * Jpeg.dctSin3 + 2048), 12);
+      t = _shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
+      v4 = _shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
       v7 = t;
-      t = _shiftR((v5 * Jpeg.dctSin1 + v6 * Jpeg.dctCos1 + 2048), 12);
-      v5 = _shiftR((v5 * Jpeg.dctCos1 - v6 * Jpeg.dctSin1 + 2048), 12);
+      t = _shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
+      v5 = _shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
       v6 = t;
 
       // stage 1
@@ -1060,13 +832,11 @@ class JpegData  {
 
     // convert to 8-bit integers
     for (int i = 0; i < 64; ++i) {
-      dataOut[i] = _clamp(128 + _shiftR((p[i] + 8), 4));
+      dataOut[i] = dctClip[(dctClipOffset + 128 + _shiftR((p[i] + 8), 4))];
     }
   }
 
-  int _clamp(int i) {
-    return i < 0 ? 0 : i > 255 ? 255 : i;
-  }
+  int _clamp(int i) => i < 0 ? 0 : i > 255 ? 255 : i;
 
   int _progressTotal = 0;
   int _progress = 0;

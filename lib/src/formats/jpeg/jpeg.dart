@@ -23,15 +23,6 @@ class Jpeg {
       63, 63, 63, 63, 63, 63, 63, 63, // extra entries for safety in decoder
       63, 63, 63, 63, 63, 63, 63, 63 ];
 
-  static const int dctCos1  = 4017;  // cos(pi/16)
-  static const int dctSin1  = 799;   // sin(pi/16)
-  static const int dctCos3  = 3406;  // cos(3*pi/16)
-  static const int dctSin3  = 2276;  // sin(3*pi/16)
-  static const int dctCos6  = 1567;  // cos(6*pi/16)
-  static const int dctSin6  = 3784;  // sin(6*pi/16)
-  static const int dctSqrt2 = 5793;  // sqrt(2)
-  static const int dctSqrt1d2 = 2896; // sqrt(2) / 2
-
   static const int DCTSIZE = 8; // The basic DCT block is 8x8 samples
   static const int DCTSIZE2 = 64;  // DCTSIZE squared; # of elements in a block
   static const int NUM_QUANT_TBLS = 4; // Quantization tables are numbered 0..3
