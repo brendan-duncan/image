@@ -363,6 +363,9 @@ class JpegData  {
 
   int _nextMarker() {
     int c = 0;
+    if (input.isEOS) {
+      return c;
+    }
 
     do {
       do {
