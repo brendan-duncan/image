@@ -228,21 +228,21 @@ class JpegData  {
         component4 = components[3];
 
         for (int y = 0; y < height; y++) {
-          component1Line = component1['lines'][(y * component1['scaleY'] * scaleY)];
-          component2Line = component2['lines'][(y * component2['scaleY'] * scaleY)];
-          component3Line = component3['lines'][(y * component3['scaleY'] * scaleY)];
-          component4Line = component4['lines'][(y * component4['scaleY'] * scaleY)];
+          component1Line = component1['lines'][(y * component1['scaleY'] * scaleY).toInt()];
+          component2Line = component2['lines'][(y * component2['scaleY'] * scaleY).toInt()];
+          component3Line = component3['lines'][(y * component3['scaleY'] * scaleY).toInt()];
+          component4Line = component4['lines'][(y * component4['scaleY'] * scaleY).toInt()];
           for (int x = 0; x < width; x++) {
             if (!colorTransform) {
-              C = component1Line[(x * component1['scaleX'] * scaleX)];
-              M = component2Line[(x * component2['scaleX'] * scaleX)];
-              Ye = component3Line[(x * component3['scaleX'] * scaleX)];
-              K = component4Line[(x * component4['scaleX'] * scaleX)];
+              C = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
+              M = component2Line[(x * component2['scaleX'] * scaleX).toInt()];
+              Ye = component3Line[(x * component3['scaleX'] * scaleX).toInt()];
+              K = component4Line[(x * component4['scaleX'] * scaleX).toInt()];
             } else {
-              Y = component1Line[(x * component1['scaleX'] * scaleX)];
-              Cb = component2Line[(x * component2['scaleX'] * scaleX)];
-              Cr = component3Line[(x * component3['scaleX'] * scaleX)];
-              K = component4Line[(x * component4['scaleX'] * scaleX)];
+              Y = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
+              Cb = component2Line[(x * component2['scaleX'] * scaleX).toInt()];
+              Cr = component3Line[(x * component3['scaleX'] * scaleX).toInt()];
+              K = component4Line[(x * component4['scaleX'] * scaleX).toInt()];
 
               C = 255 - _clamp((Y + 1.402 * (Cr - 128)).toInt());
               M = 255 - _clamp((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128)).toInt());
