@@ -36,6 +36,7 @@ class JpegData  {
         case Jpeg.M_SOS: // SOS (Start of Scan)
           hasSOS = true;
           break;
+        default:
       }
 
       marker = _nextMarker();
@@ -227,27 +228,38 @@ class JpegData  {
         component3 = components[2];
         component4 = components[3];
 
+        var sx1 = component1['scaleX'] * scaleX;
+        var sx2 = component2['scaleX'] * scaleX;
+        var sx3 = component3['scaleX'] * scaleX;
+        var sx4 = component4['scaleX'] * scaleX;
+        var sy1 = component1['scaleY'] * scaleY;
+        var sy2 = component2['scaleY'] * scaleY;
+        var sy3 = component3['scaleY'] * scaleY;
+        var sy4 = component4['scaleY'] * scaleY;
+
         for (int y = 0; y < height; y++) {
-          component1Line = component1['lines'][(y * component1['scaleY'] * scaleY).toInt()];
-          component2Line = component2['lines'][(y * component2['scaleY'] * scaleY).toInt()];
-          component3Line = component3['lines'][(y * component3['scaleY'] * scaleY).toInt()];
-          component4Line = component4['lines'][(y * component4['scaleY'] * scaleY).toInt()];
+          component1Line = component1['lines'][(y * sy1).toInt()];
+          component2Line = component2['lines'][(y * sy2).toInt()];
+          component3Line = component3['lines'][(y * sy3).toInt()];
+          component4Line = component4['lines'][(y * sy4).toInt()];
           for (int x = 0; x < width; x++) {
             if (!colorTransform) {
-              C = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
-              M = component2Line[(x * component2['scaleX'] * scaleX).toInt()];
-              Ye = component3Line[(x * component3['scaleX'] * scaleX).toInt()];
-              K = component4Line[(x * component4['scaleX'] * scaleX).toInt()];
+              C = component1Line[(x * sx1).toInt()];
+              M = component2Line[(x * sx2).toInt()];
+              Ye = component3Line[(x * sx3).toInt()];
+              K = component4Line[(x * sx4).toInt()];
             } else {
-              Y = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
-              Cb = component2Line[(x * component2['scaleX'] * scaleX).toInt()];
-              Cr = component3Line[(x * component3['scaleX'] * scaleX).toInt()];
-              K = component4Line[(x * component4['scaleX'] * scaleX).toInt()];
+              Y = component1Line[(x * sx1).toInt()];
+              Cb = component2Line[(x * sx2).toInt()];
+              Cr = component3Line[(x * sx3).toInt()];
+              K = component4Line[(x * sx4).toInt()];
 
               C = 255 - _clamp((Y + 1.402 * (Cr - 128)).toInt());
-              M = 255 - _clamp((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128)).toInt());
+              M = 255 - _clamp((Y - 0.3441363 * (Cb - 128) -
+                                    0.71413636 * (Cr - 128)).toInt());
               Ye = 255 - _clamp((Y + 1.772 * (Cb - 128)).toInt());
             }
+
             data[offset++] = C;
             data[offset++] = M;
             data[offset++] = Ye;
@@ -258,6 +270,7 @@ class JpegData  {
       default:
         throw new ImageException('Unsupported color mode');
     }
+
     return data;
   }
 
