@@ -53,7 +53,7 @@ class JpegData  {
       return null;
     }
 
-    JpegInfo info;
+    JpegInfo info = new JpegInfo();
 
     bool hasSOF = false;
     bool hasSOS = false;
