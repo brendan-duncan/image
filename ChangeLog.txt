@@ -1,3 +1,7 @@
+v 1.1.22 - July 31, 2014
+
+- Various bug fixes
+
 v 1.1.21 - June 19, 2014
 
 - Add drawImage function
