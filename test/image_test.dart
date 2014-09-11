@@ -4,6 +4,7 @@ import 'dart:io' as Io;
 import 'package:image/image.dart';
 import 'package:unittest/unittest.dart';
 
+part 'color_test.dart';
 part 'exr_test.dart';
 part 'filter_test.dart';
 part 'font_test.dart';
@@ -17,6 +18,7 @@ part 'tiff_test.dart';
 part 'webp_test.dart';
 
 void main() {
+  defineColorTests();
   defineJpegTests();
   definePngTests();
   defineGifTests();

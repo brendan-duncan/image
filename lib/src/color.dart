@@ -1,5 +1,65 @@
 part of image;
 
+/**
+ * Image pixel colors are instantiated as an int object rather than an instance
+ * of the Color class in order to reduce object allocations. Image pixels are
+ * stored in 32-bit RGBA format (8 bits per channel). Internally in dart, this
+ * will be stored in a "small integer" on 64-bit machines, or a
+ * "medium integer" on 32-bit machines. In Javascript, this will be stored
+ * in a 64-bit double.
+ *
+ * The Color class is used as a namespace for color operations, in an attempt
+ * to create a cleaner API for color operations.
+ */
+class Color {
+  /**
+   * Create a color value from RGB values in the range [0, 255].
+   */
+  static int fromRgb(int red, int green, int blue) {
+    return getColor(red, green, blue);
+  }
+
+  /**
+   * Create a color value from RGBA values in the range [0, 255].
+   */
+  static int fromRgba(int red, int green, int blue, int alpha) {
+    return getColor(red, green, blue, alpha);
+  }
+
+  /**
+   * Create a color value from HSL values in the range [0, 1].
+   */
+  static int fromHsl(num hue, num saturation, num lightness) {
+    var rgb = hslToRGB(hue, saturation, lightness);
+    return getColor(rgb[0], rgb[1], rgb[2]);
+  }
+
+  /**
+   * Create a color value from HSV values in the range [0, 1].
+   */
+  static int fromHsv(num hue, num saturation, num value) {
+    var rgb = hsvToRGB(hue, saturation, value);
+    return getColor(rgb[0], rgb[1], rgb[2]);
+  }
+
+  /**
+   * Create a color value from XYZ values.
+   */
+  static int fromXyz(num x, num y, num z) {
+    var rgb = xyzToRGB(x, y, z);
+    return getColor(rgb[0], rgb[1], rgb[2]);
+  }
+
+  /**
+   * Create a color value from CIE-L*ab values.
+   */
+  static int fromLab(num L, num a, num b) {
+    var rgb = labToRGB(L, a, b);
+    return getColor(rgb[0], rgb[1], rgb[2]);
+  }
+}
+
+
 /// Red channel of a color.
 const int RED = 0;
 /// Green channel of a color.
@@ -11,20 +71,21 @@ const int ALPHA = 3;
 /// Luminance of a color.
 const int LUMINANCE = 4;
 
-
 int _clamp(int x, int a, int b) => x.clamp(a, b);
 
 int _clamp255(int x) => x.clamp(0, 255);
 
 /**
  * Get the color with the given [r], [g], [b], and [a] components.
+ *
+ * The channel order of a uint32 encoded color is RGBA, to be consistent
+ * with the image data of a canvas html element.
  */
-int getColor(int r, int g, int b, [int a = 255]) {
-  return (_clamp255(a) << 24) |
-         (_clamp255(b) << 16) |
-         (_clamp255(g) << 8) |
-         _clamp255(r);
-}
+int getColor(int r, int g, int b, [int a = 255]) =>
+    (_clamp255(a) << 24) |
+    (_clamp255(b) << 16) |
+    (_clamp255(g) << 8) |
+    _clamp255(r);
 
 /**
  * Get the [channel] from the [color].
@@ -107,15 +168,15 @@ int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
     a *= (fraction / 255.0);
   }
 
-  int sr = (getRed(src) * a).toInt();
-  int sg = (getGreen(src) * a).toInt();
-  int sb = (getBlue(src) * a).toInt();
-  int sa = (getAlpha(src) * a).toInt();
+  int sr = (getRed(src) * a).round();
+  int sg = (getGreen(src) * a).round();
+  int sb = (getBlue(src) * a).round();
+  int sa = (getAlpha(src) * a).round();
 
-  int dr = (getRed(dst) * (1.0 - a)).toInt();
-  int dg = (getGreen(dst) * (1.0 - a)).toInt();
-  int db = (getBlue(dst) * (1.0 - a)).toInt();
-  int da = (getAlpha(dst) * (1.0 - a)).toInt();
+  int dr = (getRed(dst) * (1.0 - a)).round();
+  int dg = (getGreen(dst) * (1.0 - a)).round();
+  int db = (getBlue(dst) * (1.0 - a)).round();
+  int da = (getAlpha(dst) * (1.0 - a)).round();
 
   return getColor(sr + dr, sg + dg, sb + db, sa + da);
 }
@@ -127,44 +188,169 @@ int getLuminance(int color) {
   int r = getRed(color);
   int g = getGreen(color);
   int b = getBlue(color);
-  return (0.299 * r + 0.587 * g + 0.114 * b).toInt();
+  return (0.299 * r + 0.587 * g + 0.114 * b).round();
 }
 
 /**
  * Returns the luminance (grayscale) value of the color.
  */
-int getLuminanceRGB(int r, int g, int b) {
-  return (0.299 * r + 0.587 * g + 0.114 * b).toInt();
-}
-
+int getLuminanceRGB(int r, int g, int b) =>
+  (0.299 * r + 0.587 * g + 0.114 * b).round();
 
 /**
- * Convert Lab color to XYZ.
+ * Convert an HSL color to RGB, where h is specified in normalized degrees
+ * [0, 1] (where 1 is 360-degrees); s and l are in the range [0, 1].
+ * Returns a list [r, g, b] with values in the range [0, 255].
  */
-List<int> labToXYZ(int l, int a, int b) {
-  var x, y, z;
-  y = (l + 16) / 116;
-  x = y + (a / 500);
-  z = y - (b / 200);
+List<int> hslToRGB(num hue, num saturation, num lightness) {
+  if (saturation == 0) {
+    int gray = (lightness * 255.0).toInt();
+    return [gray, gray, gray];
+  }
+
+  hue2rgb(num p, num q, num t) {
+    if (t < 0.0) {
+      t += 1.0;
+    }
+    if (t > 1) {
+      t -= 1.0;
+    }
+    if (t < 1.0 / 6.0) {
+      return p + (q - p) * 6.0 * t;
+    }
+    if (t < 1.0 / 2.0) {
+      return q;
+    }
+    if (t < 2.0 / 3.0) {
+      return p + (q - p) * (2.0/3.0 - t) * 6.0;
+    }
+    return p;
+  }
+
+  var q = lightness < 0.5
+          ? lightness * (1.0 + saturation)
+          : lightness + saturation - lightness * saturation;
+  var p = 2.0 * lightness - q;
+
+  var r = hue2rgb(p, q, hue + 1.0 / 3.0);
+  var g = hue2rgb(p, q, hue);
+  var b = hue2rgb(p, q, hue - 1.0 / 3.0);
+
+  return [(r * 255.0).round(), (g * 255.0).round(), (b * 255.0).round()];
+}
+
+/**
+ * Convert an HSV color to RGB, where h is specified in normalized degrees
+ * [0, 1] (where 1 is 360-degrees); s and l are in the range [0, 1].
+ * Returns a list [r, g, b] with values in the range [0, 255].
+ */
+List<int> hsvToRGB(num hue, num saturation, num brightness) {
+  if (saturation == 0) {
+    var gray = (brightness * 255.0).round();
+    return [gray, gray, gray];
+  }
+
+  double h = (hue - hue.floor()) * 6.0;
+  double f = h - h.floor();
+  double p = brightness * (1.0 - saturation);
+  double q = brightness * (1.0 - saturation * f);
+  double t = brightness * (1.0 - (saturation * (1.0 - f)));
+
+  switch (h.toInt()) {
+    case 0:
+      return [(brightness * 255.0).round(),
+              (t * 255.0).round(),
+              (p * 255.0).round()];
+    case 1:
+      return [(q * 255.0).round(),
+              (brightness * 255.0).round(),
+              (p * 255.0).round()];
+    case 2:
+      return [(p * 255.0).round(),
+              (brightness * 255.0).round(),
+              (t * 255.0).round()];
+    case 3:
+      return [(p * 255.0).round(),
+              (q * 255.0).round(),
+              (brightness * 255.0).round()];
+    case 4:
+      return [(t * 255.0).round(),
+              (p * 255.0).round(),
+              (brightness * 255.0).round()];
+    case 5:
+      return [(brightness * 255.0).round(),
+              (p * 255.0).round(),
+              (q * 255.0).round()];
+    default:
+      throw new ImageException('invalid hue');
+  }
+  return null;
+}
+
+/**
+ * Convert an RGB color to HSL, where r, g and b are in the range [0, 255].
+ * Returns a list [h, s, l] with values in the range [0, 1].
+ */
+List<double> rgbToHSL(num r, num g, num b) {
+  r /= 255.0;
+  g /= 255.0;
+  b /= 255.0;
+  var max = Math.max(r, Math.max(g, b));
+  var min = Math.min(r, Math.min(g, b));
+  var h;
+  var s;
+  var l = (max + min) / 2.0;
+
+  if (max == min){
+    return [0.0, 0.0, l];
+  }
+
+  var d = max - min;
+
+  s = l > 0.5 ? d / (2.0 - max - min) : d / (max + min);
+
+  if (max == r) {
+    h = (g - b) / d + (g < b ? 6.0 : 0.0);
+  } else if (max == g) {
+    h = (b - r) / d + 2.0;
+  } else {
+    h = (r - g) / d + 4.0;
+  }
+
+  h /= 6.0;
+
+  return [h, s, l];
+}
+
+/**
+ * Convert a CIE-L*ab color to XYZ.
+ */
+List<int> labToXYZ(num l, num a, num b) {
+  var y = (l + 16.0) / 116.0;
+  var x = y + (a / 500.0);
+  var z = y - (b / 200.0);
   if (Math.pow(x, 3) > 0.008856) {
     x = Math.pow(x, 3);
   } else {
-    x = (x - 16 / 116) / 7.787;
+    x = (x - 16.0 / 116) / 7.787;
   }
   if (Math.pow(y, 3) > 0.008856) {
     y = Math.pow(y, 3);
   } else {
-    y = (y - 16 / 116) / 7.787;
+    y = (y - 16.0 / 116.0) / 7.787;
   }
   if (Math.pow(z, 3) > 0.008856) {
     z = Math.pow(z, 3);
   } else {
-    z = (z - 16 / 116) / 7.787;
+    z = (z - 16.0 / 116.0) / 7.787;
   }
 
   return [(x * 95.047).toInt(), (y * 100.0).toInt(), (z * 108.883).toInt()];
 }
 
+/**
+ * Convert an XYZ color to RGB.
+ */
 List<int> xyzToRGB(num x, num y, num z) {
   var b, g, r;
   x /= 100;
@@ -194,15 +380,22 @@ List<int> xyzToRGB(num x, num y, num z) {
           (b * 255).toInt().clamp(0, 255)];
 }
 
-List<int> cmykToRGB(int c, int m, int y, int k) {
-  int r = (65535 - (c * (255 - k) + (k << 8))) >> 8;
-  int g = (65535 - (m * (255 - k) + (k << 8))) >> 8;
-  int b = (65535 - (y * (255 - k) + (k << 8))) >> 8;
-  return [r.clamp(0, 255), g.clamp(0, 255), b.clamp(0, 255)];
+/**
+ * Convert a CMYK color to RGB, where c, m, y, k values are in the range
+ * [0, 255]. Returns a list [r, g, b] with values in the range [0, 255].
+ */
+List<int> cmykToRGB(num c, num m, num y, num k) {
+  c /= 255.0;
+  m /= 255.0;
+  y /= 255.0;
+  k /= 255.0;
+  return [(255.0 * (1.0 - c) * (1.0 - k)).round(),
+          (255.0 * (1.0 - m) * (1.0 - k)).round(),
+          (255.0 * (1.0 - y) * (1.0 - k)).round()];
 }
 
 /**
- * Convert Lab color to RGB.
+ * Convert a CIE-L*ab color to RGB.
  */
 List<int> labToRGB(num l, num a, num b) {
   const double ref_x = 95.047;
@@ -248,19 +441,19 @@ List<int> labToRGB(num l, num a, num b) {
   double B = x * 0.0557 + y * (-0.2040) + z * 1.0570;
 
   if (R > 0.0031308) {
-    R = 1.055 * (Math.pow(R, 1 / 2.4)) - 0.055;
+    R = 1.055 * (Math.pow(R, 1.0 / 2.4)) - 0.055;
   } else {
     R = 12.92 * R;
   }
 
   if (G > 0.0031308) {
-    G = 1.055 * (Math.pow(G, 1 / 2.4)) - 0.055;
+    G = 1.055 * (Math.pow(G, 1.0 / 2.4)) - 0.055;
   } else {
     G = 12.92 * G;
   }
 
   if (B > 0.0031308) {
-    B = 1.055 * (Math.pow(B, 1 / 2.4)) - 0.055;
+    B = 1.055 * (Math.pow(B, 1.0 / 2.4)) - 0.055;
   } else {
     B = 12.92 * B;
   }
