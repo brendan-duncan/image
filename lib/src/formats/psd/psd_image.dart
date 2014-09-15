@@ -93,7 +93,7 @@ class PsdImage extends DecodeInfo {
     }
 
     mergedImage = new Image(width, height);
-    mergedImage.fill(backgroundColor);
+    mergedImage.fill(0);
 
     Uint8List pixels = mergedImage.getBytes();
 
@@ -125,9 +125,9 @@ class PsdImage extends DecodeInfo {
 
             _blend(ar, ag, ab, aa, br, bg, bb, ba, blendMode, opacity,
                    pixels, di);
-
-            di += 4;
           }
+
+          di += 4;
         }
       }
     }
@@ -262,8 +262,7 @@ class PsdImage extends DecodeInfo {
     r = ((ar * (1.0 - da)) + (r * da)).toInt();
     g = ((ag * (1.0 - da)) + (g * da)).toInt();
     b = ((ab * (1.0 - da)) + (b * da)).toInt();
-    a = aa;//Math.max(aa, bb);
-    //a = ((aa * (1.0 - da)) + (a * da)).toInt();
+    a = ((aa * (1.0 - da)) + (a * da)).toInt();
 
     pixels[di++] = r;
     pixels[di++] = g;
@@ -530,11 +529,25 @@ class PsdImage extends DecodeInfo {
       for (int x = 0; x < width; ++x, si += ns) {
         switch (colorMode) {
           case COLORMODE_RGB:
+            int xi = di;
             pixels[di++] = _ch(channels[0].data, si, ns);
             pixels[di++] = _ch(channels[1].data, si, ns);
             pixels[di++] = _ch(channels[2].data, si, ns);
             pixels[di++] = numChannels >= 4 ?
                            _ch(channels[-1].data, si, ns) : 255;
+
+            var r = pixels[xi];
+            var g = pixels[xi + 1];
+            var b = pixels[xi + 2];
+            var a = pixels[xi + 3];
+            if (a != 0) {
+              // Photoshop/Gimp blend the image against white (argh!),
+              // which is not what we want for compositing. Invert the blend
+              // operation to try and undo the damage.
+              pixels[xi] = (((r + a) - 255) * 255) ~/ a;
+              pixels[xi + 1] = (((g + a) - 255) * 255) ~/ a;
+              pixels[xi + 2] = (((b + a) - 255) * 255) ~/ a;
+            }
             break;
           case COLORMODE_LAB:
             int L = _ch(channels[0].data, si, ns) * 100 >> 8;
