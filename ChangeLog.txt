@@ -1,11 +1,18 @@
+v 1.1.23 - September 15, 2014
+
+- Fix alpha for PSD images.
+
+
 v 1.1.22 - July 31, 2014
 
 - Various bug fixes
+
 
 v 1.1.21 - June 19, 2014
 
 - Add drawImage function
 - Update XML dependency to 2.0.0
+
 
 v 1.1.20 - April 26, 2014
 
