@@ -1,10 +1,10 @@
 part of image;
 
-class PvrTcPacket {
+class PvrtcPacket {
   Uint32List rawData;
   int index;
 
-  PvrTcPacket(this.rawData);
+  PvrtcPacket(this.rawData);
 
   void setIndex(int i) {
     index = i << 1;
@@ -60,37 +60,59 @@ class PvrTcPacket {
 
   static BITSCALE_3_TO_8(x) => x << 5;
 
-  PvrTcColorRgb getColorRgbA() {
+  static BITSCALE_8_TO_4_FLOOR(x) => x >> 4;
+
+  static BITSCALE_8_TO_5_FLOOR(x) => x >> 3;
+
+  static BITSCALE_8_TO_5_CEIL(x) => (x / 8.0).ceil();
+
+  void setColorARgb(PvrtcColorRgb c) {
+    int r = BITSCALE_8_TO_5_FLOOR(c.r);
+    int g = BITSCALE_8_TO_5_FLOOR(c.g);
+    int b = BITSCALE_8_TO_4_FLOOR(c.b);
+    colorA = r << 9 | g << 4 | b;
+    colorAIsOpaque = 1;
+  }
+
+  void setColorBRgb(PvrtcColorRgb c) {
+    int r = BITSCALE_8_TO_5_CEIL(c.r);
+    int g = BITSCALE_8_TO_5_CEIL(c.g);
+    int b = BITSCALE_8_TO_5_CEIL(c.b);
+    colorB = r << 10 | g << 5 | b;
+    colorBIsOpaque = 1;
+  }
+
+  PvrtcColorRgb getColorRgbA() {
     if(colorAIsOpaque != 0) {
       var r = colorA >> 9;
       var g = colorA >> 4 & 0x1f;
       var b = colorA & 0xf;
-      return new PvrTcColorRgb(BITSCALE_5_TO_8(r),
+      return new PvrtcColorRgb(BITSCALE_5_TO_8(r),
                                BITSCALE_5_TO_8(g),
                                BITSCALE_4_TO_8(b));
     } else {
       var r = (colorA >> 7) & 0xf;
       var g = (colorA >> 3) & 0xf;
       var b = colorA & 7;
-      return new PvrTcColorRgb(BITSCALE_4_TO_8(r),
+      return new PvrtcColorRgb(BITSCALE_4_TO_8(r),
                           BITSCALE_4_TO_8(g),
                           BITSCALE_3_TO_8(b));
     }
   }
 
-  PvrTcColorRgb getColorRgbB() {
+  PvrtcColorRgb getColorRgbB() {
     if (colorBIsOpaque != 0) {
       var r = colorB >> 10;
       var g = colorB >> 5 & 0x1f;
       var b = colorB & 0x1f;
-      return new PvrTcColorRgb(BITSCALE_5_TO_8(r),
+      return new PvrtcColorRgb(BITSCALE_5_TO_8(r),
                  BITSCALE_5_TO_8(g),
                  BITSCALE_5_TO_8(b));
     } else {
       var r = colorB >> 8 & 0xf;
       var g = colorB >> 4 & 0xf;
       var b = colorB & 0xf;
-      return new PvrTcColorRgb(BITSCALE_4_TO_8(r),
+      return new PvrtcColorRgb(BITSCALE_4_TO_8(r),
                  BITSCALE_4_TO_8(g),
                  BITSCALE_4_TO_8(b));
     }

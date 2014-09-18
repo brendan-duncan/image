@@ -1,7 +1,45 @@
 part of image;
 
 class PvrtcEncoder {
-  Uint8List EncodeRgb4Bpp(Image bitmap) {
+  List<int> encodePvr(Image bitmap) {
+    OutputBuffer output = new OutputBuffer();
+
+    const PVR_TYPE_PVRTC2 = 0x18;
+    const PVR_TYPE_PVRTC4 = 0x19;
+
+    // PVRV2 Header
+    int size = 44; // sizeof PVR header
+    int mipmapCount = 1;
+    int flags = PVR_TYPE_PVRTC4;
+    int texdatasize = 0;
+    int bpp = 4;
+    int rmask = 0;
+    int gmask = 0;
+    int bmask = 0;
+    int amask = 0;
+    int magic = 0x21525650;
+    int numtex = 1;
+
+    output.writeUint32(size);
+    output.writeUint32(bitmap.height);
+    output.writeUint32(bitmap.width);
+    output.writeUint32(mipmapCount);
+    output.writeUint32(flags);
+    output.writeUint32(texdatasize);
+    output.writeUint32(bpp);
+    output.writeUint32(rmask);
+    output.writeUint32(gmask);
+    output.writeUint32(bmask);
+    output.writeUint32(amask);
+    output.writeUint32(magic);
+    output.writeUint32(numtex);
+
+    output.writeBytes(encodeRgb4Bpp(bitmap));
+
+    return output.getBytes();
+  }
+
+  List<int> encodeRgb4Bpp(Image bitmap) {
     if (bitmap.width != bitmap.height) {
       throw new ImageException('PVRTC requires a square image (width == height).');
     }
@@ -16,29 +54,32 @@ class PvrtcEncoder {
 
     var bitmapData = bitmap.getBytes();
 
-    var packetData = new Uint32List((bitmap.width * bitmap.height) ~/ 2);
-    var packet = new PvrTcPacket(packetData);
+    var packetData = new Uint32List((bitmap.width * bitmap.height) ~/ 4);
+    var packet = new PvrtcPacket(packetData);
+
+    int maxIndex = 0;
 
     for (int y = 0; y < blocks; ++y) {
       for (int x = 0; x < blocks; ++x) {
         var cbb = _calculateBoundingBox(bitmapData, size, x, y);
 
         packet.setIndex(_getMortonNumber(x, y));
+        maxIndex = Math.max(packet.index, maxIndex);
 
         packet.usePunchthroughAlpha = 0;
-        packet.colorA = cbb.min;
-        packet.colorB = cbb.max;
+        packet.setColorARgb(cbb.min);
+        packet.setColorBRgb(cbb.max);
       }
     }
 
-    var p0 = new PvrTcPacket(packetData);
-    var p1 = new PvrTcPacket(packetData);
-    var p2 = new PvrTcPacket(packetData);
-    var p3 = new PvrTcPacket(packetData);
+    var p0 = new PvrtcPacket(packetData);
+    var p1 = new PvrtcPacket(packetData);
+    var p2 = new PvrtcPacket(packetData);
+    var p3 = new PvrtcPacket(packetData);
 
     for(int y = 0; y < blocks; ++y) {
       for(int x = 0; x < blocks; ++x) {
-        const factor = PvrTcPacket.BILINEAR_FACTORS;
+        const factor = PvrtcPacket.BILINEAR_FACTORS;
         int factorIndex = 0;
         final pixelIndex = y * 4 * size + x * 4;
 
@@ -58,6 +99,10 @@ class PvrtcEncoder {
             p1.setIndex(_getMortonNumber(x1, y0));
             p2.setIndex(_getMortonNumber(x0, y1));
             p3.setIndex(_getMortonNumber(x1, y1));
+            maxIndex = Math.max(p0.index, maxIndex);
+            maxIndex = Math.max(p1.index, maxIndex);
+            maxIndex = Math.max(p2.index, maxIndex);
+            maxIndex = Math.max(p3.index, maxIndex);
 
             var ca = p0.getColorRgbA() * factor[factorIndex][0] +
                      p1.getColorRgbA() * factor[factorIndex][1] +
@@ -76,7 +121,7 @@ class PvrtcEncoder {
               int b = bitmapData[pi + 2];
 
               var d = cb - ca;
-              var p = new PvrTcColorRgb(r * 16, g * 16, b * 16);
+              var p = new PvrtcColorRgb(r * 16, g * 16, b * 16);
               var v = p - ca;
 
               int projection = v % d;
@@ -93,32 +138,30 @@ class PvrtcEncoder {
         }
 
         packet.setIndex(_getMortonNumber(x, y));
+        maxIndex = Math.max(packet.index, maxIndex);
+
         packet.modulationData = modulationData;
       }
     }
 
-    return new Uint8List.view(packetData.buffer);
+    return new Uint8List.view(packetData.buffer).sublist(0, maxIndex * 2 + 8);
   }
 
   int _rotateRight(int n, int d) {
     return (n >> d) | (n << (32 - d));
   }
 
-  Uint8List EncodeRgba4Bpp(Image image) {
-    return null;
-  }
-
-  static PvrTcColorRgbBoundingBox _calculateBoundingBox(Uint8List data,
+  static PvrtcColorRgbBoundingBox _calculateBoundingBox(Uint8List data,
                                                         int size, int blockX,
                                                         int blockY) {
     int pi = blockY * 4 * size + blockX * 4;
 
     _pixel(i) {
       i = pi + i * 4;
-      return new PvrTcColorRgb(data[i], data[i + 1], data[i + 2]);
+      return new PvrtcColorRgb(data[i], data[i + 1], data[i + 2]);
     }
 
-    var cbb = new PvrTcColorRgbBoundingBox(_pixel(0), _pixel(0));
+    var cbb = new PvrtcColorRgbBoundingBox(_pixel(0), _pixel(0));
     cbb.add(_pixel(1));
     cbb.add(_pixel(2));
     cbb.add(_pixel(3));

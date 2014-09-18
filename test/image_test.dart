@@ -13,12 +13,13 @@ part 'half_test.dart';
 part 'jpeg_test.dart';
 part 'png_test.dart';
 part 'psd_test.dart';
+part 'pvrtc_test.dart';
 part 'tga_test.dart';
 part 'tiff_test.dart';
 part 'webp_test.dart';
 
 void main() {
-  defineColorTests();
+  /*defineColorTests();
   defineJpegTests();
   definePngTests();
   defineGifTests();
@@ -29,5 +30,6 @@ void main() {
   defineFilterTests();
   defineHalfTests();
   defineExrTests();
-  definePsdTests();
+  definePsdTests();*/
+  definePvrtcTests();
 }
