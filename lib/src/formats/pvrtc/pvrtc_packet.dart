@@ -1,13 +1,23 @@
 part of image;
 
+/**
+ * Ported from Jeremy Lim's PRTC encoder/decoder,
+ * https://bitbucket.org/jthlim/pvrtccompressor
+ */
 class PvrtcPacket {
   Uint32List rawData;
   int index;
 
-  PvrtcPacket(this.rawData);
+  PvrtcPacket(TypedData data)
+      : rawData = new Uint32List.view(data.buffer);
+
+  void setBlock(int x, int y) => setIndex(_getMortonNumber(x, y));
 
   void setIndex(int i) {
+    // A PvrtcPacket uses 2 uint32 values, so get the physical index
+    // from the logical index by multiplying by 2.
     index = i << 1;
+    // Pull in the values from the raw data.
     _update();
   }
 
@@ -66,7 +76,7 @@ class PvrtcPacket {
 
   static BITSCALE_8_TO_5_CEIL(x) => (x / 8.0).ceil();
 
-  void setColorARgb(PvrtcColorRgb c) {
+  void setColorA(PvrtcColor c) {
     int r = BITSCALE_8_TO_5_FLOOR(c.r);
     int g = BITSCALE_8_TO_5_FLOOR(c.g);
     int b = BITSCALE_8_TO_4_FLOOR(c.b);
@@ -74,7 +84,7 @@ class PvrtcPacket {
     colorAIsOpaque = 1;
   }
 
-  void setColorBRgb(PvrtcColorRgb c) {
+  void setColorB(PvrtcColor c) {
     int r = BITSCALE_8_TO_5_CEIL(c.r);
     int g = BITSCALE_8_TO_5_CEIL(c.g);
     int b = BITSCALE_8_TO_5_CEIL(c.b);
@@ -82,37 +92,37 @@ class PvrtcPacket {
     colorBIsOpaque = 1;
   }
 
-  PvrtcColorRgb getColorRgbA() {
+  PvrtcColor getColorA() {
     if(colorAIsOpaque != 0) {
       var r = colorA >> 9;
       var g = colorA >> 4 & 0x1f;
       var b = colorA & 0xf;
-      return new PvrtcColorRgb(BITSCALE_5_TO_8(r),
-                               BITSCALE_5_TO_8(g),
-                               BITSCALE_4_TO_8(b));
+      return new PvrtcColor(BITSCALE_5_TO_8(r),
+                            BITSCALE_5_TO_8(g),
+                            BITSCALE_4_TO_8(b));
     } else {
       var r = (colorA >> 7) & 0xf;
       var g = (colorA >> 3) & 0xf;
       var b = colorA & 7;
-      return new PvrtcColorRgb(BITSCALE_4_TO_8(r),
-                          BITSCALE_4_TO_8(g),
-                          BITSCALE_3_TO_8(b));
+      return new PvrtcColor(BITSCALE_4_TO_8(r),
+                            BITSCALE_4_TO_8(g),
+                            BITSCALE_3_TO_8(b));
     }
   }
 
-  PvrtcColorRgb getColorRgbB() {
+  PvrtcColor getColorB() {
     if (colorBIsOpaque != 0) {
       var r = colorB >> 10;
       var g = colorB >> 5 & 0x1f;
       var b = colorB & 0x1f;
-      return new PvrtcColorRgb(BITSCALE_5_TO_8(r),
+      return new PvrtcColor(BITSCALE_5_TO_8(r),
                  BITSCALE_5_TO_8(g),
                  BITSCALE_5_TO_8(b));
     } else {
       var r = colorB >> 8 & 0xf;
       var g = colorB >> 4 & 0xf;
       var b = colorB & 0xf;
-      return new PvrtcColorRgb(BITSCALE_4_TO_8(r),
+      return new PvrtcColor(BITSCALE_4_TO_8(r),
                  BITSCALE_4_TO_8(g),
                  BITSCALE_4_TO_8(b));
     }
@@ -138,6 +148,30 @@ class PvrtcPacket {
     colorAIsOpaque = (x >> 15) & 1;
     colorB = (x >> 16) & BITS_15;
     colorBIsOpaque = (x >> 31) & 1;
+  }
+
+  // Pack 2 16-bit indices into a 32-bit Morton code.
+  // From: http://and-what-happened.blogspot.com/2011/08/fast-2d-and-3d-hilbert-curves-and.html
+  static int _getMortonNumber(int index1, int index2) {
+    index1 &= 0x0000ffff;
+    index2 &= 0x0000ffff;
+    index1 |= (index1 << 8);
+    index2 |= (index2 << 8);
+    index1 &= 0x00ff00ff;
+    index2 &= 0x00ff00ff;
+    index1 |= (index1 << 4);
+    index2 |= (index2 << 4);
+    index1 &= 0x0f0f0f0f;
+    index2 &= 0x0f0f0f0f;
+    index1 |= (index1 << 2);
+    index2 |= (index2 << 2);
+    index1 &= 0x33333333;
+    index2 &= 0x33333333;
+    index1 |= (index1 << 1);
+    index2 |= (index2 << 1);
+    index1 &= 0x55555555;
+    index2 &= 0x55555555;
+    return index1 | (index2 << 1);
   }
 
   static const BITS_14 = (1 << 14) - 1;

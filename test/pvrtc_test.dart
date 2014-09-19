@@ -8,11 +8,15 @@ void definePvrtcTests() {
       image.fill(getColor(100, 200, 255));
 
       // Encode the image to PVRTC
-      List<int> pvrtc = new PvrtcEncoder().encodeRgb4Bpp(image);
-      print(pvrtc.length);
+      var pvrtc = new PvrtcEncoder().encodeRgb4Bpp(image);
+
+      Image decoded = new PvrtcDecoder().decodeRgb4Bpp(image.width, image.height, pvrtc);
+      new Io.File('out/pvrtc/test.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(encodePng(decoded));
 
       List<int> pvr = new PvrtcEncoder().encodePvr(image);
-      new Io.File('out/test.pvr')
+      new Io.File('out/pvrtc/test.pvr')
           ..createSync(recursive: true)
           ..writeAsBytesSync(pvr);
     });
