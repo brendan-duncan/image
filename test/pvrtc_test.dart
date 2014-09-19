@@ -12,7 +12,9 @@ void definePvrtcTests() {
       print(pvrtc.length);
 
       List<int> pvr = new PvrtcEncoder().encodePvr(image);
-      new Io.File('out/test.pvr').writeAsBytesSync(pvr);
+      new Io.File('out/test.pvr')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(pvr);
     });
   });
 }
