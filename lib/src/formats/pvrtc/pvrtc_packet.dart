@@ -1,7 +1,7 @@
 part of image;
 
 /**
- * Ported from Jeffrey Lim's PRTC encoder/decoder,
+ * Ported from Jeffrey Lim's PVRTC encoder/decoder,
  * https://bitbucket.org/jthlim/pvrtccompressor
  */
 class PvrtcPacket {
