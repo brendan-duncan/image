@@ -83,6 +83,7 @@ part 'src/formats/psd/psd_image.dart';
 part 'src/formats/psd/psd_layer.dart';
 part 'src/formats/psd/psd_layer_data.dart';
 part 'src/formats/psd/psd_mask.dart';
+part 'src/formats/pvrtc/pvrtc_bit_utility.dart';
 part 'src/formats/pvrtc/pvrtc_color.dart';
 part 'src/formats/pvrtc/pvrtc_color_bounding_box.dart';
 part 'src/formats/pvrtc/pvrtc_decoder.dart';

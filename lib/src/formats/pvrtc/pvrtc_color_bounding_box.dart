@@ -1,12 +1,14 @@
 part of image;
 
 class PvrtcColorBoundingBox {
-  PvrtcColor min;
-  PvrtcColor max;
+  PvrtcColorRgb min;
+  PvrtcColorRgb max;
 
-  PvrtcColorBoundingBox(this.min, this.max);
+  PvrtcColorBoundingBox(PvrtcColorRgb min, PvrtcColorRgb max)
+      : this.min = new PvrtcColorRgb.from(min)
+      , this.max = new PvrtcColorRgb.from(max);
 
-  void add(PvrtcColor c) {
+  void add(PvrtcColorRgb c) {
     if (c.r < min.r) {
       min.r = c.r;
     }

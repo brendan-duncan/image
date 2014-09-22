@@ -64,67 +64,55 @@ class PvrtcPacket {
     colorData = _getColorData();
   }
 
-  static BITSCALE_5_TO_8(x) => x << 3;
-
-  static BITSCALE_4_TO_8(x) => x << 4;
-
-  static BITSCALE_3_TO_8(x) => x << 5;
-
-  static BITSCALE_8_TO_4_FLOOR(x) => x >> 4;
-
-  static BITSCALE_8_TO_5_FLOOR(x) => x >> 3;
-
-  static BITSCALE_8_TO_5_CEIL(x) => (x / 8.0).ceil();
-
-  void setColorA(PvrtcColor c) {
-    int r = BITSCALE_8_TO_5_FLOOR(c.r);
-    int g = BITSCALE_8_TO_5_FLOOR(c.g);
-    int b = BITSCALE_8_TO_4_FLOOR(c.b);
+  void setColorA(PvrtcColorRgb c) {
+    int r = BitUtility.BITSCALE_8_TO_5_FLOOR[c.r];
+    int g = BitUtility.BITSCALE_8_TO_5_FLOOR[c.g];
+    int b = BitUtility.BITSCALE_8_TO_4_FLOOR[c.b];
     colorA = r << 9 | g << 4 | b;
     colorAIsOpaque = 1;
   }
 
-  void setColorB(PvrtcColor c) {
-    int r = BITSCALE_8_TO_5_CEIL(c.r);
-    int g = BITSCALE_8_TO_5_CEIL(c.g);
-    int b = BITSCALE_8_TO_5_CEIL(c.b);
+  void setColorB(PvrtcColorRgb c) {
+    int r = BitUtility.BITSCALE_8_TO_5_CEIL[c.r];
+    int g = BitUtility.BITSCALE_8_TO_5_CEIL[c.g];
+    int b = BitUtility.BITSCALE_8_TO_5_CEIL[c.b];
     colorB = r << 10 | g << 5 | b;
     colorBIsOpaque = 1;
   }
 
-  PvrtcColor getColorA() {
-    if(colorAIsOpaque != 0) {
+  PvrtcColorRgb getColorA() {
+    if (colorAIsOpaque != 0) {
       var r = colorA >> 9;
       var g = colorA >> 4 & 0x1f;
       var b = colorA & 0xf;
-      return new PvrtcColor(BITSCALE_5_TO_8(r),
-                            BITSCALE_5_TO_8(g),
-                            BITSCALE_4_TO_8(b));
+      return new PvrtcColorRgb(BitUtility.BITSCALE_5_TO_8[r],
+          BitUtility.BITSCALE_5_TO_8[g],
+          BitUtility.BITSCALE_4_TO_8[b]);
     } else {
       var r = (colorA >> 7) & 0xf;
       var g = (colorA >> 3) & 0xf;
       var b = colorA & 7;
-      return new PvrtcColor(BITSCALE_4_TO_8(r),
-                            BITSCALE_4_TO_8(g),
-                            BITSCALE_3_TO_8(b));
+      return new PvrtcColorRgb(BitUtility.BITSCALE_4_TO_8[r],
+          BitUtility.BITSCALE_4_TO_8[g],
+          BitUtility.BITSCALE_3_TO_8[b]);
     }
   }
 
-  PvrtcColor getColorB() {
+  PvrtcColorRgb getColorB() {
     if (colorBIsOpaque != 0) {
       var r = colorB >> 10;
       var g = colorB >> 5 & 0x1f;
       var b = colorB & 0x1f;
-      return new PvrtcColor(BITSCALE_5_TO_8(r),
-                 BITSCALE_5_TO_8(g),
-                 BITSCALE_5_TO_8(b));
+      return new PvrtcColorRgb(BitUtility.BITSCALE_5_TO_8[r],
+          BitUtility.BITSCALE_5_TO_8[g],
+          BitUtility.BITSCALE_5_TO_8[b]);
     } else {
       var r = colorB >> 8 & 0xf;
       var g = colorB >> 4 & 0xf;
       var b = colorB & 0xf;
-      return new PvrtcColor(BITSCALE_4_TO_8(r),
-                 BITSCALE_4_TO_8(g),
-                 BITSCALE_4_TO_8(b));
+      return new PvrtcColorRgb(BitUtility.BITSCALE_4_TO_8[r],
+          BitUtility.BITSCALE_4_TO_8[g],
+          BitUtility.BITSCALE_4_TO_8[b]);
     }
   }
 

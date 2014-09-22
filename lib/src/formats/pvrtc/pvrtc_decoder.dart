@@ -6,8 +6,7 @@ part of image;
  */
 class PvrtcDecoder {
   Image decodeRgb4Bpp(int width, int height, TypedData data) {
-    var image = new Image(width, height, Image.RGB);
-    var result = image.getBytes();
+    var result = new Image(width, height, Image.RGB);
 
     final int blocks = width ~/ 4;
     final int blockMask = blocks - 1;
@@ -17,7 +16,7 @@ class PvrtcDecoder {
     final p1 = new PvrtcPacket(data);
     final p2 = new PvrtcPacket(data);
     final p3 = new PvrtcPacket(data);
-    final c = new PvrtcColor();
+    final c = new PvrtcColorRgb();
     const factors = PvrtcPacket.BILINEAR_FACTORS;
     const weights = PvrtcPacket.WEIGHTS;
 
@@ -61,12 +60,9 @@ class PvrtcDecoder {
             c.g = (ca.g * w[0] + cb.g * w[1]) >> 7;
             c.b = (ca.b * w[0] + cb.b * w[1]) >> 7;
 
-            int pi = pyi + (px + x * 4);
+            int pi = (pyi + (px + x * 4));
 
-            result[pi] = c.r;
-            result[pi + 1] = c.g;
-            result[pi + 2] = c.b;
-            result[pi + 3] = 255;
+            result[pi] = getColor(c.r, c.g, c.b, 255);
 
             mod >>= 2;
             factorIndex++;
@@ -75,6 +71,6 @@ class PvrtcDecoder {
       }
     }
 
-    return image;
+    return result;
   }
 }

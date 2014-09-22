@@ -17,38 +17,33 @@ class PvrtcEncoder {
 
     var pvrtc = encodeRgb4Bpp(bitmap);
 
-    // Currently encoding to PVR2 format version.
-
-    const PVR_TYPE_PVRTC2 = 0x18;
-    const PVR_TYPE_PVRTC4 = 0x19;
-    const PVR2_MAGIC = 0x21525650;
-
-    // PVR2 Header
-    int size = 44; // sizeof PVR header
+    int version = 55727696;
+    int flags = 0;
+    int pixelFormat = PVR_RGB_4BPP;
+    int channelOrder = 0;
+    int colorSpace = 0;
+    int channelType = 0;
+    int height = bitmap.height;
+    int width = bitmap.width;
+    int depth = 1;
+    int numSurfaces = 1;
+    int numFaces = 1;
     int mipmapCount = 1;
-    int flags = PVR_TYPE_PVRTC4;
-    int texdatasize = pvrtc.length;
-    int bpp = 8;
-    int rmask = 255;
-    int gmask = 255;
-    int bmask = 255;
-    int amask = 255;
-    int magic = PVR2_MAGIC;
-    int numtex = 1;
+    int metaDataSize = 0;
 
-    output.writeUint32(size);
-    output.writeUint32(bitmap.height);
-    output.writeUint32(bitmap.width);
-    output.writeUint32(mipmapCount);
+    output.writeUint32(version);
     output.writeUint32(flags);
-    output.writeUint32(texdatasize);
-    output.writeUint32(bpp);
-    output.writeUint32(rmask);
-    output.writeUint32(gmask);
-    output.writeUint32(bmask);
-    output.writeUint32(amask);
-    output.writeUint32(magic);
-    output.writeUint32(numtex);
+    output.writeUint32(pixelFormat);
+    output.writeUint32(channelOrder);
+    output.writeUint32(colorSpace);
+    output.writeUint32(channelType);
+    output.writeUint32(height);
+    output.writeUint32(width);
+    output.writeUint32(depth);
+    output.writeUint32(numSurfaces);
+    output.writeUint32(numFaces);
+    output.writeUint32(mipmapCount);
+    output.writeUint32(metaDataSize);
 
     output.writeBytes(pvrtc);
 
@@ -60,7 +55,7 @@ class PvrtcEncoder {
       throw new ImageException('PVRTC requires a square image.');
     }
 
-    if (!_isPowerOfTwo(bitmap.width)) {
+    if (!BitUtility.isPowerOf2(bitmap.width)) {
       throw new ImageException('PVRTC requires a power-of-two sized image.');
     }
 
@@ -71,23 +66,18 @@ class PvrtcEncoder {
     var bitmapData = bitmap.getBytes();
 
     // Allocate enough data for encoding the image.
-    var outputData = new Uint8List(bitmap.width * bitmap.height);
+    var outputData = new Uint8List((bitmap.width * bitmap.height) ~/ 2);
     var packet = new PvrtcPacket(outputData);
     var p0 = new PvrtcPacket(outputData);
     var p1 = new PvrtcPacket(outputData);
     var p2 = new PvrtcPacket(outputData);
     var p3 = new PvrtcPacket(outputData);
 
-    int maxIndex = 0;
-
     for (int y = 0; y < blocks; ++y) {
       for (int x = 0; x < blocks; ++x) {
-        var cbb = _calculateBoundingBox(bitmapData, size, x, y);
-
         packet.setBlock(x, y);
-        maxIndex = Math.max(packet.index, maxIndex);
-
         packet.usePunchthroughAlpha = 0;
+        var cbb = _calculateBoundingBox(bitmap, x, y);
         packet.setColorA(cbb.min);
         packet.setColorB(cbb.max);
       }
@@ -98,7 +88,7 @@ class PvrtcEncoder {
     for (int y = 0; y < blocks; ++y) {
       for (int x = 0; x < blocks; ++x) {
         int factorIndex = 0;
-        final pixelIndex = y * 4 * size + x * 4;
+        final pixelIndex = (y * 4 * size + x * 4) * 4;
 
         int modulationData = 0;
 
@@ -116,10 +106,6 @@ class PvrtcEncoder {
             p1.setBlock(x1, y0);
             p2.setBlock(x0, y1);
             p3.setBlock(x1, y1);
-            maxIndex = Math.max(p0.index, maxIndex);
-            maxIndex = Math.max(p1.index, maxIndex);
-            maxIndex = Math.max(p2.index, maxIndex);
-            maxIndex = Math.max(p3.index, maxIndex);
 
             var ca = p0.getColorA() * factors[factorIndex][0] +
                      p1.getColorA() * factors[factorIndex][1] +
@@ -131,32 +117,36 @@ class PvrtcEncoder {
                      p2.getColorB() * factors[factorIndex][2] +
                      p3.getColorB() * factors[factorIndex][3];
 
-            if (ca != cb) {
-              int pi = pixelIndex + ((py * size + px) * 4);
-              int r = bitmapData[pi];
-              int g = bitmapData[pi + 1];
-              int b = bitmapData[pi + 2];
+            int pi = pixelIndex + ((py * size + px) * 4);
+            int r = bitmapData[pi];
+            int g = bitmapData[pi + 1];
+            int b = bitmapData[pi + 2];
 
-              var d = cb - ca;
-              var p = new PvrtcColor(r * 16, g * 16, b * 16);
-              var v = p - ca;
+            var d = cb - ca;
+            var p = new PvrtcColorRgb(r * 16, g * 16, b * 16);
+            var v = p - ca;
 
-              int projection = v % d;
-              int length = Math.sqrt(d % d).toInt();
-
-              int weight = (16 * projection ~/ length).clamp(0, 15);
-              modulationData |= MODULATION_LUT[weight];
+            // PVRTC uses weightings of 0, 3/8, 5/8 and 1
+            // The boundaries for these are 3/16, 1/2 (=8/16), 13/16
+            int projection = v.dotProd(d) * 16;
+            int lengthSquared = d.dotProd(d);
+            if (projection > 3 * lengthSquared) {
+              modulationData++;
+            }
+            if (projection > 8 * lengthSquared) {
+              modulationData++;
+            }
+            if (projection > 13 * lengthSquared) {
+              modulationData++;
             }
 
-            modulationData = _rotateRight(modulationData, 2);
+            modulationData = BitUtility.rotateRight(modulationData, 2);
 
             factorIndex++;
           }
         }
 
         packet.setBlock(x, y);
-        maxIndex = Math.max(packet.index, maxIndex);
-
         packet.modulationData = modulationData;
       }
     }
@@ -164,16 +154,14 @@ class PvrtcEncoder {
     return outputData;
   }
 
-  int _rotateRight(int n, int d) => (n >> d) | (n << (32 - d));
-
-  static PvrtcColorBoundingBox _calculateBoundingBox(Uint8List data,
-                                                     int size, int blockX,
+  static PvrtcColorBoundingBox _calculateBoundingBox(Image bitmap, int blockX,
                                                      int blockY) {
-    int pi = blockY * 4 * size + blockX * 4;
+    int size = bitmap.width;
+    int pi = (blockY * 4 * size + blockX * 4);
 
     _pixel(i) {
-      i = pi + i * 4;
-      return new PvrtcColor(data[i], data[i + 1], data[i + 2]);
+      int c = bitmap[pi + i];
+      return new PvrtcColorRgb(getRed(c), getGreen(c), getBlue(c));
     }
 
     var cbb = new PvrtcColorBoundingBox(_pixel(0), _pixel(0));
@@ -204,8 +192,6 @@ class PvrtcEncoder {
     packet.modulationData = packetData[index];
     packet.colorData = packetData[index + 1];
   }
-
-  static bool _isPowerOfTwo(x) => (x & (x - 1)) == 0;
 
   static const MODULATION_LUT =
       const [ 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3 ];

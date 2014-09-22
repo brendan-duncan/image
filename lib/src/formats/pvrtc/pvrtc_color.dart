@@ -1,21 +1,28 @@
 part of image;
 
-class PvrtcColor {
+class PvrtcColorRgb {
   int r;
   int g;
   int b;
 
-  PvrtcColor([this.r = 0, this.g = 0, this.b = 0]);
+  PvrtcColorRgb([this.r = 0, this.g = 0, this.b = 0]);
 
-  PvrtcColor operator *(int x) =>
-    new PvrtcColor(r * x, g * x, b * x);
+  PvrtcColorRgb.from(PvrtcColorRgb other)
+      : r = other.r
+      , g = other.g
+      , b = other.b;
 
-  PvrtcColor operator +(PvrtcColor x) =>
-      new PvrtcColor(r + x.r, g + x.g, b + x.b);
+  PvrtcColorRgb operator *(int x) =>
+    new PvrtcColorRgb(r * x, g * x, b * x);
 
-  PvrtcColor operator -(PvrtcColor x) =>
-      new PvrtcColor(r - x.r, g - x.g, b - x.b);
+  PvrtcColorRgb operator +(PvrtcColorRgb x) =>
+      new PvrtcColorRgb(r + x.r, g + x.g, b + x.b);
 
-  int operator %(PvrtcColor x) =>
+  PvrtcColorRgb operator -(PvrtcColorRgb x) =>
+      new PvrtcColorRgb(r - x.r, g - x.g, b - x.b);
+
+  int operator %(PvrtcColorRgb x) =>
       r * x.r + g * x.g + b * x.b;
+
+  int dotProd(PvrtcColorRgb x) => r * x.r + g * x.g + b * x.b;
 }
