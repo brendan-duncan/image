@@ -15,11 +15,33 @@ class PvrtcEncoder {
   Uint8List encodePvr(Image bitmap, {int format: PVR_AUTO}) {
     OutputBuffer output = new OutputBuffer();
 
-    var pvrtc = encodeRgb4Bpp(bitmap);
+    var pvrtc;
+    if (format == PVR_AUTO) {
+       if (bitmap.format == Image.RGB) {
+        pvrtc = encodeRgb4Bpp(bitmap);
+        format = PVR_RGB_4BPP;
+      } else {
+        //pvrtc = encodeRgba4Bpp(bitmap);
+        //format = PVR_RGBA_4BPP;
+        pvrtc = encodeRgb4Bpp(bitmap);
+        format = PVR_RGB_4BPP;
+      }
+    } else if (format == PVR_RGB_2BPP) {
+      //pvrtc = encodeRgb2Bpp(bitmap);
+      pvrtc = encodeRgb4Bpp(bitmap);
+    } else if (format == PVR_RGBA_2BPP) {
+      //pvrtc = encodeRgba2Bpp(bitmap);
+      pvrtc = encodeRgb4Bpp(bitmap);
+    } else if (format == PVR_RGB_4BPP) {
+      pvrtc = encodeRgb4Bpp(bitmap);
+    } else if (format == PVR_RGBA_4BPP) {
+      //pvrtc = encodeRgba4Bpp(bitmap);
+      pvrtc = encodeRgb4Bpp(bitmap);
+    }
 
     int version = 55727696;
     int flags = 0;
-    int pixelFormat = PVR_RGB_4BPP;
+    int pixelFormat = format;
     int channelOrder = 0;
     int colorSpace = 0;
     int channelType = 0;
