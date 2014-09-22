@@ -73,7 +73,7 @@ class PvrtcPacket {
   }
 
   void setColorRgbaA(PvrtcColorRgba c) {
-    int a = BitUtility.BITSCALE_8_TO_3_FLOOR[c.r];
+    int a = BitUtility.BITSCALE_8_TO_3_FLOOR[c.a];
     if (a == 7) {
       int r = BitUtility.BITSCALE_8_TO_5_FLOOR[c.r];
       int g = BitUtility.BITSCALE_8_TO_5_FLOOR[c.g];
@@ -98,7 +98,7 @@ class PvrtcPacket {
   }
 
   void setColorRgbaB(PvrtcColorRgba c) {
-    int a = BitUtility.BITSCALE_8_TO_3_CEIL[c.r];
+    int a = BitUtility.BITSCALE_8_TO_3_CEIL[c.a];
     if (a == 7) {
       int r = BitUtility.BITSCALE_8_TO_5_CEIL[c.r];
       int g = BitUtility.BITSCALE_8_TO_5_CEIL[c.g];
