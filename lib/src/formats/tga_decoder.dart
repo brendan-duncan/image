@@ -19,7 +19,7 @@ class TgaDecoder extends Decoder {
     if (header[2] != 2) {
       return false;
     }
-    if (header[16] != 24) {
+    if (header[16] != 24 && header[16] != 32) {
       return false;
     }
 
@@ -34,13 +34,14 @@ class TgaDecoder extends Decoder {
     if (header[2] != 2) {
       return null;
     }
-    if (header[16] != 24) {
+    if (header[16] != 24 && header[16] != 32) {
       return null;
     }
 
     info.width = (header[12] & 0xff) | ((header[13] & 0xff) << 8);
     info.height = (header[14] & 0xff) | ((header[15] & 0xff) << 8);
     info.imageOffset = input.offset;
+    info.bpp = header[16];
 
     return info;
   }
@@ -62,7 +63,8 @@ class TgaDecoder extends Decoder {
         int b = input.readByte();
         int g = input.readByte();
         int r = input.readByte();
-        image.setPixel(x, y, getColor(r, g, b));
+        int a = info.bpp == 32 ? input.readByte() : 255;
+        image.setPixel(x, y, getColor(r, g, b, a));
       }
     }
 

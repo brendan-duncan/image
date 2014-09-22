@@ -6,4 +6,7 @@ class TgaInfo extends DecodeInfo {
 
   /// Offset in the input file the image data starts at.
   int imageOffset;
+
+  /// Bits per pixel.
+  int bpp;
 }
