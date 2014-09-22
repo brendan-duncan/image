@@ -36,8 +36,8 @@ void defineTgaTests() {
 
       // Decode the image from file.
       Image image = new TgaDecoder().decodeImage(bytes);
-      expect(image.width, equals(100));
-      expect(image.height, equals(100));
+      expect(image.width, equals(128));
+      expect(image.height, equals(128));
 
       // Encode the image as a tga
       List<int> tga = new TgaEncoder().encodeImage(image);
@@ -48,8 +48,8 @@ void defineTgaTests() {
 
       // Decode the encoded image, make sure it's the same as the original.
       Image image2 = new TgaDecoder().decodeImage(tga);
-      expect(image2.width, equals(100));
-      expect(image2.height, equals(100));
+      expect(image2.width, equals(128));
+      expect(image2.height, equals(128));
     });
   });
 }
