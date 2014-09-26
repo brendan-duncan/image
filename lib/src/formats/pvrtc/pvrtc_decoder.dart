@@ -301,7 +301,7 @@ class PvrtcDecoder {
         // Currently unsupported
         return null;
       case PVR_TYPE_PVRTC4:
-        return bpp == 24 ? decodeRgb4bpp(width, height, input.toUint8List()) :
+        return amask == 0 ? decodeRgb4bpp(width, height, input.toUint8List()) :
                decodeRgba4bpp(width, height, input.toUint8List());
     }
 
