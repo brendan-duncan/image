@@ -13,6 +13,7 @@ import 'package:xml/xml.dart' as XML;
 
 part 'src/draw/draw_char.dart';
 part 'src/draw/draw_circle.dart';
+part 'src/draw/draw_image.dart';
 part 'src/draw/draw_line.dart';
 part 'src/draw/draw_pixel.dart';
 part 'src/draw/draw_rect.dart';
