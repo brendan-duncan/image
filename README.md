@@ -17,6 +17,7 @@ Read/Write:
 - JPEG
 - Targa
 - GIF / Animated GIF
+- PVR(PVRTC)
 
 Read Only:
 
