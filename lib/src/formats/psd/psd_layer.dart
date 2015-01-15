@@ -20,6 +20,7 @@ class PsdLayer {
   List<PsdLayer> children = [];
   PsdLayer parent;
   Image layerImage;
+  List<PsdEffect> effects = [];
 
   static const int SIGNATURE = 0x3842494d; // '8BIM'
 
@@ -141,6 +142,137 @@ class PsdLayer {
         }
 
         additionalData[tag] = new PsdLayerData(tag, data);
+
+        // Layer effects data
+        if (tag == 'lrFX') {
+          var fxData = additionalData['lrFX'];
+          var data = new InputBuffer.from(fxData.data);
+          int version = data.readUint16();
+          int numFx = data.readUint16();
+
+          for (int j = 0; j < numFx; ++j) {
+            var tag = data.readString(4); // 8BIM
+            var fxTag = data.readString(4);
+            int size = data.readUint32();
+
+            if (fxTag == 'dsdw') {
+              var fx = new PsdDropShadowEffect();
+              effects.add(fx);
+              fx.version = data.readUint32();
+              fx.blur = data.readUint32();
+              fx.intensity = data.readUint32();
+              fx.angle = data.readUint32();
+              fx.distance = data.readUint32();
+              fx.color = [data.readUint16(), data.readUint16(),
+                          data.readUint16(), data.readUint16(),
+                          data.readUint16()];
+              fx.blendMode = data.readString(8);
+              fx.enabled = data.readByte() != 0;
+              fx.globalAngle = data.readByte() != 0;
+              fx.opacity = data.readByte();
+              fx.nativeColor = [data.readUint16(), data.readUint16(),
+                                data.readUint16(), data.readUint16(),
+                                data.readUint16()];
+            } else if (fxTag == 'isdw') {
+              var fx = new PsdInnerShadowEffect();
+              effects.add(fx);
+              fx.version = data.readUint32();
+              fx.blur = data.readUint32();
+              fx.intensity = data.readUint32();
+              fx.angle = data.readUint32();
+              fx.distance = data.readUint32();
+              fx.color = [data.readUint16(), data.readUint16(),
+                          data.readUint16(), data.readUint16(),
+                          data.readUint16()];
+              fx.blendMode = data.readString(8);
+              fx.enabled = data.readByte() != 0;
+              fx.globalAngle = data.readByte() != 0;
+              fx.opacity = data.readByte();
+              fx.nativeColor = [data.readUint16(), data.readUint16(),
+                                data.readUint16(), data.readUint16(),
+                                data.readUint16()];
+            } else if (fxTag == 'oglw') {
+              var fx = new PsdOuterGlowEffect();
+              effects.add(fx);
+              fx.version = data.readUint32();
+              fx.blur = data.readUint32();
+              fx.intensity = data.readUint32();
+              fx.color = [data.readUint16(), data.readUint16(),
+                          data.readUint16(), data.readUint16(),
+                          data.readUint16()];
+              fx.blendMode = data.readString(8);
+              fx.enabled = data.readByte() != 0;
+              fx.opacity = data.readByte();
+              if (fx.version == 2) {
+                fx.nativeColor = [data.readUint16(), data.readUint16(),
+                                  data.readUint16(), data.readUint16(),
+                                  data.readUint16()];
+              }
+            } else if (fxTag == 'iglw') {
+              var fx = new PsdInnerGlowEffect();
+              effects.add(fx);
+              fx.version = data.readUint32();
+              fx.blur = data.readUint32();
+              fx.intensity = data.readUint32();
+              fx.color = [data.readUint16(), data.readUint16(),
+                          data.readUint16(), data.readUint16(),
+                          data.readUint16()];
+              fx.blendMode = data.readString(8);
+              fx.enabled = data.readByte() != 0;
+              fx.opacity = data.readByte();
+              if (fx.version == 2) {
+                fx.invert = data.readByte() != 0;
+                fx.nativeColor = [data.readUint16(), data.readUint16(),
+                                  data.readUint16(), data.readUint16(),
+                                  data.readUint16()];
+              }
+            } else if (fxTag == 'bevl') {
+              var fx = new PsdBevelEffect();
+              effects.add(fx);
+              fx.version = data.readUint32();
+              fx.angle = data.readUint32();
+              fx.strength = data.readUint32();
+              fx.blur = data.readUint32();
+              fx.highlightBlendMode = data.readString(8);
+              fx.shadowBlendMode = data.readString(8);
+              fx.highlightColor = [data.readUint16(), data.readUint16(),
+                                   data.readUint16(), data.readUint16(),
+                                   data.readUint16()];
+              fx.shadowColor = [data.readUint16(), data.readUint16(),
+                                data.readUint16(), data.readUint16(),
+                                data.readUint16()];
+              fx.bevelStyle = data.readByte();
+              fx.highlightOpacity = data.readByte();
+              fx.shadowOpacity = data.readByte();
+              fx.enabled = data.readByte() != 0;
+              fx.globalAngle = data.readByte() != 0;
+              fx.upOrDown = data.readByte();
+              if (fx.version == 2) {
+                fx.realHighlightColor = [data.readUint16(), data.readUint16(),
+                                         data.readUint16(), data.readUint16(),
+                                         data.readUint16()];
+                fx.realShadowColor = [data.readUint16(), data.readUint16(),
+                                      data.readUint16(), data.readUint16(),
+                                      data.readUint16()];
+              }
+            } else if (fxTag == 'sofi') {
+              var fx = new PsdSolidFillEffect();
+              effects.add(fx);
+              fx.version = data.readUint32();
+              fx.blendMode = data.readString(4);
+              fx.color = [data.readUint16(), data.readUint16(),
+                          data.readUint16(), data.readUint16(),
+                          data.readUint16()];
+              fx.opacity = data.readByte();
+              fx.enabled = data.readByte() != 0;
+              fx.nativeColor = [data.readUint16(), data.readUint16(),
+                                data.readUint16(), data.readUint16(),
+                                data.readUint16()];
+            } else {
+              data.skip(size);
+            }
+          }
+        }
       }
     }
   }

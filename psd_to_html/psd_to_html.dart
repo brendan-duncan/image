@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:image/image.dart';
+import '../lib/image.dart';
 
 /**
  * Work in progress experimental PSD to HTML converter.
@@ -42,36 +42,25 @@ void main() {
 
     outHtml += '<image src="$name" style="';
     outHtml += 'position: absolute; left: ${l.left}px; top: ${l.top}px;';
-
-    // The layer has effects
-    if (l.additionalData.containsKey('lrFX')) {
-      var fxData = l.additionalData['lrFX'];
-      var data = new InputBuffer.from(fxData.data);
-      int version = data.readUint16();
-      int numFx = data.readUint16();
-      print('      FX: $numFx');
-      for (int j = 0; j < numFx; ++j) {
-        var tag = data.readString(4); // 8BIM
-        var fxTag = data.readString(4);
-        int size = data.readUint32();
-        data.skip(size);
-        if (fxTag == 'cmnS') {
-          print('            Common State');
-        } else if (fxTag == 'dsdw') {
-          print('            Drop Shadow');
-        } else if (fxTag == 'isdw') {
-          print('            Inner Shadow');
-        } else if (fxTag == 'oglw') {
-          print('            Outer Glow');
-        } else if (fxTag == 'iglw') {
-          print('            Inner Glow');
-        } else if (fxTag == 'bevl') {
-          print('            Bevel');
-        } else if (fxTag == 'sofi') {
-          print('            Solid Fill');
-        } else {
-          print('            UNKNOWN $fxTag');
-        }
+    if (l.effects.isNotEmpty) {
+      print('        Effects');
+    }
+    for (var fx in l.effects) {
+      if (!fx.enabled) {
+        continue;
+      }
+      if (fx is PsdBevelEffect) {
+        print('            Bevel');
+      } else if (fx is PsdDropShadowEffect) {
+        print('            Drop Shadow');
+      } else if (fx is PsdInnerGlowEffect) {
+        print('            Inner Glow');
+      } else if (fx is PsdInnerShadowEffect) {
+        print('            Inner Shadow');
+      } else if (fx is PsdOuterGlowEffect) {
+        print('            Outer Glow');
+      } else if (fx is PsdSolidFillEffect) {
+        print('            Solid Fill');
       }
     }
 
