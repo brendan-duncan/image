@@ -297,6 +297,11 @@ class TiffImage {
         for (int x = 0, px = outX; x < tileWidth && px < width; ++x, ++px) {
           if (samplesPerPixel == 1) {
             int gray = bdata[pi++];
+            // downsample 16-bit to 8-bit (which means we can just skip the
+            // next 8 bytes).
+            if (bitsPerSample == 16) {
+              pi++;
+            }
             int c;
             if (photometricType == 3 && colorMap != null) {
               c = getColor(colorMap[colorMapRed + gray],
@@ -308,15 +313,45 @@ class TiffImage {
             image.setPixel(px, py, c);
           } else if (samplesPerPixel == 2) {
             int gray = bdata[pi++];
+            if (bitsPerSample == 16) {
+              pi++;
+            }
             int alpha = bdata[pi++];
+            if (bitsPerSample == 16) {
+              pi++;
+            }
             int c = getColor(gray, gray, gray, alpha);
             image.setPixel(px, py, c);
           } else if (samplesPerPixel == 3) {
-            int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], 255);
-            image.setPixel(px, py, c);
-          } else if (samplesPerPixel >= 4){
-            int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], bdata[pi++]);
-            image.setPixel(px, py, c);
+            if (bitsPerSample == 16) {
+              int r = bdata[pi++];
+              pi++;
+              int g = bdata[pi++];
+              pi++;
+              int b = bdata[pi++];
+              pi++;
+              int c = getColor(r, g, b, 255);
+              image.setPixel(px, py, c);
+            } else {
+              int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], 255);
+              image.setPixel(px, py, c);
+            }
+          } else if (samplesPerPixel >= 4) {
+            if (bitsPerSample == 16) {
+              int r = bdata[pi++];
+              pi++;
+              int g = bdata[pi++];
+              pi++;
+              int b = bdata[pi++];
+              pi++;
+              int a = bdata[pi++];
+              pi++;
+              int c = getColor(r, g, b, a);
+              image.setPixel(px, py, c);
+            } else {
+              int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], bdata[pi++]);
+              image.setPixel(px, py, c);
+            }
           }
         }
       }
