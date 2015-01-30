@@ -58,6 +58,17 @@ class TiffDecoder extends Decoder {
     return info.images[frame].decode(ptr);
   }
 
+  HdrImage decodeHdrImage(List<int> data, {int frame: 0}) {
+    InputBuffer ptr = new InputBuffer(new Uint8List.fromList(data));
+
+    TiffInfo info = _readHeader(ptr);
+    if (info == null) {
+      return null;
+    }
+
+    return info.images[frame].decodeHdr(ptr);
+  }
+
   /**
    * Decode all of the frames from an animation.  If the file is not an
    * animation, a single frame animation is returned.  If there was a problem

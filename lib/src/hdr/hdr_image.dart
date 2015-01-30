@@ -33,6 +33,23 @@ class HdrImage {
   }
 
   /**
+   * Create an RGB[A] image.
+   */
+  HdrImage.create(int width, int height, int channels, int format) {
+    if (channels < 0 || channels > 4) {
+      return;
+    }
+    if (format != HALF && format != FLOAT && format != UINT) {
+      return;
+    }
+
+    const List<String> channelList = const [R, G, B, A];
+    for (int i = 0; i < channels; ++i) {
+      addSlice(new HdrSlice(channelList[i], width, height, format));
+    }
+  }
+
+  /**
    * Create a copy of the [other] HdrImage.
    */
   HdrImage.from(HdrImage other) {
@@ -107,6 +124,12 @@ class HdrImage {
     }
   }
 
+  void setRedInt(int x, int y, int c) {
+    if (red != null) {
+      red.setInt(x,  y, c);
+    }
+  }
+
   /**
    * Get the value of the green channel at the given pixel coordinates [x], [y].
    */
@@ -120,6 +143,12 @@ class HdrImage {
   void setGreen(int x, int y, double c) {
     if (green != null) {
       green.setFloat(x, y, c);
+    }
+  }
+
+  void setGreenInt(int x, int y, int c) {
+    if (green != null) {
+      green.setInt(x,  y, c);
     }
   }
 
@@ -139,6 +168,12 @@ class HdrImage {
     }
   }
 
+  void setBlueInt(int x, int y, int c) {
+    if (blue != null) {
+      blue.setInt(x, y, c);
+    }
+  }
+
   /**
    * Get the value of the alpha channel at the given pixel coordinates [x], [y].
    */
@@ -152,6 +187,12 @@ class HdrImage {
   void setAlpha(int x, int y, double c) {
     if (alpha != null) {
       alpha.setFloat(x, y, c);
+    }
+  }
+
+  void setAlphaInt(int x, int y, int c) {
+    if (alpha != null) {
+      alpha.setInt(x, y, c);
     }
   }
 

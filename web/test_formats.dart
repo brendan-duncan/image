@@ -1,5 +1,6 @@
 import 'dart:html' as Html;
 import 'dart:async' as Async;
+import 'dart:typed_data';
 import 'package:image/image.dart';
 
 /**
@@ -22,16 +23,14 @@ void main() {
                          'animated.png', 'BladeRunner_lossy.webp'];
 
   for (String name in images) {
-    // Use an AJAX request to get the image file from disk.
+    // Use an http request to get the image file from disk.
     var req = new Html.HttpRequest();
     req.open('GET', path + '/' + name);
-    req.overrideMimeType('text\/plain; charset=x-user-defined');
+    req.responseType = 'arraybuffer';
     req.onLoadEnd.listen((e) {
       if (req.status == 200) {
         // Convert the text to binary byte list.
-        var bytes = req.responseText.split('').map((e){
-          return new String.fromCharCode(e.codeUnitAt(0) & 0xff);
-        }).join('').codeUnits;
+        List<int> bytes = new Uint8List.view(req.response);
 
         var label = new Html.DivElement();
         Html.document.body.append(label);

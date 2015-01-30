@@ -12,7 +12,7 @@ class HdrSlice {
   final int type;
   /// [data] will be either Uint16List, Float32List, or Uint32List depending
   /// on the type being HALF, FLOAT or UINT respectively.
-  final dynamic data;
+  final data;
 
   HdrSlice(this.name, int width, int height, int type) :
     this.width = width,
@@ -42,7 +42,7 @@ class HdrSlice {
   /**
    * Does this channel store floating-point data?
    */
-  bool get isFloat => type != HdrImage.UINT;
+  bool get isFloat => type == HdrImage.FLOAT || type == HdrImage.HALF;
 
   /**
    * Get the float value of the sample at the coordinates [x],[y].

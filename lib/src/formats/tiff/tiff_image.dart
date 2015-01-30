@@ -33,6 +33,7 @@ class TiffImage {
   /// Starting index in the [colorMap] for the blue channel.
   int colorMapBlue;
   Image image;
+  HdrImage hdrImage;
 
   TiffImage(InputBuffer p) {
     InputBuffer p3 = new InputBuffer.from(p);
@@ -218,6 +219,16 @@ class TiffImage {
     return image;
   }
 
+  HdrImage decodeHdr(InputBuffer p) {
+    hdrImage = new HdrImage.create(width, height, 4, HdrImage.HALF);
+      for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
+        for (int tileX = 0; tileX < tilesX; ++tileX, ++ti) {
+          _decodeTile(p, tileX, tileY);
+        }
+      }
+      return hdrImage;
+    }
+
   bool hasTag(int tag) => tags.containsKey(tag);
 
   void _decodeTile(InputBuffer p, int tileX, int tileY) {
@@ -282,7 +293,13 @@ class TiffImage {
         List<int> data = p.toList(0, byteCount);
         JpegData jpeg = new JpegData();
         jpeg.read(data);
+        if (image == null) {
+          image = new Image(width, height);
+        }
         _jpegToImage(jpeg, image, outX, outY, tileWidth, tileHeight);
+        if (hdrImage != null) {
+          hdrImage = new HdrImage.fromImage(image);
+        }
         return;
       } else {
         throw new ImageException('Unsupported Compression Type: $compression');
@@ -297,59 +314,127 @@ class TiffImage {
         for (int x = 0, px = outX; x < tileWidth && px < width; ++x, ++px) {
           if (samplesPerPixel == 1) {
             int gray = bdata[pi++];
+            int gray16 = gray;
             // downsample 16-bit to 8-bit (which means we can just skip the
             // next 8 bytes).
             if (bitsPerSample == 16) {
-              pi++;
+              gray16 = gray16 << 8 | bdata[pi++];
             }
-            int c;
-            if (photometricType == 3 && colorMap != null) {
-              c = getColor(colorMap[colorMapRed + gray],
-                           colorMap[colorMapGreen + gray],
-                           colorMap[colorMapBlue + gray]);
-            } else {
-              c = getColor(gray, gray, gray, 255);
+
+            if (photometricType == 0) {
+              gray = 255 - gray;
+              gray16 = 0xffff - gray16;
             }
-            image.setPixel(px, py, c);
+
+            if (hdrImage != null) {
+              double fg = gray16 / 0xffff;
+              hdrImage.setRed(px, py, fg);
+              hdrImage.setGreen(px, py, fg);
+              hdrImage.setBlue(px, py, fg);
+              hdrImage.setAlpha(px, py, 1.0);
+            }
+
+            if (image != null) {
+              int c;
+              if (photometricType == 3 && colorMap != null) {
+                c = getColor(colorMap[colorMapRed + gray],
+                             colorMap[colorMapGreen + gray],
+                             colorMap[colorMapBlue + gray]);
+              } else {
+                c = getColor(gray, gray, gray, 255);
+              }
+
+              image.setPixel(px, py, c);
+            }
           } else if (samplesPerPixel == 2) {
             int gray = bdata[pi++];
+            int gray16 = gray;
             if (bitsPerSample == 16) {
-              pi++;
+              gray16 = gray16 << 8 | bdata[pi++];
             }
             int alpha = bdata[pi++];
+            int alpha16 = alpha;
             if (bitsPerSample == 16) {
-              pi++;
+              alpha16 = alpha16 << 8 | bdata[pi++];
             }
-            int c = getColor(gray, gray, gray, alpha);
-            image.setPixel(px, py, c);
-          } else if (samplesPerPixel == 3) {
-            if (bitsPerSample == 16) {
-              int r = bdata[pi++];
-              pi++;
-              int g = bdata[pi++];
-              pi++;
-              int b = bdata[pi++];
-              pi++;
-              int c = getColor(r, g, b, 255);
+
+            if (hdrImage != null) {
+              double fg = gray16 / 0xffff;
+              double fa = alpha16 / 0xffff;
+              hdrImage.setRed(px, py, fg);
+              hdrImage.setGreen(px, py, fg);
+              hdrImage.setBlue(px, py, fg);
+              hdrImage.setAlpha(px, py, fa);
+            }
+
+            if (image != null) {
+              int c = getColor(gray, gray, gray, alpha);
               image.setPixel(px, py, c);
-            } else {
-              int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], 255);
+            }
+          } else if (samplesPerPixel == 3) {
+            int r = bdata[pi++];
+            int r16 = r;
+            if (bitsPerSample == 16) {
+              r16 = r16 << 8 | bdata[pi++];
+            }
+
+            int g = bdata[pi++];
+            int g16 = r;
+            if (bitsPerSample == 16) {
+              g16 = g16 << 8 | bdata[pi++];
+            }
+
+            int b = bdata[pi++];
+            int b16 = r;
+            if (bitsPerSample == 16) {
+              b16 = b16 << 8 | bdata[pi++];
+            }
+
+            if (hdrImage != null) {
+              hdrImage.setRed(px, py, r16 / 0xffff);
+              hdrImage.setGreen(px, py, g16 / 0xffff);
+              hdrImage.setBlue(px, py, b16 / 0xffff);
+              hdrImage.setAlpha(px, py, 1.0);
+            }
+
+            if (image != null) {
+              int c = getColor(r, g, b, 255);
               image.setPixel(px, py, c);
             }
           } else if (samplesPerPixel >= 4) {
+            int r = bdata[pi++];
+            int r16 = r;
             if (bitsPerSample == 16) {
-              int r = bdata[pi++];
-              pi++;
-              int g = bdata[pi++];
-              pi++;
-              int b = bdata[pi++];
-              pi++;
-              int a = bdata[pi++];
-              pi++;
+              r16 = r16 << 8 | bdata[pi++];
+            }
+
+            int g = bdata[pi++];
+            int g16 = g;
+            if (bitsPerSample == 16) {
+              g16 = g16 << 8 | bdata[pi++];
+            }
+
+            int b = bdata[pi++];
+            int b16 = b;
+            if (bitsPerSample == 16) {
+              b16 = b16 << 8 | bdata[pi++];
+            }
+
+            int a = bdata[pi++];
+            int a16 = a;
+            if (bitsPerSample == 16) {
+              a16 = a16 << 8 | bdata[pi++];
+            }
+
+            if (hdrImage != null) {
+              hdrImage.setRed(px, py, r16 / 0xffff);
+              hdrImage.setGreen(px, py, g16 / 0xffff);
+              hdrImage.setBlue(px, py, b16 / 0xffff);
+              hdrImage.setAlpha(px, py, a16 / 0xffff);
+            }
+
+            if (image != null) {
               int c = getColor(r, g, b, a);
-              image.setPixel(px, py, c);
-            } else {
-              int c = getColor(bdata[pi++], bdata[pi++], bdata[pi++], bdata[pi++]);
               image.setPixel(px, py, c);
             }
           }
