@@ -3,9 +3,9 @@ part of image_test;
 
 void definePsdTests() {
   Io.File script = new Io.File(Io.Platform.script.toFilePath());
-  String path = script.parent.path + '/res/psd';
+  String path = script.parent.path;
 
-  Io.Directory dir = new Io.Directory(path);
+  Io.Directory dir = new Io.Directory(path + '/res/psd');
   List files = dir.listSync();
 
   group('PSD', () {
@@ -22,7 +22,7 @@ void definePsdTests() {
 
         if (psd != null) {
           List<int> outPng = new PngEncoder().encodeImage(psd);
-          new Io.File('out/psd/$name.png')
+          new Io.File(path + '/out/psd/$name.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(outPng);
         } else {
