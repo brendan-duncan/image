@@ -385,6 +385,10 @@ class JpegData  {
         c = input.readByte();
       } while (c != 0xff && !input.isEOS);
 
+      if (input.isEOS) {
+        return c;
+      }
+
       do {
         c = input.readByte();
       } while (c == 0xff && !input.isEOS);
