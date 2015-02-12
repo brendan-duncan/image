@@ -747,7 +747,6 @@ class PngDecoder extends Decoder {
         }
 
         g = info.colorLut[g];
-        a = info.colorLut[a];
 
         return getColor(g, g, g, a);
       case RGBA:
@@ -788,7 +787,6 @@ class PngDecoder extends Decoder {
         r = info.colorLut[r];
         g = info.colorLut[g];
         b = info.colorLut[b];
-        a = info.colorLut[a];
 
         return getColor(r, g, b, a);
     }
