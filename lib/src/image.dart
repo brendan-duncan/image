@@ -478,6 +478,27 @@ class Image {
     }
   }
 
+  /**
+   * Return the average gray value of the image.
+   */
+  int getWhiteBalance() {
+    final len = data.length;
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    for (int i = 0; i < len; ++i) {
+      r += getRed(data[i]);
+      g += getGreen(data[i]);
+      b += getBlue(data[i]);
+    }
+
+    r ~/= len;
+    g ~/= len;
+    b ~/= len;
+
+    return (r + g + b) ~/ 3;
+  }
+
   /// Format of the image.
   int _format;
 }
