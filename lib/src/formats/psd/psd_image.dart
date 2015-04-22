@@ -525,16 +525,21 @@ class PsdImage extends DecodeInfo {
       throw new ImageException('PSD: unsupported bit depth: $bitDepth');
     }
 
+    final channel0 = channels[0];
+    final channel1 = channels[1];
+    final channel2 = channels[2];
+    final channel_1 = channels[-1];
+
     for (int y = 0, di = 0, si = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x, si += ns) {
         switch (colorMode) {
           case COLORMODE_RGB:
             int xi = di;
-            pixels[di++] = _ch(channels[0].data, si, ns);
-            pixels[di++] = _ch(channels[1].data, si, ns);
-            pixels[di++] = _ch(channels[2].data, si, ns);
+            pixels[di++] = _ch(channel0.data, si, ns);
+            pixels[di++] = _ch(channel1.data, si, ns);
+            pixels[di++] = _ch(channel2.data, si, ns);
             pixels[di++] = numChannels >= 4 ?
-                           _ch(channels[-1].data, si, ns) : 255;
+                           _ch(channel_1.data, si, ns) : 255;
 
             var r = pixels[xi];
             var g = pixels[xi + 1];
@@ -550,11 +555,11 @@ class PsdImage extends DecodeInfo {
             }
             break;
           case COLORMODE_LAB:
-            int L = _ch(channels[0].data, si, ns) * 100 >> 8;
-            int a = _ch(channels[1].data, si, ns) - 128;
-            int b = _ch(channels[2].data, si, ns) - 128;
+            int L = _ch(channel0.data, si, ns) * 100 >> 8;
+            int a = _ch(channel1.data, si, ns) - 128;
+            int b = _ch(channel2.data, si, ns) - 128;
             int alpha = numChannels >= 4 ?
-                        _ch(channels[-1].data, si, ns) : 255;
+                        _ch(channel_1.data, si, ns) : 255;
             List<int> rgb = labToRGB(L, a, b);
             pixels[di++] = rgb[0];
             pixels[di++] = rgb[1];
@@ -562,21 +567,21 @@ class PsdImage extends DecodeInfo {
             pixels[di++] = alpha;
             break;
           case COLORMODE_GRAYSCALE:
-            int gray = _ch(channels[0].data, si, ns);
+            int gray = _ch(channel0.data, si, ns);
             int alpha = numChannels >= 2 ?
-                       _ch(channels[-1].data, si, ns) : 255;
+                       _ch(channel_1.data, si, ns) : 255;
             pixels[di++] = gray;
             pixels[di++] = gray;
             pixels[di++] = gray;
             pixels[di++] = alpha;
             break;
           case COLORMODE_CMYK:
-            int c = _ch(channels[0].data, si, ns);
-            int m = _ch(channels[1].data, si, ns);
-            int y = _ch(channels[2].data, si, ns);
+            int c = _ch(channel0.data, si, ns);
+            int m = _ch(channel1.data, si, ns);
+            int y = _ch(channel2.data, si, ns);
             int k = _ch(channels[numChannels == 4 ? -1 : 3].data, si, ns);
             int alpha = numChannels >= 5 ?
-                        _ch(channels[-1].data, si, ns) : 255;
+                        _ch(channel_1.data, si, ns) : 255;
             List<int> rgb = cmykToRGB(255 - c, 255 - m, 255 - y, 255 - k);
             pixels[di++] = rgb[0];
             pixels[di++] = rgb[1];
