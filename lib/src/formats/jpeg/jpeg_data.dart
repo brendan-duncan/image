@@ -442,10 +442,10 @@ class JpegData  {
       }
 
       if (quantizationTables[n] == null) {
-        quantizationTables[n] = new Int32List(64);;
+        quantizationTables[n] = new Int16List(64);
       }
 
-      Int32List tableData = quantizationTables[n];
+      Int16List tableData = quantizationTables[n];
       for (int i = 0; i < Jpeg.DCTSIZE2; i++) {
         int tmp;
         if (prec != 0) {
@@ -454,7 +454,7 @@ class JpegData  {
           tmp = block.readByte();
         }
 
-        tableData[Jpeg.dctNaturalOrder[i]] = tmp;
+        tableData[Jpeg.dctZigZag[i]] = tmp;
       }
     }
 
@@ -661,14 +661,24 @@ class JpegData  {
     return lines;
   }
 
+  static int toFix(double val) {
+    const int FIXED_POINT = 20;
+    const int ONE = 1 << FIXED_POINT;
+
+    return (val * ONE).toInt() & 0xffffffff;
+  }
+
   static Uint8List dctClip;
   /**
    * A port of poppler's IDCT method which in turn is taken from:
    * Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
    * "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
    * IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
+   *
+   * TODO I'm pretty sure the rounding errors in some pixels are coming from
+   * here.
    */
-  void _quantizeAndInverse(Int32List quantizationTable,
+  void _quantizeAndInverse(Int16List quantizationTable,
                            Int32List coefBlock,
                            Uint8List dataOut,
                            Int32List dataIn) {

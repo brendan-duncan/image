@@ -166,20 +166,26 @@ class JpegScan {
     int diff = t == 0 ? 0 : _receiveAndExtend(t);
     component.pred += diff;
     zz[0] = component.pred;
+
     int k = 1;
     while (k < 64) {
       var rs = _decodeHuffman(component.huffmanTableAC);
       int s = rs & 15;
       int r = rs >> 4;
       if (s == 0) {
-        if (r < 15)
+        if (r < 15) {
           break;
+        }
         k += 16;
         continue;
       }
+
       k += r;
-      int z = Jpeg.dctNaturalOrder[k];
-      zz[z] = _receiveAndExtend(s);
+
+      s = _receiveAndExtend(s);
+
+      int z = Jpeg.dctZigZag[k];
+      zz[z] = s;
       k++;
     }
   }
@@ -215,7 +221,7 @@ class JpegScan {
         continue;
       }
       k += r;
-      int z = Jpeg.dctNaturalOrder[k];
+      int z = Jpeg.dctZigZag[k];
       zz[z] = (_receiveAndExtend(s) * (1 << successive));
       k++;
     }
@@ -226,7 +232,7 @@ class JpegScan {
     int e = spectralEnd;
     int r = 0;
     while (k <= e) {
-      int z = Jpeg.dctNaturalOrder[k];
+      int z = Jpeg.dctZigZag[k];
       switch (successiveACState) {
         case 0: // initial state
           int rs = _decodeHuffman(component.huffmanTableAC);
