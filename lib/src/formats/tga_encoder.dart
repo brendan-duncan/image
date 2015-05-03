@@ -21,9 +21,9 @@ class TgaEncoder extends Encoder {
     for (int y = image.height - 1; y >= 0; --y) {
       for (int x = 0; x < image.width; ++x) {
         int c = image.getPixel(x, y);
-        out.writeByte(getRed(c));
-        out.writeByte(getGreen(c));
         out.writeByte(getBlue(c));
+        out.writeByte(getGreen(c));
+        out.writeByte(getRed(c));
         if (image.format == Image.RGBA) {
           out.writeByte(getAlpha(c));
         }
