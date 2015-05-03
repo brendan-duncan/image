@@ -674,8 +674,14 @@ class JpegData  {
   }
 
   static Uint8List dctClip;
+
   /**
    * Quantize the coefficients and apply IDCT.
+   *
+   * A port of poppler's IDCT method which in turn is taken from:
+   * Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
+   * "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
+   * IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
    */
   void _quantizeAndInverse(Int16List quantizationTable,
                            Int32List coefBlock,
@@ -683,146 +689,185 @@ class JpegData  {
                            Int32List dataIn) {
     Int32List p = dataIn;
 
+    const int dctClipOffset = 256;
+    const int dctClipLength = 768;
+    if (dctClip == null) {
+      dctClip = new Uint8List(dctClipLength);
+      int i;
+      for (i = -256; i < 0; ++i) {
+        dctClip[dctClipOffset + i] = 0;
+      }
+      for (i = 0; i < 256; ++i) {
+        dctClip[dctClipOffset + i] = i;
+      }
+      for (i = 256; i < 512; ++i) {
+        dctClip[dctClipOffset + i] = 255;
+      }
+    }
+
+    // IDCT constants (20.12 fixed point format)
+    const int COS_1 = 4017;  // cos(pi/16)
+    const int SIN_1 = 799;   // sin(pi/16)
+    const int COS_3 = 3406;  // cos(3*pi/16)
+    const int SIN_3 = 2276;  // sin(3*pi/16)
+    const int COS_6 = 1567;  // cos(6*pi/16)
+    const int SIN_6 = 3784;  // sin(6*pi/16)
+    const int SQRT_2 = 5793;  // sqrt(2)
+    const int SQRT_1D2 = 2896; // sqrt(2) / 2
+
     // de-quantize
     for (int i = 0; i < 64; i++) {
       p[i] = (coefBlock[i] * quantizationTable[i]);
     }
 
-    const int w1 = 2841; // 2048*sqrt(2)*cos(1*pi/16)
-    const int w2 = 2676; // 2048*sqrt(2)*cos(2*pi/16)
-    const int w3 = 2408; // 2048*sqrt(2)*cos(3*pi/16)
-    const int w5 = 1609; // 2048*sqrt(2)*cos(5*pi/16)
-    const int w6 = 1108; // 2048*sqrt(2)*cos(6*pi/16)
-    const int w7 = 565;  // 2048*sqrt(2)*cos(7*pi/16)
-
-    const int w1pw7 = w1 + w7;
-    const int w1mw7 = w1 - w7;
-    const int w2pw6 = w2 + w6;
-    const int w2mw6 = w2 - w6;
-    const int w3pw5 = w3 + w5;
-    const int w3mw5 = w3 - w5;
-
-    const int r2 = 181; // 256/sqrt(2)
-
-    // Horizontal 1-D IDCT.
-    for (int y = 0, y8 = 0; y < 8; y++, y8 += 8) {
-      // If all the AC components are zero, then the IDCT is trivial.
-      if (p[y8 + 1] == 0 && p[y8 + 2] == 0 && p[y8 + 3] == 0 &&
-          p[y8 + 4] == 0 && p[y8 + 5] == 0 && p[y8 + 6] == 0 && p[y8 + 7] == 0) {
-        int dc = p[y8 + 0] << 3;
-        p[y8 + 0] = dc;
-        p[y8 + 1] = dc;
-        p[y8 + 2] = dc;
-        p[y8 + 3] = dc;
-        p[y8 + 4] = dc;
-        p[y8 + 5] = dc;
-        p[y8 + 6] = dc;
-        p[y8 + 7] = dc;
+    // inverse DCT on rows
+    int row = 0;
+    for (int i = 0; i < 8; ++i, row += 8) {
+      // check for all-zero AC coefficients
+      if (p[1 + row] == 0 &&
+      p[2 + row] == 0 &&
+      p[3 + row] == 0 &&
+      p[4 + row] == 0 &&
+      p[5 + row] == 0 &&
+      p[6 + row] == 0 &&
+      p[7 + row] == 0) {
+        int t = _shiftR((SQRT_2 * p[0 + row] + 512), 10);
+        p[row + 0] = t;
+        p[row + 1] = t;
+        p[row + 2] = t;
+        p[row + 3] = t;
+        p[row + 4] = t;
+        p[row + 5] = t;
+        p[row + 6] = t;
+        p[row + 7] = t;
         continue;
       }
 
-      // Prescale.
-      int x0 = (p[y8 + 0] << 11) + 128;
-      int x1 = p[y8 + 4] << 11;
-      int x2 = p[y8 + 6];
-      int x3 = p[y8 + 2];
-      int x4 = p[y8 + 1];
-      int x5 = p[y8 + 7];
-      int x6 = p[y8 + 5];
-      int x7 = p[y8 + 3];
+      // stage 4
+      int v0 = _shiftR((SQRT_2 * p[0 + row] + 128), 8);
+      int v1 = _shiftR((SQRT_2 * p[4 + row] + 128), 8);
+      int v2 = p[2 + row];
+      int v3 = p[6 + row];
+      int v4 = _shiftR((SQRT_1D2 * (p[1 + row] - p[7 + row]) + 128), 8);
+      int v7 = _shiftR((SQRT_1D2 * (p[1 + row] + p[7 + row]) + 128), 8);
+      int v5 = _shiftL(p[3 + row], 4);
+      int v6 = _shiftL(p[5 + row], 4);
 
-      // Stage 1.
-      int x8 = w7 * (x4 + x5);
-      x4 = x8 + w1mw7 * x4;
-      x5 = x8 - w1pw7 * x5;
-      x8 = w3 * (x6 + x7);
-      x6 = x8 - w3mw5 * x6;
-      x7 = x8 - w3pw5 * x7;
+      // stage 3
+      int t = _shiftR((v0 - v1 + 1), 1);
+      v0 = _shiftR((v0 + v1 + 1), 1);
+      v1 = t;
+      t = _shiftR((v2 * SIN_6 + v3 * COS_6 + 128), 8);
+      v2 = _shiftR((v2 * COS_6 - v3 * SIN_6 + 128), 8);
+      v3 = t;
+      t = _shiftR((v4 - v6 + 1), 1);
+      v4 = _shiftR((v4 + v6 + 1), 1);
+      v6 = t;
+      t = _shiftR((v7 + v5 + 1), 1);
+      v5 = _shiftR((v7 - v5 + 1), 1);
+      v7 = t;
 
-      // Stage 2.
-      x8 = x0 + x1;
-      x0 -= x1;
-      x1 = w6 * (x3 + x2);
-      x2 = x1 - w2pw6 * x2;
-      x3 = x1 + w2mw6 * x3;
-      x1 = x4 + x6;
-      x4 -= x6;
-      x6 = x5 + x7;
-      x5 -= x7;
+      // stage 2
+      t = _shiftR((v0 - v3 + 1), 1);
+      v0 = _shiftR((v0 + v3 + 1), 1);
+      v3 = t;
+      t = _shiftR((v1 - v2 + 1), 1);
+      v1 = _shiftR((v1 + v2 + 1), 1);
+      v2 = t;
+      t = _shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
+      v4 = _shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
+      v7 = t;
+      t = _shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
+      v5 = _shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
+      v6 = t;
 
-      // Stage 3.
-      x7 = x8 + x3;
-      x8 -= x3;
-      x3 = x0 + x2;
-      x0 -= x2;
-      x2 = (r2 * (x4 + x5) + 128) >> 8;
-      x4 = (r2 * (x4 - x5) + 128) >> 8;
-
-      // Stage 4.
-      p[y8 + 0] = (x7 + x1) >> 8;
-      p[y8 + 1] = (x3 + x2) >> 8;
-      p[y8 + 2] = (x0 + x4) >> 8;
-      p[y8 + 3] = (x8 + x6) >> 8;
-      p[y8 + 4] = (x8 - x6) >> 8;
-      p[y8 + 5] = (x0 - x4) >> 8;
-      p[y8 + 6] = (x3 - x2) >> 8;
-      p[y8 + 7] = (x7 - x1) >> 8;
+      // stage 1
+      p[0 + row] = (v0 + v7);
+      p[7 + row] = (v0 - v7);
+      p[1 + row] = (v1 + v6);
+      p[6 + row] = (v1 - v6);
+      p[2 + row] = (v2 + v5);
+      p[5 + row] = (v2 - v5);
+      p[3 + row] = (v3 + v4);
+      p[4 + row] = (v3 - v4);
     }
 
-    // Vertical 1-D IDCT.
-    for (int x = 0; x < 8; x++) {
-      // Prescale.
-      int y0 = (p[8 * 0 + x] << 8) + 8192;
-      int y1 = p[8 * 4 + x] << 8;
-      int y2 = p[8 * 6 + x];
-      int y3 = p[8 * 2 + x];
-      int y4 = p[8 * 1 + x];
-      int y5 = p[8 * 7 + x];
-      int y6 = p[8 * 5 + x];
-      int y7 = p[8 * 3 + x];
+    // inverse DCT on columns
+    for (int i = 0; i < 8; ++i) {
+      int col = i;
 
-      // Stage 1.
-      int y8 = w7 * (y4 + y5) + 4;
-      y4 = (y8 + w1mw7 * y4) >> 3;
-      y5 = (y8 - w1pw7 * y5) >> 3;
-      y8 = w3 * (y6 + y7) + 4;
-      y6 = (y8 - w3mw5 * y6) >> 3;
-      y7 = (y8 - w3pw5 * y7) >> 3;
+      // check for all-zero AC coefficients
+      if (p[1 * 8 + col] == 0 &&
+      p[2 * 8 + col] == 0 &&
+      p[3 * 8 + col] == 0 &&
+      p[4 * 8 + col] == 0 &&
+      p[5 * 8 + col] == 0 &&
+      p[6 * 8 + col] == 0 &&
+      p[7 * 8 + col] == 0) {
+        int t = _shiftR((SQRT_2 * dataIn[i] + 8192), 14);
+        p[0 * 8 + col] = t;
+        p[1 * 8 + col] = t;
+        p[2 * 8 + col] = t;
+        p[3 * 8 + col] = t;
+        p[4 * 8 + col] = t;
+        p[5 * 8 + col] = t;
+        p[6 * 8 + col] = t;
+        p[7 * 8 + col] = t;
+        continue;
+      }
 
-      // Stage 2.
-      y8 = y0 + y1;
-      y0 -= y1;
-      y1 = w6 * (y3 + y2) + 4;
-      y2 = (y1 - w2pw6 * y2) >> 3;
-      y3 = (y1 + w2mw6 * y3) >> 3;
-      y1 = y4 + y6;
-      y4 -= y6;
-      y6 = y5 + y7;
-      y5 -= y7;
+      // stage 4
+      int v0 = _shiftR((SQRT_2 * p[0 * 8 + col] + 2048), 12);
+      int v1 = _shiftR((SQRT_2 * p[4 * 8 + col] + 2048), 12);
+      int v2 = p[2 * 8 + col];
+      int v3 = p[6 * 8 + col];
+      int v4 = _shiftR((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048), 12);
+      int v7 = _shiftR((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048), 12);
+      int v5 = p[3 * 8 + col];
+      int v6 = p[5 * 8 + col];
 
-      // Stage 3.
-      y7 = y8 + y3;
-      y8 -= y3;
-      y3 = y0 + y2;
-      y0 -= y2;
-      y2 = (r2 * (y4 + y5) + 128) >> 8;
-      y4 = (r2 * (y4 - y5) + 128) >> 8;
+      // stage 3
+      int t = _shiftR((v0 - v1 + 1), 1);
+      v0 = _shiftR((v0 + v1 + 1), 1);
+      v1 = t;
+      t = _shiftR((v2 * SIN_6 + v3 * COS_6 + 2048), 12);
+      v2 = _shiftR((v2 * COS_6 - v3 * SIN_6 + 2048), 12);
+      v3 = t;
+      t = _shiftR((v4 - v6 + 1), 1);
+      v4 = _shiftR((v4 + v6 + 1), 1);
+      v6 = t;
+      t = _shiftR((v7 + v5 + 1), 1);
+      v5 = _shiftR((v7 - v5 + 1), 1);
+      v7 = t;
 
-      // Stage 4.
-      p[8 * 0 + x] = (y7 + y1) >> 14;
-      p[8 * 1 + x] = (y3 + y2) >> 14;
-      p[8 * 2 + x] = (y0 + y4) >> 14;
-      p[8 * 3 + x] = (y8 + y6) >> 14;
-      p[8 * 4 + x] = (y8 - y6) >> 14;
-      p[8 * 5 + x] = (y0 - y4) >> 14;
-      p[8 * 6 + x] = (y3 - y2) >> 14;
-      p[8 * 7 + x] = (y7 - y1) >> 14;
+      // stage 2
+      t = _shiftR((v0 - v3 + 1), 1);
+      v0 = _shiftR((v0 + v3 + 1), 1);
+      v3 = t;
+      t = _shiftR((v1 - v2 + 1), 1);
+      v1 = _shiftR((v1 + v2 + 1), 1);
+      v2 = t;
+      t = _shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
+      v4 = _shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
+      v7 = t;
+      t = _shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
+      v5 = _shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
+      v6 = t;
+
+      // stage 1
+      p[0 * 8 + col] = (v0 + v7);
+      p[7 * 8 + col] = (v0 - v7);
+      p[1 * 8 + col] = (v1 + v6);
+      p[6 * 8 + col] = (v1 - v6);
+      p[2 * 8 + col] = (v2 + v5);
+      p[5 * 8 + col] = (v2 - v5);
+      p[3 * 8 + col] = (v3 + v4);
+      p[4 * 8 + col] = (v3 - v4);
     }
 
     // convert to 8-bit integers
     for (int i = 0; i < 64; ++i) {
-      int b = p[i];
-      dataOut[i] = b < -128 ? 0 : b > 128 ? 255 : b + 128;
+      dataOut[i] = dctClip[(dctClipOffset + 128 + _shiftR((p[i] + 8), 4))];
     }
   }
 
