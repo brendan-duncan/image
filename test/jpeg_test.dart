@@ -1,10 +1,7 @@
 part of image_test;
 
 void defineJpegTests() {
-  Io.File script = new Io.File(Io.Platform.script.toFilePath());
-  String path = script.parent.path;
-
-  Io.Directory dir = new Io.Directory(path + '/res/jpg');
+  Io.Directory dir = new Io.Directory('res/jpg');
   List files = dir.listSync();
 
   List<int> toRGB(int pixel) =>
@@ -25,18 +22,23 @@ void defineJpegTests() {
         }
 
         List<int> png = new PngEncoder().encodeImage(image);
-        new Io.File(path + '/out/jpg/${name}.png')
+        new Io.File('out/jpg/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
+
+        List<int> outJpg = new JpegEncoder().encodeImage(image);
+        new Io.File('out/jpg/${name}')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(outJpg);
       });
     }
 
     test('decode/encode', () {
-      List<int> bytes = new Io.File(path + '/res/jpg/testimg.png').readAsBytesSync();
+      List<int> bytes = new Io.File('res/jpg/testimg.png').readAsBytesSync();
       Image png = new PngDecoder().decodeImage(bytes);
       expect(toRGB(png.getPixel(0, 0)), [48, 47, 45]);
 
-      bytes = new Io.File(path + '/res/jpg/testimg.jpg').readAsBytesSync();
+      bytes = new Io.File('res/jpg/testimg.jpg').readAsBytesSync();
 
       // Decode the image from file.
       Image image = new JpegDecoder().decodeImage(bytes);

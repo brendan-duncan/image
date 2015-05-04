@@ -1,10 +1,7 @@
 part of image_test;
 
 void defineTiffTests() {
-  Io.File script = new Io.File(Io.Platform.script.toFilePath());
-  String path = script.parent.path;
-
-  Io.Directory dir = new Io.Directory(path + '/res/tiff');
+  Io.Directory dir = new Io.Directory('res/tiff');
   if (!dir.existsSync()) {
     return;
   }
@@ -70,7 +67,7 @@ void defineTiffTests() {
         }
 
         List<int> png = new PngEncoder().encodeImage(image);
-        new Io.File(path + '/out/tif/${name}.png')
+        new Io.File('out/tif/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
       });

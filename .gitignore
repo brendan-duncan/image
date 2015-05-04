@@ -20,3 +20,5 @@ example/test_formats.dart.precompiled.js
 build/
 packages
 psd_to_html/out/
+.idea/
+.pub/

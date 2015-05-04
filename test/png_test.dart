@@ -1,9 +1,6 @@
 part of image_test;
 
 void definePngTests() {
-  Io.File script = new Io.File(Io.Platform.script.toFilePath());
-  String path = script.parent.path;
-
   group('PNG', () {
     test('encode', () {
       Image image = new Image(64, 64);
@@ -11,12 +8,12 @@ void definePngTests() {
 
       // Encode the image to PNG
       List<int> png = new PngEncoder().encodeImage(image);
-      new Io.File(path + '/out/encode.png')
+      new Io.File('out/encode.png')
             .writeAsBytesSync(png);
     });
 
     test('decode', () {
-      List<int> bytes = new Io.File(path + '/out/encode.png').readAsBytesSync();
+      List<int> bytes = new Io.File('out/encode.png').readAsBytesSync();
       Image image = new PngDecoder().decodeImage(bytes);
 
       expect(image.width, equals(64));
@@ -27,12 +24,12 @@ void definePngTests() {
       }
 
       List<int> png = new PngEncoder().encodeImage(image);
-      new Io.File(path + '/out/decode.png')
+      new Io.File('out/decode.png')
             .writeAsBytesSync(png);
     });
 
 
-    Io.Directory dir = new Io.Directory(path + '/res/png');
+    Io.Directory dir = new Io.Directory('res/png');
     List files = dir.listSync();
 
     for (var f in files) {
@@ -82,13 +79,13 @@ void definePngTests() {
           Animation anim = decodeAnimation(file.readAsBytesSync());
           if (anim.length == 1) {
             List<int> png = new PngEncoder().encodeImage(anim[0]);
-            new Io.File(path + '/out/png/${name}')
+            new Io.File('out/png/${name}')
                   ..createSync(recursive: true)
                   ..writeAsBytesSync(png);
           } else {
             for (int i = 0; i < anim.length; ++i) {
               List<int> png = new PngEncoder().encodeImage(anim[i]);
-              new Io.File(path + '/out/png/${name}-$i.png')
+              new Io.File('out/png/${name}-$i.png')
                     ..createSync(recursive: true)
                     ..writeAsBytesSync(png);
             }
