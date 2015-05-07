@@ -2,7 +2,7 @@ part of image_test;
 
 
 void definePsdTests() {
-  Io.Directory dir = new Io.Directory('test/res/psd');
+  Io.Directory dir = new Io.Directory('res/psd');
   List files = dir.listSync();
 
   group('PSD', () {
@@ -19,7 +19,7 @@ void definePsdTests() {
 
         if (psd != null) {
           List<int> outPng = new PngEncoder().encodeImage(psd);
-          new Io.File('test/out/psd/$name.png')
+          new Io.File('out/psd/$name.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(outPng);
         } else {

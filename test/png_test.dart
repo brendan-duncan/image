@@ -8,12 +8,12 @@ void definePngTests() {
 
       // Encode the image to PNG
       List<int> png = new PngEncoder().encodeImage(image);
-      new Io.File('test/out/encode.png')
+      new Io.File('out/encode.png')
             .writeAsBytesSync(png);
     });
 
     test('decode', () {
-      List<int> bytes = new Io.File('test/out/encode.png').readAsBytesSync();
+      List<int> bytes = new Io.File('out/encode.png').readAsBytesSync();
       Image image = new PngDecoder().decodeImage(bytes);
 
       expect(image.width, equals(64));
@@ -24,12 +24,12 @@ void definePngTests() {
       }
 
       List<int> png = new PngEncoder().encodeImage(image);
-      new Io.File('test/out/decode.png')
+      new Io.File('out/decode.png')
             .writeAsBytesSync(png);
     });
 
 
-    Io.Directory dir = new Io.Directory('test/res/png');
+    Io.Directory dir = new Io.Directory('res/png');
     List files = dir.listSync();
 
     for (var f in files) {
@@ -79,13 +79,13 @@ void definePngTests() {
           Animation anim = decodeAnimation(file.readAsBytesSync());
           if (anim.length == 1) {
             List<int> png = new PngEncoder().encodeImage(anim[0]);
-            new Io.File('test/out/png/${name}')
+            new Io.File('out/png/${name}')
                   ..createSync(recursive: true)
                   ..writeAsBytesSync(png);
           } else {
             for (int i = 0; i < anim.length; ++i) {
               List<int> png = new PngEncoder().encodeImage(anim[i]);
-              new Io.File('test/out/png/${name}-$i.png')
+              new Io.File('out/png/${name}-$i.png')
                     ..createSync(recursive: true)
                     ..writeAsBytesSync(png);
             }

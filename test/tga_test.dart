@@ -1,7 +1,7 @@
 part of image_test;
 
 void defineTgaTests() {
-  Io.Directory dir = new Io.Directory('test/res/tga');
+  Io.Directory dir = new Io.Directory('res/tga');
   if (!dir.existsSync()) {
     return;
   }
@@ -22,14 +22,14 @@ void defineTgaTests() {
         }
 
         List<int> png = new PngEncoder().encodeImage(image);
-        new Io.File('test/out/tga/${name}.png')
+        new Io.File('out/tga/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
       });
     }
 
     test('decode/encode', () {
-      List<int> bytes = new Io.File('test/res/tga/globe.tga').readAsBytesSync();
+      List<int> bytes = new Io.File('res/tga/globe.tga').readAsBytesSync();
 
       // Decode the image from file.
       Image image = new TgaDecoder().decodeImage(bytes);
@@ -39,7 +39,7 @@ void defineTgaTests() {
       // Encode the image as a tga
       List<int> tga = new TgaEncoder().encodeImage(image);
 
-      Io.File out = new Io.File('test/out/globe.tga')
+      Io.File out = new Io.File('out/globe.tga')
                           ..createSync(recursive: true)
                           ..writeAsBytesSync(tga);
 
