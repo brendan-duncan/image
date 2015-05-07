@@ -2,7 +2,7 @@ library image_test;
 
 import 'dart:io' as Io;
 import 'package:image/image.dart';
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 
 part 'color_test.dart';
 part 'exr_test.dart';

@@ -1,7 +1,7 @@
 part of image_test;
 
 void defineTiffTests() {
-  Io.Directory dir = new Io.Directory('res/tiff');
+  Io.Directory dir = new Io.Directory('test/res/tiff');
   if (!dir.existsSync()) {
     return;
   }
@@ -67,7 +67,7 @@ void defineTiffTests() {
         }
 
         List<int> png = new PngEncoder().encodeImage(image);
-        new Io.File('out/tif/${name}.png')
+        new Io.File('test/out/tif/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
       });

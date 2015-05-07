@@ -2,7 +2,7 @@ part of image_test;
 
 
 void defineWebPTests() {
-  Io.Directory dir = new Io.Directory('res/webp');
+  Io.Directory dir = new Io.Directory('test/res/webp');
   List files = dir.listSync();
 
   group('WebP/getInfo', () {
@@ -35,7 +35,7 @@ void defineWebPTests() {
                           .readAsBytesSync();
   Image image = new WebPDecoder().decodeImage(bytes);
   List<int> png = new PngEncoder().encode(image);
-  new Io.File('out/webp/decode.png')
+  new Io.File('test/out/webp/decode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);*/
 
@@ -43,22 +43,22 @@ void defineWebPTests() {
   for (int i = 0; i < anim.numFrames; ++i) {
     AnimationFrame frame = anim[i];
     List<int> png = new PngEncoder().encode(frame.image);
-    new Io.File('out/webp/comp_$i.png')
+    new Io.File('test/out/webp/comp_$i.png')
           ..writeAsBytesSync(png);
   }*/
 
   group('WebP/decodeImage', () {
     test('validate', () {
-      Io.File file = new Io.File('res/webp/2b.webp');
+      Io.File file = new Io.File('test/res/webp/2b.webp');
       List<int> bytes = file.readAsBytesSync();
       Image image = new WebPDecoder().decodeImage(bytes);
       List<int> png = new PngEncoder().encodeImage(image);
-      new Io.File('out/webp/decode.png')
+      new Io.File('test/out/webp/decode.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
       // Validate decoding.
-      file = new Io.File('res/webp/2b.png');
+      file = new Io.File('test/res/webp/2b.png');
       bytes = file.readAsBytesSync();
       Image debugImage = new PngDecoder().decodeImage(bytes);
       bool found = false;
@@ -85,7 +85,7 @@ void defineWebPTests() {
         }
 
         List<int> png = new PngEncoder().encodeImage(image);
-        new Io.File('out/webp/${name}.png')
+        new Io.File('test/out/webp/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
       });
