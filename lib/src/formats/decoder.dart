@@ -1,12 +1,6 @@
 part of image;
 
 /**
- * A callback called during the decoding process.
- */
-typedef void ProgressCallback(int frame, int numFrames,
-                              int progress, int total);
-
-/**
  * Base class for image format decoders.
  *
  * Image pixels are stored as 32-bit unsigned ints, so all formats, regardless
@@ -46,8 +40,6 @@ typedef void ProgressCallback(int frame, int numFrames,
  * it's changes to the image.
  */
 abstract class Decoder {
-  ProgressCallback progressCallback;
-
   /**
    * A light-weight function to test if the given file is able to be decoded
    * by this Decoder.

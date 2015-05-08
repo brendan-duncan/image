@@ -28,7 +28,6 @@ class JpegDecoder extends Decoder {
       return null;
     }
     JpegData jpeg = new JpegData();
-    jpeg.progressCallback = progressCallback;
     jpeg.read(input.buffer);
 
     if (jpeg.frames.length != 1) {
@@ -44,7 +43,6 @@ class JpegDecoder extends Decoder {
 
   Image decodeImage(List<int> data, {int frame: 0}) {
     JpegData jpeg = new JpegData();
-    jpeg.progressCallback = progressCallback;
     jpeg.read(data);
 
     if (jpeg.frames.length != 1) {

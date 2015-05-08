@@ -1,7 +1,6 @@
 part of image;
 
 class JpegData  {
-  ProgressCallback progressCallback;
   InputBuffer input;
   JpegJfif jfif;
   JpegAdobe adobe;
@@ -98,11 +97,8 @@ class JpegData  {
       throw new ImageException('Only single frame JPEGs supported');
     }
 
-    _progressTotal = 0;
-    _progress = 0;
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
       JpegComponent component = frame.components[frame.componentsOrder[i]];
-      _progressTotal += component.blocksPerColumn;
     }
 
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
@@ -195,17 +191,17 @@ class JpegData  {
               data[offset++] = component2Line[(x * sx2).toInt()];
               data[offset++] = component3Line[(x * sx3).toInt()];
             } else {
-              Y = component1Line[(x * sx1).toInt()] << 8;
+              Y =  component1Line[(x * sx1).toInt()] << 8;
               Cb = component2Line[(x * sx2).toInt()] - 128;
               Cr = component3Line[(x * sx3).toInt()] - 128;
 
-              R = (Y + 359 * Cr + 128) >> 8;
-              G = (Y - 88 * Cb - 183 * Cr + 128) >> 8;
-              B = (Y + 454 * Cb + 128) >> 8;
+              R = _shiftR((Y + 359 * Cr + 128), 8);
+              G = _shiftR((Y - 88 * Cb - 183 * Cr + 128), 8);
+              B = _shiftR((Y + 454 * Cb + 128), 8);
 
-              data[offset++] = _clamp(R);
-              data[offset++] = _clamp(G);
-              data[offset++] = _clamp(B);
+              data[offset++] = _clamp8(R);
+              data[offset++] = _clamp8(G);
+              data[offset++] = _clamp8(B);
             }
           }
         }
@@ -219,9 +215,7 @@ class JpegData  {
         // The adobe transform marker overrides any previous setting
         if (adobe.transformCode != 0) {
           colorTransform = true;
-        } /*else if (typeof this.colorTransform !== 'undefined') {
-          colorTransform = !!this.colorTransform;
-        }*/
+        }
 
         component1 = components[0];
         component2 = components[1];
@@ -259,10 +253,10 @@ class JpegData  {
               Cr = component3Line[(x * sx3).toInt()];
               K = component4Line[(x * sx4).toInt()];
 
-              C = 255 - _clamp((Y + 1.402 * (Cr - 128)).toInt());
-              M = 255 - _clamp((Y - 0.3441363 * (Cb - 128) -
+              C = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
+              M = 255 - _clamp8((Y - 0.3441363 * (Cb - 128) -
                                     0.71413636 * (Cr - 128)).toInt());
-              Ye = 255 - _clamp((Y + 1.772 * (Cb - 128)).toInt());
+              Ye = 255 - _clamp8((Y + 1.772 * (Cb - 128)).toInt());
             }
 
             data[offset++] = C;
@@ -403,7 +397,7 @@ class JpegData  {
   }
 
   void _readAppData(int marker, InputBuffer block) {
-    InputBuffer appData = block;//.buffer;
+    InputBuffer appData = block;
 
     if (marker == Jpeg.M_APP0) {
       // 'JFIF\0'
@@ -639,9 +633,6 @@ class JpegData  {
 
     int l = 0;
     for (int blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
-      if (progressCallback != null) {
-        progressCallback(0, 1, _progress++, _progressTotal);
-      }
       int scanLine = _shiftL(blockRow, 3);
       for (int i = 0; i < 8; i++) {
         lines[l++] = new Uint8List(samplesPerLine);
@@ -672,6 +663,8 @@ class JpegData  {
 
     return (val * ONE).toInt() & 0xffffffff;
   }
+
+  static int _clamp8(int i) => i < 0 ? 0 : i > 255 ? 255 : i;
 
   static Uint8List dctClip;
 
@@ -706,13 +699,13 @@ class JpegData  {
     }
 
     // IDCT constants (20.12 fixed point format)
-    const int COS_1 = 4017;  // cos(pi/16)
-    const int SIN_1 = 799;   // sin(pi/16)
-    const int COS_3 = 3406;  // cos(3*pi/16)
-    const int SIN_3 = 2276;  // sin(3*pi/16)
-    const int COS_6 = 1567;  // cos(6*pi/16)
-    const int SIN_6 = 3784;  // sin(6*pi/16)
-    const int SQRT_2 = 5793;  // sqrt(2)
+    const int COS_1 = 4017;  // cos(pi/16)*4096
+    const int SIN_1 = 799;   // sin(pi/16)*4096
+    const int COS_3 = 3406;  // cos(3*pi/16)*4096
+    const int SIN_3 = 2276;  // sin(3*pi/16)*4096
+    const int COS_6 = 1567;  // cos(6*pi/16)*4096
+    const int SIN_6 = 3784;  // sin(6*pi/16)*4096
+    const int SQRT_2 = 5793;  // sqrt(2)*4096
     const int SQRT_1D2 = 2896; // sqrt(2) / 2
 
     // de-quantize
@@ -870,11 +863,6 @@ class JpegData  {
       dataOut[i] = dctClip[(dctClipOffset + 128 + _shiftR((p[i] + 8), 4))];
     }
   }
-
-  int _clamp(int i) => i < 0 ? 0 : i > 255 ? 255 : i;
-
-  int _progressTotal = 0;
-  int _progress = 0;
 
   static const CRR = const [
     -179, -178, -177, -175, -174, -172, -171, -170, -168, -167, -165, -164, -163,

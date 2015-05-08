@@ -236,9 +236,6 @@ class GifDecoder extends Decoder {
       for (int i = 0, j = 0; i < 4; ++i) {
         for (int y = row + INTERLACED_OFFSET[i]; y < row + height;
              y += INTERLACED_JUMP[i], ++j) {
-          if (progressCallback != null) {
-            progressCallback(_frame, _numFrames, j, height);
-          }
           if (!_getLine(line)) {
             return image;
           }
@@ -247,9 +244,6 @@ class GifDecoder extends Decoder {
       }
     } else {
       for (int y = 0; y < height; ++y) {
-        if (progressCallback != null) {
-          progressCallback(_frame, _numFrames, y, height);
-        }
         if (!_getLine(line)) {
           return image;
         }

@@ -56,9 +56,6 @@ class TgaDecoder extends Decoder {
     input.offset = info.imageOffset;
     Image image = new Image(info.width, info.height, Image.RGB);
     for (int y = image.height - 1; y >= 0; --y) {
-      if (progressCallback != null) {
-        progressCallback(0, 1, y - image.height - 1, image.height);
-      }
       for (int x = 0; x < image.width; ++x) {
         int b = input.readByte();
         int g = input.readByte();

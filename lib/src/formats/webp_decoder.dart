@@ -48,8 +48,6 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
-    info.progressCallback = progressCallback;
-
     switch (info.format) {
       case WebPInfo.FORMAT_ANIMATED:
         return info;
@@ -184,7 +182,6 @@ Animation decodeAnimation(List<int> bytes) {
 
     webp._frame = info._frame;
     webp._numFrames = info._numFrames;
-    webp.progressCallback = progressCallback;
 
     if (webp.hasAnimation) {
       if (frame >= webp.frames.length || frame < 0) {

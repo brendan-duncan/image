@@ -46,6 +46,7 @@ void defineJpegTests() {
       expect(image.height, equals(149));
 
       // This test identifies the rounding error in some pixels.
+      // TODO JPEG is not a precise format and this decoder differs from the one used by Photoshop. Improve the quality.
       /*for (int y = 0; y < image.height; ++y) {
         for (int x = 0; x < image.width; ++x) {
           expect(image.getPixel(x, y), equals(png.getPixel(x, y)),

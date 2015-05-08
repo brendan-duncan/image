@@ -498,9 +498,6 @@ class VP8L {
     int count = 0;
     int di = rows;
     for (int y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
-      if (webp.progressCallback != null) {
-        webp.progressCallback(webp._frame, webp._numFrames, dy, webp.height);
-      }
       for (int x = 0; x < webp.width; ++x, ++pi) {
         int c = _pixels[pi];
         int r = getRed(c);

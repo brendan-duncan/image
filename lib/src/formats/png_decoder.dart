@@ -376,9 +376,6 @@ class PngDecoder extends Decoder {
     int pi = 0;
     for (int srcY = 0, dstY = yOffset, ri = 0;
          srcY < passHeight; ++srcY, dstY += yStep, ri = 1 - ri, _progressY++) {
-      if (progressCallback != null) {
-        progressCallback(0, 1, _progressY, info.height);
-      }
       int filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes).toUint8List();
 
@@ -438,9 +435,6 @@ class PngDecoder extends Decoder {
     final List<int> pixel = [0, 0, 0, 0];
 
     for (int y = 0, pi = 0, ri = 0; y < h; ++y, ri = 1 - ri) {
-      if (progressCallback != null) {
-        progressCallback(_frame, _numFrames, y, h);
-      }
       int filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes).toUint8List();
 

@@ -30,7 +30,6 @@ class WebPInfo extends DecodeInfo {
 
   int get numFrames => frames.length;
 
-  ProgressCallback progressCallback;
   int _frame;
   int _numFrames;
 
