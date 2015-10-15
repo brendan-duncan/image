@@ -17,7 +17,7 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
         Image dst = new Image(src.height, src.width, src.format);
         for (int y = 0; y < dst.height; ++y) {
           for (int x = 0; x < dst.width; ++x) {
-            dst.setPixel(x, y, src.getPixel(y, x));
+            dst.setPixel(x, y, src.getPixel(y, hm1 - x));
           }
         }
         return dst;
