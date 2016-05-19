@@ -72,7 +72,6 @@ class TiffImage {
       } else if (entry.tag == TAG_PREDICTOR) {
         predictor = entry.readValue(p3);
       } else if (entry.tag == TAG_COLOR_MAP) {
-        List<int> palette =
         colorMap = entry.readValues(p3);
         colorMapRed = 0;
         colorMapGreen = colorMap.length ~/ 3;
@@ -315,10 +314,14 @@ class TiffImage {
           if (samplesPerPixel == 1) {
             int gray = bdata[pi++];
             int gray16 = gray;
-            // downsample 16-bit to 8-bit (which means we can just skip the
-            // next 8 bytes).
+            // down-sample 16-bit to 8-bit..
             if (bitsPerSample == 16) {
-              gray16 = gray16 << 8 | bdata[pi++];
+              if (!p.bigEndian) {
+                gray = bdata[pi++];
+                gray16 = gray << 8 | gray16;
+              } else {
+                gray16 = gray16 << 8 | bdata[pi++];
+              }
             }
 
             if (photometricType == 0) {
