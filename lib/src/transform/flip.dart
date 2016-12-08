@@ -2,8 +2,10 @@ part of image;
 
 /// Flip the image horizontally.
 const int FLIP_HORIZONTAL = 1;
+
 /// Flip the image vertically.
 const int FLIP_VERTICAL = 2;
+
 /// Flip the image both horizontally and vertically.
 const int FLIP_BOTH = 3;
 
@@ -43,7 +45,7 @@ Image flipVertical(Image src) {
     int y1 = y * w;
     int y2 = (h - 1 - y) * w;
     for (int x = 0; x < w; ++x) {
-      int t = src[y1 + x];
+      int t = src[y2 + x];
       src[y2 + x] = src[y1 + x];
       src[y1 + x] = t;
     }
@@ -62,9 +64,9 @@ Image flipHorizontal(Image src) {
     int y1 = y * w;
     for (int x = 0; x < w2; ++x) {
       int x2 = (w - 1 - x);
-      int t = src[y1 + x];
+      int t = src[y1 + x2];
       src[y1 + x2] = src[y1 + x];
-      src[y1 + x2] = t;
+      src[y1 + x] = t;
     }
   }
   return src;

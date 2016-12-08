@@ -33,8 +33,8 @@ void defineFilterTests() {
       copyInto(d, image2, dstX: 10, dstY: 10);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/copyInto.png')
-                         ..createSync(recursive: true)
-                         ..writeAsBytesSync(writePng(d));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writePng(d));
     });
 
     test('add', () {
@@ -201,7 +201,7 @@ void defineFilterTests() {
 
     test('NOISE_GAUSSIAN', () {
       Image f = new Image.from(image);
-      noise(f, 10.0, type:NOISE_GAUSSIAN);
+      noise(f, 10.0, type: NOISE_GAUSSIAN);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_gaussian.png');
       fp.createSync(recursive: true);
@@ -210,7 +210,7 @@ void defineFilterTests() {
 
     test('NOISE_UNIFORM', () {
       Image f = new Image.from(image);
-      noise(f, 10.0, type:NOISE_UNIFORM);
+      noise(f, 10.0, type: NOISE_UNIFORM);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_uniform.png');
       fp.createSync(recursive: true);
@@ -219,7 +219,7 @@ void defineFilterTests() {
 
     test('NOISE_SALT_PEPPER', () {
       Image f = new Image.from(image);
-      noise(f, 10.0, type:NOISE_SALT_PEPPER);
+      noise(f, 10.0, type: NOISE_SALT_PEPPER);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_salt_pepper.png');
       fp.createSync(recursive: true);
@@ -228,7 +228,7 @@ void defineFilterTests() {
 
     test('NOISE_POISSON', () {
       Image f = new Image.from(image);
-      noise(f, 10.0, type:NOISE_POISSON);
+      noise(f, 10.0, type: NOISE_POISSON);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_poisson.png');
       fp.createSync(recursive: true);
@@ -237,7 +237,7 @@ void defineFilterTests() {
 
     test('NOISE_RICE', () {
       Image f = new Image.from(image);
-      noise(f, 10.0, type:NOISE_RICE);
+      noise(f, 10.0, type: NOISE_RICE);
       // Save the image as a PNG.
       Io.File fp = new Io.File('out/noise_rice.png');
       fp.createSync(recursive: true);
@@ -357,8 +357,8 @@ void defineFilterTests() {
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));
       Io.File fp = new Io.File('out/trim.png')
-                         ..createSync(recursive: true)
-                         ..writeAsBytesSync(writePng(trimmed));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writePng(trimmed));
     });
 
     test('dropShadow', () {
@@ -366,39 +366,64 @@ void defineFilterTests() {
       Image d = dropShadow(s, 5, 5, 10);
       // Save the image as a PNG.
       new Io.File('out/dropShadow.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writePng(d));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writePng(d));
 
       s = new Image.from(image2);
       d = dropShadow(s, -5, 5, 10);
       // Save the image as a PNG.
       new Io.File('out/dropShadow-2.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writePng(d));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writePng(d));
 
       s = new Image.from(image2);
       d = dropShadow(s, 5, -5, 10);
       // Save the image as a PNG.
       new Io.File('out/dropShadow-3.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writePng(d));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writePng(d));
 
       s = new Image.from(image2);
       d = dropShadow(s, -5, -5, 10);
       // Save the image as a PNG.
       new Io.File('out/dropShadow-4.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writePng(d));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writePng(d));
 
       s = new Image(256, 256);
       s.fill(0);
-      drawString(s, arial_48, 30, 100, 'Shadow',
-                color: getColor(255, 0, 0));
+      drawString(s, arial_48, 30, 100, 'Shadow', color: getColor(255, 0, 0));
       d = dropShadow(s, -3, -3, 5);
       // Save the image as a PNG.
       new Io.File('out/dropShadow-5.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writePng(d));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writePng(d));
+    });
+
+    test('flip horzontal', () {
+      Image f = new Image.from(image);
+      Image r = flip(f, 1);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/flipH.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(r));
+    });
+    test('flip vertical', () {
+      Image f = new Image.from(image);
+      Image r = flip(f, 2);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/flipV.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(r));
+    });
+
+    test('flip both', () {
+      Image f = new Image.from(image);
+      Image r = flip(f, 3);
+      // Save the image as a PNG.
+      Io.File fp = new Io.File('out/flipHV.png');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writePng(r));
     });
   });
 }
