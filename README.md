@@ -1,6 +1,6 @@
 # image
 
-[![Build Status](https://drone.io/github.com/brendan-duncan/image/status.png)](https://drone.io/github.com/brendan-duncan/image/latest)
+[![Build Status](https://travis-ci.org/brendan-duncan/image.svg?branch=master)](https://travis-ci.org/brendan-duncan/image)
 
 ##Overview
 
