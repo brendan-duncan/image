@@ -28,13 +28,25 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
 
   // Axis-aligned lines
   if (dx == 0) {
-    for (int y = y1; y <= y2; ++y) {
-      drawPixel(image, x1, y, color);
+    if (dy < 0) {
+      for (int y = y2; y <= y1; ++y) {
+        drawPixel(image, x1, y, color);
+      }
+    } else {
+      for (int y = y1; y <= y2; ++y) {
+        drawPixel(image, x1, y, color);
+      }
     }
     return image;
   } else if (dy == 0) {
-    for (int x = x1; x <= x2; ++x) {
-      drawPixel(image, x, y1, color);
+    if (dx < 0) {
+      for (int x = x2; x <= x1; ++x) {
+        drawPixel(image, x, y1, color);
+      }
+    } else {
+      for (int x = x1; x <= x2; ++x) {
+        drawPixel(image, x, y1, color);
+      }
     }
     return image;
   }
