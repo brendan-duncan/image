@@ -2,9 +2,9 @@ part of image_test;
 
 void defineFilterTests() {
   group('filter', () {
-    Image image = readJpg(new Io.File('res/jpg/big_buck_bunny.jpg').readAsBytesSync());
+    Image image = readJpg(new Io.File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync());
     image = copyResize(image, 400);
-    Image image2 = readPng(new Io.File('res/png/alpha_edge.png').readAsBytesSync());
+    Image image2 = readPng(new Io.File('test/res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       Image f = new Image(10, 10, Image.RGB);
@@ -352,7 +352,7 @@ void defineFilterTests() {
     });
 
     test('trim', () {
-      Image image = readPng(new Io.File('res/png/trim.png').readAsBytesSync());
+      Image image = readPng(new Io.File('test/res/png/trim.png').readAsBytesSync());
       Image trimmed = trim(image, mode: TRIM_TRANSPARENT);
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));

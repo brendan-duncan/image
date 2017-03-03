@@ -2,7 +2,7 @@ part of image_test;
 
 
 void definePsdTests() {
-  Io.Directory dir = new Io.Directory('res/psd');
+  Io.Directory dir = new Io.Directory('test/res/psd');
   List files = dir.listSync();
 
   group('PSD', () {

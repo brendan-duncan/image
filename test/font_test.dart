@@ -2,11 +2,11 @@ part of image_test;
 
 
 void defineFontTests() {
-  Image image = readJpg(new Io.File('res/jpg/big_buck_bunny.jpg').readAsBytesSync());
+  Image image = readJpg(new Io.File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync());
 
   group('bitmapFont', () {
     test('zip/xml', () {
-      List<int> fontZip = new Io.File('res/font/test.zip').readAsBytesSync();
+      List<int> fontZip = new Io.File('test/res/font/test.zip').readAsBytesSync();
       BitmapFont font = readFontZip(fontZip);
 
       var img = copyResize(image, 400);
@@ -18,7 +18,7 @@ void defineFontTests() {
     });
 
     test('zip/text', () {
-      List<int> fontZip = new Io.File('res/font/test_text.zip').readAsBytesSync();
+      List<int> fontZip = new Io.File('test/res/font/test_text.zip').readAsBytesSync();
       BitmapFont font = readFontZip(fontZip);
 
       var img = copyResize(image, 400);

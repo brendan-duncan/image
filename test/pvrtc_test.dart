@@ -3,7 +3,7 @@ part of image_test;
 void definePvrtcTests() {
   group('PVRTC', () {
     test('encode_rgb_4bpp', () {
-      List<int> bytes = new Io.File('res/tga/globe.tga').readAsBytesSync();
+      List<int> bytes = new Io.File('test/res/tga/globe.tga').readAsBytesSync();
       Image image = new TgaDecoder().decodeImage(bytes);
 
       new Io.File('out/pvrtc/globe_before.png')
@@ -25,7 +25,7 @@ void definePvrtcTests() {
     });
 
     test('encode_rgba_4bpp', () {
-      List<int> bytes = new Io.File('res/png/alpha_edge.png').readAsBytesSync();
+      List<int> bytes = new Io.File('test/res/png/alpha_edge.png').readAsBytesSync();
       Image image = new PngDecoder().decodeImage(bytes);
 
       new Io.File('out/pvrtc/alpha_before.png')
@@ -48,7 +48,7 @@ void definePvrtcTests() {
   });
 
   group('PVR Decode', (){
-    Io.Directory dir = new Io.Directory('res/pvr');
+    Io.Directory dir = new Io.Directory('test/res/pvr');
     List files = dir.listSync();
     for (var f in files) {
       if (f is! Io.File || !f.path.endsWith('.pvr')) {

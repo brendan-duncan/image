@@ -1,7 +1,7 @@
 part of image_test;
 
 void defineGifTests() {
-  Io.Directory dir = new Io.Directory('res/gif');
+  Io.Directory dir = new Io.Directory('test/res/gif');
   List files = dir.listSync();
 
   group('Gif/getInfo', () {
@@ -41,7 +41,7 @@ void defineGifTests() {
   });
 
   group('Gif/encodeImage', () {
-    List<int> bytes = new Io.File('res/jpg/jpeg444.jpg').readAsBytesSync();
+    List<int> bytes = new Io.File('test/res/jpg/jpeg444.jpg').readAsBytesSync();
     Image image = new JpegDecoder().decodeImage(bytes);
 
     List<int> gif = new GifEncoder().encodeImage(image);

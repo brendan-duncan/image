@@ -29,7 +29,7 @@ void definePngTests() {
     });
 
 
-    Io.Directory dir = new Io.Directory('res/png');
+    Io.Directory dir = new Io.Directory('test/res/png');
     List files = dir.listSync();
 
     for (var f in files) {

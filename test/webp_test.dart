@@ -2,7 +2,7 @@ part of image_test;
 
 
 void defineWebPTests() {
-  Io.Directory dir = new Io.Directory('res/webp');
+  Io.Directory dir = new Io.Directory('test/res/webp');
   List files = dir.listSync();
 
   group('WebP/getInfo', () {
@@ -49,7 +49,7 @@ void defineWebPTests() {
 
   group('WebP/decodeImage', () {
     test('validate', () {
-      Io.File file = new Io.File('res/webp/2b.webp');
+      Io.File file = new Io.File('test/res/webp/2b.webp');
       List<int> bytes = file.readAsBytesSync();
       Image image = new WebPDecoder().decodeImage(bytes);
       List<int> png = new PngEncoder().encodeImage(image);
@@ -58,7 +58,7 @@ void defineWebPTests() {
             ..writeAsBytesSync(png);
 
       // Validate decoding.
-      file = new Io.File('res/webp/2b.png');
+      file = new Io.File('test/res/webp/2b.png');
       bytes = file.readAsBytesSync();
       Image debugImage = new PngDecoder().decodeImage(bytes);
       bool found = false;
