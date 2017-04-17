@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/brendan-duncan/image.svg?branch=master)](https://travis-ci.org/brendan-duncan/image)
 
-##Overview
+## Overview
 
 A Dart library providing the ability to load, save and manipulate images in a variety of different file formats.
 
@@ -27,15 +27,15 @@ Read Only:
 - OpenEXR
 
 
-##[Documentation](https://github.com/brendan-duncan/image/wiki)
+## [Documentation](https://github.com/brendan-duncan/image/wiki)
 
-##[API](http://www.dartdocs.org/documentation/image/1.1.22/index.html#image/image)
+## [API](http://www.dartdocs.org/documentation/image/1.1.22/index.html#image/image)
 
-##[Examples](https://github.com/brendan-duncan/image/wiki/Examples)
+## [Examples](https://github.com/brendan-duncan/image/wiki/Examples)
 
-##[Format Decoding Functions](https://github.com/brendan-duncan/image/wiki#format-decoding-functions)
+## [Format Decoding Functions](https://github.com/brendan-duncan/image/wiki#format-decoding-functions)
 
-##Samples
+## Samples
 
 Load an image, resize it, and save it as a png:
 
