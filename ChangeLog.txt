@@ -1,3 +1,8 @@
+v 1.1.27 - May 14, 2017
+
+- Fix crash decoding some jpeg images.
+
+
 v 1.1.24 - January 23, 2015
 
 - PVR encoding/decoding
