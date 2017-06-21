@@ -131,6 +131,10 @@ class JpegScan {
     var node = tree;
     int bit;
     while ((bit = _readBit()) != null) {
+      if (bit >= node.length) {
+        // what does this mean? Some images have this error.
+        continue;
+      }
       node = node[bit];
       if (node is num) {
         return node.toInt();
