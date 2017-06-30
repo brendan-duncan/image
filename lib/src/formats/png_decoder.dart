@@ -163,7 +163,26 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'bKGD':
-          _input.skip(chunkSize);
+          if (info.colorType == 3) {
+            int paletteIndex = _input.readByte();
+            chunkSize--;
+            int p3 = paletteIndex * 3;
+            int r = info.palette[p3];
+            int g = info.palette[p3 + 1];
+            int b = info.palette[p3 + 2];
+            info.backgroundColor = Color.fromRgb(r, g, b);
+          } else if (info.colorType == 0 || info.colorType == 4) {
+            int gray = _input.readUint16();
+            chunkSize -= 2;
+          } else if (info.colorType == 2 || info.colorType ==6) {
+            int r = _input.readUint16();
+            int g = _input.readUint16();
+            int b = _input.readUint16();
+            chunkSize -= 24;
+          }
+          if (chunkSize > 0) {
+            _input.skip(chunkSize);
+          }
           _input.skip(4); // CRC
           break;
         default:
@@ -257,9 +276,9 @@ class PngDecoder extends Decoder {
       info.colorLut = new List<int>(256);
       for (int i = 0; i < 256; ++i) {
         int c = i;
-        if (info.gamma != null) {
+        /*if (info.gamma != null) {
           c = (Math.pow((c / 255.0), info.gamma) * 255.0).toInt();
-        }
+        }*/
         info.colorLut[i] = c;
       }
 
@@ -710,9 +729,9 @@ class PngDecoder extends Decoder {
           return getColor(255, 255, 255, a);
         }
 
-        int r = info.colorLut[info.palette[p]];
-        int g = info.colorLut[info.palette[p + 1]];
-        int b = info.colorLut[info.palette[p + 2]];
+        int r = info.palette[p];
+        int g = info.palette[p + 1];
+        int b = info.palette[p + 2];
 
         return getColor(r, g, b, a);
       case GRAYSCALE_ALPHA:
