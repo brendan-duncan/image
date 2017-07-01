@@ -2,6 +2,7 @@
 
 - Update pubspec to fix recent pub issues.
 - Rename changelog.txt to CHANGELOG.md.
+- Fix for 8-bit PNG decoding.
 
 ## 1.1.27 - May 14, 2017
 
