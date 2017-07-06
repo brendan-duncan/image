@@ -1,5 +1,5 @@
 import 'dart:html' as Html;
-import 'package:crypto/crypto.dart';
+import 'dart:convert/convert.dart';
 import 'package:image/image.dart';
 
 /**
@@ -20,10 +20,10 @@ void main() {
             return new String.fromCharCode(e.codeUnitAt(0) & 0xff);
            }).join('').codeUnits;
 
-          var image = decodeWebP(bytes);
-          var png = encodePng(image);
+          Image image = decodeWebP(bytes);
+          List<int> png = encodePng(image);
 
-          var png64 = CryptoUtils.bytesToBase64(png);
+          var png64 = BASE64.encode(png);
           img.src = 'data:image/png;base64,${png64}';
         }
       });

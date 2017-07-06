@@ -36,7 +36,7 @@ class JpegEncoder extends Encoder {
     OutputBuffer fp = new OutputBuffer(bigEndian: true);
 
     // Add JPEG headers
-    _writeMarker(fp, Jpeg.M_SOI);
+    _writeMarker(fp, JpegDecoder.M_SOI);
     _writeAPP0(fp);
     _writeDQT(fp);
     _writeSOF0(fp, image.width, image.height);
@@ -112,7 +112,7 @@ class JpegEncoder extends Encoder {
       _writeBits(fp, fillbits);
     }
 
-    _writeMarker(fp, Jpeg.M_EOI);
+    _writeMarker(fp, JpegDecoder.M_EOI);
 
     return fp.getBytes();
   }
@@ -368,7 +368,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeAPP0(OutputBuffer out) {
-    _writeMarker(out, Jpeg.M_APP0);
+    _writeMarker(out, JpegDecoder.M_APP0);
     out.writeUint16(16); // length
     out.writeByte(0x4A); // J
     out.writeByte(0x46); // F
@@ -385,7 +385,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height) {
-    _writeMarker(out, Jpeg.M_SOF0);
+    _writeMarker(out, JpegDecoder.M_SOF0);
     out.writeUint16(17);   // length, truecolor YUV JPG
     out.writeByte(8);    // precision
     out.writeUint16(height);
@@ -403,7 +403,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeDQT(OutputBuffer out) {
-    _writeMarker(out, Jpeg.M_DQT);
+    _writeMarker(out, JpegDecoder.M_DQT);
     out.writeUint16(132); // length
     out.writeByte(0);
     for (int i = 0; i < 64; i++) {
@@ -416,7 +416,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeDHT(OutputBuffer out) {
-    _writeMarker(out, Jpeg.M_DHT);
+    _writeMarker(out, JpegDecoder.M_DHT);
     out.writeUint16(0x01A2); // length
 
     out.writeByte(0); // HTYDCinfo
@@ -453,7 +453,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeSOS(OutputBuffer out) {
-    _writeMarker(out, Jpeg.M_SOS);
+    _writeMarker(out, JpegDecoder.M_SOS);
     out.writeUint16(12); // length
     out.writeByte(3); // nrofcomponents
     out.writeByte(1); // IdY

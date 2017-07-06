@@ -289,13 +289,12 @@ class TiffImage {
         List<int> outData = new ZLibDecoder().decodeBytes(data);
         bdata = new InputBuffer(outData);
       } else if (compression == COMPRESSION_OLD_JPEG) {
-        List<int> data = p.toList(0, byteCount);
-        JpegData jpeg = new JpegData();
-        jpeg.read(data);
         if (image == null) {
           image = new Image(width, height);
         }
-        _jpegToImage(jpeg, image, outX, outY, tileWidth, tileHeight);
+        List<int> data = p.toList(0, byteCount);
+        Image tile = new JpegDecoder().decodeImage(data);
+        _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight);
         if (hdrImage != null) {
           hdrImage = new HdrImage.fromImage(image);
         }
@@ -448,11 +447,16 @@ class TiffImage {
     }
   }
 
-  void _jpegToImage(JpegData jpeg, Image image, int outX, int outY,
+  void _jpegToImage(Image tile, Image image, int outX, int outY,
                     int tileWidth, int tileHeight) {
     int width = tileWidth;
     int height = tileHeight;
-    Uint8List data = jpeg.getData(width, height);
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        image.setPixel(x + outX, y + outY, tile.getPixel(x, y));
+      }
+    }
+    /*Uint8List data = jpeg.getData(width, height);
     List components = jpeg.components;
 
     int i = 0;
@@ -496,7 +500,7 @@ class TiffImage {
         break;
       default:
         throw 'Unsupported color mode';
-    }
+    }*/
   }
 
   int _clamp(int i) {

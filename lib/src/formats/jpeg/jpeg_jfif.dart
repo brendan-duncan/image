@@ -8,5 +8,5 @@ class JpegJfif {
   int yDensity;
   int thumbWidth;
   int thumbHeight;
-  InputBuffer thumbData;
+  Uint8List thumbData;
 }

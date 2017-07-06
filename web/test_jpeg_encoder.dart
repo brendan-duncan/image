@@ -1,5 +1,5 @@
 import 'dart:html' as Html;
-import 'package:crypto/crypto.dart';
+import 'dart:convert/convert.dart';
 import 'package:image/image.dart';
 
 void main() {
@@ -17,7 +17,7 @@ void main() {
 
   var jpg = encodeJpg(image, quality: 25);
 
-  var jpg64 = CryptoUtils.bytesToBase64(jpg);
+  var jpg64 = BASE64.encode(jpg);
   var img = Html.document.createElement('img');
   img.src = 'data:image/png;base64,${jpg64}';
   Html.document.body.append(img);

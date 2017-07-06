@@ -16,15 +16,18 @@ void defineJpegTests() {
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
+        expect(new JpegDecoder().isValidFile(bytes), equals(true));
+
+        InputBuffer stream = new InputBuffer(bytes);
         Image image = new JpegDecoder().decodeImage(bytes);
         if (image == null) {
           throw new ImageException('Unable to decode JPEG Image: $name.');
         }
 
-        List<int> png = new PngEncoder().encodeImage(image);
-        new Io.File('out/jpg/${name}.png')
+        List<int> tga = new TgaEncoder().encodeImage(image);
+        new Io.File('out/jpg/${name}.tga')
               ..createSync(recursive: true)
-              ..writeAsBytesSync(png);
+              ..writeAsBytesSync(tga);
 
         List<int> outJpg = new JpegEncoder().encodeImage(image);
         new Io.File('out/jpg/${name}')
@@ -44,16 +47,6 @@ void defineJpegTests() {
       Image image = new JpegDecoder().decodeImage(bytes);
       expect(image.width, equals(227));
       expect(image.height, equals(149));
-
-      // This test identifies the rounding error in some pixels.
-      // TODO JPEG is not a precise format and this decoder differs from the one used by Photoshop. Improve the quality.
-      /*for (int y = 0; y < image.height; ++y) {
-        for (int x = 0; x < image.width; ++x) {
-          expect(image.getPixel(x, y), equals(png.getPixel(x, y)),
-              reason: '$x $y : ${toRGB(image.getPixel(x, y))} != '
-                      '${toRGB(png.getPixel(x, y))}');
-        }
-      }*/
 
       // Encode the image to Jpeg
       List<int> jpg = new JpegEncoder().encodeImage(image);

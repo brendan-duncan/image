@@ -1,7 +1,7 @@
 import 'dart:html' as Html;
 
 import 'package:image/image.dart';
-import 'package:crypto/crypto.dart';
+import 'dart:convert/convert.dart';
 
 Html.InputElement fileInput;
 
@@ -77,7 +77,7 @@ void onFileLoaded(Html.ProgressEvent event) {
     // encode the image to a PNG
     var png = encodePng(image);
     // base64 encode the png
-    var png64 = CryptoUtils.bytesToBase64(png);
+    var png64 = BASE64.encode(png);
     // set the img src as a data url
     img.src = 'data:image/png;base64,${png64}';
   }
