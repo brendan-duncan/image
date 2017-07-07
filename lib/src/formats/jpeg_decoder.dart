@@ -1172,11 +1172,17 @@ class JpegDecoder extends Decoder {
     int c = 0;
     do {
       do {
+        if (_stream.isEOS) {
+          return 0;
+        }
         bytes++;
         c = _get_bits_1(8);
       } while (c != 0xFF);
 
       do {
+        if (_stream.isEOS) {
+          return 0;
+        }
         c = _get_bits_1(8);
       } while (c == 0xFF);
     } while (c == 0);
