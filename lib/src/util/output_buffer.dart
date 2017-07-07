@@ -113,20 +113,16 @@ class OutputBuffer {
   }
 
   /**
-   * Grow the buffer to accomidate additional data.
+   * Grow the buffer to accommodate additional data.
    */
   void _expandBuffer([int required]) {
-    int blockSize = _BLOCK_SIZE;
-    if (required != null) {
-      if (required > blockSize) {
-        blockSize = required;
-      }
-    }
+    int blockSize = (required != null) ? required :
+                    (_buffer.length == 0) ? _BLOCK_SIZE : (_buffer.length * 2);
     Uint8List newBuffer = new Uint8List(_buffer.length + blockSize);
     newBuffer.setRange(0, _buffer.length, _buffer);
     _buffer = newBuffer;
   }
 
-  static const int _BLOCK_SIZE = 0x8000; // 32k block-size
+  static const int _BLOCK_SIZE = 0x2000; // 8k block-size
   Uint8List _buffer;
 }

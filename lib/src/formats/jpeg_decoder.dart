@@ -90,7 +90,7 @@ class JpegDecoder extends Decoder {
         break;
       }
       int pi = 0;
-      if (num_components == 3) {
+      if (num_components == 3 || num_components == 4) {
         for (int x = 0; x < _image_x_size; ++x, pi += 4) {
           image.setPixel(x, y, Color.fromRgb(scanline[pi],
               scanline[pi + 1], scanline[pi + 2]));
@@ -235,6 +235,9 @@ class JpegDecoder extends Decoder {
           _gray_convert();
           scanline = _scan_line_0;
           break;
+        case _CMYK:
+          _cmyk_convert();
+          scanline = _scan_line_0;
       }
     }
 
@@ -248,6 +251,48 @@ class JpegDecoder extends Decoder {
   void _decode_init(InputBuffer stream) {
     _init(stream);
     _locate_sof_marker();
+  }
+
+  static int _clamp8(int i) => i < 0 ? 0 : i > 255 ? 255 : i;
+
+  void _cmyk_convert() {
+    int row = _max_mcu_y_size - _mcu_lines_left;
+    Uint8List d = _scan_line_0;
+    int di = 0;
+    Uint8List s = _sample_buf;
+    int si = row * 8;
+
+    for (int i = _max_mcus_per_row; i > 0; i--) {
+      for (int j = 0; j < 8; j++) {
+        int c = s[si + j];
+        int m = s[si + 64 + j];
+        int y = s[si + 128 + j];
+        int k = s[si + 192 + j];
+
+        if (adobe != null && adobe.transformCode != 0) {
+          int Y = c;
+          int Cb = m;
+          int Cr = y;
+          c = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
+          m = 255 - _clamp8((Y - 0.3441363 * (Cb - 128) -
+              0.71413636 * (Cr - 128)).toInt());
+          y = 255 - _clamp8((Y + 1.772 * (Cb - 128)).toInt());
+        }
+
+        int b = _clamp8(((y * k) >> 8));
+        int g = _clamp8(((m * k) >> 8));
+        int r = _clamp8(((c * k) >> 8));
+
+        d[di] = r;
+        d[di + 1] = g;
+        d[di + 2] = b;
+        d[di + 3] = 255;
+
+        di += 4;
+      }
+
+      si += 64 * 4;
+    }
   }
 
   // Y (1 block per MCU) to 8-bit grayscale
@@ -1961,14 +2006,21 @@ class JpegDecoder extends Decoder {
 
   void _init_frame() {
     if (_comps_in_frame == 1) {
-      if ((_comp_h_samp[0] != 1) || (_comp_v_samp[0] != 1)) {
-        _terminate(UNSUPPORTED_SAMP_FACTORS);
-      }
-
       _scan_type = _GRAYSCALE;
       _max_blocks_per_mcu = 1;
-      _max_mcu_x_size = 8;
-      _max_mcu_y_size = 8;
+      _max_mcu_x_size = 8 * _comp_h_samp[0];
+      _max_mcu_y_size = 8 * _comp_v_samp[0];
+    } else if (_comps_in_frame == 4) {
+      if (((_comp_h_samp[1] != 1) || (_comp_v_samp[1] != 1)) ||
+          ((_comp_h_samp[2] != 1) || (_comp_v_samp[2] != 1)) ||
+          ((_comp_h_samp[3] != 1) || (_comp_v_samp[3] != 1))) {
+        _terminate(UNSUPPORTED_SAMP_FACTORS);
+      }
+      _scan_type = _CMYK;
+      _max_blocks_per_mcu = 4;
+      _max_mcu_x_size = 8 * _comp_h_samp[0];
+      _max_mcu_y_size = 8 * _comp_v_samp[1];
+
     } else if (_comps_in_frame == 3) {
       if (((_comp_h_samp[1] != 1) || (_comp_v_samp[1] != 1)) ||
           ((_comp_h_samp[2] != 1) || (_comp_v_samp[2] != 1))) {
@@ -2671,6 +2723,7 @@ class JpegDecoder extends Decoder {
   static const int _YH2V1 = 2;
   static const int _YH1V2 = 3;
   static const int _YH2V2 = 4;
+  static const int _CMYK = 5;
 
   static const int _MAX_BLOCKS_PER_MCU = 10;
   static const int _MAX_HUFF_TABLES = 8;
