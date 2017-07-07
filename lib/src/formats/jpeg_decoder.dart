@@ -368,7 +368,7 @@ class JpegDecoder extends Decoder {
           int gc = ((_crg[cr] + _cbg[cb]) >> 16);
           int bc = _cbb[cb];
 
-          int yy = y[yi + j << 1];
+          int yy = y[yi + (j << 1)];
           d0[d0i + 0] = _clamp(yy + rc);
           d0[d0i + 1] = _clamp(yy + gc);
           d0[d0i + 2] = _clamp(yy + bc);
@@ -1256,8 +1256,8 @@ class JpegDecoder extends Decoder {
           break;
       }
     }
-    _terminate(STREAM_READ);
-    return 0;
+    //_terminate(STREAM_READ);
+    return M_EOI;
   }
 
   void _read_app_data(int marker) {
