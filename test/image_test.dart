@@ -21,7 +21,7 @@ part 'webp_test.dart';
 void main() {
   defineColorTests();
   defineJpegTests();
-  /*definePngTests();
+  definePngTests();
   defineGifTests();
   defineTgaTests();
   defineTiffTests();
@@ -31,5 +31,5 @@ void main() {
   defineHalfTests();
   defineExrTests();
   definePsdTests();
-  definePvrtcTests();*/
+  definePvrtcTests();
 }
