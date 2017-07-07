@@ -2008,8 +2008,8 @@ class JpegDecoder extends Decoder {
     if (_comps_in_frame == 1) {
       _scan_type = _GRAYSCALE;
       _max_blocks_per_mcu = 1;
-      _max_mcu_x_size = 8 * _comp_h_samp[0];
-      _max_mcu_y_size = 8 * _comp_v_samp[0];
+      _max_mcu_x_size = 8;
+      _max_mcu_y_size = 8;
     } else if (_comps_in_frame == 4) {
       if (((_comp_h_samp[1] != 1) || (_comp_v_samp[1] != 1)) ||
           ((_comp_h_samp[2] != 1) || (_comp_v_samp[2] != 1)) ||
@@ -2017,9 +2017,9 @@ class JpegDecoder extends Decoder {
         _terminate(UNSUPPORTED_SAMP_FACTORS);
       }
       _scan_type = _CMYK;
-      _max_blocks_per_mcu = 4;
-      _max_mcu_x_size = 8 * _comp_h_samp[0];
-      _max_mcu_y_size = 8 * _comp_v_samp[1];
+      _max_blocks_per_mcu = 8;
+      _max_mcu_x_size = 8;
+      _max_mcu_y_size = 8;
 
     } else if (_comps_in_frame == 3) {
       if (((_comp_h_samp[1] != 1) || (_comp_v_samp[1] != 1)) ||
@@ -2082,8 +2082,7 @@ class JpegDecoder extends Decoder {
     }
 
     // Allocate the coefficient buffer, enough for one MCU
-    Int16List q = new Int16List(_max_blocks_per_mcu * 64 + 4);
-    _mcu_coefficients = q;
+    _mcu_coefficients = new Int16List(_max_blocks_per_mcu * 64 + 4);
 
     for (int i = 0; i < _max_blocks_per_mcu; ++i) {
       _mcu_block_max_zag[i] = 64;
