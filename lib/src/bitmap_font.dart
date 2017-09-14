@@ -115,6 +115,10 @@ class BitmapFont {
   }
 
 
+  Iterable<XML.XmlElement> _childElements(XML.XmlNode n) =>
+    n.children.where((c) => c is XML.XmlElement).map((c) => c as XML.XmlElement);
+
+
   void _parseFnt(XML.XmlDocument xml, Map<int, Image> fontPages,
                  [Archive arc]) {
     if (xml.children.length != 1) {
@@ -123,10 +127,7 @@ class BitmapFont {
 
     var font = xml.children[0];
 
-    for (var c in font.children) {
-      if (c is! XML.XmlElement) {
-        continue;
-      }
+    for (var c in _childElements(font)) {
       String name = c.name.toString();
       if (name == 'info') {
         for (XML.XmlAttribute a in c.attributes) {
@@ -201,10 +202,7 @@ class BitmapFont {
           }
         }
       } else if (name == 'pages') {
-        for (var page in c.children) {
-          if (page is! XML.XmlElement) {
-            continue;
-          }
+        for (var page in _childElements(c)) {
           int id = int.parse(page.getAttribute('id'));
           String filename = page.getAttribute('file');
 
@@ -225,10 +223,7 @@ class BitmapFont {
           }
         }
       } else if (name == 'kernings') {
-        for (var kerning in c.children) {
-          if (kerning is! XML.XmlElement) {
-            continue;
-          }
+        for (var kerning in _childElements(c)) {
           int first = int.parse(kerning.getAttribute('first'));
           int second = int.parse(kerning.getAttribute('second'));
           int amount = int.parse(kerning.getAttribute('amount'));
@@ -241,16 +236,10 @@ class BitmapFont {
       }
     }
 
-    for (var c in font.children) {
-      if (c is! XML.XmlElement) {
-        continue;
-      }
+    for (var c in _childElements(font)) {
       String name = c.name.toString();
       if (name == 'chars') {
-        for (var char in c.children) {
-          if (char is! XML.XmlElement) {
-            continue;
-          }
+        for (var char in _childElements(c)) {
           int id = int.parse(char.getAttribute('id'));
           int x = int.parse(char.getAttribute('x'));
           int y = int.parse(char.getAttribute('y'));
@@ -288,10 +277,10 @@ class BitmapFont {
   }
 
   XML.XmlDocument _parseTextFnt(String content) {
-    var children = [];
-    var pageList = [];
-    var charList = [];
-    var kerningList = [];
+    var children = <XML.XmlNode>[];
+    var pageList = <XML.XmlNode>[];
+    var charList = <XML.XmlNode>[];
+    var kerningList = <XML.XmlNode>[];
     var charsAttrs;
     var kerningsAttrs;
 
@@ -361,8 +350,8 @@ class BitmapFont {
     return doc;
   }
 
-  List _parseParameters(List<String> tk) {
-    var params = [];
+  List<XML.XmlAttribute> _parseParameters(List<String> tk) {
+    var params = <XML.XmlAttribute>[];
     for (int ti = 1; ti < tk.length; ++ti) {
       if (tk[ti].isEmpty) {
         continue;

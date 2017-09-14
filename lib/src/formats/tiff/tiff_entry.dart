@@ -21,14 +21,14 @@ class TiffEntry {
 
   bool get isString => type == TYPE_ASCII;
 
-  readValue(InputBuffer p) {
+  int readValue(InputBuffer p) {
     p.offset = valueOffset;
     return _readValue(p);
   }
 
-  List readValues(InputBuffer p) {
+  List<int> readValues(InputBuffer p) {
     p.offset = valueOffset;
-    List values = [];
+    var values = <int>[];
     for (int i = 0; i < numValues; ++i) {
       values.add(_readValue(p));
     }
@@ -43,7 +43,7 @@ class TiffEntry {
     return new String.fromCharCodes(readValues(p));
   }
 
-  _readValue(InputBuffer p) {
+  int _readValue(InputBuffer p) {
     switch (type) {
       case TYPE_BYTE:
       case TYPE_ASCII:
@@ -58,7 +58,7 @@ class TiffEntry {
         if (den == 0) {
           return 0;
         }
-        return num / den;
+        return num ~/ den;
       case TYPE_SBYTE:
         throw new ImageException('Unhandled value type: SBYTE');
       case TYPE_UNDEFINED:

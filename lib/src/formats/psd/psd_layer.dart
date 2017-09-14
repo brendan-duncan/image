@@ -145,7 +145,7 @@ class PsdLayer {
 
         // Layer effects data
         if (tag == 'lrFX') {
-          var fxData = additionalData['lrFX'];
+          var fxData = (additionalData['lrFX'] as PsdLayerAdditionalData);
           var data = new InputBuffer.from(fxData.data);
           int version = data.readUint16();
           int numFx = data.readUint16();
