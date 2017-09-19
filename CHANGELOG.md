@@ -1,3 +1,7 @@
+## 1.1.29 - September 18, 2017
+
+- Add fixes for strong mode support.
+
 ## 1.1.28 - May 27, 2017
 
 - Update pubspec to fix recent pub issues.
