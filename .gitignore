@@ -19,6 +19,7 @@ example/test_formats.dart.js.map
 example/test_formats.dart.precompiled.js
 build/
 packages
+.packages
 psd_to_html/out/
 .idea/
 .pub/
