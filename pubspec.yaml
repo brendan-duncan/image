@@ -9,6 +9,6 @@ environment:
 dependencies:
   archive: '>=1.0.16 <1.1.0'
   browser: any
-  xml: '>=2.0.0 <3.0.0'
+  xml: '^3.0.0-alpha'
 dev_dependencies:
   test: '>=0.12.0 <1.0.0'
