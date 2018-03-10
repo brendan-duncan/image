@@ -1,3 +1,8 @@
+## 1.1.30 - March 10, 2018
+
+  Update pubspec to account for the new version of xml package that has been
+  published.
+
 ## 1.1.29 - September 18, 2017
 
 - Add fixes for strong mode support.
