@@ -1,5 +1,5 @@
 name: image
-version: 1.1.29
+version: 1.1.30
 author: Brendan Duncan <brendanduncan@gmail.com>
 description: Provides server and web apps the ability to load, manipulate, and save images with various image file formats including PNG, JPEG, GIF, WebP, TIFF, TGA, PSD, PVR, and OpenEXR.
 homepage: https://github.com/brendan-duncan/image
@@ -9,6 +9,6 @@ environment:
 dependencies:
   archive: '>=1.0.16 <1.1.0'
   browser: any
-  xml: '>=2.0.0 <3.0.0'
+  xml: '>=2.0.0 <4.0.0'
 dev_dependencies:
   test: '>=0.12.0 <1.0.0'
