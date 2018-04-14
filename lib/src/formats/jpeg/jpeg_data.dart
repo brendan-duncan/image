@@ -6,7 +6,7 @@ class JpegData  {
   JpegAdobe adobe;
   JpegFrame frame;
   int resetInterval;
-  final List quantizationTables = new List(Jpeg.NUM_QUANT_TBLS);
+  final List<Int16List> quantizationTables = new List(Jpeg.NUM_QUANT_TBLS);
   final List<JpegFrame> frames = [];
   final List huffmanTablesAC = [];
   final List huffmanTablesDC = [];
