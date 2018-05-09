@@ -1,4 +1,6 @@
-part of image;
+import '../../internal/internal.dart';
+import '../decode_info.dart';
+import 'png_frame.dart';
 
 class PngInfo extends DecodeInfo {
   int bits;
@@ -20,4 +22,9 @@ class PngInfo extends DecodeInfo {
   List<int> _idat = [];
 
   bool get isAnimated => frames.isNotEmpty;
+}
+
+@internal
+class InternalPngInfo extends PngInfo {
+  List<int> get idat => _idat;
 }

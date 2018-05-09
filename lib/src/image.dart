@@ -1,4 +1,9 @@
-part of image;
+import 'dart:math' as Math;
+import 'dart:typed_data';
+
+import 'color.dart';
+import 'image_exception.dart';
+import 'util/interpolation.dart';
 
 /**
  * A 32-bit image buffer where pixels are encoded into 32-bit unsigned ints.

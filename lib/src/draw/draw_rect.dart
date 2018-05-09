@@ -1,4 +1,7 @@
-part of image;
+import 'dart:math' as Math;
+
+import '../image.dart';
+import 'draw_line.dart';
 
 /**
  * Draw a rectangle in the image [dst] with the [color].

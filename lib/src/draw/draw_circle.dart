@@ -1,4 +1,5 @@
-part of image;
+import '../image.dart';
+import 'draw_pixel.dart';
 
 /**
  * Draw a circle into the [image] with a center of [x0],[y0] and

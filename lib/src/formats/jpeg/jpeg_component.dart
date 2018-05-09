@@ -1,4 +1,4 @@
-part of image;
+import 'dart:typed_data';
 
 class JpegComponent {
   int h;

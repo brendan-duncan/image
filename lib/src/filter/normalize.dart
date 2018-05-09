@@ -1,4 +1,8 @@
-part of image;
+import 'dart:typed_data';
+
+import '../image.dart';
+import '../draw/fill.dart';
+import '../util/min_max.dart';
 
 /**
  * Linearly normalize the colors of the image.  All color values will be mapped

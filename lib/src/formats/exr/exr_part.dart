@@ -1,4 +1,13 @@
-part of image;
+import 'dart:math' as Math;
+import 'dart:typed_data';
+
+import '../../image_exception.dart';
+import '../../internal/internal.dart';
+import '../../hdr/hdr_image.dart';
+import '../../util/input_buffer.dart';
+import 'exr_attribute.dart';
+import 'exr_channel.dart';
+import 'exr_compressor.dart';
 
 class ExrPart {
   /// The framebuffer for this exr part.
@@ -266,21 +275,6 @@ class ExrPart {
     return y + r;
   }
 
-  void _readOffsets(InputBuffer input) {
-    if (_tiled) {
-      for (int i = 0; i < _offsets.length; ++i) {
-        for (int j = 0; j < _offsets[i].length; ++j) {
-          _offsets[i][j] = input.readUint64();
-        }
-      }
-    } else {
-      int numOffsets = _offsets[0].length;
-      for (int i = 0; i < numOffsets; ++i) {
-        _offsets[0][i] = input.readUint64();
-      }
-    }
-  }
-
   int _calculateBytesPerPixel() {
     int bytesPerPixel = 0;
 
@@ -353,4 +347,38 @@ class ExrPart {
   int _bytesPerPixel;
   int _maxBytesPerTileLine;
   int _tileBufferSize;
+}
+
+@internal
+class InternalExrPart extends ExrPart {
+  InternalExrPart(bool tiled, InputBuffer input) : super(tiled, input);
+
+  List<Uint32List> get offsets => _offsets;
+
+  ExrCompressor get compressor => _compressor;
+  int get linesInBuffer => _linesInBuffer;
+  Uint32List get offsetInLineBuffer => _offsetInLineBuffer;
+
+  bool get tiled => _tiled;
+  int get tileWidth => _tileWidth;
+  int get tileHeight => _tileHeight;
+  List<int> get numXTiles => _numXTiles;
+  List<int> get numYTiles => _numYTiles;
+  int get numXLevels => _numXLevels;
+  int get numYLevels => _numYLevels;
+
+  void readOffsets(InputBuffer input) {
+    if (_tiled) {
+      for (int i = 0; i < _offsets.length; ++i) {
+        for (int j = 0; j < _offsets[i].length; ++j) {
+          _offsets[i][j] = input.readUint64();
+        }
+      }
+    } else {
+      int numOffsets = _offsets[0].length;
+      for (int i = 0; i < numOffsets; ++i) {
+        _offsets[0][i] = input.readUint64();
+      }
+    }
+  }
 }

@@ -1,4 +1,7 @@
-part of image;
+import 'dart:typed_data';
+
+import 'half.dart';
+import 'hdr_image.dart';
 
 /**
  * A slice is the data for an image framebuffer for a single channel.

@@ -1,4 +1,7 @@
-part of image;
+import 'dart:math' as Math;
+
+import '../color.dart';
+import '../image.dart';
 
 /**
  * Generate a normal map from a heightfield bump image.

@@ -1,4 +1,8 @@
-part of image;
+import '../animation.dart';
+import '../image.dart';
+import 'decoder.dart';
+import 'decode_info.dart';
+import 'psd/psd_image.dart';
 
 /**
  * Decode a Photoshop PSD image.

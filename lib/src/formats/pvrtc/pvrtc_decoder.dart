@@ -1,4 +1,10 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../color.dart';
+import '../../image.dart';
+import '../../util/input_buffer.dart';
+import 'pvrtc_color.dart';
+import 'pvrtc_packet.dart';
 
 /**
  * Ported from Jeffrey Lim's PVRTC encoder/decoder,

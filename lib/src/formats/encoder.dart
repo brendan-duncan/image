@@ -1,4 +1,5 @@
-part of image;
+import '../animation.dart';
+import '../image.dart';
 
 /**
  * Base class for image format encoders.

@@ -1,4 +1,16 @@
-part of image;
+import 'dart:typed_data';
+
+import 'package:meta/meta.dart';
+
+import '../../image_exception.dart';
+import '../../internal/internal.dart';
+import '../../util/input_buffer.dart';
+import 'exr_b44_compressor.dart';
+import 'exr_part.dart';
+import 'exr_piz_compressor.dart';
+import 'exr_pxr24_compressor.dart';
+import 'exr_rle_compressor.dart';
+import 'exr_zip_compressor.dart';
 
 abstract class ExrCompressor {
   static const int NO_COMPRESSION = 0;
@@ -76,11 +88,18 @@ abstract class ExrCompressor {
     throw new ImageException('Unsupported compression type');
   }
 
-  int _numSamples(int s, int a, int b) {
+  ExrPart _header;
+}
+
+@internal
+abstract class InternalExrCompressor extends ExrCompressor {
+  InternalExrCompressor(InternalExrPart header) : super._(header);
+
+  InternalExrPart get header => _header;
+
+  int numSamples(int s, int a, int b) {
     int a1 = a ~/ s;
     int b1 = b ~/ s;
     return  b1 - a1 + ((a1 * s < a) ? 0: 1);
   }
-
-  ExrPart _header;
 }

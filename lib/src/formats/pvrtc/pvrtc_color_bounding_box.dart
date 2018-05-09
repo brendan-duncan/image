@@ -1,5 +1,3 @@
-part of image;
-
 class PvrtcColorBoundingBox {
   var min;
   var max;

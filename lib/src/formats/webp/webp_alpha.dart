@@ -1,5 +1,10 @@
-part of image;
+import 'dart:typed_data';
 
+import '../../util/input_buffer.dart';
+import 'vp8l.dart';
+import 'vp8l_transform.dart';
+import 'webp_filters.dart';
+import 'webp_info.dart';
 
 class WebPAlpha {
   InputBuffer input;
@@ -92,12 +97,12 @@ class WebPAlpha {
 
 
   bool _decodeAlphaImageStream(int lastRow, Uint8List output) {
-    _vp8l._opaque = output;
+    _vp8l.opaque = output;
     // Decode (with special row processing).
     return _use8bDecode ?
-        _vp8l._decodeAlphaData(_vp8l.webp.width, _vp8l.webp.height, lastRow) :
-        _vp8l._decodeImageData(_vp8l._pixels, _vp8l.webp.width, _vp8l.webp.height,
-                               lastRow, _vp8l._extractAlphaRows);
+        _vp8l.decodeAlphaData(_vp8l.webp.width, _vp8l.webp.height, lastRow) :
+        _vp8l.decodeImageData(_vp8l.pixels, _vp8l.webp.width, _vp8l.webp.height,
+                               lastRow, _vp8l.extractAlphaRows);
   }
 
   bool _decodeAlphaHeader() {
@@ -105,29 +110,29 @@ class WebPAlpha {
     webp.width = width;
     webp.height = height;
 
-    _vp8l = new VP8L(input, webp);
-    _vp8l._ioWidth = width;
-    _vp8l._ioHeight = height;
+    _vp8l = new InternalVP8L(input, webp);
+    _vp8l.ioWidth = width;
+    _vp8l.ioHeight = height;
 
-    _vp8l._decodeImageStream(webp.width, webp.height, true);
+    _vp8l.decodeImageStream(webp.width, webp.height, true);
 
     // Special case: if alpha data uses only the color indexing transform and
     // doesn't use color cache (a frequent case), we will use DecodeAlphaData()
     // method that only needs allocation of 1 byte per pixel (alpha channel).
-    if (_vp8l._transforms.length == 1 &&
-        _vp8l._transforms[0].type == VP8LTransform.COLOR_INDEXING_TRANSFORM &&
-        _vp8l._is8bOptimizable()) {
+    if (_vp8l.transforms.length == 1 &&
+        _vp8l.transforms[0].type == VP8LTransform.COLOR_INDEXING_TRANSFORM &&
+        _vp8l.is8bOptimizable()) {
       _use8bDecode = true;
-      _vp8l._allocateInternalBuffers8b();
+      _vp8l.allocateInternalBuffers8b();
     } else {
       _use8bDecode = false;
-      _vp8l._allocateInternalBuffers32b();
+      _vp8l.allocateInternalBuffers32b();
     }
 
     return true;
   }
 
-  VP8L _vp8l;
+  InternalVP8L _vp8l;
   /// Although alpha channel
   /// requires only 1 byte per
   /// pixel, sometimes VP8LDecoder may need to allocate

@@ -1,5 +1,3 @@
-part of image;
-
 class PvrtcColorRgb {
   int r;
   int g;

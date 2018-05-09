@@ -1,4 +1,5 @@
-part of image;
+import '../color.dart';
+import '../image.dart';
 
 /**
  * A kernel object to use with [seperableConvolution] filtering.

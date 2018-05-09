@@ -1,13 +1,24 @@
-part of image;
+import 'dart:typed_data';
 
-class ExrB44Compressor extends ExrCompressor {
-  ExrB44Compressor(ExrPart header, this._maxScanLineSize, this._numScanLines,
-                   this._optFlatFields) :
-    super._(header) {
+import '../../image_exception.dart';
+import '../../internal/internal.dart';
+import '../../util/input_buffer.dart';
+import 'exr_compressor.dart';
+import 'exr_part.dart';
+
+abstract class ExrB44Compressor extends ExrCompressor {
+  factory ExrB44Compressor(ExrPart header, int maxScanLineSize, int numScanLines,
+                           bool optFlatFields) = InternalExrB44Compressor;
+}
+
+@internal
+class InternalExrB44Compressor extends InternalExrCompressor implements ExrB44Compressor {
+  InternalExrB44Compressor(ExrPart header, this._maxScanLineSize, this._numScanLines,
+                           this._optFlatFields) :
+    super(header) {
   }
 
   int numScanLines() => _numScanLines;
-
 
   Uint8List compress(InputBuffer inPtr, int x, int y,
                      [int width, int height]) {

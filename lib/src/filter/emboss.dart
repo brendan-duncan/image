@@ -1,4 +1,5 @@
-part of image;
+import '../image.dart';
+import 'convolution.dart';
 
 /**
  * Apply an emboss convolution filter.

@@ -1,4 +1,7 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../image_exception.dart';
+import '../../util/input_buffer.dart';
 
 class VP8LBitReader {
   int bitPos = 0;

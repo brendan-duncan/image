@@ -1,5 +1,3 @@
-part of image;
-
 /**
  * Provides information about the image being decoded.
  */

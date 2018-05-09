@@ -1,4 +1,15 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../color.dart';
+import '../../image.dart';
+import '../../image_exception.dart';
+import '../../internal/internal.dart';
+import '../../util/input_buffer.dart';
+import 'vp8l_bit_reader.dart';
+import 'vp8l_color_cache.dart';
+import 'vp8l_transform.dart';
+import 'webp_huffman.dart';
+import 'webp_info.dart';
 
 /**
  * WebP lossless format.
@@ -199,7 +210,7 @@ class VP8L {
     int row = _lastPixel ~/ width;
     int col = _lastPixel % width;
 
-    _HTreeGroup htreeGroup = _getHtreeGroupForPos(col, row);
+    HTreeGroup htreeGroup = _getHtreeGroupForPos(col, row);
 
     int src = _lastPixel;
     int lastCached = src;
@@ -343,7 +354,7 @@ class VP8L {
     // When the Huffman tree contains only one symbol, we can skip the
     // call to ReadSymbol() for red/blue/alpha channels.
     for (int i = 0; i < _numHtreeGroups; ++i) {
-      List<_HuffmanTree> htrees = _htreeGroups[i].htrees;
+      List<HuffmanTree> htrees = _htreeGroups[i].htrees;
       if (htrees[_RED].numNodes > 1) {
         return false;
       }
@@ -386,7 +397,7 @@ class VP8L {
     int row = _lastPixel ~/ width;
     int col = _lastPixel % width;
 
-    _HTreeGroup htreeGroup = _getHtreeGroupForPos(col, row);
+    HTreeGroup htreeGroup = _getHtreeGroupForPos(col, row);
     int pos = _lastPixel; // current position
     final int end = width * height; // End of data
     final int last = width * lastRow; // Last pixel to decode
@@ -559,9 +570,9 @@ class VP8L {
 
     assert(numHtreeGroups <= 0x10000);
 
-    List<_HTreeGroup> htreeGroups = new List<_HTreeGroup>(numHtreeGroups);
+    List<HTreeGroup> htreeGroups = new List<HTreeGroup>(numHtreeGroups);
     for (int i = 0; i < numHtreeGroups; ++i) {
-      htreeGroups[i] = new _HTreeGroup();
+      htreeGroups[i] = new HTreeGroup();
 
       for (int j = 0; j < HUFFMAN_CODES_PER_META_CODE; ++j) {
         int alphabetSize = ALPHABET_SIZE[j];
@@ -583,7 +594,7 @@ class VP8L {
     return true;
   }
 
-  bool _readHuffmanCode(int alphabetSize, _HuffmanTree tree) {
+  bool _readHuffmanCode(int alphabetSize, HuffmanTree tree) {
     bool ok = false;
     final int simpleCode = br.readBits(1);
 
@@ -643,7 +654,7 @@ class VP8L {
     int symbol;
     int max_symbol;
     int prev_code_len = DEFAULT_CODE_LENGTH;
-    _HuffmanTree tree = new _HuffmanTree();
+    HuffmanTree tree = new HuffmanTree();
 
     if (!tree.buildImplicit(codeLengthCodeLengths, _NUM_CODE_LENGTH_CODES)) {
       return false;
@@ -723,7 +734,6 @@ class VP8L {
     }
   }
 
-
   /**
    * Computes sampled size of 'size' when sampling using 'sampling bits'.
    */
@@ -767,11 +777,11 @@ class VP8L {
     return image[xsize * (y >> bits) + (x >> bits)];
   }
 
-  _HTreeGroup _getHtreeGroupForPos(int x, int y) {
+  HTreeGroup _getHtreeGroupForPos(int x, int y) {
     int metaIndex = _getMetaIndex(_huffmanImage, _huffmanXsize,
                                   _huffmanSubsampleBits, x, y);
     if (_htreeGroups[metaIndex] == null) {
-      _htreeGroups[metaIndex] = new _HTreeGroup();
+      _htreeGroups[metaIndex] = new HTreeGroup();
     }
     return _htreeGroups[metaIndex];
   }
@@ -828,7 +838,7 @@ class VP8L {
   int _huffmanXsize = 0;
   Uint32List _huffmanImage;
   int _numHtreeGroups = 0;
-  List<_HTreeGroup> _htreeGroups = [];
+  List<HTreeGroup> _htreeGroups = [];
   List<VP8LTransform> _transforms = [];
   int _transformsSeen = 0;
 
@@ -854,3 +864,37 @@ class VP8L {
   static const int CODE_LENGTH_CODES = 19;
 }
 
+@internal
+class InternalVP8L extends VP8L {
+  InternalVP8L(InputBuffer input, WebPInfo webp) : super(input, webp);
+
+  List<VP8LTransform> get transforms => _transforms;
+  Uint32List get pixels => _pixels;
+
+  Uint8List get opaque => _opaque;
+  set opaque(Uint8List value) => _opaque = value;
+
+  int get ioWidth => _ioWidth;
+  set ioWidth(int width) => _ioWidth = width;
+  int get ioHeight => _ioHeight;
+  set ioHeight(int height) => _ioHeight = height;
+
+  bool decodeImageData(data, int width, int height, int lastRow, processFunc) =>
+      _decodeImageData(data, width, height, lastRow, processFunc);
+
+  Uint32List decodeImageStream(int xsize, int ysize, bool isLevel0) =>
+      _decodeImageStream(xsize, ysize, isLevel0);
+
+  bool allocateInternalBuffers32b() => _allocateInternalBuffers32b();
+
+  bool allocateInternalBuffers8b() => _allocateInternalBuffers8b();
+
+  bool decodeAlphaData(int width, int height, int lastRow) =>
+      _decodeAlphaData(width, height, lastRow);
+
+  bool is8bOptimizable() => _is8bOptimizable();
+
+  void extractAlphaRows(int row) => _extractAlphaRows(row);
+
+  static int subSampleSize(int size, int samplingBits) => VP8L._subSampleSize(size, samplingBits);
+}

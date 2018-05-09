@@ -1,4 +1,15 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../image_exception.dart';
+import '../../internal/bit_operators.dart';
+import '../../util/input_buffer.dart';
+import 'jpeg.dart';
+import 'jpeg_adobe.dart';
+import 'jpeg_component.dart';
+import 'jpeg_frame.dart';
+import 'jpeg_info.dart';
+import 'jpeg_jfif.dart';
+import 'jpeg_scan.dart';
 
 class JpegData  {
   InputBuffer input;
@@ -195,9 +206,9 @@ class JpegData  {
               Cb = component2Line[(x * sx2).toInt()] - 128;
               Cr = component3Line[(x * sx3).toInt()] - 128;
 
-              R = _shiftR((Y + 359 * Cr + 128), 8);
-              G = _shiftR((Y - 88 * Cb - 183 * Cr + 128), 8);
-              B = _shiftR((Y + 454 * Cb + 128), 8);
+              R = shiftR((Y + 359 * Cr + 128), 8);
+              G = shiftR((Y - 88 * Cb - 183 * Cr + 128), 8);
+              B = shiftR((Y + 454 * Cb + 128), 8);
 
               data[offset++] = _clamp8(R);
               data[offset++] = _clamp8(G);
@@ -413,8 +424,8 @@ class JpegData  {
         jfif.majorVersion = appData[5];
         jfif.minorVersion = appData[6];
         jfif.densityUnits = appData[7];
-        jfif.xDensity = _shiftL(appData[8], 8) | appData[9];
-        jfif.yDensity = _shiftL(appData[10], 8) | appData[11];
+        jfif.xDensity = shiftL(appData[8], 8) | appData[9];
+        jfif.yDensity = shiftL(appData[10], 8) | appData[11];
         jfif.thumbWidth = appData[12];
         jfif.thumbHeight = appData[13];
         int thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
@@ -429,8 +440,8 @@ class JpegData  {
           appData[4] == 0x65 && appData[5] == 0) {
         adobe = new JpegAdobe();
         adobe.version = appData[6];
-        adobe.flags0 = _shiftL(appData[7], 8) | appData[8];
-        adobe.flags1 = _shiftL(appData[9], 8) | appData[10];
+        adobe.flags0 = shiftL(appData[7], 8) | appData[8];
+        adobe.flags1 = shiftL(appData[9], 8) | appData[10];
         adobe.transformCode = appData[11];
       }
     }
@@ -439,7 +450,7 @@ class JpegData  {
   void _readDQT(InputBuffer block) {
     while (!block.isEOS) {
       int n = block.readByte();
-      int prec = _shiftR(n, 4);
+      int prec = shiftR(n, 4);
       n &= 0x0F;
 
       if (n >= Jpeg.NUM_QUANT_TBLS) {
@@ -485,7 +496,7 @@ class JpegData  {
     for (int i = 0; i < numComponents; i++) {
       int componentId = block.readByte();
       int x = block.readByte();
-      int h = _shiftR(x, 4) & 15;
+      int h = shiftR(x, 4) & 15;
       int v = x & 15;
       int qId = block.readByte();
       frame.componentsOrder.add(componentId);
@@ -551,7 +562,7 @@ class JpegData  {
       JpegComponent component = frame.components[id];
       components[i] = component;
 
-      int dc_tbl_no = _shiftR(c, 4) & 15;
+      int dc_tbl_no = shiftR(c, 4) & 15;
       int ac_tbl_no = c & 15;
 
       if (dc_tbl_no < huffmanTablesDC.length) {
@@ -566,7 +577,7 @@ class JpegData  {
     int spectralEnd = block.readByte();
     int successiveApproximation = block.readByte();
 
-    int Ah = _shiftR(successiveApproximation, 4) & 15;
+    int Ah = shiftR(successiveApproximation, 4) & 15;
     int Al = successiveApproximation & 15;
 
     new JpegScan(input, frame, components, resetInterval,
@@ -630,14 +641,14 @@ class JpegData  {
                                       JpegComponent component) {
     final int blocksPerLine = component.blocksPerLine;
     final int blocksPerColumn = component.blocksPerColumn;
-    int samplesPerLine = _shiftL(blocksPerLine, 3);
+    int samplesPerLine = shiftL(blocksPerLine, 3);
     Int32List R = new Int32List(64);
     Uint8List r = new Uint8List(64);
     List<Uint8List> lines = new List(blocksPerColumn * 8);
 
     int l = 0;
     for (int blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
-      int scanLine = _shiftL(blockRow, 3);
+      int scanLine = shiftL(blockRow, 3);
       for (int i = 0; i < 8; i++) {
         lines[l++] = new Uint8List(samplesPerLine);
       }
@@ -648,7 +659,7 @@ class JpegData  {
                             r, R);
 
         int offset = 0;
-        int sample = _shiftL(blockCol, 3);
+        int sample = shiftL(blockCol, 3);
         for (int j = 0; j < 8; j++) {
           Uint8List line = lines[scanLine + j];
           for (int i = 0; i < 8; i++) {
@@ -728,7 +739,7 @@ class JpegData  {
       p[5 + row] == 0 &&
       p[6 + row] == 0 &&
       p[7 + row] == 0) {
-        int t = _shiftR((SQRT_2 * p[0 + row] + 512), 10);
+        int t = shiftR((SQRT_2 * p[0 + row] + 512), 10);
         p[row + 0] = t;
         p[row + 1] = t;
         p[row + 2] = t;
@@ -741,41 +752,41 @@ class JpegData  {
       }
 
       // stage 4
-      int v0 = _shiftR((SQRT_2 * p[0 + row] + 128), 8);
-      int v1 = _shiftR((SQRT_2 * p[4 + row] + 128), 8);
+      int v0 = shiftR((SQRT_2 * p[0 + row] + 128), 8);
+      int v1 = shiftR((SQRT_2 * p[4 + row] + 128), 8);
       int v2 = p[2 + row];
       int v3 = p[6 + row];
-      int v4 = _shiftR((SQRT_1D2 * (p[1 + row] - p[7 + row]) + 128), 8);
-      int v7 = _shiftR((SQRT_1D2 * (p[1 + row] + p[7 + row]) + 128), 8);
-      int v5 = _shiftL(p[3 + row], 4);
-      int v6 = _shiftL(p[5 + row], 4);
+      int v4 = shiftR((SQRT_1D2 * (p[1 + row] - p[7 + row]) + 128), 8);
+      int v7 = shiftR((SQRT_1D2 * (p[1 + row] + p[7 + row]) + 128), 8);
+      int v5 = shiftL(p[3 + row], 4);
+      int v6 = shiftL(p[5 + row], 4);
 
       // stage 3
-      int t = _shiftR((v0 - v1 + 1), 1);
-      v0 = _shiftR((v0 + v1 + 1), 1);
+      int t = shiftR((v0 - v1 + 1), 1);
+      v0 = shiftR((v0 + v1 + 1), 1);
       v1 = t;
-      t = _shiftR((v2 * SIN_6 + v3 * COS_6 + 128), 8);
-      v2 = _shiftR((v2 * COS_6 - v3 * SIN_6 + 128), 8);
+      t = shiftR((v2 * SIN_6 + v3 * COS_6 + 128), 8);
+      v2 = shiftR((v2 * COS_6 - v3 * SIN_6 + 128), 8);
       v3 = t;
-      t = _shiftR((v4 - v6 + 1), 1);
-      v4 = _shiftR((v4 + v6 + 1), 1);
+      t = shiftR((v4 - v6 + 1), 1);
+      v4 = shiftR((v4 + v6 + 1), 1);
       v6 = t;
-      t = _shiftR((v7 + v5 + 1), 1);
-      v5 = _shiftR((v7 - v5 + 1), 1);
+      t = shiftR((v7 + v5 + 1), 1);
+      v5 = shiftR((v7 - v5 + 1), 1);
       v7 = t;
 
       // stage 2
-      t = _shiftR((v0 - v3 + 1), 1);
-      v0 = _shiftR((v0 + v3 + 1), 1);
+      t = shiftR((v0 - v3 + 1), 1);
+      v0 = shiftR((v0 + v3 + 1), 1);
       v3 = t;
-      t = _shiftR((v1 - v2 + 1), 1);
-      v1 = _shiftR((v1 + v2 + 1), 1);
+      t = shiftR((v1 - v2 + 1), 1);
+      v1 = shiftR((v1 + v2 + 1), 1);
       v2 = t;
-      t = _shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
-      v4 = _shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
+      t = shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
+      v4 = shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
       v7 = t;
-      t = _shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
-      v5 = _shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
+      t = shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
+      v5 = shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
       v6 = t;
 
       // stage 1
@@ -801,7 +812,7 @@ class JpegData  {
       p[5 * 8 + col] == 0 &&
       p[6 * 8 + col] == 0 &&
       p[7 * 8 + col] == 0) {
-        int t = _shiftR((SQRT_2 * dataIn[i] + 8192), 14);
+        int t = shiftR((SQRT_2 * dataIn[i] + 8192), 14);
         p[0 * 8 + col] = t;
         p[1 * 8 + col] = t;
         p[2 * 8 + col] = t;
@@ -814,41 +825,41 @@ class JpegData  {
       }
 
       // stage 4
-      int v0 = _shiftR((SQRT_2 * p[0 * 8 + col] + 2048), 12);
-      int v1 = _shiftR((SQRT_2 * p[4 * 8 + col] + 2048), 12);
+      int v0 = shiftR((SQRT_2 * p[0 * 8 + col] + 2048), 12);
+      int v1 = shiftR((SQRT_2 * p[4 * 8 + col] + 2048), 12);
       int v2 = p[2 * 8 + col];
       int v3 = p[6 * 8 + col];
-      int v4 = _shiftR((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048), 12);
-      int v7 = _shiftR((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048), 12);
+      int v4 = shiftR((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048), 12);
+      int v7 = shiftR((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048), 12);
       int v5 = p[3 * 8 + col];
       int v6 = p[5 * 8 + col];
 
       // stage 3
-      int t = _shiftR((v0 - v1 + 1), 1);
-      v0 = _shiftR((v0 + v1 + 1), 1);
+      int t = shiftR((v0 - v1 + 1), 1);
+      v0 = shiftR((v0 + v1 + 1), 1);
       v1 = t;
-      t = _shiftR((v2 * SIN_6 + v3 * COS_6 + 2048), 12);
-      v2 = _shiftR((v2 * COS_6 - v3 * SIN_6 + 2048), 12);
+      t = shiftR((v2 * SIN_6 + v3 * COS_6 + 2048), 12);
+      v2 = shiftR((v2 * COS_6 - v3 * SIN_6 + 2048), 12);
       v3 = t;
-      t = _shiftR((v4 - v6 + 1), 1);
-      v4 = _shiftR((v4 + v6 + 1), 1);
+      t = shiftR((v4 - v6 + 1), 1);
+      v4 = shiftR((v4 + v6 + 1), 1);
       v6 = t;
-      t = _shiftR((v7 + v5 + 1), 1);
-      v5 = _shiftR((v7 - v5 + 1), 1);
+      t = shiftR((v7 + v5 + 1), 1);
+      v5 = shiftR((v7 - v5 + 1), 1);
       v7 = t;
 
       // stage 2
-      t = _shiftR((v0 - v3 + 1), 1);
-      v0 = _shiftR((v0 + v3 + 1), 1);
+      t = shiftR((v0 - v3 + 1), 1);
+      v0 = shiftR((v0 + v3 + 1), 1);
       v3 = t;
-      t = _shiftR((v1 - v2 + 1), 1);
-      v1 = _shiftR((v1 + v2 + 1), 1);
+      t = shiftR((v1 - v2 + 1), 1);
+      v1 = shiftR((v1 + v2 + 1), 1);
       v2 = t;
-      t = _shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
-      v4 = _shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
+      t = shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
+      v4 = shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
       v7 = t;
-      t = _shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
-      v5 = _shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
+      t = shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
+      v5 = shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
       v6 = t;
 
       // stage 1
@@ -864,7 +875,7 @@ class JpegData  {
 
     // convert to 8-bit integers
     for (int i = 0; i < 64; ++i) {
-      dataOut[i] = dctClip[(dctClipOffset + 128 + _shiftR((p[i] + 8), 4))];
+      dataOut[i] = dctClip[(dctClipOffset + 128 + shiftR((p[i] + 8), 4))];
     }
   }
 

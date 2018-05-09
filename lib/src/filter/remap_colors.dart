@@ -1,4 +1,5 @@
-part of image;
+import '../color.dart';
+import '../image.dart';
 
 /**
  * Remap the color channels of the image.

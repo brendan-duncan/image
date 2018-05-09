@@ -1,4 +1,7 @@
-part of image;
+import 'dart:math' as Math;
+import 'dart:typed_data';
+
+import 'hdr_image.dart';
 
 /**
  * Applies an HDR bloom filter to the image, in-place.

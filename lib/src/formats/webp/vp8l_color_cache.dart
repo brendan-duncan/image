@@ -1,4 +1,4 @@
-part of image;
+import 'dart:typed_data';
 
 class VP8LColorCache {
   final Uint32List colors; // color entries

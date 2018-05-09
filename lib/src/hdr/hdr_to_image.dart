@@ -1,4 +1,9 @@
-part of image;
+import 'dart:math' as Math;
+import 'dart:typed_data';
+
+import '../image.dart';
+import '../image_exception.dart';
+import 'hdr_image.dart';
 
 /**
  * Convert a high dynamic range image to a low dynamic range image,

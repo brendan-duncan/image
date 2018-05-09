@@ -1,5 +1,4 @@
-part of image;
-
+import 'psd_effect.dart';
 
 class PsdSolidFillEffect extends PsdEffect {
   String blendMode;

@@ -1,9 +1,18 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../image_exception.dart';
+import '../../formats/decode_info.dart';
+import '../../hdr/hdr_image.dart';
+import '../../hdr/hdr_slice.dart';
+import '../../util/input_buffer.dart';
+import 'exr_channel.dart';
+import 'exr_compressor.dart';
+import 'exr_part.dart';
 
 
 class ExrImage extends DecodeInfo {
   /// An EXR image has one or more parts, each of which contains a framebuffer.
-  List<ExrPart> parts = [];
+  List<InternalExrPart> _parts = [];
 
   ExrImage(List<int> bytes) {
     InputBuffer input = new InputBuffer(bytes);
@@ -24,30 +33,32 @@ class ExrImage extends DecodeInfo {
     }
 
     if (!_isMultiPart()) {
-      ExrPart part = new ExrPart(_isTiled(), input);
+      ExrPart part = new InternalExrPart(_isTiled(), input);
       if (part.isValid) {
-        parts.add(part);
+        _parts.add(part);
       }
     } else {
       while (true) {
-        ExrPart part = new ExrPart(_isTiled(), input);
+        ExrPart part = new InternalExrPart(_isTiled(), input);
         if (!part.isValid) {
           break;
         }
-        parts.add(part);
+        _parts.add(part);
       }
     }
 
-    if (parts.isEmpty) {
+    if (_parts.isEmpty) {
       throw new ImageException('Error reading image header');
     }
 
-    for (ExrPart part in parts) {
-      part._readOffsets(input);
+    for (InternalExrPart part in _parts) {
+      part.readOffsets(input);
     }
 
     _readImage(input);
   }
+
+  List<ExrPart> get parts => _parts;
 
   int get numFrames => 1;
 
@@ -75,9 +86,9 @@ class ExrImage extends DecodeInfo {
     return true;
   }
 
-  int numParts() => parts.length;
+  int numParts() => _parts.length;
 
-  ExrPart getPart(int i) => parts[i];
+  ExrPart getPart(int i) => _parts[i];
 
   bool _isTiled()  {
     return (flags & TILED_FLAG) != 0;
@@ -98,8 +109,8 @@ class ExrImage extends DecodeInfo {
   void _readImage(InputBuffer input) {
     final bool multiPart = _isMultiPart();
 
-    for (int pi = 0; pi < parts.length; ++pi) {
-      ExrPart part = parts[pi];
+    for (int pi = 0; pi < _parts.length; ++pi) {
+      InternalExrPart part = _parts[pi];
       HdrImage framebuffer = part.framebuffer;
 
       for (int ci = 0; ci < part.channels.length; ++ci) {
@@ -112,7 +123,7 @@ class ExrImage extends DecodeInfo {
         }
       }
 
-      if (part._tiled) {
+      if (part.tiled) {
         _readTiledPart(pi, input);
       } else {
         _readScanlinePart(pi, input);
@@ -121,18 +132,18 @@ class ExrImage extends DecodeInfo {
   }
 
   void _readTiledPart(int pi, InputBuffer input) {
-    ExrPart part = parts[pi];
+    InternalExrPart part = _parts[pi];
     final bool multiPart = _isMultiPart();
     HdrImage framebuffer = part.framebuffer;
-    ExrCompressor compressor = part._compressor;
-    List<Uint32List> offsets = part._offsets;
+    ExrCompressor compressor = part.compressor;
+    List<Uint32List> offsets = part.offsets;
     Uint32List fbi = new Uint32List(part.channels.length);
 
     InputBuffer imgData = new InputBuffer.from(input);
-    for (int ly = 0, l = 0; ly < part._numYLevels; ++ly) {
-      for (int lx = 0; lx < part._numXLevels; ++lx, ++l) {
-        for (int ty = 0, oi = 0; ty < part._numYTiles[ly]; ++ty) {
-          for (int tx = 0; tx < part._numXTiles[lx]; ++tx, ++oi) {
+    for (int ly = 0, l = 0; ly < part.numYLevels; ++ly) {
+      for (int lx = 0; lx < part.numXLevels; ++lx, ++l) {
+        for (int ty = 0, oi = 0; ty < part.numYTiles[ly]; ++ty) {
+          for (int tx = 0; tx < part.numXTiles[lx]; ++tx, ++oi) {
             // TODO support sub-levels (for rip/mip-mapping).
             if (l != 0) {
               break;
@@ -154,8 +165,8 @@ class ExrImage extends DecodeInfo {
             int dataSize = imgData.readUint32();
             InputBuffer data = imgData.readBytes(dataSize);
 
-            int ty = tileY * part._tileHeight;
-            int tx = tileX * part._tileWidth;
+            int ty = tileY * part.tileHeight;
+            int tx = tileX * part.tileWidth;
 
             int tileWidth = compressor.decodedWidth;
             int tileHeight = compressor.decodedHeight;
@@ -170,8 +181,8 @@ class ExrImage extends DecodeInfo {
             Uint8List uncompressedData;
             if (compressor != null) {
               uncompressedData = compressor.uncompress(data, tx, ty,
-                                                       part._tileWidth,
-                                                       part._tileHeight);
+                                                       part.tileWidth,
+                                                       part.tileHeight);
               tileWidth = compressor.decodedWidth;
               tileHeight = compressor.decodedHeight;
             } else {
@@ -190,7 +201,7 @@ class ExrImage extends DecodeInfo {
                   break;
                 }
 
-                int tx = tileX * part._tileWidth;
+                int tx = tileX * part.tileWidth;
                 for (int xx = 0; xx < tileWidth; ++xx, ++tx) {
                   for (int bi = 0; bi < ch.size; ++bi) {
                     if (tx < part.width && ty < part.height) {
@@ -210,18 +221,18 @@ class ExrImage extends DecodeInfo {
   }
 
   void _readScanlinePart(int pi, InputBuffer input) {
-    ExrPart part = parts[pi];
+    InternalExrPart part = _parts[pi];
     final bool multiPart = _isMultiPart();
     HdrImage framebuffer = part.framebuffer;
-    ExrCompressor compressor = part._compressor;
-    List<int> offsets = part._offsets[0];
+    ExrCompressor compressor = part.compressor;
+    List<int> offsets = part.offsets[0];
 
     int scanLineMin = part.top;
     int scanLineMax = part.bottom;
-    int linesInBuffer = part._linesInBuffer;
+    int linesInBuffer = part.linesInBuffer;
 
     int minY = part.top;
-    int maxY = minY + part._linesInBuffer - 1;
+    int maxY = minY + part.linesInBuffer - 1;
 
     Uint32List fbi = new Uint32List(part.channels.length);
     int total = 0;
@@ -256,7 +267,7 @@ class ExrImage extends DecodeInfo {
       int numChannels = part.channels.length;
       int lineCount = 0;
       for (int yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
-        si = part._offsetInLineBuffer[yy];
+        si = part.offsetInLineBuffer[yy];
         if (si >= len) {
           break;
         }

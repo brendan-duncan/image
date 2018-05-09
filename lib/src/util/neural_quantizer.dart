@@ -1,4 +1,8 @@
-part of image;
+import 'dart:typed_data';
+
+import '../color.dart';
+import '../image.dart';
+import '../image_exception.dart';
 
 /* NeuQuant Neural-Net Quantization Algorithm
  * ------------------------------------------

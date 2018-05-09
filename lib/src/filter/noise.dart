@@ -1,4 +1,9 @@
-part of image;
+import 'dart:math' as Math;
+
+import '../color.dart';
+import '../image.dart';
+import '../util/min_max.dart';
+import '../util/random.dart';
 
 /// Gaussian noise type used by [noise].
 const int NOISE_GAUSSIAN = 0;

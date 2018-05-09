@@ -1,8 +1,22 @@
-part of image;
+import 'dart:typed_data';
 
-class ExrPxr24Compressor extends ExrCompressor {
-  ExrPxr24Compressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
-    super._(header) {
+import 'package:archive/archive.dart';
+
+import '../../image_exception.dart';
+import '../../util/input_buffer.dart';
+import '../../util/output_buffer.dart';
+import 'exr_channel.dart';
+import 'exr_compressor.dart';
+import 'exr_part.dart';
+
+abstract class ExrPxr24Compressor extends ExrCompressor {
+  factory ExrPxr24Compressor(ExrPart header, int maxScanLineSize,
+                             int numScanLines) = InternalExrPxr24Compressor;
+}
+
+class InternalExrPxr24Compressor extends InternalExrCompressor implements ExrPxr24Compressor {
+  InternalExrPxr24Compressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
+    super(header) {
   }
 
   int numScanLines() => _numScanLines;
@@ -30,10 +44,10 @@ class ExrPxr24Compressor extends ExrCompressor {
     Uint8List pixelBytes = new Uint8List.view(pixel.buffer);
 
     if (width == null) {
-      width = _header.width;
+      width = header.width;
     }
     if (height == null) {
-      height = _header._linesInBuffer;
+      height = header.linesInBuffer;
     }
 
     int minX = x;
@@ -41,26 +55,26 @@ class ExrPxr24Compressor extends ExrCompressor {
     int minY = y;
     int maxY = y + height - 1;
 
-    if (maxX > _header.width) {
-      maxX = _header.width - 1;
+    if (maxX > header.width) {
+      maxX = header.width - 1;
     }
-    if (maxY > _header.height) {
-      maxY = _header.height - 1;
+    if (maxY > header.height) {
+      maxY = header.height - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;
     decodedHeight = (maxY - minY) + 1;
 
-    int numChannels = _header.channels.length;
+    int numChannels = header.channels.length;
     for (int yi = minY; yi <= maxY; ++yi) {
 
       for (int ci = 0; ci < numChannels; ++ci) {
-        ExrChannel ch = _header.channels[ci];
+        ExrChannel ch = header.channels[ci];
         if ((y % ch.ySampling) != 0) {
           continue;
         }
 
-        int n = _numSamples(ch.xSampling, minX, maxX);
+        int n = numSamples(ch.xSampling, minX, maxX);
         pixel[0] = 0;
 
         switch (ch.type) {

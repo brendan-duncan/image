@@ -1,4 +1,10 @@
-part of image;
+import 'dart:typed_data';
+
+import '../animation.dart';
+import '../image.dart';
+import '../util/neural_quantizer.dart';
+import '../util/output_buffer.dart';
+import 'encoder.dart';
 
 /**
  *

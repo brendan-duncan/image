@@ -1,4 +1,7 @@
-part of image;
+import 'dart:math' as Math;
+
+import 'image_exception.dart';
+import 'internal/clamp.dart';
 
 /**
  * Image pixel colors are instantiated as an int object rather than an instance
@@ -71,10 +74,6 @@ const int ALPHA = 3;
 /// Luminance of a color.
 const int LUMINANCE = 4;
 
-int _clamp(int x, int a, int b) => x.clamp(a, b);
-
-int _clamp255(int x) => x.clamp(0, 255);
-
 /**
  * Get the color with the given [r], [g], [b], and [a] components.
  *
@@ -82,10 +81,10 @@ int _clamp255(int x) => x.clamp(0, 255);
  * with the image data of a canvas html element.
  */
 int getColor(int r, int g, int b, [int a = 255]) =>
-    (_clamp255(a) << 24) |
-    (_clamp255(b) << 16) |
-    (_clamp255(g) << 8) |
-    _clamp255(r);
+    (clamp255(a) << 24) |
+    (clamp255(b) << 16) |
+    (clamp255(g) << 8) |
+    clamp255(r);
 
 /**
  * Get the [channel] from the [color].
@@ -117,7 +116,7 @@ int getRed(int color) =>
  * by [value].
  */
 int setRed(int color, int value) =>
-    (color & 0xffffff00) | (_clamp255(value));
+    (color & 0xffffff00) | (clamp255(value));
 
 /**
  * Get the green channel from the [color].
@@ -130,7 +129,7 @@ int getGreen(int color) =>
  * by [value].
  */
 int setGreen(int color, int value) =>
-    (color & 0xffff00ff) | (_clamp255(value) << 8);
+    (color & 0xffff00ff) | (clamp255(value) << 8);
 
 /**
  * Get the blue channel from the [color].
@@ -143,7 +142,7 @@ int getBlue(int color) =>
  * by [value].
  */
 int setBlue(int color, int value) =>
-    (color & 0xff00ffff) | (_clamp255(value) << 16);
+    (color & 0xff00ffff) | (clamp255(value) << 16);
 
 /**
  * Get the alpha channel from the [color].
@@ -156,7 +155,7 @@ int getAlpha(int color) =>
  * by [value].
  */
 int setAlpha(int color, int value) =>
-    (color & 0x00ffffff) | (_clamp255(value) << 24);
+    (color & 0x00ffffff) | (clamp255(value) << 24);
 
 /**
  * Returns a new color of [src] alpha-blended onto [dst]. The opacity of [src]

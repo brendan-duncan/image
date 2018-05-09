@@ -1,4 +1,8 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../internal/bit_operators.dart';
+import '../../util/input_buffer.dart';
+import 'vp8.dart';
 
 class VP8Filter {
   VP8Filter() {
@@ -141,8 +145,8 @@ class VP8Filter {
     final int q0 = p[0];
     final int q1 = p[step];
     final int a = 3 * (q0 - p0) + sclip1[1020 + p1 - q1];
-    final int a1 = sclip2[112 + _shiftR((a + 4), 3)];
-    final int a2 = sclip2[112 + _shiftR((a + 3), 3)];
+    final int a1 = sclip2[112 + shiftR((a + 4), 3)];
+    final int a2 = sclip2[112 + shiftR((a + 3), 3)];
     p[-step] = clip1[255 + p0 + a2];
     p[0] = clip1[255 + q0 - a1];
   }
@@ -156,9 +160,9 @@ class VP8Filter {
     final int q0 = p[0];
     final int q1 = p[step];
     final int a = 3 * (q0 - p0);
-    final int a1 = sclip2[112 + _shiftR((a + 4), 3)];
-    final int a2 = sclip2[112 + _shiftR((a + 3), 3)];
-    final int a3 = _shiftR(a1 + 1, 1);
+    final int a1 = sclip2[112 + shiftR((a + 4), 3)];
+    final int a2 = sclip2[112 + shiftR((a + 3), 3)];
+    final int a3 = shiftR(a1 + 1, 1);
     p[-2 * step] = clip1[255 + p1 + a3];
     p[-step] = clip1[255 + p0 + a2];
     p[0] = clip1[255 + q0 - a1];
@@ -176,9 +180,9 @@ class VP8Filter {
     final int q1 = p[step];
     final int q2 = p[2 * step];
     final int a = sclip1[1020 + 3 * (q0 - p0) + sclip1[1020 + p1 - q1]];
-    final int a1 = _shiftR(27 * a + 63, 7); // eq. to ((3 * a + 7) * 9) >> 7
-    final int a2 = _shiftR(18 * a + 63, 7); // eq. to ((2 * a + 7) * 9) >> 7
-    final int a3 = _shiftR(9  * a + 63, 7); // eq. to ((1 * a + 7) * 9) >> 7
+    final int a1 = shiftR(27 * a + 63, 7); // eq. to ((3 * a + 7) * 9) >> 7
+    final int a2 = shiftR(18 * a + 63, 7); // eq. to ((2 * a + 7) * 9) >> 7
+    final int a3 = shiftR(9  * a + 63, 7); // eq. to ((1 * a + 7) * 9) >> 7
     p[-3 * step] = clip1[255 + p2 + a3];
     p[-2 * step] = clip1[255 + p1 + a2];
     p[-step] = clip1[255 + p0 + a1];
@@ -318,8 +322,8 @@ class VP8Filter {
     _store2(dst, 3, a - d4, d1, c1);
   }
 
-  static int AVG3(a, b, c) => _shiftR(((a) + 2 * (b) + (c) + 2), 2);
-  static int AVG2(a, b) => _shiftR(((a) + (b) + 1), 1);
+  static int AVG3(a, b, c) => shiftR(((a) + 2 * (b) + (c) + 2), 2);
+  static int AVG2(a, b) => shiftR(((a) + (b) + 1), 1);
 
   static void VE4(InputBuffer dst) {
     int top = -VP8.BPS; // dst +
@@ -662,7 +666,7 @@ class VP8Filter {
 
   static int _mul(int a, int b) {
     int c = a * b;
-    return _shiftR(c, 16);
+    return shiftR(c, 16);
   }
 
   static void _store(InputBuffer dst, int di, int x, int y, int v) {

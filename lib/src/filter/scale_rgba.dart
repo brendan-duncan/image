@@ -1,4 +1,4 @@
-part of image;
+import '../image.dart';
 
 Image scaleRGBA(Image src, int r, int g, int b, int a) {
   double dr = r / 255.0;

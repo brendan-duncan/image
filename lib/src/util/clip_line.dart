@@ -1,5 +1,3 @@
-part of image;
-
 /**
  * Clip a line to a rectangle using the Cohen–Sutherland clipping algorithm.
  * [line] is a list of 4 ints <x1, y1, x2, y2>.

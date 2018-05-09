@@ -1,4 +1,4 @@
-part of image;
+import '../image.dart';
 
 /// Flip the image horizontally.
 const int FLIP_HORIZONTAL = 1;

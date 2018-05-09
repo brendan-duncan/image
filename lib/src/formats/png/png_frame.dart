@@ -1,4 +1,4 @@
-part of image;
+import '../../internal/internal.dart';
 
 /**
  * Decodes a frame from a PNG animation.
@@ -23,4 +23,9 @@ class PngFrame {
   int blend;
 
   List<int> _fdat = [];
+}
+
+@internal
+class InternalPngFrame extends PngFrame {
+  List<int> get fdat => _fdat;
 }

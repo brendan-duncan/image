@@ -1,4 +1,6 @@
-part of image;
+import '../../image_exception.dart';
+import '../../hdr/hdr_image.dart';
+import '../../util/input_buffer.dart';
 
 class ExrChannel {
   static const int TYPE_UINT = HdrImage.UINT;

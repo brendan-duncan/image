@@ -1,4 +1,6 @@
-part of image;
+import 'dart:typed_data';
+
+import '../internal/bit_operators.dart';
 
 /**
  * A 16-bit floating-point number, used by high-dynamic-range image formats
@@ -35,7 +37,7 @@ class Half {
     }
 
     f = f.toDouble();
-    int x_i = _float32ToUint32(f);
+    int x_i = float32ToUint32(f);
     if (f == 0.0) {
       // Common special case - zero.
       // Preserve the zero's sign bit.

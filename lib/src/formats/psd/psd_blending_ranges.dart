@@ -1,4 +1,6 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../util/input_buffer.dart';
 
 class PsdBlendingRanges {
   int grayBlackSrc;

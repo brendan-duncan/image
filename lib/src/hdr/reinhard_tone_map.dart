@@ -1,4 +1,6 @@
-part of image;
+import 'dart:math' as Math;
+
+import 'hdr_image.dart';
 
 /**
  * Applies Reinhard tone mapping to the hdr image, in-place.

@@ -1,5 +1,3 @@
-part of image;
-
 // enum Interpolation
 
 /// Nearest interopolation.

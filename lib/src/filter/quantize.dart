@@ -1,4 +1,5 @@
-part of image;
+import '../image.dart';
+import '../util/neural_quantizer.dart';
 
 /**
  * Quantize the number of colors in image to 256.

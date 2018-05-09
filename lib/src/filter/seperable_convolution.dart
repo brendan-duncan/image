@@ -1,4 +1,5 @@
-part of image;
+import '../image.dart';
+import 'seperable_kernel.dart';
 
 /**
  * Apply a generic seperable convolution filter the [src] image, using the

@@ -1,10 +1,22 @@
-part of image;
+import 'dart:typed_data';
 
-class ExrZipCompressor extends ExrCompressor {
+import 'package:archive/archive.dart';
+
+import '../../image_exception.dart';
+import '../../util/input_buffer.dart';
+import 'exr_compressor.dart';
+import 'exr_part.dart';
+
+abstract class ExrZipCompressor extends ExrCompressor {
+  factory ExrZipCompressor(ExrPart header, int maxScanLineSize,
+                           int numScanLines) = InternalExrZipCompressor;
+}
+
+class InternalExrZipCompressor extends InternalExrCompressor implements ExrZipCompressor {
   ZLibDecoder zlib = new ZLibDecoder();
 
-  ExrZipCompressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
-    super._(header) {
+  InternalExrZipCompressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
+    super(header) {
   }
 
   int numScanLines() => _numScanLines;
@@ -19,10 +31,10 @@ class ExrZipCompressor extends ExrCompressor {
     Uint8List data = zlib.decodeBytes(input.toUint8List());
 
     if (width == null) {
-      width = _header.width;
+      width = header.width;
     }
     if (height == null) {
-      height = _header._linesInBuffer;
+      height = header.linesInBuffer;
     }
 
     int minX = x;
@@ -30,11 +42,11 @@ class ExrZipCompressor extends ExrCompressor {
     int minY = y;
     int maxY = y + height - 1;
 
-    if (maxX > _header.width) {
-      maxX = _header.width - 1;
+    if (maxX > header.width) {
+      maxX = header.width - 1;
     }
-    if (maxY > _header.height) {
-      maxY = _header.height - 1;
+    if (maxY > header.height) {
+      maxY = header.height - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;

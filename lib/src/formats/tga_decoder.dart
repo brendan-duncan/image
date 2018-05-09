@@ -1,4 +1,10 @@
-part of image;
+import '../animation.dart';
+import '../color.dart';
+import '../image.dart';
+import '../util/input_buffer.dart';
+import 'decoder.dart';
+import 'decode_info.dart';
+import 'tga/tga_info.dart';
 
 /**
  * Decode a Targa TGA image. This only supports the 24-bit uncompressed format.

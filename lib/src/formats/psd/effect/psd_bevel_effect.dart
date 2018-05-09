@@ -1,5 +1,4 @@
-part of image;
-
+import 'psd_effect.dart';
 
 class PsdBevelEffect extends PsdEffect {
   int angle;

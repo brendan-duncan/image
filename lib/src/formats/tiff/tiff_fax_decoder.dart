@@ -1,4 +1,5 @@
-part of image;
+import '../../image_exception.dart';
+import '../../util/input_buffer.dart';
 
 class TiffFaxDecoder {
   int width;

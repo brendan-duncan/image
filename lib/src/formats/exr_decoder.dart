@@ -1,4 +1,10 @@
-part of image;
+import '../animation.dart';
+import '../image.dart';
+import '../hdr/hdr_image.dart';
+import '../hdr/hdr_to_image.dart';
+import 'decode_info.dart';
+import 'decoder.dart';
+import 'exr/exr_image.dart';
 
 /**
  * Decode an OpenEXR formatted image.

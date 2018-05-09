@@ -1,4 +1,6 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../color.dart';
 
 class GifColorMap {
   int bitsPerPixel;
