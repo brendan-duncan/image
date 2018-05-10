@@ -1,4 +1,8 @@
-part of image;
+import 'dart:math' as Math;
+
+import '../image.dart';
+import 'seperable_convolution.dart';
+import 'seperable_kernel.dart';
 
 Map<int, SeperableKernel> _gaussianKernelCache = {};
 

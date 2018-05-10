@@ -1,4 +1,8 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../internal/bit_operators.dart';
+import '../../util/input_buffer.dart';
+import 'vp8l.dart';
 
 class VP8LTransform {
   // enum VP8LImageTransformType
@@ -48,7 +52,7 @@ class VP8LTransform {
           // transforms work on effective width of xsize_.
           final int outStride = (rowEnd - rowStart) * width;
           final int inStride = (rowEnd - rowStart) *
-                                VP8L._subSampleSize(xsize, bits);
+              InternalVP8L.subSampleSize(xsize, bits);
 
           int src = rowsOut + outStride - inStride;
           outData.setRange(src, src + inStride, inData, rowsOut);
@@ -141,7 +145,7 @@ class VP8LTransform {
                                   int data) {
     final int width = xsize;
     final int mask = (1 << bits) - 1;
-    final int tilesPerRow = VP8L._subSampleSize(width, bits);
+    final int tilesPerRow = InternalVP8L.subSampleSize(width, bits);
     int y = yStart;
     int predRow = (y >> bits) * tilesPerRow; //this.data +
 
@@ -185,7 +189,7 @@ class VP8LTransform {
 
     int y = yStart;
     final int mask = (1 << bits) - 1;
-    final int tilesPerRow = VP8L._subSampleSize(width, bits);
+    final int tilesPerRow = InternalVP8L.subSampleSize(width, bits);
     int predModeBase = (y >> bits) * tilesPerRow; //this.data +
 
     while (y < yEnd) {
@@ -459,9 +463,9 @@ class _VP8LMultipliers {
   int colorTransformDelta(int colorPred, int color) {
     // There's a bug in dart2js (issue 16497) that requires I do this a bit
     // convoluted to avoid having the optimizer butcher the code.
-    int a = _uint8ToInt8(colorPred);
-    int b = _uint8ToInt8(color);
-    int d = _int32ToUint32(a * b);
+    int a = uint8ToInt8(colorPred);
+    int b = uint8ToInt8(color);
+    int d = int32ToUint32(a * b);
     return d >> 5;
   }
 }

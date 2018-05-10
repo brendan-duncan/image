@@ -1,4 +1,6 @@
-part of image;
+import 'dart:typed_data';
+
+import 'vp8.dart';
 
 class VP8FrameHeader {
   bool keyFrame;

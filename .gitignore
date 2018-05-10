@@ -21,6 +21,7 @@ build/
 packages
 psd_to_html/out/
 .idea/
+.packages
 .pub/
 add.png
 out

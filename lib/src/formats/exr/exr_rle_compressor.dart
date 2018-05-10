@@ -1,8 +1,18 @@
-part of image;
+import 'dart:typed_data';
 
-class ExrRleCompressor extends ExrCompressor {
-  ExrRleCompressor(ExrPart header, this._maxScanLineSize) :
-    super._(header) {
+import '../../image_exception.dart';
+import '../../util/input_buffer.dart';
+import '../../util/output_buffer.dart';
+import 'exr_compressor.dart';
+import 'exr_part.dart';
+
+abstract class ExrRleCompressor extends ExrCompressor {
+  factory ExrRleCompressor(ExrPart header, int maxScanLineSize) = InternalExrRleCompressor;
+}
+
+class InternalExrRleCompressor extends InternalExrCompressor implements ExrRleCompressor {
+  InternalExrRleCompressor(ExrPart header, this._maxScanLineSize) :
+    super(header) {
   }
 
   int numScanLines() => 1;
@@ -17,10 +27,10 @@ class ExrRleCompressor extends ExrCompressor {
     OutputBuffer out = new OutputBuffer(size: inPtr.length * 2);
 
     if (width == null) {
-      width = _header.width;
+      width = header.width;
     }
     if (height == null) {
-      height = _header._linesInBuffer;
+      height = header.linesInBuffer;
     }
 
     int minX = x;
@@ -28,11 +38,11 @@ class ExrRleCompressor extends ExrCompressor {
     int minY = y;
     int maxY = y + height - 1;
 
-    if (maxX > _header.width) {
-      maxX = _header.width - 1;
+    if (maxX > header.width) {
+      maxX = header.width - 1;
     }
-    if (maxY > _header.height) {
-      maxY = _header.height - 1;
+    if (maxY > header.height) {
+      maxY = header.height - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;

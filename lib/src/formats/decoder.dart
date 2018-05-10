@@ -1,4 +1,7 @@
-part of image;
+import '../animation.dart';
+import '../image.dart';
+import '../hdr/hdr_image.dart';
+import 'decode_info.dart';
 
 /**
  * Base class for image format decoders.

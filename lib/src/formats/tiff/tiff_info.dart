@@ -1,4 +1,5 @@
-part of image;
+import '../../formats/decode_info.dart';
+import 'tiff_image.dart';
 
 class TiffInfo extends DecodeInfo {
   bool bigEndian;

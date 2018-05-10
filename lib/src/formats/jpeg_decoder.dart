@@ -1,4 +1,14 @@
-part of image;
+import 'dart:typed_data';
+
+import '../animation.dart';
+import '../color.dart';
+import '../image.dart';
+import '../image_exception.dart';
+import '../util/input_buffer.dart';
+import 'decode_info.dart';
+import 'decoder.dart';
+import 'jpeg/jpeg_data.dart';
+import 'jpeg/jpeg_info.dart';
 
 /**
  * Decode a jpeg encoded image.

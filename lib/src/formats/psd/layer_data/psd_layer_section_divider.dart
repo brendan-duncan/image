@@ -1,4 +1,6 @@
-part of image;
+import '../../../image_exception.dart';
+import '../../../util/input_buffer.dart';
+import '../psd_layer_data.dart';
 
 class PsdLayerSectionDivider extends PsdLayerData {
   static const String TAG = 'lsct';

@@ -1,4 +1,7 @@
-part of image;
+import '../bitmap_font.dart';
+import '../color.dart';
+import '../image.dart';
+import 'draw_pixel.dart';
 
 /**
  * Draw a string horizontally into [image] horizontally into [image] at position

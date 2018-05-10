@@ -1,5 +1,3 @@
-part of image;
-
 /**
  * An exception thrown when there was a problem in the image library.
  */

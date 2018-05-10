@@ -1,4 +1,6 @@
-part of image;
+import 'dart:math' as Math;
+
+import 'hdr_image.dart';
 
 /**
  * Apply gamma scaling to the HDR image, in-place.

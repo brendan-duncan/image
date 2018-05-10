@@ -1,4 +1,7 @@
-part of image;
+import '../color.dart';
+import '../image.dart';
+import '../util/output_buffer.dart';
+import 'encoder.dart';
 
 /**
  * Encode a Targa TGA image.  This only supports the 24-bit uncompressed format.

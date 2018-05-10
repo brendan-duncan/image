@@ -1,4 +1,5 @@
-part of image;
+import '../color.dart';
+import '../image.dart';
 
 /**
  * Find the minimum and maximum color value in the image.

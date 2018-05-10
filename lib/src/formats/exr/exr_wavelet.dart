@@ -1,4 +1,6 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../internal/bit_operators.dart';
 
 class ExrWavelet {
   static void decode(Uint16List input, int si, int nx, int ox, int ny, int oy,
@@ -128,8 +130,8 @@ class ExrWavelet {
   static const int MOD_MASK = (1 <<  NBITS) - 1;
 
   static void wdec14(int l, int h, List<int> a_b) {
-    int ls = _uint16ToInt16(l);
-    int hs = _uint16ToInt16(h);
+    int ls = uint16ToInt16(l);
+    int hs = uint16ToInt16(h);
 
     int hi = hs;
     int ai = ls + (hi & 1) + (hi >> 1);

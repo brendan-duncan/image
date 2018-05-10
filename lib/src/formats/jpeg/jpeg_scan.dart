@@ -1,4 +1,8 @@
-part of image;
+import '../../image_exception.dart';
+import '../../util/input_buffer.dart';
+import 'jpeg.dart';
+import 'jpeg_component.dart';
+import 'jpeg_frame.dart';
 
 
 class JpegScan {

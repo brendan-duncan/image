@@ -1,4 +1,5 @@
-part of image;
+import '../image.dart';
+import '../draw/draw_pixel.dart';
 
 /**
  * Copies a rectangular portion of one image to another image. [dst] is the

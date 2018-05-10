@@ -1,4 +1,6 @@
-part of image;
+import '../color.dart';
+import '../image.dart';
+import '../transform/copy_into.dart';
 
 /// Trim an image to the top-left and bottom-right most non-transparent pixels,
 /// used by [findTrim] and [trim].

@@ -1,4 +1,7 @@
-part of image;
+import 'dart:typed_data';
+
+import '../image.dart';
+import 'hdr_slice.dart';
 
 /**
  * A high dynamic range RGBA image stored in 16-bit or 32-bit floating-point

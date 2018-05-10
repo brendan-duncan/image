@@ -1,4 +1,6 @@
-part of image;
+import '../decode_info.dart';
+import 'gif_color_map.dart';
+import 'gif_image_desc.dart';
 
 class GifInfo extends DecodeInfo {
   int colorResolution = 0;

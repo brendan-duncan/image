@@ -1,4 +1,6 @@
-part of image;
+import 'dart:typed_data';
+
+import 'input_buffer.dart';
 
 class OutputBuffer {
   int length;

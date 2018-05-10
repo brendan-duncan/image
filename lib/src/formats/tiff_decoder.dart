@@ -1,5 +1,12 @@
-part of image;
+import 'dart:typed_data';
 
+import '../animation.dart';
+import '../image.dart';
+import '../hdr/hdr_image.dart';
+import '../util/input_buffer.dart';
+import 'decoder.dart';
+import 'tiff/tiff_image.dart';
+import 'tiff/tiff_info.dart';
 
 class TiffDecoder extends Decoder {
   TiffInfo info;

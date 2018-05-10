@@ -1,4 +1,14 @@
-part of image;
+import 'dart:math' as Math;
+import 'dart:typed_data';
+
+import '../decode_info.dart';
+import '../../color.dart';
+import '../../image.dart';
+import '../../image_exception.dart';
+import '../../util/input_buffer.dart';
+import 'psd_channel.dart';
+import 'psd_image_resource.dart';
+import 'psd_layer.dart';
 
 class PsdImage extends DecodeInfo {
   static const int SIGNATURE = 0x38425053; // '8BPS'

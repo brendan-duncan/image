@@ -1,14 +1,24 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../image.dart';
+import '../../util/input_buffer.dart';
+import 'vp8_bit_reader.dart';
+import 'vp8_filter.dart';
+import 'vp8_types.dart';
+import 'webp_alpha.dart';
+import 'webp_info.dart';
 
 /**
  * WebP lossy format.
  */
 class VP8 {
   InputBuffer input;
-  WebPInfo webp;
+  InternalWebPInfo _webp;
 
-  VP8(InputBuffer input, this.webp) :
+  VP8(InputBuffer input, this._webp) :
     this.input = input;
+
+  WebPInfo get webp => _webp;
 
   bool decodeHeader() {
     int bits = input.readUint24();
@@ -341,8 +351,8 @@ class VP8 {
   }
 
   bool _initFrame() {
-    if (webp._alphaData != null) {
-      _alphaData = webp._alphaData;
+    if (_webp.alphaData != null) {
+      _alphaData = _webp.alphaData;
     }
 
     _fStrengths = new List<List<VP8FInfo>>(NUM_MB_SEGMENTS);

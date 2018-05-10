@@ -1,4 +1,7 @@
-part of image;
+import 'dart:math' as Math;
+
+import '../color.dart';
+import '../image.dart';
 
 /**
  * Apply a 3x3 convolution filter to the [src] image.  [filter] should be a

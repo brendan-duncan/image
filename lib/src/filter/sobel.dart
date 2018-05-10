@@ -1,4 +1,8 @@
-part of image;
+import 'dart:math' as Math;
+
+import '../image.dart';
+import '../internal/clamp.dart';
+import 'grayscale.dart';
 
 
 /**
@@ -34,11 +38,11 @@ Image sobel(Image src, {double amount: 1.0}) {
       double h = -tlInt - 2.0 * tInt - trInt + blInt + 2.0 * bInt + brInt;
       double v = -blInt - 2.0 * lInt - tlInt + brInt + 2.0 * rInt + trInt;
 
-      int mag = _clamp255((Math.sqrt(h * h + v * v) * 255.0).toInt());
+      int mag = clamp255((Math.sqrt(h * h + v * v) * 255.0).toInt());
 
-      rgba[pi] = _clamp255((mag * amount + rgba[pi] * invAmount).toInt());
-      rgba[pi + 1] = _clamp255((mag * amount + rgba[pi + 1] * invAmount).toInt());
-      rgba[pi + 2] = _clamp255((mag * amount + rgba[pi + 2] * invAmount).toInt());
+      rgba[pi] = clamp255((mag * amount + rgba[pi] * invAmount).toInt());
+      rgba[pi + 1] = clamp255((mag * amount + rgba[pi + 1] * invAmount).toInt());
+      rgba[pi + 2] = clamp255((mag * amount + rgba[pi + 2] * invAmount).toInt());
     }
   }
 

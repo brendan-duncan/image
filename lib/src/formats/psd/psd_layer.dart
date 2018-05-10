@@ -1,4 +1,20 @@
-part of image;
+import '../../image.dart';
+import '../../image_exception.dart';
+import '../../util/input_buffer.dart';
+import 'psd_blending_ranges.dart';
+import 'psd_channel.dart';
+import 'psd_image.dart';
+import 'psd_layer_data.dart';
+import 'psd_mask.dart';
+import 'effect/psd_bevel_effect.dart';
+import 'effect/psd_drop_shadow_effect.dart';
+import 'effect/psd_effect.dart';
+import 'effect/psd_inner_glow_effect.dart';
+import 'effect/psd_inner_shadow_effect.dart';
+import 'effect/psd_outer_glow_effect.dart';
+import 'effect/psd_solid_fill_effect.dart';
+import 'layer_data/psd_layer_additional_data.dart';
+import 'layer_data/psd_layer_section_divider.dart';
 
 class PsdLayer {
   int top;

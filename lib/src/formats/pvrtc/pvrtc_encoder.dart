@@ -1,4 +1,13 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../color.dart';
+import '../../image.dart';
+import '../../image_exception.dart';
+import '../../util/output_buffer.dart';
+import 'pvrtc_bit_utility.dart';
+import 'pvrtc_color.dart';
+import 'pvrtc_color_bounding_box.dart';
+import 'pvrtc_packet.dart';
 
 /**
  * Ported from Jeffrey Lim's PVRTC encoder/decoder,

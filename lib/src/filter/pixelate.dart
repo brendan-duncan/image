@@ -1,4 +1,6 @@
-part of image;
+import '../color.dart';
+import '../image.dart';
+import '../draw/fill_rect.dart';
 
 /// Use the top-left pixel of a block for the block color, used by [pixelate].
 const int PIXELATE_UPPERLEFT = 0;

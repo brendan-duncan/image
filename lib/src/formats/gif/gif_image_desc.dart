@@ -1,4 +1,6 @@
-part of image;
+import '../../internal/internal.dart';
+import '../../util/input_buffer.dart';
+import 'gif_color_map.dart';
 
 class GifImageDesc {
   int x;
@@ -38,3 +40,9 @@ class GifImageDesc {
   int _inputPosition;
 }
 
+@internal
+class InternalGifImageDesc extends GifImageDesc {
+  InternalGifImageDesc(InputBuffer input) : super(input);
+
+  int get inputPosition => _inputPosition;
+}

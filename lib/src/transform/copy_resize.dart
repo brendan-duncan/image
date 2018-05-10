@@ -1,4 +1,9 @@
-part of image;
+import 'dart:typed_data';
+
+import '../color.dart';
+import '../image.dart';
+import '../image_exception.dart';
+import '../util/interpolation.dart';
 
 /**
  * Returns a resized copy of the [src] image.

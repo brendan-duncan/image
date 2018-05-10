@@ -1,4 +1,6 @@
-part of image;
+import 'dart:typed_data';
+
+import 'jpeg_component.dart';
 
 class JpegFrame {
   bool extended;

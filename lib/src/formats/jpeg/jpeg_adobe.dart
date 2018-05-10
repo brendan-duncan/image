@@ -1,5 +1,3 @@
-part of image;
-
 class JpegAdobe {
   int version;
   int flags0;

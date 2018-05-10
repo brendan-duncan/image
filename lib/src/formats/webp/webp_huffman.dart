@@ -1,9 +1,14 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../internal/internal.dart';
+import 'vp8l.dart';
+import 'vp8l_bit_reader.dart';
 
 /**
  * Huffman Tree.
  */
-class _HuffmanTree {
+@internal
+class HuffmanTree {
   static const int HUFF_LUT_BITS = 7;
   static const int HUFF_LUT = (1 << HUFF_LUT_BITS);
   // Fast lookup for short bit lengths.
@@ -19,7 +24,7 @@ class _HuffmanTree {
   /// number of currently occupied nodes
   int numNodes = 0;
 
-  _HuffmanTree([int numLeaves = 0]) {
+  HuffmanTree([int numLeaves = 0]) {
     _init(numLeaves);
   }
 
@@ -303,19 +308,20 @@ class _HuffmanTree {
 /**
  * A group of huffman trees.
  */
-class _HTreeGroup {
-  final List<_HuffmanTree> htrees =
-      new List<_HuffmanTree>(VP8L.HUFFMAN_CODES_PER_META_CODE);
+@internal
+class HTreeGroup {
+  final List<HuffmanTree> htrees =
+      new List<HuffmanTree>(VP8L.HUFFMAN_CODES_PER_META_CODE);
 
-  _HTreeGroup() {
+  HTreeGroup() {
     for (int i = 0, len = htrees.length; i < len; ++i) {
-      htrees[i] = new _HuffmanTree();
+      htrees[i] = new HuffmanTree();
     }
   }
 
-  _HuffmanTree operator[](int index) {
+  HuffmanTree operator[](int index) {
     if (htrees[index] == null) {
-      htrees[index] = new _HuffmanTree();
+      htrees[index] = new HuffmanTree();
     }
     return htrees[index];
   }

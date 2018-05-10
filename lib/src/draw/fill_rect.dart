@@ -1,4 +1,7 @@
-part of image;
+import 'dart:math' as Math;
+
+import '../image.dart';
+import 'draw_pixel.dart';
 
 /**
  * Fill a rectangle in the image [src] with the given [color] with the corners

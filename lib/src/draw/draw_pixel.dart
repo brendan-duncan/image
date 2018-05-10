@@ -1,4 +1,5 @@
-part of image;
+import '../color.dart';
+import '../image.dart';
 
 /**
  * Draw a single pixel into the image, applying alpha and opacity blending.

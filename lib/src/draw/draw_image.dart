@@ -1,4 +1,5 @@
-part of image;
+import '../image.dart';
+import 'draw_pixel.dart';
 
 /**
  * Draw the image [src] onto the image [dst].

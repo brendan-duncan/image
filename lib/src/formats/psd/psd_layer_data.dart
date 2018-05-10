@@ -1,4 +1,6 @@
-part of image;
+import '../../util/input_buffer.dart';
+import 'layer_data/psd_layer_additional_data.dart';
+import 'layer_data/psd_layer_section_divider.dart';
 
 class PsdLayerData {
   String tag;

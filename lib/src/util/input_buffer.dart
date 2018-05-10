@@ -1,4 +1,7 @@
-part of image;
+import 'dart:typed_data';
+
+import '../image_exception.dart';
+import '../internal/bit_operators.dart';
 
 /**
  * A buffer that can be read as a stream of bytes.
@@ -138,7 +141,7 @@ class InputBuffer {
   }
 
   int readInt8() {
-    return _uint8ToInt8(readByte());
+    return uint8ToInt8(readByte());
   }
 
   /**
@@ -189,7 +192,7 @@ class InputBuffer {
    * Read a 16-bit word from the stream.
    */
   int readInt16() {
-    return _uint16ToInt16(readUint16());
+    return uint16ToInt16(readUint16());
   }
 
   /**
@@ -223,14 +226,14 @@ class InputBuffer {
    * Read a signed 32-bit integer from the stream.
    */
   int readInt32() {
-    return _uint32ToInt32(readUint32());
+    return uint32ToInt32(readUint32());
   }
 
   /**
    * Read a 32-bit float.
    */
   double readFloat32() {
-    return _uint32ToFloat32(readUint32());
+    return uint32ToFloat32(readUint32());
   }
 
   /**

@@ -1,4 +1,4 @@
-part of image;
+import '../../util/input_buffer.dart';
 
 class PsdImageResource {
   int id;

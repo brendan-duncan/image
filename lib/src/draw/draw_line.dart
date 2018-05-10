@@ -1,4 +1,8 @@
-part of image;
+import 'dart:math' as Math;
+
+import '../image.dart';
+import '../util/clip_line.dart';
+import 'draw_pixel.dart';
 
 /**
  * Draw a line into [image].

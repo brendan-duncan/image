@@ -1,4 +1,11 @@
-part of image;
+import 'dart:typed_data';
+
+import 'package:archive/archive.dart';
+
+import '../color.dart';
+import '../image.dart';
+import '../util/output_buffer.dart';
+import 'encoder.dart';
 
 /**
  * Encode an image to the PNG format.

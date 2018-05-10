@@ -1,3 +1,7 @@
+## 1.1.32 - May 9, 2018
+
+  Remove the use of `part` and `part of` in the main library.
+
 ## 1.1.30 - March 10, 2018
 
   Update pubspec to account for the new version of xml package that has been

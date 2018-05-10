@@ -1,4 +1,5 @@
-part of image;
+import '../../internal/internal.dart';
+import '../../util/input_buffer.dart';
 
 /**
  * Decodes a frame from a WebP animation.
@@ -42,4 +43,12 @@ class WebPFrame {
 
   // Size of an animation frame header.
   static const int _ANIMF_HEADER_SIZE = 16;
+}
+
+@internal
+class InternalWebPFrame extends WebPFrame {
+  InternalWebPFrame(InputBuffer input, int size) : super(input, size);
+
+  int get framePosition => _framePosition;
+  int get frameSize => _frameSize;
 }

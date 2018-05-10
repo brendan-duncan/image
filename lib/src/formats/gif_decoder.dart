@@ -1,4 +1,13 @@
-part of image;
+import 'dart:typed_data';
+
+import '../animation.dart';
+import '../image.dart';
+import '../transform/copy_into.dart';
+import '../util/input_buffer.dart';
+import 'decoder.dart';
+import 'gif/gif_color_map.dart';
+import 'gif/gif_image_desc.dart';
+import 'gif/gif_info.dart';
 
 /**
  * A decoder for the GIF image format.  This supports both single frame and
@@ -47,7 +56,7 @@ class GifDecoder extends Decoder {
         int recordType = _input.readByte();
         switch (recordType) {
           case IMAGE_DESC_RECORD_TYPE:
-            GifImageDesc gifImage = _skipImage();
+            InternalGifImageDesc gifImage = _skipImage();
             if (gifImage == null) {
               return info;
             }
@@ -68,7 +77,7 @@ class GifDecoder extends Decoder {
               recordType = _input.peekBytes(1)[0];
               if (recordType == IMAGE_DESC_RECORD_TYPE) {
                 _input.skip(1);
-                GifImageDesc gifImage = _skipImage();
+                InternalGifImageDesc gifImage = _skipImage();
                 if (gifImage == null) {
                   return info;
                 }
@@ -114,7 +123,8 @@ class GifDecoder extends Decoder {
     }
 
     _frame = frame;
-    _input.offset = info.frames[frame]._inputPosition;
+    InternalGifImageDesc gifImage = info.frames[frame];
+    _input.offset = gifImage.inputPosition;
 
     return _decodeImage(info.frames[frame]);
   }
@@ -176,11 +186,11 @@ class GifDecoder extends Decoder {
     return anim;
   }
 
-  GifImageDesc _skipImage() {
+  InternalGifImageDesc _skipImage() {
     if (_input.isEOS) {
       return null;
     }
-    GifImageDesc gifImage = new GifImageDesc(_input);
+    InternalGifImageDesc gifImage = new InternalGifImageDesc(_input);
     _input.skip(1);
     _skipRemainder();
     return gifImage;

@@ -1,4 +1,18 @@
-part of image;
+import 'dart:typed_data';
+
+import 'package:archive/archive.dart';
+
+import '../../color.dart';
+import '../../image.dart';
+import '../../image_exception.dart';
+import '../../formats/jpeg_decoder.dart';
+import '../../hdr/hdr_image.dart';
+import '../../internal/bit_operators.dart';
+import '../../util/input_buffer.dart';
+import 'tiff_bit_reader.dart';
+import 'tiff_entry.dart';
+import 'tiff_fax_decoder.dart';
+import 'tiff_lzw_decoder.dart';
 
 class TiffImage {
   Map<int, TiffEntry> tags = {};
@@ -608,7 +622,7 @@ class TiffImage {
     int dstCount = 0;
 
     while (dstCount < arraySize) {
-      int b = _uint8ToInt8(data[srcCount++]);
+      int b = uint8ToInt8(data[srcCount++]);
       if (b >= 0 && b <= 127) {
         // literal run packet
         for (int i = 0; i < (b + 1); ++i) {

@@ -1,11 +1,27 @@
-part of image;
+import 'dart:typed_data';
+
+import '../../image_exception.dart';
+import '../../internal/internal.dart';
+import '../../util/input_buffer.dart';
+import '../../util/output_buffer.dart';
+import 'exr_channel.dart';
+import 'exr_compressor.dart';
+import 'exr_huffman.dart';
+import 'exr_part.dart';
+import 'exr_wavelet.dart';
 
 /**
  * Wavelet compression
  */
-class ExrPizCompressor extends ExrCompressor {
-  ExrPizCompressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
-    super._(header) {
+abstract class ExrPizCompressor extends ExrCompressor {
+  factory ExrPizCompressor(ExrPart header, int maxScanLineSize,
+                           int numScanLines) = InternalExrPizCompressor;
+}
+
+@internal
+class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCompressor {
+  InternalExrPizCompressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
+    super(header) {
     _channelData = new List<_PizChannelData>(header.channels.length);
     for (int i = 0; i < _channelData.length; ++i) {
       _channelData[i] = new _PizChannelData();
@@ -17,7 +33,6 @@ class ExrPizCompressor extends ExrCompressor {
 
   int numScanLines() => _numScanLines;
 
-
   Uint8List compress(InputBuffer inPtr, int x, int y,
                      [int width, int height]) {
     throw new ImageException('Piz compression not yet supported.');
@@ -26,10 +41,10 @@ class ExrPizCompressor extends ExrCompressor {
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
                        [int width, int height]) {
     if (width == null) {
-      width = _header.width;
+      width = header.width;
     }
     if (height == null) {
-      height = _header._linesInBuffer;
+      height = header.linesInBuffer;
     }
 
     int minX = x;
@@ -37,18 +52,18 @@ class ExrPizCompressor extends ExrCompressor {
     int minY = y;
     int maxY = y + height - 1;
 
-    if (maxX > _header.width) {
-      maxX = _header.width - 1;
+    if (maxX > header.width) {
+      maxX = header.width - 1;
     }
-    if (maxY > _header.height) {
-      maxY = _header.height - 1;
+    if (maxY > header.height) {
+      maxY = header.height - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;
     decodedHeight = (maxY - minY) + 1;
 
     int tmpBufferEnd = 0;
-    List<ExrChannel> channels = _header.channels;
+    List<ExrChannel> channels = header.channels;
     final int numChannels = channels.length;
 
     for (int i = 0; i < numChannels; ++i) {
@@ -57,8 +72,8 @@ class ExrPizCompressor extends ExrCompressor {
       cd.start = tmpBufferEnd;
       cd.end = cd.start;
 
-      cd.nx = _numSamples(ch.xSampling, minX, maxX);
-      cd.ny = _numSamples(ch.ySampling, minY, maxY);
+      cd.nx = numSamples(ch.xSampling, minX, maxX);
+      cd.ny = numSamples(ch.ySampling, minY, maxY);
       cd.ys = ch.ySampling;
 
       cd.size = ch.size ~/ 2; //2=size(HALF)

@@ -1,4 +1,5 @@
-part of image;
+import '../image.dart';
+import 'convolution.dart';
 
 /**
  * Apply a smoothing convolution filter to the [src] image.

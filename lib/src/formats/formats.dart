@@ -1,4 +1,21 @@
-part of image;
+import 'dart:typed_data';
+
+import '../animation.dart';
+import '../image.dart';
+
+import 'decoder.dart';
+import 'exr_decoder.dart';
+import 'gif_decoder.dart';
+import 'gif_encoder.dart';
+import 'jpeg_decoder.dart';
+import 'jpeg_encoder.dart';
+import 'png_decoder.dart';
+import 'png_encoder.dart';
+import 'psd_decoder.dart';
+import 'tga_decoder.dart';
+import 'tga_encoder.dart';
+import 'tiff_decoder.dart';
+import 'webp_decoder.dart';
 
 /**
  * Find a [Decoder] that is able to decode the given image [data].

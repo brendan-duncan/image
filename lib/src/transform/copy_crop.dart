@@ -1,4 +1,4 @@
-part of image;
+import '../image.dart';
 
 /**
  * Returns a croped copy of [src].

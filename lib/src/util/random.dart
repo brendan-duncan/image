@@ -1,4 +1,4 @@
-part of image;
+import 'dart:math' as Math;
 
 /**
  * Return a random variable between [-1,1].

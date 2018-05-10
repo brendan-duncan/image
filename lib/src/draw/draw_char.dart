@@ -1,4 +1,6 @@
-part of image;
+import '../image.dart';
+import '../bitmap_font.dart';
+import 'draw_pixel.dart';
 
 /**
  * Draw a single character from [char] horizontally into [image] at position
