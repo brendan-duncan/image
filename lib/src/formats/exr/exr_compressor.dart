@@ -1,7 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:meta/meta.dart';
-
 import '../../image_exception.dart';
 import '../../internal/internal.dart';
 import '../../util/input_buffer.dart';
