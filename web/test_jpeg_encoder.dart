@@ -17,7 +17,7 @@ void main() {
 
   var jpg = encodeJpg(image, quality: 25);
 
-  var jpg64 = BASE64.encode(jpg);
+  var jpg64 = base64Encode(jpg);
   var img = Html.document.createElement('img');
   img.src = 'data:image/png;base64,${jpg64}';
   Html.document.body.append(img);
