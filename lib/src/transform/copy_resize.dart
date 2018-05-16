@@ -20,7 +20,7 @@ Image copyResize(Image src, int width, [int height = -1,
     throw new ImageException('Invalid size');
   }
 
-  Image dst = new Image(width, height, src.format);
+  Image dst = new Image(width, height, src.format, src.exif);
 
   double dy = src.height / height;
   double dx = src.width / width;

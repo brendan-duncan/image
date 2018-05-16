@@ -2,6 +2,7 @@ import 'dart:math' as Math;
 import 'dart:typed_data';
 
 import 'color.dart';
+import 'exif_data.dart';
 import 'image_exception.dart';
 import 'util/interpolation.dart';
 
@@ -61,14 +62,16 @@ class Image {
   /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
   /// channel.
   final Uint32List data;
+  ExifData exif;
 
   /**
    * Create an image with the given dimensions and format.
    */
-  Image(int width, int height, [this._format = RGBA]) :
+  Image(int width, int height, [this._format = RGBA, ExifData exif = null]) :
     this.width = width,
     this.height = height,
-    data = new Uint32List(width * height);
+    data = new Uint32List(width * height),
+    exif = new ExifData.from(exif);
 
   /**
    * Create a copy of the image [other].
@@ -82,7 +85,8 @@ class Image {
     disposeMethod = other.disposeMethod,
     blendMethod = other.blendMethod,
     _format = other._format,
-    data = new Uint32List.fromList(other.data);
+    data = new Uint32List.fromList(other.data),
+    exif = new ExifData.from(other.exif);
 
   /**
    * Create an image from [bytes].
@@ -97,7 +101,7 @@ class Image {
    * Image image = new Image.fromBytes(canvas.width, canvas.height, bytes);
    */
   Image.fromBytes(int width, int height, List<int> bytes,
-                  [this._format = RGBA]) :
+                  [this._format = RGBA, ExifData exif = null]) :
     this.width = width,
     this.height = height,
     // Create a uint32 view of the byte buffer.
@@ -105,7 +109,8 @@ class Image {
     data = bytes is Uint8List ? new Uint32List.view(bytes.buffer) :
             bytes is Uint8ClampedList ? new Uint32List.view(bytes.buffer) :
             bytes is Uint32List ? new Uint32List.view(bytes.buffer) :
-            new Uint32List.view(new Uint8List.fromList(bytes).buffer);
+            new Uint32List.view(new Uint8List.fromList(bytes).buffer),
+    exif = new ExifData.from(exif);
 
   /**
    * Clone this image.

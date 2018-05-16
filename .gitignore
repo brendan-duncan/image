@@ -25,3 +25,4 @@ psd_to_html/out/
 .pub/
 add.png
 out
+.dart_tool/

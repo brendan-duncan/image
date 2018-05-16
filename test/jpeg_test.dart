@@ -2,7 +2,7 @@ part of image_test;
 
 void defineJpegTests() {
   Io.Directory dir = new Io.Directory('test/res/jpg');
-  List files = dir.listSync();
+  List files = dir.listSync(recursive: true);
 
   List<int> toRGB(int pixel) =>
       [getRed(pixel), getGreen(pixel), getBlue(pixel)];

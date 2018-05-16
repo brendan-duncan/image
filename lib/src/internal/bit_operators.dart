@@ -56,6 +56,15 @@ double uint32ToFloat32(int d) {
 }
 
 /**
+ * Binary conversion of a uint64 to an float64.  This is equivalent in C to
+ * typecasting an unsigned long long to double.
+ */
+double uint64ToFloat64(int d) {
+  __uint64[0] = d;
+  return __uint64ToFloat64[0];
+}
+
+/**
  * Binary conversion of an int32 to a uint32. This is equivalent in C to
  * typecasting an int to an unsigned int.
  */
@@ -88,3 +97,6 @@ final Uint32List __int32ToUint32 = new Uint32List.view(__int32.buffer);
 
 final Float32List __float32 = new Float32List(1);
 final Uint32List __float32ToUint32 = new Uint32List.view(__float32.buffer);
+
+final Uint64List __uint64 = new Uint64List(1);
+final Float64List __uint64ToFloat64 = new Float64List.view(__uint64.buffer);

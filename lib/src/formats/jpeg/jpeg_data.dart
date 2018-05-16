@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../../exif_data.dart';
 import '../../image_exception.dart';
 import '../../internal/bit_operators.dart';
 import '../../util/input_buffer.dart';
@@ -17,6 +18,7 @@ class JpegData  {
   JpegAdobe adobe;
   JpegFrame frame;
   int resetInterval;
+  ExifData exif = new ExifData();
   final List<Int16List> quantizationTables = new List(Jpeg.NUM_QUANT_TBLS);
   final List<JpegFrame> frames = [];
   final List huffmanTablesAC = [];
@@ -413,6 +415,148 @@ class JpegData  {
     return c;
   }
 
+  num _readExifValue(InputBuffer block, int format) {
+    const FMT_BYTE = 1;
+    const FMT_STRING = 2;
+    const FMT_USHORT = 3;
+    const FMT_ULONG = 4;
+    const FMT_URATIONAL = 5;
+    const FMT_SBYTE = 6;
+    const FMT_UNDEFINED = 7;
+    const FMT_SSHORT = 8;
+    const FMT_SLONG = 9;
+    const FMT_SRATIONAL = 10;
+    const FMT_SINGLE = 11;
+    const FMT_DOUBLE = 12;
+
+    switch (format) {
+      case FMT_SBYTE:
+        return block.readInt8();
+      case FMT_BYTE:
+        return block.readByte();
+      case FMT_USHORT:
+        return block.readUint16();
+      case FMT_ULONG:
+        return block.readUint32();
+      case FMT_URATIONAL:
+      case FMT_SRATIONAL: {
+        int num = block.readInt32();
+        int den = block.readInt32();
+        if (den == 0) {
+          return 0.0;
+        }
+        return num / den;
+      }
+      case FMT_SSHORT:
+        return block.readInt16();
+      case FMT_SLONG:
+        return block.readInt32();
+      // Not sure if this is correct (never seen float used in Exif format)
+      case FMT_SINGLE:
+        return block.readFloat32();
+      case FMT_DOUBLE:
+        return block.readFloat64();
+      default:
+        return 0;
+    }
+  }
+
+  void _readExifDir(InputBuffer block, [int nesting = 0]) {
+    if (nesting > 4) {
+      return; // Maximum Exif directory nesting exceeded (corrupt Exif header)
+    }
+
+    int numDirEntries = block.readUint16();
+
+    const TAG_ORIENTATION = 0x0112;
+    const TAG_INTEROP_OFFSET = 0xA005;
+    const TAG_EXIF_OFFSET = 0x8769;
+    const maxFormats = 12;
+    const bytesPerFormat = const [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
+
+    for (int di = 0; di < numDirEntries; ++di) {
+      int tag = block.readUint16();
+      int format = block.readUint16();
+      int components = block.readUint32();
+
+      if (format - 1 >= maxFormats) {
+        continue;
+      }
+
+      // too many components
+      if (components > 0x10000) {
+        continue;
+      }
+
+      int byteCount = bytesPerFormat[format];
+
+      // If its bigger than 4 bytes, the dir entry contains an offset.
+      if (byteCount > 4) {
+        int offset = block.readUint32();
+        if (offset + byteCount > block.length) {
+          continue; // Bogus pointer offset and / or bytecount value
+        }
+
+        //ValuePtr = OffsetBase+OffsetVal;
+      }
+
+      switch (tag) {
+        case TAG_ORIENTATION: {
+            num orientation = _readExifValue(block, format);
+            exif.orientation = orientation.toInt();
+          }
+          break;
+        case TAG_EXIF_OFFSET:
+        case TAG_INTEROP_OFFSET:
+          break;
+        default:
+          // skip unknown tags
+          break;
+      }
+    }
+  }
+
+  void _readExifData(InputBuffer block) {
+    const EXIF_TAG = 0x45786966; // Exif\0\0
+    if (block.readUint32() != EXIF_TAG) {
+      return;
+    }
+    if (block.readUint16() != 0) {
+      return;
+    }
+
+    bool saveEndian = block.bigEndian;
+
+    // Exif Directory
+    String alignment = block.readString(2);
+    if (alignment == 'II') { // Exif is in Intel order
+      block.bigEndian = false;
+    } else if (alignment == 'MM') { // Exif section in Motorola order
+      block.bigEndian = true;
+    } else {
+      return;
+    }
+
+    block.skip(2);
+
+    int offset = block.readUint32();
+    if (offset < 8 || offset > 16){
+      if (offset > block.length - 16) {
+        // invalid offset for first Exif IFD value ;
+        block.bigEndian = saveEndian;
+        return;
+      }
+    }
+
+    if (offset > 8) {
+      block.skip(offset - 8);
+    }
+
+    _readExifDir(block);
+
+    block.bigEndian = saveEndian;
+  }
+
   void _readAppData(int marker, InputBuffer block) {
     InputBuffer appData = block;
 
@@ -431,6 +575,11 @@ class JpegData  {
         int thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
         jfif.thumbData = appData.subset(14 + thumbSize, offset: 14);
       }
+    }
+
+    if (marker == Jpeg.M_APP1) {
+      // 'EXIF\0'
+      _readExifData(appData);
     }
 
     if (marker == Jpeg.M_APP14) {
