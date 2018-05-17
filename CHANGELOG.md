@@ -1,3 +1,7 @@
+## 1.1.33 - May 16, 2018
+
+  Maintain EXIF data from JPEG images.
+
 ## 1.1.32 - May 9, 2018
 
   Remove the use of `part` and `part of` in the main library.
