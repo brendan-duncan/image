@@ -517,6 +517,8 @@ class JpegData  {
   }
 
   void _readExifData(InputBuffer block) {
+    exif.rawData = block.toUint8List();
+
     const EXIF_TAG = 0x45786966; // Exif\0\0
     if (block.readUint32() != EXIF_TAG) {
       return;

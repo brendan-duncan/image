@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../exif_data.dart';
 import '../image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
@@ -43,6 +44,7 @@ class JpegEncoder extends Encoder {
     // Add JPEG headers
     _writeMarker(fp, Jpeg.M_SOI);
     _writeAPP0(fp);
+    _writeAPP1(fp, image.exif);
     _writeDQT(fp);
     _writeSOF0(fp, image.width, image.height);
     _writeDHT(fp);
@@ -387,6 +389,16 @@ class JpegEncoder extends Encoder {
     out.writeUint16(1); // ydensity
     out.writeByte(0); // thumbnwidth
     out.writeByte(0); // thumbnheight
+  }
+
+  void _writeAPP1(OutputBuffer out, ExifData exif) {
+    if (exif.rawData == null) {
+      return;
+    }
+
+    _writeMarker(out, Jpeg.M_APP1);
+    out.writeUint16(exif.rawData.length);
+    out.writeBytes(exif.rawData);
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height) {
