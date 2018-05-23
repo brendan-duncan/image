@@ -4,9 +4,7 @@
 set -e
 
 # Analyze the code.
-dartanalyzer --fatal-warnings \
-  lib/image.dart \
-  test/image_test.dart
+dartanalyzer --fatal-warnings lib/image.dart
 
 # Run the tests.
-dart -c test/image_test.dart
+pub run build_runner test
