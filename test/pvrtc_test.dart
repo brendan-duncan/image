@@ -1,6 +1,8 @@
-part of image_test;
+import 'dart:io' as Io;
+import 'package:image/image.dart';
+import 'package:test/test.dart';
 
-void definePvrtcTests() {
+void main() {
   group('PVRTC', () {
     test('encode_rgb_4bpp', () {
       List<int> bytes = new Io.File('test/res/tga/globe.tga').readAsBytesSync();

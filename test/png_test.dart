@@ -1,6 +1,8 @@
-part of image_test;
+import 'dart:io' as Io;
+import 'package:image/image.dart';
+import 'package:test/test.dart';
 
-void definePngTests() {
+void main() {
   group('PNG', () {
     test('encode', () {
       Image image = new Image(64, 64);

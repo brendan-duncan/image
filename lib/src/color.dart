@@ -283,7 +283,6 @@ List<int> hsvToRGB(num hue, num saturation, num brightness) {
     default:
       throw new ImageException('invalid hue');
   }
-  return null;
 }
 
 /**

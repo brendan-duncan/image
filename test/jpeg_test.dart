@@ -1,8 +1,10 @@
-part of image_test;
+import 'dart:io' as Io;
+import 'package:image/image.dart';
+import 'package:test/test.dart';
 
-void defineJpegTests() {
+void main() {
   Io.Directory dir = new Io.Directory('test/res/jpg');
-  List files = dir.listSync();
+  List files = dir.listSync(recursive: true);
 
   List<int> toRGB(int pixel) =>
       [getRed(pixel), getGreen(pixel), getBlue(pixel)];

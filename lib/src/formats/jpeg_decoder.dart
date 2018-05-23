@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../animation.dart';
 import '../color.dart';
+import '../exif_data.dart';
 import '../image.dart';
 import '../image_exception.dart';
 import '../util/input_buffer.dart';
@@ -81,6 +82,8 @@ class JpegDecoder extends Decoder {
   }
 
   void _copyToImage(JpegData jpeg, Image imageData) {
+    imageData.exif = new ExifData.from(jpeg.exif);
+
     int width = imageData.width;
     int height = imageData.height;
     Uint8List data = jpeg.getData(width, height);

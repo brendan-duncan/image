@@ -1,6 +1,8 @@
-part of image_test;
+import 'dart:io' as Io;
+import 'package:image/image.dart';
+import 'package:test/test.dart';
 
-void defineFilterTests() {
+void main() {
   group('filter', () {
     Image image = readJpg(new Io.File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync());
     image = copyResize(image, 400);

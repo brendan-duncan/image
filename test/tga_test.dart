@@ -1,6 +1,8 @@
-part of image_test;
+import 'dart:io' as Io;
+import 'package:image/image.dart';
+import 'package:test/test.dart';
 
-void defineTgaTests() {
+void main() {
   Io.Directory dir = new Io.Directory('res/tga');
   if (!dir.existsSync()) {
     return;

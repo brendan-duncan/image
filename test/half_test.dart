@@ -1,6 +1,7 @@
-part of image_test;
+import 'package:image/image.dart';
+import 'package:test/test.dart';
 
-void defineHalfTests() {
+void main() {
   group('Half', () {
      test('Arithmetic', () {
        double f1 = 1.0;

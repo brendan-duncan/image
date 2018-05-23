@@ -1,6 +1,7 @@
-part of image_test;
+import 'dart:io' as Io;
+import 'package:image/image.dart';
 
-void defineExrTests() {
+void main() {
   List<int> bytes = new Io.File('test/res/exr/grid.exr').readAsBytesSync();
 
   ExrDecoder dec = new ExrDecoder();

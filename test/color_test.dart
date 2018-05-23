@@ -1,6 +1,7 @@
-part of image_test;
+import 'package:image/image.dart';
+import 'package:test/test.dart';
 
-void defineColorTests() {
+void main() {
   group('Color', () {
     test('RGBA', () {
       int rgba = Color.fromRgba(0xaa, 0xbb, 0xcc, 0xff);

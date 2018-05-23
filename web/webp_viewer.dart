@@ -9,7 +9,8 @@ import 'package:image/image.dart';
 void main() {
   var images = Html.querySelectorAll('img');
 
-  for (var img in images) {
+  for (var _img in images) {
+    var img = _img as Html.ImageElement;
     if (img.src.toLowerCase().endsWith('.webp')) {
       var req = new Html.HttpRequest();
       req.open('GET', img.src);

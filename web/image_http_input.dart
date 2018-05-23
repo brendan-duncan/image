@@ -9,7 +9,7 @@ void main() {
   // There are at least two ways to get a file into an html dart app:
   // using a file Input element, or an AJAX HttpRequest.
 
-  // This example demonstrats using a file Input element.
+  // This example demonstrates using a file Input element.
   fileInput = Html.querySelector("#file");
 
   fileInput.addEventListener("change", onFileChanged);
@@ -30,7 +30,7 @@ void onFileChanged(Html.Event event) {
 /**
  * Called when the file has been read.
  */
-void onFileLoaded(Html.ProgressEvent event) {
+void onFileLoaded(Html.Event event) {
   Html.FileReader reader = event.currentTarget;
 
   var bytes = reader.result;
@@ -81,4 +81,6 @@ void onFileLoaded(Html.ProgressEvent event) {
     // set the img src as a data url
     img.src = 'data:image/png;base64,${png64}';
   }
+
+  return;
 }

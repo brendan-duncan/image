@@ -1,7 +1,8 @@
-part of image_test;
+import 'dart:io' as Io;
+import 'package:image/image.dart';
+import 'package:test/test.dart';
 
-
-void defineWebPTests() {
+void main() {
   Io.Directory dir = new Io.Directory('test/res/webp');
   List files = dir.listSync();
 

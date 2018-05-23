@@ -60,7 +60,7 @@ class Jpeg {
   static const int M_EXP   = 0xdf;
 
   static const int M_APP0  = 0xe0; // JFIF
-  static const int M_APP1  = 0xe1; //
+  static const int M_APP1  = 0xe1; // EXIF
   static const int M_APP2  = 0xe2;
   static const int M_APP3  = 0xe3;
   static const int M_APP4  = 0xe4;
