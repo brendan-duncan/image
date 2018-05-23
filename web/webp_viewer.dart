@@ -23,7 +23,7 @@ void main() {
           Image image = decodeWebP(bytes);
           List<int> png = encodePng(image);
 
-          var png64 = BASE64.encode(png);
+          var png64 = base64Encode(png);
           img.src = 'data:image/png;base64,${png64}';
         }
       });

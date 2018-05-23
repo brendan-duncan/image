@@ -77,7 +77,7 @@ void onFileLoaded(Html.ProgressEvent event) {
     // encode the image to a PNG
     var png = encodePng(image);
     // base64 encode the png
-    var png64 = BASE64.encode(png);
+    var png64 = base64Encode(png);
     // set the img src as a data url
     img.src = 'data:image/png;base64,${png64}';
   }

@@ -1,3 +1,8 @@
+## 1.1.33 - May 16, 2018
+
+  Remove the use of Dart 1 upper-case constants.
+  Update SDK dependency to a 2.0 development release.
+
 ## 1.1.32 - May 9, 2018
 
   Remove the use of `part` and `part of` in the main library.
