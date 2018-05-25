@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'image.dart';
 
 /**
- * Stores multiple images, most oftenly as the frames of an animation.
+ * Stores multiple images, most often as the frames of an animation.
  *
  * Some formats, such as [TiffDecoder], support multiple images that are not
  * to be interpreted as animation, but rather multiple pages of a document.

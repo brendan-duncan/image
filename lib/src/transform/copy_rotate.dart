@@ -46,7 +46,7 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
   }
 
   // Generic angle.
-  double rad = (nangle * Math.PI / 180.0);
+  double rad = (nangle * Math.pi / 180.0);
   double ca = Math.cos(rad);
   double sa = Math.sin(rad);
   double ux = (src.width * ca).abs();

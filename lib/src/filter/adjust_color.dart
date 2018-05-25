@@ -6,7 +6,7 @@ import '../image.dart';
 import '../internal/clamp.dart';
 
 /**
- * Adjust the color of the [src] image using varous color transformations.
+ * Adjust the color of the [src] image using various color transformations.
  *
  * [blacks] defines the black level of the image, as a color.
  *
@@ -26,11 +26,11 @@ import '../internal/clamp.dart';
  * [brightness] is a constant scalar of the image colors.  At 0 the image
  * is black, 1.0 unmodified, and > 1.0 the image becomes brighter.
  *
- * [gamma] is an exponental scalar of the image colors.  At < 1.0 the image
+ * [gamma] is an exponential scalar of the image colors.  At < 1.0 the image
  * becomes brighter, and > 1.0 the image becomes darker.  A [gamma] of 1/2.2
  * will convert the image colors to linear color space.
  *
- * [exposure] is an exponental scalar of the image as rgb * pow(2, exposure).
+ * [exposure] is an exponential scalar of the image as rgb * pow(2, exposure).
  * At 0, the image is unmodified; as the exposure increases, the image
  * brightens.
  *

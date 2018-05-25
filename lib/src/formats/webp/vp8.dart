@@ -830,7 +830,7 @@ class VP8 {
       return false;
     }
 
-    int numLinesOut = _emitFancyRGB(mbY, mbW, mbH);
+    /*int numLinesOut =*/ _emitFancyRGB(mbY, mbW, mbH);
     _emitAlphaRGB(mbY, mbW, mbH);
 
     //_lastY += numLinesOut;
@@ -1099,7 +1099,7 @@ class VP8 {
     VP8QuantMatrix q = _dqm[_segment];
     VP8MBData block = _mbData[_mbX];
     InputBuffer dst = new InputBuffer(block.coeffs);
-    int di = 0;
+    //int di = 0;
     VP8MB leftMb = _mbInfo[0];
     int tnz;
     int lnz;
@@ -1401,7 +1401,7 @@ class VP8 {
 
   // Dithering strength, deduced from decoding options
   bool _dither = false; // whether to use dithering or not
-  VP8Random _ditheringRand; // random generator for dithering
+  //VP8Random _ditheringRand; // random generator for dithering
 
   // dequantization (one set of DC/AC dequant factor per segment)
   List<VP8QuantMatrix> _dqm = new List<VP8QuantMatrix>(NUM_MB_SEGMENTS);
@@ -1446,7 +1446,7 @@ class VP8 {
   InputBuffer _a;
 
   /// main memory chunk for the above data. Persistent.
-  Uint8List _mem;
+  //Uint8List _mem;
 
   // Per macroblock non-persistent infos.
   /// current position, in macroblock units
@@ -1466,14 +1466,14 @@ class VP8 {
   /// compressed alpha data (if present)
   InputBuffer _alphaData;
   /// true if alpha_data_ is decoded in alpha_plane_
-  int _isAlphaDecoded;
+  //int _isAlphaDecoded;
   /// output. Persistent, contains the whole data.
   Uint8List _alphaPlane;
 
   // extensions
-  int _layerColorspace;
+  //int _layerColorspace;
   /// compressed layer data (if present)
-  Uint8List _layerData;
+  //Uint8List _layerData;
 
   static int _clip(int v, int M) {
     return v < 0 ? 0 : v > M ? M : v;

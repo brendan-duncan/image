@@ -73,7 +73,7 @@ class GifDecoder extends Decoder {
             }
             break;
           case TERMINATE_RECORD_TYPE:
-            _numFrames = info.numFrames;
+            //_numFrames = info.numFrames;
             return info;
           default:
             break;
@@ -82,7 +82,7 @@ class GifDecoder extends Decoder {
     } catch (error) {
     }
 
-    _numFrames = info.numFrames;
+    //_numFrames = info.numFrames;
     return info;
   }
 
@@ -101,13 +101,13 @@ class GifDecoder extends Decoder {
   }
 
   void _readGraphicsControlExt(InputBuffer _input) {
-    int blockSize =  _input.readByte();
+    /*int blockSize =*/  _input.readByte();
     int b = _input.readByte();
     int duration = _input.readUint16();
     int transparent = _input.readByte();
-    int endBlock = _input.readByte();
+    /*int endBlock =*/ _input.readByte();
     int disposalMethod = (b >> 3) & 0x7;
-    int userInput = (b >> 1) & 0x1;
+    //int userInput = (b >> 1) & 0x1;
     int transparentFlag = b & 0x1;
 
     int recordType = _input.peekBytes(1)[0];
@@ -142,7 +142,7 @@ class GifDecoder extends Decoder {
       return null;
     }
 
-    _frame = frame;
+    //_frame = frame;
     InternalGifImageDesc gifImage = info.frames[frame];
     _input.offset = gifImage.inputPosition;
 
@@ -153,8 +153,8 @@ class GifDecoder extends Decoder {
     if (startDecode(bytes) == null) {
       return null;
     }
-    _frame = 0;
-    _numFrames = 1;
+    //_frame = 0;
+    //_numFrames = 1;
     return decodeFrame(frame);
   }
 
@@ -174,7 +174,7 @@ class GifDecoder extends Decoder {
 
     Image lastImage = new Image(info.width, info.height);
     for (int i = 0; i < info.numFrames; ++i) {
-      _frame = i;
+      //_frame = i;
       if (lastImage == null) {
         lastImage = new Image(info.width, info.height);
       } else {
@@ -217,7 +217,7 @@ class GifDecoder extends Decoder {
     return gifImage;
   }
 
-  bool _skipExtension() {
+  /*bool _skipExtension() {
     int extCode = _input.readByte();
     int b = _input.readByte();
     while (b != 0) {
@@ -225,7 +225,7 @@ class GifDecoder extends Decoder {
       b = _input.readByte();
     }
     return true;
-  }
+  }*/
 
   Image _decodeImage(GifImageDesc gifImage) {
     if (_buffer == null) {
@@ -588,8 +588,8 @@ class GifDecoder extends Decoder {
   }
 
   InputBuffer _input;
-  int _frame;
-  int _numFrames;
+  //int _frame;
+  //int _numFrames;
   int _repeat = 0;
   Uint8List _buffer;
   Uint8List _stack;

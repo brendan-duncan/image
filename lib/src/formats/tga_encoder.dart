@@ -4,7 +4,7 @@ import '../util/output_buffer.dart';
 import 'encoder.dart';
 
 /**
- * Encode a Targa TGA image.  This only supports the 24-bit uncompressed format.
+ * Encode a TGA image.  This only supports the 24-bit uncompressed format.
  */
 class TgaEncoder extends Encoder {
   List<int> encodeImage(Image image) {

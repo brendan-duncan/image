@@ -316,11 +316,11 @@ class PvrtcDecoder {
   }
 
   Image decodePVR3(List<int> data) {
-    const int PVR3_PVRTC_2BPP_RGB = 0;
-    const int PVR3_PVRTC_2BPP_RGBA = 1;
+    //const int PVR3_PVRTC_2BPP_RGB = 0;
+    //const int PVR3_PVRTC_2BPP_RGBA = 1;
     const int PVR3_PVRTC_4BPP_RGB = 2;
     const int PVR3_PVRTC_4BPP_RGBA = 3;
-    const int PVR3_PVRTC2_2BPP = 4;
+    /*const int PVR3_PVRTC2_2BPP = 4;
     const int PVR3_PVRTC2_4BPP = 5;
     const int PVR3_ETC1 = 6;
     const int PVR3_DXT1 = 7;
@@ -347,7 +347,7 @@ class PvrtcDecoder {
     const int PVR3_EAC_R11_U = 25;
     const int PVR3_EAC_R11_S = 26;
     const int PVR3_EAC_RG11_U = 27;
-    const int PVR3_EAC_RG11_S = 28;
+    const int PVR3_EAC_RG11_S = 28;*/
 
     InputBuffer input = new InputBuffer(data);
 

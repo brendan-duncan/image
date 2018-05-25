@@ -714,7 +714,7 @@ class VP8Filter {
     return ((v & -256) == 0) ? v : (v < 0) ? 0 : 255;
   }
 
-  static int __maxN = 0;
+  //static int __maxN = 0;
 
   static bool _tablesInitialized = false;
 }

@@ -98,16 +98,16 @@ class ExrImage extends DecodeInfo {
     return flags & MULTI_PART_FILE_FLAG != 0;
   }
 
-  bool _isNonImage() {
+  /*bool _isNonImage() {
     return flags & NON_IMAGE_FLAG != 0;
-  }
+  }*/
 
   static bool _supportsFlags(int flags) {
     return (flags & ~ALL_FLAGS) == 0;
   }
 
   void _readImage(InputBuffer input) {
-    final bool multiPart = _isMultiPart();
+    //final bool multiPart = _isMultiPart();
 
     for (int pi = 0; pi < _parts.length; ++pi) {
       InternalExrPart part = _parts[pi];
@@ -137,7 +137,7 @@ class ExrImage extends DecodeInfo {
     HdrImage framebuffer = part.framebuffer;
     ExrCompressor compressor = part.compressor;
     List<Uint32List> offsets = part.offsets;
-    Uint32List fbi = new Uint32List(part.channels.length);
+    //Uint32List fbi = new Uint32List(part.channels.length);
 
     InputBuffer imgData = new InputBuffer.from(input);
     for (int ly = 0, l = 0; ly < part.numYLevels; ++ly) {
@@ -160,8 +160,8 @@ class ExrImage extends DecodeInfo {
 
             int tileX = imgData.readUint32();
             int tileY = imgData.readUint32();
-            int levelX = imgData.readUint32();
-            int levelY = imgData.readUint32();
+            /*int levelX =*/ imgData.readUint32();
+            /*int levelY =*/ imgData.readUint32();
             int dataSize = imgData.readUint32();
             InputBuffer data = imgData.readBytes(dataSize);
 
@@ -192,7 +192,7 @@ class ExrImage extends DecodeInfo {
             int si = 0;
             int len = uncompressedData.length;
             int numChannels = part.channels.length;
-            int lineCount = 0;
+            //int lineCount = 0;
             for (int yi = 0; yi < tileHeight && ty < height; ++yi, ++ty) {
               for (int ci = 0; ci < numChannels; ++ci) {
                 ExrChannel ch = part.channels[ci];
@@ -227,17 +227,17 @@ class ExrImage extends DecodeInfo {
     ExrCompressor compressor = part.compressor;
     List<int> offsets = part.offsets[0];
 
-    int scanLineMin = part.top;
-    int scanLineMax = part.bottom;
+    //int scanLineMin = part.top;
+    //int scanLineMax = part.bottom;
     int linesInBuffer = part.linesInBuffer;
 
-    int minY = part.top;
-    int maxY = minY + part.linesInBuffer - 1;
+    //int minY = part.top;
+    //int maxY = minY + part.linesInBuffer - 1;
 
     Uint32List fbi = new Uint32List(part.channels.length);
-    int total = 0;
+    //int total = 0;
 
-    int xx = 0;
+    //int xx = 0;
     int yy = 0;
 
     InputBuffer imgData = new InputBuffer.from(input);
@@ -251,7 +251,7 @@ class ExrImage extends DecodeInfo {
         }
       }
 
-      int y = imgData.readInt32();
+      /*int y =*/ imgData.readInt32();
       int dataSize = imgData.readInt32();
       InputBuffer data = imgData.readBytes(dataSize);
 
@@ -265,7 +265,7 @@ class ExrImage extends DecodeInfo {
       int si = 0;
       int len = uncompressedData.length;
       int numChannels = part.channels.length;
-      int lineCount = 0;
+      //int lineCount = 0;
       for (int yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
         si = part.offsetInLineBuffer[yy];
         if (si >= len) {

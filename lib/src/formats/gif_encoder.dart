@@ -88,6 +88,7 @@ class GifEncoder extends Encoder {
    * Encode an animation.
    */
   List<int> encodeAnimation(Animation anim) {
+    repeat = anim.loopCount;
     for (Image f in anim) {
       addFrame(f, duration: f.duration);
     }

@@ -22,7 +22,6 @@ class JpegDecoder extends Decoder {
    * Is the given file a valid JPEG image?
    */
   bool isValidFile(List<int> data) {
-    InputBuffer input = new InputBuffer(data, bigEndian: true);
     return new JpegData().validate(data);
   }
 

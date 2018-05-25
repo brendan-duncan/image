@@ -517,9 +517,9 @@ class TiffImage {
     }*/
   }
 
-  int _clamp(int i) {
+  /*int _clamp(int i) {
     return i < 0 ? 0 : i > 255 ? 255 : i;
-  }
+  }*/
 
   void _decodeBilevelTile(InputBuffer p, int tileX, int tileY) {
     int tileIndex = tileY * tilesX + tileX;

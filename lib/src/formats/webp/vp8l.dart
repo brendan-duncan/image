@@ -495,7 +495,7 @@ class VP8L {
    * Processes (transforms, scales & color-converts) the rows decoded after the
    * last call.
    */
-  static int __count = 0;
+  //static int __count = 0;
   void _processRows(int row) {
     int rows = webp.width * _lastRow; // offset into _pixels
     final int numRows = row - _lastRow;
@@ -506,8 +506,8 @@ class VP8L {
 
     _applyInverseTransforms(numRows, rows);
 
-    int count = 0;
-    int di = rows;
+    //int count = 0;
+    //int di = rows;
     for (int y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
       for (int x = 0; x < webp.width; ++x, ++pi) {
         int c = _pixels[pi];
@@ -650,7 +650,7 @@ class VP8L {
 
   bool _readHuffmanCodeLengths(List<int> codeLengthCodeLengths,
                                int numSymbols, List<int> codeLengths) {
-    bool ok = false;
+    //bool ok = false;
     int symbol;
     int max_symbol;
     int prev_code_len = DEFAULT_CODE_LENGTH;

@@ -7,7 +7,7 @@ import 'decode_info.dart';
 import 'tga/tga_info.dart';
 
 /**
- * Decode a Targa TGA image. This only supports the 24-bit uncompressed format.
+ * Decode a TGA image. This only supports the 24-bit uncompressed format.
  * TODO add more TGA support.
  */
 class TgaDecoder extends Decoder {
@@ -15,7 +15,7 @@ class TgaDecoder extends Decoder {
   InputBuffer input;
 
   /**
-   * Is the given file a valid Targa image?
+   * Is the given file a valid TGA image?
    */
   bool isValidFile(List<int> data) {
     InputBuffer input = new InputBuffer(data,

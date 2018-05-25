@@ -70,10 +70,10 @@ class OutputBuffer {
   void writeUint16(int value) {
     if (bigEndian) {
       writeByte((value >> 8) & 0xff);
-      writeByte((value) & 0xff);
+      writeByte(value & 0xff);
       return;
     }
-    writeByte((value) & 0xff);
+    writeByte(value & 0xff);
     writeByte((value >> 8) & 0xff);
   }
 

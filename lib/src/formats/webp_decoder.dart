@@ -223,7 +223,7 @@ Animation decodeAnimation(List<int> bytes) {
       return false;
     }
 
-    int fileSize = input.readUint32();
+    /*int fileSize =*/ input.readUint32();
 
     tag = input.readString(4);
     if (tag != 'WEBP') {
@@ -315,10 +315,10 @@ Animation decodeAnimation(List<int> bytes) {
     if ((b & 0xc0) != 0) {
       return false;
     }
-    int icc = (b >> 5) & 0x1;
+    //int icc = (b >> 5) & 0x1;
     int alpha = (b >> 4) & 0x1;
-    int exif = (b >> 3) & 0x1;
-    int xmp = (b >> 2) & 0x1;
+    //int exif = (b >> 3) & 0x1;
+    //int xmp = (b >> 2) & 0x1;
     int a = (b >> 1) & 0x1;
 
     if (b & 0x1 != 0) {

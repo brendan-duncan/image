@@ -44,7 +44,7 @@ HdrImage hdrBloom(HdrImage hdr, {double radius: 0.01, double weight: 0.1}) {
             }
             int dist2 = dx * dx + dy * dy;
             if (dist2 < bloomWidth * bloomWidth) {
-              int bloomOffset = bx + by * hdr.width;
+              //int bloomOffset = bx + by * hdr.width;
               double wt = bloomFilter[dist2];
 
               sumWt += wt;
