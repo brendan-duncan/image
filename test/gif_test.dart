@@ -42,6 +42,22 @@ void main() {
     }
   });
 
+  group('Gif/decodeAnimation', () {
+    for (var f in files) {
+      if (f is! Io.File || !f.path.endsWith('cars.gif')) {
+        continue;
+      }
+
+      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      test('$name', () {
+        List<int> bytes = f.readAsBytesSync();
+        Animation anim = new GifDecoder().decodeAnimation(bytes);
+        expect(anim.length, equals(30));
+        expect(anim.loopCount, equals(0));
+      });
+    }
+  });
+
   group('Gif/encodeImage', () {
     List<int> bytes = new Io.File('test/res/jpg/jpeg444.jpg').readAsBytesSync();
     Image image = new JpegDecoder().decodeImage(bytes);

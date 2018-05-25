@@ -54,6 +54,7 @@ class GifEncoder extends Encoder {
     if (_encodedFrames == 0) {
       _writeHeader(_width, _height);
     } else {
+      _writeApplicationExt();
       _writeGraphicsCtrlExt();
     }
 
@@ -280,6 +281,16 @@ class GifEncoder extends Encoder {
     }
   }
 
+  void _writeApplicationExt() {
+    output.writeByte(EXTENSION_RECORD_TYPE);
+    output.writeByte(APPLICATION_EXT);
+    output.writeByte(11); // data block size
+    output.writeBytes("NETSCAPE2.0".codeUnits); // app identifier
+    output.writeBytes([0x03, 0x01]);
+    output.writeUint16(repeat); // loop count
+    output.writeByte(0); // block terminator
+  }
+
   void _writeGraphicsCtrlExt() {
     output.writeByte(EXTENSION_RECORD_TYPE);
     output.writeByte(GRAPHIC_CONTROL_EXT);
@@ -341,6 +352,7 @@ class GifEncoder extends Encoder {
   static const int EXTENSION_RECORD_TYPE = 0x21;
   static const int TERMINATE_RECORD_TYPE = 0x3b;
 
+  static const int APPLICATION_EXT = 0xff;
   static const int GRAPHIC_CONTROL_EXT = 0xf9;
 
   static const int EOF = -1;

@@ -10,7 +10,7 @@ import 'gif/gif_image_desc.dart';
 import 'gif/gif_info.dart';
 
 /**
- * A decoder for the GIF image format.  This supports both single frame and
+ * A decoder for the GIF image format. This supports both single frame and
  * animated GIF files, and transparency.
  */
 class GifDecoder extends Decoder {
@@ -23,7 +23,7 @@ class GifDecoder extends Decoder {
   }
 
   /**
-   * Is the given file a valid WebP image?
+   * Is the given file a valid Gif image?
    */
   bool isValidFile(List<int> bytes) {
     _input = new InputBuffer(bytes);
@@ -64,37 +64,10 @@ class GifDecoder extends Decoder {
             break;
           case EXTENSION_RECORD_TYPE:
             int extCode = _input.readByte();
-            if (extCode == GRAPHIC_CONTROL_EXT) {
-              int blockSize =  _input.readByte();
-              int b = _input.readByte();
-              int duration = _input.readUint16();
-              int transparent = _input.readByte();
-              int endBlock = _input.readByte();
-              int disposalMethod = (b >> 3) & 0x7;
-              int userInput = (b >> 1) & 0x1;
-              int transparentFlag = b & 0x1;
-
-              recordType = _input.peekBytes(1)[0];
-              if (recordType == IMAGE_DESC_RECORD_TYPE) {
-                _input.skip(1);
-                InternalGifImageDesc gifImage = _skipImage();
-                if (gifImage == null) {
-                  return info;
-                }
-
-                gifImage.duration = duration;
-                gifImage.clearFrame = disposalMethod == 2;
-
-                if (transparentFlag != 0) {
-                  if (gifImage.colorMap != null) {
-                    gifImage.colorMap.transparent = transparent;
-                  } else if (info.globalColorMap != null) {
-                    info.globalColorMap.transparent = transparent;
-                  }
-                }
-
-                info.frames.add(gifImage);
-              }
+            if (extCode == APPLICATION_EXT) {
+              _readApplicationExt(_input);
+            } else if (extCode == GRAPHIC_CONTROL_EXT) {
+              _readGraphicsControlExt(_input);
             } else {
               _skipRemainder();
             }
@@ -111,6 +84,53 @@ class GifDecoder extends Decoder {
 
     _numFrames = info.numFrames;
     return info;
+  }
+
+  void _readApplicationExt(InputBuffer _input) {
+    int blockSize =  _input.readByte();
+    String tag = _input.readString(blockSize);
+    if (tag == "NETSCAPE2.0") {
+      int b1 = _input.readByte();
+      int b2 = _input.readByte();
+      if (b1 == 0x03 && b2 == 0x01) {
+        _repeat = _input.readUint16();
+      }
+    } else {
+      _skipRemainder();
+    }
+  }
+
+  void _readGraphicsControlExt(InputBuffer _input) {
+    int blockSize =  _input.readByte();
+    int b = _input.readByte();
+    int duration = _input.readUint16();
+    int transparent = _input.readByte();
+    int endBlock = _input.readByte();
+    int disposalMethod = (b >> 3) & 0x7;
+    int userInput = (b >> 1) & 0x1;
+    int transparentFlag = b & 0x1;
+
+    int recordType = _input.peekBytes(1)[0];
+    if (recordType == IMAGE_DESC_RECORD_TYPE) {
+      _input.skip(1);
+      InternalGifImageDesc gifImage = _skipImage();
+      if (gifImage == null) {
+        return;
+      }
+
+      gifImage.duration = duration;
+      gifImage.clearFrame = disposalMethod == 2;
+
+      if (transparentFlag != 0) {
+        if (gifImage.colorMap != null) {
+          gifImage.colorMap.transparent = transparent;
+        } else if (info.globalColorMap != null) {
+          info.globalColorMap.transparent = transparent;
+        }
+      }
+
+      info.frames.add(gifImage);
+    }
   }
 
   Image decodeFrame(int frame) {
@@ -150,6 +170,7 @@ class GifDecoder extends Decoder {
     Animation anim = new Animation();
     anim.width = info.width;
     anim.height = info.height;
+    anim.loopCount = _repeat;
 
     Image lastImage = new Image(info.width, info.height);
     for (int i = 0; i < info.numFrames; ++i) {
@@ -472,7 +493,7 @@ class GifDecoder extends Decoder {
 
   /**
    * The LZ decompression input routine:
-   * This routine is responsable for the decompression of the bit stream from
+   * This routine is responsible for the decompression of the bit stream from
    * 8 bits (bytes) packets, into the real codes.
    */
   int _decompressInput() {
@@ -569,6 +590,7 @@ class GifDecoder extends Decoder {
   InputBuffer _input;
   int _frame;
   int _numFrames;
+  int _repeat = 0;
   Uint8List _buffer;
   Uint8List _stack;
   Uint8List _suffix;
@@ -595,6 +617,7 @@ class GifDecoder extends Decoder {
   static const int TERMINATE_RECORD_TYPE = 0x3b;
 
   static const int GRAPHIC_CONTROL_EXT = 0xf9;
+  static const int APPLICATION_EXT = 0xff;
 
   static const int LZ_MAX_CODE = 4095;
   static const int LZ_BITS = 12;
