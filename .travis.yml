@@ -3,9 +3,8 @@ language: dart
 dart:
   - dev
 
-# Only building master means that we don't run two builds for each pull request.
-branches:
-  only: [master]
+dart_task:
+  - test
 
 matrix:
   include:
@@ -13,5 +12,6 @@ matrix:
     - dart: dev
       dart_task: dartanalyzer
 
-dart_task:
-  - test
+# Only building master means that we don't run two builds for each pull request.
+branches:
+  only: [master]
