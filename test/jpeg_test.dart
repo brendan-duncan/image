@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Io.Directory dir = new Io.Directory('test/res/jpg');
+  Io.Directory dir = new Io.Directory('test/res/jpg/exif');
   List files = dir.listSync(recursive: true);
 
   List<int> toRGB(int pixel) =>
@@ -20,7 +20,6 @@ void main() {
         List<int> bytes = f.readAsBytesSync();
         expect(new JpegDecoder().isValidFile(bytes), equals(true));
 
-        InputBuffer stream = new InputBuffer(bytes);
         Image image = new JpegDecoder().decodeImage(bytes);
         if (image == null) {
           throw new ImageException('Unable to decode JPEG Image: $name.');
@@ -35,6 +34,13 @@ void main() {
         new Io.File('out/jpg/${name}')
           ..createSync(recursive: true)
           ..writeAsBytesSync(outJpg);
+
+        // Make sure we can read what we just wrote.
+        Image image2 = new JpegDecoder().decodeImage(
+            new Io.File('out/jpg/${name}').readAsBytesSync());
+        if (image2 == null) {
+          throw new ImageException('Unable to re-decode JPEG Image: $name.');
+        }
       });
     }
 

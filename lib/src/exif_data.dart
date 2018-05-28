@@ -9,7 +9,7 @@ class ExifData {
   static const int DATE_TIME = 0x0132; // string
   static const int ORIENTATION = 0x0112; // int
 
-  Uint8List rawData;
+  List<Uint8List> rawData;
   Map<int, dynamic> data;
 
   ExifData()
@@ -19,9 +19,14 @@ class ExifData {
   ExifData.from(ExifData other)
     : data = (other == null) ?
               new Map<int, dynamic>() :
-              new Map<int, dynamic>.from(other.data)
-    , rawData = (other == null || other.rawData == null) ?
-                null : new Uint8List.fromList(other.rawData);
+              new Map<int, dynamic>.from(other.data) {
+    if (rawData != null) {
+      rawData = new List<Uint8List>(other.rawData.length);
+      for (int i = 0; i < other.rawData.length; ++i) {
+        rawData[i] = new Uint8List.fromList(other.rawData[i]);
+      }
+    }
+  }
 
   bool get isEmpty => data.isEmpty;
   bool get isNotEmpty => data.isNotEmpty;

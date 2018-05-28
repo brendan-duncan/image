@@ -69,6 +69,7 @@ void main() {
 
     List<int> gif = encodeGifAnimation(anim);
     new File('out/gif/encodeAnimation.gif')
+      ..createSync(recursive: true)
       ..writeAsBytesSync(gif);
   });
 

@@ -517,9 +517,14 @@ class JpegData  {
   }
 
   void _readExifData(InputBuffer block) {
-    exif.rawData = block.toUint8List();
+    Uint8List rawData = new Uint8List.fromList(block.toUint8List());
+    if (exif.rawData == null) {
+      exif.rawData = new List<Uint8List>();
+    }
 
-    const EXIF_TAG = 0x45786966; // Exif\0\0
+    exif.rawData.add(rawData);
+
+    /*const EXIF_TAG = 0x45786966; // Exif\0\0
     if (block.readUint32() != EXIF_TAG) {
       return;
     }
@@ -556,7 +561,7 @@ class JpegData  {
 
     _readExifDir(block);
 
-    block.bigEndian = saveEndian;
+    block.bigEndian = saveEndian;*/
   }
 
   void _readAppData(int marker, InputBuffer block) {

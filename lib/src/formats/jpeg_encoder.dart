@@ -396,9 +396,11 @@ class JpegEncoder extends Encoder {
       return;
     }
 
-    _writeMarker(out, Jpeg.M_APP1);
-    out.writeUint16(exif.rawData.length);
-    out.writeBytes(exif.rawData);
+    for (var rawData in exif.rawData) {
+      _writeMarker(out, Jpeg.M_APP1);
+      out.writeUint16(rawData.length);
+      out.writeBytes(rawData);
+    }
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height) {
