@@ -1,3 +1,7 @@
+## 2.0.1 - May 28, 2018
+
+Fix for bad jpeg files when encoding EXIF data.
+
 ## 2.0.0 - May 22, 2018
 
 Remove the use of Dart 1 upper-case constants.
