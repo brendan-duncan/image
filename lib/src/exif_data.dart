@@ -13,14 +13,13 @@ class ExifData {
   Map<int, dynamic> data;
 
   ExifData()
-    : data = new Map<int, dynamic>()
-    , rawData = null;
+    : data = new Map<int, dynamic>();
 
   ExifData.from(ExifData other)
     : data = (other == null) ?
               new Map<int, dynamic>() :
               new Map<int, dynamic>.from(other.data) {
-    if (rawData != null) {
+    if (other != null && other.rawData != null) {
       rawData = new List<Uint8List>(other.rawData.length);
       for (int i = 0; i < other.rawData.length; ++i) {
         rawData[i] = new Uint8List.fromList(other.rawData[i]);
@@ -28,10 +27,7 @@ class ExifData {
     }
   }
 
-  bool get isEmpty => data.isEmpty;
-  bool get isNotEmpty => data.isNotEmpty;
-
-  bool get hasRawData => rawData != null;
+  bool get hasRawData => rawData != null && rawData.isNotEmpty;
 
   bool get hasOrientation => data.containsKey(ORIENTATION);
   int get orientation => data[ORIENTATION];

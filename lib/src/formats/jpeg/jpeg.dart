@@ -59,22 +59,22 @@ class Jpeg {
   static const int M_DHP   = 0xde;
   static const int M_EXP   = 0xdf;
 
-  static const int M_APP0  = 0xe0; // JFIF
-  static const int M_APP1  = 0xe1; // EXIF
-  static const int M_APP2  = 0xe2;
-  static const int M_APP3  = 0xe3;
-  static const int M_APP4  = 0xe4;
-  static const int M_APP5  = 0xe5;
-  static const int M_APP6  = 0xe6;
-  static const int M_APP7  = 0xe7;
-  static const int M_APP8  = 0xe8;
-  static const int M_APP9  = 0xe9;
-  static const int M_APP10 = 0xea;
-  static const int M_APP11 = 0xeb;
-  static const int M_APP12 = 0xec;
-  static const int M_APP13 = 0xed;
+  static const int M_APP0  = 0xe0; // JFIF, JFXX, CIFF, AVI1, Ocad
+  static const int M_APP1  = 0xe1; // EXIF, ExtendedXMP, XMP, QVCI, FLIR
+  static const int M_APP2  = 0xe2; // ICC_Profile, FPXR, MPF, PreviewImage
+  static const int M_APP3  = 0xe3; // Meta, Stim, PreviewImage
+  static const int M_APP4  = 0xe4; // Scalado, FPXR, PreviewImage
+  static const int M_APP5  = 0xe5; // RMETA, PreviewImage
+  static const int M_APP6  = 0xe6; // EPPIM, NITF, HP_TDHD, GoPro
+  static const int M_APP7  = 0xe7; // Pentax, Qualcomm
+  static const int M_APP8  = 0xe8; // SPIFF
+  static const int M_APP9  = 0xe9; // MediaJukebox
+  static const int M_APP10 = 0xea; // Comment
+  static const int M_APP11 = 0xeb; // Jpeg-HDR
+  static const int M_APP12 = 0xec; // PictureInfo, Ducky
+  static const int M_APP13 = 0xed; // Photoshop, Adobe_CM
   static const int M_APP14 = 0xee; // ADOBE
-  static const int M_APP15 = 0xef;
+  static const int M_APP15 = 0xef; // GraphicConverter
 
   static const int M_JPG0  = 0xf0;
   static const int M_JPG13 = 0xfd;

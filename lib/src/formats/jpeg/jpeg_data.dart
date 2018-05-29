@@ -517,11 +517,11 @@ class JpegData  {
   }
 
   void _readExifData(InputBuffer block) {
-    Uint8List rawData = new Uint8List.fromList(block.toUint8List());
     if (exif.rawData == null) {
       exif.rawData = new List<Uint8List>();
     }
 
+    Uint8List rawData = new Uint8List.fromList(block.toUint8List());
     exif.rawData.add(rawData);
 
     /*const EXIF_TAG = 0x45786966; // Exif\0\0
@@ -582,14 +582,10 @@ class JpegData  {
         int thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
         jfif.thumbData = appData.subset(14 + thumbSize, offset: 14);
       }
-    }
-
-    if (marker == Jpeg.M_APP1) {
+    } else if (marker == Jpeg.M_APP1) {
       // 'EXIF\0'
       _readExifData(appData);
-    }
-
-    if (marker == Jpeg.M_APP14) {
+    } else if (marker == Jpeg.M_APP14) {
       // 'Adobe\0'
       if (appData[0] == 0x41 && appData[1] == 0x64 &&
           appData[2] == 0x6F && appData[3] == 0x62 &&
@@ -600,6 +596,8 @@ class JpegData  {
         adobe.flags1 = shiftL(appData[9], 8) | appData[10];
         adobe.transformCode = appData[11];
       }
+    } else {
+      //print("!!!! UNHANDLED APP TAG 0x${marker.toRadixString(16)}");
     }
   }
 

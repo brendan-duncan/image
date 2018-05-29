@@ -119,9 +119,6 @@ class JpegDecoder extends Decoder {
             int Y = data[i++];
             int K = data[i++];
 
-            //int R = 255 - _clamp(C * (1 - K / 255) + K);
-            //int G = 255 - _clamp(M * (1 - K / 255) + K);
-            //int B = 255 - _clamp(Y * (1 - K / 255) + K);
             int R = (C * (K)) >> 8;
             int G = (M * (K)) >> 8;
             int B = (Y * (K)) >> 8;
@@ -133,9 +130,5 @@ class JpegDecoder extends Decoder {
       default:
         throw 'Unsupported color mode';
     }
-  }
-
-  int _clamp(i) {
-    return i < 0 ? 0 : i > 255 ? 255 : i.toInt();
   }
 }

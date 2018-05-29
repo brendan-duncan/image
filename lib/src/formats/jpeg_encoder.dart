@@ -398,7 +398,7 @@ class JpegEncoder extends Encoder {
 
     for (var rawData in exif.rawData) {
       _writeMarker(out, Jpeg.M_APP1);
-      out.writeUint16(rawData.length);
+      out.writeUint16(rawData.length + 2);
       out.writeBytes(rawData);
     }
   }

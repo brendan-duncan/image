@@ -1,9 +1,9 @@
-import 'dart:io' as Io;
+import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Io.Directory dir = new Io.Directory('test/res/jpg/exif');
+  Directory dir = new Directory('test/res/jpg');
   List files = dir.listSync(recursive: true);
 
   List<int> toRGB(int pixel) =>
@@ -11,7 +11,7 @@ void main() {
 
   group('JPEG', () {
     for (var f in files) {
-      if (f is! Io.File || !f.path.endsWith('.jpg')) {
+      if (f is! File || !f.path.endsWith('.jpg')) {
         continue;
       }
 
@@ -25,19 +25,14 @@ void main() {
           throw new ImageException('Unable to decode JPEG Image: $name.');
         }
 
-        List<int> tga = new TgaEncoder().encodeImage(image);
-        new Io.File('out/jpg/${name}.tga')
-              ..createSync(recursive: true)
-              ..writeAsBytesSync(tga);
-
         List<int> outJpg = new JpegEncoder().encodeImage(image);
-        new Io.File('out/jpg/${name}')
+        new File('out/jpg/${name}')
           ..createSync(recursive: true)
           ..writeAsBytesSync(outJpg);
 
         // Make sure we can read what we just wrote.
         Image image2 = new JpegDecoder().decodeImage(
-            new Io.File('out/jpg/${name}').readAsBytesSync());
+            new File('out/jpg/${name}').readAsBytesSync());
         if (image2 == null) {
           throw new ImageException('Unable to re-decode JPEG Image: $name.');
         }
@@ -45,11 +40,11 @@ void main() {
     }
 
     test('decode/encode', () {
-      List<int> bytes = new Io.File('test/res/jpg/testimg.png').readAsBytesSync();
+      List<int> bytes = new File('test/res/jpg/testimg.png').readAsBytesSync();
       Image png = new PngDecoder().decodeImage(bytes);
       expect(toRGB(png.getPixel(0, 0)), [48, 47, 45]);
 
-      bytes = new Io.File('test/res/jpg/testimg.jpg').readAsBytesSync();
+      bytes = new File('test/res/jpg/testimg.jpg').readAsBytesSync();
 
       // Decode the image from file.
       Image image = new JpegDecoder().decodeImage(bytes);
