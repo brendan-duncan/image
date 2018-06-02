@@ -3,11 +3,8 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Directory dir = new Directory('test/res/jpg');
+  var dir = new Directory('test/res/jpg');
   List files = dir.listSync(recursive: true);
-
-  List<int> toRGB(int pixel) =>
-      [getRed(pixel), getGreen(pixel), getBlue(pixel)];
 
   group('JPEG', () {
     for (var f in files) {
@@ -31,35 +28,37 @@ void main() {
           ..writeAsBytesSync(outJpg);
 
         // Make sure we can read what we just wrote.
-        Image image2 = new JpegDecoder().decodeImage(
-            new File('out/jpg/${name}').readAsBytesSync());
+        Image image2 = new JpegDecoder().decodeImage(outJpg);
         if (image2 == null) {
           throw new ImageException('Unable to re-decode JPEG Image: $name.');
         }
+
+        expect(image.width, equals(image2.width));
+        expect(image.height, equals(image2.height));
       });
     }
 
-    test('decode/encode', () {
-      List<int> bytes = new File('test/res/jpg/testimg.png').readAsBytesSync();
-      Image png = new PngDecoder().decodeImage(bytes);
-      expect(toRGB(png.getPixel(0, 0)), [48, 47, 45]);
+    for (int i = 1; i < 9; ++i) {
+      test('exif/orientation_$i/landscape', () {
+        Image image = new JpegDecoder().decodeImage(
+            new File('test/res/jpg/landscape_$i.jpg').readAsBytesSync());
+        expect(image.exif.hasOrientation, equals(true));
+        expect(image.exif.orientation, equals(i));
+        new File('out/jpg/landscape_$i.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(new PngEncoder().encodeImage(bakeOrientation(image)));
+      });
 
-      bytes = new File('test/res/jpg/testimg.jpg').readAsBytesSync();
-
-      // Decode the image from file.
-      Image image = new JpegDecoder().decodeImage(bytes);
-      expect(image.width, equals(227));
-      expect(image.height, equals(149));
-
-      // Encode the image to Jpeg
-      List<int> jpg = new JpegEncoder().encodeImage(image);
-
-      // Decode the encoded jpg.
-      Image image2 = new JpegDecoder().decodeImage(jpg);
-
-      // We can't exactly do a byte-level comparison since Jpeg is lossy.
-      expect(image2.width, equals(227));
-      expect(image2.height, equals(149));
-    });
+      test('exif/orientation_$i/portrait', () {
+        Image image = new JpegDecoder().decodeImage(
+            new File('test/res/jpg/portrait_$i.jpg').readAsBytesSync());
+        expect(image.exif.hasOrientation, equals(true));
+        expect(image.exif.orientation, equals(i));
+        new File('out/jpg/portrait_$i.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(new PngEncoder().encodeImage(bakeOrientation(image)));
+      });
+    }
   });
 }
+
