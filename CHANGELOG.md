@@ -1,3 +1,9 @@
+## 2.0.2 - June 1, 2018
+
+- Re-added decoding of orientation exif value from jpeg images.
+- Added bake_orientation function, which will rotate an image so that it physically matches its orientation exif value,
+useful for rotating an image prior to exporting it to a format that doesn't support exif data.
+
 ## 2.0.1 - May 28, 2018
 
 Fix for bad jpeg files when encoding EXIF data.
