@@ -9,15 +9,21 @@ import '../util/interpolation.dart';
  * Returns a resized copy of the [src] image.
  * If [height] is -1, then it will be determined by the aspect
  * ratio of [src] and [width].
+ * If [width] is -1, then it will be determined by the aspect ratio
+ * of [src] and [height].
  */
 Image copyResize(Image src, int width, [int height = -1,
                  int interpolation = LINEAR]) {
-  if (height < 0) {
+  if (width <= 0 && height <= 0) {
+    throw new ImageException('Invalid size');
+  }
+
+  if (height <= 0) {
     height = (width * (src.height / src.width)).toInt();
   }
 
-  if (width <= 0 || height <= 0) {
-    throw new ImageException('Invalid size');
+  if (width <= 0) {
+    width = (height * (src.width / src.height)).toInt();
   }
 
   Image dst = new Image(width, height, src.format, src.exif);
