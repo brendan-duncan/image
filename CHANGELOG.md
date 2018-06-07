@@ -1,3 +1,8 @@
+## 2.0.3 - June 6, 2018
+
+- copyResize can maintain aspect ratio when resizing height by using -1 for the width.
+- Added example for loading and processing images in an isolate.
+
 ## 2.0.2 - June 1, 2018
 
 - Re-added decoding of orientation exif value from jpeg images.
