@@ -356,6 +356,16 @@ class Image {
     boundsSafe(x, y) ? data[y * width + x] : 0;
 
   /**
+   * Get the pixel from the given [x], [y] coordinate without check the bounds.
+   */
+  int getUnsafePixel(int x, int y) => data[y * width + x];
+
+  /**
+   * Get the pixel from the given [offset], index.
+   */
+  int getUnsafePixel_(int offset) => data[offset];
+
+  /**
    * Get the pixel using the given [interpolation] type for non-integer pixel
    * coordinates.
    */
@@ -473,6 +483,23 @@ class Image {
     if (boundsSafe(x, y)) {
       data[y * width + x] = color;
     }
+  }
+
+  /**
+   * Set the pixel at the given [x], [y] coordinate to the [color] without check the bounds.
+   *
+   * This simply replaces the existing color, it does not do any alpha
+   * blending.  Use [drawPixel] for that.
+   */
+  void setUnsafePixel(int x, int y, int color){
+    data[y * width + x] = color;
+  }
+
+  /**
+   * Set the pixel at the given [offset] index to the [color] without check the bounds.
+   */
+  void setUnsafePixel_(int offset, int color){
+    data[offset] = color;
   }
 
   /**
