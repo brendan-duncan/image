@@ -34,6 +34,8 @@ class Image {
   static const int DISPOSE_NONE = 0;
   /// When drawing this frame, the canvas should be cleared first.
   static const int DISPOSE_CLEAR = 1;
+  /// When drawing this frame, the canvas should be reverted to how it was before drawing it.
+  static const int DISPOSE_PREVIOUS = 2;
 
   /// No alpha blending should be done when drawing this frame (replace
   /// pixels in canvas).

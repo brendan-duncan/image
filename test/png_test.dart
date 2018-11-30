@@ -10,12 +10,28 @@ void main() {
 
       // Encode the image to PNG
       List<int> png = new PngEncoder().encodeImage(image);
-      new Io.File('out/encode.png')
-            .writeAsBytesSync(png);
+      new Io.File('out/png/encode.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(png);
+    });
+
+    test('encodeAnimation', () {
+      Animation anim = new Animation();
+      anim.loopCount = 10;
+      for (var i = 0; i < 10; i++) {
+        Image image = new Image(480, 120);
+        drawString(image, arial_48, 100, 60, i.toString());
+        anim.addFrame(image);
+      }
+
+      List<int> png = encodePngAnimation(anim);
+      new Io.File('out/png/encodeAnimation.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(png);
     });
 
     test('decode', () {
-      List<int> bytes = new Io.File('out/encode.png').readAsBytesSync();
+      List<int> bytes = new Io.File('out/png/encode.png').readAsBytesSync();
       Image image = new PngDecoder().decodeImage(bytes);
 
       expect(image.width, equals(64));
@@ -26,7 +42,7 @@ void main() {
       }
 
       List<int> png = new PngEncoder().encodeImage(image);
-      new Io.File('out/decode.png')
+      new Io.File('out/png/decode.png')
             .writeAsBytesSync(png);
     });
 
