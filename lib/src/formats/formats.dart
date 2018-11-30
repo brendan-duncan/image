@@ -225,6 +225,13 @@ List<int> encodePng(Image image, {int level: 6}) {
 }
 
 /**
+ * Encode an animation to the PNG format.
+ */
+List<int> encodePngAnimation(Animation anim, {int level: 6}) {
+  return new PngEncoder(level: level).encodeAnimation(anim);
+}
+
+/**
  * Renamed to [encodePng], left for backward compatibility.
  */
 List<int> writePng(Image image, {int level: 6}) =>

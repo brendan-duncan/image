@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 
 import '../color.dart';
+import '../animation.dart';
 import '../image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
@@ -11,34 +12,29 @@ import 'encoder.dart';
  * Encode an image to the PNG format.
  */
 class PngEncoder extends Encoder {
-  static const int FILTER_NONE = 0;
-  static const int FILTER_SUB = 1;
-  static const int FILTER_UP = 2;
-  static const int FILTER_AVERAGE = 3;
-  static const int FILTER_PAETH = 4;
-  static const int FILTER_AGRESSIVE = 5;
-
-  int filter;
-  int level;
-
   PngEncoder({this.filter: FILTER_PAETH, this.level});
 
-  List<int> encodeImage(Image image) {
-    OutputBuffer output = new OutputBuffer(bigEndian: true);
+  void addFrame(Image image) {
 
-    // PNG file signature
-    output.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+    xOffset = image.xOffset;
+    yOffset = image.xOffset;
+    delay = image.duration;
+    disposeMethod = image.disposeMethod;
+    blendMethod = image.blendMethod;
 
-    // IHDR chunk
-    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
-    chunk.writeUint32(image.width);
-    chunk.writeUint32(image.height);
-    chunk.writeByte(8);
-    chunk.writeByte(image.format == Image.RGB ? 2 : 6);
-    chunk.writeByte(0); // compression method
-    chunk.writeByte(0); // filter method
-    chunk.writeByte(0); // interlace method
-    _writeChunk(output, 'IHDR', chunk.getBytes());
+    if (output == null) {
+      output = new OutputBuffer(bigEndian: true);
+
+      format = image.format;
+      _width = image.width;
+      _height = image.height;
+
+      _writeHeader(_width, _height);
+
+      if (isAnimated) {
+        _writeAnimationControlChunk();
+      }
+    }
 
     // Include room for the filter bytes (1 byte per row).
     List<int> filteredImage = new Uint8List((image.width * image.height *
@@ -49,11 +45,103 @@ class PngEncoder extends Encoder {
     List<int> compressed = new ZLibEncoder().encode(filteredImage,
                                                         level: level);
 
-    _writeChunk(output, 'IDAT', compressed);
+    if (isAnimated) {
+      _writeFrameControlChunk();
+      sequenceNumber++;
+    }
+
+    if (sequenceNumber <= 1) {
+      _writeChunk(output, 'IDAT', compressed);
+    } else {
+      // fdAT chunck
+      OutputBuffer fdat = new OutputBuffer(bigEndian: true);
+      fdat.writeUint32(sequenceNumber);
+      fdat.writeBytes(compressed);
+      _writeChunk(output, 'fdAT', fdat.getBytes());
+
+      sequenceNumber++;
+    }
+  }
+
+  List<int> finish() {
+    List<int> bytes;
+
+    if (output == null) {
+      return bytes;
+    }
 
     _writeChunk(output, 'IEND', []);
 
-    return output.getBytes();
+    sequenceNumber = 0;
+
+    bytes = output.getBytes();
+    output = null;
+    return bytes;
+  }
+
+  /**
+   * Does this encoder support animation?
+   */
+  bool get supportsAnimation => true;
+
+  /**
+   * Encode an animation.
+   */
+  List<int> encodeAnimation(Animation anim) {
+    isAnimated = true;
+    _frames = anim.frames.length;
+    repeat = anim.loopCount;
+
+    for (Image f in anim) {
+      addFrame(f);
+    }
+    return finish();
+  }
+
+  /**
+   * Encode a single frame image.
+   */
+  List<int> encodeImage(Image image) {
+    isAnimated = false;
+    addFrame(image);
+    return finish();
+  }
+
+  void _writeHeader(int width, int height) {
+    // PNG file signature
+    output.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+
+    // IHDR chunk
+    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
+    chunk.writeUint32(width);
+    chunk.writeUint32(height);
+    chunk.writeByte(8);
+    chunk.writeByte(format == Image.RGB ? 2 : 6);
+    chunk.writeByte(0); // compression method
+    chunk.writeByte(0); // filter method
+    chunk.writeByte(0); // interlace method
+    _writeChunk(output, 'IHDR', chunk.getBytes());
+  }
+
+  void _writeAnimationControlChunk() {
+    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
+    chunk.writeUint32(_frames); // number of frames
+    chunk.writeUint32(repeat); // loop count
+    _writeChunk(output, 'acTL', chunk.getBytes());
+  }
+
+  void _writeFrameControlChunk() {
+    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
+    chunk.writeUint32(sequenceNumber);
+    chunk.writeUint32(_width);
+    chunk.writeUint32(_height);
+    chunk.writeUint32(xOffset);
+    chunk.writeUint32(yOffset);
+    chunk.writeUint16(delay);
+    chunk.writeUint16(0); // delay denominator
+    chunk.writeByte(disposeMethod);
+    chunk.writeByte(blendMethod);
+    _writeChunk(output, 'fcTL', chunk.getBytes());
   }
 
   void _writeChunk(OutputBuffer out, String type, List<int> chunk) {
@@ -253,6 +341,29 @@ class PngEncoder extends Encoder {
     int crc = getCrc32(type.codeUnits);
     return getCrc32(bytes, crc);
   }
+
+  int format;
+  int filter;
+  int repeat;
+  int level;
+  int xOffset;
+  int yOffset;
+  int delay;
+  int disposeMethod;
+  int blendMethod;
+  int _width;
+  int _height;
+  int _frames;
+  int sequenceNumber = 0;
+  bool isAnimated;
+  OutputBuffer output;
+
+  static const int FILTER_NONE = 0;
+  static const int FILTER_SUB = 1;
+  static const int FILTER_UP = 2;
+  static const int FILTER_AVERAGE = 3;
+  static const int FILTER_PAETH = 4;
+  static const int FILTER_AGRESSIVE = 5;
 
   // Table of CRCs of all 8-bit messages.
   final List<int> _crcTable = new List<int>(256);
