@@ -1,3 +1,8 @@
+## 2.0.5 - December 1, 2018
+
+- Added APNG (animated PNG) encoding.
+- Optimized drawString function.
+
 ## 2.0.3 - June 6, 2018
 
 - copyResize can maintain aspect ratio when resizing height by using -1 for the width.
