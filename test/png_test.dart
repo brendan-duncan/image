@@ -89,7 +89,7 @@ void main() {
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
           try {
-            Image image = new PngDecoder().decodeImage(file.readAsBytesSync());
+            new PngDecoder().decodeImage(file.readAsBytesSync());
             throw new ImageException('This image should not have loaded: $name.');
           } catch (e) {
           }

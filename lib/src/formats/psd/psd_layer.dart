@@ -163,11 +163,11 @@ class PsdLayer {
         if (tag == 'lrFX') {
           var fxData = (additionalData['lrFX'] as PsdLayerAdditionalData);
           var data = new InputBuffer.from(fxData.data);
-          int version = data.readUint16();
+          /*int version =*/ data.readUint16();
           int numFx = data.readUint16();
 
           for (int j = 0; j < numFx; ++j) {
-            var tag = data.readString(4); // 8BIM
+            /*var tag =*/ data.readString(4); // 8BIM
             var fxTag = data.readString(4);
             int size = data.readUint32();
 

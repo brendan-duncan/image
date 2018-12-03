@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+//import 'dart:math' as Math;
 
 import 'package:archive/archive.dart';
 
@@ -171,7 +171,7 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'fdAT':
-          int sequenceNumber = _input.readUint32();
+          /*int sequenceNumber =*/ _input.readUint32();
           InternalPngFrame frame = _info.frames.last;
           frame.fdat.add(inputPos);
           _input.skip(chunkSize - 4);
@@ -187,12 +187,12 @@ class PngDecoder extends Decoder {
             int b = _info.palette[p3 + 2];
             _info.backgroundColor = Color.fromRgb(r, g, b);
           } else if (_info.colorType == 0 || _info.colorType == 4) {
-            int gray = _input.readUint16();
+            /*int gray =*/ _input.readUint16();
             chunkSize -= 2;
           } else if (_info.colorType == 2 || _info.colorType ==6) {
-            int r = _input.readUint16();
-            int g = _input.readUint16();
-            int b = _input.readUint16();
+            /*int r =*/ _input.readUint16();
+            /*int g =*/ _input.readUint16();
+            /*int b =*/ _input.readUint16();
             chunkSize -= 24;
           }
           if (chunkSize > 0) {
@@ -260,14 +260,14 @@ class PngDecoder extends Decoder {
       for (int i = 0; i < f.fdat.length; ++i) {
         _input.offset = f.fdat[i];
         int chunkSize = _input.readUint32();
-        String chunkType = _input.readString(4);
+        /*String chunkType =*/ _input.readString(4);
         _input.skip(4); // sequence number
         List<int> data = _input.readBytes(chunkSize).toUint8List();
         imageData.addAll(data);
       }
 
-      _frame = frame;
-      _numFrames = _info.numFrames;
+      //_frame = frame;
+      //_numFrames = _info.numFrames;
     }
 
     int format;
@@ -407,7 +407,7 @@ class PngDecoder extends Decoder {
 
     final List<int> pixel = [0, 0, 0, 0];
 
-    int pi = 0;
+    //int pi = 0;
     for (int srcY = 0, dstY = yOffset, ri = 0;
          srcY < passHeight; ++srcY, dstY += yStep, ri = 1 - ri, _progressY++) {
       int filterType = input.readByte();
@@ -429,7 +429,7 @@ class PngDecoder extends Decoder {
       final int blockHeight = xStep;
       final int blockWidth = xStep - xOffset;
 
-      int yMax = Math.min(dstY + blockHeight, _info.height);
+      //int yMax = Math.min(dstY + blockHeight, _info.height);
 
       for (int srcX = 0, dstX = xOffset; srcX < passWidth;
            ++srcX, dstX += xStep) {
@@ -438,8 +438,8 @@ class PngDecoder extends Decoder {
         image.setPixel(dstX, dstY, c);
 
         if (blockWidth > 1 || blockHeight > 1) {
-          int xMax = Math.min(dstX + blockWidth, _info.width);
-          int xPixels = xMax - dstX;
+          //int xMax = Math.min(dstX + blockWidth, _info.width);
+          //int xPixels = xMax - dstX;
           for (int i = 0; i < blockHeight; ++i) {
             for (int j = 0; j < blockWidth; ++j) {
               image.setPixel(dstX + j, dstY + j, c);
@@ -824,8 +824,8 @@ class PngDecoder extends Decoder {
 
   InputBuffer _input;
   int _progressY;
-  int _frame = 0;
-  int _numFrames = 1;
+  //int _frame = 0;
+  //int _numFrames = 1;
 
   static const int GRAYSCALE = 0;
   static const int RGB = 2;

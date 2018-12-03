@@ -366,5 +366,5 @@ class PngEncoder extends Encoder {
   static const int FILTER_AGRESSIVE = 5;
 
   // Table of CRCs of all 8-bit messages.
-  final List<int> _crcTable = new List<int>(256);
+  //final List<int> _crcTable = new List<int>(256);
 }

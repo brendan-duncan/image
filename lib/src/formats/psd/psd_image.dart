@@ -42,7 +42,7 @@ class PsdImage extends DecodeInfo {
     }
 
     int len = _input.readUint32();
-    _colorData = _input.readBytes(len);
+    /*_colorData =*/ _input.readBytes(len);
 
     len = _input.readUint32();
     _imageResourceData = _input.readBytes(len);
@@ -81,7 +81,7 @@ class PsdImage extends DecodeInfo {
     _readMergeImageData();
 
     _input = null;
-    _colorData = null;
+    //_colorData = null;
     _imageResourceData = null;
     _layerAndMaskData = null;
     _imageData = null;
@@ -116,7 +116,7 @@ class PsdImage extends DecodeInfo {
       double opacity = layer.opacity / 255.0;
       int blendMode = layer.blendMode;
 
-      int ns = depth == 16 ? 2 : 1;
+      //int ns = depth == 16 ? 2 : 1;
       Uint8List srcP = layer.layerImage.getBytes();
 
       for (int y = 0, sy = layer.top, si = 0; y < layer.height; ++y, ++sy) {
@@ -478,13 +478,13 @@ class PsdImage extends DecodeInfo {
     len = _layerAndMaskData.readUint32();
     InputBuffer maskData = _layerAndMaskData.readBytes(len);
     if (len > 0) {
-      int colorSpace = maskData.readUint16();
-      int rc = maskData.readUint16();
-      int gc = maskData.readUint16();
-      int bc = maskData.readUint16();
-      int ac = maskData.readUint16();
-      int opacity = maskData.readUint16(); // 0-100
-      int kind = maskData.readByte();
+      /*int colorSpace =*/ maskData.readUint16();
+      /*int rc =*/ maskData.readUint16();
+      /*int gc =*/ maskData.readUint16();
+      /*int bc =*/ maskData.readUint16();
+      /*int ac =*/ maskData.readUint16();
+      /*int opacity =*/ maskData.readUint16(); // 0-100
+      /*int kind =*/ maskData.readByte();
     }
   }
 
@@ -610,7 +610,7 @@ class PsdImage extends DecodeInfo {
   static const int RESOURCE_BLOCK_SIGNATURE = 0x3842494d; // '8BIM'
 
   InputBuffer _input;
-  InputBuffer _colorData;
+  //InputBuffer _colorData;
   InputBuffer _imageResourceData;
   InputBuffer _layerAndMaskData;
   InputBuffer _imageData;

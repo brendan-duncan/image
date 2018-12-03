@@ -122,7 +122,7 @@ class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCo
     }
     _output.rewind();
 
-    int count = 0;
+    //int count = 0;
     // Rearrange the pixel data into the format expected by the caller.
     for (int y = minY; y <= maxY; ++y) {
       for (int i = 0; i < numChannels; ++i) {

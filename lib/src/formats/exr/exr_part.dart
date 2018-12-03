@@ -31,7 +31,7 @@ class ExrPart {
   Float32List chromaticities;
 
   ExrPart(this._tiled, InputBuffer input) {
-    _type = _tiled ? ExrPart.TYPE_TILE : ExrPart.TYPE_SCANLINE;
+    //_type = _tiled ? ExrPart.TYPE_TILE : ExrPart.TYPE_SCANLINE;
 
     while (true) {
       String name = input.readString();
@@ -83,7 +83,7 @@ class ExrPart {
                            value.readInt32(), value.readInt32()];
           break;
         case 'lineOrder':
-          _lineOrder = value.readByte();
+          //_lineOrder = value.readByte();
           break;
         case 'pixelAspectRatio':
           pixelAspectRatio = value.readFloat32();
@@ -105,9 +105,9 @@ class ExrPart {
         case 'type':
           String s = value.readString();
           if (s == 'deepscanline') {
-            this._type = TYPE_DEEP_SCANLINE;
+            //this._type = TYPE_DEEP_SCANLINE;
           } else if (s == 'deeptile') {
-            this._type = TYPE_DEEP_TILE;
+            //this._type = TYPE_DEEP_TILE;
           } else {
             throw new ImageException('EXR Invalid type: $s');
           }
@@ -135,7 +135,7 @@ class ExrPart {
 
       _bytesPerPixel = _calculateBytesPerPixel();
       _maxBytesPerTileLine = _bytesPerPixel * _tileWidth;
-      _tileBufferSize = _maxBytesPerTileLine * _tileHeight;
+      //_tileBufferSize = _maxBytesPerTileLine * _tileHeight;
 
       _compressor = new ExrCompressor(_compressionType, this,
                                       _maxBytesPerTileLine, _tileHeight);
@@ -165,7 +165,7 @@ class ExrPart {
       _compressor = new ExrCompressor(_compressionType, this, maxBytesPerLine);
 
       _linesInBuffer = _compressor.numScanLines();
-      _lineBufferSize = maxBytesPerLine * _linesInBuffer;
+      //_lineBufferSize = maxBytesPerLine * _linesInBuffer;
 
       _offsetInLineBuffer = new Uint32List(_bytesPerLine.length);
 
@@ -324,15 +324,15 @@ class ExrPart {
   static const int ROUND_DOWN = 0;
   static const int ROUND_UP = 1;
 
-  int _type;
-  int _lineOrder = INCREASING_Y;
+  //int _type;
+  //int _lineOrder = INCREASING_Y;
   int _compressionType = ExrCompressor.NO_COMPRESSION;
   List<Uint32List> _offsets;
 
   Uint32List _bytesPerLine;
   ExrCompressor _compressor;
   int _linesInBuffer;
-  int _lineBufferSize;
+  //int _lineBufferSize;
   Uint32List _offsetInLineBuffer;
 
   bool _tiled;
@@ -346,7 +346,7 @@ class ExrPart {
   int _numYLevels;
   int _bytesPerPixel;
   int _maxBytesPerTileLine;
-  int _tileBufferSize;
+  //int _tileBufferSize;
 }
 
 @internal

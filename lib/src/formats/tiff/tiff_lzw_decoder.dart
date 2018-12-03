@@ -18,18 +18,18 @@ class LzwDecoder {
 
     _initializeStringTable();
 
-    _bitPointer = 0;
+    //_bitPointer = 0;
     _nextData = 0;
     _nextBits = 0;
 
     int oldCode = 0;
-    int num = 0;
+    //int num = 0;
 
     int code = _getNextCode();
     while ((code != 257) && _outPointer < outLen) {
       if (code == 256) {
         _initializeStringTable();
-        num++;
+        //num++;
         code = _getNextCode();
         _bufferLength = 0;
         if (code == 257) {
@@ -58,7 +58,7 @@ class LzwDecoder {
         }
       }
 
-      num++;
+      //num++;
       code = _getNextCode();
     }
   }
@@ -129,7 +129,7 @@ class LzwDecoder {
 
   int _bitsToGet = 9;
   int _bytePointer = 0;
-  int _bitPointer = 0;
+  //int _bitPointer = 0;
   int _nextData = 0;
   int _nextBits = 0;
   Uint8List _data;

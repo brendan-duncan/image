@@ -62,8 +62,8 @@ class JpegEncoder extends Encoder {
 
     Uint8List imageData = image.getBytes();
     int quadWidth = width * 4;
-    int tripleWidth = width * 3;
-    bool first = true;
+    //int tripleWidth = width * 3;
+    //bool first = true;
 
     int y = 0;
     while (y < height) {

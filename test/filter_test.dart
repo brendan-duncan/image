@@ -34,7 +34,7 @@ void main() {
       copyInto(d, s, dstX: 10, dstY: 10);
       copyInto(d, image2, dstX: 10, dstY: 10);
       // Save the image as a PNG.
-      Io.File fp = new Io.File('out/copyInto.png')
+      new Io.File('out/copyInto.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
     });
@@ -358,7 +358,7 @@ void main() {
       Image trimmed = trim(image, mode: TRIM_TRANSPARENT);
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));
-      Io.File fp = new Io.File('out/trim.png')
+      new Io.File('out/trim.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(trimmed));
     });

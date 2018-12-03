@@ -15,7 +15,7 @@ abstract class ExrZipCompressor extends ExrCompressor {
 class InternalExrZipCompressor extends InternalExrCompressor implements ExrZipCompressor {
   ZLibDecoder zlib = new ZLibDecoder();
 
-  InternalExrZipCompressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
+  InternalExrZipCompressor(ExrPart header, int maxScanLineSize, this._numScanLines) :
     super(header) {
   }
 
@@ -83,7 +83,6 @@ class InternalExrZipCompressor extends InternalExrCompressor implements ExrZipCo
     return _outCache;
   }
 
-  int _maxScanLineSize;
   int _numScanLines;
   Uint8List _outCache;
 }

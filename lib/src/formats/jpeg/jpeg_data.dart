@@ -111,7 +111,7 @@ class JpegData  {
     }
 
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
-      JpegComponent component = frame.components[frame.componentsOrder[i]];
+      /*JpegComponent component =*/ frame.components[frame.componentsOrder[i]];
     }
 
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
@@ -417,12 +417,12 @@ class JpegData  {
 
   num _readExifValue(InputBuffer block, int format) {
     const FMT_BYTE = 1;
-    const FMT_STRING = 2;
+    //const FMT_STRING = 2;
     const FMT_USHORT = 3;
     const FMT_ULONG = 4;
     const FMT_URATIONAL = 5;
     const FMT_SBYTE = 6;
-    const FMT_UNDEFINED = 7;
+    //const FMT_UNDEFINED = 7;
     const FMT_SSHORT = 8;
     const FMT_SLONG = 9;
     const FMT_SRATIONAL = 10;
@@ -1143,10 +1143,10 @@ class _JpegHuffman {
   int index = 0;
 }
 
-class _JPEG_HuffTables {
+/*class _JPEG_HuffTables {
   bool ac_table = false;
   Uint32List look_up = new Uint32List(256);
   Uint32List look_up2 = new Uint32List(256);
   Uint8List code_size = new Uint8List(256);
   Uint32List tree = new Uint32List(512);
-}
+}*/

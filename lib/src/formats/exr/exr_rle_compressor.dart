@@ -11,7 +11,7 @@ abstract class ExrRleCompressor extends ExrCompressor {
 }
 
 class InternalExrRleCompressor extends InternalExrCompressor implements ExrRleCompressor {
-  InternalExrRleCompressor(ExrPart header, this._maxScanLineSize) :
+  InternalExrRleCompressor(ExrPart header, int maxScanLineSize) :
     super(header) {
   }
 
@@ -97,5 +97,4 @@ class InternalExrRleCompressor extends InternalExrCompressor implements ExrRleCo
   }
 
   Uint8List _outCache;
-  int _maxScanLineSize;
 }

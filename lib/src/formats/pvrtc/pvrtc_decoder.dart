@@ -40,15 +40,15 @@ class PvrtcDecoder {
       if (size == HEADER_SIZE) {
         return null;
       }
-      int height = input.readUint32();
-      int width = input.readUint32();
-      int mipcount = input.readUint32();
-      int flags = input.readUint32();
-      int texdatasize = input.readUint32();
-      int bpp = input.readUint32();
-      int rmask = input.readUint32();
-      int gmask = input.readUint32();
-      int bmask = input.readUint32();
+      /*int height =*/ input.readUint32();
+      /*int width =*/ input.readUint32();
+      /*int mipcount =*/ input.readUint32();
+      /*int flags =*/ input.readUint32();
+      /*int texdatasize =*/ input.readUint32();
+      /*int bpp =*/ input.readUint32();
+      /*int rmask =*/ input.readUint32();
+      /*int gmask =*/ input.readUint32();
+      /*int bmask =*/ input.readUint32();
       int magic = input.readUint32();
       if (magic == 0x21525650) {
         // this looks more like a PowerVR file.
@@ -56,13 +56,13 @@ class PvrtcDecoder {
       }
     }
 
-    const int PVRTC2 = 1;
-    const int PVRTC4 = 2;
+    //const int PVRTC2 = 1;
+    //const int PVRTC4 = 2;
 
     int mode = 1;
     int res = 8;
     int size = data.length;
-    int format = 0;
+    //int format = 0;
 
     // this is a tough one, could be 2bpp 8x8, 4bpp 8x8
     if (size == 32) {
@@ -81,14 +81,14 @@ class PvrtcDecoder {
         if ((test2bpp << s2) & size != 0) {
           res = 16 << shift;
           mode = 1;
-          format = PVRTC2;
+          //format = PVRTC2;
           break;
         }
 
         if ((test4bpp << s2) & size != 0) {
           res = 16 << shift;
           mode = 0;
-          format = PVRTC4;
+          //format = PVRTC4;
           break;
         }
 
@@ -105,7 +105,7 @@ class PvrtcDecoder {
     int width = res;
     int height = res;
     int bpp = (mode + 1) * 2;
-    int numMips = 0;
+    //int numMips = 0;
 
     if (bpp == 4) {
       // 2bpp is currently unsupported
@@ -141,13 +141,13 @@ class PvrtcDecoder {
     int size = input.readUint32();
     int height = input.readUint32();
     int width = input.readUint32();
-    int mipcount = input.readUint32();
+    /*int mipcount =*/ input.readUint32();
     int flags = input.readUint32();
-    int texdatasize = input.readUint32();
+    /*int texdatasize =*/ input.readUint32();
     int bpp = input.readUint32();
-    int rmask = input.readUint32();
-    int gmask = input.readUint32();
-    int bmask = input.readUint32();
+    /*int rmask =*/ input.readUint32();
+    /*int gmask =*/ input.readUint32();
+    /*int bmask =*/ input.readUint32();
     int amask = input.readUint32();
     int magic = input.readUint32();
     int numtex = input.readUint32();
@@ -357,18 +357,18 @@ class PvrtcDecoder {
       return null;
     }
 
-    int flags = input.readUint32();
+    /*int flags =*/ input.readUint32();
     var format = input.readUint32();
     var order = [input.readByte(), input.readByte(),
                  input.readByte(), input.readByte()];
-    int colorspace = input.readUint32();
-    int channeltype = input.readUint32();
+    /*int colorspace =*/ input.readUint32();
+    /*int channeltype =*/ input.readUint32();
     int height = input.readUint32();
     int width = input.readUint32();
-    int depth = input.readUint32();
-    int num_surfaces = input.readUint32();
-    int num_faces = input.readUint32();
-    int mipcount = input.readUint32();
+    /*int depth =*/ input.readUint32();
+    /*int num_surfaces =*/ input.readUint32();
+    /*int num_faces =*/ input.readUint32();
+    /*int mipcount =*/ input.readUint32();
     int metadata_size = input.readUint32();
 
     input.skip(metadata_size);

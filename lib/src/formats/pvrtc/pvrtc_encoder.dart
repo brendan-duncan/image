@@ -357,11 +357,11 @@ class PvrtcEncoder {
     return cbb;
   }
 
-  static void _getPacket(packet, packetData, index) {
+  /*static void _getPacket(packet, packetData, index) {
     index *= 2;
     packet.modulationData = packetData[index];
     packet.colorData = packetData[index + 1];
-  }
+  }*/
 
   static const MODULATION_LUT =
       const [ 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3 ];
