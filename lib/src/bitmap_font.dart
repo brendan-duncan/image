@@ -300,17 +300,17 @@ class BitmapFont {
       switch (tk[0]) {
         case 'info':
           var attrs = _parseParameters(tk);
-          var info = new XML.XmlElement(new XML.XmlName('info'), attrs, []);
+          var info = new XML.XmlElement(new XML.XmlName('info'), attributes: attrs, children: []);
           children.add(info);
           break;
         case 'common':
           var attrs = _parseParameters(tk);
-          var node = new XML.XmlElement(new XML.XmlName('common'), attrs, []);
+          var node = new XML.XmlElement(new XML.XmlName('common'), attributes: attrs, children: []);
           children.add(node);
           break;
         case 'page':
           var attrs = _parseParameters(tk);
-          var page = new XML.XmlElement(new XML.XmlName('page'), attrs, []);
+          var page = new XML.XmlElement(new XML.XmlName('page'), attributes: attrs, children: []);
           pageList.add(page);
           break;
         case 'chars':
@@ -318,7 +318,7 @@ class BitmapFont {
           break;
         case 'char':
           var attrs = _parseParameters(tk);
-          var node = new XML.XmlElement(new XML.XmlName('char'), attrs, []);
+          var node = new XML.XmlElement(new XML.XmlName('char'), attributes: attrs, children: []);
           charList.add(node);
           break;
         case 'kernings':
@@ -326,30 +326,30 @@ class BitmapFont {
           break;
         case 'kerning':
           var attrs = _parseParameters(tk);
-          var node = new XML.XmlElement(new XML.XmlName('kerning'), attrs, []);
+          var node = new XML.XmlElement(new XML.XmlName('kerning'), attributes: attrs, children: []);
           kerningList.add(node);
           break;
       }
     }
 
     if (charsAttrs != null || charList.isNotEmpty) {
-      var node = new XML.XmlElement(new XML.XmlName('chars'), charsAttrs,
-          charList);
+      var node = new XML.XmlElement(new XML.XmlName('chars'), attributes: charsAttrs,
+          children: charList);
       children.add(node);
     }
 
     if (kerningsAttrs != null || kerningList.isNotEmpty) {
-      var node = new XML.XmlElement(new XML.XmlName('kernings'), kerningsAttrs,
-          kerningList);
+      var node = new XML.XmlElement(new XML.XmlName('kernings'), attributes: kerningsAttrs,
+          children: kerningList);
       children.add(node);
     }
 
     if (pageList.isNotEmpty) {
-      var pages = new XML.XmlElement(new XML.XmlName('pages'), [], pageList);
+      var pages = new XML.XmlElement(new XML.XmlName('pages'), attributes: [], children: pageList);
       children.add(pages);
     }
 
-    var xml = new XML.XmlElement(new XML.XmlName('font'), [], children);
+    var xml = new XML.XmlElement(new XML.XmlName('font'), attributes: [], children: children);
     var doc = new XML.XmlDocument([xml]);
 
     return doc;
