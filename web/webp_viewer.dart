@@ -1,5 +1,5 @@
 import 'dart:html' as Html;
-import 'dart:convert/convert.dart';
+import 'dart:convert';
 import 'package:image/image.dart';
 
 /**

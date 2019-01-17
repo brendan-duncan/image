@@ -1,7 +1,7 @@
 import 'dart:html' as Html;
 
 import 'package:image/image.dart';
-import 'dart:convert/convert.dart';
+import 'dart:convert';
 
 Html.InputElement fileInput;
 
