@@ -4,6 +4,7 @@ import '../color.dart';
 import '../image.dart';
 import '../image_exception.dart';
 import '../util/interpolation.dart';
+import 'bake_orientation.dart';
 
 /**
  * Returns a resized copy of the [src] image.
@@ -17,6 +18,8 @@ Image copyResize(Image src, int width, [int height = -1,
   if (width <= 0 && height <= 0) {
     throw new ImageException('Invalid size');
   }
+
+  src = bakeOrientation(src);
 
   if (height <= 0) {
     height = (width * (src.height / src.width)).toInt();

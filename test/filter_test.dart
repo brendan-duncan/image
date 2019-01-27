@@ -1,30 +1,28 @@
-import 'dart:io' as Io;
+import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('filter', () {
-    Image image = readJpg(new Io.File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync());
+    Image image = readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
     image = copyResize(image, 400);
-    Image image2 = readPng(new Io.File('test/res/png/alpha_edge.png').readAsBytesSync());
+    Image image2 = readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       Image f = new Image(10, 10, Image.RGB);
       f.fill(getColor(128, 64, 32, 255));
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/fill.png');
+      File fp = new File('out/fill.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('fillRect', () {
       Image f = new Image.from(image);
       int c = getColor(128, 255, 128, 255);
       fillRect(f, 50, 50, 150, 150, c);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/fillRect.png');
+      File fp = new File('out/fillRect.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('copyInto', () {
@@ -33,50 +31,50 @@ void main() {
       fill(d, 0xff0000ff);
       copyInto(d, s, dstX: 10, dstY: 10);
       copyInto(d, image2, dstX: 10, dstY: 10);
-      // Save the image as a PNG.
-      new Io.File('out/copyInto.png')
+
+      new File('out/copyInto.jpg')
         ..createSync(recursive: true)
-        ..writeAsBytesSync(writePng(d));
+        ..writeAsBytesSync(writeJpg(d));
     });
 
     test('add', () {
       Image i1 = new Image.from(image);
       Image i2 = new Image.from(image2);
       i1 += i2;
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/add.png');
+
+      File fp = new File('out/add.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(i1));
+      fp.writeAsBytesSync(writeJpg(i1));
     });
 
     test('sub', () {
       Image i1 = new Image.from(image);
       Image i2 = new Image.from(image2);
       i1 -= i2;
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/sub.png');
+
+      File fp = new File('out/sub.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(i1));
+      fp.writeAsBytesSync(writeJpg(i1));
     });
 
     test('or', () {
       Image i1 = new Image.from(image);
       Image i2 = new Image.from(image2);
       i1 |= i2;
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/or.png');
+
+      File fp = new File('out/or.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(i1));
+      fp.writeAsBytesSync(writeJpg(i1));
     });
 
     test('and', () {
       Image i1 = new Image.from(image);
       Image i2 = new Image.from(image2);
       i1 &= i2;
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/and.png');
+
+      File fp = new File('out/and.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(i1));
+      fp.writeAsBytesSync(writeJpg(i1));
     });
 
     test('draw shapes', () {
@@ -87,278 +85,276 @@ void main() {
       drawLine(f, f.width, 0, 0, f.height, c2, thickness: 5, antialias: true);
       drawCircle(f, 100, 100, 50, c1);
       drawRect(f, 50, 50, 150, 150, c2);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/drawShapes.png');
+
+      File fp = new File('out/drawShapes.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('brightness', () {
       Image f = new Image.from(image);
       brightness(f, 100);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/brightness.png');
+      File fp = new File('out/brightness.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('copyResize', () {
-      Image f = new Image.from(image);
-      f = copyResize(f, 100);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/copyResize.png');
+      Image f = copyResize(image, -1, 100);
+      expect(f.height, equals(100));
+      File fp = new File('out/copyResize.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('colorOffset', () {
       Image f = new Image.from(image);
       colorOffset(f, 50, 0, 0, 0);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/colorOffset.png');
+
+      File fp = new File('out/colorOffset.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('contrast', () {
       Image f = new Image.from(image);
       contrast(f, 150);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/contrast.png');
+
+      File fp = new File('out/contrast.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('adjustColor:saturation', () {
       Image f = new Image.from(image);
       adjustColor(f, saturation: 0.35);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/adjustColor_saturation.png');
+
+      File fp = new File('out/adjustColor_saturation.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('adjustColor:gamma', () {
       Image f = new Image.from(image);
       adjustColor(f, gamma: 1.0 / 2.2);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/adjustColor_gamma.png');
+
+      File fp = new File('out/adjustColor_gamma.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('adjustColor:hue', () {
       Image f = new Image.from(image);
       adjustColor(f, hue: 75.0, gamma: 0.75, amount: 0.35);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/adjustColor_hue.png');
+
+      File fp = new File('out/adjustColor_hue.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('emboss', () {
       Image f = new Image.from(image);
       emboss(f);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/emboss.png');
+
+      File fp = new File('out/emboss.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('sobel', () {
       Image f = new Image.from(image);
       sobel(f);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/sobel.png');
+
+      File fp = new File('out/sobel.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('gaussianBlur', () {
       Image f = new Image.from(image);
       gaussianBlur(f, 10);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/gaussianBlur.png');
+
+      File fp = new File('out/gaussianBlur.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('grayscale', () {
       Image f = new Image.from(image);
       grayscale(f);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/grayscale.png');
+
+      File fp = new File('out/grayscale.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('invert', () {
       Image f = new Image.from(image);
       invert(f);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/invert.png');
+
+      File fp = new File('out/invert.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('NOISE_GAUSSIAN', () {
       Image f = new Image.from(image);
       noise(f, 10.0, type: NOISE_GAUSSIAN);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/noise_gaussian.png');
+
+      File fp = new File('out/noise_gaussian.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('NOISE_UNIFORM', () {
       Image f = new Image.from(image);
       noise(f, 10.0, type: NOISE_UNIFORM);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/noise_uniform.png');
+
+      File fp = new File('out/noise_uniform.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('NOISE_SALT_PEPPER', () {
       Image f = new Image.from(image);
       noise(f, 10.0, type: NOISE_SALT_PEPPER);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/noise_salt_pepper.png');
+
+      File fp = new File('out/noise_salt_pepper.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('NOISE_POISSON', () {
       Image f = new Image.from(image);
       noise(f, 10.0, type: NOISE_POISSON);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/noise_poisson.png');
+
+      File fp = new File('out/noise_poisson.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('NOISE_RICE', () {
       Image f = new Image.from(image);
       noise(f, 10.0, type: NOISE_RICE);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/noise_rice.png');
+
+      File fp = new File('out/noise_rice.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('normalize', () {
       Image f = new Image.from(image);
       normalize(f, 100, 255);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/normalize.png');
+
+      File fp = new File('out/normalize.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('pixelate', () {
       Image f = new Image.from(image);
       pixelate(f, 20, mode: PIXELATE_UPPERLEFT);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/PIXELATE_UPPERLEFT.png');
+
+      File fp = new File('out/PIXELATE_UPPERLEFT.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
 
       f = new Image.from(image);
       pixelate(f, 20, mode: PIXELATE_AVERAGE);
-      // Save the image as a PNG.
-      fp = new Io.File('out/PIXELATE_AVERAGE.png');
+
+      fp = new File('out/PIXELATE_AVERAGE.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('remapColors', () {
       Image f = new Image.from(image);
       f.format = Image.RGBA;
       remapColors(f, red: GREEN, green: RED, alpha: LUMINANCE);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/remapColors.png');
+
+      File fp = new File('out/remapColors.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('rotate_90', () {
       Image f = new Image.from(image);
       Image r = copyRotate(f, 90);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/rotate_90.png');
+
+      File fp = new File('out/rotate_90.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(r));
+      fp.writeAsBytesSync(writeJpg(r));
     });
 
     test('rotate_180', () {
       Image f = new Image.from(image);
       Image r = copyRotate(f, 180);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/rotate_180.png');
+
+      File fp = new File('out/rotate_180.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(r));
+      fp.writeAsBytesSync(writeJpg(r));
     });
 
     test('rotate_270', () {
       Image f = new Image.from(image);
       Image r = copyRotate(f, 270);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/rotate_270.png');
+
+      File fp = new File('out/rotate_270.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(r));
+      fp.writeAsBytesSync(writeJpg(r));
     });
 
     test('rotate_45', () {
       Image f = new Image.from(image);
       f = copyRotate(f, 45);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/rotate_45.png');
+
+      File fp = new File('out/rotate_45.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('smooth', () {
       Image f = new Image.from(image);
       smooth(f, 10);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/smooth.png');
+
+      File fp = new File('out/smooth.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('sepia', () {
       Image f = new Image.from(image);
       sepia(f);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/sepia.png');
+
+      File fp = new File('out/sepia.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('vignette', () {
       Image f = new Image.from(image);
       vignette(f);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/vignette.png');
+
+      File fp = new File('out/vignette.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('quantize', () {
       Image f = new Image.from(image);
       quantize(f);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/quantize.png');
+
+      File fp = new File('out/quantize.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(f));
+      fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('trim', () {
-      Image image = readPng(new Io.File('test/res/png/trim.png').readAsBytesSync());
+      Image image = readPng(new File('test/res/png/trim.png').readAsBytesSync());
       Image trimmed = trim(image, mode: TRIM_TRANSPARENT);
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));
-      new Io.File('out/trim.png')
+      new File('out/trim.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(trimmed));
     });
@@ -366,29 +362,29 @@ void main() {
     test('dropShadow', () {
       Image s = new Image.from(image2);
       Image d = dropShadow(s, 5, 5, 10);
-      // Save the image as a PNG.
-      new Io.File('out/dropShadow.png')
+
+      new File('out/dropShadow.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
       s = new Image.from(image2);
       d = dropShadow(s, -5, 5, 10);
-      // Save the image as a PNG.
-      new Io.File('out/dropShadow-2.png')
+
+      new File('out/dropShadow-2.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
       s = new Image.from(image2);
       d = dropShadow(s, 5, -5, 10);
-      // Save the image as a PNG.
-      new Io.File('out/dropShadow-3.png')
+
+      new File('out/dropShadow-3.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
       s = new Image.from(image2);
       d = dropShadow(s, -5, -5, 10);
-      // Save the image as a PNG.
-      new Io.File('out/dropShadow-4.png')
+
+      new File('out/dropShadow-4.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
@@ -396,8 +392,8 @@ void main() {
       s.fill(0);
       drawString(s, arial_48, 30, 100, 'Shadow', color: getColor(255, 0, 0));
       d = dropShadow(s, -3, -3, 5);
-      // Save the image as a PNG.
-      new Io.File('out/dropShadow-5.png')
+
+      new File('out/dropShadow-5.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
     });
@@ -405,27 +401,27 @@ void main() {
     test('flip horzontal', () {
       Image f = new Image.from(image);
       Image r = flip(f, 1);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/flipH.png');
+
+      File fp = new File('out/flipH.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(r));
+      fp.writeAsBytesSync(writeJpg(r));
     });
     test('flip vertical', () {
       Image f = new Image.from(image);
       Image r = flip(f, 2);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/flipV.png');
+
+      File fp = new File('out/flipV.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(r));
+      fp.writeAsBytesSync(writeJpg(r));
     });
 
     test('flip both', () {
       Image f = new Image.from(image);
       Image r = flip(f, 3);
-      // Save the image as a PNG.
-      Io.File fp = new Io.File('out/flipHV.png');
+
+      File fp = new File('out/flipHV.jpg');
       fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writePng(r));
+      fp.writeAsBytesSync(writeJpg(r));
     });
   });
 }
