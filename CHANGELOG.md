@@ -1,3 +1,8 @@
+## 2.0.6 - January 26, 2019
+
+- bakeOrientation will clear the image's exif orientation properties.
+- copyResize will correctly maintain the image's orientation.
+
 ## 2.0.5 - December 1, 2018
 
 - Added APNG (animated PNG) encoding.
