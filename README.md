@@ -29,7 +29,7 @@ Read Only:
 
 ## [Documentation](https://github.com/brendan-duncan/image/wiki)
 
-## [API](http://www.dartdocs.org/documentation/image/1.1.22/index.html#image/image)
+## [API](https://www.dartdocs.org/documentation/image/latest/)
 
 ## [Examples](https://github.com/brendan-duncan/image/wiki/Examples)
 
