@@ -4,14 +4,16 @@ int shiftR(int v, int n) {
   // dart2js can't handle binary operations on negative numbers, so
   // until that issue is fixed (issues 16506, 1533), we'll have to do it
   // the slow way.
-  return (v / SHIFT_BITS[n]).floor();
+  //return (v / SHIFT_BITS[n]).floor();
+  return (v >> n).toSigned(32);
 }
 
 int shiftL(int v, int n) {
   // dart2js can't handle binary operations on negative numbers, so
   // until that issue is fixed (issues 16506, 1533), we'll have to do it
   // the slow way.
-  return (v * SHIFT_BITS[n]);
+  //return (v * SHIFT_BITS[n]);
+  return (v << n).toSigned(32);
 }
 
 const List<int> SHIFT_BITS = const [
