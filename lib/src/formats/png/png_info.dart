@@ -1,6 +1,7 @@
 import '../../internal/internal.dart';
 import '../decode_info.dart';
 import 'png_frame.dart';
+import 'dart:typed_data';
 
 class PngInfo extends DecodeInfo {
   int bits;
@@ -13,6 +14,8 @@ class PngInfo extends DecodeInfo {
   List<int> colorLut;
   double gamma;
   int backgroundColor = 0x00ffffff;
+  String iCCPProfileName = "";
+  Uint8List iCCPProfileData;
 
   // APNG extensions
   int numFrames = 1;
