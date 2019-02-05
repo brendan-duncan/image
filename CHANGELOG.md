@@ -1,3 +1,8 @@
+## 2.0.7 - February 5, 2019
+
+- Improve JPEG decoding performance.
+- Decode and encode ICC profile data from PNG images.
+
 ## 2.0.6 - January 26, 2019
 
 - bakeOrientation will clear the image's exif orientation properties.
