@@ -4,6 +4,7 @@ import 'package:archive/archive.dart';
 
 import '../animation.dart';
 import '../color.dart';
+import '../icc_profile_data.dart';
 import '../image.dart';
 import '../image_exception.dart';
 import '../transform/copy_into.dart';
@@ -201,13 +202,11 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'iCCP':
-          _info.iCCPProfileName = _input.readString();
-          final compression = _input.readByte(); // 0: deflate
-          chunkSize -= _info.iCCPProfileName.length + 2;
+          _info.iCCPName = _input.readString();
+          _info.iCCPCompression = _input.readByte(); // 0: deflate
+          chunkSize -= _info.iCCPName.length + 2;
           final profile = _input.readBytes(chunkSize);
-          if (compression == 0) {
-            _info.iCCPProfileData = new ZLibDecoder().decodeBytes(profile.toUint8List());
-          }
+          _info.iCCPData = profile.toUint8List();
           _input.skip(4); // CRC
           break;
         default:
@@ -297,7 +296,6 @@ class PngDecoder extends Decoder {
     _resetBits();
 
     // Set up a LUT to transform colors for gamma correction.
-    // TODO: apply iCCPProfileData
     if (_info.colorLut == null) {
       _info.colorLut = new List<int>(256);
       for (int i = 0; i < 256; ++i) {
@@ -338,6 +336,10 @@ class PngDecoder extends Decoder {
 
     _info.width = origW;
     _info.height = origH;
+
+    image.iccProfile = new ICCProfileData(_info.iCCPName,
+                                          ICCPCompression.deflate,
+                                          _info.iCCPData);
 
     return image;
   }

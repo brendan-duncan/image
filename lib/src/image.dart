@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'color.dart';
 import 'exif_data.dart';
+import 'icc_profile_data.dart';
 import 'image_exception.dart';
 import 'util/interpolation.dart';
 
@@ -65,15 +66,18 @@ class Image {
   /// channel.
   final Uint32List data;
   ExifData exif;
+  ICCProfileData iccProfile;
 
   /**
    * Create an image with the given dimensions and format.
    */
-  Image(int width, int height, [this._format = RGBA, ExifData exif = null]) :
+  Image(int width, int height, [this._format = RGBA, ExifData exif,
+        ICCProfileData iccp]) :
     this.width = width,
     this.height = height,
     data = new Uint32List(width * height),
-    exif = new ExifData.from(exif);
+    exif = new ExifData.from(exif),
+    iccProfile = iccp;
 
   /**
    * Create a copy of the image [other].
@@ -88,7 +92,8 @@ class Image {
     blendMethod = other.blendMethod,
     _format = other._format,
     data = new Uint32List.fromList(other.data),
-    exif = new ExifData.from(other.exif);
+    exif = new ExifData.from(other.exif),
+    iccProfile = other.iccProfile;
 
   /**
    * Create an image from [bytes].
@@ -103,7 +108,7 @@ class Image {
    * Image image = new Image.fromBytes(canvas.width, canvas.height, bytes);
    */
   Image.fromBytes(int width, int height, List<int> bytes,
-                  [this._format = RGBA, ExifData exif = null]) :
+                  [this._format = RGBA, ExifData exif, ICCProfileData iccp]) :
     this.width = width,
     this.height = height,
     // Create a uint32 view of the byte buffer.
@@ -112,7 +117,8 @@ class Image {
             bytes is Uint8ClampedList ? new Uint32List.view(bytes.buffer) :
             bytes is Uint32List ? new Uint32List.view(bytes.buffer) :
             new Uint32List.view(new Uint8List.fromList(bytes).buffer),
-    exif = new ExifData.from(exif);
+    exif = new ExifData.from(exif),
+    iccProfile = iccp;
 
   /**
    * Clone this image.

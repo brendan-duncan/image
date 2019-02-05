@@ -4,6 +4,7 @@ import 'package:archive/archive.dart';
 
 import '../color.dart';
 import '../animation.dart';
+import '../icc_profile_data.dart';
 import '../image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
@@ -31,6 +32,8 @@ class PngEncoder extends Encoder {
 
       _writeHeader(_width, _height);
 
+      _writeICCPChunk(output, image.iccProfile);
+
       if (isAnimated) {
         _writeAnimationControlChunk();
       }
@@ -53,7 +56,7 @@ class PngEncoder extends Encoder {
     if (sequenceNumber <= 1) {
       _writeChunk(output, 'IDAT', compressed);
     } else {
-      // fdAT chunck
+      // fdAT chunk
       OutputBuffer fdat = new OutputBuffer(bigEndian: true);
       fdat.writeUint32(sequenceNumber);
       fdat.writeBytes(compressed);
@@ -142,6 +145,26 @@ class PngEncoder extends Encoder {
     chunk.writeByte(disposeMethod);
     chunk.writeByte(blendMethod);
     _writeChunk(output, 'fcTL', chunk.getBytes());
+  }
+
+  void _writeICCPChunk(OutputBuffer out, ICCProfileData iccp) {
+    if (iccp == null || iccp.data == null) {
+      return;
+    }
+
+    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
+
+    // name
+    chunk.writeBytes(iccp.name.codeUnits);
+    chunk.writeByte(0);
+
+    // compression
+    chunk.writeByte(0); // 0 - deflate
+
+    // profile data
+    chunk.writeBytes(iccp.compressed());
+
+    _writeChunk(output, 'iCCP', chunk.getBytes());
   }
 
   void _writeChunk(OutputBuffer out, String type, List<int> chunk) {

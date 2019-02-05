@@ -17,7 +17,8 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
     int iangle = nangle ~/ 90.0;
     switch (iangle) {
       case 1: // 90 deg.
-        Image dst = new Image(src.height, src.width, src.format, src.exif);
+        Image dst = new Image(src.height, src.width, src.format, src.exif,
+                              src.iccProfile);
         for (int y = 0; y < dst.height; ++y) {
           for (int x = 0; x < dst.width; ++x) {
             dst.setPixel(x, y, src.getPixel(y, hm1 - x));
@@ -25,7 +26,8 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
         }
         return dst;
       case 2: // 180 deg.
-        Image dst = new Image(src.width, src.height, src.format, src.exif);
+        Image dst = new Image(src.width, src.height, src.format, src.exif,
+                              src.iccProfile);
         for (int y = 0; y < dst.height; ++y) {
           for (int x = 0; x < dst.width; ++x) {
             dst.setPixel(x, y, src.getPixel(wm1 - x, hm1 - y));
@@ -33,7 +35,8 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
         }
         return dst;
       case 3: // 270 deg.
-        Image dst = new Image(src.height, src.width, src.format, src.exif);
+        Image dst = new Image(src.height, src.width, src.format, src.exif,
+                              src.iccProfile);
         for (int y = 0; y < dst.height; ++y) {
           for (int x = 0; x < dst.width; ++x) {
             dst.setPixel(x, y, src.getPixel(wm1 - y, x));
@@ -59,7 +62,7 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
   double dh2 = 0.5 * (uy + vy);
 
   Image dst = new Image((ux + vx).toInt(), (uy + vy).toInt(), Image.RGBA,
-                        src.exif);
+                        src.exif, src.iccProfile);
 
   for (int y = 0; y < dst.height; ++y) {
     for (int x = 0; x < dst.width; ++x) {

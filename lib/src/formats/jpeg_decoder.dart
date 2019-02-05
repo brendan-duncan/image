@@ -83,10 +83,10 @@ class JpegDecoder extends Decoder {
   void _copyToImage(JpegData jpeg, Image imageData) {
     imageData.exif = new ExifData.from(jpeg.exif);
 
-    int width = imageData.width;
-    int height = imageData.height;
-    Uint8List data = jpeg.getData(width, height);
-    List components = jpeg.components;
+    final width = imageData.width;
+    final height = imageData.height;
+    final data = jpeg.getData(width, height);
+    final components = jpeg.components;
 
     int i = 0;
     int j = 0;

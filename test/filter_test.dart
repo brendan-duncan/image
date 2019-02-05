@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('filter', () {
-    Image image = readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
+    var image = readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
     image = copyResize(image, 400);
-    Image image2 = readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
+    var image2 = readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       Image f = new Image(10, 10, Image.RGB);

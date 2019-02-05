@@ -46,6 +46,20 @@ void main() {
             .writeAsBytesSync(png);
     });
 
+    test('iCCP', () {
+      final bytes = new Io.File('test/res/png/iCCP.png').readAsBytesSync();
+      final image = new PngDecoder().decodeImage(bytes);
+      expect(image.iccProfile, isNotNull);
+      expect(image.iccProfile.data, isNotNull);
+
+      final png = new PngEncoder().encodeImage(image);
+
+      final image2 = new PngDecoder().decodeImage(png);
+      expect(image2.iccProfile, isNotNull);
+      expect(image2.iccProfile.data, isNotNull);
+      expect(image2.iccProfile.data.length, equals(image.iccProfile.data.length));
+    });
+
 
     Io.Directory dir = new Io.Directory('test/res/png');
     List files = dir.listSync();
