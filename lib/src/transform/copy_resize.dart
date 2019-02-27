@@ -14,7 +14,7 @@ import 'bake_orientation.dart';
  * of [src] and [height].
  */
 Image copyResize(Image src, int width, [int height = -1,
-                 int interpolation = LINEAR]) {
+                 int interpolation = NEAREST]) {
   if (width <= 0 && height <= 0) {
     throw new ImageException('Invalid size');
   }
@@ -67,6 +67,17 @@ Image copyResize(Image src, int width, [int height = -1,
           }
         }
         dst.setPixel(x, y, getColor(r ~/ np, g ~/ np, b ~/ np, a ~/ np));
+      }
+    }
+  } else if (interpolation == NEAREST) {
+    final scaleX = Int32List(width);
+    for (int x = 0; x < width; ++x) {
+      scaleX[x] = (x * dx).toInt();
+    }
+    for (int y = 0; y < height; ++y) {
+      int y2 = (y * dy).toInt();
+      for (int x = 0; x < width; ++x) {
+        dst.setPixel(x, y, src.getPixel(scaleX[x], y2));
       }
     }
   } else {
