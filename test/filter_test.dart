@@ -25,6 +25,15 @@ void main() {
       fp.writeAsBytesSync(writeJpg(f));
     });
 
+    test('copyRectify', () {
+      Image s = readJpg(new File('test/res/rectify.jpg').readAsBytesSync());;
+      Image d = copyRectify(s, topLeft: Point(119, 207), topRight: Point(512, 254),
+                            bottomLeft: Point(120, 978), bottomRight: Point(700, 918));
+      File fp = new File('out/rectify.jpg');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writeJpg(d));
+    });
+
     test('copyInto', () {
       Image s = new Image.from(image);
       Image d = new Image(image.width + 20, image.height + 20, image.format);
