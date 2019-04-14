@@ -10,8 +10,11 @@ void main() {
 
   group('rectify', () {
     test('basic test', () {
-      Image out = rectify(
-          img, Point(16, 32), Point(79, 39), Point(16, 151), Point(108, 141));
+      Image out = copyRectify(img,
+          topLeft: Point(16, 32),
+          topRight: Point(79, 39),
+          bottomLeft: Point(16, 151),
+          bottomRight: Point(108, 141));
       File fp = new File('out/jpg/oblique.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(out));

@@ -138,11 +138,11 @@ export 'src/hdr/reinhard_tone_map.dart';
 export 'src/transform/bake_orientation.dart';
 export 'src/transform/copy_crop.dart';
 export 'src/transform/copy_into.dart';
+export 'src/transform/copy_rectify.dart';
 export 'src/transform/copy_resize.dart';
 export 'src/transform/copy_rotate.dart';
 export 'src/transform/flip.dart';
 export 'src/transform/trim.dart';
-export 'src/transform/transform.dart';
 
 export 'src/util/clip_line.dart';
 export 'src/util/input_buffer.dart';
@@ -150,6 +150,7 @@ export 'src/util/interpolation.dart';
 export 'src/util/min_max.dart';
 export 'src/util/neural_quantizer.dart';
 export 'src/util/output_buffer.dart';
+export 'src/util/point.dart';
 export 'src/util/random.dart';
 
 export 'src/animation.dart';
