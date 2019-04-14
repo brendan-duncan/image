@@ -8,7 +8,7 @@ import '../image.dart';
  */
 Image rectify(Image src, Point topLeft, Point topRight, Point bottomLeft,
     Point bottomRight) {
-  Image dstImage;
+  Image dstImage = Image.from(src);
   for (int y = 0; y < dstImage.height; ++y) {
     double v = y / (dstImage.height - 1);
     for (int x = 0; x < dstImage.width; ++x) {
@@ -18,7 +18,8 @@ Image rectify(Image src, Point topLeft, Point topRight, Point bottomLeft,
           topRight * (u) * (1 - v) +
           bottomLeft * (1 - u) * (v) +
           bottomRight * (u) * (v);
-      var srcPixel = src.getPixel(srcPixelCoord.x, srcPixelCoord.y);
+      var srcPixel = src.getPixel(
+          srcPixelCoord.x.round(), srcPixelCoord.y.round());
       dstImage.setPixel(x, y, srcPixel);
     }
   }
