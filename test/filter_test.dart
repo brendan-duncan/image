@@ -26,10 +26,13 @@ void main() {
     });
 
     test('copyRectify', () {
-      Image s = readJpg(new File('test/res/rectify.jpg').readAsBytesSync());;
-      Image d = copyRectify(s, topLeft: Point(119, 207), topRight: Point(512, 254),
-                            bottomLeft: Point(120, 978), bottomRight: Point(700, 918));
-      File fp = new File('out/rectify.jpg');
+      Image s = readJpg(new File('test/res/oblique.jpg').readAsBytesSync());
+      Image d = Image(92, 119);
+      copyRectify(s, topLeft: Point(16, 32),
+          topRight: Point(79, 39),
+          bottomLeft: Point(16, 151),
+          bottomRight: Point(108, 141), toImage: d);
+      File fp = new File('out/oblique.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(d));
     });
