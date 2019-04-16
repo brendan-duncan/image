@@ -60,6 +60,28 @@ class Color {
     var rgb = labToRGB(L, a, b);
     return getColor(rgb[0], rgb[1], rgb[2]);
   }
+
+  /**
+   * Compare colors from a 3 or 4 dimensional color space
+   */
+  static double distance(List<double> c1, List<double> c2, bool compareAlpha) {
+    double d1 = c1[0] - c2[0];
+    double d2 = c1[1] - c2[1];
+    double d3 = c1[2] - c2[2];
+    if (compareAlpha) {
+      double dA = c1[3] - c2[3];
+      return Math.sqrt(
+        Math.max(d1*d1, (d1-dA)*(d1-dA)) +
+        Math.max(d2*d2, (d2-dA)*(d2-dA)) +
+        Math.max(d3*d3, (d3-dA)*(d3-dA))
+      );
+    } else {
+      return Math.sqrt(
+        d1*d1 +
+        d2*d2 +
+        d3*d3);
+    }
+  }
 }
 
 
@@ -459,4 +481,87 @@ List<int> labToRGB(num l, num a, num b) {
   return [(R * 255.0).toInt().clamp(0,  255),
           (G * 255.0).toInt().clamp(0,  255),
           (B * 255.0).toInt().clamp(0,  255)];
+}
+
+/**
+ * Convert a RGB color to XYZ.
+ */
+List<double> rgbToXYZ(num r, num g, num b) {
+  r = r / 255.0;
+  g = g / 255.0;
+  b = b / 255.0;
+
+  if ( r > 0.04045 ) r = Math.pow((r + 0.055) / 1.055, 2.4);
+  else               r = r / 12.92;
+  if ( g > 0.04045 ) g = Math.pow((g + 0.055) / 1.055, 2.4);
+  else               g = g / 12.92;
+  if ( b > 0.04045 ) b = Math.pow((b + 0.055) / 1.055, 2.4);
+  else               b = b / 12.92;
+
+  r = r * 100.0;
+  g = g * 100.0;
+  b = b * 100.0;
+
+  return [r * 0.4124 + g * 0.3576 + b * 0.1805,
+          r * 0.2126 + g * 0.7152 + b * 0.0722,
+          r * 0.0193 + g * 0.1192 + b * 0.9505];
+}
+
+/**
+ * Convert a XYZ color to CIE-L*ab.
+ */
+List<double> xyzToLab(num x, num y, num z) {
+  x = x / 95.047;
+  y = y / 100.0;
+  z = z / 108.883;
+
+  if (x > 0.008856) x = Math.pow(x, 1/3.0);
+  else              x = (7.787 * x) + (16 / 116.0);
+  if (y > 0.008856) y = Math.pow(y, 1/3.0);
+  else              y = (7.787 * y) + (16 / 116.0);
+  if (z > 0.008856) z = Math.pow(z, 1/3.0);
+  else              z = (7.787 * z) + (16 / 116.0);
+
+  return [(116.0 * y) - 16,
+          500.0 * (x - y),
+          200.0 * (y - z)];
+}
+
+/**
+ * Convert a RGB color to CIE-L*ab.
+ */
+List<double> rgbToLab(num r, num g, num b) {
+  r = r / 255.0;
+  g = g / 255.0;
+  b = b / 255.0;
+
+  if ( r > 0.04045 ) r = Math.pow((r + 0.055) / 1.055, 2.4);
+  else               r = r / 12.92;
+  if ( g > 0.04045 ) g = Math.pow((g + 0.055) / 1.055, 2.4);
+  else               g = g / 12.92;
+  if ( b > 0.04045 ) b = Math.pow((b + 0.055) / 1.055, 2.4);
+  else               b = b / 12.92;
+
+  r = r * 100.0;
+  g = g * 100.0;
+  b = b * 100.0;
+
+  double x = r * 0.4124 + g * 0.3576 + b * 0.1805;
+  double y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+  double z = r * 0.0193 + g * 0.1192 + b * 0.9505;
+
+  x = x / 95.047;
+  y = y / 100.0;
+  z = z / 108.883;
+
+  if (x > 0.008856) x = Math.pow(x, 1/3.0);
+  else              x = (7.787 * x) + (16 / 116.0);
+  if (y > 0.008856) y = Math.pow(y, 1/3.0);
+  else              y = (7.787 * y) + (16 / 116.0);
+  if (z > 0.008856) z = Math.pow(z, 1/3.0);
+  else              z = (7.787 * z) + (16 / 116.0);
+
+  return [(116.0 * y) - 16,
+          500.0 * (x - y),
+          200.0 * (y - z)];
 }

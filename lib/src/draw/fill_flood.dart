@@ -1,11 +1,8 @@
 import 'dart:math' as Math;
+import 'dart:typed_data';
 
+import '../color.dart';
 import '../image.dart';
-
-/**
- * Adam Milazzo (2015). A More Efficient Flood Fill.
- * http://www.adammil.net/blog/v126_A_More_Efficient_Flood_Fill.html
- */
 
 typedef TestPixel = bool Function(int y, int x);
 typedef MarkPixel = void Function(int y, int x);
@@ -14,16 +11,65 @@ typedef MarkPixel = void Function(int y, int x);
  * Fill the 4-connected shape containing [x],[y] in the image [src] with the given [color]
  */
 
-Image fillFlood(Image src, int x, int y, int color) {
+Image fillFlood(Image src, int x, int y, int color, {threshold=0.0, compareAlpha=false}) {
   int srcColor = src.getPixel(x, y);
-  if (srcColor == color) return src;
-  TestPixel array = (int y, int x) => src.getPixel(x, y) != srcColor;
-  MarkPixel mark  = (int y, int x) => src.setPixel(x, y, color);
-  _fillFlood(src, x, y, array, mark);
+  if (!compareAlpha) srcColor = setAlpha(srcColor, 0);
+
+  TestPixel array;
+  if (threshold > 0) {
+    List<double> lab = rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
+    if (compareAlpha) lab.add(getAlpha(srcColor).toDouble());
+    array = (int y, int x) => _testPixelLabColorDistance(src, x, y, lab, threshold);
+  } else if (!compareAlpha) {
+    array = (int y, int x) => setAlpha(src.getPixel(x, y), 0) != srcColor;
+  } else {
+    array = (int y, int x) => src.getPixel(x, y) != srcColor;
+  }
+
+  MarkPixel mark = (int y, int x) => src.setPixel(x, y, color);
+  _fill4(src, x, y, array, mark);
   return src;
 }
 
-void _fillFlood(Image src, int x, int y, TestPixel array, MarkPixel mark) {
+/**
+ * Create a mask describing the 4-connected shape containing [x],[y] in the image [src]
+ */
+
+Uint8List maskFlood(Image src, int x, int y, {threshold=0.0, compareAlpha=false}) {
+  int srcColor = src.getPixel(x, y);
+  if (!compareAlpha) srcColor = setAlpha(srcColor, 0);
+  Uint8List ret = Uint8List(src.width * src.height);
+
+  TestPixel array;
+  if (threshold > 0) {
+    List<double> lab = rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
+    if (compareAlpha) lab.add(getAlpha(srcColor).toDouble());
+    array = (int y, int x) => ret[y * src.width + x] == 0 && _testPixelLabColorDistance(src, x, y, lab, threshold);
+  } else if (!compareAlpha) {
+    array = (int y, int x) => ret[y * src.width + x] == 0 && setAlpha(src.getPixel(x, y), 0) != srcColor;
+  } else {
+    array = (int y, int x) => ret[y * src.width + x] == 0 && src.getPixel(x, y) != srcColor;
+  }
+
+  MarkPixel mark = (int y, int x) => ret[y * src.width + x] = 255;
+  _fill4(src, x, y, array, mark);
+  return ret;
+}
+
+bool _testPixelLabColorDistance(Image src, int x, int y, List<double> refColor, double threshold) {
+  int pixel = src.getPixel(x, y);
+  bool compareAlpha = refColor.length > 3;
+  List<double> pixelColor = rgbToLab(getRed(pixel), getGreen(pixel), getBlue(pixel));
+  if (compareAlpha) pixelColor.add(getAlpha(pixel).toDouble());
+  return Color.distance(pixelColor, refColor, compareAlpha) > threshold;
+}
+
+/**
+ * Adam Milazzo (2015). A More Efficient Flood Fill.
+ * http://www.adammil.net/blog/v126_A_More_Efficient_Flood_Fill.html
+ */
+
+void _fill4(Image src, int x, int y, TestPixel array, MarkPixel mark) {
 
   // at this point, we know array(y,x) is clear, and we want to move as far as possible to the upper-left. moving
   // up is much more important than moving left, so we could try to make this smarter by sometimes moving to
@@ -35,10 +81,10 @@ void _fillFlood(Image src, int x, int y, TestPixel array, MarkPixel mark) {
     while (x != 0 && !array(y, x-1)) x--;
     if (x == ox && y == oy) break;
   }
-  _fillFloodCore(src, x, y, array, mark);
+  _fill4Core(src, x, y, array, mark);
 }
 
-void _fillFloodCore(Image src, int x, int y, TestPixel array, MarkPixel mark) {
+void _fill4Core(Image src, int x, int y, TestPixel array, MarkPixel mark) {
   // at this point, we know that array(y,x) is clear, and array(y-1,x) and array(y,x-1) are set.
   // we'll begin scanning down and to the right, attempting to fill an entire rectangular block
   int lastRowLength = 0; // the number of cells that were clear in the last row we scanned
@@ -64,7 +110,7 @@ void _fillFloodCore(Image src, int x, int y, TestPixel array, MarkPixel mark) {
         // like |* **| when we begin filling from (2,0), move down to (2,1), and then move left to (0,1).
         // the  |****| main scan assumes the portion of the previous row from x to x+lastRowLength has already
         // been filled. adjusting x and lastRowLength breaks that assumption in this case, so we must fix it
-        if (y != 0 && !array(y-1, x)) _fillFlood(src, x, y-1, array, mark); // use _Fill since there may be more up and left
+        if (y != 0 && !array(y-1, x)) _fill4(src, x, y-1, array, mark); // use _Fill since there may be more up and left
       }
     }
 
@@ -81,7 +127,7 @@ void _fillFloodCore(Image src, int x, int y, TestPixel array, MarkPixel mark) {
     if (rowLength < lastRowLength) {
       for (int end=x+lastRowLength; ++sx < end; ) // 'end' is the end of the previous row, so scan the current row to
       {                                           // there. any clear cells would have been connected to the previous
-        if (!array(y, sx)) _fillFloodCore(src, sx, y, array, mark); // row. the cells up and left must be set so use FillCore
+        if (!array(y, sx)) _fill4Core(src, sx, y, array, mark); // row. the cells up and left must be set so use FillCore
       }
     }
     // alternately, if this row is longer than the previous row, as in the case |*** *| then we must look above
@@ -89,7 +135,7 @@ void _fillFloodCore(Image src, int x, int y, TestPixel array, MarkPixel mark) {
     else if (rowLength > lastRowLength && y != 0) // if this row is longer and we're not already at the top...
     {
       for (int ux=x+lastRowLength; ++ux<sx; ) { // sx is the end of the current row
-        if (!array(y-1, ux)) _fillFlood(src, ux, y-1, array, mark); // since there may be clear cells up and left, use _Fill
+        if (!array(y-1, ux)) _fill4(src, ux, y-1, array, mark); // since there may be clear cells up and left, use _Fill
       }
     }
     lastRowLength = rowLength; // record the new row length
