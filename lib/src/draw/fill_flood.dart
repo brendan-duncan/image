@@ -11,7 +11,7 @@ typedef MarkPixel = void Function(int y, int x);
  * Fill the 4-connected shape containing [x],[y] in the image [src] with the given [color]
  */
 
-Image fillFlood(Image src, int x, int y, int color, {threshold=0.0, compareAlpha=false}) {
+Image fillFlood(Image src, int x, int y, int color, {num threshold=0.0, bool compareAlpha=false}) {
   int srcColor = src.getPixel(x, y);
   if (!compareAlpha) srcColor = setAlpha(srcColor, 0);
 
@@ -35,7 +35,7 @@ Image fillFlood(Image src, int x, int y, int color, {threshold=0.0, compareAlpha
  * Create a mask describing the 4-connected shape containing [x],[y] in the image [src]
  */
 
-Uint8List maskFlood(Image src, int x, int y, {threshold=0.0, compareAlpha=false}) {
+Uint8List maskFlood(Image src, int x, int y, {num threshold=0.0, bool compareAlpha=false}) {
   int srcColor = src.getPixel(x, y);
   if (!compareAlpha) srcColor = setAlpha(srcColor, 0);
   Uint8List ret = Uint8List(src.width * src.height);
@@ -56,7 +56,7 @@ Uint8List maskFlood(Image src, int x, int y, {threshold=0.0, compareAlpha=false}
   return ret;
 }
 
-bool _testPixelLabColorDistance(Image src, int x, int y, List<double> refColor, double threshold) {
+bool _testPixelLabColorDistance(Image src, int x, int y, List<double> refColor, num threshold) {
   int pixel = src.getPixel(x, y);
   bool compareAlpha = refColor.length > 3;
   List<double> pixelColor = rgbToLab(getRed(pixel), getGreen(pixel), getBlue(pixel));
