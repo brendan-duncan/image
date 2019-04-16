@@ -13,6 +13,7 @@ export 'src/draw/draw_rect.dart';
 export 'src/draw/draw_string.dart';
 export 'src/draw/fill.dart';
 export 'src/draw/fill_rect.dart';
+export 'src/draw/fill_flood.dart';
 
 export 'src/effects/drop_shadow.dart';
 
