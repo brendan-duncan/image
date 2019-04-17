@@ -180,7 +180,7 @@ class JpegScan {
 
     int k = 1;
     while (k < 64) {
-      var rs = _decodeHuffman(component.huffmanTableAC);
+      var rs = _decodeHuffman(component.huffmanTableAC) ?? 0;
       int s = rs & 15;
       int r = rs >> 4;
       if (s == 0) {
