@@ -35,7 +35,7 @@ Image fillFlood(Image src, int x, int y, int color, {num threshold=0.0, bool com
  * Create a mask describing the 4-connected shape containing [x],[y] in the image [src]
  */
 
-Uint8List maskFlood(Image src, int x, int y, {num threshold=0.0, bool compareAlpha=false}) {
+Uint8List maskFlood(Image src, int x, int y, {num threshold=0.0, bool compareAlpha=false, int fillValue=255}) {
   int srcColor = src.getPixel(x, y);
   if (!compareAlpha) srcColor = setAlpha(srcColor, 0);
   Uint8List ret = Uint8List(src.width * src.height);
@@ -44,14 +44,14 @@ Uint8List maskFlood(Image src, int x, int y, {num threshold=0.0, bool compareAlp
   if (threshold > 0) {
     List<double> lab = rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
     if (compareAlpha) lab.add(getAlpha(srcColor).toDouble());
-    array = (int y, int x) => ret[y * src.width + x] == 0 && _testPixelLabColorDistance(src, x, y, lab, threshold);
+    array = (int y, int x) => ret[y * src.width + x] != 0 || _testPixelLabColorDistance(src, x, y, lab, threshold);
   } else if (!compareAlpha) {
-    array = (int y, int x) => ret[y * src.width + x] == 0 && setAlpha(src.getPixel(x, y), 0) != srcColor;
+    array = (int y, int x) => ret[y * src.width + x] != 0 || setAlpha(src.getPixel(x, y), 0) != srcColor;
   } else {
-    array = (int y, int x) => ret[y * src.width + x] == 0 && src.getPixel(x, y) != srcColor;
+    array = (int y, int x) => ret[y * src.width + x] != 0 || src.getPixel(x, y) != srcColor;
   }
 
-  MarkPixel mark = (int y, int x) => ret[y * src.width + x] = 255;
+  MarkPixel mark = (int y, int x) => ret[y * src.width + x] = fillValue;
   _fill4(src, x, y, array, mark);
   return ret;
 }
