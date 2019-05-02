@@ -85,12 +85,12 @@ class Color {
 }
 
 
-/// Red channel of a color.
-const int RED = 0;
+/// Blue channel of a color.
+const int BLUE = 0;
 /// Green channel of a color.
 const int GREEN = 1;
-/// Blue channel of a color.
-const int BLUE = 2;
+/// Red channel of a color.
+const int RED = 2;
 /// Alpha channel of a color.
 const int ALPHA = 3;
 /// Luminance of a color.
@@ -104,17 +104,17 @@ const int LUMINANCE = 4;
  */
 int getColor(int r, int g, int b, [int a = 255]) =>
     (clamp255(a) << 24) |
-    (clamp255(b) << 16) |
+    (clamp255(r) << 16) |
     (clamp255(g) << 8) |
-    clamp255(r);
+    (clamp255(b));
 
 /**
  * Get the [channel] from the [color].
  */
 int getChannel(int color, int channel) =>
-    channel == 0 ? getRed(color) :
-    channel == 1 ? getGreen(color) :
-    channel == 2 ? getBlue(color) :
+    channel == RED ? getRed(color) :
+    channel == GREEN ? getGreen(color) :
+    channel == BLUE ? getBlue(color) :
     getAlpha(color);
 
 /**
@@ -122,22 +122,22 @@ int getChannel(int color, int channel) =>
  * replaced with the given [value].
  */
 int setChannel(int color, int channel, int value) =>
-    channel == 0 ? setRed(color, value) :
-    channel == 1 ? setGreen(color, value) :
-    channel == 2 ? setBlue(color, value) :
+    channel == RED ? setRed(color, value) :
+    channel == GREEN ? setGreen(color, value) :
+    channel == BLUE ? setBlue(color, value) :
     setAlpha(color, value);
 
 /**
- * Get the red channel from the [color].
+ * Get the blue channel from the [color].
  */
-int getRed(int color) =>
+int getBlue(int color) =>
     (color) & 0xff;
 
 /**
- * Returns a new color where the red channel of [color] has been replaced
+ * Returns a new color where the blue channel of [color] has been replaced
  * by [value].
  */
-int setRed(int color, int value) =>
+int setBlue(int color, int value) =>
     (color & 0xffffff00) | (clamp255(value));
 
 /**
@@ -154,16 +154,16 @@ int setGreen(int color, int value) =>
     (color & 0xffff00ff) | (clamp255(value) << 8);
 
 /**
- * Get the blue channel from the [color].
+ * Get the red channel from the [color].
  */
-int getBlue(int color) =>
+int getRed(int color) =>
     (color >> 16) & 0xff;
 
 /**
- * Returns a new color where the blue channel of [color] has been replaced
+ * Returns a new color where the red channel of [color] has been replaced
  * by [value].
  */
-int setBlue(int color, int value) =>
+int setRed(int color, int value) =>
     (color & 0xff00ffff) | (clamp255(value) << 16);
 
 /**

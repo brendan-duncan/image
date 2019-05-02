@@ -5,30 +5,30 @@ void main() {
   group('Color', () {
     test('RGBA', () {
       int rgba = Color.fromRgba(0xaa, 0xbb, 0xcc, 0xff);
-      expect(rgba, equals(0xffccbbaa));
+      expect(rgba, equals(0xffaabbcc));
 
       expect(getRed(rgba), equals(0xaa));
       expect(getGreen(rgba), equals(0xbb));
       expect(getBlue(rgba), equals(0xcc));
       expect(getAlpha(rgba), equals(0xff));
 
-      expect(getChannel(rgba, 0), equals(0xaa));
-      expect(getChannel(rgba, 1), equals(0xbb));
-      expect(getChannel(rgba, 2), equals(0xcc));
-      expect(getChannel(rgba, 3), equals(0xff));
+      expect(getChannel(rgba, RED), equals(0xaa));
+      expect(getChannel(rgba, GREEN), equals(0xbb));
+      expect(getChannel(rgba, BLUE), equals(0xcc));
+      expect(getChannel(rgba, ALPHA), equals(0xff));
       expect(getChannel(rgba, 4), equals(0xff)); // out-of-bounds returns alpha
 
-      rgba = setChannel(rgba, 0, 0x11);
-      rgba = setChannel(rgba, 1, 0x22);
-      rgba = setChannel(rgba, 2, 0x33);
-      rgba = setChannel(rgba, 3, 0x44);
-      expect(rgba, equals(0x44332211));
+      rgba = setChannel(rgba, RED, 0x11);
+      rgba = setChannel(rgba, GREEN, 0x22);
+      rgba = setChannel(rgba, BLUE, 0x33);
+      rgba = setChannel(rgba, ALPHA, 0x44);
+      expect(rgba, equals(0x44112233));
 
       rgba = setRed(rgba, 0x55);
       rgba = setGreen(rgba, 0x66);
       rgba = setBlue(rgba, 0x77);
       rgba = setAlpha(rgba, 0x88);
-      expect(rgba, equals(0x88776655));
+      expect(rgba, equals(0x88556677));
     });
 
     test('Grayscale', () {

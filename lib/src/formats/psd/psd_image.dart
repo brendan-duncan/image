@@ -545,23 +545,23 @@ class PsdImage extends DecodeInfo {
         switch (colorMode) {
           case COLORMODE_RGB:
             int xi = di;
-            pixels[di++] = _ch(channel0.data, si, ns);
-            pixels[di++] = _ch(channel1.data, si, ns);
             pixels[di++] = _ch(channel2.data, si, ns);
+            pixels[di++] = _ch(channel1.data, si, ns);
+            pixels[di++] = _ch(channel0.data, si, ns);
             pixels[di++] = numChannels >= 4 ?
                            _ch(channel_1.data, si, ns) : 255;
 
-            var r = pixels[xi];
+            var b = pixels[xi];
             var g = pixels[xi + 1];
-            var b = pixels[xi + 2];
+            var r = pixels[xi + 2];
             var a = pixels[xi + 3];
             if (a != 0) {
               // Photoshop/Gimp blend the image against white (argh!),
               // which is not what we want for compositing. Invert the blend
               // operation to try and undo the damage.
-              pixels[xi] = (((r + a) - 255) * 255) ~/ a;
+              pixels[xi] = (((b + a) - 255) * 255) ~/ a;
               pixels[xi + 1] = (((g + a) - 255) * 255) ~/ a;
-              pixels[xi + 2] = (((b + a) - 255) * 255) ~/ a;
+              pixels[xi + 2] = (((r + a) - 255) * 255) ~/ a;
             }
             break;
           case COLORMODE_LAB:
@@ -571,9 +571,9 @@ class PsdImage extends DecodeInfo {
             int alpha = numChannels >= 4 ?
                         _ch(channel_1.data, si, ns) : 255;
             List<int> rgb = labToRGB(L, a, b);
-            pixels[di++] = rgb[0];
-            pixels[di++] = rgb[1];
             pixels[di++] = rgb[2];
+            pixels[di++] = rgb[1];
+            pixels[di++] = rgb[0];
             pixels[di++] = alpha;
             break;
           case COLORMODE_GRAYSCALE:
@@ -593,9 +593,9 @@ class PsdImage extends DecodeInfo {
             int alpha = numChannels >= 5 ?
                         _ch(channel_1.data, si, ns) : 255;
             List<int> rgb = cmykToRGB(255 - c, 255 - m, 255 - y, 255 - k);
-            pixels[di++] = rgb[0];
-            pixels[di++] = rgb[1];
             pixels[di++] = rgb[2];
+            pixels[di++] = rgb[1];
+            pixels[di++] = rgb[0];
             pixels[di++] = alpha;
             break;
           default:

@@ -241,7 +241,7 @@ class VP8L {
         int blue = htreeGroup.htrees[_BLUE].readSymbol(br);
         int alpha = htreeGroup.htrees[_ALPHA].readSymbol(br);
 
-        int c = (alpha << 24) | (red << 16) | (green << 8) | blue;
+        int c = getColor(red, green, blue, alpha);
         data[src] = c;
 
         ++src;
@@ -511,12 +511,13 @@ class VP8L {
     for (int y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
       for (int x = 0; x < webp.width; ++x, ++pi) {
         int c = _pixels[pi];
-        int r = getRed(c);
-        int g = getGreen(c);
-        int b = getBlue(c);
-        int a = getAlpha(c);
+        image.setPixel(x, dy, c);
+        //int r = getRed(c);
+        //int g = getGreen(c);
+        //int b = getBlue(c);
+        //int a = getAlpha(c);
         // rearrange the ARGB webp color to RGBA image color.
-        image.setPixel(x, dy, getColor(b, g, r, a));
+        //image.setPixel(x, dy, getColor(r, g, b, a));
       }
     }
 

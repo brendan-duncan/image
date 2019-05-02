@@ -856,9 +856,9 @@ class VP8 {
   }
 
   void _yuvToRgb(int y, int u, int v, InputBuffer rgb) {
-    rgb[0] = _yuvToR(y, v);
+    rgb[2] = _yuvToR(y, v);
     rgb[1] = _yuvToG(y, u, v);
-    rgb[2] = _yuvToB(y, u);
+    rgb[0] = _yuvToB(y, u);
   }
 
   void _yuvToRgba(int y, int u, int v, InputBuffer rgba) {
