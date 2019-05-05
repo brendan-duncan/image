@@ -354,7 +354,15 @@ void main() {
 
     test('quantize', () {
       Image f = new Image.from(image);
-      quantize(f);
+      quantize(f, numberOfColors: 16);
+      var colors = Set();
+      for (int y = 0; y < f.height; ++y) {
+        for (int x = 0; x < f.width; ++x) {
+          colors.add(f.getPixel(x, y));
+        }
+      }
+
+      expect(colors.length, equals(16));
 
       File fp = new File('out/quantize.jpg');
       fp.createSync(recursive: true);

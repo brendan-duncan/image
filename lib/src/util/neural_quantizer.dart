@@ -29,18 +29,20 @@ import '../image_exception.dart';
  */
 
 /**
- * Compute a 256 color map that best represents the given image.
+ * Compute a color map with a given number of colors that best represents
+ * the given image.
  */
 class NeuralQuantizer {
-  Uint8List colorMap = new Uint8List(NET_SIZE * 3);
+  Uint8List colorMap;
 
-  NeuralQuantizer(Image image) {
+  NeuralQuantizer(Image image, {int numberOfColors=256}) {
     if (image.width * image.height < MAX_PRIME) {
       throw new ImageException('Image is too small');
     }
 
-    _setupArrays();
+    _initialize(numberOfColors);
 
+    _setupArrays();
     addImage(image);
   }
 
@@ -105,6 +107,19 @@ class NeuralQuantizer {
       map[i] = lookup(image[i]);
     }
     return map;
+  }
+
+  void _initialize(int numberOfColors) {
+    NET_SIZE = numberOfColors; // number of colours used
+    CUT_NET_SIZE = NET_SIZE - SPECIALS;
+    MAX_NET_POS = NET_SIZE - 1;
+    INIT_RAD = NET_SIZE ~/ 8; // for 256 cols, radius starts at 32
+    INIT_BIAS_RADIUS = INIT_RAD * RADIUS_BIAS;
+    _network = new List<double>(NET_SIZE * 3);
+    _colorMap = new Int32List(NET_SIZE * 4);
+    _bias = new List<double>(NET_SIZE);
+    _freq = new List<double>(NET_SIZE);
+    colorMap = new Uint8List(NET_SIZE * 3);
   }
 
   void _copyColorMap() {
@@ -258,7 +273,6 @@ class NeuralQuantizer {
        _netIndex[j] = MAX_NET_POS; // really 256
     }
   }
-
 
   void _learn(Image image) {
     int biasRadius = INIT_BIAS_RADIUS;
@@ -460,16 +474,16 @@ class NeuralQuantizer {
 
   static const int NUM_CYCLES = 100; // no. of learning cycles
 
-  static const int NET_SIZE = 256; // number of colours used
+  int NET_SIZE = 16; // number of colours used
   static const int SPECIALS = 3; // number of reserved colours used
   static const int BG_COLOR = SPECIALS - 1; // reserved background colour
-  static const int CUT_NET_SIZE = NET_SIZE - SPECIALS;
-  static const int MAX_NET_POS = NET_SIZE - 1;
+  int CUT_NET_SIZE;
+  int MAX_NET_POS;
 
-  static const int INIT_RAD = NET_SIZE ~/ 8; // for 256 cols, radius starts at 32
+  int INIT_RAD; // for 256 cols, radius starts at 32
   static const int RADIUS_BIAS_SHIFT = 6;
   static const int RADIUS_BIAS = 1 << RADIUS_BIAS_SHIFT;
-  static const int INIT_BIAS_RADIUS = INIT_RAD * RADIUS_BIAS;
+  int INIT_BIAS_RADIUS;
   static const int RADIUS_DEC = 30; // factor of 1/30 each cycle
 
   static const int ALPHA_BIAS_SHIFT = 10; // alpha starts at 1
@@ -480,12 +494,12 @@ class NeuralQuantizer {
   static const double BETA_GAMMA = BETA * GAMMA;
 
   /// the network itself
-  List<double> _network = new List<double>(NET_SIZE * 3);
-  Int32List _colorMap = new Int32List(NET_SIZE * 4);
+  List<double> _network ;
+  Int32List _colorMap;
   Int32List _netIndex = new Int32List(256);
   // bias and freq arrays for learning
-  List<double> _bias = new List<double>(NET_SIZE);
-  List<double> _freq = new List<double>(NET_SIZE);
+  List<double> _bias;
+  List<double> _freq;
 
   // four primes near 500 - assume no image has a length so large
   // that it is divisible by all four primes
