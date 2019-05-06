@@ -24,20 +24,20 @@ void main() {
 
   for (String name in images) {
     // Use an http request to get the image file from disk.
-    var req = new Html.HttpRequest();
+    var req = Html.HttpRequest();
     req.open('GET', path + '/' + name);
     req.responseType = 'arraybuffer';
     req.onLoadEnd.listen((e) {
       if (req.status == 200) {
         // Convert the text to binary byte list.
-        List<int> bytes = new Uint8List.view(req.response);
+        List<int> bytes = Uint8List.view(req.response);
 
-        var label = new Html.DivElement();
+        var label = Html.DivElement();
         Html.document.body.append(label);
         label.text = name;
 
         // Create a canvas to put our decoded image into.
-        var c = new Html.CanvasElement();
+        var c = Html.CanvasElement();
         Html.document.body.append(c);
 
         // Find the best decoder for the image.

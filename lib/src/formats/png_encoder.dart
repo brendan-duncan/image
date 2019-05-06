@@ -24,7 +24,7 @@ class PngEncoder extends Encoder {
     blendMethod = image.blendMethod;
 
     if (output == null) {
-      output = new OutputBuffer(bigEndian: true);
+      output = OutputBuffer(bigEndian: true);
 
       format = image.format;
       _width = image.width;
@@ -40,12 +40,12 @@ class PngEncoder extends Encoder {
     }
 
     // Include room for the filter bytes (1 byte per row).
-    List<int> filteredImage = new Uint8List((image.width * image.height *
+    List<int> filteredImage = Uint8List((image.width * image.height *
         image.format) + image.height);
 
     _filter(image, filteredImage);
 
-    List<int> compressed = new ZLibEncoder().encode(filteredImage,
+    List<int> compressed = ZLibEncoder().encode(filteredImage,
                                                         level: level);
 
     if (isAnimated) {
@@ -57,7 +57,7 @@ class PngEncoder extends Encoder {
       _writeChunk(output, 'IDAT', compressed);
     } else {
       // fdAT chunk
-      OutputBuffer fdat = new OutputBuffer(bigEndian: true);
+      OutputBuffer fdat = OutputBuffer(bigEndian: true);
       fdat.writeUint32(sequenceNumber);
       fdat.writeBytes(compressed);
       _writeChunk(output, 'fdAT', fdat.getBytes());
@@ -115,7 +115,7 @@ class PngEncoder extends Encoder {
     output.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
     // IHDR chunk
-    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
+    OutputBuffer chunk = OutputBuffer(bigEndian: true);
     chunk.writeUint32(width);
     chunk.writeUint32(height);
     chunk.writeByte(8);
@@ -127,14 +127,14 @@ class PngEncoder extends Encoder {
   }
 
   void _writeAnimationControlChunk() {
-    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
+    OutputBuffer chunk = OutputBuffer(bigEndian: true);
     chunk.writeUint32(_frames); // number of frames
     chunk.writeUint32(repeat); // loop count
     _writeChunk(output, 'acTL', chunk.getBytes());
   }
 
   void _writeFrameControlChunk() {
-    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
+    OutputBuffer chunk = OutputBuffer(bigEndian: true);
     chunk.writeUint32(sequenceNumber);
     chunk.writeUint32(_width);
     chunk.writeUint32(_height);
@@ -152,7 +152,7 @@ class PngEncoder extends Encoder {
       return;
     }
 
-    OutputBuffer chunk = new OutputBuffer(bigEndian: true);
+    OutputBuffer chunk = OutputBuffer(bigEndian: true);
 
     // name
     chunk.writeBytes(iccp.name.codeUnits);
@@ -389,5 +389,5 @@ class PngEncoder extends Encoder {
   static const int FILTER_AGRESSIVE = 5;
 
   // Table of CRCs of all 8-bit messages.
-  //final List<int> _crcTable = new List<int>(256);
+  //final List<int> _crcTable = List<int>(256);
 }

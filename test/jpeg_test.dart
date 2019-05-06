@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  var dir = new Directory('test/res/jpg');
+  var dir = Directory('test/res/jpg');
   List files = dir.listSync(recursive: true);
 
   group('JPEG', () {
@@ -17,18 +17,18 @@ void main() {
         List<int> bytes = f.readAsBytesSync();
         expect(new JpegDecoder().isValidFile(bytes), equals(true));
 
-        Image image = new JpegDecoder().decodeImage(bytes);
+        Image image = JpegDecoder().decodeImage(bytes);
         if (image == null) {
           throw new ImageException('Unable to decode JPEG Image: $name.');
         }
 
-        List<int> outJpg = new JpegEncoder().encodeImage(image);
+        List<int> outJpg = JpegEncoder().encodeImage(image);
         new File('out/jpg/${name}')
           ..createSync(recursive: true)
           ..writeAsBytesSync(outJpg);
 
         // Make sure we can read what we just wrote.
-        Image image2 = new JpegDecoder().decodeImage(outJpg);
+        Image image2 = JpegDecoder().decodeImage(outJpg);
         if (image2 == null) {
           throw new ImageException('Unable to re-decode JPEG Image: $name.');
         }
@@ -40,7 +40,7 @@ void main() {
 
     for (int i = 1; i < 9; ++i) {
       test('exif/orientation_$i/landscape', () {
-        Image image = new JpegDecoder().decodeImage(
+        Image image = JpegDecoder().decodeImage(
             new File('test/res/jpg/landscape_$i.jpg').readAsBytesSync());
         expect(image.exif.hasOrientation, equals(true));
         expect(image.exif.orientation, equals(i));
@@ -50,7 +50,7 @@ void main() {
       });
 
       test('exif/orientation_$i/portrait', () {
-        Image image = new JpegDecoder().decodeImage(
+        Image image = JpegDecoder().decodeImage(
             new File('test/res/jpg/portrait_$i.jpg').readAsBytesSync());
         expect(image.exif.hasOrientation, equals(true));
         expect(image.exif.orientation, equals(i));

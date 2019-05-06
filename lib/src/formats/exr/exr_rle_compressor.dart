@@ -24,7 +24,7 @@ class InternalExrRleCompressor extends InternalExrCompressor implements ExrRleCo
 
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
                        [int width, int height]) {
-    OutputBuffer out = new OutputBuffer(size: inPtr.length * 2);
+    OutputBuffer out = OutputBuffer(size: inPtr.length * 2);
 
     if (width == null) {
       width = header.width;
@@ -72,7 +72,7 @@ class InternalExrRleCompressor extends InternalExrCompressor implements ExrRleCo
 
     // Reorder the pixel data
     if (_outCache == null || _outCache.length != data.length) {
-      _outCache = new Uint8List(data.length);
+      _outCache = Uint8List(data.length);
     }
 
     final int len = data.length;

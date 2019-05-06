@@ -102,7 +102,7 @@ class NeuralQuantizer {
    * Convert the [image] to an index map, mapping to this [colorMap].
    */
   Uint8List getIndexMap(Image image) {
-    Uint8List map = new Uint8List(image.width * image.height);
+    Uint8List map = Uint8List(image.width * image.height);
     for (int i = 0, len = image.length; i < len; ++i) {
       map[i] = lookup(image[i]);
     }
@@ -115,11 +115,11 @@ class NeuralQuantizer {
     MAX_NET_POS = NET_SIZE - 1;
     INIT_RAD = NET_SIZE ~/ 8; // for 256 cols, radius starts at 32
     INIT_BIAS_RADIUS = INIT_RAD * RADIUS_BIAS;
-    _network = new List<double>(NET_SIZE * 3);
-    _colorMap = new Int32List(NET_SIZE * 4);
-    _bias = new List<double>(NET_SIZE);
-    _freq = new List<double>(NET_SIZE);
-    colorMap = new Uint8List(NET_SIZE * 3);
+    _network = List<double>(NET_SIZE * 3);
+    _colorMap = Int32List(NET_SIZE * 4);
+    _bias = List<double>(NET_SIZE);
+    _freq = List<double>(NET_SIZE);
+    colorMap = Uint8List(NET_SIZE * 3);
   }
 
   void _copyColorMap() {
@@ -496,7 +496,7 @@ class NeuralQuantizer {
   /// the network itself
   List<double> _network ;
   Int32List _colorMap;
-  Int32List _netIndex = new Int32List(256);
+  Int32List _netIndex = Int32List(256);
   // bias and freq arrays for learning
   List<double> _bias;
   List<double> _freq;

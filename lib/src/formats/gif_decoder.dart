@@ -26,8 +26,8 @@ class GifDecoder extends Decoder {
    * Is the given file a valid Gif image?
    */
   bool isValidFile(List<int> bytes) {
-    _input = new InputBuffer(bytes);
-    info = new GifInfo();
+    _input = InputBuffer(bytes);
+    info = GifInfo();
     return _getInfo();
   }
 
@@ -44,9 +44,9 @@ class GifDecoder extends Decoder {
    * If the file is not a valid Gif image, null is returned.
    */
   GifInfo startDecode(List<int> bytes) {
-    _input = new InputBuffer(bytes);
+    _input = InputBuffer(bytes);
 
-    info = new GifInfo();
+    info = GifInfo();
     if (!_getInfo()) {
       return null;
     }
@@ -167,18 +167,18 @@ class GifDecoder extends Decoder {
       return null;
     }
 
-    Animation anim = new Animation();
+    Animation anim = Animation();
     anim.width = info.width;
     anim.height = info.height;
     anim.loopCount = _repeat;
 
-    Image lastImage = new Image(info.width, info.height);
+    Image lastImage = Image(info.width, info.height);
     for (int i = 0; i < info.numFrames; ++i) {
       //_frame = i;
       if (lastImage == null) {
-        lastImage = new Image(info.width, info.height);
+        lastImage = Image(info.width, info.height);
       } else {
-        lastImage = new Image.from(lastImage);
+        lastImage = Image.from(lastImage);
       }
 
       GifImageDesc frame = info.frames[i];
@@ -211,7 +211,7 @@ class GifDecoder extends Decoder {
     if (_input.isEOS) {
       return null;
     }
-    InternalGifImageDesc gifImage = new InternalGifImageDesc(_input);
+    InternalGifImageDesc gifImage = InternalGifImageDesc(_input);
     _input.skip(1);
     _skipRemainder();
     return gifImage;
@@ -259,8 +259,8 @@ class GifDecoder extends Decoder {
 
     _pixelCount = width * height;
 
-    Image image = new Image(width, height);
-    Uint8List line = new Uint8List(width);
+    Image image = Image(width, height);
+    Uint8List line = Uint8List(width);
 
     if (gifImage.interlaced) {
       int row = gifImage.y;
@@ -314,7 +314,7 @@ class GifDecoder extends Decoder {
 
     // Is there a global color map?
     if (b & 0x80 != 0) {
-      info.globalColorMap = new GifColorMap(1 << bitsPerPixel);
+      info.globalColorMap = GifColorMap(1 << bitsPerPixel);
 
       // Get the global color map:
       for (int i = 0; i < info.globalColorMap.numColors; ++i) {
@@ -581,10 +581,10 @@ class GifDecoder extends Decoder {
   }
 
   void _initDecode() {
-    _buffer = new Uint8List(256);
-    _stack = new Uint8List(LZ_MAX_CODE);
-    _suffix = new Uint8List(LZ_MAX_CODE + 1);
-    _prefix = new Uint32List(LZ_MAX_CODE + 1);
+    _buffer = Uint8List(256);
+    _stack = Uint8List(LZ_MAX_CODE);
+    _suffix = Uint8List(LZ_MAX_CODE + 1);
+    _prefix = Uint32List(LZ_MAX_CODE + 1);
   }
 
   InputBuffer _input;

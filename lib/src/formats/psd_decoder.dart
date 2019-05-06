@@ -22,7 +22,7 @@ class PsdDecoder extends Decoder {
    * Decode a raw PSD image without rendering it to a flat image.
    */
   PsdImage decodePsd(List<int> bytes) {
-    PsdImage psd = new PsdImage(bytes);
+    PsdImage psd = PsdImage(bytes);
     if (!psd.decode()) {
       return null;
     }
@@ -49,7 +49,7 @@ class PsdDecoder extends Decoder {
       return null;
     }
 
-    Animation anim = new Animation();
+    Animation anim = Animation();
     anim.width = info.width;
     anim.height = info.height;
     anim.frameType = Animation.PAGE;
@@ -69,7 +69,7 @@ class PsdDecoder extends Decoder {
    * process the frames until they are requested with decodeFrame.
    */
   DecodeInfo startDecode(List<int> bytes) {
-    info = new PsdImage(bytes);
+    info = PsdImage(bytes);
     return info;
   }
 

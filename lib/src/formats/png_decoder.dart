@@ -24,7 +24,7 @@ class PngDecoder extends Decoder {
    * Is the given file a valid PNG image?
    */
   bool isValidFile(List<int> data) {
-    InputBuffer input = new InputBuffer(data, bigEndian: true);
+    InputBuffer input = InputBuffer(data, bigEndian: true);
     InputBuffer pngHeader = input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
@@ -43,7 +43,7 @@ class PngDecoder extends Decoder {
    * process the frames until they are requested with decodeFrame.
    */
   DecodeInfo startDecode(List<int> data) {
-    _input = new InputBuffer(data, bigEndian: true);
+    _input = InputBuffer(data, bigEndian: true);
 
     InputBuffer pngHeader = _input.readBytes(8);
     const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
@@ -59,9 +59,9 @@ class PngDecoder extends Decoder {
       String chunkType = _input.readString(4);
       switch (chunkType) {
         case 'IHDR':
-          InputBuffer hdr = new InputBuffer.from(_input.readBytes(chunkSize));
+          InputBuffer hdr = InputBuffer.from(_input.readBytes(chunkSize));
           List<int> hdrBytes = hdr.toUint8List();
-          _info = new InternalPngInfo();
+          _info = InternalPngInfo();
           _info.width = hdr.readUint32();
           _info.height = hdr.readUint32();
           _info.bits = hdr.readByte();
@@ -158,7 +158,7 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'fcTL': // Frame control chunk
-          PngFrame frame = new InternalPngFrame();
+          PngFrame frame = InternalPngFrame();
           _info.frames.add(frame);
           frame.sequenceNumber = _input.readUint32();
           frame.width = _input.readUint32();
@@ -287,17 +287,17 @@ class PngDecoder extends Decoder {
       format = Image.RGB;
     }
 
-    Image image = new Image(width, height, format);
+    Image image = Image(width, height, format);
 
-    List<int> uncompressed = new ZLibDecoder().decodeBytes(imageData);
+    List<int> uncompressed = ZLibDecoder().decodeBytes(imageData);
 
     // input is the decompressed data.
-    InputBuffer input = new InputBuffer(uncompressed, bigEndian: true);
+    InputBuffer input = InputBuffer(uncompressed, bigEndian: true);
     _resetBits();
 
     // Set up a LUT to transform colors for gamma correction.
     if (_info.colorLut == null) {
-      _info.colorLut = new List<int>(256);
+      _info.colorLut = List<int>(256);
       for (int i = 0; i < 256; ++i) {
         int c = i;
         /*if (info.gamma != null) {
@@ -337,7 +337,7 @@ class PngDecoder extends Decoder {
     _info.width = origW;
     _info.height = origH;
 
-    image.iccProfile = new ICCProfileData(_info.iCCPName,
+    image.iccProfile = ICCProfileData(_info.iCCPName,
                                           ICCPCompression.deflate,
                                           _info.iCCPData);
 
@@ -356,7 +356,7 @@ class PngDecoder extends Decoder {
       return null;
     }
 
-    Animation anim = new Animation();
+    Animation anim = Animation();
     anim.width = _info.width;
     anim.height = _info.height;
 
@@ -367,13 +367,13 @@ class PngDecoder extends Decoder {
     }
 
     int dispose = PngFrame.APNG_DISPOSE_OP_BACKGROUND;
-    Image lastImage = new Image(_info.width, _info.height);
+    Image lastImage = Image(_info.width, _info.height);
     for (int i = 0; i < _info.numFrames; ++i) {
       //_frame = i;
       if (lastImage == null) {
-        lastImage = new Image(_info.width, _info.height);
+        lastImage = Image(_info.width, _info.height);
       } else {
-        lastImage = new Image.from(lastImage);
+        lastImage = Image.from(lastImage);
       }
 
       PngFrame frame = _info.frames[i];
@@ -415,7 +415,7 @@ class PngDecoder extends Decoder {
     final int bpp = (pixelDepth + 7) >> 3;
     final int rowBytes = (pixelDepth * passWidth + 7) >> 3;
 
-    final List<int> line = new List<int>.filled(rowBytes, 0);
+    final List<int> line = List<int>.filled(rowBytes, 0);
     final List<List<int>> inData = [line, line];
 
     final List<int> pixel = [0, 0, 0, 0];
@@ -437,7 +437,7 @@ class PngDecoder extends Decoder {
       // reset the bit stream counter.
       _resetBits();
 
-      InputBuffer rowInput = new InputBuffer(row, bigEndian: true);
+      InputBuffer rowInput = InputBuffer(row, bigEndian: true);
 
       final int blockHeight = xStep;
       final int blockWidth = xStep - xOffset;
@@ -476,7 +476,7 @@ class PngDecoder extends Decoder {
     final int rowBytes = (((w * pixelDepth + 7)) >> 3);
     final int bpp = (pixelDepth + 7) >> 3;
 
-    final List<int> line = new List<int>.filled(rowBytes, 0);
+    final List<int> line = List<int>.filled(rowBytes, 0);
     final List<List<int>> inData = [line, line];
 
     final List<int> pixel = [0, 0, 0, 0];
@@ -496,7 +496,7 @@ class PngDecoder extends Decoder {
       // reset the bit stream counter.
       _resetBits();
 
-      InputBuffer rowInput = new InputBuffer(inData[ri], bigEndian: true);
+      InputBuffer rowInput = InputBuffer(inData[ri], bigEndian: true);
 
       for (int x = 0; x < w; ++x) {
         _readPixel(rowInput, pixel);

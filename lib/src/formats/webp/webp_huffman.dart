@@ -12,9 +12,9 @@ class HuffmanTree {
   static const int HUFF_LUT_BITS = 7;
   static const int HUFF_LUT = (1 << HUFF_LUT_BITS);
   // Fast lookup for short bit lengths.
-  Uint8List lutBits = new Uint8List(HUFF_LUT);
-  Int16List lutSymbol = new Int16List(HUFF_LUT);
-  Int16List lutJump = new Int16List(HUFF_LUT);
+  Uint8List lutBits = Uint8List(HUFF_LUT);
+  Int16List lutSymbol = Int16List(HUFF_LUT);
+  Int16List lutJump = Int16List(HUFF_LUT);
 
   /// all the nodes, starting at root, stored as a single int array, where
   /// each node occupies two ints as [symbol, children].
@@ -34,7 +34,7 @@ class HuffmanTree {
     }
 
     maxNodes = (numLeaves << 1) - 1;
-    tree = new Int32List(maxNodes << 1);
+    tree = Int32List(maxNodes << 1);
     tree[1] = -1;
     numNodes = 1;
     lutBits.fillRange(0, lutBits.length, 255);
@@ -74,7 +74,7 @@ class HuffmanTree {
     // Normal case.
 
     // Get Huffman codes from the code lengths.
-    Int32List codes = new Int32List(codeLengthsSize);
+    Int32List codes = Int32List(codeLengthsSize);
 
     if (!_huffmanCodeLengthsToCodes(codeLengths, codeLengthsSize, codes)) {
       return false;
@@ -315,13 +315,13 @@ class HTreeGroup {
 
   HTreeGroup() {
     for (int i = 0, len = htrees.length; i < len; ++i) {
-      htrees[i] = new HuffmanTree();
+      htrees[i] = HuffmanTree();
     }
   }
 
   HuffmanTree operator[](int index) {
     if (htrees[index] == null) {
-      htrees[index] = new HuffmanTree();
+      htrees[index] = HuffmanTree();
     }
     return htrees[index];
   }

@@ -13,7 +13,7 @@ void main() {
   ctx.drawImage(theImg,0,0);
 
   var bytes = ctx.getImageData(0, 0, cvs.width, cvs.height).data;
-  Image image = new Image.fromBytes(cvs.width, cvs.height, bytes);
+  Image image = Image.fromBytes(cvs.width, cvs.height, bytes);
 
   var jpg = encodeJpg(image, quality: 25);
 

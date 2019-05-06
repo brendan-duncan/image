@@ -34,14 +34,14 @@ class InternalExrPxr24Compressor extends InternalExrCompressor implements ExrPxr
     }
 
     if (_output == null) {
-      _output = new OutputBuffer(size: _numScanLines * _maxScanLineSize);
+      _output = OutputBuffer(size: _numScanLines * _maxScanLineSize);
     }
     _output.rewind();
 
     int tmpEnd = 0;
     List<int> ptr = [0, 0, 0, 0];
-    Uint32List pixel = new Uint32List(1);
-    Uint8List pixelBytes = new Uint8List.view(pixel.buffer);
+    Uint32List pixel = Uint32List(1);
+    Uint8List pixelBytes = Uint8List.view(pixel.buffer);
 
     if (width == null) {
       width = header.width;
@@ -128,7 +128,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor implements ExrPxr
     return _output.getBytes();
   }
 
-  ZLibDecoder _zlib = new ZLibDecoder();
+  ZLibDecoder _zlib = ZLibDecoder();
   int _maxScanLineSize;
   int _numScanLines;
   OutputBuffer _output;

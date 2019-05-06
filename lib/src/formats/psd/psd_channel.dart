@@ -53,7 +53,7 @@ class PsdChannel {
   }
 
   Uint16List _readLineLengths(InputBuffer input, int height) {
-    Uint16List lineLengths = new Uint16List(height);
+    Uint16List lineLengths = Uint16List(height);
     for (int i = 0; i < height; ++i) {
       lineLengths[i] = input.readUint16();
     }
@@ -67,7 +67,7 @@ class PsdChannel {
       len *= 2;
     }
     if (len > input.length) {
-      data = new Uint8List(len);
+      data = Uint8List(len);
       data.fillRange(0, len, 255);
       return;
     }
@@ -83,7 +83,7 @@ class PsdChannel {
     if (bitDepth == 16) {
       len *= 2;
     }
-    data = new Uint8List(len);
+    data = Uint8List(len);
     int pos = 0;
     int lineIndex = planeNum * height;
     if (lineIndex >= lineLengths.length) {

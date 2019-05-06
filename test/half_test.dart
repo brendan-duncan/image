@@ -6,10 +6,10 @@ void main() {
      test('Arithmetic', () {
        double f1 = 1.0;
        double f2 = 2.0;
-       Half  h1 = new Half(3);
-       Half  h2 = new Half(4);
+       Half  h1 = Half(3);
+       Half  h2 = Half(4);
 
-       h1 = new Half(f1 + f2);
+       h1 = Half(f1 + f2);
        expect(h1.toDouble(), equals(3.0));
 
        h2 += f1;

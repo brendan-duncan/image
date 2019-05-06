@@ -18,7 +18,7 @@ class TgaDecoder extends Decoder {
    * Is the given file a valid TGA image?
    */
   bool isValidFile(List<int> data) {
-    InputBuffer input = new InputBuffer(data,
+    InputBuffer input = InputBuffer(data,
         bigEndian: true);
 
     InputBuffer header = input.readBytes(18);
@@ -33,8 +33,8 @@ class TgaDecoder extends Decoder {
   }
 
   DecodeInfo startDecode(List<int> data) {
-    info = new TgaInfo();
-    input = new InputBuffer(data, bigEndian: true);
+    info = TgaInfo();
+    input = InputBuffer(data, bigEndian: true);
 
     InputBuffer header = input.readBytes(18);
     if (header[2] != 2) {
@@ -60,7 +60,7 @@ class TgaDecoder extends Decoder {
     }
 
     input.offset = info.imageOffset;
-    Image image = new Image(info.width, info.height, Image.RGB);
+    Image image = Image(info.width, info.height, Image.RGB);
     for (int y = image.height - 1; y >= 0; --y) {
       for (int x = 0; x < image.width; ++x) {
         int b = input.readByte();
@@ -88,7 +88,7 @@ class TgaDecoder extends Decoder {
       return null;
     }
 
-    Animation anim = new Animation();
+    Animation anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);

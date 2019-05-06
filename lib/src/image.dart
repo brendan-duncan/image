@@ -75,8 +75,8 @@ class Image {
         ICCProfileData iccp]) :
     this.width = width,
     this.height = height,
-    data = new Uint32List(width * height),
-    exif = new ExifData.from(exif),
+    data = Uint32List(width * height),
+    exif = ExifData.from(exif),
     iccProfile = iccp;
 
   /**
@@ -91,8 +91,8 @@ class Image {
     disposeMethod = other.disposeMethod,
     blendMethod = other.blendMethod,
     _format = other._format,
-    data = new Uint32List.fromList(other.data),
-    exif = new ExifData.from(other.exif),
+    data = Uint32List.fromList(other.data),
+    exif = ExifData.from(other.exif),
     iccProfile = other.iccProfile;
 
   /**
@@ -105,7 +105,7 @@ class Image {
    * For example, given an Html Canvas, you could create an image:
    * var bytes = canvas.getContext('2d').getImageData(0, 0,
    *   canvas.width, canvas.height).data;
-   * Image image = new Image.fromBytes(canvas.width, canvas.height, bytes);
+   * Image image = Image.fromBytes(canvas.width, canvas.height, bytes);
    */
   Image.fromBytes(int width, int height, List<int> bytes,
                   [this._format = RGBA, ExifData exif, ICCProfileData iccp]) :
@@ -117,7 +117,7 @@ class Image {
             bytes is Uint8ClampedList ? new Uint32List.view(bytes.buffer) :
             bytes is Uint32List ? new Uint32List.view(bytes.buffer) :
             new Uint32List.view(new Uint8List.fromList(bytes).buffer),
-    exif = new ExifData.from(exif),
+    exif = ExifData.from(exif),
     iccProfile = iccp;
 
   /**

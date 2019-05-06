@@ -12,7 +12,7 @@ class PvrtcPacket {
   int index;
 
   PvrtcPacket(TypedData data)
-      : rawData = new Uint32List.view(data.buffer);
+      : rawData = Uint32List.view(data.buffer);
 
   void setBlock(int x, int y) => setIndex(_getMortonNumber(x, y));
 

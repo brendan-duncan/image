@@ -23,7 +23,7 @@ class TiffDecoder extends Decoder {
    * If the file is not a valid Gif image, null is returned.
    */
   TiffInfo startDecode(List<int> bytes) {
-    _input = new InputBuffer(new Uint8List.fromList(bytes));
+    _input = InputBuffer(new Uint8List.fromList(bytes));
     info = _readHeader(_input);
     return info;
   }
@@ -55,7 +55,7 @@ class TiffDecoder extends Decoder {
    * decoding the file, null is returned.
    */
   Image decodeImage(List<int> data, {int frame: 0}) {
-    InputBuffer ptr = new InputBuffer(new Uint8List.fromList(data));
+    InputBuffer ptr = InputBuffer(new Uint8List.fromList(data));
 
     TiffInfo info = _readHeader(ptr);
     if (info == null) {
@@ -66,7 +66,7 @@ class TiffDecoder extends Decoder {
   }
 
   HdrImage decodeHdrImage(List<int> data, {int frame: 0}) {
-    InputBuffer ptr = new InputBuffer(new Uint8List.fromList(data));
+    InputBuffer ptr = InputBuffer(new Uint8List.fromList(data));
 
     TiffInfo info = _readHeader(ptr);
     if (info == null) {
@@ -86,7 +86,7 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    Animation anim = new Animation();
+    Animation anim = Animation();
     anim.width = info.width;
     anim.height = info.height;
     anim.frameType = Animation.PAGE;
@@ -105,7 +105,7 @@ class TiffDecoder extends Decoder {
    * Read the TIFF header and IFD blocks.
    */
   TiffInfo _readHeader(InputBuffer p) {
-    TiffInfo info = new TiffInfo();
+    TiffInfo info = TiffInfo();
     int byteOrder = p.readUint16();
     if (byteOrder != TIFF_LITTLE_ENDIAN &&
         byteOrder != TIFF_BIG_ENDIAN) {
@@ -128,13 +128,13 @@ class TiffDecoder extends Decoder {
     int offset = p.readUint32();
     info.ifdOffset = offset;
 
-    InputBuffer p2 = new InputBuffer.from(p);
+    InputBuffer p2 = InputBuffer.from(p);
     p2.offset = offset;
 
     while (offset != 0) {
       TiffImage img;
       try {
-        img = new TiffImage(p2);
+        img = TiffImage(p2);
         if (!img.isValid) {
           break;
         }

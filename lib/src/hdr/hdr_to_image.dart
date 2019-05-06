@@ -24,7 +24,7 @@ Image hdrToImage(HdrImage hdr, {double exposure}) {
     return (Math.pow(x, 0.4545) * 84.66);
   }
 
-  Image image = new Image(hdr.width, hdr.height);
+  Image image = Image(hdr.width, hdr.height);
   Uint8List pixels = image.getBytes();
 
   if (!hdr.hasColor) {

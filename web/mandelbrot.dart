@@ -14,7 +14,7 @@ void main() {
   const int height = 1024;
 
   // Create a canvas to put our decoded image into.
-  var c = new Html.CanvasElement(width: width, height: height);
+  var c = Html.CanvasElement(width: width, height: height);
   Html.document.body.append(c);
 
   double zoom = 1.0;
@@ -29,7 +29,7 @@ void main() {
   const double w_2 = width / 2.0;
   const double aspect = 0.5;
 
-  Image image = new Image(width, height);
+  Image image = Image(width, height);
   for (int y = 0; y < height; ++y) {
     double pi = (y - h_2) / (0.5 * zoom * aspect * height) + moveY;
 

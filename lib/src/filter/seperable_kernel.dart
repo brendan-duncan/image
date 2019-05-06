@@ -12,7 +12,7 @@ class SeperableKernel {
    * Create a seperable convolution kernel for the given [radius].
    */
   SeperableKernel(int radius) :
-    coefficients = new List<double>(2 * radius + 1),
+    coefficients = List<double>(2 * radius + 1),
     this.size = radius;
 
   /**

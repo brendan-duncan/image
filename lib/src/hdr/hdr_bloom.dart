@@ -16,14 +16,14 @@ HdrImage hdrBloom(HdrImage hdr, {double radius: 0.01, double weight: 0.1}) {
     int bloomSupport = (radius * Math.max(hdr.width, hdr.height)).ceil();
     int bloomWidth = bloomSupport ~/ 2;
     // Initialize bloom filter table
-    Float32List bloomFilter = new Float32List(bloomWidth * bloomWidth);
+    Float32List bloomFilter = Float32List(bloomWidth * bloomWidth);
     for (int i = 0; i < bloomWidth * bloomWidth; ++i) {
       double dist = Math.sqrt(i / bloomWidth);
       bloomFilter[i] = Math.pow(Math.max(0.0, 1.0 - dist), 4.0);
     }
 
     // Apply bloom filter to image pixels
-    Float32List bloomImage = new Float32List(3 * hdr.width * hdr.height);
+    Float32List bloomImage = Float32List(3 * hdr.width * hdr.height);
     for (int y = 0, offset = 0; y < hdr.height; ++y) {
       for (int x = 0; x < hdr.width; ++x, ++offset) {
         // Compute bloom for pixel _(x,y)_

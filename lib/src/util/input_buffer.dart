@@ -172,7 +172,7 @@ class InputBuffer {
 
     InputBuffer s = readBytes(len);
     Uint8List bytes = s.toUint8List();
-    String str = new String.fromCharCodes(bytes);
+    String str = String.fromCharCodes(bytes);
     return str;
   }
 

@@ -23,7 +23,7 @@ class VP8L {
   VP8L(InputBuffer input, WebPInfo webp) :
     this.input = input,
     this.webp = webp,
-    this.br = new VP8LBitReader(input) {
+    this.br = VP8LBitReader(input) {
   }
 
   bool decodeHeader() {
@@ -56,7 +56,7 @@ class VP8L {
 
     _allocateInternalBuffers32b();
 
-    image = new Image(webp.width, webp.height);
+    image = Image(webp.width, webp.height);
 
     if (!_decodeImageData(_pixels, webp.width, webp.height,
                           webp.height, _processRows)) {
@@ -75,9 +75,9 @@ class VP8L {
     final int cachePixels = webp.width * _NUM_ARGB_CACHE_ROWS;
     final int totalNumPixels = numPixels + cacheTopPixels + cachePixels;
 
-    Uint32List pixels32 = new Uint32List(totalNumPixels);
+    Uint32List pixels32 = Uint32List(totalNumPixels);
     _pixels = pixels32;
-    _pixels8 = new Uint8List.view(pixels32.buffer);
+    _pixels8 = Uint8List.view(pixels32.buffer);
     _argbCache = numPixels + cacheTopPixels;
 
     return true;
@@ -88,8 +88,8 @@ class VP8L {
     _argbCache = 0;
     // pad the byteBuffer to a multiple of 4
     int n = totalNumPixels + (4 - (totalNumPixels % 4));
-    _pixels8 = new Uint8List(n);
-    _pixels = new Uint32List.view(_pixels8.buffer);
+    _pixels8 = Uint8List(n);
+    _pixels = Uint32List.view(_pixels8.buffer);
     return true;
   }
 
@@ -104,7 +104,7 @@ class VP8L {
     }
     _transformsSeen |= (1 << type);
 
-    VP8LTransform transform = new VP8LTransform();
+    VP8LTransform transform = VP8LTransform();
     _transforms.add(transform);
 
     transform.type = type;
@@ -173,7 +173,7 @@ class VP8L {
     // Finish setting up the color-cache
     if (colorCacheBits > 0) {
       _colorCacheSize = 1 << colorCacheBits;
-      _colorCache = new VP8LColorCache(colorCacheBits);
+      _colorCache = VP8LColorCache(colorCacheBits);
     } else {
       _colorCacheSize = 0;
     }
@@ -191,7 +191,7 @@ class VP8L {
     }
 
     final int totalSize = transformXsize * transformYsize;
-    Uint32List data = new Uint32List(totalSize);
+    Uint32List data = Uint32List(totalSize);
 
     // Use the Huffman trees to decode the LZ77 encoded data.
     if (!_decodeImageData(data, transformXsize, transformYsize,
@@ -384,7 +384,7 @@ class VP8L {
     final int cachePixs = width * numRows;
 
     final int di = width * _lastRow;
-    InputBuffer src = new InputBuffer(_pixels, offset: _argbCache);
+    InputBuffer src = InputBuffer(_pixels, offset: _argbCache);
 
     for (int i = 0; i < cachePixs; ++i) {
       _opaque[di + i] = (src[i] >> 8) & 0xff;
@@ -472,7 +472,7 @@ class VP8L {
 
   void _extractPalettedAlphaRows(int row) {
     final int numRows = row - _lastRow;
-    InputBuffer pIn = new InputBuffer(_pixels8, offset: webp.width * _lastRow);
+    InputBuffer pIn = InputBuffer(_pixels8, offset: webp.width * _lastRow);
     if (numRows > 0) {
       _applyInverseTransformsAlpha(numRows, pIn);
     }
@@ -485,7 +485,7 @@ class VP8L {
   void _applyInverseTransformsAlpha(int numRows, InputBuffer rows) {
     final int startRow = _lastRow;
     final int endRow = startRow + numRows;
-    InputBuffer rowsOut = new InputBuffer(_opaque, offset: _ioWidth * startRow);
+    InputBuffer rowsOut = InputBuffer(_opaque, offset: _ioWidth * startRow);
     VP8LTransform transform = _transforms[0];
 
     transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);
@@ -571,9 +571,9 @@ class VP8L {
 
     assert(numHtreeGroups <= 0x10000);
 
-    List<HTreeGroup> htreeGroups = new List<HTreeGroup>(numHtreeGroups);
+    List<HTreeGroup> htreeGroups = List<HTreeGroup>(numHtreeGroups);
     for (int i = 0; i < numHtreeGroups; ++i) {
-      htreeGroups[i] = new HTreeGroup();
+      htreeGroups[i] = HTreeGroup();
 
       for (int j = 0; j < HUFFMAN_CODES_PER_META_CODE; ++j) {
         int alphabetSize = ALPHABET_SIZE[j];
@@ -632,7 +632,7 @@ class VP8L {
         return false;
       }
 
-      Int32List codeLengths = new Int32List(alphabetSize);
+      Int32List codeLengths = Int32List(alphabetSize);
 
       for (int i = 0; i < numCodes; ++i) {
         codeLengthCodeLengths[_CODE_LENGTH_CODE_ORDER[i]] = br.readBits(3);
@@ -655,7 +655,7 @@ class VP8L {
     int symbol;
     int max_symbol;
     int prev_code_len = DEFAULT_CODE_LENGTH;
-    HuffmanTree tree = new HuffmanTree();
+    HuffmanTree tree = HuffmanTree();
 
     if (!tree.buildImplicit(codeLengthCodeLengths, _NUM_CODE_LENGTH_CODES)) {
       return false;
@@ -748,9 +748,9 @@ class VP8L {
    */
   bool _expandColorMap(int numColors, VP8LTransform transform) {
     final int finalNumColors = 1 << (8 >> transform.bits);
-    Uint32List newColorMap = new Uint32List(finalNumColors);
-    Uint8List data = new Uint8List.view(transform.data.buffer);
-    Uint8List newData = new Uint8List.view(newColorMap.buffer);
+    Uint32List newColorMap = Uint32List(finalNumColors);
+    Uint8List data = Uint8List.view(transform.data.buffer);
+    Uint8List newData = Uint8List.view(newColorMap.buffer);
 
     newColorMap[0] = transform.data[0];
 
@@ -782,7 +782,7 @@ class VP8L {
     int metaIndex = _getMetaIndex(_huffmanImage, _huffmanXsize,
                                   _huffmanSubsampleBits, x, y);
     if (_htreeGroups[metaIndex] == null) {
-      _htreeGroups[metaIndex] = new HTreeGroup();
+      _htreeGroups[metaIndex] = HTreeGroup();
     }
     return _htreeGroups[metaIndex];
   }

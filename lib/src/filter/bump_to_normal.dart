@@ -11,7 +11,7 @@ import '../image.dart';
  * the strength of the normal image.
  */
 Image bumpToNormal(Image src, {double strength: 2.0}) {
-  Image dest = new Image.from(src);
+  Image dest = Image.from(src);
 
   for (var y = 0; y < src.height; ++y) {
     for (var x = 0; x < src.width; ++x) {

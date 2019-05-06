@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Io.Directory dir = new Io.Directory('test/res/webp');
+  Io.Directory dir = Io.Directory('test/res/webp');
   List files = dir.listSync();
 
   group('WebP/getInfo', () {
@@ -16,7 +16,7 @@ void main() {
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
 
-        WebPInfo data = new WebPDecoder().startDecode(bytes);
+        WebPInfo data = WebPDecoder().startDecode(bytes);
         if (data == null) {
           throw new ImageException('Unable to parse WebP info: $name.');
         }
@@ -32,36 +32,36 @@ void main() {
     }
   });
 
-  /*List<int> bytes = new Io.File('1_webp_ll.webp')
+  /*List<int> bytes = Io.File('1_webp_ll.webp')
                           .readAsBytesSync();
-  Image image = new WebPDecoder().decodeImage(bytes);
-  List<int> png = new PngEncoder().encode(image);
+  Image image = WebPDecoder().decodeImage(bytes);
+  List<int> png = PngEncoder().encode(image);
   new Io.File('out/webp/decode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);*/
 
-  /*Animation anim = new WebPDecoder().decodeAnimation(bytes);
+  /*Animation anim = WebPDecoder().decodeAnimation(bytes);
   for (int i = 0; i < anim.numFrames; ++i) {
     AnimationFrame frame = anim[i];
-    List<int> png = new PngEncoder().encode(frame.image);
+    List<int> png = PngEncoder().encode(frame.image);
     new Io.File('out/webp/comp_$i.png')
           ..writeAsBytesSync(png);
   }*/
 
   group('WebP/decodeImage', () {
     test('validate', () {
-      Io.File file = new Io.File('test/res/webp/2b.webp');
+      Io.File file = Io.File('test/res/webp/2b.webp');
       List<int> bytes = file.readAsBytesSync();
-      Image image = new WebPDecoder().decodeImage(bytes);
-      List<int> png = new PngEncoder().encodeImage(image);
+      Image image = WebPDecoder().decodeImage(bytes);
+      List<int> png = PngEncoder().encodeImage(image);
       new Io.File('out/webp/decode.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
       // Validate decoding.
-      file = new Io.File('test/res/webp/2b.png');
+      file = Io.File('test/res/webp/2b.png');
       bytes = file.readAsBytesSync();
-      Image debugImage = new PngDecoder().decodeImage(bytes);
+      Image debugImage = PngDecoder().decodeImage(bytes);
       bool found = false;
       for (int y = 0; y < debugImage.height && !found; ++y) {
         for (int x = 0; x < debugImage.width; ++x) {
@@ -80,12 +80,12 @@ void main() {
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
-        Image image = new WebPDecoder().decodeImage(bytes);
+        Image image = WebPDecoder().decodeImage(bytes);
         if (image == null) {
           throw new ImageException('Unable to decode WebP Image: $name.');
         }
 
-        List<int> png = new PngEncoder().encodeImage(image);
+        List<int> png = PngEncoder().encodeImage(image);
         new Io.File('out/webp/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);

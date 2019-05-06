@@ -8,9 +8,9 @@ Image origImage;
 
 void _addControl(String label, String value, Html.DivElement parent,
                  callback) {
-  Html.LabelElement amountLabel = new Html.LabelElement();
+  Html.LabelElement amountLabel = Html.LabelElement();
   amountLabel.text = label + ':';
-  var amountEdit = new Html.InputElement();
+  var amountEdit = Html.InputElement();
   amountEdit.value = value;
   amountEdit.id = label + '_edit';
   amountEdit.onChange.listen((e) {
@@ -31,16 +31,16 @@ void testSepia() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = new Html.Element.tag('h1');
+  var label = Html.Element.tag('h1');
   label.text = 'Sepia';
   sidebar.children.add(label);
 
   double amount = 1.0;
 
   void _apply() {
-    Stopwatch t = new Stopwatch();
+    Stopwatch t = Stopwatch();
     t.start();
-    Image image = new Image.from(origImage);
+    Image image = Image.from(origImage);
     image = sepia(image, amount: amount);
 
     // Fill the buffer with our image data.
@@ -65,16 +65,16 @@ void testSobel() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = new Html.Element.tag('h1');
+  var label = Html.Element.tag('h1');
   label.text = 'Sepia';
   sidebar.children.add(label);
 
   double amount = 1.0;
 
   void _apply() {
-    Stopwatch t = new Stopwatch();
+    Stopwatch t = Stopwatch();
     t.start();
-    Image image = new Image.from(origImage);
+    Image image = Image.from(origImage);
     image = sobel(image, amount: amount);
 
     // Fill the buffer with our image data.
@@ -99,16 +99,16 @@ void testGaussian() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = new Html.Element.tag('h1');
+  var label = Html.Element.tag('h1');
   label.text = 'Gaussian Blur';
   sidebar.children.add(label);
 
   int radius = 5;
 
   void _apply() {
-    Stopwatch t = new Stopwatch();
+    Stopwatch t = Stopwatch();
     t.start();
-    Image image = new Image.from(origImage);
+    Image image = Image.from(origImage);
     image = gaussianBlur(image, radius);
 
     // Fill the buffer with our image data.
@@ -133,7 +133,7 @@ void testVignette() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = new Html.Element.tag('h1');
+  var label = Html.Element.tag('h1');
   label.text = 'Vignette';
   sidebar.children.add(label);
 
@@ -142,9 +142,9 @@ void testVignette() {
   double amount = 1.0;
 
   void _apply() {
-    Stopwatch t = new Stopwatch();
+    Stopwatch t = Stopwatch();
     t.start();
-    Image image = new Image.from(origImage);
+    Image image = Image.from(origImage);
     image = vignette(image, start: start, end: end, amount: amount);
 
     // Fill the buffer with our image data.
@@ -179,16 +179,16 @@ void testPixelate() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = new Html.Element.tag('h1');
+  var label = Html.Element.tag('h1');
   label.text = 'Pixelate';
   sidebar.children.add(label);
 
   int blockSize = 5;
 
   void _apply() {
-    Stopwatch t = new Stopwatch();
+    Stopwatch t = Stopwatch();
     t.start();
-    Image image = new Image.from(origImage);
+    Image image = Image.from(origImage);
     image = pixelate(image, blockSize);
 
     // Fill the buffer with our image data.
@@ -213,7 +213,7 @@ void testColorOffset() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = new Html.Element.tag('h1');
+  var label = Html.Element.tag('h1');
   label.text = 'Pixelate';
   sidebar.children.add(label);
 
@@ -223,9 +223,9 @@ void testColorOffset() {
   int alpha = 0;
 
   void _apply() {
-    Stopwatch t = new Stopwatch();
+    Stopwatch t = Stopwatch();
     t.start();
-    Image image = new Image.from(origImage);
+    Image image = Image.from(origImage);
     image = colorOffset(image, red, green, blue, alpha);
 
     // Fill the buffer with our image data.
@@ -265,7 +265,7 @@ void testAdjustColor() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = new Html.Element.tag('h1');
+  var label = Html.Element.tag('h1');
   label.text = 'Adjust Color';
   sidebar.children.add(label);
 
@@ -278,9 +278,9 @@ void testAdjustColor() {
   double amount = 1.0;
 
   void _apply() {
-    Stopwatch t = new Stopwatch();
+    Stopwatch t = Stopwatch();
     t.start();
-    Image image = new Image.from(origImage);
+    Image image = Image.from(origImage);
 
     image = adjustColor(image, contrast: contrast, saturation: saturation,
         brightness: brightness, gamma: gamma, exposure: exposure,
@@ -358,16 +358,16 @@ void main() {
     }
   });
 
-  Html.ImageElement img = new Html.ImageElement();
+  Html.ImageElement img = Html.ImageElement();
   img.src = 'res/big_buck_bunny.jpg';
   img.onLoad.listen((e) {
-    var c = new Html.CanvasElement();
+    var c = Html.CanvasElement();
     c.width = img.width;
     c.height = img.height;
     c.context2D.drawImage(img, 0, 0);
 
     var imageData = c.context2D.getImageData(0, 0, img.width, img.height);
-    origImage = new Image.fromBytes(img.width, img.height, imageData.data);
+    origImage = Image.fromBytes(img.width, img.height, imageData.data);
 
     canvas.width = img.width;
     canvas.height = img.height;

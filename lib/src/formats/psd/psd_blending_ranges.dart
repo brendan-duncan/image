@@ -23,10 +23,10 @@ class PsdBlendingRanges {
     int numChannels = len ~/ 8;
 
     if (numChannels > 0) {
-      blackSrc = new Uint16List(numChannels);
-      whiteSrc = new Uint16List(numChannels);
-      blackDst = new Uint16List(numChannels);
-      whiteDst = new Uint16List(numChannels);
+      blackSrc = Uint16List(numChannels);
+      whiteSrc = Uint16List(numChannels);
+      blackDst = Uint16List(numChannels);
+      whiteDst = Uint16List(numChannels);
 
       for (int i = 0; i < numChannels; ++i) {
         blackSrc[i] = input.readUint16();

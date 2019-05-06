@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Directory dir = new Directory('test/res/gif');
+  Directory dir = Directory('test/res/gif');
   List files = dir.listSync();
 
   group('Gif/getInfo', () {
@@ -16,7 +16,7 @@ void main() {
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
 
-        GifInfo data = new GifDecoder().startDecode(bytes);
+        GifInfo data = GifDecoder().startDecode(bytes);
         if (data == null) {
           throw new ImageException('Unable to parse Gif info: $name.');
         }
@@ -33,7 +33,7 @@ void main() {
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
-        Image image = new GifDecoder().decodeImage(bytes);
+        Image image = GifDecoder().decodeImage(bytes);
         new File('out/gif/$name.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(encodePng(image));
@@ -51,7 +51,7 @@ void main() {
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
-        Animation anim = new GifDecoder().decodeAnimation(bytes);
+        Animation anim = GifDecoder().decodeAnimation(bytes);
         expect(anim.length, equals(30));
         expect(anim.loopCount, equals(0));
       });
@@ -59,10 +59,10 @@ void main() {
   });
 
   group('Gif/encodeAnimation', () {
-    Animation anim = new Animation();
+    Animation anim = Animation();
     anim.loopCount = 10;
     for (var i = 0; i < 10; i++) {
-      Image image = new Image(480, 120);
+      Image image = Image(480, 120);
       drawString(image, arial_48, 100, 60, i.toString());
       anim.addFrame(image);
     }
@@ -74,10 +74,10 @@ void main() {
   });
 
   group('Gif/encodeImage', () {
-    List<int> bytes = new File('test/res/jpg/jpeg444.jpg').readAsBytesSync();
-    Image image = new JpegDecoder().decodeImage(bytes);
+    List<int> bytes = File('test/res/jpg/jpeg444.jpg').readAsBytesSync();
+    Image image = JpegDecoder().decodeImage(bytes);
 
-    List<int> gif = new GifEncoder().encodeImage(image);
+    List<int> gif = GifEncoder().encodeImage(image);
     new File('out/gif/jpeg444.gif')
           ..createSync(recursive: true)
           ..writeAsBytesSync(gif);

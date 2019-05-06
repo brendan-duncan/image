@@ -9,7 +9,7 @@ import 'seperable_kernel.dart';
  */
 Image seperableConvolution(Image src, SeperableKernel kernel) {
   // Apply the filter horizontally
-  Image tmp = new Image.from(src);
+  Image tmp = Image.from(src);
   kernel.apply(src, tmp, horizontal: true);
 
   // Apply the filter vertically, applying back to the original image.

@@ -255,7 +255,7 @@ class HdrImage {
    * floats in RGBA order.
    */
   Float32List toFloatRgba() {
-    Float32List rgba = new Float32List(width * height * 4);
+    Float32List rgba = Float32List(width * height * 4);
     int w = width;
     int h = height;
     for (int y = 0, di = 0; y < h; ++y) {

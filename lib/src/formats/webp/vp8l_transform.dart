@@ -151,7 +151,7 @@ class VP8LTransform {
 
     while (y < yEnd) {
       int pred = predRow; // this.data+
-      _VP8LMultipliers m = new _VP8LMultipliers();
+      _VP8LMultipliers m = _VP8LMultipliers();
 
       for (int x = 0; x < width; ++x) {
         if ((x & mask) == 0) {
@@ -402,7 +402,7 @@ class VP8LTransform {
 }
 
 class _VP8LMultipliers {
-  final Uint8List data = new Uint8List(3);
+  final Uint8List data = Uint8List(3);
 
   // Note: the members are uint8_t, so that any negative values are
   // automatically converted to "mod 256" values.

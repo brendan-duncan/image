@@ -34,7 +34,7 @@ class PsdImage extends DecodeInfo {
   bool hasAlpha = false;
 
   PsdImage(List<int> bytes) {
-    _input = new InputBuffer(bytes, bigEndian: true);
+    _input = InputBuffer(bytes, bigEndian: true);
 
     _readHeader();
     if (!isValid) {
@@ -102,7 +102,7 @@ class PsdImage extends DecodeInfo {
       return mergedImage;
     }
 
-    mergedImage = new Image(width, height);
+    mergedImage = Image(width, height);
     mergedImage.fill(0);
 
     Uint8List pixels = mergedImage.getBytes();
@@ -438,7 +438,7 @@ class PsdImage extends DecodeInfo {
       }
 
       if (blockSignature == RESOURCE_BLOCK_SIGNATURE) {
-        imageResources[blockId] = new PsdImageResource(blockId, blockName,
+        imageResources[blockId] = PsdImageResource(blockId, blockName,
                                                        blockData);
       }
     }
@@ -465,7 +465,7 @@ class PsdImage extends DecodeInfo {
       }
 
       for (int i = 0; i < count; ++i) {
-        PsdLayer layer = new PsdLayer(layerData);
+        PsdLayer layer = PsdLayer(layerData);
         layers.add(layer);
       }
     }
@@ -495,7 +495,7 @@ class PsdImage extends DecodeInfo {
     Uint16List lineLengths;
     if (compression == PsdChannel.COMPRESS_RLE) {
       int numLines = height * this.channels;
-      lineLengths = new Uint16List(numLines);
+      lineLengths = Uint16List(numLines);
       for (int i = 0; i < numLines; ++i) {
         lineLengths[i] = _imageData.readUint16();
       }
@@ -521,7 +521,7 @@ class PsdImage extends DecodeInfo {
   static Image createImageFromChannels(int colorMode, int bitDepth, int width,
                                        int height,
                                        List<PsdChannel> channelList) {
-    Image output = new Image(width, height);
+    Image output = Image(width, height);
     Uint8List pixels = output.getBytes();
 
     Map<int, PsdChannel> channels = {};

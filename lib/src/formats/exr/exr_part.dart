@@ -11,7 +11,7 @@ import 'exr_compressor.dart';
 
 class ExrPart {
   /// The framebuffer for this exr part.
-  HdrImage framebuffer = new HdrImage();
+  HdrImage framebuffer = HdrImage();
   /// The channels present in this part.
   List<ExrChannel> channels = [];
   /// The extra attributes read from the part header.
@@ -43,12 +43,12 @@ class ExrPart {
       int size = input.readUint32();
       InputBuffer value = input.readBytes(size);
 
-      attributes[name] = new ExrAttribute(name, type, size, value);
+      attributes[name] = ExrAttribute(name, type, size, value);
 
       switch (name) {
         case 'channels':
           while (true) {
-            ExrChannel channel = new ExrChannel(value);
+            ExrChannel channel = ExrChannel(value);
             if (!channel.isValid) {
               break;
             }
@@ -56,7 +56,7 @@ class ExrPart {
           }
           break;
         case 'chromaticities':
-          chromaticities = new Float32List(8);
+          chromaticities = Float32List(8);
           chromaticities[0] = value.readFloat32();
           chromaticities[1] = value.readFloat32();
           chromaticities[2] = value.readFloat32();
@@ -124,8 +124,8 @@ class ExrPart {
         _numYLevels = 1;
       }
 
-      _numXTiles = new List<int>(_numXLevels);
-      _numYTiles = new List<int>(_numYLevels);
+      _numXTiles = List<int>(_numXLevels);
+      _numYTiles = List<int>(_numYLevels);
 
       _calculateNumTiles(_numXTiles, _numXLevels, left, right, _tileWidth,
                          _tileRoundingMode);
@@ -137,17 +137,17 @@ class ExrPart {
       _maxBytesPerTileLine = _bytesPerPixel * _tileWidth;
       //_tileBufferSize = _maxBytesPerTileLine * _tileHeight;
 
-      _compressor = new ExrCompressor(_compressionType, this,
+      _compressor = ExrCompressor(_compressionType, this,
                                       _maxBytesPerTileLine, _tileHeight);
 
-      _offsets = new List<Uint32List>(_numXLevels * _numYLevels);
+      _offsets = List<Uint32List>(_numXLevels * _numYLevels);
       for (int ly = 0, l = 0; ly < _numYLevels; ++ly) {
         for (int lx = 0; lx < _numXLevels; ++lx, ++l) {
-          _offsets[l] = new Uint32List(_numXTiles[lx] * _numYTiles[ly]);
+          _offsets[l] = Uint32List(_numXTiles[lx] * _numYTiles[ly]);
         }
       }
     } else {
-      _bytesPerLine = new Uint32List(height + 1);
+      _bytesPerLine = Uint32List(height + 1);
       for (ExrChannel ch in channels) {
         int nBytes = ch.size * width ~/ ch.xSampling;
         for (int y = 0; y < height; ++y) {
@@ -162,12 +162,12 @@ class ExrPart {
         maxBytesPerLine = Math.max(maxBytesPerLine, _bytesPerLine[y]);
       }
 
-      _compressor = new ExrCompressor(_compressionType, this, maxBytesPerLine);
+      _compressor = ExrCompressor(_compressionType, this, maxBytesPerLine);
 
       _linesInBuffer = _compressor.numScanLines();
       //_lineBufferSize = maxBytesPerLine * _linesInBuffer;
 
-      _offsetInLineBuffer = new Uint32List(_bytesPerLine.length);
+      _offsetInLineBuffer = Uint32List(_bytesPerLine.length);
 
       int offset = 0;
       for (int i = 0; i <= _bytesPerLine.length - 1; ++i) {

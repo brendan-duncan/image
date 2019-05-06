@@ -79,9 +79,9 @@ class WebPFilters {
                                   bool inverse, Uint8List out) {
     final int startOffset = row * stride;
     final int lastRow = row + numRows;
-    InputBuffer s = new InputBuffer(src, offset: startOffset);
-    InputBuffer o = new InputBuffer(src, offset: startOffset);
-    InputBuffer preds = new InputBuffer.from(inverse ? o : s);
+    InputBuffer s = InputBuffer(src, offset: startOffset);
+    InputBuffer o = InputBuffer(src, offset: startOffset);
+    InputBuffer preds = InputBuffer.from(inverse ? o : s);
 
     if (row == 0) {
       // Leftmost pixel is the same as input for topmost scanline.
@@ -113,9 +113,9 @@ class WebPFilters {
                                bool inverse, Uint8List out) {
     final int startOffset = row * stride;
     final int last_row = row + numRows;
-    InputBuffer s = new InputBuffer(src, offset: startOffset);
-    InputBuffer o = new InputBuffer(out, offset: startOffset);
-    InputBuffer preds = new InputBuffer.from(inverse ? o : s);
+    InputBuffer s = InputBuffer(src, offset: startOffset);
+    InputBuffer o = InputBuffer(out, offset: startOffset);
+    InputBuffer preds = InputBuffer.from(inverse ? o : s);
 
     if (row == 0) {
       // Very first top-left pixel is copied.
@@ -153,9 +153,9 @@ class WebPFilters {
                                 bool inverse, Uint8List out) {
     final int startOffset = row * stride;
     final int lastRow = row + numRows;
-    InputBuffer s = new InputBuffer(src, offset: startOffset);
-    InputBuffer o = new InputBuffer(out, offset: startOffset);
-    InputBuffer preds = new InputBuffer.from(inverse ? o : s);
+    InputBuffer s = InputBuffer(src, offset: startOffset);
+    InputBuffer o = InputBuffer(out, offset: startOffset);
+    InputBuffer preds = InputBuffer.from(inverse ? o : s);
 
     // left prediction for top scan-line
     if (row == 0) {

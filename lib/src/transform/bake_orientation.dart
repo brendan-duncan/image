@@ -10,14 +10,14 @@ import 'copy_rotate.dart';
  * data.
  */
 Image bakeOrientation(Image image) {
-  Image bakedImage = new Image.from(image);
+  Image bakedImage = Image.from(image);
   if (!image.exif.hasOrientation || image.exif.orientation == 1) {
     return bakedImage;
   }
 
   // Clear the exif data.
   // TODO: only clear the orientation property
-  bakedImage.exif = new ExifData();
+  bakedImage.exif = ExifData();
   switch (image.exif.orientation) {
     case 2:
       return flipHorizontal(bakedImage);

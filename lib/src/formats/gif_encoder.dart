@@ -15,12 +15,12 @@ class GifEncoder extends Encoder {
 
   void addFrame(Image image, {int duration}) {
     if (output == null) {
-      output = new OutputBuffer();
+      output = OutputBuffer();
 
       if (duration != null) {
         this.delay = duration;
       }
-      _lastColorMap = new NeuralQuantizer(image);
+      _lastColorMap = NeuralQuantizer(image);
       _lastImage = _lastColorMap.getIndexMap(image);
       _width = image.width;
       _height = image.height;
@@ -38,7 +38,7 @@ class GifEncoder extends Encoder {
     if (duration != null) {
       this.delay = duration;
     }
-    _lastColorMap = new NeuralQuantizer(image);
+    _lastColorMap = NeuralQuantizer(image);
     _lastImage = _lastColorMap.getIndexMap(image);
   }
 
@@ -121,13 +121,13 @@ class GifEncoder extends Encoder {
     _curAccum = 0;
     _curBits = 0;
     _blockSize = 0;
-    _block = new Uint8List(256);
+    _block = Uint8List(256);
 
     const int initCodeSize = 8;
     output.writeByte(initCodeSize);
 
-    Int32List hTab = new Int32List(HSIZE);
-    Int32List codeTab = new Int32List(HSIZE);
+    Int32List hTab = Int32List(HSIZE);
+    Int32List codeTab = Int32List(HSIZE);
     int remaining = width * height;
     int curPixel = 0;
 

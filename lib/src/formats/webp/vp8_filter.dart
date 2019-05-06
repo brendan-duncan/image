@@ -10,7 +10,7 @@ class VP8Filter {
   }
 
   void simpleVFilter16(InputBuffer p, int stride, int thresh) {
-    InputBuffer p2 = new InputBuffer.from(p);
+    InputBuffer p2 = InputBuffer.from(p);
     for (int i = 0; i < 16; ++i) {
       p2.offset = p.offset + i;
       if (_needsFilter(p2, stride, thresh)) {
@@ -20,7 +20,7 @@ class VP8Filter {
   }
 
   void simpleHFilter16(InputBuffer p, int stride, int thresh) {
-    InputBuffer p2 = new InputBuffer.from(p);
+    InputBuffer p2 = InputBuffer.from(p);
     for (int i = 0; i < 16; ++i) {
       p2.offset = p.offset + i * stride;
       if (_needsFilter(p2, 1, thresh)) {
@@ -30,7 +30,7 @@ class VP8Filter {
   }
 
   void simpleVFilter16i(InputBuffer p, int stride, int thresh) {
-    InputBuffer p2 = new InputBuffer.from(p);
+    InputBuffer p2 = InputBuffer.from(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4 * stride;
       simpleVFilter16(p2, stride, thresh);
@@ -38,7 +38,7 @@ class VP8Filter {
   }
 
   void simpleHFilter16i(InputBuffer p, int stride, int thresh) {
-    InputBuffer p2 = new InputBuffer.from(p);
+    InputBuffer p2 = InputBuffer.from(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4;
       simpleHFilter16(p2, stride, thresh);
@@ -59,7 +59,7 @@ class VP8Filter {
   // on three inner edges
   void vFilter16i(InputBuffer p, int stride, int thresh, int ithresh,
                   int hev_thresh) {
-    InputBuffer p2 = new InputBuffer.from(p);
+    InputBuffer p2 = InputBuffer.from(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4 * stride;
       _filterLoop24(p2, stride, 1, 16, thresh, ithresh, hev_thresh);
@@ -68,7 +68,7 @@ class VP8Filter {
 
   void hFilter16i(InputBuffer p, int stride, int thresh, int ithresh,
                   int hev_thresh) {
-    InputBuffer p2 = new InputBuffer.from(p);
+    InputBuffer p2 = InputBuffer.from(p);
     for (int k = 3; k > 0; --k) {
       p2.offset += 4;
       _filterLoop24(p2, 1, stride, 16, thresh, ithresh, hev_thresh);
@@ -92,23 +92,23 @@ class VP8Filter {
 
   void vFilter8i(InputBuffer u, InputBuffer v, int stride, int thresh, int ithresh,
                  int hev_thresh) {
-    InputBuffer u2 = new InputBuffer.from(u, offset: 4 * stride);
-    InputBuffer v2 = new InputBuffer.from(v, offset: 4 * stride);
+    InputBuffer u2 = InputBuffer.from(u, offset: 4 * stride);
+    InputBuffer v2 = InputBuffer.from(v, offset: 4 * stride);
     _filterLoop24(u2, stride, 1, 8, thresh, ithresh, hev_thresh);
     _filterLoop24(v2, stride, 1, 8, thresh, ithresh, hev_thresh);
   }
 
   void hFilter8i(InputBuffer u, InputBuffer v, int stride, int thresh, int ithresh,
                  int hev_thresh) {
-    InputBuffer u2 = new InputBuffer.from(u, offset: 4);
-    InputBuffer v2 = new InputBuffer.from(v, offset: 4);
+    InputBuffer u2 = InputBuffer.from(u, offset: 4);
+    InputBuffer v2 = InputBuffer.from(v, offset: 4);
     _filterLoop24(u2, 1, stride, 8, thresh, ithresh, hev_thresh);
     _filterLoop24(v2, 1, stride, 8, thresh, ithresh, hev_thresh);
   }
 
   void _filterLoop26(InputBuffer p, int hstride, int vstride, int size,
                      int thresh, int ithresh, int hev_thresh) {
-    InputBuffer p2 = new InputBuffer.from(p);
+    InputBuffer p2 = InputBuffer.from(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
         if (_hev(p2, hstride, hev_thresh)) {
@@ -123,7 +123,7 @@ class VP8Filter {
 
   void _filterLoop24(InputBuffer p, int hstride, int vstride, int size,
                      int thresh, int ithresh, int hev_thresh) {
-    InputBuffer p2 = new InputBuffer.from(p);
+    InputBuffer p2 = InputBuffer.from(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
         if (_hev(p2, hstride, hev_thresh)) {
@@ -226,7 +226,7 @@ class VP8Filter {
   }
 
   void transformOne(InputBuffer src, InputBuffer dst) {
-    Int32List C = new Int32List(4 * 4);
+    Int32List C = Int32List(4 * 4);
     int si = 0;
     int di = 0;
     int tmp = 0;
@@ -345,7 +345,7 @@ class VP8Filter {
     final int D = dst[-1 + 2 * VP8.BPS];
     final int E = dst[-1 + 3 * VP8.BPS];
 
-    InputBuffer d2 = new InputBuffer.from(dst);
+    InputBuffer d2 = InputBuffer.from(dst);
 
     d2.toUint32List()[0] = 0x01010101 * AVG3(A, B, C);
     d2.offset += VP8.BPS;
@@ -681,15 +681,15 @@ class VP8Filter {
   }
 
   /// abs(i)
-  static Uint8List abs0 = new Uint8List(255 + 255 + 1);
+  static Uint8List abs0 = Uint8List(255 + 255 + 1);
   /// abs(i)>>1
-  static Uint8List abs1 = new Uint8List(255 + 255 + 1);
+  static Uint8List abs1 = Uint8List(255 + 255 + 1);
   /// clips [-1020, 1020] to [-128, 127]
-  static Int8List sclip1 = new Int8List(1020 + 1020 + 1);
+  static Int8List sclip1 = Int8List(1020 + 1020 + 1);
   /// clips [-112, 112] to [-16, 15]
-  static Int8List sclip2 = new Int8List(112 + 112 + 1);
+  static Int8List sclip2 = Int8List(112 + 112 + 1);
   /// clips [-255,510] to [0,255]
-  static Uint8List clip1 = new Uint8List(255 + 510 + 1);
+  static Uint8List clip1 = Uint8List(255 + 510 + 1);
 
   static void _initTables() {
     if (!_tablesInitialized) {

@@ -10,7 +10,7 @@ class GifColorMap {
 
   GifColorMap(int numColors) :
     this.numColors = numColors,
-    colors = new Uint8List(numColors * 3) {
+    colors = Uint8List(numColors * 3) {
     bitsPerPixel = _bitSize(numColors);
   }
 

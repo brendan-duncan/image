@@ -44,7 +44,7 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
     newImageHeight = shadowHeight + shadowOffsetY + vShadow;
   }
 
-  Image dst = new Image(newImageWidth, newImageHeight);
+  Image dst = Image(newImageWidth, newImageHeight);
   dst.fill(0x00ffffff);
 
   copyInto(dst, src, dstX: shadowOffsetX, dstY: shadowOffsetY);

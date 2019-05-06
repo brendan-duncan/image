@@ -39,7 +39,7 @@ class JpegEncoder extends Encoder {
   }
 
   List<int> encodeImage(Image image) {
-    OutputBuffer fp = new OutputBuffer(bigEndian: true);
+    OutputBuffer fp = OutputBuffer(bigEndian: true);
 
     // Add JPEG headers
     _writeMarker(fp, Jpeg.M_SOI);
@@ -187,7 +187,7 @@ class JpegEncoder extends Encoder {
   List _computeHuffmanTbl(List nrcodes, List std_table) {
     int codevalue = 0;
     int pos_in_table = 0;
-    List HT = new List();
+    List HT = List();
     for (int k = 1; k <= 16; k++) {
       for (int j = 1; j <= nrcodes[k]; j++) {
         int index = std_table[pos_in_table];
@@ -575,24 +575,24 @@ class JpegEncoder extends Encoder {
     _bytepos = 7;
   }
 
-  final YTable = new Uint8List(64);
-  final UVTable = new Uint8List(64);
-  final fdtbl_Y = new Float32List(64);
-  final fdtbl_UV = new Float32List(64);
+  final YTable = Uint8List(64);
+  final UVTable = Uint8List(64);
+  final fdtbl_Y = Float32List(64);
+  final fdtbl_UV = Float32List(64);
   List YDC_HT;
   List UVDC_HT;
   List YAC_HT;
   List UVAC_HT;
 
-  final bitcode = new List(65535);
-  final category = new List(65535);
-  final outputfDCTQuant = new List<int>(64);
-  final DU = new List(64);
+  final bitcode = List(65535);
+  final category = List(65535);
+  final outputfDCTQuant = List<int>(64);
+  final DU = List(64);
 
-  final Float32List YDU = new Float32List(64);
-  final Float32List UDU = new Float32List(64);
-  final Float32List VDU = new Float32List(64);
-  final Int32List RGB_YUV_TABLE = new Int32List(2048);
+  final Float32List YDU = Float32List(64);
+  final Float32List UDU = Float32List(64);
+  final Float32List VDU = Float32List(64);
+  final Int32List RGB_YUV_TABLE = Int32List(2048);
   int currentQuality;
 
   static const List<int> ZIGZAG = const [

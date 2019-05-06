@@ -5,21 +5,21 @@ import 'package:test/test.dart';
 void main() {
   group('PNG', () {
     test('encode', () {
-      Image image = new Image(64, 64);
+      Image image = Image(64, 64);
       image.fill(getColor(100, 200, 255));
 
       // Encode the image to PNG
-      List<int> png = new PngEncoder().encodeImage(image);
+      List<int> png = PngEncoder().encodeImage(image);
       new Io.File('out/png/encode.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
     });
 
     test('encodeAnimation', () {
-      Animation anim = new Animation();
+      Animation anim = Animation();
       anim.loopCount = 10;
       for (var i = 0; i < 10; i++) {
-        Image image = new Image(480, 120);
+        Image image = Image(480, 120);
         drawString(image, arial_48, 100, 60, i.toString());
         anim.addFrame(image);
       }
@@ -31,8 +31,8 @@ void main() {
     });
 
     test('decode', () {
-      List<int> bytes = new Io.File('out/png/encode.png').readAsBytesSync();
-      Image image = new PngDecoder().decodeImage(bytes);
+      List<int> bytes = Io.File('out/png/encode.png').readAsBytesSync();
+      Image image = PngDecoder().decodeImage(bytes);
 
       expect(image.width, equals(64));
       expect(image.height, equals(64));
@@ -41,27 +41,27 @@ void main() {
         expect(image[i], equals(c));
       }
 
-      List<int> png = new PngEncoder().encodeImage(image);
+      List<int> png = PngEncoder().encodeImage(image);
       new Io.File('out/png/decode.png')
             .writeAsBytesSync(png);
     });
 
     test('iCCP', () {
-      final bytes = new Io.File('test/res/png/iCCP.png').readAsBytesSync();
-      final image = new PngDecoder().decodeImage(bytes);
+      final bytes = Io.File('test/res/png/iCCP.png').readAsBytesSync();
+      final image = PngDecoder().decodeImage(bytes);
       expect(image.iccProfile, isNotNull);
       expect(image.iccProfile.data, isNotNull);
 
-      final png = new PngEncoder().encodeImage(image);
+      final png = PngEncoder().encodeImage(image);
 
-      final image2 = new PngDecoder().decodeImage(png);
+      final image2 = PngDecoder().decodeImage(png);
       expect(image2.iccProfile, isNotNull);
       expect(image2.iccProfile.data, isNotNull);
       expect(image2.iccProfile.data.length, equals(image.iccProfile.data.length));
     });
 
 
-    Io.Directory dir = new Io.Directory('test/res/png');
+    Io.Directory dir = Io.Directory('test/res/png');
     List files = dir.listSync();
 
     for (var f in files) {
@@ -110,13 +110,13 @@ void main() {
         } else {
           Animation anim = decodeAnimation(file.readAsBytesSync());
           if (anim.length == 1) {
-            List<int> png = new PngEncoder().encodeImage(anim[0]);
+            List<int> png = PngEncoder().encodeImage(anim[0]);
             new Io.File('out/png/${name}')
                   ..createSync(recursive: true)
                   ..writeAsBytesSync(png);
           } else {
             for (int i = 0; i < anim.length; ++i) {
-              List<int> png = new PngEncoder().encodeImage(anim[i]);
+              List<int> png = PngEncoder().encodeImage(anim[i]);
               new Io.File('out/png/${name}-$i.png')
                     ..createSync(recursive: true)
                     ..writeAsBytesSync(png);

@@ -22,7 +22,7 @@ class PvrtcEncoder {
   static const int PVR_RGBA_4BPP = 3;
 
   Uint8List encodePvr(Image bitmap, {int format: PVR_AUTO}) {
-    OutputBuffer output = new OutputBuffer();
+    OutputBuffer output = OutputBuffer();
 
     var pvrtc;
     if (format == PVR_AUTO) {
@@ -94,12 +94,12 @@ class PvrtcEncoder {
     var bitmapData = bitmap.getBytes();
 
     // Allocate enough data for encoding the image.
-    var outputData = new Uint8List((bitmap.width * bitmap.height) ~/ 2);
-    var packet = new PvrtcPacket(outputData);
-    var p0 = new PvrtcPacket(outputData);
-    var p1 = new PvrtcPacket(outputData);
-    var p2 = new PvrtcPacket(outputData);
-    var p3 = new PvrtcPacket(outputData);
+    var outputData = Uint8List((bitmap.width * bitmap.height) ~/ 2);
+    var packet = PvrtcPacket(outputData);
+    var p0 = PvrtcPacket(outputData);
+    var p1 = PvrtcPacket(outputData);
+    var p2 = PvrtcPacket(outputData);
+    var p3 = PvrtcPacket(outputData);
 
     for (int y = 0; y < blocks; ++y) {
       for (int x = 0; x < blocks; ++x) {
@@ -151,7 +151,7 @@ class PvrtcEncoder {
             int b = bitmapData[pi + 2];
 
             var d = cb - ca;
-            var p = new PvrtcColorRgb(r * 16, g * 16, b * 16);
+            var p = PvrtcColorRgb(r * 16, g * 16, b * 16);
             var v = p - ca;
 
             // PVRTC uses weightings of 0, 3/8, 5/8 and 1
@@ -199,12 +199,12 @@ class PvrtcEncoder {
     var bitmapData = bitmap.getBytes();
 
     // Allocate enough data for encoding the image.
-    var outputData = new Uint8List((bitmap.width * bitmap.height) ~/ 2);
-    var packet = new PvrtcPacket(outputData);
-    var p0 = new PvrtcPacket(outputData);
-    var p1 = new PvrtcPacket(outputData);
-    var p2 = new PvrtcPacket(outputData);
-    var p3 = new PvrtcPacket(outputData);
+    var outputData = Uint8List((bitmap.width * bitmap.height) ~/ 2);
+    var packet = PvrtcPacket(outputData);
+    var p0 = PvrtcPacket(outputData);
+    var p1 = PvrtcPacket(outputData);
+    var p2 = PvrtcPacket(outputData);
+    var p3 = PvrtcPacket(outputData);
 
     for (int y = 0; y < blocks; ++y) {
       for (int x = 0; x < blocks; ++x) {
@@ -257,7 +257,7 @@ class PvrtcEncoder {
             int a = bitmapData[pi + 3];
 
             var d = cb - ca;
-            var p = new PvrtcColorRgba(r * 16, g * 16, b * 16, a * 16);
+            var p = PvrtcColorRgba(r * 16, g * 16, b * 16, a * 16);
             var v = p - ca;
 
             // PVRTC uses weightings of 0, 3/8, 5/8 and 1
@@ -300,7 +300,7 @@ class PvrtcEncoder {
       return new PvrtcColorRgb(getRed(c), getGreen(c), getBlue(c));
     }
 
-    var cbb = new PvrtcColorBoundingBox(_pixel(0), _pixel(0));
+    var cbb = PvrtcColorBoundingBox(_pixel(0), _pixel(0));
     cbb.add(_pixel(1));
     cbb.add(_pixel(2));
     cbb.add(_pixel(3));
@@ -334,7 +334,7 @@ class PvrtcEncoder {
       return new PvrtcColorRgba(getRed(c), getGreen(c), getBlue(c), getAlpha(c));
     }
 
-    var cbb = new PvrtcColorBoundingBox(_pixel(0), _pixel(0));
+    var cbb = PvrtcColorBoundingBox(_pixel(0), _pixel(0));
     cbb.add(_pixel(1));
     cbb.add(_pixel(2));
     cbb.add(_pixel(3));

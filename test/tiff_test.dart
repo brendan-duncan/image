@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Io.Directory dir = new Io.Directory('res/tiff');
+  Io.Directory dir = Io.Directory('res/tiff');
   if (!dir.existsSync()) {
     return;
   }
@@ -20,7 +20,7 @@ void main() {
       test('$name', () {
         List<int> bytes = f.readAsBytesSync();
 
-        TiffInfo info = new TiffDecoder().startDecode(bytes);
+        TiffInfo info = TiffDecoder().startDecode(bytes);
         if (info == null) {
           throw new ImageException('Unable to parse Tiff info: $name.');
         }
@@ -63,12 +63,12 @@ void main() {
       test('$name', () {
         print(name);
         List<int> bytes = f.readAsBytesSync();
-        Image image = new TiffDecoder().decodeImage(bytes);
+        Image image = TiffDecoder().decodeImage(bytes);
         if (image == null) {
           throw new ImageException('Unable to decode TIFF Image: $name.');
         }
 
-        List<int> png = new PngEncoder().encodeImage(image);
+        List<int> png = PngEncoder().encodeImage(image);
         new Io.File('out/tif/${name}.png')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);

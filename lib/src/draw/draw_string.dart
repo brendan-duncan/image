@@ -4,10 +4,10 @@ import '../color.dart';
 import '../image.dart';
 import 'draw_pixel.dart';
 
-var _r_lut = new Uint8List(256);
-var _g_lut = new Uint8List(256);
-var _b_lut = new Uint8List(256);
-var _a_lut = new Uint8List(256);
+var _r_lut = Uint8List(256);
+var _g_lut = Uint8List(256);
+var _b_lut = Uint8List(256);
+var _a_lut = Uint8List(256);
 
 /**
  * Draw a string horizontally into [image] horizontally into [image] at position

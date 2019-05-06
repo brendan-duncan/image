@@ -27,12 +27,12 @@ class ExrHuffman {
 
     compressed.skip(4);
 
-    List<int> freq = new List<int>(HUF_ENCSIZE);
+    List<int> freq = List<int>(HUF_ENCSIZE);
     freq.fillRange(0, HUF_ENCSIZE, 0);
 
-    List<ExrHufDec> hdec = new List<ExrHufDec>(HUF_DECSIZE);
+    List<ExrHufDec> hdec = List<ExrHufDec>(HUF_DECSIZE);
     for (int i = 0; i < HUF_DECSIZE; ++i) {
-      hdec[i] = new ExrHufDec();
+      hdec[i] = ExrHufDec();
     }
 
     unpackEncTable(compressed, nCompressed - 20, im, iM, freq);
@@ -185,7 +185,7 @@ class ExrHuffman {
 
         if (pl.p != null) {
           List<int> p = pl.p;
-          pl.p = new List<int>(pl.lit);
+          pl.p = List<int>(pl.lit);
 
           for (int i = 0; i < pl.lit - 1; ++i) {
             pl.p[i] = p[i];
@@ -271,7 +271,7 @@ class ExrHuffman {
   static int hufCode(int code) => code >> 6;
 
   static void canonicalCodeTable(List<int> hcode) {
-    List<int> n = new List<int>(59);
+    List<int> n = List<int>(59);
     n.fillRange(0, 59, 0);
 
     // For each i from 0 through 58, count the

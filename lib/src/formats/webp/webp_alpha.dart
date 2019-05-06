@@ -106,11 +106,11 @@ class WebPAlpha {
   }
 
   bool _decodeAlphaHeader() {
-    WebPInfo webp = new WebPInfo();
+    WebPInfo webp = WebPInfo();
     webp.width = width;
     webp.height = height;
 
-    _vp8l = new InternalVP8L(input, webp);
+    _vp8l = InternalVP8L(input, webp);
     _vp8l.ioWidth = width;
     _vp8l.ioHeight = height;
 

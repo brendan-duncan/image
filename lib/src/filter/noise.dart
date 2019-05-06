@@ -24,7 +24,7 @@ const int NOISE_RICE = 4;
 Image noise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
   Math.Random random}) {
   if (random == null) {
-    random = new Math.Random();
+    random = Math.Random();
   }
 
   double nsigma = sigma;

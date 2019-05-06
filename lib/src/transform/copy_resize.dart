@@ -29,7 +29,7 @@ Image copyResize(Image src, int width, [int height = -1,
     width = (height * (src.width / src.height)).toInt();
   }
 
-  Image dst = new Image(width, height, src.format, src.exif, src.iccProfile);
+  Image dst = Image(width, height, src.format, src.exif, src.iccProfile);
 
   double dy = src.height / height;
   double dx = src.width / width;

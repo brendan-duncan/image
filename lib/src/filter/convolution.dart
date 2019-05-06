@@ -12,7 +12,7 @@ import '../image.dart';
  */
 Image convolution(Image src, List<num> filter,
                   [num filterDiv = 1.0, num offset = 0.0]) {
-  Image tmp = new Image.from(src);
+  Image tmp = Image.from(src);
 
   for (int y = 0; y < src.height; ++y) {
     for (int x = 0; x < src.width; ++x) {

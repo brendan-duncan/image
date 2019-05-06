@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Io.Directory dir = new Io.Directory('test/res/psd');
+  Io.Directory dir = Io.Directory('test/res/psd');
   List files = dir.listSync();
 
   group('PSD', () {
@@ -16,10 +16,10 @@ void main() {
       test(name, () {
         print('Decoding $name');
 
-        Image psd = new PsdDecoder().decodeImage(f.readAsBytesSync());
+        Image psd = PsdDecoder().decodeImage(f.readAsBytesSync());
 
         if (psd != null) {
-          List<int> outPng = new PngEncoder().encodeImage(psd);
+          List<int> outPng = PngEncoder().encodeImage(psd);
           new Io.File('out/psd/$name.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(outPng);

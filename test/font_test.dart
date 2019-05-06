@@ -7,7 +7,7 @@ void main() {
 
   group('bitmapFont', () {
     test('zip/xml', () {
-      List<int> fontZip = new Io.File('test/res/font/test.zip').readAsBytesSync();
+      List<int> fontZip = Io.File('test/res/font/test.zip').readAsBytesSync();
       BitmapFont font = readFontZip(fontZip);
 
       var img = copyResize(image, 400);
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('zip/text', () {
-      List<int> fontZip = new Io.File('test/res/font/test_text.zip').readAsBytesSync();
+      List<int> fontZip = Io.File('test/res/font/test_text.zip').readAsBytesSync();
       BitmapFont font = readFontZip(fontZip);
 
       var img = copyResize(image, 400);

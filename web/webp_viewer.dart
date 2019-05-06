@@ -12,7 +12,7 @@ void main() {
   for (var _img in images) {
     var img = _img as Html.ImageElement;
     if (img.src.toLowerCase().endsWith('.webp')) {
-      var req = new Html.HttpRequest();
+      var req = Html.HttpRequest();
       req.open('GET', img.src);
       req.overrideMimeType('text\/plain; charset=x-user-defined');
       req.onLoadEnd.listen((e) {

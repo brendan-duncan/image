@@ -21,7 +21,7 @@ void decode(DecodeParam param) {
 // Decode and process an image file in a separate thread (isolate) to avoid
 // stalling the main UI thread.
 void main() async {
-  ReceivePort receivePort = new ReceivePort();
+  ReceivePort receivePort = ReceivePort();
 
   await Isolate.spawn(decode,
       new DecodeParam(new File('test.webp'), receivePort.sendPort));

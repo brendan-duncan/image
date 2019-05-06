@@ -42,7 +42,7 @@ class ExrDecoder extends Decoder {
   }
 
   DecodeInfo startDecode(List<int> data) {
-    exrImage = new ExrImage(data);
+    exrImage = ExrImage(data);
     return exrImage;
   }
 
@@ -88,7 +88,7 @@ class ExrDecoder extends Decoder {
       return null;
     }
 
-    Animation anim = new Animation();
+    Animation anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);

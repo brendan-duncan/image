@@ -25,8 +25,8 @@ class TiffFaxDecoder {
   int oneD;
 
   TiffFaxDecoder(this.fillOrder, this.width, this.height) {
-    prevChangingElems = new List<int>(width);
-    currChangingElems = new List<int>(width);
+    prevChangingElems = List<int>(width);
+    currChangingElems = List<int>(width);
   }
 
   /**
@@ -197,7 +197,7 @@ class TiffFaxDecoder {
     int scanlineStride = (width + 7) ~/ 8;
 
     int a0, a1, b1, b2;
-    List<int> b = new List<int>(2);
+    List<int> b = List<int>(2);
     int entry, code, bits;
     bool isWhite;
     int currIndex = 0;
@@ -347,7 +347,7 @@ class TiffFaxDecoder {
     List<int> temp;
 
     // Return values from getNextChangingElement
-    List<int> b = new List<int>(2);
+    List<int> b = List<int>(2);
 
     uncompressedMode = ((tiffT6Options & 0x02) >> 1);
 

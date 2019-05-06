@@ -22,13 +22,13 @@ abstract class ExrPizCompressor extends ExrCompressor {
 class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCompressor {
   InternalExrPizCompressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
     super(header) {
-    _channelData = new List<_PizChannelData>(header.channels.length);
+    _channelData = List<_PizChannelData>(header.channels.length);
     for (int i = 0; i < _channelData.length; ++i) {
-      _channelData[i] = new _PizChannelData();
+      _channelData[i] = _PizChannelData();
     }
 
     int tmpBufferSize = (_maxScanLineSize * _numScanLines) ~/ 2;
-    _tmpBuffer = new Uint16List(tmpBufferSize);
+    _tmpBuffer = Uint16List(tmpBufferSize);
   }
 
   int numScanLines() => _numScanLines;
@@ -89,7 +89,7 @@ class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCo
                                "(invalid bitmap size).");
     }
 
-    Uint8List bitmap = new Uint8List(BITMAP_SIZE);
+    Uint8List bitmap = Uint8List(BITMAP_SIZE);
     if (minNonZero <= maxNonZero) {
       InputBuffer b = inPtr.readBytes(maxNonZero - minNonZero + 1);
       for (int i = 0, j = minNonZero, len = b.length; i < len; ++i) {
@@ -97,7 +97,7 @@ class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCo
       }
     }
 
-    Uint16List lut = new Uint16List(USHORT_RANGE);
+    Uint16List lut = Uint16List(USHORT_RANGE);
     int maxValue = _reverseLutFromBitmap(bitmap, lut);
 
     // Huffman decoding
@@ -117,7 +117,7 @@ class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCo
     _applyLut(lut, _tmpBuffer, tmpBufferEnd);
 
     if (_output == null) {
-      _output = new OutputBuffer(size: (_maxScanLineSize * _numScanLines) +
+      _output = OutputBuffer(size: (_maxScanLineSize * _numScanLines) +
                                        (65536 + 8192));
     }
     _output.rewind();

@@ -121,14 +121,14 @@ class PsdLayer {
       assert(len == 0 || len == 20 || len == 36);
       if (len > 0) {
         InputBuffer maskData = extra.readBytes(len);
-        mask = new PsdMask(maskData);
+        mask = PsdMask(maskData);
       }
 
       // Layer Blending Ranges
       len = extra.readUint32();
       if (len > 0) {
         InputBuffer data = extra.readBytes(len);
-        blendingRanges = new PsdBlendingRanges(data);
+        blendingRanges = PsdBlendingRanges(data);
       }
 
       // Layer name
@@ -157,12 +157,12 @@ class PsdLayer {
           extra.skip(1);
         }
 
-        additionalData[tag] = new PsdLayerData(tag, data);
+        additionalData[tag] = PsdLayerData(tag, data);
 
         // Layer effects data
         if (tag == 'lrFX') {
           var fxData = (additionalData['lrFX'] as PsdLayerAdditionalData);
-          var data = new InputBuffer.from(fxData.data);
+          var data = InputBuffer.from(fxData.data);
           /*int version =*/ data.readUint16();
           int numFx = data.readUint16();
 
@@ -172,7 +172,7 @@ class PsdLayer {
             int size = data.readUint32();
 
             if (fxTag == 'dsdw') {
-              var fx = new PsdDropShadowEffect();
+              var fx = PsdDropShadowEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
@@ -190,7 +190,7 @@ class PsdLayer {
                                 data.readUint16(), data.readUint16(),
                                 data.readUint16()];
             } else if (fxTag == 'isdw') {
-              var fx = new PsdInnerShadowEffect();
+              var fx = PsdInnerShadowEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
@@ -208,7 +208,7 @@ class PsdLayer {
                                 data.readUint16(), data.readUint16(),
                                 data.readUint16()];
             } else if (fxTag == 'oglw') {
-              var fx = new PsdOuterGlowEffect();
+              var fx = PsdOuterGlowEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
@@ -225,7 +225,7 @@ class PsdLayer {
                                   data.readUint16()];
               }
             } else if (fxTag == 'iglw') {
-              var fx = new PsdInnerGlowEffect();
+              var fx = PsdInnerGlowEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
@@ -243,7 +243,7 @@ class PsdLayer {
                                   data.readUint16()];
               }
             } else if (fxTag == 'bevl') {
-              var fx = new PsdBevelEffect();
+              var fx = PsdBevelEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.angle = data.readUint32();
@@ -272,7 +272,7 @@ class PsdLayer {
                                       data.readUint16()];
               }
             } else if (fxTag == 'sofi') {
-              var fx = new PsdSolidFillEffect();
+              var fx = PsdSolidFillEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blendMode = data.readString(4);

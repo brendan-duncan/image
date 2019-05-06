@@ -13,7 +13,7 @@ abstract class ExrZipCompressor extends ExrCompressor {
 }
 
 class InternalExrZipCompressor extends InternalExrCompressor implements ExrZipCompressor {
-  ZLibDecoder zlib = new ZLibDecoder();
+  ZLibDecoder zlib = ZLibDecoder();
 
   InternalExrZipCompressor(ExrPart header, int maxScanLineSize, this._numScanLines) :
     super(header) {
@@ -59,7 +59,7 @@ class InternalExrZipCompressor extends InternalExrCompressor implements ExrZipCo
 
     // Reorder the pixel data
     if (_outCache == null || _outCache.length != data.length) {
-      _outCache = new Uint8List(data.length);
+      _outCache = Uint8List(data.length);
     }
 
     final int len = data.length;

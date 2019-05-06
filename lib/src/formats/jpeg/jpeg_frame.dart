@@ -13,7 +13,7 @@ class JpegFrame {
   int mcusPerLine;
   int mcusPerColumn;
   final Map<int, JpegComponent> components = {};
-  final List<int> componentsOrder = new List<int>();
+  final List<int> componentsOrder = List<int>();
 
   void prepare() {
     for (int componentId in components.keys) {
@@ -38,11 +38,11 @@ class JpegFrame {
       int blocksPerLineForMcu = mcusPerLine * component.h;
       int blocksPerColumnForMcu = mcusPerColumn * component.v;
 
-      List blocks = new List(blocksPerColumnForMcu);
+      List blocks = List(blocksPerColumnForMcu);
       for (int i = 0; i < blocksPerColumnForMcu; i++) {
-        List row = new List(blocksPerLineForMcu);
+        List row = List(blocksPerLineForMcu);
         for (int j = 0; j < blocksPerLineForMcu; j++) {
-          row[j] = new Int32List(64);
+          row[j] = Int32List(64);
         }
         blocks[i] = row;
       }

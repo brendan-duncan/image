@@ -50,14 +50,14 @@ class TiffImage {
   HdrImage hdrImage;
 
   TiffImage(InputBuffer p) {
-    InputBuffer p3 = new InputBuffer.from(p);
+    InputBuffer p3 = InputBuffer.from(p);
 
     int numDirEntries = p.readUint16();
     for (int i = 0; i < numDirEntries; ++i) {
       int tag = p.readUint16();
       int type = p.readUint16();
       int numValues = p.readUint32();
-      TiffEntry entry = new TiffEntry(tag, type, numValues);
+      TiffEntry entry = TiffEntry(tag, type, numValues);
 
       // The value for the tag is either stored in another location,
       // or within the tag itself (if the size fits in 4 bytes).
@@ -223,7 +223,7 @@ class TiffImage {
                       compression != null;
 
   Image decode(InputBuffer p) {
-    image = new Image(width, height);
+    image = Image(width, height);
     for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
       for (int tileX = 0; tileX < tilesX; ++tileX, ++ti) {
         _decodeTile(p, tileX, tileY);
@@ -233,7 +233,7 @@ class TiffImage {
   }
 
   HdrImage decodeHdr(InputBuffer p) {
-    hdrImage = new HdrImage.create(width, height, 4, HdrImage.HALF);
+    hdrImage = HdrImage.create(width, height, 4, HdrImage.HALF);
       for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
         for (int tileX = 0; tileX < tilesX; ++tileX, ++ti) {
           _decodeTile(p, tileX, tileY);
@@ -270,8 +270,8 @@ class TiffImage {
         bdata = p;
 
       } else if (compression == COMPRESSION_LZW) {
-        bdata = new InputBuffer(new Uint8List(bytesInThisTile));
-        LzwDecoder decoder = new LzwDecoder();
+        bdata = InputBuffer(new Uint8List(bytesInThisTile));
+        LzwDecoder decoder = LzwDecoder();
         try {
           decoder.decode(new InputBuffer.from(p, offset: 0, length: byteCount),
                          bdata.buffer);
@@ -290,27 +290,27 @@ class TiffImage {
           }
         }
       } else if (compression == COMPRESSION_PACKBITS) {
-        bdata = new InputBuffer(new Uint8List(bytesInThisTile));
+        bdata = InputBuffer(new Uint8List(bytesInThisTile));
         _decodePackbits(p, bytesInThisTile, bdata.buffer);
 
       } else if (compression == COMPRESSION_DEFLATE) {
         List<int> data = p.toList(0, byteCount);
-        List<int> outData = new Inflate(data).getBytes();
-        bdata = new InputBuffer(outData);
+        List<int> outData = Inflate(data).getBytes();
+        bdata = InputBuffer(outData);
 
       } else if (compression == COMPRESSION_ZIP) {
         List<int> data = p.toList(0, byteCount);
-        List<int> outData = new ZLibDecoder().decodeBytes(data);
-        bdata = new InputBuffer(outData);
+        List<int> outData = ZLibDecoder().decodeBytes(data);
+        bdata = InputBuffer(outData);
       } else if (compression == COMPRESSION_OLD_JPEG) {
         if (image == null) {
-          image = new Image(width, height);
+          image = Image(width, height);
         }
         List<int> data = p.toList(0, byteCount);
-        Image tile = new JpegDecoder().decodeImage(data);
+        Image tile = JpegDecoder().decodeImage(data);
         _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight);
         if (hdrImage != null) {
-          hdrImage = new HdrImage.fromImage(image);
+          hdrImage = HdrImage.fromImage(image);
         }
         return;
       } else {
@@ -540,12 +540,12 @@ class TiffImage {
       } else {
         bytesInThisTile = (tileWidth ~/ 8 + 1) * tileHeight;
       }
-      bdata = new InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
       _decodePackbits(p, bytesInThisTile, bdata.buffer);
     } else if (compression == COMPRESSION_LZW) {
-      bdata = new InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
 
-      LzwDecoder decoder = new LzwDecoder();
+      LzwDecoder decoder = LzwDecoder();
       decoder.decode(new InputBuffer.from(p, length: byteCount), bdata.buffer);
 
       // Horizontal Differencing Predictor
@@ -560,21 +560,21 @@ class TiffImage {
         }
       }
     } else if (compression == COMPRESSION_CCITT_RLE) {
-      bdata = new InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
       try {
         new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
             decode1D(bdata, p, 0, tileHeight);
       } catch (_) {
       }
     } else if (compression == COMPRESSION_CCITT_FAX3) {
-      bdata = new InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
       try {
         new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
             decode2D(bdata, p, 0, tileHeight, t4Options);
       } catch (_) {
       }
     } else if (compression == COMPRESSION_CCITT_FAX4) {
-      bdata = new InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
       try {
         new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
             decodeT6(bdata, p, 0, tileHeight, t6Options);
@@ -582,12 +582,12 @@ class TiffImage {
       }
     } else if (compression == COMPRESSION_ZIP) {
       List<int> data = p.toList(0, byteCount);
-      List<int> outData = new ZLibDecoder().decodeBytes(data);
-      bdata = new InputBuffer(outData);
+      List<int> outData = ZLibDecoder().decodeBytes(data);
+      bdata = InputBuffer(outData);
     } else if (compression == COMPRESSION_DEFLATE) {
       List<int> data = p.toList(0, byteCount);
-      List<int> outData = new Inflate(data).getBytes();
-      bdata = new InputBuffer(outData);
+      List<int> outData = Inflate(data).getBytes();
+      bdata = InputBuffer(outData);
     } else if (compression == COMPRESSION_NONE) {
       bdata = p;
     } else {
@@ -598,7 +598,7 @@ class TiffImage {
       return;
     }
 
-    TiffBitReader br = new TiffBitReader(bdata);
+    TiffBitReader br = TiffBitReader(bdata);
     final int white = isWhiteZero ? 0xff000000 : 0xffffffff;
     final int black = isWhiteZero ? 0xffffffff : 0xff000000;
 

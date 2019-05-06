@@ -313,9 +313,9 @@ class Half {
     if (_toFloatUint32 != null) {
       return;
     }
-    _toFloatUint32 = new Uint32List(1 << 16);
-    _toFloatFloat32 = new Float32List.view(_toFloatUint32.buffer);
-    _eLut = new Uint16List(1 << 9);
+    _toFloatUint32 = Uint32List(1 << 16);
+    _toFloatFloat32 = Float32List.view(_toFloatUint32.buffer);
+    _eLut = Uint16List(1 << 9);
 
     // Init eLut
     for (int i = 0; i < 0x100; i++) {

@@ -9,7 +9,7 @@ void main(List<String> argv) {
 
   String filename = argv[0];
 
-  Io.File file = new Io.File(filename);
+  Io.File file = Io.File(filename);
   if (!file.existsSync()) {
     print('File does not exist: ${filename}');
     return;
@@ -28,7 +28,7 @@ void main(List<String> argv) {
   // ... do something with image ...
 
   // Save the image as a PNG
-  List<int> png = new PngEncoder().encodeImage(image);
+  List<int> png = PngEncoder().encodeImage(image);
   // Write the PNG to disk
   new Io.File(filename + '.png').writeAsBytesSync(png);
 }

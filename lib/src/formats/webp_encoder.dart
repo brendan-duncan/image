@@ -30,7 +30,7 @@ class WebPEncoder extends Encoder {
    */
   void addFrame(Image image, {int duration}) {
     if (output == null) {
-      output = new OutputBuffer();
+      output = OutputBuffer();
 
       if (duration != null) {
         this.delay = duration;

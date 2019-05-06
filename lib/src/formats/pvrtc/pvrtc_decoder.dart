@@ -21,7 +21,7 @@ class PvrtcDecoder {
       }
     }
 
-    var input = new InputBuffer(data, bigEndian: false);
+    var input = InputBuffer(data, bigEndian: false);
     var magic = input.readUint32();
     if (magic == 0x03525650) {
       return decodePVR3(data);
@@ -34,7 +34,7 @@ class PvrtcDecoder {
     // additional heuristic
     const int HEADER_SIZE = 52;
     if (data.length > HEADER_SIZE) {
-      InputBuffer input = new InputBuffer(data, bigEndian: false);
+      InputBuffer input = InputBuffer(data, bigEndian: false);
       // Header
       int size = input.readUint32();
       if (size == HEADER_SIZE) {
@@ -136,7 +136,7 @@ class PvrtcDecoder {
       return null;
     }
 
-    InputBuffer input = new InputBuffer(data, bigEndian: false);
+    InputBuffer input = InputBuffer(data, bigEndian: false);
     // Header
     int size = input.readUint32();
     int height = input.readUint32();
@@ -173,7 +173,7 @@ class PvrtcDecoder {
 
     switch (ptype) {
       case PVR_TYPE_RGBA4444:
-        Image image = new Image(width, height);
+        Image image = Image(width, height);
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
@@ -193,7 +193,7 @@ class PvrtcDecoder {
         }
         return image;
       case PVR_TYPE_RGBA5551:
-        Image image = new Image(width, height);
+        Image image = Image(width, height);
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
@@ -213,7 +213,7 @@ class PvrtcDecoder {
         }
         return image;
       case PVR_TYPE_RGBA8888:
-        Image image = new Image(width, height);
+        Image image = Image(width, height);
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
@@ -226,7 +226,7 @@ class PvrtcDecoder {
         }
         return image;
       case PVR_TYPE_RGB565:
-        Image image = new Image(width, height);
+        Image image = Image(width, height);
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
@@ -244,7 +244,7 @@ class PvrtcDecoder {
         }
         return image;
       case PVR_TYPE_RGB555:
-        Image image = new Image(width, height);
+        Image image = Image(width, height);
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
@@ -262,7 +262,7 @@ class PvrtcDecoder {
         }
         return image;
       case PVR_TYPE_RGB888:
-        Image image = new Image(width, height);
+        Image image = Image(width, height);
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
@@ -275,7 +275,7 @@ class PvrtcDecoder {
         }
         return image;
       case PVR_TYPE_I8:
-        Image image = new Image(width, height);
+        Image image = Image(width, height);
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
@@ -289,7 +289,7 @@ class PvrtcDecoder {
         }
         return image;
       case PVR_TYPE_AI8:
-        Image image = new Image(width, height);
+        Image image = Image(width, height);
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
@@ -349,7 +349,7 @@ class PvrtcDecoder {
     const int PVR3_EAC_RG11_U = 27;
     const int PVR3_EAC_RG11_S = 28;*/
 
-    InputBuffer input = new InputBuffer(data);
+    InputBuffer input = InputBuffer(data);
 
     // Header
     int version = input.readUint32();
@@ -455,17 +455,17 @@ class PvrtcDecoder {
   }
 
   Image decodeRgb4bpp(int width, int height, TypedData data) {
-    var result = new Image(width, height, Image.RGB);
+    var result = Image(width, height, Image.RGB);
 
     final int blocks = width ~/ 4;
     final int blockMask = blocks - 1;
 
-    final packet = new PvrtcPacket(data);
-    final p0 = new PvrtcPacket(data);
-    final p1 = new PvrtcPacket(data);
-    final p2 = new PvrtcPacket(data);
-    final p3 = new PvrtcPacket(data);
-    final c = new PvrtcColorRgb();
+    final packet = PvrtcPacket(data);
+    final p0 = PvrtcPacket(data);
+    final p1 = PvrtcPacket(data);
+    final p2 = PvrtcPacket(data);
+    final p3 = PvrtcPacket(data);
+    final c = PvrtcColorRgb();
     const factors = PvrtcPacket.BILINEAR_FACTORS;
     const weights = PvrtcPacket.WEIGHTS;
 
@@ -524,17 +524,17 @@ class PvrtcDecoder {
   }
 
   Image decodeRgba4bpp(int width, int height, TypedData data) {
-    var result = new Image(width, height, Image.RGBA);
+    var result = Image(width, height, Image.RGBA);
 
     final int blocks = width ~/ 4;
     final int blockMask = blocks - 1;
 
-    final packet = new PvrtcPacket(data);
-    final p0 = new PvrtcPacket(data);
-    final p1 = new PvrtcPacket(data);
-    final p2 = new PvrtcPacket(data);
-    final p3 = new PvrtcPacket(data);
-    final c = new PvrtcColorRgba();
+    final packet = PvrtcPacket(data);
+    final p0 = PvrtcPacket(data);
+    final p1 = PvrtcPacket(data);
+    final p2 = PvrtcPacket(data);
+    final p3 = PvrtcPacket(data);
+    final c = PvrtcColorRgba();
     const factors = PvrtcPacket.BILINEAR_FACTORS;
     const weights = PvrtcPacket.WEIGHTS;
 

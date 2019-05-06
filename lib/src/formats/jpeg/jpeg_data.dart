@@ -18,15 +18,15 @@ class JpegData  {
   JpegAdobe adobe;
   JpegFrame frame;
   int resetInterval;
-  ExifData exif = new ExifData();
-  final List<Int16List> quantizationTables = new List(Jpeg.NUM_QUANT_TBLS);
+  ExifData exif = ExifData();
+  final List<Int16List> quantizationTables = List(Jpeg.NUM_QUANT_TBLS);
   final List<JpegFrame> frames = [];
   final List huffmanTablesAC = [];
   final List huffmanTablesDC = [];
   final List<Map> components = [];
 
   bool validate(List<int> bytes) {
-    input = new InputBuffer(bytes, bigEndian: true);
+    input = InputBuffer(bytes, bigEndian: true);
 
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
@@ -58,14 +58,14 @@ class JpegData  {
   }
 
   JpegInfo readInfo(List<int> bytes) {
-    input = new InputBuffer(bytes, bigEndian: true);
+    input = InputBuffer(bytes, bigEndian: true);
 
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
       return null;
     }
 
-    JpegInfo info = new JpegInfo();
+    JpegInfo info = JpegInfo();
 
     bool hasSOF = false;
     bool hasSOS = false;
@@ -102,7 +102,7 @@ class JpegData  {
   }
 
   void read(List<int> bytes) {
-    input = new InputBuffer(bytes, bigEndian: true);
+    input = InputBuffer(bytes, bigEndian: true);
 
     _read();
 
@@ -143,7 +143,7 @@ class JpegData  {
     int Y, Cb, Cr, K, C, M, Ye, R, G, B;
     bool colorTransform = false;
     int dataLength = width * height * components.length;
-    Uint8List data = new Uint8List(dataLength);
+    Uint8List data = Uint8List(dataLength);
 
     switch (components.length) {
       case 1:
@@ -518,10 +518,10 @@ class JpegData  {
 
   void _readExifData(InputBuffer block) {
     if (exif.rawData == null) {
-      exif.rawData = new List<Uint8List>();
+      exif.rawData = List<Uint8List>();
     }
 
-    Uint8List rawData = new Uint8List.fromList(block.toUint8List());
+    Uint8List rawData = Uint8List.fromList(block.toUint8List());
     exif.rawData.add(rawData);
 
     const EXIF_TAG = 0x45786966; // Exif\0\0
@@ -571,7 +571,7 @@ class JpegData  {
       // 'JFIF\0'
       if (appData[0] == 0x4A && appData[1] == 0x46 &&
           appData[2] == 0x49 && appData[3] == 0x46 && appData[4] == 0) {
-        jfif = new JpegJfif();
+        jfif = JpegJfif();
         jfif.majorVersion = appData[5];
         jfif.minorVersion = appData[6];
         jfif.densityUnits = appData[7];
@@ -590,7 +590,7 @@ class JpegData  {
       if (appData[0] == 0x41 && appData[1] == 0x64 &&
           appData[2] == 0x6F && appData[3] == 0x62 &&
           appData[4] == 0x65 && appData[5] == 0) {
-        adobe = new JpegAdobe();
+        adobe = JpegAdobe();
         adobe.version = appData[6];
         adobe.flags0 = shiftL(appData[7], 8) | appData[8];
         adobe.flags1 = shiftL(appData[9], 8) | appData[10];
@@ -612,7 +612,7 @@ class JpegData  {
       }
 
       if (quantizationTables[n] == null) {
-        quantizationTables[n] = new Int16List(64);
+        quantizationTables[n] = Int16List(64);
       }
 
       Int16List tableData = quantizationTables[n];
@@ -638,7 +638,7 @@ class JpegData  {
       throw new ImageException('Duplicate JPG frame data found.');
     }
 
-    frame = new JpegFrame();
+    frame = JpegFrame();
     frame.extended = (marker == Jpeg.M_SOF1);
     frame.progressive = (marker == Jpeg.M_SOF2);
     frame.precision = block.readByte();
@@ -666,14 +666,14 @@ class JpegData  {
     while (!block.isEOS) {
       int index = block.readByte();
 
-      Uint8List bits = new Uint8List(16);
+      Uint8List bits = Uint8List(16);
       int count = 0;
       for (int j = 0; j < 16; j++) {
         bits[j] = block.readByte();
         count += bits[j];
       }
 
-      Uint8List huffmanValues = new Uint8List(count);
+      Uint8List huffmanValues = Uint8List(count);
       for (int j = 0; j < count; j++) {
         huffmanValues[j] = block.readByte();
       }
@@ -704,7 +704,7 @@ class JpegData  {
       throw new ImageException('Invalid SOS block');
     }
 
-    List components = new List(n);
+    List components = List(n);
     for (int i = 0; i < n; i++) {
       int id = block.readByte();
       int c = block.readByte();
@@ -765,7 +765,7 @@ class JpegData  {
         p.index++;
         code.add(p);
         while (code.length <= i) {
-          q = new _JpegHuffman();
+          q = _JpegHuffman();
           code.add(q);
           if (p.children.length <= p.index) {
             p.children.length = p.index + 1;
@@ -778,7 +778,7 @@ class JpegData  {
 
       if ((i + 1) < length) {
         // p here points to last code
-        q = new _JpegHuffman();
+        q = _JpegHuffman();
         code.add(q);
         if (p.children.length <= p.index) {
           p.children.length = p.index + 1;
@@ -796,15 +796,15 @@ class JpegData  {
     final int blocksPerLine = component.blocksPerLine;
     final int blocksPerColumn = component.blocksPerColumn;
     int samplesPerLine = shiftL(blocksPerLine, 3);
-    Int32List R = new Int32List(64);
-    Uint8List r = new Uint8List(64);
-    List<Uint8List> lines = new List(blocksPerColumn * 8);
+    Int32List R = Int32List(64);
+    Uint8List r = Uint8List(64);
+    List<Uint8List> lines = List(blocksPerColumn * 8);
 
     int l = 0;
     for (int blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
       int scanLine = shiftL(blockRow, 3);
       for (int i = 0; i < 8; i++) {
-        lines[l++] = new Uint8List(samplesPerLine);
+        lines[l++] = Uint8List(samplesPerLine);
       }
 
       for (int blockCol = 0; blockCol < blocksPerLine; blockCol++) {
@@ -854,7 +854,7 @@ class JpegData  {
     const int dctClipOffset = 256;
     const int dctClipLength = 768;
     if (dctClip == null) {
-      dctClip = new Uint8List(dctClipLength);
+      dctClip = Uint8List(dctClipLength);
       int i;
       for (i = -256; i < 0; ++i) {
         dctClip[dctClipOffset + i] = 0;
@@ -1145,8 +1145,8 @@ class _JpegHuffman {
 
 /*class _JPEG_HuffTables {
   bool ac_table = false;
-  Uint32List look_up = new Uint32List(256);
-  Uint32List look_up2 = new Uint32List(256);
-  Uint8List code_size = new Uint8List(256);
-  Uint32List tree = new Uint32List(512);
+  Uint32List look_up = Uint32List(256);
+  Uint32List look_up2 = Uint32List(256);
+  Uint8List code_size = Uint8List(256);
+  Uint32List tree = Uint32List(512);
 }*/

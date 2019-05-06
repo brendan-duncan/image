@@ -26,8 +26,8 @@ class JpegDecoder extends Decoder {
   }
 
   DecodeInfo startDecode(List<int> data) {
-    input = new InputBuffer(data, bigEndian: true);
-    info = new JpegData().readInfo(data);
+    input = InputBuffer(data, bigEndian: true);
+    info = JpegData().readInfo(data);
     return info;
   }
 
@@ -37,14 +37,14 @@ class JpegDecoder extends Decoder {
     if (input == null) {
       return null;
     }
-    JpegData jpeg = new JpegData();
+    JpegData jpeg = JpegData();
     jpeg.read(input.buffer);
 
     if (jpeg.frames.length != 1) {
       throw new ImageException('only single frame JPEGs supported');
     }
 
-    Image image = new Image(jpeg.width, jpeg.height, Image.RGB);
+    Image image = Image(jpeg.width, jpeg.height, Image.RGB);
 
     _copyToImage(jpeg, image);
 
@@ -52,14 +52,14 @@ class JpegDecoder extends Decoder {
   }
 
   Image decodeImage(List<int> data, {int frame: 0}) {
-    JpegData jpeg = new JpegData();
+    JpegData jpeg = JpegData();
     jpeg.read(data);
 
     if (jpeg.frames.length != 1) {
       throw new ImageException('only single frame JPEGs supported');
     }
 
-    Image image = new Image(jpeg.width, jpeg.height, Image.RGB);
+    Image image = Image(jpeg.width, jpeg.height, Image.RGB);
 
     _copyToImage(jpeg, image);
 
@@ -72,7 +72,7 @@ class JpegDecoder extends Decoder {
       return null;
     }
 
-    Animation anim = new Animation();
+    Animation anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);
@@ -81,7 +81,7 @@ class JpegDecoder extends Decoder {
   }
 
   void _copyToImage(JpegData jpeg, Image imageData) {
-    imageData.exif = new ExifData.from(jpeg.exif);
+    imageData.exif = ExifData.from(jpeg.exif);
 
     final width = imageData.width;
     final height = imageData.height;

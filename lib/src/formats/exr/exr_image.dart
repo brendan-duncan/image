@@ -15,7 +15,7 @@ class ExrImage extends DecodeInfo {
   List<InternalExrPart> _parts = [];
 
   ExrImage(List<int> bytes) {
-    InputBuffer input = new InputBuffer(bytes);
+    InputBuffer input = InputBuffer(bytes);
     int magic = input.readUint32();
     if (magic != MAGIC) {
       throw new ImageException('File is not an OpenEXR image file.');
@@ -33,13 +33,13 @@ class ExrImage extends DecodeInfo {
     }
 
     if (!_isMultiPart()) {
-      ExrPart part = new InternalExrPart(_isTiled(), input);
+      ExrPart part = InternalExrPart(_isTiled(), input);
       if (part.isValid) {
         _parts.add(part);
       }
     } else {
       while (true) {
-        ExrPart part = new InternalExrPart(_isTiled(), input);
+        ExrPart part = InternalExrPart(_isTiled(), input);
         if (!part.isValid) {
           break;
         }
@@ -66,7 +66,7 @@ class ExrImage extends DecodeInfo {
    * Parse just enough of the file to identify that it's an EXR image.
    */
   static bool isValidFile(List<int> bytes) {
-    InputBuffer input = new InputBuffer(bytes);
+    InputBuffer input = InputBuffer(bytes);
 
     int magic = input.readUint32();
     if (magic != MAGIC) {
@@ -137,9 +137,9 @@ class ExrImage extends DecodeInfo {
     HdrImage framebuffer = part.framebuffer;
     ExrCompressor compressor = part.compressor;
     List<Uint32List> offsets = part.offsets;
-    //Uint32List fbi = new Uint32List(part.channels.length);
+    //Uint32List fbi = Uint32List(part.channels.length);
 
-    InputBuffer imgData = new InputBuffer.from(input);
+    InputBuffer imgData = InputBuffer.from(input);
     for (int ly = 0, l = 0; ly < part.numYLevels; ++ly) {
       for (int lx = 0; lx < part.numXLevels; ++lx, ++l) {
         for (int ty = 0, oi = 0; ty < part.numYTiles[ly]; ++ty) {
@@ -234,13 +234,13 @@ class ExrImage extends DecodeInfo {
     //int minY = part.top;
     //int maxY = minY + part.linesInBuffer - 1;
 
-    Uint32List fbi = new Uint32List(part.channels.length);
+    Uint32List fbi = Uint32List(part.channels.length);
     //int total = 0;
 
     //int xx = 0;
     int yy = 0;
 
-    InputBuffer imgData = new InputBuffer.from(input);
+    InputBuffer imgData = InputBuffer.from(input);
     for (int offset in offsets) {
       imgData.offset = offset;
 

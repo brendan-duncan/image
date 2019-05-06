@@ -8,9 +8,9 @@ import 'encoder.dart';
  */
 class TgaEncoder extends Encoder {
   List<int> encodeImage(Image image) {
-    OutputBuffer out = new OutputBuffer(bigEndian: true);
+    OutputBuffer out = OutputBuffer(bigEndian: true);
 
-    List<int> header = new List<int>(18);
+    List<int> header = List<int>(18);
     header.fillRange(0, 18, 0);
     header[2] = 2;
     header[12] = image.width & 0xff;

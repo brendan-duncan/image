@@ -75,7 +75,7 @@ class BitmapFont {
    * .fnt font definition and associated PNG images.
    */
   BitmapFont.fromZip(List<int> fileData) {
-    Archive arc = new ZipDecoder().decodeBytes(fileData);
+    Archive arc = ZipDecoder().decodeBytes(fileData);
 
     ArchiveFile font_file;
     for (int i = 0; i < arc.numberOfFiles(); ++i) {
@@ -89,7 +89,7 @@ class BitmapFont {
       throw new ImageException('Invalid font archive');
     }
 
-    String font_str = new String.fromCharCodes(font_file.content);
+    String font_str = String.fromCharCodes(font_file.content);
     XML.XmlDocument xml;
 
     if (font_str.startsWith('<font>')) {
@@ -222,7 +222,7 @@ class BitmapFont {
                                        '$filename');
             }
 
-            Image image = new PngDecoder().decodeImage(imageFile.content);
+            Image image = PngDecoder().decodeImage(imageFile.content);
 
             fontPages[id] = image;
           }
@@ -262,7 +262,7 @@ class BitmapFont {
 
           Image fontImage = fontPages[page];
 
-          BitmapFontCharacter ch = new BitmapFontCharacter(id, width, height,
+          BitmapFontCharacter ch = BitmapFontCharacter(id, width, height,
               xoffset, yoffset, xadvance, page, chnl);
 
           characters[id] = ch;
@@ -300,17 +300,17 @@ class BitmapFont {
       switch (tk[0]) {
         case 'info':
           var attrs = _parseParameters(tk);
-          var info = new XML.XmlElement(new XML.XmlName('info'), attrs, []);
+          var info = XML.XmlElement(new XML.XmlName('info'), attrs, []);
           children.add(info);
           break;
         case 'common':
           var attrs = _parseParameters(tk);
-          var node = new XML.XmlElement(new XML.XmlName('common'), attrs, []);
+          var node = XML.XmlElement(new XML.XmlName('common'), attrs, []);
           children.add(node);
           break;
         case 'page':
           var attrs = _parseParameters(tk);
-          var page = new XML.XmlElement(new XML.XmlName('page'), attrs, []);
+          var page = XML.XmlElement(new XML.XmlName('page'), attrs, []);
           pageList.add(page);
           break;
         case 'chars':
@@ -318,7 +318,7 @@ class BitmapFont {
           break;
         case 'char':
           var attrs = _parseParameters(tk);
-          var node = new XML.XmlElement(new XML.XmlName('char'), attrs, []);
+          var node = XML.XmlElement(new XML.XmlName('char'), attrs, []);
           charList.add(node);
           break;
         case 'kernings':
@@ -326,31 +326,31 @@ class BitmapFont {
           break;
         case 'kerning':
           var attrs = _parseParameters(tk);
-          var node = new XML.XmlElement(new XML.XmlName('kerning'), attrs, []);
+          var node = XML.XmlElement(new XML.XmlName('kerning'), attrs, []);
           kerningList.add(node);
           break;
       }
     }
 
     if (charsAttrs != null || charList.isNotEmpty) {
-      var node = new XML.XmlElement(new XML.XmlName('chars'), charsAttrs,
+      var node = XML.XmlElement(new XML.XmlName('chars'), charsAttrs,
           charList);
       children.add(node);
     }
 
     if (kerningsAttrs != null || kerningList.isNotEmpty) {
-      var node = new XML.XmlElement(new XML.XmlName('kernings'), kerningsAttrs,
+      var node = XML.XmlElement(new XML.XmlName('kernings'), kerningsAttrs,
           kerningList);
       children.add(node);
     }
 
     if (pageList.isNotEmpty) {
-      var pages = new XML.XmlElement(new XML.XmlName('pages'), [], pageList);
+      var pages = XML.XmlElement(new XML.XmlName('pages'), [], pageList);
       children.add(pages);
     }
 
-    var xml = new XML.XmlElement(new XML.XmlName('font'), [], children);
-    var doc = new XML.XmlDocument([xml]);
+    var xml = XML.XmlElement(new XML.XmlName('font'), [], children);
+    var doc = XML.XmlDocument([xml]);
 
     return doc;
   }
@@ -369,7 +369,7 @@ class BitmapFont {
       // Remove all " characters
       atk[1] = atk[1].replaceAll('"', '');
 
-      var a = new XML.XmlAttribute(new XML.XmlName(atk[0]), atk[1]);
+      var a = XML.XmlAttribute(new XML.XmlName(atk[0]), atk[1]);
       params.add(a);
     }
     return params;
@@ -404,7 +404,7 @@ class BitmapFontCharacter {
                       this.channel) :
     this.width = width,
     this.height = height,
-    image = new Image(width, height);
+    image = Image(width, height);
 
   String toString() {
     Map x = {'id': id, 'width': width, 'height': height, 'xoffset': xoffset,

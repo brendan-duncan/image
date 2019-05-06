@@ -110,7 +110,7 @@ Image trim(Image src, {int mode: TRIM_TRANSPARENT, sides: TRIM_ALL}) {
 
   List<int> crop = findTrim(src, mode: mode, sides: sides);
 
-  Image dst = new Image(crop[2], crop[3], Image.RGBA, src.exif, src.iccProfile);
+  Image dst = Image(crop[2], crop[3], Image.RGBA, src.exif, src.iccProfile);
   copyInto(dst, src, srcX: crop[0], srcY: crop[1],
            srcW: crop[2], srcH: crop[3], blend: false);
 

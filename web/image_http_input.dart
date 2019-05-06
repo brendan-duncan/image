@@ -22,7 +22,7 @@ void onFileChanged(Html.Event event) {
   Html.FileList files = fileInput.files;
   var file = files.item(0);
 
-  Html.FileReader reader = new Html.FileReader();
+  Html.FileReader reader = Html.FileReader();
   reader.addEventListener("load", onFileLoaded);
   reader.readAsArrayBuffer(file);
 }
@@ -55,7 +55,7 @@ void onFileLoaded(Html.Event event) {
 
     // Draw the image into a canvas.  First create a canvas at the correct
     // resolution.
-    var c = new Html.CanvasElement();
+    var c = Html.CanvasElement();
     Html.document.body.append(c);
     c.width = image.width;
     c.height = image.height;
@@ -72,7 +72,7 @@ void onFileLoaded(Html.Event event) {
     // This requires encoding it to a common format (like PNG), base64 encoding
     // the encoded image, and using a data url for the img src.
 
-    var img = new Html.ImageElement();
+    var img = Html.ImageElement();
     Html.document.body.append(img);
     // encode the image to a PNG
     var png = encodePng(image);

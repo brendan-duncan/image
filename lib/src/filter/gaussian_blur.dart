@@ -25,7 +25,7 @@ Image gaussianBlur(Image src, int radius) {
     double sigma = radius * (2.0 / 3.0);
     double s = 2.0 * sigma * sigma;
 
-    kernel = new SeperableKernel(radius);
+    kernel = SeperableKernel(radius);
 
     double sum = 0.0;
     for (int x = -radius; x <= radius; ++x) {

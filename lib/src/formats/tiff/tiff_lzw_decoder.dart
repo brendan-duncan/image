@@ -114,8 +114,8 @@ class LzwDecoder {
    * Initialize the string table.
    */
   void _initializeStringTable() {
-    _table = new Uint8List(LZ_MAX_CODE + 1);
-    _prefix = new Uint32List(LZ_MAX_CODE + 1);
+    _table = Uint8List(LZ_MAX_CODE + 1);
+    _prefix = Uint32List(LZ_MAX_CODE + 1);
     _prefix.fillRange(0, _prefix.length, NO_SUCH_CODE);
 
     for (int i = 0; i < 256; i++) {
@@ -138,7 +138,7 @@ class LzwDecoder {
   List<int> _out;
   int _outPointer;
 
-  Uint8List _buffer = new Uint8List(4096);
+  Uint8List _buffer = Uint8List(4096);
   Uint8List _table;
   Uint32List _prefix;
   int _tableIndex;
