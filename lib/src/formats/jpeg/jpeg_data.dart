@@ -23,7 +23,7 @@ class JpegData  {
   final List<JpegFrame> frames = [];
   final List huffmanTablesAC = [];
   final List huffmanTablesDC = [];
-  final List<Map> components = [];
+  final List<_ComponentData> components = [];
 
   bool validate(List<int> bytes) {
     input = InputBuffer(bytes, bigEndian: true);
@@ -116,11 +116,9 @@ class JpegData  {
 
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
       JpegComponent component = frame.components[frame.componentsOrder[i]];
-      components.add({
-        'scaleX': component.h / frame.maxH,
-        'scaleY': component.v / frame.maxV,
-        'lines': _buildComponentData(frame, component)
-      });
+      components.add(_ComponentData(component.h / frame.maxH,
+                                    component.v / frame.maxV,
+                                    _buildComponentData(frame, component)));
     }
   }
 
@@ -131,10 +129,10 @@ class JpegData  {
   Uint8List getData(int width, int height) {
     num scaleX = 1;
     num scaleY = 1;
-    Map component1;
-    Map component2;
-    Map component3;
-    Map component4;
+    _ComponentData component1;
+    _ComponentData component2;
+    _ComponentData component3;
+    _ComponentData component4;
     Uint8List component1Line;
     Uint8List component2Line;
     Uint8List component3Line;
@@ -148,9 +146,9 @@ class JpegData  {
     switch (components.length) {
       case 1:
         component1 = components[0];
-        var lines = component1['lines'];
-        var sy = component1['scaleY'];
-        var sx =  component1['scaleX'];
+        var lines = component1.lines;
+        var sy = component1.scaleY;
+        var sx =  component1.scaleX;
         for (int y = 0; y < height; y++) {
           component1Line = lines[(y * sy * scaleY).toInt()];
           for (int x = 0; x < width; x++) {
@@ -164,12 +162,12 @@ class JpegData  {
         component1 = components[0];
         component2 = components[1];
         for (int y = 0; y < height; y++) {
-          component1Line = component1['lines'][(y * component1['scaleY'] * scaleY)];
-          component2Line = component2['lines'][(y * component2['scaleY'] * scaleY)];
+          component1Line = component1.lines[(y * component1.scaleY * scaleY).toInt()];
+          component2Line = component2.lines[(y * component2.scaleY * scaleY).toInt()];
           for (int x = 0; x < width; x++) {
-            Y = component1Line[(x * component1['scaleX'] * scaleX).toInt()];
+            Y = component1Line[(x * component1.scaleX * scaleX).toInt()];
             data[offset++] = Y;
-            Y = component2Line[(x * component2['scaleX'] * scaleX).toInt()];
+            Y = component2Line[(x * component2.scaleX * scaleX).toInt()];
             data[offset++] = Y;
           }
         }
@@ -182,16 +180,16 @@ class JpegData  {
         component2 = components[1];
         component3 = components[2];
 
-        double sy1 = (component1['scaleY'] * scaleY).toDouble();
-        double sy2 = (component2['scaleY'] * scaleY).toDouble();
-        double sy3 = (component3['scaleY'] * scaleY).toDouble();
-        double sx1 = (component1['scaleX'] * scaleX).toDouble();
-        double sx2 = (component2['scaleX'] * scaleX).toDouble();
-        double sx3 = (component3['scaleX'] * scaleX).toDouble();
+        double sy1 = (component1.scaleY * scaleY).toDouble();
+        double sy2 = (component2.scaleY * scaleY).toDouble();
+        double sy3 = (component3.scaleY * scaleY).toDouble();
+        double sx1 = (component1.scaleX * scaleX).toDouble();
+        double sx2 = (component2.scaleX * scaleX).toDouble();
+        double sx3 = (component3.scaleX * scaleX).toDouble();
 
-        List<Uint8List> lines1 = component1['lines'];
-        List<Uint8List> lines2 = component2['lines'];
-        List<Uint8List> lines3 = component3['lines'];
+        List<Uint8List> lines1 = component1.lines;
+        List<Uint8List> lines2 = component2.lines;
+        List<Uint8List> lines3 = component3.lines;
 
         for (int y = 0; y < height; y++) {
           component1Line = lines1[(y * sy1).toInt()];
@@ -235,19 +233,19 @@ class JpegData  {
         component3 = components[2];
         component4 = components[3];
 
-        var sx1 = component1['scaleX'] * scaleX;
-        var sx2 = component2['scaleX'] * scaleX;
-        var sx3 = component3['scaleX'] * scaleX;
-        var sx4 = component4['scaleX'] * scaleX;
-        var sy1 = component1['scaleY'] * scaleY;
-        var sy2 = component2['scaleY'] * scaleY;
-        var sy3 = component3['scaleY'] * scaleY;
-        var sy4 = component4['scaleY'] * scaleY;
+        var sx1 = component1.scaleX * scaleX;
+        var sx2 = component2.scaleX * scaleX;
+        var sx3 = component3.scaleX * scaleX;
+        var sx4 = component4.scaleX * scaleX;
+        var sy1 = component1.scaleY * scaleY;
+        var sy2 = component2.scaleY * scaleY;
+        var sy3 = component3.scaleY * scaleY;
+        var sy4 = component4.scaleY * scaleY;
 
-        var lines1 = component1['lines'];
-        var lines2 = component2['lines'];
-        var lines3 = component3['lines'];
-        var lines4 = component4['lines'];
+        var lines1 = component1.lines;
+        var lines2 = component2.lines;
+        var lines3 = component3.lines;
+        var lines4 = component4.lines;
 
         for (int y = 0; y < height; y++) {
           component1Line = lines1[(y * sy1).toInt()];
@@ -1141,6 +1139,13 @@ class JpegData  {
 class _JpegHuffman {
   List children = [];
   int index = 0;
+}
+
+class _ComponentData {
+  double scaleX;
+  double scaleY;
+  List<Uint8List> lines;
+  _ComponentData(this.scaleX, this.scaleY, this.lines);
 }
 
 /*class _JPEG_HuffTables {
