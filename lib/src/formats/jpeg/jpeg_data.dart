@@ -116,8 +116,8 @@ class JpegData  {
 
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
       JpegComponent component = frame.components[frame.componentsOrder[i]];
-      components.add(_ComponentData(component.h / frame.maxH,
-                                    component.v / frame.maxV,
+      components.add(_ComponentData(component.hSamples, frame.maxHSamples,
+                                    component.vSamples, frame.maxVSamples,
                                     _buildComponentData(frame, component)));
     }
   }
@@ -147,12 +147,14 @@ class JpegData  {
       case 1:
         component1 = components[0];
         var lines = component1.lines;
-        var sy = component1.scaleY;
-        var sx =  component1.scaleX;
+        int hShift1 = component1.hScaleShift;
+        int vShift1 = component1.vScaleShift;
         for (int y = 0; y < height; y++) {
-          component1Line = lines[(y * sy * scaleY).toInt()];
+          int y1 = y >> vShift1;
+          component1Line = lines[y1];
           for (int x = 0; x < width; x++) {
-            Y = component1Line[(x *sx * scaleX).toInt()];
+            int x1 = x >> hShift1;
+            Y = component1Line[x1];
             data[offset++] = Y;
           }
         }
@@ -161,13 +163,25 @@ class JpegData  {
         // PDF might compress two component data in custom color-space
         component1 = components[0];
         component2 = components[1];
+        int hShift1 = component1.hScaleShift;
+        int vShift1 = component1.vScaleShift;
+        int hShift2 = component2.hScaleShift;
+        int vShift2 = component2.vScaleShift;
+
         for (int y = 0; y < height; y++) {
-          component1Line = component1.lines[(y * component1.scaleY * scaleY).toInt()];
-          component2Line = component2.lines[(y * component2.scaleY * scaleY).toInt()];
+          int y1 = y >> vShift1;
+          int y2 = y >> vShift2;
+          component1Line = component1.lines[y1];
+          component2Line = component2.lines[y2];
+
           for (int x = 0; x < width; x++) {
-            Y = component1Line[(x * component1.scaleX * scaleX).toInt()];
+            int x1 = x >> hShift1;
+            int x2 = x >> hShift2;
+
+            Y = component1Line[x1];
             data[offset++] = Y;
-            Y = component2Line[(x * component2.scaleX * scaleX).toInt()];
+
+            Y = component2Line[x2];
             data[offset++] = Y;
           }
         }
@@ -180,31 +194,39 @@ class JpegData  {
         component2 = components[1];
         component3 = components[2];
 
-        double sy1 = (component1.scaleY * scaleY).toDouble();
-        double sy2 = (component2.scaleY * scaleY).toDouble();
-        double sy3 = (component3.scaleY * scaleY).toDouble();
-        double sx1 = (component1.scaleX * scaleX).toDouble();
-        double sx2 = (component2.scaleX * scaleX).toDouble();
-        double sx3 = (component3.scaleX * scaleX).toDouble();
+        var lines1 = component1.lines;
+        var lines2 = component2.lines;
+        var lines3 = component3.lines;
 
-        List<Uint8List> lines1 = component1.lines;
-        List<Uint8List> lines2 = component2.lines;
-        List<Uint8List> lines3 = component3.lines;
+        int hShift1 = component1.hScaleShift;
+        int vShift1 = component1.vScaleShift;
+        int hShift2 = component2.hScaleShift;
+        int vShift2 = component2.vScaleShift;
+        int hShift3 = component3.hScaleShift;
+        int vShift3 = component3.vScaleShift;
 
         for (int y = 0; y < height; y++) {
-          component1Line = lines1[(y * sy1).toInt()];
-          component2Line = lines2[(y * sy2).toInt()];
-          component3Line = lines3[(y * sy3).toInt()];
+          int y1 = y >> vShift1;
+          int y2 = y >> vShift2;
+          int y3 = y >> vShift3;
+
+          component1Line = lines1[y1];
+          component2Line = lines2[y2];
+          component3Line = lines3[y3];
 
           for (int x = 0; x < width; x++) {
+            int x1 = x >> hShift1;
+            int x2 = x >> hShift2;
+            int x3 = x >> hShift3;
+
             if (!colorTransform) {
-              data[offset++] = component1Line[(x * sx1).toInt()];
-              data[offset++] = component2Line[(x * sx2).toInt()];
-              data[offset++] = component3Line[(x * sx3).toInt()];
+              data[offset++] = component1Line[x1];
+              data[offset++] = component2Line[x2];
+              data[offset++] = component3Line[x3];
             } else {
-              Y =  component1Line[(x * sx1).toInt()] << 8;
-              Cb = component2Line[(x * sx2).toInt()] - 128;
-              Cr = component3Line[(x * sx3).toInt()] - 128;
+              Y = component1Line[x1] << 8;
+              Cb = component2Line[x2] - 128;
+              Cr = component3Line[x3] - 128;
 
               R = shiftR((Y + 359 * Cr + 128), 8);
               G = shiftR((Y - 88 * Cb - 183 * Cr + 128), 8);
@@ -233,36 +255,44 @@ class JpegData  {
         component3 = components[2];
         component4 = components[3];
 
-        var sx1 = component1.scaleX * scaleX;
-        var sx2 = component2.scaleX * scaleX;
-        var sx3 = component3.scaleX * scaleX;
-        var sx4 = component4.scaleX * scaleX;
-        var sy1 = component1.scaleY * scaleY;
-        var sy2 = component2.scaleY * scaleY;
-        var sy3 = component3.scaleY * scaleY;
-        var sy4 = component4.scaleY * scaleY;
-
         var lines1 = component1.lines;
         var lines2 = component2.lines;
         var lines3 = component3.lines;
         var lines4 = component4.lines;
 
+        int hShift1 = component1.hScaleShift;
+        int vShift1 = component1.vScaleShift;
+        int hShift2 = component2.hScaleShift;
+        int vShift2 = component2.vScaleShift;
+        int hShift3 = component3.hScaleShift;
+        int vShift3 = component3.vScaleShift;
+        int hShift4 = component4.hScaleShift;
+        int vShift4 = component4.vScaleShift;
+
         for (int y = 0; y < height; y++) {
-          component1Line = lines1[(y * sy1).toInt()];
-          component2Line = lines2[(y * sy2).toInt()];
-          component3Line = lines3[(y * sy3).toInt()];
-          component4Line = lines4[(y * sy4).toInt()];
+          int y1 = y >> vShift1;
+          int y2 = y >> vShift2;
+          int y3 = y >> vShift3;
+          int y4 = y >> vShift4;
+          component1Line = lines1[y1];
+          component2Line = lines2[y2];
+          component3Line = lines3[y3];
+          component4Line = lines4[y4];
           for (int x = 0; x < width; x++) {
+            int x1 = x >> hShift1;
+            int x2 = x >> hShift2;
+            int x3 = x >> hShift3;
+            int x4 = x >> hShift4;
             if (!colorTransform) {
-              C = component1Line[(x * sx1).toInt()];
-              M = component2Line[(x * sx2).toInt()];
-              Ye = component3Line[(x * sx3).toInt()];
-              K = component4Line[(x * sx4).toInt()];
+              C = component1Line[x1];
+              M = component2Line[x2];
+              Ye = component3Line[x3];
+              K = component4Line[x4];
             } else {
-              Y = component1Line[(x * sx1).toInt()];
-              Cb = component2Line[(x * sx2).toInt()];
-              Cr = component3Line[(x * sx3).toInt()];
-              K = component4Line[(x * sx4).toInt()];
+              Y = component1Line[x1];
+              Cb = component2Line[x2];
+              Cr = component3Line[x3];
+              K = component4Line[x4];
 
               C = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
               M = 255 - _clamp8((Y - 0.3441363 * (Cb - 128) -
@@ -827,7 +857,6 @@ class JpegData  {
   static int toFix(double val) {
     const int FIXED_POINT = 20;
     const int ONE = 1 << FIXED_POINT;
-
     return (val * ONE).toInt() & 0xffffffff;
   }
 
@@ -1142,16 +1171,15 @@ class _JpegHuffman {
 }
 
 class _ComponentData {
-  double scaleX;
-  double scaleY;
+  int hSamples;
+  int maxHSamples;
+  int vSamples;
+  int maxVSamples;
   List<Uint8List> lines;
-  _ComponentData(this.scaleX, this.scaleY, this.lines);
+  int hScaleShift;
+  int vScaleShift;
+  _ComponentData(this.hSamples, this.maxHSamples, this.vSamples,
+                 this.maxVSamples, this.lines)
+    : hScaleShift = (hSamples == 1 && maxHSamples == 2) ? 1 : 0
+    , vScaleShift = (vSamples == 1 && maxVSamples == 2) ? 1 : 0;
 }
-
-/*class _JPEG_HuffTables {
-  bool ac_table = false;
-  Uint32List look_up = Uint32List(256);
-  Uint32List look_up2 = Uint32List(256);
-  Uint8List code_size = Uint8List(256);
-  Uint32List tree = Uint32List(512);
-}*/

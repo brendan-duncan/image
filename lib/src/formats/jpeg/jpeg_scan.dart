@@ -36,8 +36,8 @@ class JpegScan {
     scanLines = frame.scanLines;
     mcusPerLine = frame.mcusPerLine;
     progressive = frame.progressive;
-    maxH = frame.maxH;
-    maxV = frame.maxV;
+    maxH = frame.maxHSamples;
+    maxV = frame.maxVSamples;
   }
 
   void decode() {
@@ -86,8 +86,8 @@ class JpegScan {
         for (int n = 0; n < resetInterval; n++) {
           for (int i = 0; i < componentsLength; i++) {
             component = components[i];
-            h = component.h;
-            v = component.v;
+            h = component.hSamples;
+            v = component.vSamples;
             for (int j = 0; j < v; j++) {
               for (int k = 0; k < h; k++) {
                 _decodeMcu(component, decodeFn, mcu, j, k);
@@ -306,8 +306,8 @@ class JpegScan {
                   int mcu, int row, int col) {
     int mcuRow = (mcu ~/ mcusPerLine);
     int mcuCol = mcu % mcusPerLine;
-    int blockRow = mcuRow * component.v + row;
-    int blockCol = mcuCol * component.h + col;
+    int blockRow = mcuRow * component.vSamples + row;
+    int blockCol = mcuCol * component.hSamples + col;
     if (blockRow >= component.blocks.length ||
         blockCol >= component.blocks[blockRow].length) {
       return;
