@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import '../color.dart';
@@ -110,7 +111,7 @@ class NeuralQuantizer {
   }
 
   void _initialize(int numberOfColors) {
-    NET_SIZE = numberOfColors; // number of colours used
+    NET_SIZE = max(numberOfColors, 4); // number of colours used
     CUT_NET_SIZE = NET_SIZE - SPECIALS;
     MAX_NET_POS = NET_SIZE - 1;
     INIT_RAD = NET_SIZE ~/ 8; // for 256 cols, radius starts at 32
@@ -120,6 +121,8 @@ class NeuralQuantizer {
     _bias = List<double>(NET_SIZE);
     _freq = List<double>(NET_SIZE);
     colorMap = Uint8List(NET_SIZE * 3);
+    SPECIALS = 3; // number of reserved colours used
+    BG_COLOR = SPECIALS - 1;
   }
 
   void _copyColorMap() {
@@ -475,8 +478,8 @@ class NeuralQuantizer {
   static const int NUM_CYCLES = 100; // no. of learning cycles
 
   int NET_SIZE = 16; // number of colours used
-  static const int SPECIALS = 3; // number of reserved colours used
-  static const int BG_COLOR = SPECIALS - 1; // reserved background colour
+  int SPECIALS = 3; // number of reserved colours used
+  int BG_COLOR; // reserved background colour
   int CUT_NET_SIZE;
   int MAX_NET_POS;
 
