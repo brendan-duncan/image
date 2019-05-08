@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
-
 import '../color.dart';
 import '../image.dart';
 import '../image_exception.dart';
+import 'quantizer.dart';
 
 /* NeuQuant Neural-Net Quantization Algorithm
  * ------------------------------------------
@@ -33,7 +33,7 @@ import '../image_exception.dart';
  * Compute a color map with a given number of colors that best represents
  * the given image.
  */
-class NeuralQuantizer {
+class NeuralQuantizer extends Quantizer {
   Uint8List colorMap;
 
   NeuralQuantizer(Image image, {int numberOfColors=256}) {

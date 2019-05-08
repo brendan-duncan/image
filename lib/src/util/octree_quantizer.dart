@@ -1,14 +1,10 @@
-import 'dart:math';
-import 'dart:typed_data';
-
 import '../color.dart';
 import '../image.dart';
-import '../image_exception.dart';
-
+import 'quantizer.dart';
 
 // Color quantization using octree,
 // from https://rosettacode.org/wiki/Color_quantization/C
-class OctreeQuantizer {
+class OctreeQuantizer extends Quantizer {
   _OctreeNode _root;
 
   OctreeQuantizer(Image image, {int numberOfColors=256}) {
@@ -47,7 +43,9 @@ class OctreeQuantizer {
     var root = _root;
 
     for (int bit = 1 << 7; bit != 0; bit >>= 1) {
-      int i = ((g & bit) != 0 ? 1 : 0) * 4 + ((r & bit) != 0 ? 1 : 0) * 2 + ((b & bit) != 0 ? 1 : 0);
+      int i = ((g & bit) != 0 ? 1 : 0) * 4 +
+              ((r & bit) != 0 ? 1 : 0) * 2 +
+              ((b & bit) != 0 ? 1 : 0);
       if (root.children[i] == null) {
         break;
       }
