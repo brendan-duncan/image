@@ -352,19 +352,32 @@ void main() {
       fp.writeAsBytesSync(writeJpg(f));
     });
 
-    test('quantize', () {
-      Image f = Image.from(image);
-      quantize(f, numberOfColors: 16);
+    test('octree quantize', () {
+      var f = readPng(new File('test/res/png/lenna.png').readAsBytesSync());
+
+      quantize(f, numberOfColors: 16, method: QuantizeMethod.octree);
       var colors = Set();
       for (int y = 0; y < f.height; ++y) {
         for (int x = 0; x < f.width; ++x) {
           colors.add(f.getPixel(x, y));
         }
       }
+      File fp = File('out/quantize_octree.jpg');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writeJpg(f));
+    });
 
-      expect(colors.length, equals(16));
+    test('neural quantize', () {
+      var f = readPng(new File('test/res/png/lenna.png').readAsBytesSync());
 
-      File fp = File('out/quantize.jpg');
+      quantize(f, numberOfColors: 16, method: QuantizeMethod.neuralNet);
+      var colors = Set();
+      for (int y = 0; y < f.height; ++y) {
+        for (int x = 0; x < f.width; ++x) {
+          colors.add(f.getPixel(x, y));
+        }
+      }
+      File fp = File('out/quantize_neural.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });

@@ -12,7 +12,7 @@ class OctreeQuantizer {
   _OctreeNode _root;
 
   OctreeQuantizer(Image image, {int numberOfColors=256}) {
-    _root = new _OctreeNode(0, 0, null);
+    _root = _OctreeNode(0, 0, null);
 
     _HeapNode heap = _HeapNode();
     for (int si = 0; si < image.length; ++si) {
@@ -23,11 +23,12 @@ class OctreeQuantizer {
       _heapAdd(heap, _nodeInsert(_root, r, g, b));
     }
 
-    while (heap.buf.length > numberOfColors + 1) {
+    int nc = numberOfColors + 1;
+    while (heap.n > nc) {
       _heapAdd(heap, _nodeFold(_popHeap(heap)));
     }
 
-    for (int i = 1; i < heap.buf.length; i++) {
+    for (int i = 1; i < heap.n; i++) {
       var got = heap.buf[i];
       int c = got.count;
       got.r = (got.r / c).round();
@@ -47,7 +48,7 @@ class OctreeQuantizer {
 
     for (int bit = 1 << 7; bit != 0; bit >>= 1) {
       int i = ((g & bit) != 0 ? 1 : 0) * 4 + ((r & bit) != 0 ? 1 : 0) * 2 + ((b & bit) != 0 ? 1 : 0);
-      if (root.children[i] != null) {
+      if (root.children[i] == null) {
         break;
       }
       root = root.children[i];
@@ -60,27 +61,26 @@ class OctreeQuantizer {
   }
 
   int _compareNode(_OctreeNode a, _OctreeNode b) {
-    if (a.children.length < b.children.length) {
+    if (a.childCount < b.childCount) {
       return -1;
     }
-    if (a.children.length > b.children.length) {
+    if (a.childCount > b.childCount) {
       return 1;
     }
 
-    int ac = a.count * (1 + a.childIndex) >> a.depth;
-    int bc = b.count * (1 + b.childIndex) >> b.depth;
-    return ac < bc ? -1 : (ac > bc) ? 1 : 0;
+    int ac = a.count >> a.depth;
+    int bc = b.count >> b.depth;
+    return (ac < bc) ? -1 : (ac > bc) ? 1 : 0;
   }
 
 
   _OctreeNode _nodeInsert(_OctreeNode root, int r, int g, int b) {
-    const int OCT_DEPTH = 8;
     int depth = 0;
-    for (int bit = 1 << 7; ++depth < OCT_DEPTH; bit >>= 1) {
+    for (int bit = 1 << 7; ++depth < 8; bit >>= 1) {
       int i = ((g & bit) != 0 ? 1 : 0) * 4 +
           ((r & bit) != 0 ? 1 : 0) * 2 + ((b & bit) != 0 ? 1 : 0);
       if (root.children[i] == null) {
-        root.children[i] = new _OctreeNode(i, depth, root);
+        root.children[i] = _OctreeNode(i, depth, root);
       }
 
       root = root.children[i];
@@ -111,7 +111,7 @@ class OctreeQuantizer {
   static const _ON_INHEAP = 1;
 
   _OctreeNode _popHeap(_HeapNode h) {
-    if (h.buf.length <= 1) {
+    if (h.n <= 1) {
       return null;
     }
 
@@ -131,6 +131,7 @@ class OctreeQuantizer {
     }
 
     p.flags |= _ON_INHEAP;
+    p.heap_idx = h.n;
     h.buf.add(p);
     _upHeap(h, p);
   }
@@ -139,10 +140,10 @@ class OctreeQuantizer {
     int n = p.heap_idx;
     while (true) {
       int m = n * 2;
-      if (m >= h.buf.length) {
+      if (m >= h.n) {
         break;
       }
-      if ((m + 1) < h.buf.length && _compareNode(h.buf[m], h.buf[m + 1]) > 0) {
+      if ((m + 1) < h.n && _compareNode(h.buf[m], h.buf[m + 1]) > 0) {
         m++;
       }
 
@@ -200,5 +201,6 @@ class _OctreeNode {
 }
 
 class _HeapNode {
-  List<_OctreeNode> buf = [];
+  List<_OctreeNode> buf = [null];
+  int get n => buf.length;
 }
