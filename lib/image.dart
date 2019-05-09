@@ -142,6 +142,7 @@ export 'src/transform/copy_crop.dart';
 export 'src/transform/copy_into.dart';
 export 'src/transform/copy_rectify.dart';
 export 'src/transform/copy_resize.dart';
+export 'src/transform/copy_resize_crop_square.dart';
 export 'src/transform/copy_rotate.dart';
 export 'src/transform/flip.dart';
 export 'src/transform/trim.dart';
