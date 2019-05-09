@@ -4,7 +4,7 @@ linter:
   rules:
     - camel_case_types
 
-analyzer:
-  strong-mode:
-    implicit-casts: false
-    implicit-dynamic: false
+#analyzer:
+#  strong-mode:
+#    implicit-casts: false
+#    implicit-dynamic: false
