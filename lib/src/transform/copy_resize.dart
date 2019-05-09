@@ -13,8 +13,8 @@ import 'bake_orientation.dart';
  * If [width] is -1, then it will be determined by the aspect ratio
  * of [src] and [height].
  */
-Image copyResize(Image src, int width, [int height = -1,
-                 int interpolation = NEAREST]) {
+Image copyResize(Image src, int width,
+    [int height = -1, int interpolation = NEAREST]) {
   if (width <= 0 && height <= 0) {
     throw new ImageException('Invalid size');
   }
@@ -83,11 +83,11 @@ Image copyResize(Image src, int width, [int height = -1,
   } else {
     // Copy the pixels from this image to the new image.
     for (int y = 0; y < height; ++y) {
-     double y2 = (y * dy);
-     for (int x = 0; x < width; ++x) {
-       double x2 = (x * dx);
-       dst.setPixel(x, y, src.getPixelInterpolate(x2, y2, interpolation));
-     }
+      double y2 = (y * dy);
+      for (int x = 0; x < width; ++x) {
+        double x2 = (x * dx);
+        dst.setPixel(x, y, src.getPixelInterpolate(x2, y2, interpolation));
+      }
     }
   }
 

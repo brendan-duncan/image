@@ -3,10 +3,8 @@ import 'dart:typed_data';
 import '../image.dart';
 import 'hdr_slice.dart';
 
-/**
- * A high dynamic range RGBA image stored in 16-bit or 32-bit floating-point
- * channels.
- */
+/// A high dynamic range RGBA image stored in 16-bit or 32-bit floating-point
+/// channels.
 class HdrImage {
   static const int HALF = 1;
   static const int FLOAT = 2;
@@ -14,14 +12,19 @@ class HdrImage {
 
   /// Red value of a sample
   static const String R = 'R';
+
   /// Green value of a sample
   static const String G = 'G';
+
   /// Blue value of a sample
   static const String B = 'B';
+
   /// Alpha/opacity
   static const String A = 'A';
+
   /// Distance of the front of a sample from the viewer
   static const String Z = 'Z';
+
   /// A numerical identifier for the object represented by a sample.
   static const String ID = 'id';
 
@@ -32,12 +35,9 @@ class HdrImage {
   HdrSlice alpha;
   HdrSlice depth;
 
-  HdrImage() {
-  }
+  HdrImage() {}
 
-  /**
-   * Create an RGB[A] image.
-   */
+  /// Create an RGB[A] image.
   HdrImage.create(int width, int height, int channels, int format) {
     if (channels < 0 || channels > 4) {
       return;
@@ -52,9 +52,7 @@ class HdrImage {
     }
   }
 
-  /**
-   * Create a copy of the [other] HdrImage.
-   */
+  /// Create a copy of the [other] HdrImage.
   HdrImage.from(HdrImage other) {
     for (String ch in other.slices.keys) {
       HdrSlice slice = other.slices[ch];
@@ -62,10 +60,8 @@ class HdrImage {
     }
   }
 
-  /**
-   * Create an HDR image from a LDR [Image] by transforming the channel values
-   * to the range [0, 1].
-   */
+  /// Create an HDR image from a LDR [Image] by transforming the channel values
+  /// to the range [0, 1].
   HdrImage.fromImage(Image other) {
     addSlice(new HdrSlice(R, other.width, other.height, HALF));
     addSlice(new HdrSlice(G, other.width, other.height, HALF));
@@ -86,42 +82,28 @@ class HdrImage {
     }
   }
 
-  /**
-   * Does the image have any color channels?
-   */
+  /// Does the image have any color channels?
   bool get hasColor => red != null || green != null || blue != null;
 
-  /**
-   * Does the image have an alpha channel?
-   */
+  /// Does the image have an alpha channel?
   bool get hasAlpha => alpha != null;
 
-  /**
-   * Does the image have a depth channel?
-   */
+  /// Does the image have a depth channel?
   bool get hasDepth => depth != null;
 
-  /**
-   * The width of the framebuffer.
-   */
+  /// The width of the framebuffer.
   int get width => slices.isEmpty ? 0 : slices.values.first.width;
 
-  /**
-   * The height of the framebuffer.
-   */
+  /// The height of the framebuffer.
   int get height => slices.isEmpty ? 0 : slices.values.first.height;
 
-  /**
-   * Get the value of the red channel at the given pixel coordinates [x], [y].
-   */
+  /// Get the value of the red channel at the given pixel coordinates [x], [y].
   double getRed(int x, int y) {
     return red != null ? red.getFloat(x, y) : 0.0;
   }
 
-  /**
-   * Set the value of the red channel at the given pixel coordinates [x], [y].
-   */
-  void setRed(int x, int y, double c) {
+  /// Set the value of the red channel at the given pixel coordinates [x], [y].
+  void setRed(int x, int y, num c) {
     if (red != null) {
       red.setFloat(x, y, c);
     }
@@ -129,21 +111,17 @@ class HdrImage {
 
   void setRedInt(int x, int y, int c) {
     if (red != null) {
-      red.setInt(x,  y, c);
+      red.setInt(x, y, c);
     }
   }
 
-  /**
-   * Get the value of the green channel at the given pixel coordinates [x], [y].
-   */
+  /// Get the value of the green channel at the given pixel coordinates [x], [y].
   double getGreen(int x, int y) {
     return green != null ? green.getFloat(x, y) : 0.0;
   }
 
-  /**
-   * Set the value of the green channel at the given pixel coordinates [x], [y].
-   */
-  void setGreen(int x, int y, double c) {
+  /// Set the value of the green channel at the given pixel coordinates [x], [y].
+  void setGreen(int x, int y, num c) {
     if (green != null) {
       green.setFloat(x, y, c);
     }
@@ -151,21 +129,17 @@ class HdrImage {
 
   void setGreenInt(int x, int y, int c) {
     if (green != null) {
-      green.setInt(x,  y, c);
+      green.setInt(x, y, c);
     }
   }
 
-  /**
-   * Get the value of the blue channel at the given pixel coordinates [x], [y].
-   */
+  /// Get the value of the blue channel at the given pixel coordinates [x], [y].
   double getBlue(int x, int y) {
     return blue != null ? blue.getFloat(x, y) : 0.0;
   }
 
-  /**
-   * Set the value of the blue channel at the given pixel coordinates [x], [y].
-   */
-  void setBlue(int x, int y, double c) {
+  /// Set the value of the blue channel at the given pixel coordinates [x], [y].
+  void setBlue(int x, int y, num c) {
     if (blue != null) {
       blue.setFloat(x, y, c);
     }
@@ -177,16 +151,12 @@ class HdrImage {
     }
   }
 
-  /**
-   * Get the value of the alpha channel at the given pixel coordinates [x], [y].
-   */
+  /// Get the value of the alpha channel at the given pixel coordinates [x], [y].
   double getAlpha(int x, int y) {
     return alpha != null ? alpha.getFloat(x, y) : 0.0;
   }
 
-  /**
-   * Set the value of the alpha channel at the given pixel coordinates [x], [y].
-   */
+  /// Set the value of the alpha channel at the given pixel coordinates [x], [y].
   void setAlpha(int x, int y, double c) {
     if (alpha != null) {
       alpha.setFloat(x, y, c);
@@ -199,35 +169,25 @@ class HdrImage {
     }
   }
 
-  /**
-   * Get the value of the depth channel at the given pixel coordinates [x], [y].
-   */
+  /// Get the value of the depth channel at the given pixel coordinates [x], [y].
   double getDepth(int x, int y) {
     return depth != null ? depth.getFloat(x, y) : 0.0;
   }
 
-  /**
-   * Set the value of the depth channel at the given pixel coordinates [x], [y].
-   */
+  /// Set the value of the depth channel at the given pixel coordinates [x], [y].
   void setDepth(int x, int y, double c) {
     if (depth != null) {
       depth.setFloat(x, y, c);
     }
   }
 
-  /**
-   * Does this image contain the given channel?
-   */
+  /// Does this image contain the given channel?
   bool hasChannel(String ch) => slices.containsKey(ch);
 
-  /**
-   * Access a framebuffer slice by name.
-   */
-  HdrSlice operator[](String ch) => slices[ch];
+  /// Access a framebuffer slice by name.
+  HdrSlice operator [](String ch) => slices[ch];
 
-  /**
-   * Add a channel [slice] to the
-   */
+  /// Add a channel [slice] to the
   void addSlice(HdrSlice slice) {
     String ch = slice.name;
     slices[ch] = slice;
@@ -250,10 +210,8 @@ class HdrImage {
     }
   }
 
-  /**
-   * Convert the framebuffer to an floating-point image, as a sequence of
-   * floats in RGBA order.
-   */
+  /// Convert the framebuffer to an floating-point image, as a sequence of
+  /// floats in RGBA order.
   Float32List toFloatRgba() {
     Float32List rgba = Float32List(width * height * 4);
     int w = width;
@@ -270,4 +228,3 @@ class HdrImage {
     return rgba;
   }
 }
-

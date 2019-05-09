@@ -107,8 +107,7 @@ class TiffDecoder extends Decoder {
   TiffInfo _readHeader(InputBuffer p) {
     TiffInfo info = TiffInfo();
     int byteOrder = p.readUint16();
-    if (byteOrder != TIFF_LITTLE_ENDIAN &&
-        byteOrder != TIFF_BIG_ENDIAN) {
+    if (byteOrder != TIFF_LITTLE_ENDIAN && byteOrder != TIFF_BIG_ENDIAN) {
       return null;
     }
 

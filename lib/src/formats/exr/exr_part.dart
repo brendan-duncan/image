@@ -12,16 +12,22 @@ import 'exr_compressor.dart';
 class ExrPart {
   /// The framebuffer for this exr part.
   HdrImage framebuffer = HdrImage();
+
   /// The channels present in this part.
   List<ExrChannel> channels = [];
+
   /// The extra attributes read from the part header.
   Map<String, ExrAttribute> attributes = {};
+
   /// The display window (see the openexr documentation).
   List<int> displayWindow;
+
   /// The data window (see the openexr documentation).
   List<int> dataWindow;
+
   /// width of the data window
   int width;
+
   /// Height of the data window
   int height;
   double pixelAspectRatio = 1.0;
@@ -73,14 +79,22 @@ class ExrPart {
           }
           break;
         case 'dataWindow':
-          dataWindow = [value.readInt32(), value.readInt32(),
-                        value.readInt32(), value.readInt32()];
+          dataWindow = [
+            value.readInt32(),
+            value.readInt32(),
+            value.readInt32(),
+            value.readInt32()
+          ];
           width = (dataWindow[2] - dataWindow[0]) + 1;
           height = (dataWindow[3] - dataWindow[1]) + 1;
           break;
         case 'displayWindow':
-          displayWindow = [value.readInt32(), value.readInt32(),
-                           value.readInt32(), value.readInt32()];
+          displayWindow = [
+            value.readInt32(),
+            value.readInt32(),
+            value.readInt32(),
+            value.readInt32()
+          ];
           break;
         case 'lineOrder':
           //_lineOrder = value.readByte();
@@ -127,18 +141,18 @@ class ExrPart {
       _numXTiles = List<int>(_numXLevels);
       _numYTiles = List<int>(_numYLevels);
 
-      _calculateNumTiles(_numXTiles, _numXLevels, left, right, _tileWidth,
-                         _tileRoundingMode);
+      _calculateNumTiles(
+          _numXTiles, _numXLevels, left, right, _tileWidth, _tileRoundingMode);
 
-      _calculateNumTiles(_numYTiles, _numYLevels, top, bottom, _tileHeight,
-                         _tileRoundingMode);
+      _calculateNumTiles(
+          _numYTiles, _numYLevels, top, bottom, _tileHeight, _tileRoundingMode);
 
       _bytesPerPixel = _calculateBytesPerPixel();
       _maxBytesPerTileLine = _bytesPerPixel * _tileWidth;
       //_tileBufferSize = _maxBytesPerTileLine * _tileHeight;
 
-      _compressor = ExrCompressor(_compressionType, this,
-                                      _maxBytesPerTileLine, _tileHeight);
+      _compressor = ExrCompressor(
+          _compressionType, this, _maxBytesPerTileLine, _tileHeight);
 
       _offsets = List<Uint32List>(_numXLevels * _numYLevels);
       for (int ly = 0, l = 0; ly < _numYLevels; ++ly) {
@@ -219,7 +233,6 @@ class ExrPart {
     return num;
   }
 
-
   int _calculateNumYLevels(int minX, int maxX, int minY, int maxY) {
     int num = 0;
 
@@ -251,13 +264,12 @@ class ExrPart {
     int y = 0;
 
     while (x > 1) {
-      y +=  1;
+      y += 1;
       x >>= 1;
     }
 
     return y;
   }
-
 
   int _ceilLog2(int x) {
     int y = 0;
@@ -268,7 +280,7 @@ class ExrPart {
         r = 1;
       }
 
-      y +=  1;
+      y += 1;
       x >>= 1;
     }
 
@@ -285,8 +297,8 @@ class ExrPart {
     return bytesPerPixel;
   }
 
-  void _calculateNumTiles(List<int> numTiles, int numLevels,
-                          int min, int max, int size, int rmode) {
+  void _calculateNumTiles(List<int> numTiles, int numLevels, int min, int max,
+      int size, int rmode) {
     for (int i = 0; i < numLevels; i++) {
       numTiles[i] = (_levelSize(min, max, i, rmode) + size - 1) ~/ size;
     }

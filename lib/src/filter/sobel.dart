@@ -4,7 +4,6 @@ import '../image.dart';
 import '../internal/clamp.dart';
 import 'grayscale.dart';
 
-
 /**
  * Apply Sobe edge detection filtering to the [src] Image.
  */
@@ -41,8 +40,10 @@ Image sobel(Image src, {double amount: 1.0}) {
       int mag = clamp255((Math.sqrt(h * h + v * v) * 255.0).toInt());
 
       rgba[pi] = clamp255((mag * amount + rgba[pi] * invAmount).toInt());
-      rgba[pi + 1] = clamp255((mag * amount + rgba[pi + 1] * invAmount).toInt());
-      rgba[pi + 2] = clamp255((mag * amount + rgba[pi + 2] * invAmount).toInt());
+      rgba[pi + 1] =
+          clamp255((mag * amount + rgba[pi + 1] * invAmount).toInt());
+      rgba[pi + 2] =
+          clamp255((mag * amount + rgba[pi + 2] * invAmount).toInt());
     }
   }
 

@@ -15,8 +15,7 @@ class VP8 {
   InputBuffer input;
   InternalWebPInfo _webp;
 
-  VP8(InputBuffer input, this._webp) :
-    this.input = input;
+  VP8(InputBuffer input, this._webp) : this.input = input;
 
   WebPInfo get webp => _webp;
 
@@ -120,7 +119,7 @@ class VP8 {
     _parseQuant();
 
     // Frame buffer marking
-    br.get();   // ignore the value of update_proba_
+    br.get(); // ignore the value of update_proba_
 
     _parseProba();
 
@@ -131,7 +130,8 @@ class VP8 {
     hdr.useSegment = br.get() != 0;
     if (hdr.useSegment) {
       hdr.updateMap = br.get() != 0;
-      if (br.get() != 0) {   // update data
+      if (br.get() != 0) {
+        // update data
         hdr.absoluteDelta = br.get() != 0;
         for (int s = 0; s < NUM_MB_SEGMENTS; ++s) {
           hdr.quantizer[s] = br.get() != 0 ? br.getSignedValue(7) : 0;
@@ -159,7 +159,8 @@ class VP8 {
     hdr.sharpness = br.getValue(3);
     hdr.useLfDelta = br.get() != 0;
     if (hdr.useLfDelta) {
-      if (br.get() != 0) {   // update lf-delta?
+      if (br.get() != 0) {
+        // update lf-delta?
         for (int i = 0; i < NUM_REF_LF_DELTAS; ++i) {
           if (br.get() != 0) {
             hdr.refLfDelta[i] = br.getSignedValue(6);
@@ -215,8 +216,8 @@ class VP8 {
       sz += 3;
     }
 
-    InputBuffer pin = input.subset(bufEnd - partStart,
-                                   position: input.position + partStart);
+    InputBuffer pin =
+        input.subset(bufEnd - partStart, position: input.position + partStart);
     _partitions[lastPart] = VP8BitReader(pin);
 
     // Init is ok, but there's not enough data
@@ -251,7 +252,7 @@ class VP8 {
 
       VP8QuantMatrix m = _dqm[i];
       m.y1Mat[0] = DC_TABLE[_clip(q + dqy1_dc, 127)];
-      m.y1Mat[1] = AC_TABLE[_clip(q + 0,       127)];
+      m.y1Mat[1] = AC_TABLE[_clip(q + 0, 127)];
 
       m.y2Mat[0] = DC_TABLE[_clip(q + dqy2_dc, 127)] * 2;
       // For all x in [0..284], x*155/100 is bitwise equal to (x*101581) >> 16.
@@ -265,7 +266,7 @@ class VP8 {
       m.uvMat[0] = DC_TABLE[_clip(q + dquv_dc, 117)];
       m.uvMat[1] = AC_TABLE[_clip(q + dquv_ac, 127)];
 
-      m.uvQuant = q + dquv_ac;   // for dithering strength evaluation
+      m.uvQuant = q + dquv_ac; // for dithering strength evaluation
     }
   }
 
@@ -275,9 +276,10 @@ class VP8 {
       for (int b = 0; b < NUM_BANDS; ++b) {
         for (int c = 0; c < NUM_CTX; ++c) {
           for (int p = 0; p < NUM_PROBAS; ++p) {
-            final int v = br.getBit(COEFFS_UPDATE_PROBA[t][b][c][p]) != 0 ?
-                br.getValue(8) : COEFFS_PROBA_0[t][b][c][p];
-                proba.bands[t][b].probas[c][p] = v;
+            final int v = br.getBit(COEFFS_UPDATE_PROBA[t][b][c][p]) != 0
+                ? br.getValue(8)
+                : COEFFS_PROBA_0[t][b][c][p];
+            proba.bands[t][b].probas[c][p] = v;
           }
         }
       }
@@ -341,7 +343,7 @@ class VP8 {
             info.fLimit = 2 * level + ilevel;
             info.hevThresh = (level >= 40) ? 2 : (level >= 15) ? 1 : 0;
           } else {
-            info.fLimit = 0;  // no filtering
+            info.fLimit = 0; // no filtering
           }
 
           info.fInner = i4x4 != 0;
@@ -377,13 +379,13 @@ class VP8 {
     final int extra_uv = (extra_rows ~/ 2) * _cacheUVStride;
 
     _cacheY = InputBuffer(new Uint8List(16 * _cacheYStride + extra_y),
-                         offset: extra_y);
+        offset: extra_y);
 
     _cacheU = InputBuffer(new Uint8List(8 * _cacheUVStride + extra_uv),
-                         offset: extra_uv);
+        offset: extra_uv);
 
     _cacheV = InputBuffer(new Uint8List(8 * _cacheUVStride + extra_uv),
-                         offset: extra_uv);
+        offset: extra_uv);
 
     _tmpY = InputBuffer(new Uint8List(webp.width));
 
@@ -536,12 +538,14 @@ class VP8 {
       }
 
       // predict and add residuals
-      if (block.isIntra4x4) {   // 4x4
+      if (block.isIntra4x4) {
+        // 4x4
         InputBuffer topRight = InputBuffer.from(y_dst, offset: -BPS + 16);
         Uint32List topRight32 = topRight.toUint32List();
 
         if (mb_y > 0) {
-          if (mb_x >= _mbWidth - 1) { // on rightmost border
+          if (mb_x >= _mbWidth - 1) {
+            // on rightmost border
             topRight.memset(0, 4, top_yuv.y[15]);
           } else {
             topRight.memcpy(0, 4, _yuvT[mb_x + 1].y);
@@ -562,7 +566,8 @@ class VP8 {
 
           _doTransform(bits, new InputBuffer(coeffs, offset: n * 16), dst);
         }
-      } else { // 16x16
+      } else {
+        // 16x16
         int predFunc = _checkMode(mb_x, mb_y, block.imodes[0]);
 
         VP8Filter.PredLuma16[predFunc](y_dst);
@@ -615,10 +620,23 @@ class VP8 {
   }
 
   static const List<int> kScan = const [
-    0 +  0 * BPS,  4 +  0 * BPS, 8 +  0 * BPS, 12 +  0 * BPS,
-    0 +  4 * BPS,  4 +  4 * BPS, 8 +  4 * BPS, 12 +  4 * BPS,
-    0 +  8 * BPS,  4 +  8 * BPS, 8 +  8 * BPS, 12 +  8 * BPS,
-    0 + 12 * BPS,  4 + 12 * BPS, 8 + 12 * BPS, 12 + 12 * BPS ];
+    0 + 0 * BPS,
+    4 + 0 * BPS,
+    8 + 0 * BPS,
+    12 + 0 * BPS,
+    0 + 4 * BPS,
+    4 + 4 * BPS,
+    8 + 4 * BPS,
+    12 + 4 * BPS,
+    0 + 8 * BPS,
+    4 + 8 * BPS,
+    8 + 8 * BPS,
+    12 + 8 * BPS,
+    0 + 12 * BPS,
+    4 + 12 * BPS,
+    8 + 12 * BPS,
+    12 + 12 * BPS
+  ];
 
   static int _checkMode(int mb_x, int mb_y, int mode) {
     if (mode == B_DC_PRED) {
@@ -648,8 +666,10 @@ class VP8 {
   }
 
   void _doUVTransform(int bits, InputBuffer src, InputBuffer dst) {
-    if (bits & 0xff != 0) { // any non-zero coeff at all?
-      if (bits & 0xaa != 0) { // any non-zero AC coefficient?
+    if (bits & 0xff != 0) {
+      // any non-zero coeff at all?
+      if (bits & 0xaa != 0) {
+        // any non-zero AC coefficient?
         // note we don't use the AC3 variant for U/V
         _dsp.transformUV(src, dst);
       } else {
@@ -668,7 +688,7 @@ class VP8 {
    * Complex filter: up to 4 luma samples are read and 3 are written. Same for
    *                U/V, so it's 8 samples total (because of the 2x upsampling).
    */
-  static const List<int> kFilterExtraRows = const [ 0, 2, 8 ];
+  static const List<int> kFilterExtraRows = const [0, 2, 8];
 
   void _doFilter(int mbX, int mbY) {
     final int yBps = _cacheYStride;
@@ -680,7 +700,8 @@ class VP8 {
       return;
     }
 
-    if (_filterType == 1) {   // simple
+    if (_filterType == 1) {
+      // simple
       if (mbX > 0) {
         _dsp.simpleHFilter16(yDst, yBps, limit + 4);
       }
@@ -693,7 +714,8 @@ class VP8 {
       if (fInfo.fInner) {
         _dsp.simpleVFilter16i(yDst, yBps, limit);
       }
-    } else {    // complex
+    } else {
+      // complex
       final int uvBps = _cacheUVStride;
       InputBuffer uDst = InputBuffer.from(_cacheU, offset: mbX * 8);
       InputBuffer vDst = InputBuffer.from(_cacheV, offset: mbX * 8);
@@ -727,9 +749,7 @@ class VP8 {
     }
   }
 
-  void _ditherRow() {
-  }
-
+  void _ditherRow() {}
 
   /**
    * This function is called after a row of macroblocks is finished decoding.
@@ -780,7 +800,7 @@ class VP8 {
     }
 
     if (yEnd > _cropBottom) {
-      yEnd = _cropBottom;    // make sure we don't overflow on last row.
+      yEnd = _cropBottom; // make sure we don't overflow on last row.
     }
 
     _a = null;
@@ -866,16 +886,21 @@ class VP8 {
     rgba[3] = 0xff;
   }
 
-  void _upsample(InputBuffer topY, InputBuffer bottomY,
-                 InputBuffer topU, InputBuffer topV,
-                 InputBuffer curU, InputBuffer curV,
-                 InputBuffer topDst, InputBuffer bottomDst,
-                 int len) {
+  void _upsample(
+      InputBuffer topY,
+      InputBuffer bottomY,
+      InputBuffer topU,
+      InputBuffer topV,
+      InputBuffer curU,
+      InputBuffer curV,
+      InputBuffer topDst,
+      InputBuffer bottomDst,
+      int len) {
     int LOAD_UV(int u, int v) => ((u) | ((v) << 16));
 
     final int lastPixelPair = (len - 1) >> 1;
     int tl_uv = LOAD_UV(topU[0], topV[0]); // top-left sample
-    int l_uv  = LOAD_UV(curU[0], curV[0]); // left-sample
+    int l_uv = LOAD_UV(curU[0], curV[0]); // left-sample
 
     final int uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
     _yuvToRgba(topY[0], uv0 & 0xff, (uv0 >> 16), topDst);
@@ -887,7 +912,7 @@ class VP8 {
 
     for (int x = 1; x <= lastPixelPair; ++x) {
       final int t_uv = LOAD_UV(topU[x], topV[x]); // top sample
-      final int uv   = LOAD_UV(curU[x], curV[x]); // sample
+      final int uv = LOAD_UV(curU[x], curV[x]); // sample
       // precompute invariant values associated with first and second diagonals
       final int avg = tl_uv + t_uv + l_uv + uv + 0x00080008;
       final int diag_12 = (avg + 2 * (t_uv + l_uv)) >> 3;
@@ -900,7 +925,7 @@ class VP8 {
           new InputBuffer.from(topDst, offset: (2 * x - 1) * 4));
 
       _yuvToRgba(topY[2 * x - 0], uv1 & 0xff, (uv1 >> 16),
-              new InputBuffer.from(topDst, offset: (2 * x - 0) * 4));
+          new InputBuffer.from(topDst, offset: (2 * x - 0) * 4));
 
       if (bottomY != null) {
         uv0 = (diag_03 + l_uv) >> 1;
@@ -910,7 +935,7 @@ class VP8 {
             new InputBuffer.from(bottomDst, offset: (2 * x - 1) * 4));
 
         _yuvToRgba(bottomY[2 * x], uv1 & 0xff, (uv1 >> 16),
-                new InputBuffer.from(bottomDst, offset: (2 * x + 0) * 4));
+            new InputBuffer.from(bottomDst, offset: (2 * x + 0) * 4));
       }
 
       tl_uv = t_uv;
@@ -920,12 +945,12 @@ class VP8 {
     if ((len & 1) == 0) {
       final int uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
       _yuvToRgba(topY[len - 1], uv0 & 0xff, (uv0 >> 16),
-           new InputBuffer.from(topDst, offset: (len - 1) * 4));
+          new InputBuffer.from(topDst, offset: (len - 1) * 4));
 
       if (bottomY != null) {
         final int uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
         _yuvToRgba(bottomY[len - 1], uv0 & 0xff, (uv0 >> 16),
-             new InputBuffer.from(bottomDst, offset: (len - 1) * 4));
+            new InputBuffer.from(bottomDst, offset: (len - 1) * 4));
       }
     }
   }
@@ -953,7 +978,8 @@ class VP8 {
       alpha.offset -= webp.width;
     }
 
-    InputBuffer dst = InputBuffer(output.getBytes(), offset: startY * stride + 3);
+    InputBuffer dst =
+        InputBuffer(output.getBytes(), offset: startY * stride + 3);
 
     if (_cropTop + mbY + mbH == _cropBottom) {
       // If it's the very last call, we process all the remaining rows!
@@ -971,10 +997,10 @@ class VP8 {
     }
   }
 
-
   int _emitFancyRGB(int mbY, int mbW, int mbH) {
-    int numLinesOut = mbH;   // a priori guess
-    InputBuffer dst = InputBuffer(output.getBytes(), offset: mbY * webp.width * 4);
+    int numLinesOut = mbH; // a priori guess
+    InputBuffer dst =
+        InputBuffer(output.getBytes(), offset: mbY * webp.width * 4);
     InputBuffer curY = InputBuffer.from(_y);
     InputBuffer curU = InputBuffer.from(_u);
     InputBuffer curV = InputBuffer.from(_v);
@@ -991,7 +1017,7 @@ class VP8 {
     } else {
       // We can finish the left-over line from previous call.
       _upsample(_tmpY, curY, topU, topV, curU, curV,
-                new InputBuffer.from(dst, offset: -stride), dst, mbW);
+          new InputBuffer.from(dst, offset: -stride), dst, mbW);
       ++numLinesOut;
     }
 
@@ -1005,9 +1031,16 @@ class VP8 {
       curV.offset += _cacheUVStride;
       dst.offset += 2 * stride;
       curY.offset += 2 * _cacheYStride;
-      _upsample(new InputBuffer.from(curY, offset: -_cacheYStride), curY,
-          topU, topV, curU, curV,
-          new InputBuffer.from(dst, offset: -stride), dst, mbW);
+      _upsample(
+          new InputBuffer.from(curY, offset: -_cacheYStride),
+          curY,
+          topU,
+          topV,
+          curU,
+          curV,
+          new InputBuffer.from(dst, offset: -stride),
+          dst,
+          mbW);
     }
 
     // move to last row
@@ -1036,7 +1069,7 @@ class VP8 {
     final int height = webp.height;
 
     if (row < 0 || numRows <= 0 || row + numRows > height) {
-      return null;    // sanity check.
+      return null; // sanity check.
     }
 
     if (row == 0) {
@@ -1064,9 +1097,9 @@ class VP8 {
     // to decode more than 1 keyframe.
     if (_segmentHeader.updateMap) {
       // Hardcoded tree parsing
-      _segment = br.getBit(_proba.segments[0]) == 0 ?
-            br.getBit(_proba.segments[1]) :
-            2 + br.getBit(_proba.segments[2]);
+      _segment = br.getBit(_proba.segments[0]) == 0
+          ? br.getBit(_proba.segments[1])
+          : 2 + br.getBit(_proba.segments[2]);
     }
 
     skip = _useSkipProba ? br.getBit(_skipP) != 0 : false;
@@ -1084,7 +1117,8 @@ class VP8 {
       block.nonZeroUV = 0;
     }
 
-    if (_filterType > 0) {  // store filter info
+    if (_filterType > 0) {
+      // store filter info
       _fInfo[_mbX] = _fStrengths[_segment][block.isIntra4x4 ? 1 : 0];
       VP8FInfo finfo = _fInfo[_mbX];
       finfo.fInner = finfo.fInner || !skip;
@@ -1111,14 +1145,17 @@ class VP8 {
 
     dst.memset(0, dst.length, 0);
 
-    if (!block.isIntra4x4) {    // parse DC
+    if (!block.isIntra4x4) {
+      // parse DC
       InputBuffer dc = InputBuffer(new Int16List(16));
       final int ctx = mb.nzDc + leftMb.nzDc;
       final int nz = _getCoeffs(tokenBr, bands[1], ctx, q.y2Mat, 0, dc);
       mb.nzDc = leftMb.nzDc = (nz > 0) ? 1 : 0;
-      if (nz > 1) {   // more than just the DC -> perform the full transform
+      if (nz > 1) {
+        // more than just the DC -> perform the full transform
         _transformWHT(dc, dst);
-      } else {        // only DC is non-zero -> inlined simplified transform
+      } else {
+        // only DC is non-zero -> inlined simplified transform
         final int dc0 = (dc[0] + 3) >> 3;
         for (int i = 0; i < 16 * 16; i += 16) {
           dst[i] = dc0;
@@ -1199,21 +1236,21 @@ class VP8 {
     int oi = 0;
     for (int i = 0; i < 4; ++i) {
       final int a0 = src[0 + i] + src[12 + i];
-      final int a1 = src[4 + i] + src[ 8 + i];
-      final int a2 = src[4 + i] - src[ 8 + i];
+      final int a1 = src[4 + i] + src[8 + i];
+      final int a2 = src[4 + i] - src[8 + i];
       final int a3 = src[0 + i] - src[12 + i];
-      tmp[0  + i] = a0 + a1;
-      tmp[8  + i] = a0 - a1;
-      tmp[4  + i] = a3 + a2;
+      tmp[0 + i] = a0 + a1;
+      tmp[8 + i] = a0 - a1;
+      tmp[4 + i] = a3 + a2;
       tmp[12 + i] = a3 - a2;
     }
 
     for (int i = 0; i < 4; ++i) {
-      final int dc = tmp[0 + i * 4] + 3;    // w/ rounder
-      final int a0 = dc             + tmp[3 + i * 4];
+      final int dc = tmp[0 + i * 4] + 3; // w/ rounder
+      final int a0 = dc + tmp[3 + i * 4];
       final int a1 = tmp[1 + i * 4] + tmp[2 + i * 4];
       final int a2 = tmp[1 + i * 4] - tmp[2 + i * 4];
-      final int a3 = dc             - tmp[3 + i * 4];
+      final int a3 = dc - tmp[3 + i * 4];
       out[oi + 0] = (a0 + a1) >> 3;
       out[oi + 16] = (a3 + a2) >> 3;
       out[oi + 32] = (a0 - a1) >> 3;
@@ -1230,16 +1267,60 @@ class VP8 {
   }
 
   static const List<int> kBands = const [
-     0, 1, 2, 3, 6, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 0];
+    0,
+    1,
+    2,
+    3,
+    6,
+    4,
+    5,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    7,
+    0
+  ];
 
-  static const List<int> kCat3 = const [ 173, 148, 140 ];
-  static const List<int> kCat4 = const [ 176, 155, 140, 135 ];
-  static const List<int> kCat5 = const [ 180, 157, 141, 134, 130 ];
-  static const List<int> kCat6 = const [ 254, 254, 243, 230, 196, 177, 153,
-                                         140, 133, 130, 129 ];
-  static const List<List<int>> kCat3456 = const [ kCat3, kCat4, kCat5, kCat6 ];
-  static const List<int> kZigzag = const [ 0, 1, 4, 8,  5, 2, 3, 6,  9, 12,
-                                           13, 10,  7, 11, 14, 15 ];
+  static const List<int> kCat3 = const [173, 148, 140];
+  static const List<int> kCat4 = const [176, 155, 140, 135];
+  static const List<int> kCat5 = const [180, 157, 141, 134, 130];
+  static const List<int> kCat6 = const [
+    254,
+    254,
+    243,
+    230,
+    196,
+    177,
+    153,
+    140,
+    133,
+    130,
+    129
+  ];
+  static const List<List<int>> kCat3456 = const [kCat3, kCat4, kCat5, kCat6];
+  static const List<int> kZigzag = const [
+    0,
+    1,
+    4,
+    8,
+    5,
+    2,
+    3,
+    6,
+    9,
+    12,
+    13,
+    10,
+    7,
+    11,
+    14,
+    15
+  ];
 
   /**
    * See section 13-2: http://tools.ietf.org/html/rfc6386#section-13.2
@@ -1275,27 +1356,28 @@ class VP8 {
     return v;
   }
 
-
   /**
    * Returns the position of the last non-zero coeff plus one
    */
-  int _getCoeffs(VP8BitReader br, List<VP8BandProbas> prob,
-                 int ctx, List<int> dq, int n, InputBuffer out) {
+  int _getCoeffs(VP8BitReader br, List<VP8BandProbas> prob, int ctx,
+      List<int> dq, int n, InputBuffer out) {
     // n is either 0 or 1 here. kBands[n] is not necessary for extracting '*p'.
     List<int> p = prob[n].probas[ctx];
     for (; n < 16; ++n) {
       if (br.getBit(p[0]) == 0) {
-        return n;  // previous coeff was last non-zero coeff
+        return n; // previous coeff was last non-zero coeff
       }
 
-      while (br.getBit(p[1]) == 0) { // sequence of zero coeffs
+      while (br.getBit(p[1]) == 0) {
+        // sequence of zero coeffs
         p = prob[kBands[++n]].probas[0];
         if (n == 16) {
           return 16;
         }
       }
 
-      { // non zero coeff
+      {
+        // non zero coeff
         List<Uint8List> p_ctx = prob[kBands[n + 1]].probas;
         int v;
         if (br.getBit(p[2]) == 0) {
@@ -1324,10 +1406,9 @@ class VP8 {
     block.isIntra4x4 = br.getBit(145) == 0;
     if (!block.isIntra4x4) {
       // Hardcoded 16x16 intra-mode decision tree.
-      final int ymode =
-          br.getBit(156) != 0 ?
-              (br.getBit(128) != 0 ? TM_PRED : H_PRED) :
-              (br.getBit(163) != 0 ? V_PRED : DC_PRED);
+      final int ymode = br.getBit(156) != 0
+          ? (br.getBit(128) != 0 ? TM_PRED : H_PRED)
+          : (br.getBit(163) != 0 ? V_PRED : DC_PRED);
       block.imodes[0] = ymode;
 
       top.fillRange(ti, ti + 4, ymode);
@@ -1360,9 +1441,9 @@ class VP8 {
     }
 
     // Hardcoded UVMode decision tree
-    block.uvmode = br.getBit(142) == 0 ? DC_PRED
-        : br.getBit(114) == 0 ? V_PRED
-            : br.getBit(183) != 0 ? TM_PRED : H_PRED;
+    block.uvmode = br.getBit(142) == 0
+        ? DC_PRED
+        : br.getBit(114) == 0 ? V_PRED : br.getBit(183) != 0 ? TM_PRED : H_PRED;
   }
 
   // Main data source
@@ -1385,6 +1466,7 @@ class VP8 {
 
   /// Width in macroblock units.
   int _mbWidth;
+
   /// Height in macroblock units.
   int _mbHeight;
 
@@ -1414,18 +1496,22 @@ class VP8 {
   // Boundary data cache and persistent buffers.
   /// top intra modes values: 4 * _mbWidth
   Uint8List _intraT;
+
   /// left intra modes values
   Uint8List _intraL = Uint8List(4);
 
   /// uint8, segment of the currently parsed block
   int _segment;
+
   /// top y/u/v samples
   List<VP8TopSamples> _yuvT;
 
   /// contextual macroblock info (mb_w_ + 1)
   List<VP8MB> _mbInfo;
+
   /// filter strength info
   List<VP8FInfo> _fInfo;
+
   /// main block for Y/U/V (size = YUV_SIZE)
   Uint8List _yuvBlock;
 
@@ -1452,19 +1538,23 @@ class VP8 {
   /// current position, in macroblock units
   int _mbX = 0;
   int _mbY = 0;
+
   /// parsed reconstruction data
   List<VP8MBData> _mbData;
 
   /// 0=off, 1=simple, 2=complex
   int _filterType;
+
   /// precalculated per-segment/type
   List<List<VP8FInfo>> _fStrengths;
 
   // Alpha
   /// alpha-plane decoder object
   WebPAlpha _alpha;
+
   /// compressed alpha data (if present)
   InputBuffer _alphaData;
+
   /// true if alpha_data_ is decoded in alpha_plane_
   //int _isAlphaDecoded;
   /// output. Persistent, contains the whole data.
@@ -1480,422 +1570,531 @@ class VP8 {
   }
 
   static const List<int> kYModesIntra4 = const [
-    -B_DC_PRED, 1,
-    -B_TM_PRED, 2,
-    -B_VE_PRED, 3,
-    4, 6,
-    -B_HE_PRED, 5,
-    -B_RD_PRED, -B_VR_PRED,
-    -B_LD_PRED, 7,
-    -B_VL_PRED, 8,
-    -B_HD_PRED, -B_HU_PRED ];
+    -B_DC_PRED,
+    1,
+    -B_TM_PRED,
+    2,
+    -B_VE_PRED,
+    3,
+    4,
+    6,
+    -B_HE_PRED,
+    5,
+    -B_RD_PRED,
+    -B_VR_PRED,
+    -B_LD_PRED,
+    7,
+    -B_VL_PRED,
+    8,
+    -B_HD_PRED,
+    -B_HU_PRED
+  ];
 
   static const List<List<List<int>>> kBModesProba = const [
-     const [ const [ 231, 120, 48, 89, 115, 113, 120, 152, 112 ],
-       const [ 152, 179, 64, 126, 170, 118, 46, 70, 95 ],
-       const [ 175, 69, 143, 80, 85, 82, 72, 155, 103 ],
-       const [ 56, 58, 10, 171, 218, 189, 17, 13, 152 ],
-       const [ 114, 26, 17, 163, 44, 195, 21, 10, 173 ],
-       const [ 121, 24, 80, 195, 26, 62, 44, 64, 85 ],
-       const [ 144, 71, 10, 38, 171, 213, 144, 34, 26 ],
-       const [ 170, 46, 55, 19, 136, 160, 33, 206, 71 ],
-       const [ 63, 20, 8, 114, 114, 208, 12, 9, 226 ],
-       const [ 81, 40, 11, 96, 182, 84, 29, 16, 36 ] ],
-       const [ const [ 134, 183, 89, 137, 98, 101, 106, 165, 148 ],
-         const [ 72, 187, 100, 130, 157, 111, 32, 75, 80 ],
-         const [ 66, 102, 167, 99, 74, 62, 40, 234, 128 ],
-         const [ 41, 53, 9, 178, 241, 141, 26, 8, 107 ],
-         const [ 74, 43, 26, 146, 73, 166, 49, 23, 157 ],
-         const [ 65, 38, 105, 160, 51, 52, 31, 115, 128 ],
-         const [ 104, 79, 12, 27, 217, 255, 87, 17, 7 ],
-         const [ 87, 68, 71, 44, 114, 51, 15, 186, 23 ],
-         const [ 47, 41, 14, 110, 182, 183, 21, 17, 194 ],
-         const [ 66, 45, 25, 102, 197, 189, 23, 18, 22 ] ],
-         const [ const [ 88, 88, 147, 150, 42, 46, 45, 196, 205 ],
-           const [ 43, 97, 183, 117, 85, 38, 35, 179, 61 ],
-           const [ 39, 53, 200, 87, 26, 21, 43, 232, 171 ],
-           const [ 56, 34, 51, 104, 114, 102, 29, 93, 77 ],
-           const [ 39, 28, 85, 171, 58, 165, 90, 98, 64 ],
-           const [ 34, 22, 116, 206, 23, 34, 43, 166, 73 ],
-           const [ 107, 54, 32, 26, 51, 1, 81, 43, 31 ],
-           const [ 68, 25, 106, 22, 64, 171, 36, 225, 114 ],
-           const [ 34, 19, 21, 102, 132, 188, 16, 76, 124 ],
-           const [ 62, 18, 78, 95, 85, 57, 50, 48, 51 ] ],
-           const [ const [ 193, 101, 35, 159, 215, 111, 89, 46, 111 ],
-             const [ 60, 148, 31, 172, 219, 228, 21, 18, 111 ],
-             const [ 112, 113, 77, 85, 179, 255, 38, 120, 114 ],
-             const [ 40, 42, 1, 196, 245, 209, 10, 25, 109 ],
-             const [ 88, 43, 29, 140, 166, 213, 37, 43, 154 ],
-             const [ 61, 63, 30, 155, 67, 45, 68, 1, 209 ],
-             const [ 100, 80, 8, 43, 154, 1, 51, 26, 71 ],
-             const [ 142, 78, 78, 16, 255, 128, 34, 197, 171 ],
-             const [ 41, 40, 5, 102, 211, 183, 4, 1, 221 ],
-             const [ 51, 50, 17, 168, 209, 192, 23, 25, 82 ] ],
-             const [ const [ 138, 31, 36, 171, 27, 166, 38, 44, 229 ],
-               const [ 67, 87, 58, 169, 82, 115, 26, 59, 179 ],
-               const [ 63, 59, 90, 180, 59, 166, 93, 73, 154 ],
-               const [ 40, 40, 21, 116, 143, 209, 34, 39, 175 ],
-               const [ 47, 15, 16, 183, 34, 223, 49, 45, 183 ],
-               const [ 46, 17, 33, 183, 6, 98, 15, 32, 183 ],
-               const [ 57, 46, 22, 24, 128, 1, 54, 17, 37 ],
-               const [ 65, 32, 73, 115, 28, 128, 23, 128, 205 ],
-               const [ 40, 3, 9, 115, 51, 192, 18, 6, 223 ],
-               const [ 87, 37, 9, 115, 59, 77, 64, 21, 47 ] ],
-               const [ const [ 104, 55, 44, 218, 9, 54, 53, 130, 226 ],
-                 const [ 64, 90, 70, 205, 40, 41, 23, 26, 57 ],
-                 const [ 54, 57, 112, 184, 5, 41, 38, 166, 213 ],
-                 const [ 30, 34, 26, 133, 152, 116, 10, 32, 134 ],
-                 const [ 39, 19, 53, 221, 26, 114, 32, 73, 255 ],
-                 const [ 31, 9, 65, 234, 2, 15, 1, 118, 73 ],
-                 const [ 75, 32, 12, 51, 192, 255, 160, 43, 51 ],
-                 const [ 88, 31, 35, 67, 102, 85, 55, 186, 85 ],
-                 const [ 56, 21, 23, 111, 59, 205, 45, 37, 192 ],
-                 const [ 55, 38, 70, 124, 73, 102, 1, 34, 98 ] ],
-                 const [ const [ 125, 98, 42, 88, 104, 85, 117, 175, 82 ],
-                   const [ 95, 84, 53, 89, 128, 100, 113, 101, 45 ],
-                   const [ 75, 79, 123, 47, 51, 128, 81, 171, 1 ],
-                   const [ 57, 17, 5, 71, 102, 57, 53, 41, 49 ],
-                   const [ 38, 33, 13, 121, 57, 73, 26, 1, 85 ],
-                   const [ 41, 10, 67, 138, 77, 110, 90, 47, 114 ],
-                   const [ 115, 21, 2, 10, 102, 255, 166, 23, 6 ],
-                   const [ 101, 29, 16, 10, 85, 128, 101, 196, 26 ],
-                   const [ 57, 18, 10, 102, 102, 213, 34, 20, 43 ],
-                   const [ 117, 20, 15, 36, 163, 128, 68, 1, 26 ] ],
-                   const [ const [ 102, 61, 71, 37, 34, 53, 31, 243, 192 ],
-                     const [ 69, 60, 71, 38, 73, 119, 28, 222, 37 ],
-                     const [ 68, 45, 128, 34, 1, 47, 11, 245, 171 ],
-                     const [ 62, 17, 19, 70, 146, 85, 55, 62, 70 ],
-                     const [ 37, 43, 37, 154, 100, 163, 85, 160, 1 ],
-                     const [ 63, 9, 92, 136, 28, 64, 32, 201, 85 ],
-                     const [ 75, 15, 9, 9, 64, 255, 184, 119, 16 ],
-                     const [ 86, 6, 28, 5, 64, 255, 25, 248, 1 ],
-                     const [ 56, 8, 17, 132, 137, 255, 55, 116, 128 ],
-                     const [ 58, 15, 20, 82, 135, 57, 26, 121, 40 ] ],
-                     const [ const [ 164, 50, 31, 137, 154, 133, 25, 35, 218 ],
-                       const [ 51, 103, 44, 131, 131, 123, 31, 6, 158 ],
-                       const [ 86, 40, 64, 135, 148, 224, 45, 183, 128 ],
-                       const [ 22, 26, 17, 131, 240, 154, 14, 1, 209 ],
-                       const [ 45, 16, 21, 91, 64, 222, 7, 1, 197 ],
-                       const [ 56, 21, 39, 155, 60, 138, 23, 102, 213 ],
-                       const [ 83, 12, 13, 54, 192, 255, 68, 47, 28 ],
-                       const [ 85, 26, 85, 85, 128, 128, 32, 146, 171 ],
-                       const [ 18, 11, 7, 63, 144, 171, 4, 4, 246 ],
-                       const [ 35, 27, 10, 146, 174, 171, 12, 26, 128 ] ],
-                       const [ const [ 190, 80, 35, 99, 180, 80, 126, 54, 45 ],
-                         const [ 85, 126, 47, 87, 176, 51, 41, 20, 32 ],
-                         const [ 101, 75, 128, 139, 118, 146, 116, 128, 85 ],
-                         const [ 56, 41, 15, 176, 236, 85, 37, 9, 62 ],
-                         const [ 71, 30, 17, 119, 118, 255, 17, 18, 138 ],
-                         const [ 101, 38, 60, 138, 55, 70, 43, 26, 142 ],
-                         const [ 146, 36, 19, 30, 171, 255, 97, 27, 20 ],
-                         const [ 138, 45, 61, 62, 219, 1, 81, 188, 64 ],
-                         const [ 32, 41, 20, 117, 151, 142, 20, 21, 163 ],
-                         const [ 112, 19, 12, 61, 195, 128, 48, 4, 24 ] ] ];
+    const [
+      const [231, 120, 48, 89, 115, 113, 120, 152, 112],
+      const [152, 179, 64, 126, 170, 118, 46, 70, 95],
+      const [175, 69, 143, 80, 85, 82, 72, 155, 103],
+      const [56, 58, 10, 171, 218, 189, 17, 13, 152],
+      const [114, 26, 17, 163, 44, 195, 21, 10, 173],
+      const [121, 24, 80, 195, 26, 62, 44, 64, 85],
+      const [144, 71, 10, 38, 171, 213, 144, 34, 26],
+      const [170, 46, 55, 19, 136, 160, 33, 206, 71],
+      const [63, 20, 8, 114, 114, 208, 12, 9, 226],
+      const [81, 40, 11, 96, 182, 84, 29, 16, 36]
+    ],
+    const [
+      const [134, 183, 89, 137, 98, 101, 106, 165, 148],
+      const [72, 187, 100, 130, 157, 111, 32, 75, 80],
+      const [66, 102, 167, 99, 74, 62, 40, 234, 128],
+      const [41, 53, 9, 178, 241, 141, 26, 8, 107],
+      const [74, 43, 26, 146, 73, 166, 49, 23, 157],
+      const [65, 38, 105, 160, 51, 52, 31, 115, 128],
+      const [104, 79, 12, 27, 217, 255, 87, 17, 7],
+      const [87, 68, 71, 44, 114, 51, 15, 186, 23],
+      const [47, 41, 14, 110, 182, 183, 21, 17, 194],
+      const [66, 45, 25, 102, 197, 189, 23, 18, 22]
+    ],
+    const [
+      const [88, 88, 147, 150, 42, 46, 45, 196, 205],
+      const [43, 97, 183, 117, 85, 38, 35, 179, 61],
+      const [39, 53, 200, 87, 26, 21, 43, 232, 171],
+      const [56, 34, 51, 104, 114, 102, 29, 93, 77],
+      const [39, 28, 85, 171, 58, 165, 90, 98, 64],
+      const [34, 22, 116, 206, 23, 34, 43, 166, 73],
+      const [107, 54, 32, 26, 51, 1, 81, 43, 31],
+      const [68, 25, 106, 22, 64, 171, 36, 225, 114],
+      const [34, 19, 21, 102, 132, 188, 16, 76, 124],
+      const [62, 18, 78, 95, 85, 57, 50, 48, 51]
+    ],
+    const [
+      const [193, 101, 35, 159, 215, 111, 89, 46, 111],
+      const [60, 148, 31, 172, 219, 228, 21, 18, 111],
+      const [112, 113, 77, 85, 179, 255, 38, 120, 114],
+      const [40, 42, 1, 196, 245, 209, 10, 25, 109],
+      const [88, 43, 29, 140, 166, 213, 37, 43, 154],
+      const [61, 63, 30, 155, 67, 45, 68, 1, 209],
+      const [100, 80, 8, 43, 154, 1, 51, 26, 71],
+      const [142, 78, 78, 16, 255, 128, 34, 197, 171],
+      const [41, 40, 5, 102, 211, 183, 4, 1, 221],
+      const [51, 50, 17, 168, 209, 192, 23, 25, 82]
+    ],
+    const [
+      const [138, 31, 36, 171, 27, 166, 38, 44, 229],
+      const [67, 87, 58, 169, 82, 115, 26, 59, 179],
+      const [63, 59, 90, 180, 59, 166, 93, 73, 154],
+      const [40, 40, 21, 116, 143, 209, 34, 39, 175],
+      const [47, 15, 16, 183, 34, 223, 49, 45, 183],
+      const [46, 17, 33, 183, 6, 98, 15, 32, 183],
+      const [57, 46, 22, 24, 128, 1, 54, 17, 37],
+      const [65, 32, 73, 115, 28, 128, 23, 128, 205],
+      const [40, 3, 9, 115, 51, 192, 18, 6, 223],
+      const [87, 37, 9, 115, 59, 77, 64, 21, 47]
+    ],
+    const [
+      const [104, 55, 44, 218, 9, 54, 53, 130, 226],
+      const [64, 90, 70, 205, 40, 41, 23, 26, 57],
+      const [54, 57, 112, 184, 5, 41, 38, 166, 213],
+      const [30, 34, 26, 133, 152, 116, 10, 32, 134],
+      const [39, 19, 53, 221, 26, 114, 32, 73, 255],
+      const [31, 9, 65, 234, 2, 15, 1, 118, 73],
+      const [75, 32, 12, 51, 192, 255, 160, 43, 51],
+      const [88, 31, 35, 67, 102, 85, 55, 186, 85],
+      const [56, 21, 23, 111, 59, 205, 45, 37, 192],
+      const [55, 38, 70, 124, 73, 102, 1, 34, 98]
+    ],
+    const [
+      const [125, 98, 42, 88, 104, 85, 117, 175, 82],
+      const [95, 84, 53, 89, 128, 100, 113, 101, 45],
+      const [75, 79, 123, 47, 51, 128, 81, 171, 1],
+      const [57, 17, 5, 71, 102, 57, 53, 41, 49],
+      const [38, 33, 13, 121, 57, 73, 26, 1, 85],
+      const [41, 10, 67, 138, 77, 110, 90, 47, 114],
+      const [115, 21, 2, 10, 102, 255, 166, 23, 6],
+      const [101, 29, 16, 10, 85, 128, 101, 196, 26],
+      const [57, 18, 10, 102, 102, 213, 34, 20, 43],
+      const [117, 20, 15, 36, 163, 128, 68, 1, 26]
+    ],
+    const [
+      const [102, 61, 71, 37, 34, 53, 31, 243, 192],
+      const [69, 60, 71, 38, 73, 119, 28, 222, 37],
+      const [68, 45, 128, 34, 1, 47, 11, 245, 171],
+      const [62, 17, 19, 70, 146, 85, 55, 62, 70],
+      const [37, 43, 37, 154, 100, 163, 85, 160, 1],
+      const [63, 9, 92, 136, 28, 64, 32, 201, 85],
+      const [75, 15, 9, 9, 64, 255, 184, 119, 16],
+      const [86, 6, 28, 5, 64, 255, 25, 248, 1],
+      const [56, 8, 17, 132, 137, 255, 55, 116, 128],
+      const [58, 15, 20, 82, 135, 57, 26, 121, 40]
+    ],
+    const [
+      const [164, 50, 31, 137, 154, 133, 25, 35, 218],
+      const [51, 103, 44, 131, 131, 123, 31, 6, 158],
+      const [86, 40, 64, 135, 148, 224, 45, 183, 128],
+      const [22, 26, 17, 131, 240, 154, 14, 1, 209],
+      const [45, 16, 21, 91, 64, 222, 7, 1, 197],
+      const [56, 21, 39, 155, 60, 138, 23, 102, 213],
+      const [83, 12, 13, 54, 192, 255, 68, 47, 28],
+      const [85, 26, 85, 85, 128, 128, 32, 146, 171],
+      const [18, 11, 7, 63, 144, 171, 4, 4, 246],
+      const [35, 27, 10, 146, 174, 171, 12, 26, 128]
+    ],
+    const [
+      const [190, 80, 35, 99, 180, 80, 126, 54, 45],
+      const [85, 126, 47, 87, 176, 51, 41, 20, 32],
+      const [101, 75, 128, 139, 118, 146, 116, 128, 85],
+      const [56, 41, 15, 176, 236, 85, 37, 9, 62],
+      const [71, 30, 17, 119, 118, 255, 17, 18, 138],
+      const [101, 38, 60, 138, 55, 70, 43, 26, 142],
+      const [146, 36, 19, 30, 171, 255, 97, 27, 20],
+      const [138, 45, 61, 62, 219, 1, 81, 188, 64],
+      const [32, 41, 20, 117, 151, 142, 20, 21, 163],
+      const [112, 19, 12, 61, 195, 128, 48, 4, 24]
+    ]
+  ];
 
   static const List COEFFS_PROBA_0 = const [
-  const [ const [ const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ]
+    const [
+      const [
+        const [128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128]
+      ],
+      const [
+        const [253, 136, 254, 255, 228, 219, 128, 128, 128, 128, 128],
+        const [189, 129, 242, 255, 227, 213, 255, 219, 128, 128, 128],
+        const [106, 126, 227, 252, 214, 209, 255, 255, 128, 128, 128]
+      ],
+      const [
+        const [1, 98, 248, 255, 236, 226, 255, 255, 128, 128, 128],
+        const [181, 133, 238, 254, 221, 234, 255, 154, 128, 128, 128],
+        const [78, 134, 202, 247, 198, 180, 255, 219, 128, 128, 128],
+      ],
+      const [
+        const [1, 185, 249, 255, 243, 255, 128, 128, 128, 128, 128],
+        const [184, 150, 247, 255, 236, 224, 128, 128, 128, 128, 128],
+        const [77, 110, 216, 255, 236, 230, 128, 128, 128, 128, 128],
+      ],
+      const [
+        const [1, 101, 251, 255, 241, 255, 128, 128, 128, 128, 128],
+        const [170, 139, 241, 252, 236, 209, 255, 255, 128, 128, 128],
+        const [37, 116, 196, 243, 228, 255, 255, 255, 128, 128, 128]
+      ],
+      const [
+        const [1, 204, 254, 255, 245, 255, 128, 128, 128, 128, 128],
+        const [207, 160, 250, 255, 238, 128, 128, 128, 128, 128, 128],
+        const [102, 103, 231, 255, 211, 171, 128, 128, 128, 128, 128]
+      ],
+      const [
+        const [1, 152, 252, 255, 240, 255, 128, 128, 128, 128, 128],
+        const [177, 135, 243, 255, 234, 225, 128, 128, 128, 128, 128],
+        const [80, 129, 211, 255, 194, 224, 128, 128, 128, 128, 128]
+      ],
+      const [
+        const [1, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [246, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [255, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128]
+      ]
     ],
-    const [ const [ 253, 136, 254, 255, 228, 219, 128, 128, 128, 128, 128 ],
-      const [ 189, 129, 242, 255, 227, 213, 255, 219, 128, 128, 128 ],
-      const [ 106, 126, 227, 252, 214, 209, 255, 255, 128, 128, 128 ]
+    const [
+      const [
+        const [198, 35, 237, 223, 193, 187, 162, 160, 145, 155, 62],
+        const [131, 45, 198, 221, 172, 176, 220, 157, 252, 221, 1],
+        const [68, 47, 146, 208, 149, 167, 221, 162, 255, 223, 128]
+      ],
+      const [
+        const [1, 149, 241, 255, 221, 224, 255, 255, 128, 128, 128],
+        const [184, 141, 234, 253, 222, 220, 255, 199, 128, 128, 128],
+        const [81, 99, 181, 242, 176, 190, 249, 202, 255, 255, 128]
+      ],
+      const [
+        const [1, 129, 232, 253, 214, 197, 242, 196, 255, 255, 128],
+        const [99, 121, 210, 250, 201, 198, 255, 202, 128, 128, 128],
+        const [23, 91, 163, 242, 170, 187, 247, 210, 255, 255, 128]
+      ],
+      const [
+        const [1, 200, 246, 255, 234, 255, 128, 128, 128, 128, 128],
+        const [109, 178, 241, 255, 231, 245, 255, 255, 128, 128, 128],
+        const [44, 130, 201, 253, 205, 192, 255, 255, 128, 128, 128]
+      ],
+      const [
+        const [1, 132, 239, 251, 219, 209, 255, 165, 128, 128, 128],
+        const [94, 136, 225, 251, 218, 190, 255, 255, 128, 128, 128],
+        const [22, 100, 174, 245, 186, 161, 255, 199, 128, 128, 128]
+      ],
+      const [
+        const [1, 182, 249, 255, 232, 235, 128, 128, 128, 128, 128],
+        const [124, 143, 241, 255, 227, 234, 128, 128, 128, 128, 128],
+        const [35, 77, 181, 251, 193, 211, 255, 205, 128, 128, 128]
+      ],
+      const [
+        const [1, 157, 247, 255, 236, 231, 255, 255, 128, 128, 128],
+        const [121, 141, 235, 255, 225, 227, 255, 255, 128, 128, 128],
+        const [45, 99, 188, 251, 195, 217, 255, 224, 128, 128, 128]
+      ],
+      const [
+        const [1, 1, 251, 255, 213, 255, 128, 128, 128, 128, 128],
+        const [203, 1, 248, 255, 255, 128, 128, 128, 128, 128, 128],
+        const [137, 1, 177, 255, 224, 255, 128, 128, 128, 128, 128]
+      ]
     ],
-    const [ const [ 1, 98, 248, 255, 236, 226, 255, 255, 128, 128, 128 ],
-      const [ 181, 133, 238, 254, 221, 234, 255, 154, 128, 128, 128 ],
-      const [ 78, 134, 202, 247, 198, 180, 255, 219, 128, 128, 128 ],
+    const [
+      const [
+        const [253, 9, 248, 251, 207, 208, 255, 192, 128, 128, 128],
+        const [175, 13, 224, 243, 193, 185, 249, 198, 255, 255, 128],
+        const [73, 17, 171, 221, 161, 179, 236, 167, 255, 234, 128]
+      ],
+      const [
+        const [1, 95, 247, 253, 212, 183, 255, 255, 128, 128, 128],
+        const [239, 90, 244, 250, 211, 209, 255, 255, 128, 128, 128],
+        const [155, 77, 195, 248, 188, 195, 255, 255, 128, 128, 128]
+      ],
+      const [
+        const [1, 24, 239, 251, 218, 219, 255, 205, 128, 128, 128],
+        const [201, 51, 219, 255, 196, 186, 128, 128, 128, 128, 128],
+        const [69, 46, 190, 239, 201, 218, 255, 228, 128, 128, 128]
+      ],
+      const [
+        const [1, 191, 251, 255, 255, 128, 128, 128, 128, 128, 128],
+        const [223, 165, 249, 255, 213, 255, 128, 128, 128, 128, 128],
+        const [141, 124, 248, 255, 255, 128, 128, 128, 128, 128, 128]
+      ],
+      const [
+        const [1, 16, 248, 255, 255, 128, 128, 128, 128, 128, 128],
+        const [190, 36, 230, 255, 236, 255, 128, 128, 128, 128, 128],
+        const [149, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128]
+      ],
+      const [
+        const [1, 226, 255, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [247, 192, 255, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [240, 128, 255, 128, 128, 128, 128, 128, 128, 128, 128]
+      ],
+      const [
+        const [1, 134, 252, 255, 255, 128, 128, 128, 128, 128, 128],
+        const [213, 62, 250, 255, 255, 128, 128, 128, 128, 128, 128],
+        const [55, 93, 255, 128, 128, 128, 128, 128, 128, 128, 128]
+      ],
+      const [
+        const [128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128]
+      ]
     ],
-    const [ const [ 1, 185, 249, 255, 243, 255, 128, 128, 128, 128, 128 ],
-      const [ 184, 150, 247, 255, 236, 224, 128, 128, 128, 128, 128 ],
-      const [ 77, 110, 216, 255, 236, 230, 128, 128, 128, 128, 128 ],
-    ],
-    const [ const [ 1, 101, 251, 255, 241, 255, 128, 128, 128, 128, 128 ],
-      const [ 170, 139, 241, 252, 236, 209, 255, 255, 128, 128, 128 ],
-      const [ 37, 116, 196, 243, 228, 255, 255, 255, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 204, 254, 255, 245, 255, 128, 128, 128, 128, 128 ],
-      const [ 207, 160, 250, 255, 238, 128, 128, 128, 128, 128, 128 ],
-      const [ 102, 103, 231, 255, 211, 171, 128, 128, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 152, 252, 255, 240, 255, 128, 128, 128, 128, 128 ],
-      const [ 177, 135, 243, 255, 234, 225, 128, 128, 128, 128, 128 ],
-      const [ 80, 129, 211, 255, 194, 224, 128, 128, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 246, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 255, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ]
+    const [
+      const [
+        const [202, 24, 213, 235, 186, 191, 220, 160, 240, 175, 255],
+        const [126, 38, 182, 232, 169, 184, 228, 174, 255, 187, 128],
+        const [61, 46, 138, 219, 151, 178, 240, 170, 255, 216, 128]
+      ],
+      const [
+        const [1, 112, 230, 250, 199, 191, 247, 159, 255, 255, 128],
+        const [166, 109, 228, 252, 211, 215, 255, 174, 128, 128, 128],
+        const [39, 77, 162, 232, 172, 180, 245, 178, 255, 255, 128]
+      ],
+      const [
+        const [1, 52, 220, 246, 198, 199, 249, 220, 255, 255, 128],
+        const [124, 74, 191, 243, 183, 193, 250, 221, 255, 255, 128],
+        const [24, 71, 130, 219, 154, 170, 243, 182, 255, 255, 128]
+      ],
+      const [
+        const [1, 182, 225, 249, 219, 240, 255, 224, 128, 128, 128],
+        const [149, 150, 226, 252, 216, 205, 255, 171, 128, 128, 128],
+        const [28, 108, 170, 242, 183, 194, 254, 223, 255, 255, 128]
+      ],
+      const [
+        const [1, 81, 230, 252, 204, 203, 255, 192, 128, 128, 128],
+        const [123, 102, 209, 247, 188, 196, 255, 233, 128, 128, 128],
+        const [20, 95, 153, 243, 164, 173, 255, 203, 128, 128, 128]
+      ],
+      const [
+        const [1, 222, 248, 255, 216, 213, 128, 128, 128, 128, 128],
+        const [168, 175, 246, 252, 235, 205, 255, 255, 128, 128, 128],
+        const [47, 116, 215, 255, 211, 212, 255, 255, 128, 128, 128]
+      ],
+      const [
+        const [1, 121, 236, 253, 212, 214, 255, 255, 128, 128, 128],
+        const [141, 84, 213, 252, 201, 202, 255, 219, 128, 128, 128],
+        const [42, 80, 160, 240, 162, 185, 255, 205, 128, 128, 128]
+      ],
+      const [
+        const [1, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [244, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128],
+        const [238, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128]
+      ]
     ]
-  ],
-  const [ const [ const [ 198, 35, 237, 223, 193, 187, 162, 160, 145, 155, 62 ],
-      const [ 131, 45, 198, 221, 172, 176, 220, 157, 252, 221, 1 ],
-      const [ 68, 47, 146, 208, 149, 167, 221, 162, 255, 223, 128 ]
-    ],
-    const [ const [ 1, 149, 241, 255, 221, 224, 255, 255, 128, 128, 128 ],
-      const [ 184, 141, 234, 253, 222, 220, 255, 199, 128, 128, 128 ],
-      const [ 81, 99, 181, 242, 176, 190, 249, 202, 255, 255, 128 ]
-    ],
-    const [ const [ 1, 129, 232, 253, 214, 197, 242, 196, 255, 255, 128 ],
-      const [ 99, 121, 210, 250, 201, 198, 255, 202, 128, 128, 128 ],
-      const [ 23, 91, 163, 242, 170, 187, 247, 210, 255, 255, 128 ]
-    ],
-    const [ const [ 1, 200, 246, 255, 234, 255, 128, 128, 128, 128, 128 ],
-      const [ 109, 178, 241, 255, 231, 245, 255, 255, 128, 128, 128 ],
-      const [ 44, 130, 201, 253, 205, 192, 255, 255, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 132, 239, 251, 219, 209, 255, 165, 128, 128, 128 ],
-      const [ 94, 136, 225, 251, 218, 190, 255, 255, 128, 128, 128 ],
-      const [ 22, 100, 174, 245, 186, 161, 255, 199, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 182, 249, 255, 232, 235, 128, 128, 128, 128, 128 ],
-      const [ 124, 143, 241, 255, 227, 234, 128, 128, 128, 128, 128 ],
-      const [ 35, 77, 181, 251, 193, 211, 255, 205, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 157, 247, 255, 236, 231, 255, 255, 128, 128, 128 ],
-      const [ 121, 141, 235, 255, 225, 227, 255, 255, 128, 128, 128 ],
-      const [ 45, 99, 188, 251, 195, 217, 255, 224, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 1, 251, 255, 213, 255, 128, 128, 128, 128, 128 ],
-      const [ 203, 1, 248, 255, 255, 128, 128, 128, 128, 128, 128 ],
-      const [ 137, 1, 177, 255, 224, 255, 128, 128, 128, 128, 128 ]
-    ]
-  ],
-  const [ const [ const [ 253, 9, 248, 251, 207, 208, 255, 192, 128, 128, 128 ],
-      const [ 175, 13, 224, 243, 193, 185, 249, 198, 255, 255, 128 ],
-      const [ 73, 17, 171, 221, 161, 179, 236, 167, 255, 234, 128 ]
-    ],
-    const [ const [ 1, 95, 247, 253, 212, 183, 255, 255, 128, 128, 128 ],
-      const [ 239, 90, 244, 250, 211, 209, 255, 255, 128, 128, 128 ],
-      const [ 155, 77, 195, 248, 188, 195, 255, 255, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 24, 239, 251, 218, 219, 255, 205, 128, 128, 128 ],
-      const [ 201, 51, 219, 255, 196, 186, 128, 128, 128, 128, 128 ],
-      const [ 69, 46, 190, 239, 201, 218, 255, 228, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 191, 251, 255, 255, 128, 128, 128, 128, 128, 128 ],
-      const [ 223, 165, 249, 255, 213, 255, 128, 128, 128, 128, 128 ],
-      const [ 141, 124, 248, 255, 255, 128, 128, 128, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 16, 248, 255, 255, 128, 128, 128, 128, 128, 128 ],
-      const [ 190, 36, 230, 255, 236, 255, 128, 128, 128, 128, 128 ],
-      const [ 149, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 226, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 247, 192, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 240, 128, 255, 128, 128, 128, 128, 128, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 134, 252, 255, 255, 128, 128, 128, 128, 128, 128 ],
-      const [ 213, 62, 250, 255, 255, 128, 128, 128, 128, 128, 128 ],
-      const [ 55, 93, 255, 128, 128, 128, 128, 128, 128, 128, 128 ]
-    ],
-    const [ const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 ]
-    ]
-  ],
-  const [ const [ const [ 202, 24, 213, 235, 186, 191, 220, 160, 240, 175, 255 ],
-      const [ 126, 38, 182, 232, 169, 184, 228, 174, 255, 187, 128 ],
-      const [ 61, 46, 138, 219, 151, 178, 240, 170, 255, 216, 128 ]
-    ],
-    const [ const [ 1, 112, 230, 250, 199, 191, 247, 159, 255, 255, 128 ],
-      const [ 166, 109, 228, 252, 211, 215, 255, 174, 128, 128, 128 ],
-      const [ 39, 77, 162, 232, 172, 180, 245, 178, 255, 255, 128 ]
-    ],
-    const [ const [ 1, 52, 220, 246, 198, 199, 249, 220, 255, 255, 128 ],
-      const [ 124, 74, 191, 243, 183, 193, 250, 221, 255, 255, 128 ],
-      const [ 24, 71, 130, 219, 154, 170, 243, 182, 255, 255, 128 ]
-    ],
-    const [ const [ 1, 182, 225, 249, 219, 240, 255, 224, 128, 128, 128 ],
-      const [ 149, 150, 226, 252, 216, 205, 255, 171, 128, 128, 128 ],
-      const [ 28, 108, 170, 242, 183, 194, 254, 223, 255, 255, 128 ]
-    ],
-    const [ const [ 1, 81, 230, 252, 204, 203, 255, 192, 128, 128, 128 ],
-      const [ 123, 102, 209, 247, 188, 196, 255, 233, 128, 128, 128 ],
-      const [ 20, 95, 153, 243, 164, 173, 255, 203, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 222, 248, 255, 216, 213, 128, 128, 128, 128, 128 ],
-      const [ 168, 175, 246, 252, 235, 205, 255, 255, 128, 128, 128 ],
-      const [ 47, 116, 215, 255, 211, 212, 255, 255, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 121, 236, 253, 212, 214, 255, 255, 128, 128, 128 ],
-      const [ 141, 84, 213, 252, 201, 202, 255, 219, 128, 128, 128 ],
-      const [ 42, 80, 160, 240, 162, 185, 255, 205, 128, 128, 128 ]
-    ],
-    const [ const [ 1, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 244, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ],
-      const [ 238, 1, 255, 128, 128, 128, 128, 128, 128, 128, 128 ]
-    ]
-  ] ];
-
+  ];
 
   static const List COEFFS_UPDATE_PROBA = const [
-    const [ const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    const [
+      const [
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [176, 246, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [223, 241, 252, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [249, 253, 253, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 244, 252, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [234, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [253, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 246, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [239, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [254, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 248, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [251, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [251, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [254, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 254, 253, 255, 254, 255, 255, 255, 255, 255, 255],
+        const [250, 255, 254, 255, 254, 255, 255, 255, 255, 255, 255],
+        const [254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ]
     ],
-    const [ const [ 176, 246, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 223, 241, 252, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 249, 253, 253, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    const [
+      const [
+        const [217, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [225, 252, 241, 253, 255, 255, 254, 255, 255, 255, 255],
+        const [234, 250, 241, 250, 253, 255, 253, 254, 255, 255, 255]
+      ],
+      const [
+        const [255, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [223, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [238, 253, 254, 254, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 248, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [249, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 253, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [247, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [252, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [253, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 254, 253, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [250, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ]
     ],
-    const [ const [ 255, 244, 252, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 234, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 253, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    const [
+      const [
+        const [186, 251, 250, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [234, 251, 244, 254, 255, 255, 255, 255, 255, 255, 255],
+        const [251, 251, 243, 253, 254, 255, 254, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [236, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [251, 253, 253, 254, 254, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [254, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [254, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ]
     ],
-    const [ const [ 255, 246, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 239, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 254, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 248, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 251, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 251, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 254, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 254, 253, 255, 254, 255, 255, 255, 255, 255, 255 ],
-      const [ 250, 255, 254, 255, 254, 255, 255, 255, 255, 255, 255 ],
-      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
+    const [
+      const [
+        const [248, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [250, 254, 252, 254, 255, 255, 255, 255, 255, 255, 255],
+        const [248, 254, 249, 253, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 253, 253, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [246, 253, 253, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [252, 254, 251, 254, 254, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 254, 252, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [248, 254, 253, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [253, 255, 254, 254, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 251, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [245, 251, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [253, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 251, 253, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [252, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 252, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [249, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 255, 253, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [250, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ],
+      const [
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+        const [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+      ]
     ]
-    ],
-    const [ const [ const [ 217, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 225, 252, 241, 253, 255, 255, 254, 255, 255, 255, 255 ],
-      const [ 234, 250, 241, 250, 253, 255, 253, 254, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 223, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 238, 253, 254, 254, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 248, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 249, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 253, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 247, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 252, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 253, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 254, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 250, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ]
-    ],
-    const [ const [ const [ 186, 251, 250, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 234, 251, 244, 254, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 251, 251, 243, 253, 254, 255, 254, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 236, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 251, 253, 253, 254, 254, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 254, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 254, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ]
-    ],
-    const [ const [ const [ 248, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 250, 254, 252, 254, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 248, 254, 249, 253, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 253, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 246, 253, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 252, 254, 251, 254, 254, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 254, 252, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 248, 254, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 253, 255, 254, 254, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 251, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 245, 251, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 253, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 251, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 252, 253, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 252, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 249, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 254, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 255, 253, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 250, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ],
-    const [ const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ],
-      const [ 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 ]
-    ] ] ];
+  ];
 
   // Paragraph 14.1
-  static const List<int> DC_TABLE = const [ // uint8
-      4,     5,   6,   7,   8,   9,  10,  10,
-      11,   12,  13,  14,  15,  16,  17,  17,
-      18,   19,  20,  20,  21,  21,  22,  22,
-      23,   23,  24,  25,  25,  26,  27,  28,
-      29,   30,  31,  32,  33,  34,  35,  36,
-      37,   37,  38,  39,  40,  41,  42,  43,
-      44,   45,  46,  46,  47,  48,  49,  50,
-      51,   52,  53,  54,  55,  56,  57,  58,
-      59,   60,  61,  62,  63,  64,  65,  66,
-      67,   68,  69,  70,  71,  72,  73,  74,
-      75,   76,  76,  77,  78,  79,  80,  81,
-      82,   83,  84,  85,  86,  87,  88,  89,
-      91,   93,  95,  96,  98, 100, 101, 102,
-      104, 106, 108, 110, 112, 114, 116, 118,
-      122, 124, 126, 128, 130, 132, 134, 136,
-      138, 140, 143, 145, 148, 151, 154, 157];
+  static const List<int> DC_TABLE = const [
+    // uint8
+    4, 5, 6, 7, 8, 9, 10, 10,
+    11, 12, 13, 14, 15, 16, 17, 17,
+    18, 19, 20, 20, 21, 21, 22, 22,
+    23, 23, 24, 25, 25, 26, 27, 28,
+    29, 30, 31, 32, 33, 34, 35, 36,
+    37, 37, 38, 39, 40, 41, 42, 43,
+    44, 45, 46, 46, 47, 48, 49, 50,
+    51, 52, 53, 54, 55, 56, 57, 58,
+    59, 60, 61, 62, 63, 64, 65, 66,
+    67, 68, 69, 70, 71, 72, 73, 74,
+    75, 76, 76, 77, 78, 79, 80, 81,
+    82, 83, 84, 85, 86, 87, 88, 89,
+    91, 93, 95, 96, 98, 100, 101, 102,
+    104, 106, 108, 110, 112, 114, 116, 118,
+    122, 124, 126, 128, 130, 132, 134, 136,
+    138, 140, 143, 145, 148, 151, 154, 157
+  ];
 
-  static const List<int> AC_TABLE = const [ // uint16
-       4,     5,   6,   7,   8,   9,  10,  11,
-       12,   13,  14,  15,  16,  17,  18,  19,
-       20,   21,  22,  23,  24,  25,  26,  27,
-       28,   29,  30,  31,  32,  33,  34,  35,
-       36,   37,  38,  39,  40,  41,  42,  43,
-       44,   45,  46,  47,  48,  49,  50,  51,
-       52,   53,  54,  55,  56,  57,  58,  60,
-       62,   64,  66,  68,  70,  72,  74,  76,
-       78,   80,  82,  84,  86,  88,  90,  92,
-       94,   96,  98, 100, 102, 104, 106, 108,
-       110, 112, 114, 116, 119, 122, 125, 128,
-       131, 134, 137, 140, 143, 146, 149, 152,
-       155, 158, 161, 164, 167, 170, 173, 177,
-       181, 185, 189, 193, 197, 201, 205, 209,
-       213, 217, 221, 225, 229, 234, 239, 245,
-       249, 254, 259, 264, 269, 274, 279, 284];
+  static const List<int> AC_TABLE = const [
+    // uint16
+    4, 5, 6, 7, 8, 9, 10, 11,
+    12, 13, 14, 15, 16, 17, 18, 19,
+    20, 21, 22, 23, 24, 25, 26, 27,
+    28, 29, 30, 31, 32, 33, 34, 35,
+    36, 37, 38, 39, 40, 41, 42, 43,
+    44, 45, 46, 47, 48, 49, 50, 51,
+    52, 53, 54, 55, 56, 57, 58, 60,
+    62, 64, 66, 68, 70, 72, 74, 76,
+    78, 80, 82, 84, 86, 88, 90, 92,
+    94, 96, 98, 100, 102, 104, 106, 108,
+    110, 112, 114, 116, 119, 122, 125, 128,
+    131, 134, 137, 140, 143, 146, 149, 152,
+    155, 158, 161, 164, 167, 170, 173, 177,
+    181, 185, 189, 193, 197, 201, 205, 209,
+    213, 217, 221, 225, 229, 234, 239, 245,
+    249, 254, 259, 264, 269, 274, 279, 284
+  ];
 
   /**
    * FILTER_EXTRA_ROWS = How many extra lines are needed on the MB boundary
@@ -1904,17 +2103,17 @@ class VP8 {
    * Complex filter: up to 4 luma samples are read and 3 are written. Same for
    *               U/V, so it's 8 samples total (because of the 2x upsampling).
    */
-  static const List<int> FILTER_EXTRA_ROWS = const [ 0, 2, 8 ];
+  static const List<int> FILTER_EXTRA_ROWS = const [0, 2, 8];
 
   static const int VP8_SIGNATURE = 0x2a019d;
 
   static const int MB_FEATURE_TREE_PROBS = 3;
   static const int NUM_MB_SEGMENTS = 4;
   static const int NUM_REF_LF_DELTAS = 4;
-  static const int NUM_MODE_LF_DELTAS = 4;    // I4x4, ZERO, *, SPLIT
+  static const int NUM_MODE_LF_DELTAS = 4; // I4x4, ZERO, *, SPLIT
   static const int MAX_NUM_PARTITIONS = 8;
 
-  static const int B_DC_PRED = 0;   // 4x4 modes
+  static const int B_DC_PRED = 0; // 4x4 modes
   static const int B_TM_PRED = 1;
   static const int B_VE_PRED = 2;
   static const int B_HE_PRED = 3;
@@ -1963,12 +2162,13 @@ class VP8 {
   static const int XOR_YUV_MASK2 = (-YUV_MASK2 - 1);
 
   // These constants are 14b fixed-point version of ITU-R BT.601 constants.
-  static const int kYScale = 19077;    // 1.164 = 255 / 219
-  static const int kVToR = 26149;    // 1.596 = 255 / 112 * 0.701
-  static const int kUToG = 6419;    // 0.391 = 255 / 112 * 0.886 * 0.114 / 0.587
-  static const int kVToG = 13320;    // 0.813 = 255 / 112 * 0.701 * 0.299 / 0.587
-  static const int kUToB = 33050;    // 2.018 = 255 / 112 * 0.886
+  static const int kYScale = 19077; // 1.164 = 255 / 219
+  static const int kVToR = 26149; // 1.596 = 255 / 112 * 0.701
+  static const int kUToG = 6419; // 0.391 = 255 / 112 * 0.886 * 0.114 / 0.587
+  static const int kVToG = 13320; // 0.813 = 255 / 112 * 0.701 * 0.299 / 0.587
+  static const int kUToB = 33050; // 2.018 = 255 / 112 * 0.886
   static const int kRCst = (-kYScale * 16 - kVToR * 128 + YUV_HALF2);
-  static const int kGCst = (-kYScale * 16 + kUToG * 128 + kVToG * 128 + YUV_HALF2);
+  static const int kGCst =
+      (-kYScale * 16 + kUToG * 128 + kVToG * 128 + YUV_HALF2);
   static const int kBCst = (-kYScale * 16 - kUToB * 128 + YUV_HALF2);
 }

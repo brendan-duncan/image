@@ -26,7 +26,7 @@ class PvrtcEncoder {
 
     var pvrtc;
     if (format == PVR_AUTO) {
-       if (bitmap.format == Image.RGB) {
+      if (bitmap.format == Image.RGB) {
         pvrtc = encodeRgb4Bpp(bitmap);
         format = PVR_RGB_4BPP;
       } else {
@@ -125,7 +125,7 @@ class PvrtcEncoder {
           final int y0 = (y + yOffset) & blockMask;
           final int y1 = (y0 + 1) & blockMask;
 
-          for(int px = 0; px < 4; ++px) {
+          for (int px = 0; px < 4; ++px) {
             final int xOffset = (px < 2) ? -1 : 0;
             final int x0 = (x + xOffset) & blockMask;
             final int x1 = (x0 + 1) & blockMask;
@@ -136,14 +136,14 @@ class PvrtcEncoder {
             p3.setBlock(x1, y1);
 
             var ca = p0.getColorRgbA() * factors[factorIndex][0] +
-                     p1.getColorRgbA() * factors[factorIndex][1] +
-                     p2.getColorRgbA() * factors[factorIndex][2] +
-                     p3.getColorRgbA() * factors[factorIndex][3];
+                p1.getColorRgbA() * factors[factorIndex][1] +
+                p2.getColorRgbA() * factors[factorIndex][2] +
+                p3.getColorRgbA() * factors[factorIndex][3];
 
             var cb = p0.getColorRgbB() * factors[factorIndex][0] +
-                     p1.getColorRgbB() * factors[factorIndex][1] +
-                     p2.getColorRgbB() * factors[factorIndex][2] +
-                     p3.getColorRgbB() * factors[factorIndex][3];
+                p1.getColorRgbB() * factors[factorIndex][1] +
+                p2.getColorRgbB() * factors[factorIndex][2] +
+                p3.getColorRgbB() * factors[factorIndex][3];
 
             int pi = pixelIndex + ((py * size + px) * 4);
             int r = bitmapData[pi];
@@ -181,7 +181,6 @@ class PvrtcEncoder {
 
     return outputData;
   }
-
 
   Uint8List encodeRgba4Bpp(Image bitmap) {
     if (bitmap.width != bitmap.height) {
@@ -230,7 +229,7 @@ class PvrtcEncoder {
           final int y0 = (y + yOffset) & blockMask;
           final int y1 = (y0 + 1) & blockMask;
 
-          for(int px = 0; px < 4; ++px) {
+          for (int px = 0; px < 4; ++px) {
             final int xOffset = (px < 2) ? -1 : 0;
             final int x0 = (x + xOffset) & blockMask;
             final int x1 = (x0 + 1) & blockMask;
@@ -241,14 +240,14 @@ class PvrtcEncoder {
             p3.setBlock(x1, y1);
 
             var ca = p0.getColorRgbaA() * factors[factorIndex][0] +
-                     p1.getColorRgbaA() * factors[factorIndex][1] +
-                     p2.getColorRgbaA() * factors[factorIndex][2] +
-                     p3.getColorRgbaA() * factors[factorIndex][3];
+                p1.getColorRgbaA() * factors[factorIndex][1] +
+                p2.getColorRgbaA() * factors[factorIndex][2] +
+                p3.getColorRgbaA() * factors[factorIndex][3];
 
             var cb = p0.getColorRgbaB() * factors[factorIndex][0] +
-                     p1.getColorRgbaB() * factors[factorIndex][1] +
-                     p2.getColorRgbaB() * factors[factorIndex][2] +
-                     p3.getColorRgbaB() * factors[factorIndex][3];
+                p1.getColorRgbaB() * factors[factorIndex][1] +
+                p2.getColorRgbaB() * factors[factorIndex][2] +
+                p3.getColorRgbaB() * factors[factorIndex][3];
 
             int pi = pixelIndex + ((py * size + px) * 4);
             int r = bitmapData[pi];
@@ -289,9 +288,8 @@ class PvrtcEncoder {
     return outputData;
   }
 
-  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(Image bitmap,
-                                                        int blockX,
-                                                        int blockY) {
+  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(
+      Image bitmap, int blockX, int blockY) {
     int size = bitmap.width;
     int pi = (blockY * 4 * size + blockX * 4);
 
@@ -323,15 +321,15 @@ class PvrtcEncoder {
     return cbb;
   }
 
-  static PvrtcColorBoundingBox _calculateBoundingBoxRgba(Image bitmap,
-                                                         int blockX,
-                                                         int blockY) {
+  static PvrtcColorBoundingBox _calculateBoundingBoxRgba(
+      Image bitmap, int blockX, int blockY) {
     int size = bitmap.width;
     int pi = (blockY * 4 * size + blockX * 4);
 
     _pixel(i) {
       int c = bitmap[pi + i];
-      return new PvrtcColorRgba(getRed(c), getGreen(c), getBlue(c), getAlpha(c));
+      return new PvrtcColorRgba(
+          getRed(c), getGreen(c), getBlue(c), getAlpha(c));
     }
 
     var cbb = PvrtcColorBoundingBox(_pixel(0), _pixel(0));
@@ -363,6 +361,22 @@ class PvrtcEncoder {
     packet.colorData = packetData[index + 1];
   }*/
 
-  static const MODULATION_LUT =
-      const [ 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3 ];
+  static const MODULATION_LUT = const [
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3
+  ];
 }

@@ -20,11 +20,10 @@ class VP8L {
   WebPInfo webp;
   Image image;
 
-  VP8L(InputBuffer input, WebPInfo webp) :
-    this.input = input,
-    this.webp = webp,
-    this.br = VP8LBitReader(input) {
-  }
+  VP8L(InputBuffer input, WebPInfo webp)
+      : this.input = input,
+        this.webp = webp,
+        this.br = VP8LBitReader(input) {}
 
   bool decodeHeader() {
     int signature = br.readBits(8);
@@ -58,8 +57,8 @@ class VP8L {
 
     image = Image(webp.width, webp.height);
 
-    if (!_decodeImageData(_pixels, webp.width, webp.height,
-                          webp.height, _processRows)) {
+    if (!_decodeImageData(
+        _pixels, webp.width, webp.height, webp.height, _processRows)) {
       return null;
     }
 
@@ -116,14 +115,15 @@ class VP8L {
       case VP8LTransform.CROSS_COLOR_TRANSFORM:
         transform.bits = br.readBits(3) + 2;
         transform.data = _decodeImageStream(
-                _subSampleSize(transform.xsize, transform.bits),
-                _subSampleSize(transform.ysize, transform.bits), false);
+            _subSampleSize(transform.xsize, transform.bits),
+            _subSampleSize(transform.ysize, transform.bits),
+            false);
         break;
       case VP8LTransform.COLOR_INDEXING_TRANSFORM:
         final int numColors = br.readBits(8) + 1;
-        final int bits = (numColors > 16) ? 0 :
-                         (numColors > 4) ? 1 :
-                         (numColors > 2) ? 2 : 3;
+        final int bits = (numColors > 16)
+            ? 0
+            : (numColors > 4) ? 1 : (numColors > 2) ? 2 : 3;
         transformSize[0] = _subSampleSize(transform.xsize, bits);
         transform.bits = bits;
         transform.data = _decodeImageStream(numColors, 1, false);
@@ -165,8 +165,8 @@ class VP8L {
     }
 
     // Read the Huffman codes (may recurse).
-    if (!_readHuffmanCodes(transformXsize, transformYsize,
-                           colorCacheBits, isLevel0)) {
+    if (!_readHuffmanCodes(
+        transformXsize, transformYsize, colorCacheBits, isLevel0)) {
       throw new ImageException('Invalid Huffman Codes');
     }
 
@@ -194,8 +194,8 @@ class VP8L {
     Uint32List data = Uint32List(totalSize);
 
     // Use the Huffman trees to decode the LZ77 encoded data.
-    if (!_decodeImageData(data, transformXsize, transformYsize,
-                          transformYsize, null)) {
+    if (!_decodeImageData(
+        data, transformXsize, transformYsize, transformYsize, null)) {
       throw new ImageException('Failed to decode image data.');
     }
 
@@ -205,8 +205,7 @@ class VP8L {
     return data;
   }
 
-  bool _decodeImageData(data, int width, int height,
-                        int lastRow, processFunc) {
+  bool _decodeImageData(data, int width, int height, int lastRow, processFunc) {
     int row = _lastPixel ~/ width;
     int col = _lastPixel % width;
 
@@ -234,7 +233,8 @@ class VP8L {
       br.fillBitWindow();
       int code = htreeGroup.htrees[_GREEN].readSymbol(br);
 
-      if (code < NUM_LITERAL_CODES) {  // Literal
+      if (code < NUM_LITERAL_CODES) {
+        // Literal
         int red = htreeGroup.htrees[_RED].readSymbol(br);
         int green = code;
         br.fillBitWindow();
@@ -261,7 +261,8 @@ class VP8L {
             }
           }
         }
-      } else if (code < lenCodeLimit) {  // Backward reference
+      } else if (code < lenCodeLimit) {
+        // Backward reference
         final int lengthSym = code - NUM_LITERAL_CODES;
         final int length = _getCopyLength(lengthSym);
         final int distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
@@ -297,7 +298,8 @@ class VP8L {
             }
           }
         }
-      } else if (code < colorCacheLimit) {  // Color cache
+      } else if (code < colorCacheLimit) {
+        // Color cache
         final int key = code - lenCodeLimit;
 
         while (lastCached < src) {
@@ -324,7 +326,8 @@ class VP8L {
             }
           }
         }
-      } else {  // Not reached
+      } else {
+        // Not reached
         return false;
       }
     }
@@ -374,13 +377,13 @@ class VP8L {
   void _extractAlphaRows(int row) {
     final int numRows = row - _lastRow;
     if (numRows <= 0) {
-      return;  // Nothing to be done.
+      return; // Nothing to be done.
     }
 
     _applyInverseTransforms(numRows, webp.width * _lastRow);
 
     // Extract alpha (which is stored in the green plane).
-    final int width = webp.width;      // the final width (!= dec->width_)
+    final int width = webp.width; // the final width (!= dec->width_)
     final int cachePixs = width * numRows;
 
     final int di = width * _lastRow;
@@ -413,7 +416,8 @@ class VP8L {
       br.fillBitWindow();
 
       int code = htreeGroup.htrees[_GREEN].readSymbol(br);
-      if (code < NUM_LITERAL_CODES) {  // Literal
+      if (code < NUM_LITERAL_CODES) {
+        // Literal
         _pixels8[pos] = code;
         ++pos;
         ++col;
@@ -424,7 +428,8 @@ class VP8L {
             _extractPalettedAlphaRows(row);
           }
         }
-      } else if (code < lenCodeLimit) {  // Backward reference
+      } else if (code < lenCodeLimit) {
+        // Backward reference
         final int lengthSym = code - NUM_LITERAL_CODES;
         final int length = _getCopyLength(lengthSym);
         final int distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
@@ -457,7 +462,8 @@ class VP8L {
         if (pos < last && (col & mask) != 0) {
           htreeGroup = _getHtreeGroupForPos(col, row);
         }
-      } else {  // Not reached
+      } else {
+        // Not reached
         return false;
       }
     }
@@ -501,7 +507,7 @@ class VP8L {
     final int numRows = row - _lastRow;
 
     if (numRows <= 0) {
-      return;  // Nothing to be done.
+      return; // Nothing to be done.
     }
 
     _applyInverseTransforms(numRows, rows);
@@ -537,14 +543,14 @@ class VP8L {
 
     while (n-- > 0) {
       VP8LTransform transform = _transforms[n];
-      transform.inverseTransform(startRow, endRow, _pixels, rowsIn,
-                                 _pixels, rowsOut);
+      transform.inverseTransform(
+          startRow, endRow, _pixels, rowsIn, _pixels, rowsOut);
       rowsIn = rowsOut;
     }
   }
 
-  bool _readHuffmanCodes(int xsize, int ysize, int colorCacheBits,
-                         bool allowRecursion) {
+  bool _readHuffmanCodes(
+      int xsize, int ysize, int colorCacheBits, bool allowRecursion) {
     Uint32List huffmanImage;
     int numHtreeGroups = 1;
 
@@ -620,12 +626,11 @@ class VP8L {
         codeLengths[1] = numSymbols - 1;
       }
 
-      ok = tree.buildExplicit(codeLengths, codes, symbols,
-                              alphabetSize, numSymbols);
+      ok = tree.buildExplicit(
+          codeLengths, codes, symbols, alphabetSize, numSymbols);
     } else {
       // Decode Huffman-coded code lengths.
-      Int32List codeLengthCodeLengths =
-          new Int32List(_NUM_CODE_LENGTH_CODES);
+      Int32List codeLengthCodeLengths = new Int32List(_NUM_CODE_LENGTH_CODES);
 
       final int numCodes = br.readBits(4) + 4;
       if (numCodes > _NUM_CODE_LENGTH_CODES) {
@@ -638,8 +643,8 @@ class VP8L {
         codeLengthCodeLengths[_CODE_LENGTH_CODE_ORDER[i]] = br.readBits(3);
       }
 
-      ok = _readHuffmanCodeLengths(codeLengthCodeLengths, alphabetSize,
-                                   codeLengths);
+      ok = _readHuffmanCodeLengths(
+          codeLengthCodeLengths, alphabetSize, codeLengths);
 
       if (ok) {
         ok = tree.buildImplicit(codeLengths, alphabetSize);
@@ -649,8 +654,8 @@ class VP8L {
     return ok;
   }
 
-  bool _readHuffmanCodeLengths(List<int> codeLengthCodeLengths,
-                               int numSymbols, List<int> codeLengths) {
+  bool _readHuffmanCodeLengths(
+      List<int> codeLengthCodeLengths, int numSymbols, List<int> codeLengths) {
     //bool ok = false;
     int symbol;
     int max_symbol;
@@ -661,7 +666,8 @@ class VP8L {
       return false;
     }
 
-    if (br.readBits(1) != 0) {    // use length
+    if (br.readBits(1) != 0) {
+      // use length
       final int length_nbits = 2 + 2 * br.readBits(3);
       max_symbol = 2 + br.readBits(length_nbits);
       if (max_symbol > numSymbols) {
@@ -779,8 +785,8 @@ class VP8L {
   }
 
   HTreeGroup _getHtreeGroupForPos(int x, int y) {
-    int metaIndex = _getMetaIndex(_huffmanImage, _huffmanXsize,
-                                  _huffmanSubsampleBits, x, y);
+    int metaIndex = _getMetaIndex(
+        _huffmanImage, _huffmanXsize, _huffmanSubsampleBits, x, y);
     if (_htreeGroups[metaIndex] == null) {
       _htreeGroups[metaIndex] = HTreeGroup();
     }
@@ -798,32 +804,163 @@ class VP8L {
   static const int _NUM_CODE_LENGTH_CODES = 19;
 
   static const List<int> _CODE_LENGTH_CODE_ORDER = const [
-      17, 18, 0, 1, 2, 3, 4, 5, 16, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+    17,
+    18,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    16,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ];
 
   static const int _CODE_TO_PLANE_CODES = 120;
   static const List<int> _CODE_TO_PLANE = const [
-      0x18, 0x07, 0x17, 0x19, 0x28, 0x06, 0x27, 0x29, 0x16, 0x1a,
-      0x26, 0x2a, 0x38, 0x05, 0x37, 0x39, 0x15, 0x1b, 0x36, 0x3a,
-      0x25, 0x2b, 0x48, 0x04, 0x47, 0x49, 0x14, 0x1c, 0x35, 0x3b,
-      0x46, 0x4a, 0x24, 0x2c, 0x58, 0x45, 0x4b, 0x34, 0x3c, 0x03,
-      0x57, 0x59, 0x13, 0x1d, 0x56, 0x5a, 0x23, 0x2d, 0x44, 0x4c,
-      0x55, 0x5b, 0x33, 0x3d, 0x68, 0x02, 0x67, 0x69, 0x12, 0x1e,
-      0x66, 0x6a, 0x22, 0x2e, 0x54, 0x5c, 0x43, 0x4d, 0x65, 0x6b,
-      0x32, 0x3e, 0x78, 0x01, 0x77, 0x79, 0x53, 0x5d, 0x11, 0x1f,
-      0x64, 0x6c, 0x42, 0x4e, 0x76, 0x7a, 0x21, 0x2f, 0x75, 0x7b,
-      0x31, 0x3f, 0x63, 0x6d, 0x52, 0x5e, 0x00, 0x74, 0x7c, 0x41,
-      0x4f, 0x10, 0x20, 0x62, 0x6e, 0x30, 0x73, 0x7d, 0x51, 0x5f,
-      0x40, 0x72, 0x7e, 0x61, 0x6f, 0x50, 0x71, 0x7f, 0x60, 0x70];
+    0x18,
+    0x07,
+    0x17,
+    0x19,
+    0x28,
+    0x06,
+    0x27,
+    0x29,
+    0x16,
+    0x1a,
+    0x26,
+    0x2a,
+    0x38,
+    0x05,
+    0x37,
+    0x39,
+    0x15,
+    0x1b,
+    0x36,
+    0x3a,
+    0x25,
+    0x2b,
+    0x48,
+    0x04,
+    0x47,
+    0x49,
+    0x14,
+    0x1c,
+    0x35,
+    0x3b,
+    0x46,
+    0x4a,
+    0x24,
+    0x2c,
+    0x58,
+    0x45,
+    0x4b,
+    0x34,
+    0x3c,
+    0x03,
+    0x57,
+    0x59,
+    0x13,
+    0x1d,
+    0x56,
+    0x5a,
+    0x23,
+    0x2d,
+    0x44,
+    0x4c,
+    0x55,
+    0x5b,
+    0x33,
+    0x3d,
+    0x68,
+    0x02,
+    0x67,
+    0x69,
+    0x12,
+    0x1e,
+    0x66,
+    0x6a,
+    0x22,
+    0x2e,
+    0x54,
+    0x5c,
+    0x43,
+    0x4d,
+    0x65,
+    0x6b,
+    0x32,
+    0x3e,
+    0x78,
+    0x01,
+    0x77,
+    0x79,
+    0x53,
+    0x5d,
+    0x11,
+    0x1f,
+    0x64,
+    0x6c,
+    0x42,
+    0x4e,
+    0x76,
+    0x7a,
+    0x21,
+    0x2f,
+    0x75,
+    0x7b,
+    0x31,
+    0x3f,
+    0x63,
+    0x6d,
+    0x52,
+    0x5e,
+    0x00,
+    0x74,
+    0x7c,
+    0x41,
+    0x4f,
+    0x10,
+    0x20,
+    0x62,
+    0x6e,
+    0x30,
+    0x73,
+    0x7d,
+    0x51,
+    0x5f,
+    0x40,
+    0x72,
+    0x7e,
+    0x61,
+    0x6f,
+    0x50,
+    0x71,
+    0x7f,
+    0x60,
+    0x70
+  ];
 
   static const int _CODE_LENGTH_LITERALS = 16;
   static const int _CODE_LENGTH_REPEAT_CODE = 16;
   static const List<int> _CODE_LENGTH_EXTRA_BITS = const [2, 3, 7];
-  static const List<int> _CODE_LENGTH_REPEAT_OFFSETS = const [ 3, 3, 11 ];
+  static const List<int> _CODE_LENGTH_REPEAT_OFFSETS = const [3, 3, 11];
 
   static const List<int> ALPHABET_SIZE = const [
     NUM_LITERAL_CODES + NUM_LENGTH_CODES,
-    NUM_LITERAL_CODES, NUM_LITERAL_CODES,
-    NUM_LITERAL_CODES, NUM_DISTANCE_CODES];
+    NUM_LITERAL_CODES,
+    NUM_LITERAL_CODES,
+    NUM_LITERAL_CODES,
+    NUM_DISTANCE_CODES
+  ];
 
   static const int VP8L_MAGIC_BYTE = 0x2f;
   static const int VP8L_VERSION = 0;
@@ -832,7 +969,7 @@ class VP8L {
   int _lastRow = 0;
 
   int _colorCacheSize = 0;
-  VP8LColorCache  _colorCache;
+  VP8LColorCache _colorCache;
 
   int _huffmanMask = 0;
   int _huffmanSubsampleBits = 0;
@@ -897,5 +1034,6 @@ class InternalVP8L extends VP8L {
 
   void extractAlphaRows(int row) => _extractAlphaRows(row);
 
-  static int subSampleSize(int size, int samplingBits) => VP8L._subSampleSize(size, samplingBits);
+  static int subSampleSize(int size, int samplingBits) =>
+      VP8L._subSampleSize(size, samplingBits);
 }

@@ -6,8 +6,7 @@ Html.CanvasElement canvas;
 Html.DivElement logDiv;
 Image origImage;
 
-void _addControl(String label, String value, Html.DivElement parent,
-                 callback) {
+void _addControl(String label, String value, Html.DivElement parent, callback) {
   Html.LabelElement amountLabel = Html.LabelElement();
   amountLabel.text = label + ':';
   var amountEdit = Html.InputElement();
@@ -17,15 +16,13 @@ void _addControl(String label, String value, Html.DivElement parent,
     try {
       double d = double.parse(amountEdit.value);
       callback(d);
-    } catch (e) {
-    }
+    } catch (e) {}
   });
   amountLabel.htmlFor = label + '_edit';
   parent.append(amountLabel);
   parent.append(amountEdit);
   parent.append(new Html.ParagraphElement());
 }
-
 
 void testSepia() {
   Html.DivElement sidebar = Html.document.querySelector('#sidebar');
@@ -44,8 +41,8 @@ void testSepia() {
     image = sepia(image, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-                                  image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -78,8 +75,8 @@ void testSobel() {
     image = sobel(image, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-                                  image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -112,8 +109,8 @@ void testGaussian() {
     image = gaussianBlur(image, radius);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-                                  image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -148,8 +145,8 @@ void testVignette() {
     image = vignette(image, start: start, end: end, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-                                  image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -163,14 +160,14 @@ void testVignette() {
   });
 
   _addControl('End', end.toString(), sidebar, (v) {
-      end = v;
-      _apply();
-    });
+    end = v;
+    _apply();
+  });
 
   _addControl('Amount', amount.toString(), sidebar, (v) {
-      amount = v;
-      _apply();
-    });
+    amount = v;
+    _apply();
+  });
 
   _apply();
 }
@@ -192,8 +189,8 @@ void testPixelate() {
     image = pixelate(image, blockSize);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-                                  image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -229,8 +226,8 @@ void testColorOffset() {
     image = colorOffset(image, red, green, blue, alpha);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-                                  image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -244,19 +241,19 @@ void testColorOffset() {
   });
 
   _addControl('green', red.toString(), sidebar, (v) {
-      green = v.toInt();
-      _apply();
-    });
+    green = v.toInt();
+    _apply();
+  });
 
   _addControl('blue', red.toString(), sidebar, (v) {
-      blue = v.toInt();
-      _apply();
-    });
+    blue = v.toInt();
+    _apply();
+  });
 
   _addControl('alpha', red.toString(), sidebar, (v) {
-      alpha = v.toInt();
-      _apply();
-    });
+    alpha = v.toInt();
+    _apply();
+  });
 
   _apply();
 }
@@ -282,13 +279,18 @@ void testAdjustColor() {
     t.start();
     Image image = Image.from(origImage);
 
-    image = adjustColor(image, contrast: contrast, saturation: saturation,
-        brightness: brightness, gamma: gamma, exposure: exposure,
-        hue: hue, amount: amount);
+    image = adjustColor(image,
+        contrast: contrast,
+        saturation: saturation,
+        brightness: brightness,
+        gamma: gamma,
+        exposure: exposure,
+        hue: hue,
+        amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-                                  image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -303,29 +305,29 @@ void testAdjustColor() {
   });
 
   _addControl('Saturation', saturation.toString(), sidebar, (v) {
-      saturation = v;
-      _apply();
-    });
+    saturation = v;
+    _apply();
+  });
 
   _addControl('Brightness', brightness.toString(), sidebar, (v) {
-      brightness = v;
-      _apply();
-    });
+    brightness = v;
+    _apply();
+  });
 
   _addControl('Gamma', gamma.toString(), sidebar, (v) {
-      gamma = v;
-      _apply();
-    });
+    gamma = v;
+    _apply();
+  });
 
   _addControl('Exposure', exposure.toString(), sidebar, (v) {
-      exposure = v;
-      _apply();
-    });
+    exposure = v;
+    _apply();
+  });
 
   _addControl('Hue', hue.toString(), sidebar, (v) {
-      hue = v;
-      _apply();
-    });
+    hue = v;
+    _apply();
+  });
 
   _addControl('Amount', amount.toString(), sidebar, (v) {
     amount = v;

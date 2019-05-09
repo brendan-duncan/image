@@ -19,8 +19,10 @@ class HuffmanTree {
   /// all the nodes, starting at root, stored as a single int array, where
   /// each node occupies two ints as [symbol, children].
   Int32List tree;
+
   /// max number of nodes
   int maxNodes = 0;
+
   /// number of currently occupied nodes
   int numNodes = 0;
 
@@ -92,11 +94,8 @@ class HuffmanTree {
     return _isFull();
   }
 
-  bool buildExplicit(List<int> codeLengths,
-                     List<int> codes,
-                     List<int> symbols,
-                     int maxSymbol,
-                     int numSymbols) {
+  bool buildExplicit(List<int> codeLengths, List<int> codes, List<int> symbols,
+      int maxSymbol, int numSymbols) {
     // Initialize the tree. Will fail if num_symbols = 0.
     if (!_init(numSymbols)) {
       return false;
@@ -165,8 +164,8 @@ class HuffmanTree {
         lutBits[idx] = codeLength;
       }
     } else {
-      baseCode = _reverseBitsShort((code >> (codeLength - HUFF_LUT_BITS)),
-                                   HUFF_LUT_BITS);
+      baseCode = _reverseBitsShort(
+          (code >> (codeLength - HUFF_LUT_BITS)), HUFF_LUT_BITS);
     }
 
     while (codeLength-- > 0) {
@@ -209,8 +208,23 @@ class HuffmanTree {
 
   // Pre-reversed 4-bit values.
   static const List<int> _REVERSED_BITS = const [
-    0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe,
-    0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf];
+    0x0,
+    0x8,
+    0x4,
+    0xc,
+    0x2,
+    0xa,
+    0x6,
+    0xe,
+    0x1,
+    0x9,
+    0x5,
+    0xd,
+    0x3,
+    0xb,
+    0x7,
+    0xf
+  ];
 
   int _reverseBitsShort(int bits, int numBits) {
     int v = (_REVERSED_BITS[bits & 0xf] << 4) | _REVERSED_BITS[bits >> 4];
@@ -251,15 +265,13 @@ class HuffmanTree {
     _nodeSetChildren(children + 1, -1);
   }
 
-  bool _huffmanCodeLengthsToCodes(List<int> codeLengths, int codeLengthsSize,
-                                  List<int> huffCodes) {
+  bool _huffmanCodeLengthsToCodes(
+      List<int> codeLengths, int codeLengthsSize, List<int> huffCodes) {
     int symbol;
     int codeLen;
-    Int32List codeLengthHist =
-        new Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    Int32List codeLengthHist = new Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
     int currCode;
-    Int32List nextCodes =
-        new Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    Int32List nextCodes = new Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
     int maxCodeLength = 0;
 
     // Calculate max code length.
@@ -319,7 +331,7 @@ class HTreeGroup {
     }
   }
 
-  HuffmanTree operator[](int index) {
+  HuffmanTree operator [](int index) {
     if (htrees[index] == null) {
       htrees[index] = HuffmanTree();
     }

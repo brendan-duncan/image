@@ -9,10 +9,8 @@ import 'gif/gif_color_map.dart';
 import 'gif/gif_image_desc.dart';
 import 'gif/gif_info.dart';
 
-/**
- * A decoder for the GIF image format. This supports both single frame and
- * animated GIF files, and transparency.
- */
+/// A decoder for the GIF image format. This supports both single frame and
+/// animated GIF files, and transparency.
 class GifDecoder extends Decoder {
   GifInfo info;
 
@@ -22,27 +20,21 @@ class GifDecoder extends Decoder {
     }
   }
 
-  /**
-   * Is the given file a valid Gif image?
-   */
+  /// Is the given file a valid Gif image?
   bool isValidFile(List<int> bytes) {
     _input = InputBuffer(bytes);
     info = GifInfo();
     return _getInfo();
   }
 
-  /**
-   * How many frames are available to decode?
-   *
-   * You should have prepared the decoder by either passing the file bytes
-   * to the constructor, or calling getInfo.
-   */
+  /// How many frames are available to decode?
+  ///
+  /// You should have prepared the decoder by either passing the file bytes
+  /// to the constructor, or calling getInfo.
   int numFrames() => (info != null) ? info.numFrames : 0;
 
-  /**
-   * Validate the file is a Gif image and get information about it.
-   * If the file is not a valid Gif image, null is returned.
-   */
+  /// Validate the file is a Gif image and get information about it.
+  /// If the file is not a valid Gif image, null is returned.
   GifInfo startDecode(List<int> bytes) {
     _input = InputBuffer(bytes);
 
@@ -79,15 +71,14 @@ class GifDecoder extends Decoder {
             break;
         }
       }
-    } catch (error) {
-    }
+    } catch (error) {}
 
     //_numFrames = info.numFrames;
     return info;
   }
 
   void _readApplicationExt(InputBuffer _input) {
-    int blockSize =  _input.readByte();
+    int blockSize = _input.readByte();
     String tag = _input.readString(blockSize);
     if (tag == "NETSCAPE2.0") {
       int b1 = _input.readByte();
@@ -101,7 +92,7 @@ class GifDecoder extends Decoder {
   }
 
   void _readGraphicsControlExt(InputBuffer _input) {
-    /*int blockSize =*/  _input.readByte();
+    /*int blockSize =*/ _input.readByte();
     int b = _input.readByte();
     int duration = _input.readUint16();
     int transparent = _input.readByte();
@@ -143,7 +134,7 @@ class GifDecoder extends Decoder {
     }
 
     //_frame = frame;
-    InternalGifImageDesc gifImage = info.frames[frame];
+    InternalGifImageDesc gifImage = info.frames[frame] as InternalGifImageDesc;
     _input.offset = gifImage.inputPosition;
 
     return _decodeImage(info.frames[frame]);
@@ -158,10 +149,8 @@ class GifDecoder extends Decoder {
     return decodeFrame(frame);
   }
 
-  /**
-   * Decode all of the frames of an animated gif. For single image gifs,
-   * this will return an animation with a single frame.
-   */
+  /// Decode all of the frames of an animated gif. For single image gifs,
+  /// this will return an animation with a single frame.
   Animation decodeAnimation(List<int> bytes) {
     if (startDecode(bytes) == null) {
       return null;
@@ -187,9 +176,8 @@ class GifDecoder extends Decoder {
         return null;
       }
 
-      GifColorMap colorMap = (frame.colorMap != null) ?
-                              frame.colorMap :
-                                info.globalColorMap;
+      GifColorMap colorMap =
+          (frame.colorMap != null) ? frame.colorMap : info.globalColorMap;
 
       if (lastImage != null) {
         if (frame.clearFrame) {
@@ -248,14 +236,12 @@ class GifDecoder extends Decoder {
     int width = gifImage.width;
     int height = gifImage.height;
 
-    if (gifImage.x + width > info.width ||
-        gifImage.y + height > info.height) {
+    if (gifImage.x + width > info.width || gifImage.y + height > info.height) {
       return null;
     }
 
-    GifColorMap colorMap = (gifImage.colorMap != null) ?
-                           gifImage.colorMap :
-                             info.globalColorMap;
+    GifColorMap colorMap =
+        (gifImage.colorMap != null) ? gifImage.colorMap : info.globalColorMap;
 
     _pixelCount = width * height;
 
@@ -265,8 +251,9 @@ class GifDecoder extends Decoder {
     if (gifImage.interlaced) {
       int row = gifImage.y;
       for (int i = 0, j = 0; i < 4; ++i) {
-        for (int y = row + INTERLACED_OFFSET[i]; y < row + height;
-             y += INTERLACED_JUMP[i], ++j) {
+        for (int y = row + INTERLACED_OFFSET[i];
+            y < row + height;
+            y += INTERLACED_JUMP[i], ++j) {
           if (!_getLine(line)) {
             return image;
           }
@@ -285,8 +272,7 @@ class GifDecoder extends Decoder {
     return image;
   }
 
-  void _updateImage(Image image, int y, GifColorMap colorMap,
-                    Uint8List line) {
+  void _updateImage(Image image, int y, GifColorMap colorMap, Uint8List line) {
     if (colorMap != null) {
       for (int x = 0, width = line.length; x < width; ++x) {
         image.setPixel(x, y, colorMap.color(line[x]));
@@ -345,11 +331,9 @@ class GifDecoder extends Decoder {
     return true;
   }
 
-  /**
-   * Continue to get the image code in compressed form. This routine should be
-   * called until NULL block is returned.
-   * The block should NOT be freed by the user (not dynamically allocated).
-   */
+  /// Continue to get the image code in compressed form. This routine should be
+  /// called until NULL block is returned.
+  /// The block should NOT be freed by the user (not dynamically allocated).
   bool _skipRemainder() {
     if (_input.isEOS) {
       return true;
@@ -365,12 +349,10 @@ class GifDecoder extends Decoder {
     return true;
   }
 
-  /**
-   * The LZ decompression routine:
-   * This version decompress the given gif file into Line of length LineLen.
-   * This routine can be called few times (one per scan line, for example), in
-   * order the complete the whole image.
-   */
+  /// The LZ decompression routine:
+  /// This version decompress the given gif file into Line of length LineLen.
+  /// This routine can be called few times (one per scan line, for example), in
+  /// order the complete the whole image.
   bool _decompressLine(Uint8List line) {
     if (_stackPtr > LZ_MAX_CODE) {
       return false;
@@ -380,7 +362,7 @@ class GifDecoder extends Decoder {
     int i = 0;
 
     if (_stackPtr != 0) {
-      // Let pop the stack off before continueing to read the gif file:
+      // Let pop the stack off before continuing to read the gif file:
       while (_stackPtr != 0 && i < lineLen) {
         line[i++] = _stack[--_stackPtr];
       }
@@ -431,10 +413,8 @@ class GifDecoder extends Decoder {
             // exactly the prefix of last code!
             if (_currentCode == _runningCode - 2) {
               currentPrefix = _lastCode;
-              _suffix[_runningCode - 2] =
-                   _stack[_stackPtr++] = _getPrefixChar(_prefix,
-                                                        _lastCode,
-                                                        _clearCode);
+              _suffix[_runningCode - 2] = _stack[_stackPtr++] =
+                  _getPrefixChar(_prefix, _lastCode, _clearCode);
             } else {
               return false;
             }
@@ -449,7 +429,8 @@ class GifDecoder extends Decoder {
           // loop more than that.
           int j = 0;
           while (j++ <= LZ_MAX_CODE &&
-                 currentPrefix > _clearCode && currentPrefix <= LZ_MAX_CODE) {
+              currentPrefix > _clearCode &&
+              currentPrefix <= LZ_MAX_CODE) {
             _stack[_stackPtr++] = _suffix[currentPrefix];
             currentPrefix = _prefix[currentPrefix];
           }
@@ -477,10 +458,10 @@ class GifDecoder extends Decoder {
             // prefix code is last code and the suffix char is
             // exactly the prefix of last code!
             _suffix[_runningCode - 2] =
-                 _getPrefixChar(_prefix, _lastCode, _clearCode);
+                _getPrefixChar(_prefix, _lastCode, _clearCode);
           } else {
             _suffix[_runningCode - 2] =
-               _getPrefixChar(_prefix, _currentCode, _clearCode);
+                _getPrefixChar(_prefix, _currentCode, _clearCode);
           }
         }
 
@@ -491,11 +472,9 @@ class GifDecoder extends Decoder {
     return true;
   }
 
-  /**
-   * The LZ decompression input routine:
-   * This routine is responsible for the decompression of the bit stream from
-   * 8 bits (bytes) packets, into the real codes.
-   */
+  /// The LZ decompression input routine:
+  /// This routine is responsible for the decompression of the bit stream from
+  /// 8 bits (bytes) packets, into the real codes.
   int _decompressInput() {
     int code;
 
@@ -521,7 +500,8 @@ class GifDecoder extends Decoder {
     // however that codes above 4095 are used for special signaling.
     // If we're using LZ_BITS bits already and we're at the max code, just
     // keep using the table as it is, don't increment Private->RunningCode.
-    if (_runningCode < LZ_MAX_CODE + 2 && ++_runningCode > _maxCode1 &&
+    if (_runningCode < LZ_MAX_CODE + 2 &&
+        ++_runningCode > _maxCode1 &&
         _runningBits < LZ_BITS) {
       _maxCode1 <<= 1;
       _runningBits++;
@@ -530,12 +510,10 @@ class GifDecoder extends Decoder {
     return code;
   }
 
-  /**
-   * Routine to trace the Prefixes linked list until we get a prefix which is
-   * not code, but a pixel value (less than ClearCode). Returns that pixel value.
-   * If image is defective, we might loop here forever, so we limit the loops to
-   * the maximum possible if image O.k. - LZ_MAX_CODE times.
-   */
+  /// Routine to trace the Prefixes linked list until we get a prefix which is
+  /// not code, but a pixel value (less than ClearCode). Returns that pixel value.
+  /// If image is defective, we might loop here forever, so we limit the loops to
+  /// the maximum possible if image O.k. - LZ_MAX_CODE times.
   int _getPrefixChar(Uint32List prefix, int code, int clearCode) {
     int i = 0;
     while (code > clearCode && i++ <= LZ_MAX_CODE) {
@@ -547,12 +525,10 @@ class GifDecoder extends Decoder {
     return code;
   }
 
-  /**
-   * This routines read one gif data block at a time and buffers it internally
-   * so that the decompression routine could access it.
-   * The routine returns the next byte from its internal buffer (or read next
-   * block in if buffer empty) and returns null on failure.
-   */
+  /// This routines read one gif data block at a time and buffers it internally
+  /// so that the decompression routine could access it.
+  /// The routine returns the next byte from its internal buffer (or read next
+  /// block in if buffer empty) and returns null on failure.
   int _bufferedInput() {
     int nextByte;
     if (_buffer[0] == 0) {
@@ -566,8 +542,8 @@ class GifDecoder extends Decoder {
         return null;
       }
 
-      _buffer.setRange(1, 1 + _buffer[0],
-          _input.readBytes(_buffer[0]).toUint8List());
+      _buffer.setRange(
+          1, 1 + _buffer[0], _input.readBytes(_buffer[0]).toUint8List());
 
       nextByte = _buffer[1];
       _buffer[1] = 2; // We use now the second place as last char read!
@@ -622,14 +598,24 @@ class GifDecoder extends Decoder {
   static const int LZ_MAX_CODE = 4095;
   static const int LZ_BITS = 12;
 
-  static const int NO_SUCH_CODE = 4098;  // Impossible code, to signal empty.
+  static const int NO_SUCH_CODE = 4098; // Impossible code, to signal empty.
 
   static const List<int> CODE_MASKS = const [
-      0x0000, 0x0001, 0x0003, 0x0007,
-      0x000f, 0x001f, 0x003f, 0x007f,
-      0x00ff, 0x01ff, 0x03ff, 0x07ff,
-      0x0fff];
+    0x0000,
+    0x0001,
+    0x0003,
+    0x0007,
+    0x000f,
+    0x001f,
+    0x003f,
+    0x007f,
+    0x00ff,
+    0x01ff,
+    0x03ff,
+    0x07ff,
+    0x0fff
+  ];
 
-  static const List<int> INTERLACED_OFFSET = const [ 0, 4, 2, 1 ];
-  static const List<int> INTERLACED_JUMP = const [ 8, 8, 4, 2 ];
+  static const List<int> INTERLACED_OFFSET = const [0, 4, 2, 1];
+  static const List<int> INTERLACED_JUMP = const [8, 8, 4, 2];
 }

@@ -8,10 +8,7 @@ import 'convolution.dart';
  * 1.0, it will make the image sharper.
  */
 Image smooth(Image src, num w) {
-  List<double> filter = [
-    1.0, 1.0, 1.0,
-    1.0, w.toDouble(),   1.0,
-    1.0, 1.0, 1.0];
+  List<double> filter = [1.0, 1.0, 1.0, 1.0, w.toDouble(), 1.0, 1.0, 1.0, 1.0];
 
   return convolution(src, filter, w + 8, 0);
 }

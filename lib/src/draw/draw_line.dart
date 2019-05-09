@@ -11,7 +11,7 @@ import 'draw_pixel.dart';
  * [thickness] determines how thick the line should be drawn, in pixels.
  */
 Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
-               {bool antialias: false, num thickness: 1}) {
+    {bool antialias: false, num thickness: 1}) {
   List<int> line = [x1, y1, x2, y2];
   if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
     return image;
@@ -202,9 +202,9 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
 
   // Antialias Line
 
-  double ag = (dy.abs() < dx.abs()) ?
-              Math.cos(Math.atan2(dy, dx)) :
-              Math.sin(Math.atan2(dy, dx));
+  double ag = (dy.abs() < dx.abs())
+      ? Math.cos(Math.atan2(dy, dx))
+      : Math.sin(Math.atan2(dy, dx));
 
   int wid;
   if (ag != 0.0) {
@@ -232,7 +232,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     int inc = (dy * 65536) ~/ dx;
     int frac = 0;
 
-    for (int x = x1 ; x <= x2; x++) {
+    for (int x = x1; x <= x2; x++) {
       int wstart = (y - wid ~/ 2);
       for (int w = wstart; w < wstart + wid; w++) {
         drawPixel(image, x, w, color, (frac >> 8) & 0xff);
@@ -264,7 +264,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     int inc = (dx * 65536) ~/ dy;
     int frac = 0;
 
-    for (int y = y1 ; y <= y2; y++) {
+    for (int y = y1; y <= y2; y++) {
       int wstart = (x - wid ~/ 2);
       for (int w = wstart; w < wstart + wid; w++) {
         drawPixel(image, w, y, color, (frac >> 8) & 0xff);

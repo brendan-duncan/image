@@ -1,10 +1,7 @@
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
 
-enum ICCPCompression {
-  none,
-  deflate
-}
+enum ICCPCompression { none, deflate }
 
 /**
  * ICC Profile data stored with an image.

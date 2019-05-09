@@ -44,7 +44,8 @@ void main() {
           print('    tileHeight: ${info.images[i].tileHeight}');
           print('    predictor: ${info.images[i].predictor}');
           if (info.images[i].colorMap != null) {
-            print('    colorMap.numColors: ${info.images[i].colorMap.length ~/ 3}');
+            print(
+                '    colorMap.numColors: ${info.images[i].colorMap.length ~/ 3}');
             print('    colorMap: ${info.images[i].colorMap}');
           }
         }
@@ -70,8 +71,8 @@ void main() {
 
         List<int> png = PngEncoder().encodeImage(image);
         new Io.File('out/tif/${name}.png')
-              ..createSync(recursive: true)
-              ..writeAsBytesSync(png);
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(png);
       });
     }
   });

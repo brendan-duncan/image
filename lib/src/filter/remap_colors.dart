@@ -9,11 +9,7 @@ import '../image.dart';
  * will swap the red and green channels of the image.
  */
 Image remapColors(Image src,
-   {int red: RED,
-    int green: GREEN,
-    int blue: BLUE,
-    int alpha: ALPHA}) {
-
+    {int red: RED, int green: GREEN, int blue: BLUE, int alpha: ALPHA}) {
   List<int> l = [0, 0, 0, 0, 0];
   var p = src.getBytes();
   for (int i = 0, len = p.length; i < len; i += 4) {
@@ -21,7 +17,9 @@ Image remapColors(Image src,
     l[1] = p[i + 1];
     l[2] = p[i + 2];
     l[3] = p[i + 3];
-    if (red == LUMINANCE || green == LUMINANCE || blue == LUMINANCE ||
+    if (red == LUMINANCE ||
+        green == LUMINANCE ||
+        blue == LUMINANCE ||
         alpha == LUMINANCE) {
       l[4] = getLuminanceRGB(l[0], l[1], l[2]);
     }

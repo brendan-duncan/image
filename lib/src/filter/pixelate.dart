@@ -4,6 +4,7 @@ import '../draw/fill_rect.dart';
 
 /// Use the top-left pixel of a block for the block color, used by [pixelate].
 const int PIXELATE_UPPERLEFT = 0;
+
 /// Use the average of the pixels within a block for the block color, used by
 /// [pixelate].
 const int PIXELATE_AVERAGE = 1;

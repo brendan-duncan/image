@@ -67,7 +67,6 @@ void onFileLoaded(Html.Event event) {
     // Draw the buffer onto the canvas.
     c.context2D.putImageData(d, 0, 0);
 
-
     // OR we could use an IMG element to display the image.
     // This requires encoding it to a common format (like PNG), base64 encoding
     // the encoded image, and using a data url for the img src.

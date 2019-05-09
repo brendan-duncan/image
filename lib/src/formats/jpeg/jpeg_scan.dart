@@ -4,7 +4,6 @@ import 'jpeg.dart';
 import 'jpeg_component.dart';
 import 'jpeg_frame.dart';
 
-
 class JpegScan {
   InputBuffer input;
   JpegFrame frame;
@@ -28,9 +27,15 @@ class JpegScan {
   int successiveACState = 0;
   int successiveACNextValue;
 
-  JpegScan(this.input, this.frame, this.components,
-           this.resetInterval, this.spectralStart, this.spectralEnd,
-           this.successivePrev, this.successive) {
+  JpegScan(
+      this.input,
+      this.frame,
+      this.components,
+      this.resetInterval,
+      this.spectralStart,
+      this.spectralEnd,
+      this.successivePrev,
+      this.successive) {
     precision = frame.precision;
     samplesPerLine = frame.samplesPerLine;
     scanLines = frame.scanLines;
@@ -59,7 +64,8 @@ class JpegScan {
 
     int mcuExpected;
     if (componentsLength == 1) {
-      mcuExpected = (components[0].blocksPerLine * components[0].blocksPerColumn);
+      mcuExpected =
+          (components[0].blocksPerLine * components[0].blocksPerColumn);
     } else {
       mcuExpected = (mcusPerLine * frame.mcusPerColumn);
     }
@@ -127,7 +133,7 @@ class JpegScan {
       int nextByte = input.readByte();
       if (nextByte != 0) {
         throw new ImageException('unexpected marker: ' +
-              ((bitsData << 8) | nextByte).toRadixString(16));
+            ((bitsData << 8) | nextByte).toRadixString(16));
       }
     }
 
@@ -149,7 +155,7 @@ class JpegScan {
   }
 
   int _receive(int length) {
-    int  n = 0;
+    int n = 0;
     while (length > 0) {
       int bit = _readBit();
       if (bit == null) {
@@ -302,8 +308,8 @@ class JpegScan {
     }
   }
 
-  void _decodeMcu(JpegComponent component, decodeFn,
-                  int mcu, int row, int col) {
+  void _decodeMcu(
+      JpegComponent component, decodeFn, int mcu, int row, int col) {
     int mcuRow = (mcu ~/ mcusPerLine);
     int mcuCol = mcu % mcusPerLine;
     int blockRow = mcuRow * component.vSamples + row;

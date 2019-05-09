@@ -10,8 +10,7 @@ import 'encoder.dart';
  *
  */
 class GifEncoder extends Encoder {
-  GifEncoder({this.delay: 80}) :
-    _encodedFrames = 0;
+  GifEncoder({this.delay: 80}) : _encodedFrames = 0;
 
   void addFrame(Image image, {int duration}) {
     if (output == null) {
@@ -95,8 +94,8 @@ class GifEncoder extends Encoder {
     return finish();
   }
 
-  void _addImage(Uint8List image, int width, int height,
-                 Uint8List colorMap, int numColors) {
+  void _addImage(Uint8List image, int width, int height, Uint8List colorMap,
+      int numColors) {
     // Image desc
     output.writeByte(IMAGE_DESC_RECORD_TYPE);
     output.writeUint16(0); // image position x,y = 0,0
@@ -139,7 +138,6 @@ class GifEncoder extends Encoder {
     _clearFlag = false;
     _freeEnt = _clearCode + 2;
 
-
     int _nextPixel() {
       if (remaining == 0) {
         return EOF;
@@ -176,7 +174,8 @@ class GifEncoder extends Encoder {
           ent = codeTab[i];
           c = _nextPixel();
           continue;
-        } else if (hTab[i] >= 0) { // non-empty slot
+        } else if (hTab[i] >= 0) {
+          // non-empty slot
           int disp = hSizeReg - i; // secondary hash (after G. Knott)
           if (i == 0) {
             disp = 1;
@@ -301,10 +300,10 @@ class GifEncoder extends Encoder {
     int dispose = 0; // dispose = no action
 
     // packed fields
-    output.writeByte(0 |       // 1:3 reserved
-                     dispose | // 4:6 disposal
-                     0 |       // 7   user input - 0 = none
-                     transparency); // 8   transparency flag
+    output.writeByte(0 | // 1:3 reserved
+        dispose | // 4:6 disposal
+        0 | // 7   user input - 0 = none
+        transparency); // 8   transparency flag
 
     output.writeUint16(delay); // delay x 1/100 sec
     output.writeByte(0); // transparent color index
@@ -360,7 +359,22 @@ class GifEncoder extends Encoder {
   static const int BITS = 12;
   static const int HSIZE = 5003; // 80% occupancy
   static const List<int> MASKS = const [
-    0x0000, 0x0001, 0x0003, 0x0007, 0x000F, 0x001F,
-    0x003F, 0x007F, 0x00FF, 0x01FF, 0x03FF, 0x07FF,
-    0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF];
+    0x0000,
+    0x0001,
+    0x0003,
+    0x0007,
+    0x000F,
+    0x001F,
+    0x003F,
+    0x007F,
+    0x00FF,
+    0x01FF,
+    0x03FF,
+    0x07FF,
+    0x0FFF,
+    0x1FFF,
+    0x3FFF,
+    0x7FFF,
+    0xFFFF
+  ];
 }

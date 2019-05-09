@@ -15,6 +15,5 @@ class JpegComponent {
   JpegComponent(this.hSamples, this.vSamples, this.quantizationTableList,
       this.quantizationIndex);
 
-  Int16List get quantizationTable =>
-      quantizationTableList[quantizationIndex];
+  Int16List get quantizationTable => quantizationTableList[quantizationIndex];
 }

@@ -14,14 +14,17 @@ import 'exr_wavelet.dart';
  * Wavelet compression
  */
 abstract class ExrPizCompressor extends ExrCompressor {
-  factory ExrPizCompressor(ExrPart header, int maxScanLineSize,
-                           int numScanLines) = InternalExrPizCompressor;
+  factory ExrPizCompressor(
+          ExrPart header, int maxScanLineSize, int numScanLines) =
+      InternalExrPizCompressor;
 }
 
 @internal
-class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCompressor {
-  InternalExrPizCompressor(ExrPart header, this._maxScanLineSize, this._numScanLines) :
-    super(header) {
+class InternalExrPizCompressor extends InternalExrCompressor
+    implements ExrPizCompressor {
+  InternalExrPizCompressor(
+      ExrPart header, this._maxScanLineSize, this._numScanLines)
+      : super(header) {
     _channelData = List<_PizChannelData>(header.channels.length);
     for (int i = 0; i < _channelData.length; ++i) {
       _channelData[i] = _PizChannelData();
@@ -33,13 +36,12 @@ class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCo
 
   int numScanLines() => _numScanLines;
 
-  Uint8List compress(InputBuffer inPtr, int x, int y,
-                     [int width, int height]) {
+  Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
     throw new ImageException('Piz compression not yet supported.');
   }
 
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
-                       [int width, int height]) {
+      [int width, int height]) {
     if (width == null) {
       width = header.width;
     }
@@ -86,7 +88,7 @@ class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCo
 
     if (maxNonZero >= BITMAP_SIZE) {
       throw new ImageException("Error in header for PIZ-compressed data "
-                               "(invalid bitmap size).");
+          "(invalid bitmap size).");
     }
 
     Uint8List bitmap = Uint8List(BITMAP_SIZE);
@@ -109,7 +111,7 @@ class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCo
       _PizChannelData cd = _channelData[i];
       for (int j = 0; j < cd.size; ++j) {
         ExrWavelet.decode(_tmpBuffer, cd.start + j, cd.nx, cd.size, cd.ny,
-                          cd.nx * cd.size, maxValue);
+            cd.nx * cd.size, maxValue);
       }
     }
 
@@ -117,8 +119,8 @@ class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCo
     _applyLut(lut, _tmpBuffer, tmpBufferEnd);
 
     if (_output == null) {
-      _output = OutputBuffer(size: (_maxScanLineSize * _numScanLines) +
-                                       (65536 + 8192));
+      _output = OutputBuffer(
+          size: (_maxScanLineSize * _numScanLines) + (65536 + 8192));
     }
     _output.rewind();
 
@@ -161,7 +163,7 @@ class InternalExrPizCompressor extends InternalExrCompressor implements ExrPizCo
       lut[k++] = 0;
     }
 
-    return n;   // maximum k where lut[k] is non-zero,
+    return n; // maximum k where lut[k] is non-zero,
   }
 
   static const int USHORT_RANGE = 1 << 16;

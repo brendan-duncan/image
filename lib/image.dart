@@ -52,7 +52,8 @@ export 'src/formats/exr/exr_huffman.dart';
 export 'src/formats/exr/exr_image.dart';
 export 'src/formats/exr/exr_part.dart' hide InternalExrPart;
 export 'src/formats/exr/exr_piz_compressor.dart' hide InternalExrPizCompressor;
-export 'src/formats/exr/exr_pxr24_compressor.dart' hide InternalExrPxr24Compressor;
+export 'src/formats/exr/exr_pxr24_compressor.dart'
+    hide InternalExrPxr24Compressor;
 export 'src/formats/exr/exr_rle_compressor.dart' hide InternalExrRleCompressor;
 export 'src/formats/exr/exr_wavelet.dart';
 export 'src/formats/exr/exr_zip_compressor.dart' hide InternalExrZipCompressor;

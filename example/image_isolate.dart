@@ -27,7 +27,7 @@ void main() async {
       new DecodeParam(new File('test.webp'), receivePort.sendPort));
 
   // Get the processed image from the isolate.
-  Image image = await receivePort.first;
+  Image image = await receivePort.first as Image;
 
   new File('thumbnail.png').writeAsBytesSync(encodePng(image));
 }

@@ -9,7 +9,6 @@ import 'exr_channel.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';
 
-
 class ExrImage extends DecodeInfo {
   /// An EXR image has one or more parts, each of which contains a framebuffer.
   List<InternalExrPart> _parts = [];
@@ -29,7 +28,7 @@ class ExrImage extends DecodeInfo {
     flags = input.readUint24();
     if (!_supportsFlags(flags)) {
       throw new ImageException('The file format version number\'s flag field '
-                               'contains unrecognized flags.');
+          'contains unrecognized flags.');
     }
 
     if (!_isMultiPart()) {
@@ -90,7 +89,7 @@ class ExrImage extends DecodeInfo {
 
   ExrPart getPart(int i) => _parts[i];
 
-  bool _isTiled()  {
+  bool _isTiled() {
     return (flags & TILED_FLAG) != 0;
   }
 
@@ -118,8 +117,8 @@ class ExrImage extends DecodeInfo {
         if (!framebuffer.hasChannel(ch.name)) {
           width = part.width;
           height = part.height;
-          framebuffer.addSlice(new HdrSlice(ch.name, part.width, part.height,
-                                            ch.type));
+          framebuffer.addSlice(
+              new HdrSlice(ch.name, part.width, part.height, ch.type));
         }
       }
 
@@ -180,9 +179,8 @@ class ExrImage extends DecodeInfo {
 
             Uint8List uncompressedData;
             if (compressor != null) {
-              uncompressedData = compressor.uncompress(data, tx, ty,
-                                                       part.tileWidth,
-                                                       part.tileHeight);
+              uncompressedData = compressor.uncompress(
+                  data, tx, ty, part.tileWidth, part.tileHeight);
               tileWidth = compressor.decodedWidth;
               tileHeight = compressor.decodedHeight;
             } else {

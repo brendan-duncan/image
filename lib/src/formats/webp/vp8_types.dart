@@ -23,12 +23,16 @@ class VP8PictureHeader {
  */
 class VP8SegmentHeader {
   bool useSegment = false;
+
   /// whether to update the segment map or not
   bool updateMap = false;
+
   /// absolute or delta values for quantizer and filter
   bool absoluteDelta = true;
+
   /// quantization changes
   Int8List quantizer = Int8List(VP8.NUM_MB_SEGMENTS);
+
   /// filter strength for segments
   Int8List filterStrength = Int8List(VP8.NUM_MB_SEGMENTS);
 }
@@ -50,6 +54,7 @@ class VP8BandProbas {
  */
 class VP8Proba {
   Uint8List segments = Uint8List(VP8.MB_FEATURE_TREE_PROBS);
+
   /// Type: 0:Intra16-AC  1:Intra16-DC   2:Chroma   3:Intra4
   List<List<VP8BandProbas>> bands = List(VP8.NUM_TYPES);
 
@@ -93,8 +98,9 @@ class VP8FInfo {
 /**
  * Top/Left Contexts used for syntax-parsing
  */
-class VP8MB{
-  int nz = 0; // uint8_t, non-zero AC/DC coeffs (4bit for luma + 4bit for chroma)
+class VP8MB {
+  int nz =
+      0; // uint8_t, non-zero AC/DC coeffs (4bit for luma + 4bit for chroma)
   int nzDc = 0; // uint8_t, non-zero DC coeff (1bit)
 }
 
@@ -119,6 +125,7 @@ class VP8MBData {
   bool isIntra4x4; // true if intra4x4
   /// one 16x16 mode (#0) or sixteen 4x4 modes
   Uint8List imodes = Uint8List(16);
+
   /// chroma prediction mode
   int uvmode;
   // bit-wise info about the content of each sub-4x4 blocks (in decoding order).
@@ -130,6 +137,7 @@ class VP8MBData {
   // This allows to call specialized transform functions.
   int nonZeroY;
   int nonZeroUV;
+
   /// uint8_t, local dithering strength (deduced from non_zero_*)
   int dither;
 }
@@ -156,9 +164,11 @@ class VP8Random {
     _table.setRange(0, RANDOM_TABLE_SIZE, _RANDOM_TABLE);
     _index1 = 0;
     _index2 = 31;
-    _amplitude = (dithering < 0.0) ? 0 :
-                 (dithering > 1.0) ? (1 << RANDOM_DITHER_FIX) :
-                 ((1 << RANDOM_DITHER_FIX) * dithering).toInt();
+    _amplitude = (dithering < 0.0)
+        ? 0
+        : (dithering > 1.0)
+            ? (1 << RANDOM_DITHER_FIX)
+            : ((1 << RANDOM_DITHER_FIX) * dithering).toInt();
   }
 
   /**
@@ -201,14 +211,60 @@ class VP8Random {
 
   // 31b-range values
   static const List<int> _RANDOM_TABLE = const [
-    0x0de15230, 0x03b31886, 0x775faccb, 0x1c88626a, 0x68385c55, 0x14b3b828,
-    0x4a85fef8, 0x49ddb84b, 0x64fcf397, 0x5c550289, 0x4a290000, 0x0d7ec1da,
-    0x5940b7ab, 0x5492577d, 0x4e19ca72, 0x38d38c69, 0x0c01ee65, 0x32a1755f,
-    0x5437f652, 0x5abb2c32, 0x0faa57b1, 0x73f533e7, 0x685feeda, 0x7563cce2,
-    0x6e990e83, 0x4730a7ed, 0x4fc0d9c6, 0x496b153c, 0x4f1403fa, 0x541afb0c,
-    0x73990b32, 0x26d7cb1c, 0x6fcc3706, 0x2cbb77d8, 0x75762f2a, 0x6425ccdd,
-    0x24b35461, 0x0a7d8715, 0x220414a8, 0x141ebf67, 0x56b41583, 0x73e502e3,
-    0x44cab16f, 0x28264d42, 0x73baaefb, 0x0a50ebed, 0x1d6ab6fb, 0x0d3ad40b,
-    0x35db3b68, 0x2b081e83, 0x77ce6b95, 0x5181e5f0, 0x78853bbc, 0x009f9494,
-    0x27e5ed3c];
+    0x0de15230,
+    0x03b31886,
+    0x775faccb,
+    0x1c88626a,
+    0x68385c55,
+    0x14b3b828,
+    0x4a85fef8,
+    0x49ddb84b,
+    0x64fcf397,
+    0x5c550289,
+    0x4a290000,
+    0x0d7ec1da,
+    0x5940b7ab,
+    0x5492577d,
+    0x4e19ca72,
+    0x38d38c69,
+    0x0c01ee65,
+    0x32a1755f,
+    0x5437f652,
+    0x5abb2c32,
+    0x0faa57b1,
+    0x73f533e7,
+    0x685feeda,
+    0x7563cce2,
+    0x6e990e83,
+    0x4730a7ed,
+    0x4fc0d9c6,
+    0x496b153c,
+    0x4f1403fa,
+    0x541afb0c,
+    0x73990b32,
+    0x26d7cb1c,
+    0x6fcc3706,
+    0x2cbb77d8,
+    0x75762f2a,
+    0x6425ccdd,
+    0x24b35461,
+    0x0a7d8715,
+    0x220414a8,
+    0x141ebf67,
+    0x56b41583,
+    0x73e502e3,
+    0x44cab16f,
+    0x28264d42,
+    0x73baaefb,
+    0x0a50ebed,
+    0x1d6ab6fb,
+    0x0d3ad40b,
+    0x35db3b68,
+    0x2b081e83,
+    0x77ce6b95,
+    0x5181e5f0,
+    0x78853bbc,
+    0x009f9494,
+    0x27e5ed3c
+  ];
 }

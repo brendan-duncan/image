@@ -93,18 +93,19 @@ class TiffEntry {
   static const int TYPE_DOUBLE = 12;
 
   static const List<int> SIZE_OF_TYPE = const [
-      0, //  0 = n/a
-      1, //  1 = byte
-      1, //  2 = ascii
-      2, //  3 = short
-      4, //  4 = long
-      8, //  5 = rational
-      1, //  6 = sbyte
-      1, //  7 = undefined
-      2, //  8 = sshort
-      4, //  9 = slong
-      8, // 10 = srational
-      4, // 11 = float
-      8, // 12 = double
-      0];
+    0, //  0 = n/a
+    1, //  1 = byte
+    1, //  2 = ascii
+    2, //  3 = short
+    4, //  4 = long
+    8, //  5 = rational
+    1, //  6 = sbyte
+    1, //  7 = undefined
+    2, //  8 = sshort
+    4, //  9 = slong
+    8, // 10 = srational
+    4, // 11 = float
+    8, // 12 = double
+    0
+  ];
 }

@@ -7,7 +7,7 @@ import '../util/interpolation.dart';
  * Returns a copy of the [src] image, rotated by [angle] degrees.
  */
 Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
-  double nangle = angle % 360.0;
+  num nangle = angle % 360.0;
 
   // Optimized version for orthogonal angles.
   if ((nangle % 90.0) == 0.0) {
@@ -17,8 +17,8 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
     int iangle = nangle ~/ 90.0;
     switch (iangle) {
       case 1: // 90 deg.
-        Image dst = Image(src.height, src.width, src.format, src.exif,
-                              src.iccProfile);
+        Image dst =
+            Image(src.height, src.width, src.format, src.exif, src.iccProfile);
         for (int y = 0; y < dst.height; ++y) {
           for (int x = 0; x < dst.width; ++x) {
             dst.setPixel(x, y, src.getPixel(y, hm1 - x));
@@ -26,8 +26,8 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
         }
         return dst;
       case 2: // 180 deg.
-        Image dst = Image(src.width, src.height, src.format, src.exif,
-                              src.iccProfile);
+        Image dst =
+            Image(src.width, src.height, src.format, src.exif, src.iccProfile);
         for (int y = 0; y < dst.height; ++y) {
           for (int x = 0; x < dst.width; ++x) {
             dst.setPixel(x, y, src.getPixel(wm1 - x, hm1 - y));
@@ -35,8 +35,8 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
         }
         return dst;
       case 3: // 270 deg.
-        Image dst = Image(src.height, src.width, src.format, src.exif,
-                              src.iccProfile);
+        Image dst =
+            Image(src.height, src.width, src.format, src.exif, src.iccProfile);
         for (int y = 0; y < dst.height; ++y) {
           for (int x = 0; x < dst.width; ++x) {
             dst.setPixel(x, y, src.getPixel(wm1 - y, x));
@@ -61,14 +61,13 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
   double dw2 = 0.5 * (ux + vx);
   double dh2 = 0.5 * (uy + vy);
 
-  Image dst = Image((ux + vx).toInt(), (uy + vy).toInt(), Image.RGBA,
-                        src.exif, src.iccProfile);
+  Image dst = Image((ux + vx).toInt(), (uy + vy).toInt(), Image.RGBA, src.exif,
+      src.iccProfile);
 
   for (int y = 0; y < dst.height; ++y) {
     for (int x = 0; x < dst.width; ++x) {
       int c = src.getPixelInterpolate(w2 + (x - dw2) * ca + (y - dh2) * sa,
-                                      h2 - (x - dw2) * sa + (y - dh2) * ca,
-                                      interpolation);
+          h2 - (x - dw2) * sa + (y - dh2) * ca, interpolation);
       dst.setPixel(x, y, c);
     }
   }

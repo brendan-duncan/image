@@ -17,7 +17,7 @@ var _a_lut = Uint8List(256);
  * such as: [arial_14], [arial_24], or [arial_48].
  */
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
-                 {int color = 0xffffffff}) {
+    {int color = 0xffffffff}) {
   if (color != 0xffffffff) {
     int ca = getAlpha(color);
     if (ca == 0) {
@@ -51,10 +51,8 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
       for (int xi = x; xi < x2; ++xi) {
         int p = ch.image[pi++];
         if (color != 0xffffffff) {
-          p = getColor(_r_lut[getRed(p)],
-              _g_lut[getGreen(p)],
-              _b_lut[getBlue(p)],
-              _a_lut[getAlpha(p)]);
+          p = getColor(_r_lut[getRed(p)], _g_lut[getGreen(p)],
+              _b_lut[getBlue(p)], _a_lut[getAlpha(p)]);
         }
         drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, p);
       }

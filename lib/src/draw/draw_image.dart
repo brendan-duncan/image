@@ -16,8 +16,13 @@ import 'draw_pixel.dart';
  * but if the regions overlap the results will be unpredictable.
  */
 Image drawImage(Image dst, Image src,
-                {int dstX, int dstY, int srcX, int srcY,
-                 int srcW, int srcH, bool blend: true}) {
+    {int dstX,
+    int dstY,
+    int srcX,
+    int srcY,
+    int srcW,
+    int srcH,
+    bool blend: true}) {
   if (dstX == null) {
     dstX = 0;
   }

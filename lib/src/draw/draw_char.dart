@@ -7,7 +7,7 @@ import 'draw_pixel.dart';
  * [x],[y] with the given [color].
  */
 Image drawChar(Image image, BitmapFont font, int x, int y, String char,
-               {int color: 0xffffffff}) {
+    {int color: 0xffffffff}) {
   int c = char.codeUnits[0];
   if (!font.characters.containsKey(c)) {
     return image;

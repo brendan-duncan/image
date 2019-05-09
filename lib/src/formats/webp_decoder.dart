@@ -9,10 +9,8 @@ import 'webp/vp8l.dart';
 import 'webp/webp_frame.dart';
 import 'webp/webp_info.dart';
 
-/**
- * Decode a WebP formatted image. This supports lossless (vp8l), lossy (vp8),
- * lossy+alpha, and animated WebP images.
- */
+/// Decode a WebP formatted image. This supports lossless (vp8l), lossy (vp8),
+/// lossy+alpha, and animated WebP images.
 class WebPDecoder extends Decoder {
   InternalWebPInfo _info;
 
@@ -24,9 +22,7 @@ class WebPDecoder extends Decoder {
 
   WebPInfo get info => _info;
 
-  /**
-   * Is the given file a valid WebP image?
-   */
+  /// Is the given file a valid WebP image?
   bool isValidFile(List<int> bytes) {
     _input = InputBuffer(bytes);
     if (!_getHeader(_input)) {
@@ -35,18 +31,14 @@ class WebPDecoder extends Decoder {
     return true;
   }
 
-  /**
-   * How many frames are available to decode?
-   *
-   * You should have prepared the decoder by either passing the file bytes
-   * to the constructor, or calling getInfo.
-   */
+  /// How many frames are available to decode?
+  ///
+  /// You should have prepared the decoder by either passing the file bytes
+  /// to the constructor, or calling getInfo.
   int numFrames() => (_info != null) ? _info.numFrames : 0;
 
-  /**
-   * Validate the file is a WebP image and get information about it.
-   * If the file is not a valid WebP image, null is returned.
-   */
+  /// Validate the file is a WebP image and get information about it.
+  /// If the file is not a valid WebP image, null is returned.
   WebPInfo startDecode(List<int> bytes) {
     _input = InputBuffer(bytes);
 
@@ -91,32 +83,30 @@ class WebPDecoder extends Decoder {
         return null;
       }
 
-      InternalWebPFrame f = _info.frames[frame];
-      InputBuffer frameData = _input.subset(f.frameSize,
-                                            position: f.framePosition);
+      InternalWebPFrame f = _info.frames[frame] as InternalWebPFrame;
+      InputBuffer frameData =
+          _input.subset(f.frameSize, position: f.framePosition);
 
       return _decodeFrame(frameData, frame: frame);
     }
 
     if (_info.format == WebPInfo.FORMAT_LOSSLESS) {
-      InputBuffer data = _input.subset(_info.vp8Size,
-                                       position: _info.vp8Position);
+      InputBuffer data =
+          _input.subset(_info.vp8Size, position: _info.vp8Position);
       return new VP8L(data, _info).decode();
     } else if (_info.format == WebPInfo.FORMAT_LOSSY) {
-      InputBuffer data = _input.subset(_info.vp8Size,
-                                       position: _info.vp8Position);
+      InputBuffer data =
+          _input.subset(_info.vp8Size, position: _info.vp8Position);
       return new VP8(data, _info).decode();
     }
 
     return null;
   }
 
-  /**
-   * Decode a WebP formatted file stored in [bytes] into an Image.
-   * If it's not a valid webp file, null is returned.
-   * If the webp file stores animated frames, only the first image will
-   * be returned.  Use [decodeAnimation] to decode the full animation.
-   */
+  /// Decode a WebP formatted file stored in [bytes] into an Image.
+  /// If it's not a valid webp file, null is returned.
+  /// If the webp file stores animated frames, only the first image will
+  /// be returned.  Use [decodeAnimation] to decode the full animation.
   Image decodeImage(List<int> bytes, {int frame: 0}) {
     startDecode(bytes);
     _info.frame = 0;
@@ -124,11 +114,9 @@ class WebPDecoder extends Decoder {
     return decodeFrame(frame);
   }
 
-  /**
-   * Decode all of the frames of an animated webp. For single image webps,
-   * this will return an animation with a single frame.
-   */
-Animation decodeAnimation(List<int> bytes) {
+  /// Decode all of the frames of an animated webp. For single image webps,
+  /// this will return an animation with a single frame.
+  Animation decodeAnimation(List<int> bytes) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -180,7 +168,6 @@ Animation decodeAnimation(List<int> bytes) {
     return anim;
   }
 
-
   Image _decodeFrame(InputBuffer input, {int frame: 0}) {
     InternalWebPInfo webp = InternalWebPInfo();
     if (!_getInfo(input, webp)) {
@@ -198,14 +185,13 @@ Animation decodeAnimation(List<int> bytes) {
       if (frame >= webp.frames.length || frame < 0) {
         return null;
       }
-      InternalWebPFrame f = webp.frames[frame];
-      InputBuffer frameData = input.subset(f.frameSize,
-                                           position: f.framePosition);
+      InternalWebPFrame f = webp.frames[frame] as InternalWebPFrame;
+      InputBuffer frameData =
+          input.subset(f.frameSize, position: f.framePosition);
 
       return _decodeFrame(frameData, frame: frame);
     } else {
-      InputBuffer data = input.subset(webp.vp8Size,
-                                      position: webp.vp8Position);
+      InputBuffer data = input.subset(webp.vp8Size, position: webp.vp8Position);
       if (webp.format == WebPInfo.FORMAT_LOSSLESS) {
         return new VP8L(data, webp).decode();
       } else if (webp.format == WebPInfo.FORMAT_LOSSY) {
@@ -261,8 +247,8 @@ Animation decodeAnimation(List<int> bytes) {
           found = true;
           break;
         case 'ALPH':
-          webp.alphaData = InputBuffer(input.buffer,
-                                           bigEndian: input.bigEndian);
+          webp.alphaData =
+              InputBuffer(input.buffer, bigEndian: input.bigEndian);
           webp.alphaData.offset = input.offset;
           webp.alphaSize = size;
           input.skip(diskSize);

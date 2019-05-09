@@ -11,8 +11,8 @@ void main() {
       // Encode the image to PNG
       List<int> png = PngEncoder().encodeImage(image);
       new Io.File('out/png/encode.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(png);
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(png);
     });
 
     test('encodeAnimation', () {
@@ -42,8 +42,7 @@ void main() {
       }
 
       List<int> png = PngEncoder().encodeImage(image);
-      new Io.File('out/png/decode.png')
-            .writeAsBytesSync(png);
+      new Io.File('out/png/decode.png').writeAsBytesSync(png);
     });
 
     test('iCCP', () {
@@ -57,9 +56,9 @@ void main() {
       final image2 = PngDecoder().decodeImage(png);
       expect(image2.iccProfile, isNotNull);
       expect(image2.iccProfile.data, isNotNull);
-      expect(image2.iccProfile.data.length, equals(image.iccProfile.data.length));
+      expect(
+          image2.iccProfile.data.length, equals(image.iccProfile.data.length));
     });
-
 
     Io.Directory dir = Io.Directory('test/res/png');
     List files = dir.listSync();
@@ -104,22 +103,22 @@ void main() {
         if (name.startsWith('x')) {
           try {
             new PngDecoder().decodeImage(file.readAsBytesSync());
-            throw new ImageException('This image should not have loaded: $name.');
-          } catch (e) {
-          }
+            throw new ImageException(
+                'This image should not have loaded: $name.');
+          } catch (e) {}
         } else {
           Animation anim = decodeAnimation(file.readAsBytesSync());
           if (anim.length == 1) {
             List<int> png = PngEncoder().encodeImage(anim[0]);
             new Io.File('out/png/${name}')
-                  ..createSync(recursive: true)
-                  ..writeAsBytesSync(png);
+              ..createSync(recursive: true)
+              ..writeAsBytesSync(png);
           } else {
             for (int i = 0; i < anim.length; ++i) {
               List<int> png = PngEncoder().encodeImage(anim[i]);
               new Io.File('out/png/${name}-$i.png')
-                    ..createSync(recursive: true)
-                    ..writeAsBytesSync(png);
+                ..createSync(recursive: true)
+                ..writeAsBytesSync(png);
             }
           }
         }

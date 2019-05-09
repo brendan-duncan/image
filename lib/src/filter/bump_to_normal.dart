@@ -16,10 +16,12 @@ Image bumpToNormal(Image src, {double strength: 2.0}) {
   for (var y = 0; y < src.height; ++y) {
     for (var x = 0; x < src.width; ++x) {
       final height = getRed(src.getPixel(x, y)) / 255.0;
-      var du = (height - getRed(src.getPixel(x < src.width - 1 ? x + 1 : x, y))
-          / 255.0) * strength;
-      var dv = (height - getRed(src.getPixel(x, y < src.height - 1 ? y + 1 : y))
-          / 255.0) * strength;
+      var du = (height -
+              getRed(src.getPixel(x < src.width - 1 ? x + 1 : x, y)) / 255.0) *
+          strength;
+      var dv = (height -
+              getRed(src.getPixel(x, y < src.height - 1 ? y + 1 : y)) / 255.0) *
+          strength;
       final z = du.abs() + dv.abs();
 
       if (z > 1) {
@@ -32,8 +34,8 @@ Image bumpToNormal(Image src, {double strength: 2.0}) {
       final nY = dv * 0.5 + 0.5;
       final nZ = dw;
 
-      dest.setPixelRGBA(x, y, (255 * nX).floor(), (255 * nY).floor(),
-          (255 * nZ).floor());
+      dest.setPixelRGBA(
+          x, y, (255 * nX).floor(), (255 * nY).floor(), (255 * nZ).floor());
     }
   }
 

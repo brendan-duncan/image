@@ -16,7 +16,6 @@ class PngEncoder extends Encoder {
   PngEncoder({this.filter: FILTER_PAETH, this.level});
 
   void addFrame(Image image) {
-
     xOffset = image.xOffset;
     yOffset = image.xOffset;
     delay = image.duration;
@@ -40,13 +39,12 @@ class PngEncoder extends Encoder {
     }
 
     // Include room for the filter bytes (1 byte per row).
-    List<int> filteredImage = Uint8List((image.width * image.height *
-        image.format) + image.height);
+    List<int> filteredImage =
+        Uint8List((image.width * image.height * image.format) + image.height);
 
     _filter(image, filteredImage);
 
-    List<int> compressed = ZLibEncoder().encode(filteredImage,
-                                                        level: level);
+    List<int> compressed = ZLibEncoder().encode(filteredImage, level: level);
 
     if (isAnimated) {
       _writeFrameControlChunk();
@@ -267,7 +265,8 @@ class PngEncoder extends Encoder {
       if (image.format == Image.RGBA) {
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
         int xa = getAlpha(image.getPixel(x, row));
-        out[oi++] = (xa - ba) & 0xff;;
+        out[oi++] = (xa - ba) & 0xff;
+        ;
       }
     }
 
@@ -297,7 +296,8 @@ class PngEncoder extends Encoder {
         int aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
         int xa = getAlpha(image.getPixel(x, row));
-        out[oi++] = (xa - ((aa + ba) >> 1)) & 0xff;;
+        out[oi++] = (xa - ((aa + ba) >> 1)) & 0xff;
+        ;
       }
     }
 
@@ -329,9 +329,12 @@ class PngEncoder extends Encoder {
       int bg = (row == 0) ? 0 : getGreen(image.getPixel(x, row - 1));
       int bb = (row == 0) ? 0 : getBlue(image.getPixel(x, row - 1));
 
-      int cr = (row == 0 || x == 0) ? 0 : getRed(image.getPixel(x - 1, row - 1));
-      int cg = (row == 0 || x == 0) ? 0 : getGreen(image.getPixel(x - 1, row - 1));
-      int cb = (row == 0 || x == 0) ? 0 : getBlue(image.getPixel(x - 1, row - 1));
+      int cr =
+          (row == 0 || x == 0) ? 0 : getRed(image.getPixel(x - 1, row - 1));
+      int cg =
+          (row == 0 || x == 0) ? 0 : getGreen(image.getPixel(x - 1, row - 1));
+      int cb =
+          (row == 0 || x == 0) ? 0 : getBlue(image.getPixel(x - 1, row - 1));
 
       int xr = getRed(image.getPixel(x, row));
       int xg = getGreen(image.getPixel(x, row));
@@ -347,10 +350,12 @@ class PngEncoder extends Encoder {
       if (image.format == Image.RGBA) {
         int aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
-        int ca = (row == 0 || x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row - 1));
+        int ca =
+            (row == 0 || x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row - 1));
         int xa = getAlpha(image.getPixel(x, row));
         int pa = _paethPredictor(aa, ba, ca);
-        out[oi++] = (xa - pa) & 0xff;;
+        out[oi++] = (xa - pa) & 0xff;
+        ;
       }
     }
 

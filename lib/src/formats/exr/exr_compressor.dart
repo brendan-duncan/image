@@ -24,35 +24,35 @@ abstract class ExrCompressor {
   int decodedHeight = 0;
 
   factory ExrCompressor(int type, ExrPart hdr, int maxScanLineSize,
-                        [int numScanLines]) {
+      [int numScanLines]) {
     switch (type) {
       case RLE_COMPRESSION:
         return new ExrRleCompressor(hdr, maxScanLineSize);
       case ZIPS_COMPRESSION:
-        return new ExrZipCompressor(hdr, maxScanLineSize,
-                                    numScanLines == null ? 1 : numScanLines);
+        return new ExrZipCompressor(
+            hdr, maxScanLineSize, numScanLines == null ? 1 : numScanLines);
       case ZIP_COMPRESSION:
-        return new ExrZipCompressor(hdr, maxScanLineSize,
-                                    numScanLines == null ? 16 : numScanLines);
+        return new ExrZipCompressor(
+            hdr, maxScanLineSize, numScanLines == null ? 16 : numScanLines);
       case PIZ_COMPRESSION:
-        return new ExrPizCompressor(hdr, maxScanLineSize,
-                                    numScanLines == null ? 32 : numScanLines);
+        return new ExrPizCompressor(
+            hdr, maxScanLineSize, numScanLines == null ? 32 : numScanLines);
       case PXR24_COMPRESSION:
-        return new ExrPxr24Compressor(hdr, maxScanLineSize,
-                                     numScanLines == null ? 16 : numScanLines);
+        return new ExrPxr24Compressor(
+            hdr, maxScanLineSize, numScanLines == null ? 16 : numScanLines);
       case B44_COMPRESSION:
         return new ExrB44Compressor(hdr, maxScanLineSize,
-                              numScanLines == null ? 32 : numScanLines, false);
+            numScanLines == null ? 32 : numScanLines, false);
       case B44A_COMPRESSION:
         return new ExrB44Compressor(hdr, maxScanLineSize,
-                              numScanLines == null ? 32 : numScanLines, true);
+            numScanLines == null ? 32 : numScanLines, true);
       default:
         throw new ImageException('Invalid compression type: $type');
     }
   }
 
-  factory ExrCompressor.tile(int type, int tileLineSize, int numTileLines,
-                             ExrPart hdr) {
+  factory ExrCompressor.tile(
+      int type, int tileLineSize, int numTileLines, ExrPart hdr) {
     switch (type) {
       case RLE_COMPRESSION:
         return new ExrRleCompressor(hdr, (tileLineSize * numTileLines));
@@ -76,13 +76,12 @@ abstract class ExrCompressor {
 
   int numScanLines();
 
-  Uint8List compress(InputBuffer inPtr, int x, int y,
-                     [int width, int height]) {
+  Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
     throw new ImageException('Unsupported compression type');
   }
 
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
-                       [int width, int height]) {
+      [int width, int height]) {
     throw new ImageException('Unsupported compression type');
   }
 
@@ -98,6 +97,6 @@ abstract class InternalExrCompressor extends ExrCompressor {
   int numSamples(int s, int a, int b) {
     int a1 = a ~/ s;
     int b1 = b ~/ s;
-    return  b1 - a1 + ((a1 * s < a) ? 0: 1);
+    return b1 - a1 + ((a1 * s < a) ? 0 : 1);
   }
 }

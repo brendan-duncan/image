@@ -14,8 +14,8 @@ double _smoothStep(double edge0, double edge1, double x) {
   return x * x * (3.0 - 2.0 * x);
 }
 
-Image vignette(Image src, {double start: 0.3, double end: 0.75,
-               double amount: 0.8}) {
+Image vignette(Image src,
+    {double start: 0.3, double end: 0.75, double amount: 0.8}) {
   final int h = src.height - 1;
   final int w = src.width - 1;
   double invAmt = 1.0 - amount;

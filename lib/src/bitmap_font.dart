@@ -1,31 +1,22 @@
 import 'package:archive/archive.dart';
-import 'package:xml/xml.dart' as XML;
+import 'package:xml/xml.dart';
 
 import 'image.dart';
 import 'image_exception.dart';
 import 'formats/png_decoder.dart';
 
-/**
- * Decode a [BitmapFont] from the contents of a zip file that stores the
- * .fnt font definition and associated PNG images.
- */
-BitmapFont readFontZip(List<int> bytes) =>
-    new BitmapFont.fromZip(bytes);
+/// Decode a [BitmapFont] from the contents of a zip file that stores the
+/// .fnt font definition and associated PNG images.
+BitmapFont readFontZip(List<int> bytes) => new BitmapFont.fromZip(bytes);
 
-
-/**
- * Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
- * and an [Image] that stores the font [map].
- */
+/// Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
+/// and an [Image] that stores the font [map].
 BitmapFont readFont(String font, Image map) =>
     new BitmapFont.fromFnt(font, map);
 
-
-/**
- * A bitmap font that can be used with [drawString] and [drawChar] functions.
- * You can generate a font files from a program
- * like: http://kvazars.com/littera
- */
+/// A bitmap font that can be used with [drawString] and [drawChar] functions.
+/// You can generate a font files from a program
+/// like: http://kvazars.com/littera
 class BitmapFont {
   String face = '';
   int size = 0;
@@ -49,31 +40,28 @@ class BitmapFont {
   Map<int, BitmapFontCharacter> characters = {};
   Map<int, Map<int, int>> kernings = {};
 
-  /**
-   * Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
-   * and an [Image] that stores the font [map].
-   */
+  /// Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
+  /// and an [Image] that stores the font [map].
   BitmapFont.fromFnt(String fnt, Image page) {
-    Map<int, Image> fontPages = { 0: page };
+    Map<int, Image> fontPages = {0: page};
 
-    XML.XmlDocument xml;
+    XmlDocument doc;
 
     if (fnt.startsWith('<font>')) {
-      xml = XML.parse(fnt);
-      if (xml == null) {
+      doc = parse(fnt);
+      if (doc == null) {
         throw new ImageException('Invalid font XML');
       }
     } else {
-      xml = _parseTextFnt(fnt);
+      doc = _parseTextFnt(fnt);
     }
 
-    _parseFnt(xml, fontPages);
+    _parseFnt(doc, fontPages);
   }
 
-  /**
-   * Decode a [BitmapFont] from the contents of a zip file that stores the
-   * .fnt font definition and associated PNG images.
-   */
+  /// Decode a [BitmapFont] from the contents of a zip file that stores the
+  /// .fnt font definition and associated PNG images.
+  ///
   BitmapFont.fromZip(List<int> fileData) {
     Archive arc = ZipDecoder().decodeBytes(fileData);
 
@@ -89,11 +77,11 @@ class BitmapFont {
       throw new ImageException('Invalid font archive');
     }
 
-    String font_str = String.fromCharCodes(font_file.content);
-    XML.XmlDocument xml;
+    String font_str = String.fromCharCodes(font_file.content as List<int>);
+    XmlDocument xml;
 
     if (font_str.startsWith('<font>')) {
-      xml = XML.parse(font_str);
+      xml = parse(font_str);
       if (xml == null) {
         throw new ImageException('Invalid font XML');
       }
@@ -104,10 +92,8 @@ class BitmapFont {
     _parseFnt(xml, {}, arc);
   }
 
-  /**
-   * Get the amount the writer x position should advance after drawing the
-   * character [ch].
-   */
+  /// Get the amount the writer x position should advance after drawing the
+  /// character [ch].
   int characterXAdvance(String ch) {
     if (ch.isEmpty) {
       return 0;
@@ -119,13 +105,12 @@ class BitmapFont {
     return characters[c].xadvance;
   }
 
+  Iterable<XmlElement> _childElements(XmlNode n) => n.children
+      .where((c) => c is XmlElement)
+      .map((c) => c as XmlElement);
 
-  Iterable<XML.XmlElement> _childElements(XML.XmlNode n) =>
-    n.children.where((c) => c is XML.XmlElement).map((c) => c as XML.XmlElement);
-
-
-  void _parseFnt(XML.XmlDocument xml, Map<int, Image> fontPages,
-                 [Archive arc]) {
+  void _parseFnt(XmlDocument xml, Map<int, Image> fontPages,
+      [Archive arc]) {
     if (xml.children.length != 1) {
       throw new ImageException('Invalid font XML');
     }
@@ -135,7 +120,7 @@ class BitmapFont {
     for (var c in _childElements(font)) {
       String name = c.name.toString();
       if (name == 'info') {
-        for (XML.XmlAttribute a in c.attributes) {
+        for (XmlAttribute a in c.attributes) {
           switch (a.name.toString()) {
             case 'face':
               face = a.value;
@@ -184,7 +169,7 @@ class BitmapFont {
           }
         }
       } else if (name == 'common') {
-        for (XML.XmlAttribute a in c.attributes) {
+        for (XmlAttribute a in c.attributes) {
           switch (a.name.toString()) {
             case 'lineHeight':
               lineHeight = int.parse(a.value);
@@ -219,10 +204,10 @@ class BitmapFont {
             ArchiveFile imageFile = _findFile(arc, filename);
             if (imageFile == null) {
               throw new ImageException('Font zip missing font page image '
-                                       '$filename');
+                  '$filename');
             }
 
-            Image image = PngDecoder().decodeImage(imageFile.content);
+            Image image = PngDecoder().decodeImage(imageFile.content as List<int>);
 
             fontPages[id] = image;
           }
@@ -262,8 +247,8 @@ class BitmapFont {
 
           Image fontImage = fontPages[page];
 
-          BitmapFontCharacter ch = BitmapFontCharacter(id, width, height,
-              xoffset, yoffset, xadvance, page, chnl);
+          BitmapFontCharacter ch = BitmapFontCharacter(
+              id, width, height, xoffset, yoffset, xadvance, page, chnl);
 
           characters[id] = ch;
 
@@ -281,13 +266,13 @@ class BitmapFont {
     }
   }
 
-  XML.XmlDocument _parseTextFnt(String content) {
-    var children = <XML.XmlNode>[];
-    var pageList = <XML.XmlNode>[];
-    var charList = <XML.XmlNode>[];
-    var kerningList = <XML.XmlNode>[];
-    var charsAttrs;
-    var kerningsAttrs;
+  XmlDocument _parseTextFnt(String content) {
+    var children = <XmlNode>[];
+    var pageList = <XmlNode>[];
+    var charList = <XmlNode>[];
+    var kerningList = <XmlNode>[];
+    List<XmlAttribute> charsAttrs;
+    List<XmlAttribute> kerningsAttrs;
 
     List<String> lines = content.split('\n');
 
@@ -300,17 +285,17 @@ class BitmapFont {
       switch (tk[0]) {
         case 'info':
           var attrs = _parseParameters(tk);
-          var info = XML.XmlElement(new XML.XmlName('info'), attrs, []);
+          var info = XmlElement(new XmlName('info'), attrs, []);
           children.add(info);
           break;
         case 'common':
           var attrs = _parseParameters(tk);
-          var node = XML.XmlElement(new XML.XmlName('common'), attrs, []);
+          var node = XmlElement(new XmlName('common'), attrs, []);
           children.add(node);
           break;
         case 'page':
           var attrs = _parseParameters(tk);
-          var page = XML.XmlElement(new XML.XmlName('page'), attrs, []);
+          var page = XmlElement(new XmlName('page'), attrs, []);
           pageList.add(page);
           break;
         case 'chars':
@@ -318,7 +303,7 @@ class BitmapFont {
           break;
         case 'char':
           var attrs = _parseParameters(tk);
-          var node = XML.XmlElement(new XML.XmlName('char'), attrs, []);
+          var node = XmlElement(new XmlName('char'), attrs, []);
           charList.add(node);
           break;
         case 'kernings':
@@ -326,37 +311,36 @@ class BitmapFont {
           break;
         case 'kerning':
           var attrs = _parseParameters(tk);
-          var node = XML.XmlElement(new XML.XmlName('kerning'), attrs, []);
+          var node = XmlElement(new XmlName('kerning'), attrs, []);
           kerningList.add(node);
           break;
       }
     }
 
     if (charsAttrs != null || charList.isNotEmpty) {
-      var node = XML.XmlElement(new XML.XmlName('chars'), charsAttrs,
-          charList);
+      var node = XmlElement(new XmlName('chars'), charsAttrs, charList);
       children.add(node);
     }
 
     if (kerningsAttrs != null || kerningList.isNotEmpty) {
-      var node = XML.XmlElement(new XML.XmlName('kernings'), kerningsAttrs,
-          kerningList);
+      var node = XmlElement(
+          new XmlName('kernings'), kerningsAttrs, kerningList);
       children.add(node);
     }
 
     if (pageList.isNotEmpty) {
-      var pages = XML.XmlElement(new XML.XmlName('pages'), [], pageList);
+      var pages = XmlElement(new XmlName('pages'), [], pageList);
       children.add(pages);
     }
 
-    var xml = XML.XmlElement(new XML.XmlName('font'), [], children);
-    var doc = XML.XmlDocument([xml]);
+    var xml = XmlElement(new XmlName('font'), [], children);
+    var doc = XmlDocument([xml]);
 
     return doc;
   }
 
-  List<XML.XmlAttribute> _parseParameters(List<String> tk) {
-    var params = <XML.XmlAttribute>[];
+  List<XmlAttribute> _parseParameters(List<String> tk) {
+    var params = <XmlAttribute>[];
     for (int ti = 1; ti < tk.length; ++ti) {
       if (tk[ti].isEmpty) {
         continue;
@@ -369,7 +353,7 @@ class BitmapFont {
       // Remove all " characters
       atk[1] = atk[1].replaceAll('"', '');
 
-      var a = XML.XmlAttribute(new XML.XmlName(atk[0]), atk[1]);
+      var a = XmlAttribute(new XmlName(atk[0]), atk[1]);
       params.add(a);
     }
     return params;
@@ -385,9 +369,7 @@ class BitmapFont {
   }
 }
 
-/**
- * A single character in a [BitmapFont].
- */
+/// A single character in a [BitmapFont].
 class BitmapFontCharacter {
   final int id;
   final int width;
@@ -399,17 +381,23 @@ class BitmapFontCharacter {
   final int channel;
   final Image image;
 
-  BitmapFontCharacter(this.id, int width, int height,
-                      this.xoffset, this.yoffset, this.xadvance, this.page,
-                      this.channel) :
-    this.width = width,
-    this.height = height,
-    image = Image(width, height);
+  BitmapFontCharacter(this.id, int width, int height, this.xoffset,
+      this.yoffset, this.xadvance, this.page, this.channel)
+      : this.width = width,
+        this.height = height,
+        image = Image(width, height);
 
   String toString() {
-    Map x = {'id': id, 'width': width, 'height': height, 'xoffset': xoffset,
-             'yoffset': yoffset, 'xadvance': xadvance, 'page': page,
-             'channel': channel};
+    Map<String, int> x = {
+      'id': id,
+      'width': width,
+      'height': height,
+      'xoffset': xoffset,
+      'yoffset': yoffset,
+      'xadvance': xadvance,
+      'page': page,
+      'channel': channel
+    };
     return 'Character $x';
   }
 }

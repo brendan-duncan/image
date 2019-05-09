@@ -12,13 +12,12 @@ class ExifData {
   List<Uint8List> rawData;
   Map<int, dynamic> data;
 
-  ExifData()
-    : data = Map<int, dynamic>();
+  ExifData() : data = Map<int, dynamic>();
 
   ExifData.from(ExifData other)
-    : data = (other == null) ?
-              new Map<int, dynamic>() :
-              new Map<int, dynamic>.from(other.data) {
+      : data = (other == null)
+            ? new Map<int, dynamic>()
+            : new Map<int, dynamic>.from(other.data) {
     if (other != null && other.rawData != null) {
       rawData = List<Uint8List>(other.rawData.length);
       for (int i = 0; i < other.rawData.length; ++i) {

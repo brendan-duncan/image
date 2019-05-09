@@ -61,8 +61,7 @@ class WebPAlpha {
       final int offset = row * width;
       final int numPixels = numRows * width;
 
-      output.setRange(offset, numPixels, input.buffer,
-                      input.position + offset);
+      output.setRange(offset, numPixels, input.buffer, input.position + offset);
     } else {
       if (!_decodeAlphaImageStream(row + numRows, output)) {
         return false;
@@ -86,23 +85,26 @@ class WebPAlpha {
     return true;
   }
 
-  bool _dequantizeLevels(Uint8List data, int width, int height,
-                         int row, int num_rows) {
-    if (data == null || width <= 0 || height <= 0 || row < 0 || num_rows < 0 ||
+  bool _dequantizeLevels(
+      Uint8List data, int width, int height, int row, int num_rows) {
+    if (data == null ||
+        width <= 0 ||
+        height <= 0 ||
+        row < 0 ||
+        num_rows < 0 ||
         row + num_rows > height) {
       return false;
     }
     return true;
   }
 
-
   bool _decodeAlphaImageStream(int lastRow, Uint8List output) {
     _vp8l.opaque = output;
     // Decode (with special row processing).
-    return _use8bDecode ?
-        _vp8l.decodeAlphaData(_vp8l.webp.width, _vp8l.webp.height, lastRow) :
-        _vp8l.decodeImageData(_vp8l.pixels, _vp8l.webp.width, _vp8l.webp.height,
-                               lastRow, _vp8l.extractAlphaRows);
+    return _use8bDecode
+        ? _vp8l.decodeAlphaData(_vp8l.webp.width, _vp8l.webp.height, lastRow)
+        : _vp8l.decodeImageData(_vp8l.pixels, _vp8l.webp.width,
+            _vp8l.webp.height, lastRow, _vp8l.extractAlphaRows);
   }
 
   bool _decodeAlphaHeader() {
@@ -133,6 +135,7 @@ class WebPAlpha {
   }
 
   InternalVP8L _vp8l;
+
   /// Although alpha channel
   /// requires only 1 byte per
   /// pixel, sometimes VP8LDecoder may need to allocate

@@ -10,7 +10,7 @@ void main() {
 
   var ctx = cvs.getContext("2d") as Html.CanvasRenderingContext2D;
 
-  ctx.drawImage(theImg,0,0);
+  ctx.drawImage(theImg, 0, 0);
 
   var bytes = ctx.getImageData(0, 0, cvs.width, cvs.height).data;
   Image image = Image.fromBytes(cvs.width, cvs.height, bytes);

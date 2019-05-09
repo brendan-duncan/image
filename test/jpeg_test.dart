@@ -46,7 +46,8 @@ void main() {
         expect(image.exif.orientation, equals(i));
         new File('out/jpg/landscape_$i.png')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(new PngEncoder().encodeImage(bakeOrientation(image)));
+          ..writeAsBytesSync(
+              new PngEncoder().encodeImage(bakeOrientation(image)));
       });
 
       test('exif/orientation_$i/portrait', () {
@@ -56,9 +57,9 @@ void main() {
         expect(image.exif.orientation, equals(i));
         new File('out/jpg/portrait_$i.png')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(new PngEncoder().encodeImage(bakeOrientation(image)));
+          ..writeAsBytesSync(
+              new PngEncoder().encodeImage(bakeOrientation(image)));
       });
     }
   });
 }
-

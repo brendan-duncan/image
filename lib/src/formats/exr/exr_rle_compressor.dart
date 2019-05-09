@@ -7,23 +7,23 @@ import 'exr_compressor.dart';
 import 'exr_part.dart';
 
 abstract class ExrRleCompressor extends ExrCompressor {
-  factory ExrRleCompressor(ExrPart header, int maxScanLineSize) = InternalExrRleCompressor;
+  factory ExrRleCompressor(ExrPart header, int maxScanLineSize) =
+      InternalExrRleCompressor;
 }
 
-class InternalExrRleCompressor extends InternalExrCompressor implements ExrRleCompressor {
-  InternalExrRleCompressor(ExrPart header, int maxScanLineSize) :
-    super(header) {
-  }
+class InternalExrRleCompressor extends InternalExrCompressor
+    implements ExrRleCompressor {
+  InternalExrRleCompressor(ExrPart header, int maxScanLineSize)
+      : super(header) {}
 
   int numScanLines() => 1;
 
-  Uint8List compress(InputBuffer inPtr, int x, int y,
-                     [int width, int height]) {
+  Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
     throw new ImageException('Rle compression not yet supported.');
   }
 
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
-                       [int width, int height]) {
+      [int width, int height]) {
     OutputBuffer out = OutputBuffer(size: inPtr.length * 2);
 
     if (width == null) {

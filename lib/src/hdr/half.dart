@@ -2,14 +2,12 @@ import 'dart:typed_data';
 
 import '../internal/bit_operators.dart';
 
-/**
- * A 16-bit floating-point number, used by high-dynamic-range image formats
- * as a more efficient storage for floating-point values that don't require
- * full 32-bit precision. A list of Half floats can be stored in a [Uint16List],
- * and converted to a double using the [HalfToDouble] static method.
- *
- * This class is derived from the OpenEXR library.
- */
+/// A 16-bit floating-point number, used by high-dynamic-range image formats
+/// as a more efficient storage for floating-point values that don't require
+/// full 32-bit precision. A list of Half floats can be stored in a [Uint16List],
+/// and converted to a double using the [HalfToDouble] static method.
+///
+/// This class is derived from the OpenEXR library.
 class Half {
   Half([num f]) {
     if (f != null) {
@@ -17,8 +15,7 @@ class Half {
     }
   }
 
-  Half.fromBits(int bits) :
-    _h = bits {
+  Half.fromBits(int bits) : _h = bits {
     if (_toFloatFloat32 == null) {
       _initialize();
     }
@@ -31,12 +28,12 @@ class Half {
     return _toFloatFloat32[bits];
   }
 
-  static int DoubleToHalf(num f) {
+  static int DoubleToHalf(num n) {
     if (_toFloatFloat32 == null) {
       _initialize();
     }
 
-    f = f.toDouble();
+    double f = n.toDouble();
     int x_i = float32ToUint32(f);
     if (f == 0.0) {
       // Common special case - zero.
@@ -74,38 +71,30 @@ class Half {
 
   double toDouble() => _toFloatFloat32[_h];
 
-  /**
-   * Unary minus
-   */
-  Half operator-() => new Half.fromBits(_h ^ 0x8000);
+  /// Unary minus
+  Half operator -() => new Half.fromBits(_h ^ 0x8000);
 
-  /**
-   * Addition operator for Half or num left operands.
-   */
-  Half operator+(f) {
+  /// Addition operator for Half or num left operands.
+  Half operator +(num f) {
     return new Half(toDouble() + f.toDouble());
   }
 
-  /**
-   * Subtraction operator for Half or num left operands.
-   */
-  Half operator-(f) {
+  /// Subtraction operator for Half or num left operands.
+  Half operator -(num f) {
     return new Half(toDouble() - f.toDouble());
   }
 
-  Half operator*(f) {
+  Half operator *(num f) {
     return new Half(toDouble() * f.toDouble());
   }
 
-  Half operator/(f) {
+  Half operator /(num f) {
     return new Half(toDouble() / f.toDouble());
   }
 
-  /**
-   * Round to n-bit precision (n should be between 0 and 10).
-   * After rounding, the significand's 10-n least significant
-   * bits will be zero.
-   */
+  /// Round to n-bit precision (n should be between 0 and 10).
+  /// After rounding, the significand's 10-n least significant
+  /// bits will be zero.
   Half round(int n) {
     if (n >= 10) {
       return this;
@@ -122,7 +111,7 @@ class Half {
     // up causes the significand to overflow.
 
     e >>= 9 - n;
-    e  += e & 1;
+    e += e & 1;
     e <<= 9 - n;
 
     // Check for exponent overflow.
@@ -138,81 +127,59 @@ class Half {
     return new Half.fromBits(s | e);
   }
 
-  /**
-   * Returns true if h is a normalized number, a denormalized number or zero.
-   */
+  /// Returns true if h is a normalized number, a denormalized number or zero.
   bool isFinite() {
     int e = (_h >> 10) & 0x001f;
     return e < 31;
   }
 
-  /**
-   * Returns true if h is a normalized number.
-   */
+  /// Returns true if h is a normalized number.
   bool isNormalized() {
     int e = (_h >> 10) & 0x001f;
     return e > 0 && e < 31;
   }
 
-  /**
-   * Returns true if h is a denormalized number.
-   */
+  /// Returns true if h is a denormalized number.
   bool isDenormalized() {
     int e = (_h >> 10) & 0x001f;
-    int m =  _h & 0x3ff;
+    int m = _h & 0x3ff;
     return e == 0 && m != 0;
   }
 
-  /**
-   * Returns true if h is zero.
-   */
+  /// Returns true if h is zero.
   bool isZero() {
     return (_h & 0x7fff) == 0;
   }
 
-  /**
-   * Returns true if h is a NAN.
-   */
+  /// Returns true if h is a NAN.
   bool isNan() {
     int e = (_h >> 10) & 0x001f;
-    int m =  _h & 0x3ff;
+    int m = _h & 0x3ff;
     return e == 31 && m != 0;
   }
 
-  /**
-   * Returns true if h is a positive or a negative infinity.
-   */
+  /// Returns true if h is a positive or a negative infinity.
   bool isInfinity() {
     int e = (_h >> 10) & 0x001f;
-    int m =  _h & 0x3ff;
+    int m = _h & 0x3ff;
     return e == 31 && m == 0;
   }
 
-  /**
-   * Returns true if the sign bit of h is set (negative).
-   */
+  /// Returns true if the sign bit of h is set (negative).
   bool isNegative() {
     return (_h & 0x8000) != 0;
   }
 
-  /**
-   * Returns +infinity.
-   */
+  /// Returns +infinity.
   static Half posInf() => new Half.fromBits(0x7c00);
 
-  /**
-   * Returns -infinity.
-   */
+  /// Returns -infinity.
   static Half negInf() => new Half.fromBits(0xfc00);
 
-  /**
-   * Returns a NAN with the bit pattern 0111111111111111.
-   */
+  /// Returns a NAN with the bit pattern 0111111111111111.
   static Half qNan() => new Half.fromBits(0x7fff);
 
-  /**
-   * Returns a NAN with the bit pattern 0111110111111111.
-   */
+  /// Returns a NAN with the bit pattern 0111110111111111.
   static Half sNan() => new Half.fromBits(0x7dff);
 
   int bits() => _h;
@@ -229,9 +196,9 @@ class Half {
     // resulting half number.
     // Adjust e, accounting for the different exponent bias
     // of float and half (127 versus 15).
-    int s =  (i >> 16) & 0x00008000;
+    int s = (i >> 16) & 0x00008000;
     int e = ((i >> 23) & 0x000000ff) - (127 - 15);
-    int m =   i        & 0x007fffff;
+    int m = i & 0x007fffff;
 
     // Now reassemble s, e and m into a half:
     if (e <= 0) {
@@ -294,14 +261,14 @@ class Half {
       m = m + 0x00000fff + ((m >> 13) & 1);
 
       if (m & 0x00800000 != 0) {
-        m =  0;   // overflow in significand,
-        e += 1;   // adjust exponent
+        m = 0; // overflow in significand,
+        e += 1; // adjust exponent
       }
 
       // Handle exponent overflow
 
       if (e > 30) {
-        return s | 0x7c00;  // if this returns, the half becomes an
+        return s | 0x7c00; // if this returns, the half becomes an
       } // infinity with the same sign as f.
 
       // Assemble the half from s, e and m.
@@ -323,11 +290,11 @@ class Half {
 
       if (e <= 0 || e >= 30) {
         // Special case
-        _eLut[i]         = 0;
+        _eLut[i] = 0;
         _eLut[i | 0x100] = 0;
       } else {
         // Common case - normalized half, no exponent overflow possible
-        _eLut[i]         =  (e << 10);
+        _eLut[i] = (e << 10);
         _eLut[i | 0x100] = ((e << 10) | 0x8000);
       }
     }
@@ -342,7 +309,7 @@ class Half {
   static int _halfToFloat(int y) {
     int s = (y >> 15) & 0x00000001;
     int e = (y >> 10) & 0x0000001f;
-    int m =  y        & 0x000003ff;
+    int m = y & 0x000003ff;
 
     if (e == 0) {
       if (m == 0) {
@@ -352,7 +319,7 @@ class Half {
         // Denormalized number -- renormalize it
         while ((m & 0x00000400) == 0) {
           m <<= 1;
-          e -=  1;
+          e -= 1;
         }
 
         e += 1;

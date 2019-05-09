@@ -8,26 +8,27 @@ import 'exr_compressor.dart';
 import 'exr_part.dart';
 
 abstract class ExrZipCompressor extends ExrCompressor {
-  factory ExrZipCompressor(ExrPart header, int maxScanLineSize,
-                           int numScanLines) = InternalExrZipCompressor;
+  factory ExrZipCompressor(
+          ExrPart header, int maxScanLineSize, int numScanLines) =
+      InternalExrZipCompressor;
 }
 
-class InternalExrZipCompressor extends InternalExrCompressor implements ExrZipCompressor {
+class InternalExrZipCompressor extends InternalExrCompressor
+    implements ExrZipCompressor {
   ZLibDecoder zlib = ZLibDecoder();
 
-  InternalExrZipCompressor(ExrPart header, int maxScanLineSize, this._numScanLines) :
-    super(header) {
-  }
+  InternalExrZipCompressor(
+      ExrPart header, int maxScanLineSize, this._numScanLines)
+      : super(header) {}
 
   int numScanLines() => _numScanLines;
 
-  Uint8List compress(InputBuffer input, int x, int y,
-                     [int width, int height]) {
+  Uint8List compress(InputBuffer input, int x, int y, [int width, int height]) {
     throw new ImageException('Zip compression not yet supported');
   }
 
   Uint8List uncompress(InputBuffer input, int x, int y,
-                       [int width, int height]) {
+      [int width, int height]) {
     Uint8List data = zlib.decodeBytes(input.toUint8List());
 
     if (width == null) {

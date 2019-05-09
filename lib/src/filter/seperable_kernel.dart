@@ -11,9 +11,9 @@ class SeperableKernel {
   /**
    * Create a seperable convolution kernel for the given [radius].
    */
-  SeperableKernel(int radius) :
-    coefficients = List<double>(2 * radius + 1),
-    this.size = radius;
+  SeperableKernel(int radius)
+      : coefficients = List<double>(2 * radius + 1),
+        this.size = radius;
 
   /**
    * Get the number of coefficients in the kernel.
@@ -23,12 +23,12 @@ class SeperableKernel {
   /**
    * Get a coefficient from the kernel.
    */
-  double operator[](int index) => coefficients[index];
+  double operator [](int index) => coefficients[index];
 
   /**
    * Set a coefficient in the kernel.
    */
-  void operator[]=(int index, double c) {
+  void operator []=(int index, double c) {
     coefficients[index] = c;
   }
 
@@ -69,8 +69,8 @@ class SeperableKernel {
     return x;
   }
 
-  void _applyCoeffsLine(Image src, Image dst, int y, int width,
-                        bool horizontal) {
+  void _applyCoeffsLine(
+      Image src, Image dst, int y, int width, bool horizontal) {
     for (int x = 0; x < width; x++) {
       double r = 0.0;
       double g = 0.0;
@@ -81,9 +81,7 @@ class SeperableKernel {
         double coeff = coefficients[j2];
         int gr = _reflect(width, x + j);
 
-        int sc = (horizontal) ?
-            src.getPixel(gr, y) :
-            src.getPixel(y, gr);
+        int sc = (horizontal) ? src.getPixel(gr, y) : src.getPixel(y, gr);
 
         r += coeff * getRed(sc);
         g += coeff * getGreen(sc);
@@ -91,7 +89,8 @@ class SeperableKernel {
         a += coeff * getAlpha(sc);
       }
 
-      int c = getColor((r > 255.0 ? 255.0 : r).toInt(),
+      int c = getColor(
+          (r > 255.0 ? 255.0 : r).toInt(),
           (g > 255.0 ? 255.0 : g).toInt(),
           (b > 255.0 ? 255.0 : b).toInt(),
           (a > 255.0 ? 255.0 : a).toInt());

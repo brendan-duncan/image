@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import '../../internal/bit_operators.dart';
 
 class ExrWavelet {
-  static void decode(Uint16List input, int si, int nx, int ox, int ny, int oy,
-                     int mx) {
+  static void decode(
+      Uint16List input, int si, int nx, int ox, int ny, int oy, int mx) {
     bool w14 = (mx < (1 << 14));
     int n = (nx > ny) ? ny : nx;
     int p = 1;
@@ -38,8 +38,8 @@ class ExrWavelet {
 
         // X loop
         for (; px <= ex; px += ox2) {
-          int p01 = px  + ox1;
-          int p10 = px  + oy1;
+          int p01 = px + ox1;
+          int p10 = px + oy1;
           int p11 = p10 + ox1;
 
           // 2D wavelet decoding
@@ -60,7 +60,7 @@ class ExrWavelet {
             input[p10] = a_b[0];
             input[p11] = a_b[1];
           } else {
-            wdec16(input[px],  input[p10], a_b);
+            wdec16(input[px], input[p10], a_b);
             i00 = a_b[0];
             i10 = a_b[1];
 
@@ -125,9 +125,9 @@ class ExrWavelet {
   }
 
   static const int NBITS = 16;
-  static const int A_OFFSET =  1 << (NBITS  - 1);
-  static const int M_OFFSET =  1 << (NBITS  - 1);
-  static const int MOD_MASK = (1 <<  NBITS) - 1;
+  static const int A_OFFSET = 1 << (NBITS - 1);
+  static const int M_OFFSET = 1 << (NBITS - 1);
+  static const int MOD_MASK = (1 << NBITS) - 1;
 
   static void wdec14(int l, int h, List<int> a_b) {
     int ls = uint16ToInt16(l);

@@ -3,9 +3,7 @@ import 'dart:typed_data';
 
 import 'hdr_image.dart';
 
-/**
- * Applies an HDR bloom filter to the image, in-place.
- */
+/// Applies an HDR bloom filter to the image, in-place.
 HdrImage hdrBloom(HdrImage hdr, {double radius: 0.01, double weight: 0.1}) {
   double _lerp(double t, double a, double b) => (1.0 - t) * a + t * b;
 
@@ -19,7 +17,7 @@ HdrImage hdrBloom(HdrImage hdr, {double radius: 0.01, double weight: 0.1}) {
     Float32List bloomFilter = Float32List(bloomWidth * bloomWidth);
     for (int i = 0; i < bloomWidth * bloomWidth; ++i) {
       double dist = Math.sqrt(i / bloomWidth);
-      bloomFilter[i] = Math.pow(Math.max(0.0, 1.0 - dist), 4.0);
+      bloomFilter[i] = Math.pow(Math.max(0.0, 1.0 - dist), 4.0).toDouble();
     }
 
     // Apply bloom filter to image pixels
@@ -66,8 +64,10 @@ HdrImage hdrBloom(HdrImage hdr, {double radius: 0.01, double weight: 0.1}) {
     for (int y = 0, offset = 0; y < hdr.height; ++y) {
       for (int x = 0; x < hdr.width; ++x, offset += 3) {
         hdr.setRed(x, y, _lerp(weight, hdr.getRed(x, y), bloomImage[offset]));
-        hdr.setGreen(x, y, _lerp(weight, hdr.getGreen(x, y), bloomImage[offset + 1]));
-        hdr.setBlue(x, y, _lerp(weight, hdr.getBlue(x, y), bloomImage[offset + 2]));
+        hdr.setGreen(
+            x, y, _lerp(weight, hdr.getGreen(x, y), bloomImage[offset + 1]));
+        hdr.setBlue(
+            x, y, _lerp(weight, hdr.getBlue(x, y), bloomImage[offset + 2]));
       }
     }
   }

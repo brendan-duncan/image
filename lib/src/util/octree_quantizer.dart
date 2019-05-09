@@ -7,7 +7,7 @@ import 'quantizer.dart';
 class OctreeQuantizer extends Quantizer {
   _OctreeNode _root;
 
-  OctreeQuantizer(Image image, {int numberOfColors=256}) {
+  OctreeQuantizer(Image image, {int numberOfColors = 256}) {
     _root = _OctreeNode(0, 0, null);
 
     _HeapNode heap = _HeapNode();
@@ -44,8 +44,8 @@ class OctreeQuantizer extends Quantizer {
 
     for (int bit = 1 << 7; bit != 0; bit >>= 1) {
       int i = ((g & bit) != 0 ? 1 : 0) * 4 +
-              ((r & bit) != 0 ? 1 : 0) * 2 +
-              ((b & bit) != 0 ? 1 : 0);
+          ((r & bit) != 0 ? 1 : 0) * 2 +
+          ((b & bit) != 0 ? 1 : 0);
       if (root.children[i] == null) {
         break;
       }
@@ -71,12 +71,12 @@ class OctreeQuantizer extends Quantizer {
     return (ac < bc) ? -1 : (ac > bc) ? 1 : 0;
   }
 
-
   _OctreeNode _nodeInsert(_OctreeNode root, int r, int g, int b) {
     int depth = 0;
     for (int bit = 1 << 7; ++depth < 8; bit >>= 1) {
       int i = ((g & bit) != 0 ? 1 : 0) * 4 +
-          ((r & bit) != 0 ? 1 : 0) * 2 + ((b & bit) != 0 ? 1 : 0);
+          ((r & bit) != 0 ? 1 : 0) * 2 +
+          ((b & bit) != 0 ? 1 : 0);
       if (root.children[i] == null) {
         root.children[i] = _OctreeNode(i, depth, root);
       }

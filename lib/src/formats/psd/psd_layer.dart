@@ -75,7 +75,6 @@ class PsdLayer {
   static const int FLAG_PHOTOSHOP_5 = 8;
   static const int FLAG_PIXEL_DATA_IRRELEVANT_TO_APPEARANCE = 16;
 
-
   PsdLayer([InputBuffer input]) {
     if (input == null) {
       return;
@@ -99,7 +98,7 @@ class PsdLayer {
     int sig = input.readUint32();
     if (sig != SIGNATURE) {
       throw new ImageException('Invalid PSD layer signature: '
-                               '${sig.toRadixString(16)}');
+          '${sig.toRadixString(16)}');
     }
 
     blendMode = input.readUint32();
@@ -145,7 +144,7 @@ class PsdLayer {
         int sig = extra.readUint32();
         if (sig != SIGNATURE) {
           throw new ImageException('PSD invalid signature for layer additional '
-                                   'data: ${sig.toRadixString(16)}');
+              'data: ${sig.toRadixString(16)}');
         }
 
         String tag = extra.readString(4);
@@ -179,16 +178,24 @@ class PsdLayer {
               fx.intensity = data.readUint32();
               fx.angle = data.readUint32();
               fx.distance = data.readUint32();
-              fx.color = [data.readUint16(), data.readUint16(),
-                          data.readUint16(), data.readUint16(),
-                          data.readUint16()];
+              fx.color = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
               fx.blendMode = data.readString(8);
               fx.enabled = data.readByte() != 0;
               fx.globalAngle = data.readByte() != 0;
               fx.opacity = data.readByte();
-              fx.nativeColor = [data.readUint16(), data.readUint16(),
-                                data.readUint16(), data.readUint16(),
-                                data.readUint16()];
+              fx.nativeColor = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
             } else if (fxTag == 'isdw') {
               var fx = PsdInnerShadowEffect();
               effects.add(fx);
@@ -197,32 +204,48 @@ class PsdLayer {
               fx.intensity = data.readUint32();
               fx.angle = data.readUint32();
               fx.distance = data.readUint32();
-              fx.color = [data.readUint16(), data.readUint16(),
-                          data.readUint16(), data.readUint16(),
-                          data.readUint16()];
+              fx.color = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
               fx.blendMode = data.readString(8);
               fx.enabled = data.readByte() != 0;
               fx.globalAngle = data.readByte() != 0;
               fx.opacity = data.readByte();
-              fx.nativeColor = [data.readUint16(), data.readUint16(),
-                                data.readUint16(), data.readUint16(),
-                                data.readUint16()];
+              fx.nativeColor = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
             } else if (fxTag == 'oglw') {
               var fx = PsdOuterGlowEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
               fx.intensity = data.readUint32();
-              fx.color = [data.readUint16(), data.readUint16(),
-                          data.readUint16(), data.readUint16(),
-                          data.readUint16()];
+              fx.color = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
               fx.blendMode = data.readString(8);
               fx.enabled = data.readByte() != 0;
               fx.opacity = data.readByte();
               if (fx.version == 2) {
-                fx.nativeColor = [data.readUint16(), data.readUint16(),
-                                  data.readUint16(), data.readUint16(),
-                                  data.readUint16()];
+                fx.nativeColor = [
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16()
+                ];
               }
             } else if (fxTag == 'iglw') {
               var fx = PsdInnerGlowEffect();
@@ -230,17 +253,25 @@ class PsdLayer {
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
               fx.intensity = data.readUint32();
-              fx.color = [data.readUint16(), data.readUint16(),
-                          data.readUint16(), data.readUint16(),
-                          data.readUint16()];
+              fx.color = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
               fx.blendMode = data.readString(8);
               fx.enabled = data.readByte() != 0;
               fx.opacity = data.readByte();
               if (fx.version == 2) {
                 fx.invert = data.readByte() != 0;
-                fx.nativeColor = [data.readUint16(), data.readUint16(),
-                                  data.readUint16(), data.readUint16(),
-                                  data.readUint16()];
+                fx.nativeColor = [
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16()
+                ];
               }
             } else if (fxTag == 'bevl') {
               var fx = PsdBevelEffect();
@@ -251,12 +282,20 @@ class PsdLayer {
               fx.blur = data.readUint32();
               fx.highlightBlendMode = data.readString(8);
               fx.shadowBlendMode = data.readString(8);
-              fx.highlightColor = [data.readUint16(), data.readUint16(),
-                                   data.readUint16(), data.readUint16(),
-                                   data.readUint16()];
-              fx.shadowColor = [data.readUint16(), data.readUint16(),
-                                data.readUint16(), data.readUint16(),
-                                data.readUint16()];
+              fx.highlightColor = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
+              fx.shadowColor = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
               fx.bevelStyle = data.readByte();
               fx.highlightOpacity = data.readByte();
               fx.shadowOpacity = data.readByte();
@@ -264,26 +303,42 @@ class PsdLayer {
               fx.globalAngle = data.readByte() != 0;
               fx.upOrDown = data.readByte();
               if (fx.version == 2) {
-                fx.realHighlightColor = [data.readUint16(), data.readUint16(),
-                                         data.readUint16(), data.readUint16(),
-                                         data.readUint16()];
-                fx.realShadowColor = [data.readUint16(), data.readUint16(),
-                                      data.readUint16(), data.readUint16(),
-                                      data.readUint16()];
+                fx.realHighlightColor = [
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16()
+                ];
+                fx.realShadowColor = [
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16(),
+                  data.readUint16()
+                ];
               }
             } else if (fxTag == 'sofi') {
               var fx = PsdSolidFillEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blendMode = data.readString(4);
-              fx.color = [data.readUint16(), data.readUint16(),
-                          data.readUint16(), data.readUint16(),
-                          data.readUint16()];
+              fx.color = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
               fx.opacity = data.readByte();
               fx.enabled = data.readByte() != 0;
-              fx.nativeColor = [data.readUint16(), data.readUint16(),
-                                data.readUint16(), data.readUint16(),
-                                data.readUint16()];
+              fx.nativeColor = [
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16(),
+                data.readUint16()
+              ];
             } else {
               data.skip(size);
             }
@@ -303,7 +358,8 @@ class PsdLayer {
    */
   int type() {
     if (additionalData.containsKey(PsdLayerSectionDivider.TAG)) {
-      PsdLayerSectionDivider section = additionalData[PsdLayerSectionDivider.TAG];
+      PsdLayerSectionDivider section =
+          additionalData[PsdLayerSectionDivider.TAG];
       return section.type;
     }
     return PsdLayerSectionDivider.NORMAL;
@@ -327,7 +383,7 @@ class PsdLayer {
       channels[i].readPlane(input, width, height, psd.depth);
     }
 
-    layerImage = PsdImage.createImageFromChannels(psd.colorMode, psd.depth,
-                                                  width, height, channels);
+    layerImage = PsdImage.createImageFromChannels(
+        psd.colorMode, psd.depth, width, height, channels);
   }
 }

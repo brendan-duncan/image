@@ -9,47 +9,50 @@ void main() {
       Image image = TgaDecoder().decodeImage(bytes);
 
       new Io.File('out/pvrtc/globe_before.png')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(encodePng(image));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(image));
 
       // Encode the image to PVRTC
       var pvrtc = PvrtcEncoder().encodeRgb4Bpp(image);
 
-      Image decoded = PvrtcDecoder().decodeRgb4bpp(image.width, image.height, pvrtc);
+      Image decoded =
+          PvrtcDecoder().decodeRgb4bpp(image.width, image.height, pvrtc);
       new Io.File('out/pvrtc/globe_after.png')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(encodePng(decoded));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(decoded));
 
       List<int> pvr = PvrtcEncoder().encodePvr(image);
       new Io.File('out/pvrtc/globe.pvr')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(pvr);
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(pvr);
     });
 
     test('encode_rgba_4bpp', () {
-      List<int> bytes = Io.File('test/res/png/alpha_edge.png').readAsBytesSync();
+      List<int> bytes =
+          Io.File('test/res/png/alpha_edge.png').readAsBytesSync();
       Image image = PngDecoder().decodeImage(bytes);
 
       new Io.File('out/pvrtc/alpha_before.png')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(encodePng(image));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(image));
 
       // Encode the image to PVRTC
       var pvrtc = PvrtcEncoder().encodeRgba4Bpp(image);
 
-      Image decoded = PvrtcDecoder().decodeRgba4bpp(image.width, image.height, pvrtc);
+      Image decoded =
+          PvrtcDecoder().decodeRgba4bpp(image.width, image.height, pvrtc);
       new Io.File('out/pvrtc/alpha_after.png')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(encodePng(decoded));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(decoded));
 
       List<int> pvr = PvrtcEncoder().encodePvr(image);
       new Io.File('out/pvrtc/alpha.pvr')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(pvr);
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(pvr);
     });
   });
 
-  group('PVR Decode', (){
+  group('PVR Decode', () {
     Io.Directory dir = Io.Directory('test/res/pvr');
     List files = dir.listSync();
     for (var f in files) {
@@ -62,8 +65,8 @@ void main() {
         Image img = PvrtcDecoder().decodePvr(bytes);
         assert(img != null);
         new Io.File('out/pvrtc/pvr_$name.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(encodePng(img));
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(encodePng(img));
       });
     }
   });

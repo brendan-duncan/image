@@ -3,7 +3,8 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Image image = readJpg(new Io.File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync());
+  Image image =
+      readJpg(new Io.File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync());
 
   group('bitmapFont', () {
     test('zip/xml', () {
@@ -14,12 +15,13 @@ void main() {
       drawString(img, font, 10, 50, 'Testing Font 1: Hello World');
 
       new Io.File('out/font/font_zip_xml.jpg')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writeJpg(img));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(img));
     });
 
     test('zip/text', () {
-      List<int> fontZip = Io.File('test/res/font/test_text.zip').readAsBytesSync();
+      List<int> fontZip =
+          Io.File('test/res/font/test_text.zip').readAsBytesSync();
       BitmapFont font = readFontZip(fontZip);
 
       var img = copyResize(image, 400);
@@ -27,8 +29,8 @@ void main() {
           color: getColor(255, 0, 0, 128));
 
       new Io.File('out/font/font_zip_text.jpg')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writeJpg(img));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(img));
     });
 
     test('arial_14', () {
@@ -37,8 +39,8 @@ void main() {
           color: getColor(255, 0, 0, 128));
 
       new Io.File('out/font/font_arial_14.jpg')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writeJpg(img));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(img));
     });
 
     test('arial_24', () {
@@ -47,8 +49,8 @@ void main() {
           color: getColor(255, 0, 0, 128));
 
       new Io.File('out/font/font_arial_24.jpg')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writeJpg(img));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(img));
     });
 
     test('arial_48', () {
@@ -57,8 +59,8 @@ void main() {
           color: getColor(255, 0, 0, 128));
 
       new Io.File('out/font/font_arial_48.jpg')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(writeJpg(img));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(img));
     });
   });
 }

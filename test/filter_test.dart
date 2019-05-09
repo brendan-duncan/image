@@ -4,9 +4,11 @@ import 'package:test/test.dart';
 
 void main() {
   group('filter', () {
-    var image = readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
+    var image =
+        readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
     image = copyResize(image, 400);
-    var image2 = readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
+    var image2 =
+        readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       Image f = Image(10, 10, Image.RGB);
@@ -28,10 +30,12 @@ void main() {
     test('copyRectify', () {
       Image s = readJpg(new File('test/res/oblique.jpg').readAsBytesSync());
       Image d = Image(92, 119);
-      copyRectify(s, topLeft: Point(16, 32),
+      copyRectify(s,
+          topLeft: Point(16, 32),
           topRight: Point(79, 39),
           bottomLeft: Point(16, 151),
-          bottomRight: Point(108, 141), toImage: d);
+          bottomRight: Point(108, 141),
+          toImage: d);
       File fp = File('out/oblique.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(d));
@@ -383,7 +387,8 @@ void main() {
     });
 
     test('trim', () {
-      Image image = readPng(new File('test/res/png/trim.png').readAsBytesSync());
+      Image image =
+          readPng(new File('test/res/png/trim.png').readAsBytesSync());
       Image trimmed = trim(image, mode: TRIM_TRANSPARENT);
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));

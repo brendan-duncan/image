@@ -6,7 +6,7 @@ import 'vp8l.dart';
 
 class VP8LTransform {
   // enum VP8LImageTransformType
-  static const int PREDICTOR_TRANSFORM  = 0;
+  static const int PREDICTOR_TRANSFORM = 0;
   static const int CROSS_COLOR_TRANSFORM = 1;
   static const int SUBTRACT_GREEN = 2;
   static const int COLOR_INDEXING_TRANSFORM = 3;
@@ -17,17 +17,14 @@ class VP8LTransform {
   Uint32List data;
   int bits = 0;
 
-  void inverseTransform(int rowStart, int rowEnd,
-                        Uint32List inData,
-                        int rowsIn,
-                        Uint32List outData,
-                        int rowsOut) {
+  void inverseTransform(int rowStart, int rowEnd, Uint32List inData, int rowsIn,
+      Uint32List outData, int rowsOut) {
     final int width = xsize;
 
     switch (type) {
       case SUBTRACT_GREEN:
-        addGreenToBlueAndRed(outData, rowsOut,
-                             rowsOut + (rowEnd - rowStart) * width);
+        addGreenToBlueAndRed(
+            outData, rowsOut, rowsOut + (rowEnd - rowStart) * width);
         break;
       case PREDICTOR_TRANSFORM:
         predictorInverseTransform(rowStart, rowEnd, outData, rowsOut);
@@ -51,24 +48,24 @@ class VP8LTransform {
           // the effective width of VP8LSubSampleSize(xsize_, bits_). All other
           // transforms work on effective width of xsize_.
           final int outStride = (rowEnd - rowStart) * width;
-          final int inStride = (rowEnd - rowStart) *
-              InternalVP8L.subSampleSize(xsize, bits);
+          final int inStride =
+              (rowEnd - rowStart) * InternalVP8L.subSampleSize(xsize, bits);
 
           int src = rowsOut + outStride - inStride;
           outData.setRange(src, src + inStride, inData, rowsOut);
 
-          colorIndexInverseTransform(rowStart, rowEnd, inData, src,
-                                      outData, rowsOut);
+          colorIndexInverseTransform(
+              rowStart, rowEnd, inData, src, outData, rowsOut);
         } else {
-          colorIndexInverseTransform(rowStart, rowEnd, inData, rowsIn,
-                                      outData, rowsOut);
+          colorIndexInverseTransform(
+              rowStart, rowEnd, inData, rowsIn, outData, rowsOut);
         }
         break;
     }
   }
 
-  void colorIndexInverseTransformAlpha(int yStart, int yEnd,
-                                           InputBuffer src, InputBuffer dst) {
+  void colorIndexInverseTransformAlpha(
+      int yStart, int yEnd, InputBuffer src, InputBuffer dst) {
     final int bitsPerPixel = 8 >> bits;
     final int width = xsize;
     Uint32List colorMap = this.data;
@@ -87,7 +84,8 @@ class VP8LTransform {
             packed_pixels = _getAlphaIndex(src[0]);
             src.offset++;
           }
-          int p = _getAlphaValue(colorMap[packed_pixels & bit_mask]);;
+          int p = _getAlphaValue(colorMap[packed_pixels & bit_mask]);
+          ;
           dst[0] = p;
           dst.offset++;
           packed_pixels >>= bitsPerPixel;
@@ -105,9 +103,8 @@ class VP8LTransform {
     }
   }
 
-  void colorIndexInverseTransform(int yStart, int yEnd,
-                                  Uint32List inData, int src,
-                                  Uint32List outData, int dst) {
+  void colorIndexInverseTransform(int yStart, int yEnd, Uint32List inData,
+      int src, Uint32List outData, int dst) {
     final int bitsPerPixel = 8 >> bits;
     final int width = xsize;
     Uint32List colorMap = this.data;
@@ -132,7 +129,8 @@ class VP8LTransform {
     } else {
       for (int y = yStart; y < yEnd; ++y) {
         for (int x = 0; x < width; ++x) {
-          outData[dst++] = _getARGBValue(colorMap[_getARGBIndex(inData[src++])]);
+          outData[dst++] =
+              _getARGBValue(colorMap[_getARGBIndex(inData[src++])]);
         }
       }
     }
@@ -141,8 +139,8 @@ class VP8LTransform {
   /**
    * Color space inverse transform.
    */
-  void colorSpaceInverseTransform(int yStart, int yEnd, Uint32List outData,
-                                  int data) {
+  void colorSpaceInverseTransform(
+      int yStart, int yEnd, Uint32List outData, int data) {
     final int width = xsize;
     final int mask = (1 << bits) - 1;
     final int tilesPerRow = InternalVP8L.subSampleSize(width, bits);
@@ -165,7 +163,8 @@ class VP8LTransform {
       ++y;
 
       if ((y & mask) == 0) {
-        predRow += tilesPerRow;;
+        predRow += tilesPerRow;
+        ;
       }
     }
   }
@@ -173,10 +172,11 @@ class VP8LTransform {
   /**
    * Inverse prediction.
    */
-  void predictorInverseTransform(int yStart, int yEnd, Uint32List outData,
-                                 int data) {
+  void predictorInverseTransform(
+      int yStart, int yEnd, Uint32List outData, int data) {
     final int width = xsize;
-    if (yStart == 0) {  // First Row follows the L (mode=1) mode.
+    if (yStart == 0) {
+      // First Row follows the L (mode=1) mode.
       final int pred0 = _predictor0(outData, outData[data - 1], 0);
       _addPixelsEq(outData, data, pred0);
       for (int x = 1; x < width; ++x) {
@@ -204,7 +204,8 @@ class VP8LTransform {
 
       var predFunc = PREDICTORS[k];
       for (int x = 1; x < width; ++x) {
-        if ((x & mask) == 0) {    // start of tile. Read predictor function.
+        if ((x & mask) == 0) {
+          // start of tile. Read predictor function.
           int k = ((this.data[predModeSrc++]) >> 8) & 0xf;
           predFunc = PREDICTORS[k];
         }
@@ -216,7 +217,8 @@ class VP8LTransform {
       data += width;
       ++y;
 
-      if ((y & mask) == 0) {   // Use the same mask, since tiles are squares.
+      if ((y & mask) == 0) {
+        // Use the same mask, since tiles are squares.
         predModeBase += tilesPerRow;
       }
     }
@@ -293,15 +295,12 @@ class VP8LTransform {
     return _clip255(a + b - c);
   }
 
-
   static int _clampedAddSubtractFull(int c0, int c1, int c2) {
     final int a = _addSubtractComponentFull(c0 >> 24, c1 >> 24, c2 >> 24);
-    final int r = _addSubtractComponentFull((c0 >> 16) & 0xff,
-        (c1 >> 16) & 0xff,
-        (c2 >> 16) & 0xff);
-    final int g = _addSubtractComponentFull((c0 >> 8) & 0xff,
-        (c1 >> 8) & 0xff,
-        (c2 >> 8) & 0xff);
+    final int r = _addSubtractComponentFull(
+        (c0 >> 16) & 0xff, (c1 >> 16) & 0xff, (c2 >> 16) & 0xff);
+    final int g = _addSubtractComponentFull(
+        (c0 >> 8) & 0xff, (c1 >> 8) & 0xff, (c2 >> 8) & 0xff);
     final int b = _addSubtractComponentFull(c0 & 0xff, c1 & 0xff, c2 & 0xff);
     return (a << 24) | (r << 16) | (g << 8) | b;
   }
@@ -313,9 +312,12 @@ class VP8LTransform {
   static int _clampedAddSubtractHalf(int c0, int c1, int c2) {
     final int avg = _average2(c0, c1);
     final int a = _addSubtractComponentHalf(avg >> 24, c2 >> 24);
-    final int r = _addSubtractComponentHalf((avg >> 16) & 0xff, (c2 >> 16) & 0xff);
-    final int g = _addSubtractComponentHalf((avg >> 8) & 0xff, (c2 >> 8) & 0xff);
-    final int b = _addSubtractComponentHalf((avg >> 0) & 0xff, (c2 >> 0) & 0xff);
+    final int r =
+        _addSubtractComponentHalf((avg >> 16) & 0xff, (c2 >> 16) & 0xff);
+    final int g =
+        _addSubtractComponentHalf((avg >> 8) & 0xff, (c2 >> 8) & 0xff);
+    final int b =
+        _addSubtractComponentHalf((avg >> 0) & 0xff, (c2 >> 0) & 0xff);
     return (a << 24) | (r << 16) | (g << 8) | b;
   }
 
@@ -326,11 +328,10 @@ class VP8LTransform {
   }
 
   static int _select(int a, int b, int c) {
-    final int pa_minus_pb =
-        _sub3((a >> 24)       , (b >> 24)       , (c >> 24)       ) +
+    final int pa_minus_pb = _sub3((a >> 24), (b >> 24), (c >> 24)) +
         _sub3((a >> 16) & 0xff, (b >> 16) & 0xff, (c >> 16) & 0xff) +
-        _sub3((a >>  8) & 0xff, (b >>  8) & 0xff, (c >>  8) & 0xff) +
-        _sub3((a      ) & 0xff, (b      ) & 0xff, (c      ) & 0xff);
+        _sub3((a >> 8) & 0xff, (b >> 8) & 0xff, (c >> 8) & 0xff) +
+        _sub3((a) & 0xff, (b) & 0xff, (c) & 0xff);
     return (pa_minus_pb <= 0) ? a : b;
   }
 
@@ -354,7 +355,7 @@ class VP8LTransform {
   }
 
   static int _predictor4(Uint32List pixels, int left, int top) {
-    return pixels[top -1];
+    return pixels[top - 1];
   }
 
   static int _predictor5(Uint32List pixels, int left, int top) {
@@ -370,7 +371,7 @@ class VP8LTransform {
   }
 
   static int _predictor8(Uint32List pixels, int left, int top) {
-    return _average2(pixels[top -1], pixels[top]);
+    return _average2(pixels[top - 1], pixels[top]);
   }
 
   static int _predictor9(Uint32List pixels, int left, int top) {
@@ -378,7 +379,7 @@ class VP8LTransform {
   }
 
   static int _predictor10(Uint32List pixels, int left, int top) {
-    return _average4(left, pixels[top -1], pixels[top], pixels[top + 1]);
+    return _average4(left, pixels[top - 1], pixels[top], pixels[top + 1]);
   }
 
   static int _predictor11(Uint32List pixels, int left, int top) {
@@ -394,11 +395,23 @@ class VP8LTransform {
   }
 
   static final List PREDICTORS = [
-    _predictor0, _predictor1, _predictor2, _predictor3,
-    _predictor4, _predictor5, _predictor6, _predictor7,
-    _predictor8, _predictor9, _predictor10, _predictor11,
-    _predictor12, _predictor13,
-    _predictor0, _predictor0 ];
+    _predictor0,
+    _predictor1,
+    _predictor2,
+    _predictor3,
+    _predictor4,
+    _predictor5,
+    _predictor6,
+    _predictor7,
+    _predictor8,
+    _predictor9,
+    _predictor10,
+    _predictor11,
+    _predictor12,
+    _predictor13,
+    _predictor0,
+    _predictor0
+  ];
 }
 
 class _VP8LMultipliers {
@@ -430,10 +443,7 @@ class _VP8LMultipliers {
     data[2] = (colorCode >> 16) & 0xff;
   }
 
-  int get colorCode => 0xff000000 |
-      (data[2] << 16) |
-      (data[1] << 8) |
-      data[0];
+  int get colorCode => 0xff000000 | (data[2] << 16) | (data[1] << 8) | data[0];
 
   int transformColor(int argb, bool inverse) {
     final int green = (argb >> 8) & 0xff;
@@ -445,7 +455,8 @@ class _VP8LMultipliers {
       int g = colorTransformDelta(greenToRed, green);
       newRed = (newRed + g) & 0xffffffff;
       newRed &= 0xff;
-      newBlue = (newBlue + colorTransformDelta(greenToBlue, green)) & 0xffffffff;
+      newBlue =
+          (newBlue + colorTransformDelta(greenToBlue, green)) & 0xffffffff;
       newBlue = (newBlue + colorTransformDelta(redToBlue, newRed)) & 0xffffffff;
       newBlue &= 0xff;
     } else {
@@ -469,4 +480,3 @@ class _VP8LMultipliers {
     return d >> 5;
   }
 }
-

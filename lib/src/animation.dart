@@ -30,19 +30,25 @@ import 'image.dart';
 class Animation extends IterableBase<Image> {
   /// The frames of this document are to be interpreted as animation.
   static const int ANIMATION = 0;
+
   /// The frames of this document are to be interpreted as pages of a document.
   static const int PAGE = 1;
 
   /// The canvas width for containing the animation.
   int width;
+
   /// The canvas height for containing the animation.
   int height;
+
   /// The suggested background color to clear the canvas with.
   int backgroundColor = 0xffffffff;
+
   /// The frames of the animation.
   List<Image> frames = [];
+
   /// How many times should the animation loop (0 means forever)?
   int loopCount = 0;
+
   /// How should the frames be interpreted?  If [ANIMATION], the frames
   /// are part of an animated sequence.  If [PAGE], the frames are the pages
   /// of a document.
@@ -61,7 +67,7 @@ class Animation extends IterableBase<Image> {
   /**
    * Get the frame at the given [index].
    */
-  Image operator[](int index) => frames[index];
+  Image operator [](int index) => frames[index];
 
   /**
    * Add a frame to the animation.

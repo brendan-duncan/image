@@ -5,61 +5,66 @@ import '../color.dart';
 import '../image.dart';
 import '../internal/clamp.dart';
 
-/**
- * Adjust the color of the [src] image using various color transformations.
- *
- * [blacks] defines the black level of the image, as a color.
- *
- * [whites] defines the white level of the image, as a color.
- *
- * [mids] defines the mid level of hte image, as a color.
- *
- * [contrast] increases (> 1) / decreases (< 1) the contrast of the image by
- * pushing colors away/toward neutral gray, where at 0.0 the image is entirely
- * neutral gray (0 contrast), 1.0, the image is not adjusted and > 1.0 the
- * image increases contrast.
- *
- * [saturation] increases (> 1) / decreases (< 1) the saturation of the image
- * by pushing colors away/toward their grayscale value, where 0.0 is grayscale
- * and 1.0 is the original image, and > 1.0 the image becomes more saturated.
- *
- * [brightness] is a constant scalar of the image colors.  At 0 the image
- * is black, 1.0 unmodified, and > 1.0 the image becomes brighter.
- *
- * [gamma] is an exponential scalar of the image colors.  At < 1.0 the image
- * becomes brighter, and > 1.0 the image becomes darker.  A [gamma] of 1/2.2
- * will convert the image colors to linear color space.
- *
- * [exposure] is an exponential scalar of the image as rgb * pow(2, exposure).
- * At 0, the image is unmodified; as the exposure increases, the image
- * brightens.
- *
- * [hue] shifts the hue component of the image colors in degrees.  A [hue] of
- * 0 will have no affect, and a [hue] of 45 will shift the hue of all colors
- * by 45 degrees.
- *
- * [amount] controls how much affect this filter has on the [src] image, where
- * 0.0 has no effect and 1.0 has full effect.
- */
-Image adjustColor(Image src, {int blacks, int whites, int mids,
-                  double contrast, double saturation, double brightness,
-                  double gamma, double exposure, double hue,
-                  double amount}) {
+/// Adjust the color of the [src] image using various color transformations.
+///
+/// [blacks] defines the black level of the image, as a color.
+///
+/// [whites] defines the white level of the image, as a color.
+///
+/// [mids] defines the mid level of hte image, as a color.
+///
+/// [contrast] increases (> 1) / decreases (< 1) the contrast of the image by
+/// pushing colors away/toward neutral gray, where at 0.0 the image is entirely
+/// neutral gray (0 contrast), 1.0, the image is not adjusted and > 1.0 the
+/// image increases contrast.
+///
+/// [saturation] increases (> 1) / decreases (< 1) the saturation of the image
+/// by pushing colors away/toward their grayscale value, where 0.0 is grayscale
+/// and 1.0 is the original image, and > 1.0 the image becomes more saturated.
+///
+/// [brightness] is a constant scalar of the image colors.  At 0 the image
+/// is black, 1.0 unmodified, and > 1.0 the image becomes brighter.
+///
+/// [gamma] is an exponential scalar of the image colors.  At < 1.0 the image
+/// becomes brighter, and > 1.0 the image becomes darker.  A [gamma] of 1/2.2
+/// will convert the image colors to linear color space.
+///
+/// [exposure] is an exponential scalar of the image as rgb/// pow(2, exposure).
+/// At 0, the image is unmodified; as the exposure increases, the image
+/// brightens.
+///
+/// [hue] shifts the hue component of the image colors in degrees.  A [hue] of
+/// 0 will have no affect, and a [hue] of 45 will shift the hue of all colors
+/// by 45 degrees.
+///
+/// [amount] controls how much affect this filter has on the [src] image, where
+/// 0.0 has no effect and 1.0 has full effect.
+Image adjustColor(Image src,
+   {int blacks,
+    int whites,
+    int mids,
+    num contrast,
+    num saturation,
+    num brightness,
+    num gamma,
+    num exposure,
+    num hue,
+    num amount}) {
   if (amount == 0.0) {
     return src;
   }
 
-  const double DEG_TO_RAD = 0.0174532925;
-  const double avgLumR = 0.5;
-  const double avgLumG = 0.5;
-  const double avgLumB = 0.5;
-  const double lumCoeffR = 0.2125;
-  const double lumCoeffG = 0.7154;
-  const double lumCoeffB = 0.0721;
+  const DEG_TO_RAD = 0.0174532925;
+  const avgLumR = 0.5;
+  const avgLumG = 0.5;
+  const avgLumB = 0.5;
+  const lumCoeffR = 0.2125;
+  const lumCoeffG = 0.7154;
+  const lumCoeffB = 0.0721;
 
-  double br, bg, bb;
-  double wr, wg, wb;
-  double mr, mg, mb;
+  num br, bg, bb;
+  num wr, wg, wb;
+  num mr, mg, mb;
   if (blacks != null || whites != null || mids != null) {
     br = blacks != null ? getRed(blacks) / 255.0 : 0.0;
     bg = blacks != null ? getGreen(blacks) / 255.0 : 0.0;
@@ -78,37 +83,37 @@ Image adjustColor(Image src, {int blacks, int whites, int mids,
     mb = 1.0 / (1.0 + 2.0 * (mb - 0.5));
   }
 
-  double invSaturation = saturation != null ? 1.0 - saturation : 0.0;
-  double invContrast = contrast != null ? 1.0 - contrast : 0.0;
+  num invSaturation = saturation != null ? 1.0 - saturation : 0.0;
+  num invContrast = contrast != null ? 1.0 - contrast : 0.0;
 
   if (exposure != null) {
     exposure = Math.pow(2.0, exposure);
   }
 
-  double hueR;
-  double hueG;
-  double hueB;
+  num hueR;
+  num hueG;
+  num hueB;
   if (hue != null) {
     hue *= DEG_TO_RAD;
-    double s = Math.sin(hue);
-    double c = Math.cos(hue);
+    var s = Math.sin(hue);
+    var c = Math.cos(hue);
 
     hueR = (2.0 * c) / 3.0;
     hueG = (-Math.sqrt(3.0) * s - c) / 3.0;
     hueB = ((Math.sqrt(3.0) * s - c) + 1.0) / 3.0;
   }
 
-  double invAmount = amount != null ? 1.0 - amount : 0.0;
+  var invAmount = amount != null ? 1.0 - amount : 0.0;
 
   Uint8List pixels = src.getBytes();
   for (int i = 0, len = pixels.length; i < len; i += 4) {
-    double or = pixels[i] / 255.0;
-    double og = pixels[i + 1] / 255.0;
-    double ob = pixels[i + 2] / 255.0;
+    num or = pixels[i] / 255.0;
+    num og = pixels[i + 1] / 255.0;
+    num ob = pixels[i + 2] / 255.0;
 
-    double r = or;
-    double g = og;
-    double b = ob;
+    num r = or;
+    num g = og;
+    num b = ob;
 
     if (br != null) {
       r = Math.pow((r + br) * wr, mr);
@@ -123,7 +128,7 @@ Image adjustColor(Image src, {int blacks, int whites, int mids,
     }
 
     if (saturation != null) {
-      double lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
+      num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
 
       r = lum * invSaturation + r * saturation;
       g = lum * invSaturation + g * saturation;
@@ -149,9 +154,9 @@ Image adjustColor(Image src, {int blacks, int whites, int mids,
     }
 
     if (hue != null && hue != 0.0) {
-      double hr = r * hueR + g * hueG + b * hueB;
-      double hg = r * hueB + g * hueR + b * hueG;
-      double hb = r * hueG + g * hueB + b * hueR;
+      num hr = r * hueR + g * hueG + b * hueB;
+      num hg = r * hueB + g * hueR + b * hueG;
+      num hb = r * hueG + g * hueB + b * hueR;
 
       r = hr;
       g = hg;

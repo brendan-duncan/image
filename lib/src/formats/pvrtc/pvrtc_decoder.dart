@@ -17,7 +17,7 @@ class PvrtcDecoder {
       // very likely to be apple PVRTC
       var image = decodeApplePVRTC(data);
       if (image != null) {
-         return image;
+        return image;
       }
     }
 
@@ -120,17 +120,17 @@ class PvrtcDecoder {
 
     const int HEADER_SIZE = 52;
     const int PVRTEX_CUBEMAP = (1 << 12);
-    const int PVR_PIXELTYPE_MASK  = 0xff;
-    const int PVR_TYPE_RGBA4444   = 0x10;
-    const int PVR_TYPE_RGBA5551   = 0x11;
-    const int PVR_TYPE_RGBA8888   = 0x12;
-    const int PVR_TYPE_RGB565     = 0x13;
-    const int PVR_TYPE_RGB555     = 0x14;
-    const int PVR_TYPE_RGB888     = 0x15;
-    const int PVR_TYPE_I8         = 0x16;
-    const int PVR_TYPE_AI8        = 0x17;
-    const int PVR_TYPE_PVRTC2     = 0x18;
-    const int PVR_TYPE_PVRTC4     = 0x19;
+    const int PVR_PIXELTYPE_MASK = 0xff;
+    const int PVR_TYPE_RGBA4444 = 0x10;
+    const int PVR_TYPE_RGBA5551 = 0x11;
+    const int PVR_TYPE_RGBA8888 = 0x12;
+    const int PVR_TYPE_RGB565 = 0x13;
+    const int PVR_TYPE_RGB555 = 0x14;
+    const int PVR_TYPE_RGB888 = 0x15;
+    const int PVR_TYPE_I8 = 0x16;
+    const int PVR_TYPE_AI8 = 0x17;
+    const int PVR_TYPE_PVRTC2 = 0x18;
+    const int PVR_TYPE_PVRTC4 = 0x19;
 
     if (length < HEADER_SIZE) {
       return null;
@@ -279,7 +279,7 @@ class PvrtcDecoder {
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
-          for(int x = 0; x < width; ++x) {
+          for (int x = 0; x < width; ++x) {
             int i = input.readByte();
             out[oi++] = i;
             out[oi++] = i;
@@ -293,7 +293,7 @@ class PvrtcDecoder {
         Uint8List out = image.getBytes();
         int oi = 0;
         for (int y = 0; y < height; ++y) {
-          for(int x = 0; x < width; ++x) {
+          for (int x = 0; x < width; ++x) {
             int i = input.readByte();
             int a = input.readByte();
             out[oi++] = i;
@@ -307,8 +307,9 @@ class PvrtcDecoder {
         // Currently unsupported
         return null;
       case PVR_TYPE_PVRTC4:
-        return amask == 0 ? decodeRgb4bpp(width, height, input.toUint8List()) :
-               decodeRgba4bpp(width, height, input.toUint8List());
+        return amask == 0
+            ? decodeRgb4bpp(width, height, input.toUint8List())
+            : decodeRgba4bpp(width, height, input.toUint8List());
     }
 
     // Unknown format
@@ -359,8 +360,12 @@ class PvrtcDecoder {
 
     /*int flags =*/ input.readUint32();
     var format = input.readUint32();
-    var order = [input.readByte(), input.readByte(),
-                 input.readByte(), input.readByte()];
+    var order = [
+      input.readByte(),
+      input.readByte(),
+      input.readByte(),
+      input.readByte()
+    ];
     /*int colorspace =*/ input.readUint32();
     /*int channeltype =*/ input.readUint32();
     int height = input.readUint32();
@@ -494,14 +499,14 @@ class PvrtcDecoder {
             p3.setBlock(x1, y1);
 
             var ca = p0.getColorRgbA() * factors[factorIndex][0] +
-                     p1.getColorRgbA() * factors[factorIndex][1] +
-                     p2.getColorRgbA() * factors[factorIndex][2] +
-                     p3.getColorRgbA() * factors[factorIndex][3];
+                p1.getColorRgbA() * factors[factorIndex][1] +
+                p2.getColorRgbA() * factors[factorIndex][2] +
+                p3.getColorRgbA() * factors[factorIndex][3];
 
             var cb = p0.getColorRgbB() * factors[factorIndex][0] +
-                     p1.getColorRgbB() * factors[factorIndex][1] +
-                     p2.getColorRgbB() * factors[factorIndex][2] +
-                     p3.getColorRgbB() * factors[factorIndex][3];
+                p1.getColorRgbB() * factors[factorIndex][1] +
+                p2.getColorRgbB() * factors[factorIndex][2] +
+                p3.getColorRgbB() * factors[factorIndex][3];
 
             var w = weights[weightIndex + mod & 3];
 
@@ -563,14 +568,14 @@ class PvrtcDecoder {
             p3.setBlock(x1, y1);
 
             var ca = p0.getColorRgbaA() * factors[factorIndex][0] +
-                     p1.getColorRgbaA() * factors[factorIndex][1] +
-                     p2.getColorRgbaA() * factors[factorIndex][2] +
-                     p3.getColorRgbaA() * factors[factorIndex][3];
+                p1.getColorRgbaA() * factors[factorIndex][1] +
+                p2.getColorRgbaA() * factors[factorIndex][2] +
+                p3.getColorRgbaA() * factors[factorIndex][3];
 
             var cb = p0.getColorRgbaB() * factors[factorIndex][0] +
-                     p1.getColorRgbaB() * factors[factorIndex][1] +
-                     p2.getColorRgbaB() * factors[factorIndex][2] +
-                     p3.getColorRgbaB() * factors[factorIndex][3];
+                p1.getColorRgbaB() * factors[factorIndex][1] +
+                p2.getColorRgbaB() * factors[factorIndex][2] +
+                p3.getColorRgbaB() * factors[factorIndex][3];
 
             var w = weights[weightIndex + mod & 3];
 

@@ -28,40 +28,51 @@ import 'util/interpolation.dart';
 class Image {
   /// 24-bit RGB image.
   static const int RGB = 3;
+
   /// 32-bit RGBA image.
   static const int RGBA = 4;
 
   /// When drawing this frame, the canvas should be left as it is.
   static const int DISPOSE_NONE = 0;
+
   /// When drawing this frame, the canvas should be cleared first.
   static const int DISPOSE_CLEAR = 1;
+
   /// When drawing this frame, the canvas should be reverted to how it was before drawing it.
   static const int DISPOSE_PREVIOUS = 2;
 
   /// No alpha blending should be done when drawing this frame (replace
   /// pixels in canvas).
   static const int BLEND_SOURCE = 0;
+
   /// Alpha blending should be used when drawing this frame (composited over
   /// the current canvas image).
   static const int BLEND_OVER = 1;
 
   /// Width of the image.
   final int width;
+
   /// Height of the image.
   final int height;
+
   /// x position at which to render the frame.
   int xOffset = 0;
+
   /// y position at which to render the frame.
   int yOffset = 0;
+
   /// How long this frame should be displayed, in milliseconds.
   /// A duration of 0 indicates no delay and the next frame will be drawn
   /// as quickly as it can.
   int duration = 0;
+
   /// Defines what should be done to the canvas when drawing this frame.
   int disposeMethod = DISPOSE_CLEAR;
+
   /// Defines the blending method (alpha compositing) to use when drawing this
   /// frame.
   int blendMethod = BLEND_OVER;
+
   /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
   /// channel.
   final Uint32List data;
@@ -71,29 +82,29 @@ class Image {
   /**
    * Create an image with the given dimensions and format.
    */
-  Image(int width, int height, [this._format = RGBA, ExifData exif,
-        ICCProfileData iccp]) :
-    this.width = width,
-    this.height = height,
-    data = Uint32List(width * height),
-    exif = ExifData.from(exif),
-    iccProfile = iccp;
+  Image(int width, int height,
+      [this._format = RGBA, ExifData exif, ICCProfileData iccp])
+      : this.width = width,
+        this.height = height,
+        data = Uint32List(width * height),
+        exif = ExifData.from(exif),
+        iccProfile = iccp;
 
   /**
    * Create a copy of the image [other].
    */
-  Image.from(Image other) :
-    width = other.width,
-    height = other.height,
-    xOffset = other.xOffset,
-    yOffset = other.yOffset,
-    duration = other.duration,
-    disposeMethod = other.disposeMethod,
-    blendMethod = other.blendMethod,
-    _format = other._format,
-    data = Uint32List.fromList(other.data),
-    exif = ExifData.from(other.exif),
-    iccProfile = other.iccProfile;
+  Image.from(Image other)
+      : width = other.width,
+        height = other.height,
+        xOffset = other.xOffset,
+        yOffset = other.yOffset,
+        duration = other.duration,
+        disposeMethod = other.disposeMethod,
+        blendMethod = other.blendMethod,
+        _format = other._format,
+        data = Uint32List.fromList(other.data),
+        exif = ExifData.from(other.exif),
+        iccProfile = other.iccProfile;
 
   /**
    * Create an image from [bytes].
@@ -108,17 +119,20 @@ class Image {
    * Image image = Image.fromBytes(canvas.width, canvas.height, bytes);
    */
   Image.fromBytes(int width, int height, List<int> bytes,
-                  [this._format = RGBA, ExifData exif, ICCProfileData iccp]) :
-    this.width = width,
-    this.height = height,
-    // Create a uint32 view of the byte buffer.
-    // This assumes the system architecture is little-endian...
-    data = bytes is Uint8List ? new Uint32List.view(bytes.buffer) :
-            bytes is Uint8ClampedList ? new Uint32List.view(bytes.buffer) :
-            bytes is Uint32List ? new Uint32List.view(bytes.buffer) :
-            new Uint32List.view(new Uint8List.fromList(bytes).buffer),
-    exif = ExifData.from(exif),
-    iccProfile = iccp;
+      [this._format = RGBA, ExifData exif, ICCProfileData iccp])
+      : this.width = width,
+        this.height = height,
+        // Create a uint32 view of the byte buffer.
+        // This assumes the system architecture is little-endian...
+        data = bytes is Uint8List
+            ? new Uint32List.view(bytes.buffer)
+            : bytes is Uint8ClampedList
+                ? new Uint32List.view(bytes.buffer)
+                : bytes is Uint32List
+                    ? new Uint32List.view(bytes.buffer)
+                    : new Uint32List.view(new Uint8List.fromList(bytes).buffer),
+        exif = ExifData.from(exif),
+        iccProfile = iccp;
 
   /**
    * Clone this image.
@@ -136,8 +150,7 @@ class Image {
    * d.data.setRange(0, image.length, image.getBytes());
    * context2D.putImageData(data, 0, 0);
    */
-  Uint8List getBytes() =>
-    new Uint8List.view(data.buffer);
+  Uint8List getBytes() => new Uint8List.view(data.buffer);
 
   /**
    * Get the format of the image, either [RGB] or [RGBA].
@@ -176,7 +189,7 @@ class Image {
   /**
    * Add the colors of [other] to the pixels of this image.
    */
-  Image operator+(Image other) {
+  Image operator +(Image other) {
     int h = Math.min(height, other.height);
     int w = Math.min(width, other.width);
     for (int y = 0; y < h; ++y) {
@@ -202,7 +215,7 @@ class Image {
   /**
    * Subtract the colors of [other] from the pixels of this image.
    */
-  Image operator-(Image other) {
+  Image operator -(Image other) {
     int h = Math.min(height, other.height);
     int w = Math.min(width, other.width);
     for (int y = 0; y < h; ++y) {
@@ -228,7 +241,7 @@ class Image {
   /**
    * Multiply the colors of [other] with the pixels of this image.
    */
-  Image operator*(Image other) {
+  Image operator *(Image other) {
     int h = Math.min(height, other.height);
     int w = Math.min(width, other.width);
     for (int y = 0; y < h; ++y) {
@@ -254,7 +267,7 @@ class Image {
   /**
    * OR the colors of [other] to the pixels of this image.
    */
-  Image operator|(Image other) {
+  Image operator |(Image other) {
     int h = Math.min(height, other.height);
     int w = Math.min(width, other.width);
     for (int y = 0; y < h; ++y) {
@@ -280,7 +293,7 @@ class Image {
   /**
    * AND the colors of [other] with the pixels of this image.
    */
-  Image operator&(Image other) {
+  Image operator &(Image other) {
     int h = Math.min(height, other.height);
     int w = Math.min(width, other.width);
     for (int y = 0; y < h; ++y) {
@@ -306,7 +319,7 @@ class Image {
   /**
    * Modula the colors of [other] with the pixels of this image.
    */
-  Image operator%(Image other) {
+  Image operator %(Image other) {
     int h = Math.min(height, other.height);
     int w = Math.min(width, other.width);
     for (int y = 0; y < h; ++y) {
@@ -337,12 +350,12 @@ class Image {
   /**
    * Get a pixel from the buffer.
    */
-  int operator[](int index) => data[index];
+  int operator [](int index) => data[index];
 
   /**
    * Set a pixel in the buffer.
    */
-  void operator[]=(int index, int color) {
+  void operator []=(int index, int color) {
     data[index] = color;
   }
 
@@ -354,14 +367,12 @@ class Image {
   /**
    * Is the given pixel coordinates within the resolution of the image.
    */
-  bool boundsSafe(int x, int y) =>
-    x >= 0 && x < width && y >= 0 && y < height;
+  bool boundsSafe(int x, int y) => x >= 0 && x < width && y >= 0 && y < height;
 
   /**
    * Get the pixel from the given [x], [y] coordinate.
    */
-  int getPixel(int x, int y) =>
-    boundsSafe(x, y) ? data[y * width + x] : 0;
+  int getPixel(int x, int y) => boundsSafe(x, y) ? data[y * width + x] : 0;
 
   /**
    * Get the pixel from the given [x], [y] coordinate without check the bounds.
@@ -399,8 +410,10 @@ class Image {
     double dy = fy - y;
 
     int _linear(int Icc, int Inc, int Icn, int Inn) {
-      return (Icc + dx * (Inc - Icc + dy * (Icc + Inn - Icn - Inc)) +
-              dy * (Icn - Icc)).toInt();
+      return (Icc +
+              dx * (Inc - Icc + dy * (Icc + Inn - Icn - Inc)) +
+              dy * (Icn - Icc))
+          .toInt();
     }
 
     int Icc = getPixel(x, y);
@@ -433,45 +446,59 @@ class Image {
     var dy = fy - y;
 
     double _cubic(num dx, num Ipp, num Icp, num Inp, num Iap) =>
-        Icp + 0.5 * (dx * (-Ipp + Inp) +
-        dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
-        dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
+        Icp +
+        0.5 *
+            (dx * (-Ipp + Inp) +
+                dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
+                dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
 
     int Ipp = getPixel(px, py);
     int Icp = getPixel(x, py);
     int Inp = getPixel(nx, py);
     int Iap = getPixel(ax, py);
     double Ip0 = _cubic(dx, getRed(Ipp), getRed(Icp), getRed(Inp), getRed(Iap));
-    double Ip1 = _cubic(dx, getGreen(Ipp), getGreen(Icp), getGreen(Inp), getGreen(Iap));
-    double Ip2 = _cubic(dx, getBlue(Ipp), getBlue(Icp), getBlue(Inp), getBlue(Iap));
-    double Ip3 = _cubic(dx, getAlpha(Ipp), getAlpha(Icp), getAlpha(Inp), getAlpha(Iap));
+    double Ip1 =
+        _cubic(dx, getGreen(Ipp), getGreen(Icp), getGreen(Inp), getGreen(Iap));
+    double Ip2 =
+        _cubic(dx, getBlue(Ipp), getBlue(Icp), getBlue(Inp), getBlue(Iap));
+    double Ip3 =
+        _cubic(dx, getAlpha(Ipp), getAlpha(Icp), getAlpha(Inp), getAlpha(Iap));
 
     int Ipc = getPixel(px, y);
     int Icc = getPixel(x, y);
     int Inc = getPixel(nx, y);
     int Iac = getPixel(ax, y);
     double Ic0 = _cubic(dx, getRed(Ipc), getRed(Icc), getRed(Inc), getRed(Iac));
-    double Ic1 = _cubic(dx, getGreen(Ipc), getGreen(Icc), getGreen(Inc), getGreen(Iac));
-    double Ic2 = _cubic(dx, getBlue(Ipc), getBlue(Icc), getBlue(Inc), getBlue(Iac));
-    double Ic3 = _cubic(dx, getAlpha(Ipc), getAlpha(Icc), getAlpha(Inc), getAlpha(Iac));
+    double Ic1 =
+        _cubic(dx, getGreen(Ipc), getGreen(Icc), getGreen(Inc), getGreen(Iac));
+    double Ic2 =
+        _cubic(dx, getBlue(Ipc), getBlue(Icc), getBlue(Inc), getBlue(Iac));
+    double Ic3 =
+        _cubic(dx, getAlpha(Ipc), getAlpha(Icc), getAlpha(Inc), getAlpha(Iac));
 
     int Ipn = getPixel(px, ny);
     int Icn = getPixel(x, ny);
     int Inn = getPixel(nx, ny);
     int Ian = getPixel(ax, ny);
     double In0 = _cubic(dx, getRed(Ipn), getRed(Icn), getRed(Inn), getRed(Ian));
-    double In1 = _cubic(dx, getGreen(Ipn), getGreen(Icn), getGreen(Inn), getGreen(Ian));
-    double In2 = _cubic(dx, getBlue(Ipn), getBlue(Icn), getBlue(Inn), getBlue(Ian));
-    double In3 = _cubic(dx, getAlpha(Ipn), getAlpha(Icn), getAlpha(Inn), getAlpha(Ian));
+    double In1 =
+        _cubic(dx, getGreen(Ipn), getGreen(Icn), getGreen(Inn), getGreen(Ian));
+    double In2 =
+        _cubic(dx, getBlue(Ipn), getBlue(Icn), getBlue(Inn), getBlue(Ian));
+    double In3 =
+        _cubic(dx, getAlpha(Ipn), getAlpha(Icn), getAlpha(Inn), getAlpha(Ian));
 
     int Ipa = getPixel(px, ay);
     int Ica = getPixel(x, ay);
     int Ina = getPixel(nx, ay);
     int Iaa = getPixel(ax, ay);
     double Ia0 = _cubic(dx, getRed(Ipa), getRed(Ica), getRed(Ina), getRed(Iaa));
-    double Ia1 = _cubic(dx, getGreen(Ipa), getGreen(Ica), getGreen(Ina), getGreen(Iaa));
-    double Ia2 = _cubic(dx, getBlue(Ipa), getBlue(Ica), getBlue(Ina), getBlue(Iaa));
-    double Ia3 = _cubic(dx, getAlpha(Ipa), getAlpha(Ica), getAlpha(Ina), getAlpha(Iaa));
+    double Ia1 =
+        _cubic(dx, getGreen(Ipa), getGreen(Ica), getGreen(Ina), getGreen(Iaa));
+    double Ia2 =
+        _cubic(dx, getBlue(Ipa), getBlue(Ica), getBlue(Ina), getBlue(Iaa));
+    double Ia3 =
+        _cubic(dx, getAlpha(Ipa), getAlpha(Ica), getAlpha(Ina), getAlpha(Iaa));
 
     double c0 = _cubic(dy, Ip0, Ic0, In0, Ia0);
     double c1 = _cubic(dy, Ip1, Ic1, In1, Ia1);
@@ -499,14 +526,14 @@ class Image {
    * This simply replaces the existing color, it does not do any alpha
    * blending.  Use [drawPixel] for that.
    */
-  void setUnsafePixel(int x, int y, int color){
+  void setUnsafePixel(int x, int y, int color) {
     data[y * width + x] = color;
   }
 
   /**
    * Set the pixel at the given [offset] index to the [color] without check the bounds.
    */
-  void setUnsafePixel_(int offset, int color){
+  void setUnsafePixel_(int offset, int color) {
     data[offset] = color;
   }
 

@@ -21,8 +21,8 @@ void main() {
         if (psd != null) {
           List<int> outPng = PngEncoder().encodeImage(psd);
           new Io.File('out/psd/$name.png')
-                ..createSync(recursive: true)
-                ..writeAsBytesSync(outPng);
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(outPng);
         } else {
           throw 'Unable to decode $name';
         }

@@ -35,9 +35,8 @@ void main() {
         List<int> bytes = f.readAsBytesSync();
         Image image = GifDecoder().decodeImage(bytes);
         new File('out/gif/$name.png')
-              ..createSync(recursive: true)
-              ..writeAsBytesSync(encodePng(image));
-
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(encodePng(image));
       });
     }
   });
@@ -79,7 +78,7 @@ void main() {
 
     List<int> gif = GifEncoder().encodeImage(image);
     new File('out/gif/jpeg444.gif')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(gif);
+      ..createSync(recursive: true)
+      ..writeAsBytesSync(gif);
   });
 }

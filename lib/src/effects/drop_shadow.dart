@@ -9,7 +9,7 @@ import '../transform/copy_into.dart';
  * Create a drop-shadow effect for the image.
  */
 Image dropShadow(Image src, int hShadow, int vShadow, int blur,
-                 {int shadowColor: 0xa0000000}) {
+    {int shadowColor: 0xa0000000}) {
   if (blur < 0) {
     blur = 0;
   }
@@ -52,10 +52,9 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
   remapColors(dst, red: ALPHA, green: ALPHA, blue: ALPHA);
 
   scaleRGBA(dst, getRed(shadowColor), getGreen(shadowColor),
-            getBlue(shadowColor), getAlpha(shadowColor));
+      getBlue(shadowColor), getAlpha(shadowColor));
 
   gaussianBlur(dst, blur);
-
 
   copyInto(dst, src, dstX: imageOffsetX, dstY: imageOffsetY);
 

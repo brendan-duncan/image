@@ -36,7 +36,7 @@ class TiffBitReader {
       }
 
       value = (value << numBits) +
-              (_bitBuffer >> (_bitPos - numBits) & _BIT_MASK[numBits]);
+          (_bitBuffer >> (_bitPos - numBits) & _BIT_MASK[numBits]);
 
       _bitPos -= numBits;
     }

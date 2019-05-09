@@ -17,9 +17,24 @@ int shiftL(int v, int n) {
 }
 
 const List<int> SHIFT_BITS = const [
-  1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384,
-  32768, 65536];
-
+  1,
+  2,
+  4,
+  8,
+  16,
+  32,
+  64,
+  128,
+  256,
+  512,
+  1024,
+  2048,
+  4096,
+  8192,
+  16384,
+  32768,
+  65536
+];
 
 /**
  * Binary conversion of a uint8 to an int8.  This is equivalent in C to

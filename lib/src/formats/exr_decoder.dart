@@ -27,6 +27,7 @@ import 'exr/exr_image.dart';
  */
 class ExrDecoder extends Decoder {
   ExrImage exrImage;
+
   /// Exposure for tone-mapping the hdr image to an [Image], applied during
   /// [decodeFrame].
   double exposure;
@@ -53,8 +54,7 @@ class ExrDecoder extends Decoder {
       return null;
     }
 
-    return hdrToImage(exrImage.getPart(frame).framebuffer,
-                      exposure: exposure);
+    return hdrToImage(exrImage.getPart(frame).framebuffer, exposure: exposure);
   }
 
   HdrImage decodeHdrFrame(int frame) {

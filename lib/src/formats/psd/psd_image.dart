@@ -133,8 +133,8 @@ class PsdImage extends DecodeInfo {
             int ab = pixels[di + 2];
             int aa = pixels[di + 3];
 
-            _blend(ar, ag, ab, aa, br, bg, bb, ba, blendMode, opacity,
-                   pixels, di);
+            _blend(
+                ar, ag, ab, aa, br, bg, bb, ba, blendMode, opacity, pixels, di);
           }
 
           di += 4;
@@ -145,10 +145,8 @@ class PsdImage extends DecodeInfo {
     return mergedImage;
   }
 
-  void _blend(int ar, int ag, int ab, int aa,
-              int br, int bg, int bb, int ba,
-              int blendMode, double opacity,
-              Uint8List pixels, int di) {
+  void _blend(int ar, int ag, int ab, int aa, int br, int bg, int bb, int ba,
+      int blendMode, double opacity, Uint8List pixels, int di) {
     int r = br;
     int g = bg;
     int b = bb;
@@ -285,7 +283,7 @@ class PsdImage extends DecodeInfo {
   }
 
   static int _blendDarken(int a, int b) {
-    return Math.min(a,  b);
+    return Math.min(a, b);
   }
 
   static int _blendMultiply(int a, int b) {
@@ -302,8 +300,7 @@ class PsdImage extends DecodeInfo {
     if (2.0 * x < aa) {
       z = 2.0 * y * x + y * (1.0 - aa) + x * (1.0 - ba);
     } else {
-      z = ba * aa - 2.0 * (aa - x) * (ba - y) +
-          y * (1.0 - aa) + x * (1.0 - ba);
+      z = ba * aa - 2.0 * (aa - x) * (ba - y) + y * (1.0 - aa) + x * (1.0 - ba);
     }
 
     return (z * 255.0).toInt().clamp(0, 255);
@@ -339,8 +336,9 @@ class PsdImage extends DecodeInfo {
   static int _blendSoftLight(int a, int b) {
     double aa = a / 255.0;
     double bb = b / 255.0;
-    return (255.0 * ((1.0 - bb) * bb * aa +
-                     bb * (1.0 - (1.0 - bb) * (1.0 - aa)))).round();
+    return (255.0 *
+            ((1.0 - bb) * bb * aa + bb * (1.0 - (1.0 - bb) * (1.0 - aa))))
+        .round();
   }
 
   static int _blendHardLight(int bottom, int top) {
@@ -354,7 +352,7 @@ class PsdImage extends DecodeInfo {
   }
 
   static int _blendVividLight(int bottom, int top) {
-    if ( top < 128) {
+    if (top < 128) {
       return _blendColorBurn(bottom, 2 * top);
     } else {
       return _blendColorDodge(bottom, 2 * (top - 128));
@@ -370,9 +368,9 @@ class PsdImage extends DecodeInfo {
   }
 
   static int _blendPinLight(int bottom, int top) {
-    return (top < 128) ?
-           _blendDarken(bottom, 2 * top) :
-           _blendLighten(bottom, 2 * (top - 128));
+    return (top < 128)
+        ? _blendDarken(bottom, 2 * top)
+        : _blendLighten(bottom, 2 * (top - 128));
   }
 
   static int _blendHardMix(int bottom, int top) {
@@ -438,8 +436,8 @@ class PsdImage extends DecodeInfo {
       }
 
       if (blockSignature == RESOURCE_BLOCK_SIGNATURE) {
-        imageResources[blockId] = PsdImageResource(blockId, blockName,
-                                                       blockData);
+        imageResources[blockId] =
+            PsdImageResource(blockId, blockName, blockData);
       }
     }
   }
@@ -504,23 +502,19 @@ class PsdImage extends DecodeInfo {
     mergeImageChannels = [];
     for (int i = 0; i < channels; ++i) {
       mergeImageChannels.add(new PsdChannel.read(_imageData, i == 3 ? -1 : i,
-                                         width, height, depth, compression,
-                                         lineLengths, i));
+          width, height, depth, compression, lineLengths, i));
     }
 
-    mergedImage = createImageFromChannels(colorMode, depth,
-                                         width, height,
-                                         mergeImageChannels);
+    mergedImage = createImageFromChannels(
+        colorMode, depth, width, height, mergeImageChannels);
   }
 
   static int _ch(List<int> data, int si, int ns) {
-    return ns == 1 ? data[si] :
-           ((data[si] << 8) | data[si + 1]) >> 8;
+    return ns == 1 ? data[si] : ((data[si] << 8) | data[si + 1]) >> 8;
   }
 
   static Image createImageFromChannels(int colorMode, int bitDepth, int width,
-                                       int height,
-                                       List<PsdChannel> channelList) {
+      int height, List<PsdChannel> channelList) {
     Image output = Image(width, height);
     Uint8List pixels = output.getBytes();
 
@@ -548,8 +542,7 @@ class PsdImage extends DecodeInfo {
             pixels[di++] = _ch(channel2.data, si, ns);
             pixels[di++] = _ch(channel1.data, si, ns);
             pixels[di++] = _ch(channel0.data, si, ns);
-            pixels[di++] = numChannels >= 4 ?
-                           _ch(channel_1.data, si, ns) : 255;
+            pixels[di++] = numChannels >= 4 ? _ch(channel_1.data, si, ns) : 255;
 
             var b = pixels[xi];
             var g = pixels[xi + 1];
@@ -568,8 +561,7 @@ class PsdImage extends DecodeInfo {
             int L = _ch(channel0.data, si, ns) * 100 >> 8;
             int a = _ch(channel1.data, si, ns) - 128;
             int b = _ch(channel2.data, si, ns) - 128;
-            int alpha = numChannels >= 4 ?
-                        _ch(channel_1.data, si, ns) : 255;
+            int alpha = numChannels >= 4 ? _ch(channel_1.data, si, ns) : 255;
             List<int> rgb = labToRGB(L, a, b);
             pixels[di++] = rgb[2];
             pixels[di++] = rgb[1];
@@ -578,8 +570,7 @@ class PsdImage extends DecodeInfo {
             break;
           case COLORMODE_GRAYSCALE:
             int gray = _ch(channel0.data, si, ns);
-            int alpha = numChannels >= 2 ?
-                       _ch(channel_1.data, si, ns) : 255;
+            int alpha = numChannels >= 2 ? _ch(channel_1.data, si, ns) : 255;
             pixels[di++] = gray;
             pixels[di++] = gray;
             pixels[di++] = gray;
@@ -590,8 +581,7 @@ class PsdImage extends DecodeInfo {
             int m = _ch(channel1.data, si, ns);
             int y = _ch(channel2.data, si, ns);
             int k = _ch(channels[numChannels == 4 ? -1 : 3].data, si, ns);
-            int alpha = numChannels >= 5 ?
-                        _ch(channel_1.data, si, ns) : 255;
+            int alpha = numChannels >= 5 ? _ch(channel_1.data, si, ns) : 255;
             List<int> rgb = cmykToRGB(255 - c, 255 - m, 255 - y, 255 - k);
             pixels[di++] = rgb[2];
             pixels[di++] = rgb[1];

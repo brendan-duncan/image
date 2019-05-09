@@ -19,7 +19,7 @@ double grand(Math.Random rand) {
     w = x1 * x1 + x2 * x2;
   } while (w <= 0.0 || w >= 1.0);
 
-  return x1 * Math.sqrt((-2.0 * Math.log(w))  /w);
+  return x1 * Math.sqrt((-2.0 * Math.log(w)) / w);
 }
 
 /**

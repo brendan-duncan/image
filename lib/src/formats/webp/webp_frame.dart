@@ -7,14 +7,19 @@ import '../../util/input_buffer.dart';
 class WebPFrame {
   /// The x coordinate of the upper left corner of the frame.
   int x;
+
   /// The y coordinate of the upper left corner of the frame.
   int y;
+
   /// The width of the frame.
   int width;
+
   /// The height of the frame.
   int height;
+
   /// How long the frame should be displayed, in milliseconds.
   int duration;
+
   /// Indicates how the current frame is to be treated after it has been
   /// displayed (before rendering the next frame) on the canvas.
   /// If true, the frame is cleared to the background color.  If false,

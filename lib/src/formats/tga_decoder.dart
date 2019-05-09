@@ -18,8 +18,7 @@ class TgaDecoder extends Decoder {
    * Is the given file a valid TGA image?
    */
   bool isValidFile(List<int> data) {
-    InputBuffer input = InputBuffer(data,
-        bigEndian: true);
+    InputBuffer input = InputBuffer(data, bigEndian: true);
 
     InputBuffer header = input.readBytes(18);
     if (header[2] != 2) {

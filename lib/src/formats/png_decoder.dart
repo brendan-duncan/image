@@ -1,5 +1,3 @@
-//import 'dart:math' as Math;
-
 import 'package:archive/archive.dart';
 
 import '../animation.dart';
@@ -14,15 +12,11 @@ import 'decoder.dart';
 import 'png/png_frame.dart';
 import 'png/png_info.dart';
 
-/**
- * Decode a PNG encoded image.
- */
+/// Decode a PNG encoded image.
 class PngDecoder extends Decoder {
   InternalPngInfo _info;
 
-  /**
-   * Is the given file a valid PNG image?
-   */
+  /// Is the given file a valid PNG image?
   bool isValidFile(List<int> data) {
     InputBuffer input = InputBuffer(data, bigEndian: true);
     InputBuffer pngHeader = input.readBytes(8);
@@ -38,10 +32,8 @@ class PngDecoder extends Decoder {
 
   PngInfo get info => _info;
 
-  /**
-   * Start decoding the data as an animation sequence, but don't actually
-   * process the frames until they are requested with decodeFrame.
-   */
+  /// Start decoding the data as an animation sequence, but don't actually
+  /// process the frames until they are requested with decodeFrame.
   DecodeInfo startDecode(List<int> data) {
     _input = InputBuffer(data, bigEndian: true);
 
@@ -72,8 +64,8 @@ class PngDecoder extends Decoder {
 
           // Validate some of the info in the header to make sure we support
           // the proposed image data.
-          if (![GRAYSCALE, RGB, INDEXED,
-                GRAYSCALE_ALPHA, RGBA].contains(_info.colorType)) {
+          if (![GRAYSCALE, RGB, INDEXED, GRAYSCALE_ALPHA, RGBA]
+              .contains(_info.colorType)) {
             return null;
           }
 
@@ -173,7 +165,7 @@ class PngDecoder extends Decoder {
           break;
         case 'fdAT':
           /*int sequenceNumber =*/ _input.readUint32();
-          InternalPngFrame frame = _info.frames.last;
+          InternalPngFrame frame = _info.frames.last as InternalPngFrame;
           frame.fdat.add(inputPos);
           _input.skip(chunkSize - 4);
           _input.skip(4); // CRC
@@ -190,7 +182,7 @@ class PngDecoder extends Decoder {
           } else if (_info.colorType == 0 || _info.colorType == 4) {
             /*int gray =*/ _input.readUint16();
             chunkSize -= 2;
-          } else if (_info.colorType == 2 || _info.colorType ==6) {
+          } else if (_info.colorType == 2 || _info.colorType == 6) {
             /*int r =*/ _input.readUint16();
             /*int g =*/ _input.readUint16();
             /*int b =*/ _input.readUint16();
@@ -227,14 +219,10 @@ class PngDecoder extends Decoder {
     return _info;
   }
 
-  /**
-   * The number of frames that can be decoded.
-   */
+  /// The number of frames that can be decoded.
   int numFrames() => _info != null ? _info.numFrames : 0;
 
-  /**
-   * Decode the frame (assuming [startDecode] has already been called).
-   */
+  /// Decode the frame (assuming [startDecode] has already been called).
   Image decodeFrame(int frame) {
     if (_info == null) {
       return null;
@@ -263,7 +251,7 @@ class PngDecoder extends Decoder {
         throw new ImageException('Invalid Frame Number: $frame');
       }
 
-      InternalPngFrame f = _info.frames[frame];
+      InternalPngFrame f = _info.frames[frame] as InternalPngFrame;
       width = f.width;
       height = f.height;
       for (int i = 0; i < f.fdat.length; ++i) {
@@ -281,7 +269,8 @@ class PngDecoder extends Decoder {
 
     int format;
     if (_info.colorType == GRAYSCALE_ALPHA ||
-        _info.colorType == RGBA || _info.transparency != null) {
+        _info.colorType == RGBA ||
+        _info.transparency != null) {
       format = Image.RGBA;
     } else {
       format = Image.RGB;
@@ -337,9 +326,8 @@ class PngDecoder extends Decoder {
     _info.width = origW;
     _info.height = origH;
 
-    image.iccProfile = ICCProfileData(_info.iCCPName,
-                                          ICCPCompression.deflate,
-                                          _info.iCCPData);
+    image.iccProfile =
+        ICCProfileData(_info.iCCPName, ICCPCompression.deflate, _info.iCCPData);
 
     return image;
   }
@@ -387,8 +375,10 @@ class PngDecoder extends Decoder {
             dispose == PngFrame.APNG_DISPOSE_OP_PREVIOUS) {
           lastImage.fill(_info.backgroundColor);
         }
-        copyInto(lastImage, image, dstX: frame.xOffset, dstY: frame.yOffset,
-                 blend: frame.blend == PngFrame.APNG_BLEND_OP_OVER);
+        copyInto(lastImage, image,
+            dstX: frame.xOffset,
+            dstY: frame.yOffset,
+            blend: frame.blend == PngFrame.APNG_BLEND_OP_OVER);
       } else {
         lastImage = image;
       }
@@ -401,15 +391,12 @@ class PngDecoder extends Decoder {
     return anim;
   }
 
-  /**
-   * Process a pass of an interlaced image.
-   */
-  void _processPass(InputBuffer input, Image image,
-                    int xOffset, int yOffset, int xStep, int yStep,
-                    int passWidth, int passHeight) {
-    final int channels = (_info.colorType == GRAYSCALE_ALPHA) ? 2 :
-      (_info.colorType == RGB) ? 3 :
-        (_info.colorType == RGBA) ? 4 : 1;
+  /// Process a pass of an interlaced image.
+  void _processPass(InputBuffer input, Image image, int xOffset, int yOffset,
+      int xStep, int yStep, int passWidth, int passHeight) {
+    final int channels = (_info.colorType == GRAYSCALE_ALPHA)
+        ? 2
+        : (_info.colorType == RGB) ? 3 : (_info.colorType == RGBA) ? 4 : 1;
 
     final int pixelDepth = channels * _info.bits;
     final int bpp = (pixelDepth + 7) >> 3;
@@ -422,7 +409,8 @@ class PngDecoder extends Decoder {
 
     //int pi = 0;
     for (int srcY = 0, dstY = yOffset, ri = 0;
-         srcY < passHeight; ++srcY, dstY += yStep, ri = 1 - ri, _progressY++) {
+        srcY < passHeight;
+        ++srcY, dstY += yStep, ri = 1 - ri, _progressY++) {
       int filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes).toUint8List();
 
@@ -444,8 +432,9 @@ class PngDecoder extends Decoder {
 
       //int yMax = Math.min(dstY + blockHeight, _info.height);
 
-      for (int srcX = 0, dstX = xOffset; srcX < passWidth;
-           ++srcX, dstX += xStep) {
+      for (int srcX = 0, dstX = xOffset;
+          srcX < passWidth;
+          ++srcX, dstX += xStep) {
         _readPixel(rowInput, pixel);
         int c = _getColor(pixel);
         image.setPixel(dstX, dstY, c);
@@ -464,9 +453,9 @@ class PngDecoder extends Decoder {
   }
 
   void _process(InputBuffer input, Image image) {
-    final int channels = (_info.colorType == GRAYSCALE_ALPHA) ? 2 :
-                         (_info.colorType == RGB) ? 3 :
-                         (_info.colorType == RGBA) ? 4 : 1;
+    final int channels = (_info.colorType == GRAYSCALE_ALPHA)
+        ? 2
+        : (_info.colorType == RGB) ? 3 : (_info.colorType == RGBA) ? 4 : 1;
 
     final int pixelDepth = channels * _info.bits;
 
@@ -573,9 +562,7 @@ class PngDecoder extends Decoder {
     return c << 4;
   }
 
-  /**
-   * Return the CRC of the bytes
-   */
+  /// Return the CRC of the bytes
   int _crc(String type, List<int> bytes) {
     int crc = getCrc32(type.codeUnits);
     return getCrc32(bytes, crc);
@@ -589,9 +576,7 @@ class PngDecoder extends Decoder {
     _bitBufferLen = 0;
   }
 
-  /**
-   * Read a number of bits from the input stream.
-   */
+  /// Read a number of bits from the input stream.
   int _readBits(InputBuffer input, int numBits) {
     if (numBits == 0) {
       return 0;
@@ -620,11 +605,13 @@ class PngDecoder extends Decoder {
     }
 
     // output byte
-    int mask = (numBits == 1) ? 1 :
-               (numBits == 2) ? 3 :
-               (numBits == 4) ? 0xf :
-               (numBits == 8) ? 0xff :
-               (numBits == 16) ? 0xffff : 0;
+    int mask = (numBits == 1)
+        ? 1
+        : (numBits == 2)
+            ? 3
+            : (numBits == 4)
+                ? 0xf
+                : (numBits == 8) ? 0xff : (numBits == 16) ? 0xffff : 0;
 
     int octet = (_bitBuffer >> (_bitBufferLen - numBits)) & mask;
 
@@ -633,9 +620,7 @@ class PngDecoder extends Decoder {
     return octet;
   }
 
-  /**
-   * Read the next pixel from the input stream.
-   */
+  /// Read the next pixel from the input stream.
   void _readPixel(InputBuffer input, List<int> pixel) {
     switch (_info.colorType) {
       case GRAYSCALE:
@@ -664,9 +649,7 @@ class PngDecoder extends Decoder {
     throw new ImageException('Invalid color type: ${_info.colorType}.');
   }
 
-  /**
-   * Get the color with the list of components.
-   */
+  /// Get the color with the list of components.
   int _getColor(List<int> raw) {
     switch (_info.colorType) {
       case GRAYSCALE:
@@ -750,8 +733,9 @@ class PngDecoder extends Decoder {
       case INDEXED:
         int p = raw[0] * 3;
 
-        int a = _info.transparency != null &&
-            raw[0] < _info.transparency.length ? _info.transparency[raw[0]] : 255;
+        int a = _info.transparency != null && raw[0] < _info.transparency.length
+            ? _info.transparency[raw[0]]
+            : 255;
 
         if (p >= _info.palette.length) {
           return getColor(255, 255, 255, a);

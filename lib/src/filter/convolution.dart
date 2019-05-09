@@ -11,7 +11,7 @@ import '../image.dart';
  * filters to normalize and offset the filtered pixel value.
  */
 Image convolution(Image src, List<num> filter,
-                  [num filterDiv = 1.0, num offset = 0.0]) {
+    [num filterDiv = 1.0, num offset = 0.0]) {
   Image tmp = Image.from(src);
 
   for (int y = 0; y < src.height; ++y) {

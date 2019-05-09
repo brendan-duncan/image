@@ -40,10 +40,13 @@ class TiffImage {
   int t6Options = 0;
   int extraSamples;
   List<int> colorMap;
+
   /// Starting index in the [colorMap] for the red channel.
   int colorMapRed;
+
   /// Starting index in the [colorMap] for the green channel.
   int colorMapGreen;
+
   /// Starting index in the [colorMap] for the blue channel.
   int colorMapBlue;
   Image image;
@@ -93,8 +96,10 @@ class TiffImage {
       }
     }
 
-    if (width == null || height == null ||
-        bitsPerSample == null || compression == null) {
+    if (width == null ||
+        height == null ||
+        bitsPerSample == null ||
+        compression == null) {
       return;
     }
 
@@ -178,8 +183,7 @@ class TiffImage {
         break;
       case 3: // RGB Palette
         if (samplesPerPixel == 1 &&
-            (bitsPerSample == 4 || bitsPerSample == 8 ||
-             bitsPerSample == 16)) {
+            (bitsPerSample == 4 || bitsPerSample == 8 || bitsPerSample == 16)) {
           imageType = TYPE_PALETTE;
         }
         break;
@@ -190,7 +194,8 @@ class TiffImage {
         break;
       case 6: // YCbCr
         if (compression == COMPRESSION_JPEG &&
-            bitsPerSample == 8 && samplesPerPixel == 3) {
+            bitsPerSample == 8 &&
+            samplesPerPixel == 3) {
           imageType = TYPE_RGB;
         } else {
           if (hasTag(TAG_YCBCR_SUBSAMPLING)) {
@@ -217,10 +222,12 @@ class TiffImage {
     }
   }
 
-  bool get isValid => width != null && height != null &&
-                      samplesPerPixel != null &&
-                      bitsPerSample != null &&
-                      compression != null;
+  bool get isValid =>
+      width != null &&
+      height != null &&
+      samplesPerPixel != null &&
+      bitsPerSample != null &&
+      compression != null;
 
   Image decode(InputBuffer p) {
     image = Image(width, height);
@@ -234,13 +241,13 @@ class TiffImage {
 
   HdrImage decodeHdr(InputBuffer p) {
     hdrImage = HdrImage.create(width, height, 4, HdrImage.HALF);
-      for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
-        for (int tileX = 0; tileX < tilesX; ++tileX, ++ti) {
-          _decodeTile(p, tileX, tileY);
-        }
+    for (int tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
+      for (int tileX = 0; tileX < tilesX; ++tileX, ++ti) {
+        _decodeTile(p, tileX, tileY);
       }
-      return hdrImage;
     }
+    return hdrImage;
+  }
 
   bool hasTag(int tag) => tags.containsKey(tag);
 
@@ -268,22 +275,21 @@ class TiffImage {
     if (bitsPerSample == 8 || bitsPerSample == 16) {
       if (compression == COMPRESSION_NONE) {
         bdata = p;
-
       } else if (compression == COMPRESSION_LZW) {
         bdata = InputBuffer(new Uint8List(bytesInThisTile));
         LzwDecoder decoder = LzwDecoder();
         try {
           decoder.decode(new InputBuffer.from(p, offset: 0, length: byteCount),
-                         bdata.buffer);
-        } catch (e) {
-        }
+              bdata.buffer);
+        } catch (e) {}
         // Horizontal Differencing Predictor
         if (predictor == 2) {
           int count;
           for (int j = 0; j < tileHeight; j++) {
             count = samplesPerPixel * (j * tileWidth + 1);
             for (int i = samplesPerPixel, len = tileWidth * samplesPerPixel;
-                 i < len; i++) {
+                i < len;
+                i++) {
               bdata[count] += bdata[count - samplesPerPixel];
               count++;
             }
@@ -292,12 +298,10 @@ class TiffImage {
       } else if (compression == COMPRESSION_PACKBITS) {
         bdata = InputBuffer(new Uint8List(bytesInThisTile));
         _decodePackbits(p, bytesInThisTile, bdata.buffer);
-
       } else if (compression == COMPRESSION_DEFLATE) {
         List<int> data = p.toList(0, byteCount);
         List<int> outData = Inflate(data).getBytes();
         bdata = InputBuffer(outData);
-
       } else if (compression == COMPRESSION_ZIP) {
         List<int> data = p.toList(0, byteCount);
         List<int> outData = ZLibDecoder().decodeBytes(data);
@@ -353,9 +357,10 @@ class TiffImage {
             if (image != null) {
               int c;
               if (photometricType == 3 && colorMap != null) {
-                c = getColor(colorMap[colorMapRed + gray],
-                             colorMap[colorMapGreen + gray],
-                             colorMap[colorMapBlue + gray]);
+                c = getColor(
+                    colorMap[colorMapRed + gray],
+                    colorMap[colorMapGreen + gray],
+                    colorMap[colorMapBlue + gray]);
               } else {
                 c = getColor(gray, gray, gray, 255);
               }
@@ -461,8 +466,8 @@ class TiffImage {
     }
   }
 
-  void _jpegToImage(Image tile, Image image, int outX, int outY,
-                    int tileWidth, int tileHeight) {
+  void _jpegToImage(Image tile, Image image, int outX, int outY, int tileWidth,
+      int tileHeight) {
     int width = tileWidth;
     int height = tileHeight;
     for (int y = 0; y < height; y++) {
@@ -562,24 +567,21 @@ class TiffImage {
     } else if (compression == COMPRESSION_CCITT_RLE) {
       bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
       try {
-        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
-            decode1D(bdata, p, 0, tileHeight);
-      } catch (_) {
-      }
+        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
+            .decode1D(bdata, p, 0, tileHeight);
+      } catch (_) {}
     } else if (compression == COMPRESSION_CCITT_FAX3) {
       bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
       try {
-        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
-            decode2D(bdata, p, 0, tileHeight, t4Options);
-      } catch (_) {
-      }
+        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
+            .decode2D(bdata, p, 0, tileHeight, t4Options);
+      } catch (_) {}
     } else if (compression == COMPRESSION_CCITT_FAX4) {
       bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
       try {
-        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight).
-            decodeT6(bdata, p, 0, tileHeight, t6Options);
-      } catch (_) {
-      }
+        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
+            .decodeT6(bdata, p, 0, tileHeight, t6Options);
+      } catch (_) {}
     } else if (compression == COMPRESSION_ZIP) {
       List<int> data = p.toList(0, byteCount);
       List<int> outData = ZLibDecoder().decodeBytes(data);
@@ -734,7 +736,7 @@ class TiffImage {
   static const int TAG_T4_OPTIONS = 292;
   static const int TAG_T6_OPTIONS = 293;
   static const int TAG_THRESHOLDING = 263;
-  static const int TAG_TILE_WIDTH  = 322;
+  static const int TAG_TILE_WIDTH = 322;
   static const int TAG_TILE_LENGTH = 323;
   static const int TAG_TILE_OFFSETS = 324;
   static const int TAG_TILE_BYTE_COUNTS = 325;

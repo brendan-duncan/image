@@ -36,7 +36,7 @@ import 'quantizer.dart';
 class NeuralQuantizer extends Quantizer {
   Uint8List colorMap;
 
-  NeuralQuantizer(Image image, {int numberOfColors=256}) {
+  NeuralQuantizer(Image image, {int numberOfColors = 256}) {
     if (image.width * image.height < MAX_PRIME) {
       throw new ImageException('Image is too small');
     }
@@ -65,9 +65,8 @@ class NeuralQuantizer extends Quantizer {
   /**
    * Get a color from the [colorMap].
    */
-  int color(int index) => getColor(colorMap[index * 3],
-                                   colorMap[index * 3 + 1],
-                                   colorMap[index * 3 + 2]);
+  int color(int index) => getColor(
+      colorMap[index * 3], colorMap[index * 3 + 1], colorMap[index * 3 + 2]);
 
   /**
    * Find the index of the closest color to [c] in the [colorMap].
@@ -136,15 +135,15 @@ class NeuralQuantizer extends Quantizer {
 
   int _inxSearch(int b, int g, int r) {
     // Search for BGR values 0..255 and return colour index
-    int bestd = 1000;   // biggest possible dist is 256*3
+    int bestd = 1000; // biggest possible dist is 256*3
     int best = -1;
-    int i = _netIndex[g];  // index on g
-    int j = i - 1;    // start at netindex[g] and work outwards
+    int i = _netIndex[g]; // index on g
+    int j = i - 1; // start at netindex[g] and work outwards
 
     while ((i < NET_SIZE) || (j >= 0)) {
       if (i < NET_SIZE) {
         int p = i * 4;
-        int dist = _colorMap[p + 1] - g;    // inx key
+        int dist = _colorMap[p + 1] - g; // inx key
         if (dist >= bestd) {
           i = NET_SIZE; // stop iter
         } else {
@@ -233,9 +232,10 @@ class NeuralQuantizer extends Quantizer {
 
       // find smallest in i..netsize-1
       for (int j = i + 1, q = p + 4; j < NET_SIZE; j++, q += 4) {
-        if (_colorMap[q + 1] < smallval) {    // index on g
+        if (_colorMap[q + 1] < smallval) {
+          // index on g
           smallpos = j;
-          smallval = _colorMap[q + 1];  // index on g
+          smallval = _colorMap[q + 1]; // index on g
         }
       }
 
@@ -267,13 +267,13 @@ class NeuralQuantizer extends Quantizer {
           _netIndex[j] = i;
         }
         previouscol = smallval;
-         startpos = i;
+        startpos = i;
       }
     }
 
     _netIndex[previouscol] = (startpos + MAX_NET_POS) >> 1;
     for (int j = previouscol + 1; j < 256; j++) {
-       _netIndex[j] = MAX_NET_POS; // really 256
+      _netIndex[j] = MAX_NET_POS; // really 256
     }
   }
 
@@ -310,15 +310,16 @@ class NeuralQuantizer extends Quantizer {
     int i = 0;
     while (i < samplePixels) {
       int p = image[pos];
-      int red   = getRed(p);
+      int red = getRed(p);
       int green = getGreen(p);
-      int blue  = getBlue(p);
+      int blue = getBlue(p);
 
       double b = blue.toDouble();
       double g = green.toDouble();
       double r = red.toDouble();
 
-      if (i == 0) {   // remember background colour
+      if (i == 0) {
+        // remember background colour
         _network[BG_COLOR * 3] = b;
         _network[BG_COLOR * 3 + 1] = g;
         _network[BG_COLOR * 3 + 2] = r;
@@ -327,11 +328,12 @@ class NeuralQuantizer extends Quantizer {
       int j = _specialFind(b, g, r);
       j = j < 0 ? _contest(b, g, r) : j;
 
-      if (j >= SPECIALS) {   // don't learn for specials
+      if (j >= SPECIALS) {
+        // don't learn for specials
         double a = (1.0 * alpha) / INIT_ALPHA;
         _alterSingle(a, j, b, g, r);
         if (rad > 0) {
-          _alterNeighbors(a, rad, j, b, g, r);   // alter neighbours
+          _alterNeighbors(a, rad, j, b, g, r); // alter neighbours
         }
       }
 
@@ -356,12 +358,12 @@ class NeuralQuantizer extends Quantizer {
     // Move neuron i towards biased (b,g,r) by factor alpha
     int p = i * 3;
     _network[p] -= (alpha * (_network[p] - b));
-    _network[p + 1] -= (alpha*(_network[p + 1] - g));
-    _network[p + 2] -= (alpha*(_network[p + 2] - r));
+    _network[p + 1] -= (alpha * (_network[p + 1] - g));
+    _network[p + 2] -= (alpha * (_network[p + 2] - r));
   }
 
-  void _alterNeighbors(double alpha, int rad, int i,
-                       double b, double g, double r) {
+  void _alterNeighbors(
+      double alpha, int rad, int i, double b, double g, double r) {
     int lo = i - rad;
     if (lo < SPECIALS - 1) {
       lo = SPECIALS - 1;
@@ -450,11 +452,11 @@ class NeuralQuantizer extends Quantizer {
   }
 
   void _setupArrays() {
-    _network[0] = 0.0;  // black
+    _network[0] = 0.0; // black
     _network[1] = 0.0;
     _network[2] = 0.0;
 
-    _network[3] = 255.0;  // white
+    _network[3] = 255.0; // white
     _network[4] = 255.0;
     _network[5] = 255.0;
 
@@ -497,7 +499,7 @@ class NeuralQuantizer extends Quantizer {
   static const double BETA_GAMMA = BETA * GAMMA;
 
   /// the network itself
-  List<double> _network ;
+  List<double> _network;
   Int32List _colorMap;
   Int32List _netIndex = Int32List(256);
   // bias and freq arrays for learning
@@ -507,10 +509,10 @@ class NeuralQuantizer extends Quantizer {
   // four primes near 500 - assume no image has a length so large
   // that it is divisible by all four primes
 
-  static const int PRIME1  = 499;
-  static const int PRIME2  = 491;
-  static const int PRIME3  = 487;
-  static const int PRIME4  = 503;
+  static const int PRIME1 = 499;
+  static const int PRIME2 = 491;
+  static const int PRIME3 = 487;
+  static const int PRIME4 = 503;
   static const int MAX_PRIME = PRIME4;
 
   int _sampleFac = 1;

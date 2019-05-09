@@ -11,3 +11,4 @@ dependencies:
   xml: '>=3.2.5 <4.0.0'
 dev_dependencies:
   test: '>=0.12.42 <2.0.0'
+  pedantic: ^1.0.0

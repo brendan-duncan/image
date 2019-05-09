@@ -25,7 +25,7 @@ class VP8LBitReader {
     int b2 = 0;
     if (bitPos < 32) {
       b2 = (_buffer[0] >> bitPos) +
-           ((_buffer[1] & BIT_MASK[bitPos]) * (BIT_MASK[32 - bitPos] + 1));
+          ((_buffer[1] & BIT_MASK[bitPos]) * (BIT_MASK[32 - bitPos] + 1));
     } else if (bitPos == 32) {
       b2 = _buffer[1];
     } else {
@@ -83,16 +83,49 @@ class VP8LBitReader {
   /// The number of bytes used for the bit buffer.
   static const int VALUE_SIZE = 8;
   static const int MAX_NUM_BIT_READ = 25;
+
   /// Number of bits prefetched.
   static const int LBITS = 64;
+
   /// Minimum number of bytes needed after fillBitWindow.
   static const int WBITS = 32;
+
   /// Number of bytes needed to store WBITS bits.
   static const int LOG8_WBITS = 4;
 
   static const List<int> BIT_MASK = const [
-      0, 1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383,
-      32767, 65535, 131071, 262143, 524287, 1048575, 2097151, 4194303, 8388607,
-      16777215, 33554431, 67108863, 134217727, 268435455, 536870911,
-      1073741823, 2147483647, 4294967295];
+    0,
+    1,
+    3,
+    7,
+    15,
+    31,
+    63,
+    127,
+    255,
+    511,
+    1023,
+    2047,
+    4095,
+    8191,
+    16383,
+    32767,
+    65535,
+    131071,
+    262143,
+    524287,
+    1048575,
+    2097151,
+    4194303,
+    8388607,
+    16777215,
+    33554431,
+    67108863,
+    134217727,
+    268435455,
+    536870911,
+    1073741823,
+    2147483647,
+    4294967295
+  ];
 }

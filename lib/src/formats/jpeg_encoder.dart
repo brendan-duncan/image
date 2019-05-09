@@ -6,12 +6,10 @@ import '../util/output_buffer.dart';
 import 'encoder.dart';
 import 'jpeg/jpeg.dart';
 
-/**
- * Encode an image to the JPEG format.
- *
- * Derived from:
- * https://github.com/owencm/javascript-jpeg-encoder
- */
+/// Encode an image to the JPEG format.
+///
+/// Derived from:
+/// https://github.com/owencm/javascript-jpeg-encoder
 class JpegEncoder extends Encoder {
   JpegEncoder({int quality: 100}) {
     _initHuffmanTbl();
@@ -21,10 +19,11 @@ class JpegEncoder extends Encoder {
   }
 
   void setQuality(int quality) {
-    quality = quality.clamp(0, 100);
+    quality = quality.clamp(0, 100).toInt();
 
     if (currentQuality == quality) {
-      return; // don't recalc if unchanged
+      // don't re-calc if unchanged
+      return;
     }
 
     int sf = 0;
@@ -115,8 +114,8 @@ class JpegEncoder extends Encoder {
 
     // Do the bit alignment of the EOI marker
     if (_bytepos >= 0) {
-      final fillbits = [(1 << (_bytepos + 1)) - 1, _bytepos + 1];
-      _writeBits(fp, fillbits);
+      final fillBits = [(1 << (_bytepos + 1)) - 1, _bytepos + 1];
+      _writeBits(fp, fillBits);
     }
 
     _writeMarker(fp, Jpeg.M_EOI);
@@ -184,10 +183,10 @@ class JpegEncoder extends Encoder {
     }
   }
 
-  List _computeHuffmanTbl(List nrcodes, List std_table) {
+  List<List<int>> _computeHuffmanTbl(List<int> nrcodes, List<int> std_table) {
     int codevalue = 0;
     int pos_in_table = 0;
-    List HT = List();
+    List<List<int>> HT = [];
     for (int k = 1; k <= 16; k++) {
       for (int j = 1; j <= nrcodes[k]; j++) {
         int index = std_table[pos_in_table];
@@ -224,7 +223,7 @@ class JpegEncoder extends Encoder {
         bitcode[32767 + nr] = [nr, cat];
       }
       // Negative numbers
-      for (int nrneg = -(nrupper-1); nrneg <= -nrlower; nrneg++) {
+      for (int nrneg = -(nrupper - 1); nrneg <= -nrlower; nrneg++) {
         category[32767 + nrneg] = cat;
         bitcode[32767 + nrneg] = [nrupper - 1 + nrneg, cat];
       }
@@ -405,20 +404,20 @@ class JpegEncoder extends Encoder {
 
   void _writeSOF0(OutputBuffer out, int width, int height) {
     _writeMarker(out, Jpeg.M_SOF0);
-    out.writeUint16(17);   // length, truecolor YUV JPG
-    out.writeByte(8);    // precision
+    out.writeUint16(17); // length, truecolor YUV JPG
+    out.writeByte(8); // precision
     out.writeUint16(height);
     out.writeUint16(width);
-    out.writeByte(3);    // nrofcomponents
-    out.writeByte(1);    // IdY
+    out.writeByte(3); // nrofcomponents
+    out.writeByte(1); // IdY
     out.writeByte(0x11); // HVY
-    out.writeByte(0);    // QTY
-    out.writeByte(2);    // IdU
+    out.writeByte(0); // QTY
+    out.writeByte(2); // IdU
     out.writeByte(0x11); // HVU
-    out.writeByte(1);    // QTU
-    out.writeByte(3);    // IdV
+    out.writeByte(1); // QTU
+    out.writeByte(3); // IdV
     out.writeByte(0x11); // HVV
-    out.writeByte(1);    // QTV
+    out.writeByte(1); // QTV
   }
 
   void _writeDQT(OutputBuffer out) {
@@ -487,9 +486,9 @@ class JpegEncoder extends Encoder {
   }
 
   int _processDU(OutputBuffer out, List<double> CDU, List<double> fdtbl,
-                 int DC, HTDC, HTAC) {
-    List EOB = HTAC[0x00];
-    List M16zeroes = HTAC[0xF0];
+                 int DC, List<List<int>> HTDC, List<List<int>> HTAC) {
+    List<int> EOB = HTAC[0x00];
+    List<int> M16zeroes = HTAC[0xF0];
     int pos;
     const I16 = 16;
     const I63 = 63;
@@ -579,15 +578,15 @@ class JpegEncoder extends Encoder {
   final UVTable = Uint8List(64);
   final fdtbl_Y = Float32List(64);
   final fdtbl_UV = Float32List(64);
-  List YDC_HT;
-  List UVDC_HT;
-  List YAC_HT;
-  List UVAC_HT;
+  List<List<int>> YDC_HT;
+  List<List<int>> UVDC_HT;
+  List<List<int>> YAC_HT;
+  List<List<int>> UVAC_HT;
 
-  final bitcode = List(65535);
-  final category = List(65535);
+  final bitcode = List<List<int>>(65535);
+  final category = List<int>(65535);
   final outputfDCTQuant = List<int>(64);
-  final DU = List(64);
+  final DU = List<int>(64);
 
   final Float32List YDU = Float32List(64);
   final Float32List UDU = Float32List(64);

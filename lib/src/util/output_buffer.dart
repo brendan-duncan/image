@@ -9,9 +9,9 @@ class OutputBuffer {
   /**
    * Create a byte buffer for writing.
    */
-  OutputBuffer({int size: _BLOCK_SIZE, this.bigEndian: false}) :
-    _buffer = Uint8List(size == null ? _BLOCK_SIZE : size),
-    length = 0;
+  OutputBuffer({int size: _BLOCK_SIZE, this.bigEndian: false})
+      : _buffer = Uint8List(size == null ? _BLOCK_SIZE : size),
+        length = 0;
 
   void rewind() {
     length = 0;
@@ -118,8 +118,9 @@ class OutputBuffer {
    * Grow the buffer to accommodate additional data.
    */
   void _expandBuffer([int required]) {
-    int blockSize = (required != null) ? required :
-                    (_buffer.length == 0) ? _BLOCK_SIZE : (_buffer.length * 2);
+    int blockSize = (required != null)
+        ? required
+        : (_buffer.length == 0) ? _BLOCK_SIZE : (_buffer.length * 2);
     Uint8List newBuffer = Uint8List(_buffer.length + blockSize);
     newBuffer.setRange(0, _buffer.length, _buffer);
     _buffer = newBuffer;

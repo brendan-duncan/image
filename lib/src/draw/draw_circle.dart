@@ -6,8 +6,10 @@ import 'draw_pixel.dart';
  * the given [radius] and [color].
  */
 Image drawCircle(Image image, int x0, int y0, int radius, int color) {
-  if (radius < 0 || x0 - radius >= image.width ||
-      y0 + radius < 0 || y0 - radius >= image.height) {
+  if (radius < 0 ||
+      x0 - radius >= image.width ||
+      y0 + radius < 0 ||
+      y0 - radius >= image.height) {
     return image;
   }
 
@@ -25,7 +27,7 @@ Image drawCircle(Image image, int x0, int y0, int radius, int color) {
   }
 
   for (int f = 1 - radius, ddFx = 0, ddFy = -(radius << 1), x = 0, y = radius;
-       x < y; ) {
+      x < y;) {
     if (f >= 0) {
       f += (ddFy += 2);
       --y;

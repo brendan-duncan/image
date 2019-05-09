@@ -15,18 +15,25 @@ class WebPInfo extends DecodeInfo {
 
   /// True if the bitstream contains an alpha channel.
   bool hasAlpha = false;
+
   /// True if the bitstream is an animation.
   bool hasAnimation = false;
+
   /// 0 = undefined (/mixed), 1 = lossy, 2 = lossless, 3 = animated
   int format = FORMAT_UNDEFINED;
+
   /// ICCP data string.
   String iccp = '';
+
   /// EXIF data string.
   String exif = '';
+
   /// XMP data string.
   String xmp = '';
+
   /// How many times the animation should loop.
   int animLoopCount = 0;
+
   /// Information about each animation frame.
   List<WebPFrame> frames = [];
 

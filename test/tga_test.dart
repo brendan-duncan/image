@@ -25,8 +25,8 @@ void main() {
 
         List<int> png = PngEncoder().encodeImage(image);
         new Io.File('out/tga/${name}.png')
-              ..createSync(recursive: true)
-              ..writeAsBytesSync(png);
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(png);
       });
     }
 
@@ -42,8 +42,8 @@ void main() {
       List<int> tga = TgaEncoder().encodeImage(image);
 
       new Io.File('out/globe.tga')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(tga);
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(tga);
 
       // Decode the encoded image, make sure it's the same as the original.
       Image image2 = TgaDecoder().decodeImage(tga);

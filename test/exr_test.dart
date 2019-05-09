@@ -10,6 +10,6 @@ void main() {
 
   List<int> png = PngEncoder().encodeImage(img);
   new Io.File('out/exr/grid.png')
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(png);
+    ..createSync(recursive: true)
+    ..writeAsBytesSync(png);
 }

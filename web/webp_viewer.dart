@@ -17,9 +17,13 @@ void main() {
       req.overrideMimeType('text\/plain; charset=x-user-defined');
       req.onLoadEnd.listen((e) {
         if (req.status == 200) {
-          var bytes = req.responseText.split('').map((e){
-            return new String.fromCharCode(e.codeUnitAt(0) & 0xff);
-           }).join('').codeUnits;
+          var bytes = req.responseText
+              .split('')
+              .map((e) {
+                return new String.fromCharCode(e.codeUnitAt(0) & 0xff);
+              })
+              .join('')
+              .codeUnits;
 
           Image image = decodeWebP(bytes);
           List<int> png = encodePng(image);

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import '../animation.dart';
 import '../color.dart';
 import '../exif_data.dart';

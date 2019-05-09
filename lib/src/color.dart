@@ -70,29 +70,27 @@ class Color {
     double d3 = c1[2] - c2[2];
     if (compareAlpha) {
       double dA = c1[3] - c2[3];
-      return Math.sqrt(
-        Math.max(d1*d1, (d1-dA)*(d1-dA)) +
-        Math.max(d2*d2, (d2-dA)*(d2-dA)) +
-        Math.max(d3*d3, (d3-dA)*(d3-dA))
-      );
+      return Math.sqrt(Math.max(d1 * d1, (d1 - dA) * (d1 - dA)) +
+          Math.max(d2 * d2, (d2 - dA) * (d2 - dA)) +
+          Math.max(d3 * d3, (d3 - dA) * (d3 - dA)));
     } else {
-      return Math.sqrt(
-        d1*d1 +
-        d2*d2 +
-        d3*d3);
+      return Math.sqrt(d1 * d1 + d2 * d2 + d3 * d3);
     }
   }
 }
 
-
 /// Blue channel of a color.
 const int BLUE = 0;
+
 /// Green channel of a color.
 const int GREEN = 1;
+
 /// Red channel of a color.
 const int RED = 2;
+
 /// Alpha channel of a color.
 const int ALPHA = 3;
+
 /// Luminance of a color.
 const int LUMINANCE = 4;
 
@@ -111,40 +109,37 @@ int getColor(int r, int g, int b, [int a = 255]) =>
 /**
  * Get the [channel] from the [color].
  */
-int getChannel(int color, int channel) =>
-    channel == RED ? getRed(color) :
-    channel == GREEN ? getGreen(color) :
-    channel == BLUE ? getBlue(color) :
-    getAlpha(color);
+int getChannel(int color, int channel) => channel == RED
+    ? getRed(color)
+    : channel == GREEN
+        ? getGreen(color)
+        : channel == BLUE ? getBlue(color) : getAlpha(color);
 
 /**
  * Returns a new color, where the given [color]'s [channel] has been
  * replaced with the given [value].
  */
-int setChannel(int color, int channel, int value) =>
-    channel == RED ? setRed(color, value) :
-    channel == GREEN ? setGreen(color, value) :
-    channel == BLUE ? setBlue(color, value) :
-    setAlpha(color, value);
+int setChannel(int color, int channel, int value) => channel == RED
+    ? setRed(color, value)
+    : channel == GREEN
+        ? setGreen(color, value)
+        : channel == BLUE ? setBlue(color, value) : setAlpha(color, value);
 
 /**
  * Get the blue channel from the [color].
  */
-int getBlue(int color) =>
-    (color) & 0xff;
+int getBlue(int color) => (color) & 0xff;
 
 /**
  * Returns a new color where the blue channel of [color] has been replaced
  * by [value].
  */
-int setBlue(int color, int value) =>
-    (color & 0xffffff00) | (clamp255(value));
+int setBlue(int color, int value) => (color & 0xffffff00) | (clamp255(value));
 
 /**
  * Get the green channel from the [color].
  */
-int getGreen(int color) =>
-    (color >> 8) & 0xff;
+int getGreen(int color) => (color >> 8) & 0xff;
 
 /**
  * Returns a new color where the green channel of [color] has been replaced
@@ -156,8 +151,7 @@ int setGreen(int color, int value) =>
 /**
  * Get the red channel from the [color].
  */
-int getRed(int color) =>
-    (color >> 16) & 0xff;
+int getRed(int color) => (color >> 16) & 0xff;
 
 /**
  * Returns a new color where the red channel of [color] has been replaced
@@ -169,8 +163,7 @@ int setRed(int color, int value) =>
 /**
  * Get the alpha channel from the [color].
  */
-int getAlpha(int color) =>
-    (color >> 24) & 0xff;
+int getAlpha(int color) => (color >> 24) & 0xff;
 
 /**
  * Returns a new color where the alpha channel of [color] has been replaced
@@ -216,7 +209,7 @@ int getLuminance(int color) {
  * Returns the luminance (grayscale) value of the color.
  */
 int getLuminanceRGB(int r, int g, int b) =>
-  (0.299 * r + 0.587 * g + 0.114 * b).round();
+    (0.299 * r + 0.587 * g + 0.114 * b).round();
 
 /**
  * Convert an HSL color to RGB, where h is specified in normalized degrees
@@ -243,14 +236,14 @@ List<int> hslToRGB(num hue, num saturation, num lightness) {
       return q;
     }
     if (t < 2.0 / 3.0) {
-      return p + (q - p) * (2.0/3.0 - t) * 6.0;
+      return p + (q - p) * (2.0 / 3.0 - t) * 6.0;
     }
     return p;
   }
 
   var q = lightness < 0.5
-          ? lightness * (1.0 + saturation)
-          : lightness + saturation - lightness * saturation;
+      ? lightness * (1.0 + saturation)
+      : lightness + saturation - lightness * saturation;
   var p = 2.0 * lightness - q;
 
   var r = hue2rgb(p, q, hue + 1.0 / 3.0);
@@ -279,29 +272,41 @@ List<int> hsvToRGB(num hue, num saturation, num brightness) {
 
   switch (h.toInt()) {
     case 0:
-      return [(brightness * 255.0).round(),
-              (t * 255.0).round(),
-              (p * 255.0).round()];
+      return [
+        (brightness * 255.0).round(),
+        (t * 255.0).round(),
+        (p * 255.0).round()
+      ];
     case 1:
-      return [(q * 255.0).round(),
-              (brightness * 255.0).round(),
-              (p * 255.0).round()];
+      return [
+        (q * 255.0).round(),
+        (brightness * 255.0).round(),
+        (p * 255.0).round()
+      ];
     case 2:
-      return [(p * 255.0).round(),
-              (brightness * 255.0).round(),
-              (t * 255.0).round()];
+      return [
+        (p * 255.0).round(),
+        (brightness * 255.0).round(),
+        (t * 255.0).round()
+      ];
     case 3:
-      return [(p * 255.0).round(),
-              (q * 255.0).round(),
-              (brightness * 255.0).round()];
+      return [
+        (p * 255.0).round(),
+        (q * 255.0).round(),
+        (brightness * 255.0).round()
+      ];
     case 4:
-      return [(t * 255.0).round(),
-              (p * 255.0).round(),
-              (brightness * 255.0).round()];
+      return [
+        (t * 255.0).round(),
+        (p * 255.0).round(),
+        (brightness * 255.0).round()
+      ];
     case 5:
-      return [(brightness * 255.0).round(),
-              (p * 255.0).round(),
-              (q * 255.0).round()];
+      return [
+        (brightness * 255.0).round(),
+        (p * 255.0).round(),
+        (q * 255.0).round()
+      ];
     default:
       throw new ImageException('invalid hue');
   }
@@ -321,7 +326,7 @@ List<double> rgbToHSL(num r, num g, num b) {
   var s;
   var l = (max + min) / 2.0;
 
-  if (max == min){
+  if (max == min) {
     return [0.0, 0.0, l];
   }
 
@@ -395,9 +400,11 @@ List<int> xyzToRGB(num x, num y, num z) {
     b *= 12.92;
   }
 
-  return [(r * 255).toInt().clamp(0, 255),
-          (g * 255).toInt().clamp(0, 255),
-          (b * 255).toInt().clamp(0, 255)];
+  return [
+    (r * 255).toInt().clamp(0, 255),
+    (g * 255).toInt().clamp(0, 255),
+    (b * 255).toInt().clamp(0, 255)
+  ];
 }
 
 /**
@@ -409,9 +416,11 @@ List<int> cmykToRGB(num c, num m, num y, num k) {
   m /= 255.0;
   y /= 255.0;
   k /= 255.0;
-  return [(255.0 * (1.0 - c) * (1.0 - k)).round(),
-          (255.0 * (1.0 - m) * (1.0 - k)).round(),
-          (255.0 * (1.0 - y) * (1.0 - k)).round()];
+  return [
+    (255.0 * (1.0 - c) * (1.0 - k)).round(),
+    (255.0 * (1.0 - m) * (1.0 - k)).round(),
+    (255.0 * (1.0 - y) * (1.0 - k)).round()
+  ];
 }
 
 /**
@@ -433,7 +442,7 @@ List<int> labToRGB(num l, num a, num b) {
     y = (y - 16 / 116) / 7.787;
   }
 
-  double x3 = Math.pow(x,  3);
+  double x3 = Math.pow(x, 3);
   if (x3 > 0.008856) {
     x = x3;
   } else {
@@ -478,9 +487,11 @@ List<int> labToRGB(num l, num a, num b) {
     B = 12.92 * B;
   }
 
-  return [(R * 255.0).toInt().clamp(0,  255),
-          (G * 255.0).toInt().clamp(0,  255),
-          (B * 255.0).toInt().clamp(0,  255)];
+  return [
+    (R * 255.0).toInt().clamp(0, 255),
+    (G * 255.0).toInt().clamp(0, 255),
+    (B * 255.0).toInt().clamp(0, 255)
+  ];
 }
 
 /**
@@ -491,20 +502,28 @@ List<double> rgbToXYZ(num r, num g, num b) {
   g = g / 255.0;
   b = b / 255.0;
 
-  if ( r > 0.04045 ) r = Math.pow((r + 0.055) / 1.055, 2.4);
-  else               r = r / 12.92;
-  if ( g > 0.04045 ) g = Math.pow((g + 0.055) / 1.055, 2.4);
-  else               g = g / 12.92;
-  if ( b > 0.04045 ) b = Math.pow((b + 0.055) / 1.055, 2.4);
-  else               b = b / 12.92;
+  if (r > 0.04045)
+    r = Math.pow((r + 0.055) / 1.055, 2.4);
+  else
+    r = r / 12.92;
+  if (g > 0.04045)
+    g = Math.pow((g + 0.055) / 1.055, 2.4);
+  else
+    g = g / 12.92;
+  if (b > 0.04045)
+    b = Math.pow((b + 0.055) / 1.055, 2.4);
+  else
+    b = b / 12.92;
 
   r = r * 100.0;
   g = g * 100.0;
   b = b * 100.0;
 
-  return [r * 0.4124 + g * 0.3576 + b * 0.1805,
-          r * 0.2126 + g * 0.7152 + b * 0.0722,
-          r * 0.0193 + g * 0.1192 + b * 0.9505];
+  return [
+    r * 0.4124 + g * 0.3576 + b * 0.1805,
+    r * 0.2126 + g * 0.7152 + b * 0.0722,
+    r * 0.0193 + g * 0.1192 + b * 0.9505
+  ];
 }
 
 /**
@@ -515,16 +534,20 @@ List<double> xyzToLab(num x, num y, num z) {
   y = y / 100.0;
   z = z / 108.883;
 
-  if (x > 0.008856) x = Math.pow(x, 1/3.0);
-  else              x = (7.787 * x) + (16 / 116.0);
-  if (y > 0.008856) y = Math.pow(y, 1/3.0);
-  else              y = (7.787 * y) + (16 / 116.0);
-  if (z > 0.008856) z = Math.pow(z, 1/3.0);
-  else              z = (7.787 * z) + (16 / 116.0);
+  if (x > 0.008856)
+    x = Math.pow(x, 1 / 3.0);
+  else
+    x = (7.787 * x) + (16 / 116.0);
+  if (y > 0.008856)
+    y = Math.pow(y, 1 / 3.0);
+  else
+    y = (7.787 * y) + (16 / 116.0);
+  if (z > 0.008856)
+    z = Math.pow(z, 1 / 3.0);
+  else
+    z = (7.787 * z) + (16 / 116.0);
 
-  return [(116.0 * y) - 16,
-          500.0 * (x - y),
-          200.0 * (y - z)];
+  return [(116.0 * y) - 16, 500.0 * (x - y), 200.0 * (y - z)];
 }
 
 /**
@@ -535,12 +558,18 @@ List<double> rgbToLab(num r, num g, num b) {
   g = g / 255.0;
   b = b / 255.0;
 
-  if ( r > 0.04045 ) r = Math.pow((r + 0.055) / 1.055, 2.4);
-  else               r = r / 12.92;
-  if ( g > 0.04045 ) g = Math.pow((g + 0.055) / 1.055, 2.4);
-  else               g = g / 12.92;
-  if ( b > 0.04045 ) b = Math.pow((b + 0.055) / 1.055, 2.4);
-  else               b = b / 12.92;
+  if (r > 0.04045)
+    r = Math.pow((r + 0.055) / 1.055, 2.4);
+  else
+    r = r / 12.92;
+  if (g > 0.04045)
+    g = Math.pow((g + 0.055) / 1.055, 2.4);
+  else
+    g = g / 12.92;
+  if (b > 0.04045)
+    b = Math.pow((b + 0.055) / 1.055, 2.4);
+  else
+    b = b / 12.92;
 
   r = r * 100.0;
   g = g * 100.0;
@@ -554,14 +583,18 @@ List<double> rgbToLab(num r, num g, num b) {
   y = y / 100.0;
   z = z / 108.883;
 
-  if (x > 0.008856) x = Math.pow(x, 1/3.0);
-  else              x = (7.787 * x) + (16 / 116.0);
-  if (y > 0.008856) y = Math.pow(y, 1/3.0);
-  else              y = (7.787 * y) + (16 / 116.0);
-  if (z > 0.008856) z = Math.pow(z, 1/3.0);
-  else              z = (7.787 * z) + (16 / 116.0);
+  if (x > 0.008856)
+    x = Math.pow(x, 1 / 3.0);
+  else
+    x = (7.787 * x) + (16 / 116.0);
+  if (y > 0.008856)
+    y = Math.pow(y, 1 / 3.0);
+  else
+    y = (7.787 * y) + (16 / 116.0);
+  if (z > 0.008856)
+    z = Math.pow(z, 1 / 3.0);
+  else
+    z = (7.787 * z) + (16 / 116.0);
 
-  return [(116.0 * y) - 16,
-          500.0 * (x - y),
-          200.0 * (y - z)];
+  return [(116.0 * y) - 16, 500.0 * (x - y), 200.0 * (y - z)];
 }

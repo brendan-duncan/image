@@ -7,12 +7,16 @@ import '../util/random.dart';
 
 /// Gaussian noise type used by [noise].
 const int NOISE_GAUSSIAN = 0;
+
 /// Uniform noise type used by [noise].
 const int NOISE_UNIFORM = 1;
+
 /// Salt&Pepper noise type used by [noise].
 const int NOISE_SALT_PEPPER = 2;
+
 /// Poisson noise type used by [noise].
 const int NOISE_POISSON = 3;
+
 /// Rice noise type used by [noise].
 const int NOISE_RICE = 4;
 
@@ -21,8 +25,8 @@ const int NOISE_RICE = 4;
  * should be.  [type] should be one of the following: [NOISE_GAUSSIAN],
  * [NOISE_UNIFORM], [NOISE_SALT_PEPPER], [NOISE_POISSON], or [NOISE_RICE].
  */
-Image noise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
-  Math.Random random}) {
+Image noise(Image image, double sigma,
+    {int type: NOISE_GAUSSIAN, Math.Random random}) {
   if (random == null) {
     random = Math.Random();
   }
@@ -57,7 +61,7 @@ Image noise(Image image, double sigma, {int type: NOISE_GAUSSIAN,
         image[i] = getColor(r, g, b, a);
       }
       break;
-    case NOISE_UNIFORM :
+    case NOISE_UNIFORM:
       for (int i = 0; i < len; ++i) {
         int c = image[i];
         int r = (getRed(c) + nsigma * crand(random)).toInt();

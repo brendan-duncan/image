@@ -27,10 +27,11 @@ class JpegFrame {
 
     for (int componentId in components.keys) {
       JpegComponent component = components[componentId];
-      int blocksPerLine = ((samplesPerLine / 8).ceil() *
-                           component.hSamples / maxHSamples).ceil();
-      int blocksPerColumn = ((scanLines / 8).ceil() *
-                             component.vSamples / maxVSamples).ceil();
+      int blocksPerLine =
+          ((samplesPerLine / 8).ceil() * component.hSamples / maxHSamples)
+              .ceil();
+      int blocksPerColumn =
+          ((scanLines / 8).ceil() * component.vSamples / maxVSamples).ceil();
       int blocksPerLineForMcu = mcusPerLine * component.hSamples;
       int blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
 
