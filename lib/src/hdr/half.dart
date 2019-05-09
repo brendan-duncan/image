@@ -75,21 +75,25 @@ class Half {
   Half operator -() => new Half.fromBits(_h ^ 0x8000);
 
   /// Addition operator for Half or num left operands.
-  Half operator +(num f) {
-    return new Half(toDouble() + f.toDouble());
+  Half operator +(dynamic f) {
+    double d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
+    return new Half(toDouble() + d);
   }
 
   /// Subtraction operator for Half or num left operands.
-  Half operator -(num f) {
-    return new Half(toDouble() - f.toDouble());
+  Half operator -(dynamic f) {
+    double d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
+    return new Half(toDouble() - d.toDouble());
   }
 
-  Half operator *(num f) {
-    return new Half(toDouble() * f.toDouble());
+  Half operator *(dynamic f) {
+    double d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
+    return new Half(toDouble() * d.toDouble());
   }
 
-  Half operator /(num f) {
-    return new Half(toDouble() / f.toDouble());
+  Half operator /(dynamic f) {
+    double d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
+    return new Half(toDouble() / d.toDouble());
   }
 
   /// Round to n-bit precision (n should be between 0 and 10).
