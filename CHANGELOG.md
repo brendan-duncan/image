@@ -1,3 +1,12 @@
+## 2.0.8 - May 8, 2019
+
+- Add ability to quantize an image to any number of colors.
+- Optimizations for the JPEG decoder.
+- Use #AARRGGBB for colors instead of ##AABBGGRR, to be compatible with Flutter image class.
+- Add floodfill drawing function.
+- CopyRectify to transform an arbitrary quad to the full image.
+- Improve performance of CopyResize.
+
 ## 2.0.7 - February 5, 2019
 
 - Improve JPEG decoding performance.
@@ -138,4 +147,3 @@ Update SDK dependency to a 2.0 development release.
 ## 1.1.7 - January 28, 2014
 
 - Added WebP decoding support, included animated WebP.
-
