@@ -332,7 +332,7 @@ class PngDecoder extends Decoder {
     return image;
   }
 
-  Image decodeImage(List<int> data, {int frame: 0}) {
+  Image decodeImage(List<int> data, {int frame = 0}) {
     if (startDecode(data) == null) {
       return null;
     }

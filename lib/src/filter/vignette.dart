@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math';
 
 import '../image.dart';
 import '../internal/clamp.dart';
@@ -15,7 +15,7 @@ double _smoothStep(double edge0, double edge1, double x) {
 }
 
 Image vignette(Image src,
-    {double start: 0.3, double end: 0.75, double amount: 0.8}) {
+    {double start = 0.3, double end = 0.75, double amount = 0.8}) {
   final int h = src.height - 1;
   final int w = src.width - 1;
   double invAmt = 1.0 - amount;
@@ -25,7 +25,7 @@ Image vignette(Image src,
     for (int x = 0; x <= w; ++x, i += 4) {
       double dx = 0.5 - (x / w);
 
-      double d = Math.sqrt(dx * dx + dy * dy);
+      double d = sqrt(dx * dx + dy * dy);
       d = _smoothStep(end, start, d);
 
       p[i] = clamp255((amount * p[i] * d + invAmt * p[i]).toInt());

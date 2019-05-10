@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'color.dart';
@@ -162,7 +162,7 @@ class Image {
    * for informational purposes and has no effect on the actual stored data,
    * which is always in 4-byte RGBA format.
    */
-  void set format(int f) {
+  set format(int f) {
     if (f == _format) {
       return;
     }
@@ -190,8 +190,8 @@ class Image {
    * Add the colors of [other] to the pixels of this image.
    */
   Image operator +(Image other) {
-    int h = Math.min(height, other.height);
-    int w = Math.min(width, other.width);
+    int h = min(height, other.height);
+    int w = min(width, other.width);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         int c1 = getPixel(x, y);
@@ -216,8 +216,8 @@ class Image {
    * Subtract the colors of [other] from the pixels of this image.
    */
   Image operator -(Image other) {
-    int h = Math.min(height, other.height);
-    int w = Math.min(width, other.width);
+    int h = min(height, other.height);
+    int w = min(width, other.width);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         int c1 = getPixel(x, y);
@@ -242,8 +242,8 @@ class Image {
    * Multiply the colors of [other] with the pixels of this image.
    */
   Image operator *(Image other) {
-    int h = Math.min(height, other.height);
-    int w = Math.min(width, other.width);
+    int h = min(height, other.height);
+    int w = min(width, other.width);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         int c1 = getPixel(x, y);
@@ -268,8 +268,8 @@ class Image {
    * OR the colors of [other] to the pixels of this image.
    */
   Image operator |(Image other) {
-    int h = Math.min(height, other.height);
-    int w = Math.min(width, other.width);
+    int h = min(height, other.height);
+    int w = min(width, other.width);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         int c1 = getPixel(x, y);
@@ -294,8 +294,8 @@ class Image {
    * AND the colors of [other] with the pixels of this image.
    */
   Image operator &(Image other) {
-    int h = Math.min(height, other.height);
-    int w = Math.min(width, other.width);
+    int h = min(height, other.height);
+    int w = min(width, other.width);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         int c1 = getPixel(x, y);
@@ -320,8 +320,8 @@ class Image {
    * Modula the colors of [other] with the pixels of this image.
    */
   Image operator %(Image other) {
-    int h = Math.min(height, other.height);
-    int w = Math.min(width, other.width);
+    int h = min(height, other.height);
+    int w = min(width, other.width);
     for (int y = 0; y < h; ++y) {
       for (int x = 0; x < w; ++x) {
         int c1 = getPixel(x, y);

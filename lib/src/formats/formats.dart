@@ -186,14 +186,14 @@ Image readJpg(List<int> bytes) => decodeJpg(bytes);
 /**
  * Encode an image to the JPEG format.
  */
-List<int> encodeJpg(Image image, {int quality: 100}) {
+List<int> encodeJpg(Image image, {int quality = 100}) {
   return new JpegEncoder(quality: quality).encodeImage(image);
 }
 
 /**
  * Renamed to [encodeJpg], left for backward compatibility.
  */
-List<int> writeJpg(Image image, {int quality: 100}) =>
+List<int> writeJpg(Image image, {int quality = 100}) =>
     encodeJpg(image, quality: quality);
 
 /**
@@ -218,21 +218,21 @@ Image readPng(List<int> bytes) => decodePng(bytes);
 /**
  * Encode an image to the PNG format.
  */
-List<int> encodePng(Image image, {int level: 6}) {
+List<int> encodePng(Image image, {int level = 6}) {
   return new PngEncoder(level: level).encodeImage(image);
 }
 
 /**
  * Encode an animation to the PNG format.
  */
-List<int> encodePngAnimation(Animation anim, {int level: 6}) {
+List<int> encodePngAnimation(Animation anim, {int level = 6}) {
   return new PngEncoder(level: level).encodeAnimation(anim);
 }
 
 /**
  * Renamed to [encodePng], left for backward compatibility.
  */
-List<int> writePng(Image image, {int level: 6}) =>
+List<int> writePng(Image image, {int level = 6}) =>
     encodePng(image, level: level);
 
 /**
@@ -330,6 +330,6 @@ Image decodePsd(List<int> bytes) {
  * Decode an OpenEXR formatted image, tone-mapped using the
  * given [exposure] to a low-dynamic-range [Image].
  */
-Image decodeExr(List<int> bytes, {double exposure: 1.0}) {
+Image decodeExr(List<int> bytes, {double exposure = 1.0}) {
   return new ExrDecoder(exposure: exposure).decodeImage(bytes);
 }

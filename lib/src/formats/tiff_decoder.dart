@@ -54,7 +54,7 @@ class TiffDecoder extends Decoder {
    * animated, the specified [frame] will be decoded.  If there was a problem
    * decoding the file, null is returned.
    */
-  Image decodeImage(List<int> data, {int frame: 0}) {
+  Image decodeImage(List<int> data, {int frame = 0}) {
     InputBuffer ptr = InputBuffer(new Uint8List.fromList(data));
 
     TiffInfo info = _readHeader(ptr);
@@ -65,7 +65,7 @@ class TiffDecoder extends Decoder {
     return info.images[frame].decode(ptr);
   }
 
-  HdrImage decodeHdrImage(List<int> data, {int frame: 0}) {
+  HdrImage decodeHdrImage(List<int> data, {int frame = 0}) {
     InputBuffer ptr = InputBuffer(new Uint8List.fromList(data));
 
     TiffInfo info = _readHeader(ptr);
@@ -152,7 +152,7 @@ class TiffDecoder extends Decoder {
       }
     }
 
-    return info.images.length > 0 ? info : null;
+    return info.images.isNotEmpty ? info : null;
   }
 
   InputBuffer _input;

@@ -23,7 +23,7 @@ Image copyInto(Image dst, Image src,
     int srcY,
     int srcW,
     int srcH,
-    bool blend: true}) {
+    bool blend = true}) {
   if (dstX == null) {
     dstX = 0;
   }

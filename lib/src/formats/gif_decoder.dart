@@ -71,7 +71,9 @@ class GifDecoder extends Decoder {
             break;
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      print(error);
+    }
 
     //_numFrames = info.numFrames;
     return info;
@@ -140,7 +142,7 @@ class GifDecoder extends Decoder {
     return _decodeImage(info.frames[frame]);
   }
 
-  Image decodeImage(List<int> bytes, {int frame: 0}) {
+  Image decodeImage(List<int> bytes, {int frame = 0}) {
     if (startDecode(bytes) == null) {
       return null;
     }

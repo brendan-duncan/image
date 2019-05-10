@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 
-/**
- * Exif data stored with an image.
- */
+/// Exif data stored with an image.
 class ExifData {
   static const int CAMERA_MAKE = 0x010F; // string
   static const int CAMERA_MODEL = 0x0110; // string

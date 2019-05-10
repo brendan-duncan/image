@@ -1,13 +1,11 @@
-import 'dart:math' as Math;
+import 'dart:math';
 
 import '../image.dart';
 import '../internal/clamp.dart';
 import 'grayscale.dart';
 
-/**
- * Apply Sobe edge detection filtering to the [src] Image.
- */
-Image sobel(Image src, {double amount: 1.0}) {
+/// Apply Sobel edge detection filtering to the [src] Image.
+Image sobel(Image src, {double amount = 1.0}) {
   double invAmount = 1.0 - amount;
   Image orig = grayscale(new Image.from(src));
   final List<int> origRGBA = orig.getBytes();
@@ -37,7 +35,7 @@ Image sobel(Image src, {double amount: 1.0}) {
       double h = -tlInt - 2.0 * tInt - trInt + blInt + 2.0 * bInt + brInt;
       double v = -blInt - 2.0 * lInt - tlInt + brInt + 2.0 * rInt + trInt;
 
-      int mag = clamp255((Math.sqrt(h * h + v * v) * 255.0).toInt());
+      int mag = clamp255((sqrt(h * h + v * v) * 255.0).toInt());
 
       rgba[pi] = clamp255((mag * amount + rgba[pi] * invAmount).toInt());
       rgba[pi + 1] =

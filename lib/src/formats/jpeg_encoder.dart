@@ -11,7 +11,7 @@ import 'jpeg/jpeg.dart';
 /// Derived from:
 /// https://github.com/owencm/javascript-jpeg-encoder
 class JpegEncoder extends Encoder {
-  JpegEncoder({int quality: 100}) {
+  JpegEncoder({int quality = 100}) {
     _initHuffmanTbl();
     _initCategoryNumber();
     _initRGBYUVTable();
@@ -524,7 +524,8 @@ class JpegEncoder extends Encoder {
     int lng;
     while (i <= end0pos) {
       int startpos = i;
-      for (; (DU[i] == 0) && (i <= end0pos); ++i);
+      for (; (DU[i] == 0) && (i <= end0pos); ++i) {
+      }
 
       int nrzeroes = i - startpos;
       if (nrzeroes >= I16) {

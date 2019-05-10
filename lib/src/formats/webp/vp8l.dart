@@ -23,7 +23,7 @@ class VP8L {
   VP8L(InputBuffer input, WebPInfo webp)
       : this.input = input,
         this.webp = webp,
-        this.br = VP8LBitReader(input) {}
+        this.br = VP8LBitReader(input);
 
   bool decodeHeader() {
     int signature = br.readBits(8);

@@ -107,8 +107,9 @@ void _fill4Core(Image src, int x, int y, TestPixel array, MarkPixel mark) {
     if (lastRowLength != 0 && array(y, x)) {
       // if this is not the first row and the leftmost cell is filled...
       do {
-        if (--lastRowLength == 0)
+        if (--lastRowLength == 0) {
           return; // shorten the row. if it's full, we're done
+        }
       } while (array(y,
           ++x)); // otherwise, update the starting point of the main scan to match
       sx = x;

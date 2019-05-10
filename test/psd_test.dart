@@ -1,18 +1,18 @@
-import 'dart:io' as Io;
+import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Io.Directory dir = Io.Directory('test/res/psd');
+  Directory dir = Directory('test/res/psd');
   List files = dir.listSync();
 
   group('PSD', () {
     for (var f in files) {
-      if (f is! Io.File || !f.path.endsWith('.psd')) {
+      if (f is! File || !f.path.endsWith('.psd')) {
         continue;
       }
 
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test(name, () {
         print('Decoding $name');
 
@@ -20,7 +20,7 @@ void main() {
 
         if (psd != null) {
           List<int> outPng = PngEncoder().encodeImage(psd);
-          new Io.File('out/psd/$name.png')
+          File('out/psd/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(outPng);
         } else {

@@ -107,7 +107,7 @@ class WebPDecoder extends Decoder {
   /// If it's not a valid webp file, null is returned.
   /// If the webp file stores animated frames, only the first image will
   /// be returned.  Use [decodeAnimation] to decode the full animation.
-  Image decodeImage(List<int> bytes, {int frame: 0}) {
+  Image decodeImage(List<int> bytes, {int frame = 0}) {
     startDecode(bytes);
     _info.frame = 0;
     _info.numFrames = 1;
@@ -168,7 +168,7 @@ class WebPDecoder extends Decoder {
     return anim;
   }
 
-  Image _decodeFrame(InputBuffer input, {int frame: 0}) {
+  Image _decodeFrame(InputBuffer input, {int frame = 0}) {
     InternalWebPInfo webp = InternalWebPInfo();
     if (!_getInfo(input, webp)) {
       return null;

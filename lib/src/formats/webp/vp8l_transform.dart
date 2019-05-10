@@ -437,7 +437,7 @@ class _VP8LMultipliers {
     data[2] = 0;
   }
 
-  void set colorCode(int colorCode) {
+  set colorCode(int colorCode) {
     data[0] = (colorCode >> 0) & 0xff;
     data[1] = (colorCode >> 8) & 0xff;
     data[2] = (colorCode >> 16) & 0xff;

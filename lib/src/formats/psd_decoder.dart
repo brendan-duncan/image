@@ -34,7 +34,7 @@ class PsdDecoder extends Decoder {
    * animated, the specified [frame] will be decoded.  If there was a problem
    * decoding the file, null is returned.
    */
-  Image decodeImage(List<int> bytes, {int frame: 0}) {
+  Image decodeImage(List<int> bytes, {int frame = 0}) {
     startDecode(bytes);
     return decodeFrame(frame);
   }

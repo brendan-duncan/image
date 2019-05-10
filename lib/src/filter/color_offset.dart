@@ -1,10 +1,8 @@
 import '../image.dart';
 import '../internal/clamp.dart';
 
-/**
- * Add the [red], [green], [blue] and [alpha] values to the [src] image
- * colors, a per-channel brightness.
- */
+/// Add the [red], [green], [blue] and [alpha] values to the [src] image
+/// colors, a per-channel brightness.
 Image colorOffset(Image src, int red, int green, int blue, int alpha) {
   var pixels = src.getBytes();
   for (int i = 0, len = pixels.length; i < len; i += 4) {

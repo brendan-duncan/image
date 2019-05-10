@@ -104,7 +104,7 @@ class ExrWavelet {
         for (; px <= ex; px += ox2) {
           int p01 = px + ox1;
 
-          if (w14 != 0) {
+          if (w14) {
             wdec14(input[px], input[p01], a_b);
             i00 = a_b[0];
             input[p01] = a_b[1];

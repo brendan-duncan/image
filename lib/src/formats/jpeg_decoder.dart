@@ -49,7 +49,7 @@ class JpegDecoder extends Decoder {
     return image;
   }
 
-  Image decodeImage(List<int> data, {int frame: 0}) {
+  Image decodeImage(List<int> data, {int frame = 0}) {
     JpegData jpeg = JpegData();
     jpeg.read(data);
 

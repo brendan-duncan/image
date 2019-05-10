@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math';
 
 import '../color.dart';
 import '../image.dart';
@@ -20,15 +20,13 @@ const int NOISE_POISSON = 3;
 /// Rice noise type used by [noise].
 const int NOISE_RICE = 4;
 
-/**
- * Add random noise to pixel values.  [sigma] determines how strong the effect
- * should be.  [type] should be one of the following: [NOISE_GAUSSIAN],
- * [NOISE_UNIFORM], [NOISE_SALT_PEPPER], [NOISE_POISSON], or [NOISE_RICE].
- */
+/// Add random noise to pixel values.  [sigma] determines how strong the effect
+/// should be.  [type] should be one of the following: [NOISE_GAUSSIAN],
+/// [NOISE_UNIFORM], [NOISE_SALT_PEPPER], [NOISE_POISSON], or [NOISE_RICE].
 Image noise(Image image, double sigma,
-    {int type: NOISE_GAUSSIAN, Math.Random random}) {
+    {int type = NOISE_GAUSSIAN, Random random}) {
   if (random == null) {
-    random = Math.Random();
+    random = Random();
   }
 
   double nsigma = sigma;
@@ -101,26 +99,26 @@ Image noise(Image image, double sigma,
       }
       break;
     case NOISE_RICE:
-      double sqrt2 = Math.sqrt(2.0);
+      double sqrt2 = sqrt(2.0);
       for (int i = 0; i < len; ++i) {
         int c = image[i];
 
         double val0 = getRed(c) / sqrt2;
         double re = (val0 + nsigma * grand(random));
         double im = (val0 + nsigma * grand(random));
-        double val = Math.sqrt(re * re + im * im);
+        double val = sqrt(re * re + im * im);
         int r = val.toInt();
 
         val0 = getGreen(c) / sqrt2;
         re = (val0 + nsigma * grand(random));
         im = (val0 + nsigma * grand(random));
-        val = Math.sqrt(re * re + im * im);
+        val = sqrt(re * re + im * im);
         int g = val.toInt();
 
         val0 = getBlue(c) / sqrt2;
         re = (val0 + nsigma * grand(random));
         im = (val0 + nsigma * grand(random));
-        val = Math.sqrt(re * re + im * im);
+        val = sqrt(re * re + im * im);
         int b = val.toInt();
 
         int a = getAlpha(c);

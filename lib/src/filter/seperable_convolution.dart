@@ -1,12 +1,10 @@
 import '../image.dart';
 import 'seperable_kernel.dart';
 
-/**
- * Apply a generic seperable convolution filter the [src] image, using the
- * given [kernel].
- *
- * [gaussianBlur] is an example of such a filter.
- */
+/// Apply a generic seperable convolution filter the [src] image, using the
+/// given [kernel].
+///
+/// [gaussianBlur] is an example of such a filter.
 Image seperableConvolution(Image src, SeperableKernel kernel) {
   // Apply the filter horizontally
   Image tmp = Image.from(src);

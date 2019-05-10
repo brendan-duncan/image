@@ -21,7 +21,7 @@ class PvrtcEncoder {
   static const int PVR_RGB_4BPP = 2;
   static const int PVR_RGBA_4BPP = 3;
 
-  Uint8List encodePvr(Image bitmap, {int format: PVR_AUTO}) {
+  Uint8List encodePvr(Image bitmap, {int format = PVR_AUTO}) {
     OutputBuffer output = OutputBuffer();
 
     var pvrtc;

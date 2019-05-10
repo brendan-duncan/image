@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import '../color.dart';
 import '../image.dart';
 import '../image_exception.dart';
 
@@ -26,8 +25,8 @@ Image copyResizeCropSquare(Image src, int size) {
   double dy = src.height / height;
   double dx = src.width / width;
 
-  int xOffset = ((width - size) / 2).toInt();
-  int yOffset = ((height - size) / 2).toInt();
+  int xOffset = ((width - size) ~/ 2);
+  int yOffset = ((height - size) ~/ 2);
 
   final scaleX = Int32List(size);
   for (int x = 0; x < size; ++x) {

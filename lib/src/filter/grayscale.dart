@@ -1,9 +1,7 @@
 import '../color.dart';
 import '../image.dart';
 
-/**
- * Convert the image to grayscale.
- */
+/// Convert the image to grayscale.
 Image grayscale(Image src) {
   var p = src.getBytes();
   for (int i = 0, len = p.length; i < len; i += 4) {

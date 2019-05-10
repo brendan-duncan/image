@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math';
 import 'dart:typed_data';
 
 import '../decode_info.dart';
@@ -279,11 +279,11 @@ class PsdImage extends DecodeInfo {
   }
 
   static int _blendLighten(int a, int b) {
-    return Math.max(a, b);
+    return max(a, b);
   }
 
   static int _blendDarken(int a, int b) {
-    return Math.min(a, b);
+    return min(a, b);
   }
 
   static int _blendMultiply(int a, int b) {

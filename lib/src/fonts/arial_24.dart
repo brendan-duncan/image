@@ -1,8 +1,6 @@
 import '../bitmap_font.dart';
 
-/**
- * 24px Arial font for use with [drawString] and [drawChar].
- */
+/// 24px Arial font for use with [drawString] and [drawChar].
 final BitmapFont arial_24 = BitmapFont.fromZip(_ARIAL_24);
 
 const List<int> _ARIAL_24 = const [

@@ -16,7 +16,9 @@ void _addControl(String label, String value, Html.DivElement parent, callback) {
     try {
       double d = double.parse(amountEdit.value);
       callback(d);
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
   });
   amountLabel.htmlFor = label + '_edit';
   parent.append(amountLabel);

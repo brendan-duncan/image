@@ -19,7 +19,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     implements ExrPxr24Compressor {
   InternalExrPxr24Compressor(
       ExrPart header, this._maxScanLineSize, this._numScanLines)
-      : super(header) {}
+      : super(header);
 
   int numScanLines() => _numScanLines;
 

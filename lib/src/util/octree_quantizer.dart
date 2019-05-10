@@ -185,7 +185,7 @@ class _OctreeNode {
   int count = 0;
   int heap_idx = 0;
   List<_OctreeNode> children = List<_OctreeNode>(8);
-  _OctreeNode parent = null;
+  _OctreeNode parent;
   int childCount = 0;
   int childIndex = 0;
   int flags = 0;

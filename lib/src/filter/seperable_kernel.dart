@@ -1,44 +1,32 @@
 import '../color.dart';
 import '../image.dart';
 
-/**
- * A kernel object to use with [seperableConvolution] filtering.
- */
+/// A kernel object to use with [seperableConvolution] filtering.
 class SeperableKernel {
   final List<double> coefficients;
   final int size;
 
-  /**
-   * Create a seperable convolution kernel for the given [radius].
-   */
+  /// Create a seperable convolution kernel for the given [radius].
   SeperableKernel(int radius)
       : coefficients = List<double>(2 * radius + 1),
         this.size = radius;
 
-  /**
-   * Get the number of coefficients in the kernel.
-   */
+  /// Get the number of coefficients in the kernel.
   int get length => coefficients.length;
 
-  /**
-   * Get a coefficient from the kernel.
-   */
+  /// Get a coefficient from the kernel.
   double operator [](int index) => coefficients[index];
 
-  /**
-   * Set a coefficient in the kernel.
-   */
+  /// Set a coefficient in the kernel.
   void operator []=(int index, double c) {
     coefficients[index] = c;
   }
 
-  /**
-   * Apply the kernel to the [src] image, storing the results in [dst],
-   * for a single dimension. If [horizontal is true, the filter will be
-   * applied to the horizontal axis, otherwise it will be appied to the
-   * vertical axis.
-   */
-  void apply(Image src, Image dst, {bool horizontal: true}) {
+  /// Apply the kernel to the [src] image, storing the results in [dst],
+  /// for a single dimension. If [horizontal is true, the filter will be
+  /// applied to the horizontal axis, otherwise it will be appied to the
+  /// vertical axis.
+  void apply(Image src, Image dst, {bool horizontal = true}) {
     if (horizontal) {
       for (int y = 0; y < src.height; ++y) {
         _applyCoeffsLine(src, dst, y, src.width, horizontal);
@@ -50,9 +38,7 @@ class SeperableKernel {
     }
   }
 
-  /**
-   * Scale all of the coefficients by [s].
-   */
+  /// Scale all of the coefficients by [s].
   void scaleCoefficients(double s) {
     for (int i = 0; i < coefficients.length; ++i) {
       coefficients[i] *= s;

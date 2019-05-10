@@ -1,16 +1,14 @@
-import 'dart:math' as Math;
+import 'dart:math';
 
 import '../color.dart';
 import '../image.dart';
 
-/**
- * Generate a normal map from a heightfield bump image.
- *
- * The red channel of the [src] image is used as an input, 0 represents a low
- * height and 1 a high value. The optional [strength] parameter allows to set
- * the strength of the normal image.
- */
-Image bumpToNormal(Image src, {double strength: 2.0}) {
+/// Generate a normal map from a heightfield bump image.
+///
+/// The red channel of the [src] image is used as an input, 0 represents a low
+/// height and 1 a high value. The optional [strength] parameter allows to set
+/// the strength of the normal image.
+Image bumpToNormal(Image src, {double strength = 2.0}) {
   Image dest = Image.from(src);
 
   for (var y = 0; y < src.height; ++y) {
@@ -29,7 +27,7 @@ Image bumpToNormal(Image src, {double strength: 2.0}) {
         dv /= z;
       }
 
-      final dw = Math.sqrt(1.0 - du * du - dv * dv);
+      final dw = sqrt(1.0 - du * du - dv * dv);
       final nX = du * 0.5 + 0.5;
       final nY = dv * 0.5 + 0.5;
       final nZ = dw;

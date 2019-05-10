@@ -1,6 +1,4 @@
-/**
- * Provides information about the image being decoded.
- */
+/// Provides information about the image being decoded.
 abstract class DecodeInfo {
   /// The width of the image canvas.
   int width = 0;

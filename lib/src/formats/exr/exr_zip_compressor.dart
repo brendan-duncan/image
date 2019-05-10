@@ -19,7 +19,7 @@ class InternalExrZipCompressor extends InternalExrCompressor
 
   InternalExrZipCompressor(
       ExrPart header, int maxScanLineSize, this._numScanLines)
-      : super(header) {}
+      : super(header);
 
   int numScanLines() => _numScanLines;
 

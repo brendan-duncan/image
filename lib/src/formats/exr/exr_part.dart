@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math';
 import 'dart:typed_data';
 
 import '../../image_exception.dart';
@@ -173,7 +173,7 @@ class ExrPart {
 
       int maxBytesPerLine = 0;
       for (int y = 0; y < height; ++y) {
-        maxBytesPerLine = Math.max(maxBytesPerLine, _bytesPerLine[y]);
+        maxBytesPerLine = max(maxBytesPerLine, _bytesPerLine[y]);
       }
 
       _compressor = ExrCompressor(_compressionType, this, maxBytesPerLine);
@@ -220,7 +220,7 @@ class ExrPart {
       case MIPMAP_LEVELS:
         int w = maxX - minX + 1;
         int h = maxY - minY + 1;
-        num = _roundLog2(Math.max(w, h), _tileRoundingMode) + 1;
+        num = _roundLog2(max(w, h), _tileRoundingMode) + 1;
         break;
       case RIPMAP_LEVELS:
         int w = maxX - minX + 1;
@@ -243,7 +243,7 @@ class ExrPart {
       case MIPMAP_LEVELS:
         int w = (maxX - minX) + 1;
         int h = (maxY - minY) + 1;
-        num = _roundLog2(Math.max(w, h), _tileRoundingMode) + 1;
+        num = _roundLog2(max(w, h), _tileRoundingMode) + 1;
         break;
       case RIPMAP_LEVELS:
         int h = (maxY - minY) + 1;
@@ -304,12 +304,12 @@ class ExrPart {
     }
   }
 
-  int _levelSize(int min, int max, int l, int rmode) {
+  int _levelSize(int _min, int _max, int l, int rmode) {
     if (l < 0) {
       throw new ImageException('Argument not in valid range.');
     }
 
-    int a = (max - min) + 1;
+    int a = (_max - _min) + 1;
     int b = (1 << l);
     int size = a ~/ b;
 
@@ -317,7 +317,7 @@ class ExrPart {
       size += 1;
     }
 
-    return Math.max(size, 1);
+    return max(size, 1);
   }
 
   static const int TYPE_SCANLINE = 0;

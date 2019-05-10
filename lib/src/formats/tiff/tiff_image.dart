@@ -281,7 +281,9 @@ class TiffImage {
         try {
           decoder.decode(new InputBuffer.from(p, offset: 0, length: byteCount),
               bdata.buffer);
-        } catch (e) {}
+        } catch (e) {
+          print(e);
+        }
         // Horizontal Differencing Predictor
         if (predictor == 2) {
           int count;

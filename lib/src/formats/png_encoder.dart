@@ -13,7 +13,7 @@ import 'encoder.dart';
  * Encode an image to the PNG format.
  */
 class PngEncoder extends Encoder {
-  PngEncoder({this.filter: FILTER_PAETH, this.level});
+  PngEncoder({this.filter = FILTER_PAETH, this.level});
 
   void addFrame(Image image) {
     xOffset = image.xOffset;

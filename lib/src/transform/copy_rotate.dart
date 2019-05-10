@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math';
 
 import '../image.dart';
 import '../util/interpolation.dart';
@@ -6,7 +6,7 @@ import '../util/interpolation.dart';
 /**
  * Returns a copy of the [src] image, rotated by [angle] degrees.
  */
-Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
+Image copyRotate(Image src, num angle, {int interpolation = LINEAR}) {
   num nangle = angle % 360.0;
 
   // Optimized version for orthogonal angles.
@@ -49,9 +49,9 @@ Image copyRotate(Image src, num angle, {int interpolation: LINEAR}) {
   }
 
   // Generic angle.
-  double rad = (nangle * Math.pi / 180.0);
-  double ca = Math.cos(rad);
-  double sa = Math.sin(rad);
+  double rad = (nangle * pi / 180.0);
+  double ca = cos(rad);
+  double sa = sin(rad);
   double ux = (src.width * ca).abs();
   double uy = (src.width * sa).abs();
   double vx = (src.height * sa).abs();

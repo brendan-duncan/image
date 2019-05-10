@@ -14,7 +14,7 @@ abstract class ExrRleCompressor extends ExrCompressor {
 class InternalExrRleCompressor extends InternalExrCompressor
     implements ExrRleCompressor {
   InternalExrRleCompressor(ExrPart header, int maxScanLineSize)
-      : super(header) {}
+      : super(header);
 
   int numScanLines() => 1;
 

@@ -1,8 +1,6 @@
 import '../image.dart';
 
-/**
- * Invert the colors of the [src] image.
- */
+/// Invert the colors of the [src] image.
 Image invert(Image src) {
   var p = src.getBytes();
   for (int i = 0, len = p.length; i < len; i += 4) {

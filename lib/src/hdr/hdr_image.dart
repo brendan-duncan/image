@@ -35,7 +35,7 @@ class HdrImage {
   HdrSlice alpha;
   HdrSlice depth;
 
-  HdrImage() {}
+  HdrImage();
 
   /// Create an RGB[A] image.
   HdrImage.create(int width, int height, int channels, int format) {

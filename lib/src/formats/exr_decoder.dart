@@ -36,7 +36,7 @@ class ExrDecoder extends Decoder {
   double bloomAmount;
   double bloomRadius;
 
-  ExrDecoder({this.exposure: 1.0});
+  ExrDecoder({this.exposure = 1.0});
 
   bool isValidFile(List<int> data) {
     return ExrImage.isValidFile(data);
@@ -67,7 +67,7 @@ class ExrDecoder extends Decoder {
     return exrImage.parts[frame].framebuffer;
   }
 
-  Image decodeImage(List<int> bytes, {int frame: 0}) {
+  Image decodeImage(List<int> bytes, {int frame = 0}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -75,7 +75,7 @@ class ExrDecoder extends Decoder {
     return decodeFrame(frame);
   }
 
-  HdrImage decodeHdrImage(List<int> bytes, {int frame: 0}) {
+  HdrImage decodeHdrImage(List<int> bytes, {int frame = 0}) {
     if (startDecode(bytes) == null) {
       return null;
     }

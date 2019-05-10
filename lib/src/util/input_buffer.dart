@@ -12,14 +12,15 @@ class InputBuffer {
   bool bigEndian;
 
   /// Create a InputStream for reading from a List<int>
-  InputBuffer(List<int> buffer, {this.bigEndian: false, int offset: 0, int length})
+  InputBuffer(List<int> buffer, {this.bigEndian = false, int offset = 0,
+              int length})
       : this.buffer = buffer,
         this.start = offset,
         this.offset = offset,
         this.end = (length == null) ? buffer.length : offset + length;
 
   /// Create a copy of [other].
-  InputBuffer.from(InputBuffer other, {int offset: 0, int length})
+  InputBuffer.from(InputBuffer other, {int offset = 0, int length})
       : this.buffer = other.buffer,
         this.offset = other.offset + offset,
         this.start = other.start,
@@ -71,7 +72,7 @@ class InputBuffer {
   /// to the start of the buffer.  If [position] is not specified, the current
   /// read position is used. If [length] is not specified, the remainder of this
   /// stream is used.
-  InputBuffer subset(int count, {int position, int offset: 0}) {
+  InputBuffer subset(int count, {int position, int offset = 0}) {
     int pos = position != null ? start + position : this.offset;
     pos += offset;
 

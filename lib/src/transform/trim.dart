@@ -39,7 +39,8 @@ const int TRIM_ALL = TRIM_TOP | TRIM_BOTTOM | TRIM_LEFT | TRIM_RIGHT;
 /// Find the crop area to be used by the trim function. Returns the
 /// coordinates as [x, y, width, height]. You could pass these coordinates
 /// to the [copyCrop] function to crop the image.
-List<int> findTrim(Image src, {int mode: TRIM_TRANSPARENT, int sides: TRIM_ALL}) {
+List<int> findTrim(Image src, {int mode = TRIM_TRANSPARENT,
+                   int sides = TRIM_ALL}) {
   int h = src.height;
   int w = src.width;
 
@@ -105,7 +106,7 @@ List<int> findTrim(Image src, {int mode: TRIM_TRANSPARENT, int sides: TRIM_ALL})
 /// [sides] can be used to control which sides of the image get trimmed,
 /// and can be any combination of [TRIM_TOP], [TRIM_BOTTOM], [TRIM_LEFT],
 /// and [TRIM_RIGHT].
-Image trim(Image src, {int mode: TRIM_TRANSPARENT, int sides: TRIM_ALL}) {
+Image trim(Image src, {int mode = TRIM_TRANSPARENT, int sides = TRIM_ALL}) {
   if (mode == TRIM_TRANSPARENT && src.format == Image.RGB) {
     return new Image.from(src);
   }

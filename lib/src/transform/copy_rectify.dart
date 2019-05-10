@@ -10,7 +10,7 @@ Image copyRectify(Image src,
     Point topRight,
     Point bottomLeft,
     Point bottomRight,
-    Image toImage = null}) {
+    Image toImage}) {
   Image dst = toImage == null ? Image.from(src) : toImage;
   for (int y = 0; y < dst.height; ++y) {
     double v = y / (dst.height - 1);

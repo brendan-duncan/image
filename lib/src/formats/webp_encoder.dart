@@ -20,7 +20,7 @@ class WebPEncoder extends Encoder {
    * [quality] is controls lossy compression, in the range
    * 0 (smallest file) and 100 (biggest).
    */
-  WebPEncoder({this.format: LOSSY, this.quality: 100});
+  WebPEncoder({this.format = LOSSY, this.quality = 100});
 
   /**
    * Add a frame to be encoded. Call [finish] to encode the added frames.

@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math';
 
 import 'hdr_image.dart';
 
@@ -18,12 +18,12 @@ HdrImage reinhardToneMap(HdrImage hdr) {
 
       double lum = yw[0] * r + yw[1] * g + yw[2] * b;
       if (lum > 1.0e-4) {
-        Ywa += Math.log(lum);
+        Ywa += log(lum);
       }
     }
   }
 
-  Ywa = Math.exp(Ywa / (hdr.width * hdr.height));
+  Ywa = exp(Ywa / (hdr.width * hdr.height));
 
   double invY2 = 1.0 / (Ywa * Ywa);
 

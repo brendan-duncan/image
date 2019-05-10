@@ -16,7 +16,7 @@ class InternalExrB44Compressor extends InternalExrCompressor
     implements ExrB44Compressor {
   InternalExrB44Compressor(ExrPart header, int maxScanLineSize,
       this._numScanLines, bool optFlatFields)
-      : super(header) {}
+      : super(header);
 
   int numScanLines() => _numScanLines;
 

@@ -1,4 +1,4 @@
-import 'dart:io' as Io;
+import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -10,7 +10,7 @@ void main() {
 
       // Encode the image to PNG
       List<int> png = PngEncoder().encodeImage(image);
-      new Io.File('out/png/encode.png')
+      File('out/png/encode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
@@ -25,13 +25,13 @@ void main() {
       }
 
       List<int> png = encodePngAnimation(anim);
-      new Io.File('out/png/encodeAnimation.png')
+      File('out/png/encodeAnimation.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
 
     test('decode', () {
-      List<int> bytes = Io.File('out/png/encode.png').readAsBytesSync();
+      List<int> bytes = File('out/png/encode.png').readAsBytesSync();
       Image image = PngDecoder().decodeImage(bytes);
 
       expect(image.width, equals(64));
@@ -42,11 +42,11 @@ void main() {
       }
 
       List<int> png = PngEncoder().encodeImage(image);
-      new Io.File('out/png/decode.png').writeAsBytesSync(png);
+      File('out/png/decode.png').writeAsBytesSync(png);
     });
 
     test('iCCP', () {
-      final bytes = Io.File('test/res/png/iCCP.png').readAsBytesSync();
+      final bytes = File('test/res/png/iCCP.png').readAsBytesSync();
       final image = PngDecoder().decodeImage(bytes);
       expect(image.iccProfile, isNotNull);
       expect(image.iccProfile.data, isNotNull);
@@ -60,11 +60,11 @@ void main() {
           image2.iccProfile.data.length, equals(image.iccProfile.data.length));
     });
 
-    Io.Directory dir = Io.Directory('test/res/png');
+    Directory dir = Directory('test/res/png');
     List files = dir.listSync();
 
     for (var f in files) {
-      if (f is! Io.File || !f.path.endsWith('.png')) {
+      if (f is! File || !f.path.endsWith('.png')) {
         continue;
       }
 
@@ -94,29 +94,31 @@ void main() {
       //      interlacing:
       //        n - non-interlaced
       //        i - interlaced
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
 
       test('PNG $name', () {
-        Io.File file = f;
+        File file = f;
 
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
           try {
-            new PngDecoder().decodeImage(file.readAsBytesSync());
-            throw new ImageException(
+            PngDecoder().decodeImage(file.readAsBytesSync());
+            throw ImageException(
                 'This image should not have loaded: $name.');
-          } catch (e) {}
+          } catch (e) {
+            print(e);
+          }
         } else {
           Animation anim = decodeAnimation(file.readAsBytesSync());
           if (anim.length == 1) {
             List<int> png = PngEncoder().encodeImage(anim[0]);
-            new Io.File('out/png/${name}')
+            File('out/png/${name}')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
           } else {
             for (int i = 0; i < anim.length; ++i) {
               List<int> png = PngEncoder().encodeImage(anim[i]);
-              new Io.File('out/png/${name}-$i.png')
+              File('out/png/${name}-$i.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
             }

@@ -2,12 +2,10 @@ import '../color.dart';
 import '../image.dart';
 import '../internal/clamp.dart';
 
-/**
- * Apply sepia tone to the image.
- *
- * [amount] controls the strength of the effect, in the range 0.0 - 1.0.
- */
-Image sepia(Image src, {num amount: 1.0}) {
+/// Apply sepia tone to the image.
+///
+/// [amount] controls the strength of the effect, in the range 0.0 - 1.0.
+Image sepia(Image src, {num amount = 1.0}) {
   if (amount == 0) {
     return src;
   }

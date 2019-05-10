@@ -1,18 +1,16 @@
-import 'dart:html' as Html;
+import 'dart:html';
 import 'dart:convert';
 import 'package:image/image.dart';
 
-/**
- * Convert all .webp IMG elements on the page to PNG so that they can be viewed
- * by browsers like FireFox and IE.
- */
+/// Convert all .webp IMG elements on the page to PNG so that they can be viewed
+/// by browsers like FireFox and IE.
 void main() {
-  var images = Html.querySelectorAll('img');
+  var images = querySelectorAll('img');
 
   for (var _img in images) {
-    var img = _img as Html.ImageElement;
+    var img = _img as ImageElement;
     if (img.src.toLowerCase().endsWith('.webp')) {
-      var req = Html.HttpRequest();
+      var req = HttpRequest();
       req.open('GET', img.src);
       req.overrideMimeType('text\/plain; charset=x-user-defined');
       req.onLoadEnd.listen((e) {
