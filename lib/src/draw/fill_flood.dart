@@ -6,10 +6,7 @@ import '../image.dart';
 typedef TestPixel = bool Function(int y, int x);
 typedef MarkPixel = void Function(int y, int x);
 
-/**
- * Fill the 4-connected shape containing [x],[y] in the image [src] with the given [color]
- */
-
+/// Fill the 4-connected shape containing [x],[y] in the image [src] with the given [color]
 Image fillFlood(Image src, int x, int y, int color,
     {num threshold = 0.0, bool compareAlpha = false}) {
   int srcColor = src.getPixel(x, y);
@@ -33,10 +30,7 @@ Image fillFlood(Image src, int x, int y, int color,
   return src;
 }
 
-/**
- * Create a mask describing the 4-connected shape containing [x],[y] in the image [src]
- */
-
+/// Create a mask describing the 4-connected shape containing [x],[y] in the image [src]
 Uint8List maskFlood(Image src, int x, int y,
     {num threshold = 0.0, bool compareAlpha = false, int fillValue = 255}) {
   int srcColor = src.getPixel(x, y);
@@ -75,20 +69,23 @@ bool _testPixelLabColorDistance(
   return Color.distance(pixelColor, refColor, compareAlpha) > threshold;
 }
 
-/**
- * Adam Milazzo (2015). A More Efficient Flood Fill.
- * http://www.adammil.net/blog/v126_A_More_Efficient_Flood_Fill.html
- */
-
+/// Adam Milazzo (2015). A More Efficient Flood Fill.
+/// http://www.adammil.net/blog/v126_A_More_Efficient_Flood_Fill.html
 void _fill4(Image src, int x, int y, TestPixel array, MarkPixel mark) {
   // at this point, we know array(y,x) is clear, and we want to move as far as possible to the upper-left. moving
   // up is much more important than moving left, so we could try to make this smarter by sometimes moving to
   // the right if doing so would allow us to move further up, but it doesn't seem worth the complexity
   while (true) {
     int ox = x, oy = y;
-    while (y != 0 && !array(y - 1, x)) y--;
-    while (x != 0 && !array(y, x - 1)) x--;
-    if (x == ox && y == oy) break;
+    while (y != 0 && !array(y - 1, x)) {
+      y--;
+    }
+    while (x != 0 && !array(y, x - 1)) {
+      x--;
+    }
+    if (x == ox && y == oy) {
+      break;
+    }
   }
   _fill4Core(src, x, y, array, mark);
 }
@@ -126,16 +123,19 @@ void _fill4Core(Image src, int x, int y, TestPixel array, MarkPixel mark) {
         // like |* **| when we begin filling from (2,0), move down to (2,1), and then move left to (0,1).
         // the  |****| main scan assumes the portion of the previous row from x to x+lastRowLength has already
         // been filled. adjusting x and lastRowLength breaks that assumption in this case, so we must fix it
-        if (y != 0 && !array(y - 1, x))
-          _fill4(src, x, y - 1, array,
-              mark); // use _Fill since there may be more up and left
+        if (y != 0 && !array(y - 1, x)) {
+          // use _Fill since there may be more up and left
+          _fill4(src, x, y - 1, array, mark);
+        }
       }
     }
 
     // now at this point we can begin to scan the current row in the rectangular block. the span of the previous
     // row from x (inclusive) to x+lastRowLength (exclusive) has already been filled, so we don't need to
     // check it. so scan across to the right in the current row
-    for (; sx < src.width && !array(y, sx); rowLength++, sx++) mark(y, sx);
+    for (; sx < src.width && !array(y, sx); rowLength++, sx++) {
+      mark(y, sx);
+    }
     // now we've scanned this row. if the block is rectangular, then the previous row has already been scanned,
     // so we don't need to look upwards and we're going to scan the next row in the next iteration so we don't
     // need to look downwards. however, if the block is not rectangular, we may need to look upwards or rightwards
@@ -143,29 +143,25 @@ void _fill4Core(Image src, int x, int y, TestPixel array, MarkPixel mark) {
     // the end, as in the case of |*****|, where the first row is 5 cells long and the second row is 3 cells long.
     // we must look to the right  |*** *| of the single cell at the end of the second row, i.e. at (4,1)
     if (rowLength < lastRowLength) {
-      for (int end = x + lastRowLength;
-          ++sx <
-              end;) // 'end' is the end of the previous row, so scan the current row to
-      {
+      // 'end' is the end of the previous row, so scan the current row to
+      for (int end = x + lastRowLength; ++sx < end; ) {
         // there. any clear cells would have been connected to the previous
-        if (!array(y, sx))
-          _fill4Core(src, sx, y, array,
-              mark); // row. the cells up and left must be set so use FillCore
+        if (!array(y, sx)) {
+          _fill4Core(src, sx, y, array, mark); // row. the cells up and left must be set so use FillCore
+        }
       }
     }
     // alternately, if this row is longer than the previous row, as in the case |*** *| then we must look above
     // the end of the row, i.e at (4,0)                                         |*****|
-    else if (rowLength > lastRowLength &&
-        y != 0) // if this row is longer and we're not already at the top...
-    {
+    else if (rowLength > lastRowLength && y != 0) { // if this row is longer and we're not already at the top...
       for (int ux = x + lastRowLength; ++ux < sx;) {
         // sx is the end of the current row
-        if (!array(y - 1, ux))
-          _fill4(src, ux, y - 1, array,
-              mark); // since there may be clear cells up and left, use _Fill
+        if (!array(y - 1, ux)) {
+          // since there may be clear cells up and left, use _Fill
+          _fill4(src, ux, y - 1, array, mark);
+        }
       }
     }
     lastRowLength = rowLength; // record the new row length
-  } while (lastRowLength != 0 &&
-      ++y < src.height); // if we get to a full row or to the bottom, we're done
+  } while (lastRowLength != 0 && ++y < src.height); // if we get to a full row or to the bottom, we're done
 }

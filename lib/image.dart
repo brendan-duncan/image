@@ -1,7 +1,5 @@
-/**
- * The image library aims to provide server-side programs the ability to load,
- * manipulate, and save various image file formats.
- */
+/// The image library aims to provide server-side programs the ability to load,
+/// manipulate, and save various image file formats.
 library image;
 
 export 'src/draw/draw_char.dart';

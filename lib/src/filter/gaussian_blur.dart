@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math';
 
 import '../image.dart';
 import 'seperable_convolution.dart';
@@ -6,11 +6,9 @@ import 'seperable_kernel.dart';
 
 Map<int, SeperableKernel> _gaussianKernelCache = {};
 
-/**
- * Apply gaussian blur to the [src] image.  [radius] determines how many pixels
- * away from the current pixel should contribute to the blur, where 0 is no
- * blur and the larger the radius, the stronger the blur.
- */
+/// Apply gaussian blur to the [src] image.  [radius] determines how many pixels
+/// away from the current pixel should contribute to the blur, where 0 is no
+/// blur and the larger the radius, the stronger the blur.
 Image gaussianBlur(Image src, int radius) {
   if (radius <= 0) {
     return src;
@@ -29,7 +27,7 @@ Image gaussianBlur(Image src, int radius) {
 
     double sum = 0.0;
     for (int x = -radius; x <= radius; ++x) {
-      double c = Math.exp(-(x * x) / s);
+      double c = exp(-(x * x) / s);
       sum += c;
       kernel[x + radius] = c;
     }

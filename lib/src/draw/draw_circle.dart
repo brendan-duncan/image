@@ -1,10 +1,8 @@
 import '../image.dart';
 import 'draw_pixel.dart';
 
-/**
- * Draw a circle into the [image] with a center of [x0],[y0] and
- * the given [radius] and [color].
- */
+/// Draw a circle into the [image] with a center of [x0],[y0] and
+/// the given [radius] and [color].
 Image drawCircle(Image image, int x0, int y0, int radius, int color) {
   if (radius < 0 ||
       x0 - radius >= image.width ||

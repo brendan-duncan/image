@@ -9,13 +9,11 @@ var _g_lut = Uint8List(256);
 var _b_lut = Uint8List(256);
 var _a_lut = Uint8List(256);
 
-/**
- * Draw a string horizontally into [image] horizontally into [image] at position
- * [x],[y] with the given [color].
- *
- * You can load your own font, or use one of the existing ones
- * such as: [arial_14], [arial_24], or [arial_48].
- */
+/// Draw a string horizontally into [image] horizontally into [image] at position
+/// [x],[y] with the given [color].
+///
+/// You can load your own font, or use one of the existing ones
+/// such as: [arial_14], [arial_24], or [arial_48].
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
     {int color = 0xffffffff}) {
   if (color != 0xffffffff) {
