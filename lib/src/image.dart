@@ -462,10 +462,16 @@ class Image {
     data[y * width + x] = color;
   }
 
+  void setPixelSafe(int x, int y, int color) {
+    if (boundsSafe(x, y)) {
+      data[y * width + x] = color;
+    }
+  }
+
   /// Set the pixel at the given [x], [y] coordinate to the [color] without check the bounds.
   ///
   /// This simply replaces the existing color, it does not do any alpha
-  /// blending.  Use [drawPixel] for that.
+  /// blending. Use [drawPixel] for that.
   void setUnsafePixel(int x, int y, int color) {
     data[y * width + x] = color;
   }

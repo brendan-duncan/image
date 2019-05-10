@@ -102,11 +102,10 @@ void main() {
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
           try {
-            PngDecoder().decodeImage(file.readAsBytesSync());
-            throw ImageException(
-                'This image should not have loaded: $name.');
+            var image = PngDecoder().decodeImage(file.readAsBytesSync());
+            expect(image, isNull);
           } catch (e) {
-            print(e);
+            ;
           }
         } else {
           Animation anim = decodeAnimation(file.readAsBytesSync());

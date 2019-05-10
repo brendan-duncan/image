@@ -444,7 +444,7 @@ class PngDecoder extends Decoder {
           //int xPixels = xMax - dstX;
           for (int i = 0; i < blockHeight; ++i) {
             for (int j = 0; j < blockWidth; ++j) {
-              image.setPixel(dstX + j, dstY + j, c);
+              image.setPixelSafe(dstX + j, dstY + j, c);
             }
           }
         }
