@@ -29,10 +29,8 @@ import 'quantizer.dart';
  * Dart port by Brendan Duncan.
  */
 
-/**
- * Compute a color map with a given number of colors that best represents
- * the given image.
- */
+/// Compute a color map with a given number of colors that best represents
+/// the given image.
 class NeuralQuantizer extends Quantizer {
   Uint8List colorMap;
 
@@ -47,9 +45,7 @@ class NeuralQuantizer extends Quantizer {
     addImage(image);
   }
 
-  /**
-   * Add an image to the quantized color table.
-   */
+  /// Add an image to the quantized color table.
   void addImage(Image image) {
     _learn(image);
     _fix();
@@ -57,20 +53,14 @@ class NeuralQuantizer extends Quantizer {
     _copyColorMap();
   }
 
-  /**
-   * How many colors are in the [colorMap]?
-   */
+  /// How many colors are in the [colorMap]?
   int get numColors => NET_SIZE;
 
-  /**
-   * Get a color from the [colorMap].
-   */
+  /// Get a color from the [colorMap].
   int color(int index) => getColor(
       colorMap[index * 3], colorMap[index * 3 + 1], colorMap[index * 3 + 2]);
 
-  /**
-   * Find the index of the closest color to [c] in the [colorMap].
-   */
+  /// Find the index of the closest color to [c] in the [colorMap].
   int lookup(int c) {
     int r = getRed(c);
     int g = getGreen(c);
@@ -78,16 +68,12 @@ class NeuralQuantizer extends Quantizer {
     return _inxSearch(b, g, r);
   }
 
-  /**
-     * Find the index of the closest color to [r],[g],[b] in the [colorMap].
-     */
+  /// Find the index of the closest color to [r],[g],[b] in the [colorMap].
   int lookupRGB(int r, int g, int b) {
     return _inxSearch(b, g, r);
   }
 
-  /**
-   * Find the color closest to [c] in the [colorMap].
-   */
+  /// Find the color closest to [c] in the [colorMap].
   int getQuantizedColor(int c) {
     int r = getRed(c);
     int g = getGreen(c);
@@ -98,9 +84,7 @@ class NeuralQuantizer extends Quantizer {
     return getColor(colorMap[i], colorMap[i + 1], colorMap[i + 2], a);
   }
 
-  /**
-   * Convert the [image] to an index map, mapping to this [colorMap].
-   */
+  /// Convert the [image] to an index map, mapping to this [colorMap].
   Uint8List getIndexMap(Image image) {
     Uint8List map = Uint8List(image.width * image.height);
     for (int i = 0, len = image.length; i < len; ++i) {
@@ -219,9 +203,7 @@ class NeuralQuantizer extends Quantizer {
     }
   }
 
-  /**
-   * Insertion sort of network and building of netindex[0..255]
-   */
+  /// Insertion sort of network and building of netindex[0..255]
   void _inxBuild() {
     int previouscol = 0;
     int startpos = 0;

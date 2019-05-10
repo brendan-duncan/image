@@ -7,9 +7,7 @@ class TiffBitReader {
 
   int readByte() => readBits(8);
 
-  /**
-   * Read a number of bits from the input stream.
-   */
+  /// Read a number of bits from the input stream.
   int readBits(int numBits) {
     if (numBits == 0) {
       return 0;
@@ -44,10 +42,8 @@ class TiffBitReader {
     return value;
   }
 
-  /**
-   * Flush the rest of the bits in the buffer so the next read starts at the
-   * next byte.
-   */
+  /// Flush the rest of the bits in the buffer so the next read starts at the
+  /// next byte.
   void flushByte() {
     _bitPos = 0;
   }

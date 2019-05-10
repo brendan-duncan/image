@@ -1,8 +1,6 @@
 import '../../internal/internal.dart';
 
-/**
- * Decodes a frame from a PNG animation.
- */
+/// Decodes a frame from a PNG animation.
 class PngFrame {
   // DisposeMode
   static const int APNG_DISPOSE_OP_NONE = 0;

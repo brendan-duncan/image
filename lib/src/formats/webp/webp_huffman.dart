@@ -4,9 +4,7 @@ import '../../internal/internal.dart';
 import 'vp8l.dart';
 import 'vp8l_bit_reader.dart';
 
-/**
- * Huffman Tree.
- */
+/// Huffman Tree.
 @internal
 class HuffmanTree {
   static const int HUFF_LUT_BITS = 7;
@@ -117,11 +115,9 @@ class HuffmanTree {
     return _isFull();
   }
 
-  /**
-   * Decodes the next Huffman code from bit-stream.
-   * input.fillBitWindow() needs to be called at minimum every second call
-   * to ReadSymbol, in order to pre-fetch enough bits.
-   */
+  /// Decodes the next Huffman code from bit-stream.
+  /// input.fillBitWindow() needs to be called at minimum every second call
+  /// to ReadSymbol, in order to pre-fetch enough bits.
   int readSymbol(VP8LBitReader br) {
     int node = 0;
     int bits = br.prefetchBits();
@@ -317,9 +313,7 @@ class HuffmanTree {
   }
 }
 
-/**
- * A group of huffman trees.
- */
+/// A group of huffman trees.
 @internal
 class HTreeGroup {
   final List<HuffmanTree> htrees =

@@ -3,12 +3,10 @@ import '../exif_data.dart';
 import 'flip.dart';
 import 'copy_rotate.dart';
 
-/**
- * If [image] has an orientation value in its exif data, this will rotate the
- * image so that it physically matches its orientation. This can be used to
- * bake the orientation of the image for image formats that don't support exif
- * data.
- */
+/// If [image] has an orientation value in its exif data, this will rotate the
+/// image so that it physically matches its orientation. This can be used to
+/// bake the orientation of the image for image formats that don't support exif
+/// data.
 Image bakeOrientation(Image image) {
   Image bakedImage = Image.from(image);
   if (!image.exif.hasOrientation || image.exif.orientation == 1) {

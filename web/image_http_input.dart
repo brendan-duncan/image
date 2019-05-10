@@ -1,37 +1,33 @@
-import 'dart:html' as Html;
+import 'dart:html';
 
 import 'package:image/image.dart';
 import 'dart:convert';
 
-Html.InputElement fileInput;
+InputElement fileInput;
 
 void main() {
   // There are at least two ways to get a file into an html dart app:
   // using a file Input element, or an AJAX HttpRequest.
 
   // This example demonstrates using a file Input element.
-  fileInput = Html.querySelector("#file");
+  fileInput = querySelector("#file");
 
   fileInput.addEventListener("change", onFileChanged);
 }
 
-/**
- * Called when the user has selected a file.
- */
-void onFileChanged(Html.Event event) {
-  Html.FileList files = fileInput.files;
+/// Called when the user has selected a file.
+void onFileChanged(Event event) {
+  FileList files = fileInput.files;
   var file = files.item(0);
 
-  Html.FileReader reader = Html.FileReader();
+  FileReader reader = FileReader();
   reader.addEventListener("load", onFileLoaded);
   reader.readAsArrayBuffer(file);
 }
 
-/**
- * Called when the file has been read.
- */
-void onFileLoaded(Html.Event event) {
-  Html.FileReader reader = event.currentTarget;
+/// Called when the file has been read.
+void onFileLoaded(Event event) {
+  FileReader reader = event.currentTarget;
 
   var bytes = reader.result;
 
@@ -51,17 +47,17 @@ void onFileLoaded(Html.Event event) {
   // a canvas.
   if (image != null) {
     // Add a separator to the html page
-    Html.document.body.append(new Html.ParagraphElement());
+    document.body.append(new ParagraphElement());
 
     // Draw the image into a canvas.  First create a canvas at the correct
     // resolution.
-    var c = Html.CanvasElement();
-    Html.document.body.append(c);
+    var c = CanvasElement();
+    document.body.append(c);
     c.width = image.width;
     c.height = image.height;
 
     // Create a buffer that the canvas can draw.
-    Html.ImageData d = c.context2D.createImageData(c.width, c.height);
+    ImageData d = c.context2D.createImageData(c.width, c.height);
     // Fill the buffer with our image data.
     d.data.setRange(0, d.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
@@ -71,8 +67,8 @@ void onFileLoaded(Html.Event event) {
     // This requires encoding it to a common format (like PNG), base64 encoding
     // the encoded image, and using a data url for the img src.
 
-    var img = Html.ImageElement();
-    Html.document.body.append(img);
+    var img = ImageElement();
+    document.body.append(img);
     // encode the image to a PNG
     var png = encodePng(image);
     // base64 encode the png

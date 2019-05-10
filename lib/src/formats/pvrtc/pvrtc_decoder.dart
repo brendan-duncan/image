@@ -6,10 +6,8 @@ import '../../util/input_buffer.dart';
 import 'pvrtc_color.dart';
 import 'pvrtc_packet.dart';
 
-/**
- * Ported from Jeffrey Lim's PVRTC encoder/decoder,
- * https://bitbucket.org/jthlim/pvrtccompressor
- */
+/// Ported from Jeffrey Lim's PVRTC encoder/decoder,
+/// https://bitbucket.org/jthlim/pvrtccompressor
 class PvrtcDecoder {
   Image decodePvr(List<int> data) {
     // Use a heuristic to detect potential apple PVRTC formats

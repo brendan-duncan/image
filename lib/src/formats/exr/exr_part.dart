@@ -205,9 +205,7 @@ class ExrPart {
 
   int get bottom => dataWindow[3];
 
-  /**
-   * Was this part successfully decoded?
-   */
+  /// Was this part successfully decoded?
   bool get isValid => width != null;
 
   int _calculateNumXLevels(int minX, int maxX, int minY, int maxY) {

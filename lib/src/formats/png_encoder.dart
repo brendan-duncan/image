@@ -9,9 +9,7 @@ import '../image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 
-/**
- * Encode an image to the PNG format.
- */
+/// Encode an image to the PNG format.
 class PngEncoder extends Encoder {
   PngEncoder({this.filter = FILTER_PAETH, this.level});
 
@@ -80,14 +78,10 @@ class PngEncoder extends Encoder {
     return bytes;
   }
 
-  /**
-   * Does this encoder support animation?
-   */
+  /// Does this encoder support animation?
   bool get supportsAnimation => true;
 
-  /**
-   * Encode an animation.
-   */
+  /// Encode an animation.
   List<int> encodeAnimation(Animation anim) {
     isAnimated = true;
     _frames = anim.frames.length;
@@ -99,9 +93,7 @@ class PngEncoder extends Encoder {
     return finish();
   }
 
-  /**
-   * Encode a single frame image.
-   */
+  /// Encode a single frame image.
   List<int> encodeImage(Image image) {
     isAnimated = false;
     addFrame(image);
@@ -362,9 +354,7 @@ class PngEncoder extends Encoder {
     return oi;
   }
 
-  /**
-   * Return the CRC of the bytes
-   */
+  /// Return the CRC of the bytes
   int _crc(String type, List<int> bytes) {
     int crc = getCrc32(type.codeUnits);
     return getCrc32(bytes, crc);

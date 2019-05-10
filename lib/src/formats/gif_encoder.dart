@@ -6,9 +6,6 @@ import '../util/neural_quantizer.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 
-/**
- *
- */
 class GifEncoder extends Encoder {
   GifEncoder({this.delay = 80}) : _encodedFrames = 0;
 
@@ -41,9 +38,7 @@ class GifEncoder extends Encoder {
     _lastImage = _lastColorMap.getIndexMap(image);
   }
 
-  /**
-   * Encode the images that were added with [addFrame].
-   */
+  /// Encode the images that were added with [addFrame].
   List<int> finish() {
     List<int> bytes;
     if (output == null) {
@@ -70,22 +65,16 @@ class GifEncoder extends Encoder {
     return bytes;
   }
 
-  /**
-   * Encode a single frame image.
-   */
+  /// Encode a single frame image.
   List<int> encodeImage(Image image) {
     addFrame(image);
     return finish();
   }
 
-  /**
-   * Does this encoder support animation?
-   */
+  /// Does this encoder support animation?
   bool get supportsAnimation => true;
 
-  /**
-   * Encode an animation.
-   */
+  /// Encode an animation.
   List<int> encodeAnimation(Animation anim) {
     repeat = anim.loopCount;
     for (Image f in anim) {
@@ -310,9 +299,7 @@ class GifEncoder extends Encoder {
     output.writeByte(0); // block terminator
   }
 
-  /**
-   * GIF header and Logical Screen Descriptor
-   */
+  /// GIF header and Logical Screen Descriptor
   void _writeHeader(int width, int height) {
     output.writeBytes(GIF89_STAMP.codeUnits);
     output.writeUint16(width);

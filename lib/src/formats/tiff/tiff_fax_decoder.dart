@@ -29,9 +29,7 @@ class TiffFaxDecoder {
     currChangingElems = List<int>(width);
   }
 
-  /**
-   * One-dimensional decoding methods
-   */
+  /// One-dimensional decoding methods
   void decode1D(InputBuffer out, InputBuffer compData, int startX, int height) {
     this.data = compData;
     bitPointer = 0;
@@ -185,10 +183,7 @@ class TiffFaxDecoder {
     currChangingElems[changingElemSize++] = bitOffset;
   }
 
-  /**
-   * Two-dimensional decoding methods
-   */
-
+  /// Two-dimensional decoding methods
   void decode2D(InputBuffer out, InputBuffer compData, int startX, int height,
       int tiffT4Options) {
     this.data = compData;
@@ -538,9 +533,7 @@ class TiffFaxDecoder {
     }
   }
 
-  /**
-   * Returns run length
-   */
+  /// Returns run length
   int _decodeWhiteCodeWord() {
     int current, entry, bits, isT, twoBits, code = -1;
     int runLength = 0;
@@ -585,9 +578,7 @@ class TiffFaxDecoder {
     return runLength;
   }
 
-  /**
-   * Returns run length
-   */
+  /// Returns run length
   int _decodeBlackCodeWord() {
     int current, entry, bits, isT, code = -1;
     int runLength = 0;
@@ -878,9 +869,7 @@ class TiffFaxDecoder {
     return i1;
   }
 
-  /**
-   * Move pointer backwards by given amount of bits
-   */
+  /// Move pointer backwards by given amount of bits
   void _updatePointer(int bitsToMoveBack) {
     int i = bitPointer - bitsToMoveBack;
 
@@ -892,9 +881,7 @@ class TiffFaxDecoder {
     }
   }
 
-  /**
-   * Move to the next byte boundary
-   */
+  /// Move to the next byte boundary
   bool _advancePointer() {
     if (bitPointer != 0) {
       bytePointer++;

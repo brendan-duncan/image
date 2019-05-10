@@ -9,10 +9,8 @@ const int FLIP_VERTICAL = 2;
 /// Flip the image both horizontally and vertically.
 const int FLIP_BOTH = 3;
 
-/**
- * Flips the [src] image using the given [mode], which can be one of:
- * [FLIP_HORIZONTAL], [FLIP_VERTICAL], or [FLIP_BOTH].
- */
+/// Flips the [src] image using the given [mode], which can be one of:
+/// [FLIP_HORIZONTAL], [FLIP_VERTICAL], or [FLIP_BOTH].
 Image flip(Image src, int mode) {
   if (mode < 1 || mode > 3) {
     return src;
@@ -34,9 +32,7 @@ Image flip(Image src, int mode) {
   return src;
 }
 
-/**
- * Flip the [src] image vertically.
- */
+/// Flip the [src] image vertically.
 Image flipVertical(Image src) {
   int w = src.width;
   int h = src.height;
@@ -53,9 +49,7 @@ Image flipVertical(Image src) {
   return src;
 }
 
-/**
- * Flip the src image horizontally.
- */
+/// Flip the src image horizontally.
 Image flipHorizontal(Image src) {
   int w = src.width;
   int h = src.height;

@@ -1,16 +1,12 @@
 import 'dart:math';
 
-/**
- * Return a random variable between [-1,1].
- */
+/// Return a random variable between [-1,1].
 double crand(Random rand) {
   return 1.0 - 2.0 * rand.nextDouble();
 }
 
-/**
- * Return a random variable following a gaussian distribution and a standard
- * deviation of 1.
- */
+/// Return a random variable following a gaussian distribution and a standard
+/// deviation of 1.
 double grand(Random rand) {
   double x1, w;
   do {
@@ -22,9 +18,7 @@ double grand(Random rand) {
   return x1 * sqrt((-2.0 * log(w)) / w);
 }
 
-/**
- * Return a random variable following a Poisson distribution of parameter [z].
- */
+/// Return a random variable following a Poisson distribution of parameter [z].
 int prand(Random rand, double z) {
   if (z <= 1.0e-10) {
     return 0;

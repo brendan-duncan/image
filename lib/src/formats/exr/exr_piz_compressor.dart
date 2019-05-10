@@ -10,9 +10,7 @@ import 'exr_huffman.dart';
 import 'exr_part.dart';
 import 'exr_wavelet.dart';
 
-/**
- * Wavelet compression
- */
+/// Wavelet compression
 abstract class ExrPizCompressor extends ExrCompressor {
   factory ExrPizCompressor(
           ExrPart header, int maxScanLineSize, int numScanLines) =

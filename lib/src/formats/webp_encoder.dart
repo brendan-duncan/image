@@ -5,9 +5,7 @@ import '../image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 
-/**
- * Encode an image to the PNG format.
- */
+/// Encode an image to the PNG format.
 class WebPEncoder extends Encoder {
   static const int LOSSLESS = 0;
   static const int LOSSY = 1;
@@ -15,18 +13,14 @@ class WebPEncoder extends Encoder {
   int format;
   num quality;
 
-  /**
-   * [format] can be [LOSSY] or [LOSSLESS].
-   * [quality] is controls lossy compression, in the range
-   * 0 (smallest file) and 100 (biggest).
-   */
+  /// [format] can be [LOSSY] or [LOSSLESS].
+  /// [quality] is controls lossy compression, in the range
+  /// 0 (smallest file) and 100 (biggest).
   WebPEncoder({this.format = LOSSY, this.quality = 100});
 
-  /**
-   * Add a frame to be encoded. Call [finish] to encode the added frames.
-   * If only one frame is added, a single-image WebP is encoded; otherwise
-   * if there are more than one frame, a multi-frame animated WebP is encoded.
-   */
+  /// Add a frame to be encoded. Call [finish] to encode the added frames.
+  /// If only one frame is added, a single-image WebP is encoded; otherwise
+  /// if there are more than one frame, a multi-frame animated WebP is encoded.
   void addFrame(Image image, {int duration}) {
     if (output == null) {
       output = OutputBuffer();
@@ -54,9 +48,7 @@ class WebPEncoder extends Encoder {
     _lastImage = _encodeImage(image);
   }
 
-  /**
-   * Encode the images that were added with [addFrame].
-   */
+  /// Encode the images that were added with [addFrame].
   List<int> finish() {
     List<int> bytes;
     if (output == null) {
@@ -82,22 +74,16 @@ class WebPEncoder extends Encoder {
     return bytes;
   }
 
-  /**
-   * Encode a single frame image.
-   */
+  /// Encode a single frame image.
   List<int> encodeImage(Image image) {
     addFrame(image);
     return finish();
   }
 
-  /**
-   * Does this encoder support animation?
-   */
+  /// Does this encoder support animation?
   bool get supportsAnimation => true;
 
-  /**
-   * Encode an animation.
-   */
+  /// Encode an animation.
   List<int> encodeAnimation(Animation anim) {
     for (Image f in anim) {
       addFrame(f, duration: f.duration);

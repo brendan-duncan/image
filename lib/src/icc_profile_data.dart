@@ -3,9 +3,7 @@ import 'package:archive/archive.dart';
 
 enum ICCPCompression { none, deflate }
 
-/**
- * ICC Profile data stored with an image.
- */
+/// ICC Profile data stored with an image.
 class ICCProfileData {
   String name = "";
   ICCPCompression compression;

@@ -618,9 +618,7 @@ class TiffImage {
     }
   }
 
-  /**
-   * Uncompress packbits compressed image data.
-   */
+  /// Uncompress packbits compressed image data.
   void _decodePackbits(InputBuffer data, int arraySize, List<int> dst) {
     int srcCount = 0;
     int dstCount = 0;

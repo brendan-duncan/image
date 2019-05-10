@@ -1,9 +1,9 @@
-import 'dart:io' as Io;
+import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Io.Directory dir = Io.Directory('res/tiff');
+  Directory dir = Directory('res/tiff');
   if (!dir.existsSync()) {
     return;
   }
@@ -11,7 +11,7 @@ void main() {
 
   group('TIFF/getInfo', () {
     for (var f in files) {
-      if (f is! Io.File ||
+      if (f is! File ||
           (!f.path.endsWith('.tif') && !f.path.endsWith('.tiff'))) {
         continue;
       }
@@ -55,7 +55,7 @@ void main() {
 
   group('TIFF/decodeImage', () {
     for (var f in files) {
-      if (f is! Io.File ||
+      if (f is! File ||
           (!f.path.endsWith('.tif') && !f.path.endsWith('.tiff'))) {
         continue;
       }
@@ -70,7 +70,7 @@ void main() {
         }
 
         List<int> png = PngEncoder().encodeImage(image);
-        new Io.File('out/tif/${name}.png')
+        new File('out/tif/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

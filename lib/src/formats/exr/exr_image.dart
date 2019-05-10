@@ -61,9 +61,7 @@ class ExrImage extends DecodeInfo {
 
   int get numFrames => 1;
 
-  /**
-   * Parse just enough of the file to identify that it's an EXR image.
-   */
+  /// Parse just enough of the file to identify that it's an EXR image.
   static bool isValidFile(List<int> bytes) {
     InputBuffer input = InputBuffer(bytes);
 

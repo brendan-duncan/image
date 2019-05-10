@@ -348,14 +348,10 @@ class PsdLayer {
     }
   }
 
-  /**
-   * Is this layer visible?
-   */
+  /// Is this layer visible?
   bool isVisible() => flags & FLAG_HIDDEN == 0;
 
-  /**
-   * Is this layer a folder?
-   */
+  /// Is this layer a folder?
   int type() {
     if (additionalData.containsKey(PsdLayerSectionDivider.TAG)) {
       PsdLayerSectionDivider section =
@@ -365,10 +361,8 @@ class PsdLayer {
     return PsdLayerSectionDivider.NORMAL;
   }
 
-  /**
-   * Get the channel for the given [id].
-   * Returns null if the layer does not have the given channel.
-   */
+  /// Get the channel for the given [id].
+  /// Returns null if the layer does not have the given channel.
   PsdChannel getChannel(int id) {
     for (int i = 0; i < channels.length; ++i) {
       if (channels[i].id == id) {

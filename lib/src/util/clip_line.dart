@@ -1,11 +1,9 @@
-/**
- * Clip a line to a rectangle using the Cohen–Sutherland clipping algorithm.
- * [line] is a list of 4 ints <x1, y1, x2, y2>.
- * [rect] is a list of 4 ints <x1, y1, x2, y2>.
- * Results are stored in [line].
- * If [line] falls completely outside of [rect], false is returned, otherwise
- * true is returned.
- */
+/// Clip a line to a rectangle using the Cohen–Sutherland clipping algorithm.
+/// [line] is a list of 4 ints <x1, y1, x2, y2>.
+/// [rect] is a list of 4 ints <x1, y1, x2, y2>.
+/// Results are stored in [line].
+/// If [line] falls completely outside of [rect], false is returned, otherwise
+/// true is returned.
 bool clipLine(List<int> line, List<int> rect) {
   int x0 = line[0];
   int y0 = line[1];

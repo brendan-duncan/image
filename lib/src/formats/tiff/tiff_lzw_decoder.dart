@@ -88,9 +88,7 @@ class LzwDecoder {
     }
   }
 
-  /**
-   * Returns the next 9, 10, 11 or 12 bits
-   */
+  /// Returns the next 9, 10, 11 or 12 bits
   int _getNextCode() {
     if (_bytePointer >= _dataLength) {
       return 257;
@@ -110,9 +108,7 @@ class LzwDecoder {
     return code;
   }
 
-  /**
-   * Initialize the string table.
-   */
+  /// Initialize the string table.
   void _initializeStringTable() {
     _table = Uint8List(LZ_MAX_CODE + 1);
     _prefix = Uint32List(LZ_MAX_CODE + 1);

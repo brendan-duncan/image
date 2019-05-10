@@ -882,14 +882,12 @@ class JpegData {
 
   static Uint8List dctClip;
 
-  /**
-   * Quantize the coefficients and apply IDCT.
-   *
-   * A port of poppler's IDCT method which in turn is taken from:
-   * Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
-   * "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
-   * IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
-   */
+  /// Quantize the coefficients and apply IDCT.
+  ///
+  /// A port of poppler's IDCT method which in turn is taken from:
+  /// Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
+  /// "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
+  /// IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
   void _quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
       Uint8List dataOut, Int32List dataIn) {
     Int32List p = dataIn;

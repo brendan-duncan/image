@@ -1,15 +1,15 @@
-import 'dart:html' as Html;
+import 'dart:html';
 import 'package:image/image.dart';
 
-Html.ImageData filterImageData;
-Html.CanvasElement canvas;
-Html.DivElement logDiv;
+ImageData filterImageData;
+CanvasElement canvas;
+DivElement logDiv;
 Image origImage;
 
-void _addControl(String label, String value, Html.DivElement parent, callback) {
-  Html.LabelElement amountLabel = Html.LabelElement();
+void _addControl(String label, String value, DivElement parent, callback) {
+  LabelElement amountLabel = LabelElement();
   amountLabel.text = label + ':';
-  var amountEdit = Html.InputElement();
+  var amountEdit = InputElement();
   amountEdit.value = value;
   amountEdit.id = label + '_edit';
   amountEdit.onChange.listen((e) {
@@ -23,14 +23,14 @@ void _addControl(String label, String value, Html.DivElement parent, callback) {
   amountLabel.htmlFor = label + '_edit';
   parent.append(amountLabel);
   parent.append(amountEdit);
-  parent.append(new Html.ParagraphElement());
+  parent.append(new ParagraphElement());
 }
 
 void testSepia() {
-  Html.DivElement sidebar = Html.document.querySelector('#sidebar');
+  DivElement sidebar = document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = Html.Element.tag('h1');
+  var label = Element.tag('h1');
   label.text = 'Sepia';
   sidebar.children.add(label);
 
@@ -61,10 +61,10 @@ void testSepia() {
 }
 
 void testSobel() {
-  Html.DivElement sidebar = Html.document.querySelector('#sidebar');
+  DivElement sidebar = document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = Html.Element.tag('h1');
+  var label = Element.tag('h1');
   label.text = 'Sepia';
   sidebar.children.add(label);
 
@@ -95,10 +95,10 @@ void testSobel() {
 }
 
 void testGaussian() {
-  Html.DivElement sidebar = Html.document.querySelector('#sidebar');
+  DivElement sidebar = document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = Html.Element.tag('h1');
+  var label = Element.tag('h1');
   label.text = 'Gaussian Blur';
   sidebar.children.add(label);
 
@@ -129,10 +129,10 @@ void testGaussian() {
 }
 
 void testVignette() {
-  Html.DivElement sidebar = Html.document.querySelector('#sidebar');
+  DivElement sidebar = document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = Html.Element.tag('h1');
+  var label = Element.tag('h1');
   label.text = 'Vignette';
   sidebar.children.add(label);
 
@@ -175,10 +175,10 @@ void testVignette() {
 }
 
 void testPixelate() {
-  Html.DivElement sidebar = Html.document.querySelector('#sidebar');
+  DivElement sidebar = document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = Html.Element.tag('h1');
+  var label = Element.tag('h1');
   label.text = 'Pixelate';
   sidebar.children.add(label);
 
@@ -209,10 +209,10 @@ void testPixelate() {
 }
 
 void testColorOffset() {
-  Html.DivElement sidebar = Html.document.querySelector('#sidebar');
+  DivElement sidebar = document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = Html.Element.tag('h1');
+  var label = Element.tag('h1');
   label.text = 'Pixelate';
   sidebar.children.add(label);
 
@@ -261,10 +261,10 @@ void testColorOffset() {
 }
 
 void testAdjustColor() {
-  Html.DivElement sidebar = Html.document.querySelector('#sidebar');
+  DivElement sidebar = document.querySelector('#sidebar');
   sidebar.children.clear();
 
-  var label = Html.Element.tag('h1');
+  var label = Element.tag('h1');
   label.text = 'Adjust Color';
   sidebar.children.add(label);
 
@@ -340,10 +340,10 @@ void testAdjustColor() {
 }
 
 void main() {
-  canvas = Html.document.querySelector('#filter_canvas');
-  logDiv = Html.document.querySelector('#log');
+  canvas = document.querySelector('#filter_canvas');
+  logDiv = document.querySelector('#log');
 
-  Html.SelectElement menu = Html.document.querySelector('#FilterType');
+  SelectElement menu = document.querySelector('#FilterType');
   menu.onChange.listen((e) {
     if (menu.value == 'Pixelate') {
       testPixelate();
@@ -362,10 +362,10 @@ void main() {
     }
   });
 
-  Html.ImageElement img = Html.ImageElement();
+  ImageElement img = ImageElement();
   img.src = 'res/big_buck_bunny.jpg';
   img.onLoad.listen((e) {
-    var c = Html.CanvasElement();
+    var c = CanvasElement();
     c.width = img.width;
     c.height = img.height;
     c.context2D.drawImage(img, 0, 0);

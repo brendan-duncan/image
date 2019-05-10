@@ -7,24 +7,22 @@ import 'icc_profile_data.dart';
 import 'image_exception.dart';
 import 'util/interpolation.dart';
 
-/**
- * A 32-bit image buffer where pixels are encoded into 32-bit unsigned ints.
- * You can use the methods in color to encode/decode the RGBA channels of a
- * color for a pixel.
- *
- * Pixels are stored in 32-bit unsigned integers in aabbggrr format.
- * This is to be consistent with HTML canvas data.  You can use
- * [getBytes] to access the pixel at the byte (channel) level, where there
- * are four bytes per pixel in red, green, blue, and alpha order.
- *
- * If this image is a frame of an animation as decoded by the [decodeFrame]
- * method of [Decoder], then the [xOffset], [yOffset], [width] and [height]
- * coordinates determine area of the canvas this image should be drawn into,
- * as some frames of an animation only modify part of the canvas (recording
- * the part of the frame that actually changes).  The [decodeAnimation] method
- * will always return the fully composed animation, so these coordinate
- * properties are not used.
- */
+/// A 32-bit image buffer where pixels are encoded into 32-bit unsigned ints.
+/// You can use the methods in color to encode/decode the RGBA channels of a
+/// color for a pixel.
+///
+/// Pixels are stored in 32-bit unsigned integers in aabbggrr format.
+/// This is to be consistent with HTML canvas data.  You can use
+/// [getBytes] to access the pixel at the byte (channel) level, where there
+/// are four bytes per pixel in red, green, blue, and alpha order.
+///
+/// If this image is a frame of an animation as decoded by the [decodeFrame]
+/// method of [Decoder], then the [xOffset], [yOffset], [width] and [height]
+/// coordinates determine area of the canvas this image should be drawn into,
+/// as some frames of an animation only modify part of the canvas (recording
+/// the part of the frame that actually changes).  The [decodeAnimation] method
+/// will always return the fully composed animation, so these coordinate
+/// properties are not used.
 class Image {
   /// 24-bit RGB image.
   static const int RGB = 3;
@@ -79,9 +77,7 @@ class Image {
   ExifData exif;
   ICCProfileData iccProfile;
 
-  /**
-   * Create an image with the given dimensions and format.
-   */
+  /// Create an image with the given dimensions and format.
   Image(int width, int height,
       [this._format = RGBA, ExifData exif, ICCProfileData iccp])
       : this.width = width,
@@ -90,9 +86,7 @@ class Image {
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
-  /**
-   * Create a copy of the image [other].
-   */
+  /// Create a copy of the image [other].
   Image.from(Image other)
       : width = other.width,
         height = other.height,
@@ -106,18 +100,16 @@ class Image {
         exif = ExifData.from(other.exif),
         iccProfile = other.iccProfile;
 
-  /**
-   * Create an image from [bytes].
-   *
-   * [bytes] should be in RGB<A> format with a byte [0,255] for each channel.
-   * The length of [bytes] should be <3|4> * (width * height).
-   * [format] determines if there are 3 or 4 channels per pixel.
-   *
-   * For example, given an Html Canvas, you could create an image:
-   * var bytes = canvas.getContext('2d').getImageData(0, 0,
-   *   canvas.width, canvas.height).data;
-   * Image image = Image.fromBytes(canvas.width, canvas.height, bytes);
-   */
+  /// Create an image from [bytes].
+  ///
+  /// [bytes] should be in RGB<A> format with a byte [0,255] for each channel.
+  /// The length of [bytes] should be <3|4> * (width * height).
+  /// [format] determines if there are 3 or 4 channels per pixel.
+  ///
+  /// For example, given an Html Canvas, you could create an image:
+  /// var bytes = canvas.getContext('2d').getImageData(0, 0,
+  ///   canvas.width, canvas.height).data;
+  /// Image image = Image.fromBytes(canvas.width, canvas.height, bytes);
   Image.fromBytes(int width, int height, List<int> bytes,
       [this._format = RGBA, ExifData exif, ICCProfileData iccp])
       : this.width = width,
@@ -134,34 +126,26 @@ class Image {
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
-  /**
-   * Clone this image.
-   */
+  /// Clone this image.
   Image clone() => new Image.from(this);
 
-  /**
-   * Get the RGBA bytes from the image.  You can use this to access the
-   * RGBA color channels directly, or to pass it to something like an
-   * Html canvas context.
-   *
-   * For example, given an Html Canvas, you could draw this image into the
-   * canvas:
-   * Html.ImageData d = context2D.createImageData(image.width, image.height);
-   * d.data.setRange(0, image.length, image.getBytes());
-   * context2D.putImageData(data, 0, 0);
-   */
+  /// Get the RGBA bytes from the image.  You can use this to access the
+  /// RGBA color channels directly, or to pass it to something like an
+  /// Html canvas context.
+  ///
+  /// For example, given an Html Canvas, you could draw this image into the
+  /// canvas:
+  /// Html.ImageData d = context2D.createImageData(image.width, image.height);
+  /// d.data.setRange(0, image.length, image.getBytes());
+  /// context2D.putImageData(data, 0, 0);
   Uint8List getBytes() => new Uint8List.view(data.buffer);
 
-  /**
-   * Get the format of the image, either [RGB] or [RGBA].
-   */
+  /// Get the format of the image, either [RGB] or [RGBA].
   int get format => _format;
 
-  /**
-   * Set the format of the image, either [RGB] or [RGBA].  The format is used
-   * for informational purposes and has no effect on the actual stored data,
-   * which is always in 4-byte RGBA format.
-   */
+  /// Set the format of the image, either [RGB] or [RGBA].  The format is used
+  /// for informational purposes and has no effect on the actual stored data,
+  /// which is always in 4-byte RGBA format.
   set format(int f) {
     if (f == _format) {
       return;
@@ -172,23 +156,17 @@ class Image {
     _format = f;
   }
 
-  /**
-   * How many color channels does the image have, 3 or 4?
-   * Note that internally, images always have 4 8-bit channels.
-   */
+  /// How many color channels does the image have, 3 or 4?
+  /// Note that internally, images always have 4 8-bit channels.
   int get numChannels => _format;
 
-  /**
-   * Set all of the pixels of the image to the given [color].
-   */
+  /// Set all of the pixels of the image to the given [color].
   Image fill(int color) {
     data.fillRange(0, data.length, color);
     return this;
   }
 
-  /**
-   * Add the colors of [other] to the pixels of this image.
-   */
+  /// Add the colors of [other] to the pixels of this image.
   Image operator +(Image other) {
     int h = min(height, other.height);
     int w = min(width, other.width);
@@ -212,9 +190,7 @@ class Image {
     return this;
   }
 
-  /**
-   * Subtract the colors of [other] from the pixels of this image.
-   */
+  /// Subtract the colors of [other] from the pixels of this image.
   Image operator -(Image other) {
     int h = min(height, other.height);
     int w = min(width, other.width);
@@ -238,9 +214,7 @@ class Image {
     return this;
   }
 
-  /**
-   * Multiply the colors of [other] with the pixels of this image.
-   */
+  /// Multiply the colors of [other] with the pixels of this image.
   Image operator *(Image other) {
     int h = min(height, other.height);
     int w = min(width, other.width);
@@ -264,9 +238,7 @@ class Image {
     return this;
   }
 
-  /**
-   * OR the colors of [other] to the pixels of this image.
-   */
+  /// OR the colors of [other] to the pixels of this image.
   Image operator |(Image other) {
     int h = min(height, other.height);
     int w = min(width, other.width);
@@ -290,9 +262,7 @@ class Image {
     return this;
   }
 
-  /**
-   * AND the colors of [other] with the pixels of this image.
-   */
+  /// AND the colors of [other] with the pixels of this image.
   Image operator &(Image other) {
     int h = min(height, other.height);
     int w = min(width, other.width);
@@ -316,9 +286,7 @@ class Image {
     return this;
   }
 
-  /**
-   * Modula the colors of [other] with the pixels of this image.
-   */
+  /// Modula the colors of [other] with the pixels of this image.
   Image operator %(Image other) {
     int h = min(height, other.height);
     int w = min(width, other.width);
@@ -342,52 +310,34 @@ class Image {
     return this;
   }
 
-  /**
-   * The size of the image buffer.
-   */
+  /// The size of the image buffer.
   int get length => data.length;
 
-  /**
-   * Get a pixel from the buffer.
-   */
+  /// Get a pixel from the buffer.
   int operator [](int index) => data[index];
 
-  /**
-   * Set a pixel in the buffer.
-   */
+  /// Set a pixel in the buffer.
   void operator []=(int index, int color) {
     data[index] = color;
   }
 
-  /**
-   * Get the buffer index for the [x], [y] pixel coordinates.
-   */
+  /// Get the buffer index for the [x], [y] pixel coordinates.
   int index(int x, int y) => y * width + x;
 
-  /**
-   * Is the given pixel coordinates within the resolution of the image.
-   */
+  /// Is the given pixel coordinates within the resolution of the image.
   bool boundsSafe(int x, int y) => x >= 0 && x < width && y >= 0 && y < height;
 
-  /**
-   * Get the pixel from the given [x], [y] coordinate.
-   */
+  /// Get the pixel from the given [x], [y] coordinate.
   int getPixel(int x, int y) => boundsSafe(x, y) ? data[y * width + x] : 0;
 
-  /**
-   * Get the pixel from the given [x], [y] coordinate without check the bounds.
-   */
+  /// Get the pixel from the given [x], [y] coordinate without check the bounds.
   int getUnsafePixel(int x, int y) => data[y * width + x];
 
-  /**
-   * Get the pixel from the given [offset], index.
-   */
+  /// Get the pixel from the given [offset], index.
   int getUnsafePixel_(int offset) => data[offset];
 
-  /**
-   * Get the pixel using the given [interpolation] type for non-integer pixel
-   * coordinates.
-   */
+  /// Get the pixel using the given [interpolation] type for non-integer pixel
+  /// coordinates.
   int getPixelInterpolate(num fx, num fy, [int interpolation = LINEAR]) {
     if (interpolation == CUBIC) {
       return getPixelCubic(fx, fy);
@@ -397,10 +347,8 @@ class Image {
     return getPixel(fx.toInt(), fy.toInt());
   }
 
-  /**
-   * Get the pixel using linear interpolation for non-integer pixel
-   * coordinates.
-   */
+  /// Get the pixel using linear interpolation for non-integer pixel
+  /// coordinates.
   int getPixelLinear(num fx, num fy) {
     int x = fx.toInt() - (fx >= 0 ? 0 : 1);
     int nx = x + 1;
@@ -428,10 +376,8 @@ class Image {
         _linear(getAlpha(Icc), getAlpha(Inc), getAlpha(Icn), getAlpha(Inn)));
   }
 
-  /**
-   * Get the pixel using cubic interpolation for non-integer pixel
-   * coordinates.
-   */
+  /// Get the pixel using cubic interpolation for non-integer pixel
+  /// coordinates.
   int getPixelCubic(num fx, num fy) {
     int x = fx.toInt() - (fx >= 0.0 ? 0 : 1);
     int px = x - 1;
@@ -508,51 +454,37 @@ class Image {
     return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
   }
 
-  /**
-   * Set the pixel at the given [x], [y] coordinate to the [color].
-   *
-   * This simply replaces the existing color, it does not do any alpha
-   * blending.  Use [drawPixel] for that.
-   */
+  /// Set the pixel at the given [x], [y] coordinate to the [color].
+  ///
+  /// This simply replaces the existing color, it does not do any alpha
+  /// blending.  Use [drawPixel] for that.
   void setPixel(int x, int y, int color) {
-    if (boundsSafe(x, y)) {
-      data[y * width + x] = color;
-    }
+    data[y * width + x] = color;
   }
 
-  /**
-   * Set the pixel at the given [x], [y] coordinate to the [color] without check the bounds.
-   *
-   * This simply replaces the existing color, it does not do any alpha
-   * blending.  Use [drawPixel] for that.
-   */
+  /// Set the pixel at the given [x], [y] coordinate to the [color] without check the bounds.
+  ///
+  /// This simply replaces the existing color, it does not do any alpha
+  /// blending.  Use [drawPixel] for that.
   void setUnsafePixel(int x, int y, int color) {
     data[y * width + x] = color;
   }
 
-  /**
-   * Set the pixel at the given [offset] index to the [color] without check the bounds.
-   */
+  /// Set the pixel at the given [offset] index to the [color] without check the bounds.
   void setUnsafePixel_(int offset, int color) {
     data[offset] = color;
   }
 
-  /**
-   * Set the pixel at the given [x], [y] coordinate to the color
-   * [r], [g], [b], [a].
-   *
-   * This simply replaces the existing color, it does not do any alpha
-   * blending.  Use [drawPixel] for that.
-   */
+  /// Set the pixel at the given [x], [y] coordinate to the color
+  /// [r], [g], [b], [a].
+  ///
+  /// This simply replaces the existing color, it does not do any alpha
+  /// blending.  Use [drawPixel] for that.
   void setPixelRGBA(int x, int y, int r, int g, int b, [int a = 0xff]) {
-    if (boundsSafe(x, y)) {
-      data[y * width + x] = getColor(r, g, b, a);
-    }
+    data[y * width + x] = getColor(r, g, b, a);
   }
 
-  /**
-   * Return the average gray value of the image.
-   */
+  /// Return the average gray value of the image.
   int getWhiteBalance() {
     final len = data.length;
     int r = 0;

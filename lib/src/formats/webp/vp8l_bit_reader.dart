@@ -18,9 +18,7 @@ class VP8LBitReader {
     _buffer8[7] = _input.readByte();
   }
 
-  /**
-   * Return the prefetched bits, so they can be looked up.
-   */
+  /// Return the prefetched bits, so they can be looked up.
   int prefetchBits() {
     int b2 = 0;
     if (bitPos < 32) {
@@ -36,18 +34,14 @@ class VP8LBitReader {
 
   bool get isEOS => (_input.isEOS && bitPos >= LBITS);
 
-  /**
-   * Advances the read buffer by 4 bytes to make room for reading next 32 bits.
-   */
+  /// Advances the read buffer by 4 bytes to make room for reading next 32 bits.
   void fillBitWindow() {
     if (bitPos >= WBITS) {
       _shiftBytes();
     }
   }
 
-  /**
-   * Reads the specified number of bits from Read Buffer.
-   */
+  /// Reads the specified number of bits from Read Buffer.
   int readBits(int numBits) {
     // Flag an error if end_of_stream or n_bits is more than allowed limit.
     if (!isEOS && numBits < MAX_NUM_BIT_READ) {
@@ -61,9 +55,7 @@ class VP8LBitReader {
     }
   }
 
-  /**
-   * If not at EOS, reload up to LBITS byte-by-byte
-   */
+  /// If not at EOS, reload up to LBITS byte-by-byte
   void _shiftBytes() {
     while (bitPos >= 8 && !_input.isEOS) {
       int b = _input.readByte();

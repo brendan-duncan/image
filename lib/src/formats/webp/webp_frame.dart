@@ -1,9 +1,7 @@
 import '../../internal/internal.dart';
 import '../../util/input_buffer.dart';
 
-/**
- * Decodes a frame from a WebP animation.
- */
+/// Decodes a frame from a WebP animation.
 class WebPFrame {
   /// The x coordinate of the upper left corner of the frame.
   int x;

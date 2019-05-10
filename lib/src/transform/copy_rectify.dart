@@ -1,10 +1,8 @@
 import '../image.dart';
 import '../util/point.dart';
 
-/**
- * Returns a copy of the [src] image, where the given rectangle
- * has been mapped to the full image.
- */
+/// Returns a copy of the [src] image, where the given rectangle
+/// has been mapped to the full image.
 Image copyRectify(Image src,
     {Point topLeft,
     Point topRight,

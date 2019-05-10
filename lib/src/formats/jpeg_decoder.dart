@@ -9,16 +9,12 @@ import 'decoder.dart';
 import 'jpeg/jpeg_data.dart';
 import 'jpeg/jpeg_info.dart';
 
-/**
- * Decode a jpeg encoded image.
- */
+/// Decode a jpeg encoded image.
 class JpegDecoder extends Decoder {
   JpegInfo info;
   InputBuffer input;
 
-  /**
-   * Is the given file a valid JPEG image?
-   */
+  /// Is the given file a valid JPEG image?
   bool isValidFile(List<int> data) {
     return new JpegData().validate(data);
   }

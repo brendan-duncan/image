@@ -36,64 +36,50 @@ const List<int> SHIFT_BITS = const [
   65536
 ];
 
-/**
- * Binary conversion of a uint8 to an int8.  This is equivalent in C to
- * typecasting an unsigned char to a char.
- */
+/// Binary conversion of a uint8 to an int8.  This is equivalent in C to
+/// typecasting an unsigned char to a char.
 int uint8ToInt8(int d) {
   __uint8[0] = d;
   return __uint8ToInt8[0];
 }
 
-/**
- * Binary conversion of a uint16 to an int16.  This is equivalent in C to
- * typecasting an unsigned short to a short.
- */
+/// Binary conversion of a uint16 to an int16.  This is equivalent in C to
+/// typecasting an unsigned short to a short.
 int uint16ToInt16(int d) {
   __uint16[0] = d;
   return __uint16ToInt16[0];
 }
 
-/**
- * Binary conversion of a uint32 to an int32.  This is equivalent in C to
- * typecasting an unsigned int to signed int.
- */
+/// Binary conversion of a uint32 to an int32.  This is equivalent in C to
+/// typecasting an unsigned int to signed int.
 int uint32ToInt32(int d) {
   __uint32[0] = d;
   return __uint32ToInt32[0];
 }
 
-/**
- * Binary conversion of a uint32 to an float32.  This is equivalent in C to
- * typecasting an unsigned int to float.
- */
+/// Binary conversion of a uint32 to an float32.  This is equivalent in C to
+/// typecasting an unsigned int to float.
 double uint32ToFloat32(int d) {
   __uint32[0] = d;
   return __uint32ToFloat32[0];
 }
 
-/**
- * Binary conversion of a uint64 to an float64.  This is equivalent in C to
- * typecasting an unsigned long long to double.
- */
+/// Binary conversion of a uint64 to an float64.  This is equivalent in C to
+/// typecasting an unsigned long long to double.
 double uint64ToFloat64(int d) {
   __uint64[0] = d;
   return __uint64ToFloat64[0];
 }
 
-/**
- * Binary conversion of an int32 to a uint32. This is equivalent in C to
- * typecasting an int to an unsigned int.
- */
+/// Binary conversion of an int32 to a uint32. This is equivalent in C to
+/// typecasting an int to an unsigned int.
 int int32ToUint32(int d) {
   __int32[0] = d;
   return __int32ToUint32[0];
 }
 
-/**
- * Binary conversion of a float32 to an uint32.  This is equivalent in C to
- * typecasting a float to unsigned int.
- */
+/// Binary conversion of a float32 to an uint32.  This is equivalent in C to
+/// typecasting a float to unsigned int.
 int float32ToUint32(double d) {
   __float32[0] = d;
   return __float32ToUint32[0];

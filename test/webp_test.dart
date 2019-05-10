@@ -1,14 +1,14 @@
-import 'dart:io' as Io;
+import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Io.Directory dir = Io.Directory('test/res/webp');
+  Directory dir = Directory('test/res/webp');
   List files = dir.listSync();
 
   group('WebP/getInfo', () {
     for (var f in files) {
-      if (f is! Io.File || !f.path.endsWith('.webp')) {
+      if (f is! File || !f.path.endsWith('.webp')) {
         continue;
       }
 
@@ -32,11 +32,11 @@ void main() {
     }
   });
 
-  /*List<int> bytes = Io.File('1_webp_ll.webp')
+  /*List<int> bytes = File('1_webp_ll.webp')
                           .readAsBytesSync();
   Image image = WebPDecoder().decodeImage(bytes);
   List<int> png = PngEncoder().encode(image);
-  new Io.File('out/webp/decode.png')
+  new File('out/webp/decode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);*/
 
@@ -44,22 +44,22 @@ void main() {
   for (int i = 0; i < anim.numFrames; ++i) {
     AnimationFrame frame = anim[i];
     List<int> png = PngEncoder().encode(frame.image);
-    new Io.File('out/webp/comp_$i.png')
+    new File('out/webp/comp_$i.png')
           ..writeAsBytesSync(png);
   }*/
 
   group('WebP/decodeImage', () {
     test('validate', () {
-      Io.File file = Io.File('test/res/webp/2b.webp');
+      File file = File('test/res/webp/2b.webp');
       List<int> bytes = file.readAsBytesSync();
       Image image = WebPDecoder().decodeImage(bytes);
       List<int> png = PngEncoder().encodeImage(image);
-      new Io.File('out/webp/decode.png')
+      new File('out/webp/decode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
       // Validate decoding.
-      file = Io.File('test/res/webp/2b.png');
+      file = File('test/res/webp/2b.png');
       bytes = file.readAsBytesSync();
       Image debugImage = PngDecoder().decodeImage(bytes);
       bool found = false;
@@ -73,7 +73,7 @@ void main() {
     });
 
     for (var f in files) {
-      if (f is! Io.File || !f.path.endsWith('.webp')) {
+      if (f is! File || !f.path.endsWith('.webp')) {
         continue;
       }
 
@@ -86,7 +86,7 @@ void main() {
         }
 
         List<int> png = PngEncoder().encodeImage(image);
-        new Io.File('out/webp/${name}.png')
+        new File('out/webp/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

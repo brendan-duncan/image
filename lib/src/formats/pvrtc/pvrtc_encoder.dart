@@ -9,10 +9,8 @@ import 'pvrtc_color.dart';
 import 'pvrtc_color_bounding_box.dart';
 import 'pvrtc_packet.dart';
 
-/**
- * Ported from Jeffrey Lim's PVRTC encoder/decoder,
- * https://bitbucket.org/jthlim/pvrtccompressor
- */
+/// Ported from Jeffrey Lim's PVRTC encoder/decoder,
+/// https://bitbucket.org/jthlim/pvrtccompressor
 class PvrtcEncoder {
   // PVR Format
   static const int PVR_AUTO = -1;

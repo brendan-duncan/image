@@ -3,9 +3,7 @@ import '../../util/input_buffer.dart';
 import '../decode_info.dart';
 import 'webp_frame.dart';
 
-/**
- * Features gathered from the bitstream
- */
+/// Features gathered from the bitstream
 class WebPInfo extends DecodeInfo {
   // enum Format
   static const int FORMAT_UNDEFINED = 0;

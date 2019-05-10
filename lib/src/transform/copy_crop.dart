@@ -1,8 +1,6 @@
 import '../image.dart';
 
-/**
- * Returns a cropped copy of [src].
- */
+/// Returns a cropped copy of [src].
 Image copyCrop(Image src, int x, int y, int w, int h) {
   Image dst = Image(w, h, src.format, src.exif, src.iccProfile);
 

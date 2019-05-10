@@ -1,15 +1,15 @@
-import 'dart:io' as Io;
+import 'dart:io';
 import 'package:image/image.dart';
 
 void main(List<String> argv) {
-  if (argv.length < 1) {
+  if (argv.isEmpty) {
     print('Usage: image_server <image_file>');
     return;
   }
 
   String filename = argv[0];
 
-  Io.File file = Io.File(filename);
+  File file = File(filename);
   if (!file.existsSync()) {
     print('File does not exist: ${filename}');
     return;
@@ -30,5 +30,5 @@ void main(List<String> argv) {
   // Save the image as a PNG
   List<int> png = PngEncoder().encodeImage(image);
   // Write the PNG to disk
-  new Io.File(filename + '.png').writeAsBytesSync(png);
+  new File(filename + '.png').writeAsBytesSync(png);
 }
