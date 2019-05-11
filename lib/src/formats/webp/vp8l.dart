@@ -203,7 +203,8 @@ class VP8L {
     return data;
   }
 
-  bool _decodeImageData(data, int width, int height, int lastRow, processFunc) {
+  bool _decodeImageData(dynamic data, int width, int height, int lastRow,
+                        dynamic processFunc) {
     int row = _lastPixel ~/ width;
     int col = _lastPixel % width;
 
@@ -254,7 +255,7 @@ class VP8L {
 
           if (colorCache != null) {
             while (lastCached < src) {
-              colorCache.insert(data[lastCached]);
+              colorCache.insert(data[lastCached] as int);
               lastCached++;
             }
           }
@@ -291,7 +292,7 @@ class VP8L {
           }
           if (colorCache != null) {
             while (lastCached < src) {
-              colorCache.insert(data[lastCached]);
+              colorCache.insert(data[lastCached] as int);
               lastCached++;
             }
           }
@@ -301,7 +302,7 @@ class VP8L {
         final int key = code - lenCodeLimit;
 
         while (lastCached < src) {
-          colorCache.insert(data[lastCached]);
+          colorCache.insert(data[lastCached] as int);
           lastCached++;
         }
 
@@ -319,7 +320,7 @@ class VP8L {
 
           if (colorCache != null) {
             while (lastCached < src) {
-              colorCache.insert(data[lastCached]);
+              colorCache.insert(data[lastCached] as int);
               lastCached++;
             }
           }
@@ -1003,7 +1004,8 @@ class InternalVP8L extends VP8L {
   int get ioHeight => _ioHeight;
   set ioHeight(int height) => _ioHeight = height;
 
-  bool decodeImageData(data, int width, int height, int lastRow, processFunc) =>
+  bool decodeImageData(dynamic data, int width, int height, int lastRow,
+                       dynamic processFunc) =>
       _decodeImageData(data, width, height, lastRow, processFunc);
 
   Uint32List decodeImageStream(int xsize, int ysize, bool isLevel0) =>

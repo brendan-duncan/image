@@ -10,14 +10,14 @@ void main() {
   // using a file Input element, or an AJAX HttpRequest.
 
   // This example demonstrates using a file Input element.
-  fileInput = querySelector("#file");
+  fileInput = querySelector("#file") as InputElement;
 
   fileInput.addEventListener("change", onFileChanged);
 }
 
 /// Called when the user has selected a file.
 void onFileChanged(Event event) {
-  FileList files = fileInput.files;
+  var files = fileInput.files as FileList;
   var file = files.item(0);
 
   FileReader reader = FileReader();
@@ -27,9 +27,9 @@ void onFileChanged(Event event) {
 
 /// Called when the file has been read.
 void onFileLoaded(Event event) {
-  FileReader reader = event.currentTarget;
+  FileReader reader = event.currentTarget as FileReader;
 
-  var bytes = reader.result;
+  var bytes = reader.result as List<int>;
 
   // Find a decoder that is able to decode the given file contents.
   Decoder decoder = findDecoderForData(bytes);

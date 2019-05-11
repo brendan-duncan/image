@@ -7,7 +7,7 @@ void main() {
   if (!dir.existsSync()) {
     return;
   }
-  List files = dir.listSync();
+  var files = dir.listSync();
 
   group('TGA', () {
     for (var f in files) {
@@ -17,7 +17,7 @@ void main() {
 
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
-        List<int> bytes = f.readAsBytesSync();
+        List<int> bytes = (f as File).readAsBytesSync();
         Image image = TgaDecoder().decodeImage(bytes);
         if (image == null) {
           throw new ImageException('Unable to decode TGA Image: $name.');

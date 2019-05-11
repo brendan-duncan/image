@@ -7,7 +7,7 @@ void main() {
   if (!dir.existsSync()) {
     return;
   }
-  List files = dir.listSync();
+  var files = dir.listSync();
 
   group('TIFF/getInfo', () {
     for (var f in files) {
@@ -18,7 +18,7 @@ void main() {
 
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
-        List<int> bytes = f.readAsBytesSync();
+        List<int> bytes = (f as File).readAsBytesSync();
 
         TiffInfo info = TiffDecoder().startDecode(bytes);
         if (info == null) {
@@ -63,7 +63,7 @@ void main() {
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
         print(name);
-        List<int> bytes = f.readAsBytesSync();
+        List<int> bytes = (f as File).readAsBytesSync();
         Image image = TiffDecoder().decodeImage(bytes);
         if (image == null) {
           throw new ImageException('Unable to decode TIFF Image: $name.');

@@ -34,7 +34,7 @@ class ExrImage extends DecodeInfo {
     if (!_isMultiPart()) {
       ExrPart part = InternalExrPart(_isTiled(), input);
       if (part.isValid) {
-        _parts.add(part);
+        _parts.add(part as InternalExrPart);
       }
     } else {
       while (true) {
@@ -42,7 +42,7 @@ class ExrImage extends DecodeInfo {
         if (!part.isValid) {
           break;
         }
-        _parts.add(part);
+        _parts.add(part as InternalExrPart);
       }
     }
 

@@ -27,6 +27,6 @@ class ExifData {
   bool get hasRawData => rawData != null && rawData.isNotEmpty;
 
   bool get hasOrientation => data.containsKey(ORIENTATION);
-  int get orientation => data[ORIENTATION];
+  int get orientation => data[ORIENTATION] as int;
   set orientation(int value) => data[ORIENTATION] = value;
 }

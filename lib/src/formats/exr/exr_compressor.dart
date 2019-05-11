@@ -92,7 +92,7 @@ abstract class ExrCompressor {
 abstract class InternalExrCompressor extends ExrCompressor {
   InternalExrCompressor(InternalExrPart header) : super._(header);
 
-  InternalExrPart get header => _header;
+  InternalExrPart get header => _header as InternalExrPart;
 
   int numSamples(int s, int a, int b) {
     int a1 = a ~/ s;

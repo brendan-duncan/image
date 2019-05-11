@@ -35,9 +35,9 @@ class JpegFrame {
       int blocksPerLineForMcu = mcusPerLine * component.hSamples;
       int blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
 
-      List blocks = List(blocksPerColumnForMcu);
+      final blocks = List<dynamic>(blocksPerColumnForMcu);
       for (int i = 0; i < blocksPerColumnForMcu; i++) {
-        List row = List(blocksPerLineForMcu);
+        final row = List<dynamic>(blocksPerLineForMcu);
         for (int j = 0; j < blocksPerLineForMcu; j++) {
           row[j] = Int32List(64);
         }

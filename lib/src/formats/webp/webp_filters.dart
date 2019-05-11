@@ -12,14 +12,14 @@ class WebPFilters {
   static const int FILTER_BEST = 5;
   static const int FILTER_FAST = 6;
 
-  static const List FILTERS = const [
+  static const FILTERS = [
     null, // WEBP_FILTER_NONE
     horizontalFilter, // WEBP_FILTER_HORIZONTAL
     verticalFilter, // WEBP_FILTER_VERTICAL
     gradientFilter // WEBP_FILTER_GRADIENT
   ];
 
-  static const List UNFILTERS = const [
+  static const UNFILTERS = [
     null, // WEBP_FILTER_NONE
     horizontalUnfilter, // WEBP_FILTER_HORIZONTAL
     verticalUnfilter, // WEBP_FILTER_VERTICAL

@@ -318,8 +318,8 @@ class VP8Filter {
     _store2(dst, 3, a - d4, d1, c1);
   }
 
-  static int AVG3(a, b, c) => shiftR(((a) + 2 * (b) + (c) + 2), 2);
-  static int AVG2(a, b) => shiftR(((a) + (b) + 1), 1);
+  static int AVG3(int a, int b, int c) => shiftR(((a) + 2 * (b) + (c) + 2), 2);
+  static int AVG2(int a, int b) => shiftR(((a) + (b) + 1), 1);
 
   static void VE4(InputBuffer dst) {
     int top = -VP8.BPS; // dst +
@@ -392,7 +392,7 @@ class VP8Filter {
     trueMotion(dst, 16);
   }
 
-  static int DST(x, y) => x + y * VP8.BPS;
+  static int DST(int x, int y) => x + y * VP8.BPS;
 
   /// Down-right
   static void RD4(InputBuffer dst) {
@@ -628,7 +628,7 @@ class VP8Filter {
     Put8x8uv(0x80, dst);
   }
 
-  static const List PredLuma4 = const [
+  static const PredLuma4 = [
     DC4,
     TM4,
     VE4,
@@ -641,7 +641,7 @@ class VP8Filter {
     HU4
   ];
 
-  static const List PredLuma16 = const [
+  static const PredLuma16 = [
     DC16,
     TM16,
     VE16,
@@ -651,7 +651,7 @@ class VP8Filter {
     DC16NoTopLeft
   ];
 
-  static const List PredChroma8 = const [
+  static const PredChroma8 = [
     DC8uv,
     TM8uv,
     VE8uv,

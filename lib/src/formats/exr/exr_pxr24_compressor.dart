@@ -19,7 +19,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     implements ExrPxr24Compressor {
   InternalExrPxr24Compressor(
       ExrPart header, this._maxScanLineSize, this._numScanLines)
-      : super(header);
+      : super(header as InternalExrPart);
 
   int numScanLines() => _numScanLines;
 
@@ -125,7 +125,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
       }
     }
 
-    return _output.getBytes();
+    return _output.getBytes() as Uint8List;
   }
 
   ZLibDecoder _zlib = ZLibDecoder();

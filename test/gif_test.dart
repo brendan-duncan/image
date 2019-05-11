@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   Directory dir = Directory('test/res/gif');
-  List files = dir.listSync();
+  var files = dir.listSync();
 
   group('Gif/getInfo', () {
     for (var f in files) {
@@ -14,7 +14,7 @@ void main() {
 
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
-        List<int> bytes = f.readAsBytesSync();
+        var bytes = (f as File).readAsBytesSync();
 
         GifInfo data = GifDecoder().startDecode(bytes);
         if (data == null) {
@@ -32,7 +32,7 @@ void main() {
 
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
-        List<int> bytes = f.readAsBytesSync();
+        var bytes = (f as File).readAsBytesSync();
         Image image = GifDecoder().decodeImage(bytes);
         new File('out/gif/$name.png')
           ..createSync(recursive: true)
@@ -49,7 +49,7 @@ void main() {
 
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test('$name', () {
-        List<int> bytes = f.readAsBytesSync();
+        List<int> bytes = (f as File).readAsBytesSync();
         Animation anim = GifDecoder().decodeAnimation(bytes);
         expect(anim.length, equals(30));
         expect(anim.loopCount, equals(0));

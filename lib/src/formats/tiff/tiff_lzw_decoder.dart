@@ -8,7 +8,7 @@ class LzwDecoder {
     this._out = out;
     int outLen = out.length;
     _outPointer = 0;
-    _data = p.buffer;
+    _data = p.buffer as Uint8List;
     _dataLength = _data.length;
     _bytePointer = p.offset;
 

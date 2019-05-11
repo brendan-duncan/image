@@ -18,12 +18,12 @@ class JpegData {
   JpegAdobe adobe;
   JpegFrame frame;
   int resetInterval;
-  ExifData exif = ExifData();
-  final List<Int16List> quantizationTables = List(Jpeg.NUM_QUANT_TBLS);
-  final List<JpegFrame> frames = [];
-  final List huffmanTablesAC = [];
-  final List huffmanTablesDC = [];
-  final List<_ComponentData> components = [];
+  final exif = ExifData();
+  final quantizationTables = List<Int16List>(Jpeg.NUM_QUANT_TBLS);
+  final frames = List<JpegFrame>();
+  final huffmanTablesAC = List<dynamic>();
+  final huffmanTablesDC = List<dynamic>();
+  final components = List<_ComponentData>();
 
   bool validate(List<int> bytes) {
     input = InputBuffer(bytes, bigEndian: true);
@@ -750,7 +750,7 @@ class JpegData {
       throw new ImageException('Invalid SOS block');
     }
 
-    List components = List(n);
+    final components = List<dynamic>(n);
     for (int i = 0; i < n; i++) {
       int id = block.readByte();
       int c = block.readByte();
@@ -766,10 +766,10 @@ class JpegData {
       int ac_tbl_no = c & 15;
 
       if (dc_tbl_no < huffmanTablesDC.length) {
-        component.huffmanTableDC = huffmanTablesDC[dc_tbl_no];
+        component.huffmanTableDC = huffmanTablesDC[dc_tbl_no] as List;
       }
       if (ac_tbl_no < huffmanTablesAC.length) {
-        component.huffmanTableAC = huffmanTablesAC[ac_tbl_no];
+        component.huffmanTableAC = huffmanTablesAC[ac_tbl_no] as List;
       }
     }
 
@@ -787,7 +787,7 @@ class JpegData {
 
   List _buildHuffmanTable(Uint8List codeLengths, Uint8List values) {
     int k = 0;
-    List code = [];
+    final code = List<dynamic>();
     int length = 16;
 
     while (length > 0 && (codeLengths[length - 1] == 0)) {
@@ -796,18 +796,18 @@ class JpegData {
 
     code.add(new _JpegHuffman());
 
-    _JpegHuffman p = code[0];
+    _JpegHuffman p = code[0] as _JpegHuffman;
     _JpegHuffman q;
 
     for (int i = 0; i < length; i++) {
       for (int j = 0; j < codeLengths[i]; j++) {
-        p = code.removeLast();
+        p = code.removeLast() as _JpegHuffman;
         if (p.children.length <= p.index) {
           p.children.length = p.index + 1;
         }
         p.children[p.index] = values[k];
         while (p.index > 0) {
-          p = code.removeLast();
+          p = code.removeLast() as _JpegHuffman;
         }
         p.index++;
         code.add(p);
@@ -835,7 +835,7 @@ class JpegData {
       }
     }
 
-    return code[0].children;
+    return code[0].children as List;
   }
 
   List<Uint8List> _buildComponentData(
@@ -856,7 +856,7 @@ class JpegData {
 
       for (int blockCol = 0; blockCol < blocksPerLine; blockCol++) {
         _quantizeAndInverse(component.quantizationTable,
-            component.blocks[blockRow][blockCol], r, R);
+            component.blocks[blockRow][blockCol] as Int32List, r, R);
 
         int offset = 0;
         int sample = shiftL(blockCol, 3);
@@ -2114,7 +2114,7 @@ class JpegData {
 }
 
 class _JpegHuffman {
-  List children = [];
+  final children = List<dynamic>();
   int index = 0;
 }
 

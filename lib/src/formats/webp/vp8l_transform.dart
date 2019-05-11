@@ -384,7 +384,7 @@ class VP8LTransform {
     return _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
   }
 
-  static final List PREDICTORS = [
+  static final PREDICTORS = [
     _predictor0,
     _predictor1,
     _predictor2,
@@ -405,7 +405,7 @@ class VP8LTransform {
 }
 
 class _VP8LMultipliers {
-  final Uint8List data = Uint8List(3);
+  final data = Uint8List(3);
 
   // Note: the members are uint8_t, so that any negative values are
   // automatically converted to "mod 256" values.

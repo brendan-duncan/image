@@ -54,14 +54,14 @@ void main() {
 
   group('PVR Decode', () {
     Directory dir = Directory('test/res/pvr');
-    List files = dir.listSync();
+    var files = dir.listSync();
     for (var f in files) {
       if (f is! File || !f.path.endsWith('.pvr')) {
         continue;
       }
       String name = f.path.split(new RegExp(r'(/|\\)')).last;
       test(name, () {
-        List<int> bytes = f.readAsBytesSync();
+        List<int> bytes = (f as File).readAsBytesSync();
         Image img = PvrtcDecoder().decodePvr(bytes);
         assert(img != null);
         new File('out/pvrtc/pvr_$name.png')

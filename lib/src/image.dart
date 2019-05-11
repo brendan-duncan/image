@@ -354,8 +354,8 @@ class Image {
     int nx = x + 1;
     int y = fy.toInt() - (fy >= 0 ? 0 : 1);
     int ny = y + 1;
-    double dx = fx - x;
-    double dy = fy - y;
+    num dx = fx - x;
+    num dy = fy - y;
 
     int _linear(int Icc, int Inc, int Icn, int Inn) {
       return (Icc +
@@ -391,10 +391,8 @@ class Image {
     var dx = fx - x;
     var dy = fy - y;
 
-    double _cubic(num dx, num Ipp, num Icp, num Inp, num Iap) =>
-        Icp +
-        0.5 *
-            (dx * (-Ipp + Inp) +
+    num _cubic(num dx, num Ipp, num Icp, num Inp, num Iap) =>
+        Icp + 0.5 * (dx * (-Ipp + Inp) +
                 dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
                 dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
 
@@ -402,54 +400,54 @@ class Image {
     int Icp = getPixel(x, py);
     int Inp = getPixel(nx, py);
     int Iap = getPixel(ax, py);
-    double Ip0 = _cubic(dx, getRed(Ipp), getRed(Icp), getRed(Inp), getRed(Iap));
-    double Ip1 =
+    num Ip0 = _cubic(dx, getRed(Ipp), getRed(Icp), getRed(Inp), getRed(Iap));
+    num Ip1 =
         _cubic(dx, getGreen(Ipp), getGreen(Icp), getGreen(Inp), getGreen(Iap));
-    double Ip2 =
+    num Ip2 =
         _cubic(dx, getBlue(Ipp), getBlue(Icp), getBlue(Inp), getBlue(Iap));
-    double Ip3 =
+    num Ip3 =
         _cubic(dx, getAlpha(Ipp), getAlpha(Icp), getAlpha(Inp), getAlpha(Iap));
 
     int Ipc = getPixel(px, y);
     int Icc = getPixel(x, y);
     int Inc = getPixel(nx, y);
     int Iac = getPixel(ax, y);
-    double Ic0 = _cubic(dx, getRed(Ipc), getRed(Icc), getRed(Inc), getRed(Iac));
-    double Ic1 =
+    num Ic0 = _cubic(dx, getRed(Ipc), getRed(Icc), getRed(Inc), getRed(Iac));
+    num Ic1 =
         _cubic(dx, getGreen(Ipc), getGreen(Icc), getGreen(Inc), getGreen(Iac));
-    double Ic2 =
+    num Ic2 =
         _cubic(dx, getBlue(Ipc), getBlue(Icc), getBlue(Inc), getBlue(Iac));
-    double Ic3 =
+    num Ic3 =
         _cubic(dx, getAlpha(Ipc), getAlpha(Icc), getAlpha(Inc), getAlpha(Iac));
 
     int Ipn = getPixel(px, ny);
     int Icn = getPixel(x, ny);
     int Inn = getPixel(nx, ny);
     int Ian = getPixel(ax, ny);
-    double In0 = _cubic(dx, getRed(Ipn), getRed(Icn), getRed(Inn), getRed(Ian));
-    double In1 =
+    num In0 = _cubic(dx, getRed(Ipn), getRed(Icn), getRed(Inn), getRed(Ian));
+    num In1 =
         _cubic(dx, getGreen(Ipn), getGreen(Icn), getGreen(Inn), getGreen(Ian));
-    double In2 =
+    num In2 =
         _cubic(dx, getBlue(Ipn), getBlue(Icn), getBlue(Inn), getBlue(Ian));
-    double In3 =
+    num In3 =
         _cubic(dx, getAlpha(Ipn), getAlpha(Icn), getAlpha(Inn), getAlpha(Ian));
 
     int Ipa = getPixel(px, ay);
     int Ica = getPixel(x, ay);
     int Ina = getPixel(nx, ay);
     int Iaa = getPixel(ax, ay);
-    double Ia0 = _cubic(dx, getRed(Ipa), getRed(Ica), getRed(Ina), getRed(Iaa));
-    double Ia1 =
+    num Ia0 = _cubic(dx, getRed(Ipa), getRed(Ica), getRed(Ina), getRed(Iaa));
+    num Ia1 =
         _cubic(dx, getGreen(Ipa), getGreen(Ica), getGreen(Ina), getGreen(Iaa));
-    double Ia2 =
+    num Ia2 =
         _cubic(dx, getBlue(Ipa), getBlue(Ica), getBlue(Ina), getBlue(Iaa));
-    double Ia3 =
+    num Ia3 =
         _cubic(dx, getAlpha(Ipa), getAlpha(Ica), getAlpha(Ina), getAlpha(Iaa));
 
-    double c0 = _cubic(dy, Ip0, Ic0, In0, Ia0);
-    double c1 = _cubic(dy, Ip1, Ic1, In1, Ia1);
-    double c2 = _cubic(dy, Ip2, Ic2, In2, Ia2);
-    double c3 = _cubic(dy, Ip3, Ic3, In3, Ia3);
+    num c0 = _cubic(dy, Ip0, Ic0, In0, Ia0);
+    num c1 = _cubic(dy, Ip1, Ic1, In1, Ia1);
+    num c2 = _cubic(dy, Ip2, Ic2, In2, Ia2);
+    num c3 = _cubic(dy, Ip3, Ic3, In3, Ia3);
 
     return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
   }
@@ -468,7 +466,8 @@ class Image {
     }
   }
 
-  /// Set the pixel at the given [x], [y] coordinate to the [color] without check the bounds.
+  /// Set the pixel at the given [x], [y] coordinate to the [color] without
+  /// check the bounds.
   ///
   /// This simply replaces the existing color, it does not do any alpha
   /// blending. Use [drawPixel] for that.
@@ -476,7 +475,8 @@ class Image {
     data[y * width + x] = color;
   }
 
-  /// Set the pixel at the given [offset] index to the [color] without check the bounds.
+  /// Set the pixel at the given [offset] index to the [color] without check
+  /// the bounds.
   void setUnsafePixel_(int offset, int color) {
     data[offset] = color;
   }

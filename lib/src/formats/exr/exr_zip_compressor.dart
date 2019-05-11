@@ -19,7 +19,7 @@ class InternalExrZipCompressor extends InternalExrCompressor
 
   InternalExrZipCompressor(
       ExrPart header, int maxScanLineSize, this._numScanLines)
-      : super(header);
+      : super(header as InternalExrPart);
 
   int numScanLines() => _numScanLines;
 
@@ -29,7 +29,7 @@ class InternalExrZipCompressor extends InternalExrCompressor
 
   Uint8List uncompress(InputBuffer input, int x, int y,
       [int width, int height]) {
-    Uint8List data = zlib.decodeBytes(input.toUint8List());
+    var data = zlib.decodeBytes(input.toUint8List());
 
     if (width == null) {
       width = header.width;

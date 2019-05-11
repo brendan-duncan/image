@@ -48,12 +48,12 @@ class Color {
   }
 
   /// Compare colors from a 3 or 4 dimensional color space
-  static double distance(List<double> c1, List<double> c2, bool compareAlpha) {
-    double d1 = c1[0] - c2[0];
-    double d2 = c1[1] - c2[1];
-    double d3 = c1[2] - c2[2];
+  static num distance(List<num> c1, List<num> c2, bool compareAlpha) {
+    num d1 = c1[0] - c2[0];
+    num d2 = c1[1] - c2[1];
+    num d3 = c1[2] - c2[2];
     if (compareAlpha) {
-      double dA = c1[3] - c2[3];
+      num dA = c1[3] - c2[3];
       return sqrt(max(d1 * d1, (d1 - dA) * (d1 - dA)) +
           max(d2 * d2, (d2 - dA) * (d2 - dA)) +
           max(d3 * d3, (d3 - dA) * (d3 - dA)));
@@ -216,11 +216,11 @@ List<int> hsvToRGB(num hue, num saturation, num brightness) {
     return [gray, gray, gray];
   }
 
-  double h = (hue - hue.floor()) * 6.0;
-  double f = h - h.floor();
-  double p = brightness * (1.0 - saturation);
-  double q = brightness * (1.0 - saturation * f);
-  double t = brightness * (1.0 - (saturation * (1.0 - f)));
+  num h = (hue - hue.floor()) * 6.0;
+  num f = h - h.floor();
+  num p = brightness * (1.0 - saturation);
+  num q = brightness * (1.0 - saturation * f);
+  num t = brightness * (1.0 - (saturation * (1.0 - f)));
 
   switch (h.toInt()) {
     case 0:
@@ -266,7 +266,7 @@ List<int> hsvToRGB(num hue, num saturation, num brightness) {
 
 /// Convert an RGB color to HSL, where r, g and b are in the range [0, 255].
 /// Returns a list [h, s, l] with values in the range [0, 1].
-List<double> rgbToHSL(num r, num g, num b) {
+List<num> rgbToHSL(num r, num g, num b) {
   r /= 255.0;
   g /= 255.0;
   b /= 255.0;
@@ -298,9 +298,9 @@ List<double> rgbToHSL(num r, num g, num b) {
 
 /// Convert a CIE-L*ab color to XYZ.
 List<int> labToXYZ(num l, num a, num b) {
-  var y = (l + 16.0) / 116.0;
-  var x = y + (a / 500.0);
-  var z = y - (b / 200.0);
+  num y = (l + 16.0) / 116.0;
+  num x = y + (a / 500.0);
+  num z = y - (b / 200.0);
   if (pow(x, 3) > 0.008856) {
     x = pow(x, 3);
   } else {
@@ -322,13 +322,12 @@ List<int> labToXYZ(num l, num a, num b) {
 
 /// Convert an XYZ color to RGB.
 List<int> xyzToRGB(num x, num y, num z) {
-  var b, g, r;
   x /= 100;
   y /= 100;
   z /= 100;
-  r = (3.2406 * x) + (-1.5372 * y) + (-0.4986 * z);
-  g = (-0.9689 * x) + (1.8758 * y) + (0.0415 * z);
-  b = (0.0557 * x) + (-0.2040 * y) + (1.0570 * z);
+  num r = (3.2406 * x) + (-1.5372 * y) + (-0.4986 * z);
+  num g = (-0.9689 * x) + (1.8758 * y) + (0.0415 * z);
+  num b = (0.0557 * x) + (-0.2040 * y) + (1.0570 * z);
   if (r > 0.0031308) {
     r = (1.055 * pow(r, 0.4166666667)) - 0.055;
   } else {
@@ -346,9 +345,9 @@ List<int> xyzToRGB(num x, num y, num z) {
   }
 
   return [
-    (r * 255).toInt().clamp(0, 255),
-    (g * 255).toInt().clamp(0, 255),
-    (b * 255).toInt().clamp(0, 255)
+    (r * 255).clamp(0, 255).toInt(),
+    (g * 255).clamp(0, 255).toInt(),
+    (b * 255).clamp(0, 255).toInt()
   ];
 }
 
@@ -368,29 +367,29 @@ List<int> cmykToRGB(num c, num m, num y, num k) {
 
 /// Convert a CIE-L*ab color to RGB.
 List<int> labToRGB(num l, num a, num b) {
-  const double ref_x = 95.047;
-  const double ref_y = 100.000;
-  const double ref_z = 108.883;
+  const num ref_x = 95.047;
+  const num ref_y = 100.000;
+  const num ref_z = 108.883;
 
-  double y = (l + 16.0) / 116.0;
-  double x = a / 500.0 + y;
-  double z = y - b / 200.0;
+  num y = (l + 16.0) / 116.0;
+  num x = a / 500.0 + y;
+  num z = y - b / 200.0;
 
-  double y3 = pow(y, 3);
+  num y3 = pow(y, 3);
   if (y3 > 0.008856) {
     y = y3;
   } else {
     y = (y - 16 / 116) / 7.787;
   }
 
-  double x3 = pow(x, 3);
+  num x3 = pow(x, 3);
   if (x3 > 0.008856) {
     x = x3;
   } else {
     x = (x - 16 / 116) / 7.787;
   }
 
-  double z3 = pow(z, 3);
+  num z3 = pow(z, 3);
   if (z3 > 0.008856) {
     z = z3;
   } else {
@@ -406,9 +405,9 @@ List<int> labToRGB(num l, num a, num b) {
   z /= 100.0;
 
   // xyz to rgb
-  double R = x * 3.2406 + y * (-1.5372) + z * (-0.4986);
-  double G = x * (-0.9689) + y * 1.8758 + z * 0.0415;
-  double B = x * 0.0557 + y * (-0.2040) + z * 1.0570;
+  num R = x * 3.2406 + y * (-1.5372) + z * (-0.4986);
+  num G = x * (-0.9689) + y * 1.8758 + z * 0.0415;
+  num B = x * 0.0557 + y * (-0.2040) + z * 1.0570;
 
   if (R > 0.0031308) {
     R = 1.055 * (pow(R, 1.0 / 2.4)) - 0.055;
@@ -429,14 +428,14 @@ List<int> labToRGB(num l, num a, num b) {
   }
 
   return [
-    (R * 255.0).toInt().clamp(0, 255),
-    (G * 255.0).toInt().clamp(0, 255),
-    (B * 255.0).toInt().clamp(0, 255)
+    (R * 255.0).clamp(0, 255).toInt(),
+    (G * 255.0).clamp(0, 255).toInt(),
+    (B * 255.0).clamp(0, 255).toInt()
   ];
 }
 
 /// Convert a RGB color to XYZ.
-List<double> rgbToXYZ(num r, num g, num b) {
+List<num> rgbToXYZ(num r, num g, num b) {
   r = r / 255.0;
   g = g / 255.0;
   b = b / 255.0;
@@ -469,7 +468,7 @@ List<double> rgbToXYZ(num r, num g, num b) {
 }
 
 /// Convert a XYZ color to CIE-L*ab.
-List<double> xyzToLab(num x, num y, num z) {
+List<num> xyzToLab(num x, num y, num z) {
   x = x / 95.047;
   y = y / 100.0;
   z = z / 108.883;
@@ -494,7 +493,7 @@ List<double> xyzToLab(num x, num y, num z) {
 }
 
 /// Convert a RGB color to CIE-L*ab.
-List<double> rgbToLab(num r, num g, num b) {
+List<num> rgbToLab(num r, num g, num b) {
   r = r / 255.0;
   g = g / 255.0;
   b = b / 255.0;
@@ -519,9 +518,9 @@ List<double> rgbToLab(num r, num g, num b) {
   g = g * 100.0;
   b = b * 100.0;
 
-  double x = r * 0.4124 + g * 0.3576 + b * 0.1805;
-  double y = r * 0.2126 + g * 0.7152 + b * 0.0722;
-  double z = r * 0.0193 + g * 0.1192 + b * 0.9505;
+  num x = r * 0.4124 + g * 0.3576 + b * 0.1805;
+  num y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+  num z = r * 0.0193 + g * 0.1192 + b * 0.9505;
 
   x = x / 95.047;
   y = y / 100.0;

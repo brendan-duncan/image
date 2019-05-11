@@ -14,7 +14,7 @@ abstract class ExrRleCompressor extends ExrCompressor {
 class InternalExrRleCompressor extends InternalExrCompressor
     implements ExrRleCompressor {
   InternalExrRleCompressor(ExrPart header, int maxScanLineSize)
-      : super(header);
+      : super(header as InternalExrPart);
 
   int numScanLines() => 1;
 
@@ -63,7 +63,7 @@ class InternalExrRleCompressor extends InternalExrCompressor
       }
     }
 
-    Uint8List data = out.getBytes();
+    Uint8List data = out.getBytes() as Uint8List;
 
     // Predictor
     for (int i = 1, len = data.length; i < len; ++i) {

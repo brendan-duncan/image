@@ -22,7 +22,7 @@ class PvrtcEncoder {
   Uint8List encodePvr(Image bitmap, {int format = PVR_AUTO}) {
     OutputBuffer output = OutputBuffer();
 
-    var pvrtc;
+    dynamic pvrtc;
     if (format == PVR_AUTO) {
       if (bitmap.format == Image.RGB) {
         pvrtc = encodeRgb4Bpp(bitmap);
@@ -71,9 +71,9 @@ class PvrtcEncoder {
     output.writeUint32(mipmapCount);
     output.writeUint32(metaDataSize);
 
-    output.writeBytes(pvrtc);
+    output.writeBytes(pvrtc as List<int>);
 
-    return output.getBytes();
+    return output.getBytes() as Uint8List;
   }
 
   Uint8List encodeRgb4Bpp(Image bitmap) {
@@ -104,8 +104,8 @@ class PvrtcEncoder {
         packet.setBlock(x, y);
         packet.usePunchthroughAlpha = 0;
         var cbb = _calculateBoundingBoxRgb(bitmap, x, y);
-        packet.setColorRgbA(cbb.min);
-        packet.setColorRgbB(cbb.max);
+        packet.setColorRgbA(cbb.min as PvrtcColorRgb);
+        packet.setColorRgbB(cbb.max as PvrtcColorRgb);
       }
     }
 
@@ -208,8 +208,8 @@ class PvrtcEncoder {
         packet.setBlock(x, y);
         packet.usePunchthroughAlpha = 0;
         var cbb = _calculateBoundingBoxRgba(bitmap, x, y);
-        packet.setColorRgbaA(cbb.min);
-        packet.setColorRgbaB(cbb.max);
+        packet.setColorRgbaA(cbb.min as PvrtcColorRgba);
+        packet.setColorRgbaB(cbb.max as PvrtcColorRgba);
       }
     }
 
@@ -286,12 +286,12 @@ class PvrtcEncoder {
     return outputData;
   }
 
-  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(
-      Image bitmap, int blockX, int blockY) {
+  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(Image bitmap,
+      int blockX, int blockY) {
     int size = bitmap.width;
     int pi = (blockY * 4 * size + blockX * 4);
 
-    _pixel(i) {
+    _pixel(int i) {
       int c = bitmap[pi + i];
       return new PvrtcColorRgb(getRed(c), getGreen(c), getBlue(c));
     }
@@ -324,7 +324,7 @@ class PvrtcEncoder {
     int size = bitmap.width;
     int pi = (blockY * 4 * size + blockX * 4);
 
-    _pixel(i) {
+    _pixel(int i) {
       int c = bitmap[pi + i];
       return new PvrtcColorRgba(
           getRed(c), getGreen(c), getBlue(c), getAlpha(c));
@@ -352,12 +352,6 @@ class PvrtcEncoder {
 
     return cbb;
   }
-
-  /*static void _getPacket(packet, packetData, index) {
-    index *= 2;
-    packet.modulationData = packetData[index];
-    packet.colorData = packetData[index + 1];
-  }*/
 
   static const MODULATION_LUT = const [
     0,

@@ -301,7 +301,7 @@ class PsdImage extends DecodeInfo {
       z = ba * aa - 2.0 * (aa - x) * (ba - y) + y * (1.0 - aa) + x * (1.0 - ba);
     }
 
-    return (z * 255.0).toInt().clamp(0, 255);
+    return (z * 255.0).clamp(0, 255).toInt();
   }
 
   static int _blendColorBurn(int a, int b) {
@@ -309,22 +309,22 @@ class PsdImage extends DecodeInfo {
       return 0; // We don't want to divide by zero
     }
     int c = (255.0 * (1.0 - (1.0 - (a / 255.0)) / (b / 255.0))).toInt();
-    return c.clamp(0, 255);
+    return c.clamp(0, 255).toInt();
   }
 
   static int _blendLinearBurn(int a, int b) {
-    return (a + b - 255).clamp(0, 255);
+    return (a + b - 255).clamp(0, 255).toInt();
   }
 
   static int _blendScreen(int a, int b) {
-    return (255 - ((255 - b) * (255 - a))).clamp(0, 255);
+    return (255 - ((255 - b) * (255 - a))).clamp(0, 255).toInt();
   }
 
   static int _blendColorDodge(int a, int b) {
     if (b == 255) {
       return 255;
     }
-    return (((a / 255) / (1.0 - (b / 255.0))) * 255.0).toInt().clamp(0, 255);
+    return (((a / 255) / (1.0 - (b / 255.0))) * 255.0).clamp(0, 255).toInt();
   }
 
   static int _blendLinearDodge(int a, int b) {

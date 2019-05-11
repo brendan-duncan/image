@@ -354,8 +354,8 @@ class PsdLayer {
   /// Is this layer a folder?
   int type() {
     if (additionalData.containsKey(PsdLayerSectionDivider.TAG)) {
-      PsdLayerSectionDivider section =
-          additionalData[PsdLayerSectionDivider.TAG];
+      var section =
+          additionalData[PsdLayerSectionDivider.TAG] as PsdLayerSectionDivider;
       return section.type;
     }
     return PsdLayerSectionDivider.NORMAL;

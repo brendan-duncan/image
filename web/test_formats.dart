@@ -1,5 +1,6 @@
 import 'dart:html';
 import 'dart:async';
+import 'dart:html' as prefix0;
 import 'dart:typed_data';
 import 'package:image/image.dart';
 
@@ -10,7 +11,7 @@ void main() {
   // An img on the html page is used to establish the path to the images
   // directory.  It's removed after we get the path since we'll be populating
   // the page with our own decoded images.
-  ImageElement img = querySelectorAll('img')[0];
+  var img = querySelectorAll('img')[0] as prefix0.ImageElement;
   String path = img.src.substring(0, img.src.lastIndexOf('/'));
   img.remove();
 
@@ -36,7 +37,7 @@ void main() {
     req.onLoadEnd.listen((e) {
       if (req.status == 200) {
         // Convert the text to binary byte list.
-        List<int> bytes = Uint8List.view(req.response);
+        List<int> bytes = Uint8List.view(req.response as ByteBuffer);
 
         var label = DivElement();
         document.body.append(label);

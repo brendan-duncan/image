@@ -6,7 +6,8 @@ CanvasElement canvas;
 DivElement logDiv;
 Image origImage;
 
-void _addControl(String label, String value, DivElement parent, callback) {
+void _addControl(String label, String value, DivElement parent,
+                 dynamic callback) {
   LabelElement amountLabel = LabelElement();
   amountLabel.text = label + ':';
   var amountEdit = InputElement();
@@ -27,14 +28,14 @@ void _addControl(String label, String value, DivElement parent, callback) {
 }
 
 void testSepia() {
-  DivElement sidebar = document.querySelector('#sidebar');
+  var sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
   var label = Element.tag('h1');
   label.text = 'Sepia';
   sidebar.children.add(label);
 
-  double amount = 1.0;
+  num amount = 1.0;
 
   void _apply() {
     Stopwatch t = Stopwatch();
@@ -52,7 +53,7 @@ void testSepia() {
     print(t.elapsedMilliseconds / 1000.0);
   }
 
-  _addControl('Amount', amount.toString(), sidebar, (v) {
+  _addControl('Amount', amount.toString(), sidebar, (num v) {
     amount = v;
     _apply();
   });
@@ -61,14 +62,14 @@ void testSepia() {
 }
 
 void testSobel() {
-  DivElement sidebar = document.querySelector('#sidebar');
+  var sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
   var label = Element.tag('h1');
   label.text = 'Sepia';
   sidebar.children.add(label);
 
-  double amount = 1.0;
+  num amount = 1.0;
 
   void _apply() {
     Stopwatch t = Stopwatch();
@@ -86,7 +87,7 @@ void testSobel() {
     print(t.elapsedMilliseconds / 1000.0);
   }
 
-  _addControl('Amount', amount.toString(), sidebar, (v) {
+  _addControl('Amount', amount.toString(), sidebar, (num v) {
     amount = v;
     _apply();
   });
@@ -95,7 +96,7 @@ void testSobel() {
 }
 
 void testGaussian() {
-  DivElement sidebar = document.querySelector('#sidebar');
+  var sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
   var label = Element.tag('h1');
@@ -120,7 +121,7 @@ void testGaussian() {
     print(t.elapsedMilliseconds / 1000.0);
   }
 
-  _addControl('Radius', radius.toString(), sidebar, (v) {
+  _addControl('Radius', radius.toString(), sidebar, (num v) {
     radius = v.toInt();
     _apply();
   });
@@ -129,16 +130,16 @@ void testGaussian() {
 }
 
 void testVignette() {
-  DivElement sidebar = document.querySelector('#sidebar');
+  var sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
   var label = Element.tag('h1');
   label.text = 'Vignette';
   sidebar.children.add(label);
 
-  double start = 0.3;
-  double end = 0.75;
-  double amount = 1.0;
+  num start = 0.3;
+  num end = 0.75;
+  num amount = 1.0;
 
   void _apply() {
     Stopwatch t = Stopwatch();
@@ -147,8 +148,8 @@ void testVignette() {
     image = vignette(image, start: start, end: end, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -156,17 +157,17 @@ void testVignette() {
     print(t.elapsedMilliseconds / 1000.0);
   }
 
-  _addControl('Start', start.toString(), sidebar, (v) {
+  _addControl('Start', start.toString(), sidebar, (num v) {
     start = v;
     _apply();
   });
 
-  _addControl('End', end.toString(), sidebar, (v) {
+  _addControl('End', end.toString(), sidebar, (num v) {
     end = v;
     _apply();
   });
 
-  _addControl('Amount', amount.toString(), sidebar, (v) {
+  _addControl('Amount', amount.toString(), sidebar, (num v) {
     amount = v;
     _apply();
   });
@@ -175,7 +176,7 @@ void testVignette() {
 }
 
 void testPixelate() {
-  DivElement sidebar = document.querySelector('#sidebar');
+  var sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
   var label = Element.tag('h1');
@@ -191,8 +192,8 @@ void testPixelate() {
     image = pixelate(image, blockSize);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -200,7 +201,7 @@ void testPixelate() {
     print(t.elapsedMilliseconds / 1000.0);
   }
 
-  _addControl('blockSize', blockSize.toString(), sidebar, (v) {
+  _addControl('blockSize', blockSize.toString(), sidebar, (num v) {
     blockSize = v.toInt();
     _apply();
   });
@@ -209,7 +210,7 @@ void testPixelate() {
 }
 
 void testColorOffset() {
-  DivElement sidebar = document.querySelector('#sidebar');
+  var sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
   var label = Element.tag('h1');
@@ -228,8 +229,8 @@ void testColorOffset() {
     image = colorOffset(image, red, green, blue, alpha);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -237,22 +238,22 @@ void testColorOffset() {
     print(t.elapsedMilliseconds / 1000.0);
   }
 
-  _addControl('red', red.toString(), sidebar, (v) {
+  _addControl('red', red.toString(), sidebar, (num v) {
     red = v.toInt();
     _apply();
   });
 
-  _addControl('green', red.toString(), sidebar, (v) {
+  _addControl('green', red.toString(), sidebar, (num v) {
     green = v.toInt();
     _apply();
   });
 
-  _addControl('blue', red.toString(), sidebar, (v) {
+  _addControl('blue', red.toString(), sidebar, (num v) {
     blue = v.toInt();
     _apply();
   });
 
-  _addControl('alpha', red.toString(), sidebar, (v) {
+  _addControl('alpha', red.toString(), sidebar, (num v) {
     alpha = v.toInt();
     _apply();
   });
@@ -261,20 +262,20 @@ void testColorOffset() {
 }
 
 void testAdjustColor() {
-  DivElement sidebar = document.querySelector('#sidebar');
+  var sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
   var label = Element.tag('h1');
   label.text = 'Adjust Color';
   sidebar.children.add(label);
 
-  double contrast = 1.0;
-  double saturation = 1.0;
-  double brightness = 1.0;
-  double gamma = 0.8;
-  double exposure = 0.3;
-  double hue = 0.0;
-  double amount = 1.0;
+  num contrast = 1.0;
+  num saturation = 1.0;
+  num brightness = 1.0;
+  num gamma = 0.8;
+  num exposure = 0.3;
+  num hue = 0.0;
+  num amount = 1.0;
 
   void _apply() {
     Stopwatch t = Stopwatch();
@@ -301,37 +302,37 @@ void testAdjustColor() {
     print(t.elapsedMilliseconds / 1000.0);
   }
 
-  _addControl('Contrast', contrast.toString(), sidebar, (v) {
+  _addControl('Contrast', contrast.toString(), sidebar, (num v) {
     contrast = v;
     _apply();
   });
 
-  _addControl('Saturation', saturation.toString(), sidebar, (v) {
+  _addControl('Saturation', saturation.toString(), sidebar, (num v) {
     saturation = v;
     _apply();
   });
 
-  _addControl('Brightness', brightness.toString(), sidebar, (v) {
+  _addControl('Brightness', brightness.toString(), sidebar, (num v) {
     brightness = v;
     _apply();
   });
 
-  _addControl('Gamma', gamma.toString(), sidebar, (v) {
+  _addControl('Gamma', gamma.toString(), sidebar, (num v) {
     gamma = v;
     _apply();
   });
 
-  _addControl('Exposure', exposure.toString(), sidebar, (v) {
+  _addControl('Exposure', exposure.toString(), sidebar, (num v) {
     exposure = v;
     _apply();
   });
 
-  _addControl('Hue', hue.toString(), sidebar, (v) {
+  _addControl('Hue', hue.toString(), sidebar, (num v) {
     hue = v;
     _apply();
   });
 
-  _addControl('Amount', amount.toString(), sidebar, (v) {
+  _addControl('Amount', amount.toString(), sidebar, (num v) {
     amount = v;
     _apply();
   });
@@ -340,10 +341,10 @@ void testAdjustColor() {
 }
 
 void main() {
-  canvas = document.querySelector('#filter_canvas');
-  logDiv = document.querySelector('#log');
+  canvas = document.querySelector('#filter_canvas') as CanvasElement;
+  logDiv = document.querySelector('#log') as DivElement;
 
-  SelectElement menu = document.querySelector('#FilterType');
+  var menu = document.querySelector('#FilterType') as SelectElement;
   menu.onChange.listen((e) {
     if (menu.value == 'Pixelate') {
       testPixelate();

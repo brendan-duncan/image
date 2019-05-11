@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   Directory dir = Directory('test/res/psd');
-  List files = dir.listSync();
+  var files = dir.listSync();
 
   group('PSD', () {
     for (var f in files) {
@@ -16,7 +16,7 @@ void main() {
       test(name, () {
         print('Decoding $name');
 
-        Image psd = PsdDecoder().decodeImage(f.readAsBytesSync());
+        Image psd = PsdDecoder().decodeImage((f as File).readAsBytesSync());
 
         if (psd != null) {
           List<int> outPng = PngEncoder().encodeImage(psd);

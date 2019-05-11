@@ -360,7 +360,7 @@ void main() {
       var f = readPng(new File('test/res/png/lenna.png').readAsBytesSync());
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.octree);
-      var colors = Set();
+      var colors = Set<int>();
       for (int y = 0; y < f.height; ++y) {
         for (int x = 0; x < f.width; ++x) {
           colors.add(f.getPixel(x, y));
@@ -375,7 +375,7 @@ void main() {
       var f = readPng(new File('test/res/png/lenna.png').readAsBytesSync());
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.neuralNet);
-      var colors = Set();
+      var colors = Set<int>();
       for (int y = 0; y < f.height; ++y) {
         for (int x = 0; x < f.width; ++x) {
           colors.add(f.getPixel(x, y));

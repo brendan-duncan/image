@@ -61,7 +61,7 @@ void main() {
     });
 
     Directory dir = Directory('test/res/png');
-    List files = dir.listSync();
+    var files = dir.listSync();
 
     for (var f in files) {
       if (f is! File || !f.path.endsWith('.png')) {
@@ -97,7 +97,7 @@ void main() {
       String name = f.path.split(RegExp(r'(/|\\)')).last;
 
       test('PNG $name', () {
-        File file = f;
+        File file = f as File;
 
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {

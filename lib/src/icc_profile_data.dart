@@ -22,7 +22,7 @@ class ICCProfileData {
     if (compression == ICCPCompression.deflate) {
       return data;
     }
-    data = ZLibEncoder().encode(data);
+    data = ZLibEncoder().encode(data) as Uint8List;
     compression = ICCPCompression.deflate;
     return data;
   }
@@ -33,7 +33,7 @@ class ICCProfileData {
     if (compression == ICCPCompression.deflate) {
       return data;
     }
-    data = ZLibDecoder().decodeBytes(data);
+    data = ZLibDecoder().decodeBytes(data) as Uint8List;
     compression = ICCPCompression.none;
     return data;
   }

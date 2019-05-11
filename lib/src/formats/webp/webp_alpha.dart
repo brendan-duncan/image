@@ -55,7 +55,7 @@ class WebPAlpha {
       return false;
     }
 
-    var unfilterFunc = WebPFilters.UNFILTERS[filter];
+    dynamic unfilterFunc = WebPFilters.UNFILTERS[filter];
 
     if (method == ALPHA_NO_COMPRESSION) {
       final int offset = row * width;
