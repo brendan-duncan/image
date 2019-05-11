@@ -47,17 +47,17 @@ Image copyRotate(Image src, num angle, {int interpolation = LINEAR}) {
   }
 
   // Generic angle.
-  double rad = (nangle * pi / 180.0);
-  double ca = cos(rad);
-  double sa = sin(rad);
-  double ux = (src.width * ca).abs();
-  double uy = (src.width * sa).abs();
-  double vx = (src.height * sa).abs();
-  double vy = (src.height * ca).abs();
-  double w2 = 0.5 * src.width;
-  double h2 = 0.5 * src.height;
-  double dw2 = 0.5 * (ux + vx);
-  double dh2 = 0.5 * (uy + vy);
+  num rad = (nangle * pi / 180.0);
+  num ca = cos(rad);
+  num sa = sin(rad);
+  num ux = (src.width * ca).abs();
+  num uy = (src.width * sa).abs();
+  num vx = (src.height * sa).abs();
+  num vy = (src.height * ca).abs();
+  num w2 = 0.5 * src.width;
+  num h2 = 0.5 * src.height;
+  num dw2 = 0.5 * (ux + vx);
+  num dh2 = 0.5 * (uy + vy);
 
   Image dst = Image((ux + vx).toInt(), (uy + vy).toInt(), Image.RGBA, src.exif,
       src.iccProfile);

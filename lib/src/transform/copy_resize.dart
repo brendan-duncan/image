@@ -12,7 +12,7 @@ import 'bake_orientation.dart';
 /// If [width] is -1, then it will be determined by the aspect ratio
 /// of [src] and [height].
 Image copyResize(Image src, int width,
-    [int height = -1, int interpolation = NEAREST]) {
+                 [int height = -1, int interpolation = NEAREST]) {
   if (width <= 0 && height <= 0) {
     throw new ImageException('Invalid size');
   }

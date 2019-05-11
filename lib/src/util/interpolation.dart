@@ -1,6 +1,6 @@
 // enum Interpolation
 
-/// Nearest interopolation.
+/// Nearest interpolation.
 const int NEAREST = 0;
 
 /// Linear interpolation.

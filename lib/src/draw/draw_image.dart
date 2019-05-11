@@ -13,14 +13,8 @@ import 'draw_pixel.dart';
 /// The coordinates refer to the upper left corner. This function can be used to
 /// copy regions within the same image (if [dst] is the same as [src])
 /// but if the regions overlap the results will be unpredictable.
-Image drawImage(Image dst, Image src,
-    {int dstX,
-    int dstY,
-    int srcX,
-    int srcY,
-    int srcW,
-    int srcH,
-    bool blend = true}) {
+Image drawImage(Image dst, Image src, {int dstX, int dstY, int srcX, int srcY,
+                int srcW, int srcH, bool blend = true}) {
   if (dstX == null) {
     dstX = 0;
   }

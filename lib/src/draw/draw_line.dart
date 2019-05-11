@@ -9,7 +9,7 @@ import 'draw_pixel.dart';
 /// If [antialias] is true then the line is drawn with smooth edges.
 /// [thickness] determines how thick the line should be drawn, in pixels.
 Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
-    {bool antialias = false, num thickness = 1}) {
+               {bool antialias = false, num thickness = 1}) {
   List<int> line = [x1, y1, x2, y2];
   if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
     return image;
@@ -61,7 +61,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     dy = dy.abs();
     if (dy <= dx) {
       // More-or-less horizontal. use wid for vertical stroke
-      double ac = cos(atan2(dy, dx));
+      num ac = cos(atan2(dy, dx));
       int wid;
       if (ac != 0) {
         wid = thickness ~/ ac;
@@ -129,7 +129,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
       }
     } else {
       // More-or-less vertical. use wid for horizontal stroke
-      double as = sin(atan2(dy, dx));
+      num as = sin(atan2(dy, dx));
       int wid;
       if (as != 0) {
         wid = thickness ~/ as;
@@ -200,7 +200,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
 
   // Antialias Line
 
-  double ag = (dy.abs() < dx.abs())
+  num ag = (dy.abs() < dx.abs())
       ? cos(atan2(dy, dx))
       : sin(atan2(dy, dx));
 

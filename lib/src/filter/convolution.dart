@@ -4,7 +4,7 @@ import '../color.dart';
 import '../image.dart';
 
 /// Apply a 3x3 convolution filter to the [src] image.  [filter] should be a
-/// list of 9 doubles.
+/// list of 9 numbers.
 ///
 /// The rgb channels will be divided by [filterDiv] and add [offset], allowing
 /// filters to normalize and offset the filtered pixel value.
@@ -15,9 +15,9 @@ Image convolution(Image src, List<num> filter,
   for (int y = 0; y < src.height; ++y) {
     for (int x = 0; x < src.width; ++x) {
       int c = tmp.getPixel(x, y);
-      double r = 0.0;
-      double g = 0.0;
-      double b = 0.0;
+      num r = 0.0;
+      num g = 0.0;
+      num b = 0.0;
       int a = getAlpha(c);
       for (int j = 0, fi = 0; j < 3; ++j) {
         int yv = min(max(y - 1 + j, 0), src.height - 1);

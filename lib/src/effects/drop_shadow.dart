@@ -7,7 +7,7 @@ import '../transform/copy_into.dart';
 
 /// Create a drop-shadow effect for the image.
 Image dropShadow(Image src, int hShadow, int vShadow, int blur,
-    {int shadowColor = 0xa0000000}) {
+                 {int shadowColor = 0xa0000000}) {
   if (blur < 0) {
     blur = 0;
   }

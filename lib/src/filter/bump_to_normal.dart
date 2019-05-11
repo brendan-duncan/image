@@ -8,7 +8,7 @@ import '../image.dart';
 /// The red channel of the [src] image is used as an input, 0 represents a low
 /// height and 1 a high value. The optional [strength] parameter allows to set
 /// the strength of the normal image.
-Image bumpToNormal(Image src, {double strength = 2.0}) {
+Image bumpToNormal(Image src, {num strength = 2.0}) {
   Image dest = Image.from(src);
 
   for (var y = 0; y < src.height; ++y) {

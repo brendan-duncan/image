@@ -3,22 +3,22 @@ import '../image.dart';
 
 /// A kernel object to use with [seperableConvolution] filtering.
 class SeperableKernel {
-  final List<double> coefficients;
+  final List<num> coefficients;
   final int size;
 
   /// Create a seperable convolution kernel for the given [radius].
   SeperableKernel(int radius)
-      : coefficients = List<double>(2 * radius + 1),
+      : coefficients = List<num>(2 * radius + 1),
         this.size = radius;
 
   /// Get the number of coefficients in the kernel.
   int get length => coefficients.length;
 
   /// Get a coefficient from the kernel.
-  double operator [](int index) => coefficients[index];
+  num operator [](int index) => coefficients[index];
 
   /// Set a coefficient in the kernel.
-  void operator []=(int index, double c) {
+  void operator []=(int index, num c) {
     coefficients[index] = c;
   }
 
@@ -39,7 +39,7 @@ class SeperableKernel {
   }
 
   /// Scale all of the coefficients by [s].
-  void scaleCoefficients(double s) {
+  void scaleCoefficients(num s) {
     for (int i = 0; i < coefficients.length; ++i) {
       coefficients[i] *= s;
     }
@@ -55,16 +55,16 @@ class SeperableKernel {
     return x;
   }
 
-  void _applyCoeffsLine(
-      Image src, Image dst, int y, int width, bool horizontal) {
+  void _applyCoeffsLine(Image src, Image dst, int y, int width,
+                        bool horizontal) {
     for (int x = 0; x < width; x++) {
-      double r = 0.0;
-      double g = 0.0;
-      double b = 0.0;
-      double a = 0.0;
+      num r = 0.0;
+      num g = 0.0;
+      num b = 0.0;
+      num a = 0.0;
 
       for (int j = -size, j2 = 0; j <= size; ++j, ++j2) {
-        double coeff = coefficients[j2];
+        num coeff = coefficients[j2];
         int gr = _reflect(width, x + j);
 
         int sc = (horizontal) ? src.getPixel(gr, y) : src.getPixel(y, gr);
