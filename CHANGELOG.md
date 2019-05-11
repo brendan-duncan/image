@@ -1,3 +1,7 @@
+## 2.0.9 - May 10, 2019
+
+- Use strict dartanalysys settings and clean up code.
+
 ## 2.0.8 - May 8, 2019
 
 - Add ability to quantize an image to any number of colors.
