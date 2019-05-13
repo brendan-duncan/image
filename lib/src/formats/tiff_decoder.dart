@@ -13,13 +13,13 @@ class TiffDecoder extends Decoder {
 
   /// Is the given file a valid TIFF image?
   bool isValidFile(List<int> data) {
-    return _readHeader(new InputBuffer(data)) != null;
+    return _readHeader(InputBuffer(data)) != null;
   }
 
   /// Validate the file is a Gif image and get information about it.
   /// If the file is not a valid Gif image, null is returned.
   TiffInfo startDecode(List<int> bytes) {
-    _input = InputBuffer(new Uint8List.fromList(bytes));
+    _input = InputBuffer(Uint8List.fromList(bytes));
     info = _readHeader(_input);
     return info;
   }
@@ -45,7 +45,7 @@ class TiffDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded.  If there was a problem
   /// decoding the file, null is returned.
   Image decodeImage(List<int> data, {int frame = 0}) {
-    InputBuffer ptr = InputBuffer(new Uint8List.fromList(data));
+    InputBuffer ptr = InputBuffer(Uint8List.fromList(data));
 
     TiffInfo info = _readHeader(ptr);
     if (info == null) {
@@ -56,7 +56,7 @@ class TiffDecoder extends Decoder {
   }
 
   HdrImage decodeHdrImage(List<int> data, {int frame = 0}) {
-    InputBuffer ptr = InputBuffer(new Uint8List.fromList(data));
+    InputBuffer ptr = InputBuffer(Uint8List.fromList(data));
 
     TiffInfo info = _readHeader(ptr);
     if (info == null) {

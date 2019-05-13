@@ -26,7 +26,7 @@ Image hdrToImage(HdrImage hdr, {num exposure}) {
   Uint8List pixels = image.getBytes();
 
   if (!hdr.hasColor) {
-    throw new ImageException('Only RGB[A] images are currently supported.');
+    throw ImageException('Only RGB[A] images are currently supported.');
   }
 
   num m = (exposure != null)

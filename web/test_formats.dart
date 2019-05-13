@@ -18,14 +18,14 @@ void main() {
   // The list of images we'll be decoding, representing a wide range
   // of formats and sub-formats.
   List<String> images = [
-    'penguins.jpg',
-    '1_webp_ll.webp',
-    '1.webp',
-    '3_webp_a.webp',
-    'puppies.jpg',
-    'cars.gif',
-    'trees.png',
-    'animated.png',
+    //'penguins.jpg',
+    //'1_webp_ll.webp',
+    //'1.webp',
+    //'3_webp_a.webp',
+    //'puppies.jpg',
+    //'cars.gif',
+    //'trees.png',
+    //'animated.png',
     'BladeRunner_lossy.webp'
   ];
 
@@ -73,7 +73,7 @@ void main() {
           // Create a buffer that the canvas can draw.
           ImageData d = c.context2D.createImageData(c.width, c.height);
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length, newImage.getBytes());
+          d.data.setRange(0, d.data.length, newImage.getBytes(format: Format.rgba));
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
 
@@ -98,7 +98,7 @@ void main() {
           }
 
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length, image.getBytes());
+          d.data.setRange(0, d.data.length, image.getBytes(format: Format.rgba));
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
         });

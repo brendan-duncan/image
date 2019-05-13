@@ -13,12 +13,13 @@ void main() {
   ctx.drawImage(theImg, 0, 0);
 
   var bytes = ctx.getImageData(0, 0, cvs.width, cvs.height).data;
-  Image image = Image.fromBytes(cvs.width, cvs.height, bytes);
+  Image image = Image.fromBytes(cvs.width, cvs.height, bytes,
+                                format: Format.rgba);
 
   var jpg = encodeJpg(image, quality: 25);
 
   var jpg64 = base64Encode(jpg);
   var img = document.createElement('img') as ImageElement;
-  img.src = 'data:image/png;base64,${jpg64}';
+  img.src = 'data:image/jpeg;base64,${jpg64}';
   document.body.append(img);
 }

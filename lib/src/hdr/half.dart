@@ -72,28 +72,28 @@ class Half {
   double toDouble() => _toFloatFloat32[_h];
 
   /// Unary minus
-  Half operator -() => new Half.fromBits(_h ^ 0x8000);
+  Half operator -() => Half.fromBits(_h ^ 0x8000);
 
   /// Addition operator for Half or num left operands.
   Half operator +(dynamic f) {
     double d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
-    return new Half(toDouble() + d);
+    return Half(toDouble() + d);
   }
 
   /// Subtraction operator for Half or num left operands.
   Half operator -(dynamic f) {
     double d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
-    return new Half(toDouble() - d.toDouble());
+    return Half(toDouble() - d.toDouble());
   }
 
   Half operator *(dynamic f) {
     double d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
-    return new Half(toDouble() * d.toDouble());
+    return Half(toDouble() * d.toDouble());
   }
 
   Half operator /(dynamic f) {
     double d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
-    return new Half(toDouble() / d.toDouble());
+    return Half(toDouble() / d.toDouble());
   }
 
   /// Round to n-bit precision (n should be between 0 and 10).
@@ -128,7 +128,7 @@ class Half {
 
     // Put the original sign bit back.
 
-    return new Half.fromBits(s | e);
+    return Half.fromBits(s | e);
   }
 
   /// Returns true if h is a normalized number, a denormalized number or zero.
@@ -175,16 +175,16 @@ class Half {
   }
 
   /// Returns +infinity.
-  static Half posInf() => new Half.fromBits(0x7c00);
+  static Half posInf() => Half.fromBits(0x7c00);
 
   /// Returns -infinity.
-  static Half negInf() => new Half.fromBits(0xfc00);
+  static Half negInf() => Half.fromBits(0xfc00);
 
   /// Returns a NAN with the bit pattern 0111111111111111.
-  static Half qNan() => new Half.fromBits(0x7fff);
+  static Half qNan() => Half.fromBits(0x7fff);
 
   /// Returns a NAN with the bit pattern 0111110111111111.
-  static Half sNan() => new Half.fromBits(0x7dff);
+  static Half sNan() => Half.fromBits(0x7dff);
 
   int bits() => _h;
 

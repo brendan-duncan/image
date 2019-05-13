@@ -36,7 +36,7 @@ class NeuralQuantizer extends Quantizer {
 
   NeuralQuantizer(Image image, {int numberOfColors = 256}) {
     if (image.width * image.height < MAX_PRIME) {
-      throw new ImageException('Image is too small');
+      throw ImageException('Image is too small');
     }
 
     _initialize(numberOfColors);

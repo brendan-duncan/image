@@ -7,12 +7,12 @@ import 'formats/png_decoder.dart';
 
 /// Decode a [BitmapFont] from the contents of a zip file that stores the
 /// .fnt font definition and associated PNG images.
-BitmapFont readFontZip(List<int> bytes) => new BitmapFont.fromZip(bytes);
+BitmapFont readFontZip(List<int> bytes) => BitmapFont.fromZip(bytes);
 
 /// Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
 /// and an [Image] that stores the font [map].
 BitmapFont readFont(String font, Image map) =>
-    new BitmapFont.fromFnt(font, map);
+    BitmapFont.fromFnt(font, map);
 
 /// A bitmap font that can be used with [drawString] and [drawChar] functions.
 /// You can generate a font files from a program
@@ -50,7 +50,7 @@ class BitmapFont {
     if (fnt.startsWith('<font>')) {
       doc = parse(fnt);
       if (doc == null) {
-        throw new ImageException('Invalid font XML');
+        throw ImageException('Invalid font XML');
       }
     } else {
       doc = _parseTextFnt(fnt);
@@ -74,7 +74,7 @@ class BitmapFont {
     }
 
     if (font_file == null) {
-      throw new ImageException('Invalid font archive');
+      throw ImageException('Invalid font archive');
     }
 
     String font_str = String.fromCharCodes(font_file.content as List<int>);
@@ -83,7 +83,7 @@ class BitmapFont {
     if (font_str.startsWith('<font>')) {
       xml = parse(font_str);
       if (xml == null) {
-        throw new ImageException('Invalid font XML');
+        throw ImageException('Invalid font XML');
       }
     } else {
       xml = _parseTextFnt(font_str);
@@ -112,7 +112,7 @@ class BitmapFont {
   void _parseFnt(XmlDocument xml, Map<int, Image> fontPages,
       [Archive arc]) {
     if (xml.children.length != 1) {
-      throw new ImageException('Invalid font XML');
+      throw ImageException('Invalid font XML');
     }
 
     var font = xml.children[0];
@@ -197,13 +197,13 @@ class BitmapFont {
           String filename = page.getAttribute('file');
 
           if (fontPages.containsKey(id)) {
-            throw new ImageException('Duplicate font page id found: $id.');
+            throw ImageException('Duplicate font page id found: $id.');
           }
 
           if (arc != null) {
             ArchiveFile imageFile = _findFile(arc, filename);
             if (imageFile == null) {
-              throw new ImageException('Font zip missing font page image '
+              throw ImageException('Font zip missing font page image '
                   '$filename');
             }
 
@@ -242,7 +242,7 @@ class BitmapFont {
           int chnl = int.parse(char.getAttribute('chnl'));
 
           if (!fontPages.containsKey(page)) {
-            throw new ImageException('Missing page image: $page');
+            throw ImageException('Missing page image: $page');
           }
 
           Image fontImage = fontPages[page];
@@ -285,17 +285,17 @@ class BitmapFont {
       switch (tk[0]) {
         case 'info':
           var attrs = _parseParameters(tk);
-          var info = XmlElement(new XmlName('info'), attrs, []);
+          var info = XmlElement(XmlName('info'), attrs, []);
           children.add(info);
           break;
         case 'common':
           var attrs = _parseParameters(tk);
-          var node = XmlElement(new XmlName('common'), attrs, []);
+          var node = XmlElement(XmlName('common'), attrs, []);
           children.add(node);
           break;
         case 'page':
           var attrs = _parseParameters(tk);
-          var page = XmlElement(new XmlName('page'), attrs, []);
+          var page = XmlElement(XmlName('page'), attrs, []);
           pageList.add(page);
           break;
         case 'chars':
@@ -303,7 +303,7 @@ class BitmapFont {
           break;
         case 'char':
           var attrs = _parseParameters(tk);
-          var node = XmlElement(new XmlName('char'), attrs, []);
+          var node = XmlElement(XmlName('char'), attrs, []);
           charList.add(node);
           break;
         case 'kernings':
@@ -311,29 +311,29 @@ class BitmapFont {
           break;
         case 'kerning':
           var attrs = _parseParameters(tk);
-          var node = XmlElement(new XmlName('kerning'), attrs, []);
+          var node = XmlElement(XmlName('kerning'), attrs, []);
           kerningList.add(node);
           break;
       }
     }
 
     if (charsAttrs != null || charList.isNotEmpty) {
-      var node = XmlElement(new XmlName('chars'), charsAttrs, charList);
+      var node = XmlElement(XmlName('chars'), charsAttrs, charList);
       children.add(node);
     }
 
     if (kerningsAttrs != null || kerningList.isNotEmpty) {
       var node = XmlElement(
-          new XmlName('kernings'), kerningsAttrs, kerningList);
+          XmlName('kernings'), kerningsAttrs, kerningList);
       children.add(node);
     }
 
     if (pageList.isNotEmpty) {
-      var pages = XmlElement(new XmlName('pages'), [], pageList);
+      var pages = XmlElement(XmlName('pages'), [], pageList);
       children.add(pages);
     }
 
-    var xml = XmlElement(new XmlName('font'), [], children);
+    var xml = XmlElement(XmlName('font'), [], children);
     var doc = XmlDocument([xml]);
 
     return doc;
@@ -353,7 +353,7 @@ class BitmapFont {
       // Remove all " characters
       atk[1] = atk[1].replaceAll('"', '');
 
-      var a = XmlAttribute(new XmlName(atk[0]), atk[1]);
+      var a = XmlAttribute(XmlName(atk[0]), atk[1]);
       params.add(a);
     }
     return params;

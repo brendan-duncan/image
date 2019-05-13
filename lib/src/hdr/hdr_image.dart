@@ -48,7 +48,7 @@ class HdrImage {
 
     const List<String> channelList = const [R, G, B, A];
     for (int i = 0; i < channels; ++i) {
-      addSlice(new HdrSlice(channelList[i], width, height, format));
+      addSlice(HdrSlice(channelList[i], width, height, format));
     }
   }
 
@@ -56,18 +56,18 @@ class HdrImage {
   HdrImage.from(HdrImage other) {
     for (String ch in other.slices.keys) {
       HdrSlice slice = other.slices[ch];
-      addSlice(new HdrSlice.from(slice));
+      addSlice(HdrSlice.from(slice));
     }
   }
 
   /// Create an HDR image from a LDR [Image] by transforming the channel values
   /// to the range [0, 1].
   HdrImage.fromImage(Image other) {
-    addSlice(new HdrSlice(R, other.width, other.height, HALF));
-    addSlice(new HdrSlice(G, other.width, other.height, HALF));
-    addSlice(new HdrSlice(B, other.width, other.height, HALF));
+    addSlice(HdrSlice(R, other.width, other.height, HALF));
+    addSlice(HdrSlice(G, other.width, other.height, HALF));
+    addSlice(HdrSlice(B, other.width, other.height, HALF));
     if (other.format == Image.RGBA) {
-      addSlice(new HdrSlice(A, other.width, other.height, HALF));
+      addSlice(HdrSlice(A, other.width, other.height, HALF));
     }
     Uint8List rgb = other.getBytes();
     for (int y = 0, si = 0; y < other.height; ++y) {

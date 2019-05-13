@@ -8,7 +8,7 @@ class ExrHuffman {
       InputBuffer compressed, int nCompressed, Uint16List raw, int nRaw) {
     if (nCompressed == 0) {
       if (nRaw != 0) {
-        throw new ImageException('Incomplete huffman data');
+        throw ImageException('Incomplete huffman data');
       }
 
       return;
@@ -22,7 +22,7 @@ class ExrHuffman {
     int nBits = compressed.readUint32();
 
     if (im < 0 || im >= HUF_ENCSIZE || iM < 0 || iM >= HUF_ENCSIZE) {
-      throw new ImageException('Invalid huffman table size');
+      throw ImageException('Invalid huffman table size');
     }
 
     compressed.skip(4);
@@ -38,7 +38,7 @@ class ExrHuffman {
     unpackEncTable(compressed, nCompressed - 20, im, iM, freq);
 
     if (nBits > 8 * (nCompressed - (compressed.offset - start))) {
-      throw new ImageException("Error in header for Huffman-encoded data "
+      throw ImageException("Error in header for Huffman-encoded data "
           "(invalid number of bits).");
     }
 
@@ -68,7 +68,7 @@ class ExrHuffman {
           oi = getCode(pl.lit, rlc, c_lc, input, out, oi, no);
         } else {
           if (pl.p == null) {
-            throw new ImageException("Error in Huffman-encoded data "
+            throw ImageException("Error in Huffman-encoded data "
                 "(invalid code).");
           }
 
@@ -94,7 +94,7 @@ class ExrHuffman {
           }
 
           if (j == pl.lit) {
-            throw new ImageException("Error in Huffman-encoded data "
+            throw ImageException("Error in Huffman-encoded data "
                 "(invalid code).");
           }
         }
@@ -113,13 +113,13 @@ class ExrHuffman {
         c_lc[1] -= pl.len;
         oi = getCode(pl.lit, rlc, c_lc, input, out, oi, no);
       } else {
-        throw new ImageException("Error in Huffman-encoded data "
+        throw ImageException("Error in Huffman-encoded data "
             "(invalid code).");
       }
     }
 
     if (oi != no) {
-      throw new ImageException("Error in Huffman-encoded data "
+      throw ImageException("Error in Huffman-encoded data "
           "(decoded data are shorter than expected).");
     }
   }
@@ -136,7 +136,7 @@ class ExrHuffman {
       int cs = (c_lc[0] >> c_lc[1]) & 0xff;
 
       if (oi + cs > oe) {
-        throw new ImageException("Error in Huffman-encoded data "
+        throw ImageException("Error in Huffman-encoded data "
             "(decoded data are longer than expected).");
       }
 
@@ -148,7 +148,7 @@ class ExrHuffman {
     } else if (oi < oe) {
       out[oi++] = po;
     } else {
-      throw new ImageException("Error in Huffman-encoded data "
+      throw ImageException("Error in Huffman-encoded data "
           "(decoded data are longer than expected).");
     }
     return oi;
@@ -166,7 +166,7 @@ class ExrHuffman {
         // Error: c is supposed to be an l-bit code,
         // but c contains a value that is greater
         // than the largest l-bit number.
-        throw new ImageException("Error in Huffman-encoded data "
+        throw ImageException("Error in Huffman-encoded data "
             "(invalid code table entry).");
       }
 
@@ -177,7 +177,7 @@ class ExrHuffman {
         if (pl.len != 0) {
           // Error: a short code has already
           // been stored in table entry *pl.
-          throw new ImageException("Error in Huffman-encoded data "
+          throw ImageException("Error in Huffman-encoded data "
               "(invalid code table entry).");
         }
 
@@ -205,7 +205,7 @@ class ExrHuffman {
           if (pl.len != 0 || pl.p != null) {
             // Error: a short code or a long code has
             // already been stored in table entry *pl.
-            throw new ImageException("Error in Huffman-encoded data "
+            throw ImageException("Error in Huffman-encoded data "
                 "(invalid code table entry).");
           }
 
@@ -223,7 +223,7 @@ class ExrHuffman {
 
     for (; im <= iM; im++) {
       if (p.offset - pcode > ni) {
-        throw new ImageException("Error in Huffman-encoded data "
+        throw ImageException("Error in Huffman-encoded data "
             "(unexpected end of code table data).");
       }
 
@@ -231,14 +231,14 @@ class ExrHuffman {
 
       if (l == LONG_ZEROCODE_RUN) {
         if (p.offset - pcode > ni) {
-          throw new ImageException("Error in Huffman-encoded data "
+          throw ImageException("Error in Huffman-encoded data "
               "(unexpected end of code table data).");
         }
 
         int zerun = getBits(8, c_lc, p) + SHORTEST_LONG_RUN;
 
         if (im + zerun > iM + 1) {
-          throw new ImageException("Error in Huffman-encoded data "
+          throw ImageException("Error in Huffman-encoded data "
               "(code table is longer than expected).");
         }
 
@@ -251,7 +251,7 @@ class ExrHuffman {
         int zerun = l - SHORT_ZEROCODE_RUN + 2;
 
         if (im + zerun > iM + 1) {
-          throw new ImageException("Error in Huffman-encoded data "
+          throw ImageException("Error in Huffman-encoded data "
               "(code table is longer than expected).");
         }
 

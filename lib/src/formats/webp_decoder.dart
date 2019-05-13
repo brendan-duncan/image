@@ -121,7 +121,7 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
-    _info.numFrames = _info.numFrames;
+    _info.numFrames = _info.frames.length;
 
     Animation anim = Animation();
     anim.width = _info.width;

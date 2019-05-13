@@ -14,8 +14,8 @@ class ExifData {
 
   ExifData.from(ExifData other)
       : data = (other == null)
-            ? new Map<int, dynamic>()
-            : new Map<int, dynamic>.from(other.data) {
+            ? Map<int, dynamic>()
+            : Map<int, dynamic>.from(other.data) {
     if (other != null && other.rawData != null) {
       rawData = List<Uint8List>(other.rawData.length);
       for (int i = 0; i < other.rawData.length; ++i) {

@@ -67,7 +67,7 @@ class TiffFaxDecoder {
           // Additional Make up code
           // Get the next 2 bits
           twoBits = _nextLesserThan8Bits(2);
-          // Consolidate the 2 new bits and last 2 bits into 4 bits
+          // Consolidate the 2 bits and last 2 bits into 4 bits
           current = ((current << 2) & 0x000c) | twoBits;
           entry = ADDITIONAL_MAKEUP[current];
           bits = (entry >> 1) & 0x07; // 3 bits 0000 0111
@@ -77,10 +77,10 @@ class TiffFaxDecoder {
           _updatePointer(4 - bits);
         } else if (bits == 0) {
           // ERROR
-          throw new ImageException("TIFFFaxDecoder0");
+          throw ImageException("TIFFFaxDecoder0");
         } else if (bits == 15) {
           // EOL
-          throw new ImageException("TIFFFaxDecoder1");
+          throw ImageException("TIFFFaxDecoder1");
         } else {
           // 11 bits - 0000 0111 1111 1111 = 0x07ff
           code = (entry >> 5) & 0x07ff;
@@ -136,7 +136,7 @@ class TiffFaxDecoder {
             _updatePointer(4 - bits);
           } else if (bits == 15) {
             // EOL code
-            throw new ImageException("TIFFFaxDecoder2");
+            throw ImageException("TIFFFaxDecoder2");
           } else {
             _setToBlack(buffer, lineOffset, bitOffset, code);
             bitOffset += code;
@@ -212,7 +212,7 @@ class TiffFaxDecoder {
 
     // The data must start with an EOL code
     if (_readEOL() != 1) {
-      throw new ImageException("TIFFFaxDecoder3");
+      throw ImageException("TIFFFaxDecoder3");
     }
 
     int lineOffset = 0;
@@ -311,7 +311,7 @@ class TiffFaxDecoder {
 
             _updatePointer(7 - bits);
           } else {
-            throw new ImageException("TIFFFaxDecoder4");
+            throw ImageException("TIFFFaxDecoder4");
           }
         }
 
@@ -453,7 +453,7 @@ class TiffFaxDecoder {
           _updatePointer(7 - bits);
         } else if (code == 11) {
           if (_nextLesserThan8Bits(3) != 7) {
-            throw new ImageException("TIFFFaxDecoder5");
+            throw ImageException("TIFFFaxDecoder5");
           }
 
           int zeros = 0;
@@ -518,7 +518,7 @@ class TiffFaxDecoder {
             }
           }
         } else {
-          throw new ImageException("TIFFFaxDecoder5 $code");
+          throw ImageException("TIFFFaxDecoder5 $code");
         }
       }
 
@@ -560,10 +560,10 @@ class TiffFaxDecoder {
         _updatePointer(4 - bits);
       } else if (bits == 0) {
         // ERROR
-        throw new ImageException("TIFFFaxDecoder0");
+        throw ImageException("TIFFFaxDecoder0");
       } else if (bits == 15) {
         // EOL
-        throw new ImageException("TIFFFaxDecoder1");
+        throw ImageException("TIFFFaxDecoder1");
       } else {
         // 11 bits - 0000 0111 1111 1111 = 0x07ff
         code = (entry >> 5) & 0x07ff;
@@ -614,7 +614,7 @@ class TiffFaxDecoder {
           _updatePointer(4 - bits);
         } else if (bits == 15) {
           // EOL code
-          throw new ImageException("TIFFFaxDecoder2");
+          throw ImageException("TIFFFaxDecoder2");
         } else {
           runLength += code;
           _updatePointer(9 - bits);
@@ -645,7 +645,7 @@ class TiffFaxDecoder {
   int _readEOL() {
     if (fillBits == 0) {
       if (_nextNBits(12) != 1) {
-        throw new ImageException("TIFFFaxDecoder6");
+        throw ImageException("TIFFFaxDecoder6");
       }
     } else if (fillBits == 1) {
       // First EOL code word xxxx 0000 0000 0001 will occur
@@ -654,7 +654,7 @@ class TiffFaxDecoder {
       int bitsLeft = 8 - bitPointer;
 
       if (_nextNBits(bitsLeft) != 0) {
-        throw new ImageException("TIFFFaxDecoder8");
+        throw ImageException("TIFFFaxDecoder8");
       }
 
       // If the number of bitsLeft is less than 8, then to have a 12
@@ -663,7 +663,7 @@ class TiffFaxDecoder {
       // that.
       if (bitsLeft < 4) {
         if (_nextNBits(8) != 0) {
-          throw new ImageException("TIFFFaxDecoder8");
+          throw ImageException("TIFFFaxDecoder8");
         }
       }
 
@@ -674,7 +674,7 @@ class TiffFaxDecoder {
       while ((n = _nextNBits(8)) != 1) {
         // If not all zeros
         if (n != 0) {
-          throw new ImageException("TIFFFaxDecoder8");
+          throw ImageException("TIFFFaxDecoder8");
         }
       }
     }
@@ -786,7 +786,7 @@ class TiffFaxDecoder {
         next2next = FLIP_TABLE[data[bp + 2] & 0xff];
       }
     } else {
-      throw new ImageException("TIFFFaxDecoder7");
+      throw ImageException("TIFFFaxDecoder7");
     }
 
     int bitsLeft = 8 - bitPointer;
@@ -842,7 +842,7 @@ class TiffFaxDecoder {
         next = FLIP_TABLE[data[bp + 1] & 0xff];
       }
     } else {
-      throw new ImageException("TIFFFaxDecoder7");
+      throw ImageException("TIFFFaxDecoder7");
     }
 
     int bitsLeft = 8 - bitPointer;

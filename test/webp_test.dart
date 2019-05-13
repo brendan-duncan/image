@@ -27,26 +27,16 @@ void main() {
           expect(data.height, equals(_webp_tests[name]['height']));
           expect(data.hasAlpha, equals(_webp_tests[name]['hasAlpha']));
           expect(data.hasAnimation, equals(_webp_tests[name]['hasAnimation']));
+
+          if (data.hasAnimation) {
+            Animation anim = WebPDecoder().decodeAnimation(bytes);
+            expect(anim.length, equals(_webp_tests[name]['numFrames']));
+          }
         }
       });
     }
   });
 
-  /*List<int> bytes = File('1_webp_ll.webp')
-                          .readAsBytesSync();
-  Image image = WebPDecoder().decodeImage(bytes);
-  List<int> png = PngEncoder().encode(image);
-  new File('out/webp/decode.png')
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(png);*/
-
-  /*Animation anim = WebPDecoder().decodeAnimation(bytes);
-  for (int i = 0; i < anim.numFrames; ++i) {
-    AnimationFrame frame = anim[i];
-    List<int> png = PngEncoder().encode(frame.image);
-    new File('out/webp/comp_$i.png')
-          ..writeAsBytesSync(png);
-  }*/
 
   group('WebP/decodeImage', () {
     test('validate', () {
@@ -212,42 +202,16 @@ const _webp_tests = {
     'width': 500,
     'height': 224,
     'hasAlpha': true,
-    'hasAnimation': true
+    'hasAnimation': true,
+    'numFrames': 75
   },
   'BladeRunner_lossy.webp': {
     'format': 3,
     'width': 500,
     'height': 224,
     'hasAlpha': true,
-    'hasAnimation': true
-  },
-  'Contact.webp': {
-    'format': 3,
-    'width': 500,
-    'height': 219,
-    'hasAlpha': true,
-    'hasAnimation': true
-  },
-  'Contact_lossy.webp': {
-    'format': 3,
-    'width': 500,
-    'height': 219,
-    'hasAlpha': true,
-    'hasAnimation': true
-  },
-  'GenevaDrive.webp': {
-    'format': 3,
-    'width': 320,
-    'height': 240,
-    'hasAlpha': true,
-    'hasAnimation': true
-  },
-  'GenevaDrive_lossy.webp': {
-    'format': 3,
-    'width': 320,
-    'height': 240,
-    'hasAlpha': true,
-    'hasAnimation': true
+    'hasAnimation': true,
+    'numFrames': 75
   },
   'red.webp': {
     'format': 1,
@@ -261,13 +225,15 @@ const _webp_tests = {
     'width': 320,
     'height': 240,
     'hasAlpha': true,
-    'hasAnimation': true
+    'hasAnimation': true,
+    'numFrames': 31
   },
   'SteamEngine_lossy.webp': {
     'format': 3,
     'width': 320,
     'height': 240,
     'hasAlpha': true,
-    'hasAnimation': true
+    'hasAnimation': true,
+    'numFrames': 31
   }
 };

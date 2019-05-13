@@ -22,10 +22,10 @@ class HdrSlice {
         this.height = height,
         this.type = type,
         data = type == HdrImage.HALF
-            ? new Uint16List(width * height)
+            ? Uint16List(width * height)
             : type == HdrImage.FLOAT
-                ? new Float32List(width * height)
-                : new Uint32List(width * height);
+                ? Float32List(width * height)
+                : Uint32List(width * height);
 
   /// Create a copy of the [other] HdrSlice.
   HdrSlice.from(HdrSlice other)
@@ -34,13 +34,13 @@ class HdrSlice {
         height = other.height,
         type = other.type,
         data = other.type == HdrImage.HALF
-            ? new Uint16List.fromList(other.data as List<int>)
+            ? Uint16List.fromList(other.data as List<int>)
             : other.type == HdrImage.FLOAT
-                ? new Float32List.fromList(other.data as List<double>)
-                : new Uint32List.fromList(other.data as List<int>);
+                ? Float32List.fromList(other.data as List<double>)
+                : Uint32List.fromList(other.data as List<int>);
 
   /// Get the raw bytes of the data buffer.
-  Uint8List getBytes() => new Uint8List.view(data.buffer as ByteBuffer);
+  Uint8List getBytes() => Uint8List.view(data.buffer as ByteBuffer);
 
   /// Does this channel store floating-point data?
   bool get isFloat => type == HdrImage.FLOAT || type == HdrImage.HALF;

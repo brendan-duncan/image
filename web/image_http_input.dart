@@ -47,7 +47,7 @@ void onFileLoaded(Event event) {
   // a canvas.
   if (image != null) {
     // Add a separator to the html page
-    document.body.append(new ParagraphElement());
+    document.body.append(ParagraphElement());
 
     // Draw the image into a canvas.  First create a canvas at the correct
     // resolution.
@@ -59,7 +59,7 @@ void onFileLoaded(Event event) {
     // Create a buffer that the canvas can draw.
     ImageData d = c.context2D.createImageData(c.width, c.height);
     // Fill the buffer with our image data.
-    d.data.setRange(0, d.data.length, image.getBytes());
+    d.data.setRange(0, d.data.length, image.getBytes(format: Format.rgba));
     // Draw the buffer onto the canvas.
     c.context2D.putImageData(d, 0, 0);
 

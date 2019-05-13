@@ -260,7 +260,7 @@ List<int> hsvToRGB(num hue, num saturation, num brightness) {
         (q * 255.0).round()
       ];
     default:
-      throw new ImageException('invalid hue');
+      throw ImageException('invalid hue');
   }
 }
 
