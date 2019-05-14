@@ -24,7 +24,7 @@ class PvrtcEncoder {
 
     dynamic pvrtc;
     if (format == PVR_AUTO) {
-      if (bitmap.format == Image.RGB) {
+      if (bitmap.channels == Channels.rgb) {
         pvrtc = encodeRgb4Bpp(bitmap);
         format = PVR_RGB_4BPP;
       } else {

@@ -458,7 +458,7 @@ class PvrtcDecoder {
   }
 
   Image decodeRgb4bpp(int width, int height, TypedData data) {
-    var result = Image(width, height, Image.RGB);
+    var result = Image(width, height, channels: Channels.rgb);
 
     final int blocks = width ~/ 4;
     final int blockMask = blocks - 1;
@@ -527,7 +527,7 @@ class PvrtcDecoder {
   }
 
   Image decodeRgba4bpp(int width, int height, TypedData data) {
-    var result = Image(width, height, Image.RGBA);
+    var result = Image(width, height, channels: Channels.rgb);
 
     final int blocks = width ~/ 4;
     final int blockMask = blocks - 1;

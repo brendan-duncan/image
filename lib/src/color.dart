@@ -3,6 +3,18 @@ import 'dart:math';
 import 'image_exception.dart';
 import 'internal/clamp.dart';
 
+/// Blue channel of a color.
+const int BLUE = 0;
+
+/// Green channel of a color.
+const int GREEN = 1;
+
+/// Red channel of a color.
+const int RED = 2;
+
+/// Alpha channel of a color.
+const int ALPHA = 3;
+
 /// Image pixel colors are instantiated as an int object rather than an instance
 /// of the Color class in order to reduce object allocations. Image pixels are
 /// stored in 32-bit RGBA format (8 bits per channel). Internally in dart, this
@@ -14,11 +26,15 @@ import 'internal/clamp.dart';
 /// to create a cleaner API for color operations.
 class Color {
   /// Create a color value from RGB values in the range [0, 255].
+  ///
+  /// The channel order of a uint32 encoded color is BGRA.
   static int fromRgb(int red, int green, int blue) {
     return getColor(red, green, blue);
   }
 
   /// Create a color value from RGBA values in the range [0, 255].
+  ///
+  /// The channel order of a uint32 encoded color is BGRA.
   static int fromRgba(int red, int green, int blue, int alpha) {
     return getColor(red, green, blue, alpha);
   }
@@ -63,25 +79,9 @@ class Color {
   }
 }
 
-/// Blue channel of a color.
-const int BLUE = 0;
-
-/// Green channel of a color.
-const int GREEN = 1;
-
-/// Red channel of a color.
-const int RED = 2;
-
-/// Alpha channel of a color.
-const int ALPHA = 3;
-
-/// Luminance of a color.
-const int LUMINANCE = 4;
-
 /// Get the color with the given [r], [g], [b], and [a] components.
 ///
-/// The channel order of a uint32 encoded color is RGBA, to be consistent
-/// with the image data of a canvas html element.
+/// The channel order of a uint32 encoded color is BGRA.
 int getColor(int r, int g, int b, [int a = 255]) =>
     (clamp255(a) << 24) |
     (clamp255(r) << 16) |
@@ -89,19 +89,19 @@ int getColor(int r, int g, int b, [int a = 255]) =>
     (clamp255(b));
 
 /// Get the [channel] from the [color].
-int getChannel(int color, int channel) => channel == RED
-    ? getRed(color)
-    : channel == GREEN
-        ? getGreen(color)
-        : channel == BLUE ? getBlue(color) : getAlpha(color);
+int getChannel(int color, int channel) =>
+    channel == RED ? getRed(color)
+    : channel == GREEN ? getGreen(color)
+    : channel == BLUE ? getBlue(color)
+    : getAlpha(color);
 
 /// Returns a new color, where the given [color]'s [channel] has been
 /// replaced with the given [value].
-int setChannel(int color, int channel, int value) => channel == RED
-    ? setRed(color, value)
-    : channel == GREEN
-        ? setGreen(color, value)
-        : channel == BLUE ? setBlue(color, value) : setAlpha(color, value);
+int setChannel(int color, int channel, int value) =>
+    channel == RED ? setRed(color, value)
+    : channel == GREEN ? setGreen(color, value)
+    : channel == BLUE ? setBlue(color, value)
+    : setAlpha(color, value);
 
 /// Get the blue channel from the [color].
 int getBlue(int color) => (color) & 0xff;
@@ -195,9 +195,8 @@ List<int> hslToRGB(num hue, num saturation, num lightness) {
     return p;
   }
 
-  var q = lightness < 0.5
-      ? lightness * (1.0 + saturation)
-      : lightness + saturation - lightness * saturation;
+  var q = lightness < 0.5 ? lightness * (1.0 + saturation)
+          : lightness + saturation - lightness * saturation;
   var p = 2.0 * lightness - q;
 
   var r = hue2rgb(p, q, hue + 1.0 / 3.0);

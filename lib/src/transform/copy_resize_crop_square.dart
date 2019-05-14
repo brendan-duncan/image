@@ -6,7 +6,7 @@ import '../image_exception.dart';
 /// Returns a resized and square cropped copy of the [src] image of [size] size.
 Image copyResizeCropSquare(Image src, int size) {
   if (size <= 0) {
-    throw new ImageException('Invalid size');
+    throw ImageException('Invalid size');
   }
 
   int height = size;
@@ -18,7 +18,8 @@ Image copyResizeCropSquare(Image src, int size) {
     width = (size * (src.width / src.height)).toInt();
   }
 
-  Image dst = Image(size, size, src.format, src.exif, src.iccProfile);
+  Image dst = Image(size, size, channels: src.channels, exif: src.exif,
+      iccp: src.iccProfile);
 
   double dy = src.height / height;
   double dx = src.width / width;

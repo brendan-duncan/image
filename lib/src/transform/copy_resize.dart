@@ -12,9 +12,10 @@ import 'bake_orientation.dart';
 /// If [width] is -1, then it will be determined by the aspect ratio
 /// of [src] and [height].
 Image copyResize(Image src, int width,
-                 [int height = -1, int interpolation = NEAREST]) {
+                 {int height = -1,
+                  Interpolation interpolation = Interpolation.nearest}) {
   if (width <= 0 && height <= 0) {
-    throw new ImageException('Invalid size');
+    throw ImageException('Invalid size');
   }
 
   src = bakeOrientation(src);
@@ -27,12 +28,13 @@ Image copyResize(Image src, int width,
     width = (height * (src.width / src.height)).toInt();
   }
 
-  Image dst = Image(width, height, src.format, src.exif, src.iccProfile);
+  Image dst = Image(width, height, channels: src.channels, exif: src.exif,
+      iccp: src.iccProfile);
 
   double dy = src.height / height;
   double dx = src.width / width;
 
-  if (interpolation == AVERAGE) {
+  if (interpolation == Interpolation.average) {
     Uint8List sData = src.getBytes();
     int sw4 = src.width * 4;
 
@@ -67,7 +69,7 @@ Image copyResize(Image src, int width,
         dst.setPixel(x, y, getColor(r ~/ np, g ~/ np, b ~/ np, a ~/ np));
       }
     }
-  } else if (interpolation == NEAREST) {
+  } else if (interpolation == Interpolation.nearest) {
     final scaleX = Int32List(width);
     for (int x = 0; x < width; ++x) {
       scaleX[x] = (x * dx).toInt();

@@ -32,7 +32,7 @@ Image bumpToNormal(Image src, {num strength = 2.0}) {
       final nY = dv * 0.5 + 0.5;
       final nZ = dw;
 
-      dest.setPixelRGBA(
+      dest.setPixelRgba(
           x, y, (255 * nX).floor(), (255 * nY).floor(), (255 * nZ).floor());
     }
   }

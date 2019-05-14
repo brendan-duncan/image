@@ -267,16 +267,16 @@ class PngDecoder extends Decoder {
       //_numFrames = _info.numFrames;
     }
 
-    int format;
+    Channels channels;
     if (_info.colorType == GRAYSCALE_ALPHA ||
         _info.colorType == RGBA ||
         _info.transparency != null) {
-      format = Image.RGBA;
+      channels = Channels.rgba;
     } else {
-      format = Image.RGB;
+      channels = Channels.rgb;
     }
 
-    Image image = Image(width, height, format);
+    Image image = Image(width, height, channels: channels);
 
     List<int> uncompressed = ZLibDecoder().decodeBytes(imageData);
 

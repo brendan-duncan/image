@@ -38,7 +38,7 @@ class JpegDecoder extends Decoder {
       throw new ImageException('only single frame JPEGs supported');
     }
 
-    Image image = Image(jpeg.width, jpeg.height, Image.RGB);
+    Image image = Image(jpeg.width, jpeg.height, channels: Channels.rgb);
 
     _copyToImage(jpeg, image);
 
@@ -53,7 +53,7 @@ class JpegDecoder extends Decoder {
       throw new ImageException('only single frame JPEGs supported');
     }
 
-    Image image = Image(jpeg.width, jpeg.height, Image.RGB);
+    Image image = Image(jpeg.width, jpeg.height, channels: Channels.rgb);
 
     _copyToImage(jpeg, image);
 

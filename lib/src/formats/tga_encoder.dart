@@ -15,7 +15,7 @@ class TgaEncoder extends Encoder {
     header[13] = (image.width >> 8) & 0xff;
     header[14] = image.height & 0xff;
     header[15] = (image.height >> 8) & 0xff;
-    header[16] = image.format == Image.RGB ? 24 : 32;
+    header[16] = image.channels == Channels.rgb ? 24 : 32;
 
     out.writeBytes(header);
 
@@ -25,7 +25,7 @@ class TgaEncoder extends Encoder {
         out.writeByte(getBlue(c));
         out.writeByte(getGreen(c));
         out.writeByte(getRed(c));
-        if (image.format == Image.RGBA) {
+        if (image.channels == Channels.rgba) {
           out.writeByte(getAlpha(c));
         }
       }

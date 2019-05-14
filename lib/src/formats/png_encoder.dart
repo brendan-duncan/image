@@ -23,7 +23,7 @@ class PngEncoder extends Encoder {
     if (output == null) {
       output = OutputBuffer(bigEndian: true);
 
-      format = image.format;
+      channels = image.channels;
       _width = image.width;
       _height = image.height;
 
@@ -37,8 +37,8 @@ class PngEncoder extends Encoder {
     }
 
     // Include room for the filter bytes (1 byte per row).
-    List<int> filteredImage =
-        Uint8List((image.width * image.height * image.format) + image.height);
+    var filteredImage =
+        Uint8List((image.width * image.height * image.numberOfChannels) + image.height);
 
     _filter(image, filteredImage);
 
@@ -109,7 +109,7 @@ class PngEncoder extends Encoder {
     chunk.writeUint32(width);
     chunk.writeUint32(height);
     chunk.writeByte(8);
-    chunk.writeByte(format == Image.RGB ? 2 : 6);
+    chunk.writeByte(channels == Channels.rgb ? 2 : 6);
     chunk.writeByte(0); // compression method
     chunk.writeByte(0); // filter method
     chunk.writeByte(0); // interlace method
@@ -200,7 +200,7 @@ class PngEncoder extends Encoder {
       out[oi++] = getRed(c);
       out[oi++] = getGreen(c);
       out[oi++] = getBlue(c);
-      if (image.format == Image.RGBA) {
+      if (image.channels == Channels.rgba) {
         out[oi++] = getAlpha(image.getPixel(x, row));
       }
     }
@@ -213,7 +213,7 @@ class PngEncoder extends Encoder {
     out[oi++] = getRed(image.getPixel(0, row));
     out[oi++] = getGreen(image.getPixel(0, row));
     out[oi++] = getBlue(image.getPixel(0, row));
-    if (image.format == Image.RGBA) {
+    if (image.channels == Channels.rgba) {
       out[oi++] = getAlpha(image.getPixel(0, row));
     }
 
@@ -229,7 +229,7 @@ class PngEncoder extends Encoder {
       out[oi++] = ((r - ar)) & 0xff;
       out[oi++] = ((g - ag)) & 0xff;
       out[oi++] = ((b - ab)) & 0xff;
-      if (image.format == Image.RGBA) {
+      if (image.channels == Channels.rgba) {
         int aa = getAlpha(image.getPixel(x - 1, row));
         int a = getAlpha(image.getPixel(x, row));
         out[oi++] = ((a - aa)) & 0xff;
@@ -254,7 +254,7 @@ class PngEncoder extends Encoder {
       out[oi++] = (xr - br) & 0xff;
       out[oi++] = (xg - bg) & 0xff;
       out[oi++] = (xb - bb) & 0xff;
-      if (image.format == Image.RGBA) {
+      if (image.channels == Channels.rgba) {
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
         int xa = getAlpha(image.getPixel(x, row));
         out[oi++] = (xa - ba) & 0xff;
@@ -284,7 +284,7 @@ class PngEncoder extends Encoder {
       out[oi++] = (xr - ((ar + br) >> 1)) & 0xff;
       out[oi++] = (xg - ((ag + bg) >> 1)) & 0xff;
       out[oi++] = (xb - ((ab + bb) >> 1)) & 0xff;
-      if (image.format == Image.RGBA) {
+      if (image.channels == Channels.rgba) {
         int aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
         int xa = getAlpha(image.getPixel(x, row));
@@ -339,15 +339,14 @@ class PngEncoder extends Encoder {
       out[oi++] = (xr - pr) & 0xff;
       out[oi++] = (xg - pg) & 0xff;
       out[oi++] = (xb - pb) & 0xff;
-      if (image.format == Image.RGBA) {
+      if (image.channels == Channels.rgba) {
         int aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
-        int ca =
-            (row == 0 || x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row - 1));
+        int ca = (row == 0 || x == 0) ? 0
+            : getAlpha(image.getPixel(x - 1, row - 1));
         int xa = getAlpha(image.getPixel(x, row));
         int pa = _paethPredictor(aa, ba, ca);
         out[oi++] = (xa - pa) & 0xff;
-        ;
       }
     }
 
@@ -360,7 +359,7 @@ class PngEncoder extends Encoder {
     return getCrc32(bytes, crc);
   }
 
-  int format;
+  Channels channels;
   int filter;
   int repeat;
   int level;

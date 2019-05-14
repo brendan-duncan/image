@@ -1,11 +1,16 @@
 import '../color.dart';
 import '../image.dart';
 
+/// Luminance of a color.
+const int LUMINANCE = 4;
+
 /// Remap the color channels of the image.
 /// [red], [green], [blue] and [alpha] should be set to one of the following:
-/// [RED], [GREEN], [BLUE] or [ALPHA].  For example,
+/// [RED], [GREEN], [BLUE], [ALPHA], or [LUMINANCE]. For example,
 /// remapColors(src, red: GREEN, green: RED);
 /// will swap the red and green channels of the image.
+/// remapColors(src, alpha: LUMINANCE)
+/// will set the alpha channel to the luminance (grayscale) of the image.
 Image remapColors(Image src,
     {int red = RED, int green = GREEN, int blue = BLUE, int alpha = ALPHA}) {
   List<int> l = [0, 0, 0, 0, 0];

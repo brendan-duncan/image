@@ -66,7 +66,7 @@ class HdrImage {
     addSlice(HdrSlice(R, other.width, other.height, HALF));
     addSlice(HdrSlice(G, other.width, other.height, HALF));
     addSlice(HdrSlice(B, other.width, other.height, HALF));
-    if (other.format == Image.RGBA) {
+    if (other.channels == Channels.rgba) {
       addSlice(HdrSlice(A, other.width, other.height, HALF));
     }
     Uint8List rgb = other.getBytes();
