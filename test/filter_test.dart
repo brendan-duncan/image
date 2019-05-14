@@ -6,12 +6,12 @@ void main() {
   group('filter', () {
     var image =
         readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
-    image = copyResize(image, 400);
+    image = copyResize(image, width: 400);
     var image2 =
         readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
-      Image f = Image(10, 10, Image.RGB);
+      Image f = Image(10, 10, channels: Channels.rgb);
       f.fill(getColor(128, 64, 32, 255));
       File fp = File('out/fill.jpg');
       fp.createSync(recursive: true);
@@ -43,7 +43,8 @@ void main() {
 
     test('copyInto', () {
       Image s = Image.from(image);
-      Image d = Image(image.width + 20, image.height + 20, image.format);
+      Image d = Image(image.width + 20, image.height + 20,
+          channels: image.channels);
       fill(d, 0xff0000ff);
       copyInto(d, s, dstX: 10, dstY: 10);
       copyInto(d, image2, dstX: 10, dstY: 10);
@@ -116,7 +117,7 @@ void main() {
     });
 
     test('copyResize', () {
-      Image f = copyResize(image, -1, 100);
+      Image f = copyResize(image, height: 100);
       expect(f.height, equals(100));
       File fp = File('out/copyResize.jpg');
       fp.createSync(recursive: true);
@@ -285,7 +286,7 @@ void main() {
 
     test('remapColors', () {
       Image f = Image.from(image);
-      f.format = Image.RGBA;
+      f.channels = Channels.rgba;
       remapColors(f, red: GREEN, green: RED, alpha: LUMINANCE);
 
       File fp = File('out/remapColors.jpg');

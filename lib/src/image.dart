@@ -62,7 +62,7 @@ class Image {
   /// Height of the image.
   final int height;
 
-  final Channels channels;
+  Channels channels;
 
   /// x position at which to render the frame.
   int xOffset = 0;
@@ -89,13 +89,18 @@ class Image {
   ICCProfileData iccProfile;
 
   /// Create an image with the given dimensions and format.
-  Image(int width, int height,
-        {this.channels, ExifData exif, ICCProfileData iccp})
-      : this.width = width,
-        this.height = height,
-        data = Uint32List(width * height),
-        exif = ExifData.from(exif),
-        iccProfile = iccp;
+  Image(this.width, this.height,
+        {this.channels = Channels.rgba, ExifData exif, ICCProfileData iccp})
+      : this.data = Uint32List(width * height),
+        this.exif = ExifData.from(exif),
+        this.iccProfile = iccp;
+
+  Image.rgb(this.width, this.height,
+      {ExifData exif, ICCProfileData iccp})
+      : this.channels = Channels.rgb,
+        this.data = Uint32List(width * height),
+        this.exif = ExifData.from(exif),
+        this.iccProfile = iccp;
 
   /// Create a copy of the image [other].
   Image.from(Image other)
@@ -390,7 +395,7 @@ class Image {
     } else if (interpolation == Interpolation.linear) {
       return getPixelLinear(fx, fy);
     }
-    return getPixel(fx.toInt(), fy.toInt());
+    return getPixelSafe(fx.toInt(), fy.toInt());
   }
 
   /// Get the pixel using linear interpolation for non-integer pixel
@@ -410,10 +415,10 @@ class Image {
           .toInt();
     }
 
-    int Icc = getPixel(x, y);
-    int Inc = getPixel(nx, y);
-    int Icn = getPixel(x, ny);
-    int Inn = getPixel(nx, ny);
+    int Icc = getPixelSafe(x, y);
+    int Inc = getPixelSafe(nx, y);
+    int Icn = getPixelSafe(x, ny);
+    int Inn = getPixelSafe(nx, ny);
 
     return getColor(
         _linear(getRed(Icc), getRed(Inc), getRed(Icn), getRed(Inn)),
@@ -442,10 +447,10 @@ class Image {
                 dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
                 dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
 
-    int Ipp = getPixel(px, py);
-    int Icp = getPixel(x, py);
-    int Inp = getPixel(nx, py);
-    int Iap = getPixel(ax, py);
+    int Ipp = getPixelSafe(px, py);
+    int Icp = getPixelSafe(x, py);
+    int Inp = getPixelSafe(nx, py);
+    int Iap = getPixelSafe(ax, py);
     num Ip0 = _cubic(dx, getRed(Ipp), getRed(Icp), getRed(Inp), getRed(Iap));
     num Ip1 =
         _cubic(dx, getGreen(Ipp), getGreen(Icp), getGreen(Inp), getGreen(Iap));
@@ -454,10 +459,10 @@ class Image {
     num Ip3 =
         _cubic(dx, getAlpha(Ipp), getAlpha(Icp), getAlpha(Inp), getAlpha(Iap));
 
-    int Ipc = getPixel(px, y);
-    int Icc = getPixel(x, y);
-    int Inc = getPixel(nx, y);
-    int Iac = getPixel(ax, y);
+    int Ipc = getPixelSafe(px, y);
+    int Icc = getPixelSafe(x, y);
+    int Inc = getPixelSafe(nx, y);
+    int Iac = getPixelSafe(ax, y);
     num Ic0 = _cubic(dx, getRed(Ipc), getRed(Icc), getRed(Inc), getRed(Iac));
     num Ic1 =
         _cubic(dx, getGreen(Ipc), getGreen(Icc), getGreen(Inc), getGreen(Iac));
@@ -466,10 +471,10 @@ class Image {
     num Ic3 =
         _cubic(dx, getAlpha(Ipc), getAlpha(Icc), getAlpha(Inc), getAlpha(Iac));
 
-    int Ipn = getPixel(px, ny);
-    int Icn = getPixel(x, ny);
-    int Inn = getPixel(nx, ny);
-    int Ian = getPixel(ax, ny);
+    int Ipn = getPixelSafe(px, ny);
+    int Icn = getPixelSafe(x, ny);
+    int Inn = getPixelSafe(nx, ny);
+    int Ian = getPixelSafe(ax, ny);
     num In0 = _cubic(dx, getRed(Ipn), getRed(Icn), getRed(Inn), getRed(Ian));
     num In1 =
         _cubic(dx, getGreen(Ipn), getGreen(Icn), getGreen(Inn), getGreen(Ian));
@@ -478,10 +483,10 @@ class Image {
     num In3 =
         _cubic(dx, getAlpha(Ipn), getAlpha(Icn), getAlpha(Inn), getAlpha(Ian));
 
-    int Ipa = getPixel(px, ay);
-    int Ica = getPixel(x, ay);
-    int Ina = getPixel(nx, ay);
-    int Iaa = getPixel(ax, ay);
+    int Ipa = getPixelSafe(px, ay);
+    int Ica = getPixelSafe(x, ay);
+    int Ina = getPixelSafe(nx, ay);
+    int Iaa = getPixelSafe(ax, ay);
     num Ia0 = _cubic(dx, getRed(Ipa), getRed(Ica), getRed(Ina), getRed(Iaa));
     num Ia1 =
         _cubic(dx, getGreen(Ipa), getGreen(Ica), getGreen(Ina), getGreen(Iaa));

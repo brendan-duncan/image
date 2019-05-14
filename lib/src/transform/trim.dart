@@ -107,13 +107,15 @@ List<int> findTrim(Image src, {int mode = TRIM_TRANSPARENT,
 /// and can be any combination of [TRIM_TOP], [TRIM_BOTTOM], [TRIM_LEFT],
 /// and [TRIM_RIGHT].
 Image trim(Image src, {int mode = TRIM_TRANSPARENT, int sides = TRIM_ALL}) {
-  if (mode == TRIM_TRANSPARENT && src.format == Image.RGB) {
+  if (mode == TRIM_TRANSPARENT && src.channels == Channels.rgb) {
     return new Image.from(src);
   }
 
   List<int> crop = findTrim(src, mode: mode, sides: sides);
 
-  Image dst = Image(crop[2], crop[3], Image.RGBA, src.exif, src.iccProfile);
+  Image dst = Image(crop[2], crop[3], channels: Channels.rgba, exif: src.exif,
+      iccp: src.iccProfile);
+
   copyInto(dst, src,
       srcX: crop[0], srcY: crop[1], srcW: crop[2], srcH: crop[3], blend: false);
 

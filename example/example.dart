@@ -7,7 +7,7 @@ void main() {
   Image image = decodeImage(new File('test.webp').readAsBytesSync());
 
   // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-  Image thumbnail = copyResize(image, 120);
+  Image thumbnail = copyResize(image, width: 120);
 
   // Save the thumbnail as a PNG.
   new File('thumbnail.png').writeAsBytesSync(encodePng(thumbnail));

@@ -14,7 +14,7 @@ void decode(DecodeParam param) {
   // decoder.
   Image image = decodeImage(param.file.readAsBytesSync());
   // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-  Image thumbnail = gaussianBlur(copyResize(image, 120), 5);
+  Image thumbnail = gaussianBlur(copyResize(image, width: 120), 5);
   param.sendPort.send(thumbnail);
 }
 
