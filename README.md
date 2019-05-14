@@ -48,7 +48,7 @@ Load an image, resize it, and save it as a png:
       Image image = decodeImage(File('test.webp').readAsBytesSync());
 
       // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-      Image thumbnail = copyResize(image, 120);
+      Image thumbnail = copyResize(image, width: 120);
     
       // Save the thumbnail as a PNG.
       File('thumbnail.png')..writeAsBytesSync(encodePng(thumbnail));
