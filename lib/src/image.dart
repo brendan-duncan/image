@@ -63,12 +63,20 @@ class Image {
   /// Height of the image.
   final int height;
 
+  /// The channels used by this image, indicating whether the alpha channel
+  /// is used or not. All images have an implicit alpha channel due to the
+  /// image data being stored in a Uint32, but some images, such as those
+  /// decoded from a Jpeg, don't use the alpha channel. This allows
+  /// image encoders that support both rgb and rgba formats, to know which
+  /// one it should use.
   Channels channels;
 
-  /// x position at which to render the frame.
+  /// x position at which to render the frame. This is used for frames
+  /// in an animation, such as from an animated GIF.
   int xOffset = 0;
 
-  /// y position at which to render the frame.
+  /// y position at which to render the frame. This is used for frames
+  /// in an animation, such as from an animated GIF.
   int yOffset = 0;
 
   /// How long this frame should be displayed, in milliseconds.
@@ -76,17 +84,21 @@ class Image {
   /// as quickly as it can.
   int duration = 0;
 
-  /// Defines what should be done to the canvas when drawing this frame.
+  /// Defines what should be done to the canvas when drawing this frame
+  /// in an animation.
   DisposeMode disposeMethod = DisposeMode.clear;
 
   /// Defines the blending method (alpha compositing) to use when drawing this
-  /// frame.
+  /// frame in an animation.
   BlendMode blendMethod = BlendMode.over;
 
-  /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
-  /// channel.
+  /// Pixels are encoded into 4-byte Uint32 integers in 0xAARRGGBB channel order.
   final Uint32List data;
+
+  /// EXIF data decoded from an image file.
   ExifData exif;
+
+  /// ICC color profile read from an image file.
   ICCProfileData iccProfile;
 
   /// Create an image with the given dimensions and format.
@@ -379,12 +391,13 @@ class Image {
   /// Is the given pixel coordinates within the resolution of the image.
   bool boundsSafe(int x, int y) => x >= 0 && x < width && y >= 0 && y < height;
 
-  /// Get the pixel from the given [x], [y] coordinate. Color is encoded as
-  /// #AARRGGBB.
+  /// Get the pixel from the given [x], [y] coordinate. Color is encoded in a
+  /// Uint32 as 0xAARRGGBB.
   int getPixel(int x, int y) => data[y * width + x];
 
-  /// Get the pixel from the given [x], [y] coordinate. Color is encoded as
-  /// #AARRGGBB. If the pixel coordinates are out of bounds, 0 is returned.
+  /// Get the pixel from the given [x], [y] coordinate. Color is encoded in a
+  /// Uint32 as 0xAARRGGBB. If the pixel coordinates are out of bounds, 0 is
+  /// returned.
   int getPixelSafe(int x, int y) => boundsSafe(x, y) ? data[y * width + x] : 0;
 
   /// Get the pixel using the given [interpolation] type for non-integer pixel
