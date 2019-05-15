@@ -391,7 +391,7 @@ class PngDecoder extends Decoder {
     return anim;
   }
 
-  /// Process a pass of an interlaced image.
+  // Process a pass of an interlaced image.
   void _processPass(InputBuffer input, Image image, int xOffset, int yOffset,
       int xStep, int yStep, int passWidth, int passHeight) {
     final int channels = (_info.colorType == GRAYSCALE_ALPHA)
@@ -562,7 +562,7 @@ class PngDecoder extends Decoder {
     return c << 4;
   }
 
-  /// Return the CRC of the bytes
+  // Return the CRC of the bytes
   int _crc(String type, List<int> bytes) {
     int crc = getCrc32(type.codeUnits);
     return getCrc32(bytes, crc);
@@ -576,7 +576,7 @@ class PngDecoder extends Decoder {
     _bitBufferLen = 0;
   }
 
-  /// Read a number of bits from the input stream.
+  // Read a number of bits from the input stream.
   int _readBits(InputBuffer input, int numBits) {
     if (numBits == 0) {
       return 0;
@@ -620,7 +620,7 @@ class PngDecoder extends Decoder {
     return octet;
   }
 
-  /// Read the next pixel from the input stream.
+  // Read the next pixel from the input stream.
   void _readPixel(InputBuffer input, List<int> pixel) {
     switch (_info.colorType) {
       case GRAYSCALE:
@@ -649,7 +649,7 @@ class PngDecoder extends Decoder {
     throw new ImageException('Invalid color type: ${_info.colorType}.');
   }
 
-  /// Get the color with the list of components.
+  // Get the color with the list of components.
   int _getColor(List<int> raw) {
     switch (_info.colorType) {
       case GRAYSCALE:

@@ -4,7 +4,7 @@ import '../../internal/internal.dart';
 import 'vp8l.dart';
 import 'vp8l_bit_reader.dart';
 
-/// Huffman Tree.
+// Huffman Tree.
 @internal
 class HuffmanTree {
   static const int HUFF_LUT_BITS = 7;
@@ -14,14 +14,14 @@ class HuffmanTree {
   Int16List lutSymbol = Int16List(HUFF_LUT);
   Int16List lutJump = Int16List(HUFF_LUT);
 
-  /// all the nodes, starting at root, stored as a single int array, where
-  /// each node occupies two ints as [symbol, children].
+  // all the nodes, starting at root, stored as a single int array, where
+  // each node occupies two ints as [symbol, children].
   Int32List tree;
 
-  /// max number of nodes
+  // max number of nodes
   int maxNodes = 0;
 
-  /// number of currently occupied nodes
+  // number of currently occupied nodes
   int numNodes = 0;
 
   HuffmanTree([int numLeaves = 0]) {
@@ -115,9 +115,9 @@ class HuffmanTree {
     return _isFull();
   }
 
-  /// Decodes the next Huffman code from bit-stream.
-  /// input.fillBitWindow() needs to be called at minimum every second call
-  /// to ReadSymbol, in order to pre-fetch enough bits.
+  // Decodes the next Huffman code from bit-stream.
+  // input.fillBitWindow() needs to be called at minimum every second call
+  // to ReadSymbol, in order to pre-fetch enough bits.
   int readSymbol(VP8LBitReader br) {
     int node = 0;
     int bits = br.prefetchBits();
@@ -313,7 +313,7 @@ class HuffmanTree {
   }
 }
 
-/// A group of huffman trees.
+// A group of huffman trees.
 @internal
 class HTreeGroup {
   final List<HuffmanTree> htrees =

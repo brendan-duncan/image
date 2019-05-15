@@ -11,7 +11,7 @@ import 'vp8l_transform.dart';
 import 'webp_huffman.dart';
 import 'webp_info.dart';
 
-/// WebP lossless format.
+// WebP lossless format.
 class VP8L {
   InputBuffer input;
   VP8LBitReader br;
@@ -345,8 +345,8 @@ class VP8L {
     return true;
   }
 
-  /// Row-processing for the special case when alpha data contains only one
-  /// transform (color indexing), and trivial non-green literals.
+  // Row-processing for the special case when alpha data contains only one
+  // transform (color indexing), and trivial non-green literals.
   bool _is8bOptimizable() {
     if (_colorCacheSize > 0) {
       return false;
@@ -368,7 +368,7 @@ class VP8L {
     return true;
   }
 
-  /// Special row-processing that only stores the alpha data.
+  // Special row-processing that only stores the alpha data.
   void _extractAlphaRows(int row) {
     final int numRows = row - _lastRow;
     if (numRows <= 0) {
@@ -480,7 +480,7 @@ class VP8L {
     _lastRow = row;
   }
 
-  /// Special method for paletted alpha data.
+  // Special method for paletted alpha data.
   void _applyInverseTransformsAlpha(int numRows, InputBuffer rows) {
     final int startRow = _lastRow;
     final int endRow = startRow + numRows;
@@ -490,8 +490,8 @@ class VP8L {
     transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);
   }
 
-  /// Processes (transforms, scales & color-converts) the rows decoded after the
-  /// last call.
+  // Processes (transforms, scales & color-converts) the rows decoded after the
+  // last call.
   //static int __count = 0;
   void _processRows(int row) {
     int rows = webp.width * _lastRow; // offset into _pixels
@@ -732,13 +732,13 @@ class VP8L {
     }
   }
 
-  /// Computes sampled size of 'size' when sampling using 'sampling bits'.
+  // Computes sampled size of 'size' when sampling using 'sampling bits'.
   static int _subSampleSize(int size, int samplingBits) {
     return (size + (1 << samplingBits) - 1) >> samplingBits;
   }
 
-  /// For security reason, we need to remap the color map to span
-  /// the total possible bundled values, and not just the num_colors.
+  // For security reason, we need to remap the color map to span
+  // the total possible bundled values, and not just the num_colors.
   bool _expandColorMap(int numColors, VP8LTransform transform) {
     final int finalNumColors = 1 << (8 >> transform.bits);
     Uint32List newColorMap = Uint32List(finalNumColors);

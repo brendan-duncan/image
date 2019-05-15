@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'pvrtc_bit_utility.dart';
 import 'pvrtc_color.dart';
 
-/// Ported from Jeffrey Lim's PVRTC encoder/decoder,
-/// https://bitbucket.org/jthlim/pvrtccompressor
+// Ported from Jeffrey Lim's PVRTC encoder/decoder,
+// https://bitbucket.org/jthlim/pvrtccompressor
 class PvrtcPacket {
   Uint32List rawData;
   int index;

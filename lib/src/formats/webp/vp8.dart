@@ -8,7 +8,7 @@ import 'vp8_types.dart';
 import 'webp_alpha.dart';
 import 'webp_info.dart';
 
-/// WebP lossy format.
+// WebP lossy format.
 class VP8 {
   InputBuffer input;
   InternalWebPInfo _webp;
@@ -178,14 +178,14 @@ class VP8 {
     return true;
   }
 
-  /// This function returns VP8_STATUS_SUSPENDED if we don't have all the
-  /// necessary data in 'buf'.
-  /// This case is not necessarily an error (for incremental decoding).
-  /// Still, no bitreader is ever initialized to make it possible to read
-  /// unavailable memory.
-  /// If we don't even have the partitions' sizes, than VP8_STATUS_NOT_ENOUGH_DATA
-  /// is returned, and this is an unrecoverable error.
-  /// If the partitions were positioned ok, VP8_STATUS_OK is returned.
+  // This function returns VP8_STATUS_SUSPENDED if we don't have all the
+  // necessary data in 'buf'.
+  // This case is not necessarily an error (for incremental decoding).
+  // Still, no bitreader is ever initialized to make it possible to read
+  // unavailable memory.
+  // If we don't even have the partitions' sizes, than VP8_STATUS_NOT_ENOUGH_DATA
+  // is returned, and this is an unrecoverable error.
+  // If the partitions were positioned ok, VP8_STATUS_OK is returned.
   bool _parsePartitions(InputBuffer input) {
     int sz = 0;
     int bufEnd = input.length;
@@ -287,8 +287,8 @@ class VP8 {
     }
   }
 
-  /// Precompute the filtering strength for each segment and each i4x4/i16x16
-  /// mode.
+  // Precompute the filtering strength for each segment and each i4x4/i16x16
+  // mode.
   void _precomputeFilterStrengths() {
     if (_filterType > 0) {
       VP8FilterHeader hdr = _filterHeader;
@@ -675,11 +675,11 @@ class VP8 {
   // vertical position of a MB
   int MACROBLOCK_VPOS(int mb_y) => mb_y * 16;
 
-  /// kFilterExtraRows[] = How many extra lines are needed on the MB boundary
-  /// for caching, given a filtering level.
-  /// Simple filter:  up to 2 luma samples are read and 1 is written.
-  /// Complex filter: up to 4 luma samples are read and 3 are written. Same for
-  ///                U/V, so it's 8 samples total (because of the 2x upsampling).
+  // kFilterExtraRows[] = How many extra lines are needed on the MB boundary
+  // for caching, given a filtering level.
+  // Simple filter:  up to 2 luma samples are read and 1 is written.
+  // Complex filter: up to 4 luma samples are read and 3 are written. Same for
+  //                U/V, so it's 8 samples total (because of the 2x upsampling).
   static const List<int> kFilterExtraRows = const [0, 2, 8];
 
   void _doFilter(int mbX, int mbY) {
@@ -732,7 +732,7 @@ class VP8 {
     }
   }
 
-  /// Filter the decoded macroblock row (if needed)
+  // Filter the decoded macroblock row (if needed)
   void _filterRow() {
     for (int mbX = _tlMbX; mbX < _brMbX; ++mbX) {
       _doFilter(mbX, _mbY);
@@ -741,16 +741,16 @@ class VP8 {
 
   void _ditherRow() {}
 
-  /// This function is called after a row of macroblocks is finished decoding.
-  /// It also takes into account the following restrictions:
-  ///
-  /// * In case of in-loop filtering, we must hold off sending some of the bottom
-  ///    pixels as they are yet unfiltered. They will be when the next macroblock
-  ///    row is decoded. Meanwhile, we must preserve them by rotating them in the
-  ///    cache area. This doesn't hold for the very bottom row of the uncropped
-  ///    picture of course.
-  ///  * we must clip the remaining pixels against the cropping area. The VP8Io
-  ///    struct must have the following fields set correctly before calling put():
+  // This function is called after a row of macroblocks is finished decoding.
+  // It also takes into account the following restrictions:
+  //
+  // * In case of in-loop filtering, we must hold off sending some of the bottom
+  //    pixels as they are yet unfiltered. They will be when the next macroblock
+  //    row is decoded. Meanwhile, we must preserve them by rotating them in the
+  //    cache area. This doesn't hold for the very bottom row of the uncropped
+  //    picture of course.
+  //  * we must clip the remaining pixels against the cropping area. The VP8Io
+  //    struct must have the following fields set correctly before calling put():
   bool _finishRow(bool useFilter) {
     final int extraYRows = kFilterExtraRows[_filterType];
     final int ySize = extraYRows * _cacheYStride;
@@ -1310,7 +1310,7 @@ class VP8 {
     15
   ];
 
-  /// See section 13-2: http://tools.ietf.org/html/rfc6386#section-13.2
+  // See section 13-2: http://tools.ietf.org/html/rfc6386#section-13.2
   int _getLargeValue(VP8BitReader br, List<int> p) {
     int v;
     if (br.getBit(p[3]) == 0) {
@@ -1342,7 +1342,7 @@ class VP8 {
     return v;
   }
 
-  /// Returns the position of the last non-zero coeff plus one
+  // Returns the position of the last non-zero coeff plus one
   int _getCoeffs(VP8BitReader br, List<VP8BandProbas> prob, int ctx,
       List<int> dq, int n, InputBuffer out) {
     // n is either 0 or 1 here. kBands[n] is not necessary for extracting '*p'.
@@ -1448,10 +1448,10 @@ class VP8 {
   int _cropTop;
   int _cropBottom;
 
-  /// Width in macroblock units.
+  // Width in macroblock units.
   int _mbWidth;
 
-  /// Height in macroblock units.
+  // Height in macroblock units.
   int _mbHeight;
 
   // Macroblock to process/filter, depending on cropping and filter_type.
@@ -1478,28 +1478,28 @@ class VP8 {
   int _skipP;
 
   // Boundary data cache and persistent buffers.
-  /// top intra modes values: 4 * _mbWidth
+  // top intra modes values: 4 * _mbWidth
   Uint8List _intraT;
 
-  /// left intra modes values
+  // left intra modes values
   Uint8List _intraL = Uint8List(4);
 
-  /// uint8, segment of the currently parsed block
+  // uint8, segment of the currently parsed block
   int _segment;
 
-  /// top y/u/v samples
+  // top y/u/v samples
   List<VP8TopSamples> _yuvT;
 
-  /// contextual macroblock info (mb_w_ + 1)
+  // contextual macroblock info (mb_w_ + 1)
   List<VP8MB> _mbInfo;
 
-  /// filter strength info
+  // filter strength info
   List<VP8FInfo> _fInfo;
 
-  /// main block for Y/U/V (size = YUV_SIZE)
+  // main block for Y/U/V (size = YUV_SIZE)
   Uint8List _yuvBlock;
 
-  /// macroblock row for storing unfiltered samples
+  // macroblock row for storing unfiltered samples
   InputBuffer _cacheY;
   InputBuffer _cacheU;
   InputBuffer _cacheV;
@@ -1515,38 +1515,38 @@ class VP8 {
   InputBuffer _v;
   InputBuffer _a;
 
-  /// main memory chunk for the above data. Persistent.
+  // main memory chunk for the above data. Persistent.
   //Uint8List _mem;
 
   // Per macroblock non-persistent infos.
-  /// current position, in macroblock units
+  // current position, in macroblock units
   int _mbX = 0;
   int _mbY = 0;
 
-  /// parsed reconstruction data
+  // parsed reconstruction data
   List<VP8MBData> _mbData;
 
-  /// 0=off, 1=simple, 2=complex
+  // 0=off, 1=simple, 2=complex
   int _filterType;
 
-  /// precalculated per-segment/type
+  // precalculated per-segment/type
   List<List<VP8FInfo>> _fStrengths;
 
   // Alpha
-  /// alpha-plane decoder object
+  // alpha-plane decoder object
   WebPAlpha _alpha;
 
-  /// compressed alpha data (if present)
+  // compressed alpha data (if present)
   InputBuffer _alphaData;
 
-  /// true if alpha_data_ is decoded in alpha_plane_
+  // true if alpha_data_ is decoded in alpha_plane_
   //int _isAlphaDecoded;
-  /// output. Persistent, contains the whole data.
+  // output. Persistent, contains the whole data.
   Uint8List _alphaPlane;
 
   // extensions
   //int _layerColorspace;
-  /// compressed layer data (if present)
+  // compressed layer data (if present)
   //Uint8List _layerData;
 
   static int _clip(int v, int M) {
@@ -2080,11 +2080,11 @@ class VP8 {
     249, 254, 259, 264, 269, 274, 279, 284
   ];
 
-  /// FILTER_EXTRA_ROWS = How many extra lines are needed on the MB boundary
-  /// for caching, given a filtering level.
-  /// Simple filter:  up to 2 luma samples are read and 1 is written.
-  /// Complex filter: up to 4 luma samples are read and 3 are written. Same for
-  ///               U/V, so it's 8 samples total (because of the 2x upsampling).
+  // FILTER_EXTRA_ROWS = How many extra lines are needed on the MB boundary
+  // for caching, given a filtering level.
+  // Simple filter:  up to 2 luma samples are read and 1 is written.
+  // Complex filter: up to 4 luma samples are read and 3 are written. Same for
+  //               U/V, so it's 8 samples total (because of the 2x upsampling).
   static const FILTER_EXTRA_ROWS = [0, 2, 8];
 
   static const int VP8_SIGNATURE = 0x2a019d;

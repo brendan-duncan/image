@@ -3,7 +3,7 @@ import '../../util/input_buffer.dart';
 import '../decode_info.dart';
 import 'webp_frame.dart';
 
-/// Features gathered from the bitstream
+// Features gathered from the bitstream
 class WebPInfo extends DecodeInfo {
   // enum Format
   static const int FORMAT_UNDEFINED = 0;
@@ -11,28 +11,28 @@ class WebPInfo extends DecodeInfo {
   static const int FORMAT_LOSSLESS = 2;
   static const int FORMAT_ANIMATED = 3;
 
-  /// True if the bitstream contains an alpha channel.
+  // True if the bitstream contains an alpha channel.
   bool hasAlpha = false;
 
-  /// True if the bitstream is an animation.
+  // True if the bitstream is an animation.
   bool hasAnimation = false;
 
-  /// 0 = undefined (/mixed), 1 = lossy, 2 = lossless, 3 = animated
+  // 0 = undefined (/mixed), 1 = lossy, 2 = lossless, 3 = animated
   int format = FORMAT_UNDEFINED;
 
-  /// ICCP data string.
+  // ICCP data string.
   String iccp = '';
 
-  /// EXIF data string.
+  // EXIF data string.
   String exif = '';
 
-  /// XMP data string.
+  // XMP data string.
   String xmp = '';
 
-  /// How many times the animation should loop.
+  // How many times the animation should loop.
   int animLoopCount = 0;
 
-  /// Information about each animation frame.
+  // Information about each animation frame.
   List<WebPFrame> frames = [];
 
   int get numFrames => frames.length;

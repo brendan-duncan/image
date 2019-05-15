@@ -55,11 +55,11 @@ class PsdImage extends DecodeInfo {
 
   bool get isValid => signature == SIGNATURE;
 
-  /// The number of frames that can be decoded.
+  // The number of frames that can be decoded.
   int get numFrames => 1;
 
-  /// Decode the raw psd structure without rendering the output image.
-  /// Use [renderImage] to render the output image.
+  // Decode the raw psd structure without rendering the output image.
+  // Use [renderImage] to render the output image.
   bool decode() {
     if (!isValid || _input == null) {
       return false;

@@ -29,7 +29,7 @@ class TiffFaxDecoder {
     currChangingElems = List<int>(width);
   }
 
-  /// One-dimensional decoding methods
+  // One-dimensional decoding methods
   void decode1D(InputBuffer out, InputBuffer compData, int startX, int height) {
     this.data = compData;
     bitPointer = 0;
@@ -183,7 +183,7 @@ class TiffFaxDecoder {
     currChangingElems[changingElemSize++] = bitOffset;
   }
 
-  /// Two-dimensional decoding methods
+  // Two-dimensional decoding methods
   void decode2D(InputBuffer out, InputBuffer compData, int startX, int height,
       int tiffT4Options) {
     this.data = compData;
@@ -533,7 +533,7 @@ class TiffFaxDecoder {
     }
   }
 
-  /// Returns run length
+  // Returns run length
   int _decodeWhiteCodeWord() {
     int current, entry, bits, isT, twoBits, code = -1;
     int runLength = 0;
@@ -578,7 +578,7 @@ class TiffFaxDecoder {
     return runLength;
   }
 
-  /// Returns run length
+  // Returns run length
   int _decodeBlackCodeWord() {
     int current, entry, bits, isT, code = -1;
     int runLength = 0;
@@ -869,7 +869,7 @@ class TiffFaxDecoder {
     return i1;
   }
 
-  /// Move pointer backwards by given amount of bits
+  // Move pointer backwards by given amount of bits
   void _updatePointer(int bitsToMoveBack) {
     int i = bitPointer - bitsToMoveBack;
 
@@ -881,7 +881,7 @@ class TiffFaxDecoder {
     }
   }
 
-  /// Move to the next byte boundary
+  // Move to the next byte boundary
   bool _advancePointer() {
     if (bitPointer != 0) {
       bytePointer++;
@@ -1435,7 +1435,7 @@ class TiffFaxDecoder {
     232, 232, 232, 232, 232, 232, 232, 232
   ];
 
-  /// Additional make up codes for both White and Black runs
+  // Additional make up codes for both White and Black runs
   static const List<int> ADDITIONAL_MAKEUP = const [
     28679,
     28679,
@@ -1455,7 +1455,7 @@ class TiffFaxDecoder {
     -24567
   ];
 
-  /// Initial black run look up table, uses the first 4 bits of a code
+  // Initial black run look up table, uses the first 4 bits of a code
   static const List<int> INIT_BLACK = const [
     // 0 - 7
     3226, 6412, 200, 168, 38, 38, 134, 134,

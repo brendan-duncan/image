@@ -299,7 +299,7 @@ class GifEncoder extends Encoder {
     output.writeByte(0); // block terminator
   }
 
-  /// GIF header and Logical Screen Descriptor
+  // GIF header and Logical Screen Descriptor
   void _writeHeader(int width, int height) {
     output.writeBytes(GIF89_STAMP.codeUnits);
     output.writeUint16(width);

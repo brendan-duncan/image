@@ -18,24 +18,24 @@ class VP8PictureHeader {
   int clampType; // uint8
 }
 
-/// Segment features
+// Segment features
 class VP8SegmentHeader {
   bool useSegment = false;
 
-  /// whether to update the segment map or not
+  // whether to update the segment map or not
   bool updateMap = false;
 
-  /// absolute or delta values for quantizer and filter
+  // absolute or delta values for quantizer and filter
   bool absoluteDelta = true;
 
-  /// quantization changes
+  // quantization changes
   Int8List quantizer = Int8List(VP8.NUM_MB_SEGMENTS);
 
-  /// filter strength for segments
+  // filter strength for segments
   Int8List filterStrength = Int8List(VP8.NUM_MB_SEGMENTS);
 }
 
-/// All the probas associated to one band
+// All the probas associated to one band
 class VP8BandProbas {
   List<Uint8List> probas = List<Uint8List>(VP8.NUM_CTX);
   VP8BandProbas() {
@@ -45,11 +45,11 @@ class VP8BandProbas {
   }
 }
 
-/// Struct collecting all frame-persistent probabilities.
+// Struct collecting all frame-persistent probabilities.
 class VP8Proba {
   Uint8List segments = Uint8List(VP8.MB_FEATURE_TREE_PROBS);
 
-  /// Type: 0:Intra16-AC  1:Intra16-DC   2:Chroma   3:Intra4
+  // Type: 0:Intra16-AC  1:Intra16-DC   2:Chroma   3:Intra4
   List<List<VP8BandProbas>> bands = List(VP8.NUM_TYPES);
 
   VP8Proba() {
@@ -64,7 +64,7 @@ class VP8Proba {
   }
 }
 
-/// Filter parameters
+// Filter parameters
 class VP8FilterHeader {
   bool simple; // 0=complex, 1=simple
   int level; // [0..63]
@@ -77,7 +77,7 @@ class VP8FilterHeader {
 //------------------------------------------------------------------------------
 // Informations about the macroblocks.
 
-/// filter specs
+// filter specs
 class VP8FInfo {
   int fLimit = 0; // uint8_t, filter limit in [3..189], or 0 if no filtering
   int fInnerLevel = 0; // uint8_t, inner limit in [1..63]
@@ -85,14 +85,14 @@ class VP8FInfo {
   int hevThresh = 0; // uint8_t, high edge variance threshold in [0..2]
 }
 
-/// Top/Left Contexts used for syntax-parsing
+// Top/Left Contexts used for syntax-parsing
 class VP8MB {
   int nz =
       0; // uint8_t, non-zero AC/DC coeffs (4bit for luma + 4bit for chroma)
   int nzDc = 0; // uint8_t, non-zero DC coeff (1bit)
 }
 
-/// Dequantization matrices
+// Dequantization matrices
 class VP8QuantMatrix {
   Int32List y1Mat = Int32List(2);
   Int32List y2Mat = Int32List(2);
@@ -102,15 +102,15 @@ class VP8QuantMatrix {
   int dither; // dithering amplitude (0 = off, max=255)
 }
 
-/// Data needed to reconstruct a macroblock
+// Data needed to reconstruct a macroblock
 class VP8MBData {
-  /// 384 coeffs = (16+4+4) * 4*4
+  // 384 coeffs = (16+4+4) * 4*4
   Int16List coeffs = Int16List(384);
   bool isIntra4x4; // true if intra4x4
-  /// one 16x16 mode (#0) or sixteen 4x4 modes
+  // one 16x16 mode (#0) or sixteen 4x4 modes
   Uint8List imodes = Uint8List(16);
 
-  /// chroma prediction mode
+  // chroma prediction mode
   int uvmode;
   // bit-wise info about the content of each sub-4x4 blocks (in decoding order).
   // Each of the 4x4 blocks for y/u/v is associated with a 2b code according to:
@@ -122,11 +122,11 @@ class VP8MBData {
   int nonZeroY;
   int nonZeroUV;
 
-  /// uint8_t, local dithering strength (deduced from non_zero_*)
+  // uint8_t, local dithering strength (deduced from non_zero_*)
   int dither;
 }
 
-/// Saved top samples, per macroblock. Fits into a cache-line.
+// Saved top samples, per macroblock. Fits into a cache-line.
 class VP8TopSamples {
   Uint8List y = Uint8List(16);
   Uint8List u = Uint8List(8);
@@ -139,7 +139,7 @@ class VP8Random {
   Uint32List _table = Uint32List(RANDOM_TABLE_SIZE);
   int _amplitude;
 
-  /// Initializes random generator with an amplitude 'dithering' in range [0..1].
+  // Initializes random generator with an amplitude 'dithering' in range [0..1].
   VP8Random(double dithering) {
     _table.setRange(0, RANDOM_TABLE_SIZE, _RANDOM_TABLE);
     _index1 = 0;
@@ -151,9 +151,9 @@ class VP8Random {
             : ((1 << RANDOM_DITHER_FIX) * dithering).toInt();
   }
 
-  /// Returns a centered pseudo-random number with 'num_bits' amplitude.
-  /// (uses D.Knuth's Difference-based random generator).
-  /// 'amp' is in RANDOM_DITHER_FIX fixed-point precision.
+  // Returns a centered pseudo-random number with 'num_bits' amplitude.
+  // (uses D.Knuth's Difference-based random generator).
+  // 'amp' is in RANDOM_DITHER_FIX fixed-point precision.
   int randomBits2(int numBits, int amp) {
     int diff = _table[_index1] - _table[_index2];
     if (diff < 0) {
@@ -183,7 +183,7 @@ class VP8Random {
     return randomBits2(numBits, _amplitude);
   }
 
-  /// fixed-point precision for dithering
+  // fixed-point precision for dithering
   static const int RANDOM_DITHER_FIX = 8;
   static const int RANDOM_TABLE_SIZE = 55;
 

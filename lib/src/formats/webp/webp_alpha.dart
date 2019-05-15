@@ -136,10 +136,10 @@ class WebPAlpha {
 
   InternalVP8L _vp8l;
 
-  /// Although alpha channel
-  /// requires only 1 byte per
-  /// pixel, sometimes VP8LDecoder may need to allocate
-  /// 4 bytes per pixel internally during decode.
+  // Although alpha channel
+  // requires only 1 byte per
+  // pixel, sometimes VP8LDecoder may need to allocate
+  // 4 bytes per pixel internally during decode.
   bool _use8bDecode = false;
 
   // Alpha related constants.

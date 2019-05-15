@@ -353,7 +353,7 @@ class PngEncoder extends Encoder {
     return oi;
   }
 
-  /// Return the CRC of the bytes
+  // Return the CRC of the bytes
   int _crc(String type, List<int> bytes) {
     int crc = getCrc32(type.codeUnits);
     return getCrc32(bytes, crc);

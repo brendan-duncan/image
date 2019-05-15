@@ -333,9 +333,9 @@ class GifDecoder extends Decoder {
     return true;
   }
 
-  /// Continue to get the image code in compressed form. This routine should be
-  /// called until NULL block is returned.
-  /// The block should NOT be freed by the user (not dynamically allocated).
+  // Continue to get the image code in compressed form. This routine should be
+  // called until NULL block is returned.
+  // The block should NOT be freed by the user (not dynamically allocated).
   bool _skipRemainder() {
     if (_input.isEOS) {
       return true;
@@ -351,10 +351,10 @@ class GifDecoder extends Decoder {
     return true;
   }
 
-  /// The LZ decompression routine:
-  /// This version decompress the given gif file into Line of length LineLen.
-  /// This routine can be called few times (one per scan line, for example), in
-  /// order the complete the whole image.
+  // The LZ decompression routine:
+  // This version decompress the given gif file into Line of length LineLen.
+  // This routine can be called few times (one per scan line, for example), in
+  // order the complete the whole image.
   bool _decompressLine(Uint8List line) {
     if (_stackPtr > LZ_MAX_CODE) {
       return false;
@@ -474,9 +474,9 @@ class GifDecoder extends Decoder {
     return true;
   }
 
-  /// The LZ decompression input routine:
-  /// This routine is responsible for the decompression of the bit stream from
-  /// 8 bits (bytes) packets, into the real codes.
+  // The LZ decompression input routine:
+  // This routine is responsible for the decompression of the bit stream from
+  // 8 bits (bytes) packets, into the real codes.
   int _decompressInput() {
     int code;
 
@@ -512,10 +512,10 @@ class GifDecoder extends Decoder {
     return code;
   }
 
-  /// Routine to trace the Prefixes linked list until we get a prefix which is
-  /// not code, but a pixel value (less than ClearCode). Returns that pixel value.
-  /// If image is defective, we might loop here forever, so we limit the loops to
-  /// the maximum possible if image O.k. - LZ_MAX_CODE times.
+  // Routine to trace the Prefixes linked list until we get a prefix which is
+  // not code, but a pixel value (less than ClearCode). Returns that pixel value.
+  // If image is defective, we might loop here forever, so we limit the loops to
+  // the maximum possible if image O.k. - LZ_MAX_CODE times.
   int _getPrefixChar(Uint32List prefix, int code, int clearCode) {
     int i = 0;
     while (code > clearCode && i++ <= LZ_MAX_CODE) {
@@ -527,10 +527,10 @@ class GifDecoder extends Decoder {
     return code;
   }
 
-  /// This routines read one gif data block at a time and buffers it internally
-  /// so that the decompression routine could access it.
-  /// The routine returns the next byte from its internal buffer (or read next
-  /// block in if buffer empty) and returns null on failure.
+  // This routines read one gif data block at a time and buffers it internally
+  // so that the decompression routine could access it.
+  // The routine returns the next byte from its internal buffer (or read next
+  // block in if buffer empty) and returns null on failure.
   int _bufferedInput() {
     int nextByte;
     if (_buffer[0] == 0) {

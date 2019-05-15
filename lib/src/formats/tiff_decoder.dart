@@ -89,7 +89,7 @@ class TiffDecoder extends Decoder {
     return anim;
   }
 
-  /// Read the TIFF header and IFD blocks.
+  // Read the TIFF header and IFD blocks.
   TiffInfo _readHeader(InputBuffer p) {
     TiffInfo info = TiffInfo();
     int byteOrder = p.readUint16();
