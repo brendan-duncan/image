@@ -40,18 +40,18 @@ enum DisposeMode {
   previous
 }
 
-/// A 32-bit image buffer where pixels are encoded into 32-bit unsigned ints.
-/// You can use the methods in color to encode/decode the RGBA channels of a
-/// color for a pixel.
+/// An image buffer where pixels are encoded into 32-bit unsigned ints (Uint32).
 ///
-/// Pixels are stored in 32-bit unsigned integers in 0xAARRGGBB format.
+/// Pixels are stored in 32-bit unsigned integers in #AARRGGBB format.
 /// This is to be consistent with the Flutter image data. You can use
 /// [getBytes] to access the pixel data at the byte (channel) level, optionally
-/// providing the format to get the image data as.
+/// providing the format to get the image data as. You can use the various color
+/// functions, such as [getRed], [getGreen], [getBlue], and [getAlpha] to access
+/// the individual channels of a given pixel color.
 ///
 /// If this image is a frame of an animation as decoded by the [decodeFrame]
 /// method of [Decoder], then the [xOffset], [yOffset], [width] and [height]
-/// coordinates determine area of the canvas this image should be drawn into,
+/// determine the area of the canvas this image should be drawn into,
 /// as some frames of an animation only modify part of the canvas (recording
 /// the part of the frame that actually changes). The [decodeAnimation] method
 /// will always return the fully composed animation, so these coordinate
@@ -134,7 +134,13 @@ class Image {
   /// [format] defines the order of color channels in [bytes].
   /// An HTML canvas element stores colors in Format.rgba format; a Flutter
   /// Image object stores colors in Format.bgra format.
-  /// The length of [bytes] should be format-bytes[1,2,3,4] * (width * height).
+  /// The length of [bytes] should be (width * height) * format-byte-count,
+  /// where format-byte-count is 1, 3, or 4 depnending on the number of
+  /// channels in the format (luminance, rgb, rgba, etc).
+  ///
+  /// The native format of an image is Format.bgra. If another format
+  /// is specified, the input data will be converted to bgra to store
+  /// in the Image.
   ///
   /// For example, given an Html Canvas, you could create an image:
   /// var bytes = canvas.getContext('2d').getImageData(0, 0,
@@ -154,12 +160,18 @@ class Image {
   /// Clone this image.
   Image clone() => Image.from(this);
 
-  /// The number of channels used by this Image.
+  /// The number of channels used by this Image. While all images
+  /// are stored internally with 4 bytes, some images, such as those
+  /// loaded from a Jpeg, don't use the 4th (alpha) channel.
   int get numberOfChannels => channels == Channels.rgba ? 4 : 3;
 
   /// Get the bytes from the image. You can use this to access the
   /// color channels directly, or to pass it to something like an
   /// Html canvas context.
+  ///
+  /// Specifying the [format] will convert the image data to the specified
+  /// format. Images are stored internally in Format.bgra format; any
+  /// other format will require a conversion.
   ///
   /// For example, given an Html Canvas, you could draw this image into the
   /// canvas:
@@ -377,26 +389,27 @@ class Image {
   /// The size of the image buffer.
   int get length => data.length;
 
-  /// Get a pixel from the buffer.
+  /// Get a pixel from the buffer. No range checking is done.
   int operator [](int index) => data[index];
 
-  /// Set a pixel in the buffer.
+  /// Set a pixel in the buffer. No range checking is done.
   void operator []=(int index, int color) {
     data[index] = color;
   }
 
   /// Get the buffer index for the [x], [y] pixel coordinates.
+  /// No range checking is done.
   int index(int x, int y) => y * width + x;
 
-  /// Is the given pixel coordinates within the resolution of the image.
+  /// Is the given [x], [y] pixel coordinates within the resolution of the image.
   bool boundsSafe(int x, int y) => x >= 0 && x < width && y >= 0 && y < height;
 
   /// Get the pixel from the given [x], [y] coordinate. Color is encoded in a
-  /// Uint32 as 0xAARRGGBB.
+  /// Uint32 as #AARRGGBB. No range checking is done.
   int getPixel(int x, int y) => data[y * width + x];
 
   /// Get the pixel from the given [x], [y] coordinate. Color is encoded in a
-  /// Uint32 as 0xAARRGGBB. If the pixel coordinates are out of bounds, 0 is
+  /// Uint32 as #AARRGGBB. If the pixel coordinates are out of bounds, 0 is
   /// returned.
   int getPixelSafe(int x, int y) => boundsSafe(x, y) ? data[y * width + x] : 0;
 
@@ -425,8 +438,7 @@ class Image {
     int _linear(int Icc, int Inc, int Icn, int Inn) {
       return (Icc +
               dx * (Inc - Icc + dy * (Icc + Inn - Icn - Inc)) +
-              dy * (Icn - Icc))
-          .toInt();
+              dy * (Icn - Icc)).toInt();
     }
 
     int Icc = getPixelSafe(x, y);
@@ -518,6 +530,7 @@ class Image {
   }
 
   /// Set the pixel at the given [x], [y] coordinate to the [color].
+  /// No range checking is done.
   void setPixel(int x, int y, int color) {
     data[y * width + x] = color;
   }
@@ -534,7 +547,7 @@ class Image {
   /// [r], [g], [b], [a].
   ///
   /// This simply replaces the existing color, it does not do any alpha
-  /// blending. Use [drawPixel] for that.
+  /// blending. Use [drawPixel] for that. No range checking is done.
   void setPixelRgba(int x, int y, int r, int g, int b, [int a = 0xff]) {
     data[y * width + x] = getColor(r, g, b, a);
   }
