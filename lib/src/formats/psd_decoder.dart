@@ -42,7 +42,7 @@ class PsdDecoder extends Decoder {
     Animation anim = Animation();
     anim.width = info.width;
     anim.height = info.height;
-    anim.frameType = Animation.PAGE;
+    anim.frameType = FrameType.page;
     for (int i = 0, len = numFrames(); i < len; ++i) {
       Image image = decodeFrame(i);
       if (i == null) {

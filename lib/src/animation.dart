@@ -2,14 +2,21 @@ import 'dart:collection';
 
 import 'image.dart';
 
+enum FrameType {
+  /// The frames of this document are to be interpreted as animation.
+  animation,
+  /// The frames of this document are to be interpreted as pages of a document.
+  page
+}
+
 /// Stores multiple images, most often as the frames of an animation.
 ///
 /// Some formats, such as [TiffDecoder], support multiple images that are not
 /// to be interpreted as animation, but rather multiple pages of a document.
 /// The [Animation] container is still used to store the images for these files.
 /// The [frameType] property is used to differentiate multi-page documents from
-/// multi-frame animations, where it is set to [PAGE] for documents and
-/// [ANIMATION] for animated frames.
+/// multi-frame animations, where it is set to [FrameType.page] for documents
+/// and [FrameType.animation] for animated frames.
 ///
 /// All [Decoder] classes support decoding to an [Animation], where the
 /// [Animation] will only contain a single frame for single image formats
@@ -26,12 +33,6 @@ import 'image.dart';
 /// how to draw the particular frame, such as the area of the canvas to draw
 /// into, and if the canvas should be cleared prior to drawing the frame.
 class Animation extends IterableBase<Image> {
-  /// The frames of this document are to be interpreted as animation.
-  static const int ANIMATION = 0;
-
-  /// The frames of this document are to be interpreted as pages of a document.
-  static const int PAGE = 1;
-
   /// The canvas width for containing the animation.
   int width;
 
@@ -47,10 +48,10 @@ class Animation extends IterableBase<Image> {
   /// How many times should the animation loop (0 means forever)?
   int loopCount = 0;
 
-  /// How should the frames be interpreted?  If [ANIMATION], the frames
-  /// are part of an animated sequence. If [PAGE], the frames are the pages
-  /// of a document.
-  int frameType = ANIMATION;
+  /// How should the frames be interpreted?  If [FrameType.animation], the
+  /// frames are part of an animated sequence. If [FrameType.page], the frames
+  /// are the pages of a document.
+  FrameType frameType = FrameType.animation;
 
   /// How many frames are in the animation?
   int get numFrames => frames.length;
