@@ -47,9 +47,10 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
 
   copyInto(dst, src, dstX: shadowOffsetX, dstY: shadowOffsetY);
 
-  remapColors(dst, red: ALPHA, green: ALPHA, blue: ALPHA);
+  remapColors(dst, red: Channel.alpha, green: Channel.alpha,
+      blue: Channel.alpha);
 
-  scaleRGBA(dst, getRed(shadowColor), getGreen(shadowColor),
+  scaleRgba(dst, getRed(shadowColor), getGreen(shadowColor),
       getBlue(shadowColor), getAlpha(shadowColor));
 
   gaussianBlur(dst, blur);

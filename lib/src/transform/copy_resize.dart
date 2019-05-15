@@ -7,24 +7,28 @@ import '../util/interpolation.dart';
 import 'bake_orientation.dart';
 
 /// Returns a resized copy of the [src] image.
-/// If [height] is -1, then it will be determined by the aspect
+/// If [height] isn't specified, then it will be determined by the aspect
 /// ratio of [src] and [width].
-/// If [width] is -1, then it will be determined by the aspect ratio
+/// If [width] isn't specified, then it will be determined by the aspect ratio
 /// of [src] and [height].
-Image copyResize(Image src, {int width = -1, int height = -1,
+Image copyResize(Image src, {int width, int height,
                   Interpolation interpolation = Interpolation.nearest}) {
-  if (width <= 0 && height <= 0) {
+  if (width == null && height == null) {
     throw ImageException('Invalid size');
   }
 
   src = bakeOrientation(src);
 
-  if (height <= 0) {
+  if (height == null || height <= 0) {
     height = (width * (src.height / src.width)).toInt();
   }
 
-  if (width <= 0) {
+  if (width == null || width <= 0) {
     width = (height * (src.width / src.height)).toInt();
+  }
+
+  if (width == src.width && height == src.height) {
+    return src.clone();
   }
 
   Image dst = Image(width, height, channels: src.channels, exif: src.exif,

@@ -106,7 +106,7 @@ class WebPDecoder extends Decoder {
   /// Decode a WebP formatted file stored in [bytes] into an Image.
   /// If it's not a valid webp file, null is returned.
   /// If the webp file stores animated frames, only the first image will
-  /// be returned.  Use [decodeAnimation] to decode the full animation.
+  /// be returned. Use [decodeAnimation] to decode the full animation.
   Image decodeImage(List<int> bytes, {int frame = 0}) {
     startDecode(bytes);
     _info.frame = 0;

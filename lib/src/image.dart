@@ -21,6 +21,25 @@ enum Channels {
   rgba
 }
 
+enum BlendMode {
+  /// No alpha blending should be done when drawing this frame (replace
+  /// pixels in canvas).
+  source,
+  /// Alpha blending should be used when drawing this frame (composited over
+  /// the current canvas image).
+  over
+}
+
+enum DisposeMode {
+  /// When drawing a frame, the canvas should be left as it is.
+  none,
+  /// When drawing a frame, the canvas should be cleared first.
+  clear,
+  /// When drawing this frame, the canvas should be reverted to how it was
+  /// before drawing it.
+  previous
+}
+
 /// A 32-bit image buffer where pixels are encoded into 32-bit unsigned ints.
 /// You can use the methods in color to encode/decode the RGBA channels of a
 /// color for a pixel.
@@ -38,24 +57,6 @@ enum Channels {
 /// will always return the fully composed animation, so these coordinate
 /// properties are not used.
 class Image {
-  /// When drawing this frame, the canvas should be left as it is.
-  static const int DISPOSE_NONE = 0;
-
-  /// When drawing this frame, the canvas should be cleared first.
-  static const int DISPOSE_CLEAR = 1;
-
-  /// When drawing this frame, the canvas should be reverted to how it was
-  /// before drawing it.
-  static const int DISPOSE_PREVIOUS = 2;
-
-  /// No alpha blending should be done when drawing this frame (replace
-  /// pixels in canvas).
-  static const int BLEND_SOURCE = 0;
-
-  /// Alpha blending should be used when drawing this frame (composited over
-  /// the current canvas image).
-  static const int BLEND_OVER = 1;
-
   /// Width of the image.
   final int width;
 
@@ -76,11 +77,11 @@ class Image {
   int duration = 0;
 
   /// Defines what should be done to the canvas when drawing this frame.
-  int disposeMethod = DISPOSE_CLEAR;
+  DisposeMode disposeMethod = DisposeMode.clear;
 
   /// Defines the blending method (alpha compositing) to use when drawing this
   /// frame.
-  int blendMethod = BLEND_OVER;
+  BlendMode blendMethod = BlendMode.over;
 
   /// Pixels are encoded into 4-byte integers, where each byte is an RGBA
   /// channel.
@@ -203,7 +204,7 @@ class Image {
         return bytes;
       case Format.luminance:
         Uint8List bytes = Uint8List(width * height);
-        for (int i = 0, j = 0, len = length; i < len; ++i) {
+        for (int i = 0, len = length; i < len; ++i) {
           bytes[i] = getLuminance(data[i]);
         }
         return bytes;
@@ -520,7 +521,7 @@ class Image {
   /// [r], [g], [b], [a].
   ///
   /// This simply replaces the existing color, it does not do any alpha
-  /// blending.  Use [drawPixel] for that.
+  /// blending. Use [drawPixel] for that.
   void setPixelRgba(int x, int y, int r, int g, int b, [int a = 0xff]) {
     data[y * width + x] = getColor(r, g, b, a);
   }

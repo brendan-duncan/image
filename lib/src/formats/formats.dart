@@ -85,7 +85,7 @@ Animation decodeAnimation(List<int> data) {
 }
 
 /// Return the [Decoder] that can decode image with the given [name],
-/// by looking at the file extension.  See also [findDecoderForData] to
+/// by looking at the file extension. See also [findDecoderForData] to
 /// determine the decoder to use given the bytes of the file.
 Decoder getDecoderForNamedImage(String name) {
   String n = name.toLowerCase();
@@ -118,7 +118,7 @@ Decoder getDecoderForNamedImage(String name) {
 
 /// Identify the format of the image using the file extension of the given
 /// [name], and decode the given file [bytes] to an [Animation] with one or more
-/// [Image] frames.  See also [decodeAnimation].
+/// [Image] frames. See also [decodeAnimation].
 Animation decodeNamedAnimation(List<int> bytes, String name) {
   Decoder decoder = getDecoderForNamedImage(name);
   if (decoder == null) {
@@ -128,7 +128,7 @@ Animation decodeNamedAnimation(List<int> bytes, String name) {
 }
 
 /// Identify the format of the image using the file extension of the given
-/// [name], and decode the given file [bytes] to a single frame [Image].  See
+/// [name], and decode the given file [bytes] to a single frame [Image]. See
 /// also [decodeImage].
 Image decodeNamedImage(List<int> bytes, String name) {
   Decoder decoder = getDecoderForNamedImage(name);
@@ -222,7 +222,7 @@ Image decodeWebP(List<int> bytes) {
   return new WebPDecoder().decodeImage(bytes);
 }
 
-/// Decode an animated WebP file.  If the webp isn't animated, the animation
+/// Decode an animated WebP file. If the webp isn't animated, the animation
 /// will contain a single frame with the webp's image.
 Animation decodeWebPAnimation(List<int> bytes) {
   return new WebPDecoder().decodeAnimation(bytes);
@@ -233,7 +233,7 @@ Image decodeGif(List<int> bytes) {
   return new GifDecoder().decodeImage(bytes);
 }
 
-/// Decode an animated GIF file.  If the gif isn't animated, the animation
+/// Decode an animated GIF file. If the gif isn't animated, the animation
 /// will contain a single frame with the gif's image.
 Animation decodeGifAnimation(List<int> bytes) {
   return new GifDecoder().decodeAnimation(bytes);
@@ -254,7 +254,7 @@ Image decodeTiff(List<int> bytes) {
   return new TiffDecoder().decodeImage(bytes);
 }
 
-/// Decode an multi-image (animated) TIFF file.  If the tiff doesn't have
+/// Decode an multi-image (animated) TIFF file. If the tiff doesn't have
 /// multiple images, the animation will contain a single frame with the tiff's
 /// image.
 Animation decodeTiffAnimation(List<int> bytes) {

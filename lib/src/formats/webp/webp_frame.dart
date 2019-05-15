@@ -20,7 +20,7 @@ class WebPFrame {
 
   /// Indicates how the current frame is to be treated after it has been
   /// displayed (before rendering the next frame) on the canvas.
-  /// If true, the frame is cleared to the background color.  If false,
+  /// If true, the frame is cleared to the background color. If false,
   /// frame is left and the next frame drawn over it.
   bool clearFrame;
 

@@ -6,7 +6,8 @@ import '../image.dart';
 typedef TestPixel = bool Function(int y, int x);
 typedef MarkPixel = void Function(int y, int x);
 
-/// Fill the 4-connected shape containing [x],[y] in the image [src] with the given [color]
+/// Fill the 4-connected shape containing [x],[y] in the image [src] with the
+/// given [color].
 Image fillFlood(Image src, int x, int y, int color,
     {num threshold = 0.0, bool compareAlpha = false}) {
   int srcColor = src.getPixel(x, y);
@@ -37,7 +38,8 @@ Image fillFlood(Image src, int x, int y, int color,
   return src;
 }
 
-/// Create a mask describing the 4-connected shape containing [x],[y] in the image [src]
+/// Create a mask describing the 4-connected shape containing [x],[y] in the
+/// image [src].
 Uint8List maskFlood(Image src, int x, int y,
     {num threshold = 0.0, bool compareAlpha = false, int fillValue = 255}) {
   int srcColor = src.getPixel(x, y);
@@ -86,8 +88,8 @@ bool _testPixelLabColorDistance(Image src, int x, int y, List<num> refColor,
   return Color.distance(pixelColor, refColor, compareAlpha) > threshold;
 }
 
-/// Adam Milazzo (2015). A More Efficient Flood Fill.
-/// http://www.adammil.net/blog/v126_A_More_Efficient_Flood_Fill.html
+// Adam Milazzo (2015). A More Efficient Flood Fill.
+// http://www.adammil.net/blog/v126_A_More_Efficient_Flood_Fill.html
 void _fill4(Image src, int x, int y, TestPixel array, MarkPixel mark) {
   // at this point, we know array(y,x) is clear, and we want to move as far as
   // possible to the upper-left. moving up is much more important than moving

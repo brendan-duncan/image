@@ -9,7 +9,7 @@ import 'package:image/image.dart';
 /// javascript.
 void main() {
   // An img on the html page is used to establish the path to the images
-  // directory.  It's removed after we get the path since we'll be populating
+  // directory. It's removed after we get the path since we'll be populating
   // the page with our own decoded images.
   var img = querySelectorAll('img')[0] as prefix0.ImageElement;
   String path = img.src.substring(0, img.src.lastIndexOf('/'));

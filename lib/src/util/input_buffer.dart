@@ -67,9 +67,9 @@ class InputBuffer {
     buffer.fillRange(offset + start, offset + start + length, value);
   }
 
-  /// Return a InputStream to read a subset of this stream.  It does not
-  /// move the read position of this stream.  [position] is specified relative
-  /// to the start of the buffer.  If [position] is not specified, the current
+  /// Return a InputStream to read a subset of this stream. It does not
+  /// move the read position of this stream. [position] is specified relative
+  /// to the start of the buffer. If [position] is not specified, the current
   /// read position is used. If [length] is not specified, the remainder of this
   /// stream is used.
   InputBuffer subset(int count, {int position, int offset = 0}) {
@@ -81,7 +81,7 @@ class InputBuffer {
   }
 
   /// Returns the position of the given [value] within the buffer, starting
-  /// from the current read position with the given [offset].  The position
+  /// from the current read position with the given [offset]. The position
   /// returned is relative to the start of the buffer, or -1 if the [value]
   /// was not found.
   int indexOf(int value, [int offset = 0]) {

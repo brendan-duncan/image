@@ -2,51 +2,47 @@ import '../color.dart';
 import '../image.dart';
 import '../transform/copy_into.dart';
 
-/// Trim an image to the top-left and bottom-right most non-transparent pixels,
-/// used by [findTrim] and [trim].
-const int TRIM_TRANSPARENT = 0;
+class Trim {
+  /// Trim the image down from the top.
+  static const top = Trim._internal(1);
+  /// Trim the image up from the bottom.
+  static const bottom = Trim._internal(2);
+  /// Trim the left edge of the image.
+  static const left = Trim._internal(4);
+  /// Trim the right edge of the image.
+  static const right = Trim._internal(8);
+  /// Trim all edges of the image.
+  static const all = Trim._internal(1 | 2 | 4 | 8);
 
-/// Trim an image to the top-left and bottom-right most pixels that are not the
-/// same as the top-left most pixel of the image,
-/// used by [findTrim] and [trim].
-const int TRIM_TOP_LEFT_COLOR = 1;
+  final int _value;
+  const Trim._internal(this._value);
 
-/// Trim an image to the top-left and bottom-right most pixels that are not the
-/// same as the bottom-right most pixel of the image,
-/// used by [findTrim] and [trim].
-const int TRIM_BOTTOM_RIGHT_COLOR = 2;
+  Trim operator |(Trim rhs) => Trim._internal(_value | rhs._value);
+  bool operator &(Trim rhs) => (_value & rhs._value) != 0;
+}
 
-/// Trim the image down from the top,
-/// used by [findTrim] and [trim].
-const int TRIM_TOP = 1;
-
-/// Trim the image up from the bottom,
-/// used by [findTrim] and [trim].
-const int TRIM_BOTTOM = 2;
-
-/// Trim the left edge of the image,
-/// used by [findTrim] and [trim].
-const int TRIM_LEFT = 4;
-
-/// Trim the right edge of the image,
-/// used by [findTrim] and [trim].
-const int TRIM_RIGHT = 8;
-
-/// Trim all edges of the image,
-/// used by [findTrim] and [trim].
-const int TRIM_ALL = TRIM_TOP | TRIM_BOTTOM | TRIM_LEFT | TRIM_RIGHT;
+enum TrimMode {
+  /// Trim an image to the top-left and bottom-right most non-transparent pixels
+  transparent,
+  /// Trim an image to the top-left and bottom-right most pixels that are not the
+  /// same as the top-left most pixel of the image.
+  topLeftColor,
+  /// Trim an image to the top-left and bottom-right most pixels that are not the
+  /// same as the bottom-right most pixel of the image.
+  bottomRightColor
+}
 
 /// Find the crop area to be used by the trim function. Returns the
 /// coordinates as [x, y, width, height]. You could pass these coordinates
 /// to the [copyCrop] function to crop the image.
-List<int> findTrim(Image src, {int mode = TRIM_TRANSPARENT,
-                   int sides = TRIM_ALL}) {
+List<int> findTrim(Image src, {TrimMode mode = TrimMode.transparent,
+                   Trim sides = Trim.all}) {
   int h = src.height;
   int w = src.width;
 
-  int bg = (mode == TRIM_TOP_LEFT_COLOR)
-      ? src.getPixel(0, 0)
-      : (mode == TRIM_BOTTOM_RIGHT_COLOR) ? src.getPixel(w - 1, h - 1) : 0;
+  int bg = (mode == TrimMode.topLeftColor) ? src.getPixel(0, 0)
+      : (mode == TrimMode.bottomRightColor) ? src.getPixel(w - 1, h - 1)
+      : 0;
 
   int xmin = w;
   int xmax = 0;
@@ -57,7 +53,7 @@ List<int> findTrim(Image src, {int mode = TRIM_TRANSPARENT,
     bool first = true;
     for (int x = 0; x < w; ++x) {
       int c = src.getPixel(x, y);
-      if ((mode == TRIM_TRANSPARENT && getAlpha(c) != 0) && (c != bg)) {
+      if ((mode == TrimMode.transparent && getAlpha(c) != 0) && (c != bg)) {
         if (xmin > x) {
           xmin = x;
         }
@@ -78,16 +74,16 @@ List<int> findTrim(Image src, {int mode = TRIM_TRANSPARENT,
     }
   }
 
-  if (sides & TRIM_TOP == 0) {
+  if (sides & Trim.top == false) {
     ymin = 0;
   }
-  if (sides & TRIM_BOTTOM == 0) {
+  if (sides & Trim.bottom == false) {
     ymax = h - 1;
   }
-  if (sides & TRIM_LEFT == 0) {
+  if (sides & Trim.left == false) {
     xmin = 0;
   }
-  if (sides & TRIM_RIGHT == 0) {
+  if (sides & Trim.right == false) {
     xmax = w - 1;
   }
 
@@ -100,14 +96,15 @@ List<int> findTrim(Image src, {int mode = TRIM_TRANSPARENT,
 /// Automatically crops the image by finding the corners of the image that
 /// meet the [mode] criteria (not transparent or a different color).
 ///
-/// [mode] can be either [TRIM_TRANSPARENT], [TRIM_TOP_LEFT_CORNER] or
-/// [TRIM_BOTTOM_RIGHT_CORNER].
+/// [mode] can be either [TrimMode.transparent], [TrimMode.topLeftColor] or
+/// [TrimMode.bottomRightColor].
 ///
 /// [sides] can be used to control which sides of the image get trimmed,
-/// and can be any combination of [TRIM_TOP], [TRIM_BOTTOM], [TRIM_LEFT],
-/// and [TRIM_RIGHT].
-Image trim(Image src, {int mode = TRIM_TRANSPARENT, int sides = TRIM_ALL}) {
-  if (mode == TRIM_TRANSPARENT && src.channels == Channels.rgb) {
+/// and can be any combination of [Trim.top], [Trim.bottom], [Trim.left],
+/// and [Trim.right].
+Image trim(Image src, {TrimMode mode = TrimMode.transparent,
+           Trim sides = Trim.all}) {
+  if (mode == TrimMode.transparent && src.channels == Channels.rgb) {
     return new Image.from(src);
   }
 

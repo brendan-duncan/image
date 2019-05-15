@@ -226,7 +226,8 @@ void testColorOffset() {
     Stopwatch t = Stopwatch();
     t.start();
     Image image = Image.from(origImage);
-    image = colorOffset(image, red, green, blue, alpha);
+    image = colorOffset(image, red: red, green: green, blue: blue,
+        alpha: alpha);
 
     // Fill the buffer with our image data.
     filterImageData.data.setRange(0, filterImageData.data.length,

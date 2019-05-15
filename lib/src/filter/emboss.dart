@@ -9,5 +9,5 @@ Image emboss(Image src) {
     0.0, 0.0, -1.5
   ];
 
-  return convolution(src, filter, 1, 127);
+  return convolution(src, filter, div: 1, offset: 127);
 }

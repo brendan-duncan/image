@@ -42,14 +42,14 @@ void onFileLoaded(Event event) {
   Image image = decoder.decodeImage(bytes);
 
   // If the image was able to be decoded, we can display it in a couple
-  // different ways.  We could encode it to a format that can be displayed
+  // different ways. We could encode it to a format that can be displayed
   // by an IMG image element (like PNG or JPEG); or we could draw it into
   // a canvas.
   if (image != null) {
     // Add a separator to the html page
     document.body.append(ParagraphElement());
 
-    // Draw the image into a canvas.  First create a canvas at the correct
+    // Draw the image into a canvas. First create a canvas at the correct
     // resolution.
     var c = CanvasElement();
     document.body.append(c);

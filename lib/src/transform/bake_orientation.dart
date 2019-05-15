@@ -20,7 +20,7 @@ Image bakeOrientation(Image image) {
     case 2:
       return flipHorizontal(bakedImage);
     case 3:
-      return flip(bakedImage, FLIP_BOTH);
+      return flip(bakedImage, Flip.both);
     case 4:
       return flipHorizontal(copyRotate(bakedImage, 180));
     case 5:

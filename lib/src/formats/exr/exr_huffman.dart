@@ -295,7 +295,7 @@ class ExrHuffman {
     }
 
     // hcode[i] contains the length, l, of the
-    // code for symbol i.  Assign the next available
+    // code for symbol i. Assign the next available
     // code of length l to the symbol and store both
     // l and the code in hcode[i].
 

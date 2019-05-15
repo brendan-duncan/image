@@ -12,16 +12,15 @@ void main() {
       expect(getBlue(rgba), equals(0xcc));
       expect(getAlpha(rgba), equals(0xff));
 
-      expect(getChannel(rgba, RED), equals(0xaa));
-      expect(getChannel(rgba, GREEN), equals(0xbb));
-      expect(getChannel(rgba, BLUE), equals(0xcc));
-      expect(getChannel(rgba, ALPHA), equals(0xff));
-      expect(getChannel(rgba, 4), equals(0xff)); // out-of-bounds returns alpha
+      expect(getChannel(rgba, Channel.red), equals(0xaa));
+      expect(getChannel(rgba, Channel.green), equals(0xbb));
+      expect(getChannel(rgba, Channel.blue), equals(0xcc));
+      expect(getChannel(rgba, Channel.alpha), equals(0xff));
 
-      rgba = setChannel(rgba, RED, 0x11);
-      rgba = setChannel(rgba, GREEN, 0x22);
-      rgba = setChannel(rgba, BLUE, 0x33);
-      rgba = setChannel(rgba, ALPHA, 0x44);
+      rgba = setChannel(rgba, Channel.red, 0x11);
+      rgba = setChannel(rgba, Channel.green, 0x22);
+      rgba = setChannel(rgba, Channel.blue, 0x33);
+      rgba = setChannel(rgba, Channel.alpha, 0x44);
       expect(rgba, equals(0x44112233));
 
       rgba = setRed(rgba, 0x55);
@@ -36,24 +35,24 @@ void main() {
       var l = getLuminance(rgba);
       expect(l, equals(0x63));
 
-      l = getLuminanceRGB(0x55, 0x66, 0x77);
+      l = getLuminanceRgb(0x55, 0x66, 0x77);
       expect(l, equals(0x63));
     });
 
     test('HSL', () {
-      var rgb = hslToRGB(180.0 / 360.0, 0.5, 0.75);
+      var rgb = hslToRgb(180.0 / 360.0, 0.5, 0.75);
       expect(rgb[0], equals(159));
       expect(rgb[1], equals(223));
       expect(rgb[2], equals(223));
 
-      var hsl = rgbToHSL(rgb[0], rgb[1], rgb[2]);
+      var hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
       expect(hsl[0], closeTo(0.5, 0.001));
       expect(hsl[1], closeTo(0.5, 0.001));
       expect(hsl[2], closeTo(0.75, 0.001));
     });
 
     test('CMYK', () {
-      var rgb = cmykToRGB((0.75 * 255), (0.5 * 255), (0.5 * 255), (0.5 * 255));
+      var rgb = cmykToRgb((0.75 * 255), (0.5 * 255), (0.5 * 255), (0.5 * 255));
       expect(rgb[0], equals(32));
       expect(rgb[1], equals(64));
       expect(rgb[2], equals(64));

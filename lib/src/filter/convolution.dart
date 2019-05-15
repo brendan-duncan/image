@@ -3,13 +3,13 @@ import 'dart:math';
 import '../color.dart';
 import '../image.dart';
 
-/// Apply a 3x3 convolution filter to the [src] image.  [filter] should be a
+/// Apply a 3x3 convolution filter to the [src] image. [filter] should be a
 /// list of 9 numbers.
 ///
 /// The rgb channels will be divided by [filterDiv] and add [offset], allowing
 /// filters to normalize and offset the filtered pixel value.
 Image convolution(Image src, List<num> filter,
-    [num filterDiv = 1.0, num offset = 0.0]) {
+                  {num div = 1.0, num offset = 0.0}) {
   Image tmp = Image.from(src);
 
   for (int y = 0; y < src.height; ++y) {
@@ -30,9 +30,9 @@ Image convolution(Image src, List<num> filter,
         }
       }
 
-      r = (r / filterDiv) + offset;
-      g = (g / filterDiv) + offset;
-      b = (b / filterDiv) + offset;
+      r = (r / div) + offset;
+      g = (g / div) + offset;
+      b = (b / div) + offset;
 
       r = (r > 255.0) ? 255.0 : ((r < 0.0) ? 0.0 : r);
       g = (g > 255.0) ? 255.0 : ((g < 0.0) ? 0.0 : g);

@@ -1,10 +1,8 @@
-import 'dart:typed_data';
-
 import '../image.dart';
 import '../draw/fill.dart';
 import '../util/min_max.dart';
 
-/// Linearly normalize the colors of the image.  All color values will be mapped
+/// Linearly normalize the colors of the image. All color values will be mapped
 /// to the range [minValue], [maxValue] inclusive.
 Image normalize(Image src, int minValue, int maxValue) {
   int A = minValue < maxValue ? minValue : maxValue;

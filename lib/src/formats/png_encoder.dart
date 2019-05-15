@@ -132,8 +132,8 @@ class PngEncoder extends Encoder {
     chunk.writeUint32(yOffset);
     chunk.writeUint16(delay);
     chunk.writeUint16(0); // delay denominator
-    chunk.writeByte(disposeMethod);
-    chunk.writeByte(blendMethod);
+    chunk.writeByte(disposeMethod.index);
+    chunk.writeByte(blendMethod.index);
     _writeChunk(output, 'fcTL', chunk.getBytes());
   }
 
@@ -366,8 +366,8 @@ class PngEncoder extends Encoder {
   int xOffset;
   int yOffset;
   int delay;
-  int disposeMethod;
-  int blendMethod;
+  DisposeMode disposeMethod;
+  BlendMode blendMethod;
   int _width;
   int _height;
   int _frames;

@@ -1,6 +1,6 @@
 import '../image.dart';
 
-Image scaleRGBA(Image src, int r, int g, int b, int a) {
+Image scaleRgba(Image src, int r, int g, int b, int a) {
   num dr = r / 255.0;
   num dg = g / 255.0;
   num db = b / 255.0;

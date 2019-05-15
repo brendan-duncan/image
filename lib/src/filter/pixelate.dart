@@ -2,20 +2,21 @@ import '../color.dart';
 import '../image.dart';
 import '../draw/fill_rect.dart';
 
-/// Use the top-left pixel of a block for the block color, used by [pixelate].
-const int PIXELATE_UPPERLEFT = 0;
-
-/// Use the average of the pixels within a block for the block color, used by
-/// [pixelate].
-const int PIXELATE_AVERAGE = 1;
+enum PixelateMode {
+  /// Use the top-left pixel of a block for the block color.
+  upperLeft,
+  /// Use the average of the pixels within a block for the block color.
+  average
+}
 
 /// Pixelate the [src] image.
 ///
 /// [blockSize] determines the size of the pixelated blocks.
-/// If [mode] is [PIXELATE_UPPERLEFT] then the upper-left corner of the block
-/// will be used for the block color. Otherwise if [mode] is [PIXELATE_AVERAGE],
+/// If [mode] is [PixelateMode.upperLeft] then the upper-left corner of the block
+/// will be used for the block color. Otherwise if [mode] is [PixelateMode.average],
 /// the average of all the pixels in the block will be used for the block color.
-Image pixelate(Image src, int blockSize, {int mode = PIXELATE_UPPERLEFT}) {
+Image pixelate(Image src, int blockSize,
+              {PixelateMode mode = PixelateMode.upperLeft}) {
   if (blockSize <= 1) {
     return src;
   }
@@ -23,7 +24,7 @@ Image pixelate(Image src, int blockSize, {int mode = PIXELATE_UPPERLEFT}) {
   int bs = blockSize - 1;
 
   switch (mode) {
-    case PIXELATE_UPPERLEFT:
+    case PixelateMode.upperLeft:
       for (int y = 0; y < src.height; y += blockSize) {
         for (int x = 0; x < src.width; x += blockSize) {
           if (src.boundsSafe(x, y)) {
@@ -33,7 +34,7 @@ Image pixelate(Image src, int blockSize, {int mode = PIXELATE_UPPERLEFT}) {
         }
       }
       break;
-    case PIXELATE_AVERAGE:
+    case PixelateMode.average:
       for (int y = 0; y < src.height; y += blockSize) {
         for (int x = 0; x < src.width; x += blockSize) {
           int a = 0;

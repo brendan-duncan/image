@@ -407,7 +407,7 @@ class GifDecoder extends Decoder {
           // Its a code to needed to be traced: trace the linked list
           // until the prefix is a pixel, while pushing the suffix
           // pixels on our stack. If we done, pop the stack in reverse
-          // (thats what stack is good for!) order to output.  */
+          // (thats what stack is good for!) order to output. */
           if (_prefix[_currentCode] == NO_SUCH_CODE) {
             // Only allowed if CrntCode is exactly the running code:
             // In that case CrntCode = XXXCode, CrntCode or the
@@ -538,7 +538,7 @@ class GifDecoder extends Decoder {
       _buffer[0] = _input.readByte();
 
       // There shouldn't be any empty data blocks here as the LZW spec
-      // says the LZW termination code should come first.  Therefore we
+      // says the LZW termination code should come first. Therefore we
       // shouldn't be inside this routine at that point.
       if (_buffer[0] == 0) {
         return null;

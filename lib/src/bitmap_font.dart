@@ -61,7 +61,6 @@ class BitmapFont {
 
   /// Decode a [BitmapFont] from the contents of a zip file that stores the
   /// .fnt font definition and associated PNG images.
-  ///
   BitmapFont.fromZip(List<int> fileData) {
     Archive arc = ZipDecoder().decodeBytes(fileData);
 

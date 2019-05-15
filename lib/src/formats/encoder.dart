@@ -9,7 +9,7 @@ abstract class Encoder {
   /// Does this encoder support animation?
   bool get supportsAnimation => false;
 
-  /// Encode an animation.  Not all formats support animation, and null
+  /// Encode an animation. Not all formats support animation, and null
   /// will be returned if not.
   List<int> encodeAnimation(Animation anim) {
     return null;

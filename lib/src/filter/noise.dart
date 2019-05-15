@@ -5,26 +5,20 @@ import '../image.dart';
 import '../util/min_max.dart';
 import '../util/random.dart';
 
-/// Gaussian noise type used by [noise].
-const int NOISE_GAUSSIAN = 0;
+enum NoiseType {
+  gaussian,
+  uniform,
+  salt_pepper,
+  poisson,
+  rice
+}
 
-/// Uniform noise type used by [noise].
-const int NOISE_UNIFORM = 1;
-
-/// Salt&Pepper noise type used by [noise].
-const int NOISE_SALT_PEPPER = 2;
-
-/// Poisson noise type used by [noise].
-const int NOISE_POISSON = 3;
-
-/// Rice noise type used by [noise].
-const int NOISE_RICE = 4;
-
-/// Add random noise to pixel values.  [sigma] determines how strong the effect
-/// should be.  [type] should be one of the following: [NOISE_GAUSSIAN],
+/// Add random noise to pixel values. [sigma] determines how strong the effect
+/// should be. [type] should be one of the following: [NOISE_GAUSSIAN],
 /// [NOISE_UNIFORM], [NOISE_SALT_PEPPER], [NOISE_POISSON], or [NOISE_RICE].
 Image noise(Image image, num sigma,
-    {int type = NOISE_GAUSSIAN, Random random}) {
+           {NoiseType type = NoiseType.gaussian,
+            Random random}) {
   if (random == null) {
     random = Random();
   }
@@ -33,11 +27,11 @@ Image noise(Image image, num sigma,
   int m = 0;
   int M = 0;
 
-  if (nsigma == 0.0 && type != NOISE_POISSON) {
+  if (nsigma == 0.0 && type != NoiseType.poisson) {
     return image;
   }
 
-  if (nsigma < 0.0 || type == NOISE_SALT_PEPPER) {
+  if (nsigma < 0.0 || type == NoiseType.salt_pepper) {
     List<int> mM = minMax(image);
     m = mM[0];
     M = mM[1];
@@ -49,7 +43,7 @@ Image noise(Image image, num sigma,
 
   final int len = image.length;
   switch (type) {
-    case NOISE_GAUSSIAN:
+    case NoiseType.gaussian:
       for (int i = 0; i < len; ++i) {
         int c = image[i];
         int r = (getRed(c) + nsigma * grand(random)).toInt();
@@ -59,7 +53,7 @@ Image noise(Image image, num sigma,
         image[i] = getColor(r, g, b, a);
       }
       break;
-    case NOISE_UNIFORM:
+    case NoiseType.uniform:
       for (int i = 0; i < len; ++i) {
         int c = image[i];
         int r = (getRed(c) + nsigma * crand(random)).toInt();
@@ -69,7 +63,7 @@ Image noise(Image image, num sigma,
         image[i] = getColor(r, g, b, a);
       }
       break;
-    case NOISE_SALT_PEPPER:
+    case NoiseType.salt_pepper:
       if (nsigma < 0) {
         nsigma = -nsigma;
       }
@@ -88,7 +82,7 @@ Image noise(Image image, num sigma,
         }
       }
       break;
-    case NOISE_POISSON:
+    case NoiseType.poisson:
       for (int i = 0; i < len; ++i) {
         int c = image[i];
         int r = prand(random, getRed(c).toDouble());
@@ -98,7 +92,7 @@ Image noise(Image image, num sigma,
         image[i] = getColor(r, g, b, a);
       }
       break;
-    case NOISE_RICE:
+    case NoiseType.rice:
       num sqrt2 = sqrt(2.0);
       for (int i = 0; i < len; ++i) {
         int c = image[i];

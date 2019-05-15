@@ -4,11 +4,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('filter', () {
-    var image =
-        readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
+    var image = readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
     image = copyResize(image, width: 400);
-    var image2 =
-        readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
+    var image2 = readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       Image f = Image(10, 10, channels: Channels.rgb);
@@ -126,7 +124,7 @@ void main() {
 
     test('colorOffset', () {
       Image f = Image.from(image);
-      colorOffset(f, 50, 0, 0, 0);
+      colorOffset(f, red: 5);
 
       File fp = File('out/colorOffset.jpg');
       fp.createSync(recursive: true);
@@ -179,7 +177,7 @@ void main() {
     });
 
     test('sobel', () {
-      Image f = Image.from(image);
+      var f = readPng(new File('test/res/png/lenna.png').readAsBytesSync());
       sobel(f);
 
       File fp = File('out/sobel.jpg');
@@ -216,7 +214,7 @@ void main() {
 
     test('NOISE_GAUSSIAN', () {
       Image f = Image.from(image);
-      noise(f, 10.0, type: NOISE_GAUSSIAN);
+      noise(f, 10.0, type: NoiseType.gaussian);
 
       File fp = File('out/noise_gaussian.jpg');
       fp.createSync(recursive: true);
@@ -225,7 +223,7 @@ void main() {
 
     test('NOISE_UNIFORM', () {
       Image f = Image.from(image);
-      noise(f, 10.0, type: NOISE_UNIFORM);
+      noise(f, 10.0, type: NoiseType.uniform);
 
       File fp = File('out/noise_uniform.jpg');
       fp.createSync(recursive: true);
@@ -234,7 +232,7 @@ void main() {
 
     test('NOISE_SALT_PEPPER', () {
       Image f = Image.from(image);
-      noise(f, 10.0, type: NOISE_SALT_PEPPER);
+      noise(f, 10.0, type: NoiseType.salt_pepper);
 
       File fp = File('out/noise_salt_pepper.jpg');
       fp.createSync(recursive: true);
@@ -243,7 +241,7 @@ void main() {
 
     test('NOISE_POISSON', () {
       Image f = Image.from(image);
-      noise(f, 10.0, type: NOISE_POISSON);
+      noise(f, 10.0, type: NoiseType.poisson);
 
       File fp = File('out/noise_poisson.jpg');
       fp.createSync(recursive: true);
@@ -252,7 +250,7 @@ void main() {
 
     test('NOISE_RICE', () {
       Image f = Image.from(image);
-      noise(f, 10.0, type: NOISE_RICE);
+      noise(f, 10.0, type: NoiseType.rice);
 
       File fp = File('out/noise_rice.jpg');
       fp.createSync(recursive: true);
@@ -270,14 +268,14 @@ void main() {
 
     test('pixelate', () {
       Image f = Image.from(image);
-      pixelate(f, 20, mode: PIXELATE_UPPERLEFT);
+      pixelate(f, 20, mode: PixelateMode.upperLeft);
 
       File fp = File('out/PIXELATE_UPPERLEFT.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
 
       f = Image.from(image);
-      pixelate(f, 20, mode: PIXELATE_AVERAGE);
+      pixelate(f, 20, mode: PixelateMode.average);
 
       fp = File('out/PIXELATE_AVERAGE.jpg');
       fp.createSync(recursive: true);
@@ -287,7 +285,8 @@ void main() {
     test('remapColors', () {
       Image f = Image.from(image);
       f.channels = Channels.rgba;
-      remapColors(f, red: GREEN, green: RED, alpha: LUMINANCE);
+      remapColors(f, red: Channel.green, green: Channel.red,
+          alpha: Channel.luminance);
 
       File fp = File('out/remapColors.jpg');
       fp.createSync(recursive: true);
@@ -390,7 +389,7 @@ void main() {
     test('trim', () {
       Image image =
           readPng(new File('test/res/png/trim.png').readAsBytesSync());
-      Image trimmed = trim(image, mode: TRIM_TRANSPARENT);
+      Image trimmed = trim(image, mode: TrimMode.transparent);
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));
       new File('out/trim.png')
@@ -437,9 +436,9 @@ void main() {
         ..writeAsBytesSync(writePng(d));
     });
 
-    test('flip horzontal', () {
+    test('flip horizontal', () {
       Image f = Image.from(image);
-      Image r = flip(f, 1);
+      Image r = flip(f, Flip.horizontal);
 
       File fp = File('out/flipH.jpg');
       fp.createSync(recursive: true);
@@ -447,7 +446,7 @@ void main() {
     });
     test('flip vertical', () {
       Image f = Image.from(image);
-      Image r = flip(f, 2);
+      Image r = flip(f, Flip.vertical);
 
       File fp = File('out/flipV.jpg');
       fp.createSync(recursive: true);
@@ -456,7 +455,7 @@ void main() {
 
     test('flip both', () {
       Image f = Image.from(image);
-      Image r = flip(f, 3);
+      Image r = flip(f, Flip.both);
 
       File fp = File('out/flipHV.jpg');
       fp.createSync(recursive: true);

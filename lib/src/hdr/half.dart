@@ -42,7 +42,7 @@ class Half {
     }
 
     // We extract the combined sign and exponent, e, from our
-    // floating-point number, f.  Then we convert e to the sign
+    // floating-point number, f. Then we convert e to the sign
     // and exponent of the half number via a table lookup.
     //
     // For the most common case, where a normalized half is produced,
@@ -194,7 +194,7 @@ class Half {
 
   static int _convert(int i) {
     // Our floating point number, f, is represented by the bit
-    // pattern in integer i.  Disassemble that bit pattern into
+    // pattern in integer i. Disassemble that bit pattern into
     // the sign, s, the exponent, e, and the significand, m.
     // Shift s into the position where it will go in in the
     // resulting half number.
@@ -207,7 +207,7 @@ class Half {
     // Now reassemble s, e and m into a half:
     if (e <= 0) {
       if (e < -10) {
-        // E is less than -10.  The absolute value of f is
+        // E is less than -10. The absolute value of f is
         // less than HALF_MIN (f may be a small normalized
         // float, a denormalized float or a zero).
         //
@@ -215,7 +215,7 @@ class Half {
         return s;
       }
 
-      // E is between -10 and 0.  F is a normalized float
+      // E is between -10 and 0. F is a normalized float
       // whose magnitude is less than HALF_NRM_MIN.
       //
       // We convert f to a denormalized half.
@@ -228,7 +228,7 @@ class Half {
       // -10 and 0); in case of a tie, round to the nearest even value.
       //
       // Rounding may cause the significand to overflow and make
-      // our number normalized.  Because of the way a half's bits
+      // our number normalized. Because of the way a half's bits
       // are laid out, we don't have to treat this case separately;
       // the code below will handle it correctly.
 
@@ -257,10 +257,10 @@ class Half {
         return s | 0x7c00 | m | ((m == 0) ? 1 : 0);
       }
     } else {
-      // E is greater than zero.  F is a normalized float.
+      // E is greater than zero. F is a normalized float.
       // We try to convert f to a normalized half.
 
-      // Round to m to the nearest 10-bit value.  In case of
+      // Round to m to the nearest 10-bit value. In case of
       // a tie, round to the nearest even value.
       m = m + 0x00000fff + ((m >> 13) & 1);
 

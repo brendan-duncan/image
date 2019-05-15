@@ -288,7 +288,7 @@ class ExrImage extends DecodeInfo {
   int flags;
 
   /// The MAGIC number is stored in the first four bytes of every
-  /// OpenEXR image file.  This can be used to quickly test whether
+  /// OpenEXR image file. This can be used to quickly test whether
   /// a given file is an OpenEXR image file (see isImfMagic(), below).
   static const int MAGIC = 20000630;
 

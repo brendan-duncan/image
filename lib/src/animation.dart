@@ -14,13 +14,13 @@ import 'image.dart';
 /// All [Decoder] classes support decoding to an [Animation], where the
 /// [Animation] will only contain a single frame for single image formats
 /// such as JPEG, or if the file doesn't contain any animation such as a single
-/// image GIF.  If you want to generically support both animated and non-animated
+/// image GIF. If you want to generically support both animated and non-animated
 /// files, you can always decode to an animation and if the animation has only
 /// a single frame, then it's a non-animated image.
 ///
 /// In some cases, the frames of the animation may only provide a portion of the
 /// canvas, such as the case of animations encoding only the changing pixels
-/// from one frame to the next.  The [width] and [height] and [backgroundColor]
+/// from one frame to the next. The [width] and [height] and [backgroundColor]
 /// properties of the [Animation] provide information about the canvas that
 /// contains the animation, and the [Image] frames provide information about
 /// how to draw the particular frame, such as the area of the canvas to draw
@@ -48,7 +48,7 @@ class Animation extends IterableBase<Image> {
   int loopCount = 0;
 
   /// How should the frames be interpreted?  If [ANIMATION], the frames
-  /// are part of an animated sequence.  If [PAGE], the frames are the pages
+  /// are part of an animated sequence. If [PAGE], the frames are the pages
   /// of a document.
   int frameType = ANIMATION;
 
@@ -78,7 +78,7 @@ class Animation extends IterableBase<Image> {
   /// Returns true if there is at least one frame in the animation.
   bool get isNotEmpty => frames.isNotEmpty;
 
-  /// Get the iterator for looping over the animation.  This allows the
+  /// Get the iterator for looping over the animation. This allows the
   /// Animation to be used in for-each loops:
   /// for (AnimationFrame frame in animation) { ... }
   Iterator<Image> get iterator => frames.iterator;
