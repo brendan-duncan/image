@@ -9,7 +9,7 @@ import 'exr/exr_image.dart';
 /// Decode an OpenEXR formatted image.
 ///
 /// OpenEXR is a format developed by Industrial Light & Magic, with collaboration
-/// from other companies such as Weta and Pixar, for storing hight dynamic
+/// from other companies such as Weta and Pixar, for storing high dynamic
 /// range (HDR) images for use in digital visual effects production. It supports
 /// a wide range of features, including 16-bit or 32-bit floating-point channels;
 /// lossless and lossy data compression; arbitrary image channels for storing

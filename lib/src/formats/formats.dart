@@ -233,8 +233,8 @@ Image decodeGif(List<int> bytes) {
   return new GifDecoder().decodeImage(bytes);
 }
 
-/// Decode an animated GIF file. If the gif isn't animated, the animation
-/// will contain a single frame with the gif's image.
+/// Decode an animated GIF file. If the GIF isn't animated, the animation
+/// will contain a single frame with the GIFf's image.
 Animation decodeGifAnimation(List<int> bytes) {
   return new GifDecoder().decodeAnimation(bytes);
 }
