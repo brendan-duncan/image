@@ -1,3 +1,7 @@
+## 2.1.0 - May 15, 2019
+
+- Big API clean-up to bring it up to a more modern Dart syntax.
+
 ## 2.0.9 - May 10, 2019
 
 - Use strict dartanalysys settings and clean up code.
@@ -6,7 +10,7 @@
 
 - Add ability to quantize an image to any number of colors.
 - Optimizations for the JPEG decoder.
-- Use #AARRGGBB for colors instead of ##AABBGGRR, to be compatible with Flutter image class.
+- Use #AARRGGBB for colors instead of #AABBGGRR, to be compatible with Flutter image class.
 - Add floodfill drawing function.
 - CopyRectify to transform an arbitrary quad to the full image.
 - Improve performance of CopyResize.
@@ -35,7 +39,7 @@
 
 - Re-added decoding of orientation exif value from jpeg images.
 - Added bake_orientation function, which will rotate an image so that it physically matches its orientation exif value,
-useful for rotating an image prior to exporting it to a format that doesn't support exif data.
+useful for rotating an image prior to exporting it to a format that does not support exif data.
 
 ## 2.0.1 - May 28, 2018
 
