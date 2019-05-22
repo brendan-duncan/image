@@ -1,3 +1,7 @@
+## 2.1.1 - May 22, 2019
+
+- Fix typo and missing license in license file.
+
 ## 2.1.0 - May 15, 2019
 
 - Big API clean-up to bring it up to a more modern Dart syntax.
