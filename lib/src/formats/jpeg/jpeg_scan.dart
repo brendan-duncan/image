@@ -314,8 +314,11 @@ class JpegScan {
     int mcuCol = mcu % mcusPerLine;
     int blockRow = mcuRow * component.vSamples + row;
     int blockCol = mcuCol * component.hSamples + col;
+    if (blockRow >= component.blocks.length) {
+      return;
+    }
     int numCols = component.blocks[blockRow].length as int;
-    if (blockRow >= component.blocks.length || blockCol >= numCols) {
+    if (blockCol >= numCols) {
       return;
     }
     decodeFn(component, component.blocks[blockRow][blockCol]);
