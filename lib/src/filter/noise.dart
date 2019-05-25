@@ -14,8 +14,9 @@ enum NoiseType {
 }
 
 /// Add random noise to pixel values. [sigma] determines how strong the effect
-/// should be. [type] should be one of the following: [NOISE_GAUSSIAN],
-/// [NOISE_UNIFORM], [NOISE_SALT_PEPPER], [NOISE_POISSON], or [NOISE_RICE].
+/// should be. [type] should be one of the following: [NoiseType.gaussian],
+/// [NoiseType.uniform], [NoiseType.salt_pepper], [NoiseType.poisson],
+/// or [NoiseType.rice].
 Image noise(Image image, num sigma,
            {NoiseType type = NoiseType.gaussian,
             Random random}) {
