@@ -3,38 +3,50 @@ import 'dart:typed_data';
 import '../color.dart';
 import '../image.dart';
 
-typedef TestPixel = bool Function(int y, int x);
-typedef MarkPixel = void Function(int y, int x);
+typedef _TestPixel = bool Function(int y, int x);
+typedef _MarkPixel = void Function(int y, int x);
 
 /// Fill the 4-connected shape containing [x],[y] in the image [src] with the
 /// given [color].
 Image fillFlood(Image src, int x, int y, int color,
     {num threshold = 0.0, bool compareAlpha = false}) {
+  var visited = Uint8List(src.width * src.height);
+
   int srcColor = src.getPixel(x, y);
   if (!compareAlpha) {
     srcColor = setAlpha(srcColor, 0);
   }
 
-  TestPixel array;
+  _TestPixel array;
   if (threshold > 0) {
-    List<num> lab =
-        rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
-
+    var lab = rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
     if (compareAlpha) {
       lab.add(getAlpha(srcColor).toDouble());
     }
 
-    array =
-        (int y, int x) => _testPixelLabColorDistance(src, x, y, lab, threshold);
+    array = (int y, int x) {
+      return visited[y * src.width + x] == 0 &&
+             _testPixelLabColorDistance(src, x, y, lab, threshold);
+    };
 
   } else if (!compareAlpha) {
-    array = (int y, int x) => setAlpha(src.getPixel(x, y), 0) != srcColor;
+    array = (int y, int x) {
+      return visited[y * src.width + x] == 0 &&
+             setAlpha(src.getPixel(x, y), 0) != srcColor;
+    };
   } else {
-    array = (int y, int x) => src.getPixel(x, y) != srcColor;
+    array = (int y, int x) {
+      return visited[y * src.width + x] == 0 &&
+             src.getPixel(x, y) != srcColor;
+    };
   }
 
-  MarkPixel mark = (int y, int x) => src.setPixel(x, y, color);
-  _fill4(src, x, y, array, mark);
+  _MarkPixel mark = (int y, int x) {
+    src.setPixel(x, y, color);
+    visited[y * src.width + x] = 1;
+  };
+
+  _fill4(src, x, y, array, mark, visited);
   return src;
 }
 
@@ -42,15 +54,16 @@ Image fillFlood(Image src, int x, int y, int color,
 /// image [src].
 Uint8List maskFlood(Image src, int x, int y,
     {num threshold = 0.0, bool compareAlpha = false, int fillValue = 255}) {
-  int srcColor = src.getPixel(x, y);
+  var visited = Uint8List(src.width * src.height);
 
+  int srcColor = src.getPixel(x, y);
   if (!compareAlpha) {
     srcColor = setAlpha(srcColor, 0);
   }
 
   Uint8List ret = Uint8List(src.width * src.height);
 
-  TestPixel array;
+  _TestPixel array;
   if (threshold > 0) {
     List<num> lab =
         rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
@@ -59,20 +72,30 @@ Uint8List maskFlood(Image src, int x, int y,
       lab.add(getAlpha(srcColor).toDouble());
     }
 
-    array = (int y, int x) =>
-        ret[y * src.width + x] != 0 ||
-        _testPixelLabColorDistance(src, x, y, lab, threshold);
+    array = (int y, int x) {
+      return visited[y * src.width + x] == 0 &&
+          (ret[y * src.width + x] != 0 ||
+           _testPixelLabColorDistance(src, x, y, lab, threshold));
+    };
   } else if (!compareAlpha) {
-    array = (int y, int x) =>
-        ret[y * src.width + x] != 0 ||
-        setAlpha(src.getPixel(x, y), 0) != srcColor;
+    array = (int y, int x) {
+      return visited[y * src.width + x] == 0 &&
+          (ret[y * src.width + x] != 0 ||
+           setAlpha(src.getPixel(x, y), 0) != srcColor);
+    };
   } else {
-    array = (int y, int x) =>
-        ret[y * src.width + x] != 0 || src.getPixel(x, y) != srcColor;
+    array = (int y, int x) {
+      return visited[y * src.width + x] == 0 &&
+          (ret[y * src.width + x] != 0 || src.getPixel(x, y) != srcColor);
+    };
   }
 
-  MarkPixel mark = (int y, int x) => ret[y * src.width + x] = fillValue;
-  _fill4(src, x, y, array, mark);
+  _MarkPixel mark = (int y, int x) {
+    ret[y * src.width + x] = fillValue;
+    visited[y * src.width + x] = 1;
+  };
+
+  _fill4(src, x, y, array, mark, visited);
   return ret;
 }
 
@@ -90,7 +113,12 @@ bool _testPixelLabColorDistance(Image src, int x, int y, List<num> refColor,
 
 // Adam Milazzo (2015). A More Efficient Flood Fill.
 // http://www.adammil.net/blog/v126_A_More_Efficient_Flood_Fill.html
-void _fill4(Image src, int x, int y, TestPixel array, MarkPixel mark) {
+void _fill4(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
+            Uint8List visited) {
+  if (visited[y * src.width + x] == 1) {
+    return;
+  }
+
   // at this point, we know array(y,x) is clear, and we want to move as far as
   // possible to the upper-left. moving up is much more important than moving
   // left, so we could try to make this smarter by sometimes moving to the
@@ -109,10 +137,14 @@ void _fill4(Image src, int x, int y, TestPixel array, MarkPixel mark) {
       break;
     }
   }
-  _fill4Core(src, x, y, array, mark);
+  _fill4Core(src, x, y, array, mark, visited);
 }
 
-void _fill4Core(Image src, int x, int y, TestPixel array, MarkPixel mark) {
+void _fill4Core(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
+                Uint8List visited) {
+  if (visited[y * src.width + x] == 1) {
+    return;
+  }
   // at this point, we know that array(y,x) is clear, and array(y-1,x) and
   // array(y,x-1) are set. We'll begin scanning down and to the right,
   // attempting to fill an entire rectangular block
@@ -155,7 +187,7 @@ void _fill4Core(Image src, int x, int y, TestPixel array, MarkPixel mark) {
         // lastRowLength breaks that assumption in this case, so we must fix it
         if (y != 0 && !array(y - 1, x)) {
           // use _Fill since there may be more up and left
-          _fill4(src, x, y - 1, array, mark);
+          _fill4(src, x, y - 1, array, mark, visited);
         }
       }
     }
@@ -182,7 +214,7 @@ void _fill4Core(Image src, int x, int y, TestPixel array, MarkPixel mark) {
         // there. any clear cells would have been connected to the previous
         if (!array(y, sx)) {
           // row. the cells up and left must be set so use FillCore
-          _fill4Core(src, sx, y, array, mark);
+          _fill4Core(src, sx, y, array, mark, visited);
         }
       }
     }
@@ -195,7 +227,7 @@ void _fill4Core(Image src, int x, int y, TestPixel array, MarkPixel mark) {
         // sx is the end of the current row
         if (!array(y - 1, ux)) {
           // since there may be clear cells up and left, use _Fill
-          _fill4(src, ux, y - 1, array, mark);
+          _fill4(src, ux, y - 1, array, mark, visited);
         }
       }
     }

@@ -25,6 +25,15 @@ void main() {
       fp.writeAsBytesSync(writeJpg(f));
     });
 
+    test('floodFill', () {
+      Image s = readJpg(new File('test/res/oblique.jpg').readAsBytesSync());
+      int c = s.getPixel(50, 50);
+      fillFlood(s, 50, 50, c, threshold: 15.6);
+      File fp = File('out/fillFlood.jpg');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writeJpg(s));
+    });
+
     test('copyRectify', () {
       Image s = readJpg(new File('test/res/oblique.jpg').readAsBytesSync());
       Image d = Image(92, 119);
