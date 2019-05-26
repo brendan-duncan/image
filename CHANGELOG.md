@@ -1,3 +1,8 @@
+## 2.1.2 - May 25, 2019
+
+- Fix crash decoding some Jpeg images.
+- Fix infinite recursion crash with fillFlood when fill color is the same as the start pixel color. 
+
 ## 2.1.1 - May 22, 2019
 
 - Fix typo and missing license in license file.
