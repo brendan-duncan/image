@@ -508,13 +508,12 @@ class VP8L {
     for (int y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
       for (int x = 0; x < webp.width; ++x, ++pi) {
         int c = _pixels[pi];
-        image.setPixel(x, dy, c);
-        //int r = getRed(c);
-        //int g = getGreen(c);
-        //int b = getBlue(c);
-        //int a = getAlpha(c);
+        int r = getRed(c);
+        int g = getGreen(c);
+        int b = getBlue(c);
+        int a = getAlpha(c);
         // rearrange the ARGB webp color to RGBA image color.
-        //image.setPixel(x, dy, getColor(r, g, b, a));
+        image.setPixel(x, dy, getColor(r, g, b, a));
       }
     }
 

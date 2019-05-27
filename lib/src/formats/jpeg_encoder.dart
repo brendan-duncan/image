@@ -82,9 +82,9 @@ class JpegEncoder extends Encoder {
             p -= ((x + col) - quadWidth + 4);
           }
 
-          int b = imageData[p++];
-          int g = imageData[p++];
           int r = imageData[p++];
+          int g = imageData[p++];
+          int b = imageData[p++];
 
           // calculate YUV values
           YDU[pos] = ((RGB_YUV_TABLE[r] +

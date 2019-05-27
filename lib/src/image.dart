@@ -92,7 +92,7 @@ class Image {
   /// frame in an animation.
   BlendMode blendMethod = BlendMode.over;
 
-  /// Pixels are encoded into 4-byte Uint32 integers in 0xAARRGGBB channel order.
+  /// Pixels are encoded into 4-byte Uint32 integers in #AABBGGRR channel order.
   final Uint32List data;
 
   /// EXIF data decoded from an image file.
@@ -133,13 +133,13 @@ class Image {
   ///
   /// [format] defines the order of color channels in [bytes].
   /// An HTML canvas element stores colors in Format.rgba format; a Flutter
-  /// Image object stores colors in Format.bgra format.
+  /// Image object stores colors in Format.rgba format.
   /// The length of [bytes] should be (width * height) * format-byte-count,
-  /// where format-byte-count is 1, 3, or 4 depnending on the number of
+  /// where format-byte-count is 1, 3, or 4 depending on the number of
   /// channels in the format (luminance, rgb, rgba, etc).
   ///
-  /// The native format of an image is Format.bgra. If another format
-  /// is specified, the input data will be converted to bgra to store
+  /// The native format of an image is Format.rgba. If another format
+  /// is specified, the input data will be converted to rgba to store
   /// in the Image.
   ///
   /// For example, given an Html Canvas, you could create an image:
@@ -149,7 +149,7 @@ class Image {
   ///                             format: Format.rgba);
   Image.fromBytes(int width, int height, List<int> bytes,
                  {ExifData exif, ICCProfileData iccp,
-                 Format format = Format.bgra,
+                 Format format = Format.rgba,
                  this.channels = Channels.rgba})
       : this.width = width,
         this.height = height,
@@ -170,7 +170,7 @@ class Image {
   /// Html canvas context.
   ///
   /// Specifying the [format] will convert the image data to the specified
-  /// format. Images are stored internally in Format.bgra format; any
+  /// format. Images are stored internally in Format.rgba format; any
   /// other format will require a conversion.
   ///
   /// For example, given an Html Canvas, you could draw this image into the
@@ -178,52 +178,52 @@ class Image {
   /// Html.ImageData d = context2D.createImageData(image.width, image.height);
   /// d.data.setRange(0, image.length, image.getBytes(format: Format.rgba));
   /// context2D.putImageData(data, 0, 0);
-  Uint8List getBytes({Format format = Format.bgra}) {
-    Uint8List bgra = Uint8List.view(data.buffer);
+  Uint8List getBytes({Format format = Format.rgba}) {
+    Uint8List rgba = Uint8List.view(data.buffer);
     switch (format) {
-      case Format.bgra:
-        return bgra;
       case Format.rgba:
+        return rgba;
+      case Format.bgra:
         Uint8List bytes = Uint8List(width * height * 4);
         for (int i = 0, len = bytes.length; i < len; i += 4) {
-          bytes[i + 0] = bgra[i + 2];
-          bytes[i + 1] = bgra[i + 1];
-          bytes[i + 2] = bgra[i + 0];
-          bytes[i + 3] = bgra[i + 3];
+          bytes[i + 0] = rgba[i + 2];
+          bytes[i + 1] = rgba[i + 1];
+          bytes[i + 2] = rgba[i + 0];
+          bytes[i + 3] = rgba[i + 3];
         }
         return bytes;
       case Format.abgr:
         Uint8List bytes = Uint8List(width * height * 4);
         for (int i = 0, len = bytes.length; i < len; i += 4) {
-          bytes[i + 0] = bgra[i + 3];
-          bytes[i + 1] = bgra[i + 0];
-          bytes[i + 2] = bgra[i + 1];
-          bytes[i + 3] = bgra[i + 2];
+          bytes[i + 0] = rgba[i + 3];
+          bytes[i + 1] = rgba[i + 2];
+          bytes[i + 2] = rgba[i + 1];
+          bytes[i + 3] = rgba[i + 0];
         }
         return bytes;
       case Format.argb:
         Uint8List bytes = Uint8List(width * height * 4);
         for (int i = 0, len = bytes.length; i < len; i += 4) {
-          bytes[i + 0] = bgra[i + 3];
-          bytes[i + 1] = bgra[i + 2];
-          bytes[i + 2] = bgra[i + 1];
-          bytes[i + 3] = bgra[i + 0];
+          bytes[i + 0] = rgba[i + 3];
+          bytes[i + 1] = rgba[i + 0];
+          bytes[i + 2] = rgba[i + 1];
+          bytes[i + 3] = rgba[i + 2];
         }
         return bytes;
       case Format.rgb:
         Uint8List bytes = Uint8List(width * height * 3);
         for (int i = 0, j = 0, len = bytes.length; i < len; i += 4, j += 3) {
-          bytes[j + 0] = bgra[i + 2];
-          bytes[j + 1] = bgra[i + 1];
-          bytes[j + 2] = bgra[i + 0];
+          bytes[j + 0] = rgba[i + 0];
+          bytes[j + 1] = rgba[i + 1];
+          bytes[j + 2] = rgba[i + 2];
         }
         return bytes;
       case Format.bgr:
         Uint8List bytes = Uint8List(width * height * 3);
         for (int i = 0, j = 0, len = bytes.length; i < len; i += 4, j += 3) {
-          bytes[j + 0] = bgra[i + 0];
-          bytes[j + 1] = bgra[i + 1];
-          bytes[j + 2] = bgra[i + 2];
+          bytes[j + 0] = rgba[i + 2];
+          bytes[j + 1] = rgba[i + 1];
+          bytes[j + 2] = rgba[i + 0];
         }
         return bytes;
       case Format.luminance:
@@ -233,7 +233,7 @@ class Image {
         }
         return bytes;
     }
-    return bgra;
+    return rgba;
   }
 
   /// Set all of the pixels of the image to the given [color].
@@ -405,11 +405,11 @@ class Image {
   bool boundsSafe(int x, int y) => x >= 0 && x < width && y >= 0 && y < height;
 
   /// Get the pixel from the given [x], [y] coordinate. Color is encoded in a
-  /// Uint32 as #AARRGGBB. No range checking is done.
+  /// Uint32 as #AABBGGRR. No range checking is done.
   int getPixel(int x, int y) => data[y * width + x];
 
   /// Get the pixel from the given [x], [y] coordinate. Color is encoded in a
-  /// Uint32 as #AARRGGBB. If the pixel coordinates are out of bounds, 0 is
+  /// Uint32 as #AABBGGRR. If the pixel coordinates are out of bounds, 0 is
   /// returned.
   int getPixelSafe(int x, int y) => boundsSafe(x, y) ? data[y * width + x] : 0;
 
@@ -573,7 +573,7 @@ class Image {
 
   static Uint32List _convertData(int width, int height, List<int> bytes,
                                  Format format) {
-    if (format == Format.bgra) {
+    if (format == Format.rgba) {
       return bytes is Uint32List
           ? Uint32List.fromList(bytes)
           : Uint32List.view(Uint8List.fromList(bytes).buffer);
@@ -584,60 +584,60 @@ class Image {
         : bytes;
 
     Uint32List data = Uint32List(width * height);
-    Uint8List bgra = Uint8List.view(data.buffer);
+    Uint8List rgba = Uint8List.view(data.buffer);
 
     switch (format) {
-      case Format.bgra:
+      case Format.rgba:
         for (int i = 0, len = input.length; i < len; ++i) {
-          bgra[i] = input[i];
+          rgba[i] = input[i];
         }
         break;
-      case Format.rgba:
+      case Format.bgra:
         for (int i = 0, len = input.length; i < len; i += 4) {
-          bgra[i + 0] = input[i + 2];
-          bgra[i + 1] = input[i + 1];
-          bgra[i + 2] = input[i + 0];
-          bgra[i + 3] = input[i + 3];
+          rgba[i + 0] = input[i + 2];
+          rgba[i + 1] = input[i + 1];
+          rgba[i + 2] = input[i + 0];
+          rgba[i + 3] = input[i + 3];
         }
         break;
       case Format.abgr:
         for (int i = 0, len = input.length; i < len; i += 4) {
-          bgra[i + 0] = input[i + 1];
-          bgra[i + 1] = input[i + 2];
-          bgra[i + 2] = input[i + 3];
-          bgra[i + 3] = input[i + 0];
+          rgba[i + 0] = input[i + 3];
+          rgba[i + 1] = input[i + 2];
+          rgba[i + 2] = input[i + 1];
+          rgba[i + 3] = input[i + 0];
         }
         break;
       case Format.argb:
         for (int i = 0, len = input.length; i < len; i += 4) {
-          bgra[i + 0] = input[i + 3];
-          bgra[i + 1] = input[i + 2];
-          bgra[i + 2] = input[i + 1];
-          bgra[i + 3] = input[i + 0];
+          rgba[i + 0] = input[i + 1];
+          rgba[i + 1] = input[i + 2];
+          rgba[i + 2] = input[i + 3];
+          rgba[i + 3] = input[i + 0];
         }
         break;
       case Format.bgr:
         for (int i = 0, j = 0, len = input.length; i < len; i += 4, j += 3) {
-          bgra[i + 0] = input[j + 0];
-          bgra[i + 1] = input[j + 1];
-          bgra[i + 2] = input[j + 2];
-          bgra[i + 3] = 255;
+          rgba[i + 0] = input[j + 2];
+          rgba[i + 1] = input[j + 1];
+          rgba[i + 2] = input[j + 0];
+          rgba[i + 3] = 255;
         }
         break;
       case Format.rgb:
         for (int i = 0, j = 0, len = input.length; i < len; i += 4, j += 3) {
-          bgra[i + 0] = input[j + 2];
-          bgra[i + 1] = input[j + 1];
-          bgra[i + 2] = input[j + 0];
-          bgra[i + 3] = 255;
+          rgba[i + 0] = input[j + 0];
+          rgba[i + 1] = input[j + 1];
+          rgba[i + 2] = input[j + 2];
+          rgba[i + 3] = 255;
         }
         break;
       case Format.luminance:
         for (int i = 0, j = 0, len = input.length; i < len; i += 4, ++j) {
-          bgra[i] = 255;
-          bgra[i + 1] = input[j];
-          bgra[i + 2] = input[j];
-          bgra[i + 3] = input[j];
+          rgba[i + 0] = input[j];
+          rgba[i + 1] = input[j];
+          rgba[i + 2] = input[j];
+          rgba[i + 3] = 255;
         }
         break;
     }

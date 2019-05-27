@@ -5,7 +5,7 @@ void main() {
   group('Color', () {
     test('RGBA', () {
       int rgba = Color.fromRgba(0xaa, 0xbb, 0xcc, 0xff);
-      expect(rgba, equals(0xffaabbcc));
+      expect(rgba, equals(0xffccbbaa));
 
       expect(getRed(rgba), equals(0xaa));
       expect(getGreen(rgba), equals(0xbb));
@@ -21,13 +21,13 @@ void main() {
       rgba = setChannel(rgba, Channel.green, 0x22);
       rgba = setChannel(rgba, Channel.blue, 0x33);
       rgba = setChannel(rgba, Channel.alpha, 0x44);
-      expect(rgba, equals(0x44112233));
+      expect(rgba, equals(0x44332211));
 
       rgba = setRed(rgba, 0x55);
       rgba = setGreen(rgba, 0x66);
       rgba = setBlue(rgba, 0x77);
       rgba = setAlpha(rgba, 0x88);
-      expect(rgba, equals(0x88556677));
+      expect(rgba, equals(0x88776655));
     });
 
     test('Grayscale', () {
