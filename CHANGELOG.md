@@ -1,3 +1,7 @@
+## 2.1.3 - May 26, 2019
+
+- Revert the internal color format to #AABBGGRR.
+
 ## 2.1.2 - May 25, 2019
 
 - Fix crash decoding some Jpeg images.
