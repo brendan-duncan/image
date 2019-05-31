@@ -135,9 +135,27 @@ void main() {
       Image f = Image.from(image);
       colorOffset(f, red: 5);
 
-      File fp = File('out/colorOffset.jpg');
-      fp.createSync(recursive: true);
-      fp.writeAsBytesSync(writeJpg(f));
+      File('out/colorOffset.jpg')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(f));
+
+      f = Image(48, 48);
+      colorOffset(f, red: 255);
+      File('out/colorOffset_red.jpg')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(f));
+
+      f = Image(48, 48);
+      colorOffset(f, green: 255);
+      File('out/colorOffset_green.jpg')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(f));
+
+      f = Image(48, 48);
+      colorOffset(f, blue: 255);
+      File('out/colorOffset_blue.jpg')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(f));
     });
 
     test('contrast', () {
