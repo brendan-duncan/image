@@ -18,8 +18,8 @@ void main() {
 
     test('fillRect', () {
       Image f = Image.from(image);
-      int c = getColor(128, 255, 128, 255);
-      fillRect(f, 50, 50, 150, 150, c);
+      fillRect(f, 50, 50, 150, 150, getColor(128, 255, 128, 255));
+      fillRect(f, 250, -10, 100, 750, getColor(255, 128, 128, 128));
       File fp = File('out/fillRect.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));

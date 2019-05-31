@@ -140,7 +140,12 @@ int setAlpha(int color, int value) =>
 /// Returns a new color of [src] alpha-blended onto [dst]. The opacity of [src]
 /// is additionally scaled by [fraction] / 255.
 int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
-  double a = (getAlpha(src) / 255.0);
+  int srcAlpha = getAlpha(src);
+  if (srcAlpha == 255 && fraction == 0xff) {
+    // src is fully opaque, nothing to blend
+    return src;
+  }
+  double a = (srcAlpha / 255.0);
   if (fraction != 0xff) {
     a *= (fraction / 255.0);
   }
@@ -148,7 +153,7 @@ int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
   int sr = (getRed(src) * a).round();
   int sg = (getGreen(src) * a).round();
   int sb = (getBlue(src) * a).round();
-  int sa = (getAlpha(src) * a).round();
+  int sa = (srcAlpha * a).round();
 
   int dr = (getRed(dst) * (1.0 - a)).round();
   int dg = (getGreen(dst) * (1.0 - a)).round();
