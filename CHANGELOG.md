@@ -1,3 +1,7 @@
+## 2.1.4 - June 01, 2019
+
+- Optimize fillRect, drawPixel, and other drawing functions when opaque colors are used.
+
 ## 2.1.3 - May 26, 2019
 
 - Revert the internal color format to #AABBGGRR.
