@@ -7,7 +7,7 @@ import '../util/output_buffer.dart';
 import 'encoder.dart';
 
 class GifEncoder extends Encoder {
-  GifEncoder({this.delay = 80}) : _encodedFrames = 0;
+  GifEncoder({this.delay = 80, this.repeat = 0}) : _encodedFrames = 0;
 
   void addFrame(Image image, {int duration}) {
     if (output == null) {
