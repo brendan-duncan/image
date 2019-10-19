@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:image/image.dart';
+
 void main() {
   // Read an image from file (webp in this case).
   // decodeImage will identify the format of the image and use the appropriate

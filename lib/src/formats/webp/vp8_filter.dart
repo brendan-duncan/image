@@ -628,18 +628,7 @@ class VP8Filter {
     Put8x8uv(0x80, dst);
   }
 
-  static const PredLuma4 = [
-    DC4,
-    TM4,
-    VE4,
-    HE4,
-    RD4,
-    VR4,
-    LD4,
-    VL4,
-    HD4,
-    HU4
-  ];
+  static const PredLuma4 = [DC4, TM4, VE4, HE4, RD4, VR4, LD4, VL4, HD4, HU4];
 
   static const PredLuma16 = [
     DC16,

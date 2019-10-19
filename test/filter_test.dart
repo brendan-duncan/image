@@ -4,9 +4,11 @@ import 'package:test/test.dart';
 
 void main() {
   group('filter', () {
-    var image = readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
+    var image =
+        readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
     image = copyResize(image, width: 400);
-    var image2 = readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
+    var image2 =
+        readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       Image f = Image(10, 10, channels: Channels.rgb);
@@ -50,8 +52,8 @@ void main() {
 
     test('copyInto', () {
       Image s = Image.from(image);
-      Image d = Image(image.width + 20, image.height + 20,
-          channels: image.channels);
+      Image d =
+          Image(image.width + 20, image.height + 20, channels: image.channels);
       fill(d, 0xff0000ff);
       copyInto(d, s, dstX: 10, dstY: 10);
       copyInto(d, image2, dstX: 10, dstY: 10);
@@ -312,8 +314,8 @@ void main() {
     test('remapColors', () {
       Image f = Image.from(image);
       f.channels = Channels.rgba;
-      remapColors(f, red: Channel.green, green: Channel.red,
-          alpha: Channel.luminance);
+      remapColors(f,
+          red: Channel.green, green: Channel.red, alpha: Channel.luminance);
 
       File fp = File('out/remapColors.jpg');
       fp.createSync(recursive: true);

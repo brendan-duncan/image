@@ -28,8 +28,7 @@ void main() {
     });
 
     test('encode_rgba_4bpp', () {
-      List<int> bytes =
-          File('test/res/png/alpha_edge.png').readAsBytesSync();
+      List<int> bytes = File('test/res/png/alpha_edge.png').readAsBytesSync();
       Image image = PngDecoder().decodeImage(bytes);
 
       new File('out/pvrtc/alpha_before.png')

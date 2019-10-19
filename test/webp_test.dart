@@ -37,7 +37,6 @@ void main() {
     }
   });
 
-
   group('WebP/decodeImage', () {
     test('validate', () {
       File file = File('test/res/webp/2b.webp');

@@ -40,7 +40,7 @@ import '../internal/clamp.dart';
 /// [amount] controls how much affect this filter has on the [src] image, where
 /// 0.0 has no effect and 1.0 has full effect.
 Image adjustColor(Image src,
-   {int blacks,
+    {int blacks,
     int whites,
     int mids,
     num contrast,

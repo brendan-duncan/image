@@ -20,8 +20,7 @@ void main() {
     });
 
     test('zip/text', () {
-      List<int> fontZip =
-          File('test/res/font/test_text.zip').readAsBytesSync();
+      List<int> fontZip = File('test/res/font/test_text.zip').readAsBytesSync();
       BitmapFont font = readFontZip(fontZip);
 
       var img = copyResize(image, width: 400);

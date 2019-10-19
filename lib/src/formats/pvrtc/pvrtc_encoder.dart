@@ -286,8 +286,8 @@ class PvrtcEncoder {
     return outputData;
   }
 
-  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(Image bitmap,
-      int blockX, int blockY) {
+  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(
+      Image bitmap, int blockX, int blockY) {
     int size = bitmap.width;
     int pi = (blockY * 4 * size + blockX * 4);
 

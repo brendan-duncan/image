@@ -6,25 +6,15 @@ import 'exif_data.dart';
 import 'icc_profile_data.dart';
 import 'util/interpolation.dart';
 
-enum Format {
-  argb,
-  abgr,
-  rgba,
-  bgra,
-  rgb,
-  bgr,
-  luminance
-}
+enum Format { argb, abgr, rgba, bgra, rgb, bgr, luminance }
 
-enum Channels {
-  rgb,
-  rgba
-}
+enum Channels { rgb, rgba }
 
 enum BlendMode {
   /// No alpha blending should be done when drawing this frame (replace
   /// pixels in canvas).
   source,
+
   /// Alpha blending should be used when drawing this frame (composited over
   /// the current canvas image).
   over
@@ -33,8 +23,10 @@ enum BlendMode {
 enum DisposeMode {
   /// When drawing a frame, the canvas should be left as it is.
   none,
+
   /// When drawing a frame, the canvas should be cleared first.
   clear,
+
   /// When drawing this frame, the canvas should be reverted to how it was
   /// before drawing it.
   previous
@@ -103,13 +95,12 @@ class Image {
 
   /// Create an image with the given dimensions and format.
   Image(this.width, this.height,
-        {this.channels = Channels.rgba, ExifData exif, ICCProfileData iccp})
+      {this.channels = Channels.rgba, ExifData exif, ICCProfileData iccp})
       : this.data = Uint32List(width * height),
         this.exif = ExifData.from(exif),
         this.iccProfile = iccp;
 
-  Image.rgb(this.width, this.height,
-      {ExifData exif, ICCProfileData iccp})
+  Image.rgb(this.width, this.height, {ExifData exif, ICCProfileData iccp})
       : this.channels = Channels.rgb,
         this.data = Uint32List(width * height),
         this.exif = ExifData.from(exif),
@@ -148,9 +139,10 @@ class Image {
   /// var image = Image.fromBytes(canvas.width, canvas.height, bytes,
   ///                             format: Format.rgba);
   Image.fromBytes(int width, int height, List<int> bytes,
-                 {ExifData exif, ICCProfileData iccp,
-                 Format format = Format.rgba,
-                 this.channels = Channels.rgba})
+      {ExifData exif,
+      ICCProfileData iccp,
+      Format format = Format.rgba,
+      this.channels = Channels.rgba})
       : this.width = width,
         this.height = height,
         data = _convertData(width, height, bytes, format),
@@ -438,7 +430,8 @@ class Image {
     int _linear(int Icc, int Inc, int Icn, int Inn) {
       return (Icc +
               dx * (Inc - Icc + dy * (Icc + Inn - Icn - Inc)) +
-              dy * (Icn - Icc)).toInt();
+              dy * (Icn - Icc))
+          .toInt();
     }
 
     int Icc = getPixelSafe(x, y);
@@ -469,7 +462,9 @@ class Image {
     var dy = fy - y;
 
     num _cubic(num dx, num Ipp, num Icp, num Inp, num Iap) =>
-        Icp + 0.5 * (dx * (-Ipp + Inp) +
+        Icp +
+        0.5 *
+            (dx * (-Ipp + Inp) +
                 dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
                 dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
 
@@ -571,17 +566,16 @@ class Image {
     return (r + g + b) ~/ 3;
   }
 
-  static Uint32List _convertData(int width, int height, List<int> bytes,
-                                 Format format) {
+  static Uint32List _convertData(
+      int width, int height, List<int> bytes, Format format) {
     if (format == Format.rgba) {
       return bytes is Uint32List
           ? Uint32List.fromList(bytes)
           : Uint32List.view(Uint8List.fromList(bytes).buffer);
     }
 
-    List<int> input = bytes is Uint32List
-        ? Uint8List.view(bytes.buffer)
-        : bytes;
+    List<int> input =
+        bytes is Uint32List ? Uint8List.view(bytes.buffer) : bytes;
 
     Uint32List data = Uint32List(width * height);
     Uint8List rgba = Uint8List.view(data.buffer);

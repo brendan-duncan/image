@@ -23,8 +23,8 @@ void decode(DecodeParam param) {
 void main() async {
   ReceivePort receivePort = ReceivePort();
 
-  await Isolate.spawn(decode,
-      new DecodeParam(new File('test.webp'), receivePort.sendPort));
+  await Isolate.spawn(
+      decode, new DecodeParam(new File('test.webp'), receivePort.sendPort));
 
   // Get the processed image from the isolate.
   Image image = await receivePort.first as Image;

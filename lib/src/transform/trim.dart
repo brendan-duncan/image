@@ -5,12 +5,16 @@ import '../transform/copy_into.dart';
 class Trim {
   /// Trim the image down from the top.
   static const top = Trim._internal(1);
+
   /// Trim the image up from the bottom.
   static const bottom = Trim._internal(2);
+
   /// Trim the left edge of the image.
   static const left = Trim._internal(4);
+
   /// Trim the right edge of the image.
   static const right = Trim._internal(8);
+
   /// Trim all edges of the image.
   static const all = Trim._internal(1 | 2 | 4 | 8);
 
@@ -24,9 +28,11 @@ class Trim {
 enum TrimMode {
   /// Trim an image to the top-left and bottom-right most non-transparent pixels
   transparent,
+
   /// Trim an image to the top-left and bottom-right most pixels that are not the
   /// same as the top-left most pixel of the image.
   topLeftColor,
+
   /// Trim an image to the top-left and bottom-right most pixels that are not the
   /// same as the bottom-right most pixel of the image.
   bottomRightColor
@@ -35,14 +41,14 @@ enum TrimMode {
 /// Find the crop area to be used by the trim function. Returns the
 /// coordinates as [x, y, width, height]. You could pass these coordinates
 /// to the [copyCrop] function to crop the image.
-List<int> findTrim(Image src, {TrimMode mode = TrimMode.transparent,
-                   Trim sides = Trim.all}) {
+List<int> findTrim(Image src,
+    {TrimMode mode = TrimMode.transparent, Trim sides = Trim.all}) {
   int h = src.height;
   int w = src.width;
 
-  int bg = (mode == TrimMode.topLeftColor) ? src.getPixel(0, 0)
-      : (mode == TrimMode.bottomRightColor) ? src.getPixel(w - 1, h - 1)
-      : 0;
+  int bg = (mode == TrimMode.topLeftColor)
+      ? src.getPixel(0, 0)
+      : (mode == TrimMode.bottomRightColor) ? src.getPixel(w - 1, h - 1) : 0;
 
   int xmin = w;
   int xmax = 0;
@@ -102,16 +108,16 @@ List<int> findTrim(Image src, {TrimMode mode = TrimMode.transparent,
 /// [sides] can be used to control which sides of the image get trimmed,
 /// and can be any combination of [Trim.top], [Trim.bottom], [Trim.left],
 /// and [Trim.right].
-Image trim(Image src, {TrimMode mode = TrimMode.transparent,
-           Trim sides = Trim.all}) {
+Image trim(Image src,
+    {TrimMode mode = TrimMode.transparent, Trim sides = Trim.all}) {
   if (mode == TrimMode.transparent && src.channels == Channels.rgb) {
     return new Image.from(src);
   }
 
   List<int> crop = findTrim(src, mode: mode, sides: sides);
 
-  Image dst = Image(crop[2], crop[3], channels: Channels.rgba, exif: src.exif,
-      iccp: src.iccProfile);
+  Image dst = Image(crop[2], crop[3],
+      channels: Channels.rgba, exif: src.exif, iccp: src.iccProfile);
 
   copyInto(dst, src,
       srcX: crop[0], srcY: crop[1], srcW: crop[2], srcH: crop[3], blend: false);

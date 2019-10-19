@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
+
 import '../color.dart';
 import '../image.dart';
 import '../image_exception.dart';
@@ -34,11 +35,14 @@ import 'quantizer.dart';
 class NeuralQuantizer extends Quantizer {
   Uint8List colorMap;
 
-  NeuralQuantizer(Image image, {int numberOfColors = 256}) {
+  final int samplingFactor;
+
+  /// 10 is a reasonable [samplingFactor] according to https://scientificgems.wordpress.com/stuff/neuquant-fast-high-quality-image-quantization/.
+  NeuralQuantizer(Image image,
+      {int numberOfColors = 256, this.samplingFactor = 10}) {
     if (image.width * image.height < MAX_PRIME) {
       throw ImageException('Image is too small');
     }
-
     _initialize(numberOfColors);
 
     _setupArrays();
@@ -261,9 +265,9 @@ class NeuralQuantizer extends Quantizer {
 
   void _learn(Image image) {
     int biasRadius = INIT_BIAS_RADIUS;
-    int alphadec = 30 + ((_sampleFac - 1) ~/ 3);
+    int alphadec = 30 + ((samplingFactor - 1) ~/ 3);
     int lengthCount = image.length;
-    int samplePixels = lengthCount ~/ _sampleFac;
+    int samplePixels = lengthCount ~/ samplingFactor;
     int delta = samplePixels ~/ NUM_CYCLES;
     int alpha = INIT_ALPHA;
 
@@ -292,6 +296,7 @@ class NeuralQuantizer extends Quantizer {
     int i = 0;
     while (i < samplePixels) {
       int p = image[pos];
+
       int red = getRed(p);
       int green = getGreen(p);
       int blue = getBlue(p);
@@ -359,6 +364,7 @@ class NeuralQuantizer extends Quantizer {
     int j = i + 1;
     int k = i - 1;
     int q = 0;
+
     while ((j < hi) || (k > lo)) {
       double a = (alpha * (rad * rad - q * q)) / (rad * rad);
       q++;
@@ -419,6 +425,7 @@ class NeuralQuantizer extends Quantizer {
       _freq[i] -= BETA * _freq[i];
       _bias[i] += BETA_GAMMA * _freq[i];
     }
+
     _freq[bestpos] += BETA;
     _bias[bestpos] -= BETA_GAMMA;
     return bestbiaspos;
@@ -484,6 +491,7 @@ class NeuralQuantizer extends Quantizer {
   List<double> _network;
   Int32List _colorMap;
   Int32List _netIndex = Int32List(256);
+
   // bias and freq arrays for learning
   List<double> _bias;
   List<double> _freq;
@@ -496,6 +504,4 @@ class NeuralQuantizer extends Quantizer {
   static const int PRIME3 = 487;
   static const int PRIME4 = 503;
   static const int MAX_PRIME = PRIME4;
-
-  int _sampleFac = 1;
 }

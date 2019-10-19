@@ -11,8 +11,7 @@ BitmapFont readFontZip(List<int> bytes) => BitmapFont.fromZip(bytes);
 
 /// Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
 /// and an [Image] that stores the font [map].
-BitmapFont readFont(String font, Image map) =>
-    BitmapFont.fromFnt(font, map);
+BitmapFont readFont(String font, Image map) => BitmapFont.fromFnt(font, map);
 
 /// A bitmap font that can be used with [drawString] and [drawChar] functions.
 /// You can generate a font files from a program
@@ -104,12 +103,10 @@ class BitmapFont {
     return characters[c].xadvance;
   }
 
-  Iterable<XmlElement> _childElements(XmlNode n) => n.children
-      .where((c) => c is XmlElement)
-      .map((c) => c as XmlElement);
+  Iterable<XmlElement> _childElements(XmlNode n) =>
+      n.children.where((c) => c is XmlElement).map((c) => c as XmlElement);
 
-  void _parseFnt(XmlDocument xml, Map<int, Image> fontPages,
-      [Archive arc]) {
+  void _parseFnt(XmlDocument xml, Map<int, Image> fontPages, [Archive arc]) {
     if (xml.children.length != 1) {
       throw ImageException('Invalid font XML');
     }
@@ -206,7 +203,8 @@ class BitmapFont {
                   '$filename');
             }
 
-            Image image = PngDecoder().decodeImage(imageFile.content as List<int>);
+            Image image =
+                PngDecoder().decodeImage(imageFile.content as List<int>);
 
             fontPages[id] = image;
           }
@@ -322,8 +320,7 @@ class BitmapFont {
     }
 
     if (kerningsAttrs != null || kerningList.isNotEmpty) {
-      var node = XmlElement(
-          XmlName('kernings'), kerningsAttrs, kerningList);
+      var node = XmlElement(XmlName('kernings'), kerningsAttrs, kerningList);
       children.add(node);
     }
 

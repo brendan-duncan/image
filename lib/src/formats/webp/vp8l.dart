@@ -203,8 +203,8 @@ class VP8L {
     return data;
   }
 
-  bool _decodeImageData(dynamic data, int width, int height, int lastRow,
-                        dynamic processFunc) {
+  bool _decodeImageData(
+      dynamic data, int width, int height, int lastRow, dynamic processFunc) {
     int row = _lastPixel ~/ width;
     int col = _lastPixel % width;
 
@@ -1004,7 +1004,7 @@ class InternalVP8L extends VP8L {
   set ioHeight(int height) => _ioHeight = height;
 
   bool decodeImageData(dynamic data, int width, int height, int lastRow,
-                       dynamic processFunc) =>
+          dynamic processFunc) =>
       _decodeImageData(data, width, height, lastRow, processFunc);
 
   Uint32List decodeImageStream(int xsize, int ysize, bool isLevel0) =>
