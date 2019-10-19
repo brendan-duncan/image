@@ -8,56 +8,50 @@ void main() {
   var files = dir.listSync();
 
   group('Gif', () {
-    test('getInfo', () {
-      for (var f in files) {
-        if (f is! File || !f.path.endsWith('.gif')) {
-          continue;
-        }
-
-        String name = f.path.split(RegExp(r'(/|\\)')).last;
-        test('$name', () {
-          var bytes = (f as File).readAsBytesSync();
-
-          GifInfo data = GifDecoder().startDecode(bytes);
-          if (data == null) {
-            throw ImageException('Unable to parse Gif info: $name.');
-          }
-        });
+    for (var f in files) {
+      if (f is! File || !f.path.endsWith('.gif')) {
+        continue;
       }
-    });
 
-    test('decodeImage', () {
-      for (var f in files) {
-        if (f is! File || !f.path.endsWith('.gif')) {
-          continue;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      test('getInfo $name', () {
+        var bytes = (f as File).readAsBytesSync();
+
+        GifInfo data = GifDecoder().startDecode(bytes);
+        if (data == null) {
+          throw ImageException('Unable to parse Gif info: $name.');
         }
+      });
+    }
 
-        String name = f.path.split(RegExp(r'(/|\\)')).last;
-        test('$name', () {
-          var bytes = (f as File).readAsBytesSync();
-          Image image = GifDecoder().decodeImage(bytes);
-          File('out/gif/$name.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(encodePng(image));
-        });
+    for (var f in files) {
+      if (f is! File || !f.path.endsWith('.gif')) {
+        continue;
       }
-    });
 
-    test('decodeAnimation', () {
-      for (var f in files) {
-        if (f is! File || !f.path.endsWith('cars.gif')) {
-          continue;
-        }
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      test('decodeImage $name', () {
+        var bytes = (f as File).readAsBytesSync();
+        Image image = GifDecoder().decodeImage(bytes);
+        File('out/gif/$name.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(encodePng(image));
+      });
+    }
 
-        String name = f.path.split(RegExp(r'(/|\\)')).last;
-        test('$name', () {
-          List<int> bytes = (f as File).readAsBytesSync();
-          Animation anim = GifDecoder().decodeAnimation(bytes);
-          expect(anim.length, equals(30));
-          expect(anim.loopCount, equals(0));
-        });
+    for (var f in files) {
+      if (f is! File || !f.path.endsWith('cars.gif')) {
+        continue;
       }
-    });
+
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      test('decodeAnimation $name', () {
+        List<int> bytes = (f as File).readAsBytesSync();
+        Animation anim = GifDecoder().decodeAnimation(bytes);
+        expect(anim.length, equals(30));
+        expect(anim.loopCount, equals(0));
+      });
+    }
 
     test('encodeAnimation', () {
       Animation anim = Animation();
