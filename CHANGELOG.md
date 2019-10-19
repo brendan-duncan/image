@@ -1,3 +1,8 @@
+## 2.1.5
+
+* Added the `samplingFactor` parameter to GIF encoding, which allows to significantly speed up
+  encoding times of GIF encoding. 
+
 ## 2.1.4 - June 01, 2019
 
 - Optimize fillRect, drawPixel, and other drawing functions when opaque colors are used.
