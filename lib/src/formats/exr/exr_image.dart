@@ -17,17 +17,17 @@ class ExrImage extends DecodeInfo {
     InputBuffer input = InputBuffer(bytes);
     int magic = input.readUint32();
     if (magic != MAGIC) {
-      throw new ImageException('File is not an OpenEXR image file.');
+      throw ImageException('File is not an OpenEXR image file.');
     }
 
     version = input.readByte();
     if (version != EXR_VERSION) {
-      throw new ImageException('Cannot read version $version image files.');
+      throw ImageException('Cannot read version $version image files.');
     }
 
     flags = input.readUint24();
     if (!_supportsFlags(flags)) {
-      throw new ImageException('The file format version number\'s flag field '
+      throw ImageException('The file format version number\'s flag field '
           'contains unrecognized flags.');
     }
 
@@ -47,7 +47,7 @@ class ExrImage extends DecodeInfo {
     }
 
     if (_parts.isEmpty) {
-      throw new ImageException('Error reading image header');
+      throw ImageException('Error reading image header');
     }
 
     for (InternalExrPart part in _parts) {
@@ -115,8 +115,8 @@ class ExrImage extends DecodeInfo {
         if (!framebuffer.hasChannel(ch.name)) {
           width = part.width;
           height = part.height;
-          framebuffer.addSlice(
-              new HdrSlice(ch.name, part.width, part.height, ch.type));
+          framebuffer
+              .addSlice(HdrSlice(ch.name, part.width, part.height, ch.type));
         }
       }
 
@@ -151,7 +151,7 @@ class ExrImage extends DecodeInfo {
             if (multiPart) {
               int p = imgData.readUint32();
               if (p != pi) {
-                throw new ImageException('Invalid Image Data');
+                throw ImageException('Invalid Image Data');
               }
             }
 
@@ -243,7 +243,7 @@ class ExrImage extends DecodeInfo {
       if (multiPart) {
         int p = imgData.readUint32();
         if (p != pi) {
-          throw new ImageException('Invalid Image Data');
+          throw ImageException('Invalid Image Data');
         }
       }
 

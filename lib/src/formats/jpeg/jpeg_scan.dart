@@ -132,7 +132,7 @@ class JpegScan {
     if (bitsData == 0xff) {
       int nextByte = input.readByte();
       if (nextByte != 0) {
-        throw new ImageException('unexpected marker: ' +
+        throw ImageException('unexpected marker: ' +
             ((bitsData << 8) | nextByte).toRadixString(16));
       }
     }
@@ -267,7 +267,7 @@ class JpegScan {
             }
           } else {
             if (s != 1) {
-              throw new ImageException('invalid ACn encoding');
+              throw ImageException('invalid ACn encoding');
             }
             successiveACNextValue = _receiveAndExtend(s);
             successiveACState = r != 0 ? 2 : 3;

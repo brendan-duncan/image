@@ -8,8 +8,8 @@ class SeparableKernel {
 
   /// Create a separable convolution kernel for the given [radius].
   SeparableKernel(int radius)
-      : coefficients = List<num>(2 * radius + 1)
-      , this.size = radius;
+      : coefficients = List<num>(2 * radius + 1),
+        this.size = radius;
 
   /// Get the number of coefficients in the kernel.
   int get length => coefficients.length;
@@ -55,8 +55,8 @@ class SeparableKernel {
     return x;
   }
 
-  void _applyCoeffsLine(Image src, Image dst, int y, int width,
-                        bool horizontal) {
+  void _applyCoeffsLine(
+      Image src, Image dst, int y, int width, bool horizontal) {
     for (int x = 0; x < width; x++) {
       num r = 0.0;
       num g = 0.0;

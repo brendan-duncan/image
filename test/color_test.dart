@@ -75,8 +75,8 @@ void main() {
       expect(argb[2], 128);
       expect(argb[3], 64);
 
-      var image_argb = Image.fromBytes(image.width, image.height, argb,
-                                      format: Format.argb);
+      var image_argb =
+          Image.fromBytes(image.width, image.height, argb, format: Format.argb);
       expect(getRed(image_argb[0]), 200);
       expect(getGreen(image_argb[0]), 128);
       expect(getBlue(image_argb[0]), 64);
@@ -88,8 +88,8 @@ void main() {
       expect(abgr[2], 128);
       expect(abgr[3], 200);
 
-      var image_abgr = Image.fromBytes(image.width, image.height, abgr,
-          format: Format.abgr);
+      var image_abgr =
+          Image.fromBytes(image.width, image.height, abgr, format: Format.abgr);
       expect(getRed(image_abgr[0]), 200);
       expect(getGreen(image_abgr[0]), 128);
       expect(getBlue(image_abgr[0]), 64);
@@ -101,8 +101,8 @@ void main() {
       expect(rgba[2], 64);
       expect(rgba[3], 255);
 
-      var image_rgba = Image.fromBytes(image.width, image.height, rgba,
-          format: Format.rgba);
+      var image_rgba =
+          Image.fromBytes(image.width, image.height, rgba, format: Format.rgba);
       expect(getRed(image_rgba[0]), 200);
       expect(getGreen(image_rgba[0]), 128);
       expect(getBlue(image_rgba[0]), 64);
@@ -114,8 +114,8 @@ void main() {
       expect(bgra[2], 200);
       expect(bgra[3], 255);
 
-      var image_bgra = Image.fromBytes(image.width, image.height, bgra,
-          format: Format.bgra);
+      var image_bgra =
+          Image.fromBytes(image.width, image.height, bgra, format: Format.bgra);
       expect(getRed(image_bgra[0]), 200);
       expect(getGreen(image_bgra[0]), 128);
       expect(getBlue(image_bgra[0]), 64);
@@ -126,8 +126,8 @@ void main() {
       expect(rgb[1], 128);
       expect(rgb[2], 64);
 
-      var image_rgb = Image.fromBytes(image.width, image.height, rgb,
-          format: Format.rgb);
+      var image_rgb =
+          Image.fromBytes(image.width, image.height, rgb, format: Format.rgb);
       expect(getRed(image_rgb[0]), 200);
       expect(getGreen(image_rgb[0]), 128);
       expect(getBlue(image_rgb[0]), 64);
@@ -138,8 +138,8 @@ void main() {
       expect(bgr[1], 128);
       expect(bgr[2], 200);
 
-      var image_bgr = Image.fromBytes(image.width, image.height, bgr,
-          format: Format.bgr);
+      var image_bgr =
+          Image.fromBytes(image.width, image.height, bgr, format: Format.bgr);
       expect(getRed(image_bgr[0]), 200);
       expect(getGreen(image_bgr[0]), 128);
       expect(getBlue(image_bgr[0]), 64);

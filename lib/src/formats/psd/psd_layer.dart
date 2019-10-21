@@ -92,12 +92,12 @@ class PsdLayer {
     for (int i = 0; i < numChannels; ++i) {
       int id = input.readInt16();
       int len = input.readUint32();
-      channels.add(new PsdChannel(id, len));
+      channels.add(PsdChannel(id, len));
     }
 
     int sig = input.readUint32();
     if (sig != SIGNATURE) {
-      throw new ImageException('Invalid PSD layer signature: '
+      throw ImageException('Invalid PSD layer signature: '
           '${sig.toRadixString(16)}');
     }
 
@@ -108,7 +108,7 @@ class PsdLayer {
 
     int filler = input.readByte(); // should be 0
     if (filler != 0) {
-      throw new ImageException('Invalid PSD layer data');
+      throw ImageException('Invalid PSD layer data');
     }
 
     int len = input.readUint32();
@@ -143,7 +143,7 @@ class PsdLayer {
       while (!extra.isEOS) {
         int sig = extra.readUint32();
         if (sig != SIGNATURE) {
-          throw new ImageException('PSD invalid signature for layer additional '
+          throw ImageException('PSD invalid signature for layer additional '
               'data: ${sig.toRadixString(16)}');
         }
 

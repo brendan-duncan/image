@@ -353,7 +353,7 @@ class VP8 {
 
     _fStrengths = List<List<VP8FInfo>>(NUM_MB_SEGMENTS);
     for (int i = 0; i < NUM_MB_SEGMENTS; ++i) {
-      _fStrengths[i] = [new VP8FInfo(), new VP8FInfo()];
+      _fStrengths[i] = [VP8FInfo(), VP8FInfo()];
     }
 
     _yuvT = List<VP8TopSamples>(_mbWidth);
@@ -372,20 +372,20 @@ class VP8 {
     final int extra_y = extra_rows * _cacheYStride;
     final int extra_uv = (extra_rows ~/ 2) * _cacheUVStride;
 
-    _cacheY = InputBuffer(new Uint8List(16 * _cacheYStride + extra_y),
-        offset: extra_y);
+    _cacheY =
+        InputBuffer(Uint8List(16 * _cacheYStride + extra_y), offset: extra_y);
 
-    _cacheU = InputBuffer(new Uint8List(8 * _cacheUVStride + extra_uv),
-        offset: extra_uv);
+    _cacheU =
+        InputBuffer(Uint8List(8 * _cacheUVStride + extra_uv), offset: extra_uv);
 
-    _cacheV = InputBuffer(new Uint8List(8 * _cacheUVStride + extra_uv),
-        offset: extra_uv);
+    _cacheV =
+        InputBuffer(Uint8List(8 * _cacheUVStride + extra_uv), offset: extra_uv);
 
-    _tmpY = InputBuffer(new Uint8List(webp.width));
+    _tmpY = InputBuffer(Uint8List(webp.width));
 
     final int uvWidth = (webp.width + 1) >> 1;
-    _tmpU = InputBuffer(new Uint8List(uvWidth));
-    _tmpV = InputBuffer(new Uint8List(uvWidth));
+    _tmpU = InputBuffer(Uint8List(uvWidth));
+    _tmpV = InputBuffer(Uint8List(uvWidth));
 
     // Define the area where we can skip in-loop filtering, in case of cropping.
     //
@@ -558,7 +558,7 @@ class VP8 {
 
           VP8Filter.PredLuma4[block.imodes[n]](dst);
 
-          _doTransform(bits, new InputBuffer(coeffs, offset: n * 16), dst);
+          _doTransform(bits, InputBuffer(coeffs, offset: n * 16), dst);
         }
       } else {
         // 16x16
@@ -569,7 +569,7 @@ class VP8 {
           for (int n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
             InputBuffer dst = InputBuffer.from(y_dst, offset: kScan[n]);
 
-            _doTransform(bits, new InputBuffer(coeffs, offset: n * 16), dst);
+            _doTransform(bits, InputBuffer(coeffs, offset: n * 16), dst);
           }
         }
       }
@@ -613,7 +613,7 @@ class VP8 {
     }
   }
 
-  static const List<int> kScan = const [
+  static const List<int> kScan = [
     0 + 0 * BPS,
     4 + 0 * BPS,
     8 + 0 * BPS,
@@ -680,7 +680,7 @@ class VP8 {
   // Simple filter:  up to 2 luma samples are read and 1 is written.
   // Complex filter: up to 4 luma samples are read and 3 are written. Same for
   //                U/V, so it's 8 samples total (because of the 2x upsampling).
-  static const List<int> kFilterExtraRows = const [0, 2, 8];
+  static const List<int> kFilterExtraRows = [0, 2, 8];
 
   void _doFilter(int mbX, int mbY) {
     final int yBps = _cacheYStride;
@@ -910,20 +910,20 @@ class VP8 {
       int uv1 = (diag_03 + t_uv) >> 1;
 
       _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
-          new InputBuffer.from(topDst, offset: (2 * x - 1) * 4));
+          InputBuffer.from(topDst, offset: (2 * x - 1) * 4));
 
       _yuvToRgba(topY[2 * x - 0], uv1 & 0xff, (uv1 >> 16),
-          new InputBuffer.from(topDst, offset: (2 * x - 0) * 4));
+          InputBuffer.from(topDst, offset: (2 * x - 0) * 4));
 
       if (bottomY != null) {
         uv0 = (diag_03 + l_uv) >> 1;
         uv1 = (diag_12 + uv) >> 1;
 
         _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
-            new InputBuffer.from(bottomDst, offset: (2 * x - 1) * 4));
+            InputBuffer.from(bottomDst, offset: (2 * x - 1) * 4));
 
         _yuvToRgba(bottomY[2 * x], uv1 & 0xff, (uv1 >> 16),
-            new InputBuffer.from(bottomDst, offset: (2 * x + 0) * 4));
+            InputBuffer.from(bottomDst, offset: (2 * x + 0) * 4));
       }
 
       tl_uv = t_uv;
@@ -933,12 +933,12 @@ class VP8 {
     if ((len & 1) == 0) {
       final int uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
       _yuvToRgba(topY[len - 1], uv0 & 0xff, (uv0 >> 16),
-          new InputBuffer.from(topDst, offset: (len - 1) * 4));
+          InputBuffer.from(topDst, offset: (len - 1) * 4));
 
       if (bottomY != null) {
         final int uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
         _yuvToRgba(bottomY[len - 1], uv0 & 0xff, (uv0 >> 16),
-            new InputBuffer.from(bottomDst, offset: (len - 1) * 4));
+            InputBuffer.from(bottomDst, offset: (len - 1) * 4));
       }
     }
   }
@@ -1005,7 +1005,7 @@ class VP8 {
     } else {
       // We can finish the left-over line from previous call.
       _upsample(_tmpY, curY, topU, topV, curU, curV,
-          new InputBuffer.from(dst, offset: -stride), dst, mbW);
+          InputBuffer.from(dst, offset: -stride), dst, mbW);
       ++numLinesOut;
     }
 
@@ -1019,16 +1019,8 @@ class VP8 {
       curV.offset += _cacheUVStride;
       dst.offset += 2 * stride;
       curY.offset += 2 * _cacheYStride;
-      _upsample(
-          new InputBuffer.from(curY, offset: -_cacheYStride),
-          curY,
-          topU,
-          topV,
-          curU,
-          curV,
-          new InputBuffer.from(dst, offset: -stride),
-          dst,
-          mbW);
+      _upsample(InputBuffer.from(curY, offset: -_cacheYStride), curY, topU,
+          topV, curU, curV, InputBuffer.from(dst, offset: -stride), dst, mbW);
     }
 
     // move to last row
@@ -1045,7 +1037,7 @@ class VP8 {
       // Process the very last row of even-sized picture
       if ((yEnd & 1) == 0) {
         _upsample(curY, null, curU, curV, curU, curV,
-            new InputBuffer.from(dst, offset: stride), null, mbW);
+            InputBuffer.from(dst, offset: stride), null, mbW);
       }
     }
 
@@ -1072,7 +1064,7 @@ class VP8 {
     }
 
     // Return a pointer to the current decoded row.
-    return new InputBuffer(_alphaPlane, offset: row * width);
+    return InputBuffer(_alphaPlane, offset: row * width);
   }
 
   bool _decodeMB(VP8BitReader tokenBr) {
@@ -1135,7 +1127,7 @@ class VP8 {
 
     if (!block.isIntra4x4) {
       // parse DC
-      InputBuffer dc = InputBuffer(new Int16List(16));
+      InputBuffer dc = InputBuffer(Int16List(16));
       final int ctx = mb.nzDc + leftMb.nzDc;
       final int nz = _getCoeffs(tokenBr, bands[1], ctx, q.y2Mat, 0, dc);
       mb.nzDc = leftMb.nzDc = (nz > 0) ? 1 : 0;
@@ -1254,7 +1246,7 @@ class VP8 {
     return nz_coeffs;
   }
 
-  static const List<int> kBands = const [
+  static const List<int> kBands = [
     0,
     1,
     2,
@@ -1274,10 +1266,10 @@ class VP8 {
     0
   ];
 
-  static const List<int> kCat3 = const [173, 148, 140];
-  static const List<int> kCat4 = const [176, 155, 140, 135];
-  static const List<int> kCat5 = const [180, 157, 141, 134, 130];
-  static const List<int> kCat6 = const [
+  static const List<int> kCat3 = [173, 148, 140];
+  static const List<int> kCat4 = [176, 155, 140, 135];
+  static const List<int> kCat5 = [180, 157, 141, 134, 130];
+  static const List<int> kCat6 = [
     254,
     254,
     243,
@@ -1290,8 +1282,8 @@ class VP8 {
     130,
     129
   ];
-  static const List<List<int>> kCat3456 = const [kCat3, kCat4, kCat5, kCat6];
-  static const List<int> kZigzag = const [
+  static const List<List<int>> kCat3456 = [kCat3, kCat4, kCat5, kCat6];
+  static const List<int> kZigzag = [
     0,
     1,
     4,

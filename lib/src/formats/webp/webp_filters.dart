@@ -83,8 +83,8 @@ class WebPFilters {
     if (row == 0) {
       // Leftmost pixel is the same as input for topmost scanline.
       o[0] = s[0];
-      _predictLine(new InputBuffer.from(s, offset: 1), preds,
-          new InputBuffer.from(o, offset: 1), width - 1, inverse);
+      _predictLine(InputBuffer.from(s, offset: 1), preds,
+          InputBuffer.from(o, offset: 1), width - 1, inverse);
       row = 1;
       preds.offset += stride;
       s.offset += stride;
@@ -94,10 +94,9 @@ class WebPFilters {
     // Filter line-by-line.
     while (row < lastRow) {
       // Leftmost pixel is predicted from above.
-      _predictLine(
-          s, new InputBuffer.from(preds, offset: -stride), o, 1, inverse);
-      _predictLine(new InputBuffer.from(s, offset: 1), preds,
-          new InputBuffer.from(o, offset: 1), width - 1, inverse);
+      _predictLine(s, InputBuffer.from(preds, offset: -stride), o, 1, inverse);
+      _predictLine(InputBuffer.from(s, offset: 1), preds,
+          InputBuffer.from(o, offset: 1), width - 1, inverse);
       ++row;
       preds.offset += stride;
       s.offset += stride;
@@ -117,8 +116,8 @@ class WebPFilters {
       // Very first top-left pixel is copied.
       o[0] = s[0];
       // Rest of top scan-line is left-predicted.
-      _predictLine(new InputBuffer.from(s, offset: 1), preds,
-          new InputBuffer.from(o, offset: 1), width - 1, inverse);
+      _predictLine(InputBuffer.from(s, offset: 1), preds,
+          InputBuffer.from(o, offset: 1), width - 1, inverse);
       row = 1;
       s.offset += stride;
       o.offset += stride;
@@ -153,8 +152,8 @@ class WebPFilters {
     // left prediction for top scan-line
     if (row == 0) {
       o[0] = s[0];
-      _predictLine(new InputBuffer.from(s, offset: 1), preds,
-          new InputBuffer.from(o, offset: 1), width - 1, inverse);
+      _predictLine(InputBuffer.from(s, offset: 1), preds,
+          InputBuffer.from(o, offset: 1), width - 1, inverse);
       row = 1;
       preds.offset += stride;
       s.offset += stride;
@@ -164,8 +163,7 @@ class WebPFilters {
     // Filter line-by-line.
     while (row < lastRow) {
       // leftmost pixel: predict from above.
-      _predictLine(
-          s, new InputBuffer.from(preds, offset: -stride), o, 1, inverse);
+      _predictLine(s, InputBuffer.from(preds, offset: -stride), o, 1, inverse);
       for (int w = 1; w < width; ++w) {
         final int pred = _gradientPredictor(
             preds[w - 1], preds[w - stride], preds[w - stride - 1]);

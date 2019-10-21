@@ -891,7 +891,7 @@ class TiffFaxDecoder {
     return true;
   }
 
-  static const List<int> TABLE1 = const [
+  static const List<int> TABLE1 = [
     0x00, // 0 bits are left in first byte - SHOULD NOT HAPPEN
     0x01, // 1 bits are left in first byte
     0x03, // 2 bits are left in first byte
@@ -903,7 +903,7 @@ class TiffFaxDecoder {
     0xff
   ]; // 8 bits are left in first byte
 
-  static const List<int> TABLE2 = const [
+  static const List<int> TABLE2 = [
     0x00, // 0
     0x80, // 1
     0xc0, // 2
@@ -916,7 +916,7 @@ class TiffFaxDecoder {
   ]; // 8
 
   // Table to be used when fillOrder = 2, for flipping bytes.
-  static const List<int> FLIP_TABLE = const [
+  static const List<int> FLIP_TABLE = [
     0,
     -128,
     64,
@@ -1176,7 +1176,7 @@ class TiffFaxDecoder {
   ];
 
   // The main 10 bit white runs lookup table
-  static const List<int> WHITE = const [
+  static const List<int> WHITE = [
     // 0 - 7
     6430, 6400, 6400, 6400, 3225, 3225, 3225, 3225,
     // 8 - 15
@@ -1436,7 +1436,7 @@ class TiffFaxDecoder {
   ];
 
   // Additional make up codes for both White and Black runs
-  static const List<int> ADDITIONAL_MAKEUP = const [
+  static const List<int> ADDITIONAL_MAKEUP = [
     28679,
     28679,
     31752,
@@ -1456,7 +1456,7 @@ class TiffFaxDecoder {
   ];
 
   // Initial black run look up table, uses the first 4 bits of a code
-  static const List<int> INIT_BLACK = const [
+  static const List<int> INIT_BLACK = [
     // 0 - 7
     3226, 6412, 200, 168, 38, 38, 134, 134,
     // 8 - 15
@@ -1464,10 +1464,10 @@ class TiffFaxDecoder {
   ];
 
   //
-  static const List<int> TWO_BIT_BLACK = const [292, 260, 226, 226]; // 0 - 3
+  static const List<int> TWO_BIT_BLACK = [292, 260, 226, 226]; // 0 - 3
 
   // Main black run table, using the last 9 bits of possible 13 bit code
-  static const List<int> BLACK = const [
+  static const List<int> BLACK = [
     // 0 - 7
     62, 62, 30, 30, 0, 0, 0, 0,
     // 8 - 15
@@ -1598,7 +1598,7 @@ class TiffFaxDecoder {
     390, 390, 390, 390, 390, 390, 390, 390
   ];
 
-  static const List<int> TWO_D_CODES = const [
+  static const List<int> TWO_D_CODES = [
     // 0 - 7
     80, 88, 23, 71, 30, 30, 62, 62,
     // 8 - 15

@@ -78,11 +78,11 @@ class PvrtcEncoder {
 
   Uint8List encodeRgb4Bpp(Image bitmap) {
     if (bitmap.width != bitmap.height) {
-      throw new ImageException('PVRTC requires a square image.');
+      throw ImageException('PVRTC requires a square image.');
     }
 
     if (!BitUtility.isPowerOf2(bitmap.width)) {
-      throw new ImageException('PVRTC requires a power-of-two sized image.');
+      throw ImageException('PVRTC requires a power-of-two sized image.');
     }
 
     final int size = bitmap.width;
@@ -182,11 +182,11 @@ class PvrtcEncoder {
 
   Uint8List encodeRgba4Bpp(Image bitmap) {
     if (bitmap.width != bitmap.height) {
-      throw new ImageException('PVRTC requires a square image.');
+      throw ImageException('PVRTC requires a square image.');
     }
 
     if (!BitUtility.isPowerOf2(bitmap.width)) {
-      throw new ImageException('PVRTC requires a power-of-two sized image.');
+      throw ImageException('PVRTC requires a power-of-two sized image.');
     }
 
     final int size = bitmap.width;
@@ -286,14 +286,14 @@ class PvrtcEncoder {
     return outputData;
   }
 
-  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(Image bitmap,
-      int blockX, int blockY) {
+  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(
+      Image bitmap, int blockX, int blockY) {
     int size = bitmap.width;
     int pi = (blockY * 4 * size + blockX * 4);
 
     _pixel(int i) {
       int c = bitmap[pi + i];
-      return new PvrtcColorRgb(getRed(c), getGreen(c), getBlue(c));
+      return PvrtcColorRgb(getRed(c), getGreen(c), getBlue(c));
     }
 
     var cbb = PvrtcColorBoundingBox(_pixel(0), _pixel(0));
@@ -326,8 +326,7 @@ class PvrtcEncoder {
 
     _pixel(int i) {
       int c = bitmap[pi + i];
-      return new PvrtcColorRgba(
-          getRed(c), getGreen(c), getBlue(c), getAlpha(c));
+      return PvrtcColorRgba(getRed(c), getGreen(c), getBlue(c), getAlpha(c));
     }
 
     var cbb = PvrtcColorBoundingBox(_pixel(0), _pixel(0));
@@ -353,7 +352,7 @@ class PvrtcEncoder {
     return cbb;
   }
 
-  static const MODULATION_LUT = const [
+  static const MODULATION_LUT = [
     0,
     0,
     0,

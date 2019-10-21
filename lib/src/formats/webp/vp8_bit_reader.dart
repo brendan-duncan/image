@@ -101,7 +101,7 @@ class VP8BitReader {
   static const int BITS = 8;
 
   // Read a bit with proba 'prob'. Speed-critical function!
-  static const List<int> LOG_2_RANGE = const [
+  static const List<int> LOG_2_RANGE = [
     7,
     6,
     6,
@@ -232,7 +232,7 @@ class VP8BitReader {
     0
   ];
 
-  static const List<int> NEW_RANGE = const [
+  static const List<int> NEW_RANGE = [
     127,
     127,
     191,

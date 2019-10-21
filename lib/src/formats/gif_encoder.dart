@@ -7,17 +7,24 @@ import '../util/output_buffer.dart';
 import 'encoder.dart';
 
 class GifEncoder extends Encoder {
-  GifEncoder({this.delay = 80, this.repeat = 0}) : _encodedFrames = 0;
+  int delay, repeat, samplingFactor;
 
+  GifEncoder({this.delay = 80, this.repeat = 0, this.samplingFactor = 10})
+      : _encodedFrames = 0;
+
+  /// This adds the frame passed to [image].
+  /// After the last frame has been added, [finish] is required to be called.
   void addFrame(Image image, {int duration}) {
+    if (duration != null) {
+      delay = duration;
+    }
+
     if (output == null) {
       output = OutputBuffer();
 
-      if (duration != null) {
-        this.delay = duration;
-      }
-      _lastColorMap = NeuralQuantizer(image);
+      _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
       _lastImage = _lastColorMap.getIndexMap(image);
+
       _width = image.width;
       _height = image.height;
       return;
@@ -28,17 +35,21 @@ class GifEncoder extends Encoder {
     }
 
     _writeGraphicsCtrlExt();
+
     _addImage(_lastImage, _width, _height, _lastColorMap.colorMap, 256);
     _encodedFrames++;
 
-    if (duration != null) {
-      this.delay = duration;
-    }
-    _lastColorMap = NeuralQuantizer(image);
+    _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
     _lastImage = _lastColorMap.getIndexMap(image);
   }
 
   /// Encode the images that were added with [addFrame].
+  /// After this has been called (returning the finishes GIF),
+  /// calling [addFrame] for a new animation or image is safe again.
+  ///
+  /// [addFrame] will not encode the first image passed and after that
+  /// always encode the previous image. Hence, the last image needs to be
+  /// encoded here.
   List<int> finish() {
     List<int> bytes;
     if (output == null) {
@@ -309,10 +320,6 @@ class GifEncoder extends Encoder {
     output.writeByte(0); // aspect
   }
 
-  int background;
-  int delay;
-  int repeat;
-
   Uint8List _lastImage;
   NeuralQuantizer _lastColorMap;
   int _width;
@@ -345,7 +352,7 @@ class GifEncoder extends Encoder {
   static const int EOF = -1;
   static const int BITS = 12;
   static const int HSIZE = 5003; // 80% occupancy
-  static const List<int> MASKS = const [
+  static const List<int> MASKS = [
     0x0000,
     0x0001,
     0x0003,

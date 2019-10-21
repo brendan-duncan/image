@@ -7,7 +7,7 @@ import 'grayscale.dart';
 /// Apply Sobel edge detection filtering to the [src] Image.
 Image sobel(Image src, {num amount = 1.0}) {
   num invAmount = 1.0 - amount;
-  Image orig = grayscale(new Image.from(src));
+  Image orig = grayscale(Image.from(src));
   final origRGBA = orig.getBytes();
   int rowSize = src.width * 4;
   List<int> rgba = src.getBytes();

@@ -18,7 +18,7 @@ void main() {
           var bytes = req.responseText
               .split('')
               .map((e) {
-                return new String.fromCharCode(e.codeUnitAt(0) & 0xff);
+                return String.fromCharCode(e.codeUnitAt(0) & 0xff);
               })
               .join('')
               .codeUnits;

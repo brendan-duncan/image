@@ -19,7 +19,7 @@ class InternalExrRleCompressor extends InternalExrCompressor
   int numScanLines() => 1;
 
   Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
-    throw new ImageException('Rle compression not yet supported.');
+    throw ImageException('Rle compression not yet supported.');
   }
 
   Uint8List uncompress(InputBuffer inPtr, int x, int y,

@@ -47,7 +47,7 @@ class PsdChannel {
             input, width, height, bitDepth, lineLengths, planeNum);
         break;
       default:
-        throw new ImageException('Unsupported compression: $compression');
+        throw ImageException('Unsupported compression: $compression');
     }
   }
 

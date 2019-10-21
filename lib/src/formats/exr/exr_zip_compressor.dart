@@ -24,7 +24,7 @@ class InternalExrZipCompressor extends InternalExrCompressor
   int numScanLines() => _numScanLines;
 
   Uint8List compress(InputBuffer input, int x, int y, [int width, int height]) {
-    throw new ImageException('Zip compression not yet supported');
+    throw ImageException('Zip compression not yet supported');
   }
 
   Uint8List uncompress(InputBuffer input, int x, int y,

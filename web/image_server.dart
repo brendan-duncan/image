@@ -30,5 +30,5 @@ void main(List<String> argv) {
   // Save the image as a PNG
   List<int> png = PngEncoder().encodeImage(image);
   // Write the PNG to disk
-  new File(filename + '.png').writeAsBytesSync(png);
+  File(filename + '.png').writeAsBytesSync(png);
 }

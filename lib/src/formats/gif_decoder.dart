@@ -602,7 +602,7 @@ class GifDecoder extends Decoder {
 
   static const int NO_SUCH_CODE = 4098; // Impossible code, to signal empty.
 
-  static const List<int> CODE_MASKS = const [
+  static const List<int> CODE_MASKS = [
     0x0000,
     0x0001,
     0x0003,
@@ -618,6 +618,6 @@ class GifDecoder extends Decoder {
     0x0fff
   ];
 
-  static const List<int> INTERLACED_OFFSET = const [0, 4, 2, 1];
-  static const List<int> INTERLACED_JUMP = const [8, 8, 4, 2];
+  static const List<int> INTERLACED_OFFSET = [0, 4, 2, 1];
+  static const List<int> INTERLACED_JUMP = [8, 8, 4, 2];
 }
