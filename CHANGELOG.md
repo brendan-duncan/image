@@ -1,3 +1,8 @@
+## 2.1.5
+
+- Added the `samplingFactor` parameter to GIF encoding, which allows to significantly speed up
+  encoding times of GIF encoding. 
+
 ## 2.1.4 - June 01, 2019
 
 - Optimize fillRect, drawPixel, and other drawing functions when opaque colors are used.
@@ -129,7 +134,7 @@ Update SDK dependency to a 2.0 development release.
 
 ## 1.1.18 - April 06, 2014
 
-- Added OpenEXR format docoder.
+- Added OpenEXR format decoder.
 
 
 ## 1.1.17 - April 02, 2014

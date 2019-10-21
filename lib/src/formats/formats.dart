@@ -240,13 +240,35 @@ Animation decodeGifAnimation(List<int> bytes) {
 }
 
 /// Encode an image to the GIF format.
-List<int> encodeGif(Image image) {
-  return new GifEncoder().encodeImage(image);
+///
+/// The [samplingFactor] specifies the sampling factor for
+/// NeuQuant image quantization. It is responsible for reducing
+/// the amount of unique colors in your images to 256.
+/// According to https://scientificgems.wordpress.com/stuff/neuquant-fast-high-quality-image-quantization/,
+/// a sampling factor of 10 gives you a reasonable trade-off between
+/// image quality and quantization speed.
+/// If you know that you have less than 256 colors in your frames
+/// anyway, you should supply a very large [samplingFactor] for maximum performance.
+List<int> encodeGif(Image image, {int samplingFactor = 10}) {
+  return new GifEncoder(samplingFactor: samplingFactor).encodeImage(image);
 }
 
 /// Encode an animation to the GIF format.
-List<int> encodeGifAnimation(Animation anim) {
-  return new GifEncoder().encodeAnimation(anim);
+///
+/// The [samplingFactor] specifies the sampling factor for
+/// NeuQuant image quantization. It is responsible for reducing
+/// the amount of unique colors in your images to 256.
+/// According to https://scientificgems.wordpress.com/stuff/neuquant-fast-high-quality-image-quantization/,
+/// a sampling factor of 10 gives you a reasonable trade-off between
+/// image quality and quantization speed.
+/// If you know that you have less than 256 colors in your frames
+/// anyway, you should supply a very large [samplingFactor] for maximum performance.
+///
+/// Here, `30` is used a default value for the [samplingFactor] as
+/// encoding animations is usually a process that takes longer than
+/// encoding a single image (see [encodeGif]).
+List<int> encodeGifAnimation(Animation anim, {int samplingFactor = 30}) {
+  return new GifEncoder(samplingFactor: samplingFactor).encodeAnimation(anim);
 }
 
 /// Decode a TIFF formatted image.
