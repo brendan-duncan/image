@@ -1,3 +1,8 @@
+## 2.1.5
+
+- Formatted package using `dartfmt`.
+- Fixed "Unnecessary new" and other Dart analyzer warnings.
+
 ## 2.1.4 - June 01, 2019
 
 - Optimize fillRect, drawPixel, and other drawing functions when opaque colors are used.
