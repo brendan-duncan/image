@@ -250,7 +250,7 @@ Animation decodeGifAnimation(List<int> bytes) {
 /// If you know that you have less than 256 colors in your frames
 /// anyway, you should supply a very large [samplingFactor] for maximum performance.
 List<int> encodeGif(Image image, {int samplingFactor = 10}) {
-  return new GifEncoder(samplingFactor = samplingFactor).encodeImage(image);
+  return new GifEncoder(samplingFactor: samplingFactor).encodeImage(image);
 }
 
 /// Encode an animation to the GIF format.
