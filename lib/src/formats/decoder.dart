@@ -61,7 +61,7 @@ abstract class Decoder {
     if (img == null) {
       return null;
     }
-    return new HdrImage.fromImage(img);
+    return HdrImage.fromImage(img);
   }
 
   /// Decode all of the frames from an animation. If the file is not an
@@ -96,6 +96,6 @@ abstract class Decoder {
     if (img == null) {
       return null;
     }
-    return new HdrImage.fromImage(img);
+    return HdrImage.fromImage(img);
   }
 }

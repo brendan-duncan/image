@@ -37,8 +37,8 @@ class PngEncoder extends Encoder {
     }
 
     // Include room for the filter bytes (1 byte per row).
-    var filteredImage =
-        Uint8List((image.width * image.height * image.numberOfChannels) + image.height);
+    var filteredImage = Uint8List(
+        (image.width * image.height * image.numberOfChannels) + image.height);
 
     _filter(image, filteredImage);
 
@@ -342,8 +342,8 @@ class PngEncoder extends Encoder {
       if (image.channels == Channels.rgba) {
         int aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
         int ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
-        int ca = (row == 0 || x == 0) ? 0
-            : getAlpha(image.getPixel(x - 1, row - 1));
+        int ca =
+            (row == 0 || x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row - 1));
         int xa = getAlpha(image.getPixel(x, row));
         int pa = _paethPredictor(aa, ba, ca);
         out[oi++] = (xa - pa) & 0xff;

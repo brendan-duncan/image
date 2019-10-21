@@ -73,7 +73,8 @@ void main() {
           // Create a buffer that the canvas can draw.
           ImageData d = c.context2D.createImageData(c.width, c.height);
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length, newImage.getBytes(format: Format.rgba));
+          d.data.setRange(
+              0, d.data.length, newImage.getBytes(format: Format.rgba));
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
 
@@ -91,14 +92,15 @@ void main() {
         ImageData d = c.context2D.createImageData(c.width, c.height);
 
         int frame = 0;
-        new Timer.periodic(new Duration(milliseconds: 40), (t) {
+        Timer.periodic(Duration(milliseconds: 40), (t) {
           Image image = anim.frames[frame++];
           if (frame >= anim.numFrames) {
             frame = 0;
           }
 
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length, image.getBytes(format: Format.rgba));
+          d.data
+              .setRange(0, d.data.length, image.getBytes(format: Format.rgba));
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
         });

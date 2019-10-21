@@ -39,10 +39,10 @@ class TiffEntry {
 
   String readString(InputBuffer p) {
     if (type != TYPE_ASCII) {
-      throw new ImageException('readString requires ASCII entity');
+      throw ImageException('readString requires ASCII entity');
     }
     // TODO: ASCII fields can contain multiple strings, separated with a NULL.
-    return new String.fromCharCodes(readValues(p));
+    return String.fromCharCodes(readValues(p));
   }
 
   int _readValue(InputBuffer p) {
@@ -62,19 +62,19 @@ class TiffEntry {
         }
         return num ~/ den;
       case TYPE_SBYTE:
-        throw new ImageException('Unhandled value type: SBYTE');
+        throw ImageException('Unhandled value type: SBYTE');
       case TYPE_UNDEFINED:
         return p.readByte();
       case TYPE_SSHORT:
-        throw new ImageException('Unhandled value type: SSHORT');
+        throw ImageException('Unhandled value type: SSHORT');
       case TYPE_SLONG:
-        throw new ImageException('Unhandled value type: SLONG');
+        throw ImageException('Unhandled value type: SLONG');
       case TYPE_SRATIONAL:
-        throw new ImageException('Unhandled value type: SRATIONAL');
+        throw ImageException('Unhandled value type: SRATIONAL');
       case TYPE_FLOAT:
-        throw new ImageException('Unhandled value type: FLOAT');
+        throw ImageException('Unhandled value type: FLOAT');
       case TYPE_DOUBLE:
-        throw new ImageException('Unhandled value type: DOUBLE');
+        throw ImageException('Unhandled value type: DOUBLE');
     }
     return 0;
   }
@@ -92,7 +92,7 @@ class TiffEntry {
   static const int TYPE_FLOAT = 11;
   static const int TYPE_DOUBLE = 12;
 
-  static const List<int> SIZE_OF_TYPE = const [
+  static const List<int> SIZE_OF_TYPE = [
     0, //  0 = n/a
     1, //  1 = byte
     1, //  2 = ascii

@@ -203,7 +203,7 @@ class HuffmanTree {
   }
 
   // Pre-reversed 4-bit values.
-  static const List<int> _REVERSED_BITS = const [
+  static const List<int> _REVERSED_BITS = [
     0x0,
     0x8,
     0x4,
@@ -265,9 +265,9 @@ class HuffmanTree {
       List<int> codeLengths, int codeLengthsSize, List<int> huffCodes) {
     int symbol;
     int codeLen;
-    Int32List codeLengthHist = new Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    Int32List codeLengthHist = Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
     int currCode;
-    Int32List nextCodes = new Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    Int32List nextCodes = Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
     int maxCodeLength = 0;
 
     // Calculate max code length.
@@ -317,7 +317,7 @@ class HuffmanTree {
 @internal
 class HTreeGroup {
   final List<HuffmanTree> htrees =
-      new List<HuffmanTree>(VP8L.HUFFMAN_CODES_PER_META_CODE);
+      List<HuffmanTree>(VP8L.HUFFMAN_CODES_PER_META_CODE);
 
   HTreeGroup() {
     for (int i = 0, len = htrees.length; i < len; ++i) {

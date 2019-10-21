@@ -12,13 +12,13 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         var bytes = (f as File).readAsBytesSync();
 
         GifInfo data = GifDecoder().startDecode(bytes);
         if (data == null) {
-          throw new ImageException('Unable to parse Gif info: $name.');
+          throw ImageException('Unable to parse Gif info: $name.');
         }
       });
     }
@@ -30,11 +30,11 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         var bytes = (f as File).readAsBytesSync();
         Image image = GifDecoder().decodeImage(bytes);
-        new File('out/gif/$name.png')
+        File('out/gif/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(image));
       });
@@ -47,7 +47,7 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
         Animation anim = GifDecoder().decodeAnimation(bytes);
@@ -67,7 +67,7 @@ void main() {
     }
 
     List<int> gif = encodeGifAnimation(anim);
-    new File('out/gif/encodeAnimation.gif')
+    File('out/gif/encodeAnimation.gif')
       ..createSync(recursive: true)
       ..writeAsBytesSync(gif);
   });
@@ -77,7 +77,7 @@ void main() {
     Image image = JpegDecoder().decodeImage(bytes);
 
     List<int> gif = GifEncoder().encodeImage(image);
-    new File('out/gif/jpeg444.gif')
+    File('out/gif/jpeg444.gif')
       ..createSync(recursive: true)
       ..writeAsBytesSync(gif);
   });

@@ -499,8 +499,8 @@ class PsdImage extends DecodeInfo {
 
     mergeImageChannels = [];
     for (int i = 0; i < channels; ++i) {
-      mergeImageChannels.add(new PsdChannel.read(_imageData, i == 3 ? -1 : i,
-          width, height, depth, compression, lineLengths, i));
+      mergeImageChannels.add(PsdChannel.read(_imageData, i == 3 ? -1 : i, width,
+          height, depth, compression, lineLengths, i));
     }
 
     mergedImage = createImageFromChannels(
@@ -524,7 +524,7 @@ class PsdImage extends DecodeInfo {
     int numChannels = channelList.length;
     int ns = (bitDepth == 8) ? 1 : (bitDepth == 16) ? 2 : -1;
     if (ns == -1) {
-      throw new ImageException('PSD: unsupported bit depth: $bitDepth');
+      throw ImageException('PSD: unsupported bit depth: $bitDepth');
     }
 
     final channel0 = channels[0];
@@ -587,7 +587,7 @@ class PsdImage extends DecodeInfo {
             pixels[di++] = alpha;
             break;
           default:
-            throw new ImageException('Unhandled color mode: $colorMode');
+            throw ImageException('Unhandled color mode: $colorMode');
         }
       }
     }

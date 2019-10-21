@@ -1,4 +1,3 @@
-
 /// Clamp [x] to [a] [b]
 int clamp(int x, int a, int b) => x.clamp(a, b).toInt();
 

@@ -51,7 +51,7 @@ class VP8LBitReader {
       _shiftBytes();
       return value;
     } else {
-      throw new ImageException('Not enough data in input.');
+      throw ImageException('Not enough data in input.');
     }
   }
 
@@ -85,7 +85,7 @@ class VP8LBitReader {
   // Number of bytes needed to store WBITS bits.
   static const int LOG8_WBITS = 4;
 
-  static const List<int> BIT_MASK = const [
+  static const List<int> BIT_MASK = [
     0,
     1,
     3,

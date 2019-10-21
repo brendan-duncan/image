@@ -20,7 +20,7 @@ class PngDecoder extends Decoder {
   bool isValidFile(List<int> data) {
     InputBuffer input = InputBuffer(data, bigEndian: true);
     InputBuffer pngHeader = input.readBytes(8);
-    const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
+    const PNG_HEADER = [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
         return false;
@@ -38,7 +38,7 @@ class PngDecoder extends Decoder {
     _input = InputBuffer(data, bigEndian: true);
 
     InputBuffer pngHeader = _input.readBytes(8);
-    const PNG_HEADER = const [137, 80, 78, 71, 13, 10, 26, 10];
+    const PNG_HEADER = [137, 80, 78, 71, 13, 10, 26, 10];
     for (int i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
         return null;
@@ -104,7 +104,7 @@ class PngDecoder extends Decoder {
           int crc = _input.readUint32();
           int computedCrc = _crc(chunkType, hdrBytes);
           if (crc != computedCrc) {
-            throw new ImageException('Invalid $chunkType checksum');
+            throw ImageException('Invalid $chunkType checksum');
           }
           break;
         case 'PLTE':
@@ -112,7 +112,7 @@ class PngDecoder extends Decoder {
           int crc = _input.readUint32();
           int computedCrc = _crc(chunkType, _info.palette);
           if (crc != computedCrc) {
-            throw new ImageException('Invalid $chunkType checksum');
+            throw ImageException('Invalid $chunkType checksum');
           }
           break;
         case 'tRNS':
@@ -120,7 +120,7 @@ class PngDecoder extends Decoder {
           int crc = _input.readUint32();
           int computedCrc = _crc(chunkType, _info.transparency);
           if (crc != computedCrc) {
-            throw new ImageException('Invalid $chunkType checksum');
+            throw ImageException('Invalid $chunkType checksum');
           }
           break;
         case 'IEND':
@@ -129,7 +129,7 @@ class PngDecoder extends Decoder {
           break;
         case 'gAMA':
           if (chunkSize != 4) {
-            throw new ImageException('Invalid gAMA chunk');
+            throw ImageException('Invalid gAMA chunk');
           }
           int gammaInt = _input.readUint32();
           _input.skip(4); // CRC
@@ -243,12 +243,12 @@ class PngDecoder extends Decoder {
         int crc = _input.readUint32();
         int computedCrc = _crc(chunkType, data);
         if (crc != computedCrc) {
-          throw new ImageException('Invalid $chunkType checksum');
+          throw ImageException('Invalid $chunkType checksum');
         }
       }
     } else {
       if (frame < 0 || frame >= _info.frames.length) {
-        throw new ImageException('Invalid Frame Number: $frame');
+        throw ImageException('Invalid Frame Number: $frame');
       }
 
       InternalPngFrame f = _info.frames[frame] as InternalPngFrame;
@@ -542,7 +542,7 @@ class PngDecoder extends Decoder {
         }
         break;
       default:
-        throw new ImageException('Invalid filter value: ${filterType}');
+        throw ImageException('Invalid filter value: ${filterType}');
     }
   }
 
@@ -593,7 +593,7 @@ class PngDecoder extends Decoder {
     // not enough buffer
     while (_bitBufferLen < numBits) {
       if (input.isEOS) {
-        throw new ImageException('Invalid PNG data.');
+        throw ImageException('Invalid PNG data.');
       }
 
       // input byte
@@ -646,7 +646,7 @@ class PngDecoder extends Decoder {
         return;
     }
 
-    throw new ImageException('Invalid color type: ${_info.colorType}.');
+    throw ImageException('Invalid color type: ${_info.colorType}.');
   }
 
   // Get the color with the list of components.
@@ -816,7 +816,7 @@ class PngDecoder extends Decoder {
         return getColor(r, g, b, a);
     }
 
-    throw new ImageException('Invalid color type: ${_info.colorType}.');
+    throw ImageException('Invalid color type: ${_info.colorType}.');
   }
 
   InputBuffer _input;

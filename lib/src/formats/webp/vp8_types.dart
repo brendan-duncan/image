@@ -188,7 +188,7 @@ class VP8Random {
   static const int RANDOM_TABLE_SIZE = 55;
 
   // 31b-range values
-  static const List<int> _RANDOM_TABLE = const [
+  static const List<int> _RANDOM_TABLE = [
     0x0de15230,
     0x03b31886,
     0x775faccb,

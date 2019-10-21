@@ -5,21 +5,14 @@ import '../image.dart';
 import '../util/min_max.dart';
 import '../util/random.dart';
 
-enum NoiseType {
-  gaussian,
-  uniform,
-  salt_pepper,
-  poisson,
-  rice
-}
+enum NoiseType { gaussian, uniform, salt_pepper, poisson, rice }
 
 /// Add random noise to pixel values. [sigma] determines how strong the effect
 /// should be. [type] should be one of the following: [NoiseType.gaussian],
 /// [NoiseType.uniform], [NoiseType.salt_pepper], [NoiseType.poisson],
 /// or [NoiseType.rice].
 Image noise(Image image, num sigma,
-           {NoiseType type = NoiseType.gaussian,
-            Random random}) {
+    {NoiseType type = NoiseType.gaussian, Random random}) {
   if (random == null) {
     random = Random();
   }

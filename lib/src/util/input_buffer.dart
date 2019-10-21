@@ -12,8 +12,8 @@ class InputBuffer {
   bool bigEndian;
 
   /// Create a InputStream for reading from a List<int>
-  InputBuffer(List<int> buffer, {this.bigEndian = false, int offset = 0,
-              int length})
+  InputBuffer(List<int> buffer,
+      {this.bigEndian = false, int offset = 0, int length})
       : this.buffer = buffer,
         this.start = offset,
         this.offset = offset,
@@ -249,8 +249,7 @@ class InputBuffer {
   Uint32List toUint32List([int offset = 0]) {
     if (buffer is Uint8List) {
       Uint8List b = buffer as Uint8List;
-      return Uint32List.view(
-          b.buffer, b.offsetInBytes + this.offset + offset);
+      return Uint32List.view(b.buffer, b.offsetInBytes + this.offset + offset);
     }
     return Uint32List.view(toUint8List().buffer);
   }

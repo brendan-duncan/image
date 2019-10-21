@@ -16,13 +16,13 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
 
         TiffInfo info = TiffDecoder().startDecode(bytes);
         if (info == null) {
-          throw new ImageException('Unable to parse Tiff info: $name.');
+          throw ImageException('Unable to parse Tiff info: $name.');
         }
 
         print(name);
@@ -60,17 +60,17 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         print(name);
         List<int> bytes = (f as File).readAsBytesSync();
         Image image = TiffDecoder().decodeImage(bytes);
         if (image == null) {
-          throw new ImageException('Unable to decode TIFF Image: $name.');
+          throw ImageException('Unable to decode TIFF Image: $name.');
         }
 
         List<int> png = PngEncoder().encodeImage(image);
-        new File('out/tif/${name}.png')
+        File('out/tif/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

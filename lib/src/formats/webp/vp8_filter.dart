@@ -267,15 +267,15 @@ class VP8Filter {
   void transform(InputBuffer src, InputBuffer dst, bool doTwo) {
     transformOne(src, dst);
     if (doTwo) {
-      transformOne(new InputBuffer.from(src, offset: 16),
-          new InputBuffer.from(dst, offset: 4));
+      transformOne(
+          InputBuffer.from(src, offset: 16), InputBuffer.from(dst, offset: 4));
     }
   }
 
   void transformUV(InputBuffer src, InputBuffer dst) {
     transform(src, dst, true);
-    transform(new InputBuffer.from(src, offset: 2 * 16),
-        new InputBuffer.from(dst, offset: 4 * VP8.BPS), true);
+    transform(InputBuffer.from(src, offset: 2 * 16),
+        InputBuffer.from(dst, offset: 4 * VP8.BPS), true);
   }
 
   void transformDC(InputBuffer src, InputBuffer dst) {
@@ -292,16 +292,16 @@ class VP8Filter {
       transformDC(src, dst);
     }
     if (src[1 * 16] != 0) {
-      transformDC(new InputBuffer.from(src, offset: 1 * 16),
-          new InputBuffer.from(dst, offset: 4));
+      transformDC(InputBuffer.from(src, offset: 1 * 16),
+          InputBuffer.from(dst, offset: 4));
     }
     if (src[2 * 16] != 0) {
-      transformDC(new InputBuffer.from(src, offset: 2 * 16),
-          new InputBuffer.from(dst, offset: 4 * VP8.BPS));
+      transformDC(InputBuffer.from(src, offset: 2 * 16),
+          InputBuffer.from(dst, offset: 4 * VP8.BPS));
     }
     if (src[3 * 16] != 0) {
-      transformDC(new InputBuffer.from(src, offset: 3 * 16),
-          new InputBuffer.from(dst, offset: 4 * VP8.BPS + 4));
+      transformDC(InputBuffer.from(src, offset: 3 * 16),
+          InputBuffer.from(dst, offset: 4 * VP8.BPS + 4));
     }
   }
 
@@ -628,18 +628,7 @@ class VP8Filter {
     Put8x8uv(0x80, dst);
   }
 
-  static const PredLuma4 = [
-    DC4,
-    TM4,
-    VE4,
-    HE4,
-    RD4,
-    VR4,
-    LD4,
-    VL4,
-    HD4,
-    HU4
-  ];
+  static const PredLuma4 = [DC4, TM4, VE4, HE4, RD4, VR4, LD4, VL4, HD4, HU4];
 
   static const PredLuma16 = [
     DC16,

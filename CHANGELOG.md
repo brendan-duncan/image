@@ -1,5 +1,9 @@
 ## 2.1.5
 
+- Fixed null value in `GifEncoder`.
+- Added Dart syntax highlighting in the readme file.
+- Formatted package using `dartfmt`.
+- Fixed "Unnecessary new" and other Dart analyzer warnings.
 - Added the `samplingFactor` parameter to GIF encoding, which allows to significantly speed up
   encoding times of GIF encoding. 
 

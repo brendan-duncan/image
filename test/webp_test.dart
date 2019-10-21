@@ -12,13 +12,13 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
 
         WebPInfo data = WebPDecoder().startDecode(bytes);
         if (data == null) {
-          throw new ImageException('Unable to parse WebP info: $name.');
+          throw ImageException('Unable to parse WebP info: $name.');
         }
 
         if (_webp_tests.containsKey(name)) {
@@ -37,14 +37,13 @@ void main() {
     }
   });
 
-
   group('WebP/decodeImage', () {
     test('validate', () {
       File file = File('test/res/webp/2b.webp');
       List<int> bytes = file.readAsBytesSync();
       Image image = WebPDecoder().decodeImage(bytes);
       List<int> png = PngEncoder().encodeImage(image);
-      new File('out/webp/decode.png')
+      File('out/webp/decode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -67,16 +66,16 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
         Image image = WebPDecoder().decodeImage(bytes);
         if (image == null) {
-          throw new ImageException('Unable to decode WebP Image: $name.');
+          throw ImageException('Unable to decode WebP Image: $name.');
         }
 
         List<int> png = PngEncoder().encodeImage(image);
-        new File('out/webp/${name}.png')
+        File('out/webp/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

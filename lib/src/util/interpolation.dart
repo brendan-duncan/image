@@ -1,8 +1,3 @@
 // enum Interpolation
 
-enum Interpolation {
-  nearest,
-  linear,
-  cubic,
-  average
-}
+enum Interpolation { nearest, linear, cubic, average }

@@ -75,7 +75,7 @@ class ExrPart {
         case 'compression':
           _compressionType = value.readByte();
           if (_compressionType > 7) {
-            throw new ImageException('EXR Invalid compression type');
+            throw ImageException('EXR Invalid compression type');
           }
           break;
         case 'dataWindow':
@@ -123,7 +123,7 @@ class ExrPart {
           } else if (s == 'deeptile') {
             //this._type = TYPE_DEEP_TILE;
           } else {
-            throw new ImageException('EXR Invalid type: $s');
+            throw ImageException('EXR Invalid type: $s');
           }
           break;
         default:
@@ -193,7 +193,7 @@ class ExrPart {
       }
 
       int numOffsets = ((height + _linesInBuffer) ~/ _linesInBuffer) - 1;
-      _offsets = [new Uint32List(numOffsets)];
+      _offsets = [Uint32List(numOffsets)];
     }
   }
 
@@ -225,7 +225,7 @@ class ExrPart {
         num = _roundLog2(w, _tileRoundingMode) + 1;
         break;
       default:
-        throw new ImageException("Unknown LevelMode format.");
+        throw ImageException("Unknown LevelMode format.");
     }
 
     return num;
@@ -248,7 +248,7 @@ class ExrPart {
         num = _roundLog2(h, _tileRoundingMode) + 1;
         break;
       default:
-        throw new ImageException('Unknown LevelMode format.');
+        throw ImageException('Unknown LevelMode format.');
     }
 
     return num;
@@ -304,7 +304,7 @@ class ExrPart {
 
   int _levelSize(int _min, int _max, int l, int rmode) {
     if (l < 0) {
-      throw new ImageException('Argument not in valid range.');
+      throw ImageException('Argument not in valid range.');
     }
 
     int a = (_max - _min) + 1;

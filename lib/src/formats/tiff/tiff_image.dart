@@ -276,11 +276,11 @@ class TiffImage {
       if (compression == COMPRESSION_NONE) {
         bdata = p;
       } else if (compression == COMPRESSION_LZW) {
-        bdata = InputBuffer(new Uint8List(bytesInThisTile));
+        bdata = InputBuffer(Uint8List(bytesInThisTile));
         LzwDecoder decoder = LzwDecoder();
         try {
-          decoder.decode(new InputBuffer.from(p, offset: 0, length: byteCount),
-              bdata.buffer);
+          decoder.decode(
+              InputBuffer.from(p, offset: 0, length: byteCount), bdata.buffer);
         } catch (e) {
           print(e);
         }
@@ -298,7 +298,7 @@ class TiffImage {
           }
         }
       } else if (compression == COMPRESSION_PACKBITS) {
-        bdata = InputBuffer(new Uint8List(bytesInThisTile));
+        bdata = InputBuffer(Uint8List(bytesInThisTile));
         _decodePackbits(p, bytesInThisTile, bdata.buffer);
       } else if (compression == COMPRESSION_DEFLATE) {
         List<int> data = p.toList(0, byteCount);
@@ -320,7 +320,7 @@ class TiffImage {
         }
         return;
       } else {
-        throw new ImageException('Unsupported Compression Type: $compression');
+        throw ImageException('Unsupported Compression Type: $compression');
       }
 
       if (bdata == null) {
@@ -464,7 +464,7 @@ class TiffImage {
         }
       }
     } else {
-      throw new ImageException('Unsupported bitsPerSample: $bitsPerSample');
+      throw ImageException('Unsupported bitsPerSample: $bitsPerSample');
     }
   }
 
@@ -547,13 +547,13 @@ class TiffImage {
       } else {
         bytesInThisTile = (tileWidth ~/ 8 + 1) * tileHeight;
       }
-      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
       _decodePackbits(p, bytesInThisTile, bdata.buffer);
     } else if (compression == COMPRESSION_LZW) {
-      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
 
       LzwDecoder decoder = LzwDecoder();
-      decoder.decode(new InputBuffer.from(p, length: byteCount), bdata.buffer);
+      decoder.decode(InputBuffer.from(p, length: byteCount), bdata.buffer);
 
       // Horizontal Differencing Predictor
       if (predictor == 2) {
@@ -567,21 +567,21 @@ class TiffImage {
         }
       }
     } else if (compression == COMPRESSION_CCITT_RLE) {
-      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
       try {
-        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
+        TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
             .decode1D(bdata, p, 0, tileHeight);
       } catch (_) {}
     } else if (compression == COMPRESSION_CCITT_FAX3) {
-      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
       try {
-        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
+        TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
             .decode2D(bdata, p, 0, tileHeight, t4Options);
       } catch (_) {}
     } else if (compression == COMPRESSION_CCITT_FAX4) {
-      bdata = InputBuffer(new Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
       try {
-        new TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
+        TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
             .decodeT6(bdata, p, 0, tileHeight, t6Options);
       } catch (_) {}
     } else if (compression == COMPRESSION_ZIP) {
@@ -595,7 +595,7 @@ class TiffImage {
     } else if (compression == COMPRESSION_NONE) {
       bdata = p;
     } else {
-      throw new ImageException('Unsupported Compression Type: $compression');
+      throw ImageException('Unsupported Compression Type: $compression');
     }
 
     if (bdata == null) {
@@ -747,7 +747,7 @@ class TiffImage {
   static const int TAG_YCBCR_SUBSAMPLING = 530;
   static const int TAG_YCBCR_POSITIONING = 531;
 
-  static const Map<int, String> TAG_NAME = const {
+  static const Map<int, String> TAG_NAME = {
     TAG_ARTIST: 'artist',
     TAG_BITS_PER_SAMPLE: 'bitsPerSample',
     TAG_CELL_LENGTH: 'cellLength',
