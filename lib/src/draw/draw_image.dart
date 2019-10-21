@@ -13,8 +13,16 @@ import 'draw_pixel.dart';
 /// The coordinates refer to the upper left corner. This function can be used to
 /// copy regions within the same image (if [dst] is the same as [src])
 /// but if the regions overlap the results will be unpredictable.
-Image drawImage(Image dst, Image src, {int dstX, int dstY, int dstW, int dstH,
-  int srcX, int srcY, int srcW, int srcH, bool blend = true}) {
+Image drawImage(Image dst, Image src,
+    {int dstX,
+    int dstY,
+    int dstW,
+    int dstH,
+    int srcX,
+    int srcY,
+    int srcW,
+    int srcH,
+    bool blend = true}) {
   if (dstX == null) {
     dstX = 0;
   }
@@ -50,8 +58,8 @@ Image drawImage(Image dst, Image src, {int dstX, int dstY, int dstW, int dstH,
 
   for (int y = 0; y < dstH; ++y) {
     for (int x = 0; x < dstW; ++x) {
-      int stepX = (x * (srcW/dstW)).toInt();
-      int stepY = (y * (srcH/dstH)).toInt();
+      int stepX = (x * (srcW / dstW)).toInt();
+      int stepY = (y * (srcH / dstH)).toInt();
 
       final srcPixel = src.getPixel(srcX + stepX, srcY + stepY);
       if (blend) {

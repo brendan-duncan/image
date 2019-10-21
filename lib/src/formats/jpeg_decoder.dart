@@ -16,7 +16,7 @@ class JpegDecoder extends Decoder {
 
   /// Is the given file a valid JPEG image?
   bool isValidFile(List<int> data) {
-    return new JpegData().validate(data);
+    return JpegData().validate(data);
   }
 
   DecodeInfo startDecode(List<int> data) {
@@ -35,7 +35,7 @@ class JpegDecoder extends Decoder {
     jpeg.read(input.buffer);
 
     if (jpeg.frames.length != 1) {
-      throw new ImageException('only single frame JPEGs supported');
+      throw ImageException('only single frame JPEGs supported');
     }
 
     Image image = Image(jpeg.width, jpeg.height, channels: Channels.rgb);
@@ -50,7 +50,7 @@ class JpegDecoder extends Decoder {
     jpeg.read(data);
 
     if (jpeg.frames.length != 1) {
-      throw new ImageException('only single frame JPEGs supported');
+      throw ImageException('only single frame JPEGs supported');
     }
 
     Image image = Image(jpeg.width, jpeg.height, channels: Channels.rgb);

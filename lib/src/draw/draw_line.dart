@@ -9,7 +9,7 @@ import 'draw_pixel.dart';
 /// If [antialias] is true then the line is drawn with smooth edges.
 /// [thickness] determines how thick the line should be drawn, in pixels.
 Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
-               {bool antialias = false, num thickness = 1}) {
+    {bool antialias = false, num thickness = 1}) {
   List<int> line = [x1, y1, x2, y2];
   if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
     return image;
@@ -200,9 +200,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
 
   // Antialias Line
 
-  num ag = (dy.abs() < dx.abs())
-      ? cos(atan2(dy, dx))
-      : sin(atan2(dy, dx));
+  num ag = (dy.abs() < dx.abs()) ? cos(atan2(dy, dx)) : sin(atan2(dy, dx));
 
   int wid;
   if (ag != 0.0) {

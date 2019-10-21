@@ -26,18 +26,16 @@ Image fillFlood(Image src, int x, int y, int color,
 
     array = (int y, int x) {
       return visited[y * src.width + x] == 0 &&
-             _testPixelLabColorDistance(src, x, y, lab, threshold);
+          _testPixelLabColorDistance(src, x, y, lab, threshold);
     };
-
   } else if (!compareAlpha) {
     array = (int y, int x) {
       return visited[y * src.width + x] == 0 &&
-             setAlpha(src.getPixel(x, y), 0) != srcColor;
+          setAlpha(src.getPixel(x, y), 0) != srcColor;
     };
   } else {
     array = (int y, int x) {
-      return visited[y * src.width + x] == 0 &&
-             src.getPixel(x, y) != srcColor;
+      return visited[y * src.width + x] == 0 && src.getPixel(x, y) != srcColor;
     };
   }
 
@@ -75,13 +73,13 @@ Uint8List maskFlood(Image src, int x, int y,
     array = (int y, int x) {
       return visited[y * src.width + x] == 0 &&
           (ret[y * src.width + x] != 0 ||
-           _testPixelLabColorDistance(src, x, y, lab, threshold));
+              _testPixelLabColorDistance(src, x, y, lab, threshold));
     };
   } else if (!compareAlpha) {
     array = (int y, int x) {
       return visited[y * src.width + x] == 0 &&
           (ret[y * src.width + x] != 0 ||
-           setAlpha(src.getPixel(x, y), 0) != srcColor);
+              setAlpha(src.getPixel(x, y), 0) != srcColor);
     };
   } else {
     array = (int y, int x) {
@@ -99,8 +97,8 @@ Uint8List maskFlood(Image src, int x, int y,
   return ret;
 }
 
-bool _testPixelLabColorDistance(Image src, int x, int y, List<num> refColor,
-                                num threshold) {
+bool _testPixelLabColorDistance(
+    Image src, int x, int y, List<num> refColor, num threshold) {
   int pixel = src.getPixel(x, y);
   bool compareAlpha = refColor.length > 3;
   var pixelColor = rgbToLab(getRed(pixel), getGreen(pixel), getBlue(pixel));
@@ -114,7 +112,7 @@ bool _testPixelLabColorDistance(Image src, int x, int y, List<num> refColor,
 // Adam Milazzo (2015). A More Efficient Flood Fill.
 // http://www.adammil.net/blog/v126_A_More_Efficient_Flood_Fill.html
 void _fill4(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
-            Uint8List visited) {
+    Uint8List visited) {
   if (visited[y * src.width + x] == 1) {
     return;
   }
@@ -141,7 +139,7 @@ void _fill4(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
 }
 
 void _fill4Core(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
-                Uint8List visited) {
+    Uint8List visited) {
   if (visited[y * src.width + x] == 1) {
     return;
   }
@@ -210,7 +208,7 @@ void _fill4Core(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
     // of the single cell at the end of the second row, i.e. at (4,1)
     if (rowLength < lastRowLength) {
       // 'end' is the end of the previous row, so scan the current row to
-      for (int end = x + lastRowLength; ++sx < end; ) {
+      for (int end = x + lastRowLength; ++sx < end;) {
         // there. any clear cells would have been connected to the previous
         if (!array(y, sx)) {
           // row. the cells up and left must be set so use FillCore

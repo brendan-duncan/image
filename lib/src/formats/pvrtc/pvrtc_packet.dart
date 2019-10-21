@@ -119,13 +119,13 @@ class PvrtcPacket {
       var r = colorA >> 9;
       var g = colorA >> 4 & 0x1f;
       var b = colorA & 0xf;
-      return new PvrtcColorRgb(BitUtility.BITSCALE_5_TO_8[r],
+      return PvrtcColorRgb(BitUtility.BITSCALE_5_TO_8[r],
           BitUtility.BITSCALE_5_TO_8[g], BitUtility.BITSCALE_4_TO_8[b]);
     } else {
       var r = (colorA >> 7) & 0xf;
       var g = (colorA >> 3) & 0xf;
       var b = colorA & 7;
-      return new PvrtcColorRgb(BitUtility.BITSCALE_4_TO_8[r],
+      return PvrtcColorRgb(BitUtility.BITSCALE_4_TO_8[r],
           BitUtility.BITSCALE_4_TO_8[g], BitUtility.BITSCALE_3_TO_8[b]);
     }
   }
@@ -135,14 +135,14 @@ class PvrtcPacket {
       var r = colorA >> 9;
       var g = colorA >> 4 & 0x1f;
       var b = colorA & 0xf;
-      return new PvrtcColorRgba(BitUtility.BITSCALE_5_TO_8[r],
+      return PvrtcColorRgba(BitUtility.BITSCALE_5_TO_8[r],
           BitUtility.BITSCALE_5_TO_8[g], BitUtility.BITSCALE_4_TO_8[b], 255);
     } else {
       var a = colorA >> 11 & 7;
       var r = (colorA >> 7) & 0xf;
       var g = (colorA >> 3) & 0xf;
       var b = colorA & 7;
-      return new PvrtcColorRgba(
+      return PvrtcColorRgba(
           BitUtility.BITSCALE_4_TO_8[r],
           BitUtility.BITSCALE_4_TO_8[g],
           BitUtility.BITSCALE_3_TO_8[b],
@@ -155,13 +155,13 @@ class PvrtcPacket {
       var r = colorB >> 10;
       var g = colorB >> 5 & 0x1f;
       var b = colorB & 0x1f;
-      return new PvrtcColorRgb(BitUtility.BITSCALE_5_TO_8[r],
+      return PvrtcColorRgb(BitUtility.BITSCALE_5_TO_8[r],
           BitUtility.BITSCALE_5_TO_8[g], BitUtility.BITSCALE_5_TO_8[b]);
     } else {
       var r = colorB >> 8 & 0xf;
       var g = colorB >> 4 & 0xf;
       var b = colorB & 0xf;
-      return new PvrtcColorRgb(BitUtility.BITSCALE_4_TO_8[r],
+      return PvrtcColorRgb(BitUtility.BITSCALE_4_TO_8[r],
           BitUtility.BITSCALE_4_TO_8[g], BitUtility.BITSCALE_4_TO_8[b]);
     }
   }
@@ -171,14 +171,14 @@ class PvrtcPacket {
       var r = colorB >> 10;
       var g = colorB >> 5 & 0x1f;
       var b = colorB & 0x1f;
-      return new PvrtcColorRgba(BitUtility.BITSCALE_5_TO_8[r],
+      return PvrtcColorRgba(BitUtility.BITSCALE_5_TO_8[r],
           BitUtility.BITSCALE_5_TO_8[g], BitUtility.BITSCALE_5_TO_8[b], 255);
     } else {
       var a = colorB >> 12 & 7;
       var r = colorB >> 8 & 0xf;
       var g = colorB >> 4 & 0xf;
       var b = colorB & 0xf;
-      return new PvrtcColorRgba(
+      return PvrtcColorRgba(
           BitUtility.BITSCALE_4_TO_8[r],
           BitUtility.BITSCALE_4_TO_8[g],
           BitUtility.BITSCALE_4_TO_8[b],
@@ -218,41 +218,41 @@ class PvrtcPacket {
   static const BITS_14 = (1 << 14) - 1;
   static const BITS_15 = (1 << 15) - 1;
 
-  static const BILINEAR_FACTORS = const [
-    const [4, 4, 4, 4],
-    const [2, 6, 2, 6],
-    const [8, 0, 8, 0],
-    const [6, 2, 6, 2],
-    const [2, 2, 6, 6],
-    const [1, 3, 3, 9],
-    const [4, 0, 12, 0],
-    const [3, 1, 9, 3],
-    const [8, 8, 0, 0],
-    const [4, 12, 0, 0],
-    const [16, 0, 0, 0],
-    const [12, 4, 0, 0],
-    const [6, 6, 2, 2],
-    const [3, 9, 1, 3],
-    const [12, 0, 4, 0],
-    const [9, 3, 3, 1],
+  static const BILINEAR_FACTORS = [
+    [4, 4, 4, 4],
+    [2, 6, 2, 6],
+    [8, 0, 8, 0],
+    [6, 2, 6, 2],
+    [2, 2, 6, 6],
+    [1, 3, 3, 9],
+    [4, 0, 12, 0],
+    [3, 1, 9, 3],
+    [8, 8, 0, 0],
+    [4, 12, 0, 0],
+    [16, 0, 0, 0],
+    [12, 4, 0, 0],
+    [6, 6, 2, 2],
+    [3, 9, 1, 3],
+    [12, 0, 4, 0],
+    [9, 3, 3, 1],
   ];
 
   // Weights are { colorA, colorB, alphaA, alphaB }
-  static const WEIGHTS = const [
+  static const WEIGHTS = [
     // Weights for Mode=0
-    const [8, 0, 8, 0],
-    const [5, 3, 5, 3],
-    const [3, 5, 3, 5],
-    const [0, 8, 0, 8],
+    [8, 0, 8, 0],
+    [5, 3, 5, 3],
+    [3, 5, 3, 5],
+    [0, 8, 0, 8],
 
     // Weights for Mode=1
-    const [8, 0, 8, 0],
-    const [4, 4, 4, 4],
-    const [4, 4, 0, 0],
-    const [0, 8, 0, 8],
+    [8, 0, 8, 0],
+    [4, 4, 4, 4],
+    [4, 4, 0, 0],
+    [0, 8, 0, 8],
   ];
 
-  static const MORTON_TABLE = const [
+  static const MORTON_TABLE = [
     0x0000,
     0x0001,
     0x0004,

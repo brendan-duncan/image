@@ -130,7 +130,7 @@ class VP8L {
       case VP8LTransform.SUBTRACT_GREEN:
         break;
       default:
-        throw new ImageException('Invalid WebP tranform type: $type');
+        throw ImageException('Invalid WebP tranform type: $type');
     }
 
     return ok;
@@ -146,7 +146,7 @@ class VP8L {
       while (br.readBits(1) != 0) {
         List<int> sizes = [transformXsize, transformYsize];
         if (!_readTransform(sizes)) {
-          throw new ImageException('Invalid Transform');
+          throw ImageException('Invalid Transform');
         }
         transformXsize = sizes[0];
         transformYsize = sizes[1];
@@ -158,14 +158,14 @@ class VP8L {
       colorCacheBits = br.readBits(4);
       bool ok = (colorCacheBits >= 1 && colorCacheBits <= MAX_CACHE_BITS);
       if (!ok) {
-        throw new ImageException('Invalid Color Cache');
+        throw ImageException('Invalid Color Cache');
       }
     }
 
     // Read the Huffman codes (may recurse).
     if (!_readHuffmanCodes(
         transformXsize, transformYsize, colorCacheBits, isLevel0)) {
-      throw new ImageException('Invalid Huffman Codes');
+      throw ImageException('Invalid Huffman Codes');
     }
 
     // Finish setting up the color-cache
@@ -194,7 +194,7 @@ class VP8L {
     // Use the Huffman trees to decode the LZ77 encoded data.
     if (!_decodeImageData(
         data, transformXsize, transformYsize, transformYsize, null)) {
-      throw new ImageException('Failed to decode image data.');
+      throw ImageException('Failed to decode image data.');
     }
 
     // Reset for future DECODE_DATA_FUNC() calls.
@@ -203,8 +203,8 @@ class VP8L {
     return data;
   }
 
-  bool _decodeImageData(dynamic data, int width, int height, int lastRow,
-                        dynamic processFunc) {
+  bool _decodeImageData(
+      dynamic data, int width, int height, int lastRow, dynamic processFunc) {
     int row = _lastPixel ~/ width;
     int col = _lastPixel % width;
 
@@ -620,7 +620,7 @@ class VP8L {
           codeLengths, codes, symbols, alphabetSize, numSymbols);
     } else {
       // Decode Huffman-coded code lengths.
-      Int32List codeLengthCodeLengths = new Int32List(_NUM_CODE_LENGTH_CODES);
+      Int32List codeLengthCodeLengths = Int32List(_NUM_CODE_LENGTH_CODES);
 
       final int numCodes = br.readBits(4) + 4;
       if (numCodes > _NUM_CODE_LENGTH_CODES) {
@@ -789,7 +789,7 @@ class VP8L {
 
   static const int _NUM_CODE_LENGTH_CODES = 19;
 
-  static const List<int> _CODE_LENGTH_CODE_ORDER = const [
+  static const List<int> _CODE_LENGTH_CODE_ORDER = [
     17,
     18,
     0,
@@ -812,7 +812,7 @@ class VP8L {
   ];
 
   static const int _CODE_TO_PLANE_CODES = 120;
-  static const List<int> _CODE_TO_PLANE = const [
+  static const List<int> _CODE_TO_PLANE = [
     0x18,
     0x07,
     0x17,
@@ -937,10 +937,10 @@ class VP8L {
 
   static const int _CODE_LENGTH_LITERALS = 16;
   static const int _CODE_LENGTH_REPEAT_CODE = 16;
-  static const List<int> _CODE_LENGTH_EXTRA_BITS = const [2, 3, 7];
-  static const List<int> _CODE_LENGTH_REPEAT_OFFSETS = const [3, 3, 11];
+  static const List<int> _CODE_LENGTH_EXTRA_BITS = [2, 3, 7];
+  static const List<int> _CODE_LENGTH_REPEAT_OFFSETS = [3, 3, 11];
 
-  static const List<int> ALPHABET_SIZE = const [
+  static const List<int> ALPHABET_SIZE = [
     NUM_LITERAL_CODES + NUM_LENGTH_CODES,
     NUM_LITERAL_CODES,
     NUM_LITERAL_CODES,
@@ -1004,7 +1004,7 @@ class InternalVP8L extends VP8L {
   set ioHeight(int height) => _ioHeight = height;
 
   bool decodeImageData(dynamic data, int width, int height, int lastRow,
-                       dynamic processFunc) =>
+          dynamic processFunc) =>
       _decodeImageData(data, width, height, lastRow, processFunc);
 
   Uint32List decodeImageStream(int xsize, int ysize, bool isLevel0) =>

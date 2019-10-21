@@ -93,11 +93,11 @@ class WebPDecoder extends Decoder {
     if (_info.format == WebPInfo.FORMAT_LOSSLESS) {
       InputBuffer data =
           _input.subset(_info.vp8Size, position: _info.vp8Position);
-      return new VP8L(data, _info).decode();
+      return VP8L(data, _info).decode();
     } else if (_info.format == WebPInfo.FORMAT_LOSSY) {
       InputBuffer data =
           _input.subset(_info.vp8Size, position: _info.vp8Position);
-      return new VP8(data, _info).decode();
+      return VP8(data, _info).decode();
     }
 
     return null;
@@ -193,9 +193,9 @@ class WebPDecoder extends Decoder {
     } else {
       InputBuffer data = input.subset(webp.vp8Size, position: webp.vp8Position);
       if (webp.format == WebPInfo.FORMAT_LOSSLESS) {
-        return new VP8L(data, webp).decode();
+        return VP8L(data, webp).decode();
       } else if (webp.format == WebPInfo.FORMAT_LOSSY) {
-        return new VP8(data, webp).decode();
+        return VP8(data, webp).decode();
       }
     }
 

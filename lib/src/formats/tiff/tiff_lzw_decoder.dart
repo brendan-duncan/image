@@ -13,7 +13,7 @@ class LzwDecoder {
     _bytePointer = p.offset;
 
     if (_data[0] == 0x00 && _data[1] == 0x01) {
-      throw new ImageException('Invalid LZW Data');
+      throw ImageException('Invalid LZW Data');
     }
 
     _initializeStringTable();
@@ -142,5 +142,5 @@ class LzwDecoder {
 
   static const int LZ_MAX_CODE = 4095;
   static const int NO_SUCH_CODE = 4098;
-  static const List<int> AND_TABLE = const [511, 1023, 2047, 4095];
+  static const List<int> AND_TABLE = [511, 1023, 2047, 4095];
 }

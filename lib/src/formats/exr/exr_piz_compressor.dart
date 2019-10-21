@@ -35,7 +35,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
   int numScanLines() => _numScanLines;
 
   Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
-    throw new ImageException('Piz compression not yet supported.');
+    throw ImageException('Piz compression not yet supported.');
   }
 
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
@@ -85,7 +85,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
     int maxNonZero = inPtr.readUint16();
 
     if (maxNonZero >= BITMAP_SIZE) {
-      throw new ImageException("Error in header for PIZ-compressed data "
+      throw ImageException("Error in header for PIZ-compressed data "
           "(invalid bitmap size).");
     }
 

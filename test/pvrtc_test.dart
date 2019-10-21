@@ -8,7 +8,7 @@ void main() {
       List<int> bytes = File('test/res/tga/globe.tga').readAsBytesSync();
       Image image = TgaDecoder().decodeImage(bytes);
 
-      new File('out/pvrtc/globe_before.png')
+      File('out/pvrtc/globe_before.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -17,22 +17,21 @@ void main() {
 
       Image decoded =
           PvrtcDecoder().decodeRgb4bpp(image.width, image.height, pvrtc);
-      new File('out/pvrtc/globe_after.png')
+      File('out/pvrtc/globe_after.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
 
       List<int> pvr = PvrtcEncoder().encodePvr(image);
-      new File('out/pvrtc/globe.pvr')
+      File('out/pvrtc/globe.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
     });
 
     test('encode_rgba_4bpp', () {
-      List<int> bytes =
-          File('test/res/png/alpha_edge.png').readAsBytesSync();
+      List<int> bytes = File('test/res/png/alpha_edge.png').readAsBytesSync();
       Image image = PngDecoder().decodeImage(bytes);
 
-      new File('out/pvrtc/alpha_before.png')
+      File('out/pvrtc/alpha_before.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -41,12 +40,12 @@ void main() {
 
       Image decoded =
           PvrtcDecoder().decodeRgba4bpp(image.width, image.height, pvrtc);
-      new File('out/pvrtc/alpha_after.png')
+      File('out/pvrtc/alpha_after.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
 
       List<int> pvr = PvrtcEncoder().encodePvr(image);
-      new File('out/pvrtc/alpha.pvr')
+      File('out/pvrtc/alpha.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
     });
@@ -59,12 +58,12 @@ void main() {
       if (f is! File || !f.path.endsWith('.pvr')) {
         continue;
       }
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test(name, () {
         List<int> bytes = (f as File).readAsBytesSync();
         Image img = PvrtcDecoder().decodePvr(bytes);
         assert(img != null);
-        new File('out/pvrtc/pvr_$name.png')
+        File('out/pvrtc/pvr_$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(img));
       });

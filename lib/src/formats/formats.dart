@@ -90,28 +90,28 @@ Animation decodeAnimation(List<int> data) {
 Decoder getDecoderForNamedImage(String name) {
   String n = name.toLowerCase();
   if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
-    return new JpegDecoder();
+    return JpegDecoder();
   }
   if (n.endsWith('.png')) {
-    return new PngDecoder();
+    return PngDecoder();
   }
   if (n.endsWith('.tga')) {
-    return new TgaDecoder();
+    return TgaDecoder();
   }
   if (n.endsWith('.webp')) {
-    return new WebPDecoder();
+    return WebPDecoder();
   }
   if (n.endsWith('.gif')) {
-    return new GifDecoder();
+    return GifDecoder();
   }
   if (n.endsWith('.tif') || n.endsWith('.tiff')) {
-    return new TiffDecoder();
+    return TiffDecoder();
   }
   if (n.endsWith('.psd')) {
-    return new PsdDecoder();
+    return PsdDecoder();
   }
   if (n.endsWith('.exr')) {
-    return new ExrDecoder();
+    return ExrDecoder();
   }
   return null;
 }
@@ -159,7 +159,7 @@ List<int> encodeNamedImage(Image image, String name) {
 
 /// Decode a JPG formatted image.
 Image decodeJpg(List<int> bytes) {
-  return new JpegDecoder().decodeImage(bytes);
+  return JpegDecoder().decodeImage(bytes);
 }
 
 /// Renamed to [decodeJpg], left for backward compatibility.
@@ -167,7 +167,7 @@ Image readJpg(List<int> bytes) => decodeJpg(bytes);
 
 /// Encode an image to the JPEG format.
 List<int> encodeJpg(Image image, {int quality = 100}) {
-  return new JpegEncoder(quality: quality).encodeImage(image);
+  return JpegEncoder(quality: quality).encodeImage(image);
 }
 
 /// Renamed to [encodeJpg], left for backward compatibility.
@@ -176,12 +176,12 @@ List<int> writeJpg(Image image, {int quality = 100}) =>
 
 /// Decode a PNG formatted image.
 Image decodePng(List<int> bytes) {
-  return new PngDecoder().decodeImage(bytes);
+  return PngDecoder().decodeImage(bytes);
 }
 
 /// Decode a PNG formatted animation.
 Animation decodePngAnimation(List<int> bytes) {
-  return new PngDecoder().decodeAnimation(bytes);
+  return PngDecoder().decodeAnimation(bytes);
 }
 
 /// Renamed to [decodePng], left for backward compatibility.
@@ -189,12 +189,12 @@ Image readPng(List<int> bytes) => decodePng(bytes);
 
 /// Encode an image to the PNG format.
 List<int> encodePng(Image image, {int level = 6}) {
-  return new PngEncoder(level: level).encodeImage(image);
+  return PngEncoder(level: level).encodeImage(image);
 }
 
 /// Encode an animation to the PNG format.
 List<int> encodePngAnimation(Animation anim, {int level = 6}) {
-  return new PngEncoder(level: level).encodeAnimation(anim);
+  return PngEncoder(level: level).encodeAnimation(anim);
 }
 
 /// Renamed to [encodePng], left for backward compatibility.
@@ -203,7 +203,7 @@ List<int> writePng(Image image, {int level = 6}) =>
 
 /// Decode a Targa formatted image.
 Image decodeTga(List<int> bytes) {
-  return new TgaDecoder().decodeImage(bytes);
+  return TgaDecoder().decodeImage(bytes);
 }
 
 /// Renamed to [decodeTga], left for backward compatibility.
@@ -211,7 +211,7 @@ Image readTga(List<int> bytes) => decodeTga(bytes);
 
 /// Encode an image to the Targa format.
 List<int> encodeTga(Image image) {
-  return new TgaEncoder().encodeImage(image);
+  return TgaEncoder().encodeImage(image);
 }
 
 /// Renamed to [encodeTga], left for backward compatibility.
@@ -219,55 +219,55 @@ List<int> writeTga(Image image) => encodeTga(image);
 
 /// Decode a WebP formatted image (first frame for animations).
 Image decodeWebP(List<int> bytes) {
-  return new WebPDecoder().decodeImage(bytes);
+  return WebPDecoder().decodeImage(bytes);
 }
 
 /// Decode an animated WebP file. If the webp isn't animated, the animation
 /// will contain a single frame with the webp's image.
 Animation decodeWebPAnimation(List<int> bytes) {
-  return new WebPDecoder().decodeAnimation(bytes);
+  return WebPDecoder().decodeAnimation(bytes);
 }
 
 /// Decode a GIF formatted image (first frame for animations).
 Image decodeGif(List<int> bytes) {
-  return new GifDecoder().decodeImage(bytes);
+  return GifDecoder().decodeImage(bytes);
 }
 
 /// Decode an animated GIF file. If the GIF isn't animated, the animation
 /// will contain a single frame with the GIF's image.
 Animation decodeGifAnimation(List<int> bytes) {
-  return new GifDecoder().decodeAnimation(bytes);
+  return GifDecoder().decodeAnimation(bytes);
 }
 
 /// Encode an image to the GIF format.
 List<int> encodeGif(Image image) {
-  return new GifEncoder().encodeImage(image);
+  return GifEncoder().encodeImage(image);
 }
 
 /// Encode an animation to the GIF format.
 List<int> encodeGifAnimation(Animation anim) {
-  return new GifEncoder().encodeAnimation(anim);
+  return GifEncoder().encodeAnimation(anim);
 }
 
 /// Decode a TIFF formatted image.
 Image decodeTiff(List<int> bytes) {
-  return new TiffDecoder().decodeImage(bytes);
+  return TiffDecoder().decodeImage(bytes);
 }
 
 /// Decode an multi-image (animated) TIFF file. If the tiff doesn't have
 /// multiple images, the animation will contain a single frame with the tiff's
 /// image.
 Animation decodeTiffAnimation(List<int> bytes) {
-  return new TiffDecoder().decodeAnimation(bytes);
+  return TiffDecoder().decodeAnimation(bytes);
 }
 
 /// Decode a Photoshop PSD formatted image.
 Image decodePsd(List<int> bytes) {
-  return new PsdDecoder().decodeImage(bytes);
+  return PsdDecoder().decodeImage(bytes);
 }
 
 /// Decode an OpenEXR formatted image, tone-mapped using the
 /// given [exposure] to a low-dynamic-range [Image].
 Image decodeExr(List<int> bytes, {double exposure = 1.0}) {
-  return new ExrDecoder(exposure: exposure).decodeImage(bytes);
+  return ExrDecoder(exposure: exposure).decodeImage(bytes);
 }

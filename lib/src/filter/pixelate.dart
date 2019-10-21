@@ -5,6 +5,7 @@ import '../draw/fill_rect.dart';
 enum PixelateMode {
   /// Use the top-left pixel of a block for the block color.
   upperLeft,
+
   /// Use the average of the pixels within a block for the block color.
   average
 }
@@ -16,7 +17,7 @@ enum PixelateMode {
 /// will be used for the block color. Otherwise if [mode] is [PixelateMode.average],
 /// the average of all the pixels in the block will be used for the block color.
 Image pixelate(Image src, int blockSize,
-              {PixelateMode mode = PixelateMode.upperLeft}) {
+    {PixelateMode mode = PixelateMode.upperLeft}) {
   if (blockSize <= 1) {
     return src;
   }

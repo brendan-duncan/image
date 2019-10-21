@@ -15,16 +15,16 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(new RegExp(r'(/|\\)')).last;
+      String name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
         Image image = TgaDecoder().decodeImage(bytes);
         if (image == null) {
-          throw new ImageException('Unable to decode TGA Image: $name.');
+          throw ImageException('Unable to decode TGA Image: $name.');
         }
 
         List<int> png = PngEncoder().encodeImage(image);
-        new File('out/tga/${name}.png')
+        File('out/tga/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });
@@ -41,7 +41,7 @@ void main() {
       // Encode the image as a tga
       List<int> tga = TgaEncoder().encodeImage(image);
 
-      new File('out/globe.tga')
+      File('out/globe.tga')
         ..createSync(recursive: true)
         ..writeAsBytesSync(tga);
 

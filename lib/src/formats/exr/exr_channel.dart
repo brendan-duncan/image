@@ -80,7 +80,7 @@ class ExrChannel {
         size = 4;
         break;
       default:
-        throw new ImageException('EXR Invalid pixel type: $type');
+        throw ImageException('EXR Invalid pixel type: $type');
     }
   }
 

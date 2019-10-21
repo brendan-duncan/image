@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('filter', () {
-    var image = readJpg(new File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
+    var image = readJpg(File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
     image = copyResize(image, width: 400);
-    var image2 = readPng(new File('test/res/png/alpha_edge.png').readAsBytesSync());
+    var image2 = readPng(File('test/res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       Image f = Image(10, 10, channels: Channels.rgb);
@@ -26,7 +26,7 @@ void main() {
     });
 
     test('floodFill', () {
-      Image s = readJpg(new File('test/res/oblique.jpg').readAsBytesSync());
+      Image s = readJpg(File('test/res/oblique.jpg').readAsBytesSync());
       int c = s.getPixel(50, 50);
       fillFlood(s, 50, 50, c, threshold: 15.6);
       File fp = File('out/fillFlood.jpg');
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('copyRectify', () {
-      Image s = readJpg(new File('test/res/oblique.jpg').readAsBytesSync());
+      Image s = readJpg(File('test/res/oblique.jpg').readAsBytesSync());
       Image d = Image(92, 119);
       copyRectify(s,
           topLeft: Point(16, 32),
@@ -50,13 +50,13 @@ void main() {
 
     test('copyInto', () {
       Image s = Image.from(image);
-      Image d = Image(image.width + 20, image.height + 20,
-          channels: image.channels);
+      Image d =
+          Image(image.width + 20, image.height + 20, channels: image.channels);
       fill(d, 0xff0000ff);
       copyInto(d, s, dstX: 10, dstY: 10);
       copyInto(d, image2, dstX: 10, dstY: 10);
 
-      new File('out/copyInto.jpg')
+      File('out/copyInto.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(d));
     });
@@ -204,7 +204,7 @@ void main() {
     });
 
     test('sobel', () {
-      var f = readPng(new File('test/res/png/lenna.png').readAsBytesSync());
+      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync());
       sobel(f);
 
       File fp = File('out/sobel.jpg');
@@ -312,8 +312,8 @@ void main() {
     test('remapColors', () {
       Image f = Image.from(image);
       f.channels = Channels.rgba;
-      remapColors(f, red: Channel.green, green: Channel.red,
-          alpha: Channel.luminance);
+      remapColors(f,
+          red: Channel.green, green: Channel.red, alpha: Channel.luminance);
 
       File fp = File('out/remapColors.jpg');
       fp.createSync(recursive: true);
@@ -384,7 +384,7 @@ void main() {
     });
 
     test('octree quantize', () {
-      var f = readPng(new File('test/res/png/lenna.png').readAsBytesSync());
+      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync());
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.octree);
       var colors = Set<int>();
@@ -399,7 +399,7 @@ void main() {
     });
 
     test('neural quantize', () {
-      var f = readPng(new File('test/res/png/lenna.png').readAsBytesSync());
+      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync());
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.neuralNet);
       var colors = Set<int>();
@@ -414,12 +414,11 @@ void main() {
     });
 
     test('trim', () {
-      Image image =
-          readPng(new File('test/res/png/trim.png').readAsBytesSync());
+      Image image = readPng(File('test/res/png/trim.png').readAsBytesSync());
       Image trimmed = trim(image, mode: TrimMode.transparent);
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));
-      new File('out/trim.png')
+      File('out/trim.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(trimmed));
     });
@@ -428,28 +427,28 @@ void main() {
       Image s = Image.from(image2);
       Image d = dropShadow(s, 5, 5, 10);
 
-      new File('out/dropShadow.png')
+      File('out/dropShadow.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
       s = Image.from(image2);
       d = dropShadow(s, -5, 5, 10);
 
-      new File('out/dropShadow-2.png')
+      File('out/dropShadow-2.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
       s = Image.from(image2);
       d = dropShadow(s, 5, -5, 10);
 
-      new File('out/dropShadow-3.png')
+      File('out/dropShadow-3.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
       s = Image.from(image2);
       d = dropShadow(s, -5, -5, 10);
 
-      new File('out/dropShadow-4.png')
+      File('out/dropShadow-4.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
@@ -458,7 +457,7 @@ void main() {
       drawString(s, arial_48, 30, 100, 'Shadow', color: getColor(255, 0, 0));
       d = dropShadow(s, -3, -3, 5);
 
-      new File('out/dropShadow-5.png')
+      File('out/dropShadow-5.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
     });

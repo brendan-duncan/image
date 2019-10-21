@@ -17,7 +17,7 @@ class OutputBuffer {
 
   /// Get the resulting bytes from the buffer.
   List<int> getBytes() {
-    return new Uint8List.view(_buffer.buffer, 0, length);
+    return Uint8List.view(_buffer.buffer, 0, length);
   }
 
   /// Clear the buffer.
@@ -95,7 +95,7 @@ class OutputBuffer {
       end = length + end;
     }
 
-    return new Uint8List.view(_buffer.buffer, start, end - start);
+    return Uint8List.view(_buffer.buffer, start, end - start);
   }
 
   /// Grow the buffer to accommodate additional data.

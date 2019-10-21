@@ -6,12 +6,16 @@ import 'internal/clamp.dart';
 enum Channel {
   /// Red channel of a color.
   red,
+
   /// Green channel of a color.
   green,
+
   /// Blue channel of a color.
   blue,
+
   /// Alpha channel of a color.
   alpha,
+
   /// Luminance (brightness) of a color.
   luminance
 }
@@ -90,21 +94,23 @@ int getColor(int r, int g, int b, [int a = 255]) =>
     (clamp255(r));
 
 /// Get the [channel] from the [color].
-int getChannel(int color, Channel channel) =>
-    channel == Channel.red ? getRed(color)
-    : channel == Channel.green ? getGreen(color)
-    : channel == Channel.blue ? getBlue(color)
-    : channel == Channel.alpha ? getAlpha(color)
-    : getLuminance(color);
+int getChannel(int color, Channel channel) => channel == Channel.red
+    ? getRed(color)
+    : channel == Channel.green
+        ? getGreen(color)
+        : channel == Channel.blue
+            ? getBlue(color)
+            : channel == Channel.alpha ? getAlpha(color) : getLuminance(color);
 
 /// Returns a new color, where the given [color]'s [channel] has been
 /// replaced with the given [value].
-int setChannel(int color, Channel channel, int value) =>
-    channel == Channel.red ? setRed(color, value)
-    : channel == Channel.green ? setGreen(color, value)
-    : channel == Channel.blue ? setBlue(color, value)
-    : channel == Channel.alpha ? setAlpha(color, value)
-    : color;
+int setChannel(int color, Channel channel, int value) => channel == Channel.red
+    ? setRed(color, value)
+    : channel == Channel.green
+        ? setGreen(color, value)
+        : channel == Channel.blue
+            ? setBlue(color, value)
+            : channel == Channel.alpha ? setAlpha(color, value) : color;
 
 /// Get the red channel from the [color].
 int getRed(int color) => (color) & 0xff;
@@ -203,8 +209,9 @@ List<int> hslToRgb(num hue, num saturation, num lightness) {
     return p;
   }
 
-  var q = lightness < 0.5 ? lightness * (1.0 + saturation)
-          : lightness + saturation - lightness * saturation;
+  var q = lightness < 0.5
+      ? lightness * (1.0 + saturation)
+      : lightness + saturation - lightness * saturation;
   var p = 2.0 * lightness - q;
 
   var r = hue2rgb(p, q, hue + 1.0 / 3.0);

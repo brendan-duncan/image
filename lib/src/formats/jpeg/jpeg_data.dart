@@ -109,7 +109,7 @@ class JpegData {
     _read();
 
     if (frames.length != 1) {
-      throw new ImageException('Only single frame JPEGs supported');
+      throw ImageException('Only single frame JPEGs supported');
     }
 
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
@@ -244,7 +244,7 @@ class JpegData {
         break;
       case 4:
         if (adobe == null) {
-          throw new ImageException('Unsupported color mode (4 components)');
+          throw ImageException('Unsupported color mode (4 components)');
         }
         // The default transform for four components is false
         colorTransform = false;
@@ -312,7 +312,7 @@ class JpegData {
         }
         break;
       default:
-        throw new ImageException('Unsupported color mode');
+        throw ImageException('Unsupported color mode');
     }
 
     return data;
@@ -322,7 +322,7 @@ class JpegData {
     int marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
       // SOI (Start of Image)
-      throw new ImageException('Start Of Image marker not found.');
+      throw ImageException('Start Of Image marker not found.');
     }
 
     marker = _nextMarker();
@@ -370,7 +370,7 @@ class JpegData {
         case Jpeg.M_SOF13:
         case Jpeg.M_SOF14:
         case Jpeg.M_SOF15:
-          throw new ImageException(
+          throw ImageException(
               'Unhandled frame type ${marker.toRadixString(16)}');
 
         case Jpeg.M_DHT: // DHT (Define Huffman Tables)
@@ -400,7 +400,7 @@ class JpegData {
           }
 
           if (marker != 0) {
-            throw new ImageException(
+            throw ImageException(
                 'Unknown JPEG marker ' + marker.toRadixString(16));
           }
           break;
@@ -413,7 +413,7 @@ class JpegData {
   void _skipBlock() {
     int length = input.readUint16();
     if (length < 2) {
-      throw new ImageException('Invalid Block');
+      throw ImageException('Invalid Block');
     }
     input.offset += length - 2;
   }
@@ -421,7 +421,7 @@ class JpegData {
   InputBuffer _readBlock() {
     int length = input.readUint16();
     if (length < 2) {
-      throw new ImageException('Invalid Block');
+      throw ImageException('Invalid Block');
     }
     return input.readBytes(length - 2);
   }
@@ -507,7 +507,7 @@ class JpegData {
     const TAG_INTEROP_OFFSET = 0xA005;
     const TAG_EXIF_OFFSET = 0x8769;
     const maxFormats = 12;
-    const bytesPerFormat = const [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
+    const bytesPerFormat = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
 
     for (int di = 0; di < numDirEntries; ++di) {
       int tag = block.readUint16();
@@ -652,7 +652,7 @@ class JpegData {
       n &= 0x0F;
 
       if (n >= Jpeg.NUM_QUANT_TBLS) {
-        throw new ImageException('Invalid number of quantization tables');
+        throw ImageException('Invalid number of quantization tables');
       }
 
       if (quantizationTables[n] == null) {
@@ -673,13 +673,13 @@ class JpegData {
     }
 
     if (!block.isEOS) {
-      throw new ImageException('Bad length for DQT block');
+      throw ImageException('Bad length for DQT block');
     }
   }
 
   void _readFrame(int marker, InputBuffer block) {
     if (frame != null) {
-      throw new ImageException('Duplicate JPG frame data found.');
+      throw ImageException('Duplicate JPG frame data found.');
     }
 
     frame = JpegFrame();
@@ -699,7 +699,7 @@ class JpegData {
       int qId = block.readByte();
       frame.componentsOrder.add(componentId);
       frame.components[componentId] =
-          new JpegComponent(h, v, quantizationTables, qId);
+          JpegComponent(h, v, quantizationTables, qId);
     }
 
     frame.prepare();
@@ -747,7 +747,7 @@ class JpegData {
   void _readSOS(InputBuffer block) {
     int n = block.readByte();
     if (n < 1 || n > Jpeg.MAX_COMPS_IN_SCAN) {
-      throw new ImageException('Invalid SOS block');
+      throw ImageException('Invalid SOS block');
     }
 
     final components = List<dynamic>(n);
@@ -756,7 +756,7 @@ class JpegData {
       int c = block.readByte();
 
       if (!frame.components.containsKey(id)) {
-        throw new ImageException('Invalid Component in SOS block');
+        throw ImageException('Invalid Component in SOS block');
       }
 
       JpegComponent component = frame.components[id];
@@ -780,7 +780,7 @@ class JpegData {
     int Ah = shiftR(successiveApproximation, 4) & 15;
     int Al = successiveApproximation & 15;
 
-    new JpegScan(input, frame, components, resetInterval, spectralStart,
+    JpegScan(input, frame, components, resetInterval, spectralStart,
             spectralEnd, Ah, Al)
         .decode();
   }
@@ -794,7 +794,7 @@ class JpegData {
       length--;
     }
 
-    code.add(new _JpegHuffman());
+    code.add(_JpegHuffman());
 
     _JpegHuffman p = code[0] as _JpegHuffman;
     _JpegHuffman q;
@@ -1076,7 +1076,7 @@ class JpegData {
     }
   }
 
-  static const CRR = const [
+  static const CRR = [
     -179,
     -178,
     -177,
@@ -1335,7 +1335,7 @@ class JpegData {
     178
   ];
 
-  static const CRG = const [
+  static const CRG = [
     5990656,
     5943854,
     5897052,
@@ -1594,7 +1594,7 @@ class JpegData {
     -5943854
   ];
 
-  static const CBG = const [
+  static const CBG = [
     2919680,
     2897126,
     2874572,
@@ -1853,7 +1853,7 @@ class JpegData {
     -2831590
   ];
 
-  static const CBB = const [
+  static const CBB = [
     -227,
     -225,
     -223,

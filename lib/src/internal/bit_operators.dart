@@ -16,7 +16,7 @@ int shiftL(int v, int n) {
   return (v << n).toSigned(32);
 }
 
-const List<int> SHIFT_BITS = const [
+const List<int> SHIFT_BITS = [
   1,
   2,
   4,

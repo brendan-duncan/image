@@ -6,8 +6,8 @@ CanvasElement canvas;
 DivElement logDiv;
 Image origImage;
 
-void _addControl(String label, String value, DivElement parent,
-                 dynamic callback) {
+void _addControl(
+    String label, String value, DivElement parent, dynamic callback) {
   LabelElement amountLabel = LabelElement();
   amountLabel.text = label + ':';
   var amountEdit = InputElement();
@@ -24,7 +24,7 @@ void _addControl(String label, String value, DivElement parent,
   amountLabel.htmlFor = label + '_edit';
   parent.append(amountLabel);
   parent.append(amountEdit);
-  parent.append(new ParagraphElement());
+  parent.append(ParagraphElement());
 }
 
 void testSepia() {
@@ -148,8 +148,8 @@ void testVignette() {
     image = vignette(image, start: start, end: end, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -192,8 +192,8 @@ void testPixelate() {
     image = pixelate(image, blockSize);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -226,12 +226,12 @@ void testColorOffset() {
     Stopwatch t = Stopwatch();
     t.start();
     Image image = Image.from(origImage);
-    image = colorOffset(image, red: red, green: green, blue: blue,
-        alpha: alpha);
+    image =
+        colorOffset(image, red: red, green: green, blue: blue, alpha: alpha);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.getBytes());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
     canvas.context2D.putImageData(filterImageData, 0, 0);

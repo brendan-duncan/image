@@ -4,7 +4,7 @@ class BitUtility {
   static int rotateRight(int value, int shift) =>
       (value >> shift) | (value << (32 - shift));
 
-  static const List<int> BITSCALE_5_TO_8 = const [
+  static const List<int> BITSCALE_5_TO_8 = [
     0,
     8,
     16,
@@ -39,7 +39,7 @@ class BitUtility {
     255
   ];
 
-  static const List<int> BITSCALE_4_TO_8 = const [
+  static const List<int> BITSCALE_4_TO_8 = [
     0,
     17,
     34,
@@ -58,18 +58,9 @@ class BitUtility {
     255
   ];
 
-  static const List<int> BITSCALE_3_TO_8 = const [
-    0,
-    36,
-    72,
-    109,
-    145,
-    182,
-    218,
-    255
-  ];
+  static const List<int> BITSCALE_3_TO_8 = [0, 36, 72, 109, 145, 182, 218, 255];
 
-  static const List<int> BITSCALE_8_TO_5_FLOOR = const [
+  static const List<int> BITSCALE_8_TO_5_FLOOR = [
     0,
     0,
     0,
@@ -328,7 +319,7 @@ class BitUtility {
     31
   ];
 
-  static const List<int> BITSCALE_8_TO_4_FLOOR = const [
+  static const List<int> BITSCALE_8_TO_4_FLOOR = [
     0,
     0,
     0,
@@ -587,7 +578,7 @@ class BitUtility {
     15
   ];
 
-  static const List<int> BITSCALE_8_TO_3_FLOOR = const [
+  static const List<int> BITSCALE_8_TO_3_FLOOR = [
     0,
     0,
     0,
@@ -846,7 +837,7 @@ class BitUtility {
     7
   ];
 
-  static const List<int> BITSCALE_8_TO_5_CEIL = const [
+  static const List<int> BITSCALE_8_TO_5_CEIL = [
     0,
     1,
     1,
@@ -1105,7 +1096,7 @@ class BitUtility {
     31
   ];
 
-  static const List<int> BITSCALE_8_TO_4_CEIL = const [
+  static const List<int> BITSCALE_8_TO_4_CEIL = [
     0,
     1,
     1,
@@ -1364,7 +1355,7 @@ class BitUtility {
     15
   ];
 
-  static const List<int> BITSCALE_8_TO_3_CEIL = const [
+  static const List<int> BITSCALE_8_TO_3_CEIL = [
     0,
     1,
     1,

@@ -345,7 +345,7 @@ class GifEncoder extends Encoder {
   static const int EOF = -1;
   static const int BITS = 12;
   static const int HSIZE = 5003; // 80% occupancy
-  static const List<int> MASKS = const [
+  static const List<int> MASKS = [
     0x0000,
     0x0001,
     0x0003,

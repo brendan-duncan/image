@@ -46,7 +46,7 @@ class HdrImage {
       return;
     }
 
-    const List<String> channelList = const [R, G, B, A];
+    const List<String> channelList = [R, G, B, A];
     for (int i = 0; i < channels; ++i) {
       addSlice(HdrSlice(channelList[i], width, height, format));
     }

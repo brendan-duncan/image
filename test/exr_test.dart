@@ -9,7 +9,7 @@ void main() {
   Image img = dec.decodeFrame(0);
 
   List<int> png = PngEncoder().encodeImage(img);
-  new File('out/exr/grid.png')
+  File('out/exr/grid.png')
     ..createSync(recursive: true)
     ..writeAsBytesSync(png);
 }

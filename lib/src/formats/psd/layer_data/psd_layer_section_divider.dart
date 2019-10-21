@@ -25,7 +25,7 @@ class PsdLayerSectionDivider extends PsdLayerData {
     if (len >= 12) {
       String sig = data.readString(4);
       if (sig != '8BIM') {
-        throw new ImageException('Invalid key in layer additional data');
+        throw ImageException('Invalid key in layer additional data');
       }
       key = data.readString(4);
     }
