@@ -1,3 +1,7 @@
+## 2.1.5
+
+- Updated some tests to use `test`-syntax.
+
 ## 2.1.4 - June 01, 2019
 
 - Optimize fillRect, drawPixel, and other drawing functions when opaque colors are used.
