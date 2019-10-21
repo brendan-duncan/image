@@ -1,5 +1,6 @@
 ## 2.1.5
 
+- Updated some tests to use `test`-syntax.
 - Fixed null value in `GifEncoder`.
 - Added Dart syntax highlighting in the readme file.
 - Formatted package using `dartfmt`.
