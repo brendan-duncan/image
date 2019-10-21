@@ -4,6 +4,8 @@
 - Added Dart syntax highlighting in the readme file.
 - Formatted package using `dartfmt`.
 - Fixed "Unnecessary new" and other Dart analyzer warnings.
+- Added the `samplingFactor` parameter to GIF encoding, which allows to significantly speed up
+  encoding times of GIF encoding. 
 
 ## 2.1.4 - June 01, 2019
 
@@ -136,7 +138,7 @@ Update SDK dependency to a 2.0 development release.
 
 ## 1.1.18 - April 06, 2014
 
-- Added OpenEXR format docoder.
+- Added OpenEXR format decoder.
 
 
 ## 1.1.17 - April 02, 2014

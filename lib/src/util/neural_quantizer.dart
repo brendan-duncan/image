@@ -34,7 +34,10 @@ import 'quantizer.dart';
 class NeuralQuantizer extends Quantizer {
   Uint8List colorMap;
 
-  NeuralQuantizer(Image image, {int numberOfColors = 256}) {
+  int samplingFactor;
+
+  /// 10 is a reasonable [samplingFactor] according to https://scientificgems.wordpress.com/stuff/neuquant-fast-high-quality-image-quantization/.
+  NeuralQuantizer(Image image, {int numberOfColors = 256, this.samplingFactor = 10}) {
     if (image.width * image.height < MAX_PRIME) {
       throw ImageException('Image is too small');
     }
@@ -261,9 +264,9 @@ class NeuralQuantizer extends Quantizer {
 
   void _learn(Image image) {
     int biasRadius = INIT_BIAS_RADIUS;
-    int alphadec = 30 + ((_sampleFac - 1) ~/ 3);
+    int alphadec = 30 + ((samplingFactor - 1) ~/ 3);
     int lengthCount = image.length;
-    int samplePixels = lengthCount ~/ _sampleFac;
+    int samplePixels = lengthCount ~/ samplingFactor;
     int delta = samplePixels ~/ NUM_CYCLES;
     int alpha = INIT_ALPHA;
 
@@ -496,6 +499,4 @@ class NeuralQuantizer extends Quantizer {
   static const int PRIME3 = 487;
   static const int PRIME4 = 503;
   static const int MAX_PRIME = PRIME4;
-
-  int _sampleFac = 1;
 }
