@@ -15,7 +15,7 @@ class BitmapFileHeader {
   int offset;
   BitmapFileHeader(InputBuffer b) {
     if (!isValidFile(b)) {
-      throw 'Not a bitmap file.';
+      throw ImageException('Not a bitmap file.');
     }
     b.skip(2);
 
@@ -80,7 +80,8 @@ class BmpInfo extends DecodeInfo {
     };
     final compression = map[compIndex];
     if (compression == null) {
-      throw "Bitmap compression $compIndex is not supported yet.";
+      throw ImageException(
+          "Bitmap compression $compIndex is not supported yet.");
     }
     return compression;
   }
@@ -109,7 +110,8 @@ class BmpInfo extends DecodeInfo {
     //   return _rgbaFrom16(input);
     // }
     else {
-      throw 'Unsupported bpp ($bpp) or compression unsupported.';
+      throw ImageException(
+          'Unsupported bpp ($bpp) or compression unsupported.');
     }
   }
 
