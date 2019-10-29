@@ -1,3 +1,7 @@
+## 2.1.6 - October 29, 2019
+
+- Add BMP decoder, currently only supporting 24-bit and 32-bit non compressed BMP images. (Thanks Ryan Kauk)
+
 ## 2.1.5
 
 - Updated some tests to use `test`-syntax.
