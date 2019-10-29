@@ -48,9 +48,8 @@ class BmpDecoder extends Decoder {
     for (int y = image.height - 1; y >= 0; --y) {
       InputBuffer row = _input.readBytes(rowStride);
       for (int x = 0; x < image.width; ++x) {
-        final colors = info.decodeRgba(row);
-        image.setPixel(
-            x, y, getColor(colors[0], colors[1], colors[2], colors[3]));
+        final color = info.decodeRgba(row);
+        image.setPixel(x, y, color);
       }
     }
 

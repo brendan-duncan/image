@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:image/image.dart';
+
 import '../../formats/decode_info.dart';
 
 import '../../util/input_buffer.dart';
@@ -83,25 +85,25 @@ class BmpInfo extends DecodeInfo {
     return compression;
   }
 
-  List<int> decodeRgba(InputBuffer input) {
+  int decodeRgba(InputBuffer input) {
     if (this.compression == BitmapCompression.BI_BITFIELDS && bpp == 32) {
       final a = input.readByte();
       final b = input.readByte();
       final g = input.readByte();
       final r = input.readByte();
-      return [r, g, b, a];
+      return getColor(r, g, b, a);
     } else if (bpp == 32 && compression == BitmapCompression.NONE) {
       final b = input.readByte();
       final g = input.readByte();
       final r = input.readByte();
       final a = input.readByte();
-      return [r, g, b, a];
+      return getColor(r, g, b, a);
     } else if (bpp == 24) {
       final b = input.readByte();
       final g = input.readByte();
       final r = input.readByte();
-      final a = 0;
-      return [r, g, b, a];
+      final a = 255;
+      return getColor(r, g, b, a);
     }
     // else if (bpp == 16) {
     //   return _rgbaFrom16(input);
