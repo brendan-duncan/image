@@ -83,24 +83,25 @@ class BmpInfo extends DecodeInfo {
     return compression;
   }
 
-  final R = 'R';
-  final G = 'G';
-  final B = 'B';
-  final A = 'A';
-
   List<int> decodeRgba(InputBuffer input) {
     if (this.compression == BitmapCompression.BI_BITFIELDS && bpp == 32) {
-      return _rgba(input, [A, B, G, R]);
+      final a = input.readByte();
+      final b = input.readByte();
+      final g = input.readByte();
+      final r = input.readByte();
+      return [r, g, b, a];
     } else if (bpp == 32 && compression == BitmapCompression.NONE) {
-      return _rgba(input, [B, G, R, A], defaults: {A: 0});
+      final b = input.readByte();
+      final g = input.readByte();
+      final r = input.readByte();
+      final a = input.readByte();
+      return [r, g, b, a];
     } else if (bpp == 24) {
-      return _rgba(input, [
-        B,
-        G,
-        R,
-      ], defaults: {
-        A: 0
-      });
+      final b = input.readByte();
+      final g = input.readByte();
+      final r = input.readByte();
+      final a = 0;
+      return [r, g, b, a];
     }
     // else if (bpp == 16) {
     //   return _rgbaFrom16(input);
@@ -118,16 +119,6 @@ class BmpInfo extends DecodeInfo {
     final pixel = input.readUint16();
 
     return [(pixel & maskRed), (pixel & maskGreen), (pixel & maskBlue), 0];
-  }
-
-  // defaults do not move any bytes
-  List<int> _rgba(InputBuffer input, List<String> order,
-      {Map<String, int> defaults = const {}}) {
-    defaults.keys.forEach((k) => !order.contains(k) ? order.add(k) : null);
-    final lookup = <String, int>{};
-    order.forEach((k) => lookup[k] = defaults[k] ?? input.readByte());
-
-    return [lookup[R], lookup[G], lookup[B], lookup[A]];
   }
 
   String _compToString() {

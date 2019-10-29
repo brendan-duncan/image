@@ -305,6 +305,6 @@ Image decodeExr(List<int> bytes, {double exposure = 1.0}) {
 
 /// Decode an OpenEXR formatted image, tone-mapped using the
 /// given [exposure] to a low-dynamic-range [Image].
-Image decodeBmp(List<int> bytes, {double exposure = 1.0}) {
+Image decodeBmp(List<int> bytes) {
   return BmpDecoder().decodeImage(bytes);
 }

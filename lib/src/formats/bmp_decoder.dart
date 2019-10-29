@@ -26,7 +26,6 @@ class BmpDecoder extends Decoder {
     if (!isValidFile(bytes)) return null;
     _input = InputBuffer(Uint8List.fromList(bytes));
     info = BmpInfo(_input);
-    print(info);
 
     return info;
   }
@@ -37,15 +36,19 @@ class BmpDecoder extends Decoder {
   /// is returned, which provides the image, and top-left coordinates of the
   /// image, as animated frames may only occupy a subset of the canvas.
   Image decodeFrame(int frame) {
-    _input.offset =
-        info.compression == BitmapCompression.BI_BITFIELDS && info.bpp == 16
-            ? info.file.offset + 16
-            : info.file.offset;
+    _input.offset = info.file.offset;
+    int bytesPerPixel = info.bpp >> 3;
+    int rowStride = (info.width * bytesPerPixel);
+    while (rowStride % 4 != 0) {
+      rowStride++;
+    }
 
     Image image = Image(info.width, info.height, channels: Channels.rgb);
+
     for (int y = image.height - 1; y >= 0; --y) {
+      InputBuffer row = _input.readBytes(rowStride);
       for (int x = 0; x < image.width; ++x) {
-        final colors = info.decodeRgba(_input);
+        final colors = info.decodeRgba(row);
         image.setPixel(
             x, y, getColor(colors[0], colors[1], colors[2], colors[3]));
       }
