@@ -20,24 +20,25 @@ class IcoEncoder extends Encoder {
     out.writeUint16(1); // type: ICO => 1; CUR => 2
     out.writeUint16(count);
 
-    int offset = 6 + count * 16;
+    int offset = 6 + count * 16; // file header with image directory byte size
 
     List<List<int>> imageDatas = [];
 
     for (Image img in images) {
-      out.writeByte(img.width);
-      out.writeByte(img.height);
-      out.writeByte(32); // number of colors in the color palette
-      out.writeByte(0);
-      out.writeUint16(0); // TODO 0 or 1, maybe change
-      out.writeUint16(8); // TODO bits per pixel
+      out.writeByte(img.width); // image width in pixels
+      out.writeByte(img.height); // image height in pixels
+      out.writeByte(0); // Color count, should be 0 if more than 256 colors https://fileformats.fandom.com/wiki/Icon
+      out.writeByte(0); // Reserved
+      out.writeUint16(0); // Color planes
+      out.writeUint16(32); // bits per pixel
 
-      List<int> data = PngEncoder().encodeImage(img);
+      List<int> data =
+          PngEncoder().encodeImage(img); // Use png instead of bmp encoded data, it's supported since Windows Vista
 
-      out.writeUint32(data.length * 8);
-      out.writeUint32(offset);
+      out.writeUint32(data.length); // size of the image's data in bytes
+      out.writeUint32(offset); // offset of data from the beginning of the file
 
-      offset += data.length;
+      offset += data.length; // add the size of bytes to get the new begin of the next image
       imageDatas.add(data);
     }
 
