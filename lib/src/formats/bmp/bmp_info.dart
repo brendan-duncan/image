@@ -4,7 +4,7 @@ import '../../formats/decode_info.dart';
 
 import '../../util/input_buffer.dart';
 
-enum BitmapCompression { BI_BITFIELDS, RLE_8, RLE_4, NONE }
+enum BitmapCompression { BI_BITFIELDS, NONE }
 
 class BitmapFileHeader {
   int fileLength;
@@ -136,10 +136,6 @@ class BmpInfo extends DecodeInfo {
         return 'BI_BITFIELDS';
       case BitmapCompression.NONE:
         return 'none';
-      case BitmapCompression.RLE_4:
-        return 'RLE-4';
-      case BitmapCompression.RLE_8:
-        return 'RLE-8';
     }
     return 'UNSUPPORTED: $compression';
   }
