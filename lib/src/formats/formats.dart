@@ -16,6 +16,7 @@ import 'tga_decoder.dart';
 import 'tga_encoder.dart';
 import 'tiff_decoder.dart';
 import 'webp_decoder.dart';
+import 'bmp_decoder.dart';
 
 /// Find a [Decoder] that is able to decode the given image [data].
 /// Use this is you don't know the type of image it is.
@@ -58,6 +59,11 @@ Decoder findDecoderForData(List<int> data) {
   ExrDecoder exr = ExrDecoder();
   if (exr.isValidFile(bytes)) {
     return exr;
+  }
+
+  BmpDecoder bmp = BmpDecoder();
+  if (bmp.isValidFile(bytes)) {
+    return bmp;
   }
 
   return null;
@@ -112,6 +118,9 @@ Decoder getDecoderForNamedImage(String name) {
   }
   if (n.endsWith('.exr')) {
     return ExrDecoder();
+  }
+  if (n.endsWith('.bmp')) {
+    return BmpDecoder();
   }
   return null;
 }
@@ -292,4 +301,10 @@ Image decodePsd(List<int> bytes) {
 /// given [exposure] to a low-dynamic-range [Image].
 Image decodeExr(List<int> bytes, {double exposure = 1.0}) {
   return ExrDecoder(exposure: exposure).decodeImage(bytes);
+}
+
+/// Decode an OpenEXR formatted image, tone-mapped using the
+/// given [exposure] to a low-dynamic-range [Image].
+Image decodeBmp(List<int> bytes, {double exposure = 1.0}) {
+  return BmpDecoder().decodeImage(bytes);
 }

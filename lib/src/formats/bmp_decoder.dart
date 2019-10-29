@@ -58,7 +58,7 @@ class BmpDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   Image decodeImage(List<int> data, {int frame = 0}) {
-    // if (!isValidFile(data)) return null;
+    if (!isValidFile(data)) return null;
     startDecode(data);
     return decodeFrame(frame);
   }
