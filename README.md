@@ -27,6 +27,10 @@ Read Only:
 - Photoshop PSD
 - OpenEXR
 
+Write Only:
+
+- ICO
+- CUR
 
 ## [Documentation](https://github.com/brendan-duncan/image/wiki)
 

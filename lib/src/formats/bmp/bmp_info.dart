@@ -26,6 +26,9 @@ class BitmapFileHeader {
   }
 
   static bool isValidFile(InputBuffer b) {
+    if (b.length < 2) {
+      return false;
+    }
     final type = InputBuffer.from(b).readUint16();
     return type == BMP_HEADER_FILETYPE;
   }

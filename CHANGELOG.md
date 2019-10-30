@@ -1,3 +1,8 @@
+## 2.1.7 - October 30, 2019
+
+- Add ICO and CUR encoder.
+- Fix BMP decoder for top-down BMP image files.
+
 ## 2.1.6 - October 29, 2019
 
 - Add BMP decoder, currently only supporting 24-bit and 32-bit non compressed BMP images. (Thanks Ryan Kauk)

@@ -17,6 +17,8 @@ import 'tga_encoder.dart';
 import 'tiff_decoder.dart';
 import 'webp_decoder.dart';
 import 'bmp_decoder.dart';
+import 'ico_encoder.dart';
+import 'cur_encoder.dart';
 
 /// Find a [Decoder] that is able to decode the given image [data].
 /// Use this is you don't know the type of image it is.
@@ -163,6 +165,12 @@ List<int> encodeNamedImage(Image image, String name) {
   if (n.endsWith('.gif')) {
     return encodeGif(image);
   }
+  if (n.endsWith('.cur')) {
+    return encodeCur(image);
+  }
+  if (n.endsWith('.ico')) {
+    return encodeIco(image);
+  }
   return null;
 }
 
@@ -259,7 +267,7 @@ Animation decodeGifAnimation(List<int> bytes) {
 /// If you know that you have less than 256 colors in your frames
 /// anyway, you should supply a very large [samplingFactor] for maximum performance.
 List<int> encodeGif(Image image, {int samplingFactor = 10}) {
-  return new GifEncoder(samplingFactor: samplingFactor).encodeImage(image);
+  return GifEncoder(samplingFactor: samplingFactor).encodeImage(image);
 }
 
 /// Encode an animation to the GIF format.
@@ -277,7 +285,7 @@ List<int> encodeGif(Image image, {int samplingFactor = 10}) {
 /// encoding animations is usually a process that takes longer than
 /// encoding a single image (see [encodeGif]).
 List<int> encodeGifAnimation(Animation anim, {int samplingFactor = 30}) {
-  return new GifEncoder(samplingFactor: samplingFactor).encodeAnimation(anim);
+  return GifEncoder(samplingFactor: samplingFactor).encodeAnimation(anim);
 }
 
 /// Decode a TIFF formatted image.
@@ -303,8 +311,27 @@ Image decodeExr(List<int> bytes, {double exposure = 1.0}) {
   return ExrDecoder(exposure: exposure).decodeImage(bytes);
 }
 
-/// Decode an OpenEXR formatted image, tone-mapped using the
-/// given [exposure] to a low-dynamic-range [Image].
+/// Decode a BMP formatted image.
 Image decodeBmp(List<int> bytes) {
   return BmpDecoder().decodeImage(bytes);
+}
+
+/// Encode an image to the CUR format.
+List<int> encodeCur(Image image) {
+  return CurEncoder().encodeImage(image);
+}
+
+/// Encode a list of images to the CUR format.
+List<int> encodeCurImages(List<Image> images) {
+  return CurEncoder().encodeImages(images);
+}
+
+/// Encode an image to the ICO format.
+List<int> encodeIco(Image image) {
+  return IcoEncoder().encodeImage(image);
+}
+
+/// Encode a list of images to the ICO format.
+List<int> encodeIcoImages(List<Image> images) {
+  return IcoEncoder().encodeImages(images);
 }
