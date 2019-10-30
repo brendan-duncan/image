@@ -43,10 +43,9 @@ class BmpInfo extends DecodeInfo {
   int get numFrames => 1;
   final BitmapFileHeader file;
 
+  final int _height;
   @override
   final int width;
-  @override
-  final int height;
 
   final int headerSize;
   final int planes;
@@ -57,11 +56,15 @@ class BmpInfo extends DecodeInfo {
   final int yppm;
   final int totalColors;
   final int importantColors;
+  bool get readBottomUp => !_height.isNegative;
+  @override
+  int get height => _height.abs();
+
   BmpInfo(InputBuffer p)
       : this.file = BitmapFileHeader(p),
         this.headerSize = p.readUint32(),
         this.width = p.readInt32(),
-        this.height = p.readInt32(),
+        this._height = p.readInt32(),
         this.planes = p.readUint16(),
         this.bpp = p.readUint16(),
         this.compression = _intToCompressions(p.readUint32()),
@@ -86,25 +89,29 @@ class BmpInfo extends DecodeInfo {
     return compression;
   }
 
+  int _readRgba(InputBuffer input, {int aDefault}) {
+    if (readBottomUp) {
+      final b = input.readByte();
+      final g = input.readByte();
+      final r = input.readByte();
+      final a = aDefault ?? input.readByte();
+      return getColor(r, g, b, 255 - a);
+    } else {
+      final r = input.readByte();
+      final b = input.readByte();
+      final g = input.readByte();
+      final a = aDefault ?? input.readByte();
+      return getColor(r, b, g, 255 - a);
+    }
+  }
+
   int decodeRgba(InputBuffer input) {
     if (this.compression == BitmapCompression.BI_BITFIELDS && bpp == 32) {
-      final b = input.readByte();
-      final g = input.readByte();
-      final r = input.readByte();
-      final a = input.readByte();
-      return getColor(r, g, b, 255 - a);
+      return _readRgba(input);
     } else if (bpp == 32 && compression == BitmapCompression.NONE) {
-      final b = input.readByte();
-      final g = input.readByte();
-      final r = input.readByte();
-      final a = input.readByte();
-      return getColor(r, g, b, a);
+      return _readRgba(input);
     } else if (bpp == 24) {
-      final b = input.readByte();
-      final g = input.readByte();
-      final r = input.readByte();
-      final a = 255;
-      return getColor(r, g, b, a);
+      return _readRgba(input, aDefault: 0);
     }
     // else if (bpp == 16) {
     //   return _rgbaFrom16(input);
@@ -149,7 +156,8 @@ class BmpInfo extends DecodeInfo {
       'xppm': xppm,
       'yppm': yppm,
       'totalColors': totalColors,
-      'importantColors': importantColors
+      'importantColors': importantColors,
+      'readBottomUp': readBottomUp
     });
   }
 }

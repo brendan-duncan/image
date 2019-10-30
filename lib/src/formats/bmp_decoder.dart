@@ -46,10 +46,11 @@ class BmpDecoder extends Decoder {
     Image image = Image(info.width, info.height, channels: Channels.rgb);
 
     for (int y = image.height - 1; y >= 0; --y) {
+      var line = info.readBottomUp ? y : image.height - 1 - y;
       InputBuffer row = _input.readBytes(rowStride);
       for (int x = 0; x < image.width; ++x) {
         final color = info.decodeRgba(row);
-        image.setPixel(x, y, color);
+        image.setPixel(x, line, color);
       }
     }
 
