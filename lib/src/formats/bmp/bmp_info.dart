@@ -88,11 +88,11 @@ class BmpInfo extends DecodeInfo {
 
   int decodeRgba(InputBuffer input) {
     if (this.compression == BitmapCompression.BI_BITFIELDS && bpp == 32) {
-      final a = input.readByte();
       final b = input.readByte();
       final g = input.readByte();
       final r = input.readByte();
-      return getColor(r, g, b, a);
+      final a = input.readByte();
+      return getColor(r, g, b, 255 - a);
     } else if (bpp == 32 && compression == BitmapCompression.NONE) {
       final b = input.readByte();
       final g = input.readByte();

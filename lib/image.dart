@@ -126,6 +126,7 @@ export 'src/formats/tga_encoder.dart';
 export 'src/formats/tiff_decoder.dart';
 export 'src/formats/webp_decoder.dart';
 export 'src/formats/webp_encoder.dart';
+export 'src/formats/bmp_decoder.dart';
 
 export 'src/hdr/half.dart';
 export 'src/hdr/hdr_bloom.dart';

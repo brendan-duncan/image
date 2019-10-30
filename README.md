@@ -21,6 +21,7 @@ Read/Write:
 
 Read Only:
 
+- BMP
 - WebP / Animated WebP
 - TIFF
 - Photoshop PSD
