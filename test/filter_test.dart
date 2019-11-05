@@ -416,11 +416,25 @@ void main() {
     test('trim', () {
       Image image = readPng(File('test/res/png/trim.png').readAsBytesSync());
       Image trimmed = trim(image, mode: TrimMode.transparent);
-      expect(trimmed.width, equals(64));
-      expect(trimmed.height, equals(56));
       File('out/trim.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(trimmed));
+      expect(trimmed.width, equals(64));
+      expect(trimmed.height, equals(56));
+
+      trimmed = trim(image, mode: TrimMode.topLeftColor);
+      File('out/trim_topLeftColor.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writePng(trimmed));
+      expect(trimmed.width, equals(64));
+      expect(trimmed.height, equals(56));
+
+      trimmed = trim(image, mode: TrimMode.bottomRightColor);
+      File('out/trim_bottomRightColor.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writePng(trimmed));
+      expect(trimmed.width, equals(64));
+      expect(trimmed.height, equals(56));
     });
 
     test('dropShadow', () {

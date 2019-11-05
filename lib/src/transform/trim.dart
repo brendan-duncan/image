@@ -59,7 +59,8 @@ List<int> findTrim(Image src,
     bool first = true;
     for (int x = 0; x < w; ++x) {
       int c = src.getPixel(x, y);
-      if ((mode == TrimMode.transparent && getAlpha(c) != 0) && (c != bg)) {
+      if ((mode == TrimMode.transparent && getAlpha(c) != 0) ||
+          (mode != TrimMode.transparent && (c != bg))) {
         if (xmin > x) {
           xmin = x;
         }
@@ -78,6 +79,11 @@ List<int> findTrim(Image src,
         }
       }
     }
+  }
+
+  // A trim wasn't found
+  if (ymin == null) {
+    return [0, 0, w, h];
   }
 
   if (sides & Trim.top == false) {
