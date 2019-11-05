@@ -1,3 +1,8 @@
+## 2.1.8 - November 05, 2019
+
+- Fix issue with XML parsing for font files not reading some files
+- Fix bug with trim function for non-transparent trim mode
+
 ## 2.1.7 - October 30, 2019
 
 - Add ICO and CUR encoder.
