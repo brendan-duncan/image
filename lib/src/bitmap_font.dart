@@ -45,8 +45,9 @@ class BitmapFont {
     Map<int, Image> fontPages = {0: page};
 
     XmlDocument doc;
+    fnt = fnt.trimLeft();
 
-    if (fnt.startsWith('<font>')) {
+    if (fnt.startsWith('<?xml') || fnt.startsWith('<font>')) {
       doc = parse(fnt);
       if (doc == null) {
         throw ImageException('Invalid font XML');
@@ -75,10 +76,12 @@ class BitmapFont {
       throw ImageException('Invalid font archive');
     }
 
-    String font_str = String.fromCharCodes(font_file.content as List<int>);
+    /// Remove leading whitespace so xml detection is correct
+    String font_str = String.fromCharCodes(font_file.content as List<int>).trimLeft();
     XmlDocument xml;
 
-    if (font_str.startsWith('<font>')) {
+    /// Added <?xml which may be present, appropriately
+    if (font_str.startsWith('<?xml') || font_str.startsWith('<font>')) {
       xml = parse(font_str);
       if (xml == null) {
         throw ImageException('Invalid font XML');
@@ -107,11 +110,14 @@ class BitmapFont {
       n.children.whereType<XmlElement>();
 
   void _parseFnt(XmlDocument xml, Map<int, Image> fontPages, [Archive arc]) {
-    if (xml.children.length != 1) {
+    /// Rather than check for children, which will also count whitespace as XmlText,
+    /// The first child should have the name <font>.
+    var docElements = _childElements(xml).toList();
+    if (docElements.length != 1 || docElements[0].name.toString() != 'font') {
       throw ImageException('Invalid font XML');
     }
 
-    var font = xml.children[0];
+    var font = docElements[0];
 
     for (var c in _childElements(font)) {
       String name = c.name.toString();
