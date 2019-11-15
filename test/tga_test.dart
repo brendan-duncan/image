@@ -24,7 +24,7 @@ void main() {
         }
 
         List<int> png = PngEncoder().encodeImage(image);
-        File('out/tga/${name}.png')
+        File('.dart_tool/out/tga/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });
@@ -41,7 +41,7 @@ void main() {
       // Encode the image as a tga
       List<int> tga = TgaEncoder().encodeImage(image);
 
-      File('out/globe.tga')
+      File('.dart_tool/out/globe.tga')
         ..createSync(recursive: true)
         ..writeAsBytesSync(tga);
 

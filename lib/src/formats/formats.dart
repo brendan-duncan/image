@@ -68,6 +68,11 @@ Decoder findDecoderForData(List<int> data) {
     return bmp;
   }
 
+  TgaDecoder tga = TgaDecoder();
+  if (tga.isValidFile(bytes)) {
+    return tga;
+  }
+
   return null;
 }
 

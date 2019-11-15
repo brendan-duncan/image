@@ -70,7 +70,7 @@ void main() {
         }
 
         List<int> png = PngEncoder().encodeImage(image);
-        File('out/tif/${name}.png')
+        File('.dart_tool/out/tif/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

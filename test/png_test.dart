@@ -10,7 +10,7 @@ void main() {
 
       // Encode the image to PNG
       List<int> png = PngEncoder().encodeImage(image);
-      File('out/png/encode.png')
+      File('.dart_tool/out/png/encode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
@@ -25,13 +25,13 @@ void main() {
       }
 
       List<int> png = encodePngAnimation(anim);
-      File('out/png/encodeAnimation.png')
+      File('.dart_tool/out/png/encodeAnimation.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
 
     test('decode', () {
-      List<int> bytes = File('out/png/encode.png').readAsBytesSync();
+      List<int> bytes = File('.dart_tool/out/png/encode.png').readAsBytesSync();
       Image image = PngDecoder().decodeImage(bytes);
 
       expect(image.width, equals(64));
@@ -42,7 +42,7 @@ void main() {
       }
 
       List<int> png = PngEncoder().encodeImage(image);
-      File('out/png/decode.png').writeAsBytesSync(png);
+      File('.dart_tool/out/png/decode.png').writeAsBytesSync(png);
     });
 
     test('iCCP', () {
@@ -111,13 +111,13 @@ void main() {
           Animation anim = decodeAnimation(file.readAsBytesSync());
           if (anim.length == 1) {
             List<int> png = PngEncoder().encodeImage(anim[0]);
-            File('out/png/${name}')
+            File('.dart_tool/out/png/${name}')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
           } else {
             for (int i = 0; i < anim.length; ++i) {
               List<int> png = PngEncoder().encodeImage(anim[i]);
-              File('out/png/${name}-$i.png')
+              File('.dart_tool/out/png/${name}-$i.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
             }

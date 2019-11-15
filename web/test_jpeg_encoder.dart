@@ -4,6 +4,7 @@ import 'package:image/image.dart';
 
 void main() {
   var theImg = document.getElementById('testimage') as ImageElement;
+
   var cvs = document.createElement('canvas') as CanvasElement;
   cvs.width = theImg.width;
   cvs.height = theImg.height;
@@ -13,6 +14,7 @@ void main() {
   ctx.drawImage(theImg, 0, 0);
 
   var bytes = ctx.getImageData(0, 0, cvs.width, cvs.height).data;
+
   Image image =
       Image.fromBytes(cvs.width, cvs.height, bytes, format: Format.rgba);
 

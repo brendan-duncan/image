@@ -43,7 +43,7 @@ void main() {
       List<int> bytes = file.readAsBytesSync();
       Image image = WebPDecoder().decodeImage(bytes);
       List<int> png = PngEncoder().encodeImage(image);
-      File('out/webp/decode.png')
+      File('.dart_tool/out/webp/decode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -75,7 +75,7 @@ void main() {
         }
 
         List<int> png = PngEncoder().encodeImage(image);
-        File('out/webp/${name}.png')
+        File('.dart_tool/out/webp/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

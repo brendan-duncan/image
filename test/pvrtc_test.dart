@@ -8,7 +8,7 @@ void main() {
       List<int> bytes = File('test/res/tga/globe.tga').readAsBytesSync();
       Image image = TgaDecoder().decodeImage(bytes);
 
-      File('out/pvrtc/globe_before.png')
+      File('.dart_tool/out/pvrtc/globe_before.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -17,12 +17,12 @@ void main() {
 
       Image decoded =
           PvrtcDecoder().decodeRgb4bpp(image.width, image.height, pvrtc);
-      File('out/pvrtc/globe_after.png')
+      File('.dart_tool/out/pvrtc/globe_after.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
 
       List<int> pvr = PvrtcEncoder().encodePvr(image);
-      File('out/pvrtc/globe.pvr')
+      File('.dart_tool/out/pvrtc/globe.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
     });
@@ -31,7 +31,7 @@ void main() {
       List<int> bytes = File('test/res/png/alpha_edge.png').readAsBytesSync();
       Image image = PngDecoder().decodeImage(bytes);
 
-      File('out/pvrtc/alpha_before.png')
+      File('.dart_tool/out/pvrtc/alpha_before.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -40,12 +40,12 @@ void main() {
 
       Image decoded =
           PvrtcDecoder().decodeRgba4bpp(image.width, image.height, pvrtc);
-      File('out/pvrtc/alpha_after.png')
+      File('.dart_tool/out/pvrtc/alpha_after.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
 
       List<int> pvr = PvrtcEncoder().encodePvr(image);
-      File('out/pvrtc/alpha.pvr')
+      File('.dart_tool/out/pvrtc/alpha.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
     });
@@ -63,7 +63,7 @@ void main() {
         List<int> bytes = (f as File).readAsBytesSync();
         Image img = PvrtcDecoder().decodePvr(bytes);
         assert(img != null);
-        File('out/pvrtc/pvr_$name.png')
+        File('.dart_tool/out/pvrtc/pvr_$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(img));
       });

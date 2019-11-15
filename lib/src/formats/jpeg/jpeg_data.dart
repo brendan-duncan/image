@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 
+import '../../color.dart';
 import '../../exif_data.dart';
+import '../../image.dart';
 import '../../image_exception.dart';
-import '../../internal/bit_operators.dart';
 import '../../util/input_buffer.dart';
+import '_component_data.dart';
 import 'jpeg.dart';
 import 'jpeg_adobe.dart';
 import 'jpeg_component.dart';
@@ -11,6 +13,10 @@ import 'jpeg_frame.dart';
 import 'jpeg_info.dart';
 import 'jpeg_jfif.dart';
 import 'jpeg_scan.dart';
+import 'jpeg_quantize_stub.dart'
+    if (dart.library.io) '_jpeg_quantize_io.dart'
+    if (dart.library.js) '_jpeg_quantize_html.dart';
+
 
 class JpegData {
   InputBuffer input;
@@ -23,7 +29,7 @@ class JpegData {
   final frames = List<JpegFrame>();
   final huffmanTablesAC = List<dynamic>();
   final huffmanTablesDC = List<dynamic>();
-  final components = List<_ComponentData>();
+  final components = List<ComponentData>();
 
   bool validate(List<int> bytes) {
     input = InputBuffer(bytes, bigEndian: true);
@@ -105,7 +111,6 @@ class JpegData {
 
   void read(List<int> bytes) {
     input = InputBuffer(bytes, bigEndian: true);
-
     _read();
 
     if (frames.length != 1) {
@@ -118,7 +123,7 @@ class JpegData {
 
     for (int i = 0; i < frame.componentsOrder.length; ++i) {
       JpegComponent component = frame.components[frame.componentsOrder[i]];
-      components.add(_ComponentData(
+      components.add(ComponentData(
           component.hSamples,
           frame.maxHSamples,
           component.vSamples,
@@ -131,191 +136,8 @@ class JpegData {
 
   int get height => frame.scanLines;
 
-  Uint8List getData(int width, int height) {
-    _ComponentData component1;
-    _ComponentData component2;
-    _ComponentData component3;
-    _ComponentData component4;
-    Uint8List component1Line;
-    Uint8List component2Line;
-    Uint8List component3Line;
-    Uint8List component4Line;
-    int offset = 0;
-    int Y, Cb, Cr, K, C, M, Ye, R, G, B;
-    bool colorTransform = false;
-    int dataLength = width * height * components.length;
-    Uint8List data = Uint8List(dataLength);
-
-    switch (components.length) {
-      case 1:
-        component1 = components[0];
-        var lines = component1.lines;
-        int hShift1 = component1.hScaleShift;
-        int vShift1 = component1.vScaleShift;
-        for (int y = 0; y < height; y++) {
-          int y1 = y >> vShift1;
-          component1Line = lines[y1];
-          for (int x = 0; x < width; x++) {
-            int x1 = x >> hShift1;
-            Y = component1Line[x1];
-            data[offset++] = Y;
-          }
-        }
-        break;
-      case 2:
-        // PDF might compress two component data in custom color-space
-        component1 = components[0];
-        component2 = components[1];
-        int hShift1 = component1.hScaleShift;
-        int vShift1 = component1.vScaleShift;
-        int hShift2 = component2.hScaleShift;
-        int vShift2 = component2.vScaleShift;
-
-        for (int y = 0; y < height; y++) {
-          int y1 = y >> vShift1;
-          int y2 = y >> vShift2;
-          component1Line = component1.lines[y1];
-          component2Line = component2.lines[y2];
-
-          for (int x = 0; x < width; x++) {
-            int x1 = x >> hShift1;
-            int x2 = x >> hShift2;
-
-            Y = component1Line[x1];
-            data[offset++] = Y;
-
-            Y = component2Line[x2];
-            data[offset++] = Y;
-          }
-        }
-        break;
-      case 3:
-        // The default transform for three components is true
-        colorTransform = true;
-
-        component1 = components[0];
-        component2 = components[1];
-        component3 = components[2];
-
-        var lines1 = component1.lines;
-        var lines2 = component2.lines;
-        var lines3 = component3.lines;
-
-        int hShift1 = component1.hScaleShift;
-        int vShift1 = component1.vScaleShift;
-        int hShift2 = component2.hScaleShift;
-        int vShift2 = component2.vScaleShift;
-        int hShift3 = component3.hScaleShift;
-        int vShift3 = component3.vScaleShift;
-
-        for (int y = 0; y < height; y++) {
-          int y1 = y >> vShift1;
-          int y2 = y >> vShift2;
-          int y3 = y >> vShift3;
-
-          component1Line = lines1[y1];
-          component2Line = lines2[y2];
-          component3Line = lines3[y3];
-
-          for (int x = 0; x < width; x++) {
-            int x1 = x >> hShift1;
-            int x2 = x >> hShift2;
-            int x3 = x >> hShift3;
-
-            if (!colorTransform) {
-              data[offset++] = component1Line[x1];
-              data[offset++] = component2Line[x2];
-              data[offset++] = component3Line[x3];
-            } else {
-              Y = component1Line[x1] << 8;
-              Cb = component2Line[x2] - 128;
-              Cr = component3Line[x3] - 128;
-
-              R = shiftR((Y + 359 * Cr + 128), 8);
-              G = shiftR((Y - 88 * Cb - 183 * Cr + 128), 8);
-              B = shiftR((Y + 454 * Cb + 128), 8);
-
-              data[offset++] = _clamp8(R);
-              data[offset++] = _clamp8(G);
-              data[offset++] = _clamp8(B);
-            }
-          }
-        }
-        break;
-      case 4:
-        if (adobe == null) {
-          throw ImageException('Unsupported color mode (4 components)');
-        }
-        // The default transform for four components is false
-        colorTransform = false;
-        // The adobe transform marker overrides any previous setting
-        if (adobe.transformCode != 0) {
-          colorTransform = true;
-        }
-
-        component1 = components[0];
-        component2 = components[1];
-        component3 = components[2];
-        component4 = components[3];
-
-        var lines1 = component1.lines;
-        var lines2 = component2.lines;
-        var lines3 = component3.lines;
-        var lines4 = component4.lines;
-
-        int hShift1 = component1.hScaleShift;
-        int vShift1 = component1.vScaleShift;
-        int hShift2 = component2.hScaleShift;
-        int vShift2 = component2.vScaleShift;
-        int hShift3 = component3.hScaleShift;
-        int vShift3 = component3.vScaleShift;
-        int hShift4 = component4.hScaleShift;
-        int vShift4 = component4.vScaleShift;
-
-        for (int y = 0; y < height; y++) {
-          int y1 = y >> vShift1;
-          int y2 = y >> vShift2;
-          int y3 = y >> vShift3;
-          int y4 = y >> vShift4;
-          component1Line = lines1[y1];
-          component2Line = lines2[y2];
-          component3Line = lines3[y3];
-          component4Line = lines4[y4];
-          for (int x = 0; x < width; x++) {
-            int x1 = x >> hShift1;
-            int x2 = x >> hShift2;
-            int x3 = x >> hShift3;
-            int x4 = x >> hShift4;
-            if (!colorTransform) {
-              C = component1Line[x1];
-              M = component2Line[x2];
-              Ye = component3Line[x3];
-              K = component4Line[x4];
-            } else {
-              Y = component1Line[x1];
-              Cb = component2Line[x2];
-              Cr = component3Line[x3];
-              K = component4Line[x4];
-
-              C = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
-              M = 255 -
-                  _clamp8((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128))
-                      .toInt());
-              Ye = 255 - _clamp8((Y + 1.772 * (Cb - 128)).toInt());
-            }
-
-            data[offset++] = C;
-            data[offset++] = M;
-            data[offset++] = Ye;
-            data[offset++] = K;
-          }
-        }
-        break;
-      default:
-        throw ImageException('Unsupported color mode');
-    }
-
-    return data;
+  Image getImage() {
+    return getImageFromJpeg(this);
   }
 
   void _read() {
@@ -616,8 +438,8 @@ class JpegData {
         jfif.majorVersion = appData[5];
         jfif.minorVersion = appData[6];
         jfif.densityUnits = appData[7];
-        jfif.xDensity = shiftL(appData[8], 8) | appData[9];
-        jfif.yDensity = shiftL(appData[10], 8) | appData[11];
+        jfif.xDensity = (appData[8] << 8) | appData[9];
+        jfif.yDensity = (appData[10] << 8) | appData[11];
         jfif.thumbWidth = appData[12];
         jfif.thumbHeight = appData[13];
         int thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
@@ -636,8 +458,8 @@ class JpegData {
           appData[5] == 0) {
         adobe = JpegAdobe();
         adobe.version = appData[6];
-        adobe.flags0 = shiftL(appData[7], 8) | appData[8];
-        adobe.flags1 = shiftL(appData[9], 8) | appData[10];
+        adobe.flags0 = (appData[7] << 8) | appData[8];
+        adobe.flags1 = (appData[9] << 8) | appData[10];
         adobe.transformCode = appData[11];
       }
     } else {
@@ -648,7 +470,7 @@ class JpegData {
   void _readDQT(InputBuffer block) {
     while (!block.isEOS) {
       int n = block.readByte();
-      int prec = shiftR(n, 4);
+      int prec = (n >> 4);
       n &= 0x0F;
 
       if (n >= Jpeg.NUM_QUANT_TBLS) {
@@ -694,7 +516,7 @@ class JpegData {
     for (int i = 0; i < numComponents; i++) {
       int componentId = block.readByte();
       int x = block.readByte();
-      int h = shiftR(x, 4) & 15;
+      int h = (x >> 4) & 15;
       int v = x & 15;
       int qId = block.readByte();
       frame.componentsOrder.add(componentId);
@@ -762,7 +584,7 @@ class JpegData {
       JpegComponent component = frame.components[id];
       components[i] = component;
 
-      int dc_tbl_no = shiftR(c, 4) & 15;
+      int dc_tbl_no = (c >> 4) & 15;
       int ac_tbl_no = c & 15;
 
       if (dc_tbl_no < huffmanTablesDC.length) {
@@ -777,7 +599,7 @@ class JpegData {
     int spectralEnd = block.readByte();
     int successiveApproximation = block.readByte();
 
-    int Ah = shiftR(successiveApproximation, 4) & 15;
+    int Ah = (successiveApproximation >> 4) & 15;
     int Al = successiveApproximation & 15;
 
     JpegScan(input, frame, components, resetInterval, spectralStart,
@@ -842,24 +664,24 @@ class JpegData {
       JpegFrame frame, JpegComponent component) {
     final int blocksPerLine = component.blocksPerLine;
     final int blocksPerColumn = component.blocksPerColumn;
-    int samplesPerLine = shiftL(blocksPerLine, 3);
+    int samplesPerLine = (blocksPerLine << 3);
     Int32List R = Int32List(64);
     Uint8List r = Uint8List(64);
     List<Uint8List> lines = List(blocksPerColumn * 8);
 
     int l = 0;
     for (int blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
-      int scanLine = shiftL(blockRow, 3);
+      int scanLine = (blockRow << 3);
       for (int i = 0; i < 8; i++) {
         lines[l++] = Uint8List(samplesPerLine);
       }
 
       for (int blockCol = 0; blockCol < blocksPerLine; blockCol++) {
-        _quantizeAndInverse(component.quantizationTable,
+        quantizeAndInverse(component.quantizationTable,
             component.blocks[blockRow][blockCol] as Int32List, r, R);
 
         int offset = 0;
-        int sample = shiftL(blockCol, 3);
+        int sample = (blockCol << 3);
         for (int j = 0; j < 8; j++) {
           Uint8List line = lines[scanLine + j];
           for (int i = 0; i < 8; i++) {
@@ -879,202 +701,6 @@ class JpegData {
   }
 
   static int _clamp8(int i) => i < 0 ? 0 : i > 255 ? 255 : i;
-
-  static Uint8List dctClip;
-
-  // Quantize the coefficients and apply IDCT.
-  //
-  // A port of poppler's IDCT method which in turn is taken from:
-  // Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
-  // "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
-  // IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
-  void _quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
-      Uint8List dataOut, Int32List dataIn) {
-    Int32List p = dataIn;
-
-    const int dctClipOffset = 256;
-    const int dctClipLength = 768;
-    if (dctClip == null) {
-      dctClip = Uint8List(dctClipLength);
-      int i;
-      for (i = -256; i < 0; ++i) {
-        dctClip[dctClipOffset + i] = 0;
-      }
-      for (i = 0; i < 256; ++i) {
-        dctClip[dctClipOffset + i] = i;
-      }
-      for (i = 256; i < 512; ++i) {
-        dctClip[dctClipOffset + i] = 255;
-      }
-    }
-
-    // IDCT constants (20.12 fixed point format)
-    const int COS_1 = 4017; // cos(pi/16)*4096
-    const int SIN_1 = 799; // sin(pi/16)*4096
-    const int COS_3 = 3406; // cos(3*pi/16)*4096
-    const int SIN_3 = 2276; // sin(3*pi/16)*4096
-    const int COS_6 = 1567; // cos(6*pi/16)*4096
-    const int SIN_6 = 3784; // sin(6*pi/16)*4096
-    const int SQRT_2 = 5793; // sqrt(2)*4096
-    const int SQRT_1D2 = 2896; // sqrt(2) / 2
-
-    // de-quantize
-    for (int i = 0; i < 64; i++) {
-      p[i] = (coefBlock[i] * quantizationTable[i]);
-    }
-
-    // inverse DCT on rows
-    int row = 0;
-    for (int i = 0; i < 8; ++i, row += 8) {
-      // check for all-zero AC coefficients
-      if (p[1 + row] == 0 &&
-          p[2 + row] == 0 &&
-          p[3 + row] == 0 &&
-          p[4 + row] == 0 &&
-          p[5 + row] == 0 &&
-          p[6 + row] == 0 &&
-          p[7 + row] == 0) {
-        int t = shiftR((SQRT_2 * p[0 + row] + 512), 10);
-        p[row + 0] = t;
-        p[row + 1] = t;
-        p[row + 2] = t;
-        p[row + 3] = t;
-        p[row + 4] = t;
-        p[row + 5] = t;
-        p[row + 6] = t;
-        p[row + 7] = t;
-        continue;
-      }
-
-      // stage 4
-      int v0 = shiftR((SQRT_2 * p[0 + row] + 128), 8);
-      int v1 = shiftR((SQRT_2 * p[4 + row] + 128), 8);
-      int v2 = p[2 + row];
-      int v3 = p[6 + row];
-      int v4 = shiftR((SQRT_1D2 * (p[1 + row] - p[7 + row]) + 128), 8);
-      int v7 = shiftR((SQRT_1D2 * (p[1 + row] + p[7 + row]) + 128), 8);
-      int v5 = shiftL(p[3 + row], 4);
-      int v6 = shiftL(p[5 + row], 4);
-
-      // stage 3
-      int t = shiftR((v0 - v1 + 1), 1);
-      v0 = shiftR((v0 + v1 + 1), 1);
-      v1 = t;
-      t = shiftR((v2 * SIN_6 + v3 * COS_6 + 128), 8);
-      v2 = shiftR((v2 * COS_6 - v3 * SIN_6 + 128), 8);
-      v3 = t;
-      t = shiftR((v4 - v6 + 1), 1);
-      v4 = shiftR((v4 + v6 + 1), 1);
-      v6 = t;
-      t = shiftR((v7 + v5 + 1), 1);
-      v5 = shiftR((v7 - v5 + 1), 1);
-      v7 = t;
-
-      // stage 2
-      t = shiftR((v0 - v3 + 1), 1);
-      v0 = shiftR((v0 + v3 + 1), 1);
-      v3 = t;
-      t = shiftR((v1 - v2 + 1), 1);
-      v1 = shiftR((v1 + v2 + 1), 1);
-      v2 = t;
-      t = shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
-      v4 = shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
-      v7 = t;
-      t = shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
-      v5 = shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
-      v6 = t;
-
-      // stage 1
-      p[0 + row] = (v0 + v7);
-      p[7 + row] = (v0 - v7);
-      p[1 + row] = (v1 + v6);
-      p[6 + row] = (v1 - v6);
-      p[2 + row] = (v2 + v5);
-      p[5 + row] = (v2 - v5);
-      p[3 + row] = (v3 + v4);
-      p[4 + row] = (v3 - v4);
-    }
-
-    // inverse DCT on columns
-    for (int i = 0; i < 8; ++i) {
-      int col = i;
-
-      // check for all-zero AC coefficients
-      if (p[1 * 8 + col] == 0 &&
-          p[2 * 8 + col] == 0 &&
-          p[3 * 8 + col] == 0 &&
-          p[4 * 8 + col] == 0 &&
-          p[5 * 8 + col] == 0 &&
-          p[6 * 8 + col] == 0 &&
-          p[7 * 8 + col] == 0) {
-        int t = shiftR((SQRT_2 * dataIn[i] + 8192), 14);
-        p[0 * 8 + col] = t;
-        p[1 * 8 + col] = t;
-        p[2 * 8 + col] = t;
-        p[3 * 8 + col] = t;
-        p[4 * 8 + col] = t;
-        p[5 * 8 + col] = t;
-        p[6 * 8 + col] = t;
-        p[7 * 8 + col] = t;
-        continue;
-      }
-
-      // stage 4
-      int v0 = shiftR((SQRT_2 * p[0 * 8 + col] + 2048), 12);
-      int v1 = shiftR((SQRT_2 * p[4 * 8 + col] + 2048), 12);
-      int v2 = p[2 * 8 + col];
-      int v3 = p[6 * 8 + col];
-      int v4 =
-          shiftR((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048), 12);
-      int v7 =
-          shiftR((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048), 12);
-      int v5 = p[3 * 8 + col];
-      int v6 = p[5 * 8 + col];
-
-      // stage 3
-      int t = shiftR((v0 - v1 + 1), 1);
-      v0 = shiftR((v0 + v1 + 1), 1);
-      v1 = t;
-      t = shiftR((v2 * SIN_6 + v3 * COS_6 + 2048), 12);
-      v2 = shiftR((v2 * COS_6 - v3 * SIN_6 + 2048), 12);
-      v3 = t;
-      t = shiftR((v4 - v6 + 1), 1);
-      v4 = shiftR((v4 + v6 + 1), 1);
-      v6 = t;
-      t = shiftR((v7 + v5 + 1), 1);
-      v5 = shiftR((v7 - v5 + 1), 1);
-      v7 = t;
-
-      // stage 2
-      t = shiftR((v0 - v3 + 1), 1);
-      v0 = shiftR((v0 + v3 + 1), 1);
-      v3 = t;
-      t = shiftR((v1 - v2 + 1), 1);
-      v1 = shiftR((v1 + v2 + 1), 1);
-      v2 = t;
-      t = shiftR((v4 * SIN_3 + v7 * COS_3 + 2048), 12);
-      v4 = shiftR((v4 * COS_3 - v7 * SIN_3 + 2048), 12);
-      v7 = t;
-      t = shiftR((v5 * SIN_1 + v6 * COS_1 + 2048), 12);
-      v5 = shiftR((v5 * COS_1 - v6 * SIN_1 + 2048), 12);
-      v6 = t;
-
-      // stage 1
-      p[0 * 8 + col] = (v0 + v7);
-      p[7 * 8 + col] = (v0 - v7);
-      p[1 * 8 + col] = (v1 + v6);
-      p[6 * 8 + col] = (v1 - v6);
-      p[2 * 8 + col] = (v2 + v5);
-      p[5 * 8 + col] = (v2 - v5);
-      p[3 * 8 + col] = (v3 + v4);
-      p[4 * 8 + col] = (v3 - v4);
-    }
-
-    // convert to 8-bit integers
-    for (int i = 0; i < 64; ++i) {
-      dataOut[i] = dctClip[(dctClipOffset + 128 + shiftR((p[i] + 8), 4))];
-    }
-  }
 
   static const CRR = [
     -179,
@@ -2116,18 +1742,4 @@ class JpegData {
 class _JpegHuffman {
   final children = List<dynamic>();
   int index = 0;
-}
-
-class _ComponentData {
-  int hSamples;
-  int maxHSamples;
-  int vSamples;
-  int maxVSamples;
-  List<Uint8List> lines;
-  int hScaleShift;
-  int vScaleShift;
-  _ComponentData(this.hSamples, this.maxHSamples, this.vSamples,
-      this.maxVSamples, this.lines)
-      : hScaleShift = (hSamples == 1 && maxHSamples == 2) ? 1 : 0,
-        vScaleShift = (vSamples == 1 && maxVSamples == 2) ? 1 : 0;
 }

@@ -20,7 +20,7 @@ void main() {
 
         if (psd != null) {
           List<int> outPng = PngEncoder().encodeImage(psd);
-          File('out/psd/$name.png')
+          File('.dart_tool/out/psd/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(outPng);
         } else {

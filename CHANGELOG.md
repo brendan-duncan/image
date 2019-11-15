@@ -1,3 +1,7 @@
+## 2.1.9 - November 15, 2019
+
+- JpegDecoder optimizations. Decoding an 8k jpeg went from 2048ms to 1340ms.
+
 ## 2.1.8 - November 05, 2019
 
 - Fix issue with XML parsing for font files not reading some files

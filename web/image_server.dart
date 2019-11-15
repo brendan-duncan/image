@@ -7,28 +7,28 @@ void main(List<String> argv) {
     return;
   }
 
-  String filename = argv[0];
+  var filename = argv[0];
 
-  File file = File(filename);
+  var file = File(filename);
   if (!file.existsSync()) {
     print('File does not exist: ${filename}');
     return;
   }
 
-  List<int> fileBytes = file.readAsBytesSync();
+  var fileBytes = file.readAsBytesSync();
 
-  Decoder decoder = findDecoderForData(fileBytes);
+  var decoder = findDecoderForData(fileBytes);
   if (decoder == null) {
     print('Could not find format decoder for: ${filename}');
     return;
   }
 
-  Image image = decoder.decodeImage(fileBytes);
+  var image = decoder.decodeImage(fileBytes);
 
   // ... do something with image ...
 
   // Save the image as a PNG
-  List<int> png = PngEncoder().encodeImage(image);
+  var png = PngEncoder().encodeImage(image);
   // Write the PNG to disk
   File(filename + '.png').writeAsBytesSync(png);
 }

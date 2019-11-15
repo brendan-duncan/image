@@ -12,7 +12,7 @@ void main() {
       Image img = dec.decodeFrame(0);
 
       List<int> png = PngEncoder().encodeImage(img);
-      File('out/exr/grid.png')
+      File('.dart_tool/out/exr/grid.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });

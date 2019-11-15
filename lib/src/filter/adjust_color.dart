@@ -54,6 +54,13 @@ Image adjustColor(Image src,
     return src;
   }
 
+  contrast = contrast != null ? contrast.clamp(0, 1) : null;
+  saturation = saturation != null ? saturation.clamp(0, 1) : null;
+  brightness = brightness != null ? brightness.clamp(0, 1) : null;
+  gamma = gamma != null ? gamma.clamp(0, 1000) : null;
+  exposure = exposure != null ? exposure.clamp(0, 1000) : null;
+  amount = amount != null ? amount.clamp(0, 1000) : null;
+
   const DEG_TO_RAD = 0.0174532925;
   const avgLumR = 0.5;
   const avgLumG = 0.5;
@@ -83,8 +90,8 @@ Image adjustColor(Image src,
     mb = 1.0 / (1.0 + 2.0 * (mb - 0.5));
   }
 
-  num invSaturation = saturation != null ? 1.0 - saturation : 0.0;
-  num invContrast = contrast != null ? 1.0 - contrast : 0.0;
+  num invSaturation = saturation != null ? 1.0 - saturation.clamp(0, 1) : 0.0;
+  num invContrast = contrast != null ? 1.0 - contrast.clamp(0, 1) : 0.0;
 
   if (exposure != null) {
     exposure = pow(2.0, exposure);
@@ -103,7 +110,7 @@ Image adjustColor(Image src,
     hueB = ((sqrt(3.0) * s - c) + 1.0) / 3.0;
   }
 
-  var invAmount = amount != null ? 1.0 - amount : 0.0;
+  var invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
 
   Uint8List pixels = src.getBytes();
   for (int i = 0, len = pixels.length; i < len; i += 4) {
@@ -122,9 +129,10 @@ Image adjustColor(Image src,
     }
 
     if (brightness != null && brightness != 1.0) {
-      r *= brightness;
-      g *= brightness;
-      b *= brightness;
+      var b = brightness.clamp(0, 1000);
+      r *= b;
+      g *= b;
+      b *= b;
     }
 
     if (saturation != null) {

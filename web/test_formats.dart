@@ -19,14 +19,14 @@ void main() {
   // of formats and sub-formats.
   List<String> images = [
     'penguins.jpg',
+    'puppies.jpg',
     '1_webp_ll.webp',
     '1.webp',
     '3_webp_a.webp',
-    'puppies.jpg',
+    'BladeRunner_lossy.webp',
     'cars.gif',
     'trees.png',
     'animated.png',
-    'BladeRunner_lossy.webp'
   ];
 
   for (String name in images) {

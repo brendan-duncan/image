@@ -14,7 +14,7 @@ void main() {
       var img = copyResize(image, width: 400);
       drawString(img, font, 10, 50, 'Testing Font 1: Hello World');
 
-      File('out/font/font_zip_xml.jpg')
+      File('.dart_tool/out/font/font_zip_xml.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(img));
     });
@@ -27,7 +27,7 @@ void main() {
       drawString(img, font, 10, 50, 'Testing Font 2: Hello World',
           color: getColor(255, 0, 0, 128));
 
-      File('out/font/font_zip_text.jpg')
+      File('.dart_tool/out/font/font_zip_text.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(img));
     });
@@ -37,7 +37,7 @@ void main() {
       drawString(img, arial_14, 10, 50, 'Testing Arial 14: Hello World',
           color: getColor(255, 0, 0, 128));
 
-      File('out/font/font_arial_14.jpg')
+      File('.dart_tool/out/font/font_arial_14.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(img));
     });
@@ -47,7 +47,7 @@ void main() {
       drawString(img, arial_24, 10, 50, 'Testing Arial 24: Hello World',
           color: getColor(255, 0, 0, 128));
 
-      File('out/font/font_arial_24.jpg')
+      File('.dart_tool/out/font/font_arial_24.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(img));
     });
@@ -57,7 +57,7 @@ void main() {
       drawString(img, arial_48, 10, 50, 'Testing Arial 48: Hello World',
           color: getColor(255, 0, 0, 128));
 
-      File('out/font/font_arial_48.jpg')
+      File('.dart_tool/out/font/font_arial_48.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(img));
     });

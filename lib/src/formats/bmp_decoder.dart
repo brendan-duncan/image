@@ -1,9 +1,7 @@
 import 'dart:typed_data';
 
 import '../animation.dart';
-import '../color.dart';
 import '../image.dart';
-
 import '../util/input_buffer.dart';
 import 'decoder.dart';
 import 'bmp/bmp_info.dart';

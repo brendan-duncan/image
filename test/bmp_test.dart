@@ -24,7 +24,7 @@ void main() {
         }
 
         List<int> png = PngEncoder().encodeImage(image);
-        File('out/bmp/${name}.png')
+        File('.dart_tool/out/bmp/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

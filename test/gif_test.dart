@@ -32,7 +32,7 @@ void main() {
       test('decodeImage $name', () {
         var bytes = (f as File).readAsBytesSync();
         Image image = GifDecoder().decodeImage(bytes);
-        File('out/gif/$name.png')
+        File('.dart_tool/out/gif/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(image));
       });
@@ -62,7 +62,7 @@ void main() {
       }
 
       List<int> gif = encodeGifAnimation(anim);
-      File('out/gif/encodeAnimation.gif')
+      File('.dart_tool/out/gif/encodeAnimation.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
     });
@@ -72,7 +72,7 @@ void main() {
       Image image = JpegDecoder().decodeImage(bytes);
 
       List<int> gif = GifEncoder().encodeImage(image);
-      File('out/gif/jpeg444.gif')
+      File('.dart_tool/out/gif/jpeg444.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
     });
