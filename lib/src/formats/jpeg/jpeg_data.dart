@@ -17,7 +17,6 @@ import 'jpeg_quantize_stub.dart'
     if (dart.library.io) '_jpeg_quantize_io.dart'
     if (dart.library.js) '_jpeg_quantize_html.dart';
 
-
 class JpegData {
   InputBuffer input;
   JpegJfif jfif;
