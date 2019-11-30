@@ -125,15 +125,15 @@ class BmpInfo extends DecodeInfo {
     }
   }
 
-  List<int> _rgbaFrom16(InputBuffer input) {
-    // TODO: finish decoding for 16 bit
-    final maskRed = 0x7C00;
-    final maskGreen = 0x3E0;
-    final maskBlue = 0x1F;
-    final pixel = input.readUint16();
+  // TODO: finish decoding for 16 bit
+  // List<int> _rgbaFrom16(InputBuffer input) {
+  //   final maskRed = 0x7C00;
+  //   final maskGreen = 0x3E0;
+  //   final maskBlue = 0x1F;
+  //   final pixel = input.readUint16();
 
-    return [(pixel & maskRed), (pixel & maskGreen), (pixel & maskBlue), 0];
-  }
+  //   return [(pixel & maskRed), (pixel & maskGreen), (pixel & maskBlue), 0];
+  // }
 
   String _compToString() {
     switch (compression) {

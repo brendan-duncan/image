@@ -1,6 +1,6 @@
 ## 2.1.9+1
 
-- Formatted code according to Pub's Health suggestions.
+- Applied Pub's Health suggestions.
 
 ## 2.1.9 - November 15, 2019
 
