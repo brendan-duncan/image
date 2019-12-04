@@ -1,9 +1,6 @@
 import 'dart:convert';
-
 import 'package:image/image.dart';
-
 import '../../formats/decode_info.dart';
-
 import '../../util/input_buffer.dart';
 
 enum BitmapCompression { BI_BITFIELDS, NONE }
@@ -131,7 +128,6 @@ class BmpInfo extends DecodeInfo {
   //   final maskGreen = 0x3E0;
   //   final maskBlue = 0x1F;
   //   final pixel = input.readUint16();
-
   //   return [(pixel & maskRed), (pixel & maskGreen), (pixel & maskBlue), 0];
   // }
 

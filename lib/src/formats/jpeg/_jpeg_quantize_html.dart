@@ -376,9 +376,8 @@ Image getImageFromJpeg(JpegData jpeg) {
             K = component4Line[x4];
 
             C = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
-            M = 255 -
-                _clamp8((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128))
-                    .toInt());
+            M = 255 - _clamp8((Y - 0.3441363 * (Cb - 128) -
+                0.71413636 * (Cr - 128)).toInt());
             Ye = 255 - _clamp8((Y + 1.772 * (Cb - 128)).toInt());
           }
           R = shiftR((C * K), 8);
