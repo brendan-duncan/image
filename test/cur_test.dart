@@ -19,7 +19,9 @@ void main() {
       Image image2 = Image(64, 64);
       image2.fill(getColor(100, 255, 200));
 
-      List<int> png2 = CurEncoder(hotSpots: {1: Point(64, 64), 0: Point(64, 64)}).encodeImages([image, image2]);
+      List<int> png2 =
+          CurEncoder(hotSpots: {1: Point(64, 64), 0: Point(64, 64)})
+              .encodeImages([image, image2]);
       File('.dart_tool/out/cur/encode2.cur')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png2);

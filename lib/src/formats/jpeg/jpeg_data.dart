@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import '../../color.dart';
 import '../../exif_data.dart';
 import '../../image.dart';
 import '../../image_exception.dart';
@@ -16,7 +15,6 @@ import 'jpeg_scan.dart';
 import 'jpeg_quantize_stub.dart'
     if (dart.library.io) '_jpeg_quantize_io.dart'
     if (dart.library.js) '_jpeg_quantize_html.dart';
-
 
 class JpegData {
   InputBuffer input;
@@ -699,8 +697,6 @@ class JpegData {
     const int ONE = 1 << FIXED_POINT;
     return (val * ONE).toInt() & 0xffffffff;
   }
-
-  static int _clamp8(int i) => i < 0 ? 0 : i > 255 ? 255 : i;
 
   static const CRR = [
     -179,

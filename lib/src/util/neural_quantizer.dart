@@ -37,7 +37,8 @@ class NeuralQuantizer extends Quantizer {
   int samplingFactor;
 
   /// 10 is a reasonable [samplingFactor] according to https://scientificgems.wordpress.com/stuff/neuquant-fast-high-quality-image-quantization/.
-  NeuralQuantizer(Image image, {int numberOfColors = 256, this.samplingFactor = 10}) {
+  NeuralQuantizer(Image image,
+      {int numberOfColors = 256, this.samplingFactor = 10}) {
     if (image.width * image.height < MAX_PRIME) {
       throw ImageException('Image is too small');
     }

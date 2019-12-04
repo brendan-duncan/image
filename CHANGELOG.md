@@ -1,3 +1,7 @@
+## 2.1.9+1
+
+- Applied Pub's Health suggestions.
+
 ## 2.1.9 - November 15, 2019
 
 - JpegDecoder optimizations. Decoding an 8k jpeg went from 2048ms to 1340ms.

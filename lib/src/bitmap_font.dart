@@ -77,7 +77,8 @@ class BitmapFont {
     }
 
     /// Remove leading whitespace so xml detection is correct
-    String font_str = String.fromCharCodes(font_file.content as List<int>).trimLeft();
+    String font_str =
+        String.fromCharCodes(font_file.content as List<int>).trimLeft();
     XmlDocument xml;
 
     /// Added <?xml which may be present, appropriately

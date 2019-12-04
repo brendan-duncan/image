@@ -16,7 +16,7 @@ int _clamp8(int i) => i < 0 ? 0 : i > 255 ? 255 : i;
 // "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
 // IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
 void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
-                        Uint8List dataOut, Int32List dataIn) {
+    Uint8List dataOut, Int32List dataIn) {
   Int32List p = dataIn;
 
   const int dctClipOffset = 256;
@@ -151,10 +151,8 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
     int v1 = ((SQRT_2 * p[4 * 8 + col] + 2048) >> 12);
     int v2 = p[2 * 8 + col];
     int v3 = p[6 * 8 + col];
-    int v4 =
-    ((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048) >> 12);
-    int v7 =
-    ((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048) >> 12);
+    int v4 = ((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048) >> 12);
+    int v7 = ((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048) >> 12);
     int v5 = p[3 * 8 + col];
     int v6 = p[5 * 8 + col];
 
@@ -235,7 +233,7 @@ Image getImageFromJpeg(JpegData jpeg) {
         }
       }
       break;
-  /*case 2:
+    /*case 2:
         // PDF might compress two component data in custom color-space
         component1 = components[0];
         component2 = components[1];
@@ -263,7 +261,7 @@ Image getImageFromJpeg(JpegData jpeg) {
         }
         break;*/
     case 3:
-    // The default transform for three components is true
+      // The default transform for three components is true
       colorTransform = true;
 
       component1 = jpeg.components[0];
@@ -372,8 +370,9 @@ Image getImageFromJpeg(JpegData jpeg) {
             K = component4Line[x4];
 
             C = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
-            M = 255 - _clamp8((Y - 0.3441363 * (Cb - 128) -
-                0.71413636 * (Cr - 128)).toInt());
+            M = 255 -
+                _clamp8((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128))
+                    .toInt());
             Ye = 255 - _clamp8((Y + 1.772 * (Cb - 128)).toInt());
           }
           R = (C * K) >> 8;
