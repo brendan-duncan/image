@@ -34,10 +34,10 @@ class HdrSlice {
         height = other.height,
         type = other.type,
         data = other.type == HdrImage.HALF
-            ? Uint16List.fromList(other.data as List<int>)
+            ? (other.data as Uint16List).sublist(0)
             : other.type == HdrImage.FLOAT
-                ? Float32List.fromList(other.data as List<double>)
-                : Uint32List.fromList(other.data as List<int>);
+                ? (other.data as Float32List).sublist(0)
+                : (other.data as Uint32List).sublist(0);
 
   /// Get the raw bytes of the data buffer.
   Uint8List getBytes() => Uint8List.view(data.buffer as ByteBuffer);

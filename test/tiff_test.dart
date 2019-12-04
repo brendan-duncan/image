@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Directory dir = Directory('res/tiff');
+  Directory dir = Directory('test/res/tiff');
   if (!dir.existsSync()) {
     return;
   }
