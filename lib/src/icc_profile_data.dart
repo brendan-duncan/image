@@ -14,7 +14,7 @@ class ICCProfileData {
   ICCProfileData.from(ICCProfileData other)
       : name = other.name,
         compression = other.compression,
-        data = Uint8List.fromList(other.data);
+        data = other.data.sublist(0);
 
   /// Returns the compressed data of the ICC Profile, compressing the stored
   /// data as necessary.

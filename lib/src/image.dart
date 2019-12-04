@@ -116,7 +116,7 @@ class Image {
         disposeMethod = other.disposeMethod,
         blendMethod = other.blendMethod,
         channels = other.channels,
-        data = Uint32List.fromList(other.data),
+        data = other.data.sublist(0),
         exif = ExifData.from(other.exif),
         iccProfile = other.iccProfile;
 
@@ -570,7 +570,9 @@ class Image {
       int width, int height, List<int> bytes, Format format) {
     if (format == Format.rgba) {
       return bytes is Uint32List
-          ? Uint32List.fromList(bytes)
+          ? bytes.sublist(0)
+          : bytes is Uint8List
+          ? Uint32List.view(bytes.buffer).sublist(0)
           : Uint32List.view(Uint8List.fromList(bytes).buffer);
     }
 

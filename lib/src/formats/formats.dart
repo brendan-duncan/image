@@ -26,7 +26,7 @@ Decoder findDecoderForData(List<int> data) {
   // The various decoders will be creating a Uint8List for their InputStream
   // if the data isn't already that type, so do it once here to avoid having to
   // do it multiple times.
-  Uint8List bytes = Uint8List.fromList(data);
+  Uint8List bytes = data is Uint8List ? data : Uint8List.fromList(data);
 
   JpegDecoder jpg = JpegDecoder();
   if (jpg.isValidFile(bytes)) {

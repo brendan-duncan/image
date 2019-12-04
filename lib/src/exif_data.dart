@@ -19,7 +19,7 @@ class ExifData {
     if (other != null && other.rawData != null) {
       rawData = List<Uint8List>(other.rawData.length);
       for (int i = 0; i < other.rawData.length; ++i) {
-        rawData[i] = Uint8List.fromList(other.rawData[i]);
+        rawData[i] = other.rawData[i].sublist(0);
       }
     }
   }

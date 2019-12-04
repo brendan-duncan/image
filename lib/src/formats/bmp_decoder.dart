@@ -22,9 +22,8 @@ class BmpDecoder extends Decoder {
   @override
   BmpInfo startDecode(List<int> bytes) {
     if (!isValidFile(bytes)) return null;
-    _input = InputBuffer(Uint8List.fromList(bytes));
+    _input = InputBuffer(bytes);
     info = BmpInfo(_input);
-
     return info;
   }
 

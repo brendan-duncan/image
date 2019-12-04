@@ -379,7 +379,7 @@ class JpegData {
       exif.rawData = List<Uint8List>();
     }
 
-    Uint8List rawData = Uint8List.fromList(block.toUint8List());
+    Uint8List rawData = block.toUint8List().sublist(0);
     exif.rawData.add(rawData);
 
     const EXIF_TAG = 0x45786966; // Exif\0\0
