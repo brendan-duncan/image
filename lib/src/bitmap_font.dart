@@ -278,7 +278,11 @@ class BitmapFont {
     List<XmlAttribute> charsAttrs;
     List<XmlAttribute> kerningsAttrs;
 
-    List<String> lines = content.split('\n');
+    List<String> lines = [];
+    lines = content.split('\r\n');
+    if(lines.length <= 1) {
+      lines = content.split('\n');
+    }
 
     for (String line in lines) {
       if (line.isEmpty) {
