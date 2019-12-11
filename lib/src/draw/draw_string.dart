@@ -61,3 +61,19 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 
   return image;
 }
+
+Image drawStringXCentered(Image image, BitmapFont font, int y, String string,
+    {int color = 0xffffffff}) {
+  int stringWidth = 0;
+  List<int> chars = string.codeUnits;
+  for (int c in chars) {
+    if (!font.characters.containsKey(c)) {
+      continue;
+    }
+    BitmapFontCharacter ch = font.characters[c];
+    stringWidth += ch.xadvance;
+  }
+
+  int x = (image.width / 2).round() - (stringWidth / 2).round();
+  return drawString(image, font, x, y, string, color: color);
+}
