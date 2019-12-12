@@ -24,4 +24,11 @@ class Point {
   Point operator +(Point rhs) {
     return Point(x + rhs.x, y + rhs.y);
   }
+
+  @override
+  bool operator ==(dynamic other) =>
+      other is Point && x == other.x && y == other.y;
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode;
 }
