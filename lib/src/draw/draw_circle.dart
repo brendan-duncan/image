@@ -16,7 +16,9 @@ Image drawCircle(Image image, int x0, int y0, int radius, int color) {
 ///
 /// The algorithm uses the same logic as [drawCircle] to calculate each point
 /// around the circle's circumference. Then it iterates through every point,
-/// finding the smallest and largest y-coordinate value for a given x-coordinate.
+/// finding the smallest and largest y-coordinate values for a given x-
+/// coordinate.
+///
 /// Once found, it draws a line connecting those two points. The circle is thus
 /// filled one vertical slice at a time (each slice being 1-pixel wide).
 Image fillCircle(Image image, int x0, int y0, int radius, int color) {
@@ -40,6 +42,7 @@ Image fillCircle(Image image, int x0, int y0, int radius, int color) {
   }
   print('(${start.xi},${start.yi}), (${end.xi},${end.yi})');
   drawLine(image, start.xi, start.yi, end.xi, end.yi, color);
+  return image;
 }
 
 /// Calculate the pixels that make up the circumference of a circle on the
