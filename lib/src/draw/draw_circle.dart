@@ -1,7 +1,6 @@
-import 'package:image/src/draw/draw_line.dart';
-import 'package:image/src/util/point.dart';
-
 import '../image.dart';
+import '../util/point.dart';
+import 'draw_line.dart';
 import 'draw_pixel.dart';
 
 /// Draw a circle into the [image] with a center of [x0],[y0] and

@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import '../../image.dart';
 import '../image.dart';
 import '../util/clip_line.dart';
+import 'draw_circle.dart';
 import 'draw_pixel.dart';
 
 /// Draw a line into [image].
@@ -38,42 +38,46 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
   if (dx == 0) {
     if (dy < 0) {
       for (int y = y2; y <= y1; ++y) {
-        if (thickness <= 1)
+        if (thickness <= 1) {
           drawPixel(image, x1, y, color);
-        else
+        } else {
           for (int i = 0; i < thickness; i++) {
             drawPixel(image, x1 - radius + i, y, color);
           }
+        }
       }
     } else {
       for (int y = y1; y <= y2; ++y) {
-        if (thickness <= 1)
+        if (thickness <= 1) {
           drawPixel(image, x1, y, color);
-        else
+        } else {
           for (int i = 0; i < thickness; i++) {
             drawPixel(image, x1 - radius + i, y, color);
           }
+        }
       }
     }
     return image;
   } else if (dy == 0) {
     if (dx < 0) {
       for (int x = x2; x <= x1; ++x) {
-        if (thickness <= 1)
+        if (thickness <= 1) {
           drawPixel(image, x, y1, color);
-        else
+        } else {
           for (int i = 0; i < thickness; i++) {
             drawPixel(image, x, y1 - radius + i, color);
           }
+        }
       }
     } else {
       for (int x = x1; x <= x2; ++x) {
-        if (thickness <= 1)
+        if (thickness <= 1) {
           drawPixel(image, x, y1, color);
-        else
+        } else {
           for (int i = 0; i < thickness; i++) {
             drawPixel(image, x, y1 - radius + i, color);
           }
+        }
       }
     }
     return image;
