@@ -1,6 +1,9 @@
-## 2.1.9+1
+## 2.1.10 - December 04, 2019
 
 - Applied Pub's Health suggestions.
+- Optimize use of slow typed_data methods.
+- Add drawStringCentered function
+
 
 ## 2.1.9 - November 15, 2019
 

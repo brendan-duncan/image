@@ -61,5 +61,35 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(img));
     });
+
+    test('drawStringCenteredY', () {
+      var img = copyResize(image, width: 400);
+      drawStringCentered(img, arial_24, 'Testing Arial 24: Hello World',
+          y: 50, color: getColor(255, 0, 0, 128));
+
+      File('.dart_tool/out/font/y_centered.jpg')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(img));
+    });
+
+    test('drawStringCenteredY', () {
+      var img = copyResize(image, width: 400);
+      drawStringCentered(img, arial_24, 'Testing Arial 24: Hello World',
+          x: 10, color: getColor(255, 0, 0, 128));
+
+      File('.dart_tool/out/font/x_centered.jpg')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(img));
+    });
+
+    test('drawStringCenteredXY', () {
+      var img = copyResize(image, width: 400);
+      drawStringCentered(img, arial_24, 'Testing Arial 24: Hello World',
+          color: getColor(255, 0, 0, 128));
+
+      File('.dart_tool/out/font/xy_centered.jpg')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(img));
+    });
   });
 }
