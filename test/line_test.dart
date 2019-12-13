@@ -191,7 +191,6 @@ void main() {
           var pt = Point(x, y);
           if (!blackPixels.contains(pt)) {
             var pixel = image.getPixel(pt.xi, pt.yi);
-            print('($x,$y) = $pixel');
             expect(pixel, whitecolor);
           }
         }

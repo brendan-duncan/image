@@ -33,13 +33,11 @@ Image fillCircle(Image image, int x0, int y0, int radius, int color) {
     if (pt.x == start.x) {
       end = pt;
     } else {
-      print('(${start.xi},${start.yi}), (${end.xi},${end.yi})');
       drawLine(image, start.xi, start.yi, end.xi, end.yi, color);
       start = pt;
       end = pt;
     }
   }
-  print('(${start.xi},${start.yi}), (${end.xi},${end.yi})');
   drawLine(image, start.xi, start.yi, end.xi, end.yi, color);
   return image;
 }
