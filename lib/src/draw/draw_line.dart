@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../image.dart';
 import '../util/clip_line.dart';
+import 'draw_circle.dart';
 import 'draw_pixel.dart';
 
 /// Draw a line into [image].
@@ -23,31 +24,60 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
   int dx = (x2 - x1);
   int dy = (y2 - y1);
 
+  var radius = (thickness / 2.0).floor();
+
   // Drawing a single point.
   if (dx == 0 && dy == 0) {
-    return drawPixel(image, x1, y1, color);
+    thickness == 1
+        ? drawPixel(image, x1, y1, color)
+        : fillCircle(image, x1, y1, radius, color);
+    return image;
   }
 
   // Axis-aligned lines
   if (dx == 0) {
     if (dy < 0) {
       for (int y = y2; y <= y1; ++y) {
-        drawPixel(image, x1, y, color);
+        if (thickness <= 1) {
+          drawPixel(image, x1, y, color);
+        } else {
+          for (int i = 0; i < thickness; i++) {
+            drawPixel(image, x1 - radius + i, y, color);
+          }
+        }
       }
     } else {
       for (int y = y1; y <= y2; ++y) {
-        drawPixel(image, x1, y, color);
+        if (thickness <= 1) {
+          drawPixel(image, x1, y, color);
+        } else {
+          for (int i = 0; i < thickness; i++) {
+            drawPixel(image, x1 - radius + i, y, color);
+          }
+        }
       }
     }
     return image;
   } else if (dy == 0) {
     if (dx < 0) {
       for (int x = x2; x <= x1; ++x) {
-        drawPixel(image, x, y1, color);
+        if (thickness <= 1) {
+          drawPixel(image, x, y1, color);
+        } else {
+          for (int i = 0; i < thickness; i++) {
+            drawPixel(image, x, y1 - radius + i, color);
+          }
+        }
       }
     } else {
       for (int x = x1; x <= x2; ++x) {
-        drawPixel(image, x, y1, color);
+        if (thickness <= 1) {
+          drawPixel(image, x, y1, color);
+        } else {
+          for (int i = 0; i < thickness; i++) {
+            drawPixel(image, x, y1 - radius + i, color);
+          }
+        }
       }
     }
     return image;
