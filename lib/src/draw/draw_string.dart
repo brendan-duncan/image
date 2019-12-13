@@ -61,3 +61,45 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 
   return image;
 }
+
+/// Draw a string horizontally into [image] at position
+/// [x],[y] with the given [color]. 
+/// If x is omitted text is automatically centered into [image]
+/// If y is omitted text is automatically centered into [image].
+/// If both x and y are provided it has the same behaviour of drawString method.
+///
+/// You can load your own font, or use one of the existing ones
+/// such as: [arial_14], [arial_24], or [arial_48].
+Image drawStringCentered(Image image, BitmapFont font, String string,
+    {int x, int y, int color = 0xffffffff}) {
+  int stringWidth = 0;
+  int stringHeight = 0;
+
+  if (x == null || y == null) {
+    List<int> chars = string.codeUnits;
+    for (int c in chars) {
+      if (!font.characters.containsKey(c)) {
+        continue;
+      }
+      BitmapFontCharacter ch = font.characters[c];
+      stringWidth += ch.xadvance;
+      if(ch.height + ch.yoffset > stringHeight) {
+        stringHeight = ch.height + ch.yoffset;
+      }
+    }
+  }
+
+  int xPos, yPos;
+  if(x == null) {
+    xPos = (image.width / 2).round() - (stringWidth / 2).round();
+  } else {
+    xPos = x;
+  }
+  if(y == null) {
+    yPos = (image.height / 2).round() - (stringHeight / 2).round();
+  } else {
+    yPos = y;
+  }
+
+  return drawString(image, font, xPos, yPos, string, color: color);
+}
