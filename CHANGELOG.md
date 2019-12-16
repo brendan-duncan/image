@@ -3,7 +3,8 @@
 - Applied Pub's Health suggestions.
 - Optimize use of slow typed_data methods.
 - Add drawStringCentered function
-
+- Add fillCircle function
+- Fix drawLine thickness for axis-aligned lines 
 
 ## 2.1.9 - November 15, 2019
 
