@@ -32,6 +32,7 @@ class GifEncoder extends Encoder {
 
     if (_encodedFrames == 0) {
       _writeHeader(_width, _height);
+      _writeApplicationExt();
     }
 
     _writeGraphicsCtrlExt();
@@ -58,8 +59,8 @@ class GifEncoder extends Encoder {
 
     if (_encodedFrames == 0) {
       _writeHeader(_width, _height);
-    } else {
       _writeApplicationExt();
+    } else {
       _writeGraphicsCtrlExt();
     }
 

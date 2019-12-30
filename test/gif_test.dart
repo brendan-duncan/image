@@ -43,12 +43,20 @@ void main() {
         continue;
       }
 
+      Animation anim;
       String name = f.path.split(RegExp(r'(/|\\)')).last;
-      test('decodeAnimation $name', () {
+      test('decodeCars $name', () {
         List<int> bytes = (f as File).readAsBytesSync();
-        Animation anim = GifDecoder().decodeAnimation(bytes);
+        anim = GifDecoder().decodeAnimation(bytes);
         expect(anim.length, equals(30));
         expect(anim.loopCount, equals(0));
+      });
+
+      test('encodeCars', () {
+        var gif = encodeGifAnimation(anim);
+        File('.dart_tool/out/gif/cars.gif')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(gif);
       });
     }
 
@@ -65,6 +73,10 @@ void main() {
       File('.dart_tool/out/gif/encodeAnimation.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
+
+      Animation anim2 = GifDecoder().decodeAnimation(gif);
+      expect(anim2.length, equals(10));
+      expect(anim2.loopCount, equals(10));
     });
 
     test('encodeImage', () {
