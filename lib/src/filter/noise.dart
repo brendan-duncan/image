@@ -13,20 +13,18 @@ enum NoiseType { gaussian, uniform, salt_pepper, poisson, rice }
 /// or [NoiseType.rice].
 Image noise(Image image, num sigma,
     {NoiseType type = NoiseType.gaussian, Random random}) {
-  if (random == null) {
-    random = Random();
-  }
+  random ??= Random();
 
-  num nsigma = sigma;
-  int m = 0;
-  int M = 0;
+  var nsigma = sigma;
+  var m = 0;
+  var M = 0;
 
   if (nsigma == 0.0 && type != NoiseType.poisson) {
     return image;
   }
 
   if (nsigma < 0.0 || type == NoiseType.salt_pepper) {
-    List<int> mM = minMax(image);
+    var mM = minMax(image);
     m = mM[0];
     M = mM[1];
   }
@@ -35,25 +33,25 @@ Image noise(Image image, num sigma,
     nsigma = -nsigma * (M - m) / 100.0;
   }
 
-  final int len = image.length;
+  final len = image.length;
   switch (type) {
     case NoiseType.gaussian:
-      for (int i = 0; i < len; ++i) {
-        int c = image[i];
-        int r = (getRed(c) + nsigma * grand(random)).toInt();
-        int g = (getGreen(c) + nsigma * grand(random)).toInt();
-        int b = (getBlue(c) + nsigma * grand(random)).toInt();
-        int a = getAlpha(c);
+      for (var i = 0; i < len; ++i) {
+        var c = image[i];
+        var r = (getRed(c) + nsigma * grand(random)).toInt();
+        var g = (getGreen(c) + nsigma * grand(random)).toInt();
+        var b = (getBlue(c) + nsigma * grand(random)).toInt();
+        var a = getAlpha(c);
         image[i] = getColor(r, g, b, a);
       }
       break;
     case NoiseType.uniform:
-      for (int i = 0; i < len; ++i) {
-        int c = image[i];
-        int r = (getRed(c) + nsigma * crand(random)).toInt();
-        int g = (getGreen(c) + nsigma * crand(random)).toInt();
-        int b = (getBlue(c) + nsigma * crand(random)).toInt();
-        int a = getAlpha(c);
+      for (var i = 0; i < len; ++i) {
+        var c = image[i];
+        var r = (getRed(c) + nsigma * crand(random)).toInt();
+        var g = (getGreen(c) + nsigma * crand(random)).toInt();
+        var b = (getBlue(c) + nsigma * crand(random)).toInt();
+        var a = getAlpha(c);
         image[i] = getColor(r, g, b, a);
       }
       break;
@@ -65,51 +63,51 @@ Image noise(Image image, num sigma,
         m = 0;
         M = 255;
       }
-      for (int i = 0; i < len; ++i) {
-        int c = image[i];
+      for (var i = 0; i < len; ++i) {
+        var c = image[i];
         if (random.nextDouble() * 100.0 < nsigma) {
-          int r = (random.nextDouble() < 0.5 ? M : m);
-          int g = (random.nextDouble() < 0.5 ? M : m);
-          int b = (random.nextDouble() < 0.5 ? M : m);
-          int a = getAlpha(c);
+          var r = (random.nextDouble() < 0.5 ? M : m);
+          var g = (random.nextDouble() < 0.5 ? M : m);
+          var b = (random.nextDouble() < 0.5 ? M : m);
+          var a = getAlpha(c);
           image[i] = getColor(r, g, b, a);
         }
       }
       break;
     case NoiseType.poisson:
-      for (int i = 0; i < len; ++i) {
-        int c = image[i];
-        int r = prand(random, getRed(c).toDouble());
-        int g = prand(random, getGreen(c).toDouble());
-        int b = prand(random, getBlue(c).toDouble());
-        int a = getAlpha(c);
+      for (var i = 0; i < len; ++i) {
+        var c = image[i];
+        var r = prand(random, getRed(c).toDouble());
+        var g = prand(random, getGreen(c).toDouble());
+        var b = prand(random, getBlue(c).toDouble());
+        var a = getAlpha(c);
         image[i] = getColor(r, g, b, a);
       }
       break;
     case NoiseType.rice:
       num sqrt2 = sqrt(2.0);
-      for (int i = 0; i < len; ++i) {
-        int c = image[i];
+      for (var i = 0; i < len; ++i) {
+        var c = image[i];
 
-        num val0 = getRed(c) / sqrt2;
-        num re = (val0 + nsigma * grand(random));
-        num im = (val0 + nsigma * grand(random));
-        num val = sqrt(re * re + im * im);
-        int r = val.toInt();
+        var val0 = getRed(c) / sqrt2;
+        var re = (val0 + nsigma * grand(random));
+        var im = (val0 + nsigma * grand(random));
+        var val = sqrt(re * re + im * im);
+        var r = val.toInt();
 
         val0 = getGreen(c) / sqrt2;
         re = (val0 + nsigma * grand(random));
         im = (val0 + nsigma * grand(random));
         val = sqrt(re * re + im * im);
-        int g = val.toInt();
+        var g = val.toInt();
 
         val0 = getBlue(c) / sqrt2;
         re = (val0 + nsigma * grand(random));
         im = (val0 + nsigma * grand(random));
         val = sqrt(re * re + im * im);
-        int b = val.toInt();
+        var b = val.toInt();
 
-        int a = getAlpha(c);
+        var a = getAlpha(c);
         image[i] = getColor(r, g, b, a);
       }
       break;

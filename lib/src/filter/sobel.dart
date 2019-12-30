@@ -7,21 +7,21 @@ import 'grayscale.dart';
 /// Apply Sobel edge detection filtering to the [src] Image.
 Image sobel(Image src, {num amount = 1.0}) {
   num invAmount = 1.0 - amount;
-  Image orig = grayscale(Image.from(src));
+  var orig = grayscale(Image.from(src));
   final origRGBA = orig.getBytes();
-  int rowSize = src.width * 4;
+  var rowSize = src.width * 4;
   List<int> rgba = src.getBytes();
   final rgbaLen = rgba.length;
-  for (int y = 0, pi = 0; y < src.height; ++y) {
-    for (int x = 0; x < src.width; ++x, pi += 4) {
-      int bl = pi + rowSize - 4;
-      int b = pi + rowSize;
-      int br = pi + rowSize + 4;
-      int l = pi - 4;
-      int r = pi + 4;
-      int tl = pi - rowSize - 4;
-      int t = pi - rowSize;
-      int tr = pi - rowSize + 4;
+  for (var y = 0, pi = 0; y < src.height; ++y) {
+    for (var x = 0; x < src.width; ++x, pi += 4) {
+      var bl = pi + rowSize - 4;
+      var b = pi + rowSize;
+      var br = pi + rowSize + 4;
+      var l = pi - 4;
+      var r = pi + 4;
+      var tl = pi - rowSize - 4;
+      var t = pi - rowSize;
+      var tr = pi - rowSize + 4;
 
       num tlInt = tl < 0 ? 0.0 : origRGBA[tl] / 255.0;
       num tInt = t < 0 ? 0.0 : origRGBA[t] / 255.0;
@@ -32,10 +32,10 @@ Image sobel(Image src, {num amount = 1.0}) {
       num bInt = b < rgbaLen ? origRGBA[b] / 255.0 : 0.0;
       num brInt = br < rgbaLen ? origRGBA[br] / 255.0 : 0.0;
 
-      num h = -tlInt - 2.0 * tInt - trInt + blInt + 2.0 * bInt + brInt;
-      num v = -blInt - 2.0 * lInt - tlInt + brInt + 2.0 * rInt + trInt;
+      var h = -tlInt - 2.0 * tInt - trInt + blInt + 2.0 * bInt + brInt;
+      var v = -blInt - 2.0 * lInt - tlInt + brInt + 2.0 * rInt + trInt;
 
-      int mag = clamp255((sqrt(h * h + v * v) * 255.0).toInt());
+      var mag = clamp255((sqrt(h * h + v * v) * 255.0).toInt());
 
       rgba[pi] = clamp255((mag * amount + rgba[pi] * invAmount).toInt());
       rgba[pi + 1] =

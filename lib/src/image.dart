@@ -96,15 +96,15 @@ class Image {
   /// Create an image with the given dimensions and format.
   Image(this.width, this.height,
       {this.channels = Channels.rgba, ExifData exif, ICCProfileData iccp})
-      : this.data = Uint32List(width * height),
-        this.exif = ExifData.from(exif),
-        this.iccProfile = iccp;
+      : data = Uint32List(width * height),
+        exif = ExifData.from(exif),
+        iccProfile = iccp;
 
   Image.rgb(this.width, this.height, {ExifData exif, ICCProfileData iccp})
-      : this.channels = Channels.rgb,
-        this.data = Uint32List(width * height),
-        this.exif = ExifData.from(exif),
-        this.iccProfile = iccp;
+      : channels = Channels.rgb,
+        data = Uint32List(width * height),
+        exif = ExifData.from(exif),
+        iccProfile = iccp;
 
   /// Create a copy of the image [other].
   Image.from(Image other)
@@ -143,8 +143,8 @@ class Image {
       ICCProfileData iccp,
       Format format = Format.rgba,
       this.channels = Channels.rgba})
-      : this.width = width,
-        this.height = height,
+      : width = width,
+        height = height,
         data = _convertData(width, height, bytes, format),
         exif = ExifData.from(exif),
         iccProfile = iccp;
@@ -171,13 +171,13 @@ class Image {
   /// d.data.setRange(0, image.length, image.getBytes(format: Format.rgba));
   /// context2D.putImageData(data, 0, 0);
   Uint8List getBytes({Format format = Format.rgba}) {
-    Uint8List rgba = Uint8List.view(data.buffer);
+    var rgba = Uint8List.view(data.buffer);
     switch (format) {
       case Format.rgba:
         return rgba;
       case Format.bgra:
-        Uint8List bytes = Uint8List(width * height * 4);
-        for (int i = 0, len = bytes.length; i < len; i += 4) {
+        var bytes = Uint8List(width * height * 4);
+        for (var i = 0, len = bytes.length; i < len; i += 4) {
           bytes[i + 0] = rgba[i + 2];
           bytes[i + 1] = rgba[i + 1];
           bytes[i + 2] = rgba[i + 0];
@@ -185,8 +185,8 @@ class Image {
         }
         return bytes;
       case Format.abgr:
-        Uint8List bytes = Uint8List(width * height * 4);
-        for (int i = 0, len = bytes.length; i < len; i += 4) {
+        var bytes = Uint8List(width * height * 4);
+        for (var i = 0, len = bytes.length; i < len; i += 4) {
           bytes[i + 0] = rgba[i + 3];
           bytes[i + 1] = rgba[i + 2];
           bytes[i + 2] = rgba[i + 1];
@@ -194,8 +194,8 @@ class Image {
         }
         return bytes;
       case Format.argb:
-        Uint8List bytes = Uint8List(width * height * 4);
-        for (int i = 0, len = bytes.length; i < len; i += 4) {
+        var bytes = Uint8List(width * height * 4);
+        for (var i = 0, len = bytes.length; i < len; i += 4) {
           bytes[i + 0] = rgba[i + 3];
           bytes[i + 1] = rgba[i + 0];
           bytes[i + 2] = rgba[i + 1];
@@ -203,24 +203,24 @@ class Image {
         }
         return bytes;
       case Format.rgb:
-        Uint8List bytes = Uint8List(width * height * 3);
-        for (int i = 0, j = 0, len = bytes.length; i < len; i += 4, j += 3) {
+        var bytes = Uint8List(width * height * 3);
+        for (var i = 0, j = 0, len = bytes.length; i < len; i += 4, j += 3) {
           bytes[j + 0] = rgba[i + 0];
           bytes[j + 1] = rgba[i + 1];
           bytes[j + 2] = rgba[i + 2];
         }
         return bytes;
       case Format.bgr:
-        Uint8List bytes = Uint8List(width * height * 3);
-        for (int i = 0, j = 0, len = bytes.length; i < len; i += 4, j += 3) {
+        var bytes = Uint8List(width * height * 3);
+        for (var i = 0, j = 0, len = bytes.length; i < len; i += 4, j += 3) {
           bytes[j + 0] = rgba[i + 2];
           bytes[j + 1] = rgba[i + 1];
           bytes[j + 2] = rgba[i + 0];
         }
         return bytes;
       case Format.luminance:
-        Uint8List bytes = Uint8List(width * height);
-        for (int i = 0, len = length; i < len; ++i) {
+        var bytes = Uint8List(width * height);
+        for (var i = 0, len = length; i < len; ++i) {
           bytes[i] = getLuminance(data[i]);
         }
         return bytes;
@@ -236,21 +236,21 @@ class Image {
 
   /// Add the colors of [other] to the pixels of this image.
   Image operator +(Image other) {
-    int h = min(height, other.height);
-    int w = min(width, other.width);
-    for (int y = 0; y < h; ++y) {
-      for (int x = 0; x < w; ++x) {
-        int c1 = getPixel(x, y);
-        int r1 = getRed(c1);
-        int g1 = getGreen(c1);
-        int b1 = getBlue(c1);
-        int a1 = getAlpha(c1);
+    var h = min(height, other.height);
+    var w = min(width, other.width);
+    for (var y = 0; y < h; ++y) {
+      for (var x = 0; x < w; ++x) {
+        var c1 = getPixel(x, y);
+        var r1 = getRed(c1);
+        var g1 = getGreen(c1);
+        var b1 = getBlue(c1);
+        var a1 = getAlpha(c1);
 
-        int c2 = other.getPixel(x, y);
-        int r2 = getRed(c2);
-        int g2 = getGreen(c2);
-        int b2 = getBlue(c2);
-        int a2 = getAlpha(c2);
+        var c2 = other.getPixel(x, y);
+        var r2 = getRed(c2);
+        var g2 = getGreen(c2);
+        var b2 = getBlue(c2);
+        var a2 = getAlpha(c2);
 
         setPixel(x, y, getColor(r1 + r2, g1 + g2, b1 + b2, a1 + a2));
       }
@@ -260,21 +260,21 @@ class Image {
 
   /// Subtract the colors of [other] from the pixels of this image.
   Image operator -(Image other) {
-    int h = min(height, other.height);
-    int w = min(width, other.width);
-    for (int y = 0; y < h; ++y) {
-      for (int x = 0; x < w; ++x) {
-        int c1 = getPixel(x, y);
-        int r1 = getRed(c1);
-        int g1 = getGreen(c1);
-        int b1 = getBlue(c1);
-        int a1 = getAlpha(c1);
+    var h = min(height, other.height);
+    var w = min(width, other.width);
+    for (var y = 0; y < h; ++y) {
+      for (var x = 0; x < w; ++x) {
+        var c1 = getPixel(x, y);
+        var r1 = getRed(c1);
+        var g1 = getGreen(c1);
+        var b1 = getBlue(c1);
+        var a1 = getAlpha(c1);
 
-        int c2 = other.getPixel(x, y);
-        int r2 = getRed(c2);
-        int g2 = getGreen(c2);
-        int b2 = getBlue(c2);
-        int a2 = getAlpha(c2);
+        var c2 = other.getPixel(x, y);
+        var r2 = getRed(c2);
+        var g2 = getGreen(c2);
+        var b2 = getBlue(c2);
+        var a2 = getAlpha(c2);
 
         setPixel(x, y, getColor(r1 - r2, g1 - g2, b1 - b2, a1 - a2));
       }
@@ -284,21 +284,21 @@ class Image {
 
   /// Multiply the colors of [other] with the pixels of this image.
   Image operator *(Image other) {
-    int h = min(height, other.height);
-    int w = min(width, other.width);
-    for (int y = 0; y < h; ++y) {
-      for (int x = 0; x < w; ++x) {
-        int c1 = getPixel(x, y);
-        int r1 = getRed(c1);
-        int g1 = getGreen(c1);
-        int b1 = getBlue(c1);
-        int a1 = getAlpha(c1);
+    var h = min(height, other.height);
+    var w = min(width, other.width);
+    for (var y = 0; y < h; ++y) {
+      for (var x = 0; x < w; ++x) {
+        var c1 = getPixel(x, y);
+        var r1 = getRed(c1);
+        var g1 = getGreen(c1);
+        var b1 = getBlue(c1);
+        var a1 = getAlpha(c1);
 
-        int c2 = other.getPixel(x, y);
-        int r2 = getRed(c2);
-        int g2 = getGreen(c2);
-        int b2 = getBlue(c2);
-        int a2 = getAlpha(c2);
+        var c2 = other.getPixel(x, y);
+        var r2 = getRed(c2);
+        var g2 = getGreen(c2);
+        var b2 = getBlue(c2);
+        var a2 = getAlpha(c2);
 
         setPixel(x, y, getColor(r1 * r2, g1 * g2, b1 * b2, a1 * a2));
       }
@@ -308,21 +308,21 @@ class Image {
 
   /// OR the colors of [other] to the pixels of this image.
   Image operator |(Image other) {
-    int h = min(height, other.height);
-    int w = min(width, other.width);
-    for (int y = 0; y < h; ++y) {
-      for (int x = 0; x < w; ++x) {
-        int c1 = getPixel(x, y);
-        int r1 = getRed(c1);
-        int g1 = getGreen(c1);
-        int b1 = getBlue(c1);
-        int a1 = getAlpha(c1);
+    var h = min(height, other.height);
+    var w = min(width, other.width);
+    for (var y = 0; y < h; ++y) {
+      for (var x = 0; x < w; ++x) {
+        var c1 = getPixel(x, y);
+        var r1 = getRed(c1);
+        var g1 = getGreen(c1);
+        var b1 = getBlue(c1);
+        var a1 = getAlpha(c1);
 
-        int c2 = other.getPixel(x, y);
-        int r2 = getRed(c2);
-        int g2 = getGreen(c2);
-        int b2 = getBlue(c2);
-        int a2 = getAlpha(c2);
+        var c2 = other.getPixel(x, y);
+        var r2 = getRed(c2);
+        var g2 = getGreen(c2);
+        var b2 = getBlue(c2);
+        var a2 = getAlpha(c2);
 
         setPixel(x, y, getColor(r1 | r2, g1 | g2, b1 | b2, a1 | a2));
       }
@@ -332,21 +332,21 @@ class Image {
 
   /// AND the colors of [other] with the pixels of this image.
   Image operator &(Image other) {
-    int h = min(height, other.height);
-    int w = min(width, other.width);
-    for (int y = 0; y < h; ++y) {
-      for (int x = 0; x < w; ++x) {
-        int c1 = getPixel(x, y);
-        int r1 = getRed(c1);
-        int g1 = getGreen(c1);
-        int b1 = getBlue(c1);
-        int a1 = getAlpha(c1);
+    var h = min(height, other.height);
+    var w = min(width, other.width);
+    for (var y = 0; y < h; ++y) {
+      for (var x = 0; x < w; ++x) {
+        var c1 = getPixel(x, y);
+        var r1 = getRed(c1);
+        var g1 = getGreen(c1);
+        var b1 = getBlue(c1);
+        var a1 = getAlpha(c1);
 
-        int c2 = other.getPixel(x, y);
-        int r2 = getRed(c2);
-        int g2 = getGreen(c2);
-        int b2 = getBlue(c2);
-        int a2 = getAlpha(c2);
+        var c2 = other.getPixel(x, y);
+        var r2 = getRed(c2);
+        var g2 = getGreen(c2);
+        var b2 = getBlue(c2);
+        var a2 = getAlpha(c2);
 
         setPixel(x, y, getColor(r1 & r2, g1 & g2, b1 & b2, a1 & a2));
       }
@@ -356,21 +356,21 @@ class Image {
 
   /// Modula the colors of [other] with the pixels of this image.
   Image operator %(Image other) {
-    int h = min(height, other.height);
-    int w = min(width, other.width);
-    for (int y = 0; y < h; ++y) {
-      for (int x = 0; x < w; ++x) {
-        int c1 = getPixel(x, y);
-        int r1 = getRed(c1);
-        int g1 = getGreen(c1);
-        int b1 = getBlue(c1);
-        int a1 = getAlpha(c1);
+    var h = min(height, other.height);
+    var w = min(width, other.width);
+    for (var y = 0; y < h; ++y) {
+      for (var x = 0; x < w; ++x) {
+        var c1 = getPixel(x, y);
+        var r1 = getRed(c1);
+        var g1 = getGreen(c1);
+        var b1 = getBlue(c1);
+        var a1 = getAlpha(c1);
 
-        int c2 = other.getPixel(x, y);
-        int r2 = getRed(c2);
-        int g2 = getGreen(c2);
-        int b2 = getBlue(c2);
-        int a2 = getAlpha(c2);
+        var c2 = other.getPixel(x, y);
+        var r2 = getRed(c2);
+        var g2 = getGreen(c2);
+        var b2 = getBlue(c2);
+        var a2 = getAlpha(c2);
 
         setPixel(x, y, getColor(r1 % r2, g1 % g2, b1 % b2, a1 % a2));
       }
@@ -420,12 +420,12 @@ class Image {
   /// Get the pixel using linear interpolation for non-integer pixel
   /// coordinates.
   int getPixelLinear(num fx, num fy) {
-    int x = fx.toInt() - (fx >= 0 ? 0 : 1);
-    int nx = x + 1;
-    int y = fy.toInt() - (fy >= 0 ? 0 : 1);
-    int ny = y + 1;
-    num dx = fx - x;
-    num dy = fy - y;
+    var x = fx.toInt() - (fx >= 0 ? 0 : 1);
+    var nx = x + 1;
+    var y = fy.toInt() - (fy >= 0 ? 0 : 1);
+    var ny = y + 1;
+    var dx = fx - x;
+    var dy = fy - y;
 
     int _linear(int Icc, int Inc, int Icn, int Inn) {
       return (Icc +
@@ -434,10 +434,10 @@ class Image {
           .toInt();
     }
 
-    int Icc = getPixelSafe(x, y);
-    int Inc = getPixelSafe(nx, y);
-    int Icn = getPixelSafe(x, ny);
-    int Inn = getPixelSafe(nx, ny);
+    var Icc = getPixelSafe(x, y);
+    var Inc = getPixelSafe(nx, y);
+    var Icn = getPixelSafe(x, ny);
+    var Inn = getPixelSafe(nx, ny);
 
     return getColor(
         _linear(getRed(Icc), getRed(Inc), getRed(Icn), getRed(Inn)),
@@ -449,14 +449,14 @@ class Image {
   /// Get the pixel using cubic interpolation for non-integer pixel
   /// coordinates.
   int getPixelCubic(num fx, num fy) {
-    int x = fx.toInt() - (fx >= 0.0 ? 0 : 1);
-    int px = x - 1;
-    int nx = x + 1;
-    int ax = x + 2;
-    int y = fy.toInt() - (fy >= 0.0 ? 0 : 1);
-    int py = y - 1;
-    int ny = y + 1;
-    int ay = y + 2;
+    var x = fx.toInt() - (fx >= 0.0 ? 0 : 1);
+    var px = x - 1;
+    var nx = x + 1;
+    var ax = x + 2;
+    var y = fy.toInt() - (fy >= 0.0 ? 0 : 1);
+    var py = y - 1;
+    var ny = y + 1;
+    var ay = y + 2;
 
     var dx = fx - x;
     var dy = fy - y;
@@ -468,58 +468,58 @@ class Image {
                 dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
                 dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
 
-    int Ipp = getPixelSafe(px, py);
-    int Icp = getPixelSafe(x, py);
-    int Inp = getPixelSafe(nx, py);
-    int Iap = getPixelSafe(ax, py);
-    num Ip0 = _cubic(dx, getRed(Ipp), getRed(Icp), getRed(Inp), getRed(Iap));
-    num Ip1 =
+    var Ipp = getPixelSafe(px, py);
+    var Icp = getPixelSafe(x, py);
+    var Inp = getPixelSafe(nx, py);
+    var Iap = getPixelSafe(ax, py);
+    var Ip0 = _cubic(dx, getRed(Ipp), getRed(Icp), getRed(Inp), getRed(Iap));
+    var Ip1 =
         _cubic(dx, getGreen(Ipp), getGreen(Icp), getGreen(Inp), getGreen(Iap));
-    num Ip2 =
+    var Ip2 =
         _cubic(dx, getBlue(Ipp), getBlue(Icp), getBlue(Inp), getBlue(Iap));
-    num Ip3 =
+    var Ip3 =
         _cubic(dx, getAlpha(Ipp), getAlpha(Icp), getAlpha(Inp), getAlpha(Iap));
 
-    int Ipc = getPixelSafe(px, y);
-    int Icc = getPixelSafe(x, y);
-    int Inc = getPixelSafe(nx, y);
-    int Iac = getPixelSafe(ax, y);
-    num Ic0 = _cubic(dx, getRed(Ipc), getRed(Icc), getRed(Inc), getRed(Iac));
-    num Ic1 =
+    var Ipc = getPixelSafe(px, y);
+    var Icc = getPixelSafe(x, y);
+    var Inc = getPixelSafe(nx, y);
+    var Iac = getPixelSafe(ax, y);
+    var Ic0 = _cubic(dx, getRed(Ipc), getRed(Icc), getRed(Inc), getRed(Iac));
+    var Ic1 =
         _cubic(dx, getGreen(Ipc), getGreen(Icc), getGreen(Inc), getGreen(Iac));
-    num Ic2 =
+    var Ic2 =
         _cubic(dx, getBlue(Ipc), getBlue(Icc), getBlue(Inc), getBlue(Iac));
-    num Ic3 =
+    var Ic3 =
         _cubic(dx, getAlpha(Ipc), getAlpha(Icc), getAlpha(Inc), getAlpha(Iac));
 
-    int Ipn = getPixelSafe(px, ny);
-    int Icn = getPixelSafe(x, ny);
-    int Inn = getPixelSafe(nx, ny);
-    int Ian = getPixelSafe(ax, ny);
-    num In0 = _cubic(dx, getRed(Ipn), getRed(Icn), getRed(Inn), getRed(Ian));
-    num In1 =
+    var Ipn = getPixelSafe(px, ny);
+    var Icn = getPixelSafe(x, ny);
+    var Inn = getPixelSafe(nx, ny);
+    var Ian = getPixelSafe(ax, ny);
+    var In0 = _cubic(dx, getRed(Ipn), getRed(Icn), getRed(Inn), getRed(Ian));
+    var In1 =
         _cubic(dx, getGreen(Ipn), getGreen(Icn), getGreen(Inn), getGreen(Ian));
-    num In2 =
+    var In2 =
         _cubic(dx, getBlue(Ipn), getBlue(Icn), getBlue(Inn), getBlue(Ian));
-    num In3 =
+    var In3 =
         _cubic(dx, getAlpha(Ipn), getAlpha(Icn), getAlpha(Inn), getAlpha(Ian));
 
-    int Ipa = getPixelSafe(px, ay);
-    int Ica = getPixelSafe(x, ay);
-    int Ina = getPixelSafe(nx, ay);
-    int Iaa = getPixelSafe(ax, ay);
-    num Ia0 = _cubic(dx, getRed(Ipa), getRed(Ica), getRed(Ina), getRed(Iaa));
-    num Ia1 =
+    var Ipa = getPixelSafe(px, ay);
+    var Ica = getPixelSafe(x, ay);
+    var Ina = getPixelSafe(nx, ay);
+    var Iaa = getPixelSafe(ax, ay);
+    var Ia0 = _cubic(dx, getRed(Ipa), getRed(Ica), getRed(Ina), getRed(Iaa));
+    var Ia1 =
         _cubic(dx, getGreen(Ipa), getGreen(Ica), getGreen(Ina), getGreen(Iaa));
-    num Ia2 =
+    var Ia2 =
         _cubic(dx, getBlue(Ipa), getBlue(Ica), getBlue(Ina), getBlue(Iaa));
-    num Ia3 =
+    var Ia3 =
         _cubic(dx, getAlpha(Ipa), getAlpha(Ica), getAlpha(Ina), getAlpha(Iaa));
 
-    num c0 = _cubic(dy, Ip0, Ic0, In0, Ia0);
-    num c1 = _cubic(dy, Ip1, Ic1, In1, Ia1);
-    num c2 = _cubic(dy, Ip2, Ic2, In2, Ia2);
-    num c3 = _cubic(dy, Ip3, Ic3, In3, Ia3);
+    var c0 = _cubic(dy, Ip0, Ic0, In0, Ia0);
+    var c1 = _cubic(dy, Ip1, Ic1, In1, Ia1);
+    var c2 = _cubic(dy, Ip2, Ic2, In2, Ia2);
+    var c3 = _cubic(dy, Ip3, Ic3, In3, Ia3);
 
     return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
   }
@@ -550,10 +550,10 @@ class Image {
   /// Return the average gray value of the image.
   int getWhiteBalance() {
     final len = data.length;
-    int r = 0;
-    int g = 0;
-    int b = 0;
-    for (int i = 0; i < len; ++i) {
+    var r = 0;
+    var g = 0;
+    var b = 0;
+    for (var i = 0; i < len; ++i) {
       r += getRed(data[i]);
       g += getGreen(data[i]);
       b += getBlue(data[i]);
@@ -576,20 +576,20 @@ class Image {
           : Uint32List.view(Uint8List.fromList(bytes).buffer);
     }
 
-    List<int> input =
+    var input =
         bytes is Uint32List ? Uint8List.view(bytes.buffer) : bytes;
 
-    Uint32List data = Uint32List(width * height);
-    Uint8List rgba = Uint8List.view(data.buffer);
+    var data = Uint32List(width * height);
+    var rgba = Uint8List.view(data.buffer);
 
     switch (format) {
       case Format.rgba:
-        for (int i = 0, len = input.length; i < len; ++i) {
+        for (var i = 0, len = input.length; i < len; ++i) {
           rgba[i] = input[i];
         }
         break;
       case Format.bgra:
-        for (int i = 0, len = input.length; i < len; i += 4) {
+        for (var i = 0, len = input.length; i < len; i += 4) {
           rgba[i + 0] = input[i + 2];
           rgba[i + 1] = input[i + 1];
           rgba[i + 2] = input[i + 0];
@@ -597,7 +597,7 @@ class Image {
         }
         break;
       case Format.abgr:
-        for (int i = 0, len = input.length; i < len; i += 4) {
+        for (var i = 0, len = input.length; i < len; i += 4) {
           rgba[i + 0] = input[i + 3];
           rgba[i + 1] = input[i + 2];
           rgba[i + 2] = input[i + 1];
@@ -605,7 +605,7 @@ class Image {
         }
         break;
       case Format.argb:
-        for (int i = 0, len = input.length; i < len; i += 4) {
+        for (var i = 0, len = input.length; i < len; i += 4) {
           rgba[i + 0] = input[i + 1];
           rgba[i + 1] = input[i + 2];
           rgba[i + 2] = input[i + 3];
@@ -613,7 +613,7 @@ class Image {
         }
         break;
       case Format.bgr:
-        for (int i = 0, j = 0, len = input.length; i < len; i += 4, j += 3) {
+        for (var i = 0, j = 0, len = input.length; i < len; i += 4, j += 3) {
           rgba[i + 0] = input[j + 2];
           rgba[i + 1] = input[j + 1];
           rgba[i + 2] = input[j + 0];
@@ -621,7 +621,7 @@ class Image {
         }
         break;
       case Format.rgb:
-        for (int i = 0, j = 0, len = input.length; i < len; i += 4, j += 3) {
+        for (var i = 0, j = 0, len = input.length; i < len; i += 4, j += 3) {
           rgba[i + 0] = input[j + 0];
           rgba[i + 1] = input[j + 1];
           rgba[i + 2] = input[j + 2];
@@ -629,7 +629,7 @@ class Image {
         }
         break;
       case Format.luminance:
-        for (int i = 0, j = 0, len = input.length; i < len; i += 4, ++j) {
+        for (var i = 0, j = 0, len = input.length; i < len; i += 4, ++j) {
           rgba[i + 0] = input[j];
           rgba[i + 1] = input[j];
           rgba[i + 2] = input[j];

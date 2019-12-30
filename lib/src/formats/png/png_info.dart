@@ -13,8 +13,9 @@ class PngInfo extends DecodeInfo {
   List<int> transparency;
   List<int> colorLut;
   double gamma;
+  @override
   int backgroundColor = 0x00ffffff;
-  String iCCPName = "";
+  String iCCPName = '';
   int iCCPCompression = 0;
   Uint8List iCCPData;
 
@@ -22,9 +23,9 @@ class PngInfo extends DecodeInfo {
   @override
   int numFrames = 1;
   int repeat = 0;
-  List<PngFrame> frames = [];
+  final frames = <PngFrame>[];
 
-  List<int> _idat = [];
+  final _idat = <int>[];
 
   bool get isAnimated => frames.isNotEmpty;
 }

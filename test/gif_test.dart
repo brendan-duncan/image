@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Directory dir = Directory('test/res/gif');
+  final dir = Directory('test/res/gif');
   var files = dir.listSync();
 
   group('GIF', () {
@@ -12,11 +12,11 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('getInfo $name', () {
         var bytes = (f as File).readAsBytesSync();
 
-        GifInfo data = GifDecoder().startDecode(bytes);
+        final data = GifDecoder().startDecode(bytes);
         if (data == null) {
           throw ImageException('Unable to parse Gif info: $name.');
         }
@@ -28,10 +28,10 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('decodeImage $name', () {
         var bytes = (f as File).readAsBytesSync();
-        Image image = GifDecoder().decodeImage(bytes);
+        final image = GifDecoder().decodeImage(bytes);
         File('.dart_tool/out/gif/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(image));
@@ -44,9 +44,9 @@ void main() {
       }
 
       Animation anim;
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('decodeCars $name', () {
-        List<int> bytes = (f as File).readAsBytesSync();
+        final bytes = (f as File).readAsBytesSync();
         anim = GifDecoder().decodeAnimation(bytes);
         expect(anim.length, equals(30));
         expect(anim.loopCount, equals(0));
@@ -61,29 +61,29 @@ void main() {
     }
 
     test('encodeAnimation', () {
-      Animation anim = Animation();
+      final anim = Animation();
       anim.loopCount = 10;
       for (var i = 0; i < 10; i++) {
-        Image image = Image(480, 120);
+        final image = Image(480, 120);
         drawString(image, arial_48, 100, 60, i.toString());
         anim.addFrame(image);
       }
 
-      List<int> gif = encodeGifAnimation(anim);
+      final gif = encodeGifAnimation(anim);
       File('.dart_tool/out/gif/encodeAnimation.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
 
-      Animation anim2 = GifDecoder().decodeAnimation(gif);
+      final anim2 = GifDecoder().decodeAnimation(gif);
       expect(anim2.length, equals(10));
       expect(anim2.loopCount, equals(10));
     });
 
     test('encodeImage', () {
-      List<int> bytes = File('test/res/jpg/jpeg444.jpg').readAsBytesSync();
-      Image image = JpegDecoder().decodeImage(bytes);
+      final bytes = File('test/res/jpg/jpeg444.jpg').readAsBytesSync();
+      final image = JpegDecoder().decodeImage(bytes);
 
-      List<int> gif = GifEncoder().encodeImage(image);
+      final gif = GifEncoder().encodeImage(image);
       File('.dart_tool/out/gif/jpeg444.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);

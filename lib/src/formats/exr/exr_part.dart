@@ -40,21 +40,21 @@ class ExrPart {
     //_type = _tiled ? ExrPart.TYPE_TILE : ExrPart.TYPE_SCANLINE;
 
     while (true) {
-      String name = input.readString();
+      var name = input.readString();
       if (name == null || name.isEmpty) {
         break;
       }
 
-      String type = input.readString();
-      int size = input.readUint32();
-      InputBuffer value = input.readBytes(size);
+      var type = input.readString();
+      var size = input.readUint32();
+      var value = input.readBytes(size);
 
       attributes[name] = ExrAttribute(name, type, size, value);
 
       switch (name) {
         case 'channels':
           while (true) {
-            ExrChannel channel = ExrChannel(value);
+            var channel = ExrChannel(value);
             if (!channel.isValid) {
               break;
             }
@@ -112,12 +112,12 @@ class ExrPart {
         case 'tiles':
           _tileWidth = value.readUint32();
           _tileHeight = value.readUint32();
-          int mode = value.readByte();
+          var mode = value.readByte();
           _tileLevelMode = mode & 0xf;
           _tileRoundingMode = (mode >> 4) & 0xf;
           break;
         case 'type':
-          String s = value.readString();
+          var s = value.readString();
           if (s == 'deepscanline') {
             //this._type = TYPE_DEEP_SCANLINE;
           } else if (s == 'deeptile') {
@@ -155,24 +155,24 @@ class ExrPart {
           _compressionType, this, _maxBytesPerTileLine, _tileHeight);
 
       _offsets = List<Uint32List>(_numXLevels * _numYLevels);
-      for (int ly = 0, l = 0; ly < _numYLevels; ++ly) {
-        for (int lx = 0; lx < _numXLevels; ++lx, ++l) {
+      for (var ly = 0, l = 0; ly < _numYLevels; ++ly) {
+        for (var lx = 0; lx < _numXLevels; ++lx, ++l) {
           _offsets[l] = Uint32List(_numXTiles[lx] * _numYTiles[ly]);
         }
       }
     } else {
       _bytesPerLine = Uint32List(height + 1);
-      for (ExrChannel ch in channels) {
-        int nBytes = ch.size * width ~/ ch.xSampling;
-        for (int y = 0; y < height; ++y) {
+      for (var ch in channels) {
+        var nBytes = ch.size * width ~/ ch.xSampling;
+        for (var y = 0; y < height; ++y) {
           if ((y + top) % ch.ySampling == 0) {
             _bytesPerLine[y] += nBytes;
           }
         }
       }
 
-      int maxBytesPerLine = 0;
-      for (int y = 0; y < height; ++y) {
+      var maxBytesPerLine = 0;
+      for (var y = 0; y < height; ++y) {
         maxBytesPerLine = max(maxBytesPerLine, _bytesPerLine[y]);
       }
 
@@ -183,8 +183,8 @@ class ExrPart {
 
       _offsetInLineBuffer = Uint32List(_bytesPerLine.length);
 
-      int offset = 0;
-      for (int i = 0; i <= _bytesPerLine.length - 1; ++i) {
+      var offset = 0;
+      for (var i = 0; i <= _bytesPerLine.length - 1; ++i) {
         if (i % _linesInBuffer == 0) {
           offset = 0;
         }
@@ -192,7 +192,7 @@ class ExrPart {
         offset += _bytesPerLine[i];
       }
 
-      int numOffsets = ((height + _linesInBuffer) ~/ _linesInBuffer) - 1;
+      var numOffsets = ((height + _linesInBuffer) ~/ _linesInBuffer) - 1;
       _offsets = [Uint32List(numOffsets)];
     }
   }
@@ -209,42 +209,42 @@ class ExrPart {
   bool get isValid => width != null;
 
   int _calculateNumXLevels(int minX, int maxX, int minY, int maxY) {
-    int num = 0;
+    var num = 0;
 
     switch (_tileLevelMode) {
       case ONE_LEVEL:
         num = 1;
         break;
       case MIPMAP_LEVELS:
-        int w = maxX - minX + 1;
-        int h = maxY - minY + 1;
+        var w = maxX - minX + 1;
+        var h = maxY - minY + 1;
         num = _roundLog2(max(w, h), _tileRoundingMode) + 1;
         break;
       case RIPMAP_LEVELS:
-        int w = maxX - minX + 1;
+        var w = maxX - minX + 1;
         num = _roundLog2(w, _tileRoundingMode) + 1;
         break;
       default:
-        throw ImageException("Unknown LevelMode format.");
+        throw ImageException('Unknown LevelMode format.');
     }
 
     return num;
   }
 
   int _calculateNumYLevels(int minX, int maxX, int minY, int maxY) {
-    int num = 0;
+    var num = 0;
 
     switch (_tileLevelMode) {
       case ONE_LEVEL:
         num = 1;
         break;
       case MIPMAP_LEVELS:
-        int w = (maxX - minX) + 1;
-        int h = (maxY - minY) + 1;
+        var w = (maxX - minX) + 1;
+        var h = (maxY - minY) + 1;
         num = _roundLog2(max(w, h), _tileRoundingMode) + 1;
         break;
       case RIPMAP_LEVELS:
-        int h = (maxY - minY) + 1;
+        var h = (maxY - minY) + 1;
         num = _roundLog2(h, _tileRoundingMode) + 1;
         break;
       default:
@@ -259,7 +259,7 @@ class ExrPart {
   }
 
   int _floorLog2(int x) {
-    int y = 0;
+    var y = 0;
 
     while (x > 1) {
       y += 1;
@@ -270,8 +270,8 @@ class ExrPart {
   }
 
   int _ceilLog2(int x) {
-    int y = 0;
-    int r = 0;
+    var y = 0;
+    var r = 0;
 
     while (x > 1) {
       if (x & 1 != 0) {
@@ -286,9 +286,9 @@ class ExrPart {
   }
 
   int _calculateBytesPerPixel() {
-    int bytesPerPixel = 0;
+    var bytesPerPixel = 0;
 
-    for (ExrChannel ch in channels) {
+    for (var ch in channels) {
       bytesPerPixel += ch.size;
     }
 
@@ -297,7 +297,7 @@ class ExrPart {
 
   void _calculateNumTiles(List<int> numTiles, int numLevels, int min, int max,
       int size, int rmode) {
-    for (int i = 0; i < numLevels; i++) {
+    for (var i = 0; i < numLevels; i++) {
       numTiles[i] = (_levelSize(min, max, i, rmode) + size - 1) ~/ size;
     }
   }
@@ -307,9 +307,9 @@ class ExrPart {
       throw ImageException('Argument not in valid range.');
     }
 
-    int a = (_max - _min) + 1;
-    int b = (1 << l);
-    int size = a ~/ b;
+    var a = (_max - _min) + 1;
+    var b = (1 << l);
+    var size = a ~/ b;
 
     if (rmode == ROUND_UP && size * b < a) {
       size += 1;
@@ -318,21 +318,21 @@ class ExrPart {
     return max(size, 1);
   }
 
-  static const int TYPE_SCANLINE = 0;
-  static const int TYPE_TILE = 1;
-  static const int TYPE_DEEP_SCANLINE = 2;
-  static const int TYPE_DEEP_TILE = 3;
+  static const TYPE_SCANLINE = 0;
+  static const TYPE_TILE = 1;
+  static const TYPE_DEEP_SCANLINE = 2;
+  static const TYPE_DEEP_TILE = 3;
 
-  static const int INCREASING_Y = 0;
-  static const int DECREASING_Y = 1;
-  static const int RANDOM_Y = 2;
+  static const INCREASING_Y = 0;
+  static const DECREASING_Y = 1;
+  static const RANDOM_Y = 2;
 
-  static const int ONE_LEVEL = 0;
-  static const int MIPMAP_LEVELS = 1;
-  static const int RIPMAP_LEVELS = 2;
+  static const ONE_LEVEL = 0;
+  static const MIPMAP_LEVELS = 1;
+  static const RIPMAP_LEVELS = 2;
 
-  static const int ROUND_DOWN = 0;
-  static const int ROUND_UP = 1;
+  static const ROUND_DOWN = 0;
+  static const ROUND_UP = 1;
 
   //int _type;
   //int _lineOrder = INCREASING_Y;
@@ -345,7 +345,7 @@ class ExrPart {
   //int _lineBufferSize;
   Uint32List _offsetInLineBuffer;
 
-  bool _tiled;
+  final bool _tiled;
   int _tileWidth;
   int _tileHeight;
   int _tileLevelMode;
@@ -379,14 +379,14 @@ class InternalExrPart extends ExrPart {
 
   void readOffsets(InputBuffer input) {
     if (_tiled) {
-      for (int i = 0; i < _offsets.length; ++i) {
-        for (int j = 0; j < _offsets[i].length; ++j) {
+      for (var i = 0; i < _offsets.length; ++i) {
+        for (var j = 0; j < _offsets[i].length; ++j) {
           _offsets[i][j] = input.readUint64();
         }
       }
     } else {
-      int numOffsets = _offsets[0].length;
-      for (int i = 0; i < numOffsets; ++i) {
+      var numOffsets = _offsets[0].length;
+      for (var i = 0; i < numOffsets; ++i) {
         _offsets[0][i] = input.readUint64();
       }
     }

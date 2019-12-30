@@ -5,26 +5,26 @@ import 'package:test/test.dart';
 void main() {
   group('PNG', () {
     test('encode', () {
-      Image image = Image(64, 64);
+      final image = Image(64, 64);
       image.fill(getColor(100, 200, 255));
 
       // Encode the image to PNG
-      List<int> png = PngEncoder().encodeImage(image);
+      final png = PngEncoder().encodeImage(image);
       File('.dart_tool/out/png/encode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
 
     test('encodeAnimation', () {
-      Animation anim = Animation();
+      final anim = Animation();
       anim.loopCount = 10;
       for (var i = 0; i < 10; i++) {
-        Image image = Image(480, 120);
+        final image = Image(480, 120);
         drawString(image, arial_48, 100, 60, i.toString());
         anim.addFrame(image);
       }
 
-      List<int> png = encodePngAnimation(anim);
+      final png = encodePngAnimation(anim);
       File('.dart_tool/out/png/encodeAnimation.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
@@ -32,16 +32,16 @@ void main() {
 
     test('decode', () {
       List<int> bytes = File('.dart_tool/out/png/encode.png').readAsBytesSync();
-      Image image = PngDecoder().decodeImage(bytes);
+      final image = PngDecoder().decodeImage(bytes);
 
       expect(image.width, equals(64));
       expect(image.height, equals(64));
       var c = getColor(100, 200, 255);
-      for (int i = 0, len = image.length; i < len; ++i) {
+      for (var i = 0, len = image.length; i < len; ++i) {
         expect(image[i], equals(c));
       }
 
-      List<int> png = PngEncoder().encodeImage(image);
+      final png = PngEncoder().encodeImage(image);
       File('.dart_tool/out/png/decode.png').writeAsBytesSync(png);
     });
 
@@ -60,7 +60,7 @@ void main() {
           image2.iccProfile.data.length, equals(image.iccProfile.data.length));
     });
 
-    Directory dir = Directory('test/res/png');
+    final dir = Directory('test/res/png');
     var files = dir.listSync();
 
     for (var f in files) {
@@ -94,10 +94,10 @@ void main() {
       //      interlacing:
       //        n - non-interlaced
       //        i - interlaced
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      final name = f.path.split(RegExp(r'(/|\\)')).last;
 
       test('PNG $name', () {
-        File file = f as File;
+        final file = f as File;
 
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
@@ -108,15 +108,15 @@ void main() {
             ;
           }
         } else {
-          Animation anim = decodeAnimation(file.readAsBytesSync());
+          final anim = decodeAnimation(file.readAsBytesSync());
           if (anim.length == 1) {
-            List<int> png = PngEncoder().encodeImage(anim[0]);
+            final png = PngEncoder().encodeImage(anim[0]);
             File('.dart_tool/out/png/${name}')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
           } else {
-            for (int i = 0; i < anim.length; ++i) {
-              List<int> png = PngEncoder().encodeImage(anim[i]);
+            for (var i = 0; i < anim.length; ++i) {
+              final png = PngEncoder().encodeImage(anim[i]);
               File('.dart_tool/out/png/${name}-$i.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);

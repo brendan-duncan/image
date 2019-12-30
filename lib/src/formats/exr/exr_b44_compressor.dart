@@ -18,8 +18,10 @@ class InternalExrB44Compressor extends InternalExrCompressor
       this._numScanLines, bool optFlatFields)
       : super(header as InternalExrPart);
 
+  @override
   int numScanLines() => _numScanLines;
 
+  @override
   Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
     throw ImageException('B44 compression not yet supported.');
   }
@@ -31,6 +33,6 @@ class InternalExrB44Compressor extends InternalExrCompressor
   }
 
   //int _maxScanLineSize;
-  int _numScanLines;
+  final int _numScanLines;
   //bool _optFlatFields;
 }

@@ -46,7 +46,7 @@ class JpegScan {
   }
 
   void decode() {
-    int componentsLength = components.length;
+    var componentsLength = components.length;
     JpegComponent component;
     dynamic decodeFn;
 
@@ -60,7 +60,7 @@ class JpegScan {
       decodeFn = _decodeBaseline;
     }
 
-    int mcu = 0;
+    var mcu = 0;
 
     int mcuExpected;
     if (componentsLength == 1) {
@@ -77,25 +77,25 @@ class JpegScan {
     int h, v;
     while (mcu < mcuExpected) {
       // reset interval stuff
-      for (int i = 0; i < componentsLength; i++) {
+      for (var i = 0; i < componentsLength; i++) {
         components[i].pred = 0;
       }
       eobrun = 0;
 
       if (componentsLength == 1) {
         component = components[0] as JpegComponent;
-        for (int n = 0; n < resetInterval; n++) {
+        for (var n = 0; n < resetInterval; n++) {
           _decodeBlock(component, decodeFn, mcu);
           mcu++;
         }
       } else {
-        for (int n = 0; n < resetInterval; n++) {
-          for (int i = 0; i < componentsLength; i++) {
+        for (var n = 0; n < resetInterval; n++) {
+          for (var i = 0; i < componentsLength; i++) {
             component = components[i] as JpegComponent;
             h = component.hSamples;
             v = component.vSamples;
-            for (int j = 0; j < v; j++) {
-              for (int k = 0; k < h; k++) {
+            for (var j = 0; j < v; j++) {
+              for (var k = 0; k < h; k++) {
                 _decodeMcu(component, decodeFn, mcu, j, k);
               }
             }
@@ -106,8 +106,8 @@ class JpegScan {
 
       // find marker
       bitsCount = 0;
-      int m1 = input[0];
-      int m2 = input[1];
+      var m1 = input[0];
+      var m2 = input[1];
       if (m1 == 0xff) {
         if (m2 >= Jpeg.M_RST0 && m2 <= Jpeg.M_RST7) {
           input.offset += 2;
@@ -130,7 +130,7 @@ class JpegScan {
 
     bitsData = input.readByte();
     if (bitsData == 0xff) {
-      int nextByte = input.readByte();
+      var nextByte = input.readByte();
       if (nextByte != 0) {
         throw ImageException('unexpected marker: ' +
             ((bitsData << 8) | nextByte).toRadixString(16));
@@ -155,9 +155,9 @@ class JpegScan {
   }
 
   int _receive(int length) {
-    int n = 0;
+    var n = 0;
     while (length > 0) {
-      int bit = _readBit();
+      var bit = _readBit();
       if (bit == null) {
         return null;
       }
@@ -171,7 +171,7 @@ class JpegScan {
     if (length == 1) {
       return _readBit() == 1 ? 1 : -1;
     }
-    int n = _receive(length);
+    var n = _receive(length);
     if (n >= (1 << (length - 1))) {
       return n;
     }
@@ -179,16 +179,16 @@ class JpegScan {
   }
 
   void _decodeBaseline(JpegComponent component, List zz) {
-    int t = _decodeHuffman(component.huffmanTableDC);
-    int diff = t == 0 ? 0 : _receiveAndExtend(t);
+    var t = _decodeHuffman(component.huffmanTableDC);
+    var diff = t == 0 ? 0 : _receiveAndExtend(t);
     component.pred += diff;
     zz[0] = component.pred;
 
-    int k = 1;
+    var k = 1;
     while (k < 64) {
       var rs = _decodeHuffman(component.huffmanTableAC);
-      int s = rs & 15;
-      int r = rs >> 4;
+      var s = rs & 15;
+      var r = rs >> 4;
       if (s == 0) {
         if (r < 15) {
           break;
@@ -201,15 +201,15 @@ class JpegScan {
 
       s = _receiveAndExtend(s);
 
-      int z = Jpeg.dctZigZag[k];
+      var z = Jpeg.dctZigZag[k];
       zz[z] = s;
       k++;
     }
   }
 
   void _decodeDCFirst(JpegComponent component, List zz) {
-    int t = _decodeHuffman(component.huffmanTableDC);
-    int diff = (t == 0) ? 0 : (_receiveAndExtend(t) << successive);
+    var t = _decodeHuffman(component.huffmanTableDC);
+    var diff = (t == 0) ? 0 : (_receiveAndExtend(t) << successive);
     component.pred += diff;
     zz[0] = component.pred;
   }
@@ -223,12 +223,12 @@ class JpegScan {
       eobrun--;
       return;
     }
-    int k = spectralStart;
-    int e = spectralEnd;
+    var k = spectralStart;
+    var e = spectralEnd;
     while (k <= e) {
-      int rs = _decodeHuffman(component.huffmanTableAC);
-      int s = rs & 15;
-      int r = rs >> 4;
+      var rs = _decodeHuffman(component.huffmanTableAC);
+      var s = rs & 15;
+      var r = rs >> 4;
       if (s == 0) {
         if (r < 15) {
           eobrun = (_receive(r) + (1 << r) - 1);
@@ -238,22 +238,22 @@ class JpegScan {
         continue;
       }
       k += r;
-      int z = Jpeg.dctZigZag[k];
+      var z = Jpeg.dctZigZag[k];
       zz[z] = (_receiveAndExtend(s) * (1 << successive));
       k++;
     }
   }
 
   void _decodeACSuccessive(JpegComponent component, dynamic zz) {
-    int k = spectralStart;
-    int e = spectralEnd;
-    int s = 0;
-    int r = 0;
+    var k = spectralStart;
+    var e = spectralEnd;
+    var s = 0;
+    var r = 0;
     while (k <= e) {
-      int z = Jpeg.dctZigZag[k];
+      var z = Jpeg.dctZigZag[k];
       switch (successiveACState) {
         case 0: // initial state
-          int rs = _decodeHuffman(component.huffmanTableAC);
+          var rs = _decodeHuffman(component.huffmanTableAC);
           if (rs == null) continue;
           s = rs & 15;
           r = rs >> 4;
@@ -310,14 +310,14 @@ class JpegScan {
 
   void _decodeMcu(
       JpegComponent component, dynamic decodeFn, int mcu, int row, int col) {
-    int mcuRow = (mcu ~/ mcusPerLine);
-    int mcuCol = mcu % mcusPerLine;
-    int blockRow = mcuRow * component.vSamples + row;
-    int blockCol = mcuCol * component.hSamples + col;
+    var mcuRow = (mcu ~/ mcusPerLine);
+    var mcuCol = mcu % mcusPerLine;
+    var blockRow = mcuRow * component.vSamples + row;
+    var blockCol = mcuCol * component.hSamples + col;
     if (blockRow >= component.blocks.length) {
       return;
     }
-    int numCols = component.blocks[blockRow].length as int;
+    var numCols = component.blocks[blockRow].length as int;
     if (blockCol >= numCols) {
       return;
     }
@@ -325,8 +325,8 @@ class JpegScan {
   }
 
   void _decodeBlock(JpegComponent component, dynamic decodeFn, int mcu) {
-    int blockRow = mcu ~/ component.blocksPerLine;
-    int blockCol = mcu % component.blocksPerLine;
+    var blockRow = mcu ~/ component.blocksPerLine;
+    var blockCol = mcu % component.blocksPerLine;
     decodeFn(component, component.blocks[blockRow][blockCol]);
   }
 }

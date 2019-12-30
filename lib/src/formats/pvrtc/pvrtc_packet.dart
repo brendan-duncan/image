@@ -65,50 +65,50 @@ class PvrtcPacket {
   }
 
   void setColorRgbA(PvrtcColorRgb c) {
-    int r = BitUtility.BITSCALE_8_TO_5_FLOOR[c.r];
-    int g = BitUtility.BITSCALE_8_TO_5_FLOOR[c.g];
-    int b = BitUtility.BITSCALE_8_TO_4_FLOOR[c.b];
+    var r = BitUtility.BITSCALE_8_TO_5_FLOOR[c.r];
+    var g = BitUtility.BITSCALE_8_TO_5_FLOOR[c.g];
+    var b = BitUtility.BITSCALE_8_TO_4_FLOOR[c.b];
     colorA = r << 9 | g << 4 | b;
     colorAIsOpaque = 1;
   }
 
   void setColorRgbaA(PvrtcColorRgba c) {
-    int a = BitUtility.BITSCALE_8_TO_3_FLOOR[c.a];
+    var a = BitUtility.BITSCALE_8_TO_3_FLOOR[c.a];
     if (a == 7) {
-      int r = BitUtility.BITSCALE_8_TO_5_FLOOR[c.r];
-      int g = BitUtility.BITSCALE_8_TO_5_FLOOR[c.g];
-      int b = BitUtility.BITSCALE_8_TO_4_FLOOR[c.b];
+      var r = BitUtility.BITSCALE_8_TO_5_FLOOR[c.r];
+      var g = BitUtility.BITSCALE_8_TO_5_FLOOR[c.g];
+      var b = BitUtility.BITSCALE_8_TO_4_FLOOR[c.b];
       colorA = r << 9 | g << 4 | b;
       colorAIsOpaque = 1;
     } else {
-      int r = BitUtility.BITSCALE_8_TO_4_FLOOR[c.r];
-      int g = BitUtility.BITSCALE_8_TO_4_FLOOR[c.g];
-      int b = BitUtility.BITSCALE_8_TO_3_FLOOR[c.b];
+      var r = BitUtility.BITSCALE_8_TO_4_FLOOR[c.r];
+      var g = BitUtility.BITSCALE_8_TO_4_FLOOR[c.g];
+      var b = BitUtility.BITSCALE_8_TO_3_FLOOR[c.b];
       colorA = a << 11 | r << 7 | g << 3 | b;
       colorAIsOpaque = 0;
     }
   }
 
   void setColorRgbB(PvrtcColorRgb c) {
-    int r = BitUtility.BITSCALE_8_TO_5_CEIL[c.r];
-    int g = BitUtility.BITSCALE_8_TO_5_CEIL[c.g];
-    int b = BitUtility.BITSCALE_8_TO_5_CEIL[c.b];
+    var r = BitUtility.BITSCALE_8_TO_5_CEIL[c.r];
+    var g = BitUtility.BITSCALE_8_TO_5_CEIL[c.g];
+    var b = BitUtility.BITSCALE_8_TO_5_CEIL[c.b];
     colorB = r << 10 | g << 5 | b;
     colorBIsOpaque = 1;
   }
 
   void setColorRgbaB(PvrtcColorRgba c) {
-    int a = BitUtility.BITSCALE_8_TO_3_CEIL[c.a];
+    var a = BitUtility.BITSCALE_8_TO_3_CEIL[c.a];
     if (a == 7) {
-      int r = BitUtility.BITSCALE_8_TO_5_CEIL[c.r];
-      int g = BitUtility.BITSCALE_8_TO_5_CEIL[c.g];
-      int b = BitUtility.BITSCALE_8_TO_5_CEIL[c.b];
+      var r = BitUtility.BITSCALE_8_TO_5_CEIL[c.r];
+      var g = BitUtility.BITSCALE_8_TO_5_CEIL[c.g];
+      var b = BitUtility.BITSCALE_8_TO_5_CEIL[c.b];
       colorB = r << 10 | g << 5 | b;
       colorBIsOpaque = 1;
     } else {
-      int r = BitUtility.BITSCALE_8_TO_4_CEIL[c.r];
-      int g = BitUtility.BITSCALE_8_TO_4_CEIL[c.g];
-      int b = BitUtility.BITSCALE_8_TO_4_CEIL[c.b];
+      var r = BitUtility.BITSCALE_8_TO_4_CEIL[c.r];
+      var g = BitUtility.BITSCALE_8_TO_4_CEIL[c.g];
+      var b = BitUtility.BITSCALE_8_TO_4_CEIL[c.b];
       colorB = a << 12 | r << 8 | g << 4 | b;
       colorBIsOpaque = 0;
     }
@@ -200,7 +200,7 @@ class PvrtcPacket {
       ((colorBIsOpaque & 1) << 31);
 
   void _update() {
-    int x = colorData;
+    var x = colorData;
     usePunchthroughAlpha = x & 1;
     colorA = (x >> 1) & BITS_14;
     colorAIsOpaque = (x >> 15) & 1;

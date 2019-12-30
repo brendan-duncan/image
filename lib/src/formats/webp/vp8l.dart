@@ -19,12 +19,12 @@ class VP8L {
   Image image;
 
   VP8L(InputBuffer input, WebPInfo webp)
-      : this.input = input,
-        this.webp = webp,
-        this.br = VP8LBitReader(input);
+      : input = input,
+        webp = webp,
+        br = VP8LBitReader(input);
 
   bool decodeHeader() {
-    int signature = br.readBits(8);
+    var signature = br.readBits(8);
     if (signature != VP8L_MAGIC_BYTE) {
       return false;
     }
@@ -33,7 +33,7 @@ class VP8L {
     webp.width = br.readBits(14) + 1;
     webp.height = br.readBits(14) + 1;
     webp.hasAlpha = br.readBits(1) != 0;
-    int version = br.readBits(3);
+    var version = br.readBits(3);
 
     if (version != VP8L_VERSION) {
       return false;
@@ -64,15 +64,15 @@ class VP8L {
   }
 
   bool _allocateInternalBuffers32b() {
-    final int numPixels = webp.width * webp.height;
+    final numPixels = webp.width * webp.height;
     // Scratch buffer corresponding to top-prediction row for transforming the
     // first row in the row-blocks. Not needed for paletted alpha.
-    final int cacheTopPixels = webp.width;
+    final cacheTopPixels = webp.width;
     // Scratch buffer for temporary BGRA storage. Not needed for paletted alpha.
-    final int cachePixels = webp.width * _NUM_ARGB_CACHE_ROWS;
-    final int totalNumPixels = numPixels + cacheTopPixels + cachePixels;
+    final cachePixels = webp.width * _NUM_ARGB_CACHE_ROWS;
+    final totalNumPixels = numPixels + cacheTopPixels + cachePixels;
 
-    Uint32List pixels32 = Uint32List(totalNumPixels);
+    var pixels32 = Uint32List(totalNumPixels);
     _pixels = pixels32;
     _pixels8 = Uint8List.view(pixels32.buffer);
     _argbCache = numPixels + cacheTopPixels;
@@ -81,19 +81,19 @@ class VP8L {
   }
 
   bool _allocateInternalBuffers8b() {
-    final int totalNumPixels = webp.width * webp.height;
+    final totalNumPixels = webp.width * webp.height;
     _argbCache = 0;
     // pad the byteBuffer to a multiple of 4
-    int n = totalNumPixels + (4 - (totalNumPixels % 4));
+    var n = totalNumPixels + (4 - (totalNumPixels % 4));
     _pixels8 = Uint8List(n);
     _pixels = Uint32List.view(_pixels8.buffer);
     return true;
   }
 
   bool _readTransform(List<int> transformSize) {
-    bool ok = true;
+    var ok = true;
 
-    int type = br.readBits(2);
+    var type = br.readBits(2);
 
     // Each transform type can only be present once in the stream.
     if ((_transformsSeen & (1 << type)) != 0) {
@@ -101,7 +101,7 @@ class VP8L {
     }
     _transformsSeen |= (1 << type);
 
-    VP8LTransform transform = VP8LTransform();
+    var transform = VP8LTransform();
     _transforms.add(transform);
 
     transform.type = type;
@@ -118,8 +118,8 @@ class VP8L {
             false);
         break;
       case VP8LTransform.COLOR_INDEXING_TRANSFORM:
-        final int numColors = br.readBits(8) + 1;
-        final int bits = (numColors > 16)
+        final numColors = br.readBits(8) + 1;
+        final bits = (numColors > 16)
             ? 0
             : (numColors > 4) ? 1 : (numColors > 2) ? 2 : 3;
         transformSize[0] = _subSampleSize(transform.xsize, bits);
@@ -137,14 +137,14 @@ class VP8L {
   }
 
   Uint32List _decodeImageStream(int xsize, int ysize, bool isLevel0) {
-    int transformXsize = xsize;
-    int transformYsize = ysize;
-    int colorCacheBits = 0;
+    var transformXsize = xsize;
+    var transformYsize = ysize;
+    var colorCacheBits = 0;
 
     // Read the transforms (may recurse).
     if (isLevel0) {
       while (br.readBits(1) != 0) {
-        List<int> sizes = [transformXsize, transformYsize];
+        var sizes = [transformXsize, transformYsize];
         if (!_readTransform(sizes)) {
           throw ImageException('Invalid Transform');
         }
@@ -156,7 +156,7 @@ class VP8L {
     // Color cache
     if (br.readBits(1) != 0) {
       colorCacheBits = br.readBits(4);
-      bool ok = (colorCacheBits >= 1 && colorCacheBits <= MAX_CACHE_BITS);
+      var ok = (colorCacheBits >= 1 && colorCacheBits <= MAX_CACHE_BITS);
       if (!ok) {
         throw ImageException('Invalid Color Cache');
       }
@@ -178,7 +178,7 @@ class VP8L {
 
     webp.width = transformXsize;
     webp.height = transformYsize;
-    final int numBits = _huffmanSubsampleBits;
+    final numBits = _huffmanSubsampleBits;
     _huffmanXsize = _subSampleSize(transformXsize, numBits);
     _huffmanMask = (numBits == 0) ? ~0 : (1 << numBits) - 1;
 
@@ -188,8 +188,8 @@ class VP8L {
       return null;
     }
 
-    final int totalSize = transformXsize * transformYsize;
-    Uint32List data = Uint32List(totalSize);
+    final totalSize = transformXsize * transformYsize;
+    var data = Uint32List(totalSize);
 
     // Use the Huffman trees to decode the LZ77 encoded data.
     if (!_decodeImageData(
@@ -205,21 +205,21 @@ class VP8L {
 
   bool _decodeImageData(
       dynamic data, int width, int height, int lastRow, dynamic processFunc) {
-    int row = _lastPixel ~/ width;
-    int col = _lastPixel % width;
+    var row = _lastPixel ~/ width;
+    var col = _lastPixel % width;
 
-    HTreeGroup htreeGroup = _getHtreeGroupForPos(col, row);
+    var htreeGroup = _getHtreeGroupForPos(col, row);
 
-    int src = _lastPixel;
-    int lastCached = src;
-    int srcEnd = width * height; // End of data
-    int srcLast = width * lastRow; // Last pixel to decode
+    var src = _lastPixel;
+    var lastCached = src;
+    var srcEnd = width * height; // End of data
+    var srcLast = width * lastRow; // Last pixel to decode
 
-    const int lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
-    final int colorCacheLimit = lenCodeLimit + _colorCacheSize;
+    const lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
+    final colorCacheLimit = lenCodeLimit + _colorCacheSize;
 
-    VP8LColorCache colorCache = (_colorCacheSize > 0) ? _colorCache : null;
-    final int mask = _huffmanMask;
+    var colorCache = (_colorCacheSize > 0) ? _colorCache : null;
+    final mask = _huffmanMask;
 
     while (!br.isEOS && src < srcLast) {
       // Only update when changing tile. Note we could use this test:
@@ -230,17 +230,17 @@ class VP8L {
       }
 
       br.fillBitWindow();
-      int code = htreeGroup.htrees[_GREEN].readSymbol(br);
+      var code = htreeGroup.htrees[_GREEN].readSymbol(br);
 
       if (code < NUM_LITERAL_CODES) {
         // Literal
-        int red = htreeGroup.htrees[_RED].readSymbol(br);
-        int green = code;
+        var red = htreeGroup.htrees[_RED].readSymbol(br);
+        var green = code;
         br.fillBitWindow();
-        int blue = htreeGroup.htrees[_BLUE].readSymbol(br);
-        int alpha = htreeGroup.htrees[_ALPHA].readSymbol(br);
+        var blue = htreeGroup.htrees[_BLUE].readSymbol(br);
+        var alpha = htreeGroup.htrees[_ALPHA].readSymbol(br);
 
-        int c = getColor(red, green, blue, alpha);
+        var c = getColor(red, green, blue, alpha);
         data[src] = c;
 
         ++src;
@@ -262,18 +262,18 @@ class VP8L {
         }
       } else if (code < lenCodeLimit) {
         // Backward reference
-        final int lengthSym = code - NUM_LITERAL_CODES;
-        final int length = _getCopyLength(lengthSym);
-        final int distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
+        final lengthSym = code - NUM_LITERAL_CODES;
+        final length = _getCopyLength(lengthSym);
+        final distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
 
         br.fillBitWindow();
-        int distCode = _getCopyDistance(distSymbol);
-        int dist = _planeCodeToDistance(width, distCode);
+        var distCode = _getCopyDistance(distSymbol);
+        var dist = _planeCodeToDistance(width, distCode);
 
         if (src < dist || srcEnd - src < length) {
           return false;
         } else {
-          for (int i = 0; i < length; ++i) {
+          for (var i = 0; i < length; ++i) {
             data[src + i] = data[src + (i - dist)];
           }
           src += length;
@@ -299,7 +299,7 @@ class VP8L {
         }
       } else if (code < colorCacheLimit) {
         // Color cache
-        final int key = code - lenCodeLimit;
+        final key = code - lenCodeLimit;
 
         while (lastCached < src) {
           colorCache.insert(data[lastCached] as int);
@@ -353,8 +353,8 @@ class VP8L {
     }
     // When the Huffman tree contains only one symbol, we can skip the
     // call to ReadSymbol() for red/blue/alpha channels.
-    for (int i = 0; i < _numHtreeGroups; ++i) {
-      List<HuffmanTree> htrees = _htreeGroups[i].htrees;
+    for (var i = 0; i < _numHtreeGroups; ++i) {
+      var htrees = _htreeGroups[i].htrees;
       if (htrees[_RED].numNodes > 1) {
         return false;
       }
@@ -370,7 +370,7 @@ class VP8L {
 
   // Special row-processing that only stores the alpha data.
   void _extractAlphaRows(int row) {
-    final int numRows = row - _lastRow;
+    final numRows = row - _lastRow;
     if (numRows <= 0) {
       return; // Nothing to be done.
     }
@@ -378,13 +378,13 @@ class VP8L {
     _applyInverseTransforms(numRows, webp.width * _lastRow);
 
     // Extract alpha (which is stored in the green plane).
-    final int width = webp.width; // the final width (!= dec->width_)
-    final int cachePixs = width * numRows;
+    final width = webp.width; // the final width (!= dec->width_)
+    final cachePixs = width * numRows;
 
-    final int di = width * _lastRow;
-    InputBuffer src = InputBuffer(_pixels, offset: _argbCache);
+    final di = width * _lastRow;
+    var src = InputBuffer(_pixels, offset: _argbCache);
 
-    for (int i = 0; i < cachePixs; ++i) {
+    for (var i = 0; i < cachePixs; ++i) {
       _opaque[di + i] = (src[i] >> 8) & 0xff;
     }
 
@@ -392,15 +392,15 @@ class VP8L {
   }
 
   bool _decodeAlphaData(int width, int height, int lastRow) {
-    int row = _lastPixel ~/ width;
-    int col = _lastPixel % width;
+    var row = _lastPixel ~/ width;
+    var col = _lastPixel % width;
 
-    HTreeGroup htreeGroup = _getHtreeGroupForPos(col, row);
-    int pos = _lastPixel; // current position
-    final int end = width * height; // End of data
-    final int last = width * lastRow; // Last pixel to decode
-    final int lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
-    final int mask = _huffmanMask;
+    var htreeGroup = _getHtreeGroupForPos(col, row);
+    var pos = _lastPixel; // current position
+    final end = width * height; // End of data
+    final last = width * lastRow; // Last pixel to decode
+    final lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
+    final mask = _huffmanMask;
 
     while (!br.isEOS && pos < last) {
       // Only update when changing tile.
@@ -410,7 +410,7 @@ class VP8L {
 
       br.fillBitWindow();
 
-      int code = htreeGroup.htrees[_GREEN].readSymbol(br);
+      var code = htreeGroup.htrees[_GREEN].readSymbol(br);
       if (code < NUM_LITERAL_CODES) {
         // Literal
         _pixels8[pos] = code;
@@ -425,17 +425,17 @@ class VP8L {
         }
       } else if (code < lenCodeLimit) {
         // Backward reference
-        final int lengthSym = code - NUM_LITERAL_CODES;
-        final int length = _getCopyLength(lengthSym);
-        final int distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
+        final lengthSym = code - NUM_LITERAL_CODES;
+        final length = _getCopyLength(lengthSym);
+        final distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
 
         br.fillBitWindow();
 
-        int distCode = _getCopyDistance(distSymbol);
-        int dist = _planeCodeToDistance(width, distCode);
+        var distCode = _getCopyDistance(distSymbol);
+        var dist = _planeCodeToDistance(width, distCode);
 
         if (pos >= dist && end - pos >= length) {
-          for (int i = 0; i < length; ++i) {
+          for (var i = 0; i < length; ++i) {
             _pixels8[pos + i] = _pixels8[pos + i - dist];
           }
         } else {
@@ -472,8 +472,8 @@ class VP8L {
   }
 
   void _extractPalettedAlphaRows(int row) {
-    final int numRows = row - _lastRow;
-    InputBuffer pIn = InputBuffer(_pixels8, offset: webp.width * _lastRow);
+    final numRows = row - _lastRow;
+    var pIn = InputBuffer(_pixels8, offset: webp.width * _lastRow);
     if (numRows > 0) {
       _applyInverseTransformsAlpha(numRows, pIn);
     }
@@ -482,10 +482,10 @@ class VP8L {
 
   // Special method for paletted alpha data.
   void _applyInverseTransformsAlpha(int numRows, InputBuffer rows) {
-    final int startRow = _lastRow;
-    final int endRow = startRow + numRows;
-    InputBuffer rowsOut = InputBuffer(_opaque, offset: _ioWidth * startRow);
-    VP8LTransform transform = _transforms[0];
+    final startRow = _lastRow;
+    final endRow = startRow + numRows;
+    var rowsOut = InputBuffer(_opaque, offset: _ioWidth * startRow);
+    var transform = _transforms[0];
 
     transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);
   }
@@ -494,8 +494,8 @@ class VP8L {
   // last call.
   //static int __count = 0;
   void _processRows(int row) {
-    int rows = webp.width * _lastRow; // offset into _pixels
-    final int numRows = row - _lastRow;
+    var rows = webp.width * _lastRow; // offset into _pixels
+    final numRows = row - _lastRow;
 
     if (numRows <= 0) {
       return; // Nothing to be done.
@@ -505,13 +505,13 @@ class VP8L {
 
     //int count = 0;
     //int di = rows;
-    for (int y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
-      for (int x = 0; x < webp.width; ++x, ++pi) {
-        int c = _pixels[pi];
-        int r = getRed(c);
-        int g = getGreen(c);
-        int b = getBlue(c);
-        int a = getAlpha(c);
+    for (var y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
+      for (var x = 0; x < webp.width; ++x, ++pi) {
+        var c = _pixels[pi];
+        var r = getRed(c);
+        var g = getGreen(c);
+        var b = getBlue(c);
+        var a = getAlpha(c);
         // rearrange the ARGB webp color to RGBA image color.
         image.setPixel(x, dy, getColor(r, g, b, a));
       }
@@ -521,18 +521,18 @@ class VP8L {
   }
 
   void _applyInverseTransforms(int numRows, int rows) {
-    int n = _transforms.length;
-    final int cachePixs = webp.width * numRows;
-    final int startRow = _lastRow;
-    final int endRow = startRow + numRows;
-    int rowsIn = rows;
-    int rowsOut = _argbCache;
+    var n = _transforms.length;
+    final cachePixs = webp.width * numRows;
+    final startRow = _lastRow;
+    final endRow = startRow + numRows;
+    var rowsIn = rows;
+    var rowsOut = _argbCache;
 
     // Inverse transforms.
     _pixels.setRange(rowsOut, rowsOut + cachePixs, _pixels, rowsIn);
 
     while (n-- > 0) {
-      VP8LTransform transform = _transforms[n];
+      var transform = _transforms[n];
       transform.inverseTransform(
           startRow, endRow, _pixels, rowsIn, _pixels, rowsOut);
       rowsIn = rowsOut;
@@ -542,22 +542,22 @@ class VP8L {
   bool _readHuffmanCodes(
       int xsize, int ysize, int colorCacheBits, bool allowRecursion) {
     Uint32List huffmanImage;
-    int numHtreeGroups = 1;
+    var numHtreeGroups = 1;
 
     if (allowRecursion && br.readBits(1) != 0) {
       // use meta Huffman codes.
-      final int huffmanPrecision = br.readBits(3) + 2;
-      final int huffmanXsize = _subSampleSize(xsize, huffmanPrecision);
-      final int huffmanYsize = _subSampleSize(ysize, huffmanPrecision);
-      final int huffmanPixs = huffmanXsize * huffmanYsize;
+      final huffmanPrecision = br.readBits(3) + 2;
+      final huffmanXsize = _subSampleSize(xsize, huffmanPrecision);
+      final huffmanYsize = _subSampleSize(ysize, huffmanPrecision);
+      final huffmanPixs = huffmanXsize * huffmanYsize;
 
       huffmanImage = _decodeImageStream(huffmanXsize, huffmanYsize, false);
 
       _huffmanSubsampleBits = huffmanPrecision;
 
-      for (int i = 0; i < huffmanPixs; ++i) {
+      for (var i = 0; i < huffmanPixs; ++i) {
         // The huffman data is stored in red and green bytes.
-        final int group = (huffmanImage[i] >> 8) & 0xffff;
+        final group = (huffmanImage[i] >> 8) & 0xffff;
         huffmanImage[i] = group;
         if (group >= numHtreeGroups) {
           numHtreeGroups = group + 1;
@@ -567,12 +567,12 @@ class VP8L {
 
     assert(numHtreeGroups <= 0x10000);
 
-    List<HTreeGroup> htreeGroups = List<HTreeGroup>(numHtreeGroups);
-    for (int i = 0; i < numHtreeGroups; ++i) {
+    var htreeGroups = List<HTreeGroup>(numHtreeGroups);
+    for (var i = 0; i < numHtreeGroups; ++i) {
       htreeGroups[i] = HTreeGroup();
 
-      for (int j = 0; j < HUFFMAN_CODES_PER_META_CODE; ++j) {
-        int alphabetSize = ALPHABET_SIZE[j];
+      for (var j = 0; j < HUFFMAN_CODES_PER_META_CODE; ++j) {
+        var alphabetSize = ALPHABET_SIZE[j];
         if (j == 0 && colorCacheBits > 0) {
           alphabetSize += 1 << colorCacheBits;
         }
@@ -592,17 +592,17 @@ class VP8L {
   }
 
   bool _readHuffmanCode(int alphabetSize, HuffmanTree tree) {
-    bool ok = false;
-    final int simpleCode = br.readBits(1);
+    var ok = false;
+    final simpleCode = br.readBits(1);
 
     // Read symbols, codes & code lengths directly.
     if (simpleCode != 0) {
-      List<int> symbols = [0, 0];
-      List<int> codes = [0, 0];
-      List<int> codeLengths = [0, 0];
+      var symbols = [0, 0];
+      var codes = [0, 0];
+      var codeLengths = [0, 0];
 
-      final int numSymbols = br.readBits(1) + 1;
-      final int firstSymbolLenCode = br.readBits(1);
+      final numSymbols = br.readBits(1) + 1;
+      final firstSymbolLenCode = br.readBits(1);
 
       // The first code is either 1 bit or 8 bit code.
       symbols[0] = br.readBits((firstSymbolLenCode == 0) ? 1 : 8);
@@ -620,16 +620,16 @@ class VP8L {
           codeLengths, codes, symbols, alphabetSize, numSymbols);
     } else {
       // Decode Huffman-coded code lengths.
-      Int32List codeLengthCodeLengths = Int32List(_NUM_CODE_LENGTH_CODES);
+      var codeLengthCodeLengths = Int32List(_NUM_CODE_LENGTH_CODES);
 
-      final int numCodes = br.readBits(4) + 4;
+      final numCodes = br.readBits(4) + 4;
       if (numCodes > _NUM_CODE_LENGTH_CODES) {
         return false;
       }
 
-      Int32List codeLengths = Int32List(alphabetSize);
+      var codeLengths = Int32List(alphabetSize);
 
-      for (int i = 0; i < numCodes; ++i) {
+      for (var i = 0; i < numCodes; ++i) {
         codeLengthCodeLengths[_CODE_LENGTH_CODE_ORDER[i]] = br.readBits(3);
       }
 
@@ -649,8 +649,8 @@ class VP8L {
     //bool ok = false;
     int symbol;
     int max_symbol;
-    int prev_code_len = DEFAULT_CODE_LENGTH;
-    HuffmanTree tree = HuffmanTree();
+    var prev_code_len = DEFAULT_CODE_LENGTH;
+    var tree = HuffmanTree();
 
     if (!tree.buildImplicit(codeLengthCodeLengths, _NUM_CODE_LENGTH_CODES)) {
       return false;
@@ -658,7 +658,7 @@ class VP8L {
 
     if (br.readBits(1) != 0) {
       // use length
-      final int length_nbits = 2 + 2 * br.readBits(3);
+      final length_nbits = 2 + 2 * br.readBits(3);
       max_symbol = 2 + br.readBits(length_nbits);
       if (max_symbol > numSymbols) {
         return false;
@@ -684,16 +684,16 @@ class VP8L {
           prev_code_len = code_len;
         }
       } else {
-        final bool usePrev = (code_len == _CODE_LENGTH_REPEAT_CODE);
-        final int slot = code_len - _CODE_LENGTH_LITERALS;
-        final int extra_bits = _CODE_LENGTH_EXTRA_BITS[slot];
-        final int repeat_offset = _CODE_LENGTH_REPEAT_OFFSETS[slot];
-        int repeat = br.readBits(extra_bits) + repeat_offset;
+        final usePrev = (code_len == _CODE_LENGTH_REPEAT_CODE);
+        final slot = code_len - _CODE_LENGTH_LITERALS;
+        final extra_bits = _CODE_LENGTH_EXTRA_BITS[slot];
+        final repeat_offset = _CODE_LENGTH_REPEAT_OFFSETS[slot];
+        var repeat = br.readBits(extra_bits) + repeat_offset;
 
         if (symbol + repeat > numSymbols) {
           return false;
         } else {
-          final int length = usePrev ? prev_code_len : 0;
+          final length = usePrev ? prev_code_len : 0;
           while (repeat-- > 0) {
             codeLengths[symbol++] = length;
           }
@@ -708,8 +708,8 @@ class VP8L {
     if (distanceSymbol < 4) {
       return distanceSymbol + 1;
     }
-    int extraBits = (distanceSymbol - 2) >> 1;
-    int offset = (2 + (distanceSymbol & 1)) << extraBits;
+    var extraBits = (distanceSymbol - 2) >> 1;
+    var offset = (2 + (distanceSymbol & 1)) << extraBits;
     return offset + br.readBits(extraBits) + 1;
   }
 
@@ -722,10 +722,10 @@ class VP8L {
     if (planeCode > _CODE_TO_PLANE_CODES) {
       return planeCode - _CODE_TO_PLANE_CODES;
     } else {
-      final int distCode = _CODE_TO_PLANE[planeCode - 1];
-      final int yoffset = distCode >> 4;
-      final int xoffset = 8 - (distCode & 0xf);
-      final int dist = yoffset * xsize + xoffset;
+      final distCode = _CODE_TO_PLANE[planeCode - 1];
+      final yoffset = distCode >> 4;
+      final xoffset = 8 - (distCode & 0xf);
+      final dist = yoffset * xsize + xoffset;
       // dist<1 can happen if xsize is very small
       return (dist >= 1) ? dist : 1;
     }
@@ -739,14 +739,14 @@ class VP8L {
   // For security reason, we need to remap the color map to span
   // the total possible bundled values, and not just the num_colors.
   bool _expandColorMap(int numColors, VP8LTransform transform) {
-    final int finalNumColors = 1 << (8 >> transform.bits);
-    Uint32List newColorMap = Uint32List(finalNumColors);
-    Uint8List data = Uint8List.view(transform.data.buffer);
-    Uint8List newData = Uint8List.view(newColorMap.buffer);
+    final finalNumColors = 1 << (8 >> transform.bits);
+    var newColorMap = Uint32List(finalNumColors);
+    var data = Uint8List.view(transform.data.buffer);
+    var newData = Uint8List.view(newColorMap.buffer);
 
     newColorMap[0] = transform.data[0];
 
-    int len = 4 * numColors;
+    var len = 4 * numColors;
 
     int i;
     for (i = 4; i < len; ++i) {
@@ -771,7 +771,7 @@ class VP8L {
   }
 
   HTreeGroup _getHtreeGroupForPos(int x, int y) {
-    int metaIndex = _getMetaIndex(
+    var metaIndex = _getMetaIndex(
         _huffmanImage, _huffmanXsize, _huffmanSubsampleBits, x, y);
     if (_htreeGroups[metaIndex] == null) {
       _htreeGroups[metaIndex] = HTreeGroup();
@@ -779,17 +779,17 @@ class VP8L {
     return _htreeGroups[metaIndex];
   }
 
-  static const int _GREEN = 0;
-  static const int _RED = 1;
-  static const int _BLUE = 2;
-  static const int _ALPHA = 3;
-  static const int _DIST = 4;
+  static const _GREEN = 0;
+  static const _RED = 1;
+  static const _BLUE = 2;
+  static const _ALPHA = 3;
+  static const _DIST = 4;
 
-  static const int _NUM_ARGB_CACHE_ROWS = 16;
+  static const _NUM_ARGB_CACHE_ROWS = 16;
 
-  static const int _NUM_CODE_LENGTH_CODES = 19;
+  static const _NUM_CODE_LENGTH_CODES = 19;
 
-  static const List<int> _CODE_LENGTH_CODE_ORDER = [
+  static const _CODE_LENGTH_CODE_ORDER = <int>[
     17,
     18,
     0,
@@ -811,8 +811,8 @@ class VP8L {
     15
   ];
 
-  static const int _CODE_TO_PLANE_CODES = 120;
-  static const List<int> _CODE_TO_PLANE = [
+  static const _CODE_TO_PLANE_CODES = 120;
+  static const _CODE_TO_PLANE = <int>[
     0x18,
     0x07,
     0x17,
@@ -935,8 +935,8 @@ class VP8L {
     0x70
   ];
 
-  static const int _CODE_LENGTH_LITERALS = 16;
-  static const int _CODE_LENGTH_REPEAT_CODE = 16;
+  static const _CODE_LENGTH_LITERALS = 16;
+  static const _CODE_LENGTH_REPEAT_CODE = 16;
   static const List<int> _CODE_LENGTH_EXTRA_BITS = [2, 3, 7];
   static const List<int> _CODE_LENGTH_REPEAT_OFFSETS = [3, 3, 11];
 
@@ -948,8 +948,8 @@ class VP8L {
     NUM_DISTANCE_CODES
   ];
 
-  static const int VP8L_MAGIC_BYTE = 0x2f;
-  static const int VP8L_VERSION = 0;
+  static const VP8L_MAGIC_BYTE = 0x2f;
+  static const VP8L_VERSION = 0;
 
   int _lastPixel = 0;
   int _lastRow = 0;
@@ -963,7 +963,7 @@ class VP8L {
   Uint32List _huffmanImage;
   int _numHtreeGroups = 0;
   List<HTreeGroup> _htreeGroups = [];
-  List<VP8LTransform> _transforms = [];
+  final List<VP8LTransform> _transforms = [];
   int _transformsSeen = 0;
 
   Uint32List _pixels;
@@ -975,17 +975,17 @@ class VP8L {
   int _ioWidth;
   int _ioHeight;
 
-  static const int ARGB_BLACK = 0xff000000;
-  static const int MAX_CACHE_BITS = 11;
-  static const int HUFFMAN_CODES_PER_META_CODE = 5;
+  static const ARGB_BLACK = 0xff000000;
+  static const MAX_CACHE_BITS = 11;
+  static const HUFFMAN_CODES_PER_META_CODE = 5;
 
-  static const int DEFAULT_CODE_LENGTH = 8;
-  static const int MAX_ALLOWED_CODE_LENGTH = 15;
+  static const DEFAULT_CODE_LENGTH = 8;
+  static const MAX_ALLOWED_CODE_LENGTH = 15;
 
-  static const int NUM_LITERAL_CODES = 256;
-  static const int NUM_LENGTH_CODES = 24;
-  static const int NUM_DISTANCE_CODES = 40;
-  static const int CODE_LENGTH_CODES = 19;
+  static const NUM_LITERAL_CODES = 256;
+  static const NUM_LENGTH_CODES = 24;
+  static const NUM_DISTANCE_CODES = 40;
+  static const CODE_LENGTH_CODES = 19;
 }
 
 @internal

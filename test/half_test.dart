@@ -4,10 +4,10 @@ import 'package:test/test.dart';
 void main() {
   group('Half', () {
     test('Arithmetic', () {
-      double f1 = 1.0;
-      double f2 = 2.0;
-      Half h1 = Half(3);
-      Half h2 = Half(4);
+      final f1 = 1.0;
+      final f2 = 2.0;
+      var h1 = Half(3);
+      var h2 = Half(4);
 
       h1 = Half(f1 + f2);
       expect(h1.toDouble(), equals(3.0));

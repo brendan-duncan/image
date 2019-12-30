@@ -10,15 +10,15 @@ Image quantize(Image src,
     {int numberOfColors = 256,
     QuantizeMethod method = QuantizeMethod.neuralNet}) {
   if (method == QuantizeMethod.octree || numberOfColors < 4) {
-    OctreeQuantizer oct = OctreeQuantizer(src, numberOfColors: numberOfColors);
-    for (int i = 0, len = src.length; i < len; ++i) {
+    var oct = OctreeQuantizer(src, numberOfColors: numberOfColors);
+    for (var i = 0, len = src.length; i < len; ++i) {
       src[i] = oct.getQuantizedColor(src[i]);
     }
     return src;
   }
 
-  NeuralQuantizer quant = NeuralQuantizer(src, numberOfColors: numberOfColors);
-  for (int i = 0, len = src.length; i < len; ++i) {
+  var quant = NeuralQuantizer(src, numberOfColors: numberOfColors);
+  for (var i = 0, len = src.length; i < len; ++i) {
     src[i] = quant.getQuantizedColor(src[i]);
   }
   return src;

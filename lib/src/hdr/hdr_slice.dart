@@ -18,9 +18,9 @@ class HdrSlice {
   final dynamic data;
 
   HdrSlice(this.name, int width, int height, int type)
-      : this.width = width,
-        this.height = height,
-        this.type = type,
+      : width = width,
+        height = height,
+        type = type,
         data = type == HdrImage.HALF
             ? Uint16List(width * height)
             : type == HdrImage.FLOAT
@@ -49,7 +49,7 @@ class HdrSlice {
   /// [Half] samples are converted to double.
   /// An exception will occur if the slice stores UINT data.
   double getFloat(int x, int y) {
-    int pi = y * width + x;
+    final pi = y * width + x;
     var s = (type == HdrImage.HALF)
         ? Half.HalfToDouble(data[pi] as int)
         : data[pi] as double;
@@ -59,7 +59,7 @@ class HdrSlice {
   /// Set the float value of the sample at the coordinates [x],[y] for
   ///[FLOAT] or [HALF] slices.
   void setFloat(int x, int y, num v) {
-    int pi = y * width + x;
+    final pi = y * width + x;
     if (type == HdrImage.FLOAT) {
       data[pi] = v;
     } else if (type == HdrImage.HALF) {
@@ -70,14 +70,14 @@ class HdrSlice {
   /// Get the int value of the sample at the coordinates [x],[y].
   ///An exception will occur if the slice stores FLOAT or HALF data.
   int getInt(int x, int y) {
-    int pi = y * width + x;
+    final pi = y * width + x;
     return data[pi] as int;
   }
 
   /// Set the int value of the sample at the coordinates [x],[y] for [UINT]
   /// slices.
   void setInt(int x, int y, int v) {
-    int pi = y * width + x;
+    final pi = y * width + x;
     data[pi] = v;
   }
 }

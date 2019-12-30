@@ -6,16 +6,16 @@ CanvasElement canvas;
 DivElement logDiv;
 Image origImage;
 
-void _addControl(
-    String label, String value, DivElement parent, dynamic callback) {
-  LabelElement amountLabel = LabelElement();
+void _addControl(String label, String value, DivElement parent,
+    dynamic callback) {
+  var amountLabel = LabelElement();
   amountLabel.text = label + ':';
   var amountEdit = InputElement();
   amountEdit.value = value;
   amountEdit.id = label + '_edit';
   amountEdit.onChange.listen((e) {
     try {
-      double d = double.parse(amountEdit.value);
+      var d = double.parse(amountEdit.value);
       callback(d);
     } catch (e) {
       print(e);
@@ -38,9 +38,9 @@ void testSepia() {
   num amount = 1.0;
 
   void _apply() {
-    Stopwatch t = Stopwatch();
+    var t = Stopwatch();
     t.start();
-    Image image = Image.from(origImage);
+    var image = Image.from(origImage);
     image = sepia(image, amount: amount);
 
     // Fill the buffer with our image data.
@@ -72,9 +72,9 @@ void testSobel() {
   num amount = 1.0;
 
   void _apply() {
-    Stopwatch t = Stopwatch();
+    var t = Stopwatch();
     t.start();
-    Image image = Image.from(origImage);
+    var image = Image.from(origImage);
     image = sobel(image, amount: amount);
 
     // Fill the buffer with our image data.
@@ -103,12 +103,12 @@ void testGaussian() {
   label.text = 'Gaussian Blur';
   sidebar.children.add(label);
 
-  int radius = 5;
+  var radius = 5;
 
   void _apply() {
-    Stopwatch t = Stopwatch();
+    var t = Stopwatch();
     t.start();
-    Image image = Image.from(origImage);
+    var image = Image.from(origImage);
     image = gaussianBlur(image, radius);
 
     // Fill the buffer with our image data.
@@ -142,9 +142,9 @@ void testVignette() {
   num amount = 1.0;
 
   void _apply() {
-    Stopwatch t = Stopwatch();
+    var t = Stopwatch();
     t.start();
-    Image image = Image.from(origImage);
+    var image = Image.from(origImage);
     image = vignette(image, start: start, end: end, amount: amount);
 
     // Fill the buffer with our image data.
@@ -183,12 +183,12 @@ void testPixelate() {
   label.text = 'Pixelate';
   sidebar.children.add(label);
 
-  int blockSize = 5;
+  var blockSize = 5;
 
   void _apply() {
-    Stopwatch t = Stopwatch();
+    var t = Stopwatch();
     t.start();
-    Image image = Image.from(origImage);
+    var image = Image.from(origImage);
     image = pixelate(image, blockSize);
 
     // Fill the buffer with our image data.
@@ -217,15 +217,15 @@ void testColorOffset() {
   label.text = 'Pixelate';
   sidebar.children.add(label);
 
-  int red = 0;
-  int green = 0;
-  int blue = 0;
-  int alpha = 0;
+  var red = 0;
+  var green = 0;
+  var blue = 0;
+  var alpha = 0;
 
   void _apply() {
-    Stopwatch t = Stopwatch();
+    var t = Stopwatch();
     t.start();
-    Image image = Image.from(origImage);
+    var image = Image.from(origImage);
     image =
         colorOffset(image, red: red, green: green, blue: blue, alpha: alpha);
 
@@ -279,9 +279,9 @@ void testAdjustColor() {
   num amount = 1.0;
 
   void _apply() {
-    Stopwatch t = Stopwatch();
+    var t = Stopwatch();
     t.start();
-    Image image = Image.from(origImage);
+    var image = Image.from(origImage);
 
     image = adjustColor(image,
         contrast: contrast,
@@ -364,7 +364,7 @@ void main() {
     }
   });
 
-  ImageElement img = ImageElement();
+  var img = ImageElement();
   img.src = 'res/big_buck_bunny.jpg';
   img.onLoad.listen((e) {
     var c = CanvasElement();

@@ -78,18 +78,21 @@ class GifEncoder extends Encoder {
   }
 
   /// Encode a single frame image.
+  @override
   List<int> encodeImage(Image image) {
     addFrame(image);
     return finish();
   }
 
   /// Does this encoder support animation?
+  @override
   bool get supportsAnimation => true;
 
   /// Encode an animation.
+  @override
   List<int> encodeAnimation(Animation anim) {
     repeat = anim.loopCount;
-    for (Image f in anim) {
+    for (var f in anim) {
       addFrame(f, duration: f.duration);
     }
     return finish();
@@ -108,7 +111,7 @@ class GifEncoder extends Encoder {
     // (0x80: Use LCM, 0x07: Palette Size (7 = 8-bit))
     output.writeByte(0x87);
     output.writeBytes(colorMap);
-    for (int i = numColors; i < 256; ++i) {
+    for (var i = numColors; i < 256; ++i) {
       output.writeByte(0);
       output.writeByte(0);
       output.writeByte(0);
@@ -123,13 +126,13 @@ class GifEncoder extends Encoder {
     _blockSize = 0;
     _block = Uint8List(256);
 
-    const int initCodeSize = 8;
+    const initCodeSize = 8;
     output.writeByte(initCodeSize);
 
-    Int32List hTab = Int32List(HSIZE);
-    Int32List codeTab = Int32List(HSIZE);
-    int remaining = width * height;
-    int curPixel = 0;
+    var hTab = Int32List(HSIZE);
+    var codeTab = Int32List(HSIZE);
+    var remaining = width * height;
+    var curPixel = 0;
 
     _initBits = initCodeSize + 1;
     _nBits = _initBits;
@@ -147,29 +150,29 @@ class GifEncoder extends Encoder {
       return image[curPixel++] & 0xff;
     }
 
-    int ent = _nextPixel();
+    var ent = _nextPixel();
 
-    int hshift = 0;
-    for (int fcode = HSIZE; fcode < 65536; fcode *= 2) {
+    var hshift = 0;
+    for (var fcode = HSIZE; fcode < 65536; fcode *= 2) {
       hshift++;
     }
     hshift = 8 - hshift;
 
-    int hSizeReg = HSIZE;
+    var hSizeReg = HSIZE;
     for (var i = 0; i < hSizeReg; ++i) {
       hTab[i] = -1;
     }
 
     _output(_clearCode);
 
-    bool outerLoop = true;
+    var outerLoop = true;
     while (outerLoop) {
       outerLoop = false;
 
-      int c = _nextPixel();
+      var c = _nextPixel();
       while (c != EOF) {
-        int fcode = (c << BITS) + ent;
-        int i = (c << hshift) ^ ent; // xor hashing
+        var fcode = (c << BITS) + ent;
+        var i = (c << hshift) ^ ent; // xor hashing
 
         if (hTab[i] == fcode) {
           ent = codeTab[i];
@@ -177,7 +180,7 @@ class GifEncoder extends Encoder {
           continue;
         } else if (hTab[i] >= 0) {
           // non-empty slot
-          int disp = hSizeReg - i; // secondary hash (after G. Knott)
+          var disp = hSizeReg - i; // secondary hash (after G. Knott)
           if (i == 0) {
             disp = 1;
           }
@@ -200,11 +203,11 @@ class GifEncoder extends Encoder {
         _output(ent);
         ent = c;
 
-        if (_freeEnt < 1 << BITS) {
+        if (_freeEnt < (1 << BITS)) {
           codeTab[i] = _freeEnt++; // code -> hashtable
           hTab[i] = fcode;
         } else {
-          for (int i = 0; i < HSIZE; ++i) {
+          for (var i = 0; i < HSIZE; ++i) {
             hTab[i] = -1;
           }
           _freeEnt = _clearCode + 2;
@@ -286,7 +289,7 @@ class GifEncoder extends Encoder {
     output.writeByte(EXTENSION_RECORD_TYPE);
     output.writeByte(APPLICATION_EXT);
     output.writeByte(11); // data block size
-    output.writeBytes("NETSCAPE2.0".codeUnits); // app identifier
+    output.writeBytes('NETSCAPE2.0'.codeUnits); // app identifier
     output.writeBytes([0x03, 0x01]);
     output.writeUint16(repeat); // loop count
     output.writeByte(0); // block terminator
@@ -297,8 +300,8 @@ class GifEncoder extends Encoder {
     output.writeByte(GRAPHIC_CONTROL_EXT);
     output.writeByte(4); // data block size
 
-    int transparency = 0;
-    int dispose = 0; // dispose = no action
+    var transparency = 0;
+    var dispose = 0; // dispose = no action
 
     // packed fields
     output.writeByte(0 | // 1:3 reserved
@@ -343,16 +346,16 @@ class GifEncoder extends Encoder {
 
   static const String GIF89_STAMP = 'GIF89a';
 
-  static const int IMAGE_DESC_RECORD_TYPE = 0x2c;
-  static const int EXTENSION_RECORD_TYPE = 0x21;
-  static const int TERMINATE_RECORD_TYPE = 0x3b;
+  static const IMAGE_DESC_RECORD_TYPE = 0x2c;
+  static const EXTENSION_RECORD_TYPE = 0x21;
+  static const TERMINATE_RECORD_TYPE = 0x3b;
 
-  static const int APPLICATION_EXT = 0xff;
-  static const int GRAPHIC_CONTROL_EXT = 0xf9;
+  static const APPLICATION_EXT = 0xff;
+  static const GRAPHIC_CONTROL_EXT = 0xf9;
 
-  static const int EOF = -1;
-  static const int BITS = 12;
-  static const int HSIZE = 5003; // 80% occupancy
+  static const EOF = -1;
+  static const BITS = 12;
+  static const HSIZE = 5003; // 80% occupancy
   static const List<int> MASKS = [
     0x0000,
     0x0001,

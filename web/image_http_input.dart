@@ -10,9 +10,9 @@ void main() {
   // using a file Input element, or an AJAX HttpRequest.
 
   // This example demonstrates using a file Input element.
-  fileInput = querySelector("#file") as InputElement;
+  fileInput = querySelector('#file') as InputElement;
 
-  fileInput.addEventListener("change", onFileChanged);
+  fileInput.addEventListener('change', onFileChanged);
 }
 
 /// Called when the user has selected a file.
@@ -20,26 +20,26 @@ void onFileChanged(Event event) {
   var files = fileInput.files as FileList;
   var file = files.item(0);
 
-  FileReader reader = FileReader();
-  reader.addEventListener("load", onFileLoaded);
+  var reader = FileReader();
+  reader.addEventListener('load', onFileLoaded);
   reader.readAsArrayBuffer(file);
 }
 
 /// Called when the file has been read.
 void onFileLoaded(Event event) {
-  FileReader reader = event.currentTarget as FileReader;
+  var reader = event.currentTarget as FileReader;
 
   var bytes = reader.result as List<int>;
 
   // Find a decoder that is able to decode the given file contents.
-  Decoder decoder = findDecoderForData(bytes);
+  var decoder = findDecoderForData(bytes);
   if (decoder == null) {
     print('Could not find format decoder for file');
     return;
   }
 
   // If a decoder was found, decode the file contents into an image.
-  Image image = decoder.decodeImage(bytes);
+  var image = decoder.decodeImage(bytes);
 
   // If the image was able to be decoded, we can display it in a couple
   // different ways. We could encode it to a format that can be displayed
@@ -57,7 +57,7 @@ void onFileLoaded(Event event) {
     c.height = image.height;
 
     // Create a buffer that the canvas can draw.
-    ImageData d = c.context2D.createImageData(c.width, c.height);
+    var d = c.context2D.createImageData(c.width, c.height);
     // Fill the buffer with our image data.
     d.data.setRange(0, d.data.length, image.getBytes(format: Format.rgba));
     // Draw the buffer onto the canvas.

@@ -42,7 +42,7 @@ class BitmapFont {
   /// Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
   /// and an [Image] that stores the font [map].
   BitmapFont.fromFnt(String fnt, Image page) {
-    Map<int, Image> fontPages = {0: page};
+    var fontPages = {0: page};
 
     XmlDocument doc;
     fnt = fnt.trimLeft();
@@ -62,10 +62,10 @@ class BitmapFont {
   /// Decode a [BitmapFont] from the contents of a zip file that stores the
   /// .fnt font definition and associated PNG images.
   BitmapFont.fromZip(List<int> fileData) {
-    Archive arc = ZipDecoder().decodeBytes(fileData);
+    var arc = ZipDecoder().decodeBytes(fileData);
 
     ArchiveFile font_file;
-    for (int i = 0; i < arc.numberOfFiles(); ++i) {
+    for (var i = 0; i < arc.numberOfFiles(); ++i) {
       if (arc.fileName(i).endsWith('.fnt')) {
         font_file = arc.files[i];
         break;
@@ -77,7 +77,7 @@ class BitmapFont {
     }
 
     /// Remove leading whitespace so xml detection is correct
-    String font_str =
+    var font_str =
         String.fromCharCodes(font_file.content as List<int>).trimLeft();
     XmlDocument xml;
 
@@ -100,7 +100,7 @@ class BitmapFont {
     if (ch.isEmpty) {
       return 0;
     }
-    int c = ch.codeUnits[0];
+    var c = ch.codeUnits[0];
     if (!characters.containsKey(ch)) {
       return base ~/ 2;
     }
@@ -121,9 +121,9 @@ class BitmapFont {
     var font = docElements[0];
 
     for (var c in _childElements(font)) {
-      String name = c.name.toString();
+      var name = c.name.toString();
       if (name == 'info') {
-        for (XmlAttribute a in c.attributes) {
+        for (var a in c.attributes) {
           switch (a.name.toString()) {
             case 'face':
               face = a.value;
@@ -153,16 +153,16 @@ class BitmapFont {
               antialias = (int.parse(a.value) == 1);
               break;
             case 'padding':
-              List<String> tk = a.value.split(',');
+              var tk = a.value.split(',');
               padding = [];
-              for (String t in tk) {
+              for (var t in tk) {
                 padding.add(int.parse(t));
               }
               break;
             case 'spacing':
-              List<String> tk = a.value.split(',');
+              var tk = a.value.split(',');
               spacing = [];
-              for (String t in tk) {
+              for (var t in tk) {
                 spacing.add(int.parse(t));
               }
               break;
@@ -172,7 +172,7 @@ class BitmapFont {
           }
         }
       } else if (name == 'common') {
-        for (XmlAttribute a in c.attributes) {
+        for (var a in c.attributes) {
           switch (a.name.toString()) {
             case 'lineHeight':
               lineHeight = int.parse(a.value);
@@ -196,21 +196,21 @@ class BitmapFont {
         }
       } else if (name == 'pages') {
         for (var page in _childElements(c)) {
-          int id = int.parse(page.getAttribute('id'));
-          String filename = page.getAttribute('file');
+          var id = int.parse(page.getAttribute('id'));
+          var filename = page.getAttribute('file');
 
           if (fontPages.containsKey(id)) {
             throw ImageException('Duplicate font page id found: $id.');
           }
 
           if (arc != null) {
-            ArchiveFile imageFile = _findFile(arc, filename);
+            var imageFile = _findFile(arc, filename);
             if (imageFile == null) {
               throw ImageException('Font zip missing font page image '
                   '$filename');
             }
 
-            Image image =
+            var image =
                 PngDecoder().decodeImage(imageFile.content as List<int>);
 
             fontPages[id] = image;
@@ -218,9 +218,9 @@ class BitmapFont {
         }
       } else if (name == 'kernings') {
         for (var kerning in _childElements(c)) {
-          int first = int.parse(kerning.getAttribute('first'));
-          int second = int.parse(kerning.getAttribute('second'));
-          int amount = int.parse(kerning.getAttribute('amount'));
+          var first = int.parse(kerning.getAttribute('first'));
+          var second = int.parse(kerning.getAttribute('second'));
+          var amount = int.parse(kerning.getAttribute('amount'));
 
           if (!kernings.containsKey(first)) {
             kernings[first] = {};
@@ -231,37 +231,37 @@ class BitmapFont {
     }
 
     for (var c in _childElements(font)) {
-      String name = c.name.toString();
+      var name = c.name.toString();
       if (name == 'chars') {
         for (var char in _childElements(c)) {
-          int id = int.parse(char.getAttribute('id'));
-          int x = int.parse(char.getAttribute('x'));
-          int y = int.parse(char.getAttribute('y'));
-          int width = int.parse(char.getAttribute('width'));
-          int height = int.parse(char.getAttribute('height'));
-          int xoffset = int.parse(char.getAttribute('xoffset'));
-          int yoffset = int.parse(char.getAttribute('yoffset'));
-          int xadvance = int.parse(char.getAttribute('xadvance'));
-          int page = int.parse(char.getAttribute('page'));
-          int chnl = int.parse(char.getAttribute('chnl'));
+          var id = int.parse(char.getAttribute('id'));
+          var x = int.parse(char.getAttribute('x'));
+          var y = int.parse(char.getAttribute('y'));
+          var width = int.parse(char.getAttribute('width'));
+          var height = int.parse(char.getAttribute('height'));
+          var xoffset = int.parse(char.getAttribute('xoffset'));
+          var yoffset = int.parse(char.getAttribute('yoffset'));
+          var xadvance = int.parse(char.getAttribute('xadvance'));
+          var page = int.parse(char.getAttribute('page'));
+          var chnl = int.parse(char.getAttribute('chnl'));
 
           if (!fontPages.containsKey(page)) {
             throw ImageException('Missing page image: $page');
           }
 
-          Image fontImage = fontPages[page];
+          var fontImage = fontPages[page];
 
-          BitmapFontCharacter ch = BitmapFontCharacter(
+          var ch = BitmapFontCharacter(
               id, width, height, xoffset, yoffset, xadvance, page, chnl);
 
           characters[id] = ch;
 
-          int x2 = x + width;
-          int y2 = y + height;
-          int pi = 0;
-          Image image = ch.image;
-          for (int yi = y; yi < y2; ++yi) {
-            for (int xi = x; xi < x2; ++xi) {
+          var x2 = x + width;
+          var y2 = y + height;
+          var pi = 0;
+          var image = ch.image;
+          for (var yi = y; yi < y2; ++yi) {
+            for (var xi = x; xi < x2; ++xi) {
               image[pi++] = fontImage.getPixel(xi, yi);
             }
           }
@@ -278,18 +278,18 @@ class BitmapFont {
     List<XmlAttribute> charsAttrs;
     List<XmlAttribute> kerningsAttrs;
 
-    List<String> lines = [];
+    var lines = <String>[];
     lines = content.split('\r\n');
     if(lines.length <= 1) {
       lines = content.split('\n');
     }
 
-    for (String line in lines) {
+    for (var line in lines) {
       if (line.isEmpty) {
         continue;
       }
 
-      List<String> tk = line.split(' ');
+      var tk = line.split(' ');
       switch (tk[0]) {
         case 'info':
           var attrs = _parseParameters(tk);
@@ -348,11 +348,11 @@ class BitmapFont {
 
   List<XmlAttribute> _parseParameters(List<String> tk) {
     var params = <XmlAttribute>[];
-    for (int ti = 1; ti < tk.length; ++ti) {
+    for (var ti = 1; ti < tk.length; ++ti) {
       if (tk[ti].isEmpty) {
         continue;
       }
-      List<String> atk = tk[ti].split('=');
+      var atk = tk[ti].split('=');
       if (atk.length != 2) {
         continue;
       }
@@ -367,7 +367,7 @@ class BitmapFont {
   }
 
   static ArchiveFile _findFile(Archive arc, String filename) {
-    for (ArchiveFile f in arc.files) {
+    for (var f in arc.files) {
       if (f.name == filename) {
         return f;
       }
@@ -390,13 +390,13 @@ class BitmapFontCharacter {
 
   BitmapFontCharacter(this.id, int width, int height, this.xoffset,
       this.yoffset, this.xadvance, this.page, this.channel)
-      : this.width = width,
-        this.height = height,
+      : width = width,
+        height = height,
         image = Image(width, height);
 
   @override
   String toString() {
-    Map<String, int> x = {
+    var x = {
       'id': id,
       'width': width,
       'height': height,

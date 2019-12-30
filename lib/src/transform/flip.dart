@@ -32,14 +32,14 @@ Image flip(Image src, Flip mode) {
 
 /// Flip the [src] image vertically.
 Image flipVertical(Image src) {
-  int w = src.width;
-  int h = src.height;
-  int h2 = h ~/ 2;
-  for (int y = 0; y < h2; ++y) {
-    int y1 = y * w;
-    int y2 = (h - 1 - y) * w;
-    for (int x = 0; x < w; ++x) {
-      int t = src[y2 + x];
+  final w = src.width;
+  final h = src.height;
+  final h2 = h ~/ 2;
+  for (var y = 0; y < h2; ++y) {
+    final y1 = y * w;
+    final y2 = (h - 1 - y) * w;
+    for (var x = 0; x < w; ++x) {
+      final t = src[y2 + x];
       src[y2 + x] = src[y1 + x];
       src[y1 + x] = t;
     }
@@ -49,14 +49,14 @@ Image flipVertical(Image src) {
 
 /// Flip the src image horizontally.
 Image flipHorizontal(Image src) {
-  int w = src.width;
-  int h = src.height;
-  int w2 = src.width ~/ 2;
-  for (int y = 0; y < h; ++y) {
-    int y1 = y * w;
-    for (int x = 0; x < w2; ++x) {
-      int x2 = (w - 1 - x);
-      int t = src[y1 + x2];
+  final w = src.width;
+  final h = src.height;
+  final w2 = src.width ~/ 2;
+  for (var y = 0; y < h; ++y) {
+    final y1 = y * w;
+    for (var x = 0; x < w2; ++x) {
+      final x2 = (w - 1 - x);
+      final t = src[y1 + x2];
       src[y1 + x2] = src[y1 + x];
       src[y1 + x] = t;
     }

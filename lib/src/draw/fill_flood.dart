@@ -12,7 +12,7 @@ Image fillFlood(Image src, int x, int y, int color,
     {num threshold = 0.0, bool compareAlpha = false}) {
   var visited = Uint8List(src.width * src.height);
 
-  int srcColor = src.getPixel(x, y);
+  var srcColor = src.getPixel(x, y);
   if (!compareAlpha) {
     srcColor = setAlpha(srcColor, 0);
   }
@@ -54,16 +54,16 @@ Uint8List maskFlood(Image src, int x, int y,
     {num threshold = 0.0, bool compareAlpha = false, int fillValue = 255}) {
   var visited = Uint8List(src.width * src.height);
 
-  int srcColor = src.getPixel(x, y);
+  var srcColor = src.getPixel(x, y);
   if (!compareAlpha) {
     srcColor = setAlpha(srcColor, 0);
   }
 
-  Uint8List ret = Uint8List(src.width * src.height);
+  var ret = Uint8List(src.width * src.height);
 
   _TestPixel array;
   if (threshold > 0) {
-    List<num> lab =
+    var lab =
         rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
 
     if (compareAlpha) {
@@ -99,8 +99,8 @@ Uint8List maskFlood(Image src, int x, int y,
 
 bool _testPixelLabColorDistance(
     Image src, int x, int y, List<num> refColor, num threshold) {
-  int pixel = src.getPixel(x, y);
-  bool compareAlpha = refColor.length > 3;
+  var pixel = src.getPixel(x, y);
+  var compareAlpha = refColor.length > 3;
   var pixelColor = rgbToLab(getRed(pixel), getGreen(pixel), getBlue(pixel));
   if (compareAlpha) {
     pixelColor.add(getAlpha(pixel).toDouble());
@@ -123,8 +123,8 @@ void _fill4(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
   // right if doing so would allow us to move further up, but it doesn't seem
   // worth the complexity
   while (true) {
-    int ox = x;
-    int oy = y;
+    var ox = x;
+    var oy = y;
     while (y != 0 && !array(y - 1, x)) {
       y--;
     }
@@ -148,11 +148,11 @@ void _fill4Core(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
   // attempting to fill an entire rectangular block
 
   // the number of cells that were clear in the last row we scanned
-  int lastRowLength = 0;
+  var lastRowLength = 0;
 
   do {
-    int rowLength = 0;
-    int sx = x;
+    var rowLength = 0;
+    var sx = x;
     // keep track of how long this row is. sx is the starting x for the main
     // scan below now we want to handle a case like |***|, where we fill 3
     // cells in the first row and then after we move to the second row we find
@@ -208,7 +208,7 @@ void _fill4Core(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
     // of the single cell at the end of the second row, i.e. at (4,1)
     if (rowLength < lastRowLength) {
       // 'end' is the end of the previous row, so scan the current row to
-      for (int end = x + lastRowLength; ++sx < end;) {
+      for (var end = x + lastRowLength; ++sx < end;) {
         // there. any clear cells would have been connected to the previous
         if (!array(y, sx)) {
           // row. the cells up and left must be set so use FillCore
@@ -221,7 +221,7 @@ void _fill4Core(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
     // |*****|
     else if (rowLength > lastRowLength && y != 0) {
       // if this row is longer and we're not already at the top...
-      for (int ux = x + lastRowLength; ++ux < sx;) {
+      for (var ux = x + lastRowLength; ++ux < sx;) {
         // sx is the end of the current row
         if (!array(y - 1, ux)) {
           // since there may be clear cells up and left, use _Fill

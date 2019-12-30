@@ -12,15 +12,15 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
     blur = 0;
   }
 
-  int shadowWidth = src.width + blur * 2;
-  int shadowHeight = src.height + blur * 2;
-  int shadowOffsetX = -blur;
-  int shadowOffsetY = -blur;
+  var shadowWidth = src.width + blur * 2;
+  var shadowHeight = src.height + blur * 2;
+  var shadowOffsetX = -blur;
+  var shadowOffsetY = -blur;
 
-  int newImageWidth = shadowWidth;
-  int newImageHeight = shadowHeight;
-  int imageOffsetX = 0;
-  int imageOffsetY = 0;
+  var newImageWidth = shadowWidth;
+  var newImageHeight = shadowHeight;
+  var imageOffsetX = 0;
+  var imageOffsetY = 0;
 
   if (shadowOffsetX + hShadow < 0) {
     imageOffsetX = -(shadowOffsetX + hShadow);
@@ -42,7 +42,7 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
     newImageHeight = shadowHeight + shadowOffsetY + vShadow;
   }
 
-  Image dst = Image(newImageWidth, newImageHeight);
+  var dst = Image(newImageWidth, newImageHeight);
   dst.fill(0x00ffffff);
 
   copyInto(dst, src, dstX: shadowOffsetX, dstY: shadowOffsetY);

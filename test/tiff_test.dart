@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Directory dir = Directory('test/res/tiff');
+  var dir = Directory('test/res/tiff');
   if (!dir.existsSync()) {
     return;
   }
@@ -16,11 +16,11 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      var name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
 
-        TiffInfo info = TiffDecoder().startDecode(bytes);
+        var info = TiffDecoder().startDecode(bytes);
         if (info == null) {
           throw ImageException('Unable to parse Tiff info: $name.');
         }
@@ -30,7 +30,7 @@ void main() {
         print('  height: ${info.height}');
         print('  bigEndian: ${info.bigEndian}');
         print('  images: ${info.images.length}');
-        for (int i = 0; i < info.images.length; ++i) {
+        for (var i = 0; i < info.images.length; ++i) {
           print('  image[$i]');
           print('    width: ${info.images[i].width}');
           print('    height: ${info.images[i].height}');
@@ -60,16 +60,16 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      var name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         print(name);
         List<int> bytes = (f as File).readAsBytesSync();
-        Image image = TiffDecoder().decodeImage(bytes);
+        var image = TiffDecoder().decodeImage(bytes);
         if (image == null) {
           throw ImageException('Unable to decode TIFF Image: $name.');
         }
 
-        List<int> png = PngEncoder().encodeImage(image);
+        var png = PngEncoder().encodeImage(image);
         File('.dart_tool/out/tif/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);

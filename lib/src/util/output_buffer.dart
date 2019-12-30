@@ -8,7 +8,7 @@ class OutputBuffer {
 
   /// Create a byte buffer for writing.
   OutputBuffer({int size = _BLOCK_SIZE, this.bigEndian = false})
-      : _buffer = Uint8List(size == null ? _BLOCK_SIZE : size),
+      : _buffer = Uint8List(size ?? _BLOCK_SIZE),
         length = 0;
 
   void rewind() {
@@ -36,9 +36,7 @@ class OutputBuffer {
 
   /// Write a set of bytes to the end of the buffer.
   void writeBytes(List<int> bytes, [int len]) {
-    if (len == null) {
-      len = bytes.length;
-    }
+    len ??= bytes.length;
     while (length + len > _buffer.length) {
       _expandBuffer((length + len) - _buffer.length);
     }
@@ -100,14 +98,14 @@ class OutputBuffer {
 
   /// Grow the buffer to accommodate additional data.
   void _expandBuffer([int required]) {
-    int blockSize = (required != null)
+    final blockSize = (required != null)
         ? required
         : (_buffer.isEmpty) ? _BLOCK_SIZE : (_buffer.length * 2);
-    Uint8List newBuffer = Uint8List(_buffer.length + blockSize);
+    final newBuffer = Uint8List(_buffer.length + blockSize);
     newBuffer.setRange(0, _buffer.length, _buffer);
     _buffer = newBuffer;
   }
 
-  static const int _BLOCK_SIZE = 0x2000; // 8k block-size
+  static const _BLOCK_SIZE = 0x2000; // 8k block-size
   Uint8List _buffer;
 }

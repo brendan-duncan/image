@@ -10,7 +10,7 @@ Image brightness(Image src, int brightness) {
   }
 
   var pixels = src.getBytes();
-  for (int i = 0, len = pixels.length; i < len; i += 4) {
+  for (var i = 0, len = pixels.length; i < len; i += 4) {
     pixels[i] = clamp255(pixels[i] + brightness);
     pixels[i + 1] = clamp255(pixels[i + 1] + brightness);
     pixels[i + 2] = clamp255(pixels[i + 2] + brightness);

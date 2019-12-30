@@ -6,10 +6,10 @@ import 'webp_frame.dart';
 // Features gathered from the bitstream
 class WebPInfo extends DecodeInfo {
   // enum Format
-  static const int FORMAT_UNDEFINED = 0;
-  static const int FORMAT_LOSSY = 1;
-  static const int FORMAT_LOSSLESS = 2;
-  static const int FORMAT_ANIMATED = 3;
+  static const FORMAT_UNDEFINED = 0;
+  static const FORMAT_LOSSY = 1;
+  static const FORMAT_LOSSLESS = 2;
+  static const FORMAT_ANIMATED = 3;
 
   // True if the bitstream contains an alpha channel.
   bool hasAlpha = false;
@@ -52,6 +52,7 @@ class InternalWebPInfo extends WebPInfo {
   int get frame => _frame;
   set frame(int value) => _frame = value;
 
+  @override
   int get numFrames => _numFrames;
   set numFrames(int value) => _numFrames = value;
 

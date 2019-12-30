@@ -4,14 +4,14 @@ import '../image.dart';
 /// Find the minimum and maximum color value in the image.
 /// Returns a list as <[min], [max]>.
 List<int> minMax(Image image) {
-  int min = 255;
-  int max = 0;
-  final int len = image.length;
-  for (int i = 0; i < len; ++i) {
-    int c = image[i];
-    int r = getRed(c);
-    int g = getGreen(c);
-    int b = getBlue(c);
+  var min = 255;
+  var max = 0;
+  final len = image.length;
+  for (var i = 0; i < len; ++i) {
+    final c = image[i];
+    final r = getRed(c);
+    final g = getGreen(c);
+    final b = getBlue(c);
 
     if (r < min) {
       min = r;
@@ -32,7 +32,7 @@ List<int> minMax(Image image) {
       max = b;
     }
     if (image.channels == Channels.rgba) {
-      int a = getAlpha(c);
+      final a = getAlpha(c);
       if (a < min) {
         min = a;
       }

@@ -9,7 +9,7 @@ class GifColorMap {
   final Uint8List colors;
 
   GifColorMap(int numColors)
-      : this.numColors = numColors,
+      : numColors = numColors,
         colors = Uint8List(numColors * 3) {
     bitsPerPixel = _bitSize(numColors);
   }
@@ -19,13 +19,13 @@ class GifColorMap {
   operator []=(int index, int value) => colors[index] = value;
 
   int color(int index) {
-    int ci = index * 3;
-    int a = (index == transparent) ? 0 : 255;
+    var ci = index * 3;
+    var a = (index == transparent) ? 0 : 255;
     return getColor(colors[ci], colors[ci + 1], colors[ci + 2], a);
   }
 
   void setColor(int index, int r, int g, int b) {
-    int ci = index * 3;
+    var ci = index * 3;
     colors[ci] = r;
     colors[ci + 1] = g;
     colors[ci + 2] = b;
@@ -40,7 +40,7 @@ class GifColorMap {
   int alpha(int color) => (color == transparent) ? 0 : 255;
 
   int _bitSize(int n) {
-    for (int i = 1; i <= 8; i++) {
+    for (var i = 1; i <= 8; i++) {
       if ((1 << i) >= n) {
         return i;
       }

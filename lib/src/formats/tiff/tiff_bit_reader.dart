@@ -18,7 +18,7 @@ class TiffBitReader {
       _bitBuffer = input.readByte();
     }
 
-    int value = 0;
+    var value = 0;
 
     while (numBits > _bitPos) {
       value = (value << _bitPos) + (_bitBuffer & _BIT_MASK[_bitPos]);

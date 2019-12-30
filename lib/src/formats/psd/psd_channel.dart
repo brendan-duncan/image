@@ -4,18 +4,18 @@ import '../../image_exception.dart';
 import '../../util/input_buffer.dart';
 
 class PsdChannel {
-  static const int RED = 0;
-  static const int GREEN = 1;
-  static const int BLUE = 2;
-  static const int BLACK = 3;
-  static const int ALPHA = -1;
-  static const int MASK = -2;
-  static const int REAL_MASK = -3;
+  static const RED = 0;
+  static const GREEN = 1;
+  static const BLUE = 2;
+  static const BLACK = 3;
+  static const ALPHA = -1;
+  static const MASK = -2;
+  static const REAL_MASK = -3;
 
-  static const int COMPRESS_NONE = 0;
-  static const int COMPRESS_RLE = 1;
-  static const int COMPRESS_ZIP = 2;
-  static const int COMPRESS_ZIP_PREDICTOR = 3;
+  static const COMPRESS_NONE = 0;
+  static const COMPRESS_RLE = 1;
+  static const COMPRESS_ZIP = 2;
+  static const COMPRESS_ZIP_PREDICTOR = 3;
 
   int id;
   int dataLength;
@@ -31,18 +31,14 @@ class PsdChannel {
 
   void readPlane(InputBuffer input, int width, int height, int bitDepth,
       [int compression, Uint16List lineLengths, int planeNum = 0]) {
-    if (compression == null) {
-      compression = input.readUint16();
-    }
+    compression ??= input.readUint16();
 
     switch (compression) {
       case COMPRESS_NONE:
         _readPlaneUncompressed(input, width, height, bitDepth);
         break;
       case COMPRESS_RLE:
-        if (lineLengths == null) {
-          lineLengths = _readLineLengths(input, height);
-        }
+        lineLengths ??= _readLineLengths(input, height);
         _readPlaneRleCompressed(
             input, width, height, bitDepth, lineLengths, planeNum);
         break;
@@ -52,8 +48,8 @@ class PsdChannel {
   }
 
   Uint16List _readLineLengths(InputBuffer input, int height) {
-    Uint16List lineLengths = Uint16List(height);
-    for (int i = 0; i < height; ++i) {
+    var lineLengths = Uint16List(height);
+    for (var i = 0; i < height; ++i) {
       lineLengths[i] = input.readUint16();
     }
     return lineLengths;
@@ -61,7 +57,7 @@ class PsdChannel {
 
   void _readPlaneUncompressed(
       InputBuffer input, int width, int height, int bitDepth) {
-    int len = width * height;
+    var len = width * height;
     if (bitDepth == 16) {
       len *= 2;
     }
@@ -71,27 +67,27 @@ class PsdChannel {
       return;
     }
 
-    InputBuffer imgData = input.readBytes(len);
+    var imgData = input.readBytes(len);
     data = imgData.toUint8List();
   }
 
   void _readPlaneRleCompressed(InputBuffer input, int width, int height,
       int bitDepth, Uint16List lineLengths, int planeNum) {
-    int len = width * height;
+    var len = width * height;
     if (bitDepth == 16) {
       len *= 2;
     }
     data = Uint8List(len);
-    int pos = 0;
-    int lineIndex = planeNum * height;
+    var pos = 0;
+    var lineIndex = planeNum * height;
     if (lineIndex >= lineLengths.length) {
       data.fillRange(0, data.length, 255);
       return;
     }
 
-    for (int i = 0; i < height; ++i) {
-      int len = lineLengths[lineIndex++];
-      InputBuffer s = input.readBytes(len);
+    for (var i = 0; i < height; ++i) {
+      var len = lineLengths[lineIndex++];
+      var s = input.readBytes(len);
       _decodeRLE(s, data, pos);
       pos += width;
     }
@@ -99,16 +95,16 @@ class PsdChannel {
 
   void _decodeRLE(InputBuffer src, Uint8List dst, int dstIndex) {
     while (!src.isEOS) {
-      int n = src.readInt8();
+      var n = src.readInt8();
       if (n < 0) {
         n = 1 - n;
-        int b = src.readByte();
-        for (int i = 0; i < n; ++i) {
+        var b = src.readByte();
+        for (var i = 0; i < n; ++i) {
           dst[dstIndex++] = b;
         }
       } else {
         n++;
-        for (int i = 0; i < n; ++i) {
+        for (var i = 0; i < n; ++i) {
           dst[dstIndex++] = src.readByte();
         }
       }

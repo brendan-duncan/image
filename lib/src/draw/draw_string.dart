@@ -17,7 +17,7 @@ var _a_lut = Uint8List(256);
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
     {int color = 0xffffffff}) {
   if (color != 0xffffffff) {
-    int ca = getAlpha(color);
+    var ca = getAlpha(color);
     if (ca == 0) {
       return image;
     }
@@ -25,7 +25,7 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     num dr = getRed(color) / 255.0;
     num dg = getGreen(color) / 255.0;
     num db = getBlue(color) / 255.0;
-    for (int i = 1; i < 256; ++i) {
+    for (var i = 1; i < 256; ++i) {
       _r_lut[i] = (dr * i).toInt();
       _g_lut[i] = (dg * i).toInt();
       _b_lut[i] = (db * i).toInt();
@@ -33,21 +33,21 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     }
   }
 
-  List<int> chars = string.codeUnits;
-  for (int c in chars) {
+  var chars = string.codeUnits;
+  for (var c in chars) {
     if (!font.characters.containsKey(c)) {
       x += font.base ~/ 2;
       continue;
     }
 
-    BitmapFontCharacter ch = font.characters[c];
+    var ch = font.characters[c];
 
-    int x2 = x + ch.width;
-    int y2 = y + ch.height;
-    int pi = 0;
-    for (int yi = y; yi < y2; ++yi) {
-      for (int xi = x; xi < x2; ++xi) {
-        int p = ch.image[pi++];
+    var x2 = x + ch.width;
+    var y2 = y + ch.height;
+    var pi = 0;
+    for (var yi = y; yi < y2; ++yi) {
+      for (var xi = x; xi < x2; ++xi) {
+        var p = ch.image[pi++];
         if (color != 0xffffffff) {
           p = getColor(_r_lut[getRed(p)], _g_lut[getGreen(p)],
               _b_lut[getBlue(p)], _a_lut[getAlpha(p)]);
@@ -72,16 +72,16 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 /// such as: [arial_14], [arial_24], or [arial_48].
 Image drawStringCentered(Image image, BitmapFont font, String string,
     {int x, int y, int color = 0xffffffff}) {
-  int stringWidth = 0;
-  int stringHeight = 0;
+  var stringWidth = 0;
+  var stringHeight = 0;
 
   if (x == null || y == null) {
-    List<int> chars = string.codeUnits;
-    for (int c in chars) {
+    var chars = string.codeUnits;
+    for (var c in chars) {
       if (!font.characters.containsKey(c)) {
         continue;
       }
-      BitmapFontCharacter ch = font.characters[c];
+      var ch = font.characters[c];
       stringWidth += ch.xadvance;
       if(ch.height + ch.yoffset > stringHeight) {
         stringHeight = ch.height + ch.yoffset;

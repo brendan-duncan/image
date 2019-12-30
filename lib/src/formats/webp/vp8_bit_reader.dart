@@ -16,7 +16,7 @@ class VP8BitReader {
   }
 
   int getValue(int bits) {
-    int v = 0;
+    var v = 0;
     while (bits-- > 0) {
       v |= getBit(0x80) << bits;
     }
@@ -24,14 +24,14 @@ class VP8BitReader {
   }
 
   int getSigned(int v) {
-    final int split = (_range >> 1);
-    final int bit = _bitUpdate(split);
+    final split = (_range >> 1);
+    final bit = _bitUpdate(split);
     _shift();
     return bit != 0 ? -v : v;
   }
 
   int getSignedValue(int bits) {
-    final int value = getValue(bits);
+    final value = getValue(bits);
     return get() == 1 ? -value : value;
   }
 
@@ -40,8 +40,8 @@ class VP8BitReader {
   }
 
   int getBit(int prob) {
-    final int split = (_range * prob) >> 8;
-    final int bit = _bitUpdate(split);
+    final split = (_range * prob) >> 8;
+    final bit = _bitUpdate(split);
     if (_range <= 0x7e) {
       _shift();
     }
@@ -54,8 +54,8 @@ class VP8BitReader {
       _loadNewBytes();
     }
 
-    final int pos = _bits;
-    final int value = (_value >> pos);
+    final pos = _bits;
+    final value = (_value >> pos);
     if (value > split) {
       _range -= split + 1;
       _value -= (split + 1) << pos;
@@ -67,7 +67,7 @@ class VP8BitReader {
   }
 
   void _shift() {
-    final int shift = LOG_2_RANGE[_range];
+    final shift = LOG_2_RANGE[_range];
     _range = NEW_RANGE[_range];
     _bits -= shift;
   }
@@ -76,7 +76,7 @@ class VP8BitReader {
     // Read 'BITS' bits at a time if possible.
     if (input.length >= 1) {
       // convert memory type to register type (with some zero'ing!)
-      int bits = input.readByte();
+      var bits = input.readByte();
       _value = bits | (_value << BITS);
       _bits += (BITS);
     } else {
@@ -98,7 +98,7 @@ class VP8BitReader {
     }
   }
 
-  static const int BITS = 8;
+  static const BITS = 8;
 
   // Read a bit with proba 'prob'. Speed-critical function!
   static const List<int> LOG_2_RANGE = [

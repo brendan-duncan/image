@@ -39,7 +39,7 @@ class VP8SegmentHeader {
 class VP8BandProbas {
   List<Uint8List> probas = List<Uint8List>(VP8.NUM_CTX);
   VP8BandProbas() {
-    for (int i = 0; i < VP8.NUM_CTX; ++i) {
+    for (var i = 0; i < VP8.NUM_CTX; ++i) {
       probas[i] = Uint8List(VP8.NUM_PROBAS);
     }
   }
@@ -53,9 +53,9 @@ class VP8Proba {
   List<List<VP8BandProbas>> bands = List(VP8.NUM_TYPES);
 
   VP8Proba() {
-    for (int i = 0; i < VP8.NUM_TYPES; ++i) {
+    for (var i = 0; i < VP8.NUM_TYPES; ++i) {
       bands[i] = List<VP8BandProbas>(VP8.NUM_BANDS);
-      for (int j = 0; j < VP8.NUM_BANDS; ++j) {
+      for (var j = 0; j < VP8.NUM_BANDS; ++j) {
         bands[i][j] = VP8BandProbas();
       }
     }
@@ -136,7 +136,7 @@ class VP8TopSamples {
 class VP8Random {
   int _index1;
   int _index2;
-  Uint32List _table = Uint32List(RANDOM_TABLE_SIZE);
+  final _table = Uint32List(RANDOM_TABLE_SIZE);
   int _amplitude;
 
   // Initializes random generator with an amplitude 'dithering' in range [0..1].
@@ -155,7 +155,7 @@ class VP8Random {
   // (uses D.Knuth's Difference-based random generator).
   // 'amp' is in RANDOM_DITHER_FIX fixed-point precision.
   int randomBits2(int numBits, int amp) {
-    int diff = _table[_index1] - _table[_index2];
+    var diff = _table[_index1] - _table[_index2];
     if (diff < 0) {
       diff += (1 << 31);
     }
@@ -184,8 +184,8 @@ class VP8Random {
   }
 
   // fixed-point precision for dithering
-  static const int RANDOM_DITHER_FIX = 8;
-  static const int RANDOM_TABLE_SIZE = 55;
+  static const RANDOM_DITHER_FIX = 8;
+  static const RANDOM_TABLE_SIZE = 55;
 
   // 31b-range values
   static const List<int> _RANDOM_TABLE = [

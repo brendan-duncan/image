@@ -7,11 +7,11 @@ void main() {
     test('decoding', () {
       List<int> bytes = File('test/res/exr/grid.exr').readAsBytesSync();
 
-      ExrDecoder dec = ExrDecoder();
+      final dec = ExrDecoder();
       dec.startDecode(bytes);
-      Image img = dec.decodeFrame(0);
+      final img = dec.decodeFrame(0);
 
-      List<int> png = PngEncoder().encodeImage(img);
+      final png = PngEncoder().encodeImage(img);
       File('.dart_tool/out/exr/grid.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);

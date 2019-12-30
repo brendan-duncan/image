@@ -5,25 +5,25 @@ import '../psd_layer_data.dart';
 class PsdLayerSectionDivider extends PsdLayerData {
   static const String TAG = 'lsct';
 
-  static const int NORMAL = 0;
-  static const int OPEN_FOLDER = 1;
-  static const int CLOSED_FOLDER = 2;
-  static const int SECTION_DIVIDER = 3;
+  static const NORMAL = 0;
+  static const OPEN_FOLDER = 1;
+  static const CLOSED_FOLDER = 2;
+  static const SECTION_DIVIDER = 3;
 
-  static const int SUBTYPE_NORMAL = 0;
-  static const int SUBTYPE_SCENE_GROUP = 1;
+  static const SUBTYPE_NORMAL = 0;
+  static const SUBTYPE_SCENE_GROUP = 1;
 
   int type;
   String key;
   int subType = SUBTYPE_NORMAL;
 
   PsdLayerSectionDivider(String tag, InputBuffer data) : super.type(tag) {
-    int len = data.length;
+    var len = data.length;
 
     type = data.readUint32();
 
     if (len >= 12) {
-      String sig = data.readString(4);
+      var sig = data.readString(4);
       if (sig != '8BIM') {
         throw ImageException('Invalid key in layer additional data');
       }

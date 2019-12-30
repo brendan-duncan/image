@@ -21,27 +21,26 @@ class InternalExrZipCompressor extends InternalExrCompressor
       ExrPart header, int maxScanLineSize, this._numScanLines)
       : super(header as InternalExrPart);
 
+  @override
   int numScanLines() => _numScanLines;
 
+  @override
   Uint8List compress(InputBuffer input, int x, int y, [int width, int height]) {
     throw ImageException('Zip compression not yet supported');
   }
 
+  @override
   Uint8List uncompress(InputBuffer input, int x, int y,
       [int width, int height]) {
     var data = zlib.decodeBytes(input.toUint8List());
 
-    if (width == null) {
-      width = header.width;
-    }
-    if (height == null) {
-      height = header.linesInBuffer;
-    }
+    width ??= header.width;
+    height ??= header.linesInBuffer;
 
-    int minX = x;
-    int maxX = x + width - 1;
-    int minY = y;
-    int maxY = y + height - 1;
+    var minX = x;
+    var maxX = x + width - 1;
+    var minY = y;
+    var maxY = y + height - 1;
 
     if (maxX > header.width) {
       maxX = header.width - 1;
@@ -54,7 +53,7 @@ class InternalExrZipCompressor extends InternalExrCompressor
     decodedHeight = (maxY - minY) + 1;
 
     // Predictor
-    for (int i = 1, len = data.length; i < len; ++i) {
+    for (var i = 1, len = data.length; i < len; ++i) {
       data[i] = data[i - 1] + data[i] - 128;
     }
 
@@ -63,10 +62,10 @@ class InternalExrZipCompressor extends InternalExrCompressor
       _outCache = Uint8List(data.length);
     }
 
-    final int len = data.length;
-    int t1 = 0;
-    int t2 = (len + 1) ~/ 2;
-    int si = 0;
+    final len = data.length;
+    var t1 = 0;
+    var t2 = (len + 1) ~/ 2;
+    var si = 0;
 
     while (true) {
       if (si < len) {
@@ -84,6 +83,6 @@ class InternalExrZipCompressor extends InternalExrCompressor
     return _outCache;
   }
 
-  int _numScanLines;
+  final int _numScanLines;
   Uint8List _outCache;
 }

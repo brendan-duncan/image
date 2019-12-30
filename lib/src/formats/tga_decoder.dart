@@ -12,10 +12,11 @@ class TgaDecoder extends Decoder {
   InputBuffer input;
 
   /// Is the given file a valid TGA image?
+  @override
   bool isValidFile(List<int> data) {
-    InputBuffer input = InputBuffer(data, bigEndian: true);
+    var input = InputBuffer(data, bigEndian: true);
 
-    InputBuffer header = input.readBytes(18);
+    var header = input.readBytes(18);
     if (header[2] != 2) {
       return false;
     }
@@ -26,11 +27,12 @@ class TgaDecoder extends Decoder {
     return true;
   }
 
+  @override
   DecodeInfo startDecode(List<int> data) {
     info = TgaInfo();
     input = InputBuffer(data, bigEndian: true);
 
-    InputBuffer header = input.readBytes(18);
+    var header = input.readBytes(18);
     if (header[2] != 2) {
       return null;
     }
@@ -46,21 +48,23 @@ class TgaDecoder extends Decoder {
     return info;
   }
 
+  @override
   int numFrames() => info != null ? 1 : 0;
 
+  @override
   Image decodeFrame(int frame) {
     if (info == null) {
       return null;
     }
 
     input.offset = info.imageOffset;
-    Image image = Image(info.width, info.height, channels: Channels.rgb);
-    for (int y = image.height - 1; y >= 0; --y) {
-      for (int x = 0; x < image.width; ++x) {
-        int b = input.readByte();
-        int g = input.readByte();
-        int r = input.readByte();
-        int a = info.bpp == 32 ? input.readByte() : 255;
+    var image = Image(info.width, info.height, channels: Channels.rgb);
+    for (var y = image.height - 1; y >= 0; --y) {
+      for (var x = 0; x < image.width; ++x) {
+        var b = input.readByte();
+        var g = input.readByte();
+        var r = input.readByte();
+        var a = info.bpp == 32 ? input.readByte() : 255;
         image.setPixel(x, y, getColor(r, g, b, a));
       }
     }
@@ -68,6 +72,7 @@ class TgaDecoder extends Decoder {
     return image;
   }
 
+  @override
   Image decodeImage(List<int> data, {int frame = 0}) {
     if (startDecode(data) == null) {
       return null;
@@ -76,13 +81,14 @@ class TgaDecoder extends Decoder {
     return decodeFrame(frame);
   }
 
+  @override
   Animation decodeAnimation(List<int> data) {
-    Image image = decodeImage(data);
+    var image = decodeImage(data);
     if (image == null) {
       return null;
     }
 
-    Animation anim = Animation();
+    var anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);

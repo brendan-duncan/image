@@ -3,9 +3,9 @@ import '../../hdr/hdr_image.dart';
 import '../../util/input_buffer.dart';
 
 class ExrChannel {
-  static const int TYPE_UINT = HdrImage.UINT;
-  static const int TYPE_HALF = HdrImage.HALF;
-  static const int TYPE_FLOAT = HdrImage.FLOAT;
+  static const TYPE_UINT = HdrImage.UINT;
+  static const TYPE_HALF = HdrImage.HALF;
+  static const TYPE_FLOAT = HdrImage.FLOAT;
 
   // Channel Names
 
@@ -62,7 +62,7 @@ class ExrChannel {
       return;
     }
     type = input.readUint32();
-    int i = input.readByte();
+    var i = input.readByte();
     assert(i == 0 || i == 1);
     pLinear = i == 1;
     input.skip(3);

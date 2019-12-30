@@ -57,7 +57,7 @@ abstract class Decoder {
   /// [frame] will be decoded. If there was a problem decoding the file, null is
   /// returned.
   HdrImage decodeHdrImage(List<int> bytes, {int frame = 0}) {
-    Image img = decodeImage(bytes, frame: frame);
+    var img = decodeImage(bytes, frame: frame);
     if (img == null) {
       return null;
     }
@@ -92,7 +92,7 @@ abstract class Decoder {
   /// is returned, which provides the image, and top-left coordinates of the
   /// image, as animated frames may only occupy a subset of the canvas.
   HdrImage decodeHdrFrame(int frame) {
-    Image img = decodeFrame(frame);
+    var img = decodeFrame(frame);
     if (img == null) {
       return null;
     }

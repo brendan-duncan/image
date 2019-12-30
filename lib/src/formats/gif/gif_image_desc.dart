@@ -18,16 +18,16 @@ class GifImageDesc {
     width = input.readUint16();
     height = input.readUint16();
 
-    int b = input.readByte();
+    var b = input.readByte();
 
-    int bitsPerPixel = (b & 0x07) + 1;
+    var bitsPerPixel = (b & 0x07) + 1;
 
     interlaced = (b & 0x40) != 0;
 
     if (b & 0x80 != 0) {
       colorMap = GifColorMap(1 << bitsPerPixel);
 
-      for (int i = 0; i < colorMap.numColors; ++i) {
+      for (var i = 0; i < colorMap.numColors; ++i) {
         colorMap.setColor(
             i, input.readByte(), input.readByte(), input.readByte());
       }

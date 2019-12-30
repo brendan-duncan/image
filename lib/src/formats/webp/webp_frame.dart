@@ -30,7 +30,7 @@ class WebPFrame {
     width = input.readUint24() + 1;
     height = input.readUint24() + 1;
     duration = input.readUint24();
-    int b = input.readByte();
+    var b = input.readByte();
     _reserved = (b & 0x7F) >> 7;
     clearFrame = (b & 0x1) != 0;
 
@@ -45,7 +45,7 @@ class WebPFrame {
   int _frameSize;
 
   // Size of an animation frame header.
-  static const int _ANIMF_HEADER_SIZE = 16;
+  static const _ANIMF_HEADER_SIZE = 16;
 }
 
 @internal

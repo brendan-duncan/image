@@ -4,13 +4,13 @@ import '../../util/input_buffer.dart';
 
 class WebPFilters {
   // Filters.
-  static const int FILTER_NONE = 0;
-  static const int FILTER_HORIZONTAL = 1;
-  static const int FILTER_VERTICAL = 2;
-  static const int FILTER_GRADIENT = 3;
-  static const int FILTER_LAST = FILTER_GRADIENT + 1; // end marker
-  static const int FILTER_BEST = 5;
-  static const int FILTER_FAST = 6;
+  static const FILTER_NONE = 0;
+  static const FILTER_HORIZONTAL = 1;
+  static const FILTER_VERTICAL = 2;
+  static const FILTER_GRADIENT = 3;
+  static const FILTER_LAST = FILTER_GRADIENT + 1; // end marker
+  static const FILTER_BEST = 5;
+  static const FILTER_FAST = 6;
 
   static const FILTERS = [
     null, // WEBP_FILTER_NONE
@@ -62,11 +62,11 @@ class WebPFilters {
   static void _predictLine(InputBuffer src, InputBuffer pred, InputBuffer dst,
       int length, bool inverse) {
     if (inverse) {
-      for (int i = 0; i < length; ++i) {
+      for (var i = 0; i < length; ++i) {
         dst[i] = src[i] + pred[i];
       }
     } else {
-      for (int i = 0; i < length; ++i) {
+      for (var i = 0; i < length; ++i) {
         dst[i] = src[i] - pred[i];
       }
     }
@@ -74,11 +74,11 @@ class WebPFilters {
 
   static void _doHorizontalFilter(Uint8List src, int width, int height,
       int stride, int row, int numRows, bool inverse, Uint8List out) {
-    final int startOffset = row * stride;
-    final int lastRow = row + numRows;
-    InputBuffer s = InputBuffer(src, offset: startOffset);
-    InputBuffer o = InputBuffer(src, offset: startOffset);
-    InputBuffer preds = InputBuffer.from(inverse ? o : s);
+    final startOffset = row * stride;
+    final lastRow = row + numRows;
+    var s = InputBuffer(src, offset: startOffset);
+    var o = InputBuffer(src, offset: startOffset);
+    var preds = InputBuffer.from(inverse ? o : s);
 
     if (row == 0) {
       // Leftmost pixel is the same as input for topmost scanline.
@@ -106,11 +106,11 @@ class WebPFilters {
 
   static void _doVerticalFilter(Uint8List src, int width, int height,
       int stride, int row, int numRows, bool inverse, Uint8List out) {
-    final int startOffset = row * stride;
-    final int last_row = row + numRows;
-    InputBuffer s = InputBuffer(src, offset: startOffset);
-    InputBuffer o = InputBuffer(out, offset: startOffset);
-    InputBuffer preds = InputBuffer.from(inverse ? o : s);
+    final startOffset = row * stride;
+    final last_row = row + numRows;
+    var s = InputBuffer(src, offset: startOffset);
+    var o = InputBuffer(out, offset: startOffset);
+    var preds = InputBuffer.from(inverse ? o : s);
 
     if (row == 0) {
       // Very first top-left pixel is copied.
@@ -137,17 +137,17 @@ class WebPFilters {
   }
 
   static int _gradientPredictor(int a, int b, int c) {
-    final int g = a + b - c;
+    final g = a + b - c;
     return ((g & ~0xff) == 0) ? g : (g < 0) ? 0 : 255; // clip to 8bit
   }
 
   static void _doGradientFilter(Uint8List src, int width, int height,
       int stride, int row, int numRows, bool inverse, Uint8List out) {
-    final int startOffset = row * stride;
-    final int lastRow = row + numRows;
-    InputBuffer s = InputBuffer(src, offset: startOffset);
-    InputBuffer o = InputBuffer(out, offset: startOffset);
-    InputBuffer preds = InputBuffer.from(inverse ? o : s);
+    final startOffset = row * stride;
+    final lastRow = row + numRows;
+    var s = InputBuffer(src, offset: startOffset);
+    var o = InputBuffer(out, offset: startOffset);
+    var preds = InputBuffer.from(inverse ? o : s);
 
     // left prediction for top scan-line
     if (row == 0) {
@@ -164,8 +164,8 @@ class WebPFilters {
     while (row < lastRow) {
       // leftmost pixel: predict from above.
       _predictLine(s, InputBuffer.from(preds, offset: -stride), o, 1, inverse);
-      for (int w = 1; w < width; ++w) {
-        final int pred = _gradientPredictor(
+      for (var w = 1; w < width; ++w) {
+        final pred = _gradientPredictor(
             preds[w - 1], preds[w - stride], preds[w - stride - 1]);
         o[w] = s[w] + (inverse ? pred : -pred);
       }

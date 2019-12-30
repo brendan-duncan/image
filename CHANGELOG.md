@@ -1,6 +1,7 @@
-## 2.1.11 - December 29, 2019
+## 2.1.11 - December 30, 2019
 
 - Fix GIF animation loopCount encoding. Some viewers were not seeing the repeat count correctly.
+- Resolve analysis warnings.
 
 ## 2.1.10 - December 04, 2019
 

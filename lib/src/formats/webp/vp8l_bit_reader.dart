@@ -20,7 +20,7 @@ class VP8LBitReader {
 
   // Return the prefetched bits, so they can be looked up.
   int prefetchBits() {
-    int b2 = 0;
+    var b2 = 0;
     if (bitPos < 32) {
       b2 = (_buffer[0] >> bitPos) +
           ((_buffer[1] & BIT_MASK[bitPos]) * (BIT_MASK[32 - bitPos] + 1));
@@ -45,8 +45,8 @@ class VP8LBitReader {
   int readBits(int numBits) {
     // Flag an error if end_of_stream or n_bits is more than allowed limit.
     if (!isEOS && numBits < MAX_NUM_BIT_READ) {
-      //final int value = (buffer >> bitPos) & BIT_MASK[numBits];
-      final int value = prefetchBits() & BIT_MASK[numBits];
+      //final value = (buffer >> bitPos) & BIT_MASK[numBits];
+      final value = prefetchBits() & BIT_MASK[numBits];
       bitPos += numBits;
       _shiftBytes();
       return value;
@@ -58,7 +58,7 @@ class VP8LBitReader {
   // If not at EOS, reload up to LBITS byte-by-byte
   void _shiftBytes() {
     while (bitPos >= 8 && !_input.isEOS) {
-      int b = _input.readByte();
+      var b = _input.readByte();
       // buffer >>= 8
       _buffer[0] = (_buffer[0] >> 8) + ((_buffer[1] & 0xff) * 0x1000000);
       _buffer[1] >>= 8;
@@ -68,22 +68,22 @@ class VP8LBitReader {
     }
   }
 
-  InputBuffer _input;
-  Uint32List _buffer = Uint32List(2);
+  final InputBuffer _input;
+  final _buffer = Uint32List(2);
   Uint8List _buffer8;
 
   // The number of bytes used for the bit buffer.
-  static const int VALUE_SIZE = 8;
-  static const int MAX_NUM_BIT_READ = 25;
+  static const VALUE_SIZE = 8;
+  static const MAX_NUM_BIT_READ = 25;
 
   // Number of bits prefetched.
-  static const int LBITS = 64;
+  static const LBITS = 64;
 
   // Minimum number of bytes needed after fillBitWindow.
-  static const int WBITS = 32;
+  static const WBITS = 32;
 
   // Number of bytes needed to store WBITS bits.
-  static const int LOG8_WBITS = 4;
+  static const LOG8_WBITS = 4;
 
   static const List<int> BIT_MASK = [
     0,

@@ -62,18 +62,18 @@ class BmpInfo extends DecodeInfo {
   int get height => _height.abs();
 
   BmpInfo(InputBuffer p)
-      : this.file = BitmapFileHeader(p),
-        this.headerSize = p.readUint32(),
-        this.width = p.readInt32(),
-        this._height = p.readInt32(),
-        this.planes = p.readUint16(),
-        this.bpp = p.readUint16(),
-        this.compression = _intToCompressions(p.readUint32()),
-        this.imageSize = p.readUint32(),
-        this.xppm = p.readInt32(),
-        this.yppm = p.readInt32(),
-        this.totalColors = p.readUint32(),
-        this.importantColors = p.readUint32();
+      : file = BitmapFileHeader(p),
+        headerSize = p.readUint32(),
+        width = p.readInt32(),
+        _height = p.readInt32(),
+        planes = p.readUint16(),
+        bpp = p.readUint16(),
+        compression = _intToCompressions(p.readUint32()),
+        imageSize = p.readUint32(),
+        xppm = p.readInt32(),
+        yppm = p.readInt32(),
+        totalColors = p.readUint32(),
+        importantColors = p.readUint32();
 
   static BitmapCompression _intToCompressions(int compIndex) {
     final map = <int, BitmapCompression>{
@@ -85,7 +85,7 @@ class BmpInfo extends DecodeInfo {
     final compression = map[compIndex];
     if (compression == null) {
       throw ImageException(
-          "Bitmap compression $compIndex is not supported yet.");
+          'Bitmap compression $compIndex is not supported yet.');
     }
     return compression;
   }
@@ -107,7 +107,7 @@ class BmpInfo extends DecodeInfo {
   }
 
   int decodeRgba(InputBuffer input) {
-    if (this.compression == BitmapCompression.BI_BITFIELDS && bpp == 32) {
+    if (compression == BitmapCompression.BI_BITFIELDS && bpp == 32) {
       return _readRgba(input);
     } else if (bpp == 32 && compression == BitmapCompression.NONE) {
       return _readRgba(input);
@@ -142,8 +142,9 @@ class BmpInfo extends DecodeInfo {
     return 'UNSUPPORTED: $compression';
   }
 
+  @override
   String toString() {
-    final json = JsonEncoder.withIndent(" ");
+    final json = JsonEncoder.withIndent(' ');
     return json.convert({
       'headerSize': headerSize,
       'width': width,

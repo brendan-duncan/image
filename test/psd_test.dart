@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Directory dir = Directory('test/res/psd');
+  var dir = Directory('test/res/psd');
   var files = dir.listSync();
 
   group('PSD', () {
@@ -12,14 +12,14 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      var name = f.path.split(RegExp(r'(/|\\)')).last;
       test(name, () {
         print('Decoding $name');
 
-        Image psd = PsdDecoder().decodeImage((f as File).readAsBytesSync());
+        var psd = PsdDecoder().decodeImage((f as File).readAsBytesSync());
 
         if (psd != null) {
-          List<int> outPng = PngEncoder().encodeImage(psd);
+          var outPng = PngEncoder().encodeImage(psd);
           File('.dart_tool/out/psd/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(outPng);

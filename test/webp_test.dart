@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Directory dir = Directory('test/res/webp');
+  var dir = Directory('test/res/webp');
   var files = dir.listSync();
 
   group('WebP/getInfo', () {
@@ -12,11 +12,11 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      var name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
 
-        WebPInfo data = WebPDecoder().startDecode(bytes);
+        var data = WebPDecoder().startDecode(bytes);
         if (data == null) {
           throw ImageException('Unable to parse WebP info: $name.');
         }
@@ -29,7 +29,7 @@ void main() {
           expect(data.hasAnimation, equals(_webp_tests[name]['hasAnimation']));
 
           if (data.hasAnimation) {
-            Animation anim = WebPDecoder().decodeAnimation(bytes);
+            var anim = WebPDecoder().decodeAnimation(bytes);
             expect(anim.length, equals(_webp_tests[name]['numFrames']));
           }
         }
@@ -39,10 +39,10 @@ void main() {
 
   group('WebP/decodeImage', () {
     test('validate', () {
-      File file = File('test/res/webp/2b.webp');
-      List<int> bytes = file.readAsBytesSync();
-      Image image = WebPDecoder().decodeImage(bytes);
-      List<int> png = PngEncoder().encodeImage(image);
+      var file = File('test/res/webp/2b.webp');
+      var bytes = file.readAsBytesSync();
+      var image = WebPDecoder().decodeImage(bytes);
+      var png = PngEncoder().encodeImage(image);
       File('.dart_tool/out/webp/decode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
@@ -50,12 +50,12 @@ void main() {
       // Validate decoding.
       file = File('test/res/webp/2b.png');
       bytes = file.readAsBytesSync();
-      Image debugImage = PngDecoder().decodeImage(bytes);
-      bool found = false;
-      for (int y = 0; y < debugImage.height && !found; ++y) {
-        for (int x = 0; x < debugImage.width; ++x) {
-          int dc = debugImage.getPixel(x, y);
-          int c = image.getPixel(x, y);
+      var debugImage = PngDecoder().decodeImage(bytes);
+      var found = false;
+      for (var y = 0; y < debugImage.height && !found; ++y) {
+        for (var x = 0; x < debugImage.width; ++x) {
+          var dc = debugImage.getPixel(x, y);
+          var c = image.getPixel(x, y);
           expect(c, equals(dc));
         }
       }
@@ -66,15 +66,15 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      var name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
-        Image image = WebPDecoder().decodeImage(bytes);
+        var image = WebPDecoder().decodeImage(bytes);
         if (image == null) {
           throw ImageException('Unable to decode WebP Image: $name.');
         }
 
-        List<int> png = PngEncoder().encodeImage(image);
+        var png = PngEncoder().encodeImage(image);
         File('.dart_tool/out/webp/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);

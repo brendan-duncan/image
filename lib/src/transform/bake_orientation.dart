@@ -8,7 +8,7 @@ import 'copy_rotate.dart';
 /// bake the orientation of the image for image formats that don't support exif
 /// data.
 Image bakeOrientation(Image image) {
-  Image bakedImage = Image.from(image);
+  var bakedImage = Image.from(image);
   if (!image.exif.hasOrientation || image.exif.orientation == 1) {
     return bakedImage;
   }

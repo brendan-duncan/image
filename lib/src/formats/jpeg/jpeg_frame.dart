@@ -12,12 +12,12 @@ class JpegFrame {
   int maxVSamples = 0;
   int mcusPerLine;
   int mcusPerColumn;
-  final Map<int, JpegComponent> components = {};
-  final List<int> componentsOrder = List<int>();
+  final components = <int, JpegComponent>{};
+  final List<int> componentsOrder = <int>[];
 
   void prepare() {
-    for (int componentId in components.keys) {
-      JpegComponent component = components[componentId];
+    for (var componentId in components.keys) {
+      var component = components[componentId];
       maxHSamples = max(maxHSamples, component.hSamples);
       maxVSamples = max(maxVSamples, component.vSamples);
     }
@@ -25,20 +25,20 @@ class JpegFrame {
     mcusPerLine = (samplesPerLine / 8 / maxHSamples).ceil();
     mcusPerColumn = (scanLines / 8 / maxVSamples).ceil();
 
-    for (int componentId in components.keys) {
-      JpegComponent component = components[componentId];
-      int blocksPerLine =
+    for (var componentId in components.keys) {
+      var component = components[componentId];
+      var blocksPerLine =
           ((samplesPerLine / 8).ceil() * component.hSamples / maxHSamples)
               .ceil();
-      int blocksPerColumn =
+      var blocksPerColumn =
           ((scanLines / 8).ceil() * component.vSamples / maxVSamples).ceil();
-      int blocksPerLineForMcu = mcusPerLine * component.hSamples;
-      int blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
+      var blocksPerLineForMcu = mcusPerLine * component.hSamples;
+      var blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
 
       final blocks = List<dynamic>(blocksPerColumnForMcu);
-      for (int i = 0; i < blocksPerColumnForMcu; i++) {
+      for (var i = 0; i < blocksPerColumnForMcu; i++) {
         final row = List<dynamic>(blocksPerLineForMcu);
-        for (int j = 0; j < blocksPerLineForMcu; j++) {
+        for (var j = 0; j < blocksPerLineForMcu; j++) {
           row[j] = Int32List(64);
         }
         blocks[i] = row;

@@ -10,23 +10,23 @@ class OctreeQuantizer extends Quantizer {
   OctreeQuantizer(Image image, {int numberOfColors = 256}) {
     _root = _OctreeNode(0, 0, null);
 
-    _HeapNode heap = _HeapNode();
-    for (int si = 0; si < image.length; ++si) {
-      int c = image[si];
-      int r = getRed(c);
-      int g = getGreen(c);
-      int b = getBlue(c);
+    var heap = _HeapNode();
+    for (var si = 0; si < image.length; ++si) {
+      var c = image[si];
+      var r = getRed(c);
+      var g = getGreen(c);
+      var b = getBlue(c);
       _heapAdd(heap, _nodeInsert(_root, r, g, b));
     }
 
-    int nc = numberOfColors + 1;
+    var nc = numberOfColors + 1;
     while (heap.n > nc) {
       _heapAdd(heap, _nodeFold(_popHeap(heap)));
     }
 
-    for (int i = 1; i < heap.n; i++) {
+    for (var i = 1; i < heap.n; i++) {
       var got = heap.buf[i];
-      int c = got.count;
+      var c = got.count;
       got.r = (got.r / c).round();
       got.g = (got.g / c).round();
       got.b = (got.b / c).round();
@@ -34,14 +34,15 @@ class OctreeQuantizer extends Quantizer {
   }
 
   /// Find the index of the closest color to [c] in the [colorMap].
+  @override
   int getQuantizedColor(int c) {
-    int r = getRed(c);
-    int g = getGreen(c);
-    int b = getBlue(c);
+    var r = getRed(c);
+    var g = getGreen(c);
+    var b = getBlue(c);
     var root = _root;
 
-    for (int bit = 1 << 7; bit != 0; bit >>= 1) {
-      int i = ((g & bit) != 0 ? 1 : 0) * 4 +
+    for (var bit = 1 << 7; bit != 0; bit >>= 1) {
+      var i = ((g & bit) != 0 ? 1 : 0) * 4 +
           ((r & bit) != 0 ? 1 : 0) * 2 +
           ((b & bit) != 0 ? 1 : 0);
       if (root.children[i] == null) {
@@ -64,15 +65,15 @@ class OctreeQuantizer extends Quantizer {
       return 1;
     }
 
-    int ac = a.count >> a.depth;
-    int bc = b.count >> b.depth;
+    var ac = a.count >> a.depth;
+    var bc = b.count >> b.depth;
     return (ac < bc) ? -1 : (ac > bc) ? 1 : 0;
   }
 
   _OctreeNode _nodeInsert(_OctreeNode root, int r, int g, int b) {
-    int depth = 0;
-    for (int bit = 1 << 7; ++depth < 8; bit >>= 1) {
-      int i = ((g & bit) != 0 ? 1 : 0) * 4 +
+    var depth = 0;
+    for (var bit = 1 << 7; ++depth < 8; bit >>= 1) {
+      var i = ((g & bit) != 0 ? 1 : 0) * 4 +
           ((r & bit) != 0 ? 1 : 0) * 2 +
           ((b & bit) != 0 ? 1 : 0);
       if (root.children[i] == null) {
@@ -111,7 +112,7 @@ class OctreeQuantizer extends Quantizer {
       return null;
     }
 
-    _OctreeNode ret = h.buf[1];
+    var ret = h.buf[1];
     h.buf[1] = h.buf.removeLast();
     h.buf[1].heap_idx = 1;
     _downHeap(h, h.buf[1]);
@@ -133,9 +134,9 @@ class OctreeQuantizer extends Quantizer {
   }
 
   void _downHeap(_HeapNode h, _OctreeNode p) {
-    int n = p.heap_idx;
+    var n = p.heap_idx;
     while (true) {
-      int m = n * 2;
+      var m = n * 2;
       if (m >= h.n) {
         break;
       }
@@ -157,7 +158,7 @@ class OctreeQuantizer extends Quantizer {
   }
 
   void _upHeap(_HeapNode h, _OctreeNode p) {
-    int n = p.heap_idx;
+    var n = p.heap_idx;
     _OctreeNode prev;
 
     while (n > 1) {

@@ -23,43 +23,19 @@ Image drawImage(Image dst, Image src,
     int srcW,
     int srcH,
     bool blend = true}) {
-  if (dstX == null) {
-    dstX = 0;
-  }
-  if (dstY == null) {
-    dstY = 0;
-  }
-  if (srcX == null) {
-    srcX = 0;
-  }
-  if (srcY == null) {
-    srcY = 0;
-  }
-  if (srcW == null) {
-    srcW = src.width;
-  }
-  if (srcH == null) {
-    srcH = src.height;
-  }
-  if (dstW == null) {
-    if (dst.width < src.width) {
-      dstW = dst.width;
-    } else {
-      dstW = src.width;
-    }
-  }
-  if (dstH == null) {
-    if (dst.height < dst.height) {
-      dstH = dst.height;
-    } else {
-      dstH = src.height;
-    }
-  }
+  dstX ??= 0;
+  dstY ??= 0;
+  srcX ??= 0;
+  srcY ??= 0;
+  srcW ??= src.width;
+  srcH ??= src.height;
+  dstW ??= (dst.width < src.width) ? dstW = dst.width : src.width;
+  dstH ??= (dst.height < dst.height) ? dst.height : src.height;
 
-  for (int y = 0; y < dstH; ++y) {
-    for (int x = 0; x < dstW; ++x) {
-      int stepX = (x * (srcW / dstW)).toInt();
-      int stepY = (y * (srcH / dstH)).toInt();
+  for (var y = 0; y < dstH; ++y) {
+    for (var x = 0; x < dstW; ++x) {
+      var stepX = (x * (srcW / dstW)).toInt();
+      var stepY = (y * (srcH / dstH)).toInt();
 
       final srcPixel = src.getPixel(srcX + stepX, srcY + stepY);
       if (blend) {

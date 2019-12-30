@@ -15,13 +15,13 @@ num _smoothStep(num edge0, num edge1, num x) {
 }
 
 Image vignette(Image src, {num start = 0.3, num end = 0.75, num amount = 0.8}) {
-  final int h = src.height - 1;
-  final int w = src.width - 1;
+  final h = src.height - 1;
+  final w = src.width - 1;
   num invAmt = 1.0 - amount;
   var p = src.getBytes();
-  for (int y = 0, i = 0; y <= h; ++y) {
+  for (var y = 0, i = 0; y <= h; ++y) {
     num dy = 0.5 - (y / h);
-    for (int x = 0; x <= w; ++x, i += 4) {
+    for (var x = 0; x <= w; ++x, i += 4) {
       num dx = 0.5 - (x / w);
 
       num d = sqrt(dx * dx + dy * dy);

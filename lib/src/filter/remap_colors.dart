@@ -14,9 +14,9 @@ Image remapColors(Image src,
     Channel green = Channel.green,
     Channel blue = Channel.blue,
     Channel alpha = Channel.alpha}) {
-  List<int> l = [0, 0, 0, 0, 0];
+  var l = [0, 0, 0, 0, 0];
   var p = src.getBytes();
-  for (int i = 0, len = p.length; i < len; i += 4) {
+  for (var i = 0, len = p.length; i < len; i += 4) {
     l[0] = p[i];
     l[1] = p[i + 1];
     l[2] = p[i + 2];

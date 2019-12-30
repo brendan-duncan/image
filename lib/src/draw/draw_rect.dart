@@ -5,8 +5,8 @@ import 'draw_line.dart';
 
 /// Draw a rectangle in the image [dst] with the [color].
 Image drawRect(Image dst, int x1, int y1, int x2, int y2, int color) {
-  int x0 = min(x1, x2);
-  int y0 = min(y1, y2);
+  var x0 = min(x1, x2);
+  var y0 = min(y1, y2);
   x1 = max(x1, x2);
   y1 = max(y1, y2);
 

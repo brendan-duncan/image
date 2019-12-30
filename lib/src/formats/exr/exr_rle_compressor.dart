@@ -16,8 +16,10 @@ class InternalExrRleCompressor extends InternalExrCompressor
   InternalExrRleCompressor(ExrPart header, int maxScanLineSize)
       : super(header as InternalExrPart);
 
+  @override
   int numScanLines() => 1;
 
+  @override
   Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
     throw ImageException('Rle compression not yet supported.');
   }
@@ -25,19 +27,15 @@ class InternalExrRleCompressor extends InternalExrCompressor
   @override
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
       [int width, int height]) {
-    OutputBuffer out = OutputBuffer(size: inPtr.length * 2);
+    var out = OutputBuffer(size: inPtr.length * 2);
 
-    if (width == null) {
-      width = header.width;
-    }
-    if (height == null) {
-      height = header.linesInBuffer;
-    }
+    width ??= header.width;
+    height ??= header.linesInBuffer;
 
-    int minX = x;
-    int maxX = x + width - 1;
-    int minY = y;
-    int maxY = y + height - 1;
+    var minX = x;
+    var maxX = x + width - 1;
+    var minY = y;
+    var maxY = y + height - 1;
 
     if (maxX > header.width) {
       maxX = header.width - 1;
@@ -50,24 +48,24 @@ class InternalExrRleCompressor extends InternalExrCompressor
     decodedHeight = (maxY - minY) + 1;
 
     while (!inPtr.isEOS) {
-      int n = inPtr.readInt8();
+      var n = inPtr.readInt8();
       if (n < 0) {
-        int count = -n;
+        var count = -n;
         while (count-- > 0) {
           out.writeByte(inPtr.readByte());
         }
       } else {
-        int count = n;
+        var count = n;
         while (count-- >= 0) {
           out.writeByte(inPtr.readByte());
         }
       }
     }
 
-    Uint8List data = out.getBytes() as Uint8List;
+    var data = out.getBytes() as Uint8List;
 
     // Predictor
-    for (int i = 1, len = data.length; i < len; ++i) {
+    for (var i = 1, len = data.length; i < len; ++i) {
       data[i] = data[i - 1] + data[i] - 128;
     }
 
@@ -76,10 +74,10 @@ class InternalExrRleCompressor extends InternalExrCompressor
       _outCache = Uint8List(data.length);
     }
 
-    final int len = data.length;
-    int t1 = 0;
-    int t2 = (len + 1) ~/ 2;
-    int si = 0;
+    final len = data.length;
+    var t1 = 0;
+    var t2 = (len + 1) ~/ 2;
+    var si = 0;
 
     while (true) {
       if (si < len) {

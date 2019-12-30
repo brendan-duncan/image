@@ -22,27 +22,15 @@ Image copyInto(Image dst, Image src,
     int srcW,
     int srcH,
     bool blend = true}) {
-  if (dstX == null) {
-    dstX = 0;
-  }
-  if (dstY == null) {
-    dstY = 0;
-  }
-  if (srcX == null) {
-    srcX = 0;
-  }
-  if (srcY == null) {
-    srcY = 0;
-  }
-  if (srcW == null) {
-    srcW = src.width;
-  }
-  if (srcH == null) {
-    srcH = src.height;
-  }
+  dstX ??= 0;
+  dstY ??= 0;
+  srcX ??= 0;
+  srcY ??= 0;
+  srcW ??= src.width;
+  srcH ??= src.height;
 
-  for (int y = 0; y < srcH; ++y) {
-    for (int x = 0; x < srcW; ++x) {
+  for (var y = 0; y < srcH; ++y) {
+    for (var x = 0; x < srcW; ++x) {
       if (blend) {
         drawPixel(dst, dstX + x, dstY + y, src.getPixel(srcX + x, srcY + y));
       } else {

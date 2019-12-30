@@ -5,8 +5,8 @@ import 'package:test/test.dart';
 void main() {
   group('PVRTC', () {
     test('encode_rgb_4bpp', () {
-      List<int> bytes = File('test/res/tga/globe.tga').readAsBytesSync();
-      Image image = TgaDecoder().decodeImage(bytes);
+      var bytes = File('test/res/tga/globe.tga').readAsBytesSync();
+      var image = TgaDecoder().decodeImage(bytes);
 
       File('.dart_tool/out/pvrtc/globe_before.png')
         ..createSync(recursive: true)
@@ -15,21 +15,21 @@ void main() {
       // Encode the image to PVRTC
       var pvrtc = PvrtcEncoder().encodeRgb4Bpp(image);
 
-      Image decoded =
+      var decoded =
           PvrtcDecoder().decodeRgb4bpp(image.width, image.height, pvrtc);
       File('.dart_tool/out/pvrtc/globe_after.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
 
-      List<int> pvr = PvrtcEncoder().encodePvr(image);
+      var pvr = PvrtcEncoder().encodePvr(image);
       File('.dart_tool/out/pvrtc/globe.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
     });
 
     test('encode_rgba_4bpp', () {
-      List<int> bytes = File('test/res/png/alpha_edge.png').readAsBytesSync();
-      Image image = PngDecoder().decodeImage(bytes);
+      var bytes = File('test/res/png/alpha_edge.png').readAsBytesSync();
+      var image = PngDecoder().decodeImage(bytes);
 
       File('.dart_tool/out/pvrtc/alpha_before.png')
         ..createSync(recursive: true)
@@ -38,13 +38,13 @@ void main() {
       // Encode the image to PVRTC
       var pvrtc = PvrtcEncoder().encodeRgba4Bpp(image);
 
-      Image decoded =
+      var decoded =
           PvrtcDecoder().decodeRgba4bpp(image.width, image.height, pvrtc);
       File('.dart_tool/out/pvrtc/alpha_after.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
 
-      List<int> pvr = PvrtcEncoder().encodePvr(image);
+      var pvr = PvrtcEncoder().encodePvr(image);
       File('.dart_tool/out/pvrtc/alpha.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
@@ -52,16 +52,16 @@ void main() {
   });
 
   group('PVR Decode', () {
-    Directory dir = Directory('test/res/pvr');
+    var dir = Directory('test/res/pvr');
     var files = dir.listSync();
     for (var f in files) {
       if (f is! File || !f.path.endsWith('.pvr')) {
         continue;
       }
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      var name = f.path.split(RegExp(r'(/|\\)')).last;
       test(name, () {
         List<int> bytes = (f as File).readAsBytesSync();
-        Image img = PvrtcDecoder().decodePvr(bytes);
+        var img = PvrtcDecoder().decodePvr(bytes);
         assert(img != null);
         File('.dart_tool/out/pvrtc/pvr_$name.png')
           ..createSync(recursive: true)

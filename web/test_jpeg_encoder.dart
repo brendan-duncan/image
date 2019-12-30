@@ -9,7 +9,7 @@ void main() {
   cvs.width = theImg.width;
   cvs.height = theImg.height;
 
-  var ctx = cvs.getContext("2d") as CanvasRenderingContext2D;
+  var ctx = cvs.getContext('2d') as CanvasRenderingContext2D;
 
   ctx.drawImage(theImg, 0, 0);
 

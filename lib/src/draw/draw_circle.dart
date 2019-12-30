@@ -26,8 +26,8 @@ Image fillCircle(Image image, int x0, int y0, int radius, int color) {
   // sort points by x-coordinate and then by y-coordinate
   points.sort((a, b) => (a.x == b.x) ? a.y.compareTo(b.y) : a.x.compareTo(b.x));
 
-  Point start = points.first;
-  Point end = points.first;
+  var start = points.first;
+  var end = points.first;
 
   for (var pt in points.sublist(1)) {
     if (pt.x == start.x) {
@@ -69,7 +69,7 @@ List<Point> _calculateCircumference(Image image, int x0, int y0, int radius) {
     return points;
   }
 
-  for (int f = 1 - radius, ddFx = 0, ddFy = -(radius << 1), x = 0, y = radius;
+  for (var f = 1 - radius, ddFx = 0, ddFy = -(radius << 1), x = 0, y = radius;
       x < y;) {
     if (f >= 0) {
       f += (ddFy += 2);
@@ -80,14 +80,14 @@ List<Point> _calculateCircumference(Image image, int x0, int y0, int radius) {
     f += ddFx + 1;
 
     if (x != y + 1) {
-      int x1 = x0 - y;
-      int x2 = x0 + y;
-      int y1 = y0 - x;
-      int y2 = y0 + x;
-      int x3 = x0 - x;
-      int x4 = x0 + x;
-      int y3 = y0 - y;
-      int y4 = y0 + y;
+      var x1 = x0 - y;
+      var x2 = x0 + y;
+      var y1 = y0 - x;
+      var y2 = y0 + x;
+      var x3 = x0 - x;
+      var x4 = x0 + x;
+      var y3 = y0 - y;
+      var y4 = y0 + y;
 
       points.add(Point(x1, y1));
       points.add(Point(x1, y2));

@@ -5,8 +5,8 @@ import '../../util/input_buffer.dart';
 
 class LzwDecoder {
   void decode(InputBuffer p, List<int> out) {
-    this._out = out;
-    int outLen = out.length;
+    _out = out;
+    var outLen = out.length;
     _outPointer = 0;
     _data = p.buffer as Uint8List;
     _dataLength = _data.length;
@@ -22,10 +22,10 @@ class LzwDecoder {
     _nextData = 0;
     _nextBits = 0;
 
-    int oldCode = 0;
+    var oldCode = 0;
     //int num = 0;
 
-    int code = _getNextCode();
+    var code = _getNextCode();
     while ((code != 257) && _outPointer < outLen) {
       if (code == 256) {
         _initializeStringTable();
@@ -41,14 +41,14 @@ class LzwDecoder {
       } else {
         if (code < _tableIndex) {
           _getString(code);
-          for (int i = _bufferLength - 1; i >= 0; --i) {
+          for (var i = _bufferLength - 1; i >= 0; --i) {
             _out[_outPointer++] = _buffer[i];
           }
           _addString(oldCode, _buffer[_bufferLength - 1]);
           oldCode = code;
         } else {
           _getString(oldCode);
-          for (int i = _bufferLength - 1; i >= 0; --i) {
+          for (var i = _bufferLength - 1; i >= 0; --i) {
             _out[_outPointer++] = _buffer[i];
           }
           _out[_outPointer++] = _buffer[_bufferLength - 1];
@@ -79,7 +79,7 @@ class LzwDecoder {
 
   void _getString(int code) {
     _bufferLength = 0;
-    int c = code;
+    var c = code;
     _buffer[_bufferLength++] = _table[c];
     c = _prefix[c];
     while (c != NO_SUCH_CODE) {
@@ -103,7 +103,7 @@ class LzwDecoder {
     }
 
     _nextBits -= _bitsToGet;
-    int code = (_nextData >> _nextBits) & AND_TABLE[_bitsToGet - 9];
+    var code = (_nextData >> _nextBits) & AND_TABLE[_bitsToGet - 9];
 
     return code;
   }
@@ -114,7 +114,7 @@ class LzwDecoder {
     _prefix = Uint32List(LZ_MAX_CODE + 1);
     _prefix.fillRange(0, _prefix.length, NO_SUCH_CODE);
 
-    for (int i = 0; i < 256; i++) {
+    for (var i = 0; i < 256; i++) {
       _table[i] = i;
     }
 
@@ -134,13 +134,13 @@ class LzwDecoder {
   List<int> _out;
   int _outPointer;
 
-  Uint8List _buffer = Uint8List(4096);
+  final _buffer = Uint8List(4096);
   Uint8List _table;
   Uint32List _prefix;
   int _tableIndex;
   int _bufferLength;
 
-  static const int LZ_MAX_CODE = 4095;
-  static const int NO_SUCH_CODE = 4098;
+  static const LZ_MAX_CODE = 4095;
+  static const NO_SUCH_CODE = 4098;
   static const List<int> AND_TABLE = [511, 1023, 2047, 4095];
 }

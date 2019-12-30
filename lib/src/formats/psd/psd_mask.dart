@@ -10,7 +10,7 @@ class PsdMask {
   int params = 0;
 
   PsdMask(InputBuffer input) {
-    int len = input.length;
+    var len = input.length;
 
     top = input.readUint32();
     left = input.readUint32();

@@ -33,38 +33,38 @@ Image copyResize(Image src,
     return src.clone();
   }
 
-  Image dst = Image(width, height,
+  final dst = Image(width, height,
       channels: src.channels, exif: src.exif, iccp: src.iccProfile);
 
-  double dy = src.height / height;
-  double dx = src.width / width;
+  final dy = src.height / height;
+  final dx = src.width / width;
 
   if (interpolation == Interpolation.average) {
-    Uint8List sData = src.getBytes();
-    int sw4 = src.width * 4;
+    final sData = src.getBytes();
+    final sw4 = src.width * 4;
 
-    for (int y = 0; y < height; ++y) {
-      int y1 = (y * dy).toInt();
-      int y2 = ((y + 1) * dy).toInt();
+    for (var y = 0; y < height; ++y) {
+      final y1 = (y * dy).toInt();
+      var y2 = ((y + 1) * dy).toInt();
       if (y2 == y1) {
         y2++;
       }
 
-      for (int x = 0; x < width; ++x) {
-        int x1 = (x * dx).toInt();
-        int x2 = ((x + 1) * dx).toInt();
+      for (var x = 0; x < width; ++x) {
+        final x1 = (x * dx).toInt();
+        var x2 = ((x + 1) * dx).toInt();
         if (x2 == x1) {
           x2++;
         }
 
-        int r = 0;
-        int g = 0;
-        int b = 0;
-        int a = 0;
-        int np = 0;
-        for (int sy = y1; sy < y2; ++sy) {
-          int si = sy * sw4 + x1 * 4;
-          for (int sx = x1; sx < x2; ++sx, ++np) {
+        var r = 0;
+        var g = 0;
+        var b = 0;
+        var a = 0;
+        var np = 0;
+        for (var sy = y1; sy < y2; ++sy) {
+          var si = sy * sw4 + x1 * 4;
+          for (var sx = x1; sx < x2; ++sx, ++np) {
             r += sData[si++];
             g += sData[si++];
             b += sData[si++];
@@ -76,21 +76,21 @@ Image copyResize(Image src,
     }
   } else if (interpolation == Interpolation.nearest) {
     final scaleX = Int32List(width);
-    for (int x = 0; x < width; ++x) {
+    for (var x = 0; x < width; ++x) {
       scaleX[x] = (x * dx).toInt();
     }
-    for (int y = 0; y < height; ++y) {
-      int y2 = (y * dy).toInt();
-      for (int x = 0; x < width; ++x) {
+    for (var y = 0; y < height; ++y) {
+      final y2 = (y * dy).toInt();
+      for (var x = 0; x < width; ++x) {
         dst.setPixel(x, y, src.getPixel(scaleX[x], y2));
       }
     }
   } else {
     // Copy the pixels from this image to the new image.
-    for (int y = 0; y < height; ++y) {
-      double y2 = (y * dy);
-      for (int x = 0; x < width; ++x) {
-        double x2 = (x * dx);
+    for (var y = 0; y < height; ++y) {
+      final y2 = (y * dy);
+      for (var x = 0; x < width; ++x) {
+        final x2 = (x * dx);
         dst.setPixel(x, y, src.getPixelInterpolate(x2, y2, interpolation));
       }
     }

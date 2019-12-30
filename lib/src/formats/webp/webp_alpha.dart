@@ -17,7 +17,7 @@ class WebPAlpha {
   bool isAlphaDecoded = false;
 
   WebPAlpha(this.input, this.width, this.height) {
-    int b = input.readByte();
+    var b = input.readByte();
     method = b & 0x03;
     filter = (b >> 2) & 0x03;
     preProcessing = (b >> 4) & 0x03;
@@ -25,7 +25,7 @@ class WebPAlpha {
 
     if (isValid) {
       if (method == ALPHA_NO_COMPRESSION) {
-        final int alphaDecodedSize = width * height;
+        final alphaDecodedSize = width * height;
         if (input.length < alphaDecodedSize) {
           rsrv = 1;
         }
@@ -58,8 +58,8 @@ class WebPAlpha {
     dynamic unfilterFunc = WebPFilters.UNFILTERS[filter];
 
     if (method == ALPHA_NO_COMPRESSION) {
-      final int offset = row * width;
-      final int numPixels = numRows * width;
+      final offset = row * width;
+      final numPixels = numRows * width;
 
       output.setRange(offset, numPixels, input.buffer, input.position + offset);
     } else {
@@ -108,7 +108,7 @@ class WebPAlpha {
   }
 
   bool _decodeAlphaHeader() {
-    WebPInfo webp = WebPInfo();
+    var webp = WebPInfo();
     webp.width = width;
     webp.height = height;
 
@@ -143,7 +143,7 @@ class WebPAlpha {
   bool _use8bDecode = false;
 
   // Alpha related constants.
-  static const int ALPHA_NO_COMPRESSION = 0;
-  static const int ALPHA_LOSSLESS_COMPRESSION = 1;
-  static const int ALPHA_PREPROCESSED_LEVELS = 1;
+  static const ALPHA_NO_COMPRESSION = 0;
+  static const ALPHA_LOSSLESS_COMPRESSION = 1;
+  static const ALPHA_PREPROCESSED_LEVELS = 1;
 }

@@ -21,40 +21,37 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
       ExrPart header, this._maxScanLineSize, this._numScanLines)
       : super(header as InternalExrPart);
 
+  @override
   int numScanLines() => _numScanLines;
 
+  @override
   Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
     throw ImageException('Pxr24 compression not yet supported.');
   }
 
+  @override
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
       [int width, int height]) {
-    List<int> data = _zlib.decodeBytes(inPtr.toUint8List());
+    var data = _zlib.decodeBytes(inPtr.toUint8List());
     if (data == null) {
       throw ImageException('Error decoding pxr24 compressed data');
     }
 
-    if (_output == null) {
-      _output = OutputBuffer(size: _numScanLines * _maxScanLineSize);
-    }
+    _output ??= OutputBuffer(size: _numScanLines * _maxScanLineSize);
     _output.rewind();
 
-    int tmpEnd = 0;
-    List<int> ptr = [0, 0, 0, 0];
-    Uint32List pixel = Uint32List(1);
-    Uint8List pixelBytes = Uint8List.view(pixel.buffer);
+    var tmpEnd = 0;
+    var ptr = [0, 0, 0, 0];
+    var pixel = Uint32List(1);
+    var pixelBytes = Uint8List.view(pixel.buffer);
 
-    if (width == null) {
-      width = header.width;
-    }
-    if (height == null) {
-      height = header.linesInBuffer;
-    }
+    width ??= header.width;
+    height ??= header.linesInBuffer;
 
-    int minX = x;
-    int maxX = x + width - 1;
-    int minY = y;
-    int maxY = y + height - 1;
+    var minX = x;
+    var maxX = x + width - 1;
+    var minY = y;
+    var maxY = y + height - 1;
 
     if (maxX > header.width) {
       maxX = header.width - 1;
@@ -66,15 +63,15 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     decodedWidth = (maxX - minX) + 1;
     decodedHeight = (maxY - minY) + 1;
 
-    int numChannels = header.channels.length;
-    for (int yi = minY; yi <= maxY; ++yi) {
-      for (int ci = 0; ci < numChannels; ++ci) {
-        ExrChannel ch = header.channels[ci];
+    var numChannels = header.channels.length;
+    for (var yi = minY; yi <= maxY; ++yi) {
+      for (var ci = 0; ci < numChannels; ++ci) {
+        var ch = header.channels[ci];
         if ((y % ch.ySampling) != 0) {
           continue;
         }
 
-        int n = numSamples(ch.xSampling, minX, maxX);
+        var n = numSamples(ch.xSampling, minX, maxX);
         pixel[0] = 0;
 
         switch (ch.type) {
@@ -83,12 +80,12 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
             ptr[1] = ptr[0] + n;
             ptr[2] = ptr[1] + n;
             tmpEnd = ptr[2] + n;
-            for (int j = 0; j < n; ++j) {
-              int diff = (data[ptr[0]++] << 24) |
+            for (var j = 0; j < n; ++j) {
+              var diff = (data[ptr[0]++] << 24) |
                   (data[ptr[1]++] << 16) |
                   (data[ptr[2]++] << 8);
               pixel[0] += diff;
-              for (int k = 0; k < 4; ++k) {
+              for (var k = 0; k < 4; ++k) {
                 _output.writeByte(pixelBytes[k]);
               }
             }
@@ -97,11 +94,11 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
             ptr[0] = tmpEnd;
             ptr[1] = ptr[0] + n;
             tmpEnd = ptr[1] + n;
-            for (int j = 0; j < n; ++j) {
-              int diff = (data[ptr[0]++] << 8) | data[ptr[1]++];
+            for (var j = 0; j < n; ++j) {
+              var diff = (data[ptr[0]++] << 8) | data[ptr[1]++];
               pixel[0] += diff;
 
-              for (int k = 0; k < 2; ++k) {
+              for (var k = 0; k < 2; ++k) {
                 _output.writeByte(pixelBytes[k]);
               }
             }
@@ -111,12 +108,12 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
             ptr[1] = ptr[0] + n;
             ptr[2] = ptr[1] + n;
             tmpEnd = ptr[2] + n;
-            for (int j = 0; j < n; ++j) {
-              int diff = (data[ptr[0]++] << 24) |
+            for (var j = 0; j < n; ++j) {
+              var diff = (data[ptr[0]++] << 24) |
                   (data[ptr[1]++] << 16) |
                   (data[ptr[2]++] << 8);
               pixel[0] += diff;
-              for (int k = 0; k < 4; ++k) {
+              for (var k = 0; k < 4; ++k) {
                 _output.writeByte(pixelBytes[k]);
               }
             }
@@ -128,8 +125,8 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     return _output.getBytes() as Uint8List;
   }
 
-  ZLibDecoder _zlib = ZLibDecoder();
-  int _maxScanLineSize;
-  int _numScanLines;
+  final _zlib = ZLibDecoder();
+  final int _maxScanLineSize;
+  final int _numScanLines;
   OutputBuffer _output;
 }

@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 void main() {
   group('Color', () {
     test('RGBA', () {
-      int rgba = Color.fromRgba(0xaa, 0xbb, 0xcc, 0xff);
+      var rgba = Color.fromRgba(0xaa, 0xbb, 0xcc, 0xff);
       expect(rgba, equals(0xffccbbaa));
 
       expect(getRed(rgba), equals(0xaa));
@@ -60,7 +60,7 @@ void main() {
 
     test('Image', () {
       var image = Image(1, 1);
-      for (int i = 0, len = image.length; i < len; ++i) {
+      for (var i = 0, len = image.length; i < len; ++i) {
         image[i] = Color.fromRgba(200, 128, 64, 255);
       }
 

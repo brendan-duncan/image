@@ -12,12 +12,12 @@ void main() {
   // directory. It's removed after we get the path since we'll be populating
   // the page with our own decoded images.
   var img = querySelectorAll('img')[0] as prefix0.ImageElement;
-  String path = img.src.substring(0, img.src.lastIndexOf('/'));
+  var path = img.src.substring(0, img.src.lastIndexOf('/'));
   img.remove();
 
   // The list of images we'll be decoding, representing a wide range
   // of formats and sub-formats.
-  List<String> images = [
+  var images = [
     'penguins.jpg',
     'puppies.jpg',
     '1_webp_ll.webp',
@@ -29,7 +29,7 @@ void main() {
     'animated.png',
   ];
 
-  for (String name in images) {
+  for (var name in images) {
     // Use an http request to get the image file from disk.
     var req = HttpRequest();
     req.open('GET', path + '/' + name);
@@ -48,21 +48,21 @@ void main() {
         document.body.append(c);
 
         // Find the best decoder for the image.
-        Decoder decoder = findDecoderForData(bytes);
+        var decoder = findDecoderForData(bytes);
         if (decoder == null) {
           return;
         }
 
         // Some of the files are animated, so always decode to animation.
         // Single image files will decode to a single framed animation.
-        Animation anim = decoder.decodeAnimation(bytes);
+        var anim = decoder.decodeAnimation(bytes);
         if (anim == null) {
           return;
         }
 
         // If it's a single image, dump the decoded image into the canvas.
         if (anim.length == 1) {
-          Image image = anim.frames[0];
+          var image = anim.frames[0];
 
           //Image newImage = copyResize(image, 2000, -1, CUBIC);
           var newImage = image;
@@ -71,10 +71,10 @@ void main() {
           c.height = newImage.height;
 
           // Create a buffer that the canvas can draw.
-          ImageData d = c.context2D.createImageData(c.width, c.height);
+          var d = c.context2D.createImageData(c.width, c.height);
           // Fill the buffer with our image data.
-          d.data.setRange(
-              0, d.data.length, newImage.getBytes(format: Format.rgba));
+          d.data.setRange(0, d.data.length,
+              newImage.getBytes(format: Format.rgba));
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
 
@@ -89,11 +89,11 @@ void main() {
         c.width = anim.frames[0].width;
         c.height = anim.frames[0].height;
         // Create a buffer that the canvas can draw.
-        ImageData d = c.context2D.createImageData(c.width, c.height);
+        var d = c.context2D.createImageData(c.width, c.height);
 
-        int frame = 0;
+        var frame = 0;
         Timer.periodic(Duration(milliseconds: 40), (t) {
-          Image image = anim.frames[frame++];
+          var image = anim.frames[frame++];
           if (frame >= anim.numFrames) {
             frame = 0;
           }

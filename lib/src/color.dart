@@ -70,11 +70,11 @@ class Color {
 
   /// Compare colors from a 3 or 4 dimensional color space
   static num distance(List<num> c1, List<num> c2, bool compareAlpha) {
-    num d1 = c1[0] - c2[0];
-    num d2 = c1[1] - c2[1];
-    num d3 = c1[2] - c2[2];
+    var d1 = c1[0] - c2[0];
+    var d2 = c1[1] - c2[1];
+    var d3 = c1[2] - c2[2];
     if (compareAlpha) {
-      num dA = c1[3] - c2[3];
+      var dA = c1[3] - c2[3];
       return sqrt(max(d1 * d1, (d1 - dA) * (d1 - dA)) +
           max(d2 * d2, (d2 - dA) * (d2 - dA)) +
           max(d3 * d3, (d3 - dA) * (d3 - dA)));
@@ -146,34 +146,34 @@ int setAlpha(int color, int value) =>
 /// Returns a new color of [src] alpha-blended onto [dst]. The opacity of [src]
 /// is additionally scaled by [fraction] / 255.
 int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
-  int srcAlpha = getAlpha(src);
+  var srcAlpha = getAlpha(src);
   if (srcAlpha == 255 && fraction == 0xff) {
     // src is fully opaque, nothing to blend
     return src;
   }
-  double a = (srcAlpha / 255.0);
+  var a = (srcAlpha / 255.0);
   if (fraction != 0xff) {
     a *= (fraction / 255.0);
   }
 
-  int sr = (getRed(src) * a).round();
-  int sg = (getGreen(src) * a).round();
-  int sb = (getBlue(src) * a).round();
-  int sa = (srcAlpha * a).round();
+  var sr = (getRed(src) * a).round();
+  var sg = (getGreen(src) * a).round();
+  var sb = (getBlue(src) * a).round();
+  var sa = (srcAlpha * a).round();
 
-  int dr = (getRed(dst) * (1.0 - a)).round();
-  int dg = (getGreen(dst) * (1.0 - a)).round();
-  int db = (getBlue(dst) * (1.0 - a)).round();
-  int da = (getAlpha(dst) * (1.0 - a)).round();
+  var dr = (getRed(dst) * (1.0 - a)).round();
+  var dg = (getGreen(dst) * (1.0 - a)).round();
+  var db = (getBlue(dst) * (1.0 - a)).round();
+  var da = (getAlpha(dst) * (1.0 - a)).round();
 
   return getColor(sr + dr, sg + dg, sb + db, sa + da);
 }
 
 /// Returns the luminance (grayscale) value of the [color].
 int getLuminance(int color) {
-  int r = getRed(color);
-  int g = getGreen(color);
-  int b = getBlue(color);
+  var r = getRed(color);
+  var g = getGreen(color);
+  var b = getBlue(color);
   return (0.299 * r + 0.587 * g + 0.114 * b).round();
 }
 
@@ -186,11 +186,11 @@ int getLuminanceRgb(int r, int g, int b) =>
 /// Returns a list [r, g, b] with values in the range [0, 255].
 List<int> hslToRgb(num hue, num saturation, num lightness) {
   if (saturation == 0) {
-    int gray = (lightness * 255.0).toInt();
+    var gray = (lightness * 255.0).toInt();
     return [gray, gray, gray];
   }
 
-  hue2rgb(num p, num q, num t) {
+  num hue2rgb(num p, num q, num t) {
     if (t < 0.0) {
       t += 1.0;
     }
@@ -230,11 +230,11 @@ List<int> hsvToRgb(num hue, num saturation, num brightness) {
     return [gray, gray, gray];
   }
 
-  num h = (hue - hue.floor()) * 6.0;
-  num f = h - h.floor();
-  num p = brightness * (1.0 - saturation);
-  num q = brightness * (1.0 - saturation * f);
-  num t = brightness * (1.0 - (saturation * (1.0 - f)));
+  var h = (hue - hue.floor()) * 6.0;
+  var f = h - h.floor();
+  var p = brightness * (1.0 - saturation);
+  var q = brightness * (1.0 - saturation * f);
+  var t = brightness * (1.0 - (saturation * (1.0 - f)));
 
   switch (h.toInt()) {
     case 0:
@@ -313,8 +313,8 @@ List<num> rgbToHsl(num r, num g, num b) {
 /// Convert a CIE-L*ab color to XYZ.
 List<int> labToXyz(num l, num a, num b) {
   num y = (l + 16.0) / 116.0;
-  num x = y + (a / 500.0);
-  num z = y - (b / 200.0);
+  var x = y + (a / 500.0);
+  var z = y - (b / 200.0);
   if (pow(x, 3) > 0.008856) {
     x = pow(x, 3);
   } else {
@@ -381,29 +381,29 @@ List<int> cmykToRgb(num c, num m, num y, num k) {
 
 /// Convert a CIE-L*ab color to RGB.
 List<int> labToRgb(num l, num a, num b) {
-  const num ref_x = 95.047;
-  const num ref_y = 100.000;
-  const num ref_z = 108.883;
+  const ref_x = 95.047;
+  const ref_y = 100.000;
+  const ref_z = 108.883;
 
   num y = (l + 16.0) / 116.0;
   num x = a / 500.0 + y;
-  num z = y - b / 200.0;
+  var z = y - b / 200.0;
 
-  num y3 = pow(y, 3);
+  var y3 = pow(y, 3);
   if (y3 > 0.008856) {
     y = y3;
   } else {
     y = (y - 16 / 116) / 7.787;
   }
 
-  num x3 = pow(x, 3);
+  var x3 = pow(x, 3);
   if (x3 > 0.008856) {
     x = x3;
   } else {
     x = (x - 16 / 116) / 7.787;
   }
 
-  num z3 = pow(z, 3);
+  var z3 = pow(z, 3);
   if (z3 > 0.008856) {
     z = z3;
   } else {
@@ -419,9 +419,9 @@ List<int> labToRgb(num l, num a, num b) {
   z /= 100.0;
 
   // xyz to rgb
-  num R = x * 3.2406 + y * (-1.5372) + z * (-0.4986);
-  num G = x * (-0.9689) + y * 1.8758 + z * 0.0415;
-  num B = x * 0.0557 + y * (-0.2040) + z * 1.0570;
+  var R = x * 3.2406 + y * (-1.5372) + z * (-0.4986);
+  var G = x * (-0.9689) + y * 1.8758 + z * 0.0415;
+  var B = x * 0.0557 + y * (-0.2040) + z * 1.0570;
 
   if (R > 0.0031308) {
     R = 1.055 * (pow(R, 1.0 / 2.4)) - 0.055;
@@ -532,9 +532,9 @@ List<num> rgbToLab(num r, num g, num b) {
   g = g * 100.0;
   b = b * 100.0;
 
-  num x = r * 0.4124 + g * 0.3576 + b * 0.1805;
-  num y = r * 0.2126 + g * 0.7152 + b * 0.0722;
-  num z = r * 0.0193 + g * 0.1192 + b * 0.9505;
+  var x = r * 0.4124 + g * 0.3576 + b * 0.1805;
+  var y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+  var z = r * 0.0193 + g * 0.1192 + b * 0.9505;
 
   x = x / 95.047;
   y = y / 100.0;

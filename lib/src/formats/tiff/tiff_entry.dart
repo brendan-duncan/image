@@ -32,7 +32,7 @@ class TiffEntry {
   List<int> readValues(InputBuffer p) {
     p.offset = valueOffset;
     var values = <int>[];
-    for (int i = 0; i < numValues; ++i) {
+    for (var i = 0; i < numValues; ++i) {
       values.add(_readValue(p));
     }
     return values;
@@ -56,8 +56,8 @@ class TiffEntry {
       case TYPE_LONG:
         return p.readUint32();
       case TYPE_RATIONAL:
-        int num = p.readUint32();
-        int den = p.readUint32();
+        var num = p.readUint32();
+        var den = p.readUint32();
         if (den == 0) {
           return 0;
         }
@@ -80,18 +80,18 @@ class TiffEntry {
     return 0;
   }
 
-  static const int TYPE_BYTE = 1;
-  static const int TYPE_ASCII = 2;
-  static const int TYPE_SHORT = 3;
-  static const int TYPE_LONG = 4;
-  static const int TYPE_RATIONAL = 5;
-  static const int TYPE_SBYTE = 6;
-  static const int TYPE_UNDEFINED = 7;
-  static const int TYPE_SSHORT = 8;
-  static const int TYPE_SLONG = 9;
-  static const int TYPE_SRATIONAL = 10;
-  static const int TYPE_FLOAT = 11;
-  static const int TYPE_DOUBLE = 12;
+  static const TYPE_BYTE = 1;
+  static const TYPE_ASCII = 2;
+  static const TYPE_SHORT = 3;
+  static const TYPE_LONG = 4;
+  static const TYPE_RATIONAL = 5;
+  static const TYPE_SBYTE = 6;
+  static const TYPE_UNDEFINED = 7;
+  static const TYPE_SSHORT = 8;
+  static const TYPE_SLONG = 9;
+  static const TYPE_SRATIONAL = 10;
+  static const TYPE_FLOAT = 11;
+  static const TYPE_DOUBLE = 12;
 
   static const List<int> SIZE_OF_TYPE = [
     0, //  0 = n/a

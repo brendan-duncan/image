@@ -36,17 +36,21 @@ class ExrDecoder extends Decoder {
 
   ExrDecoder({this.exposure = 1.0});
 
+  @override
   bool isValidFile(List<int> data) {
     return ExrImage.isValidFile(data);
   }
 
+  @override
   DecodeInfo startDecode(List<int> data) {
     exrImage = ExrImage(data);
     return exrImage;
   }
 
+  @override
   int numFrames() => exrImage != null ? exrImage.parts.length : 0;
 
+  @override
   Image decodeFrame(int frame) {
     if (exrImage == null) {
       return null;
@@ -55,6 +59,7 @@ class ExrDecoder extends Decoder {
     return hdrToImage(exrImage.getPart(frame).framebuffer, exposure: exposure);
   }
 
+  @override
   HdrImage decodeHdrFrame(int frame) {
     if (exrImage == null) {
       return null;
@@ -65,6 +70,7 @@ class ExrDecoder extends Decoder {
     return exrImage.parts[frame].framebuffer;
   }
 
+  @override
   Image decodeImage(List<int> bytes, {int frame = 0}) {
     if (startDecode(bytes) == null) {
       return null;
@@ -73,6 +79,7 @@ class ExrDecoder extends Decoder {
     return decodeFrame(frame);
   }
 
+  @override
   HdrImage decodeHdrImage(List<int> bytes, {int frame = 0}) {
     if (startDecode(bytes) == null) {
       return null;
@@ -80,13 +87,14 @@ class ExrDecoder extends Decoder {
     return decodeHdrFrame(frame);
   }
 
+  @override
   Animation decodeAnimation(List<int> data) {
-    Image image = decodeImage(data);
+    var image = decodeImage(data);
     if (image == null) {
       return null;
     }
 
-    Animation anim = Animation();
+    var anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import '../animation.dart';
 import '../image.dart';
 import '../hdr/hdr_image.dart';
@@ -12,12 +10,14 @@ class TiffDecoder extends Decoder {
   TiffInfo info;
 
   /// Is the given file a valid TIFF image?
+  @override
   bool isValidFile(List<int> data) {
     return _readHeader(InputBuffer(data)) != null;
   }
 
   /// Validate the file is a Gif image and get information about it.
   /// If the file is not a valid Gif image, null is returned.
+  @override
   TiffInfo startDecode(List<int> bytes) {
     _input = InputBuffer(bytes);
     info = _readHeader(_input);
@@ -26,6 +26,7 @@ class TiffDecoder extends Decoder {
 
   /// How many frames are available to be decoded. [startDecode] should have
   /// been called first. Non animated image files will have a single frame.
+  @override
   int numFrames() => info != null ? info.images.length : 0;
 
   /// Decode a single frame from the data stat was set with [startDecode].
@@ -33,6 +34,7 @@ class TiffDecoder extends Decoder {
   /// Non animated image files will only have [frame] 0. An [AnimationFrame]
   /// is returned, which provides the image, and top-left coordinates of the
   /// image, as animated frames may only occupy a subset of the canvas.
+  @override
   Image decodeFrame(int frame) {
     if (info == null) {
       return null;
@@ -44,10 +46,11 @@ class TiffDecoder extends Decoder {
   /// Decode the file and extract a single image from it. If the file is
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
+  @override
   Image decodeImage(List<int> data, {int frame = 0}) {
-    InputBuffer ptr = InputBuffer(data);
+    var ptr = InputBuffer(data);
 
-    TiffInfo info = _readHeader(ptr);
+    var info = _readHeader(ptr);
     if (info == null) {
       return null;
     }
@@ -55,10 +58,11 @@ class TiffDecoder extends Decoder {
     return info.images[frame].decode(ptr);
   }
 
+  @override
   HdrImage decodeHdrImage(List<int> data, {int frame = 0}) {
-    InputBuffer ptr = InputBuffer(data);
+    var ptr = InputBuffer(data);
 
-    TiffInfo info = _readHeader(ptr);
+    var info = _readHeader(ptr);
     if (info == null) {
       return null;
     }
@@ -75,12 +79,12 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    Animation anim = Animation();
+    var anim = Animation();
     anim.width = info.width;
     anim.height = info.height;
     anim.frameType = FrameType.page;
-    for (int i = 0, len = numFrames(); i < len; ++i) {
-      Image image = decodeFrame(i);
+    for (var i = 0, len = numFrames(); i < len; ++i) {
+      var image = decodeFrame(i);
       if (i == null) {
         continue;
       }
@@ -92,8 +96,8 @@ class TiffDecoder extends Decoder {
 
   // Read the TIFF header and IFD blocks.
   TiffInfo _readHeader(InputBuffer p) {
-    TiffInfo info = TiffInfo();
-    int byteOrder = p.readUint16();
+    var info = TiffInfo();
+    var byteOrder = p.readUint16();
     if (byteOrder != TIFF_LITTLE_ENDIAN && byteOrder != TIFF_BIG_ENDIAN) {
       return null;
     }
@@ -111,10 +115,10 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    int offset = p.readUint32();
+    var offset = p.readUint32();
     info.ifdOffset = offset;
 
-    InputBuffer p2 = InputBuffer.from(p);
+    var p2 = InputBuffer.from(p);
     p2.offset = offset;
 
     while (offset != 0) {
@@ -144,7 +148,7 @@ class TiffDecoder extends Decoder {
 
   InputBuffer _input;
 
-  static const int TIFF_SIGNATURE = 42;
-  static const int TIFF_LITTLE_ENDIAN = 0x4949;
-  static const int TIFF_BIG_ENDIAN = 0x4d4d;
+  static const TIFF_SIGNATURE = 42;
+  static const TIFF_LITTLE_ENDIAN = 0x4949;
+  static const TIFF_BIG_ENDIAN = 0x4d4d;
 }

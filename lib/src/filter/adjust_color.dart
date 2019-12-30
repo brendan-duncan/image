@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:typed_data';
 
 import '../color.dart';
 import '../image.dart';
@@ -112,15 +111,15 @@ Image adjustColor(Image src,
 
   var invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
 
-  Uint8List pixels = src.getBytes();
-  for (int i = 0, len = pixels.length; i < len; i += 4) {
+  var pixels = src.getBytes();
+  for (var i = 0, len = pixels.length; i < len; i += 4) {
     num or = pixels[i] / 255.0;
     num og = pixels[i + 1] / 255.0;
     num ob = pixels[i + 2] / 255.0;
 
-    num r = or;
-    num g = og;
-    num b = ob;
+    var r = or;
+    var g = og;
+    var b = ob;
 
     if (br != null) {
       r = pow((r + br) * wr, mr);
@@ -136,7 +135,7 @@ Image adjustColor(Image src,
     }
 
     if (saturation != null) {
-      num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
+      var lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
 
       r = lum * invSaturation + r * saturation;
       g = lum * invSaturation + g * saturation;
@@ -162,9 +161,9 @@ Image adjustColor(Image src,
     }
 
     if (hue != null && hue != 0.0) {
-      num hr = r * hueR + g * hueG + b * hueB;
-      num hg = r * hueB + g * hueR + b * hueG;
-      num hb = r * hueG + g * hueB + b * hueR;
+      var hr = r * hueR + g * hueG + b * hueB;
+      var hg = r * hueB + g * hueR + b * hueG;
+      var hb = r * hueG + g * hueB + b * hueR;
 
       r = hr;
       g = hg;

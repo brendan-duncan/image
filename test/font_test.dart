@@ -3,13 +3,13 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Image image =
+  final image =
       readJpg(File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync());
 
   group('bitmapFont', () {
     test('zip/xml', () {
-      List<int> fontZip = File('test/res/font/test.zip').readAsBytesSync();
-      BitmapFont font = readFontZip(fontZip);
+      final fontZip = File('test/res/font/test.zip').readAsBytesSync();
+      final font = readFontZip(fontZip);
 
       var img = copyResize(image, width: 400);
       drawString(img, font, 10, 50, 'Testing Font 1: Hello World');
@@ -20,8 +20,8 @@ void main() {
     });
 
     test('zip/text', () {
-      List<int> fontZip = File('test/res/font/test_text.zip').readAsBytesSync();
-      BitmapFont font = readFontZip(fontZip);
+      final fontZip = File('test/res/font/test_text.zip').readAsBytesSync();
+      final font = readFontZip(fontZip);
 
       var img = copyResize(image, width: 400);
       drawString(img, font, 10, 50, 'Testing Font 2: Hello World',

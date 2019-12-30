@@ -7,8 +7,8 @@ import 'encoder.dart';
 
 /// Encode an image to the PNG format.
 class WebPEncoder extends Encoder {
-  static const int LOSSLESS = 0;
-  static const int LOSSY = 1;
+  static const LOSSLESS = 0;
+  static const LOSSY = 1;
 
   int format;
   num quality;
@@ -26,7 +26,7 @@ class WebPEncoder extends Encoder {
       output = OutputBuffer();
 
       if (duration != null) {
-        this.delay = duration;
+        delay = duration;
       }
       _lastImage = _encodeImage(image);
       _width = image.width;
@@ -42,7 +42,7 @@ class WebPEncoder extends Encoder {
     _encodedFrames++;
 
     if (duration != null) {
-      this.delay = duration;
+      delay = duration;
     }
 
     _lastImage = _encodeImage(image);
@@ -75,17 +75,20 @@ class WebPEncoder extends Encoder {
   }
 
   /// Encode a single frame image.
+  @override
   List<int> encodeImage(Image image) {
     addFrame(image);
     return finish();
   }
 
   /// Does this encoder support animation?
+  @override
   bool get supportsAnimation => true;
 
   /// Encode an animation.
+  @override
   List<int> encodeAnimation(Animation anim) {
-    for (Image f in anim) {
+    for (var f in anim) {
       addFrame(f, duration: f.duration);
     }
     return finish();

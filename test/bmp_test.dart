@@ -3,7 +3,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
-  Directory dir = Directory('test/res/bmp');
+  final dir = Directory('test/res/bmp');
   if (!dir.existsSync()) {
     return;
   }
@@ -15,15 +15,15 @@ void main() {
         continue;
       }
 
-      String name = f.path.split(RegExp(r'(/|\\)')).last;
+      final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
-        Image image = BmpDecoder().decodeImage(bytes);
+        final image = BmpDecoder().decodeImage(bytes);
         if (image == null) {
           throw ImageException('Unable to decode TGA Image: $name.');
         }
 
-        List<int> png = PngEncoder().encodeImage(image);
+        final png = PngEncoder().encodeImage(image);
         File('.dart_tool/out/bmp/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);

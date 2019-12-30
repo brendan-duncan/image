@@ -17,10 +17,10 @@ int _clamp8(int i) => i < 0 ? 0 : i > 255 ? 255 : i;
 // IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
 void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
     Uint8List dataOut, Int32List dataIn) {
-  Int32List p = dataIn;
+  var p = dataIn;
 
-  const int dctClipOffset = 256;
-  const int dctClipLength = 768;
+  const dctClipOffset = 256;
+  const dctClipLength = 768;
   if (_dctClip == null) {
     _dctClip = Uint8List(dctClipLength);
     int i;
@@ -36,23 +36,23 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
   }
 
   // IDCT constants (20.12 fixed point format)
-  const int COS_1 = 4017; // cos(pi/16)*4096
-  const int SIN_1 = 799; // sin(pi/16)*4096
-  const int COS_3 = 3406; // cos(3*pi/16)*4096
-  const int SIN_3 = 2276; // sin(3*pi/16)*4096
-  const int COS_6 = 1567; // cos(6*pi/16)*4096
-  const int SIN_6 = 3784; // sin(6*pi/16)*4096
-  const int SQRT_2 = 5793; // sqrt(2)*4096
-  const int SQRT_1D2 = 2896; // sqrt(2) / 2
+  const COS_1 = 4017; // cos(pi/16)*4096
+  const SIN_1 = 799; // sin(pi/16)*4096
+  const COS_3 = 3406; // cos(3*pi/16)*4096
+  const SIN_3 = 2276; // sin(3*pi/16)*4096
+  const COS_6 = 1567; // cos(6*pi/16)*4096
+  const SIN_6 = 3784; // sin(6*pi/16)*4096
+  const SQRT_2 = 5793; // sqrt(2)*4096
+  const SQRT_1D2 = 2896; // sqrt(2) / 2
 
   // de-quantize
-  for (int i = 0; i < 64; i++) {
+  for (var i = 0; i < 64; i++) {
     p[i] = (coefBlock[i] * quantizationTable[i]);
   }
 
   // inverse DCT on rows
-  int row = 0;
-  for (int i = 0; i < 8; ++i, row += 8) {
+  var row = 0;
+  for (var i = 0; i < 8; ++i, row += 8) {
     // check for all-zero AC coefficients
     if (p[1 + row] == 0 &&
         p[2 + row] == 0 &&
@@ -61,7 +61,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
         p[5 + row] == 0 &&
         p[6 + row] == 0 &&
         p[7 + row] == 0) {
-      int t = ((SQRT_2 * p[0 + row] + 512) >> 10);
+      var t = ((SQRT_2 * p[0 + row] + 512) >> 10);
       p[row + 0] = t;
       p[row + 1] = t;
       p[row + 2] = t;
@@ -74,17 +74,17 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
     }
 
     // stage 4
-    int v0 = ((SQRT_2 * p[0 + row] + 128) >> 8);
-    int v1 = ((SQRT_2 * p[4 + row] + 128) >> 8);
-    int v2 = p[2 + row];
-    int v3 = p[6 + row];
-    int v4 = ((SQRT_1D2 * (p[1 + row] - p[7 + row]) + 128) >> 8);
-    int v7 = ((SQRT_1D2 * (p[1 + row] + p[7 + row]) + 128) >> 8);
-    int v5 = (p[3 + row] << 4);
-    int v6 = (p[5 + row] << 4);
+    var v0 = ((SQRT_2 * p[0 + row] + 128) >> 8);
+    var v1 = ((SQRT_2 * p[4 + row] + 128) >> 8);
+    var v2 = p[2 + row];
+    var v3 = p[6 + row];
+    var v4 = ((SQRT_1D2 * (p[1 + row] - p[7 + row]) + 128) >> 8);
+    var v7 = ((SQRT_1D2 * (p[1 + row] + p[7 + row]) + 128) >> 8);
+    var v5 = (p[3 + row] << 4);
+    var v6 = (p[5 + row] << 4);
 
     // stage 3
-    int t = ((v0 - v1 + 1) >> 1);
+    var t = ((v0 - v1 + 1) >> 1);
     v0 = ((v0 + v1 + 1) >> 1);
     v1 = t;
     t = ((v2 * SIN_6 + v3 * COS_6 + 128) >> 8);
@@ -123,8 +123,8 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
   }
 
   // inverse DCT on columns
-  for (int i = 0; i < 8; ++i) {
-    int col = i;
+  for (var i = 0; i < 8; ++i) {
+    var col = i;
 
     // check for all-zero AC coefficients
     if (p[1 * 8 + col] == 0 &&
@@ -134,7 +134,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
         p[5 * 8 + col] == 0 &&
         p[6 * 8 + col] == 0 &&
         p[7 * 8 + col] == 0) {
-      int t = ((SQRT_2 * dataIn[i] + 8192) >> 14);
+      var t = ((SQRT_2 * dataIn[i] + 8192) >> 14);
       p[0 * 8 + col] = t;
       p[1 * 8 + col] = t;
       p[2 * 8 + col] = t;
@@ -147,17 +147,17 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
     }
 
     // stage 4
-    int v0 = ((SQRT_2 * p[0 * 8 + col] + 2048) >> 12);
-    int v1 = ((SQRT_2 * p[4 * 8 + col] + 2048) >> 12);
-    int v2 = p[2 * 8 + col];
-    int v3 = p[6 * 8 + col];
-    int v4 = ((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048) >> 12);
-    int v7 = ((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048) >> 12);
-    int v5 = p[3 * 8 + col];
-    int v6 = p[5 * 8 + col];
+    var v0 = ((SQRT_2 * p[0 * 8 + col] + 2048) >> 12);
+    var v1 = ((SQRT_2 * p[4 * 8 + col] + 2048) >> 12);
+    var v2 = p[2 * 8 + col];
+    var v3 = p[6 * 8 + col];
+    var v4 = ((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048) >> 12);
+    var v7 = ((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048) >> 12);
+    var v5 = p[3 * 8 + col];
+    var v6 = p[5 * 8 + col];
 
     // stage 3
-    int t = ((v0 - v1 + 1) >> 1);
+    var t = ((v0 - v1 + 1) >> 1);
     v0 = ((v0 + v1 + 1) >> 1);
     v1 = t;
     t = ((v2 * SIN_6 + v3 * COS_6 + 2048) >> 12);
@@ -196,7 +196,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
   }
 
   // convert to 8-bit integers
-  for (int i = 0; i < 64; ++i) {
+  for (var i = 0; i < 64; ++i) {
     dataOut[i] = _dctClip[(dctClipOffset + 128 + ((p[i] + 8) >> 4))];
   }
 }
@@ -213,21 +213,21 @@ Image getImageFromJpeg(JpegData jpeg) {
   Uint8List component2Line;
   Uint8List component3Line;
   Uint8List component4Line;
-  int offset = 0;
+  var offset = 0;
   int Y, Cb, Cr, K, C, M, Ye, R, G, B;
-  bool colorTransform = false;
+  var colorTransform = false;
 
   switch (jpeg.components.length) {
     case 1:
       component1 = jpeg.components[0];
       var lines = component1.lines;
-      int hShift1 = component1.hScaleShift;
-      int vShift1 = component1.vScaleShift;
-      for (int y = 0; y < jpeg.height; y++) {
-        int y1 = y >> vShift1;
+      var hShift1 = component1.hScaleShift;
+      var vShift1 = component1.vScaleShift;
+      for (var y = 0; y < jpeg.height; y++) {
+        var y1 = y >> vShift1;
         component1Line = lines[y1];
-        for (int x = 0; x < jpeg.width; x++) {
-          int x1 = x >> hShift1;
+        for (var x = 0; x < jpeg.width; x++) {
+          var x1 = x >> hShift1;
           Y = component1Line[x1];
           image[offset++] = getColor(Y, Y, Y);
         }
@@ -272,26 +272,26 @@ Image getImageFromJpeg(JpegData jpeg) {
       var lines2 = component2.lines;
       var lines3 = component3.lines;
 
-      int hShift1 = component1.hScaleShift;
-      int vShift1 = component1.vScaleShift;
-      int hShift2 = component2.hScaleShift;
-      int vShift2 = component2.vScaleShift;
-      int hShift3 = component3.hScaleShift;
-      int vShift3 = component3.vScaleShift;
+      var hShift1 = component1.hScaleShift;
+      var vShift1 = component1.vScaleShift;
+      var hShift2 = component2.hScaleShift;
+      var vShift2 = component2.vScaleShift;
+      var hShift3 = component3.hScaleShift;
+      var vShift3 = component3.vScaleShift;
 
-      for (int y = 0; y < jpeg.height; y++) {
-        int y1 = y >> vShift1;
-        int y2 = y >> vShift2;
-        int y3 = y >> vShift3;
+      for (var y = 0; y < jpeg.height; y++) {
+        var y1 = y >> vShift1;
+        var y2 = y >> vShift2;
+        var y3 = y >> vShift3;
 
         component1Line = lines1[y1];
         component2Line = lines2[y2];
         component3Line = lines3[y3];
 
-        for (int x = 0; x < jpeg.width; x++) {
-          int x1 = x >> hShift1;
-          int x2 = x >> hShift2;
-          int x3 = x >> hShift3;
+        for (var x = 0; x < jpeg.width; x++) {
+          var x1 = x >> hShift1;
+          var x2 = x >> hShift2;
+          var x3 = x >> hShift3;
 
           if (!colorTransform) {
             R = component1Line[x1];
@@ -335,29 +335,29 @@ Image getImageFromJpeg(JpegData jpeg) {
       var lines3 = component3.lines;
       var lines4 = component4.lines;
 
-      int hShift1 = component1.hScaleShift;
-      int vShift1 = component1.vScaleShift;
-      int hShift2 = component2.hScaleShift;
-      int vShift2 = component2.vScaleShift;
-      int hShift3 = component3.hScaleShift;
-      int vShift3 = component3.vScaleShift;
-      int hShift4 = component4.hScaleShift;
-      int vShift4 = component4.vScaleShift;
+      var hShift1 = component1.hScaleShift;
+      var vShift1 = component1.vScaleShift;
+      var hShift2 = component2.hScaleShift;
+      var vShift2 = component2.vScaleShift;
+      var hShift3 = component3.hScaleShift;
+      var vShift3 = component3.vScaleShift;
+      var hShift4 = component4.hScaleShift;
+      var vShift4 = component4.vScaleShift;
 
-      for (int y = 0; y < jpeg.height; y++) {
-        int y1 = y >> vShift1;
-        int y2 = y >> vShift2;
-        int y3 = y >> vShift3;
-        int y4 = y >> vShift4;
+      for (var y = 0; y < jpeg.height; y++) {
+        var y1 = y >> vShift1;
+        var y2 = y >> vShift2;
+        var y3 = y >> vShift3;
+        var y4 = y >> vShift4;
         component1Line = lines1[y1];
         component2Line = lines2[y2];
         component3Line = lines3[y3];
         component4Line = lines4[y4];
-        for (int x = 0; x < jpeg.width; x++) {
-          int x1 = x >> hShift1;
-          int x2 = x >> hShift2;
-          int x3 = x >> hShift3;
-          int x4 = x >> hShift4;
+        for (var x = 0; x < jpeg.width; x++) {
+          var x1 = x >> hShift1;
+          var x2 = x >> hShift2;
+          var x3 = x >> hShift3;
+          var x4 = x >> hShift4;
           if (!colorTransform) {
             C = component1Line[x1];
             M = component2Line[x2];

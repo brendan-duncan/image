@@ -26,7 +26,7 @@ Image gaussianBlur(Image src, int radius) {
     kernel = SeparableKernel(radius);
 
     num sum = 0.0;
-    for (int x = -radius; x <= radius; ++x) {
+    for (var x = -radius; x <= radius; ++x) {
       num c = exp(-(x * x) / s);
       sum += c;
       kernel[x + radius] = c;

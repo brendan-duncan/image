@@ -6,9 +6,9 @@ import 'hdr_slice.dart';
 /// A high dynamic range RGBA image stored in 16-bit or 32-bit floating-point
 /// channels.
 class HdrImage {
-  static const int HALF = 1;
-  static const int FLOAT = 2;
-  static const int UINT = 0;
+  static const HALF = 1;
+  static const FLOAT = 2;
+  static const UINT = 0;
 
   /// Red value of a sample
   static const String R = 'R';
@@ -46,16 +46,16 @@ class HdrImage {
       return;
     }
 
-    const List<String> channelList = [R, G, B, A];
-    for (int i = 0; i < channels; ++i) {
+    const channelList = [R, G, B, A];
+    for (var i = 0; i < channels; ++i) {
       addSlice(HdrSlice(channelList[i], width, height, format));
     }
   }
 
   /// Create a copy of the [other] HdrImage.
   HdrImage.from(HdrImage other) {
-    for (String ch in other.slices.keys) {
-      HdrSlice slice = other.slices[ch];
+    for (final ch in other.slices.keys) {
+      final slice = other.slices[ch];
       addSlice(HdrSlice.from(slice));
     }
   }
@@ -69,9 +69,9 @@ class HdrImage {
     if (other.channels == Channels.rgba) {
       addSlice(HdrSlice(A, other.width, other.height, HALF));
     }
-    Uint8List rgb = other.getBytes();
-    for (int y = 0, si = 0; y < other.height; ++y) {
-      for (int x = 0; x < other.width; ++x) {
+    final rgb = other.getBytes();
+    for (var y = 0, si = 0; y < other.height; ++y) {
+      for (var x = 0; x < other.width; ++x) {
         red.setFloat(x, y, rgb[si++] / 255.0);
         green.setFloat(x, y, rgb[si++] / 255.0);
         blue.setFloat(x, y, rgb[si++] / 255.0);
@@ -189,7 +189,7 @@ class HdrImage {
 
   /// Add a channel [slice] to the
   void addSlice(HdrSlice slice) {
-    String ch = slice.name;
+    final ch = slice.name;
     slices[ch] = slice;
     switch (ch) {
       case R:
@@ -213,11 +213,11 @@ class HdrImage {
   /// Convert the framebuffer to an floating-point image, as a sequence of
   /// floats in RGBA order.
   Float32List toFloatRgba() {
-    Float32List rgba = Float32List(width * height * 4);
-    int w = width;
-    int h = height;
-    for (int y = 0, di = 0; y < h; ++y) {
-      for (int x = 0; x < w; ++x) {
+    final rgba = Float32List(width * height * 4);
+    final w = width;
+    final h = height;
+    for (var y = 0, di = 0; y < h; ++y) {
+      for (var x = 0; x < w; ++x) {
         rgba[di++] = red == null ? 0.0 : red.getFloat(x, y);
         rgba[di++] = green == null ? 0.0 : green.getFloat(x, y);
         rgba[di++] = blue == null ? 0.0 : blue.getFloat(x, y);
