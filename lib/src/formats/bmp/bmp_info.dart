@@ -40,6 +40,7 @@ class BitmapFileHeader {
 }
 
 class BmpInfo extends DecodeInfo {
+  @override
   int get numFrames => 1;
   final BitmapFileHeader file;
 

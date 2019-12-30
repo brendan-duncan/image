@@ -15,7 +15,7 @@ void main() {
 
   var bytes = ctx.getImageData(0, 0, cvs.width, cvs.height).data;
 
-  Image image =
+  var image =
       Image.fromBytes(cvs.width, cvs.height, bytes, format: Format.rgba);
 
   var jpg = encodeJpg(image, quality: 25);

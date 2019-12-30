@@ -8,5 +8,6 @@ class TiffInfo extends DecodeInfo {
   int ifdOffset;
   List<TiffImage> images = [];
 
+  @override
   int get numFrames => images.length;
 }

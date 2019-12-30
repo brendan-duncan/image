@@ -32,6 +32,7 @@ class BmpDecoder extends Decoder {
   /// Non animated image files will only have [frame] 0. An [AnimationFrame]
   /// is returned, which provides the image, and top-left coordinates of the
   /// image, as animated frames may only occupy a subset of the canvas.
+  @override
   Image decodeFrame(int frame) {
     _input.offset = info.file.offset;
     int bytesPerPixel = info.bpp >> 3;

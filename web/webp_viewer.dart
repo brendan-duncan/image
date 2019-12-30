@@ -23,8 +23,8 @@ void main() {
               .join('')
               .codeUnits;
 
-          Image image = decodeWebP(bytes);
-          List<int> png = encodePng(image);
+          var image = decodeWebP(bytes);
+          var png = encodePng(image);
 
           var png64 = base64Encode(png);
           img.src = 'data:image/png;base64,${png64}';

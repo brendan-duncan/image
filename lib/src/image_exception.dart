@@ -5,5 +5,6 @@ class ImageException implements Exception {
 
   ImageException(this.message);
 
+  @override
   String toString() => 'ImageException: $message';
 }

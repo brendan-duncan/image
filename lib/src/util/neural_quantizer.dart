@@ -78,6 +78,7 @@ class NeuralQuantizer extends Quantizer {
   }
 
   /// Find the color closest to [c] in the [colorMap].
+  @override
   int getQuantizedColor(int c) {
     int r = getRed(c);
     int g = getGreen(c);

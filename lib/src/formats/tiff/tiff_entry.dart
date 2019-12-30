@@ -10,6 +10,7 @@ class TiffEntry {
 
   TiffEntry(this.tag, this.type, this.numValues);
 
+  @override
   String toString() {
     if (TiffImage.TAG_NAME.containsKey(tag)) {
       return '${TiffImage.TAG_NAME[tag]}: $type $numValues';

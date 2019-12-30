@@ -79,6 +79,7 @@ class PngEncoder extends Encoder {
   }
 
   /// Does this encoder support animation?
+  @override
   bool get supportsAnimation => true;
 
   /// Encode an animation.

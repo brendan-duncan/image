@@ -8,5 +8,6 @@ class GifInfo extends DecodeInfo {
   bool isGif89 = false;
   List<GifImageDesc> frames = [];
 
+  @override
   int get numFrames => frames.length;
 }

@@ -35,6 +35,7 @@ class WebPInfo extends DecodeInfo {
   // Information about each animation frame.
   List<WebPFrame> frames = [];
 
+  @override
   int get numFrames => frames.length;
 
   int _frame;

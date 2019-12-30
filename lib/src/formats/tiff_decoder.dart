@@ -69,6 +69,7 @@ class TiffDecoder extends Decoder {
   /// Decode all of the frames from an animation. If the file is not an
   /// animation, a single frame animation is returned. If there was a problem
   /// decoding the file, null is returned.
+  @override
   Animation decodeAnimation(List<int> data) {
     if (startDecode(data) == null) {
       return null;

@@ -19,6 +19,7 @@ class PngInfo extends DecodeInfo {
   Uint8List iCCPData;
 
   // APNG extensions
+  @override
   int numFrames = 1;
   int repeat = 0;
   List<PngFrame> frames = [];

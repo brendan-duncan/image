@@ -24,6 +24,7 @@ class InternalExrB44Compressor extends InternalExrCompressor
     throw ImageException('B44 compression not yet supported.');
   }
 
+  @override
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
       [int width, int height]) {
     throw ImageException('B44 compression not yet supported.');

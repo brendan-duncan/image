@@ -394,6 +394,7 @@ class BitmapFontCharacter {
         this.height = height,
         image = Image(width, height);
 
+  @override
   String toString() {
     Map<String, int> x = {
       'id': id,
