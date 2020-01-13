@@ -56,6 +56,7 @@ class WebPDecoder extends Decoder {
 
     switch (_info.format) {
       case WebPInfo.FORMAT_ANIMATED:
+        _info.numFrames = _info.frames.length;
         return _info;
       case WebPInfo.FORMAT_LOSSLESS:
         _input.offset = _info.vp8Position;
@@ -63,6 +64,7 @@ class WebPDecoder extends Decoder {
         if (!vp8l.decodeHeader()) {
           return null;
         }
+        _info.numFrames = _info.frames.length;
         return _info;
       case WebPInfo.FORMAT_LOSSY:
         _input.offset = _info.vp8Position;
@@ -70,6 +72,7 @@ class WebPDecoder extends Decoder {
         if (!vp8.decodeHeader()) {
           return null;
         }
+        _info.numFrames = _info.frames.length;
         return _info;
     }
 
@@ -126,8 +129,6 @@ class WebPDecoder extends Decoder {
     if (startDecode(bytes) == null) {
       return null;
     }
-
-    _info.numFrames = _info.frames.length;
 
     final anim = Animation();
     anim.width = _info.width;
