@@ -38,13 +38,13 @@ class WebPInfo extends DecodeInfo {
   @override
   int get numFrames => frames.length;
 
-  int _frame;
-  int _numFrames;
+  int _frame = 0;
+  int _numFrames = 0;
 
   InputBuffer _alphaData;
-  int _alphaSize;
-  int _vp8Position;
-  int _vp8Size;
+  int _alphaSize = 0;
+  int _vp8Position = 0;
+  int _vp8Size = 0;
 }
 
 @internal

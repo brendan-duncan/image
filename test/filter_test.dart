@@ -115,6 +115,17 @@ void main() {
       fp.writeAsBytesSync(writeJpg(f));
     });
 
+    test('drawImage', () {
+      final dst = Image(1000, 1000);
+      fill(dst, getColor(0, 255, 0));
+      final src = Image(100, 100);
+      fill(src, getColor(255, 0, 0));
+      drawImage(src, dst, blend: false);
+      final fp = File('.dart_tool/out/drawImage.jpg')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(writeJpg(src));
+    });
+
     test('brightness', () {
       final f = Image.from(image);
       brightness(f, 100);

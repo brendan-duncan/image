@@ -16,7 +16,8 @@ void main() {
       test('$name', () {
         List<int> bytes = (f as File).readAsBytesSync();
 
-        var data = WebPDecoder().startDecode(bytes);
+        var webp = WebPDecoder(bytes);
+        var data = webp.info;
         if (data == null) {
           throw ImageException('Unable to parse WebP info: $name.');
         }
@@ -29,8 +30,7 @@ void main() {
           expect(data.hasAnimation, equals(_webp_tests[name]['hasAnimation']));
 
           if (data.hasAnimation) {
-            var anim = WebPDecoder().decodeAnimation(bytes);
-            expect(anim.length, equals(_webp_tests[name]['numFrames']));
+            expect(webp.numFrames(), equals(_webp_tests[name]['numFrames']));
           }
         }
       });
