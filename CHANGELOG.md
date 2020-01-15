@@ -1,3 +1,10 @@
+## 2.1.12 - January 14, 2020
+
+- drawChar now uses color parameter.
+- Fix index out of range bug in drawImage.
+- Fix transparency with animated WebP images.
+
+
 ## 2.1.11 - December 30, 2019
 
 - Fix GIF animation loopCount encoding. Some viewers were not seeing the repeat count correctly.
