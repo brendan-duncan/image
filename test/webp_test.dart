@@ -81,6 +81,22 @@ void main() {
       });
     }
   });
+
+  group('WebP/decodeAnimation', () {
+    test('Transparent Animation', () {
+      final path = 'test/res/webp/animated_transparency.webp';
+      var anim = WebPDecoder().decodeAnimation(File(path).readAsBytesSync());
+
+      expect(anim.numFrames, equals(20));
+      expect(anim.frames[2].getPixel(0, 0), equals(0));
+      for (var i = 0; i < anim.numFrames; ++i) {
+        var image = anim.frames[i];
+        File('.dart_tool/out/webp/animated_transparency_$i.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(PngEncoder().encodeImage(image));
+      }
+    });
+  });
 }
 
 const _webp_tests = {

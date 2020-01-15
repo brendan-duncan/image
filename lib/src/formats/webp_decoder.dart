@@ -153,7 +153,7 @@ class WebPDecoder extends Decoder {
 
         if (lastImage != null) {
           if (frame.clearFrame) {
-            lastImage.fill(_info.backgroundColor);
+            lastImage.fill(0);
           }
           copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
         } else {
