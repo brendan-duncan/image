@@ -269,14 +269,14 @@ class JpegData {
     return c;
   }
 
-  num _readExifValue(InputBuffer block, int format, int offset) {
+  dynamic _readExifValue(InputBuffer block, int format, int offset) {
     const FMT_BYTE = 1;
-    //const FMT_STRING = 2;
+    const FMT_ASCII = 2;
     const FMT_USHORT = 3;
     const FMT_ULONG = 4;
     const FMT_URATIONAL = 5;
     const FMT_SBYTE = 6;
-    //const FMT_UNDEFINED = 7;
+    const FMT_UNDEFINED = 7;
     const FMT_SSHORT = 8;
     const FMT_SLONG = 9;
     const FMT_SRATIONAL = 10;
@@ -289,7 +289,10 @@ class JpegData {
         case FMT_SBYTE:
           return block.readInt8();
         case FMT_BYTE:
+        case FMT_UNDEFINED:
           return block.readByte();
+        case FMT_ASCII:
+          return block.readString(1);
         case FMT_USHORT:
           return block.readUint16();
         case FMT_ULONG:
