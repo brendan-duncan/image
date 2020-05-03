@@ -14,8 +14,7 @@ Image bakeOrientation(Image image) {
   }
 
   // Clear the exif data.
-  // TODO: only clear the orientation property
-  bakedImage.exif = ExifData();
+  bakedImage.exif.data.remove(ExifData.ORIENTATION);
   switch (image.exif.orientation) {
     case 2:
       return flipHorizontal(bakedImage);
