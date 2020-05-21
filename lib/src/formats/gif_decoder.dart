@@ -102,7 +102,7 @@ class GifDecoder extends Decoder {
     var duration = _input.readUint16();
     var transparent = _input.readByte();
     /*int endBlock =*/ _input.readByte();
-    var disposalMethod = (b >> 3) & 0x7;
+    var disposalMethod = (b >> 2) & 0x7;
     //int userInput = (b >> 1) & 0x1;
     var transparentFlag = b & 0x1;
 
