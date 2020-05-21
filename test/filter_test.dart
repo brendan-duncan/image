@@ -121,7 +121,7 @@ void main() {
       final src = Image(100, 100);
       fill(src, getColor(255, 0, 0));
       drawImage(src, dst, blend: false);
-      final fp = File('.dart_tool/out/drawImage.jpg')
+      File('.dart_tool/out/drawImage.jpg')
           ..createSync(recursive: true)
           ..writeAsBytesSync(writeJpg(src));
     });
