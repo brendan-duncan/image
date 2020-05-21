@@ -1,3 +1,9 @@
+## 2.1.13 - May 21, 2020
+
+- Improvements for JPEG EXIF decoding
+- Fix for the GIF animation decoder
+- APNG encoder time delay correctly to milliseconds 
+
 ## 2.1.12 - January 14, 2020
 
 - drawChar now uses color parameter.
