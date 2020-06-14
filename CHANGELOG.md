@@ -1,3 +1,7 @@
+## 2.1.14 - June 14, 2020
+
+- Update xml dependency to 4.2.0
+
 ## 2.1.13 - May 21, 2020
 
 - Improvements for JPEG EXIF decoding
