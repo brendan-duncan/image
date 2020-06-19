@@ -613,7 +613,7 @@ class Image {
         }
         break;
       case Format.bgr:
-        for (var i = 0, j = 0, len = input.length; i < len; i += 4, j += 3) {
+        for (var i = 0, j = 0, len = input.length; j < len; i += 4, j += 3) {
           rgba[i + 0] = input[j + 2];
           rgba[i + 1] = input[j + 1];
           rgba[i + 2] = input[j + 0];
@@ -621,7 +621,7 @@ class Image {
         }
         break;
       case Format.rgb:
-        for (var i = 0, j = 0, len = input.length; i < len; i += 4, j += 3) {
+        for (var i = 0, j = 0, len = input.length; j < len; i += 4, j += 3) {
           rgba[i + 0] = input[j + 0];
           rgba[i + 1] = input[j + 1];
           rgba[i + 2] = input[j + 2];
@@ -629,7 +629,7 @@ class Image {
         }
         break;
       case Format.luminance:
-        for (var i = 0, j = 0, len = input.length; i < len; i += 4, ++j) {
+        for (var i = 0, j = 0, len = input.length; j < len; i += 4, ++j) {
           rgba[i + 0] = input[j];
           rgba[i + 1] = input[j];
           rgba[i + 2] = input[j];
