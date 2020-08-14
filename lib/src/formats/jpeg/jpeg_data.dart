@@ -43,7 +43,11 @@ class JpegData {
     marker = _nextMarker();
     while (marker != Jpeg.M_EOI && !input.isEOS) {
       // EOI (End of image)
-      _skipBlock();
+      final sectionByteSize = input.readUint16();
+      if (sectionByteSize < 2) {
+        // jpeg section consists of more than 2 bytes at least
+        return false;
+      }
       switch (marker) {
         case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
         case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
