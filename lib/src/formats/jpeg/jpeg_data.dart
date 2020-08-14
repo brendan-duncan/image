@@ -46,7 +46,8 @@ class JpegData {
       final sectionByteSize = input.readUint16();
       if (sectionByteSize < 2) {
         // jpeg section consists of more than 2 bytes at least
-        return false;
+        // return success only when SOF and SOS have already found (as a jpeg without EOF.)
+        break;
       }
       switch (marker) {
         case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
