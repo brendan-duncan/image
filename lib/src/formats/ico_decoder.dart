@@ -102,7 +102,7 @@ class IcoDecoder extends Decoder {
     return image;
   }
 
-  /// decodes the larges frame.
+  /// decodes the largest frame.
   Image decodeImageLargest(List<int> bytes) {
     final info = startDecode(bytes);
     if (info == null) {

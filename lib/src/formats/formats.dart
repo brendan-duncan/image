@@ -17,6 +17,7 @@ import 'tga_encoder.dart';
 import 'tiff_decoder.dart';
 import 'webp_decoder.dart';
 import 'bmp_decoder.dart';
+import 'ico_decoder.dart';
 import 'ico_encoder.dart';
 import 'cur_encoder.dart';
 
@@ -71,6 +72,11 @@ Decoder findDecoderForData(List<int> data) {
   var tga = TgaDecoder();
   if (tga.isValidFile(bytes)) {
     return tga;
+  }
+
+  var ico = IcoDecoder();
+  if (ico.isValidFile(bytes)) {
+    return ico;
   }
 
   return null;
