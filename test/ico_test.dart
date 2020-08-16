@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:image/image.dart';
+import 'package:image/src/formats/ico_decoder.dart';
 import 'package:image/src/formats/ico_encoder.dart';
 import 'package:test/test.dart';
 
@@ -32,5 +33,25 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(png3);
     });
+
+    final dir = Directory('test/res/ico');
+    if (!dir.existsSync()) {
+      return;
+    }
+
+    for (final file in dir.listSync()) {
+      if (file is! File || !file.path.endsWith('.ico')) {
+        continue;
+      }
+
+      final name = file.path.split(RegExp(r'(/|\\)')).last;
+      test('decode $name', () {
+        final bytes = (file as File).readAsBytesSync();
+        final image = IcoDecoder().decodeImageLargest(bytes);
+        File('.dart_tool/out/ico/$name.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(PngEncoder().encodeImage(image));
+      });
+    }
   });
 }

@@ -103,3 +103,15 @@ final Uint32List __float32ToUint32 = Uint32List.view(__float32.buffer);
 
 final Uint64List __uint64 = Uint64List(1);
 final Float64List __uint64ToFloat64 = Float64List.view(__uint64.buffer);
+
+String debugBits32(int value) {
+  if (value == null) {
+    return 'null';
+  }
+  final bitCount = 32;
+  final result = StringBuffer();
+  for (var i = bitCount; i > -1; i--) {
+    result.write((value & (1 << i)) == 0 ? '0' : '1');
+  }
+  return result.toString();
+}

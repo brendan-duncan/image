@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:image/image.dart';
+import 'package:image/src/internal/bit_operators.dart';
 import '../../formats/decode_info.dart';
 import '../../util/input_buffer.dart';
 
@@ -57,12 +58,27 @@ class BmpInfo extends DecodeInfo {
   final int yppm;
   final int totalColors;
   final int importantColors;
+
+  int v5redMask;
+  int v5greenMask;
+  int v5blueMask;
+  int v5alphaMask;
+
+  // BITMAPINFOHEADER should (probably) ignore alpha channel altogether.
+  // This is the behavior in gimp (?)
+  // https://gitlab.gnome.org/GNOME/gimp/-/issues/461#note_208715
+  bool get ignoreAlphaChannel =>
+      headerSize == 40 ||
+      // BITMAPV5HEADER with null alpha mask.
+      headerSize == 124 && v5alphaMask == 0;
   bool get readBottomUp => !_height.isNegative;
   @override
   int get height => _height.abs();
 
-  BmpInfo(InputBuffer p)
-      : file = BitmapFileHeader(p),
+  List<int> colorPalette;
+
+  BmpInfo(InputBuffer p, {BitmapFileHeader fileHeader})
+      : file = fileHeader ?? BitmapFileHeader(p),
         headerSize = p.readUint32(),
         width = p.readInt32(),
         _height = p.readInt32(),
@@ -73,7 +89,28 @@ class BmpInfo extends DecodeInfo {
         xppm = p.readInt32(),
         yppm = p.readInt32(),
         totalColors = p.readUint32(),
-        importantColors = p.readUint32();
+        importantColors = p.readUint32() {
+    if ([1, 4, 8].contains(bpp)) {
+      readPalette(p);
+    }
+    if (headerSize == 124) {
+      // BITMAPV5HEADER
+      v5redMask = p.readUint32();
+      v5greenMask = p.readUint32();
+      v5blueMask = p.readUint32();
+      v5alphaMask = p.readUint32();
+    }
+    print(toString());
+  }
+
+  void readPalette(InputBuffer p) {
+    final colors = totalColors == 0 ? 1 << bpp : totalColors;
+    print('reading colors: $colors');
+    final colorBytes = headerSize == 12 ? 3 : 4;
+    colorPalette = Iterable.generate(
+            colors, (i) => _readRgba(p, aDefault: colorBytes == 3 ? 100 : null))
+        .toList();
+  }
 
   static BitmapCompression _intToCompressions(int compIndex) {
     final map = <int, BitmapCompression>{
@@ -96,23 +133,33 @@ class BmpInfo extends DecodeInfo {
       final g = input.readByte();
       final r = input.readByte();
       final a = aDefault ?? input.readByte();
-      return getColor(r, g, b, 255 - a);
+      return getColor(r, g, b, ignoreAlphaChannel ? 255 : a);
     } else {
       final r = input.readByte();
       final b = input.readByte();
       final g = input.readByte();
       final a = aDefault ?? input.readByte();
-      return getColor(r, b, g, 255 - a);
+      return getColor(r, b, g, ignoreAlphaChannel ? 255 : a);
     }
   }
 
-  int decodeRgba(InputBuffer input) {
+  void decodeRgba(InputBuffer input, void Function(int color) pixel) {
+    if (colorPalette != null) {
+      if (bpp == 4) {
+        final b = input.readByte();
+        final left = b >> 4;
+        final right = b & 0x0f;
+        pixel(colorPalette[left]);
+        pixel(colorPalette[right]);
+        return;
+      }
+    }
     if (compression == BitmapCompression.BI_BITFIELDS && bpp == 32) {
-      return _readRgba(input);
+      return pixel(_readRgba(input));
     } else if (bpp == 32 && compression == BitmapCompression.NONE) {
-      return _readRgba(input);
+      return pixel(_readRgba(input));
     } else if (bpp == 24) {
-      return _readRgba(input, aDefault: 0);
+      return pixel(_readRgba(input, aDefault: 255));
     }
     // else if (bpp == 16) {
     //   return _rgbaFrom16(input);
@@ -158,7 +205,11 @@ class BmpInfo extends DecodeInfo {
       'yppm': yppm,
       'totalColors': totalColors,
       'importantColors': importantColors,
-      'readBottomUp': readBottomUp
+      'readBottomUp': readBottomUp,
+      'v5redMask': debugBits32(v5redMask),
+      'v5greenMask': debugBits32(v5greenMask),
+      'v5blueMask': debugBits32(v5blueMask),
+      'v5alphaMask': debugBits32(v5alphaMask),
     });
   }
 }
