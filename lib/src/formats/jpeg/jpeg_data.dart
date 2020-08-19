@@ -49,6 +49,8 @@ class JpegData {
         // return success only when SOF and SOS have already found (as a jpeg without EOF.)
         break;
       }
+      input.offset += sectionByteSize - 2;
+      
       switch (marker) {
         case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
         case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
