@@ -13,8 +13,14 @@ Image bakeOrientation(Image image) {
     return bakedImage;
   }
 
-  // Clear the exif data.
-  bakedImage.exif.data.remove(ExifData.ORIENTATION);
+  // Copy all exif data except for orientation
+  bakedImage.exif = ExifData();
+  for (var key in image.exif.data.keys) {
+    if (key != ExifData.ORIENTATION) {
+      bakedImage.exif.data[key] = image.exif.data[key];
+    }
+  }
+
   switch (image.exif.orientation) {
     case 2:
       return flipHorizontal(bakedImage);
