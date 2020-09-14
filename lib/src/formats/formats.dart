@@ -22,7 +22,8 @@ import 'ico_encoder.dart';
 import 'cur_encoder.dart';
 
 /// Find a [Decoder] that is able to decode the given image [data].
-/// Use this is you don't know the type of image it is.
+/// Use this is you don't know the type of image it is. Since this will
+/// validate the image against all known decoders, it is potentially very slow.
 Decoder findDecoderForData(List<int> data) {
   // The various decoders will be creating a Uint8List for their InputStream
   // if the data isn't already that type, so do it once here to avoid having to
@@ -134,6 +135,9 @@ Decoder getDecoderForNamedImage(String name) {
   }
   if (n.endsWith('.bmp')) {
     return BmpDecoder();
+  }
+  if (n.endsWith('.ico')) {
+    return IcoDecoder();
   }
   return null;
 }
@@ -345,4 +349,9 @@ List<int> encodeIco(Image image) {
 /// Encode a list of images to the ICO format.
 List<int> encodeIcoImages(List<Image> images) {
   return IcoEncoder().encodeImages(images);
+}
+
+/// Decode an ICO image.
+Image decodeIco(List<int> bytes) {
+  return IcoDecoder().decodeImage(bytes);
 }

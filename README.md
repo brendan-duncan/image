@@ -18,6 +18,7 @@ Read/Write:
 - Targa
 - GIF / Animated GIF
 - PVR(PVRTC)
+- ICO
 
 Read Only:
 
@@ -29,7 +30,6 @@ Read Only:
 
 Write Only:
 
-- ICO
 - CUR
 
 ## [Documentation](https://github.com/brendan-duncan/image/wiki)

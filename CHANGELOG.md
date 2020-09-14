@@ -1,3 +1,10 @@
+## 2.1.15 - September 13, 2020
+
+- Fix Image.getBytes for cropping images
+- Fix bakeOrientation EXIF data
+- Added ICO format decoder
+- Fix JpegData.validate for unintended exceptions with non jpeg images 
+
 ## 2.1.14 - June 14, 2020
 
 - Update xml dependency to 4.2.0

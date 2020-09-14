@@ -290,7 +290,7 @@ class JpegData {
     const FMT_SINGLE = 11;
     const FMT_DOUBLE = 12;
 
-    int initialBlockLength = block.length;
+    final initialBlockLength = block.length;
     try {
       switch (format) {
         case FMT_SBYTE:
@@ -307,7 +307,7 @@ class JpegData {
         case FMT_URATIONAL:
         case FMT_SRATIONAL:
           {
-            InputBuffer buffer = block.peekBytes(8, offset);
+            final buffer = block.peekBytes(8, offset);
             var num = buffer.readInt32();
             var den = buffer.readInt32();
             if (den == 0) {
@@ -328,7 +328,7 @@ class JpegData {
           return 0;
       }
     } finally {
-      int bytesRead = initialBlockLength - block.length;
+      final bytesRead = initialBlockLength - block.length;
       if (bytesRead < 4) {
         block.skip(4 - bytesRead);
       }
@@ -342,9 +342,9 @@ class JpegData {
 
     var numDirEntries = block.readUint16();
 
-    const TAG_ORIENTATION = 0x0112;
-    const TAG_INTEROP_OFFSET = 0xA005;
-    const TAG_EXIF_OFFSET = 0x8769;
+    //const TAG_ORIENTATION = 0x0112;
+    //const TAG_INTEROP_OFFSET = 0xA005;
+    //const TAG_EXIF_OFFSET = 0x8769;
     const maxFormats = 12;
     const bytesPerFormat = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
 

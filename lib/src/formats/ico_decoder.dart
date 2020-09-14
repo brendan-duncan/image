@@ -2,6 +2,7 @@ import 'package:image/image.dart';
 import 'package:image/src/animation.dart';
 import 'package:image/src/formats/bmp/bmp_info.dart';
 import 'package:image/src/formats/decode_info.dart';
+import 'package:meta/meta.dart';
 
 import '../image.dart';
 import '../util/input_buffer.dart';
@@ -182,13 +183,13 @@ class IcoInfo extends DecodeInfo {
 
 class IcoInfoImage {
   IcoInfoImage({
-    this.width,
-    this.height,
-    this.colorPalette,
-    this.bytesSize,
-    this.bytesOffset,
-    this.colorPlanes,
-    this.bitsPerPixel,
+    @required this.width,
+    @required this.height,
+    @required this.colorPalette,
+    @required this.bytesSize,
+    @required this.bytesOffset,
+    @required this.colorPlanes,
+    @required this.bitsPerPixel
   })  : assert(width != null),
         assert(height != null),
         assert(colorPalette != null),
