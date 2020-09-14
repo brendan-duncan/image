@@ -27,7 +27,8 @@ void main() {
       hdrGamma(hdr, gamma: 2.2);
       //hdrBloom(hdr, radius: 0.2);
       img2 = hdrToImage(hdr);
-      File('.dart_tool/out/exr/lenna_gamma.png').writeAsBytesSync(encodePng(img2));
+      File('.dart_tool/out/exr/lenna_gamma.png')
+          .writeAsBytesSync(encodePng(img2));
     });
   });
 }

@@ -67,7 +67,11 @@ class OctreeQuantizer extends Quantizer {
 
     var ac = a.count >> a.depth;
     var bc = b.count >> b.depth;
-    return (ac < bc) ? -1 : (ac > bc) ? 1 : 0;
+    return (ac < bc)
+        ? -1
+        : (ac > bc)
+            ? 1
+            : 0;
   }
 
   _OctreeNode _nodeInsert(_OctreeNode root, int r, int g, int b) {

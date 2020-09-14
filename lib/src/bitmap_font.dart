@@ -280,7 +280,7 @@ class BitmapFont {
 
     var lines = <String>[];
     lines = content.split('\r\n');
-    if(lines.length <= 1) {
+    if (lines.length <= 1) {
       lines = content.split('\n');
     }
 

@@ -76,23 +76,39 @@ class Half {
 
   /// Addition operator for Half or num left operands.
   Half operator +(dynamic f) {
-    var d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
+    var d = (f is Half)
+        ? f.toDouble()
+        : (f is num)
+            ? f.toDouble()
+            : 0;
     return Half(toDouble() + d);
   }
 
   /// Subtraction operator for Half or num left operands.
   Half operator -(dynamic f) {
-    var d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
+    var d = (f is Half)
+        ? f.toDouble()
+        : (f is num)
+            ? f.toDouble()
+            : 0;
     return Half(toDouble() - d.toDouble());
   }
 
   Half operator *(dynamic f) {
-    var d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
+    var d = (f is Half)
+        ? f.toDouble()
+        : (f is num)
+            ? f.toDouble()
+            : 0;
     return Half(toDouble() * d.toDouble());
   }
 
   Half operator /(dynamic f) {
-    var d = (f is Half) ? f.toDouble() : (f is num) ? f.toDouble() : 0;
+    var d = (f is Half)
+        ? f.toDouble()
+        : (f is num)
+            ? f.toDouble()
+            : 0;
     return Half(toDouble() / d.toDouble());
   }
 

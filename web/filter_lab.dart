@@ -6,8 +6,8 @@ CanvasElement canvas;
 DivElement logDiv;
 Image origImage;
 
-void _addControl(String label, String value, DivElement parent,
-    dynamic callback) {
+void _addControl(
+    String label, String value, DivElement parent, dynamic callback) {
   var amountLabel = LabelElement();
   amountLabel.text = label + ':';
   var amountEdit = InputElement();

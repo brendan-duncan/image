@@ -63,7 +63,7 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 }
 
 /// Draw a string horizontally into [image] at position
-/// [x],[y] with the given [color]. 
+/// [x],[y] with the given [color].
 /// If x is omitted text is automatically centered into [image]
 /// If y is omitted text is automatically centered into [image].
 /// If both x and y are provided it has the same behaviour of drawString method.
@@ -83,19 +83,19 @@ Image drawStringCentered(Image image, BitmapFont font, String string,
       }
       var ch = font.characters[c];
       stringWidth += ch.xadvance;
-      if(ch.height + ch.yoffset > stringHeight) {
+      if (ch.height + ch.yoffset > stringHeight) {
         stringHeight = ch.height + ch.yoffset;
       }
     }
   }
 
   int xPos, yPos;
-  if(x == null) {
+  if (x == null) {
     xPos = (image.width / 2).round() - (stringWidth / 2).round();
   } else {
     xPos = x;
   }
-  if(y == null) {
+  if (y == null) {
     yPos = (image.height / 2).round() - (stringHeight / 2).round();
   } else {
     yPos = y;

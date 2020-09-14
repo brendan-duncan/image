@@ -19,8 +19,8 @@ abstract class ExrPizCompressor extends ExrCompressor {
 @internal
 class InternalExrPizCompressor extends InternalExrCompressor
     implements ExrPizCompressor {
-  InternalExrPizCompressor(ExrPart header, this._maxScanLineSize,
-      this._numScanLines)
+  InternalExrPizCompressor(
+      ExrPart header, this._maxScanLineSize, this._numScanLines)
       : super(header as InternalExrPart) {
     _channelData = List<_PizChannelData>(header.channels.length);
     for (var i = 0; i < _channelData.length; ++i) {
@@ -114,8 +114,8 @@ class InternalExrPizCompressor extends InternalExrCompressor
     // Expand the pixel data to their original range
     _applyLut(lut, _tmpBuffer, tmpBufferEnd);
 
-    _output ??= OutputBuffer(
-        size: (_maxScanLineSize * _numScanLines) + (65536 + 8192));
+    _output ??=
+        OutputBuffer(size: (_maxScanLineSize * _numScanLines) + (65536 + 8192));
 
     _output.rewind();
 

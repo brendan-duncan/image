@@ -523,7 +523,11 @@ class PsdImage extends DecodeInfo {
     }
 
     var numChannels = channelList.length;
-    var ns = (bitDepth == 8) ? 1 : (bitDepth == 16) ? 2 : -1;
+    var ns = (bitDepth == 8)
+        ? 1
+        : (bitDepth == 16)
+            ? 2
+            : -1;
     if (ns == -1) {
       throw ImageException('PSD: unsupported bit depth: $bitDepth');
     }

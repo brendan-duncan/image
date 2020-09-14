@@ -7,7 +7,11 @@ import '_component_data.dart';
 import 'jpeg_data.dart';
 
 Uint8List _dctClip;
-int _clamp8(int i) => i < 0 ? 0 : i > 255 ? 255 : i;
+int _clamp8(int i) => i < 0
+    ? 0
+    : i > 255
+        ? 255
+        : i;
 
 // Quantize the coefficients and apply IDCT.
 //
@@ -370,8 +374,9 @@ Image getImageFromJpeg(JpegData jpeg) {
             K = component4Line[x4];
 
             C = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
-            M = 255 - _clamp8((Y - 0.3441363 * (Cb - 128) -
-                0.71413636 * (Cr - 128)).toInt());
+            M = 255 -
+                _clamp8((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128))
+                    .toInt());
             Ye = 255 - _clamp8((Y + 1.772 * (Cb - 128)).toInt());
           }
           R = (C * K) >> 8;

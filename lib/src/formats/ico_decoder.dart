@@ -182,15 +182,15 @@ class IcoInfo extends DecodeInfo {
 }
 
 class IcoInfoImage {
-  IcoInfoImage({
-    @required this.width,
-    @required this.height,
-    @required this.colorPalette,
-    @required this.bytesSize,
-    @required this.bytesOffset,
-    @required this.colorPlanes,
-    @required this.bitsPerPixel
-  })  : assert(width != null),
+  IcoInfoImage(
+      {@required this.width,
+      @required this.height,
+      @required this.colorPalette,
+      @required this.bytesSize,
+      @required this.bytesOffset,
+      @required this.colorPlanes,
+      @required this.bitsPerPixel})
+      : assert(width != null),
         assert(height != null),
         assert(colorPalette != null),
         assert(bytesSize != null),

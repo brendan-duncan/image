@@ -50,7 +50,7 @@ class JpegData {
         break;
       }
       input.offset += sectionByteSize - 2;
-      
+
       switch (marker) {
         case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
         case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
@@ -319,7 +319,7 @@ class JpegData {
           return block.readInt16();
         case FMT_SLONG:
           return block.readInt32();
-      // Not sure if this is correct (never seen float used in Exif format)
+        // Not sure if this is correct (never seen float used in Exif format)
         case FMT_SINGLE:
           return block.readFloat32();
         case FMT_DOUBLE:

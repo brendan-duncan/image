@@ -302,12 +302,9 @@ class VP8LTransform {
   static int _clampedAddSubtractHalf(int c0, int c1, int c2) {
     final avg = _average2(c0, c1);
     final a = _addSubtractComponentHalf(avg >> 24, c2 >> 24);
-    final r =
-        _addSubtractComponentHalf((avg >> 16) & 0xff, (c2 >> 16) & 0xff);
-    final g =
-        _addSubtractComponentHalf((avg >> 8) & 0xff, (c2 >> 8) & 0xff);
-    final b =
-        _addSubtractComponentHalf((avg >> 0) & 0xff, (c2 >> 0) & 0xff);
+    final r = _addSubtractComponentHalf((avg >> 16) & 0xff, (c2 >> 16) & 0xff);
+    final g = _addSubtractComponentHalf((avg >> 8) & 0xff, (c2 >> 8) & 0xff);
+    final b = _addSubtractComponentHalf((avg >> 0) & 0xff, (c2 >> 0) & 0xff);
     return (a << 24) | (r << 16) | (g << 8) | b;
   }
 

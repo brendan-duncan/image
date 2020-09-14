@@ -59,8 +59,7 @@ class ExrHuffman {
 
       // Access decoding table
       while (c_lc[1] >= HUF_DECBITS) {
-        var pl =
-            hdecod[(c_lc[0] >> (c_lc[1] - HUF_DECBITS)) & HUF_DECMASK];
+        var pl = hdecod[(c_lc[0] >> (c_lc[1] - HUF_DECBITS)) & HUF_DECMASK];
 
         if (pl.len != 0) {
           // Get short code
@@ -334,8 +333,7 @@ class ExrHuffman {
 
   static const SHORT_ZEROCODE_RUN = 59;
   static const LONG_ZEROCODE_RUN = 63;
-  static const SHORTEST_LONG_RUN =
-      2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
+  static const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
   static const LONGEST_LONG_RUN = 255 + SHORTEST_LONG_RUN;
 }
 

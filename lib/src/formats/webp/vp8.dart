@@ -173,7 +173,11 @@ class VP8 {
       }
     }
 
-    _filterType = (hdr.level == 0) ? 0 : hdr.simple ? 1 : 2;
+    _filterType = (hdr.level == 0)
+        ? 0
+        : hdr.simple
+            ? 1
+            : 2;
 
     return true;
   }
@@ -314,7 +318,11 @@ class VP8 {
             }
           }
 
-          level = (level < 0) ? 0 : (level > 63) ? 63 : level;
+          level = (level < 0)
+              ? 0
+              : (level > 63)
+                  ? 63
+                  : level;
           if (level > 0) {
             var ilevel = level;
             if (hdr.sharpness > 0) {
@@ -335,7 +343,11 @@ class VP8 {
 
             info.fInnerLevel = ilevel;
             info.fLimit = 2 * level + ilevel;
-            info.hevThresh = (level >= 40) ? 2 : (level >= 15) ? 1 : 0;
+            info.hevThresh = (level >= 40)
+                ? 2
+                : (level >= 15)
+                    ? 1
+                    : 0;
           } else {
             info.fLimit = 0; // no filtering
           }
@@ -847,7 +859,11 @@ class VP8 {
   }
 
   int _clip8(int v) {
-    var d = ((v & XOR_YUV_MASK2) == 0) ? (v >> YUV_FIX2) : (v < 0) ? 0 : 255;
+    var d = ((v & XOR_YUV_MASK2) == 0)
+        ? (v >> YUV_FIX2)
+        : (v < 0)
+            ? 0
+            : 255;
     return d;
   }
 
@@ -966,8 +982,7 @@ class VP8 {
       alpha.offset -= webp.width;
     }
 
-    var dst =
-        InputBuffer(output.getBytes(), offset: startY * stride + 3);
+    var dst = InputBuffer(output.getBytes(), offset: startY * stride + 3);
 
     if (_cropTop + mbY + mbH == _cropBottom) {
       // If it's the very last call, we process all the remaining rows!
@@ -987,8 +1002,7 @@ class VP8 {
 
   int _emitFancyRGB(int mbY, int mbW, int mbH) {
     var numLinesOut = mbH; // a priori guess
-    var dst =
-        InputBuffer(output.getBytes(), offset: mbY * webp.width * 4);
+    var dst = InputBuffer(output.getBytes(), offset: mbY * webp.width * 4);
     var curY = InputBuffer.from(_y);
     var curU = InputBuffer.from(_u);
     var curV = InputBuffer.from(_v);
@@ -1242,7 +1256,11 @@ class VP8 {
 
   int _nzCodeBits(int nz_coeffs, int nz, int dc_nz) {
     nz_coeffs <<= 2;
-    nz_coeffs |= (nz > 3) ? 3 : (nz > 1) ? 2 : dc_nz;
+    nz_coeffs |= (nz > 3)
+        ? 3
+        : (nz > 1)
+            ? 2
+            : dc_nz;
     return nz_coeffs;
   }
 
@@ -1419,7 +1437,11 @@ class VP8 {
     // Hardcoded UVMode decision tree
     block.uvmode = br.getBit(142) == 0
         ? DC_PRED
-        : br.getBit(114) == 0 ? V_PRED : br.getBit(183) != 0 ? TM_PRED : H_PRED;
+        : br.getBit(114) == 0
+            ? V_PRED
+            : br.getBit(183) != 0
+                ? TM_PRED
+                : H_PRED;
   }
 
   // Main data source
@@ -1542,7 +1564,11 @@ class VP8 {
   //Uint8List _layerData;
 
   static int _clip(int v, int M) {
-    return v < 0 ? 0 : v > M ? M : v;
+    return v < 0
+        ? 0
+        : v > M
+            ? M
+            : v;
   }
 
   static const kYModesIntra4 = [
@@ -2142,7 +2168,6 @@ class VP8 {
   static const kVToG = 13320; // 0.813 = 255 / 112 * 0.701 * 0.299 / 0.587
   static const kUToB = 33050; // 2.018 = 255 / 112 * 0.886
   static const kRCst = (-kYScale * 16 - kVToR * 128 + YUV_HALF2);
-  static const kGCst =
-      (-kYScale * 16 + kUToG * 128 + kVToG * 128 + YUV_HALF2);
+  static const kGCst = (-kYScale * 16 + kUToG * 128 + kVToG * 128 + YUV_HALF2);
   static const kBCst = (-kYScale * 16 - kUToB * 128 + YUV_HALF2);
 }

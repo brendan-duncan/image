@@ -63,8 +63,7 @@ Uint8List maskFlood(Image src, int x, int y,
 
   _TestPixel array;
   if (threshold > 0) {
-    var lab =
-        rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
+    var lab = rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
 
     if (compareAlpha) {
       lab.add(getAlpha(srcColor).toDouble());

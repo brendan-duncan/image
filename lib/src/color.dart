@@ -100,7 +100,9 @@ int getChannel(int color, Channel channel) => channel == Channel.red
         ? getGreen(color)
         : channel == Channel.blue
             ? getBlue(color)
-            : channel == Channel.alpha ? getAlpha(color) : getLuminance(color);
+            : channel == Channel.alpha
+                ? getAlpha(color)
+                : getLuminance(color);
 
 /// Returns a new color, where the given [color]'s [channel] has been
 /// replaced with the given [value].
@@ -110,7 +112,9 @@ int setChannel(int color, Channel channel, int value) => channel == Channel.red
         ? setGreen(color, value)
         : channel == Channel.blue
             ? setBlue(color, value)
-            : channel == Channel.alpha ? setAlpha(color, value) : color;
+            : channel == Channel.alpha
+                ? setAlpha(color, value)
+                : color;
 
 /// Get the red channel from the [color].
 int getRed(int color) => (color) & 0xff;

@@ -121,7 +121,11 @@ class VP8L {
         final numColors = br.readBits(8) + 1;
         final bits = (numColors > 16)
             ? 0
-            : (numColors > 4) ? 1 : (numColors > 2) ? 2 : 3;
+            : (numColors > 4)
+                ? 1
+                : (numColors > 2)
+                    ? 2
+                    : 3;
         transformSize[0] = _subSampleSize(transform.xsize, bits);
         transform.bits = bits;
         transform.data = _decodeImageStream(numColors, 1, false);

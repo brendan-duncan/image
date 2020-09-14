@@ -572,12 +572,11 @@ class Image {
       return bytes is Uint32List
           ? bytes.sublist(0)
           : bytes is Uint8List
-          ? Uint32List.view(bytes.buffer).sublist(0)
-          : Uint32List.view(Uint8List.fromList(bytes).buffer);
+              ? Uint32List.view(bytes.buffer).sublist(0)
+              : Uint32List.view(Uint8List.fromList(bytes).buffer);
     }
 
-    var input =
-        bytes is Uint32List ? Uint8List.view(bytes.buffer) : bytes;
+    var input = bytes is Uint32List ? Uint8List.view(bytes.buffer) : bytes;
 
     var data = Uint32List(width * height);
     var rgba = Uint8List.view(data.buffer);

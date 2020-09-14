@@ -402,7 +402,11 @@ class PngDecoder extends Decoder {
       int xStep, int yStep, int passWidth, int passHeight) {
     final channels = (_info.colorType == GRAYSCALE_ALPHA)
         ? 2
-        : (_info.colorType == RGB) ? 3 : (_info.colorType == RGBA) ? 4 : 1;
+        : (_info.colorType == RGB)
+            ? 3
+            : (_info.colorType == RGBA)
+                ? 4
+                : 1;
 
     final pixelDepth = channels * _info.bits;
     final bpp = (pixelDepth + 7) >> 3;
@@ -461,7 +465,11 @@ class PngDecoder extends Decoder {
   void _process(InputBuffer input, Image image) {
     final channels = (_info.colorType == GRAYSCALE_ALPHA)
         ? 2
-        : (_info.colorType == RGB) ? 3 : (_info.colorType == RGBA) ? 4 : 1;
+        : (_info.colorType == RGB)
+            ? 3
+            : (_info.colorType == RGBA)
+                ? 4
+                : 1;
 
     final pixelDepth = channels * _info.bits;
 
@@ -617,7 +625,11 @@ class PngDecoder extends Decoder {
             ? 3
             : (numBits == 4)
                 ? 0xf
-                : (numBits == 8) ? 0xff : (numBits == 16) ? 0xffff : 0;
+                : (numBits == 8)
+                    ? 0xff
+                    : (numBits == 16)
+                        ? 0xffff
+                        : 0;
 
     var octet = (_bitBuffer >> (_bitBufferLen - numBits)) & mask;
 

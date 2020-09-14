@@ -691,20 +691,36 @@ class VP8Filter {
         abs1[255 + i] = abs0[255 + i] >> 1;
       }
       for (var i = -1020; i <= 1020; ++i) {
-        sclip1[1020 + i] = (i < -128) ? -128 : (i > 127) ? 127 : i;
+        sclip1[1020 + i] = (i < -128)
+            ? -128
+            : (i > 127)
+                ? 127
+                : i;
       }
       for (var i = -112; i <= 112; ++i) {
-        sclip2[112 + i] = (i < -16) ? -16 : (i > 15) ? 15 : i;
+        sclip2[112 + i] = (i < -16)
+            ? -16
+            : (i > 15)
+                ? 15
+                : i;
       }
       for (var i = -255; i <= 255 + 255; ++i) {
-        clip1[255 + i] = (i < 0) ? 0 : (i > 255) ? 255 : i;
+        clip1[255 + i] = (i < 0)
+            ? 0
+            : (i > 255)
+                ? 255
+                : i;
       }
       _tablesInitialized = true;
     }
   }
 
   static int _clip8b(int v) {
-    return ((v & -256) == 0) ? v : (v < 0) ? 0 : 255;
+    return ((v & -256) == 0)
+        ? v
+        : (v < 0)
+            ? 0
+            : 255;
   }
 
   //static int __maxN = 0;

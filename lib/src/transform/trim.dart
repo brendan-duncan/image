@@ -48,7 +48,9 @@ List<int> findTrim(Image src,
 
   final bg = (mode == TrimMode.topLeftColor)
       ? src.getPixel(0, 0)
-      : (mode == TrimMode.bottomRightColor) ? src.getPixel(w - 1, h - 1) : 0;
+      : (mode == TrimMode.bottomRightColor)
+          ? src.getPixel(w - 1, h - 1)
+          : 0;
 
   var xmin = w;
   var xmax = 0;

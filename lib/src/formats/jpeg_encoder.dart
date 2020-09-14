@@ -92,15 +92,21 @@ class JpegEncoder extends Encoder {
           // calculate YUV values
           YDU[pos] = ((RGB_YUV_TABLE[r] +
                       RGB_YUV_TABLE[(g + 256)] +
-                      RGB_YUV_TABLE[(b + 512)]) >> 16) - 128.0;
+                      RGB_YUV_TABLE[(b + 512)]) >>
+                  16) -
+              128.0;
 
           UDU[pos] = ((RGB_YUV_TABLE[(r + 768)] +
                       RGB_YUV_TABLE[(g + 1024)] +
-                      RGB_YUV_TABLE[(b + 1280)]) >> 16) - 128.0;
+                      RGB_YUV_TABLE[(b + 1280)]) >>
+                  16) -
+              128.0;
 
           VDU[pos] = ((RGB_YUV_TABLE[(r + 1280)] +
                       RGB_YUV_TABLE[(g + 1536)] +
-                      RGB_YUV_TABLE[(b + 1792)]) >> 16) - 128.0;
+                      RGB_YUV_TABLE[(b + 1792)]) >>
+                  16) -
+              128.0;
         }
 
         DCY = _processDU(fp, YDU, fdtbl_Y, DCY, YDC_HT, YAC_HT);

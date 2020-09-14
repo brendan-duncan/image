@@ -16,8 +16,7 @@ class Jpeg {
   static const DCTSIZE2 = 64; // DCTSIZE squared; # of elements in a block
   static const NUM_QUANT_TBLS = 4; // Quantization tables are numbered 0..3
   static const NUM_HUFF_TBLS = 4; // Huffman tables are numbered 0..3
-  static const NUM_ARITH_TBLS =
-      16; // Arith-coding tables are numbered 0..15
+  static const NUM_ARITH_TBLS = 16; // Arith-coding tables are numbered 0..15
   static const MAX_COMPS_IN_SCAN =
       4; // JPEG limit on # of components in one scan
   static const MAX_SAMP_FACTOR = 4; // JPEG limit on sampling factors

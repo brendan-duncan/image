@@ -91,19 +91,16 @@ class WebPDecoder extends Decoder {
       }
 
       final f = _info.frames[frame] as InternalWebPFrame;
-      final frameData =
-          _input.subset(f.frameSize, position: f.framePosition);
+      final frameData = _input.subset(f.frameSize, position: f.framePosition);
 
       return _decodeFrame(frameData, frame: frame);
     }
 
     if (_info.format == WebPInfo.FORMAT_LOSSLESS) {
-      final data =
-          _input.subset(_info.vp8Size, position: _info.vp8Position);
+      final data = _input.subset(_info.vp8Size, position: _info.vp8Position);
       return VP8L(data, _info).decode();
     } else if (_info.format == WebPInfo.FORMAT_LOSSY) {
-      final data =
-          _input.subset(_info.vp8Size, position: _info.vp8Position);
+      final data = _input.subset(_info.vp8Size, position: _info.vp8Position);
       return VP8(data, _info).decode();
     }
 
@@ -193,8 +190,7 @@ class WebPDecoder extends Decoder {
         return null;
       }
       final f = webp.frames[frame] as InternalWebPFrame;
-      final frameData =
-          input.subset(f.frameSize, position: f.framePosition);
+      final frameData = input.subset(f.frameSize, position: f.framePosition);
 
       return _decodeFrame(frameData, frame: frame);
     } else {

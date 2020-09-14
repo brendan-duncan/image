@@ -242,10 +242,10 @@ class InputBuffer {
           b.buffer, b.offsetInBytes + this.offset + offset, len);
     }
     return (buffer is Uint8List)
-        ? (buffer as Uint8List).sublist(this.offset + offset,
-            this.offset + offset + len)
-        : Uint8List.fromList(buffer.sublist(this.offset + offset,
-            this.offset + offset + len));
+        ? (buffer as Uint8List)
+            .sublist(this.offset + offset, this.offset + offset + len)
+        : Uint8List.fromList(
+            buffer.sublist(this.offset + offset, this.offset + offset + len));
   }
 
   Uint32List toUint32List([int offset = 0]) {

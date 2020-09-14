@@ -73,8 +73,8 @@ void main() {
           // Create a buffer that the canvas can draw.
           var d = c.context2D.createImageData(c.width, c.height);
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length,
-              newImage.getBytes(format: Format.rgba));
+          d.data.setRange(
+              0, d.data.length, newImage.getBytes(format: Format.rgba));
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
 

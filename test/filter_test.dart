@@ -122,8 +122,8 @@ void main() {
       fill(src, getColor(255, 0, 0));
       drawImage(src, dst, blend: false);
       File('.dart_tool/out/drawImage.jpg')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(writeJpg(src));
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(writeJpg(src));
     });
 
     test('brightness', () {

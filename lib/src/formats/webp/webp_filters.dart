@@ -138,7 +138,11 @@ class WebPFilters {
 
   static int _gradientPredictor(int a, int b, int c) {
     final g = a + b - c;
-    return ((g & ~0xff) == 0) ? g : (g < 0) ? 0 : 255; // clip to 8bit
+    return ((g & ~0xff) == 0)
+        ? g
+        : (g < 0)
+            ? 0
+            : 255; // clip to 8bit
   }
 
   static void _doGradientFilter(Uint8List src, int width, int height,
