@@ -204,7 +204,7 @@ class Image {
         return bytes;
       case Format.rgb:
         var bytes = Uint8List(width * height * 3);
-        for (var i = 0, j = 0, len = bytes.length; i < len; i += 4, j += 3) {
+        for (var i = 0, j = 0, len = bytes.length; j < len; i += 4, j += 3) {
           bytes[j + 0] = rgba[i + 0];
           bytes[j + 1] = rgba[i + 1];
           bytes[j + 2] = rgba[i + 2];
@@ -212,7 +212,7 @@ class Image {
         return bytes;
       case Format.bgr:
         var bytes = Uint8List(width * height * 3);
-        for (var i = 0, j = 0, len = bytes.length; i < len; i += 4, j += 3) {
+        for (var i = 0, j = 0, len = bytes.length; j < len; i += 4, j += 3) {
           bytes[j + 0] = rgba[i + 2];
           bytes[j + 1] = rgba[i + 1];
           bytes[j + 2] = rgba[i + 0];
