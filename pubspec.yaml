@@ -8,7 +8,7 @@ environment:
 dependencies:
   archive: '>=2.0.0 <3.0.0'
   xml: '>=4.2.0 <5.0.0'
-  meta: '>=1.2.0 <2.0.0'
+  meta: '>=1.1.8 <2.0.0'
 dev_dependencies:
   test: '>=1.0.0 <2.0.0'
   pedantic: '>=1.0.0 <2.0.0'
