@@ -1,3 +1,7 @@
+## 2.1.17 - September 20, 2020
+
+- Added 32-bit float and 16-bit half-float formats to the TIFF decoder.
+
 ## 2.1.16 - September 19, 2020
 
 - Downgrade Meta dependency to be compatible with flutter_test in the stable channel.
