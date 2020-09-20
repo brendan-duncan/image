@@ -1,3 +1,7 @@
+## 2.1.16 - September 19, 2020
+
+- Downgrade Meta dependency to be compatible with flutter_test in the stable channel.
+
 ## 2.1.15 - September 13, 2020
 
 - Fix Image.getBytes for cropping images
