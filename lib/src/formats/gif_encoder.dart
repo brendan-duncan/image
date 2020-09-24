@@ -16,15 +16,12 @@ class GifEncoder extends Encoder {
   /// After the last frame has been added, [finish] is required to be called.
   /// Optional frame [duration] is in 1/100 sec.
   void addFrame(Image image, {int duration}) {
-    if (duration != null) {
-      delay = duration;
-    }
-
     if (output == null) {
       output = OutputBuffer();
 
       _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
       _lastImage = _lastColorMap.getIndexMap(image);
+      _lastImageDuration = duration;
 
       _width = image.width;
       _height = image.height;
@@ -43,6 +40,7 @@ class GifEncoder extends Encoder {
 
     _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
     _lastImage = _lastColorMap.getIndexMap(image);
+    _lastImageDuration = duration;
   }
 
   /// Encode the images that were added with [addFrame].
@@ -310,7 +308,7 @@ class GifEncoder extends Encoder {
         0 | // 7   user input - 0 = none
         transparency); // 8   transparency flag
 
-    output.writeUint16(delay); // delay x 1/100 sec
+    output.writeUint16(_lastImageDuration ?? delay); // delay x 1/100 sec
     output.writeByte(0); // transparent color index
     output.writeByte(0); // block terminator
   }
@@ -326,6 +324,7 @@ class GifEncoder extends Encoder {
   }
 
   Uint8List _lastImage;
+  int _lastImageDuration;
   NeuralQuantizer _lastColorMap;
   int _width;
   int _height;
