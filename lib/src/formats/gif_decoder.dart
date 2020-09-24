@@ -196,7 +196,7 @@ class GifDecoder extends Decoder {
         lastImage = image;
       }
 
-      lastImage.duration = frame.duration;
+      lastImage.duration = frame.duration * 10; // Convert 1/100 sec to ms.
       anim.addFrame(lastImage);
     }
 

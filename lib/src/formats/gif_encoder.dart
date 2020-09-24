@@ -92,7 +92,10 @@ class GifEncoder extends Encoder {
   List<int> encodeAnimation(Animation anim) {
     repeat = anim.loopCount;
     for (var f in anim) {
-      addFrame(f, duration: f.duration);
+      addFrame(
+        f,
+        duration: f.duration ~/ 10, // Convert ms to 1/100 sec.
+      );
     }
     return finish();
   }
