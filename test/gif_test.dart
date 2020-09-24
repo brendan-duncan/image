@@ -84,7 +84,7 @@ void main() {
       for (var i = 1; i <= 3; i++) {
         final image = Image(480, 120);
         image.duration = i * 1000;
-        drawString(image, arial_48, 100, 60, i.toString());
+        drawString(image, arial_24, 50, 50, 'This frame is $i second(s) long');
         anim.addFrame(image);
       }
 
