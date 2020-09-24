@@ -14,6 +14,7 @@ class GifEncoder extends Encoder {
 
   /// This adds the frame passed to [image].
   /// After the last frame has been added, [finish] is required to be called.
+  /// Optional frame [duration] is in 1/100 sec.
   void addFrame(Image image, {int duration}) {
     if (duration != null) {
       delay = duration;
