@@ -79,6 +79,28 @@ void main() {
       expect(anim2.loopCount, equals(10));
     });
 
+    test('encodeAnimation with variable FPS', () {
+      final anim = Animation();
+      for (var i = 1; i <= 3; i++) {
+        final image = Image(480, 120);
+        image.duration = i * 1000;
+        drawString(image, arial_24, 50, 50, 'This frame is $i second(s) long');
+        anim.addFrame(image);
+      }
+
+      final gif = encodeGifAnimation(anim);
+      File('.dart_tool/out/gif/encodeAnimation_variable_fps.gif')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(gif);
+
+      final anim2 = GifDecoder().decodeAnimation(gif);
+      expect(anim2.length, equals(3));
+      expect(anim2.loopCount, equals(0));
+      expect(anim2[0].duration, equals(1000));
+      expect(anim2[1].duration, equals(2000));
+      expect(anim2[2].duration, equals(3000));
+    });
+
     test('encodeImage', () {
       final bytes = File('test/res/jpg/jpeg444.jpg').readAsBytesSync();
       final image = JpegDecoder().decodeImage(bytes);
