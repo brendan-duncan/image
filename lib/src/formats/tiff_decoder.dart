@@ -50,7 +50,7 @@ class TiffDecoder extends Decoder {
   Image decodeImage(List<int> data, {int frame = 0}) {
     var ptr = InputBuffer(data);
 
-    var info = _readHeader(ptr);
+    info = _readHeader(ptr);
     if (info == null) {
       return null;
     }
@@ -62,7 +62,7 @@ class TiffDecoder extends Decoder {
   HdrImage decodeHdrImage(List<int> data, {int frame = 0}) {
     var ptr = InputBuffer(data);
 
-    var info = _readHeader(ptr);
+    info = _readHeader(ptr);
     if (info == null) {
       return null;
     }
