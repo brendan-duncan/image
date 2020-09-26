@@ -23,7 +23,9 @@ class HdrSlice {
         type = type,
         data = type == HdrImage.HALF
             ? Uint16List(width * height)
-            : type == HdrImage.FLOAT
+            : type == HdrImage.FLOAT64
+              ? Float64List(width * height)
+              : type == HdrImage.FLOAT
                 ? Float32List(width * height)
                 : Uint32List(width * height);
 
@@ -35,7 +37,9 @@ class HdrSlice {
         type = other.type,
         data = other.type == HdrImage.HALF
             ? (other.data as Uint16List).sublist(0)
-            : other.type == HdrImage.FLOAT
+            : other.type == HdrImage.FLOAT64
+              ? (other.data as Float64List).sublist(0)
+              : other.type == HdrImage.FLOAT
                 ? (other.data as Float32List).sublist(0)
                 : (other.data as Uint32List).sublist(0);
 
@@ -43,7 +47,9 @@ class HdrSlice {
   Uint8List getBytes() => Uint8List.view(data.buffer as ByteBuffer);
 
   /// Does this channel store floating-point data?
-  bool get isFloat => type == HdrImage.FLOAT || type == HdrImage.HALF;
+  bool get isFloat => type == HdrImage.FLOAT
+      || type == HdrImage.FLOAT64
+      || type == HdrImage.HALF;
 
   /// Get the float value of the sample at the coordinates [x],[y].
   /// [Half] samples are converted to double.
@@ -60,7 +66,7 @@ class HdrSlice {
   ///[FLOAT] or [HALF] slices.
   void setFloat(int x, int y, num v) {
     final pi = y * width + x;
-    if (type == HdrImage.FLOAT) {
+    if (type == HdrImage.FLOAT || type == HdrImage.FLOAT64) {
       data[pi] = v;
     } else if (type == HdrImage.HALF) {
       data[pi] = Half.DoubleToHalf(v);

@@ -6,9 +6,10 @@ import 'hdr_slice.dart';
 /// A high dynamic range RGBA image stored in 16-bit or 32-bit floating-point
 /// channels.
 class HdrImage {
+  static const UINT = 0;
   static const HALF = 1;
   static const FLOAT = 2;
-  static const UINT = 0;
+  static const FLOAT64 = 3;
 
   /// Red value of a sample
   static const String R = 'R';

@@ -278,12 +278,13 @@ class TiffImage {
     }
 
     InputBuffer bdata;
-    if (bitsPerSample == 8 || bitsPerSample == 16 || bitsPerSample == 32) {
+    if (bitsPerSample == 8 || bitsPerSample == 16 || bitsPerSample == 32 ||
+        bitsPerSample == 64) {
       if (compression == COMPRESSION_NONE) {
         bdata = p;
       } else if (compression == COMPRESSION_LZW) {
         bdata = InputBuffer(Uint8List(bytesInThisTile));
-        var decoder = LzwDecoder();
+        final decoder = LzwDecoder();
         try {
           decoder.decode(
               InputBuffer.from(p, offset: 0, length: byteCount), bdata.buffer);
@@ -339,6 +340,8 @@ class TiffImage {
               var sample = 0.0;
               if (bitsPerSample == 32) {
                 sample = bdata.readFloat32();
+              } else if (bitsPerSample == 64) {
+                sample = bdata.readFloat64();
               } else if (bitsPerSample == 16) {
                 sample = Half.HalfToDouble(bdata.readUint16());
               }
@@ -435,6 +438,10 @@ class TiffImage {
                 r = bdata.readFloat32();
                 g = bdata.readFloat32();
                 b = bdata.readFloat32();
+              } else if (bitsPerSample == 64) {
+                r = bdata.readFloat64();
+                g = bdata.readFloat64();
+                b = bdata.readFloat64();
               } else if (bitsPerSample == 16) {
                 r = Half.HalfToDouble(bdata.readUint16());
                 g = Half.HalfToDouble(bdata.readUint16());
@@ -495,6 +502,11 @@ class TiffImage {
                 g = bdata.readFloat32();
                 b = bdata.readFloat32();
                 a = bdata.readFloat32();
+              } else if (bitsPerSample == 64) {
+                r = bdata.readFloat64();
+                g = bdata.readFloat64();
+                b = bdata.readFloat64();
+                a = bdata.readFloat64();
               } else if (bitsPerSample == 16) {
                 r = Half.HalfToDouble(bdata.readUint16());
                 g = Half.HalfToDouble(bdata.readUint16());
