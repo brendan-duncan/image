@@ -1,3 +1,10 @@
+## 2.1.18 - September 25, 2020
+
+- Added 64-bit float format to TIFF decoder.
+- Fixed issues with TiffDecoder.decodeHdrImage.
+- Added range clamping to copyCrop to avoid out-of-bound errors.
+- Variable FPS for animated GIF encoding. 
+
 ## 2.1.17 - September 20, 2020
 
 - Added 32-bit float and 16-bit half-float formats to the TIFF decoder.
