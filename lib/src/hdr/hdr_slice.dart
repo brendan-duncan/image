@@ -24,10 +24,10 @@ class HdrSlice {
         data = type == HdrImage.HALF
             ? Uint16List(width * height)
             : type == HdrImage.FLOAT64
-              ? Float64List(width * height)
-              : type == HdrImage.FLOAT
-                ? Float32List(width * height)
-                : Uint32List(width * height);
+                ? Float64List(width * height)
+                : type == HdrImage.FLOAT
+                    ? Float32List(width * height)
+                    : Uint32List(width * height);
 
   /// Create a copy of the [other] HdrSlice.
   HdrSlice.from(HdrSlice other)
@@ -38,18 +38,19 @@ class HdrSlice {
         data = other.type == HdrImage.HALF
             ? (other.data as Uint16List).sublist(0)
             : other.type == HdrImage.FLOAT64
-              ? (other.data as Float64List).sublist(0)
-              : other.type == HdrImage.FLOAT
-                ? (other.data as Float32List).sublist(0)
-                : (other.data as Uint32List).sublist(0);
+                ? (other.data as Float64List).sublist(0)
+                : other.type == HdrImage.FLOAT
+                    ? (other.data as Float32List).sublist(0)
+                    : (other.data as Uint32List).sublist(0);
 
   /// Get the raw bytes of the data buffer.
   Uint8List getBytes() => Uint8List.view(data.buffer as ByteBuffer);
 
   /// Does this channel store floating-point data?
-  bool get isFloat => type == HdrImage.FLOAT
-      || type == HdrImage.FLOAT64
-      || type == HdrImage.HALF;
+  bool get isFloat =>
+      type == HdrImage.FLOAT ||
+      type == HdrImage.FLOAT64 ||
+      type == HdrImage.HALF;
 
   /// Get the float value of the sample at the coordinates [x],[y].
   /// [Half] samples are converted to double.

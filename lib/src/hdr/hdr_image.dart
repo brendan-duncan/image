@@ -43,7 +43,9 @@ class HdrImage {
     if (channels < 0 || channels > 4) {
       return;
     }
-    if (format != HALF && format != FLOAT && format != FLOAT64 &&
+    if (format != HALF &&
+        format != FLOAT &&
+        format != FLOAT64 &&
         format != UINT) {
       return;
     }

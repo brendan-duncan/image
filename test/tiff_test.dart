@@ -84,7 +84,8 @@ void main() {
       expect(image.numChannels, equals(1));
       expect(image.red.data[11], equals(-9999.0));
       var img = hdrToImage(image);
-      File('.dart_tool/out/tif/dtm_test.hdr.png').writeAsBytesSync(encodePng(img));
+      File('.dart_tool/out/tif/dtm_test.hdr.png')
+          .writeAsBytesSync(encodePng(img));
     });
   });
 }

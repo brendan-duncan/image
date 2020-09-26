@@ -244,12 +244,19 @@ class TiffImage {
   }
 
   HdrImage decodeHdr(InputBuffer p) {
-    hdrImage = HdrImage.create(width, height, samplesPerPixel,
-        sampleFormat == FORMAT_UINT ? HdrImage.UINT :
-        bitsPerSample == 16 ? HdrImage.HALF :
-        bitsPerSample == 32 ? HdrImage.FLOAT :
-        bitsPerSample == 64 ? HdrImage.FLOAT64 :
-        HdrImage.FLOAT);
+    hdrImage = HdrImage.create(
+        width,
+        height,
+        samplesPerPixel,
+        sampleFormat == FORMAT_UINT
+            ? HdrImage.UINT
+            : bitsPerSample == 16
+                ? HdrImage.HALF
+                : bitsPerSample == 32
+                    ? HdrImage.FLOAT
+                    : bitsPerSample == 64
+                        ? HdrImage.FLOAT64
+                        : HdrImage.FLOAT);
     for (var tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
       for (var tileX = 0; tileX < tilesX; ++tileX, ++ti) {
         _decodeTile(p, tileX, tileY);
@@ -283,7 +290,9 @@ class TiffImage {
     }
 
     InputBuffer bdata;
-    if (bitsPerSample == 8 || bitsPerSample == 16 || bitsPerSample == 32 ||
+    if (bitsPerSample == 8 ||
+        bitsPerSample == 16 ||
+        bitsPerSample == 32 ||
         bitsPerSample == 64) {
       if (compression == COMPRESSION_NONE) {
         bdata = p;
