@@ -34,6 +34,14 @@ void main() {
       fp.writeAsBytesSync(writeJpg(s));
     });
 
+    test('copyCrop', () {
+      final s = readPng(File('test/res/png/lenna.png').readAsBytesSync());
+      final d = copyCrop(s, 200, 200, 5000, 5000);
+      final fp = File('.dart_tool/out/copyCrop.jpg');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writeJpg(d));
+    });
+
     test('copyRectify', () {
       final s = readJpg(File('test/res/oblique.jpg').readAsBytesSync());
       final d = Image(92, 119);
@@ -120,10 +128,10 @@ void main() {
       fill(dst, getColor(0, 255, 0));
       final src = Image(100, 100);
       fill(src, getColor(255, 0, 0));
-      drawImage(src, dst, blend: false);
+      drawImage(dst, src, blend: false, dstX: 100, dstY: 100);
       File('.dart_tool/out/drawImage.jpg')
         ..createSync(recursive: true)
-        ..writeAsBytesSync(writeJpg(src));
+        ..writeAsBytesSync(writeJpg(dst));
     });
 
     test('brightness', () {
@@ -144,7 +152,7 @@ void main() {
 
     test('colorOffset', () {
       var f = Image.from(image);
-      colorOffset(f, red: 5);
+      colorOffset(f, red: 100);
 
       File('.dart_tool/out/colorOffset.jpg')
         ..createSync(recursive: true)
