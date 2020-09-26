@@ -7,9 +7,8 @@ import 'hdr_slice.dart';
 /// channels.
 class HdrImage {
   static const UINT = 0;
-  static const HALF = 1;
-  static const FLOAT = 2;
-  static const FLOAT64 = 3;
+  static const INT = 1;
+  static const FLOAT = 3;
 
   /// Red value of a sample
   static const String R = 'R';
@@ -39,20 +38,14 @@ class HdrImage {
   HdrImage();
 
   /// Create an RGB[A] image.
-  HdrImage.create(int width, int height, int channels, int format) {
+  HdrImage.create(int width, int height, int channels,
+      int type, int bitsPerSample) {
     if (channels < 0 || channels > 4) {
       return;
     }
-    if (format != HALF &&
-        format != FLOAT &&
-        format != FLOAT64 &&
-        format != UINT) {
-      return;
-    }
-
     const channelList = [R, G, B, A];
     for (var i = 0; i < channels; ++i) {
-      addSlice(HdrSlice(channelList[i], width, height, format));
+      addSlice(HdrSlice(channelList[i], width, height, type, bitsPerSample));
     }
   }
 
@@ -66,12 +59,12 @@ class HdrImage {
 
   /// Create an HDR image from a LDR [Image] by transforming the channel values
   /// to the range [0, 1].
-  HdrImage.fromImage(Image other) {
-    addSlice(HdrSlice(R, other.width, other.height, HALF));
-    addSlice(HdrSlice(G, other.width, other.height, HALF));
-    addSlice(HdrSlice(B, other.width, other.height, HALF));
+  HdrImage.fromImage(Image other, {int type = FLOAT, int bitsPerSample = 16}) {
+    addSlice(HdrSlice(R, other.width, other.height, type, bitsPerSample));
+    addSlice(HdrSlice(G, other.width, other.height, type, bitsPerSample));
+    addSlice(HdrSlice(B, other.width, other.height, type, bitsPerSample));
     if (other.channels == Channels.rgba) {
-      addSlice(HdrSlice(A, other.width, other.height, HALF));
+      addSlice(HdrSlice(A, other.width, other.height, type, bitsPerSample));
     }
     final rgb = other.getBytes();
     for (var y = 0, si = 0; y < other.height; ++y) {
@@ -102,14 +95,22 @@ class HdrImage {
   int get height => slices.isEmpty ? 0 : slices.values.first.height;
 
   /// Get the value of the red channel at the given pixel coordinates [x], [y].
-  double getRed(int x, int y) {
-    return red != null ? red.getFloat(x, y) : 0.0;
+  num getRed(int x, int y) {
+    return red != null
+        ? red.isFloat
+          ? red.getFloat(x, y)
+          : red.getInt(x, y)
+        : 0;
   }
 
   /// Set the value of the red channel at the given pixel coordinates [x], [y].
   void setRed(int x, int y, num c) {
     if (red != null) {
-      red.setFloat(x, y, c);
+      if (red.isFloat) {
+        red.setFloat(x, y, c);
+      } else {
+        red.setInt(x, y, c as int);
+      }
     }
   }
 
@@ -120,14 +121,22 @@ class HdrImage {
   }
 
   /// Get the value of the green channel at the given pixel coordinates [x], [y].
-  double getGreen(int x, int y) {
-    return green != null ? green.getFloat(x, y) : 0.0;
+  num getGreen(int x, int y) {
+    return green != null
+        ? green.isFloat
+        ? green.getFloat(x, y)
+        : green.getInt(x, y)
+        : 0;
   }
 
   /// Set the value of the green channel at the given pixel coordinates [x], [y].
   void setGreen(int x, int y, num c) {
     if (green != null) {
-      green.setFloat(x, y, c);
+      if (red.isFloat) {
+        green.setFloat(x, y, c);
+      } else {
+        green.setInt(x, y, c as int);
+      }
     }
   }
 
@@ -138,14 +147,22 @@ class HdrImage {
   }
 
   /// Get the value of the blue channel at the given pixel coordinates [x], [y].
-  double getBlue(int x, int y) {
-    return blue != null ? blue.getFloat(x, y) : 0.0;
+  num getBlue(int x, int y) {
+    return blue != null
+        ? blue.isFloat
+        ? blue.getFloat(x, y)
+        : blue.getInt(x, y)
+        : 0;
   }
 
   /// Set the value of the blue channel at the given pixel coordinates [x], [y].
   void setBlue(int x, int y, num c) {
-    if (blue != null) {
-      blue.setFloat(x, y, c);
+    if (green != null) {
+      if (blue.isFloat) {
+        blue.setFloat(x, y, c);
+      } else {
+        blue.setInt(x, y, c as int);
+      }
     }
   }
 
@@ -156,14 +173,22 @@ class HdrImage {
   }
 
   /// Get the value of the alpha channel at the given pixel coordinates [x], [y].
-  double getAlpha(int x, int y) {
-    return alpha != null ? alpha.getFloat(x, y) : 0.0;
+  num getAlpha(int x, int y) {
+    return alpha != null
+        ? alpha.isFloat
+        ? alpha.getFloat(x, y)
+        : alpha.getInt(x, y)
+        : 0;
   }
 
   /// Set the value of the alpha channel at the given pixel coordinates [x], [y].
-  void setAlpha(int x, int y, double c) {
+  void setAlpha(int x, int y, num c) {
     if (alpha != null) {
-      alpha.setFloat(x, y, c);
+      if (alpha.isFloat) {
+        alpha.setFloat(x, y, c);
+      } else {
+        alpha.setInt(x, y, c as int);
+      }
     }
   }
 
@@ -174,14 +199,22 @@ class HdrImage {
   }
 
   /// Get the value of the depth channel at the given pixel coordinates [x], [y].
-  double getDepth(int x, int y) {
-    return depth != null ? depth.getFloat(x, y) : 0.0;
+  num getDepth(int x, int y) {
+    return depth != null
+        ? depth.isFloat
+        ? depth.getFloat(x, y)
+        : depth.getInt(x, y)
+        : 0;
   }
 
   /// Set the value of the depth channel at the given pixel coordinates [x], [y].
-  void setDepth(int x, int y, double c) {
+  void setDepth(int x, int y, num c) {
     if (depth != null) {
-      depth.setFloat(x, y, c);
+      if (depth.isFloat) {
+        depth.setFloat(x, y, c);
+      } else {
+        depth.setInt(x, y, c as int);
+      }
     }
   }
 

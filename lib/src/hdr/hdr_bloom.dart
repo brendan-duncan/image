@@ -63,11 +63,11 @@ HdrImage hdrBloom(HdrImage hdr, {double radius = 0.01, double weight = 0.1}) {
     // Mix bloom effect into each pixel
     for (var y = 0, offset = 0; y < hdr.height; ++y) {
       for (var x = 0; x < hdr.width; ++x, offset += 3) {
-        hdr.setRed(x, y, _lerp(weight, hdr.getRed(x, y), bloomImage[offset]));
+        hdr.setRed(x, y, _lerp(weight, hdr.getRed(x, y).toDouble(), bloomImage[offset]));
         hdr.setGreen(
-            x, y, _lerp(weight, hdr.getGreen(x, y), bloomImage[offset + 1]));
+            x, y, _lerp(weight, hdr.getGreen(x, y).toDouble(), bloomImage[offset + 1]));
         hdr.setBlue(
-            x, y, _lerp(weight, hdr.getBlue(x, y), bloomImage[offset + 2]));
+            x, y, _lerp(weight, hdr.getBlue(x, y).toDouble(), bloomImage[offset + 2]));
       }
     }
   }

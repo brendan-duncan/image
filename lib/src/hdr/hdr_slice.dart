@@ -9,25 +9,55 @@ class HdrSlice {
   final int width;
   final int height;
 
-  /// Indicates the type of data stored by the slice, either [HdrImage.HALF],
+  /// Indicates the type of data stored by the slice, either [HdrImage.INT],
   /// [HdrImage.FLOAT], or [HdrImage.UINT].
   final int type;
+  /// How many bits per sample, either 8, 16, 32, or 64.
+  final int bitsPerSample;
 
-  /// [data] will be either Uint16List, Float32List, or Uint32List depending
-  /// on the type being HALF, FLOAT or UINT respectively.
+  /// [data] will be one of the type data lists, depending on the [type] and
+  /// [bitsPerSample]. 16-bit FLOAT slices will be stored in a [Uint16List].
   final dynamic data;
 
-  HdrSlice(this.name, int width, int height, int type)
+  static dynamic allocateDataForType(int size, int type, int bitsPerSample) {
+    switch (type) {
+      case HdrImage.INT:
+        if (bitsPerSample == 8) {
+          return Int8List(size);
+        } else if (bitsPerSample == 16) {
+          return Int16List(size);
+        } else if (bitsPerSample == 32) {
+          return Int32List(size);
+        }
+        break;
+      case HdrImage.UINT:
+        if (bitsPerSample == 8) {
+          return Uint8List(size);
+        } else if (bitsPerSample == 16) {
+          return Uint16List(size);
+        } else if (bitsPerSample == 32) {
+          return Uint32List(size);
+        }
+        break;
+      case HdrImage.FLOAT:
+        if (bitsPerSample == 16) {
+          return Uint16List(size);
+        } else if (bitsPerSample == 32) {
+          return Float32List(size);
+        } else if (bitsPerSample == 64) {
+          return Float64List(size);
+        }
+        break;
+    }
+    return null;
+  }
+
+  HdrSlice(this.name, int width, int height, int type, int bitsPerSample)
       : width = width,
         height = height,
         type = type,
-        data = type == HdrImage.HALF
-            ? Uint16List(width * height)
-            : type == HdrImage.FLOAT64
-                ? Float64List(width * height)
-                : type == HdrImage.FLOAT
-                    ? Float32List(width * height)
-                    : Uint32List(width * height);
+        bitsPerSample = bitsPerSample,
+        data = allocateDataForType(width * height, type, bitsPerSample);
 
   /// Create a copy of the [other] HdrSlice.
   HdrSlice.from(HdrSlice other)
@@ -35,54 +65,63 @@ class HdrSlice {
         width = other.width,
         height = other.height,
         type = other.type,
-        data = other.type == HdrImage.HALF
-            ? (other.data as Uint16List).sublist(0)
-            : other.type == HdrImage.FLOAT64
-                ? (other.data as Float64List).sublist(0)
-                : other.type == HdrImage.FLOAT
-                    ? (other.data as Float32List).sublist(0)
-                    : (other.data as Uint32List).sublist(0);
+        bitsPerSample = other.bitsPerSample,
+        data = other.data.sublist(0);
 
   /// Get the raw bytes of the data buffer.
   Uint8List getBytes() => Uint8List.view(data.buffer as ByteBuffer);
 
   /// Does this channel store floating-point data?
-  bool get isFloat =>
-      type == HdrImage.FLOAT ||
-      type == HdrImage.FLOAT64 ||
-      type == HdrImage.HALF;
+  bool get isFloat => type == HdrImage.FLOAT;
+
+  int get _maxIntSize {
+    var v = (bitsPerSample == 8
+            ? 0xff
+            : bitsPerSample == 16
+            ? 0xffff
+            : 0xffffffff);
+    if (type == HdrImage.INT) {
+      v -= 1;
+    }
+    return v;
+  }
 
   /// Get the float value of the sample at the coordinates [x],[y].
   /// [Half] samples are converted to double.
-  /// An exception will occur if the slice stores UINT data.
   double getFloat(int x, int y) {
     final pi = y * width + x;
-    var s = (type == HdrImage.HALF)
+    if (type == HdrImage.INT || type == HdrImage.UINT) {
+      return (data[pi] as int) / _maxIntSize;
+    }
+    var s = (type == HdrImage.FLOAT && bitsPerSample == 16)
         ? Half.HalfToDouble(data[pi] as int)
         : data[pi] as double;
     return s;
   }
 
   /// Set the float value of the sample at the coordinates [x],[y] for
-  ///[FLOAT] or [HALF] slices.
+  ///[FLOAT] slices.
   void setFloat(int x, int y, num v) {
+    if (type != HdrImage.FLOAT) {
+      return;
+    }
     final pi = y * width + x;
-    if (type == HdrImage.FLOAT || type == HdrImage.FLOAT64) {
-      data[pi] = v;
-    } else if (type == HdrImage.HALF) {
+    if (bitsPerSample == 16) {
       data[pi] = Half.DoubleToHalf(v);
+    } else {
+      data[pi] = v;
     }
   }
 
   /// Get the int value of the sample at the coordinates [x],[y].
-  ///An exception will occur if the slice stores FLOAT or HALF data.
+  ///An exception will occur if the slice stores FLOAT data.
   int getInt(int x, int y) {
     final pi = y * width + x;
     return data[pi] as int;
   }
 
-  /// Set the int value of the sample at the coordinates [x],[y] for [UINT]
-  /// slices.
+  /// Set the int value of the sample at the coordinates [x],[y] for [INT] and
+  /// [UINT] slices.
   void setInt(int x, int y, int v) {
     final pi = y * width + x;
     data[pi] = v;

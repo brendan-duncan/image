@@ -1,11 +1,10 @@
 import '../../image_exception.dart';
-import '../../hdr/hdr_image.dart';
 import '../../util/input_buffer.dart';
 
 class ExrChannel {
-  static const TYPE_UINT = HdrImage.UINT;
-  static const TYPE_HALF = HdrImage.HALF;
-  static const TYPE_FLOAT = HdrImage.FLOAT;
+  static const TYPE_UINT = 0;
+  static const TYPE_HALF = 1;
+  static const TYPE_FLOAT = 2;
 
   // Channel Names
 

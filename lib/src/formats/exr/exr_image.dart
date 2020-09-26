@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:image/image.dart';
+
 import '../../image_exception.dart';
 import '../../formats/decode_info.dart';
 import '../../hdr/hdr_slice.dart';
@@ -114,7 +116,11 @@ class ExrImage extends DecodeInfo {
           width = part.width;
           height = part.height;
           framebuffer
-              .addSlice(HdrSlice(ch.name, part.width, part.height, ch.type));
+              .addSlice(HdrSlice(ch.name, part.width, part.height,
+                ch.type == ExrChannel.TYPE_UINT
+                    ? HdrImage.UINT
+                    : HdrImage.FLOAT,
+                8 * ch.size));
         }
       }
 

@@ -250,13 +250,10 @@ class TiffImage {
         samplesPerPixel,
         sampleFormat == FORMAT_UINT
             ? HdrImage.UINT
-            : bitsPerSample == 16
-                ? HdrImage.HALF
-                : bitsPerSample == 32
-                    ? HdrImage.FLOAT
-                    : bitsPerSample == 64
-                        ? HdrImage.FLOAT64
-                        : HdrImage.FLOAT);
+            : sampleFormat == FORMAT_INT
+              ? HdrImage.INT
+              : HdrImage.FLOAT,
+        bitsPerSample);
     for (var tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
       for (var tileX = 0; tileX < tilesX; ++tileX, ++ti) {
         _decodeTile(p, tileX, tileY);
@@ -376,29 +373,35 @@ class TiffImage {
                 image.setPixel(px, py, c);
               }
             } else {
-              var gray = bdata[pi++];
-              var gray16 = gray;
-              // down-sample 16-bit to 8-bit..
-              if (bitsPerSample == 16) {
-                if (!p.bigEndian) {
-                  gray = bdata[pi++];
-                  gray16 = gray << 8 | gray16;
-                } else {
-                  gray16 = gray16 << 8 | bdata[pi++];
-                }
-              }
-
-              if (photometricType == 0) {
-                gray = 255 - gray;
-                gray16 = 0xffff - gray16;
+              var gray = 0;
+              if (bitsPerSample == 8) {
+                gray = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt8()
+                    : bdata.readByte();
+              } else if (bitsPerSample == 16) {
+                gray = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt16()
+                    : bdata.readUint16();
+              } else if (bitsPerSample == 32) {
+                gray = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt32()
+                    : bdata.readUint32();
               }
 
               if (hdrImage != null) {
-                var fg = gray16 / 0xffff;
-                hdrImage.setRed(px, py, fg);
+                hdrImage.setRed(px, py, gray);
               }
 
               if (image != null) {
+                gray = (bitsPerSample == 16)
+                    ? gray >> 8
+                    : (bitsPerSample == 32)
+                      ? gray >> 24
+                      : gray;
+                if (photometricType == 0) {
+                  gray = 255 - gray;
+                }
+
                 int c;
                 if (photometricType == 3 && colorMap != null) {
                   c = getColor(
@@ -413,25 +416,47 @@ class TiffImage {
               }
             }
           } else if (samplesPerPixel == 2) {
-            var gray = bdata[pi++];
-            var gray16 = gray;
-            if (bitsPerSample == 16) {
-              gray16 = gray16 << 8 | bdata[pi++];
-            }
-            var alpha = bdata[pi++];
-            var alpha16 = alpha;
-            if (bitsPerSample == 16) {
-              alpha16 = alpha16 << 8 | bdata[pi++];
+            var gray = 0;
+            var alpha = 0;
+            if (bitsPerSample == 8) {
+              gray = sampleFormat == TiffImage.FORMAT_INT
+                  ? bdata.readInt8()
+                  : bdata.readByte();
+              alpha = sampleFormat == TiffImage.FORMAT_INT
+                  ? bdata.readInt8()
+                  : bdata.readByte();
+            } else if (bitsPerSample == 16) {
+              gray = sampleFormat == TiffImage.FORMAT_INT
+                  ? bdata.readInt16()
+                  : bdata.readUint16();
+              alpha = sampleFormat == TiffImage.FORMAT_INT
+                  ? bdata.readInt16()
+                  : bdata.readUint16();
+            } else if (bitsPerSample == 32) {
+              gray = sampleFormat == TiffImage.FORMAT_INT
+                  ? bdata.readInt32()
+                  : bdata.readUint32();
+              alpha = sampleFormat == TiffImage.FORMAT_INT
+                  ? bdata.readInt32()
+                  : bdata.readUint32();
             }
 
             if (hdrImage != null) {
-              var fg = gray16 / 0xffff;
-              var fa = alpha16 / 0xffff;
-              hdrImage.setRed(px, py, fg);
-              hdrImage.setGreen(px, py, fg);
+              hdrImage.setRed(px, py, gray);
+              hdrImage.setGreen(px, py, alpha);
             }
 
             if (image != null) {
+              gray = (bitsPerSample == 16)
+                  ? gray >> 8
+                  : (bitsPerSample == 32)
+                  ? gray >> 24
+                  : gray;
+              alpha = (bitsPerSample == 16)
+                  ? alpha >> 8
+                  : (bitsPerSample == 32)
+                  ? alpha >> 24
+                  : alpha;
               var c = getColor(gray, gray, gray, alpha);
               image.setPixel(px, py, c);
             }
@@ -466,31 +491,63 @@ class TiffImage {
                 image.setPixel(px, py, c);
               }
             } else {
-              var r = bdata[pi++];
-              var r16 = r;
-              if (bitsPerSample == 16) {
-                r16 = r16 << 8 | bdata[pi++];
-              }
-
-              var g = bdata[pi++];
-              var g16 = r;
-              if (bitsPerSample == 16) {
-                g16 = g16 << 8 | bdata[pi++];
-              }
-
-              var b = bdata[pi++];
-              var b16 = r;
-              if (bitsPerSample == 16) {
-                b16 = b16 << 8 | bdata[pi++];
+              var r = 0;
+              var g = 0;
+              var b = 0;
+              if (bitsPerSample == 8) {
+                r = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt8()
+                    : bdata.readByte();
+                g = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt8()
+                    : bdata.readByte();
+                b = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt8()
+                    : bdata.readByte();
+              } else if (bitsPerSample == 16) {
+                r = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt16()
+                    : bdata.readUint16();
+                g = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt16()
+                    : bdata.readUint16();
+                b = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt16()
+                    : bdata.readUint16();
+              } else if (bitsPerSample == 32) {
+                r = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt32()
+                    : bdata.readUint32();
+                g = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt32()
+                    : bdata.readUint32();
+                b = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt32()
+                    : bdata.readUint32();
               }
 
               if (hdrImage != null) {
-                hdrImage.setRed(px, py, r16 / 0xffff);
-                hdrImage.setGreen(px, py, g16 / 0xffff);
-                hdrImage.setBlue(px, py, b16 / 0xffff);
+                hdrImage.setRed(px, py, r);
+                hdrImage.setGreen(px, py, g);
+                hdrImage.setBlue(px, py, b);
               }
 
               if (image != null) {
+                r = (bitsPerSample == 16)
+                    ? r >> 8
+                    : (bitsPerSample == 32)
+                    ? r >> 24
+                    : r;
+                g = (bitsPerSample == 16)
+                    ? g >> 8
+                    : (bitsPerSample == 32)
+                    ? g >> 24
+                    : g;
+                b = (bitsPerSample == 16)
+                    ? b >> 8
+                    : (bitsPerSample == 32)
+                    ? b >> 24
+                    : b;
                 var c = getColor(r, g, b, 255);
                 image.setPixel(px, py, c);
               }
@@ -532,38 +589,79 @@ class TiffImage {
                 image.setPixel(px, py, c);
               }
             } else {
-              var r = bdata[pi++];
-              var r16 = r;
-              if (bitsPerSample == 16) {
-                r16 = r16 << 8 | bdata[pi++];
-              }
-
-              var g = bdata[pi++];
-              var g16 = g;
-              if (bitsPerSample == 16) {
-                g16 = g16 << 8 | bdata[pi++];
-              }
-
-              var b = bdata[pi++];
-              var b16 = b;
-              if (bitsPerSample == 16) {
-                b16 = b16 << 8 | bdata[pi++];
-              }
-
-              var a = bdata[pi++];
-              var a16 = a;
-              if (bitsPerSample == 16) {
-                a16 = a16 << 8 | bdata[pi++];
+              var r = 0;
+              var g = 0;
+              var b = 0;
+              var a = 0;
+              if (bitsPerSample == 8) {
+                r = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt8()
+                    : bdata.readByte();
+                g = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt8()
+                    : bdata.readByte();
+                b = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt8()
+                    : bdata.readByte();
+                a = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt8()
+                    : bdata.readByte();
+              } else if (bitsPerSample == 16) {
+                r = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt16()
+                    : bdata.readUint16();
+                g = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt16()
+                    : bdata.readUint16();
+                b = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt16()
+                    : bdata.readUint16();
+                a = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt16()
+                    : bdata.readUint16();
+              } else if (bitsPerSample == 32) {
+                r = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt32()
+                    : bdata.readUint32();
+                g = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt32()
+                    : bdata.readUint32();
+                b = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt32()
+                    : bdata.readUint32();
+                a = sampleFormat == TiffImage.FORMAT_INT
+                    ? bdata.readInt32()
+                    : bdata.readUint32();
               }
 
               if (hdrImage != null) {
-                hdrImage.setRed(px, py, r16 / 0xffff);
-                hdrImage.setGreen(px, py, g16 / 0xffff);
-                hdrImage.setBlue(px, py, b16 / 0xffff);
-                hdrImage.setAlpha(px, py, a16 / 0xffff);
+                hdrImage.setRed(px, py, r);
+                hdrImage.setGreen(px, py, g);
+                hdrImage.setBlue(px, py, b);
+                hdrImage.setAlpha(px, py, a);
               }
 
               if (image != null) {
+                r = (bitsPerSample == 16)
+                    ? r >> 8
+                    : (bitsPerSample == 32)
+                    ? r >> 24
+                    : r;
+                g = (bitsPerSample == 16)
+                    ? g >> 8
+                    : (bitsPerSample == 32)
+                    ? g >> 24
+                    : g;
+                b = (bitsPerSample == 16)
+                    ? b >> 8
+                    : (bitsPerSample == 32)
+                    ? b >> 24
+                    : b;
+                a = (bitsPerSample == 16)
+                    ? a >> 8
+                    : (bitsPerSample == 32)
+                    ? a >> 24
+                    : a;
                 var c = getColor(r, g, b, a);
                 image.setPixel(px, py, c);
               }

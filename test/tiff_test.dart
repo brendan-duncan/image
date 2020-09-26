@@ -78,13 +78,24 @@ void main() {
   });
 
   group('TIFF/dtm_test', () {
-    test('dtm_test.tiff', () {
-      final bytes = File('test/res/tiff/dtm_test.tiff').readAsBytesSync();
+    test('dtm_test.tif', () {
+      final bytes = File('test/res/tiff/dtm_test.tif').readAsBytesSync();
       var image = TiffDecoder().decodeHdrImage(bytes);
       expect(image.numChannels, equals(1));
       expect(image.red.data[11], equals(-9999.0));
       var img = hdrToImage(image);
       File('.dart_tool/out/tif/dtm_test.hdr.png')
+          .writeAsBytesSync(encodePng(img));
+    });
+  });
+
+  group('TIFF/tca32int', () {
+    test('tca32int.tif', () {
+      final bytes = File('test/res/tiff/tca32int.tif').readAsBytesSync();
+      var image = TiffDecoder().decodeHdrImage(bytes);
+      expect(image.numChannels, equals(1));
+      var img = hdrToImage(image);
+      File('.dart_tool/out/tif/tca32int.hdr.png')
           .writeAsBytesSync(encodePng(img));
     });
   });
