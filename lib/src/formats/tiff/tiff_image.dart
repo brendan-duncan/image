@@ -244,7 +244,12 @@ class TiffImage {
   }
 
   HdrImage decodeHdr(InputBuffer p) {
-    hdrImage = HdrImage.create(width, height, 4, HdrImage.HALF);
+    hdrImage = HdrImage.create(width, height, samplesPerPixel,
+        sampleFormat == FORMAT_UINT ? HdrImage.UINT :
+        bitsPerSample == 16 ? HdrImage.HALF :
+        bitsPerSample == 32 ? HdrImage.FLOAT :
+        bitsPerSample == 64 ? HdrImage.FLOAT64 :
+        HdrImage.FLOAT);
     for (var tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
       for (var tileX = 0; tileX < tilesX; ++tileX, ++ti) {
         _decodeTile(p, tileX, tileY);
@@ -347,9 +352,6 @@ class TiffImage {
               }
               if (hdrImage != null) {
                 hdrImage.setRed(px, py, sample);
-                hdrImage.setGreen(px, py, sample);
-                hdrImage.setBlue(px, py, sample);
-                hdrImage.setAlpha(px, py, 1.0);
               }
               if (image != null) {
                 final gray = (sample * 255).clamp(0, 255).toInt();
@@ -385,9 +387,6 @@ class TiffImage {
               if (hdrImage != null) {
                 var fg = gray16 / 0xffff;
                 hdrImage.setRed(px, py, fg);
-                hdrImage.setGreen(px, py, fg);
-                hdrImage.setBlue(px, py, fg);
-                hdrImage.setAlpha(px, py, 1.0);
               }
 
               if (image != null) {
@@ -421,8 +420,6 @@ class TiffImage {
               var fa = alpha16 / 0xffff;
               hdrImage.setRed(px, py, fg);
               hdrImage.setGreen(px, py, fg);
-              hdrImage.setBlue(px, py, fg);
-              hdrImage.setAlpha(px, py, fa);
             }
 
             if (image != null) {
@@ -451,7 +448,6 @@ class TiffImage {
                 hdrImage.setRed(px, py, r);
                 hdrImage.setGreen(px, py, g);
                 hdrImage.setBlue(px, py, b);
-                hdrImage.setAlpha(px, py, 1.0);
               }
               if (image != null) {
                 final ri = (r * 255).clamp(0, 255).toInt();
@@ -483,7 +479,6 @@ class TiffImage {
                 hdrImage.setRed(px, py, r16 / 0xffff);
                 hdrImage.setGreen(px, py, g16 / 0xffff);
                 hdrImage.setBlue(px, py, b16 / 0xffff);
-                hdrImage.setAlpha(px, py, 1.0);
               }
 
               if (image != null) {

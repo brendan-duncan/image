@@ -76,4 +76,15 @@ void main() {
       });
     }
   });
+
+  group('TIFF/dtm_test', () {
+    test('dtm_test.tiff', () {
+      final bytes = File('test/res/tiff/dtm_test.tiff').readAsBytesSync();
+      var image = TiffDecoder().decodeHdrImage(bytes);
+      expect(image.numChannels, equals(1));
+      expect(image.red.data[11], equals(-9999.0));
+      var img = hdrToImage(image);
+      File('.dart_tool/out/tif/dtm_test.hdr.png').writeAsBytesSync(encodePng(img));
+    });
+  });
 }

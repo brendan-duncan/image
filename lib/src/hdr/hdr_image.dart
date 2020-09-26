@@ -43,7 +43,8 @@ class HdrImage {
     if (channels < 0 || channels > 4) {
       return;
     }
-    if (format != HALF && format != FLOAT && format != UINT) {
+    if (format != HALF && format != FLOAT && format != FLOAT64 &&
+        format != UINT) {
       return;
     }
 
@@ -181,6 +182,9 @@ class HdrImage {
       depth.setFloat(x, y, c);
     }
   }
+
+  /// The number of channels used by the image
+  int get numChannels => slices.length;
 
   /// Does this image contain the given channel?
   bool hasChannel(String ch) => slices.containsKey(ch);

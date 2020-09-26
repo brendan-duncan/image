@@ -34,8 +34,8 @@ Image hdrToImage(HdrImage hdr, {num exposure}) {
   for (var y = 0, di = 0; y < hdr.height; ++y) {
     for (var x = 0; x < hdr.width; ++x) {
       var r = hdr.getRed(x, y);
-      var g = hdr.getGreen(x, y);
-      var b = hdr.getBlue(x, y);
+      var g = hdr.numChannels == 1 ? r : hdr.getGreen(x, y);
+      var b = hdr.numChannels == 1 ? r : hdr.getBlue(x, y);
 
       if (r.isInfinite || r.isNaN) {
         r = 0.0;
