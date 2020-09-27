@@ -43,31 +43,38 @@ class TiffDecoder extends Decoder {
     return info.images[frame].decode(_input);
   }
 
+  HdrImage decodeFrameHdr(int frame) {
+    if (info == null) {
+      return null;
+    }
+    return info.images[frame].decodeHdr(_input);
+  }
+
   /// Decode the file and extract a single image from it. If the file is
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
   Image decodeImage(List<int> data, {int frame = 0}) {
-    var ptr = InputBuffer(data);
+    _input = InputBuffer(data);
 
-    info = _readHeader(ptr);
+    info = _readHeader(_input);
     if (info == null) {
       return null;
     }
 
-    return info.images[frame].decode(ptr);
+    return info.images[frame].decode(_input);
   }
 
   @override
   HdrImage decodeHdrImage(List<int> data, {int frame = 0}) {
-    var ptr = InputBuffer(data);
+    _input = InputBuffer(data);
 
-    info = _readHeader(ptr);
+    info = _readHeader(_input);
     if (info == null) {
       return null;
     }
 
-    return info.images[frame].decodeHdr(ptr);
+    return info.images[frame].decodeHdr(_input);
   }
 
   /// Decode all of the frames from an animation. If the file is not an

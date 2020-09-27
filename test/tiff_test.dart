@@ -92,8 +92,39 @@ void main() {
   group('TIFF/tca32int', () {
     test('tca32int.tif', () {
       final bytes = File('test/res/tiff/tca32int.tif').readAsBytesSync();
-      var image = TiffDecoder().decodeHdrImage(bytes);
+      final decoder = TiffDecoder();
+      final image = decoder.decodeHdrImage(bytes);
       expect(image.numChannels, equals(1));
+      final tags = decoder.info.images[0].tags;
+      for (var tag in tags.keys) {
+        final entry = tags[tag];
+        if (entry.type == TiffEntry.TYPE_ASCII) {
+          print('tca32int TAG $tag: ${entry.readString()}');
+        } else {
+          print('tca32int TAG $tag: ${entry.read()}');
+        }
+      }
+      var img = hdrToImage(image);
+      File('.dart_tool/out/tif/tca32int.hdr.png')
+          .writeAsBytesSync(encodePng(img));
+    });
+  });
+
+  group('TIFF/dtm64float', () {
+    test('dtm64float.tif', () {
+      final bytes = File('test/res/tiff/dtm64float.tif').readAsBytesSync();
+      final decoder = TiffDecoder();
+      final image = decoder.decodeHdrImage(bytes);
+      expect(image.numChannels, equals(1));
+      final tags = decoder.info.images[0].tags;
+      for (var tag in tags.keys) {
+        final entry = tags[tag];
+        if (entry.type == TiffEntry.TYPE_ASCII) {
+          print('dtm64float TAG $tag: ${entry.readString()}');
+        } else {
+          print('dtm64float TAG $tag: ${entry.read()}');
+        }
+      }
       var img = hdrToImage(image);
       File('.dart_tool/out/tif/tca32int.hdr.png')
           .writeAsBytesSync(encodePng(img));

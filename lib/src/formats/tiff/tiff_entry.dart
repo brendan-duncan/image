@@ -7,8 +7,9 @@ class TiffEntry {
   int type;
   int numValues;
   int valueOffset;
+  InputBuffer p;
 
-  TiffEntry(this.tag, this.type, this.numValues);
+  TiffEntry(this.tag, this.type, this.numValues, this.p);
 
   @override
   String toString() {
@@ -24,29 +25,62 @@ class TiffEntry {
 
   bool get isString => type == TYPE_ASCII;
 
-  int readValue(InputBuffer p) {
+  int readValue() {
     p.offset = valueOffset;
-    return _readValue(p);
+    return _readValue();
   }
 
-  List<int> readValues(InputBuffer p) {
+  List<int> readValues() {
     p.offset = valueOffset;
     var values = <int>[];
     for (var i = 0; i < numValues; ++i) {
-      values.add(_readValue(p));
+      values.add(_readValue());
     }
     return values;
   }
 
-  String readString(InputBuffer p) {
+  String readString() {
     if (type != TYPE_ASCII) {
       throw ImageException('readString requires ASCII entity');
     }
     // TODO: ASCII fields can contain multiple strings, separated with a NULL.
-    return String.fromCharCodes(readValues(p));
+    return String.fromCharCodes(readValues());
   }
 
-  int _readValue(InputBuffer p) {
+  List read() {
+    p.offset = valueOffset;
+    var values = <dynamic>[];
+    for (var i = 0; i < numValues; ++i) {
+      switch (type) {
+        case TYPE_BYTE:
+        case TYPE_ASCII:
+          values.add(p.readByte());
+          break;
+        case TYPE_SHORT:
+          values.add(p.readUint16());
+          break;
+        case TYPE_LONG:
+          values.add(p.readUint32());
+          break;
+        case TYPE_RATIONAL:
+          var num = p.readUint32();
+          var den = p.readUint32();
+          if (den != 0) {
+            values.add(num / den);
+          }
+          break;
+        case TYPE_FLOAT:
+          values.add(p.readFloat32());
+          break;
+        case TYPE_DOUBLE:
+          values.add(p.readFloat64());
+          break;
+      }
+    }
+    return values;
+  }
+
+  int _readValue() {
     switch (type) {
       case TYPE_BYTE:
       case TYPE_ASCII:

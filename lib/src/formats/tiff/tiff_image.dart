@@ -62,7 +62,7 @@ class TiffImage {
       var tag = p.readUint16();
       var type = p.readUint16();
       var numValues = p.readUint32();
-      var entry = TiffEntry(tag, type, numValues);
+      var entry = TiffEntry(tag, type, numValues, p3);
 
       // The value for the tag is either stored in another location,
       // or within the tag itself (if the size fits in 4 bytes).
@@ -77,23 +77,23 @@ class TiffImage {
       tags[entry.tag] = entry;
 
       if (entry.tag == TAG_IMAGE_WIDTH) {
-        width = entry.readValue(p3);
+        width = entry.readValue();
       } else if (entry.tag == TAG_IMAGE_LENGTH) {
-        height = entry.readValue(p3);
+        height = entry.readValue();
       } else if (entry.tag == TAG_PHOTOMETRIC_INTERPRETATION) {
-        photometricType = entry.readValue(p3);
+        photometricType = entry.readValue();
       } else if (entry.tag == TAG_COMPRESSION) {
-        compression = entry.readValue(p3);
+        compression = entry.readValue();
       } else if (entry.tag == TAG_BITS_PER_SAMPLE) {
-        bitsPerSample = entry.readValue(p3);
+        bitsPerSample = entry.readValue();
       } else if (entry.tag == TAG_SAMPLES_PER_PIXEL) {
-        samplesPerPixel = entry.readValue(p3);
+        samplesPerPixel = entry.readValue();
       } else if (entry.tag == TAG_PREDICTOR) {
-        predictor = entry.readValue(p3);
+        predictor = entry.readValue();
       } else if (entry.tag == TAG_SAMPLE_FORMAT) {
-        sampleFormat = entry.readValue(p3);
+        sampleFormat = entry.readValue();
       } else if (entry.tag == TAG_COLOR_MAP) {
-        colorMap = entry.readValues(p3);
+        colorMap = entry.readValues();
         colorMapRed = 0;
         colorMapGreen = colorMap.length ~/ 3;
         colorMapBlue = colorMapGreen * 2;
@@ -120,18 +120,18 @@ class TiffImage {
     if (hasTag(TAG_TILE_OFFSETS)) {
       tiled = true;
       // Image is in tiled format
-      tileWidth = _readTag(p3, TAG_TILE_WIDTH);
-      tileHeight = _readTag(p3, TAG_TILE_LENGTH);
-      tileOffsets = _readTagList(p3, TAG_TILE_OFFSETS);
-      tileByteCounts = _readTagList(p3, TAG_TILE_BYTE_COUNTS);
+      tileWidth = _readTag(TAG_TILE_WIDTH);
+      tileHeight = _readTag(TAG_TILE_LENGTH);
+      tileOffsets = _readTagList(TAG_TILE_OFFSETS);
+      tileByteCounts = _readTagList(TAG_TILE_BYTE_COUNTS);
     } else {
       tiled = false;
 
-      tileWidth = _readTag(p3, TAG_TILE_WIDTH, width);
+      tileWidth = _readTag(TAG_TILE_WIDTH, width);
       if (!hasTag(TAG_ROWS_PER_STRIP)) {
-        tileHeight = _readTag(p3, TAG_TILE_LENGTH, height);
+        tileHeight = _readTag(TAG_TILE_LENGTH, height);
       } else {
-        var l = _readTag(p3, TAG_ROWS_PER_STRIP);
+        var l = _readTag(TAG_ROWS_PER_STRIP);
         var infinity = 1;
         infinity = (infinity << 32) - 1;
         if (l == infinity) {
@@ -142,8 +142,8 @@ class TiffImage {
         }
       }
 
-      tileOffsets = _readTagList(p3, TAG_STRIP_OFFSETS);
-      tileByteCounts = _readTagList(p3, TAG_STRIP_BYTE_COUNTS);
+      tileOffsets = _readTagList(TAG_STRIP_OFFSETS);
+      tileByteCounts = _readTagList(TAG_STRIP_BYTE_COUNTS);
     }
 
     // Calculate number of tiles and the tileSize in bytes
@@ -151,10 +151,10 @@ class TiffImage {
     tilesY = (height + tileHeight - 1) ~/ tileHeight;
     tileSize = tileWidth * tileHeight * samplesPerPixel;
 
-    fillOrder = _readTag(p3, TAG_FILL_ORDER, 1);
-    t4Options = _readTag(p3, TAG_T4_OPTIONS, 0);
-    t6Options = _readTag(p3, TAG_T6_OPTIONS, 0);
-    extraSamples = _readTag(p3, TAG_EXTRA_SAMPLES, 0);
+    fillOrder = _readTag(TAG_FILL_ORDER, 1);
+    t4Options = _readTag(TAG_T4_OPTIONS, 0);
+    t6Options = _readTag(TAG_T6_OPTIONS, 0);
+    extraSamples = _readTag(TAG_EXTRA_SAMPLES, 0);
 
     // Determine which kind of image we are dealing with.
     switch (photometricType) {
@@ -203,7 +203,7 @@ class TiffImage {
           imageType = TYPE_RGB;
         } else {
           if (hasTag(TAG_YCBCR_SUBSAMPLING)) {
-            var v = tags[TAG_YCBCR_SUBSAMPLING].readValues(p3);
+            var v = tags[TAG_YCBCR_SUBSAMPLING].readValues();
             chromaSubH = v[0];
             chromaSubV = v[1];
           } else {
@@ -343,7 +343,6 @@ class TiffImage {
         return;
       }
 
-      var pi = 0;
       for (var y = 0, py = outY; y < tileHeight && py < height; ++y, ++py) {
         for (var x = 0, px = outX; x < tileWidth && px < width; ++x, ++px) {
           if (samplesPerPixel == 1) {
@@ -849,18 +848,18 @@ class TiffImage {
     }
   }
 
-  int _readTag(InputBuffer p, int type, [int defaultValue = 0]) {
+  int _readTag(int type, [int defaultValue = 0]) {
     if (!hasTag(type)) {
       return defaultValue;
     }
-    return tags[type].readValue(p);
+    return tags[type].readValue();
   }
 
-  List<int> _readTagList(InputBuffer p, int type) {
+  List<int> _readTagList(int type) {
     if (!hasTag(type)) {
       return null;
     }
-    return tags[type].readValues(p);
+    return tags[type].readValues();
   }
 
   // Compression types
