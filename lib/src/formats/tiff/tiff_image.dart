@@ -251,8 +251,8 @@ class TiffImage {
         sampleFormat == FORMAT_UINT
             ? HdrImage.UINT
             : sampleFormat == FORMAT_INT
-              ? HdrImage.INT
-              : HdrImage.FLOAT,
+                ? HdrImage.INT
+                : HdrImage.FLOAT,
         bitsPerSample);
     for (var tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
       for (var tileX = 0; tileX < tilesX; ++tileX, ++ti) {
@@ -395,8 +395,8 @@ class TiffImage {
                 gray = (bitsPerSample == 16)
                     ? gray >> 8
                     : (bitsPerSample == 32)
-                      ? gray >> 24
-                      : gray;
+                        ? gray >> 24
+                        : gray;
                 if (photometricType == 0) {
                   gray = 255 - gray;
                 }
@@ -449,13 +449,13 @@ class TiffImage {
               gray = (bitsPerSample == 16)
                   ? gray >> 8
                   : (bitsPerSample == 32)
-                  ? gray >> 24
-                  : gray;
+                      ? gray >> 24
+                      : gray;
               alpha = (bitsPerSample == 16)
                   ? alpha >> 8
                   : (bitsPerSample == 32)
-                  ? alpha >> 24
-                  : alpha;
+                      ? alpha >> 24
+                      : alpha;
               var c = getColor(gray, gray, gray, alpha);
               image.setPixel(px, py, c);
             }
@@ -535,18 +535,18 @@ class TiffImage {
                 r = (bitsPerSample == 16)
                     ? r >> 8
                     : (bitsPerSample == 32)
-                    ? r >> 24
-                    : r;
+                        ? r >> 24
+                        : r;
                 g = (bitsPerSample == 16)
                     ? g >> 8
                     : (bitsPerSample == 32)
-                    ? g >> 24
-                    : g;
+                        ? g >> 24
+                        : g;
                 b = (bitsPerSample == 16)
                     ? b >> 8
                     : (bitsPerSample == 32)
-                    ? b >> 24
-                    : b;
+                        ? b >> 24
+                        : b;
                 var c = getColor(r, g, b, 255);
                 image.setPixel(px, py, c);
               }
@@ -644,23 +644,23 @@ class TiffImage {
                 r = (bitsPerSample == 16)
                     ? r >> 8
                     : (bitsPerSample == 32)
-                    ? r >> 24
-                    : r;
+                        ? r >> 24
+                        : r;
                 g = (bitsPerSample == 16)
                     ? g >> 8
                     : (bitsPerSample == 32)
-                    ? g >> 24
-                    : g;
+                        ? g >> 24
+                        : g;
                 b = (bitsPerSample == 16)
                     ? b >> 8
                     : (bitsPerSample == 32)
-                    ? b >> 24
-                    : b;
+                        ? b >> 24
+                        : b;
                 a = (bitsPerSample == 16)
                     ? a >> 8
                     : (bitsPerSample == 32)
-                    ? a >> 24
-                    : a;
+                        ? a >> 24
+                        : a;
                 var c = getColor(r, g, b, a);
                 image.setPixel(px, py, c);
               }
@@ -887,6 +887,10 @@ class TiffImage {
   static const COMPRESSION_SGILOG = 34676;
   static const COMPRESSION_SGILOG24 = 34677;
   static const COMPRESSION_JP2000 = 34712;
+
+  // Photometric types
+  static const PHOTOMETRIC_BLACKISZERO = 1;
+  static const PHOTOMETRIC_RGB = 2;
 
   // Image types
   static const TYPE_UNSUPPORTED = -1;

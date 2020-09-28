@@ -125,6 +125,7 @@ export 'src/formats/psd_decoder.dart';
 export 'src/formats/tga_decoder.dart';
 export 'src/formats/tga_encoder.dart';
 export 'src/formats/tiff_decoder.dart';
+export 'src/formats/tiff_encoder.dart';
 export 'src/formats/webp_decoder.dart';
 export 'src/formats/webp_encoder.dart';
 export 'src/formats/bmp_decoder.dart';

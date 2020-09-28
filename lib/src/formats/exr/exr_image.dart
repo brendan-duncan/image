@@ -115,12 +115,12 @@ class ExrImage extends DecodeInfo {
         if (!framebuffer.hasChannel(ch.name)) {
           width = part.width;
           height = part.height;
-          framebuffer
-              .addSlice(HdrSlice(ch.name, part.width, part.height,
-                ch.type == ExrChannel.TYPE_UINT
-                    ? HdrImage.UINT
-                    : HdrImage.FLOAT,
-                8 * ch.size));
+          framebuffer.addSlice(HdrSlice(
+              ch.name,
+              part.width,
+              part.height,
+              ch.type == ExrChannel.TYPE_UINT ? HdrImage.UINT : HdrImage.FLOAT,
+              8 * ch.size));
         }
       }
 

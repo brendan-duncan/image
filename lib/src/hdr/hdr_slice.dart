@@ -12,6 +12,7 @@ class HdrSlice {
   /// Indicates the type of data stored by the slice, either [HdrImage.INT],
   /// [HdrImage.FLOAT], or [HdrImage.UINT].
   final int type;
+
   /// How many bits per sample, either 8, 16, 32, or 64.
   final int bitsPerSample;
 
@@ -76,8 +77,8 @@ class HdrSlice {
 
   int get _maxIntSize {
     var v = (bitsPerSample == 8
-            ? 0xff
-            : bitsPerSample == 16
+        ? 0xff
+        : bitsPerSample == 16
             ? 0xffff
             : 0xffffffff);
     if (type == HdrImage.INT) {

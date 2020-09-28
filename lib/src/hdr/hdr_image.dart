@@ -38,8 +38,8 @@ class HdrImage {
   HdrImage();
 
   /// Create an RGB[A] image.
-  HdrImage.create(int width, int height, int channels,
-      int type, int bitsPerSample) {
+  HdrImage.create(
+      int width, int height, int channels, int type, int bitsPerSample) {
     if (channels < 0 || channels > 4) {
       return;
     }
@@ -98,8 +98,8 @@ class HdrImage {
   num getRed(int x, int y) {
     return red != null
         ? red.isFloat
-          ? red.getFloat(x, y)
-          : red.getInt(x, y)
+            ? red.getFloat(x, y)
+            : red.getInt(x, y)
         : 0;
   }
 
@@ -124,8 +124,8 @@ class HdrImage {
   num getGreen(int x, int y) {
     return green != null
         ? green.isFloat
-        ? green.getFloat(x, y)
-        : green.getInt(x, y)
+            ? green.getFloat(x, y)
+            : green.getInt(x, y)
         : 0;
   }
 
@@ -150,8 +150,8 @@ class HdrImage {
   num getBlue(int x, int y) {
     return blue != null
         ? blue.isFloat
-        ? blue.getFloat(x, y)
-        : blue.getInt(x, y)
+            ? blue.getFloat(x, y)
+            : blue.getInt(x, y)
         : 0;
   }
 
@@ -176,8 +176,8 @@ class HdrImage {
   num getAlpha(int x, int y) {
     return alpha != null
         ? alpha.isFloat
-        ? alpha.getFloat(x, y)
-        : alpha.getInt(x, y)
+            ? alpha.getFloat(x, y)
+            : alpha.getInt(x, y)
         : 0;
   }
 
@@ -202,8 +202,8 @@ class HdrImage {
   num getDepth(int x, int y) {
     return depth != null
         ? depth.isFloat
-        ? depth.getFloat(x, y)
-        : depth.getInt(x, y)
+            ? depth.getFloat(x, y)
+            : depth.getInt(x, y)
         : 0;
   }
 
@@ -218,8 +218,21 @@ class HdrImage {
     }
   }
 
+  /// The number of bits per sample.
+  int get bitsPerSample => red != null
+      ? red.bitsPerSample
+      : slices.isEmpty
+          ? 0
+          : slices[slices.keys.first].bitsPerSample;
+
+  int get sampleFormat => red != null
+      ? red.type
+      : slices.isEmpty
+          ? 0
+          : slices[slices.keys.first].type;
+
   /// The number of channels used by the image
-  int get numChannels => slices.length;
+  int get numberOfChannels => slices.length;
 
   /// Does this image contain the given channel?
   bool hasChannel(String ch) => slices.containsKey(ch);
