@@ -100,12 +100,10 @@ class BmpInfo extends DecodeInfo {
       v5blueMask = p.readUint32();
       v5alphaMask = p.readUint32();
     }
-    print(toString());
   }
 
   void readPalette(InputBuffer p) {
     final colors = totalColors == 0 ? 1 << bpp : totalColors;
-    print('reading colors: $colors');
     final colorBytes = headerSize == 12 ? 3 : 4;
     colorPalette = Iterable.generate(
             colors, (i) => _readRgba(p, aDefault: colorBytes == 3 ? 100 : null))
