@@ -288,10 +288,8 @@ class WebPDecoder extends Decoder {
       }
     }
 
-    /**
-     * The alpha flag might not have been set, but it does in fact have alpha
-     * if there is an ALPH chunk.
-     */
+    /// The alpha flag might not have been set, but it does in fact have alpha
+    /// if there is an ALPH chunk.
     if (!webp.hasAlpha) {
       webp.hasAlpha = webp.alphaData != null;
     }

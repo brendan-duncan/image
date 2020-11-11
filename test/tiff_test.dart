@@ -120,7 +120,7 @@ void main() {
       }
 
       //File('.dart_tool/out/tif/tca32int.tif')
-          //.writeAsBytes(TiffEncoder().encodeHdrImage(image));
+      //.writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
       File('.dart_tool/out/tif/tca32int.hdr.png')
@@ -145,7 +145,7 @@ void main() {
       }
 
       //File('.dart_tool/out/tif/dtm64float.tif')
-        //.writeAsBytes(TiffEncoder().encodeHdrImage(image));
+      //.writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
       File('.dart_tool/out/tif/dtm64float.hdr.png')

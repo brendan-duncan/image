@@ -46,8 +46,8 @@ class TiffEncoder extends Encoder {
 
     _writeEntryUint32(out, TiffImage.TAG_ROWS_PER_STRIP, image.height);
     _writeEntryUint16(out, TiffImage.TAG_PLANAR_CONFIGURATION, 1);
-    _writeEntryUint32(out, TiffImage.TAG_STRIP_BYTE_COUNTS,
-        image.width * image.height * 4);
+    _writeEntryUint32(
+        out, TiffImage.TAG_STRIP_BYTE_COUNTS, image.width * image.height * 4);
     _writeEntryUint32(out, TiffImage.TAG_STRIP_OFFSETS, out.length + 4);
     out.writeBytes(image.getBytes());
   }
@@ -60,18 +60,20 @@ class TiffEncoder extends Encoder {
     _writeEntryUint16(out, TiffImage.TAG_BITS_PER_SAMPLE, image.bitsPerSample);
     _writeEntryUint16(
         out, TiffImage.TAG_COMPRESSION, TiffImage.COMPRESSION_NONE);
-    _writeEntryUint16(out, TiffImage.TAG_PHOTOMETRIC_INTERPRETATION,
+    _writeEntryUint16(
+        out,
+        TiffImage.TAG_PHOTOMETRIC_INTERPRETATION,
         image.numberOfChannels == 1
             ? TiffImage.PHOTOMETRIC_BLACKISZERO
             : TiffImage.PHOTOMETRIC_RGB);
-    _writeEntryUint16(out, TiffImage.TAG_SAMPLES_PER_PIXEL,
-        image.numberOfChannels);
-    _writeEntryUint16(out, TiffImage.TAG_SAMPLE_FORMAT,
-        _getSampleFormat(image));
+    _writeEntryUint16(
+        out, TiffImage.TAG_SAMPLES_PER_PIXEL, image.numberOfChannels);
+    _writeEntryUint16(
+        out, TiffImage.TAG_SAMPLE_FORMAT, _getSampleFormat(image));
 
     final bytesPerSample = image.bitsPerSample ~/ 8;
-    final imageSize = image.width * image.height * image.slices.length *
-        bytesPerSample;
+    final imageSize =
+        image.width * image.height * image.slices.length * bytesPerSample;
 
     _writeEntryUint32(out, TiffImage.TAG_ROWS_PER_STRIP, image.height);
     _writeEntryUint16(out, TiffImage.TAG_PLANAR_CONFIGURATION, 1);
@@ -79,7 +81,8 @@ class TiffEncoder extends Encoder {
     _writeEntryUint32(out, TiffImage.TAG_STRIP_OFFSETS, out.length + 4);
 
     final channels = <Uint8List>[];
-    if (image.blue != null) { // ? Why does this channel order working but not RGB?
+    if (image.blue != null) {
+      // ? Why does this channel order working but not RGB?
       channels.add(image.blue.getBytes());
     }
     if (image.red != null) {
