@@ -1,3 +1,10 @@
+## 2.1.19 - November 11, 2020
+
+- Refactor HdrImage to better support more diverse formats, used for Hdr Tiff decoding.
+- TiffDecoder will maintain Tag data after decoding, allowing them to be read to process image metadata.
+- Added TiffEncoder. Still needs work to be able to add tag data to an encoded image.
+- Clean up print statements from BmpDecoder.
+
 ## 2.1.18 - September 25, 2020
 
 - Added 64-bit float format to TIFF decoder.
