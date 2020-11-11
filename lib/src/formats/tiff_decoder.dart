@@ -15,8 +15,8 @@ class TiffDecoder extends Decoder {
     return _readHeader(InputBuffer(data)) != null;
   }
 
-  /// Validate the file is a Gif image and get information about it.
-  /// If the file is not a valid Gif image, null is returned.
+  /// Validate the file is a TIFF image and get information about it.
+  /// If the file is not a valid TIFF image, null is returned.
   @override
   TiffInfo startDecode(List<int> bytes) {
     _input = InputBuffer(bytes);

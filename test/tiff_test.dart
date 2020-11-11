@@ -153,6 +153,23 @@ void main() {
     });
   });
 
+  group('TIFF/startDecode', () {
+    test('dtm64float.tif', () {
+      final bytes = File('test/res/tiff/dtm64float.tif').readAsBytesSync();
+      final decoder = TiffDecoder();
+      final info = decoder.startDecode(bytes);
+      final tags = info.images[0].tags;
+      for (var tag in tags.keys) {
+        final entry = tags[tag];
+        if (entry.type == TiffEntry.TYPE_ASCII) {
+          print('dtm64float TAG ${tag}: ${entry.readString()}');
+        } else {
+          print('dtm64float TAG ${tag}: ${entry.read()}');
+        }
+      }
+    });
+  });
+
   group('TIFF/float1x32', () {
     test('float1x32.tif', () {
       final bytes = File('test/res/tiff/float1x32.tif').readAsBytesSync();
