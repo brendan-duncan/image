@@ -18,6 +18,7 @@ export 'src/effects/drop_shadow.dart';
 export 'src/filter/adjust_color.dart';
 export 'src/filter/brightness.dart';
 export 'src/filter/bump_to_normal.dart';
+export 'src/filter/change_color.dart';
 export 'src/filter/color_offset.dart';
 export 'src/filter/contrast.dart';
 export 'src/filter/convolution.dart';
