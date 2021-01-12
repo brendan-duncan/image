@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   var dir = Directory('test/res/jpg');
   var files = dir.listSync(recursive: true);
@@ -23,7 +25,7 @@ void main() {
         }
 
         final outJpg = JpegEncoder().encodeImage(image);
-        File('.dart_tool/out/jpg/${name}')
+        File('$tmpPath/out/jpg/${name}')
           ..createSync(recursive: true)
           ..writeAsBytesSync(outJpg);
 
@@ -44,7 +46,7 @@ void main() {
             File('test/res/jpg/landscape_$i.jpg').readAsBytesSync());
         expect(image.exif.hasOrientation, equals(true));
         expect(image.exif.orientation, equals(i));
-        File('.dart_tool/out/jpg/landscape_$i.png')
+        File('$tmpPath/out/jpg/landscape_$i.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(PngEncoder().encodeImage(bakeOrientation(image)));
       });
@@ -54,7 +56,7 @@ void main() {
             File('test/res/jpg/portrait_$i.jpg').readAsBytesSync());
         expect(image.exif.hasOrientation, equals(true));
         expect(image.exif.orientation, equals(i));
-        File('.dart_tool/out/jpg/portrait_$i.png')
+        File('$tmpPath/out/jpg/portrait_$i.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(PngEncoder().encodeImage(bakeOrientation(image)));
       });

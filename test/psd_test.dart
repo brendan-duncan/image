@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   var dir = Directory('test/res/psd');
   var files = dir.listSync();
@@ -20,7 +22,7 @@ void main() {
 
         if (psd != null) {
           var outPng = PngEncoder().encodeImage(psd);
-          File('.dart_tool/out/psd/$name.png')
+          File('$tmpPath/out/psd/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(outPng);
         } else {

@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   group('PNG', () {
     test('encode', () {
@@ -10,7 +12,7 @@ void main() {
 
       // Encode the image to PNG
       final png = PngEncoder().encodeImage(image);
-      File('.dart_tool/out/png/encode.png')
+      File('$tmpPath/out/png/encode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
@@ -25,13 +27,13 @@ void main() {
       }
 
       final png = encodePngAnimation(anim);
-      File('.dart_tool/out/png/encodeAnimation.png')
+      File('$tmpPath/out/png/encodeAnimation.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
 
     test('decode', () {
-      List<int> bytes = File('.dart_tool/out/png/encode.png').readAsBytesSync();
+      List<int> bytes = File('$tmpPath/out/png/encode.png').readAsBytesSync();
       final image = PngDecoder().decodeImage(bytes);
 
       expect(image.width, equals(64));
@@ -42,7 +44,7 @@ void main() {
       }
 
       final png = PngEncoder().encodeImage(image);
-      File('.dart_tool/out/png/decode.png').writeAsBytesSync(png);
+      File('$tmpPath/out/png/decode.png').writeAsBytesSync(png);
     });
 
     test('iCCP', () {
@@ -111,13 +113,13 @@ void main() {
           final anim = decodeAnimation(file.readAsBytesSync());
           if (anim.length == 1) {
             final png = PngEncoder().encodeImage(anim[0]);
-            File('.dart_tool/out/png/${name}')
+            File('$tmpPath/out/png/${name}')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
           } else {
             for (var i = 0; i < anim.length; ++i) {
               final png = PngEncoder().encodeImage(anim[i]);
-              File('.dart_tool/out/png/${name}-$i.png')
+              File('$tmpPath/out/png/${name}-$i.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
             }

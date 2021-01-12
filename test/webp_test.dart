@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   var dir = Directory('test/res/webp');
   var files = dir.listSync();
@@ -43,7 +45,7 @@ void main() {
       var bytes = file.readAsBytesSync();
       var image = WebPDecoder().decodeImage(bytes);
       var png = PngEncoder().encodeImage(image);
-      File('.dart_tool/out/webp/decode.png')
+      File('$tmpPath/out/webp/decode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -75,7 +77,7 @@ void main() {
         }
 
         var png = PngEncoder().encodeImage(image);
-        File('.dart_tool/out/webp/${name}.png')
+        File('$tmpPath/out/webp/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });
@@ -91,7 +93,7 @@ void main() {
       expect(anim.frames[2].getPixel(0, 0), equals(0));
       for (var i = 0; i < anim.numFrames; ++i) {
         var image = anim.frames[i];
-        File('.dart_tool/out/webp/animated_transparency_$i.png')
+        File('$tmpPath/out/webp/animated_transparency_$i.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(PngEncoder().encodeImage(image));
       }

@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   final dir = Directory('test/res/bmp');
   if (!dir.existsSync()) {
@@ -24,7 +26,7 @@ void main() {
         }
 
         final png = PngEncoder().encodeImage(image);
-        File('.dart_tool/out/bmp/${name}.png')
+        File('$tmpPath/out/bmp/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

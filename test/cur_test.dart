@@ -4,6 +4,8 @@ import 'package:image/image.dart';
 import 'package:image/src/formats/cur_encoder.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   group('CUR', () {
     test('encode', () {
@@ -12,7 +14,7 @@ void main() {
 
       // Encode the image to CUR
       final png = CurEncoder().encodeImage(image);
-      File('.dart_tool/out/cur/encode.cur')
+      File('$tmpPath/out/cur/encode.cur')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -21,7 +23,7 @@ void main() {
 
       final png2 = CurEncoder(hotSpots: {1: Point(64, 64), 0: Point(64, 64)})
           .encodeImages([image, image2]);
-      File('.dart_tool/out/cur/encode2.cur')
+      File('$tmpPath/out/cur/encode2.cur')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png2);
 
@@ -29,7 +31,7 @@ void main() {
       image3.fill(getColor(255, 100, 200));
 
       final png3 = CurEncoder().encodeImages([image, image2, image3]);
-      File('.dart_tool/out/cur/encode3.cur')
+      File('$tmpPath/out/cur/encode3.cur')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png3);
     });

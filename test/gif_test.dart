@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   final dir = Directory('test/res/gif');
   var files = dir.listSync();
@@ -32,7 +34,7 @@ void main() {
       test('decodeImage $name', () {
         var bytes = (f as File).readAsBytesSync();
         final image = GifDecoder().decodeImage(bytes);
-        File('.dart_tool/out/gif/$name.png')
+        File('$tmpPath/out/gif/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(image));
       });
@@ -54,7 +56,7 @@ void main() {
 
       test('encodeCars', () {
         var gif = encodeGifAnimation(anim);
-        File('.dart_tool/out/gif/cars.gif')
+        File('$tmpPath/out/gif/cars.gif')
           ..createSync(recursive: true)
           ..writeAsBytesSync(gif);
       });
@@ -70,7 +72,7 @@ void main() {
       }
 
       final gif = encodeGifAnimation(anim);
-      File('.dart_tool/out/gif/encodeAnimation.gif')
+      File('$tmpPath/out/gif/encodeAnimation.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
 
@@ -89,7 +91,7 @@ void main() {
       }
 
       final gif = encodeGifAnimation(anim);
-      File('.dart_tool/out/gif/encodeAnimation_variable_fps.gif')
+      File('$tmpPath/out/gif/encodeAnimation_variable_fps.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
 
@@ -106,7 +108,7 @@ void main() {
       final image = JpegDecoder().decodeImage(bytes);
 
       final gif = GifEncoder().encodeImage(image);
-      File('.dart_tool/out/gif/jpeg444.gif')
+      File('$tmpPath/out/gif/jpeg444.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
     });

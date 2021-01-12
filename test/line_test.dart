@@ -4,6 +4,8 @@ import 'package:test/test.dart';
 
 import 'package:image/image.dart';
 
+import 'paths.dart';
+
 int blackcolor = getColor(0, 0, 0);
 int whitecolor = getColor(255, 255, 255);
 
@@ -20,7 +22,7 @@ void main() {
       // draw a vertical line from (10, 10) to (10, 90) with thickness 1 and color black
       drawLine(image, 10, 10, 10, 90, blackcolor);
 
-      File('.dart_tool/out/line_test_vertical_thickness_1.png')
+      File('$tmpPath/out/line_test_vertical_thickness_1.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -43,7 +45,7 @@ void main() {
       // draw a vertical line from (90, 10) to (90, 90) with thickness 1 and color black
       drawLine(image, 90, 10, 90, 90, blackcolor, thickness: 4);
 
-      File('.dart_tool/out/line_test_vertical_thickness_4.png')
+      File('$tmpPath/out/line_test_vertical_thickness_4.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -70,7 +72,7 @@ void main() {
       // draw a horizontal line from (10,10) to (90,10) with thickness 1 and color black
       drawLine(image, 10, 10, 90, 10, blackcolor);
 
-      File('.dart_tool/out/line_test_horizontal_thickness_1.png')
+      File('$tmpPath/out/line_test_horizontal_thickness_1.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -93,7 +95,7 @@ void main() {
       // draw a vertical line from (10,90) to (90,90) with thickness 7 and color black
       drawLine(image, 10, 90, 90, 90, blackcolor, thickness: 7);
 
-      File('.dart_tool/out/line_test_horizontal_thickness_7.png')
+      File('$tmpPath/out/line_test_horizontal_thickness_7.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -119,7 +121,7 @@ void main() {
     test('thickness = 1', () {
       drawLine(image, 50, 50, 50, 50, blackcolor);
 
-      File('.dart_tool/out/line_test_point_thickness_1.png')
+      File('$tmpPath/out/line_test_point_thickness_1.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -137,7 +139,7 @@ void main() {
     test('thickness = 3', () {
       drawLine(image, 50, 50, 50, 50, blackcolor, thickness: 3);
 
-      File('.dart_tool/out/line_test_point_thickness_3.png')
+      File('$tmpPath/out/line_test_point_thickness_3.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -167,7 +169,7 @@ void main() {
     test('thickness = 4', () {
       drawLine(image, 50, 50, 50, 50, blackcolor, thickness: 4);
 
-      File('.dart_tool/out/line_test_point_thickness_4.png')
+      File('$tmpPath/out/line_test_point_thickness_4.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -200,7 +202,7 @@ void main() {
     test('fillCircle', () {
       fillCircle(image, 50, 50, 7, blackcolor);
 
-      File('.dart_tool/out/line_test_fillCircle.png')
+      File('$tmpPath/out/line_test_fillCircle.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
     });

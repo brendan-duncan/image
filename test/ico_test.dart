@@ -5,6 +5,8 @@ import 'package:image/src/formats/ico_decoder.dart';
 import 'package:image/src/formats/ico_encoder.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   group('ICO', () {
     test('encode', () {
@@ -13,7 +15,7 @@ void main() {
 
       // Encode the image to ICO
       final png = IcoEncoder().encodeImage(image);
-      File('.dart_tool/out/ico/encode.ico')
+      File('$tmpPath/out/ico/encode.ico')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -21,7 +23,7 @@ void main() {
       image2.fill(getColor(100, 255, 200));
 
       final png2 = IcoEncoder().encodeImages([image, image2]);
-      File('.dart_tool/out/ico/encode2.ico')
+      File('$tmpPath/out/ico/encode2.ico')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png2);
 
@@ -29,7 +31,7 @@ void main() {
       image3.fill(getColor(255, 100, 200));
 
       final png3 = IcoEncoder().encodeImages([image, image2, image3]);
-      File('.dart_tool/out/ico/encode3.ico')
+      File('$tmpPath/out/ico/encode3.ico')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png3);
     });
@@ -48,7 +50,7 @@ void main() {
       test('decode $name', () {
         final bytes = (file as File).readAsBytesSync();
         final image = IcoDecoder().decodeImageLargest(bytes);
-        File('.dart_tool/out/ico/$name.png')
+        File('$tmpPath/out/ico/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(PngEncoder().encodeImage(image));
       });

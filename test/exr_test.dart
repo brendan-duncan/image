@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   group('EXR', () {
     test('decoding', () {
@@ -12,7 +14,7 @@ void main() {
       final img = dec.decodeFrame(0);
 
       final png = PngEncoder().encodeImage(img);
-      File('.dart_tool/out/exr/grid.png')
+      File('$tmpPath/out/exr/grid.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
@@ -22,12 +24,12 @@ void main() {
       img.channels = Channels.rgba;
       final hdr = HdrImage.fromImage(img);
       var img2 = hdrToImage(hdr);
-      File('.dart_tool/out/exr/lenna.png').writeAsBytesSync(encodePng(img2));
+      File('$tmpPath/out/exr/lenna.png').writeAsBytesSync(encodePng(img2));
 
       hdrGamma(hdr, gamma: 2.2);
       //hdrBloom(hdr, radius: 0.2);
       img2 = hdrToImage(hdr);
-      File('.dart_tool/out/exr/lenna_gamma.png')
+      File('$tmpPath/out/exr/lenna_gamma.png')
           .writeAsBytesSync(encodePng(img2));
     });
   });

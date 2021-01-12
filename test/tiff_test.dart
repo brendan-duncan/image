@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   var dir = Directory('test/res/tiff');
   if (!dir.existsSync()) {
@@ -70,12 +72,12 @@ void main() {
         }
 
         final png = PngEncoder().encodeImage(image);
-        File('.dart_tool/out/tif/${name}.png')
+        File('$tmpPath/out/tif/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
 
         final tif = TiffEncoder().encodeImage(image);
-        File('.dart_tool/out/tif/${name}.tif')
+        File('$tmpPath/out/tif/${name}.tif')
           ..createSync(recursive: true)
           ..writeAsBytesSync(tif);
 
@@ -84,7 +86,7 @@ void main() {
         expect(img2.height, equals(image.height));
 
         final png2 = PngEncoder().encodeImage(image);
-        File('.dart_tool/out/tif/${name}-2.png')
+        File('$tmpPath/out/tif/${name}-2.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png2);
       });
@@ -98,7 +100,7 @@ void main() {
       expect(image.numberOfChannels, equals(1));
       expect(image.red.data[11], equals(-9999.0));
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/dtm_test.hdr.png')
+      File('$tmpPath/out/tif/dtm_test.hdr.png')
           .writeAsBytesSync(encodePng(img));
     });
   });
@@ -119,11 +121,11 @@ void main() {
         }
       }
 
-      //File('.dart_tool/out/tif/tca32int.tif')
+      //File('$tmpPath/out/tif/tca32int.tif')
       //.writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/tca32int.hdr.png')
+      File('$tmpPath/out/tif/tca32int.hdr.png')
           .writeAsBytesSync(encodePng(img));
     });
   });
@@ -144,11 +146,11 @@ void main() {
         }
       }
 
-      //File('.dart_tool/out/tif/dtm64float.tif')
+      //File('$tmpPath/out/tif/dtm64float.tif')
       //.writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/dtm64float.hdr.png')
+      File('$tmpPath/out/tif/dtm64float.hdr.png')
           .writeAsBytesSync(encodePng(img));
     });
   });
@@ -177,11 +179,11 @@ void main() {
       final image = decoder.decodeHdrImage(bytes);
       expect(image.numberOfChannels, equals(1));
 
-      File('.dart_tool/out/tif/float1x32.tif')
+      File('$tmpPath/out/tif/float1x32.tif')
           .writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/float1x32.hdr.png')
+      File('$tmpPath/out/tif/float1x32.hdr.png')
           .writeAsBytesSync(encodePng(img));
     });
   });
@@ -193,12 +195,11 @@ void main() {
       final image = decoder.decodeHdrImage(bytes);
       expect(image.numberOfChannels, equals(3));
 
-      File('.dart_tool/out/tif/float32.tif')
+      File('$tmpPath/out/tif/float32.tif')
           .writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/float32.hdr.png')
-          .writeAsBytesSync(encodePng(img));
+      File('$tmpPath/out/tif/float32.hdr.png').writeAsBytesSync(encodePng(img));
     });
   });
 }

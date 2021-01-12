@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
-  var dir = Directory('res/tga');
+  var dir = Directory('test/res/tga');
   if (!dir.existsSync()) {
     return;
   }
@@ -24,14 +26,14 @@ void main() {
         }
 
         var png = PngEncoder().encodeImage(image);
-        File('.dart_tool/out/tga/${name}.png')
+        File('$tmpPath/out/tga/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });
     }
 
     test('decode/encode', () {
-      var bytes = File('res/tga/globe.tga').readAsBytesSync();
+      var bytes = File('test/res/tga/globe.tga').readAsBytesSync();
 
       // Decode the image from file.
       var image = TgaDecoder().decodeImage(bytes);
@@ -41,7 +43,7 @@ void main() {
       // Encode the image as a tga
       var tga = TgaEncoder().encodeImage(image);
 
-      File('.dart_tool/out/globe.tga')
+      File('$tmpPath/out/globe.tga')
         ..createSync(recursive: true)
         ..writeAsBytesSync(tga);
 

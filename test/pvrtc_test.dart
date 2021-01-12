@@ -2,13 +2,15 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   group('PVRTC', () {
     test('encode_rgb_4bpp', () {
       var bytes = File('test/res/tga/globe.tga').readAsBytesSync();
       var image = TgaDecoder().decodeImage(bytes);
 
-      File('.dart_tool/out/pvrtc/globe_before.png')
+      File('$tmpPath/out/pvrtc/globe_before.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -17,12 +19,12 @@ void main() {
 
       var decoded =
           PvrtcDecoder().decodeRgb4bpp(image.width, image.height, pvrtc);
-      File('.dart_tool/out/pvrtc/globe_after.png')
+      File('$tmpPath/out/pvrtc/globe_after.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
 
       var pvr = PvrtcEncoder().encodePvr(image);
-      File('.dart_tool/out/pvrtc/globe.pvr')
+      File('$tmpPath/out/pvrtc/globe.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
     });
@@ -31,7 +33,7 @@ void main() {
       var bytes = File('test/res/png/alpha_edge.png').readAsBytesSync();
       var image = PngDecoder().decodeImage(bytes);
 
-      File('.dart_tool/out/pvrtc/alpha_before.png')
+      File('$tmpPath/out/pvrtc/alpha_before.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -40,12 +42,12 @@ void main() {
 
       var decoded =
           PvrtcDecoder().decodeRgba4bpp(image.width, image.height, pvrtc);
-      File('.dart_tool/out/pvrtc/alpha_after.png')
+      File('$tmpPath/out/pvrtc/alpha_after.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
 
       var pvr = PvrtcEncoder().encodePvr(image);
-      File('.dart_tool/out/pvrtc/alpha.pvr')
+      File('$tmpPath/out/pvrtc/alpha.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
     });
@@ -63,7 +65,7 @@ void main() {
         List<int> bytes = (f as File).readAsBytesSync();
         var img = PvrtcDecoder().decodePvr(bytes);
         assert(img != null);
-        File('.dart_tool/out/pvrtc/pvr_$name.png')
+        File('$tmpPath/out/pvrtc/pvr_$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(img));
       });
