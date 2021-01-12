@@ -1,5 +1,5 @@
 /// 2-dimensional point
-// @dart=2.11
+
 class Point {
   num x;
   num y;
