@@ -1,4 +1,3 @@
-// @dart=2.11
 import 'dart:typed_data';
 
 /// Exif data stored with an image.
@@ -8,24 +7,22 @@ class ExifData {
   static const DATE_TIME = 0x0132; // string
   static const ORIENTATION = 0x0112; // int
 
-  List<Uint8List> rawData;
+  List<Uint8List>? rawData;
   Map<int, dynamic> data;
 
   ExifData() : data = <int, dynamic>{};
 
-  ExifData.from(ExifData other)
+  ExifData.from(ExifData? other)
       : data = (other == null)
             ? <int, dynamic>{}
             : Map<int, dynamic>.from(other.data) {
     if (other != null && other.rawData != null) {
-      rawData = List<Uint8List>(other.rawData.length);
-      for (var i = 0; i < other.rawData.length; ++i) {
-        rawData[i] = other.rawData[i].sublist(0);
-      }
+      rawData = List<Uint8List>.generate(
+          other.rawData!.length, (i) => other.rawData![i].sublist(0));
     }
   }
 
-  bool get hasRawData => rawData != null && rawData.isNotEmpty;
+  bool get hasRawData => rawData != null && rawData!.isNotEmpty;
 
   bool get hasOrientation => data.containsKey(ORIENTATION);
   int get orientation => data[ORIENTATION] as int;

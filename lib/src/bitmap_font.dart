@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 
@@ -65,7 +65,7 @@ class BitmapFont {
   BitmapFont.fromZip(List<int> fileData) {
     var arc = ZipDecoder().decodeBytes(fileData);
 
-    ArchiveFile font_file;
+    ArchiveFile? font_file;
     for (var i = 0; i < arc.numberOfFiles(); ++i) {
       if (arc.fileName(i).endsWith('.fnt')) {
         font_file = arc.files[i];
@@ -105,13 +105,13 @@ class BitmapFont {
     if (!characters.containsKey(ch)) {
       return base ~/ 2;
     }
-    return characters[c].xadvance;
+    return characters[c]!.xadvance;
   }
 
   Iterable<XmlElement> _childElements(XmlNode n) =>
       n.children.whereType<XmlElement>();
 
-  void _parseFnt(XmlDocument xml, Map<int, Image> fontPages, [Archive arc]) {
+  void _parseFnt(XmlDocument xml, Map<int, Image?> fontPages, [Archive? arc]) {
     /// Rather than check for children, which will also count whitespace as XmlText,
     /// The first child should have the name <font>.
     var docElements = _childElements(xml).toList();
@@ -197,7 +197,7 @@ class BitmapFont {
         }
       } else if (name == 'pages') {
         for (var page in _childElements(c)) {
-          var id = int.parse(page.getAttribute('id'));
+          var id = int.parse(page.getAttribute('id')!);
           var filename = page.getAttribute('file');
 
           if (fontPages.containsKey(id)) {
@@ -212,21 +212,21 @@ class BitmapFont {
             }
 
             var image =
-                PngDecoder().decodeImage(imageFile.content as List<int>);
+                PngDecoder().decodeImage(imageFile.content as List<int>?);
 
             fontPages[id] = image;
           }
         }
       } else if (name == 'kernings') {
         for (var kerning in _childElements(c)) {
-          var first = int.parse(kerning.getAttribute('first'));
-          var second = int.parse(kerning.getAttribute('second'));
-          var amount = int.parse(kerning.getAttribute('amount'));
+          var first = int.parse(kerning.getAttribute('first')!);
+          var second = int.parse(kerning.getAttribute('second')!);
+          var amount = int.parse(kerning.getAttribute('amount')!);
 
           if (!kernings.containsKey(first)) {
             kernings[first] = {};
           }
-          kernings[first][second] = amount;
+          kernings[first]![second] = amount;
         }
       }
     }
@@ -235,16 +235,16 @@ class BitmapFont {
       var name = c.name.toString();
       if (name == 'chars') {
         for (var char in _childElements(c)) {
-          var id = int.parse(char.getAttribute('id'));
-          var x = int.parse(char.getAttribute('x'));
-          var y = int.parse(char.getAttribute('y'));
-          var width = int.parse(char.getAttribute('width'));
-          var height = int.parse(char.getAttribute('height'));
-          var xoffset = int.parse(char.getAttribute('xoffset'));
-          var yoffset = int.parse(char.getAttribute('yoffset'));
-          var xadvance = int.parse(char.getAttribute('xadvance'));
-          var page = int.parse(char.getAttribute('page'));
-          var chnl = int.parse(char.getAttribute('chnl'));
+          var id = int.parse(char.getAttribute('id')!);
+          var x = int.parse(char.getAttribute('x')!);
+          var y = int.parse(char.getAttribute('y')!);
+          var width = int.parse(char.getAttribute('width')!);
+          var height = int.parse(char.getAttribute('height')!);
+          var xoffset = int.parse(char.getAttribute('xoffset')!);
+          var yoffset = int.parse(char.getAttribute('yoffset')!);
+          var xadvance = int.parse(char.getAttribute('xadvance')!);
+          var page = int.parse(char.getAttribute('page')!);
+          var chnl = int.parse(char.getAttribute('chnl')!);
 
           if (!fontPages.containsKey(page)) {
             throw ImageException('Missing page image: $page');
@@ -263,7 +263,7 @@ class BitmapFont {
           var image = ch.image;
           for (var yi = y; yi < y2; ++yi) {
             for (var xi = x; xi < x2; ++xi) {
-              image[pi++] = fontImage.getPixel(xi, yi);
+              image[pi++] = fontImage!.getPixel(xi, yi);
             }
           }
         }
@@ -276,8 +276,8 @@ class BitmapFont {
     var pageList = <XmlNode>[];
     var charList = <XmlNode>[];
     var kerningList = <XmlNode>[];
-    List<XmlAttribute> charsAttrs;
-    List<XmlAttribute> kerningsAttrs;
+    List<XmlAttribute>? charsAttrs;
+    List<XmlAttribute>? kerningsAttrs;
 
     var lines = <String>[];
     lines = content.split('\r\n');
@@ -327,12 +327,12 @@ class BitmapFont {
     }
 
     if (charsAttrs != null || charList.isNotEmpty) {
-      var node = XmlElement(XmlName('chars'), charsAttrs, charList);
+      var node = XmlElement(XmlName('chars'), charsAttrs!, charList);
       children.add(node);
     }
 
     if (kerningsAttrs != null || kerningList.isNotEmpty) {
-      var node = XmlElement(XmlName('kernings'), kerningsAttrs, kerningList);
+      var node = XmlElement(XmlName('kernings'), kerningsAttrs!, kerningList);
       children.add(node);
     }
 
@@ -367,7 +367,7 @@ class BitmapFont {
     return params;
   }
 
-  static ArchiveFile _findFile(Archive arc, String filename) {
+  static ArchiveFile? _findFile(Archive arc, String? filename) {
     for (var f in arc.files) {
       if (f.name == filename) {
         return f;
