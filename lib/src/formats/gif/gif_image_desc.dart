@@ -1,15 +1,14 @@
-// @dart=2.11
 import '../../internal/internal.dart';
 import '../../util/input_buffer.dart';
 import 'gif_color_map.dart';
 
 class GifImageDesc {
-  int x;
-  int y;
-  int width;
-  int height;
-  bool interlaced;
-  GifColorMap colorMap;
+  late int x;
+  late int y;
+  late int width;
+  late int height;
+  late bool interlaced;
+  GifColorMap? colorMap;
   int duration = 80;
   bool clearFrame = true;
 
@@ -28,9 +27,9 @@ class GifImageDesc {
     if (b & 0x80 != 0) {
       colorMap = GifColorMap(1 << bitsPerPixel);
 
-      for (var i = 0; i < colorMap.numColors; ++i) {
-        colorMap.setColor(
-            i, input.readByte(), input.readByte(), input.readByte());
+      for (var i = 0; i < colorMap!.numColors; ++i) {
+        colorMap!
+            .setColor(i, input.readByte(), input.readByte(), input.readByte());
       }
     }
 
@@ -38,7 +37,7 @@ class GifImageDesc {
   }
 
   /// The position in the file after the ImageDesc for this frame.
-  int _inputPosition;
+  late int _inputPosition;
 }
 
 @internal
