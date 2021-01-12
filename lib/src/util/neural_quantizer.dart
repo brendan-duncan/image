@@ -1,4 +1,3 @@
-// @dart=2.11
 import 'dart:math';
 import 'dart:typed_data';
 import '../color.dart';
@@ -33,7 +32,7 @@ import 'quantizer.dart';
 /// Compute a color map with a given number of colors that best represents
 /// the given image.
 class NeuralQuantizer extends Quantizer {
-  Uint8List colorMap;
+  late Uint8List colorMap;
 
   int samplingFactor;
 
@@ -46,7 +45,6 @@ class NeuralQuantizer extends Quantizer {
 
     _initialize(numberOfColors);
 
-    _setupArrays();
     addImage(image);
   }
 
@@ -104,13 +102,42 @@ class NeuralQuantizer extends Quantizer {
     MAX_NET_POS = NET_SIZE - 1;
     INIT_RAD = NET_SIZE ~/ 8; // for 256 cols, radius starts at 32
     INIT_BIAS_RADIUS = INIT_RAD * RADIUS_BIAS;
-    _network = List<double>(NET_SIZE * 3);
     _colorMap = Int32List(NET_SIZE * 4);
-    _bias = List<double>(NET_SIZE);
-    _freq = List<double>(NET_SIZE);
     colorMap = Uint8List(NET_SIZE * 3);
     SPECIALS = 3; // number of reserved colours used
     BG_COLOR = SPECIALS - 1;
+
+    var network = List<double?>.filled(NET_SIZE * 3, null);
+    var bias = List<double?>.filled(NET_SIZE, null);
+    var freq = List<double?>.filled(NET_SIZE, null);
+
+    network[0] = 0.0; // black
+    network[1] = 0.0;
+    network[2] = 0.0;
+
+    network[3] = 255.0; // white
+    network[4] = 255.0;
+    network[5] = 255.0;
+
+    // RESERVED bgColour  // background
+    final f = 1.0 / NET_SIZE;
+    for (var i = 0; i < SPECIALS; ++i) {
+      freq[i] = f;
+      bias[i] = 0.0;
+    }
+
+    for (var i = SPECIALS, p = SPECIALS * 3; i < NET_SIZE; ++i) {
+      network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
+      network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
+      network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
+
+      freq[i] = f;
+      bias[i] = 0.0;
+    }
+
+    _network = List<double>.from(network);
+    _bias = List<double>.from(bias);
+    _freq = List<double>.from(freq);
   }
 
   void _copyColorMap() {
@@ -258,9 +285,9 @@ class NeuralQuantizer extends Quantizer {
       }
     }
 
-    _netIndex[previouscol] = (startpos + MAX_NET_POS) >> 1;
+    _netIndex[previouscol] = (startpos + MAX_NET_POS!) >> 1;
     for (var j = previouscol + 1; j < 256; j++) {
-      _netIndex[j] = MAX_NET_POS; // really 256
+      _netIndex[j] = MAX_NET_POS!; // really 256
     }
   }
 
@@ -438,44 +465,18 @@ class NeuralQuantizer extends Quantizer {
     return -1;
   }
 
-  void _setupArrays() {
-    _network[0] = 0.0; // black
-    _network[1] = 0.0;
-    _network[2] = 0.0;
-
-    _network[3] = 255.0; // white
-    _network[4] = 255.0;
-    _network[5] = 255.0;
-
-    // RESERVED bgColour  // background
-    final f = 1.0 / NET_SIZE;
-    for (var i = 0; i < SPECIALS; ++i) {
-      _freq[i] = f;
-      _bias[i] = 0.0;
-    }
-
-    for (var i = SPECIALS, p = SPECIALS * 3; i < NET_SIZE; ++i) {
-      _network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
-      _network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
-      _network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
-
-      _freq[i] = f;
-      _bias[i] = 0.0;
-    }
-  }
-
   static const NUM_CYCLES = 100; // no. of learning cycles
 
   int NET_SIZE = 16; // number of colours used
   int SPECIALS = 3; // number of reserved colours used
-  int BG_COLOR; // reserved background colour
-  int CUT_NET_SIZE;
-  int MAX_NET_POS;
+  late int BG_COLOR; // reserved background colour
+  late int CUT_NET_SIZE;
+  int? MAX_NET_POS;
 
-  int INIT_RAD; // for 256 cols, radius starts at 32
+  late int INIT_RAD; // for 256 cols, radius starts at 32
   static const RADIUS_BIAS_SHIFT = 6;
   static const RADIUS_BIAS = 1 << RADIUS_BIAS_SHIFT;
-  int INIT_BIAS_RADIUS;
+  late int INIT_BIAS_RADIUS;
   static const RADIUS_DEC = 30; // factor of 1/30 each cycle
 
   static const ALPHA_BIAS_SHIFT = 10; // alpha starts at 1
@@ -486,12 +487,12 @@ class NeuralQuantizer extends Quantizer {
   static const double BETA_GAMMA = BETA * GAMMA;
 
   /// the network itself
-  List<double> _network;
-  Int32List _colorMap;
+  late List<double> _network;
+  late Int32List _colorMap;
   final _netIndex = Int32List(256);
   // bias and freq arrays for learning
-  List<double> _bias;
-  List<double> _freq;
+  late List<double> _bias;
+  late List<double> _freq;
 
   // four primes near 500 - assume no image has a length so large
   // that it is divisible by all four primes
