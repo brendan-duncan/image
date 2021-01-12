@@ -1,4 +1,4 @@
-// @dart=2.11
+
 class Jpeg {
   static const dctZigZag = [
     0, 1, 8, 16, 9, 2, 3, 10,

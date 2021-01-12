@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../decode_info.dart';
 
 class JpegInfo extends DecodeInfo {
