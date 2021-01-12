@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import 'input_buffer.dart';
@@ -36,7 +36,7 @@ class OutputBuffer {
   }
 
   /// Write a set of bytes to the end of the buffer.
-  void writeBytes(List<int> bytes, [int len]) {
+  void writeBytes(List<int> bytes, [int? len]) {
     len ??= bytes.length;
     while (length + len > _buffer.length) {
       _expandBuffer((length + len) - _buffer.length);
@@ -83,7 +83,7 @@ class OutputBuffer {
   /// If [start] or [end] are < 0 then it is relative to the end of the buffer.
   /// If [end] is not specified (or null), then it is the end of the buffer.
   /// This is equivalent to the python list range operator.
-  List<int> subset(int start, [int end]) {
+  List<int> subset(int start, [int? end]) {
     if (start < 0) {
       start = (length) + start;
     }
@@ -98,7 +98,7 @@ class OutputBuffer {
   }
 
   /// Grow the buffer to accommodate additional data.
-  void _expandBuffer([int required]) {
+  void _expandBuffer([int? required]) {
     final blockSize = (required != null)
         ? required
         : (_buffer.isEmpty)

@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import '../image_exception.dart';
@@ -14,14 +14,14 @@ class InputBuffer {
 
   /// Create a InputStream for reading from a List<int>
   InputBuffer(List<int> buffer,
-      {this.bigEndian = false, int offset = 0, int length})
+      {this.bigEndian = false, int offset = 0, int? length})
       : buffer = buffer,
         start = offset,
         offset = offset,
         end = (length == null) ? buffer.length : offset + length;
 
   /// Create a copy of [other].
-  InputBuffer.from(InputBuffer other, {int offset = 0, int length})
+  InputBuffer.from(InputBuffer other, {int offset = 0, int? length})
       : buffer = other.buffer,
         offset = other.offset + offset,
         start = other.start,
@@ -72,7 +72,7 @@ class InputBuffer {
   /// to the start of the buffer. If [position] is not specified, the current
   /// read position is used. If [length] is not specified, the remainder of this
   /// stream is used.
-  InputBuffer subset(int count, {int position, int offset = 0}) {
+  InputBuffer subset(int count, {int? position, int offset = 0}) {
     var pos = position != null ? start + position : this.offset;
     pos += offset;
 
@@ -124,7 +124,7 @@ class InputBuffer {
 
   /// Read a null-terminated string, or if [len] is provided, that number of
   /// bytes returned as a string.
-  String readString([int len]) {
+  String readString([int? len]) {
     if (len == null) {
       var codes = <int>[];
       while (!isEOS) {
@@ -235,7 +235,7 @@ class InputBuffer {
     return buffer.sublist(s, e);
   }
 
-  Uint8List toUint8List([int offset = 0, int length]) {
+  Uint8List toUint8List([int offset = 0, int? length]) {
     var len = length ?? this.length - offset;
     if (buffer is Uint8List) {
       var b = buffer as Uint8List;
