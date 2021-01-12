@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'input_buffer.dart';
@@ -8,7 +7,7 @@ class OutputBuffer {
   final bool bigEndian;
 
   /// Create a byte buffer for writing.
-  OutputBuffer({int size = _BLOCK_SIZE, this.bigEndian = false})
+  OutputBuffer({int? size = _BLOCK_SIZE, this.bigEndian = false})
       : _buffer = Uint8List(size ?? _BLOCK_SIZE),
         length = 0;
 
