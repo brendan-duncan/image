@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:math';
 
 import '../image.dart';
@@ -33,8 +33,8 @@ Image sobel(Image src, {num amount = 1.0}) {
       num bInt = b < rgbaLen ? origRGBA[b] / 255.0 : 0.0;
       num brInt = br < rgbaLen ? origRGBA[br] / 255.0 : 0.0;
 
-      var h = -tlInt - 2.0 * tInt - trInt + blInt + 2.0 * bInt + brInt;
-      var v = -blInt - 2.0 * lInt - tlInt + brInt + 2.0 * rInt + trInt;
+      num h = -tlInt - 2.0 * tInt - trInt + blInt + 2.0 * bInt + brInt;
+      num v = -blInt - 2.0 * lInt - tlInt + brInt + 2.0 * rInt + trInt;
 
       var mag = clamp255((sqrt(h * h + v * v) * 255.0).toInt());
 

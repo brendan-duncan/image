@@ -1,11 +1,11 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import '../image.dart';
 import '../internal/clamp.dart';
 
-num _lastContrast;
-Uint8List _contrast;
+num? _lastContrast;
+late Uint8List _contrast;
 
 /// Set the [contrast] level for the image [src].
 ///

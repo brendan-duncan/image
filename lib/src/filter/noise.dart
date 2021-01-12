@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:math';
 
 import '../color.dart';
@@ -13,7 +13,7 @@ enum NoiseType { gaussian, uniform, salt_pepper, poisson, rice }
 /// [NoiseType.uniform], [NoiseType.salt_pepper], [NoiseType.poisson],
 /// or [NoiseType.rice].
 Image noise(Image image, num sigma,
-    {NoiseType type = NoiseType.gaussian, Random random}) {
+    {NoiseType type = NoiseType.gaussian, Random? random}) {
   random ??= Random();
 
   var nsigma = sigma;
