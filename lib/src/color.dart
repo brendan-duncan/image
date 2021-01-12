@@ -1,4 +1,3 @@
-// @dart=2.11
 import 'dart:math';
 
 import 'image_exception.dart';
@@ -235,11 +234,11 @@ List<int> hsvToRgb(num hue, num saturation, num brightness) {
     return [gray, gray, gray];
   }
 
-  var h = (hue - hue.floor()) * 6.0;
+  num h = (hue - hue.floor()) * 6.0;
   var f = h - h.floor();
-  var p = brightness * (1.0 - saturation);
-  var q = brightness * (1.0 - saturation * f);
-  var t = brightness * (1.0 - (saturation * (1.0 - f)));
+  num p = brightness * (1.0 - saturation);
+  num q = brightness * (1.0 - saturation * f);
+  num t = brightness * (1.0 - (saturation * (1.0 - f)));
 
   switch (h.toInt()) {
     case 0:
@@ -318,8 +317,8 @@ List<num> rgbToHsl(num r, num g, num b) {
 /// Convert a CIE-L*ab color to XYZ.
 List<int> labToXyz(num l, num a, num b) {
   num y = (l + 16.0) / 116.0;
-  var x = y + (a / 500.0);
-  var z = y - (b / 200.0);
+  num x = y + (a / 500.0);
+  num z = y - (b / 200.0);
   if (pow(x, 3) > 0.008856) {
     x = pow(x, 3);
   } else {
@@ -392,7 +391,7 @@ List<int> labToRgb(num l, num a, num b) {
 
   num y = (l + 16.0) / 116.0;
   num x = a / 500.0 + y;
-  var z = y - b / 200.0;
+  num z = y - b / 200.0;
 
   var y3 = pow(y, 3);
   if (y3 > 0.008856) {
@@ -424,9 +423,9 @@ List<int> labToRgb(num l, num a, num b) {
   z /= 100.0;
 
   // xyz to rgb
-  var R = x * 3.2406 + y * (-1.5372) + z * (-0.4986);
-  var G = x * (-0.9689) + y * 1.8758 + z * 0.0415;
-  var B = x * 0.0557 + y * (-0.2040) + z * 1.0570;
+  num R = x * 3.2406 + y * (-1.5372) + z * (-0.4986);
+  num G = x * (-0.9689) + y * 1.8758 + z * 0.0415;
+  num B = x * 0.0557 + y * (-0.2040) + z * 1.0570;
 
   if (R > 0.0031308) {
     R = 1.055 * (pow(R, 1.0 / 2.4)) - 0.055;
@@ -537,9 +536,9 @@ List<num> rgbToLab(num r, num g, num b) {
   g = g * 100.0;
   b = b * 100.0;
 
-  var x = r * 0.4124 + g * 0.3576 + b * 0.1805;
-  var y = r * 0.2126 + g * 0.7152 + b * 0.0722;
-  var z = r * 0.0193 + g * 0.1192 + b * 0.9505;
+  num x = r * 0.4124 + g * 0.3576 + b * 0.1805;
+  num y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+  num z = r * 0.0193 + g * 0.1192 + b * 0.9505;
 
   x = x / 95.047;
   y = y / 100.0;
