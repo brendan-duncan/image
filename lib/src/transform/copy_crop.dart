@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../image.dart';
 
 /// Returns a cropped copy of [src].

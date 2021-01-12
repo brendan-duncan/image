@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../color.dart';
 import '../image.dart';
 import '../transform/copy_into.dart';
@@ -55,7 +55,7 @@ List<int> findTrim(Image src,
 
   var xmin = w;
   var xmax = 0;
-  int ymin;
+  int? ymin;
   var ymax = 0;
 
   for (var y = 0; y < h; ++y) {
