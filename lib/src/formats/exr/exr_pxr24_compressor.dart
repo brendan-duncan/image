@@ -1,4 +1,3 @@
-// @dart=2.11
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -12,7 +11,7 @@ import 'exr_part.dart';
 
 abstract class ExrPxr24Compressor extends ExrCompressor {
   factory ExrPxr24Compressor(
-          ExrPart header, int maxScanLineSize, int numScanLines) =
+          ExrPart header, int? maxScanLineSize, int numScanLines) =
       InternalExrPxr24Compressor;
 }
 
@@ -26,20 +25,18 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
   int numScanLines() => _numScanLines;
 
   @override
-  Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
+  Uint8List compress(InputBuffer inPtr, int x, int y,
+      [int? width, int? height]) {
     throw ImageException('Pxr24 compression not yet supported.');
   }
 
   @override
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
-      [int width, int height]) {
+      [int? width, int? height]) {
     var data = _zlib.decodeBytes(inPtr.toUint8List());
-    if (data == null) {
-      throw ImageException('Error decoding pxr24 compressed data');
-    }
 
-    _output ??= OutputBuffer(size: _numScanLines * _maxScanLineSize);
-    _output.rewind();
+    _output ??= OutputBuffer(size: _numScanLines * _maxScanLineSize!);
+    _output!.rewind();
 
     var tmpEnd = 0;
     var ptr = [0, 0, 0, 0];
@@ -50,15 +47,15 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     height ??= header.linesInBuffer;
 
     var minX = x;
-    var maxX = x + width - 1;
+    var maxX = x + width! - 1;
     var minY = y;
-    var maxY = y + height - 1;
+    var maxY = y + height! - 1;
 
-    if (maxX > header.width) {
-      maxX = header.width - 1;
+    if (maxX > header.width!) {
+      maxX = header.width! - 1;
     }
-    if (maxY > header.height) {
-      maxY = header.height - 1;
+    if (maxY > header.height!) {
+      maxY = header.height! - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;
@@ -87,7 +84,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
                   (data[ptr[2]++] << 8);
               pixel[0] += diff;
               for (var k = 0; k < 4; ++k) {
-                _output.writeByte(pixelBytes[k]);
+                _output!.writeByte(pixelBytes[k]);
               }
             }
             break;
@@ -100,7 +97,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
               pixel[0] += diff;
 
               for (var k = 0; k < 2; ++k) {
-                _output.writeByte(pixelBytes[k]);
+                _output!.writeByte(pixelBytes[k]);
               }
             }
             break;
@@ -115,7 +112,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
                   (data[ptr[2]++] << 8);
               pixel[0] += diff;
               for (var k = 0; k < 4; ++k) {
-                _output.writeByte(pixelBytes[k]);
+                _output!.writeByte(pixelBytes[k]);
               }
             }
             break;
@@ -123,11 +120,11 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
       }
     }
 
-    return _output.getBytes() as Uint8List;
+    return _output!.getBytes() as Uint8List;
   }
 
   final _zlib = ZLibDecoder();
-  final int _maxScanLineSize;
+  final int? _maxScanLineSize;
   final int _numScanLines;
-  OutputBuffer _output;
+  OutputBuffer? _output;
 }

@@ -1,4 +1,3 @@
-// @dart=2.11
 import '../../image_exception.dart';
 import '../../util/input_buffer.dart';
 
@@ -48,16 +47,16 @@ class ExrChannel {
   /// A numerical identifier for the object represented by a sample.
   static const String ID = 'id';
 
-  String name;
-  int type;
-  int size;
-  bool pLinear;
-  int xSampling;
-  int ySampling;
+  String? name;
+  late int type;
+  late int size;
+  late bool pLinear;
+  late int xSampling;
+  late int ySampling;
 
   ExrChannel(InputBuffer input) {
     name = input.readString();
-    if (name == null || name.isEmpty) {
+    if (name == null || name!.isEmpty) {
       name = null;
       return;
     }

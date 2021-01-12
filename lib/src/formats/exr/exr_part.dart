@@ -1,4 +1,3 @@
-// @dart=2.11
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -21,28 +20,28 @@ class ExrPart {
   Map<String, ExrAttribute> attributes = {};
 
   /// The display window (see the openexr documentation).
-  List<int> displayWindow;
+  List<int>? displayWindow;
 
   /// The data window (see the openexr documentation).
-  List<int> dataWindow;
+  late List<int> dataWindow;
 
   /// width of the data window
-  int width;
+  int? width;
 
   /// Height of the data window
-  int height;
+  int? height;
   double pixelAspectRatio = 1.0;
   double screenWindowCenterX = 0.0;
   double screenWindowCenterY = 0.0;
   double screenWindowWidth = 1.0;
-  Float32List chromaticities;
+  late Float32List chromaticities;
 
   ExrPart(this._tiled, InputBuffer input) {
     //_type = _tiled ? ExrPart.TYPE_TILE : ExrPart.TYPE_SCANLINE;
 
     while (true) {
       var name = input.readString();
-      if (name == null || name.isEmpty) {
+      if (name.isEmpty) {
         break;
       }
 
@@ -139,33 +138,34 @@ class ExrPart {
         _numYLevels = 1;
       }
 
-      _numXTiles = List<int>(_numXLevels);
-      _numYTiles = List<int>(_numYLevels);
-
-      _calculateNumTiles(
-          _numXTiles, _numXLevels, left, right, _tileWidth, _tileRoundingMode);
-
-      _calculateNumTiles(
-          _numYTiles, _numYLevels, top, bottom, _tileHeight, _tileRoundingMode);
+      _numXTiles = _calculateNumTiles(
+          _numXLevels!, left, right, _tileWidth, _tileRoundingMode);
+      _numYTiles = _calculateNumTiles(
+          _numYLevels!, top, bottom, _tileHeight, _tileRoundingMode);
 
       _bytesPerPixel = _calculateBytesPerPixel();
-      _maxBytesPerTileLine = _bytesPerPixel * _tileWidth;
+      _maxBytesPerTileLine = _bytesPerPixel * _tileWidth!;
       //_tileBufferSize = _maxBytesPerTileLine * _tileHeight;
 
       _compressor = ExrCompressor(
           _compressionType, this, _maxBytesPerTileLine, _tileHeight);
 
-      _offsets = List<Uint32List>(_numXLevels * _numYLevels);
-      for (var ly = 0, l = 0; ly < _numYLevels; ++ly) {
-        for (var lx = 0; lx < _numXLevels; ++lx, ++l) {
-          _offsets[l] = Uint32List(_numXTiles[lx] * _numYTiles[ly]);
+      var lx = 0;
+      var ly = 0;
+      _offsets = List<Uint32List>.generate(_numXLevels! * _numYLevels!, (l) {
+        var result = Uint32List(_numXTiles![lx]! * _numYTiles![ly]!);
+        ++lx;
+        if (lx == _numXLevels) {
+          lx = 0;
+          ++ly;
         }
-      }
+        return result;
+      });
     } else {
-      _bytesPerLine = Uint32List(height + 1);
+      _bytesPerLine = Uint32List(height! + 1);
       for (var ch in channels) {
-        var nBytes = ch.size * width ~/ ch.xSampling;
-        for (var y = 0; y < height; ++y) {
+        var nBytes = ch.size * width! ~/ ch.xSampling;
+        for (var y = 0; y < height!; ++y) {
           if ((y + top) % ch.ySampling == 0) {
             _bytesPerLine[y] += nBytes;
           }
@@ -173,27 +173,27 @@ class ExrPart {
       }
 
       var maxBytesPerLine = 0;
-      for (var y = 0; y < height; ++y) {
+      for (var y = 0; y < height!; ++y) {
         maxBytesPerLine = max(maxBytesPerLine, _bytesPerLine[y]);
       }
 
       _compressor = ExrCompressor(_compressionType, this, maxBytesPerLine);
 
-      _linesInBuffer = _compressor.numScanLines();
+      _linesInBuffer = _compressor!.numScanLines();
       //_lineBufferSize = maxBytesPerLine * _linesInBuffer;
 
       _offsetInLineBuffer = Uint32List(_bytesPerLine.length);
 
       var offset = 0;
       for (var i = 0; i <= _bytesPerLine.length - 1; ++i) {
-        if (i % _linesInBuffer == 0) {
+        if (i % _linesInBuffer! == 0) {
           offset = 0;
         }
-        _offsetInLineBuffer[i] = offset;
+        _offsetInLineBuffer![i] = offset;
         offset += _bytesPerLine[i];
       }
 
-      var numOffsets = ((height + _linesInBuffer) ~/ _linesInBuffer) - 1;
+      var numOffsets = ((height! + _linesInBuffer!) ~/ _linesInBuffer!) - 1;
       _offsets = [Uint32List(numOffsets)];
     }
   }
@@ -255,7 +255,7 @@ class ExrPart {
     return num;
   }
 
-  int _roundLog2(int x, int rmode) {
+  int _roundLog2(int x, int? rmode) {
     return (rmode == ROUND_DOWN) ? _floorLog2(x) : _ceilLog2(x);
   }
 
@@ -296,14 +296,14 @@ class ExrPart {
     return bytesPerPixel;
   }
 
-  void _calculateNumTiles(List<int> numTiles, int numLevels, int min, int max,
-      int size, int rmode) {
-    for (var i = 0; i < numLevels; i++) {
-      numTiles[i] = (_levelSize(min, max, i, rmode) + size - 1) ~/ size;
-    }
+  List<int> _calculateNumTiles(
+      int numLevels, int min, int max, int? size, int? rmode) {
+    return List<int>.generate(
+        numLevels, (i) => (_levelSize(min, max, i, rmode) + size! - 1) ~/ size,
+        growable: false);
   }
 
-  int _levelSize(int _min, int _max, int l, int rmode) {
+  int _levelSize(int _min, int _max, int l, int? rmode) {
     if (l < 0) {
       throw ImageException('Argument not in valid range.');
     }
@@ -338,25 +338,25 @@ class ExrPart {
   //int _type;
   //int _lineOrder = INCREASING_Y;
   int _compressionType = ExrCompressor.NO_COMPRESSION;
-  List<Uint32List> _offsets;
+  List<Uint32List?>? _offsets;
 
-  Uint32List _bytesPerLine;
-  ExrCompressor _compressor;
-  int _linesInBuffer;
+  late Uint32List _bytesPerLine;
+  ExrCompressor? _compressor;
+  int? _linesInBuffer;
   //int _lineBufferSize;
-  Uint32List _offsetInLineBuffer;
+  Uint32List? _offsetInLineBuffer;
 
   final bool _tiled;
-  int _tileWidth;
-  int _tileHeight;
-  int _tileLevelMode;
-  int _tileRoundingMode;
-  List<int> _numXTiles;
-  List<int> _numYTiles;
-  int _numXLevels;
-  int _numYLevels;
-  int _bytesPerPixel;
-  int _maxBytesPerTileLine;
+  int? _tileWidth;
+  int? _tileHeight;
+  int? _tileLevelMode;
+  int? _tileRoundingMode;
+  List<int?>? _numXTiles;
+  List<int?>? _numYTiles;
+  int? _numXLevels;
+  int? _numYLevels;
+  late int _bytesPerPixel;
+  int? _maxBytesPerTileLine;
   //int _tileBufferSize;
 }
 
@@ -364,31 +364,31 @@ class ExrPart {
 class InternalExrPart extends ExrPart {
   InternalExrPart(bool tiled, InputBuffer input) : super(tiled, input);
 
-  List<Uint32List> get offsets => _offsets;
+  List<Uint32List?>? get offsets => _offsets;
 
-  ExrCompressor get compressor => _compressor;
-  int get linesInBuffer => _linesInBuffer;
-  Uint32List get offsetInLineBuffer => _offsetInLineBuffer;
+  ExrCompressor? get compressor => _compressor;
+  int? get linesInBuffer => _linesInBuffer;
+  Uint32List? get offsetInLineBuffer => _offsetInLineBuffer;
 
   bool get tiled => _tiled;
-  int get tileWidth => _tileWidth;
-  int get tileHeight => _tileHeight;
-  List<int> get numXTiles => _numXTiles;
-  List<int> get numYTiles => _numYTiles;
-  int get numXLevels => _numXLevels;
-  int get numYLevels => _numYLevels;
+  int? get tileWidth => _tileWidth;
+  int? get tileHeight => _tileHeight;
+  List<int?>? get numXTiles => _numXTiles;
+  List<int?>? get numYTiles => _numYTiles;
+  int? get numXLevels => _numXLevels;
+  int? get numYLevels => _numYLevels;
 
   void readOffsets(InputBuffer input) {
     if (_tiled) {
-      for (var i = 0; i < _offsets.length; ++i) {
-        for (var j = 0; j < _offsets[i].length; ++j) {
-          _offsets[i][j] = input.readUint64();
+      for (var i = 0; i < _offsets!.length; ++i) {
+        for (var j = 0; j < _offsets![i]!.length; ++j) {
+          _offsets![i]![j] = input.readUint64();
         }
       }
     } else {
-      var numOffsets = _offsets[0].length;
+      var numOffsets = _offsets![0]!.length;
       for (var i = 0; i < numOffsets; ++i) {
-        _offsets[0][i] = input.readUint64();
+        _offsets![0]![i] = input.readUint64();
       }
     }
   }

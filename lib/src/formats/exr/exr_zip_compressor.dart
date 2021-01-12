@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -10,7 +10,7 @@ import 'exr_part.dart';
 
 abstract class ExrZipCompressor extends ExrCompressor {
   factory ExrZipCompressor(
-          ExrPart header, int maxScanLineSize, int numScanLines) =
+          ExrPart header, int? maxScanLineSize, int numScanLines) =
       InternalExrZipCompressor;
 }
 
@@ -19,35 +19,35 @@ class InternalExrZipCompressor extends InternalExrCompressor
   ZLibDecoder zlib = ZLibDecoder();
 
   InternalExrZipCompressor(
-      ExrPart header, int maxScanLineSize, this._numScanLines)
+      ExrPart header, int? maxScanLineSize, this._numScanLines)
       : super(header as InternalExrPart);
 
   @override
   int numScanLines() => _numScanLines;
 
   @override
-  Uint8List compress(InputBuffer input, int x, int y, [int width, int height]) {
+  Uint8List compress(InputBuffer input, int x, int y, [int? width, int? height]) {
     throw ImageException('Zip compression not yet supported');
   }
 
   @override
   Uint8List uncompress(InputBuffer input, int x, int y,
-      [int width, int height]) {
+      [int? width, int? height]) {
     var data = zlib.decodeBytes(input.toUint8List());
 
     width ??= header.width;
     height ??= header.linesInBuffer;
 
     var minX = x;
-    var maxX = x + width - 1;
+    var maxX = x + width! - 1;
     var minY = y;
-    var maxY = y + height - 1;
+    var maxY = y + height! - 1;
 
-    if (maxX > header.width) {
-      maxX = header.width - 1;
+    if (maxX > header.width!) {
+      maxX = header.width! - 1;
     }
-    if (maxY > header.height) {
-      maxY = header.height - 1;
+    if (maxY > header.height!) {
+      maxY = header.height! - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;
@@ -59,7 +59,7 @@ class InternalExrZipCompressor extends InternalExrCompressor
     }
 
     // Reorder the pixel data
-    if (_outCache == null || _outCache.length != data.length) {
+    if (_outCache == null || _outCache!.length != data.length) {
       _outCache = Uint8List(data.length);
     }
 
@@ -70,20 +70,20 @@ class InternalExrZipCompressor extends InternalExrCompressor
 
     while (true) {
       if (si < len) {
-        _outCache[si++] = data[t1++];
+        _outCache![si++] = data[t1++];
       } else {
         break;
       }
       if (si < len) {
-        _outCache[si++] = data[t2++];
+        _outCache![si++] = data[t2++];
       } else {
         break;
       }
     }
 
-    return _outCache;
+    return _outCache!;
   }
 
   final int _numScanLines;
-  Uint8List _outCache;
+  Uint8List? _outCache;
 }
