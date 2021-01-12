@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../bitmap_font.dart';
 
 /// 24px Arial font for use with [drawString] and [drawChar].
