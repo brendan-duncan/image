@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -75,7 +75,7 @@ class Image {
   /// How long this frame should be displayed, in milliseconds.
   /// A duration of 0 indicates no delay and the next frame will be drawn
   /// as quickly as it can.
-  int duration = 0;
+  int? duration = 0;
 
   /// Defines what should be done to the canvas when drawing this frame
   /// in an animation.
@@ -92,16 +92,16 @@ class Image {
   ExifData exif;
 
   /// ICC color profile read from an image file.
-  ICCProfileData iccProfile;
+  ICCProfileData? iccProfile;
 
   /// Create an image with the given dimensions and format.
   Image(this.width, this.height,
-      {this.channels = Channels.rgba, ExifData exif, ICCProfileData iccp})
+      {this.channels = Channels.rgba, ExifData? exif, ICCProfileData? iccp})
       : data = Uint32List(width * height),
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
-  Image.rgb(this.width, this.height, {ExifData exif, ICCProfileData iccp})
+  Image.rgb(this.width, this.height, {ExifData? exif, ICCProfileData? iccp})
       : channels = Channels.rgb,
         data = Uint32List(width * height),
         exif = ExifData.from(exif),
@@ -140,8 +140,8 @@ class Image {
   /// var image = Image.fromBytes(canvas.width, canvas.height, bytes,
   ///                             format: Format.rgba);
   Image.fromBytes(int width, int height, List<int> bytes,
-      {ExifData exif,
-      ICCProfileData iccp,
+      {ExifData? exif,
+      ICCProfileData? iccp,
       Format format = Format.rgba,
       this.channels = Channels.rgba})
       : width = width,
