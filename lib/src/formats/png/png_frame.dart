@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../../internal/internal.dart';
 
 // Decodes a frame from a PNG animation.
@@ -11,15 +11,15 @@ class PngFrame {
   static const APNG_BLEND_OP_SOURCE = 0;
   static const APNG_BLEND_OP_OVER = 1;
 
-  int sequenceNumber;
-  int width;
-  int height;
-  int xOffset;
-  int yOffset;
-  int delayNum;
-  int delayDen;
-  int dispose;
-  int blend;
+  int? sequenceNumber;
+  int? width;
+  int? height;
+  int? xOffset;
+  int? yOffset;
+  int? delayNum;
+  int? delayDen;
+  int? dispose;
+  int? blend;
 
   final List<int> _fdat = [];
 }
