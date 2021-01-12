@@ -49,7 +49,7 @@ class JpegScan {
   void decode() {
     var componentsLength = components.length;
     JpegComponent component;
-    dynamic decodeFn;
+    void Function(JpegComponent, List) decodeFn;
 
     if (progressive) {
       if (spectralStart == 0) {
@@ -245,7 +245,7 @@ class JpegScan {
     }
   }
 
-  void _decodeACSuccessive(JpegComponent component, dynamic zz) {
+  void _decodeACSuccessive(JpegComponent component, List zz) {
     var k = spectralStart;
     var e = spectralEnd;
     var s = 0;
