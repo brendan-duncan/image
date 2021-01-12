@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:collection';
 
 import 'image.dart';
@@ -36,10 +36,10 @@ enum FrameType {
 /// into, and if the canvas should be cleared prior to drawing the frame.
 class Animation extends IterableBase<Image> {
   /// The canvas width for containing the animation.
-  int width;
+  int? width;
 
   /// The canvas height for containing the animation.
-  int height;
+  int? height;
 
   /// The suggested background color to clear the canvas with.
   int backgroundColor = 0xffffffff;
