@@ -1,3 +1,4 @@
+// @dart=2.11
 import '../../util/input_buffer.dart';
 
 class ExrAttribute {

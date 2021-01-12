@@ -1,4 +1,5 @@
 /// Provides information about the image being decoded.
+// @dart=2.11
 abstract class DecodeInfo {
   /// The width of the image canvas.
   int width = 0;

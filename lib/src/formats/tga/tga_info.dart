@@ -1,3 +1,4 @@
+// @dart=2.11
 import '../decode_info.dart';
 
 class TgaInfo extends DecodeInfo {

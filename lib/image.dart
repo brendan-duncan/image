@@ -1,5 +1,6 @@
 /// The image library aims to provide server-side programs the ability to load,
 /// manipulate, and save various image file formats.
+// @dart=2.11
 library image;
 
 export 'src/draw/draw_char.dart';

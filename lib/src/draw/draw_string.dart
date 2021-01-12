@@ -1,3 +1,4 @@
+// @dart=2.11
 import 'dart:typed_data';
 import '../bitmap_font.dart';
 import '../color.dart';

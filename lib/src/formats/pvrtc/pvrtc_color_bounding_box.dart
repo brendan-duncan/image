@@ -1,3 +1,4 @@
+// @dart=2.11
 class PvrtcColorBoundingBox {
   dynamic min;
   dynamic max;

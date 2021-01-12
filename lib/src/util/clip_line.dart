@@ -4,6 +4,7 @@
 /// Results are stored in [line].
 /// If [line] falls completely outside of [rect], false is returned, otherwise
 /// true is returned.
+// @dart=2.11
 bool clipLine(List<int> line, List<int> rect) {
   var x0 = line[0];
   var y0 = line[1];

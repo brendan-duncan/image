@@ -1,4 +1,5 @@
 /// Clamp [x] to [a] [b]
+// @dart=2.11
 int clamp(int x, int a, int b) => x.clamp(a, b).toInt();
 
 /// Clamp [x] to [0, 255]

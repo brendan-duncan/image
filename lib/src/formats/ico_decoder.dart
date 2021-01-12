@@ -1,3 +1,4 @@
+// @dart=2.11
 import 'package:image/image.dart';
 import 'package:image/src/animation.dart';
 import 'package:image/src/formats/bmp/bmp_info.dart';

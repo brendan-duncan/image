@@ -1,3 +1,4 @@
+// @dart=2.11
 import '../image.dart';
 
 /// Set all of the pixels of an [image] to the given [color].

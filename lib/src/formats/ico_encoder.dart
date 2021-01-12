@@ -1,3 +1,4 @@
+// @dart=2.11
 import 'package:image/src/formats/png_encoder.dart';
 
 import '../image.dart';

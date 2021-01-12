@@ -1,3 +1,4 @@
+// @dart=2.11
 import '../../internal/internal.dart';
 
 // Decodes a frame from a PNG animation.

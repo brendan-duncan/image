@@ -1,3 +1,4 @@
+// @dart=2.11
 import 'dart:typed_data';
 
 /// Exif data stored with an image.
