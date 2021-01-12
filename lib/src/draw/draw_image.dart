@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../image.dart';
 import 'draw_pixel.dart';
 
@@ -15,14 +15,14 @@ import 'draw_pixel.dart';
 /// copy regions within the same image (if [dst] is the same as [src])
 /// but if the regions overlap the results will be unpredictable.
 Image drawImage(Image dst, Image src,
-    {int dstX,
-    int dstY,
-    int dstW,
-    int dstH,
-    int srcX,
-    int srcY,
-    int srcW,
-    int srcH,
+    {int? dstX,
+    int? dstY,
+    int? dstW,
+    int? dstH,
+    int? srcX,
+    int? srcY,
+    int? srcW,
+    int? srcH,
     bool blend = true}) {
   dstX ??= 0;
   dstY ??= 0;

@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../image.dart';
 import '../util/point.dart';
 import 'draw_line.dart';
