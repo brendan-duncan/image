@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../../util/input_buffer.dart';
@@ -88,8 +87,7 @@ class WebPAlpha {
 
   bool _dequantizeLevels(
       Uint8List data, int width, int height, int row, int num_rows) {
-    if (data == null ||
-        width <= 0 ||
+    if (width <= 0 ||
         height <= 0 ||
         row < 0 ||
         num_rows < 0 ||

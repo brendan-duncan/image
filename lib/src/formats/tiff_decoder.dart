@@ -1,4 +1,3 @@
-
 import '../animation.dart';
 import '../image.dart';
 import '../hdr/hdr_image.dart';
@@ -93,9 +92,6 @@ class TiffDecoder extends Decoder {
     anim.frameType = FrameType.page;
     for (var i = 0, len = numFrames(); i < len; ++i) {
       var image = decodeFrame(i);
-      if (i == null) {
-        continue;
-      }
       anim.addFrame(image!);
     }
 

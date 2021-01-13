@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:image/image.dart';
@@ -180,15 +179,10 @@ class ExrImage extends DecodeInfo {
               tileHeight = height - ty;
             }
 
-            Uint8List uncompressedData;
-            if (compressor != null) {
-              uncompressedData = compressor.uncompress(
-                  data, tx, ty, part.tileWidth, part.tileHeight);
-              tileWidth = compressor.decodedWidth;
-              tileHeight = compressor.decodedHeight;
-            } else {
-              uncompressedData = data.toUint8List();
-            }
+            var uncompressedData = compressor.uncompress(
+                data, tx, ty, part.tileWidth, part.tileHeight);
+            tileWidth = compressor.decodedWidth;
+            tileHeight = compressor.decodedHeight;
 
             var si = 0;
             var len = uncompressedData.length;

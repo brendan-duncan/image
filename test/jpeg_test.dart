@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -21,10 +20,6 @@ void main() {
         expect(JpegDecoder().isValidFile(bytes), equals(true));
 
         final image = JpegDecoder().decodeImage(bytes);
-        if (image == null) {
-          throw ImageException('Unable to decode JPEG Image: $name.');
-        }
-
         final outJpg = JpegEncoder().encodeImage(image);
         File('$tmpPath/out/jpg/${name}')
           ..createSync(recursive: true)
@@ -32,9 +27,6 @@ void main() {
 
         // Make sure we can read what we just wrote.
         final image2 = JpegDecoder().decodeImage(outJpg);
-        if (image2 == null) {
-          throw ImageException('Unable to re-decode JPEG Image: $name.');
-        }
 
         expect(image.width, equals(image2.width));
         expect(image.height, equals(image2.height));

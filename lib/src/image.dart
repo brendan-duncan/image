@@ -1,4 +1,3 @@
-
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -226,7 +225,6 @@ class Image {
         }
         return bytes;
     }
-    return rgba;
   }
 
   /// Set all of the pixels of the image to the given [color].

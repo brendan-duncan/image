@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -65,7 +64,6 @@ void main() {
       test(name, () {
         List<int> bytes = f.readAsBytesSync();
         var img = PvrtcDecoder().decodePvr(bytes)!;
-        assert(img != null);
         File('$tmpPath/out/pvrtc/pvr_$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(img));

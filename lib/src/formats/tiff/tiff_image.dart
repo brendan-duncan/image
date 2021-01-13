@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -101,10 +100,7 @@ class TiffImage {
       }
     }
 
-    if (width == null ||
-        height == null ||
-        bitsPerSample == null ||
-        compression == null) {
+    if (width == null || height == null) {
       return;
     }
 
@@ -227,12 +223,7 @@ class TiffImage {
     }
   }
 
-  bool get isValid =>
-      width != null &&
-      height != null &&
-      samplesPerPixel != null &&
-      bitsPerSample != null &&
-      compression != null;
+  bool get isValid => width != null && height != null;
 
   Image decode(InputBuffer p) {
     image = Image(width!, height!);
@@ -338,10 +329,6 @@ class TiffImage {
         return;
       } else {
         throw ImageException('Unsupported Compression Type: $compression');
-      }
-
-      if (bdata == null) {
-        return;
       }
 
       for (var y = 0, py = outY; y < tileHeight! && py < height!; ++y, ++py) {
@@ -674,8 +661,8 @@ class TiffImage {
     }
   }
 
-  void _jpegToImage(Image tile, Image? image, int outX, int outY, int? tileWidth,
-      int tileHeight) {
+  void _jpegToImage(Image tile, Image? image, int outX, int outY,
+      int? tileWidth, int tileHeight) {
     var width = tileWidth;
     var height = tileHeight;
     for (var y = 0; y < height; y++) {
@@ -802,10 +789,6 @@ class TiffImage {
       bdata = p;
     } else {
       throw ImageException('Unsupported Compression Type: $compression');
-    }
-
-    if (bdata == null) {
-      return;
     }
 
     var br = TiffBitReader(bdata);

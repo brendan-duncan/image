@@ -1,4 +1,3 @@
-
 import '../animation.dart';
 import '../color.dart';
 import '../image.dart';
@@ -137,11 +136,7 @@ class WebPDecoder extends Decoder {
       var lastImage = Image(_info!.width, _info!.height);
       for (var i = 0; i < _info!.numFrames; ++i) {
         _info!.frame = i;
-        if (lastImage == null) {
-          lastImage = Image(_info!.width, _info!.height);
-        } else {
-          lastImage = Image.from(lastImage);
-        }
+        lastImage = Image.from(lastImage);
 
         final frame = _info!.frames[i];
         final image = decodeFrame(i);
@@ -149,14 +144,10 @@ class WebPDecoder extends Decoder {
           return null;
         }
 
-        if (lastImage != null) {
-          if (frame.clearFrame) {
-            lastImage.fill(0);
-          }
-          copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
-        } else {
-          lastImage = image;
+        if (frame.clearFrame) {
+          lastImage.fill(0);
         }
+        copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
 
         lastImage.duration = frame.duration;
         anim.addFrame(lastImage);

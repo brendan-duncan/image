@@ -1,9 +1,7 @@
-
 import 'package:image/image.dart';
 import 'package:image/src/animation.dart';
 import 'package:image/src/formats/bmp/bmp_info.dart';
 import 'package:image/src/formats/decode_info.dart';
-import 'package:meta/meta.dart';
 
 import '../image.dart';
 import '../util/input_buffer.dart';
@@ -57,10 +55,6 @@ class IcoDecoder extends Decoder {
       ..writeUint32(0);
     final bmpInfo = IcoBmpInfo(InputBuffer(imageBuffer),
         fileHeader: BitmapFileHeader(InputBuffer(dummyBmpHeader.getBytes())));
-    if (bmpInfo == null) {
-      // invalid header.
-      return null;
-    }
     if (bmpInfo.headerSize != 40 && bmpInfo.planes != 1) {
       // invalid header.
       return null;
@@ -190,14 +184,7 @@ class IcoInfoImage {
       required this.bytesSize,
       required this.bytesOffset,
       required this.colorPlanes,
-      required this.bitsPerPixel})
-      : assert(width != null),
-        assert(height != null),
-        assert(colorPalette != null),
-        assert(bytesSize != null),
-        assert(bytesOffset != null),
-        assert(colorPlanes != null),
-        assert(bitsPerPixel != null);
+      required this.bitsPerPixel});
 
   final int width;
   final int height;

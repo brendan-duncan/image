@@ -185,7 +185,6 @@ class BmpInfo extends DecodeInfo {
       case BitmapCompression.NONE:
         return 'none';
     }
-    return 'UNSUPPORTED: $compression';
   }
 
   @override

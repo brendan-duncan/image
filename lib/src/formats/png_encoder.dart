@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -142,7 +141,7 @@ class PngEncoder extends Encoder {
   }
 
   void _writeICCPChunk(OutputBuffer? out, ICCProfileData? iccp) {
-    if (iccp == null || iccp.data == null) {
+    if (iccp == null) {
       return;
     }
 

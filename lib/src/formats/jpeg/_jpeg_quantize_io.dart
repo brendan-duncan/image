@@ -299,24 +299,17 @@ Image getImageFromJpeg(JpegData jpeg) {
           var x2 = x >> hShift2;
           var x3 = x >> hShift3;
 
-          if (!colorTransform) {
-            R = component1Line![x1];
-            G = component1Line[x2];
-            B = component1Line[x3];
-            image[offset++] = getColor(R, G, B);
-          } else {
-            Y = component1Line![x1] << 8;
-            Cb = component2Line![x2] - 128;
-            Cr = component3Line![x3] - 128;
+          Y = component1Line![x1] << 8;
+          Cb = component2Line![x2] - 128;
+          Cr = component3Line![x3] - 128;
 
-            R = (Y + 359 * Cr + 128);
-            G = (Y - 88 * Cb - 183 * Cr + 128);
-            B = (Y + 454 * Cb + 128);
-            R = _clamp8(R >> 8);
-            G = _clamp8(G >> 8);
-            B = _clamp8(B >> 8);
-            image[offset++] = getColor(R, G, B);
-          }
+          R = (Y + 359 * Cr + 128);
+          G = (Y - 88 * Cb - 183 * Cr + 128);
+          B = (Y + 454 * Cb + 128);
+          R = _clamp8(R >> 8);
+          G = _clamp8(G >> 8);
+          B = _clamp8(B >> 8);
+          image[offset++] = getColor(R, G, B);
         }
       }
       break;
