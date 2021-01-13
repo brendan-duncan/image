@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import '../../color.dart';
@@ -10,7 +10,7 @@ import 'pvrtc_packet.dart';
 // Ported from Jeffrey Lim's PVRTC encoder/decoder,
 // https://bitbucket.org/jthlim/pvrtccompressor
 class PvrtcDecoder {
-  Image decodePvr(List<int> data) {
+  Image? decodePvr(List<int> data) {
     // Use a heuristic to detect potential apple PVRTC formats
     if (_countBits(data.length) == 1) {
       // very likely to be apple PVRTC
@@ -29,7 +29,7 @@ class PvrtcDecoder {
     return decodePVR2(data);
   }
 
-  Image decodeApplePVRTC(List<int> data) {
+  Image? decodeApplePVRTC(List<int> data) {
     // additional heuristic
     const HEADER_SIZE = 52;
     if (data.length > HEADER_SIZE) {
@@ -114,7 +114,7 @@ class PvrtcDecoder {
     return decodeRgba4bpp(width, height, data as TypedData);
   }
 
-  Image decodePVR2(List<int> data) {
+  Image? decodePVR2(List<int> data) {
     var length = data.length;
 
     const HEADER_SIZE = 52;
@@ -315,7 +315,7 @@ class PvrtcDecoder {
     return null;
   }
 
-  Image decodePVR3(List<int> data) {
+  Image? decodePVR3(List<int> data) {
     //const PVR3_PVRTC_2BPP_RGB = 0;
     //const PVR3_PVRTC_2BPP_RGBA = 1;
     const PVR3_PVRTC_4BPP_RGB = 2;

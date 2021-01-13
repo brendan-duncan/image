@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import 'pvrtc_bit_utility.dart';
@@ -8,7 +8,7 @@ import 'pvrtc_color.dart';
 // https://bitbucket.org/jthlim/pvrtccompressor
 class PvrtcPacket {
   Uint32List rawData;
-  int index;
+  late int index;
 
   PvrtcPacket(TypedData data) : rawData = Uint32List.view(data.buffer);
 

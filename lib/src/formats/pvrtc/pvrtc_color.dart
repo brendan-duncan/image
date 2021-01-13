@@ -1,4 +1,4 @@
-// @dart=2.11
+
 class PvrtcColorRgb {
   int r;
   int g;
