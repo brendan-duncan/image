@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import '../../image_exception.dart';
@@ -71,7 +71,7 @@ class VP8LBitReader {
 
   final InputBuffer _input;
   final _buffer = Uint32List(2);
-  Uint8List _buffer8;
+  late Uint8List _buffer8;
 
   // The number of bytes used for the bit buffer.
   static const VALUE_SIZE = 8;

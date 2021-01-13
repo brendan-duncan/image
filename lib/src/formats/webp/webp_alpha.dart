@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import '../../util/input_buffer.dart';
@@ -135,7 +135,7 @@ class WebPAlpha {
     return true;
   }
 
-  InternalVP8L _vp8l;
+  late InternalVP8L _vp8l;
 
   // Although alpha channel
   // requires only 1 byte per

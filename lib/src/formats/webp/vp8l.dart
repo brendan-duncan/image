@@ -1,4 +1,3 @@
-// @dart=2.11
 import 'dart:typed_data';
 
 import '../../color.dart';
@@ -17,7 +16,7 @@ class VP8L {
   InputBuffer input;
   VP8LBitReader br;
   WebPInfo webp;
-  Image image;
+  Image? image;
 
   VP8L(InputBuffer input, WebPInfo webp)
       : input = input,
@@ -43,7 +42,7 @@ class VP8L {
     return true;
   }
 
-  Image decode() {
+  Image? decode() {
     _lastPixel = 0;
 
     if (!decodeHeader()) {
@@ -141,7 +140,7 @@ class VP8L {
     return ok;
   }
 
-  Uint32List _decodeImageStream(int xsize, int ysize, bool isLevel0) {
+  Uint32List? _decodeImageStream(int xsize, int ysize, bool isLevel0) {
     var transformXsize = xsize;
     var transformYsize = ysize;
     var colorCacheBits = 0;
@@ -307,11 +306,11 @@ class VP8L {
         final key = code - lenCodeLimit;
 
         while (lastCached < src) {
-          colorCache.insert(data[lastCached] as int);
+          colorCache!.insert(data[lastCached] as int);
           lastCached++;
         }
 
-        data[src] = colorCache.lookup(key);
+        data[src] = colorCache!.lookup(key);
 
         ++src;
         ++col;
@@ -323,11 +322,9 @@ class VP8L {
             processFunc(row);
           }
 
-          if (colorCache != null) {
-            while (lastCached < src) {
-              colorCache.insert(data[lastCached] as int);
-              lastCached++;
-            }
+          while (lastCached < src) {
+            colorCache.insert(data[lastCached] as int);
+            lastCached++;
           }
         }
       } else {
@@ -387,10 +384,10 @@ class VP8L {
     final cachePixs = width * numRows;
 
     final di = width * _lastRow;
-    var src = InputBuffer(_pixels, offset: _argbCache);
+    var src = InputBuffer(_pixels!, offset: _argbCache!);
 
     for (var i = 0; i < cachePixs; ++i) {
-      _opaque[di + i] = (src[i] >> 8) & 0xff;
+      _opaque![di + i] = (src[i] >> 8) & 0xff;
     }
 
     _lastRow = row;
@@ -489,7 +486,7 @@ class VP8L {
   void _applyInverseTransformsAlpha(int numRows, InputBuffer rows) {
     final startRow = _lastRow;
     final endRow = startRow + numRows;
-    var rowsOut = InputBuffer(_opaque, offset: _ioWidth * startRow);
+    var rowsOut = InputBuffer(_opaque!, offset: _ioWidth! * startRow);
     var transform = _transforms[0];
 
     transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);
@@ -510,15 +507,15 @@ class VP8L {
 
     //int count = 0;
     //int di = rows;
-    for (var y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
+    for (var y = 0, pi = _argbCache!, dy = _lastRow; y < numRows; ++y, ++dy) {
       for (var x = 0; x < webp.width; ++x, ++pi) {
-        var c = _pixels[pi];
+        var c = _pixels![pi];
         var r = getRed(c);
         var g = getGreen(c);
         var b = getBlue(c);
         var a = getAlpha(c);
         // rearrange the ARGB webp color to RGBA image color.
-        image.setPixel(x, dy, getColor(r, g, b, a));
+        image!.setPixel(x, dy, getColor(r, g, b, a));
       }
     }
 
@@ -531,22 +528,22 @@ class VP8L {
     final startRow = _lastRow;
     final endRow = startRow + numRows;
     var rowsIn = rows;
-    var rowsOut = _argbCache;
+    var rowsOut = _argbCache!;
 
     // Inverse transforms.
-    _pixels.setRange(rowsOut, rowsOut + cachePixs, _pixels, rowsIn);
+    _pixels!.setRange(rowsOut, rowsOut + cachePixs, _pixels!, rowsIn);
 
     while (n-- > 0) {
       var transform = _transforms[n];
       transform.inverseTransform(
-          startRow, endRow, _pixels, rowsIn, _pixels, rowsOut);
+          startRow, endRow, _pixels!, rowsIn, _pixels!, rowsOut);
       rowsIn = rowsOut;
     }
   }
 
   bool _readHuffmanCodes(
       int xsize, int ysize, int colorCacheBits, bool allowRecursion) {
-    Uint32List huffmanImage;
+    Uint32List? huffmanImage;
     var numHtreeGroups = 1;
 
     if (allowRecursion && br.readBits(1) != 0) {
@@ -562,7 +559,7 @@ class VP8L {
 
       for (var i = 0; i < huffmanPixs; ++i) {
         // The huffman data is stored in red and green bytes.
-        final group = (huffmanImage[i] >> 8) & 0xffff;
+        final group = (huffmanImage![i] >> 8) & 0xffff;
         huffmanImage[i] = group;
         if (group >= numHtreeGroups) {
           numHtreeGroups = group + 1;
@@ -572,10 +569,10 @@ class VP8L {
 
     assert(numHtreeGroups <= 0x10000);
 
-    var htreeGroups = List<HTreeGroup>(numHtreeGroups);
+    var htreeGroups = List<HTreeGroup>.generate(
+        numHtreeGroups, (_) => HTreeGroup(),
+        growable: false);
     for (var i = 0; i < numHtreeGroups; ++i) {
-      htreeGroups[i] = HTreeGroup();
-
       for (var j = 0; j < HUFFMAN_CODES_PER_META_CODE; ++j) {
         var alphabetSize = ALPHABET_SIZE[j];
         if (j == 0 && colorCacheBits > 0) {
@@ -746,10 +743,10 @@ class VP8L {
   bool _expandColorMap(int numColors, VP8LTransform transform) {
     final finalNumColors = 1 << (8 >> transform.bits);
     var newColorMap = Uint32List(finalNumColors);
-    var data = Uint8List.view(transform.data.buffer);
+    var data = Uint8List.view(transform.data!.buffer);
     var newData = Uint8List.view(newColorMap.buffer);
 
-    newColorMap[0] = transform.data[0];
+    newColorMap[0] = transform.data![0];
 
     var len = 4 * numColors;
 
@@ -768,19 +765,16 @@ class VP8L {
     return true;
   }
 
-  int _getMetaIndex(Uint32List image, int xsize, int bits, int x, int y) {
+  int _getMetaIndex(Uint32List? image, int xsize, int bits, int x, int y) {
     if (bits == 0) {
       return 0;
     }
-    return image[xsize * (y >> bits) + (x >> bits)];
+    return image![xsize * (y >> bits) + (x >> bits)];
   }
 
   HTreeGroup _getHtreeGroupForPos(int x, int y) {
     var metaIndex = _getMetaIndex(
         _huffmanImage, _huffmanXsize, _huffmanSubsampleBits, x, y);
-    if (_htreeGroups[metaIndex] == null) {
-      _htreeGroups[metaIndex] = HTreeGroup();
-    }
     return _htreeGroups[metaIndex];
   }
 
@@ -960,25 +954,25 @@ class VP8L {
   int _lastRow = 0;
 
   int _colorCacheSize = 0;
-  VP8LColorCache _colorCache;
+  VP8LColorCache? _colorCache;
 
   int _huffmanMask = 0;
   int _huffmanSubsampleBits = 0;
   int _huffmanXsize = 0;
-  Uint32List _huffmanImage;
+  Uint32List? _huffmanImage;
   int _numHtreeGroups = 0;
   List<HTreeGroup> _htreeGroups = [];
   final List<VP8LTransform> _transforms = [];
   int _transformsSeen = 0;
 
-  Uint32List _pixels;
-  Uint8List _pixels8;
-  int _argbCache;
+  Uint32List? _pixels;
+  late Uint8List _pixels8;
+  int? _argbCache;
 
-  Uint8List _opaque;
+  Uint8List? _opaque;
 
-  int _ioWidth;
-  int _ioHeight;
+  int? _ioWidth;
+  int? _ioHeight;
 
   static const ARGB_BLACK = 0xff000000;
   static const MAX_CACHE_BITS = 11;
@@ -998,21 +992,21 @@ class InternalVP8L extends VP8L {
   InternalVP8L(InputBuffer input, WebPInfo webp) : super(input, webp);
 
   List<VP8LTransform> get transforms => _transforms;
-  Uint32List get pixels => _pixels;
+  Uint32List? get pixels => _pixels;
 
-  Uint8List get opaque => _opaque;
-  set opaque(Uint8List value) => _opaque = value;
+  Uint8List? get opaque => _opaque;
+  set opaque(Uint8List? value) => _opaque = value;
 
-  int get ioWidth => _ioWidth;
-  set ioWidth(int width) => _ioWidth = width;
-  int get ioHeight => _ioHeight;
-  set ioHeight(int height) => _ioHeight = height;
+  int? get ioWidth => _ioWidth;
+  set ioWidth(int? width) => _ioWidth = width;
+  int? get ioHeight => _ioHeight;
+  set ioHeight(int? height) => _ioHeight = height;
 
   bool decodeImageData(dynamic data, int width, int height, int lastRow,
           dynamic processFunc) =>
       _decodeImageData(data, width, height, lastRow, processFunc);
 
-  Uint32List decodeImageStream(int xsize, int ysize, bool isLevel0) =>
+  Uint32List? decodeImageStream(int xsize, int ysize, bool isLevel0) =>
       _decodeImageStream(xsize, ysize, isLevel0);
 
   bool allocateInternalBuffers32b() => _allocateInternalBuffers32b();

@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import '../../internal/bit_operators.dart';
@@ -15,7 +15,7 @@ class VP8LTransform {
   int type = 0;
   int xsize = 0;
   int ysize = 0;
-  Uint32List data;
+  Uint32List? data;
   int bits = 0;
 
   void inverseTransform(int rowStart, int rowEnd, Uint32List inData, int rowsIn,
@@ -85,7 +85,7 @@ class VP8LTransform {
             packed_pixels = _getAlphaIndex(src[0]);
             src.offset++;
           }
-          var p = _getAlphaValue(colorMap[packed_pixels & bit_mask]);
+          var p = _getAlphaValue(colorMap![packed_pixels & bit_mask]);
           ;
           dst[0] = p;
           dst.offset++;
@@ -97,7 +97,7 @@ class VP8LTransform {
         for (var x = 0; x < width; ++x) {
           var index = _getAlphaIndex(src[0]);
           src.offset++;
-          dst[0] = _getAlphaValue(colorMap[index]);
+          dst[0] = _getAlphaValue(colorMap![index]);
           dst.offset++;
         }
       }
@@ -123,7 +123,7 @@ class VP8LTransform {
           if ((x & countMask) == 0) {
             packed_pixels = _getARGBIndex(inData[src++]);
           }
-          outData[dst++] = _getARGBValue(colorMap[packed_pixels & bit_mask]);
+          outData[dst++] = _getARGBValue(colorMap![packed_pixels & bit_mask]);
           packed_pixels >>= bitsPerPixel;
         }
       }
@@ -131,7 +131,7 @@ class VP8LTransform {
       for (var y = yStart; y < yEnd; ++y) {
         for (var x = 0; x < width; ++x) {
           outData[dst++] =
-              _getARGBValue(colorMap[_getARGBIndex(inData[src++])]);
+              _getARGBValue(colorMap![_getARGBIndex(inData[src++])]);
         }
       }
     }
@@ -152,7 +152,7 @@ class VP8LTransform {
 
       for (var x = 0; x < width; ++x) {
         if ((x & mask) == 0) {
-          m.colorCode = this.data[pred++];
+          m.colorCode = this.data![pred++];
         }
 
         outData[data + x] = m.transformColor(outData[data + x], true);
@@ -197,13 +197,13 @@ class VP8LTransform {
       _addPixelsEq(outData, data, pred2);
 
       // .. the rest:
-      var k = (this.data[predModeSrc++] >> 8) & 0xf;
+      var k = (this.data![predModeSrc++] >> 8) & 0xf;
 
       var predFunc = PREDICTORS[k];
       for (var x = 1; x < width; ++x) {
         if ((x & mask) == 0) {
           // start of tile. Read predictor function.
-          var k = ((this.data[predModeSrc++]) >> 8) & 0xf;
+          var k = ((this.data![predModeSrc++]) >> 8) & 0xf;
           predFunc = PREDICTORS[k];
         }
         var d = outData[data + x - 1];
