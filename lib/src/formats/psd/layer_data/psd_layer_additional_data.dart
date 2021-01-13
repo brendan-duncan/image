@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../../../util/input_buffer.dart';
 import '../psd_layer_data.dart';
 

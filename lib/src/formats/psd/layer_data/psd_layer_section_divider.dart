@@ -1,4 +1,3 @@
-// @dart=2.11
 import '../../../image_exception.dart';
 import '../../../util/input_buffer.dart';
 import '../psd_layer_data.dart';
@@ -14,8 +13,8 @@ class PsdLayerSectionDivider extends PsdLayerData {
   static const SUBTYPE_NORMAL = 0;
   static const SUBTYPE_SCENE_GROUP = 1;
 
-  int type;
-  String key;
+  late int type;
+  String? key;
   int subType = SUBTYPE_NORMAL;
 
   PsdLayerSectionDivider(String tag, InputBuffer data) : super.type(tag) {

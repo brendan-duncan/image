@@ -1,4 +1,3 @@
-// @dart=2.11
 import 'dart:typed_data';
 
 import '../../image_exception.dart';
@@ -19,29 +18,36 @@ class PsdChannel {
   static const COMPRESS_ZIP_PREDICTOR = 3;
 
   int id;
-  int dataLength;
-  Uint8List data;
+  int? dataLength;
+  late Uint8List data;
 
   PsdChannel(this.id, this.dataLength);
 
-  PsdChannel.read(InputBuffer input, this.id, int width, int height,
-      int bitDepth, int compression, Uint16List lineLengths, int planeNumber) {
+  PsdChannel.read(
+      InputBuffer input,
+      this.id,
+      int width,
+      int height,
+      int? bitDepth,
+      int compression,
+      Uint16List? lineLengths,
+      int planeNumber) {
     readPlane(
         input, width, height, bitDepth, compression, lineLengths, planeNumber);
   }
 
-  void readPlane(InputBuffer input, int width, int height, int bitDepth,
-      [int compression, Uint16List lineLengths, int planeNum = 0]) {
+  void readPlane(InputBuffer input, int width, int height, int? bitDepth,
+      [int? compression, Uint16List? lineLengths, int planeNum = 0]) {
     compression ??= input.readUint16();
 
     switch (compression) {
       case COMPRESS_NONE:
-        _readPlaneUncompressed(input, width, height, bitDepth);
+        _readPlaneUncompressed(input, width, height, bitDepth!);
         break;
       case COMPRESS_RLE:
         lineLengths ??= _readLineLengths(input, height);
         _readPlaneRleCompressed(
-            input, width, height, bitDepth, lineLengths, planeNum);
+            input, width, height, bitDepth!, lineLengths, planeNum);
         break;
       default:
         throw ImageException('Unsupported compression: $compression');
