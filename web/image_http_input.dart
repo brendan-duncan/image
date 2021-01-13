@@ -1,10 +1,9 @@
-// @dart=2.11
 import 'dart:html';
 
 import 'package:image/image.dart';
 import 'dart:convert';
 
-InputElement fileInput;
+late InputElement fileInput;
 
 void main() {
   // There are at least two ways to get a file into an html dart app:
@@ -19,7 +18,7 @@ void main() {
 /// Called when the user has selected a file.
 void onFileChanged(Event event) {
   var files = fileInput.files as FileList;
-  var file = files.item(0);
+  var file = files.item(0)!;
 
   var reader = FileReader();
   reader.addEventListener('load', onFileLoaded);
@@ -48,12 +47,12 @@ void onFileLoaded(Event event) {
   // a canvas.
   if (image != null) {
     // Add a separator to the html page
-    document.body.append(ParagraphElement());
+    document.body!.append(ParagraphElement());
 
     // Draw the image into a canvas. First create a canvas at the correct
     // resolution.
     var c = CanvasElement();
-    document.body.append(c);
+    document.body!.append(c);
     c.width = image.width;
     c.height = image.height;
 
@@ -69,7 +68,7 @@ void onFileLoaded(Event event) {
     // the encoded image, and using a data url for the img src.
 
     var img = ImageElement();
-    document.body.append(img);
+    document.body!.append(img);
     // encode the image to a PNG
     var png = encodePng(image);
     // base64 encode the png

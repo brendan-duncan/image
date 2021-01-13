@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:io';
 import 'package:image/image.dart';
 
@@ -6,7 +6,7 @@ void main() {
   // Read an image from file (webp in this case).
   // decodeImage will identify the format of the image and use the appropriate
   // decoder.
-  var image = decodeImage(File('test.webp').readAsBytesSync());
+  var image = decodeImage(File('test.webp').readAsBytesSync())!;
 
   // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
   var thumbnail = copyResize(image, width: 120);
