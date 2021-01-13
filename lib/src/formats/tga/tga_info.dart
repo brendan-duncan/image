@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../decode_info.dart';
 
 class TgaInfo extends DecodeInfo {
@@ -7,8 +7,8 @@ class TgaInfo extends DecodeInfo {
   int get numFrames => 1;
 
   // Offset in the input file the image data starts at.
-  int imageOffset;
+  int? imageOffset;
 
   // Bits per pixel.
-  int bpp;
+  int? bpp;
 }

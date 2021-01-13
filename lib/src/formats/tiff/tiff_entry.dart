@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../../image_exception.dart';
 import '../../util/input_buffer.dart';
 import 'tiff_image.dart';
@@ -7,7 +7,7 @@ class TiffEntry {
   int tag;
   int type;
   int numValues;
-  int valueOffset;
+  int? valueOffset;
   InputBuffer p;
 
   TiffEntry(this.tag, this.type, this.numValues, this.p);
@@ -27,12 +27,12 @@ class TiffEntry {
   bool get isString => type == TYPE_ASCII;
 
   int readValue() {
-    p.offset = valueOffset;
+    p.offset = valueOffset!;
     return _readValue();
   }
 
   List<int> readValues() {
-    p.offset = valueOffset;
+    p.offset = valueOffset!;
     var values = <int>[];
     for (var i = 0; i < numValues; ++i) {
       values.add(_readValue());
@@ -49,7 +49,7 @@ class TiffEntry {
   }
 
   List read() {
-    p.offset = valueOffset;
+    p.offset = valueOffset!;
     var values = <dynamic>[];
     for (var i = 0; i < numValues; ++i) {
       switch (type) {
