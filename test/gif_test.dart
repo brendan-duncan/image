@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -10,14 +10,14 @@ void main() {
   var files = dir.listSync();
 
   group('GIF', () {
-    for (var f in files) {
-      if (f is! File || !f.path.endsWith('.gif')) {
+    for (var f in files.whereType<File>()) {
+      if (!f.path.endsWith('.gif')) {
         continue;
       }
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('getInfo $name', () {
-        var bytes = (f as File).readAsBytesSync();
+        var bytes = f.readAsBytesSync();
 
         final data = GifDecoder().startDecode(bytes);
         if (data == null) {
@@ -33,8 +33,8 @@ void main() {
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('decodeImage $name', () {
-        var bytes = (f as File).readAsBytesSync();
-        final image = GifDecoder().decodeImage(bytes);
+        var bytes = f.readAsBytesSync();
+        final image = GifDecoder().decodeImage(bytes)!;
         File('$tmpPath/out/gif/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(image));
@@ -46,17 +46,17 @@ void main() {
         continue;
       }
 
-      Animation anim;
+      Animation? anim;
       final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('decodeCars $name', () {
-        final bytes = (f as File).readAsBytesSync();
+        final bytes = f.readAsBytesSync();
         anim = GifDecoder().decodeAnimation(bytes);
-        expect(anim.length, equals(30));
-        expect(anim.loopCount, equals(0));
+        expect(anim!.length, equals(30));
+        expect(anim!.loopCount, equals(0));
       });
 
       test('encodeCars', () {
-        var gif = encodeGifAnimation(anim);
+        var gif = encodeGifAnimation(anim!)!;
         File('$tmpPath/out/gif/cars.gif')
           ..createSync(recursive: true)
           ..writeAsBytesSync(gif);
@@ -72,12 +72,12 @@ void main() {
         anim.addFrame(image);
       }
 
-      final gif = encodeGifAnimation(anim);
+      final gif = encodeGifAnimation(anim)!;
       File('$tmpPath/out/gif/encodeAnimation.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
 
-      final anim2 = GifDecoder().decodeAnimation(gif);
+      final anim2 = GifDecoder().decodeAnimation(gif)!;
       expect(anim2.length, equals(10));
       expect(anim2.loopCount, equals(10));
     });
@@ -91,12 +91,12 @@ void main() {
         anim.addFrame(image);
       }
 
-      final gif = encodeGifAnimation(anim);
+      final gif = encodeGifAnimation(anim)!;
       File('$tmpPath/out/gif/encodeAnimation_variable_fps.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
 
-      final anim2 = GifDecoder().decodeAnimation(gif);
+      final anim2 = GifDecoder().decodeAnimation(gif)!;
       expect(anim2.length, equals(3));
       expect(anim2.loopCount, equals(0));
       expect(anim2[0].duration, equals(1000));

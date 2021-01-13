@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -13,14 +13,14 @@ void main() {
   var files = dir.listSync();
 
   group('TGA', () {
-    for (var f in files) {
-      if (f is! File || !f.path.endsWith('.tga')) {
+    for (var f in files.whereType<File>()) {
+      if (!f.path.endsWith('.tga')) {
         continue;
       }
 
       var name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
-        var bytes = (f as File).readAsBytesSync();
+        var bytes = f.readAsBytesSync();
         var image = TgaDecoder().decodeImage(bytes);
         if (image == null) {
           throw ImageException('Unable to decode TGA Image: $name.');
@@ -37,7 +37,7 @@ void main() {
       var bytes = File('test/res/tga/globe.tga').readAsBytesSync();
 
       // Decode the image from file.
-      var image = TgaDecoder().decodeImage(bytes);
+      var image = TgaDecoder().decodeImage(bytes)!;
       expect(image.width, equals(128));
       expect(image.height, equals(128));
 
@@ -49,7 +49,7 @@ void main() {
         ..writeAsBytesSync(tga);
 
       // Decode the encoded image, make sure it's the same as the original.
-      var image2 = TgaDecoder().decodeImage(tga);
+      var image2 = TgaDecoder().decodeImage(tga)!;
       expect(image2.width, equals(128));
       expect(image2.height, equals(128));
     });

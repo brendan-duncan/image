@@ -1,4 +1,3 @@
-// @dart=2.11
 import 'dart:io';
 
 import 'package:image/image.dart';
@@ -42,15 +41,15 @@ void main() {
       return;
     }
 
-    for (final file in dir.listSync()) {
-      if (file is! File || !file.path.endsWith('.ico')) {
+    for (final file in dir.listSync().whereType<File>()) {
+      if (!file.path.endsWith('.ico')) {
         continue;
       }
 
       final name = file.path.split(RegExp(r'(/|\\)')).last;
       test('decode $name', () {
-        final bytes = (file as File).readAsBytesSync();
-        final image = IcoDecoder().decodeImageLargest(bytes);
+        final bytes = file.readAsBytesSync();
+        final image = IcoDecoder().decodeImageLargest(bytes)!;
         File('$tmpPath/out/ico/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(PngEncoder().encodeImage(image));

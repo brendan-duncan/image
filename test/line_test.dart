@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:io';
 
 import 'package:test/test.dart';
@@ -11,7 +11,7 @@ int blackcolor = getColor(0, 0, 0);
 int whitecolor = getColor(255, 255, 255);
 
 void main() {
-  Image image;
+  late Image image;
 
   setUp(() {
     image = Image(100, 100);

@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -12,7 +12,7 @@ void main() {
 
       final dec = ExrDecoder();
       dec.startDecode(bytes);
-      final img = dec.decodeFrame(0);
+      final img = dec.decodeFrame(0)!;
 
       final png = PngEncoder().encodeImage(img);
       File('$tmpPath/out/exr/grid.png')
@@ -21,7 +21,7 @@ void main() {
     });
 
     test('hdr image', () {
-      final img = decodePng(File('test/res/png/lenna.png').readAsBytesSync());
+      final img = decodePng(File('test/res/png/lenna.png').readAsBytesSync())!;
       img.channels = Channels.rgba;
       final hdr = HdrImage.fromImage(img);
       var img2 = hdrToImage(hdr);

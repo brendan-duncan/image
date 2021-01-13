@@ -107,37 +107,33 @@ class NeuralQuantizer extends Quantizer {
     SPECIALS = 3; // number of reserved colours used
     BG_COLOR = SPECIALS - 1;
 
-    var network = List<double?>.filled(NET_SIZE * 3, null);
-    var bias = List<double?>.filled(NET_SIZE, null);
-    var freq = List<double?>.filled(NET_SIZE, null);
+    _network = List<double>.filled(NET_SIZE * 3, 0);
+    _bias = List<double>.filled(NET_SIZE, 0);
+    _freq = List<double>.filled(NET_SIZE, 0);
 
-    network[0] = 0.0; // black
-    network[1] = 0.0;
-    network[2] = 0.0;
+    _network[0] = 0.0; // black
+    _network[1] = 0.0;
+    _network[2] = 0.0;
 
-    network[3] = 255.0; // white
-    network[4] = 255.0;
-    network[5] = 255.0;
+    _network[3] = 255.0; // white
+    _network[4] = 255.0;
+    _network[5] = 255.0;
 
     // RESERVED bgColour  // background
     final f = 1.0 / NET_SIZE;
     for (var i = 0; i < SPECIALS; ++i) {
-      freq[i] = f;
-      bias[i] = 0.0;
+      _freq[i] = f;
+      _bias[i] = 0.0;
     }
 
     for (var i = SPECIALS, p = SPECIALS * 3; i < NET_SIZE; ++i) {
-      network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
-      network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
-      network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
+      _network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
+      _network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
+      _network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
 
-      freq[i] = f;
-      bias[i] = 0.0;
+      _freq[i] = f;
+      _bias[i] = 0.0;
     }
-
-    _network = List<double>.from(network);
-    _bias = List<double>.from(bias);
-    _freq = List<double>.from(freq);
   }
 
   void _copyColorMap() {

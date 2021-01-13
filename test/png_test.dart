@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -27,7 +27,7 @@ void main() {
         anim.addFrame(image);
       }
 
-      final png = encodePngAnimation(anim);
+      final png = encodePngAnimation(anim)!;
       File('$tmpPath/out/png/encodeAnimation.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
@@ -35,7 +35,7 @@ void main() {
 
     test('decode', () {
       List<int> bytes = File('$tmpPath/out/png/encode.png').readAsBytesSync();
-      final image = PngDecoder().decodeImage(bytes);
+      final image = PngDecoder().decodeImage(bytes)!;
 
       expect(image.width, equals(64));
       expect(image.height, equals(64));
@@ -50,17 +50,17 @@ void main() {
 
     test('iCCP', () {
       final bytes = File('test/res/png/iCCP.png').readAsBytesSync();
-      final image = PngDecoder().decodeImage(bytes);
+      final image = PngDecoder().decodeImage(bytes)!;
       expect(image.iccProfile, isNotNull);
-      expect(image.iccProfile.data, isNotNull);
+      expect(image.iccProfile!.data, isNotNull);
 
       final png = PngEncoder().encodeImage(image);
 
-      final image2 = PngDecoder().decodeImage(png);
+      final image2 = PngDecoder().decodeImage(png)!;
       expect(image2.iccProfile, isNotNull);
-      expect(image2.iccProfile.data, isNotNull);
+      expect(image2.iccProfile!.data, isNotNull);
       expect(
-          image2.iccProfile.data.length, equals(image.iccProfile.data.length));
+          image2.iccProfile!.data.length, equals(image.iccProfile!.data.length));
     });
 
     final dir = Directory('test/res/png');
@@ -100,7 +100,7 @@ void main() {
       final name = f.path.split(RegExp(r'(/|\\)')).last;
 
       test('PNG $name', () {
-        final file = f as File;
+        final file = f;
 
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
@@ -111,7 +111,7 @@ void main() {
             ;
           }
         } else {
-          final anim = decodeAnimation(file.readAsBytesSync());
+          final anim = decodeAnimation(file.readAsBytesSync())!;
           if (anim.length == 1) {
             final png = PngEncoder().encodeImage(anim[0]);
             File('$tmpPath/out/png/${name}')

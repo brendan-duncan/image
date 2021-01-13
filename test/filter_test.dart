@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -38,7 +38,7 @@ void main() {
     });
 
     test('copyCrop', () {
-      final s = readPng(File('test/res/png/lenna.png').readAsBytesSync());
+      final s = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
       final d = copyCrop(s, 200, 200, 5000, 5000);
       final fp = File('$tmpPath/out/copyCrop.jpg');
       fp.createSync(recursive: true);
@@ -65,7 +65,7 @@ void main() {
           Image(image.width + 20, image.height + 20, channels: image.channels);
       fill(d, 0xff0000ff);
       copyInto(d, s, dstX: 10, dstY: 10);
-      copyInto(d, image2, dstX: 10, dstY: 10);
+      copyInto(d, image2!, dstX: 10, dstY: 10);
 
       File('$tmpPath/out/copyInto.jpg')
         ..createSync(recursive: true)
@@ -74,7 +74,7 @@ void main() {
 
     test('add', () {
       var i1 = Image.from(image);
-      final i2 = Image.from(image2);
+      final i2 = Image.from(image2!);
       i1 += i2;
 
       final fp = File('$tmpPath/out/add.jpg');
@@ -84,7 +84,7 @@ void main() {
 
     test('sub', () {
       var i1 = Image.from(image);
-      final i2 = Image.from(image2);
+      final i2 = Image.from(image2!);
       i1 -= i2;
 
       final fp = File('$tmpPath/out/sub.jpg');
@@ -94,7 +94,7 @@ void main() {
 
     test('or', () {
       var i1 = Image.from(image);
-      final i2 = Image.from(image2);
+      final i2 = Image.from(image2!);
       i1 |= i2;
 
       final fp = File('$tmpPath/out/or.jpg');
@@ -104,7 +104,7 @@ void main() {
 
     test('and', () {
       var i1 = Image.from(image);
-      final i2 = Image.from(image2);
+      final i2 = Image.from(image2!);
       i1 &= i2;
 
       final fp = File('$tmpPath/out/and.jpg');
@@ -226,7 +226,7 @@ void main() {
     });
 
     test('sobel', () {
-      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync());
+      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
       sobel(f);
 
       final fp = File('$tmpPath/out/sobel.jpg');
@@ -406,7 +406,7 @@ void main() {
     });
 
     test('octree quantize', () {
-      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync());
+      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.octree);
       // ignore: prefer_collection_literals
@@ -422,7 +422,7 @@ void main() {
     });
 
     test('neural quantize', () {
-      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync());
+      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.neuralNet);
       // ignore: prefer_collection_literals
@@ -438,7 +438,7 @@ void main() {
     });
 
     test('trim', () {
-      var image = readPng(File('test/res/png/trim.png').readAsBytesSync());
+      var image = readPng(File('test/res/png/trim.png').readAsBytesSync())!;
       var trimmed = trim(image, mode: TrimMode.transparent);
       File('$tmpPath/out/trim.png')
         ..createSync(recursive: true)
@@ -462,7 +462,7 @@ void main() {
     });
 
     test('dropShadow', () {
-      var s = Image.from(image2);
+      var s = Image.from(image2!);
       var d = dropShadow(s, 5, 5, 10);
 
       File('$tmpPath/out/dropShadow.png')
