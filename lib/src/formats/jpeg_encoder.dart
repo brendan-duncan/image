@@ -1,4 +1,3 @@
-// @dart=2.11
 import 'dart:typed_data';
 
 import '../exif_data.dart';
@@ -52,9 +51,9 @@ class JpegEncoder extends Encoder {
     _writeSOS(fp);
 
     // Encode 8x8 macroblocks
-    var DCY = 0;
-    var DCU = 0;
-    var DCV = 0;
+    int? DCY = 0;
+    int? DCU = 0;
+    int? DCV = 0;
 
     _resetBits();
 
@@ -110,9 +109,9 @@ class JpegEncoder extends Encoder {
               128.0;
         }
 
-        DCY = _processDU(fp, YDU, fdtbl_Y, DCY, YDC_HT, YAC_HT);
-        DCU = _processDU(fp, UDU, fdtbl_UV, DCU, UVDC_HT, UVAC_HT);
-        DCV = _processDU(fp, VDU, fdtbl_UV, DCV, UVDC_HT, UVAC_HT);
+        DCY = _processDU(fp, YDU, fdtbl_Y, DCY!, YDC_HT, YAC_HT);
+        DCU = _processDU(fp, UDU, fdtbl_UV, DCU!, UVDC_HT, UVAC_HT);
+        DCV = _processDU(fp, VDU, fdtbl_UV, DCV!, UVDC_HT, UVAC_HT);
 
         x += 32;
       }
@@ -527,7 +526,7 @@ class JpegEncoder extends Encoder {
       return;
     }
 
-    for (var rawData in exif.rawData) {
+    for (var rawData in exif.rawData!) {
       _writeMarker(out, Jpeg.M_APP1);
       out.writeUint16(rawData.length + 2);
       out.writeBytes(rawData);
@@ -617,8 +616,8 @@ class JpegEncoder extends Encoder {
     out.writeByte(0); // Bf
   }
 
-  int _processDU(OutputBuffer out, List<double> CDU, List<double> fdtbl, int DC,
-      List<List<int>> HTDC, List<List<int>> HTAC) {
+  int? _processDU(OutputBuffer out, List<double> CDU, List<double> fdtbl,
+      int DC, List<List<int>>? HTDC, List<List<int>> HTAC) {
     var EOB = HTAC[0x00];
     var M16zeroes = HTAC[0xF0];
     int pos;
@@ -636,11 +635,11 @@ class JpegEncoder extends Encoder {
     DC = DU[0];
     // Encode DC
     if (Diff == 0) {
-      _writeBits(out, HTDC[0]); // Diff might be 0
+      _writeBits(out, HTDC![0]); // Diff might be 0
     } else {
       pos = 32767 + Diff;
-      _writeBits(out, HTDC[category[pos]]);
-      _writeBits(out, bitcode[pos]);
+      _writeBits(out, HTDC![category[pos]]);
+      _writeBits(out, bitcode[pos]!);
     }
 
     // Encode ACs
@@ -669,7 +668,7 @@ class JpegEncoder extends Encoder {
       }
       pos = 32767 + DU[i];
       _writeBits(out, HTAC[(nrzeroes << 4) + category[pos]]);
-      _writeBits(out, bitcode[pos]);
+      _writeBits(out, bitcode[pos]!);
       i++;
     }
 
@@ -711,21 +710,21 @@ class JpegEncoder extends Encoder {
   final UVTable = Uint8List(64);
   final fdtbl_Y = Float32List(64);
   final fdtbl_UV = Float32List(64);
-  List<List<int>> YDC_HT;
-  List<List<int>> UVDC_HT;
-  List<List<int>> YAC_HT;
-  List<List<int>> UVAC_HT;
+  List<List<int>>? YDC_HT;
+  List<List<int>>? UVDC_HT;
+  late List<List<int>> YAC_HT;
+  late List<List<int>> UVAC_HT;
 
-  final bitcode = List<List<int>>(65535);
-  final category = List<int>(65535);
-  final outputfDCTQuant = List<int>(64);
-  final DU = List<int>(64);
+  final bitcode = List<List<int>?>.filled(65535, null);
+  final category = List<int>.filled(65535, 0);
+  final outputfDCTQuant = List<int>.filled(64, 0);
+  final DU = List<int>.filled(64, 0);
 
   final Float32List YDU = Float32List(64);
   final Float32List UDU = Float32List(64);
   final Float32List VDU = Float32List(64);
   final Int32List RGB_YUV_TABLE = Int32List(2048);
-  int currentQuality;
+  int? currentQuality;
 
   static const List<int> ZIGZAG = [
     0,

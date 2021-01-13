@@ -1,4 +1,3 @@
-
 import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 
@@ -50,9 +49,6 @@ class BitmapFont {
 
     if (fnt.startsWith('<?xml') || fnt.startsWith('<font>')) {
       doc = XmlDocument.parse(fnt);
-      if (doc == null) {
-        throw ImageException('Invalid font XML');
-      }
     } else {
       doc = _parseTextFnt(fnt);
     }
@@ -85,9 +81,6 @@ class BitmapFont {
     /// Added <?xml which may be present, appropriately
     if (font_str.startsWith('<?xml') || font_str.startsWith('<font>')) {
       xml = XmlDocument.parse(font_str);
-      if (xml == null) {
-        throw ImageException('Invalid font XML');
-      }
     } else {
       xml = _parseTextFnt(font_str);
     }
@@ -212,7 +205,7 @@ class BitmapFont {
             }
 
             var image =
-                PngDecoder().decodeImage(imageFile.content as List<int>?);
+                PngDecoder().decodeImage(imageFile.content as List<int>);
 
             fontPages[id] = image;
           }

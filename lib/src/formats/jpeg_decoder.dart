@@ -1,4 +1,3 @@
-// @dart=2.11
 import '../animation.dart';
 import '../image.dart';
 import '../image_exception.dart';
@@ -10,8 +9,8 @@ import 'jpeg/jpeg_info.dart';
 
 /// Decode a jpeg encoded image.
 class JpegDecoder extends Decoder {
-  JpegInfo info;
-  InputBuffer input;
+  JpegInfo? info;
+  InputBuffer? input;
 
   /// Is the given file a valid JPEG image?
   @override
@@ -20,22 +19,22 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  DecodeInfo startDecode(List<int> data) {
+  DecodeInfo? startDecode(List<int> data) {
     input = InputBuffer(data, bigEndian: true);
     info = JpegData().readInfo(data);
     return info;
   }
 
   @override
-  int numFrames() => info == null ? 0 : info.numFrames;
+  int numFrames() => info == null ? 0 : info!.numFrames;
 
   @override
-  Image decodeFrame(int frame) {
+  Image? decodeFrame(int frame) {
     if (input == null) {
       return null;
     }
     var jpeg = JpegData();
-    jpeg.read(input.buffer);
+    jpeg.read(input!.buffer);
     if (jpeg.frames.length != 1) {
       throw ImageException('only single frame JPEGs supported');
     }
@@ -58,9 +57,6 @@ class JpegDecoder extends Decoder {
   @override
   Animation decodeAnimation(List<int> data) {
     var image = decodeImage(data);
-    if (image == null) {
-      return null;
-    }
 
     var anim = Animation();
     anim.width = image.width;

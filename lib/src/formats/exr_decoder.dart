@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import '../animation.dart';
 import '../image.dart';
 import '../hdr/hdr_image.dart';
@@ -25,15 +25,15 @@ import 'exr/exr_image.dart';
 /// a simple tone-mapping function is provided with a single [exposure]
 /// parameter. More tone-mapping functionality will be added.
 class ExrDecoder extends Decoder {
-  ExrImage exrImage;
+  ExrImage? exrImage;
 
   /// Exposure for tone-mapping the hdr image to an [Image], applied during
   /// [decodeFrame].
   double exposure;
-  double gamma;
-  bool reinhard;
-  double bloomAmount;
-  double bloomRadius;
+  double? gamma;
+  bool? reinhard;
+  double? bloomAmount;
+  double? bloomRadius;
 
   ExrDecoder({this.exposure = 1.0});
 
@@ -43,36 +43,36 @@ class ExrDecoder extends Decoder {
   }
 
   @override
-  DecodeInfo startDecode(List<int> data) {
+  DecodeInfo? startDecode(List<int> data) {
     exrImage = ExrImage(data);
     return exrImage;
   }
 
   @override
-  int numFrames() => exrImage != null ? exrImage.parts.length : 0;
+  int numFrames() => exrImage != null ? exrImage!.parts.length : 0;
 
   @override
-  Image decodeFrame(int frame) {
+  Image? decodeFrame(int frame) {
     if (exrImage == null) {
       return null;
     }
 
-    return hdrToImage(exrImage.getPart(frame).framebuffer, exposure: exposure);
+    return hdrToImage(exrImage!.getPart(frame).framebuffer, exposure: exposure);
   }
 
   @override
-  HdrImage decodeHdrFrame(int frame) {
+  HdrImage? decodeHdrFrame(int frame) {
     if (exrImage == null) {
       return null;
     }
-    if (frame >= exrImage.parts.length) {
+    if (frame >= exrImage!.parts.length) {
       return null;
     }
-    return exrImage.parts[frame].framebuffer;
+    return exrImage!.parts[frame].framebuffer;
   }
 
   @override
-  Image decodeImage(List<int> bytes, {int frame = 0}) {
+  Image? decodeImage(List<int> bytes, {int frame = 0}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -81,7 +81,7 @@ class ExrDecoder extends Decoder {
   }
 
   @override
-  HdrImage decodeHdrImage(List<int> bytes, {int frame = 0}) {
+  HdrImage? decodeHdrImage(List<int> bytes, {int frame = 0}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -89,7 +89,7 @@ class ExrDecoder extends Decoder {
   }
 
   @override
-  Animation decodeAnimation(List<int> data) {
+  Animation? decodeAnimation(List<int> data) {
     var image = decodeImage(data);
     if (image == null) {
       return null;

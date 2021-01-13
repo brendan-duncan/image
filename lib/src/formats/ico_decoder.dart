@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'package:image/image.dart';
 import 'package:image/src/animation.dart';
 import 'package:image/src/formats/bmp/bmp_info.dart';
@@ -14,20 +14,20 @@ const _TYPE_ICO = 1;
 const _TYPE_CUR = 2;
 
 class IcoDecoder extends Decoder {
-  InputBuffer _input;
-  IcoInfo _icoInfo;
+  InputBuffer? _input;
+  IcoInfo? _icoInfo;
 
   @override
   bool isValidFile(List<int> bytes) {
     _input = InputBuffer(bytes);
-    _icoInfo = IcoInfo._read(_input);
+    _icoInfo = IcoInfo._read(_input!);
     return _icoInfo != null;
   }
 
   @override
-  DecodeInfo startDecode(List<int> bytes) {
+  DecodeInfo? startDecode(List<int> bytes) {
     _input = InputBuffer(bytes);
-    _icoInfo = IcoInfo._read(_input);
+    _icoInfo = IcoInfo._read(_input!);
     return _icoInfo;
   }
 
@@ -37,14 +37,14 @@ class IcoDecoder extends Decoder {
   }
 
   @override
-  Image decodeFrame(int frame) {
-    if (_input == null || _icoInfo == null || frame >= _icoInfo.numFrames) {
+  Image? decodeFrame(int frame) {
+    if (_input == null || _icoInfo == null || frame >= _icoInfo!.numFrames) {
       return null;
     }
-    final imageInfo = _icoInfo.images[frame];
-    final imageBuffer = _input.buffer.sublist(
-        _input.start + imageInfo.bytesOffset,
-        _input.start + imageInfo.bytesOffset + imageInfo.bytesSize);
+    final imageInfo = _icoInfo!.images![frame];
+    final imageBuffer = _input!.buffer.sublist(
+        _input!.start + imageInfo.bytesOffset,
+        _input!.start + imageInfo.bytesOffset + imageInfo.bytesSize);
     final png = PngDecoder();
     if (png.isValidFile(imageBuffer)) {
       return png.decodeImage(imageBuffer);
@@ -105,15 +105,15 @@ class IcoDecoder extends Decoder {
   }
 
   /// decodes the largest frame.
-  Image decodeImageLargest(List<int> bytes) {
+  Image? decodeImageLargest(List<int> bytes) {
     final info = startDecode(bytes);
     if (info == null) {
       return null;
     }
     var largestFrame = 0;
     var largestSize = 0;
-    for (var i = 0; i < _icoInfo.images.length; i++) {
-      final image = _icoInfo.images[i];
+    for (var i = 0; i < _icoInfo!.images!.length; i++) {
+      final image = _icoInfo!.images![i];
       final size = image.width * image.height;
       if (size > largestSize) {
         largestSize = size;
@@ -124,7 +124,7 @@ class IcoDecoder extends Decoder {
   }
 
   @override
-  Image decodeImage(List<int> bytes, {int frame = 0}) {
+  Image? decodeImage(List<int> bytes, {int frame = 0}) {
     final info = startDecode(bytes);
     if (info == null) {
       return null;
@@ -137,9 +137,9 @@ class IcoDecoder extends Decoder {
 }
 
 class IcoInfo extends DecodeInfo {
-  IcoInfo({this.type, this.numFrames, this.images});
+  IcoInfo({this.type, required this.numFrames, this.images});
 
-  static IcoInfo _read(InputBuffer input) {
+  static IcoInfo? _read(InputBuffer input) {
     if (input.readUint16() != 0) {
       return null;
     }
@@ -175,22 +175,22 @@ class IcoInfo extends DecodeInfo {
     );
   }
 
-  final int type;
+  final int? type;
 
   @override
   final int numFrames;
-  final List<IcoInfoImage> images;
+  final List<IcoInfoImage>? images;
 }
 
 class IcoInfoImage {
   IcoInfoImage(
-      {@required this.width,
-      @required this.height,
-      @required this.colorPalette,
-      @required this.bytesSize,
-      @required this.bytesOffset,
-      @required this.colorPlanes,
-      @required this.bitsPerPixel})
+      {required this.width,
+      required this.height,
+      required this.colorPalette,
+      required this.bytesSize,
+      required this.bytesOffset,
+      required this.colorPlanes,
+      required this.bitsPerPixel})
       : assert(width != null),
         assert(height != null),
         assert(colorPalette != null),
@@ -210,7 +210,7 @@ class IcoInfoImage {
 }
 
 class IcoBmpInfo extends BmpInfo {
-  IcoBmpInfo(InputBuffer p, {BitmapFileHeader fileHeader})
+  IcoBmpInfo(InputBuffer p, {BitmapFileHeader? fileHeader})
       : super(p, fileHeader: fileHeader);
 
   @override

@@ -1,4 +1,4 @@
-// @dart=2.11
+
 import 'dart:typed_data';
 
 import '../animation.dart';
@@ -22,7 +22,7 @@ class WebPEncoder extends Encoder {
   /// Add a frame to be encoded. Call [finish] to encode the added frames.
   /// If only one frame is added, a single-image WebP is encoded; otherwise
   /// if there are more than one frame, a multi-frame animated WebP is encoded.
-  void addFrame(Image image, {int duration}) {
+  void addFrame(Image image, {int? duration}) {
     if (output == null) {
       output = OutputBuffer();
 
@@ -50,8 +50,8 @@ class WebPEncoder extends Encoder {
   }
 
   /// Encode the images that were added with [addFrame].
-  List<int> finish() {
-    List<int> bytes;
+  List<int>? finish() {
+    List<int>? bytes;
     if (output == null) {
       return bytes;
     }
@@ -69,7 +69,7 @@ class WebPEncoder extends Encoder {
     _lastImage = null;
     _encodedFrames = 0;*/
 
-    bytes = output.getBytes();
+    bytes = output!.getBytes();
     output = null;
 
     return bytes;
@@ -79,7 +79,7 @@ class WebPEncoder extends Encoder {
   @override
   List<int> encodeImage(Image image) {
     addFrame(image);
-    return finish();
+    return finish()!;
   }
 
   /// Does this encoder support animation?
@@ -88,25 +88,25 @@ class WebPEncoder extends Encoder {
 
   /// Encode an animation.
   @override
-  List<int> encodeAnimation(Animation anim) {
+  List<int>? encodeAnimation(Animation anim) {
     for (var f in anim) {
       addFrame(f, duration: f.duration);
     }
     return finish();
   }
 
-  Uint8List _encodeImage(Image image) {
+  Uint8List? _encodeImage(Image image) {
     return null;
   }
 
-  void _writeHeader(int width, int height) {}
+  void _writeHeader(int? width, int? height) {}
 
-  void _addImage(Uint8List image, int width, int height) {}
+  void _addImage(Uint8List? image, int? width, int? height) {}
 
-  OutputBuffer output;
-  int delay;
-  Uint8List _lastImage;
-  int _width;
-  int _height;
+  OutputBuffer? output;
+  int? delay;
+  Uint8List? _lastImage;
+  int? _width;
+  int? _height;
   int _encodedFrames = 0;
 }
