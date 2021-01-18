@@ -94,7 +94,7 @@ class GifEncoder extends Encoder {
     for (var f in anim) {
       addFrame(
         f,
-        duration: f.duration! ~/ 10, // Convert ms to 1/100 sec.
+        duration: f.duration ~/ 10, // Convert ms to 1/100 sec.
       );
     }
     return finish();

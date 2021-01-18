@@ -3,19 +3,19 @@ import '../image.dart';
 
 /// A kernel object to use with [separableConvolution] filtering.
 class SeparableKernel {
-  final List<num?> coefficients;
+  final List<num> coefficients;
   final int size;
 
   /// Create a separable convolution kernel for the given [radius].
   SeparableKernel(int radius)
-      : coefficients = List<num?>.filled(2 * radius + 1, null),
+      : coefficients = List<num>.filled(2 * radius + 1, 0),
         size = radius;
 
   /// Get the number of coefficients in the kernel.
   int get length => coefficients.length;
 
   /// Get a coefficient from the kernel.
-  num? operator [](int index) => coefficients[index];
+  num operator [](int index) => coefficients[index];
 
   /// Set a coefficient in the kernel.
   void operator []=(int index, num c) {
@@ -41,7 +41,7 @@ class SeparableKernel {
   /// Scale all of the coefficients by [s].
   void scaleCoefficients(num s) {
     for (var i = 0; i < coefficients.length; ++i) {
-      coefficients[i] = coefficients[i]! * s;
+      coefficients[i] = coefficients[i] * s;
     }
   }
 
@@ -64,7 +64,7 @@ class SeparableKernel {
       num a = 0.0;
 
       for (var j = -size, j2 = 0; j <= size; ++j, ++j2) {
-        var coeff = coefficients[j2]!;
+        var coeff = coefficients[j2];
         var gr = _reflect(width, x + j);
 
         var sc = (horizontal) ? src.getPixel(gr, y) : src.getPixel(y, gr);

@@ -74,7 +74,7 @@ class Image {
   /// How long this frame should be displayed, in milliseconds.
   /// A duration of 0 indicates no delay and the next frame will be drawn
   /// as quickly as it can.
-  int? duration = 0;
+  int duration = 0;
 
   /// Defines what should be done to the canvas when drawing this frame
   /// in an animation.
