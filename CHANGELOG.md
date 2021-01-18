@@ -1,3 +1,7 @@
+## 3.0.0 (unreleased)
+
+- Migrate to null safety.
+
 ## 2.1.19 - November 11, 2020
 
 - Refactor HdrImage to better support more diverse formats, used for Hdr Tiff decoding.
