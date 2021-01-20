@@ -91,16 +91,16 @@ class Image {
   ExifData exif;
 
   /// ICC color profile read from an image file.
-  ICCProfileData iccProfile;
+  ICCProfileData? iccProfile;
 
   /// Create an image with the given dimensions and format.
   Image(this.width, this.height,
-      {this.channels = Channels.rgba, ExifData exif, ICCProfileData iccp})
+      {this.channels = Channels.rgba, ExifData? exif, ICCProfileData? iccp})
       : data = Uint32List(width * height),
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
-  Image.rgb(this.width, this.height, {ExifData exif, ICCProfileData iccp})
+  Image.rgb(this.width, this.height, {ExifData? exif, ICCProfileData? iccp})
       : channels = Channels.rgb,
         data = Uint32List(width * height),
         exif = ExifData.from(exif),
@@ -139,8 +139,8 @@ class Image {
   /// var image = Image.fromBytes(canvas.width, canvas.height, bytes,
   ///                             format: Format.rgba);
   Image.fromBytes(int width, int height, List<int> bytes,
-      {ExifData exif,
-      ICCProfileData iccp,
+      {ExifData? exif,
+      ICCProfileData? iccp,
       Format format = Format.rgba,
       this.channels = Channels.rgba})
       : width = width,
@@ -225,7 +225,6 @@ class Image {
         }
         return bytes;
     }
-    return rgba;
   }
 
   /// Set all of the pixels of the image to the given [color].

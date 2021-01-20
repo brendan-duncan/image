@@ -1,3 +1,4 @@
+
 import '../../image.dart';
 import '../../image_exception.dart';
 import '../../util/input_buffer.dart';
@@ -17,25 +18,25 @@ import 'layer_data/psd_layer_additional_data.dart';
 import 'layer_data/psd_layer_section_divider.dart';
 
 class PsdLayer {
-  int top;
-  int left;
-  int bottom;
-  int right;
-  int width;
-  int height;
-  int blendMode;
-  int opacity;
-  int clipping;
-  int flags;
-  int compression;
-  String name;
-  List<PsdChannel> channels;
-  PsdMask mask;
-  PsdBlendingRanges blendingRanges;
+  int? top;
+  int? left;
+  late int bottom;
+  late int right;
+  late int width;
+  late int height;
+  int? blendMode;
+  late int opacity;
+  int? clipping;
+  late int flags;
+  int? compression;
+  String? name;
+  late List<PsdChannel> channels;
+  PsdMask? mask;
+  PsdBlendingRanges? blendingRanges;
   Map<String, PsdLayerData> additionalData = {};
   List<PsdLayer> children = [];
-  PsdLayer parent;
-  Image layerImage;
+  PsdLayer? parent;
+  late Image layerImage;
   List<PsdEffect> effects = [];
 
   static const SIGNATURE = 0x3842494d; // '8BIM'
@@ -75,7 +76,7 @@ class PsdLayer {
   static const FLAG_PHOTOSHOP_5 = 8;
   static const FLAG_PIXEL_DATA_IRRELEVANT_TO_APPEARANCE = 16;
 
-  PsdLayer([InputBuffer input]) {
+  PsdLayer([InputBuffer? input]) {
     if (input == null) {
       return;
     }
@@ -84,8 +85,8 @@ class PsdLayer {
     left = input.readInt32();
     bottom = input.readInt32();
     right = input.readInt32();
-    width = right - left;
-    height = bottom - top;
+    width = right - left!;
+    height = bottom - top!;
 
     channels = [];
     var numChannels = input.readUint16();
@@ -363,7 +364,7 @@ class PsdLayer {
 
   // Get the channel for the given [id].
   // Returns null if the layer does not have the given channel.
-  PsdChannel getChannel(int id) {
+  PsdChannel? getChannel(int id) {
     for (var i = 0; i < channels.length; ++i) {
       if (channels[i].id == id) {
         return channels[i];

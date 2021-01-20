@@ -1,3 +1,4 @@
+
 import 'dart:html';
 import 'dart:convert';
 import 'package:image/image.dart';
@@ -9,13 +10,13 @@ void main() {
 
   for (var _img in images) {
     var img = _img as ImageElement;
-    if (img.src.toLowerCase().endsWith('.webp')) {
+    if (img.src!.toLowerCase().endsWith('.webp')) {
       var req = HttpRequest();
-      req.open('GET', img.src);
+      req.open('GET', img.src!);
       req.overrideMimeType('text\/plain; charset=x-user-defined');
       req.onLoadEnd.listen((e) {
         if (req.status == 200) {
-          var bytes = req.responseText
+          var bytes = req.responseText!
               .split('')
               .map((e) {
                 return String.fromCharCode(e.codeUnitAt(0) & 0xff);
@@ -23,7 +24,7 @@ void main() {
               .join('')
               .codeUnits;
 
-          var image = decodeWebP(bytes);
+          var image = decodeWebP(bytes)!;
           var png = encodePng(image);
 
           var png64 = base64Encode(png);

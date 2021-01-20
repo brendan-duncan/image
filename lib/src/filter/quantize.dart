@@ -1,3 +1,4 @@
+
 import 'package:image/src/util/octree_quantizer.dart';
 
 import '../image.dart';

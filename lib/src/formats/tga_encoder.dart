@@ -9,8 +9,7 @@ class TgaEncoder extends Encoder {
   List<int> encodeImage(Image image) {
     var out = OutputBuffer(bigEndian: true);
 
-    var header = List<int>(18);
-    header.fillRange(0, 18, 0);
+    var header = List<int>.filled(18, 0);
     header[2] = 2;
     header[12] = image.width & 0xff;
     header[13] = (image.width >> 8) & 0xff;

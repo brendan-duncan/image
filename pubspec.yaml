@@ -1,17 +1,35 @@
 name: image
-version: 2.1.19
+version: 3.0.0
 description: Provides server and web apps the ability to load, manipulate, and save images with various image file formats including PNG, JPEG, GIF, BMP, WebP, TIFF, TGA, PSD, PVR, and OpenEXR.
 homepage: https://github.com/brendan-duncan/image
 documentation: https://github.com/brendan-duncan/image/wiki
+
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: '>=2.12.0-0 <3.0.0'
+
 dependencies:
-  archive: '>=2.0.0 <3.0.0'
+  archive: '>=3.0.0-nullsafety.0 <4.0.0'
   xml: '>=4.2.0 <5.0.0'
   meta: '>=1.1.8 <2.0.0'
+
 dev_dependencies:
-  test: '>=1.0.0 <2.0.0'
+  test: 1.16.0-nullsafety.9
   pedantic: '>=1.0.0 <2.0.0'
   build_web_compilers: '>=2.0.0 <3.0.0'
   build_runner: '>=1.0.0 <2.0.0'
   build_test: '>=1.0.0 <2.0.0'
+
+dependency_overrides:
+  # Not published yet.
+  archive:
+    git:
+      url: git://github.com/brendan-duncan/archive.git
+      ref: 2ea0307f401b4d762c31b5e344f4bd0d9e82bc7c
+  xml:
+    git:
+      url: git://github.com/renggli/dart-xml.git
+      ref: 1cd2e34787f446af53c906de3080f8efc03a79b1
+  # Needs bump in `package:archive`.
+  crypto: ^3.0.0-nullsafety.0
+  # Needs bump in `package:analyzer`.
+  convert: ^3.0.0-nullsafety.0

@@ -1,3 +1,4 @@
+
 import 'dart:math';
 
 import '../image.dart';
@@ -17,7 +18,7 @@ Image gaussianBlur(Image src, int radius) {
   SeparableKernel kernel;
 
   if (_gaussianKernelCache.containsKey(radius)) {
-    kernel = _gaussianKernelCache[radius];
+    kernel = _gaussianKernelCache[radius]!;
   } else {
     // Compute coefficients
     num sigma = radius * (2.0 / 3.0);

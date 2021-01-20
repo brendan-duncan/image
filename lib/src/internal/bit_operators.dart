@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 int shiftR(int v, int n) {
@@ -104,7 +105,7 @@ final Uint32List __float32ToUint32 = Uint32List.view(__float32.buffer);
 final Uint64List __uint64 = Uint64List(1);
 final Float64List __uint64ToFloat64 = Float64List.view(__uint64.buffer);
 
-String debugBits32(int value) {
+String debugBits32(int? value) {
   if (value == null) {
     return 'null';
   }

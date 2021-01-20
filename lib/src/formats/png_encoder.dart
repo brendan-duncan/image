@@ -50,30 +50,30 @@ class PngEncoder extends Encoder {
     }
 
     if (sequenceNumber <= 1) {
-      _writeChunk(output, 'IDAT', compressed);
+      _writeChunk(output!, 'IDAT', compressed);
     } else {
       // fdAT chunk
       var fdat = OutputBuffer(bigEndian: true);
       fdat.writeUint32(sequenceNumber);
       fdat.writeBytes(compressed);
-      _writeChunk(output, 'fdAT', fdat.getBytes());
+      _writeChunk(output!, 'fdAT', fdat.getBytes());
 
       sequenceNumber++;
     }
   }
 
-  List<int> finish() {
-    List<int> bytes;
+  List<int>? finish() {
+    List<int>? bytes;
 
     if (output == null) {
       return bytes;
     }
 
-    _writeChunk(output, 'IEND', []);
+    _writeChunk(output!, 'IEND', []);
 
     sequenceNumber = 0;
 
-    bytes = output.getBytes();
+    bytes = output!.getBytes();
     output = null;
     return bytes;
   }
@@ -84,7 +84,7 @@ class PngEncoder extends Encoder {
 
   /// Encode an animation.
   @override
-  List<int> encodeAnimation(Animation anim) {
+  List<int>? encodeAnimation(Animation anim) {
     isAnimated = true;
     _frames = anim.frames.length;
     repeat = anim.loopCount;
@@ -100,12 +100,12 @@ class PngEncoder extends Encoder {
   List<int> encodeImage(Image image) {
     isAnimated = false;
     addFrame(image);
-    return finish();
+    return finish()!;
   }
 
   void _writeHeader(int width, int height) {
     // PNG file signature
-    output.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+    output!.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
     // IHDR chunk
     var chunk = OutputBuffer(bigEndian: true);
@@ -116,14 +116,14 @@ class PngEncoder extends Encoder {
     chunk.writeByte(0); // compression method
     chunk.writeByte(0); // filter method
     chunk.writeByte(0); // interlace method
-    _writeChunk(output, 'IHDR', chunk.getBytes());
+    _writeChunk(output!, 'IHDR', chunk.getBytes());
   }
 
   void _writeAnimationControlChunk() {
     var chunk = OutputBuffer(bigEndian: true);
     chunk.writeUint32(_frames); // number of frames
     chunk.writeUint32(repeat); // loop count
-    _writeChunk(output, 'acTL', chunk.getBytes());
+    _writeChunk(output!, 'acTL', chunk.getBytes());
   }
 
   void _writeFrameControlChunk() {
@@ -133,15 +133,15 @@ class PngEncoder extends Encoder {
     chunk.writeUint32(_height);
     chunk.writeUint32(xOffset);
     chunk.writeUint32(yOffset);
-    chunk.writeUint16(delay);
+    chunk.writeUint16(delay!);
     chunk.writeUint16(1000); // delay denominator
     chunk.writeByte(disposeMethod.index);
     chunk.writeByte(blendMethod.index);
-    _writeChunk(output, 'fcTL', chunk.getBytes());
+    _writeChunk(output!, 'fcTL', chunk.getBytes());
   }
 
-  void _writeICCPChunk(OutputBuffer out, ICCProfileData iccp) {
-    if (iccp == null || iccp.data == null) {
+  void _writeICCPChunk(OutputBuffer? out, ICCProfileData? iccp) {
+    if (iccp == null) {
       return;
     }
 
@@ -157,7 +157,7 @@ class PngEncoder extends Encoder {
     // profile data
     chunk.writeBytes(iccp.compressed());
 
-    _writeChunk(output, 'iCCP', chunk.getBytes());
+    _writeChunk(output!, 'iCCP', chunk.getBytes());
   }
 
   void _writeChunk(OutputBuffer out, String type, List<int> chunk) {
@@ -362,21 +362,21 @@ class PngEncoder extends Encoder {
     return getCrc32(bytes, crc);
   }
 
-  Channels channels;
+  Channels? channels;
   int filter;
-  int repeat;
-  int level;
-  int xOffset;
-  int yOffset;
-  int delay;
-  DisposeMode disposeMethod;
-  BlendMode blendMethod;
-  int _width;
-  int _height;
-  int _frames;
+  late int repeat;
+  int? level;
+  late int xOffset;
+  late int yOffset;
+  int? delay;
+  late DisposeMode disposeMethod;
+  late BlendMode blendMethod;
+  late int _width;
+  late int _height;
+  late int _frames;
   int sequenceNumber = 0;
-  bool isAnimated;
-  OutputBuffer output;
+  late bool isAnimated;
+  OutputBuffer? output;
 
   static const FILTER_NONE = 0;
   static const FILTER_SUB = 1;

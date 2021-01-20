@@ -1,6 +1,9 @@
+
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
+
+import 'paths.dart';
 
 void main() {
   var dir = Directory('test/res/tiff');
@@ -10,15 +13,14 @@ void main() {
   var files = dir.listSync();
 
   group('TIFF/getInfo', () {
-    for (var f in files) {
-      if (f is! File ||
-          (!f.path.endsWith('.tif') && !f.path.endsWith('.tiff'))) {
+    for (var f in files.whereType<File>()) {
+      if (!f.path.endsWith('.tif') && !f.path.endsWith('.tiff')) {
         continue;
       }
 
       var name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
-        final bytes = (f as File).readAsBytesSync();
+        final bytes = f.readAsBytesSync();
 
         var info = TiffDecoder().startDecode(bytes);
         if (info == null) {
@@ -45,7 +47,7 @@ void main() {
           print('    predictor: ${info.images[i].predictor}');
           if (info.images[i].colorMap != null) {
             print(
-                '    colorMap.numColors: ${info.images[i].colorMap.length ~/ 3}');
+                '    colorMap.numColors: ${info.images[i].colorMap!.length ~/ 3}');
             print('    colorMap: ${info.images[i].colorMap}');
           }
         }
@@ -63,28 +65,28 @@ void main() {
       var name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         print(name);
-        List<int> bytes = (f as File).readAsBytesSync();
+        List<int> bytes = f.readAsBytesSync();
         final image = TiffDecoder().decodeImage(bytes);
         if (image == null) {
           throw ImageException('Unable to decode TIFF Image: $name.');
         }
 
         final png = PngEncoder().encodeImage(image);
-        File('.dart_tool/out/tif/${name}.png')
+        File('$tmpPath/out/tif/${name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
 
         final tif = TiffEncoder().encodeImage(image);
-        File('.dart_tool/out/tif/${name}.tif')
+        File('$tmpPath/out/tif/${name}.tif')
           ..createSync(recursive: true)
           ..writeAsBytesSync(tif);
 
-        final img2 = TiffDecoder().decodeImage(tif);
+        final img2 = TiffDecoder().decodeImage(tif)!;
         expect(img2.width, equals(image.width));
         expect(img2.height, equals(image.height));
 
         final png2 = PngEncoder().encodeImage(image);
-        File('.dart_tool/out/tif/${name}-2.png')
+        File('$tmpPath/out/tif/${name}-2.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png2);
       });
@@ -94,11 +96,11 @@ void main() {
   group('TIFF/dtm_test', () {
     test('dtm_test.tif', () {
       final bytes = File('test/res/tiff/dtm_test.tif').readAsBytesSync();
-      final image = TiffDecoder().decodeHdrImage(bytes);
+      final image = TiffDecoder().decodeHdrImage(bytes)!;
       expect(image.numberOfChannels, equals(1));
-      expect(image.red.data[11], equals(-9999.0));
+      expect(image.red!.data[11], equals(-9999.0));
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/dtm_test.hdr.png')
+      File('$tmpPath/out/tif/dtm_test.hdr.png')
           .writeAsBytesSync(encodePng(img));
     });
   });
@@ -107,11 +109,11 @@ void main() {
     test('tca32int.tif', () {
       final bytes = File('test/res/tiff/tca32int.tif').readAsBytesSync();
       final decoder = TiffDecoder();
-      final image = decoder.decodeHdrImage(bytes);
+      final image = decoder.decodeHdrImage(bytes)!;
       expect(image.numberOfChannels, equals(1));
-      final tags = decoder.info.images[0].tags;
+      final tags = decoder.info!.images[0].tags;
       for (var tag in tags.keys) {
-        final entry = tags[tag];
+        final entry = tags[tag]!;
         if (entry.type == TiffEntry.TYPE_ASCII) {
           print('tca32int TAG $tag: ${entry.readString()}');
         } else {
@@ -119,11 +121,11 @@ void main() {
         }
       }
 
-      //File('.dart_tool/out/tif/tca32int.tif')
+      //File('$tmpPath/out/tif/tca32int.tif')
       //.writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/tca32int.hdr.png')
+      File('$tmpPath/out/tif/tca32int.hdr.png')
           .writeAsBytesSync(encodePng(img));
     });
   });
@@ -132,11 +134,11 @@ void main() {
     test('dtm64float.tif', () {
       final bytes = File('test/res/tiff/dtm64float.tif').readAsBytesSync();
       final decoder = TiffDecoder();
-      final image = decoder.decodeHdrImage(bytes);
+      final image = decoder.decodeHdrImage(bytes)!;
       expect(image.numberOfChannels, equals(1));
-      final tags = decoder.info.images[0].tags;
+      final tags = decoder.info!.images[0].tags;
       for (var tag in tags.keys) {
-        final entry = tags[tag];
+        final entry = tags[tag]!;
         if (entry.type == TiffEntry.TYPE_ASCII) {
           print('dtm64float TAG ${tag}: ${entry.readString()}');
         } else {
@@ -144,11 +146,11 @@ void main() {
         }
       }
 
-      //File('.dart_tool/out/tif/dtm64float.tif')
+      //File('$tmpPath/out/tif/dtm64float.tif')
       //.writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/dtm64float.hdr.png')
+      File('$tmpPath/out/tif/dtm64float.hdr.png')
           .writeAsBytesSync(encodePng(img));
     });
   });
@@ -157,10 +159,10 @@ void main() {
     test('dtm64float.tif', () {
       final bytes = File('test/res/tiff/dtm64float.tif').readAsBytesSync();
       final decoder = TiffDecoder();
-      final info = decoder.startDecode(bytes);
+      final info = decoder.startDecode(bytes)!;
       final tags = info.images[0].tags;
       for (var tag in tags.keys) {
-        final entry = tags[tag];
+        final entry = tags[tag]!;
         if (entry.type == TiffEntry.TYPE_ASCII) {
           print('dtm64float TAG ${tag}: ${entry.readString()}');
         } else {
@@ -174,14 +176,14 @@ void main() {
     test('float1x32.tif', () {
       final bytes = File('test/res/tiff/float1x32.tif').readAsBytesSync();
       final decoder = TiffDecoder();
-      final image = decoder.decodeHdrImage(bytes);
+      final image = decoder.decodeHdrImage(bytes)!;
       expect(image.numberOfChannels, equals(1));
 
-      File('.dart_tool/out/tif/float1x32.tif')
+      File('$tmpPath/out/tif/float1x32.tif')
           .writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/float1x32.hdr.png')
+      File('$tmpPath/out/tif/float1x32.hdr.png')
           .writeAsBytesSync(encodePng(img));
     });
   });
@@ -190,15 +192,14 @@ void main() {
     test('float32.tif', () {
       final bytes = File('test/res/tiff/float32.tif').readAsBytesSync();
       final decoder = TiffDecoder();
-      final image = decoder.decodeHdrImage(bytes);
+      final image = decoder.decodeHdrImage(bytes)!;
       expect(image.numberOfChannels, equals(3));
 
-      File('.dart_tool/out/tif/float32.tif')
+      File('$tmpPath/out/tif/float32.tif')
           .writeAsBytes(TiffEncoder().encodeHdrImage(image));
 
       final img = hdrToImage(image);
-      File('.dart_tool/out/tif/float32.hdr.png')
-          .writeAsBytesSync(encodePng(img));
+      File('$tmpPath/out/tif/float32.hdr.png').writeAsBytesSync(encodePng(img));
     });
   });
 }

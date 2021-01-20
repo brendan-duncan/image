@@ -1,3 +1,4 @@
+
 import '../image.dart';
 import '../draw/draw_pixel.dart';
 
@@ -15,12 +16,12 @@ import '../draw/draw_pixel.dart';
 /// copy regions within the same image (if [dst] is the same as [src])
 /// but if the regions overlap the results will be unpredictable.
 Image copyInto(Image dst, Image src,
-    {int dstX,
-    int dstY,
-    int srcX,
-    int srcY,
-    int srcW,
-    int srcH,
+    {int? dstX,
+    int? dstY,
+    int? srcX,
+    int? srcY,
+    int? srcW,
+    int? srcH,
     bool blend = true}) {
   dstX ??= 0;
   dstY ??= 0;

@@ -17,9 +17,9 @@ import 'tiff_lzw_decoder.dart';
 
 class TiffImage {
   Map<int, TiffEntry> tags = {};
-  int width;
-  int height;
-  int photometricType;
+  int? width;
+  int? height;
+  int? photometricType;
   int compression = 1;
   int bitsPerSample = 1;
   int samplesPerPixel = 1;
@@ -27,32 +27,32 @@ class TiffImage {
   int imageType = TYPE_UNSUPPORTED;
   bool isWhiteZero = false;
   int predictor = 1;
-  int chromaSubH;
-  int chromaSubV;
+  late int chromaSubH;
+  late int chromaSubV;
   bool tiled = false;
-  int tileWidth;
-  int tileHeight;
-  List<int> tileOffsets;
-  List<int> tileByteCounts;
-  int tilesX;
-  int tilesY;
-  int tileSize;
-  int fillOrder = 1;
-  int t4Options = 0;
-  int t6Options = 0;
-  int extraSamples;
-  List<int> colorMap;
+  int? tileWidth;
+  int? tileHeight;
+  List<int>? tileOffsets;
+  List<int>? tileByteCounts;
+  late int tilesX;
+  late int tilesY;
+  int? tileSize;
+  int? fillOrder = 1;
+  int? t4Options = 0;
+  int? t6Options = 0;
+  int? extraSamples;
+  List<int>? colorMap;
 
   // Starting index in the [colorMap] for the red channel.
-  int colorMapRed;
+  late int colorMapRed;
 
   // Starting index in the [colorMap] for the green channel.
-  int colorMapGreen;
+  late int colorMapGreen;
 
   // Starting index in the [colorMap] for the blue channel.
-  int colorMapBlue;
-  Image image;
-  HdrImage hdrImage;
+  late int colorMapBlue;
+  Image? image;
+  HdrImage? hdrImage;
 
   TiffImage(InputBuffer p) {
     var p3 = InputBuffer.from(p);
@@ -95,21 +95,18 @@ class TiffImage {
       } else if (entry.tag == TAG_COLOR_MAP) {
         colorMap = entry.readValues();
         colorMapRed = 0;
-        colorMapGreen = colorMap.length ~/ 3;
+        colorMapGreen = colorMap!.length ~/ 3;
         colorMapBlue = colorMapGreen * 2;
       }
     }
 
-    if (width == null ||
-        height == null ||
-        bitsPerSample == null ||
-        compression == null) {
+    if (width == null || height == null) {
       return;
     }
 
     if (colorMap != null && bitsPerSample == 8) {
-      for (var i = 0, len = colorMap.length; i < len; ++i) {
-        colorMap[i] >>= 8;
+      for (var i = 0, len = colorMap!.length; i < len; ++i) {
+        colorMap![i] >>= 8;
       }
     }
 
@@ -147,9 +144,9 @@ class TiffImage {
     }
 
     // Calculate number of tiles and the tileSize in bytes
-    tilesX = (width + tileWidth - 1) ~/ tileWidth;
-    tilesY = (height + tileHeight - 1) ~/ tileHeight;
-    tileSize = tileWidth * tileHeight * samplesPerPixel;
+    tilesX = (width! + tileWidth! - 1) ~/ tileWidth!;
+    tilesY = (height! + tileHeight! - 1) ~/ tileHeight!;
+    tileSize = tileWidth! * tileHeight! * samplesPerPixel;
 
     fillOrder = _readTag(TAG_FILL_ORDER, 1);
     t4Options = _readTag(TAG_T4_OPTIONS, 0);
@@ -203,7 +200,7 @@ class TiffImage {
           imageType = TYPE_RGB;
         } else {
           if (hasTag(TAG_YCBCR_SUBSAMPLING)) {
-            var v = tags[TAG_YCBCR_SUBSAMPLING].readValues();
+            var v = tags[TAG_YCBCR_SUBSAMPLING]!.readValues();
             chromaSubH = v[0];
             chromaSubV = v[1];
           } else {
@@ -226,21 +223,16 @@ class TiffImage {
     }
   }
 
-  bool get isValid =>
-      width != null &&
-      height != null &&
-      samplesPerPixel != null &&
-      bitsPerSample != null &&
-      compression != null;
+  bool get isValid => width != null && height != null;
 
   Image decode(InputBuffer p) {
-    image = Image(width, height);
+    image = Image(width!, height!);
     for (var tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
       for (var tileX = 0; tileX < tilesX; ++tileX, ++ti) {
         _decodeTile(p, tileX, tileY);
       }
     }
-    return image;
+    return image!;
   }
 
   HdrImage decodeHdr(InputBuffer p) {
@@ -259,7 +251,7 @@ class TiffImage {
         _decodeTile(p, tileX, tileY);
       }
     }
-    return hdrImage;
+    return hdrImage!;
   }
 
   bool hasTag(int tag) => tags.containsKey(tag);
@@ -273,13 +265,13 @@ class TiffImage {
     }
 
     var tileIndex = tileY * tilesX + tileX;
-    p.offset = tileOffsets[tileIndex];
+    p.offset = tileOffsets![tileIndex];
 
-    var outX = tileX * tileWidth;
-    var outY = tileY * tileHeight;
+    var outX = tileX * tileWidth!;
+    var outY = tileY * tileHeight!;
 
-    var byteCount = tileByteCounts[tileIndex];
-    var bytesInThisTile = tileWidth * tileHeight * samplesPerPixel;
+    var byteCount = tileByteCounts![tileIndex];
+    var bytesInThisTile = tileWidth! * tileHeight! * samplesPerPixel;
     if (bitsPerSample == 16) {
       bytesInThisTile *= 2;
     } else if (bitsPerSample == 32) {
@@ -305,9 +297,9 @@ class TiffImage {
         // Horizontal Differencing Predictor
         if (predictor == 2) {
           int count;
-          for (var j = 0; j < tileHeight; j++) {
-            count = samplesPerPixel * (j * tileWidth + 1);
-            for (var i = samplesPerPixel, len = tileWidth * samplesPerPixel;
+          for (var j = 0; j < tileHeight!; j++) {
+            count = samplesPerPixel * (j * tileWidth! + 1);
+            for (var i = samplesPerPixel, len = tileWidth! * samplesPerPixel;
                 i < len;
                 i++) {
               bdata[count] += bdata[count - samplesPerPixel];
@@ -327,24 +319,20 @@ class TiffImage {
         var outData = ZLibDecoder().decodeBytes(data);
         bdata = InputBuffer(outData);
       } else if (compression == COMPRESSION_OLD_JPEG) {
-        image ??= Image(width, height);
+        image ??= Image(width!, height!);
         var data = p.toList(0, byteCount);
         var tile = JpegDecoder().decodeImage(data);
-        _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight);
+        _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight!);
         if (hdrImage != null) {
-          hdrImage = HdrImage.fromImage(image);
+          hdrImage = HdrImage.fromImage(image!);
         }
         return;
       } else {
         throw ImageException('Unsupported Compression Type: $compression');
       }
 
-      if (bdata == null) {
-        return;
-      }
-
-      for (var y = 0, py = outY; y < tileHeight && py < height; ++y, ++py) {
-        for (var x = 0, px = outX; x < tileWidth && px < width; ++x, ++px) {
+      for (var y = 0, py = outY; y < tileHeight! && py < height!; ++y, ++py) {
+        for (var x = 0, px = outX; x < tileWidth! && px < width!; ++x, ++px) {
           if (samplesPerPixel == 1) {
             if (sampleFormat == TiffImage.FORMAT_FLOAT) {
               var sample = 0.0;
@@ -356,20 +344,20 @@ class TiffImage {
                 sample = Half.HalfToDouble(bdata.readUint16());
               }
               if (hdrImage != null) {
-                hdrImage.setRed(px, py, sample);
+                hdrImage!.setRed(px, py, sample);
               }
               if (image != null) {
                 final gray = (sample * 255).clamp(0, 255).toInt();
                 int c;
                 if (photometricType == 3 && colorMap != null) {
                   c = getColor(
-                      colorMap[colorMapRed + gray],
-                      colorMap[colorMapGreen + gray],
-                      colorMap[colorMapBlue + gray]);
+                      colorMap![colorMapRed + gray],
+                      colorMap![colorMapGreen + gray],
+                      colorMap![colorMapBlue + gray]);
                 } else {
                   c = getColor(gray, gray, gray, 255);
                 }
-                image.setPixel(px, py, c);
+                image!.setPixel(px, py, c);
               }
             } else {
               var gray = 0;
@@ -388,7 +376,7 @@ class TiffImage {
               }
 
               if (hdrImage != null) {
-                hdrImage.setRed(px, py, gray);
+                hdrImage!.setRed(px, py, gray);
               }
 
               if (image != null) {
@@ -404,14 +392,14 @@ class TiffImage {
                 int c;
                 if (photometricType == 3 && colorMap != null) {
                   c = getColor(
-                      colorMap[colorMapRed + gray],
-                      colorMap[colorMapGreen + gray],
-                      colorMap[colorMapBlue + gray]);
+                      colorMap![colorMapRed + gray],
+                      colorMap![colorMapGreen + gray],
+                      colorMap![colorMapBlue + gray]);
                 } else {
                   c = getColor(gray, gray, gray, 255);
                 }
 
-                image.setPixel(px, py, c);
+                image!.setPixel(px, py, c);
               }
             }
           } else if (samplesPerPixel == 2) {
@@ -441,8 +429,8 @@ class TiffImage {
             }
 
             if (hdrImage != null) {
-              hdrImage.setRed(px, py, gray);
-              hdrImage.setGreen(px, py, alpha);
+              hdrImage!.setRed(px, py, gray);
+              hdrImage!.setGreen(px, py, alpha);
             }
 
             if (image != null) {
@@ -457,7 +445,7 @@ class TiffImage {
                       ? alpha >> 24
                       : alpha;
               var c = getColor(gray, gray, gray, alpha);
-              image.setPixel(px, py, c);
+              image!.setPixel(px, py, c);
             }
           } else if (samplesPerPixel == 3) {
             if (sampleFormat == FORMAT_FLOAT) {
@@ -478,16 +466,16 @@ class TiffImage {
                 b = Half.HalfToDouble(bdata.readUint16());
               }
               if (hdrImage != null) {
-                hdrImage.setRed(px, py, r);
-                hdrImage.setGreen(px, py, g);
-                hdrImage.setBlue(px, py, b);
+                hdrImage!.setRed(px, py, r);
+                hdrImage!.setGreen(px, py, g);
+                hdrImage!.setBlue(px, py, b);
               }
               if (image != null) {
                 final ri = (r * 255).clamp(0, 255).toInt();
                 final gi = (g * 255).clamp(0, 255).toInt();
                 final bi = (b * 255).clamp(0, 255).toInt();
                 final c = getColor(ri, gi, bi, 255);
-                image.setPixel(px, py, c);
+                image!.setPixel(px, py, c);
               }
             } else {
               var r = 0;
@@ -526,9 +514,9 @@ class TiffImage {
               }
 
               if (hdrImage != null) {
-                hdrImage.setRed(px, py, r);
-                hdrImage.setGreen(px, py, g);
-                hdrImage.setBlue(px, py, b);
+                hdrImage!.setRed(px, py, r);
+                hdrImage!.setGreen(px, py, g);
+                hdrImage!.setBlue(px, py, b);
               }
 
               if (image != null) {
@@ -548,7 +536,7 @@ class TiffImage {
                         ? b >> 24
                         : b;
                 var c = getColor(r, g, b, 255);
-                image.setPixel(px, py, c);
+                image!.setPixel(px, py, c);
               }
             }
           } else if (samplesPerPixel >= 4) {
@@ -574,10 +562,10 @@ class TiffImage {
                 a = Half.HalfToDouble(bdata.readUint16());
               }
               if (hdrImage != null) {
-                hdrImage.setRed(px, py, r);
-                hdrImage.setGreen(px, py, g);
-                hdrImage.setBlue(px, py, b);
-                hdrImage.setAlpha(px, py, a);
+                hdrImage!.setRed(px, py, r);
+                hdrImage!.setGreen(px, py, g);
+                hdrImage!.setBlue(px, py, b);
+                hdrImage!.setAlpha(px, py, a);
               }
               if (image != null) {
                 final ri = (r * 255).clamp(0, 255).toInt();
@@ -585,7 +573,7 @@ class TiffImage {
                 final bi = (b * 255).clamp(0, 255).toInt();
                 final ai = (a * 255).clamp(0, 255).toInt();
                 final c = getColor(ri, gi, bi, ai);
-                image.setPixel(px, py, c);
+                image!.setPixel(px, py, c);
               }
             } else {
               var r = 0;
@@ -634,10 +622,10 @@ class TiffImage {
               }
 
               if (hdrImage != null) {
-                hdrImage.setRed(px, py, r);
-                hdrImage.setGreen(px, py, g);
-                hdrImage.setBlue(px, py, b);
-                hdrImage.setAlpha(px, py, a);
+                hdrImage!.setRed(px, py, r);
+                hdrImage!.setGreen(px, py, g);
+                hdrImage!.setBlue(px, py, b);
+                hdrImage!.setAlpha(px, py, a);
               }
 
               if (image != null) {
@@ -662,7 +650,7 @@ class TiffImage {
                         ? a >> 24
                         : a;
                 var c = getColor(r, g, b, a);
-                image.setPixel(px, py, c);
+                image!.setPixel(px, py, c);
               }
             }
           }
@@ -673,13 +661,13 @@ class TiffImage {
     }
   }
 
-  void _jpegToImage(Image tile, Image image, int outX, int outY, int tileWidth,
-      int tileHeight) {
+  void _jpegToImage(Image tile, Image? image, int outX, int outY,
+      int? tileWidth, int tileHeight) {
     var width = tileWidth;
     var height = tileHeight;
     for (var y = 0; y < height; y++) {
-      for (var x = 0; x < width; x++) {
-        image.setPixel(x + outX, y + outY, tile.getPixel(x, y));
+      for (var x = 0; x < width!; x++) {
+        image!.setPixel(x + outX, y + outY, tile.getPixel(x, y));
       }
     }
     /*Uint8List data = jpeg.getData(width, height);
@@ -735,27 +723,27 @@ class TiffImage {
 
   void _decodeBilevelTile(InputBuffer p, int tileX, int tileY) {
     var tileIndex = tileY * tilesX + tileX;
-    p.offset = tileOffsets[tileIndex];
+    p.offset = tileOffsets![tileIndex];
 
-    var outX = tileX * tileWidth;
-    var outY = tileY * tileHeight;
+    var outX = tileX * tileWidth!;
+    var outY = tileY * tileHeight!;
 
-    var byteCount = tileByteCounts[tileIndex];
+    var byteCount = tileByteCounts![tileIndex];
 
     InputBuffer bdata;
     if (compression == COMPRESSION_PACKBITS) {
       // Since the decompressed data will still be packed
       // 8 pixels into 1 byte, calculate bytesInThisTile
       int bytesInThisTile;
-      if ((tileWidth % 8) == 0) {
-        bytesInThisTile = (tileWidth ~/ 8) * tileHeight;
+      if ((tileWidth! % 8) == 0) {
+        bytesInThisTile = (tileWidth! ~/ 8) * tileHeight!;
       } else {
-        bytesInThisTile = (tileWidth ~/ 8 + 1) * tileHeight;
+        bytesInThisTile = (tileWidth! ~/ 8 + 1) * tileHeight!;
       }
-      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
       _decodePackbits(p, bytesInThisTile, bdata.buffer);
     } else if (compression == COMPRESSION_LZW) {
-      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
 
       var decoder = LzwDecoder();
       decoder.decode(InputBuffer.from(p, length: byteCount), bdata.buffer);
@@ -763,31 +751,31 @@ class TiffImage {
       // Horizontal Differencing Predictor
       if (predictor == 2) {
         int count;
-        for (var j = 0; j < height; j++) {
-          count = samplesPerPixel * (j * width + 1);
-          for (var i = samplesPerPixel; i < width * samplesPerPixel; i++) {
+        for (var j = 0; j < height!; j++) {
+          count = samplesPerPixel * (j * width! + 1);
+          for (var i = samplesPerPixel; i < width! * samplesPerPixel; i++) {
             bdata[count] += bdata[count - samplesPerPixel];
             count++;
           }
         }
       }
     } else if (compression == COMPRESSION_CCITT_RLE) {
-      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
       try {
-        TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
-            .decode1D(bdata, p, 0, tileHeight);
+        TiffFaxDecoder(fillOrder, tileWidth!, tileHeight!)
+            .decode1D(bdata, p, 0, tileHeight!);
       } catch (_) {}
     } else if (compression == COMPRESSION_CCITT_FAX3) {
-      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
       try {
-        TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
-            .decode2D(bdata, p, 0, tileHeight, t4Options);
+        TiffFaxDecoder(fillOrder, tileWidth!, tileHeight!)
+            .decode2D(bdata, p, 0, tileHeight!, t4Options!);
       } catch (_) {}
     } else if (compression == COMPRESSION_CCITT_FAX4) {
-      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
+      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
       try {
-        TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
-            .decodeT6(bdata, p, 0, tileHeight, t6Options);
+        TiffFaxDecoder(fillOrder, tileWidth!, tileHeight!)
+            .decodeT6(bdata, p, 0, tileHeight!, t6Options!);
       } catch (_) {}
     } else if (compression == COMPRESSION_ZIP) {
       var data = p.toList(0, byteCount);
@@ -803,20 +791,16 @@ class TiffImage {
       throw ImageException('Unsupported Compression Type: $compression');
     }
 
-    if (bdata == null) {
-      return;
-    }
-
     var br = TiffBitReader(bdata);
     final white = isWhiteZero ? 0xff000000 : 0xffffffff;
     final black = isWhiteZero ? 0xffffffff : 0xff000000;
 
-    for (var y = 0, py = outY; y < tileHeight; ++y, ++py) {
-      for (var x = 0, px = outX; x < tileWidth; ++x, ++px) {
+    for (var y = 0, py = outY; y < tileHeight!; ++y, ++py) {
+      for (var x = 0, px = outX; x < tileWidth!; ++x, ++px) {
         if (br.readBits(1) == 0) {
-          image.setPixel(px, py, black);
+          image!.setPixel(px, py, black);
         } else {
-          image.setPixel(px, py, white);
+          image!.setPixel(px, py, white);
         }
       }
       br.flushByte();
@@ -848,18 +832,18 @@ class TiffImage {
     }
   }
 
-  int _readTag(int type, [int defaultValue = 0]) {
+  int? _readTag(int type, [int? defaultValue = 0]) {
     if (!hasTag(type)) {
       return defaultValue;
     }
-    return tags[type].readValue();
+    return tags[type]!.readValue();
   }
 
-  List<int> _readTagList(int type) {
+  List<int>? _readTagList(int type) {
     if (!hasTag(type)) {
       return null;
     }
-    return tags[type].readValues();
+    return tags[type]!.readValues();
   }
 
   // Compression types

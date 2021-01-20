@@ -1,3 +1,4 @@
+
 class PvrtcColorBoundingBox {
   dynamic min;
   dynamic max;

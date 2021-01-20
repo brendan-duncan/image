@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 import '../color.dart';
@@ -12,8 +13,8 @@ import 'bake_orientation.dart';
 /// If [width] isn't specified, then it will be determined by the aspect ratio
 /// of [src] and [height].
 Image copyResize(Image src,
-    {int width,
-    int height,
+    {int? width,
+    int? height,
     Interpolation interpolation = Interpolation.nearest}) {
   if (width == null && height == null) {
     throw ImageException('Invalid size');
@@ -22,7 +23,7 @@ Image copyResize(Image src,
   src = bakeOrientation(src);
 
   if (height == null || height <= 0) {
-    height = (width * (src.height / src.width)).toInt();
+    height = (width! * (src.height / src.width)).toInt();
   }
 
   if (width == null || width <= 0) {

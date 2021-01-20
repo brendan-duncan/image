@@ -13,8 +13,8 @@ class PsdLayerSectionDivider extends PsdLayerData {
   static const SUBTYPE_NORMAL = 0;
   static const SUBTYPE_SCENE_GROUP = 1;
 
-  int type;
-  String key;
+  late int type;
+  String? key;
   int subType = SUBTYPE_NORMAL;
 
   PsdLayerSectionDivider(String tag, InputBuffer data) : super.type(tag) {

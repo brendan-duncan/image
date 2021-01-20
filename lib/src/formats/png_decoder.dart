@@ -14,7 +14,7 @@ import 'png/png_info.dart';
 
 /// Decode a PNG encoded image.
 class PngDecoder extends Decoder {
-  InternalPngInfo _info;
+  InternalPngInfo? _info;
 
   /// Is the given file a valid PNG image?
   @override
@@ -31,12 +31,12 @@ class PngDecoder extends Decoder {
     return true;
   }
 
-  PngInfo get info => _info;
+  PngInfo? get info => _info;
 
   /// Start decoding the data as an animation sequence, but don't actually
   /// process the frames until they are requested with decodeFrame.
   @override
-  DecodeInfo startDecode(List<int> data) {
+  DecodeInfo? startDecode(List<int> data) {
     _input = InputBuffer(data, bigEndian: true);
 
     var pngHeader = _input.readBytes(8);
@@ -56,48 +56,48 @@ class PngDecoder extends Decoder {
           var hdr = InputBuffer.from(_input.readBytes(chunkSize));
           List<int> hdrBytes = hdr.toUint8List();
           _info = InternalPngInfo();
-          _info.width = hdr.readUint32();
-          _info.height = hdr.readUint32();
-          _info.bits = hdr.readByte();
-          _info.colorType = hdr.readByte();
-          _info.compressionMethod = hdr.readByte();
-          _info.filterMethod = hdr.readByte();
-          _info.interlaceMethod = hdr.readByte();
+          _info!.width = hdr.readUint32();
+          _info!.height = hdr.readUint32();
+          _info!.bits = hdr.readByte();
+          _info!.colorType = hdr.readByte();
+          _info!.compressionMethod = hdr.readByte();
+          _info!.filterMethod = hdr.readByte();
+          _info!.interlaceMethod = hdr.readByte();
 
           // Validate some of the info in the header to make sure we support
           // the proposed image data.
           if (![GRAYSCALE, RGB, INDEXED, GRAYSCALE_ALPHA, RGBA]
-              .contains(_info.colorType)) {
+              .contains(_info!.colorType)) {
             return null;
           }
 
-          if (_info.filterMethod != 0) {
+          if (_info!.filterMethod != 0) {
             return null;
           }
 
-          switch (_info.colorType) {
+          switch (_info!.colorType) {
             case GRAYSCALE:
-              if (![1, 2, 4, 8, 16].contains(_info.bits)) {
+              if (![1, 2, 4, 8, 16].contains(_info!.bits)) {
                 return null;
               }
               break;
             case RGB:
-              if (![8, 16].contains(_info.bits)) {
+              if (![8, 16].contains(_info!.bits)) {
                 return null;
               }
               break;
             case INDEXED:
-              if (![1, 2, 4, 8].contains(_info.bits)) {
+              if (![1, 2, 4, 8].contains(_info!.bits)) {
                 return null;
               }
               break;
             case GRAYSCALE_ALPHA:
-              if (![8, 16].contains(_info.bits)) {
+              if (![8, 16].contains(_info!.bits)) {
                 return null;
               }
               break;
             case RGBA:
-              if (![8, 16].contains(_info.bits)) {
+              if (![8, 16].contains(_info!.bits)) {
                 return null;
               }
               break;
@@ -110,17 +110,17 @@ class PngDecoder extends Decoder {
           }
           break;
         case 'PLTE':
-          _info.palette = _input.readBytes(chunkSize).toUint8List();
+          _info!.palette = _input.readBytes(chunkSize).toUint8List();
           var crc = _input.readUint32();
-          var computedCrc = _crc(chunkType, _info.palette);
+          var computedCrc = _crc(chunkType, _info!.palette as List<int>);
           if (crc != computedCrc) {
             throw ImageException('Invalid $chunkType checksum');
           }
           break;
         case 'tRNS':
-          _info.transparency = _input.readBytes(chunkSize).toUint8List();
+          _info!.transparency = _input.readBytes(chunkSize).toUint8List();
           var crc = _input.readUint32();
-          var computedCrc = _crc(chunkType, _info.transparency);
+          var computedCrc = _crc(chunkType, _info!.transparency!);
           if (crc != computedCrc) {
             throw ImageException('Invalid $chunkType checksum');
           }
@@ -138,22 +138,22 @@ class PngDecoder extends Decoder {
           // A gamma of 1.0 doesn't have any affect, so pretend we didn't get
           // a gamma in that case.
           if (gammaInt != 100000) {
-            _info.gamma = gammaInt / 100000.0;
+            _info!.gamma = gammaInt / 100000.0;
           }
           break;
         case 'IDAT':
-          _info.idat.add(inputPos);
+          _info!.idat.add(inputPos);
           _input.skip(chunkSize);
           _input.skip(4); // CRC
           break;
         case 'acTL': // Animation control chunk
-          _info.numFrames = _input.readUint32();
-          _info.repeat = _input.readUint32();
+          _info!.numFrames = _input.readUint32();
+          _info!.repeat = _input.readUint32();
           _input.skip(4); // CRC
           break;
         case 'fcTL': // Frame control chunk
           PngFrame frame = InternalPngFrame();
-          _info.frames.add(frame);
+          _info!.frames.add(frame);
           frame.sequenceNumber = _input.readUint32();
           frame.width = _input.readUint32();
           frame.height = _input.readUint32();
@@ -167,24 +167,24 @@ class PngDecoder extends Decoder {
           break;
         case 'fdAT':
           /*int sequenceNumber =*/ _input.readUint32();
-          var frame = _info.frames.last as InternalPngFrame;
+          var frame = _info!.frames.last as InternalPngFrame;
           frame.fdat.add(inputPos);
           _input.skip(chunkSize - 4);
           _input.skip(4); // CRC
           break;
         case 'bKGD':
-          if (_info.colorType == 3) {
+          if (_info!.colorType == 3) {
             var paletteIndex = _input.readByte();
             chunkSize--;
             var p3 = paletteIndex * 3;
-            var r = _info.palette[p3];
-            var g = _info.palette[p3 + 1];
-            var b = _info.palette[p3 + 2];
-            _info.backgroundColor = Color.fromRgb(r, g, b);
-          } else if (_info.colorType == 0 || _info.colorType == 4) {
+            var r = _info!.palette![p3]!;
+            var g = _info!.palette![p3 + 1]!;
+            var b = _info!.palette![p3 + 2]!;
+            _info!.backgroundColor = Color.fromRgb(r, g, b);
+          } else if (_info!.colorType == 0 || _info!.colorType == 4) {
             /*int gray =*/ _input.readUint16();
             chunkSize -= 2;
-          } else if (_info.colorType == 2 || _info.colorType == 6) {
+          } else if (_info!.colorType == 2 || _info!.colorType == 6) {
             /*int r =*/ _input.readUint16();
             /*int g =*/ _input.readUint16();
             /*int b =*/ _input.readUint16();
@@ -196,11 +196,11 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'iCCP':
-          _info.iCCPName = _input.readString();
-          _info.iCCPCompression = _input.readByte(); // 0: deflate
-          chunkSize -= _info.iCCPName.length + 2;
+          _info!.iCCPName = _input.readString();
+          _info!.iCCPCompression = _input.readByte(); // 0: deflate
+          chunkSize -= _info!.iCCPName.length + 2;
           final profile = _input.readBytes(chunkSize);
-          _info.iCCPData = profile.toUint8List();
+          _info!.iCCPData = profile.toUint8List();
           _input.skip(4); // CRC
           break;
         default:
@@ -223,23 +223,23 @@ class PngDecoder extends Decoder {
 
   /// The number of frames that can be decoded.
   @override
-  int numFrames() => _info != null ? _info.numFrames : 0;
+  int numFrames() => _info != null ? _info!.numFrames : 0;
 
   /// Decode the frame (assuming [startDecode] has already been called).
   @override
-  Image decodeFrame(int frame) {
+  Image? decodeFrame(int frame) {
     if (_info == null) {
       return null;
     }
 
     var imageData = <int>[];
 
-    var width = _info.width;
-    var height = _info.height;
+    int? width = _info!.width;
+    int? height = _info!.height;
 
-    if (!_info.isAnimated || frame == 0) {
-      for (var i = 0, len = _info.idat.length; i < len; ++i) {
-        _input.offset = _info.idat[i];
+    if (!_info!.isAnimated || frame == 0) {
+      for (var i = 0, len = _info!.idat.length; i < len; ++i) {
+        _input.offset = _info!.idat[i];
         var chunkSize = _input.readUint32();
         var chunkType = _input.readString(4);
         var data = _input.readBytes(chunkSize).toUint8List();
@@ -251,11 +251,11 @@ class PngDecoder extends Decoder {
         }
       }
     } else {
-      if (frame < 0 || frame >= _info.frames.length) {
+      if (frame < 0 || frame >= _info!.frames.length) {
         throw ImageException('Invalid Frame Number: $frame');
       }
 
-      var f = _info.frames[frame] as InternalPngFrame;
+      var f = _info!.frames[frame] as InternalPngFrame;
       width = f.width;
       height = f.height;
       for (var i = 0; i < f.fdat.length; ++i) {
@@ -272,15 +272,15 @@ class PngDecoder extends Decoder {
     }
 
     Channels channels;
-    if (_info.colorType == GRAYSCALE_ALPHA ||
-        _info.colorType == RGBA ||
-        _info.transparency != null) {
+    if (_info!.colorType == GRAYSCALE_ALPHA ||
+        _info!.colorType == RGBA ||
+        _info!.transparency != null) {
       channels = Channels.rgba;
     } else {
       channels = Channels.rgb;
     }
 
-    var image = Image(width, height, channels: channels);
+    var image = Image(width!, height!, channels: channels);
 
     var uncompressed = ZLibDecoder().decodeBytes(imageData);
 
@@ -289,33 +289,32 @@ class PngDecoder extends Decoder {
     _resetBits();
 
     // Set up a LUT to transform colors for gamma correction.
-    if (_info.colorLut == null) {
-      _info.colorLut = List<int>(256);
-      for (var i = 0; i < 256; ++i) {
+    if (_info!.colorLut == null) {
+      _info!.colorLut = List<int>.generate(256, (i) {
         var c = i;
         /*if (info.gamma != null) {
           c = (Math.pow((c / 255.0), info.gamma) * 255.0).toInt();
         }*/
-        _info.colorLut[i] = c;
-      }
+        return c;
+      }, growable: false);
 
       // Apply the LUT to the palette, if necessary.
-      if (_info.palette != null && _info.gamma != null) {
-        for (var i = 0; i < _info.palette.length; ++i) {
-          _info.palette[i] = _info.colorLut[_info.palette[i]];
+      if (_info!.palette != null && _info!.gamma != null) {
+        for (var i = 0; i < _info!.palette!.length; ++i) {
+          _info!.palette![i] = _info!.colorLut![_info!.palette![i]!];
         }
       }
     }
 
-    var origW = _info.width;
-    var origH = _info.height;
-    _info.width = width;
-    _info.height = height;
+    var origW = _info!.width;
+    var origH = _info!.height;
+    _info!.width = width;
+    _info!.height = height;
 
-    var w = width;
-    var h = height;
+    int? w = width;
+    int? h = height;
     _progressY = 0;
-    if (_info.interlaceMethod != 0) {
+    if (_info!.interlaceMethod != 0) {
       _processPass(input, image, 0, 0, 8, 8, (w + 7) >> 3, (h + 7) >> 3);
       _processPass(input, image, 4, 0, 8, 8, (w + 3) >> 3, (h + 7) >> 3);
       _processPass(input, image, 0, 4, 4, 8, (w + 3) >> 2, (h + 3) >> 3);
@@ -327,17 +326,19 @@ class PngDecoder extends Decoder {
       _process(input, image);
     }
 
-    _info.width = origW;
-    _info.height = origH;
+    _info!.width = origW;
+    _info!.height = origH;
 
-    image.iccProfile =
-        ICCProfileData(_info.iCCPName, ICCPCompression.deflate, _info.iCCPData);
+    if (_info!.iCCPData != null) {
+      image.iccProfile = ICCProfileData(
+          _info!.iCCPName, ICCPCompression.deflate, _info!.iCCPData!);
+    }
 
     return image;
   }
 
   @override
-  Image decodeImage(List<int> data, {int frame = 0}) {
+  Image? decodeImage(List<int> data, {int frame = 0}) {
     if (startDecode(data) == null) {
       return null;
     }
@@ -345,50 +346,41 @@ class PngDecoder extends Decoder {
   }
 
   @override
-  Animation decodeAnimation(List<int> data) {
+  Animation? decodeAnimation(List<int> data) {
     if (startDecode(data) == null) {
       return null;
     }
 
     var anim = Animation();
-    anim.width = _info.width;
-    anim.height = _info.height;
+    anim.width = _info!.width;
+    anim.height = _info!.height;
 
-    if (!_info.isAnimated) {
-      var image = decodeFrame(0);
+    if (!_info!.isAnimated) {
+      var image = decodeFrame(0)!;
       anim.addFrame(image);
       return anim;
     }
 
-    var dispose = PngFrame.APNG_DISPOSE_OP_BACKGROUND;
-    var lastImage = Image(_info.width, _info.height);
-    for (var i = 0; i < _info.numFrames; ++i) {
+    int? dispose = PngFrame.APNG_DISPOSE_OP_BACKGROUND;
+    var lastImage = Image(_info!.width, _info!.height);
+    for (var i = 0; i < _info!.numFrames; ++i) {
       //_frame = i;
-      if (lastImage == null) {
-        lastImage = Image(_info.width, _info.height);
-      } else {
-        lastImage = Image.from(lastImage);
-      }
+      lastImage = Image.from(lastImage);
 
-      var frame = _info.frames[i];
+      var frame = _info!.frames[i];
       var image = decodeFrame(i);
       if (image == null) {
         continue;
       }
 
-      if (lastImage != null) {
-        if (dispose == PngFrame.APNG_DISPOSE_OP_BACKGROUND ||
-            dispose == PngFrame.APNG_DISPOSE_OP_PREVIOUS) {
-          lastImage.fill(_info.backgroundColor);
-        }
-        copyInto(lastImage, image,
-            dstX: frame.xOffset,
-            dstY: frame.yOffset,
-            blend: frame.blend == PngFrame.APNG_BLEND_OP_OVER);
-      } else {
-        lastImage = image;
+      if (dispose == PngFrame.APNG_DISPOSE_OP_BACKGROUND ||
+          dispose == PngFrame.APNG_DISPOSE_OP_PREVIOUS) {
+        lastImage.fill(_info!.backgroundColor);
       }
-
+      copyInto(lastImage, image,
+          dstX: frame.xOffset,
+          dstY: frame.yOffset,
+          blend: frame.blend == PngFrame.APNG_BLEND_OP_OVER);
       anim.addFrame(lastImage);
 
       dispose = frame.dispose;
@@ -400,15 +392,15 @@ class PngDecoder extends Decoder {
   // Process a pass of an interlaced image.
   void _processPass(InputBuffer input, Image image, int xOffset, int yOffset,
       int xStep, int yStep, int passWidth, int passHeight) {
-    final channels = (_info.colorType == GRAYSCALE_ALPHA)
+    final channels = (_info!.colorType == GRAYSCALE_ALPHA)
         ? 2
-        : (_info.colorType == RGB)
+        : (_info!.colorType == RGB)
             ? 3
-            : (_info.colorType == RGBA)
+            : (_info!.colorType == RGBA)
                 ? 4
                 : 1;
 
-    final pixelDepth = channels * _info.bits;
+    final pixelDepth = channels * _info!.bits!;
     final bpp = (pixelDepth + 7) >> 3;
     final rowBytes = (pixelDepth * passWidth + 7) >> 3;
 
@@ -463,18 +455,18 @@ class PngDecoder extends Decoder {
   }
 
   void _process(InputBuffer input, Image image) {
-    final channels = (_info.colorType == GRAYSCALE_ALPHA)
+    final channels = (_info!.colorType == GRAYSCALE_ALPHA)
         ? 2
-        : (_info.colorType == RGB)
+        : (_info!.colorType == RGB)
             ? 3
-            : (_info.colorType == RGBA)
+            : (_info!.colorType == RGBA)
                 ? 4
                 : 1;
 
-    final pixelDepth = channels * _info.bits;
+    final pixelDepth = channels * _info!.bits!;
 
-    final w = _info.width;
-    final h = _info.height;
+    final w = _info!.width;
+    final h = _info!.height;
 
     final rowBytes = (((w * pixelDepth + 7)) >> 3);
     final bpp = (pixelDepth + 7) >> 3;
@@ -640,39 +632,39 @@ class PngDecoder extends Decoder {
 
   // Read the next pixel from the input stream.
   void _readPixel(InputBuffer input, List<int> pixel) {
-    switch (_info.colorType) {
+    switch (_info!.colorType) {
       case GRAYSCALE:
-        pixel[0] = _readBits(input, _info.bits);
+        pixel[0] = _readBits(input, _info!.bits!);
         return;
       case RGB:
-        pixel[0] = _readBits(input, _info.bits);
-        pixel[1] = _readBits(input, _info.bits);
-        pixel[2] = _readBits(input, _info.bits);
+        pixel[0] = _readBits(input, _info!.bits!);
+        pixel[1] = _readBits(input, _info!.bits!);
+        pixel[2] = _readBits(input, _info!.bits!);
         return;
       case INDEXED:
-        pixel[0] = _readBits(input, _info.bits);
+        pixel[0] = _readBits(input, _info!.bits!);
         return;
       case GRAYSCALE_ALPHA:
-        pixel[0] = _readBits(input, _info.bits);
-        pixel[1] = _readBits(input, _info.bits);
+        pixel[0] = _readBits(input, _info!.bits!);
+        pixel[1] = _readBits(input, _info!.bits!);
         return;
       case RGBA:
-        pixel[0] = _readBits(input, _info.bits);
-        pixel[1] = _readBits(input, _info.bits);
-        pixel[2] = _readBits(input, _info.bits);
-        pixel[3] = _readBits(input, _info.bits);
+        pixel[0] = _readBits(input, _info!.bits!);
+        pixel[1] = _readBits(input, _info!.bits!);
+        pixel[2] = _readBits(input, _info!.bits!);
+        pixel[3] = _readBits(input, _info!.bits!);
         return;
     }
 
-    throw ImageException('Invalid color type: ${_info.colorType}.');
+    throw ImageException('Invalid color type: ${_info!.colorType}.');
   }
 
   // Get the color with the list of components.
   int _getColor(List<int> raw) {
-    switch (_info.colorType) {
+    switch (_info!.colorType) {
       case GRAYSCALE:
-        int g;
-        switch (_info.bits) {
+        late int g;
+        switch (_info!.bits) {
           case 1:
             g = _convert1to8(raw[0]);
             break;
@@ -690,11 +682,11 @@ class PngDecoder extends Decoder {
             break;
         }
 
-        g = _info.colorLut[g];
+        g = _info!.colorLut![g]!;
 
-        if (_info.transparency != null) {
-          var a = ((_info.transparency[0] & 0xff) << 24) |
-              (_info.transparency[1] & 0xff);
+        if (_info!.transparency != null) {
+          var a = ((_info!.transparency![0] & 0xff) << 24) |
+              (_info!.transparency![1] & 0xff);
           if (raw[0] == a) {
             return getColor(g, g, g, 0);
           }
@@ -702,8 +694,8 @@ class PngDecoder extends Decoder {
 
         return getColor(g, g, g, 255);
       case RGB:
-        int r, g, b;
-        switch (_info.bits) {
+        late int r, g, b;
+        switch (_info!.bits) {
           case 1:
             r = _convert1to8(raw[0]);
             g = _convert1to8(raw[1]);
@@ -731,17 +723,17 @@ class PngDecoder extends Decoder {
             break;
         }
 
-        r = _info.colorLut[r];
-        g = _info.colorLut[g];
-        b = _info.colorLut[b];
+        r = _info!.colorLut![r]!;
+        g = _info!.colorLut![g]!;
+        b = _info!.colorLut![b]!;
 
-        if (_info.transparency != null) {
-          var tr = ((_info.transparency[0] & 0xff) << 8) |
-              (_info.transparency[1] & 0xff);
-          var tg = ((_info.transparency[2] & 0xff) << 8) |
-              (_info.transparency[3] & 0xff);
-          var tb = ((_info.transparency[4] & 0xff) << 8) |
-              (_info.transparency[5] & 0xff);
+        if (_info!.transparency != null) {
+          var tr = ((_info!.transparency![0] & 0xff) << 8) |
+              (_info!.transparency![1] & 0xff);
+          var tg = ((_info!.transparency![2] & 0xff) << 8) |
+              (_info!.transparency![3] & 0xff);
+          var tb = ((_info!.transparency![4] & 0xff) << 8) |
+              (_info!.transparency![5] & 0xff);
           if (raw[0] == tr && raw[1] == tg && raw[2] == tb) {
             return getColor(r, g, b, 0);
           }
@@ -751,22 +743,23 @@ class PngDecoder extends Decoder {
       case INDEXED:
         var p = raw[0] * 3;
 
-        var a = _info.transparency != null && raw[0] < _info.transparency.length
-            ? _info.transparency[raw[0]]
-            : 255;
+        var a =
+            _info!.transparency != null && raw[0] < _info!.transparency!.length
+                ? _info!.transparency![raw[0]]
+                : 255;
 
-        if (p >= _info.palette.length) {
+        if (p >= _info!.palette!.length) {
           return getColor(255, 255, 255, a);
         }
 
-        var r = _info.palette[p];
-        var g = _info.palette[p + 1];
-        var b = _info.palette[p + 2];
+        var r = _info!.palette![p]!;
+        var g = _info!.palette![p + 1]!;
+        var b = _info!.palette![p + 2]!;
 
         return getColor(r, g, b, a);
       case GRAYSCALE_ALPHA:
-        int g, a;
-        switch (_info.bits) {
+        late int g, a;
+        switch (_info!.bits) {
           case 1:
             g = _convert1to8(raw[0]);
             a = _convert1to8(raw[1]);
@@ -789,12 +782,12 @@ class PngDecoder extends Decoder {
             break;
         }
 
-        g = _info.colorLut[g];
+        g = _info!.colorLut![g]!;
 
         return getColor(g, g, g, a);
       case RGBA:
-        int r, g, b, a;
-        switch (_info.bits) {
+        late int r, g, b, a;
+        switch (_info!.bits) {
           case 1:
             r = _convert1to8(raw[0]);
             g = _convert1to8(raw[1]);
@@ -827,18 +820,18 @@ class PngDecoder extends Decoder {
             break;
         }
 
-        r = _info.colorLut[r];
-        g = _info.colorLut[g];
-        b = _info.colorLut[b];
+        r = _info!.colorLut![r]!;
+        g = _info!.colorLut![g]!;
+        b = _info!.colorLut![b]!;
 
         return getColor(r, g, b, a);
     }
 
-    throw ImageException('Invalid color type: ${_info.colorType}.');
+    throw ImageException('Invalid color type: ${_info!.colorType}.');
   }
 
-  InputBuffer _input;
-  int _progressY;
+  late InputBuffer _input;
+  int _progressY = 0;
   //int _frame = 0;
   //int _numFrames = 1;
 

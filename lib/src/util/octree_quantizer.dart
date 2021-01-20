@@ -5,11 +5,10 @@ import 'quantizer.dart';
 // Color quantization using octree,
 // from https://rosettacode.org/wiki/Color_quantization/C
 class OctreeQuantizer extends Quantizer {
-  _OctreeNode _root;
+  final _OctreeNode _root;
 
-  OctreeQuantizer(Image image, {int numberOfColors = 256}) {
-    _root = _OctreeNode(0, 0, null);
-
+  OctreeQuantizer(Image image, {int numberOfColors = 256})
+      : _root = _OctreeNode(0, 0, null) {
     var heap = _HeapNode();
     for (var si = 0; si < image.length; ++si) {
       var c = image[si];
@@ -21,11 +20,11 @@ class OctreeQuantizer extends Quantizer {
 
     var nc = numberOfColors + 1;
     while (heap.n > nc) {
-      _heapAdd(heap, _nodeFold(_popHeap(heap)));
+      _heapAdd(heap, _nodeFold(_popHeap(heap)!)!);
     }
 
     for (var i = 1; i < heap.n; i++) {
-      var got = heap.buf[i];
+      var got = heap.buf[i]!;
       var c = got.count;
       got.r = (got.r / c).round();
       got.g = (got.g / c).round();
@@ -39,19 +38,19 @@ class OctreeQuantizer extends Quantizer {
     var r = getRed(c);
     var g = getGreen(c);
     var b = getBlue(c);
-    var root = _root;
+    _OctreeNode? root = _root;
 
     for (var bit = 1 << 7; bit != 0; bit >>= 1) {
       var i = ((g & bit) != 0 ? 1 : 0) * 4 +
           ((r & bit) != 0 ? 1 : 0) * 2 +
           ((b & bit) != 0 ? 1 : 0);
-      if (root.children[i] == null) {
+      if (root!.children[i] == null) {
         break;
       }
       root = root.children[i];
     }
 
-    r = root.r;
+    r = root!.r;
     g = root.g;
     b = root.b;
     return getColor(r, g, b, 255);
@@ -84,7 +83,7 @@ class OctreeQuantizer extends Quantizer {
         root.children[i] = _OctreeNode(i, depth, root);
       }
 
-      root = root.children[i];
+      root = root.children[i]!;
     }
 
     root.r += r;
@@ -94,11 +93,11 @@ class OctreeQuantizer extends Quantizer {
     return root;
   }
 
-  _OctreeNode _nodeFold(_OctreeNode p) {
+  _OctreeNode? _nodeFold(_OctreeNode p) {
     if (p.childCount > 0) {
       return null;
     }
-    var q = p.parent;
+    var q = p.parent!;
     q.count += p.count;
 
     q.r += p.r;
@@ -111,15 +110,15 @@ class OctreeQuantizer extends Quantizer {
 
   static const _ON_INHEAP = 1;
 
-  _OctreeNode _popHeap(_HeapNode h) {
+  _OctreeNode? _popHeap(_HeapNode h) {
     if (h.n <= 1) {
       return null;
     }
 
     var ret = h.buf[1];
     h.buf[1] = h.buf.removeLast();
-    h.buf[1].heap_idx = 1;
-    _downHeap(h, h.buf[1]);
+    h.buf[1]!.heap_idx = 1;
+    _downHeap(h, h.buf[1]!);
 
     return ret;
   }
@@ -144,16 +143,16 @@ class OctreeQuantizer extends Quantizer {
       if (m >= h.n) {
         break;
       }
-      if ((m + 1) < h.n && _compareNode(h.buf[m], h.buf[m + 1]) > 0) {
+      if ((m + 1) < h.n && _compareNode(h.buf[m]!, h.buf[m + 1]!) > 0) {
         m++;
       }
 
-      if (_compareNode(p, h.buf[m]) <= 0) {
+      if (_compareNode(p, h.buf[m]!) <= 0) {
         break;
       }
 
       h.buf[n] = h.buf[m];
-      h.buf[n].heap_idx = n;
+      h.buf[n]!.heap_idx = n;
       n = m;
     }
 
@@ -163,11 +162,11 @@ class OctreeQuantizer extends Quantizer {
 
   void _upHeap(_HeapNode h, _OctreeNode p) {
     var n = p.heap_idx;
-    _OctreeNode prev;
+    _OctreeNode? prev;
 
     while (n > 1) {
       prev = h.buf[n ~/ 2];
-      if (_compareNode(p, prev) >= 0) {
+      if (_compareNode(p, prev!) >= 0) {
         break;
       }
 
@@ -187,8 +186,8 @@ class _OctreeNode {
   int b = 0;
   int count = 0;
   int heap_idx = 0;
-  List<_OctreeNode> children = List<_OctreeNode>(8);
-  _OctreeNode parent;
+  List<_OctreeNode?> children = List<_OctreeNode?>.filled(8, null);
+  _OctreeNode? parent;
   int childCount = 0;
   int childIndex = 0;
   int flags = 0;
@@ -196,12 +195,12 @@ class _OctreeNode {
 
   _OctreeNode(this.childIndex, this.depth, this.parent) {
     if (parent != null) {
-      parent.childCount++;
+      parent!.childCount++;
     }
   }
 }
 
 class _HeapNode {
-  List<_OctreeNode> buf = [null];
+  List<_OctreeNode?> buf = [null];
   int get n => buf.length;
 }

@@ -1,11 +1,12 @@
+
 import '../../formats/decode_info.dart';
 import 'tiff_image.dart';
 
 class TiffInfo extends DecodeInfo {
-  bool bigEndian;
-  int signature;
+  bool? bigEndian;
+  int? signature;
 
-  int ifdOffset;
+  int? ifdOffset;
   List<TiffImage> images = [];
 
   @override

@@ -1,12 +1,13 @@
+
 import '../../util/input_buffer.dart';
 
 class VP8BitReader {
   InputBuffer input;
 
   // boolean decoder
-  int _range; // current range minus 1. In [127, 254] interval.
-  int _value; // current value
-  int _bits; // number of valid bits left
+  late int _range; // current range minus 1. In [127, 254] interval.
+  late int _value; // current value
+  late int _bits; // number of valid bits left
   bool _eof = false;
 
   VP8BitReader(this.input) {

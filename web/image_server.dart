@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'package:image/image.dart';
 
@@ -23,7 +24,7 @@ void main(List<String> argv) {
     return;
   }
 
-  var image = decoder.decodeImage(fileBytes);
+  var image = decoder.decodeImage(fileBytes)!;
 
   // ... do something with image ...
 

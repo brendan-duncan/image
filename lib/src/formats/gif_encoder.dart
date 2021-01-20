@@ -15,12 +15,12 @@ class GifEncoder extends Encoder {
   /// This adds the frame passed to [image].
   /// After the last frame has been added, [finish] is required to be called.
   /// Optional frame [duration] is in 1/100 sec.
-  void addFrame(Image image, {int duration}) {
+  void addFrame(Image image, {int? duration}) {
     if (output == null) {
       output = OutputBuffer();
 
       _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
-      _lastImage = _lastColorMap.getIndexMap(image);
+      _lastImage = _lastColorMap!.getIndexMap(image);
       _lastImageDuration = duration;
 
       _width = image.width;
@@ -35,11 +35,11 @@ class GifEncoder extends Encoder {
 
     _writeGraphicsCtrlExt();
 
-    _addImage(_lastImage, _width, _height, _lastColorMap.colorMap, 256);
+    _addImage(_lastImage, _width, _height, _lastColorMap!.colorMap, 256);
     _encodedFrames++;
 
     _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
-    _lastImage = _lastColorMap.getIndexMap(image);
+    _lastImage = _lastColorMap!.getIndexMap(image);
     _lastImageDuration = duration;
   }
 
@@ -50,8 +50,8 @@ class GifEncoder extends Encoder {
   /// [addFrame] will not encode the first image passed and after that
   /// always encode the previous image. Hence, the last image needs to be
   /// encoded here.
-  List<int> finish() {
-    List<int> bytes;
+  List<int>? finish() {
+    List<int>? bytes;
     if (output == null) {
       return bytes;
     }
@@ -63,15 +63,15 @@ class GifEncoder extends Encoder {
       _writeGraphicsCtrlExt();
     }
 
-    _addImage(_lastImage, _width, _height, _lastColorMap.colorMap, 256);
+    _addImage(_lastImage, _width, _height, _lastColorMap!.colorMap, 256);
 
-    output.writeByte(TERMINATE_RECORD_TYPE);
+    output!.writeByte(TERMINATE_RECORD_TYPE);
 
     _lastImage = null;
     _lastColorMap = null;
     _encodedFrames = 0;
 
-    bytes = output.getBytes();
+    bytes = output!.getBytes();
     output = null;
     return bytes;
   }
@@ -80,7 +80,7 @@ class GifEncoder extends Encoder {
   @override
   List<int> encodeImage(Image image) {
     addFrame(image);
-    return finish();
+    return finish()!;
   }
 
   /// Does this encoder support animation?
@@ -89,7 +89,7 @@ class GifEncoder extends Encoder {
 
   /// Encode an animation.
   @override
-  List<int> encodeAnimation(Animation anim) {
+  List<int>? encodeAnimation(Animation anim) {
     repeat = anim.loopCount;
     for (var f in anim) {
       addFrame(
@@ -100,36 +100,36 @@ class GifEncoder extends Encoder {
     return finish();
   }
 
-  void _addImage(Uint8List image, int width, int height, Uint8List colorMap,
+  void _addImage(Uint8List? image, int width, int height, Uint8List colorMap,
       int numColors) {
     // Image desc
-    output.writeByte(IMAGE_DESC_RECORD_TYPE);
-    output.writeUint16(0); // image position x,y = 0,0
-    output.writeUint16(0);
-    output.writeUint16(width); // image size
-    output.writeUint16(height);
+    output!.writeByte(IMAGE_DESC_RECORD_TYPE);
+    output!.writeUint16(0); // image position x,y = 0,0
+    output!.writeUint16(0);
+    output!.writeUint16(width); // image size
+    output!.writeUint16(height);
 
     // Local Color Map
     // (0x80: Use LCM, 0x07: Palette Size (7 = 8-bit))
-    output.writeByte(0x87);
-    output.writeBytes(colorMap);
+    output!.writeByte(0x87);
+    output!.writeBytes(colorMap);
     for (var i = numColors; i < 256; ++i) {
-      output.writeByte(0);
-      output.writeByte(0);
-      output.writeByte(0);
+      output!.writeByte(0);
+      output!.writeByte(0);
+      output!.writeByte(0);
     }
 
     _encodeLZW(image, width, height);
   }
 
-  void _encodeLZW(Uint8List image, int width, int height) {
+  void _encodeLZW(Uint8List? image, int width, int height) {
     _curAccum = 0;
     _curBits = 0;
     _blockSize = 0;
     _block = Uint8List(256);
 
     const initCodeSize = 8;
-    output.writeByte(initCodeSize);
+    output!.writeByte(initCodeSize);
 
     var hTab = Int32List(HSIZE);
     var codeTab = Int32List(HSIZE);
@@ -149,7 +149,7 @@ class GifEncoder extends Encoder {
         return EOF;
       }
       --remaining;
-      return image[curPixel++] & 0xff;
+      return image![curPixel++] & 0xff;
     }
 
     var ent = _nextPixel();
@@ -224,16 +224,16 @@ class GifEncoder extends Encoder {
     _output(ent);
     _output(_EOFCode);
 
-    output.writeByte(0);
+    output!.writeByte(0);
   }
 
-  void _output(int code) {
+  void _output(int? code) {
     _curAccum &= MASKS[_curBits];
 
     if (_curBits > 0) {
-      _curAccum |= (code << _curBits);
+      _curAccum |= (code! << _curBits);
     } else {
-      _curAccum = code;
+      _curAccum = code!;
     }
 
     _curBits += _nBits;
@@ -274,8 +274,8 @@ class GifEncoder extends Encoder {
 
   void _writeBlock() {
     if (_blockSize > 0) {
-      output.writeByte(_blockSize);
-      output.writeBytes(_block, _blockSize);
+      output!.writeByte(_blockSize);
+      output!.writeBytes(_block, _blockSize);
       _blockSize = 0;
     }
   }
@@ -288,64 +288,64 @@ class GifEncoder extends Encoder {
   }
 
   void _writeApplicationExt() {
-    output.writeByte(EXTENSION_RECORD_TYPE);
-    output.writeByte(APPLICATION_EXT);
-    output.writeByte(11); // data block size
-    output.writeBytes('NETSCAPE2.0'.codeUnits); // app identifier
-    output.writeBytes([0x03, 0x01]);
-    output.writeUint16(repeat); // loop count
-    output.writeByte(0); // block terminator
+    output!.writeByte(EXTENSION_RECORD_TYPE);
+    output!.writeByte(APPLICATION_EXT);
+    output!.writeByte(11); // data block size
+    output!.writeBytes('NETSCAPE2.0'.codeUnits); // app identifier
+    output!.writeBytes([0x03, 0x01]);
+    output!.writeUint16(repeat); // loop count
+    output!.writeByte(0); // block terminator
   }
 
   void _writeGraphicsCtrlExt() {
-    output.writeByte(EXTENSION_RECORD_TYPE);
-    output.writeByte(GRAPHIC_CONTROL_EXT);
-    output.writeByte(4); // data block size
+    output!.writeByte(EXTENSION_RECORD_TYPE);
+    output!.writeByte(GRAPHIC_CONTROL_EXT);
+    output!.writeByte(4); // data block size
 
     var transparency = 0;
     var dispose = 0; // dispose = no action
 
     // packed fields
-    output.writeByte(0 | // 1:3 reserved
+    output!.writeByte(0 | // 1:3 reserved
         dispose | // 4:6 disposal
         0 | // 7   user input - 0 = none
         transparency); // 8   transparency flag
 
-    output.writeUint16(_lastImageDuration ?? delay); // delay x 1/100 sec
-    output.writeByte(0); // transparent color index
-    output.writeByte(0); // block terminator
+    output!.writeUint16(_lastImageDuration ?? delay); // delay x 1/100 sec
+    output!.writeByte(0); // transparent color index
+    output!.writeByte(0); // block terminator
   }
 
   // GIF header and Logical Screen Descriptor
   void _writeHeader(int width, int height) {
-    output.writeBytes(GIF89_STAMP.codeUnits);
-    output.writeUint16(width);
-    output.writeUint16(height);
-    output.writeByte(0); // global color map parameters (not being used).
-    output.writeByte(0); // background color index.
-    output.writeByte(0); // aspect
+    output!.writeBytes(GIF89_STAMP.codeUnits);
+    output!.writeUint16(width);
+    output!.writeUint16(height);
+    output!.writeByte(0); // global color map parameters (not being used).
+    output!.writeByte(0); // background color index.
+    output!.writeByte(0); // aspect
   }
 
-  Uint8List _lastImage;
-  int _lastImageDuration;
-  NeuralQuantizer _lastColorMap;
-  int _width;
-  int _height;
+  Uint8List? _lastImage;
+  int? _lastImageDuration;
+  NeuralQuantizer? _lastColorMap;
+  late int _width;
+  late int _height;
   int _encodedFrames;
 
-  int _curAccum;
-  int _curBits;
-  int _nBits;
-  int _initBits;
-  int _EOFCode;
-  int _maxCode;
-  int _clearCode;
-  int _freeEnt;
-  bool _clearFlag;
-  Uint8List _block;
-  int _blockSize;
+  int _curAccum = 0;
+  int _curBits = 0;
+  int _nBits = 0;
+  int _initBits = 0;
+  int _EOFCode = 0;
+  int _maxCode = 0;
+  int _clearCode = 0;
+  int _freeEnt = 0;
+  bool _clearFlag = false;
+  late Uint8List _block;
+  int _blockSize = 0;
 
-  OutputBuffer output;
+  OutputBuffer? output;
 
   static const String GIF89_STAMP = 'GIF89a';
 

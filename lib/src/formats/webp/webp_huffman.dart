@@ -16,7 +16,7 @@ class HuffmanTree {
 
   // all the nodes, starting at root, stored as a single int array, where
   // each node occupies two ints as [symbol, children].
-  Int32List tree;
+  late Int32List tree;
 
   // max number of nodes
   int maxNodes = 0;
@@ -316,18 +316,14 @@ class HuffmanTree {
 // A group of huffman trees.
 @internal
 class HTreeGroup {
-  final htrees = List<HuffmanTree>(VP8L.HUFFMAN_CODES_PER_META_CODE);
+  final List<HuffmanTree> htrees;
 
-  HTreeGroup() {
-    for (var i = 0, len = htrees.length; i < len; ++i) {
-      htrees[i] = HuffmanTree();
-    }
-  }
+  HTreeGroup()
+      : htrees = List<HuffmanTree>.generate(
+            VP8L.HUFFMAN_CODES_PER_META_CODE, (_) => HuffmanTree(),
+            growable: false);
 
   HuffmanTree operator [](int index) {
-    if (htrees[index] == null) {
-      htrees[index] = HuffmanTree();
-    }
     return htrees[index];
   }
 }

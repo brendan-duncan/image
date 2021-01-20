@@ -1,10 +1,10 @@
 import 'dart:html';
 import 'package:image/image.dart';
 
-ImageData filterImageData;
-CanvasElement canvas;
-DivElement logDiv;
-Image origImage;
+late ImageData filterImageData;
+late CanvasElement canvas;
+late DivElement logDiv;
+late Image origImage;
 
 void _addControl(
     String label, String value, DivElement parent, dynamic callback) {
@@ -15,7 +15,7 @@ void _addControl(
   amountEdit.id = label + '_edit';
   amountEdit.onChange.listen((e) {
     try {
-      var d = double.parse(amountEdit.value);
+      var d = double.parse(amountEdit.value!);
       callback(d);
     } catch (e) {
       print(e);
@@ -47,7 +47,7 @@ void testSepia() {
     filterImageData.data
         .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
-    canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     print(t.elapsedMilliseconds / 1000.0);
@@ -81,7 +81,7 @@ void testSobel() {
     filterImageData.data
         .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
-    canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     print(t.elapsedMilliseconds / 1000.0);
@@ -115,7 +115,7 @@ void testGaussian() {
     filterImageData.data
         .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
-    canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     print(t.elapsedMilliseconds / 1000.0);
@@ -151,7 +151,7 @@ void testVignette() {
     filterImageData.data
         .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
-    canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     print(t.elapsedMilliseconds / 1000.0);
@@ -195,7 +195,7 @@ void testPixelate() {
     filterImageData.data
         .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
-    canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     print(t.elapsedMilliseconds / 1000.0);
@@ -233,7 +233,7 @@ void testColorOffset() {
     filterImageData.data
         .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
-    canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     print(t.elapsedMilliseconds / 1000.0);
@@ -296,7 +296,7 @@ void testAdjustColor() {
     filterImageData.data
         .setRange(0, filterImageData.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
-    canvas.context2D.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
 
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
@@ -372,8 +372,8 @@ void main() {
     c.height = img.height;
     c.context2D.drawImage(img, 0, 0);
 
-    var imageData = c.context2D.getImageData(0, 0, img.width, img.height);
-    origImage = Image.fromBytes(img.width, img.height, imageData.data);
+    var imageData = c.context2D.getImageData(0, 0, img.width!, img.height!);
+    origImage = Image.fromBytes(img.width!, img.height!, imageData.data);
 
     canvas.width = img.width;
     canvas.height = img.height;

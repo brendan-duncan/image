@@ -113,12 +113,12 @@ class ExrImage extends DecodeInfo {
       for (var ci = 0; ci < part.channels.length; ++ci) {
         var ch = part.channels[ci];
         if (!framebuffer.hasChannel(ch.name)) {
-          width = part.width;
-          height = part.height;
+          width = part.width!;
+          height = part.height!;
           framebuffer.addSlice(HdrSlice(
               ch.name,
-              part.width,
-              part.height,
+              part.width!,
+              part.height!,
               ch.type == ExrChannel.TYPE_UINT ? HdrImage.UINT : HdrImage.FLOAT,
               8 * ch.size));
         }
@@ -141,15 +141,15 @@ class ExrImage extends DecodeInfo {
     //Uint32List fbi = Uint32List(part.channels.length);
 
     var imgData = InputBuffer.from(input);
-    for (var ly = 0, l = 0; ly < part.numYLevels; ++ly) {
-      for (var lx = 0; lx < part.numXLevels; ++lx, ++l) {
-        for (var ty = 0, oi = 0; ty < part.numYTiles[ly]; ++ty) {
-          for (var tx = 0; tx < part.numXTiles[lx]; ++tx, ++oi) {
+    for (var ly = 0, l = 0; ly < part.numYLevels!; ++ly) {
+      for (var lx = 0; lx < part.numXLevels!; ++lx, ++l) {
+        for (var ty = 0, oi = 0; ty < part.numYTiles![ly]!; ++ty) {
+          for (var tx = 0; tx < part.numXTiles![lx]!; ++tx, ++oi) {
             // TODO support sub-levels (for rip/mip-mapping).
             if (l != 0) {
               break;
             }
-            var offset = offsets[l][oi];
+            var offset = offsets![l]![oi];
             imgData.offset = offset;
 
             if (multiPart) {
@@ -166,10 +166,10 @@ class ExrImage extends DecodeInfo {
             var dataSize = imgData.readUint32();
             var data = imgData.readBytes(dataSize);
 
-            var ty = tileY * part.tileHeight;
-            var tx = tileX * part.tileWidth;
+            var ty = tileY * part.tileHeight!;
+            var tx = tileX * part.tileWidth!;
 
-            var tileWidth = compressor.decodedWidth;
+            var tileWidth = compressor!.decodedWidth;
             var tileHeight = compressor.decodedHeight;
 
             if (tx + tileWidth > width) {
@@ -179,15 +179,10 @@ class ExrImage extends DecodeInfo {
               tileHeight = height - ty;
             }
 
-            Uint8List uncompressedData;
-            if (compressor != null) {
-              uncompressedData = compressor.uncompress(
-                  data, tx, ty, part.tileWidth, part.tileHeight);
-              tileWidth = compressor.decodedWidth;
-              tileHeight = compressor.decodedHeight;
-            } else {
-              uncompressedData = data.toUint8List();
-            }
+            var uncompressedData = compressor.uncompress(
+                data, tx, ty, part.tileWidth, part.tileHeight);
+            tileWidth = compressor.decodedWidth;
+            tileHeight = compressor.decodedHeight;
 
             var si = 0;
             var len = uncompressedData.length;
@@ -196,16 +191,16 @@ class ExrImage extends DecodeInfo {
             for (var yi = 0; yi < tileHeight && ty < height; ++yi, ++ty) {
               for (var ci = 0; ci < numChannels; ++ci) {
                 var ch = part.channels[ci];
-                var slice = framebuffer[ch.name].getBytes();
+                var slice = framebuffer[ch.name]!.getBytes();
                 if (si >= len) {
                   break;
                 }
 
-                var tx = tileX * part.tileWidth;
+                var tx = tileX * part.tileWidth!;
                 for (var xx = 0; xx < tileWidth; ++xx, ++tx) {
                   for (var bi = 0; bi < ch.size; ++bi) {
-                    if (tx < part.width && ty < part.height) {
-                      var di = (ty * part.width + tx) * ch.size + bi;
+                    if (tx < part.width! && ty < part.height!) {
+                      var di = (ty * part.width! + tx) * ch.size + bi;
                       slice[di] = uncompressedData[si++];
                     } else {
                       si++;
@@ -225,7 +220,7 @@ class ExrImage extends DecodeInfo {
     final multiPart = _isMultiPart();
     var framebuffer = part.framebuffer;
     var compressor = part.compressor;
-    var offsets = part.offsets[0];
+    var offsets = part.offsets![0]!;
 
     //var scanLineMin = part.top;
     //var scanLineMax = part.bottom;
@@ -266,19 +261,19 @@ class ExrImage extends DecodeInfo {
       var len = uncompressedData.length;
       var numChannels = part.channels.length;
       //int lineCount = 0;
-      for (var yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
-        si = part.offsetInLineBuffer[yy];
+      for (var yi = 0; yi < linesInBuffer! && yy < height; ++yi, ++yy) {
+        si = part.offsetInLineBuffer![yy];
         if (si >= len) {
           break;
         }
 
         for (var ci = 0; ci < numChannels; ++ci) {
           var ch = part.channels[ci];
-          var slice = framebuffer[ch.name].getBytes();
+          var slice = framebuffer[ch.name]!.getBytes();
           if (si >= len) {
             break;
           }
-          for (var xx = 0; xx < part.width; ++xx) {
+          for (var xx = 0; xx < part.width!; ++xx) {
             for (var bi = 0; bi < ch.size; ++bi) {
               slice[fbi[ci]++] = uncompressedData[si++];
             }
@@ -288,8 +283,8 @@ class ExrImage extends DecodeInfo {
     }
   }
 
-  int version;
-  int flags;
+  int? version;
+  late int flags;
 
   /// The MAGIC number is stored in the first four bytes of every
   /// OpenEXR image file. This can be used to quickly test whether

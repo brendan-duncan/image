@@ -12,9 +12,9 @@ import 'gif/gif_info.dart';
 /// A decoder for the GIF image format. This supports both single frame and
 /// animated GIF files, and transparency.
 class GifDecoder extends Decoder {
-  GifInfo info;
+  GifInfo? info;
 
-  GifDecoder([List<int> bytes]) {
+  GifDecoder([List<int>? bytes]) {
     if (bytes != null) {
       startDecode(bytes);
     }
@@ -33,12 +33,12 @@ class GifDecoder extends Decoder {
   /// You should have prepared the decoder by either passing the file bytes
   /// to the constructor, or calling getInfo.
   @override
-  int numFrames() => (info != null) ? info.numFrames : 0;
+  int numFrames() => (info != null) ? info!.numFrames : 0;
 
   /// Validate the file is a Gif image and get information about it.
   /// If the file is not a valid Gif image, null is returned.
   @override
-  GifInfo startDecode(List<int> bytes) {
+  GifInfo? startDecode(List<int> bytes) {
     _input = InputBuffer(bytes);
 
     info = GifInfo();
@@ -47,22 +47,22 @@ class GifDecoder extends Decoder {
     }
 
     try {
-      while (!_input.isEOS) {
-        var recordType = _input.readByte();
+      while (!_input!.isEOS) {
+        var recordType = _input!.readByte();
         switch (recordType) {
           case IMAGE_DESC_RECORD_TYPE:
             var gifImage = _skipImage();
             if (gifImage == null) {
               return info;
             }
-            info.frames.add(gifImage);
+            info!.frames.add(gifImage);
             break;
           case EXTENSION_RECORD_TYPE:
-            var extCode = _input.readByte();
+            var extCode = _input!.readByte();
             if (extCode == APPLICATION_EXT) {
-              _readApplicationExt(_input);
+              _readApplicationExt(_input!);
             } else if (extCode == GRAPHIC_CONTROL_EXT) {
-              _readGraphicsControlExt(_input);
+              _readGraphicsControlExt(_input!);
             } else {
               _skipRemainder();
             }
@@ -119,35 +119,35 @@ class GifDecoder extends Decoder {
 
       if (transparentFlag != 0) {
         if (gifImage.colorMap != null) {
-          gifImage.colorMap.transparent = transparent;
-        } else if (info.globalColorMap != null) {
-          info.globalColorMap.transparent = transparent;
+          gifImage.colorMap!.transparent = transparent;
+        } else if (info!.globalColorMap != null) {
+          info!.globalColorMap!.transparent = transparent;
         }
       }
 
-      info.frames.add(gifImage);
+      info!.frames.add(gifImage);
     }
   }
 
   @override
-  Image decodeFrame(int frame) {
+  Image? decodeFrame(int frame) {
     if (_input == null || info == null) {
       return null;
     }
 
-    if (frame >= info.frames.length || frame < 0) {
+    if (frame >= info!.frames.length || frame < 0) {
       return null;
     }
 
     //_frame = frame;
-    var gifImage = info.frames[frame] as InternalGifImageDesc;
-    _input.offset = gifImage.inputPosition;
+    var gifImage = info!.frames[frame] as InternalGifImageDesc;
+    _input!.offset = gifImage.inputPosition;
 
-    return _decodeImage(info.frames[frame]);
+    return _decodeImage(info!.frames[frame]);
   }
 
   @override
-  Image decodeImage(List<int> bytes, {int frame = 0}) {
+  Image? decodeImage(List<int> bytes, {int frame = 0}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -159,42 +159,34 @@ class GifDecoder extends Decoder {
   /// Decode all of the frames of an animated gif. For single image gifs,
   /// this will return an animation with a single frame.
   @override
-  Animation decodeAnimation(List<int> bytes) {
+  Animation? decodeAnimation(List<int> bytes) {
     if (startDecode(bytes) == null) {
       return null;
     }
 
     var anim = Animation();
-    anim.width = info.width;
-    anim.height = info.height;
+    anim.width = info!.width;
+    anim.height = info!.height;
     anim.loopCount = _repeat;
 
-    var lastImage = Image(info.width, info.height);
-    for (var i = 0; i < info.numFrames; ++i) {
+    var lastImage = Image(info!.width, info!.height);
+    for (var i = 0; i < info!.numFrames; ++i) {
       //_frame = i;
-      if (lastImage == null) {
-        lastImage = Image(info.width, info.height);
-      } else {
-        lastImage = Image.from(lastImage);
-      }
+      lastImage = Image.from(lastImage);
 
-      var frame = info.frames[i];
+      var frame = info!.frames[i];
       var image = decodeFrame(i);
       if (image == null) {
         return null;
       }
 
       var colorMap =
-          (frame.colorMap != null) ? frame.colorMap : info.globalColorMap;
+          (frame.colorMap != null) ? frame.colorMap : info!.globalColorMap;
 
-      if (lastImage != null) {
-        if (frame.clearFrame) {
-          lastImage.fill(colorMap.color(info.backgroundColor));
-        }
-        copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
-      } else {
-        lastImage = image;
+      if (frame.clearFrame) {
+        lastImage.fill(colorMap!.color(info!.backgroundColor));
       }
+      copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
 
       lastImage.duration = frame.duration * 10; // Convert 1/100 sec to ms.
       anim.addFrame(lastImage);
@@ -203,12 +195,12 @@ class GifDecoder extends Decoder {
     return anim;
   }
 
-  InternalGifImageDesc _skipImage() {
-    if (_input.isEOS) {
+  InternalGifImageDesc? _skipImage() {
+    if (_input!.isEOS) {
       return null;
     }
-    var gifImage = InternalGifImageDesc(_input);
-    _input.skip(1);
+    var gifImage = InternalGifImageDesc(_input!);
+    _input!.skip(1);
     _skipRemainder();
     return gifImage;
   }
@@ -223,12 +215,12 @@ class GifDecoder extends Decoder {
     return true;
   }*/
 
-  Image _decodeImage(GifImageDesc gifImage) {
+  Image? _decodeImage(GifImageDesc gifImage) {
     if (_buffer == null) {
       _initDecode();
     }
 
-    _bitsPerPixel = _input.readByte();
+    _bitsPerPixel = _input!.readByte();
     _clearCode = 1 << _bitsPerPixel;
     _eofCode = _clearCode + 1;
     _runningCode = _eofCode + 1;
@@ -238,18 +230,19 @@ class GifDecoder extends Decoder {
     _lastCode = NO_SUCH_CODE;
     _currentShiftState = 0;
     _currentShiftDWord = 0;
-    _buffer[0] = 0;
-    _prefix.fillRange(0, _prefix.length, NO_SUCH_CODE);
+    _buffer![0] = 0;
+    _prefix!.fillRange(0, _prefix!.length, NO_SUCH_CODE);
 
     var width = gifImage.width;
     var height = gifImage.height;
 
-    if (gifImage.x + width > info.width || gifImage.y + height > info.height) {
+    if (gifImage.x + width > info!.width ||
+        gifImage.y + height > info!.height) {
       return null;
     }
 
     var colorMap =
-        (gifImage.colorMap != null) ? gifImage.colorMap : info.globalColorMap;
+        (gifImage.colorMap != null) ? gifImage.colorMap : info!.globalColorMap;
 
     _pixelCount = width * height;
 
@@ -280,7 +273,7 @@ class GifDecoder extends Decoder {
     return image;
   }
 
-  void _updateImage(Image image, int y, GifColorMap colorMap, Uint8List line) {
+  void _updateImage(Image image, int y, GifColorMap? colorMap, Uint8List line) {
     if (colorMap != null) {
       for (var x = 0, width = line.length; x < width; ++x) {
         image.setPixel(x, y, colorMap.color(line[x]));
@@ -289,43 +282,43 @@ class GifDecoder extends Decoder {
   }
 
   bool _getInfo() {
-    var tag = _input.readString(STAMP_SIZE);
+    var tag = _input!.readString(STAMP_SIZE);
     if (tag != GIF87_STAMP && tag != GIF89_STAMP) {
       return false;
     }
 
-    info.width = _input.readUint16();
-    info.height = _input.readUint16();
+    info!.width = _input!.readUint16();
+    info!.height = _input!.readUint16();
 
-    var b = _input.readByte();
-    info.colorResolution = (((b & 0x70) + 1) >> 4) + 1;
+    var b = _input!.readByte();
+    info!.colorResolution = (((b & 0x70) + 1) >> 4) + 1;
 
     var bitsPerPixel = (b & 0x07) + 1;
 
-    info.backgroundColor = _input.readByte();
+    info!.backgroundColor = _input!.readByte();
 
-    _input.skip(1);
+    _input!.skip(1);
 
     // Is there a global color map?
     if (b & 0x80 != 0) {
-      info.globalColorMap = GifColorMap(1 << bitsPerPixel);
+      info!.globalColorMap = GifColorMap(1 << bitsPerPixel);
 
       // Get the global color map:
-      for (var i = 0; i < info.globalColorMap.numColors; ++i) {
-        var r = _input.readByte();
-        var g = _input.readByte();
-        var b = _input.readByte();
-        info.globalColorMap.setColor(i, r, g, b);
+      for (var i = 0; i < info!.globalColorMap!.numColors; ++i) {
+        var r = _input!.readByte();
+        var g = _input!.readByte();
+        var b = _input!.readByte();
+        info!.globalColorMap!.setColor(i, r, g, b);
       }
     }
 
-    info.isGif89 = tag == GIF89_STAMP;
+    info!.isGif89 = tag == GIF89_STAMP;
 
     return true;
   }
 
   bool _getLine(Uint8List line) {
-    _pixelCount -= line.length;
+    _pixelCount = _pixelCount! - line.length;
 
     if (!_decompressLine(line)) {
       return false;
@@ -343,16 +336,16 @@ class GifDecoder extends Decoder {
   // called until NULL block is returned.
   // The block should NOT be freed by the user (not dynamically allocated).
   bool _skipRemainder() {
-    if (_input.isEOS) {
+    if (_input!.isEOS) {
       return true;
     }
-    var b = _input.readByte();
-    while (b != 0 && !_input.isEOS) {
-      _input.skip(b);
-      if (_input.isEOS) {
+    var b = _input!.readByte();
+    while (b != 0 && !_input!.isEOS) {
+      _input!.skip(b);
+      if (_input!.isEOS) {
         return true;
       }
-      b = _input.readByte();
+      b = _input!.readByte();
     }
     return true;
   }
@@ -376,7 +369,7 @@ class GifDecoder extends Decoder {
       }
     }
 
-    int currentPrefix;
+    int? currentPrefix;
 
     // Decode LineLen items.
     while (i < lineLen) {
@@ -395,7 +388,7 @@ class GifDecoder extends Decoder {
       if (_currentCode == _clearCode) {
         // We need to start over again:
         for (var j = 0; j <= LZ_MAX_CODE; j++) {
-          _prefix[j] = NO_SUCH_CODE;
+          _prefix![j] = NO_SUCH_CODE;
         }
 
         _runningCode = _eofCode + 1;
@@ -406,15 +399,15 @@ class GifDecoder extends Decoder {
         // Its regular code - if in pixel range simply add it to output
         // stream, otherwise trace to codes linked list until the prefix
         // is in pixel range:
-        if (_currentCode < _clearCode) {
+        if (_currentCode! < _clearCode) {
           // This is simple - its pixel scalar, so add it to output:
-          line[i++] = _currentCode;
+          line[i++] = _currentCode!;
         } else {
           // Its a code to needed to be traced: trace the linked list
           // until the prefix is a pixel, while pushing the suffix
           // pixels on our stack. If we done, pop the stack in reverse
           // (thats what stack is good for!) order to output. */
-          if (_prefix[_currentCode] == NO_SUCH_CODE) {
+          if (_prefix![_currentCode!] == NO_SUCH_CODE) {
             // Only allowed if CrntCode is exactly the running code:
             // In that case CrntCode = XXXCode, CrntCode or the
             // prefix code is last code and the suffix char is
@@ -437,13 +430,13 @@ class GifDecoder extends Decoder {
           // loop more than that.
           var j = 0;
           while (j++ <= LZ_MAX_CODE &&
-              currentPrefix > _clearCode &&
+              currentPrefix! > _clearCode &&
               currentPrefix <= LZ_MAX_CODE) {
             _stack[_stackPtr++] = _suffix[currentPrefix];
-            currentPrefix = _prefix[currentPrefix];
+            currentPrefix = _prefix![currentPrefix];
           }
 
-          if (j >= LZ_MAX_CODE || currentPrefix > LZ_MAX_CODE) {
+          if (j >= LZ_MAX_CODE || currentPrefix! > LZ_MAX_CODE) {
             return false;
           }
 
@@ -457,8 +450,8 @@ class GifDecoder extends Decoder {
         }
 
         if (_lastCode != NO_SUCH_CODE &&
-            _prefix[_runningCode - 2] == NO_SUCH_CODE) {
-          _prefix[_runningCode - 2] = _lastCode;
+            _prefix![_runningCode - 2] == NO_SUCH_CODE) {
+          _prefix![_runningCode - 2] = _lastCode;
 
           if (_currentCode == _runningCode - 2) {
             // Only allowed if CrntCode is exactly the running code:
@@ -469,11 +462,11 @@ class GifDecoder extends Decoder {
                 _getPrefixChar(_prefix, _lastCode, _clearCode);
           } else {
             _suffix[_runningCode - 2] =
-                _getPrefixChar(_prefix, _currentCode, _clearCode);
+                _getPrefixChar(_prefix, _currentCode!, _clearCode);
           }
         }
 
-        _lastCode = _currentCode;
+        _lastCode = _currentCode!;
       }
     }
 
@@ -483,7 +476,7 @@ class GifDecoder extends Decoder {
   // The LZ decompression input routine:
   // This routine is responsible for the decompression of the bit stream from
   // 8 bits (bytes) packets, into the real codes.
-  int _decompressInput() {
+  int? _decompressInput() {
     int code;
 
     // The image can't contain more than LZ_BITS per code.
@@ -493,7 +486,7 @@ class GifDecoder extends Decoder {
 
     while (_currentShiftState < _runningBits) {
       // Needs to get more bytes from input stream for next code:
-      var nextByte = _bufferedInput();
+      var nextByte = _bufferedInput()!;
 
       _currentShiftDWord |= nextByte << _currentShiftState;
       _currentShiftState += 8;
@@ -522,13 +515,13 @@ class GifDecoder extends Decoder {
   // not code, but a pixel value (less than ClearCode). Returns that pixel value.
   // If image is defective, we might loop here forever, so we limit the loops to
   // the maximum possible if image O.k. - LZ_MAX_CODE times.
-  int _getPrefixChar(Uint32List prefix, int code, int clearCode) {
+  int _getPrefixChar(Uint32List? prefix, int code, int clearCode) {
     var i = 0;
     while (code > clearCode && i++ <= LZ_MAX_CODE) {
       if (code > LZ_MAX_CODE) {
         return NO_SUCH_CODE;
       }
-      code = prefix[code];
+      code = prefix![code];
     }
     return code;
   }
@@ -537,28 +530,28 @@ class GifDecoder extends Decoder {
   // so that the decompression routine could access it.
   // The routine returns the next byte from its internal buffer (or read next
   // block in if buffer empty) and returns null on failure.
-  int _bufferedInput() {
+  int? _bufferedInput() {
     int nextByte;
-    if (_buffer[0] == 0) {
+    if (_buffer![0] == 0) {
       // Needs to read the next buffer - this one is empty:
-      _buffer[0] = _input.readByte();
+      _buffer![0] = _input!.readByte();
 
       // There shouldn't be any empty data blocks here as the LZW spec
       // says the LZW termination code should come first. Therefore we
       // shouldn't be inside this routine at that point.
-      if (_buffer[0] == 0) {
+      if (_buffer![0] == 0) {
         return null;
       }
 
-      _buffer.setRange(
-          1, 1 + _buffer[0], _input.readBytes(_buffer[0]).toUint8List());
+      _buffer!.setRange(
+          1, 1 + _buffer![0], _input!.readBytes(_buffer![0]).toUint8List());
 
-      nextByte = _buffer[1];
-      _buffer[1] = 2; // We use now the second place as last char read!
-      _buffer[0]--;
+      nextByte = _buffer![1];
+      _buffer![1] = 2; // We use now the second place as last char read!
+      _buffer![0]--;
     } else {
-      nextByte = _buffer[_buffer[1]++];
-      _buffer[0]--;
+      nextByte = _buffer![_buffer![1]++];
+      _buffer![0]--;
     }
 
     return nextByte;
@@ -571,26 +564,26 @@ class GifDecoder extends Decoder {
     _prefix = Uint32List(LZ_MAX_CODE + 1);
   }
 
-  InputBuffer _input;
+  InputBuffer? _input;
   //int _frame;
   //int _numFrames;
   int _repeat = 0;
-  Uint8List _buffer;
-  Uint8List _stack;
-  Uint8List _suffix;
-  Uint32List _prefix;
-  int _bitsPerPixel;
-  int _pixelCount;
-  int _currentShiftDWord;
-  int _currentShiftState;
-  int _stackPtr;
-  int _currentCode;
-  int _lastCode;
-  int _maxCode1;
-  int _runningBits;
-  int _runningCode;
-  int _eofCode;
-  int _clearCode;
+  Uint8List? _buffer;
+  late Uint8List _stack;
+  late Uint8List _suffix;
+  Uint32List? _prefix;
+  int _bitsPerPixel = 0;
+  int? _pixelCount;
+  int _currentShiftDWord = 0;
+  int _currentShiftState = 0;
+  int _stackPtr = 0;
+  int? _currentCode;
+  int _lastCode = 0;
+  int _maxCode1 = 0;
+  int _runningBits = 0;
+  int _runningCode = 0;
+  int _eofCode = 0;
+  int _clearCode = 0;
 
   static const STAMP_SIZE = 6;
   static const String GIF87_STAMP = 'GIF87a';

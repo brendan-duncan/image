@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 import '../../image_exception.dart';
@@ -23,8 +24,8 @@ abstract class ExrCompressor {
   int decodedWidth = 0;
   int decodedHeight = 0;
 
-  factory ExrCompressor(int type, ExrPart hdr, int maxScanLineSize,
-      [int numScanLines]) {
+  factory ExrCompressor(int type, ExrPart hdr, int? maxScanLineSize,
+      [int? numScanLines]) {
     switch (type) {
       case RLE_COMPRESSION:
         return ExrRleCompressor(hdr, maxScanLineSize);
@@ -71,12 +72,12 @@ abstract class ExrCompressor {
 
   int numScanLines();
 
-  Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
+  Uint8List compress(InputBuffer inPtr, int x, int y, [int? width, int? height]) {
     throw ImageException('Unsupported compression type');
   }
 
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
-      [int width, int height]) {
+      [int? width, int? height]) {
     throw ImageException('Unsupported compression type');
   }
 

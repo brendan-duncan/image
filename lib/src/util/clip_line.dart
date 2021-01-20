@@ -4,6 +4,7 @@
 /// Results are stored in [line].
 /// If [line] falls completely outside of [rect], false is returned, otherwise
 /// true is returned.
+
 bool clipLine(List<int> line, List<int> rect) {
   var x0 = line[0];
   var y0 = line[1];
@@ -64,7 +65,7 @@ bool clipLine(List<int> line, List<int> rect) {
       // At least one endpoint is outside the clip rectangle; pick it.
       var outcodeOut = outcode0 != 0 ? outcode0 : outcode1;
 
-      int x, y;
+      int? x, y;
       // Now find the intersection point;
       // use formulas y = y0 + slope * (x - x0), x = x0 + (1 / slope) * (y - y0)
       if ((outcodeOut & TOP) != 0) {
@@ -88,12 +89,12 @@ bool clipLine(List<int> line, List<int> rect) {
       // Now we move outside point to intersection point to clip
       // and get ready for next pass.
       if (outcodeOut == outcode0) {
-        x0 = x;
-        y0 = y;
+        x0 = x!;
+        y0 = y!;
         outcode0 = _computeOutCode(x0, y0);
       } else {
-        x1 = x;
-        y1 = y;
+        x1 = x!;
+        y1 = y!;
         outcode1 = _computeOutCode(x1, y1);
       }
     }

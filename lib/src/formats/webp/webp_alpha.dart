@@ -87,8 +87,7 @@ class WebPAlpha {
 
   bool _dequantizeLevels(
       Uint8List data, int width, int height, int row, int num_rows) {
-    if (data == null ||
-        width <= 0 ||
+    if (width <= 0 ||
         height <= 0 ||
         row < 0 ||
         num_rows < 0 ||
@@ -134,7 +133,7 @@ class WebPAlpha {
     return true;
   }
 
-  InternalVP8L _vp8l;
+  late InternalVP8L _vp8l;
 
   // Although alpha channel
   // requires only 1 byte per

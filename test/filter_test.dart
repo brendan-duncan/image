@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import 'paths.dart';
+
 void main() {
   group('filter', () {
     var image = readJpg(File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
@@ -11,7 +13,7 @@ void main() {
     test('fill', () {
       final f = Image(10, 10, channels: Channels.rgb);
       f.fill(getColor(128, 64, 32, 255));
-      final fp = File('.dart_tool/out/fill.jpg');
+      final fp = File('$tmpPath/out/fill.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -20,7 +22,7 @@ void main() {
       final f = Image.from(image);
       fillRect(f, 50, 50, 150, 150, getColor(128, 255, 128, 255));
       fillRect(f, 250, -10, 100, 750, getColor(255, 128, 128, 128));
-      final fp = File('.dart_tool/out/fillRect.jpg');
+      final fp = File('$tmpPath/out/fillRect.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -29,15 +31,15 @@ void main() {
       final s = readJpg(File('test/res/oblique.jpg').readAsBytesSync());
       final c = s.getPixel(50, 50);
       fillFlood(s, 50, 50, c, threshold: 15.6);
-      final fp = File('.dart_tool/out/fillFlood.jpg');
+      final fp = File('$tmpPath/out/fillFlood.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(s));
     });
 
     test('copyCrop', () {
-      final s = readPng(File('test/res/png/lenna.png').readAsBytesSync());
+      final s = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
       final d = copyCrop(s, 200, 200, 5000, 5000);
-      final fp = File('.dart_tool/out/copyCrop.jpg');
+      final fp = File('$tmpPath/out/copyCrop.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(d));
     });
@@ -51,7 +53,7 @@ void main() {
           bottomLeft: Point(16, 151),
           bottomRight: Point(108, 141),
           toImage: d);
-      final fp = File('.dart_tool/out/oblique.jpg');
+      final fp = File('$tmpPath/out/oblique.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(d));
     });
@@ -62,49 +64,49 @@ void main() {
           Image(image.width + 20, image.height + 20, channels: image.channels);
       fill(d, 0xff0000ff);
       copyInto(d, s, dstX: 10, dstY: 10);
-      copyInto(d, image2, dstX: 10, dstY: 10);
+      copyInto(d, image2!, dstX: 10, dstY: 10);
 
-      File('.dart_tool/out/copyInto.jpg')
+      File('$tmpPath/out/copyInto.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(d));
     });
 
     test('add', () {
       var i1 = Image.from(image);
-      final i2 = Image.from(image2);
+      final i2 = Image.from(image2!);
       i1 += i2;
 
-      final fp = File('.dart_tool/out/add.jpg');
+      final fp = File('$tmpPath/out/add.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(i1));
     });
 
     test('sub', () {
       var i1 = Image.from(image);
-      final i2 = Image.from(image2);
+      final i2 = Image.from(image2!);
       i1 -= i2;
 
-      final fp = File('.dart_tool/out/sub.jpg');
+      final fp = File('$tmpPath/out/sub.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(i1));
     });
 
     test('or', () {
       var i1 = Image.from(image);
-      final i2 = Image.from(image2);
+      final i2 = Image.from(image2!);
       i1 |= i2;
 
-      final fp = File('.dart_tool/out/or.jpg');
+      final fp = File('$tmpPath/out/or.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(i1));
     });
 
     test('and', () {
       var i1 = Image.from(image);
-      final i2 = Image.from(image2);
+      final i2 = Image.from(image2!);
       i1 &= i2;
 
-      final fp = File('.dart_tool/out/and.jpg');
+      final fp = File('$tmpPath/out/and.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(i1));
     });
@@ -118,7 +120,7 @@ void main() {
       drawCircle(f, 100, 100, 50, c1);
       drawRect(f, 50, 50, 150, 150, c2);
 
-      final fp = File('.dart_tool/out/drawShapes.jpg');
+      final fp = File('$tmpPath/out/drawShapes.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -129,7 +131,7 @@ void main() {
       final src = Image(100, 100);
       fill(src, getColor(255, 0, 0));
       drawImage(dst, src, blend: false, dstX: 100, dstY: 100);
-      File('.dart_tool/out/drawImage.jpg')
+      File('$tmpPath/out/drawImage.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(dst));
     });
@@ -137,7 +139,7 @@ void main() {
     test('brightness', () {
       final f = Image.from(image);
       brightness(f, 100);
-      final fp = File('.dart_tool/out/brightness.jpg');
+      final fp = File('$tmpPath/out/brightness.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -145,7 +147,7 @@ void main() {
     test('copyResize', () {
       final f = copyResize(image, height: 100);
       expect(f.height, equals(100));
-      final fp = File('.dart_tool/out/copyResize.jpg');
+      final fp = File('$tmpPath/out/copyResize.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -154,25 +156,25 @@ void main() {
       var f = Image.from(image);
       colorOffset(f, red: 100);
 
-      File('.dart_tool/out/colorOffset.jpg')
+      File('$tmpPath/out/colorOffset.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(f));
 
       f = Image(48, 48);
       colorOffset(f, red: 255);
-      File('.dart_tool/out/colorOffset_red.jpg')
+      File('$tmpPath/out/colorOffset_red.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(f));
 
       f = Image(48, 48);
       colorOffset(f, green: 255);
-      File('.dart_tool/out/colorOffset_green.jpg')
+      File('$tmpPath/out/colorOffset_green.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(f));
 
       f = Image(48, 48);
       colorOffset(f, blue: 255);
-      File('.dart_tool/out/colorOffset_blue.jpg')
+      File('$tmpPath/out/colorOffset_blue.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writeJpg(f));
     });
@@ -181,7 +183,7 @@ void main() {
       final f = Image.from(image);
       contrast(f, 150);
 
-      final fp = File('.dart_tool/out/contrast.jpg');
+      final fp = File('$tmpPath/out/contrast.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -190,7 +192,7 @@ void main() {
       final f = Image.from(image);
       adjustColor(f, saturation: 0.35);
 
-      final fp = File('.dart_tool/out/adjustColor_saturation.jpg');
+      final fp = File('$tmpPath/out/adjustColor_saturation.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -199,7 +201,7 @@ void main() {
       final f = Image.from(image);
       adjustColor(f, gamma: 1.0 / 2.2);
 
-      final fp = File('.dart_tool/out/adjustColor_gamma.jpg');
+      final fp = File('$tmpPath/out/adjustColor_gamma.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -208,7 +210,7 @@ void main() {
       final f = Image.from(image);
       adjustColor(f, hue: 75.0, gamma: 0.75, amount: 0.35);
 
-      final fp = File('.dart_tool/out/adjustColor_hue.jpg');
+      final fp = File('$tmpPath/out/adjustColor_hue.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -217,16 +219,16 @@ void main() {
       final f = Image.from(image);
       emboss(f);
 
-      final fp = File('.dart_tool/out/emboss.jpg');
+      final fp = File('$tmpPath/out/emboss.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('sobel', () {
-      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync());
+      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
       sobel(f);
 
-      final fp = File('.dart_tool/out/sobel.jpg');
+      final fp = File('$tmpPath/out/sobel.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -235,7 +237,7 @@ void main() {
       final f = Image.from(image);
       gaussianBlur(f, 10);
 
-      final fp = File('.dart_tool/out/gaussianBlur.jpg');
+      final fp = File('$tmpPath/out/gaussianBlur.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -244,7 +246,7 @@ void main() {
       final f = Image.from(image);
       grayscale(f);
 
-      final fp = File('.dart_tool/out/grayscale.jpg');
+      final fp = File('$tmpPath/out/grayscale.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -253,7 +255,7 @@ void main() {
       final f = Image.from(image);
       invert(f);
 
-      final fp = File('.dart_tool/out/invert.jpg');
+      final fp = File('$tmpPath/out/invert.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -262,7 +264,7 @@ void main() {
       final f = Image.from(image);
       noise(f, 10.0, type: NoiseType.gaussian);
 
-      final fp = File('.dart_tool/out/noise_gaussian.jpg');
+      final fp = File('$tmpPath/out/noise_gaussian.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -271,7 +273,7 @@ void main() {
       final f = Image.from(image);
       noise(f, 10.0, type: NoiseType.uniform);
 
-      final fp = File('.dart_tool/out/noise_uniform.jpg');
+      final fp = File('$tmpPath/out/noise_uniform.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -280,7 +282,7 @@ void main() {
       final f = Image.from(image);
       noise(f, 10.0, type: NoiseType.salt_pepper);
 
-      final fp = File('.dart_tool/out/noise_salt_pepper.jpg');
+      final fp = File('$tmpPath/out/noise_salt_pepper.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -289,7 +291,7 @@ void main() {
       final f = Image.from(image);
       noise(f, 10.0, type: NoiseType.poisson);
 
-      final fp = File('.dart_tool/out/noise_poisson.jpg');
+      final fp = File('$tmpPath/out/noise_poisson.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -298,7 +300,7 @@ void main() {
       final f = Image.from(image);
       noise(f, 10.0, type: NoiseType.rice);
 
-      final fp = File('.dart_tool/out/noise_rice.jpg');
+      final fp = File('$tmpPath/out/noise_rice.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -307,7 +309,7 @@ void main() {
       final f = Image.from(image);
       normalize(f, 100, 255);
 
-      final fp = File('.dart_tool/out/normalize.jpg');
+      final fp = File('$tmpPath/out/normalize.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -316,14 +318,14 @@ void main() {
       var f = Image.from(image);
       pixelate(f, 20, mode: PixelateMode.upperLeft);
 
-      var fp = File('.dart_tool/out/PIXELATE_UPPERLEFT.jpg');
+      var fp = File('$tmpPath/out/PIXELATE_UPPERLEFT.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
 
       f = Image.from(image);
       pixelate(f, 20, mode: PixelateMode.average);
 
-      fp = File('.dart_tool/out/PIXELATE_AVERAGE.jpg');
+      fp = File('$tmpPath/out/PIXELATE_AVERAGE.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -334,7 +336,7 @@ void main() {
       remapColors(f,
           red: Channel.green, green: Channel.red, alpha: Channel.luminance);
 
-      final fp = File('.dart_tool/out/remapColors.jpg');
+      final fp = File('$tmpPath/out/remapColors.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -343,7 +345,7 @@ void main() {
       final f = Image.from(image);
       final r = copyRotate(f, 90);
 
-      final fp = File('.dart_tool/out/rotate_90.jpg');
+      final fp = File('$tmpPath/out/rotate_90.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(r));
     });
@@ -352,7 +354,7 @@ void main() {
       final f = Image.from(image);
       final r = copyRotate(f, 180);
 
-      final fp = File('.dart_tool/out/rotate_180.jpg');
+      final fp = File('$tmpPath/out/rotate_180.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(r));
     });
@@ -361,7 +363,7 @@ void main() {
       final f = Image.from(image);
       final r = copyRotate(f, 270);
 
-      final fp = File('.dart_tool/out/rotate_270.jpg');
+      final fp = File('$tmpPath/out/rotate_270.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(r));
     });
@@ -370,7 +372,7 @@ void main() {
       var f = Image.from(image);
       f = copyRotate(f, 45);
 
-      final fp = File('.dart_tool/out/rotate_45.jpg');
+      final fp = File('$tmpPath/out/rotate_45.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -379,7 +381,7 @@ void main() {
       final f = Image.from(image);
       smooth(f, 10);
 
-      final fp = File('.dart_tool/out/smooth.jpg');
+      final fp = File('$tmpPath/out/smooth.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -388,7 +390,7 @@ void main() {
       final f = Image.from(image);
       sepia(f);
 
-      final fp = File('.dart_tool/out/sepia.jpg');
+      final fp = File('$tmpPath/out/sepia.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
@@ -397,13 +399,13 @@ void main() {
       final f = Image.from(image);
       vignette(f);
 
-      final fp = File('.dart_tool/out/vignette.jpg');
+      final fp = File('$tmpPath/out/vignette.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('octree quantize', () {
-      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync());
+      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.octree);
       // ignore: prefer_collection_literals
@@ -413,13 +415,13 @@ void main() {
           colors.add(f.getPixel(x, y));
         }
       }
-      final fp = File('.dart_tool/out/quantize_octree.jpg');
+      final fp = File('$tmpPath/out/quantize_octree.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('neural quantize', () {
-      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync());
+      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.neuralNet);
       // ignore: prefer_collection_literals
@@ -429,29 +431,29 @@ void main() {
           colors.add(f.getPixel(x, y));
         }
       }
-      var fp = File('.dart_tool/out/quantize_neural.jpg');
+      var fp = File('$tmpPath/out/quantize_neural.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('trim', () {
-      var image = readPng(File('test/res/png/trim.png').readAsBytesSync());
+      var image = readPng(File('test/res/png/trim.png').readAsBytesSync())!;
       var trimmed = trim(image, mode: TrimMode.transparent);
-      File('.dart_tool/out/trim.png')
+      File('$tmpPath/out/trim.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(trimmed));
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));
 
       trimmed = trim(image, mode: TrimMode.topLeftColor);
-      File('.dart_tool/out/trim_topLeftColor.png')
+      File('$tmpPath/out/trim_topLeftColor.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(trimmed));
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));
 
       trimmed = trim(image, mode: TrimMode.bottomRightColor);
-      File('.dart_tool/out/trim_bottomRightColor.png')
+      File('$tmpPath/out/trim_bottomRightColor.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(trimmed));
       expect(trimmed.width, equals(64));
@@ -459,31 +461,31 @@ void main() {
     });
 
     test('dropShadow', () {
-      var s = Image.from(image2);
+      var s = Image.from(image2!);
       var d = dropShadow(s, 5, 5, 10);
 
-      File('.dart_tool/out/dropShadow.png')
+      File('$tmpPath/out/dropShadow.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
       s = Image.from(image2);
       d = dropShadow(s, -5, 5, 10);
 
-      File('.dart_tool/out/dropShadow-2.png')
+      File('$tmpPath/out/dropShadow-2.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
       s = Image.from(image2);
       d = dropShadow(s, 5, -5, 10);
 
-      File('.dart_tool/out/dropShadow-3.png')
+      File('$tmpPath/out/dropShadow-3.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
       s = Image.from(image2);
       d = dropShadow(s, -5, -5, 10);
 
-      File('.dart_tool/out/dropShadow-4.png')
+      File('$tmpPath/out/dropShadow-4.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
 
@@ -492,7 +494,7 @@ void main() {
       drawString(s, arial_48, 30, 100, 'Shadow', color: getColor(255, 0, 0));
       d = dropShadow(s, -3, -3, 5);
 
-      File('.dart_tool/out/dropShadow-5.png')
+      File('$tmpPath/out/dropShadow-5.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(d));
     });
@@ -501,7 +503,7 @@ void main() {
       final f = Image.from(image);
       final r = flip(f, Flip.horizontal);
 
-      final fp = File('.dart_tool/out/flipH.jpg');
+      final fp = File('$tmpPath/out/flipH.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(r));
     });
@@ -509,7 +511,7 @@ void main() {
       final f = Image.from(image);
       final r = flip(f, Flip.vertical);
 
-      final fp = File('.dart_tool/out/flipV.jpg');
+      final fp = File('$tmpPath/out/flipV.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(r));
     });
@@ -518,7 +520,7 @@ void main() {
       final f = Image.from(image);
       final r = flip(f, Flip.both);
 
-      final fp = File('.dart_tool/out/flipHV.jpg');
+      final fp = File('$tmpPath/out/flipHV.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(r));
     });

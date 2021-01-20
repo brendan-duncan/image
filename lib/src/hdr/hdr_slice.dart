@@ -5,7 +5,7 @@ import 'hdr_image.dart';
 
 /// A slice is the data for an image framebuffer for a single channel.
 class HdrSlice {
-  final String name;
+  final String? name;
   final int width;
   final int height;
 

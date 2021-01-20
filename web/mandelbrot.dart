@@ -1,3 +1,4 @@
+
 import 'dart:html';
 import 'dart:math';
 import 'package:image/image.dart';
@@ -13,7 +14,7 @@ void main() {
 
   // Create a canvas to put our decoded image into.
   var c = CanvasElement(width: width, height: height);
-  document.body.append(c);
+  document.body!.append(c);
 
   var zoom = 1.0;
   var moveX = -0.5;

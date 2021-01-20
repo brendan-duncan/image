@@ -7,15 +7,15 @@ import 'jpeg_frame.dart';
 class JpegScan {
   InputBuffer input;
   JpegFrame frame;
-  int precision;
-  int samplesPerLine;
-  int scanLines;
-  int mcusPerLine;
-  bool progressive;
-  int maxH;
-  int maxV;
+  int? precision;
+  int? samplesPerLine;
+  int? scanLines;
+  late int mcusPerLine;
+  bool? progressive;
+  int? maxH;
+  int? maxV;
   List components;
-  int resetInterval;
+  int? resetInterval;
   int spectralStart;
   int spectralEnd;
   int successivePrev;
@@ -25,7 +25,7 @@ class JpegScan {
   int bitsCount = 0;
   int eobrun = 0;
   int successiveACState = 0;
-  int successiveACNextValue;
+  late int successiveACNextValue;
 
   JpegScan(
       this.input,
@@ -47,10 +47,10 @@ class JpegScan {
 
   void decode() {
     var componentsLength = components.length;
-    JpegComponent component;
-    dynamic decodeFn;
+    JpegComponent? component;
+    void Function(JpegComponent, List) decodeFn;
 
-    if (progressive) {
+    if (progressive!) {
       if (spectralStart == 0) {
         decodeFn = successivePrev == 0 ? _decodeDCFirst : _decodeDCSuccessive;
       } else {
@@ -62,20 +62,20 @@ class JpegScan {
 
     var mcu = 0;
 
-    int mcuExpected;
+    int? mcuExpected;
     if (componentsLength == 1) {
       mcuExpected =
-          (components[0].blocksPerLine * components[0].blocksPerColumn) as int;
+          (components[0].blocksPerLine * components[0].blocksPerColumn) as int?;
     } else {
       mcuExpected = (mcusPerLine * frame.mcusPerColumn);
     }
 
     if (resetInterval == null || resetInterval == 0) {
-      resetInterval = mcuExpected;
+      resetInterval = mcuExpected!;
     }
 
     int h, v;
-    while (mcu < mcuExpected) {
+    while (mcu < mcuExpected!) {
       // reset interval stuff
       for (var i = 0; i < componentsLength; i++) {
         components[i].pred = 0;
@@ -83,16 +83,16 @@ class JpegScan {
       eobrun = 0;
 
       if (componentsLength == 1) {
-        component = components[0] as JpegComponent;
-        for (var n = 0; n < resetInterval; n++) {
-          _decodeBlock(component, decodeFn, mcu);
+        component = components[0] as JpegComponent?;
+        for (var n = 0; n < resetInterval!; n++) {
+          _decodeBlock(component!, decodeFn, mcu);
           mcu++;
         }
       } else {
-        for (var n = 0; n < resetInterval; n++) {
+        for (var n = 0; n < resetInterval!; n++) {
           for (var i = 0; i < componentsLength; i++) {
-            component = components[i] as JpegComponent;
-            h = component.hSamples;
+            component = components[i] as JpegComponent?;
+            h = component!.hSamples;
             v = component.vSamples;
             for (var j = 0; j < v; j++) {
               for (var k = 0; k < h; k++) {
@@ -118,7 +118,7 @@ class JpegScan {
     }
   }
 
-  int _readBit() {
+  int? _readBit() {
     if (bitsCount > 0) {
       bitsCount--;
       return (bitsData >> bitsCount) & 1;
@@ -141,9 +141,9 @@ class JpegScan {
     return (bitsData >> 7) & 1;
   }
 
-  int _decodeHuffman(dynamic tree) {
+  int? _decodeHuffman(dynamic tree) {
     dynamic node = tree;
-    int bit;
+    int? bit;
     while ((bit = _readBit()) != null) {
       node = node[bit];
       if (node is num) {
@@ -154,7 +154,7 @@ class JpegScan {
     return null;
   }
 
-  int _receive(int length) {
+  int? _receive(int length) {
     var n = 0;
     while (length > 0) {
       var bit = _readBit();
@@ -167,11 +167,11 @@ class JpegScan {
     return n;
   }
 
-  int _receiveAndExtend(int length) {
+  int _receiveAndExtend(int? length) {
     if (length == 1) {
       return _readBit() == 1 ? 1 : -1;
     }
-    var n = _receive(length);
+    var n = _receive(length!)!;
     if (n >= (1 << (length - 1))) {
       return n;
     }
@@ -186,7 +186,7 @@ class JpegScan {
 
     var k = 1;
     while (k < 64) {
-      var rs = _decodeHuffman(component.huffmanTableAC);
+      var rs = _decodeHuffman(component.huffmanTableAC)!;
       var s = rs & 15;
       var r = rs >> 4;
       if (s == 0) {
@@ -215,7 +215,7 @@ class JpegScan {
   }
 
   void _decodeDCSuccessive(JpegComponent component, List zz) {
-    zz[0] = (zz[0] | (_readBit() << successive));
+    zz[0] = (zz[0] | (_readBit()! << successive));
   }
 
   void _decodeACFirst(JpegComponent component, List zz) {
@@ -226,12 +226,12 @@ class JpegScan {
     var k = spectralStart;
     var e = spectralEnd;
     while (k <= e) {
-      var rs = _decodeHuffman(component.huffmanTableAC);
+      var rs = _decodeHuffman(component.huffmanTableAC)!;
       var s = rs & 15;
       var r = rs >> 4;
       if (s == 0) {
         if (r < 15) {
-          eobrun = (_receive(r) + (1 << r) - 1);
+          eobrun = (_receive(r)! + (1 << r) - 1);
           break;
         }
         k += 16;
@@ -244,7 +244,7 @@ class JpegScan {
     }
   }
 
-  void _decodeACSuccessive(JpegComponent component, dynamic zz) {
+  void _decodeACSuccessive(JpegComponent component, List zz) {
     var k = spectralStart;
     var e = spectralEnd;
     var s = 0;
@@ -259,7 +259,7 @@ class JpegScan {
           r = rs >> 4;
           if (s == 0) {
             if (r < 15) {
-              eobrun = (_receive(r) + (1 << r));
+              eobrun = (_receive(r)! + (1 << r));
               successiveACState = 4;
             } else {
               r = 16;
@@ -276,7 +276,7 @@ class JpegScan {
         case 1: // skipping r zero items
         case 2:
           if (zz[z] != 0) {
-            zz[z] += (_readBit() << successive);
+            zz[z] += (_readBit()! << successive);
           } else {
             r--;
             if (r == 0) {
@@ -286,7 +286,7 @@ class JpegScan {
           break;
         case 3: // set value for a zero item
           if (zz[z] != 0) {
-            zz[z] += (_readBit() << successive);
+            zz[z] += (_readBit()! << successive);
           } else {
             zz[z] = (successiveACNextValue << successive);
             successiveACState = 0;
@@ -294,7 +294,7 @@ class JpegScan {
           break;
         case 4: // eob
           if (zz[z] != 0) {
-            zz[z] += (_readBit() << successive);
+            zz[z] += (_readBit()! << successive);
           }
           break;
       }

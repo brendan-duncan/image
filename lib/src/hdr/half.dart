@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 import '../internal/bit_operators.dart';
@@ -9,7 +10,7 @@ import '../internal/bit_operators.dart';
 ///
 /// This class is derived from the OpenEXR library.
 class Half {
-  Half([num f]) {
+  Half([num? f]) {
     if (f != null) {
       _h = DoubleToHalf(f);
     }
@@ -25,7 +26,7 @@ class Half {
     if (_toFloatFloat32 == null) {
       _initialize();
     }
-    return _toFloatFloat32[bits];
+    return _toFloatFloat32![bits];
   }
 
   static int DoubleToHalf(num n) {
@@ -69,10 +70,10 @@ class Half {
     return _convert(x_i);
   }
 
-  double toDouble() => _toFloatFloat32[_h];
+  double toDouble() => _toFloatFloat32![_h!];
 
   /// Unary minus
-  Half operator -() => Half.fromBits(_h ^ 0x8000);
+  Half operator -() => Half.fromBits(_h! ^ 0x8000);
 
   /// Addition operator for Half or num left operands.
   Half operator +(dynamic f) {
@@ -122,8 +123,8 @@ class Half {
 
     // Disassemble h into the sign, s,
     // and the combined exponent and significand, e.
-    var s = _h & 0x8000;
-    var e = _h & 0x7fff;
+    var s = _h! & 0x8000;
+    var e = _h! & 0x7fff;
 
     // Round the exponent and significand to the nearest value
     // where ones occur only in the (10-n) most significant bits.
@@ -137,7 +138,7 @@ class Half {
     // Check for exponent overflow.
     if (e >= 0x7c00) {
       // Overflow occurred -- truncate instead of rounding.
-      e = _h;
+      e = _h!;
       e >>= 10 - n;
       e <<= 10 - n;
     }
@@ -149,45 +150,45 @@ class Half {
 
   /// Returns true if h is a normalized number, a denormalized number or zero.
   bool isFinite() {
-    var e = (_h >> 10) & 0x001f;
+    var e = (_h! >> 10) & 0x001f;
     return e < 31;
   }
 
   /// Returns true if h is a normalized number.
   bool isNormalized() {
-    var e = (_h >> 10) & 0x001f;
+    var e = (_h! >> 10) & 0x001f;
     return e > 0 && e < 31;
   }
 
   /// Returns true if h is a denormalized number.
   bool isDenormalized() {
-    var e = (_h >> 10) & 0x001f;
-    var m = _h & 0x3ff;
+    var e = (_h! >> 10) & 0x001f;
+    var m = _h! & 0x3ff;
     return e == 0 && m != 0;
   }
 
   /// Returns true if h is zero.
   bool isZero() {
-    return (_h & 0x7fff) == 0;
+    return (_h! & 0x7fff) == 0;
   }
 
   /// Returns true if h is a NAN.
   bool isNan() {
-    var e = (_h >> 10) & 0x001f;
-    var m = _h & 0x3ff;
+    var e = (_h! >> 10) & 0x001f;
+    var m = _h! & 0x3ff;
     return e == 31 && m != 0;
   }
 
   /// Returns true if h is a positive or a negative infinity.
   bool isInfinity() {
-    var e = (_h >> 10) & 0x001f;
-    var m = _h & 0x3ff;
+    var e = (_h! >> 10) & 0x001f;
+    var m = _h! & 0x3ff;
     return e == 31 && m == 0;
   }
 
   /// Returns true if the sign bit of h is set (negative).
   bool isNegative() {
-    return (_h & 0x8000) != 0;
+    return (_h! & 0x8000) != 0;
   }
 
   /// Returns +infinity.
@@ -202,7 +203,7 @@ class Half {
   /// Returns a NAN with the bit pattern 0111110111111111.
   static Half sNan() => Half.fromBits(0x7dff);
 
-  int bits() => _h;
+  int? bits() => _h;
 
   void setBits(int bits) {
     _h = bits;
@@ -301,7 +302,7 @@ class Half {
       return;
     }
     _toFloatUint32 = Uint32List(1 << 16);
-    _toFloatFloat32 = Float32List.view(_toFloatUint32.buffer);
+    _toFloatFloat32 = Float32List.view(_toFloatUint32!.buffer);
     _eLut = Uint16List(1 << 9);
 
     // Init eLut
@@ -322,7 +323,7 @@ class Half {
     // Init toFloat
     const iMax = (1 << 16);
     for (var i = 0; i < iMax; i++) {
-      _toFloatUint32[i] = _halfToFloat(i);
+      _toFloatUint32![i] = _halfToFloat(i);
     }
   }
 
@@ -363,9 +364,9 @@ class Half {
     return (s << 31) | (e << 23) | m;
   }
 
-  int _h;
+  int? _h;
 
-  static Uint32List _toFloatUint32;
-  static Float32List _toFloatFloat32;
-  static Uint16List _eLut;
+  static Uint32List? _toFloatUint32;
+  static Float32List? _toFloatFloat32;
+  static late Uint16List _eLut;
 }

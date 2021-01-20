@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 import '../../internal/bit_operators.dart';
@@ -47,43 +48,43 @@ class VP8Filter {
 
   // on macroblock edges
   void vFilter16(
-      InputBuffer p, int stride, int thresh, int ithresh, int hev_thresh) {
+      InputBuffer p, int stride, int thresh, int? ithresh, int hev_thresh) {
     _filterLoop26(p, stride, 1, 16, thresh, ithresh, hev_thresh);
   }
 
   void hFilter16(
-      InputBuffer p, int stride, int thresh, int ithresh, int hev_thresh) {
+      InputBuffer p, int stride, int thresh, int? ithresh, int hev_thresh) {
     _filterLoop26(p, 1, stride, 16, thresh, ithresh, hev_thresh);
   }
 
   // on three inner edges
   void vFilter16i(
-      InputBuffer p, int stride, int thresh, int ithresh, int hev_thresh) {
+      InputBuffer p, int stride, int thresh, int? ithresh, int hev_thresh) {
     var p2 = InputBuffer.from(p);
     for (var k = 3; k > 0; --k) {
       p2.offset += 4 * stride;
-      _filterLoop24(p2, stride, 1, 16, thresh, ithresh, hev_thresh);
+      _filterLoop24(p2, stride, 1, 16, thresh, ithresh!, hev_thresh);
     }
   }
 
   void hFilter16i(
-      InputBuffer p, int stride, int thresh, int ithresh, int hev_thresh) {
+      InputBuffer p, int stride, int thresh, int? ithresh, int hev_thresh) {
     var p2 = InputBuffer.from(p);
     for (var k = 3; k > 0; --k) {
       p2.offset += 4;
-      _filterLoop24(p2, 1, stride, 16, thresh, ithresh, hev_thresh);
+      _filterLoop24(p2, 1, stride, 16, thresh, ithresh!, hev_thresh);
     }
   }
 
   // 8-pixels wide variant, for chroma filtering
   void vFilter8(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int ithresh, int hev_thresh) {
+      int? ithresh, int hev_thresh) {
     _filterLoop26(u, stride, 1, 8, thresh, ithresh, hev_thresh);
     _filterLoop26(v, stride, 1, 8, thresh, ithresh, hev_thresh);
   }
 
   void hFilter8(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int ithresh, int hev_thresh) {
+      int? ithresh, int hev_thresh) {
     _filterLoop26(u, 1, stride, 8, thresh, ithresh, hev_thresh);
     _filterLoop26(v, 1, stride, 8, thresh, ithresh, hev_thresh);
   }
@@ -105,7 +106,7 @@ class VP8Filter {
   }
 
   void _filterLoop26(InputBuffer p, int hstride, int vstride, int size,
-      int thresh, int ithresh, int hev_thresh) {
+      int thresh, int? ithresh, int hev_thresh) {
     var p2 = InputBuffer.from(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
@@ -199,7 +200,7 @@ class VP8Filter {
     return (2 * abs0[255 + p0 - q0] + abs1[255 + p1 - q1]) <= thresh;
   }
 
-  bool _needsFilter2(InputBuffer p, int step, int t, int it) {
+  bool _needsFilter2(InputBuffer p, int step, int t, int? it) {
     final p3 = p[-4 * step];
     final p2 = p[-3 * step];
     final p1 = p[-2 * step];
@@ -212,7 +213,7 @@ class VP8Filter {
       return false;
     }
 
-    return abs0[255 + p3 - p2] <= it &&
+    return abs0[255 + p3 - p2] <= it! &&
         abs0[255 + p2 - p1] <= it &&
         abs0[255 + p1 - p0] <= it &&
         abs0[255 + q3 - q2] <= it &&

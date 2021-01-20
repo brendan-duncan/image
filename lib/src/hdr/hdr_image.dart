@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 import '../image.dart';
@@ -28,31 +29,31 @@ class HdrImage {
   /// A numerical identifier for the object represented by a sample.
   static const String ID = 'id';
 
-  final Map<String, HdrSlice> slices = {};
-  HdrSlice red;
-  HdrSlice green;
-  HdrSlice blue;
-  HdrSlice alpha;
-  HdrSlice depth;
+  final Map<String?, HdrSlice> slices = {};
+  HdrSlice? red;
+  HdrSlice? green;
+  HdrSlice? blue;
+  HdrSlice? alpha;
+  HdrSlice? depth;
 
   HdrImage();
 
   /// Create an RGB[A] image.
   HdrImage.create(
-      int width, int height, int channels, int type, int bitsPerSample) {
+      int? width, int? height, int channels, int type, int bitsPerSample) {
     if (channels < 0 || channels > 4) {
       return;
     }
     const channelList = [R, G, B, A];
     for (var i = 0; i < channels; ++i) {
-      addSlice(HdrSlice(channelList[i], width, height, type, bitsPerSample));
+      addSlice(HdrSlice(channelList[i], width!, height!, type, bitsPerSample));
     }
   }
 
   /// Create a copy of the [other] HdrImage.
   HdrImage.from(HdrImage other) {
     for (final ch in other.slices.keys) {
-      final slice = other.slices[ch];
+      final slice = other.slices[ch]!;
       addSlice(HdrSlice.from(slice));
     }
   }
@@ -69,11 +70,11 @@ class HdrImage {
     final rgb = other.getBytes();
     for (var y = 0, si = 0; y < other.height; ++y) {
       for (var x = 0; x < other.width; ++x) {
-        red.setFloat(x, y, rgb[si++] / 255.0);
-        green.setFloat(x, y, rgb[si++] / 255.0);
-        blue.setFloat(x, y, rgb[si++] / 255.0);
+        red!.setFloat(x, y, rgb[si++] / 255.0);
+        green!.setFloat(x, y, rgb[si++] / 255.0);
+        blue!.setFloat(x, y, rgb[si++] / 255.0);
         if (alpha != null) {
-          alpha.setFloat(x, y, rgb[si++] / 255.0);
+          alpha!.setFloat(x, y, rgb[si++] / 255.0);
         }
       }
     }
@@ -97,148 +98,148 @@ class HdrImage {
   /// Get the value of the red channel at the given pixel coordinates [x], [y].
   num getRed(int x, int y) {
     return red != null
-        ? red.isFloat
-            ? red.getFloat(x, y)
-            : red.getInt(x, y)
+        ? red!.isFloat
+            ? red!.getFloat(x, y)
+            : red!.getInt(x, y)
         : 0;
   }
 
   /// Set the value of the red channel at the given pixel coordinates [x], [y].
   void setRed(int x, int y, num c) {
     if (red != null) {
-      if (red.isFloat) {
-        red.setFloat(x, y, c);
+      if (red!.isFloat) {
+        red!.setFloat(x, y, c);
       } else {
-        red.setInt(x, y, c as int);
+        red!.setInt(x, y, c as int);
       }
     }
   }
 
   void setRedInt(int x, int y, int c) {
     if (red != null) {
-      red.setInt(x, y, c);
+      red!.setInt(x, y, c);
     }
   }
 
   /// Get the value of the green channel at the given pixel coordinates [x], [y].
   num getGreen(int x, int y) {
     return green != null
-        ? green.isFloat
-            ? green.getFloat(x, y)
-            : green.getInt(x, y)
+        ? green!.isFloat
+            ? green!.getFloat(x, y)
+            : green!.getInt(x, y)
         : 0;
   }
 
   /// Set the value of the green channel at the given pixel coordinates [x], [y].
   void setGreen(int x, int y, num c) {
     if (green != null) {
-      if (red.isFloat) {
-        green.setFloat(x, y, c);
+      if (red!.isFloat) {
+        green!.setFloat(x, y, c);
       } else {
-        green.setInt(x, y, c as int);
+        green!.setInt(x, y, c as int);
       }
     }
   }
 
   void setGreenInt(int x, int y, int c) {
     if (green != null) {
-      green.setInt(x, y, c);
+      green!.setInt(x, y, c);
     }
   }
 
   /// Get the value of the blue channel at the given pixel coordinates [x], [y].
   num getBlue(int x, int y) {
     return blue != null
-        ? blue.isFloat
-            ? blue.getFloat(x, y)
-            : blue.getInt(x, y)
+        ? blue!.isFloat
+            ? blue!.getFloat(x, y)
+            : blue!.getInt(x, y)
         : 0;
   }
 
   /// Set the value of the blue channel at the given pixel coordinates [x], [y].
   void setBlue(int x, int y, num c) {
     if (green != null) {
-      if (blue.isFloat) {
-        blue.setFloat(x, y, c);
+      if (blue!.isFloat) {
+        blue!.setFloat(x, y, c);
       } else {
-        blue.setInt(x, y, c as int);
+        blue!.setInt(x, y, c as int);
       }
     }
   }
 
   void setBlueInt(int x, int y, int c) {
     if (blue != null) {
-      blue.setInt(x, y, c);
+      blue!.setInt(x, y, c);
     }
   }
 
   /// Get the value of the alpha channel at the given pixel coordinates [x], [y].
   num getAlpha(int x, int y) {
     return alpha != null
-        ? alpha.isFloat
-            ? alpha.getFloat(x, y)
-            : alpha.getInt(x, y)
+        ? alpha!.isFloat
+            ? alpha!.getFloat(x, y)
+            : alpha!.getInt(x, y)
         : 0;
   }
 
   /// Set the value of the alpha channel at the given pixel coordinates [x], [y].
   void setAlpha(int x, int y, num c) {
     if (alpha != null) {
-      if (alpha.isFloat) {
-        alpha.setFloat(x, y, c);
+      if (alpha!.isFloat) {
+        alpha!.setFloat(x, y, c);
       } else {
-        alpha.setInt(x, y, c as int);
+        alpha!.setInt(x, y, c as int);
       }
     }
   }
 
   void setAlphaInt(int x, int y, int c) {
     if (alpha != null) {
-      alpha.setInt(x, y, c);
+      alpha!.setInt(x, y, c);
     }
   }
 
   /// Get the value of the depth channel at the given pixel coordinates [x], [y].
   num getDepth(int x, int y) {
     return depth != null
-        ? depth.isFloat
-            ? depth.getFloat(x, y)
-            : depth.getInt(x, y)
+        ? depth!.isFloat
+            ? depth!.getFloat(x, y)
+            : depth!.getInt(x, y)
         : 0;
   }
 
   /// Set the value of the depth channel at the given pixel coordinates [x], [y].
   void setDepth(int x, int y, num c) {
     if (depth != null) {
-      if (depth.isFloat) {
-        depth.setFloat(x, y, c);
+      if (depth!.isFloat) {
+        depth!.setFloat(x, y, c);
       } else {
-        depth.setInt(x, y, c as int);
+        depth!.setInt(x, y, c as int);
       }
     }
   }
 
   /// The number of bits per sample.
   int get bitsPerSample => red != null
-      ? red.bitsPerSample
+      ? red!.bitsPerSample
       : slices.isEmpty
           ? 0
-          : slices[slices.keys.first].bitsPerSample;
+          : slices[slices.keys.first]!.bitsPerSample;
 
   int get sampleFormat => red != null
-      ? red.type
+      ? red!.type
       : slices.isEmpty
           ? 0
-          : slices[slices.keys.first].type;
+          : slices[slices.keys.first]!.type;
 
   /// The number of channels used by the image
   int get numberOfChannels => slices.length;
 
   /// Does this image contain the given channel?
-  bool hasChannel(String ch) => slices.containsKey(ch);
+  bool hasChannel(String? ch) => slices.containsKey(ch);
 
   /// Access a framebuffer slice by name.
-  HdrSlice operator [](String ch) => slices[ch];
+  HdrSlice? operator [](String? ch) => slices[ch];
 
   /// Add a channel [slice] to the
   void addSlice(HdrSlice slice) {
@@ -271,10 +272,10 @@ class HdrImage {
     final h = height;
     for (var y = 0, di = 0; y < h; ++y) {
       for (var x = 0; x < w; ++x) {
-        rgba[di++] = red == null ? 0.0 : red.getFloat(x, y);
-        rgba[di++] = green == null ? 0.0 : green.getFloat(x, y);
-        rgba[di++] = blue == null ? 0.0 : blue.getFloat(x, y);
-        rgba[di++] = alpha == null ? 1.0 : alpha.getFloat(x, y);
+        rgba[di++] = red == null ? 0.0 : red!.getFloat(x, y);
+        rgba[di++] = green == null ? 0.0 : green!.getFloat(x, y);
+        rgba[di++] = blue == null ? 0.0 : blue!.getFloat(x, y);
+        rgba[di++] = alpha == null ? 1.0 : alpha!.getFloat(x, y);
       }
     }
 

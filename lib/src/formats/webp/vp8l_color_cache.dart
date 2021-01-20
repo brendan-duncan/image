@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 class VP8LColorCache {

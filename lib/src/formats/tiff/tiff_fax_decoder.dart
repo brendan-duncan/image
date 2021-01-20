@@ -4,15 +4,15 @@ import '../../util/input_buffer.dart';
 class TiffFaxDecoder {
   int width;
   int height;
-  int fillOrder;
+  int? fillOrder;
   // Data structures needed to store changing elements for the previous
   // and the current scanline
   int changingElemSize = 0;
-  List<int> prevChangingElems;
-  List<int> currChangingElems;
-  InputBuffer data;
-  int bitPointer;
-  int bytePointer;
+  List<int?>? prevChangingElems;
+  List<int?>? currChangingElems;
+  late InputBuffer data;
+  int? bitPointer;
+  int? bytePointer;
 
   // Element at which to start search in getNextChangingElement
   int lastChangingElement = 0;
@@ -22,11 +22,11 @@ class TiffFaxDecoder {
   // Variables set by T4Options
   int uncompressedMode = 0;
   int fillBits = 0;
-  int oneD;
+  int? oneD;
 
   TiffFaxDecoder(this.fillOrder, this.width, this.height) {
-    prevChangingElems = List<int>(width);
-    currChangingElems = List<int>(width);
+    prevChangingElems = List<int?>.filled(width, null);
+    currChangingElems = List<int?>.filled(width, null);
   }
 
   // One-dimensional decoding methods
@@ -89,7 +89,7 @@ class TiffFaxDecoder {
           _updatePointer(10 - bits);
           if (isT == 0) {
             isWhite = false;
-            currChangingElems[changingElemSize++] = bitOffset;
+            currChangingElems![changingElemSize++] = bitOffset;
           }
         }
       }
@@ -144,7 +144,7 @@ class TiffFaxDecoder {
             _updatePointer(9 - bits);
             if (isT == 0) {
               isWhite = true;
-              currChangingElems[changingElemSize++] = bitOffset;
+              currChangingElems![changingElemSize++] = bitOffset;
             }
           }
         } else if (code == 200) {
@@ -159,7 +159,7 @@ class TiffFaxDecoder {
 
           _updatePointer(2 - bits);
           isWhite = true;
-          currChangingElems[changingElemSize++] = bitOffset;
+          currChangingElems![changingElemSize++] = bitOffset;
         } else {
           // Is a Terminating code
           _setToBlack(buffer, lineOffset, bitOffset, code);
@@ -167,7 +167,7 @@ class TiffFaxDecoder {
 
           _updatePointer(4 - bits);
           isWhite = true;
-          currChangingElems[changingElemSize++] = bitOffset;
+          currChangingElems![changingElemSize++] = bitOffset;
         }
       }
 
@@ -180,7 +180,7 @@ class TiffFaxDecoder {
       }
     }
 
-    currChangingElems[changingElemSize++] = bitOffset;
+    currChangingElems![changingElemSize++] = bitOffset;
   }
 
   // Two-dimensional decoding methods
@@ -194,12 +194,12 @@ class TiffFaxDecoder {
 
     var scanlineStride = (width + 7) ~/ 8;
 
-    int a0, a1, b1, b2;
-    var b = List<int>(2);
+    int? a0, a1, b1, b2;
+    var b = List<int?>.filled(2, null);
     int entry, code, bits;
     bool isWhite;
     var currIndex = 0;
-    List<int> temp;
+    List<int?>? temp;
 
     // fillBits - dealt with this in readEOL
     // 1D/2D encoding - dealt with this in readEOL
@@ -216,7 +216,7 @@ class TiffFaxDecoder {
     }
 
     var lineOffset = 0;
-    int bitOffset;
+    int? bitOffset;
 
     // Then the 1D encoded scanline data will occur, changing elements
     // array gets set.
@@ -243,7 +243,7 @@ class TiffFaxDecoder {
 
         lastChangingElement = 0;
 
-        while (bitOffset < width) {
+        while (bitOffset! < width) {
           // Get the next changing element
           _getNextChangingElement(a0, isWhite, b);
 
@@ -262,7 +262,7 @@ class TiffFaxDecoder {
 
           if (code == 0) {
             if (!isWhite) {
-              _setToBlack(out, lineOffset, bitOffset, b2 - bitOffset);
+              _setToBlack(out, lineOffset, bitOffset, b2! - bitOffset);
             }
             bitOffset = a0 = b2;
 
@@ -277,29 +277,29 @@ class TiffFaxDecoder {
             if (isWhite) {
               number = _decodeWhiteCodeWord();
               bitOffset += number;
-              currChangingElems[currIndex++] = bitOffset;
+              currChangingElems![currIndex++] = bitOffset;
 
               number = _decodeBlackCodeWord();
               _setToBlack(out, lineOffset, bitOffset, number);
               bitOffset += number;
-              currChangingElems[currIndex++] = bitOffset;
+              currChangingElems![currIndex++] = bitOffset;
             } else {
               number = _decodeBlackCodeWord();
               _setToBlack(out, lineOffset, bitOffset, number);
               bitOffset += number;
-              currChangingElems[currIndex++] = bitOffset;
+              currChangingElems![currIndex++] = bitOffset;
 
               number = _decodeWhiteCodeWord();
               bitOffset += number;
-              currChangingElems[currIndex++] = bitOffset;
+              currChangingElems![currIndex++] = bitOffset;
             }
 
             a0 = bitOffset;
           } else if (code <= 8) {
             // Vertical
-            a1 = b1 + (code - 5);
+            a1 = b1! + (code - 5);
 
-            currChangingElems[currIndex++] = a1;
+            currChangingElems![currIndex++] = a1;
 
             // We write the current color till a1 - 1 pos,
             // since a1 is where the next color starts
@@ -317,7 +317,7 @@ class TiffFaxDecoder {
 
         // Add the changing element beyond the current scanline for the
         // other color too
-        currChangingElems[currIndex++] = bitOffset;
+        currChangingElems![currIndex++] = bitOffset;
         changingElemSize = currIndex;
       } else {
         // 1D encoded scanline follows
@@ -338,19 +338,19 @@ class TiffFaxDecoder {
 
     var scanlineStride = (width + 7) ~/ 8;
 
-    int a0, a1, b1, b2;
+    int? a0, a1, b1, b2;
     int entry, code, bits;
     bool isWhite;
     int currIndex;
-    List<int> temp;
+    List<int?>? temp;
 
     // Return values from getNextChangingElement
-    var b = List<int>(2);
+    var b = List<int?>.filled(2, null);
 
     uncompressedMode = ((tiffT6Options & 0x02) >> 1);
 
     // Local cached reference
-    var cce = currChangingElems;
+    var cce = currChangingElems!;
 
     // Assume invisible preceding row of all white pixels and insert
     // both black and white changing elements beyond the end of this
@@ -360,7 +360,7 @@ class TiffFaxDecoder {
     cce[changingElemSize++] = width;
 
     var lineOffset = 0;
-    int bitOffset;
+    int? bitOffset;
 
     for (var lines = 0; lines < height; lines++) {
       // a0 has to be set just before the start of the scanline.
@@ -372,7 +372,7 @@ class TiffFaxDecoder {
       // changing elements into the currChangingElems.
       temp = prevChangingElems;
       prevChangingElems = currChangingElems;
-      cce = currChangingElems = temp;
+      cce = (currChangingElems = temp)!;
       currIndex = 0;
 
       // Start decoding the scanline at startX in the raster
@@ -382,7 +382,7 @@ class TiffFaxDecoder {
       lastChangingElement = 0;
 
       // Till one whole scanline is decoded
-      while (bitOffset < width) {
+      while (bitOffset! < width) {
         // Get the next changing element
         _getNextChangingElement(a0, isWhite, b);
         b1 = b[0];
@@ -401,7 +401,7 @@ class TiffFaxDecoder {
           // Pass
           // We always assume WhiteIsZero format for fax.
           if (!isWhite) {
-            _setToBlack(out, lineOffset, bitOffset, b2 - bitOffset);
+            _setToBlack(out, lineOffset, bitOffset, b2! - bitOffset);
           }
           bitOffset = a0 = b2;
 
@@ -439,7 +439,7 @@ class TiffFaxDecoder {
           a0 = bitOffset;
         } else if (code <= 8) {
           // Vertical
-          a1 = b1 + (code - 5);
+          a1 = b1! + (code - 5);
           cce[currIndex++] = a1;
 
           // We write the current color till a1 - 1 pos,
@@ -475,7 +475,7 @@ class TiffFaxDecoder {
               }
 
               // Zeros before the exit code
-              bitOffset += zeros;
+              bitOffset = bitOffset! + zeros;
               if (zeros > 0) {
                 // Some zeros have been written
                 isWhite = true;
@@ -502,12 +502,12 @@ class TiffFaxDecoder {
               if (!isWhite) {
                 cce[currIndex++] = bitOffset;
               }
-              bitOffset += zeros;
+              bitOffset = bitOffset! + zeros;
 
               // Last thing written was white
               isWhite = true;
             } else {
-              bitOffset += zeros;
+              bitOffset = bitOffset! + zeros;
 
               cce[currIndex++] = bitOffset;
               _setToBlack(out, lineOffset, bitOffset, 1);
@@ -651,7 +651,7 @@ class TiffFaxDecoder {
       // First EOL code word xxxx 0000 0000 0001 will occur
       // As many fill bits will be present as required to make
       // the EOL code of 12 bits end on a byte boundary.
-      var bitsLeft = 8 - bitPointer;
+      var bitsLeft = 8 - bitPointer!;
 
       if (_nextNBits(bitsLeft) != 0) {
         throw ImageException('TIFFFaxDecoder8');
@@ -689,7 +689,7 @@ class TiffFaxDecoder {
     }
   }
 
-  void _getNextChangingElement(int a0, bool isWhite, List<int> ret) {
+  void _getNextChangingElement(int? a0, bool isWhite, List<int?> ret) {
     // Local copies of instance variables
     var pce = prevChangingElems;
     var ces = changingElemSize;
@@ -706,8 +706,8 @@ class TiffFaxDecoder {
 
     var i = start;
     for (; i < ces; i += 2) {
-      var temp = pce[i];
-      if (temp > a0) {
+      var temp = pce![i]!;
+      if (temp > a0!) {
         lastChangingElement = i;
         ret[0] = temp;
         break;
@@ -715,7 +715,7 @@ class TiffFaxDecoder {
     }
 
     if (i + 1 < ces) {
-      ret[1] = pce[i + 1];
+      ret[1] = pce![i + 1];
     }
   }
 
@@ -760,7 +760,7 @@ class TiffFaxDecoder {
     var bp = bytePointer;
 
     if (fillOrder == 1) {
-      b = data[bp];
+      b = data[bp!];
 
       if (bp == l) {
         next = 0x00;
@@ -773,7 +773,7 @@ class TiffFaxDecoder {
         next2next = data[bp + 2];
       }
     } else if (fillOrder == 2) {
-      b = FLIP_TABLE[data[bp] & 0xff];
+      b = FLIP_TABLE[data[bp!] & 0xff];
 
       if (bp == l) {
         next = 0x00;
@@ -789,7 +789,7 @@ class TiffFaxDecoder {
       throw ImageException('TIFFFaxDecoder7');
     }
 
-    var bitsLeft = 8 - bitPointer;
+    var bitsLeft = 8 - bitPointer!;
     var bitsFromNextByte = bitsToGet - bitsLeft;
     var bitsFromNext2NextByte = 0;
     if (bitsFromNextByte > 8) {
@@ -797,7 +797,7 @@ class TiffFaxDecoder {
       bitsFromNextByte = 8;
     }
 
-    bytePointer++;
+    bytePointer = bytePointer! + 1;
 
     var i1 = (b & TABLE1[bitsLeft]) << (bitsToGet - bitsLeft);
     var i2 = (next & TABLE2[bitsFromNextByte]) >> (8 - bitsFromNextByte);
@@ -808,12 +808,12 @@ class TiffFaxDecoder {
       i3 = (next2next & TABLE2[bitsFromNext2NextByte]) >>
           (8 - bitsFromNext2NextByte);
       i2 |= i3;
-      bytePointer++;
+      bytePointer = bytePointer! + 1;
       bitPointer = bitsFromNext2NextByte;
     } else {
       if (bitsFromNextByte == 8) {
         bitPointer = 0;
-        bytePointer++;
+        bytePointer = bytePointer! + 1;
       } else {
         bitPointer = bitsFromNextByte;
       }
@@ -828,14 +828,14 @@ class TiffFaxDecoder {
     var bp = bytePointer;
 
     if (fillOrder == 1) {
-      b = data[bp];
+      b = data[bp!];
       if (bp == l) {
         next = 0x00;
       } else {
         next = data[bp + 1];
       }
     } else if (fillOrder == 2) {
-      b = FLIP_TABLE[data[bp] & 0xff];
+      b = FLIP_TABLE[data[bp!] & 0xff];
       if (bp == l) {
         next = 0x00;
       } else {
@@ -845,24 +845,24 @@ class TiffFaxDecoder {
       throw ImageException('TIFFFaxDecoder7');
     }
 
-    var bitsLeft = 8 - bitPointer;
+    var bitsLeft = 8 - bitPointer!;
     var bitsFromNextByte = bitsToGet - bitsLeft;
 
     var shift = bitsLeft - bitsToGet;
     int i1, i2;
     if (shift >= 0) {
       i1 = (b & TABLE1[bitsLeft]) >> shift;
-      bitPointer += bitsToGet;
+      bitPointer = bitPointer! + bitsToGet;
       if (bitPointer == 8) {
         bitPointer = 0;
-        bytePointer++;
+        bytePointer = bytePointer! + 1;
       }
     } else {
       i1 = (b & TABLE1[bitsLeft]) << (-shift);
       i2 = (next & TABLE2[bitsFromNextByte]) >> (8 - bitsFromNextByte);
 
       i1 |= i2;
-      bytePointer++;
+      bytePointer = bytePointer! + 1;
       bitPointer = bitsFromNextByte;
     }
 
@@ -871,10 +871,10 @@ class TiffFaxDecoder {
 
   // Move pointer backwards by given amount of bits
   void _updatePointer(int bitsToMoveBack) {
-    var i = bitPointer - bitsToMoveBack;
+    var i = bitPointer! - bitsToMoveBack;
 
     if (i < 0) {
-      bytePointer--;
+      bytePointer = bytePointer! - 1;
       bitPointer = 8 + i;
     } else {
       bitPointer = i;
@@ -884,7 +884,7 @@ class TiffFaxDecoder {
   // Move to the next byte boundary
   bool _advancePointer() {
     if (bitPointer != 0) {
-      bytePointer++;
+      bytePointer = bytePointer! + 1;
       bitPointer = 0;
     }
 

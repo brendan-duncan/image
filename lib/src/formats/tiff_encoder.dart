@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 import '../image.dart';
 import '../hdr/hdr_image.dart';
@@ -83,19 +84,19 @@ class TiffEncoder extends Encoder {
     final channels = <Uint8List>[];
     if (image.blue != null) {
       // ? Why does this channel order working but not RGB?
-      channels.add(image.blue.getBytes());
+      channels.add(image.blue!.getBytes());
     }
     if (image.red != null) {
-      channels.add(image.red.getBytes());
+      channels.add(image.red!.getBytes());
     }
     if (image.green != null) {
-      channels.add(image.green.getBytes());
+      channels.add(image.green!.getBytes());
     }
     if (image.alpha != null) {
-      channels.add(image.alpha.getBytes());
+      channels.add(image.alpha!.getBytes());
     }
     if (image.depth != null) {
-      channels.add(image.depth.getBytes());
+      channels.add(image.depth!.getBytes());
     }
 
     for (var y = 0, pi = 0; y < image.height; ++y) {

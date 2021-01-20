@@ -39,16 +39,16 @@ import '../internal/clamp.dart';
 /// [amount] controls how much affect this filter has on the [src] image, where
 /// 0.0 has no effect and 1.0 has full effect.
 Image adjustColor(Image src,
-    {int blacks,
-    int whites,
-    int mids,
-    num contrast,
-    num saturation,
-    num brightness,
-    num gamma,
-    num exposure,
-    num hue,
-    num amount}) {
+    {int? blacks,
+    int? whites,
+    int? mids,
+    num? contrast,
+    num? saturation,
+    num? brightness,
+    num? gamma,
+    num? exposure,
+    num? hue,
+    num? amount}) {
   if (amount == 0.0) {
     return src;
   }
@@ -68,10 +68,11 @@ Image adjustColor(Image src,
   const lumCoeffG = 0.7154;
   const lumCoeffB = 0.0721;
 
-  num br, bg, bb;
-  num wr, wg, wb;
-  num mr, mg, mb;
-  if (blacks != null || whites != null || mids != null) {
+  var useBlacksWhitesMids = blacks != null || whites != null || mids != null;
+  late num br, bg, bb;
+  late num wr, wg, wb;
+  late num mr, mg, mb;
+  if (useBlacksWhitesMids) {
     br = blacks != null ? getRed(blacks) / 255.0 : 0.0;
     bg = blacks != null ? getGreen(blacks) / 255.0 : 0.0;
     bb = blacks != null ? getBlue(blacks) / 255.0 : 0.0;
@@ -96,9 +97,9 @@ Image adjustColor(Image src,
     exposure = pow(2.0, exposure);
   }
 
-  num hueR;
-  num hueG;
-  num hueB;
+  late num hueR;
+  late num hueG;
+  late num hueB;
   if (hue != null) {
     hue *= DEG_TO_RAD;
     var s = sin(hue);
@@ -121,7 +122,7 @@ Image adjustColor(Image src,
     var g = og;
     var b = ob;
 
-    if (br != null) {
+    if (useBlacksWhitesMids) {
       r = pow((r + br) * wr, mr);
       g = pow((g + bg) * wg, mg);
       b = pow((b + bb) * wb, mb);
@@ -135,7 +136,7 @@ Image adjustColor(Image src,
     }
 
     if (saturation != null) {
-      var lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
+      num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
 
       r = lum * invSaturation + r * saturation;
       g = lum * invSaturation + g * saturation;

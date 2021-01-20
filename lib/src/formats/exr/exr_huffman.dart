@@ -5,7 +5,7 @@ import '../../util/input_buffer.dart';
 
 class ExrHuffman {
   static void uncompress(
-      InputBuffer compressed, int nCompressed, Uint16List raw, int nRaw) {
+      InputBuffer compressed, int nCompressed, Uint16List? raw, int nRaw) {
     if (nCompressed == 0) {
       if (nRaw != 0) {
         throw ImageException('Incomplete huffman data');
@@ -27,13 +27,9 @@ class ExrHuffman {
 
     compressed.skip(4);
 
-    var freq = List<int>(HUF_ENCSIZE);
-    freq.fillRange(0, HUF_ENCSIZE, 0);
-
-    var hdec = List<ExrHufDec>(HUF_DECSIZE);
-    for (var i = 0; i < HUF_DECSIZE; ++i) {
-      hdec[i] = ExrHufDec();
-    }
+    var freq = List<int>.filled(HUF_ENCSIZE, 0);
+    var hdec = List<ExrHufDec>.generate(HUF_DECSIZE, (_) => ExrHufDec(),
+        growable: false);
 
     unpackEncTable(compressed, nCompressed - 20, im, iM, freq);
 
@@ -47,7 +43,7 @@ class ExrHuffman {
   }
 
   static void decode(List<int> hcode, List<ExrHufDec> hdecod, InputBuffer input,
-      int ni, int rlc, int no, Uint16List out) {
+      int ni, int rlc, int no, Uint16List? out) {
     var c_lc = [0, 0];
     var ie = input.offset + (ni + 7) ~/ 8; // input byte size
     var oi = 0;
@@ -74,7 +70,7 @@ class ExrHuffman {
           // Search long code
           int j;
           for (j = 0; j < pl.lit; j++) {
-            var l = hufLength(hcode[pl.p[j]]);
+            var l = hufLength(hcode[pl.p![j]]);
 
             while (c_lc[1] < l && input.offset < ie) {
               // get more bits
@@ -82,11 +78,11 @@ class ExrHuffman {
             }
 
             if (c_lc[1] >= l) {
-              if (hufCode(hcode[pl.p[j]]) ==
+              if (hufCode(hcode[pl.p![j]]) ==
                   ((c_lc[0] >> (c_lc[1] - l)) & ((1 << l) - 1))) {
                 // Found : get long code
                 c_lc[1] -= l;
-                oi = getCode(pl.p[j], rlc, c_lc, input, out, oi, no);
+                oi = getCode(pl.p![j], rlc, c_lc, input, out, oi, no);
                 break;
               }
             }
@@ -124,7 +120,7 @@ class ExrHuffman {
   }
 
   static int getCode(int po, int rlc, List<int> c_lc, InputBuffer input,
-      Uint16List out, int oi, int oe) {
+      Uint16List? out, int oi, int oe) {
     if (po == rlc) {
       if (c_lc[1] < 8) {
         getChar(c_lc, input);
@@ -139,13 +135,13 @@ class ExrHuffman {
             '(decoded data are longer than expected).');
       }
 
-      var s = out[oi - 1];
+      var s = out![oi - 1];
 
       while (cs-- > 0) {
         out[oi++] = s;
       }
     } else if (oi < oe) {
-      out[oi++] = po;
+      out![oi++] = po;
     } else {
       throw ImageException('Error in Huffman-encoded data '
           '(decoded data are longer than expected).');
@@ -184,16 +180,16 @@ class ExrHuffman {
 
         if (pl.p != null) {
           var p = pl.p;
-          pl.p = List<int>(pl.lit);
+          pl.p = List<int>.filled(pl.lit, 0);
 
           for (var i = 0; i < pl.lit - 1; ++i) {
-            pl.p[i] = p[i];
+            pl.p![i] = p![i];
           }
         } else {
           pl.p = [0];
         }
 
-        pl.p[pl.lit - 1] = im;
+        pl.p![pl.lit - 1] = im;
       } else if (l != 0) {
         // Short code: init all primary entries
         var pi = (c << (HUF_DECBITS - l));
@@ -270,8 +266,7 @@ class ExrHuffman {
   static int hufCode(int code) => code >> 6;
 
   static void canonicalCodeTable(List<int> hcode) {
-    var n = List<int>(59);
-    n.fillRange(0, 59, 0);
+    var n = List<int>.filled(59, 0);
 
     // For each i from 0 through 58, count the
     // number of different codes of length i, and
@@ -340,5 +335,5 @@ class ExrHuffman {
 class ExrHufDec {
   int len = 0;
   int lit = 0;
-  List<int> p;
+  List<int>? p;
 }

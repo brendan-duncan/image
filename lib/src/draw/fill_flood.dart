@@ -39,7 +39,7 @@ Image fillFlood(Image src, int x, int y, int color,
     };
   }
 
-  _MarkPixel mark = (int y, int x) {
+  var mark = (int y, int x) {
     src.setPixel(x, y, color);
     visited[y * src.width + x] = 1;
   };
@@ -87,7 +87,7 @@ Uint8List maskFlood(Image src, int x, int y,
     };
   }
 
-  _MarkPixel mark = (int y, int x) {
+  var mark = (int y, int x) {
     ret[y * src.width + x] = fillValue;
     visited[y * src.width + x] = 1;
   };

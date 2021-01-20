@@ -7,7 +7,7 @@ import '../../internal/bit_operators.dart';
 import '_component_data.dart';
 import 'jpeg_data.dart';
 
-Uint8List _dctClip;
+Uint8List? _dctClip;
 int _clamp8(int i) => i < 0
     ? 0
     : i > 255
@@ -34,13 +34,13 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
     _dctClip = Uint8List(dctClipLength);
     int i;
     for (i = -256; i < 0; ++i) {
-      _dctClip[dctClipOffset + i] = 0;
+      _dctClip![dctClipOffset + i] = 0;
     }
     for (i = 0; i < 256; ++i) {
-      _dctClip[dctClipOffset + i] = i;
+      _dctClip![dctClipOffset + i] = i;
     }
     for (i = 256; i < 512; ++i) {
-      _dctClip[dctClipOffset + i] = 255;
+      _dctClip![dctClipOffset + i] = 255;
     }
   }
 
@@ -206,22 +206,22 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 
   // convert to 8-bit integers
   for (var i = 0; i < 64; ++i) {
-    dataOut[i] = _dctClip[(dctClipOffset + 128 + shiftR((p[i] + 8), 4))];
+    dataOut[i] = _dctClip![(dctClipOffset + 128 + shiftR((p[i] + 8), 4))];
   }
 }
 
 Image getImageFromJpeg(JpegData jpeg) {
-  var image = Image(jpeg.width, jpeg.height, channels: Channels.rgb);
+  var image = Image(jpeg.width!, jpeg.height!, channels: Channels.rgb);
   image.exif = ExifData.from(jpeg.exif);
 
   ComponentData component1;
   ComponentData component2;
   ComponentData component3;
   ComponentData component4;
-  Uint8List component1Line;
-  Uint8List component2Line;
-  Uint8List component3Line;
-  Uint8List component4Line;
+  Uint8List? component1Line;
+  Uint8List? component2Line;
+  Uint8List? component3Line;
+  Uint8List? component4Line;
   var offset = 0;
   int Y, Cb, Cr, K, C, M, Ye, R, G, B;
   var colorTransform = false;
@@ -232,12 +232,12 @@ Image getImageFromJpeg(JpegData jpeg) {
       var lines = component1.lines;
       var hShift1 = component1.hScaleShift;
       var vShift1 = component1.vScaleShift;
-      for (var y = 0; y < jpeg.height; y++) {
+      for (var y = 0; y < jpeg.height!; y++) {
         var y1 = y >> vShift1;
         component1Line = lines[y1];
-        for (var x = 0; x < jpeg.width; x++) {
+        for (var x = 0; x < jpeg.width!; x++) {
           var x1 = x >> hShift1;
-          Y = component1Line[x1];
+          Y = component1Line![x1];
           image[offset++] = getColor(Y, Y, Y);
         }
       }
@@ -288,7 +288,7 @@ Image getImageFromJpeg(JpegData jpeg) {
       var hShift3 = component3.hScaleShift;
       var vShift3 = component3.vScaleShift;
 
-      for (var y = 0; y < jpeg.height; y++) {
+      for (var y = 0; y < jpeg.height!; y++) {
         var y1 = y >> vShift1;
         var y2 = y >> vShift2;
         var y3 = y >> vShift3;
@@ -297,30 +297,23 @@ Image getImageFromJpeg(JpegData jpeg) {
         component2Line = lines2[y2];
         component3Line = lines3[y3];
 
-        for (var x = 0; x < jpeg.width; x++) {
+        for (var x = 0; x < jpeg.width!; x++) {
           var x1 = x >> hShift1;
           var x2 = x >> hShift2;
           var x3 = x >> hShift3;
 
-          if (!colorTransform) {
-            R = component1Line[x1];
-            G = component1Line[x2];
-            B = component1Line[x3];
-            image[offset++] = getColor(R, G, B);
-          } else {
-            Y = component1Line[x1] << 8;
-            Cb = component2Line[x2] - 128;
-            Cr = component3Line[x3] - 128;
+          Y = component1Line![x1] << 8;
+          Cb = component2Line![x2] - 128;
+          Cr = component3Line![x3] - 128;
 
-            R = (Y + 359 * Cr + 128);
-            G = (Y - 88 * Cb - 183 * Cr + 128);
-            B = (Y + 454 * Cb + 128);
+          R = (Y + 359 * Cr + 128);
+          G = (Y - 88 * Cb - 183 * Cr + 128);
+          B = (Y + 454 * Cb + 128);
 
-            R = _clamp8(shiftR(R, 8));
-            G = _clamp8(shiftR(G, 8));
-            B = _clamp8(shiftR(B, 8));
-            image[offset++] = getColor(R, G, B);
-          }
+          R = _clamp8(shiftR(R, 8));
+          G = _clamp8(shiftR(G, 8));
+          B = _clamp8(shiftR(B, 8));
+          image[offset++] = getColor(R, G, B);
         }
       }
       break;
@@ -331,7 +324,7 @@ Image getImageFromJpeg(JpegData jpeg) {
       // The default transform for four components is false
       colorTransform = false;
       // The adobe transform marker overrides any previous setting
-      if (jpeg.adobe.transformCode != 0) {
+      if (jpeg.adobe!.transformCode != 0) {
         colorTransform = true;
       }
 
@@ -354,7 +347,7 @@ Image getImageFromJpeg(JpegData jpeg) {
       var hShift4 = component4.hScaleShift;
       var vShift4 = component4.vScaleShift;
 
-      for (var y = 0; y < jpeg.height; y++) {
+      for (var y = 0; y < jpeg.height!; y++) {
         var y1 = y >> vShift1;
         var y2 = y >> vShift2;
         var y3 = y >> vShift3;
@@ -363,21 +356,21 @@ Image getImageFromJpeg(JpegData jpeg) {
         component2Line = lines2[y2];
         component3Line = lines3[y3];
         component4Line = lines4[y4];
-        for (var x = 0; x < jpeg.width; x++) {
+        for (var x = 0; x < jpeg.width!; x++) {
           var x1 = x >> hShift1;
           var x2 = x >> hShift2;
           var x3 = x >> hShift3;
           var x4 = x >> hShift4;
           if (!colorTransform) {
-            C = component1Line[x1];
-            M = component2Line[x2];
-            Ye = component3Line[x3];
-            K = component4Line[x4];
+            C = component1Line![x1];
+            M = component2Line![x2];
+            Ye = component3Line![x3];
+            K = component4Line![x4];
           } else {
-            Y = component1Line[x1];
-            Cb = component2Line[x2];
-            Cr = component3Line[x3];
-            K = component4Line[x4];
+            Y = component1Line![x1];
+            Cb = component2Line![x2];
+            Cr = component3Line![x3];
+            K = component4Line![x4];
 
             C = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
             M = 255 -

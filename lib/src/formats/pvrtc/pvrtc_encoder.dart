@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 import '../../color.dart';
@@ -22,7 +23,7 @@ class PvrtcEncoder {
   Uint8List encodePvr(Image bitmap, {int format = PVR_AUTO}) {
     var output = OutputBuffer();
 
-    dynamic pvrtc;
+    late dynamic pvrtc;
     if (format == PVR_AUTO) {
       if (bitmap.channels == Channels.rgb) {
         pvrtc = encodeRgb4Bpp(bitmap);

@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 import '../bitmap_font.dart';
 import '../color.dart';
@@ -40,7 +41,7 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
       continue;
     }
 
-    var ch = font.characters[c];
+    var ch = font.characters[c]!;
 
     var x2 = x + ch.width;
     var y2 = y + ch.height;
@@ -71,7 +72,7 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 /// You can load your own font, or use one of the existing ones
 /// such as: [arial_14], [arial_24], or [arial_48].
 Image drawStringCentered(Image image, BitmapFont font, String string,
-    {int x, int y, int color = 0xffffffff}) {
+    {int? x, int? y, int color = 0xffffffff}) {
   var stringWidth = 0;
   var stringHeight = 0;
 
@@ -81,7 +82,7 @@ Image drawStringCentered(Image image, BitmapFont font, String string,
       if (!font.characters.containsKey(c)) {
         continue;
       }
-      var ch = font.characters[c];
+      var ch = font.characters[c]!;
       stringWidth += ch.xadvance;
       if (ch.height + ch.yoffset > stringHeight) {
         stringHeight = ch.height + ch.yoffset;

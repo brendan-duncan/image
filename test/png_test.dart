@@ -1,6 +1,9 @@
+
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
+
+import 'paths.dart';
 
 void main() {
   group('PNG', () {
@@ -10,7 +13,7 @@ void main() {
 
       // Encode the image to PNG
       final png = PngEncoder().encodeImage(image);
-      File('.dart_tool/out/png/encode.png')
+      File('$tmpPath/out/png/encode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
@@ -24,15 +27,15 @@ void main() {
         anim.addFrame(image);
       }
 
-      final png = encodePngAnimation(anim);
-      File('.dart_tool/out/png/encodeAnimation.png')
+      final png = encodePngAnimation(anim)!;
+      File('$tmpPath/out/png/encodeAnimation.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
 
     test('decode', () {
-      List<int> bytes = File('.dart_tool/out/png/encode.png').readAsBytesSync();
-      final image = PngDecoder().decodeImage(bytes);
+      List<int> bytes = File('$tmpPath/out/png/encode.png').readAsBytesSync();
+      final image = PngDecoder().decodeImage(bytes)!;
 
       expect(image.width, equals(64));
       expect(image.height, equals(64));
@@ -42,22 +45,22 @@ void main() {
       }
 
       final png = PngEncoder().encodeImage(image);
-      File('.dart_tool/out/png/decode.png').writeAsBytesSync(png);
+      File('$tmpPath/out/png/decode.png').writeAsBytesSync(png);
     });
 
     test('iCCP', () {
       final bytes = File('test/res/png/iCCP.png').readAsBytesSync();
-      final image = PngDecoder().decodeImage(bytes);
+      final image = PngDecoder().decodeImage(bytes)!;
       expect(image.iccProfile, isNotNull);
-      expect(image.iccProfile.data, isNotNull);
+      expect(image.iccProfile!.data, isNotNull);
 
       final png = PngEncoder().encodeImage(image);
 
-      final image2 = PngDecoder().decodeImage(png);
+      final image2 = PngDecoder().decodeImage(png)!;
       expect(image2.iccProfile, isNotNull);
-      expect(image2.iccProfile.data, isNotNull);
+      expect(image2.iccProfile!.data, isNotNull);
       expect(
-          image2.iccProfile.data.length, equals(image.iccProfile.data.length));
+          image2.iccProfile!.data.length, equals(image.iccProfile!.data.length));
     });
 
     final dir = Directory('test/res/png');
@@ -97,7 +100,7 @@ void main() {
       final name = f.path.split(RegExp(r'(/|\\)')).last;
 
       test('PNG $name', () {
-        final file = f as File;
+        final file = f;
 
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
@@ -108,16 +111,16 @@ void main() {
             ;
           }
         } else {
-          final anim = decodeAnimation(file.readAsBytesSync());
+          final anim = decodeAnimation(file.readAsBytesSync())!;
           if (anim.length == 1) {
             final png = PngEncoder().encodeImage(anim[0]);
-            File('.dart_tool/out/png/${name}')
+            File('$tmpPath/out/png/${name}')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
           } else {
             for (var i = 0; i < anim.length; ++i) {
               final png = PngEncoder().encodeImage(anim[i]);
-              File('.dart_tool/out/png/${name}-$i.png')
+              File('$tmpPath/out/png/${name}-$i.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
             }

@@ -8,7 +8,7 @@ class SeparableKernel {
 
   /// Create a separable convolution kernel for the given [radius].
   SeparableKernel(int radius)
-      : coefficients = List<num>(2 * radius + 1),
+      : coefficients = List<num>.filled(2 * radius + 1, 0),
         size = radius;
 
   /// Get the number of coefficients in the kernel.
@@ -41,7 +41,7 @@ class SeparableKernel {
   /// Scale all of the coefficients by [s].
   void scaleCoefficients(num s) {
     for (var i = 0; i < coefficients.length; ++i) {
-      coefficients[i] *= s;
+      coefficients[i] = coefficients[i] * s;
     }
   }
 

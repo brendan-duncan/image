@@ -7,10 +7,11 @@ import '../../util/input_buffer.dart';
 enum BitmapCompression { BI_BITFIELDS, NONE }
 
 class BitmapFileHeader {
-  int fileLength;
   static final fileHeaderSize = 14;
 
-  int offset;
+  late int fileLength;
+  late int offset;
+
   BitmapFileHeader(InputBuffer b) {
     if (!isValidFile(b)) {
       throw ImageException('Not a bitmap file.');
@@ -59,10 +60,10 @@ class BmpInfo extends DecodeInfo {
   final int totalColors;
   final int importantColors;
 
-  int v5redMask;
-  int v5greenMask;
-  int v5blueMask;
-  int v5alphaMask;
+  int? v5redMask;
+  int? v5greenMask;
+  int? v5blueMask;
+  int? v5alphaMask;
 
   // BITMAPINFOHEADER should (probably) ignore alpha channel altogether.
   // This is the behavior in gimp (?)
@@ -75,9 +76,9 @@ class BmpInfo extends DecodeInfo {
   @override
   int get height => _height.abs();
 
-  List<int> colorPalette;
+  List<int>? colorPalette;
 
-  BmpInfo(InputBuffer p, {BitmapFileHeader fileHeader})
+  BmpInfo(InputBuffer p, {BitmapFileHeader? fileHeader})
       : file = fileHeader ?? BitmapFileHeader(p),
         headerSize = p.readUint32(),
         width = p.readInt32(),
@@ -125,7 +126,7 @@ class BmpInfo extends DecodeInfo {
     return compression;
   }
 
-  int _readRgba(InputBuffer input, {int aDefault}) {
+  int _readRgba(InputBuffer input, {int? aDefault}) {
     if (readBottomUp) {
       final b = input.readByte();
       final g = input.readByte();
@@ -147,8 +148,8 @@ class BmpInfo extends DecodeInfo {
         final b = input.readByte();
         final left = b >> 4;
         final right = b & 0x0f;
-        pixel(colorPalette[left]);
-        pixel(colorPalette[right]);
+        pixel(colorPalette![left]);
+        pixel(colorPalette![right]);
         return;
       }
     }
@@ -184,7 +185,6 @@ class BmpInfo extends DecodeInfo {
       case BitmapCompression.NONE:
         return 'none';
     }
-    return 'UNSUPPORTED: $compression';
   }
 
   @override

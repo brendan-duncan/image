@@ -17,14 +17,14 @@ import 'jpeg_quantize_stub.dart'
     if (dart.library.js) '_jpeg_quantize_html.dart';
 
 class JpegData {
-  InputBuffer input;
-  JpegJfif jfif;
-  JpegAdobe adobe;
-  JpegFrame frame;
-  int resetInterval;
+  late InputBuffer input;
+  late JpegJfif jfif;
+  JpegAdobe? adobe;
+  JpegFrame? frame;
+  int? resetInterval;
   final exif = ExifData();
-  final quantizationTables = List<Int16List>(Jpeg.NUM_QUANT_TBLS);
-  final frames = <JpegFrame>[];
+  final quantizationTables = List<Int16List?>.filled(Jpeg.NUM_QUANT_TBLS, null);
+  final frames = <JpegFrame?>[];
   final huffmanTablesAC = <dynamic>[];
   final huffmanTablesDC = <dynamic>[];
   final components = <ComponentData>[];
@@ -69,7 +69,7 @@ class JpegData {
     return hasSOF && hasSOS;
   }
 
-  JpegInfo readInfo(List<int> bytes) {
+  JpegInfo? readInfo(List<int> bytes) {
     input = InputBuffer(bytes, bigEndian: true);
 
     var marker = _nextMarker();
@@ -105,8 +105,8 @@ class JpegData {
     }
 
     if (frame != null) {
-      info.width = frame.samplesPerLine;
-      info.height = frame.scanLines;
+      info.width = frame!.samplesPerLine!;
+      info.height = frame!.scanLines!;
     }
     frame = null;
     frames.clear();
@@ -122,24 +122,25 @@ class JpegData {
       throw ImageException('Only single frame JPEGs supported');
     }
 
-    for (var i = 0; i < frame.componentsOrder.length; ++i) {
-      /*JpegComponent component =*/ frame.components[frame.componentsOrder[i]];
+    for (var i = 0; i < frame!.componentsOrder.length; ++i) {
+      /*JpegComponent component =*/ frame!
+          .components[frame!.componentsOrder[i]];
     }
 
-    for (var i = 0; i < frame.componentsOrder.length; ++i) {
-      var component = frame.components[frame.componentsOrder[i]];
+    for (var i = 0; i < frame!.componentsOrder.length; ++i) {
+      var component = frame!.components[frame!.componentsOrder[i]]!;
       components.add(ComponentData(
           component.hSamples,
-          frame.maxHSamples,
+          frame!.maxHSamples,
           component.vSamples,
-          frame.maxVSamples,
+          frame!.maxVSamples,
           _buildComponentData(frame, component)));
     }
   }
 
-  int get width => frame.samplesPerLine;
+  int? get width => frame!.samplesPerLine;
 
-  int get height => frame.scanLines;
+  int? get height => frame!.scanLines;
 
   Image getImage() {
     return getImageFromJpeg(this);
@@ -384,7 +385,7 @@ class JpegData {
     exif.rawData ??= <Uint8List>[];
 
     var rawData = block.toUint8List().sublist(0);
-    exif.rawData.add(rawData);
+    exif.rawData!.add(rawData);
 
     const EXIF_TAG = 0x45786966; // Exif\0\0
     if (block.readUint32() != EXIF_TAG) {
@@ -461,10 +462,10 @@ class JpegData {
           appData[4] == 0x65 &&
           appData[5] == 0) {
         adobe = JpegAdobe();
-        adobe.version = appData[6];
-        adobe.flags0 = (appData[7] << 8) | appData[8];
-        adobe.flags1 = (appData[9] << 8) | appData[10];
-        adobe.transformCode = appData[11];
+        adobe!.version = appData[6];
+        adobe!.flags0 = (appData[7] << 8) | appData[8];
+        adobe!.flags1 = (appData[9] << 8) | appData[10];
+        adobe!.transformCode = appData[11];
       }
     } else {
       //print("!!!! UNHANDLED APP TAG 0x${marker.toRadixString(16)}");
@@ -494,7 +495,7 @@ class JpegData {
           tmp = block.readByte();
         }
 
-        tableData[Jpeg.dctZigZag[i]] = tmp;
+        tableData![Jpeg.dctZigZag[i]] = tmp;
       }
     }
 
@@ -509,11 +510,11 @@ class JpegData {
     }
 
     frame = JpegFrame();
-    frame.extended = (marker == Jpeg.M_SOF1);
-    frame.progressive = (marker == Jpeg.M_SOF2);
-    frame.precision = block.readByte();
-    frame.scanLines = block.readUint16();
-    frame.samplesPerLine = block.readUint16();
+    frame!.extended = (marker == Jpeg.M_SOF1);
+    frame!.progressive = (marker == Jpeg.M_SOF2);
+    frame!.precision = block.readByte();
+    frame!.scanLines = block.readUint16();
+    frame!.samplesPerLine = block.readUint16();
 
     var numComponents = block.readByte();
 
@@ -523,12 +524,12 @@ class JpegData {
       var h = (x >> 4) & 15;
       var v = x & 15;
       var qId = block.readByte();
-      frame.componentsOrder.add(componentId);
-      frame.components[componentId] =
+      frame!.componentsOrder.add(componentId);
+      frame!.components[componentId] =
           JpegComponent(h, v, quantizationTables, qId);
     }
 
-    frame.prepare();
+    frame!.prepare();
     frames.add(frame);
   }
 
@@ -576,26 +577,26 @@ class JpegData {
       throw ImageException('Invalid SOS block');
     }
 
-    final components = List<dynamic>(n);
+    final components = List<dynamic>.filled(n, null);
     for (var i = 0; i < n; i++) {
       var id = block.readByte();
       var c = block.readByte();
 
-      if (!frame.components.containsKey(id)) {
+      if (!frame!.components.containsKey(id)) {
         throw ImageException('Invalid Component in SOS block');
       }
 
-      var component = frame.components[id];
+      var component = frame!.components[id];
       components[i] = component;
 
       var dc_tbl_no = (c >> 4) & 15;
       var ac_tbl_no = c & 15;
 
       if (dc_tbl_no < huffmanTablesDC.length) {
-        component.huffmanTableDC = huffmanTablesDC[dc_tbl_no] as List;
+        component!.huffmanTableDC = huffmanTablesDC[dc_tbl_no] as List?;
       }
       if (ac_tbl_no < huffmanTablesAC.length) {
-        component.huffmanTableAC = huffmanTablesAC[ac_tbl_no] as List;
+        component!.huffmanTableAC = huffmanTablesAC[ac_tbl_no] as List?;
       }
     }
 
@@ -606,12 +607,12 @@ class JpegData {
     var Ah = (successiveApproximation >> 4) & 15;
     var Al = successiveApproximation & 15;
 
-    JpegScan(input, frame, components, resetInterval, spectralStart,
+    JpegScan(input, frame!, components, resetInterval, spectralStart,
             spectralEnd, Ah, Al)
         .decode();
   }
 
-  List _buildHuffmanTable(Uint8List codeLengths, Uint8List values) {
+  List? _buildHuffmanTable(Uint8List codeLengths, Uint8List values) {
     var k = 0;
     final code = <dynamic>[];
     var length = 16;
@@ -661,17 +662,17 @@ class JpegData {
       }
     }
 
-    return code[0].children as List;
+    return code[0].children as List?;
   }
 
-  List<Uint8List> _buildComponentData(
-      JpegFrame frame, JpegComponent component) {
+  List<Uint8List?> _buildComponentData(
+      JpegFrame? frame, JpegComponent component) {
     final blocksPerLine = component.blocksPerLine;
     final blocksPerColumn = component.blocksPerColumn;
     var samplesPerLine = (blocksPerLine << 3);
     var R = Int32List(64);
     var r = Uint8List(64);
-    var lines = List<Uint8List>(blocksPerColumn * 8);
+    var lines = List<Uint8List?>.filled(blocksPerColumn * 8, null);
 
     var l = 0;
     for (var blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
@@ -681,7 +682,7 @@ class JpegData {
       }
 
       for (var blockCol = 0; blockCol < blocksPerLine; blockCol++) {
-        quantizeAndInverse(component.quantizationTable,
+        quantizeAndInverse(component.quantizationTable!,
             component.blocks[blockRow][blockCol] as Int32List, r, R);
 
         var offset = 0;
@@ -689,7 +690,7 @@ class JpegData {
         for (var j = 0; j < 8; j++) {
           var line = lines[scanLine + j];
           for (var i = 0; i < 8; i++) {
-            line[sample + i] = r[offset++];
+            line![sample + i] = r[offset++];
           }
         }
       }

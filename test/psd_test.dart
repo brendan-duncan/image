@@ -1,14 +1,17 @@
+
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
+
+import 'paths.dart';
 
 void main() {
   var dir = Directory('test/res/psd');
   var files = dir.listSync();
 
   group('PSD', () {
-    for (var f in files) {
-      if (f is! File || !f.path.endsWith('.psd')) {
+    for (var f in files.whereType<File>()) {
+      if (!f.path.endsWith('.psd')) {
         continue;
       }
 
@@ -16,11 +19,11 @@ void main() {
       test(name, () {
         print('Decoding $name');
 
-        var psd = PsdDecoder().decodeImage((f as File).readAsBytesSync());
+        var psd = PsdDecoder().decodeImage(f.readAsBytesSync());
 
         if (psd != null) {
           var outPng = PngEncoder().encodeImage(psd);
-          File('.dart_tool/out/psd/$name.png')
+          File('$tmpPath/out/psd/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(outPng);
         } else {

@@ -12,21 +12,21 @@ import 'webp/webp_info.dart';
 /// Decode a WebP formatted image. This supports lossless (vp8l), lossy (vp8),
 /// lossy+alpha, and animated WebP images.
 class WebPDecoder extends Decoder {
-  InternalWebPInfo _info;
+  InternalWebPInfo? _info;
 
-  WebPDecoder([List<int> bytes]) {
+  WebPDecoder([List<int>? bytes]) {
     if (bytes != null) {
       startDecode(bytes);
     }
   }
 
-  WebPInfo get info => _info;
+  WebPInfo? get info => _info;
 
   /// Is the given file a valid WebP image?
   @override
   bool isValidFile(List<int> bytes) {
     _input = InputBuffer(bytes);
-    if (!_getHeader(_input)) {
+    if (!_getHeader(_input!)) {
       return false;
     }
     return true;
@@ -37,42 +37,42 @@ class WebPDecoder extends Decoder {
   /// You should have prepared the decoder by either passing the file bytes
   /// to the constructor, or calling getInfo.
   @override
-  int numFrames() => (_info != null) ? _info.numFrames : 0;
+  int numFrames() => (_info != null) ? _info!.numFrames : 0;
 
   /// Validate the file is a WebP image and get information about it.
   /// If the file is not a valid WebP image, null is returned.
   @override
-  WebPInfo startDecode(List<int> bytes) {
+  WebPInfo? startDecode(List<int> bytes) {
     _input = InputBuffer(bytes);
 
-    if (!_getHeader(_input)) {
+    if (!_getHeader(_input!)) {
       return null;
     }
 
     _info = InternalWebPInfo();
-    if (!_getInfo(_input, _info)) {
+    if (!_getInfo(_input!, _info)) {
       return null;
     }
 
-    switch (_info.format) {
+    switch (_info!.format) {
       case WebPInfo.FORMAT_ANIMATED:
-        _info.numFrames = _info.frames.length;
+        _info!.numFrames = _info!.frames.length;
         return _info;
       case WebPInfo.FORMAT_LOSSLESS:
-        _input.offset = _info.vp8Position;
-        final vp8l = VP8L(_input, _info);
+        _input!.offset = _info!.vp8Position;
+        final vp8l = VP8L(_input!, _info!);
         if (!vp8l.decodeHeader()) {
           return null;
         }
-        _info.numFrames = _info.frames.length;
+        _info!.numFrames = _info!.frames.length;
         return _info;
       case WebPInfo.FORMAT_LOSSY:
-        _input.offset = _info.vp8Position;
-        final vp8 = VP8(_input, _info);
+        _input!.offset = _info!.vp8Position;
+        final vp8 = VP8(_input!, _info!);
         if (!vp8.decodeHeader()) {
           return null;
         }
-        _info.numFrames = _info.frames.length;
+        _info!.numFrames = _info!.frames.length;
         return _info;
     }
 
@@ -80,28 +80,28 @@ class WebPDecoder extends Decoder {
   }
 
   @override
-  Image decodeFrame(int frame) {
+  Image? decodeFrame(int frame) {
     if (_input == null || _info == null) {
       return null;
     }
 
-    if (_info.hasAnimation) {
-      if (frame >= _info.frames.length || frame < 0) {
+    if (_info!.hasAnimation) {
+      if (frame >= _info!.frames.length || frame < 0) {
         return null;
       }
 
-      final f = _info.frames[frame] as InternalWebPFrame;
-      final frameData = _input.subset(f.frameSize, position: f.framePosition);
+      final f = _info!.frames[frame] as InternalWebPFrame;
+      final frameData = _input!.subset(f.frameSize, position: f.framePosition);
 
       return _decodeFrame(frameData, frame: frame);
     }
 
-    if (_info.format == WebPInfo.FORMAT_LOSSLESS) {
-      final data = _input.subset(_info.vp8Size, position: _info.vp8Position);
-      return VP8L(data, _info).decode();
-    } else if (_info.format == WebPInfo.FORMAT_LOSSY) {
-      final data = _input.subset(_info.vp8Size, position: _info.vp8Position);
-      return VP8(data, _info).decode();
+    if (_info!.format == WebPInfo.FORMAT_LOSSLESS) {
+      final data = _input!.subset(_info!.vp8Size, position: _info!.vp8Position);
+      return VP8L(data, _info!).decode();
+    } else if (_info!.format == WebPInfo.FORMAT_LOSSY) {
+      final data = _input!.subset(_info!.vp8Size, position: _info!.vp8Position);
+      return VP8(data, _info!).decode();
     }
 
     return null;
@@ -112,50 +112,42 @@ class WebPDecoder extends Decoder {
   /// If the webp file stores animated frames, only the first image will
   /// be returned. Use [decodeAnimation] to decode the full animation.
   @override
-  Image decodeImage(List<int> bytes, {int frame = 0}) {
+  Image? decodeImage(List<int> bytes, {int frame = 0}) {
     startDecode(bytes);
-    _info.frame = 0;
-    _info.numFrames = 1;
+    _info!.frame = 0;
+    _info!.numFrames = 1;
     return decodeFrame(frame);
   }
 
   /// Decode all of the frames of an animated webp. For single image webps,
   /// this will return an animation with a single frame.
   @override
-  Animation decodeAnimation(List<int> bytes) {
+  Animation? decodeAnimation(List<int> bytes) {
     if (startDecode(bytes) == null) {
       return null;
     }
 
     final anim = Animation();
-    anim.width = _info.width;
-    anim.height = _info.height;
-    anim.loopCount = _info.animLoopCount;
+    anim.width = _info!.width;
+    anim.height = _info!.height;
+    anim.loopCount = _info!.animLoopCount;
 
-    if (_info.hasAnimation) {
-      var lastImage = Image(_info.width, _info.height);
-      for (var i = 0; i < _info.numFrames; ++i) {
-        _info.frame = i;
-        if (lastImage == null) {
-          lastImage = Image(_info.width, _info.height);
-        } else {
-          lastImage = Image.from(lastImage);
-        }
+    if (_info!.hasAnimation) {
+      var lastImage = Image(_info!.width, _info!.height);
+      for (var i = 0; i < _info!.numFrames; ++i) {
+        _info!.frame = i;
+        lastImage = Image.from(lastImage);
 
-        final frame = _info.frames[i];
+        final frame = _info!.frames[i];
         final image = decodeFrame(i);
         if (image == null) {
           return null;
         }
 
-        if (lastImage != null) {
-          if (frame.clearFrame) {
-            lastImage.fill(0);
-          }
-          copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
-        } else {
-          lastImage = image;
+        if (frame.clearFrame) {
+          lastImage.fill(0);
         }
+        copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
 
         lastImage.duration = frame.duration;
         anim.addFrame(lastImage);
@@ -172,7 +164,7 @@ class WebPDecoder extends Decoder {
     return anim;
   }
 
-  Image _decodeFrame(InputBuffer input, {int frame = 0}) {
+  Image? _decodeFrame(InputBuffer input, {int frame = 0}) {
     final webp = InternalWebPInfo();
     if (!_getInfo(input, webp)) {
       return null;
@@ -182,8 +174,8 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
-    webp.frame = _info.frame;
-    webp.numFrames = _info.numFrames;
+    webp.frame = _info!.frame;
+    webp.numFrames = _info!.numFrames;
 
     if (webp.hasAnimation) {
       if (frame >= webp.frames.length || frame < 0) {
@@ -222,7 +214,7 @@ class WebPDecoder extends Decoder {
     return true;
   }
 
-  bool _getInfo(InputBuffer input, InternalWebPInfo webp) {
+  bool _getInfo(InputBuffer input, InternalWebPInfo? webp) {
     var found = false;
     while (!input.isEOS && !found) {
       final tag = input.readString(4);
@@ -238,26 +230,26 @@ class WebPDecoder extends Decoder {
           }
           break;
         case 'VP8 ':
-          webp.vp8Position = input.position;
+          webp!.vp8Position = input.position;
           webp.vp8Size = size;
           webp.format = WebPInfo.FORMAT_LOSSY;
           found = true;
           break;
         case 'VP8L':
-          webp.vp8Position = input.position;
+          webp!.vp8Position = input.position;
           webp.vp8Size = size;
           webp.format = WebPInfo.FORMAT_LOSSLESS;
           found = true;
           break;
         case 'ALPH':
-          webp.alphaData =
+          webp!.alphaData =
               InputBuffer(input.buffer, bigEndian: input.bigEndian);
-          webp.alphaData.offset = input.offset;
+          webp.alphaData!.offset = input.offset;
           webp.alphaSize = size;
           input.skip(diskSize);
           break;
         case 'ANIM':
-          webp.format = WebPInfo.FORMAT_ANIMATED;
+          webp!.format = WebPInfo.FORMAT_ANIMATED;
           if (!_getAnimInfo(input, webp)) {
             return false;
           }
@@ -268,13 +260,13 @@ class WebPDecoder extends Decoder {
           }
           break;
         case 'ICCP':
-          webp.iccp = input.readString(size);
+          webp!.iccp = input.readString(size);
           break;
         case 'EXIF':
-          webp.exif = input.readString(size);
+          webp!.exif = input.readString(size);
           break;
         case 'XMP ':
-          webp.xmp = input.readString(size);
+          webp!.xmp = input.readString(size);
           break;
         default:
           print('UNKNOWN WEBP TAG: $tag');
@@ -290,14 +282,14 @@ class WebPDecoder extends Decoder {
 
     /// The alpha flag might not have been set, but it does in fact have alpha
     /// if there is an ALPH chunk.
-    if (!webp.hasAlpha) {
+    if (!webp!.hasAlpha) {
       webp.hasAlpha = webp.alphaData != null;
     }
 
     return webp.format != 0;
   }
 
-  bool _getVp8xInfo(InputBuffer input, WebPInfo webp) {
+  bool _getVp8xInfo(InputBuffer input, WebPInfo? webp) {
     final b = input.readByte();
     if ((b & 0xc0) != 0) {
       return false;
@@ -318,7 +310,7 @@ class WebPDecoder extends Decoder {
     final w = input.readUint24() + 1;
     final h = input.readUint24() + 1;
 
-    webp.width = w;
+    webp!.width = w;
     webp.height = h;
     webp.hasAnimation = a != 0;
     webp.hasAlpha = alpha != 0;
@@ -339,14 +331,14 @@ class WebPDecoder extends Decoder {
     return true;
   }
 
-  bool _getAnimFrameInfo(InputBuffer input, WebPInfo webp, int size) {
+  bool _getAnimFrameInfo(InputBuffer input, WebPInfo? webp, int size) {
     final frame = InternalWebPFrame(input, size);
     if (!frame.isValid) {
       return false;
     }
-    webp.frames.add(frame);
+    webp!.frames.add(frame);
     return true;
   }
 
-  InputBuffer _input;
+  InputBuffer? _input;
 }

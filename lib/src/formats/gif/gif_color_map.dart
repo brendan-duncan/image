@@ -5,14 +5,13 @@ import '../../color.dart';
 class GifColorMap {
   int bitsPerPixel;
   int numColors;
-  int transparent;
+  int? transparent;
   final Uint8List colors;
 
   GifColorMap(int numColors)
       : numColors = numColors,
-        colors = Uint8List(numColors * 3) {
-    bitsPerPixel = _bitSize(numColors);
-  }
+        colors = Uint8List(numColors * 3),
+        bitsPerPixel = _bitSize(numColors);
 
   int operator [](int index) => colors[index];
 
@@ -39,7 +38,7 @@ class GifColorMap {
 
   int alpha(int color) => (color == transparent) ? 0 : 255;
 
-  int _bitSize(int n) {
+  static int _bitSize(int n) {
     for (var i = 1; i <= 8; i++) {
       if ((1 << i) >= n) {
         return i;

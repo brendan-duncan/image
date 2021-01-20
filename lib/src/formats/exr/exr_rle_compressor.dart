@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 import '../../image_exception.dart';
@@ -7,41 +8,41 @@ import 'exr_compressor.dart';
 import 'exr_part.dart';
 
 abstract class ExrRleCompressor extends ExrCompressor {
-  factory ExrRleCompressor(ExrPart header, int maxScanLineSize) =
+  factory ExrRleCompressor(ExrPart header, int? maxScanLineSize) =
       InternalExrRleCompressor;
 }
 
 class InternalExrRleCompressor extends InternalExrCompressor
     implements ExrRleCompressor {
-  InternalExrRleCompressor(ExrPart header, int maxScanLineSize)
+  InternalExrRleCompressor(ExrPart header, int? maxScanLineSize)
       : super(header as InternalExrPart);
 
   @override
   int numScanLines() => 1;
 
   @override
-  Uint8List compress(InputBuffer inPtr, int x, int y, [int width, int height]) {
+  Uint8List compress(InputBuffer inPtr, int x, int y, [int? width, int? height]) {
     throw ImageException('Rle compression not yet supported.');
   }
 
   @override
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
-      [int width, int height]) {
+      [int? width, int? height]) {
     var out = OutputBuffer(size: inPtr.length * 2);
 
     width ??= header.width;
     height ??= header.linesInBuffer;
 
     var minX = x;
-    var maxX = x + width - 1;
+    var maxX = x + width! - 1;
     var minY = y;
-    var maxY = y + height - 1;
+    var maxY = y + height! - 1;
 
-    if (maxX > header.width) {
-      maxX = header.width - 1;
+    if (maxX > header.width!) {
+      maxX = header.width! - 1;
     }
-    if (maxY > header.height) {
-      maxY = header.height - 1;
+    if (maxY > header.height!) {
+      maxY = header.height! - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;
@@ -70,7 +71,7 @@ class InternalExrRleCompressor extends InternalExrCompressor
     }
 
     // Reorder the pixel data
-    if (_outCache == null || _outCache.length != data.length) {
+    if (_outCache == null || _outCache!.length != data.length) {
       _outCache = Uint8List(data.length);
     }
 
@@ -81,19 +82,19 @@ class InternalExrRleCompressor extends InternalExrCompressor
 
     while (true) {
       if (si < len) {
-        _outCache[si++] = data[t1++];
+        _outCache![si++] = data[t1++];
       } else {
         break;
       }
       if (si < len) {
-        _outCache[si++] = data[t2++];
+        _outCache![si++] = data[t2++];
       } else {
         break;
       }
     }
 
-    return _outCache;
+    return _outCache!;
   }
 
-  Uint8List _outCache;
+  Uint8List? _outCache;
 }

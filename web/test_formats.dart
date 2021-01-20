@@ -1,3 +1,4 @@
+
 import 'dart:html';
 import 'dart:async';
 import 'dart:html' as prefix0;
@@ -12,7 +13,7 @@ void main() {
   // directory. It's removed after we get the path since we'll be populating
   // the page with our own decoded images.
   var img = querySelectorAll('img')[0] as prefix0.ImageElement;
-  var path = img.src.substring(0, img.src.lastIndexOf('/'));
+  var path = img.src!.substring(0, img.src!.lastIndexOf('/'));
   img.remove();
 
   // The list of images we'll be decoding, representing a wide range
@@ -40,12 +41,12 @@ void main() {
         List<int> bytes = Uint8List.view(req.response as ByteBuffer);
 
         var label = DivElement();
-        document.body.append(label);
+        document.body!.append(label);
         label.text = name;
 
         // Create a canvas to put our decoded image into.
         var c = CanvasElement();
-        document.body.append(c);
+        document.body!.append(c);
 
         // Find the best decoder for the image.
         var decoder = findDecoderForData(bytes);

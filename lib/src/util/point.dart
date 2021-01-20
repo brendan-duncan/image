@@ -1,4 +1,5 @@
 /// 2-dimensional point
+
 class Point {
   num x;
   num y;

@@ -35,10 +35,10 @@ enum FrameType {
 /// into, and if the canvas should be cleared prior to drawing the frame.
 class Animation extends IterableBase<Image> {
   /// The canvas width for containing the animation.
-  int width;
+  int width = 0;
 
   /// The canvas height for containing the animation.
-  int height;
+  int height = 0;
 
   /// The suggested background color to clear the canvas with.
   int backgroundColor = 0xffffffff;

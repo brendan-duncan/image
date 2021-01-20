@@ -51,9 +51,9 @@ class JpegEncoder extends Encoder {
     _writeSOS(fp);
 
     // Encode 8x8 macroblocks
-    var DCY = 0;
-    var DCU = 0;
-    var DCV = 0;
+    int? DCY = 0;
+    int? DCU = 0;
+    int? DCV = 0;
 
     _resetBits();
 
@@ -109,9 +109,9 @@ class JpegEncoder extends Encoder {
               128.0;
         }
 
-        DCY = _processDU(fp, YDU, fdtbl_Y, DCY, YDC_HT, YAC_HT);
-        DCU = _processDU(fp, UDU, fdtbl_UV, DCU, UVDC_HT, UVAC_HT);
-        DCV = _processDU(fp, VDU, fdtbl_UV, DCV, UVDC_HT, UVAC_HT);
+        DCY = _processDU(fp, YDU, fdtbl_Y, DCY!, YDC_HT, YAC_HT);
+        DCU = _processDU(fp, UDU, fdtbl_UV, DCU!, UVDC_HT, UVAC_HT);
+        DCV = _processDU(fp, VDU, fdtbl_UV, DCV!, UVDC_HT, UVAC_HT);
 
         x += 32;
       }
@@ -314,10 +314,10 @@ class JpegEncoder extends Encoder {
     }
   }
 
-  List<List<int>> _computeHuffmanTbl(List<int> nrcodes, List<int> std_table) {
+  List<List<int>?> _computeHuffmanTbl(List<int> nrcodes, List<int> std_table) {
     var codevalue = 0;
     var pos_in_table = 0;
-    var HT = [<int>[]];
+    var HT = <List<int>?>[<int>[]];
     for (var k = 1; k <= 16; k++) {
       for (var j = 1; j <= nrcodes[k]; j++) {
         var index = std_table[pos_in_table];
@@ -377,7 +377,7 @@ class JpegEncoder extends Encoder {
   }
 
   // DCT & quantization core
-  List<int> _fDCTQuant(List<double> data, List<double> fdtbl) {
+  List<int?> _fDCTQuant(List<double> data, List<double> fdtbl) {
     // Pass 1: process rows.
     var dataOff = 0;
     const I8 = 8;
@@ -526,7 +526,7 @@ class JpegEncoder extends Encoder {
       return;
     }
 
-    for (var rawData in exif.rawData) {
+    for (var rawData in exif.rawData!) {
       _writeMarker(out, Jpeg.M_APP1);
       out.writeUint16(rawData.length + 2);
       out.writeBytes(rawData);
@@ -616,8 +616,8 @@ class JpegEncoder extends Encoder {
     out.writeByte(0); // Bf
   }
 
-  int _processDU(OutputBuffer out, List<double> CDU, List<double> fdtbl, int DC,
-      List<List<int>> HTDC, List<List<int>> HTAC) {
+  int? _processDU(OutputBuffer out, List<double> CDU, List<double> fdtbl,
+      int DC, List<List<int>?>? HTDC, List<List<int>?> HTAC) {
     var EOB = HTAC[0x00];
     var M16zeroes = HTAC[0xF0];
     int pos;
@@ -631,15 +631,15 @@ class JpegEncoder extends Encoder {
       DU[ZIGZAG[j]] = DU_DCT[j];
     }
 
-    var Diff = DU[0] - DC;
-    DC = DU[0];
+    var Diff = DU[0]! - DC;
+    DC = DU[0]!;
     // Encode DC
     if (Diff == 0) {
-      _writeBits(out, HTDC[0]); // Diff might be 0
+      _writeBits(out, HTDC![0]!); // Diff might be 0
     } else {
       pos = 32767 + Diff;
-      _writeBits(out, HTDC[category[pos]]);
-      _writeBits(out, bitcode[pos]);
+      _writeBits(out, HTDC![category[pos]!]!);
+      _writeBits(out, bitcode[pos]!);
     }
 
     // Encode ACs
@@ -648,7 +648,7 @@ class JpegEncoder extends Encoder {
     ;
     //end0pos = first element in reverse order !=0
     if (end0pos == 0) {
-      _writeBits(out, EOB);
+      _writeBits(out, EOB!);
       return DC;
     }
 
@@ -662,18 +662,18 @@ class JpegEncoder extends Encoder {
       if (nrzeroes >= I16) {
         lng = nrzeroes >> 4;
         for (var nrmarker = 1; nrmarker <= lng; ++nrmarker) {
-          _writeBits(out, M16zeroes);
+          _writeBits(out, M16zeroes!);
         }
         nrzeroes = nrzeroes & 0xF;
       }
-      pos = 32767 + DU[i];
-      _writeBits(out, HTAC[(nrzeroes << 4) + category[pos]]);
-      _writeBits(out, bitcode[pos]);
+      pos = 32767 + DU[i]!;
+      _writeBits(out, HTAC[(nrzeroes << 4) + category[pos]!]!);
+      _writeBits(out, bitcode[pos]!);
       i++;
     }
 
     if (end0pos != I63) {
-      _writeBits(out, EOB);
+      _writeBits(out, EOB!);
     }
 
     return DC;
@@ -710,21 +710,21 @@ class JpegEncoder extends Encoder {
   final UVTable = Uint8List(64);
   final fdtbl_Y = Float32List(64);
   final fdtbl_UV = Float32List(64);
-  List<List<int>> YDC_HT;
-  List<List<int>> UVDC_HT;
-  List<List<int>> YAC_HT;
-  List<List<int>> UVAC_HT;
+  List<List<int>?>? YDC_HT;
+  List<List<int>?>? UVDC_HT;
+  late List<List<int>?> YAC_HT;
+  late List<List<int>?> UVAC_HT;
 
-  final bitcode = List<List<int>>(65535);
-  final category = List<int>(65535);
-  final outputfDCTQuant = List<int>(64);
-  final DU = List<int>(64);
+  final bitcode = List<List<int>?>.filled(65535, null);
+  final category = List<int?>.filled(65535, null);
+  final outputfDCTQuant = List<int?>.filled(64, null);
+  final DU = List<int?>.filled(64, null);
 
   final Float32List YDU = Float32List(64);
   final Float32List UDU = Float32List(64);
   final Float32List VDU = Float32List(64);
   final Int32List RGB_YUV_TABLE = Int32List(2048);
-  int currentQuality;
+  int? currentQuality;
 
   static const List<int> ZIGZAG = [
     0,

@@ -1,3 +1,4 @@
+
 import '../../internal/internal.dart';
 import '../../util/input_buffer.dart';
 import '../decode_info.dart';
@@ -41,7 +42,7 @@ class WebPInfo extends DecodeInfo {
   int _frame = 0;
   int _numFrames = 0;
 
-  InputBuffer _alphaData;
+  InputBuffer? _alphaData;
   int _alphaSize = 0;
   int _vp8Position = 0;
   int _vp8Size = 0;
@@ -56,8 +57,8 @@ class InternalWebPInfo extends WebPInfo {
   int get numFrames => _numFrames;
   set numFrames(int value) => _numFrames = value;
 
-  InputBuffer get alphaData => _alphaData;
-  set alphaData(InputBuffer buffer) => _alphaData = buffer;
+  InputBuffer? get alphaData => _alphaData;
+  set alphaData(InputBuffer? buffer) => _alphaData = buffer;
 
   int get alphaSize => _alphaSize;
   set alphaSize(int value) => _alphaSize = value;

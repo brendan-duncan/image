@@ -3,15 +3,15 @@ import 'dart:typed_data';
 import '../image.dart';
 import '../internal/clamp.dart';
 
-num _lastContrast;
-Uint8List _contrast;
+num? _lastContrast;
+late Uint8List _contrast;
 
 /// Set the [contrast] level for the image [src].
 ///
 /// [contrast] values below 100 will decrees the contrast of the image,
 /// and values above 100 will increase the contrast. A contrast of of 100
 /// will have no affect.
-Image contrast(Image src, num contrast) {
+Image? contrast(Image? src, num contrast) {
   if (src == null || contrast == 100.0) {
     return src;
   }

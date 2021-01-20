@@ -1,3 +1,4 @@
+
 import '../animation.dart';
 import '../image.dart';
 
@@ -11,7 +12,7 @@ abstract class Encoder {
 
   /// Encode an animation. Not all formats support animation, and null
   /// will be returned if not.
-  List<int> encodeAnimation(Animation anim) {
+  List<int>? encodeAnimation(Animation anim) {
     return null;
   }
 }

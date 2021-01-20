@@ -1,3 +1,4 @@
+
 class BitUtility {
   static bool isPowerOf2(int x) => (x & (x - 1)) == 0;
 

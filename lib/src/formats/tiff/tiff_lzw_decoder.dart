@@ -39,7 +39,7 @@ class LzwDecoder {
         _out[_outPointer++] = code;
         oldCode = code;
       } else {
-        if (code < _tableIndex) {
+        if (code < _tableIndex!) {
           _getString(code);
           for (var i = _bufferLength - 1; i >= 0; --i) {
             _out[_outPointer++] = _buffer[i];
@@ -64,9 +64,9 @@ class LzwDecoder {
   }
 
   void _addString(int string, int newString) {
-    _table[_tableIndex] = newString;
-    _prefix[_tableIndex] = string;
-    _tableIndex++;
+    _table[_tableIndex!] = newString;
+    _prefix[_tableIndex!] = string;
+    _tableIndex = _tableIndex! + 1;
 
     if (_tableIndex == 511) {
       _bitsToGet = 10;
@@ -128,17 +128,17 @@ class LzwDecoder {
   //int _bitPointer = 0;
   int _nextData = 0;
   int _nextBits = 0;
-  Uint8List _data;
-  int _dataLength;
+  late Uint8List _data;
+  late int _dataLength;
 
-  List<int> _out;
-  int _outPointer;
+  late List<int> _out;
+  late int _outPointer;
 
   final _buffer = Uint8List(4096);
-  Uint8List _table;
-  Uint32List _prefix;
-  int _tableIndex;
-  int _bufferLength;
+  late Uint8List _table;
+  late Uint32List _prefix;
+  int? _tableIndex;
+  late int _bufferLength;
 
   static const LZ_MAX_CODE = 4095;
   static const NO_SUCH_CODE = 4098;

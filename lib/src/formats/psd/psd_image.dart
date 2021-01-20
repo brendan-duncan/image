@@ -22,14 +22,14 @@ class PsdImage extends DecodeInfo {
   static const COLORMODE_DUOTONE = 8;
   static const COLORMODE_LAB = 9;
 
-  int signature;
-  int version;
-  int channels;
-  int depth;
-  int colorMode;
-  List<PsdLayer> layers;
-  List<PsdChannel> mergeImageChannels;
-  Image mergedImage;
+  int? signature;
+  int? version;
+  late int channels;
+  int? depth;
+  int? colorMode;
+  late List<PsdLayer> layers;
+  late List<PsdChannel> mergeImageChannels;
+  Image? mergedImage;
   final imageResources = <int, PsdImageResource>{};
   bool hasAlpha = false;
 
@@ -41,16 +41,16 @@ class PsdImage extends DecodeInfo {
       return;
     }
 
-    var len = _input.readUint32();
-    /*_colorData =*/ _input.readBytes(len);
+    var len = _input!.readUint32();
+    /*_colorData =*/ _input!.readBytes(len);
 
-    len = _input.readUint32();
-    _imageResourceData = _input.readBytes(len);
+    len = _input!.readUint32();
+    _imageResourceData = _input!.readBytes(len);
 
-    len = _input.readUint32();
-    _layerAndMaskData = _input.readBytes(len);
+    len = _input!.readUint32();
+    _layerAndMaskData = _input!.readBytes(len);
 
-    _imageData = _input.readBytes(_input.length);
+    _imageData = _input!.readBytes(_input!.length);
   }
 
   bool get isValid => signature == SIGNATURE;
@@ -88,7 +88,7 @@ class PsdImage extends DecodeInfo {
     return true;
   }
 
-  Image decodeImage() {
+  Image? decodeImage() {
     if (!decode()) {
       return null;
     }
@@ -98,13 +98,13 @@ class PsdImage extends DecodeInfo {
 
   Image renderImage() {
     if (mergedImage != null) {
-      return mergedImage;
+      return mergedImage!;
     }
 
     mergedImage = Image(width, height);
-    mergedImage.fill(0);
+    mergedImage!.fill(0);
 
-    var pixels = mergedImage.getBytes();
+    var pixels = mergedImage!.getBytes();
 
     for (var li = 0; li < layers.length; ++li) {
       var layer = layers[li];
@@ -118,15 +118,15 @@ class PsdImage extends DecodeInfo {
       //int ns = depth == 16 ? 2 : 1;
       var srcP = layer.layerImage.getBytes();
 
-      for (var y = 0, sy = layer.top, si = 0; y < layer.height; ++y, ++sy) {
-        var di = (layer.top + y) * width * 4 + layer.left * 4;
-        for (var x = 0, sx = layer.left; x < layer.width; ++x, ++sx) {
+      for (var y = 0, sy = layer.top!, si = 0; y < layer.height; ++y, ++sy) {
+        var di = (layer.top! + y) * width * 4 + layer.left! * 4;
+        for (int? x = 0, sx = layer.left; x! < layer.width; ++x, ++sx) {
           var br = srcP[si++];
           var bg = srcP[si++];
           var bb = srcP[si++];
           var ba = srcP[si++];
 
-          if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
+          if (sx! >= 0 && sx < width && sy >= 0 && sy < height) {
             var ar = pixels[di];
             var ag = pixels[di + 1];
             var ab = pixels[di + 2];
@@ -141,11 +141,11 @@ class PsdImage extends DecodeInfo {
       }
     }
 
-    return mergedImage;
+    return mergedImage!;
   }
 
   void _blend(int ar, int ag, int ab, int aa, int br, int bg, int bb, int ba,
-      int blendMode, double opacity, Uint8List pixels, int di) {
+      int? blendMode, double opacity, Uint8List pixels, int di) {
     var r = br;
     var g = bg;
     var b = bb;
@@ -385,8 +385,8 @@ class PsdImage extends DecodeInfo {
   }
 
   void _readHeader() {
-    signature = _input.readUint32();
-    version = _input.readUint16();
+    signature = _input!.readUint32();
+    version = _input!.readUint16();
 
     // version should be 1 (2 for PSB files).
     if (version != 1) {
@@ -395,7 +395,7 @@ class PsdImage extends DecodeInfo {
     }
 
     // padding should be all 0's
-    var padding = _input.readBytes(6);
+    var padding = _input!.readBytes(6);
     for (var i = 0; i < 6; ++i) {
       if (padding[i] != 0) {
         signature = 0;
@@ -403,11 +403,11 @@ class PsdImage extends DecodeInfo {
       }
     }
 
-    channels = _input.readUint16();
-    height = _input.readUint32();
-    width = _input.readUint32();
-    depth = _input.readUint16();
-    colorMode = _input.readUint16();
+    channels = _input!.readUint16();
+    height = _input!.readUint32();
+    width = _input!.readUint32();
+    depth = _input!.readUint16();
+    colorMode = _input!.readUint16();
   }
 
   void _readColorModeData() {
@@ -415,23 +415,23 @@ class PsdImage extends DecodeInfo {
   }
 
   void _readImageResources() {
-    _imageResourceData.rewind();
-    while (!_imageResourceData.isEOS) {
-      var blockSignature = _imageResourceData.readUint32();
-      var blockId = _imageResourceData.readUint16();
+    _imageResourceData!.rewind();
+    while (!_imageResourceData!.isEOS) {
+      var blockSignature = _imageResourceData!.readUint32();
+      var blockId = _imageResourceData!.readUint16();
 
-      var len = _imageResourceData.readByte();
-      var blockName = _imageResourceData.readString(len);
+      var len = _imageResourceData!.readByte();
+      var blockName = _imageResourceData!.readString(len);
       // name string is padded to an even size
       if (len & 1 == 0) {
-        _imageResourceData.skip(1);
+        _imageResourceData!.skip(1);
       }
 
-      len = _imageResourceData.readUint32();
-      var blockData = _imageResourceData.readBytes(len);
+      len = _imageResourceData!.readUint32();
+      var blockData = _imageResourceData!.readBytes(len);
       // blocks are padded to an even length.
       if (len & 1 == 1) {
-        _imageResourceData.skip(1);
+        _imageResourceData!.skip(1);
       }
 
       if (blockSignature == RESOURCE_BLOCK_SIGNATURE) {
@@ -442,13 +442,13 @@ class PsdImage extends DecodeInfo {
   }
 
   void _readLayerAndMaskData() {
-    _layerAndMaskData.rewind();
-    var len = _layerAndMaskData.readUint32();
+    _layerAndMaskData!.rewind();
+    var len = _layerAndMaskData!.readUint32();
     if ((len & 1) != 0) {
       len++;
     }
 
-    var layerData = _layerAndMaskData.readBytes(len);
+    var layerData = _layerAndMaskData!.readBytes(len);
 
     layers = [];
     if (len > 0) {
@@ -472,8 +472,8 @@ class PsdImage extends DecodeInfo {
     }
 
     // Global layer mask info
-    len = _layerAndMaskData.readUint32();
-    var maskData = _layerAndMaskData.readBytes(len);
+    len = _layerAndMaskData!.readUint32();
+    var maskData = _layerAndMaskData!.readBytes(len);
     if (len > 0) {
       /*int colorSpace =*/ maskData.readUint16();
       /*int rc =*/ maskData.readUint16();
@@ -486,22 +486,22 @@ class PsdImage extends DecodeInfo {
   }
 
   void _readMergeImageData() {
-    _imageData.rewind();
-    var compression = _imageData.readUint16();
+    _imageData!.rewind();
+    var compression = _imageData!.readUint16();
 
-    Uint16List lineLengths;
+    Uint16List? lineLengths;
     if (compression == PsdChannel.COMPRESS_RLE) {
       var numLines = height * channels;
       lineLengths = Uint16List(numLines);
       for (var i = 0; i < numLines; ++i) {
-        lineLengths[i] = _imageData.readUint16();
+        lineLengths[i] = _imageData!.readUint16();
       }
     }
 
     mergeImageChannels = [];
     for (var i = 0; i < channels; ++i) {
-      mergeImageChannels.add(PsdChannel.read(_imageData, i == 3 ? -1 : i, width,
-          height, depth, compression, lineLengths, i));
+      mergeImageChannels.add(PsdChannel.read(_imageData!, i == 3 ? -1 : i,
+          width, height, depth, compression, lineLengths, i));
     }
 
     mergedImage = createImageFromChannels(
@@ -512,7 +512,7 @@ class PsdImage extends DecodeInfo {
     return ns == 1 ? data[si] : ((data[si] << 8) | data[si + 1]) >> 8;
   }
 
-  static Image createImageFromChannels(int colorMode, int bitDepth, int width,
+  static Image createImageFromChannels(int? colorMode, int? bitDepth, int width,
       int height, List<PsdChannel> channelList) {
     var output = Image(width, height);
     var pixels = output.getBytes();
@@ -542,10 +542,11 @@ class PsdImage extends DecodeInfo {
         switch (colorMode) {
           case COLORMODE_RGB:
             var xi = di;
-            pixels[di++] = _ch(channel0.data, si, ns);
-            pixels[di++] = _ch(channel1.data, si, ns);
-            pixels[di++] = _ch(channel2.data, si, ns);
-            pixels[di++] = numChannels >= 4 ? _ch(channel_1.data, si, ns) : 255;
+            pixels[di++] = _ch(channel0!.data, si, ns);
+            pixels[di++] = _ch(channel1!.data, si, ns);
+            pixels[di++] = _ch(channel2!.data, si, ns);
+            pixels[di++] =
+                numChannels >= 4 ? _ch(channel_1!.data, si, ns) : 255;
 
             var r = pixels[xi];
             var g = pixels[xi + 1];
@@ -561,10 +562,10 @@ class PsdImage extends DecodeInfo {
             }
             break;
           case COLORMODE_LAB:
-            var L = _ch(channel0.data, si, ns) * 100 >> 8;
-            var a = _ch(channel1.data, si, ns) - 128;
-            var b = _ch(channel2.data, si, ns) - 128;
-            var alpha = numChannels >= 4 ? _ch(channel_1.data, si, ns) : 255;
+            var L = _ch(channel0!.data, si, ns) * 100 >> 8;
+            var a = _ch(channel1!.data, si, ns) - 128;
+            var b = _ch(channel2!.data, si, ns) - 128;
+            var alpha = numChannels >= 4 ? _ch(channel_1!.data, si, ns) : 255;
             var rgb = labToRgb(L, a, b);
             pixels[di++] = rgb[0];
             pixels[di++] = rgb[1];
@@ -572,19 +573,19 @@ class PsdImage extends DecodeInfo {
             pixels[di++] = alpha;
             break;
           case COLORMODE_GRAYSCALE:
-            var gray = _ch(channel0.data, si, ns);
-            var alpha = numChannels >= 2 ? _ch(channel_1.data, si, ns) : 255;
+            var gray = _ch(channel0!.data, si, ns);
+            var alpha = numChannels >= 2 ? _ch(channel_1!.data, si, ns) : 255;
             pixels[di++] = gray;
             pixels[di++] = gray;
             pixels[di++] = gray;
             pixels[di++] = alpha;
             break;
           case COLORMODE_CMYK:
-            var c = _ch(channel0.data, si, ns);
-            var m = _ch(channel1.data, si, ns);
-            var y = _ch(channel2.data, si, ns);
-            var k = _ch(channels[numChannels == 4 ? -1 : 3].data, si, ns);
-            var alpha = numChannels >= 5 ? _ch(channel_1.data, si, ns) : 255;
+            var c = _ch(channel0!.data, si, ns);
+            var m = _ch(channel1!.data, si, ns);
+            var y = _ch(channel2!.data, si, ns);
+            var k = _ch(channels[numChannels == 4 ? -1 : 3]!.data, si, ns);
+            var alpha = numChannels >= 5 ? _ch(channel_1!.data, si, ns) : 255;
             var rgb = cmykToRgb(255 - c, 255 - m, 255 - y, 255 - k);
             pixels[di++] = rgb[0];
             pixels[di++] = rgb[1];
@@ -602,9 +603,9 @@ class PsdImage extends DecodeInfo {
 
   static const RESOURCE_BLOCK_SIGNATURE = 0x3842494d; // '8BIM'
 
-  InputBuffer _input;
+  late InputBuffer? _input;
   //InputBuffer _colorData;
-  InputBuffer _imageResourceData;
-  InputBuffer _layerAndMaskData;
-  InputBuffer _imageData;
+  late InputBuffer? _imageResourceData;
+  late InputBuffer? _layerAndMaskData;
+  late InputBuffer? _imageData;
 }
