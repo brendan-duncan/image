@@ -40,23 +40,41 @@ Write Only:
 
 ## [Format Decoding Functions](https://github.com/brendan-duncan/image/wiki#format-decoding-functions)
 
-## Samples
+## Example
 
-Load an image, resize it, and save it as a png:
-
+Load an image asynchronously and resize it as a thumbnail. 
 ```dart
 import 'dart:io';
+import 'dart:isolate';
 import 'package:image/image.dart';
-void main() {
+
+class DecodeParam {
+  final File file;
+  final SendPort sendPort;
+  DecodeParam(this.file, this.sendPort);
+}
+
+void decodeIsolate(DecodeParam param) {
   // Read an image from file (webp in this case).
   // decodeImage will identify the format of the image and use the appropriate
   // decoder.
-  Image image = decodeImage(File('test.webp').readAsBytesSync());
-
+  var image = decodeImage(param.file.readAsBytesSync())!;
   // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-  Image thumbnail = copyResize(image, width: 120);
+  var thumbnail = copyResize(image, width: 120);
+  param.sendPort.send(thumbnail);
+}
 
-  // Save the thumbnail as a PNG.
-  File('thumbnail.png')..writeAsBytesSync(encodePng(thumbnail));
+// Decode and process an image file in a separate thread (isolate) to avoid
+// stalling the main UI thread.
+void main() async {
+  var receivePort = ReceivePort();
+
+  await Isolate.spawn(
+      decodeIsolate, DecodeParam(File('test.webp'), receivePort.sendPort));
+
+  // Get the processed image from the isolate.
+  var image = await receivePort.first as Image;
+
+  await File('thumbnail.png').writeAsBytes(encodePng(image));
 }
 ```
