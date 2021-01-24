@@ -1,4 +1,4 @@
-## 3.0.0 (unreleased)
+## 3.0.0-nullsafety.0
 
 - Migrate to null safety.
 
@@ -14,7 +14,7 @@
 - Added 64-bit float format to TIFF decoder.
 - Fixed issues with TiffDecoder.decodeHdrImage.
 - Added range clamping to copyCrop to avoid out-of-bound errors.
-- Variable FPS for animated GIF encoding. 
+- Variable FPS for animated GIF encoding.
 
 ## 2.1.17 - September 20, 2020
 
@@ -29,7 +29,7 @@
 - Fix Image.getBytes for cropping images
 - Fix bakeOrientation EXIF data
 - Added ICO format decoder
-- Fix JpegData.validate for unintended exceptions with non jpeg images 
+- Fix JpegData.validate for unintended exceptions with non jpeg images
 
 ## 2.1.14 - June 14, 2020
 
@@ -39,7 +39,7 @@
 
 - Improvements for JPEG EXIF decoding
 - Fix for the GIF animation decoder
-- APNG encoder time delay correctly to milliseconds 
+- APNG encoder time delay correctly to milliseconds
 
 ## 2.1.12 - January 14, 2020
 
@@ -59,7 +59,7 @@
 - Optimize use of slow typed_data methods.
 - Add drawStringCentered function
 - Add fillCircle function
-- Fix drawLine thickness for axis-aligned lines 
+- Fix drawLine thickness for axis-aligned lines
 
 ## 2.1.9 - November 15, 2019
 
@@ -87,7 +87,7 @@
 - Formatted package using `dartfmt`.
 - Fixed "Unnecessary new" and other Dart analyzer warnings.
 - Added the `samplingFactor` parameter to GIF encoding, which allows to significantly speed up
-  encoding times of GIF encoding. 
+  encoding times of GIF encoding.
 
 ## 2.1.4 - June 01, 2019
 
@@ -100,7 +100,7 @@
 ## 2.1.2 - May 25, 2019
 
 - Fix crash decoding some Jpeg images.
-- Fix infinite recursion crash with fillFlood when fill color is the same as the start pixel color. 
+- Fix infinite recursion crash with fillFlood when fill color is the same as the start pixel color.
 
 ## 2.1.1 - May 22, 2019
 

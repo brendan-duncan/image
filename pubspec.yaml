@@ -13,8 +13,12 @@ dependencies:
   meta: '>=1.1.8 <2.0.0'
 
 dev_dependencies:
-  test: 1.16.0-nullsafety.9
+  test: 1.16.0-nullsafety.16
   pedantic: '>=1.0.0 <2.0.0'
-  build_web_compilers: '>=2.0.0 <3.0.0'
+  build_web_compilers:
+    git:
+      url: https://github.com/dart-lang/build
+      path: build_web_compilers
+      ref: archive
   build_runner: '>=1.0.0 <2.0.0'
   build_test: '>=1.0.0 <2.0.0'
