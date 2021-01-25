@@ -15,10 +15,6 @@ dependencies:
 dev_dependencies:
   test: 1.16.0-nullsafety.16
   pedantic: '>=1.0.0 <2.0.0'
-  build_web_compilers:
-    git:
-      url: https://github.com/dart-lang/build
-      path: build_web_compilers
-      ref: archive
+  build_web_compilers: '>=2.16.1 <3.0.0'
   build_runner: '>=1.0.0 <2.0.0'
   build_test: '>=1.0.0 <2.0.0'
