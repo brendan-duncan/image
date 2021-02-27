@@ -28,54 +28,54 @@ Decoder? findDecoderForData(List<int> data) {
   // The various decoders will be creating a Uint8List for their InputStream
   // if the data isn't already that type, so do it once here to avoid having to
   // do it multiple times.
-  var bytes = data is Uint8List ? data : Uint8List.fromList(data);
+  final bytes = data is Uint8List ? data : Uint8List.fromList(data);
 
-  var jpg = JpegDecoder();
+  final jpg = JpegDecoder();
   if (jpg.isValidFile(bytes)) {
     return jpg;
   }
 
-  var png = PngDecoder();
+  final png = PngDecoder();
   if (png.isValidFile(bytes)) {
     return png;
   }
 
-  var gif = GifDecoder();
+  final gif = GifDecoder();
   if (gif.isValidFile(bytes)) {
     return gif;
   }
 
-  var webp = WebPDecoder();
+  final webp = WebPDecoder();
   if (webp.isValidFile(bytes)) {
     return webp;
   }
 
-  var tiff = TiffDecoder();
+  final tiff = TiffDecoder();
   if (tiff.isValidFile(bytes)) {
     return tiff;
   }
 
-  var psd = PsdDecoder();
+  final psd = PsdDecoder();
   if (psd.isValidFile(bytes)) {
     return psd;
   }
 
-  var exr = ExrDecoder();
+  final exr = ExrDecoder();
   if (exr.isValidFile(bytes)) {
     return exr;
   }
 
-  var bmp = BmpDecoder();
+  final bmp = BmpDecoder();
   if (bmp.isValidFile(bytes)) {
     return bmp;
   }
 
-  var tga = TgaDecoder();
+  final tga = TgaDecoder();
   if (tga.isValidFile(bytes)) {
     return tga;
   }
 
-  var ico = IcoDecoder();
+  final ico = IcoDecoder();
   if (ico.isValidFile(bytes)) {
     return ico;
   }
@@ -86,7 +86,7 @@ Decoder? findDecoderForData(List<int> data) {
 /// Decode the given image file bytes by first identifying the format of the
 /// file and using that decoder to decode the file into a single frame [Image].
 Image? decodeImage(List<int> data) {
-  var decoder = findDecoderForData(data);
+  final decoder = findDecoderForData(data);
   if (decoder == null) {
     return null;
   }
@@ -97,7 +97,7 @@ Image? decodeImage(List<int> data) {
 /// file and using that decoder to decode the file into an [Animation]
 /// containing one or more [Image] frames.
 Animation? decodeAnimation(List<int> data) {
-  var decoder = findDecoderForData(data);
+  final decoder = findDecoderForData(data);
   if (decoder == null) {
     return null;
   }
@@ -108,7 +108,7 @@ Animation? decodeAnimation(List<int> data) {
 /// by looking at the file extension. See also [findDecoderForData] to
 /// determine the decoder to use given the bytes of the file.
 Decoder? getDecoderForNamedImage(String name) {
-  var n = name.toLowerCase();
+  final n = name.toLowerCase();
   if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
     return JpegDecoder();
   }
@@ -146,7 +146,7 @@ Decoder? getDecoderForNamedImage(String name) {
 /// [name], and decode the given file [bytes] to an [Animation] with one or more
 /// [Image] frames. See also [decodeAnimation].
 Animation? decodeNamedAnimation(List<int> bytes, String name) {
-  var decoder = getDecoderForNamedImage(name);
+  final decoder = getDecoderForNamedImage(name);
   if (decoder == null) {
     return null;
   }
@@ -157,7 +157,7 @@ Animation? decodeNamedAnimation(List<int> bytes, String name) {
 /// [name], and decode the given file [bytes] to a single frame [Image]. See
 /// also [decodeImage].
 Image? decodeNamedImage(List<int> bytes, String name) {
-  var decoder = getDecoderForNamedImage(name);
+  final decoder = getDecoderForNamedImage(name);
   if (decoder == null) {
     return null;
   }
@@ -167,7 +167,7 @@ Image? decodeNamedImage(List<int> bytes, String name) {
 /// Identify the format of the image and encode it with the appropriate
 /// [Encoder].
 List<int>? encodeNamedImage(Image image, String name) {
-  var n = name.toLowerCase();
+  final n = name.toLowerCase();
   if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
     return encodeJpg(image);
   }

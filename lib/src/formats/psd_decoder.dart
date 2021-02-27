@@ -17,7 +17,7 @@ class PsdDecoder extends Decoder {
 
   /// Decode a raw PSD image without rendering it to a flat image.
   PsdImage? decodePsd(List<int> bytes) {
-    var psd = PsdImage(bytes);
+    final psd = PsdImage(bytes);
     if (!psd.decode()) {
       return null;
     }
@@ -42,12 +42,12 @@ class PsdDecoder extends Decoder {
       return null;
     }
 
-    var anim = Animation();
+    final anim = Animation();
     anim.width = info!.width;
     anim.height = info!.height;
     anim.frameType = FrameType.page;
     for (var i = 0, len = numFrames(); i < len; ++i) {
-      var image = decodeFrame(i);
+      final image = decodeFrame(i);
       anim.addFrame(image!);
     }
 

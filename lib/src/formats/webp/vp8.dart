@@ -18,7 +18,7 @@ class VP8 {
   WebPInfo get webp => _webp;
 
   bool decodeHeader() {
-    var bits = input.readUint24();
+    final bits = input.readUint24();
 
     final keyFrame = (bits & 1) == 0;
     if (!keyFrame) {
@@ -38,7 +38,7 @@ class VP8 {
     _frameHeader.show = (bits >> 4) & 1;
     _frameHeader.partitionLength = (bits >> 5);
 
-    var signature = input.readUint24();
+    final signature = input.readUint24();
     if (signature != VP8_SIGNATURE) {
       return false;
     }
@@ -151,7 +151,7 @@ class VP8 {
   }
 
   bool _parseFilterHeader() {
-    var hdr = _filterHeader;
+    final hdr = _filterHeader;
     hdr.simple = br.get() != 0;
     hdr.level = br.getValue(6);
     hdr.sharpness = br.getValue(3);
@@ -192,10 +192,10 @@ class VP8 {
   // If the partitions were positioned ok, VP8_STATUS_OK is returned.
   bool _parsePartitions(InputBuffer input) {
     var sz = 0;
-    var bufEnd = input.length;
+    final bufEnd = input.length;
 
     _numPartitions = 1 << br.getValue(2);
-    var lastPart = _numPartitions - 1;
+    final lastPart = _numPartitions - 1;
     var partStart = lastPart * 3;
     if (bufEnd < partStart) {
       // we can't even read the sizes with sz[]! That's a failure.
@@ -203,20 +203,20 @@ class VP8 {
     }
 
     for (var p = 0; p < lastPart; ++p) {
-      var szb = input.peekBytes(3, sz);
+      final szb = input.peekBytes(3, sz);
       final psize = szb[0] | (szb[1] << 8) | (szb[2] << 16);
       var partEnd = partStart + psize;
       if (partEnd > bufEnd) {
         partEnd = bufEnd;
       }
 
-      var pin = input.subset(partEnd - partStart, position: partStart);
+      final pin = input.subset(partEnd - partStart, position: partStart);
       _partitions[p] = VP8BitReader(pin);
       partStart = partEnd;
       sz += 3;
     }
 
-    var pin =
+    final pin =
         input.subset(bufEnd - partStart, position: input.position + partStart);
     _partitions[lastPart] = VP8BitReader(pin);
 
@@ -232,7 +232,7 @@ class VP8 {
     final dquv_dc = br.get() != 0 ? br.getSignedValue(4) : 0;
     final dquv_ac = br.get() != 0 ? br.getSignedValue(4) : 0;
 
-    var hdr = _segmentHeader;
+    final hdr = _segmentHeader;
 
     for (var i = 0; i < NUM_MB_SEGMENTS; ++i) {
       int q;
@@ -250,7 +250,7 @@ class VP8 {
         }
       }
 
-      var m = _dqm[i]!;
+      final m = _dqm[i]!;
       m.y1Mat[0] = DC_TABLE[_clip(q + dqy1_dc, 127)];
       m.y1Mat[1] = AC_TABLE[_clip(q + 0, 127)];
 
@@ -271,7 +271,7 @@ class VP8 {
   }
 
   void _parseProba() {
-    var proba = _proba;
+    final proba = _proba;
     for (var t = 0; t < NUM_TYPES; ++t) {
       for (var b = 0; b < NUM_BANDS; ++b) {
         for (var c = 0; c < NUM_CTX; ++c) {
@@ -295,7 +295,7 @@ class VP8 {
   // mode.
   void _precomputeFilterStrengths() {
     if (_filterType! > 0) {
-      var hdr = _filterHeader;
+      final hdr = _filterHeader;
       for (var s = 0; s < NUM_MB_SEGMENTS; ++s) {
         // First, compute the initial level
         int? baseLevel;
@@ -309,7 +309,7 @@ class VP8 {
         }
 
         for (var i4x4 = 0; i4x4 <= 1; ++i4x4) {
-          var info = _fStrengths[s][i4x4];
+          final info = _fStrengths[s][i4x4];
           var level = baseLevel;
           if (hdr.useLfDelta) {
             level = level! + hdr.refLfDelta[0];
@@ -453,7 +453,7 @@ class VP8 {
   bool _parseFrame() {
     for (_mbY = 0; _mbY < _brMbY!; ++_mbY) {
       // Parse bitstream for this row.
-      var tokenBr = _partitions[_mbY & (_numPartitions - 1)];
+      final tokenBr = _partitions[_mbY & (_numPartitions - 1)];
       for (; _mbX < _mbWidth!; ++_mbX) {
         if (!_decodeMB(tokenBr)) {
           return false;
@@ -461,7 +461,7 @@ class VP8 {
       }
 
       // Prepare for next scanline
-      var left = _mbInfo[0];
+      final left = _mbInfo[0];
       left.nz = 0;
       left.nzDc = 0;
       _intraL.fillRange(0, _intraL.length, B_DC_PRED);
@@ -479,18 +479,19 @@ class VP8 {
   bool _processRow() {
     _reconstructRow();
 
-    var useFilter = (_filterType! > 0) && (_mbY >= _tlMbY) && (_mbY <= _brMbY!);
+    final useFilter =
+        (_filterType! > 0) && (_mbY >= _tlMbY) && (_mbY <= _brMbY!);
     return _finishRow(useFilter);
   }
 
   void _reconstructRow() {
-    var mb_y = _mbY;
-    var y_dst = InputBuffer(_yuvBlock, offset: Y_OFF);
-    var u_dst = InputBuffer(_yuvBlock, offset: U_OFF);
-    var v_dst = InputBuffer(_yuvBlock, offset: V_OFF);
+    final mb_y = _mbY;
+    final y_dst = InputBuffer(_yuvBlock, offset: Y_OFF);
+    final u_dst = InputBuffer(_yuvBlock, offset: U_OFF);
+    final v_dst = InputBuffer(_yuvBlock, offset: V_OFF);
 
     for (var mb_x = 0; mb_x < _mbWidth!; ++mb_x) {
-      var block = _mbData[mb_x];
+      final block = _mbData[mb_x];
 
       // Rotate in the left samples from previously decoded block. We move four
       // pixels at a time for alignment reason, and because of in-loop filter.
@@ -520,8 +521,8 @@ class VP8 {
       }
 
       // bring top samples into the cache
-      var top_yuv = _yuvT[mb_x];
-      var coeffs = block.coeffs;
+      final top_yuv = _yuvT[mb_x];
+      final coeffs = block.coeffs;
       var bits = block.nonZeroY;
 
       if (mb_y > 0) {
@@ -539,8 +540,8 @@ class VP8 {
       // predict and add residuals
       if (block.isIntra4x4) {
         // 4x4
-        var topRight = InputBuffer.from(y_dst, offset: -BPS + 16);
-        var topRight32 = topRight.toUint32List();
+        final topRight = InputBuffer.from(y_dst, offset: -BPS + 16);
+        final topRight32 = topRight.toUint32List();
 
         if (mb_y > 0) {
           if (mb_x >= _mbWidth! - 1) {
@@ -552,14 +553,14 @@ class VP8 {
         }
 
         // replicate the top-right pixels below
-        var p = topRight32[0];
+        final p = topRight32[0];
         topRight32[3 * BPS] = p;
         topRight32[2 * BPS] = p;
         topRight32[BPS] = p;
 
         // predict and add residuals for all 4x4 blocks in turn.
         for (var n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
-          var dst = InputBuffer.from(y_dst, offset: kScan[n]);
+          final dst = InputBuffer.from(y_dst, offset: kScan[n]);
 
           VP8Filter.PredLuma4[block.imodes[n]](dst);
 
@@ -567,12 +568,12 @@ class VP8 {
         }
       } else {
         // 16x16
-        var predFunc = _checkMode(mb_x, mb_y, block.imodes[0])!;
+        final predFunc = _checkMode(mb_x, mb_y, block.imodes[0])!;
 
         VP8Filter.PredLuma16[predFunc](y_dst);
         if (bits != 0) {
           for (var n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
-            var dst = InputBuffer.from(y_dst, offset: kScan[n]);
+            final dst = InputBuffer.from(y_dst, offset: kScan[n]);
 
             _doTransform(bits!, InputBuffer(coeffs, offset: n * 16), dst);
           }
@@ -580,15 +581,15 @@ class VP8 {
       }
 
       // Chroma
-      var bits_uv = block.nonZeroUV;
-      var pred_func = _checkMode(mb_x, mb_y, block.uvmode)!;
+      final bits_uv = block.nonZeroUV;
+      final pred_func = _checkMode(mb_x, mb_y, block.uvmode)!;
       VP8Filter.PredChroma8[pred_func](u_dst);
       VP8Filter.PredChroma8[pred_func](v_dst);
 
-      var c1 = InputBuffer(coeffs, offset: 16 * 16);
+      final c1 = InputBuffer(coeffs, offset: 16 * 16);
       _doUVTransform(bits_uv, c1, u_dst);
 
-      var c2 = InputBuffer(coeffs, offset: 20 * 16);
+      final c2 = InputBuffer(coeffs, offset: 20 * 16);
       _doUVTransform(bits_uv >> 8, c2, v_dst);
 
       // stash away top samples for next block
@@ -599,12 +600,12 @@ class VP8 {
       }
 
       // Transfer reconstructed samples from yuv_b_ cache to final destination.
-      var y_out = mb_x * 16; // dec->cache_y_ +
-      var u_out = mb_x * 8; // dec->cache_u_ +
-      var v_out = mb_x * 8; // _dec->cache_v_ +
+      final y_out = mb_x * 16; // dec->cache_y_ +
+      final u_out = mb_x * 8; // dec->cache_u_ +
+      final v_out = mb_x * 8; // _dec->cache_v_ +
 
       for (var j = 0; j < 16; ++j) {
-        var start = y_out + j * _cacheYStride!;
+        final start = y_out + j * _cacheYStride!;
         _cacheY.memcpy(start, 16, y_dst, j * BPS);
       }
 
@@ -689,8 +690,8 @@ class VP8 {
 
   void _doFilter(int mbX, int mbY) {
     final yBps = _cacheYStride;
-    var fInfo = _fInfo[mbX]!;
-    var yDst = InputBuffer.from(_cacheY, offset: mbX * 16);
+    final fInfo = _fInfo[mbX]!;
+    final yDst = InputBuffer.from(_cacheY, offset: mbX * 16);
     final ilevel = fInfo.fInnerLevel;
     final limit = fInfo.fLimit;
     if (limit == 0) {
@@ -714,8 +715,8 @@ class VP8 {
     } else {
       // complex
       final uvBps = _cacheUVStride;
-      var uDst = InputBuffer.from(_cacheU, offset: mbX * 8);
-      var vDst = InputBuffer.from(_cacheV, offset: mbX * 8);
+      final uDst = InputBuffer.from(_cacheU, offset: mbX * 8);
+      final vDst = InputBuffer.from(_cacheV, offset: mbX * 8);
 
       final hevThresh = fInfo.hevThresh;
       if (mbX > 0) {
@@ -760,9 +761,9 @@ class VP8 {
     final extraYRows = kFilterExtraRows[_filterType!];
     final ySize = extraYRows * _cacheYStride!;
     final uvSize = (extraYRows ~/ 2) * _cacheUVStride!;
-    var yDst = InputBuffer.from(_cacheY, offset: -ySize);
-    var uDst = InputBuffer.from(_cacheU, offset: -uvSize);
-    var vDst = InputBuffer.from(_cacheV, offset: -uvSize);
+    final yDst = InputBuffer.from(_cacheY, offset: -ySize);
+    final uDst = InputBuffer.from(_cacheU, offset: -uvSize);
+    final vDst = InputBuffer.from(_cacheV, offset: -uvSize);
     final mbY = _mbY;
     final isFirstRow = (mbY == 0);
     final isLastRow = (mbY >= _brMbY! - 1);
@@ -852,7 +853,7 @@ class VP8 {
   }
 
   int _clip8(int v) {
-    var d = ((v & XOR_YUV_MASK2) == 0)
+    final d = ((v & XOR_YUV_MASK2) == 0)
         ? (v >> YUV_FIX2)
         : (v < 0)
             ? 0
@@ -958,7 +959,7 @@ class VP8 {
     }
 
     final stride = webp.width * 4;
-    var alpha = InputBuffer.from(_a!);
+    final alpha = InputBuffer.from(_a!);
     var startY = mbY;
     var numRows = mbH;
 
@@ -975,7 +976,7 @@ class VP8 {
       alpha.offset -= webp.width;
     }
 
-    var dst = InputBuffer(output!.getBytes(), offset: startY * stride + 3);
+    final dst = InputBuffer(output!.getBytes(), offset: startY * stride + 3);
 
     if (_cropTop! + mbY + mbH == _cropBottom) {
       // If it's the very last call, we process all the remaining rows!
@@ -995,16 +996,16 @@ class VP8 {
 
   int _emitFancyRGB(int mbY, int mbW, int mbH) {
     var numLinesOut = mbH; // a priori guess
-    var dst = InputBuffer(output!.getBytes(), offset: mbY * webp.width * 4);
-    var curY = InputBuffer.from(_y);
-    var curU = InputBuffer.from(_u);
-    var curV = InputBuffer.from(_v);
+    final dst = InputBuffer(output!.getBytes(), offset: mbY * webp.width * 4);
+    final curY = InputBuffer.from(_y);
+    final curU = InputBuffer.from(_u);
+    final curV = InputBuffer.from(_v);
     var y = mbY;
     final yEnd = mbY + mbH;
     final uvW = (mbW + 1) >> 1;
     final stride = webp.width * 4;
-    var topU = InputBuffer.from(_tmpU);
-    var topV = InputBuffer.from(_tmpV);
+    final topU = InputBuffer.from(_tmpU);
+    final topV = InputBuffer.from(_tmpV);
 
     if (y == 0) {
       // First line is special cased. We mirror the u/v samples at boundary.
@@ -1075,9 +1076,9 @@ class VP8 {
   }
 
   bool _decodeMB(VP8BitReader? tokenBr) {
-    var left = _mbInfo[0];
-    var mb = _mbInfo[1 + _mbX];
-    var block = _mbData[_mbX];
+    final left = _mbInfo[0];
+    final mb = _mbInfo[1 + _mbX];
+    final block = _mbData[_mbX];
     bool skip;
 
     // Note: we don't save segment map (yet), as we don't expect
@@ -1107,7 +1108,7 @@ class VP8 {
     if (_filterType! > 0) {
       // store filter info
       _fInfo[_mbX] = _fStrengths[_segment][block.isIntra4x4 ? 1 : 0];
-      var finfo = _fInfo[_mbX]!;
+      final finfo = _fInfo[_mbX]!;
       finfo.fInner = finfo.fInner || !skip;
     }
 
@@ -1115,13 +1116,13 @@ class VP8 {
   }
 
   bool _parseResiduals(VP8MB mb, VP8BitReader? tokenBr) {
-    var bands = _proba!.bands;
+    final bands = _proba!.bands;
     List<VP8BandProbas> acProba;
-    var q = _dqm[_segment];
-    var block = _mbData[_mbX];
-    var dst = InputBuffer(block.coeffs);
+    final q = _dqm[_segment];
+    final block = _mbData[_mbX];
+    final dst = InputBuffer(block.coeffs);
     //int di = 0;
-    var leftMb = _mbInfo[0];
+    final leftMb = _mbInfo[0];
     int tnz;
     int lnz;
     var nonZeroY = 0;
@@ -1134,7 +1135,7 @@ class VP8 {
 
     if (!block.isIntra4x4) {
       // parse DC
-      var dc = InputBuffer(Int16List(16));
+      final dc = InputBuffer(Int16List(16));
       final ctx = mb.nzDc + leftMb.nzDc;
       final nz = _getCoeffs(tokenBr, bands[1], ctx, q!.y2Mat, 0, dc);
       mb.nzDc = leftMb.nzDc = (nz > 0) ? 1 : 0;
@@ -1218,7 +1219,7 @@ class VP8 {
   }
 
   void _transformWHT(InputBuffer src, InputBuffer out) {
-    var tmp = Int32List(16);
+    final tmp = Int32List(16);
 
     var oi = 0;
     for (var i = 0; i < 4; ++i) {
@@ -1335,7 +1336,7 @@ class VP8 {
         final bit0 = br.getBit(p[9 + bit1]);
         final cat = 2 * bit1 + bit0;
         v = 0;
-        var tab = kCat3456[cat];
+        final tab = kCat3456[cat];
         for (var i = 0, len = tab.length; i < len; ++i) {
           v += v + br.getBit(tab[i]);
         }
@@ -1365,7 +1366,7 @@ class VP8 {
 
       {
         // non zero coeff
-        var p_ctx = prob[kBands[n + 1]].probas;
+        final p_ctx = prob[kBands[n + 1]].probas;
         int v;
         if (br.getBit(p[2]) == 0) {
           v = 1;
@@ -1382,12 +1383,12 @@ class VP8 {
   }
 
   void _parseIntraMode() {
-    var ti = 4 * _mbX;
-    var li = 0;
-    var top = _intraT;
-    var left = _intraL;
+    final ti = 4 * _mbX;
+    final li = 0;
+    final top = _intraT;
+    final left = _intraL;
 
-    var block = _mbData[_mbX];
+    final block = _mbData[_mbX];
 
     // decide for B_PRED first
     block.isIntra4x4 = br.getBit(145) == 0;
@@ -1401,15 +1402,15 @@ class VP8 {
       top!.fillRange(ti, ti + 4, ymode);
       left.fillRange(li, li + 4, ymode);
     } else {
-      var modes = block.imodes;
+      final modes = block.imodes;
       var mi = 0;
       for (var y = 0; y < 4; ++y) {
         var ymode = left[y];
         for (var x = 0; x < 4; ++x) {
-          var prob = kBModesProba[top![ti + x]][ymode];
+          final prob = kBModesProba[top![ti + x]][ymode];
 
           // Generic tree-parsing
-          var b = br.getBit(prob[0]);
+          final b = br.getBit(prob[0]);
           var i = kYModesIntra4[b];
 
           while (i > 0) {

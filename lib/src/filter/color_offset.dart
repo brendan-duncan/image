@@ -5,7 +5,7 @@ import '../internal/clamp.dart';
 /// colors, a per-channel brightness.
 Image colorOffset(Image src,
     {int red = 0, int green = 0, int blue = 0, int alpha = 0}) {
-  var pixels = src.getBytes();
+  final pixels = src.getBytes();
   for (var i = 0, len = pixels.length; i < len; i += 4) {
     pixels[i] = clamp255(pixels[i] + red);
     pixels[i + 1] = clamp255(pixels[i + 1] + green);

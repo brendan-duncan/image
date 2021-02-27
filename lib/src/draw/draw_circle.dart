@@ -6,7 +6,7 @@ import 'draw_pixel.dart';
 /// Draw a circle into the [image] with a center of [x0],[y0] and
 /// the given [radius] and [color].
 Image drawCircle(Image image, int x0, int y0, int radius, int color) {
-  var points = _calculateCircumference(image, x0, y0, radius);
+  final points = _calculateCircumference(image, x0, y0, radius);
   return _draw(image, points, color);
 }
 
@@ -21,7 +21,7 @@ Image drawCircle(Image image, int x0, int y0, int radius, int color) {
 /// Once found, it draws a line connecting those two points. The circle is thus
 /// filled one vertical slice at a time (each slice being 1-pixel wide).
 Image fillCircle(Image image, int x0, int y0, int radius, int color) {
-  var points = _calculateCircumference(image, x0, y0, radius);
+  final points = _calculateCircumference(image, x0, y0, radius);
 
   // sort points by x-coordinate and then by y-coordinate
   points.sort((a, b) => (a.x == b.x) ? a.y.compareTo(b.y) : a.x.compareTo(b.x));
@@ -59,7 +59,7 @@ List<Point> _calculateCircumference(Image image, int x0, int y0, int radius) {
     return [Point(x0, y0)];
   }
 
-  var points = <Point>[];
+  final points = <Point>[];
   points.add(Point(x0 - radius, y0));
   points.add(Point(x0 + radius, y0));
   points.add(Point(x0, y0 - radius));
@@ -80,14 +80,14 @@ List<Point> _calculateCircumference(Image image, int x0, int y0, int radius) {
     f += ddFx + 1;
 
     if (x != y + 1) {
-      var x1 = x0 - y;
-      var x2 = x0 + y;
-      var y1 = y0 - x;
-      var y2 = y0 + x;
-      var x3 = x0 - x;
-      var x4 = x0 + x;
-      var y3 = y0 - y;
-      var y4 = y0 + y;
+      final x1 = x0 - y;
+      final x2 = x0 + y;
+      final y1 = y0 - x;
+      final y2 = y0 + x;
+      final x3 = x0 - x;
+      final x4 = x0 + x;
+      final y3 = y0 - y;
+      final y4 = y0 + y;
 
       points.add(Point(x1, y1));
       points.add(Point(x1, y2));

@@ -82,7 +82,7 @@ class IcoDecoder extends Decoder {
 
     // AND bitmask
     for (var y = 0; y < bmpInfo.height; y++) {
-      var line = bmpInfo.readBottomUp ? y : image.height - 1 - y;
+      final line = bmpInfo.readBottomUp ? y : image.height - 1 - y;
       final row = inp.readBytes(rowLength);
       for (var x = 0; x < bmpInfo.width;) {
         final b = row.readByte();

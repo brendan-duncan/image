@@ -11,7 +11,7 @@ import 'draw_pixel.dart';
 /// [thickness] determines how thick the line should be drawn, in pixels.
 Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     {bool antialias = false, num thickness = 1}) {
-  var line = [x1, y1, x2, y2];
+  final line = [x1, y1, x2, y2];
   if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
     return image;
   }
@@ -24,7 +24,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
   var dx = (x2 - x1);
   var dy = (y2 - y1);
 
-  var radius = (thickness / 2.0).floor();
+  final radius = (thickness / 2.0).floor();
 
   // Drawing a single point.
   if (dx == 0 && dy == 0) {
@@ -91,7 +91,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     dy = dy.abs();
     if (dy <= dx) {
       // More-or-less horizontal. use wid for vertical stroke
-      num ac = cos(atan2(dy, dx));
+      final num ac = cos(atan2(dy, dx));
       int wid;
       if (ac != 0) {
         wid = thickness ~/ ac;
@@ -104,8 +104,8 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
       }
 
       var d = 2 * dy - dx;
-      var incr1 = 2 * dy;
-      var incr2 = 2 * (dy - dx);
+      final incr1 = 2 * dy;
+      final incr2 = 2 * (dy - dx);
 
       int x, y;
       int ydirflag;
@@ -159,7 +159,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
       }
     } else {
       // More-or-less vertical. use wid for horizontal stroke
-      var as = sin(atan2(dy, dx));
+      final as = sin(atan2(dy, dx));
       int wid;
       if (as != 0) {
         wid = thickness ~/ as;
@@ -171,8 +171,8 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
       }
 
       var d = 2 * dx - dy;
-      var incr1 = 2 * dx;
-      var incr2 = 2 * (dx - dy);
+      final incr1 = 2 * dx;
+      final incr2 = 2 * (dx - dy);
       int x, y;
       int yend;
       int xdirflag;
@@ -230,7 +230,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
 
   // Antialias Line
 
-  var ag = (dy.abs() < dx.abs()) ? cos(atan2(dy, dx)) : sin(atan2(dy, dx));
+  final ag = (dy.abs() < dx.abs()) ? cos(atan2(dy, dx)) : sin(atan2(dy, dx));
 
   int wid;
   if (ag != 0.0) {
@@ -255,11 +255,11 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     }
 
     var y = y1;
-    var inc = (dy * 65536) ~/ dx;
+    final inc = (dy * 65536) ~/ dx;
     var frac = 0;
 
     for (var x = x1; x <= x2; x++) {
-      var wstart = (y - wid ~/ 2);
+      final wstart = (y - wid ~/ 2);
       for (var w = wstart; w < wstart + wid; w++) {
         drawPixel(image, x, w, color, (frac >> 8) & 0xff);
         drawPixel(image, x, w + 1, color, (_xor(frac) >> 8) & 0xff);
@@ -287,11 +287,11 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     }
 
     var x = x1;
-    var inc = (dx * 65536) ~/ dy;
+    final inc = (dx * 65536) ~/ dy;
     var frac = 0;
 
     for (var y = y1; y <= y2; y++) {
-      var wstart = (x - wid ~/ 2);
+      final wstart = (x - wid ~/ 2);
       for (var w = wstart; w < wstart + wid; w++) {
         drawPixel(image, w, y, color, (frac >> 8) & 0xff);
         drawPixel(image, w + 1, y, color, (_xor(frac) >> 8) & 0xff);

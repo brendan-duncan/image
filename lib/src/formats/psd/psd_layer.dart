@@ -88,14 +88,14 @@ class PsdLayer {
     height = bottom - top!;
 
     channels = [];
-    var numChannels = input.readUint16();
+    final numChannels = input.readUint16();
     for (var i = 0; i < numChannels; ++i) {
-      var id = input.readInt16();
-      var len = input.readUint32();
+      final id = input.readInt16();
+      final len = input.readUint32();
       channels.add(PsdChannel(id, len));
     }
 
-    var sig = input.readUint32();
+    final sig = input.readUint32();
     if (sig != SIGNATURE) {
       throw ImageException('Invalid PSD layer signature: '
           '${sig.toRadixString(16)}');
@@ -106,27 +106,27 @@ class PsdLayer {
     clipping = input.readByte();
     flags = input.readByte();
 
-    var filler = input.readByte(); // should be 0
+    final filler = input.readByte(); // should be 0
     if (filler != 0) {
       throw ImageException('Invalid PSD layer data');
     }
 
     var len = input.readUint32();
-    var extra = input.readBytes(len);
+    final extra = input.readBytes(len);
 
     if (len > 0) {
       // Mask Data
       len = extra.readUint32();
       assert(len == 0 || len == 20 || len == 36);
       if (len > 0) {
-        var maskData = extra.readBytes(len);
+        final maskData = extra.readBytes(len);
         mask = PsdMask(maskData);
       }
 
       // Layer Blending Ranges
       len = extra.readUint32();
       if (len > 0) {
-        var data = extra.readBytes(len);
+        final data = extra.readBytes(len);
         blendingRanges = PsdBlendingRanges(data);
       }
 
@@ -134,23 +134,23 @@ class PsdLayer {
       len = extra.readByte();
       name = extra.readString(len);
       // Layer name is padded to a multiple of 4 bytes.
-      var padding = (4 - (len % 4)) - 1;
+      final padding = (4 - (len % 4)) - 1;
       if (padding > 0) {
         extra.skip(padding);
       }
 
       // Additional layer sections
       while (!extra.isEOS) {
-        var sig = extra.readUint32();
+        final sig = extra.readUint32();
         if (sig != SIGNATURE) {
           throw ImageException('PSD invalid signature for layer additional '
               'data: ${sig.toRadixString(16)}');
         }
 
-        var tag = extra.readString(4);
+        final tag = extra.readString(4);
 
         len = extra.readUint32();
-        var data = extra.readBytes(len);
+        final data = extra.readBytes(len);
         // pad to an even byte count.
         if (len & 1 == 1) {
           extra.skip(1);
@@ -160,18 +160,18 @@ class PsdLayer {
 
         // Layer effects data
         if (tag == 'lrFX') {
-          var fxData = (additionalData['lrFX'] as PsdLayerAdditionalData);
-          var data = InputBuffer.from(fxData.data);
+          final fxData = (additionalData['lrFX'] as PsdLayerAdditionalData);
+          final data = InputBuffer.from(fxData.data);
           /*int version =*/ data.readUint16();
-          var numFx = data.readUint16();
+          final numFx = data.readUint16();
 
           for (var j = 0; j < numFx; ++j) {
             /*var tag =*/ data.readString(4); // 8BIM
-            var fxTag = data.readString(4);
-            var size = data.readUint32();
+            final fxTag = data.readString(4);
+            final size = data.readUint32();
 
             if (fxTag == 'dsdw') {
-              var fx = PsdDropShadowEffect();
+              final fx = PsdDropShadowEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
@@ -197,7 +197,7 @@ class PsdLayer {
                 data.readUint16()
               ];
             } else if (fxTag == 'isdw') {
-              var fx = PsdInnerShadowEffect();
+              final fx = PsdInnerShadowEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
@@ -223,7 +223,7 @@ class PsdLayer {
                 data.readUint16()
               ];
             } else if (fxTag == 'oglw') {
-              var fx = PsdOuterGlowEffect();
+              final fx = PsdOuterGlowEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
@@ -248,7 +248,7 @@ class PsdLayer {
                 ];
               }
             } else if (fxTag == 'iglw') {
-              var fx = PsdInnerGlowEffect();
+              final fx = PsdInnerGlowEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blur = data.readUint32();
@@ -274,7 +274,7 @@ class PsdLayer {
                 ];
               }
             } else if (fxTag == 'bevl') {
-              var fx = PsdBevelEffect();
+              final fx = PsdBevelEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.angle = data.readUint32();
@@ -319,7 +319,7 @@ class PsdLayer {
                 ];
               }
             } else if (fxTag == 'sofi') {
-              var fx = PsdSolidFillEffect();
+              final fx = PsdSolidFillEffect();
               effects.add(fx);
               fx.version = data.readUint32();
               fx.blendMode = data.readString(4);
@@ -354,7 +354,7 @@ class PsdLayer {
   // Is this layer a folder?
   int type() {
     if (additionalData.containsKey(PsdLayerSectionDivider.TAG)) {
-      var section =
+      final section =
           additionalData[PsdLayerSectionDivider.TAG] as PsdLayerSectionDivider;
       return section.type;
     }

@@ -14,12 +14,12 @@ class ExrHuffman {
       return;
     }
 
-    var start = compressed.offset;
+    final start = compressed.offset;
 
-    var im = compressed.readUint32();
-    var iM = compressed.readUint32();
+    final im = compressed.readUint32();
+    final iM = compressed.readUint32();
     compressed.skip(4); // tableLength
-    var nBits = compressed.readUint32();
+    final nBits = compressed.readUint32();
 
     if (im < 0 || im >= HUF_ENCSIZE || iM < 0 || iM >= HUF_ENCSIZE) {
       throw ImageException('Invalid huffman table size');
@@ -27,8 +27,8 @@ class ExrHuffman {
 
     compressed.skip(4);
 
-    var freq = List<int>.filled(HUF_ENCSIZE, 0);
-    var hdec = List<ExrHufDec>.generate(HUF_DECSIZE, (_) => ExrHufDec(),
+    final freq = List<int>.filled(HUF_ENCSIZE, 0);
+    final hdec = List<ExrHufDec>.generate(HUF_DECSIZE, (_) => ExrHufDec(),
         growable: false);
 
     unpackEncTable(compressed, nCompressed - 20, im, iM, freq);
@@ -44,8 +44,8 @@ class ExrHuffman {
 
   static void decode(List<int> hcode, List<ExrHufDec> hdecod, InputBuffer input,
       int ni, int rlc, int no, Uint16List? out) {
-    var c_lc = [0, 0];
-    var ie = input.offset + (ni + 7) ~/ 8; // input byte size
+    final c_lc = [0, 0];
+    final ie = input.offset + (ni + 7) ~/ 8; // input byte size
     var oi = 0;
 
     // Loop on input bytes
@@ -55,7 +55,7 @@ class ExrHuffman {
 
       // Access decoding table
       while (c_lc[1] >= HUF_DECBITS) {
-        var pl = hdecod[(c_lc[0] >> (c_lc[1] - HUF_DECBITS)) & HUF_DECMASK];
+        final pl = hdecod[(c_lc[0] >> (c_lc[1] - HUF_DECBITS)) & HUF_DECMASK];
 
         if (pl.len != 0) {
           // Get short code
@@ -70,7 +70,7 @@ class ExrHuffman {
           // Search long code
           int j;
           for (j = 0; j < pl.lit; j++) {
-            var l = hufLength(hcode[pl.p![j]]);
+            final l = hufLength(hcode[pl.p![j]]);
 
             while (c_lc[1] < l && input.offset < ie) {
               // get more bits
@@ -97,12 +97,12 @@ class ExrHuffman {
     }
 
     // Get remaining (short) codes
-    var i = (8 - ni) & 7;
+    final i = (8 - ni) & 7;
     c_lc[0] >>= i;
     c_lc[1] -= i;
 
     while (c_lc[1] > 0) {
-      var pl = hdecod[(c_lc[0] << (HUF_DECBITS - c_lc[1])) & HUF_DECMASK];
+      final pl = hdecod[(c_lc[0] << (HUF_DECBITS - c_lc[1])) & HUF_DECMASK];
 
       if (pl.len != 0) {
         c_lc[1] -= pl.len;
@@ -135,7 +135,7 @@ class ExrHuffman {
             '(decoded data are longer than expected).');
       }
 
-      var s = out![oi - 1];
+      final s = out![oi - 1];
 
       while (cs-- > 0) {
         out[oi++] = s;
@@ -154,8 +154,8 @@ class ExrHuffman {
     // Init hashtable & loop on all codes.
     // Assumes that hufClearDecTable(hdecod) has already been called.
     for (; im <= iM; im++) {
-      var c = hufCode(hcode[im]);
-      var l = hufLength(hcode[im]);
+      final c = hufCode(hcode[im]);
+      final l = hufLength(hcode[im]);
 
       if (c >> l != 0) {
         // Error: c is supposed to be an l-bit code,
@@ -167,7 +167,7 @@ class ExrHuffman {
 
       if (l > HUF_DECBITS) {
         // Long code: add a secondary entry
-        var pl = hdecod[(c >> (l - HUF_DECBITS))];
+        final pl = hdecod[(c >> (l - HUF_DECBITS))];
 
         if (pl.len != 0) {
           // Error: a short code has already
@@ -179,7 +179,7 @@ class ExrHuffman {
         pl.lit++;
 
         if (pl.p != null) {
-          var p = pl.p;
+          final p = pl.p;
           pl.p = List<int>.filled(pl.lit, 0);
 
           for (var i = 0; i < pl.lit - 1; ++i) {
@@ -213,8 +213,8 @@ class ExrHuffman {
 
   static void unpackEncTable(
       InputBuffer p, int ni, int im, int iM, List<int> hcode) {
-    var pcode = p.offset;
-    var c_lc = [0, 0];
+    final pcode = p.offset;
+    final c_lc = [0, 0];
 
     for (; im <= iM; im++) {
       if (p.offset - pcode > ni) {
@@ -222,7 +222,7 @@ class ExrHuffman {
             '(unexpected end of code table data).');
       }
 
-      var l = hcode[im] = getBits(6, c_lc, p); // code length
+      final l = hcode[im] = getBits(6, c_lc, p); // code length
 
       if (l == LONG_ZEROCODE_RUN) {
         if (p.offset - pcode > ni) {
@@ -266,7 +266,7 @@ class ExrHuffman {
   static int hufCode(int code) => code >> 6;
 
   static void canonicalCodeTable(List<int> hcode) {
-    var n = List<int>.filled(59, 0);
+    final n = List<int>.filled(59, 0);
 
     // For each i from 0 through 58, count the
     // number of different codes of length i, and
@@ -283,7 +283,7 @@ class ExrHuffman {
     var c = 0;
 
     for (var i = 58; i > 0; --i) {
-      var nc = ((c + n[i]) >> 1);
+      final nc = ((c + n[i]) >> 1);
       n[i] = c;
       c = nc;
     }
@@ -294,7 +294,7 @@ class ExrHuffman {
     // l and the code in hcode[i].
 
     for (var i = 0; i < HUF_ENCSIZE; ++i) {
-      var l = hcode[i];
+      final l = hcode[i];
       if (l > 0) {
         hcode[i] = l | (n[l]++ << 6);
       }

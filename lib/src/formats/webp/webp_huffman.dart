@@ -74,7 +74,7 @@ class HuffmanTree {
     // Normal case.
 
     // Get Huffman codes from the code lengths.
-    var codes = Int32List(codeLengthsSize);
+    final codes = Int32List(codeLengthsSize);
 
     if (!_huffmanCodeLengthsToCodes(codeLengths, codeLengthsSize, codes)) {
       return false;

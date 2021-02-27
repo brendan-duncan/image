@@ -77,7 +77,7 @@ class JpegData {
       return null;
     }
 
-    var info = JpegInfo();
+    final info = JpegInfo();
 
     var hasSOF = false;
     var hasSOS = false;
@@ -128,7 +128,7 @@ class JpegData {
     }
 
     for (var i = 0; i < frame!.componentsOrder.length; ++i) {
-      var component = frame!.components[frame!.componentsOrder[i]]!;
+      final component = frame!.components[frame!.componentsOrder[i]]!;
       components.add(ComponentData(
           component.hSamples,
           frame!.maxHSamples,
@@ -155,7 +155,7 @@ class JpegData {
 
     marker = _nextMarker();
     while (marker != Jpeg.M_EOI && !input.isEOS) {
-      var block = _readBlock();
+      final block = _readBlock();
       switch (marker) {
         case Jpeg.M_APP0:
         case Jpeg.M_APP1:
@@ -239,7 +239,7 @@ class JpegData {
   }
 
   void _skipBlock() {
-    var length = input.readUint16();
+    final length = input.readUint16();
     if (length < 2) {
       throw ImageException('Invalid Block');
     }
@@ -247,7 +247,7 @@ class JpegData {
   }
 
   InputBuffer _readBlock() {
-    var length = input.readUint16();
+    final length = input.readUint16();
     if (length < 2) {
       throw ImageException('Invalid Block');
     }
@@ -309,8 +309,8 @@ class JpegData {
         case FMT_SRATIONAL:
           {
             final buffer = block.peekBytes(8, offset);
-            var num = buffer.readInt32();
-            var den = buffer.readInt32();
+            final num = buffer.readInt32();
+            final den = buffer.readInt32();
             if (den == 0) {
               return 0.0;
             }
@@ -341,7 +341,7 @@ class JpegData {
       return; // Maximum Exif directory nesting exceeded (corrupt Exif header)
     }
 
-    var numDirEntries = block.readUint16();
+    final numDirEntries = block.readUint16();
 
     //const TAG_ORIENTATION = 0x0112;
     //const TAG_INTEROP_OFFSET = 0xA005;
@@ -350,9 +350,9 @@ class JpegData {
     const bytesPerFormat = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
 
     for (var di = 0; di < numDirEntries; ++di) {
-      var tag = block.readUint16();
-      var format = block.readUint16();
-      var components = block.readUint32();
+      final tag = block.readUint16();
+      final format = block.readUint16();
+      final components = block.readUint32();
 
       if (format - 1 >= maxFormats) {
         continue;
@@ -363,7 +363,7 @@ class JpegData {
         continue;
       }
 
-      var byteCount = bytesPerFormat[format];
+      final byteCount = bytesPerFormat[format];
 
       var offset = 0;
 
@@ -384,7 +384,7 @@ class JpegData {
   void _readExifData(InputBuffer block) {
     exif.rawData ??= <Uint8List>[];
 
-    var rawData = block.toUint8List().sublist(0);
+    final rawData = block.toUint8List().sublist(0);
     exif.rawData!.add(rawData);
 
     const EXIF_TAG = 0x45786966; // Exif\0\0
@@ -395,10 +395,10 @@ class JpegData {
       return;
     }
 
-    var saveEndian = block.bigEndian;
+    final saveEndian = block.bigEndian;
 
     // Exif Directory
-    var alignment = block.readString(2);
+    final alignment = block.readString(2);
     if (alignment == 'II') {
       // Exif is in Intel order
       block.bigEndian = false;
@@ -411,7 +411,7 @@ class JpegData {
 
     block.skip(2);
 
-    var offset = block.readUint32();
+    final offset = block.readUint32();
     if (offset < 8 || offset > 16) {
       if (offset > block.length - 16) {
         // invalid offset for first Exif IFD value ;
@@ -430,7 +430,7 @@ class JpegData {
   }
 
   void _readAppData(int marker, InputBuffer block) {
-    var appData = block;
+    final appData = block;
 
     if (marker == Jpeg.M_APP0) {
       // 'JFIF\0'
@@ -447,7 +447,7 @@ class JpegData {
         jfif.yDensity = (appData[10] << 8) | appData[11];
         jfif.thumbWidth = appData[12];
         jfif.thumbHeight = appData[13];
-        var thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
+        final thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
         jfif.thumbData = appData.subset(14 + thumbSize, offset: 14);
       }
     } else if (marker == Jpeg.M_APP1) {
@@ -475,7 +475,7 @@ class JpegData {
   void _readDQT(InputBuffer block) {
     while (!block.isEOS) {
       var n = block.readByte();
-      var prec = (n >> 4);
+      final prec = (n >> 4);
       n &= 0x0F;
 
       if (n >= Jpeg.NUM_QUANT_TBLS) {
@@ -486,7 +486,7 @@ class JpegData {
         quantizationTables[n] = Int16List(64);
       }
 
-      var tableData = quantizationTables[n];
+      final tableData = quantizationTables[n];
       for (var i = 0; i < Jpeg.DCTSIZE2; i++) {
         int tmp;
         if (prec != 0) {
@@ -516,14 +516,14 @@ class JpegData {
     frame!.scanLines = block.readUint16();
     frame!.samplesPerLine = block.readUint16();
 
-    var numComponents = block.readByte();
+    final numComponents = block.readByte();
 
     for (var i = 0; i < numComponents; i++) {
-      var componentId = block.readByte();
-      var x = block.readByte();
-      var h = (x >> 4) & 15;
-      var v = x & 15;
-      var qId = block.readByte();
+      final componentId = block.readByte();
+      final x = block.readByte();
+      final h = (x >> 4) & 15;
+      final v = x & 15;
+      final qId = block.readByte();
       frame!.componentsOrder.add(componentId);
       frame!.components[componentId] =
           JpegComponent(h, v, quantizationTables, qId);
@@ -537,14 +537,14 @@ class JpegData {
     while (!block.isEOS) {
       var index = block.readByte();
 
-      var bits = Uint8List(16);
+      final bits = Uint8List(16);
       var count = 0;
       for (var j = 0; j < 16; j++) {
         bits[j] = block.readByte();
         count += bits[j];
       }
 
-      var huffmanValues = Uint8List(count);
+      final huffmanValues = Uint8List(count);
       for (var j = 0; j < count; j++) {
         huffmanValues[j] = block.readByte();
       }
@@ -572,25 +572,25 @@ class JpegData {
   }
 
   void _readSOS(InputBuffer block) {
-    var n = block.readByte();
+    final n = block.readByte();
     if (n < 1 || n > Jpeg.MAX_COMPS_IN_SCAN) {
       throw ImageException('Invalid SOS block');
     }
 
     final components = List<dynamic>.filled(n, null);
     for (var i = 0; i < n; i++) {
-      var id = block.readByte();
-      var c = block.readByte();
+      final id = block.readByte();
+      final c = block.readByte();
 
       if (!frame!.components.containsKey(id)) {
         throw ImageException('Invalid Component in SOS block');
       }
 
-      var component = frame!.components[id];
+      final component = frame!.components[id];
       components[i] = component;
 
-      var dc_tbl_no = (c >> 4) & 15;
-      var ac_tbl_no = c & 15;
+      final dc_tbl_no = (c >> 4) & 15;
+      final ac_tbl_no = c & 15;
 
       if (dc_tbl_no < huffmanTablesDC.length) {
         component!.huffmanTableDC = huffmanTablesDC[dc_tbl_no] as List?;
@@ -600,12 +600,12 @@ class JpegData {
       }
     }
 
-    var spectralStart = block.readByte();
-    var spectralEnd = block.readByte();
-    var successiveApproximation = block.readByte();
+    final spectralStart = block.readByte();
+    final spectralEnd = block.readByte();
+    final successiveApproximation = block.readByte();
 
-    var Ah = (successiveApproximation >> 4) & 15;
-    var Al = successiveApproximation & 15;
+    final Ah = (successiveApproximation >> 4) & 15;
+    final Al = successiveApproximation & 15;
 
     JpegScan(input, frame!, components.cast<JpegComponent>(), resetInterval,
             spectralStart, spectralEnd, Ah, Al)
@@ -669,14 +669,14 @@ class JpegData {
       JpegFrame? frame, JpegComponent component) {
     final blocksPerLine = component.blocksPerLine;
     final blocksPerColumn = component.blocksPerColumn;
-    var samplesPerLine = (blocksPerLine << 3);
-    var R = Int32List(64);
-    var r = Uint8List(64);
-    var lines = List<Uint8List?>.filled(blocksPerColumn * 8, null);
+    final samplesPerLine = (blocksPerLine << 3);
+    final R = Int32List(64);
+    final r = Uint8List(64);
+    final lines = List<Uint8List?>.filled(blocksPerColumn * 8, null);
 
     var l = 0;
     for (var blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
-      var scanLine = (blockRow << 3);
+      final scanLine = (blockRow << 3);
       for (var i = 0; i < 8; i++) {
         lines[l++] = Uint8List(samplesPerLine);
       }
@@ -686,9 +686,9 @@ class JpegData {
             component.blocks[blockRow][blockCol] as Int32List, r, R);
 
         var offset = 0;
-        var sample = (blockCol << 3);
+        final sample = (blockCol << 3);
         for (var j = 0; j < 8; j++) {
-          var line = lines[scanLine + j];
+          final line = lines[scanLine + j];
           for (var i = 0; i < 8; i++) {
             line![sample + i] = r[offset++];
           }

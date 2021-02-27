@@ -42,7 +42,7 @@ class BitmapFont {
   /// Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
   /// and an [Image] that stores the font [map].
   BitmapFont.fromFnt(String fnt, Image page) {
-    var fontPages = {0: page};
+    final fontPages = {0: page};
 
     XmlDocument doc;
     fnt = fnt.trimLeft();
@@ -59,7 +59,7 @@ class BitmapFont {
   /// Decode a [BitmapFont] from the contents of a zip file that stores the
   /// .fnt font definition and associated PNG images.
   BitmapFont.fromZip(List<int> fileData) {
-    var arc = ZipDecoder().decodeBytes(fileData);
+    final arc = ZipDecoder().decodeBytes(fileData);
 
     ArchiveFile? font_file;
     for (var i = 0; i < arc.numberOfFiles(); ++i) {
@@ -74,7 +74,7 @@ class BitmapFont {
     }
 
     /// Remove leading whitespace so xml detection is correct
-    var font_str =
+    final font_str =
         String.fromCharCodes(font_file.content as List<int>).trimLeft();
     XmlDocument xml;
 
@@ -94,7 +94,7 @@ class BitmapFont {
     if (ch.isEmpty) {
       return 0;
     }
-    var c = ch.codeUnits[0];
+    final c = ch.codeUnits[0];
     if (!characters.containsKey(ch)) {
       return base ~/ 2;
     }
@@ -107,15 +107,15 @@ class BitmapFont {
   void _parseFnt(XmlDocument xml, Map<int, Image?> fontPages, [Archive? arc]) {
     /// Rather than check for children, which will also count whitespace as XmlText,
     /// The first child should have the name <font>.
-    var docElements = _childElements(xml).toList();
+    final docElements = _childElements(xml).toList();
     if (docElements.length != 1 || docElements[0].name.toString() != 'font') {
       throw ImageException('Invalid font XML');
     }
 
-    var font = docElements[0];
+    final font = docElements[0];
 
     for (var c in _childElements(font)) {
-      var name = c.name.toString();
+      final name = c.name.toString();
       if (name == 'info') {
         for (var a in c.attributes) {
           switch (a.name.toString()) {
@@ -147,14 +147,14 @@ class BitmapFont {
               antialias = (int.parse(a.value) == 1);
               break;
             case 'padding':
-              var tk = a.value.split(',');
+              final tk = a.value.split(',');
               padding = [];
               for (var t in tk) {
                 padding.add(int.parse(t));
               }
               break;
             case 'spacing':
-              var tk = a.value.split(',');
+              final tk = a.value.split(',');
               spacing = [];
               for (var t in tk) {
                 spacing.add(int.parse(t));
@@ -190,21 +190,21 @@ class BitmapFont {
         }
       } else if (name == 'pages') {
         for (var page in _childElements(c)) {
-          var id = int.parse(page.getAttribute('id')!);
-          var filename = page.getAttribute('file');
+          final id = int.parse(page.getAttribute('id')!);
+          final filename = page.getAttribute('file');
 
           if (fontPages.containsKey(id)) {
             throw ImageException('Duplicate font page id found: $id.');
           }
 
           if (arc != null) {
-            var imageFile = _findFile(arc, filename);
+            final imageFile = _findFile(arc, filename);
             if (imageFile == null) {
               throw ImageException('Font zip missing font page image '
                   '$filename');
             }
 
-            var image =
+            final image =
                 PngDecoder().decodeImage(imageFile.content as List<int>);
 
             fontPages[id] = image;
@@ -212,9 +212,9 @@ class BitmapFont {
         }
       } else if (name == 'kernings') {
         for (var kerning in _childElements(c)) {
-          var first = int.parse(kerning.getAttribute('first')!);
-          var second = int.parse(kerning.getAttribute('second')!);
-          var amount = int.parse(kerning.getAttribute('amount')!);
+          final first = int.parse(kerning.getAttribute('first')!);
+          final second = int.parse(kerning.getAttribute('second')!);
+          final amount = int.parse(kerning.getAttribute('amount')!);
 
           if (!kernings.containsKey(first)) {
             kernings[first] = {};
@@ -225,35 +225,35 @@ class BitmapFont {
     }
 
     for (var c in _childElements(font)) {
-      var name = c.name.toString();
+      final name = c.name.toString();
       if (name == 'chars') {
         for (var char in _childElements(c)) {
-          var id = int.parse(char.getAttribute('id')!);
-          var x = int.parse(char.getAttribute('x')!);
-          var y = int.parse(char.getAttribute('y')!);
-          var width = int.parse(char.getAttribute('width')!);
-          var height = int.parse(char.getAttribute('height')!);
-          var xoffset = int.parse(char.getAttribute('xoffset')!);
-          var yoffset = int.parse(char.getAttribute('yoffset')!);
-          var xadvance = int.parse(char.getAttribute('xadvance')!);
-          var page = int.parse(char.getAttribute('page')!);
-          var chnl = int.parse(char.getAttribute('chnl')!);
+          final id = int.parse(char.getAttribute('id')!);
+          final x = int.parse(char.getAttribute('x')!);
+          final y = int.parse(char.getAttribute('y')!);
+          final width = int.parse(char.getAttribute('width')!);
+          final height = int.parse(char.getAttribute('height')!);
+          final xoffset = int.parse(char.getAttribute('xoffset')!);
+          final yoffset = int.parse(char.getAttribute('yoffset')!);
+          final xadvance = int.parse(char.getAttribute('xadvance')!);
+          final page = int.parse(char.getAttribute('page')!);
+          final chnl = int.parse(char.getAttribute('chnl')!);
 
           if (!fontPages.containsKey(page)) {
             throw ImageException('Missing page image: $page');
           }
 
-          var fontImage = fontPages[page];
+          final fontImage = fontPages[page];
 
-          var ch = BitmapFontCharacter(
+          final ch = BitmapFontCharacter(
               id, width, height, xoffset, yoffset, xadvance, page, chnl);
 
           characters[id] = ch;
 
-          var x2 = x + width;
-          var y2 = y + height;
+          final x2 = x + width;
+          final y2 = y + height;
           var pi = 0;
-          var image = ch.image;
+          final image = ch.image;
           for (var yi = y; yi < y2; ++yi) {
             for (var xi = x; xi < x2; ++xi) {
               image[pi++] = fontImage!.getPixel(xi, yi);
@@ -265,10 +265,10 @@ class BitmapFont {
   }
 
   XmlDocument _parseTextFnt(String content) {
-    var children = <XmlNode>[];
-    var pageList = <XmlNode>[];
-    var charList = <XmlNode>[];
-    var kerningList = <XmlNode>[];
+    final children = <XmlNode>[];
+    final pageList = <XmlNode>[];
+    final charList = <XmlNode>[];
+    final kerningList = <XmlNode>[];
     List<XmlAttribute>? charsAttrs;
     List<XmlAttribute>? kerningsAttrs;
 
@@ -283,70 +283,70 @@ class BitmapFont {
         continue;
       }
 
-      var tk = line.split(' ');
+      final tk = line.split(' ');
       switch (tk[0]) {
         case 'info':
-          var attrs = _parseParameters(tk);
-          var info = XmlElement(XmlName('info'), attrs, []);
+          final attrs = _parseParameters(tk);
+          final info = XmlElement(XmlName('info'), attrs, []);
           children.add(info);
           break;
         case 'common':
-          var attrs = _parseParameters(tk);
-          var node = XmlElement(XmlName('common'), attrs, []);
+          final attrs = _parseParameters(tk);
+          final node = XmlElement(XmlName('common'), attrs, []);
           children.add(node);
           break;
         case 'page':
-          var attrs = _parseParameters(tk);
-          var page = XmlElement(XmlName('page'), attrs, []);
+          final attrs = _parseParameters(tk);
+          final page = XmlElement(XmlName('page'), attrs, []);
           pageList.add(page);
           break;
         case 'chars':
           charsAttrs = _parseParameters(tk);
           break;
         case 'char':
-          var attrs = _parseParameters(tk);
-          var node = XmlElement(XmlName('char'), attrs, []);
+          final attrs = _parseParameters(tk);
+          final node = XmlElement(XmlName('char'), attrs, []);
           charList.add(node);
           break;
         case 'kernings':
           kerningsAttrs = _parseParameters(tk);
           break;
         case 'kerning':
-          var attrs = _parseParameters(tk);
-          var node = XmlElement(XmlName('kerning'), attrs, []);
+          final attrs = _parseParameters(tk);
+          final node = XmlElement(XmlName('kerning'), attrs, []);
           kerningList.add(node);
           break;
       }
     }
 
     if (charsAttrs != null || charList.isNotEmpty) {
-      var node = XmlElement(XmlName('chars'), charsAttrs!, charList);
+      final node = XmlElement(XmlName('chars'), charsAttrs!, charList);
       children.add(node);
     }
 
     if (kerningsAttrs != null || kerningList.isNotEmpty) {
-      var node = XmlElement(XmlName('kernings'), kerningsAttrs!, kerningList);
+      final node = XmlElement(XmlName('kernings'), kerningsAttrs!, kerningList);
       children.add(node);
     }
 
     if (pageList.isNotEmpty) {
-      var pages = XmlElement(XmlName('pages'), [], pageList);
+      final pages = XmlElement(XmlName('pages'), [], pageList);
       children.add(pages);
     }
 
-    var xml = XmlElement(XmlName('font'), [], children);
-    var doc = XmlDocument([xml]);
+    final xml = XmlElement(XmlName('font'), [], children);
+    final doc = XmlDocument([xml]);
 
     return doc;
   }
 
   List<XmlAttribute> _parseParameters(List<String> tk) {
-    var params = <XmlAttribute>[];
+    final params = <XmlAttribute>[];
     for (var ti = 1; ti < tk.length; ++ti) {
       if (tk[ti].isEmpty) {
         continue;
       }
-      var atk = tk[ti].split('=');
+      final atk = tk[ti].split('=');
       if (atk.length != 2) {
         continue;
       }
@@ -354,7 +354,7 @@ class BitmapFont {
       // Remove all " characters
       atk[1] = atk[1].replaceAll('"', '');
 
-      var a = XmlAttribute(XmlName(atk[0]), atk[1]);
+      final a = XmlAttribute(XmlName(atk[0]), atk[1]);
       params.add(a);
     }
     return params;
@@ -390,7 +390,7 @@ class BitmapFontCharacter {
 
   @override
   String toString() {
-    var x = {
+    final x = {
       'id': id,
       'width': width,
       'height': height,

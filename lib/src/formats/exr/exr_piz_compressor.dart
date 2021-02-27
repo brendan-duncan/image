@@ -26,7 +26,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
         header.channels.length, (_) => _PizChannelData(),
         growable: false);
 
-    var tmpBufferSize = (_maxScanLineSize! * _numScanLines) ~/ 2;
+    final tmpBufferSize = (_maxScanLineSize! * _numScanLines) ~/ 2;
     _tmpBuffer = Uint16List(tmpBufferSize);
   }
 
@@ -45,9 +45,9 @@ class InternalExrPizCompressor extends InternalExrCompressor
     width ??= header.width;
     height ??= header.linesInBuffer;
 
-    var minX = x;
+    final minX = x;
     var maxX = x + width! - 1;
-    var minY = y;
+    final minY = y;
     var maxY = y + height! - 1;
 
     if (maxX > header.width!) {
@@ -61,12 +61,12 @@ class InternalExrPizCompressor extends InternalExrCompressor
     decodedHeight = (maxY - minY) + 1;
 
     var tmpBufferEnd = 0;
-    var channels = header.channels;
+    final channels = header.channels;
     final numChannels = channels.length;
 
     for (var i = 0; i < numChannels; ++i) {
-      var ch = channels[i];
-      var cd = _channelData[i]!;
+      final ch = channels[i];
+      final cd = _channelData[i]!;
       cd.start = tmpBufferEnd;
       cd.end = cd.start;
 
@@ -79,32 +79,32 @@ class InternalExrPizCompressor extends InternalExrCompressor
       tmpBufferEnd += cd.nx * cd.ny * cd.size;
     }
 
-    var minNonZero = inPtr.readUint16();
-    var maxNonZero = inPtr.readUint16();
+    final minNonZero = inPtr.readUint16();
+    final maxNonZero = inPtr.readUint16();
 
     if (maxNonZero >= BITMAP_SIZE) {
       throw ImageException('Error in header for PIZ-compressed data '
           '(invalid bitmap size).');
     }
 
-    var bitmap = Uint8List(BITMAP_SIZE);
+    final bitmap = Uint8List(BITMAP_SIZE);
     if (minNonZero <= maxNonZero) {
-      var b = inPtr.readBytes(maxNonZero - minNonZero + 1);
+      final b = inPtr.readBytes(maxNonZero - minNonZero + 1);
       for (var i = 0, j = minNonZero, len = b.length; i < len; ++i) {
         bitmap[j++] = b[i];
       }
     }
 
-    var lut = Uint16List(USHORT_RANGE);
-    var maxValue = _reverseLutFromBitmap(bitmap, lut);
+    final lut = Uint16List(USHORT_RANGE);
+    final maxValue = _reverseLutFromBitmap(bitmap, lut);
 
     // Huffman decoding
-    var length = inPtr.readUint32();
+    final length = inPtr.readUint32();
     ExrHuffman.uncompress(inPtr, length, _tmpBuffer, tmpBufferEnd);
 
     // Wavelet decoding
     for (var i = 0; i < numChannels; ++i) {
-      var cd = _channelData[i]!;
+      final cd = _channelData[i]!;
       for (var j = 0; j < cd.size; ++j) {
         ExrWavelet.decode(_tmpBuffer!, cd.start + j, cd.nx, cd.size, cd.ny,
             cd.nx * cd.size, maxValue);
@@ -123,7 +123,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
     // Rearrange the pixel data into the format expected by the caller.
     for (var y = minY; y <= maxY; ++y) {
       for (var i = 0; i < numChannels; ++i) {
-        var cd = _channelData[i]!;
+        final cd = _channelData[i]!;
 
         if ((y % cd.ys) != 0) {
           continue;
@@ -152,7 +152,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
       }
     }
 
-    var n = k - 1;
+    final n = k - 1;
 
     while (k < USHORT_RANGE) {
       lut[k++] = 0;

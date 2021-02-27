@@ -94,7 +94,7 @@ class HdrSlice {
     if (type == HdrImage.INT || type == HdrImage.UINT) {
       return (data[pi] as int) / _maxIntSize;
     }
-    var s = (type == HdrImage.FLOAT && bitsPerSample == 16)
+    final s = (type == HdrImage.FLOAT && bitsPerSample == 16)
         ? Half.HalfToDouble(data[pi] as int)
         : data[pi] as double;
     return s;

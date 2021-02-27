@@ -8,7 +8,8 @@ void main() {
   group('filter', () {
     var image = readJpg(File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
     image = copyResize(image, width: 400);
-    var image2 = readPng(File('test/res/png/alpha_edge.png').readAsBytesSync());
+    final image2 =
+        readPng(File('test/res/png/alpha_edge.png').readAsBytesSync());
 
     test('fill', () {
       final f = Image(10, 10, channels: Channels.rgb);
@@ -225,7 +226,7 @@ void main() {
     });
 
     test('sobel', () {
-      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
+      final f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
       sobel(f);
 
       final fp = File('$tmpPath/out/sobel.jpg');
@@ -405,11 +406,11 @@ void main() {
     });
 
     test('octree quantize', () {
-      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
+      final f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.octree);
       // ignore: prefer_collection_literals
-      var colors = Set<int>();
+      final colors = Set<int>();
       for (var y = 0; y < f.height; ++y) {
         for (var x = 0; x < f.width; ++x) {
           colors.add(f.getPixel(x, y));
@@ -421,23 +422,23 @@ void main() {
     });
 
     test('neural quantize', () {
-      var f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
+      final f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.neuralNet);
       // ignore: prefer_collection_literals
-      var colors = Set<int>();
+      final colors = Set<int>();
       for (var y = 0; y < f.height; ++y) {
         for (var x = 0; x < f.width; ++x) {
           colors.add(f.getPixel(x, y));
         }
       }
-      var fp = File('$tmpPath/out/quantize_neural.jpg');
+      final fp = File('$tmpPath/out/quantize_neural.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
     });
 
     test('trim', () {
-      var image = readPng(File('test/res/png/trim.png').readAsBytesSync())!;
+      final image = readPng(File('test/res/png/trim.png').readAsBytesSync())!;
       var trimmed = trim(image, mode: TrimMode.transparent);
       File('$tmpPath/out/trim.png')
         ..createSync(recursive: true)

@@ -12,22 +12,22 @@ void decode(DecodeParam param) {
   // Read an image from file (webp in this case).
   // decodeImage will identify the format of the image and use the appropriate
   // decoder.
-  var image = decodeImage(param.file.readAsBytesSync())!;
+  final image = decodeImage(param.file.readAsBytesSync())!;
   // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-  var thumbnail = gaussianBlur(copyResize(image, width: 120), 5);
+  final thumbnail = gaussianBlur(copyResize(image, width: 120), 5);
   param.sendPort.send(thumbnail);
 }
 
 // Decode and process an image file in a separate thread (isolate) to avoid
 // stalling the main UI thread.
 void main() async {
-  var receivePort = ReceivePort();
+  final receivePort = ReceivePort();
 
   await Isolate.spawn(
       decode, DecodeParam(File('test.webp'), receivePort.sendPort));
 
   // Get the processed image from the isolate.
-  var image = await receivePort.first as Image;
+  final image = await receivePort.first as Image;
 
   File('thumbnail.png').writeAsBytesSync(encodePng(image));
 }

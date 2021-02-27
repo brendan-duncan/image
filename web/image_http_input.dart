@@ -17,29 +17,29 @@ void main() {
 
 /// Called when the user has selected a file.
 void onFileChanged(Event event) {
-  var files = fileInput.files as FileList;
-  var file = files.item(0)!;
+  final files = fileInput.files as FileList;
+  final file = files.item(0)!;
 
-  var reader = FileReader();
+  final reader = FileReader();
   reader.addEventListener('load', onFileLoaded);
   reader.readAsArrayBuffer(file);
 }
 
 /// Called when the file has been read.
 void onFileLoaded(Event event) {
-  var reader = event.currentTarget as FileReader;
+  final reader = event.currentTarget as FileReader;
 
-  var bytes = reader.result as List<int>;
+  final bytes = reader.result as List<int>;
 
   // Find a decoder that is able to decode the given file contents.
-  var decoder = findDecoderForData(bytes);
+  final decoder = findDecoderForData(bytes);
   if (decoder == null) {
     print('Could not find format decoder for file');
     return;
   }
 
   // If a decoder was found, decode the file contents into an image.
-  var image = decoder.decodeImage(bytes);
+  final image = decoder.decodeImage(bytes);
 
   // If the image was able to be decoded, we can display it in a couple
   // different ways. We could encode it to a format that can be displayed
@@ -51,13 +51,13 @@ void onFileLoaded(Event event) {
 
     // Draw the image into a canvas. First create a canvas at the correct
     // resolution.
-    var c = CanvasElement();
+    final c = CanvasElement();
     document.body!.append(c);
     c.width = image.width;
     c.height = image.height;
 
     // Create a buffer that the canvas can draw.
-    var d = c.context2D.createImageData(c.width, c.height);
+    final d = c.context2D.createImageData(c.width, c.height);
     // Fill the buffer with our image data.
     d.data.setRange(0, d.data.length, image.getBytes(format: Format.rgba));
     // Draw the buffer onto the canvas.
@@ -67,12 +67,12 @@ void onFileLoaded(Event event) {
     // This requires encoding it to a common format (like PNG), base64 encoding
     // the encoded image, and using a data url for the img src.
 
-    var img = ImageElement();
+    final img = ImageElement();
     document.body!.append(img);
     // encode the image to a PNG
-    var png = encodePng(image);
+    final png = encodePng(image);
     // base64 encode the png
-    var png64 = base64Encode(png);
+    final png64 = base64Encode(png);
     // set the img src as a data url
     img.src = 'data:image/png;base64,${png64}';
   }

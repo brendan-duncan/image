@@ -40,11 +40,11 @@ class BmpDecoder extends Decoder {
       rowStride += 4 - (rowStride % 4);
     }
 
-    var image = Image(info!.width, info!.height, channels: Channels.rgba);
+    final image = Image(info!.width, info!.height, channels: Channels.rgba);
 
     for (var y = image.height - 1; y >= 0; --y) {
-      var line = info!.readBottomUp ? y : image.height - 1 - y;
-      var row = _input.readBytes(rowStride);
+      final line = info!.readBottomUp ? y : image.height - 1 - y;
+      final row = _input.readBytes(rowStride);
       for (var x = 0; x < image.width;) {
         info!.decodeRgba(row, (color) => image.setPixel(x++, line, color));
       }
@@ -69,9 +69,9 @@ class BmpDecoder extends Decoder {
   @override
   Animation? decodeAnimation(List<int> data) {
     if (!isValidFile(data)) return null;
-    var image = decodeImage(data)!;
+    final image = decodeImage(data)!;
 
-    var anim = Animation();
+    final anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);

@@ -10,10 +10,10 @@ bool clipLine(List<int> line, List<int> rect) {
   var y0 = line[1];
   var x1 = line[2];
   var y1 = line[3];
-  var xmin = rect[0];
-  var ymin = rect[1];
-  var xmax = rect[2];
-  var ymax = rect[3];
+  final xmin = rect[0];
+  final ymin = rect[1];
+  final xmax = rect[2];
+  final ymax = rect[3];
 
   const INSIDE = 0; // 0000
   const LEFT = 1; // 0001
@@ -63,7 +63,7 @@ bool clipLine(List<int> line, List<int> rect) {
       // from an outside point to an intersection with clip edge
 
       // At least one endpoint is outside the clip rectangle; pick it.
-      var outcodeOut = outcode0 != 0 ? outcode0 : outcode1;
+      final outcodeOut = outcode0 != 0 ? outcode0 : outcode1;
 
       int? x, y;
       // Now find the intersection point;

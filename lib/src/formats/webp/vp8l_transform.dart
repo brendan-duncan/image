@@ -31,9 +31,9 @@ class VP8LTransform {
         if (rowEnd != ysize) {
           // The last predicted row in this iteration will be the top-pred row
           // for the first row in next iteration.
-          var start = rowsOut - width;
-          var end = start + width;
-          var offset = rowsOut + (rowEnd - rowStart - 1) * width;
+          final start = rowsOut - width;
+          final end = start + width;
+          final offset = rowsOut + (rowEnd - rowStart - 1) * width;
           outData.setRange(start, end, inData, offset);
         }
         break;
@@ -51,7 +51,7 @@ class VP8LTransform {
           final inStride =
               (rowEnd - rowStart) * InternalVP8L.subSampleSize(xsize, bits);
 
-          var src = rowsOut + outStride - inStride;
+          final src = rowsOut + outStride - inStride;
           outData.setRange(src, src + inStride, inData, rowsOut);
 
           colorIndexInverseTransform(
@@ -68,7 +68,7 @@ class VP8LTransform {
       int yStart, int yEnd, InputBuffer src, InputBuffer dst) {
     final bitsPerPixel = 8 >> bits;
     final width = xsize;
-    var colorMap = data;
+    final colorMap = data;
     if (bitsPerPixel < 8) {
       final pixelsPerByte = 1 << bits;
       final countMask = pixelsPerByte - 1;
@@ -84,7 +84,7 @@ class VP8LTransform {
             packed_pixels = _getAlphaIndex(src[0]);
             src.offset++;
           }
-          var p = _getAlphaValue(colorMap![packed_pixels & bit_mask]);
+          final p = _getAlphaValue(colorMap![packed_pixels & bit_mask]);
           ;
           dst[0] = p;
           dst.offset++;
@@ -94,7 +94,7 @@ class VP8LTransform {
     } else {
       for (var y = yStart; y < yEnd; ++y) {
         for (var x = 0; x < width; ++x) {
-          var index = _getAlphaIndex(src[0]);
+          final index = _getAlphaIndex(src[0]);
           src.offset++;
           dst[0] = _getAlphaValue(colorMap![index]);
           dst.offset++;
@@ -107,7 +107,7 @@ class VP8LTransform {
       int src, Uint32List outData, int dst) {
     final bitsPerPixel = 8 >> bits;
     final width = xsize;
-    var colorMap = data;
+    final colorMap = data;
     if (bitsPerPixel < 8) {
       final pixelsPerByte = 1 << bits;
       final countMask = pixelsPerByte - 1;
@@ -147,7 +147,7 @@ class VP8LTransform {
 
     while (y < yEnd) {
       var pred = predRow; // this.data+
-      var m = _VP8LMultipliers();
+      final m = _VP8LMultipliers();
 
       for (var x = 0; x < width; ++x) {
         if ((x & mask) == 0) {
@@ -196,17 +196,17 @@ class VP8LTransform {
       _addPixelsEq(outData, data, pred2);
 
       // .. the rest:
-      var k = (this.data![predModeSrc++] >> 8) & 0xf;
+      final k = (this.data![predModeSrc++] >> 8) & 0xf;
 
       var predFunc = PREDICTORS[k];
       for (var x = 1; x < width; ++x) {
         if ((x & mask) == 0) {
           // start of tile. Read predictor function.
-          var k = ((this.data![predModeSrc++]) >> 8) & 0xf;
+          final k = ((this.data![predModeSrc++]) >> 8) & 0xf;
           predFunc = PREDICTORS[k];
         }
-        var d = outData[data + x - 1];
-        var pred = predFunc(outData, d, data + x - width);
+        final d = outData[data + x - 1];
+        final pred = predFunc(outData, d, data + x - width);
         _addPixelsEq(outData, data + x, pred);
       }
 
@@ -251,7 +251,7 @@ class VP8LTransform {
 
   // In-place sum of each component with mod 256.
   static void _addPixelsEq(Uint32List pixels, int a, int b) {
-    var pa = pixels[a];
+    final pa = pixels[a];
     final alphaAndGreen = (pa & 0xff00ff00) + (b & 0xff00ff00);
     final redAndBlue = (pa & 0x00ff00ff) + (b & 0x00ff00ff);
     pixels[a] = (alphaAndGreen & 0xff00ff00) | (redAndBlue & 0x00ff00ff);
@@ -439,7 +439,7 @@ class _VP8LMultipliers {
     var newBlue = argb & 0xff;
 
     if (inverse) {
-      var g = colorTransformDelta(greenToRed, green);
+      final g = colorTransformDelta(greenToRed, green);
       newRed = (newRed + g) & 0xffffffff;
       newRed &= 0xff;
       newBlue =
@@ -454,16 +454,16 @@ class _VP8LMultipliers {
       newBlue &= 0xff;
     }
 
-    var c = (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | (newBlue);
+    final c = (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | (newBlue);
     return c;
   }
 
   int colorTransformDelta(int colorPred, int color) {
     // There's a bug in dart2js (issue 16497) that requires I do this a bit
     // convoluted to avoid having the optimizer butcher the code.
-    var a = uint8ToInt8(colorPred);
-    var b = uint8ToInt8(color);
-    var d = int32ToUint32(a * b);
+    final a = uint8ToInt8(colorPred);
+    final b = uint8ToInt8(color);
+    final d = int32ToUint32(a * b);
     return d >> 5;
   }
 }

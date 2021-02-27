@@ -89,12 +89,12 @@ class ExrDecoder extends Decoder {
 
   @override
   Animation? decodeAnimation(List<int> data) {
-    var image = decodeImage(data);
+    final image = decodeImage(data);
     if (image == null) {
       return null;
     }
 
-    var anim = Animation();
+    final anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);

@@ -33,7 +33,7 @@ class JpegDecoder extends Decoder {
     if (input == null) {
       return null;
     }
-    var jpeg = JpegData();
+    final jpeg = JpegData();
     jpeg.read(input!.buffer);
     if (jpeg.frames.length != 1) {
       throw ImageException('only single frame JPEGs supported');
@@ -44,7 +44,7 @@ class JpegDecoder extends Decoder {
 
   @override
   Image decodeImage(List<int> data, {int frame = 0}) {
-    var jpeg = JpegData();
+    final jpeg = JpegData();
     jpeg.read(data);
 
     if (jpeg.frames.length != 1) {
@@ -56,9 +56,9 @@ class JpegDecoder extends Decoder {
 
   @override
   Animation decodeAnimation(List<int> data) {
-    var image = decodeImage(data);
+    final image = decodeImage(data);
 
-    var anim = Animation();
+    final anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);

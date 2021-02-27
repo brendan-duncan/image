@@ -4,6 +4,10 @@ linter:
   rules:
   - avoid_dynamic_calls
   - camel_case_types
+  - prefer_final_fields
+  # Disabled due to for-loop usage
+  #- prefer_final_locals
+  - omit_local_variable_types
 
 analyzer:
   strong-mode:

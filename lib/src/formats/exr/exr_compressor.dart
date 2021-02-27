@@ -91,8 +91,8 @@ abstract class InternalExrCompressor extends ExrCompressor {
   InternalExrPart get header => _header as InternalExrPart;
 
   int numSamples(int s, int a, int b) {
-    var a1 = a ~/ s;
-    var b1 = b ~/ s;
+    final a1 = a ~/ s;
+    final b1 = b ~/ s;
     return b1 - a1 + ((a1 * s < a) ? 0 : 1);
   }
 }

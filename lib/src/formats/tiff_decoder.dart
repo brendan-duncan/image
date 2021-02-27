@@ -86,12 +86,12 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    var anim = Animation();
+    final anim = Animation();
     anim.width = info!.width;
     anim.height = info!.height;
     anim.frameType = FrameType.page;
     for (var i = 0, len = numFrames(); i < len; ++i) {
-      var image = decodeFrame(i);
+      final image = decodeFrame(i);
       anim.addFrame(image!);
     }
 
@@ -100,8 +100,8 @@ class TiffDecoder extends Decoder {
 
   // Read the TIFF header and IFD blocks.
   TiffInfo? _readHeader(InputBuffer p) {
-    var info = TiffInfo();
-    var byteOrder = p.readUint16();
+    final info = TiffInfo();
+    final byteOrder = p.readUint16();
     if (byteOrder != TIFF_LITTLE_ENDIAN && byteOrder != TIFF_BIG_ENDIAN) {
       return null;
     }
@@ -122,7 +122,7 @@ class TiffDecoder extends Decoder {
     var offset = p.readUint32();
     info.ifdOffset = offset;
 
-    var p2 = InputBuffer.from(p);
+    final p2 = InputBuffer.from(p);
     p2.offset = offset;
 
     while (offset != 0) {

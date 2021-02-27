@@ -59,7 +59,7 @@ Image hdrToImage(HdrImage hdr, {num? exposure}) {
       }
 
       // Normalize the color
-      var mi = math.max(ri, math.max(gi, bi));
+      final mi = math.max(ri, math.max(gi, bi));
       if (mi > 255.0) {
         ri = 255.0 * (ri / mi);
         gi = 255.0 * (gi / mi);

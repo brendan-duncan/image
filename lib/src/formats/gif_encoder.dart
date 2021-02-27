@@ -131,8 +131,8 @@ class GifEncoder extends Encoder {
     const initCodeSize = 8;
     output!.writeByte(initCodeSize);
 
-    var hTab = Int32List(HSIZE);
-    var codeTab = Int32List(HSIZE);
+    final hTab = Int32List(HSIZE);
+    final codeTab = Int32List(HSIZE);
     var remaining = width * height;
     var curPixel = 0;
 
@@ -160,7 +160,7 @@ class GifEncoder extends Encoder {
     }
     hshift = 8 - hshift;
 
-    var hSizeReg = HSIZE;
+    final hSizeReg = HSIZE;
     for (var i = 0; i < hSizeReg; ++i) {
       hTab[i] = -1;
     }
@@ -173,7 +173,7 @@ class GifEncoder extends Encoder {
 
       var c = _nextPixel();
       while (c != EOF) {
-        var fcode = (c << BITS) + ent;
+        final fcode = (c << BITS) + ent;
         var i = (c << hshift) ^ ent; // xor hashing
 
         if (hTab[i] == fcode) {
@@ -302,8 +302,8 @@ class GifEncoder extends Encoder {
     output!.writeByte(GRAPHIC_CONTROL_EXT);
     output!.writeByte(4); // data block size
 
-    var transparency = 0;
-    var dispose = 0; // dispose = no action
+    final transparency = 0;
+    final dispose = 0; // dispose = no action
 
     // packed fields
     output!.writeByte(0 | // 1:3 reserved

@@ -31,7 +31,7 @@ void main() {
     });
 
     test('Grayscale', () {
-      var rgba = Color.fromRgba(0x55, 0x66, 0x77, 0x88);
+      final rgba = Color.fromRgba(0x55, 0x66, 0x77, 0x88);
       var l = getLuminance(rgba);
       expect(l, equals(0x63));
 
@@ -40,26 +40,27 @@ void main() {
     });
 
     test('HSL', () {
-      var rgb = hslToRgb(180.0 / 360.0, 0.5, 0.75);
+      final rgb = hslToRgb(180.0 / 360.0, 0.5, 0.75);
       expect(rgb[0], equals(159));
       expect(rgb[1], equals(223));
       expect(rgb[2], equals(223));
 
-      var hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+      final hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
       expect(hsl[0], closeTo(0.5, 0.001));
       expect(hsl[1], closeTo(0.5, 0.001));
       expect(hsl[2], closeTo(0.75, 0.001));
     });
 
     test('CMYK', () {
-      var rgb = cmykToRgb((0.75 * 255), (0.5 * 255), (0.5 * 255), (0.5 * 255));
+      final rgb =
+          cmykToRgb((0.75 * 255), (0.5 * 255), (0.5 * 255), (0.5 * 255));
       expect(rgb[0], equals(32));
       expect(rgb[1], equals(64));
       expect(rgb[2], equals(64));
     });
 
     test('Image', () {
-      var image = Image(1, 1);
+      final image = Image(1, 1);
       for (var i = 0, len = image.length; i < len; ++i) {
         image[i] = Color.fromRgba(200, 128, 64, 255);
       }
@@ -69,76 +70,76 @@ void main() {
       expect(getBlue(image[0]), 64);
       expect(getAlpha(image[0]), 255);
 
-      var argb = image.getBytes(format: Format.argb);
+      final argb = image.getBytes(format: Format.argb);
       expect(argb[0], 255);
       expect(argb[1], 200);
       expect(argb[2], 128);
       expect(argb[3], 64);
 
-      var image_argb =
+      final image_argb =
           Image.fromBytes(image.width, image.height, argb, format: Format.argb);
       expect(getRed(image_argb[0]), 200);
       expect(getGreen(image_argb[0]), 128);
       expect(getBlue(image_argb[0]), 64);
       expect(getAlpha(image_argb[0]), 255);
 
-      var abgr = image.getBytes(format: Format.abgr);
+      final abgr = image.getBytes(format: Format.abgr);
       expect(abgr[0], 255);
       expect(abgr[1], 64);
       expect(abgr[2], 128);
       expect(abgr[3], 200);
 
-      var image_abgr =
+      final image_abgr =
           Image.fromBytes(image.width, image.height, abgr, format: Format.abgr);
       expect(getRed(image_abgr[0]), 200);
       expect(getGreen(image_abgr[0]), 128);
       expect(getBlue(image_abgr[0]), 64);
       expect(getAlpha(image_abgr[0]), 255);
 
-      var rgba = image.getBytes(format: Format.rgba);
+      final rgba = image.getBytes(format: Format.rgba);
       expect(rgba[0], 200);
       expect(rgba[1], 128);
       expect(rgba[2], 64);
       expect(rgba[3], 255);
 
-      var image_rgba =
+      final image_rgba =
           Image.fromBytes(image.width, image.height, rgba, format: Format.rgba);
       expect(getRed(image_rgba[0]), 200);
       expect(getGreen(image_rgba[0]), 128);
       expect(getBlue(image_rgba[0]), 64);
       expect(getAlpha(image_rgba[0]), 255);
 
-      var bgra = image.getBytes(format: Format.bgra);
+      final bgra = image.getBytes(format: Format.bgra);
       expect(bgra[0], 64);
       expect(bgra[1], 128);
       expect(bgra[2], 200);
       expect(bgra[3], 255);
 
-      var image_bgra =
+      final image_bgra =
           Image.fromBytes(image.width, image.height, bgra, format: Format.bgra);
       expect(getRed(image_bgra[0]), 200);
       expect(getGreen(image_bgra[0]), 128);
       expect(getBlue(image_bgra[0]), 64);
       expect(getAlpha(image_bgra[0]), 255);
 
-      var rgb = image.getBytes(format: Format.rgb);
+      final rgb = image.getBytes(format: Format.rgb);
       expect(rgb[0], 200);
       expect(rgb[1], 128);
       expect(rgb[2], 64);
 
-      var image_rgb =
+      final image_rgb =
           Image.fromBytes(image.width, image.height, rgb, format: Format.rgb);
       expect(getRed(image_rgb[0]), 200);
       expect(getGreen(image_rgb[0]), 128);
       expect(getBlue(image_rgb[0]), 64);
       expect(getAlpha(image_rgb[0]), 255);
 
-      var bgr = image.getBytes(format: Format.bgr);
+      final bgr = image.getBytes(format: Format.bgr);
       expect(bgr[0], 64);
       expect(bgr[1], 128);
       expect(bgr[2], 200);
 
-      var image_bgr =
+      final image_bgr =
           Image.fromBytes(image.width, image.height, bgr, format: Format.bgr);
       expect(getRed(image_bgr[0]), 200);
       expect(getGreen(image_bgr[0]), 128);

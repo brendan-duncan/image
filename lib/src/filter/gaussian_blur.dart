@@ -20,14 +20,14 @@ Image gaussianBlur(Image src, int radius) {
     kernel = _gaussianKernelCache[radius]!;
   } else {
     // Compute coefficients
-    num sigma = radius * (2.0 / 3.0);
-    num s = 2.0 * sigma * sigma;
+    final num sigma = radius * (2.0 / 3.0);
+    final num s = 2.0 * sigma * sigma;
 
     kernel = SeparableKernel(radius);
 
     num sum = 0.0;
     for (var x = -radius; x <= radius; ++x) {
-      num c = exp(-(x * x) / s);
+      final num c = exp(-(x * x) / s);
       sum += c;
       kernel[x + radius] = c;
     }

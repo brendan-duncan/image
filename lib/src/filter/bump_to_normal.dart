@@ -9,7 +9,7 @@ import '../image.dart';
 /// height and 1 a high value. The optional [strength] parameter allows to set
 /// the strength of the normal image.
 Image bumpToNormal(Image src, {num strength = 2.0}) {
-  var dest = Image.from(src);
+  final dest = Image.from(src);
 
   for (var y = 0; y < src.height; ++y) {
     for (var x = 0; x < src.width; ++x) {

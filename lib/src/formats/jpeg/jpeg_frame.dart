@@ -18,7 +18,7 @@ class JpegFrame {
 
   void prepare() {
     for (var componentId in components.keys) {
-      var component = components[componentId]!;
+      final component = components[componentId]!;
       maxHSamples = max(maxHSamples, component.hSamples);
       maxVSamples = max(maxVSamples, component.vSamples);
     }
@@ -27,14 +27,14 @@ class JpegFrame {
     mcusPerColumn = (scanLines! / 8 / maxVSamples).ceil();
 
     for (var componentId in components.keys) {
-      var component = components[componentId]!;
-      var blocksPerLine =
+      final component = components[componentId]!;
+      final blocksPerLine =
           ((samplesPerLine! / 8).ceil() * component.hSamples / maxHSamples)
               .ceil();
-      var blocksPerColumn =
+      final blocksPerColumn =
           ((scanLines! / 8).ceil() * component.vSamples / maxVSamples).ceil();
-      var blocksPerLineForMcu = mcusPerLine * component.hSamples;
-      var blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
+      final blocksPerLineForMcu = mcusPerLine * component.hSamples;
+      final blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
 
       final blocks = List.generate(
           blocksPerColumnForMcu,

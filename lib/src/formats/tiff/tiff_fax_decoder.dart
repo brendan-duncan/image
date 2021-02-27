@@ -36,7 +36,7 @@ class TiffFaxDecoder {
     bytePointer = 0;
 
     var lineOffset = 0;
-    var scanlineStride = (width + 7) ~/ 8;
+    final scanlineStride = (width + 7) ~/ 8;
 
     for (var i = 0; i < height; i++) {
       _decodeNextScanline(out, lineOffset, startX);
@@ -192,10 +192,10 @@ class TiffFaxDecoder {
     bitPointer = 0;
     bytePointer = 0;
 
-    var scanlineStride = (width + 7) ~/ 8;
+    final scanlineStride = (width + 7) ~/ 8;
 
     int? a0, a1, b1, b2;
-    var b = List<int?>.filled(2, null);
+    final b = List<int?>.filled(2, null);
     int entry, code, bits;
     bool isWhite;
     var currIndex = 0;
@@ -336,7 +336,7 @@ class TiffFaxDecoder {
     bitPointer = 0;
     bytePointer = 0;
 
-    var scanlineStride = (width + 7) ~/ 8;
+    final scanlineStride = (width + 7) ~/ 8;
 
     int? a0, a1, b1, b2;
     int entry, code, bits;
@@ -345,7 +345,7 @@ class TiffFaxDecoder {
     List<int?>? temp;
 
     // Return values from getNextChangingElement
-    var b = List<int?>.filled(2, null);
+    final b = List<int?>.filled(2, null);
 
     uncompressedMode = ((tiffT6Options & 0x02) >> 1);
 
@@ -651,7 +651,7 @@ class TiffFaxDecoder {
       // First EOL code word xxxx 0000 0000 0001 will occur
       // As many fill bits will be present as required to make
       // the EOL code of 12 bits end on a byte boundary.
-      var bitsLeft = 8 - bitPointer!;
+      final bitsLeft = 8 - bitPointer!;
 
       if (_nextNBits(bitsLeft) != 0) {
         throw ImageException('TIFFFaxDecoder8');
@@ -691,8 +691,8 @@ class TiffFaxDecoder {
 
   void _getNextChangingElement(int? a0, bool isWhite, List<int?> ret) {
     // Local copies of instance variables
-    var pce = prevChangingElems;
-    var ces = changingElemSize;
+    final pce = prevChangingElems;
+    final ces = changingElemSize;
 
     // If the previous match was at an odd element, we still
     // have to search the preceeding element.
@@ -706,7 +706,7 @@ class TiffFaxDecoder {
 
     var i = start;
     for (; i < ces; i += 2) {
-      var temp = pce![i]!;
+      final temp = pce![i]!;
       if (temp > a0!) {
         lastChangingElement = i;
         ret[0] = temp;
@@ -722,12 +722,12 @@ class TiffFaxDecoder {
   void _setToBlack(
       InputBuffer buffer, int lineOffset, int bitOffset, int numBits) {
     var bitNum = 8 * lineOffset + bitOffset;
-    var lastBit = bitNum + numBits;
+    final lastBit = bitNum + numBits;
 
     var byteNum = bitNum >> 3;
 
     // Handle bits in first byte
-    var shift = bitNum & 0x7;
+    final shift = bitNum & 0x7;
     if (shift > 0) {
       var maskVal = 1 << (7 - shift);
       var val = buffer[byteNum];
@@ -756,8 +756,8 @@ class TiffFaxDecoder {
 
   int _nextNBits(int bitsToGet) {
     int b, next, next2next;
-    var l = data.length - 1;
-    var bp = bytePointer;
+    final l = data.length - 1;
+    final bp = bytePointer;
 
     if (fillOrder == 1) {
       b = data[bp!];
@@ -789,7 +789,7 @@ class TiffFaxDecoder {
       throw ImageException('TIFFFaxDecoder7');
     }
 
-    var bitsLeft = 8 - bitPointer!;
+    final bitsLeft = 8 - bitPointer!;
     var bitsFromNextByte = bitsToGet - bitsLeft;
     var bitsFromNext2NextByte = 0;
     if (bitsFromNextByte > 8) {
@@ -799,7 +799,7 @@ class TiffFaxDecoder {
 
     bytePointer = bytePointer! + 1;
 
-    var i1 = (b & TABLE1[bitsLeft]) << (bitsToGet - bitsLeft);
+    final i1 = (b & TABLE1[bitsLeft]) << (bitsToGet - bitsLeft);
     var i2 = (next & TABLE2[bitsFromNextByte]) >> (8 - bitsFromNextByte);
 
     var i3 = 0;
@@ -824,8 +824,8 @@ class TiffFaxDecoder {
 
   int _nextLesserThan8Bits(int bitsToGet) {
     int b, next;
-    var l = data.length - 1;
-    var bp = bytePointer;
+    final l = data.length - 1;
+    final bp = bytePointer;
 
     if (fillOrder == 1) {
       b = data[bp!];
@@ -845,10 +845,10 @@ class TiffFaxDecoder {
       throw ImageException('TIFFFaxDecoder7');
     }
 
-    var bitsLeft = 8 - bitPointer!;
-    var bitsFromNextByte = bitsToGet - bitsLeft;
+    final bitsLeft = 8 - bitPointer!;
+    final bitsFromNextByte = bitsToGet - bitsLeft;
 
-    var shift = bitsLeft - bitsToGet;
+    final shift = bitsLeft - bitsToGet;
     int i1, i2;
     if (shift >= 0) {
       i1 = (b & TABLE1[bitsLeft]) >> shift;
@@ -871,7 +871,7 @@ class TiffFaxDecoder {
 
   // Move pointer backwards by given amount of bits
   void _updatePointer(int bitsToMoveBack) {
-    var i = bitPointer! - bitsToMoveBack;
+    final i = bitPointer! - bitsToMoveBack;
 
     if (i < 0) {
       bytePointer = bytePointer! - 1;

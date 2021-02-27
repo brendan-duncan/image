@@ -6,14 +6,14 @@ import 'draw_pixel.dart';
 /// [x],[y] with the given [color].
 Image drawChar(Image image, BitmapFont font, int x, int y, String char,
     {int? color}) {
-  var c = char.codeUnits[0];
+  final c = char.codeUnits[0];
   if (!font.characters.containsKey(c)) {
     return image;
   }
 
-  var ch = font.characters[c]!;
-  var x2 = x + ch.width;
-  var y2 = y + ch.height;
+  final ch = font.characters[c]!;
+  final x2 = x + ch.width;
+  final y2 = y + ch.height;
   var pi = 0;
   for (var yi = y; yi < y2; ++yi) {
     for (var xi = x; xi < x2; ++xi) {

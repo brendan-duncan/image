@@ -48,17 +48,17 @@ class GifDecoder extends Decoder {
 
     try {
       while (!_input!.isEOS) {
-        var recordType = _input!.readByte();
+        final recordType = _input!.readByte();
         switch (recordType) {
           case IMAGE_DESC_RECORD_TYPE:
-            var gifImage = _skipImage();
+            final gifImage = _skipImage();
             if (gifImage == null) {
               return info;
             }
             info!.frames.add(gifImage);
             break;
           case EXTENSION_RECORD_TYPE:
-            var extCode = _input!.readByte();
+            final extCode = _input!.readByte();
             if (extCode == APPLICATION_EXT) {
               _readApplicationExt(_input!);
             } else if (extCode == GRAPHIC_CONTROL_EXT) {
@@ -83,11 +83,11 @@ class GifDecoder extends Decoder {
   }
 
   void _readApplicationExt(InputBuffer _input) {
-    var blockSize = _input.readByte();
-    var tag = _input.readString(blockSize);
+    final blockSize = _input.readByte();
+    final tag = _input.readString(blockSize);
     if (tag == 'NETSCAPE2.0') {
-      var b1 = _input.readByte();
-      var b2 = _input.readByte();
+      final b1 = _input.readByte();
+      final b2 = _input.readByte();
       if (b1 == 0x03 && b2 == 0x01) {
         _repeat = _input.readUint16();
       }
@@ -98,18 +98,18 @@ class GifDecoder extends Decoder {
 
   void _readGraphicsControlExt(InputBuffer _input) {
     /*int blockSize =*/ _input.readByte();
-    var b = _input.readByte();
-    var duration = _input.readUint16();
-    var transparent = _input.readByte();
+    final b = _input.readByte();
+    final duration = _input.readUint16();
+    final transparent = _input.readByte();
     /*int endBlock =*/ _input.readByte();
-    var disposalMethod = (b >> 2) & 0x7;
+    final disposalMethod = (b >> 2) & 0x7;
     //int userInput = (b >> 1) & 0x1;
-    var transparentFlag = b & 0x1;
+    final transparentFlag = b & 0x1;
 
-    var recordType = _input.peekBytes(1)[0];
+    final recordType = _input.peekBytes(1)[0];
     if (recordType == IMAGE_DESC_RECORD_TYPE) {
       _input.skip(1);
-      var gifImage = _skipImage();
+      final gifImage = _skipImage();
       if (gifImage == null) {
         return;
       }
@@ -140,7 +140,7 @@ class GifDecoder extends Decoder {
     }
 
     //_frame = frame;
-    var gifImage = info!.frames[frame] as InternalGifImageDesc;
+    final gifImage = info!.frames[frame] as InternalGifImageDesc;
     _input!.offset = gifImage.inputPosition;
 
     return _decodeImage(info!.frames[frame]);
@@ -164,7 +164,7 @@ class GifDecoder extends Decoder {
       return null;
     }
 
-    var anim = Animation();
+    final anim = Animation();
     anim.width = info!.width;
     anim.height = info!.height;
     anim.loopCount = _repeat;
@@ -174,13 +174,13 @@ class GifDecoder extends Decoder {
       //_frame = i;
       lastImage = Image.from(lastImage);
 
-      var frame = info!.frames[i];
-      var image = decodeFrame(i);
+      final frame = info!.frames[i];
+      final image = decodeFrame(i);
       if (image == null) {
         return null;
       }
 
-      var colorMap =
+      final colorMap =
           (frame.colorMap != null) ? frame.colorMap : info!.globalColorMap;
 
       if (frame.clearFrame) {
@@ -199,7 +199,7 @@ class GifDecoder extends Decoder {
     if (_input!.isEOS) {
       return null;
     }
-    var gifImage = InternalGifImageDesc(_input!);
+    final gifImage = InternalGifImageDesc(_input!);
     _input!.skip(1);
     _skipRemainder();
     return gifImage;
@@ -233,24 +233,24 @@ class GifDecoder extends Decoder {
     _buffer![0] = 0;
     _prefix!.fillRange(0, _prefix!.length, NO_SUCH_CODE);
 
-    var width = gifImage.width;
-    var height = gifImage.height;
+    final width = gifImage.width;
+    final height = gifImage.height;
 
     if (gifImage.x + width > info!.width ||
         gifImage.y + height > info!.height) {
       return null;
     }
 
-    var colorMap =
+    final colorMap =
         (gifImage.colorMap != null) ? gifImage.colorMap : info!.globalColorMap;
 
     _pixelCount = width * height;
 
-    var image = Image(width, height);
-    var line = Uint8List(width);
+    final image = Image(width, height);
+    final line = Uint8List(width);
 
     if (gifImage.interlaced) {
-      var row = gifImage.y;
+      final row = gifImage.y;
       for (var i = 0, j = 0; i < 4; ++i) {
         for (var y = row + INTERLACED_OFFSET[i];
             y < row + height;
@@ -282,7 +282,7 @@ class GifDecoder extends Decoder {
   }
 
   bool _getInfo() {
-    var tag = _input!.readString(STAMP_SIZE);
+    final tag = _input!.readString(STAMP_SIZE);
     if (tag != GIF87_STAMP && tag != GIF89_STAMP) {
       return false;
     }
@@ -290,10 +290,10 @@ class GifDecoder extends Decoder {
     info!.width = _input!.readUint16();
     info!.height = _input!.readUint16();
 
-    var b = _input!.readByte();
+    final b = _input!.readByte();
     info!.colorResolution = (((b & 0x70) + 1) >> 4) + 1;
 
-    var bitsPerPixel = (b & 0x07) + 1;
+    final bitsPerPixel = (b & 0x07) + 1;
 
     info!.backgroundColor = _input!.readByte();
 
@@ -305,9 +305,9 @@ class GifDecoder extends Decoder {
 
       // Get the global color map:
       for (var i = 0; i < info!.globalColorMap!.numColors; ++i) {
-        var r = _input!.readByte();
-        var g = _input!.readByte();
-        var b = _input!.readByte();
+        final r = _input!.readByte();
+        final g = _input!.readByte();
+        final b = _input!.readByte();
         info!.globalColorMap!.setColor(i, r, g, b);
       }
     }
@@ -359,7 +359,7 @@ class GifDecoder extends Decoder {
       return false;
     }
 
-    var lineLen = line.length;
+    final lineLen = line.length;
     var i = 0;
 
     if (_stackPtr != 0) {
@@ -486,7 +486,7 @@ class GifDecoder extends Decoder {
 
     while (_currentShiftState < _runningBits) {
       // Needs to get more bytes from input stream for next code:
-      var nextByte = _bufferedInput()!;
+      final nextByte = _bufferedInput()!;
 
       _currentShiftDWord |= nextByte << _currentShiftState;
       _currentShiftState += 8;

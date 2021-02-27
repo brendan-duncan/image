@@ -13,8 +13,8 @@ class ExrImage extends DecodeInfo {
   final List<InternalExrPart> _parts = [];
 
   ExrImage(List<int> bytes) {
-    var input = InputBuffer(bytes);
-    var magic = input.readUint32();
+    final input = InputBuffer(bytes);
+    final magic = input.readUint32();
     if (magic != MAGIC) {
       throw ImageException('File is not an OpenEXR image file.');
     }
@@ -31,13 +31,13 @@ class ExrImage extends DecodeInfo {
     }
 
     if (!_isMultiPart()) {
-      ExrPart part = InternalExrPart(_isTiled(), input);
+      final ExrPart part = InternalExrPart(_isTiled(), input);
       if (part.isValid) {
         _parts.add(part as InternalExrPart);
       }
     } else {
       while (true) {
-        ExrPart part = InternalExrPart(_isTiled(), input);
+        final ExrPart part = InternalExrPart(_isTiled(), input);
         if (!part.isValid) {
           break;
         }
@@ -63,19 +63,19 @@ class ExrImage extends DecodeInfo {
 
   /// Parse just enough of the file to identify that it's an EXR image.
   static bool isValidFile(List<int> bytes) {
-    var input = InputBuffer(bytes);
+    final input = InputBuffer(bytes);
 
-    var magic = input.readUint32();
+    final magic = input.readUint32();
     if (magic != MAGIC) {
       return false;
     }
 
-    var version = input.readByte();
+    final version = input.readByte();
     if (version != EXR_VERSION) {
       return false;
     }
 
-    var flags = input.readUint24();
+    final flags = input.readUint24();
     if (!_supportsFlags(flags)) {
       return false;
     }
@@ -107,11 +107,11 @@ class ExrImage extends DecodeInfo {
     //final bool multiPart = _isMultiPart();
 
     for (var pi = 0; pi < _parts.length; ++pi) {
-      var part = _parts[pi];
-      var framebuffer = part.framebuffer;
+      final part = _parts[pi];
+      final framebuffer = part.framebuffer;
 
       for (var ci = 0; ci < part.channels.length; ++ci) {
-        var ch = part.channels[ci];
+        final ch = part.channels[ci];
         if (!framebuffer.hasChannel(ch.name)) {
           width = part.width!;
           height = part.height!;
@@ -133,14 +133,14 @@ class ExrImage extends DecodeInfo {
   }
 
   void _readTiledPart(int pi, InputBuffer input) {
-    var part = _parts[pi];
+    final part = _parts[pi];
     final multiPart = _isMultiPart();
-    var framebuffer = part.framebuffer;
-    var compressor = part.compressor;
-    var offsets = part.offsets;
+    final framebuffer = part.framebuffer;
+    final compressor = part.compressor;
+    final offsets = part.offsets;
     //Uint32List fbi = Uint32List(part.channels.length);
 
-    var imgData = InputBuffer.from(input);
+    final imgData = InputBuffer.from(input);
     for (var ly = 0, l = 0; ly < part.numYLevels!; ++ly) {
       for (var lx = 0; lx < part.numXLevels!; ++lx, ++l) {
         for (var ty = 0, oi = 0; ty < part.numYTiles![ly]!; ++ty) {
@@ -149,25 +149,25 @@ class ExrImage extends DecodeInfo {
             if (l != 0) {
               break;
             }
-            var offset = offsets![l]![oi];
+            final offset = offsets![l]![oi];
             imgData.offset = offset;
 
             if (multiPart) {
-              var p = imgData.readUint32();
+              final p = imgData.readUint32();
               if (p != pi) {
                 throw ImageException('Invalid Image Data');
               }
             }
 
-            var tileX = imgData.readUint32();
-            var tileY = imgData.readUint32();
+            final tileX = imgData.readUint32();
+            final tileY = imgData.readUint32();
             /*int levelX =*/ imgData.readUint32();
             /*int levelY =*/ imgData.readUint32();
-            var dataSize = imgData.readUint32();
-            var data = imgData.readBytes(dataSize);
+            final dataSize = imgData.readUint32();
+            final data = imgData.readBytes(dataSize);
 
             var ty = tileY * part.tileHeight!;
-            var tx = tileX * part.tileWidth!;
+            final tx = tileX * part.tileWidth!;
 
             var tileWidth = compressor!.decodedWidth;
             var tileHeight = compressor.decodedHeight;
@@ -179,19 +179,19 @@ class ExrImage extends DecodeInfo {
               tileHeight = height - ty;
             }
 
-            var uncompressedData = compressor.uncompress(
+            final uncompressedData = compressor.uncompress(
                 data, tx, ty, part.tileWidth, part.tileHeight);
             tileWidth = compressor.decodedWidth;
             tileHeight = compressor.decodedHeight;
 
             var si = 0;
-            var len = uncompressedData.length;
-            var numChannels = part.channels.length;
+            final len = uncompressedData.length;
+            final numChannels = part.channels.length;
             //int lineCount = 0;
             for (var yi = 0; yi < tileHeight && ty < height; ++yi, ++ty) {
               for (var ci = 0; ci < numChannels; ++ci) {
-                var ch = part.channels[ci];
-                var slice = framebuffer[ch.name]!.getBytes();
+                final ch = part.channels[ci];
+                final slice = framebuffer[ch.name]!.getBytes();
                 if (si >= len) {
                   break;
                 }
@@ -200,7 +200,7 @@ class ExrImage extends DecodeInfo {
                 for (var xx = 0; xx < tileWidth; ++xx, ++tx) {
                   for (var bi = 0; bi < ch.size; ++bi) {
                     if (tx < part.width! && ty < part.height!) {
-                      var di = (ty * part.width! + tx) * ch.size + bi;
+                      final di = (ty * part.width! + tx) * ch.size + bi;
                       slice[di] = uncompressedData[si++];
                     } else {
                       si++;
@@ -216,39 +216,39 @@ class ExrImage extends DecodeInfo {
   }
 
   void _readScanlinePart(int pi, InputBuffer input) {
-    var part = _parts[pi];
+    final part = _parts[pi];
     final multiPart = _isMultiPart();
-    var framebuffer = part.framebuffer;
-    var compressor = part.compressor;
-    var offsets = part.offsets![0]!;
+    final framebuffer = part.framebuffer;
+    final compressor = part.compressor;
+    final offsets = part.offsets![0]!;
 
     //var scanLineMin = part.top;
     //var scanLineMax = part.bottom;
-    var linesInBuffer = part.linesInBuffer;
+    final linesInBuffer = part.linesInBuffer;
 
     //var minY = part.top;
     //var maxY = minY + part.linesInBuffer - 1;
 
-    var fbi = Uint32List(part.channels.length);
+    final fbi = Uint32List(part.channels.length);
     //var total = 0;
 
     //var xx = 0;
     var yy = 0;
 
-    var imgData = InputBuffer.from(input);
+    final imgData = InputBuffer.from(input);
     for (var offset in offsets) {
       imgData.offset = offset;
 
       if (multiPart) {
-        var p = imgData.readUint32();
+        final p = imgData.readUint32();
         if (p != pi) {
           throw ImageException('Invalid Image Data');
         }
       }
 
       /*var y =*/ imgData.readInt32();
-      var dataSize = imgData.readInt32();
-      var data = imgData.readBytes(dataSize);
+      final dataSize = imgData.readInt32();
+      final data = imgData.readBytes(dataSize);
 
       Uint8List uncompressedData;
       if (compressor != null) {
@@ -258,8 +258,8 @@ class ExrImage extends DecodeInfo {
       }
 
       var si = 0;
-      var len = uncompressedData.length;
-      var numChannels = part.channels.length;
+      final len = uncompressedData.length;
+      final numChannels = part.channels.length;
       //int lineCount = 0;
       for (var yi = 0; yi < linesInBuffer! && yy < height; ++yi, ++yy) {
         si = part.offsetInLineBuffer![yy];
@@ -268,8 +268,8 @@ class ExrImage extends DecodeInfo {
         }
 
         for (var ci = 0; ci < numChannels; ++ci) {
-          var ch = part.channels[ci];
-          var slice = framebuffer[ch.name]!.getBytes();
+          final ch = part.channels[ci];
+          final slice = framebuffer[ch.name]!.getBytes();
           if (si >= len) {
             break;
           }

@@ -5,8 +5,8 @@ import 'package:test/test.dart';
 import 'paths.dart';
 
 void main() {
-  var dir = Directory('test/res/jpg');
-  var files = dir.listSync(recursive: true);
+  final dir = Directory('test/res/jpg');
+  final files = dir.listSync(recursive: true);
 
   group('JPEG', () {
     for (var f in files.whereType<File>()) {
@@ -16,7 +16,7 @@ void main() {
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
-        List<int> bytes = f.readAsBytesSync();
+        final List<int> bytes = f.readAsBytesSync();
         expect(JpegDecoder().isValidFile(bytes), equals(true));
 
         final image = JpegDecoder().decodeImage(bytes);

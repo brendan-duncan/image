@@ -76,7 +76,7 @@ class VP8BitReader {
     // Read 'BITS' bits at a time if possible.
     if (input.length >= 1) {
       // convert memory type to register type (with some zero'ing!)
-      var bits = input.readByte();
+      final bits = input.readByte();
       _value = bits | (_value << BITS);
       _bits += (BITS);
     } else {

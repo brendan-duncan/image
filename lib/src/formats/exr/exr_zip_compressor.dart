@@ -33,14 +33,14 @@ class InternalExrZipCompressor extends InternalExrCompressor
   @override
   Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
-    var data = zlib.decodeBytes(input.toUint8List());
+    final data = zlib.decodeBytes(input.toUint8List());
 
     width ??= header.width;
     height ??= header.linesInBuffer;
 
-    var minX = x;
+    final minX = x;
     var maxX = x + width! - 1;
-    var minY = y;
+    final minY = y;
     var maxY = y + height! - 1;
 
     if (maxX > header.width!) {

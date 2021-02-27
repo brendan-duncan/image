@@ -29,14 +29,14 @@ void main() {
       // verify pixels from (9,10) to (9,90) and (11,10) to (11,90) are white
       for (var x in [9, 11]) {
         for (var y = 10; y < 90; y++) {
-          var pixel = image.getPixel(x, y);
+          final pixel = image.getPixel(x, y);
           expect(pixel, whitecolor);
         }
       }
 
       // verify pixels from (10,10) to (10,90) are black
       for (var y = 10; y < 90; y++) {
-        var pixel = image.getPixel(10, y);
+        final pixel = image.getPixel(10, y);
         expect(pixel, blackcolor);
       }
     });
@@ -52,7 +52,7 @@ void main() {
       // verify pixels from (87,10) to (87,90) and (93,10) to (93,90) are white
       for (var x in [87, 92]) {
         for (var y = 10; y < 90; y++) {
-          var pixel = image.getPixel(x, y);
+          final pixel = image.getPixel(x, y);
           expect(pixel, whitecolor);
         }
       }
@@ -60,7 +60,7 @@ void main() {
       // verify pixels from (88,10) through (91,90) are black
       for (var x = 88; x < 92; x++) {
         for (var y = 10; y < 91; y++) {
-          var pixel = image.getPixel(x, y);
+          final pixel = image.getPixel(x, y);
           expect(pixel, blackcolor);
         }
       }
@@ -79,14 +79,14 @@ void main() {
       // verify pixels from (10,9) to (90,9) and (10,11) to (90,11) are white
       for (var y in [9, 11]) {
         for (var x = 10; x < 90; x++) {
-          var pixel = image.getPixel(x, y);
+          final pixel = image.getPixel(x, y);
           expect(pixel, whitecolor);
         }
       }
 
       // verify pixels from (90,10) to (90,90) are black
       for (var x = 10; x < 90; x++) {
-        var pixel = image.getPixel(x, 10);
+        final pixel = image.getPixel(x, 10);
         expect(pixel, blackcolor);
       }
     });
@@ -102,7 +102,7 @@ void main() {
       // verify pixels from (10,86) to (90,86) and (10,94) to (90,94) are white
       for (var y in [86, 94]) {
         for (var x = 10; x < 91; x++) {
-          var pixel = image.getPixel(x, y);
+          final pixel = image.getPixel(x, y);
           expect(pixel, whitecolor);
         }
       }
@@ -110,7 +110,7 @@ void main() {
       // verify pixels from (10,87) through (90,93) are black
       for (var y = 87; y < 94; y++) {
         for (var x = 10; x < 91; x++) {
-          var pixel = image.getPixel(x, y);
+          final pixel = image.getPixel(x, y);
           expect(pixel, blackcolor);
         }
       }
@@ -130,7 +130,7 @@ void main() {
       for (var x = 49; x <= 51; x++) {
         for (var y = 49; y <= 51; y++) {
           if (x == 50 && y == 50) continue;
-          var pixel = image.getPixel(x, y);
+          final pixel = image.getPixel(x, y);
           expect(pixel, whitecolor);
         }
       }
@@ -143,7 +143,7 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
-      var blackPixels = [
+      final blackPixels = [
         Point(49, 50),
         Point(50, 49),
         Point(50, 50),
@@ -157,9 +157,9 @@ void main() {
 
       for (var x = 48; x <= 52; x++) {
         for (var y = 48; y <= 52; y++) {
-          var pt = Point(x, y);
+          final pt = Point(x, y);
           if (!blackPixels.contains(pt)) {
-            var pixel = image.getPixel(pt.xi, pt.yi);
+            final pixel = image.getPixel(pt.xi, pt.yi);
             expect(pixel, whitecolor);
           }
         }
@@ -173,7 +173,7 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
-      var blackPixels = [
+      final blackPixels = [
         Point(48, 49), Point(48, 50), Point(48, 51), // column 1
         Point(49, 48), Point(49, 49), Point(49, 50), Point(49, 51),
         Point(49, 52), // column 2
@@ -190,9 +190,9 @@ void main() {
 
       for (var x = 47; x <= 53; x++) {
         for (var y = 47; y <= 53; y++) {
-          var pt = Point(x, y);
+          final pt = Point(x, y);
           if (!blackPixels.contains(pt)) {
-            var pixel = image.getPixel(pt.xi, pt.yi);
+            final pixel = image.getPixel(pt.xi, pt.yi);
             expect(pixel, whitecolor);
           }
         }

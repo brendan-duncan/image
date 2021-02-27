@@ -17,7 +17,7 @@ const _dctClipOffset = 256;
 const _dctClipLength = 768;
 
 Uint8List _createDctClip() {
-  var result = Uint8List(_dctClipLength);
+  final result = Uint8List(_dctClipLength);
   int i;
   for (i = -256; i < 0; ++i) {
     result[_dctClipOffset + i] = 0;
@@ -39,7 +39,7 @@ Uint8List _createDctClip() {
 // IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
 void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
     Uint8List dataOut, Int32List dataIn) {
-  var p = dataIn;
+  final p = dataIn;
 
   // IDCT constants (20.12 fixed point format)
   const COS_1 = 4017; // cos(pi/16)*4096
@@ -67,7 +67,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
         p[5 + row] == 0 &&
         p[6 + row] == 0 &&
         p[7 + row] == 0) {
-      var t = ((SQRT_2 * p[0 + row] + 512) >> 10);
+      final t = ((SQRT_2 * p[0 + row] + 512) >> 10);
       p[row + 0] = t;
       p[row + 1] = t;
       p[row + 2] = t;
@@ -130,7 +130,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 
   // inverse DCT on columns
   for (var i = 0; i < 8; ++i) {
-    var col = i;
+    final col = i;
 
     // check for all-zero AC coefficients
     if (p[1 * 8 + col] == 0 &&
@@ -140,7 +140,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
         p[5 * 8 + col] == 0 &&
         p[6 * 8 + col] == 0 &&
         p[7 * 8 + col] == 0) {
-      var t = ((SQRT_2 * dataIn[i] + 8192) >> 14);
+      final t = ((SQRT_2 * dataIn[i] + 8192) >> 14);
       p[0 * 8 + col] = t;
       p[1 * 8 + col] = t;
       p[2 * 8 + col] = t;
@@ -208,7 +208,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 }
 
 Image getImageFromJpeg(JpegData jpeg) {
-  var image = Image(jpeg.width!, jpeg.height!, channels: Channels.rgb);
+  final image = Image(jpeg.width!, jpeg.height!, channels: Channels.rgb);
   image.exif = ExifData.from(jpeg.exif);
 
   ComponentData component1;
@@ -226,14 +226,14 @@ Image getImageFromJpeg(JpegData jpeg) {
   switch (jpeg.components.length) {
     case 1:
       component1 = jpeg.components[0];
-      var lines = component1.lines;
-      var hShift1 = component1.hScaleShift;
-      var vShift1 = component1.vScaleShift;
+      final lines = component1.lines;
+      final hShift1 = component1.hScaleShift;
+      final vShift1 = component1.vScaleShift;
       for (var y = 0; y < jpeg.height!; y++) {
-        var y1 = y >> vShift1;
+        final y1 = y >> vShift1;
         component1Line = lines[y1];
         for (var x = 0; x < jpeg.width!; x++) {
-          var x1 = x >> hShift1;
+          final x1 = x >> hShift1;
           Y = component1Line![x1];
           image[offset++] = getColor(Y, Y, Y);
         }
@@ -274,30 +274,30 @@ Image getImageFromJpeg(JpegData jpeg) {
       component2 = jpeg.components[1];
       component3 = jpeg.components[2];
 
-      var lines1 = component1.lines;
-      var lines2 = component2.lines;
-      var lines3 = component3.lines;
+      final lines1 = component1.lines;
+      final lines2 = component2.lines;
+      final lines3 = component3.lines;
 
-      var hShift1 = component1.hScaleShift;
-      var vShift1 = component1.vScaleShift;
-      var hShift2 = component2.hScaleShift;
-      var vShift2 = component2.vScaleShift;
-      var hShift3 = component3.hScaleShift;
-      var vShift3 = component3.vScaleShift;
+      final hShift1 = component1.hScaleShift;
+      final vShift1 = component1.vScaleShift;
+      final hShift2 = component2.hScaleShift;
+      final vShift2 = component2.vScaleShift;
+      final hShift3 = component3.hScaleShift;
+      final vShift3 = component3.vScaleShift;
 
       for (var y = 0; y < jpeg.height!; y++) {
-        var y1 = y >> vShift1;
-        var y2 = y >> vShift2;
-        var y3 = y >> vShift3;
+        final y1 = y >> vShift1;
+        final y2 = y >> vShift2;
+        final y3 = y >> vShift3;
 
         component1Line = lines1[y1];
         component2Line = lines2[y2];
         component3Line = lines3[y3];
 
         for (var x = 0; x < jpeg.width!; x++) {
-          var x1 = x >> hShift1;
-          var x2 = x >> hShift2;
-          var x3 = x >> hShift3;
+          final x1 = x >> hShift1;
+          final x2 = x >> hShift2;
+          final x3 = x >> hShift3;
 
           Y = component1Line![x1] << 8;
           Cb = component2Line![x2] - 128;
@@ -329,34 +329,34 @@ Image getImageFromJpeg(JpegData jpeg) {
       component3 = jpeg.components[2];
       component4 = jpeg.components[3];
 
-      var lines1 = component1.lines;
-      var lines2 = component2.lines;
-      var lines3 = component3.lines;
-      var lines4 = component4.lines;
+      final lines1 = component1.lines;
+      final lines2 = component2.lines;
+      final lines3 = component3.lines;
+      final lines4 = component4.lines;
 
-      var hShift1 = component1.hScaleShift;
-      var vShift1 = component1.vScaleShift;
-      var hShift2 = component2.hScaleShift;
-      var vShift2 = component2.vScaleShift;
-      var hShift3 = component3.hScaleShift;
-      var vShift3 = component3.vScaleShift;
-      var hShift4 = component4.hScaleShift;
-      var vShift4 = component4.vScaleShift;
+      final hShift1 = component1.hScaleShift;
+      final vShift1 = component1.vScaleShift;
+      final hShift2 = component2.hScaleShift;
+      final vShift2 = component2.vScaleShift;
+      final hShift3 = component3.hScaleShift;
+      final vShift3 = component3.vScaleShift;
+      final hShift4 = component4.hScaleShift;
+      final vShift4 = component4.vScaleShift;
 
       for (var y = 0; y < jpeg.height!; y++) {
-        var y1 = y >> vShift1;
-        var y2 = y >> vShift2;
-        var y3 = y >> vShift3;
-        var y4 = y >> vShift4;
+        final y1 = y >> vShift1;
+        final y2 = y >> vShift2;
+        final y3 = y >> vShift3;
+        final y4 = y >> vShift4;
         component1Line = lines1[y1];
         component2Line = lines2[y2];
         component3Line = lines3[y3];
         component4Line = lines4[y4];
         for (var x = 0; x < jpeg.width!; x++) {
-          var x1 = x >> hShift1;
-          var x2 = x >> hShift2;
-          var x3 = x >> hShift3;
-          var x4 = x >> hShift4;
+          final x1 = x >> hShift1;
+          final x2 = x >> hShift2;
+          final x3 = x >> hShift3;
+          final x4 = x >> hShift4;
           if (!colorTransform) {
             C = component1Line![x1];
             M = component2Line![x2];

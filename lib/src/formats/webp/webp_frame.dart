@@ -30,7 +30,7 @@ class WebPFrame {
         width = input.readUint24() + 1,
         height = input.readUint24() + 1,
         duration = input.readUint24() {
-    var b = input.readByte();
+    final b = input.readByte();
     _reserved = (b & 0x7F) >> 7;
     clearFrame = (b & 0x1) != 0;
 

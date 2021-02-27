@@ -5,11 +5,11 @@ import 'package:test/test.dart';
 import 'paths.dart';
 
 void main() {
-  var dir = Directory('test/res/tiff');
+  final dir = Directory('test/res/tiff');
   if (!dir.existsSync()) {
     return;
   }
-  var files = dir.listSync();
+  final files = dir.listSync();
 
   group('TIFF/getInfo', () {
     for (var f in files.whereType<File>()) {
@@ -17,11 +17,11 @@ void main() {
         continue;
       }
 
-      var name = f.path.split(RegExp(r'(/|\\)')).last;
+      final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         final bytes = f.readAsBytesSync();
 
-        var info = TiffDecoder().startDecode(bytes);
+        final info = TiffDecoder().startDecode(bytes);
         if (info == null) {
           throw ImageException('Unable to parse Tiff info: $name.');
         }
@@ -61,10 +61,10 @@ void main() {
         continue;
       }
 
-      var name = f.path.split(RegExp(r'(/|\\)')).last;
+      final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('$name', () {
         print(name);
-        List<int> bytes = f.readAsBytesSync();
+        final List<int> bytes = f.readAsBytesSync();
         final image = TiffDecoder().decodeImage(bytes);
         if (image == null) {
           throw ImageException('Unable to decode TIFF Image: $name.');

@@ -28,14 +28,14 @@ class InternalExrRleCompressor extends InternalExrCompressor
   @override
   Uint8List uncompress(InputBuffer inPtr, int x, int y,
       [int? width, int? height]) {
-    var out = OutputBuffer(size: inPtr.length * 2);
+    final out = OutputBuffer(size: inPtr.length * 2);
 
     width ??= header.width;
     height ??= header.linesInBuffer;
 
-    var minX = x;
+    final minX = x;
     var maxX = x + width! - 1;
-    var minY = y;
+    final minY = y;
     var maxY = y + height! - 1;
 
     if (maxX > header.width!) {
@@ -49,7 +49,7 @@ class InternalExrRleCompressor extends InternalExrCompressor
     decodedHeight = (maxY - minY) + 1;
 
     while (!inPtr.isEOS) {
-      var n = inPtr.readInt8();
+      final n = inPtr.readInt8();
       if (n < 0) {
         var count = -n;
         while (count-- > 0) {
@@ -63,7 +63,7 @@ class InternalExrRleCompressor extends InternalExrCompressor
       }
     }
 
-    var data = out.getBytes() as Uint8List;
+    final data = out.getBytes() as Uint8List;
 
     // Predictor
     for (var i = 1, len = data.length; i < len; ++i) {

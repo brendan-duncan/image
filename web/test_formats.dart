@@ -11,13 +11,13 @@ void main() {
   // An img on the html page is used to establish the path to the images
   // directory. It's removed after we get the path since we'll be populating
   // the page with our own decoded images.
-  var img = querySelectorAll('img')[0] as prefix0.ImageElement;
-  var path = img.src!.substring(0, img.src!.lastIndexOf('/'));
+  final img = querySelectorAll('img')[0] as prefix0.ImageElement;
+  final path = img.src!.substring(0, img.src!.lastIndexOf('/'));
   img.remove();
 
   // The list of images we'll be decoding, representing a wide range
   // of formats and sub-formats.
-  var images = [
+  final images = [
     'penguins.jpg',
     'puppies.jpg',
     '1_webp_ll.webp',
@@ -31,47 +31,47 @@ void main() {
 
   for (var name in images) {
     // Use an http request to get the image file from disk.
-    var req = HttpRequest();
+    final req = HttpRequest();
     req.open('GET', path + '/' + name);
     req.responseType = 'arraybuffer';
     req.onLoadEnd.listen((e) {
       if (req.status == 200) {
         // Convert the text to binary byte list.
-        List<int> bytes = Uint8List.view(req.response as ByteBuffer);
+        final List<int> bytes = Uint8List.view(req.response as ByteBuffer);
 
-        var label = DivElement();
+        final label = DivElement();
         document.body!.append(label);
         label.text = name;
 
         // Create a canvas to put our decoded image into.
-        var c = CanvasElement();
+        final c = CanvasElement();
         document.body!.append(c);
 
         // Find the best decoder for the image.
-        var decoder = findDecoderForData(bytes);
+        final decoder = findDecoderForData(bytes);
         if (decoder == null) {
           return;
         }
 
         // Some of the files are animated, so always decode to animation.
         // Single image files will decode to a single framed animation.
-        var anim = decoder.decodeAnimation(bytes);
+        final anim = decoder.decodeAnimation(bytes);
         if (anim == null) {
           return;
         }
 
         // If it's a single image, dump the decoded image into the canvas.
         if (anim.length == 1) {
-          var image = anim.frames[0];
+          final image = anim.frames[0];
 
           //Image newImage = copyResize(image, 2000, -1, CUBIC);
-          var newImage = image;
+          final newImage = image;
 
           c.width = newImage.width;
           c.height = newImage.height;
 
           // Create a buffer that the canvas can draw.
-          var d = c.context2D.createImageData(c.width, c.height);
+          final d = c.context2D.createImageData(c.width, c.height);
           // Fill the buffer with our image data.
           d.data.setRange(
               0, d.data.length, newImage.getBytes(format: Format.rgba));
@@ -89,11 +89,11 @@ void main() {
         c.width = anim.frames[0].width;
         c.height = anim.frames[0].height;
         // Create a buffer that the canvas can draw.
-        var d = c.context2D.createImageData(c.width, c.height);
+        final d = c.context2D.createImageData(c.width, c.height);
 
         var frame = 0;
         Timer.periodic(Duration(milliseconds: 40), (t) {
-          var image = anim.frames[frame++];
+          final image = anim.frames[frame++];
           if (frame >= anim.numFrames) {
             frame = 0;
           }

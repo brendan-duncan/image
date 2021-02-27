@@ -6,7 +6,7 @@ import 'paths.dart';
 
 void main() {
   final dir = Directory('test/res/gif');
-  var files = dir.listSync();
+  final files = dir.listSync();
 
   group('GIF', () {
     for (var f in files.whereType<File>()) {
@@ -16,7 +16,7 @@ void main() {
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('getInfo $name', () {
-        var bytes = f.readAsBytesSync();
+        final bytes = f.readAsBytesSync();
 
         final data = GifDecoder().startDecode(bytes);
         if (data == null) {
@@ -32,7 +32,7 @@ void main() {
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
       test('decodeImage $name', () {
-        var bytes = f.readAsBytesSync();
+        final bytes = f.readAsBytesSync();
         final image = GifDecoder().decodeImage(bytes)!;
         File('$tmpPath/out/gif/$name.png')
           ..createSync(recursive: true)
@@ -55,7 +55,7 @@ void main() {
       });
 
       test('encodeCars', () {
-        var gif = encodeGifAnimation(anim!)!;
+        final gif = encodeGifAnimation(anim!)!;
         File('$tmpPath/out/gif/cars.gif')
           ..createSync(recursive: true)
           ..writeAsBytesSync(gif);

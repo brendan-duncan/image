@@ -9,14 +9,14 @@ late Image origImage;
 
 void _addControl(String label, String value, DivElement parent,
     void Function(double) callback) {
-  var amountLabel = LabelElement();
+  final amountLabel = LabelElement();
   amountLabel.text = label + ':';
-  var amountEdit = InputElement();
+  final amountEdit = InputElement();
   amountEdit.value = value;
   amountEdit.id = label + '_edit';
   amountEdit.onChange.listen((e) {
     try {
-      var d = double.parse(amountEdit.value!);
+      final d = double.parse(amountEdit.value!);
       callback(d);
     } catch (e) {
       print(e);
@@ -29,17 +29,17 @@ void _addControl(String label, String value, DivElement parent,
 }
 
 void testSepia() {
-  var sidebar = document.querySelector('#sidebar') as DivElement;
+  final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  var label = Element.tag('h1');
+  final label = Element.tag('h1');
   label.text = 'Sepia';
   sidebar.children.add(label);
 
   num amount = 1.0;
 
   void _apply() {
-    var t = Stopwatch();
+    final t = Stopwatch();
     t.start();
     var image = Image.from(origImage);
     image = sepia(image, amount: amount);
@@ -63,17 +63,17 @@ void testSepia() {
 }
 
 void testSobel() {
-  var sidebar = document.querySelector('#sidebar') as DivElement;
+  final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  var label = Element.tag('h1');
+  final label = Element.tag('h1');
   label.text = 'Sepia';
   sidebar.children.add(label);
 
   num amount = 1.0;
 
   void _apply() {
-    var t = Stopwatch();
+    final t = Stopwatch();
     t.start();
     var image = Image.from(origImage);
     image = sobel(image, amount: amount);
@@ -97,17 +97,17 @@ void testSobel() {
 }
 
 void testGaussian() {
-  var sidebar = document.querySelector('#sidebar') as DivElement;
+  final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  var label = Element.tag('h1');
+  final label = Element.tag('h1');
   label.text = 'Gaussian Blur';
   sidebar.children.add(label);
 
   var radius = 5;
 
   void _apply() {
-    var t = Stopwatch();
+    final t = Stopwatch();
     t.start();
     var image = Image.from(origImage);
     image = gaussianBlur(image, radius);
@@ -131,10 +131,10 @@ void testGaussian() {
 }
 
 void testVignette() {
-  var sidebar = document.querySelector('#sidebar') as DivElement;
+  final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  var label = Element.tag('h1');
+  final label = Element.tag('h1');
   label.text = 'Vignette';
   sidebar.children.add(label);
 
@@ -143,7 +143,7 @@ void testVignette() {
   num amount = 1.0;
 
   void _apply() {
-    var t = Stopwatch();
+    final t = Stopwatch();
     t.start();
     var image = Image.from(origImage);
     image = vignette(image, start: start, end: end, amount: amount);
@@ -177,17 +177,17 @@ void testVignette() {
 }
 
 void testPixelate() {
-  var sidebar = document.querySelector('#sidebar') as DivElement;
+  final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  var label = Element.tag('h1');
+  final label = Element.tag('h1');
   label.text = 'Pixelate';
   sidebar.children.add(label);
 
   var blockSize = 5;
 
   void _apply() {
-    var t = Stopwatch();
+    final t = Stopwatch();
     t.start();
     var image = Image.from(origImage);
     image = pixelate(image, blockSize);
@@ -211,10 +211,10 @@ void testPixelate() {
 }
 
 void testColorOffset() {
-  var sidebar = document.querySelector('#sidebar') as DivElement;
+  final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  var label = Element.tag('h1');
+  final label = Element.tag('h1');
   label.text = 'Pixelate';
   sidebar.children.add(label);
 
@@ -224,7 +224,7 @@ void testColorOffset() {
   var alpha = 0;
 
   void _apply() {
-    var t = Stopwatch();
+    final t = Stopwatch();
     t.start();
     var image = Image.from(origImage);
     image =
@@ -264,10 +264,10 @@ void testColorOffset() {
 }
 
 void testAdjustColor() {
-  var sidebar = document.querySelector('#sidebar') as DivElement;
+  final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  var label = Element.tag('h1');
+  final label = Element.tag('h1');
   label.text = 'Adjust Color';
   sidebar.children.add(label);
 
@@ -280,7 +280,7 @@ void testAdjustColor() {
   num amount = 1.0;
 
   void _apply() {
-    var t = Stopwatch();
+    final t = Stopwatch();
     t.start();
     var image = Image.from(origImage);
 
@@ -346,7 +346,7 @@ void main() {
   canvas = document.querySelector('#filter_canvas') as CanvasElement;
   logDiv = document.querySelector('#log') as DivElement;
 
-  var menu = document.querySelector('#FilterType') as SelectElement;
+  final menu = document.querySelector('#FilterType') as SelectElement;
   menu.onChange.listen((e) {
     if (menu.value == 'Pixelate') {
       testPixelate();
@@ -365,15 +365,15 @@ void main() {
     }
   });
 
-  var img = ImageElement();
+  final img = ImageElement();
   img.src = 'res/big_buck_bunny.jpg';
   img.onLoad.listen((e) {
-    var c = CanvasElement();
+    final c = CanvasElement();
     c.width = img.width;
     c.height = img.height;
     c.context2D.drawImage(img, 0, 0);
 
-    var imageData = c.context2D.getImageData(0, 0, img.width!, img.height!);
+    final imageData = c.context2D.getImageData(0, 0, img.width!, img.height!);
     origImage = Image.fromBytes(img.width!, img.height!, imageData.data);
 
     canvas.width = img.width;

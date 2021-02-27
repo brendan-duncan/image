@@ -39,7 +39,7 @@ class JpegEncoder extends Encoder {
 
   @override
   List<int> encodeImage(Image image) {
-    var fp = OutputBuffer(bigEndian: true);
+    final fp = OutputBuffer(bigEndian: true);
 
     // Add JPEG headers
     _writeMarker(fp, Jpeg.M_SOI);
@@ -57,11 +57,11 @@ class JpegEncoder extends Encoder {
 
     _resetBits();
 
-    var width = image.width;
-    var height = image.height;
+    final width = image.width;
+    final height = image.height;
 
-    var imageData = image.getBytes();
-    var quadWidth = width * 4;
+    final imageData = image.getBytes();
+    final quadWidth = width * 4;
     //int tripleWidth = width * 3;
     //bool first = true;
 
@@ -69,10 +69,10 @@ class JpegEncoder extends Encoder {
     while (y < height) {
       var x = 0;
       while (x < quadWidth) {
-        var start = quadWidth * y + x;
+        final start = quadWidth * y + x;
         for (var pos = 0; pos < 64; pos++) {
-          var row = pos >> 3; // / 8
-          var col = (pos & 7) * 4; // % 8
+          final row = pos >> 3; // / 8
+          final col = (pos & 7) * 4; // % 8
           var p = start + (row * quadWidth) + col;
 
           if (y + row >= height) {
@@ -85,9 +85,9 @@ class JpegEncoder extends Encoder {
             p -= ((x + col) - quadWidth + 4);
           }
 
-          var r = imageData[p++];
-          var g = imageData[p++];
-          var b = imageData[p++];
+          final r = imageData[p++];
+          final g = imageData[p++];
+          final b = imageData[p++];
 
           // calculate YUV values
           YDU[pos] = ((RGB_YUV_TABLE[r] +
@@ -317,10 +317,10 @@ class JpegEncoder extends Encoder {
   List<List<int>?> _computeHuffmanTbl(List<int> nrcodes, List<int> std_table) {
     var codevalue = 0;
     var pos_in_table = 0;
-    var HT = <List<int>?>[<int>[]];
+    final HT = <List<int>?>[<int>[]];
     for (var k = 1; k <= 16; k++) {
       for (var j = 1; j <= nrcodes[k]; j++) {
-        var index = std_table[pos_in_table];
+        final index = std_table[pos_in_table];
         if (HT.length <= index) {
           HT.length = index + 1;
         }
@@ -383,34 +383,34 @@ class JpegEncoder extends Encoder {
     const I8 = 8;
     const I64 = 64;
     for (var i = 0; i < I8; ++i) {
-      var d0 = data[dataOff];
-      var d1 = data[dataOff + 1];
-      var d2 = data[dataOff + 2];
-      var d3 = data[dataOff + 3];
-      var d4 = data[dataOff + 4];
-      var d5 = data[dataOff + 5];
-      var d6 = data[dataOff + 6];
-      var d7 = data[dataOff + 7];
+      final d0 = data[dataOff];
+      final d1 = data[dataOff + 1];
+      final d2 = data[dataOff + 2];
+      final d3 = data[dataOff + 3];
+      final d4 = data[dataOff + 4];
+      final d5 = data[dataOff + 5];
+      final d6 = data[dataOff + 6];
+      final d7 = data[dataOff + 7];
 
-      var tmp0 = d0 + d7;
-      var tmp7 = d0 - d7;
-      var tmp1 = d1 + d6;
-      var tmp6 = d1 - d6;
-      var tmp2 = d2 + d5;
-      var tmp5 = d2 - d5;
-      var tmp3 = d3 + d4;
-      var tmp4 = d3 - d4;
+      final tmp0 = d0 + d7;
+      final tmp7 = d0 - d7;
+      final tmp1 = d1 + d6;
+      final tmp6 = d1 - d6;
+      final tmp2 = d2 + d5;
+      final tmp5 = d2 - d5;
+      final tmp3 = d3 + d4;
+      final tmp4 = d3 - d4;
 
       // Even part
       var tmp10 = tmp0 + tmp3; // phase 2
-      var tmp13 = tmp0 - tmp3;
+      final tmp13 = tmp0 - tmp3;
       var tmp11 = tmp1 + tmp2;
       var tmp12 = tmp1 - tmp2;
 
       data[dataOff] = tmp10 + tmp11; // phase 3
       data[dataOff + 4] = tmp10 - tmp11;
 
-      var z1 = (tmp12 + tmp13) * 0.707106781; // c4
+      final z1 = (tmp12 + tmp13) * 0.707106781; // c4
       data[dataOff + 2] = tmp13 + z1; // phase 5
       data[dataOff + 6] = tmp13 - z1;
 
@@ -420,13 +420,13 @@ class JpegEncoder extends Encoder {
       tmp12 = tmp6 + tmp7;
 
       // The rotator is modified from fig 4-8 to avoid extra negations.
-      var z5 = (tmp10 - tmp12) * 0.382683433; // c6
-      var z2 = 0.541196100 * tmp10 + z5; // c2 - c6
-      var z4 = 1.306562965 * tmp12 + z5; // c2 + c6
-      var z3 = tmp11 * 0.707106781; // c4
+      final z5 = (tmp10 - tmp12) * 0.382683433; // c6
+      final z2 = 0.541196100 * tmp10 + z5; // c2 - c6
+      final z4 = 1.306562965 * tmp12 + z5; // c2 + c6
+      final z3 = tmp11 * 0.707106781; // c4
 
-      var z11 = tmp7 + z3; // phase 5
-      var z13 = tmp7 - z3;
+      final z11 = tmp7 + z3; // phase 5
+      final z13 = tmp7 - z3;
 
       data[dataOff + 5] = z13 + z2; // phase 6
       data[dataOff + 3] = z13 - z2;
@@ -439,34 +439,34 @@ class JpegEncoder extends Encoder {
     // Pass 2: process columns.
     dataOff = 0;
     for (var i = 0; i < I8; ++i) {
-      var d0 = data[dataOff];
-      var d1 = data[dataOff + 8];
-      var d2 = data[dataOff + 16];
-      var d3 = data[dataOff + 24];
-      var d4 = data[dataOff + 32];
-      var d5 = data[dataOff + 40];
-      var d6 = data[dataOff + 48];
-      var d7 = data[dataOff + 56];
+      final d0 = data[dataOff];
+      final d1 = data[dataOff + 8];
+      final d2 = data[dataOff + 16];
+      final d3 = data[dataOff + 24];
+      final d4 = data[dataOff + 32];
+      final d5 = data[dataOff + 40];
+      final d6 = data[dataOff + 48];
+      final d7 = data[dataOff + 56];
 
-      var tmp0p2 = d0 + d7;
-      var tmp7p2 = d0 - d7;
-      var tmp1p2 = d1 + d6;
-      var tmp6p2 = d1 - d6;
-      var tmp2p2 = d2 + d5;
-      var tmp5p2 = d2 - d5;
-      var tmp3p2 = d3 + d4;
-      var tmp4p2 = d3 - d4;
+      final tmp0p2 = d0 + d7;
+      final tmp7p2 = d0 - d7;
+      final tmp1p2 = d1 + d6;
+      final tmp6p2 = d1 - d6;
+      final tmp2p2 = d2 + d5;
+      final tmp5p2 = d2 - d5;
+      final tmp3p2 = d3 + d4;
+      final tmp4p2 = d3 - d4;
 
       // Even part
       var tmp10p2 = tmp0p2 + tmp3p2; // phase 2
-      var tmp13p2 = tmp0p2 - tmp3p2;
+      final tmp13p2 = tmp0p2 - tmp3p2;
       var tmp11p2 = tmp1p2 + tmp2p2;
       var tmp12p2 = tmp1p2 - tmp2p2;
 
       data[dataOff] = tmp10p2 + tmp11p2; // phase 3
       data[dataOff + 32] = tmp10p2 - tmp11p2;
 
-      var z1p2 = (tmp12p2 + tmp13p2) * 0.707106781; // c4
+      final z1p2 = (tmp12p2 + tmp13p2) * 0.707106781; // c4
       data[dataOff + 16] = tmp13p2 + z1p2; // phase 5
       data[dataOff + 48] = tmp13p2 - z1p2;
 
@@ -476,13 +476,13 @@ class JpegEncoder extends Encoder {
       tmp12p2 = tmp6p2 + tmp7p2;
 
       // The rotator is modified from fig 4-8 to avoid extra negations.
-      var z5p2 = (tmp10p2 - tmp12p2) * 0.382683433; // c6
-      var z2p2 = 0.541196100 * tmp10p2 + z5p2; // c2 - c6
-      var z4p2 = 1.306562965 * tmp12p2 + z5p2; // c2 + c6
-      var z3p2 = tmp11p2 * 0.707106781; // c4
+      final z5p2 = (tmp10p2 - tmp12p2) * 0.382683433; // c6
+      final z2p2 = 0.541196100 * tmp10p2 + z5p2; // c2 - c6
+      final z4p2 = 1.306562965 * tmp12p2 + z5p2; // c2 + c6
+      final z3p2 = tmp11p2 * 0.707106781; // c4
 
-      var z11p2 = tmp7p2 + z3p2; // phase 5
-      var z13p2 = tmp7p2 - z3p2;
+      final z11p2 = tmp7p2 + z3p2; // phase 5
+      final z13p2 = tmp7p2 - z3p2;
 
       data[dataOff + 40] = z13p2 + z2p2; // phase 6
       data[dataOff + 24] = z13p2 - z2p2;
@@ -495,7 +495,7 @@ class JpegEncoder extends Encoder {
     // Quantize/descale the coefficients
     for (var i = 0; i < I64; ++i) {
       // Apply the quantization and scaling factor & Round to nearest integer
-      var fDCTQuant = data[i] * fdtbl[i];
+      final fDCTQuant = data[i] * fdtbl[i];
       outputfDCTQuant[i] = (fDCTQuant > 0.0)
           ? ((fDCTQuant + 0.5).toInt())
           : ((fDCTQuant - 0.5).toInt());
@@ -618,20 +618,20 @@ class JpegEncoder extends Encoder {
 
   int? _processDU(OutputBuffer out, List<double> CDU, List<double> fdtbl,
       int DC, List<List<int>?>? HTDC, List<List<int>?> HTAC) {
-    var EOB = HTAC[0x00];
-    var M16zeroes = HTAC[0xF0];
+    final EOB = HTAC[0x00];
+    final M16zeroes = HTAC[0xF0];
     int pos;
     const I16 = 16;
     const I63 = 63;
     const I64 = 64;
-    var DU_DCT = _fDCTQuant(CDU, fdtbl);
+    final DU_DCT = _fDCTQuant(CDU, fdtbl);
 
     // ZigZag reorder
     for (var j = 0; j < I64; ++j) {
       DU[ZIGZAG[j]] = DU_DCT[j];
     }
 
-    var Diff = DU[0]! - DC;
+    final Diff = DU[0]! - DC;
     DC = DU[0]!;
     // Encode DC
     if (Diff == 0) {
@@ -655,7 +655,7 @@ class JpegEncoder extends Encoder {
     var i = 1;
     int lng;
     while (i <= end0pos) {
-      var startpos = i;
+      final startpos = i;
       for (; (DU[i] == 0) && (i <= end0pos); ++i) {}
 
       var nrzeroes = i - startpos;
@@ -680,7 +680,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeBits(OutputBuffer out, List<int> bits) {
-    var value = bits[0];
+    final value = bits[0];
     var posval = bits[1] - 1;
     while (posval >= 0) {
       if ((value & (1 << posval)) != 0) {

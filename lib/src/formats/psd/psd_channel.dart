@@ -55,7 +55,7 @@ class PsdChannel {
   }
 
   Uint16List _readLineLengths(InputBuffer input, int height) {
-    var lineLengths = Uint16List(height);
+    final lineLengths = Uint16List(height);
     for (var i = 0; i < height; ++i) {
       lineLengths[i] = input.readUint16();
     }
@@ -74,7 +74,7 @@ class PsdChannel {
       return;
     }
 
-    var imgData = input.readBytes(len);
+    final imgData = input.readBytes(len);
     data = imgData.toUint8List();
   }
 
@@ -93,8 +93,8 @@ class PsdChannel {
     }
 
     for (var i = 0; i < height; ++i) {
-      var len = lineLengths[lineIndex++];
-      var s = input.readBytes(len);
+      final len = lineLengths[lineIndex++];
+      final s = input.readBytes(len);
       _decodeRLE(s, data, pos);
       pos += width;
     }
@@ -105,7 +105,7 @@ class PsdChannel {
       var n = src.readInt8();
       if (n < 0) {
         n = 1 - n;
-        var b = src.readByte();
+        final b = src.readByte();
         for (var i = 0; i < n; ++i) {
           dst[dstIndex++] = b;
         }

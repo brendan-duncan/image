@@ -17,9 +17,9 @@ abstract class WinEncoder extends Encoder {
   }
 
   List<int> encodeImages(List<Image> images) {
-    var count = images.length;
+    final count = images.length;
 
-    var out = OutputBuffer(bigEndian: false);
+    final out = OutputBuffer(bigEndian: false);
 
     // header
     out.writeUint16(0); // reserved
@@ -28,7 +28,7 @@ abstract class WinEncoder extends Encoder {
 
     var offset = 6 + count * 16; // file header with image directory byte size
 
-    var imageDatas = [<int>[]];
+    final imageDatas = [<int>[]];
 
     var i = 0;
     for (var img in images) {
@@ -45,7 +45,7 @@ abstract class WinEncoder extends Encoder {
       out.writeUint16(bitsPerPixelOrYHotSpot(i));
 
       // Use png instead of bmp encoded data, it's supported since Windows Vista
-      var data = PngEncoder().encodeImage(img);
+      final data = PngEncoder().encodeImage(img);
 
       out.writeUint32(data.length); // size of the image's data in bytes
       out.writeUint32(offset); // offset of data from the beginning of the file

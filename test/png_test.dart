@@ -33,12 +33,13 @@ void main() {
     });
 
     test('decode', () {
-      List<int> bytes = File('$tmpPath/out/png/encode.png').readAsBytesSync();
+      final List<int> bytes =
+          File('$tmpPath/out/png/encode.png').readAsBytesSync();
       final image = PngDecoder().decodeImage(bytes)!;
 
       expect(image.width, equals(64));
       expect(image.height, equals(64));
-      var c = getColor(100, 200, 255);
+      final c = getColor(100, 200, 255);
       for (var i = 0, len = image.length; i < len; ++i) {
         expect(image[i], equals(c));
       }
@@ -63,7 +64,7 @@ void main() {
     });
 
     final dir = Directory('test/res/png');
-    var files = dir.listSync();
+    final files = dir.listSync();
 
     for (var f in files) {
       if (f is! File || !f.path.endsWith('.png')) {
@@ -104,7 +105,7 @@ void main() {
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
           try {
-            var image = PngDecoder().decodeImage(file.readAsBytesSync());
+            final image = PngDecoder().decodeImage(file.readAsBytesSync());
             expect(image, isNull);
           } catch (e) {
             ;

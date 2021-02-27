@@ -64,10 +64,10 @@ class SeparableKernel {
       num a = 0.0;
 
       for (var j = -size, j2 = 0; j <= size; ++j, ++j2) {
-        var coeff = coefficients[j2];
-        var gr = _reflect(width, x + j);
+        final coeff = coefficients[j2];
+        final gr = _reflect(width, x + j);
 
-        var sc = (horizontal) ? src.getPixel(gr, y) : src.getPixel(y, gr);
+        final sc = (horizontal) ? src.getPixel(gr, y) : src.getPixel(y, gr);
 
         r += coeff * getRed(sc);
         g += coeff * getGreen(sc);
@@ -75,7 +75,7 @@ class SeparableKernel {
         a += coeff * getAlpha(sc);
       }
 
-      var c = getColor(
+      final c = getColor(
           (r > 255.0 ? 255.0 : r).toInt(),
           (g > 255.0 ? 255.0 : g).toInt(),
           (b > 255.0 ? 255.0 : b).toInt(),

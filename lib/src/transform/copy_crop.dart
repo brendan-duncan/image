@@ -13,7 +13,7 @@ Image copyCrop(Image src, int x, int y, int w, int h) {
     h = src.height - y;
   }
 
-  var dst =
+  final dst =
       Image(w, h, channels: src.channels, exif: src.exif, iccp: src.iccProfile);
 
   for (var yi = 0, sy = y; yi < h; ++yi, ++sy) {
@@ -39,7 +39,7 @@ Image copyCropCircle(Image src, {int? radius, Point? center}) {
   final tlx = center.x.toInt() - radius; //topLeft.x
   final tly = center.y.toInt() - radius; //topLeft.y
 
-  var dst = Image(
+  final dst = Image(
     radius * 2,
     radius * 2,
     channels: Channels.rgba,

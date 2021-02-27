@@ -17,7 +17,7 @@ class WebPAlpha {
   bool isAlphaDecoded = false;
 
   WebPAlpha(this.input, this.width, this.height) {
-    var b = input.readByte();
+    final b = input.readByte();
     method = b & 0x03;
     filter = (b >> 2) & 0x03;
     preProcessing = (b >> 4) & 0x03;
@@ -55,7 +55,7 @@ class WebPAlpha {
       return false;
     }
 
-    var unfilterFunc = WebPFilters.UNFILTERS[filter];
+    final unfilterFunc = WebPFilters.UNFILTERS[filter];
 
     if (method == ALPHA_NO_COMPRESSION) {
       final offset = row * width;
@@ -107,7 +107,7 @@ class WebPAlpha {
   }
 
   bool _decodeAlphaHeader() {
-    var webp = WebPInfo();
+    final webp = WebPInfo();
     webp.width = width;
     webp.height = height;
 

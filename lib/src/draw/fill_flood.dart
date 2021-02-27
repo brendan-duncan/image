@@ -10,7 +10,7 @@ typedef _MarkPixel = void Function(int y, int x);
 /// given [color].
 Image fillFlood(Image src, int x, int y, int color,
     {num threshold = 0.0, bool compareAlpha = false}) {
-  var visited = Uint8List(src.width * src.height);
+  final visited = Uint8List(src.width * src.height);
 
   var srcColor = src.getPixel(x, y);
   if (!compareAlpha) {
@@ -19,7 +19,8 @@ Image fillFlood(Image src, int x, int y, int color,
 
   _TestPixel array;
   if (threshold > 0) {
-    var lab = rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
+    final lab =
+        rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
     if (compareAlpha) {
       lab.add(getAlpha(srcColor).toDouble());
     }
@@ -39,7 +40,7 @@ Image fillFlood(Image src, int x, int y, int color,
     };
   }
 
-  var mark = (int y, int x) {
+  final mark = (int y, int x) {
     src.setPixel(x, y, color);
     visited[y * src.width + x] = 1;
   };
@@ -52,18 +53,19 @@ Image fillFlood(Image src, int x, int y, int color,
 /// image [src].
 Uint8List maskFlood(Image src, int x, int y,
     {num threshold = 0.0, bool compareAlpha = false, int fillValue = 255}) {
-  var visited = Uint8List(src.width * src.height);
+  final visited = Uint8List(src.width * src.height);
 
   var srcColor = src.getPixel(x, y);
   if (!compareAlpha) {
     srcColor = setAlpha(srcColor, 0);
   }
 
-  var ret = Uint8List(src.width * src.height);
+  final ret = Uint8List(src.width * src.height);
 
   _TestPixel array;
   if (threshold > 0) {
-    var lab = rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
+    final lab =
+        rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
 
     if (compareAlpha) {
       lab.add(getAlpha(srcColor).toDouble());
@@ -87,7 +89,7 @@ Uint8List maskFlood(Image src, int x, int y,
     };
   }
 
-  var mark = (int y, int x) {
+  final mark = (int y, int x) {
     ret[y * src.width + x] = fillValue;
     visited[y * src.width + x] = 1;
   };
@@ -98,9 +100,9 @@ Uint8List maskFlood(Image src, int x, int y,
 
 bool _testPixelLabColorDistance(
     Image src, int x, int y, List<num> refColor, num threshold) {
-  var pixel = src.getPixel(x, y);
-  var compareAlpha = refColor.length > 3;
-  var pixelColor = rgbToLab(getRed(pixel), getGreen(pixel), getBlue(pixel));
+  final pixel = src.getPixel(x, y);
+  final compareAlpha = refColor.length > 3;
+  final pixelColor = rgbToLab(getRed(pixel), getGreen(pixel), getBlue(pixel));
   if (compareAlpha) {
     pixelColor.add(getAlpha(pixel).toDouble());
   }
@@ -122,8 +124,8 @@ void _fill4(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
   // right if doing so would allow us to move further up, but it doesn't seem
   // worth the complexity
   while (true) {
-    var ox = x;
-    var oy = y;
+    final ox = x;
+    final oy = y;
     while (y != 0 && !array(y - 1, x)) {
       y--;
     }
@@ -207,7 +209,7 @@ void _fill4Core(Image src, int x, int y, _TestPixel array, _MarkPixel mark,
     // of the single cell at the end of the second row, i.e. at (4,1)
     if (rowLength < lastRowLength) {
       // 'end' is the end of the previous row, so scan the current row to
-      for (var end = x + lastRowLength; ++sx < end;) {
+      for (final end = x + lastRowLength; ++sx < end;) {
         // there. any clear cells would have been connected to the previous
         if (!array(y, sx)) {
           // row. the cells up and left must be set so use FillCore
