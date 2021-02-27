@@ -114,8 +114,9 @@ void main() {
     });
 
     test('encode_small_gif', () {
-      final image = Image(16, 16);
-      final gif = encodeGif(image);
+      final image = decodePng(File('test/res/png/lenna.png').readAsBytesSync());
+      final resized = copyResize(image!, width: 16, height: 16);
+      final gif = encodeGif(resized);
       File('$tmpPath/out/gif/encode_small_gif.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
