@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../image.dart';
@@ -21,8 +20,8 @@ Image copyResizeCropSquare(Image src, int size) {
   final dst = Image(size, size,
       channels: src.channels, exif: src.exif, iccp: src.iccProfile);
 
-  var dy = src.height / height;
-  var dx = src.width / width;
+  final dy = src.height / height;
+  final dx = src.width / width;
 
   final xOffset = ((width - size) ~/ 2);
   final yOffset = ((height - size) ~/ 2);

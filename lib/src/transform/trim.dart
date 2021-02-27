@@ -1,4 +1,3 @@
-
 import '../color.dart';
 import '../image.dart';
 import '../transform/copy_into.dart';
@@ -123,8 +122,7 @@ Image trim(Image src,
 
   final crop = findTrim(src, mode: mode, sides: sides);
 
-  final dst = Image(crop[2], crop[3],
-      channels: Channels.rgba, exif: src.exif, iccp: src.iccProfile);
+  final dst = Image(crop[2], crop[3], exif: src.exif, iccp: src.iccProfile);
 
   copyInto(dst, src,
       srcX: crop[0], srcY: crop[1], srcW: crop[2], srcH: crop[3], blend: false);

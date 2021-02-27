@@ -1,9 +1,8 @@
-
 import '../animation.dart';
 import '../image.dart';
 import '../util/input_buffer.dart';
-import 'decoder.dart';
 import 'bmp/bmp_info.dart';
+import 'decoder.dart';
 
 class BmpDecoder extends Decoder {
   late InputBuffer _input;
@@ -11,9 +10,8 @@ class BmpDecoder extends Decoder {
 
   /// Is the given file a valid BMP image?
   @override
-  bool isValidFile(List<int> data) {
-    return BitmapFileHeader.isValidFile(InputBuffer(data));
-  }
+  bool isValidFile(List<int> data) =>
+      BitmapFileHeader.isValidFile(InputBuffer(data));
 
   @override
   int numFrames() => info != null ? info!.numFrames : 0;
@@ -41,11 +39,11 @@ class BmpDecoder extends Decoder {
       rowStride += 4 - (rowStride % 4);
     }
 
-    var image = Image(info!.width, info!.height, channels: Channels.rgba);
+    final image = Image(info!.width, info!.height);
 
     for (var y = image.height - 1; y >= 0; --y) {
-      var line = info!.readBottomUp ? y : image.height - 1 - y;
-      var row = _input.readBytes(rowStride);
+      final line = info!.readBottomUp ? y : image.height - 1 - y;
+      final row = _input.readBytes(rowStride);
       for (var x = 0; x < image.width;) {
         info!.decodeRgba(row, (color) => image.setPixel(x++, line, color));
       }
@@ -70,9 +68,9 @@ class BmpDecoder extends Decoder {
   @override
   Animation? decodeAnimation(List<int> data) {
     if (!isValidFile(data)) return null;
-    var image = decodeImage(data)!;
+    final image = decodeImage(data)!;
 
-    var anim = Animation();
+    final anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);

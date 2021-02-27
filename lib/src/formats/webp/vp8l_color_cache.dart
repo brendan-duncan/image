@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 class VP8LColorCache {
@@ -15,9 +14,7 @@ class VP8LColorCache {
     colors[key] = argb;
   }
 
-  int lookup(int key) {
-    return colors[key];
-  }
+  int lookup(int key) => colors[key];
 
   static const _HASH_MUL = 0x1e35a7bd;
 }

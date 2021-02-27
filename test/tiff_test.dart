@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -6,11 +5,11 @@ import 'package:test/test.dart';
 import 'paths.dart';
 
 void main() {
-  var dir = Directory('test/res/tiff');
+  final dir = Directory('test/res/tiff');
   if (!dir.existsSync()) {
     return;
   }
-  var files = dir.listSync();
+  final files = dir.listSync();
 
   group('TIFF/getInfo', () {
     for (var f in files.whereType<File>()) {
@@ -18,11 +17,11 @@ void main() {
         continue;
       }
 
-      var name = f.path.split(RegExp(r'(/|\\)')).last;
-      test('$name', () {
+      final name = f.path.split(RegExp(r'(/|\\)')).last;
+      test(name, () {
         final bytes = f.readAsBytesSync();
 
-        var info = TiffDecoder().startDecode(bytes);
+        final info = TiffDecoder().startDecode(bytes);
         if (info == null) {
           throw ImageException('Unable to parse Tiff info: $name.');
         }
@@ -62,22 +61,22 @@ void main() {
         continue;
       }
 
-      var name = f.path.split(RegExp(r'(/|\\)')).last;
-      test('$name', () {
+      final name = f.path.split(RegExp(r'(/|\\)')).last;
+      test(name, () {
         print(name);
-        List<int> bytes = f.readAsBytesSync();
+        final List<int> bytes = f.readAsBytesSync();
         final image = TiffDecoder().decodeImage(bytes);
         if (image == null) {
           throw ImageException('Unable to decode TIFF Image: $name.');
         }
 
         final png = PngEncoder().encodeImage(image);
-        File('$tmpPath/out/tif/${name}.png')
+        File('$tmpPath/out/tif/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
 
         final tif = TiffEncoder().encodeImage(image);
-        File('$tmpPath/out/tif/${name}.tif')
+        File('$tmpPath/out/tif/$name.tif')
           ..createSync(recursive: true)
           ..writeAsBytesSync(tif);
 
@@ -86,7 +85,7 @@ void main() {
         expect(img2.height, equals(image.height));
 
         final png2 = PngEncoder().encodeImage(image);
-        File('$tmpPath/out/tif/${name}-2.png')
+        File('$tmpPath/out/tif/$name-2.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png2);
       });
@@ -140,9 +139,9 @@ void main() {
       for (var tag in tags.keys) {
         final entry = tags[tag]!;
         if (entry.type == TiffEntry.TYPE_ASCII) {
-          print('dtm64float TAG ${tag}: ${entry.readString()}');
+          print('dtm64float TAG $tag: ${entry.readString()}');
         } else {
-          print('dtm64float TAG ${tag}: ${entry.read()}');
+          print('dtm64float TAG $tag: ${entry.read()}');
         }
       }
 
@@ -164,9 +163,9 @@ void main() {
       for (var tag in tags.keys) {
         final entry = tags[tag]!;
         if (entry.type == TiffEntry.TYPE_ASCII) {
-          print('dtm64float TAG ${tag}: ${entry.readString()}');
+          print('dtm64float TAG $tag: ${entry.readString()}');
         } else {
-          print('dtm64float TAG ${tag}: ${entry.read()}');
+          print('dtm64float TAG $tag: ${entry.read()}');
         }
       }
     });

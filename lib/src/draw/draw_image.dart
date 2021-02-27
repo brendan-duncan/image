@@ -1,4 +1,3 @@
-
 import '../image.dart';
 import 'draw_pixel.dart';
 
@@ -35,8 +34,8 @@ Image drawImage(Image dst, Image src,
 
   for (var y = 0; y < dstH; ++y) {
     for (var x = 0; x < dstW; ++x) {
-      var stepX = (x * (srcW / dstW)).toInt();
-      var stepY = (y * (srcH / dstH)).toInt();
+      final stepX = (x * (srcW / dstW)).toInt();
+      final stepY = (y * (srcH / dstH)).toInt();
 
       final srcPixel = src.getPixel(srcX + stepX, srcY + stepY);
       if (blend) {

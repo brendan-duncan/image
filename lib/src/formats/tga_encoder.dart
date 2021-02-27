@@ -7,9 +7,9 @@ import 'encoder.dart';
 class TgaEncoder extends Encoder {
   @override
   List<int> encodeImage(Image image) {
-    var out = OutputBuffer(bigEndian: true);
+    final out = OutputBuffer(bigEndian: true);
 
-    var header = List<int>.filled(18, 0);
+    final header = List<int>.filled(18, 0);
     header[2] = 2;
     header[12] = image.width & 0xff;
     header[13] = (image.width >> 8) & 0xff;
@@ -21,7 +21,7 @@ class TgaEncoder extends Encoder {
 
     for (var y = image.height - 1; y >= 0; --y) {
       for (var x = 0; x < image.width; ++x) {
-        var c = image.getPixel(x, y);
+        final c = image.getPixel(x, y);
         out.writeByte(getBlue(c));
         out.writeByte(getGreen(c));
         out.writeByte(getRed(c));

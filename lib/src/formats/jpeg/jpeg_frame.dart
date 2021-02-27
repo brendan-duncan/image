@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
+
 import 'jpeg_component.dart';
 
 class JpegFrame {
@@ -17,7 +18,7 @@ class JpegFrame {
 
   void prepare() {
     for (var componentId in components.keys) {
-      var component = components[componentId]!;
+      final component = components[componentId]!;
       maxHSamples = max(maxHSamples, component.hSamples);
       maxVSamples = max(maxVSamples, component.vSamples);
     }
@@ -26,18 +27,18 @@ class JpegFrame {
     mcusPerColumn = (scanLines! / 8 / maxVSamples).ceil();
 
     for (var componentId in components.keys) {
-      var component = components[componentId]!;
-      var blocksPerLine =
+      final component = components[componentId]!;
+      final blocksPerLine =
           ((samplesPerLine! / 8).ceil() * component.hSamples / maxHSamples)
               .ceil();
-      var blocksPerColumn =
+      final blocksPerColumn =
           ((scanLines! / 8).ceil() * component.vSamples / maxVSamples).ceil();
-      var blocksPerLineForMcu = mcusPerLine * component.hSamples;
-      var blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
+      final blocksPerLineForMcu = mcusPerLine * component.hSamples;
+      final blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
 
-      final blocks = List<dynamic>.generate(
+      final blocks = List.generate(
           blocksPerColumnForMcu,
-          (_) => List<dynamic>.generate(
+          (_) => List<Int32List>.generate(
               blocksPerLineForMcu, (_) => Int32List(64),
               growable: false),
           growable: false);

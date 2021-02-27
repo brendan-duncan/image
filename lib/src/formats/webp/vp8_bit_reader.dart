@@ -1,4 +1,3 @@
-
 import '../../util/input_buffer.dart';
 
 class VP8BitReader {
@@ -36,9 +35,7 @@ class VP8BitReader {
     return get() == 1 ? -value : value;
   }
 
-  int get() {
-    return getValue(1);
-  }
+  int get() => getValue(1);
 
   int getBit(int prob) {
     final split = (_range * prob) >> 8;
@@ -77,7 +74,7 @@ class VP8BitReader {
     // Read 'BITS' bits at a time if possible.
     if (input.length >= 1) {
       // convert memory type to register type (with some zero'ing!)
-      var bits = input.readByte();
+      final bits = input.readByte();
       _value = bits | (_value << BITS);
       _bits += (BITS);
     } else {

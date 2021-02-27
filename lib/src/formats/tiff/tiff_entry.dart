@@ -1,4 +1,3 @@
-
 import '../../image_exception.dart';
 import '../../util/input_buffer.dart';
 import 'tiff_image.dart';
@@ -33,7 +32,7 @@ class TiffEntry {
 
   List<int> readValues() {
     p.offset = valueOffset!;
-    var values = <int>[];
+    final values = <int>[];
     for (var i = 0; i < numValues; ++i) {
       values.add(_readValue());
     }
@@ -50,7 +49,7 @@ class TiffEntry {
 
   List read() {
     p.offset = valueOffset!;
-    var values = <dynamic>[];
+    final values = <dynamic>[];
     for (var i = 0; i < numValues; ++i) {
       switch (type) {
         case TYPE_BYTE:
@@ -64,8 +63,8 @@ class TiffEntry {
           values.add(p.readUint32());
           break;
         case TYPE_RATIONAL:
-          var num = p.readUint32();
-          var den = p.readUint32();
+          final num = p.readUint32();
+          final den = p.readUint32();
           if (den != 0) {
             values.add(num / den);
           }
@@ -91,8 +90,8 @@ class TiffEntry {
       case TYPE_LONG:
         return p.readUint32();
       case TYPE_RATIONAL:
-        var num = p.readUint32();
-        var den = p.readUint32();
+        final num = p.readUint32();
+        final den = p.readUint32();
         if (den == 0) {
           return 0;
         }

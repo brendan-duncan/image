@@ -1,4 +1,3 @@
-
 import '../../formats/decode_info.dart';
 import 'tiff_image.dart';
 

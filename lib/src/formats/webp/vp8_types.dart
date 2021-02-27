@@ -177,9 +177,7 @@ class VP8Random {
     return diff;
   }
 
-  int randomBits(int numBits) {
-    return randomBits2(numBits, _amplitude);
-  }
+  int randomBits(int numBits) => randomBits2(numBits, _amplitude);
 
   // fixed-point precision for dithering
   static const RANDOM_DITHER_FIX = 8;

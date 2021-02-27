@@ -19,8 +19,8 @@ class PngDecoder extends Decoder {
   /// Is the given file a valid PNG image?
   @override
   bool isValidFile(List<int> data) {
-    var input = InputBuffer(data, bigEndian: true);
-    var pngHeader = input.readBytes(8);
+    final input = InputBuffer(data, bigEndian: true);
+    final pngHeader = input.readBytes(8);
     const PNG_HEADER = [137, 80, 78, 71, 13, 10, 26, 10];
     for (var i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
@@ -39,7 +39,7 @@ class PngDecoder extends Decoder {
   DecodeInfo? startDecode(List<int> data) {
     _input = InputBuffer(data, bigEndian: true);
 
-    var pngHeader = _input.readBytes(8);
+    final pngHeader = _input.readBytes(8);
     const PNG_HEADER = [137, 80, 78, 71, 13, 10, 26, 10];
     for (var i = 0; i < 8; ++i) {
       if (pngHeader[i] != PNG_HEADER[i]) {
@@ -48,13 +48,13 @@ class PngDecoder extends Decoder {
     }
 
     while (true) {
-      var inputPos = _input.position;
+      final inputPos = _input.position;
       var chunkSize = _input.readUint32();
-      var chunkType = _input.readString(4);
+      final chunkType = _input.readString(4);
       switch (chunkType) {
         case 'IHDR':
-          var hdr = InputBuffer.from(_input.readBytes(chunkSize));
-          List<int> hdrBytes = hdr.toUint8List();
+          final hdr = InputBuffer.from(_input.readBytes(chunkSize));
+          final List<int> hdrBytes = hdr.toUint8List();
           _info = InternalPngInfo();
           _info!.width = hdr.readUint32();
           _info!.height = hdr.readUint32();
@@ -103,24 +103,24 @@ class PngDecoder extends Decoder {
               break;
           }
 
-          var crc = _input.readUint32();
-          var computedCrc = _crc(chunkType, hdrBytes);
+          final crc = _input.readUint32();
+          final computedCrc = _crc(chunkType, hdrBytes);
           if (crc != computedCrc) {
             throw ImageException('Invalid $chunkType checksum');
           }
           break;
         case 'PLTE':
           _info!.palette = _input.readBytes(chunkSize).toUint8List();
-          var crc = _input.readUint32();
-          var computedCrc = _crc(chunkType, _info!.palette as List<int>);
+          final crc = _input.readUint32();
+          final computedCrc = _crc(chunkType, _info!.palette as List<int>);
           if (crc != computedCrc) {
             throw ImageException('Invalid $chunkType checksum');
           }
           break;
         case 'tRNS':
           _info!.transparency = _input.readBytes(chunkSize).toUint8List();
-          var crc = _input.readUint32();
-          var computedCrc = _crc(chunkType, _info!.transparency!);
+          final crc = _input.readUint32();
+          final computedCrc = _crc(chunkType, _info!.transparency!);
           if (crc != computedCrc) {
             throw ImageException('Invalid $chunkType checksum');
           }
@@ -133,7 +133,7 @@ class PngDecoder extends Decoder {
           if (chunkSize != 4) {
             throw ImageException('Invalid gAMA chunk');
           }
-          var gammaInt = _input.readUint32();
+          final gammaInt = _input.readUint32();
           _input.skip(4); // CRC
           // A gamma of 1.0 doesn't have any affect, so pretend we didn't get
           // a gamma in that case.
@@ -152,7 +152,7 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'fcTL': // Frame control chunk
-          PngFrame frame = InternalPngFrame();
+          final PngFrame frame = InternalPngFrame();
           _info!.frames.add(frame);
           frame.sequenceNumber = _input.readUint32();
           frame.width = _input.readUint32();
@@ -166,28 +166,31 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'fdAT':
-          /*int sequenceNumber =*/ _input.readUint32();
-          var frame = _info!.frames.last as InternalPngFrame;
+          /*int sequenceNumber =*/
+          _input.readUint32();
+          final frame = _info!.frames.last as InternalPngFrame;
           frame.fdat.add(inputPos);
           _input.skip(chunkSize - 4);
           _input.skip(4); // CRC
           break;
         case 'bKGD':
           if (_info!.colorType == 3) {
-            var paletteIndex = _input.readByte();
+            final paletteIndex = _input.readByte();
             chunkSize--;
-            var p3 = paletteIndex * 3;
-            var r = _info!.palette![p3]!;
-            var g = _info!.palette![p3 + 1]!;
-            var b = _info!.palette![p3 + 2]!;
+            final p3 = paletteIndex * 3;
+            final r = _info!.palette![p3]!;
+            final g = _info!.palette![p3 + 1]!;
+            final b = _info!.palette![p3 + 2]!;
             _info!.backgroundColor = Color.fromRgb(r, g, b);
           } else if (_info!.colorType == 0 || _info!.colorType == 4) {
             /*int gray =*/ _input.readUint16();
             chunkSize -= 2;
           } else if (_info!.colorType == 2 || _info!.colorType == 6) {
             /*int r =*/ _input.readUint16();
-            /*int g =*/ _input.readUint16();
-            /*int b =*/ _input.readUint16();
+            /*int g =*/
+            _input.readUint16();
+            /*int b =*/
+            _input.readUint16();
             chunkSize -= 24;
           }
           if (chunkSize > 0) {
@@ -232,7 +235,7 @@ class PngDecoder extends Decoder {
       return null;
     }
 
-    var imageData = <int>[];
+    final imageData = <int>[];
 
     int? width = _info!.width;
     int? height = _info!.height;
@@ -240,12 +243,12 @@ class PngDecoder extends Decoder {
     if (!_info!.isAnimated || frame == 0) {
       for (var i = 0, len = _info!.idat.length; i < len; ++i) {
         _input.offset = _info!.idat[i];
-        var chunkSize = _input.readUint32();
-        var chunkType = _input.readString(4);
-        var data = _input.readBytes(chunkSize).toUint8List();
+        final chunkSize = _input.readUint32();
+        final chunkType = _input.readString(4);
+        final data = _input.readBytes(chunkSize).toUint8List();
         imageData.addAll(data);
-        var crc = _input.readUint32();
-        var computedCrc = _crc(chunkType, data);
+        final crc = _input.readUint32();
+        final computedCrc = _crc(chunkType, data);
         if (crc != computedCrc) {
           throw ImageException('Invalid $chunkType checksum');
         }
@@ -255,15 +258,16 @@ class PngDecoder extends Decoder {
         throw ImageException('Invalid Frame Number: $frame');
       }
 
-      var f = _info!.frames[frame] as InternalPngFrame;
+      final f = _info!.frames[frame] as InternalPngFrame;
       width = f.width;
       height = f.height;
       for (var i = 0; i < f.fdat.length; ++i) {
         _input.offset = f.fdat[i];
-        var chunkSize = _input.readUint32();
-        /*String chunkType =*/ _input.readString(4);
+        final chunkSize = _input.readUint32();
+        /*String chunkType =*/
+        _input.readString(4);
         _input.skip(4); // sequence number
-        var data = _input.readBytes(chunkSize).toUint8List();
+        final data = _input.readBytes(chunkSize).toUint8List();
         imageData.addAll(data);
       }
 
@@ -280,18 +284,18 @@ class PngDecoder extends Decoder {
       channels = Channels.rgb;
     }
 
-    var image = Image(width!, height!, channels: channels);
+    final image = Image(width!, height!, channels: channels);
 
-    var uncompressed = ZLibDecoder().decodeBytes(imageData);
+    final uncompressed = ZLibDecoder().decodeBytes(imageData);
 
     // input is the decompressed data.
-    var input = InputBuffer(uncompressed, bigEndian: true);
+    final input = InputBuffer(uncompressed, bigEndian: true);
     _resetBits();
 
     // Set up a LUT to transform colors for gamma correction.
     if (_info!.colorLut == null) {
       _info!.colorLut = List<int>.generate(256, (i) {
-        var c = i;
+        final c = i;
         /*if (info.gamma != null) {
           c = (Math.pow((c / 255.0), info.gamma) * 255.0).toInt();
         }*/
@@ -306,13 +310,13 @@ class PngDecoder extends Decoder {
       }
     }
 
-    var origW = _info!.width;
-    var origH = _info!.height;
+    final origW = _info!.width;
+    final origH = _info!.height;
     _info!.width = width;
     _info!.height = height;
 
-    int? w = width;
-    int? h = height;
+    final w = width;
+    final h = height;
     _progressY = 0;
     if (_info!.interlaceMethod != 0) {
       _processPass(input, image, 0, 0, 8, 8, (w + 7) >> 3, (h + 7) >> 3);
@@ -338,25 +342,25 @@ class PngDecoder extends Decoder {
   }
 
   @override
-  Image? decodeImage(List<int> data, {int frame = 0}) {
-    if (startDecode(data) == null) {
+  Image? decodeImage(List<int> bytes, {int frame = 0}) {
+    if (startDecode(bytes) == null) {
       return null;
     }
     return decodeFrame(frame);
   }
 
   @override
-  Animation? decodeAnimation(List<int> data) {
-    if (startDecode(data) == null) {
+  Animation? decodeAnimation(List<int> bytes) {
+    if (startDecode(bytes) == null) {
       return null;
     }
 
-    var anim = Animation();
+    final anim = Animation();
     anim.width = _info!.width;
     anim.height = _info!.height;
 
     if (!_info!.isAnimated) {
-      var image = decodeFrame(0)!;
+      final image = decodeFrame(0)!;
       anim.addFrame(image);
       return anim;
     }
@@ -367,8 +371,8 @@ class PngDecoder extends Decoder {
       //_frame = i;
       lastImage = Image.from(lastImage);
 
-      var frame = _info!.frames[i];
-      var image = decodeFrame(i);
+      final frame = _info!.frames[i];
+      final image = decodeFrame(i);
       if (image == null) {
         continue;
       }
@@ -413,7 +417,7 @@ class PngDecoder extends Decoder {
     for (var srcY = 0, dstY = yOffset, ri = 0;
         srcY < passHeight;
         ++srcY, dstY += yStep, ri = 1 - ri, _progressY++) {
-      var filterType = input.readByte();
+      final filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes).toUint8List();
 
       final row = inData[ri];
@@ -427,7 +431,7 @@ class PngDecoder extends Decoder {
       // reset the bit stream counter.
       _resetBits();
 
-      var rowInput = InputBuffer(row, bigEndian: true);
+      final rowInput = InputBuffer(row, bigEndian: true);
 
       final blockHeight = xStep;
       final blockWidth = xStep - xOffset;
@@ -438,7 +442,7 @@ class PngDecoder extends Decoder {
           srcX < passWidth;
           ++srcX, dstX += xStep) {
         _readPixel(rowInput, pixel);
-        var c = _getColor(pixel);
+        final c = _getColor(pixel);
         image.setPixel(dstX, dstY, c);
 
         if (blockWidth > 1 || blockHeight > 1) {
@@ -477,11 +481,11 @@ class PngDecoder extends Decoder {
     final pixel = [0, 0, 0, 0];
 
     for (var y = 0, pi = 0, ri = 0; y < h; ++y, ri = 1 - ri) {
-      var filterType = input.readByte();
+      final filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes).toUint8List();
 
-      var row = inData[ri];
-      var prevRow = inData[1 - ri];
+      final row = inData[ri];
+      final prevRow = inData[1 - ri];
 
       // Before the image is compressed, it was filtered to improve compression.
       // Reverse the filter now.
@@ -491,7 +495,7 @@ class PngDecoder extends Decoder {
       // reset the bit stream counter.
       _resetBits();
 
-      var rowInput = InputBuffer(inData[ri], bigEndian: true);
+      final rowInput = InputBuffer(inData[ri], bigEndian: true);
 
       for (var x = 0; x < w; ++x) {
         _readPixel(rowInput, pixel);
@@ -518,22 +522,22 @@ class PngDecoder extends Decoder {
         break;
       case FILTER_AVERAGE:
         for (var x = 0; x < rowBytes; ++x) {
-          var a = x < bpp ? 0 : row[x - bpp];
-          var b = prevRow[x];
+          final a = x < bpp ? 0 : row[x - bpp];
+          final b = prevRow[x];
           row[x] = (row[x] + ((a + b) >> 1)) & 0xff;
         }
         break;
       case FILTER_PAETH:
         for (var x = 0; x < rowBytes; ++x) {
-          var a = x < bpp ? 0 : row[x - bpp];
-          var b = prevRow[x];
-          var c = x < bpp ? 0 : prevRow[x - bpp];
+          final a = x < bpp ? 0 : row[x - bpp];
+          final b = prevRow[x];
+          final c = x < bpp ? 0 : prevRow[x - bpp];
 
-          var p = a + b - c;
+          final p = a + b - c;
 
-          var pa = (p - a).abs();
-          var pb = (p - b).abs();
-          var pc = (p - c).abs();
+          final pa = (p - a).abs();
+          final pb = (p - b).abs();
+          final pc = (p - c).abs();
 
           var paeth = 0;
           if (pa <= pb && pa <= pc) {
@@ -548,29 +552,21 @@ class PngDecoder extends Decoder {
         }
         break;
       default:
-        throw ImageException('Invalid filter value: ${filterType}');
+        throw ImageException('Invalid filter value: $filterType');
     }
   }
 
-  int _convert16to8(int c) {
-    return c >> 8;
-  }
+  int _convert16to8(int c) => c >> 8;
 
-  int _convert1to8(int c) {
-    return (c == 0) ? 0 : 255;
-  }
+  int _convert1to8(int c) => (c == 0) ? 0 : 255;
 
-  int _convert2to8(int c) {
-    return c * 85;
-  }
+  int _convert2to8(int c) => c * 85;
 
-  int _convert4to8(int c) {
-    return c << 4;
-  }
+  int _convert4to8(int c) => c << 4;
 
   // Return the CRC of the bytes
   int _crc(String type, List<int> bytes) {
-    var crc = getCrc32(type.codeUnits);
+    final crc = getCrc32(type.codeUnits);
     return getCrc32(bytes, crc);
   }
 
@@ -603,7 +599,7 @@ class PngDecoder extends Decoder {
       }
 
       // input byte
-      var octet = input.readByte();
+      final octet = input.readByte();
 
       // concat octet
       _bitBuffer = octet << _bitBufferLen;
@@ -611,7 +607,7 @@ class PngDecoder extends Decoder {
     }
 
     // output byte
-    var mask = (numBits == 1)
+    final mask = (numBits == 1)
         ? 1
         : (numBits == 2)
             ? 3
@@ -623,7 +619,7 @@ class PngDecoder extends Decoder {
                         ? 0xffff
                         : 0;
 
-    var octet = (_bitBuffer >> (_bitBufferLen - numBits)) & mask;
+    final octet = (_bitBuffer >> (_bitBufferLen - numBits)) & mask;
 
     _bitBufferLen -= numBits;
 
@@ -685,14 +681,14 @@ class PngDecoder extends Decoder {
         g = _info!.colorLut![g]!;
 
         if (_info!.transparency != null) {
-          var a = ((_info!.transparency![0] & 0xff) << 24) |
+          final a = ((_info!.transparency![0] & 0xff) << 24) |
               (_info!.transparency![1] & 0xff);
           if (raw[0] == a) {
             return getColor(g, g, g, 0);
           }
         }
 
-        return getColor(g, g, g, 255);
+        return getColor(g, g, g);
       case RGB:
         late int r, g, b;
         switch (_info!.bits) {
@@ -728,22 +724,22 @@ class PngDecoder extends Decoder {
         b = _info!.colorLut![b]!;
 
         if (_info!.transparency != null) {
-          var tr = ((_info!.transparency![0] & 0xff) << 8) |
+          final tr = ((_info!.transparency![0] & 0xff) << 8) |
               (_info!.transparency![1] & 0xff);
-          var tg = ((_info!.transparency![2] & 0xff) << 8) |
+          final tg = ((_info!.transparency![2] & 0xff) << 8) |
               (_info!.transparency![3] & 0xff);
-          var tb = ((_info!.transparency![4] & 0xff) << 8) |
+          final tb = ((_info!.transparency![4] & 0xff) << 8) |
               (_info!.transparency![5] & 0xff);
           if (raw[0] == tr && raw[1] == tg && raw[2] == tb) {
             return getColor(r, g, b, 0);
           }
         }
 
-        return getColor(r, g, b, 255);
+        return getColor(r, g, b);
       case INDEXED:
-        var p = raw[0] * 3;
+        final p = raw[0] * 3;
 
-        var a =
+        final a =
             _info!.transparency != null && raw[0] < _info!.transparency!.length
                 ? _info!.transparency![raw[0]]
                 : 255;
@@ -752,9 +748,9 @@ class PngDecoder extends Decoder {
           return getColor(255, 255, 255, a);
         }
 
-        var r = _info!.palette![p]!;
-        var g = _info!.palette![p + 1]!;
-        var b = _info!.palette![p + 2]!;
+        final r = _info!.palette![p]!;
+        final g = _info!.palette![p + 1]!;
+        final b = _info!.palette![p + 2]!;
 
         return getColor(r, g, b, a);
       case GRAYSCALE_ALPHA:
@@ -832,6 +828,7 @@ class PngDecoder extends Decoder {
 
   late InputBuffer _input;
   int _progressY = 0;
+
   //int _frame = 0;
   //int _numFrames = 1;
 

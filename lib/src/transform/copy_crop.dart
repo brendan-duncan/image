@@ -1,4 +1,3 @@
-
 import '../../image.dart' show Point;
 import '../image.dart';
 
@@ -14,7 +13,7 @@ Image copyCrop(Image src, int x, int y, int w, int h) {
     h = src.height - y;
   }
 
-  var dst =
+  final dst =
       Image(w, h, channels: src.channels, exif: src.exif, iccp: src.iccProfile);
 
   for (var yi = 0, sy = y; yi < h; ++yi, ++sy) {
@@ -27,10 +26,7 @@ Image copyCrop(Image src, int x, int y, int w, int h) {
 }
 
 /// Returns a round cropped copy of [src].
-Image copyCropCircle(Image src, {
-  int? radius,
-  Point? center
-}) {
+Image copyCropCircle(Image src, {int? radius, Point? center}) {
   int min(num x, num y) => (x < y ? x : y).toInt();
   final defaultRadius = min(src.width, src.height) ~/ 2;
   radius ??= defaultRadius;
@@ -43,10 +39,9 @@ Image copyCropCircle(Image src, {
   final tlx = center.x.toInt() - radius; //topLeft.x
   final tly = center.y.toInt() - radius; //topLeft.y
 
-  var dst = Image(
+  final dst = Image(
     radius * 2,
     radius * 2,
-    channels: Channels.rgba,
     iccp: src.iccProfile,
   );
 
@@ -61,4 +56,3 @@ Image copyCropCircle(Image src, {
 
   return dst;
 }
-

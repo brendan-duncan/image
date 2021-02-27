@@ -6,7 +6,7 @@ import '../../util/input_buffer.dart';
 class LzwDecoder {
   void decode(InputBuffer p, List<int> out) {
     _out = out;
-    var outLen = out.length;
+    final outLen = out.length;
     _outPointer = 0;
     _data = p.buffer as Uint8List;
     _dataLength = _data.length;
@@ -103,7 +103,7 @@ class LzwDecoder {
     }
 
     _nextBits -= _bitsToGet;
-    var code = (_nextData >> _nextBits) & AND_TABLE[_bitsToGet - 9];
+    final code = (_nextData >> _nextBits) & AND_TABLE[_bitsToGet - 9];
 
     return code;
   }

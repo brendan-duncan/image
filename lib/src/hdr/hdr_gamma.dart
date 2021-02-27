@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import 'hdr_image.dart';
@@ -7,9 +6,9 @@ import 'hdr_image.dart';
 HdrImage hdrGamma(HdrImage hdr, {double gamma = 2.2}) {
   for (var y = 0; y < hdr.height; ++y) {
     for (var x = 0; x < hdr.width; ++x) {
-      var r = pow(hdr.getRed(x, y), 1.0 / gamma);
-      var g = pow(hdr.getGreen(x, y), 1.0 / gamma);
-      var b = pow(hdr.getBlue(x, y), 1.0 / gamma);
+      final r = pow(hdr.getRed(x, y), 1.0 / gamma);
+      final g = pow(hdr.getGreen(x, y), 1.0 / gamma);
+      final b = pow(hdr.getBlue(x, y), 1.0 / gamma);
 
       hdr.setRed(x, y, r);
       hdr.setGreen(x, y, g);

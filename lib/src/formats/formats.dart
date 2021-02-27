@@ -1,13 +1,15 @@
-
 import 'dart:typed_data';
 
 import '../animation.dart';
 import '../image.dart';
-
+import 'bmp_decoder.dart';
+import 'cur_encoder.dart';
 import 'decoder.dart';
 import 'exr_decoder.dart';
 import 'gif_decoder.dart';
 import 'gif_encoder.dart';
+import 'ico_decoder.dart';
+import 'ico_encoder.dart';
 import 'jpeg_decoder.dart';
 import 'jpeg_encoder.dart';
 import 'png_decoder.dart';
@@ -17,10 +19,6 @@ import 'tga_decoder.dart';
 import 'tga_encoder.dart';
 import 'tiff_decoder.dart';
 import 'webp_decoder.dart';
-import 'bmp_decoder.dart';
-import 'ico_decoder.dart';
-import 'ico_encoder.dart';
-import 'cur_encoder.dart';
 
 /// Find a [Decoder] that is able to decode the given image [data].
 /// Use this is you don't know the type of image it is. Since this will
@@ -29,54 +27,54 @@ Decoder? findDecoderForData(List<int> data) {
   // The various decoders will be creating a Uint8List for their InputStream
   // if the data isn't already that type, so do it once here to avoid having to
   // do it multiple times.
-  var bytes = data is Uint8List ? data : Uint8List.fromList(data);
+  final bytes = data is Uint8List ? data : Uint8List.fromList(data);
 
-  var jpg = JpegDecoder();
+  final jpg = JpegDecoder();
   if (jpg.isValidFile(bytes)) {
     return jpg;
   }
 
-  var png = PngDecoder();
+  final png = PngDecoder();
   if (png.isValidFile(bytes)) {
     return png;
   }
 
-  var gif = GifDecoder();
+  final gif = GifDecoder();
   if (gif.isValidFile(bytes)) {
     return gif;
   }
 
-  var webp = WebPDecoder();
+  final webp = WebPDecoder();
   if (webp.isValidFile(bytes)) {
     return webp;
   }
 
-  var tiff = TiffDecoder();
+  final tiff = TiffDecoder();
   if (tiff.isValidFile(bytes)) {
     return tiff;
   }
 
-  var psd = PsdDecoder();
+  final psd = PsdDecoder();
   if (psd.isValidFile(bytes)) {
     return psd;
   }
 
-  var exr = ExrDecoder();
+  final exr = ExrDecoder();
   if (exr.isValidFile(bytes)) {
     return exr;
   }
 
-  var bmp = BmpDecoder();
+  final bmp = BmpDecoder();
   if (bmp.isValidFile(bytes)) {
     return bmp;
   }
 
-  var tga = TgaDecoder();
+  final tga = TgaDecoder();
   if (tga.isValidFile(bytes)) {
     return tga;
   }
 
-  var ico = IcoDecoder();
+  final ico = IcoDecoder();
   if (ico.isValidFile(bytes)) {
     return ico;
   }
@@ -87,7 +85,7 @@ Decoder? findDecoderForData(List<int> data) {
 /// Decode the given image file bytes by first identifying the format of the
 /// file and using that decoder to decode the file into a single frame [Image].
 Image? decodeImage(List<int> data) {
-  var decoder = findDecoderForData(data);
+  final decoder = findDecoderForData(data);
   if (decoder == null) {
     return null;
   }
@@ -98,7 +96,7 @@ Image? decodeImage(List<int> data) {
 /// file and using that decoder to decode the file into an [Animation]
 /// containing one or more [Image] frames.
 Animation? decodeAnimation(List<int> data) {
-  var decoder = findDecoderForData(data);
+  final decoder = findDecoderForData(data);
   if (decoder == null) {
     return null;
   }
@@ -109,7 +107,7 @@ Animation? decodeAnimation(List<int> data) {
 /// by looking at the file extension. See also [findDecoderForData] to
 /// determine the decoder to use given the bytes of the file.
 Decoder? getDecoderForNamedImage(String name) {
-  var n = name.toLowerCase();
+  final n = name.toLowerCase();
   if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
     return JpegDecoder();
   }
@@ -147,7 +145,7 @@ Decoder? getDecoderForNamedImage(String name) {
 /// [name], and decode the given file [bytes] to an [Animation] with one or more
 /// [Image] frames. See also [decodeAnimation].
 Animation? decodeNamedAnimation(List<int> bytes, String name) {
-  var decoder = getDecoderForNamedImage(name);
+  final decoder = getDecoderForNamedImage(name);
   if (decoder == null) {
     return null;
   }
@@ -158,7 +156,7 @@ Animation? decodeNamedAnimation(List<int> bytes, String name) {
 /// [name], and decode the given file [bytes] to a single frame [Image]. See
 /// also [decodeImage].
 Image? decodeNamedImage(List<int> bytes, String name) {
-  var decoder = getDecoderForNamedImage(name);
+  final decoder = getDecoderForNamedImage(name);
   if (decoder == null) {
     return null;
   }
@@ -168,7 +166,7 @@ Image? decodeNamedImage(List<int> bytes, String name) {
 /// Identify the format of the image and encode it with the appropriate
 /// [Encoder].
 List<int>? encodeNamedImage(Image image, String name) {
-  var n = name.toLowerCase();
+  final n = name.toLowerCase();
   if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
     return encodeJpg(image);
   }
@@ -191,86 +189,68 @@ List<int>? encodeNamedImage(Image image, String name) {
 }
 
 /// Decode a JPG formatted image.
-Image decodeJpg(List<int> bytes) {
-  return JpegDecoder().decodeImage(bytes);
-}
+Image decodeJpg(List<int> bytes) => JpegDecoder().decodeImage(bytes);
 
 /// Renamed to [decodeJpg], left for backward compatibility.
 Image readJpg(List<int> bytes) => decodeJpg(bytes);
 
 /// Encode an image to the JPEG format.
-List<int> encodeJpg(Image image, {int quality = 100}) {
-  return JpegEncoder(quality: quality).encodeImage(image);
-}
+List<int> encodeJpg(Image image, {int quality = 100}) =>
+    JpegEncoder(quality: quality).encodeImage(image);
 
 /// Renamed to [encodeJpg], left for backward compatibility.
 List<int> writeJpg(Image image, {int quality = 100}) =>
     encodeJpg(image, quality: quality);
 
 /// Decode a PNG formatted image.
-Image? decodePng(List<int> bytes) {
-  return PngDecoder().decodeImage(bytes);
-}
+Image? decodePng(List<int> bytes) => PngDecoder().decodeImage(bytes);
 
 /// Decode a PNG formatted animation.
-Animation? decodePngAnimation(List<int> bytes) {
-  return PngDecoder().decodeAnimation(bytes);
-}
+Animation? decodePngAnimation(List<int> bytes) =>
+    PngDecoder().decodeAnimation(bytes);
 
 /// Renamed to [decodePng], left for backward compatibility.
 Image? readPng(List<int> bytes) => decodePng(bytes);
 
 /// Encode an image to the PNG format.
-List<int> encodePng(Image image, {int level = 6}) {
-  return PngEncoder(level: level).encodeImage(image);
-}
+List<int> encodePng(Image image, {int level = 6}) =>
+    PngEncoder(level: level).encodeImage(image);
 
 /// Encode an animation to the PNG format.
-List<int>? encodePngAnimation(Animation anim, {int level = 6}) {
-  return PngEncoder(level: level).encodeAnimation(anim);
-}
+List<int>? encodePngAnimation(Animation anim, {int level = 6}) =>
+    PngEncoder(level: level).encodeAnimation(anim);
 
 /// Renamed to [encodePng], left for backward compatibility.
 List<int> writePng(Image image, {int level = 6}) =>
     encodePng(image, level: level);
 
 /// Decode a Targa formatted image.
-Image? decodeTga(List<int> bytes) {
-  return TgaDecoder().decodeImage(bytes);
-}
+Image? decodeTga(List<int> bytes) => TgaDecoder().decodeImage(bytes);
 
 /// Renamed to [decodeTga], left for backward compatibility.
 Image? readTga(List<int> bytes) => decodeTga(bytes);
 
 /// Encode an image to the Targa format.
-List<int> encodeTga(Image image) {
-  return TgaEncoder().encodeImage(image);
-}
+List<int> encodeTga(Image image) => TgaEncoder().encodeImage(image);
 
 /// Renamed to [encodeTga], left for backward compatibility.
 List<int> writeTga(Image image) => encodeTga(image);
 
 /// Decode a WebP formatted image (first frame for animations).
-Image? decodeWebP(List<int> bytes) {
-  return WebPDecoder().decodeImage(bytes);
-}
+Image? decodeWebP(List<int> bytes) => WebPDecoder().decodeImage(bytes);
 
 /// Decode an animated WebP file. If the webp isn't animated, the animation
 /// will contain a single frame with the webp's image.
-Animation? decodeWebPAnimation(List<int> bytes) {
-  return WebPDecoder().decodeAnimation(bytes);
-}
+Animation? decodeWebPAnimation(List<int> bytes) =>
+    WebPDecoder().decodeAnimation(bytes);
 
 /// Decode a GIF formatted image (first frame for animations).
-Image? decodeGif(List<int> bytes) {
-  return GifDecoder().decodeImage(bytes);
-}
+Image? decodeGif(List<int> bytes) => GifDecoder().decodeImage(bytes);
 
 /// Decode an animated GIF file. If the GIF isn't animated, the animation
 /// will contain a single frame with the GIF's image.
-Animation? decodeGifAnimation(List<int> bytes) {
-  return GifDecoder().decodeAnimation(bytes);
-}
+Animation? decodeGifAnimation(List<int> bytes) =>
+    GifDecoder().decodeAnimation(bytes);
 
 /// Encode an image to the GIF format.
 ///
@@ -282,9 +262,8 @@ Animation? decodeGifAnimation(List<int> bytes) {
 /// image quality and quantization speed.
 /// If you know that you have less than 256 colors in your frames
 /// anyway, you should supply a very large [samplingFactor] for maximum performance.
-List<int> encodeGif(Image image, {int samplingFactor = 10}) {
-  return GifEncoder(samplingFactor: samplingFactor).encodeImage(image);
-}
+List<int> encodeGif(Image image, {int samplingFactor = 10}) =>
+    GifEncoder(samplingFactor: samplingFactor).encodeImage(image);
 
 /// Encode an animation to the GIF format.
 ///
@@ -300,59 +279,42 @@ List<int> encodeGif(Image image, {int samplingFactor = 10}) {
 /// Here, `30` is used a default value for the [samplingFactor] as
 /// encoding animations is usually a process that takes longer than
 /// encoding a single image (see [encodeGif]).
-List<int>? encodeGifAnimation(Animation anim, {int samplingFactor = 30}) {
-  return GifEncoder(samplingFactor: samplingFactor).encodeAnimation(anim);
-}
+List<int>? encodeGifAnimation(Animation anim, {int samplingFactor = 30}) =>
+    GifEncoder(samplingFactor: samplingFactor).encodeAnimation(anim);
 
 /// Decode a TIFF formatted image.
-Image? decodeTiff(List<int> bytes) {
-  return TiffDecoder().decodeImage(bytes);
-}
+Image? decodeTiff(List<int> bytes) => TiffDecoder().decodeImage(bytes);
 
 /// Decode an multi-image (animated) TIFF file. If the tiff doesn't have
 /// multiple images, the animation will contain a single frame with the tiff's
 /// image.
-Animation? decodeTiffAnimation(List<int> bytes) {
-  return TiffDecoder().decodeAnimation(bytes);
-}
+Animation? decodeTiffAnimation(List<int> bytes) =>
+    TiffDecoder().decodeAnimation(bytes);
 
 /// Decode a Photoshop PSD formatted image.
-Image? decodePsd(List<int> bytes) {
-  return PsdDecoder().decodeImage(bytes);
-}
+Image? decodePsd(List<int> bytes) => PsdDecoder().decodeImage(bytes);
 
 /// Decode an OpenEXR formatted image, tone-mapped using the
 /// given [exposure] to a low-dynamic-range [Image].
-Image? decodeExr(List<int> bytes, {double exposure = 1.0}) {
-  return ExrDecoder(exposure: exposure).decodeImage(bytes);
-}
+Image? decodeExr(List<int> bytes, {double exposure = 1.0}) =>
+    ExrDecoder(exposure: exposure).decodeImage(bytes);
 
 /// Decode a BMP formatted image.
-Image? decodeBmp(List<int> bytes) {
-  return BmpDecoder().decodeImage(bytes);
-}
+Image? decodeBmp(List<int> bytes) => BmpDecoder().decodeImage(bytes);
 
 /// Encode an image to the CUR format.
-List<int> encodeCur(Image image) {
-  return CurEncoder().encodeImage(image);
-}
+List<int> encodeCur(Image image) => CurEncoder().encodeImage(image);
 
 /// Encode a list of images to the CUR format.
-List<int> encodeCurImages(List<Image> images) {
-  return CurEncoder().encodeImages(images);
-}
+List<int> encodeCurImages(List<Image> images) =>
+    CurEncoder().encodeImages(images);
 
 /// Encode an image to the ICO format.
-List<int> encodeIco(Image image) {
-  return IcoEncoder().encodeImage(image);
-}
+List<int> encodeIco(Image image) => IcoEncoder().encodeImage(image);
 
 /// Encode a list of images to the ICO format.
-List<int> encodeIcoImages(List<Image> images) {
-  return IcoEncoder().encodeImages(images);
-}
+List<int> encodeIcoImages(List<Image> images) =>
+    IcoEncoder().encodeImages(images);
 
 /// Decode an ICO image.
-Image? decodeIco(List<int> bytes) {
-  return IcoDecoder().decodeImage(bytes);
-}
+Image? decodeIco(List<int> bytes) => IcoDecoder().decodeImage(bytes);

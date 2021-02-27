@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../../internal/bit_operators.dart';
@@ -11,7 +10,7 @@ class VP8Filter {
   }
 
   void simpleVFilter16(InputBuffer p, int stride, int thresh) {
-    var p2 = InputBuffer.from(p);
+    final p2 = InputBuffer.from(p);
     for (var i = 0; i < 16; ++i) {
       p2.offset = p.offset + i;
       if (_needsFilter(p2, stride, thresh)) {
@@ -21,7 +20,7 @@ class VP8Filter {
   }
 
   void simpleHFilter16(InputBuffer p, int stride, int thresh) {
-    var p2 = InputBuffer.from(p);
+    final p2 = InputBuffer.from(p);
     for (var i = 0; i < 16; ++i) {
       p2.offset = p.offset + i * stride;
       if (_needsFilter(p2, 1, thresh)) {
@@ -31,7 +30,7 @@ class VP8Filter {
   }
 
   void simpleVFilter16i(InputBuffer p, int stride, int thresh) {
-    var p2 = InputBuffer.from(p);
+    final p2 = InputBuffer.from(p);
     for (var k = 3; k > 0; --k) {
       p2.offset += 4 * stride;
       simpleVFilter16(p2, stride, thresh);
@@ -39,7 +38,7 @@ class VP8Filter {
   }
 
   void simpleHFilter16i(InputBuffer p, int stride, int thresh) {
-    var p2 = InputBuffer.from(p);
+    final p2 = InputBuffer.from(p);
     for (var k = 3; k > 0; --k) {
       p2.offset += 4;
       simpleHFilter16(p2, stride, thresh);
@@ -60,7 +59,7 @@ class VP8Filter {
   // on three inner edges
   void vFilter16i(
       InputBuffer p, int stride, int thresh, int? ithresh, int hev_thresh) {
-    var p2 = InputBuffer.from(p);
+    final p2 = InputBuffer.from(p);
     for (var k = 3; k > 0; --k) {
       p2.offset += 4 * stride;
       _filterLoop24(p2, stride, 1, 16, thresh, ithresh!, hev_thresh);
@@ -69,7 +68,7 @@ class VP8Filter {
 
   void hFilter16i(
       InputBuffer p, int stride, int thresh, int? ithresh, int hev_thresh) {
-    var p2 = InputBuffer.from(p);
+    final p2 = InputBuffer.from(p);
     for (var k = 3; k > 0; --k) {
       p2.offset += 4;
       _filterLoop24(p2, 1, stride, 16, thresh, ithresh!, hev_thresh);
@@ -91,23 +90,23 @@ class VP8Filter {
 
   void vFilter8i(InputBuffer u, InputBuffer v, int stride, int thresh,
       int ithresh, int hev_thresh) {
-    var u2 = InputBuffer.from(u, offset: 4 * stride);
-    var v2 = InputBuffer.from(v, offset: 4 * stride);
+    final u2 = InputBuffer.from(u, offset: 4 * stride);
+    final v2 = InputBuffer.from(v, offset: 4 * stride);
     _filterLoop24(u2, stride, 1, 8, thresh, ithresh, hev_thresh);
     _filterLoop24(v2, stride, 1, 8, thresh, ithresh, hev_thresh);
   }
 
   void hFilter8i(InputBuffer u, InputBuffer v, int stride, int thresh,
       int ithresh, int hev_thresh) {
-    var u2 = InputBuffer.from(u, offset: 4);
-    var v2 = InputBuffer.from(v, offset: 4);
+    final u2 = InputBuffer.from(u, offset: 4);
+    final v2 = InputBuffer.from(v, offset: 4);
     _filterLoop24(u2, 1, stride, 8, thresh, ithresh, hev_thresh);
     _filterLoop24(v2, 1, stride, 8, thresh, ithresh, hev_thresh);
   }
 
   void _filterLoop26(InputBuffer p, int hstride, int vstride, int size,
       int thresh, int? ithresh, int hev_thresh) {
-    var p2 = InputBuffer.from(p);
+    final p2 = InputBuffer.from(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
         if (_hev(p2, hstride, hev_thresh)) {
@@ -122,7 +121,7 @@ class VP8Filter {
 
   void _filterLoop24(InputBuffer p, int hstride, int vstride, int size,
       int thresh, int ithresh, int hev_thresh) {
-    var p2 = InputBuffer.from(p);
+    final p2 = InputBuffer.from(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
         if (_hev(p2, hstride, hev_thresh)) {
@@ -222,7 +221,7 @@ class VP8Filter {
   }
 
   void transformOne(InputBuffer src, InputBuffer dst) {
-    var C = Int32List(4 * 4);
+    final C = Int32List(4 * 4);
     var si = 0;
     var di = 0;
     var tmp = 0;
@@ -323,7 +322,7 @@ class VP8Filter {
   static int AVG2(int a, int b) => shiftR(((a) + (b) + 1), 1);
 
   static void VE4(InputBuffer dst) {
-    var top = -VP8.BPS; // dst +
+    final top = -VP8.BPS; // dst +
     final vals = <int>[
       AVG3(dst[top - 1], dst[top], dst[top + 1]),
       AVG3(dst[top], dst[top + 1], dst[top + 2]),
@@ -343,7 +342,7 @@ class VP8Filter {
     final D = dst[-1 + 2 * VP8.BPS];
     final E = dst[-1 + 3 * VP8.BPS];
 
-    var d2 = InputBuffer.from(dst);
+    final d2 = InputBuffer.from(dst);
 
     d2.toUint32List()[0] = 0x01010101 * AVG3(A, B, C);
     d2.offset += VP8.BPS;
@@ -368,11 +367,11 @@ class VP8Filter {
 
   static void trueMotion(InputBuffer dst, int size) {
     var di = 0;
-    var top = -VP8.BPS; // dst +
-    var clip0 = 255 - dst[top - 1]; // clip1 +
+    final top = -VP8.BPS; // dst +
+    final clip0 = 255 - dst[top - 1]; // clip1 +
 
     for (var y = 0; y < size; ++y) {
-      var clip = clip0 + dst[di - 1];
+      final clip = clip0 + dst[di - 1];
       for (var x = 0; x < size; ++x) {
         dst[di + x] = clip1[clip + dst[top + x]];
       }
@@ -655,7 +654,7 @@ class VP8Filter {
   static const kC2 = 35468;
 
   static int _mul(int a, int b) {
-    var c = a * b;
+    final c = a * b;
     return shiftR(c, 16);
   }
 
@@ -716,13 +715,11 @@ class VP8Filter {
     }
   }
 
-  static int _clip8b(int v) {
-    return ((v & -256) == 0)
-        ? v
-        : (v < 0)
-            ? 0
-            : 255;
-  }
+  static int _clip8b(int v) => ((v & -256) == 0)
+      ? v
+      : (v < 0)
+          ? 0
+          : 255;
 
   //static int __maxN = 0;
 

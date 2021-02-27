@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../internal/bit_operators.dart';
@@ -34,8 +33,8 @@ class Half {
       _initialize();
     }
 
-    var f = n.toDouble();
-    var x_i = float32ToUint32(f);
+    final f = n.toDouble();
+    final x_i = float32ToUint32(f);
     if (f == 0.0) {
       // Common special case - zero.
       // Preserve the zero's sign bit.
@@ -62,7 +61,7 @@ class Half {
     if (e != 0) {
       // Simple case - round the significand, m, to 10
       // bits and combine it with the sign and exponent.
-      var m = x_i & 0x007fffff;
+      final m = x_i & 0x007fffff;
       return e + ((m + 0x00000fff + ((m >> 13) & 1)) >> 13);
     }
 
@@ -77,7 +76,7 @@ class Half {
 
   /// Addition operator for Half or num left operands.
   Half operator +(dynamic f) {
-    var d = (f is Half)
+    final d = (f is Half)
         ? f.toDouble()
         : (f is num)
             ? f.toDouble()
@@ -87,7 +86,7 @@ class Half {
 
   /// Subtraction operator for Half or num left operands.
   Half operator -(dynamic f) {
-    var d = (f is Half)
+    final d = (f is Half)
         ? f.toDouble()
         : (f is num)
             ? f.toDouble()
@@ -96,7 +95,7 @@ class Half {
   }
 
   Half operator *(dynamic f) {
-    var d = (f is Half)
+    final d = (f is Half)
         ? f.toDouble()
         : (f is num)
             ? f.toDouble()
@@ -105,7 +104,7 @@ class Half {
   }
 
   Half operator /(dynamic f) {
-    var d = (f is Half)
+    final d = (f is Half)
         ? f.toDouble()
         : (f is num)
             ? f.toDouble()
@@ -123,7 +122,7 @@ class Half {
 
     // Disassemble h into the sign, s,
     // and the combined exponent and significand, e.
-    var s = _h! & 0x8000;
+    final s = _h! & 0x8000;
     var e = _h! & 0x7fff;
 
     // Round the exponent and significand to the nearest value
@@ -150,46 +149,42 @@ class Half {
 
   /// Returns true if h is a normalized number, a denormalized number or zero.
   bool isFinite() {
-    var e = (_h! >> 10) & 0x001f;
+    final e = (_h! >> 10) & 0x001f;
     return e < 31;
   }
 
   /// Returns true if h is a normalized number.
   bool isNormalized() {
-    var e = (_h! >> 10) & 0x001f;
+    final e = (_h! >> 10) & 0x001f;
     return e > 0 && e < 31;
   }
 
   /// Returns true if h is a denormalized number.
   bool isDenormalized() {
-    var e = (_h! >> 10) & 0x001f;
-    var m = _h! & 0x3ff;
+    final e = (_h! >> 10) & 0x001f;
+    final m = _h! & 0x3ff;
     return e == 0 && m != 0;
   }
 
   /// Returns true if h is zero.
-  bool isZero() {
-    return (_h! & 0x7fff) == 0;
-  }
+  bool isZero() => (_h! & 0x7fff) == 0;
 
   /// Returns true if h is a NAN.
   bool isNan() {
-    var e = (_h! >> 10) & 0x001f;
-    var m = _h! & 0x3ff;
+    final e = (_h! >> 10) & 0x001f;
+    final m = _h! & 0x3ff;
     return e == 31 && m != 0;
   }
 
   /// Returns true if h is a positive or a negative infinity.
   bool isInfinity() {
-    var e = (_h! >> 10) & 0x001f;
-    var m = _h! & 0x3ff;
+    final e = (_h! >> 10) & 0x001f;
+    final m = _h! & 0x3ff;
     return e == 31 && m == 0;
   }
 
   /// Returns true if the sign bit of h is set (negative).
-  bool isNegative() {
-    return (_h! & 0x8000) != 0;
-  }
+  bool isNegative() => (_h! & 0x8000) != 0;
 
   /// Returns +infinity.
   static Half posInf() => Half.fromBits(0x7c00);
@@ -217,7 +212,7 @@ class Half {
     // resulting half number.
     // Adjust e, accounting for the different exponent bias
     // of float and half (127 versus 15).
-    var s = (i >> 16) & 0x00008000;
+    final s = (i >> 16) & 0x00008000;
     var e = ((i >> 23) & 0x000000ff) - (127 - 15);
     var m = i & 0x007fffff;
 
@@ -249,9 +244,9 @@ class Half {
       // are laid out, we don't have to treat this case separately;
       // the code below will handle it correctly.
 
-      var t = 14 - e;
-      var a = (1 << (t - 1)) - 1;
-      var b = (m >> t) & 1;
+      final t = 14 - e;
+      final a = (1 << (t - 1)) - 1;
+      final b = (m >> t) & 1;
 
       m = (m + a + b) >> t;
 
@@ -307,7 +302,7 @@ class Half {
 
     // Init eLut
     for (var i = 0; i < 0x100; i++) {
-      var e = (i & 0x0ff) - (127 - 15);
+      final e = (i & 0x0ff) - (127 - 15);
 
       if (e <= 0 || e >= 30) {
         // Special case
@@ -328,7 +323,7 @@ class Half {
   }
 
   static int _halfToFloat(int y) {
-    var s = (y >> 15) & 0x00000001;
+    final s = (y >> 15) & 0x00000001;
     var e = (y >> 10) & 0x0000001f;
     var m = y & 0x000003ff;
 

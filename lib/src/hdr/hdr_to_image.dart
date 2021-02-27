@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 import '../image.dart';
 import '../image_exception.dart';
@@ -7,9 +6,7 @@ import 'hdr_image.dart';
 /// Convert a high dynamic range image to a low dynamic range image,
 /// with optional exposure control.
 Image hdrToImage(HdrImage hdr, {num? exposure}) {
-  num _knee(num x, num f) {
-    return math.log(x * f + 1.0) / f;
-  }
+  num _knee(num x, num f) => math.log(x * f + 1.0) / f;
 
   num _gamma(num h, num m) {
     var x = math.max(0, h * m);
@@ -60,7 +57,7 @@ Image hdrToImage(HdrImage hdr, {num? exposure}) {
       }
 
       // Normalize the color
-      var mi = math.max(ri, math.max(gi, bi));
+      final mi = math.max(ri, math.max(gi, bi));
       if (mi > 255.0) {
         ri = 255.0 * (ri / mi);
         gi = 255.0 * (gi / mi);

@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../../image_exception.dart';
@@ -59,7 +58,7 @@ class VP8LBitReader {
   // If not at EOS, reload up to LBITS byte-by-byte
   void _shiftBytes() {
     while (bitPos >= 8 && !_input.isEOS) {
-      var b = _input.readByte();
+      final b = _input.readByte();
       // buffer >>= 8
       _buffer[0] = (_buffer[0] >> 8) + ((_buffer[1] & 0xff) * 0x1000000);
       _buffer[1] >>= 8;

@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 import '../bitmap_font.dart';
 import '../color.dart';
@@ -18,14 +17,14 @@ var _a_lut = Uint8List(256);
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
     {int color = 0xffffffff}) {
   if (color != 0xffffffff) {
-    var ca = getAlpha(color);
+    final ca = getAlpha(color);
     if (ca == 0) {
       return image;
     }
-    num da = ca / 255.0;
-    num dr = getRed(color) / 255.0;
-    num dg = getGreen(color) / 255.0;
-    num db = getBlue(color) / 255.0;
+    final num da = ca / 255.0;
+    final num dr = getRed(color) / 255.0;
+    final num dg = getGreen(color) / 255.0;
+    final num db = getBlue(color) / 255.0;
     for (var i = 1; i < 256; ++i) {
       _r_lut[i] = (dr * i).toInt();
       _g_lut[i] = (dg * i).toInt();
@@ -34,17 +33,17 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     }
   }
 
-  var chars = string.codeUnits;
+  final chars = string.codeUnits;
   for (var c in chars) {
     if (!font.characters.containsKey(c)) {
       x += font.base ~/ 2;
       continue;
     }
 
-    var ch = font.characters[c]!;
+    final ch = font.characters[c]!;
 
-    var x2 = x + ch.width;
-    var y2 = y + ch.height;
+    final x2 = x + ch.width;
+    final y2 = y + ch.height;
     var pi = 0;
     for (var yi = y; yi < y2; ++yi) {
       for (var xi = x; xi < x2; ++xi) {
@@ -77,12 +76,12 @@ Image drawStringCentered(Image image, BitmapFont font, String string,
   var stringHeight = 0;
 
   if (x == null || y == null) {
-    var chars = string.codeUnits;
+    final chars = string.codeUnits;
     for (var c in chars) {
       if (!font.characters.containsKey(c)) {
         continue;
       }
-      var ch = font.characters[c]!;
+      final ch = font.characters[c]!;
       stringWidth += ch.xadvance;
       if (ch.height + ch.yoffset > stringHeight) {
         stringHeight = ch.height + ch.yoffset;

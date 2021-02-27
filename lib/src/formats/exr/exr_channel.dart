@@ -61,7 +61,7 @@ class ExrChannel {
       return;
     }
     type = input.readUint32();
-    var i = input.readByte();
+    final i = input.readByte();
     assert(i == 0 || i == 1);
     pLinear = i == 1;
     input.skip(3);

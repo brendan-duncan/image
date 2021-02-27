@@ -1,4 +1,3 @@
-
 import 'psd_effect.dart';
 
 class PsdInnerGlowEffect extends PsdEffect {

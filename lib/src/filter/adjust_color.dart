@@ -53,12 +53,12 @@ Image adjustColor(Image src,
     return src;
   }
 
-  contrast = contrast != null ? contrast.clamp(0, 1) : null;
-  saturation = saturation != null ? saturation.clamp(0, 1) : null;
-  brightness = brightness != null ? brightness.clamp(0, 1) : null;
-  gamma = gamma != null ? gamma.clamp(0, 1000) : null;
-  exposure = exposure != null ? exposure.clamp(0, 1000) : null;
-  amount = amount != null ? amount.clamp(0, 1000) : null;
+  contrast = contrast?.clamp(0, 1);
+  saturation = saturation?.clamp(0, 1);
+  brightness = brightness?.clamp(0, 1);
+  gamma = gamma?.clamp(0, 1000);
+  exposure = exposure?.clamp(0, 1000);
+  amount = amount?.clamp(0, 1000);
 
   const DEG_TO_RAD = 0.0174532925;
   const avgLumR = 0.5;
@@ -68,7 +68,7 @@ Image adjustColor(Image src,
   const lumCoeffG = 0.7154;
   const lumCoeffB = 0.0721;
 
-  var useBlacksWhitesMids = blacks != null || whites != null || mids != null;
+  final useBlacksWhitesMids = blacks != null || whites != null || mids != null;
   late num br, bg, bb;
   late num wr, wg, wb;
   late num mr, mg, mb;
@@ -90,8 +90,9 @@ Image adjustColor(Image src,
     mb = 1.0 / (1.0 + 2.0 * (mb - 0.5));
   }
 
-  num invSaturation = saturation != null ? 1.0 - saturation.clamp(0, 1) : 0.0;
-  num invContrast = contrast != null ? 1.0 - contrast.clamp(0, 1) : 0.0;
+  final num invSaturation =
+      saturation != null ? 1.0 - saturation.clamp(0, 1) : 0.0;
+  final num invContrast = contrast != null ? 1.0 - contrast.clamp(0, 1) : 0.0;
 
   if (exposure != null) {
     exposure = pow(2.0, exposure);
@@ -102,21 +103,21 @@ Image adjustColor(Image src,
   late num hueB;
   if (hue != null) {
     hue *= DEG_TO_RAD;
-    var s = sin(hue);
-    var c = cos(hue);
+    final s = sin(hue);
+    final c = cos(hue);
 
     hueR = (2.0 * c) / 3.0;
     hueG = (-sqrt(3.0) * s - c) / 3.0;
     hueB = ((sqrt(3.0) * s - c) + 1.0) / 3.0;
   }
 
-  var invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
+  final invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
 
-  var pixels = src.getBytes();
+  final pixels = src.getBytes();
   for (var i = 0, len = pixels.length; i < len; i += 4) {
-    num or = pixels[i] / 255.0;
-    num og = pixels[i + 1] / 255.0;
-    num ob = pixels[i + 2] / 255.0;
+    final num or = pixels[i] / 255.0;
+    final num og = pixels[i + 1] / 255.0;
+    final num ob = pixels[i + 2] / 255.0;
 
     var r = or;
     var g = og;
@@ -136,7 +137,7 @@ Image adjustColor(Image src,
     }
 
     if (saturation != null) {
-      num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
+      final num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
 
       r = lum * invSaturation + r * saturation;
       g = lum * invSaturation + g * saturation;
@@ -162,9 +163,9 @@ Image adjustColor(Image src,
     }
 
     if (hue != null && hue != 0.0) {
-      var hr = r * hueR + g * hueG + b * hueB;
-      var hg = r * hueB + g * hueR + b * hueG;
-      var hb = r * hueG + g * hueB + b * hueR;
+      final hr = r * hueR + g * hueG + b * hueB;
+      final hg = r * hueB + g * hueR + b * hueG;
+      final hb = r * hueG + g * hueB + b * hueR;
 
       r = hr;
       g = hg;

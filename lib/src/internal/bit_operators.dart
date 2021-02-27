@@ -1,21 +1,8 @@
-
 import 'dart:typed_data';
 
-int shiftR(int v, int n) {
-  // dart2js can't handle binary operations on negative numbers, so
-  // until that issue is fixed (issues 16506, 1533), we'll have to do it
-  // the slow way.
-  //return (v / SHIFT_BITS[n]).floor();
-  return (v >> n).toSigned(32);
-}
+int shiftR(int v, int n) => (v >> n).toSigned(32);
 
-int shiftL(int v, int n) {
-  // dart2js can't handle binary operations on negative numbers, so
-  // until that issue is fixed (issues 16506, 1533), we'll have to do it
-  // the slow way.
-  //return (v * SHIFT_BITS[n]);
-  return (v << n).toSigned(32);
-}
+int shiftL(int v, int n) => (v << n).toSigned(32);
 
 const List<int> SHIFT_BITS = [
   1,
@@ -109,7 +96,7 @@ String debugBits32(int? value) {
   if (value == null) {
     return 'null';
   }
-  final bitCount = 32;
+  const bitCount = 32;
   final result = StringBuffer();
   for (var i = bitCount; i > -1; i--) {
     result.write((value & (1 << i)) == 0 ? '0' : '1');

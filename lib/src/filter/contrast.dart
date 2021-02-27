@@ -28,7 +28,7 @@ Image? contrast(Image? src, num contrast) {
     }
   }
 
-  var p = src.getBytes();
+  final p = src.getBytes();
   for (var i = 0, len = p.length; i < len; i += 4) {
     p[i] = _contrast[p[i]];
     p[i + 1] = _contrast[p[i + 1]];

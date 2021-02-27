@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import '../color.dart';
@@ -11,20 +10,20 @@ import '../image.dart';
 /// filters to normalize and offset the filtered pixel value.
 Image convolution(Image src, List<num> filter,
     {num div = 1.0, num offset = 0.0}) {
-  var tmp = Image.from(src);
+  final tmp = Image.from(src);
 
   for (var y = 0; y < src.height; ++y) {
     for (var x = 0; x < src.width; ++x) {
-      var c = tmp.getPixel(x, y);
+      final c = tmp.getPixel(x, y);
       num r = 0.0;
       num g = 0.0;
       num b = 0.0;
-      var a = getAlpha(c);
+      final a = getAlpha(c);
       for (var j = 0, fi = 0; j < 3; ++j) {
-        var yv = min(max(y - 1 + j, 0), src.height - 1);
+        final yv = min(max(y - 1 + j, 0), src.height - 1);
         for (var i = 0; i < 3; ++i, ++fi) {
-          var xv = min(max(x - 1 + i, 0), src.width - 1);
-          var c2 = tmp.getPixel(xv, yv);
+          final xv = min(max(x - 1 + i, 0), src.width - 1);
+          final c2 = tmp.getPixel(xv, yv);
           r += getRed(c2) * filter[fi];
           g += getGreen(c2) * filter[fi];
           b += getBlue(c2) * filter[fi];

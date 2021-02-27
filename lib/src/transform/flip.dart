@@ -1,4 +1,3 @@
-
 import '../image.dart';
 
 enum Flip {

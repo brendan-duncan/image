@@ -1,8 +1,7 @@
-
 import '../animation.dart';
-import '../image.dart';
 import '../hdr/hdr_image.dart';
 import '../hdr/hdr_to_image.dart';
+import '../image.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'exr/exr_image.dart';
@@ -38,13 +37,11 @@ class ExrDecoder extends Decoder {
   ExrDecoder({this.exposure = 1.0});
 
   @override
-  bool isValidFile(List<int> data) {
-    return ExrImage.isValidFile(data);
-  }
+  bool isValidFile(List<int> bytes) => ExrImage.isValidFile(bytes);
 
   @override
-  DecodeInfo? startDecode(List<int> data) {
-    exrImage = ExrImage(data);
+  DecodeInfo? startDecode(List<int> bytes) {
+    exrImage = ExrImage(bytes);
     return exrImage;
   }
 
@@ -89,13 +86,13 @@ class ExrDecoder extends Decoder {
   }
 
   @override
-  Animation? decodeAnimation(List<int> data) {
-    var image = decodeImage(data);
+  Animation? decodeAnimation(List<int> bytes) {
+    final image = decodeImage(bytes);
     if (image == null) {
       return null;
     }
 
-    var anim = Animation();
+    final anim = Animation();
     anim.width = image.width;
     anim.height = image.height;
     anim.addFrame(image);

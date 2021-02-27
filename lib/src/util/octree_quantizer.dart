@@ -9,23 +9,23 @@ class OctreeQuantizer extends Quantizer {
 
   OctreeQuantizer(Image image, {int numberOfColors = 256})
       : _root = _OctreeNode(0, 0, null) {
-    var heap = _HeapNode();
+    final heap = _HeapNode();
     for (var si = 0; si < image.length; ++si) {
-      var c = image[si];
-      var r = getRed(c);
-      var g = getGreen(c);
-      var b = getBlue(c);
+      final c = image[si];
+      final r = getRed(c);
+      final g = getGreen(c);
+      final b = getBlue(c);
       _heapAdd(heap, _nodeInsert(_root, r, g, b));
     }
 
-    var nc = numberOfColors + 1;
+    final nc = numberOfColors + 1;
     while (heap.n > nc) {
       _heapAdd(heap, _nodeFold(_popHeap(heap)!)!);
     }
 
     for (var i = 1; i < heap.n; i++) {
-      var got = heap.buf[i]!;
-      var c = got.count;
+      final got = heap.buf[i]!;
+      final c = got.count;
       got.r = (got.r / c).round();
       got.g = (got.g / c).round();
       got.b = (got.b / c).round();
@@ -41,7 +41,7 @@ class OctreeQuantizer extends Quantizer {
     _OctreeNode? root = _root;
 
     for (var bit = 1 << 7; bit != 0; bit >>= 1) {
-      var i = ((g & bit) != 0 ? 1 : 0) * 4 +
+      final i = ((g & bit) != 0 ? 1 : 0) * 4 +
           ((r & bit) != 0 ? 1 : 0) * 2 +
           ((b & bit) != 0 ? 1 : 0);
       if (root!.children[i] == null) {
@@ -53,7 +53,7 @@ class OctreeQuantizer extends Quantizer {
     r = root!.r;
     g = root.g;
     b = root.b;
-    return getColor(r, g, b, 255);
+    return getColor(r, g, b);
   }
 
   int _compareNode(_OctreeNode a, _OctreeNode b) {
@@ -64,8 +64,8 @@ class OctreeQuantizer extends Quantizer {
       return 1;
     }
 
-    var ac = a.count >> a.depth;
-    var bc = b.count >> b.depth;
+    final ac = a.count >> a.depth;
+    final bc = b.count >> b.depth;
     return (ac < bc)
         ? -1
         : (ac > bc)
@@ -76,7 +76,7 @@ class OctreeQuantizer extends Quantizer {
   _OctreeNode _nodeInsert(_OctreeNode root, int r, int g, int b) {
     var depth = 0;
     for (var bit = 1 << 7; ++depth < 8; bit >>= 1) {
-      var i = ((g & bit) != 0 ? 1 : 0) * 4 +
+      final i = ((g & bit) != 0 ? 1 : 0) * 4 +
           ((r & bit) != 0 ? 1 : 0) * 2 +
           ((b & bit) != 0 ? 1 : 0);
       if (root.children[i] == null) {
@@ -97,7 +97,7 @@ class OctreeQuantizer extends Quantizer {
     if (p.childCount > 0) {
       return null;
     }
-    var q = p.parent!;
+    final q = p.parent!;
     q.count += p.count;
 
     q.r += p.r;
@@ -115,7 +115,7 @@ class OctreeQuantizer extends Quantizer {
       return null;
     }
 
-    var ret = h.buf[1];
+    final ret = h.buf[1];
     h.buf[1] = h.buf.removeLast();
     h.buf[1]!.heap_idx = 1;
     _downHeap(h, h.buf[1]!);

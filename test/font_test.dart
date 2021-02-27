@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -14,7 +13,7 @@ void main() {
       final fontZip = File('test/res/font/test.zip').readAsBytesSync();
       final font = readFontZip(fontZip);
 
-      var img = copyResize(image, width: 400);
+      final img = copyResize(image, width: 400);
       drawString(img, font, 10, 50, 'Testing Font 1: Hello World');
 
       File('$tmpPath/out/font/font_zip_xml.jpg')
@@ -26,7 +25,7 @@ void main() {
       final fontZip = File('test/res/font/test_text.zip').readAsBytesSync();
       final font = readFontZip(fontZip);
 
-      var img = copyResize(image, width: 400);
+      final img = copyResize(image, width: 400);
       drawString(img, font, 10, 50, 'Testing Font 2: Hello World',
           color: getColor(255, 0, 0, 128));
 
@@ -36,7 +35,7 @@ void main() {
     });
 
     test('arial_14', () {
-      var img = copyResize(image, width: 400);
+      final img = copyResize(image, width: 400);
       drawString(img, arial_14, 10, 50, 'Testing Arial 14: Hello World',
           color: getColor(255, 0, 0, 128));
 
@@ -46,7 +45,7 @@ void main() {
     });
 
     test('arial_24', () {
-      var img = copyResize(image, width: 400);
+      final img = copyResize(image, width: 400);
       drawString(img, arial_24, 10, 50, 'Testing Arial 24: Hello World',
           color: getColor(255, 0, 0, 128));
 
@@ -56,7 +55,7 @@ void main() {
     });
 
     test('arial_48', () {
-      var img = copyResize(image, width: 400);
+      final img = copyResize(image, width: 400);
       drawString(img, arial_48, 10, 50, 'Testing Arial 48: Hello World',
           color: getColor(255, 0, 0, 128));
 
@@ -66,7 +65,7 @@ void main() {
     });
 
     test('drawStringCenteredY', () {
-      var img = copyResize(image, width: 400);
+      final img = copyResize(image, width: 400);
       drawStringCentered(img, arial_24, 'Testing Arial 24: Hello World',
           y: 50, color: getColor(255, 0, 0, 128));
 
@@ -76,7 +75,7 @@ void main() {
     });
 
     test('drawStringCenteredY', () {
-      var img = copyResize(image, width: 400);
+      final img = copyResize(image, width: 400);
       drawStringCentered(img, arial_24, 'Testing Arial 24: Hello World',
           x: 10, color: getColor(255, 0, 0, 128));
 
@@ -86,7 +85,7 @@ void main() {
     });
 
     test('drawStringCenteredXY', () {
-      var img = copyResize(image, width: 400);
+      final img = copyResize(image, width: 400);
       drawStringCentered(img, arial_24, 'Testing Arial 24: Hello World',
           color: getColor(255, 0, 0, 128));
 

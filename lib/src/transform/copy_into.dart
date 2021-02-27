@@ -1,6 +1,5 @@
-
-import '../image.dart';
 import '../draw/draw_pixel.dart';
+import '../image.dart';
 
 /// Copies a rectangular portion of one image to another image. [dst] is the
 /// destination image, [src] is the source image identifier.

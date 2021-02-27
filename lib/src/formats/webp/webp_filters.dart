@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../../util/input_buffer.dart';
@@ -77,9 +76,9 @@ class WebPFilters {
       int stride, int row, int numRows, bool inverse, Uint8List out) {
     final startOffset = row * stride;
     final lastRow = row + numRows;
-    var s = InputBuffer(src, offset: startOffset);
-    var o = InputBuffer(src, offset: startOffset);
-    var preds = InputBuffer.from(inverse ? o : s);
+    final s = InputBuffer(src, offset: startOffset);
+    final o = InputBuffer(src, offset: startOffset);
+    final preds = InputBuffer.from(inverse ? o : s);
 
     if (row == 0) {
       // Leftmost pixel is the same as input for topmost scanline.
@@ -109,9 +108,9 @@ class WebPFilters {
       int stride, int row, int numRows, bool inverse, Uint8List out) {
     final startOffset = row * stride;
     final last_row = row + numRows;
-    var s = InputBuffer(src, offset: startOffset);
-    var o = InputBuffer(out, offset: startOffset);
-    var preds = InputBuffer.from(inverse ? o : s);
+    final s = InputBuffer(src, offset: startOffset);
+    final o = InputBuffer(out, offset: startOffset);
+    final preds = InputBuffer.from(inverse ? o : s);
 
     if (row == 0) {
       // Very first top-left pixel is copied.
@@ -150,9 +149,9 @@ class WebPFilters {
       int stride, int row, int numRows, bool inverse, Uint8List out) {
     final startOffset = row * stride;
     final lastRow = row + numRows;
-    var s = InputBuffer(src, offset: startOffset);
-    var o = InputBuffer(out, offset: startOffset);
-    var preds = InputBuffer.from(inverse ? o : s);
+    final s = InputBuffer(src, offset: startOffset);
+    final o = InputBuffer(out, offset: startOffset);
+    final preds = InputBuffer.from(inverse ? o : s);
 
     // left prediction for top scan-line
     if (row == 0) {

@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../../image_exception.dart';
@@ -23,12 +22,13 @@ class InternalExrB44Compressor extends InternalExrCompressor
   int numScanLines() => _numScanLines;
 
   @override
-  Uint8List compress(InputBuffer inPtr, int x, int y, [int? width, int? height]) {
+  Uint8List compress(InputBuffer input, int x, int y,
+      [int? width, int? height]) {
     throw ImageException('B44 compression not yet supported.');
   }
 
   @override
-  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+  Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
     throw ImageException('B44 compression not yet supported.');
   }

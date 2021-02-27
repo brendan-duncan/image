@@ -18,9 +18,9 @@ class HdrSlice {
 
   /// [data] will be one of the type data lists, depending on the [type] and
   /// [bitsPerSample]. 16-bit FLOAT slices will be stored in a [Uint16List].
-  final dynamic data;
+  final List data;
 
-  static dynamic allocateDataForType(int size, int type, int bitsPerSample) {
+  static List allocateDataForType(int size, int type, int bitsPerSample) {
     switch (type) {
       case HdrImage.INT:
         if (bitsPerSample == 8) {
@@ -50,15 +50,11 @@ class HdrSlice {
         }
         break;
     }
-    return null;
+    throw UnimplementedError();
   }
 
-  HdrSlice(this.name, int width, int height, int type, int bitsPerSample)
-      : width = width,
-        height = height,
-        type = type,
-        bitsPerSample = bitsPerSample,
-        data = allocateDataForType(width * height, type, bitsPerSample);
+  HdrSlice(this.name, this.width, this.height, this.type, this.bitsPerSample)
+      : data = allocateDataForType(width * height, type, bitsPerSample);
 
   /// Create a copy of the [other] HdrSlice.
   HdrSlice.from(HdrSlice other)
@@ -70,7 +66,7 @@ class HdrSlice {
         data = other.data.sublist(0);
 
   /// Get the raw bytes of the data buffer.
-  Uint8List getBytes() => Uint8List.view(data.buffer as ByteBuffer);
+  Uint8List getBytes() => Uint8List.view((data as TypedData).buffer);
 
   /// Does this channel store floating-point data?
   bool get isFloat => type == HdrImage.FLOAT;
@@ -94,7 +90,7 @@ class HdrSlice {
     if (type == HdrImage.INT || type == HdrImage.UINT) {
       return (data[pi] as int) / _maxIntSize;
     }
-    var s = (type == HdrImage.FLOAT && bitsPerSample == 16)
+    final s = (type == HdrImage.FLOAT && bitsPerSample == 16)
         ? Half.HalfToDouble(data[pi] as int)
         : data[pi] as double;
     return s;

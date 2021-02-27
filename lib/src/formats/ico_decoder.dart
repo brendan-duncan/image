@@ -1,11 +1,10 @@
-import 'package:image/image.dart';
-import 'package:image/src/animation.dart';
-import 'package:image/src/formats/bmp/bmp_info.dart';
-import 'package:image/src/formats/decode_info.dart';
-
+import '../../image.dart';
+import '../animation.dart';
 import '../image.dart';
 import '../util/input_buffer.dart';
 import '../util/output_buffer.dart';
+import 'bmp/bmp_info.dart';
+import 'decode_info.dart';
 import 'decoder.dart';
 
 const _TYPE_ICO = 1;
@@ -82,7 +81,7 @@ class IcoDecoder extends Decoder {
 
     // AND bitmask
     for (var y = 0; y < bmpInfo.height; y++) {
-      var line = bmpInfo.readBottomUp ? y : image.height - 1 - y;
+      final line = bmpInfo.readBottomUp ? y : image.height - 1 - y;
       final row = inp.readBytes(rowLength);
       for (var x = 0; x < bmpInfo.width;) {
         final b = row.readByte();

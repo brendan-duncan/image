@@ -18,12 +18,12 @@ class PsdLayerSectionDivider extends PsdLayerData {
   int subType = SUBTYPE_NORMAL;
 
   PsdLayerSectionDivider(String tag, InputBuffer data) : super.type(tag) {
-    var len = data.length;
+    final len = data.length;
 
     type = data.readUint32();
 
     if (len >= 12) {
-      var sig = data.readString(4);
+      final sig = data.readString(4);
       if (sig != '8BIM') {
         throw ImageException('Invalid key in layer additional data');
       }

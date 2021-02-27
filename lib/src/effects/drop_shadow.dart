@@ -1,9 +1,8 @@
-
 import '../color.dart';
-import '../image.dart';
 import '../filter/gaussian_blur.dart';
 import '../filter/remap_colors.dart';
 import '../filter/scale_rgba.dart';
+import '../image.dart';
 import '../transform/copy_into.dart';
 
 /// Create a drop-shadow effect for the image.
@@ -13,8 +12,8 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
     blur = 0;
   }
 
-  var shadowWidth = src.width + blur * 2;
-  var shadowHeight = src.height + blur * 2;
+  final shadowWidth = src.width + blur * 2;
+  final shadowHeight = src.height + blur * 2;
   var shadowOffsetX = -blur;
   var shadowOffsetY = -blur;
 
@@ -43,7 +42,7 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
     newImageHeight = shadowHeight + shadowOffsetY + vShadow;
   }
 
-  var dst = Image(newImageWidth, newImageHeight);
+  final dst = Image(newImageWidth, newImageHeight);
   dst.fill(0x00ffffff);
 
   copyInto(dst, src, dstX: shadowOffsetX, dstY: shadowOffsetY);

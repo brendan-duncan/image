@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import '../../hdr/hdr_image.dart';
 import '../../image_exception.dart';
 import '../../internal/internal.dart';
-import '../../hdr/hdr_image.dart';
 import '../../util/input_buffer.dart';
 import 'exr_attribute.dart';
 import 'exr_channel.dart';
@@ -40,21 +40,21 @@ class ExrPart {
     //_type = _tiled ? ExrPart.TYPE_TILE : ExrPart.TYPE_SCANLINE;
 
     while (true) {
-      var name = input.readString();
+      final name = input.readString();
       if (name.isEmpty) {
         break;
       }
 
-      var type = input.readString();
-      var size = input.readUint32();
-      var value = input.readBytes(size);
+      final type = input.readString();
+      final size = input.readUint32();
+      final value = input.readBytes(size);
 
       attributes[name] = ExrAttribute(name, type, size, value);
 
       switch (name) {
         case 'channels':
           while (true) {
-            var channel = ExrChannel(value);
+            final channel = ExrChannel(value);
             if (!channel.isValid) {
               break;
             }
@@ -112,12 +112,12 @@ class ExrPart {
         case 'tiles':
           _tileWidth = value.readUint32();
           _tileHeight = value.readUint32();
-          var mode = value.readByte();
+          final mode = value.readByte();
           _tileLevelMode = mode & 0xf;
           _tileRoundingMode = (mode >> 4) & 0xf;
           break;
         case 'type':
-          var s = value.readString();
+          final s = value.readString();
           if (s == 'deepscanline') {
             //this._type = TYPE_DEEP_SCANLINE;
           } else if (s == 'deeptile') {
@@ -153,7 +153,7 @@ class ExrPart {
       var lx = 0;
       var ly = 0;
       _offsets = List<Uint32List>.generate(_numXLevels! * _numYLevels!, (l) {
-        var result = Uint32List(_numXTiles![lx]! * _numYTiles![ly]!);
+        final result = Uint32List(_numXTiles![lx]! * _numYTiles![ly]!);
         ++lx;
         if (lx == _numXLevels) {
           lx = 0;
@@ -164,7 +164,7 @@ class ExrPart {
     } else {
       _bytesPerLine = Uint32List(height! + 1);
       for (var ch in channels) {
-        var nBytes = ch.size * width! ~/ ch.xSampling;
+        final nBytes = ch.size * width! ~/ ch.xSampling;
         for (var y = 0; y < height!; ++y) {
           if ((y + top) % ch.ySampling == 0) {
             _bytesPerLine[y] += nBytes;
@@ -193,7 +193,7 @@ class ExrPart {
         offset += _bytesPerLine[i];
       }
 
-      var numOffsets = ((height! + _linesInBuffer!) ~/ _linesInBuffer!) - 1;
+      final numOffsets = ((height! + _linesInBuffer!) ~/ _linesInBuffer!) - 1;
       _offsets = [Uint32List(numOffsets)];
     }
   }
@@ -217,12 +217,12 @@ class ExrPart {
         num = 1;
         break;
       case MIPMAP_LEVELS:
-        var w = maxX - minX + 1;
-        var h = maxY - minY + 1;
+        final w = maxX - minX + 1;
+        final h = maxY - minY + 1;
         num = _roundLog2(max(w, h), _tileRoundingMode) + 1;
         break;
       case RIPMAP_LEVELS:
-        var w = maxX - minX + 1;
+        final w = maxX - minX + 1;
         num = _roundLog2(w, _tileRoundingMode) + 1;
         break;
       default:
@@ -240,12 +240,12 @@ class ExrPart {
         num = 1;
         break;
       case MIPMAP_LEVELS:
-        var w = (maxX - minX) + 1;
-        var h = (maxY - minY) + 1;
+        final w = (maxX - minX) + 1;
+        final h = (maxY - minY) + 1;
         num = _roundLog2(max(w, h), _tileRoundingMode) + 1;
         break;
       case RIPMAP_LEVELS:
-        var h = (maxY - minY) + 1;
+        final h = (maxY - minY) + 1;
         num = _roundLog2(h, _tileRoundingMode) + 1;
         break;
       default:
@@ -255,9 +255,8 @@ class ExrPart {
     return num;
   }
 
-  int _roundLog2(int x, int? rmode) {
-    return (rmode == ROUND_DOWN) ? _floorLog2(x) : _ceilLog2(x);
-  }
+  int _roundLog2(int x, int? rmode) =>
+      (rmode == ROUND_DOWN) ? _floorLog2(x) : _ceilLog2(x);
 
   int _floorLog2(int x) {
     var y = 0;
@@ -297,19 +296,18 @@ class ExrPart {
   }
 
   List<int> _calculateNumTiles(
-      int numLevels, int min, int max, int? size, int? rmode) {
-    return List<int>.generate(
-        numLevels, (i) => (_levelSize(min, max, i, rmode) + size! - 1) ~/ size,
-        growable: false);
-  }
+          int numLevels, int min, int max, int? size, int? rmode) =>
+      List<int>.generate(numLevels,
+          (i) => (_levelSize(min, max, i, rmode) + size! - 1) ~/ size,
+          growable: false);
 
   int _levelSize(int _min, int _max, int l, int? rmode) {
     if (l < 0) {
       throw ImageException('Argument not in valid range.');
     }
 
-    var a = (_max - _min) + 1;
-    var b = (1 << l);
+    final a = (_max - _min) + 1;
+    final b = (1 << l);
     var size = a ~/ b;
 
     if (rmode == ROUND_UP && size * b < a) {
@@ -343,6 +341,7 @@ class ExrPart {
   late Uint32List _bytesPerLine;
   ExrCompressor? _compressor;
   int? _linesInBuffer;
+
   //int _lineBufferSize;
   Uint32List? _offsetInLineBuffer;
 
@@ -357,7 +356,7 @@ class ExrPart {
   int? _numYLevels;
   late int _bytesPerPixel;
   int? _maxBytesPerTileLine;
-  //int _tileBufferSize;
+//int _tileBufferSize;
 }
 
 @internal
@@ -367,15 +366,23 @@ class InternalExrPart extends ExrPart {
   List<Uint32List?>? get offsets => _offsets;
 
   ExrCompressor? get compressor => _compressor;
+
   int? get linesInBuffer => _linesInBuffer;
+
   Uint32List? get offsetInLineBuffer => _offsetInLineBuffer;
 
   bool get tiled => _tiled;
+
   int? get tileWidth => _tileWidth;
+
   int? get tileHeight => _tileHeight;
+
   List<int?>? get numXTiles => _numXTiles;
+
   List<int?>? get numYTiles => _numYTiles;
+
   int? get numXLevels => _numXLevels;
+
   int? get numYLevels => _numYLevels;
 
   void readOffsets(InputBuffer input) {
@@ -386,7 +393,7 @@ class InternalExrPart extends ExrPart {
         }
       }
     } else {
-      var numOffsets = _offsets![0]!.length;
+      final numOffsets = _offsets![0]!.length;
       for (var i = 0; i < numOffsets; ++i) {
         _offsets![0]![i] = input.readUint64();
       }

@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import '../image.dart';
@@ -62,7 +61,7 @@ Image copyRotate(Image src, num angle,
   final dh2 = 0.5 * (uy + vy);
 
   final dst = Image((ux + vx).toInt(), (uy + vy).toInt(),
-      channels: Channels.rgba, exif: src.exif, iccp: src.iccProfile);
+      exif: src.exif, iccp: src.iccProfile);
 
   for (var y = 0; y < dst.height; ++y) {
     for (var x = 0; x < dst.width; ++x) {

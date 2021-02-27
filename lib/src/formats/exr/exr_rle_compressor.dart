@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../../image_exception.dart';
@@ -21,21 +20,22 @@ class InternalExrRleCompressor extends InternalExrCompressor
   int numScanLines() => 1;
 
   @override
-  Uint8List compress(InputBuffer inPtr, int x, int y, [int? width, int? height]) {
+  Uint8List compress(InputBuffer input, int x, int y,
+      [int? width, int? height]) {
     throw ImageException('Rle compression not yet supported.');
   }
 
   @override
-  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+  Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
-    var out = OutputBuffer(size: inPtr.length * 2);
+    final out = OutputBuffer(size: input.length * 2);
 
     width ??= header.width;
     height ??= header.linesInBuffer;
 
-    var minX = x;
+    final minX = x;
     var maxX = x + width! - 1;
-    var minY = y;
+    final minY = y;
     var maxY = y + height! - 1;
 
     if (maxX > header.width!) {
@@ -48,22 +48,22 @@ class InternalExrRleCompressor extends InternalExrCompressor
     decodedWidth = (maxX - minX) + 1;
     decodedHeight = (maxY - minY) + 1;
 
-    while (!inPtr.isEOS) {
-      var n = inPtr.readInt8();
+    while (!input.isEOS) {
+      final n = input.readInt8();
       if (n < 0) {
         var count = -n;
         while (count-- > 0) {
-          out.writeByte(inPtr.readByte());
+          out.writeByte(input.readByte());
         }
       } else {
         var count = n;
         while (count-- >= 0) {
-          out.writeByte(inPtr.readByte());
+          out.writeByte(input.readByte());
         }
       }
     }
 
-    var data = out.getBytes() as Uint8List;
+    final data = out.getBytes() as Uint8List;
 
     // Predictor
     for (var i = 1, len = data.length; i < len; ++i) {

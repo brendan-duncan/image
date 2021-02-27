@@ -1,4 +1,3 @@
-
 import '../decode_info.dart';
 import 'gif_color_map.dart';
 import 'gif_image_desc.dart';

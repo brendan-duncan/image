@@ -72,9 +72,7 @@ class NeuralQuantizer extends Quantizer {
   }
 
   /// Find the index of the closest color to [r],[g],[b] in the [colorMap].
-  int lookupRGB(int r, int g, int b) {
-    return _inxSearch(b, g, r);
-  }
+  int lookupRGB(int r, int g, int b) => _inxSearch(b, g, r);
 
   /// Find the color closest to [c] in the [colorMap].
   @override
@@ -183,7 +181,7 @@ class NeuralQuantizer extends Quantizer {
       }
 
       if (j >= 0) {
-        var p = j * 4;
+        final p = j * 4;
         var dist = g - _colorMap[p + 1]; // inx key - reverse dif
         if (dist >= bestd) {
           j = -1; // stop iter
@@ -249,7 +247,7 @@ class NeuralQuantizer extends Quantizer {
         }
       }
 
-      var q = smallpos * 4;
+      final q = smallpos * 4;
 
       // swap p (i) and q (smallpos) entries
       if (i != smallpos) {
@@ -289,10 +287,10 @@ class NeuralQuantizer extends Quantizer {
 
   void _learn(Image image) {
     var biasRadius = INIT_BIAS_RADIUS;
-    var alphadec = 30 + ((samplingFactor - 1) ~/ 3);
-    var lengthCount = image.length;
-    var samplePixels = lengthCount ~/ samplingFactor;
-    var delta = samplePixels ~/ NUM_CYCLES;
+    final alphadec = 30 + ((samplingFactor - 1) ~/ 3);
+    final lengthCount = image.length;
+    final samplePixels = lengthCount ~/ samplingFactor;
+    final delta = samplePixels ~/ NUM_CYCLES;
     var alpha = INIT_ALPHA;
 
     var rad = biasRadius >> RADIUS_BIAS_SHIFT;
@@ -439,7 +437,7 @@ class NeuralQuantizer extends Quantizer {
         bestpos = i;
       }
 
-      var biasdist = dist - _bias[i];
+      final biasdist = dist - _bias[i];
       if (biasdist < bestbiasd) {
         bestbiasd = biasdist;
         bestbiaspos = i;

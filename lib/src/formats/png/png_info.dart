@@ -1,7 +1,8 @@
+import 'dart:typed_data';
+
 import '../../internal/internal.dart';
 import '../decode_info.dart';
 import 'png_frame.dart';
-import 'dart:typed_data';
 
 class PngInfo extends DecodeInfo {
   int? bits;

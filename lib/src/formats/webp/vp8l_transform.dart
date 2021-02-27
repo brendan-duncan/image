@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../../internal/bit_operators.dart';
@@ -32,9 +31,9 @@ class VP8LTransform {
         if (rowEnd != ysize) {
           // The last predicted row in this iteration will be the top-pred row
           // for the first row in next iteration.
-          var start = rowsOut - width;
-          var end = start + width;
-          var offset = rowsOut + (rowEnd - rowStart - 1) * width;
+          final start = rowsOut - width;
+          final end = start + width;
+          final offset = rowsOut + (rowEnd - rowStart - 1) * width;
           outData.setRange(start, end, inData, offset);
         }
         break;
@@ -52,7 +51,7 @@ class VP8LTransform {
           final inStride =
               (rowEnd - rowStart) * InternalVP8L.subSampleSize(xsize, bits);
 
-          var src = rowsOut + outStride - inStride;
+          final src = rowsOut + outStride - inStride;
           outData.setRange(src, src + inStride, inData, rowsOut);
 
           colorIndexInverseTransform(
@@ -69,7 +68,7 @@ class VP8LTransform {
       int yStart, int yEnd, InputBuffer src, InputBuffer dst) {
     final bitsPerPixel = 8 >> bits;
     final width = xsize;
-    var colorMap = data;
+    final colorMap = data;
     if (bitsPerPixel < 8) {
       final pixelsPerByte = 1 << bits;
       final countMask = pixelsPerByte - 1;
@@ -85,8 +84,7 @@ class VP8LTransform {
             packed_pixels = _getAlphaIndex(src[0]);
             src.offset++;
           }
-          var p = _getAlphaValue(colorMap![packed_pixels & bit_mask]);
-          ;
+          final p = _getAlphaValue(colorMap![packed_pixels & bit_mask]);
           dst[0] = p;
           dst.offset++;
           packed_pixels >>= bitsPerPixel;
@@ -95,7 +93,7 @@ class VP8LTransform {
     } else {
       for (var y = yStart; y < yEnd; ++y) {
         for (var x = 0; x < width; ++x) {
-          var index = _getAlphaIndex(src[0]);
+          final index = _getAlphaIndex(src[0]);
           src.offset++;
           dst[0] = _getAlphaValue(colorMap![index]);
           dst.offset++;
@@ -108,7 +106,7 @@ class VP8LTransform {
       int src, Uint32List outData, int dst) {
     final bitsPerPixel = 8 >> bits;
     final width = xsize;
-    var colorMap = data;
+    final colorMap = data;
     if (bitsPerPixel < 8) {
       final pixelsPerByte = 1 << bits;
       final countMask = pixelsPerByte - 1;
@@ -148,7 +146,7 @@ class VP8LTransform {
 
     while (y < yEnd) {
       var pred = predRow; // this.data+
-      var m = _VP8LMultipliers();
+      final m = _VP8LMultipliers();
 
       for (var x = 0; x < width; ++x) {
         if ((x & mask) == 0) {
@@ -163,7 +161,6 @@ class VP8LTransform {
 
       if ((y & mask) == 0) {
         predRow += tilesPerRow;
-        ;
       }
     }
   }
@@ -197,17 +194,17 @@ class VP8LTransform {
       _addPixelsEq(outData, data, pred2);
 
       // .. the rest:
-      var k = (this.data![predModeSrc++] >> 8) & 0xf;
+      final k = (this.data![predModeSrc++] >> 8) & 0xf;
 
       var predFunc = PREDICTORS[k];
       for (var x = 1; x < width; ++x) {
         if ((x & mask) == 0) {
           // start of tile. Read predictor function.
-          var k = ((this.data![predModeSrc++]) >> 8) & 0xf;
+          final k = ((this.data![predModeSrc++]) >> 8) & 0xf;
           predFunc = PREDICTORS[k];
         }
-        var d = outData[data + x - 1];
-        var pred = predFunc(outData, d, data + x - width);
+        final d = outData[data + x - 1];
+        final pred = predFunc(outData, d, data + x - width);
         _addPixelsEq(outData, data + x, pred);
       }
 
@@ -234,41 +231,30 @@ class VP8LTransform {
     }
   }
 
-  static int _getARGBIndex(int idx) {
-    return (idx >> 8) & 0xff;
-  }
+  static int _getARGBIndex(int idx) => (idx >> 8) & 0xff;
 
-  static int _getAlphaIndex(int idx) {
-    return idx;
-  }
+  static int _getAlphaIndex(int idx) => idx;
 
-  static int _getARGBValue(int val) {
-    return val;
-  }
+  static int _getARGBValue(int val) => val;
 
-  static int _getAlphaValue(int val) {
-    return (val >> 8) & 0xff;
-  }
+  static int _getAlphaValue(int val) => (val >> 8) & 0xff;
 
   // In-place sum of each component with mod 256.
   static void _addPixelsEq(Uint32List pixels, int a, int b) {
-    var pa = pixels[a];
+    final pa = pixels[a];
     final alphaAndGreen = (pa & 0xff00ff00) + (b & 0xff00ff00);
     final redAndBlue = (pa & 0x00ff00ff) + (b & 0x00ff00ff);
     pixels[a] = (alphaAndGreen & 0xff00ff00) | (redAndBlue & 0x00ff00ff);
   }
 
-  static int _average2(int a0, int a1) {
-    return (((a0 ^ a1) & 0xfefefefe) >> 1) + (a0 & a1);
-  }
+  static int _average2(int a0, int a1) =>
+      (((a0 ^ a1) & 0xfefefefe) >> 1) + (a0 & a1);
 
-  static int _average3(int a0, int a1, int a2) {
-    return _average2(_average2(a0, a2), a1);
-  }
+  static int _average3(int a0, int a1, int a2) =>
+      _average2(_average2(a0, a2), a1);
 
-  static int _average4(int a0, int a1, int a2, int a3) {
-    return _average2(_average2(a0, a1), _average2(a2, a3));
-  }
+  static int _average4(int a0, int a1, int a2, int a3) =>
+      _average2(_average2(a0, a1), _average2(a2, a3));
 
   // Return 0, when a is a negative integer.
   // Return 255, when a is positive.
@@ -282,9 +268,8 @@ class VP8LTransform {
     return a;
   }
 
-  static int _addSubtractComponentFull(int a, int b, int c) {
-    return _clip255(a + b - c);
-  }
+  static int _addSubtractComponentFull(int a, int b, int c) =>
+      _clip255(a + b - c);
 
   static int _clampedAddSubtractFull(int c0, int c1, int c2) {
     final a = _addSubtractComponentFull(c0 >> 24, c1 >> 24, c2 >> 24);
@@ -296,9 +281,8 @@ class VP8LTransform {
     return (a << 24) | (r << 16) | (g << 8) | b;
   }
 
-  static int _addSubtractComponentHalf(int a, int b) {
-    return _clip255(a + (a - b) ~/ 2);
-  }
+  static int _addSubtractComponentHalf(int a, int b) =>
+      _clip255(a + (a - b) ~/ 2);
 
   static int _clampedAddSubtractHalf(int c0, int c1, int c2) {
     final avg = _average2(c0, c1);
@@ -326,61 +310,45 @@ class VP8LTransform {
   //--------------------------------------------------------------------------
   // Predictors
 
-  static int _predictor0(Uint32List pixels, int left, int top) {
-    return VP8L.ARGB_BLACK;
-  }
+  static int _predictor0(Uint32List pixels, int left, int top) =>
+      VP8L.ARGB_BLACK;
 
-  static int _predictor1(Uint32List pixels, int left, int top) {
-    return left;
-  }
+  static int _predictor1(Uint32List pixels, int left, int top) => left;
 
-  static int _predictor2(Uint32List pixels, int left, int top) {
-    return pixels[top];
-  }
+  static int _predictor2(Uint32List pixels, int left, int top) => pixels[top];
 
-  static int _predictor3(Uint32List pixels, int left, int top) {
-    return pixels[top + 1];
-  }
+  static int _predictor3(Uint32List pixels, int left, int top) =>
+      pixels[top + 1];
 
-  static int _predictor4(Uint32List pixels, int left, int top) {
-    return pixels[top - 1];
-  }
+  static int _predictor4(Uint32List pixels, int left, int top) =>
+      pixels[top - 1];
 
-  static int _predictor5(Uint32List pixels, int left, int top) {
-    return _average3(left, pixels[top], pixels[top + 1]);
-  }
+  static int _predictor5(Uint32List pixels, int left, int top) =>
+      _average3(left, pixels[top], pixels[top + 1]);
 
-  static int _predictor6(Uint32List pixels, int left, int top) {
-    return _average2(left, pixels[top - 1]);
-  }
+  static int _predictor6(Uint32List pixels, int left, int top) =>
+      _average2(left, pixels[top - 1]);
 
-  static int _predictor7(Uint32List pixels, int left, int top) {
-    return _average2(left, pixels[top]);
-  }
+  static int _predictor7(Uint32List pixels, int left, int top) =>
+      _average2(left, pixels[top]);
 
-  static int _predictor8(Uint32List pixels, int left, int top) {
-    return _average2(pixels[top - 1], pixels[top]);
-  }
+  static int _predictor8(Uint32List pixels, int left, int top) =>
+      _average2(pixels[top - 1], pixels[top]);
 
-  static int _predictor9(Uint32List pixels, int left, int top) {
-    return _average2(pixels[top], pixels[top + 1]);
-  }
+  static int _predictor9(Uint32List pixels, int left, int top) =>
+      _average2(pixels[top], pixels[top + 1]);
 
-  static int _predictor10(Uint32List pixels, int left, int top) {
-    return _average4(left, pixels[top - 1], pixels[top], pixels[top + 1]);
-  }
+  static int _predictor10(Uint32List pixels, int left, int top) =>
+      _average4(left, pixels[top - 1], pixels[top], pixels[top + 1]);
 
-  static int _predictor11(Uint32List pixels, int left, int top) {
-    return _select(pixels[top], left, pixels[top - 1]);
-  }
+  static int _predictor11(Uint32List pixels, int left, int top) =>
+      _select(pixels[top], left, pixels[top - 1]);
 
-  static int _predictor12(Uint32List pixels, int left, int top) {
-    return _clampedAddSubtractFull(left, pixels[top], pixels[top - 1]);
-  }
+  static int _predictor12(Uint32List pixels, int left, int top) =>
+      _clampedAddSubtractFull(left, pixels[top], pixels[top - 1]);
 
-  static int _predictor13(Uint32List pixels, int left, int top) {
-    return _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
-  }
+  static int _predictor13(Uint32List pixels, int left, int top) =>
+      _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
 
   static final PREDICTORS = [
     _predictor0,
@@ -440,7 +408,7 @@ class _VP8LMultipliers {
     var newBlue = argb & 0xff;
 
     if (inverse) {
-      var g = colorTransformDelta(greenToRed, green);
+      final g = colorTransformDelta(greenToRed, green);
       newRed = (newRed + g) & 0xffffffff;
       newRed &= 0xff;
       newBlue =
@@ -455,16 +423,16 @@ class _VP8LMultipliers {
       newBlue &= 0xff;
     }
 
-    var c = (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | (newBlue);
+    final c = (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | (newBlue);
     return c;
   }
 
   int colorTransformDelta(int colorPred, int color) {
     // There's a bug in dart2js (issue 16497) that requires I do this a bit
     // convoluted to avoid having the optimizer butcher the code.
-    var a = uint8ToInt8(colorPred);
-    var b = uint8ToInt8(color);
-    var d = int32ToUint32(a * b);
+    final a = uint8ToInt8(colorPred);
+    final b = uint8ToInt8(color);
+    final d = int32ToUint32(a * b);
     return d >> 5;
   }
 }

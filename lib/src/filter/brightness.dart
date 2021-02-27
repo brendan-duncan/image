@@ -1,4 +1,3 @@
-
 import '../image.dart';
 import '../internal/clamp.dart';
 
@@ -10,7 +9,7 @@ Image? brightness(Image? src, int brightness) {
     return src;
   }
 
-  var pixels = src.getBytes();
+  final pixels = src.getBytes();
   for (var i = 0, len = pixels.length; i < len; i += 4) {
     pixels[i] = clamp255(pixels[i] + brightness);
     pixels[i + 1] = clamp255(pixels[i + 1] + brightness);

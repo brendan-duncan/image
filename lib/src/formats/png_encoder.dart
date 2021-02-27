@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
-import '../color.dart';
 import '../animation.dart';
+import '../color.dart';
 import '../icc_profile_data.dart';
 import '../image.dart';
 import '../util/output_buffer.dart';
@@ -37,12 +37,12 @@ class PngEncoder extends Encoder {
     }
 
     // Include room for the filter bytes (1 byte per row).
-    var filteredImage = Uint8List(
+    final filteredImage = Uint8List(
         (image.width * image.height * image.numberOfChannels) + image.height);
 
     _filter(image, filteredImage);
 
-    var compressed = ZLibEncoder().encode(filteredImage, level: level);
+    final compressed = ZLibEncoder().encode(filteredImage, level: level);
 
     if (isAnimated) {
       _writeFrameControlChunk();
@@ -53,7 +53,7 @@ class PngEncoder extends Encoder {
       _writeChunk(output!, 'IDAT', compressed);
     } else {
       // fdAT chunk
-      var fdat = OutputBuffer(bigEndian: true);
+      final fdat = OutputBuffer(bigEndian: true);
       fdat.writeUint32(sequenceNumber);
       fdat.writeBytes(compressed);
       _writeChunk(output!, 'fdAT', fdat.getBytes());
@@ -108,7 +108,7 @@ class PngEncoder extends Encoder {
     output!.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
     // IHDR chunk
-    var chunk = OutputBuffer(bigEndian: true);
+    final chunk = OutputBuffer(bigEndian: true);
     chunk.writeUint32(width);
     chunk.writeUint32(height);
     chunk.writeByte(8);
@@ -120,14 +120,14 @@ class PngEncoder extends Encoder {
   }
 
   void _writeAnimationControlChunk() {
-    var chunk = OutputBuffer(bigEndian: true);
+    final chunk = OutputBuffer(bigEndian: true);
     chunk.writeUint32(_frames); // number of frames
     chunk.writeUint32(repeat); // loop count
     _writeChunk(output!, 'acTL', chunk.getBytes());
   }
 
   void _writeFrameControlChunk() {
-    var chunk = OutputBuffer(bigEndian: true);
+    final chunk = OutputBuffer(bigEndian: true);
     chunk.writeUint32(sequenceNumber);
     chunk.writeUint32(_width);
     chunk.writeUint32(_height);
@@ -145,7 +145,7 @@ class PngEncoder extends Encoder {
       return;
     }
 
-    var chunk = OutputBuffer(bigEndian: true);
+    final chunk = OutputBuffer(bigEndian: true);
 
     // name
     chunk.writeBytes(iccp.name.codeUnits);
@@ -164,7 +164,7 @@ class PngEncoder extends Encoder {
     out.writeUint32(chunk.length);
     out.writeBytes(type.codeUnits);
     out.writeBytes(chunk);
-    var crc = _crc(type, chunk);
+    final crc = _crc(type, chunk);
     out.writeUint32(crc);
   }
 
@@ -199,7 +199,7 @@ class PngEncoder extends Encoder {
   int _filterNone(Image image, int oi, int row, List<int> out) {
     out[oi++] = FILTER_NONE;
     for (var x = 0; x < image.width; ++x) {
-      var c = image.getPixel(x, row);
+      final c = image.getPixel(x, row);
       out[oi++] = getRed(c);
       out[oi++] = getGreen(c);
       out[oi++] = getBlue(c);
@@ -221,20 +221,20 @@ class PngEncoder extends Encoder {
     }
 
     for (var x = 1; x < image.width; ++x) {
-      var ar = getRed(image.getPixel(x - 1, row));
-      var ag = getGreen(image.getPixel(x - 1, row));
-      var ab = getBlue(image.getPixel(x - 1, row));
+      final ar = getRed(image.getPixel(x - 1, row));
+      final ag = getGreen(image.getPixel(x - 1, row));
+      final ab = getBlue(image.getPixel(x - 1, row));
 
-      var r = getRed(image.getPixel(x, row));
-      var g = getGreen(image.getPixel(x, row));
-      var b = getBlue(image.getPixel(x, row));
+      final r = getRed(image.getPixel(x, row));
+      final g = getGreen(image.getPixel(x, row));
+      final b = getBlue(image.getPixel(x, row));
 
       out[oi++] = ((r - ar)) & 0xff;
       out[oi++] = ((g - ag)) & 0xff;
       out[oi++] = ((b - ab)) & 0xff;
       if (image.channels == Channels.rgba) {
-        var aa = getAlpha(image.getPixel(x - 1, row));
-        var a = getAlpha(image.getPixel(x, row));
+        final aa = getAlpha(image.getPixel(x - 1, row));
+        final a = getAlpha(image.getPixel(x, row));
         out[oi++] = ((a - aa)) & 0xff;
       }
     }
@@ -246,22 +246,21 @@ class PngEncoder extends Encoder {
     out[oi++] = FILTER_UP;
 
     for (var x = 0; x < image.width; ++x) {
-      var br = (row == 0) ? 0 : getRed(image.getPixel(x, row - 1));
-      var bg = (row == 0) ? 0 : getGreen(image.getPixel(x, row - 1));
-      var bb = (row == 0) ? 0 : getBlue(image.getPixel(x, row - 1));
+      final br = (row == 0) ? 0 : getRed(image.getPixel(x, row - 1));
+      final bg = (row == 0) ? 0 : getGreen(image.getPixel(x, row - 1));
+      final bb = (row == 0) ? 0 : getBlue(image.getPixel(x, row - 1));
 
-      var xr = getRed(image.getPixel(x, row));
-      var xg = getGreen(image.getPixel(x, row));
-      var xb = getBlue(image.getPixel(x, row));
+      final xr = getRed(image.getPixel(x, row));
+      final xg = getGreen(image.getPixel(x, row));
+      final xb = getBlue(image.getPixel(x, row));
 
       out[oi++] = (xr - br) & 0xff;
       out[oi++] = (xg - bg) & 0xff;
       out[oi++] = (xb - bb) & 0xff;
       if (image.channels == Channels.rgba) {
-        var ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
-        var xa = getAlpha(image.getPixel(x, row));
+        final ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
+        final xa = getAlpha(image.getPixel(x, row));
         out[oi++] = (xa - ba) & 0xff;
-        ;
       }
     }
 
@@ -272,27 +271,26 @@ class PngEncoder extends Encoder {
     out[oi++] = FILTER_AVERAGE;
 
     for (var x = 0; x < image.width; ++x) {
-      var ar = (x == 0) ? 0 : getRed(image.getPixel(x - 1, row));
-      var ag = (x == 0) ? 0 : getGreen(image.getPixel(x - 1, row));
-      var ab = (x == 0) ? 0 : getBlue(image.getPixel(x - 1, row));
+      final ar = (x == 0) ? 0 : getRed(image.getPixel(x - 1, row));
+      final ag = (x == 0) ? 0 : getGreen(image.getPixel(x - 1, row));
+      final ab = (x == 0) ? 0 : getBlue(image.getPixel(x - 1, row));
 
-      var br = (row == 0) ? 0 : getRed(image.getPixel(x, row - 1));
-      var bg = (row == 0) ? 0 : getGreen(image.getPixel(x, row - 1));
-      var bb = (row == 0) ? 0 : getBlue(image.getPixel(x, row - 1));
+      final br = (row == 0) ? 0 : getRed(image.getPixel(x, row - 1));
+      final bg = (row == 0) ? 0 : getGreen(image.getPixel(x, row - 1));
+      final bb = (row == 0) ? 0 : getBlue(image.getPixel(x, row - 1));
 
-      var xr = getRed(image.getPixel(x, row));
-      var xg = getGreen(image.getPixel(x, row));
-      var xb = getBlue(image.getPixel(x, row));
+      final xr = getRed(image.getPixel(x, row));
+      final xg = getGreen(image.getPixel(x, row));
+      final xb = getBlue(image.getPixel(x, row));
 
       out[oi++] = (xr - ((ar + br) >> 1)) & 0xff;
       out[oi++] = (xg - ((ag + bg) >> 1)) & 0xff;
       out[oi++] = (xb - ((ab + bb) >> 1)) & 0xff;
       if (image.channels == Channels.rgba) {
-        var aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
-        var ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
-        var xa = getAlpha(image.getPixel(x, row));
+        final aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
+        final ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
+        final xa = getAlpha(image.getPixel(x, row));
         out[oi++] = (xa - ((aa + ba) >> 1)) & 0xff;
-        ;
       }
     }
 
@@ -300,10 +298,10 @@ class PngEncoder extends Encoder {
   }
 
   int _paethPredictor(int a, int b, int c) {
-    var p = a + b - c;
-    var pa = (p > a) ? p - a : a - p;
-    var pb = (p > b) ? p - b : b - p;
-    var pc = (p > c) ? p - c : c - p;
+    final p = a + b - c;
+    final pa = (p > a) ? p - a : a - p;
+    final pb = (p > b) ? p - b : b - p;
+    final pc = (p > c) ? p - c : c - p;
     if (pa <= pb && pa <= pc) {
       return a;
     } else if (pb <= pc) {
@@ -316,39 +314,39 @@ class PngEncoder extends Encoder {
     out[oi++] = FILTER_PAETH;
 
     for (var x = 0; x < image.width; ++x) {
-      var ar = (x == 0) ? 0 : getRed(image.getPixel(x - 1, row));
-      var ag = (x == 0) ? 0 : getGreen(image.getPixel(x - 1, row));
-      var ab = (x == 0) ? 0 : getBlue(image.getPixel(x - 1, row));
+      final ar = (x == 0) ? 0 : getRed(image.getPixel(x - 1, row));
+      final ag = (x == 0) ? 0 : getGreen(image.getPixel(x - 1, row));
+      final ab = (x == 0) ? 0 : getBlue(image.getPixel(x - 1, row));
 
-      var br = (row == 0) ? 0 : getRed(image.getPixel(x, row - 1));
-      var bg = (row == 0) ? 0 : getGreen(image.getPixel(x, row - 1));
-      var bb = (row == 0) ? 0 : getBlue(image.getPixel(x, row - 1));
+      final br = (row == 0) ? 0 : getRed(image.getPixel(x, row - 1));
+      final bg = (row == 0) ? 0 : getGreen(image.getPixel(x, row - 1));
+      final bb = (row == 0) ? 0 : getBlue(image.getPixel(x, row - 1));
 
-      var cr =
+      final cr =
           (row == 0 || x == 0) ? 0 : getRed(image.getPixel(x - 1, row - 1));
-      var cg =
+      final cg =
           (row == 0 || x == 0) ? 0 : getGreen(image.getPixel(x - 1, row - 1));
-      var cb =
+      final cb =
           (row == 0 || x == 0) ? 0 : getBlue(image.getPixel(x - 1, row - 1));
 
-      var xr = getRed(image.getPixel(x, row));
-      var xg = getGreen(image.getPixel(x, row));
-      var xb = getBlue(image.getPixel(x, row));
+      final xr = getRed(image.getPixel(x, row));
+      final xg = getGreen(image.getPixel(x, row));
+      final xb = getBlue(image.getPixel(x, row));
 
-      var pr = _paethPredictor(ar, br, cr);
-      var pg = _paethPredictor(ag, bg, cg);
-      var pb = _paethPredictor(ab, bb, cb);
+      final pr = _paethPredictor(ar, br, cr);
+      final pg = _paethPredictor(ag, bg, cg);
+      final pb = _paethPredictor(ab, bb, cb);
 
       out[oi++] = (xr - pr) & 0xff;
       out[oi++] = (xg - pg) & 0xff;
       out[oi++] = (xb - pb) & 0xff;
       if (image.channels == Channels.rgba) {
-        var aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
-        var ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
-        var ca =
+        final aa = (x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row));
+        final ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
+        final ca =
             (row == 0 || x == 0) ? 0 : getAlpha(image.getPixel(x - 1, row - 1));
-        var xa = getAlpha(image.getPixel(x, row));
-        var pa = _paethPredictor(aa, ba, ca);
+        final xa = getAlpha(image.getPixel(x, row));
+        final pa = _paethPredictor(aa, ba, ca);
         out[oi++] = (xa - pa) & 0xff;
       }
     }
@@ -358,7 +356,7 @@ class PngEncoder extends Encoder {
 
   // Return the CRC of the bytes
   int _crc(String type, List<int> bytes) {
-    var crc = getCrc32(type.codeUnits);
+    final crc = getCrc32(type.codeUnits);
     return getCrc32(bytes, crc);
   }
 
@@ -385,6 +383,6 @@ class PngEncoder extends Encoder {
   static const FILTER_PAETH = 4;
   static const FILTER_AGRESSIVE = 5;
 
-  // Table of CRCs of all 8-bit messages.
-  //final List<int> _crcTable = List<int>(256);
+// Table of CRCs of all 8-bit messages.
+//final List<int> _crcTable = List<int>(256);
 }

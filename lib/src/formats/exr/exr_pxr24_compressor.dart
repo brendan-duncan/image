@@ -25,30 +25,30 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
   int numScanLines() => _numScanLines;
 
   @override
-  Uint8List compress(InputBuffer inPtr, int x, int y,
+  Uint8List compress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
     throw ImageException('Pxr24 compression not yet supported.');
   }
 
   @override
-  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+  Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
-    var data = _zlib.decodeBytes(inPtr.toUint8List());
+    final data = _zlib.decodeBytes(input.toUint8List());
 
     _output ??= OutputBuffer(size: _numScanLines * _maxScanLineSize!);
     _output!.rewind();
 
     var tmpEnd = 0;
-    var ptr = [0, 0, 0, 0];
-    var pixel = Uint32List(1);
-    var pixelBytes = Uint8List.view(pixel.buffer);
+    final ptr = [0, 0, 0, 0];
+    final pixel = Uint32List(1);
+    final pixelBytes = Uint8List.view(pixel.buffer);
 
     width ??= header.width;
     height ??= header.linesInBuffer;
 
-    var minX = x;
+    final minX = x;
     var maxX = x + width! - 1;
-    var minY = y;
+    final minY = y;
     var maxY = y + height! - 1;
 
     if (maxX > header.width!) {
@@ -61,15 +61,15 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     decodedWidth = (maxX - minX) + 1;
     decodedHeight = (maxY - minY) + 1;
 
-    var numChannels = header.channels.length;
+    final numChannels = header.channels.length;
     for (var yi = minY; yi <= maxY; ++yi) {
       for (var ci = 0; ci < numChannels; ++ci) {
-        var ch = header.channels[ci];
+        final ch = header.channels[ci];
         if ((y % ch.ySampling) != 0) {
           continue;
         }
 
-        var n = numSamples(ch.xSampling, minX, maxX);
+        final n = numSamples(ch.xSampling, minX, maxX);
         pixel[0] = 0;
 
         switch (ch.type) {
@@ -79,7 +79,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
             ptr[2] = ptr[1] + n;
             tmpEnd = ptr[2] + n;
             for (var j = 0; j < n; ++j) {
-              var diff = (data[ptr[0]++] << 24) |
+              final diff = (data[ptr[0]++] << 24) |
                   (data[ptr[1]++] << 16) |
                   (data[ptr[2]++] << 8);
               pixel[0] += diff;
@@ -93,7 +93,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
             ptr[1] = ptr[0] + n;
             tmpEnd = ptr[1] + n;
             for (var j = 0; j < n; ++j) {
-              var diff = (data[ptr[0]++] << 8) | data[ptr[1]++];
+              final diff = (data[ptr[0]++] << 8) | data[ptr[1]++];
               pixel[0] += diff;
 
               for (var k = 0; k < 2; ++k) {
@@ -107,7 +107,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
             ptr[2] = ptr[1] + n;
             tmpEnd = ptr[2] + n;
             for (var j = 0; j < n; ++j) {
-              var diff = (data[ptr[0]++] << 24) |
+              final diff = (data[ptr[0]++] << 24) |
                   (data[ptr[1]++] << 16) |
                   (data[ptr[2]++] << 8);
               pixel[0] += diff;

@@ -1,4 +1,3 @@
-
 class JpegAdobe {
   int? version;
   int? flags0;

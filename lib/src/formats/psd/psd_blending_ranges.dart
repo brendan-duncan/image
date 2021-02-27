@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../../util/input_buffer.dart';
@@ -20,8 +19,8 @@ class PsdBlendingRanges {
     grayBlackDst = input.readUint16();
     grayWhiteDst = input.readUint16();
 
-    var len = input.length;
-    var numChannels = len ~/ 8;
+    final len = input.length;
+    final numChannels = len ~/ 8;
 
     if (numChannels > 0) {
       blackSrc = Uint16List(numChannels);

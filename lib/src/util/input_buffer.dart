@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../image_exception.dart';
@@ -13,11 +12,9 @@ class InputBuffer {
   bool bigEndian;
 
   /// Create a InputStream for reading from a List<int>
-  InputBuffer(List<int> buffer,
-      {this.bigEndian = false, int offset = 0, int? length})
-      : buffer = buffer,
-        start = offset,
-        offset = offset,
+  InputBuffer(this.buffer,
+      {this.bigEndian = false, this.offset = 0, int? length})
+      : start = offset,
         end = (length == null) ? buffer.length : offset + length;
 
   /// Create a copy of [other].
@@ -97,9 +94,8 @@ class InputBuffer {
 
   /// Read [count] bytes from an [offset] of the current read position, without
   /// moving the read position.
-  InputBuffer peekBytes(int count, [int offset = 0]) {
-    return subset(count, offset: offset);
-  }
+  InputBuffer peekBytes(int count, [int offset = 0]) =>
+      subset(count, offset: offset);
 
   /// Move the read position by [count] bytes.
   void skip(int count) {
@@ -107,17 +103,13 @@ class InputBuffer {
   }
 
   /// Read a single byte.
-  int readByte() {
-    return buffer[offset++];
-  }
+  int readByte() => buffer[offset++];
 
-  int readInt8() {
-    return uint8ToInt8(readByte());
-  }
+  int readInt8() => uint8ToInt8(readByte());
 
   /// Read [count] bytes from the stream.
   InputBuffer readBytes(int count) {
-    var bytes = subset(count);
+    final bytes = subset(count);
     offset += bytes.length;
     return bytes;
   }
@@ -126,9 +118,9 @@ class InputBuffer {
   /// bytes returned as a string.
   String readString([int? len]) {
     if (len == null) {
-      var codes = <int>[];
+      final codes = <int>[];
       while (!isEOS) {
-        var c = readByte();
+        final c = readByte();
         if (c == 0) {
           return String.fromCharCodes(codes);
         }
@@ -137,16 +129,16 @@ class InputBuffer {
       throw ImageException('EOF reached without finding string terminator');
     }
 
-    var s = readBytes(len);
-    var bytes = s.toUint8List();
-    var str = String.fromCharCodes(bytes);
+    final s = readBytes(len);
+    final bytes = s.toUint8List();
+    final str = String.fromCharCodes(bytes);
     return str;
   }
 
   /// Read a 16-bit word from the stream.
   int readUint16() {
-    var b1 = buffer[offset++] & 0xff;
-    var b2 = buffer[offset++] & 0xff;
+    final b1 = buffer[offset++] & 0xff;
+    final b2 = buffer[offset++] & 0xff;
     if (bigEndian) {
       return (b1 << 8) | b2;
     }
@@ -154,15 +146,13 @@ class InputBuffer {
   }
 
   /// Read a 16-bit word from the stream.
-  int readInt16() {
-    return uint16ToInt16(readUint16());
-  }
+  int readInt16() => uint16ToInt16(readUint16());
 
   /// Read a 24-bit word from the stream.
   int readUint24() {
-    var b1 = buffer[offset++] & 0xff;
-    var b2 = buffer[offset++] & 0xff;
-    var b3 = buffer[offset++] & 0xff;
+    final b1 = buffer[offset++] & 0xff;
+    final b2 = buffer[offset++] & 0xff;
+    final b3 = buffer[offset++] & 0xff;
     if (bigEndian) {
       return b3 | (b2 << 8) | (b1 << 16);
     }
@@ -171,10 +161,10 @@ class InputBuffer {
 
   /// Read a 32-bit word from the stream.
   int readUint32() {
-    var b1 = buffer[offset++] & 0xff;
-    var b2 = buffer[offset++] & 0xff;
-    var b3 = buffer[offset++] & 0xff;
-    var b4 = buffer[offset++] & 0xff;
+    final b1 = buffer[offset++] & 0xff;
+    final b2 = buffer[offset++] & 0xff;
+    final b3 = buffer[offset++] & 0xff;
+    final b4 = buffer[offset++] & 0xff;
     if (bigEndian) {
       return (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
     }
@@ -182,30 +172,24 @@ class InputBuffer {
   }
 
   /// Read a signed 32-bit integer from the stream.
-  int readInt32() {
-    return uint32ToInt32(readUint32());
-  }
+  int readInt32() => uint32ToInt32(readUint32());
 
   /// Read a 32-bit float.
-  double readFloat32() {
-    return uint32ToFloat32(readUint32());
-  }
+  double readFloat32() => uint32ToFloat32(readUint32());
 
   /// Read a 64-bit float.
-  double readFloat64() {
-    return uint64ToFloat64(readUint64());
-  }
+  double readFloat64() => uint64ToFloat64(readUint64());
 
   /// Read a 64-bit word form the stream.
   int readUint64() {
-    var b1 = buffer[offset++] & 0xff;
-    var b2 = buffer[offset++] & 0xff;
-    var b3 = buffer[offset++] & 0xff;
-    var b4 = buffer[offset++] & 0xff;
-    var b5 = buffer[offset++] & 0xff;
-    var b6 = buffer[offset++] & 0xff;
-    var b7 = buffer[offset++] & 0xff;
-    var b8 = buffer[offset++] & 0xff;
+    final b1 = buffer[offset++] & 0xff;
+    final b2 = buffer[offset++] & 0xff;
+    final b3 = buffer[offset++] & 0xff;
+    final b4 = buffer[offset++] & 0xff;
+    final b5 = buffer[offset++] & 0xff;
+    final b6 = buffer[offset++] & 0xff;
+    final b7 = buffer[offset++] & 0xff;
+    final b8 = buffer[offset++] & 0xff;
     if (bigEndian) {
       return (b1 << 56) |
           (b2 << 48) |
@@ -230,15 +214,15 @@ class InputBuffer {
     if (buffer is Uint8List) {
       return toUint8List(offset, length);
     }
-    var s = start + offset + offset;
-    var e = (length <= 0) ? end : s + length;
+    final s = start + offset + offset;
+    final e = (length <= 0) ? end : s + length;
     return buffer.sublist(s, e);
   }
 
   Uint8List toUint8List([int offset = 0, int? length]) {
-    var len = length ?? this.length - offset;
+    final len = length ?? this.length - offset;
     if (buffer is Uint8List) {
-      var b = buffer as Uint8List;
+      final b = buffer as Uint8List;
       return Uint8List.view(
           b.buffer, b.offsetInBytes + this.offset + offset, len);
     }
@@ -251,7 +235,7 @@ class InputBuffer {
 
   Uint32List toUint32List([int offset = 0]) {
     if (buffer is Uint8List) {
-      var b = buffer as Uint8List;
+      final b = buffer as Uint8List;
       return Uint32List.view(b.buffer, b.offsetInBytes + this.offset + offset);
     }
     return Uint32List.view(toUint8List().buffer);

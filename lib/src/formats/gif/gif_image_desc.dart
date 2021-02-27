@@ -18,9 +18,9 @@ class GifImageDesc {
     width = input.readUint16();
     height = input.readUint16();
 
-    var b = input.readByte();
+    final b = input.readByte();
 
-    var bitsPerPixel = (b & 0x07) + 1;
+    final bitsPerPixel = (b & 0x07) + 1;
 
     interlaced = (b & 0x40) != 0;
 

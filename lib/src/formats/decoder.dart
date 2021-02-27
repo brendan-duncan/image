@@ -1,7 +1,6 @@
-
 import '../animation.dart';
-import '../image.dart';
 import '../hdr/hdr_image.dart';
+import '../image.dart';
 import 'decode_info.dart';
 
 /// Base class for image format decoders.
@@ -58,7 +57,7 @@ abstract class Decoder {
   /// [frame] will be decoded. If there was a problem decoding the file, null is
   /// returned.
   HdrImage? decodeHdrImage(List<int> bytes, {int frame = 0}) {
-    var img = decodeImage(bytes, frame: frame);
+    final img = decodeImage(bytes, frame: frame);
     if (img == null) {
       return null;
     }
@@ -93,7 +92,7 @@ abstract class Decoder {
   /// is returned, which provides the image, and top-left coordinates of the
   /// image, as animated frames may only occupy a subset of the canvas.
   HdrImage? decodeHdrFrame(int frame) {
-    var img = decodeFrame(frame);
+    final img = decodeFrame(frame);
     if (img == null) {
       return null;
     }
