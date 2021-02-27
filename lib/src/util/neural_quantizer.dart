@@ -2,7 +2,6 @@ import 'dart:math';
 import 'dart:typed_data';
 import '../color.dart';
 import '../image.dart';
-import '../image_exception.dart';
 import 'quantizer.dart';
 
 /* NeuQuant Neural-Net Quantization Algorithm
@@ -36,12 +35,10 @@ class NeuralQuantizer extends Quantizer {
 
   int samplingFactor;
 
-  /// 10 is a reasonable [samplingFactor] according to https://scientificgems.wordpress.com/stuff/neuquant-fast-high-quality-image-quantization/.
+  /// 10 is a reasonable [samplingFactor] according to
+  /// https://scientificgems.wordpress.com/stuff/neuquant-fast-high-quality-image-quantization/.
   NeuralQuantizer(Image image,
       {int numberOfColors = 256, this.samplingFactor = 10}) {
-    if (image.width * image.height < MAX_PRIME) {
-      throw ImageException('Image is too small');
-    }
 
     _initialize(numberOfColors);
 
@@ -57,7 +54,7 @@ class NeuralQuantizer extends Quantizer {
   }
 
   /// How many colors are in the [colorMap]?
-  int get numColors => NET_SIZE;
+  int get numColors => netSize;
 
   /// Get a color from the [colorMap].
   int color(int index) => getColor(
@@ -95,19 +92,20 @@ class NeuralQuantizer extends Quantizer {
   }
 
   void _initialize(int numberOfColors) {
-    NET_SIZE = max(numberOfColors, 4); // number of colours used
-    CUT_NET_SIZE = NET_SIZE - SPECIALS;
-    MAX_NET_POS = NET_SIZE - 1;
-    INIT_RAD = NET_SIZE ~/ 8; // for 256 cols, radius starts at 32
-    INIT_BIAS_RADIUS = INIT_RAD * RADIUS_BIAS;
-    _colorMap = Int32List(NET_SIZE * 4);
-    colorMap = Uint8List(NET_SIZE * 3);
-    SPECIALS = 3; // number of reserved colours used
-    BG_COLOR = SPECIALS - 1;
+    netSize = max(numberOfColors, 4); // number of colours used
+    cutNetSize = netSize - specials;
+    maxNetPos = netSize - 1;
+    initRadius = netSize ~/ 8; // for 256 cols, radius starts at 32
+    initBiasRadius = initRadius * radiusBias;
+    _colorMap = Int32List(netSize * 4);
+    colorMap = Uint8List(netSize * 3);
+    specials = 3; // number of reserved colours used
+    bgColor = specials - 1;
+    _radiusPower = Int32List(netSize >> 3);
 
-    _network = List<double>.filled(NET_SIZE * 3, 0);
-    _bias = List<double>.filled(NET_SIZE, 0);
-    _freq = List<double>.filled(NET_SIZE, 0);
+    _network = List<double>.filled(netSize * 3, 0);
+    _bias = List<double>.filled(netSize, 0);
+    _freq = List<double>.filled(netSize, 0);
 
     _network[0] = 0.0; // black
     _network[1] = 0.0;
@@ -118,16 +116,16 @@ class NeuralQuantizer extends Quantizer {
     _network[5] = 255.0;
 
     // RESERVED bgColour  // background
-    final f = 1.0 / NET_SIZE;
-    for (var i = 0; i < SPECIALS; ++i) {
+    final f = 1.0 / netSize;
+    for (var i = 0; i < specials; ++i) {
       _freq[i] = f;
       _bias[i] = 0.0;
     }
 
-    for (var i = SPECIALS, p = SPECIALS * 3; i < NET_SIZE; ++i) {
-      _network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
-      _network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
-      _network[p++] = (255.0 * (i - SPECIALS)) / CUT_NET_SIZE;
+    for (var i = specials, p = specials * 3; i < netSize; ++i) {
+      _network[p++] = (255.0 * (i - specials)) / cutNetSize;
+      _network[p++] = (255.0 * (i - specials)) / cutNetSize;
+      _network[p++] = (255.0 * (i - specials)) / cutNetSize;
 
       _freq[i] = f;
       _bias[i] = 0.0;
@@ -135,7 +133,7 @@ class NeuralQuantizer extends Quantizer {
   }
 
   void _copyColorMap() {
-    for (var i = 0, p = 0, q = 0; i < NET_SIZE; ++i) {
+    for (var i = 0, p = 0, q = 0; i < netSize; ++i) {
       colorMap[p++] = _colorMap[q + 2].abs() & 0xff;
       colorMap[p++] = _colorMap[q + 1].abs() & 0xff;
       colorMap[p++] = _colorMap[q].abs() & 0xff;
@@ -150,12 +148,12 @@ class NeuralQuantizer extends Quantizer {
     var i = _netIndex[g]; // index on g
     var j = i - 1; // start at netindex[g] and work outwards
 
-    while ((i < NET_SIZE) || (j >= 0)) {
-      if (i < NET_SIZE) {
+    while ((i < netSize) || (j >= 0)) {
+      if (i < netSize) {
         final p = i * 4;
         var dist = _colorMap[p + 1] - g; // inx key
         if (dist >= bestd) {
-          i = NET_SIZE; // stop iter
+          i = netSize; // stop iter
         } else {
           if (dist < 0) {
             dist = -dist;
@@ -214,7 +212,7 @@ class NeuralQuantizer extends Quantizer {
   }
 
   void _fix() {
-    for (var i = 0, p = 0, q = 0; i < NET_SIZE; i++, q += 4) {
+    for (var i = 0, p = 0, q = 0; i < netSize; i++, q += 4) {
       for (var j = 0; j < 3; ++j, ++p) {
         var x = (0.5 + _network[p]).toInt();
         if (x < 0) {
@@ -231,15 +229,15 @@ class NeuralQuantizer extends Quantizer {
 
   /// Insertion sort of network and building of netindex[0..255]
   void _inxBuild() {
-    var previouscol = 0;
-    var startpos = 0;
+    var previousColor = 0;
+    var startPos = 0;
 
-    for (var i = 0, p = 0; i < NET_SIZE; i++, p += 4) {
+    for (var i = 0, p = 0; i < netSize; i++, p += 4) {
       var smallpos = i;
       var smallval = _colorMap[p + 1]; // index on g
 
       // find smallest in i..netsize-1
-      for (var j = i + 1, q = p + 4; j < NET_SIZE; j++, q += 4) {
+      for (var j = i + 1, q = p + 4; j < netSize; j++, q += 4) {
         if (_colorMap[q + 1] < smallval) {
           // index on g
           smallpos = j;
@@ -268,49 +266,63 @@ class NeuralQuantizer extends Quantizer {
         _colorMap[p + 3] = j;
       }
 
-      // smallval entry is now in position i
-      if (smallval != previouscol) {
-        _netIndex[previouscol] = (startpos + i) >> 1;
-        for (var j = previouscol + 1; j < smallval; j++) {
+      // smallVal entry is now in position i
+      if (smallval != previousColor) {
+        _netIndex[previousColor] = (startPos + i) >> 1;
+        for (var j = previousColor + 1; j < smallval; j++) {
           _netIndex[j] = i;
         }
-        previouscol = smallval;
-        startpos = i;
+        previousColor = smallval;
+        startPos = i;
       }
     }
 
-    _netIndex[previouscol] = (startpos + MAX_NET_POS!) >> 1;
-    for (var j = previouscol + 1; j < 256; j++) {
-      _netIndex[j] = MAX_NET_POS!; // really 256
+    _netIndex[previousColor] = (startPos + maxNetPos!) >> 1;
+    for (var j = previousColor + 1; j < 256; j++) {
+      _netIndex[j] = maxNetPos!; // really 256
+    }
+  }
+
+  void _updateRadiusPower(int rad, int alpha) {
+    for (var i = 0; i < rad; i++) {
+      _radiusPower[i] = (alpha * (((rad * rad - i * i) * radiusBias) /
+          (rad * rad))).toInt();
     }
   }
 
   void _learn(Image image) {
-    var biasRadius = INIT_BIAS_RADIUS;
-    final alphadec = 30 + ((samplingFactor - 1) ~/ 3);
+    var biasRadius = initBiasRadius;
+    final alphaDec = 30 + ((samplingFactor - 1) ~/ 3);
     final lengthCount = image.length;
     final samplePixels = lengthCount ~/ samplingFactor;
-    final delta = samplePixels ~/ NUM_CYCLES;
-    var alpha = INIT_ALPHA;
+    var delta = max(samplePixels ~/ numCycles, 1);
+    var alpha = initAlpha;
 
-    var rad = biasRadius >> RADIUS_BIAS_SHIFT;
+    if (delta == 0) {
+      delta = 1;
+    }
+
+    var rad = biasRadius >> radiusBiasShift;
     if (rad <= 1) {
       rad = 0;
     }
+    _updateRadiusPower(rad, alpha);
 
     var step = 0;
     var pos = 0;
-
-    if ((lengthCount % PRIME1) != 0) {
-      step = PRIME1;
+    if (lengthCount < smallImageBytes) {
+      samplingFactor = 1;
+      step = 1;
+    } else if ((lengthCount % prime1) != 0) {
+      step = prime1;
     } else {
-      if ((lengthCount % PRIME2) != 0) {
-        step = PRIME2;
+      if ((lengthCount % prime2) != 0) {
+        step = prime2;
       } else {
-        if ((lengthCount % PRIME3) != 0) {
-          step = PRIME3;
+        if ((lengthCount % prime3) != 0) {
+          step = prime3;
         } else {
-          step = PRIME4;
+          step = prime4;
         }
       }
     }
@@ -328,17 +340,17 @@ class NeuralQuantizer extends Quantizer {
 
       if (i == 0) {
         // remember background colour
-        _network[BG_COLOR * 3] = b;
-        _network[BG_COLOR * 3 + 1] = g;
-        _network[BG_COLOR * 3 + 2] = r;
+        _network[bgColor * 3] = b;
+        _network[bgColor * 3 + 1] = g;
+        _network[bgColor * 3 + 2] = r;
       }
 
       var j = _specialFind(b, g, r);
       j = j < 0 ? _contest(b, g, r) : j;
 
-      if (j >= SPECIALS) {
+      if (j >= specials) {
         // don't learn for specials
-        final a = (1.0 * alpha) / INIT_ALPHA;
+        final a = (1.0 * alpha) / initAlpha;
         _alterSingle(a, j, b, g, r);
         if (rad > 0) {
           _alterNeighbors(a, rad, j, b, g, r); // alter neighbours
@@ -352,12 +364,13 @@ class NeuralQuantizer extends Quantizer {
 
       i++;
       if (i % delta == 0) {
-        alpha -= alpha ~/ alphadec;
-        biasRadius -= biasRadius ~/ RADIUS_DEC;
-        rad = biasRadius >> RADIUS_BIAS_SHIFT;
+        alpha -= alpha ~/ alphaDec;
+        biasRadius -= biasRadius ~/ radiusDec;
+        rad = biasRadius >> radiusBiasShift;
         if (rad <= 1) {
           rad = 0;
         }
+        _updateRadiusPower(rad, alpha);
       }
     }
   }
@@ -370,36 +383,38 @@ class NeuralQuantizer extends Quantizer {
     _network[p + 2] -= (alpha * (_network[p + 2] - r));
   }
 
-  void _alterNeighbors(
-      double alpha, int rad, int i, double b, double g, double r) {
+  void _alterNeighbors(double alpha, int rad, int i,
+                       double b, double g, double r) {
     var lo = i - rad;
-    if (lo < SPECIALS - 1) {
-      lo = SPECIALS - 1;
+    if (lo < specials - 1) {
+      lo = specials - 1;
     }
 
     var hi = i + rad;
-    if (hi > NET_SIZE) {
-      hi = NET_SIZE;
+    if (hi > netSize) {
+      hi = netSize;
     }
 
     var j = i + 1;
     var k = i - 1;
+    var m = 1;
     var q = 0;
     while ((j < hi) || (k > lo)) {
-      final a = (alpha * (rad * rad - q * q)) / (rad * rad);
+      final a = _radiusPower[m++];
+      //final a = (alpha * (rad * rad - q * q)) / (rad * rad);
       q++;
       if (j < hi) {
         final p = j * 3;
-        _network[p] -= (a * (_network[p] - b));
-        _network[1] -= (a * (_network[p + 1] - g));
-        _network[2] -= (a * (_network[p + 2] - r));
+        _network[p] -= (a * (_network[p] - b)) / alphaRadiusBias;
+        _network[p + 1] -= (a * (_network[p + 1] - g)) / alphaRadiusBias;
+        _network[p + 2] -= (a * (_network[p + 2] - r)) / alphaRadiusBias;
         j++;
       }
       if (k > lo) {
         final p = k * 3;
-        _network[p] -= (a * (_network[p] - b));
-        _network[p + 1] -= (a * (_network[p + 1] - g));
-        _network[p + 2] -= (a * (_network[p + 2] - r));
+        _network[p] -= (a * (_network[p] - b)) / alphaRadiusBias;
+        _network[p + 1] -= (a * (_network[p + 1] - g)) / alphaRadiusBias;
+        _network[p + 2] -= (a * (_network[p + 2] - r)) / alphaRadiusBias;
         k--;
       }
     }
@@ -413,11 +428,11 @@ class NeuralQuantizer extends Quantizer {
     // bias[i] = gamma*((1/netsize)-freq[i])
 
     var bestd = 1.0e30;
-    var bestbiasd = bestd;
+    var bestBiasDist = bestd;
     var bestpos = -1;
     var bestbiaspos = bestpos;
 
-    for (var i = SPECIALS, p = SPECIALS * 3; i < NET_SIZE; i++) {
+    for (var i = specials, p = specials * 3; i < netSize; i++) {
       var dist = _network[p++] - b;
       if (dist < 0) {
         dist = -dist;
@@ -437,21 +452,21 @@ class NeuralQuantizer extends Quantizer {
         bestpos = i;
       }
 
-      final biasdist = dist - _bias[i];
-      if (biasdist < bestbiasd) {
-        bestbiasd = biasdist;
+      final biasDist = dist - _bias[i];
+      if (biasDist < bestBiasDist) {
+        bestBiasDist = biasDist;
         bestbiaspos = i;
       }
-      _freq[i] -= BETA * _freq[i];
-      _bias[i] += BETA_GAMMA * _freq[i];
+      _freq[i] -= beta * _freq[i];
+      _bias[i] += betaGamma * _freq[i];
     }
-    _freq[bestpos] += BETA;
-    _bias[bestpos] -= BETA_GAMMA;
+    _freq[bestpos] += beta;
+    _bias[bestpos] -= betaGamma;
     return bestbiaspos;
   }
 
   int _specialFind(double b, double g, double r) {
-    for (var i = 0, p = 0; i < SPECIALS; i++) {
+    for (var i = 0, p = 0; i < specials; i++) {
       if (_network[p++] == b && _network[p++] == g && _network[p++] == r) {
         return i;
       }
@@ -459,26 +474,29 @@ class NeuralQuantizer extends Quantizer {
     return -1;
   }
 
-  static const NUM_CYCLES = 100; // no. of learning cycles
+  static const numCycles = 100; // no. of learning cycles
 
-  int NET_SIZE = 16; // number of colours used
-  int SPECIALS = 3; // number of reserved colours used
-  late int BG_COLOR; // reserved background colour
-  late int CUT_NET_SIZE;
-  int? MAX_NET_POS;
+  int netSize = 16; // number of colours used
+  int specials = 3; // number of reserved colours used
+  late int bgColor; // reserved background colour
+  late int cutNetSize;
+  int? maxNetPos;
 
-  late int INIT_RAD; // for 256 cols, radius starts at 32
-  static const RADIUS_BIAS_SHIFT = 6;
-  static const RADIUS_BIAS = 1 << RADIUS_BIAS_SHIFT;
-  late int INIT_BIAS_RADIUS;
-  static const RADIUS_DEC = 30; // factor of 1/30 each cycle
+  static const alphaBiasShift = 10; // alpha starts at 1
+  static const initAlpha = 1 << alphaBiasShift; // biased by 10 bits
 
-  static const ALPHA_BIAS_SHIFT = 10; // alpha starts at 1
-  static const INIT_ALPHA = 1 << ALPHA_BIAS_SHIFT; // biased by 10 bits
+  late int initRadius; // for 256 cols, radius starts at 32
+  static const radiusBiasShift = 8;
+  static const radiusBias = 1 << radiusBiasShift;
+  static const alphaRadiusBiasShift = alphaBiasShift + radiusBiasShift;
+  static const alphaRadiusBias = (1 << alphaRadiusBiasShift);
+  late int initBiasRadius;
+  static const radiusDec = 30; // factor of 1/30 each cycle
+  late Int32List _radiusPower;
 
-  static const double GAMMA = 1024.0;
-  static const double BETA = 1.0 / 1024.0;
-  static const double BETA_GAMMA = BETA * GAMMA;
+  static const double gamma = 1024.0;
+  static const double beta = 1.0 / 1024.0;
+  static const double betaGamma = beta * gamma;
 
   /// the network itself
   late List<double> _network;
@@ -491,9 +509,10 @@ class NeuralQuantizer extends Quantizer {
   // four primes near 500 - assume no image has a length so large
   // that it is divisible by all four primes
 
-  static const PRIME1 = 499;
-  static const PRIME2 = 491;
-  static const PRIME3 = 487;
-  static const PRIME4 = 503;
-  static const MAX_PRIME = PRIME4;
+  static const prime1 = 499;
+  static const prime2 = 491;
+  static const prime3 = 487;
+  static const prime4 = 503;
+  static const maxPrime = prime4;
+  static const smallImageBytes = 3 * prime4;
 }

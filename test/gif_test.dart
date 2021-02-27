@@ -112,5 +112,13 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
     });
+
+    test('encode_small_gif', () {
+      final image = Image(16, 16);
+      final gif = encodeGif(image);
+      File('$tmpPath/out/gif/encode_small_gif.gif')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(gif);
+    });
   });
 }
