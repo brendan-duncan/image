@@ -167,9 +167,7 @@ class Half {
   }
 
   /// Returns true if h is zero.
-  bool isZero() {
-    return (_h! & 0x7fff) == 0;
-  }
+  bool isZero() => (_h! & 0x7fff) == 0;
 
   /// Returns true if h is a NAN.
   bool isNan() {
@@ -186,9 +184,7 @@ class Half {
   }
 
   /// Returns true if the sign bit of h is set (negative).
-  bool isNegative() {
-    return (_h! & 0x8000) != 0;
-  }
+  bool isNegative() => (_h! & 0x8000) != 0;
 
   /// Returns +infinity.
   static Half posInf() => Half.fromBits(0x7c00);

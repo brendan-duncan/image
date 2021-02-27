@@ -20,7 +20,7 @@ void decode(DecodeParam param) {
 
 // Decode and process an image file in a separate thread (isolate) to avoid
 // stalling the main UI thread.
-void main() async {
+Future<void> main() async {
   final receivePort = ReceivePort();
 
   await Isolate.spawn(

@@ -138,14 +138,12 @@ class Image {
   ///   canvas.width, canvas.height).data;
   /// var image = Image.fromBytes(canvas.width, canvas.height, bytes,
   ///                             format: Format.rgba);
-  Image.fromBytes(int width, int height, List<int> bytes,
+  Image.fromBytes(this.width, this.height, List<int> bytes,
       {ExifData? exif,
       ICCProfileData? iccp,
       Format format = Format.rgba,
       this.channels = Channels.rgba})
-      : width = width,
-        height = height,
-        data = _convertData(width, height, bytes, format),
+      : data = _convertData(width, height, bytes, format),
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
@@ -426,12 +424,10 @@ class Image {
     final dx = fx - x;
     final dy = fy - y;
 
-    int _linear(int Icc, int Inc, int Icn, int Inn) {
-      return (Icc +
-              dx * (Inc - Icc + dy * (Icc + Inn - Icn - Inc)) +
-              dy * (Icn - Icc))
-          .toInt();
-    }
+    int _linear(int Icc, int Inc, int Icn, int Inn) => (Icc +
+            dx * (Inc - Icc + dy * (Icc + Inn - Icn - Inc)) +
+            dy * (Icn - Icc))
+        .toInt();
 
     final Icc = getPixelSafe(x, y);
     final Inc = getPixelSafe(nx, y);

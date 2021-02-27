@@ -109,6 +109,8 @@ List<Point> _calculateCircumference(Image image, int x0, int y0, int radius) {
 /// Given a list of [points], draw each corresponding pixel into the [image]
 /// with the given [color].
 Image _draw(Image image, List<Point> points, int color) {
-  points.forEach((pt) => drawPixel(image, pt.xi, pt.yi, color));
+  for (var pt in points) {
+    drawPixel(image, pt.xi, pt.yi, color);
+  }
   return image;
 }

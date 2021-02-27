@@ -342,16 +342,16 @@ class PngDecoder extends Decoder {
   }
 
   @override
-  Image? decodeImage(List<int> data, {int frame = 0}) {
-    if (startDecode(data) == null) {
+  Image? decodeImage(List<int> bytes, {int frame = 0}) {
+    if (startDecode(bytes) == null) {
       return null;
     }
     return decodeFrame(frame);
   }
 
   @override
-  Animation? decodeAnimation(List<int> data) {
-    if (startDecode(data) == null) {
+  Animation? decodeAnimation(List<int> bytes) {
+    if (startDecode(bytes) == null) {
       return null;
     }
 
@@ -552,25 +552,17 @@ class PngDecoder extends Decoder {
         }
         break;
       default:
-        throw ImageException('Invalid filter value: ${filterType}');
+        throw ImageException('Invalid filter value: $filterType');
     }
   }
 
-  int _convert16to8(int c) {
-    return c >> 8;
-  }
+  int _convert16to8(int c) => c >> 8;
 
-  int _convert1to8(int c) {
-    return (c == 0) ? 0 : 255;
-  }
+  int _convert1to8(int c) => (c == 0) ? 0 : 255;
 
-  int _convert2to8(int c) {
-    return c * 85;
-  }
+  int _convert2to8(int c) => c * 85;
 
-  int _convert4to8(int c) {
-    return c << 4;
-  }
+  int _convert4to8(int c) => c << 4;
 
   // Return the CRC of the bytes
   int _crc(String type, List<int> bytes) {
@@ -696,7 +688,7 @@ class PngDecoder extends Decoder {
           }
         }
 
-        return getColor(g, g, g, 255);
+        return getColor(g, g, g);
       case RGB:
         late int r, g, b;
         switch (_info!.bits) {
@@ -743,7 +735,7 @@ class PngDecoder extends Decoder {
           }
         }
 
-        return getColor(r, g, b, 255);
+        return getColor(r, g, b);
       case INDEXED:
         final p = raw[0] * 3;
 

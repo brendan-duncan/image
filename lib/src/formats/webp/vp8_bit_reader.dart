@@ -35,9 +35,7 @@ class VP8BitReader {
     return get() == 1 ? -value : value;
   }
 
-  int get() {
-    return getValue(1);
-  }
+  int get() => getValue(1);
 
   int getBit(int prob) {
     final split = (_range * prob) >> 8;

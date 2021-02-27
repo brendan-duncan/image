@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -26,7 +27,7 @@ void main() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(outPng);
         } else {
-          throw 'Unable to decode $name';
+          throw StateError('Unable to decode $name');
         }
       });
     }

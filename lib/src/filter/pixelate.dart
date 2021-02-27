@@ -1,6 +1,6 @@
 import '../color.dart';
-import '../image.dart';
 import '../draw/fill_rect.dart';
+import '../image.dart';
 
 enum PixelateMode {
   /// Use the top-left pixel of a block for the block color.

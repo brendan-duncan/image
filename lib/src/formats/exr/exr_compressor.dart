@@ -71,12 +71,12 @@ abstract class ExrCompressor {
 
   int numScanLines();
 
-  Uint8List compress(InputBuffer inPtr, int x, int y,
+  Uint8List compress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
     throw ImageException('Unsupported compression type');
   }
 
-  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+  Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
     throw ImageException('Unsupported compression type');
   }

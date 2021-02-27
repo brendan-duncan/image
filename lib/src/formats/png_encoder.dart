@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
-import '../color.dart';
 import '../animation.dart';
+import '../color.dart';
 import '../icc_profile_data.dart';
 import '../image.dart';
 import '../util/output_buffer.dart';
@@ -261,7 +261,6 @@ class PngEncoder extends Encoder {
         final ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
         final xa = getAlpha(image.getPixel(x, row));
         out[oi++] = (xa - ba) & 0xff;
-        ;
       }
     }
 
@@ -292,7 +291,6 @@ class PngEncoder extends Encoder {
         final ba = (row == 0) ? 0 : getAlpha(image.getPixel(x, row - 1));
         final xa = getAlpha(image.getPixel(x, row));
         out[oi++] = (xa - ((aa + ba) >> 1)) & 0xff;
-        ;
       }
     }
 
@@ -385,6 +383,6 @@ class PngEncoder extends Encoder {
   static const FILTER_PAETH = 4;
   static const FILTER_AGRESSIVE = 5;
 
-  // Table of CRCs of all 8-bit messages.
-  //final List<int> _crcTable = List<int>(256);
+// Table of CRCs of all 8-bit messages.
+//final List<int> _crcTable = List<int>(256);
 }

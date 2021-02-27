@@ -1,7 +1,7 @@
 import '../animation.dart';
 import '../image.dart';
-import 'decoder.dart';
 import 'decode_info.dart';
+import 'decoder.dart';
 import 'psd/psd_image.dart';
 
 /// Decode a Photoshop PSD image.
@@ -11,9 +11,7 @@ class PsdDecoder extends Decoder {
   /// A light-weight function to test if the given file is able to be decoded
   /// by this Decoder.
   @override
-  bool isValidFile(List<int> bytes) {
-    return PsdImage(bytes).isValid;
-  }
+  bool isValidFile(List<int> bytes) => PsdImage(bytes).isValid;
 
   /// Decode a raw PSD image without rendering it to a flat image.
   PsdImage? decodePsd(List<int> bytes) {

@@ -108,19 +108,19 @@ void main() {
             final image = PngDecoder().decodeImage(file.readAsBytesSync());
             expect(image, isNull);
           } catch (e) {
-            ;
+            // noop
           }
         } else {
           final anim = decodeAnimation(file.readAsBytesSync())!;
           if (anim.length == 1) {
             final png = PngEncoder().encodeImage(anim[0]);
-            File('$tmpPath/out/png/${name}')
+            File('$tmpPath/out/png/$name')
               ..createSync(recursive: true)
               ..writeAsBytesSync(png);
           } else {
             for (var i = 0; i < anim.length; ++i) {
               final png = PngEncoder().encodeImage(anim[i]);
-              File('$tmpPath/out/png/${name}-$i.png')
+              File('$tmpPath/out/png/$name-$i.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
             }

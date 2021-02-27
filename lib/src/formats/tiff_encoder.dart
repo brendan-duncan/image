@@ -1,16 +1,17 @@
 import 'dart:typed_data';
-import '../image.dart';
+
 import '../hdr/hdr_image.dart';
+import '../image.dart';
 import '../util/output_buffer.dart';
-import 'tiff/tiff_image.dart';
-import 'tiff/tiff_entry.dart';
 import 'encoder.dart';
+import 'tiff/tiff_entry.dart';
+import 'tiff/tiff_image.dart';
 
 /// Encode a TIFF image.
 class TiffEncoder extends Encoder {
   @override
   List<int> encodeImage(Image image) {
-    final out = OutputBuffer(bigEndian: false);
+    final out = OutputBuffer();
     _writeHeader(out);
     _writeImage(out, image);
     out.writeUint32(0); // no offset to the next image
@@ -18,7 +19,7 @@ class TiffEncoder extends Encoder {
   }
 
   List<int> encodeHdrImage(HdrImage image) {
-    final out = OutputBuffer(bigEndian: false);
+    final out = OutputBuffer();
     _writeHeader(out);
     _writeHdrImage(out, image);
     out.writeUint32(0); // no offset to the next image

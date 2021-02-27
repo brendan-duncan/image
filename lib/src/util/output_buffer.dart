@@ -16,9 +16,7 @@ class OutputBuffer {
   }
 
   /// Get the resulting bytes from the buffer.
-  List<int> getBytes() {
-    return Uint8List.view(_buffer.buffer, 0, length);
-  }
+  List<int> getBytes() => Uint8List.view(_buffer.buffer, 0, length);
 
   /// Clear the buffer.
   void clear() {

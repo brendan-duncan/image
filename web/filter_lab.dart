@@ -10,10 +10,10 @@ late Image origImage;
 void _addControl(String label, String value, DivElement parent,
     void Function(double) callback) {
   final amountLabel = LabelElement();
-  amountLabel.text = label + ':';
+  amountLabel.text = '$label:';
   final amountEdit = InputElement();
   amountEdit.value = value;
-  amountEdit.id = label + '_edit';
+  amountEdit.id = '${label}_edit';
   amountEdit.onChange.listen((e) {
     try {
       final d = double.parse(amountEdit.value!);
@@ -22,7 +22,7 @@ void _addControl(String label, String value, DivElement parent,
       print(e);
     }
   });
-  amountLabel.htmlFor = label + '_edit';
+  amountLabel.htmlFor = '${label}_edit';
   parent.append(amountLabel);
   parent.append(amountEdit);
   parent.append(ParagraphElement());

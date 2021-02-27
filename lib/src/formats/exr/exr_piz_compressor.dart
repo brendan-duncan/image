@@ -34,13 +34,13 @@ class InternalExrPizCompressor extends InternalExrCompressor
   int numScanLines() => _numScanLines;
 
   @override
-  Uint8List compress(InputBuffer inPtr, int x, int y,
+  Uint8List compress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
     throw ImageException('Piz compression not yet supported.');
   }
 
   @override
-  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+  Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
     width ??= header.width;
     height ??= header.linesInBuffer;
@@ -79,8 +79,8 @@ class InternalExrPizCompressor extends InternalExrCompressor
       tmpBufferEnd += cd.nx * cd.ny * cd.size;
     }
 
-    final minNonZero = inPtr.readUint16();
-    final maxNonZero = inPtr.readUint16();
+    final minNonZero = input.readUint16();
+    final maxNonZero = input.readUint16();
 
     if (maxNonZero >= BITMAP_SIZE) {
       throw ImageException('Error in header for PIZ-compressed data '
@@ -89,7 +89,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
 
     final bitmap = Uint8List(BITMAP_SIZE);
     if (minNonZero <= maxNonZero) {
-      final b = inPtr.readBytes(maxNonZero - minNonZero + 1);
+      final b = input.readBytes(maxNonZero - minNonZero + 1);
       for (var i = 0, j = minNonZero, len = b.length; i < len; ++i) {
         bitmap[j++] = b[i];
       }
@@ -99,8 +99,8 @@ class InternalExrPizCompressor extends InternalExrCompressor
     final maxValue = _reverseLutFromBitmap(bitmap, lut);
 
     // Huffman decoding
-    final length = inPtr.readUint32();
-    ExrHuffman.uncompress(inPtr, length, _tmpBuffer, tmpBufferEnd);
+    final length = input.readUint32();
+    ExrHuffman.uncompress(input, length, _tmpBuffer, tmpBufferEnd);
 
     // Wavelet decoding
     for (var i = 0; i < numChannels; ++i) {

@@ -1,7 +1,7 @@
+import 'dart:convert';
 import 'dart:html';
 
 import 'package:image/image.dart';
-import 'dart:convert';
 
 late InputElement fileInput;
 
@@ -59,7 +59,7 @@ void onFileLoaded(Event event) {
     // Create a buffer that the canvas can draw.
     final d = c.context2D.createImageData(c.width, c.height);
     // Fill the buffer with our image data.
-    d.data.setRange(0, d.data.length, image.getBytes(format: Format.rgba));
+    d.data.setRange(0, d.data.length, image.getBytes());
     // Draw the buffer onto the canvas.
     c.context2D.putImageData(d, 0, 0);
 
@@ -74,7 +74,7 @@ void onFileLoaded(Event event) {
     // base64 encode the png
     final png64 = base64Encode(png);
     // set the img src as a data url
-    img.src = 'data:image/png;base64,${png64}';
+    img.src = 'data:image/png;base64,$png64';
   }
 
   return;

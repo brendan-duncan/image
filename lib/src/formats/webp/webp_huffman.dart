@@ -227,13 +227,10 @@ class HuffmanTree {
     return v >> (8 - numBits);
   }
 
-  bool _isFull() {
-    return (numNodes == maxNodes);
-  }
+  bool _isFull() => (numNodes == maxNodes);
 
-  int _nextNode(int node, int rightChild) {
-    return node + _nodeChildren(node) + rightChild;
-  }
+  int _nextNode(int node, int rightChild) =>
+      node + _nodeChildren(node) + rightChild;
 
   int _nodeSymbol(int node) => tree[(node << 1)];
 
@@ -323,7 +320,5 @@ class HTreeGroup {
             VP8L.HUFFMAN_CODES_PER_META_CODE, (_) => HuffmanTree(),
             growable: false);
 
-  HuffmanTree operator [](int index) {
-    return htrees[index];
-  }
+  HuffmanTree operator [](int index) => htrees[index];
 }

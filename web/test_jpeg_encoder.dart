@@ -1,5 +1,6 @@
-import 'dart:html';
 import 'dart:convert';
+import 'dart:html';
+
 import 'package:image/image.dart';
 
 void main() {
@@ -15,13 +16,12 @@ void main() {
 
   final bytes = ctx.getImageData(0, 0, cvs.width!, cvs.height!).data;
 
-  final image =
-      Image.fromBytes(cvs.width!, cvs.height!, bytes, format: Format.rgba);
+  final image = Image.fromBytes(cvs.width!, cvs.height!, bytes);
 
   final jpg = encodeJpg(image, quality: 25);
 
   final jpg64 = base64Encode(jpg);
   final img = document.createElement('img') as ImageElement;
-  img.src = 'data:image/jpeg;base64,${jpg64}';
+  img.src = 'data:image/jpeg;base64,$jpg64';
   document.body!.append(img);
 }

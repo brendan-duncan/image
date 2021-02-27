@@ -25,15 +25,15 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
   int numScanLines() => _numScanLines;
 
   @override
-  Uint8List compress(InputBuffer inPtr, int x, int y,
+  Uint8List compress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
     throw ImageException('Pxr24 compression not yet supported.');
   }
 
   @override
-  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+  Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
-    final data = _zlib.decodeBytes(inPtr.toUint8List());
+    final data = _zlib.decodeBytes(input.toUint8List());
 
     _output ??= OutputBuffer(size: _numScanLines * _maxScanLineSize!);
     _output!.rewind();

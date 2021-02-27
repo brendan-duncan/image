@@ -160,7 +160,7 @@ class GifEncoder extends Encoder {
     }
     hshift = 8 - hshift;
 
-    final hSizeReg = HSIZE;
+    const hSizeReg = HSIZE;
     for (var i = 0; i < hSizeReg; ++i) {
       hTab[i] = -1;
     }
@@ -302,8 +302,8 @@ class GifEncoder extends Encoder {
     output!.writeByte(GRAPHIC_CONTROL_EXT);
     output!.writeByte(4); // data block size
 
-    final transparency = 0;
-    final dispose = 0; // dispose = no action
+    const transparency = 0;
+    const dispose = 0; // dispose = no action
 
     // packed fields
     output!.writeByte(0 | // 1:3 reserved

@@ -7,9 +7,7 @@ class SeparableKernel {
   final int size;
 
   /// Create a separable convolution kernel for the given [radius].
-  SeparableKernel(int radius)
-      : coefficients = List<num>.filled(2 * radius + 1, 0),
-        size = radius;
+  SeparableKernel(this.size) : coefficients = List<num>.filled(2 * size + 1, 0);
 
   /// Get the number of coefficients in the kernel.
   int get length => coefficients.length;

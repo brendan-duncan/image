@@ -96,14 +96,13 @@ void main() {
       expect(getBlue(image_abgr[0]), 64);
       expect(getAlpha(image_abgr[0]), 255);
 
-      final rgba = image.getBytes(format: Format.rgba);
+      final rgba = image.getBytes();
       expect(rgba[0], 200);
       expect(rgba[1], 128);
       expect(rgba[2], 64);
       expect(rgba[3], 255);
 
-      final image_rgba =
-          Image.fromBytes(image.width, image.height, rgba, format: Format.rgba);
+      final image_rgba = Image.fromBytes(image.width, image.height, rgba);
       expect(getRed(image_rgba[0]), 200);
       expect(getGreen(image_rgba[0]), 128);
       expect(getBlue(image_rgba[0]), 64);

@@ -3,11 +3,11 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 
 import '../../color.dart';
-import '../../image.dart';
-import '../../image_exception.dart';
 import '../../formats/jpeg_decoder.dart';
 import '../../hdr/half.dart';
 import '../../hdr/hdr_image.dart';
+import '../../image.dart';
+import '../../image_exception.dart';
 import '../../internal/bit_operators.dart';
 import '../../util/input_buffer.dart';
 import 'tiff_bit_reader.dart';
@@ -149,9 +149,9 @@ class TiffImage {
     tileSize = tileWidth! * tileHeight! * samplesPerPixel;
 
     fillOrder = _readTag(TAG_FILL_ORDER, 1);
-    t4Options = _readTag(TAG_T4_OPTIONS, 0);
-    t6Options = _readTag(TAG_T6_OPTIONS, 0);
-    extraSamples = _readTag(TAG_EXTRA_SAMPLES, 0);
+    t4Options = _readTag(TAG_T4_OPTIONS);
+    t6Options = _readTag(TAG_T6_OPTIONS);
+    extraSamples = _readTag(TAG_EXTRA_SAMPLES);
 
     // Determine which kind of image we are dealing with.
     switch (photometricType) {
@@ -289,8 +289,7 @@ class TiffImage {
         bdata = InputBuffer(Uint8List(bytesInThisTile));
         final decoder = LzwDecoder();
         try {
-          decoder.decode(
-              InputBuffer.from(p, offset: 0, length: byteCount), bdata.buffer);
+          decoder.decode(InputBuffer.from(p, length: byteCount), bdata.buffer);
         } catch (e) {
           print(e);
         }
@@ -355,7 +354,7 @@ class TiffImage {
                       colorMap![colorMapGreen + gray],
                       colorMap![colorMapBlue + gray]);
                 } else {
-                  c = getColor(gray, gray, gray, 255);
+                  c = getColor(gray, gray, gray);
                 }
                 image!.setPixel(px, py, c);
               }
@@ -396,7 +395,7 @@ class TiffImage {
                       colorMap![colorMapGreen + gray],
                       colorMap![colorMapBlue + gray]);
                 } else {
-                  c = getColor(gray, gray, gray, 255);
+                  c = getColor(gray, gray, gray);
                 }
 
                 image!.setPixel(px, py, c);
@@ -474,7 +473,7 @@ class TiffImage {
                 final ri = (r * 255).clamp(0, 255).toInt();
                 final gi = (g * 255).clamp(0, 255).toInt();
                 final bi = (b * 255).clamp(0, 255).toInt();
-                final c = getColor(ri, gi, bi, 255);
+                final c = getColor(ri, gi, bi);
                 image!.setPixel(px, py, c);
               }
             } else {
@@ -535,7 +534,7 @@ class TiffImage {
                     : (bitsPerSample == 32)
                         ? b >> 24
                         : b;
-                final c = getColor(r, g, b, 255);
+                final c = getColor(r, g, b);
                 image!.setPixel(px, py, c);
               }
             }

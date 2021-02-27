@@ -1,5 +1,6 @@
-import 'dart:html';
 import 'dart:convert';
+import 'dart:html';
+
 import 'package:image/image.dart';
 
 /// Convert all .webp IMG elements on the page to PNG so that they can be viewed
@@ -17,17 +18,15 @@ void main() {
         if (req.status == 200) {
           final bytes = req.responseText!
               .split('')
-              .map((e) {
-                return String.fromCharCode(e.codeUnitAt(0) & 0xff);
-              })
-              .join('')
+              .map((e) => String.fromCharCode(e.codeUnitAt(0) & 0xff))
+              .join()
               .codeUnits;
 
           final image = decodeWebP(bytes)!;
           final png = encodePng(image);
 
           final png64 = base64Encode(png);
-          img.src = 'data:image/png;base64,${png64}';
+          img.src = 'data:image/png;base64,$png64';
         }
       });
       req.send('');

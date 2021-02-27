@@ -1,10 +1,9 @@
 import 'dart:typed_data';
 
-import 'package:image/image.dart';
-
-import '../../image_exception.dart';
+import '../../../image.dart';
 import '../../formats/decode_info.dart';
 import '../../hdr/hdr_slice.dart';
+import '../../image_exception.dart';
 import '../../util/input_buffer.dart';
 import 'exr_part.dart';
 
@@ -87,21 +86,15 @@ class ExrImage extends DecodeInfo {
 
   ExrPart getPart(int i) => _parts[i];
 
-  bool _isTiled() {
-    return (flags & TILED_FLAG) != 0;
-  }
+  bool _isTiled() => (flags & TILED_FLAG) != 0;
 
-  bool _isMultiPart() {
-    return flags & MULTI_PART_FILE_FLAG != 0;
-  }
+  bool _isMultiPart() => flags & MULTI_PART_FILE_FLAG != 0;
 
   /*bool _isNonImage() {
     return flags & NON_IMAGE_FLAG != 0;
   }*/
 
-  static bool _supportsFlags(int flags) {
-    return (flags & ~ALL_FLAGS) == 0;
-  }
+  static bool _supportsFlags(int flags) => (flags & ~ALL_FLAGS) == 0;
 
   void _readImage(InputBuffer input) {
     //final bool multiPart = _isMultiPart();
@@ -161,8 +154,10 @@ class ExrImage extends DecodeInfo {
 
             final tileX = imgData.readUint32();
             final tileY = imgData.readUint32();
-            /*int levelX =*/ imgData.readUint32();
-            /*int levelY =*/ imgData.readUint32();
+            /*int levelX =*/
+            imgData.readUint32();
+            /*int levelY =*/
+            imgData.readUint32();
             final dataSize = imgData.readUint32();
             final data = imgData.readBytes(dataSize);
 
@@ -246,7 +241,8 @@ class ExrImage extends DecodeInfo {
         }
       }
 
-      /*var y =*/ imgData.readInt32();
+      /*var y =*/
+      imgData.readInt32();
       final dataSize = imgData.readInt32();
       final data = imgData.readBytes(dataSize);
 

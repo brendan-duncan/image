@@ -25,25 +25,22 @@ Image fillFlood(Image src, int x, int y, int color,
       lab.add(getAlpha(srcColor).toDouble());
     }
 
-    array = (int y, int x) {
-      return visited[y * src.width + x] == 0 &&
-          _testPixelLabColorDistance(src, x, y, lab, threshold);
-    };
+    array = (int y, int x) =>
+        visited[y * src.width + x] == 0 &&
+        _testPixelLabColorDistance(src, x, y, lab, threshold);
   } else if (!compareAlpha) {
-    array = (int y, int x) {
-      return visited[y * src.width + x] == 0 &&
-          setAlpha(src.getPixel(x, y), 0) != srcColor;
-    };
+    array = (int y, int x) =>
+        visited[y * src.width + x] == 0 &&
+        setAlpha(src.getPixel(x, y), 0) != srcColor;
   } else {
-    array = (int y, int x) {
-      return visited[y * src.width + x] == 0 && src.getPixel(x, y) != srcColor;
-    };
+    array = (int y, int x) =>
+        visited[y * src.width + x] == 0 && src.getPixel(x, y) != srcColor;
   }
 
-  final mark = (int y, int x) {
+  void mark(int y, int x) {
     src.setPixel(x, y, color);
     visited[y * src.width + x] = 1;
-  };
+  }
 
   _fill4(src, x, y, array, mark, visited);
   return src;
@@ -71,28 +68,25 @@ Uint8List maskFlood(Image src, int x, int y,
       lab.add(getAlpha(srcColor).toDouble());
     }
 
-    array = (int y, int x) {
-      return visited[y * src.width + x] == 0 &&
-          (ret[y * src.width + x] != 0 ||
-              _testPixelLabColorDistance(src, x, y, lab, threshold));
-    };
+    array = (int y, int x) =>
+        visited[y * src.width + x] == 0 &&
+        (ret[y * src.width + x] != 0 ||
+            _testPixelLabColorDistance(src, x, y, lab, threshold));
   } else if (!compareAlpha) {
-    array = (int y, int x) {
-      return visited[y * src.width + x] == 0 &&
-          (ret[y * src.width + x] != 0 ||
-              setAlpha(src.getPixel(x, y), 0) != srcColor);
-    };
+    array = (int y, int x) =>
+        visited[y * src.width + x] == 0 &&
+        (ret[y * src.width + x] != 0 ||
+            setAlpha(src.getPixel(x, y), 0) != srcColor);
   } else {
-    array = (int y, int x) {
-      return visited[y * src.width + x] == 0 &&
-          (ret[y * src.width + x] != 0 || src.getPixel(x, y) != srcColor);
-    };
+    array = (int y, int x) =>
+        visited[y * src.width + x] == 0 &&
+        (ret[y * src.width + x] != 0 || src.getPixel(x, y) != srcColor);
   }
 
-  final mark = (int y, int x) {
+  void mark(int y, int x) {
     ret[y * src.width + x] = fillValue;
     visited[y * src.width + x] = 1;
-  };
+  }
 
   _fill4(src, x, y, array, mark, visited);
   return ret;

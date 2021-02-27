@@ -19,7 +19,7 @@ class PvrtcDecoder {
       }
     }
 
-    final input = InputBuffer(data, bigEndian: false);
+    final input = InputBuffer(data);
     final magic = input.readUint32();
     if (magic == 0x03525650) {
       return decodePVR3(data);
@@ -32,7 +32,7 @@ class PvrtcDecoder {
     // additional heuristic
     const HEADER_SIZE = 52;
     if (data.length > HEADER_SIZE) {
-      final input = InputBuffer(data, bigEndian: false);
+      final input = InputBuffer(data);
       // Header
       final size = input.readUint32();
       if (size == HEADER_SIZE) {
@@ -70,8 +70,8 @@ class PvrtcDecoder {
     } else {
       // Detect if it's 2bpp or 4bpp
       var shift = 0;
-      final test2bpp = 0x40; // 16x16
-      final test4bpp = 0x80; // 16x16
+      const test2bpp = 0x40; // 16x16
+      const test4bpp = 0x80; // 16x16
 
       while (shift < 10) {
         final s2 = shift << 1;
@@ -134,7 +134,7 @@ class PvrtcDecoder {
       return null;
     }
 
-    final input = InputBuffer(data, bigEndian: false);
+    final input = InputBuffer(data);
     // Header
     final size = input.readUint32();
     final height = input.readUint32();
@@ -233,7 +233,7 @@ class PvrtcDecoder {
             final b = (v & 0x001f) << 3;
             final g = (v & 0x07e0) >> 3;
             final r = (v & 0xf800) >> 8;
-            final a = 255;
+            const a = 255;
             out[oi++] = r;
             out[oi++] = g;
             out[oi++] = b;
@@ -251,7 +251,7 @@ class PvrtcDecoder {
             final r = (v & 0x001f) << 3;
             final g = (v & 0x03e0) >> 2;
             final b = (v & 0x7c00) >> 7;
-            final a = 255;
+            const a = 255;
             out[oi++] = r;
             out[oi++] = g;
             out[oi++] = b;
@@ -514,7 +514,7 @@ class PvrtcDecoder {
 
             final pi = (pyi + (px + x * 4));
 
-            result[pi] = getColor(c.r, c.g, c.b, 255);
+            result[pi] = getColor(c.r, c.g, c.b);
 
             mod >>= 2;
             factorIndex++;

@@ -8,9 +8,8 @@ class GifColorMap {
   int? transparent;
   final Uint8List colors;
 
-  GifColorMap(int numColors)
-      : numColors = numColors,
-        colors = Uint8List(numColors * 3),
+  GifColorMap(this.numColors)
+      : colors = Uint8List(numColors * 3),
         bitsPerPixel = _bitSize(numColors);
 
   int operator [](int index) => colors[index];

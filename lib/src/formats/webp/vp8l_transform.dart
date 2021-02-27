@@ -85,7 +85,6 @@ class VP8LTransform {
             src.offset++;
           }
           final p = _getAlphaValue(colorMap![packed_pixels & bit_mask]);
-          ;
           dst[0] = p;
           dst.offset++;
           packed_pixels >>= bitsPerPixel;
@@ -162,7 +161,6 @@ class VP8LTransform {
 
       if ((y & mask) == 0) {
         predRow += tilesPerRow;
-        ;
       }
     }
   }
@@ -233,21 +231,13 @@ class VP8LTransform {
     }
   }
 
-  static int _getARGBIndex(int idx) {
-    return (idx >> 8) & 0xff;
-  }
+  static int _getARGBIndex(int idx) => (idx >> 8) & 0xff;
 
-  static int _getAlphaIndex(int idx) {
-    return idx;
-  }
+  static int _getAlphaIndex(int idx) => idx;
 
-  static int _getARGBValue(int val) {
-    return val;
-  }
+  static int _getARGBValue(int val) => val;
 
-  static int _getAlphaValue(int val) {
-    return (val >> 8) & 0xff;
-  }
+  static int _getAlphaValue(int val) => (val >> 8) & 0xff;
 
   // In-place sum of each component with mod 256.
   static void _addPixelsEq(Uint32List pixels, int a, int b) {
@@ -257,17 +247,14 @@ class VP8LTransform {
     pixels[a] = (alphaAndGreen & 0xff00ff00) | (redAndBlue & 0x00ff00ff);
   }
 
-  static int _average2(int a0, int a1) {
-    return (((a0 ^ a1) & 0xfefefefe) >> 1) + (a0 & a1);
-  }
+  static int _average2(int a0, int a1) =>
+      (((a0 ^ a1) & 0xfefefefe) >> 1) + (a0 & a1);
 
-  static int _average3(int a0, int a1, int a2) {
-    return _average2(_average2(a0, a2), a1);
-  }
+  static int _average3(int a0, int a1, int a2) =>
+      _average2(_average2(a0, a2), a1);
 
-  static int _average4(int a0, int a1, int a2, int a3) {
-    return _average2(_average2(a0, a1), _average2(a2, a3));
-  }
+  static int _average4(int a0, int a1, int a2, int a3) =>
+      _average2(_average2(a0, a1), _average2(a2, a3));
 
   // Return 0, when a is a negative integer.
   // Return 255, when a is positive.
@@ -281,9 +268,8 @@ class VP8LTransform {
     return a;
   }
 
-  static int _addSubtractComponentFull(int a, int b, int c) {
-    return _clip255(a + b - c);
-  }
+  static int _addSubtractComponentFull(int a, int b, int c) =>
+      _clip255(a + b - c);
 
   static int _clampedAddSubtractFull(int c0, int c1, int c2) {
     final a = _addSubtractComponentFull(c0 >> 24, c1 >> 24, c2 >> 24);
@@ -295,9 +281,8 @@ class VP8LTransform {
     return (a << 24) | (r << 16) | (g << 8) | b;
   }
 
-  static int _addSubtractComponentHalf(int a, int b) {
-    return _clip255(a + (a - b) ~/ 2);
-  }
+  static int _addSubtractComponentHalf(int a, int b) =>
+      _clip255(a + (a - b) ~/ 2);
 
   static int _clampedAddSubtractHalf(int c0, int c1, int c2) {
     final avg = _average2(c0, c1);
@@ -325,61 +310,45 @@ class VP8LTransform {
   //--------------------------------------------------------------------------
   // Predictors
 
-  static int _predictor0(Uint32List pixels, int left, int top) {
-    return VP8L.ARGB_BLACK;
-  }
+  static int _predictor0(Uint32List pixels, int left, int top) =>
+      VP8L.ARGB_BLACK;
 
-  static int _predictor1(Uint32List pixels, int left, int top) {
-    return left;
-  }
+  static int _predictor1(Uint32List pixels, int left, int top) => left;
 
-  static int _predictor2(Uint32List pixels, int left, int top) {
-    return pixels[top];
-  }
+  static int _predictor2(Uint32List pixels, int left, int top) => pixels[top];
 
-  static int _predictor3(Uint32List pixels, int left, int top) {
-    return pixels[top + 1];
-  }
+  static int _predictor3(Uint32List pixels, int left, int top) =>
+      pixels[top + 1];
 
-  static int _predictor4(Uint32List pixels, int left, int top) {
-    return pixels[top - 1];
-  }
+  static int _predictor4(Uint32List pixels, int left, int top) =>
+      pixels[top - 1];
 
-  static int _predictor5(Uint32List pixels, int left, int top) {
-    return _average3(left, pixels[top], pixels[top + 1]);
-  }
+  static int _predictor5(Uint32List pixels, int left, int top) =>
+      _average3(left, pixels[top], pixels[top + 1]);
 
-  static int _predictor6(Uint32List pixels, int left, int top) {
-    return _average2(left, pixels[top - 1]);
-  }
+  static int _predictor6(Uint32List pixels, int left, int top) =>
+      _average2(left, pixels[top - 1]);
 
-  static int _predictor7(Uint32List pixels, int left, int top) {
-    return _average2(left, pixels[top]);
-  }
+  static int _predictor7(Uint32List pixels, int left, int top) =>
+      _average2(left, pixels[top]);
 
-  static int _predictor8(Uint32List pixels, int left, int top) {
-    return _average2(pixels[top - 1], pixels[top]);
-  }
+  static int _predictor8(Uint32List pixels, int left, int top) =>
+      _average2(pixels[top - 1], pixels[top]);
 
-  static int _predictor9(Uint32List pixels, int left, int top) {
-    return _average2(pixels[top], pixels[top + 1]);
-  }
+  static int _predictor9(Uint32List pixels, int left, int top) =>
+      _average2(pixels[top], pixels[top + 1]);
 
-  static int _predictor10(Uint32List pixels, int left, int top) {
-    return _average4(left, pixels[top - 1], pixels[top], pixels[top + 1]);
-  }
+  static int _predictor10(Uint32List pixels, int left, int top) =>
+      _average4(left, pixels[top - 1], pixels[top], pixels[top + 1]);
 
-  static int _predictor11(Uint32List pixels, int left, int top) {
-    return _select(pixels[top], left, pixels[top - 1]);
-  }
+  static int _predictor11(Uint32List pixels, int left, int top) =>
+      _select(pixels[top], left, pixels[top - 1]);
 
-  static int _predictor12(Uint32List pixels, int left, int top) {
-    return _clampedAddSubtractFull(left, pixels[top], pixels[top - 1]);
-  }
+  static int _predictor12(Uint32List pixels, int left, int top) =>
+      _clampedAddSubtractFull(left, pixels[top], pixels[top - 1]);
 
-  static int _predictor13(Uint32List pixels, int left, int top) {
-    return _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
-  }
+  static int _predictor13(Uint32List pixels, int left, int top) =>
+      _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
 
   static final PREDICTORS = [
     _predictor0,

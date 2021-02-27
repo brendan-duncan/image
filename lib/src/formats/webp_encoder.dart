@@ -94,9 +94,7 @@ class WebPEncoder extends Encoder {
     return finish();
   }
 
-  Uint8List? _encodeImage(Image image) {
-    return null;
-  }
+  Uint8List? _encodeImage(Image image) => null;
 
   void _writeHeader(int? width, int? height) {}
 

@@ -18,10 +18,7 @@ class VP8L {
   WebPInfo webp;
   Image? image;
 
-  VP8L(InputBuffer input, WebPInfo webp)
-      : input = input,
-        webp = webp,
-        br = VP8LBitReader(input);
+  VP8L(this.input, this.webp) : br = VP8LBitReader(input);
 
   bool decodeHeader() {
     final signature = br.readBits(8);
@@ -406,7 +403,7 @@ class VP8L {
     var pos = _lastPixel; // current position
     final end = width * height; // End of data
     final last = width * lastRow; // Last pixel to decode
-    final lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
+    const lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
     final mask = _huffmanMask;
 
     while (!br.isEOS && pos < last) {
@@ -720,10 +717,7 @@ class VP8L {
     return offset + br.readBits(extraBits) + 1;
   }
 
-  int _getCopyLength(int lengthSymbol) {
-    // Length and distance prefixes are encoded the same way.
-    return _getCopyDistance(lengthSymbol);
-  }
+  int _getCopyLength(int lengthSymbol) => _getCopyDistance(lengthSymbol);
 
   int _planeCodeToDistance(int xsize, int planeCode) {
     if (planeCode > _CODE_TO_PLANE_CODES) {
@@ -739,9 +733,8 @@ class VP8L {
   }
 
   // Computes sampled size of 'size' when sampling using 'sampling bits'.
-  static int _subSampleSize(int size, int samplingBits) {
-    return (size + (1 << samplingBits) - 1) >> samplingBits;
-  }
+  static int _subSampleSize(int size, int samplingBits) =>
+      (size + (1 << samplingBits) - 1) >> samplingBits;
 
   // For security reason, we need to remap the color map to span
   // the total possible bundled values, and not just the num_colors.

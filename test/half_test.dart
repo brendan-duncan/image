@@ -4,8 +4,8 @@ import 'package:test/test.dart';
 void main() {
   group('Half', () {
     test('Arithmetic', () {
-      final f1 = 1.0;
-      final f2 = 2.0;
+      const f1 = 1.0;
+      const f2 = 2.0;
       var h1 = Half(3);
       var h2 = Half(4);
 

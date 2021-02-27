@@ -18,7 +18,7 @@ void main() {
       }
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
-      test('$name', () {
+      test(name, () {
         final List<int> bytes = f.readAsBytesSync();
         final image = BmpDecoder().decodeImage(bytes);
         if (image == null) {
@@ -26,7 +26,7 @@ void main() {
         }
 
         final png = PngEncoder().encodeImage(image);
-        File('$tmpPath/out/bmp/${name}.png')
+        File('$tmpPath/out/bmp/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

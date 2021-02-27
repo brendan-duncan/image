@@ -43,19 +43,19 @@ class PvrtcEncoder {
       pvrtc = encodeRgba4Bpp(bitmap);
     }
 
-    final version = 55727696;
-    final flags = 0;
+    const version = 55727696;
+    const flags = 0;
     final pixelFormat = format;
-    final channelOrder = 0;
-    final colorSpace = 0;
-    final channelType = 0;
+    const channelOrder = 0;
+    const colorSpace = 0;
+    const channelType = 0;
     final height = bitmap.height;
     final width = bitmap.width;
-    final depth = 1;
-    final numSurfaces = 1;
-    final numFaces = 1;
-    final mipmapCount = 1;
-    final metaDataSize = 0;
+    const depth = 1;
+    const numSurfaces = 1;
+    const numFaces = 1;
+    const mipmapCount = 1;
+    const metaDataSize = 0;
 
     output.writeUint32(version);
     output.writeUint32(flags);

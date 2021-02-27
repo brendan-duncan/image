@@ -1,8 +1,8 @@
 import '../color.dart';
-import '../image.dart';
 import '../filter/gaussian_blur.dart';
 import '../filter/remap_colors.dart';
 import '../filter/scale_rgba.dart';
+import '../image.dart';
 import '../transform/copy_into.dart';
 
 /// Create a drop-shadow effect for the image.

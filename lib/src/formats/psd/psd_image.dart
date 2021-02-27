@@ -1,11 +1,11 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import '../decode_info.dart';
 import '../../color.dart';
 import '../../image.dart';
 import '../../image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../decode_info.dart';
 import 'psd_channel.dart';
 import 'psd_image_resource.dart';
 import 'psd_layer.dart';
@@ -42,7 +42,8 @@ class PsdImage extends DecodeInfo {
     }
 
     var len = _input!.readUint32();
-    /*_colorData =*/ _input!.readBytes(len);
+    /*_colorData =*/
+    _input!.readBytes(len);
 
     len = _input!.readUint32();
     _imageResourceData = _input!.readBytes(len);
@@ -277,17 +278,11 @@ class PsdImage extends DecodeInfo {
     pixels[di++] = a;
   }
 
-  static int _blendLighten(int a, int b) {
-    return max(a, b);
-  }
+  static int _blendLighten(int a, int b) => max(a, b);
 
-  static int _blendDarken(int a, int b) {
-    return min(a, b);
-  }
+  static int _blendDarken(int a, int b) => min(a, b);
 
-  static int _blendMultiply(int a, int b) {
-    return (a * b) >> 8;
-  }
+  static int _blendMultiply(int a, int b) => (a * b) >> 8;
 
   static int _blendOverlay(int a, int b, int aAlpha, int bAlpha) {
     final x = a / 255.0;
@@ -313,13 +308,11 @@ class PsdImage extends DecodeInfo {
     return c.clamp(0, 255).toInt();
   }
 
-  static int _blendLinearBurn(int a, int b) {
-    return (a + b - 255).clamp(0, 255).toInt();
-  }
+  static int _blendLinearBurn(int a, int b) =>
+      (a + b - 255).clamp(0, 255).toInt();
 
-  static int _blendScreen(int a, int b) {
-    return (255 - ((255 - b) * (255 - a))).clamp(0, 255).toInt();
-  }
+  static int _blendScreen(int a, int b) =>
+      (255 - ((255 - b) * (255 - a))).clamp(0, 255).toInt();
 
   static int _blendColorDodge(int a, int b) {
     if (b == 255) {
@@ -328,9 +321,7 @@ class PsdImage extends DecodeInfo {
     return (((a / 255) / (1.0 - (b / 255.0))) * 255.0).clamp(0, 255).toInt();
   }
 
-  static int _blendLinearDodge(int a, int b) {
-    return (b + a > 255) ? 0xff : a + b;
-  }
+  static int _blendLinearDodge(int a, int b) => (b + a > 255) ? 0xff : a + b;
 
   static int _blendSoftLight(int a, int b) {
     final aa = a / 255.0;
@@ -366,23 +357,17 @@ class PsdImage extends DecodeInfo {
     }
   }
 
-  static int _blendPinLight(int bottom, int top) {
-    return (top < 128)
-        ? _blendDarken(bottom, 2 * top)
-        : _blendLighten(bottom, 2 * (top - 128));
-  }
+  static int _blendPinLight(int bottom, int top) => (top < 128)
+      ? _blendDarken(bottom, 2 * top)
+      : _blendLighten(bottom, 2 * (top - 128));
 
-  static int _blendHardMix(int bottom, int top) {
-    return (top < 255 - bottom) ? 0 : 255;
-  }
+  static int _blendHardMix(int bottom, int top) =>
+      (top < 255 - bottom) ? 0 : 255;
 
-  static int _blendDifference(int bottom, int top) {
-    return (top - bottom).abs();
-  }
+  static int _blendDifference(int bottom, int top) => (top - bottom).abs();
 
-  static int _blendExclusion(int bottom, int top) {
-    return (top + bottom - 2 * top * bottom / 255.0).round();
-  }
+  static int _blendExclusion(int bottom, int top) =>
+      (top + bottom - 2 * top * bottom / 255.0).round();
 
   void _readHeader() {
     signature = _input!.readUint32();
@@ -476,12 +461,18 @@ class PsdImage extends DecodeInfo {
     final maskData = _layerAndMaskData!.readBytes(len);
     if (len > 0) {
       /*int colorSpace =*/ maskData.readUint16();
-      /*int rc =*/ maskData.readUint16();
-      /*int gc =*/ maskData.readUint16();
-      /*int bc =*/ maskData.readUint16();
-      /*int ac =*/ maskData.readUint16();
-      /*int opacity =*/ maskData.readUint16(); // 0-100
-      /*int kind =*/ maskData.readByte();
+      /*int rc =*/
+      maskData.readUint16();
+      /*int gc =*/
+      maskData.readUint16();
+      /*int bc =*/
+      maskData.readUint16();
+      /*int ac =*/
+      maskData.readUint16();
+      /*int opacity =*/
+      maskData.readUint16(); // 0-100
+      /*int kind =*/
+      maskData.readByte();
     }
   }
 
@@ -508,9 +499,8 @@ class PsdImage extends DecodeInfo {
         colorMode, depth, width, height, mergeImageChannels);
   }
 
-  static int _ch(List<int> data, int si, int ns) {
-    return ns == 1 ? data[si] : ((data[si] << 8) | data[si + 1]) >> 8;
-  }
+  static int _ch(List<int> data, int si, int ns) =>
+      ns == 1 ? data[si] : ((data[si] << 8) | data[si + 1]) >> 8;
 
   static Image createImageFromChannels(int? colorMode, int? bitDepth, int width,
       int height, List<PsdChannel> channelList) {
@@ -604,6 +594,7 @@ class PsdImage extends DecodeInfo {
   static const RESOURCE_BLOCK_SIGNATURE = 0x3842494d; // '8BIM'
 
   late InputBuffer? _input;
+
   //InputBuffer _colorData;
   late InputBuffer? _imageResourceData;
   late InputBuffer? _layerAndMaskData;

@@ -1,7 +1,8 @@
-import 'dart:html';
 import 'dart:async';
+import 'dart:html';
 import 'dart:html' as prefix0;
 import 'dart:typed_data';
+
 import 'package:image/image.dart';
 
 /// Decode and display various image formats. This is used as a visual
@@ -32,7 +33,7 @@ void main() {
   for (var name in images) {
     // Use an http request to get the image file from disk.
     final req = HttpRequest();
-    req.open('GET', path + '/' + name);
+    req.open('GET', '$path/$name');
     req.responseType = 'arraybuffer';
     req.onLoadEnd.listen((e) {
       if (req.status == 200) {
@@ -73,8 +74,7 @@ void main() {
           // Create a buffer that the canvas can draw.
           final d = c.context2D.createImageData(c.width, c.height);
           // Fill the buffer with our image data.
-          d.data.setRange(
-              0, d.data.length, newImage.getBytes(format: Format.rgba));
+          d.data.setRange(0, d.data.length, newImage.getBytes());
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
 
@@ -92,15 +92,14 @@ void main() {
         final d = c.context2D.createImageData(c.width, c.height);
 
         var frame = 0;
-        Timer.periodic(Duration(milliseconds: 40), (t) {
+        Timer.periodic(const Duration(milliseconds: 40), (t) {
           final image = anim.frames[frame++];
           if (frame >= anim.numFrames) {
             frame = 0;
           }
 
           // Fill the buffer with our image data.
-          d.data
-              .setRange(0, d.data.length, image.getBytes(format: Format.rgba));
+          d.data.setRange(0, d.data.length, image.getBytes());
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
         });

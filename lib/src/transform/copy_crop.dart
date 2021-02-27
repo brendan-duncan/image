@@ -42,7 +42,6 @@ Image copyCropCircle(Image src, {int? radius, Point? center}) {
   final dst = Image(
     radius * 2,
     radius * 2,
-    channels: Channels.rgba,
     iccp: src.iccProfile,
   );
 

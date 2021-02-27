@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import '../../hdr/hdr_image.dart';
 import '../../image_exception.dart';
 import '../../internal/internal.dart';
-import '../../hdr/hdr_image.dart';
 import '../../util/input_buffer.dart';
 import 'exr_attribute.dart';
 import 'exr_channel.dart';
@@ -255,9 +255,8 @@ class ExrPart {
     return num;
   }
 
-  int _roundLog2(int x, int? rmode) {
-    return (rmode == ROUND_DOWN) ? _floorLog2(x) : _ceilLog2(x);
-  }
+  int _roundLog2(int x, int? rmode) =>
+      (rmode == ROUND_DOWN) ? _floorLog2(x) : _ceilLog2(x);
 
   int _floorLog2(int x) {
     var y = 0;
@@ -297,11 +296,10 @@ class ExrPart {
   }
 
   List<int> _calculateNumTiles(
-      int numLevels, int min, int max, int? size, int? rmode) {
-    return List<int>.generate(
-        numLevels, (i) => (_levelSize(min, max, i, rmode) + size! - 1) ~/ size,
-        growable: false);
-  }
+          int numLevels, int min, int max, int? size, int? rmode) =>
+      List<int>.generate(numLevels,
+          (i) => (_levelSize(min, max, i, rmode) + size! - 1) ~/ size,
+          growable: false);
 
   int _levelSize(int _min, int _max, int l, int? rmode) {
     if (l < 0) {
@@ -343,6 +341,7 @@ class ExrPart {
   late Uint32List _bytesPerLine;
   ExrCompressor? _compressor;
   int? _linesInBuffer;
+
   //int _lineBufferSize;
   Uint32List? _offsetInLineBuffer;
 
@@ -357,7 +356,7 @@ class ExrPart {
   int? _numYLevels;
   late int _bytesPerPixel;
   int? _maxBytesPerTileLine;
-  //int _tileBufferSize;
+//int _tileBufferSize;
 }
 
 @internal
@@ -367,15 +366,23 @@ class InternalExrPart extends ExrPart {
   List<Uint32List?>? get offsets => _offsets;
 
   ExrCompressor? get compressor => _compressor;
+
   int? get linesInBuffer => _linesInBuffer;
+
   Uint32List? get offsetInLineBuffer => _offsetInLineBuffer;
 
   bool get tiled => _tiled;
+
   int? get tileWidth => _tileWidth;
+
   int? get tileHeight => _tileHeight;
+
   List<int?>? get numXTiles => _numXTiles;
+
   List<int?>? get numYTiles => _numYTiles;
+
   int? get numXLevels => _numXLevels;
+
   int? get numYLevels => _numYLevels;
 
   void readOffsets(InputBuffer input) {

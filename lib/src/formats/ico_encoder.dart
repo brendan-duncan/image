@@ -1,8 +1,7 @@
-import 'package:image/src/formats/png_encoder.dart';
-
 import '../image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
+import 'png_encoder.dart';
 
 abstract class WinEncoder extends Encoder {
   int get type;
@@ -12,14 +11,12 @@ abstract class WinEncoder extends Encoder {
   int bitsPerPixelOrYHotSpot(int index);
 
   @override
-  List<int> encodeImage(Image image) {
-    return encodeImages([image]);
-  }
+  List<int> encodeImage(Image image) => encodeImages([image]);
 
   List<int> encodeImages(List<Image> images) {
     final count = images.length;
 
-    final out = OutputBuffer(bigEndian: false);
+    final out = OutputBuffer();
 
     // header
     out.writeUint16(0); // reserved

@@ -1,6 +1,6 @@
 import '../animation.dart';
-import '../image.dart';
 import '../hdr/hdr_image.dart';
+import '../image.dart';
 import '../util/input_buffer.dart';
 import 'decoder.dart';
 import 'tiff/tiff_image.dart';
@@ -11,9 +11,7 @@ class TiffDecoder extends Decoder {
 
   /// Is the given file a valid TIFF image?
   @override
-  bool isValidFile(List<int> data) {
-    return _readHeader(InputBuffer(data)) != null;
-  }
+  bool isValidFile(List<int> data) => _readHeader(InputBuffer(data)) != null;
 
   /// Validate the file is a TIFF image and get information about it.
   /// If the file is not a valid TIFF image, null is returned.
@@ -54,8 +52,8 @@ class TiffDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
-  Image? decodeImage(List<int> data, {int frame = 0}) {
-    _input = InputBuffer(data);
+  Image? decodeImage(List<int> bytes, {int frame = 0}) {
+    _input = InputBuffer(bytes);
 
     info = _readHeader(_input);
     if (info == null) {
@@ -66,8 +64,8 @@ class TiffDecoder extends Decoder {
   }
 
   @override
-  HdrImage? decodeHdrImage(List<int> data, {int frame = 0}) {
-    _input = InputBuffer(data);
+  HdrImage? decodeHdrImage(List<int> bytes, {int frame = 0}) {
+    _input = InputBuffer(bytes);
 
     info = _readHeader(_input);
     if (info == null) {

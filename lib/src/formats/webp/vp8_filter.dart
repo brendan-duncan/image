@@ -715,13 +715,11 @@ class VP8Filter {
     }
   }
 
-  static int _clip8b(int v) {
-    return ((v & -256) == 0)
-        ? v
-        : (v < 0)
-            ? 0
-            : 255;
-  }
+  static int _clip8b(int v) => ((v & -256) == 0)
+      ? v
+      : (v < 0)
+          ? 0
+          : 255;
 
   //static int __maxN = 0;
 

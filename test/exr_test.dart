@@ -26,7 +26,7 @@ void main() {
       var img2 = hdrToImage(hdr);
       File('$tmpPath/out/exr/lenna.png').writeAsBytesSync(encodePng(img2));
 
-      hdrGamma(hdr, gamma: 2.2);
+      hdrGamma(hdr);
       //hdrBloom(hdr, radius: 0.2);
       img2 = hdrToImage(hdr);
       File('$tmpPath/out/exr/lenna_gamma.png')

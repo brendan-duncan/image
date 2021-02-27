@@ -15,13 +15,13 @@ void main() {
       }
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
-      test('$name', () {
+      test(name, () {
         final List<int> bytes = f.readAsBytesSync();
         expect(JpegDecoder().isValidFile(bytes), equals(true));
 
         final image = JpegDecoder().decodeImage(bytes);
         final outJpg = JpegEncoder().encodeImage(image);
-        File('$tmpPath/out/jpg/${name}')
+        File('$tmpPath/out/jpg/$name')
           ..createSync(recursive: true)
           ..writeAsBytesSync(outJpg);
 

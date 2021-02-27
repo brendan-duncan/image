@@ -132,8 +132,8 @@ class JpegScan {
     if (bitsData == 0xff) {
       final nextByte = input.readByte();
       if (nextByte != 0) {
-        throw ImageException('unexpected marker: ' +
-            ((bitsData << 8) | nextByte).toRadixString(16));
+        throw ImageException(
+            'unexpected marker: ${((bitsData << 8) | nextByte).toRadixString(16)}');
       }
     }
 

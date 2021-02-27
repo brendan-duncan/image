@@ -13,7 +13,7 @@ void main() {
 
     test('fill', () {
       final f = Image(10, 10, channels: Channels.rgb);
-      f.fill(getColor(128, 64, 32, 255));
+      f.fill(getColor(128, 64, 32));
       final fp = File('$tmpPath/out/fill.jpg');
       fp.createSync(recursive: true);
       fp.writeAsBytesSync(writeJpg(f));
@@ -21,7 +21,7 @@ void main() {
 
     test('fillRect', () {
       final f = Image.from(image);
-      fillRect(f, 50, 50, 150, 150, getColor(128, 255, 128, 255));
+      fillRect(f, 50, 50, 150, 150, getColor(128, 255, 128));
       fillRect(f, 250, -10, 100, 750, getColor(255, 128, 128, 128));
       final fp = File('$tmpPath/out/fillRect.jpg');
       fp.createSync(recursive: true);
@@ -114,9 +114,9 @@ void main() {
 
     test('draw shapes', () {
       final f = Image.from(image);
-      final c1 = getColor(128, 255, 128, 255);
+      final c1 = getColor(128, 255, 128);
       drawLine(f, 0, 0, f.width, f.height, c1, thickness: 3);
-      final c2 = getColor(255, 128, 128, 255);
+      final c2 = getColor(255, 128, 128);
       drawLine(f, f.width, 0, 0, f.height, c2, thickness: 5, antialias: true);
       drawCircle(f, 100, 100, 50, c1);
       drawRect(f, 50, 50, 150, 150, c2);
@@ -263,7 +263,7 @@ void main() {
 
     test('NOISE_GAUSSIAN', () {
       final f = Image.from(image);
-      noise(f, 10.0, type: NoiseType.gaussian);
+      noise(f, 10.0);
 
       final fp = File('$tmpPath/out/noise_gaussian.jpg');
       fp.createSync(recursive: true);
@@ -317,7 +317,7 @@ void main() {
 
     test('pixelate', () {
       var f = Image.from(image);
-      pixelate(f, 20, mode: PixelateMode.upperLeft);
+      pixelate(f, 20);
 
       var fp = File('$tmpPath/out/PIXELATE_UPPERLEFT.jpg');
       fp.createSync(recursive: true);
@@ -424,7 +424,7 @@ void main() {
     test('neural quantize', () {
       final f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
 
-      quantize(f, numberOfColors: 16, method: QuantizeMethod.neuralNet);
+      quantize(f, numberOfColors: 16);
       // ignore: prefer_collection_literals
       final colors = Set<int>();
       for (var y = 0; y < f.height; ++y) {
@@ -439,7 +439,7 @@ void main() {
 
     test('trim', () {
       final image = readPng(File('test/res/png/trim.png').readAsBytesSync())!;
-      var trimmed = trim(image, mode: TrimMode.transparent);
+      var trimmed = trim(image);
       File('$tmpPath/out/trim.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(writePng(trimmed));

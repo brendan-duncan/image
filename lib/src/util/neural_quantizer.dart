@@ -72,9 +72,7 @@ class NeuralQuantizer extends Quantizer {
   }
 
   /// Find the index of the closest color to [r],[g],[b] in the [colorMap].
-  int lookupRGB(int r, int g, int b) {
-    return _inxSearch(b, g, r);
-  }
+  int lookupRGB(int r, int g, int b) => _inxSearch(b, g, r);
 
   /// Find the color closest to [c] in the [colorMap].
   @override

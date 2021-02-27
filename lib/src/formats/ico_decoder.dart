@@ -1,11 +1,10 @@
-import 'package:image/image.dart';
-import 'package:image/src/animation.dart';
-import 'package:image/src/formats/bmp/bmp_info.dart';
-import 'package:image/src/formats/decode_info.dart';
-
+import '../../image.dart';
+import '../animation.dart';
 import '../image.dart';
 import '../util/input_buffer.dart';
 import '../util/output_buffer.dart';
+import 'bmp/bmp_info.dart';
+import 'decode_info.dart';
 import 'decoder.dart';
 
 const _TYPE_ICO = 1;

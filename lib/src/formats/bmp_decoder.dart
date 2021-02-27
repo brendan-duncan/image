@@ -1,8 +1,8 @@
 import '../animation.dart';
 import '../image.dart';
 import '../util/input_buffer.dart';
-import 'decoder.dart';
 import 'bmp/bmp_info.dart';
+import 'decoder.dart';
 
 class BmpDecoder extends Decoder {
   late InputBuffer _input;
@@ -10,9 +10,8 @@ class BmpDecoder extends Decoder {
 
   /// Is the given file a valid BMP image?
   @override
-  bool isValidFile(List<int> data) {
-    return BitmapFileHeader.isValidFile(InputBuffer(data));
-  }
+  bool isValidFile(List<int> data) =>
+      BitmapFileHeader.isValidFile(InputBuffer(data));
 
   @override
   int numFrames() => info != null ? info!.numFrames : 0;
@@ -40,7 +39,7 @@ class BmpDecoder extends Decoder {
       rowStride += 4 - (rowStride % 4);
     }
 
-    final image = Image(info!.width, info!.height, channels: Channels.rgba);
+    final image = Image(info!.width, info!.height);
 
     for (var y = image.height - 1; y >= 0; --y) {
       final line = info!.readBottomUp ? y : image.height - 1 - y;

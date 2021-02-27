@@ -1,9 +1,7 @@
 import 'dart:math';
 
 /// Return a random variable between [-1,1].
-double crand(Random rand) {
-  return 1.0 - 2.0 * rand.nextDouble();
-}
+double crand(Random rand) => 1.0 - 2.0 * rand.nextDouble();
 
 /// Return a random variable following a gaussian distribution and a standard
 /// deviation of 1.

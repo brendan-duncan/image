@@ -18,7 +18,7 @@ void main() {
       }
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
-      test('$name', () {
+      test(name, () {
         final bytes = f.readAsBytesSync();
         final image = TgaDecoder().decodeImage(bytes);
         if (image == null) {
@@ -26,7 +26,7 @@ void main() {
         }
 
         final png = PngEncoder().encodeImage(image);
-        File('$tmpPath/out/tga/${name}.png')
+        File('$tmpPath/out/tga/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });

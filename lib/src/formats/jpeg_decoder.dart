@@ -14,14 +14,12 @@ class JpegDecoder extends Decoder {
 
   /// Is the given file a valid JPEG image?
   @override
-  bool isValidFile(List<int> data) {
-    return JpegData().validate(data);
-  }
+  bool isValidFile(List<int> data) => JpegData().validate(data);
 
   @override
-  DecodeInfo? startDecode(List<int> data) {
-    input = InputBuffer(data, bigEndian: true);
-    info = JpegData().readInfo(data);
+  DecodeInfo? startDecode(List<int> bytes) {
+    input = InputBuffer(bytes, bigEndian: true);
+    info = JpegData().readInfo(bytes);
     return info;
   }
 
@@ -43,9 +41,9 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  Image decodeImage(List<int> data, {int frame = 0}) {
+  Image decodeImage(List<int> bytes, {int frame = 0}) {
     final jpeg = JpegData();
-    jpeg.read(data);
+    jpeg.read(bytes);
 
     if (jpeg.frames.length != 1) {
       throw ImageException('only single frame JPEGs supported');
@@ -55,8 +53,8 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  Animation decodeAnimation(List<int> data) {
-    final image = decodeImage(data);
+  Animation decodeAnimation(List<int> bytes) {
+    final image = decodeImage(bytes);
 
     final anim = Animation();
     anim.width = image.width;

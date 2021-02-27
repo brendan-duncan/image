@@ -53,12 +53,8 @@ class HdrSlice {
     throw UnimplementedError();
   }
 
-  HdrSlice(this.name, int width, int height, int type, int bitsPerSample)
-      : width = width,
-        height = height,
-        type = type,
-        bitsPerSample = bitsPerSample,
-        data = allocateDataForType(width * height, type, bitsPerSample);
+  HdrSlice(this.name, this.width, this.height, this.type, this.bitsPerSample)
+      : data = allocateDataForType(width * height, type, bitsPerSample);
 
   /// Create a copy of the [other] HdrSlice.
   HdrSlice.from(HdrSlice other)

@@ -123,11 +123,6 @@ class JpegData {
     }
 
     for (var i = 0; i < frame!.componentsOrder.length; ++i) {
-      /*JpegComponent component =*/ frame!
-          .components[frame!.componentsOrder[i]];
-    }
-
-    for (var i = 0; i < frame!.componentsOrder.length; ++i) {
       final component = frame!.components[frame!.componentsOrder[i]]!;
       components.add(ComponentData(
           component.hSamples,
@@ -142,9 +137,7 @@ class JpegData {
 
   int? get height => frame!.scanLines;
 
-  Image getImage() {
-    return getImageFromJpeg(this);
-  }
+  Image getImage() => getImageFromJpeg(this);
 
   void _read() {
     var marker = _nextMarker();
@@ -229,7 +222,7 @@ class JpegData {
 
           if (marker != 0) {
             throw ImageException(
-                'Unknown JPEG marker ' + marker.toRadixString(16));
+                'Unknown JPEG marker ${marker.toRadixString(16)}');
           }
           break;
       }

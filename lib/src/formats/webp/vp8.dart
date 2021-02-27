@@ -13,7 +13,7 @@ class VP8 {
   InputBuffer input;
   final InternalWebPInfo _webp;
 
-  VP8(InputBuffer input, this._webp) : input = input;
+  VP8(this.input, this._webp);
 
   WebPInfo get webp => _webp;
 
@@ -221,7 +221,7 @@ class VP8 {
     _partitions[lastPart] = VP8BitReader(pin);
 
     // Init is ok, but there's not enough data
-    return (partStart < bufEnd) ? true : false;
+    return partStart < bufEnd;
   }
 
   void _parseQuant() {
@@ -861,17 +861,12 @@ class VP8 {
     return d;
   }
 
-  int _yuvToR(int y, int v) {
-    return _clip8(kYScale * y + kVToR * v + kRCst);
-  }
+  int _yuvToR(int y, int v) => _clip8(kYScale * y + kVToR * v + kRCst);
 
-  int _yuvToG(int y, int u, int v) {
-    return _clip8(kYScale * y - kUToG * u - kVToG * v + kGCst);
-  }
+  int _yuvToG(int y, int u, int v) =>
+      _clip8(kYScale * y - kUToG * u - kVToG * v + kGCst);
 
-  int _yuvToB(int y, int u) {
-    return _clip8(kYScale * y + kUToB * u + kBCst);
-  }
+  int _yuvToB(int y, int u) => _clip8(kYScale * y + kUToB * u + kBCst);
 
   void _yuvToRgb(int y, int u, int v, InputBuffer rgb) {
     rgb[0] = _yuvToR(y, v);
@@ -1384,7 +1379,7 @@ class VP8 {
 
   void _parseIntraMode() {
     final ti = 4 * _mbX;
-    final li = 0;
+    const li = 0;
     final top = _intraT;
     final left = _intraL;
 
@@ -1557,13 +1552,11 @@ class VP8 {
   // compressed layer data (if present)
   //Uint8List _layerData;
 
-  static int _clip(int v, int M) {
-    return v < 0
-        ? 0
-        : v > M
-            ? M
-            : v;
-  }
+  static int _clip(int v, int M) => v < 0
+      ? 0
+      : v > M
+          ? M
+          : v;
 
   static const kYModesIntra4 = [
     -B_DC_PRED,

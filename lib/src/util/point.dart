@@ -4,13 +4,9 @@ class Point {
   num x;
   num y;
 
-  int get xi {
-    return x.toInt();
-  }
+  int get xi => x.toInt();
 
-  int get yi {
-    return y.toInt();
-  }
+  int get yi => y.toInt();
 
   Point([this.x = 0, this.y = 0]);
 
@@ -18,13 +14,9 @@ class Point {
       : x = other.x,
         y = other.y;
 
-  Point operator *(double s) {
-    return Point(x * s, y * s);
-  }
+  Point operator *(double s) => Point(x * s, y * s);
 
-  Point operator +(Point rhs) {
-    return Point(x + rhs.x, y + rhs.y);
-  }
+  Point operator +(Point rhs) => Point(x + rhs.x, y + rhs.y);
 
   @override
   bool operator ==(dynamic other) =>

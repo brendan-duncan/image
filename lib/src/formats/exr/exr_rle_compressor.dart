@@ -20,15 +20,15 @@ class InternalExrRleCompressor extends InternalExrCompressor
   int numScanLines() => 1;
 
   @override
-  Uint8List compress(InputBuffer inPtr, int x, int y,
+  Uint8List compress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
     throw ImageException('Rle compression not yet supported.');
   }
 
   @override
-  Uint8List uncompress(InputBuffer inPtr, int x, int y,
+  Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
-    final out = OutputBuffer(size: inPtr.length * 2);
+    final out = OutputBuffer(size: input.length * 2);
 
     width ??= header.width;
     height ??= header.linesInBuffer;
@@ -48,17 +48,17 @@ class InternalExrRleCompressor extends InternalExrCompressor
     decodedWidth = (maxX - minX) + 1;
     decodedHeight = (maxY - minY) + 1;
 
-    while (!inPtr.isEOS) {
-      final n = inPtr.readInt8();
+    while (!input.isEOS) {
+      final n = input.readInt8();
       if (n < 0) {
         var count = -n;
         while (count-- > 0) {
-          out.writeByte(inPtr.readByte());
+          out.writeByte(input.readByte());
         }
       } else {
         var count = n;
         while (count-- >= 0) {
-          out.writeByte(inPtr.readByte());
+          out.writeByte(input.readByte());
         }
       }
     }

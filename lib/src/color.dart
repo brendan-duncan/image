@@ -33,16 +33,14 @@ class Color {
   /// Create a color value from RGB values in the range [0, 255].
   ///
   /// The channel order of a uint32 encoded color is BGRA.
-  static int fromRgb(int red, int green, int blue) {
-    return getColor(red, green, blue);
-  }
+  static int fromRgb(int red, int green, int blue) =>
+      getColor(red, green, blue);
 
   /// Create a color value from RGBA values in the range [0, 255].
   ///
   /// The channel order of a uint32 encoded color is BGRA.
-  static int fromRgba(int red, int green, int blue, int alpha) {
-    return getColor(red, green, blue, alpha);
-  }
+  static int fromRgba(int red, int green, int blue, int alpha) =>
+      getColor(red, green, blue, alpha);
 
   /// Create a color value from HSL values in the range [0, 1].
   static int fromHsl(num hue, num saturation, num lightness) {

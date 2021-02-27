@@ -11,7 +11,7 @@ void main(List<String> argv) {
 
   final file = File(filename);
   if (!file.existsSync()) {
-    print('File does not exist: ${filename}');
+    print('File does not exist: $filename');
     return;
   }
 
@@ -19,7 +19,7 @@ void main(List<String> argv) {
 
   final decoder = findDecoderForData(fileBytes);
   if (decoder == null) {
-    print('Could not find format decoder for: ${filename}');
+    print('Could not find format decoder for: $filename');
     return;
   }
 
@@ -30,5 +30,5 @@ void main(List<String> argv) {
   // Save the image as a PNG
   final png = PngEncoder().encodeImage(image);
   // Write the PNG to disk
-  File(filename + '.png').writeAsBytesSync(png);
+  File('$filename.png').writeAsBytesSync(png);
 }

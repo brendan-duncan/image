@@ -15,7 +15,7 @@ void main() {
       }
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
-      test('$name', () {
+      test(name, () {
         final List<int> bytes = f.readAsBytesSync();
 
         final webp = WebPDecoder(bytes);
@@ -53,7 +53,7 @@ void main() {
       file = File('test/res/webp/2b.png');
       bytes = file.readAsBytesSync();
       final debugImage = PngDecoder().decodeImage(bytes)!;
-      final found = false;
+      const found = false;
       for (var y = 0; y < debugImage.height && !found; ++y) {
         for (var x = 0; x < debugImage.width; ++x) {
           final dc = debugImage.getPixel(x, y);
@@ -69,7 +69,7 @@ void main() {
       }
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
-      test('$name', () {
+      test(name, () {
         final List<int> bytes = f.readAsBytesSync();
         final image = WebPDecoder().decodeImage(bytes);
         if (image == null) {
@@ -77,7 +77,7 @@ void main() {
         }
 
         final png = PngEncoder().encodeImage(image);
-        File('$tmpPath/out/webp/${name}.png')
+        File('$tmpPath/out/webp/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });
@@ -86,7 +86,7 @@ void main() {
 
   group('WebP/decodeAnimation', () {
     test('Transparent Animation', () {
-      final path = 'test/res/webp/animated_transparency.webp';
+      const path = 'test/res/webp/animated_transparency.webp';
       final anim = WebPDecoder().decodeAnimation(File(path).readAsBytesSync())!;
 
       expect(anim.numFrames, equals(20));

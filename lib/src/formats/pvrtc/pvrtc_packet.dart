@@ -208,12 +208,11 @@ class PvrtcPacket {
     colorBIsOpaque = (x >> 31) & 1;
   }
 
-  static int _getMortonNumber(int x, int y) {
-    return MORTON_TABLE[x >> 8] << 17 |
-        MORTON_TABLE[y >> 8] << 16 |
-        MORTON_TABLE[x & 0xFF] << 1 |
-        MORTON_TABLE[y & 0xFF];
-  }
+  static int _getMortonNumber(int x, int y) =>
+      MORTON_TABLE[x >> 8] << 17 |
+      MORTON_TABLE[y >> 8] << 16 |
+      MORTON_TABLE[x & 0xFF] << 1 |
+      MORTON_TABLE[y & 0xFF];
 
   static const BITS_14 = (1 << 14) - 1;
   static const BITS_15 = (1 << 15) - 1;

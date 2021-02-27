@@ -2,9 +2,7 @@ import 'dart:html';
 import 'dart:math';
 import 'package:image/image.dart';
 
-double logN(num x, num div) {
-  return log(x) / div;
-}
+double logN(num x, num div) => log(x) / div;
 
 /// Render the Mandelbrot Set into an Image and display it.
 void main() {
@@ -15,9 +13,9 @@ void main() {
   final c = CanvasElement(width: width, height: height);
   document.body!.append(c);
 
-  final zoom = 1.0;
-  final moveX = -0.5;
-  final moveY = 0.0;
+  const zoom = 1.0;
+  const moveX = -0.5;
+  const moveY = 0.0;
   const MaxIterations = 255;
   const radius = 2.0;
   const radius_squared = radius * radius;
@@ -65,7 +63,7 @@ void main() {
   // Create a buffer that the canvas can draw.
   final d = c.context2D.createImageData(image.width, image.height);
   // Fill the buffer with our image data.
-  d.data.setRange(0, d.data.length, image.getBytes(format: Format.rgba));
+  d.data.setRange(0, d.data.length, image.getBytes());
   // Draw the buffer onto the canvas.
   c.context2D.putImageData(d, 0, 0);
 }

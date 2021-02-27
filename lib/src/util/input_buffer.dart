@@ -12,11 +12,9 @@ class InputBuffer {
   bool bigEndian;
 
   /// Create a InputStream for reading from a List<int>
-  InputBuffer(List<int> buffer,
-      {this.bigEndian = false, int offset = 0, int? length})
-      : buffer = buffer,
-        start = offset,
-        offset = offset,
+  InputBuffer(this.buffer,
+      {this.bigEndian = false, this.offset = 0, int? length})
+      : start = offset,
         end = (length == null) ? buffer.length : offset + length;
 
   /// Create a copy of [other].
@@ -96,9 +94,8 @@ class InputBuffer {
 
   /// Read [count] bytes from an [offset] of the current read position, without
   /// moving the read position.
-  InputBuffer peekBytes(int count, [int offset = 0]) {
-    return subset(count, offset: offset);
-  }
+  InputBuffer peekBytes(int count, [int offset = 0]) =>
+      subset(count, offset: offset);
 
   /// Move the read position by [count] bytes.
   void skip(int count) {
@@ -106,13 +103,9 @@ class InputBuffer {
   }
 
   /// Read a single byte.
-  int readByte() {
-    return buffer[offset++];
-  }
+  int readByte() => buffer[offset++];
 
-  int readInt8() {
-    return uint8ToInt8(readByte());
-  }
+  int readInt8() => uint8ToInt8(readByte());
 
   /// Read [count] bytes from the stream.
   InputBuffer readBytes(int count) {
@@ -153,9 +146,7 @@ class InputBuffer {
   }
 
   /// Read a 16-bit word from the stream.
-  int readInt16() {
-    return uint16ToInt16(readUint16());
-  }
+  int readInt16() => uint16ToInt16(readUint16());
 
   /// Read a 24-bit word from the stream.
   int readUint24() {
@@ -181,19 +172,13 @@ class InputBuffer {
   }
 
   /// Read a signed 32-bit integer from the stream.
-  int readInt32() {
-    return uint32ToInt32(readUint32());
-  }
+  int readInt32() => uint32ToInt32(readUint32());
 
   /// Read a 32-bit float.
-  double readFloat32() {
-    return uint32ToFloat32(readUint32());
-  }
+  double readFloat32() => uint32ToFloat32(readUint32());
 
   /// Read a 64-bit float.
-  double readFloat64() {
-    return uint64ToFloat64(readUint64());
-  }
+  double readFloat64() => uint64ToFloat64(readUint64());
 
   /// Read a 64-bit word form the stream.
   int readUint64() {

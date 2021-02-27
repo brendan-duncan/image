@@ -53,7 +53,7 @@ class OctreeQuantizer extends Quantizer {
     r = root!.r;
     g = root.g;
     b = root.b;
-    return getColor(r, g, b, 255);
+    return getColor(r, g, b);
   }
 
   int _compareNode(_OctreeNode a, _OctreeNode b) {

@@ -1,7 +1,7 @@
-import '../image.dart';
 import '../exif_data.dart';
-import 'flip.dart';
+import '../image.dart';
 import 'copy_rotate.dart';
+import 'flip.dart';
 
 /// If [image] has an orientation value in its exif data, this will rotate the
 /// image so that it physically matches its orientation. This can be used to

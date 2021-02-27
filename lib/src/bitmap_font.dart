@@ -1,9 +1,9 @@
 import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 
+import 'formats/png_decoder.dart';
 import 'image.dart';
 import 'image_exception.dart';
-import 'formats/png_decoder.dart';
 
 /// Decode a [BitmapFont] from the contents of a zip file that stores the
 /// .fnt font definition and associated PNG images.
@@ -382,11 +382,9 @@ class BitmapFontCharacter {
   final int channel;
   final Image image;
 
-  BitmapFontCharacter(this.id, int width, int height, this.xoffset,
+  BitmapFontCharacter(this.id, this.width, this.height, this.xoffset,
       this.yoffset, this.xadvance, this.page, this.channel)
-      : width = width,
-        height = height,
-        image = Image(width, height);
+      : image = Image(width, height);
 
   @override
   String toString() {

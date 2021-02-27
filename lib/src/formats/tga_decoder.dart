@@ -2,8 +2,8 @@ import '../animation.dart';
 import '../color.dart';
 import '../image.dart';
 import '../util/input_buffer.dart';
-import 'decoder.dart';
 import 'decode_info.dart';
+import 'decoder.dart';
 import 'tga/tga_info.dart';
 
 /// Decode a TGA image. This only supports the 24-bit uncompressed format.
@@ -28,9 +28,9 @@ class TgaDecoder extends Decoder {
   }
 
   @override
-  DecodeInfo? startDecode(List<int> data) {
+  DecodeInfo? startDecode(List<int> bytes) {
     info = TgaInfo();
-    input = InputBuffer(data, bigEndian: true);
+    input = InputBuffer(bytes, bigEndian: true);
 
     final header = input.readBytes(18);
     if (header[2] != 2) {
@@ -73,8 +73,8 @@ class TgaDecoder extends Decoder {
   }
 
   @override
-  Image? decodeImage(List<int> data, {int frame = 0}) {
-    if (startDecode(data) == null) {
+  Image? decodeImage(List<int> bytes, {int frame = 0}) {
+    if (startDecode(bytes) == null) {
       return null;
     }
 
@@ -82,8 +82,8 @@ class TgaDecoder extends Decoder {
   }
 
   @override
-  Animation? decodeAnimation(List<int> data) {
-    final image = decodeImage(data);
+  Animation? decodeAnimation(List<int> bytes) {
+    final image = decodeImage(bytes);
     if (image == null) {
       return null;
     }

@@ -1,13 +1,14 @@
 import 'dart:convert';
-import 'package:image/image.dart';
-import 'package:image/src/internal/bit_operators.dart';
+
+import '../../../image.dart';
 import '../../formats/decode_info.dart';
+import '../../internal/bit_operators.dart';
 import '../../util/input_buffer.dart';
 
 enum BitmapCompression { BI_BITFIELDS, NONE }
 
 class BitmapFileHeader {
-  static final fileHeaderSize = 14;
+  static const fileHeaderSize = 14;
 
   late int fileLength;
   late int offset;
@@ -72,7 +73,9 @@ class BmpInfo extends DecodeInfo {
       headerSize == 40 ||
       // BITMAPV5HEADER with null alpha mask.
       headerSize == 124 && v5alphaMask == 0;
+
   bool get readBottomUp => !_height.isNegative;
+
   @override
   int get height => _height.abs();
 
@@ -189,7 +192,7 @@ class BmpInfo extends DecodeInfo {
 
   @override
   String toString() {
-    final json = JsonEncoder.withIndent(' ');
+    const json = JsonEncoder.withIndent(' ');
     return json.convert({
       'headerSize': headerSize,
       'width': width,
