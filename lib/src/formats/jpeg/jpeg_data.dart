@@ -11,10 +11,10 @@ import 'jpeg_component.dart';
 import 'jpeg_frame.dart';
 import 'jpeg_info.dart';
 import 'jpeg_jfif.dart';
-import 'jpeg_scan.dart';
 import 'jpeg_quantize_stub.dart'
     if (dart.library.io) '_jpeg_quantize_io.dart'
     if (dart.library.js) '_jpeg_quantize_html.dart';
+import 'jpeg_scan.dart';
 
 class JpegData {
   late InputBuffer input;
@@ -607,14 +607,14 @@ class JpegData {
     var Ah = (successiveApproximation >> 4) & 15;
     var Al = successiveApproximation & 15;
 
-    JpegScan(input, frame!, components, resetInterval, spectralStart,
-            spectralEnd, Ah, Al)
+    JpegScan(input, frame!, components.cast<JpegComponent>(), resetInterval,
+            spectralStart, spectralEnd, Ah, Al)
         .decode();
   }
 
   List? _buildHuffmanTable(Uint8List codeLengths, Uint8List values) {
     var k = 0;
-    final code = <dynamic>[];
+    final code = <_JpegHuffman>[];
     var length = 16;
 
     while (length > 0 && (codeLengths[length - 1] == 0)) {
@@ -623,18 +623,18 @@ class JpegData {
 
     code.add(_JpegHuffman());
 
-    var p = code[0] as _JpegHuffman;
+    var p = code[0];
     _JpegHuffman q;
 
     for (var i = 0; i < length; i++) {
       for (var j = 0; j < codeLengths[i]; j++) {
-        p = code.removeLast() as _JpegHuffman;
+        p = code.removeLast();
         if (p.children.length <= p.index) {
           p.children.length = p.index + 1;
         }
         p.children[p.index] = values[k];
         while (p.index > 0) {
-          p = code.removeLast() as _JpegHuffman;
+          p = code.removeLast();
         }
         p.index++;
         code.add(p);
@@ -662,7 +662,7 @@ class JpegData {
       }
     }
 
-    return code[0].children as List?;
+    return code[0].children;
   }
 
   List<Uint8List?> _buildComponentData(

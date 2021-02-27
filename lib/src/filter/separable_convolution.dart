@@ -1,4 +1,3 @@
-
 import '../image.dart';
 import 'separable_kernel.dart';
 

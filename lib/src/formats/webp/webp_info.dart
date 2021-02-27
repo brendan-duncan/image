@@ -1,4 +1,3 @@
-
 import '../../internal/internal.dart';
 import '../../util/input_buffer.dart';
 import '../decode_info.dart';

@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../image_exception.dart';

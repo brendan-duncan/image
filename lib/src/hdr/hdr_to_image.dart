@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 import '../image.dart';
 import '../image_exception.dart';

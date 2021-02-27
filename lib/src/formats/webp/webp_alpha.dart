@@ -55,7 +55,7 @@ class WebPAlpha {
       return false;
     }
 
-    dynamic unfilterFunc = WebPFilters.UNFILTERS[filter];
+    var unfilterFunc = WebPFilters.UNFILTERS[filter];
 
     if (method == ALPHA_NO_COMPRESSION) {
       final offset = row * width;
@@ -102,7 +102,7 @@ class WebPAlpha {
     // Decode (with special row processing).
     return _use8bDecode
         ? _vp8l.decodeAlphaData(_vp8l.webp.width, _vp8l.webp.height, lastRow)
-        : _vp8l.decodeImageData(_vp8l.pixels, _vp8l.webp.width,
+        : _vp8l.decodeImageData(_vp8l.pixels!, _vp8l.webp.width,
             _vp8l.webp.height, lastRow, _vp8l.extractAlphaRows);
   }
 

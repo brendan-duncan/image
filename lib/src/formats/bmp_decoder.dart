@@ -1,4 +1,3 @@
-
 import '../animation.dart';
 import '../image.dart';
 import '../util/input_buffer.dart';

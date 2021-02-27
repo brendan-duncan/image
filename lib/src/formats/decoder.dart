@@ -1,4 +1,3 @@
-
 import '../animation.dart';
 import '../image.dart';
 import '../hdr/hdr_image.dart';

@@ -1,4 +1,5 @@
 import 'dart:html';
+
 import 'package:image/image.dart';
 
 late ImageData filterImageData;
@@ -6,8 +7,8 @@ late CanvasElement canvas;
 late DivElement logDiv;
 late Image origImage;
 
-void _addControl(
-    String label, String value, DivElement parent, dynamic callback) {
+void _addControl(String label, String value, DivElement parent,
+    void Function(double) callback) {
   var amountLabel = LabelElement();
   amountLabel.text = label + ':';
   var amountEdit = InputElement();

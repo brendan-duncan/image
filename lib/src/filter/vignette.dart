@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import '../image.dart';

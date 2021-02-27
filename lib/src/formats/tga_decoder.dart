@@ -1,4 +1,3 @@
-
 import '../animation.dart';
 import '../color.dart';
 import '../image.dart';

@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -26,7 +25,8 @@ class InternalExrZipCompressor extends InternalExrCompressor
   int numScanLines() => _numScanLines;
 
   @override
-  Uint8List compress(InputBuffer input, int x, int y, [int? width, int? height]) {
+  Uint8List compress(InputBuffer input, int x, int y,
+      [int? width, int? height]) {
     throw ImageException('Zip compression not yet supported');
   }
 

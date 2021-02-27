@@ -14,7 +14,7 @@ class JpegScan {
   bool? progressive;
   int? maxH;
   int? maxV;
-  List components;
+  List<JpegComponent> components;
   int? resetInterval;
   int spectralStart;
   int spectralEnd;
@@ -48,7 +48,7 @@ class JpegScan {
   void decode() {
     var componentsLength = components.length;
     JpegComponent? component;
-    void Function(JpegComponent, List) decodeFn;
+    void Function(JpegComponent, List<int>) decodeFn;
 
     if (progressive!) {
       if (spectralStart == 0) {
@@ -65,17 +65,17 @@ class JpegScan {
     int? mcuExpected;
     if (componentsLength == 1) {
       mcuExpected =
-          (components[0].blocksPerLine * components[0].blocksPerColumn) as int?;
+          (components[0].blocksPerLine * components[0].blocksPerColumn);
     } else {
       mcuExpected = (mcusPerLine * frame.mcusPerColumn);
     }
 
     if (resetInterval == null || resetInterval == 0) {
-      resetInterval = mcuExpected!;
+      resetInterval = mcuExpected;
     }
 
     int h, v;
-    while (mcu < mcuExpected!) {
+    while (mcu < mcuExpected) {
       // reset interval stuff
       for (var i = 0; i < componentsLength; i++) {
         components[i].pred = 0;
@@ -83,16 +83,16 @@ class JpegScan {
       eobrun = 0;
 
       if (componentsLength == 1) {
-        component = components[0] as JpegComponent?;
+        component = components[0];
         for (var n = 0; n < resetInterval!; n++) {
-          _decodeBlock(component!, decodeFn, mcu);
+          _decodeBlock(component, decodeFn, mcu);
           mcu++;
         }
       } else {
         for (var n = 0; n < resetInterval!; n++) {
           for (var i = 0; i < componentsLength; i++) {
-            component = components[i] as JpegComponent?;
-            h = component!.hSamples;
+            component = components[i];
+            h = component.hSamples;
             v = component.vSamples;
             for (var j = 0; j < v; j++) {
               for (var k = 0; k < h; k++) {
@@ -145,7 +145,7 @@ class JpegScan {
     dynamic node = tree;
     int? bit;
     while ((bit = _readBit()) != null) {
-      node = node[bit];
+      node = (node as List)[bit!];
       if (node is num) {
         return node.toInt();
       }
@@ -214,7 +214,7 @@ class JpegScan {
     zz[0] = component.pred;
   }
 
-  void _decodeDCSuccessive(JpegComponent component, List zz) {
+  void _decodeDCSuccessive(JpegComponent component, List<int> zz) {
     zz[0] = (zz[0] | (_readBit()! << successive));
   }
 
@@ -244,7 +244,7 @@ class JpegScan {
     }
   }
 
-  void _decodeACSuccessive(JpegComponent component, List zz) {
+  void _decodeACSuccessive(JpegComponent component, List<int> zz) {
     var k = spectralStart;
     var e = spectralEnd;
     var s = 0;
@@ -309,7 +309,11 @@ class JpegScan {
   }
 
   void _decodeMcu(
-      JpegComponent component, dynamic decodeFn, int mcu, int row, int col) {
+      JpegComponent component,
+      void Function(JpegComponent, List<int>) decodeFn,
+      int mcu,
+      int row,
+      int col) {
     var mcuRow = (mcu ~/ mcusPerLine);
     var mcuCol = mcu % mcusPerLine;
     var blockRow = mcuRow * component.vSamples + row;
@@ -317,14 +321,15 @@ class JpegScan {
     if (blockRow >= component.blocks.length) {
       return;
     }
-    var numCols = component.blocks[blockRow].length as int;
+    var numCols = component.blocks[blockRow].length;
     if (blockCol >= numCols) {
       return;
     }
     decodeFn(component, component.blocks[blockRow][blockCol]);
   }
 
-  void _decodeBlock(JpegComponent component, dynamic decodeFn, int mcu) {
+  void _decodeBlock(JpegComponent component,
+      void Function(JpegComponent, List<int>) decodeFn, int mcu) {
     var blockRow = mcu ~/ component.blocksPerLine;
     var blockCol = mcu % component.blocksPerLine;
     decodeFn(component, component.blocks[blockRow][blockCol]);

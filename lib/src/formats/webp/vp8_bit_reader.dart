@@ -1,4 +1,3 @@
-
 import '../../util/input_buffer.dart';
 
 class VP8BitReader {

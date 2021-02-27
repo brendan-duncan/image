@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'pvrtc_bit_utility.dart';

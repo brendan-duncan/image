@@ -1,4 +1,3 @@
-
 import '../image.dart';
 import 'draw_pixel.dart';
 

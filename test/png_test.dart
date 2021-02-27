@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -59,8 +58,8 @@ void main() {
       final image2 = PngDecoder().decodeImage(png)!;
       expect(image2.iccProfile, isNotNull);
       expect(image2.iccProfile!.data, isNotNull);
-      expect(
-          image2.iccProfile!.data.length, equals(image.iccProfile!.data.length));
+      expect(image2.iccProfile!.data.length,
+          equals(image.iccProfile!.data.length));
     });
 
     final dir = Directory('test/res/png');

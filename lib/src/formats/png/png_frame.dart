@@ -1,4 +1,3 @@
-
 import '../../internal/internal.dart';
 
 // Decodes a frame from a PNG animation.

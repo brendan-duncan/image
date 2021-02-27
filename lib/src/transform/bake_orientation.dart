@@ -1,4 +1,3 @@
-
 import '../image.dart';
 import '../exif_data.dart';
 import 'flip.dart';

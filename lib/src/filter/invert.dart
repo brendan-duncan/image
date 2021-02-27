@@ -1,4 +1,3 @@
-
 import '../image.dart';
 
 /// Invert the colors of the [src] image.

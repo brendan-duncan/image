@@ -1,4 +1,3 @@
-
 import '../color.dart';
 import '../image.dart';
 import '../internal/clamp.dart';

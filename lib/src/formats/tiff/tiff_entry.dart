@@ -1,4 +1,3 @@
-
 import '../../image_exception.dart';
 import '../../util/input_buffer.dart';
 import 'tiff_image.dart';

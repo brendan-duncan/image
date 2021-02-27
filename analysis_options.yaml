@@ -2,7 +2,8 @@ include: package:pedantic/analysis_options.yaml
 
 linter:
   rules:
-    - camel_case_types
+  - avoid_dynamic_calls
+  - camel_case_types
 
 analyzer:
   strong-mode:

@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 import '../image.dart';
 import '../hdr/hdr_image.dart';

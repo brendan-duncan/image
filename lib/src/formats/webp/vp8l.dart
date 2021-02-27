@@ -56,7 +56,7 @@ class VP8L {
     image = Image(webp.width, webp.height);
 
     if (!_decodeImageData(
-        _pixels, webp.width, webp.height, webp.height, _processRows)) {
+        _pixels!, webp.width, webp.height, webp.height, _processRows)) {
       return null;
     }
 
@@ -208,7 +208,12 @@ class VP8L {
   }
 
   bool _decodeImageData(
-      dynamic data, int width, int height, int lastRow, dynamic processFunc) {
+    Uint32List data,
+    int width,
+    int height,
+    int lastRow,
+    void Function(int)? processFunc,
+  ) {
     var row = _lastPixel ~/ width;
     var col = _lastPixel % width;
 
@@ -259,7 +264,7 @@ class VP8L {
 
           if (colorCache != null) {
             while (lastCached < src) {
-              colorCache.insert(data[lastCached] as int);
+              colorCache.insert(data[lastCached]);
               lastCached++;
             }
           }
@@ -296,7 +301,7 @@ class VP8L {
           }
           if (colorCache != null) {
             while (lastCached < src) {
-              colorCache.insert(data[lastCached] as int);
+              colorCache.insert(data[lastCached]);
               lastCached++;
             }
           }
@@ -306,7 +311,7 @@ class VP8L {
         final key = code - lenCodeLimit;
 
         while (lastCached < src) {
-          colorCache!.insert(data[lastCached] as int);
+          colorCache!.insert(data[lastCached]);
           lastCached++;
         }
 
@@ -323,7 +328,7 @@ class VP8L {
           }
 
           while (lastCached < src) {
-            colorCache.insert(data[lastCached] as int);
+            colorCache.insert(data[lastCached]);
             lastCached++;
           }
         }
@@ -992,18 +997,23 @@ class InternalVP8L extends VP8L {
   InternalVP8L(InputBuffer input, WebPInfo webp) : super(input, webp);
 
   List<VP8LTransform> get transforms => _transforms;
+
   Uint32List? get pixels => _pixels;
 
   Uint8List? get opaque => _opaque;
+
   set opaque(Uint8List? value) => _opaque = value;
 
   int? get ioWidth => _ioWidth;
+
   set ioWidth(int? width) => _ioWidth = width;
+
   int? get ioHeight => _ioHeight;
+
   set ioHeight(int? height) => _ioHeight = height;
 
-  bool decodeImageData(dynamic data, int width, int height, int lastRow,
-          dynamic processFunc) =>
+  bool decodeImageData(Uint32List data, int width, int height, int lastRow,
+          void Function(int) processFunc) =>
       _decodeImageData(data, width, height, lastRow, processFunc);
 
   Uint32List? decodeImageStream(int xsize, int ysize, bool isLevel0) =>

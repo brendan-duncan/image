@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
+
 import 'jpeg_component.dart';
 
 class JpegFrame {
@@ -35,9 +36,9 @@ class JpegFrame {
       var blocksPerLineForMcu = mcusPerLine * component.hSamples;
       var blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
 
-      final blocks = List<dynamic>.generate(
+      final blocks = List.generate(
           blocksPerColumnForMcu,
-          (_) => List<dynamic>.generate(
+          (_) => List<Int32List>.generate(
               blocksPerLineForMcu, (_) => Int32List(64),
               growable: false),
           growable: false);

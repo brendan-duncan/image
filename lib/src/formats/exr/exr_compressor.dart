@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import '../../image_exception.dart';
@@ -72,7 +71,8 @@ abstract class ExrCompressor {
 
   int numScanLines();
 
-  Uint8List compress(InputBuffer inPtr, int x, int y, [int? width, int? height]) {
+  Uint8List compress(InputBuffer inPtr, int x, int y,
+      [int? width, int? height]) {
     throw ImageException('Unsupported compression type');
   }
 

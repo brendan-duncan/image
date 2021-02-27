@@ -1,4 +1,3 @@
-
 import 'dart:html';
 import 'dart:convert';
 import 'package:image/image.dart';
