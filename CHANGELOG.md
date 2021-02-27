@@ -1,3 +1,8 @@
+## 3.0.1
+
+- Improve NeuralQuantizer to fix issue encoding small GIF images.
+- Code cleanup resolving lint issues.
+
 ## 3.0.0
 
 - Migrate to null safety.
