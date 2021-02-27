@@ -322,7 +322,7 @@ class VP8Filter {
   static int AVG2(int a, int b) => shiftR(((a) + (b) + 1), 1);
 
   static void VE4(InputBuffer dst) {
-    final top = -VP8.BPS; // dst +
+    const top = -VP8.BPS; // dst +
     final vals = <int>[
       AVG3(dst[top - 1], dst[top], dst[top + 1]),
       AVG3(dst[top], dst[top + 1], dst[top + 2]),
@@ -367,7 +367,7 @@ class VP8Filter {
 
   static void trueMotion(InputBuffer dst, int size) {
     var di = 0;
-    final top = -VP8.BPS; // dst +
+    const top = -VP8.BPS; // dst +
     final clip0 = 255 - dst[top - 1]; // clip1 +
 
     for (var y = 0; y < size; ++y) {
