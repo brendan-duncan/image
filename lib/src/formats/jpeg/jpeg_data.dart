@@ -25,8 +25,8 @@ class JpegData {
   final exif = ExifData();
   final quantizationTables = List<Int16List?>.filled(Jpeg.NUM_QUANT_TBLS, null);
   final frames = <JpegFrame?>[];
-  final huffmanTablesAC = <dynamic>[];
-  final huffmanTablesDC = <dynamic>[];
+  final huffmanTablesAC = <List?>[];
+  final huffmanTablesDC = <List?>[];
   final components = <ComponentData>[];
 
   bool validate(List<int> bytes) {
@@ -570,8 +570,7 @@ class JpegData {
       throw ImageException('Invalid SOS block');
     }
 
-    final components = List<dynamic>.filled(n, null);
-    for (var i = 0; i < n; i++) {
+    final components = List<JpegComponent>.generate(n, (i) {
       final id = block.readByte();
       final c = block.readByte();
 
@@ -579,19 +578,20 @@ class JpegData {
         throw ImageException('Invalid Component in SOS block');
       }
 
-      final component = frame!.components[id];
-      components[i] = component;
+      final component = frame!.components[id]!;
 
       final dc_tbl_no = (c >> 4) & 15;
       final ac_tbl_no = c & 15;
 
       if (dc_tbl_no < huffmanTablesDC.length) {
-        component!.huffmanTableDC = huffmanTablesDC[dc_tbl_no] as List?;
+        component.huffmanTableDC = huffmanTablesDC[dc_tbl_no]!;
       }
       if (ac_tbl_no < huffmanTablesAC.length) {
-        component!.huffmanTableAC = huffmanTablesAC[ac_tbl_no] as List?;
+        component.huffmanTableAC = huffmanTablesAC[ac_tbl_no]!;
       }
-    }
+
+      return component;
+    });
 
     final spectralStart = block.readByte();
     final spectralEnd = block.readByte();
@@ -600,8 +600,8 @@ class JpegData {
     final Ah = (successiveApproximation >> 4) & 15;
     final Al = successiveApproximation & 15;
 
-    JpegScan(input, frame!, components.cast<JpegComponent>(), resetInterval,
-            spectralStart, spectralEnd, Ah, Al)
+    JpegScan(input, frame!, components, resetInterval, spectralStart,
+            spectralEnd, Ah, Al)
         .decode();
   }
 

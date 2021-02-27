@@ -141,7 +141,7 @@ class JpegScan {
     return (bitsData >> 7) & 1;
   }
 
-  int? _decodeHuffman(dynamic tree) {
+  int? _decodeHuffman(List tree) {
     dynamic node = tree;
     int? bit;
     while ((bit = _readBit()) != null) {

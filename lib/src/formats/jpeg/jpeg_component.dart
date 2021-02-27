@@ -8,8 +8,8 @@ class JpegComponent {
   late int blocksPerLine;
   late int blocksPerColumn;
   late List<List<List<int>>> blocks;
-  List? huffmanTableDC;
-  List? huffmanTableAC;
+  late List huffmanTableDC;
+  late List huffmanTableAC;
   late int pred;
 
   JpegComponent(this.hSamples, this.vSamples, this.quantizationTableList,
