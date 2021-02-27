@@ -398,11 +398,8 @@ class NeuralQuantizer extends Quantizer {
     var j = i + 1;
     var k = i - 1;
     var m = 1;
-    var q = 0;
     while ((j < hi) || (k > lo)) {
       final a = _radiusPower[m++];
-      //final a = (alpha * (rad * rad - q * q)) / (rad * rad);
-      q++;
       if (j < hi) {
         final p = j * 3;
         _network[p] -= (a * (_network[p] - b)) / alphaRadiusBias;
