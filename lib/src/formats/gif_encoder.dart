@@ -2,14 +2,18 @@ import 'dart:typed_data';
 
 import '../animation.dart';
 import '../image.dart';
+import '../util/dither_pixels.dart';
 import '../util/neural_quantizer.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 
 class GifEncoder extends Encoder {
   int delay, repeat, samplingFactor;
+  DitherKernel dither;
+  bool ditherSerpentine;
 
-  GifEncoder({this.delay = 80, this.repeat = 0, this.samplingFactor = 10})
+  GifEncoder({ this.delay = 80, this.repeat = 0, this.samplingFactor = 10,
+    this.dither = DitherKernel.FloydSteinberg, this.ditherSerpentine = false })
       : _encodedFrames = 0;
 
   /// This adds the frame passed to [image].
@@ -20,7 +24,8 @@ class GifEncoder extends Encoder {
       output = OutputBuffer();
 
       _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
-      _lastImage = _lastColorMap!.getIndexMap(image);
+      _lastImage = ditherPixels(image, _lastColorMap!,
+          dither, ditherSerpentine);
       _lastImageDuration = duration;
 
       _width = image.width;
@@ -39,7 +44,8 @@ class GifEncoder extends Encoder {
     _encodedFrames++;
 
     _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
-    _lastImage = _lastColorMap!.getIndexMap(image);
+    _lastImage = ditherPixels(image, _lastColorMap!,
+        dither, ditherSerpentine);
     _lastImageDuration = duration;
   }
 

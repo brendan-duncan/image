@@ -1,3 +1,7 @@
+## 3.0.2
+
+- Add dithering to GIF encoder.
+
 ## 3.0.1
 
 - Improve NeuralQuantizer to fix issue encoding small GIF images.

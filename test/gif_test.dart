@@ -9,6 +9,7 @@ void main() {
   final files = dir.listSync();
 
   group('GIF', () {
+    print(tmpPath);
     for (var f in files.whereType<File>()) {
       if (!f.path.endsWith('.gif')) {
         continue;
