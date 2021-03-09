@@ -31,16 +31,23 @@ Image drawImage(Image dst, Image src,
   srcH ??= src.height;
   dstW ??= (dst.width < src.width) ? dstW = dst.width : src.width;
   dstH ??= (dst.height < src.height) ? dst.height : src.height;
-
-  for (var y = 0; y < dstH; ++y) {
-    for (var x = 0; x < dstW; ++x) {
-      final stepX = (x * (srcW / dstW)).toInt();
-      final stepY = (y * (srcH / dstH)).toInt();
-
-      final srcPixel = src.getPixel(srcX + stepX, srcY + stepY);
-      if (blend) {
+    
+  if (blend) {
+    for (var y = 0; y < dstH; ++y) {
+      for (var x = 0; x < dstW; ++x) {
+        final stepX = (x * (srcW / dstW)).toInt();
+        final stepY = (y * (srcH / dstH)).toInt();
+        final srcPixel = src.getPixel(srcX + stepX, srcY + stepY);
         drawPixel(dst, dstX + x, dstY + y, srcPixel);
-      } else {
+      }
+    }
+  }
+  else {
+    for (var y = 0; y < dstH; ++y) {
+      for (var x = 0; x < dstW; ++x) {
+        final stepX = (x * (srcW / dstW)).toInt();
+        final stepY = (y * (srcH / dstH)).toInt();
+        final srcPixel = src.getPixel(srcX + stepX, srcY + stepY);
         dst.setPixel(dstX + x, dstY + y, srcPixel);
       }
     }
