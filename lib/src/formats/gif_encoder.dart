@@ -353,7 +353,7 @@ class GifEncoder extends Encoder {
 
   OutputBuffer? output;
 
-  static const String GIF89_STAMP = 'GIF89a';
+  static const GIF89_STAMP = 'GIF89a';
 
   static const IMAGE_DESC_RECORD_TYPE = 0x2c;
   static const EXTENSION_RECORD_TYPE = 0x21;
@@ -365,7 +365,7 @@ class GifEncoder extends Encoder {
   static const EOF = -1;
   static const BITS = 12;
   static const HSIZE = 5003; // 80% occupancy
-  static const List<int> MASKS = [
+  static const MASKS = [
     0x0000,
     0x0001,
     0x0003,

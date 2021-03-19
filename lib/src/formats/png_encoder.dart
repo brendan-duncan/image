@@ -362,7 +362,7 @@ class PngEncoder extends Encoder {
 
   Channels? channels;
   int filter;
-  late int repeat;
+  int repeat = 0;
   int? level;
   late int xOffset;
   late int yOffset;
@@ -373,7 +373,7 @@ class PngEncoder extends Encoder {
   late int _height;
   late int _frames;
   int sequenceNumber = 0;
-  late bool isAnimated;
+  bool isAnimated = false;
   OutputBuffer? output;
 
   static const FILTER_NONE = 0;
