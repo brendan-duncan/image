@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'dart:math';
+import 'dart:typed_data';
 import '../image.dart';
 import 'neural_quantizer.dart';
 

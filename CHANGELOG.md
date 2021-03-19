@@ -1,6 +1,8 @@
 ## 3.0.2
 
-- Add dithering to GIF encoder.
+- Dithering support for GIF encoder.
+- Fix PNGEncoder issue if addFrame is called directly instead than encodeImage or encodeAnimation.
+- Optimization for drawImage.
 
 ## 3.0.1
 
