@@ -41,8 +41,7 @@ Image drawImage(Image dst, Image src,
         drawPixel(dst, dstX + x, dstY + y, srcPixel);
       }
     }
-  }
-  else {
+  } else {
     for (var y = 0; y < dstH; ++y) {
       for (var x = 0; x < dstW; ++x) {
         final stepX = (x * (srcW / dstW)).toInt();

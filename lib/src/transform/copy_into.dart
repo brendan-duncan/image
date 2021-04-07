@@ -29,11 +29,15 @@ Image copyInto(Image dst, Image src,
   srcW ??= src.width;
   srcH ??= src.height;
 
-  for (var y = 0; y < srcH; ++y) {
-    for (var x = 0; x < srcW; ++x) {
-      if (blend) {
+  if (blend) {
+    for (var y = 0; y < srcH; ++y) {
+      for (var x = 0; x < srcW; ++x) {
         drawPixel(dst, dstX + x, dstY + y, src.getPixel(srcX + x, srcY + y));
-      } else {
+      }
+    }
+  } else {
+    for (var y = 0; y < srcH; ++y) {
+      for (var x = 0; x < srcW; ++x) {
         dst.setPixel(dstX + x, dstY + y, src.getPixel(srcX + x, srcY + y));
       }
     }
