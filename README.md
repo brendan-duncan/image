@@ -6,12 +6,16 @@
 
 A Dart library providing the ability to load, save and manipulate images in a variety of different file formats.
 
-The library has no reliance on `dart:io`, so it can be used for both server and
-web applications. 
+The library is written entirely in Dart and has no reliance on `dart:io`, so it can be used for both 
+server and web applications.
 
-**Supported Image Formats:**
+### Performance Warning
+Because this library is written entirely in Dart and is a not native executed library, its performance
+will not be as fast as a native library.
 
-Read/Write:
+### Supported Image Formats
+
+**Read/Write**
 
 - PNG / Animated APNG
 - JPEG
@@ -20,7 +24,7 @@ Read/Write:
 - PVR(PVRTC)
 - ICO
 
-Read Only:
+**Read Only**
 
 - BMP
 - WebP / Animated WebP
@@ -28,7 +32,7 @@ Read Only:
 - Photoshop PSD
 - OpenEXR
 
-Write Only:
+**Write Only**
 
 - CUR
 
