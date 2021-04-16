@@ -22,6 +22,7 @@ class JpegData {
   JpegAdobe? adobe;
   JpegFrame? frame;
   int? resetInterval;
+  String? comment;
   final exif = ExifData();
   final quantizationTables = List<Int16List?>.filled(Jpeg.NUM_QUANT_TBLS, null);
   final frames = <JpegFrame?>[];
@@ -459,6 +460,15 @@ class JpegData {
         adobe!.flags0 = (appData[7] << 8) | appData[8];
         adobe!.flags1 = (appData[9] << 8) | appData[10];
         adobe!.transformCode = appData[11];
+      }
+    } else if (marker == Jpeg.M_COM) {
+      // Comment
+      try {
+        comment = appData.readString();
+        // print('ReadComment:$comment');
+      } catch (e, stacktrace) {
+        //readString without 0x00 terminator causes exception
+        // print('ReadComment Failed:$e,$stacktrace');
       }
     } else {
       //print("!!!! UNHANDLED APP TAG 0x${marker.toRadixString(16)}");
