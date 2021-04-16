@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import '../image_exception.dart';
@@ -122,7 +123,7 @@ class InputBuffer {
       while (!isEOS) {
         final c = readByte();
         if (c == 0) {
-          return String.fromCharCodes(codes);
+          return utf8.decode(codes);
         }
         codes.add(c);
       }
@@ -131,7 +132,7 @@ class InputBuffer {
 
     final s = readBytes(len);
     final bytes = s.toUint8List();
-    final str = String.fromCharCodes(bytes);
+    final str = utf8.decode(bytes);
     return str;
   }
 
