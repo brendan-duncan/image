@@ -19,7 +19,7 @@ class JpegEncoder extends Encoder {
   }
 
   void setQuality(int quality) {
-    quality = quality.clamp(0, 100).toInt();
+    quality = quality.clamp(1, 100).toInt();
 
     if (currentQuality == quality) {
       // don't re-calc if unchanged
