@@ -260,7 +260,7 @@ class WebPDecoder extends Decoder {
           }
           break;
         case 'ICCP':
-          webp!.iccp = input.readString(size);
+          webp!.iccp = input.readBytes(size).toUint8List();
           break;
         case 'EXIF':
           webp!.exif = input.readString(size);

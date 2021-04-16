@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import '../../internal/internal.dart';
 import '../../util/input_buffer.dart';
 import '../decode_info.dart';
@@ -20,8 +21,8 @@ class WebPInfo extends DecodeInfo {
   // 0 = undefined (/mixed), 1 = lossy, 2 = lossless, 3 = animated
   int format = FORMAT_UNDEFINED;
 
-  // ICCP data string.
-  String iccp = '';
+  // ICCP data.
+  Uint8List? iccp = null;
 
   // EXIF data string.
   String exif = '';
