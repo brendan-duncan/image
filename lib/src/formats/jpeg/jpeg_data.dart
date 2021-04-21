@@ -466,7 +466,7 @@ class JpegData {
       try {
         comment = appData.readString();
         // print('ReadComment:$comment');
-      } catch (e, stacktrace) {
+      } catch (e, _) {
         //readString without 0x00 terminator causes exception
         // print('ReadComment Failed:$e,$stacktrace');
       }
