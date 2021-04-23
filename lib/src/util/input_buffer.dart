@@ -123,7 +123,7 @@ class InputBuffer {
       while (!isEOS) {
         final c = readByte();
         if (c == 0) {
-          return utf8.decode(codes);
+          return String.fromCharCodes(codes);
         }
         codes.add(c);
       }
@@ -132,8 +132,21 @@ class InputBuffer {
 
     final s = readBytes(len);
     final bytes = s.toUint8List();
-    final str = utf8.decode(bytes);
+    final str = String.fromCharCodes(bytes);
     return str;
+  }
+
+  /// Read a null-terminated UTF-8 string.
+  String readStringUtf8() {
+    final codes = <int>[];
+    while (!isEOS) {
+      final c = readByte();
+      if (c == 0) {
+        return utf8.decode(codes);
+      }
+      codes.add(c);
+    }
+    throw ImageException('EOF reached without finding string terminator');
   }
 
   /// Read a 16-bit word from the stream.

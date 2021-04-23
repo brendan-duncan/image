@@ -464,14 +464,11 @@ class JpegData {
     } else if (marker == Jpeg.M_COM) {
       // Comment
       try {
-        comment = appData.readString();
-        // print('ReadComment:$comment');
+        comment = appData.readStringUtf8();
       } catch (e, _) {
-        //readString without 0x00 terminator causes exception
-        // print('ReadComment Failed:$e,$stacktrace');
+        // readString without 0x00 terminator causes exception. Technically
+        // bad data, but no reason to abort the rest of the image decoding.
       }
-    } else {
-      //print("!!!! UNHANDLED APP TAG 0x${marker.toRadixString(16)}");
     }
   }
 
