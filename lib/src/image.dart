@@ -231,6 +231,18 @@ class Image {
     return this;
   }
 
+  /// Set all of the empty pixels (for png's) of the image to the given [color].
+  void fillBackground(int color) {
+    // loop all pixels
+    for (var i = 0; i < length; i++) {
+      // value 0 means null pixel
+      if (data[i] == 0) {
+        // set the pixel to the given color
+        data[i] = color;
+      }
+    }
+  }
+
   /// Add the colors of [other] to the pixels of this image.
   Image operator +(Image other) {
     final h = min(height, other.height);
