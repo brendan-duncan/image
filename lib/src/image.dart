@@ -93,13 +93,16 @@ class Image {
   /// ICC color profile read from an image file.
   ICCProfileData? iccProfile;
 
+  /// {@template Image/Image_constructor}
   /// Create an image with the given dimensions and format.
+  /// {@endtemplate}
   Image(this.width, this.height,
       {this.channels = Channels.rgba, ExifData? exif, ICCProfileData? iccp})
       : data = Uint32List(width * height),
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
+  /// {@macro Image/Image_constructor}
   Image.rgb(this.width, this.height, {ExifData? exif, ICCProfileData? iccp})
       : channels = Channels.rgb,
         data = Uint32List(width * height),
