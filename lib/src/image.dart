@@ -93,13 +93,16 @@ class Image {
   /// ICC color profile read from an image file.
   ICCProfileData? iccProfile;
 
+  /// {@template Image/Image_constructor}
   /// Create an image with the given dimensions and format.
+  /// {@endtemplate}
   Image(this.width, this.height,
       {this.channels = Channels.rgba, ExifData? exif, ICCProfileData? iccp})
       : data = Uint32List(width * height),
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
+  /// {@macro Image/Image_constructor}
   Image.rgb(this.width, this.height, {ExifData? exif, ICCProfileData? iccp})
       : channels = Channels.rgb,
         data = Uint32List(width * height),
@@ -229,6 +232,18 @@ class Image {
   Image fill(int color) {
     data.fillRange(0, data.length, color);
     return this;
+  }
+
+  /// Set all of the empty pixels (for png's) of the image to the given [color].
+  void fillBackground(int color) {
+    // loop all pixels
+    for (var i = 0; i < length; i++) {
+      // value 0 means null pixel
+      if (data[i] == 0) {
+        // set the pixel to the given color
+        data[i] = color;
+      }
+    }
   }
 
   /// Add the colors of [other] to the pixels of this image.
