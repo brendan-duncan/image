@@ -86,6 +86,13 @@ class Color {
 ///
 /// The channel order of a uint32 encoded color is RGBA.
 int getColor(int r, int g, int b, [int a = 255]) =>
+    // what we're doing here, is creating a 32 bit
+    // integer by collecting the rgba in one integer.
+    // we know for certain and we're also assuring that
+    // all our variables' values are 255 at maximum,
+    // which means that they can never be bigger than
+    // 8 bits  so we can safely slide each one by 8 bits
+    // for adding the other.
     (clamp255(a) << 24) |
     (clamp255(b) << 16) |
     (clamp255(g) << 8) |
@@ -176,7 +183,7 @@ int getLuminance(int color) {
   final r = getRed(color);
   final g = getGreen(color);
   final b = getBlue(color);
-  return (0.299 * r + 0.587 * g + 0.114 * b).round();
+  return getLuminanceRgb(r, g, b);
 }
 
 /// Returns the luminance (grayscale) value of the color.
