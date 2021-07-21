@@ -430,9 +430,9 @@ class Image {
         .toInt();
 
     final Icc = getPixelSafe(x, y);
-    final Inc = getPixelSafe(nx, y);
-    final Icn = getPixelSafe(x, ny);
-    final Inn = getPixelSafe(nx, ny);
+    final Icn = ny >= height ? Icc : getPixelSafe(x, ny);
+    final Inc = nx >= width ? Icc : getPixelSafe(nx, y);
+    final Inn = nx >= width || ny >= height ? Icc : getPixelSafe(nx, ny);
 
     return getColor(
         _linear(getRed(Icc), getRed(Inc), getRed(Icn), getRed(Inn)),
@@ -463,11 +463,15 @@ class Image {
                 dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
                 dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
 
-    final Ipp = getPixelSafe(px, py);
-    final Icp = getPixelSafe(x, py);
-    final Inp = getPixelSafe(nx, py);
-    final Iap = getPixelSafe(ax, py);
+    final Icc = getPixelSafe(x, y);
+
+    final Ipp = px < 0 || py < 0 ? Icc : getPixelSafe(px, py);
+    final Icp = px < 0 ? Icc : getPixelSafe(x, py);
+    final Inp = py < 0 || nx >= width ? Icc : getPixelSafe(nx, py);
+    final Iap = ax >= width || py < 0 ? Icc : getPixelSafe(ax, py);
+
     final Ip0 = _cubic(dx, getRed(Ipp), getRed(Icp), getRed(Inp), getRed(Iap));
+
     final Ip1 =
         _cubic(dx, getGreen(Ipp), getGreen(Icp), getGreen(Inp), getGreen(Iap));
     final Ip2 =
@@ -475,10 +479,10 @@ class Image {
     final Ip3 =
         _cubic(dx, getAlpha(Ipp), getAlpha(Icp), getAlpha(Inp), getAlpha(Iap));
 
-    final Ipc = getPixelSafe(px, y);
-    final Icc = getPixelSafe(x, y);
-    final Inc = getPixelSafe(nx, y);
-    final Iac = getPixelSafe(ax, y);
+    final Ipc = px < 0 ? Icc : getPixelSafe(px, y);
+    final Inc = nx >= width ? Icc : getPixelSafe(nx, y);
+    final Iac = ax >= width ? Icc : getPixelSafe(ax, y);
+
     final Ic0 = _cubic(dx, getRed(Ipc), getRed(Icc), getRed(Inc), getRed(Iac));
     final Ic1 =
         _cubic(dx, getGreen(Ipc), getGreen(Icc), getGreen(Inc), getGreen(Iac));
@@ -487,10 +491,11 @@ class Image {
     final Ic3 =
         _cubic(dx, getAlpha(Ipc), getAlpha(Icc), getAlpha(Inc), getAlpha(Iac));
 
-    final Ipn = getPixelSafe(px, ny);
-    final Icn = getPixelSafe(x, ny);
-    final Inn = getPixelSafe(nx, ny);
-    final Ian = getPixelSafe(ax, ny);
+    final Ipn = px < 0 || ny >= height ? Icc : getPixelSafe(px, ny);
+    final Icn = ny >= height ? Icc : getPixelSafe(x, ny);
+    final Inn = nx >= width || ny >= height ? Icc : getPixelSafe(nx, ny);
+    final Ian = ax >= width || ny >= height ? Icc : getPixelSafe(ax, ny);
+
     final In0 = _cubic(dx, getRed(Ipn), getRed(Icn), getRed(Inn), getRed(Ian));
     final In1 =
         _cubic(dx, getGreen(Ipn), getGreen(Icn), getGreen(Inn), getGreen(Ian));
@@ -499,10 +504,11 @@ class Image {
     final In3 =
         _cubic(dx, getAlpha(Ipn), getAlpha(Icn), getAlpha(Inn), getAlpha(Ian));
 
-    final Ipa = getPixelSafe(px, ay);
-    final Ica = getPixelSafe(x, ay);
-    final Ina = getPixelSafe(nx, ay);
-    final Iaa = getPixelSafe(ax, ay);
+    final Ipa = px < 0 || ay >= height ? Icc : getPixelSafe(px, ay);
+    final Ica = ay >= height ? Icc : getPixelSafe(x, ay);
+    final Ina = nx >= width || ay >= height ? Icc : getPixelSafe(nx, ay);
+    final Iaa = ax >= width || ay >= height ? Icc : getPixelSafe(ax, ay);
+
     final Ia0 = _cubic(dx, getRed(Ipa), getRed(Ica), getRed(Ina), getRed(Iaa));
     final Ia1 =
         _cubic(dx, getGreen(Ipa), getGreen(Ica), getGreen(Ina), getGreen(Iaa));

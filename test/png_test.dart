@@ -46,6 +46,20 @@ void main() {
 
       final png = PngEncoder().encodeImage(image);
       File('$tmpPath/out/png/decode.png').writeAsBytesSync(png);
+
+      final b2 = File('E:/test_dart_png.png').readAsBytesSync();
+      final i2 = decodeImage(b2);
+      expect(i2!.width, equals(3456));
+      expect(i2.height, equals(212));
+      var valid = false;
+      for (var i = 0; i < i2.length; ++i) {
+        if (i2[i] != 0) {
+          valid = true;
+          break;
+        }
+      }
+      expect(valid, equals(true));
+      File('E:/test_decoded.png').writeAsBytesSync(PngEncoder().encodeImage(i2));
     });
 
     test('iCCP', () {
