@@ -151,4 +151,8 @@ class ExrWavelet {
     a_b[1] = bb;
     a_b[0] = aa;
   }
+
+  // DartAnalyzer doesn't like classes with only static members now, so
+  // I added this member for now to avoid the warnings.
+  var fixWarnings = 0;
 }

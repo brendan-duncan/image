@@ -1613,4 +1613,8 @@ class BitUtility {
     7,
     7
   ];
+
+  // DartAnalyzer doesn't like classes with only static members now, so
+  // I added this member for now to avoid the warnings.
+  var fixWarnings = 0;
 }

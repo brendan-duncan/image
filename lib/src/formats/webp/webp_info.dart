@@ -22,7 +22,7 @@ class WebPInfo extends DecodeInfo {
   int format = FORMAT_UNDEFINED;
 
   // ICCP data.
-  Uint8List? iccp = null;
+  Uint8List? iccp;
 
   // EXIF data string.
   String exif = '';

@@ -1,3 +1,7 @@
+## 3.0.4
+
+- Fix Dart warnings from the previous release.
+
 ## 3.0.3
 
 - Fix #320 - copyResize incorrectly applies linear and cubic.

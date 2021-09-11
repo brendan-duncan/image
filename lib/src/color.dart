@@ -80,6 +80,10 @@ class Color {
       return sqrt(d1 * d1 + d2 * d2 + d3 * d3);
     }
   }
+
+  // DartAnalyzer doesn't like classes with only static members now, so
+  // I added this member for now to avoid the warnings.
+  var fixWarnings = 0;
 }
 
 /// Get the color with the given [r], [g], [b], and [a] components.

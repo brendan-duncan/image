@@ -330,6 +330,10 @@ class ExrHuffman {
   static const LONG_ZEROCODE_RUN = 63;
   static const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
   static const LONGEST_LONG_RUN = 255 + SHORTEST_LONG_RUN;
+
+  // DartAnalyzer doesn't like classes with only static members now, so
+  // I added this member for now to avoid the warnings.
+  var fixWarnings = 0;
 }
 
 class ExrHufDec {

@@ -1,8 +1,7 @@
 import 'dart:io';
 
-import 'package:test/test.dart';
-
 import 'package:image/image.dart';
+import 'package:test/test.dart';
 
 import 'paths.dart';
 

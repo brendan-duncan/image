@@ -218,7 +218,7 @@ Image getImageFromJpeg(JpegData jpeg) {
   final width = flipWidthHeight ? h : w;
   final height = flipWidthHeight ? w : h;
 
-  final image = Image(width, height!, channels: Channels.rgb);
+  final image = Image(width, height, channels: Channels.rgb);
 
   // Copy exif data, except for ORIENTATION which we're baking.
   image.exif = ExifData();
