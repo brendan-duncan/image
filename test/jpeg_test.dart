@@ -37,21 +37,17 @@ void main() {
       test('exif/orientation_$i/landscape', () {
         final image = JpegDecoder().decodeImage(
             File('test/res/jpg/landscape_$i.jpg').readAsBytesSync());
-        expect(image.exif.hasOrientation, equals(true));
-        expect(image.exif.orientation, equals(i));
-        File('$tmpPath/out/jpg/landscape_$i.png')
+        File('$tmpPath/out/jpg/landscape_$i.jpg')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(PngEncoder().encodeImage(bakeOrientation(image)));
+          ..writeAsBytesSync(JpegEncoder().encodeImage(image));
       });
 
       test('exif/orientation_$i/portrait', () {
         final image = JpegDecoder().decodeImage(
             File('test/res/jpg/portrait_$i.jpg').readAsBytesSync());
-        expect(image.exif.hasOrientation, equals(true));
-        expect(image.exif.orientation, equals(i));
         File('$tmpPath/out/jpg/portrait_$i.png')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(PngEncoder().encodeImage(bakeOrientation(image)));
+          ..writeAsBytesSync(JpegEncoder().encodeImage(image));
       });
     }
   });

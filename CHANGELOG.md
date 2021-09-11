@@ -1,6 +1,7 @@
 ## 3.0.3
 
--
+- Fix #320 - copyResize incorrectly applies linear and cubic.
+- Apply EXIF orientation when decoding JPEG images.
 
 ## 3.0.2
 
