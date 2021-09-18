@@ -145,6 +145,14 @@ void main() {
       fp.writeAsBytesSync(writeJpg(f));
     });
 
+    test('binary', () {
+      final f = Image.from(image);
+      binary(f);
+      final fp = File('$tmpPath/out/binary.jpg');
+      fp.createSync(recursive: true);
+      fp.writeAsBytesSync(writeJpg(f));
+    });
+
     test('copyResize', () {
       final f = copyResize(image, height: 100);
       expect(f.height, equals(100));
@@ -156,7 +164,8 @@ void main() {
     test('copyResize linear', () {
       final img = Image(8, 8);
       img.fill(getColor(255, 255, 255));
-      final img2 = copyResize(img, height: 16, interpolation: Interpolation.linear);
+      final img2 =
+          copyResize(img, height: 16, interpolation: Interpolation.linear);
       var valid = true;
       for (var y = 0; y < 16; ++y) {
         for (var x = 0; x < 16; ++x) {
@@ -171,7 +180,8 @@ void main() {
     test('copyResize cubic', () {
       final img = Image(8, 8);
       img.fill(getColor(255, 255, 255));
-      final img2 = copyResize(img, height: 16, interpolation: Interpolation.cubic);
+      final img2 =
+          copyResize(img, height: 16, interpolation: Interpolation.cubic);
       var valid = true;
       for (var y = 0; y < 16; ++y) {
         for (var x = 0; x < 16; ++x) {

@@ -18,6 +18,7 @@ export 'src/draw/fill_rect.dart';
 export 'src/effects/drop_shadow.dart';
 export 'src/filter/adjust_color.dart';
 export 'src/filter/brightness.dart';
+export 'src/filter/binary.dart';
 export 'src/filter/bump_to_normal.dart';
 export 'src/filter/color_offset.dart';
 export 'src/filter/contrast.dart';
