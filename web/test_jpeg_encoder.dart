@@ -21,7 +21,6 @@ void main() {
   final jpg = encodeJpg(image, quality: 25);
 
   final jpg64 = base64Encode(jpg);
-  final img = document.createElement('img') as ImageElement;
-  img.src = 'data:image/jpeg;base64,$jpg64';
+  final img = ImageElement(src: 'data:image/jpeg;base64,$jpg64');
   document.body!.append(img);
 }

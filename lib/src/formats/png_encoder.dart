@@ -42,7 +42,7 @@ class PngEncoder extends Encoder {
 
     _filter(image, filteredImage);
 
-    final compressed = ZLibEncoder().encode(filteredImage, level: level);
+    final compressed = const ZLibEncoder().encode(filteredImage, level: level);
 
     if (isAnimated) {
       _writeFrameControlChunk();

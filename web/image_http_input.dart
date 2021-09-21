@@ -67,14 +67,12 @@ void onFileLoaded(Event event) {
     // This requires encoding it to a common format (like PNG), base64 encoding
     // the encoded image, and using a data url for the img src.
 
-    final img = ImageElement();
-    document.body!.append(img);
     // encode the image to a PNG
     final png = encodePng(image);
     // base64 encode the png
     final png64 = base64Encode(png);
-    // set the img src as a data url
-    img.src = 'data:image/png;base64,$png64';
+    final img = ImageElement(src: 'data:image/png;base64,$png64');
+    document.body!.append(img);
   }
 
   return;

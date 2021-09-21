@@ -286,7 +286,7 @@ class PngDecoder extends Decoder {
 
     final image = Image(width!, height!, channels: channels);
 
-    final uncompressed = ZLibDecoder().decodeBytes(imageData);
+    final uncompressed = const ZLibDecoder().decodeBytes(imageData);
 
     // input is the decompressed data.
     final input = InputBuffer(uncompressed, bigEndian: true);

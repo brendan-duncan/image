@@ -26,6 +26,7 @@ void main() {
           final png = encodePng(image);
 
           final png64 = base64Encode(png);
+          // ignore: unsafe_html
           img.src = 'data:image/png;base64,$png64';
         }
       });

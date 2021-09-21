@@ -315,7 +315,7 @@ class TiffImage {
         bdata = InputBuffer(outData);
       } else if (compression == COMPRESSION_ZIP) {
         final data = p.toList(0, byteCount);
-        final outData = ZLibDecoder().decodeBytes(data);
+        final outData = const ZLibDecoder().decodeBytes(data);
         bdata = InputBuffer(outData);
       } else if (compression == COMPRESSION_OLD_JPEG) {
         image ??= Image(width!, height!);
@@ -778,7 +778,7 @@ class TiffImage {
       } catch (_) {}
     } else if (compression == COMPRESSION_ZIP) {
       final data = p.toList(0, byteCount);
-      final outData = ZLibDecoder().decodeBytes(data);
+      final outData = const ZLibDecoder().decodeBytes(data);
       bdata = InputBuffer(outData);
     } else if (compression == COMPRESSION_DEFLATE) {
       final data = p.toList(0, byteCount);

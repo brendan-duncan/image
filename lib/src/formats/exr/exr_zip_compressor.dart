@@ -15,7 +15,7 @@ abstract class ExrZipCompressor extends ExrCompressor {
 
 class InternalExrZipCompressor extends InternalExrCompressor
     implements ExrZipCompressor {
-  ZLibDecoder zlib = ZLibDecoder();
+  ZLibDecoder zlib = const ZLibDecoder();
 
   InternalExrZipCompressor(
       ExrPart header, int? maxScanLineSize, this._numScanLines)

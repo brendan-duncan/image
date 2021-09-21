@@ -123,7 +123,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     return _output!.getBytes() as Uint8List;
   }
 
-  final _zlib = ZLibDecoder();
+  final _zlib = const ZLibDecoder();
   final int? _maxScanLineSize;
   final int _numScanLines;
   OutputBuffer? _output;

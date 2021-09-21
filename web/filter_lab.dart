@@ -365,8 +365,7 @@ void main() {
     }
   });
 
-  final img = ImageElement();
-  img.src = 'res/big_buck_bunny.jpg';
+  final img = ImageElement(src: 'res/big_buck_bunny.jpg');
   img.onLoad.listen((e) {
     final c = CanvasElement();
     c.width = img.width;
