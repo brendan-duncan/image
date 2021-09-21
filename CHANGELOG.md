@@ -1,3 +1,7 @@
+## 3.0.5
+
+- Fix copyResize for landscape oriented images.
+
 ## 3.0.4
 
 - Fix Dart warnings from the previous release.
