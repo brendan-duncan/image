@@ -145,6 +145,30 @@ void main() {
       fp.writeAsBytesSync(writeJpg(f));
     });
 
+    test('copyResize_orientation', () {
+      for (var i = 1; i <= 8; ++i) {
+        final img = decodeJpg(
+            File('test/res/jpg/landscape_$i.jpg').readAsBytesSync());
+        final f = copyResize(img, height: 100);
+        expect(f.width, equals(133));
+        expect(f.height, equals(100));
+        final fp = File('$tmpPath/out/copyResize_landscape_$i.jpg');
+        fp.createSync(recursive: true);
+        fp.writeAsBytesSync(writeJpg(f));
+      }
+
+      for (var i = 1; i <= 8; ++i) {
+        final img = decodeJpg(
+            File('test/res/jpg/portrait_$i.jpg').readAsBytesSync());
+        final f = copyResize(img, height: 100);
+        expect(f.width, equals(75));
+        expect(f.height, equals(100));
+        final fp = File('$tmpPath/out/copyResize_portrait_$i.jpg');
+        fp.createSync(recursive: true);
+        fp.writeAsBytesSync(writeJpg(f));
+      }
+    });
+
     test('copyResize', () {
       final f = copyResize(image, height: 100);
       expect(f.height, equals(100));

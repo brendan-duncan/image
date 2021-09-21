@@ -22,16 +22,12 @@ Image copyResize(Image src,
   src = bakeOrientation(src);
 
   // this block sets [width] and [height] if null or negative.
-  {
-    final srcRatio = src.height / src.width;
+  if (height == null || height <= 0) {
+    height = (width! * (src.height / src.width)).toInt();
+  }
 
-    if (height == null || height <= 0) {
-      height = (width! * srcRatio).toInt();
-    }
-
-    if (width == null || width <= 0) {
-      width = (height * srcRatio).toInt();
-    }
+  if (width == null || width <= 0) {
+    width = (height * (src.width / src.height)).toInt();
   }
 
   if (width == src.width && height == src.height) {
