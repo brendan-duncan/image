@@ -1,10 +1,6 @@
 import 'dart:typed_data';
 
 import '../../../image.dart';
-import '../../formats/decode_info.dart';
-import '../../hdr/hdr_slice.dart';
-import '../../image_exception.dart';
-import '../../util/input_buffer.dart';
 import 'exr_part.dart';
 
 class ExrImage extends DecodeInfo {

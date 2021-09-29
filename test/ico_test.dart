@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:image/image.dart';
-import 'package:image/src/formats/ico_decoder.dart';
 import 'package:image/src/formats/ico_encoder.dart';
 import 'package:test/test.dart';
 

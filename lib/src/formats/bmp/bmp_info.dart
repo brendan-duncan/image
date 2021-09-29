@@ -1,9 +1,7 @@
 import 'dart:convert';
 
 import '../../../image.dart';
-import '../../formats/decode_info.dart';
 import '../../internal/bit_operators.dart';
-import '../../util/input_buffer.dart';
 
 enum BitmapCompression { BI_BITFIELDS, NONE }
 

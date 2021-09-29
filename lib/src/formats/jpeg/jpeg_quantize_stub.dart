@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 import '../../../image.dart';
 
-import '../../image.dart';
-
 // These functions contain bit-shift operations that fail with HTML builds.
 // A conditional import is used to use a modified version for HTML builds
 // to work around this javascript bug, while keeping the native version fast.
