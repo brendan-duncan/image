@@ -1,3 +1,7 @@
+## 3.0.7 - September 29, 2021
+
+- Change LICENSE to MIT.
+
 ## 3.0.6 - September 29, 2021
 
 - Clean up LICENSE file, moving other license references to LICENSE-other.
