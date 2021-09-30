@@ -12,8 +12,12 @@ class GifEncoder extends Encoder {
   DitherKernel dither;
   bool ditherSerpentine;
 
-  GifEncoder({ this.delay = 80, this.repeat = 0, this.samplingFactor = 10,
-    this.dither = DitherKernel.FloydSteinberg, this.ditherSerpentine = false })
+  GifEncoder(
+      {this.delay = 80,
+      this.repeat = 0,
+      this.samplingFactor = 10,
+      this.dither = DitherKernel.FloydSteinberg,
+      this.ditherSerpentine = false})
       : _encodedFrames = 0;
 
   /// This adds the frame passed to [image].
@@ -24,8 +28,8 @@ class GifEncoder extends Encoder {
       output = OutputBuffer();
 
       _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
-      _lastImage = ditherPixels(image, _lastColorMap!,
-          dither, ditherSerpentine);
+      _lastImage =
+          ditherPixels(image, _lastColorMap!, dither, ditherSerpentine);
       _lastImageDuration = duration;
 
       _width = image.width;
@@ -44,8 +48,7 @@ class GifEncoder extends Encoder {
     _encodedFrames++;
 
     _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
-    _lastImage = ditherPixels(image, _lastColorMap!,
-        dither, ditherSerpentine);
+    _lastImage = ditherPixels(image, _lastColorMap!, dither, ditherSerpentine);
     _lastImageDuration = duration;
   }
 

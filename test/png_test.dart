@@ -59,7 +59,8 @@ void main() {
         }
       }
       expect(valid, equals(true));
-      File('E:/test_decoded.png').writeAsBytesSync(PngEncoder().encodeImage(i2));
+      File('E:/test_decoded.png')
+          .writeAsBytesSync(PngEncoder().encodeImage(i2));
     });
 
     test('iCCP', () {

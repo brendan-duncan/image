@@ -31,7 +31,7 @@ Image drawImage(Image dst, Image src,
   srcH ??= src.height;
   dstW ??= (dst.width < src.width) ? dstW = dst.width : src.width;
   dstH ??= (dst.height < src.height) ? dst.height : src.height;
-    
+
   if (blend) {
     for (var y = 0; y < dstH; ++y) {
       for (var x = 0; x < dstW; ++x) {

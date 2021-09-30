@@ -92,7 +92,7 @@ class BitmapFont {
 
     /// Remove leading whitespace so xml detection is correct
     final font_str =
-    String.fromCharCodes(font_file.content as List<int>).trimLeft();
+        String.fromCharCodes(font_file.content as List<int>).trimLeft();
     XmlDocument xml;
 
     /// Added <?xml which may be present, appropriately
@@ -222,7 +222,7 @@ class BitmapFont {
             }
 
             final image =
-            PngDecoder().decodeImage(imageFile.content as List<int>);
+                PngDecoder().decodeImage(imageFile.content as List<int>);
 
             fontPages[id] = image;
           }
@@ -263,14 +263,7 @@ class BitmapFont {
           final fontImage = fontPages[page];
 
           final ch = BitmapFontCharacter(
-              id,
-              width,
-              height,
-              xoffset,
-              yoffset,
-              xadvance,
-              page,
-              chnl);
+              id, width, height, xoffset, yoffset, xadvance, page, chnl);
 
           characters[id] = ch;
 

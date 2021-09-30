@@ -39,7 +39,6 @@ class NeuralQuantizer extends Quantizer {
   /// https://scientificgems.wordpress.com/stuff/neuquant-fast-high-quality-image-quantization/.
   NeuralQuantizer(Image image,
       {int numberOfColors = 256, this.samplingFactor = 10}) {
-
     _initialize(numberOfColors);
 
     addImage(image);
@@ -285,8 +284,8 @@ class NeuralQuantizer extends Quantizer {
 
   void _updateRadiusPower(int rad, int alpha) {
     for (var i = 0; i < rad; i++) {
-      _radiusPower[i] = (alpha * (((rad * rad - i * i) * radiusBias) /
-          (rad * rad))).toInt();
+      _radiusPower[i] =
+          (alpha * (((rad * rad - i * i) * radiusBias) / (rad * rad))).toInt();
     }
   }
 
@@ -383,8 +382,8 @@ class NeuralQuantizer extends Quantizer {
     _network[p + 2] -= (alpha * (_network[p + 2] - r));
   }
 
-  void _alterNeighbors(double alpha, int rad, int i,
-                       double b, double g, double r) {
+  void _alterNeighbors(
+      double alpha, int rad, int i, double b, double g, double r) {
     var lo = i - rad;
     if (lo < specials - 1) {
       lo = specials - 1;

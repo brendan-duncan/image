@@ -58,7 +58,7 @@ const _ditherKernels = [
 ];
 
 Uint8List ditherPixels(Image image, NeuralQuantizer quantizer,
-                  DitherKernel kernel, bool serpentine) {
+    DitherKernel kernel, bool serpentine) {
   if (kernel == DitherKernel.None) {
     return quantizer.getIndexMap(image);
   }
@@ -103,7 +103,7 @@ Uint8List ditherPixels(Image image, NeuralQuantizer quantizer,
         continue;
       }
 
-      final i0 = direction == 1 ? 0: ds.length - 1;
+      final i0 = direction == 1 ? 0 : ds.length - 1;
       final i1 = direction == 1 ? ds.length : 0;
       for (var i = i0; i != i1; i += direction) {
         final x1 = ds[i][1].toInt();
