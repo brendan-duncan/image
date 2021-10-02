@@ -8,6 +8,26 @@ void main() {
   final dir = Directory('test/res/webp');
   final files = dir.listSync();
 
+  group('WebP/Lossless', () {
+    test('test.webp', () {
+      final webp = WebPDecoder().decodeImage(File('test/res/webp/test.webp').readAsBytesSync())!;
+      final png = PngDecoder().decodeImage(File('test/res/webp/test.png').readAsBytesSync())!;
+      expect(webp.width, equals(png.width));
+      expect(webp.height, equals(png.height));
+      var match = true;
+      for (var i = 0, len = webp.length; i < len; ++i) {
+        if (webp[i] != png[i]) {
+          match = false;
+          break;
+        }
+      }
+      expect(match, equals(true), reason: 'test.webp does not match test.png');
+      File('$tmpPath/test/res/test_webp.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(PngEncoder().encodeImage(webp));
+    });
+  });
+
   group('WebP/getInfo', () {
     for (var f in files.whereType<File>()) {
       if (!f.path.endsWith('.webp')) {

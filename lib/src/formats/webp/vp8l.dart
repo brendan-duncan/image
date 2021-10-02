@@ -131,7 +131,7 @@ class VP8L {
       case VP8LTransform.SUBTRACT_GREEN:
         break;
       default:
-        throw ImageException('Invalid WebP tranform type: $type');
+        throw ImageException('Invalid WebP transform type: $type');
     }
 
     return ok;
@@ -246,7 +246,7 @@ class VP8L {
         final blue = htreeGroup.htrees[_BLUE].readSymbol(br);
         final alpha = htreeGroup.htrees[_ALPHA].readSymbol(br);
 
-        final c = getColor(red, green, blue, alpha);
+        final c = getColor(blue, green, red, alpha);
         data[src] = c;
 
         ++src;
@@ -279,8 +279,9 @@ class VP8L {
         if (src < dist || srcEnd - src < length) {
           return false;
         } else {
+          final dst = src - dist;
           for (var i = 0; i < length; ++i) {
-            data[src + i] = data[src + (i - dist)];
+            data[src + i] = data[dst + i];
           }
           src += length;
         }
@@ -517,7 +518,7 @@ class VP8L {
         final b = getBlue(c);
         final a = getAlpha(c);
         // rearrange the ARGB webp color to RGBA image color.
-        image!.setPixel(x, dy, getColor(r, g, b, a));
+        image!.setPixel(x, dy, getColor(b, g, r, a));
       }
     }
 

@@ -1,3 +1,7 @@
+## 3.0.8 - October 02, 2021
+
+- Fix WebP lossless decoder.
+
 ## 3.0.7 - September 29, 2021
 
 - Change LICENSE to MIT.
