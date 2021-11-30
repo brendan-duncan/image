@@ -1,3 +1,8 @@
+## 3.1.0 - November 30, 2022
+
+- Update archive version requirement
+- Fix JPGDecoder to return correct nullable types.
+
 ## 3.0.8 - October 02, 2021
 
 - Fix WebP lossless decoder.
