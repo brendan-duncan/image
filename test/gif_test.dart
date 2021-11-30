@@ -106,7 +106,7 @@ void main() {
 
     test('encodeImage', () {
       final bytes = File('test/res/jpg/jpeg444.jpg').readAsBytesSync();
-      final image = JpegDecoder().decodeImage(bytes);
+      final image = JpegDecoder().decodeImage(bytes)!;
 
       final gif = GifEncoder().encodeImage(image);
       File('$tmpPath/out/gif/jpeg444.gif')
@@ -115,8 +115,9 @@ void main() {
     });
 
     test('encode_small_gif', () {
-      final image = decodePng(File('test/res/png/lenna.png').readAsBytesSync());
-      final resized = copyResize(image!, width: 16, height: 16);
+      final image =
+          decodeJpg(File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync())!;
+      final resized = copyResize(image, width: 16, height: 16);
       final gif = encodeGif(resized);
       File('$tmpPath/out/gif/encode_small_gif.gif')
         ..createSync(recursive: true)

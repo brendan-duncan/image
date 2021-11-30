@@ -20,16 +20,16 @@ void main() {
     });
 
     test('hdr image', () {
-      final img = decodePng(File('test/res/png/lenna.png').readAsBytesSync())!;
+      final img = decodeJpg(File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync())!;
       img.channels = Channels.rgba;
       final hdr = HdrImage.fromImage(img);
       var img2 = hdrToImage(hdr);
-      File('$tmpPath/out/exr/lenna.png').writeAsBytesSync(encodePng(img2));
+      File('$tmpPath/out/exr/big_buck_bunny.png').writeAsBytesSync(encodePng(img2));
 
       hdrGamma(hdr);
       //hdrBloom(hdr, radius: 0.2);
       img2 = hdrToImage(hdr);
-      File('$tmpPath/out/exr/lenna_gamma.png')
+      File('$tmpPath/out/exr/big_buck_bunny_gamma.png')
           .writeAsBytesSync(encodePng(img2));
     });
   });

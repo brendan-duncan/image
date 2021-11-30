@@ -189,10 +189,10 @@ List<int>? encodeNamedImage(Image image, String name) {
 }
 
 /// Decode a JPG formatted image.
-Image decodeJpg(List<int> bytes) => JpegDecoder().decodeImage(bytes);
+Image? decodeJpg(List<int> bytes) => JpegDecoder().decodeImage(bytes);
 
 /// Renamed to [decodeJpg], left for backward compatibility.
-Image readJpg(List<int> bytes) => decodeJpg(bytes);
+Image? readJpg(List<int> bytes) => decodeJpg(bytes);
 
 /// Encode an image to the JPEG format.
 List<int> encodeJpg(Image image, {int quality = 100}) =>

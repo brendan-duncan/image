@@ -6,7 +6,7 @@ import 'paths.dart';
 
 void main() {
   final image =
-      readJpg(File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync());
+      readJpg(File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync())!;
 
   group('bitmapFont', () {
     test('zip/xml', () {

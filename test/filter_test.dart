@@ -6,7 +6,7 @@ import 'paths.dart';
 
 void main() {
   group('filter', () {
-    var image = readJpg(File('test/res/jpg/portrait_5.jpg').readAsBytesSync());
+    var image = readJpg(File('test/res/jpg/portrait_5.jpg').readAsBytesSync())!;
     image = copyResize(image, width: 400);
     final image2 =
         readPng(File('test/res/png/alpha_edge.png').readAsBytesSync());
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('floodFill', () {
-      final s = readJpg(File('test/res/oblique.jpg').readAsBytesSync());
+      final s = readJpg(File('test/res/oblique.jpg').readAsBytesSync())!;
       final c = s.getPixel(50, 50);
       fillFlood(s, 50, 50, c, threshold: 15.6);
       final fp = File('$tmpPath/out/fillFlood.jpg');
@@ -38,7 +38,7 @@ void main() {
     });
 
     test('copyCrop', () {
-      final s = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
+      final s = readJpg(File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync())!;
       final d = copyCrop(s, 200, 200, 5000, 5000);
       final fp = File('$tmpPath/out/copyCrop.jpg');
       fp.createSync(recursive: true);
@@ -46,7 +46,7 @@ void main() {
     });
 
     test('copyRectify', () {
-      final s = readJpg(File('test/res/oblique.jpg').readAsBytesSync());
+      final s = readJpg(File('test/res/oblique.jpg').readAsBytesSync())!;
       final d = Image(92, 119);
       copyRectify(s,
           topLeft: Point(16, 32),
@@ -148,7 +148,7 @@ void main() {
     test('copyResize_orientation', () {
       for (var i = 1; i <= 8; ++i) {
         final img =
-            decodeJpg(File('test/res/jpg/landscape_$i.jpg').readAsBytesSync());
+            decodeJpg(File('test/res/jpg/landscape_$i.jpg').readAsBytesSync())!;
         final f = copyResize(img, height: 100);
         expect(f.width, equals(133));
         expect(f.height, equals(100));
@@ -159,7 +159,7 @@ void main() {
 
       for (var i = 1; i <= 8; ++i) {
         final img =
-            decodeJpg(File('test/res/jpg/portrait_$i.jpg').readAsBytesSync());
+            decodeJpg(File('test/res/jpg/portrait_$i.jpg').readAsBytesSync())!;
         final f = copyResize(img, height: 100);
         expect(f.width, equals(75));
         expect(f.height, equals(100));
@@ -282,7 +282,7 @@ void main() {
     });
 
     test('sobel', () {
-      final f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
+      final f = readJpg(File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync())!;
       sobel(f);
 
       final fp = File('$tmpPath/out/sobel.jpg');
@@ -462,7 +462,7 @@ void main() {
     });
 
     test('octree quantize', () {
-      final f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
+      final f = readJpg(File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync())!;
 
       quantize(f, numberOfColors: 16, method: QuantizeMethod.octree);
       // ignore: prefer_collection_literals
@@ -478,7 +478,7 @@ void main() {
     });
 
     test('neural quantize', () {
-      final f = readPng(File('test/res/png/lenna.png').readAsBytesSync())!;
+      final f = readJpg(File('test/res/png/big_buck_bunny.jpg').readAsBytesSync())!;
 
       quantize(f, numberOfColors: 16);
       // ignore: prefer_collection_literals

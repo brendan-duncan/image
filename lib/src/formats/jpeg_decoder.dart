@@ -41,7 +41,7 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  Image decodeImage(List<int> bytes, {int frame = 0}) {
+  Image? decodeImage(List<int> bytes, {int frame = 0}) {
     final jpeg = JpegData();
     jpeg.read(bytes);
 
@@ -53,8 +53,11 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  Animation decodeAnimation(List<int> bytes) {
+  Animation? decodeAnimation(List<int> bytes) {
     final image = decodeImage(bytes);
+    if (image == null) {
+      return null;
+    }
 
     final anim = Animation();
     anim.width = image.width;

@@ -19,14 +19,14 @@ void main() {
         final List<int> bytes = f.readAsBytesSync();
         expect(JpegDecoder().isValidFile(bytes), equals(true));
 
-        final image = JpegDecoder().decodeImage(bytes);
+        final image = JpegDecoder().decodeImage(bytes)!;
         final outJpg = JpegEncoder().encodeImage(image);
         File('$tmpPath/out/jpg/$name')
           ..createSync(recursive: true)
           ..writeAsBytesSync(outJpg);
 
         // Make sure we can read what we just wrote.
-        final image2 = JpegDecoder().decodeImage(outJpg);
+        final image2 = JpegDecoder().decodeImage(outJpg)!;
 
         expect(image.width, equals(image2.width));
         expect(image.height, equals(image2.height));
@@ -36,7 +36,7 @@ void main() {
     for (var i = 1; i < 9; ++i) {
       test('exif/orientation_$i/landscape', () {
         final image = JpegDecoder().decodeImage(
-            File('test/res/jpg/landscape_$i.jpg').readAsBytesSync());
+            File('test/res/jpg/landscape_$i.jpg').readAsBytesSync())!;
         File('$tmpPath/out/jpg/landscape_$i.jpg')
           ..createSync(recursive: true)
           ..writeAsBytesSync(JpegEncoder().encodeImage(image));
@@ -44,7 +44,7 @@ void main() {
 
       test('exif/orientation_$i/portrait', () {
         final image = JpegDecoder().decodeImage(
-            File('test/res/jpg/portrait_$i.jpg').readAsBytesSync());
+            File('test/res/jpg/portrait_$i.jpg').readAsBytesSync())!;
         File('$tmpPath/out/jpg/portrait_$i.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(JpegEncoder().encodeImage(image));

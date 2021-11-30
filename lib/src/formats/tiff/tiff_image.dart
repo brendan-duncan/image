@@ -321,7 +321,9 @@ class TiffImage {
         image ??= Image(width!, height!);
         final data = p.toList(0, byteCount);
         final tile = JpegDecoder().decodeImage(data);
-        _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight!);
+        if (tile != null) {
+          _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight!);
+        }
         if (hdrImage != null) {
           hdrImage = HdrImage.fromImage(image!);
         }
