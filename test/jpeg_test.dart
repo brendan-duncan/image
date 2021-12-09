@@ -5,10 +5,16 @@ import 'package:test/test.dart';
 import 'paths.dart';
 
 void main() {
-  final dir = Directory('test/res/jpg');
-  final files = dir.listSync(recursive: true);
-
   group('JPEG', () {
+    test('progressive', () {
+      final fb = File('test/res/jpg/progress.jpg').readAsBytesSync();
+      final image = JpegDecoder().decodeImage(fb)!;
+      expect(image.width, 341);
+      expect(image.height, 486);
+    });
+
+    final dir = Directory('test/res/jpg');
+    final files = dir.listSync(recursive: true);
     for (var f in files.whereType<File>()) {
       if (!f.path.endsWith('.jpg')) {
         continue;

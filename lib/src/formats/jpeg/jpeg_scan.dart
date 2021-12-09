@@ -254,7 +254,7 @@ class JpegScan {
       switch (successiveACState) {
         case 0: // initial state
           final rs = _decodeHuffman(component.huffmanTableAC);
-          if (rs == null) continue;
+          if (rs == null) throw ImageException('Invalid progressive encoding');
           s = rs & 15;
           r = rs >> 4;
           if (s == 0) {
