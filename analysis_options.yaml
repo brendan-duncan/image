@@ -1,5 +1,3 @@
-include: package:pedantic/analysis_options.yaml
-
 linter:
   rules:
   - avoid_dynamic_calls

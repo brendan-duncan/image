@@ -33,6 +33,13 @@ class JpegData {
   bool validate(List<int> bytes) {
     input = InputBuffer(bytes, bigEndian: true);
 
+    // Some other formats have embedded jpeg, or jpeg-like data.
+    // Only validate if the image starts with the StartOfImage tag.
+    final soiCheck = input.peekBytes(2);
+    if (soiCheck[0] != 0xff || soiCheck[1] != 0xd8) {
+      return false;
+    }
+
     var marker = _nextMarker();
     if (marker != Jpeg.M_SOI) {
       return false;
