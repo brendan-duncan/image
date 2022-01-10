@@ -142,7 +142,7 @@ class InputBuffer {
     while (!isEOS) {
       final c = readByte();
       if (c == 0) {
-        return utf8.decode(codes);
+        return utf8.decode(codes, allowMalformed: true);
       }
       codes.add(c);
     }
