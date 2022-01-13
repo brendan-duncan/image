@@ -135,8 +135,8 @@ class TiffDecoder extends Decoder {
       }
       info.images.add(img);
       if (info.images.length == 1) {
-        info.width = info.images[0].width!;
-        info.height = info.images[0].height!;
+        info.width = info.images[0].width;
+        info.height = info.images[0].height;
       }
 
       offset = p2.readUint32();

@@ -17,8 +17,8 @@ import 'tiff_lzw_decoder.dart';
 
 class TiffImage {
   Map<int, TiffEntry> tags = {};
-  int? width;
-  int? height;
+  int width = 0;
+  int height = 0;
   int? photometricType;
   int compression = 1;
   int bitsPerSample = 1;
@@ -30,8 +30,8 @@ class TiffImage {
   late int chromaSubH;
   late int chromaSubV;
   bool tiled = false;
-  int? tileWidth;
-  int? tileHeight;
+  int tileWidth = 0;
+  int tileHeight = 0;
   List<int>? tileOffsets;
   List<int>? tileByteCounts;
   late int tilesX;
@@ -100,7 +100,7 @@ class TiffImage {
       }
     }
 
-    if (width == null || height == null) {
+    if (width == 0 || height == 0) {
       return;
     }
 
@@ -144,9 +144,9 @@ class TiffImage {
     }
 
     // Calculate number of tiles and the tileSize in bytes
-    tilesX = (width! + tileWidth! - 1) ~/ tileWidth!;
-    tilesY = (height! + tileHeight! - 1) ~/ tileHeight!;
-    tileSize = tileWidth! * tileHeight! * samplesPerPixel;
+    tilesX = (width + tileWidth - 1) ~/ tileWidth;
+    tilesY = (height + tileHeight - 1) ~/ tileHeight;
+    tileSize = tileWidth * tileHeight * samplesPerPixel;
 
     fillOrder = _readTag(TAG_FILL_ORDER, 1);
     t4Options = _readTag(TAG_T4_OPTIONS);
@@ -223,10 +223,10 @@ class TiffImage {
     }
   }
 
-  bool get isValid => width != null && height != null;
+  bool get isValid => width != 0 && height != 0;
 
   Image decode(InputBuffer p) {
-    image = Image(width!, height!);
+    image = Image(width, height);
     for (var tileY = 0, ti = 0; tileY < tilesY; ++tileY) {
       for (var tileX = 0; tileX < tilesX; ++tileX, ++ti) {
         _decodeTile(p, tileX, tileY);
@@ -267,11 +267,11 @@ class TiffImage {
     final tileIndex = tileY * tilesX + tileX;
     p.offset = tileOffsets![tileIndex];
 
-    final outX = tileX * tileWidth!;
-    final outY = tileY * tileHeight!;
+    final outX = tileX * tileWidth;
+    final outY = tileY * tileHeight;
 
     final byteCount = tileByteCounts![tileIndex];
-    var bytesInThisTile = tileWidth! * tileHeight! * samplesPerPixel;
+    var bytesInThisTile = tileWidth * tileHeight * samplesPerPixel;
     if (bitsPerSample == 16) {
       bytesInThisTile *= 2;
     } else if (bitsPerSample == 32) {
@@ -296,9 +296,9 @@ class TiffImage {
         // Horizontal Differencing Predictor
         if (predictor == 2) {
           int count;
-          for (var j = 0; j < tileHeight!; j++) {
-            count = samplesPerPixel * (j * tileWidth! + 1);
-            for (var i = samplesPerPixel, len = tileWidth! * samplesPerPixel;
+          for (var j = 0; j < tileHeight; j++) {
+            count = samplesPerPixel * (j * tileWidth + 1);
+            for (var i = samplesPerPixel, len = tileWidth * samplesPerPixel;
                 i < len;
                 i++) {
               bdata[count] += bdata[count - samplesPerPixel];
@@ -318,11 +318,11 @@ class TiffImage {
         final outData = const ZLibDecoder().decodeBytes(data);
         bdata = InputBuffer(outData);
       } else if (compression == COMPRESSION_OLD_JPEG) {
-        image ??= Image(width!, height!);
+        image ??= Image(width, height);
         final data = p.toList(0, byteCount);
         final tile = JpegDecoder().decodeImage(data);
         if (tile != null) {
-          _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight!);
+          _jpegToImage(tile, image!, outX, outY, tileWidth, tileHeight);
         }
         if (hdrImage != null) {
           hdrImage = HdrImage.fromImage(image!);
@@ -332,8 +332,8 @@ class TiffImage {
         throw ImageException('Unsupported Compression Type: $compression');
       }
 
-      for (var y = 0, py = outY; y < tileHeight! && py < height!; ++y, ++py) {
-        for (var x = 0, px = outX; x < tileWidth! && px < width!; ++x, ++px) {
+      for (var y = 0, py = outY; y < tileHeight && py < height; ++y, ++py) {
+        for (var x = 0, px = outX; x < tileWidth && px < width; ++x, ++px) {
           if (samplesPerPixel == 1) {
             if (sampleFormat == TiffImage.FORMAT_FLOAT) {
               var sample = 0.0;
@@ -662,13 +662,13 @@ class TiffImage {
     }
   }
 
-  void _jpegToImage(Image tile, Image? image, int outX, int outY,
-      int? tileWidth, int tileHeight) {
+  void _jpegToImage(Image tile, Image image, int outX, int outY,
+      int tileWidth, int tileHeight) {
     final width = tileWidth;
     final height = tileHeight;
     for (var y = 0; y < height; y++) {
-      for (var x = 0; x < width!; x++) {
-        image!.setPixel(x + outX, y + outY, tile.getPixel(x, y));
+      for (var x = 0; x < width; x++) {
+        image.setPixel(x + outX, y + outY, tile.getPixel(x, y));
       }
     }
     /*Uint8List data = jpeg.getData(width, height);
@@ -726,8 +726,8 @@ class TiffImage {
     final tileIndex = tileY * tilesX + tileX;
     p.offset = tileOffsets![tileIndex];
 
-    final outX = tileX * tileWidth!;
-    final outY = tileY * tileHeight!;
+    final outX = tileX * tileWidth;
+    final outY = tileY * tileHeight;
 
     final byteCount = tileByteCounts![tileIndex];
 
@@ -736,15 +736,15 @@ class TiffImage {
       // Since the decompressed data will still be packed
       // 8 pixels into 1 byte, calculate bytesInThisTile
       int bytesInThisTile;
-      if ((tileWidth! % 8) == 0) {
-        bytesInThisTile = (tileWidth! ~/ 8) * tileHeight!;
+      if ((tileWidth % 8) == 0) {
+        bytesInThisTile = (tileWidth ~/ 8) * tileHeight;
       } else {
-        bytesInThisTile = (tileWidth! ~/ 8 + 1) * tileHeight!;
+        bytesInThisTile = (tileWidth ~/ 8 + 1) * tileHeight;
       }
-      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
       _decodePackbits(p, bytesInThisTile, bdata.buffer);
     } else if (compression == COMPRESSION_LZW) {
-      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
 
       final decoder = LzwDecoder();
       decoder.decode(InputBuffer.from(p, length: byteCount), bdata.buffer);
@@ -752,31 +752,31 @@ class TiffImage {
       // Horizontal Differencing Predictor
       if (predictor == 2) {
         int count;
-        for (var j = 0; j < height!; j++) {
-          count = samplesPerPixel * (j * width! + 1);
-          for (var i = samplesPerPixel; i < width! * samplesPerPixel; i++) {
+        for (var j = 0; j < height; j++) {
+          count = samplesPerPixel * (j * width + 1);
+          for (var i = samplesPerPixel; i < width * samplesPerPixel; i++) {
             bdata[count] += bdata[count - samplesPerPixel];
             count++;
           }
         }
       }
     } else if (compression == COMPRESSION_CCITT_RLE) {
-      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
       try {
-        TiffFaxDecoder(fillOrder, tileWidth!, tileHeight!)
-            .decode1D(bdata, p, 0, tileHeight!);
+        TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
+            .decode1D(bdata, p, 0, tileHeight);
       } catch (_) {}
     } else if (compression == COMPRESSION_CCITT_FAX3) {
-      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
       try {
-        TiffFaxDecoder(fillOrder, tileWidth!, tileHeight!)
-            .decode2D(bdata, p, 0, tileHeight!, t4Options!);
+        TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
+            .decode2D(bdata, p, 0, tileHeight, t4Options!);
       } catch (_) {}
     } else if (compression == COMPRESSION_CCITT_FAX4) {
-      bdata = InputBuffer(Uint8List(tileWidth! * tileHeight!));
+      bdata = InputBuffer(Uint8List(tileWidth * tileHeight));
       try {
-        TiffFaxDecoder(fillOrder, tileWidth!, tileHeight!)
-            .decodeT6(bdata, p, 0, tileHeight!, t6Options!);
+        TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
+            .decodeT6(bdata, p, 0, tileHeight, t6Options!);
       } catch (_) {}
     } else if (compression == COMPRESSION_ZIP) {
       final data = p.toList(0, byteCount);
@@ -796,12 +796,14 @@ class TiffImage {
     final white = isWhiteZero ? 0xff000000 : 0xffffffff;
     final black = isWhiteZero ? 0xffffffff : 0xff000000;
 
-    for (var y = 0, py = outY; y < tileHeight!; ++y, ++py) {
-      for (var x = 0, px = outX; x < tileWidth!; ++x, ++px) {
+    final img = image!;
+    for (var y = 0, py = outY; y < tileHeight; ++y, ++py) {
+      for (var x = 0, px = outX; x < tileWidth; ++x, ++px) {
+        if (py >= img.height || px >= img.width) break;
         if (br.readBits(1) == 0) {
-          image!.setPixel(px, py, black);
+          img.setPixel(px, py, black);
         } else {
-          image!.setPixel(px, py, white);
+          img.setPixel(px, py, white);
         }
       }
       br.flushByte();
@@ -833,7 +835,7 @@ class TiffImage {
     }
   }
 
-  int? _readTag(int type, [int? defaultValue = 0]) {
+  int _readTag(int type, [int defaultValue = 0]) {
     if (!hasTag(type)) {
       return defaultValue;
     }
