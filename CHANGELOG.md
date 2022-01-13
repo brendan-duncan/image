@@ -1,4 +1,9 @@
-## 3.1.0 - November 30, 2022
+## 3.1.1 - January 12, 2022
+
+- Fix error loading some tiff images
+- Fix jpeg comments to support non-strict utf8 text
+
+## 3.1.0 - November 30, 2021
 
 - Update archive version requirement
 - Fix JPGDecoder to return correct nullable types.
