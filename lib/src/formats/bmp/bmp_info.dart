@@ -152,6 +152,10 @@ class BmpInfo extends DecodeInfo {
         pixel(colorPalette![left]);
         pixel(colorPalette![right]);
         return;
+      } else if (bpp == 8) {
+        final b = input.readByte();
+        pixel(colorPalette![b]);
+        return;
       }
     }
     if (compression == BitmapCompression.BI_BITFIELDS && bpp == 32) {
@@ -166,7 +170,7 @@ class BmpInfo extends DecodeInfo {
     // }
     else {
       throw ImageException(
-          'Unsupported bpp ($bpp) or compression unsupported.');
+          'Unsupported bpp ($bpp) or compression ($compression).');
     }
   }
 
