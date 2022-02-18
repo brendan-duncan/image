@@ -13,8 +13,8 @@ class BmpEncoder extends Encoder {
     final bytesPerPixel = image.channels == Channels.rgb ? 3 : 4;
     final bpp = bytesPerPixel * 8;
     final rgbSize = image.width * image.height * bytesPerPixel;
-    final headerSize = 54;
-    final headerInfoSize = 40;
+    const headerSize = 54;
+    const headerInfoSize = 40;
     final fileSize = rgbSize + headerSize;
 
     out.writeUint16(BitmapFileHeader.BMP_HEADER_FILETYPE);
