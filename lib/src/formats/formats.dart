@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../animation.dart';
 import '../image.dart';
 import 'bmp_decoder.dart';
+import 'bmp_encoder.dart';
 import 'cur_encoder.dart';
 import 'decoder.dart';
 import 'exr_decoder.dart';
@@ -185,6 +186,9 @@ List<int>? encodeNamedImage(Image image, String name) {
   if (n.endsWith('.ico')) {
     return encodeIco(image);
   }
+  if (n.endsWith('.bmp')) {
+    return encodeBmp(image);
+  }
   return null;
 }
 
@@ -301,6 +305,9 @@ Image? decodeExr(List<int> bytes, {double exposure = 1.0}) =>
 
 /// Decode a BMP formatted image.
 Image? decodeBmp(List<int> bytes) => BmpDecoder().decodeImage(bytes);
+
+// Encode an image to the BMP format.
+List<int> encodeBmp(Image image) => BmpEncoder().encodeImage(image);
 
 /// Encode an image to the CUR format.
 List<int> encodeCur(Image image) => CurEncoder().encodeImage(image);

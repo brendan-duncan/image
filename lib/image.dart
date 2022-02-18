@@ -42,6 +42,7 @@ export 'src/fonts/arial_14.dart';
 export 'src/fonts/arial_24.dart';
 export 'src/fonts/arial_48.dart';
 export 'src/formats/bmp_decoder.dart';
+export 'src/formats/bmp_encoder.dart';
 export 'src/formats/decode_info.dart';
 export 'src/formats/decoder.dart';
 export 'src/formats/encoder.dart';

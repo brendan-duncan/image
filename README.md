@@ -23,10 +23,10 @@ will not be as fast as a native library.
 - GIF / Animated GIF
 - PVR(PVRTC)
 - ICO
+- BMP
 
 **Read Only**
 
-- BMP
 - WebP / Animated WebP
 - TIFF
 - Photoshop PSD

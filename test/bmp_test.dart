@@ -25,10 +25,10 @@ void main() {
           throw ImageException('Unable to decode TGA Image: $name.');
         }
 
-        final png = PngEncoder().encodeImage(image);
-        File('$tmpPath/out/bmp/$name.png')
+        final bmp = BmpEncoder().encodeImage(image);
+        File('$tmpPath/out/bmp/$name.bmp')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(png);
+          ..writeAsBytesSync(bmp);
       });
     }
   });

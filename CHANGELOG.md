@@ -1,3 +1,7 @@
+## 3.1.2 - February 17, 2022
+
+- Add BmpEncoder to encode BMP images, along with encodeBmp function. Currently, only 24-bit or 32-bit BMP images will be encoded.
+
 ## 3.1.1 - January 12, 2022
 
 - Fix error loading some tiff images
