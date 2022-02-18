@@ -564,22 +564,22 @@ class Image {
   }
 
   /// Return the average gray value of the image.
-  int getWhiteBalance() {
+  dynamic getWhiteBalance({bool asDouble=false}) {
     final len = data.length;
-    var r = 0;
-    var g = 0;
-    var b = 0;
+    double r = 0.0;
+    double g = 0.0;
+    double b = 0.0;
+    var t = 1;
     for (var i = 0; i < len; ++i) {
-      r += getRed(data[i]);
-      g += getGreen(data[i]);
-      b += getBlue(data[i]);
+      r += (getRed(data[i]) - r) / t;
+      g += (getGreen(data[i]) - g) / t;
+      b += (getBlue(data[i]) - b) / t;
+      ++t;
     }
 
-    r ~/= len;
-    g ~/= len;
-    b ~/= len;
+    double averageGray = (r + g + b) / 3.0;
 
-    return (r + g + b) ~/ 3;
+    return asDouble ? averageGray : averageGray.toInt();
   }
 
   static Uint32List _convertData(

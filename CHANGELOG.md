@@ -1,3 +1,7 @@
+## 3.1.3 - February 17, 2022
+
+- Optimize Image.getWhiteBalance function, add asDouble argument to return double value.
+
 ## 3.1.2 - February 17, 2022
 
 - Add BmpEncoder to encode BMP images, along with encodeBmp function. Currently, only 24-bit or 32-bit BMP images will be encoded.
