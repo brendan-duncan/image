@@ -93,17 +93,22 @@ class Image {
   /// ICC color profile read from an image file.
   ICCProfileData? iccProfile;
 
+  /// Some formats, like PNG, can encode and decode text data with the image.
+  Map<String, String>? textData;
+
   /// {@template Image/Image_constructor}
   /// Create an image with the given dimensions and format.
   /// {@endtemplate}
   Image(this.width, this.height,
-      {this.channels = Channels.rgba, ExifData? exif, ICCProfileData? iccp})
+      {this.channels = Channels.rgba, ExifData? exif, ICCProfileData? iccp,
+       this.textData})
       : data = Uint32List(width * height),
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
   /// {@macro Image/Image_constructor}
-  Image.rgb(this.width, this.height, {ExifData? exif, ICCProfileData? iccp})
+  Image.rgb(this.width, this.height, {ExifData? exif, ICCProfileData? iccp,
+            this.textData})
       : channels = Channels.rgb,
         data = Uint32List(width * height),
         exif = ExifData.from(exif),
@@ -121,7 +126,11 @@ class Image {
         channels = other.channels,
         data = other.data.sublist(0),
         exif = ExifData.from(other.exif),
-        iccProfile = other.iccProfile;
+        iccProfile = other.iccProfile {
+    if (other.textData != null) {
+      textData = Map<String,String>.from(other.textData!);
+    }
+  }
 
   /// Create an image from raw data in [bytes].
   ///
@@ -145,7 +154,7 @@ class Image {
       {ExifData? exif,
       ICCProfileData? iccp,
       Format format = Format.rgba,
-      this.channels = Channels.rgba})
+      this.channels = Channels.rgba, this.textData})
       : data = _convertData(width, height, bytes, format),
         exif = ExifData.from(exif),
         iccProfile = iccp;
@@ -580,6 +589,15 @@ class Image {
     double averageGray = (r + g + b) / 3.0;
 
     return asDouble ? averageGray : averageGray.toInt();
+  }
+
+  void addTextData(Map<String, String> data) {
+    if (textData == null) {
+      textData = {};
+    }
+    for (var key in data.keys) {
+      textData![key] = data[key]!;
+    }
   }
 
   static Uint32List _convertData(

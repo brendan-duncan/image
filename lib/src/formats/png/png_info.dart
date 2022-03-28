@@ -19,6 +19,7 @@ class PngInfo extends DecodeInfo {
   String iCCPName = '';
   int iCCPCompression = 0;
   Uint8List? iCCPData;
+  Map<String, String> textData = {};
 
   // APNG extensions
   @override

@@ -32,6 +32,14 @@ void main() {
         ..writeAsBytesSync(png);
     });
 
+    test('textData', () {
+      final img = Image(16, 16, textData: {"foo":"bar"});
+      final png = PngEncoder().encodeImage(img);
+      final img2 = PngDecoder().decodeImage(png);
+      expect(img2?.width, equals(img.width));
+      expect(img2?.textData?["foo"], equals("bar"));
+    });
+
     test('decode', () {
       final List<int> bytes =
           File('$tmpPath/out/png/encode.png').readAsBytesSync();
@@ -126,18 +134,22 @@ void main() {
             // noop
           }
         } else {
-          final anim = decodeAnimation(file.readAsBytesSync())!;
-          if (anim.length == 1) {
-            final png = PngEncoder().encodeImage(anim[0]);
-            File('$tmpPath/out/png/$name')
-              ..createSync(recursive: true)
-              ..writeAsBytesSync(png);
+          final anim = decodeAnimation(file.readAsBytesSync());
+          if (anim == null) {
+            print("!!!!");
           } else {
-            for (var i = 0; i < anim.length; ++i) {
-              final png = PngEncoder().encodeImage(anim[i]);
-              File('$tmpPath/out/png/$name-$i.png')
+            if (anim.length == 1) {
+              final png = PngEncoder().encodeImage(anim[0]);
+              File('$tmpPath/out/png/$name')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
+            } else {
+              for (var i = 0; i < anim.length; ++i) {
+                final png = PngEncoder().encodeImage(anim[i]);
+                File('$tmpPath/out/png/$name-$i.png')
+                  ..createSync(recursive: true)
+                  ..writeAsBytesSync(png);
+              }
             }
           }
         }

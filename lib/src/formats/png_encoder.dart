@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -43,6 +44,12 @@ class PngEncoder extends Encoder {
     _filter(image, filteredImage);
 
     final compressed = const ZLibEncoder().encode(filteredImage, level: level);
+
+    if (image.textData != null) {
+      for (var key in image.textData!.keys) {
+        _writeTextChunk(key, image.textData![key]!);
+      }
+    }
 
     if (isAnimated) {
       _writeFrameControlChunk();
@@ -138,6 +145,14 @@ class PngEncoder extends Encoder {
     chunk.writeByte(disposeMethod.index);
     chunk.writeByte(blendMethod.index);
     _writeChunk(output!, 'fcTL', chunk.getBytes());
+  }
+
+  void _writeTextChunk(String keyword, String text) {
+    final chunk = OutputBuffer(bigEndian: true);
+    chunk.writeBytes(latin1.encode(keyword));
+    chunk.writeByte(0);
+    chunk.writeBytes(latin1.encode(text));
+    _writeChunk(output!, 'tEXt', chunk.getBytes());
   }
 
   void _writeICCPChunk(OutputBuffer? out, ICCProfileData? iccp) {
@@ -375,6 +390,7 @@ class PngEncoder extends Encoder {
   int sequenceNumber = 0;
   bool isAnimated = false;
   OutputBuffer? output;
+  Map<String,String>? textData;
 
   static const FILTER_NONE = 0;
   static const FILTER_SUB = 1;

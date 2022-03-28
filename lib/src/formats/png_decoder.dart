@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:archive/archive.dart';
 
 import '../animation.dart';
@@ -40,9 +42,9 @@ class PngDecoder extends Decoder {
     _input = InputBuffer(data, bigEndian: true);
 
     final pngHeader = _input.readBytes(8);
-    const PNG_HEADER = [137, 80, 78, 71, 13, 10, 26, 10];
+    const expectedHeader = [137, 80, 78, 71, 13, 10, 26, 10];
     for (var i = 0; i < 8; ++i) {
-      if (pngHeader[i] != PNG_HEADER[i]) {
+      if (pngHeader[i] != expectedHeader[i]) {
         return null;
       }
     }
@@ -52,6 +54,22 @@ class PngDecoder extends Decoder {
       var chunkSize = _input.readUint32();
       final chunkType = _input.readString(4);
       switch (chunkType) {
+        case 'tEXt':
+          if (_info == null) {
+            _info = InternalPngInfo();
+          }
+
+          final txtData = _input.readBytes(chunkSize).toUint8List();
+          for (var i = 0, l = txtData.length; i < l; ++i) {
+            if (txtData[i] == 0) {
+              var key = latin1.decode(txtData.sublist(0, i));
+              var text = latin1.decode(txtData.sublist(i + 1));
+              _info!.textData[key] = text;
+              break;
+            }
+          }
+          _input.skip(4);//crc
+          break;
         case 'IHDR':
           final hdr = InputBuffer.from(_input.readBytes(chunkSize));
           final List<int> hdrBytes = hdr.toUint8List();
@@ -336,6 +354,10 @@ class PngDecoder extends Decoder {
     if (_info!.iCCPData != null) {
       image.iccProfile = ICCProfileData(
           _info!.iCCPName, ICCPCompression.deflate, _info!.iCCPData!);
+    }
+
+    if (_info!.textData.isNotEmpty) {
+      image.addTextData(_info!.textData);
     }
 
     return image;
