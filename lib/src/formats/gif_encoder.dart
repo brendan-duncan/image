@@ -74,7 +74,7 @@ class GifEncoder extends Encoder {
 
     _addImage(_lastImage, _width, _height, _lastColorMap!.colorMap, 256);
 
-    output!.writeByte(TERMINATE_RECORD_TYPE);
+    output!.writeByte(_terminateRecordType);
 
     _lastImage = null;
     _lastColorMap = null;
@@ -112,7 +112,7 @@ class GifEncoder extends Encoder {
   void _addImage(Uint8List? image, int width, int height, Uint8List colorMap,
       int numColors) {
     // Image desc
-    output!.writeByte(IMAGE_DESC_RECORD_TYPE);
+    output!.writeByte(_imageDescRecordType);
     output!.writeUint16(0); // image position x,y = 0,0
     output!.writeUint16(0);
     output!.writeUint16(width); // image size
@@ -140,8 +140,8 @@ class GifEncoder extends Encoder {
     const initCodeSize = 8;
     output!.writeByte(initCodeSize);
 
-    final hTab = Int32List(HSIZE);
-    final codeTab = Int32List(HSIZE);
+    final hTab = Int32List(_hsize);
+    final codeTab = Int32List(_hsize);
     var remaining = width * height;
     var curPixel = 0;
 
@@ -155,7 +155,7 @@ class GifEncoder extends Encoder {
 
     int _nextPixel() {
       if (remaining == 0) {
-        return EOF;
+        return _eof;
       }
       --remaining;
       return image![curPixel++] & 0xff;
@@ -164,12 +164,12 @@ class GifEncoder extends Encoder {
     var ent = _nextPixel();
 
     var hshift = 0;
-    for (var fcode = HSIZE; fcode < 65536; fcode *= 2) {
+    for (var fcode = _hsize; fcode < 65536; fcode *= 2) {
       hshift++;
     }
     hshift = 8 - hshift;
 
-    const hSizeReg = HSIZE;
+    const hSizeReg = _hsize;
     for (var i = 0; i < hSizeReg; ++i) {
       hTab[i] = -1;
     }
@@ -181,8 +181,8 @@ class GifEncoder extends Encoder {
       outerLoop = false;
 
       var c = _nextPixel();
-      while (c != EOF) {
-        final fcode = (c << BITS) + ent;
+      while (c != _eof) {
+        final fcode = (c << _bits) + ent;
         var i = (c << hshift) ^ ent; // xor hashing
 
         if (hTab[i] == fcode) {
@@ -214,11 +214,11 @@ class GifEncoder extends Encoder {
         _output(ent);
         ent = c;
 
-        if (_freeEnt < (1 << BITS)) {
+        if (_freeEnt < (1 << _bits)) {
           codeTab[i] = _freeEnt++; // code -> hashtable
           hTab[i] = fcode;
         } else {
-          for (var i = 0; i < HSIZE; ++i) {
+          for (var i = 0; i < _hsize; ++i) {
             hTab[i] = -1;
           }
           _freeEnt = _clearCode + 2;
@@ -237,7 +237,7 @@ class GifEncoder extends Encoder {
   }
 
   void _output(int? code) {
-    _curAccum &= MASKS[_curBits];
+    _curAccum &= _masks[_curBits];
 
     if (_curBits > 0) {
       _curAccum |= (code! << _curBits);
@@ -262,8 +262,8 @@ class GifEncoder extends Encoder {
         _clearFlag = false;
       } else {
         ++_nBits;
-        if (_nBits == BITS) {
-          _maxCode = 1 << BITS;
+        if (_nBits == _bits) {
+          _maxCode = 1 << _bits;
         } else {
           _maxCode = (1 << _nBits) - 1;
         }
@@ -297,8 +297,8 @@ class GifEncoder extends Encoder {
   }
 
   void _writeApplicationExt() {
-    output!.writeByte(EXTENSION_RECORD_TYPE);
-    output!.writeByte(APPLICATION_EXT);
+    output!.writeByte(_extensionRecordType);
+    output!.writeByte(_applicationExt);
     output!.writeByte(11); // data block size
     output!.writeBytes('NETSCAPE2.0'.codeUnits); // app identifier
     output!.writeBytes([0x03, 0x01]);
@@ -307,8 +307,8 @@ class GifEncoder extends Encoder {
   }
 
   void _writeGraphicsCtrlExt() {
-    output!.writeByte(EXTENSION_RECORD_TYPE);
-    output!.writeByte(GRAPHIC_CONTROL_EXT);
+    output!.writeByte(_extensionRecordType);
+    output!.writeByte(_graphicControlExt);
     output!.writeByte(4); // data block size
 
     const transparency = 0;
@@ -327,7 +327,7 @@ class GifEncoder extends Encoder {
 
   // GIF header and Logical Screen Descriptor
   void _writeHeader(int width, int height) {
-    output!.writeBytes(GIF89_STAMP.codeUnits);
+    output!.writeBytes(_gif89Id.codeUnits);
     output!.writeUint16(width);
     output!.writeUint16(height);
     output!.writeByte(0); // global color map parameters (not being used).
@@ -356,19 +356,19 @@ class GifEncoder extends Encoder {
 
   OutputBuffer? output;
 
-  static const GIF89_STAMP = 'GIF89a';
+  static const _gif89Id = 'GIF89a';
 
-  static const IMAGE_DESC_RECORD_TYPE = 0x2c;
-  static const EXTENSION_RECORD_TYPE = 0x21;
-  static const TERMINATE_RECORD_TYPE = 0x3b;
+  static const _imageDescRecordType = 0x2c;
+  static const _extensionRecordType = 0x21;
+  static const _terminateRecordType = 0x3b;
 
-  static const APPLICATION_EXT = 0xff;
-  static const GRAPHIC_CONTROL_EXT = 0xf9;
+  static const _applicationExt = 0xff;
+  static const _graphicControlExt = 0xf9;
 
-  static const EOF = -1;
-  static const BITS = 12;
-  static const HSIZE = 5003; // 80% occupancy
-  static const MASKS = [
+  static const _eof = -1;
+  static const _bits = 12;
+  static const _hsize = 5003; // 80% occupancy
+  static const _masks = [
     0x0000,
     0x0001,
     0x0003,
