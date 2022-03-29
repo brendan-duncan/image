@@ -135,9 +135,8 @@ void main() {
           }
         } else {
           final anim = decodeAnimation(file.readAsBytesSync());
-          if (anim == null) {
-            print("!!!!");
-          } else {
+          expect(anim, isNotNull);
+          if (anim != null) {
             if (anim.length == 1) {
               final png = PngEncoder().encodeImage(anim[0]);
               File('$tmpPath/out/png/$name')
