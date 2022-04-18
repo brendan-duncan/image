@@ -125,6 +125,12 @@ int setChannel(int color, Channel channel, int value) => channel == Channel.red
                 ? setAlpha(color, value)
                 : color;
 
+/// check if [color] is white
+bool isWhite(int color) => ((color) & 0xffffff == 0xffffff);
+
+/// check if [color] is white
+bool isBlack(int color) => ((color) & 0xffffff == 0x0);
+
 /// Get the red channel from the [color].
 int getRed(int color) => (color) & 0xff;
 
