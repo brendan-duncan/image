@@ -8,7 +8,7 @@ import 'package:http/http.dart';
 // https://www.waveshare.com/wiki/E-Paper_ESP8266_Driver_Board
 //
 Future<bool> epaperUpload(Image image, String host) async {
-  await makePostRequest(host+'/EPD', 'db');
+  await makePostRequest(host + '/EPD', 'db');
 
   String pixels = "";
   var currentByte = 0x0;
@@ -35,7 +35,7 @@ Future<bool> epaperUpload(Image image, String host) async {
         pixels += String.fromCharCode(((l & 0x0f00) >> 12) + 97);
         pixels += "LOAD";
 
-        await makePostRequest(host+'/LOAD', pixels);
+        await makePostRequest(host + '/LOAD', pixels);
 
         linecount += 1;
         pixels = "";
@@ -47,7 +47,19 @@ Future<bool> epaperUpload(Image image, String host) async {
       currentByte = currentByte << 1;
     }
   }
-  await makePostRequest(host+'/SHOW', '');
+
+  if (pixels.length > 0) {
+    var l = pixels.length;
+    pixels += String.fromCharCode(((l & 0x000f) >> 0) + 97);
+    pixels += String.fromCharCode(((l & 0x00f0) >> 4) + 97);
+    pixels += String.fromCharCode(((l & 0x0f00) >> 8) + 97);
+    pixels += String.fromCharCode(((l & 0x0f00) >> 12) + 97);
+    pixels += "LOAD";
+
+    await makePostRequest(host + '/LOAD', pixels);
+  }
+
+  await makePostRequest(host + '/SHOW', '');
 
   return true;
 }
@@ -57,6 +69,8 @@ makePostRequest(uriIn, bodyIn) async {
   final headers = {'Content-Type': 'text/plain'};
   final body = bodyIn;
   final encoding = Encoding.getByName('utf-8');
+
+  print(uri);
 
   Response response = await post(
     uri,
@@ -68,4 +82,3 @@ makePostRequest(uriIn, bodyIn) async {
   int statusCode = response.statusCode;
   String responseBody = response.body;
 }
-
