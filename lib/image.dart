@@ -138,6 +138,7 @@ export 'src/hdr/hdr_to_image.dart';
 export 'src/hdr/reinhard_tone_map.dart';
 export 'src/image.dart';
 export 'src/image_exception.dart';
+export 'src/transfer/epaper_upload.dart';
 export 'src/transform/bake_orientation.dart';
 export 'src/transform/copy_crop.dart';
 export 'src/transform/copy_into.dart';

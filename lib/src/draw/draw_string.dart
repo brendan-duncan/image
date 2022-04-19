@@ -14,6 +14,7 @@ var _a_lut = Uint8List(256);
 ///
 /// You can load your own font, or use one of the existing ones
 /// such as: [arial_14], [arial_24], or [arial_48].
+//  Fonts can be create with a tool such as: https://ttf2fnt.com/
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
     {int color = 0xffffffff}) {
   if (color != 0xffffffff) {
@@ -57,6 +58,68 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     }
 
     x += ch.xadvance;
+  }
+
+  return image;
+}
+
+/// Same as drawString except the strings will wrap around to create multiple lines.
+/// You can load your own font, or use one of the existing ones
+/// such as: [arial_14], [arial_24], or [arial_48].
+Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
+    {int color = 0xffffffff}) {
+
+  // find max height
+  var stringHeight = 0;
+  final chars = string.codeUnits;
+  for (var c in chars) {
+    if (!font.characters.containsKey(c)) {
+      continue;
+    }
+    final ch = font.characters[c]!;
+    if (ch.height + ch.yoffset > stringHeight) {
+      stringHeight = ch.height + ch.yoffset;
+    }
+  }
+  stringHeight = (stringHeight * 1.05).round();
+
+  var words = string.split(new RegExp(r"\s+"));
+  var subString = "";
+  var x2 = x;
+
+  for (var w in words) {
+    w += ' ';
+    final chars = w.codeUnits;
+    var wordWidth = 0;
+    for (var c in chars) {
+      if (!font.characters.containsKey(c)) {
+        wordWidth += font.base ~/ 2;
+        continue;
+      }
+      final ch = font.characters[c]!;
+      wordWidth += ch.xadvance;
+    }
+    if ((x2 + wordWidth) > image.width) {
+      // If there is a word that won't fit the starting x, stop drawing
+      if ((x == x2) || (x + wordWidth > image.width)) {
+        return image;
+      }
+
+      drawString(image, font, x, y, subString, color: color);
+
+      subString = "";
+      x2 = x;
+      y += stringHeight;
+      subString += w;
+      x2 += wordWidth;
+    } else {
+      subString += w;
+      x2 += wordWidth;
+    }
+
+    if (subString.length > 0) {
+      drawString(image, font, x, y, subString, color: color);
+    }
   }
 
   return image;
