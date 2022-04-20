@@ -34,8 +34,16 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     }
   }
 
+  final int origX = x;
+  final int stringHeight = findStringHeight(font, string);
   final chars = string.codeUnits;
   for (var c in chars) {
+    if (c == 10 || c == 13) {
+      y = y+stringHeight;
+      x = origX;
+      continue;
+    }
+
     if (!font.characters.containsKey(c)) {
       x += font.base ~/ 2;
       continue;
@@ -69,20 +77,7 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
     {int color = 0xffffffff}) {
 
-  // find max height
-  var stringHeight = 0;
-  final chars = string.codeUnits;
-  for (var c in chars) {
-    if (!font.characters.containsKey(c)) {
-      continue;
-    }
-    final ch = font.characters[c]!;
-    if (ch.height + ch.yoffset > stringHeight) {
-      stringHeight = ch.height + ch.yoffset;
-    }
-  }
-  stringHeight = (stringHeight * 1.05).round();
-
+  var stringHeight = findStringHeight(font, string);
   var words = string.split(new RegExp(r"\s+"));
   var subString = "";
   var x2 = x;
@@ -165,4 +160,19 @@ Image drawStringCentered(Image image, BitmapFont font, String string,
   }
 
   return drawString(image, font, xPos, yPos, string, color: color);
+}
+
+int findStringHeight(BitmapFont font, String string) {
+  var stringHeight = 0;
+  final chars = string.codeUnits;
+  for (var c in chars) {
+    if (!font.characters.containsKey(c)) {
+      continue;
+    }
+    final ch = font.characters[c]!;
+    if (ch.height + ch.yoffset > stringHeight) {
+      stringHeight = ch.height + ch.yoffset;
+    }
+  }
+  return (stringHeight * 1.05).round();
 }
