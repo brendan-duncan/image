@@ -16,7 +16,7 @@ var _a_lut = Uint8List(256);
 /// such as: [arial_14], [arial_24], or [arial_48].
 //  Fonts can be create with a tool such as: https://ttf2fnt.com/
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
-    {int color = 0xffffffff}) {
+    {int color = 0xffffffff, bool rightJustify = false}) {
   if (color != 0xffffffff) {
     final ca = getAlpha(color);
     if (ca == 0) {
@@ -34,30 +34,49 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     }
   }
 
-  final chars = string.codeUnits;
-  for (var c in chars) {
-    if (!font.characters.containsKey(c)) {
-      x += font.base ~/ 2;
-      continue;
-    }
+  final int stringHeight = findStringHeight(font, string);
+  final int origX = x;
+  final substrings = string.split(new RegExp(r"[(\n|\r)]"));
 
-    final ch = font.characters[c]!;
-
-    final x2 = x + ch.width;
-    final y2 = y + ch.height;
-    var pi = 0;
-    for (var yi = y; yi < y2; ++yi) {
-      for (var xi = x; xi < x2; ++xi) {
-        var p = ch.image[pi++];
-        if (color != 0xffffffff) {
-          p = getColor(_r_lut[getRed(p)], _g_lut[getGreen(p)],
-              _b_lut[getBlue(p)], _a_lut[getAlpha(p)]);
+  for (var ss in substrings) {
+    var chars = ss.codeUnits;
+    if (rightJustify == true) {
+      for (var c in chars) {
+        if (!font.characters.containsKey(c)) {
+          x -= font.base ~/ 2;
+          continue;
         }
-        drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, p);
+
+        final ch = font.characters[c]!;
+        x -= ch.xadvance;
       }
     }
+    for (var c in chars) {
+      if (!font.characters.containsKey(c)) {
+        x += font.base ~/ 2;
+        continue;
+      }
 
-    x += ch.xadvance;
+      final ch = font.characters[c]!;
+
+      final x2 = x + ch.width;
+      final y2 = y + ch.height;
+      var pi = 0;
+      for (var yi = y; yi < y2; ++yi) {
+        for (var xi = x; xi < x2; ++xi) {
+          var p = ch.image[pi++];
+          if (color != 0xffffffff) {
+            p = getColor(_r_lut[getRed(p)], _g_lut[getGreen(p)],
+                _b_lut[getBlue(p)], _a_lut[getAlpha(p)]);
+          }
+          drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, p);
+        }
+      }
+
+      x += ch.xadvance;
+    }
+    y = y+stringHeight;
+    x = origX;
   }
 
   return image;
@@ -69,20 +88,7 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
     {int color = 0xffffffff}) {
 
-  // find max height
-  var stringHeight = 0;
-  final chars = string.codeUnits;
-  for (var c in chars) {
-    if (!font.characters.containsKey(c)) {
-      continue;
-    }
-    final ch = font.characters[c]!;
-    if (ch.height + ch.yoffset > stringHeight) {
-      stringHeight = ch.height + ch.yoffset;
-    }
-  }
-  stringHeight = (stringHeight * 1.05).round();
-
+  var stringHeight = findStringHeight(font, string);
   var words = string.split(new RegExp(r"\s+"));
   var subString = "";
   var x2 = x;
@@ -165,4 +171,19 @@ Image drawStringCentered(Image image, BitmapFont font, String string,
   }
 
   return drawString(image, font, xPos, yPos, string, color: color);
+}
+
+int findStringHeight(BitmapFont font, String string) {
+  var stringHeight = 0;
+  final chars = string.codeUnits;
+  for (var c in chars) {
+    if (!font.characters.containsKey(c)) {
+      continue;
+    }
+    final ch = font.characters[c]!;
+    if (ch.height + ch.yoffset > stringHeight) {
+      stringHeight = ch.height + ch.yoffset;
+    }
+  }
+  return (stringHeight * 1.05).round();
 }
