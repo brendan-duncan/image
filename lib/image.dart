@@ -12,6 +12,7 @@ export 'src/draw/draw_line.dart';
 export 'src/draw/draw_pixel.dart';
 export 'src/draw/draw_rect.dart';
 export 'src/draw/draw_string.dart';
+export 'src/draw/draw_qr.dart';
 export 'src/draw/fill.dart';
 export 'src/draw/fill_flood.dart';
 export 'src/draw/fill_rect.dart';
