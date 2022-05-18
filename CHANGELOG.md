@@ -1,3 +1,7 @@
+## 3.2.0 - May 18, 2022
+
+- Update SDK dependency to >2.15.0 and XML package dependency to >6.0.0
+
 ## 3.1.3 - February 17, 2022
 
 - Optimize Image.getWhiteBalance function, add asDouble argument to return double value.
