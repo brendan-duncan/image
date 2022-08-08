@@ -148,6 +148,7 @@ export 'src/transform/copy_rotate.dart';
 export 'src/transform/flip.dart';
 export 'src/transform/trim.dart';
 export 'src/util/clip_line.dart';
+export 'src/util/dither_pixels.dart';
 export 'src/util/input_buffer.dart';
 export 'src/util/interpolation.dart';
 export 'src/util/min_max.dart';
