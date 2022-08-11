@@ -14,6 +14,7 @@ class PngInfo extends DecodeInfo {
   List<int>? transparency;
   List<int?>? colorLut;
   double? gamma;
+  List<List<int>> dataUncompressedUnfiltered = [];
   @override
   int backgroundColor = 0x00ffffff;
   String iCCPName = '';
