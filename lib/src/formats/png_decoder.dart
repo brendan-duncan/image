@@ -436,6 +436,7 @@ class PngDecoder extends Decoder {
     final pixel = [0, 0, 0, 0];
 
     //int pi = 0;
+    List<int> dataFrame = [];
     for (var srcY = 0, dstY = yOffset, ri = 0;
         srcY < passHeight;
         ++srcY, dstY += yStep, ri = 1 - ri, _progressY++) {
@@ -454,6 +455,8 @@ class PngDecoder extends Decoder {
       _resetBits();
 
       final rowInput = InputBuffer(row, bigEndian: true);
+      
+      dataFrame.addAll(rowInput.buffer.toList());
 
       final blockHeight = xStep;
       final blockWidth = xStep - xOffset;
@@ -478,6 +481,7 @@ class PngDecoder extends Decoder {
         }
       }
     }
+    info!.dataUncompressedUnfiltered.add(dataFrame);
   }
 
   void _process(InputBuffer input, Image image) {
@@ -502,6 +506,7 @@ class PngDecoder extends Decoder {
 
     final pixel = [0, 0, 0, 0];
 
+    List<int> dataFrame = [];
     for (var y = 0, pi = 0, ri = 0; y < h; ++y, ri = 1 - ri) {
       final filterType = input.readByte();
       inData[ri] = input.readBytes(rowBytes).toUint8List();
@@ -518,12 +523,15 @@ class PngDecoder extends Decoder {
       _resetBits();
 
       final rowInput = InputBuffer(inData[ri], bigEndian: true);
+      
+      dataFrame.addAll(rowInput.buffer.toList());
 
       for (var x = 0; x < w; ++x) {
         _readPixel(rowInput, pixel);
         image[pi++] = _getColor(pixel);
       }
     }
+    info!.dataUncompressedUnfiltered.add(dataFrame);
   }
 
   void _unfilter(int filterType, int bpp, List<int> row, List<int> prevRow) {
