@@ -410,29 +410,48 @@ class PngDecoder extends Decoder {
       return anim;
     }
 
-    int? dispose = PngFrame.APNG_DISPOSE_OP_BACKGROUND;
-    var lastImage = Image(_info!.width, _info!.height);
+    Image? lastImage = null;
     for (var i = 0; i < _info!.numFrames; ++i) {
-      //_frame = i;
-      lastImage = Image.from(lastImage);
-
       final frame = _info!.frames[i];
       final image = decodeFrame(i);
       if (image == null) {
         continue;
       }
 
-      if (dispose == PngFrame.APNG_DISPOSE_OP_BACKGROUND ||
-          dispose == PngFrame.APNG_DISPOSE_OP_PREVIOUS) {
-        lastImage.fill(_info!.backgroundColor);
+      if (lastImage == null) {
+        lastImage = image;
+        lastImage.duration = (frame.delay * 1000).toInt(); // Convert to MS
+        anim.addFrame(lastImage);
+        continue;
       }
+
+      if (image.width == lastImage.width && image.height == lastImage.height &&
+          frame.xOffset == 0 && frame.yOffset == 0 &&
+          frame.blend == PngFrame.APNG_BLEND_OP_SOURCE) {
+        lastImage = image;
+        lastImage.duration = (frame.delay * 1000).toInt(); // Convert to MS
+        anim.addFrame(lastImage);
+        continue;
+      }
+
+      final dispose = frame.dispose;
+      if (dispose == PngFrame.APNG_DISPOSE_OP_BACKGROUND) {
+        lastImage = Image(lastImage.width, lastImage.height);
+        lastImage.fill(_info!.backgroundColor);
+      } else if (dispose == PngFrame.APNG_DISPOSE_OP_PREVIOUS) {
+        lastImage = Image.from(lastImage);
+      } else {
+        lastImage = Image.from(lastImage);
+      }
+
+      lastImage.duration = (frame.delay * 1000).toInt(); // Convert to MS
+
       copyInto(lastImage, image,
           dstX: frame.xOffset,
           dstY: frame.yOffset,
           blend: frame.blend == PngFrame.APNG_BLEND_OP_OVER);
-      anim.addFrame(lastImage);
 
-      dispose = frame.dispose;
+      anim.addFrame(lastImage);
     }
 
     return anim;

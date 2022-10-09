@@ -20,7 +20,8 @@ void main() {
     test('decodeAnimation', () {
       var files = [
         ['test/res/png/apng/test_apng.png', 2, 'test_apng'],
-        ['test/res/png/apng/test_apng2.png', 60, 'test_apng2']];
+        ['test/res/png/apng/test_apng2.png', 60, 'test_apng2'],
+        ['test/res/png/apng/test_apng3.png', 19, 'test_apng3'],];
 
       for (var f in files)
       {

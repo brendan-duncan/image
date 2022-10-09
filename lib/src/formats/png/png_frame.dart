@@ -21,6 +21,9 @@ class PngFrame {
   int? blend;
 
   final List<int> _fdat = [];
+
+  double get delay => delayNum == null || delayDen == null ? 0 :
+    delayDen != 0 ? delayNum! / delayDen! : 0;
 }
 
 @internal
