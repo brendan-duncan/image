@@ -43,6 +43,16 @@ class BmpEncoder extends Encoder {
         if (bytesPerPixel == 4)
           out.writeByte(getAlpha(rgba));
       }
+
+      // Line padding
+      if (bytesPerPixel != 4) {
+        var padding = 4 - ((image.width * bytesPerPixel) % 4);
+        if (padding != 4) {
+          out.writeBytes(List.generate(padding - 1, (index) => 0x00));
+
+          out.writeByte(0xFF);
+        }
+      }
     }
 
     return out.getBytes();
