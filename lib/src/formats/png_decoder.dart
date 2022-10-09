@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
@@ -184,8 +185,7 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'fdAT':
-          /*int sequenceNumber =*/
-          _input.readUint32();
+          int sequenceNumber = _input.readUint32();
           final frame = _info!.frames.last as InternalPngFrame;
           frame.fdat.add(inputPos);
           _input.skip(chunkSize - 4);
@@ -253,23 +253,32 @@ class PngDecoder extends Decoder {
       return null;
     }
 
-    final imageData = <int>[];
+    Uint8List imageData;
 
     int? width = _info!.width;
     int? height = _info!.height;
 
     if (!_info!.isAnimated || frame == 0) {
+      var dataBlocks = <Uint8List>[];
+      var totalSize = 0;
       for (var i = 0, len = _info!.idat.length; i < len; ++i) {
         _input.offset = _info!.idat[i];
         final chunkSize = _input.readUint32();
         final chunkType = _input.readString(4);
         final data = _input.readBytes(chunkSize).toUint8List();
-        imageData.addAll(data);
+        totalSize += data.length;
+        dataBlocks.add(data);
         final crc = _input.readUint32();
         final computedCrc = _crc(chunkType, data);
         if (crc != computedCrc) {
           throw ImageException('Invalid $chunkType checksum');
         }
+      }
+      imageData = Uint8List(totalSize);
+      var offset = 0;
+      for (var data in dataBlocks) {
+        imageData.setAll(offset, data);
+        offset += data.length;
       }
     } else {
       if (frame < 0 || frame >= _info!.frames.length) {
@@ -279,14 +288,22 @@ class PngDecoder extends Decoder {
       final f = _info!.frames[frame] as InternalPngFrame;
       width = f.width;
       height = f.height;
+      var totalSize = 0;
+      var dataBlocks = <Uint8List>[];
       for (var i = 0; i < f.fdat.length; ++i) {
         _input.offset = f.fdat[i];
         final chunkSize = _input.readUint32();
-        /*String chunkType =*/
-        _input.readString(4);
+        _input.readString(4); // fDat chunk header
         _input.skip(4); // sequence number
-        final data = _input.readBytes(chunkSize).toUint8List();
-        imageData.addAll(data);
+        final data = _input.readBytes(chunkSize - 4).toUint8List();
+        totalSize += data.length;
+        dataBlocks.add(data);
+      }
+      imageData = Uint8List(totalSize);
+      var offset = 0;
+      for (var data in dataBlocks) {
+        imageData.setAll(offset, data);
+        offset += data.length;
       }
 
       //_frame = frame;
@@ -304,7 +321,13 @@ class PngDecoder extends Decoder {
 
     final image = Image(width!, height!, channels: channels);
 
-    final uncompressed = const ZLibDecoder().decodeBytes(imageData);
+    List<int> uncompressed;
+    try {
+      uncompressed = const ZLibDecoder().decodeBytes(imageData);
+    } catch (error) {
+      print(error);
+      return null;
+    }
 
     // input is the decompressed data.
     final input = InputBuffer(uncompressed, bigEndian: true);

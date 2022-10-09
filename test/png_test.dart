@@ -17,6 +17,26 @@ void main() {
         ..writeAsBytesSync(png);
     });
 
+    test('decodeAnimation', () {
+      var files = [
+        ['test/res/png/apng/test_apng.png', 2, 'test_apng'],
+        ['test/res/png/apng/test_apng2.png', 60, 'test_apng2']];
+
+      for (var f in files)
+      {
+        final bytes = File(f[0] as String).readAsBytesSync();
+        final anim = PngDecoder().decodeAnimation(bytes)!;
+        expect(anim.length, equals(f[1]));
+
+        /*for (var i = 0; i < anim.length; ++i) {
+          final png = PngEncoder().encodeImage(anim[i]);
+          File('$tmpPath/out/png/${f[2] as String}-$i.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(png);
+        }*/
+      }
+    });
+
     test('encodeAnimation', () {
       final anim = Animation();
       anim.loopCount = 10;
@@ -54,21 +74,6 @@ void main() {
 
       final png = PngEncoder().encodeImage(image);
       File('$tmpPath/out/png/decode.png').writeAsBytesSync(png);
-
-      final b2 = File('E:/test_dart_png.png').readAsBytesSync();
-      final i2 = decodeImage(b2);
-      expect(i2!.width, equals(3456));
-      expect(i2.height, equals(212));
-      var valid = false;
-      for (var i = 0; i < i2.length; ++i) {
-        if (i2[i] != 0) {
-          valid = true;
-          break;
-        }
-      }
-      expect(valid, equals(true));
-      File('E:/test_decoded.png')
-          .writeAsBytesSync(PngEncoder().encodeImage(i2));
     });
 
     test('iCCP', () {
