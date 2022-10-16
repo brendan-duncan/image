@@ -118,10 +118,11 @@ class GifDecoder extends Decoder {
       gifImage.clearFrame = disposalMethod == 2;
 
       if (transparentFlag != 0) {
+        if (gifImage.colorMap == null && info!.globalColorMap != null) {
+          gifImage.colorMap = GifColorMap.from(info!.globalColorMap!);
+        }
         if (gifImage.colorMap != null) {
           gifImage.colorMap!.transparent = transparent;
-        } else if (info!.globalColorMap != null) {
-          info!.globalColorMap!.transparent = transparent;
         }
       }
 
@@ -169,23 +170,38 @@ class GifDecoder extends Decoder {
     anim.height = info!.height;
     anim.loopCount = _repeat;
 
-    var lastImage = Image(info!.width, info!.height);
+    Image? lastImage = null;
     for (var i = 0; i < info!.numFrames; ++i) {
-      //_frame = i;
-      lastImage = Image.from(lastImage);
-
       final frame = info!.frames[i];
       final image = decodeFrame(i);
       if (image == null) {
         return null;
       }
 
-      final colorMap =
-          (frame.colorMap != null) ? frame.colorMap : info!.globalColorMap;
+      if (lastImage == null) {
+        lastImage = image;
+        lastImage.duration = frame.duration * 10; // Convert to MS
+        anim.addFrame(lastImage);
+        continue;
+      }
+
+      if (image.width == lastImage.width && image.height == lastImage.height &&
+          frame.x == 0 && frame.y == 0 && frame.clearFrame) {
+        lastImage = image;
+        lastImage.duration = frame.duration * 10; // Convert to MS
+        anim.addFrame(lastImage);
+        continue;
+      }
 
       if (frame.clearFrame) {
+        lastImage = Image(lastImage.width, lastImage.height);
+        final colorMap =
+          (frame.colorMap != null) ? frame.colorMap : info!.globalColorMap;
         lastImage.fill(colorMap!.color(info!.backgroundColor));
+      } else {
+        lastImage = new Image.from(lastImage);
       }
+
       copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
 
       lastImage.duration = frame.duration * 10; // Convert 1/100 sec to ms.

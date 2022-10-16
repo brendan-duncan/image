@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../../../image.dart';
 import '../../color.dart';
 
 class GifColorMap {
@@ -11,6 +12,12 @@ class GifColorMap {
   GifColorMap(this.numColors)
       : colors = Uint8List(numColors * 3),
         bitsPerPixel = _bitSize(numColors);
+
+  GifColorMap.from(GifColorMap other)
+    : bitsPerPixel = other.bitsPerPixel
+    , numColors = other.numColors
+    , transparent = other.transparent
+    , colors = Uint8List.fromList(other.colors);
 
   int operator [](int index) => colors[index];
 

@@ -170,6 +170,10 @@ int alphaBlendColors(int dst, int src, [int fraction = 0xff]) {
     // src is fully opaque, nothing to blend
     return src;
   }
+  if (srcAlpha == 0 && fraction == 0xff) {
+    // src is fully transparent, nothing to blend
+    return dst;
+  }
   var a = (srcAlpha / 255.0);
   if (fraction != 0xff) {
     a *= (fraction / 255.0);
