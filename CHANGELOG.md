@@ -1,3 +1,7 @@
+## 3.2.2 - October 15, 2022
+
+- Fix transparency issue with animated GIF images.
+
 ## 3.2.1 - October 15, 2022
 
 - Fixes for APNG: fix exception from some APNG files, and some frames were not composited correctly.
