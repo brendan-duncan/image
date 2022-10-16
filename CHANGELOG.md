@@ -1,3 +1,7 @@
+## 3.2.1 - October 15, 2022
+
+- Fixes for APNG: fix exception from some APNG files, and some frames were not composited correctly.
+
 ## 3.2.0 - May 18, 2022
 
 - Update SDK dependency to >2.15.0 and XML package dependency to >6.0.0
