@@ -45,7 +45,7 @@ class BmpDecoder extends Decoder {
       final line = info!.readBottomUp ? y : image.height - 1 - y;
       final row = _input.readBytes(rowStride);
       for (var x = 0; x < image.width;) {
-        info!.decodeRgba(row, (color) => image.setPixel(x++, line, color));
+        info!.decodeRgba(row, (color) => image.setPixelSafe(x++, line, color));
       }
     }
 

@@ -145,7 +145,13 @@ class BmpInfo extends DecodeInfo {
 
   void decodeRgba(InputBuffer input, void Function(int color) pixel) {
     if (colorPalette != null) {
-      if (bpp == 4) {
+      if (bpp == 1) {
+        final b = input.readByte().toRadixString(2).padLeft(8, '0');
+        for (int i = 0; i < 8; i++) {
+          pixel(colorPalette![int.parse(b[i])]);
+        }
+        return;
+      } else if (bpp == 4) {
         final b = input.readByte();
         final left = b >> 4;
         final right = b & 0x0f;

@@ -22,7 +22,7 @@ void main() {
         final List<int> bytes = f.readAsBytesSync();
         final image = BmpDecoder().decodeImage(bytes);
         if (image == null) {
-          throw ImageException('Unable to decode TGA Image: $name.');
+          throw ImageException('Unable to decode BMP Image: $name.');
         }
 
         final bmp = BmpEncoder().encodeImage(image);
