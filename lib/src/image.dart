@@ -97,11 +97,10 @@ class Image {
   Map<String, String>? textData;
 
   /// Palette data for indexed images.
-  int paletteSize = 16 * 16;
-  List<List<int>> palette = [];
+  List<int> palette;
 
   // Alpha channel data for indexed images.
-  List<int> alpha = [];
+  Uint8List alpha;
 
   /// {@template Image/Image_constructor}
   /// Create an image with the given dimensions and format.
@@ -110,14 +109,26 @@ class Image {
       {this.channels = Channels.rgba, ExifData? exif, ICCProfileData? iccp,
        this.textData})
       : data = Uint32List(width * height),
+        alpha = Uint8List(0),
+        palette = [],
         exif = ExifData.from(exif),
         iccProfile = iccp;
+
+  Image.palette(this.width, this.height)
+      : data = Uint32List(width * height),
+        channels = Channels.palette,
+        exif = ExifData(),
+        palette = List<int>.filled(16 * 16, Color.fromRgb(0, 0, 0)),
+        alpha = Uint8List(16 * 16),
+        iccProfile = null;
 
   /// {@macro Image/Image_constructor}
   Image.rgb(this.width, this.height, {ExifData? exif, ICCProfileData? iccp,
             this.textData})
       : channels = Channels.rgb,
         data = Uint32List(width * height),
+        alpha = Uint8List(0),
+        palette = [],
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
@@ -132,6 +143,8 @@ class Image {
         blendMethod = other.blendMethod,
         channels = other.channels,
         data = other.data.sublist(0),
+        palette = [],
+        alpha = Uint8List(0),
         exif = ExifData.from(other.exif),
         iccProfile = other.iccProfile {
     if (other.textData != null) {
@@ -163,6 +176,8 @@ class Image {
       Format format = Format.rgba,
       this.channels = Channels.rgba, this.textData})
       : data = _convertData(width, height, bytes, format),
+        alpha = Uint8List(0),
+        palette = Uint8List(0),
         exif = ExifData.from(exif),
         iccProfile = iccp;
 
@@ -564,8 +579,13 @@ class Image {
 
   void setIndexedPixel(int x, int y, int index, int grayscale) {
     data[y * width + x] = index;
-    palette![index] = [grayscale, grayscale, grayscale, grayscale];
-    alpha![index] = 255;
+    palette[index] = Color.fromRgb(grayscale, grayscale, grayscale);
+    alpha[index] = 255;
+  }
+
+  void setPaletteIndex(int index, int r, int g, int b, int a) {
+    palette[index] = Color.fromRgb(r, g, b);
+    alpha[index] = a;
   }
 
   /// Set the pixel at the given [x], [y] coordinate to the [color].

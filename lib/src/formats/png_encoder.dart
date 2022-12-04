@@ -31,6 +31,7 @@ class PngEncoder extends Encoder {
       _writeHeader(_width, _height);
 
       if(channels == Channels.palette) {
+        filter = FILTER_PALETTE;
         _writePaletteChunk(image.palette);
         _writeTRNSChunk(image.alpha);
       }
@@ -131,19 +132,18 @@ class PngEncoder extends Encoder {
     _writeChunk(output!, 'IHDR', chunk.getBytes());
   }
 
-  void _writePaletteChunk(List<List<int>> palette) {
+  void _writePaletteChunk(List<int> palette) {
     final chunk = OutputBuffer(bigEndian: true);
     for (var i = 0; i < palette.length; i++) {
-      List<int> c = palette[i];
-      chunk.writeByte(c[0]);
-      chunk.writeByte(c[1]);
-      chunk.writeByte(c[2]);
+      int rawColor = palette[i];
+      chunk.writeByte(getRed(rawColor));
+      chunk.writeByte(getGreen(rawColor));
+      chunk.writeByte(getBlue(rawColor));
     }
     _writeChunk(output!, 'PLTE', chunk.getBytes());
   }
 
   void _writeTRNSChunk(List<int> alpha) {
-
     final chunk = OutputBuffer(bigEndian: true);
     for (var i = 0; i < alpha.length; i++) {
       chunk.writeByte(alpha[i]);
@@ -229,6 +229,9 @@ class PngEncoder extends Encoder {
           // the smallest sum of absolute values per row.
           oi = _filterPaeth(image, oi, y, out);
           break;
+        case FILTER_PALETTE:
+          oi = _filterPalette(image, oi, y, out);
+          break;
         default:
           oi = _filterNone(image, oi, y, out);
           break;
@@ -246,6 +249,14 @@ class PngEncoder extends Encoder {
       if (image.channels == Channels.rgba) {
         out[oi++] = getAlpha(image.getPixel(x, row));
       }
+    }
+    return oi;
+  }
+
+  int _filterPalette(Image image, int oi, int row, List<int> out) {
+    out[oi++] = FILTER_NONE;
+    for (var x = 0; x < image.width; ++x) {
+      out[oi++] = image.getPixel(x, row);
     }
     return oi;
   }
@@ -423,6 +434,7 @@ class PngEncoder extends Encoder {
   static const FILTER_AVERAGE = 3;
   static const FILTER_PAETH = 4;
   static const FILTER_AGRESSIVE = 5;
+  static const FILTER_PALETTE = 6;
 
 // Table of CRCs of all 8-bit messages.
 //final List<int> _crcTable = List<int>(256);
