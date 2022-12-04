@@ -30,12 +30,9 @@ class PngEncoder extends Encoder {
 
       _writeHeader(_width, _height);
 
-      if(image.palette != null) {
-        _writePaletteChunk(image.palette!);
-      }
-
-      if(image.alpha != null) {
-        _writeTRNSChunk(image.alpha!);
+      if(channels == Channels.palette) {
+        _writePaletteChunk(image.palette);
+        _writeTRNSChunk(image.alpha);
       }
 
       _writeICCPChunk(output, image.iccProfile);
@@ -145,7 +142,7 @@ class PngEncoder extends Encoder {
     _writeChunk(output!, 'PLTE', chunk.getBytes());
   }
 
-  void _writeTRNSChunk(Uint8List alpha) {
+  void _writeTRNSChunk(List<int> alpha) {
 
     final chunk = OutputBuffer(bigEndian: true);
     for (var i = 0; i < alpha.length; i++) {

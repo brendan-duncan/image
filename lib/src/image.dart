@@ -98,17 +98,17 @@ class Image {
 
   /// Palette data for indexed images.
   int paletteSize = 16 * 16;
-  List<List<int>>? palette;
+  List<List<int>> palette = [];
 
   // Alpha channel data for indexed images.
-  Uint8List? alpha;
+  List<int> alpha = [];
 
   /// {@template Image/Image_constructor}
   /// Create an image with the given dimensions and format.
   /// {@endtemplate}
   Image(this.width, this.height,
       {this.channels = Channels.rgba, ExifData? exif, ICCProfileData? iccp,
-       this.textData, this.palette, this.alpha})
+       this.textData})
       : data = Uint32List(width * height),
         exif = ExifData.from(exif),
         iccProfile = iccp;
