@@ -8,7 +8,7 @@ import 'util/interpolation.dart';
 
 enum Format { argb, abgr, rgba, bgra, rgb, bgr, luminance }
 
-enum Channels { rgb, rgba }
+enum Channels { rgb, rgba, palette }
 
 enum BlendMode {
   /// No alpha blending should be done when drawing this frame (replace
@@ -96,12 +96,19 @@ class Image {
   /// Some formats, like PNG, can encode and decode text data with the image.
   Map<String, String>? textData;
 
+  /// Palette data for indexed images.
+  int paletteSize = 16 * 16;
+  List<List<int>>? palette;
+
+  // Alpha channel data for indexed images.
+  Uint8List? alpha;
+
   /// {@template Image/Image_constructor}
   /// Create an image with the given dimensions and format.
   /// {@endtemplate}
   Image(this.width, this.height,
       {this.channels = Channels.rgba, ExifData? exif, ICCProfileData? iccp,
-       this.textData})
+       this.textData, this.palette, this.alpha})
       : data = Uint32List(width * height),
         exif = ExifData.from(exif),
         iccProfile = iccp;
@@ -553,6 +560,12 @@ class Image {
   /// No range checking is done.
   void setPixel(int x, int y, int color) {
     data[y * width + x] = color;
+  }
+
+  void setIndexedPixel(int x, int y, int index, int grayscale) {
+    data[y * width + x] = index;
+    palette![index] = [grayscale, grayscale, grayscale, grayscale];
+    alpha![index] = 255;
   }
 
   /// Set the pixel at the given [x], [y] coordinate to the [color].

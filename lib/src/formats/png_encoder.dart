@@ -30,6 +30,14 @@ class PngEncoder extends Encoder {
 
       _writeHeader(_width, _height);
 
+      if(image.palette != null) {
+        _writePaletteChunk(image.palette!);
+      }
+
+      if(image.alpha != null) {
+        _writeTRNSChunk(image.alpha!);
+      }
+
       _writeICCPChunk(output, image.iccProfile);
 
       if (isAnimated) {
@@ -119,11 +127,31 @@ class PngEncoder extends Encoder {
     chunk.writeUint32(width);
     chunk.writeUint32(height);
     chunk.writeByte(8);
-    chunk.writeByte(channels == Channels.rgb ? 2 : 6);
+    chunk.writeByte(channels == Channels.rgb ? 2 : channels == Channels.palette ? 3 : 6);
     chunk.writeByte(0); // compression method
     chunk.writeByte(0); // filter method
     chunk.writeByte(0); // interlace method
     _writeChunk(output!, 'IHDR', chunk.getBytes());
+  }
+
+  void _writePaletteChunk(List<List<int>> palette) {
+    final chunk = OutputBuffer(bigEndian: true);
+    for (var i = 0; i < palette.length; i++) {
+      List<int> c = palette[i];
+      chunk.writeByte(c[0]);
+      chunk.writeByte(c[1]);
+      chunk.writeByte(c[2]);
+    }
+    _writeChunk(output!, 'PLTE', chunk.getBytes());
+  }
+
+  void _writeTRNSChunk(Uint8List alpha) {
+
+    final chunk = OutputBuffer(bigEndian: true);
+    for (var i = 0; i < alpha.length; i++) {
+      chunk.writeByte(alpha[i]);
+    }
+    _writeChunk(output!, 'tRNS', chunk.getBytes());
   }
 
   void _writeAnimationControlChunk() {
