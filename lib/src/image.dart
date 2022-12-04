@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'color.dart';
-import 'exif_data.dart';
+import 'exif/exif_data.dart';
 import 'icc_profile_data.dart';
 import 'util/interpolation.dart';
 

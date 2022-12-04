@@ -1,4 +1,4 @@
-import '../exif_data.dart';
+import '../exif/exif_data.dart';
 import '../image.dart';
 import 'copy_rotate.dart';
 import 'flip.dart';
@@ -9,19 +9,15 @@ import 'flip.dart';
 /// data.
 Image bakeOrientation(Image image) {
   final bakedImage = Image.from(image);
-  if (!image.exif.hasOrientation || image.exif.orientation == 1) {
+  if (!image.exif.imageIfd.hasOrientation || image.exif.imageIfd.Orientation == 1) {
     return bakedImage;
   }
 
   // Copy all exif data except for orientation
-  bakedImage.exif = ExifData();
-  for (var key in image.exif.data.keys) {
-    if (key != ExifData.ORIENTATION) {
-      bakedImage.exif.data[key] = image.exif.data[key];
-    }
-  }
+  bakedImage.exif = ExifData.from(image.exif);
+  bakedImage.exif.imageIfd.Orientation = null;
 
-  switch (image.exif.orientation) {
+  switch (image.exif.imageIfd.Orientation) {
     case 2:
       return flipHorizontal(bakedImage);
     case 3:

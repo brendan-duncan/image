@@ -1,20 +1,11 @@
 import 'dart:typed_data';
 
-import '../../exif_data.dart';
-import '../../image.dart';
-import '../../image_exception.dart';
-import '../../util/input_buffer.dart';
+import '../../../image.dart';
+import '../../exif/exif_data.dart';
 import '_component_data.dart';
-import 'jpeg.dart';
-import 'jpeg_adobe.dart';
-import 'jpeg_component.dart';
-import 'jpeg_frame.dart';
-import 'jpeg_info.dart';
-import 'jpeg_jfif.dart';
 import 'jpeg_quantize_stub.dart'
     if (dart.library.io) '_jpeg_quantize_io.dart'
     if (dart.library.js) '_jpeg_quantize_html.dart';
-import 'jpeg_scan.dart';
 
 class JpegData {
   late InputBuffer input;
@@ -278,156 +269,18 @@ class JpegData {
     return c;
   }
 
-  dynamic _readExifValue(InputBuffer block, int format, int offset) {
-    const FMT_BYTE = 1;
-    const FMT_ASCII = 2;
-    const FMT_USHORT = 3;
-    const FMT_ULONG = 4;
-    const FMT_URATIONAL = 5;
-    const FMT_SBYTE = 6;
-    const FMT_UNDEFINED = 7;
-    const FMT_SSHORT = 8;
-    const FMT_SLONG = 9;
-    const FMT_SRATIONAL = 10;
-    const FMT_SINGLE = 11;
-    const FMT_DOUBLE = 12;
-
-    final initialBlockLength = block.length;
-    try {
-      switch (format) {
-        case FMT_SBYTE:
-          return block.readInt8();
-        case FMT_BYTE:
-        case FMT_UNDEFINED:
-          return block.readByte();
-        case FMT_ASCII:
-          return block.readString(1);
-        case FMT_USHORT:
-          return block.readUint16();
-        case FMT_ULONG:
-          return block.readUint32();
-        case FMT_URATIONAL:
-        case FMT_SRATIONAL:
-          {
-            final buffer = block.peekBytes(8, offset);
-            final num = buffer.readInt32();
-            final den = buffer.readInt32();
-            if (den == 0) {
-              return 0.0;
-            }
-            return num / den;
-          }
-        case FMT_SSHORT:
-          return block.readInt16();
-        case FMT_SLONG:
-          return block.readInt32();
-        // Not sure if this is correct (never seen float used in Exif format)
-        case FMT_SINGLE:
-          return block.readFloat32();
-        case FMT_DOUBLE:
-          return block.peekBytes(8, offset).readFloat64();
-        default:
-          return 0;
-      }
-    } finally {
-      final bytesRead = initialBlockLength - block.length;
-      if (bytesRead < 4) {
-        block.skip(4 - bytesRead);
-      }
-    }
-  }
-
-  void _readExifDir(InputBuffer block, [int nesting = 0]) {
-    if (nesting > 4) {
-      return; // Maximum Exif directory nesting exceeded (corrupt Exif header)
-    }
-
-    final numDirEntries = block.readUint16();
-
-    //const TAG_ORIENTATION = 0x0112;
-    //const TAG_INTEROP_OFFSET = 0xA005;
-    //const TAG_EXIF_OFFSET = 0x8769;
-    const maxFormats = 12;
-    const bytesPerFormat = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
-
-    for (var di = 0; di < numDirEntries; ++di) {
-      final tag = block.readUint16();
-      final format = block.readUint16();
-      final components = block.readUint32();
-
-      if (format - 1 >= maxFormats) {
-        continue;
-      }
-
-      // too many components
-      if (components > 0x10000) {
-        continue;
-      }
-
-      final byteCount = bytesPerFormat[format];
-
-      var offset = 0;
-
-      // If its bigger than 4 bytes, the dir entry contains an offset.
-      if (byteCount > 4) {
-        offset = block.readUint32();
-        if (offset + byteCount > block.length) {
-          continue; // Bogus pointer offset and / or bytecount value
-        }
-
-        //ValuePtr = OffsetBase+OffsetVal;
-      }
-
-      exif.data[tag] = _readExifValue(block, format, offset);
-    }
-  }
-
   void _readExifData(InputBuffer block) {
-    exif.rawData ??= <Uint8List>[];
-
-    final rawData = block.toUint8List().sublist(0);
-    exif.rawData!.add(rawData);
-
-    const EXIF_TAG = 0x45786966; // Exif\0\0
-    if (block.readUint32() != EXIF_TAG) {
+    // Exif Header
+    const exifSignature = 0x45786966; // Exif\0\0
+    final signature = block.readUint32();
+    if (signature != exifSignature) {
       return;
     }
     if (block.readUint16() != 0) {
       return;
     }
 
-    final saveEndian = block.bigEndian;
-
-    // Exif Directory
-    final alignment = block.readString(2);
-    if (alignment == 'II') {
-      // Exif is in Intel order
-      block.bigEndian = false;
-    } else if (alignment == 'MM') {
-      // Exif section in Motorola order
-      block.bigEndian = true;
-    } else {
-      return;
-    }
-
-    block.skip(2);
-
-    final offset = block.readUint32();
-    if (offset < 8 || offset > 16) {
-      if (offset > block.length - 16) {
-        // invalid offset for first Exif IFD value ;
-        block.bigEndian = saveEndian;
-        return;
-      }
-    }
-
-    if (offset > 8) {
-      block.skip(offset - 8);
-    }
-
-    _readExifDir(block);
-
-    block.bigEndian = saveEndian;
+    exif.read(block);
   }
 
   void _readAppData(int marker, InputBuffer block) {

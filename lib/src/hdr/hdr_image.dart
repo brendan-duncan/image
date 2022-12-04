@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../exif/exif_data.dart';
 import '../image.dart';
 import 'hdr_slice.dart';
 
@@ -34,6 +35,7 @@ class HdrImage {
   HdrSlice? blue;
   HdrSlice? alpha;
   HdrSlice? depth;
+  ExifData? exif;
 
   HdrImage();
 

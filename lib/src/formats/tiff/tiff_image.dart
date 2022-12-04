@@ -1,19 +1,7 @@
 import 'dart:typed_data';
-
 import 'package:archive/archive.dart';
-
-import '../../color.dart';
-import '../../formats/jpeg_decoder.dart';
-import '../../hdr/half.dart';
-import '../../hdr/hdr_image.dart';
-import '../../image.dart';
-import '../../image_exception.dart';
+import '../../../image.dart';
 import '../../internal/bit_operators.dart';
-import '../../util/input_buffer.dart';
-import 'tiff_bit_reader.dart';
-import 'tiff_entry.dart';
-import 'tiff_fax_decoder.dart';
-import 'tiff_lzw_decoder.dart';
 
 class TiffImage {
   Map<int, TiffEntry> tags = {};

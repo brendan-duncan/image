@@ -4,7 +4,7 @@ import 'input_buffer.dart';
 
 class OutputBuffer {
   int length;
-  final bool bigEndian;
+  bool bigEndian;
 
   /// Create a byte buffer for writing.
   OutputBuffer({int? size = _BLOCK_SIZE, this.bigEndian = false})
@@ -74,6 +74,48 @@ class OutputBuffer {
     writeByte((value >> 8) & 0xff);
     writeByte((value >> 16) & 0xff);
     writeByte((value >> 24) & 0xff);
+  }
+
+  void writeFloat32(double value) {
+    final fb = Float32List(1);
+    fb[0] = value;
+    final b = Uint8List.view(fb.buffer);
+    if (bigEndian) {
+      writeByte(b[3]);
+      writeByte(b[2]);
+      writeByte(b[1]);
+      writeByte(b[0]);
+      return;
+    }
+    writeByte(b[0]);
+    writeByte(b[1]);
+    writeByte(b[2]);
+    writeByte(b[3]);
+  }
+
+  void writeFloat64(double value) {
+    final fb = Float64List(1);
+    fb[0] = value;
+    final b = Uint8List.view(fb.buffer);
+    if (bigEndian) {
+      writeByte(b[7]);
+      writeByte(b[6]);
+      writeByte(b[5]);
+      writeByte(b[4]);
+      writeByte(b[3]);
+      writeByte(b[2]);
+      writeByte(b[1]);
+      writeByte(b[0]);
+      return;
+    }
+    writeByte(b[0]);
+    writeByte(b[1]);
+    writeByte(b[2]);
+    writeByte(b[3]);
+    writeByte(b[4]);
+    writeByte(b[5]);
+    writeByte(b[6]);
+    writeByte(b[7]);
   }
 
   /// Return the subset of the buffer in the range [start:end].

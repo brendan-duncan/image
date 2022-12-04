@@ -63,7 +63,6 @@ void main() {
 
       final name = f.path.split(RegExp(r'(/|\\)')).last;
       test(name, () {
-        print(name);
         final List<int> bytes = f.readAsBytesSync();
         final image = TiffDecoder().decodeImage(bytes);
         if (image == null) {

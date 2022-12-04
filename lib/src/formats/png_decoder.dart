@@ -6,6 +6,7 @@ import 'package:archive/archive.dart';
 import '../animation.dart';
 import '../color.dart';
 import '../icc_profile_data.dart';
+import '../exif/exif_data.dart';
 import '../image.dart';
 import '../image_exception.dart';
 import '../transform/copy_into.dart';
@@ -148,6 +149,13 @@ class PngDecoder extends Decoder {
           // End of the image.
           _input.skip(4); // CRC
           break;
+        /*case 'eXif': // TODO: parse exif
+          {
+            final exifData = _input.readBytes(chunkSize);
+            final exif = ExifData.fromInputBuffer(exifData);
+            _input.skip(4); // CRC
+            break;
+          }*/
         case 'gAMA':
           if (chunkSize != 4) {
             throw ImageException('Invalid gAMA chunk');
@@ -185,7 +193,7 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'fdAT':
-          int sequenceNumber = _input.readUint32();
+          /*int sequenceNumber =*/ _input.readUint32();
           final frame = _info!.frames.last as InternalPngFrame;
           frame.fdat.add(inputPos);
           _input.skip(chunkSize - 4);

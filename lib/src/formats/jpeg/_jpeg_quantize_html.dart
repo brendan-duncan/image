@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import '../../color.dart';
-import '../../exif_data.dart';
+import '../../exif/exif_data.dart';
 import '../../image.dart';
 import '../../image_exception.dart';
 import '../../internal/bit_operators.dart';
@@ -211,7 +211,8 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 }
 
 Image getImageFromJpeg(JpegData jpeg) {
-  final orientation = jpeg.exif.hasOrientation ? jpeg.exif.orientation : 0;
+  final orientation =
+    jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.Orientation! : 0;
   final w = jpeg.width!;
   final h = jpeg.height!;
   final flipWidthHeight = orientation >= 5 && orientation <= 8;
@@ -220,13 +221,9 @@ Image getImageFromJpeg(JpegData jpeg) {
 
   final image = Image(width, height, channels: Channels.rgb);
 
-  // Copy exif data, except for ORIENTATION which we're baking.
-  image.exif = ExifData();
-  for (var key in jpeg.exif.data.keys) {
-    if (key != ExifData.ORIENTATION) {
-      image.exif.data[key] = jpeg.exif.data[key];
-    }
-  }
+  // Copy exif data, except for Orientation which we're baking.
+  image.exif = ExifData.from(jpeg.exif);
+  image.exif.imageIfd.Orientation = null;
 
   ComponentData component1;
   ComponentData component2;

@@ -1,13 +1,8 @@
-import '../animation.dart';
-import '../hdr/hdr_image.dart';
-import '../image.dart';
-import '../util/input_buffer.dart';
-import 'decoder.dart';
-import 'tiff/tiff_image.dart';
-import 'tiff/tiff_info.dart';
+import '../../image.dart';
 
 class TiffDecoder extends Decoder {
   TiffInfo? info;
+  ExifData? exif;
 
   /// Is the given file a valid TIFF image?
   @override
@@ -19,6 +14,9 @@ class TiffDecoder extends Decoder {
   TiffInfo? startDecode(List<int> bytes) {
     _input = InputBuffer(bytes);
     info = _readHeader(_input);
+    if (info != null) {
+      exif = ExifData.fromInputBuffer(InputBuffer(bytes));
+    }
     return info;
   }
 
@@ -38,7 +36,11 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    return info!.images[frame].decode(_input);
+    final image = info!.images[frame].decode(_input);
+    if (exif != null) {
+      image.exif = exif!;
+    }
+    return image;
   }
 
   HdrImage? decodeFrameHdr(int frame) {
@@ -60,7 +62,10 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    return info!.images[frame].decode(_input);
+    final image = info!.images[frame].decode(_input);
+    image.exif = ExifData.fromInputBuffer(InputBuffer(bytes));
+
+    return image;
   }
 
   @override
@@ -72,7 +77,10 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    return info!.images[frame].decodeHdr(_input);
+    final image = info!.images[frame].decodeHdr(_input);
+    image.exif = ExifData.fromInputBuffer(InputBuffer(bytes));
+
+    return image;
   }
 
   /// Decode all of the frames from an animation. If the file is not an

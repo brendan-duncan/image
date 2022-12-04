@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../exif_data.dart';
+import '../exif/exif_data.dart';
 import '../image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
@@ -522,15 +522,20 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeAPP1(OutputBuffer out, ExifData exif) {
-    if (exif.rawData == null) {
+    if (exif.isEmpty) {
       return;
     }
 
-    for (var rawData in exif.rawData!) {
-      _writeMarker(out, Jpeg.M_APP1);
-      out.writeUint16(rawData.length + 2);
-      out.writeBytes(rawData);
-    }
+    final exifData = OutputBuffer();
+    exif.write(exifData);
+    final exifBytes = exifData.getBytes();
+
+    _writeMarker(out, Jpeg.M_APP1);
+    out.writeUint16(exifBytes.length + 8);
+    const exifSignature = 0x45786966; // Exif\0\0
+    out.writeUint32(exifSignature);
+    out.writeUint16(0);
+    out.writeBytes(exifBytes);
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height) {
