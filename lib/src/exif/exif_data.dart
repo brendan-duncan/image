@@ -137,6 +137,26 @@ class ExifIFD {
     }
   }
 
+  bool get hasImageWidth => data.containsKey(0x0100);
+  int? get ImageWidth => data[0x0100]?.toInt();
+  set ImageWidth(int? value) {
+    if (value == null) {
+      data.remove(0x0100);
+    } else {
+      data[0x0100] = ExifShortValue(value);
+    }
+  }
+
+  bool get hasImageHeight => data.containsKey(0x0101);
+  int? get ImageHeight => data[0x0101]?.toInt();
+  set ImageHeight(int? value) {
+    if (value == null) {
+      data.remove(0x0101);
+    } else {
+      data[0x0101] = ExifShortValue(value);
+    }
+  }
+
   bool get hasSoftware => data.containsKey(0x0131);
   String? get Software => data[0x0131]?.toString();
   set Software(String? value) {
