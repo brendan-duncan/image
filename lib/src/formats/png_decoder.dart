@@ -6,7 +6,6 @@ import 'package:archive/archive.dart';
 import '../animation.dart';
 import '../color.dart';
 import '../icc_profile_data.dart';
-import '../exif/exif_data.dart';
 import '../image.dart';
 import '../image_exception.dart';
 import '../transform/copy_into.dart';

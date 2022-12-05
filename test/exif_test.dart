@@ -1,6 +1,4 @@
 import 'package:image/image.dart';
-import 'package:image/src/exif/exif_data.dart';
-import 'package:image/src/exif/exif_value.dart';
 import 'package:test/test.dart';
 
 void main() {

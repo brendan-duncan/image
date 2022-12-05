@@ -94,7 +94,10 @@ Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
   var x2 = x;
 
   for (var w in words) {
-    w += ' ';
+    final ws = StringBuffer();
+    ws.write(w);
+    ws.write(' ');
+    w = ws.toString();
     final chars = w.codeUnits;
     var wordWidth = 0;
     for (var c in chars) {

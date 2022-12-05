@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import '../../../image.dart';
-import '../../exif/exif_data.dart';
 import '_component_data.dart';
 import 'jpeg_quantize_stub.dart'
     if (dart.library.io) '_jpeg_quantize_io.dart'
