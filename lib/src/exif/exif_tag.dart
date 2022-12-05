@@ -13,6 +13,7 @@ const ExifTagNameToID = <String, int>{
   'OldSubfileType': 0xff,
   'ImageWidth': 0x100,
   'ImageLength': 0x101,
+  'ImageHeight': 0x101, // alias for a more common name.
   'BitsPerSample': 0x102,
   'Compression': 0x103,
   'PhotometricInterpretation': 0x106,
