@@ -16,12 +16,14 @@ void main() {
     test('exif', () {
       final fb = File('test/res/jpg/big_buck_bunny.jpg').readAsBytesSync();
       final image = JpegDecoder().decodeImage(fb)!;
-      image.exif.imageIfd.XResolution = [300,1];
-      image.exif.imageIfd.YResolution = [300,1];
+      image.exif.imageIfd['XResolution'] = [300,1];
+      image.exif.imageIfd['YResolution'] = [300,1];
       var jpg = JpegEncoder().encodeImage(image);
       final image2 = JpegDecoder().decodeImage(jpg)!;
-      expect(image.exif.imageIfd.XResolution, equals(image2.exif.imageIfd.XResolution));
-      expect(image.exif.imageIfd.YResolution, equals(image2.exif.imageIfd.YResolution));
+      expect(image.exif.imageIfd['XResolution'],
+          equals(image2.exif.imageIfd['XResolution']));
+      expect(image.exif.imageIfd['YResolution'],
+          equals(image2.exif.imageIfd['YResolution']));
     });
 
     final dir = Directory('test/res/jpg');

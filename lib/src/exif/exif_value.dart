@@ -442,6 +442,9 @@ class ExifSRationalValue extends ExifValue {
   ExifSRationalValue(int numerator, int denominator)
       : value = [Rational(numerator, denominator)];
 
+  ExifSRationalValue.from(Rational value)
+      : value = [value];
+
   ExifSRationalValue.data(InputBuffer data, int count)
       : value = List<Rational>.generate(count, (i) =>
         Rational(data.readInt32(), data.readInt32()));

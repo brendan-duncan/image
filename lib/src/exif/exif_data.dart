@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../util/input_buffer.dart';
 import '../util/output_buffer.dart';
 import 'exif_tag.dart';
@@ -55,8 +57,140 @@ class ExifIFD {
 
   bool containsKey(int tag) => data.containsKey(tag);
 
-  ExifValue? operator[](int tag) => data[tag];
-  void operator[]=(int tag, ExifValue value) { data[tag] = value; }
+  ExifValue? operator[](Object? tag) {
+    if (tag is String) {
+      tag = ExifTagNameToID[tag];
+    }
+    if (tag is int) {
+      return data[tag];
+    }
+    return null;
+  }
+
+  void operator[]=(Object? tag, Object? value) {
+    if (tag is String) {
+      tag = ExifTagNameToID[tag];
+    }
+    if (tag is! int) {
+      return;
+    }
+
+    if (value == null) {
+      data.remove(tag);
+    } else {
+      if (value is ExifValue) {
+        data[tag] = value;
+      } else {
+        final tagInfo = ExifImageTags[tag];
+        if (tagInfo != null) {
+          final tagType = tagInfo.type;
+          final tagCount = tagInfo.count;
+          switch (tagType) {
+            case ExifValueType.Byte:
+              if (value is List<int> && value.length == tagCount) {
+                data[tag] = ExifByteValue.list(Uint8List.fromList(value));
+              } else if (value is int && tagCount == 1) {
+                data[tag] = ExifByteValue(value);
+              }
+              break;
+            case ExifValueType.Ascii:
+              if (value is String) {
+                data[tag] = ExifAsciiValue(value);
+              }
+              break;
+            case ExifValueType.Short:
+              if (value is List<int> && value.length == tagCount) {
+                data[tag] = ExifShortValue.list(Uint16List.fromList(value));
+              } else if (value is int && tagCount == 1) {
+                data[tag] = ExifShortValue(value);
+              }
+              break;
+            case ExifValueType.Long:
+              if (value is List<int> && value.length == tagCount) {
+                data[tag] = ExifLongValue.list(Uint32List.fromList(value));
+              } else if (value is int && tagCount == 1) {
+                data[tag] = ExifLongValue(value);
+              }
+              break;
+            case ExifValueType.Rational:
+              if (value is List<Rational> && value.length == tagCount) {
+                data[tag] = ExifRationalValue.list(value);
+              } else if (tagCount == 1 && value is List<int> &&
+                  value.length == 2) {
+                data[tag] = ExifRationalValue(value[0], value[1]);
+              } else if (tagCount == 1 && value is Rational) {
+                data[tag] = ExifRationalValue.from(value);
+              } else if (value is List<List<int>> && value.length == tagCount) {
+                data[tag] = ExifRationalValue.list(
+                    List<Rational>.generate(value.length,
+                        (index) => Rational(value[index][0], value[index][1])));
+              }
+              break;
+            case ExifValueType.SByte:
+              if (value is List<int> && value.length == tagCount) {
+                data[tag] = ExifSByteValue.list(Int8List.fromList(value));
+              } else if (value is int && tagCount == 1) {
+                data[tag] = ExifSByteValue(value);
+              }
+              break;
+            case ExifValueType.Undefined:
+              if (value is List<int>) {
+                data[tag] = ExifUndefinedValue.list(Uint8List.fromList(value));
+              }
+              break;
+            case ExifValueType.SShort:
+              if (value is List<int> && value.length == tagCount) {
+                data[tag] = ExifSShortValue.list(Int16List.fromList(value));
+              } else if (value is int && tagCount == 1) {
+                data[tag] = ExifSShortValue(value);
+              }
+              break;
+            case ExifValueType.SLong:
+              if (value is List<int> && value.length == tagCount) {
+                data[tag] = ExifSLongValue.list(Int32List.fromList(value));
+              } else if (value is int && tagCount == 1) {
+                data[tag] = ExifSLongValue(value);
+              }
+              break;
+            case ExifValueType.SRational:
+              if (value is List<Rational> && value.length == tagCount) {
+                data[tag] = ExifSRationalValue.list(value);
+              } else if (tagCount == 1 && value is List<int> &&
+                  value.length == 2) {
+                data[tag] = ExifSRationalValue(value[0], value[1]);
+              } else if (tagCount == 1 && value is Rational) {
+                data[tag] = ExifSRationalValue.from(value);
+              } else if (value is List<List<int>> && value.length == tagCount) {
+                data[tag] = ExifSRationalValue.list(
+                  List<Rational>.generate(value.length,
+                        (index) => Rational(value[index][0], value[index][1])));
+              }
+              break;
+            case ExifValueType.Single:
+              if (value is List<double> && value.length == tagCount) {
+                data[tag] = ExifSingleValue.list(Float32List.fromList(value));
+              } else if (value is double && tagCount == 1) {
+                data[tag] = ExifSingleValue(value);
+              } else if (value is int && tagCount == 1) {
+                data[tag] = ExifSingleValue(value.toDouble());
+              }
+              break;
+            case ExifValueType.Double:
+              if (value is List<double> && value.length == tagCount) {
+                data[tag] = ExifDoubleValue.list(Float64List.fromList(value));
+              } else if (value is double && tagCount == 1) {
+                data[tag] = ExifDoubleValue(value);
+              } else if (value is int && tagCount == 1) {
+                data[tag] = ExifDoubleValue(value.toDouble());
+              }
+              break;
+            case ExifValueType.None:
+              break;
+          }
+        }
+      }
+    }
+  }
 
   bool get hasImageDescription => data.containsKey(0x010e);
   String? get ImageDescription => data[0x010e]?.toString();
