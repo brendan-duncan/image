@@ -187,7 +187,7 @@ class Image {
   /// The number of channels used by this Image. While all images
   /// are stored internally with 4 bytes, some images, such as those
   /// loaded from a Jpeg, don't use the 4th (alpha) channel.
-  int get numberOfChannels => channels == Channels.rgba ? 4 : 3;
+  int get numberOfChannels => channels == Channels.rgba ? 4 : channels != Channels.palette ? 3 : 1;
 
   /// Get the bytes from the image. You can use this to access the
   /// color channels directly, or to pass it to something like an
