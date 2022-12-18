@@ -1,14 +1,14 @@
-import '../../../image.dart';
+import 'pvrtc_color.dart';
 
-class PvrtcColorBoundingBox<Color extends PvrtcColorRgbCore<Color>> {
-  Color min;
-  Color max;
+class PvrtcColorBoundingBox<PvrtcColor extends PvrtcColorRgbCore<PvrtcColor>> {
+  PvrtcColor min;
+  PvrtcColor max;
 
-  PvrtcColorBoundingBox(Color min, Color max)
+  PvrtcColorBoundingBox(PvrtcColor min, PvrtcColor max)
       : min = min.copy(),
         max = max.copy();
 
-  void add(Color c) {
+  void add(PvrtcColor c) {
     min.setMin(c);
     max.setMax(c);
   }

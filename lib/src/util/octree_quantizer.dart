@@ -1,20 +1,22 @@
-import '../color.dart';
-import '../image.dart';
+import '../color/color.dart';
+import '../color/color_uint8.dart';
+import '../image/image.dart';
+import '../image/palette_uint8.dart';
 import 'quantizer.dart';
 
 // Color quantization using octree,
 // from https://rosettacode.org/wiki/Color_quantization/C
 class OctreeQuantizer extends Quantizer {
+  late PaletteUint8 palette;
   final _OctreeNode _root;
 
   OctreeQuantizer(Image image, {int numberOfColors = 256})
       : _root = _OctreeNode(0, 0, null) {
     final heap = _HeapNode();
-    for (var si = 0; si < image.length; ++si) {
-      final c = image[si];
-      final r = getRed(c);
-      final g = getGreen(c);
-      final b = getBlue(c);
+    for (var p in image) {
+      final r = p.r as int;
+      final g = p.g as int;
+      final b = p.b as int;
       _heapAdd(heap, _nodeInsert(_root, r, g, b));
     }
 
@@ -30,14 +32,53 @@ class OctreeQuantizer extends Quantizer {
       got.g = (got.g / c).round();
       got.b = (got.b / c).round();
     }
+
+    final nodes = <_OctreeNode>[];
+    _getNodes(nodes, _root);
+
+    palette = PaletteUint8(nodes.length, 3);
+    for (var i = 0, l = nodes.length; i < l; ++i) {
+      final n = nodes[i];
+      n.paletteIndex = i;
+      palette.setColor(i, n.r, n.g, n.b);
+    }
+  }
+
+  int getColorIndex(Color c) =>
+    getColorIndexRgb(c.r.toInt(), c.g.toInt(), c.b.toInt());
+
+  int getColorIndexRgb(int r, int g, int b) {
+    _OctreeNode? root = _root;
+    for (var bit = 1 << 7; bit != 0; bit >>= 1) {
+      final i = ((g & bit) != 0 ? 1 : 0) * 4 +
+          ((r & bit) != 0 ? 1 : 0) * 2 +
+          ((b & bit) != 0 ? 1 : 0);
+      if (root!.children[i] == null) {
+        break;
+      }
+      root = root.children[i];
+    }
+    return root?.paletteIndex ?? 0;
+  }
+
+  void _getNodes(List nodes, _OctreeNode node) {
+    if (node.childCount == 0) {
+      nodes.add(node);
+      return;
+    }
+    for (var node in node.children) {
+      if (node != null) {
+        _getNodes(nodes, node);
+      }
+    }
   }
 
   /// Find the index of the closest color to [c] in the [colorMap].
   @override
-  int getQuantizedColor(int c) {
-    var r = getRed(c);
-    var g = getGreen(c);
-    var b = getBlue(c);
+  Color getQuantizedColor(Color c) {
+    var r = c.r as int;
+    var g = c.g as int;
+    var b = c.b as int;
     _OctreeNode? root = _root;
 
     for (var bit = 1 << 7; bit != 0; bit >>= 1) {
@@ -53,7 +94,7 @@ class OctreeQuantizer extends Quantizer {
     r = root!.r;
     g = root.g;
     b = root.b;
-    return getColor(r, g, b);
+    return ColorRgb8(r, g, b);
   }
 
   int _compareNode(_OctreeNode a, _OctreeNode b) {
@@ -66,11 +107,7 @@ class OctreeQuantizer extends Quantizer {
 
     final ac = a.count >> a.depth;
     final bc = b.count >> b.depth;
-    return (ac < bc)
-        ? -1
-        : (ac > bc)
-            ? 1
-            : 0;
+    return (ac < bc) ? -1 : (ac > bc) ? 1 : 0;
   }
 
   _OctreeNode _nodeInsert(_OctreeNode root, int r, int g, int b) {
@@ -108,7 +145,7 @@ class OctreeQuantizer extends Quantizer {
     return q;
   }
 
-  static const _ON_INHEAP = 1;
+  static const _inHeap = 1;
 
   _OctreeNode? _popHeap(_HeapNode h) {
     if (h.n <= 1) {
@@ -117,27 +154,27 @@ class OctreeQuantizer extends Quantizer {
 
     final ret = h.buf[1];
     h.buf[1] = h.buf.removeLast();
-    h.buf[1]!.heap_idx = 1;
+    h.buf[1]!.heapIndex = 1;
     _downHeap(h, h.buf[1]!);
 
     return ret;
   }
 
   void _heapAdd(_HeapNode h, _OctreeNode p) {
-    if ((p.flags & _ON_INHEAP) != 0) {
+    if ((p.flags & _inHeap) != 0) {
       _downHeap(h, p);
       _upHeap(h, p);
       return;
     }
 
-    p.flags |= _ON_INHEAP;
-    p.heap_idx = h.n;
+    p.flags |= _inHeap;
+    p.heapIndex = h.n;
     h.buf.add(p);
     _upHeap(h, p);
   }
 
   void _downHeap(_HeapNode h, _OctreeNode p) {
-    var n = p.heap_idx;
+    var n = p.heapIndex;
     while (true) {
       var m = n * 2;
       if (m >= h.n) {
@@ -152,16 +189,16 @@ class OctreeQuantizer extends Quantizer {
       }
 
       h.buf[n] = h.buf[m];
-      h.buf[n]!.heap_idx = n;
+      h.buf[n]!.heapIndex = n;
       n = m;
     }
 
     h.buf[n] = p;
-    p.heap_idx = n;
+    p.heapIndex = n;
   }
 
   void _upHeap(_HeapNode h, _OctreeNode p) {
-    var n = p.heap_idx;
+    var n = p.heapIndex;
     _OctreeNode? prev;
 
     while (n > 1) {
@@ -171,11 +208,11 @@ class OctreeQuantizer extends Quantizer {
       }
 
       h.buf[n] = prev;
-      prev.heap_idx = n;
+      prev.heapIndex = n;
       n ~/= 2;
     }
     h.buf[n] = p;
-    p.heap_idx = n;
+    p.heapIndex = n;
   }
 }
 
@@ -185,7 +222,8 @@ class _OctreeNode {
   int g = 0;
   int b = 0;
   int count = 0;
-  int heap_idx = 0;
+  int heapIndex = 0;
+  int paletteIndex = 0;
   List<_OctreeNode?> children = List<_OctreeNode?>.filled(8, null);
   _OctreeNode? parent;
   int childCount = 0;

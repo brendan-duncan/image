@@ -1,4 +1,4 @@
-# image
+# Dart Image Library (DIL)
 
 [![Build Status](https://travis-ci.org/brendan-duncan/image.svg?branch=master)](https://travis-ci.org/brendan-duncan/image)
 
@@ -17,20 +17,20 @@ will not be as fast as a native library.
 
 **Read/Write**
 
+- JPG
 - PNG / Animated APNG
-- JPEG
-- Targa
 - GIF / Animated GIF
-- PVR(PVRTC)
-- ICO
 - BMP
+- TIFF
+- TGA
+- PVRTC
+- ICO
 
 **Read Only**
 
 - WebP / Animated WebP
-- TIFF
-- Photoshop PSD
-- OpenEXR
+- PSD
+- EXR
 
 **Write Only**
 
@@ -50,7 +50,7 @@ Load an image asynchronously and resize it as a thumbnail.
 ```dart
 import 'dart:io';
 import 'dart:isolate';
-import 'package:image/image.dart';
+import 'package:image/image.dart' as DIL;
 
 class DecodeParam {
   final File file;
@@ -62,9 +62,9 @@ void decodeIsolate(DecodeParam param) {
   // Read an image from file (webp in this case).
   // decodeImage will identify the format of the image and use the appropriate
   // decoder.
-  var image = decodeImage(param.file.readAsBytesSync())!;
+  var image = DIL.decodeImage(param.file.readAsBytesSync())!;
   // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-  var thumbnail = copyResize(image, width: 120);
+  var thumbnail = DIL.copyResize(image, width: 120);
   param.sendPort.send(thumbnail);
 }
 
@@ -73,12 +73,12 @@ void decodeIsolate(DecodeParam param) {
 void main() async {
   var receivePort = ReceivePort();
 
-  await Isolate.spawn(
-      decodeIsolate, DecodeParam(File('test.webp'), receivePort.sendPort));
+  await Isolate.spawn(decodeIsolate,
+      DecodeParam(File('test.webp'), receivePort.sendPort));
 
   // Get the processed image from the isolate.
-  var image = await receivePort.first as Image;
+  var image = await receivePort.first as DIL.Image;
 
-  await File('thumbnail.png').writeAsBytes(encodePng(image));
+  await File('thumbnail.png').writeAsBytes(DIL.encodePng(image));
 }
 ```

@@ -9,7 +9,8 @@ class PvrtcPacket {
   Uint32List rawData;
   late int index;
 
-  PvrtcPacket(TypedData data) : rawData = Uint32List.view(data.buffer);
+  PvrtcPacket(TypedData data)
+      : rawData = Uint32List.view(data.buffer);
 
   void setBlock(int x, int y) => setIndex(_getMortonNumber(x, y));
 
@@ -65,50 +66,50 @@ class PvrtcPacket {
   }
 
   void setColorRgbA(PvrtcColorRgb c) {
-    final r = BitUtility.BITSCALE_8_TO_5_FLOOR[c.r];
-    final g = BitUtility.BITSCALE_8_TO_5_FLOOR[c.g];
-    final b = BitUtility.BITSCALE_8_TO_4_FLOOR[c.b];
+    final r = BitUtility.bitScale8To5Floor[c.r];
+    final g = BitUtility.bitScale8To5Floor[c.g];
+    final b = BitUtility.bitScale8To4Floor[c.b];
     colorA = r << 9 | g << 4 | b;
     colorAIsOpaque = 1;
   }
 
   void setColorRgbaA(PvrtcColorRgba c) {
-    final a = BitUtility.BITSCALE_8_TO_3_FLOOR[c.a];
+    final a = BitUtility.bitScale8To3Floor[c.a];
     if (a == 7) {
-      final r = BitUtility.BITSCALE_8_TO_5_FLOOR[c.r];
-      final g = BitUtility.BITSCALE_8_TO_5_FLOOR[c.g];
-      final b = BitUtility.BITSCALE_8_TO_4_FLOOR[c.b];
+      final r = BitUtility.bitScale8To5Floor[c.r];
+      final g = BitUtility.bitScale8To5Floor[c.g];
+      final b = BitUtility.bitScale8To4Floor[c.b];
       colorA = r << 9 | g << 4 | b;
       colorAIsOpaque = 1;
     } else {
-      final r = BitUtility.BITSCALE_8_TO_4_FLOOR[c.r];
-      final g = BitUtility.BITSCALE_8_TO_4_FLOOR[c.g];
-      final b = BitUtility.BITSCALE_8_TO_3_FLOOR[c.b];
+      final r = BitUtility.bitScale8To4Floor[c.r];
+      final g = BitUtility.bitScale8To4Floor[c.g];
+      final b = BitUtility.bitScale8To3Floor[c.b];
       colorA = a << 11 | r << 7 | g << 3 | b;
       colorAIsOpaque = 0;
     }
   }
 
   void setColorRgbB(PvrtcColorRgb c) {
-    final r = BitUtility.BITSCALE_8_TO_5_CEIL[c.r];
-    final g = BitUtility.BITSCALE_8_TO_5_CEIL[c.g];
-    final b = BitUtility.BITSCALE_8_TO_5_CEIL[c.b];
+    final r = BitUtility.bitScale8To5Ceil[c.r];
+    final g = BitUtility.bitScale8To5Ceil[c.g];
+    final b = BitUtility.bitScale8To5Ceil[c.b];
     colorB = r << 10 | g << 5 | b;
     colorBIsOpaque = 1;
   }
 
   void setColorRgbaB(PvrtcColorRgba c) {
-    final a = BitUtility.BITSCALE_8_TO_3_CEIL[c.a];
+    final a = BitUtility.bitScale8To3Ceil[c.a];
     if (a == 7) {
-      final r = BitUtility.BITSCALE_8_TO_5_CEIL[c.r];
-      final g = BitUtility.BITSCALE_8_TO_5_CEIL[c.g];
-      final b = BitUtility.BITSCALE_8_TO_5_CEIL[c.b];
+      final r = BitUtility.bitScale8To5Ceil[c.r];
+      final g = BitUtility.bitScale8To5Ceil[c.g];
+      final b = BitUtility.bitScale8To5Ceil[c.b];
       colorB = r << 10 | g << 5 | b;
       colorBIsOpaque = 1;
     } else {
-      final r = BitUtility.BITSCALE_8_TO_4_CEIL[c.r];
-      final g = BitUtility.BITSCALE_8_TO_4_CEIL[c.g];
-      final b = BitUtility.BITSCALE_8_TO_4_CEIL[c.b];
+      final r = BitUtility.bitScale8To4Ceil[c.r];
+      final g = BitUtility.bitScale8To4Ceil[c.g];
+      final b = BitUtility.bitScale8To4Ceil[c.b];
       colorB = a << 12 | r << 8 | g << 4 | b;
       colorBIsOpaque = 0;
     }
@@ -119,14 +120,14 @@ class PvrtcPacket {
       final r = colorA >> 9;
       final g = colorA >> 4 & 0x1f;
       final b = colorA & 0xf;
-      return PvrtcColorRgb(BitUtility.BITSCALE_5_TO_8[r],
-          BitUtility.BITSCALE_5_TO_8[g], BitUtility.BITSCALE_4_TO_8[b]);
+      return PvrtcColorRgb(BitUtility.bitScale5To8[r],
+          BitUtility.bitScale5To8[g], BitUtility.bitScale4To8[b]);
     } else {
       final r = (colorA >> 7) & 0xf;
       final g = (colorA >> 3) & 0xf;
       final b = colorA & 7;
-      return PvrtcColorRgb(BitUtility.BITSCALE_4_TO_8[r],
-          BitUtility.BITSCALE_4_TO_8[g], BitUtility.BITSCALE_3_TO_8[b]);
+      return PvrtcColorRgb(BitUtility.bitScale4To8[r],
+          BitUtility.bitScale4To8[g], BitUtility.bitScale3To8[b]);
     }
   }
 
@@ -135,18 +136,18 @@ class PvrtcPacket {
       final r = colorA >> 9;
       final g = colorA >> 4 & 0x1f;
       final b = colorA & 0xf;
-      return PvrtcColorRgba(BitUtility.BITSCALE_5_TO_8[r],
-          BitUtility.BITSCALE_5_TO_8[g], BitUtility.BITSCALE_4_TO_8[b], 255);
+      return PvrtcColorRgba(BitUtility.bitScale5To8[r],
+          BitUtility.bitScale5To8[g], BitUtility.bitScale4To8[b], 255);
     } else {
       final a = colorA >> 11 & 7;
       final r = (colorA >> 7) & 0xf;
       final g = (colorA >> 3) & 0xf;
       final b = colorA & 7;
       return PvrtcColorRgba(
-          BitUtility.BITSCALE_4_TO_8[r],
-          BitUtility.BITSCALE_4_TO_8[g],
-          BitUtility.BITSCALE_3_TO_8[b],
-          BitUtility.BITSCALE_3_TO_8[a]);
+          BitUtility.bitScale4To8[r],
+          BitUtility.bitScale4To8[g],
+          BitUtility.bitScale3To8[b],
+          BitUtility.bitScale3To8[a]);
     }
   }
 
@@ -155,14 +156,14 @@ class PvrtcPacket {
       final r = colorB >> 10;
       final g = colorB >> 5 & 0x1f;
       final b = colorB & 0x1f;
-      return PvrtcColorRgb(BitUtility.BITSCALE_5_TO_8[r],
-          BitUtility.BITSCALE_5_TO_8[g], BitUtility.BITSCALE_5_TO_8[b]);
+      return PvrtcColorRgb(BitUtility.bitScale5To8[r],
+          BitUtility.bitScale5To8[g], BitUtility.bitScale5To8[b]);
     } else {
       final r = colorB >> 8 & 0xf;
       final g = colorB >> 4 & 0xf;
       final b = colorB & 0xf;
-      return PvrtcColorRgb(BitUtility.BITSCALE_4_TO_8[r],
-          BitUtility.BITSCALE_4_TO_8[g], BitUtility.BITSCALE_4_TO_8[b]);
+      return PvrtcColorRgb(BitUtility.bitScale4To8[r],
+          BitUtility.bitScale4To8[g], BitUtility.bitScale4To8[b]);
     }
   }
 
@@ -171,18 +172,18 @@ class PvrtcPacket {
       final r = colorB >> 10;
       final g = colorB >> 5 & 0x1f;
       final b = colorB & 0x1f;
-      return PvrtcColorRgba(BitUtility.BITSCALE_5_TO_8[r],
-          BitUtility.BITSCALE_5_TO_8[g], BitUtility.BITSCALE_5_TO_8[b], 255);
+      return PvrtcColorRgba(BitUtility.bitScale5To8[r],
+          BitUtility.bitScale5To8[g], BitUtility.bitScale5To8[b], 255);
     } else {
       final a = colorB >> 12 & 7;
       final r = colorB >> 8 & 0xf;
       final g = colorB >> 4 & 0xf;
       final b = colorB & 0xf;
       return PvrtcColorRgba(
-          BitUtility.BITSCALE_4_TO_8[r],
-          BitUtility.BITSCALE_4_TO_8[g],
-          BitUtility.BITSCALE_4_TO_8[b],
-          BitUtility.BITSCALE_3_TO_8[a]);
+          BitUtility.bitScale4To8[r],
+          BitUtility.bitScale4To8[g],
+          BitUtility.bitScale4To8[b],
+          BitUtility.bitScale3To8[a]);
     }
   }
 
@@ -194,30 +195,30 @@ class PvrtcPacket {
 
   int _getColorData() =>
       ((usePunchthroughAlpha & 1)) |
-      ((colorA & BITS_14) << 1) |
+      ((colorA & bits14) << 1) |
       ((colorAIsOpaque & 1) << 15) |
-      ((colorB & BITS_15) << 16) |
+      ((colorB & bits15) << 16) |
       ((colorBIsOpaque & 1) << 31);
 
   void _update() {
     final x = colorData;
     usePunchthroughAlpha = x & 1;
-    colorA = (x >> 1) & BITS_14;
+    colorA = (x >> 1) & bits14;
     colorAIsOpaque = (x >> 15) & 1;
-    colorB = (x >> 16) & BITS_15;
+    colorB = (x >> 16) & bits15;
     colorBIsOpaque = (x >> 31) & 1;
   }
 
   static int _getMortonNumber(int x, int y) =>
-      MORTON_TABLE[x >> 8] << 17 |
-      MORTON_TABLE[y >> 8] << 16 |
-      MORTON_TABLE[x & 0xFF] << 1 |
-      MORTON_TABLE[y & 0xFF];
+      mortonTable[x >> 8] << 17 |
+      mortonTable[y >> 8] << 16 |
+      mortonTable[x & 0xff] << 1 |
+      mortonTable[y & 0xff];
 
-  static const BITS_14 = (1 << 14) - 1;
-  static const BITS_15 = (1 << 15) - 1;
+  static const bits14 = (1 << 14) - 1;
+  static const bits15 = (1 << 15) - 1;
 
-  static const BILINEAR_FACTORS = [
+  static const bilinearFactors = [
     [4, 4, 4, 4],
     [2, 6, 2, 6],
     [8, 0, 8, 0],
@@ -237,7 +238,7 @@ class PvrtcPacket {
   ];
 
   // Weights are { colorA, colorB, alphaA, alphaB }
-  static const WEIGHTS = [
+  static const weights = [
     // Weights for Mode=0
     [8, 0, 8, 0],
     [5, 3, 5, 3],
@@ -251,7 +252,7 @@ class PvrtcPacket {
     [0, 8, 0, 8],
   ];
 
-  static const MORTON_TABLE = [
+  static const mortonTable = [
     0x0000,
     0x0001,
     0x0004,

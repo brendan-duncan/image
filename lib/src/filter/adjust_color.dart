@@ -1,8 +1,7 @@
 import 'dart:math';
 
-import '../color.dart';
-import '../image.dart';
-import '../internal/clamp.dart';
+import '../color/color.dart';
+import '../image/image.dart';
 
 /// Adjust the color of the [src] image using various color transformations.
 ///
@@ -39,16 +38,16 @@ import '../internal/clamp.dart';
 /// [amount] controls how much affect this filter has on the [src] image, where
 /// 0.0 has no effect and 1.0 has full effect.
 Image adjustColor(Image src,
-    {int? blacks,
-    int? whites,
-    int? mids,
-    num? contrast,
-    num? saturation,
-    num? brightness,
-    num? gamma,
-    num? exposure,
-    num? hue,
-    num? amount}) {
+    { Color? blacks,
+      Color? whites,
+      Color? mids,
+      num? contrast,
+      num? saturation,
+      num? brightness,
+      num? gamma,
+      num? exposure,
+      num? hue,
+      num? amount }) {
   if (amount == 0.0) {
     return src;
   }
@@ -60,7 +59,7 @@ Image adjustColor(Image src,
   exposure = exposure?.clamp(0, 1000);
   amount = amount?.clamp(0, 1000);
 
-  const DEG_TO_RAD = 0.0174532925;
+  const degToRad = 0.0174532925;
   const avgLumR = 0.5;
   const avgLumG = 0.5;
   const avgLumB = 0.5;
@@ -73,17 +72,17 @@ Image adjustColor(Image src,
   late num wr, wg, wb;
   late num mr, mg, mb;
   if (useBlacksWhitesMids) {
-    br = blacks != null ? getRed(blacks) / 255.0 : 0.0;
-    bg = blacks != null ? getGreen(blacks) / 255.0 : 0.0;
-    bb = blacks != null ? getBlue(blacks) / 255.0 : 0.0;
+    br = blacks != null ? blacks.r / blacks.maxChannelValue : 0;
+    bg = blacks != null ? blacks.g / blacks.maxChannelValue : 0;
+    bb = blacks != null ? blacks.b / blacks.maxChannelValue : 0;
 
-    wr = whites != null ? getRed(whites) / 255.0 : 1.0;
-    wg = whites != null ? getGreen(whites) / 255.0 : 1.0;
-    wb = whites != null ? getBlue(whites) / 255.0 : 1.0;
+    wr = whites != null ? whites.r / whites.maxChannelValue : 0;
+    wg = whites != null ? whites.g / whites.maxChannelValue : 0;
+    wb = whites != null ? whites.b / whites.maxChannelValue : 0;
 
-    mr = mids != null ? getRed(mids) / 255.0 : 0.5;
-    mg = mids != null ? getGreen(mids) / 255.0 : 0.5;
-    mb = mids != null ? getBlue(mids) / 255.0 : 0.5;
+    mr = mids != null ? mids.r / mids.maxChannelValue : 0;
+    mg = mids != null ? mids.g / mids.maxChannelValue : 0;
+    mb = mids != null ? mids.b / mids.maxChannelValue : 0;
 
     mr = 1.0 / (1.0 + 2.0 * (mr - 0.5));
     mg = 1.0 / (1.0 + 2.0 * (mg - 0.5));
@@ -102,7 +101,7 @@ Image adjustColor(Image src,
   late num hueG;
   late num hueB;
   if (hue != null) {
-    hue *= DEG_TO_RAD;
+    hue *= degToRad;
     final s = sin(hue);
     final c = cos(hue);
 
@@ -113,11 +112,10 @@ Image adjustColor(Image src,
 
   final invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
 
-  final pixels = src.getBytes();
-  for (var i = 0, len = pixels.length; i < len; i += 4) {
-    final num or = pixels[i] / 255.0;
-    final num og = pixels[i + 1] / 255.0;
-    final num ob = pixels[i + 2] / 255.0;
+  for (var p in src) {
+    final num or = p.r / 255.0;
+    final num og = p.g / 255.0;
+    final num ob = p.b / 255.0;
 
     var r = or;
     var g = og;
@@ -130,10 +128,10 @@ Image adjustColor(Image src,
     }
 
     if (brightness != null && brightness != 1.0) {
-      var b = brightness.clamp(0, 1000);
-      r *= b;
-      g *= b;
-      b *= b;
+      final _b = brightness.clamp(0, 1000);
+      r *= _b;
+      g *= _b;
+      b *= _b;
     }
 
     if (saturation != null) {
@@ -178,9 +176,9 @@ Image adjustColor(Image src,
       b = b * amount + ob * invAmount;
     }
 
-    pixels[i] = clamp255((r * 255.0).toInt());
-    pixels[i + 1] = clamp255((g * 255.0).toInt());
-    pixels[i + 2] = clamp255((b * 255.0).toInt());
+    p.r = r * p.maxChannelValue;
+    p.g = g * p.maxChannelValue;
+    p.b = b * p.maxChannelValue;
   }
 
   return src;

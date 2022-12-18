@@ -1,6 +1,7 @@
 import 'dart:math';
 
-import '../image.dart';
+import '../color/color.dart';
+import '../image/image.dart';
 import '../util/clip_line.dart';
 import 'draw_circle.dart';
 import 'draw_pixel.dart';
@@ -9,8 +10,8 @@ import 'draw_pixel.dart';
 ///
 /// If [antialias] is true then the line is drawn with smooth edges.
 /// [thickness] determines how thick the line should be drawn, in pixels.
-Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
-    {bool antialias = false, num thickness = 1}) {
+Image drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
+    { bool antialias = false, num thickness = 1 }) {
   final line = [x1, y1, x2, y2];
   if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
     return image;
@@ -29,8 +30,8 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
   // Drawing a single point.
   if (dx == 0 && dy == 0) {
     thickness == 1
-        ? drawPixel(image, x1, y1, color)
-        : fillCircle(image, x1, y1, radius, color);
+        ? drawPixel(image, x1, y1, c)
+        : fillCircle(image, x1, y1, radius, c);
     return image;
   }
 
@@ -39,20 +40,20 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     if (dy < 0) {
       for (var y = y2; y <= y1; ++y) {
         if (thickness <= 1) {
-          drawPixel(image, x1, y, color);
+          drawPixel(image, x1, y, c);
         } else {
           for (var i = 0; i < thickness; i++) {
-            drawPixel(image, x1 - radius + i, y, color);
+            drawPixel(image, x1 - radius + i, y, c);
           }
         }
       }
     } else {
       for (var y = y1; y <= y2; ++y) {
         if (thickness <= 1) {
-          drawPixel(image, x1, y, color);
+          drawPixel(image, x1, y, c);
         } else {
           for (var i = 0; i < thickness; i++) {
-            drawPixel(image, x1 - radius + i, y, color);
+            drawPixel(image, x1 - radius + i, y, c);
           }
         }
       }
@@ -62,20 +63,20 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     if (dx < 0) {
       for (var x = x2; x <= x1; ++x) {
         if (thickness <= 1) {
-          drawPixel(image, x, y1, color);
+          drawPixel(image, x, y1, c);
         } else {
           for (var i = 0; i < thickness; i++) {
-            drawPixel(image, x, y1 - radius + i, color);
+            drawPixel(image, x, y1 - radius + i, c);
           }
         }
       }
     } else {
       for (var x = x1; x <= x2; ++x) {
         if (thickness <= 1) {
-          drawPixel(image, x, y1, color);
+          drawPixel(image, x, y1, c);
         } else {
           for (var i = 0; i < thickness; i++) {
-            drawPixel(image, x, y1 - radius + i, color);
+            drawPixel(image, x, y1 - radius + i, c);
           }
         }
       }
@@ -125,7 +126,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
       // Set up line thickness
       var wstart = (y - wid / 2).toInt();
       for (var w = wstart; w < wstart + wid; w++) {
-        drawPixel(image, x, w, color);
+        drawPixel(image, x, w, c);
       }
 
       if (((y2 - y1) * ydirflag) > 0) {
@@ -139,7 +140,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
           }
           wstart = (y - wid / 2).toInt();
           for (var w = wstart; w < wstart + wid; w++) {
-            drawPixel(image, x, w, color);
+            drawPixel(image, x, w, c);
           }
         }
       } else {
@@ -153,7 +154,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
           }
           wstart = (y - wid / 2).toInt();
           for (var w = wstart; w < wstart + wid; w++) {
-            drawPixel(image, x, w, color);
+            drawPixel(image, x, w, c);
           }
         }
       }
@@ -191,7 +192,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
       // Set up line thickness
       var wstart = (x - wid / 2).toInt();
       for (var w = wstart; w < wstart + wid; w++) {
-        drawPixel(image, w, y, color);
+        drawPixel(image, w, y, c);
       }
 
       if (((x2 - x1) * xdirflag) > 0) {
@@ -205,7 +206,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
           }
           wstart = (x - wid / 2).toInt();
           for (var w = wstart; w < wstart + wid; w++) {
-            drawPixel(image, w, y, color);
+            drawPixel(image, w, y, c);
           }
         }
       } else {
@@ -219,7 +220,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
           }
           wstart = (x - wid / 2).toInt();
           for (var w = wstart; w < wstart + wid; w++) {
-            drawPixel(image, w, y, color);
+            drawPixel(image, w, y, c);
           }
         }
       }
@@ -261,8 +262,8 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     for (var x = x1; x <= x2; x++) {
       final wstart = (y - wid ~/ 2);
       for (var w = wstart; w < wstart + wid; w++) {
-        drawPixel(image, x, w, color, (frac >> 8) & 0xff);
-        drawPixel(image, x, w + 1, color, (_xor(frac) >> 8) & 0xff);
+        drawPixel(image, x, w, c, ((frac >> 8) & 0xff) / 255);
+        drawPixel(image, x, w + 1, c, ((_xor(frac) >> 8) & 0xff) / 255);
       }
 
       frac += inc;
@@ -293,8 +294,8 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, int color,
     for (var y = y1; y <= y2; y++) {
       final wstart = (x - wid ~/ 2);
       for (var w = wstart; w < wstart + wid; w++) {
-        drawPixel(image, w, y, color, (frac >> 8) & 0xff);
-        drawPixel(image, w + 1, y, color, (_xor(frac) >> 8) & 0xff);
+        drawPixel(image, w, y, c, ((frac >> 8) & 0xff) / 255);
+        drawPixel(image, w + 1, y, c, ((_xor(frac) >> 8) & 0xff) / 255);
       }
 
       frac += inc;

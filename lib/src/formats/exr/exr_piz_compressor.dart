@@ -1,15 +1,15 @@
 import 'dart:typed_data';
 
-import '../../image_exception.dart';
-import '../../internal/internal.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import '../../util/output_buffer.dart';
 import 'exr_compressor.dart';
 import 'exr_huffman.dart';
 import 'exr_part.dart';
 import 'exr_wavelet.dart';
 
-/// Wavelet compression
+// Wavelet compression
 abstract class ExrPizCompressor extends ExrCompressor {
   factory ExrPizCompressor(
           ExrPart header, int? maxScanLineSize, int numScanLines) =
@@ -82,12 +82,12 @@ class InternalExrPizCompressor extends InternalExrCompressor
     final minNonZero = input.readUint16();
     final maxNonZero = input.readUint16();
 
-    if (maxNonZero >= BITMAP_SIZE) {
+    if (maxNonZero >= _bitmapSize) {
       throw ImageException('Error in header for PIZ-compressed data '
           '(invalid bitmap size).');
     }
 
-    final bitmap = Uint8List(BITMAP_SIZE);
+    final bitmap = Uint8List(_bitmapSize);
     if (minNonZero <= maxNonZero) {
       final b = input.readBytes(maxNonZero - minNonZero + 1);
       for (var i = 0, j = minNonZero, len = b.length; i < len; ++i) {
@@ -95,7 +95,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
       }
     }
 
-    final lut = Uint16List(USHORT_RANGE);
+    final lut = Uint16List(_uShortRange);
     final maxValue = _reverseLutFromBitmap(bitmap, lut);
 
     // Huffman decoding
@@ -135,7 +135,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
       }
     }
 
-    return _output!.getBytes() as Uint8List;
+    return _output!.getBytes();
   }
 
   void _applyLut(List<int> lut, List<int> data, int nData) {
@@ -146,7 +146,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
 
   int _reverseLutFromBitmap(Uint8List bitmap, Uint16List lut) {
     var k = 0;
-    for (var i = 0; i < USHORT_RANGE; ++i) {
+    for (var i = 0; i < _uShortRange; ++i) {
       if ((i == 0) || (bitmap[i >> 3] & (1 << (i & 7))) != 0) {
         lut[k++] = i;
       }
@@ -154,15 +154,15 @@ class InternalExrPizCompressor extends InternalExrCompressor
 
     final n = k - 1;
 
-    while (k < USHORT_RANGE) {
+    while (k < _uShortRange) {
       lut[k++] = 0;
     }
 
     return n; // maximum k where lut[k] is non-zero,
   }
 
-  static const USHORT_RANGE = 1 << 16;
-  static const BITMAP_SIZE = 8192;
+  static const _uShortRange = 1 << 16;
+  static const _bitmapSize = 8192;
 
   OutputBuffer? _output;
   final int? _maxScanLineSize;

@@ -1,12 +1,13 @@
-import '../color.dart';
-import '../image.dart';
+import 'dart:typed_data';
+
+import '../image/image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 
 /// Encode a TGA image. This only supports the 24-bit uncompressed format.
 class TgaEncoder extends Encoder {
   @override
-  List<int> encodeImage(Image image) {
+  Uint8List encodeImage(Image image) {
     final out = OutputBuffer(bigEndian: true);
 
     final header = List<int>.filled(18, 0);
@@ -15,18 +16,28 @@ class TgaEncoder extends Encoder {
     header[13] = (image.width >> 8) & 0xff;
     header[14] = image.height & 0xff;
     header[15] = (image.height >> 8) & 0xff;
-    header[16] = image.channels == Channels.rgb ? 24 : 32;
+    final nc = image.palette?.numChannels ?? image.numChannels;
+    header[16] = nc == 3 ? 24 : 32;
 
     out.writeBytes(header);
 
-    for (var y = image.height - 1; y >= 0; --y) {
-      for (var x = 0; x < image.width; ++x) {
-        final c = image.getPixel(x, y);
-        out.writeByte(getBlue(c));
-        out.writeByte(getGreen(c));
-        out.writeByte(getRed(c));
-        if (image.channels == Channels.rgba) {
-          out.writeByte(getAlpha(c));
+    if (nc == 4) {
+      for (var y = image.height - 1; y >= 0; --y) {
+        for (var x = 0; x < image.width; ++x) {
+          final c = image.getPixel(x, y);
+          out.writeByte(c.b as int);
+          out.writeByte(c.g as int);
+          out.writeByte(c.r as int);
+          out.writeByte(c.a as int);
+        }
+      }
+    } else {
+      for (var y = image.height - 1; y >= 0; --y) {
+        for (var x = 0; x < image.width; ++x) {
+          final c = image.getPixel(x, y);
+          out.writeByte(c.b as int);
+          out.writeByte(c.g as int);
+          out.writeByte(c.r as int);
         }
       }
     }

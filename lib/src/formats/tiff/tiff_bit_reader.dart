@@ -21,7 +21,7 @@ class TiffBitReader {
     var value = 0;
 
     while (numBits > _bitPos) {
-      value = (value << _bitPos) + (_bitBuffer & _BIT_MASK[_bitPos]);
+      value = (value << _bitPos) + (_bitBuffer & _bitMask[_bitPos]);
       numBits -= _bitPos;
       _bitPos = 8;
       _bitBuffer = input.readByte();
@@ -34,7 +34,7 @@ class TiffBitReader {
       }
 
       value = (value << numBits) +
-          (_bitBuffer >> (_bitPos - numBits) & _BIT_MASK[numBits]);
+          (_bitBuffer >> (_bitPos - numBits) & _bitMask[numBits]);
 
       _bitPos -= numBits;
     }
@@ -51,5 +51,5 @@ class TiffBitReader {
   int _bitBuffer = 0;
   int _bitPos = 0;
 
-  static const List<int> _BIT_MASK = [0, 1, 3, 7, 15, 31, 63, 127, 255];
+  static const List<int> _bitMask = [0, 1, 3, 7, 15, 31, 63, 127, 255];
 }

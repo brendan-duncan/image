@@ -1,6 +1,8 @@
-import '../animation.dart';
-import '../image.dart';
-import '../image_exception.dart';
+import 'dart:typed_data';
+
+import '../image/animation.dart';
+import '../image/image.dart';
+import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
@@ -14,13 +16,12 @@ class JpegDecoder extends Decoder {
 
   /// Is the given file a valid JPEG image?
   @override
-  bool isValidFile(List<int> data) => JpegData().validate(data);
+  bool isValidFile(Uint8List data) => JpegData().validate(data);
 
   @override
-  DecodeInfo? startDecode(List<int> bytes) {
+  DecodeInfo? startDecode(Uint8List bytes) {
     input = InputBuffer(bytes, bigEndian: true);
-    info = JpegData().readInfo(bytes);
-    return info;
+    return info = JpegData().readInfo(bytes);
   }
 
   @override
@@ -41,7 +42,7 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  Image? decodeImage(List<int> bytes, {int frame = 0}) {
+  Image? decodeImage(Uint8List bytes, {int frame = 0}) {
     final jpeg = JpegData();
     jpeg.read(bytes);
 
@@ -53,7 +54,7 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  Animation? decodeAnimation(List<int> bytes) {
+  Animation? decodeAnimation(Uint8List bytes) {
     final image = decodeImage(bytes);
     if (image == null) {
       return null;

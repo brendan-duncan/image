@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import '../image_exception.dart';
-import '../internal/bit_operators.dart';
+import 'bit_utils.dart';
+import 'image_exception.dart';
 
 /// A buffer that can be read as a stream of bytes.
 class InputBuffer {

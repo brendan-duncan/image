@@ -1,4 +1,4 @@
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import 'jpeg.dart';
 import 'jpeg_component.dart';
@@ -132,8 +132,8 @@ class JpegScan {
     if (bitsData == 0xff) {
       final nextByte = input.readByte();
       if (nextByte != 0) {
-        throw ImageException(
-            'unexpected marker: ${((bitsData << 8) | nextByte).toRadixString(16)}');
+        final marker = ((bitsData << 8) | nextByte).toRadixString(16);
+        throw ImageException('unexpected marker: $marker');
       }
     }
 

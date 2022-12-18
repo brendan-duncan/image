@@ -1,5 +1,5 @@
-import '../../internal/internal.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'gif_color_map.dart';
 
 class GifImageDesc {

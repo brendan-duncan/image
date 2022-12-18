@@ -1,48 +1,43 @@
 import 'dart:math';
 
-import '../image.dart';
-import '../internal/clamp.dart';
+import '../image/image.dart';
 import 'grayscale.dart';
 
 /// Apply Sobel edge detection filtering to the [src] Image.
-Image sobel(Image src, {num amount = 1.0}) {
+Image sobel(Image src, { num amount = 1.0 }) {
+  if (amount == 0.0) {
+    return src;
+  }
+
   final num invAmount = 1.0 - amount;
   final orig = grayscale(Image.from(src));
-  final origRGBA = orig.getBytes();
-  final rowSize = src.width * 4;
-  final List<int> rgba = src.getBytes();
-  final rgbaLen = rgba.length;
-  for (var y = 0, pi = 0; y < src.height; ++y) {
-    for (var x = 0; x < src.width; ++x, pi += 4) {
-      final bl = pi + rowSize - 4;
-      final b = pi + rowSize;
-      final br = pi + rowSize + 4;
-      final l = pi - 4;
-      final r = pi + 4;
-      final tl = pi - rowSize - 4;
-      final t = pi - rowSize;
-      final tr = pi - rowSize + 4;
+  for (var p in src) {
+    final bl = orig.getPixelSafe(p.x - 1, p.y + 1);
+    final b = orig.getPixelSafe(p.x, p.y - 1);
+    final br = orig.getPixelSafe(p.x + 1, p.y + 1);
+    final l = orig.getPixelSafe(p.x - 1, p.y);
+    final r = orig.getPixelSafe(p.x + 1, p.y);
+    final tl = orig.getPixelSafe(p.x - 1, p.y - 1);
+    final t = orig.getPixelSafe(p.x, p.y - 1);
+    final tr = orig.getPixelSafe(p.x + 1, p.y - 1);
 
-      final num tlInt = tl < 0 ? 0.0 : origRGBA[tl] / 255.0;
-      final num tInt = t < 0 ? 0.0 : origRGBA[t] / 255.0;
-      final num trInt = tr < 0 ? 0.0 : origRGBA[tr] / 255.0;
-      final num lInt = l < 0 ? 0.0 : origRGBA[l] / 255.0;
-      final num rInt = r < rgbaLen ? origRGBA[r] / 255.0 : 0.0;
-      final num blInt = bl < rgbaLen ? origRGBA[bl] / 255.0 : 0.0;
-      final num bInt = b < rgbaLen ? origRGBA[b] / 255.0 : 0.0;
-      final num brInt = br < rgbaLen ? origRGBA[br] / 255.0 : 0.0;
+    final blInt = bl.r / bl.maxChannelValue;
+    final bInt = b.r / b.maxChannelValue;
+    final brInt = br.r / br.maxChannelValue;
+    final lInt = l.r / l.maxChannelValue;
+    final rInt = r.r / r.maxChannelValue;
+    final tlInt = tl.r / tl.maxChannelValue;
+    final tInt = t.r / t.maxChannelValue;
+    final trInt = tr.r / tr.maxChannelValue;
 
-      final num h = -tlInt - 2.0 * tInt - trInt + blInt + 2.0 * bInt + brInt;
-      final num v = -blInt - 2.0 * lInt - tlInt + brInt + 2.0 * rInt + trInt;
+    final num h = -tlInt - 2.0 * tInt - trInt + blInt + 2.0 * bInt + brInt;
+    final num v = -blInt - 2.0 * lInt - tlInt + brInt + 2.0 * rInt + trInt;
 
-      final mag = clamp255((sqrt(h * h + v * v) * 255.0).toInt());
+    final mag = sqrt(h * h + v * v) * p.maxChannelValue;
 
-      rgba[pi] = clamp255((mag * amount + rgba[pi] * invAmount).toInt());
-      rgba[pi + 1] =
-          clamp255((mag * amount + rgba[pi + 1] * invAmount).toInt());
-      rgba[pi + 2] =
-          clamp255((mag * amount + rgba[pi + 2] * invAmount).toInt());
-    }
+    p.r = mag * amount + p.r * invAmount;
+    p.g = mag * amount + p.g * invAmount;
+    p.b = mag * amount + p.b * invAmount;
   }
 
   return src;

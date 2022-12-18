@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import '../../util/output_buffer.dart';
 import 'exr_channel.dart';
@@ -120,7 +120,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
       }
     }
 
-    return _output!.getBytes() as Uint8List;
+    return _output!.getBytes();
   }
 
   final _zlib = const ZLibDecoder();

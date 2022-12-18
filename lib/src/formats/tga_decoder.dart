@@ -1,19 +1,21 @@
-import '../animation.dart';
-import '../color.dart';
-import '../image.dart';
+import 'dart:typed_data';
+
+import '../image/animation.dart';
+import '../image/image.dart';
 import '../util/input_buffer.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'tga/tga_info.dart';
 
-/// Decode a TGA image. This only supports the 24-bit uncompressed format.
+/// Decode a TGA image. This only supports the 24-bit and 32-bit uncompressed
+/// format.
 class TgaDecoder extends Decoder {
   TgaInfo? info;
   late InputBuffer input;
 
   /// Is the given file a valid TGA image?
   @override
-  bool isValidFile(List<int> data) {
+  bool isValidFile(Uint8List data) {
     final input = InputBuffer(data, bigEndian: true);
 
     final header = input.readBytes(18);
@@ -28,7 +30,7 @@ class TgaDecoder extends Decoder {
   }
 
   @override
-  DecodeInfo? startDecode(List<int> bytes) {
+  DecodeInfo? startDecode(Uint8List bytes) {
     info = TgaInfo();
     input = InputBuffer(bytes, bigEndian: true);
 
@@ -58,14 +60,15 @@ class TgaDecoder extends Decoder {
     }
 
     input.offset = info!.imageOffset!;
-    final image = Image(info!.width, info!.height, channels: Channels.rgb);
+    final image = Image(info!.width, info!.height,
+        numChannels: info!.bpp == 32 ? 4 : 3);
     for (var y = image.height - 1; y >= 0; --y) {
       for (var x = 0; x < image.width; ++x) {
         final b = input.readByte();
         final g = input.readByte();
         final r = input.readByte();
         final a = info!.bpp == 32 ? input.readByte() : 255;
-        image.setPixel(x, y, getColor(r, g, b, a));
+        image.setPixelColor(x, y, r, g, b, a);
       }
     }
 
@@ -73,7 +76,7 @@ class TgaDecoder extends Decoder {
   }
 
   @override
-  Image? decodeImage(List<int> bytes, {int frame = 0}) {
+  Image? decodeImage(Uint8List bytes, {int frame = 0}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -82,7 +85,7 @@ class TgaDecoder extends Decoder {
   }
 
   @override
-  Animation? decodeAnimation(List<int> bytes) {
+  Animation? decodeAnimation(Uint8List bytes) {
     final image = decodeImage(bytes);
     if (image == null) {
       return null;

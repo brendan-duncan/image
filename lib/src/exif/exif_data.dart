@@ -1,325 +1,11 @@
-import 'dart:typed_data';
-
 import '../util/input_buffer.dart';
 import '../util/output_buffer.dart';
 import 'exif_tag.dart';
-import 'exif_value.dart';
+import 'ifd_container.dart';
+import 'ifd_directory.dart';
+import 'ifd_value.dart';
 
-class ExifIFDContainer {
-  Map<String, ExifIFD> directories;
-
-  ExifIFDContainer()
-    : directories = {};
-
-  ExifIFDContainer.from(ExifIFDContainer? other)
-    : directories = other == null ? {} : Map<String, ExifIFD>.from(other.directories);
-
-  Iterable<String> get keys => directories.keys;
-  Iterable<ExifIFD> get values => directories.values;
-
-  bool get isEmpty {
-    if (directories.isEmpty) {
-      return true;
-    }
-    for (var ifd in directories.values) {
-      if (!ifd.isEmpty) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  bool containsKey(String key) => directories.containsKey(key);
-
-  void clear() {
-    directories.clear();
-  }
-
-  ExifIFD operator[](String ifdName) {
-    if (!directories.containsKey(ifdName))
-      directories[ifdName] = ExifIFD();
-    return directories[ifdName]!;
-  }
-
-  void operator[]=(String ifdName, ExifIFD value) {
-    directories[ifdName] = value;
-  }
-}
-
-class ExifIFD {
-  final data = Map<int, ExifValue>();
-  final sub = ExifIFDContainer();
-
-  Iterable<int> get keys => data.keys;
-  Iterable<ExifValue> get values => data.values;
-
-  bool get isEmpty => data.isEmpty && sub.isEmpty;
-
-  bool containsKey(int tag) => data.containsKey(tag);
-
-  ExifValue? operator[](Object? tag) {
-    if (tag is String) {
-      tag = ExifTagNameToID[tag];
-    }
-    if (tag is int) {
-      return data[tag];
-    }
-    return null;
-  }
-
-  void operator[]=(Object? tag, Object? value) {
-    if (tag is String) {
-      tag = ExifTagNameToID[tag];
-    }
-    if (tag is! int) {
-      return;
-    }
-
-    if (value == null) {
-      data.remove(tag);
-    } else {
-      if (value is ExifValue) {
-        data[tag] = value;
-      } else {
-        final tagInfo = ExifImageTags[tag];
-        if (tagInfo != null) {
-          final tagType = tagInfo.type;
-          final tagCount = tagInfo.count;
-          switch (tagType) {
-            case ExifValueType.Byte:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = ExifByteValue.list(Uint8List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = ExifByteValue(value);
-              }
-              break;
-            case ExifValueType.Ascii:
-              if (value is String) {
-                data[tag] = ExifAsciiValue(value);
-              }
-              break;
-            case ExifValueType.Short:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = ExifShortValue.list(Uint16List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = ExifShortValue(value);
-              }
-              break;
-            case ExifValueType.Long:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = ExifLongValue.list(Uint32List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = ExifLongValue(value);
-              }
-              break;
-            case ExifValueType.Rational:
-              if (value is List<Rational> && value.length == tagCount) {
-                data[tag] = ExifRationalValue.list(value);
-              } else if (tagCount == 1 && value is List<int> &&
-                  value.length == 2) {
-                data[tag] = ExifRationalValue(value[0], value[1]);
-              } else if (tagCount == 1 && value is Rational) {
-                data[tag] = ExifRationalValue.from(value);
-              } else if (value is List<List<int>> && value.length == tagCount) {
-                data[tag] = ExifRationalValue.list(
-                    List<Rational>.generate(value.length,
-                        (index) => Rational(value[index][0], value[index][1])));
-              }
-              break;
-            case ExifValueType.SByte:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = ExifSByteValue.list(Int8List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = ExifSByteValue(value);
-              }
-              break;
-            case ExifValueType.Undefined:
-              if (value is List<int>) {
-                data[tag] = ExifUndefinedValue.list(Uint8List.fromList(value));
-              }
-              break;
-            case ExifValueType.SShort:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = ExifSShortValue.list(Int16List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = ExifSShortValue(value);
-              }
-              break;
-            case ExifValueType.SLong:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = ExifSLongValue.list(Int32List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = ExifSLongValue(value);
-              }
-              break;
-            case ExifValueType.SRational:
-              if (value is List<Rational> && value.length == tagCount) {
-                data[tag] = ExifSRationalValue.list(value);
-              } else if (tagCount == 1 && value is List<int> &&
-                  value.length == 2) {
-                data[tag] = ExifSRationalValue(value[0], value[1]);
-              } else if (tagCount == 1 && value is Rational) {
-                data[tag] = ExifSRationalValue.from(value);
-              } else if (value is List<List<int>> && value.length == tagCount) {
-                data[tag] = ExifSRationalValue.list(
-                  List<Rational>.generate(value.length,
-                        (index) => Rational(value[index][0], value[index][1])));
-              }
-              break;
-            case ExifValueType.Single:
-              if (value is List<double> && value.length == tagCount) {
-                data[tag] = ExifSingleValue.list(Float32List.fromList(value));
-              } else if (value is double && tagCount == 1) {
-                data[tag] = ExifSingleValue(value);
-              } else if (value is int && tagCount == 1) {
-                data[tag] = ExifSingleValue(value.toDouble());
-              }
-              break;
-            case ExifValueType.Double:
-              if (value is List<double> && value.length == tagCount) {
-                data[tag] = ExifDoubleValue.list(Float64List.fromList(value));
-              } else if (value is double && tagCount == 1) {
-                data[tag] = ExifDoubleValue(value);
-              } else if (value is int && tagCount == 1) {
-                data[tag] = ExifDoubleValue(value.toDouble());
-              }
-              break;
-            case ExifValueType.None:
-              break;
-          }
-        }
-      }
-    }
-  }
-
-  bool get hasImageDescription => data.containsKey(0x010e);
-  String? get ImageDescription => data[0x010e]?.toString();
-  set ImageDescription(String? value) {
-    if (value == null) {
-      data.remove(0x010e);
-    } else {
-      data[0x010e] = ExifAsciiValue(value);
-    }
-  }
-
-  bool get hasMake => data.containsKey(0x010f);
-  String? get Make => data[0x010f]?.toString();
-  set Make(String? value) {
-    if (value == null) {
-      data.remove(0x010f);
-    } else {
-      data[0x010f] = ExifAsciiValue(value);
-    }
-  }
-
-  bool get hasModel => data.containsKey(0x0110);
-  String? get Model => data[0x0110]?.toString();
-  set Model(String? value) {
-    if (value == null) {
-      data.remove(0x0110);
-    } else {
-      data[0x0110] = ExifAsciiValue(value);
-    }
-  }
-
-  bool get hasOrientation => data.containsKey(0x0112);
-  int? get Orientation => data[0x0112]?.toInt();
-  set Orientation(int? value) {
-    if (value == null) {
-      data.remove(0x0112);
-    } else {
-      data[0x0112] = ExifShortValue(value);
-    }
-  }
-
-  bool _setRational(int tag, Object? value) {
-    if (value is Rational) {
-      data[tag] = ExifRationalValue.from(value);
-      return true;
-    } else if (value is List<int>) {
-      if (value.length == 2) {
-        data[tag] = ExifRationalValue.from(Rational(value[0], value[1]));
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool get hasXResolution => data.containsKey(0x011a);
-  Rational? get XResolution => data[0x011a]?.toRational();
-  set XResolution(Object? value) {
-    if (!_setRational(0x011a, value)) {
-      data.remove(0x011a);
-    }
-  }
-
-  bool get hasYResolution => data.containsKey(0x011b);
-  Rational? get YResolution => data[0x011b]?.toRational();
-  set YResolution(Object? value) {
-    if (!_setRational(0x011b, value)) {
-      data.remove(0x011b);
-    }
-  }
-
-  bool get hasResolutionUnit => data.containsKey(0x0128);
-  int? get ResolutionUnit => data[0x0128]?.toInt();
-  set ResolutionUnit(int? value) {
-    if (value == null) {
-      data.remove(0x0128);
-    } else {
-      data[0x0128] = ExifShortValue(value);
-    }
-  }
-
-  bool get hasImageWidth => data.containsKey(0x0100);
-  int? get ImageWidth => data[0x0100]?.toInt();
-  set ImageWidth(int? value) {
-    if (value == null) {
-      data.remove(0x0100);
-    } else {
-      data[0x0100] = ExifShortValue(value);
-    }
-  }
-
-  bool get hasImageHeight => data.containsKey(0x0101);
-  int? get ImageHeight => data[0x0101]?.toInt();
-  set ImageHeight(int? value) {
-    if (value == null) {
-      data.remove(0x0101);
-    } else {
-      data[0x0101] = ExifShortValue(value);
-    }
-  }
-
-  bool get hasSoftware => data.containsKey(0x0131);
-  String? get Software => data[0x0131]?.toString();
-  set Software(String? value) {
-    if (value == null) {
-      data.remove(0x0131);
-    } else {
-      data[0x0131] = ExifAsciiValue(value);
-    }
-  }
-
-  bool get hasCopyright => data.containsKey(0x8298);
-  String? get Copyright => data[0x8298]?.toString();
-  set Copyright(String? value) {
-    if (value == null) {
-      data.remove(0x8298);
-    } else {
-      data[0x8298] = ExifAsciiValue(value);
-    }
-  }
-}
-
-class ExifEntry {
-  int tag;
-  ExifValue? value;
-
-  ExifEntry(this.tag, this.value);
-}
-
-class ExifData extends ExifIFDContainer {
+class ExifData extends IfdContainer {
   ExifData()
     : super();
 
@@ -331,6 +17,8 @@ class ExifData extends ExifIFDContainer {
     read(input);
   }
 
+  ExifData clone() => ExifData.from(this);
+
   bool hasTag(int tag) {
     for (var directory in directories.values) {
       if (directory.containsKey(tag)) {
@@ -340,17 +28,17 @@ class ExifData extends ExifIFDContainer {
     return false;
   }
 
-  ExifIFD get imageIfd => this['ifd0'];
+  IfdDirectory get imageIfd => this['ifd0'];
 
-  ExifIFD get thumbnailIfd => this['ifd1'];
+  IfdDirectory get thumbnailIfd => this['ifd1'];
 
-  ExifIFD get exifIfd => this['ifd0'].sub['exif'];
+  IfdDirectory get exifIfd => this['ifd0'].sub['exif'];
 
-  ExifIFD get gpsIfd => this['ifd0'].sub['gps'];
+  IfdDirectory get gpsIfd => this['ifd0'].sub['gps'];
 
-  ExifIFD get interopIfd => this['ifd0'].sub['interop'];
+  IfdDirectory get interopIfd => this['ifd0'].sub['interop'];
 
-  ExifValue? getTag(int tag) {
+  IfdValue? getTag(int tag) {
     for (var directory in directories.values) {
       if (directory.containsKey(tag)) {
         return directory[tag];
@@ -405,7 +93,7 @@ class ExifData extends ExifIFDContainer {
     out.writeUint32(8); // offset to first ifd block
 
     if (directories['ifd0'] == null)
-      directories['ifd0'] = ExifIFD();
+      directories['ifd0'] = IfdDirectory();
 
     var dataOffset = 8; // offset to first ifd block, from start of tiff header
     var offsets = <String,int>{};
@@ -415,19 +103,19 @@ class ExifData extends ExifIFDContainer {
       offsets[name] = dataOffset;
 
       if (ifd.sub.containsKey('exif')) {
-        ifd[0x8769] = ExifLongValue(0);
+        ifd[0x8769] = IfdLongValue(0);
       } else {
         ifd.data.remove(0x8769);
       }
 
       if (ifd.sub.containsKey('interop')) {
-        ifd[0xA005] = ExifLongValue(0);
+        ifd[0xA005] = IfdLongValue(0);
       } else {
         ifd.data.remove(0xA005);
       }
 
       if (ifd.sub.containsKey('gps')) {
-        ifd[0x8825] = ExifLongValue(0);
+        ifd[0x8825] = IfdLongValue(0);
       } else {
         ifd.data.remove(0x8825);
       }
@@ -501,7 +189,7 @@ class ExifData extends ExifIFDContainer {
     out.bigEndian = saveEndian;
   }
 
-  int _writeDirectory(OutputBuffer out, ExifIFD ifd, int dataOffset) {
+  int _writeDirectory(OutputBuffer out, IfdDirectory ifd, int dataOffset) {
     out.writeUint16(ifd.keys.length);
     for (var tag in ifd.keys) {
       final value = ifd[tag]!;
@@ -525,7 +213,7 @@ class ExifData extends ExifIFDContainer {
     return dataOffset;
   }
 
-  void _writeDirectoryLargeValues(OutputBuffer out, ExifIFD ifd) {
+  void _writeDirectoryLargeValues(OutputBuffer out, IfdDirectory ifd) {
     for (var value in ifd.values) {
       var size = value.dataSize;
       if (size > 4) {
@@ -565,9 +253,9 @@ class ExifData extends ExifIFDContainer {
     while (ifdOffset > 0) {
       block.offset = blockOffset + ifdOffset;
 
-      final directory = ExifIFD();
+      final directory = IfdDirectory();
       final numEntries = block.readUint16();
-      final dir = List<ExifEntry>.generate(numEntries, (i) =>
+      final dir = List<_ExifEntry>.generate(numEntries, (i) =>
           _readEntry(block, blockOffset));
 
       for (var entry in dir) {
@@ -592,9 +280,9 @@ class ExifData extends ExifIFDContainer {
         if (d.containsKey(dt)) { // ExifOffset
           int ifdOffset = d[dt]!.toInt();
           block.offset = blockOffset + ifdOffset;
-          final directory = ExifIFD();
+          final directory = IfdDirectory();
           final numEntries = block.readUint16();
-          final dir = List<ExifEntry>.generate(numEntries, (i) =>
+          final dir = List<_ExifEntry>.generate(numEntries, (i) =>
               _readEntry(block, blockOffset));
 
           for (var entry in dir) {
@@ -611,18 +299,18 @@ class ExifData extends ExifIFDContainer {
     return false;
   }
 
-  ExifEntry _readEntry(InputBuffer block, int blockOffset) {
+  _ExifEntry _readEntry(InputBuffer block, int blockOffset) {
     final tag = block.readUint16();
     final format = block.readUint16();
     final count = block.readUint32();
 
-    final entry = ExifEntry(tag, null);
+    final entry = _ExifEntry(tag, null);
 
-    if (format > ExifValueType.values.length)
+    if (format > IfdValueType.values.length)
       return entry;
 
-    final f = ExifValueType.values[format];
-    final fsize = ExifValueTypeSize[format];
+    final f = IfdValueType.values[format];
+    final fsize = IfdValueTypeSize[format];
     final size = count * fsize;
 
     final endOffset = block.offset + 4;
@@ -639,43 +327,43 @@ class ExifData extends ExifIFDContainer {
     final data = block.readBytes(size);
 
     switch (f) {
-      case ExifValueType.None:
+      case IfdValueType.none:
         break;
-      case ExifValueType.SByte:
-        entry.value = ExifSByteValue.data(data, count);
+      case IfdValueType.sByte:
+        entry.value = IfdSByteValue.data(data, count);
         break;
-      case ExifValueType.Byte:
-        entry.value = ExifByteValue.data(data, count);
+      case IfdValueType.byte:
+        entry.value = IfdByteValue.data(data, count);
         break;
-      case ExifValueType.Undefined:
+      case IfdValueType.undefined:
         entry.value = ExifUndefinedValue.data(data, count);
         break;
-      case ExifValueType.Ascii:
-        entry.value = ExifAsciiValue.data(data, count);
+      case IfdValueType.ascii:
+        entry.value = IfdAsciiValue.data(data, count);
         break;
-      case ExifValueType.Short:
-        entry.value = ExifShortValue.data(data, count);
+      case IfdValueType.short:
+        entry.value = IfdShortValue.data(data, count);
         break;
-      case ExifValueType.Long:
-        entry.value = ExifLongValue.data(data, count);
+      case IfdValueType.long:
+        entry.value = IfdLongValue.data(data, count);
         break;
-      case ExifValueType.Rational:
-        entry.value = ExifRationalValue.data(data, count);
+      case IfdValueType.rational:
+        entry.value = IfdRationalValue.data(data, count);
         break;
-      case ExifValueType.SRational:
-        entry.value = ExifSRationalValue.data(data, count);
+      case IfdValueType.sRational:
+        entry.value = IfdSRationalValue.data(data, count);
         break;
-      case ExifValueType.SShort:
-        entry.value = ExifSShortValue.data(data, count);
+      case IfdValueType.sShort:
+        entry.value = IfdSShortValue.data(data, count);
         break;
-      case ExifValueType.SLong:
-        entry.value = ExifSLongValue.data(data, count);
+      case IfdValueType.sLong:
+        entry.value = IfdSLongValue.data(data, count);
         break;
-      case ExifValueType.Single:
-        entry.value = ExifSingleValue.data(data, count);
+      case IfdValueType.single:
+        entry.value = IfdSingleValue.data(data, count);
         break;
-      case ExifValueType.Double:
-        entry.value = ExifDoubleValue.data(data, count);
+      case IfdValueType.double:
+        entry.value = IfdDoubleValue.data(data, count);
         break;
     }
 
@@ -683,4 +371,10 @@ class ExifData extends ExifIFDContainer {
 
     return entry;
   }
+}
+
+class _ExifEntry {
+  int tag;
+  IfdValue? value;
+  _ExifEntry(this.tag, this.value);
 }

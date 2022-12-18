@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import '../exif/exif_data.dart';
-import '../image.dart';
+import '../image/image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 import 'jpeg/jpeg.dart';
@@ -12,9 +12,9 @@ import 'jpeg/jpeg.dart';
 /// https://github.com/owencm/javascript-jpeg-encoder
 class JpegEncoder extends Encoder {
   JpegEncoder({int quality = 100}) {
-    _initHuffmanTbl();
+    _initHuffmanTable();
     _initCategoryNumber();
-    _initRGBYUVTable();
+    _initRgbYuvTable();
     setQuality(quality);
   }
 
@@ -38,7 +38,7 @@ class JpegEncoder extends Encoder {
   }
 
   @override
-  List<int> encodeImage(Image image) {
+  Uint8List encodeImage(Image image) {
     final fp = OutputBuffer(bigEndian: true);
 
     // Add JPEG headers
@@ -51,69 +51,60 @@ class JpegEncoder extends Encoder {
     _writeSOS(fp);
 
     // Encode 8x8 macroblocks
-    int? DCY = 0;
-    int? DCU = 0;
-    int? DCV = 0;
+    int? dcy = 0;
+    int? dcu = 0;
+    int? dcv = 0;
 
     _resetBits();
 
     final width = image.width;
     final height = image.height;
 
-    final imageData = image.getBytes();
-    final quadWidth = width * 4;
-    //int tripleWidth = width * 3;
-    //bool first = true;
-
     var y = 0;
     while (y < height) {
       var x = 0;
-      while (x < quadWidth) {
-        final start = quadWidth * y + x;
+      while (x < width) {
         for (var pos = 0; pos < 64; pos++) {
           final row = pos >> 3; // / 8
-          final col = (pos & 7) * 4; // % 8
-          var p = start + (row * quadWidth) + col;
+          final col = pos & 7; // % 8
 
-          if (y + row >= height) {
+          var _y = y + row;
+          var _x = x + col;
+
+          if (_y >= height) {
             // padding bottom
-            p -= (quadWidth * (y + 1 + row - height));
+            _y -= y + 1 + row - height;
           }
 
-          if (x + col >= quadWidth) {
+          if (_x >= width) {
             // padding right
-            p -= ((x + col) - quadWidth + 4);
+            _x -= (x + col) - width + 1;
           }
 
-          final r = imageData[p++];
-          final g = imageData[p++];
-          final b = imageData[p++];
+          final p = image.getPixel(_x, _y);
+          final r = p.r.toInt();
+          final g = p.g.toInt();
+          final b = p.b.toInt();
 
           // calculate YUV values
-          YDU[pos] = ((RGB_YUV_TABLE[r] +
-                      RGB_YUV_TABLE[(g + 256)] +
-                      RGB_YUV_TABLE[(b + 512)]) >>
-                  16) -
-              128.0;
+          ydu[pos] = ((rgbYuvTable[r] +
+                      rgbYuvTable[(g + 256)] +
+                      rgbYuvTable[(b + 512)]) >> 16) - 128.0;
 
-          UDU[pos] = ((RGB_YUV_TABLE[(r + 768)] +
-                      RGB_YUV_TABLE[(g + 1024)] +
-                      RGB_YUV_TABLE[(b + 1280)]) >>
-                  16) -
-              128.0;
+          udu[pos] = ((rgbYuvTable[(r + 768)] +
+                      rgbYuvTable[(g + 1024)] +
+                      rgbYuvTable[(b + 1280)]) >> 16) - 128.0;
 
-          VDU[pos] = ((RGB_YUV_TABLE[(r + 1280)] +
-                      RGB_YUV_TABLE[(g + 1536)] +
-                      RGB_YUV_TABLE[(b + 1792)]) >>
-                  16) -
-              128.0;
+          vdu[pos] = ((rgbYuvTable[(r + 1280)] +
+                      rgbYuvTable[(g + 1536)] +
+                      rgbYuvTable[(b + 1792)]) >> 16) - 128.0;
         }
 
-        DCY = _processDU(fp, YDU, fdtbl_Y, DCY!, YDC_HT, YAC_HT);
-        DCU = _processDU(fp, UDU, fdtbl_UV, DCU!, UVDC_HT, UVAC_HT);
-        DCV = _processDU(fp, VDU, fdtbl_UV, DCV!, UVDC_HT, UVAC_HT);
+        dcy = _processDU(fp, ydu, fdtbl_Y, dcy!, ydcHuffman, yacHuffman);
+        dcu = _processDU(fp, udu, fdtbl_UV, dcu!, uvdcHuffman, uvacHuffman);
+        dcv = _processDU(fp, vdu, fdtbl_UV, dcv!, uvdcHuffman, uvacHuffman);
 
-        x += 32;
+        x += 8;
       }
 
       y += 8;
@@ -122,8 +113,8 @@ class JpegEncoder extends Encoder {
     ////////////////////////////////////////////////////////////////
 
     // Do the bit alignment of the EOI marker
-    if (_bytepos >= 0) {
-      final fillBits = [(1 << (_bytepos + 1)) - 1, _bytepos + 1];
+    if (_bytePos >= 0) {
+      final fillBits = [(1 << (_bytePos + 1)) - 1, _bytePos + 1];
       _writeBits(fp, fillBits);
     }
 
@@ -138,7 +129,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _initQuantTables(int sf) {
-    const YQT = <int>[
+    const yqt = <int>[
       16,
       11,
       10,
@@ -206,16 +197,16 @@ class JpegEncoder extends Encoder {
     ];
 
     for (var i = 0; i < 64; i++) {
-      var t = ((YQT[i] * sf + 50) / 100).floor();
+      var t = ((yqt[i] * sf + 50) / 100).floor();
       if (t < 1) {
         t = 1;
       } else if (t > 255) {
         t = 255;
       }
-      YTable[ZIGZAG[i]] = t;
+      YTable[zigzag[i]] = t;
     }
 
-    const UVQT = <int>[
+    const uvqt = <int>[
       17,
       18,
       24,
@@ -283,13 +274,13 @@ class JpegEncoder extends Encoder {
     ];
 
     for (var j = 0; j < 64; j++) {
-      var u = ((UVQT[j] * sf + 50) / 100).floor();
+      var u = ((uvqt[j] * sf + 50) / 100).floor();
       if (u < 1) {
         u = 1;
       } else if (u > 255) {
         u = 255;
       }
-      UVTable[ZIGZAG[j]] = u;
+      UVTable[zigzag[j]] = u;
     }
 
     const aasf = <double>[
@@ -306,73 +297,74 @@ class JpegEncoder extends Encoder {
     var k = 0;
     for (var row = 0; row < 8; row++) {
       for (var col = 0; col < 8; col++) {
-        fdtbl_Y[k] = (1.0 / (YTable[ZIGZAG[k]] * aasf[row] * aasf[col] * 8.0));
-        fdtbl_UV[k] =
-            (1.0 / (UVTable[ZIGZAG[k]] * aasf[row] * aasf[col] * 8.0));
+        fdtbl_Y[k] = (1.0 / (YTable[zigzag[k]] * aasf[row] * aasf[col] * 8.0));
+        fdtbl_UV[k] = (1.0 / (UVTable[zigzag[k]] * aasf[row] *
+            aasf[col] * 8.0));
         k++;
       }
     }
   }
 
-  List<List<int>?> _computeHuffmanTbl(List<int> nrcodes, List<int> std_table) {
-    var codevalue = 0;
+  List<List<int>?> _computeHuffmanTable(List<int> nrCodes,
+      List<int> std_table) {
+    var codeValue = 0;
     var pos_in_table = 0;
-    final HT = <List<int>?>[<int>[]];
+    final ht = <List<int>?>[<int>[]];
     for (var k = 1; k <= 16; k++) {
-      for (var j = 1; j <= nrcodes[k]; j++) {
+      for (var j = 1; j <= nrCodes[k]; j++) {
         final index = std_table[pos_in_table];
-        if (HT.length <= index) {
-          HT.length = index + 1;
+        if (ht.length <= index) {
+          ht.length = index + 1;
         }
-        HT[index] = [codevalue, k];
+        ht[index] = [codeValue, k];
         pos_in_table++;
-        codevalue++;
+        codeValue++;
       }
-      codevalue *= 2;
+      codeValue *= 2;
     }
-    return HT;
+    return ht;
   }
 
-  void _initHuffmanTbl() {
-    YDC_HT =
-        _computeHuffmanTbl(STD_DC_LUMINANCE_NR_CODES, STD_DC_LUMINANCE_VALUES);
-    UVDC_HT = _computeHuffmanTbl(
-        STD_DC_CHROMINANCE_NR_CODES, STD_DC_CHROMINANCE_VALUES);
-    YAC_HT =
-        _computeHuffmanTbl(STD_AC_LUMINANCE_NR_CODES, STD_AC_LUMINANCE_VALUES);
-    UVAC_HT = _computeHuffmanTbl(
-        STD_AC_CHROMINANCE_NR_CODES, STD_AC_CHROMINANCE_VALUES);
+  void _initHuffmanTable() {
+    ydcHuffman = _computeHuffmanTable(stdDcLuminanceNrCodes,
+        stdDcLuminanceValues);
+    uvdcHuffman = _computeHuffmanTable(stdDcChrominanceNrCodes,
+        stdDcChrominanceValues);
+    yacHuffman = _computeHuffmanTable(stdAcLuminanceNrCodes,
+        stdAcLuminanceValues);
+    uvacHuffman = _computeHuffmanTable(stdAcChrominanceNrCodes,
+        stdAcChrominanceValues);
   }
 
   void _initCategoryNumber() {
-    var nrlower = 1;
-    var nrupper = 2;
+    var nrLower = 1;
+    var nrUpper = 2;
     for (var cat = 1; cat <= 15; cat++) {
       // Positive numbers
-      for (var nr = nrlower; nr < nrupper; nr++) {
+      for (var nr = nrLower; nr < nrUpper; nr++) {
         category[32767 + nr] = cat;
         bitcode[32767 + nr] = [nr, cat];
       }
       // Negative numbers
-      for (var nrneg = -(nrupper - 1); nrneg <= -nrlower; nrneg++) {
-        category[32767 + nrneg] = cat;
-        bitcode[32767 + nrneg] = [nrupper - 1 + nrneg, cat];
+      for (var nrNeg = -(nrUpper - 1); nrNeg <= -nrLower; nrNeg++) {
+        category[32767 + nrNeg] = cat;
+        bitcode[32767 + nrNeg] = [nrUpper - 1 + nrNeg, cat];
       }
-      nrlower <<= 1;
-      nrupper <<= 1;
+      nrLower <<= 1;
+      nrUpper <<= 1;
     }
   }
 
-  void _initRGBYUVTable() {
+  void _initRgbYuvTable() {
     for (var i = 0; i < 256; i++) {
-      RGB_YUV_TABLE[i] = 19595 * i;
-      RGB_YUV_TABLE[(i + 256)] = 38470 * i;
-      RGB_YUV_TABLE[(i + 512)] = 7471 * i + 0x8000;
-      RGB_YUV_TABLE[(i + 768)] = -11059 * i;
-      RGB_YUV_TABLE[(i + 1024)] = -21709 * i;
-      RGB_YUV_TABLE[(i + 1280)] = 32768 * i + 0x807FFF;
-      RGB_YUV_TABLE[(i + 1536)] = -27439 * i;
-      RGB_YUV_TABLE[(i + 1792)] = -5329 * i;
+      rgbYuvTable[i] = 19595 * i;
+      rgbYuvTable[(i + 256)] = 38470 * i;
+      rgbYuvTable[(i + 512)] = 7471 * i + 0x8000;
+      rgbYuvTable[(i + 768)] = -11059 * i;
+      rgbYuvTable[(i + 1024)] = -21709 * i;
+      rgbYuvTable[(i + 1280)] = 32768 * i + 0x807FFF;
+      rgbYuvTable[(i + 1536)] = -27439 * i;
+      rgbYuvTable[(i + 1792)] = -5329 * i;
     }
   }
 
@@ -575,34 +567,34 @@ class JpegEncoder extends Encoder {
 
     out.writeByte(0); // HTYDCinfo
     for (var i = 0; i < 16; i++) {
-      out.writeByte(STD_DC_LUMINANCE_NR_CODES[i + 1]);
+      out.writeByte(stdDcLuminanceNrCodes[i + 1]);
     }
     for (var j = 0; j <= 11; j++) {
-      out.writeByte(STD_DC_LUMINANCE_VALUES[j]);
+      out.writeByte(stdDcLuminanceValues[j]);
     }
 
     out.writeByte(0x10); // HTYACinfo
     for (var k = 0; k < 16; k++) {
-      out.writeByte(STD_AC_LUMINANCE_NR_CODES[k + 1]);
+      out.writeByte(stdAcLuminanceNrCodes[k + 1]);
     }
     for (var l = 0; l <= 161; l++) {
-      out.writeByte(STD_AC_LUMINANCE_VALUES[l]);
+      out.writeByte(stdAcLuminanceValues[l]);
     }
 
     out.writeByte(1); // HTUDCinfo
     for (var m = 0; m < 16; m++) {
-      out.writeByte(STD_DC_CHROMINANCE_NR_CODES[m + 1]);
+      out.writeByte(stdDcChrominanceNrCodes[m + 1]);
     }
     for (var n = 0; n <= 11; n++) {
-      out.writeByte(STD_DC_CHROMINANCE_VALUES[n]);
+      out.writeByte(stdDcChrominanceValues[n]);
     }
 
     out.writeByte(0x11); // HTUACinfo
     for (var o = 0; o < 16; o++) {
-      out.writeByte(STD_AC_CHROMINANCE_NR_CODES[o + 1]);
+      out.writeByte(stdAcChrominanceNrCodes[o + 1]);
     }
     for (var p = 0; p <= 161; p++) {
-      out.writeByte(STD_AC_CHROMINANCE_VALUES[p]);
+      out.writeByte(stdAcChrominanceValues[p]);
     }
   }
 
@@ -622,28 +614,28 @@ class JpegEncoder extends Encoder {
   }
 
   int? _processDU(OutputBuffer out, List<double> CDU, List<double> fdtbl,
-      int DC, List<List<int>?>? HTDC, List<List<int>?> HTAC) {
-    final EOB = HTAC[0x00];
-    final M16zeroes = HTAC[0xF0];
+      int dc, List<List<int>?>? htdc, List<List<int>?> htac) {
+    final eob = htac[0x00];
+    final M16zeroes = htac[0xF0];
     int pos;
     const I16 = 16;
     const I63 = 63;
     const I64 = 64;
-    final DU_DCT = _fDCTQuant(CDU, fdtbl);
+    final duDct = _fDCTQuant(CDU, fdtbl);
 
     // ZigZag reorder
     for (var j = 0; j < I64; ++j) {
-      DU[ZIGZAG[j]] = DU_DCT[j];
+      DU[zigzag[j]] = duDct[j];
     }
 
-    final Diff = DU[0]! - DC;
-    DC = DU[0]!;
-    // Encode DC
+    final Diff = DU[0]! - dc;
+    dc = DU[0]!;
+    // Encode dc
     if (Diff == 0) {
-      _writeBits(out, HTDC![0]!); // Diff might be 0
+      _writeBits(out, htdc![0]!); // Diff might be 0
     } else {
       pos = 32767 + Diff;
-      _writeBits(out, HTDC![category[pos]!]!);
+      _writeBits(out, htdc![category[pos]!]!);
       _writeBits(out, bitcode[pos]!);
     }
 
@@ -652,8 +644,8 @@ class JpegEncoder extends Encoder {
     for (; (end0pos > 0) && (DU[end0pos] == 0); end0pos--) {}
     //end0pos = first element in reverse order !=0
     if (end0pos == 0) {
-      _writeBits(out, EOB!);
-      return DC;
+      _writeBits(out, eob!);
+      return dc;
     }
 
     var i = 1;
@@ -671,16 +663,16 @@ class JpegEncoder extends Encoder {
         nrzeroes = nrzeroes & 0xF;
       }
       pos = 32767 + DU[i]!;
-      _writeBits(out, HTAC[(nrzeroes << 4) + category[pos]!]!);
+      _writeBits(out, htac[(nrzeroes << 4) + category[pos]!]!);
       _writeBits(out, bitcode[pos]!);
       i++;
     }
 
     if (end0pos != I63) {
-      _writeBits(out, EOB!);
+      _writeBits(out, eob!);
     }
 
-    return DC;
+    return dc;
   }
 
   void _writeBits(OutputBuffer out, List<int> bits) {
@@ -688,49 +680,49 @@ class JpegEncoder extends Encoder {
     var posval = bits[1] - 1;
     while (posval >= 0) {
       if ((value & (1 << posval)) != 0) {
-        _bytenew |= (1 << _bytepos);
+        _byteNew |= (1 << _bytePos);
       }
       posval--;
-      _bytepos--;
-      if (_bytepos < 0) {
-        if (_bytenew == 0xff) {
+      _bytePos--;
+      if (_bytePos < 0) {
+        if (_byteNew == 0xff) {
           out.writeByte(0xff);
           out.writeByte(0);
         } else {
-          out.writeByte(_bytenew);
+          out.writeByte(_byteNew);
         }
-        _bytepos = 7;
-        _bytenew = 0;
+        _bytePos = 7;
+        _byteNew = 0;
       }
     }
   }
 
   void _resetBits() {
-    _bytenew = 0;
-    _bytepos = 7;
+    _byteNew = 0;
+    _bytePos = 7;
   }
 
   final YTable = Uint8List(64);
   final UVTable = Uint8List(64);
   final fdtbl_Y = Float32List(64);
   final fdtbl_UV = Float32List(64);
-  List<List<int>?>? YDC_HT;
-  List<List<int>?>? UVDC_HT;
-  late List<List<int>?> YAC_HT;
-  late List<List<int>?> UVAC_HT;
+  List<List<int>?>? ydcHuffman;
+  List<List<int>?>? uvdcHuffman;
+  late List<List<int>?> yacHuffman;
+  late List<List<int>?> uvacHuffman;
 
   final bitcode = List<List<int>?>.filled(65535, null);
   final category = List<int?>.filled(65535, null);
   final outputfDCTQuant = List<int?>.filled(64, null);
   final DU = List<int?>.filled(64, null);
 
-  final Float32List YDU = Float32List(64);
-  final Float32List UDU = Float32List(64);
-  final Float32List VDU = Float32List(64);
-  final Int32List RGB_YUV_TABLE = Int32List(2048);
+  final Float32List ydu = Float32List(64);
+  final Float32List udu = Float32List(64);
+  final Float32List vdu = Float32List(64);
+  final Int32List rgbYuvTable = Int32List(2048);
   int? currentQuality;
 
-  static const List<int> ZIGZAG = [
+  static const List<int> zigzag = [
     0,
     1,
     5,
@@ -797,7 +789,7 @@ class JpegEncoder extends Encoder {
     63
   ];
 
-  static const List<int> STD_DC_LUMINANCE_NR_CODES = [
+  static const List<int> stdDcLuminanceNrCodes = [
     0,
     0,
     1,
@@ -817,7 +809,7 @@ class JpegEncoder extends Encoder {
     0
   ];
 
-  static const List<int> STD_DC_LUMINANCE_VALUES = [
+  static const List<int> stdDcLuminanceValues = [
     0,
     1,
     2,
@@ -832,7 +824,7 @@ class JpegEncoder extends Encoder {
     11
   ];
 
-  static const List<int> STD_AC_LUMINANCE_NR_CODES = [
+  static const List<int> stdAcLuminanceNrCodes = [
     0,
     0,
     2,
@@ -852,7 +844,7 @@ class JpegEncoder extends Encoder {
     0x7d
   ];
 
-  static const List<int> STD_AC_LUMINANCE_VALUES = [
+  static const List<int> stdAcLuminanceValues = [
     0x01,
     0x02,
     0x03,
@@ -1017,7 +1009,7 @@ class JpegEncoder extends Encoder {
     0xfa
   ];
 
-  static const List<int> STD_DC_CHROMINANCE_NR_CODES = [
+  static const List<int> stdDcChrominanceNrCodes = [
     0,
     0,
     3,
@@ -1037,7 +1029,7 @@ class JpegEncoder extends Encoder {
     0
   ];
 
-  static const List<int> STD_DC_CHROMINANCE_VALUES = [
+  static const List<int> stdDcChrominanceValues = [
     0,
     1,
     2,
@@ -1052,7 +1044,7 @@ class JpegEncoder extends Encoder {
     11
   ];
 
-  static const List<int> STD_AC_CHROMINANCE_NR_CODES = [
+  static const List<int> stdAcChrominanceNrCodes = [
     0,
     0,
     2,
@@ -1072,7 +1064,7 @@ class JpegEncoder extends Encoder {
     0x77
   ];
 
-  static const List<int> STD_AC_CHROMINANCE_VALUES = [
+  static const List<int> stdAcChrominanceValues = [
     0x00,
     0x01,
     0x02,
@@ -1237,6 +1229,6 @@ class JpegEncoder extends Encoder {
     0xfa
   ];
 
-  int _bytenew = 0;
-  int _bytepos = 7;
+  int _byteNew = 0;
+  int _bytePos = 7;
 }

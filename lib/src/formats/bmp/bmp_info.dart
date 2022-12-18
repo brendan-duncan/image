@@ -1,17 +1,34 @@
-import 'dart:convert';
+import '../../color/color.dart';
+import '../../image/palette_uint8.dart';
+import '../../util/bit_utils.dart';
+import '../../util/image_exception.dart';
+import '../../util/input_buffer.dart';
+import '../decode_info.dart';
 
-import '../../../image.dart';
-import '../../internal/bit_operators.dart';
+enum BmpCompression {
+  none,
+  rle8,
+  rle4,
+  bitfields,
+  jpeg,
+  png,
+  alphaBitfields,
+  reserved7,
+  reserved8,
+  reserved9,
+  reserved10,
+  cmyk,
+  cmykRle8,
+  cmykRle4
+}
 
-enum BitmapCompression { BI_BITFIELDS, NONE }
-
-class BitmapFileHeader {
+class BmpFileHeader {
   static const fileHeaderSize = 14;
 
   late int fileLength;
-  late int offset;
+  late int imageOffset;
 
-  BitmapFileHeader(InputBuffer b) {
+  BmpFileHeader(InputBuffer b) {
     if (!isValidFile(b)) {
       throw ImageException('Not a bitmap file.');
     }
@@ -20,7 +37,7 @@ class BitmapFileHeader {
     fileLength = b.readInt32();
     b.skip(4); // skip reserved space
 
-    offset = b.readInt32();
+    imageOffset = b.readInt32();
   }
 
   static bool isValidFile(InputBuffer b) {
@@ -28,197 +45,234 @@ class BitmapFileHeader {
       return false;
     }
     final type = InputBuffer.from(b).readUint16();
-    return type == BMP_HEADER_FILETYPE;
+    return type == bmpHeaderFiletype;
   }
 
-  static const BMP_HEADER_FILETYPE = (0x42) + (0x4D << 8); // BM
-
-  Map<String, int> toJson() => {
-        'offset': offset,
-        'fileLength': fileLength,
-        'fileType': BMP_HEADER_FILETYPE
-      };
+  static const bmpHeaderFiletype = 0x4d42; // BM
 }
 
-class BmpInfo extends DecodeInfo {
-  @override
-  int get numFrames => 1;
-  final BitmapFileHeader file;
-
-  final int _height;
+class BmpInfo implements DecodeInfo {
+  final BmpFileHeader header;
   @override
   final int width;
-
+  final int _height;
   final int headerSize;
   final int planes;
-  final int bpp;
-  final BitmapCompression compression;
+  final int bitsPerPixel;
+  final BmpCompression compression;
   final int imageSize;
   final int xppm;
   final int yppm;
   final int totalColors;
   final int importantColors;
+  late int redMask;
+  late int greenMask;
+  late int blueMask;
+  late int alphaMask;
+  PaletteUint8? palette;
+  late int _redShift;
+  late num _redScale;
+  late int _greenShift;
+  late num _greenScale;
+  late int _blueShift;
+  late num _blueScale;
+  late int _alphaShift;
+  late num _alphaScale;
 
-  int? v5redMask;
-  int? v5greenMask;
-  int? v5blueMask;
-  int? v5alphaMask;
+  final int _startPos;
 
-  // BITMAPINFOHEADER should (probably) ignore alpha channel altogether.
-  // This is the behavior in gimp (?)
-  // https://gitlab.gnome.org/GNOME/gimp/-/issues/461#note_208715
+  BmpInfo(InputBuffer p, {BmpFileHeader? fileHeader})
+      : header = fileHeader ?? BmpFileHeader(p)
+      , _startPos = p.offset
+      , headerSize = p.readUint32()
+      , width = p.readInt32()
+      , _height = p.readInt32()
+      , planes = p.readUint16()
+      , bitsPerPixel = p.readUint16()
+      , compression = BmpCompression.values[p.readUint32()]
+      , imageSize = p.readUint32()
+      , xppm = p.readInt32()
+      , yppm = p.readInt32()
+      , totalColors = p.readUint32()
+      , importantColors = p.readUint32() {
+
+    // BMP allows > 4 bit per channel for 16bpp, so we have to scale it
+    // up to 8-bit
+    const maxChannelValue = 255.0;
+
+    if (compression == BmpCompression.bitfields ||
+        compression == BmpCompression.alphaBitfields) {
+      redMask = p.readUint32();
+      _redShift = countTrailingZeroBits(redMask);
+      final redDepth = redMask >> _redShift;
+      _redScale = redDepth > 0 ? maxChannelValue / redDepth : 0;
+
+      greenMask = p.readUint32();
+      _greenShift = countTrailingZeroBits(greenMask);
+      final greenDepth = greenMask >> _greenShift;
+      _greenScale = redDepth > 0 ? maxChannelValue / greenDepth : 0;
+
+      blueMask = p.readUint32();
+      _blueShift = countTrailingZeroBits(blueMask);
+      final blueDepth = blueMask >> _blueShift;
+      _blueScale = redDepth > 0 ? maxChannelValue / blueDepth : 0;
+
+      if (compression == BmpCompression.alphaBitfields) {
+        alphaMask = p.readUint32();
+        _alphaShift = countTrailingZeroBits(alphaMask);
+        final alphaDepth = alphaMask >> _alphaShift;
+        _alphaScale = alphaDepth > 0 ? maxChannelValue / alphaDepth : 0;
+      } else {
+        if (bitsPerPixel == 16) {
+          alphaMask = 0xff000000;
+          _alphaShift = 24;
+          _alphaScale = 1.0;
+        } else {
+          alphaMask = 0xff000000;
+          _alphaShift = 24;
+          _alphaScale = 1.0;
+        }
+      }
+    } else {
+      if (bitsPerPixel == 16) {
+        redMask = 0x7c00;
+        _redShift = 10;
+        final redDepth = redMask >> _redShift;
+        _redScale = redDepth > 0 ? maxChannelValue / redDepth : 0;
+
+        greenMask = 0x03e0;
+        _greenShift = 5;
+        final greenDepth = greenMask >> _greenShift;
+        _greenScale = redDepth > 0 ? maxChannelValue / greenDepth : 0;
+
+        blueMask = 0x001f;
+        _blueShift = 0;
+        final blueDepth = blueMask >> _blueShift;
+        _blueScale = redDepth > 0 ? maxChannelValue / blueDepth : 0;
+
+        alphaMask = 0x00000000;
+        _alphaShift = 0;
+        _alphaScale = 0.0;
+      } else {
+        redMask = 0x00ff0000;
+        _redShift = 16;
+        _redScale = 1.0;
+
+        greenMask = 0x0000ff00;
+        _greenShift = 8;
+        _greenScale = 1.0;
+
+        blueMask = 0x000000ff;
+        _blueShift = 0;
+        _blueScale = 1.0;
+
+        alphaMask = 0xff000000;
+        _alphaShift = 24;
+        _alphaScale = 1.0;
+      }
+    }
+
+    final headerRead = p.offset - _startPos;
+
+    final remainingHeaderBytes = headerSize - headerRead;
+    p.skip(remainingHeaderBytes);
+
+    if (bitsPerPixel <= 8) {
+      readPalette(p);
+    }
+  }
+
   bool get ignoreAlphaChannel =>
+      // Gimp and Photoshop ignore the alpha channel for BITMAPINFOHEADER.
       headerSize == 40 ||
       // BITMAPV5HEADER with null alpha mask.
-      headerSize == 124 && v5alphaMask == 0;
+      headerSize == 124 && alphaMask == 0;
 
   bool get readBottomUp => !_height.isNegative;
 
   @override
   int get height => _height.abs();
 
-  List<int>? colorPalette;
+  @override
+  int get numFrames => 1;
 
-  BmpInfo(InputBuffer p, {BitmapFileHeader? fileHeader})
-      : file = fileHeader ?? BitmapFileHeader(p),
-        headerSize = p.readUint32(),
-        width = p.readInt32(),
-        _height = p.readInt32(),
-        planes = p.readUint16(),
-        bpp = p.readUint16(),
-        compression = _intToCompressions(p.readUint32()),
-        imageSize = p.readUint32(),
-        xppm = p.readInt32(),
-        yppm = p.readInt32(),
-        totalColors = p.readUint32(),
-        importantColors = p.readUint32() {
-    if ([1, 4, 8].contains(bpp)) {
-      readPalette(p);
-    }
-    if (headerSize == 124) {
-      // BITMAPV5HEADER
-      v5redMask = p.readUint32();
-      v5greenMask = p.readUint32();
-      v5blueMask = p.readUint32();
-      v5alphaMask = p.readUint32();
-    }
-  }
+  @override
+  Color? get backgroundColor => null;
 
-  void readPalette(InputBuffer p) {
-    final colors = totalColors == 0 ? 1 << bpp : totalColors;
-    final colorBytes = headerSize == 12 ? 3 : 4;
-    colorPalette = Iterable.generate(
-            colors, (i) => _readRgba(p, aDefault: colorBytes == 3 ? 100 : null))
-        .toList();
-  }
-
-  static BitmapCompression _intToCompressions(int compIndex) {
-    final map = <int, BitmapCompression>{
-      0: BitmapCompression.NONE,
-      // 1: BitmapCompression.RLE_8,
-      // 2: BitmapCompression.RLE_4,
-      3: BitmapCompression.BI_BITFIELDS,
-    };
-    final compression = map[compIndex];
-    if (compression == null) {
-      throw ImageException(
-          'Bitmap compression $compIndex is not supported yet.');
-    }
-    return compression;
-  }
-
-  int _readRgba(InputBuffer input, {int? aDefault}) {
-    if (readBottomUp) {
+  void readPalette(InputBuffer input) {
+    final numColors = totalColors == 0 ? 1 << bitsPerPixel : totalColors;
+    const numChannels = 3;
+    palette = PaletteUint8(numColors, numChannels);
+    for (var i = 0; i < numColors; ++i) {
       final b = input.readByte();
       final g = input.readByte();
       final r = input.readByte();
-      final a = aDefault ?? input.readByte();
-      return getColor(r, g, b, ignoreAlphaChannel ? 255 : a);
-    } else {
-      final r = input.readByte();
-      final b = input.readByte();
-      final g = input.readByte();
-      final a = aDefault ?? input.readByte();
-      return getColor(r, b, g, ignoreAlphaChannel ? 255 : a);
+      final a = input.readByte(); // ignored
+      palette!.setColor(i, r, g, b, a);
     }
   }
 
-  void decodeRgba(InputBuffer input, void Function(int color) pixel) {
-    if (colorPalette != null) {
-      if (bpp == 1) {
-        final b = input.readByte().toRadixString(2).padLeft(8, '0');
-        for (int i = 0; i < 8; i++) {
-          pixel(colorPalette![int.parse(b[i])]);
+  void decodePixel(InputBuffer input,
+      void Function(num r, num g, num b, num a) pixel) {
+    if (palette != null) {
+      if (bitsPerPixel == 1) {
+        var bi = input.readByte();
+        for (var i = 7; i >= 0; --i) {
+          final b = (bi >> i) & 0x1;
+          pixel(b, 0, 0, 0);
         }
         return;
-      } else if (bpp == 4) {
-        final b = input.readByte();
-        final left = b >> 4;
-        final right = b & 0x0f;
-        pixel(colorPalette![left]);
-        pixel(colorPalette![right]);
+      } else if (bitsPerPixel == 2) {
+        final bi = input.readByte();
+        for (var i = 6; i >= 0; i -= 2) {
+          var b = (bi >> i) & 0x2;
+          pixel(b, 0, 0, 0);
+        }
+      } else if (bitsPerPixel == 4) {
+        final bi = input.readByte();
+        final b1 = (bi >> 4) & 0xf;
+        pixel(b1, 0, 0, 0);
+        final b2 = bi & 0xf;
+        pixel(b2, 0, 0, 0);
         return;
-      } else if (bpp == 8) {
+      } else if (bitsPerPixel == 8) {
         final b = input.readByte();
-        pixel(colorPalette![b]);
+        pixel(b, 0, 0, 0);
         return;
       }
     }
-    if (compression == BitmapCompression.BI_BITFIELDS && bpp == 32) {
-      return pixel(_readRgba(input));
-    } else if (bpp == 32 && compression == BitmapCompression.NONE) {
-      return pixel(_readRgba(input));
-    } else if (bpp == 24) {
-      return pixel(_readRgba(input, aDefault: 255));
-    }
-    // else if (bpp == 16) {
-    //   return _rgbaFrom16(input);
-    // }
-    else {
+
+    if (compression == BmpCompression.bitfields && bitsPerPixel == 32) {
+      final p = input.readUint32();
+      final r = (((p & redMask) >> _redShift) * _redScale).toInt();
+      final g = (((p & greenMask) >> _greenShift) * _greenScale).toInt();
+      final b = (((p & blueMask) >> _blueShift) * _blueScale).toInt();
+      final a = ignoreAlphaChannel ? 255
+          : (((p & alphaMask) >> _alphaShift) * _alphaScale).toInt();
+      return pixel(r, g, b, a);
+    } else if (bitsPerPixel == 32 && compression == BmpCompression.none) {
+      final b = input.readByte();
+      final g = input.readByte();
+      final r = input.readByte();
+      final a = input.readByte();
+      return pixel(r, g, b, ignoreAlphaChannel ? 255 : a);
+    } else if (bitsPerPixel == 24) {
+      final b = input.readByte();
+      final g = input.readByte();
+      final r = input.readByte();
+      return pixel(r, g, b, 255);
+    } else if (bitsPerPixel == 16) {
+      final p = input.readUint16();
+      final r = (((p & redMask) >> _redShift) * _redScale).toInt();
+      final g = (((p & greenMask) >> _greenShift) * _greenScale).toInt();
+      final b = (((p & blueMask) >> _blueShift) * _blueScale).toInt();
+      final a = ignoreAlphaChannel ? 255
+          : (((p & alphaMask) >> _alphaShift) * _alphaScale).toInt();
+      return pixel(r, g, b, a);
+    } else {
       throw ImageException(
-          'Unsupported bpp ($bpp) or compression ($compression).');
+          'Unsupported bitsPerPixel ($bitsPerPixel) or'
+              ' compression ($compression).');
     }
-  }
-
-  // TODO: finish decoding for 16 bit
-  // List<int> _rgbaFrom16(InputBuffer input) {
-  //   final maskRed = 0x7C00;
-  //   final maskGreen = 0x3E0;
-  //   final maskBlue = 0x1F;
-  //   final pixel = input.readUint16();
-  //   return [(pixel & maskRed), (pixel & maskGreen), (pixel & maskBlue), 0];
-  // }
-
-  String _compToString() {
-    switch (compression) {
-      case BitmapCompression.BI_BITFIELDS:
-        return 'BI_BITFIELDS';
-      case BitmapCompression.NONE:
-        return 'none';
-    }
-  }
-
-  @override
-  String toString() {
-    const json = JsonEncoder.withIndent(' ');
-    return json.convert({
-      'headerSize': headerSize,
-      'width': width,
-      'height': height,
-      'planes': planes,
-      'bpp': bpp,
-      'file': file.toJson(),
-      'compression': _compToString(),
-      'imageSize': imageSize,
-      'xppm': xppm,
-      'yppm': yppm,
-      'totalColors': totalColors,
-      'importantColors': importantColors,
-      'readBottomUp': readBottomUp,
-      'v5redMask': debugBits32(v5redMask),
-      'v5greenMask': debugBits32(v5greenMask),
-      'v5blueMask': debugBits32(v5blueMask),
-      'v5alphaMask': debugBits32(v5alphaMask),
-    });
   }
 }

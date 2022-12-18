@@ -1,28 +1,33 @@
+import 'dart:math';
 import 'dart:typed_data';
 
-import '../color.dart';
-import '../image.dart';
+import '../color/color.dart';
+import '../color/color_util.dart';
+import '../image/image.dart';
 
 typedef _TestPixel = bool Function(int y, int x);
 typedef _MarkPixel = void Function(int y, int x);
 
 /// Fill the 4-connected shape containing [x],[y] in the image [src] with the
 /// given [color].
-Image fillFlood(Image src, int x, int y, int color,
+Image fillFlood(Image src, int x, int y, Color color,
     {num threshold = 0.0, bool compareAlpha = false}) {
+  if (color.a == 0) {
+    return src;
+  }
+
   final visited = Uint8List(src.width * src.height);
 
   var srcColor = src.getPixel(x, y);
   if (!compareAlpha) {
-    srcColor = setAlpha(srcColor, 0);
+    color.a = 0;
   }
 
   _TestPixel array;
   if (threshold > 0) {
-    final lab =
-        rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
+    final lab = rgbToLab(srcColor.r, srcColor.g, srcColor.b);
     if (compareAlpha) {
-      lab.add(getAlpha(srcColor).toDouble());
+      lab.add(srcColor.a.toDouble());
     }
 
     array = (int y, int x) =>
@@ -31,7 +36,7 @@ Image fillFlood(Image src, int x, int y, int color,
   } else if (!compareAlpha) {
     array = (int y, int x) =>
         visited[y * src.width + x] == 0 &&
-        setAlpha(src.getPixel(x, y), 0) != srcColor;
+        _setAlpha(src.getPixel(x, y), 0) != srcColor;
   } else {
     array = (int y, int x) =>
         visited[y * src.width + x] == 0 && src.getPixel(x, y) != srcColor;
@@ -52,20 +57,19 @@ Uint8List maskFlood(Image src, int x, int y,
     {num threshold = 0.0, bool compareAlpha = false, int fillValue = 255}) {
   final visited = Uint8List(src.width * src.height);
 
-  var srcColor = src.getPixel(x, y);
+  Color srcColor = src.getPixel(x, y);
   if (!compareAlpha) {
-    srcColor = setAlpha(srcColor, 0);
+    srcColor = _setAlpha(srcColor, 0);
   }
 
   final ret = Uint8List(src.width * src.height);
 
   _TestPixel array;
   if (threshold > 0) {
-    final lab =
-        rgbToLab(getRed(srcColor), getGreen(srcColor), getBlue(srcColor));
+    final lab = rgbToLab(srcColor.r, srcColor.g, srcColor.b);
 
     if (compareAlpha) {
-      lab.add(getAlpha(srcColor).toDouble());
+      lab.add(srcColor.a.toDouble());
     }
 
     array = (int y, int x) =>
@@ -76,7 +80,7 @@ Uint8List maskFlood(Image src, int x, int y,
     array = (int y, int x) =>
         visited[y * src.width + x] == 0 &&
         (ret[y * src.width + x] != 0 ||
-            setAlpha(src.getPixel(x, y), 0) != srcColor);
+            _setAlpha(src.getPixel(x, y), 0) != srcColor);
   } else {
     array = (int y, int x) =>
         visited[y * src.width + x] == 0 &&
@@ -92,16 +96,35 @@ Uint8List maskFlood(Image src, int x, int y,
   return ret;
 }
 
-bool _testPixelLabColorDistance(
-    Image src, int x, int y, List<num> refColor, num threshold) {
+Color _setAlpha(Color c, num a) {
+  c.a = a;
+  return c;
+}
+
+/// Compare colors from a 3 or 4 dimensional color space
+num _colorDistance(List<num> c1, List<num> c2, bool compareAlpha) {
+  final d1 = c1[0] - c2[0];
+  final d2 = c1[1] - c2[1];
+  final d3 = c1[2] - c2[2];
+  if (compareAlpha) {
+    final dA = c1[3] - c2[3];
+    return sqrt(max(d1 * d1, (d1 - dA) * (d1 - dA)) +
+        max(d2 * d2, (d2 - dA) * (d2 - dA)) +
+        max(d3 * d3, (d3 - dA) * (d3 - dA)));
+  } else {
+    return sqrt(d1 * d1 + d2 * d2 + d3 * d3);
+  }
+}
+
+bool _testPixelLabColorDistance(Image src, int x, int y,
+    List<num> refColor, num threshold) {
   final pixel = src.getPixel(x, y);
   final compareAlpha = refColor.length > 3;
-  final pixelColor = rgbToLab(getRed(pixel), getGreen(pixel), getBlue(pixel));
+  final pixelColor = rgbToLab(pixel.r, pixel.g, pixel.b);
   if (compareAlpha) {
-    pixelColor.add(getAlpha(pixel).toDouble());
+    pixelColor.add(pixel.a.toDouble());
   }
-
-  return Color.distance(pixelColor, refColor, compareAlpha) > threshold;
+  return _colorDistance(pixelColor, refColor, compareAlpha) > threshold;
 }
 
 // Adam Milazzo (2015). A More Efficient Flood Fill.

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import '../image.dart';
+import '../image/image.dart';
 import 'separable_convolution.dart';
 import 'separable_kernel.dart';
 

@@ -1,11 +1,11 @@
 import 'dart:html';
 
-import 'package:image/image.dart';
+import 'package:image/image.dart' as Ix;
 
 late ImageData filterImageData;
 late CanvasElement canvas;
 late DivElement logDiv;
-late Image origImage;
+late Ix.Image origImage;
 
 void _addControl(String label, String value, DivElement parent,
     void Function(double) callback) {
@@ -41,12 +41,13 @@ void testSepia() {
   void _apply() {
     final t = Stopwatch();
     t.start();
-    var image = Image.from(origImage);
-    image = sepia(image, amount: amount);
+    var image = Ix.Image.from(origImage);
+    image = Ix.sepia(image, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.toUint8List());
+
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -75,12 +76,12 @@ void testSobel() {
   void _apply() {
     final t = Stopwatch();
     t.start();
-    var image = Image.from(origImage);
-    image = sobel(image, amount: amount);
+    var image = Ix.Image.from(origImage);
+    image = Ix.sobel(image, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -109,12 +110,12 @@ void testGaussian() {
   void _apply() {
     final t = Stopwatch();
     t.start();
-    var image = Image.from(origImage);
-    image = gaussianBlur(image, radius);
+    var image = Ix.Image.from(origImage);
+    image = Ix.gaussianBlur(image, radius);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -145,12 +146,12 @@ void testVignette() {
   void _apply() {
     final t = Stopwatch();
     t.start();
-    var image = Image.from(origImage);
-    image = vignette(image, start: start, end: end, amount: amount);
+    var image = Ix.Image.from(origImage);
+    image = Ix.vignette(image, start: start, end: end, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -189,12 +190,12 @@ void testPixelate() {
   void _apply() {
     final t = Stopwatch();
     t.start();
-    var image = Image.from(origImage);
-    image = pixelate(image, blockSize);
+    var image = Ix.Image.from(origImage);
+    image = Ix.pixelate(image, blockSize);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -226,13 +227,13 @@ void testColorOffset() {
   void _apply() {
     final t = Stopwatch();
     t.start();
-    var image = Image.from(origImage);
-    image =
-        colorOffset(image, red: red, green: green, blue: blue, alpha: alpha);
+    var image = Ix.Image.from(origImage);
+    image = Ix.colorOffset(image, red: red, green: green, blue: blue,
+        alpha: alpha);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -282,9 +283,9 @@ void testAdjustColor() {
   void _apply() {
     final t = Stopwatch();
     t.start();
-    var image = Image.from(origImage);
+    var image = Ix.Image.from(origImage);
 
-    image = adjustColor(image,
+    image = Ix.adjustColor(image,
         contrast: contrast,
         saturation: saturation,
         brightness: brightness,
@@ -294,8 +295,8 @@ void testAdjustColor() {
         amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data
-        .setRange(0, filterImageData.data.length, image.getBytes());
+    filterImageData.data.setRange(0, filterImageData.data.length,
+        image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -373,7 +374,8 @@ void main() {
     c.context2D.drawImage(img, 0, 0);
 
     final imageData = c.context2D.getImageData(0, 0, img.width!, img.height!);
-    origImage = Image.fromBytes(img.width!, img.height!, imageData.data);
+    origImage = Ix.Image.fromBytes(img.width!, img.height!,
+        imageData.data.buffer, numChannels: 4);
 
     canvas.width = img.width;
     canvas.height = img.height;

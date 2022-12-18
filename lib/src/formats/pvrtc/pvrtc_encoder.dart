@@ -1,51 +1,51 @@
 import 'dart:typed_data';
 
-import '../../color.dart';
-import '../../image.dart';
-import '../../image_exception.dart';
+import '../../image/image.dart';
+import '../../util/image_exception.dart';
 import '../../util/output_buffer.dart';
 import 'pvrtc_bit_utility.dart';
 import 'pvrtc_color.dart';
 import 'pvrtc_color_bounding_box.dart';
 import 'pvrtc_packet.dart';
 
+enum PvrtcFormat {
+  auto,
+  rgb2,
+  rgba2,
+  rgb4,
+  rgba4
+}
+
 // Ported from Jeffrey Lim's PVRTC encoder/decoder,
 // https://bitbucket.org/jthlim/pvrtccompressor
 class PvrtcEncoder {
-  // PVR Format
-  static const PVR_AUTO = -1;
-  static const PVR_RGB_2BPP = 0;
-  static const PVR_RGBA_2BPP = 1;
-  static const PVR_RGB_4BPP = 2;
-  static const PVR_RGBA_4BPP = 3;
-
-  Uint8List encodePvr(Image bitmap, {int format = PVR_AUTO}) {
+  Uint8List encodePvr(Image bitmap, { PvrtcFormat format = PvrtcFormat.auto }) {
     final output = OutputBuffer();
 
     late dynamic pvrtc;
-    if (format == PVR_AUTO) {
-      if (bitmap.channels == Channels.rgb) {
+    if (format == PvrtcFormat.auto) {
+      if (bitmap.numChannels == 3) {
         pvrtc = encodeRgb4Bpp(bitmap);
-        format = PVR_RGB_4BPP;
+        format = PvrtcFormat.rgb4;
       } else {
         pvrtc = encodeRgba4Bpp(bitmap);
-        format = PVR_RGBA_4BPP;
+        format = PvrtcFormat.rgba4;
       }
-    } else if (format == PVR_RGB_2BPP) {
+    } else if (format == PvrtcFormat.rgb2) {
       //pvrtc = encodeRgb2Bpp(bitmap);
       pvrtc = encodeRgb4Bpp(bitmap);
-    } else if (format == PVR_RGBA_2BPP) {
+    } else if (format == PvrtcFormat.rgba2) {
       //pvrtc = encodeRgba2Bpp(bitmap);
       pvrtc = encodeRgba4Bpp(bitmap);
-    } else if (format == PVR_RGB_4BPP) {
+    } else if (format == PvrtcFormat.rgb4) {
       pvrtc = encodeRgb4Bpp(bitmap);
-    } else if (format == PVR_RGBA_4BPP) {
+    } else if (format == PvrtcFormat.rgba4) {
       pvrtc = encodeRgba4Bpp(bitmap);
     }
 
     const version = 55727696;
     const flags = 0;
-    final pixelFormat = format;
+    final pixelFormat = format.index - 1;
     const channelOrder = 0;
     const colorSpace = 0;
     const channelType = 0;
@@ -73,7 +73,7 @@ class PvrtcEncoder {
 
     output.writeBytes(pvrtc as List<int>);
 
-    return output.getBytes() as Uint8List;
+    return output.getBytes();
   }
 
   Uint8List encodeRgb4Bpp(Image bitmap) {
@@ -88,8 +88,6 @@ class PvrtcEncoder {
     final size = bitmap.width;
     final blocks = size ~/ 4;
     final blockMask = blocks - 1;
-
-    final bitmapData = bitmap.getBytes();
 
     // Allocate enough data for encoding the image.
     final outputData = Uint8List((bitmap.width * bitmap.height) ~/ 2);
@@ -109,13 +107,11 @@ class PvrtcEncoder {
       }
     }
 
-    const factors = PvrtcPacket.BILINEAR_FACTORS;
+    const factors = PvrtcPacket.bilinearFactors;
 
-    for (var y = 0; y < blocks; ++y) {
-      for (var x = 0; x < blocks; ++x) {
+    for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
+      for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
         var factorIndex = 0;
-        final pixelIndex = (y * 4 * size + x * 4) * 4;
-
         var modulationData = 0;
 
         for (var py = 0; py < 4; ++py) {
@@ -143,10 +139,11 @@ class PvrtcEncoder {
                 p2.getColorRgbB() * factors[factorIndex][2] +
                 p3.getColorRgbB() * factors[factorIndex][3];
 
-            final pi = pixelIndex + ((py * size + px) * 4);
-            final r = bitmapData[pi];
-            final g = bitmapData[pi + 1];
-            final b = bitmapData[pi + 2];
+            //final pi = pixelIndex + ((py * size + px) * 4);
+            final _p = bitmap.getPixel(x4 + px, y4 + py);
+            final r = _p.r.toInt();
+            final g = _p.g.toInt();
+            final b = _p.b.toInt();
 
             final d = cb - ca;
             final p = PvrtcColorRgb(r * 16, g * 16, b * 16);
@@ -193,8 +190,6 @@ class PvrtcEncoder {
     final blocks = size ~/ 4;
     final blockMask = blocks - 1;
 
-    final bitmapData = bitmap.getBytes();
-
     // Allocate enough data for encoding the image.
     final outputData = Uint8List((bitmap.width * bitmap.height) ~/ 2);
     final packet = PvrtcPacket(outputData);
@@ -213,12 +208,12 @@ class PvrtcEncoder {
       }
     }
 
-    const factors = PvrtcPacket.BILINEAR_FACTORS;
+    const factors = PvrtcPacket.bilinearFactors;
 
-    for (var y = 0; y < blocks; ++y) {
-      for (var x = 0; x < blocks; ++x) {
+    for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
+      for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
         var factorIndex = 0;
-        final pixelIndex = (y * 4 * size + x * 4) * 4;
+        //final pixelIndex = (y * 4 * size + x * 4) * 4;
 
         var modulationData = 0;
 
@@ -247,11 +242,12 @@ class PvrtcEncoder {
                 p2.getColorRgbaB() * factors[factorIndex][2] +
                 p3.getColorRgbaB() * factors[factorIndex][3];
 
-            final pi = pixelIndex + ((py * size + px) * 4);
-            final r = bitmapData[pi];
-            final g = bitmapData[pi + 1];
-            final b = bitmapData[pi + 2];
-            final a = bitmapData[pi + 3];
+            //final pi = pixelIndex + ((py * size + px) * 4);
+            final bp = bitmap.getPixel(x4 + px, y4 + py);
+            final r = bp.r as int;
+            final g = bp.g as int;
+            final b = bp.b as int;
+            final a = bp.a as int;
 
             final d = cb - ca;
             final p = PvrtcColorRgba(r * 16, g * 16, b * 16, a * 16);
@@ -286,88 +282,65 @@ class PvrtcEncoder {
     return outputData;
   }
 
-  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(
-      Image bitmap, int blockX, int blockY) {
-    final size = bitmap.width;
-    final pi = (blockY * 4 * size + blockX * 4);
+  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(Image bitmap,
+      int blockX, int blockY) {
 
-    PvrtcColorRgb _pixel(int i) {
-      final c = bitmap[pi + i];
-      return PvrtcColorRgb(getRed(c), getGreen(c), getBlue(c));
+    PvrtcColorRgb _pixel(int x, int y) {
+      final p = bitmap.getPixel(blockX + x, blockY + y);
+      return PvrtcColorRgb(p.r as int, p.g as int, p.b as int);
     }
 
-    final cbb = PvrtcColorBoundingBox(_pixel(0), _pixel(0));
-    cbb.add(_pixel(1));
-    cbb.add(_pixel(2));
-    cbb.add(_pixel(3));
+    final cbb = PvrtcColorBoundingBox(_pixel(0,0), _pixel(0,0));
+    cbb.add(_pixel(1, 0));
+    cbb.add(_pixel(2, 0));
+    cbb.add(_pixel(3, 0));
 
-    cbb.add(_pixel(size));
-    cbb.add(_pixel(size + 1));
-    cbb.add(_pixel(size + 2));
-    cbb.add(_pixel(size + 3));
+    cbb.add(_pixel(0, 1));
+    cbb.add(_pixel(1, 1));
+    cbb.add(_pixel(1, 2));
+    cbb.add(_pixel(1, 3));
 
-    cbb.add(_pixel(2 * size));
-    cbb.add(_pixel(2 * size + 1));
-    cbb.add(_pixel(2 * size + 2));
-    cbb.add(_pixel(2 * size + 3));
+    cbb.add(_pixel(2, 0));
+    cbb.add(_pixel(2, 1));
+    cbb.add(_pixel(2, 2));
+    cbb.add(_pixel(2, 3));
 
-    cbb.add(_pixel(3 * size));
-    cbb.add(_pixel(3 * size + 1));
-    cbb.add(_pixel(3 * size + 2));
-    cbb.add(_pixel(3 * size + 3));
+    cbb.add(_pixel(3, 0));
+    cbb.add(_pixel(3, 1));
+    cbb.add(_pixel(3, 2));
+    cbb.add(_pixel(3, 3));
 
     return cbb;
   }
 
-  static PvrtcColorBoundingBox _calculateBoundingBoxRgba(
-      Image bitmap, int blockX, int blockY) {
-    final size = bitmap.width;
-    final pi = (blockY * 4 * size + blockX * 4);
+  static PvrtcColorBoundingBox _calculateBoundingBoxRgba(Image bitmap,
+      int blockX, int blockY) {
 
-    PvrtcColorRgba _pixel(int i) {
-      final c = bitmap[pi + i];
-      return PvrtcColorRgba(getRed(c), getGreen(c), getBlue(c), getAlpha(c));
+    PvrtcColorRgba _pixel(int x, int y) {
+      final p = bitmap.getPixel(blockX + x, blockY + y);
+      return PvrtcColorRgba(p.r as int, p.g as int, p.b as int, p.a as int);
     }
 
-    final cbb = PvrtcColorBoundingBox(_pixel(0), _pixel(0));
-    cbb.add(_pixel(1));
-    cbb.add(_pixel(2));
-    cbb.add(_pixel(3));
+    final cbb = PvrtcColorBoundingBox(_pixel(0,0), _pixel(0,0));
+    cbb.add(_pixel(1, 0));
+    cbb.add(_pixel(2, 0));
+    cbb.add(_pixel(3, 0));
 
-    cbb.add(_pixel(size));
-    cbb.add(_pixel(size + 1));
-    cbb.add(_pixel(size + 2));
-    cbb.add(_pixel(size + 3));
+    cbb.add(_pixel(0, 1));
+    cbb.add(_pixel(1, 1));
+    cbb.add(_pixel(1, 2));
+    cbb.add(_pixel(1, 3));
 
-    cbb.add(_pixel(2 * size));
-    cbb.add(_pixel(2 * size + 1));
-    cbb.add(_pixel(2 * size + 2));
-    cbb.add(_pixel(2 * size + 3));
+    cbb.add(_pixel(2, 0));
+    cbb.add(_pixel(2, 1));
+    cbb.add(_pixel(2, 2));
+    cbb.add(_pixel(2, 3));
 
-    cbb.add(_pixel(3 * size));
-    cbb.add(_pixel(3 * size + 1));
-    cbb.add(_pixel(3 * size + 2));
-    cbb.add(_pixel(3 * size + 3));
+    cbb.add(_pixel(3, 0));
+    cbb.add(_pixel(3, 1));
+    cbb.add(_pixel(3, 2));
+    cbb.add(_pixel(3, 3));
 
     return cbb;
   }
-
-  static const MODULATION_LUT = [
-    0,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    2,
-    2,
-    2,
-    3,
-    3,
-    3
-  ];
 }

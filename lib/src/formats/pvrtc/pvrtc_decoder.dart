@@ -1,15 +1,13 @@
 import 'dart:typed_data';
 
-import '../../color.dart';
-import '../../image.dart';
+import '../../image/image.dart';
 import '../../util/input_buffer.dart';
-import 'pvrtc_color.dart';
 import 'pvrtc_packet.dart';
 
 // Ported from Jeffrey Lim's PVRTC encoder/decoder,
 // https://bitbucket.org/jthlim/pvrtccompressor
 class PvrtcDecoder {
-  Image? decodePvr(List<int> data) {
+  Image? decodePvr(Uint8List data) {
     // Use a heuristic to detect potential apple PVRTC formats
     if (_countBits(data.length) == 1) {
       // very likely to be apple PVRTC
@@ -28,25 +26,25 @@ class PvrtcDecoder {
     return decodePVR2(data);
   }
 
-  Image? decodeApplePVRTC(List<int> data) {
+  Image? decodeApplePVRTC(Uint8List data) {
     // additional heuristic
-    const HEADER_SIZE = 52;
-    if (data.length > HEADER_SIZE) {
+    const headerSize = 52;
+    if (data.length > headerSize) {
       final input = InputBuffer(data);
       // Header
       final size = input.readUint32();
-      if (size == HEADER_SIZE) {
+      if (size == headerSize) {
         return null;
       }
       /*int height =*/ input.readUint32();
       /*int width =*/ input.readUint32();
-      /*int mipcount =*/ input.readUint32();
+      /*int mipCount =*/ input.readUint32();
       /*int flags =*/ input.readUint32();
-      /*int texdatasize =*/ input.readUint32();
+      /*int texDataSize =*/ input.readUint32();
       /*int bpp =*/ input.readUint32();
-      /*int rmask =*/ input.readUint32();
-      /*int gmask =*/ input.readUint32();
-      /*int bmask =*/ input.readUint32();
+      /*int rMask =*/ input.readUint32();
+      /*int gMask =*/ input.readUint32();
+      /*int bMask =*/ input.readUint32();
       final magic = input.readUint32();
       if (magic == 0x21525650) {
         // this looks more like a PowerVR file.
@@ -110,27 +108,27 @@ class PvrtcDecoder {
       return null;
     }
 
-    return decodeRgba4bpp(width, height, data as TypedData);
+    return decodeRgba4bpp(width, height, data);
   }
 
-  Image? decodePVR2(List<int> data) {
+  Image? decodePVR2(Uint8List data) {
     final length = data.length;
 
-    const HEADER_SIZE = 52;
-    const PVRTEX_CUBEMAP = (1 << 12);
-    const PVR_PIXELTYPE_MASK = 0xff;
-    const PVR_TYPE_RGBA4444 = 0x10;
-    const PVR_TYPE_RGBA5551 = 0x11;
-    const PVR_TYPE_RGBA8888 = 0x12;
-    const PVR_TYPE_RGB565 = 0x13;
-    const PVR_TYPE_RGB555 = 0x14;
-    const PVR_TYPE_RGB888 = 0x15;
-    const PVR_TYPE_I8 = 0x16;
-    const PVR_TYPE_AI8 = 0x17;
-    const PVR_TYPE_PVRTC2 = 0x18;
-    const PVR_TYPE_PVRTC4 = 0x19;
+    const headerSize = 52;
+    const pvrTexCubemap = (1 << 12);
+    const pvrPixelTypeMask = 0xff;
+    const pvrTypeRgba4444 = 0x10;
+    const pvrTypeRgba5551 = 0x11;
+    const pvrTypeRgba8888 = 0x12;
+    const pvrTypeRgb565 = 0x13;
+    const pvrTypeRgb555 = 0x14;
+    const pvrTypeRgb888 = 0x15;
+    const pvrTypeI8 = 0x16;
+    const pvrTypeAI8 = 0x17;
+    const pvrTypePvrtc2 = 0x18;
+    const pvrTypePvrtc4 = 0x19;
 
-    if (length < HEADER_SIZE) {
+    if (length < headerSize) {
       return null;
     }
 
@@ -150,12 +148,12 @@ class PvrtcDecoder {
     final magic = input.readUint32();
     var numtex = input.readUint32();
 
-    if (size != HEADER_SIZE || magic != 0x21525650) {
+    if (size != headerSize || magic != 0x21525650) {
       return null;
     }
 
     if (numtex < 1) {
-      numtex = (flags & PVRTEX_CUBEMAP) != 0 ? 6 : 1;
+      numtex = (flags & pvrTexCubemap) != 0 ? 6 : 1;
     }
 
     if (numtex != 1) {
@@ -163,148 +161,104 @@ class PvrtcDecoder {
       return null;
     }
 
-    if (width * height * bpp / 8 > length - HEADER_SIZE) {
+    if (width * height * bpp / 8 > length - headerSize) {
       return null;
     }
 
-    final ptype = flags & PVR_PIXELTYPE_MASK;
+    final pType = flags & pvrPixelTypeMask;
 
-    switch (ptype) {
-      case PVR_TYPE_RGBA4444:
-        final image = Image(width, height);
-        final out = image.getBytes();
-        var oi = 0;
-        for (var y = 0; y < height; ++y) {
-          for (var x = 0; x < width; ++x) {
-            final v1 = input.readByte();
-            final v2 = input.readByte();
-            final a = (v1 & 0x0f) << 4;
-            final b = (v1 & 0xf0);
-            final g = (v2 & 0x0f) << 4;
-            final r = (v2 & 0xf0);
+    switch (pType) {
+      case pvrTypeRgba4444:
+        final image = Image(width, height, numChannels: 4);
+        for (var p in image) {
+          final v1 = input.readByte();
+          final v2 = input.readByte();
+          final a = (v1 & 0x0f) << 4;
+          final b = (v1 & 0xf0);
+          final g = (v2 & 0x0f) << 4;
+          final r = (v2 & 0xf0);
 
-            out[oi++] = r;
-            out[oi++] = g;
-            out[oi++] = b;
-            out[oi++] = a;
-          }
+          p.r = r;
+          p.g = g;
+          p.b = b;
+          p.a = a;
         }
         return image;
-      case PVR_TYPE_RGBA5551:
+      case pvrTypeRgba5551:
+        final image = Image(width, height, numChannels: 4);
+        for (var p in image) {
+          final v = input.readUint16();
+          final r = (v & 0xf800) >> 8;
+          final g = (v & 0x07c0) >> 3;
+          final b = (v & 0x003e) << 2;
+          final a = (v & 0x0001) != 0 ? 255 : 0;
+          p.r = r;
+          p.g = g;
+          p.b = b;
+          p.a = a;
+        }
+        return image;
+      case pvrTypeRgba8888:
+        final image = Image(width, height, numChannels: 4);
+        for (var p in image) {
+          p.r = input.readByte();
+          p.g = input.readByte();
+          p.b = input.readByte();
+          p.a = input.readByte();
+        }
+        return image;
+      case pvrTypeRgb565:
         final image = Image(width, height);
-        final out = image.getBytes();
-        var oi = 0;
-        for (var y = 0; y < height; ++y) {
-          for (var x = 0; x < width; ++x) {
-            final v = input.readUint16();
-
-            final r = (v & 0xf800) >> 8;
-            final g = (v & 0x07c0) >> 3;
-            final b = (v & 0x003e) << 2;
-            final a = (v & 0x0001) != 0 ? 255 : 0;
-
-            out[oi++] = r;
-            out[oi++] = g;
-            out[oi++] = b;
-            out[oi++] = a;
-          }
+        for (var p in image) {
+          final v = input.readUint16();
+          final b = (v & 0x001f) << 3;
+          final g = (v & 0x07e0) >> 3;
+          final r = (v & 0xf800) >> 8;
+          p.r = r;
+          p.g = g;
+          p.b = b;
         }
         return image;
-      case PVR_TYPE_RGBA8888:
+      case pvrTypeRgb555:
         final image = Image(width, height);
-        final out = image.getBytes();
-        var oi = 0;
-        for (var y = 0; y < height; ++y) {
-          for (var x = 0; x < width; ++x) {
-            out[oi++] = input.readByte();
-            out[oi++] = input.readByte();
-            out[oi++] = input.readByte();
-            out[oi++] = input.readByte();
-          }
+        for (var p in image) {
+          final v = input.readUint16();
+          final r = (v & 0x001f) << 3;
+          final g = (v & 0x03e0) >> 2;
+          final b = (v & 0x7c00) >> 7;
+          p.r = r;
+          p.g = g;
+          p.b = b;
         }
         return image;
-      case PVR_TYPE_RGB565:
+      case pvrTypeRgb888:
         final image = Image(width, height);
-        final out = image.getBytes();
-        var oi = 0;
-        for (var y = 0; y < height; ++y) {
-          for (var x = 0; x < width; ++x) {
-            final v = input.readUint16();
-            final b = (v & 0x001f) << 3;
-            final g = (v & 0x07e0) >> 3;
-            final r = (v & 0xf800) >> 8;
-            const a = 255;
-            out[oi++] = r;
-            out[oi++] = g;
-            out[oi++] = b;
-            out[oi++] = a;
-          }
+        for (var p in image) {
+          p.r = input.readByte();
+          p.g = input.readByte();
+          p.b = input.readByte();
         }
         return image;
-      case PVR_TYPE_RGB555:
-        final image = Image(width, height);
-        final out = image.getBytes();
-        var oi = 0;
-        for (var y = 0; y < height; ++y) {
-          for (var x = 0; x < width; ++x) {
-            final v = input.readUint16();
-            final r = (v & 0x001f) << 3;
-            final g = (v & 0x03e0) >> 2;
-            final b = (v & 0x7c00) >> 7;
-            const a = 255;
-            out[oi++] = r;
-            out[oi++] = g;
-            out[oi++] = b;
-            out[oi++] = a;
-          }
+      case pvrTypeI8:
+        final image = Image(width, height, numChannels: 1);
+        for (var p in image) {
+          final i = input.readByte();
+          p.r = i;
         }
         return image;
-      case PVR_TYPE_RGB888:
-        final image = Image(width, height);
-        final out = image.getBytes();
-        var oi = 0;
-        for (var y = 0; y < height; ++y) {
-          for (var x = 0; x < width; ++x) {
-            out[oi++] = input.readByte();
-            out[oi++] = input.readByte();
-            out[oi++] = input.readByte();
-            out[oi++] = 255;
-          }
+      case pvrTypeAI8:
+        final image = Image(width, height, numChannels: 2);
+        for (var p in image) {
+          final i = input.readByte();
+          final a = input.readByte();
+          p.r = i;
+          p.g = a;
         }
         return image;
-      case PVR_TYPE_I8:
-        final image = Image(width, height);
-        final out = image.getBytes();
-        var oi = 0;
-        for (var y = 0; y < height; ++y) {
-          for (var x = 0; x < width; ++x) {
-            final i = input.readByte();
-            out[oi++] = i;
-            out[oi++] = i;
-            out[oi++] = i;
-            out[oi++] = 255;
-          }
-        }
-        return image;
-      case PVR_TYPE_AI8:
-        final image = Image(width, height);
-        final out = image.getBytes();
-        var oi = 0;
-        for (var y = 0; y < height; ++y) {
-          for (var x = 0; x < width; ++x) {
-            final i = input.readByte();
-            final a = input.readByte();
-            out[oi++] = i;
-            out[oi++] = i;
-            out[oi++] = i;
-            out[oi++] = a;
-          }
-        }
-        return image;
-      case PVR_TYPE_PVRTC2:
+      case pvrTypePvrtc2:
         // Currently unsupported
         return null;
-      case PVR_TYPE_PVRTC4:
+      case pvrTypePvrtc4:
         return amask == 0
             ? decodeRgb4bpp(width, height, input.toUint8List())
             : decodeRgba4bpp(width, height, input.toUint8List());
@@ -314,7 +268,7 @@ class PvrtcDecoder {
     return null;
   }
 
-  Image? decodePVR3(List<int> data) {
+  Image? decodePVR3(Uint8List data) {
     //const PVR3_PVRTC_2BPP_RGB = 0;
     //const PVR3_PVRTC_2BPP_RGBA = 1;
     const PVR3_PVRTC_4BPP_RGB = 2;
@@ -458,7 +412,7 @@ class PvrtcDecoder {
   }
 
   Image decodeRgb4bpp(int width, int height, TypedData data) {
-    final result = Image(width, height, channels: Channels.rgb);
+    final result = Image(width, height);
 
     final blocks = width ~/ 4;
     final blockMask = blocks - 1;
@@ -468,9 +422,8 @@ class PvrtcDecoder {
     final p1 = PvrtcPacket(data);
     final p2 = PvrtcPacket(data);
     final p3 = PvrtcPacket(data);
-    final c = PvrtcColorRgb();
-    const factors = PvrtcPacket.BILINEAR_FACTORS;
-    const weights = PvrtcPacket.WEIGHTS;
+    const factors = PvrtcPacket.bilinearFactors;
+    const weights = PvrtcPacket.weights;
 
     for (var y = 0; y < blocks; ++y) {
       for (var x = 0; x < blocks; ++x) {
@@ -484,7 +437,6 @@ class PvrtcDecoder {
           final yOffset = (py < 2) ? -1 : 0;
           final y0 = (y + yOffset) & blockMask;
           final y1 = (y0 + 1) & blockMask;
-          final pyi = (py + y * 4) * width;
 
           for (var px = 0; px < 4; ++px) {
             final xOffset = (px < 2) ? -1 : 0;
@@ -508,13 +460,10 @@ class PvrtcDecoder {
 
             final w = weights[weightIndex + mod & 3];
 
-            c.r = (ca.r * w[0] + cb.r * w[1]) >> 7;
-            c.g = (ca.g * w[0] + cb.g * w[1]) >> 7;
-            c.b = (ca.b * w[0] + cb.b * w[1]) >> 7;
-
-            final pi = (pyi + (px + x * 4));
-
-            result[pi] = getColor(c.r, c.g, c.b);
+            result.setPixelColor(px + x, py + y,
+                (ca.r * w[0] + cb.r * w[1]) >> 7,
+                (ca.g * w[0] + cb.g * w[1]) >> 7,
+                (ca.b * w[0] + cb.b * w[1]) >> 7);
 
             mod >>= 2;
             factorIndex++;
@@ -527,7 +476,7 @@ class PvrtcDecoder {
   }
 
   Image decodeRgba4bpp(int width, int height, TypedData data) {
-    final result = Image(width, height, channels: Channels.rgb);
+    final result = Image(width, height, numChannels: 4);
 
     final blocks = width ~/ 4;
     final blockMask = blocks - 1;
@@ -537,9 +486,8 @@ class PvrtcDecoder {
     final p1 = PvrtcPacket(data);
     final p2 = PvrtcPacket(data);
     final p3 = PvrtcPacket(data);
-    final c = PvrtcColorRgba();
-    const factors = PvrtcPacket.BILINEAR_FACTORS;
-    const weights = PvrtcPacket.WEIGHTS;
+    const factors = PvrtcPacket.bilinearFactors;
+    const weights = PvrtcPacket.weights;
 
     for (var y = 0; y < blocks; ++y) {
       for (var x = 0; x < blocks; ++x) {
@@ -553,7 +501,6 @@ class PvrtcDecoder {
           final yOffset = (py < 2) ? -1 : 0;
           final y0 = (y + yOffset) & blockMask;
           final y1 = (y0 + 1) & blockMask;
-          final pyi = (py + y * 4) * width;
 
           for (var px = 0; px < 4; ++px) {
             final xOffset = (px < 2) ? -1 : 0;
@@ -577,14 +524,11 @@ class PvrtcDecoder {
 
             final w = weights[weightIndex + mod & 3];
 
-            c.r = (ca.r * w[0] + cb.r * w[1]) >> 7;
-            c.g = (ca.g * w[0] + cb.g * w[1]) >> 7;
-            c.b = (ca.b * w[0] + cb.b * w[1]) >> 7;
-            c.a = (ca.a * w[2] + cb.a * w[3]) >> 7;
-
-            final pi = (pyi + (px + x * 4));
-
-            result[pi] = getColor(c.r, c.g, c.b, c.a);
+            result.setPixelColor(px + x, py + y,
+                (ca.r * w[0] + cb.r * w[1]) >> 7,
+                (ca.g * w[0] + cb.g * w[1]) >> 7,
+                (ca.b * w[0] + cb.b * w[1]) >> 7,
+                (ca.a * w[2] + cb.a * w[3]) >> 7);
 
             mod >>= 2;
             factorIndex++;

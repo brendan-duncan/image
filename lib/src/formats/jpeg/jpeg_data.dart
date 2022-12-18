@@ -1,10 +1,20 @@
 import 'dart:typed_data';
 
-import '../../../image.dart';
+import '../../exif/exif_data.dart';
+import '../../image/image.dart';
+import '../../util/image_exception.dart';
+import '../../util/input_buffer.dart';
 import '_component_data.dart';
+import 'jpeg.dart';
+import 'jpeg_adobe.dart';
+import 'jpeg_component.dart';
+import 'jpeg_frame.dart';
+import 'jpeg_info.dart';
+import 'jpeg_jfif.dart';
 import 'jpeg_quantize_stub.dart'
     if (dart.library.io) '_jpeg_quantize_io.dart'
     if (dart.library.js) '_jpeg_quantize_html.dart';
+import 'jpeg_scan.dart';
 
 class JpegData {
   late InputBuffer input;
@@ -44,7 +54,8 @@ class JpegData {
       final sectionByteSize = input.readUint16();
       if (sectionByteSize < 2) {
         // jpeg section consists of more than 2 bytes at least
-        // return success only when SOF and SOS have already found (as a jpeg without EOF.)
+        // return success only when SOF and SOS have already found (as a jpeg
+        // without EOF.)
         break;
       }
       input.offset += sectionByteSize - 2;
@@ -384,8 +395,8 @@ class JpegData {
       final v = x & 15;
       final qId = block.readByte();
       frame!.componentsOrder.add(componentId);
-      frame!.components[componentId] =
-          JpegComponent(h, v, quantizationTables, qId);
+      frame!.components[componentId] = JpegComponent(h, v,
+          quantizationTables, qId);
     }
 
     frame!.prepare();

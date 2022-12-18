@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:html';
+import 'dart:typed_data';
 
 import 'package:image/image.dart';
 
@@ -16,11 +17,12 @@ void main() {
       req.overrideMimeType('text\/plain; charset=x-user-defined');
       req.onLoadEnd.listen((e) {
         if (req.status == 200) {
-          final bytes = req.responseText!
+          final _bytes = req.responseText!
               .split('')
               .map((e) => String.fromCharCode(e.codeUnitAt(0) & 0xff))
               .join()
               .codeUnits;
+          final bytes = Uint8List.fromList(_bytes);
 
           final image = decodeWebP(bytes)!;
           final png = encodePng(image);

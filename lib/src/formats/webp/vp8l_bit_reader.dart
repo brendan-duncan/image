@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 
 class VP8LBitReader {
@@ -23,7 +23,7 @@ class VP8LBitReader {
     var b2 = 0;
     if (bitPos < 32) {
       b2 = (_buffer[0] >> bitPos) +
-          ((_buffer[1] & BIT_MASK[bitPos]) * (BIT_MASK[32 - bitPos] + 1));
+          ((_buffer[1] & bitMask[bitPos]) * (bitMask[32 - bitPos] + 1));
     } else if (bitPos == 32) {
       b2 = _buffer[1];
     } else {
@@ -32,11 +32,11 @@ class VP8LBitReader {
     return b2;
   }
 
-  bool get isEOS => (_input.isEOS && bitPos >= LBITS);
+  bool get isEOS => (_input.isEOS && bitPos >= lBits);
 
   // Advances the read buffer by 4 bytes to make room for reading next 32 bits.
   void fillBitWindow() {
-    if (bitPos >= WBITS) {
+    if (bitPos >= wBits) {
       _shiftBytes();
     }
   }
@@ -44,9 +44,9 @@ class VP8LBitReader {
   // Reads the specified number of bits from Read Buffer.
   int readBits(int numBits) {
     // Flag an error if end_of_stream or n_bits is more than allowed limit.
-    if (!isEOS && numBits < MAX_NUM_BIT_READ) {
-      //final value = (buffer >> bitPos) & BIT_MASK[numBits];
-      final value = prefetchBits() & BIT_MASK[numBits];
+    if (!isEOS && numBits < maxNumBitRead) {
+      //final value = (buffer >> bitPos) & bitMask[numBits];
+      final value = prefetchBits() & bitMask[numBits];
       bitPos += numBits;
       _shiftBytes();
       return value;
@@ -55,14 +55,14 @@ class VP8LBitReader {
     }
   }
 
-  // If not at EOS, reload up to LBITS byte-by-byte
+  // If not at EOS, reload up to lBits byte-by-byte
   void _shiftBytes() {
     while (bitPos >= 8 && !_input.isEOS) {
       final b = _input.readByte();
       // buffer >>= 8
       _buffer[0] = (_buffer[0] >> 8) + ((_buffer[1] & 0xff) * 0x1000000);
       _buffer[1] >>= 8;
-      // buffer |= b << (LBITS - 8)
+      // buffer |= b << (lBits - 8)
       _buffer[1] |= b * 0x1000000;
       bitPos -= 8;
     }
@@ -73,19 +73,19 @@ class VP8LBitReader {
   late Uint8List _buffer8;
 
   // The number of bytes used for the bit buffer.
-  static const VALUE_SIZE = 8;
-  static const MAX_NUM_BIT_READ = 25;
+  static const valueSize = 8;
+  static const maxNumBitRead = 25;
 
   // Number of bits prefetched.
-  static const LBITS = 64;
+  static const lBits = 64;
 
   // Minimum number of bytes needed after fillBitWindow.
-  static const WBITS = 32;
+  static const wBits = 32;
 
-  // Number of bytes needed to store WBITS bits.
-  static const LOG8_WBITS = 4;
+  // Number of bytes needed to store wBits bits.
+  static const log8WBits = 4;
 
-  static const List<int> BIT_MASK = [
+  static const List<int> bitMask = [
     0,
     1,
     3,

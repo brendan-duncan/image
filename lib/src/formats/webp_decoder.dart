@@ -1,7 +1,8 @@
-import '../animation.dart';
-import '../color.dart';
-import '../image.dart';
-import '../transform/copy_into.dart';
+import '../color/color_uint8.dart';
+import '../draw/draw_image.dart';
+import '../image/animation.dart';
+import '../image/image.dart';
+import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
 import 'decoder.dart';
 import 'webp/vp8.dart';
@@ -55,10 +56,10 @@ class WebPDecoder extends Decoder {
     }
 
     switch (_info!.format) {
-      case WebPInfo.FORMAT_ANIMATED:
+      case WebPFormat.animated:
         _info!.numFrames = _info!.frames.length;
         return _info;
-      case WebPInfo.FORMAT_LOSSLESS:
+      case WebPFormat.lossless:
         _input!.offset = _info!.vp8Position;
         final vp8l = VP8L(_input!, _info!);
         if (!vp8l.decodeHeader()) {
@@ -66,7 +67,7 @@ class WebPDecoder extends Decoder {
         }
         _info!.numFrames = _info!.frames.length;
         return _info;
-      case WebPInfo.FORMAT_LOSSY:
+      case WebPFormat.lossy:
         _input!.offset = _info!.vp8Position;
         final vp8 = VP8(_input!, _info!);
         if (!vp8.decodeHeader()) {
@@ -74,9 +75,9 @@ class WebPDecoder extends Decoder {
         }
         _info!.numFrames = _info!.frames.length;
         return _info;
+      case WebPFormat.undefined:
+        throw ImageException("Unknown format for WebP");
     }
-
-    return null;
   }
 
   @override
@@ -96,10 +97,10 @@ class WebPDecoder extends Decoder {
       return _decodeFrame(frameData, frame: frame);
     }
 
-    if (_info!.format == WebPInfo.FORMAT_LOSSLESS) {
+    if (_info!.format == WebPFormat.lossless) {
       final data = _input!.subset(_info!.vp8Size, position: _info!.vp8Position);
       return VP8L(data, _info!).decode();
-    } else if (_info!.format == WebPInfo.FORMAT_LOSSY) {
+    } else if (_info!.format == WebPFormat.lossy) {
       final data = _input!.subset(_info!.vp8Size, position: _info!.vp8Position);
       return VP8(data, _info!).decode();
     }
@@ -145,11 +146,11 @@ class WebPDecoder extends Decoder {
         }
 
         if (frame.clearFrame) {
-          lastImage.fill(0);
+          lastImage.clear();
         }
-        copyInto(lastImage, image, dstX: frame.x, dstY: frame.y);
+        drawImage(lastImage, image, dstX: frame.x, dstY: frame.y);
 
-        lastImage.duration = frame.duration;
+        lastImage.frameInfo.duration = frame.duration;
         anim.addFrame(lastImage);
       }
     } else {
@@ -187,9 +188,9 @@ class WebPDecoder extends Decoder {
       return _decodeFrame(frameData, frame: frame);
     } else {
       final data = input.subset(webp.vp8Size, position: webp.vp8Position);
-      if (webp.format == WebPInfo.FORMAT_LOSSLESS) {
+      if (webp.format == WebPFormat.lossless) {
         return VP8L(data, webp).decode();
-      } else if (webp.format == WebPInfo.FORMAT_LOSSY) {
+      } else if (webp.format == WebPFormat.lossy) {
         return VP8(data, webp).decode();
       }
     }
@@ -232,13 +233,13 @@ class WebPDecoder extends Decoder {
         case 'VP8 ':
           webp!.vp8Position = input.position;
           webp.vp8Size = size;
-          webp.format = WebPInfo.FORMAT_LOSSY;
+          webp.format = WebPFormat.lossy;
           found = true;
           break;
         case 'VP8L':
           webp!.vp8Position = input.position;
           webp.vp8Size = size;
-          webp.format = WebPInfo.FORMAT_LOSSLESS;
+          webp.format = WebPFormat.lossless;
           found = true;
           break;
         case 'ALPH':
@@ -249,7 +250,7 @@ class WebPDecoder extends Decoder {
           input.skip(diskSize);
           break;
         case 'ANIM':
-          webp!.format = WebPInfo.FORMAT_ANIMATED;
+          webp!.format = WebPFormat.animated;
           if (!_getAnimInfo(input, webp)) {
             return false;
           }
@@ -298,7 +299,7 @@ class WebPDecoder extends Decoder {
     final alpha = (b >> 4) & 0x1;
     //int exif = (b >> 3) & 0x1;
     //int xmp = (b >> 2) & 0x1;
-    final a = (b >> 1) & 0x1;
+    final anim = (b >> 1) & 0x1;
 
     if (b & 0x1 != 0) {
       return false;
@@ -312,7 +313,7 @@ class WebPDecoder extends Decoder {
 
     webp!.width = w;
     webp.height = h;
-    webp.hasAnimation = a != 0;
+    webp.hasAnimation = anim != 0;
     webp.hasAlpha = alpha != 0;
 
     return true;
@@ -320,14 +321,14 @@ class WebPDecoder extends Decoder {
 
   bool _getAnimInfo(InputBuffer input, WebPInfo webp) {
     final c = input.readUint32();
-    webp.animLoopCount = input.readUint16();
-
     // Color is stored in blue,green,red,alpha order.
-    final a = getRed(c);
-    final r = getGreen(c);
-    final g = getBlue(c);
-    final b = getAlpha(c);
-    webp.backgroundColor = getColor(r, g, b, a);
+    final a = c & 0xff;
+    final r = (c >> 8) & 0xff;
+    final g = (c >> 16) & 0xff;
+    final b = (c >> 24) & 0xff;
+    webp.backgroundColor = ColorRgba8(r, g, b, a);
+
+    webp.animLoopCount = input.readUint16();
     return true;
   }
 

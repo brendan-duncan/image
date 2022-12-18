@@ -1,8 +1,7 @@
 import 'dart:typed_data';
 
-import '../color.dart';
-import '../image.dart';
-import '../image_exception.dart';
+import '../image/image.dart';
+import '../util/image_exception.dart';
 import '../util/interpolation.dart';
 import 'bake_orientation.dart';
 
@@ -12,8 +11,7 @@ import 'bake_orientation.dart';
 /// If [width] isn't specified, then it will be determined by the aspect ratio
 /// of [src] and [height].
 Image copyResize(Image src,
-    {int? width,
-    int? height,
+    {int? width, int? height,
     Interpolation interpolation = Interpolation.nearest}) {
   if (width == null && height == null) {
     throw ImageException('Invalid size');
@@ -35,15 +33,13 @@ Image copyResize(Image src,
   }
 
   final dst = Image(width, height,
-      channels: src.channels, exif: src.exif, iccp: src.iccProfile);
+      numChannels: src.numChannels, format: src.format,
+      palette: src.palette, exif: src.exif, iccp: src.iccProfile);
 
   final dy = src.height / height;
   final dx = src.width / width;
 
   if (interpolation == Interpolation.average) {
-    final sData = src.getBytes();
-    final sw4 = src.width * 4;
-
     for (var y = 0; y < height; ++y) {
       final y1 = (y * dy).toInt();
       var y2 = ((y + 1) * dy).toInt();
@@ -58,21 +54,21 @@ Image copyResize(Image src,
           x2++;
         }
 
-        var r = 0;
-        var g = 0;
-        var b = 0;
-        var a = 0;
+        num r = 0;
+        num g = 0;
+        num b = 0;
+        num a = 0;
         var np = 0;
         for (var sy = y1; sy < y2; ++sy) {
-          var si = sy * sw4 + x1 * 4;
           for (var sx = x1; sx < x2; ++sx, ++np) {
-            r += sData[si++];
-            g += sData[si++];
-            b += sData[si++];
-            a += sData[si++];
+            final s = src.getPixel(sx, sy);
+            r += s.r;
+            g += s.g;
+            b += s.b;
+            a += s.a;
           }
         }
-        dst.setPixel(x, y, getColor(r ~/ np, g ~/ np, b ~/ np, a ~/ np));
+        dst.setPixel(x, y, dst.getColor(r / np, g / np, b / np, a / np));
       }
     }
   } else if (interpolation == Interpolation.nearest) {

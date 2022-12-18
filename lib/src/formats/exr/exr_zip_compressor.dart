@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';

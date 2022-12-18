@@ -1,21 +1,21 @@
 import 'dart:typed_data';
 
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 
 class PsdChannel {
-  static const RED = 0;
-  static const GREEN = 1;
-  static const BLUE = 2;
-  static const BLACK = 3;
-  static const ALPHA = -1;
-  static const MASK = -2;
-  static const REAL_MASK = -3;
+  static const red = 0;
+  static const green = 1;
+  static const blue = 2;
+  static const black = 3;
+  static const alpha = -1;
+  static const mask = -2;
+  static const realMask = -3;
 
-  static const COMPRESS_NONE = 0;
-  static const COMPRESS_RLE = 1;
-  static const COMPRESS_ZIP = 2;
-  static const COMPRESS_ZIP_PREDICTOR = 3;
+  static const compressNone = 0;
+  static const compressRle = 1;
+  static const compressZip = 2;
+  static const compressZipPredictor = 3;
 
   int id;
   int? dataLength;
@@ -41,10 +41,10 @@ class PsdChannel {
     compression ??= input.readUint16();
 
     switch (compression) {
-      case COMPRESS_NONE:
+      case compressNone:
         _readPlaneUncompressed(input, width, height, bitDepth!);
         break;
-      case COMPRESS_RLE:
+      case compressRle:
         lineLengths ??= _readLineLengths(input, height);
         _readPlaneRleCompressed(
             input, width, height, bitDepth!, lineLengths, planeNum);

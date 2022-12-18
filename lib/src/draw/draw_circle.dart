@@ -1,13 +1,14 @@
-import '../image.dart';
+import '../color/color.dart';
+import '../image/image.dart';
 import '../util/point.dart';
 import 'draw_line.dart';
 import 'draw_pixel.dart';
 
 /// Draw a circle into the [image] with a center of [x0],[y0] and
 /// the given [radius] and [color].
-Image drawCircle(Image image, int x0, int y0, int radius, int color) {
+Image drawCircle(Image image, int x0, int y0, int radius, Color c) {
   final points = _calculateCircumference(image, x0, y0, radius);
-  return _draw(image, points, color);
+  return _draw(image, points, c);
 }
 
 /// Draw and fill a circle into the [image] with a center of [x0],[y0]
@@ -20,7 +21,7 @@ Image drawCircle(Image image, int x0, int y0, int radius, int color) {
 ///
 /// Once found, it draws a line connecting those two points. The circle is thus
 /// filled one vertical slice at a time (each slice being 1-pixel wide).
-Image fillCircle(Image image, int x0, int y0, int radius, int color) {
+Image fillCircle(Image image, int x0, int y0, int radius, Color c) {
   final points = _calculateCircumference(image, x0, y0, radius);
 
   // sort points by x-coordinate and then by y-coordinate
@@ -33,12 +34,12 @@ Image fillCircle(Image image, int x0, int y0, int radius, int color) {
     if (pt.x == start.x) {
       end = pt;
     } else {
-      drawLine(image, start.xi, start.yi, end.xi, end.yi, color);
+      drawLine(image, start.xi, start.yi, end.xi, end.yi, c);
       start = pt;
       end = pt;
     }
   }
-  drawLine(image, start.xi, start.yi, end.xi, end.yi, color);
+  drawLine(image, start.xi, start.yi, end.xi, end.yi, c);
   return image;
 }
 
@@ -108,9 +109,9 @@ List<Point> _calculateCircumference(Image image, int x0, int y0, int radius) {
 
 /// Given a list of [points], draw each corresponding pixel into the [image]
 /// with the given [color].
-Image _draw(Image image, List<Point> points, int color) {
+Image _draw(Image image, List<Point> points, Color c) {
   for (var pt in points) {
-    drawPixel(image, pt.xi, pt.yi, color);
+    drawPixel(image, pt.xi, pt.yi, c);
   }
   return image;
 }

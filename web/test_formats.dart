@@ -37,7 +37,7 @@ void main() {
     req.onLoadEnd.listen((e) {
       if (req.status == 200) {
         // Convert the text to binary byte list.
-        final List<int> bytes = Uint8List.view(req.response as ByteBuffer);
+        final bytes = Uint8List.view(req.response as ByteBuffer);
 
         final label = DivElement();
         document.body!.append(label);
@@ -73,7 +73,7 @@ void main() {
           // Create a buffer that the canvas can draw.
           final d = c.context2D.createImageData(c.width, c.height);
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length, newImage.getBytes());
+          d.data.setRange(0, d.data.length, newImage.toUint8List());
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
 
@@ -98,7 +98,7 @@ void main() {
           }
 
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length, image.getBytes());
+          d.data.setRange(0, d.data.length, image.toUint8List());
           // Draw the buffer onto the canvas.
           c.context2D.putImageData(d, 0, 0);
         });

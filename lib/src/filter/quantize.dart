@@ -1,24 +1,25 @@
-import '../image.dart';
+import '../image/image.dart';
 import '../util/neural_quantizer.dart';
 import '../util/octree_quantizer.dart';
+import '../util/quantizer.dart';
+import 'dither_image.dart';
 
 enum QuantizeMethod { neuralNet, octree }
 
 /// Quantize the number of colors in image to 256.
 Image quantize(Image src,
-    {int numberOfColors = 256,
-    QuantizeMethod method = QuantizeMethod.neuralNet}) {
+    { int numberOfColors = 256,
+      QuantizeMethod method = QuantizeMethod.neuralNet,
+      DitherKernel dither = DitherKernel.None,
+      bool ditherSerpentine = false }) {
+  Quantizer quantizer;
+
   if (method == QuantizeMethod.octree || numberOfColors < 4) {
-    final oct = OctreeQuantizer(src, numberOfColors: numberOfColors);
-    for (var i = 0, len = src.length; i < len; ++i) {
-      src[i] = oct.getQuantizedColor(src[i]);
-    }
-    return src;
+    quantizer = OctreeQuantizer(src, numberOfColors: numberOfColors);
+  } else {
+    quantizer = NeuralQuantizer(src, numberOfColors: numberOfColors);
   }
 
-  final quant = NeuralQuantizer(src, numberOfColors: numberOfColors);
-  for (var i = 0, len = src.length; i < len; ++i) {
-    src[i] = quant.getQuantizedColor(src[i]);
-  }
-  return src;
+  return ditherImage(src, quantizer: quantizer, kernel: dither,
+      serpentine: ditherSerpentine);
 }

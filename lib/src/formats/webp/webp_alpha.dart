@@ -121,7 +121,7 @@ class WebPAlpha {
     // doesn't use color cache (a frequent case), we will use DecodeAlphaData()
     // method that only needs allocation of 1 byte per pixel (alpha channel).
     if (_vp8l.transforms.length == 1 &&
-        _vp8l.transforms[0].type == VP8LTransform.COLOR_INDEXING_TRANSFORM &&
+        _vp8l.transforms[0].type == VP8LImageTransformType.colorIndexing &&
         _vp8l.is8bOptimizable()) {
       _use8bDecode = true;
       _vp8l.allocateInternalBuffers8b();

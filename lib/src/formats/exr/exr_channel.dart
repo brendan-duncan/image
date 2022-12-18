@@ -1,4 +1,4 @@
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 
 class ExrChannel {

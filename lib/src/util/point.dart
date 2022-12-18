@@ -4,15 +4,14 @@ class Point {
   num x;
   num y;
 
-  int get xi => x.toInt();
-
-  int get yi => y.toInt();
-
   Point([this.x = 0, this.y = 0]);
 
   Point.from(Point other)
       : x = other.x,
         y = other.y;
+
+  int get xi => x.toInt();
+  int get yi => y.toInt();
 
   Point operator *(double s) => Point(x * s, y * s);
 

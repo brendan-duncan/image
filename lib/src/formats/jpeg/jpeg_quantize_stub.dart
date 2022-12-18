@@ -1,5 +1,7 @@
 import 'dart:typed_data';
-import '../../../image.dart';
+
+import '../../image/image.dart';
+import 'jpeg_data.dart';
 
 // These functions contain bit-shift operations that fail with HTML builds.
 // A conditional import is used to use a modified version for HTML builds

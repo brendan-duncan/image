@@ -1,14 +1,14 @@
-import '../image.dart';
+import '../image/image.dart';
 import '../util/point.dart';
 
 /// Returns a copy of the [src] image, where the given rectangle
 /// has been mapped to the full image.
 Image copyRectify(Image src,
-    {required Point topLeft,
+    { required Point topLeft,
     required Point topRight,
     required Point bottomLeft,
     required Point bottomRight,
-    Image? toImage}) {
+    Image? toImage }) {
   final dst = toImage ?? Image.from(src);
   for (var y = 0; y < dst.height; ++y) {
     final v = y / (dst.height - 1);

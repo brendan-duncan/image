@@ -1,4 +1,6 @@
-import '../image.dart';
+import 'dart:typed_data';
+
+import '../image/image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 import 'png_encoder.dart';
@@ -11,9 +13,9 @@ abstract class WinEncoder extends Encoder {
   int bitsPerPixelOrYHotSpot(int index);
 
   @override
-  List<int> encodeImage(Image image) => encodeImages([image]);
+  Uint8List encodeImage(Image image) => encodeImages([image]);
 
-  List<int> encodeImages(List<Image> images) {
+  Uint8List encodeImages(List<Image> images) {
     final count = images.length;
 
     final out = OutputBuffer();
@@ -25,7 +27,7 @@ abstract class WinEncoder extends Encoder {
 
     var offset = 6 + count * 16; // file header with image directory byte size
 
-    final imageDatas = [<int>[]];
+    final imageDataList = [<int>[]];
 
     var i = 0;
     for (var img in images) {
@@ -50,10 +52,10 @@ abstract class WinEncoder extends Encoder {
       // add the size of bytes to get the new begin of the next image
       offset += data.length;
       i++;
-      imageDatas.add(data);
+      imageDataList.add(data);
     }
 
-    for (var imageData in imageDatas) {
+    for (var imageData in imageDataList) {
       out.writeBytes(imageData);
     }
 

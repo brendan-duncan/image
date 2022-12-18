@@ -16,7 +16,7 @@ void main() {
 
   final bytes = ctx.getImageData(0, 0, cvs.width!, cvs.height!).data;
 
-  final image = Image.fromBytes(cvs.width!, cvs.height!, bytes);
+  final image = Image.fromBytes(cvs.width!, cvs.height!, bytes.buffer);
 
   final jpg = encodeJpg(image, quality: 25);
 

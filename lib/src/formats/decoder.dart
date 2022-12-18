@@ -1,6 +1,7 @@
-import '../animation.dart';
-import '../hdr/hdr_image.dart';
-import '../image.dart';
+import 'dart:typed_data';
+
+import '../image/animation.dart';
+import '../image/image.dart';
 import 'decode_info.dart';
 
 /// Base class for image format decoders.
@@ -43,35 +44,21 @@ import 'decode_info.dart';
 abstract class Decoder {
   /// A light-weight function to test if the given file is able to be decoded
   /// by this Decoder.
-  bool isValidFile(List<int> bytes);
+  bool isValidFile(Uint8List bytes);
 
   /// Decode the file and extract a single image from it. If the file is
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
-  Image? decodeImage(List<int> bytes, {int frame = 0});
-
-  /// Decode the file and extract a single High Dynamic Range (HDR) image from
-  /// it. HDR images are stored in floating-poing values. If the format of the
-  /// file does not support HDR images, the regular image will be converted to
-  /// an HDR image as (color / 255). If the file is animated, the specified
-  /// [frame] will be decoded. If there was a problem decoding the file, null is
-  /// returned.
-  HdrImage? decodeHdrImage(List<int> bytes, {int frame = 0}) {
-    final img = decodeImage(bytes, frame: frame);
-    if (img == null) {
-      return null;
-    }
-    return HdrImage.fromImage(img);
-  }
+  Image? decodeImage(Uint8List bytes, {int frame = 0});
 
   /// Decode all of the frames from an animation. If the file is not an
   /// animation, a single frame animation is returned. If there was a problem
   /// decoding the file, null is returned.
-  Animation? decodeAnimation(List<int> bytes);
+  Animation? decodeAnimation(Uint8List bytes);
 
   /// Start decoding the data as an animation sequence, but don't actually
   /// process the frames until they are requested with decodeFrame.
-  DecodeInfo? startDecode(List<int> bytes);
+  DecodeInfo? startDecode(Uint8List bytes);
 
   /// How many frames are available to be decoded. [startDecode] should have
   /// been called first. Non animated image files will have a single frame.
@@ -83,19 +70,4 @@ abstract class Decoder {
   /// is returned, which provides the image, and top-left coordinates of the
   /// image, as animated frames may only occupy a subset of the canvas.
   Image? decodeFrame(int frame);
-
-  /// Decode a single high dynamic range (HDR) frame from the data that was set
-  /// with [startDecode]. If the format of the file does not support HDR images,
-  /// the regular image will be converted to an HDR image as (color / 255).
-  /// If [frame] is out of the range of available frames, null is returned.
-  /// Non animated image files will only have [frame] 0. An [Image]
-  /// is returned, which provides the image, and top-left coordinates of the
-  /// image, as animated frames may only occupy a subset of the canvas.
-  HdrImage? decodeHdrFrame(int frame) {
-    final img = decodeFrame(frame);
-    if (img == null) {
-      return null;
-    }
-    return HdrImage.fromImage(img);
-  }
 }

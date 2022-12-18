@@ -3,10 +3,10 @@ import 'dart:typed_data';
 import '../../util/input_buffer.dart';
 
 class PsdBlendingRanges {
-  int? grayBlackSrc;
-  int? grayWhiteSrc;
-  int? grayBlackDst;
-  int? grayWhiteDst;
+  late int grayBlackSrc;
+  late int grayWhiteSrc;
+  late int grayBlackDst;
+  late int grayWhiteDst;
   late Uint16List blackSrc;
   late Uint16List whiteSrc;
   late Uint16List blackDst;

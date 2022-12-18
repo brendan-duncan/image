@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import '../image.dart';
-import '../image_exception.dart';
+import '../image/image.dart';
+import '../util/image_exception.dart';
 
 /// Returns a resized and square cropped copy of the [src] image of [size] size.
 Image copyResizeCropSquare(Image src, int size) {
@@ -17,8 +17,9 @@ Image copyResizeCropSquare(Image src, int size) {
     width = (size * (src.width / src.height)).toInt();
   }
 
-  final dst = Image(size, size,
-      channels: src.channels, exif: src.exif, iccp: src.iccProfile);
+  final dst = Image(size, size, numChannels: src.numChannels,
+      format: src.format, palette: src.palette, exif: src.exif,
+      iccp: src.iccProfile);
 
   final dy = src.height / height;
   final dx = src.width / width;

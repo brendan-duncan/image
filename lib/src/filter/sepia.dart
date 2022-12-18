@@ -1,6 +1,5 @@
-import '../color.dart';
-import '../image.dart';
-import '../internal/clamp.dart';
+import '../color/color_util.dart';
+import '../image/image.dart';
 
 /// Apply sepia tone to the image.
 ///
@@ -10,15 +9,14 @@ Image sepia(Image src, {num amount = 1.0}) {
     return src;
   }
 
-  final p = src.getBytes();
-  for (var i = 0, len = p.length; i < len; i += 4) {
-    final r = p[i];
-    final g = p[i + 1];
-    final b = p[i + 2];
+  for (var p in src) {
+    final r = p.r;
+    final g = p.g;
+    final b = p.b;
     final y = getLuminanceRgb(r, g, b);
-    p[i] = clamp255(((amount * (y + 38)) + ((1.0 - amount) * r)).toInt());
-    p[i + 1] = clamp255(((amount * (y + 18)) + ((1.0 - amount) * g)).toInt());
-    p[i + 2] = clamp255(((amount * (y - 31)) + ((1.0 - amount) * b)).toInt());
+    p.r = (amount * (y + 38)) + ((1.0 - amount) * r);
+    p.g = (amount * (y + 18)) + ((1.0 - amount) * g);
+    p.b = (amount * (y - 31)) + ((1.0 - amount) * b);
   }
 
   return src;

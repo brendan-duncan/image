@@ -1,17 +1,18 @@
 import 'dart:typed_data';
 
-import '../../internal/bit_operators.dart';
+import '../../util/bit_utils.dart';
 import '../../util/input_buffer.dart';
 import 'vp8l.dart';
 
-class VP8LTransform {
-  // enum VP8LImageTransformType
-  static const PREDICTOR_TRANSFORM = 0;
-  static const CROSS_COLOR_TRANSFORM = 1;
-  static const SUBTRACT_GREEN = 2;
-  static const COLOR_INDEXING_TRANSFORM = 3;
+enum VP8LImageTransformType {
+  predictor,
+  crossColor,
+  subtractGreen,
+  colorIndexing
+}
 
-  int type = 0;
+class VP8LTransform {
+  VP8LImageTransformType type = VP8LImageTransformType.predictor;
   int xsize = 0;
   int ysize = 0;
   Uint32List? data;
@@ -22,11 +23,11 @@ class VP8LTransform {
     final width = xsize;
 
     switch (type) {
-      case SUBTRACT_GREEN:
+      case VP8LImageTransformType.subtractGreen:
         addGreenToBlueAndRed(
             outData, rowsOut, rowsOut + (rowEnd - rowStart) * width);
         break;
-      case PREDICTOR_TRANSFORM:
+      case VP8LImageTransformType.predictor:
         predictorInverseTransform(rowStart, rowEnd, outData, rowsOut);
         if (rowEnd != ysize) {
           // The last predicted row in this iteration will be the top-pred row
@@ -37,10 +38,10 @@ class VP8LTransform {
           outData.setRange(start, end, inData, offset);
         }
         break;
-      case CROSS_COLOR_TRANSFORM:
+      case VP8LImageTransformType.crossColor:
         colorSpaceInverseTransform(rowStart, rowEnd, outData, rowsOut);
         break;
-      case COLOR_INDEXING_TRANSFORM:
+      case VP8LImageTransformType.colorIndexing:
         if (rowsIn == rowsOut && bits > 0) {
           // Move packed pixels to the end of unpacked region, so that unpacking
           // can occur seamlessly.
@@ -64,8 +65,8 @@ class VP8LTransform {
     }
   }
 
-  void colorIndexInverseTransformAlpha(
-      int yStart, int yEnd, InputBuffer src, InputBuffer dst) {
+  void colorIndexInverseTransformAlpha(int yStart, int yEnd, InputBuffer src,
+      InputBuffer dst) {
     final bitsPerPixel = 8 >> bits;
     final width = xsize;
     final colorMap = data;

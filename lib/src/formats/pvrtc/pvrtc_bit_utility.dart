@@ -4,7 +4,7 @@ class BitUtility {
   static int rotateRight(int value, int shift) =>
       (value >> shift) | (value << (32 - shift));
 
-  static const List<int> BITSCALE_5_TO_8 = [
+  static const bitScale5To8 = [
     0,
     8,
     16,
@@ -39,7 +39,7 @@ class BitUtility {
     255
   ];
 
-  static const List<int> BITSCALE_4_TO_8 = [
+  static const bitScale4To8 = [
     0,
     17,
     34,
@@ -58,9 +58,9 @@ class BitUtility {
     255
   ];
 
-  static const List<int> BITSCALE_3_TO_8 = [0, 36, 72, 109, 145, 182, 218, 255];
+  static const bitScale3To8 = [0, 36, 72, 109, 145, 182, 218, 255];
 
-  static const List<int> BITSCALE_8_TO_5_FLOOR = [
+  static const bitScale8To5Floor = [
     0,
     0,
     0,
@@ -319,7 +319,7 @@ class BitUtility {
     31
   ];
 
-  static const List<int> BITSCALE_8_TO_4_FLOOR = [
+  static const bitScale8To4Floor = [
     0,
     0,
     0,
@@ -578,7 +578,7 @@ class BitUtility {
     15
   ];
 
-  static const List<int> BITSCALE_8_TO_3_FLOOR = [
+  static const bitScale8To3Floor = [
     0,
     0,
     0,
@@ -837,7 +837,7 @@ class BitUtility {
     7
   ];
 
-  static const List<int> BITSCALE_8_TO_5_CEIL = [
+  static const bitScale8To5Ceil = [
     0,
     1,
     1,
@@ -1096,7 +1096,7 @@ class BitUtility {
     31
   ];
 
-  static const List<int> BITSCALE_8_TO_4_CEIL = [
+  static const bitScale8To4Ceil = [
     0,
     1,
     1,
@@ -1355,7 +1355,7 @@ class BitUtility {
     15
   ];
 
-  static const List<int> BITSCALE_8_TO_3_CEIL = [
+  static const bitScale8To3Ceil = [
     0,
     1,
     1,
@@ -1616,5 +1616,5 @@ class BitUtility {
 
   // DartAnalyzer doesn't like classes with only static members now, so
   // I added this member for now to avoid the warnings.
-  var fixWarnings = 0;
+  final fixWarnings = 0;
 }

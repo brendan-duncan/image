@@ -1,18 +1,18 @@
 import 'dart:typed_data';
 
-import '../../internal/internal.dart';
+import '../../util/internal.dart';
 import 'vp8l.dart';
 import 'vp8l_bit_reader.dart';
 
 // Huffman Tree.
 @internal
 class HuffmanTree {
-  static const HUFF_LUT_BITS = 7;
-  static const HUFF_LUT = (1 << HUFF_LUT_BITS);
+  static const huffmanLutBits = 7;
+  static const huffmanLut = 1 << huffmanLutBits;
   // Fast lookup for short bit lengths.
-  Uint8List lutBits = Uint8List(HUFF_LUT);
-  Int16List lutSymbol = Int16List(HUFF_LUT);
-  Int16List lutJump = Int16List(HUFF_LUT);
+  final lutBits = Uint8List(huffmanLut);
+  final lutSymbol = Int16List(huffmanLut);
+  final lutJump = Int16List(huffmanLut);
 
   // all the nodes, starting at root, stored as a single int array, where
   // each node occupies two ints as [symbol, children].
@@ -123,17 +123,17 @@ class HuffmanTree {
     var bits = br.prefetchBits();
     var newBitPos = br.bitPos;
     // Check if we find the bit combination from the Huffman lookup table.
-    final lut_ix = bits & (HUFF_LUT - 1);
+    final lut_ix = bits & (huffmanLut - 1);
     final lut_bits = lutBits[lut_ix];
 
-    if (lut_bits <= HUFF_LUT_BITS) {
+    if (lut_bits <= huffmanLutBits) {
       br.bitPos = br.bitPos + lut_bits;
       return lutSymbol[lut_ix];
     }
 
     node += lutJump[lut_ix];
-    newBitPos += HUFF_LUT_BITS;
-    bits >>= HUFF_LUT_BITS;
+    newBitPos += huffmanLutBits;
+    bits >>= huffmanLutBits;
 
     // Decode the value from a binary tree.
     do {
@@ -148,20 +148,20 @@ class HuffmanTree {
   }
 
   bool _addSymbol(int symbol, int code, int codeLength) {
-    var step = HUFF_LUT_BITS;
+    var step = huffmanLutBits;
     int baseCode;
     var node = 0;
 
-    if (codeLength <= HUFF_LUT_BITS) {
+    if (codeLength <= huffmanLutBits) {
       baseCode = _reverseBitsShort(code, codeLength);
-      for (var i = 0; i < (1 << (HUFF_LUT_BITS - codeLength)); ++i) {
+      for (var i = 0; i < (1 << (huffmanLutBits - codeLength)); ++i) {
         final idx = baseCode | (i << codeLength);
         lutSymbol[idx] = symbol;
         lutBits[idx] = codeLength;
       }
     } else {
       baseCode = _reverseBitsShort(
-          (code >> (codeLength - HUFF_LUT_BITS)), HUFF_LUT_BITS);
+          (code >> (codeLength - huffmanLutBits)), huffmanLutBits);
     }
 
     while (codeLength-- > 0) {
@@ -262,9 +262,9 @@ class HuffmanTree {
       List<int> codeLengths, int codeLengthsSize, List<int> huffCodes) {
     int symbol;
     int codeLen;
-    final codeLengthHist = Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    final codeLengthHist = Int32List(VP8L.maxAllowedCodeLength + 1);
     int currCode;
-    final nextCodes = Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    final nextCodes = Int32List(VP8L.maxAllowedCodeLength + 1);
     var maxCodeLength = 0;
 
     // Calculate max code length.
@@ -274,7 +274,7 @@ class HuffmanTree {
       }
     }
 
-    if (maxCodeLength > VP8L.MAX_ALLOWED_CODE_LENGTH) {
+    if (maxCodeLength > VP8L.maxAllowedCodeLength) {
       return false;
     }
 
@@ -317,7 +317,7 @@ class HTreeGroup {
 
   HTreeGroup()
       : htrees = List<HuffmanTree>.generate(
-            VP8L.HUFFMAN_CODES_PER_META_CODE, (_) => HuffmanTree(),
+            VP8L.huffmanCodesPerMetaCode, (_) => HuffmanTree(),
             growable: false);
 
   HuffmanTree operator [](int index) => htrees[index];

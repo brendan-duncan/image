@@ -1,7 +1,9 @@
 import 'dart:typed_data';
-import '../bitmap_font.dart';
-import '../color.dart';
-import '../image.dart';
+
+import '../color/color.dart';
+import '../color/color_uint8.dart';
+import '../font/bitmap_font.dart';
+import '../image/image.dart';
 import 'draw_pixel.dart';
 
 var _r_lut = Uint8List(256);
@@ -9,23 +11,23 @@ var _g_lut = Uint8List(256);
 var _b_lut = Uint8List(256);
 var _a_lut = Uint8List(256);
 
-/// Draw a string horizontally into [image] horizontally into [image] at position
-/// [x],[y] with the given [color].
+/// Draw a string horizontally into [image] horizontally into [image] at
+/// position [x],[y] with the given [color].
 ///
 /// You can load your own font, or use one of the existing ones
 /// such as: [arial_14], [arial_24], or [arial_48].
-//  Fonts can be create with a tool such as: https://ttf2fnt.com/
+///  Fonts can be create with a tool such as: https://ttf2fnt.com/
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
-    {int color = 0xffffffff, bool rightJustify = false}) {
-  if (color != 0xffffffff) {
-    final ca = getAlpha(color);
+    {Color? color, bool rightJustify = false}) {
+  if (color != null) {
+    final ca = color.a;
     if (ca == 0) {
       return image;
     }
-    final num da = ca / 255.0;
-    final num dr = getRed(color) / 255.0;
-    final num dg = getGreen(color) / 255.0;
-    final num db = getBlue(color) / 255.0;
+    final da = ca / 255.0;
+    final dr = color.r / 255.0;
+    final dg = color.g / 255.0;
+    final db = color.b / 255.0;
     for (var i = 1; i < 256; ++i) {
       _r_lut[i] = (dr * i).toInt();
       _g_lut[i] = (dg * i).toInt();
@@ -34,12 +36,13 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     }
   }
 
-  final int stringHeight = findStringHeight(font, string);
-  final int origX = x;
+  final stringHeight = _findStringHeight(font, string);
+  final origX = x;
   final substrings = string.split(new RegExp(r"[(\n|\r)]"));
+  final _c = ColorRgba8();
 
   for (var ss in substrings) {
-    var chars = ss.codeUnits;
+    final chars = ss.codeUnits;
     if (rightJustify == true) {
       for (var c in chars) {
         if (!font.characters.containsKey(c)) {
@@ -61,20 +64,26 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 
       final x2 = x + ch.width;
       final y2 = y + ch.height;
-      var pi = 0;
+      final cIter = ch.image.iterator;
+      cIter.moveNext();
       for (var yi = y; yi < y2; ++yi) {
-        for (var xi = x; xi < x2; ++xi) {
-          var p = ch.image[pi++];
-          if (color != 0xffffffff) {
-            p = getColor(_r_lut[getRed(p)], _g_lut[getGreen(p)],
-                _b_lut[getBlue(p)], _a_lut[getAlpha(p)]);
+        for (var xi = x; xi < x2; ++xi, cIter.moveNext()) {
+          var p = cIter.current;
+          if (color != null) {
+            _c.r = _r_lut[p.r as int];
+            _c.g = _g_lut[p.g as int];
+            _c.b = _b_lut[p.b as int];
+            _c.a = _a_lut[p.a as int];
+            drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, _c);
+          } else {
+            drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, p);
           }
-          drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, p);
         }
       }
 
       x += ch.xadvance;
     }
+
     y = y+stringHeight;
     x = origX;
   }
@@ -82,14 +91,14 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
   return image;
 }
 
-/// Same as drawString except the strings will wrap around to create multiple lines.
-/// You can load your own font, or use one of the existing ones
+/// Same as drawString except the strings will wrap around to create multiple
+/// lines. You can load your own font, or use one of the existing ones
 /// such as: [arial_14], [arial_24], or [arial_48].
 Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
-    {int color = 0xffffffff}) {
+    {Color? color}) {
 
-  var stringHeight = findStringHeight(font, string);
-  var words = string.split(new RegExp(r"\s+"));
+  final stringHeight = _findStringHeight(font, string);
+  final words = string.split(new RegExp(r"\s+"));
   var subString = "";
   var x2 = x;
 
@@ -143,7 +152,7 @@ Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
 /// You can load your own font, or use one of the existing ones
 /// such as: [arial_14], [arial_24], or [arial_48].
 Image drawStringCentered(Image image, BitmapFont font, String string,
-    {int? x, int? y, int color = 0xffffffff}) {
+    {int? x, int? y, Color? color}) {
   var stringWidth = 0;
   var stringHeight = 0;
 
@@ -176,7 +185,7 @@ Image drawStringCentered(Image image, BitmapFont font, String string,
   return drawString(image, font, xPos, yPos, string, color: color);
 }
 
-int findStringHeight(BitmapFont font, String string) {
+int _findStringHeight(BitmapFont font, String string) {
   var stringHeight = 0;
   final chars = string.codeUnits;
   for (var c in chars) {

@@ -1,17 +1,12 @@
 import 'dart:typed_data';
-import '../../color.dart';
+
 import '../../exif/exif_data.dart';
-import '../../image.dart';
-import '../../image_exception.dart';
+import '../../image/image.dart';
+import '../../util/image_exception.dart';
 import '_component_data.dart';
 import 'jpeg_data.dart';
 
-late final Uint8List _dctClip = _createDctClip();
-int _clamp8(int i) => i < 0
-    ? 0
-    : i > 255
-        ? 255
-        : i;
+final _dctClip = _createDctClip();
 
 const _dctClipOffset = 256;
 const _dctClipLength = 768;
@@ -217,7 +212,7 @@ Image getImageFromJpeg(JpegData jpeg) {
   final width = flipWidthHeight ? h : w;
   final height = flipWidthHeight ? w : h;
 
-  final image = Image(width, height, channels: Channels.rgb);
+  final image = Image(width, height);
 
   // Copy exif data, except for ORIENTATION which we're baking.
   image.exif = ExifData.from(jpeg.exif);
@@ -231,7 +226,6 @@ Image getImageFromJpeg(JpegData jpeg) {
   Uint8List? component2Line;
   Uint8List? component3Line;
   Uint8List? component4Line;
-  var offset = 0;
   int Y, Cb, Cr, K, C, M, Ye, R, G, B;
   var colorTransform = false;
 
@@ -250,23 +244,23 @@ Image getImageFromJpeg(JpegData jpeg) {
         for (var x = 0; x < w; x++) {
           final x1 = x >> hShift1;
           Y = component1Line![x1];
-          final c = getColor(Y, Y, Y);
+
           if (orientation == 2) {
-            image.setPixel(w1 - x, y, c);
+            image.setPixelColor(w1 - x, y,  Y, Y, Y);
           } else if (orientation == 3) {
-            image.setPixel(w1 - x, h1 - y, c);
+            image.setPixelColor(w1 - x, h1 - y,  Y, Y, Y);
           } else if (orientation == 4) {
-            image.setPixel(x, h1 - y, c);
+            image.setPixelColor(x, h1 - y,  Y, Y, Y);
           } else if (orientation == 5) {
-            image.setPixel(y, x, c);
+            image.setPixelColor(y, x,  Y, Y, Y);
           } else if (orientation == 6) {
-            image.setPixel(h1 - y, x, c);
+            image.setPixelColor(h1 - y, x,  Y, Y, Y);
           } else if (orientation == 7) {
-            image.setPixel(h1 - y, w1 - x, c);
+            image.setPixelColor(h1 - y, w1 - x,  Y, Y, Y);
           } else if (orientation == 8) {
-            image.setPixel(y, w1 - x, c);
+            image.setPixelColor(y, w1 - x,  Y, Y, Y);
           } else {
-            image[offset++] = c;
+            image.setPixelColor(x, y, Y, Y, Y);
           }
         }
       }
@@ -338,26 +332,26 @@ Image getImageFromJpeg(JpegData jpeg) {
           R = (Y + 359 * Cr + 128);
           G = (Y - 88 * Cb - 183 * Cr + 128);
           B = (Y + 454 * Cb + 128);
-          R = _clamp8(R >> 8);
-          G = _clamp8(G >> 8);
-          B = _clamp8(B >> 8);
-          final c = getColor(R, G, B);
+          R = (R >> 8).clamp(0, 255);
+          G = (G >> 8).clamp(0, 255);
+          B = (B >> 8).clamp(0, 255);
+
           if (orientation == 2) {
-            image.setPixel(w1 - x, y, c);
+            image.setPixelColor(w1 - x, y, R, G, B);
           } else if (orientation == 3) {
-            image.setPixel(w1 - x, h1 - y, c);
+            image.setPixelColor(w1 - x, h1 - y, R, G, B);
           } else if (orientation == 4) {
-            image.setPixel(x, h1 - y, c);
+            image.setPixelColor(x, h1 - y, R, G, B);
           } else if (orientation == 5) {
-            image.setPixel(y, x, c);
+            image.setPixelColor(y, x, R, G, B);
           } else if (orientation == 6) {
-            image.setPixel(h1 - y, x, c);
+            image.setPixelColor(h1 - y, x, R, G, B);
           } else if (orientation == 7) {
-            image.setPixel(h1 - y, w1 - x, c);
+            image.setPixelColor(h1 - y, w1 - x, R, G, B);
           } else if (orientation == 8) {
-            image.setPixel(y, w1 - x, c);
+            image.setPixelColor(y, w1 - x, R, G, B);
           } else {
-            image[offset++] = c;
+            image.setPixelColor(x, y, R, G, B);
           }
         }
       }
@@ -417,33 +411,31 @@ Image getImageFromJpeg(JpegData jpeg) {
             Cr = component3Line![x3];
             K = component4Line![x4];
 
-            C = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
-            M = 255 -
-                _clamp8((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128))
-                    .toInt());
-            Ye = 255 - _clamp8((Y + 1.772 * (Cb - 128)).toInt());
+            C = 255 - ((Y + 1.402 * (Cr - 128)).toInt()).clamp(0, 255);
+            M = 255 - ((Y - 0.3441363 * (Cb - 128) - 0.71413636 *
+                (Cr - 128)).toInt()).clamp(0, 255);
+            Ye = 255 - ((Y + 1.772 * (Cb - 128)).toInt()).clamp(0, 255);
           }
           R = (C * K) >> 8;
           G = (M * K) >> 8;
           B = (Ye * K) >> 8;
 
-          final c = getColor(R, G, B);
           if (orientation == 2) {
-            image.setPixel(w1 - x, y, c);
+            image.setPixelColor(w1 - x, y, R, G, B);
           } else if (orientation == 3) {
-            image.setPixel(w1 - x, h1 - y, c);
+            image.setPixelColor(w1 - x, h1 - y, R, G, B);
           } else if (orientation == 4) {
-            image.setPixel(x, h1 - y, c);
+            image.setPixelColor(x, h1 - y, R, G, B);
           } else if (orientation == 5) {
-            image.setPixel(y, x, c);
+            image.setPixelColor(y, x, R, G, B);
           } else if (orientation == 6) {
-            image.setPixel(h1 - y, x, c);
+            image.setPixelColor(h1 - y, x, R, G, B);
           } else if (orientation == 7) {
-            image.setPixel(h1 - y, w1 - x, c);
+            image.setPixelColor(h1 - y, w1 - x, R, G, B);
           } else if (orientation == 8) {
-            image.setPixel(y, w1 - x, c);
+            image.setPixelColor(y, w1 - x, R, G, B);
           } else {
-            image[offset++] = c;
+            image.setPixelColor(x, y, R, G, B);
           }
         }
       }

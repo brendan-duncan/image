@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../../internal/bit_operators.dart';
+import '../../util/bit_utils.dart';
 import '../../util/input_buffer.dart';
 import 'vp8.dart';
 

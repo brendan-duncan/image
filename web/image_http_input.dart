@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:html';
+import 'dart:typed_data';
 
 import 'package:image/image.dart';
 
@@ -29,7 +30,7 @@ void onFileChanged(Event event) {
 void onFileLoaded(Event event) {
   final reader = event.currentTarget as FileReader;
 
-  final bytes = reader.result as List<int>;
+  final bytes = reader.result as Uint8List;
 
   // Find a decoder that is able to decode the given file contents.
   final decoder = findDecoderForData(bytes);
@@ -59,7 +60,7 @@ void onFileLoaded(Event event) {
     // Create a buffer that the canvas can draw.
     final d = c.context2D.createImageData(c.width, c.height);
     // Fill the buffer with our image data.
-    d.data.setRange(0, d.data.length, image.getBytes());
+    d.data.setRange(0, d.data.length, image.toUint8List());
     // Draw the buffer onto the canvas.
     c.context2D.putImageData(d, 0, 0);
 

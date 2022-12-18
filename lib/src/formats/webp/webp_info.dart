@@ -1,16 +1,26 @@
 import 'dart:typed_data';
-import '../../internal/internal.dart';
+
+import '../../color/color.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import '../decode_info.dart';
 import 'webp_frame.dart';
 
+enum WebPFormat {
+  undefined,
+  lossy,
+  lossless,
+  animated
+}
+
 // Features gathered from the bitstream
-class WebPInfo extends DecodeInfo {
-  // enum Format
-  static const FORMAT_UNDEFINED = 0;
-  static const FORMAT_LOSSY = 1;
-  static const FORMAT_LOSSLESS = 2;
-  static const FORMAT_ANIMATED = 3;
+class WebPInfo implements DecodeInfo {
+  @override
+  int width = 0;
+  @override
+  int height = 0;
+  @override
+  Color? backgroundColor = null;
 
   // True if the bitstream contains an alpha channel.
   bool hasAlpha = false;
@@ -19,7 +29,7 @@ class WebPInfo extends DecodeInfo {
   bool hasAnimation = false;
 
   // 0 = undefined (/mixed), 1 = lossy, 2 = lossless, 3 = animated
-  int format = FORMAT_UNDEFINED;
+  WebPFormat format = WebPFormat.undefined;
 
   // ICCP data.
   Uint8List? iccp;

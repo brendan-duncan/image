@@ -1,23 +1,24 @@
-import '../../../image_exception.dart';
+import '../../../util/image_exception.dart';
 import '../../../util/input_buffer.dart';
 import '../psd_layer_data.dart';
 
 class PsdLayerSectionDivider extends PsdLayerData {
-  static const String TAG = 'lsct';
+  static const tagName = 'lsct';
 
-  static const NORMAL = 0;
-  static const OPEN_FOLDER = 1;
-  static const CLOSED_FOLDER = 2;
-  static const SECTION_DIVIDER = 3;
+  static const normal = 0;
+  static const openFolder = 1;
+  static const closedFolder = 2;
+  static const sectionDivider = 3;
 
-  static const SUBTYPE_NORMAL = 0;
-  static const SUBTYPE_SCENE_GROUP = 1;
+  static const subTypeNormal = 0;
+  static const subTypeGroup = 1;
 
   late int type;
   String? key;
-  int subType = SUBTYPE_NORMAL;
+  int subType = subTypeNormal;
 
-  PsdLayerSectionDivider(String tag, InputBuffer data) : super.type(tag) {
+  PsdLayerSectionDivider(String tag, InputBuffer data)
+      : super.type(tag) {
     final len = data.length;
 
     type = data.readUint32();

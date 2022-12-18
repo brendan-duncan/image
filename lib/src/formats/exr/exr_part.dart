@@ -1,17 +1,17 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import '../../hdr/hdr_image.dart';
-import '../../image_exception.dart';
-import '../../internal/internal.dart';
+import '../../image/image.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'exr_attribute.dart';
 import 'exr_channel.dart';
 import 'exr_compressor.dart';
 
 class ExrPart {
   /// The framebuffer for this exr part.
-  HdrImage framebuffer = HdrImage();
+  Image? framebuffer;
 
   /// The channels present in this part.
   List<ExrChannel> channels = [];

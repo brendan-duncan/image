@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 
 class ExrHuffman {

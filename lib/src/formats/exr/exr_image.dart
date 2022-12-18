@@ -1,21 +1,26 @@
 import 'dart:typed_data';
 
-import '../../../image.dart';
+import '../../color/color.dart';
+import '../../util/image_exception.dart';
+import '../../util/input_buffer.dart';
+import '../decode_info.dart';
 import 'exr_part.dart';
 
-class ExrImage extends DecodeInfo {
+class ExrImage implements DecodeInfo {
+  int width = 0;
+  int height = 0;
   /// An EXR image has one or more parts, each of which contains a framebuffer.
   final List<InternalExrPart> _parts = [];
 
-  ExrImage(List<int> bytes) {
+  ExrImage(Uint8List bytes) {
     final input = InputBuffer(bytes);
     final magic = input.readUint32();
-    if (magic != MAGIC) {
+    if (magic != signature) {
       throw ImageException('File is not an OpenEXR image file.');
     }
 
     version = input.readByte();
-    if (version != EXR_VERSION) {
+    if (version != exrVersion) {
       throw ImageException('Cannot read version $version image files.');
     }
 
@@ -25,14 +30,14 @@ class ExrImage extends DecodeInfo {
           'contains unrecognized flags.');
     }
 
-    if (!_isMultiPart()) {
-      final ExrPart part = InternalExrPart(_isTiled(), input);
+    if (!_isMultiPart) {
+      final ExrPart part = InternalExrPart(_isTiled, input);
       if (part.isValid) {
         _parts.add(part as InternalExrPart);
       }
     } else {
       while (true) {
-        final ExrPart part = InternalExrPart(_isTiled(), input);
+        final ExrPart part = InternalExrPart(_isTiled, input);
         if (!part.isValid) {
           break;
         }
@@ -51,9 +56,10 @@ class ExrImage extends DecodeInfo {
     _readImage(input);
   }
 
+  Color? get backgroundColor => null;
+
   List<ExrPart> get parts => _parts;
 
-  @override
   int get numFrames => 1;
 
   /// Parse just enough of the file to identify that it's an EXR image.
@@ -61,12 +67,12 @@ class ExrImage extends DecodeInfo {
     final input = InputBuffer(bytes);
 
     final magic = input.readUint32();
-    if (magic != MAGIC) {
+    if (magic != signature) {
       return false;
     }
 
     final version = input.readByte();
-    if (version != EXR_VERSION) {
+    if (version != exrVersion) {
       return false;
     }
 
@@ -78,30 +84,35 @@ class ExrImage extends DecodeInfo {
     return true;
   }
 
-  int numParts() => _parts.length;
-
   ExrPart getPart(int i) => _parts[i];
 
-  bool _isTiled() => (flags & TILED_FLAG) != 0;
+  int get numParts => _parts.length;
 
-  bool _isMultiPart() => flags & MULTI_PART_FILE_FLAG != 0;
+  bool get _isTiled => (flags & tiledFlag) != 0;
 
-  /*bool _isNonImage() {
-    return flags & NON_IMAGE_FLAG != 0;
-  }*/
+  bool get _isMultiPart => flags & multiPartFileFlag != 0;
 
-  static bool _supportsFlags(int flags) => (flags & ~ALL_FLAGS) == 0;
+  //bool get _isNonImage => flags & nonImageFlag != 0;
+
+  static bool _supportsFlags(int flags) => (flags & ~allFlags) == 0;
 
   void _readImage(InputBuffer input) {
     //final bool multiPart = _isMultiPart();
 
     for (var pi = 0; pi < _parts.length; ++pi) {
       final part = _parts[pi];
-      final framebuffer = part.framebuffer;
+      final framebuffer = part.framebuffer!;
 
       for (var ci = 0; ci < part.channels.length; ++ci) {
         final ch = part.channels[ci];
-        if (!framebuffer.hasChannel(ch.name)) {
+        if (ch.name != "R" && ch.name != "G" && ch.name != "B" &&
+            ch.name != "A") {
+          if (!framebuffer.hasExtraChannel(ch.name!)) {
+            width = part.width!;
+            height = part.height!;
+          }
+        }
+        /*if (!framebuffer.hasChannel(ch.name)) {
           width = part.width!;
           height = part.height!;
           framebuffer.addSlice(HdrSlice(
@@ -110,7 +121,7 @@ class ExrImage extends DecodeInfo {
               part.height!,
               ch.type == ExrChannel.TYPE_UINT ? HdrImage.UINT : HdrImage.FLOAT,
               8 * ch.size));
-        }
+        }*/
       }
 
       if (part.tiled) {
@@ -123,8 +134,8 @@ class ExrImage extends DecodeInfo {
 
   void _readTiledPart(int pi, InputBuffer input) {
     final part = _parts[pi];
-    final multiPart = _isMultiPart();
-    final framebuffer = part.framebuffer;
+    final multiPart = _isMultiPart;
+    //final framebuffer = part.framebuffer;
     final compressor = part.compressor;
     final offsets = part.offsets;
     //Uint32List fbi = Uint32List(part.channels.length);
@@ -155,7 +166,7 @@ class ExrImage extends DecodeInfo {
             /*int levelY =*/
             imgData.readUint32();
             final dataSize = imgData.readUint32();
-            final data = imgData.readBytes(dataSize);
+            /*final data =*/ imgData.readBytes(dataSize);
 
             var ty = tileY * part.tileHeight!;
             final tx = tileX * part.tileWidth!;
@@ -170,19 +181,19 @@ class ExrImage extends DecodeInfo {
               tileHeight = height - ty;
             }
 
-            final uncompressedData = compressor.uncompress(
-                data, tx, ty, part.tileWidth, part.tileHeight);
+            //final uncompressedData = compressor.uncompress(
+                //data, tx, ty, part.tileWidth, part.tileHeight);
             tileWidth = compressor.decodedWidth;
             tileHeight = compressor.decodedHeight;
 
-            var si = 0;
-            final len = uncompressedData.length;
+            //var si = 0;
+            //final len = uncompressedData.length;
             final numChannels = part.channels.length;
             //int lineCount = 0;
             for (var yi = 0; yi < tileHeight && ty < height; ++yi, ++ty) {
               for (var ci = 0; ci < numChannels; ++ci) {
-                final ch = part.channels[ci];
-                final slice = framebuffer[ch.name]!.getBytes();
+                //final ch = part.channels[ci];
+                /*final slice = framebuffer[ch.name]!.getBytes();
                 if (si >= len) {
                   break;
                 }
@@ -197,7 +208,7 @@ class ExrImage extends DecodeInfo {
                       si++;
                     }
                   }
-                }
+                }*/
               }
             }
           }
@@ -208,8 +219,8 @@ class ExrImage extends DecodeInfo {
 
   void _readScanlinePart(int pi, InputBuffer input) {
     final part = _parts[pi];
-    final multiPart = _isMultiPart();
-    final framebuffer = part.framebuffer;
+    final multiPart = _isMultiPart;
+    //final framebuffer = part.framebuffer;
     final compressor = part.compressor;
     final offsets = part.offsets![0]!;
 
@@ -220,7 +231,7 @@ class ExrImage extends DecodeInfo {
     //var minY = part.top;
     //var maxY = minY + part.linesInBuffer - 1;
 
-    final fbi = Uint32List(part.channels.length);
+    //final fbi = Uint32List(part.channels.length);
     //var total = 0;
 
     //var xx = 0;
@@ -260,7 +271,7 @@ class ExrImage extends DecodeInfo {
         }
 
         for (var ci = 0; ci < numChannels; ++ci) {
-          final ch = part.channels[ci];
+          /*final ch = part.channels[ci];
           final slice = framebuffer[ch.name]!.getBytes();
           if (si >= len) {
             break;
@@ -269,7 +280,7 @@ class ExrImage extends DecodeInfo {
             for (var bi = 0; bi < ch.size; ++bi) {
               slice[fbi[ci]++] = uncompressedData[si++];
             }
-          }
+          }*/
         }
       }
     }
@@ -278,27 +289,27 @@ class ExrImage extends DecodeInfo {
   int? version;
   late int flags;
 
-  /// The MAGIC number is stored in the first four bytes of every
+  /// The signature number is stored in the first four bytes of every
   /// OpenEXR image file. This can be used to quickly test whether
   /// a given file is an OpenEXR image file (see isImfMagic(), below).
-  static const MAGIC = 20000630;
+  static const signature = 20000630;
 
   /// Value that goes into VERSION_NUMBER_FIELD.
-  static const EXR_VERSION = 2;
+  static const exrVersion = 2;
 
   /// File is tiled
-  static const TILED_FLAG = 0x000002;
+  static const tiledFlag = 0x000002;
 
   /// File contains long attribute or channel names
-  static const LONG_NAMES_FLAG = 0x000004;
+  static const longNamesFlag = 0x000004;
 
   /// File has at least one part which is not a regular scanline image or
   /// regular tiled image (that is, it is a deep format).
-  static const NON_IMAGE_FLAG = 0x000008;
+  static const nonImageFlag = 0x000008;
 
   /// File has multiple parts.
-  static const MULTI_PART_FILE_FLAG = 0x000010;
+  static const multiPartFileFlag = 0x000010;
 
   /// Bitwise OR of all supported flags.
-  static const ALL_FLAGS = TILED_FLAG | LONG_NAMES_FLAG;
+  static const allFlags = tiledFlag | longNamesFlag;
 }

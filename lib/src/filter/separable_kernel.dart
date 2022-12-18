@@ -1,5 +1,4 @@
-import '../color.dart';
-import '../image.dart';
+import '../image/image.dart';
 
 /// A kernel object to use with [separableConvolution] filtering.
 class SeparableKernel {
@@ -7,7 +6,8 @@ class SeparableKernel {
   final int size;
 
   /// Create a separable convolution kernel for the given [radius].
-  SeparableKernel(this.size) : coefficients = List<num>.filled(2 * size + 1, 0);
+  SeparableKernel(this.size)
+      : coefficients = List<num>.filled(2 * size + 1, 0);
 
   /// Get the number of coefficients in the kernel.
   int get length => coefficients.length;
@@ -53,8 +53,8 @@ class SeparableKernel {
     return x;
   }
 
-  void _applyCoeffsLine(
-      Image src, Image dst, int y, int width, bool horizontal) {
+  void _applyCoeffsLine(Image src, Image dst, int y, int width,
+      bool horizontal) {
     for (var x = 0; x < width; x++) {
       num r = 0.0;
       num g = 0.0;
@@ -62,22 +62,18 @@ class SeparableKernel {
       num a = 0.0;
 
       for (var j = -size, j2 = 0; j <= size; ++j, ++j2) {
-        final coeff = coefficients[j2];
+        final c = coefficients[j2];
         final gr = _reflect(width, x + j);
 
-        final sc = (horizontal) ? src.getPixel(gr, y) : src.getPixel(y, gr);
+        final sc = horizontal ? src.getPixel(gr, y) : src.getPixel(y, gr);
 
-        r += coeff * getRed(sc);
-        g += coeff * getGreen(sc);
-        b += coeff * getBlue(sc);
-        a += coeff * getAlpha(sc);
+        r += c * sc.r;
+        g += c * sc.g;
+        b += c * sc.b;
+        a += c * sc.a;
       }
 
-      final c = getColor(
-          (r > 255.0 ? 255.0 : r).toInt(),
-          (g > 255.0 ? 255.0 : g).toInt(),
-          (b > 255.0 ? 255.0 : b).toInt(),
-          (a > 255.0 ? 255.0 : a).toInt());
+      final c = src.getColor(r, g, b, a);
 
       if (horizontal) {
         dst.setPixel(x, y, c);

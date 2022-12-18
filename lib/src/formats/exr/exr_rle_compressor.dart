@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import '../../util/output_buffer.dart';
 import 'exr_compressor.dart';
@@ -63,7 +63,7 @@ class InternalExrRleCompressor extends InternalExrCompressor
       }
     }
 
-    final data = out.getBytes() as Uint8List;
+    final data = out.getBytes();
 
     // Predictor
     for (var i = 1, len = data.length; i < len; ++i) {
