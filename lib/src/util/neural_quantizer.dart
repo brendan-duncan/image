@@ -55,10 +55,10 @@ class NeuralQuantizer extends Quantizer {
     _copyColorMap();
   }
 
-  /// How many colors are in the [colorMap]?
+  /// How many colors are in the colorMap?
   int get numColors => netSize;
 
-  /// Find the index of the closest color to [c] in the [colorMap].
+  /// Find the index of the closest color to [c] in the colorMap.
   int getColorIndex(Color c) {
     final r = c.r.toInt();
     final g = c.g.toInt();
@@ -66,10 +66,10 @@ class NeuralQuantizer extends Quantizer {
     return _inxSearch(b, g, r);
   }
 
-  /// Find the index of the closest color to [r],[g],[b] in the [colorMap].
+  /// Find the index of the closest color to [r],[g],[b] in the colorMap.
   int getColorIndexRgb(int r, int g, int b) => _inxSearch(b, g, r);
 
-  /// Find the color closest to [c] in the [colorMap].
+  /// Find the color closest to [c] in the colorMap.
   @override
   Color getQuantizedColor(Color c) {
     final i = getColorIndex(c);
@@ -375,9 +375,9 @@ class NeuralQuantizer extends Quantizer {
   void _alterSingle(double alpha, int i, double b, double g, double r) {
     // Move neuron i towards biased (b,g,r) by factor alpha
     final p = i * 3;
-    _network[p] -= (alpha * (_network[p] - b));
-    _network[p + 1] -= (alpha * (_network[p + 1] - g));
-    _network[p + 2] -= (alpha * (_network[p + 2] - r));
+    _network[p] -= alpha * (_network[p] - b);
+    _network[p + 1] -= alpha * (_network[p + 1] - g);
+    _network[p + 2] -= alpha * (_network[p + 2] - r);
   }
 
   void _alterNeighbors(
@@ -483,7 +483,7 @@ class NeuralQuantizer extends Quantizer {
   static const radiusBiasShift = 8;
   static const radiusBias = 1 << radiusBiasShift;
   static const alphaRadiusBiasShift = alphaBiasShift + radiusBiasShift;
-  static const alphaRadiusBias = (1 << alphaRadiusBiasShift);
+  static const alphaRadiusBias = 1 << alphaRadiusBiasShift;
   late int initBiasRadius;
   static const radiusDec = 30; // factor of 1/30 each cycle
   late Int32List _radiusPower;

@@ -161,7 +161,7 @@ class HuffmanTree {
       }
     } else {
       baseCode = _reverseBitsShort(
-          (code >> (codeLength - huffmanLutBits)), huffmanLutBits);
+          code >> codeLength - huffmanLutBits, huffmanLutBits);
     }
 
     while (codeLength-- > 0) {
@@ -203,7 +203,7 @@ class HuffmanTree {
   }
 
   // Pre-reversed 4-bit values.
-  static const List<int> _REVERSED_BITS = [
+  static const List<int> _reversedBits = [
     0x0,
     0x8,
     0x4,
@@ -223,11 +223,11 @@ class HuffmanTree {
   ];
 
   int _reverseBitsShort(int bits, int numBits) {
-    final v = (_REVERSED_BITS[bits & 0xf] << 4) | _REVERSED_BITS[bits >> 4];
+    final v = (_reversedBits[bits & 0xf] << 4) | _reversedBits[bits >> 4];
     return v >> (8 - numBits);
   }
 
-  bool _isFull() => (numNodes == maxNodes);
+  bool _isFull() => numNodes == maxNodes;
 
   int _nextNode(int node, int rightChild) =>
       node + _nodeChildren(node) + rightChild;

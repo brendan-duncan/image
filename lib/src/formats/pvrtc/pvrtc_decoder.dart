@@ -115,7 +115,7 @@ class PvrtcDecoder {
     final length = data.length;
 
     const headerSize = 52;
-    const pvrTexCubemap = (1 << 12);
+    const pvrTexCubemap = 1 << 12;
     const pvrPixelTypeMask = 0xff;
     const pvrTypeRgba4444 = 0x10;
     const pvrTypeRgba5551 = 0x11;
@@ -174,9 +174,9 @@ class PvrtcDecoder {
           final v1 = input.readByte();
           final v2 = input.readByte();
           final a = (v1 & 0x0f) << 4;
-          final b = (v1 & 0xf0);
+          final b = v1 & 0xf0;
           final g = (v2 & 0x0f) << 4;
-          final r = (v2 & 0xf0);
+          final r = v2 & 0xf0;
 
           p.r = r;
           p.g = g;
@@ -271,8 +271,8 @@ class PvrtcDecoder {
   Image? decodePVR3(Uint8List data) {
     //const PVR3_PVRTC_2BPP_RGB = 0;
     //const PVR3_PVRTC_2BPP_RGBA = 1;
-    const PVR3_PVRTC_4BPP_RGB = 2;
-    const PVR3_PVRTC_4BPP_RGBA = 3;
+    const pvr3Pvrtc4bppRgb = 2;
+    const pvr3Pvrtc4bppRgba = 3;
     /*const PVR3_PVRTC2_2BPP = 4;
     const PVR3_PVRTC2_4BPP = 5;
     const PVR3_ETC1 = 6;
@@ -332,9 +332,9 @@ class PvrtcDecoder {
 
     if (order[0] == 0) {
       switch (format) {
-        case PVR3_PVRTC_4BPP_RGB:
+        case pvr3Pvrtc4bppRgb:
           return decodeRgb4bpp(width, height, input.toUint8List());
-        case PVR3_PVRTC_4BPP_RGBA:
+        case pvr3Pvrtc4bppRgba:
           return decodeRgba4bpp(width, height, input.toUint8List());
         /*case PVR3_PVRTC_2BPP_RGB:
           return null;

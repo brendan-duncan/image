@@ -28,25 +28,25 @@ class TiffEncoder extends Encoder {
   void _writeImage(OutputBuffer out, Image image) {
     out.writeUint16(11); // number of IFD entries
 
-    _writeEntryUint32(out, ExifTagNameToID['ImageWidth']!, image.width);
-    _writeEntryUint32(out, ExifTagNameToID['ImageLength']!, image.height);
-    _writeEntryUint16(out, ExifTagNameToID['BitsPerSample']!,
+    _writeEntryUint32(out, exifTagNameToID['ImageWidth']!, image.width);
+    _writeEntryUint32(out, exifTagNameToID['ImageLength']!, image.height);
+    _writeEntryUint16(out, exifTagNameToID['BitsPerSample']!,
         image.bitsPerChannel);
-    _writeEntryUint16(out, ExifTagNameToID['Compression']!,
+    _writeEntryUint16(out, exifTagNameToID['Compression']!,
         TiffCompression.none);
-    _writeEntryUint16(out, ExifTagNameToID['PhotometricInterpretation']!,
+    _writeEntryUint16(out, exifTagNameToID['PhotometricInterpretation']!,
         image.numChannels == 1 ? TiffPhotometricType.blackIsZero.index
             : TiffPhotometricType.rgb.index);
-    _writeEntryUint16(out, ExifTagNameToID['SamplesPerPixel']!,
+    _writeEntryUint16(out, exifTagNameToID['SamplesPerPixel']!,
         image.numChannels);
-    _writeEntryUint16(out, ExifTagNameToID['SampleFormat']!,
+    _writeEntryUint16(out, exifTagNameToID['SampleFormat']!,
         _getSampleFormat(image).index);
 
-    _writeEntryUint32(out, ExifTagNameToID['RowsPerStrip']!, image.height);
-    _writeEntryUint16(out, ExifTagNameToID['PlanarConfiguration']!, 1);
-    _writeEntryUint32(out, ExifTagNameToID['StripByteCounts']!,
+    _writeEntryUint32(out, exifTagNameToID['RowsPerStrip']!, image.height);
+    _writeEntryUint16(out, exifTagNameToID['PlanarConfiguration']!, 1);
+    _writeEntryUint32(out, exifTagNameToID['StripByteCounts']!,
         image.width * image.height * 4);
-    _writeEntryUint32(out, ExifTagNameToID['StripOffsets']!, out.length + 4);
+    _writeEntryUint32(out, exifTagNameToID['StripOffsets']!, out.length + 4);
     out.writeBytes(image.toUint8List());
   }
 

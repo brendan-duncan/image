@@ -97,7 +97,7 @@ class VP8L {
     if ((_transformsSeen & (1 << type)) != 0) {
       return false;
     }
-    _transformsSeen |= (1 << type);
+    _transformsSeen |= 1 << type;
 
     final transform = VP8LTransform();
     _transforms.add(transform);
@@ -158,15 +158,15 @@ class VP8L {
     // Color cache
     if (br.readBits(1) != 0) {
       colorCacheBits = br.readBits(4);
-      final ok = (colorCacheBits >= 1 && colorCacheBits <= maxCacheBits);
+      final ok = colorCacheBits >= 1 && colorCacheBits <= maxCacheBits;
       if (!ok) {
         throw ImageException('Invalid Color Cache');
       }
     }
 
     // Read the Huffman codes (may recurse).
-    if (!_readHuffmanCodes(
-        transformXsize, transformYsize, colorCacheBits, isLevel0)) {
+    if (!_readHuffmanCodes(transformXsize, transformYsize,
+        colorCacheBits, isLevel0)) {
       throw ImageException('Invalid Huffman Codes');
     }
 
@@ -686,7 +686,7 @@ class VP8L {
           prev_code_len = code_len;
         }
       } else {
-        final usePrev = (code_len == _codeLengthRepeatCode);
+        final usePrev = code_len == _codeLengthRepeatCode;
         final slot = code_len - _codeLengthLiterals;
         final extra_bits = _codeLengthExtraBits[slot];
         final repeat_offset = _codeLengthRepeatOffsets[slot];
@@ -932,10 +932,10 @@ class VP8L {
 
   static const _codeLengthLiterals = 16;
   static const _codeLengthRepeatCode = 16;
-  static const List<int> _codeLengthExtraBits = [2, 3, 7];
-  static const List<int> _codeLengthRepeatOffsets = [3, 3, 11];
+  static const _codeLengthExtraBits = [2, 3, 7];
+  static const _codeLengthRepeatOffsets = [3, 3, 11];
 
-  static const List<int> _alphabetSize = [
+  static const _alphabetSize = [
     numLiteralCodes + numLengthCodes,
     numLiteralCodes,
     numLiteralCodes,
@@ -970,7 +970,7 @@ class VP8L {
   int? _ioWidth;
   int? _ioHeight;
 
-  static const ARGB_BLACK = 0xff000000;
+  static const argbBlack = 0xff000000;
   static const maxCacheBits = 11;
   static const huffmanCodesPerMetaCode = 5;
 

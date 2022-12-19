@@ -10,7 +10,7 @@ enum QuantizeMethod { neuralNet, octree }
 Image quantize(Image src,
     { int numberOfColors = 256,
       QuantizeMethod method = QuantizeMethod.neuralNet,
-      DitherKernel dither = DitherKernel.None,
+      DitherKernel dither = DitherKernel.none,
       bool ditherSerpentine = false }) {
   Quantizer quantizer;
 

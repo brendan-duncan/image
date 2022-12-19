@@ -1,54 +1,29 @@
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 
+enum ExrChannelType {
+  uint,
+  half,
+  float
+}
+
+// Standard channel names are:
+// A: Alpha/Opacity
+// R: Red value of a sample
+// G: Green value of a sample
+// B: Blue value of a sample
+// Y: Luminance
+// RY: Chroma RY
+// BY: Chroma BY
+// AR: Red for colored mattes
+// GR: Green for colored mattes
+// BR: Blue for colored mattes
+// Z: Distance of the front of a sample from the viewer
+// ZBack: Distance of the back of a sample from the viewer
+// id: A numerical identifier for the object represented by a sample.
 class ExrChannel {
-  static const TYPE_UINT = 0;
-  static const TYPE_HALF = 1;
-  static const TYPE_FLOAT = 2;
-
-  // Channel Names
-
-  /// Luminance
-  static const String Y = 'Y';
-
-  /// Chroma RY
-  static const String RY = 'RY';
-
-  /// Chroma BY
-  static const String BY = 'BY';
-
-  /// Red for colored mattes
-  static const String AR = 'AR';
-
-  /// Green for colored mattes
-  static const String AG = 'AG';
-
-  /// Blue for colored mattes
-  static const String AB = 'AB';
-
-  /// Distance of the front of a sample from the viewer
-  static const String Z = 'Z';
-
-  /// Distance of the back of a sample from the viewer
-  static const String ZBack = 'ZBack';
-
-  /// Alpha/opacity
-  static const String A = 'A';
-
-  /// Red value of a sample
-  static const String R = 'R';
-
-  /// Green value of a sample
-  static const String G = 'G';
-
-  /// Blue value of a sample
-  static const String B = 'B';
-
-  /// A numerical identifier for the object represented by a sample.
-  static const String ID = 'id';
-
-  String? name;
-  late int type;
+  late String name;
+  late ExrChannelType type;
   late int size;
   late bool pLinear;
   late int xSampling;
@@ -56,11 +31,10 @@ class ExrChannel {
 
   ExrChannel(InputBuffer input) {
     name = input.readString();
-    if (name == null || name!.isEmpty) {
-      name = null;
+    if (name.isEmpty) {
       return;
     }
-    type = input.readUint32();
+    type = ExrChannelType.values[input.readUint32()];
     final i = input.readByte();
     assert(i == 0 || i == 1);
     pLinear = i == 1;
@@ -69,13 +43,13 @@ class ExrChannel {
     ySampling = input.readUint32();
 
     switch (type) {
-      case TYPE_UINT:
+      case ExrChannelType.uint:
         size = 4;
         break;
-      case TYPE_HALF:
+      case ExrChannelType.half:
         size = 2;
         break;
-      case TYPE_FLOAT:
+      case ExrChannelType.float:
         size = 4;
         break;
       default:
@@ -83,5 +57,5 @@ class ExrChannel {
     }
   }
 
-  bool get isValid => name != null;
+  bool get isValid => name.isNotEmpty;
 }

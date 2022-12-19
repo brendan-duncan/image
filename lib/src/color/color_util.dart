@@ -107,9 +107,9 @@ Color convertColor(Color c, { Format? format, int? numChannels, num? alpha }) {
 }
 
 
-/// Returns a new color of [src] alpha-blended onto [dst]. The opacity of [src]
+/*/// Returns a new color of [src] alpha-blended onto [dst]. The opacity of [src]
 /// is additionally scaled by [fraction] / 255.
-/*void alphaBlendPixel(Pixel dst, Pixel src, [int fraction = 0xff]) {
+void alphaBlendPixel(Pixel dst, Pixel src, [int fraction = 0xff]) {
   final srcAlpha = src.a;
   if (srcAlpha == 255 && fraction == 0xff) {
     // src is fully opaque, nothing to blend
@@ -342,9 +342,9 @@ List<int> cmykToRgb(num c, num m, num y, num k) {
 
 /// Convert a CIE-L*ab color to RGB.
 List<int> labToRgb(num l, num a, num b) {
-  const ref_x = 95.047;
-  const ref_y = 100.000;
-  const ref_z = 108.883;
+  const refX = 95.047;
+  const refY = 100.000;
+  const refZ = 108.883;
 
   num y = (l + 16.0) / 116.0;
   num x = a / 500.0 + y;
@@ -371,9 +371,9 @@ List<int> labToRgb(num l, num a, num b) {
     z = (z - 16 / 116) / 7.787;
   }
 
-  x *= ref_x;
-  y *= ref_y;
-  z *= ref_z;
+  x *= refX;
+  y *= refY;
+  z *= refZ;
 
   x /= 100.0;
   y /= 100.0;

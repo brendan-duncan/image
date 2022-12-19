@@ -60,7 +60,7 @@ class PixelUint1 extends Iterable<num> implements Pixel {
     this.x = x;
     this.y = y;
     final bpp = image.numChannels;
-    _rowOffset = (y * image.rowStride);
+    _rowOffset = y * image.rowStride;
     _index = _rowOffset + ((x * bpp) >> 3);
     _bitIndex = (x * bpp) & 0x7;
   }

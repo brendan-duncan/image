@@ -5,8 +5,8 @@ import '../image/image.dart';
 
 /// Fill a rectangle in the image [src] with the given [color] with the corners
 /// [x1],[y1] and [x2],[y2].
-Image fillRect(Image src, int x1, int y1, int x2, int y2, Color c) {
-  if (c.a == 0) {
+Image fillRect(Image src, int x1, int y1, int x2, int y2, Color color) {
+  if (color.a == 0) {
     return src;
   }
 
@@ -18,21 +18,21 @@ Image fillRect(Image src, int x1, int y1, int x2, int y2, Color c) {
   final _h = (_y1 - _y0) + 1;
 
   // If no blending is necessary, use a faster fill method.
-  if (c.a == c.maxChannelValue) {
+  if (color.a == color.maxChannelValue) {
     var iter = src.getRange(_x0, _y0, _w, _h);
     while (iter.moveNext()) {
-      iter.current.set(c);
+      iter.current.set(color);
     }
   } else {
-    final a = c.a / c.maxChannelValue;
+    final a = color.a / color.maxChannelValue;
     final invA = 1.0 - a;
     var iter = src.getRange(_x0, _y0, _w, _h);
     while (iter.moveNext()) {
       final p = iter.current;
-      p.r = (c.r * a) + (p.r * invA);
-      p.g = (c.g * a) + (p.g * invA);
-      p.b = (c.b * a) + (p.b * invA);
-      p.a = c.a;
+      p.r = (color.r * a) + (p.r * invA);
+      p.g = (color.g * a) + (p.g * invA);
+      p.b = (color.b * a) + (p.b * invA);
+      p.a = color.a;
     }
   }
 

@@ -376,7 +376,7 @@ void PngTest() {
       anim.loopCount = 10;
       for (var i = 0; i < 10; i++) {
         final image = Image(480, 120);
-        drawString(image, arial_48, 100, 60, i.toString());
+        drawString(image, arial48, 100, 60, i.toString());
         anim.addFrame(image);
       }
 

@@ -7,8 +7,6 @@ import 'format.dart';
 
 /// A 4-bit color value.
 class ColorUint4 extends Iterable<num> implements Color {
-  static const MaxChannelValue = 255;
-
   final int length;
   Uint8List data;
 

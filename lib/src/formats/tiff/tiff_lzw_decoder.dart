@@ -98,7 +98,7 @@ class LzwDecoder {
       if (_bytePointer >= _dataLength) {
         return 257;
       }
-      _nextData = (((_nextData << 8) + _data[_bytePointer++])) & 0xffffffff;
+      _nextData = ((_nextData << 8) + _data[_bytePointer++]) & 0xffffffff;
       _nextBits += 8;
     }
 

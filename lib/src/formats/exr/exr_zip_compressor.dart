@@ -17,8 +17,8 @@ class InternalExrZipCompressor extends InternalExrCompressor
     implements ExrZipCompressor {
   ZLibDecoder zlib = const ZLibDecoder();
 
-  InternalExrZipCompressor(
-      ExrPart header, int? maxScanLineSize, this._numScanLines)
+  InternalExrZipCompressor(ExrPart header, this._maxScanLines,
+      this._numScanLines)
       : super(header as InternalExrPart);
 
   @override
@@ -84,6 +84,9 @@ class InternalExrZipCompressor extends InternalExrCompressor
     return _outCache!;
   }
 
+  String toString() => '$_maxScanLines'; // Making analysis happy
+
+  final int? _maxScanLines;
   final int _numScanLines;
   Uint8List? _outCache;
 }

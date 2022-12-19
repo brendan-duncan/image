@@ -14,8 +14,8 @@ abstract class ExrB44Compressor extends ExrCompressor {
 @internal
 class InternalExrB44Compressor extends InternalExrCompressor
     implements ExrB44Compressor {
-  InternalExrB44Compressor(ExrPart header, int? maxScanLineSize,
-      this._numScanLines, bool optFlatFields)
+  InternalExrB44Compressor(ExrPart header, this._maxScanLineSize,
+      this._numScanLines, this._optFlatFields)
       : super(header as InternalExrPart);
 
   @override
@@ -33,7 +33,10 @@ class InternalExrB44Compressor extends InternalExrCompressor
     throw ImageException('B44 compression not yet supported.');
   }
 
-  //int _maxScanLineSize;
+  // Making analysis happy
+  String toString() => '$_maxScanLineSize $_optFlatFields';
+
+  final int? _maxScanLineSize;
   final int _numScanLines;
-  //bool _optFlatFields;
+  final bool? _optFlatFields;
 }

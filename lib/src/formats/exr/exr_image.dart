@@ -107,7 +107,7 @@ class ExrImage implements DecodeInfo {
         final ch = part.channels[ci];
         if (ch.name != "R" && ch.name != "G" && ch.name != "B" &&
             ch.name != "A") {
-          if (!framebuffer.hasExtraChannel(ch.name!)) {
+          if (!framebuffer.hasExtraChannel(ch.name)) {
             width = part.width!;
             height = part.height!;
           }

@@ -85,9 +85,9 @@ Image copyResize(Image src,
   } else {
     // Copy the pixels from this image to the new image.
     for (var y = 0; y < height; ++y) {
-      final y2 = (y * dy);
+      final y2 = y * dy;
       for (var x = 0; x < width; ++x) {
-        final x2 = (x * dx);
+        final x2 = x * dx;
         dst.setPixel(x, y, src.getPixelInterpolate(x2, y2, interpolation));
       }
     }

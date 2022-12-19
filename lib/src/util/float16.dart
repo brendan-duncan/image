@@ -10,30 +10,20 @@ import 'bit_utils.dart';
 ///
 /// This class is derived from the OpenEXR library.
 class Float16 {
-  Float16([num? f]) {
-    if (f != null) {
-      _h = DoubleToFloat16(f);
-    }
-  }
+  int _h;
 
-  Float16.fromBits(int bits) : _h = bits {
-    if (_toFloatFloat32 == null) {
-      _initialize();
-    }
-  }
+  Float16([num? f])
+      : _h = f == null ? 0 : DoubleToFloat16(f);
 
-  static double Float16ToDouble(int bits) {
-    if (_toFloatFloat32 == null) {
-      _initialize();
-    }
-    return _toFloatFloat32![bits];
-  }
+  Float16.from(Float16 other)
+    : _h = other._h;
+
+  Float16.fromBits(int bits)
+      : _h = bits;
+
+  static double Float16ToDouble(int bits) => _toFloatFloat32[bits];
 
   static int DoubleToFloat16(num n) {
-    if (_toFloatFloat32 == null) {
-      _initialize();
-    }
-
     final f = n.toDouble();
     final x_i = float32ToUint32(f);
     if (f == 0.0) {
@@ -70,10 +60,10 @@ class Float16 {
     return _convert(x_i);
   }
 
-  double toDouble() => _toFloatFloat32![_h!];
+  double toDouble() => _toFloatFloat32[_h];
 
   /// Unary minus
-  Float16 operator -() => Float16.fromBits(_h! ^ 0x8000);
+  Float16 operator -() => Float16.fromBits(_h ^ 0x8000);
 
   /// Addition operator for Half or num left operands.
   Float16 operator +(dynamic f) {
@@ -118,13 +108,13 @@ class Float16 {
   /// bits will be zero.
   Float16 round(int n) {
     if (n >= 10) {
-      return this;
+      return Float16.from(this);
     }
 
     // Disassemble h into the sign, s,
     // and the combined exponent and significand, e.
-    final s = _h! & 0x8000;
-    var e = _h! & 0x7fff;
+    final s = _h & 0x8000;
+    var e = _h & 0x7fff;
 
     // Round the exponent and significand to the nearest value
     // where ones occur only in the (10-n) most significant bits.
@@ -138,7 +128,7 @@ class Float16 {
     // Check for exponent overflow.
     if (e >= 0x7c00) {
       // Overflow occurred -- truncate instead of rounding.
-      e = _h!;
+      e = _h;
       e >>= 10 - n;
       e <<= 10 - n;
     }
@@ -150,42 +140,42 @@ class Float16 {
 
   /// Returns true if h is a normalized number, a denormalized number or zero.
   bool isFinite() {
-    final e = (_h! >> 10) & 0x001f;
+    final e = (_h >> 10) & 0x001f;
     return e < 31;
   }
 
   /// Returns true if h is a normalized number.
   bool isNormalized() {
-    final e = (_h! >> 10) & 0x001f;
+    final e = (_h >> 10) & 0x001f;
     return e > 0 && e < 31;
   }
 
   /// Returns true if h is a denormalized number.
   bool isDenormalized() {
-    final e = (_h! >> 10) & 0x001f;
-    final m = _h! & 0x3ff;
+    final e = (_h >> 10) & 0x001f;
+    final m = _h & 0x3ff;
     return e == 0 && m != 0;
   }
 
   /// Returns true if h is zero.
-  bool isZero() => (_h! & 0x7fff) == 0;
+  bool isZero() => (_h & 0x7fff) == 0;
 
   /// Returns true if h is a NAN.
   bool isNan() {
-    final e = (_h! >> 10) & 0x001f;
-    final m = _h! & 0x3ff;
+    final e = (_h >> 10) & 0x001f;
+    final m = _h & 0x3ff;
     return e == 31 && m != 0;
   }
 
   /// Returns true if h is a positive or a negative infinity.
   bool isInfinity() {
-    final e = (_h! >> 10) & 0x001f;
-    final m = _h! & 0x3ff;
+    final e = (_h >> 10) & 0x001f;
+    final m = _h & 0x3ff;
     return e == 31 && m == 0;
   }
 
   /// Returns true if the sign bit of h is set (negative).
-  bool isNegative() => (_h! & 0x8000) != 0;
+  bool isNegative() => (_h & 0x8000) != 0;
 
   /// Returns +infinity.
   static Float16 posInf() => Float16.fromBits(0x7c00);
@@ -293,12 +283,13 @@ class Float16 {
     }
   }
 
-  static void _initialize() {
-    if (_toFloatUint32 != null) {
-      return;
+  static Float32List _initialize() {
+    if (_toFloatFloat32Data != null) {
+      return _toFloatFloat32Data!;
     }
-    _toFloatUint32 = Uint32List(1 << 16);
-    _toFloatFloat32 = Float32List.view(_toFloatUint32!.buffer);
+
+    final floatUint32Data = Uint32List(1 << 16);
+    _toFloatFloat32Data = Float32List.view(floatUint32Data.buffer);
     _eLut = Uint16List(1 << 9);
 
     // Init eLut
@@ -311,16 +302,18 @@ class Float16 {
         _eLut[i | 0x100] = 0;
       } else {
         // Common case - normalized half, no exponent overflow possible
-        _eLut[i] = (e << 10);
-        _eLut[i | 0x100] = ((e << 10) | 0x8000);
+        _eLut[i] = e << 10;
+        _eLut[i | 0x100] = (e << 10) | 0x8000;
       }
     }
 
     // Init toFloat
-    const iMax = (1 << 16);
+    const iMax = 1 << 16;
     for (var i = 0; i < iMax; i++) {
-      _toFloatUint32![i] = _halfToFloat(i);
+      floatUint32Data[i] = _halfToFloat(i);
     }
+
+    return _toFloatFloat32Data!;
   }
 
   static int _halfToFloat(int y) {
@@ -360,9 +353,9 @@ class Float16 {
     return (s << 31) | (e << 23) | m;
   }
 
-  int? _h;
+  static Float32List get  _toFloatFloat32 =>
+      _toFloatFloat32Data != null ? _toFloatFloat32Data! : _initialize();
 
-  static Uint32List? _toFloatUint32;
-  static Float32List? _toFloatFloat32;
+  static Float32List? _toFloatFloat32Data;
   static late Uint16List _eLut;
 }

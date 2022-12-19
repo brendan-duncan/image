@@ -21,7 +21,7 @@ enum IfdValueType {
   double
 }
 
-const IfdValueTypeString = [
+const ifdValueTypeString = [
   'none',
   'byte',
   'ascii',
@@ -37,7 +37,7 @@ const IfdValueTypeString = [
   'double'
 ];
 
-const IfdValueTypeSize = [
+const ifdValueTypeSize = [
   0,
   1,
   1,
@@ -59,9 +59,9 @@ abstract class IfdValue {
   IfdValueType get type;
   int get length;
 
-  int get dataSize => IfdValueTypeSize[type.index] * length;
+  int get dataSize => ifdValueTypeSize[type.index] * length;
 
-  String get typeString => IfdValueTypeString[type.index];
+  String get typeString => ifdValueTypeString[type.index];
 
   bool toBool([int index = 0]) => false;
   int toInt([int index = 0]) => 0;
@@ -300,7 +300,8 @@ class IfdSByteValue extends IfdValue {
       : value = Int8List.fromList(value);
 
   IfdSByteValue.data(InputBuffer data, int count)
-      : value = Int8List.fromList(Int8List.view(data.toUint8List().buffer));
+      : value = Int8List.fromList(
+          Int8List.view(data.toUint8List().buffer, 0, count));
 
   IfdValue clone() => IfdSByteValue.list(value);
   IfdValueType get type => IfdValueType.sByte;
@@ -552,7 +553,7 @@ class ExifUndefinedValue extends IfdValue {
       : value = Uint8List.fromList(value);
 
   ExifUndefinedValue.data(InputBuffer data, int count)
-      : value = Uint8List.fromList(data.toUint8List());
+      : value = Uint8List.fromList(data.readBytes(count).toUint8List());
 
   IfdValue clone() => ExifUndefinedValue.list(value);
   IfdValueType get type => IfdValueType.undefined;

@@ -12,7 +12,7 @@ import 'decode_info.dart';
 ///
 /// Some image formats support multiple frames, often for encoding animation.
 /// In such cases, the [decodeImage] method will decode the first (or otherwise
-/// specified with the [frame] parameter) frame of the file. [decodeAnimation]
+/// specified with the frame parameter) frame of the file. [decodeAnimation]
 /// will decode all frames from the image. [startDecode] will initiate
 /// decoding of the file, and [decodeFrame] will then decode a specific frame
 /// from the file, allowing for animations to be decoded one frame at a time.
@@ -25,22 +25,6 @@ import 'decode_info.dart';
 /// file. As such, if you are not sure if a file is animated or not, you can
 /// use the animated functions and process it as a single frame image if it
 /// has only 1 frame, and as an animation if it has more than 1 frame.
-///
-/// Most animated formats do not store full images for frames, but rather
-/// some frames will store full images and others will store partial 'change'
-/// images. For these files, [decodeAnimation] will always return all images
-/// fully composited, meaning full frame images. Decoding frames individually
-/// using [startDecode] and [decodeFrame] will return the potentially partial
-/// image. In this case, the [DecodeInfo] returned by [startDecode] will include
-/// the width and height resolution of the animation canvas, and each [Image]
-/// returned by [decodeFrame] will have x, y, width and height properties
-/// indicating where in the canvas the frame image should be drawn. It will
-/// also have a disposeMethod property that specifies what should be done to
-/// the canvas prior to drawing the frame: [Image.DISPOSE_NONE] indicates the
-/// canvas should be left alone; [Image.DISPOSE_CLEAR] indicates the canvas
-/// should be cleared. For partial frame images,[Image.DISPOSE_NONE] is used
-/// so that the partial-frame is drawn on top of the previous frame, applying
-/// it's changes to the image.
 abstract class Decoder {
   /// A light-weight function to test if the given file is able to be decoded
   /// by this Decoder.

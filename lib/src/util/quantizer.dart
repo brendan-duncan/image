@@ -3,14 +3,14 @@ import '../image/image.dart';
 import '../image/palette.dart';
 
 enum QuantizerType {
-  Octree,
-  Neural
+  octree,
+  neural
 }
 
 abstract class Quantizer {
   Palette get palette;
 
-  /// Find the index of the closest color to [c] in the [colorMap].
+  /// Find the index of the closest color to [c] in the colorMap.
   Color getQuantizedColor(Color c);
 
   int getColorIndex(Color c);

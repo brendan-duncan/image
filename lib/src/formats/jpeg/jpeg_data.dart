@@ -5,18 +5,39 @@ import '../../image/image.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import '_component_data.dart';
-import 'jpeg.dart';
 import 'jpeg_adobe.dart';
 import 'jpeg_component.dart';
 import 'jpeg_frame.dart';
 import 'jpeg_info.dart';
 import 'jpeg_jfif.dart';
+import 'jpeg_marker.dart';
 import 'jpeg_quantize_stub.dart'
     if (dart.library.io) '_jpeg_quantize_io.dart'
     if (dart.library.js) '_jpeg_quantize_html.dart';
 import 'jpeg_scan.dart';
 
 class JpegData {
+  static const dctZigZag = [
+    0, 1, 8, 16, 9, 2, 3, 10,
+    17, 24, 32, 25, 18, 11, 4, 5,
+    12, 19, 26, 33, 40, 48, 41, 34,
+    27, 20, 13, 6, 7, 14, 21, 28,
+    35, 42, 49, 56, 57, 50, 43, 36,
+    29, 22, 15, 23, 30, 37, 44, 51,
+    58, 59, 52, 45, 38, 31, 39, 46,
+    53, 60, 61, 54, 47, 55, 62, 63,
+    63, 63, 63, 63, 63, 63, 63, 63, // extra entries for safety in decoder
+    63, 63, 63, 63, 63, 63, 63, 63
+  ];
+
+  static const dctSize = 8; // The basic DCT block is 8x8 samples
+  static const dctSize2 = 64; // DCTSIZE squared; # of elements in a block
+  static const numQuantizationTables = 4; // Quantization tables are 0..3
+  static const numHuffmanTables = 4; // Huffman tables are numbered 0..3
+  static const numArithTables = 16; // Arith-coding tables are numbered 0..15
+  static const maxCompsInScan = 4; // JPEG limit on # of components in one scan
+  static const maxSamplingFactor = 4; // JPEG limit on sampling factors
+
   late InputBuffer input;
   late JpegJfif jfif;
   JpegAdobe? adobe;
@@ -24,7 +45,8 @@ class JpegData {
   int? resetInterval;
   String? comment;
   final exif = ExifData();
-  final quantizationTables = List<Int16List?>.filled(Jpeg.NUM_QUANT_TBLS, null);
+  final quantizationTables =
+      List<Int16List?>.filled(numQuantizationTables, null);
   final frames = <JpegFrame?>[];
   final huffmanTablesAC = <List?>[];
   final huffmanTablesDC = <List?>[];
@@ -41,7 +63,7 @@ class JpegData {
     }
 
     var marker = _nextMarker();
-    if (marker != Jpeg.M_SOI) {
+    if (marker != JpegMarker.soi) {
       return false;
     }
 
@@ -49,7 +71,7 @@ class JpegData {
     var hasSOS = false;
 
     marker = _nextMarker();
-    while (marker != Jpeg.M_EOI && !input.isEOS) {
+    while (marker != JpegMarker.eoi && !input.isEOS) {
       // EOI (End of image)
       final sectionByteSize = input.readUint16();
       if (sectionByteSize < 2) {
@@ -61,12 +83,12 @@ class JpegData {
       input.offset += sectionByteSize - 2;
 
       switch (marker) {
-        case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
-        case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
-        case Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
+        case JpegMarker.sof0: // SOF0 (Start of Frame, Baseline DCT)
+        case JpegMarker.sof1: // SOF1 (Start of Frame, Extended DCT)
+        case JpegMarker.sof2: // SOF2 (Start of Frame, Progressive DCT)
           hasSOF = true;
           break;
-        case Jpeg.M_SOS: // SOS (Start of Scan)
+        case JpegMarker.sos: // SOS (Start of Scan)
           hasSOS = true;
           break;
         default:
@@ -82,7 +104,7 @@ class JpegData {
     input = InputBuffer(bytes, bigEndian: true);
 
     var marker = _nextMarker();
-    if (marker != Jpeg.M_SOI) {
+    if (marker != JpegMarker.soi) {
       return null;
     }
 
@@ -92,16 +114,16 @@ class JpegData {
     var hasSOS = false;
 
     marker = _nextMarker();
-    while (marker != Jpeg.M_EOI && !input.isEOS) {
+    while (marker != JpegMarker.eoi && !input.isEOS) {
       // EOI (End of image)
       switch (marker) {
-        case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
-        case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
-        case Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
+        case JpegMarker.sof0: // SOF0 (Start of Frame, Baseline DCT)
+        case JpegMarker.sof1: // SOF1 (Start of Frame, Extended DCT)
+        case JpegMarker.sof2: // SOF2 (Start of Frame, Progressive DCT)
           hasSOF = true;
           _readFrame(marker, _readBlock());
           break;
-        case Jpeg.M_SOS: // SOS (Start of Scan)
+        case JpegMarker.sos: // SOS (Start of Scan)
           hasSOS = true;
           _skipBlock();
           break;
@@ -150,68 +172,68 @@ class JpegData {
 
   void _read() {
     var marker = _nextMarker();
-    if (marker != Jpeg.M_SOI) {
+    if (marker != JpegMarker.soi) {
       // SOI (Start of Image)
       throw ImageException('Start Of Image marker not found.');
     }
 
     marker = _nextMarker();
-    while (marker != Jpeg.M_EOI && !input.isEOS) {
+    while (marker != JpegMarker.eoi && !input.isEOS) {
       final block = _readBlock();
       switch (marker) {
-        case Jpeg.M_APP0:
-        case Jpeg.M_APP1:
-        case Jpeg.M_APP2:
-        case Jpeg.M_APP3:
-        case Jpeg.M_APP4:
-        case Jpeg.M_APP5:
-        case Jpeg.M_APP6:
-        case Jpeg.M_APP7:
-        case Jpeg.M_APP8:
-        case Jpeg.M_APP9:
-        case Jpeg.M_APP10:
-        case Jpeg.M_APP11:
-        case Jpeg.M_APP12:
-        case Jpeg.M_APP13:
-        case Jpeg.M_APP14:
-        case Jpeg.M_APP15:
-        case Jpeg.M_COM:
+        case JpegMarker.app0:
+        case JpegMarker.app1:
+        case JpegMarker.app2:
+        case JpegMarker.app3:
+        case JpegMarker.app4:
+        case JpegMarker.app5:
+        case JpegMarker.app6:
+        case JpegMarker.app7:
+        case JpegMarker.app8:
+        case JpegMarker.app9:
+        case JpegMarker.app10:
+        case JpegMarker.app11:
+        case JpegMarker.app12:
+        case JpegMarker.app13:
+        case JpegMarker.app14:
+        case JpegMarker.app15:
+        case JpegMarker.com:
           _readAppData(marker, block);
           break;
 
-        case Jpeg.M_DQT: // DQT (Define Quantization Tables)
+        case JpegMarker.dqt: // DQT (Define Quantization Tables)
           _readDQT(block);
           break;
 
-        case Jpeg.M_SOF0: // SOF0 (Start of Frame, Baseline DCT)
-        case Jpeg.M_SOF1: // SOF1 (Start of Frame, Extended DCT)
-        case Jpeg.M_SOF2: // SOF2 (Start of Frame, Progressive DCT)
+        case JpegMarker.sof0: // SOF0 (Start of Frame, Baseline DCT)
+        case JpegMarker.sof1: // SOF1 (Start of Frame, Extended DCT)
+        case JpegMarker.sof2: // SOF2 (Start of Frame, Progressive DCT)
           _readFrame(marker, block);
           break;
 
-        case Jpeg.M_SOF3:
-        case Jpeg.M_SOF5:
-        case Jpeg.M_SOF6:
-        case Jpeg.M_SOF7:
-        case Jpeg.M_JPG:
-        case Jpeg.M_SOF9:
-        case Jpeg.M_SOF10:
-        case Jpeg.M_SOF11:
-        case Jpeg.M_SOF13:
-        case Jpeg.M_SOF14:
-        case Jpeg.M_SOF15:
+        case JpegMarker.sof3:
+        case JpegMarker.sof5:
+        case JpegMarker.sof6:
+        case JpegMarker.sof7:
+        case JpegMarker.jpg:
+        case JpegMarker.sof9:
+        case JpegMarker.sof10:
+        case JpegMarker.sof11:
+        case JpegMarker.sof13:
+        case JpegMarker.sof14:
+        case JpegMarker.sof15:
           throw ImageException(
               'Unhandled frame type ${marker.toRadixString(16)}');
 
-        case Jpeg.M_DHT: // DHT (Define Huffman Tables)
+        case JpegMarker.dht: // DHT (Define Huffman Tables)
           _readDHT(block);
           break;
 
-        case Jpeg.M_DRI: // DRI (Define Restart Interval)
+        case JpegMarker.dri: // DRI (Define Restart Interval)
           _readDRI(block);
           break;
 
-        case Jpeg.M_SOS: // SOS (Start of Scan)
+        case JpegMarker.sos: // SOS (Start of Scan)
           _readSOS(block);
           break;
 
@@ -296,7 +318,7 @@ class JpegData {
   void _readAppData(int marker, InputBuffer block) {
     final appData = block;
 
-    if (marker == Jpeg.M_APP0) {
+    if (marker == JpegMarker.app0) {
       // 'JFIF\0'
       if (appData[0] == 0x4A &&
           appData[1] == 0x46 &&
@@ -314,10 +336,10 @@ class JpegData {
         final thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
         jfif.thumbData = appData.subset(14 + thumbSize, offset: 14);
       }
-    } else if (marker == Jpeg.M_APP1) {
+    } else if (marker == JpegMarker.app1) {
       // 'EXIF\0'
       _readExifData(appData);
-    } else if (marker == Jpeg.M_APP14) {
+    } else if (marker == JpegMarker.app14) {
       // 'Adobe\0'
       if (appData[0] == 0x41 &&
           appData[1] == 0x64 &&
@@ -331,7 +353,7 @@ class JpegData {
         adobe!.flags1 = (appData[9] << 8) | appData[10];
         adobe!.transformCode = appData[11];
       }
-    } else if (marker == Jpeg.M_COM) {
+    } else if (marker == JpegMarker.com) {
       // Comment
       try {
         comment = appData.readStringUtf8();
@@ -345,10 +367,10 @@ class JpegData {
   void _readDQT(InputBuffer block) {
     while (!block.isEOS) {
       var n = block.readByte();
-      final prec = (n >> 4);
+      final prec = n >> 4;
       n &= 0x0F;
 
-      if (n >= Jpeg.NUM_QUANT_TBLS) {
+      if (n >= numQuantizationTables) {
         throw ImageException('Invalid number of quantization tables');
       }
 
@@ -357,7 +379,7 @@ class JpegData {
       }
 
       final tableData = quantizationTables[n];
-      for (var i = 0; i < Jpeg.DCTSIZE2; i++) {
+      for (var i = 0; i < dctSize2; i++) {
         int tmp;
         if (prec != 0) {
           tmp = block.readUint16();
@@ -365,7 +387,7 @@ class JpegData {
           tmp = block.readByte();
         }
 
-        tableData![Jpeg.dctZigZag[i]] = tmp;
+        tableData![dctZigZag[i]] = tmp;
       }
     }
 
@@ -380,8 +402,8 @@ class JpegData {
     }
 
     frame = JpegFrame();
-    frame!.extended = (marker == Jpeg.M_SOF1);
-    frame!.progressive = (marker == Jpeg.M_SOF2);
+    frame!.extended = marker == JpegMarker.sof1;
+    frame!.progressive = marker == JpegMarker.sof2;
     frame!.precision = block.readByte();
     frame!.scanLines = block.readUint16();
     frame!.samplesPerLine = block.readUint16();
@@ -443,7 +465,7 @@ class JpegData {
 
   void _readSOS(InputBuffer block) {
     final n = block.readByte();
-    if (n < 1 || n > Jpeg.MAX_COMPS_IN_SCAN) {
+    if (n < 1 || n > maxCompsInScan) {
       throw ImageException('Invalid SOS block');
     }
 
@@ -539,14 +561,14 @@ class JpegData {
       JpegFrame? frame, JpegComponent component) {
     final blocksPerLine = component.blocksPerLine;
     final blocksPerColumn = component.blocksPerColumn;
-    final samplesPerLine = (blocksPerLine << 3);
+    final samplesPerLine = blocksPerLine << 3;
     final R = Int32List(64);
     final r = Uint8List(64);
     final lines = List<Uint8List?>.filled(blocksPerColumn * 8, null);
 
     var l = 0;
     for (var blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
-      final scanLine = (blockRow << 3);
+      final scanLine = blockRow << 3;
       for (var i = 0; i < 8; i++) {
         lines[l++] = Uint8List(samplesPerLine);
       }
@@ -556,7 +578,7 @@ class JpegData {
             component.blocks[blockRow][blockCol] as Int32List, r, R);
 
         var offset = 0;
-        final sample = (blockCol << 3);
+        final sample = blockCol << 3;
         for (var j = 0; j < 8; j++) {
           final line = lines[scanLine + j];
           for (var i = 0; i < 8; i++) {
@@ -570,1046 +592,10 @@ class JpegData {
   }
 
   static int toFix(double val) {
-    const FIXED_POINT = 20;
-    const ONE = 1 << FIXED_POINT;
-    return (val * ONE).toInt() & 0xffffffff;
+    const fixedPoint = 20;
+    const one = 1 << fixedPoint;
+    return (val * one).toInt() & 0xffffffff;
   }
-
-  static const CRR = [
-    -179,
-    -178,
-    -177,
-    -175,
-    -174,
-    -172,
-    -171,
-    -170,
-    -168,
-    -167,
-    -165,
-    -164,
-    -163,
-    -161,
-    -160,
-    -158,
-    -157,
-    -156,
-    -154,
-    -153,
-    -151,
-    -150,
-    -149,
-    -147,
-    -146,
-    -144,
-    -143,
-    -142,
-    -140,
-    -139,
-    -137,
-    -136,
-    -135,
-    -133,
-    -132,
-    -130,
-    -129,
-    -128,
-    -126,
-    -125,
-    -123,
-    -122,
-    -121,
-    -119,
-    -118,
-    -116,
-    -115,
-    -114,
-    -112,
-    -111,
-    -109,
-    -108,
-    -107,
-    -105,
-    -104,
-    -102,
-    -101,
-    -100,
-    -98,
-    -97,
-    -95,
-    -94,
-    -93,
-    -91,
-    -90,
-    -88,
-    -87,
-    -86,
-    -84,
-    -83,
-    -81,
-    -80,
-    -79,
-    -77,
-    -76,
-    -74,
-    -73,
-    -72,
-    -70,
-    -69,
-    -67,
-    -66,
-    -64,
-    -63,
-    -62,
-    -60,
-    -59,
-    -57,
-    -56,
-    -55,
-    -53,
-    -52,
-    -50,
-    -49,
-    -48,
-    -46,
-    -45,
-    -43,
-    -42,
-    -41,
-    -39,
-    -38,
-    -36,
-    -35,
-    -34,
-    -32,
-    -31,
-    -29,
-    -28,
-    -27,
-    -25,
-    -24,
-    -22,
-    -21,
-    -20,
-    -18,
-    -17,
-    -15,
-    -14,
-    -13,
-    -11,
-    -10,
-    -8,
-    -7,
-    -6,
-    -4,
-    -3,
-    -1,
-    0,
-    1,
-    3,
-    4,
-    6,
-    7,
-    8,
-    10,
-    11,
-    13,
-    14,
-    15,
-    17,
-    18,
-    20,
-    21,
-    22,
-    24,
-    25,
-    27,
-    28,
-    29,
-    31,
-    32,
-    34,
-    35,
-    36,
-    38,
-    39,
-    41,
-    42,
-    43,
-    45,
-    46,
-    48,
-    49,
-    50,
-    52,
-    53,
-    55,
-    56,
-    57,
-    59,
-    60,
-    62,
-    63,
-    64,
-    66,
-    67,
-    69,
-    70,
-    72,
-    73,
-    74,
-    76,
-    77,
-    79,
-    80,
-    81,
-    83,
-    84,
-    86,
-    87,
-    88,
-    90,
-    91,
-    93,
-    94,
-    95,
-    97,
-    98,
-    100,
-    101,
-    102,
-    104,
-    105,
-    107,
-    108,
-    109,
-    111,
-    112,
-    114,
-    115,
-    116,
-    118,
-    119,
-    121,
-    122,
-    123,
-    125,
-    126,
-    128,
-    129,
-    130,
-    132,
-    133,
-    135,
-    136,
-    137,
-    139,
-    140,
-    142,
-    143,
-    144,
-    146,
-    147,
-    149,
-    150,
-    151,
-    153,
-    154,
-    156,
-    157,
-    158,
-    160,
-    161,
-    163,
-    164,
-    165,
-    167,
-    168,
-    170,
-    171,
-    172,
-    174,
-    175,
-    177,
-    178
-  ];
-
-  static const CRG = [
-    5990656,
-    5943854,
-    5897052,
-    5850250,
-    5803448,
-    5756646,
-    5709844,
-    5663042,
-    5616240,
-    5569438,
-    5522636,
-    5475834,
-    5429032,
-    5382230,
-    5335428,
-    5288626,
-    5241824,
-    5195022,
-    5148220,
-    5101418,
-    5054616,
-    5007814,
-    4961012,
-    4914210,
-    4867408,
-    4820606,
-    4773804,
-    4727002,
-    4680200,
-    4633398,
-    4586596,
-    4539794,
-    4492992,
-    4446190,
-    4399388,
-    4352586,
-    4305784,
-    4258982,
-    4212180,
-    4165378,
-    4118576,
-    4071774,
-    4024972,
-    3978170,
-    3931368,
-    3884566,
-    3837764,
-    3790962,
-    3744160,
-    3697358,
-    3650556,
-    3603754,
-    3556952,
-    3510150,
-    3463348,
-    3416546,
-    3369744,
-    3322942,
-    3276140,
-    3229338,
-    3182536,
-    3135734,
-    3088932,
-    3042130,
-    2995328,
-    2948526,
-    2901724,
-    2854922,
-    2808120,
-    2761318,
-    2714516,
-    2667714,
-    2620912,
-    2574110,
-    2527308,
-    2480506,
-    2433704,
-    2386902,
-    2340100,
-    2293298,
-    2246496,
-    2199694,
-    2152892,
-    2106090,
-    2059288,
-    2012486,
-    1965684,
-    1918882,
-    1872080,
-    1825278,
-    1778476,
-    1731674,
-    1684872,
-    1638070,
-    1591268,
-    1544466,
-    1497664,
-    1450862,
-    1404060,
-    1357258,
-    1310456,
-    1263654,
-    1216852,
-    1170050,
-    1123248,
-    1076446,
-    1029644,
-    982842,
-    936040,
-    889238,
-    842436,
-    795634,
-    748832,
-    702030,
-    655228,
-    608426,
-    561624,
-    514822,
-    468020,
-    421218,
-    374416,
-    327614,
-    280812,
-    234010,
-    187208,
-    140406,
-    93604,
-    46802,
-    0,
-    -46802,
-    -93604,
-    -140406,
-    -187208,
-    -234010,
-    -280812,
-    -327614,
-    -374416,
-    -421218,
-    -468020,
-    -514822,
-    -561624,
-    -608426,
-    -655228,
-    -702030,
-    -748832,
-    -795634,
-    -842436,
-    -889238,
-    -936040,
-    -982842,
-    -1029644,
-    -1076446,
-    -1123248,
-    -1170050,
-    -1216852,
-    -1263654,
-    -1310456,
-    -1357258,
-    -1404060,
-    -1450862,
-    -1497664,
-    -1544466,
-    -1591268,
-    -1638070,
-    -1684872,
-    -1731674,
-    -1778476,
-    -1825278,
-    -1872080,
-    -1918882,
-    -1965684,
-    -2012486,
-    -2059288,
-    -2106090,
-    -2152892,
-    -2199694,
-    -2246496,
-    -2293298,
-    -2340100,
-    -2386902,
-    -2433704,
-    -2480506,
-    -2527308,
-    -2574110,
-    -2620912,
-    -2667714,
-    -2714516,
-    -2761318,
-    -2808120,
-    -2854922,
-    -2901724,
-    -2948526,
-    -2995328,
-    -3042130,
-    -3088932,
-    -3135734,
-    -3182536,
-    -3229338,
-    -3276140,
-    -3322942,
-    -3369744,
-    -3416546,
-    -3463348,
-    -3510150,
-    -3556952,
-    -3603754,
-    -3650556,
-    -3697358,
-    -3744160,
-    -3790962,
-    -3837764,
-    -3884566,
-    -3931368,
-    -3978170,
-    -4024972,
-    -4071774,
-    -4118576,
-    -4165378,
-    -4212180,
-    -4258982,
-    -4305784,
-    -4352586,
-    -4399388,
-    -4446190,
-    -4492992,
-    -4539794,
-    -4586596,
-    -4633398,
-    -4680200,
-    -4727002,
-    -4773804,
-    -4820606,
-    -4867408,
-    -4914210,
-    -4961012,
-    -5007814,
-    -5054616,
-    -5101418,
-    -5148220,
-    -5195022,
-    -5241824,
-    -5288626,
-    -5335428,
-    -5382230,
-    -5429032,
-    -5475834,
-    -5522636,
-    -5569438,
-    -5616240,
-    -5663042,
-    -5709844,
-    -5756646,
-    -5803448,
-    -5850250,
-    -5897052,
-    -5943854
-  ];
-
-  static const CBG = [
-    2919680,
-    2897126,
-    2874572,
-    2852018,
-    2829464,
-    2806910,
-    2784356,
-    2761802,
-    2739248,
-    2716694,
-    2694140,
-    2671586,
-    2649032,
-    2626478,
-    2603924,
-    2581370,
-    2558816,
-    2536262,
-    2513708,
-    2491154,
-    2468600,
-    2446046,
-    2423492,
-    2400938,
-    2378384,
-    2355830,
-    2333276,
-    2310722,
-    2288168,
-    2265614,
-    2243060,
-    2220506,
-    2197952,
-    2175398,
-    2152844,
-    2130290,
-    2107736,
-    2085182,
-    2062628,
-    2040074,
-    2017520,
-    1994966,
-    1972412,
-    1949858,
-    1927304,
-    1904750,
-    1882196,
-    1859642,
-    1837088,
-    1814534,
-    1791980,
-    1769426,
-    1746872,
-    1724318,
-    1701764,
-    1679210,
-    1656656,
-    1634102,
-    1611548,
-    1588994,
-    1566440,
-    1543886,
-    1521332,
-    1498778,
-    1476224,
-    1453670,
-    1431116,
-    1408562,
-    1386008,
-    1363454,
-    1340900,
-    1318346,
-    1295792,
-    1273238,
-    1250684,
-    1228130,
-    1205576,
-    1183022,
-    1160468,
-    1137914,
-    1115360,
-    1092806,
-    1070252,
-    1047698,
-    1025144,
-    1002590,
-    980036,
-    957482,
-    934928,
-    912374,
-    889820,
-    867266,
-    844712,
-    822158,
-    799604,
-    777050,
-    754496,
-    731942,
-    709388,
-    686834,
-    664280,
-    641726,
-    619172,
-    596618,
-    574064,
-    551510,
-    528956,
-    506402,
-    483848,
-    461294,
-    438740,
-    416186,
-    393632,
-    371078,
-    348524,
-    325970,
-    303416,
-    280862,
-    258308,
-    235754,
-    213200,
-    190646,
-    168092,
-    145538,
-    122984,
-    100430,
-    77876,
-    55322,
-    32768,
-    10214,
-    -12340,
-    -34894,
-    -57448,
-    -80002,
-    -102556,
-    -125110,
-    -147664,
-    -170218,
-    -192772,
-    -215326,
-    -237880,
-    -260434,
-    -282988,
-    -305542,
-    -328096,
-    -350650,
-    -373204,
-    -395758,
-    -418312,
-    -440866,
-    -463420,
-    -485974,
-    -508528,
-    -531082,
-    -553636,
-    -576190,
-    -598744,
-    -621298,
-    -643852,
-    -666406,
-    -688960,
-    -711514,
-    -734068,
-    -756622,
-    -779176,
-    -801730,
-    -824284,
-    -846838,
-    -869392,
-    -891946,
-    -914500,
-    -937054,
-    -959608,
-    -982162,
-    -1004716,
-    -1027270,
-    -1049824,
-    -1072378,
-    -1094932,
-    -1117486,
-    -1140040,
-    -1162594,
-    -1185148,
-    -1207702,
-    -1230256,
-    -1252810,
-    -1275364,
-    -1297918,
-    -1320472,
-    -1343026,
-    -1365580,
-    -1388134,
-    -1410688,
-    -1433242,
-    -1455796,
-    -1478350,
-    -1500904,
-    -1523458,
-    -1546012,
-    -1568566,
-    -1591120,
-    -1613674,
-    -1636228,
-    -1658782,
-    -1681336,
-    -1703890,
-    -1726444,
-    -1748998,
-    -1771552,
-    -1794106,
-    -1816660,
-    -1839214,
-    -1861768,
-    -1884322,
-    -1906876,
-    -1929430,
-    -1951984,
-    -1974538,
-    -1997092,
-    -2019646,
-    -2042200,
-    -2064754,
-    -2087308,
-    -2109862,
-    -2132416,
-    -2154970,
-    -2177524,
-    -2200078,
-    -2222632,
-    -2245186,
-    -2267740,
-    -2290294,
-    -2312848,
-    -2335402,
-    -2357956,
-    -2380510,
-    -2403064,
-    -2425618,
-    -2448172,
-    -2470726,
-    -2493280,
-    -2515834,
-    -2538388,
-    -2560942,
-    -2583496,
-    -2606050,
-    -2628604,
-    -2651158,
-    -2673712,
-    -2696266,
-    -2718820,
-    -2741374,
-    -2763928,
-    -2786482,
-    -2809036,
-    -2831590
-  ];
-
-  static const CBB = [
-    -227,
-    -225,
-    -223,
-    -222,
-    -220,
-    -218,
-    -216,
-    -214,
-    -213,
-    -211,
-    -209,
-    -207,
-    -206,
-    -204,
-    -202,
-    -200,
-    -198,
-    -197,
-    -195,
-    -193,
-    -191,
-    -190,
-    -188,
-    -186,
-    -184,
-    -183,
-    -181,
-    -179,
-    -177,
-    -175,
-    -174,
-    -172,
-    -170,
-    -168,
-    -167,
-    -165,
-    -163,
-    -161,
-    -159,
-    -158,
-    -156,
-    -154,
-    -152,
-    -151,
-    -149,
-    -147,
-    -145,
-    -144,
-    -142,
-    -140,
-    -138,
-    -136,
-    -135,
-    -133,
-    -131,
-    -129,
-    -128,
-    -126,
-    -124,
-    -122,
-    -120,
-    -119,
-    -117,
-    -115,
-    -113,
-    -112,
-    -110,
-    -108,
-    -106,
-    -105,
-    -103,
-    -101,
-    -99,
-    -97,
-    -96,
-    -94,
-    -92,
-    -90,
-    -89,
-    -87,
-    -85,
-    -83,
-    -82,
-    -80,
-    -78,
-    -76,
-    -74,
-    -73,
-    -71,
-    -69,
-    -67,
-    -66,
-    -64,
-    -62,
-    -60,
-    -58,
-    -57,
-    -55,
-    -53,
-    -51,
-    -50,
-    -48,
-    -46,
-    -44,
-    -43,
-    -41,
-    -39,
-    -37,
-    -35,
-    -34,
-    -32,
-    -30,
-    -28,
-    -27,
-    -25,
-    -23,
-    -21,
-    -19,
-    -18,
-    -16,
-    -14,
-    -12,
-    -11,
-    -9,
-    -7,
-    -5,
-    -4,
-    -2,
-    0,
-    2,
-    4,
-    5,
-    7,
-    9,
-    11,
-    12,
-    14,
-    16,
-    18,
-    19,
-    21,
-    23,
-    25,
-    27,
-    28,
-    30,
-    32,
-    34,
-    35,
-    37,
-    39,
-    41,
-    43,
-    44,
-    46,
-    48,
-    50,
-    51,
-    53,
-    55,
-    57,
-    58,
-    60,
-    62,
-    64,
-    66,
-    67,
-    69,
-    71,
-    73,
-    74,
-    76,
-    78,
-    80,
-    82,
-    83,
-    85,
-    87,
-    89,
-    90,
-    92,
-    94,
-    96,
-    97,
-    99,
-    101,
-    103,
-    105,
-    106,
-    108,
-    110,
-    112,
-    113,
-    115,
-    117,
-    119,
-    120,
-    122,
-    124,
-    126,
-    128,
-    129,
-    131,
-    133,
-    135,
-    136,
-    138,
-    140,
-    142,
-    144,
-    145,
-    147,
-    149,
-    151,
-    152,
-    154,
-    156,
-    158,
-    159,
-    161,
-    163,
-    165,
-    167,
-    168,
-    170,
-    172,
-    174,
-    175,
-    177,
-    179,
-    181,
-    183,
-    184,
-    186,
-    188,
-    190,
-    191,
-    193,
-    195,
-    197,
-    198,
-    200,
-    202,
-    204,
-    206,
-    207,
-    209,
-    211,
-    213,
-    214,
-    216,
-    218,
-    220,
-    222,
-    223,
-    225
-  ];
 }
 
 class _JpegHuffman {

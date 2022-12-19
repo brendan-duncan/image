@@ -4,7 +4,7 @@ import '../exif/exif_data.dart';
 import '../image/image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
-import 'jpeg/jpeg.dart';
+import 'jpeg/jpeg_marker.dart';
 
 /// Encode an image to the JPEG format.
 ///
@@ -42,7 +42,7 @@ class JpegEncoder extends Encoder {
     final fp = OutputBuffer(bigEndian: true);
 
     // Add JPEG headers
-    _writeMarker(fp, Jpeg.M_SOI);
+    _writeMarker(fp, JpegMarker.soi);
     _writeAPP0(fp);
     _writeAPP1(fp, image.exif);
     _writeDQT(fp);
@@ -118,7 +118,7 @@ class JpegEncoder extends Encoder {
       _writeBits(fp, fillBits);
     }
 
-    _writeMarker(fp, Jpeg.M_EOI);
+    _writeMarker(fp, JpegMarker.eoi);
 
     return fp.getBytes();
   }
@@ -297,9 +297,8 @@ class JpegEncoder extends Encoder {
     var k = 0;
     for (var row = 0; row < 8; row++) {
       for (var col = 0; col < 8; col++) {
-        fdtbl_Y[k] = (1.0 / (YTable[zigzag[k]] * aasf[row] * aasf[col] * 8.0));
-        fdtbl_UV[k] = (1.0 / (UVTable[zigzag[k]] * aasf[row] *
-            aasf[col] * 8.0));
+        fdtbl_Y[k] = 1.0 / (YTable[zigzag[k]] * aasf[row] * aasf[col] * 8.0);
+        fdtbl_UV[k] = 1.0 / (UVTable[zigzag[k]] * aasf[row] * aasf[col] * 8.0);
         k++;
       }
     }
@@ -372,9 +371,7 @@ class JpegEncoder extends Encoder {
   List<int?> _fDCTQuant(List<double> data, List<double> fdtbl) {
     // Pass 1: process rows.
     var dataOff = 0;
-    const I8 = 8;
-    const I64 = 64;
-    for (var i = 0; i < I8; ++i) {
+    for (var i = 0; i < 8; ++i) {
       final d0 = data[dataOff];
       final d1 = data[dataOff + 1];
       final d2 = data[dataOff + 2];
@@ -430,7 +427,7 @@ class JpegEncoder extends Encoder {
 
     // Pass 2: process columns.
     dataOff = 0;
-    for (var i = 0; i < I8; ++i) {
+    for (var i = 0; i < 8; ++i) {
       final d0 = data[dataOff];
       final d1 = data[dataOff + 8];
       final d2 = data[dataOff + 16];
@@ -485,7 +482,7 @@ class JpegEncoder extends Encoder {
     }
 
     // Quantize/descale the coefficients
-    for (var i = 0; i < I64; ++i) {
+    for (var i = 0; i < 64; ++i) {
       // Apply the quantization and scaling factor & Round to nearest integer
       final fDCTQuant = data[i] * fdtbl[i];
       outputfDCTQuant[i] = (fDCTQuant > 0.0)
@@ -497,7 +494,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeAPP0(OutputBuffer out) {
-    _writeMarker(out, Jpeg.M_APP0);
+    _writeMarker(out, JpegMarker.app0);
     out.writeUint16(16); // length
     out.writeByte(0x4A); // J
     out.writeByte(0x46); // F
@@ -522,7 +519,7 @@ class JpegEncoder extends Encoder {
     exif.write(exifData);
     final exifBytes = exifData.getBytes();
 
-    _writeMarker(out, Jpeg.M_APP1);
+    _writeMarker(out, JpegMarker.app1);
     out.writeUint16(exifBytes.length + 8);
     const exifSignature = 0x45786966; // Exif\0\0
     out.writeUint32(exifSignature);
@@ -531,7 +528,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height) {
-    _writeMarker(out, Jpeg.M_SOF0);
+    _writeMarker(out, JpegMarker.sof0);
     out.writeUint16(17); // length, truecolor YUV JPG
     out.writeByte(8); // precision
     out.writeUint16(height);
@@ -549,7 +546,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeDQT(OutputBuffer out) {
-    _writeMarker(out, Jpeg.M_DQT);
+    _writeMarker(out, JpegMarker.dqt);
     out.writeUint16(132); // length
     out.writeByte(0);
     for (var i = 0; i < 64; i++) {
@@ -562,7 +559,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeDHT(OutputBuffer out) {
-    _writeMarker(out, Jpeg.M_DHT);
+    _writeMarker(out, JpegMarker.dht);
     out.writeUint16(0x01A2); // length
 
     out.writeByte(0); // HTYDCinfo
@@ -599,7 +596,7 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeSOS(OutputBuffer out) {
-    _writeMarker(out, Jpeg.M_SOS);
+    _writeMarker(out, JpegMarker.sos);
     out.writeUint16(12); // length
     out.writeByte(3); // nrofcomponents
     out.writeByte(1); // IdY
@@ -618,13 +615,10 @@ class JpegEncoder extends Encoder {
     final eob = htac[0x00];
     final M16zeroes = htac[0xF0];
     int pos;
-    const I16 = 16;
-    const I63 = 63;
-    const I64 = 64;
     final duDct = _fDCTQuant(CDU, fdtbl);
 
     // ZigZag reorder
-    for (var j = 0; j < I64; ++j) {
+    for (var j = 0; j < 64; ++j) {
       DU[zigzag[j]] = duDct[j];
     }
 
@@ -655,7 +649,7 @@ class JpegEncoder extends Encoder {
       for (; (DU[i] == 0) && (i <= end0pos); ++i) {}
 
       var nrzeroes = i - startpos;
-      if (nrzeroes >= I16) {
+      if (nrzeroes >= 16) {
         lng = nrzeroes >> 4;
         for (var nrmarker = 1; nrmarker <= lng; ++nrmarker) {
           _writeBits(out, M16zeroes!);
@@ -668,7 +662,7 @@ class JpegEncoder extends Encoder {
       i++;
     }
 
-    if (end0pos != I63) {
+    if (end0pos != 63) {
       _writeBits(out, eob!);
     }
 
@@ -680,7 +674,7 @@ class JpegEncoder extends Encoder {
     var posval = bits[1] - 1;
     while (posval >= 0) {
       if ((value & (1 << posval)) != 0) {
-        _byteNew |= (1 << _bytePos);
+        _byteNew |= 1 << _bytePos;
       }
       posval--;
       _bytePos--;

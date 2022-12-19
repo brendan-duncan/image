@@ -16,9 +16,9 @@ Image copyRectify(Image src,
       final u = x / (dst.width - 1);
       // bilinear interpolation
       final srcPixelCoord = topLeft * (1 - u) * (1 - v) +
-          topRight * (u) * (1 - v) +
-          bottomLeft * (1 - u) * (v) +
-          bottomRight * (u) * (v);
+          topRight * u * (1 - v) +
+          bottomLeft * (1 - u) * v +
+          bottomRight * u * v;
       final srcPixel = src.getPixel(srcPixelCoord.xi, srcPixelCoord.yi);
       dst.setPixel(x, y, srcPixel);
     }

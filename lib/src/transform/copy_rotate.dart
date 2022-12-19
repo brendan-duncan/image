@@ -51,7 +51,7 @@ Image copyRotate(Image src, num angle,
   }
 
   // Generic angle.
-  final rad = (nAngle * pi / 180.0);
+  final rad = nAngle * pi / 180.0;
   final ca = cos(rad);
   final sa = sin(rad);
   final ux = (src.width * ca).abs();

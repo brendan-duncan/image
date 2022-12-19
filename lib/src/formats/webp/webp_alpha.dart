@@ -24,12 +24,12 @@ class WebPAlpha {
     rsrv = (b >> 6) & 0x03;
 
     if (isValid) {
-      if (method == ALPHA_NO_COMPRESSION) {
+      if (method == _alphaNoCompression) {
         final alphaDecodedSize = width * height;
         if (input.length < alphaDecodedSize) {
           rsrv = 1;
         }
-      } else if (method == ALPHA_LOSSLESS_COMPRESSION) {
+      } else if (method == _alphaLosslessCompression) {
         if (!_decodeAlphaHeader()) {
           rsrv = 1;
         }
@@ -40,10 +40,10 @@ class WebPAlpha {
   }
 
   bool get isValid {
-    if (method < ALPHA_NO_COMPRESSION ||
-        method > ALPHA_LOSSLESS_COMPRESSION ||
-        filter >= WebPFilters.FILTER_LAST ||
-        preProcessing > ALPHA_PREPROCESSED_LEVELS ||
+    if (method < _alphaNoCompression ||
+        method > _alphaLosslessCompression ||
+        filter >= WebPFilters.fitlerLast ||
+        preProcessing > _alphaPreprocessedLevels ||
         rsrv != 0) {
       return false;
     }
@@ -55,9 +55,9 @@ class WebPAlpha {
       return false;
     }
 
-    final unfilterFunc = WebPFilters.UNFILTERS[filter];
+    final unfilterFunc = WebPFilters.unfilters[filter];
 
-    if (method == ALPHA_NO_COMPRESSION) {
+    if (method == _alphaNoCompression) {
       final offset = row * width;
       final numPixels = numRows * width;
 
@@ -72,7 +72,7 @@ class WebPAlpha {
       unfilterFunc(width, height, width, row, numRows, output);
     }
 
-    if (preProcessing == ALPHA_PREPROCESSED_LEVELS) {
+    if (preProcessing == _alphaPreprocessedLevels) {
       if (!_dequantizeLevels(output, width, height, row, numRows)) {
         return false;
       }
@@ -142,7 +142,7 @@ class WebPAlpha {
   bool _use8bDecode = false;
 
   // Alpha related constants.
-  static const ALPHA_NO_COMPRESSION = 0;
-  static const ALPHA_LOSSLESS_COMPRESSION = 1;
-  static const ALPHA_PREPROCESSED_LEVELS = 1;
+  static const _alphaNoCompression = 0;
+  static const _alphaLosslessCompression = 1;
+  static const _alphaPreprocessedLevels = 1;
 }

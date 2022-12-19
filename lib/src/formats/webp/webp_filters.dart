@@ -4,22 +4,22 @@ import '../../util/input_buffer.dart';
 
 class WebPFilters {
   // Filters.
-  static const FILTER_NONE = 0;
-  static const FILTER_HORIZONTAL = 1;
-  static const FILTER_VERTICAL = 2;
-  static const FILTER_GRADIENT = 3;
-  static const FILTER_LAST = FILTER_GRADIENT + 1; // end marker
-  static const FILTER_BEST = 5;
-  static const FILTER_FAST = 6;
+  static const filterNone = 0;
+  static const filterHorizontal = 1;
+  static const filterVertical = 2;
+  static const fitlerGradient = 3;
+  static const fitlerLast = fitlerGradient + 1; // end marker
+  static const fitlerBest = 5;
+  static const filterFast = 6;
 
-  static const FILTERS = [
+  static const filters = [
     null, // WEBP_FILTER_NONE
     horizontalFilter, // WEBP_FILTER_HORIZONTAL
     verticalFilter, // WEBP_FILTER_VERTICAL
     gradientFilter // WEBP_FILTER_GRADIENT
   ];
 
-  static const UNFILTERS = [
+  static const unfilters = [
     null, // WEBP_FILTER_NONE
     horizontalUnfilter, // WEBP_FILTER_HORIZONTAL
     verticalUnfilter, // WEBP_FILTER_VERTICAL

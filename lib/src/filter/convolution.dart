@@ -5,7 +5,7 @@ import '../image/image.dart';
 /// Apply a 3x3 convolution filter to the [src] image. [filter] should be a
 /// list of 9 numbers.
 ///
-/// The rgb channels will be divided by [filterDiv] and add [offset], allowing
+/// The rgb channels will be divided by [div] and add [offset], allowing
 /// filters to normalize and offset the filtered pixel value.
 Image convolution(Image src, List<num> filter,
     { num div = 1.0, num offset = 0.0 }) {

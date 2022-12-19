@@ -1,11 +1,11 @@
 import '../image/image.dart';
 
-/// A kernel object to use with [separableConvolution] filtering.
+/// A kernel object to use with separableConvolution filtering.
 class SeparableKernel {
   final List<num> coefficients;
   final int size;
 
-  /// Create a separable convolution kernel for the given [radius].
+  /// Create a separable convolution kernel for the given [size].
   SeparableKernel(this.size)
       : coefficients = List<num>.filled(2 * size + 1, 0);
 

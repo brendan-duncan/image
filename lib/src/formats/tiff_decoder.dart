@@ -36,9 +36,7 @@ class TiffDecoder extends Decoder {
 
   /// Decode a single frame from the data stat was set with [startDecode].
   /// If [frame] is out of the range of available frames, null is returned.
-  /// Non animated image files will only have [frame] 0. An [AnimationFrame]
-  /// is returned, which provides the image, and top-left coordinates of the
-  /// image, as animated frames may only occupy a subset of the canvas.
+  /// Non animated image files will only have [frame] 0.
   @override
   Image? decodeFrame(int frame) {
     if (info == null) {

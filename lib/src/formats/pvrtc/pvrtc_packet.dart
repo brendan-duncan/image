@@ -194,7 +194,7 @@ class PvrtcPacket {
   int _colorBIsOpaque = 0;
 
   int _getColorData() =>
-      ((usePunchthroughAlpha & 1)) |
+      (usePunchthroughAlpha & 1) |
       ((colorA & bits14) << 1) |
       ((colorAIsOpaque & 1) << 15) |
       ((colorB & bits15) << 16) |

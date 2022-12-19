@@ -5,9 +5,9 @@ import 'draw_pixel.dart';
 /// Draw the image [src] onto the image [dst].
 ///
 /// In other words, drawImage will take an rectangular area from src of
-/// width [src_w] and height [src_h] at position ([src_x],[src_y]) and place it
-/// in a rectangular area of [dst] of width [dst_w] and height [dst_h] at
-/// position ([dst_x],[dst_y]).
+/// width [srcW] and height [srcH] at position ([srcX],[srcY]) and place it
+/// in a rectangular area of [dst] of width [dstW] and height [dstH] at
+/// position ([dstX],[dstY]).
 ///
 /// If the source and destination coordinates and width and heights differ,
 /// appropriate stretching or shrinking of the image fragment will be performed.
@@ -38,11 +38,11 @@ Image drawImage(Image dst, Image src, {
 
   if (center) {
     // if [src] is wider than [dst]
-    var wdt = (dst.width - src.width);
+    var wdt = dst.width - src.width;
     if (wdt < 0) wdt = 0;
     dstX = wdt ~/ 2;
     // if [src] is higher than [dst]
-    var height = (dst.height - src.height);
+    var height = dst.height - src.height;
     if (height < 0) height = 0;
     dstY = height ~/ 2;
   }

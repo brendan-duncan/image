@@ -224,8 +224,8 @@ class VP8LTransform {
   void addGreenToBlueAndRed(Uint32List pixels, int data, int dataEnd) {
     while (data < dataEnd) {
       final argb = pixels[data];
-      final green = ((argb >> 8) & 0xff);
-      var redBlue = (argb & 0x00ff00ff);
+      final green = (argb >> 8) & 0xff;
+      var redBlue = argb & 0x00ff00ff;
       redBlue += (green << 16) | green;
       redBlue &= 0x00ff00ff;
       pixels[data++] = (argb & 0xff00ff00) | redBlue;
@@ -301,10 +301,10 @@ class VP8LTransform {
   }
 
   static int _select(int a, int b, int c) {
-    final pa_minus_pb = _sub3((a >> 24), (b >> 24), (c >> 24)) +
+    final pa_minus_pb = _sub3(a >> 24, b >> 24, c >> 24) +
         _sub3((a >> 16) & 0xff, (b >> 16) & 0xff, (c >> 16) & 0xff) +
         _sub3((a >> 8) & 0xff, (b >> 8) & 0xff, (c >> 8) & 0xff) +
-        _sub3((a) & 0xff, (b) & 0xff, (c) & 0xff);
+        _sub3(a & 0xff, b & 0xff, c & 0xff);
     return (pa_minus_pb <= 0) ? a : b;
   }
 
@@ -312,7 +312,7 @@ class VP8LTransform {
   // Predictors
 
   static int _predictor0(Uint32List pixels, int left, int top) =>
-      VP8L.ARGB_BLACK;
+      VP8L.argbBlack;
 
   static int _predictor1(Uint32List pixels, int left, int top) => left;
 
@@ -424,7 +424,7 @@ class _VP8LMultipliers {
       newBlue &= 0xff;
     }
 
-    final c = (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | (newBlue);
+    final c = (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | newBlue;
     return c;
   }
 

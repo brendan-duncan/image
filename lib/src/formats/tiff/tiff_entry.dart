@@ -23,7 +23,7 @@ class TiffEntry {
 
   bool get isValid => type != IfdValueType.none;
 
-  int get typeSize => isValid ? IfdValueTypeSize[type.index] : 0;
+  int get typeSize => isValid ? ifdValueTypeSize[type.index] : 0;
 
   bool get isString => type == IfdValueType.ascii;
 

@@ -47,9 +47,9 @@ Image hdrToLdr(Image hdr, {num? exposure}) {
         gi = _gamma(g, m);
         bi = _gamma(b, m);
       } else {
-        ri = (r * 255.0);
-        gi = (g * 255.0);
-        bi = (b * 255.0);
+        ri = r * 255.0;
+        gi = g * 255.0;
+        bi = b * 255.0;
       }
 
       // Normalize the color

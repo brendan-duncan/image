@@ -19,7 +19,7 @@ enum FormatType {
   float
 }
 
-const FormatToFormatType = <Format, FormatType>{
+const formatToFormatType = <Format, FormatType>{
   Format.uint1: FormatType.uint,
   Format.uint2: FormatType.uint,
   Format.uint4: FormatType.uint,
@@ -34,7 +34,7 @@ const FormatToFormatType = <Format, FormatType>{
   Format.float64: FormatType.float
 };
 
-const FormatSize = <Format, int>{
+const formatSize = <Format, int>{
   Format.uint1: 1,
   Format.uint2: 1,
   Format.uint4: 1,
@@ -49,7 +49,7 @@ const FormatSize = <Format, int>{
   Format.float64: 8
 };
 
-const FormatMaxValue = <Format, int>{
+const formatMaxValue = <Format, int>{
   Format.uint1: 0x1,
   Format.uint2: 0x3,
   Format.uint4: 0xf,
@@ -72,7 +72,7 @@ num convertFormatValue(num value, Format from, Format to) {
 
   switch (from) {
     case Format.uint1:
-      return value == 0 ? 0 : FormatMaxValue[to]!;
+      return value == 0 ? 0 : formatMaxValue[to]!;
     case Format.uint2:
       switch (to) {
         case Format.uint1:

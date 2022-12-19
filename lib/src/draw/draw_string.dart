@@ -15,7 +15,7 @@ var _a_lut = Uint8List(256);
 /// position [x],[y] with the given [color].
 ///
 /// You can load your own font, or use one of the existing ones
-/// such as: [arial_14], [arial_24], or [arial_48].
+/// such as: arial14, arial24, or arial48.
 ///  Fonts can be create with a tool such as: https://ttf2fnt.com/
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
     {Color? color, bool rightJustify = false}) {
@@ -93,7 +93,7 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 
 /// Same as drawString except the strings will wrap around to create multiple
 /// lines. You can load your own font, or use one of the existing ones
-/// such as: [arial_14], [arial_24], or [arial_48].
+/// such as: arial14, arial24, or arial48.
 Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
     {Color? color}) {
 
@@ -150,7 +150,7 @@ Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
 /// If both x and y are provided it has the same behaviour of drawString method.
 ///
 /// You can load your own font, or use one of the existing ones
-/// such as: [arial_14], [arial_24], or [arial_48].
+/// such as: arial14, arial24, or arial48.
 Image drawStringCentered(Image image, BitmapFont font, String string,
     {int? x, int? y, Color? color}) {
   var stringWidth = 0;

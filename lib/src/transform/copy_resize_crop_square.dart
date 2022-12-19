@@ -24,8 +24,8 @@ Image copyResizeCropSquare(Image src, int size) {
   final dy = src.height / height;
   final dx = src.width / width;
 
-  final xOffset = ((width - size) ~/ 2);
-  final yOffset = ((height - size) ~/ 2);
+  final xOffset = (width - size) ~/ 2;
+  final yOffset = (height - size) ~/ 2;
 
   final scaleX = Int32List(size);
   for (var x = 0; x < size; ++x) {

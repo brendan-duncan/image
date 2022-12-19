@@ -320,7 +320,7 @@ class PngEncoder extends Encoder {
         final p1 = _x < bpp ? 0 : row[_x - bpp];
         final p2 = prevRow == null ? 0 : prevRow[_x];
         final p3 = row[_x];
-        out[oi++] = (p3 - ((p1 + p2) >> 1));
+        out[oi++] = p3 - ((p1 + p2) >> 1);
       }
     }
     return oi;

@@ -14,7 +14,7 @@ BitmapFont readFontZip(List<int> bytes) => BitmapFont.fromZip(bytes);
 /// and an [Image] that stores the font [map].
 BitmapFont readFont(String font, Image map) => BitmapFont.fromFnt(font, map);
 
-/// A bitmap font that can be used with [drawString] and [drawChar] functions.
+/// A bitmap font that can be used with drawString and drawChar functions.
 /// If you want use own fonts following with this steps:
 ///     1. Get your .ttf file - important is to select file with specific style
 ///     which you want
@@ -60,8 +60,8 @@ class BitmapFont {
   Map<int, BitmapFontCharacter> characters = {};
   Map<int, Map<int, int>> kernings = {};
 
-  /// Decode a [BitmapFont] from the contents of [font] definition (.fnt) file,
-  /// and an [Image] that stores the font [map].
+  /// Decode a [BitmapFont] from the contents of [fnt] definition (.fnt) file,
+  /// and an [Image] that stores the font map.
   BitmapFont.fromFnt(String fnt, Image page) {
     final fontPages = {0: page};
 
@@ -147,10 +147,10 @@ class BitmapFont {
               size = int.parse(a.value);
               break;
             case 'bold':
-              bold = (int.parse(a.value) == 1);
+              bold = int.parse(a.value) == 1;
               break;
             case 'italic':
-              italic = (int.parse(a.value) == 1);
+              italic = int.parse(a.value) == 1;
               break;
             case 'charset':
               charset = a.value;
@@ -162,10 +162,10 @@ class BitmapFont {
               stretchH = int.parse(a.value);
               break;
             case 'smooth':
-              smooth = (int.parse(a.value) == 1);
+              smooth = int.parse(a.value) == 1;
               break;
             case 'antialias':
-              antialias = (int.parse(a.value) == 1);
+              antialias = int.parse(a.value) == 1;
               break;
             case 'padding':
               final tk = a.value.split(',');
@@ -182,7 +182,7 @@ class BitmapFont {
               }
               break;
             case 'outline':
-              outline = (int.parse(a.value) == 1);
+              outline = int.parse(a.value) == 1;
               break;
           }
         }
@@ -205,7 +205,7 @@ class BitmapFont {
               pages = int.parse(a.value);
               break;
             case 'packed':
-              packed = (int.parse(a.value) == 1);
+              packed = int.parse(a.value) == 1;
               break;
           }
         }

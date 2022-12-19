@@ -22,8 +22,8 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
   x2 = line[2];
   y2 = line[3];
 
-  var dx = (x2 - x1);
-  var dy = (y2 - y1);
+  var dx = x2 - x1;
+  var dy = y2 - y1;
 
   final radius = (thickness / 2.0).floor();
 
@@ -260,7 +260,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
     var frac = 0;
 
     for (var x = x1; x <= x2; x++) {
-      final wstart = (y - wid ~/ 2);
+      final wstart = y - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
         drawPixel(image, x, w, c, ((frac >> 8) & 0xff) / 255);
         drawPixel(image, x, w + 1, c, ((_xor(frac) >> 8) & 0xff) / 255);
@@ -292,7 +292,7 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
     var frac = 0;
 
     for (var y = y1; y <= y2; y++) {
-      final wstart = (x - wid ~/ 2);
+      final wstart = x - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
         drawPixel(image, w, y, c, ((frac >> 8) & 0xff) / 255);
         drawPixel(image, w + 1, y, c, ((_xor(frac) >> 8) & 0xff) / 255);

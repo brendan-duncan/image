@@ -6,11 +6,11 @@ import '../util/quantizer.dart';
 
 // From http://jsbin.com/iXofIji/2/edit by PAEz
 enum DitherKernel {
-  None,
-  FalseFloydSteinberg,
-  FloydSteinberg,
-  Stucki,
-  Atkinson
+  none,
+  falseFloydSteinberg,
+  floydSteinberg,
+  stucki,
+  atkinson
 }
 
 const _ditherKernels = [
@@ -59,14 +59,14 @@ const _ditherKernels = [
 ];
 
 Image ditherImage(Image image, { Quantizer? quantizer,
-    DitherKernel kernel = DitherKernel.FloydSteinberg,
+    DitherKernel kernel = DitherKernel.floydSteinberg,
     bool serpentine = false }) {
 
   if (quantizer == null) {
     quantizer = NeuralQuantizer(image);
   }
 
-  if (kernel == DitherKernel.None) {
+  if (kernel == DitherKernel.none) {
     return quantizer.getIndexImage(image);
   }
 

@@ -14,22 +14,22 @@ void DitherTest() {
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));
 
-    id = ditherImage(i0, kernel: DitherKernel.Atkinson);
+    id = ditherImage(i0, kernel: DitherKernel.atkinson);
     File('$tmpPath/out/filter/dither_Atkinson.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));
 
-    id = ditherImage(i0, kernel: DitherKernel.FalseFloydSteinberg);
+    id = ditherImage(i0, kernel: DitherKernel.falseFloydSteinberg);
     File('$tmpPath/out/filter/dither_FalseFloydSteinberg.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));
 
-    id = ditherImage(i0, kernel: DitherKernel.Stucki);
+    id = ditherImage(i0, kernel: DitherKernel.stucki);
     File('$tmpPath/out/filter/dither_Stucki.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));
 
-    id = ditherImage(i0, kernel: DitherKernel.None);
+    id = ditherImage(i0, kernel: DitherKernel.none);
     File('$tmpPath/out/filter/dither_None.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));

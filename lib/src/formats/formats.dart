@@ -162,7 +162,7 @@ Animation? decodeGifAnimation(Uint8List bytes) =>
 /// performance.
 Uint8List encodeGif(Image image, {
     int samplingFactor = 10,
-    DitherKernel dither = DitherKernel.FloydSteinberg,
+    DitherKernel dither = DitherKernel.floydSteinberg,
     bool ditherSerpentine = false }) =>
     GifEncoder(samplingFactor: samplingFactor).encodeImage(image);
 
@@ -181,7 +181,7 @@ Uint8List encodeGif(Image image, {
 Uint8List encodeGifAnimation(Animation anim, { int delay = 80,
     int repeat = 0,
     int samplingFactor = 10,
-    DitherKernel dither = DitherKernel.FloydSteinberg,
+    DitherKernel dither = DitherKernel.floydSteinberg,
     bool ditherSerpentine = false }) =>
     GifEncoder(samplingFactor: samplingFactor).encodeAnimation(anim);
 

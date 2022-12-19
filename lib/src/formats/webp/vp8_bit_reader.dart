@@ -24,7 +24,7 @@ class VP8BitReader {
   }
 
   int getSigned(int v) {
-    final split = (_range >> 1);
+    final split = _range >> 1;
     final bit = _bitUpdate(split);
     _shift();
     return bit != 0 ? -v : v;
@@ -53,7 +53,7 @@ class VP8BitReader {
     }
 
     final pos = _bits;
-    final value = (_value >> pos);
+    final value = _value >> pos;
     if (value > split) {
       _range -= split + 1;
       _value -= (split + 1) << pos;

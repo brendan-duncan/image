@@ -18,7 +18,7 @@ class IfdDirectory {
 
   IfdValue? operator[](Object? tag) {
     if (tag is String) {
-      tag = ExifTagNameToID[tag];
+      tag = exifTagNameToID[tag];
     }
     if (tag is int) {
       return data[tag];
@@ -28,7 +28,7 @@ class IfdDirectory {
 
   void operator[]=(Object? tag, Object? value) {
     if (tag is String) {
-      tag = ExifTagNameToID[tag];
+      tag = exifTagNameToID[tag];
     }
     if (tag is! int) {
       return;

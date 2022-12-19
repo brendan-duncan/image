@@ -3,7 +3,7 @@ import 'dart:math';
 import '../image/image.dart';
 
 num _smoothStep(num edge0, num edge1, num x) {
-  x = ((x - edge0) / (edge1 - edge0));
+  x = (x - edge0) / (edge1 - edge0);
   if (x < 0.0) {
     x = 0.0;
   }

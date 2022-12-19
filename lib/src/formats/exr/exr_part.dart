@@ -37,7 +37,7 @@ class ExrPart {
   late Float32List chromaticities;
 
   ExrPart(this._tiled, InputBuffer input) {
-    //_type = _tiled ? ExrPart.TYPE_TILE : ExrPart.TYPE_SCANLINE;
+    //_type = _tiled ? ExrPart._typeTile : ExrPart._typeScanline;
 
     while (true) {
       final name = input.readString();
@@ -73,10 +73,7 @@ class ExrPart {
           chromaticities[7] = value.readFloat32();
           break;
         case 'compression':
-          _compressionType = value.readByte();
-          if (_compressionType > 7) {
-            throw ImageException('EXR Invalid compression type');
-          }
+          _compressionType = ExrCompressorType.values[value.readByte()];
           break;
         case 'dataWindow':
           dataWindow = [
@@ -134,7 +131,7 @@ class ExrPart {
     if (_tiled) {
       _numXLevels = _calculateNumXLevels(left, right, top, bottom);
       _numYLevels = _calculateNumYLevels(left, right, top, bottom);
-      if (_tileLevelMode != RIPMAP_LEVELS) {
+      if (_tileLevelMode != _ripmapLevels) {
         _numYLevels = 1;
       }
 
@@ -213,15 +210,15 @@ class ExrPart {
     var num = 0;
 
     switch (_tileLevelMode) {
-      case ONE_LEVEL:
+      case _oneLevel:
         num = 1;
         break;
-      case MIPMAP_LEVELS:
+      case _mipmapLevels:
         final w = maxX - minX + 1;
         final h = maxY - minY + 1;
         num = _roundLog2(max(w, h), _tileRoundingMode) + 1;
         break;
-      case RIPMAP_LEVELS:
+      case _ripmapLevels:
         final w = maxX - minX + 1;
         num = _roundLog2(w, _tileRoundingMode) + 1;
         break;
@@ -236,15 +233,15 @@ class ExrPart {
     var num = 0;
 
     switch (_tileLevelMode) {
-      case ONE_LEVEL:
+      case _oneLevel:
         num = 1;
         break;
-      case MIPMAP_LEVELS:
+      case _mipmapLevels:
         final w = (maxX - minX) + 1;
         final h = (maxY - minY) + 1;
         num = _roundLog2(max(w, h), _tileRoundingMode) + 1;
         break;
-      case RIPMAP_LEVELS:
+      case _ripmapLevels:
         final h = (maxY - minY) + 1;
         num = _roundLog2(h, _tileRoundingMode) + 1;
         break;
@@ -256,7 +253,7 @@ class ExrPart {
   }
 
   int _roundLog2(int x, int? rmode) =>
-      (rmode == ROUND_DOWN) ? _floorLog2(x) : _ceilLog2(x);
+      (rmode == _roundDown) ? _floorLog2(x) : _ceilLog2(x);
 
   int _floorLog2(int x) {
     var y = 0;
@@ -295,8 +292,8 @@ class ExrPart {
     return bytesPerPixel;
   }
 
-  List<int> _calculateNumTiles(
-          int numLevels, int min, int max, int? size, int? rmode) =>
+  List<int> _calculateNumTiles(int numLevels, int min, int max, int? size,
+      int? rmode) =>
       List<int>.generate(numLevels,
           (i) => (_levelSize(min, max, i, rmode) + size! - 1) ~/ size,
           growable: false);
@@ -307,35 +304,35 @@ class ExrPart {
     }
 
     final a = (_max - _min) + 1;
-    final b = (1 << l);
+    final b = 1 << l;
     var size = a ~/ b;
 
-    if (rmode == ROUND_UP && size * b < a) {
+    if (rmode == _roundUp && size * b < a) {
       size += 1;
     }
 
     return max(size, 1);
   }
 
-  static const TYPE_SCANLINE = 0;
-  static const TYPE_TILE = 1;
-  static const TYPE_DEEP_SCANLINE = 2;
-  static const TYPE_DEEP_TILE = 3;
+  //static const _typeScanline = 0;
+  //static const _typeTile = 1;
+  //static const _typeDeepScanline = 2;
+  //static const _typeDeepTile = 3;
 
-  static const INCREASING_Y = 0;
-  static const DECREASING_Y = 1;
-  static const RANDOM_Y = 2;
+  //static const _increasingY = 0;
+  //static const _decreasingY = 1;
+  //static const _randomY = 2;
 
-  static const ONE_LEVEL = 0;
-  static const MIPMAP_LEVELS = 1;
-  static const RIPMAP_LEVELS = 2;
+  static const _oneLevel = 0;
+  static const _mipmapLevels = 1;
+  static const _ripmapLevels = 2;
 
-  static const ROUND_DOWN = 0;
-  static const ROUND_UP = 1;
+  static const _roundDown = 0;
+  static const _roundUp = 1;
 
   //int _type;
-  //int _lineOrder = INCREASING_Y;
-  int _compressionType = ExrCompressor.NO_COMPRESSION;
+  //int _lineOrder = _increasingY;
+  ExrCompressorType _compressionType = ExrCompressorType.none;
   List<Uint32List?>? _offsets;
 
   late Uint32List _bytesPerLine;
@@ -356,7 +353,7 @@ class ExrPart {
   int? _numYLevels;
   late int _bytesPerPixel;
   int? _maxBytesPerTileLine;
-//int _tileBufferSize;
+  //int _tileBufferSize;
 }
 
 @internal

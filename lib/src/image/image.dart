@@ -112,7 +112,7 @@ class Image extends Iterable<Pixel> {
     final dataView = data!.toUint8List();
     final byteView = Uint8List.view(bytes);
 
-    rowStride ??= width * numChannels * FormatSize[format]!;
+    rowStride ??= width * numChannels * formatSize[format]!;
     final dataStride = data!.rowStride;
     final stride = min(rowStride, dataStride);
 
@@ -446,8 +446,8 @@ class Image extends Iterable<Pixel> {
     return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
   }
 
-  /// Set the color of the [Pixel] at the given coordinates to the color of the
-  /// given Pixel [p].
+  /// Set the color of the pixel at the given coordinates to the color of the
+  /// given Color [c].
   void setPixel(int x, int y, Color c) {
     if (c is Pixel) {
       if (c.image.hasPalette) {
@@ -478,7 +478,7 @@ class Image extends Iterable<Pixel> {
 
   /// Set all pixels in the image to the given [color]. If no color is provided
   /// the image will be initialized to 0.
-  void clear([Color? c]) => data?.clear(c);
+  void clear([Color? color]) => data?.clear(color);
 
   /// Convert this image to a new [format] or number of channels.
   Image convert({Format? format, int? numChannels, num? alpha}) {

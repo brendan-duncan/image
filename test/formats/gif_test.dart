@@ -55,7 +55,7 @@ void GifTest() {
       anim.loopCount = 10;
       for (var i = 0; i < 10; i++) {
         final image = Image(480, 120);
-        drawString(image, arial_48, 100, 60, i.toString());
+        drawString(image, arial48, 100, 60, i.toString());
         anim.addFrame(image);
       }
 
@@ -74,7 +74,7 @@ void GifTest() {
       for (var i = 1; i <= 3; i++) {
         final image = Image(480, 120);
         image.frameInfo.duration = i * 1000;
-        drawString(image, arial_24, 50, 50, 'This frame is $i second(s) long');
+        drawString(image, arial24, 50, 50, 'This frame is $i second(s) long');
         anim.addFrame(image);
       }
 

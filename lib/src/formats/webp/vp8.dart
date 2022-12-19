@@ -36,7 +36,7 @@ class VP8 {
     _frameHeader.keyFrame = (bits & 1) == 0;
     _frameHeader.profile = (bits >> 1) & 7;
     _frameHeader.show = (bits >> 4) & 1;
-    _frameHeader.partitionLength = (bits >> 5);
+    _frameHeader.partitionLength = bits >> 5;
 
     final signature = input.readUint24();
     if (signature != vp8Signature) {
@@ -358,7 +358,7 @@ class VP8 {
     _yuvT = List<VP8TopSamples>.generate(_mbWidth!, (_) => VP8TopSamples(),
         growable: false);
 
-    _yuvBlock = Uint8List(YUV_SIZE);
+    _yuvBlock = Uint8List(yuvSize);
 
     _intraT = Uint8List(4 * _mbWidth!);
 
@@ -452,7 +452,7 @@ class VP8 {
       final left = _mbInfo[0];
       left.nz = 0;
       left.nzDc = 0;
-      _intraL.fillRange(0, _intraL.length, B_DC_PRED);
+      _intraL.fillRange(0, _intraL.length, bDcPred);
       _mbX = 0;
 
       // Reconstruct, filter and emit the row.
@@ -474,9 +474,9 @@ class VP8 {
 
   void _reconstructRow() {
     final mb_y = _mbY;
-    final y_dst = InputBuffer(_yuvBlock, offset: Y_OFF);
-    final u_dst = InputBuffer(_yuvBlock, offset: U_OFF);
-    final v_dst = InputBuffer(_yuvBlock, offset: V_OFF);
+    final y_dst = InputBuffer(_yuvBlock, offset: yOffset);
+    final u_dst = InputBuffer(_yuvBlock, offset: uOffset);
+    final v_dst = InputBuffer(_yuvBlock, offset: vOffset);
 
     for (var mb_x = 0; mb_x < _mbWidth!; ++mb_x) {
       final block = _mbData[mb_x];
@@ -485,26 +485,26 @@ class VP8 {
       // pixels at a time for alignment reason, and because of in-loop filter.
       if (mb_x > 0) {
         for (var j = -1; j < 16; ++j) {
-          y_dst.memcpy(j * BPS - 4, 4, y_dst, j * BPS + 12);
+          y_dst.memcpy(j * bps - 4, 4, y_dst, j * bps + 12);
         }
 
         for (var j = -1; j < 8; ++j) {
-          u_dst.memcpy(j * BPS - 4, 4, u_dst, j * BPS + 4);
-          v_dst.memcpy(j * BPS - 4, 4, v_dst, j * BPS + 4);
+          u_dst.memcpy(j * bps - 4, 4, u_dst, j * bps + 4);
+          v_dst.memcpy(j * bps - 4, 4, v_dst, j * bps + 4);
         }
       } else {
         for (var j = 0; j < 16; ++j) {
-          y_dst[j * BPS - 1] = 129;
+          y_dst[j * bps - 1] = 129;
         }
 
         for (var j = 0; j < 8; ++j) {
-          u_dst[j * BPS - 1] = 129;
-          v_dst[j * BPS - 1] = 129;
+          u_dst[j * bps - 1] = 129;
+          v_dst[j * bps - 1] = 129;
         }
 
         // Init top-left sample on left column too
         if (mb_y > 0) {
-          y_dst[-1 - BPS] = u_dst[-1 - BPS] = v_dst[-1 - BPS] = 129;
+          y_dst[-1 - bps] = u_dst[-1 - bps] = v_dst[-1 - bps] = 129;
         }
       }
 
@@ -514,21 +514,21 @@ class VP8 {
       var bits = block.nonZeroY;
 
       if (mb_y > 0) {
-        y_dst.memcpy(-BPS, 16, top_yuv.y);
-        u_dst.memcpy(-BPS, 8, top_yuv.u);
-        v_dst.memcpy(-BPS, 8, top_yuv.v);
+        y_dst.memcpy(-bps, 16, top_yuv.y);
+        u_dst.memcpy(-bps, 8, top_yuv.u);
+        v_dst.memcpy(-bps, 8, top_yuv.v);
       } else if (mb_x == 0) {
         // we only need to do this init once at block (0,0).
         // Afterward, it remains valid for the whole topmost row.
-        y_dst.memset(-BPS - 1, 16 + 4 + 1, 127);
-        u_dst.memset(-BPS - 1, 8 + 1, 127);
-        v_dst.memset(-BPS - 1, 8 + 1, 127);
+        y_dst.memset(-bps - 1, 16 + 4 + 1, 127);
+        u_dst.memset(-bps - 1, 8 + 1, 127);
+        v_dst.memset(-bps - 1, 8 + 1, 127);
       }
 
       // predict and add residuals
       if (block.isIntra4x4) {
         // 4x4
-        final topRight = InputBuffer.from(y_dst, offset: -BPS + 16);
+        final topRight = InputBuffer.from(y_dst, offset: -bps + 16);
         final topRight32 = topRight.toUint32List();
 
         if (mb_y > 0) {
@@ -542,15 +542,15 @@ class VP8 {
 
         // replicate the top-right pixels below
         final p = topRight32[0];
-        topRight32[3 * BPS] = p;
-        topRight32[2 * BPS] = p;
-        topRight32[BPS] = p;
+        topRight32[3 * bps] = p;
+        topRight32[2 * bps] = p;
+        topRight32[bps] = p;
 
         // predict and add residuals for all 4x4 blocks in turn.
         for (var n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
           final dst = InputBuffer.from(y_dst, offset: kScan[n]);
 
-          VP8Filter.PredLuma4[block.imodes[n]](dst);
+          VP8Filter.predLuma4[block.imodes[n]](dst);
 
           _doTransform(bits!, InputBuffer(coeffs, offset: n * 16), dst);
         }
@@ -558,7 +558,7 @@ class VP8 {
         // 16x16
         final predFunc = _checkMode(mb_x, mb_y, block.imodes[0])!;
 
-        VP8Filter.PredLuma16[predFunc](y_dst);
+        VP8Filter.predLuma16[predFunc](y_dst);
         if (bits != 0) {
           for (var n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
             final dst = InputBuffer.from(y_dst, offset: kScan[n]);
@@ -571,8 +571,8 @@ class VP8 {
       // Chroma
       final bits_uv = block.nonZeroUV;
       final pred_func = _checkMode(mb_x, mb_y, block.uvmode)!;
-      VP8Filter.PredChroma8[pred_func](u_dst);
-      VP8Filter.PredChroma8[pred_func](v_dst);
+      VP8Filter.predChroma8[pred_func](u_dst);
+      VP8Filter.predChroma8[pred_func](v_dst);
 
       final c1 = InputBuffer(coeffs, offset: 16 * 16);
       _doUVTransform(bits_uv, c1, u_dst);
@@ -582,9 +582,9 @@ class VP8 {
 
       // stash away top samples for next block
       if (mb_y < _mbHeight! - 1) {
-        top_yuv.y.setRange(0, 16, y_dst.toUint8List(), 15 * BPS);
-        top_yuv.u.setRange(0, 8, u_dst.toUint8List(), 7 * BPS);
-        top_yuv.v.setRange(0, 8, v_dst.toUint8List(), 7 * BPS);
+        top_yuv.y.setRange(0, 16, y_dst.toUint8List(), 15 * bps);
+        top_yuv.u.setRange(0, 8, u_dst.toUint8List(), 7 * bps);
+        top_yuv.v.setRange(0, 8, v_dst.toUint8List(), 7 * bps);
       }
 
       // Transfer reconstructed samples from yuv_b_ cache to final destination.
@@ -594,44 +594,44 @@ class VP8 {
 
       for (var j = 0; j < 16; ++j) {
         final start = y_out + j * _cacheYStride!;
-        _cacheY.memcpy(start, 16, y_dst, j * BPS);
+        _cacheY.memcpy(start, 16, y_dst, j * bps);
       }
 
       for (var j = 0; j < 8; ++j) {
         var start = u_out + j * _cacheUVStride!;
-        _cacheU.memcpy(start, 8, u_dst, j * BPS);
+        _cacheU.memcpy(start, 8, u_dst, j * bps);
 
         start = v_out + j * _cacheUVStride!;
-        _cacheV.memcpy(start, 8, v_dst, j * BPS);
+        _cacheV.memcpy(start, 8, v_dst, j * bps);
       }
     }
   }
 
   static const kScan = <int>[
-    0 + 0 * BPS,
-    4 + 0 * BPS,
-    8 + 0 * BPS,
-    12 + 0 * BPS,
-    0 + 4 * BPS,
-    4 + 4 * BPS,
-    8 + 4 * BPS,
-    12 + 4 * BPS,
-    0 + 8 * BPS,
-    4 + 8 * BPS,
-    8 + 8 * BPS,
-    12 + 8 * BPS,
-    0 + 12 * BPS,
-    4 + 12 * BPS,
-    8 + 12 * BPS,
-    12 + 12 * BPS
+    0 + 0 * bps,
+    4 + 0 * bps,
+    8 + 0 * bps,
+    12 + 0 * bps,
+    0 + 4 * bps,
+    4 + 4 * bps,
+    8 + 4 * bps,
+    12 + 4 * bps,
+    0 + 8 * bps,
+    4 + 8 * bps,
+    8 + 8 * bps,
+    12 + 8 * bps,
+    0 + 12 * bps,
+    4 + 12 * bps,
+    8 + 12 * bps,
+    12 + 12 * bps
   ];
 
   static int? _checkMode(int mb_x, int mb_y, int? mode) {
-    if (mode == B_DC_PRED) {
+    if (mode == bDcPred) {
       if (mb_x == 0) {
-        return (mb_y == 0) ? B_DC_PRED_NOTOPLEFT : B_DC_PRED_NOLEFT;
+        return (mb_y == 0) ? bDcPredNoTopLeft : bDcPredNoLeft;
       } else {
-        return (mb_y == 0) ? B_DC_PRED_NOTOP : B_DC_PRED;
+        return (mb_y == 0) ? bDcPredNoTop : bDcPred;
       }
     }
     return mode;
@@ -753,8 +753,8 @@ class VP8 {
     final uDst = InputBuffer.from(_cacheU, offset: -uvSize);
     final vDst = InputBuffer.from(_cacheV, offset: -uvSize);
     final mbY = _mbY;
-    final isFirstRow = (mbY == 0);
-    final isLastRow = (mbY >= _brMbY! - 1);
+    final isFirstRow = mbY == 0;
+    final isLastRow = mbY >= _brMbY! - 1;
     int? yStart = macroBlockVPos(mbY);
     int? yEnd = macroBlockVPos(mbY + 1);
 
@@ -875,18 +875,18 @@ class VP8 {
       InputBuffer topDst,
       InputBuffer? bottomDst,
       int len) {
-    int loadUv(int u, int v) => ((u) | ((v) << 16));
+    int loadUv(int u, int v) => u | (v << 16);
 
     final lastPixelPair = (len - 1) >> 1;
     var tl_uv = loadUv(topU[0], topV[0]); // top-left sample
     var l_uv = loadUv(curU[0], curV[0]); // left-sample
 
     final uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
-    _yuvToRgba(topY[0], uv0 & 0xff, (uv0 >> 16), topDst);
+    _yuvToRgba(topY[0], uv0 & 0xff, uv0 >> 16, topDst);
 
     if (bottomY != null) {
       final uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
-      _yuvToRgba(bottomY[0], uv0 & 0xff, (uv0 >> 16), bottomDst!);
+      _yuvToRgba(bottomY[0], uv0 & 0xff, uv0 >> 16, bottomDst!);
     }
 
     for (var x = 1; x <= lastPixelPair; ++x) {
@@ -900,20 +900,20 @@ class VP8 {
       var uv0 = (diag_12 + tl_uv) >> 1;
       var uv1 = (diag_03 + t_uv) >> 1;
 
-      _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
+      _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, uv0 >> 16,
           InputBuffer.from(topDst, offset: (2 * x - 1) * 4));
 
-      _yuvToRgba(topY[2 * x - 0], uv1 & 0xff, (uv1 >> 16),
+      _yuvToRgba(topY[2 * x - 0], uv1 & 0xff, uv1 >> 16,
           InputBuffer.from(topDst, offset: (2 * x - 0) * 4));
 
       if (bottomY != null) {
         uv0 = (diag_03 + l_uv) >> 1;
         uv1 = (diag_12 + uv) >> 1;
 
-        _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, (uv0 >> 16),
+        _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, uv0 >> 16,
             InputBuffer.from(bottomDst!, offset: (2 * x - 1) * 4));
 
-        _yuvToRgba(bottomY[2 * x], uv1 & 0xff, (uv1 >> 16),
+        _yuvToRgba(bottomY[2 * x], uv1 & 0xff, uv1 >> 16,
             InputBuffer.from(bottomDst, offset: (2 * x + 0) * 4));
       }
 
@@ -923,12 +923,12 @@ class VP8 {
 
     if ((len & 1) == 0) {
       final uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
-      _yuvToRgba(topY[len - 1], uv0 & 0xff, (uv0 >> 16),
+      _yuvToRgba(topY[len - 1], uv0 & 0xff, uv0 >> 16,
           InputBuffer.from(topDst, offset: (len - 1) * 4));
 
       if (bottomY != null) {
         final uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
-        _yuvToRgba(bottomY[len - 1], uv0 & 0xff, (uv0 >> 16),
+        _yuvToRgba(bottomY[len - 1], uv0 & 0xff, uv0 >> 16,
             InputBuffer.from(bottomDst!, offset: (len - 1) * 4));
       }
     }
@@ -1376,8 +1376,8 @@ class VP8 {
     if (!block.isIntra4x4) {
       // Hardcoded 16x16 intra-mode decision tree.
       final ymode = br.getBit(156) != 0
-          ? (br.getBit(128) != 0 ? TM_PRED : H_PRED)
-          : (br.getBit(163) != 0 ? V_PRED : DC_PRED);
+          ? (br.getBit(128) != 0 ? tmPred : hPred)
+          : (br.getBit(163) != 0 ? vPred : dcPred);
       block.imodes[0] = ymode;
 
       top!.fillRange(ti, ti + 4, ymode);
@@ -1411,12 +1411,12 @@ class VP8 {
 
     // Hardcoded UVMode decision tree
     block.uvmode = br.getBit(142) == 0
-        ? DC_PRED
+        ? dcPred
         : br.getBit(114) == 0
-            ? V_PRED
+            ? vPred
             : br.getBit(183) != 0
-                ? TM_PRED
-                : H_PRED;
+                ? tmPred
+                : hPred;
   }
 
   // Main data source
@@ -1541,24 +1541,24 @@ class VP8 {
   static int _clip(int v, int M) => v < 0 ? 0 : v > M ? M : v;
 
   static const kYModesIntra4 = [
-    -B_DC_PRED,
+    -bDcPred,
     1,
-    -B_TM_PRED,
+    -bTmPred,
     2,
-    -B_VE_PRED,
+    -bVePred,
     3,
     4,
     6,
-    -B_HE_PRED,
+    -bHePred,
     5,
-    -B_RD_PRED,
-    -B_VR_PRED,
-    -B_LD_PRED,
+    -bRdPred,
+    -bVrPred,
+    -bLdPred,
     7,
-    -B_VL_PRED,
+    -bVlPred,
     8,
-    -B_HD_PRED,
-    -B_HU_PRED
+    -bHdPred,
+    -bHuPred
   ];
 
   static const kBModesProba = [
@@ -2082,30 +2082,30 @@ class VP8 {
   static const numModeLfDeltas = 4; // I4x4, ZERO, *, SPLIT
   static const maxNumPartitions = 8;
 
-  static const B_DC_PRED = 0; // 4x4 modes
-  static const B_TM_PRED = 1;
-  static const B_VE_PRED = 2;
-  static const B_HE_PRED = 3;
-  static const B_RD_PRED = 4;
-  static const B_VR_PRED = 5;
-  static const B_LD_PRED = 6;
-  static const B_VL_PRED = 7;
-  static const B_HD_PRED = 8;
-  static const B_HU_PRED = 9;
-  static const NUM_BMODES = B_HU_PRED + 1 - B_DC_PRED;
+  static const bDcPred = 0; // 4x4 modes
+  static const bTmPred = 1;
+  static const bVePred = 2;
+  static const bHePred = 3;
+  static const bRdPred = 4;
+  static const bVrPred = 5;
+  static const bLdPred = 6;
+  static const bVlPred = 7;
+  static const bHdPred = 8;
+  static const bHuPred = 9;
+  static const numBModes = bHuPred + 1 - bDcPred;
 
   // Luma16 or UV modes
-  static const DC_PRED = B_DC_PRED;
-  static const V_PRED = B_VE_PRED;
-  static const H_PRED = B_HE_PRED;
-  static const TM_PRED = B_TM_PRED;
-  static const B_PRED = NUM_BMODES;
+  static const dcPred = bDcPred;
+  static const vPred = bVePred;
+  static const hPred = bHePred;
+  static const tmPred = bTmPred;
+  static const bPred = numBModes;
 
   // special modes
-  static const B_DC_PRED_NOTOP = 4;
-  static const B_DC_PRED_NOLEFT = 5;
-  static const B_DC_PRED_NOTOPLEFT = 6;
-  static const NUM_B_DC_MODES = 7;
+  static const bDcPredNoTop = 4;
+  static const bDcPredNoLeft = 5;
+  static const bDcPredNoTopLeft = 6;
+  static const numBDcModes = 7;
 
   // Probabilities
   static const numTypes = 4;
@@ -2113,22 +2113,22 @@ class VP8 {
   static const numCtx = 3;
   static const numProbas = 11;
 
-  static const BPS = 32; // this is the common stride used by yuv[]
-  static const YUV_SIZE = (BPS * 17 + BPS * 9);
-  static const Y_SIZE = (BPS * 17);
-  static const Y_OFF = (BPS * 1 + 8);
-  static const U_OFF = (Y_OFF + BPS * 16 + BPS);
-  static const V_OFF = (U_OFF + 16);
+  static const bps = 32; // this is the common stride used by yuv[]
+  static const yuvSize = bps * 17 + bps * 9;
+  static const ySize = bps * 17;
+  static const yOffset = bps * 1 + 8;
+  static const uOffset = yOffset + bps * 16 + bps;
+  static const vOffset = uOffset + 16;
 
-  static const YUV_FIX = 16; // fixed-point precision for RGB->YUV
-  static const YUV_HALF = 1 << (YUV_FIX - 1);
-  static const YUV_MASK = (256 << YUV_FIX) - 1;
-  static const YUV_RANGE_MIN = -227; // min value of r/g/b output
-  static const YUV_RANGE_MAX = 256 + 226; // max value of r/g/b output
+  static const yuvFix = 16; // fixed-point precision for RGB->YUV
+  static const yuvHalf = 1 << (yuvFix - 1);
+  static const yuvMask = (256 << yuvFix) - 1;
+  static const yuvRangeMin = -227; // min value of r/g/b output
+  static const yuvRangeMax = 256 + 226; // max value of r/g/b output
   static const yuvFix2 = 14; // fixed-point precision for YUV->RGB
-  static const YUV_HALF2 = 1 << (yuvFix2 - 1);
-  static const YUV_MASK2 = (256 << yuvFix2) - 1;
-  static const xorYuvMask2 = (-YUV_MASK2 - 1);
+  static const yuvHalf2 = 1 << (yuvFix2 - 1);
+  static const yuvMask2 = (256 << yuvFix2) - 1;
+  static const xorYuvMask2 = -yuvMask2 - 1;
 
   // These constants are 14b fixed-point version of ITU-R BT.601 constants.
   static const kYScale = 19077; // 1.164 = 255 / 219
@@ -2136,7 +2136,7 @@ class VP8 {
   static const kUToG = 6419; // 0.391 = 255 / 112 * 0.886 * 0.114 / 0.587
   static const kVToG = 13320; // 0.813 = 255 / 112 * 0.701 * 0.299 / 0.587
   static const kUToB = 33050; // 2.018 = 255 / 112 * 0.886
-  static const kRCst = (-kYScale * 16 - kVToR * 128 + YUV_HALF2);
-  static const kGCst = (-kYScale * 16 + kUToG * 128 + kVToG * 128 + YUV_HALF2);
-  static const kBCst = (-kYScale * 16 - kUToB * 128 + YUV_HALF2);
+  static const kRCst = -kYScale * 16 - kVToR * 128 + yuvHalf2;
+  static const kGCst = -kYScale * 16 + kUToG * 128 + kVToG * 128 + yuvHalf2;
+  static const kBCst = -kYScale * 16 - kUToB * 128 + yuvHalf2;
 }

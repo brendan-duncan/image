@@ -6,9 +6,7 @@ import 'palette.dart';
 class PaletteUndefined extends Palette {
   PaletteUndefined()
       : super(0, 0);
-  PaletteUndefined.from(PaletteUndefined other)
-      : super(0, 0);
-  PaletteUndefined clone() => PaletteUndefined.from(this);
+  PaletteUndefined clone() => PaletteUndefined();
   int get lengthInBytes => 0;
   Format get format => Format.uint8;
   ByteBuffer get buffer => Uint8List(0).buffer;

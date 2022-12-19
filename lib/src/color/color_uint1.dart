@@ -5,8 +5,6 @@ import 'format.dart';
 
 /// A 1-bit color with channel values in the range [0, 1].
 class ColorUint1 extends Iterable<num> implements Color {
-  static const MaxChannelValue = 255;
-
   final int length;
   late int data;
 
@@ -51,7 +49,7 @@ class ColorUint1 extends Iterable<num> implements Color {
     ci = 7 - ci;
     var v = data;
     if (value != 0) {
-      v |= (1 << ci);
+      v |= 1 << ci;
     } else {
       v &= ~((1 << ci) & 0xff);
     }

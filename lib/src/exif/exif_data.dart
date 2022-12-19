@@ -310,7 +310,7 @@ class ExifData extends IfdContainer {
       return entry;
 
     final f = IfdValueType.values[format];
-    final fsize = IfdValueTypeSize[format];
+    final fsize = ifdValueTypeSize[format];
     final size = count * fsize;
 
     final endOffset = block.offset + 4;

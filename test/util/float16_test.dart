@@ -2,8 +2,13 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void Float16Test() {
-  group('Float16', () {
-    test('Arithmetic', () {
+  group('float16', () {
+    test('constructor', () {
+      final f1 = Float16();
+      expect(f1.toDouble(), equals(0.0));
+    });
+
+    test('arithmetic', () {
       const f1 = 1.0;
       const f2 = 2.0;
       var h1 = Float16(3);

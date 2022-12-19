@@ -35,7 +35,7 @@ void FontTests() {
 
     test('arial_14', () {
       final img = copyResize(image, width: 400);
-      drawString(img, arial_14, 10, 50, 'Testing Arial 14: Hello World',
+      drawString(img, arial14, 10, 50, 'Testing Arial 14: Hello World',
           color: ColorRgba8(255, 0, 0, 128));
 
       File('$tmpPath/out/font/font_arial_14.jpg')
@@ -45,7 +45,7 @@ void FontTests() {
 
     test('arial_24', () {
       final img = copyResize(image, width: 400);
-      drawString(img, arial_24, 10, 50, 'Testing Arial 24: Hello World',
+      drawString(img, arial24, 10, 50, 'Testing Arial 24: Hello World',
           color: ColorRgba8(255, 0, 0, 128));
 
       File('$tmpPath/out/font/font_arial_24.jpg')
@@ -55,7 +55,7 @@ void FontTests() {
 
     test('arial_48', () {
       final img = copyResize(image, width: 400);
-      drawString(img, arial_48, 10, 50, 'Testing Arial 48: Hello World',
+      drawString(img, arial48, 10, 50, 'Testing Arial 48: Hello World',
           color: ColorRgba8(255, 0, 0, 128));
 
       File('$tmpPath/out/font/font_arial_48.jpg')
@@ -65,7 +65,7 @@ void FontTests() {
 
     test('drawStringCenteredY', () {
       final img = copyResize(image, width: 400);
-      drawStringCentered(img, arial_24, 'Testing Arial 24: Hello World',
+      drawStringCentered(img, arial24, 'Testing Arial 24: Hello World',
           y: 50, color: ColorRgba8(255, 0, 0, 128));
 
       File('$tmpPath/out/font/y_centered.jpg')
@@ -75,7 +75,7 @@ void FontTests() {
 
     test('drawStringCenteredY', () {
       final img = copyResize(image, width: 400);
-      drawStringCentered(img, arial_24, 'Testing Arial 24: Hello World',
+      drawStringCentered(img, arial24, 'Testing Arial 24: Hello World',
           x: 10, color: ColorRgba8(255, 0, 0, 128));
 
       File('$tmpPath/out/font/x_centered.jpg')
@@ -85,7 +85,7 @@ void FontTests() {
 
     test('drawStringCenteredXY', () {
       final img = copyResize(image, width: 400);
-      drawStringCentered(img, arial_24, 'Testing Arial 24: Hello World',
+      drawStringCentered(img, arial24, 'Testing Arial 24: Hello World',
           color: ColorRgba8(255, 0, 0, 128));
 
       File('$tmpPath/out/font/xy_centered.jpg')

@@ -67,10 +67,10 @@ class OutputBuffer {
       writeByte((value >> 24) & 0xff);
       writeByte((value >> 16) & 0xff);
       writeByte((value >> 8) & 0xff);
-      writeByte((value) & 0xff);
+      writeByte(value & 0xff);
       return;
     }
-    writeByte((value) & 0xff);
+    writeByte(value & 0xff);
     writeByte((value >> 8) & 0xff);
     writeByte((value >> 16) & 0xff);
     writeByte((value >> 24) & 0xff);
@@ -124,7 +124,7 @@ class OutputBuffer {
   /// This is equivalent to the python list range operator.
   List<int> subset(int start, [int? end]) {
     if (start < 0) {
-      start = (length) + start;
+      start = length + start;
     }
 
     if (end == null) {

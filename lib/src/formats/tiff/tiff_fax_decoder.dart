@@ -206,9 +206,9 @@ class TiffFaxDecoder {
 
     // uncompressedMode - haven't dealt with this yet.
 
-    oneD = (tiffT4Options & 0x01);
-    uncompressedMode = ((tiffT4Options & 0x02) >> 1);
-    fillBits = ((tiffT4Options & 0x04) >> 2);
+    oneD = tiffT4Options & 0x01;
+    uncompressedMode = (tiffT4Options & 0x02) >> 1;
+    fillBits = (tiffT4Options & 0x04) >> 2;
 
     // The data must start with an EOL code
     if (_readEOL() != 1) {
@@ -254,7 +254,7 @@ class TiffFaxDecoder {
           entry = _nextLesserThan8Bits(7);
 
           // Run these through the 2DCodes table
-          entry = (_twoDCodes[entry] & 0xff);
+          entry = _twoDCodes[entry] & 0xff;
 
           // Get the code and the number of bits used up
           code = (entry & 0x78) >> 3;
@@ -347,7 +347,7 @@ class TiffFaxDecoder {
     // Return values from getNextChangingElement
     final b = List<int?>.filled(2, null);
 
-    uncompressedMode = ((tiffT6Options & 0x02) >> 1);
+    uncompressedMode = (tiffT6Options & 0x02) >> 1;
 
     // Local cached reference
     var cce = currChangingElements!;
@@ -391,7 +391,7 @@ class TiffFaxDecoder {
         // Get the next seven bits
         entry = _nextLesserThan8Bits(7);
         // Run these through the 2DCodes table
-        entry = (_twoDCodes[entry] & 0xff);
+        entry = _twoDCodes[entry] & 0xff;
 
         // Get the code and the number of bits used up
         code = (entry & 0x78) >> 3;

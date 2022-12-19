@@ -155,7 +155,7 @@ class VP8Random {
   int randomBits2(int numBits, int amp) {
     var diff = _table[_index1] - _table[_index2];
     if (diff < 0) {
-      diff += (1 << 31);
+      diff += 1 << 31;
     }
 
     _table[_index1] = diff;

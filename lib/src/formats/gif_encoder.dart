@@ -23,9 +23,9 @@ class GifEncoder extends Encoder {
       { this.delay = 80,
         this.repeat = 0,
         this.numColors = 256,
-        this.quantizerType = QuantizerType.Neural,
+        this.quantizerType = QuantizerType.neural,
         this.samplingFactor = 10,
-        this.dither = DitherKernel.FloydSteinberg,
+        this.dither = DitherKernel.floydSteinberg,
         this.ditherSerpentine = false })
       : _encodedFrames = 0;
 
@@ -37,7 +37,7 @@ class GifEncoder extends Encoder {
       output = OutputBuffer();
 
       if (!image.hasPalette) {
-        if (quantizerType == QuantizerType.Neural) {
+        if (quantizerType == QuantizerType.neural) {
           _lastColorMap = NeuralQuantizer(image, numberOfColors: numColors,
               samplingFactor: samplingFactor);
         } else {
@@ -67,7 +67,7 @@ class GifEncoder extends Encoder {
     _encodedFrames++;
 
     if (!image.hasPalette) {
-      if (quantizerType == QuantizerType.Neural) {
+      if (quantizerType == QuantizerType.neural) {
         _lastColorMap = NeuralQuantizer(image, numberOfColors: numColors,
             samplingFactor: samplingFactor);
       } else {
@@ -300,7 +300,7 @@ class GifEncoder extends Encoder {
     _curAccum &= _masks[_curBits];
 
     if (_curBits > 0) {
-      _curAccum |= (code! << _curBits);
+      _curAccum |= code! << _curBits;
     } else {
       _curAccum = code!;
     }

@@ -5,8 +5,6 @@ import 'format.dart';
 
 /// A 2-bit color value.
 class ColorUint2 extends Iterable<num> implements Color {
-  static const MaxChannelValue = 255;
-
   final int length;
   late int data;
 

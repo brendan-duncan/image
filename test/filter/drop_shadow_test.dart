@@ -7,7 +7,7 @@ import '../test_util.dart';
 void DropShadowTest() {
   test('dropShadow', () {
     final i0 = Image(256, 256, numChannels: 4);
-    drawStringCentered(i0, arial_48, 'Shadow', color: ColorRgb8(255));
+    drawStringCentered(i0, arial48, 'Shadow', color: ColorRgb8(255));
 
     final id = dropShadow(i0, -5, 5, 3);
 

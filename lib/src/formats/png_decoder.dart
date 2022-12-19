@@ -581,7 +581,7 @@ class PngDecoder extends Decoder {
     final w = _info.width;
     final h = _info.height;
 
-    final rowBytes = (((w * pixelDepth + 7)) >> 3);
+    final rowBytes = (w * pixelDepth + 7) >> 3;
     final bpp = (pixelDepth + 7) >> 3;
 
     final line = List<int>.filled(rowBytes, 0);

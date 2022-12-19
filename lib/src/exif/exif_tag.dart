@@ -7,7 +7,7 @@ class ExifTag {
   ExifTag(this.name, [this.type = IfdValueType.none, this.count = 1]);
 }
 
-const ExifTagNameToID = <String, int>{
+const exifTagNameToID = <String, int>{
   'ProcessingSoftware': 0xb,
   'SubfileType': 0xfe,
   'OldSubfileType': 0xff,

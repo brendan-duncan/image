@@ -73,7 +73,7 @@ class OctreeQuantizer extends Quantizer {
     }
   }
 
-  /// Find the index of the closest color to [c] in the [colorMap].
+  /// Find the index of the closest color to [c] in the colorMap.
   @override
   Color getQuantizedColor(Color c) {
     var r = c.r as int;

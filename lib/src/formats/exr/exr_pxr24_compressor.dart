@@ -73,7 +73,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
         pixel[0] = 0;
 
         switch (ch.type) {
-          case ExrChannel.TYPE_UINT:
+          case ExrChannelType.uint:
             ptr[0] = tmpEnd;
             ptr[1] = ptr[0] + n;
             ptr[2] = ptr[1] + n;
@@ -88,7 +88,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
               }
             }
             break;
-          case ExrChannel.TYPE_HALF:
+          case ExrChannelType.half:
             ptr[0] = tmpEnd;
             ptr[1] = ptr[0] + n;
             tmpEnd = ptr[1] + n;
@@ -101,7 +101,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
               }
             }
             break;
-          case ExrChannel.TYPE_FLOAT:
+          case ExrChannelType.float:
             ptr[0] = tmpEnd;
             ptr[1] = ptr[0] + n;
             ptr[2] = ptr[1] + n;

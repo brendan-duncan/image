@@ -170,7 +170,7 @@ class PsdLayer {
 
         // Layer effects data
         if (tag == 'lrFX') {
-          final fxData = (additionalData['lrFX'] as PsdLayerAdditionalData);
+          final fxData = additionalData['lrFX'] as PsdLayerAdditionalData;
           final data = InputBuffer.from(fxData.data);
           /*int version =*/
           data.readUint16();

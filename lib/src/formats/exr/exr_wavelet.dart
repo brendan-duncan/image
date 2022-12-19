@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import '../../util/bit_utils.dart';
 
 class ExrWavelet {
-  static void decode(
-      Uint16List input, int si, int nx, int ox, int ny, int oy, int mx) {
-    final w14 = (mx < (1 << 14));
+  static void decode(Uint16List input, int si, int nx, int ox, int ny,
+      int oy, int mx) {
+    final w14 = mx < (1 << 14);
     final n = (nx > ny) ? ny : nx;
     var p = 1;
     int p2;
@@ -124,10 +124,9 @@ class ExrWavelet {
     }
   }
 
-  static const NBITS = 16;
-  static const A_OFFSET = 1 << (NBITS - 1);
-  static const M_OFFSET = 1 << (NBITS - 1);
-  static const MOD_MASK = (1 << NBITS) - 1;
+  static const _numBits = 16;
+  static const _aOffset = 1 << (_numBits - 1);
+  static const _modMask = (1 << _numBits) - 1;
 
   static void wdec14(int l, int h, List<int> a_b) {
     final ls = uint16ToInt16(l);
@@ -146,8 +145,8 @@ class ExrWavelet {
   static void wdec16(int l, int h, List<int> a_b) {
     final m = l;
     final d = h;
-    final bb = (m - (d >> 1)) & MOD_MASK;
-    final aa = (d + bb - A_OFFSET) & MOD_MASK;
+    final bb = (m - (d >> 1)) & _modMask;
+    final aa = (d + bb - _aOffset) & _modMask;
     a_b[1] = bb;
     a_b[0] = aa;
   }

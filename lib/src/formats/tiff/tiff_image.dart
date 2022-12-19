@@ -59,7 +59,7 @@ class TiffImage {
       final tag = p.readUint16();
       final ti = p.readUint16();
       final type = IfdValueType.values[ti];
-      final typeSize = IfdValueTypeSize[ti];
+      final typeSize = ifdValueTypeSize[ti];
       final count = p.readUint32();
       var valueOffset = 0;
       // The value for the tag is either stored in another location,
@@ -76,29 +76,29 @@ class TiffImage {
 
       tags[entry.tag] = entry;
 
-      if (tag == ExifTagNameToID['ImageWidth']) {
+      if (tag == exifTagNameToID['ImageWidth']) {
         width = entry.read()?.toInt() ?? 0;
-      } else if (tag == ExifTagNameToID['ImageLength']) {
+      } else if (tag == exifTagNameToID['ImageLength']) {
         height = entry.read()?.toInt() ?? 0;
-      } else if (tag == ExifTagNameToID['PhotometricInterpretation']) {
+      } else if (tag == exifTagNameToID['PhotometricInterpretation']) {
         final pt = entry.read()?.toInt() ?? TiffPhotometricType.values.length;
         if (pt < TiffPhotometricType.values.length) {
           photometricType = TiffPhotometricType.values[pt];
         } else {
           photometricType = TiffPhotometricType.unknown;
         }
-      } else if (tag == ExifTagNameToID['Compression']) {
+      } else if (tag == exifTagNameToID['Compression']) {
         compression = entry.read()?.toInt() ?? 0;
-      } else if (tag == ExifTagNameToID['BitsPerSample']) {
+      } else if (tag == exifTagNameToID['BitsPerSample']) {
         bitsPerSample = entry.read()?.toInt() ?? 0;
-      } else if (tag == ExifTagNameToID['SamplesPerPixel']) {
+      } else if (tag == exifTagNameToID['SamplesPerPixel']) {
         samplesPerPixel = entry.read()?.toInt() ?? 0;
-      } else if (tag == ExifTagNameToID['Predictor']) {
+      } else if (tag == exifTagNameToID['Predictor']) {
         predictor = entry.read()?.toInt() ?? 0;
-      } else if (tag == ExifTagNameToID['SampleFormat']) {
+      } else if (tag == exifTagNameToID['SampleFormat']) {
         final v = entry.read()?.toInt() ?? 0;
         sampleFormat = TiffFormat.values[v];
-      } else if (tag == ExifTagNameToID['ColorMap']) {
+      } else if (tag == exifTagNameToID['ColorMap']) {
         colorMap = entry.read()?.toData();
         colorMapRed = 0;
         colorMapGreen = colorMap!.length ~/ 3;
@@ -121,21 +121,21 @@ class TiffImage {
       isWhiteZero = true;
     }
 
-    if (hasTag(ExifTagNameToID['TileOffsets']!)) {
+    if (hasTag(exifTagNameToID['TileOffsets']!)) {
       tiled = true;
       // Image is in tiled format
-      tileWidth = _readTag(ExifTagNameToID['TileWidth']!);
-      tileHeight = _readTag(ExifTagNameToID['TileLength']!);
-      tileOffsets = _readTagList(ExifTagNameToID['TileOffsets']!);
-      tileByteCounts = _readTagList(ExifTagNameToID['TileByteCounts']!);
+      tileWidth = _readTag(exifTagNameToID['TileWidth']!);
+      tileHeight = _readTag(exifTagNameToID['TileLength']!);
+      tileOffsets = _readTagList(exifTagNameToID['TileOffsets']!);
+      tileByteCounts = _readTagList(exifTagNameToID['TileByteCounts']!);
     } else {
       tiled = false;
 
-      tileWidth = _readTag(ExifTagNameToID['TileWidth']!, width);
-      if (!hasTag(ExifTagNameToID['RowsPerStrip']!)) {
-        tileHeight = _readTag(ExifTagNameToID['TileLength']!, height);
+      tileWidth = _readTag(exifTagNameToID['TileWidth']!, width);
+      if (!hasTag(exifTagNameToID['RowsPerStrip']!)) {
+        tileHeight = _readTag(exifTagNameToID['TileLength']!, height);
       } else {
-        final l = _readTag(ExifTagNameToID['RowsPerStrip']!);
+        final l = _readTag(exifTagNameToID['RowsPerStrip']!);
         var infinity = 1;
         infinity = (infinity << 32) - 1;
         if (l == infinity) {
@@ -146,8 +146,8 @@ class TiffImage {
         }
       }
 
-      tileOffsets = _readTagList(ExifTagNameToID['StripOffsets']!);
-      tileByteCounts = _readTagList(ExifTagNameToID['StripByteCounts']!);
+      tileOffsets = _readTagList(exifTagNameToID['StripOffsets']!);
+      tileByteCounts = _readTagList(exifTagNameToID['StripByteCounts']!);
     }
 
     // Calculate number of tiles and the tileSize in bytes
@@ -155,10 +155,10 @@ class TiffImage {
     tilesY = (height + tileHeight - 1) ~/ tileHeight;
     tileSize = tileWidth * tileHeight * samplesPerPixel;
 
-    fillOrder = _readTag(ExifTagNameToID['FillOrder']!, 1);
-    t4Options = _readTag(ExifTagNameToID['T4Options']!);
-    t6Options = _readTag(ExifTagNameToID['T6Options']!);
-    extraSamples = _readTag(ExifTagNameToID['ExtraSamples']!);
+    fillOrder = _readTag(exifTagNameToID['FillOrder']!, 1);
+    t4Options = _readTag(exifTagNameToID['T4Options']!);
+    t6Options = _readTag(exifTagNameToID['T6Options']!);
+    extraSamples = _readTag(exifTagNameToID['ExtraSamples']!);
 
     // Determine which kind of image we are dealing with.
     switch (photometricType) {
@@ -205,8 +205,8 @@ class TiffImage {
             samplesPerPixel == 3) {
           imageType = TiffImageType.rgb;
         } else {
-          if (hasTag(ExifTagNameToID['YCbCrSubSampling']!)) {
-            final v = tags[ExifTagNameToID['YCbCrSubSampling']!]!.read()!;
+          if (hasTag(exifTagNameToID['YCbCrSubSampling']!)) {
+            final v = tags[exifTagNameToID['YCbCrSubSampling']!]!.read()!;
             chromaSubH = v.toInt();
             chromaSubV = v.toInt(1);
           } else {
