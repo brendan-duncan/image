@@ -10,7 +10,7 @@ void copyResizeTest() {
     final i0 = copyResize(img, width: 64);
     expect(i0.width, equals(64));
     expect(i0.height, equals(39));
-    File('$tmpPath/out/transform/copyResize.png')
+    File('$testOutputPath/transform/copyResize.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

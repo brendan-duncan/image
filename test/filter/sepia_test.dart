@@ -9,7 +9,7 @@ void sepiaTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     sepia(i0);
-    File('$tmpPath/out/filter/sepia.png')
+    File('$testOutputPath/filter/sepia.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

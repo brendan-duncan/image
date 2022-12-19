@@ -12,7 +12,7 @@ void jpegTest() {
       expect(image.width, equals(300));
       expect(image.height, equals(186));
       expect(image.numChannels, equals(3));
-      File('$tmpPath/out/jpg/decode.png')
+      File('$testOutputPath/jpg/decode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
     });
@@ -20,7 +20,7 @@ void jpegTest() {
     test('encode', () {
       final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
       final image = JpegDecoder().decodeImage(fb)!;
-      File('$tmpPath/out/jpg/encode.png')
+      File('$testOutputPath/jpg/encode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(image));
     });
@@ -30,7 +30,7 @@ void jpegTest() {
       final image = JpegDecoder().decodeImage(fb)!;
       expect(image.width, 341);
       expect(image.height, 486);
-      File('$tmpPath/out/jpg/progressive.png')
+      File('$testOutputPath/jpg/progressive.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
     });
@@ -62,7 +62,7 @@ void jpegTest() {
 
         final image = JpegDecoder().decodeImage(bytes)!;
         final outJpg = JpegEncoder().encodeImage(image);
-        File('$tmpPath/out/jpg/$name.jpg')
+        File('$testOutputPath/jpg/$name.jpg')
           ..createSync(recursive: true)
           ..writeAsBytesSync(outJpg);
 
@@ -77,7 +77,7 @@ void jpegTest() {
       test('exif/orientation_$i/landscape', () {
         final image = JpegDecoder().decodeImage(
             File('test/_data/jpg/landscape_$i.jpg').readAsBytesSync())!;
-        File('$tmpPath/out/jpg/landscape_$i.jpg')
+        File('$testOutputPath/jpg/landscape_$i.jpg')
           ..createSync(recursive: true)
           ..writeAsBytesSync(JpegEncoder().encodeImage(image));
       });
@@ -85,7 +85,7 @@ void jpegTest() {
       test('exif/orientation_$i/portrait', () {
         final image = JpegDecoder().decodeImage(
             File('test/_data/jpg/portrait_$i.jpg').readAsBytesSync())!;
-        File('$tmpPath/out/jpg/portrait_$i.jpg')
+        File('$testOutputPath/jpg/portrait_$i.jpg')
           ..createSync(recursive: true)
           ..writeAsBytesSync(JpegEncoder().encodeImage(image));
       });

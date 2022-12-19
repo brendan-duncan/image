@@ -22,14 +22,14 @@ void gifTest() {
         if (anim != null) {
           final gif = encodeGifAnimation(anim);
           if (anim.length > 1) {
-            File('$tmpPath/out/gif/${name}_anim.gif')
+            File('$testOutputPath/gif/${name}_anim.gif')
               ..createSync(recursive: true)
               ..writeAsBytesSync(gif);
           }
 
           for (var frame in anim) {
             final gif = encodeGif(frame);
-            File('$tmpPath/out/gif/${name}_${frame.frameInfo.index}.gif')
+            File('$testOutputPath/gif/${name}_${frame.frameInfo.index}.gif')
               ..createSync(recursive: true)
               ..writeAsBytesSync(gif);
           }
@@ -60,7 +60,7 @@ void gifTest() {
       }
 
       final gif = encodeGifAnimation(anim);
-      File('$tmpPath/out/gif/encodeAnimation.gif')
+      File('$testOutputPath/gif/encodeAnimation.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
 
@@ -79,7 +79,7 @@ void gifTest() {
       }
 
       final gif = encodeGifAnimation(anim);
-      File('$tmpPath/out/gif/encodeAnimation_variable_fps.gif')
+      File('$testOutputPath/gif/encodeAnimation_variable_fps.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
 
@@ -96,7 +96,7 @@ void gifTest() {
           File('test/_data/gif/buck_24.gif').readAsBytesSync())!;
       final resized = copyResize(image, width: 16, height: 16);
       final gif = encodeGif(resized);
-      File('$tmpPath/out/gif/encode_small_gif.gif')
+      File('$testOutputPath/gif/encode_small_gif.gif')
         ..createSync(recursive: true)
         ..writeAsBytesSync(gif);
     });

@@ -15,7 +15,7 @@ void dropShadowTest() {
     ..clear(ColorRgb8(255, 255, 255));
     drawImage(i1, id);
 
-    File('$tmpPath/out/filter/dropShadow.png')
+    File('$testOutputPath/filter/dropShadow.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i1));
   });

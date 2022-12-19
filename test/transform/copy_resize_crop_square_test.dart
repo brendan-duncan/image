@@ -10,7 +10,7 @@ void copyResizeCropSquareTest() {
     final i0 = copyResizeCropSquare(img, 64);
     expect(i0.width, equals(64));
     expect(i0.height, equals(64));
-    File('$tmpPath/out/transform/copyResizeCropSquare.png')
+    File('$testOutputPath/transform/copyResizeCropSquare.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

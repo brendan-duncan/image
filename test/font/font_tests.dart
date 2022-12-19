@@ -16,7 +16,7 @@ void fontTests() {
       final img = copyResize(image, width: 400);
       drawString(img, font, 10, 50, 'Testing Font 1: Hello World');
 
-      File('$tmpPath/out/font/font_zip_xml.jpg')
+      File('$testOutputPath/font/font_zip_xml.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(img));
     });
@@ -29,7 +29,7 @@ void fontTests() {
       drawString(img, font, 10, 50, 'Testing Font 2: Hello World',
           color: ColorRgba8(255, 0, 0, 128));
 
-      File('$tmpPath/out/font/font_zip_text.jpg')
+      File('$testOutputPath/font/font_zip_text.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(img));
     });
@@ -39,7 +39,7 @@ void fontTests() {
       drawString(img, arial14, 10, 50, 'Testing Arial 14: Hello World',
           color: ColorRgba8(255, 0, 0, 128));
 
-      File('$tmpPath/out/font/font_arial_14.jpg')
+      File('$testOutputPath/font/font_arial_14.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(img));
     });
@@ -49,7 +49,7 @@ void fontTests() {
       drawString(img, arial24, 10, 50, 'Testing Arial 24: Hello World',
           color: ColorRgba8(255, 0, 0, 128));
 
-      File('$tmpPath/out/font/font_arial_24.jpg')
+      File('$testOutputPath/font/font_arial_24.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(img));
     });
@@ -59,7 +59,7 @@ void fontTests() {
       drawString(img, arial48, 10, 50, 'Testing Arial 48: Hello World',
           color: ColorRgba8(255, 0, 0, 128));
 
-      File('$tmpPath/out/font/font_arial_48.jpg')
+      File('$testOutputPath/font/font_arial_48.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(img));
     });
@@ -69,7 +69,7 @@ void fontTests() {
       drawStringCentered(img, arial24, 'Testing Arial 24: Hello World',
           y: 50, color: ColorRgba8(255, 0, 0, 128));
 
-      File('$tmpPath/out/font/y_centered.jpg')
+      File('$testOutputPath/font/y_centered.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(img));
     });
@@ -79,7 +79,7 @@ void fontTests() {
       drawStringCentered(img, arial24, 'Testing Arial 24: Hello World',
           x: 10, color: ColorRgba8(255, 0, 0, 128));
 
-      File('$tmpPath/out/font/x_centered.jpg')
+      File('$testOutputPath/font/x_centered.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(img));
     });
@@ -89,7 +89,7 @@ void fontTests() {
       drawStringCentered(img, arial24, 'Testing Arial 24: Hello World',
           color: ColorRgba8(255, 0, 0, 128));
 
-      File('$tmpPath/out/font/xy_centered.jpg')
+      File('$testOutputPath/font/xy_centered.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(img));
     });

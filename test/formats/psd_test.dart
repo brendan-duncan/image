@@ -19,7 +19,7 @@ void psdTest() {
       test(name, () {
         final psd = PsdDecoder().decodeImage(f.readAsBytesSync());
         expect(psd, isNotNull);
-        File('$tmpPath/out/psd/$name.png')
+        File('$testOutputPath/psd/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(psd!));
       });

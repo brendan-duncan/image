@@ -9,7 +9,7 @@ void scaleRgbaTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     scaleRgba(i0, ColorRgb8(128, 128, 128));
-    File('$tmpPath/out/filter/scaleRgba.png')
+    File('$testOutputPath/filter/scaleRgba.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

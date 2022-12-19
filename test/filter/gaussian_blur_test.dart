@@ -9,7 +9,7 @@ void gaussianBlurTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     gaussianBlur(i0, 10);
-    File('$tmpPath/out/filter/gaussianBlur.png')
+    File('$testOutputPath/filter/gaussianBlur.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

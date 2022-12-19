@@ -14,7 +14,7 @@ void icoTest() {
 
       // Encode the image to ICO
       final ico = IcoEncoder().encodeImage(image);
-      File('$tmpPath/out/ico/encode.ico')
+      File('$testOutputPath/ico/encode.ico')
         ..createSync(recursive: true)
         ..writeAsBytesSync(ico);
 
@@ -22,7 +22,7 @@ void icoTest() {
       ..clear(ColorRgb8(100, 255, 200));
 
       final ico2 = IcoEncoder().encodeImages([image, image2]);
-      File('$tmpPath/out/ico/encode2.ico')
+      File('$testOutputPath/ico/encode2.ico')
         ..createSync(recursive: true)
         ..writeAsBytesSync(ico2);
 
@@ -30,7 +30,7 @@ void icoTest() {
       ..clear(ColorRgb8(255, 100, 200));
 
       final ico3 = IcoEncoder().encodeImages([image, image2, image3]);
-      File('$tmpPath/out/ico/encode3.ico')
+      File('$testOutputPath/ico/encode3.ico')
         ..createSync(recursive: true)
         ..writeAsBytesSync(ico3);
     });
@@ -50,7 +50,7 @@ void icoTest() {
         final bytes = file.readAsBytesSync();
         final image = IcoDecoder().decodeImageLargest(bytes)!;
         final i8 = image.convert(format: Format.uint8);
-        File('$tmpPath/out/ico/$name.png')
+        File('$testOutputPath/ico/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(i8));
       });

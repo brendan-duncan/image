@@ -10,19 +10,19 @@ void copyFlipTest() {
 
     final ih = copyFlip(img, FlipDirection.horizontal);
     expect(ih.numChannels, equals(ih.numChannels));
-    File('$tmpPath/out/transform/copyFlip_h.png')
+    File('$testOutputPath/transform/copyFlip_h.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(ih));
 
     final iv = copyFlip(img, FlipDirection.vertical);
     expect(iv.numChannels, equals(ih.numChannels));
-    File('$tmpPath/out/transform/copyFlip_v.png')
+    File('$testOutputPath/transform/copyFlip_v.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(iv));
 
     final ib = copyFlip(img, FlipDirection.both);
     expect(ib.numChannels, equals(ih.numChannels));
-    File('$tmpPath/out/transform/copyFlip_b.png')
+    File('$testOutputPath/transform/copyFlip_b.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(ib));
   });

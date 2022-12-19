@@ -14,7 +14,7 @@ void exrTest() {
       final img = dec.decodeFrame(0)!;
 
       final png = PngEncoder().encodeImage(img);
-      File('$tmpPath/out/exr/grid.png')
+      File('$testOutputPath/exr/grid.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });

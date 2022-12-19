@@ -9,7 +9,7 @@ void vignetteTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     vignette(i0);
-    File('$tmpPath/out/filter/vignette.png')
+    File('$testOutputPath/filter/vignette.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

@@ -10,7 +10,7 @@ void remapColorsTest() {
     final i0 = PngDecoder().decodeImage(bytes)!;
     remapColors(i0, red: Channel.green, green: Channel.luminance,
         blue: Channel.red);
-    File('$tmpPath/out/filter/remapColors.png')
+    File('$testOutputPath/filter/remapColors.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

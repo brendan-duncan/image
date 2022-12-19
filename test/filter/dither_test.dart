@@ -10,27 +10,27 @@ void ditherTest() {
     final i0 = PngDecoder().decodeImage(bytes)!;
 
     var id = ditherImage(i0);
-    File('$tmpPath/out/filter/dither_FloydSteinberg.bmp')
+    File('$testOutputPath/filter/dither_FloydSteinberg.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));
 
     id = ditherImage(i0, kernel: DitherKernel.atkinson);
-    File('$tmpPath/out/filter/dither_Atkinson.bmp')
+    File('$testOutputPath/filter/dither_Atkinson.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));
 
     id = ditherImage(i0, kernel: DitherKernel.falseFloydSteinberg);
-    File('$tmpPath/out/filter/dither_FalseFloydSteinberg.bmp')
+    File('$testOutputPath/filter/dither_FalseFloydSteinberg.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));
 
     id = ditherImage(i0, kernel: DitherKernel.stucki);
-    File('$tmpPath/out/filter/dither_Stucki.bmp')
+    File('$testOutputPath/filter/dither_Stucki.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));
 
     id = ditherImage(i0, kernel: DitherKernel.none);
-    File('$tmpPath/out/filter/dither_None.bmp')
+    File('$testOutputPath/filter/dither_None.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(id));
   });

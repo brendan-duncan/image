@@ -9,7 +9,7 @@ void bumpToNormalTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     bumpToNormal(i0);
-    File('$tmpPath/out/filter/bumpToNormal.png')
+    File('$testOutputPath/filter/bumpToNormal.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

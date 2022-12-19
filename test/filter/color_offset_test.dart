@@ -9,7 +9,7 @@ void colorOffsetTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     colorOffset(i0, red: 50, green: 10, blue: 30);
-    File('$tmpPath/out/filter/colorOffset.png')
+    File('$testOutputPath/filter/colorOffset.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

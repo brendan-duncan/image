@@ -9,7 +9,7 @@ void embossTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     emboss(i0);
-    File('$tmpPath/out/filter/emboss.png')
+    File('$testOutputPath/filter/emboss.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

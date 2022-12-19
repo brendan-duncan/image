@@ -12,7 +12,7 @@ void copyRotateTest() {
     for (var i = 0; i < 360; i += 45) {
       final i0 = copyRotate(i4, i);
       expect(i0.numChannels, equals(i4.numChannels));
-      File('$tmpPath/out/transform/copyRotate_$i.png')
+      File('$testOutputPath/transform/copyRotate_$i.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     }

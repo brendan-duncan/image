@@ -19,7 +19,7 @@ void pngTest() {
       for (var filter in PngFilter.values) {
         test('b1_1_${filter.name}', () {
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b1_1_${filter.name}.png')
+          File('$testOutputPath/png/b1_1_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -40,7 +40,7 @@ void pngTest() {
       for (var filter in PngFilter.values) {
         test('b1_1_${filter.name}', () {
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b1_1_${filter.name}.png')
+          File('$testOutputPath/png/b1_1_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -63,7 +63,7 @@ void pngTest() {
       for (var filter in PngFilter.values) {
         test('b1_1p_${filter.name}', () {
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b1_p_${filter.name}.png')
+          File('$testOutputPath/png/b1_p_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -85,7 +85,7 @@ void pngTest() {
         test('b2_1_${filter.name}', () {
           // should encode to grayscale
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b2_1_${filter.name}.png')
+          File('$testOutputPath/png/b2_1_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -109,7 +109,7 @@ void pngTest() {
         test('b2_1p_${filter.name}', () {
           // should encode to indexed
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b2_1p_${filter.name}.png')
+          File('$testOutputPath/png/b2_1p_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -131,7 +131,7 @@ void pngTest() {
         test('b4_1_${filter.name}', () {
           // should encode to grayscale
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b4_1_${filter.name}.png')
+          File('$testOutputPath/png/b4_1_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -155,7 +155,7 @@ void pngTest() {
         test('b4_1p_${filter.name}', () {
           // should encode to indexed
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b4_1p_${filter.name}.png')
+          File('$testOutputPath/png/b4_1p_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -178,7 +178,7 @@ void pngTest() {
       for (var filter in PngFilter.values) {
         test('b8_3_${filter.name}', () {
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b8_3_${filter.name}.png')
+          File('$testOutputPath/png/b8_3_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -201,7 +201,7 @@ void pngTest() {
       for (var filter in PngFilter.values) {
         test('b8_3p_${filter.name}', () {
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b8_3p_${filter.name}.png')
+          File('$testOutputPath/png/b8_3p_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -224,7 +224,7 @@ void pngTest() {
       for (var filter in PngFilter.values) {
         test('b8_3_${filter.name}', () {
           final png = encodePng(image, filter: filter);
-          File('$tmpPath/out/png/b16_3_${filter.name}.png')
+          File('$testOutputPath/png/b16_3_${filter.name}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
@@ -265,7 +265,7 @@ void pngTest() {
       }
 
       final png = encodePng(image);
-      File('$tmpPath/out/png/encode_palette.png')
+      File('$testOutputPath/png/encode_palette.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -289,14 +289,14 @@ void pngTest() {
       expect(image.hasPalette, equals(true));
 
       final png = encodePng(image);
-      File('$tmpPath/out/png/decode_palette.png')
+      File('$testOutputPath/png/decode_palette.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
 
     test('encode filter:none', () {
       final png = PngEncoder(filter: PngFilter.none).encodeImage(buck24Image!);
-      final file = File('$tmpPath/out/png/encode_filter_none.png')
+      final file = File('$testOutputPath/png/encode_filter_none.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -307,7 +307,7 @@ void pngTest() {
 
     test('encode filter:sub', () {
       final png = PngEncoder(filter: PngFilter.sub).encodeImage(buck24Image!);
-      final file = File('$tmpPath/out/png/encode_filter_sub.png')
+      final file = File('$testOutputPath/png/encode_filter_sub.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -318,7 +318,7 @@ void pngTest() {
 
     test('encode filter:up', () {
       final png = PngEncoder(filter: PngFilter.up).encodeImage(buck24Image!);
-      final file = File('$tmpPath/out/png/encode_filter_up.png')
+      final file = File('$testOutputPath/png/encode_filter_up.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -329,7 +329,7 @@ void pngTest() {
 
     test('encode filter:average', () {
       final png = PngEncoder(filter: PngFilter.sub).encodeImage(buck24Image!);
-      final file = File('$tmpPath/out/png/encode_filter_average.png')
+      final file = File('$testOutputPath/png/encode_filter_average.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -340,7 +340,7 @@ void pngTest() {
 
     test('encode filter:paeth', () {
       final png = PngEncoder().encodeImage(buck24Image!);
-      final file = File('$tmpPath/out/png/encode_filter_paeth.png')
+      final file = File('$testOutputPath/png/encode_filter_paeth.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
@@ -363,7 +363,7 @@ void pngTest() {
 
         for (var i = 0; i < anim.length; ++i) {
           final png = PngEncoder().encodeImage(anim[i]);
-          File('$tmpPath/out/png/${f[2]}-$i.png')
+          File('$testOutputPath/png/${f[2]}-$i.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
         }
@@ -380,7 +380,7 @@ void pngTest() {
       }
 
       final png = encodePngAnimation(anim);
-      File('$tmpPath/out/png/encodeAnimation.png')
+      File('$testOutputPath/png/encodeAnimation.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
     });
@@ -462,7 +462,7 @@ void pngTest() {
           if (anim != null) {
             if (anim.length == 1) {
               final png = PngEncoder().encodeImage(anim[0]);
-              File('$tmpPath/out/png/$name.png')
+              File('$testOutputPath/png/$name.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
 
@@ -479,7 +479,7 @@ void pngTest() {
             } else {
               for (var i = 0; i < anim.length; ++i) {
                 final png = PngEncoder().encodeImage(anim[i]);
-                File('$tmpPath/out/png/$name-$i.png')
+                File('$testOutputPath/png/$name-$i.png')
                   ..createSync(recursive: true)
                   ..writeAsBytesSync(png);
               }

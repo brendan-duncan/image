@@ -12,7 +12,7 @@ void webpTest() {
       test('$name.webp', () {
         final webp = decodeWebP(File('$path/$name.webp').readAsBytesSync())!;
         final png = decodePng(File('$path/$name.png').readAsBytesSync())!;
-        File('$tmpPath/out/webp/$name.png')
+        File('$testOutputPath/webp/$name.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(PngEncoder().encodeImage(webp));
         testImageEquals(webp, png);
@@ -58,7 +58,7 @@ void webpTest() {
         var bytes = File('test/_data/webp/2b.webp').readAsBytesSync();
         final image = WebPDecoder().decodeImage(bytes)!;
         final png = PngEncoder().encodeImage(image);
-        File('$tmpPath/out/webp/decode.png')
+        File('$testOutputPath/webp/decode.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
 
@@ -83,7 +83,7 @@ void webpTest() {
           }
 
           final png = PngEncoder().encodeImage(image);
-          File('$tmpPath/out/webp/$name.png')
+          File('$testOutputPath/webp/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
         });
@@ -101,7 +101,7 @@ void webpTest() {
 
         for (var i = 0; i < anim.numFrames; ++i) {
           final image = anim.frames[i];
-          File('$tmpPath/out/webp/animated_transparency_$i.png')
+          File('$testOutputPath/webp/animated_transparency_$i.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(PngEncoder().encodeImage(image));
         }

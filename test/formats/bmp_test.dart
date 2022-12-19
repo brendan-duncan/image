@@ -22,7 +22,7 @@ void bmpTest() {
         }
 
         final bmp = BmpEncoder().encodeImage(image);
-        File('$tmpPath/out/bmp/$name.bmp')
+        File('$testOutputPath/bmp/$name.bmp')
           ..createSync(recursive: true)
           ..writeAsBytesSync(bmp);
 
@@ -31,7 +31,7 @@ void bmpTest() {
         testImageEquals(image2, image);
 
         final bmp2 = BmpEncoder().encodeImage(image2);
-        File('$tmpPath/out/bmp/${name}2.bmp')
+        File('$testOutputPath/bmp/${name}2.bmp')
           ..createSync(recursive: true)
           ..writeAsBytesSync(bmp2);
       });

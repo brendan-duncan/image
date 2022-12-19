@@ -9,7 +9,7 @@ void smoothTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     smooth(i0, 0.5);
-    File('$tmpPath/out/filter/smooth.png')
+    File('$testOutputPath/filter/smooth.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

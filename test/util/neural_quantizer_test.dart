@@ -14,19 +14,19 @@ void neuralQuantizerTest() {
 
     final q = NeuralQuantizer(img);
     var img2 = q.getIndexImage(img);
-    File('$tmpPath/out/util/neuralQuantizer_256_10.bmp')
+    File('$testOutputPath/util/neuralQuantizer_256_10.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(img2));
 
     final q_1 = NeuralQuantizer(img, samplingFactor: 1);
     img2 = q_1.getIndexImage(img);
-    File('$tmpPath/out/util/neuralQuantizer_256_1.bmp')
+    File('$testOutputPath/util/neuralQuantizer_256_1.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(img2));
 
     final q_100 = NeuralQuantizer(img, samplingFactor: 100);
     img2 = q_100.getIndexImage(img);
-    File('$tmpPath/out/util/neuralQuantizer_256_100.bmp')
+    File('$testOutputPath/util/neuralQuantizer_256_100.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(img2));
   });

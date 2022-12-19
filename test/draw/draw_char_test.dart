@@ -15,7 +15,7 @@ void drawCharTest() {
     drawChar(i0, arial24, 110, 110, "l", color: ColorRgba8(0, 0, 255));
     drawChar(i0, arial24, 130, 130, "o", color: ColorRgba8(255, 0, 0, 128));
 
-    File('$tmpPath/out/draw/draw_char_0.png')
+    File('$testOutputPath/draw/draw_char_0.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

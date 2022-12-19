@@ -27,7 +27,7 @@ void tgaTest() {
 
         //final png = PngEncoder().encodeImage(image);
         final png = TgaEncoder().encodeImage(image);
-        File('$tmpPath/out/tga/$name.tga')
+        File('$testOutputPath/tga/$name.tga')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
       });
@@ -44,7 +44,7 @@ void tgaTest() {
       // Encode the image as a tga
       final tga = TgaEncoder().encodeImage(image);
 
-      File('$tmpPath/out/tga/globe.tga')
+      File('$testOutputPath/tga/globe.tga')
         ..createSync(recursive: true)
         ..writeAsBytesSync(tga);
 

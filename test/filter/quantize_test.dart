@@ -10,13 +10,13 @@ void quantizeTest() {
 
     final i0 = PngDecoder().decodeImage(bytes)!;
     quantize(i0, numberOfColors: 32, method: QuantizeMethod.octree);
-    File('$tmpPath/out/filter/quantize_octree.png')
+    File('$testOutputPath/filter/quantize_octree.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
 
     final i1 = PngDecoder().decodeImage(bytes)!;
     quantize(i1, numberOfColors: 32);
-    File('$tmpPath/out/filter/quantize_neural.png')
+    File('$testOutputPath/filter/quantize_neural.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i1));
   });

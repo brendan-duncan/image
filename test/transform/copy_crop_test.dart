@@ -12,7 +12,7 @@ void copyCropTest() {
     expect(i0_1.width, equals(100));
     expect(i0_1.height, equals(100));
     expect(i0_1.format, equals(i0.format));
-    File('$tmpPath/out/transform/copyCrop.png')
+    File('$testOutputPath/transform/copyCrop.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0_1));
   });

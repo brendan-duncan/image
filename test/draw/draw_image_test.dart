@@ -19,7 +19,7 @@ void drawImageTest() {
     drawImage(i0, i1, dstX: 50, dstY: 50, dstW: 100, dstH: 100);
     drawImage(i0, i1, dstX: 100, dstY: 100, dstW: 100, dstH: 100);
 
-    File('$tmpPath/out/draw/drawImage_0.png')
+    File('$testOutputPath/draw/drawImage_0.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
 
@@ -32,13 +32,13 @@ void drawImageTest() {
     }
     var bg = decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
     drawImage(bg, fg, dstX: 50, dstY: 50);
-    File('$tmpPath/out/draw/drawImage_1.png')
+    File('$testOutputPath/draw/drawImage_1.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(bg));
 
     bg = decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
     drawImage(bg, fg, dstX: 50, dstY: 50, dstW: 200, dstH: 200);
-    File('$tmpPath/out/draw/drawImage_3.png')
+    File('$testOutputPath/draw/drawImage_3.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(bg));
   });

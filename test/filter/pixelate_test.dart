@@ -10,12 +10,12 @@ void pixelateTest() {
     final i0 = PngDecoder().decodeImage(bytes)!;
     final i1 = i0.clone();
     pixelate(i0, 10);
-    File('$tmpPath/out/filter/pixelate_upperLeft.png')
+    File('$testOutputPath/filter/pixelate_upperLeft.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
 
     pixelate(i1, 10, mode: PixelateMode.average);
-    File('$tmpPath/out/filter/pixelate_average.png')
+    File('$testOutputPath/filter/pixelate_average.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i1));
   });

@@ -9,7 +9,7 @@ void pvrtcTest() {
     test('globe', () {
       final bytes = File('test/_data/pvr/globe.pvr').readAsBytesSync();
       final image = PvrtcDecoder().decodePvr(bytes)!;
-      File('$tmpPath/out/pvr/globe.pvr.png')
+      File('$testOutputPath/pvr/globe.pvr.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
     });
@@ -20,18 +20,18 @@ void pvrtcTest() {
         p.setColor(p.x, p.x, p.x);
       }
 
-      File('$tmpPath/out/pvr/rgb4bpp_before.png')
+      File('$testOutputPath/pvr/rgb4bpp_before.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
       final pvr = PvrtcEncoder().encodeRgb4bpp(image);
-      File('$tmpPath/out/pvr/rgb4bpp.pvr')
+      File('$testOutputPath/pvr/rgb4bpp.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
 
       final decoded = PvrtcDecoder().decodeRgb4bpp(image.width,
           image.height, pvr);
-      File('$tmpPath/out/pvr/rgb4bpp.png')
+      File('$testOutputPath/pvr/rgb4bpp.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
     });
@@ -40,7 +40,7 @@ void pvrtcTest() {
       final bytes = File('test/_data/png/alpha_edge.png').readAsBytesSync();
       final image = PngDecoder().decodeImage(bytes)!;
 
-      File('$tmpPath/out/pvr/alpha_before.png')
+      File('$testOutputPath/pvr/alpha_before.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(image));
 
@@ -49,12 +49,12 @@ void pvrtcTest() {
 
       final decoded = PvrtcDecoder().decodeRgba4bpp(image.width, image.height,
           pvrtc);
-      File('$tmpPath/out/pvr/alpha_after.png')
+      File('$testOutputPath/pvr/alpha_after.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(decoded));
 
       final pvr = PvrtcEncoder().encodePvr(image);
-      File('$tmpPath/out/pvr/alpha.pvr')
+      File('$testOutputPath/pvr/alpha.pvr')
         ..createSync(recursive: true)
         ..writeAsBytesSync(pvr);
     });
@@ -70,7 +70,7 @@ void pvrtcTest() {
         test(name, () {
           final bytes = f.readAsBytesSync();
           final img = PvrtcDecoder().decodePvr(bytes)!;
-          File('$tmpPath/out/pvr/$name.png')
+          File('$testOutputPath/pvr/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(encodePng(img));
         });

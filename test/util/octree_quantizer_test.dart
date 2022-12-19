@@ -16,7 +16,7 @@ void octreeQuantizerTest() {
 
     final img2 = quantizer.getIndexImage(img);
 
-    File('$tmpPath/out/util/octreeQuantizer_256.bmp')
+    File('$testOutputPath/util/octreeQuantizer_256.bmp')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodeBmp(img2));
   });

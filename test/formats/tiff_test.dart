@@ -11,7 +11,7 @@ void tiffTest() {
       final bytes = File('test/_data/tiff/$name.tif').readAsBytesSync();
       final i0 = decodeTiff(bytes)!;
       final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
-      File('$tmpPath/out/tif/$name.png')
+      File('$testOutputPath/tif/$name.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i1));
     });
@@ -80,12 +80,12 @@ void tiffTest() {
           final i0 = image!;
           final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
 
-          File('$tmpPath/out/tif/$name.png')
+          File('$testOutputPath/tif/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(encodePng(i1));
 
           final tif = encodeTiff(image);
-          File('$tmpPath/out/tif/$name.tif')
+          File('$testOutputPath/tif/$name.tif')
             ..createSync(recursive: true)
             ..writeAsBytesSync(tif);
 
@@ -94,7 +94,7 @@ void tiffTest() {
           expect(i2.height, equals(image.height));
 
           final i3 = i2.isHdrFormat ? i2.convert(format: Format.uint8) : i2;
-          File('$tmpPath/out/tif/$name-2.png')
+          File('$testOutputPath/tif/$name-2.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(encodePng(i3));
         });

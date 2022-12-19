@@ -17,7 +17,7 @@ void drawRectTest() {
     p = i0.getPixel(100, 100);
     expect(p, equals([0, 128, 0]));
 
-    File('$tmpPath/out/draw/draw_rect_0.png')
+    File('$testOutputPath/draw/draw_rect_0.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

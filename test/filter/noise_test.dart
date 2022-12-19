@@ -9,7 +9,7 @@ void noiseTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     noise(i0, 10);
-    File('$tmpPath/out/filter/noise.png')
+    File('$testOutputPath/filter/noise.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

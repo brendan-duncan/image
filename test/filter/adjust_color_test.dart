@@ -9,7 +9,7 @@ void adjustColorTest() {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     adjustColor(i0, gamma: 2.2);
-    File('$tmpPath/out/filter/adjustColor.png')
+    File('$testOutputPath/filter/adjustColor.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });
