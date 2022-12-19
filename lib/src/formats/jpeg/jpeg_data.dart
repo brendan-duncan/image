@@ -479,14 +479,14 @@ class JpegData {
 
       final component = frame!.components[id]!;
 
-      final dc_tbl_no = (c >> 4) & 15;
-      final ac_tbl_no = c & 15;
+      final dcTblNo = (c >> 4) & 15;
+      final acTblNo = c & 15;
 
-      if (dc_tbl_no < huffmanTablesDC.length) {
-        component.huffmanTableDC = huffmanTablesDC[dc_tbl_no]!;
+      if (dcTblNo < huffmanTablesDC.length) {
+        component.huffmanTableDC = huffmanTablesDC[dcTblNo]!;
       }
-      if (ac_tbl_no < huffmanTablesAC.length) {
-        component.huffmanTableAC = huffmanTablesAC[ac_tbl_no]!;
+      if (acTblNo < huffmanTablesAC.length) {
+        component.huffmanTableAC = huffmanTablesAC[acTblNo]!;
       }
 
       return component;
@@ -496,11 +496,11 @@ class JpegData {
     final spectralEnd = block.readByte();
     final successiveApproximation = block.readByte();
 
-    final Ah = (successiveApproximation >> 4) & 15;
-    final Al = successiveApproximation & 15;
+    final ah = (successiveApproximation >> 4) & 15;
+    final al = successiveApproximation & 15;
 
     JpegScan(input, frame!, components, resetInterval, spectralStart,
-            spectralEnd, Ah, Al)
+            spectralEnd, ah, al)
         .decode();
   }
 

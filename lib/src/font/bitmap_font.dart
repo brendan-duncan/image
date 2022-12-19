@@ -82,28 +82,28 @@ class BitmapFont {
   BitmapFont.fromZip(List<int> fileData) {
     final arc = ZipDecoder().decodeBytes(fileData);
 
-    ArchiveFile? font_file;
+    ArchiveFile? fontFile;
     for (var i = 0; i < arc.numberOfFiles(); ++i) {
       if (arc.fileName(i).endsWith('.fnt')) {
-        font_file = arc.files[i];
+        fontFile = arc.files[i];
         break;
       }
     }
 
-    if (font_file == null) {
+    if (fontFile == null) {
       throw ImageException('Invalid font archive');
     }
 
     /// Remove leading whitespace so xml detection is correct
-    final font_str =
-        String.fromCharCodes(font_file.content as List<int>).trimLeft();
+    final fontStr =
+        String.fromCharCodes(fontFile.content as List<int>).trimLeft();
     XmlDocument xml;
 
     /// Added <?xml which may be present, appropriately
-    if (font_str.startsWith('<?xml') || font_str.startsWith('<font>')) {
-      xml = XmlDocument.parse(font_str);
+    if (fontStr.startsWith('<?xml') || fontStr.startsWith('<font>')) {
+      xml = XmlDocument.parse(fontStr);
     } else {
-      xml = _parseTextFnt(font_str);
+      xml = _parseTextFnt(fontStr);
     }
 
     _parseFnt(xml, {}, arc);

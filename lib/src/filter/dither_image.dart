@@ -77,7 +77,7 @@ Image ditherImage(Image image, { Quantizer? quantizer,
   var direction = serpentine ? -1 : 1;
 
   final palette = quantizer.palette;
-  Image indexedImage = Image(width, height, numChannels: 1,
+  final indexedImage = Image(width, height, numChannels: 1,
       palette: palette);
 
   final pIter = image.iterator;
@@ -118,7 +118,7 @@ Image ditherImage(Image image, { Quantizer? quantizer,
         final x1 = ds[i][1].toInt();
         final y1 = ds[i][2].toInt();
         if (x1 + x >= 0 && x1 + x < width && y1 + y >= 0 && y1 + y < height) {
-          var d = ds[i][0];
+          final d = ds[i][0];
           idx = index + x1 + (y1 * width);
           idx *= 4;
           final p2 = image.getPixel(x1, y1);

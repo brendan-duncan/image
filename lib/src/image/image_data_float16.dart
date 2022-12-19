@@ -57,14 +57,14 @@ class ImageDataFloat16 extends ImageData {
   }
 
   void setPixelColor(int x, int y, num r, [num g = 0, num b = 0, num a = 0]) {
-    int index = y * width * numChannels + (x * numChannels);
-    data[index] = Float16.DoubleToFloat16(r);
+    final index = y * width * numChannels + (x * numChannels);
+    data[index] = Float16.doubleToFloat16(r);
     if (numChannels > 1) {
-      data[index + 1] = Float16.DoubleToFloat16(g);
+      data[index + 1] = Float16.doubleToFloat16(g);
       if (numChannels > 2) {
-        data[index + 2] = Float16.DoubleToFloat16(b);
+        data[index + 2] = Float16.doubleToFloat16(b);
         if (numChannels > 3) {
-          data[index + 3] = Float16.DoubleToFloat16(a);
+          data[index + 3] = Float16.doubleToFloat16(a);
         }
       }
     }

@@ -10,15 +10,15 @@ import 'flip.dart';
 Image bakeOrientation(Image image) {
   final bakedImage = Image.from(image);
   if (!image.exif.imageIfd.hasOrientation ||
-      image.exif.imageIfd.Orientation == 1) {
+      image.exif.imageIfd.orientation == 1) {
     return bakedImage;
   }
 
   // Copy all exif data except for orientation
   bakedImage.exif = ExifData.from(image.exif);
-  bakedImage.exif.imageIfd.Orientation = null;
+  bakedImage.exif.imageIfd.orientation = null;
 
-  switch (image.exif.imageIfd.Orientation) {
+  switch (image.exif.imageIfd.orientation) {
     case 2:
       return flipHorizontal(bakedImage);
     case 3:

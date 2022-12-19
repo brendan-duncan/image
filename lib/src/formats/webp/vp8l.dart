@@ -650,8 +650,8 @@ class VP8L {
       List<int> codeLengthCodeLengths, int numSymbols, List<int> codeLengths) {
     //bool ok = false;
     int symbol;
-    int max_symbol;
-    var prev_code_len = defaultCodeLength;
+    int maxSymbol;
+    var prevCodeLen = defaultCodeLength;
     final tree = HuffmanTree();
 
     if (!tree.buildImplicit(codeLengthCodeLengths, _numCodeLengthCodes)) {
@@ -660,42 +660,42 @@ class VP8L {
 
     if (br.readBits(1) != 0) {
       // use length
-      final length_nbits = 2 + 2 * br.readBits(3);
-      max_symbol = 2 + br.readBits(length_nbits);
-      if (max_symbol > numSymbols) {
+      final lengthNBits = 2 + 2 * br.readBits(3);
+      maxSymbol = 2 + br.readBits(lengthNBits);
+      if (maxSymbol > numSymbols) {
         return false;
       }
     } else {
-      max_symbol = numSymbols;
+      maxSymbol = numSymbols;
     }
 
     symbol = 0;
     while (symbol < numSymbols) {
-      int code_len;
-      if (max_symbol-- == 0) {
+      int codeLen;
+      if (maxSymbol-- == 0) {
         break;
       }
 
       br.fillBitWindow();
 
-      code_len = tree.readSymbol(br);
+      codeLen = tree.readSymbol(br);
 
-      if (code_len < _codeLengthLiterals) {
-        codeLengths[symbol++] = code_len;
-        if (code_len != 0) {
-          prev_code_len = code_len;
+      if (codeLen < _codeLengthLiterals) {
+        codeLengths[symbol++] = codeLen;
+        if (codeLen != 0) {
+          prevCodeLen = codeLen;
         }
       } else {
-        final usePrev = code_len == _codeLengthRepeatCode;
-        final slot = code_len - _codeLengthLiterals;
-        final extra_bits = _codeLengthExtraBits[slot];
-        final repeat_offset = _codeLengthRepeatOffsets[slot];
-        var repeat = br.readBits(extra_bits) + repeat_offset;
+        final usePrev = codeLen == _codeLengthRepeatCode;
+        final slot = codeLen - _codeLengthLiterals;
+        final extraBits = _codeLengthExtraBits[slot];
+        final repeatOffset = _codeLengthRepeatOffsets[slot];
+        var repeat = br.readBits(extraBits) + repeatOffset;
 
         if (symbol + repeat > numSymbols) {
           return false;
         } else {
-          final length = usePrev ? prev_code_len : 0;
+          final length = usePrev ? prevCodeLen : 0;
           while (repeat-- > 0) {
             codeLengths[symbol++] = length;
           }

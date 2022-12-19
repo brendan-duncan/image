@@ -61,8 +61,8 @@ class PngDecoder extends Decoder {
           final txtData = _input.readBytes(chunkSize).toUint8List();
           for (var i = 0, l = txtData.length; i < l; ++i) {
             if (txtData[i] == 0) {
-              var key = latin1.decode(txtData.sublist(0, i));
-              var text = latin1.decode(txtData.sublist(i + 1));
+              final key = latin1.decode(txtData.sublist(0, i));
+              final text = latin1.decode(txtData.sublist(i + 1));
               _info.textData[key] = text;
               break;
             }
@@ -268,7 +268,7 @@ class PngDecoder extends Decoder {
     int? height = _info.height;
 
     if (!_info.isAnimated || frame == 0) {
-      var dataBlocks = <Uint8List>[];
+      final dataBlocks = <Uint8List>[];
       var totalSize = 0;
       for (var i = 0, len = _info.idat.length; i < len; ++i) {
         _input.offset = _info.idat[i];
@@ -298,7 +298,7 @@ class PngDecoder extends Decoder {
       width = f.width;
       height = f.height;
       var totalSize = 0;
-      var dataBlocks = <Uint8List>[];
+      final dataBlocks = <Uint8List>[];
       for (var i = 0; i < f.fdat.length; ++i) {
         _input.offset = f.fdat[i];
         final chunkSize = _input.readUint32();
@@ -589,8 +589,7 @@ class PngDecoder extends Decoder {
 
     final pixel = [0, 0, 0, 0];
 
-    var pIter = image.iterator;
-    pIter.moveNext();
+    final pIter = image.iterator..moveNext();
     for (var y = 0, ri = 0; y < h; ++y, ri = 1 - ri) {
       final filterType = PngFilterType.values[input.readByte()];
       inData[ri] = input.readBytes(rowBytes).toUint8List();

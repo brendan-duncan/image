@@ -86,12 +86,12 @@ class WebPAlpha {
   }
 
   bool _dequantizeLevels(
-      Uint8List data, int width, int height, int row, int num_rows) {
+      Uint8List data, int width, int height, int row, int numRows) {
     if (width <= 0 ||
         height <= 0 ||
         row < 0 ||
-        num_rows < 0 ||
-        row + num_rows > height) {
+        numRows < 0 ||
+        row + numRows > height) {
       return false;
     }
     return true;

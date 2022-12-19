@@ -14,7 +14,7 @@ class TiffEntry {
 
   @override
   String toString() {
-    final exifTag = ExifImageTags[tag];
+    final exifTag = exifImageTags[tag];
     if (exifTag != null) {
       return '${exifTag.name}: $type $count';
     }

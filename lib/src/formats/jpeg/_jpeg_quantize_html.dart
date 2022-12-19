@@ -207,7 +207,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 
 Image getImageFromJpeg(JpegData jpeg) {
   final orientation =
-    jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.Orientation! : 0;
+    jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.orientation! : 0;
   final w = jpeg.width!;
   final h = jpeg.height!;
   final flipWidthHeight = orientation >= 5 && orientation <= 8;
@@ -218,7 +218,7 @@ Image getImageFromJpeg(JpegData jpeg) {
 
   // Copy exif data, except for Orientation which we're baking.
   image.exif = ExifData.from(jpeg.exif);
-  image.exif.imageIfd.Orientation = null;
+  image.exif.imageIfd.orientation = null;
 
   ComponentData component1;
   ComponentData component2;
@@ -326,12 +326,12 @@ Image getImageFromJpeg(JpegData jpeg) {
           final x3 = x >> hShift3;
 
           final cy = component1Line![x1] << 8;
-          final Cb = component2Line![x2] - 128;
-          final Cr = component3Line![x3] - 128;
+          final cb = component2Line![x2] - 128;
+          final cr = component3Line![x3] - 128;
 
-          var r = cy + 359 * Cr + 128;
-          var g = cy - 88 * Cb - 183 * Cr + 128;
-          var b = cy + 454 * Cb + 128;
+          var r = cy + 359 * cr + 128;
+          var g = cy - 88 * cb - 183 * cr + 128;
+          var b = cy + 454 * cb + 128;
 
           r = shiftR(r, 8).clamp(0, 255);
           g = shiftR(g, 8).clamp(0, 255);

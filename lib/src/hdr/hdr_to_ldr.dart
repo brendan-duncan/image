@@ -25,7 +25,7 @@ Image hdrToLdr(Image hdr, {num? exposure}) {
 
   for (var y = 0; y < hdr.height; ++y) {
     for (var x = 0; x < hdr.width; ++x) {
-      var hp = hdr.getPixel(x, y);
+      final hp = hdr.getPixel(x, y);
 
       var r = hp.r;
       var g = hdr.numChannels == 1 ? r : hp.g;

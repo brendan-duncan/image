@@ -21,7 +21,7 @@ class JpegEncoder extends Encoder {
   void setQuality(int quality) {
     quality = quality.clamp(1, 100).toInt();
 
-    if (currentQuality == quality) {
+    if (_currentQuality == quality) {
       // don't re-calc if unchanged
       return;
     }
@@ -34,7 +34,7 @@ class JpegEncoder extends Encoder {
     }
 
     _initQuantTables(sf);
-    currentQuality = quality;
+    _currentQuality = quality;
   }
 
   @override
@@ -87,22 +87,22 @@ class JpegEncoder extends Encoder {
           final b = p.b.toInt();
 
           // calculate YUV values
-          ydu[pos] = ((rgbYuvTable[r] +
-                      rgbYuvTable[(g + 256)] +
-                      rgbYuvTable[(b + 512)]) >> 16) - 128.0;
+          _ydu[pos] = ((_rgbYuvTable[r] +
+                      _rgbYuvTable[(g + 256)] +
+                      _rgbYuvTable[(b + 512)]) >> 16) - 128.0;
 
-          udu[pos] = ((rgbYuvTable[(r + 768)] +
-                      rgbYuvTable[(g + 1024)] +
-                      rgbYuvTable[(b + 1280)]) >> 16) - 128.0;
+          _udu[pos] = ((_rgbYuvTable[(r + 768)] +
+                      _rgbYuvTable[(g + 1024)] +
+                      _rgbYuvTable[(b + 1280)]) >> 16) - 128.0;
 
-          vdu[pos] = ((rgbYuvTable[(r + 1280)] +
-                      rgbYuvTable[(g + 1536)] +
-                      rgbYuvTable[(b + 1792)]) >> 16) - 128.0;
+          _vdu[pos] = ((_rgbYuvTable[(r + 1280)] +
+                      _rgbYuvTable[(g + 1536)] +
+                      _rgbYuvTable[(b + 1792)]) >> 16) - 128.0;
         }
 
-        dcy = _processDU(fp, ydu, fdtbl_Y, dcy!, ydcHuffman, yacHuffman);
-        dcu = _processDU(fp, udu, fdtbl_UV, dcu!, uvdcHuffman, uvacHuffman);
-        dcv = _processDU(fp, vdu, fdtbl_UV, dcv!, uvdcHuffman, uvacHuffman);
+        dcy = _processDU(fp, _ydu, _fdtblY, dcy!, _ydcHuffman, _yacHuffman);
+        dcu = _processDU(fp, _udu, _fdtblUv, dcu!, _uvdcHuffman, _uvacHuffman);
+        dcv = _processDU(fp, _vdu, _fdtblUv, dcv!, _uvdcHuffman, _uvacHuffman);
 
         x += 8;
       }
@@ -203,7 +203,7 @@ class JpegEncoder extends Encoder {
       } else if (t > 255) {
         t = 255;
       }
-      YTable[zigzag[i]] = t;
+      _yTable[_zigzag[i]] = t;
     }
 
     const uvqt = <int>[
@@ -280,7 +280,7 @@ class JpegEncoder extends Encoder {
       } else if (u > 255) {
         u = 255;
       }
-      UVTable[zigzag[j]] = u;
+      _uvTable[_zigzag[j]] = u;
     }
 
     const aasf = <double>[
@@ -297,26 +297,26 @@ class JpegEncoder extends Encoder {
     var k = 0;
     for (var row = 0; row < 8; row++) {
       for (var col = 0; col < 8; col++) {
-        fdtbl_Y[k] = 1.0 / (YTable[zigzag[k]] * aasf[row] * aasf[col] * 8.0);
-        fdtbl_UV[k] = 1.0 / (UVTable[zigzag[k]] * aasf[row] * aasf[col] * 8.0);
+        _fdtblY[k] = 1.0 / (_yTable[_zigzag[k]] * aasf[row] * aasf[col] * 8.0);
+        _fdtblUv[k] = 1.0 /
+            (_uvTable[_zigzag[k]] * aasf[row] * aasf[col] * 8.0);
         k++;
       }
     }
   }
 
-  List<List<int>?> _computeHuffmanTable(List<int> nrCodes,
-      List<int> std_table) {
+  List<List<int>?> _computeHuffmanTable(List<int> nrCodes, List<int> stdTable) {
     var codeValue = 0;
-    var pos_in_table = 0;
+    var posInTable = 0;
     final ht = <List<int>?>[<int>[]];
     for (var k = 1; k <= 16; k++) {
       for (var j = 1; j <= nrCodes[k]; j++) {
-        final index = std_table[pos_in_table];
+        final index = stdTable[posInTable];
         if (ht.length <= index) {
           ht.length = index + 1;
         }
         ht[index] = [codeValue, k];
-        pos_in_table++;
+        posInTable++;
         codeValue++;
       }
       codeValue *= 2;
@@ -325,13 +325,13 @@ class JpegEncoder extends Encoder {
   }
 
   void _initHuffmanTable() {
-    ydcHuffman = _computeHuffmanTable(stdDcLuminanceNrCodes,
+    _ydcHuffman = _computeHuffmanTable(stdDcLuminanceNrCodes,
         stdDcLuminanceValues);
-    uvdcHuffman = _computeHuffmanTable(stdDcChrominanceNrCodes,
+    _uvdcHuffman = _computeHuffmanTable(stdDcChrominanceNrCodes,
         stdDcChrominanceValues);
-    yacHuffman = _computeHuffmanTable(stdAcLuminanceNrCodes,
+    _yacHuffman = _computeHuffmanTable(stdAcLuminanceNrCodes,
         stdAcLuminanceValues);
-    uvacHuffman = _computeHuffmanTable(stdAcChrominanceNrCodes,
+    _uvacHuffman = _computeHuffmanTable(stdAcChrominanceNrCodes,
         stdAcChrominanceValues);
   }
 
@@ -341,13 +341,13 @@ class JpegEncoder extends Encoder {
     for (var cat = 1; cat <= 15; cat++) {
       // Positive numbers
       for (var nr = nrLower; nr < nrUpper; nr++) {
-        category[32767 + nr] = cat;
-        bitcode[32767 + nr] = [nr, cat];
+        _category[32767 + nr] = cat;
+        _bitCode[32767 + nr] = [nr, cat];
       }
       // Negative numbers
       for (var nrNeg = -(nrUpper - 1); nrNeg <= -nrLower; nrNeg++) {
-        category[32767 + nrNeg] = cat;
-        bitcode[32767 + nrNeg] = [nrUpper - 1 + nrNeg, cat];
+        _category[32767 + nrNeg] = cat;
+        _bitCode[32767 + nrNeg] = [nrUpper - 1 + nrNeg, cat];
       }
       nrLower <<= 1;
       nrUpper <<= 1;
@@ -356,14 +356,14 @@ class JpegEncoder extends Encoder {
 
   void _initRgbYuvTable() {
     for (var i = 0; i < 256; i++) {
-      rgbYuvTable[i] = 19595 * i;
-      rgbYuvTable[(i + 256)] = 38470 * i;
-      rgbYuvTable[(i + 512)] = 7471 * i + 0x8000;
-      rgbYuvTable[(i + 768)] = -11059 * i;
-      rgbYuvTable[(i + 1024)] = -21709 * i;
-      rgbYuvTable[(i + 1280)] = 32768 * i + 0x807FFF;
-      rgbYuvTable[(i + 1536)] = -27439 * i;
-      rgbYuvTable[(i + 1792)] = -5329 * i;
+      _rgbYuvTable[i] = 19595 * i;
+      _rgbYuvTable[(i + 256)] = 38470 * i;
+      _rgbYuvTable[(i + 512)] = 7471 * i + 0x8000;
+      _rgbYuvTable[(i + 768)] = -11059 * i;
+      _rgbYuvTable[(i + 1024)] = -21709 * i;
+      _rgbYuvTable[(i + 1280)] = 32768 * i + 0x807FFF;
+      _rgbYuvTable[(i + 1536)] = -27439 * i;
+      _rgbYuvTable[(i + 1792)] = -5329 * i;
     }
   }
 
@@ -485,12 +485,12 @@ class JpegEncoder extends Encoder {
     for (var i = 0; i < 64; ++i) {
       // Apply the quantization and scaling factor & Round to nearest integer
       final fDCTQuant = data[i] * fdtbl[i];
-      outputfDCTQuant[i] = (fDCTQuant > 0.0)
+      _outputfDCTQuant[i] = (fDCTQuant > 0.0)
           ? ((fDCTQuant + 0.5).toInt())
           : ((fDCTQuant - 0.5).toInt());
     }
 
-    return outputfDCTQuant;
+    return _outputfDCTQuant;
   }
 
   void _writeAPP0(OutputBuffer out) {
@@ -550,11 +550,11 @@ class JpegEncoder extends Encoder {
     out.writeUint16(132); // length
     out.writeByte(0);
     for (var i = 0; i < 64; i++) {
-      out.writeByte(YTable[i]);
+      out.writeByte(_yTable[i]);
     }
     out.writeByte(1);
     for (var j = 0; j < 64; j++) {
-      out.writeByte(UVTable[j]);
+      out.writeByte(_uvTable[j]);
     }
   }
 
@@ -610,32 +610,32 @@ class JpegEncoder extends Encoder {
     out.writeByte(0); // Bf
   }
 
-  int? _processDU(OutputBuffer out, List<double> CDU, List<double> fdtbl,
+  int? _processDU(OutputBuffer out, List<double> cdu, List<double> fdtbl,
       int dc, List<List<int>?>? htdc, List<List<int>?> htac) {
     final eob = htac[0x00];
-    final M16zeroes = htac[0xF0];
+    final m16Zeroes = htac[0xf0];
     int pos;
-    final duDct = _fDCTQuant(CDU, fdtbl);
+    final duDct = _fDCTQuant(cdu, fdtbl);
 
     // ZigZag reorder
     for (var j = 0; j < 64; ++j) {
-      DU[zigzag[j]] = duDct[j];
+      _du[_zigzag[j]] = duDct[j];
     }
 
-    final Diff = DU[0]! - dc;
-    dc = DU[0]!;
+    final diff = _du[0]! - dc;
+    dc = _du[0]!;
     // Encode dc
-    if (Diff == 0) {
-      _writeBits(out, htdc![0]!); // Diff might be 0
+    if (diff == 0) {
+      _writeBits(out, htdc![0]!); // diff might be 0
     } else {
-      pos = 32767 + Diff;
-      _writeBits(out, htdc![category[pos]!]!);
-      _writeBits(out, bitcode[pos]!);
+      pos = 32767 + diff;
+      _writeBits(out, htdc![_category[pos]!]!);
+      _writeBits(out, _bitCode[pos]!);
     }
 
     // Encode ACs
     var end0pos = 63;
-    for (; (end0pos > 0) && (DU[end0pos] == 0); end0pos--) {}
+    for (; (end0pos > 0) && (_du[end0pos] == 0); end0pos--) {}
     //end0pos = first element in reverse order !=0
     if (end0pos == 0) {
       _writeBits(out, eob!);
@@ -646,19 +646,19 @@ class JpegEncoder extends Encoder {
     int lng;
     while (i <= end0pos) {
       final startpos = i;
-      for (; (DU[i] == 0) && (i <= end0pos); ++i) {}
+      for (; (_du[i] == 0) && (i <= end0pos); ++i) {}
 
       var nrzeroes = i - startpos;
       if (nrzeroes >= 16) {
         lng = nrzeroes >> 4;
         for (var nrmarker = 1; nrmarker <= lng; ++nrmarker) {
-          _writeBits(out, M16zeroes!);
+          _writeBits(out, m16Zeroes!);
         }
         nrzeroes = nrzeroes & 0xF;
       }
-      pos = 32767 + DU[i]!;
-      _writeBits(out, htac[(nrzeroes << 4) + category[pos]!]!);
-      _writeBits(out, bitcode[pos]!);
+      pos = 32767 + _du[i]!;
+      _writeBits(out, htac[(nrzeroes << 4) + _category[pos]!]!);
+      _writeBits(out, _bitCode[pos]!);
       i++;
     }
 
@@ -696,27 +696,27 @@ class JpegEncoder extends Encoder {
     _bytePos = 7;
   }
 
-  final YTable = Uint8List(64);
-  final UVTable = Uint8List(64);
-  final fdtbl_Y = Float32List(64);
-  final fdtbl_UV = Float32List(64);
-  List<List<int>?>? ydcHuffman;
-  List<List<int>?>? uvdcHuffman;
-  late List<List<int>?> yacHuffman;
-  late List<List<int>?> uvacHuffman;
+  final _yTable = Uint8List(64);
+  final _uvTable = Uint8List(64);
+  final _fdtblY = Float32List(64);
+  final _fdtblUv = Float32List(64);
+  List<List<int>?>? _ydcHuffman;
+  List<List<int>?>? _uvdcHuffman;
+  late List<List<int>?> _yacHuffman;
+  late List<List<int>?> _uvacHuffman;
 
-  final bitcode = List<List<int>?>.filled(65535, null);
-  final category = List<int?>.filled(65535, null);
-  final outputfDCTQuant = List<int?>.filled(64, null);
-  final DU = List<int?>.filled(64, null);
+  final _bitCode = List<List<int>?>.filled(65535, null);
+  final _category = List<int?>.filled(65535, null);
+  final _outputfDCTQuant = List<int?>.filled(64, null);
+  final _du = List<int?>.filled(64, null);
 
-  final Float32List ydu = Float32List(64);
-  final Float32List udu = Float32List(64);
-  final Float32List vdu = Float32List(64);
-  final Int32List rgbYuvTable = Int32List(2048);
-  int? currentQuality;
+  final Float32List _ydu = Float32List(64);
+  final Float32List _udu = Float32List(64);
+  final Float32List _vdu = Float32List(64);
+  final Int32List _rgbYuvTable = Int32List(2048);
+  int? _currentQuality;
 
-  static const List<int> zigzag = [
+  static const List<int> _zigzag = [
     0,
     1,
     5,

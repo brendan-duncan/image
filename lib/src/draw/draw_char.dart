@@ -15,8 +15,7 @@ Image drawChar(Image image, BitmapFont font, int x, int y, String char,
   final ch = font.characters[c]!;
   final x2 = x + ch.width;
   final y2 = y + ch.height;
-  final cIter = ch.image.iterator;
-  cIter.moveNext();
+  final cIter = ch.image.iterator..moveNext();
 
   for (var yi = y; yi < y2; ++yi) {
     for (var xi = x; xi < x2; ++xi, cIter.moveNext()) {

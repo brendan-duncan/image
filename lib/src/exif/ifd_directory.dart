@@ -40,7 +40,7 @@ class IfdDirectory {
       if (value is IfdValue) {
         data[tag] = value;
       } else {
-        final tagInfo = ExifImageTags[tag];
+        final tagInfo = exifImageTags[tag];
         if (tagInfo != null) {
           final tagType = tagInfo.type;
           final tagCount = tagInfo.count;
@@ -154,8 +154,8 @@ class IfdDirectory {
   }
 
   bool get hasImageDescription => data.containsKey(0x010e);
-  String? get ImageDescription => data[0x010e]?.toString();
-  set ImageDescription(String? value) {
+  String? get imageDescription => data[0x010e]?.toString();
+  set imageDescription(String? value) {
     if (value == null) {
       data.remove(0x010e);
     } else {
@@ -164,8 +164,8 @@ class IfdDirectory {
   }
 
   bool get hasMake => data.containsKey(0x010f);
-  String? get Make => data[0x010f]?.toString();
-  set Make(String? value) {
+  String? get make => data[0x010f]?.toString();
+  set make(String? value) {
     if (value == null) {
       data.remove(0x010f);
     } else {
@@ -174,8 +174,8 @@ class IfdDirectory {
   }
 
   bool get hasModel => data.containsKey(0x0110);
-  String? get Model => data[0x0110]?.toString();
-  set Model(String? value) {
+  String? get model => data[0x0110]?.toString();
+  set model(String? value) {
     if (value == null) {
       data.remove(0x0110);
     } else {
@@ -184,8 +184,8 @@ class IfdDirectory {
   }
 
   bool get hasOrientation => data.containsKey(0x0112);
-  int? get Orientation => data[0x0112]?.toInt();
-  set Orientation(int? value) {
+  int? get orientation => data[0x0112]?.toInt();
+  set orientation(int? value) {
     if (value == null) {
       data.remove(0x0112);
     } else {
@@ -207,24 +207,24 @@ class IfdDirectory {
   }
 
   bool get hasXResolution => data.containsKey(0x011a);
-  Rational? get XResolution => data[0x011a]?.toRational();
-  set XResolution(Object? value) {
+  Rational? get xResolution => data[0x011a]?.toRational();
+  set xResolution(Object? value) {
     if (!_setRational(0x011a, value)) {
       data.remove(0x011a);
     }
   }
 
   bool get hasYResolution => data.containsKey(0x011b);
-  Rational? get YResolution => data[0x011b]?.toRational();
-  set YResolution(Object? value) {
+  Rational? get yResolution => data[0x011b]?.toRational();
+  set yResolution(Object? value) {
     if (!_setRational(0x011b, value)) {
       data.remove(0x011b);
     }
   }
 
   bool get hasResolutionUnit => data.containsKey(0x0128);
-  int? get ResolutionUnit => data[0x0128]?.toInt();
-  set ResolutionUnit(int? value) {
+  int? get resolutionUnit => data[0x0128]?.toInt();
+  set resolutionUnit(int? value) {
     if (value == null) {
       data.remove(0x0128);
     } else {
@@ -233,8 +233,8 @@ class IfdDirectory {
   }
 
   bool get hasImageWidth => data.containsKey(0x0100);
-  int? get ImageWidth => data[0x0100]?.toInt();
-  set ImageWidth(int? value) {
+  int? get imageWidth => data[0x0100]?.toInt();
+  set imageWidth(int? value) {
     if (value == null) {
       data.remove(0x0100);
     } else {
@@ -243,8 +243,8 @@ class IfdDirectory {
   }
 
   bool get hasImageHeight => data.containsKey(0x0101);
-  int? get ImageHeight => data[0x0101]?.toInt();
-  set ImageHeight(int? value) {
+  int? get imageHeight => data[0x0101]?.toInt();
+  set imageHeight(int? value) {
     if (value == null) {
       data.remove(0x0101);
     } else {
@@ -253,8 +253,8 @@ class IfdDirectory {
   }
 
   bool get hasSoftware => data.containsKey(0x0131);
-  String? get Software => data[0x0131]?.toString();
-  set Software(String? value) {
+  String? get software => data[0x0131]?.toString();
+  set software(String? value) {
     if (value == null) {
       data.remove(0x0131);
     } else {
@@ -263,8 +263,8 @@ class IfdDirectory {
   }
 
   bool get hasCopyright => data.containsKey(0x8298);
-  String? get Copyright => data[0x8298]?.toString();
-  set Copyright(String? value) {
+  String? get copyright => data[0x8298]?.toString();
+  set copyright(String? value) {
     if (value == null) {
       data.remove(0x8298);
     } else {

@@ -18,7 +18,7 @@ Image fillFlood(Image src, int x, int y, Color color,
 
   final visited = Uint8List(src.width * src.height);
 
-  var srcColor = src.getPixel(x, y);
+  final srcColor = src.getPixel(x, y);
   if (!compareAlpha) {
     color.a = 0;
   }

@@ -24,19 +24,19 @@ class PaletteFloat16 extends Palette {
   void set(int index, int channel, num value) {
     if (channel < numChannels) {
       index *= numChannels;
-      data[index + channel] = Float16.DoubleToFloat16(value.toDouble());
+      data[index + channel] = Float16.doubleToFloat16(value.toDouble());
     }
   }
 
   void setColor(int index, num r, [num g = 0, num b = 0, num a = 0]) {
     index *= numChannels;
-    data[index] = Float16.DoubleToFloat16(r.toDouble());
+    data[index] = Float16.doubleToFloat16(r.toDouble());
     if (numChannels > 1) {
-      data[index + 1] = Float16.DoubleToFloat16(g.toDouble());
+      data[index + 1] = Float16.doubleToFloat16(g.toDouble());
       if (numChannels > 2) {
-        data[index + 2] = Float16.DoubleToFloat16(b.toDouble());
+        data[index + 2] = Float16.doubleToFloat16(b.toDouble());
         if (numChannels > 3) {
-          data[index + 3] = Float16.DoubleToFloat16(a.toDouble());
+          data[index + 3] = Float16.doubleToFloat16(a.toDouble());
         }
       }
     }
@@ -44,12 +44,12 @@ class PaletteFloat16 extends Palette {
 
   num get(int index, int channel) =>
       channel < numChannels ?
-      Float16.Float16ToDouble(data[index * numChannels + channel]) :
+      Float16.float16ToDouble(data[index * numChannels + channel]) :
       0.0;
 
   num getRed(int index) {
     index *= numChannels;
-    return Float16.Float16ToDouble(data[index]);
+    return Float16.float16ToDouble(data[index]);
   }
 
   num getGreen(int index) {
@@ -57,7 +57,7 @@ class PaletteFloat16 extends Palette {
       return 0.0;
     }
     index *= numChannels;
-    return Float16.Float16ToDouble(data[index + 1]);
+    return Float16.float16ToDouble(data[index + 1]);
   }
 
   num getBlue(int index) {
@@ -65,7 +65,7 @@ class PaletteFloat16 extends Palette {
       return 0.0;
     }
     index *= numChannels;
-    return Float16.Float16ToDouble(data[index + 2]);
+    return Float16.float16ToDouble(data[index + 2]);
   }
 
   num getAlpha(int index) {
@@ -73,6 +73,6 @@ class PaletteFloat16 extends Palette {
       return 0.0;
     }
     index *= numChannels;
-    return Float16.Float16ToDouble(data[index + 3]);
+    return Float16.float16ToDouble(data[index + 3]);
   }
 }

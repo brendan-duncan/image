@@ -5,7 +5,7 @@ import 'bit_utils.dart';
 /// A 16-bit floating-point number, used by high-dynamic-range image formats
 /// as a more efficient storage for floating-point values that don't require
 /// full 32-bit precision. A list of Half floats can be stored in a
-/// [Uint16List], and converted to a double using the [Float16ToDouble] static
+/// [Uint16List], and converted to a double using the [float16ToDouble] static
 /// method.
 ///
 /// This class is derived from the OpenEXR library.
@@ -13,7 +13,7 @@ class Float16 {
   int _h;
 
   Float16([num? f])
-      : _h = f == null ? 0 : DoubleToFloat16(f);
+      : _h = f == null ? 0 : doubleToFloat16(f);
 
   Float16.from(Float16 other)
     : _h = other._h;
@@ -21,15 +21,15 @@ class Float16 {
   Float16.fromBits(int bits)
       : _h = bits;
 
-  static double Float16ToDouble(int bits) => _toFloatFloat32[bits];
+  static double float16ToDouble(int bits) => _toFloatFloat32[bits];
 
-  static int DoubleToFloat16(num n) {
+  static int doubleToFloat16(num n) {
     final f = n.toDouble();
-    final x_i = float32ToUint32(f);
+    final xI = float32ToUint32(f);
     if (f == 0.0) {
       // Common special case - zero.
       // Preserve the zero's sign bit.
-      return x_i >> 16;
+      return xI >> 16;
     }
 
     // We extract the combined sign and exponent, e, from our
@@ -45,19 +45,19 @@ class Float16 {
     // resulting from underflow, infinities and NANs), the table
     // lookup returns zero, and we call a longer, non-inline function
     // to do the float-to-half conversion.
-    var e = (x_i >> 23) & 0x000001ff;
+    var e = (xI >> 23) & 0x000001ff;
 
     e = _eLut[e];
 
     if (e != 0) {
       // Simple case - round the significand, m, to 10
       // bits and combine it with the sign and exponent.
-      final m = x_i & 0x007fffff;
+      final m = xI & 0x007fffff;
       return e + ((m + 0x00000fff + ((m >> 13) & 1)) >> 13);
     }
 
     // Difficult case - call a function.
-    return _convert(x_i);
+    return _convert(xI);
   }
 
   double toDouble() => _toFloatFloat32[_h];

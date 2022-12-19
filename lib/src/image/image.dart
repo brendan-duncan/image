@@ -359,20 +359,20 @@ class Image extends Iterable<Pixel> {
     final dx = fx - x;
     final dy = fy - y;
 
-    num _linear(num Icc, num Inc, num Icn, num Inn) =>
-        Icc + dx * (Inc - Icc + dy * (Icc + Inn - Icn - Inc)) +
-            dy * (Icn - Icc);
+    num _linear(num icc, num inc, num icn, num inn) =>
+        icc + dx * (inc - icc + dy * (icc + inn - icn - inc)) +
+            dy * (icn - icc);
 
-    final Icc = getPixelSafe(x, y);
-    final Icn = ny >= height ? Icc : getPixelSafe(x, ny);
-    final Inc = nx >= width ? Icc : getPixelSafe(nx, y);
-    final Inn = nx >= width || ny >= height ? Icc : getPixelSafe(nx, ny);
+    final icc = getPixelSafe(x, y);
+    final icn = ny >= height ? icc : getPixelSafe(x, ny);
+    final inc = nx >= width ? icc : getPixelSafe(nx, y);
+    final inn = nx >= width || ny >= height ? icc : getPixelSafe(nx, ny);
 
     return getColor(
-        _linear(Icc.r, Inc.r, Icn.r, Inn.r),
-        _linear(Icc.g, Inc.g, Icn.g, Inn.g),
-        _linear(Icc.b, Inc.b, Icn.b, Inn.b),
-        _linear(Icc.a, Inc.a, Icn.a, Inn.a));
+        _linear(icc.r, inc.r, icn.r, inn.r),
+        _linear(icc.g, inc.g, icn.g, inn.g),
+        _linear(icc.b, inc.b, icn.b, inn.b),
+        _linear(icc.a, inc.a, icn.a, inn.a));
   }
 
   /// Get the pixel using cubic interpolation for non-integer pixel
@@ -390,58 +390,56 @@ class Image extends Iterable<Pixel> {
     final dx = fx - x;
     final dy = fy - y;
 
-    num _cubic(num dx, num Ipp, num Icp, num Inp, num Iap) =>
-        Icp +
-            0.5 *
-                (dx * (-Ipp + Inp) +
-                    dx * dx * (2 * Ipp - 5 * Icp + 4 * Inp - Iap) +
-                    dx * dx * dx * (-Ipp + 3 * Icp - 3 * Inp + Iap));
+    num _cubic(num dx, num ipp, num icp, num inp, num iap) =>
+        icp + 0.5 * (dx * (-ipp + inp) +
+        dx * dx * (2 * ipp - 5 * icp + 4 * inp - iap) +
+        dx * dx * dx * (-ipp + 3 * icp - 3 * inp + iap));
 
-    final Icc = getPixelSafe(x, y);
+    final icc = getPixelSafe(x, y);
 
-    final Ipp = px < 0 || py < 0 ? Icc : getPixelSafe(px, py);
-    final Icp = px < 0 ? Icc : getPixelSafe(x, py);
-    final Inp = py < 0 || nx >= width ? Icc : getPixelSafe(nx, py);
-    final Iap = ax >= width || py < 0 ? Icc : getPixelSafe(ax, py);
+    final ipp = px < 0 || py < 0 ? icc : getPixelSafe(px, py);
+    final icp = px < 0 ? icc : getPixelSafe(x, py);
+    final inp = py < 0 || nx >= width ? icc : getPixelSafe(nx, py);
+    final iap = ax >= width || py < 0 ? icc : getPixelSafe(ax, py);
 
-    final Ip0 = _cubic(dx, Ipp.r, Icp.r, Inp.r, Iap.r);
-    final Ip1 = _cubic(dx, Ipp.g, Icp.g, Inp.g, Iap.g);
-    final Ip2 = _cubic(dx, Ipp.b, Icp.b, Inp.b, Iap.b);
-    final Ip3 = _cubic(dx, Ipp.a, Icp.a, Inp.a, Iap.a);
+    final ip0 = _cubic(dx, ipp.r, icp.r, inp.r, iap.r);
+    final ip1 = _cubic(dx, ipp.g, icp.g, inp.g, iap.g);
+    final ip2 = _cubic(dx, ipp.b, icp.b, inp.b, iap.b);
+    final ip3 = _cubic(dx, ipp.a, icp.a, inp.a, iap.a);
 
-    final Ipc = px < 0 ? Icc : getPixelSafe(px, y);
-    final Inc = nx >= width ? Icc : getPixelSafe(nx, y);
-    final Iac = ax >= width ? Icc : getPixelSafe(ax, y);
+    final ipc = px < 0 ? icc : getPixelSafe(px, y);
+    final inc = nx >= width ? icc : getPixelSafe(nx, y);
+    final iac = ax >= width ? icc : getPixelSafe(ax, y);
 
-    final Ic0 = _cubic(dx, Ipc.r, Icc.r, Inc.r, Iac.r);
-    final Ic1 = _cubic(dx, Ipc.g, Icc.g, Inc.g, Iac.g);
-    final Ic2 = _cubic(dx, Ipc.b, Icc.b, Inc.b, Iac.b);
-    final Ic3 = _cubic(dx, Ipc.a, Icc.a, Inc.a, Iac.a);
+    final ic0 = _cubic(dx, ipc.r, icc.r, inc.r, iac.r);
+    final ic1 = _cubic(dx, ipc.g, icc.g, inc.g, iac.g);
+    final ic2 = _cubic(dx, ipc.b, icc.b, inc.b, iac.b);
+    final ic3 = _cubic(dx, ipc.a, icc.a, inc.a, iac.a);
 
-    final Ipn = px < 0 || ny >= height ? Icc : getPixelSafe(px, ny);
-    final Icn = ny >= height ? Icc : getPixelSafe(x, ny);
-    final Inn = nx >= width || ny >= height ? Icc : getPixelSafe(nx, ny);
-    final Ian = ax >= width || ny >= height ? Icc : getPixelSafe(ax, ny);
+    final ipn = px < 0 || ny >= height ? icc : getPixelSafe(px, ny);
+    final icn = ny >= height ? icc : getPixelSafe(x, ny);
+    final inn = nx >= width || ny >= height ? icc : getPixelSafe(nx, ny);
+    final ian = ax >= width || ny >= height ? icc : getPixelSafe(ax, ny);
 
-    final In0 = _cubic(dx, Ipn.r, Icn.r, Inn.r, Ian.r);
-    final In1 = _cubic(dx, Ipn.g, Icn.g, Inn.g, Ian.g);
-    final In2 = _cubic(dx, Ipn.b, Icn.b, Inn.b, Ian.b);
-    final In3 = _cubic(dx, Ipn.a, Icn.a, Inn.a, Ian.a);
+    final in0 = _cubic(dx, ipn.r, icn.r, inn.r, ian.r);
+    final in1 = _cubic(dx, ipn.g, icn.g, inn.g, ian.g);
+    final in2 = _cubic(dx, ipn.b, icn.b, inn.b, ian.b);
+    final in3 = _cubic(dx, ipn.a, icn.a, inn.a, ian.a);
 
-    final Ipa = px < 0 || ay >= height ? Icc : getPixelSafe(px, ay);
-    final Ica = ay >= height ? Icc : getPixelSafe(x, ay);
-    final Ina = nx >= width || ay >= height ? Icc : getPixelSafe(nx, ay);
-    final Iaa = ax >= width || ay >= height ? Icc : getPixelSafe(ax, ay);
+    final ipa = px < 0 || ay >= height ? icc : getPixelSafe(px, ay);
+    final ica = ay >= height ? icc : getPixelSafe(x, ay);
+    final ina = nx >= width || ay >= height ? icc : getPixelSafe(nx, ay);
+    final iaa = ax >= width || ay >= height ? icc : getPixelSafe(ax, ay);
 
-    final Ia0 = _cubic(dx, Ipa.r, Ica.r, Ina.r, Iaa.r);
-    final Ia1 = _cubic(dx, Ipa.g, Ica.g, Ina.g, Iaa.g);
-    final Ia2 = _cubic(dx, Ipa.b, Ica.b, Ina.b, Iaa.b);
-    final Ia3 = _cubic(dx, Ipa.a, Ica.a, Ina.a, Iaa.a);
+    final ia0 = _cubic(dx, ipa.r, ica.r, ina.r, iaa.r);
+    final ia1 = _cubic(dx, ipa.g, ica.g, ina.g, iaa.g);
+    final ia2 = _cubic(dx, ipa.b, ica.b, ina.b, iaa.b);
+    final ia3 = _cubic(dx, ipa.a, ica.a, ina.a, iaa.a);
 
-    final c0 = _cubic(dy, Ip0, Ic0, In0, Ia0);
-    final c1 = _cubic(dy, Ip1, Ic1, In1, Ia1);
-    final c2 = _cubic(dy, Ip2, Ic2, In2, Ia2);
-    final c3 = _cubic(dy, Ip3, Ic3, In3, Ia3);
+    final c0 = _cubic(dy, ip0, ic0, in0, ia0);
+    final c1 = _cubic(dy, ip1, ic1, in1, ia1);
+    final c2 = _cubic(dy, ip2, ic2, in2, ia2);
+    final c3 = _cubic(dy, ip3, ic3, in3, ia3);
 
     return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
   }

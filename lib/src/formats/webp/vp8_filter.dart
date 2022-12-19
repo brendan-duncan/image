@@ -77,39 +77,39 @@ class VP8Filter {
 
   // 8-pixels wide variant, for chroma filtering
   void vFilter8(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int? ithresh, int hev_thresh) {
-    _filterLoop26(u, stride, 1, 8, thresh, ithresh, hev_thresh);
-    _filterLoop26(v, stride, 1, 8, thresh, ithresh, hev_thresh);
+      int? ithresh, int hevThresh) {
+    _filterLoop26(u, stride, 1, 8, thresh, ithresh, hevThresh);
+    _filterLoop26(v, stride, 1, 8, thresh, ithresh, hevThresh);
   }
 
   void hFilter8(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int? ithresh, int hev_thresh) {
-    _filterLoop26(u, 1, stride, 8, thresh, ithresh, hev_thresh);
-    _filterLoop26(v, 1, stride, 8, thresh, ithresh, hev_thresh);
+      int? ithresh, int hevThresh) {
+    _filterLoop26(u, 1, stride, 8, thresh, ithresh, hevThresh);
+    _filterLoop26(v, 1, stride, 8, thresh, ithresh, hevThresh);
   }
 
   void vFilter8i(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int ithresh, int hev_thresh) {
+      int ithresh, int hevThresh) {
     final u2 = InputBuffer.from(u, offset: 4 * stride);
     final v2 = InputBuffer.from(v, offset: 4 * stride);
-    _filterLoop24(u2, stride, 1, 8, thresh, ithresh, hev_thresh);
-    _filterLoop24(v2, stride, 1, 8, thresh, ithresh, hev_thresh);
+    _filterLoop24(u2, stride, 1, 8, thresh, ithresh, hevThresh);
+    _filterLoop24(v2, stride, 1, 8, thresh, ithresh, hevThresh);
   }
 
   void hFilter8i(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int ithresh, int hev_thresh) {
+      int ithresh, int hevThresh) {
     final u2 = InputBuffer.from(u, offset: 4);
     final v2 = InputBuffer.from(v, offset: 4);
-    _filterLoop24(u2, 1, stride, 8, thresh, ithresh, hev_thresh);
-    _filterLoop24(v2, 1, stride, 8, thresh, ithresh, hev_thresh);
+    _filterLoop24(u2, 1, stride, 8, thresh, ithresh, hevThresh);
+    _filterLoop24(v2, 1, stride, 8, thresh, ithresh, hevThresh);
   }
 
   void _filterLoop26(InputBuffer p, int hstride, int vstride, int size,
-      int thresh, int? ithresh, int hev_thresh) {
+      int thresh, int? ithresh, int hevThresh) {
     final p2 = InputBuffer.from(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
-        if (_hev(p2, hstride, hev_thresh)) {
+        if (_hev(p2, hstride, hevThresh)) {
           _doFilter2(p2, hstride);
         } else {
           _doFilter6(p2, hstride);
@@ -120,11 +120,11 @@ class VP8Filter {
   }
 
   void _filterLoop24(InputBuffer p, int hstride, int vstride, int size,
-      int thresh, int ithresh, int hev_thresh) {
+      int thresh, int ithresh, int hevThresh) {
     final p2 = InputBuffer.from(p);
     while (size-- > 0) {
       if (_needsFilter2(p2, hstride, thresh, ithresh)) {
-        if (_hev(p2, hstride, hev_thresh)) {
+        if (_hev(p2, hstride, hevThresh)) {
           _doFilter2(p2, hstride);
         } else {
           _doFilter4(p2, hstride);
@@ -545,12 +545,11 @@ class VP8Filter {
   }
 
   static void dc16(InputBuffer dst) {
-    // DC
-    var DC = 16;
+    var dc = 16;
     for (var j = 0; j < 16; ++j) {
-      DC += dst[-1 + j * VP8.bps] + dst[j - VP8.bps];
+      dc += dst[-1 + j * VP8.bps] + dst[j - VP8.bps];
     }
-    put16(DC >> 5, dst);
+    put16(dc >> 5, dst);
   }
 
   // DC with top samples not available
@@ -564,11 +563,11 @@ class VP8Filter {
 
   // DC with left samples not available
   static void dc16NoLeft(InputBuffer dst) {
-    var DC = 8;
+    var dc = 8;
     for (var i = 0; i < 16; ++i) {
-      DC += dst[i - VP8.bps];
+      dc += dst[i - VP8.bps];
     }
-    put16(DC >> 4, dst);
+    put16(dc >> 4, dst);
   }
 
   // DC with no top and left samples

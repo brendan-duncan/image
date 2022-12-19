@@ -27,7 +27,6 @@ linter:
   - file_names
   - hash_and_equals
   - implementation_imports
-  #- invariant_booleans
   - iterable_contains_unrelated_type
   - join_return_with_assignment
   - lines_longer_than_80_chars
@@ -36,7 +35,7 @@ linter:
   - missing_whitespace_between_adjacent_strings
   - no_adjacent_strings_in_list
   - no_runtimeType_toString
-  #- non_constant_identifier_names
+  - non_constant_identifier_names
   - only_throw_errors
   - overridden_fields
   - package_api_docs
@@ -46,7 +45,7 @@ linter:
   - prefer_const_constructors
   - prefer_const_declarations
   - prefer_expression_function_bodies
-  #- prefer_final_locals
+  - prefer_final_locals
   - prefer_final_fields
   - prefer_function_declarations_over_variables
   - prefer_initializing_formals

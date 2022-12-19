@@ -57,7 +57,7 @@ class ImageDataInt32 extends ImageData {
   }
 
   void setPixelColor(int x, int y, num r, [num g = 0, num b = 0, num a = 0]) {
-    int index = y * width * numChannels + (x * numChannels);
+    final index = y * width * numChannels + (x * numChannels);
     data[index] = r.toInt();
     if (numChannels > 1) {
       data[index + 1] = g.toInt();

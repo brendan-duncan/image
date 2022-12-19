@@ -221,12 +221,12 @@ class VP8 {
   }
 
   void _parseQuant() {
-    final base_q0 = br.getValue(7);
-    final dqy1_dc = br.get() != 0 ? br.getSignedValue(4) : 0;
-    final dqy2_dc = br.get() != 0 ? br.getSignedValue(4) : 0;
-    final dqy2_ac = br.get() != 0 ? br.getSignedValue(4) : 0;
-    final dquv_dc = br.get() != 0 ? br.getSignedValue(4) : 0;
-    final dquv_ac = br.get() != 0 ? br.getSignedValue(4) : 0;
+    final baseQ0 = br.getValue(7);
+    final dqy1Dc = br.get() != 0 ? br.getSignedValue(4) : 0;
+    final dqy2Dc = br.get() != 0 ? br.getSignedValue(4) : 0;
+    final dqy2Ac = br.get() != 0 ? br.getSignedValue(4) : 0;
+    final dquvDc = br.get() != 0 ? br.getSignedValue(4) : 0;
+    final dquvAc = br.get() != 0 ? br.getSignedValue(4) : 0;
 
     final hdr = _segmentHeader;
 
@@ -235,34 +235,34 @@ class VP8 {
       if (hdr.useSegment) {
         q = hdr.quantizer[i];
         if (!hdr.absoluteDelta) {
-          q += base_q0;
+          q += baseQ0;
         }
       } else {
         if (i > 0) {
           _dqm[i] = _dqm[0];
           continue;
         } else {
-          q = base_q0;
+          q = baseQ0;
         }
       }
 
       final m = _dqm[i]!;
-      m.y1Mat[0] = dcTable[_clip(q + dqy1_dc, 127)];
+      m.y1Mat[0] = dcTable[_clip(q + dqy1Dc, 127)];
       m.y1Mat[1] = acTable[_clip(q + 0, 127)];
 
-      m.y2Mat[0] = dcTable[_clip(q + dqy2_dc, 127)] * 2;
+      m.y2Mat[0] = dcTable[_clip(q + dqy2Dc, 127)] * 2;
       // For all x in [0..284], x*155/100 is bitwise equal to (x*101581) >> 16.
       // The smallest precision for that is '(x*6349) >> 12' but 16 is a good
       // word size.
-      m.y2Mat[1] = (acTable[_clip(q + dqy2_ac, 127)] * 101581) >> 16;
+      m.y2Mat[1] = (acTable[_clip(q + dqy2Ac, 127)] * 101581) >> 16;
       if (m.y2Mat[1] < 8) {
         m.y2Mat[1] = 8;
       }
 
-      m.uvMat[0] = dcTable[_clip(q + dquv_dc, 117)];
-      m.uvMat[1] = acTable[_clip(q + dquv_ac, 127)];
+      m.uvMat[0] = dcTable[_clip(q + dquvDc, 117)];
+      m.uvMat[1] = acTable[_clip(q + dquvAc, 127)];
 
-      m.uvQuant = q + dquv_ac; // for dithering strength evaluation
+      m.uvQuant = q + dquvAc; // for dithering strength evaluation
     }
   }
 
@@ -365,18 +365,18 @@ class VP8 {
     _cacheYStride = 16 * _mbWidth!;
     _cacheUVStride = 8 * _mbWidth!;
 
-    final extra_rows = filterExtraRows[_filterType!];
-    final extra_y = extra_rows * _cacheYStride!;
-    final extra_uv = (extra_rows ~/ 2) * _cacheUVStride!;
+    final extraRows = filterExtraRows[_filterType!];
+    final extraY = extraRows * _cacheYStride!;
+    final extraUv = (extraRows ~/ 2) * _cacheUVStride!;
 
-    _cacheY = InputBuffer(Uint8List(16 * _cacheYStride! + extra_y),
-        offset: extra_y);
+    _cacheY = InputBuffer(Uint8List(16 * _cacheYStride! + extraY),
+        offset: extraY);
 
-    _cacheU = InputBuffer(Uint8List(8 * _cacheUVStride! + extra_uv),
-        offset: extra_uv);
+    _cacheU = InputBuffer(Uint8List(8 * _cacheUVStride! + extraUv),
+        offset: extraUv);
 
-    _cacheV = InputBuffer(Uint8List(8 * _cacheUVStride! + extra_uv),
-        offset: extra_uv);
+    _cacheV = InputBuffer(Uint8List(8 * _cacheUVStride! + extraUv),
+        offset: extraUv);
 
     _tmpY = InputBuffer(Uint8List(webp.width));
 
@@ -473,70 +473,70 @@ class VP8 {
   }
 
   void _reconstructRow() {
-    final mb_y = _mbY;
-    final y_dst = InputBuffer(_yuvBlock, offset: yOffset);
-    final u_dst = InputBuffer(_yuvBlock, offset: uOffset);
-    final v_dst = InputBuffer(_yuvBlock, offset: vOffset);
+    final mbY = _mbY;
+    final yDst = InputBuffer(_yuvBlock, offset: yOffset);
+    final uDst = InputBuffer(_yuvBlock, offset: uOffset);
+    final vDst = InputBuffer(_yuvBlock, offset: vOffset);
 
-    for (var mb_x = 0; mb_x < _mbWidth!; ++mb_x) {
-      final block = _mbData[mb_x];
+    for (var mbX = 0; mbX < _mbWidth!; ++mbX) {
+      final block = _mbData[mbX];
 
       // Rotate in the left samples from previously decoded block. We move four
       // pixels at a time for alignment reason, and because of in-loop filter.
-      if (mb_x > 0) {
+      if (mbX > 0) {
         for (var j = -1; j < 16; ++j) {
-          y_dst.memcpy(j * bps - 4, 4, y_dst, j * bps + 12);
+          yDst.memcpy(j * bps - 4, 4, yDst, j * bps + 12);
         }
 
         for (var j = -1; j < 8; ++j) {
-          u_dst.memcpy(j * bps - 4, 4, u_dst, j * bps + 4);
-          v_dst.memcpy(j * bps - 4, 4, v_dst, j * bps + 4);
+          uDst.memcpy(j * bps - 4, 4, uDst, j * bps + 4);
+          vDst.memcpy(j * bps - 4, 4, vDst, j * bps + 4);
         }
       } else {
         for (var j = 0; j < 16; ++j) {
-          y_dst[j * bps - 1] = 129;
+          yDst[j * bps - 1] = 129;
         }
 
         for (var j = 0; j < 8; ++j) {
-          u_dst[j * bps - 1] = 129;
-          v_dst[j * bps - 1] = 129;
+          uDst[j * bps - 1] = 129;
+          vDst[j * bps - 1] = 129;
         }
 
         // Init top-left sample on left column too
-        if (mb_y > 0) {
-          y_dst[-1 - bps] = u_dst[-1 - bps] = v_dst[-1 - bps] = 129;
+        if (mbY > 0) {
+          yDst[-1 - bps] = uDst[-1 - bps] = vDst[-1 - bps] = 129;
         }
       }
 
       // bring top samples into the cache
-      final top_yuv = _yuvT[mb_x];
+      final topYuv = _yuvT[mbX];
       final coeffs = block.coeffs;
       var bits = block.nonZeroY;
 
-      if (mb_y > 0) {
-        y_dst.memcpy(-bps, 16, top_yuv.y);
-        u_dst.memcpy(-bps, 8, top_yuv.u);
-        v_dst.memcpy(-bps, 8, top_yuv.v);
-      } else if (mb_x == 0) {
+      if (mbY > 0) {
+        yDst.memcpy(-bps, 16, topYuv.y);
+        uDst.memcpy(-bps, 8, topYuv.u);
+        vDst.memcpy(-bps, 8, topYuv.v);
+      } else if (mbX == 0) {
         // we only need to do this init once at block (0,0).
         // Afterward, it remains valid for the whole topmost row.
-        y_dst.memset(-bps - 1, 16 + 4 + 1, 127);
-        u_dst.memset(-bps - 1, 8 + 1, 127);
-        v_dst.memset(-bps - 1, 8 + 1, 127);
+        yDst.memset(-bps - 1, 16 + 4 + 1, 127);
+        uDst.memset(-bps - 1, 8 + 1, 127);
+        vDst.memset(-bps - 1, 8 + 1, 127);
       }
 
       // predict and add residuals
       if (block.isIntra4x4) {
         // 4x4
-        final topRight = InputBuffer.from(y_dst, offset: -bps + 16);
+        final topRight = InputBuffer.from(yDst, offset: -bps + 16);
         final topRight32 = topRight.toUint32List();
 
-        if (mb_y > 0) {
-          if (mb_x >= _mbWidth! - 1) {
+        if (mbY > 0) {
+          if (mbX >= _mbWidth! - 1) {
             // on rightmost border
-            topRight.memset(0, 4, top_yuv.y[15]);
+            topRight.memset(0, 4, topYuv.y[15]);
           } else {
-            topRight.memcpy(0, 4, _yuvT[mb_x + 1].y);
+            topRight.memcpy(0, 4, _yuvT[mbX + 1].y);
           }
         }
 
@@ -548,7 +548,7 @@ class VP8 {
 
         // predict and add residuals for all 4x4 blocks in turn.
         for (var n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
-          final dst = InputBuffer.from(y_dst, offset: kScan[n]);
+          final dst = InputBuffer.from(yDst, offset: kScan[n]);
 
           VP8Filter.predLuma4[block.imodes[n]](dst);
 
@@ -556,12 +556,12 @@ class VP8 {
         }
       } else {
         // 16x16
-        final predFunc = _checkMode(mb_x, mb_y, block.imodes[0])!;
+        final predFunc = _checkMode(mbX, mbY, block.imodes[0])!;
 
-        VP8Filter.predLuma16[predFunc](y_dst);
+        VP8Filter.predLuma16[predFunc](yDst);
         if (bits != 0) {
           for (var n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
-            final dst = InputBuffer.from(y_dst, offset: kScan[n]);
+            final dst = InputBuffer.from(yDst, offset: kScan[n]);
 
             _doTransform(bits!, InputBuffer(coeffs, offset: n * 16), dst);
           }
@@ -569,40 +569,40 @@ class VP8 {
       }
 
       // Chroma
-      final bits_uv = block.nonZeroUV;
-      final pred_func = _checkMode(mb_x, mb_y, block.uvmode)!;
-      VP8Filter.predChroma8[pred_func](u_dst);
-      VP8Filter.predChroma8[pred_func](v_dst);
+      final bitsUv = block.nonZeroUV;
+      final predFunc = _checkMode(mbX, mbY, block.uvmode)!;
+      VP8Filter.predChroma8[predFunc](uDst);
+      VP8Filter.predChroma8[predFunc](vDst);
 
       final c1 = InputBuffer(coeffs, offset: 16 * 16);
-      _doUVTransform(bits_uv, c1, u_dst);
+      _doUVTransform(bitsUv, c1, uDst);
 
       final c2 = InputBuffer(coeffs, offset: 20 * 16);
-      _doUVTransform(bits_uv >> 8, c2, v_dst);
+      _doUVTransform(bitsUv >> 8, c2, vDst);
 
       // stash away top samples for next block
-      if (mb_y < _mbHeight! - 1) {
-        top_yuv.y.setRange(0, 16, y_dst.toUint8List(), 15 * bps);
-        top_yuv.u.setRange(0, 8, u_dst.toUint8List(), 7 * bps);
-        top_yuv.v.setRange(0, 8, v_dst.toUint8List(), 7 * bps);
+      if (mbY < _mbHeight! - 1) {
+        topYuv.y.setRange(0, 16, yDst.toUint8List(), 15 * bps);
+        topYuv.u.setRange(0, 8, uDst.toUint8List(), 7 * bps);
+        topYuv.v.setRange(0, 8, vDst.toUint8List(), 7 * bps);
       }
 
       // Transfer reconstructed samples from yuv_b_ cache to final destination.
-      final y_out = mb_x * 16; // dec->cache_y_ +
-      final u_out = mb_x * 8; // dec->cache_u_ +
-      final v_out = mb_x * 8; // _dec->cache_v_ +
+      final yOut = mbX * 16; // dec->cache_y_ +
+      final uOut = mbX * 8; // dec->cache_u_ +
+      final vOut = mbX * 8; // _dec->cache_v_ +
 
       for (var j = 0; j < 16; ++j) {
-        final start = y_out + j * _cacheYStride!;
-        _cacheY.memcpy(start, 16, y_dst, j * bps);
+        final start = yOut + j * _cacheYStride!;
+        _cacheY.memcpy(start, 16, yDst, j * bps);
       }
 
       for (var j = 0; j < 8; ++j) {
-        var start = u_out + j * _cacheUVStride!;
-        _cacheU.memcpy(start, 8, u_dst, j * bps);
+        var start = uOut + j * _cacheUVStride!;
+        _cacheU.memcpy(start, 8, uDst, j * bps);
 
-        start = v_out + j * _cacheUVStride!;
-        _cacheV.memcpy(start, 8, v_dst, j * bps);
+        start = vOut + j * _cacheUVStride!;
+        _cacheV.memcpy(start, 8, vDst, j * bps);
       }
     }
   }
@@ -626,12 +626,12 @@ class VP8 {
     12 + 12 * bps
   ];
 
-  static int? _checkMode(int mb_x, int mb_y, int? mode) {
+  static int? _checkMode(int mbX, int mbY, int? mode) {
     if (mode == bDcPred) {
-      if (mb_x == 0) {
-        return (mb_y == 0) ? bDcPredNoTopLeft : bDcPredNoLeft;
+      if (mbX == 0) {
+        return (mbY == 0) ? bDcPredNoTopLeft : bDcPredNoLeft;
       } else {
-        return (mb_y == 0) ? bDcPredNoTop : bDcPred;
+        return (mbY == 0) ? bDcPredNoTop : bDcPred;
       }
     }
     return mode;
@@ -667,7 +667,7 @@ class VP8 {
   }
 
   // vertical position of a MB
-  int macroBlockVPos(int mb_y) => mb_y * 16;
+  int macroBlockVPos(int mbY) => mbY * 16;
 
   // kFilterExtraRows[] = How many extra lines are needed on the MB boundary
   // for caching, given a filtering level.
@@ -878,27 +878,27 @@ class VP8 {
     int loadUv(int u, int v) => u | (v << 16);
 
     final lastPixelPair = (len - 1) >> 1;
-    var tl_uv = loadUv(topU[0], topV[0]); // top-left sample
-    var l_uv = loadUv(curU[0], curV[0]); // left-sample
+    var tlUv = loadUv(topU[0], topV[0]); // top-left sample
+    var lUv = loadUv(curU[0], curV[0]); // left-sample
 
-    final uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
+    final uv0 = (3 * tlUv + lUv + 0x00020002) >> 2;
     _yuvToRgba(topY[0], uv0 & 0xff, uv0 >> 16, topDst);
 
     if (bottomY != null) {
-      final uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
+      final uv0 = (3 * lUv + tlUv + 0x00020002) >> 2;
       _yuvToRgba(bottomY[0], uv0 & 0xff, uv0 >> 16, bottomDst!);
     }
 
     for (var x = 1; x <= lastPixelPair; ++x) {
-      final t_uv = loadUv(topU[x], topV[x]); // top sample
+      final tUv = loadUv(topU[x], topV[x]); // top sample
       final uv = loadUv(curU[x], curV[x]); // sample
       // precompute invariant values associated with first and second diagonals
-      final avg = tl_uv + t_uv + l_uv + uv + 0x00080008;
-      final diag_12 = (avg + 2 * (t_uv + l_uv)) >> 3;
-      final diag_03 = (avg + 2 * (tl_uv + uv)) >> 3;
+      final avg = tlUv + tUv + lUv + uv + 0x00080008;
+      final diag12 = (avg + 2 * (tUv + lUv)) >> 3;
+      final diag03 = (avg + 2 * (tlUv + uv)) >> 3;
 
-      var uv0 = (diag_12 + tl_uv) >> 1;
-      var uv1 = (diag_03 + t_uv) >> 1;
+      var uv0 = (diag12 + tlUv) >> 1;
+      var uv1 = (diag03 + tUv) >> 1;
 
       _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, uv0 >> 16,
           InputBuffer.from(topDst, offset: (2 * x - 1) * 4));
@@ -907,8 +907,8 @@ class VP8 {
           InputBuffer.from(topDst, offset: (2 * x - 0) * 4));
 
       if (bottomY != null) {
-        uv0 = (diag_03 + l_uv) >> 1;
-        uv1 = (diag_12 + uv) >> 1;
+        uv0 = (diag03 + lUv) >> 1;
+        uv1 = (diag12 + uv) >> 1;
 
         _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, uv0 >> 16,
             InputBuffer.from(bottomDst!, offset: (2 * x - 1) * 4));
@@ -917,17 +917,17 @@ class VP8 {
             InputBuffer.from(bottomDst, offset: (2 * x + 0) * 4));
       }
 
-      tl_uv = t_uv;
-      l_uv = uv;
+      tlUv = tUv;
+      lUv = uv;
     }
 
     if ((len & 1) == 0) {
-      final uv0 = (3 * tl_uv + l_uv + 0x00020002) >> 2;
+      final uv0 = (3 * tlUv + lUv + 0x00020002) >> 2;
       _yuvToRgba(topY[len - 1], uv0 & 0xff, uv0 >> 16,
           InputBuffer.from(topDst, offset: (len - 1) * 4));
 
       if (bottomY != null) {
-        final uv0 = (3 * l_uv + tl_uv + 0x00020002) >> 2;
+        final uv0 = (3 * lUv + tlUv + 0x00020002) >> 2;
         _yuvToRgba(bottomY[len - 1], uv0 & 0xff, uv0 >> 16,
             InputBuffer.from(bottomDst!, offset: (len - 1) * 4));
       }
@@ -1229,14 +1229,14 @@ class VP8 {
     }
   }
 
-  int _nzCodeBits(int nz_coeffs, int nz, int dc_nz) {
-    nz_coeffs <<= 2;
-    nz_coeffs |= (nz > 3)
+  int _nzCodeBits(int nzCoeffs, int nz, int dcNz) {
+    nzCoeffs <<= 2;
+    nzCoeffs |= (nz > 3)
         ? 3
         : (nz > 1)
             ? 2
-            : dc_nz;
-    return nz_coeffs;
+            : dcNz;
+    return nzCoeffs;
   }
 
   static const List<int> kBands = [
@@ -1347,14 +1347,14 @@ class VP8 {
 
       {
         // non zero coeff
-        final p_ctx = prob[kBands[n + 1]].probas;
+        final pCtx = prob[kBands[n + 1]].probas;
         int v;
         if (br.getBit(p[2]) == 0) {
           v = 1;
-          p = p_ctx[1];
+          p = pCtx[1];
         } else {
           v = _getLargeValue(br, p);
-          p = p_ctx[2];
+          p = pCtx[2];
         }
 
         out[kZigzag[n]] = br.getSigned(v) * dq[n > 0 ? 1 : 0];

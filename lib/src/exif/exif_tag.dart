@@ -207,7 +207,7 @@ const exifTagNameToID = <String, int>{
   'GPSDifferential': 0x1e,
 };
 
-final ExifImageTags = <int, ExifTag>{
+final exifImageTags = <int, ExifTag>{
   0x000B: ExifTag('ProcessingSoftware', IfdValueType.ascii),
   0x00FE: ExifTag('SubfileType', IfdValueType.long),
   0x00FF: ExifTag('OldSubfileType', IfdValueType.long),
@@ -371,7 +371,7 @@ final ExifImageTags = <int, ExifTag>{
   0xFDE9: ExifTag('SerialNumber', IfdValueType.ascii),
 };
 
-final ExifInteropTags = <int, ExifTag>{
+final exifInteropTags = <int, ExifTag>{
   0x0001: ExifTag('InteropIndex', IfdValueType.ascii),
   0x0002: ExifTag('InteropVersion', IfdValueType.undefined),
   0x1000: ExifTag('RelatedImageFileFormat', IfdValueType.ascii),
@@ -379,7 +379,7 @@ final ExifInteropTags = <int, ExifTag>{
   0x1002: ExifTag('RelatedImageLength', IfdValueType.short),
 };
 
-final ExifGpsTags = <int, ExifTag>{
+final exifGpsTags = <int, ExifTag>{
   0x0000: ExifTag('GPSVersionID'),
   0x0001: ExifTag('GPSLatitudeRef'),
   0x0002: ExifTag('GPSLatitude'),

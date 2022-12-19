@@ -19,14 +19,14 @@ Image fillRect(Image src, int x1, int y1, int x2, int y2, Color color) {
 
   // If no blending is necessary, use a faster fill method.
   if (color.a == color.maxChannelValue) {
-    var iter = src.getRange(_x0, _y0, _w, _h);
+    final iter = src.getRange(_x0, _y0, _w, _h);
     while (iter.moveNext()) {
       iter.current.set(color);
     }
   } else {
     final a = color.a / color.maxChannelValue;
     final invA = 1.0 - a;
-    var iter = src.getRange(_x0, _y0, _w, _h);
+    final iter = src.getRange(_x0, _y0, _w, _h);
     while (iter.moveNext()) {
       final p = iter.current;
       p.r = (color.r * a) + (p.r * invA);

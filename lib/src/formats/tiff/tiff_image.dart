@@ -355,7 +355,7 @@ class TiffImage {
               } else if (bitsPerSample == 64) {
                 sample = byteData.readFloat64();
               } else if (bitsPerSample == 16) {
-                sample = Float16.Float16ToDouble(byteData.readUint16());
+                sample = Float16.float16ToDouble(byteData.readUint16());
               }
               image.setPixelColor(px, py, sample);
             } else {
@@ -422,9 +422,9 @@ class TiffImage {
                 g = byteData.readFloat64();
                 b = byteData.readFloat64();
               } else if (bitsPerSample == 16) {
-                r = Float16.Float16ToDouble(byteData.readUint16());
-                g = Float16.Float16ToDouble(byteData.readUint16());
-                b = Float16.Float16ToDouble(byteData.readUint16());
+                r = Float16.float16ToDouble(byteData.readUint16());
+                g = Float16.float16ToDouble(byteData.readUint16());
+                b = Float16.float16ToDouble(byteData.readUint16());
               }
               image.setPixelColor(px, py, r, g, b);
             } else {
@@ -482,10 +482,10 @@ class TiffImage {
                 b = byteData.readFloat64();
                 a = byteData.readFloat64();
               } else if (bitsPerSample == 16) {
-                r = Float16.Float16ToDouble(byteData.readUint16());
-                g = Float16.Float16ToDouble(byteData.readUint16());
-                b = Float16.Float16ToDouble(byteData.readUint16());
-                a = Float16.Float16ToDouble(byteData.readUint16());
+                r = Float16.float16ToDouble(byteData.readUint16());
+                g = Float16.float16ToDouble(byteData.readUint16());
+                b = Float16.float16ToDouble(byteData.readUint16());
+                a = Float16.float16ToDouble(byteData.readUint16());
               }
               image.setPixelColor(px, py, r, g, b, a);
             } else {

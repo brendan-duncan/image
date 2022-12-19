@@ -326,9 +326,9 @@ class PvrtcDecoder {
     /*int num_surfaces =*/ input.readUint32();
     /*int num_faces =*/ input.readUint32();
     /*int mipcount =*/ input.readUint32();
-    final metadata_size = input.readUint32();
+    final metadataSize = input.readUint32();
 
-    input.skip(metadata_size);
+    input.skip(metadataSize);
 
     if (order[0] == 0) {
       switch (format) {

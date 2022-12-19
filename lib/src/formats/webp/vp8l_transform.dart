@@ -73,22 +73,22 @@ class VP8LTransform {
     if (bitsPerPixel < 8) {
       final pixelsPerByte = 1 << bits;
       final countMask = pixelsPerByte - 1;
-      final bit_mask = (1 << bitsPerPixel) - 1;
+      final bitMask = (1 << bitsPerPixel) - 1;
       for (var y = yStart; y < yEnd; ++y) {
-        var packed_pixels = 0;
+        var packedPixels = 0;
         for (var x = 0; x < width; ++x) {
           // We need to load fresh 'packed_pixels' once every
           // 'pixels_per_byte' increments of x. Fortunately, pixels_per_byte
           // is a power of 2, so can just use a mask for that, instead of
           // decrementing a counter.
           if ((x & countMask) == 0) {
-            packed_pixels = _getAlphaIndex(src[0]);
+            packedPixels = _getAlphaIndex(src[0]);
             src.offset++;
           }
-          final p = _getAlphaValue(colorMap![packed_pixels & bit_mask]);
+          final p = _getAlphaValue(colorMap![packedPixels & bitMask]);
           dst[0] = p;
           dst.offset++;
-          packed_pixels >>= bitsPerPixel;
+          packedPixels >>= bitsPerPixel;
         }
       }
     } else {
@@ -111,19 +111,19 @@ class VP8LTransform {
     if (bitsPerPixel < 8) {
       final pixelsPerByte = 1 << bits;
       final countMask = pixelsPerByte - 1;
-      final bit_mask = (1 << bitsPerPixel) - 1;
+      final bitMask = (1 << bitsPerPixel) - 1;
       for (var y = yStart; y < yEnd; ++y) {
-        var packed_pixels = 0;
+        var packedPixels = 0;
         for (var x = 0; x < width; ++x) {
-          // We need to load fresh 'packed_pixels' once every
+          // We need to load fresh 'packedPixels' once every
           // 'pixels_per_byte' increments of x. Fortunately, pixels_per_byte
           // is a power of 2, so can just use a mask for that, instead of
           // decrementing a counter.
           if ((x & countMask) == 0) {
-            packed_pixels = _getARGBIndex(inData[src++]);
+            packedPixels = _getARGBIndex(inData[src++]);
           }
-          outData[dst++] = _getARGBValue(colorMap![packed_pixels & bit_mask]);
-          packed_pixels >>= bitsPerPixel;
+          outData[dst++] = _getARGBValue(colorMap![packedPixels & bitMask]);
+          packedPixels >>= bitsPerPixel;
         }
       }
     } else {
@@ -197,12 +197,12 @@ class VP8LTransform {
       // .. the rest:
       final k = (this.data![predModeSrc++] >> 8) & 0xf;
 
-      var predFunc = PREDICTORS[k];
+      var predFunc = _predictors[k];
       for (var x = 1; x < width; ++x) {
         if ((x & mask) == 0) {
           // start of tile. Read predictor function.
           final k = ((this.data![predModeSrc++]) >> 8) & 0xf;
-          predFunc = PREDICTORS[k];
+          predFunc = _predictors[k];
         }
         final d = outData[data + x - 1];
         final pred = predFunc(outData, d, data + x - width);
@@ -301,11 +301,11 @@ class VP8LTransform {
   }
 
   static int _select(int a, int b, int c) {
-    final pa_minus_pb = _sub3(a >> 24, b >> 24, c >> 24) +
+    final paMinusPb = _sub3(a >> 24, b >> 24, c >> 24) +
         _sub3((a >> 16) & 0xff, (b >> 16) & 0xff, (c >> 16) & 0xff) +
         _sub3((a >> 8) & 0xff, (b >> 8) & 0xff, (c >> 8) & 0xff) +
         _sub3(a & 0xff, b & 0xff, c & 0xff);
-    return (pa_minus_pb <= 0) ? a : b;
+    return (paMinusPb <= 0) ? a : b;
   }
 
   //--------------------------------------------------------------------------
@@ -351,7 +351,7 @@ class VP8LTransform {
   static int _predictor13(Uint32List pixels, int left, int top) =>
       _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
 
-  static final PREDICTORS = [
+  static final _predictors = [
     _predictor0,
     _predictor1,
     _predictor2,

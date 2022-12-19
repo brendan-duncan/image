@@ -204,7 +204,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 
 Image getImageFromJpeg(JpegData jpeg) {
   final orientation =
-    jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.Orientation! : 0;
+    jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.orientation! : 0;
 
   final w = jpeg.width!;
   final h = jpeg.height!;
@@ -216,7 +216,7 @@ Image getImageFromJpeg(JpegData jpeg) {
 
   // Copy exif data, except for ORIENTATION which we're baking.
   image.exif = ExifData.from(jpeg.exif);
-  image.exif.imageIfd.Orientation = null;
+  image.exif.imageIfd.orientation = null;
 
   ComponentData component1;
   ComponentData component2;

@@ -216,7 +216,7 @@ class BmpInfo implements DecodeInfo {
       void Function(num r, num g, num b, num a) pixel) {
     if (palette != null) {
       if (bitsPerPixel == 1) {
-        var bi = input.readByte();
+        final bi = input.readByte();
         for (var i = 7; i >= 0; --i) {
           final b = (bi >> i) & 0x1;
           pixel(b, 0, 0, 0);
@@ -225,7 +225,7 @@ class BmpInfo implements DecodeInfo {
       } else if (bitsPerPixel == 2) {
         final bi = input.readByte();
         for (var i = 6; i >= 0; i -= 2) {
-          var b = (bi >> i) & 0x2;
+          final b = (bi >> i) & 0x2;
           pixel(b, 0, 0, 0);
         }
       } else if (bitsPerPixel == 4) {

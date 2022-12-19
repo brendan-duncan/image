@@ -44,8 +44,8 @@ class WebPFilters {
   }
 
   static void verticalUnfilter(int width, int height, int stride, int row,
-      int num_rows, Uint8List data) {
-    _doVerticalFilter(data, width, height, stride, row, num_rows, true, data);
+      int numRows, Uint8List data) {
+    _doVerticalFilter(data, width, height, stride, row, numRows, true, data);
   }
 
   static void gradientFilter(Uint8List data, int width, int height, int stride,
@@ -55,8 +55,8 @@ class WebPFilters {
   }
 
   static void gradientUnfilter(int width, int height, int stride, int row,
-      int num_rows, Uint8List data) {
-    _doGradientFilter(data, width, height, stride, row, num_rows, true, data);
+      int numRows, Uint8List data) {
+    _doGradientFilter(data, width, height, stride, row, numRows, true, data);
   }
 
   static void _predictLine(InputBuffer src, InputBuffer pred, InputBuffer dst,
@@ -107,7 +107,7 @@ class WebPFilters {
   static void _doVerticalFilter(Uint8List src, int width, int height,
       int stride, int row, int numRows, bool inverse, Uint8List out) {
     final startOffset = row * stride;
-    final last_row = row + numRows;
+    final lastRow = row + numRows;
     final s = InputBuffer(src, offset: startOffset);
     final o = InputBuffer(out, offset: startOffset);
     final preds = InputBuffer.from(inverse ? o : s);
@@ -127,7 +127,7 @@ class WebPFilters {
     }
 
     // Filter line-by-line.
-    while (row < last_row) {
+    while (row < lastRow) {
       _predictLine(s, preds, o, width, inverse);
       ++row;
       preds.offset += stride;

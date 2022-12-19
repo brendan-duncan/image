@@ -67,51 +67,51 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
   }
 
   num operator[](int i) =>
-      i < numChannels ? Float16.Float16ToDouble(data[_index + i]) : 0;
+      i < numChannels ? Float16.float16ToDouble(data[_index + i]) : 0;
 
   void operator[]=(int i, num value) {
     if (i < image.numChannels) {
       final d = value.toDouble();
-      data[_index + i] = Float16.DoubleToFloat16(d);
+      data[_index + i] = Float16.doubleToFloat16(d);
     }
   }
 
   num get index => r;
   void set index(num i) => r = i;
 
-  num get r => numChannels > 0 ? Float16.Float16ToDouble(data[_index + 0]) : 0;
+  num get r => numChannels > 0 ? Float16.float16ToDouble(data[_index + 0]) : 0;
 
   void set r(num r) {
     if (numChannels > 0) {
       final d = r.toDouble();
-      data[_index] = Float16.DoubleToFloat16(d);
+      data[_index] = Float16.doubleToFloat16(d);
     }
   }
 
-  num get g => numChannels > 1 ? Float16.Float16ToDouble(data[_index + 1]) : 0;
+  num get g => numChannels > 1 ? Float16.float16ToDouble(data[_index + 1]) : 0;
 
   void set g(num g) {
     if (numChannels > 1) {
       final d = g.toDouble();
-      data[_index + 1] = Float16.DoubleToFloat16(d);
+      data[_index + 1] = Float16.doubleToFloat16(d);
     }
   }
 
-  num get b => numChannels > 2 ? Float16.Float16ToDouble(data[_index + 2]) : 0;
+  num get b => numChannels > 2 ? Float16.float16ToDouble(data[_index + 2]) : 0;
 
   void set b(num b) {
     if (numChannels > 2) {
       final d = b.toDouble();
-      data[_index + 2] = Float16.DoubleToFloat16(d);
+      data[_index + 2] = Float16.doubleToFloat16(d);
     }
   }
 
-  num get a => numChannels > 3 ? Float16.Float16ToDouble(data[_index + 3]) : 0;
+  num get a => numChannels > 3 ? Float16.float16ToDouble(data[_index + 3]) : 0;
 
   void set a(num a) {
     if (numChannels > 3) {
       final d = g.toDouble();
-      data[_index + 3] = Float16.DoubleToFloat16(d);
+      data[_index + 3] = Float16.doubleToFloat16(d);
     }
   }
 
@@ -127,16 +127,16 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
   void setColor(num r, [num g = 0, num b = 0, num a = 0]) {
     if (numChannels > 0) {
       final rd = r.toDouble();
-      data[_index] = Float16.DoubleToFloat16(rd);
+      data[_index] = Float16.doubleToFloat16(rd);
       if (numChannels > 1) {
         final gd = g.toDouble();
-        data[_index + 1] = Float16.DoubleToFloat16(gd);
+        data[_index + 1] = Float16.doubleToFloat16(gd);
         if (numChannels > 2) {
           final bd = b.toDouble();
-          data[_index + 2] = Float16.DoubleToFloat16(bd);
+          data[_index + 2] = Float16.doubleToFloat16(bd);
           if (numChannels > 3) {
             final ad = a.toDouble();
-            data[_index + 3] = Float16.DoubleToFloat16(ad);
+            data[_index + 3] = Float16.doubleToFloat16(ad);
           }
         }
       }

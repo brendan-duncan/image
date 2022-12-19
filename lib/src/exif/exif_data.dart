@@ -48,10 +48,10 @@ class ExifData extends IfdContainer {
   }
 
   String getTagName(int tag) {
-    if (!ExifImageTags.containsKey(tag)) {
+    if (!exifImageTags.containsKey(tag)) {
       return '<unknown>';
     }
-    return ExifImageTags[tag]!.name;
+    return exifImageTags[tag]!.name;
   }
 
   String toString() {
@@ -60,7 +60,7 @@ class ExifData extends IfdContainer {
       s.write('$name\n');
       final directory = directories[name]!;
       for (var tag in directory.keys) {
-        var value = directory[tag];
+        final value = directory[tag];
         if (value == null) {
           s.write('\t${getTagName(tag)}\n');
         } else {
@@ -71,7 +71,7 @@ class ExifData extends IfdContainer {
         s.write('$subName\n');
         final subDirectory = directory.sub[subName];
         for (var tag in subDirectory.keys) {
-          var value = subDirectory[tag];
+          final value = subDirectory[tag];
           if (value == null) {
             s.write('\t${getTagName(tag)}\n');
           } else {
@@ -96,7 +96,7 @@ class ExifData extends IfdContainer {
       directories['ifd0'] = IfdDirectory();
 
     var dataOffset = 8; // offset to first ifd block, from start of tiff header
-    var offsets = <String,int>{};
+    final offsets = <String,int>{};
 
     for (var name in directories.keys) {
       final ifd = directories[name]!;
@@ -146,7 +146,7 @@ class ExifData extends IfdContainer {
       }
     }
 
-    var numIfd = directories.keys.length;
+    final numIfd = directories.keys.length;
     for (int i = 0; i < numIfd; ++i) {
       final name = directories.keys.elementAt(i);
       final ifd = directories.values.elementAt(i);
@@ -215,7 +215,7 @@ class ExifData extends IfdContainer {
 
   void _writeDirectoryLargeValues(OutputBuffer out, IfdDirectory ifd) {
     for (var value in ifd.values) {
-      var size = value.dataSize;
+      final size = value.dataSize;
       if (size > 4) {
         value.write(out);
       }
@@ -226,10 +226,10 @@ class ExifData extends IfdContainer {
     final saveEndian = block.bigEndian;
     block.bigEndian = true;
 
-    int blockOffset = block.offset;
+    final blockOffset = block.offset;
 
     // Tiff header
-    int endian = block.readUint16();
+    final endian = block.readUint16();
     if (endian == 0x4949) { // II
       block.bigEndian = false;
       if (block.readUint16() != 0x2a00) {
@@ -278,7 +278,7 @@ class ExifData extends IfdContainer {
     for (var d in directories.values) {
       for (var dt in subTags.keys) {
         if (d.containsKey(dt)) { // ExifOffset
-          int ifdOffset = d[dt]!.toInt();
+          final ifdOffset = d[dt]!.toInt();
           block.offset = blockOffset + ifdOffset;
           final directory = IfdDirectory();
           final numEntries = block.readUint16();

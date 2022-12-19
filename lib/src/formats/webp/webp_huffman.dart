@@ -10,9 +10,9 @@ class HuffmanTree {
   static const huffmanLutBits = 7;
   static const huffmanLut = 1 << huffmanLutBits;
   // Fast lookup for short bit lengths.
-  final lutBits = Uint8List(huffmanLut);
-  final lutSymbol = Int16List(huffmanLut);
-  final lutJump = Int16List(huffmanLut);
+  final _lutBits = Uint8List(huffmanLut);
+  final _lutSymbol = Int16List(huffmanLut);
+  final _lutJump = Int16List(huffmanLut);
 
   // all the nodes, starting at root, stored as a single int array, where
   // each node occupies two ints as [symbol, children].
@@ -37,7 +37,7 @@ class HuffmanTree {
     tree = Int32List(maxNodes << 1);
     tree[1] = -1;
     numNodes = 1;
-    lutBits.fillRange(0, lutBits.length, 255);
+    _lutBits.fillRange(0, _lutBits.length, 255);
 
     return true;
   }
@@ -123,15 +123,15 @@ class HuffmanTree {
     var bits = br.prefetchBits();
     var newBitPos = br.bitPos;
     // Check if we find the bit combination from the Huffman lookup table.
-    final lut_ix = bits & (huffmanLut - 1);
-    final lut_bits = lutBits[lut_ix];
+    final lutIx = bits & (huffmanLut - 1);
+    final lutBits = _lutBits[lutIx];
 
-    if (lut_bits <= huffmanLutBits) {
-      br.bitPos = br.bitPos + lut_bits;
-      return lutSymbol[lut_ix];
+    if (lutBits <= huffmanLutBits) {
+      br.bitPos = br.bitPos + lutBits;
+      return _lutSymbol[lutIx];
     }
 
-    node += lutJump[lut_ix];
+    node += _lutJump[lutIx];
     newBitPos += huffmanLutBits;
     bits >>= huffmanLutBits;
 
@@ -156,8 +156,8 @@ class HuffmanTree {
       baseCode = _reverseBitsShort(code, codeLength);
       for (var i = 0; i < (1 << (huffmanLutBits - codeLength)); ++i) {
         final idx = baseCode | (i << codeLength);
-        lutSymbol[idx] = symbol;
-        lutBits[idx] = codeLength;
+        _lutSymbol[idx] = symbol;
+        _lutBits[idx] = codeLength;
       }
     } else {
       baseCode = _reverseBitsShort(
@@ -184,7 +184,7 @@ class HuffmanTree {
       node += _nodeChildren(node) + ((code >> codeLength) & 1);
 
       if (--step == 0) {
-        lutJump[baseCode] = node;
+        _lutJump[baseCode] = node;
       }
     }
 

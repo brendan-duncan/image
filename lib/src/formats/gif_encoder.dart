@@ -205,7 +205,7 @@ class GifEncoder extends Encoder {
     _nBits = _initBits;
     _maxCode = (1 << _nBits) - 1;
     _clearCode = 1 << (_initBits - 1);
-    _EOFCode = _clearCode + 1;
+    _eofCode = _clearCode + 1;
     _clearFlag = false;
     _freeEnt = _clearCode + 2;
     var pFinished = false;
@@ -214,7 +214,7 @@ class GifEncoder extends Encoder {
       if (pFinished) {
         return _eof;
       }
-      int r = pIter.current.index as int;
+      final r = pIter.current.index as int;
       if (!pIter.moveNext()) {
         pFinished = true;
       }
@@ -291,7 +291,7 @@ class GifEncoder extends Encoder {
     }
 
     _output(ent);
-    _output(_EOFCode);
+    _output(_eofCode);
 
     output!.writeByte(0);
   }
@@ -330,7 +330,7 @@ class GifEncoder extends Encoder {
       }
     }
 
-    if (code == _EOFCode) {
+    if (code == _eofCode) {
       // At EOF, write the rest of the buffer.
       while (_curBits > 0) {
         _addToBlock(_curAccum & 0xff);
@@ -373,7 +373,7 @@ class GifEncoder extends Encoder {
 
     var transparentIndex = 0;
     var hasTransparency = 0;
-    var palette = image.palette!;
+    final palette = image.palette!;
     final nc = palette.numChannels;
     final pa = nc - 1;
     if (nc == 4 || nc == 2) {
@@ -422,7 +422,7 @@ class GifEncoder extends Encoder {
   int _curBits = 0;
   int _nBits = 0;
   int _initBits = 0;
-  int _EOFCode = 0;
+  int _eofCode = 0;
   int _maxCode = 0;
   int _clearCode = 0;
   int _freeEnt = 0;

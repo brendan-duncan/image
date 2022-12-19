@@ -6,10 +6,10 @@ import '../font/bitmap_font.dart';
 import '../image/image.dart';
 import 'draw_pixel.dart';
 
-var _r_lut = Uint8List(256);
-var _g_lut = Uint8List(256);
-var _b_lut = Uint8List(256);
-var _a_lut = Uint8List(256);
+final _rLut = Uint8List(256);
+final _gLut = Uint8List(256);
+final _bLut = Uint8List(256);
+final _aLut = Uint8List(256);
 
 /// Draw a string horizontally into [image] horizontally into [image] at
 /// position [x],[y] with the given [color].
@@ -29,10 +29,10 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
     final dg = color.g / 255.0;
     final db = color.b / 255.0;
     for (var i = 1; i < 256; ++i) {
-      _r_lut[i] = (dr * i).toInt();
-      _g_lut[i] = (dg * i).toInt();
-      _b_lut[i] = (db * i).toInt();
-      _a_lut[i] = (da * i).toInt();
+      _rLut[i] = (dr * i).toInt();
+      _gLut[i] = (dg * i).toInt();
+      _bLut[i] = (db * i).toInt();
+      _aLut[i] = (da * i).toInt();
     }
   }
 
@@ -68,12 +68,12 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
       cIter.moveNext();
       for (var yi = y; yi < y2; ++yi) {
         for (var xi = x; xi < x2; ++xi, cIter.moveNext()) {
-          var p = cIter.current;
+          final p = cIter.current;
           if (color != null) {
-            _c.r = _r_lut[p.r as int];
-            _c.g = _g_lut[p.g as int];
-            _c.b = _b_lut[p.b as int];
-            _c.a = _a_lut[p.a as int];
+            _c.r = _rLut[p.r as int];
+            _c.g = _gLut[p.g as int];
+            _c.b = _bLut[p.b as int];
+            _c.a = _aLut[p.a as int];
             drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, _c);
           } else {
             drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, p);
