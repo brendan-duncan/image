@@ -14,20 +14,20 @@ import 'image_uint32_test.dart';
 import 'image_uint4_test.dart';
 import 'image_uint8_test.dart';
 
-void ImageTests() {
-  group('Image', () {
-    ImageUint1Test();
-    ImageUint2Test();
-    ImageUint4Test();
-    ImageUint8Test();
-    ImageUint16Test();
-    ImageUint32Test();
-    ImageInt8Test();
-    ImageInt16Test();
-    ImageInt32Test();
-    ImageFloat16Test();
-    ImageFloat32Test();
-    ImageFloat64Test();
-    ImageTest();
+void imageTests() {
+  group('image', () {
+    imageUint1Test();
+    imageUint2Test();
+    imageUint4Test();
+    imageUint8Test();
+    imageUint16Test();
+    imageUint32Test();
+    imageInt8Test();
+    imageInt16Test();
+    imageInt32Test();
+    imageFloat16Test();
+    imageFloat32Test();
+    imageFloat64Test();
+    imageTest();
   });
 }

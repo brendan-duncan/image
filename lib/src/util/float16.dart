@@ -32,6 +32,10 @@ class Float16 {
       return xI >> 16;
     }
 
+    if (_toFloatFloat32Data == null) {
+      _initialize();
+    }
+
     // We extract the combined sign and exponent, e, from our
     // floating-point number, f. Then we convert e to the sign
     // and exponent of the half number via a table lookup.

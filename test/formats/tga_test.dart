@@ -4,14 +4,14 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void TgaTest() {
-  final dir = Directory('test/data/tga');
+void tgaTest() {
+  final dir = Directory('test/_data/tga');
   if (!dir.existsSync()) {
     return;
   }
   final files = dir.listSync();
 
-  group('TGA', () {
+  group('tga', () {
     for (var f in files.whereType<File>()) {
       if (!f.path.endsWith('.tga')) {
         continue;
@@ -34,7 +34,7 @@ void TgaTest() {
     }
 
     test('decode/encode', () {
-      final bytes = File('test/data/tga/globe.tga').readAsBytesSync();
+      final bytes = File('test/_data/tga/globe.tga').readAsBytesSync();
 
       // Decode the image from file.
       final image = TgaDecoder().decodeImage(bytes)!;

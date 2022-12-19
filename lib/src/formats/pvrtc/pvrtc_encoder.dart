@@ -22,25 +22,31 @@ class PvrtcEncoder {
   Uint8List encodePvr(Image bitmap, { PvrtcFormat format = PvrtcFormat.auto }) {
     final output = OutputBuffer();
 
-    late dynamic pvrtc;
-    if (format == PvrtcFormat.auto) {
-      if (bitmap.numChannels == 3) {
-        pvrtc = encodeRgb4Bpp(bitmap);
-        format = PvrtcFormat.rgb4;
-      } else {
-        pvrtc = encodeRgba4Bpp(bitmap);
-        format = PvrtcFormat.rgba4;
-      }
-    } else if (format == PvrtcFormat.rgb2) {
-      //pvrtc = encodeRgb2Bpp(bitmap);
-      pvrtc = encodeRgb4Bpp(bitmap);
-    } else if (format == PvrtcFormat.rgba2) {
-      //pvrtc = encodeRgba2Bpp(bitmap);
-      pvrtc = encodeRgba4Bpp(bitmap);
-    } else if (format == PvrtcFormat.rgb4) {
-      pvrtc = encodeRgb4Bpp(bitmap);
-    } else if (format == PvrtcFormat.rgba4) {
-      pvrtc = encodeRgba4Bpp(bitmap);
+    Uint8List pvrtc;
+    switch (format) {
+      case PvrtcFormat.auto:
+        if (bitmap.numChannels == 3) {
+          pvrtc = encodeRgb4bpp(bitmap);
+          format = PvrtcFormat.rgb4;
+        } else {
+          pvrtc = encodeRgba4bpp(bitmap);
+          format = PvrtcFormat.rgba4;
+        }
+        break;
+      case PvrtcFormat.rgb2:
+        //pvrtc = encodeRgb2bpp(bitmap);
+        pvrtc = encodeRgb4bpp(bitmap);
+        break;
+      case PvrtcFormat.rgba2:
+        //pvrtc = encodeRgba2bpp(bitmap);
+        pvrtc = encodeRgba4bpp(bitmap);
+        break;
+      case PvrtcFormat.rgb4:
+        pvrtc = encodeRgb4bpp(bitmap);
+        break;
+      case PvrtcFormat.rgba4:
+        pvrtc = encodeRgba4bpp(bitmap);
+        break;
     }
 
     const version = 55727696;
@@ -70,13 +76,12 @@ class PvrtcEncoder {
     ..writeUint32(numFaces)
     ..writeUint32(mipmapCount)
     ..writeUint32(metaDataSize)
-
-    ..writeBytes(pvrtc as List<int>);
+    ..writeBytes(pvrtc);
 
     return output.getBytes();
   }
 
-  Uint8List encodeRgb4Bpp(Image bitmap) {
+  Uint8List encodeRgb4bpp(Image bitmap) {
     if (bitmap.width != bitmap.height) {
       throw ImageException('PVRTC requires a square image.');
     }
@@ -101,7 +106,7 @@ class PvrtcEncoder {
       for (var x = 0; x < blocks; ++x) {
         final cbb = _calculateBoundingBoxRgb(bitmap, x, y);
         packet..setBlock(x, y)
-        ..usePunchthroughAlpha = 0
+        ..usePunchthroughAlpha = false
         ..setColorRgbA(cbb.min as PvrtcColorRgb)
         ..setColorRgbB(cbb.max as PvrtcColorRgb);
       }
@@ -177,7 +182,7 @@ class PvrtcEncoder {
     return outputData;
   }
 
-  Uint8List encodeRgba4Bpp(Image bitmap) {
+  Uint8List encodeRgba4bpp(Image bitmap) {
     if (bitmap.width != bitmap.height) {
       throw ImageException('PVRTC requires a square image.');
     }
@@ -198,11 +203,11 @@ class PvrtcEncoder {
     final p2 = PvrtcPacket(outputData);
     final p3 = PvrtcPacket(outputData);
 
-    for (var y = 0; y < blocks; ++y) {
-      for (var x = 0; x < blocks; ++x) {
-        final cbb = _calculateBoundingBoxRgba(bitmap, x, y);
+    for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
+      for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
+        final cbb = _calculateBoundingBoxRgba(bitmap, x4, y4);
         packet..setBlock(x, y)
-        ..usePunchthroughAlpha = 0
+        ..usePunchthroughAlpha = false
         ..setColorRgbaA(cbb.min as PvrtcColorRgba)
         ..setColorRgbaB(cbb.max as PvrtcColorRgba);
       }
@@ -213,8 +218,6 @@ class PvrtcEncoder {
     for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
       for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
         var factorIndex = 0;
-        //final pixelIndex = (y * 4 * size + x * 4) * 4;
-
         var modulationData = 0;
 
         for (var py = 0; py < 4; ++py) {

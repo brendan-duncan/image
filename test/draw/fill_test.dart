@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void FillTest() {
+void fillTest() {
   test('fill', () {
     final i0 = Image(256, 256);
     fill(i0, ColorRgba8(120, 64, 85, 90));

@@ -1,19 +1,18 @@
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-void ImageUint8Test() {
-  group('uint8', ()
-  {
+void imageUint8Test() {
+  group('uint8', () {
     test('nc:1', () {
       final i1 = Image(2, 2, numChannels: 1);
       expect(i1.width, equals(2));
       expect(i1.height, equals(2));
       expect(i1.numChannels, equals(1));
       expect(i1.format, Format.uint8);
-      i1.setPixelColor(0, 0, 32);
-      i1.setPixelColor(1, 0, 64);
-      i1.setPixelColor(0, 1, 128);
-      i1.setPixelColor(1, 1, 255);
+      i1..setPixelColor(0, 0, 32)
+      ..setPixelColor(1, 0, 64)
+      ..setPixelColor(0, 1, 128)
+      ..setPixelColor(1, 1, 255);
       expect(i1.getPixel(0, 0), equals([32]));
       expect(i1.getPixel(1, 0), equals([64]));
       expect(i1.getPixel(0, 1), equals([128]));
@@ -34,10 +33,10 @@ void ImageUint8Test() {
       expect(i2.width, equals(2));
       expect(i2.height, equals(2));
       expect(i2.numChannels, equals(2));
-      i2.setPixelColor(0, 0, 32, 64);
-      i2.setPixelColor(1, 0, 64, 32);
-      i2.setPixelColor(0, 1, 128, 52);
-      i2.setPixelColor(1, 1, 255, 84);
+      i2..setPixelColor(0, 0, 32, 64)
+      ..setPixelColor(1, 0, 64, 32)
+      ..setPixelColor(0, 1, 128, 52)
+      ..setPixelColor(1, 1, 255, 84);
       expect(i2.getPixel(0, 0), equals([32, 64]));
       expect(i2.getPixel(1, 0), equals([64, 32]));
       expect(i2.getPixel(0, 1), equals([128, 52]));
@@ -58,10 +57,10 @@ void ImageUint8Test() {
       expect(i3.width, equals(2));
       expect(i3.height, equals(2));
       expect(i3.numChannels, equals(3));
-      i3.setPixelColor(0, 0, 32, 64, 86);
-      i3.setPixelColor(1, 0, 64, 32, 14);
-      i3.setPixelColor(0, 1, 128, 52, 5);
-      i3.setPixelColor(1, 1, 255, 84, 94);
+      i3..setPixelColor(0, 0, 32, 64, 86)
+      ..setPixelColor(1, 0, 64, 32, 14)
+      ..setPixelColor(0, 1, 128, 52, 5)
+      ..setPixelColor(1, 1, 255, 84, 94);
       expect(i3.getPixel(0, 0), equals([32, 64, 86]));
       expect(i3.getPixel(1, 0), equals([64, 32, 14]));
       expect(i3.getPixel(0, 1), equals([128, 52, 5]));
@@ -87,10 +86,10 @@ void ImageUint8Test() {
       expect(i4.width, equals(2));
       expect(i4.height, equals(2));
       expect(i4.numChannels, equals(4));
-      i4.setPixelColor(0, 0, 32, 64, 86, 144);
-      i4.setPixelColor(1, 0, 64, 32, 14, 214);
-      i4.setPixelColor(0, 1, 128, 52, 5, 52);
-      i4.setPixelColor(1, 1, 255, 84, 94, 82);
+      i4..setPixelColor(0, 0, 32, 64, 86, 144)
+      ..setPixelColor(1, 0, 64, 32, 14, 214)
+      ..setPixelColor(0, 1, 128, 52, 5, 52)
+      ..setPixelColor(1, 1, 255, 84, 94, 82);
       expect(i4.getPixel(0, 0), equals([32, 64, 86, 144]));
       expect(i4.getPixel(1, 0), equals([64, 32, 14, 214]));
       expect(i4.getPixel(0, 1), equals([128, 52, 5, 52]));
@@ -114,10 +113,10 @@ void ImageUint8Test() {
       expect(i5.palette!.numChannels, equals(3));
       i5.palette!.setColor(50, 123, 42, 86);
       i5.palette!.setColor(125, 84, 231, 52);
-      i5.setPixelColor(0, 0, 50);
-      i5.setPixelColor(1, 0, 125);
-      i5.setPixelColor(0, 1, 42);
-      i5.setPixelColor(1, 1, 0);
+      i5..setPixelColor(0, 0, 50)
+      ..setPixelColor(1, 0, 125)
+      ..setPixelColor(0, 1, 42)
+      ..setPixelColor(1, 1, 0);
       expect(i5.getPixel(0, 0), equals([123, 42, 86]));
       expect(i5.getPixel(1, 0), equals([84, 231, 52]));
       expect(i5.getPixel(0, 1), equals([0, 0, 0]));
@@ -147,10 +146,10 @@ void ImageUint8Test() {
       expect(i6.palette!.numChannels, equals(4));
       i6.palette!.setColor(50, 123, 42, 86, 128);
       i6.palette!.setColor(125, 84, 231, 52, 200);
-      i6.setPixelColor(0, 0, 50);
-      i6.setPixelColor(1, 0, 125);
-      i6.setPixelColor(0, 1, 42);
-      i6.setPixelColor(1, 1, 0);
+      i6..setPixelColor(0, 0, 50)
+      ..setPixelColor(1, 0, 125)
+      ..setPixelColor(0, 1, 42)
+      ..setPixelColor(1, 1, 0);
       expect(i6.getPixel(0, 0), equals([123, 42, 86, 128]));
       expect(i6.getPixel(1, 0), equals([84, 231, 52, 200]));
       expect(i6.getPixel(0, 1), equals([0, 0, 0, 0]));
@@ -167,11 +166,11 @@ void ImageUint8Test() {
     });
 
     test('uint8.convert', () {
-      final i1 = Image(2, 2, numChannels: 1);
-      i1.setPixelColor(0, 0, 32);
-      i1.setPixelColor(1, 0, 64);
-      i1.setPixelColor(0, 1, 128);
-      i1.setPixelColor(1, 1, 255);
+      final i1 = Image(2, 2, numChannels: 1)
+      ..setPixelColor(0, 0, 32)
+      ..setPixelColor(1, 0, 64)
+      ..setPixelColor(0, 1, 128)
+      ..setPixelColor(1, 1, 255);
 
       final i1_1 = i1.convert(numChannels: 1);
       expect(i1_1.format, equals(Format.uint8));

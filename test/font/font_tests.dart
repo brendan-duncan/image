@@ -4,12 +4,13 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void FontTests() {
-  final image = decodeJpg(File('test/data/jpg/big_buck_bunny.jpg').readAsBytesSync())!;
+void fontTests() {
+  final image = decodeJpg(
+      File('test/_data/jpg/big_buck_bunny.jpg').readAsBytesSync())!;
 
   group('bitmapFont', () {
     test('zip/xml', () {
-      final fontZip = File('test/data/font/test.zip').readAsBytesSync();
+      final fontZip = File('test/_data/font/test.zip').readAsBytesSync();
       final font = readFontZip(fontZip);
 
       final img = copyResize(image, width: 400);
@@ -21,7 +22,7 @@ void FontTests() {
     });
 
     test('zip/text', () {
-      final fontZip = File('test/data/font/test_text.zip').readAsBytesSync();
+      final fontZip = File('test/_data/font/test_text.zip').readAsBytesSync();
       final font = readFontZip(fontZip);
 
       final img = copyResize(image, width: 400);

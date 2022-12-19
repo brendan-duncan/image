@@ -46,15 +46,15 @@ class InternalExrPizCompressor extends InternalExrCompressor
     height ??= header.linesInBuffer;
 
     final minX = x;
-    var maxX = x + width! - 1;
+    var maxX = x + width - 1;
     final minY = y;
-    var maxY = y + height! - 1;
+    var maxY = y + height - 1;
 
-    if (maxX > header.width!) {
-      maxX = header.width! - 1;
+    if (maxX > header.width) {
+      maxX = header.width - 1;
     }
-    if (maxY > header.height!) {
-      maxY = header.height! - 1;
+    if (maxY > header.height) {
+      maxY = header.height - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;
@@ -73,7 +73,7 @@ class InternalExrPizCompressor extends InternalExrCompressor
       ..nx = numSamples(ch.xSampling, minX, maxX)
       ..ny = numSamples(ch.ySampling, minY, maxY)
       ..ys = ch.ySampling
-      ..size = ch.size ~/ 2; //2=size(HALF)
+      ..size = ch.dataSize ~/ 2; //2=size(HALF)
 
       tmpBufferEnd += cd.nx * cd.ny * cd.size;
     }

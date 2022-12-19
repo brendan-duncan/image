@@ -1,7 +1,7 @@
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-void ColorFloat64Test() {
+void colorFloat64Test() {
   test('ColorFloat64', () {
     final c0 = ColorFloat64(0);
     expect(c0.length, equals(0));

@@ -4,8 +4,8 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void PngTest() {
-  group('PNG', () {
+void pngTest() {
+  group('png', () {
     const _buck24Hash = 817446904;
     Image? buck24Image;
 
@@ -170,9 +170,9 @@ void PngTest() {
       final image = Image(32, 32);
       for (var p in image) {
         final c = p.x < (32 - p.y) ? 255 : 0;
-        p.r = c;
-        p.g = c;
-        p.b = c;
+        p..r = c
+        ..g = c
+        ..b = c;
       }
 
       for (var filter in PngFilter.values) {
@@ -216,9 +216,9 @@ void PngTest() {
       final image = Image(32, 32, format: Format.uint16);
       for (var p in image) {
         final c = p.x * 2114;
-        p.r = c;
-        p.g = c;
-        p.b = c;
+        p..r = c
+        ..g = c
+        ..b = c;
       }
 
       for (var filter in PngFilter.values) {
@@ -241,7 +241,7 @@ void PngTest() {
     });
 
     test('decode', () {
-      final bytes = File('test/data/png/buck_24.png').readAsBytesSync();
+      final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final image = PngDecoder().decodeImage(bytes)!;
       expect(image.width, equals(300));
       expect(image.height, equals(186));
@@ -272,8 +272,7 @@ void PngTest() {
       final image2 = decodePng(png);
       expect(image2!.width, equals(image.width));
       expect(image2.height, equals(image.height));
-      final p2 = image2.iterator;
-      p2.moveNext();
+      final p2 = image2.iterator..moveNext();
       for (var p in image) {
         expect(p, equals(p2.current));
         p2.moveNext();
@@ -281,7 +280,7 @@ void PngTest() {
     });
 
     test('decode palette', () {
-      final bytes = File('test/data/png/buck_8.png').readAsBytesSync();
+      final bytes = File('test/_data/png/buck_8.png').readAsBytesSync();
       final image = PngDecoder().decodeImage(bytes)!;
       expect(image.width, equals(300));
       expect(image.height, equals(186));
@@ -351,10 +350,10 @@ void PngTest() {
     });
 
     test('decodeAnimation', () {
-      var files = [
-        ['test/data/png/apng/test_apng.png', 2, 'test_apng'],
-        ['test/data/png/apng/test_apng2.png', 60, 'test_apng2'],
-        ['test/data/png/apng/test_apng3.png', 19, 'test_apng3']
+      const files = [
+        ['test/_data/png/apng/test_apng.png', 2, 'test_apng'],
+        ['test/_data/png/apng/test_apng2.png', 60, 'test_apng2'],
+        ['test/_data/png/apng/test_apng3.png', 19, 'test_apng3']
       ];
 
       for (var f in files) {
@@ -372,8 +371,8 @@ void PngTest() {
     });
 
     test('encodeAnimation', () {
-      final anim = Animation();
-      anim.loopCount = 10;
+      final anim = Animation()
+      ..loopCount = 10;
       for (var i = 0; i < 10; i++) {
         final image = Image(480, 120);
         drawString(image, arial48, 100, 60, i.toString());
@@ -396,7 +395,7 @@ void PngTest() {
     });
 
     test('iCCP', () {
-      final bytes = File('test/data/png/iCCP.png').readAsBytesSync();
+      final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
       final image = PngDecoder().decodeImage(bytes)!;
       expect(image.iccProfile, isNotNull);
       expect(image.iccProfile!.data, isNotNull);
@@ -410,7 +409,7 @@ void PngTest() {
           equals(image.iccProfile!.data.length));
     });
 
-    final dir = Directory('test/data/png');
+    final dir = Directory('test/_data/png');
     final files = dir.listSync();
 
     for (var f in files) {
@@ -474,7 +473,7 @@ void PngTest() {
               expect(i1.format, equals(anim[0].format));
               expect(i1.numChannels, equals(anim[0].numChannels));
               for (var p in i1) {
-                var p2 = anim[0].getPixel(p.x, p.y);
+                final p2 = anim[0].getPixel(p.x, p.y);
                 expect(p, equals(p2));
               }
             } else {

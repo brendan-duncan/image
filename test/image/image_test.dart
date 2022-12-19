@@ -3,8 +3,8 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 
-void ImageTest() {
-  group('Image', () {
+void imageTest() {
+  group('image', () {
     test('empty', () {
       final i0 = Image.empty();
       expect(i0.isValid, equals(false));
@@ -33,7 +33,7 @@ void ImageTest() {
       var differs = false;
       for (var y = 0; y < w && !differs; ++y) {
         for (var x = 0; x < h; ++x) {
-          var p = img.getPixel(x, y);
+          final p = img.getPixel(x, y);
           if (p.r != x || p.g != y || p.b != 0) {
             differs = true;
             break;

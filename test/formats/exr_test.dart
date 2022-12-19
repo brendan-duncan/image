@@ -4,13 +4,13 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void ExrTest() {
-  group('EXR', () {
+void exrTest() {
+  group('exr', () {
     test('decoding', () {
-      final bytes = File('test/data/exr/grid.exr').readAsBytesSync();
+      final bytes = File('test/_data/exr/grid.exr').readAsBytesSync();
 
-      final dec = ExrDecoder();
-      dec.startDecode(bytes);
+      final dec = ExrDecoder()
+      ..startDecode(bytes);
       final img = dec.decodeFrame(0)!;
 
       final png = PngEncoder().encodeImage(img);

@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void FillRectTest() {
+void fillRectTest() {
   test('fillRect', () {
     final i0 = Image(256, 256);
 
@@ -21,7 +21,5 @@ void FillRectTest() {
     expect(p, equals([127, 128, 0]));
     p = i0.getPixel(195, 195);
     expect(p, equals([0, 128, 0]));
-
-
   });
 }

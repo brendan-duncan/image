@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void FillCircleTest() {
+void fillCircleTest() {
   test('fillCircle', () {
     final i0 = Image(256, 256);
 

@@ -13,19 +13,19 @@ import 'color_uint32_test.dart';
 import 'color_uint4_test.dart';
 import 'color_uint8_test.dart';
 
-void ColorTests() {
-  group('Color', () {
-    ColorUint1Test();
-    ColorUint2Test();
-    ColorUint4Test();
-    ColorUint8Test();
-    ColorUint16Test();
-    ColorUint32Test();
-    ColorFloat16Test();
-    ColorFloat32Test();
-    ColorFloat64Test();
-    ColorInt8Test();
-    ColorInt16Test();
-    ColorInt32Test();
+void colorTests() {
+  group('color', () {
+    colorUint1Test();
+    colorUint2Test();
+    colorUint4Test();
+    colorUint8Test();
+    colorUint16Test();
+    colorUint32Test();
+    colorFloat16Test();
+    colorFloat32Test();
+    colorFloat64Test();
+    colorInt8Test();
+    colorInt16Test();
+    colorInt32Test();
   });
 }

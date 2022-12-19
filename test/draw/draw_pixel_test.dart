@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void DrawPixelTest() {
+void drawPixelTest() {
   test('drawPixel.uint8', () {
     final i0 = Image(256, 256);
     for (int y = 0; y < 256; ++y) {

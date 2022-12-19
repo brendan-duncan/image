@@ -6,11 +6,11 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void IcoTest() {
-  group('ICO', () {
+void icoTest() {
+  group('ico', () {
     test('encode', () {
-      final image = Image(64, 64);
-      image.clear(ColorRgb8(100, 200, 255));
+      final image = Image(64, 64)
+      ..clear(ColorRgb8(100, 200, 255));
 
       // Encode the image to ICO
       final ico = IcoEncoder().encodeImage(image);
@@ -18,16 +18,16 @@ void IcoTest() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(ico);
 
-      final image2 = Image(64, 64);
-      image2.clear(ColorRgb8(100, 255, 200));
+      final image2 = Image(64, 64)
+      ..clear(ColorRgb8(100, 255, 200));
 
       final ico2 = IcoEncoder().encodeImages([image, image2]);
       File('$tmpPath/out/ico/encode2.ico')
         ..createSync(recursive: true)
         ..writeAsBytesSync(ico2);
 
-      final image3 = Image(32, 64);
-      image3.clear(ColorRgb8(255, 100, 200));
+      final image3 = Image(32, 64)
+      ..clear(ColorRgb8(255, 100, 200));
 
       final ico3 = IcoEncoder().encodeImages([image, image2, image3]);
       File('$tmpPath/out/ico/encode3.ico')
@@ -35,7 +35,7 @@ void IcoTest() {
         ..writeAsBytesSync(ico3);
     });
 
-    final dir = Directory('test/data/ico');
+    final dir = Directory('test/_data/ico');
     if (!dir.existsSync()) {
       return;
     }

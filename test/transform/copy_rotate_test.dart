@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void CopyRotateTest() {
+void copyRotateTest() {
   test('copyRotate', () {
-    final img = decodePng(File('test/data/png/buck_24.png').readAsBytesSync())!;
+    final img = decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
     final i4 = img.convert(numChannels: 4);
 
     for (var i = 0; i < 360; i += 45) {

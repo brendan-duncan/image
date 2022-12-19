@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void GifTest() {
-  group('GIF', () {
-    final dir = Directory('test/data/gif');
+void gifTest() {
+  group('gif', () {
+    final dir = Directory('test/_data/gif');
     final files = dir.listSync();
     for (var f in files.whereType<File>()) {
       if (!f.path.endsWith('.gif')) {
@@ -42,7 +42,7 @@ void GifTest() {
           for (var frame in anim) {
             final i2 = a2[frame.frameInfo.index];
             for (var p in frame) {
-              var p2 = i2.getPixel(p.x, p.y);
+              final p2 = i2.getPixel(p.x, p.y);
               expect(p, equals(p2));
             }
           }
@@ -51,8 +51,8 @@ void GifTest() {
     }
 
     test('encodeAnimation', () {
-      final anim = Animation();
-      anim.loopCount = 10;
+      final anim = Animation()
+      ..loopCount = 10;
       for (var i = 0; i < 10; i++) {
         final image = Image(480, 120);
         drawString(image, arial48, 100, 60, i.toString());
@@ -93,7 +93,7 @@ void GifTest() {
 
     test('encode_small_gif', () {
       final image = decodeGif(
-          File('test/data/gif/buck_24.gif').readAsBytesSync())!;
+          File('test/_data/gif/buck_24.gif').readAsBytesSync())!;
       final resized = copyResize(image, width: 16, height: 16);
       final gif = encodeGif(resized);
       File('$tmpPath/out/gif/encode_small_gif.gif')

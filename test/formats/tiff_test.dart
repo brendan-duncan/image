@@ -4,11 +4,11 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void TiffTest() {
+void tiffTest() {
   group('tiff', () {
     const name = 'cmyk';
     test(name, () {
-      final bytes = File('test/data/tiff/$name.tif').readAsBytesSync();
+      final bytes = File('test/_data/tiff/$name.tif').readAsBytesSync();
       final i0 = decodeTiff(bytes)!;
       final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
       File('$tmpPath/out/tif/$name.png')
@@ -16,7 +16,7 @@ void TiffTest() {
         ..writeAsBytesSync(encodePng(i1));
     });
 
-    final dir = Directory('test/data/tiff');
+    final dir = Directory('test/_data/tiff');
     final files = dir.listSync();
 
     group('getInfo', () {

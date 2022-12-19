@@ -4,15 +4,15 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void DropShadowTest() {
+void dropShadowTest() {
   test('dropShadow', () {
     final i0 = Image(256, 256, numChannels: 4);
     drawStringCentered(i0, arial48, 'Shadow', color: ColorRgb8(255));
 
     final id = dropShadow(i0, -5, 5, 3);
 
-    final i1 = Image(256, 256);
-    i1.clear(ColorRgb8(255, 255, 255));
+    final i1 = Image(256, 256)
+    ..clear(ColorRgb8(255, 255, 255));
     drawImage(i1, id);
 
     File('$tmpPath/out/filter/dropShadow.png')

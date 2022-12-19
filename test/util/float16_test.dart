@@ -1,7 +1,7 @@
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-void Float16Test() {
+void float16Test() {
   group('float16', () {
     test('constructor', () {
       final f1 = Float16();

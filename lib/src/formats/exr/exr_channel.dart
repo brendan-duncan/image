@@ -7,6 +7,14 @@ enum ExrChannelType {
   float
 }
 
+enum ExrChannelName {
+  red,
+  green,
+  blue,
+  alpha,
+  other
+}
+
 // Standard channel names are:
 // A: Alpha/Opacity
 // R: Red value of a sample
@@ -23,18 +31,20 @@ enum ExrChannelType {
 // id: A numerical identifier for the object represented by a sample.
 class ExrChannel {
   late String name;
-  late ExrChannelType type;
-  late int size;
+  late ExrChannelName nameType;
+  late ExrChannelType dataType; ///< The data type of the channel
+  late int dataSize; ///< bytes per pixel
   late bool pLinear;
   late int xSampling;
   late int ySampling;
+  late bool isColorChannel;
 
   ExrChannel(InputBuffer input) {
     name = input.readString();
     if (name.isEmpty) {
       return;
     }
-    type = ExrChannelType.values[input.readUint32()];
+    dataType = ExrChannelType.values[input.readUint32()];
     final i = input.readByte();
     assert(i == 0 || i == 1);
     pLinear = i == 1;
@@ -42,18 +52,35 @@ class ExrChannel {
     xSampling = input.readUint32();
     ySampling = input.readUint32();
 
-    switch (type) {
+    if (name == 'R') {
+      isColorChannel = true;
+      nameType = ExrChannelName.red;
+    } else if (name == 'G') {
+      isColorChannel = true;
+      nameType = ExrChannelName.green;
+    } else if (name == 'B') {
+      isColorChannel = true;
+      nameType = ExrChannelName.blue;
+    } else if (name == 'A') {
+      isColorChannel = true;
+      nameType = ExrChannelName.alpha;
+    } else {
+      isColorChannel = false;
+      nameType = ExrChannelName.other;
+    }
+
+    switch (dataType) {
       case ExrChannelType.uint:
-        size = 4;
+        dataSize = 4;
         break;
       case ExrChannelType.half:
-        size = 2;
+        dataSize = 2;
         break;
       case ExrChannelType.float:
-        size = 4;
+        dataSize = 4;
         break;
       default:
-        throw ImageException('EXR Invalid pixel type: $type');
+        throw ImageException('EXR Invalid pixel type: $dataType');
     }
   }
 

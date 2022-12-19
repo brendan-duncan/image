@@ -5,11 +5,11 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void PsdTest() {
-  final dir = Directory('test/data/psd');
+void psdTest() {
+  final dir = Directory('test/_data/psd');
   final files = dir.listSync();
 
-  group('PSD', () {
+  group('psd', () {
     for (var f in files.whereType<File>()) {
       if (!f.path.endsWith('.psd')) {
         continue;

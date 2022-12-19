@@ -4,12 +4,12 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void OctreeQuantizerTest() {
-  group('OctreeQuantizer', () {
+void octreeQuantizerTest() {
+  group('octreeQuantizer', () {
     final img = Image(256, 256);
     for (var p in img) {
-      p.r = p.x;
-      p.g = p.y;
+      p..r = p.x
+      ..g = p.y;
     }
 
     final quantizer = OctreeQuantizer(img);

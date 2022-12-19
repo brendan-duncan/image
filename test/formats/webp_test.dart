@@ -4,10 +4,9 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void WebpTest() {
-  const path = 'test/data/webp';
-  group('WebP', ()
-  {
+void webpTest() {
+  const path = 'test/_data/webp';
+  group('webp', () {
     group('decode lossless', () {
       const name = 'test';
       test('$name.webp', () {
@@ -20,7 +19,7 @@ void WebpTest() {
       });
     });
 
-    final dir = Directory('test/data/webp');
+    final dir = Directory('test/_data/webp');
     final files = dir.listSync();
     group('getInfo', () {
       for (var f in files.whereType<File>()) {
@@ -38,16 +37,16 @@ void WebpTest() {
             throw ImageException('Unable to parse WebP info: $name.');
           }
 
-          if (_webp_tests.containsKey(name)) {
-            expect(data.format, equals(_webp_tests[name]!['format']));
-            expect(data.width, equals(_webp_tests[name]!['width']));
-            expect(data.height, equals(_webp_tests[name]!['height']));
-            expect(data.hasAlpha, equals(_webp_tests[name]!['hasAlpha']));
+          if (_webpTests.containsKey(name)) {
+            expect(data.format, equals(_webpTests[name]!['format']));
+            expect(data.width, equals(_webpTests[name]!['width']));
+            expect(data.height, equals(_webpTests[name]!['height']));
+            expect(data.hasAlpha, equals(_webpTests[name]!['hasAlpha']));
             expect(
-                data.hasAnimation, equals(_webp_tests[name]!['hasAnimation']));
+                data.hasAnimation, equals(_webpTests[name]!['hasAnimation']));
 
             if (data.hasAnimation) {
-              expect(webp.numFrames(), equals(_webp_tests[name]!['numFrames']));
+              expect(webp.numFrames(), equals(_webpTests[name]!['numFrames']));
             }
           }
         });
@@ -56,7 +55,7 @@ void WebpTest() {
 
     group('decode', () {
       test('validate', () {
-        var bytes = File('test/data/webp/2b.webp').readAsBytesSync();
+        var bytes = File('test/_data/webp/2b.webp').readAsBytesSync();
         final image = WebPDecoder().decodeImage(bytes)!;
         final png = PngEncoder().encodeImage(image);
         File('$tmpPath/out/webp/decode.png')
@@ -64,7 +63,7 @@ void WebpTest() {
           ..writeAsBytesSync(png);
 
         // Validate decoding.
-        bytes = File('test/data/webp/2b.png').readAsBytesSync();
+        bytes = File('test/_data/webp/2b.png').readAsBytesSync();
         final debugImage = PngDecoder().decodeImage(bytes)!;
 
         testImageEquals(image, debugImage);
@@ -93,8 +92,9 @@ void WebpTest() {
 
     group('decode animation', () {
       test('transparent animation', () {
-        const path = 'test/data/webp/animated_transparency.webp';
-        final anim = WebPDecoder().decodeAnimation(File(path).readAsBytesSync())!;
+        const path = 'test/_data/webp/animated_transparency.webp';
+        final bytes = File(path).readAsBytesSync();
+        final anim = WebPDecoder().decodeAnimation(bytes)!;
 
         expect(anim.numFrames, equals(20));
         expect(anim.frames[2].getPixel(0, 0), equals([0, 0, 0]));
@@ -110,7 +110,7 @@ void WebpTest() {
   });
 }
 
-const _webp_tests = {
+const _webpTests = {
   '1.webp': {
     'format': WebPFormat.lossy,
     'width': 550,

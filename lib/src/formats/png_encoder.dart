@@ -29,11 +29,12 @@ class PngEncoder extends Encoder {
       image.hasPalette ? 1 : image.numChannels;
 
   void addFrame(Image image) {
-    if (image.numChannels > 1 && !image.hasPalette &&
-        image.bitsPerChannel < 8) {
-      // Not supported. Should it be auto converted?
-      throw ImageException('PNG does not support images with'
-          '${image.format.name} format and more than 1 channel.');
+    // PNG can't encode HDR formats, and can only encode formats with fewer
+    // than 8 bits if they have a palette. In the case of incompatible
+    // formats, convert them to uint8.
+    if (image.isHdrFormat || (image.bitsPerChannel < 8 && !image.hasPalette &&
+        image.numChannels > 1)) {
+      image = image.convert(format: Format.uint8);
     }
 
     if (output == null) {

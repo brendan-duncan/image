@@ -1,7 +1,7 @@
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-void ColorFloat16Test() {
+void colorFloat16Test() {
   test('ColorFloat16', () {
     final c0 = ColorFloat16(0);
     expect(c0.length, equals(0));

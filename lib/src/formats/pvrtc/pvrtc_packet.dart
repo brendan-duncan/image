@@ -7,7 +7,7 @@ import 'pvrtc_color.dart';
 // https://bitbucket.org/jthlim/pvrtccompressor
 class PvrtcPacket {
   Uint32List rawData;
-  late int index;
+  int index = 0;
 
   PvrtcPacket(TypedData data)
       : rawData = Uint32List.view(data.buffer);
@@ -30,9 +30,9 @@ class PvrtcPacket {
 
   set colorData(int x) => rawData[index + 1] = x;
 
-  int get usePunchthroughAlpha => _usePunchthroughAlpha;
+  bool get usePunchthroughAlpha => _usePunchthroughAlpha;
 
-  set usePunchthroughAlpha(int x) {
+  set usePunchthroughAlpha(bool x) {
     _usePunchthroughAlpha = x;
     colorData = _getColorData();
   }
@@ -44,9 +44,9 @@ class PvrtcPacket {
     colorData = _getColorData();
   }
 
-  int get colorAIsOpaque => _colorAIsOpaque;
+  bool get colorAIsOpaque => _colorAIsOpaque;
 
-  set colorAIsOpaque(int x) {
+  set colorAIsOpaque(bool x) {
     _colorAIsOpaque = x;
     colorData = _getColorData();
   }
@@ -58,9 +58,9 @@ class PvrtcPacket {
     colorData = _getColorData();
   }
 
-  int get colorBIsOpaque => _colorBIsOpaque;
+  bool get colorBIsOpaque => _colorBIsOpaque;
 
-  set colorBIsOpaque(int x) {
+  set colorBIsOpaque(bool x) {
     _colorBIsOpaque = x;
     colorData = _getColorData();
   }
@@ -70,7 +70,7 @@ class PvrtcPacket {
     final g = BitUtility.bitScale8To5Floor[c.g];
     final b = BitUtility.bitScale8To4Floor[c.b];
     colorA = r << 9 | g << 4 | b;
-    colorAIsOpaque = 1;
+    colorAIsOpaque = true;
   }
 
   void setColorRgbaA(PvrtcColorRgba c) {
@@ -80,13 +80,13 @@ class PvrtcPacket {
       final g = BitUtility.bitScale8To5Floor[c.g];
       final b = BitUtility.bitScale8To4Floor[c.b];
       colorA = r << 9 | g << 4 | b;
-      colorAIsOpaque = 1;
+      colorAIsOpaque = true;
     } else {
       final r = BitUtility.bitScale8To4Floor[c.r];
       final g = BitUtility.bitScale8To4Floor[c.g];
       final b = BitUtility.bitScale8To3Floor[c.b];
       colorA = a << 11 | r << 7 | g << 3 | b;
-      colorAIsOpaque = 0;
+      colorAIsOpaque = false;
     }
   }
 
@@ -95,7 +95,7 @@ class PvrtcPacket {
     final g = BitUtility.bitScale8To5Ceil[c.g];
     final b = BitUtility.bitScale8To5Ceil[c.b];
     colorB = r << 10 | g << 5 | b;
-    colorBIsOpaque = 1;
+    colorBIsOpaque = false;
   }
 
   void setColorRgbaB(PvrtcColorRgba c) {
@@ -105,18 +105,18 @@ class PvrtcPacket {
       final g = BitUtility.bitScale8To5Ceil[c.g];
       final b = BitUtility.bitScale8To5Ceil[c.b];
       colorB = r << 10 | g << 5 | b;
-      colorBIsOpaque = 1;
+      colorBIsOpaque = true;
     } else {
       final r = BitUtility.bitScale8To4Ceil[c.r];
       final g = BitUtility.bitScale8To4Ceil[c.g];
       final b = BitUtility.bitScale8To4Ceil[c.b];
       colorB = a << 12 | r << 8 | g << 4 | b;
-      colorBIsOpaque = 0;
+      colorBIsOpaque = false;
     }
   }
 
   PvrtcColorRgb getColorRgbA() {
-    if (colorAIsOpaque != 0) {
+    if (colorAIsOpaque) {
       final r = colorA >> 9;
       final g = colorA >> 4 & 0x1f;
       final b = colorA & 0xf;
@@ -132,7 +132,7 @@ class PvrtcPacket {
   }
 
   PvrtcColorRgba getColorRgbaA() {
-    if (colorAIsOpaque != 0) {
+    if (colorAIsOpaque) {
       final r = colorA >> 9;
       final g = colorA >> 4 & 0x1f;
       final b = colorA & 0xf;
@@ -152,7 +152,7 @@ class PvrtcPacket {
   }
 
   PvrtcColorRgb getColorRgbB() {
-    if (colorBIsOpaque != 0) {
+    if (colorBIsOpaque) {
       final r = colorB >> 10;
       final g = colorB >> 5 & 0x1f;
       final b = colorB & 0x1f;
@@ -168,7 +168,7 @@ class PvrtcPacket {
   }
 
   PvrtcColorRgba getColorRgbaB() {
-    if (colorBIsOpaque != 0) {
+    if (colorBIsOpaque) {
       final r = colorB >> 10;
       final g = colorB >> 5 & 0x1f;
       final b = colorB & 0x1f;
@@ -187,36 +187,36 @@ class PvrtcPacket {
     }
   }
 
-  int _usePunchthroughAlpha = 0;
-  int _colorA = 0;
-  int _colorAIsOpaque = 0;
-  int _colorB = 0;
-  int _colorBIsOpaque = 0;
-
   int _getColorData() =>
-      (usePunchthroughAlpha & 1) |
-      ((colorA & bits14) << 1) |
-      ((colorAIsOpaque & 1) << 15) |
-      ((colorB & bits15) << 16) |
-      ((colorBIsOpaque & 1) << 31);
+    (usePunchthroughAlpha ? 1 : 0) |
+    ((colorA & _bits14) << 1) |
+    ((colorAIsOpaque ? 1 : 0) << 15) |
+    ((colorB & _bits15) << 16) |
+    ((colorBIsOpaque ? 1 : 0) << 31);
 
   void _update() {
     final x = colorData;
-    usePunchthroughAlpha = x & 1;
-    colorA = (x >> 1) & bits14;
-    colorAIsOpaque = (x >> 15) & 1;
-    colorB = (x >> 16) & bits15;
-    colorBIsOpaque = (x >> 31) & 1;
+    usePunchthroughAlpha = x & 1 == 1;
+    colorA = (x >> 1) & _bits14;
+    colorAIsOpaque = ((x >> 15) & 1) == 1;
+    colorB = (x >> 16) & _bits15;
+    colorBIsOpaque = ((x >> 31) & 1) == 1;
   }
 
   static int _getMortonNumber(int x, int y) =>
-      mortonTable[x >> 8] << 17 |
-      mortonTable[y >> 8] << 16 |
-      mortonTable[x & 0xff] << 1 |
-      mortonTable[y & 0xff];
+    _mortonTable[x >> 8] << 17 |
+    _mortonTable[y >> 8] << 16 |
+    _mortonTable[x & 0xff] << 1 |
+    _mortonTable[y & 0xff];
 
-  static const bits14 = (1 << 14) - 1;
-  static const bits15 = (1 << 15) - 1;
+  bool _usePunchthroughAlpha = false;
+  int _colorA = 0;
+  bool _colorAIsOpaque = false;
+  int _colorB = 0;
+  bool _colorBIsOpaque = false;
+
+  static const _bits14 = (1 << 14) - 1;
+  static const _bits15 = (1 << 15) - 1;
 
   static const bilinearFactors = [
     [4, 4, 4, 4],
@@ -252,7 +252,7 @@ class PvrtcPacket {
     [0, 8, 0, 8],
   ];
 
-  static const mortonTable = [
+  static const _mortonTable = [
     0x0000,
     0x0001,
     0x0004,

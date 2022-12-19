@@ -1,7 +1,7 @@
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-void ColorUint16Test() {
+void colorUint16Test() {
   test('ColorUint16', () {
     final c0 = ColorUint16(0);
     expect(c0.length, equals(0));

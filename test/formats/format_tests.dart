@@ -11,18 +11,17 @@ import 'tga_test.dart';
 import 'tiff_test.dart';
 import 'webp_test.dart';
 
-void FormatTests() {
-  //PngTest(); // +
-  //JpegTest(); // +
-  //TgaTest(); // +
-  //GifTest(); // +
-  //BmpTest(); // +
-  //WebpTest(); // +
-  //IcoTest(); // +
-  //CurTest(); // +
-  //TiffTest(); // +
-  //PsdTest(); // +
-
-  PvrtcTest(); // -
-  //ExrTest(); // -
+void formatTests() {
+  pngTest();
+  jpegTest();
+  tgaTest();
+  gifTest();
+  bmpTest();
+  webpTest();
+  icoTest();
+  curTest();
+  tiffTest();
+  psdTest();
+  exrTest();
+  pvrtcTest();
 }

@@ -9,13 +9,13 @@ import 'transform/transform_tests.dart';
 import 'util/util_tests.dart';
 
 void main(List<String> args) {
-  //ColorTests();
-  //ExifTests();
-  //FontTests();
-  UtilTests();
-  //ImageTests();
-  //DrawTests();
-  //FilterTests();
-  //TransformTests();
-  //FormatTests();
+  colorTests();
+  exifTests();
+  fontTests();
+  utilTests();
+  imageTests();
+  drawTests();
+  filterTests();
+  transformTests();
+  formatTests();
 }

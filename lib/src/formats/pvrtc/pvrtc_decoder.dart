@@ -426,12 +426,12 @@ class PvrtcDecoder {
     const factors = PvrtcPacket.bilinearFactors;
     const weights = PvrtcPacket.weights;
 
-    for (var y = 0; y < blocks; ++y) {
-      for (var x = 0; x < blocks; ++x) {
+    for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
+      for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
         packet.setBlock(x, y);
 
         var mod = packet.modulationData;
-        final weightIndex = 4 * packet.usePunchthroughAlpha;
+        final weightIndex = packet.usePunchthroughAlpha ? 4 : 0;
         var factorIndex = 0;
 
         for (var py = 0; py < 4; ++py) {
@@ -461,10 +461,10 @@ class PvrtcDecoder {
 
             final w = weights[weightIndex + mod & 3];
 
-            result.setPixelColor(px + x, py + y,
-                (ca.r * w[0] + cb.r * w[1]) >> 7,
-                (ca.g * w[0] + cb.g * w[1]) >> 7,
-                (ca.b * w[0] + cb.b * w[1]) >> 7);
+            final r = (ca.r * w[0] + cb.r * w[1]) >> 7;
+            final g = (ca.g * w[0] + cb.g * w[1]) >> 7;
+            final b = (ca.b * w[0] + cb.b * w[1]) >> 7;
+            result.setPixelColor(px + x4, py + y4, r, g, b);
 
             mod >>= 2;
             factorIndex++;
@@ -490,12 +490,12 @@ class PvrtcDecoder {
     const factors = PvrtcPacket.bilinearFactors;
     const weights = PvrtcPacket.weights;
 
-    for (var y = 0; y < blocks; ++y) {
-      for (var x = 0; x < blocks; ++x) {
+    for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
+      for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
         packet.setBlock(x, y);
 
         var mod = packet.modulationData;
-        final weightIndex = 4 * packet.usePunchthroughAlpha;
+        final weightIndex = packet.usePunchthroughAlpha ? 4 : 0;
         var factorIndex = 0;
 
         for (var py = 0; py < 4; ++py) {
@@ -525,11 +525,11 @@ class PvrtcDecoder {
 
             final w = weights[weightIndex + mod & 3];
 
-            result.setPixelColor(px + x, py + y,
-                (ca.r * w[0] + cb.r * w[1]) >> 7,
-                (ca.g * w[0] + cb.g * w[1]) >> 7,
-                (ca.b * w[0] + cb.b * w[1]) >> 7,
-                (ca.a * w[2] + cb.a * w[3]) >> 7);
+            final r = (ca.r * w[0] + cb.r * w[1]) >> 7;
+            final g = (ca.g * w[0] + cb.g * w[1]) >> 7;
+            final b = (ca.b * w[0] + cb.b * w[1]) >> 7;
+            final a = (ca.a * w[2] + cb.a * w[3]) >> 7;
+            result.setPixelColor(px + x4, py + y4, r, g, b, a);
 
             mod >>= 2;
             factorIndex++;

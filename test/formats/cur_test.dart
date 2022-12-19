@@ -6,11 +6,11 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void CurTest() {
-  group('CUR', () {
+void curTest() {
+  group('cur', () {
     test('encode', () {
-      final image = Image(64, 64);
-      image.clear(ColorRgb8(100, 200, 255));
+      final image = Image(64, 64)
+      ..clear(ColorRgb8(100, 200, 255));
 
       // Encode the image to CUR
       final png = CurEncoder().encodeImage(image);
@@ -18,8 +18,8 @@ void CurTest() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
-      final image2 = Image(64, 64);
-      image2.clear(ColorRgb8(100, 255, 200));
+      final image2 = Image(64, 64)
+      ..clear(ColorRgb8(100, 255, 200));
 
       final png2 = CurEncoder(hotSpots: {1: Point(64, 64), 0: Point(64, 64)})
           .encodeImages([image, image2]);
@@ -27,8 +27,8 @@ void CurTest() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(png2);
 
-      final image3 = Image(32, 64);
-      image3.clear(ColorRgb8(255, 100, 200));
+      final image3 = Image(32, 64)
+      ..clear(ColorRgb8(255, 100, 200));
 
       final png3 = CurEncoder().encodeImages([image, image2, image3]);
       File('$tmpPath/out/cur/encode3.cur')

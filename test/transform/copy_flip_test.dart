@@ -4,26 +4,26 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void CopyFlipTest() {
+void copyFlipTest() {
   test('copyFlip', () {
-    final img = decodePng(File('test/data/png/buck_24.png').readAsBytesSync())!;
+    final img = decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
 
-    final i_h = copyFlip(img, FlipDirection.horizontal);
-    expect(i_h.numChannels, equals(i_h.numChannels));
+    final ih = copyFlip(img, FlipDirection.horizontal);
+    expect(ih.numChannels, equals(ih.numChannels));
     File('$tmpPath/out/transform/copyFlip_h.png')
       ..createSync(recursive: true)
-      ..writeAsBytesSync(encodePng(i_h));
+      ..writeAsBytesSync(encodePng(ih));
 
-    final i_v = copyFlip(img, FlipDirection.vertical);
-    expect(i_v.numChannels, equals(i_h.numChannels));
+    final iv = copyFlip(img, FlipDirection.vertical);
+    expect(iv.numChannels, equals(ih.numChannels));
     File('$tmpPath/out/transform/copyFlip_v.png')
       ..createSync(recursive: true)
-      ..writeAsBytesSync(encodePng(i_v));
+      ..writeAsBytesSync(encodePng(iv));
 
-    final i_b = copyFlip(img, FlipDirection.both);
-    expect(i_b.numChannels, equals(i_h.numChannels));
+    final ib = copyFlip(img, FlipDirection.both);
+    expect(ib.numChannels, equals(ih.numChannels));
     File('$tmpPath/out/transform/copyFlip_b.png')
       ..createSync(recursive: true)
-      ..writeAsBytesSync(encodePng(i_b));
+      ..writeAsBytesSync(encodePng(ib));
   });
 }

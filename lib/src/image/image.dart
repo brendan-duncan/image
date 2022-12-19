@@ -37,7 +37,7 @@ import 'pixel.dart';
 
 class Image extends Iterable<Pixel> {
   ImageData? data;
-  Map<String, ImageData>? extra;
+  Map<String, ImageData>? extraChannels;
   FrameInfo? _frameInfo;
   IccProfile? iccProfile;
   Map<String, String>? textData;
@@ -63,8 +63,8 @@ class Image extends Iterable<Pixel> {
       , _frameInfo = other._frameInfo?.clone()
       , _exif = other._exif?.clone()
       , iccProfile = other.iccProfile?.clone() {
-    if (other.extra != null) {
-      extra = Map<String, ImageData>.from(other.extra!);
+    if (other.extraChannels != null) {
+      extraChannels = Map<String, ImageData>.from(other.extraChannels!);
     }
     if (other.textData != null) {
       textData = Map<String, String>.from(other.textData!);
@@ -246,28 +246,28 @@ class Image extends Iterable<Pixel> {
   set exif(ExifData exif) => _exif = exif;
 
   bool hasExtraChannel(String name) =>
-      extra != null && extra!.containsKey(name);
+      extraChannels != null && extraChannels!.containsKey(name);
 
   ImageData? getExtraChannel(String name) =>
-      extra != null ? extra![name] : null;
+      extraChannels != null ? extraChannels![name] : null;
 
   void setExtraChannel(String name, ImageData? data) {
-    if (extra == null && data == null) {
+    if (extraChannels == null && data == null) {
       return;
     }
 
-    if (extra == null) {
-      extra = {};
+    if (extraChannels == null) {
+      extraChannels = {};
     }
 
     if (data == null) {
-      extra!.remove(name);
+      extraChannels!.remove(name);
     } else {
-      extra![name] = data;
+      extraChannels![name] = data;
     }
 
-    if (extra!.isEmpty) {
-      extra = null;
+    if (extraChannels!.isEmpty) {
+      extraChannels = null;
     }
   }
 

@@ -21,27 +21,27 @@ import 'smooth_test.dart';
 import 'sobel_test.dart';
 import 'vignette_test.dart';
 
-void FilterTests() {
-  group('Filter', () {
-    AdjustColorTest();
-    BumpToNormalTest();
-    ColorOffsetTest();
-    ContrastTest();
-    DitherTest();
-    EmbossTest();
-    GaussianBlurTest();
-    GrayscaleTest();
-    InvertTest();
-    NoiseTest();
-    NormalizeTest();
-    PixelateTest();
-    QuantizeTest();
-    RemapColorsTest();
-    ScaleRgbaTest();
-    SepiaTest();
-    SmoothTest();
-    SobelTest();
-    VignetteTest();
-    DropShadowTest();
+void filterTests() {
+  group('filter', () {
+    adjustColorTest();
+    bumpToNormalTest();
+    colorOffsetTest();
+    contrastTest();
+    ditherTest();
+    embossTest();
+    gaussianBlurTest();
+    grayscaleTest();
+    invertTest();
+    noiseTest();
+    normalizeTest();
+    pixelateTest();
+    quantizeTest();
+    remapColorsTest();
+    scaleRgbaTest();
+    sepiaTest();
+    smoothTest();
+    sobelTest();
+    vignetteTest();
+    dropShadowTest();
   });
 }

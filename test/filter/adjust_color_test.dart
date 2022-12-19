@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void AdjustColorTest() {
+void adjustColorTest() {
   test('adjustColor', () {
-    final bytes = File('test/data/png/buck_24.png').readAsBytesSync();
+    final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
     final i0 = PngDecoder().decodeImage(bytes)!;
     adjustColor(i0, gamma: 2.2);
     File('$tmpPath/out/filter/adjustColor.png')

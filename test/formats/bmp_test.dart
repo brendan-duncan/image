@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void BmpTest() {
-  group('BMP', () {
-    final dir = Directory('test/data/bmp');
+void bmpTest() {
+  group('bmp', () {
+    final dir = Directory('test/_data/bmp');
     final files = dir.listSync().whereType<File>();
     for (var f in files.whereType<File>()) {
       if (!f.path.endsWith('.bmp')) {

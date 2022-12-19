@@ -1,7 +1,7 @@
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-void ColorUint32Test() {
+void colorUint32Test() {
   test('ColorUint32', () {
     final c0 = ColorUint32(0);
     expect(c0.length, equals(0));

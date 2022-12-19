@@ -1,9 +1,12 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import '../../color/color.dart';
+import '../../util/float16.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import '../decode_info.dart';
+import 'exr_channel.dart';
 import 'exr_part.dart';
 
 class ExrImage implements DecodeInfo {
@@ -31,13 +34,13 @@ class ExrImage implements DecodeInfo {
     }
 
     if (!_isMultiPart) {
-      final ExrPart part = InternalExrPart(_isTiled, input);
+      final ExrPart part = InternalExrPart(_parts.length, _isTiled, input);
       if (part.isValid) {
         _parts.add(part as InternalExrPart);
       }
     } else {
       while (true) {
-        final ExrPart part = InternalExrPart(_isTiled, input);
+        final ExrPart part = InternalExrPart(_parts.length, _isTiled, input);
         if (!part.isValid) {
           break;
         }
@@ -98,44 +101,20 @@ class ExrImage implements DecodeInfo {
 
   void _readImage(InputBuffer input) {
     //final bool multiPart = _isMultiPart();
-
-    for (var pi = 0; pi < _parts.length; ++pi) {
-      final part = _parts[pi];
-      final framebuffer = part.framebuffer!;
-
-      for (var ci = 0; ci < part.channels.length; ++ci) {
-        final ch = part.channels[ci];
-        if (ch.name != "R" && ch.name != "G" && ch.name != "B" &&
-            ch.name != "A") {
-          if (!framebuffer.hasExtraChannel(ch.name)) {
-            width = part.width!;
-            height = part.height!;
-          }
-        }
-        /*if (!framebuffer.hasChannel(ch.name)) {
-          width = part.width!;
-          height = part.height!;
-          framebuffer.addSlice(HdrSlice(
-              ch.name,
-              part.width!,
-              part.height!,
-              ch.type == ExrChannel.TYPE_UINT ? HdrImage.UINT : HdrImage.FLOAT,
-              8 * ch.size));
-        }*/
-      }
-
+    for (var part in _parts) {
+      width = max(width, part.width);
+      height = max(height, part.height);
       if (part.tiled) {
-        _readTiledPart(pi, input);
+        _readTiledPart(part, input);
       } else {
-        _readScanlinePart(pi, input);
+        _readScanlinePart(part, input);
       }
     }
   }
 
-  void _readTiledPart(int pi, InputBuffer input) {
-    final part = _parts[pi];
+  void _readTiledPart(InternalExrPart part, InputBuffer input) {
     final multiPart = _isMultiPart;
-    //final framebuffer = part.framebuffer;
+    final framebuffer = part.framebuffer!;
     final compressor = part.compressor;
     final offsets = part.offsets;
     //Uint32List fbi = Uint32List(part.channels.length);
@@ -154,19 +133,17 @@ class ExrImage implements DecodeInfo {
 
             if (multiPart) {
               final p = imgData.readUint32();
-              if (p != pi) {
+              if (p != part.index) {
                 throw ImageException('Invalid Image Data');
               }
             }
 
             final tileX = imgData.readUint32();
             final tileY = imgData.readUint32();
-            /*int levelX =*/
-            imgData..readUint32()
-            /*int levelY =*/
-            ..readUint32();
+            imgData..readUint32() // levelX
+            ..readUint32(); // levelY
             final dataSize = imgData.readUint32();
-            /*final data =*/ imgData.readBytes(dataSize);
+            final data = imgData.readBytes(dataSize);
 
             var ty = tileY * part.tileHeight!;
             final tx = tileX * part.tileWidth!;
@@ -181,34 +158,46 @@ class ExrImage implements DecodeInfo {
               tileHeight = height - ty;
             }
 
-            //final uncompressedData = compressor.uncompress(
-                //data, tx, ty, part.tileWidth, part.tileHeight);
+            final uncompressedData = InputBuffer(compressor.uncompress(
+                data, tx, ty, part.tileWidth, part.tileHeight));
             tileWidth = compressor.decodedWidth;
             tileHeight = compressor.decodedHeight;
 
-            //var si = 0;
-            //final len = uncompressedData.length;
+            var si = 0;
+            final len = uncompressedData.length;
             final numChannels = part.channels.length;
-            //int lineCount = 0;
             for (var yi = 0; yi < tileHeight && ty < height; ++yi, ++ty) {
               for (var ci = 0; ci < numChannels; ++ci) {
-                //final ch = part.channels[ci];
-                /*final slice = framebuffer[ch.name]!.getBytes();
                 if (si >= len) {
                   break;
                 }
 
+                final ch = part.channels[ci];
+
                 var tx = tileX * part.tileWidth!;
                 for (var xx = 0; xx < tileWidth; ++xx, ++tx) {
-                  for (var bi = 0; bi < ch.size; ++bi) {
-                    if (tx < part.width! && ty < part.height!) {
-                      final di = (ty * part.width! + tx) * ch.size + bi;
-                      slice[di] = uncompressedData[si++];
-                    } else {
-                      si++;
-                    }
+                  num v;
+                  switch (ch.dataType) {
+                    case ExrChannelType.half:
+                      v = Float16.float16ToDouble(
+                          uncompressedData.readUint16());
+                      break;
+                    case ExrChannelType.float:
+                      v = uncompressedData.readUint16();
+                      break;
+                    case ExrChannelType.uint:
+                      v = uncompressedData.readUint32();
+                      break;
                   }
-                }*/
+                  si += ch.dataSize;
+                  if (ch.isColorChannel) {
+                    final p = framebuffer.getPixel(tx, ty);
+                    p[ch.nameType.index] = v;
+                  } else {
+                    final slice = framebuffer.getExtraChannel(ch.name);
+                    slice?.setPixelColor(tx, ty, v);
+                  }
+                }
               }
             }
           }
@@ -217,10 +206,9 @@ class ExrImage implements DecodeInfo {
     }
   }
 
-  void _readScanlinePart(int pi, InputBuffer input) {
-    final part = _parts[pi];
+  void _readScanlinePart(InternalExrPart part, InputBuffer input) {
     final multiPart = _isMultiPart;
-    //final framebuffer = part.framebuffer;
+    final framebuffer = part.framebuffer!;
     final compressor = part.compressor;
     final offsets = part.offsets![0]!;
 
@@ -248,39 +236,57 @@ class ExrImage implements DecodeInfo {
         }
       }
 
-      /*var y =*/
-      imgData.readInt32();
+      imgData.readInt32(); // y
       final dataSize = imgData.readInt32();
       final data = imgData.readBytes(dataSize);
 
-      Uint8List uncompressedData;
+      InputBuffer uncompressedData;
       if (compressor != null) {
-        uncompressedData = compressor.uncompress(data, 0, yy);
+        uncompressedData = InputBuffer(compressor.uncompress(data, 0, yy));
       } else {
-        uncompressedData = data.toUint8List();
+        uncompressedData = data;
       }
 
       var si = 0;
       final len = uncompressedData.length;
       final numChannels = part.channels.length;
-      //int lineCount = 0;
-      for (var yi = 0; yi < linesInBuffer! && yy < height; ++yi, ++yy) {
+      for (var yi = 0; yi < linesInBuffer && yy < height; ++yi, ++yy) {
         si = part.offsetInLineBuffer![yy];
         if (si >= len) {
           break;
         }
 
         for (var ci = 0; ci < numChannels; ++ci) {
-          /*final ch = part.channels[ci];
-          final slice = framebuffer[ch.name]!.getBytes();
           if (si >= len) {
             break;
           }
-          for (var xx = 0; xx < part.width!; ++xx) {
-            for (var bi = 0; bi < ch.size; ++bi) {
-              slice[fbi[ci]++] = uncompressedData[si++];
+
+          final ch = part.channels[ci];
+          final pw = part.width;
+          for (var xx = 0; xx < pw; ++xx) {
+            num v;
+            switch (ch.dataType) {
+              case ExrChannelType.half:
+                v = Float16.float16ToDouble(uncompressedData.readUint16());
+                break;
+              case ExrChannelType.float:
+                v = uncompressedData.readUint16();
+                break;
+              case ExrChannelType.uint:
+                v = uncompressedData.readUint32();
+                break;
             }
-          }*/
+            si += ch.dataSize;
+
+            if (ch.isColorChannel) {
+              final p = framebuffer.getPixel(xx, yy);
+              final ci = ch.nameType.index;
+              p[ci] = v;
+            } else {
+              final slice = framebuffer.getExtraChannel(ch.name);
+              slice?.setPixelColor(xx, yy, v);
+            }
+          }
         }
       }
     }

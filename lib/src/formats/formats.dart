@@ -203,10 +203,9 @@ Uint8List encodeTiffAnimation(Animation anim) =>
 /// Decode a Photoshop PSD formatted image.
 Image? decodePsd(Uint8List bytes) => PsdDecoder().decodeImage(bytes);
 
-/// Decode an OpenEXR formatted image, tone-mapped using the
-/// given [exposure] to a low-dynamic-range [Image].
-Image? decodeExr(Uint8List bytes, {double exposure = 1.0}) =>
-    ExrDecoder(exposure: exposure).decodeImage(bytes);
+/// Decode an OpenEXR formatted image. EXR is a high dynamic range format.
+Image? decodeExr(Uint8List bytes) =>
+    ExrDecoder().decodeImage(bytes);
 
 /// Decode a BMP formatted image.
 Image? decodeBmp(Uint8List bytes) => BmpDecoder().decodeImage(bytes);

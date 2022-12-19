@@ -47,15 +47,15 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     height ??= header.linesInBuffer;
 
     final minX = x;
-    var maxX = x + width! - 1;
+    var maxX = x + width - 1;
     final minY = y;
-    var maxY = y + height! - 1;
+    var maxY = y + height - 1;
 
-    if (maxX > header.width!) {
-      maxX = header.width! - 1;
+    if (maxX > header.width) {
+      maxX = header.width - 1;
     }
-    if (maxY > header.height!) {
-      maxY = header.height! - 1;
+    if (maxY > header.height) {
+      maxY = header.height - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;
@@ -72,7 +72,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
         final n = numSamples(ch.xSampling, minX, maxX);
         pixel[0] = 0;
 
-        switch (ch.type) {
+        switch (ch.dataType) {
           case ExrChannelType.uint:
             ptr[0] = tmpEnd;
             ptr[1] = ptr[0] + n;

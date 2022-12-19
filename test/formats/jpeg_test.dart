@@ -4,10 +4,10 @@ import 'package:test/test.dart';
 
 import '../test_util.dart';
 
-void JpegTest() {
-  group('Jpeg', () {
+void jpegTest() {
+  group('jpg', () {
     test('decode', () {
-      final fb = File('test/data/jpg/buck_24.jpg').readAsBytesSync();
+      final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
       final image = JpegDecoder().decodeImage(fb)!;
       expect(image.width, equals(300));
       expect(image.height, equals(186));
@@ -18,7 +18,7 @@ void JpegTest() {
     });
 
     test('encode', () {
-      final fb = File('test/data/jpg/buck_24.jpg').readAsBytesSync();
+      final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
       final image = JpegDecoder().decodeImage(fb)!;
       File('$tmpPath/out/jpg/encode.png')
         ..createSync(recursive: true)
@@ -26,7 +26,7 @@ void JpegTest() {
     });
 
     test('progressive', () {
-      final fb = File('test/data/jpg/progress.jpg').readAsBytesSync();
+      final fb = File('test/_data/jpg/progress.jpg').readAsBytesSync();
       final image = JpegDecoder().decodeImage(fb)!;
       expect(image.width, 341);
       expect(image.height, 486);
@@ -36,11 +36,11 @@ void JpegTest() {
     });
 
     test('exif', () {
-      final fb = File('test/data/jpg/big_buck_bunny.jpg').readAsBytesSync();
+      final fb = File('test/_data/jpg/big_buck_bunny.jpg').readAsBytesSync();
       final image = JpegDecoder().decodeImage(fb)!;
       image.exif.imageIfd['XResolution'] = [300,1];
       image.exif.imageIfd['YResolution'] = [300,1];
-      var jpg = JpegEncoder().encodeImage(image);
+      final jpg = JpegEncoder().encodeImage(image);
       final image2 = JpegDecoder().decodeImage(jpg)!;
       expect(image.exif.imageIfd['XResolution'],
           equals(image2.exif.imageIfd['XResolution']));
@@ -48,7 +48,7 @@ void JpegTest() {
           equals(image2.exif.imageIfd['YResolution']));
     });
 
-    final dir = Directory('test/data/jpg');
+    final dir = Directory('test/_data/jpg');
     final files = dir.listSync(recursive: true);
     for (var f in files.whereType<File>()) {
       if (!f.path.endsWith('.jpg')) {
@@ -76,7 +76,7 @@ void JpegTest() {
     for (var i = 1; i < 9; ++i) {
       test('exif/orientation_$i/landscape', () {
         final image = JpegDecoder().decodeImage(
-            File('test/data/jpg/landscape_$i.jpg').readAsBytesSync())!;
+            File('test/_data/jpg/landscape_$i.jpg').readAsBytesSync())!;
         File('$tmpPath/out/jpg/landscape_$i.jpg')
           ..createSync(recursive: true)
           ..writeAsBytesSync(JpegEncoder().encodeImage(image));
@@ -84,7 +84,7 @@ void JpegTest() {
 
       test('exif/orientation_$i/portrait', () {
         final image = JpegDecoder().decodeImage(
-            File('test/data/jpg/portrait_$i.jpg').readAsBytesSync())!;
+            File('test/_data/jpg/portrait_$i.jpg').readAsBytesSync())!;
         File('$tmpPath/out/jpg/portrait_$i.jpg')
           ..createSync(recursive: true)
           ..writeAsBytesSync(JpegEncoder().encodeImage(image));

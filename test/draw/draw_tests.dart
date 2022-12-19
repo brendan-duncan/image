@@ -12,18 +12,18 @@ import 'fill_flood_test.dart';
 import 'fill_rect_test.dart';
 import 'fill_test.dart';
 
-void DrawTests() {
-  group('Draw', () {
-    DrawPixelTest();
-    DrawCharTest();
-    DrawCircleTest();
-    DrawImageTest();
-    DrawLineTest();
-    DrawRectTest();
-    DrawStringTest();
-    FillCircleTest();
-    FillFloodTest();
-    FillRectTest();
-    FillTest();
+void drawTests() {
+  group('draw', () {
+    drawPixelTest();
+    drawCharTest();
+    drawCircleTest();
+    drawImageTest();
+    drawLineTest();
+    drawRectTest();
+    drawStringTest();
+    fillCircleTest();
+    fillFloodTest();
+    fillRectTest();
+    fillTest();
   });
 }
