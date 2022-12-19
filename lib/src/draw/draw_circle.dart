@@ -22,10 +22,9 @@ Image drawCircle(Image image, int x0, int y0, int radius, Color color) {
 /// Once found, it draws a line connecting those two points. The circle is thus
 /// filled one vertical slice at a time (each slice being 1-pixel wide).
 Image fillCircle(Image image, int x0, int y0, int radius, Color color) {
-  final points = _calculateCircumference(image, x0, y0, radius);
-
-  // sort points by x-coordinate and then by y-coordinate
-  points.sort((a, b) => (a.x == b.x) ? a.y.compareTo(b.y) : a.x.compareTo(b.x));
+  final points = _calculateCircumference(image, x0, y0, radius)
+      // sort points by x-coordinate and then by y-coordinate
+      ..sort((a, b) => (a.x == b.x) ? a.y.compareTo(b.y) : a.x.compareTo(b.x));
 
   var start = points.first;
   var end = points.first;
@@ -60,11 +59,11 @@ List<Point> _calculateCircumference(Image image, int x0, int y0, int radius) {
     return [Point(x0, y0)];
   }
 
-  final points = <Point>[];
-  points.add(Point(x0 - radius, y0));
-  points.add(Point(x0 + radius, y0));
-  points.add(Point(x0, y0 - radius));
-  points.add(Point(x0, y0 + radius));
+  final points = [
+    Point(x0 - radius, y0),
+    Point(x0 + radius, y0),
+    Point(x0, y0 - radius),
+    Point(x0, y0 + radius)];
 
   if (radius == 1) {
     return points;
@@ -90,16 +89,16 @@ List<Point> _calculateCircumference(Image image, int x0, int y0, int radius) {
       final y3 = y0 - y;
       final y4 = y0 + y;
 
-      points.add(Point(x1, y1));
-      points.add(Point(x1, y2));
-      points.add(Point(x2, y1));
-      points.add(Point(x2, y2));
+      points..add(Point(x1, y1))
+        ..add(Point(x1, y2))
+        ..add(Point(x2, y1))
+        ..add(Point(x2, y2));
 
       if (x != y) {
-        points.add(Point(x3, y3));
-        points.add(Point(x4, y4));
-        points.add(Point(x4, y3));
-        points.add(Point(x3, y4));
+        points..add(Point(x3, y3))
+          ..add(Point(x4, y4))
+          ..add(Point(x4, y3))
+          ..add(Point(x3, y4));
       }
     }
   }

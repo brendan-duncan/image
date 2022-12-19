@@ -22,8 +22,7 @@ abstract class Quantizer {
     final target = Image(image.width, image.height, numChannels: 1,
         palette: palette);
 
-    final ti = target.iterator;
-    ti.moveNext();
+    final ti = target.iterator..moveNext();
 
     for (var p in image) {
       final t = ti.current;

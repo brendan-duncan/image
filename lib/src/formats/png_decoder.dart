@@ -216,11 +216,11 @@ class PngDecoder extends Decoder {
             chunkSize -= 2;
           } else if (_info.colorType == PngColorType.rgb ||
               _info.colorType == PngColorType.rgba) {
-            /*int r =*/ _input.readUint16();
+            /*int r =*/ _input..readUint16()
             /*int g =*/
-            _input.readUint16();
+            ..readUint16()
             /*int b =*/
-            _input.readUint16();
+            ..readUint16();
             chunkSize -= 24;
           }
           if (chunkSize > 0) {
@@ -302,8 +302,8 @@ class PngDecoder extends Decoder {
       for (var i = 0; i < f.fdat.length; ++i) {
         _input.offset = f.fdat[i];
         final chunkSize = _input.readUint32();
-        _input.readString(4); // fDat chunk header
-        _input.skip(4); // sequence number
+        _input..readString(4) // fDat chunk header
+        ..skip(4); // sequence number
         final data = _input.readBytes(chunkSize - 4).toUint8List();
         totalSize += data.length;
         dataBlocks.add(data);
@@ -404,8 +404,8 @@ class PngDecoder extends Decoder {
 
     final origW = _info.width;
     final origH = _info.height;
-    _info.width = width;
-    _info.height = height;
+    _info..width = width
+    ..height = height;
 
     final w = width;
     final h = height;
@@ -422,8 +422,8 @@ class PngDecoder extends Decoder {
       _process(input, image);
     }
 
-    _info.width = origW;
-    _info.height = origH;
+    _info..width = origW
+    ..height = origH;
 
     if (_info.iCCPData != null) {
       image.iccProfile = IccProfile(
@@ -451,9 +451,9 @@ class PngDecoder extends Decoder {
       return null;
     }
 
-    final anim = Animation();
-    anim.width = _info.width;
-    anim.height = _info.height;
+    final anim = Animation()
+    ..width = _info.width
+    ..height = _info.height;
 
     if (!_info.isAnimated) {
       final image = decodeFrame(0)!;
@@ -489,8 +489,8 @@ class PngDecoder extends Decoder {
 
       final dispose = frame.dispose;
       if (dispose == PngDisposeMode.background) {
-        lastImage = Image.from(lastImage);
-        lastImage.clear(_info.backgroundColor);
+        lastImage = Image.from(lastImage)
+        ..clear(_info.backgroundColor);
       } else if (dispose == PngDisposeMode.previous) {
         lastImage = Image.from(lastImage);
       } else {

@@ -128,10 +128,10 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
-    final anim = Animation();
-    anim.width = _info!.width;
-    anim.height = _info!.height;
-    anim.loopCount = _info!.animLoopCount;
+    final anim = Animation()
+    ..width = _info!.width
+    ..height = _info!.height
+    ..loopCount = _info!.animLoopCount;
 
     if (_info!.hasAnimation) {
       var lastImage = Image(_info!.width, _info!.height);
@@ -175,8 +175,8 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
-    webp.frame = _info!.frame;
-    webp.numFrames = _info!.numFrames;
+    webp..frame = _info!.frame
+    ..numFrames = _info!.numFrames;
 
     if (webp.hasAnimation) {
       if (frame >= webp.frames.length || frame < 0) {
@@ -312,9 +312,9 @@ class WebPDecoder extends Decoder {
     final h = input.readUint24() + 1;
 
     webp!.width = w;
-    webp.height = h;
-    webp.hasAnimation = anim != 0;
-    webp.hasAlpha = alpha != 0;
+    webp..height = h
+    ..hasAnimation = anim != 0
+    ..hasAlpha = alpha != 0;
 
     return true;
   }
@@ -326,9 +326,8 @@ class WebPDecoder extends Decoder {
     final r = (c >> 8) & 0xff;
     final g = (c >> 16) & 0xff;
     final b = (c >> 24) & 0xff;
-    webp.backgroundColor = ColorRgba8(r, g, b, a);
-
-    webp.animLoopCount = input.readUint16();
+    webp..backgroundColor = ColorRgba8(r, g, b, a)
+    ..animLoopCount = input.readUint16();
     return true;
   }
 

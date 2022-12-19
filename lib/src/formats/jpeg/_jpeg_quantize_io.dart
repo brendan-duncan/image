@@ -212,11 +212,10 @@ Image getImageFromJpeg(JpegData jpeg) {
   final width = flipWidthHeight ? h : w;
   final height = flipWidthHeight ? w : h;
 
-  final image = Image(width, height);
-
+  final image = Image(width, height)
   // Copy exif data, except for ORIENTATION which we're baking.
-  image.exif = ExifData.from(jpeg.exif);
-  image.exif.imageIfd.orientation = null;
+  ..exif = ExifData.from(jpeg.exif)
+  ..exif.imageIfd.orientation = null;
 
   ComponentData component1;
   ComponentData component2;

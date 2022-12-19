@@ -162,9 +162,9 @@ class ExrImage implements DecodeInfo {
             final tileX = imgData.readUint32();
             final tileY = imgData.readUint32();
             /*int levelX =*/
-            imgData.readUint32();
+            imgData..readUint32()
             /*int levelY =*/
-            imgData.readUint32();
+            ..readUint32();
             final dataSize = imgData.readUint32();
             /*final data =*/ imgData.readBytes(dataSize);
 

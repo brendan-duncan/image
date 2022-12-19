@@ -64,16 +64,15 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
 
       final x2 = x + ch.width;
       final y2 = y + ch.height;
-      final cIter = ch.image.iterator;
-      cIter.moveNext();
+      final cIter = ch.image.iterator..moveNext();
       for (var yi = y; yi < y2; ++yi) {
         for (var xi = x; xi < x2; ++xi, cIter.moveNext()) {
           final p = cIter.current;
           if (color != null) {
-            _c.r = _rLut[p.r as int];
-            _c.g = _gLut[p.g as int];
-            _c.b = _bLut[p.b as int];
-            _c.a = _aLut[p.a as int];
+            _c..r = _rLut[p.r as int]
+              ..g = _gLut[p.g as int]
+              ..b = _bLut[p.b as int]
+              ..a = _aLut[p.a as int];
             drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, _c);
           } else {
             drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, p);
@@ -103,9 +102,9 @@ Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
   var x2 = x;
 
   for (var w in words) {
-    final ws = StringBuffer();
-    ws.write(w);
-    ws.write(' ');
+    final ws = StringBuffer()
+    ..write(w)
+    ..write(' ');
     w = ws.toString();
     final chars = w.codeUnits;
     var wordWidth = 0;

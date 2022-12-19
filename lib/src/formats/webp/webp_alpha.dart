@@ -107,13 +107,13 @@ class WebPAlpha {
   }
 
   bool _decodeAlphaHeader() {
-    final webp = WebPInfo();
-    webp.width = width;
-    webp.height = height;
+    final webp = WebPInfo()
+    ..width = width
+    ..height = height;
 
-    _vp8l = InternalVP8L(input, webp);
-    _vp8l.ioWidth = width;
-    _vp8l.ioHeight = height;
+    _vp8l = InternalVP8L(input, webp)
+    ..ioWidth = width
+    ..ioHeight = height;
 
     _vp8l.decodeImageStream(webp.width, webp.height, true);
 

@@ -57,21 +57,21 @@ class PvrtcEncoder {
     const mipmapCount = 1;
     const metaDataSize = 0;
 
-    output.writeUint32(version);
-    output.writeUint32(flags);
-    output.writeUint32(pixelFormat);
-    output.writeUint32(channelOrder);
-    output.writeUint32(colorSpace);
-    output.writeUint32(channelType);
-    output.writeUint32(height);
-    output.writeUint32(width);
-    output.writeUint32(depth);
-    output.writeUint32(numSurfaces);
-    output.writeUint32(numFaces);
-    output.writeUint32(mipmapCount);
-    output.writeUint32(metaDataSize);
+    output..writeUint32(version)
+    ..writeUint32(flags)
+    ..writeUint32(pixelFormat)
+    ..writeUint32(channelOrder)
+    ..writeUint32(colorSpace)
+    ..writeUint32(channelType)
+    ..writeUint32(height)
+    ..writeUint32(width)
+    ..writeUint32(depth)
+    ..writeUint32(numSurfaces)
+    ..writeUint32(numFaces)
+    ..writeUint32(mipmapCount)
+    ..writeUint32(metaDataSize)
 
-    output.writeBytes(pvrtc as List<int>);
+    ..writeBytes(pvrtc as List<int>);
 
     return output.getBytes();
   }
@@ -99,11 +99,11 @@ class PvrtcEncoder {
 
     for (var y = 0; y < blocks; ++y) {
       for (var x = 0; x < blocks; ++x) {
-        packet.setBlock(x, y);
-        packet.usePunchthroughAlpha = 0;
         final cbb = _calculateBoundingBoxRgb(bitmap, x, y);
-        packet.setColorRgbA(cbb.min as PvrtcColorRgb);
-        packet.setColorRgbB(cbb.max as PvrtcColorRgb);
+        packet..setBlock(x, y)
+        ..usePunchthroughAlpha = 0
+        ..setColorRgbA(cbb.min as PvrtcColorRgb)
+        ..setColorRgbB(cbb.max as PvrtcColorRgb);
       }
     }
 
@@ -169,8 +169,8 @@ class PvrtcEncoder {
           }
         }
 
-        packet.setBlock(x, y);
-        packet.modulationData = modulationData;
+        packet..setBlock(x, y)
+        ..modulationData = modulationData;
       }
     }
 
@@ -200,11 +200,11 @@ class PvrtcEncoder {
 
     for (var y = 0; y < blocks; ++y) {
       for (var x = 0; x < blocks; ++x) {
-        packet.setBlock(x, y);
-        packet.usePunchthroughAlpha = 0;
         final cbb = _calculateBoundingBoxRgba(bitmap, x, y);
-        packet.setColorRgbaA(cbb.min as PvrtcColorRgba);
-        packet.setColorRgbaB(cbb.max as PvrtcColorRgba);
+        packet..setBlock(x, y)
+        ..usePunchthroughAlpha = 0
+        ..setColorRgbaA(cbb.min as PvrtcColorRgba)
+        ..setColorRgbaB(cbb.max as PvrtcColorRgba);
       }
     }
 
@@ -274,8 +274,8 @@ class PvrtcEncoder {
           }
         }
 
-        packet.setBlock(x, y);
-        packet.modulationData = modulationData;
+        packet..setBlock(x, y)
+        ..modulationData = modulationData;
       }
     }
 
@@ -290,25 +290,25 @@ class PvrtcEncoder {
       return PvrtcColorRgb(p.r as int, p.g as int, p.b as int);
     }
 
-    final cbb = PvrtcColorBoundingBox(_pixel(0,0), _pixel(0,0));
-    cbb.add(_pixel(1, 0));
-    cbb.add(_pixel(2, 0));
-    cbb.add(_pixel(3, 0));
+    final cbb = PvrtcColorBoundingBox(_pixel(0,0), _pixel(0,0))
+    ..add(_pixel(1, 0))
+    ..add(_pixel(2, 0))
+    ..add(_pixel(3, 0))
 
-    cbb.add(_pixel(0, 1));
-    cbb.add(_pixel(1, 1));
-    cbb.add(_pixel(1, 2));
-    cbb.add(_pixel(1, 3));
+    ..add(_pixel(0, 1))
+    ..add(_pixel(1, 1))
+    ..add(_pixel(1, 2))
+    ..add(_pixel(1, 3))
 
-    cbb.add(_pixel(2, 0));
-    cbb.add(_pixel(2, 1));
-    cbb.add(_pixel(2, 2));
-    cbb.add(_pixel(2, 3));
+    ..add(_pixel(2, 0))
+    ..add(_pixel(2, 1))
+    ..add(_pixel(2, 2))
+    ..add(_pixel(2, 3))
 
-    cbb.add(_pixel(3, 0));
-    cbb.add(_pixel(3, 1));
-    cbb.add(_pixel(3, 2));
-    cbb.add(_pixel(3, 3));
+    ..add(_pixel(3, 0))
+    ..add(_pixel(3, 1))
+    ..add(_pixel(3, 2))
+    ..add(_pixel(3, 3));
 
     return cbb;
   }
@@ -321,25 +321,25 @@ class PvrtcEncoder {
       return PvrtcColorRgba(p.r as int, p.g as int, p.b as int, p.a as int);
     }
 
-    final cbb = PvrtcColorBoundingBox(_pixel(0,0), _pixel(0,0));
-    cbb.add(_pixel(1, 0));
-    cbb.add(_pixel(2, 0));
-    cbb.add(_pixel(3, 0));
+    final cbb = PvrtcColorBoundingBox(_pixel(0,0), _pixel(0,0))
+    ..add(_pixel(1, 0))
+    ..add(_pixel(2, 0))
+    ..add(_pixel(3, 0))
 
-    cbb.add(_pixel(0, 1));
-    cbb.add(_pixel(1, 1));
-    cbb.add(_pixel(1, 2));
-    cbb.add(_pixel(1, 3));
+    ..add(_pixel(0, 1))
+    ..add(_pixel(1, 1))
+    ..add(_pixel(1, 2))
+    ..add(_pixel(1, 3))
 
-    cbb.add(_pixel(2, 0));
-    cbb.add(_pixel(2, 1));
-    cbb.add(_pixel(2, 2));
-    cbb.add(_pixel(2, 3));
+    ..add(_pixel(2, 0))
+    ..add(_pixel(2, 1))
+    ..add(_pixel(2, 2))
+    ..add(_pixel(2, 3))
 
-    cbb.add(_pixel(3, 0));
-    cbb.add(_pixel(3, 1));
-    cbb.add(_pixel(3, 2));
-    cbb.add(_pixel(3, 3));
+    ..add(_pixel(3, 0))
+    ..add(_pixel(3, 1))
+    ..add(_pixel(3, 2))
+    ..add(_pixel(3, 3));
 
     return cbb;
   }

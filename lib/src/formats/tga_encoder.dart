@@ -25,19 +25,19 @@ class TgaEncoder extends Encoder {
       for (var y = image.height - 1; y >= 0; --y) {
         for (var x = 0; x < image.width; ++x) {
           final c = image.getPixel(x, y);
-          out.writeByte(c.b as int);
-          out.writeByte(c.g as int);
-          out.writeByte(c.r as int);
-          out.writeByte(c.a as int);
+          out..writeByte(c.b as int)
+          ..writeByte(c.g as int)
+          ..writeByte(c.r as int)
+          ..writeByte(c.a as int);
         }
       }
     } else {
       for (var y = image.height - 1; y >= 0; --y) {
         for (var x = 0; x < image.width; ++x) {
           final c = image.getPixel(x, y);
-          out.writeByte(c.b as int);
-          out.writeByte(c.g as int);
-          out.writeByte(c.r as int);
+          out..writeByte(c.b as int)
+          ..writeByte(c.g as int)
+          ..writeByte(c.r as int);
         }
       }
     }

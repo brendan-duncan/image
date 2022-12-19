@@ -2,6 +2,9 @@
 
 [![Build Status](https://travis-ci.org/brendan-duncan/image.svg?branch=master)](https://travis-ci.org/brendan-duncan/image)
 
+## NOTE
+This is a work in progress major update for the Image library.
+
 ## Overview
 
 A Dart library providing the ability to load, save and manipulate images in a variety of different file formats.
@@ -44,7 +47,23 @@ will not be as fast as a native library.
 
 ## [Format Decoding Functions](https://github.com/brendan-duncan/image/wiki#format-decoding-functions)
 
-## Example
+## Examples
+
+Create an image, set pixel values, save it to a PNG.
+```dart
+import 'dart:io';
+import 'package:image/image.dart' as DIL;
+void main() async {
+  final image = DIL.Image(256, 256);
+  for (var pixel in image) {
+    pixel.r = pixel.x;
+    pixel.y = pixel.y;
+  }
+  final png = DIL.encodePng(image);
+  await File('image.png').writeAsBytes(png);
+}
+```
+
 
 Load an image asynchronously and resize it as a thumbnail. 
 ```dart

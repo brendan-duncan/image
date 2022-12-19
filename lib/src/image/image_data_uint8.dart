@@ -107,9 +107,9 @@ class ImageDataUint8 extends ImageData {
       final bi = c8 == null ? 0 : (c8.b as int).clamp(0,255);
       // rgb is the slow case since we can't pack the channels
       for (var p in this) {
-        p.r = ri;
-        p.g = gi;
-        p.b = bi;
+        p..r = ri
+        ..g = gi
+        ..b = bi;
       }
     }
   }

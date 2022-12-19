@@ -67,9 +67,9 @@ Image hdrBloom(Image hdr, {double radius = 0.01, double weight = 0.1}) {
     // Mix bloom effect into each pixel
     offset = 0;
     for (var p in hdr) {
-      p.r = _lerp(weight, p.r.toDouble(), bloomImage[offset]);
-      p.g = _lerp(weight, p.g.toDouble(), bloomImage[offset + 1]);
-      p.b = _lerp(weight, p.b.toDouble(), bloomImage[offset + 2]);
+      p..r = _lerp(weight, p.r.toDouble(), bloomImage[offset])
+      ..g = _lerp(weight, p.g.toDouble(), bloomImage[offset + 1])
+      ..b = _lerp(weight, p.b.toDouble(), bloomImage[offset + 2]);
     }
   }
 

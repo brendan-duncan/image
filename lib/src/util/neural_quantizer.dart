@@ -73,10 +73,10 @@ class NeuralQuantizer extends Quantizer {
   @override
   Color getQuantizedColor(Color c) {
     final i = getColorIndex(c);
-    final out = c.length == 4 ? ColorRgba8() : ColorRgb8();
-    out.r = palette.get(i, 0);
-    out.g = palette.get(i, 1);
-    out.b = palette.get(i, 2);
+    final out = c.length == 4 ? ColorRgba8() : ColorRgb8()
+    ..r = palette.get(i, 0)
+    ..g = palette.get(i, 1)
+    ..b = palette.get(i, 2);
     if (c.length == 4) {
       out.a = c.a;
     }
@@ -235,20 +235,20 @@ class NeuralQuantizer extends Quantizer {
       // swap p (i) and q (smallPos) entries
       if (i != smallPos) {
         var j = _palette.get(q, 0);
-        _palette.set(q, 0, _palette.get(p, 0));
-        _palette.set(p, 0, j);
+        _palette..set(q, 0, _palette.get(p, 0))
+        ..set(p, 0, j);
 
         j = _palette.get(q, 1);
-        _palette.set(q, 1, _palette.get(p, 1));
-        _palette.set(p, 1, j);
+        _palette..set(q, 1, _palette.get(p, 1))
+        ..set(p, 1, j);
 
         j = _palette.get(q, 2);
-        _palette.set(q, 2, _palette.get(p, 2));
-        _palette.set(p, 2, j);
+        _palette..set(q, 2, _palette.get(p, 2))
+        ..set(p, 2, j);
 
         j = _palette.get(q, 3);
-        _palette.set(q, 3, _palette.get(p, 3));
-        _palette.set(p, 3, j);
+        _palette..set(q, 3, _palette.get(p, 3))
+        ..set(p, 3, j);
       }
 
       // smallVal entry is now in position i

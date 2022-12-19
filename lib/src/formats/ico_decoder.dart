@@ -75,8 +75,8 @@ class IcoDecoder extends Decoder {
     }
 
     bmpInfo.header.imageOffset = offset;
-    dummyBmpHeader.length -= 4;
-    dummyBmpHeader.writeUint32(offset);
+    dummyBmpHeader..length -= 4
+    ..writeUint32(offset);
     final inp = InputBuffer(imageBuffer);
     final bmp = DibDecoder(inp, bmpInfo, forceRgba: true);
 

@@ -32,8 +32,8 @@ class JpegDecoder extends Decoder {
     if (input == null) {
       return null;
     }
-    final jpeg = JpegData();
-    jpeg.read(input!.buffer);
+    final jpeg = JpegData()
+    ..read(input!.buffer);
     if (jpeg.frames.length != 1) {
       throw ImageException('only single frame JPEGs supported');
     }
@@ -43,8 +43,8 @@ class JpegDecoder extends Decoder {
 
   @override
   Image? decodeImage(Uint8List bytes, {int frame = 0}) {
-    final jpeg = JpegData();
-    jpeg.read(bytes);
+    final jpeg = JpegData()
+    ..read(bytes);
 
     if (jpeg.frames.length != 1) {
       throw ImageException('only single frame JPEGs supported');
@@ -60,10 +60,10 @@ class JpegDecoder extends Decoder {
       return null;
     }
 
-    final anim = Animation();
-    anim.width = image.width;
-    anim.height = image.height;
-    anim.addFrame(image);
+    final anim = Animation()
+    ..width = image.width
+    ..height = image.height
+    ..addFrame(image);
 
     return anim;
   }

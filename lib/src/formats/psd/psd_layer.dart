@@ -171,9 +171,9 @@ class PsdLayer {
         // Layer effects data
         if (tag == 'lrFX') {
           final fxData = additionalData['lrFX'] as PsdLayerAdditionalData;
-          final data = InputBuffer.from(fxData.data);
+          final data = InputBuffer.from(fxData.data)
           /*int version =*/
-          data.readUint16();
+          ..readUint16();
           final numFx = data.readUint16();
 
           for (var j = 0; j < numFx; ++j) {
@@ -184,23 +184,23 @@ class PsdLayer {
             if (fxTag == 'dsdw') {
               final fx = PsdDropShadowEffect();
               effects.add(fx);
-              fx.version = data.readUint32();
-              fx.blur = data.readUint32();
-              fx.intensity = data.readUint32();
-              fx.angle = data.readUint32();
-              fx.distance = data.readUint32();
-              fx.color = [
+              fx..version = data.readUint32()
+              ..blur = data.readUint32()
+              ..intensity = data.readUint32()
+              ..angle = data.readUint32()
+              ..distance = data.readUint32()
+              ..color = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16()
-              ];
-              fx.blendMode = data.readString(8);
-              fx.enabled = data.readByte() != 0;
-              fx.globalAngle = data.readByte() != 0;
-              fx.opacity = data.readByte();
-              fx.nativeColor = [
+              ]
+              ..blendMode = data.readString(8)
+              ..enabled = data.readByte() != 0
+              ..globalAngle = data.readByte() != 0
+              ..opacity = data.readByte()
+              ..nativeColor = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
@@ -210,23 +210,23 @@ class PsdLayer {
             } else if (fxTag == 'isdw') {
               final fx = PsdInnerShadowEffect();
               effects.add(fx);
-              fx.version = data.readUint32();
-              fx.blur = data.readUint32();
-              fx.intensity = data.readUint32();
-              fx.angle = data.readUint32();
-              fx.distance = data.readUint32();
-              fx.color = [
+              fx..version = data.readUint32()
+              ..blur = data.readUint32()
+              ..intensity = data.readUint32()
+              ..angle = data.readUint32()
+              ..distance = data.readUint32()
+              ..color = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16()
-              ];
-              fx.blendMode = data.readString(8);
-              fx.enabled = data.readByte() != 0;
-              fx.globalAngle = data.readByte() != 0;
-              fx.opacity = data.readByte();
-              fx.nativeColor = [
+              ]
+              ..blendMode = data.readString(8)
+              ..enabled = data.readByte() != 0
+              ..globalAngle = data.readByte() != 0
+              ..opacity = data.readByte()
+              ..nativeColor = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
@@ -236,19 +236,19 @@ class PsdLayer {
             } else if (fxTag == 'oglw') {
               final fx = PsdOuterGlowEffect();
               effects.add(fx);
-              fx.version = data.readUint32();
-              fx.blur = data.readUint32();
-              fx.intensity = data.readUint32();
-              fx.color = [
+              fx..version = data.readUint32()
+              ..blur = data.readUint32()
+              ..intensity = data.readUint32()
+              ..color = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16()
-              ];
-              fx.blendMode = data.readString(8);
-              fx.enabled = data.readByte() != 0;
-              fx.opacity = data.readByte();
+              ]
+              ..blendMode = data.readString(8)
+              ..enabled = data.readByte() != 0
+              ..opacity = data.readByte();
               if (fx.version == 2) {
                 fx.nativeColor = [
                   data.readUint16(),
@@ -261,22 +261,22 @@ class PsdLayer {
             } else if (fxTag == 'iglw') {
               final fx = PsdInnerGlowEffect();
               effects.add(fx);
-              fx.version = data.readUint32();
-              fx.blur = data.readUint32();
-              fx.intensity = data.readUint32();
-              fx.color = [
+              fx..version = data.readUint32()
+              ..blur = data.readUint32()
+              ..intensity = data.readUint32()
+              ..color = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16()
-              ];
-              fx.blendMode = data.readString(8);
-              fx.enabled = data.readByte() != 0;
-              fx.opacity = data.readByte();
+              ]
+              ..blendMode = data.readString(8)
+              ..enabled = data.readByte() != 0
+              ..opacity = data.readByte();
               if (fx.version == 2) {
-                fx.invert = data.readByte() != 0;
-                fx.nativeColor = [
+                fx..invert = data.readByte() != 0
+                ..nativeColor = [
                   data.readUint16(),
                   data.readUint16(),
                   data.readUint16(),
@@ -287,41 +287,41 @@ class PsdLayer {
             } else if (fxTag == 'bevl') {
               final fx = PsdBevelEffect();
               effects.add(fx);
-              fx.version = data.readUint32();
-              fx.angle = data.readUint32();
-              fx.strength = data.readUint32();
-              fx.blur = data.readUint32();
-              fx.highlightBlendMode = data.readString(8);
-              fx.shadowBlendMode = data.readString(8);
-              fx.highlightColor = [
+              fx..version = data.readUint32()
+              ..angle = data.readUint32()
+              ..strength = data.readUint32()
+              ..blur = data.readUint32()
+              ..highlightBlendMode = data.readString(8)
+              ..shadowBlendMode = data.readString(8)
+              ..highlightColor = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16()
-              ];
-              fx.shadowColor = [
+              ]
+              ..shadowColor = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16()
-              ];
-              fx.bevelStyle = data.readByte();
-              fx.highlightOpacity = data.readByte();
-              fx.shadowOpacity = data.readByte();
-              fx.enabled = data.readByte() != 0;
-              fx.globalAngle = data.readByte() != 0;
-              fx.upOrDown = data.readByte();
+              ]
+              ..bevelStyle = data.readByte()
+              ..highlightOpacity = data.readByte()
+              ..shadowOpacity = data.readByte()
+              ..enabled = data.readByte() != 0
+              ..globalAngle = data.readByte() != 0
+              ..upOrDown = data.readByte();
               if (fx.version == 2) {
-                fx.realHighlightColor = [
+                fx..realHighlightColor = [
                   data.readUint16(),
                   data.readUint16(),
                   data.readUint16(),
                   data.readUint16(),
                   data.readUint16()
-                ];
-                fx.realShadowColor = [
+                ]
+                ..realShadowColor = [
                   data.readUint16(),
                   data.readUint16(),
                   data.readUint16(),
@@ -332,18 +332,18 @@ class PsdLayer {
             } else if (fxTag == 'sofi') {
               final fx = PsdSolidFillEffect();
               effects.add(fx);
-              fx.version = data.readUint32();
-              fx.blendMode = data.readString(4);
-              fx.color = [
+              fx..version = data.readUint32()
+              ..blendMode = data.readString(4)
+              ..color = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16()
-              ];
-              fx.opacity = data.readByte();
-              fx.enabled = data.readByte() != 0;
-              fx.nativeColor = [
+              ]
+              ..opacity = data.readByte()
+              ..enabled = data.readByte() != 0
+              ..nativeColor = [
                 data.readUint16(),
                 data.readUint16(),
                 data.readUint16(),

@@ -8,9 +8,9 @@ Image invert(Image src) {
     final max = src.maxChannelValue;
     if (max != 0.0) {
       for (var p in src) {
-        p.r = max - p.r;
-        p.g = max - p.g;
-        p.b = max - p.b;
+        p..r = max - p.r
+        ..g = max - p.g
+        ..b = max - p.b;
       }
     }
   }

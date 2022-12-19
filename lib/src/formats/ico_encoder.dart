@@ -18,12 +18,12 @@ abstract class WinEncoder extends Encoder {
   Uint8List encodeImages(List<Image> images) {
     final count = images.length;
 
-    final out = OutputBuffer();
+    final out = OutputBuffer()
 
     // header
-    out.writeUint16(0); // reserved
-    out.writeUint16(type); // type: ICO => 1; CUR => 2
-    out.writeUint16(count);
+    ..writeUint16(0) // reserved
+    ..writeUint16(type) // type: ICO => 1; CUR => 2
+    ..writeUint16(count);
 
     var offset = 6 + count * 16; // file header with image directory byte size
 
@@ -35,19 +35,19 @@ abstract class WinEncoder extends Encoder {
         throw Exception('ICO and CUR support only sizes until 256');
       }
 
-      out.writeByte(img.width); // image width in pixels
-      out.writeByte(img.height); // image height in pixels
+      out..writeByte(img.width) // image width in pixels
+      ..writeByte(img.height) // image height in pixels
       // Color count, should be 0 if more than 256 colors
-      out.writeByte(0);
-      out.writeByte(0); // Reserved
-      out.writeUint16(colorPlanesOrXHotSpot(i));
-      out.writeUint16(bitsPerPixelOrYHotSpot(i));
+      ..writeByte(0)
+      ..writeByte(0) // Reserved
+      ..writeUint16(colorPlanesOrXHotSpot(i))
+      ..writeUint16(bitsPerPixelOrYHotSpot(i));
 
       // Use png instead of bmp encoded data, it's supported since Windows Vista
       final data = PngEncoder().encodeImage(img);
 
-      out.writeUint32(data.length); // size of the image's data in bytes
-      out.writeUint32(offset); // offset of data from the beginning of the file
+      out..writeUint32(data.length) // size of the image's data in bytes
+      ..writeUint32(offset); // offset of data from the beginning of the file
 
       // add the size of bytes to get the new begin of the next image
       offset += data.length;

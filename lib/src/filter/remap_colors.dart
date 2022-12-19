@@ -27,10 +27,10 @@ Image remapColors(Image src,
         alpha == Channel.luminance) {
       l[4] = getLuminanceRgb(l[0], l[1], l[2]);
     }
-    p.r = l[red.index];
-    p.g = l[green.index];
-    p.b = l[blue.index];
-    p.a = l[alpha.index];
+    p..r = l[red.index]
+    ..g = l[green.index]
+    ..b = l[blue.index]
+    ..a = l[alpha.index];
   }
   return src;
 }

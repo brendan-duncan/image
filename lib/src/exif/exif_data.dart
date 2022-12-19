@@ -85,12 +85,12 @@ class ExifData extends IfdContainer {
 
   void write(OutputBuffer out) {
     final saveEndian = out.bigEndian;
-    out.bigEndian = true;
 
-    // Tiff header
-    out.writeUint16(0x4d4d); // big endian
-    out.writeUint16(0x002a);
-    out.writeUint32(8); // offset to first ifd block
+    out..bigEndian = true
+      // Tiff header
+      ..writeUint16(0x4d4d) // big endian
+      ..writeUint16(0x002a)
+      ..writeUint32(8); // offset to first ifd block
 
     if (directories['ifd0'] == null)
       directories['ifd0'] = IfdDirectory();
@@ -194,9 +194,9 @@ class ExifData extends IfdContainer {
     for (var tag in ifd.keys) {
       final value = ifd[tag]!;
 
-      out.writeUint16(tag);
-      out.writeUint16(value.type.index);
-      out.writeUint32(value.length);
+      out..writeUint16(tag)
+        ..writeUint16(value.type.index)
+        ..writeUint32(value.length);
 
       var size = value.dataSize;
       if (size <= 4) {

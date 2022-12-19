@@ -29,10 +29,10 @@ Image fillRect(Image src, int x1, int y1, int x2, int y2, Color color) {
     final iter = src.getRange(_x0, _y0, _w, _h);
     while (iter.moveNext()) {
       final p = iter.current;
-      p.r = (color.r * a) + (p.r * invA);
-      p.g = (color.g * a) + (p.g * invA);
-      p.b = (color.b * a) + (p.b * invA);
-      p.a = color.a;
+      p..r = (color.r * a) + (p.r * invA)
+       ..g = (color.g * a) + (p.g * invA)
+       ..b = (color.b * a) + (p.b * invA)
+       ..a = color.a;
     }
   }
 

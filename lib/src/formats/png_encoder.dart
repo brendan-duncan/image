@@ -81,9 +81,9 @@ class PngEncoder extends Encoder {
       _writeChunk(output!, 'IDAT', compressed);
     } else {
       // fdAT chunk
-      final fdat = OutputBuffer(bigEndian: true);
-      fdat.writeUint32(sequenceNumber);
-      fdat.writeBytes(compressed);
+      final fdat = OutputBuffer(bigEndian: true)
+      ..writeUint32(sequenceNumber)
+      ..writeBytes(compressed);
       _writeChunk(output!, 'fdAT', fdat.getBytes());
 
       sequenceNumber++;
@@ -136,47 +136,47 @@ class PngEncoder extends Encoder {
     output!.writeBytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
     // IHDR chunk
-    final chunk = OutputBuffer(bigEndian: true);
-    chunk.writeUint32(image.width); // width
-    chunk.writeUint32(image.height);  // height
-    chunk.writeByte(image.bitsPerChannel); // bit depth
-    chunk.writeByte(image.hasPalette ? PngColorType.indexed
+    final chunk = OutputBuffer(bigEndian: true)
+    ..writeUint32(image.width) // width
+    ..writeUint32(image.height)  // height
+    ..writeByte(image.bitsPerChannel) // bit depth
+    ..writeByte(image.hasPalette ? PngColorType.indexed
         : image.numChannels == 1 ? PngColorType.grayscale
         : image.numChannels == 2 ? PngColorType.grayscaleAlpha
         : image.numChannels == 3 ? PngColorType.rgb
-        : PngColorType.rgba);
-    chunk.writeByte(0); // compression method: 0:deflate
-    chunk.writeByte(0); // filter method: 0:adaptive
-    chunk.writeByte(0); // interlace method: 0:no interlace
+        : PngColorType.rgba)
+    ..writeByte(0) // compression method: 0:deflate
+    ..writeByte(0) // filter method: 0:adaptive
+    ..writeByte(0); // interlace method: 0:no interlace
     _writeChunk(output!, 'IHDR', chunk.getBytes());
   }
 
   void _writeAnimationControlChunk() {
-    final chunk = OutputBuffer(bigEndian: true);
-    chunk.writeUint32(_frames); // number of frames
-    chunk.writeUint32(repeat); // loop count
+    final chunk = OutputBuffer(bigEndian: true)
+    ..writeUint32(_frames) // number of frames
+    ..writeUint32(repeat); // loop count
     _writeChunk(output!, 'acTL', chunk.getBytes());
   }
 
   void _writeFrameControlChunk(Image image) {
-    final chunk = OutputBuffer(bigEndian: true);
-    chunk.writeUint32(sequenceNumber);
-    chunk.writeUint32(image.width);
-    chunk.writeUint32(image.height);
-    chunk.writeUint32(image.frameInfo.xOffset);
-    chunk.writeUint32(image.frameInfo.yOffset);
-    chunk.writeUint16(image.frameInfo.duration);
-    chunk.writeUint16(1000); // delay denominator
-    chunk.writeByte(image.frameInfo.disposeMethod.index);
-    chunk.writeByte(image.frameInfo.blendMethod.index);
+    final chunk = OutputBuffer(bigEndian: true)
+    ..writeUint32(sequenceNumber)
+    ..writeUint32(image.width)
+    ..writeUint32(image.height)
+    ..writeUint32(image.frameInfo.xOffset)
+    ..writeUint32(image.frameInfo.yOffset)
+    ..writeUint16(image.frameInfo.duration)
+    ..writeUint16(1000) // delay denominator
+    ..writeByte(image.frameInfo.disposeMethod.index)
+    ..writeByte(image.frameInfo.blendMethod.index);
     _writeChunk(output!, 'fcTL', chunk.getBytes());
   }
 
   void _writeTextChunk(String keyword, String text) {
-    final chunk = OutputBuffer(bigEndian: true);
-    chunk.writeBytes(latin1.encode(keyword));
-    chunk.writeByte(0);
-    chunk.writeBytes(latin1.encode(text));
+    final chunk = OutputBuffer(bigEndian: true)
+    ..writeBytes(latin1.encode(keyword))
+    ..writeByte(0)
+    ..writeBytes(latin1.encode(text));
     _writeChunk(output!, 'tEXt', chunk.getBytes());
   }
 
@@ -187,9 +187,9 @@ class PngEncoder extends Encoder {
     } else {
       final chunk = OutputBuffer(size: palette.numColors * 3, bigEndian: true);
       for (var i = 0, nc = palette.numColors; i < nc; ++i) {
-        chunk.writeByte(palette.getRed(i).toInt());
-        chunk.writeByte(palette.getGreen(i).toInt());
-        chunk.writeByte(palette.getBlue(i).toInt());
+        chunk..writeByte(palette.getRed(i).toInt())
+        ..writeByte(palette.getGreen(i).toInt())
+        ..writeByte(palette.getBlue(i).toInt());
       }
       _writeChunk(output!, 'PLTE', chunk.getBytes());
     }
@@ -204,25 +204,25 @@ class PngEncoder extends Encoder {
   }
 
   void _writeICCPChunk(OutputBuffer? out, IccProfile iccp) {
-    final chunk = OutputBuffer(bigEndian: true);
+    final chunk = OutputBuffer(bigEndian: true)
 
     // name
-    chunk.writeBytes(iccp.name.codeUnits);
-    chunk.writeByte(0);
+    ..writeBytes(iccp.name.codeUnits)
+    ..writeByte(0)
 
     // compression
-    chunk.writeByte(0); // 0 - deflate
+    ..writeByte(0) // 0 - deflate
 
     // profile data
-    chunk.writeBytes(iccp.compressed());
+    ..writeBytes(iccp.compressed());
 
     _writeChunk(output!, 'iCCP', chunk.getBytes());
   }
 
   void _writeChunk(OutputBuffer out, String type, List<int> chunk) {
-    out.writeUint32(chunk.length);
-    out.writeBytes(type.codeUnits);
-    out.writeBytes(chunk);
+    out..writeUint32(chunk.length)
+    ..writeBytes(type.codeUnits)
+    ..writeBytes(chunk);
     final crc = _crc(type, chunk);
     out.writeUint32(crc);
   }

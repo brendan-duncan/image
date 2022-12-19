@@ -493,12 +493,9 @@ class Image extends Iterable<Pixel> {
 
     final newImage = Image(width, height, format: format,
         numChannels: numChannels,
-        exif: _exif?.clone(), iccp: iccProfile?.clone());
-
-    newImage.textData = textData != null ?
-        Map<String, String>.from(textData!) : null;
-
-    newImage._frameInfo = _frameInfo?.clone();
+        exif: _exif?.clone(), iccp: iccProfile?.clone())
+    ..textData = textData != null ? Map<String, String>.from(textData!) : null
+    .._frameInfo = _frameInfo?.clone();
 
     Pixel? p2;
     for (var p in newImage) {

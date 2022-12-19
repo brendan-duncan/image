@@ -207,8 +207,8 @@ class ExrHuffman {
                 '(invalid code table entry).');
           }
 
-          pl.len = l;
-          pl.lit = im;
+          pl..len = l
+          ..lit = im;
         }
       }
     }

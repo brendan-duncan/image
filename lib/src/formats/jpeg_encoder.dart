@@ -124,8 +124,8 @@ class JpegEncoder extends Encoder {
   }
 
   void _writeMarker(OutputBuffer fp, int marker) {
-    fp.writeByte(0xff);
-    fp.writeByte(marker & 0xff);
+    fp..writeByte(0xff)
+    ..writeByte(marker & 0xff);
   }
 
   void _initQuantTables(int sf) {
@@ -495,19 +495,19 @@ class JpegEncoder extends Encoder {
 
   void _writeAPP0(OutputBuffer out) {
     _writeMarker(out, JpegMarker.app0);
-    out.writeUint16(16); // length
-    out.writeByte(0x4A); // J
-    out.writeByte(0x46); // F
-    out.writeByte(0x49); // I
-    out.writeByte(0x46); // F
-    out.writeByte(0); // '\0'
-    out.writeByte(1); // versionhi
-    out.writeByte(1); // versionlo
-    out.writeByte(0); // xyunits
-    out.writeUint16(1); // xdensity
-    out.writeUint16(1); // ydensity
-    out.writeByte(0); // thumbnwidth
-    out.writeByte(0); // thumbnheight
+    out..writeUint16(16) // length
+    ..writeByte(0x4A) // J
+    ..writeByte(0x46) // F
+    ..writeByte(0x49) // I
+    ..writeByte(0x46) // F
+    ..writeByte(0) // '\0'
+    ..writeByte(1) // versionhi
+    ..writeByte(1) // versionlo
+    ..writeByte(0) // xyunits
+    ..writeUint16(1) // xdensity
+    ..writeUint16(1) // ydensity
+    ..writeByte(0) // thumbnwidth
+    ..writeByte(0); // thumbnheight
   }
 
   void _writeAPP1(OutputBuffer out, ExifData exif) {
@@ -520,35 +520,36 @@ class JpegEncoder extends Encoder {
     final exifBytes = exifData.getBytes();
 
     _writeMarker(out, JpegMarker.app1);
-    out.writeUint16(exifBytes.length + 8);
+
     const exifSignature = 0x45786966; // Exif\0\0
-    out.writeUint32(exifSignature);
-    out.writeUint16(0);
-    out.writeBytes(exifBytes);
+    out..writeUint16(exifBytes.length + 8)
+    ..writeUint32(exifSignature)
+    ..writeUint16(0)
+    ..writeBytes(exifBytes);
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height) {
     _writeMarker(out, JpegMarker.sof0);
-    out.writeUint16(17); // length, truecolor YUV JPG
-    out.writeByte(8); // precision
-    out.writeUint16(height);
-    out.writeUint16(width);
-    out.writeByte(3); // nrofcomponents
-    out.writeByte(1); // IdY
-    out.writeByte(0x11); // HVY
-    out.writeByte(0); // QTY
-    out.writeByte(2); // IdU
-    out.writeByte(0x11); // HVU
-    out.writeByte(1); // QTU
-    out.writeByte(3); // IdV
-    out.writeByte(0x11); // HVV
-    out.writeByte(1); // QTV
+    out..writeUint16(17) // length, truecolor YUV JPG
+    ..writeByte(8) // precision
+    ..writeUint16(height)
+    ..writeUint16(width)
+    ..writeByte(3) // nrofcomponents
+    ..writeByte(1) // IdY
+    ..writeByte(0x11) // HVY
+    ..writeByte(0) // QTY
+    ..writeByte(2) // IdU
+    ..writeByte(0x11) // HVU
+    ..writeByte(1) // QTU
+    ..writeByte(3) // IdV
+    ..writeByte(0x11) // HVV
+    ..writeByte(1); // QTV
   }
 
   void _writeDQT(OutputBuffer out) {
     _writeMarker(out, JpegMarker.dqt);
-    out.writeUint16(132); // length
-    out.writeByte(0);
+    out..writeUint16(132) // length
+    ..writeByte(0);
     for (var i = 0; i < 64; i++) {
       out.writeByte(_yTable[i]);
     }
@@ -560,9 +561,9 @@ class JpegEncoder extends Encoder {
 
   void _writeDHT(OutputBuffer out) {
     _writeMarker(out, JpegMarker.dht);
-    out.writeUint16(0x01A2); // length
+    out..writeUint16(0x01A2) // length
 
-    out.writeByte(0); // HTYDCinfo
+    ..writeByte(0); // HTYDCinfo
     for (var i = 0; i < 16; i++) {
       out.writeByte(stdDcLuminanceNrCodes[i + 1]);
     }
@@ -597,17 +598,17 @@ class JpegEncoder extends Encoder {
 
   void _writeSOS(OutputBuffer out) {
     _writeMarker(out, JpegMarker.sos);
-    out.writeUint16(12); // length
-    out.writeByte(3); // nrofcomponents
-    out.writeByte(1); // IdY
-    out.writeByte(0); // HTY
-    out.writeByte(2); // IdU
-    out.writeByte(0x11); // HTU
-    out.writeByte(3); // IdV
-    out.writeByte(0x11); // HTV
-    out.writeByte(0); // Ss
-    out.writeByte(0x3f); // Se
-    out.writeByte(0); // Bf
+    out..writeUint16(12) // length
+    ..writeByte(3) // nrofcomponents
+    ..writeByte(1) // IdY
+    ..writeByte(0) // HTY
+    ..writeByte(2) // IdU
+    ..writeByte(0x11) // HTU
+    ..writeByte(3) // IdV
+    ..writeByte(0x11) // HTV
+    ..writeByte(0) // Ss
+    ..writeByte(0x3f) // Se
+    ..writeByte(0); // Bf
   }
 
   int? _processDU(OutputBuffer out, List<double> cdu, List<double> fdtbl,
@@ -680,8 +681,8 @@ class JpegEncoder extends Encoder {
       _bytePos--;
       if (_bytePos < 0) {
         if (_byteNew == 0xff) {
-          out.writeByte(0xff);
-          out.writeByte(0);
+          out..writeByte(0xff)
+          ..writeByte(0);
         } else {
           out.writeByte(_byteNew);
         }

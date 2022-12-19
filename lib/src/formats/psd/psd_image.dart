@@ -277,15 +277,10 @@ class PsdImage implements DecodeInfo {
         break;
     }
 
-    r = ((ar * (1.0 - da)) + (r * da)).toInt();
-    g = ((ag * (1.0 - da)) + (g * da)).toInt();
-    b = ((ab * (1.0 - da)) + (b * da)).toInt();
-    a = ((aa * (1.0 - da)) + (a * da)).toInt();
-
-    p.r = r;
-    p.g = g;
-    p.b = b;
-    p.a = a;
+    p..r = ((ar * (1.0 - da)) + (r * da)).toInt()
+    ..g = ((ag * (1.0 - da)) + (g * da)).toInt()
+    ..b = ((ab * (1.0 - da)) + (b * da)).toInt()
+    ..a = ((aa * (1.0 - da)) + (a * da)).toInt();
   }
 
   static int _blendLighten(int a, int b) => max(a, b);
@@ -470,19 +465,19 @@ class PsdImage implements DecodeInfo {
     len = _layerAndMaskData!.readUint32();
     final maskData = _layerAndMaskData!.readBytes(len);
     if (len > 0) {
-      /*int colorSpace =*/ maskData.readUint16();
+      /*int colorSpace =*/ maskData..readUint16()
       /*int rc =*/
-      maskData.readUint16();
+      ..readUint16()
       /*int gc =*/
-      maskData.readUint16();
+      ..readUint16()
       /*int bc =*/
-      maskData.readUint16();
+      ..readUint16()
       /*int ac =*/
-      maskData.readUint16();
+      ..readUint16()
       /*int opacity =*/
-      maskData.readUint16(); // 0-100
+      ..readUint16() // 0-100
       /*int kind =*/
-      maskData.readByte();
+      ..readByte();
     }
   }
 
@@ -547,9 +542,9 @@ class PsdImage implements DecodeInfo {
             // Photoshop/Gimp blend the image against white (argh!),
             // which is not what we want for compositing. Invert the blend
             // operation to try and undo the damage.
-            p.r = (((p.r + p.a) - 255) * 255) / p.a;
-            p.g = (((p.g + p.a) - 255) * 255) / p.a;
-            p.b = (((p.b + p.a) - 255) * 255) / p.a;
+            p..r = (((p.r + p.a) - 255) * 255) / p.a
+            ..g = (((p.g + p.a) - 255) * 255) / p.a
+            ..b = (((p.b + p.a) - 255) * 255) / p.a;
           }
           break;
         case PsdColorMode.lab:

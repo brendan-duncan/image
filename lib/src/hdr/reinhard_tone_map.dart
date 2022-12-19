@@ -31,9 +31,9 @@ Image reinhardToneMap(Image hdr) {
 
     final s = (1.0 + lum * invY2) / (1.0 + lum);
 
-    p.r = r * s;
-    p.g = g * s;
-    p.b = b * s;
+    p..r = r * s
+    ..g = g * s
+    ..b = b * s;
   }
 
   return hdr;

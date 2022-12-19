@@ -32,8 +32,8 @@ Image copyCropCircle(Image src, {int? radius, Point? center}) {
   radius ??= defaultRadius;
   center ??= Point(src.width ~/ 2, src.height ~/ 2);
   // Make sure center point is within the range of the src image
-  center.x = center.x.clamp(0, src.width - 1).toInt();
-  center.y = center.y.clamp(0, src.height - 1).toInt();
+  center..x = center.x.clamp(0, src.width - 1).toInt()
+  ..y = center.y.clamp(0, src.height - 1).toInt();
   radius = radius < 1 ? defaultRadius : radius;
 
   final tlx = center.x.toInt() - radius; //topLeft.x

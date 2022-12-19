@@ -280,8 +280,8 @@ class IfdRationalValue extends IfdValue {
 
   void write(OutputBuffer out) {
     for (var v in value) {
-      out.writeUint32(v.numerator);
-      out.writeUint32(v.denominator);
+      out..writeUint32(v.numerator)
+        ..writeUint32(v.denominator);
     }
   }
 
@@ -452,8 +452,8 @@ class IfdSRationalValue extends IfdValue {
 
   void write(OutputBuffer out) {
     for (var v in value) {
-      out.writeUint32(int32ToUint32(v.numerator));
-      out.writeUint32(int32ToUint32(v.denominator));
+      out..writeUint32(int32ToUint32(v.numerator))
+      ..writeUint32(int32ToUint32(v.denominator));
     }
   }
 

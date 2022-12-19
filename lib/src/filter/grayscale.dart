@@ -8,9 +8,9 @@ Image grayscale(Image src) {
   } else {
     for (var p in src) {
       final l = getLuminanceRgb(p.r, p.g, p.b);
-      p.r = l;
-      p.g = l;
-      p.b = l;
+      p..r = l
+      ..g = l
+      ..b = l;
     }
   }
 

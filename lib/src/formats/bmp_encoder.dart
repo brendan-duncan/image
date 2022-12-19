@@ -39,66 +39,66 @@ class BmpEncoder extends Encoder {
     final gapSize = imageOffset - origImageOffset;
     final fileSize = imageFileSize + headerSize + paletteSize + gapSize;
 
-    out.writeUint16(BmpFileHeader.bmpHeaderFiletype);
-    out.writeUint32(fileSize);
+    out..writeUint16(BmpFileHeader.bmpHeaderFiletype)
+    ..writeUint32(fileSize)
 
-    out.writeUint32(0); // reserved
-    out.writeUint32(imageOffset); // offset to image data
+    ..writeUint32(0) // reserved
+    ..writeUint32(imageOffset) // offset to image data
 
-    out.writeUint32(headerInfoSize);
-    out.writeUint32(image.width);
-    out.writeUint32(image.height);
-    out.writeUint16(1); // planes
-    out.writeUint16(bpp); // bits per pixel
-    out.writeUint32(BmpCompression.none.index); // compression, none
-    out.writeUint32(imageFileSize);
-    out.writeUint32(0); // hr
-    out.writeUint32(0); // vr
-    out.writeUint32(0); // totalColors
-    out.writeUint32(0); // importantColors
+    ..writeUint32(headerInfoSize)
+    ..writeUint32(image.width)
+    ..writeUint32(image.height)
+    ..writeUint16(1) // planes
+    ..writeUint16(bpp) // bits per pixel
+    ..writeUint32(BmpCompression.none.index) // compression, none
+    ..writeUint32(imageFileSize)
+    ..writeUint32(0) // hr
+    ..writeUint32(0) // vr
+    ..writeUint32(0) // totalColors
+    ..writeUint32(0); // importantColors
 
     if (bpp == 1 || bpp == 2 || bpp == 4 || bpp == 8) {
       if (image.hasPalette) {
         final palette = image.palette!;
         for (var pi = 0, l = palette.numColors; pi < l; ++pi) {
-          out.writeByte(palette.getBlue(pi).toInt());
-          out.writeByte(palette.getGreen(pi).toInt());
-          out.writeByte(palette.getRed(pi).toInt());
-          out.writeByte(0);
+          out..writeByte(palette.getBlue(pi).toInt())
+          ..writeByte(palette.getGreen(pi).toInt())
+          ..writeByte(palette.getRed(pi).toInt())
+          ..writeByte(0);
         }
       } else {
         if (bpp == 1) {
-          out.writeByte(0);
-          out.writeByte(0);
-          out.writeByte(0);
-          out.writeByte(0);
+          out..writeByte(0)
+          ..writeByte(0)
+          ..writeByte(0)
+          ..writeByte(0)
 
-          out.writeByte(255);
-          out.writeByte(255);
-          out.writeByte(255);
-          out.writeByte(0);
+          ..writeByte(255)
+          ..writeByte(255)
+          ..writeByte(255)
+          ..writeByte(0);
         } else if (bpp == 2) {
           for (var pi = 0; pi < 4; ++pi) {
             final v = pi * 85;
-            out.writeByte(v);
-            out.writeByte(v);
-            out.writeByte(v);
-            out.writeByte(0);
+            out..writeByte(v)
+            ..writeByte(v)
+            ..writeByte(v)
+            ..writeByte(0);
           }
         } else if (bpp == 4) {
           for (var pi = 0; pi < 16; ++pi) {
             final v = pi * 17;
-            out.writeByte(v);
-            out.writeByte(v);
-            out.writeByte(v);
-            out.writeByte(0);
+            out..writeByte(v)
+            ..writeByte(v)
+            ..writeByte(v)
+            ..writeByte(0);
           }
         } else if (bpp == 8) {
           for (var pi = 0; pi < 256; ++pi) {
-            out.writeByte(pi);
-            out.writeByte(pi);
-            out.writeByte(pi);
-            out.writeByte(0);
+            out..writeByte(pi)
+            ..writeByte(pi)
+            ..writeByte(pi)
+            ..writeByte(0);
           }
         }
       }
@@ -168,9 +168,9 @@ class BmpEncoder extends Encoder {
     for (var h = image.height, y = h - 1; y >= 0; --y) {
       for (var x = 0, w = image.width; x < w; ++x) {
         final p = image.getPixel(x, y);
-        out.writeByte(p.b.toInt());
-        out.writeByte(p.g.toInt());
-        out.writeByte(p.r.toInt());
+        out..writeByte(p.b.toInt())
+        ..writeByte(p.g.toInt())
+        ..writeByte(p.r.toInt());
         if (image.numChannels == 4) {
           out.writeByte(p.a.toInt());
         }

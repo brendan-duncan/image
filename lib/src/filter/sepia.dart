@@ -14,9 +14,9 @@ Image sepia(Image src, {num amount = 1.0}) {
     final g = p.g;
     final b = p.b;
     final y = getLuminanceRgb(r, g, b);
-    p.r = (amount * (y + 38)) + ((1.0 - amount) * r);
-    p.g = (amount * (y + 18)) + ((1.0 - amount) * g);
-    p.b = (amount * (y - 31)) + ((1.0 - amount) * b);
+    p..r = (amount * (y + 38)) + ((1.0 - amount) * r)
+    ..g = (amount * (y + 18)) + ((1.0 - amount) * g)
+    ..b = (amount * (y - 31)) + ((1.0 - amount) * b);
   }
 
   return src;

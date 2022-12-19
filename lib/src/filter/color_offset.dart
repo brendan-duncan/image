@@ -5,10 +5,10 @@ import '../image/image.dart';
 Image colorOffset(Image src,
     {int red = 0, int green = 0, int blue = 0, int alpha = 0}) {
   for (var p in src) {
-    p.r += red;
-    p.g += green;
-    p.b += blue;
-    p.a += alpha;
+    p..r += red
+    ..g += green
+    ..b += blue
+    ..a += alpha;
   }
   return src;
 }

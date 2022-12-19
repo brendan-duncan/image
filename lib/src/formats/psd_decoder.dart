@@ -39,10 +39,10 @@ class PsdDecoder extends Decoder {
       return null;
     }
 
-    final anim = Animation();
-    anim.width = info!.width;
-    anim.height = info!.height;
-    anim.frameType = FrameType.page;
+    final anim = Animation()
+    ..width = info!.width
+    ..height = info!.height
+    ..frameType = FrameType.page;
     for (var i = 0, len = numFrames(); i < len; ++i) {
       final image = decodeFrame(i);
       anim.addFrame(image!);

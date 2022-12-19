@@ -36,15 +36,16 @@ class PvrtcDecoder {
       if (size == headerSize) {
         return null;
       }
-      /*int height =*/ input.readUint32();
-      /*int width =*/ input.readUint32();
-      /*int mipCount =*/ input.readUint32();
-      /*int flags =*/ input.readUint32();
-      /*int texDataSize =*/ input.readUint32();
-      /*int bpp =*/ input.readUint32();
-      /*int rMask =*/ input.readUint32();
-      /*int gMask =*/ input.readUint32();
-      /*int bMask =*/ input.readUint32();
+      /*int height =*/ input..readUint32()
+      /*int width =*/ ..readUint32()
+      /*int mipCount =*/ ..readUint32()
+      /*int flags =*/ ..readUint32()
+      /*int texDataSize =*/ ..readUint32()
+      /*int bpp =*/ ..readUint32()
+      /*int rMask =*/ ..readUint32()
+      /*int gMask =*/ ..readUint32()
+      /*int bMask =*/ ..readUint32();
+
       final magic = input.readUint32();
       if (magic == 0x21525650) {
         // this looks more like a PowerVR file.
@@ -141,9 +142,9 @@ class PvrtcDecoder {
     final flags = input.readUint32();
     /*int texdatasize =*/ input.readUint32();
     final bpp = input.readUint32();
-    /*int rmask =*/ input.readUint32();
-    /*int gmask =*/ input.readUint32();
-    /*int bmask =*/ input.readUint32();
+    /*int rmask =*/ input..readUint32()
+    /*int gmask =*/ ..readUint32()
+    /*int bmask =*/ ..readUint32();
     final amask = input.readUint32();
     final magic = input.readUint32();
     var numtex = input.readUint32();
@@ -178,10 +179,10 @@ class PvrtcDecoder {
           final g = (v2 & 0x0f) << 4;
           final r = v2 & 0xf0;
 
-          p.r = r;
-          p.g = g;
-          p.b = b;
-          p.a = a;
+          p..r = r
+          ..g = g
+          ..b = b
+          ..a = a;
         }
         return image;
       case pvrTypeRgba5551:
@@ -192,19 +193,19 @@ class PvrtcDecoder {
           final g = (v & 0x07c0) >> 3;
           final b = (v & 0x003e) << 2;
           final a = (v & 0x0001) != 0 ? 255 : 0;
-          p.r = r;
-          p.g = g;
-          p.b = b;
-          p.a = a;
+          p..r = r
+          ..g = g
+          ..b = b
+          ..a = a;
         }
         return image;
       case pvrTypeRgba8888:
         final image = Image(width, height, numChannels: 4);
         for (var p in image) {
-          p.r = input.readByte();
-          p.g = input.readByte();
-          p.b = input.readByte();
-          p.a = input.readByte();
+          p..r = input.readByte()
+          ..g = input.readByte()
+          ..b = input.readByte()
+          ..a = input.readByte();
         }
         return image;
       case pvrTypeRgb565:
@@ -214,9 +215,9 @@ class PvrtcDecoder {
           final b = (v & 0x001f) << 3;
           final g = (v & 0x07e0) >> 3;
           final r = (v & 0xf800) >> 8;
-          p.r = r;
-          p.g = g;
-          p.b = b;
+          p..r = r
+          ..g = g
+          ..b = b;
         }
         return image;
       case pvrTypeRgb555:
@@ -226,17 +227,17 @@ class PvrtcDecoder {
           final r = (v & 0x001f) << 3;
           final g = (v & 0x03e0) >> 2;
           final b = (v & 0x7c00) >> 7;
-          p.r = r;
-          p.g = g;
-          p.b = b;
+          p..r = r
+          ..g = g
+          ..b = b;
         }
         return image;
       case pvrTypeRgb888:
         final image = Image(width, height);
         for (var p in image) {
-          p.r = input.readByte();
-          p.g = input.readByte();
-          p.b = input.readByte();
+          p..r = input.readByte()
+          ..g = input.readByte()
+          ..b = input.readByte();
         }
         return image;
       case pvrTypeI8:
@@ -251,8 +252,8 @@ class PvrtcDecoder {
         for (var p in image) {
           final i = input.readByte();
           final a = input.readByte();
-          p.r = i;
-          p.g = a;
+          p..r = i
+          ..g = a;
         }
         return image;
       case pvrTypePvrtc2:
@@ -316,16 +317,16 @@ class PvrtcDecoder {
       input.readByte(),
       input.readByte(),
       input.readByte(),
-      input.readByte()
+      input..readByte()
     ];
-    /*int colorspace =*/ input.readUint32();
-    /*int channeltype =*/ input.readUint32();
+    /*int colorspace =*/ input..readUint32()
+    /*int channeltype =*/ ..readUint32();
     final height = input.readUint32();
     final width = input.readUint32();
-    /*int depth =*/ input.readUint32();
-    /*int num_surfaces =*/ input.readUint32();
-    /*int num_faces =*/ input.readUint32();
-    /*int mipcount =*/ input.readUint32();
+    /*int depth =*/ input..readUint32()
+    /*int num_surfaces =*/ ..readUint32()
+    /*int num_faces =*/ ..readUint32()
+    /*int mipcount =*/ ..readUint32();
     final metadataSize = input.readUint32();
 
     input.skip(metadataSize);

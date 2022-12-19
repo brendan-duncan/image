@@ -28,9 +28,9 @@ class OctreeQuantizer extends Quantizer {
     for (var i = 1; i < heap.n; i++) {
       final got = heap.buf[i]!;
       final c = got.count;
-      got.r = (got.r / c).round();
-      got.g = (got.g / c).round();
-      got.b = (got.b / c).round();
+      got..r = (got.r / c).round()
+      ..g = (got.g / c).round()
+      ..b = (got.b / c).round();
     }
 
     final nodes = <_OctreeNode>[];
@@ -38,8 +38,8 @@ class OctreeQuantizer extends Quantizer {
 
     palette = PaletteUint8(nodes.length, 3);
     for (var i = 0, l = nodes.length; i < l; ++i) {
-      final n = nodes[i];
-      n.paletteIndex = i;
+      final n = nodes[i]
+      ..paletteIndex = i;
       palette.setColor(i, n.r, n.g, n.b);
     }
   }
@@ -123,9 +123,9 @@ class OctreeQuantizer extends Quantizer {
       root = root.children[i]!;
     }
 
-    root.r += r;
-    root.g += g;
-    root.b += b;
+    root..r += r
+    ..g += g
+    ..b += b;
     root.count++;
     return root;
   }
@@ -134,12 +134,11 @@ class OctreeQuantizer extends Quantizer {
     if (p.childCount > 0) {
       return null;
     }
-    final q = p.parent!;
-    q.count += p.count;
-
-    q.r += p.r;
-    q.g += p.g;
-    q.b += p.b;
+    final q = p.parent!
+    ..count += p.count
+    ..r += p.r
+    ..g += p.g
+    ..b += p.b;
     q.childCount--;
     q.children[p.childIndex] = null;
     return q;
@@ -167,8 +166,8 @@ class OctreeQuantizer extends Quantizer {
       return;
     }
 
-    p.flags |= _inHeap;
-    p.heapIndex = h.n;
+    p..flags |= _inHeap
+    ..heapIndex = h.n;
     h.buf.add(p);
     _upHeap(h, p);
   }

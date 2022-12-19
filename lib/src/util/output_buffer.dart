@@ -143,8 +143,8 @@ class OutputBuffer {
         : (_buffer.isEmpty)
             ? _blockSize
             : (_buffer.length * 2);
-    final newBuffer = Uint8List(_buffer.length + blockSize);
-    newBuffer.setRange(0, _buffer.length, _buffer);
+    final newBuffer = Uint8List(_buffer.length + blockSize)
+    ..setRange(0, _buffer.length, _buffer);
     _buffer = newBuffer;
   }
 

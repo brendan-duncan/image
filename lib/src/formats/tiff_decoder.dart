@@ -62,8 +62,8 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    final image = info!.images[frame].decode(_input);
-    image.exif = ExifData.fromInputBuffer(InputBuffer(bytes));
+    final image = info!.images[frame].decode(_input)
+    ..exif = ExifData.fromInputBuffer(InputBuffer(bytes));
 
     return image;
   }
@@ -77,10 +77,10 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    final anim = Animation();
-    anim.width = info!.width;
-    anim.height = info!.height;
-    anim.frameType = FrameType.page;
+    final anim = Animation()
+    ..width = info!.width
+    ..height = info!.height
+    ..frameType = FrameType.page;
     for (var i = 0, len = numFrames(); i < len; ++i) {
       final image = decodeFrame(i);
       anim.addFrame(image!);
@@ -113,8 +113,8 @@ class TiffDecoder extends Decoder {
     var offset = p.readUint32();
     info.ifdOffset = offset;
 
-    final p2 = InputBuffer.from(p);
-    p2.offset = offset;
+    final p2 = InputBuffer.from(p)
+    ..offset = offset;
 
     while (offset != 0) {
       TiffImage img;
@@ -128,8 +128,8 @@ class TiffDecoder extends Decoder {
       }
       info.images.add(img);
       if (info.images.length == 1) {
-        info.width = info.images[0].width;
-        info.height = info.images[0].height;
+        info..width = info.images[0].width
+        ..height = info.images[0].height;
       }
 
       offset = p2.readUint32();

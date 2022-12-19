@@ -18,10 +18,10 @@ Image drawPixel(Image image, int x, int y, Color c, [double? overrideAlpha]) {
     }
 
     final invA = 1.0 - a;
-    dst.r = (c.r * a) + (dst.r * invA);
-    dst.g = (c.g * a) + (dst.g * invA);
-    dst.b = (c.b * a) + (dst.b * invA);
-    dst.a = dst.maxChannelValue;
+    dst..r = (c.r * a) + (dst.r * invA)
+      ..g = (c.g * a) + (dst.g * invA)
+      ..b = (c.b * a) + (dst.b * invA)
+      ..a = dst.maxChannelValue;
   }
 
   return image;

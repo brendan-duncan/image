@@ -145,14 +145,14 @@ class GifEncoder extends Encoder {
     final palette = image.palette!;
     final numColors = palette.numColors;
 
-    final out = output!;
+    final out = output!
 
     // Image desc
-    out.writeByte(_imageDescRecordType);
-    out.writeUint16(0); // image position x,y = 0,0
-    out.writeUint16(0);
-    out.writeUint16(width); // image size
-    out.writeUint16(height);
+    ..writeByte(_imageDescRecordType)
+    ..writeUint16(0) // image position x,y = 0,0
+    ..writeUint16(0)
+    ..writeUint16(width) // image size
+    ..writeUint16(height);
 
     final paletteBytes = palette.toUint8List();
 
@@ -165,23 +165,23 @@ class GifEncoder extends Encoder {
       out.writeBytes(paletteBytes);
     } else if (numChannels == 4) {
       for (var i = 0, pi = 0; i < numColors; ++i, pi += 4) {
-        out.writeByte(paletteBytes[pi]);
-        out.writeByte(paletteBytes[pi + 1]);
-        out.writeByte(paletteBytes[pi + 2]);
+        out..writeByte(paletteBytes[pi])
+        ..writeByte(paletteBytes[pi + 1])
+        ..writeByte(paletteBytes[pi + 2]);
       }
     } else if (numChannels == 1 || numChannels == 2) {
       for (var i = 0, pi = 0; i < numColors; ++i, pi += numChannels) {
         final g = paletteBytes[pi];
-        out.writeByte(g);
-        out.writeByte(g);
-        out.writeByte(g);
+        out..writeByte(g)
+        ..writeByte(g)
+        ..writeByte(g);
       }
     }
 
     for (var i = numColors; i < 256; ++i) {
-      out.writeByte(0);
-      out.writeByte(0);
-      out.writeByte(0);
+      out..writeByte(0)
+      ..writeByte(0)
+      ..writeByte(0);
     }
 
     _encodeLZW(image, width, height);
@@ -198,8 +198,7 @@ class GifEncoder extends Encoder {
 
     final hTab = Int32List(_hSize);
     final codeTab = Int32List(_hSize);
-    final pIter = image.iterator;
-    pIter.moveNext();
+    final pIter = image.iterator..moveNext();
 
     _initBits = initCodeSize + 1;
     _nBits = _initBits;

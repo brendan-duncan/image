@@ -35,9 +35,9 @@ Image sobel(Image src, { num amount = 1.0 }) {
 
     final mag = sqrt(h * h + v * v) * p.maxChannelValue;
 
-    p.r = mag * amount + p.r * invAmount;
-    p.g = mag * amount + p.g * invAmount;
-    p.b = mag * amount + p.b * invAmount;
+    p..r = mag * amount + p.r * invAmount
+    ..g = mag * amount + p.g * invAmount
+    ..b = mag * amount + p.b * invAmount;
   }
 
   return src;

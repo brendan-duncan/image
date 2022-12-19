@@ -114,8 +114,8 @@ class GifDecoder extends Decoder {
         return;
       }
 
-      gifImage.duration = duration;
-      gifImage.clearFrame = disposalMethod == 2;
+      gifImage..duration = duration
+      ..clearFrame = disposalMethod == 2;
 
       if (transparentFlag != 0) {
         if (gifImage.colorMap == null && info!.globalColorMap != null) {
@@ -163,10 +163,10 @@ class GifDecoder extends Decoder {
       return null;
     }
 
-    final anim = Animation();
-    anim.width = info!.width;
-    anim.height = info!.height;
-    anim.loopCount = _repeat;
+    final anim = Animation()
+    ..width = info!.width
+    ..height = info!.height
+    ..loopCount = _repeat;
 
     Image? lastImage = null;
     for (var i = 0; i < info!.numFrames; ++i) {
@@ -196,9 +196,8 @@ class GifDecoder extends Decoder {
             ? frame.colorMap! : info!.globalColorMap!;
 
         lastImage = Image(lastImage.width, lastImage.height, numChannels: 1,
-            palette: colorMap.getPalette());
-
-        lastImage.clear(colorMap.color(info!.backgroundColor!.r as int));
+            palette: colorMap.getPalette())
+        ..clear(colorMap.color(info!.backgroundColor!.r as int));
       } else {
         lastImage = new Image.from(lastImage);
       }

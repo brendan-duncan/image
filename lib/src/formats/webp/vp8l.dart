@@ -27,10 +27,10 @@ class VP8L {
       return false;
     }
 
-    webp.format = WebPFormat.lossless;
-    webp.width = br.readBits(14) + 1;
-    webp.height = br.readBits(14) + 1;
-    webp.hasAlpha = br.readBits(1) != 0;
+    webp..format = WebPFormat.lossless
+    ..width = br.readBits(14) + 1
+    ..height = br.readBits(14) + 1
+    ..hasAlpha = br.readBits(1) != 0;
     final version = br.readBits(3);
 
     if (version != vp8lVersion) {
@@ -102,9 +102,9 @@ class VP8L {
     final transform = VP8LTransform();
     _transforms.add(transform);
 
-    transform.type = VP8LImageTransformType.values[type];
-    transform.xsize = transformSize[0];
-    transform.ysize = transformSize[1];
+    transform..type = VP8LImageTransformType.values[type]
+    ..xsize = transformSize[0]
+    ..ysize = transformSize[1];
 
     switch (transform.type) {
       case VP8LImageTransformType.predictor:
@@ -178,8 +178,8 @@ class VP8L {
       _colorCacheSize = 0;
     }
 
-    webp.width = transformXsize;
-    webp.height = transformYsize;
+    webp..width = transformXsize
+    ..height = transformYsize;
     final numBits = _huffmanSubsampleBits;
     _huffmanXsize = _subSampleSize(transformXsize, numBits);
     _huffmanMask = (numBits == 0) ? ~0 : (1 << numBits) - 1;
@@ -486,9 +486,8 @@ class VP8L {
     final startRow = _lastRow;
     final endRow = startRow + numRows;
     final rowsOut = InputBuffer(_opaque!, offset: _ioWidth! * startRow);
-    final transform = _transforms[0];
-
-    transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);
+    _transforms[0].colorIndexInverseTransformAlpha(startRow, endRow, rows,
+        rowsOut);
   }
 
   // Processes (transforms, scales & color-converts) the rows decoded after the
@@ -534,8 +533,7 @@ class VP8L {
     _pixels!.setRange(rowsOut, rowsOut + cachePixs, _pixels!, rowsIn);
 
     while (n-- > 0) {
-      final transform = _transforms[n];
-      transform.inverseTransform(
+      _transforms[n].inverseTransform(
           startRow, endRow, _pixels!, rowsIn, _pixels!, rowsOut);
       rowsIn = rowsOut;
     }

@@ -25,9 +25,9 @@ Image vignette(Image src, {num start = 0.3, num end = 0.75, num amount = 0.8}) {
     final r = p.r;
     final g = p.g;
     final b = p.b;
-    p.r = amount * r * d + invAmt * r;
-    p.g = amount * g * d + invAmt * g;
-    p.b = amount * b * d + invAmt * b;
+    p..r = amount * r * d + invAmt * r
+    ..g = amount * g * d + invAmt * g
+    ..b = amount * b * d + invAmt * b;
   }
   return src;
 }

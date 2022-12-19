@@ -70,10 +70,10 @@ class ExrDecoder extends Decoder {
       return null;
     }
 
-    final anim = Animation();
-    anim.width = image.width;
-    anim.height = image.height;
-    anim.addFrame(image);
+    final anim = Animation()
+    ..width = image.width
+    ..height = image.height
+    ..addFrame(image);
 
     return anim;
   }

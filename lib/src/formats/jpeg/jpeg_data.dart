@@ -136,8 +136,8 @@ class JpegData {
     }
 
     if (frame != null) {
-      info.width = frame!.samplesPerLine!;
-      info.height = frame!.scanLines!;
+      info..width = frame!.samplesPerLine!
+      ..height = frame!.scanLines!;
     }
     frame = null;
     frames.clear();
@@ -325,14 +325,14 @@ class JpegData {
           appData[2] == 0x49 &&
           appData[3] == 0x46 &&
           appData[4] == 0) {
-        jfif = JpegJfif();
-        jfif.majorVersion = appData[5];
-        jfif.minorVersion = appData[6];
-        jfif.densityUnits = appData[7];
-        jfif.xDensity = (appData[8] << 8) | appData[9];
-        jfif.yDensity = (appData[10] << 8) | appData[11];
-        jfif.thumbWidth = appData[12];
-        jfif.thumbHeight = appData[13];
+        jfif = JpegJfif()
+        ..majorVersion = appData[5]
+        ..minorVersion = appData[6]
+        ..densityUnits = appData[7]
+        ..xDensity = (appData[8] << 8) | appData[9]
+        ..yDensity = (appData[10] << 8) | appData[11]
+        ..thumbWidth = appData[12]
+        ..thumbHeight = appData[13];
         final thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
         jfif.thumbData = appData.subset(14 + thumbSize, offset: 14);
       }

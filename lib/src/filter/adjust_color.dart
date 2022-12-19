@@ -176,9 +176,9 @@ Image adjustColor(Image src,
       b = b * amount + ob * invAmount;
     }
 
-    p.r = r * p.maxChannelValue;
-    p.g = g * p.maxChannelValue;
-    p.b = b * p.maxChannelValue;
+    p..r = r * p.maxChannelValue
+    ..g = g * p.maxChannelValue
+    ..b = b * p.maxChannelValue;
   }
 
   return src;

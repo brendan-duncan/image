@@ -46,8 +46,8 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
     newImageHeight = shadowHeight + shadowOffsetY + vShadow;
   }
 
-  final dst = Image(newImageWidth, newImageHeight, numChannels: 4);
-  dst.clear(ColorRgba8(255, 255, 255, 0));
+  final dst = Image(newImageWidth, newImageHeight, numChannels: 4)
+  ..clear(ColorRgba8(255, 255, 255, 0));
 
   drawImage(dst, src, dstX: shadowOffsetX, dstY: shadowOffsetY);
 

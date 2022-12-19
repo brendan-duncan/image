@@ -632,8 +632,8 @@ class TiffImage {
     } else if (compression == TiffCompression.lzw) {
       byteData = InputBuffer(Uint8List(tileWidth * tileHeight));
 
-      final decoder = LzwDecoder();
-      decoder.decode(InputBuffer.from(p, length: byteCount), byteData.buffer);
+      LzwDecoder().decode(InputBuffer.from(p, length: byteCount),
+          byteData.buffer);
 
       // Horizontal Differencing Predictor
       if (predictor == 2) {
