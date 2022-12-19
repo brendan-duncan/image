@@ -8,7 +8,7 @@ import 'image/image_tests.dart';
 import 'transform/transform_tests.dart';
 import 'util/util_tests.dart';
 
-void main(List<String> args) {
+void main() {
   colorTests();
   exifTests();
   fontTests();
