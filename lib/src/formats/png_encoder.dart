@@ -32,8 +32,9 @@ class PngEncoder extends Encoder {
     // PNG can't encode HDR formats, and can only encode formats with fewer
     // than 8 bits if they have a palette. In the case of incompatible
     // formats, convert them to uint8.
-    if (image.isHdrFormat || (image.bitsPerChannel < 8 && !image.hasPalette &&
-        image.numChannels > 1)) {
+    if ((image.isHdrFormat && image.format != Format.uint16) ||
+        (image.bitsPerChannel < 8 && !image.hasPalette &&
+            image.numChannels > 1)) {
       image = image.convert(format: Format.uint8);
     }
 
