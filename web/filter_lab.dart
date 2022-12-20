@@ -9,11 +9,11 @@ late Ix.Image origImage;
 
 void _addControl(String label, String value, DivElement parent,
     void Function(double) callback) {
-  final amountLabel = LabelElement();
-  amountLabel.text = '$label:';
-  final amountEdit = InputElement();
-  amountEdit.value = value;
-  amountEdit.id = '${label}_edit';
+  final amountLabel = LabelElement()
+  ..text = '$label:';
+  final amountEdit = InputElement()
+  ..value = value
+  ..id = '${label}_edit';
   amountEdit.onChange.listen((e) {
     try {
       final d = double.parse(amountEdit.value!);
@@ -23,24 +23,23 @@ void _addControl(String label, String value, DivElement parent,
     }
   });
   amountLabel.htmlFor = '${label}_edit';
-  parent.append(amountLabel);
-  parent.append(amountEdit);
-  parent.append(ParagraphElement());
+  parent.append(amountLabel)
+  ..append(amountEdit)
+  ..append(ParagraphElement());
 }
 
 void testSepia() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1');
-  label.text = 'Sepia';
+  final label = Element.tag('h1')
+  ..text = 'Sepia';
   sidebar.children.add(label);
 
   num amount = 1.0;
 
   void _apply() {
-    final t = Stopwatch();
-    t.start();
+    final t = Stopwatch()..start();
     var image = Ix.Image.from(origImage);
     image = Ix.sepia(image, amount: amount);
 
@@ -67,15 +66,14 @@ void testSobel() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1');
-  label.text = 'Sepia';
+  final label = Element.tag('h1')
+  ..text = 'Sepia';
   sidebar.children.add(label);
 
   num amount = 1.0;
 
   void _apply() {
-    final t = Stopwatch();
-    t.start();
+    final t = Stopwatch()..start();
     var image = Ix.Image.from(origImage);
     image = Ix.sobel(image, amount: amount);
 
@@ -101,15 +99,14 @@ void testGaussian() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1');
-  label.text = 'Gaussian Blur';
+  final label = Element.tag('h1')
+  ..text = 'Gaussian Blur';
   sidebar.children.add(label);
 
   var radius = 5;
 
   void _apply() {
-    final t = Stopwatch();
-    t.start();
+    final t = Stopwatch()..start();
     var image = Ix.Image.from(origImage);
     image = Ix.gaussianBlur(image, radius);
 
@@ -135,8 +132,8 @@ void testVignette() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1');
-  label.text = 'Vignette';
+  final label = Element.tag('h1')
+  ..text = 'Vignette';
   sidebar.children.add(label);
 
   num start = 0.3;
@@ -144,8 +141,7 @@ void testVignette() {
   num amount = 1.0;
 
   void _apply() {
-    final t = Stopwatch();
-    t.start();
+    final t = Stopwatch()..start();
     var image = Ix.Image.from(origImage);
     image = Ix.vignette(image, start: start, end: end, amount: amount);
 
@@ -181,15 +177,14 @@ void testPixelate() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1');
-  label.text = 'Pixelate';
+  final label = Element.tag('h1')
+  ..text = 'Pixelate';
   sidebar.children.add(label);
 
   var blockSize = 5;
 
   void _apply() {
-    final t = Stopwatch();
-    t.start();
+    final t = Stopwatch()..start();
     var image = Ix.Image.from(origImage);
     image = Ix.pixelate(image, blockSize);
 
@@ -215,8 +210,8 @@ void testColorOffset() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1');
-  label.text = 'Pixelate';
+  final label = Element.tag('h1')
+  ..text = 'Pixelate';
   sidebar.children.add(label);
 
   var red = 0;
@@ -225,8 +220,7 @@ void testColorOffset() {
   var alpha = 0;
 
   void _apply() {
-    final t = Stopwatch();
-    t.start();
+    final t = Stopwatch()..start();
     var image = Ix.Image.from(origImage);
     image = Ix.colorOffset(image, red: red, green: green, blue: blue,
         alpha: alpha);
@@ -268,8 +262,8 @@ void testAdjustColor() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1');
-  label.text = 'Adjust Color';
+  final label = Element.tag('h1')
+  ..text = 'Adjust Color';
   sidebar.children.add(label);
 
   num contrast = 1.0;
@@ -281,8 +275,7 @@ void testAdjustColor() {
   num amount = 1.0;
 
   void _apply() {
-    final t = Stopwatch();
-    t.start();
+    final t = Stopwatch()..start();
     var image = Ix.Image.from(origImage);
 
     image = Ix.adjustColor(image,
@@ -368,10 +361,10 @@ void main() {
 
   final img = ImageElement(src: 'res/big_buck_bunny.jpg');
   img.onLoad.listen((e) {
-    final c = CanvasElement();
-    c.width = img.width;
-    c.height = img.height;
-    c.context2D.drawImage(img, 0, 0);
+    final c = CanvasElement()
+    ..width = img.width
+    ..height = img.height
+    ..context2D.drawImage(img, 0, 0);
 
     final imageData = c.context2D.getImageData(0, 0, img.width!, img.height!);
     origImage = Ix.Image.fromBytes(img.width!, img.height!,

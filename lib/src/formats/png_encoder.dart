@@ -8,7 +8,6 @@ import '../image/animation.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/palette.dart';
-import '../util/image_exception.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 import 'png/png_info.dart';

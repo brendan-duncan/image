@@ -2,7 +2,6 @@ import 'dart:isolate';
 
 import '../../image/image.dart';
 import '../../transform/copy_rectify.dart';
-import '../../util/interpolation.dart';
 import '../../util/point.dart';
 
 class _CopyRectify {

@@ -32,9 +32,9 @@ void main() {
   for (var name in images) {
     // Use an http request to get the image file from disk.
     final req = HttpRequest();
-    req.open('GET', '$path/$name');
-    req.responseType = 'arraybuffer';
-    req.onLoadEnd.listen((e) {
+    req..open('GET', '$path/$name')
+    ..responseType = 'arraybuffer'
+    ..onLoadEnd.listen((e) {
       if (req.status == 200) {
         // Convert the text to binary byte list.
         final bytes = Uint8List.view(req.response as ByteBuffer);
@@ -67,8 +67,8 @@ void main() {
           //Image newImage = copyResize(image, 2000, -1, CUBIC);
           final newImage = image;
 
-          c.width = newImage.width;
-          c.height = newImage.height;
+          c..width = newImage.width
+          ..height = newImage.height;
 
           // Create a buffer that the canvas can draw.
           final d = c.context2D.createImageData(c.width, c.height);
@@ -85,8 +85,8 @@ void main() {
         // [Animation], and using a hard-coded delay instead.
 
         // Setup the canvas size to the size of the first image.
-        c.width = anim.frames[0].width;
-        c.height = anim.frames[0].height;
+        c..width = anim.frames[0].width
+        ..height = anim.frames[0].height;
         // Create a buffer that the canvas can draw.
         final d = c.context2D.createImageData(c.width, c.height);
 
@@ -103,7 +103,7 @@ void main() {
           c.context2D.putImageData(d, 0, 0);
         });
       }
-    });
-    req.send('');
+    })
+    ..send('');
   }
 }

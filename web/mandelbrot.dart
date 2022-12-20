@@ -16,11 +16,11 @@ void main() {
   const zoom = 1.0;
   const moveX = -0.5;
   const moveY = 0.0;
-  const MaxIterations = 255;
+  const maxIterations = 255;
   const radius = 2.0;
-  const radius_squared = radius * radius;
+  const radiusSquared = radius * radius;
   final log2 = log(2.0);
-  final Log2MaxIterations = logN(MaxIterations, log2);
+  final log2MaxIterations = logN(maxIterations, log2);
   const h_2 = height / 2.0;
   const w_2 = width / 2.0;
   const aspect = 0.5;
@@ -35,25 +35,25 @@ void main() {
     var newRe = 0.0;
     var newIm = 0.0;
     var i = 0;
-    for (; i < MaxIterations; i++) {
+    for (; i < maxIterations; i++) {
       final oldRe = newRe;
       final oldIm = newIm;
 
       newRe = oldRe * oldRe - oldIm * oldIm + pr;
       newIm = 2.0 * oldRe * oldIm + pi;
 
-      if ((newRe * newRe + newIm * newIm) > radius_squared) {
+      if ((newRe * newRe + newIm * newIm) > radiusSquared) {
         break;
       }
     }
 
-    if (i == MaxIterations) {
-      image.setPixelColor(x, y, 0, 0, 0);
+    if (i == maxIterations) {
+      image.setPixelColor(x, y, 0);
     } else {
       final z = sqrt(newRe * newRe + newIm * newIm);
       final b = 256.0 *
           logN(1.75 + i - logN(logN(z, log2), log2), log2) /
-          Log2MaxIterations;
+          log2MaxIterations;
       final brightness = b.toInt();
       image.setPixelColor(x, y, brightness, brightness, 255);
     }

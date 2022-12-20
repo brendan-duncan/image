@@ -21,9 +21,9 @@ void onFileChanged(Event event) {
   final files = fileInput.files as FileList;
   final file = files.item(0)!;
 
-  final reader = FileReader();
-  reader.addEventListener('load', onFileLoaded);
-  reader.readAsArrayBuffer(file);
+  FileReader()
+  ..addEventListener('load', onFileLoaded)
+  ..readAsArrayBuffer(file);
 }
 
 /// Called when the file has been read.
@@ -54,8 +54,8 @@ void onFileLoaded(Event event) {
     // resolution.
     final c = CanvasElement();
     document.body!.append(c);
-    c.width = image.width;
-    c.height = image.height;
+    c..width = image.width
+    ..height = image.height;
 
     // Create a buffer that the canvas can draw.
     final d = c.context2D.createImageData(c.width, c.height);

@@ -12,9 +12,9 @@ void main() {
   for (var _img in images) {
     final img = _img as ImageElement;
     if (img.src!.toLowerCase().endsWith('.webp')) {
-      final req = HttpRequest();
-      req.open('GET', img.src!);
-      req.overrideMimeType('text\/plain; charset=x-user-defined');
+      final req = HttpRequest()
+      ..open('GET', img.src!)
+      ..overrideMimeType('text\/plain; charset=x-user-defined');
       req.onLoadEnd.listen((e) {
         if (req.status == 200) {
           final _bytes = req.responseText!

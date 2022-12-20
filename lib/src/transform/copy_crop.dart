@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import '../../image.dart' show Point;
 import '../image/image.dart';
 
 /// Returns a cropped copy of [src].
