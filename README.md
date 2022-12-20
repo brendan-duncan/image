@@ -1,5 +1,5 @@
 # Dart Image Library (DIL)
-[![Dart CI](https://github.com/brendan-duncan/image/actions/workflows/build.yaml/badge.svg)](https://github.com/brendan-duncan/image/actions/workflows/build.yaml)
+[![Dart CI](https://github.com/brendan-duncan/image/actions/workflows/build.yaml/badge.svg?branch=4.0)](https://github.com/brendan-duncan/image/actions/workflows/build.yaml)
 [![pub package](https://img.shields.io/pub/v/image.svg)](https://pub.dev/packages/image)
 
 ## NOTE
