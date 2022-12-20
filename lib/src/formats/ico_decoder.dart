@@ -33,7 +33,22 @@ class IcoDecoder extends Decoder {
 
   @override
   Animation decodeAnimation(Uint8List bytes) {
-    throw UnimplementedError();
+    final anim = Animation()
+      ..frameType = FrameType.sequence;
+
+    final info = startDecode(bytes);
+    if (info == null) {
+      return anim;
+    }
+
+    for (var i = 0; i < _icoInfo!.images.length; i++) {
+      final frame = decodeFrame(i);
+      if (frame != null) {
+        anim.frames.add(frame);
+      }
+    }
+
+    return anim;
   }
 
   @override

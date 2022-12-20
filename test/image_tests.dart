@@ -5,17 +5,19 @@ import 'filter/filter_tests.dart';
 import 'font/font_tests.dart';
 import 'formats/format_tests.dart';
 import 'image/image_tests.dart';
+import 'io/formats_async_tests.dart';
 import 'transform/transform_tests.dart';
 import 'util/util_tests.dart';
 
 void main() {
-  colorTests();
+  /*colorTests();
   exifTests();
   fontTests();
   utilTests();
   imageTests();
-  drawTests();
-  filterTests();
+  drawTests();*/
+  //filterTests();
   transformTests();
-  formatTests();
+  //formatTests();
+  formatAsyncTests();
 }

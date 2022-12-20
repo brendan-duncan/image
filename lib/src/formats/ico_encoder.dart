@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../image/animation.dart';
 import '../image/image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
@@ -14,6 +15,12 @@ abstract class WinEncoder extends Encoder {
 
   @override
   Uint8List encodeImage(Image image) => encodeImages([image]);
+
+  @override
+  bool get supportsAnimation => true;
+
+  @override
+  Uint8List encodeAnimation(Animation anim) => encodeImages(anim.frames);
 
   Uint8List encodeImages(List<Image> images) {
     final count = images.length;

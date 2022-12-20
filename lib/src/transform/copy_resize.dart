@@ -5,7 +5,7 @@ import '../util/image_exception.dart';
 import '../util/interpolation.dart';
 import 'bake_orientation.dart';
 
-/// Returns a resized copy of the [src] image.
+/// Returns a resized copy of the [src] Image.
 /// If [height] isn't specified, then it will be determined by the aspect
 /// ratio of [src] and [width].
 /// If [width] isn't specified, then it will be determined by the aspect ratio

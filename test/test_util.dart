@@ -5,9 +5,8 @@ import 'package:archive/archive.dart';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-//const writeTestOutputImages = false;
-final testOutputPath = '${Directory.systemTemp.createTempSync().path}/out';
-//const testOutputPath = './out';
+//final testOutputPath = '${Directory.systemTemp.createTempSync().path}/out';
+const testOutputPath = './out';
 
 int hashImage(Image image) {
   var hash = 0;

@@ -1,3 +1,12 @@
+## 4.0.0 -
+
+- Major update of the Dart Image Library. Includes support for:
+  - 1, 2, 4, 8, 16, and 32 bit images, with 1, 2, 3, or 4 channels per pixel.
+  - 16, 32, and 64 bit floating-point images.
+  - Palette images with 1, 2, 4, and 8 bit colors.
+  - Improved pixel access API.
+  - Async API for platforms that support isolates.
+
 ## 3.2.2 - October 15, 2022
 
 - Fix transparency issue with animated GIF images.

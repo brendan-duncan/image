@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:isolate';
-import 'package:image/image.dart' as Ixl;
+import 'package:image/image.dart' as DIL;
 
 class DecodeParam {
   final File file;
@@ -12,9 +12,9 @@ void decode(DecodeParam param) {
   // Read an image from file (webp in this case).
   // decodeImage will identify the format of the image and use the appropriate
   // decoder.
-  final image = Ixl.decodeImage(param.file.readAsBytesSync())!;
+  final image = DIL.decodeImage(param.file.readAsBytesSync())!;
   // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-  final thumbnail = Ixl.gaussianBlur(Ixl.copyResize(image, width: 120), 5);
+  final thumbnail = DIL.gaussianBlur(DIL.copyResize(image, width: 120), 5);
   param.sendPort.send(thumbnail);
 }
 
@@ -22,12 +22,11 @@ void decode(DecodeParam param) {
 // stalling the main UI thread.
 Future<void> main() async {
   final receivePort = ReceivePort();
-
   await Isolate.spawn(decode, DecodeParam(File('test.webp'),
       receivePort.sendPort));
 
   // Get the processed image from the isolate.
-  final image = await receivePort.first as Ixl.Image;
+  final image = await receivePort.first as DIL.Image;
 
-  File('thumbnail.png').writeAsBytesSync(Ixl.encodePng(image));
+  File('thumbnail.png').writeAsBytesSync(DIL.encodePng(image));
 }

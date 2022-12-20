@@ -3,7 +3,7 @@ import 'dart:math';
 import '../image/image.dart';
 import '../util/interpolation.dart';
 
-/// Returns a copy of the [src] image, rotated by [angle] degrees.
+  /// Returns a copy of the [src] image, rotated by [angle] degrees.
 Image copyRotate(Image src, num angle,
     { Interpolation interpolation = Interpolation.nearest }) {
   final num nAngle = angle % 360.0;

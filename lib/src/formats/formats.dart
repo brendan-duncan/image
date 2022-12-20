@@ -125,8 +125,9 @@ Uint8List encodePng(Image image,
     PngEncoder(filter: filter, level: level).encodeImage(image);
 
 /// Encode an animation to the PNG format.
-Uint8List encodePngAnimation(Animation anim, {int level = 6}) =>
-    PngEncoder(level: level).encodeAnimation(anim);
+Uint8List encodePngAnimation(Animation anim,
+    {int level = 6, PngFilter filter = PngFilter.paeth}) =>
+    PngEncoder(level: level, filter: filter).encodeAnimation(anim);
 
 /// Decode a Targa formatted image.
 Image? decodeTga(Uint8List bytes) => TgaDecoder().decodeImage(bytes);
@@ -164,7 +165,8 @@ Uint8List encodeGif(Image image, {
     int samplingFactor = 10,
     DitherKernel dither = DitherKernel.floydSteinberg,
     bool ditherSerpentine = false }) =>
-    GifEncoder(samplingFactor: samplingFactor).encodeImage(image);
+    GifEncoder(samplingFactor: samplingFactor, dither: dither,
+        ditherSerpentine: ditherSerpentine).encodeImage(image);
 
 /// Encode an animation to the GIF format.
 ///
@@ -210,22 +212,22 @@ Image? decodeExr(Uint8List bytes) =>
 /// Decode a BMP formatted image.
 Image? decodeBmp(Uint8List bytes) => BmpDecoder().decodeImage(bytes);
 
-// Encode an image to the BMP format.
+/// Encode an [Image] to the BMP format.
 Uint8List encodeBmp(Image image) => BmpEncoder().encodeImage(image);
 
-/// Encode an image to the CUR format.
+/// Encode an [Image] to the CUR format.
 Uint8List encodeCur(Image image) => CurEncoder().encodeImage(image);
 
-/// Encode a list of images to the CUR format.
-Uint8List encodeCurImages(List<Image> images) =>
-    CurEncoder().encodeImages(images);
+/// Encode an [Animation] (list of images) to the CUR format.
+Uint8List encodeCurAnimation(Animation anim) =>
+    CurEncoder().encodeAnimation(anim);
 
 /// Encode an image to the ICO format.
 Uint8List encodeIco(Image image) => IcoEncoder().encodeImage(image);
 
-/// Encode a list of images to the ICO format.
-Uint8List encodeIcoImages(List<Image> images) =>
-    IcoEncoder().encodeImages(images);
+/// Encode an [Animation] (list of images) to the ICO format.
+Uint8List encodeIcoAnimation(Animation anim) =>
+    IcoEncoder().encodeAnimation(anim);
 
 /// Decode an ICO image.
 Image? decodeIco(Uint8List bytes) => IcoDecoder().decodeImage(bytes);

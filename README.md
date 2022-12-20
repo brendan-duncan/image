@@ -67,37 +67,13 @@ void main() async {
 
 Load an image asynchronously and resize it as a thumbnail. 
 ```dart
-import 'dart:io';
-import 'dart:isolate';
-import 'package:image/image.dart' as DIL;
+import 'package:image/image_io.dart' as DIL;
 
-class DecodeParam {
-  final File file;
-  final SendPort sendPort;
-  DecodeParam(this.file, this.sendPort);
-}
-
-void decodeIsolate(DecodeParam param) {
-  // Read an image from file (webp in this case).
-  // decodeImage will identify the format of the image and use the appropriate
-  // decoder.
-  var image = DIL.decodeImage(param.file.readAsBytesSync())!;
-  // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-  var thumbnail = DIL.copyResize(image, width: 120);
-  param.sendPort.send(thumbnail);
-}
-
-// Decode and process an image file in a separate thread (isolate) to avoid
-// stalling the main UI thread.
-void main() async {
-  var receivePort = ReceivePort();
-
-  await Isolate.spawn(decodeIsolate,
-      DecodeParam(File('test.webp'), receivePort.sendPort));
-
-  // Get the processed image from the isolate.
-  var image = await receivePort.first as DIL.Image;
-
-  await File('thumbnail.png').writeAsBytes(DIL.encodePng(image));
+// Decode and resize an image asynchronously, saving it to a thumbnail file.
+void main(List<String> args) async {
+  final path = args.isNotEmpty ? args[0] : 'test.png';
+  final image = await decodeImageFileAsync(path);
+  final resized = await copyResizeAsync(image, width: 64);
+  await File('thumbnail.png').writeAsBytes(DIL.encodePng(resized));
 }
 ```

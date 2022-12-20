@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../../image.dart' show Point;
 import '../image/image.dart';
 
@@ -25,26 +27,32 @@ Image copyCrop(Image src, int x, int y, int w, int h) {
   return dst;
 }
 
-/// Returns a round cropped copy of [src].
-Image copyCropCircle(Image src, {int? radius, Point? center}) {
-  int min(num x, num y) => (x < y ? x : y).toInt();
-  final defaultRadius = min(src.width, src.height) ~/ 2;
-  radius ??= defaultRadius;
-  center ??= Point(src.width ~/ 2, src.height ~/ 2);
-  // Make sure center point is within the range of the src image
-  center..x = center.x.clamp(0, src.width - 1).toInt()
-  ..y = center.y.clamp(0, src.height - 1).toInt();
-  radius = radius < 1 ? defaultRadius : radius;
+/// Returns a circle cropped copy of [src], centered at [centerX] and
+/// [centerY] and with the given [radius]. If [radius] is not provided,
+/// a radius filling the image will be used. If [centerX] is not provided,
+/// the horizontal mid-point of the image will be used. If [centerY] is not
+/// provided, the vertical mid-point of the image will be used.
+Image copyCropCircle(Image src, {int? radius, int? centerX, int? centerY}) {
+  centerX ??= src.width ~/ 2;
+  centerY ??= src.height ~/ 2;
+  radius ??= min(src.width, src.height) ~/ 2;
 
-  final tlx = center.x.toInt() - radius; //topLeft.x
-  final tly = center.y.toInt() - radius; //topLeft.y
+  // Make sure center point is within the range of the src image
+  centerX = centerX.clamp(0, src.width - 1);
+  centerY = centerY.clamp(0, src.height - 1);
+  if (radius < 1) {
+    radius = min(src.width, src.height) ~/ 2;
+  }
+
+  final tlx = centerX - radius; //topLeft.x
+  final tly = centerY - radius; //topLeft.y
 
   final dst = Image(radius * 2, radius * 2,
     iccp: src.iccProfile, format: src.format, numChannels: src.numChannels,
     palette: src.palette);
 
-  for (var yi = 0, sy = tly; yi < radius * 2; ++yi, ++sy) {
-    for (var xi = 0, sx = tlx; xi < radius * 2; ++xi, ++sx) {
+  for (var yi = 0, sy = tly, dh = dst.height; yi < dh; ++yi, ++sy) {
+    for (var xi = 0, sx = tlx, dw = radius * 2; xi < dw; ++xi, ++sx) {
       if ((xi - radius) * (xi - radius) + (yi - radius) * (yi - radius) <=
           radius * radius) {
         dst.setPixel(xi, yi, src.getPixelSafe(sx, sy));

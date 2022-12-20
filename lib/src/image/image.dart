@@ -79,18 +79,11 @@ class Image extends Iterable<Pixel> {
   /// [format] defines the order of color channels in [bytes].
   /// An HTML canvas element stores colors in Format.rgba format; a Flutter
   /// Image object stores colors in Format.rgba format.
-  /// The length of [bytes] should be (width * height) * format-byte-count,
-  /// where format-byte-count is 1, 3, or 4 depending on the number of
-  /// channels in the format (luminance, rgb, rgba, etc).
-  ///
-  /// The native format of an image is Format.rgba. If another format
-  /// is specified, the input data will be converted to rgba to store
-  /// in the Image.
   ///
   /// For example, given an Html Canvas, you could create an image:
   /// var bytes = canvas.getContext('2d').getImageData(0, 0,
   ///   canvas.width, canvas.height).data;
-  /// var image = Image.fromBytes(canvas.width, canvas.height, bytes,
+  /// var image = Image.fromBytes(canvas.width, canvas.height, canvasBytes,
   ///                             numChannels: 4);
   Image.fromBytes(int width, int height, ByteBuffer bytes,
       { Format format = Format.uint8, int numChannels = 3,
@@ -478,7 +471,11 @@ class Image extends Iterable<Pixel> {
   /// the image will be initialized to 0.
   void clear([Color? color]) => data?.clear(color);
 
-  /// Convert this image to a new [format] or number of channels.
+  /// Convert this image to a new [format] or number of channels, [numChannels].
+  /// If the new number of channels is 4 and the current image does
+  /// not have an alpha channel, then the given [alpha] value will be used
+  /// to set the new alpha channel. If [alpha] is not provided, then the
+  /// [maxChannelValue] will be used to set the alpha.
   Image convert({Format? format, int? numChannels, num? alpha}) {
     if (format == null || format == this.format) {
       if (numChannels == null || numChannels == this.numChannels) {
@@ -490,6 +487,7 @@ class Image extends Iterable<Pixel> {
 
     format ??= this.format;
     numChannels ??= this.numChannels;
+    alpha ??= this.maxChannelValue;
 
     final newImage = Image(width, height, format: format,
         numChannels: numChannels,

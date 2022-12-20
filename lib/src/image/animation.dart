@@ -8,9 +8,10 @@ import 'image.dart';
 enum FrameType {
   /// The frames of this document are to be interpreted as animation.
   animation,
-
   /// The frames of this document are to be interpreted as pages of a document.
-  page
+  page,
+  /// The frames of this document are to be interpreted as a sequence of images.
+  sequence
 }
 
 /// Stores multiple images, most often as the frames of an animation.
