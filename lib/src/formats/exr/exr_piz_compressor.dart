@@ -89,7 +89,8 @@ class InternalExrPizCompressor extends InternalExrCompressor
     final bitmap = Uint8List(_bitmapSize);
     if (minNonZero <= maxNonZero) {
       final b = input.readBytes(maxNonZero - minNonZero + 1);
-      for (var i = 0, j = minNonZero, len = b.length; i < len; ++i) {
+      final len = b.length;
+      for (var i = 0, j = minNonZero; i < len; ++i) {
         bitmap[j++] = b[i];
       }
     }

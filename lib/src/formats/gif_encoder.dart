@@ -377,7 +377,8 @@ class GifEncoder extends Encoder {
     final pa = nc - 1;
     if (nc == 4 || nc == 2) {
       final p = palette.toUint8List();
-      for (var i = 0, pi = pa, l = palette.numColors; i < l; ++i, pi += nc) {
+      final l = palette.numColors;
+      for (var i = 0, pi = pa; i < l; ++i, pi += nc) {
         final a = p[pi];
         if (a == 0) {
           hasTransparency = 1;

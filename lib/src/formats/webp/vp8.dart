@@ -1316,7 +1316,8 @@ class VP8 {
         final cat = 2 * bit1 + bit0;
         v = 0;
         final tab = kCat3456[cat];
-        for (var i = 0, len = tab.length; i < len; ++i) {
+        final len = tab.length;
+        for (var i = 0; i < len; ++i) {
           v += v + br.getBit(tab[i]);
         }
         v += 3 + (8 << cat);

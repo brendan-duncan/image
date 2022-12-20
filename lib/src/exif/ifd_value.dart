@@ -191,7 +191,8 @@ class IfdShortValue extends IfdValue {
   void setInt(int v, [int index = 0]) { value[index] = v; }
 
   void write(OutputBuffer out) {
-    for (int i = 0, l = value.length; i < l; ++i) {
+    final l = value.length;
+    for (var i = 0; i < l; ++i) {
       out.writeUint16(value[i]);
     }
   }
@@ -234,7 +235,8 @@ class IfdLongValue extends IfdValue {
   Uint8List toData() => Uint8List.view(value.buffer);
 
   void write(OutputBuffer out) {
-    for (int i = 0, l = value.length; i < l; ++i) {
+    final l = value.length;
+    for (int i = 0; i < l; ++i) {
       out.writeUint32(value[i]);
     }
   }
@@ -363,7 +365,8 @@ class IfdSShortValue extends IfdValue {
   void write(OutputBuffer out) {
     final v = Int16List(1);
     final vb = Uint16List.view(v.buffer);
-    for (int i = 0, l = value.length; i < l; ++i) {
+    final l = value.length;
+    for (var i = 0; i < l; ++i) {
       v[0] = value[i];
       out.writeUint16(vb[0]);
     }
@@ -407,7 +410,8 @@ class IfdSLongValue extends IfdValue {
   Uint8List toData() => Uint8List.view(value.buffer);
 
   void write(OutputBuffer out) {
-    for (int i = 0, l = value.length; i < l; ++i) {
+    final l = value.length;
+    for (var i = 0; i < l; ++i) {
       out.writeUint32(int32ToUint32(value[i]));
     }
   }
@@ -495,7 +499,8 @@ class IfdSingleValue extends IfdValue {
   void setDouble(double v, [int index = 0]) { value[index] = v; }
 
   void write(OutputBuffer out) {
-    for (int i = 0, l = value.length; i < l; ++i) {
+    final l = value.length;
+    for (var i = 0; i < l; ++i) {
       out.writeFloat32(value[i]);
     }
   }
@@ -538,7 +543,8 @@ class IfdDoubleValue extends IfdValue {
   Uint8List toData() => Uint8List.view(value.buffer);
 
   void write(OutputBuffer out) {
-    for (int i = 0, l = value.length; i < l; ++i) {
+    final l = value.length;
+    for (var i = 0; i < l; ++i) {
       out.writeFloat64(value[i]);
     }
   }

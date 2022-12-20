@@ -112,7 +112,8 @@ class TiffImage {
 
     if (colorMap != null && bitsPerSample == 8) {
       final cm = colorMap!;
-      for (var i = 0, len = cm.length; i < len; ++i) {
+      final len = cm.length;
+      for (var i = 0; i < len; ++i) {
         cm[i] >>= 8;
       }
     }
@@ -316,8 +317,8 @@ class TiffImage {
           int count;
           for (var j = 0; j < tileHeight; j++) {
             count = samplesPerPixel * (j * tileWidth + 1);
-            for (var i = samplesPerPixel, len = tileWidth * samplesPerPixel;
-                i < len; i++) {
+            final len = tileWidth * samplesPerPixel;
+            for (var i = samplesPerPixel; i < len; i++) {
               byteData[count] += byteData[count - samplesPerPixel];
               count++;
             }

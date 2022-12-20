@@ -54,16 +54,16 @@ class InternalExrZipCompressor extends InternalExrCompressor
     decodedHeight = (maxY - minY) + 1;
 
     // Predictor
-    for (var i = 1, len = data.length; i < len; ++i) {
+    final len = data.length;
+    for (var i = 1; i < len; ++i) {
       data[i] = data[i - 1] + data[i] - 128;
     }
 
     // Reorder the pixel data
-    if (_outCache == null || _outCache!.length != data.length) {
-      _outCache = Uint8List(data.length);
+    if (_outCache == null || _outCache!.length != len) {
+      _outCache = Uint8List(len);
     }
 
-    final len = data.length;
     var t1 = 0;
     var t2 = (len + 1) ~/ 2;
     var si = 0;

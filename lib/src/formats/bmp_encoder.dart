@@ -60,7 +60,8 @@ class BmpEncoder extends Encoder {
     if (bpp == 1 || bpp == 2 || bpp == 4 || bpp == 8) {
       if (image.hasPalette) {
         final palette = image.palette!;
-        for (var pi = 0, l = palette.numColors; pi < l; ++pi) {
+        final l = palette.numColors;
+        for (var pi = 0; pi < l; ++pi) {
           out..writeByte(palette.getBlue(pi).toInt())
           ..writeByte(palette.getGreen(pi).toInt())
           ..writeByte(palette.getRed(pi).toInt())
@@ -114,13 +115,15 @@ class BmpEncoder extends Encoder {
     // Write image data
     if (bpp == 1 || bpp == 2 || bpp == 4 || bpp == 8) {
       var offset = image.lengthInBytes - imageStride;
-      for (var y = 0, h = image.height; y < h; ++y) {
+      final h = image.height;
+      for (var y = 0; y < h; ++y) {
         final bytes = Uint8List.view(image.buffer, offset, imageStride);
 
         if (bpp == 1) {
           out.writeBytes(bytes);
         } else if (bpp == 2) {
-          for (int xi = 0, l = bytes.length; xi < l; ++xi) {
+          final l = bytes.length;
+          for (var xi = 0; xi < l; ++xi) {
             final b = bytes[xi];
             final left = b >> 4;
             final right = b & 0x0f;
@@ -128,7 +131,8 @@ class BmpEncoder extends Encoder {
             out.writeByte(rb);
           }
         } else if (bpp == 4) {
-          for (int xi = 0, l = bytes.length; xi < l; ++xi) {
+          final l = bytes.length;
+          for (var xi = 0; xi < l; ++xi) {
             final b = bytes[xi];
             final b1 = b >> 4;
             final b2 = b & 0x0f;
@@ -150,8 +154,10 @@ class BmpEncoder extends Encoder {
     }
 
     if (bpp == 16) {
-      for (var h = image.height, y = h - 1; y >= 0; --y) {
-        for (var x = 0, w = image.width; x < w; ++x) {
+      final h = image.height;
+      final w = image.width;
+      for (var y = h - 1; y >= 0; --y) {
+        for (var x = 0; x < w; ++x) {
           final p = image.getPixel(x, y);
           final c = (p.r.toInt().clamp(0,15) << 10) |
               (p.g.toInt().clamp(0,15) << 5) |
@@ -165,8 +171,10 @@ class BmpEncoder extends Encoder {
       return out.getBytes();
     }
 
-    for (var h = image.height, y = h - 1; y >= 0; --y) {
-      for (var x = 0, w = image.width; x < w; ++x) {
+    final h = image.height;
+    final w = image.width;
+    for (var y = h - 1; y >= 0; --y) {
+      for (var x = 0; x < w; ++x) {
         final p = image.getPixel(x, y);
         out..writeByte(p.b.toInt())
         ..writeByte(p.g.toInt())

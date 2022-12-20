@@ -187,7 +187,8 @@ class PngEncoder extends Encoder {
       _writeChunk(output!, 'PLTE', palette.toUint8List());
     } else {
       final chunk = OutputBuffer(size: palette.numColors * 3, bigEndian: true);
-      for (var i = 0, nc = palette.numColors; i < nc; ++i) {
+      final nc = palette.numColors;
+      for (var i = 0; i < nc; ++i) {
         chunk..writeByte(palette.getRed(i).toInt())
         ..writeByte(palette.getGreen(i).toInt())
         ..writeByte(palette.getBlue(i).toInt());
@@ -197,7 +198,8 @@ class PngEncoder extends Encoder {
 
     if (palette.numChannels == 4) {
       final chunk = OutputBuffer(size: palette.numColors, bigEndian: true);
-      for (var i = 0, nc = palette.numColors; i < nc; ++i) {
+      final nc = palette.numColors;
+      for (var i = 0; i < nc; ++i) {
         chunk.writeByte(palette.getAlpha(i).toInt());
       }
       _writeChunk(output!, 'tRNS', chunk.getBytes());
@@ -276,11 +278,13 @@ class PngEncoder extends Encoder {
   int _filterNone(Uint8List rowBytes, int bpc, Uint8List out, int oi) {
     out[oi++] = PngFilter.none.index;
     if (bpc == 1) {
-      for (int i = 0, l = rowBytes.length; i < l; ++i) {
+      final l = rowBytes.length;
+      for (int i = 0; i < l; ++i) {
         out[oi++] = rowBytes[i];
       }
     } else {
-      for (int i = 0, l = rowBytes.length; i < l; i += bpc) {
+      final l = rowBytes.length;
+      for (int i = 0; i < l; i += bpc) {
         oi = _write(bpc, rowBytes, i, out, oi);
       }
     }
@@ -292,7 +296,8 @@ class PngEncoder extends Encoder {
     for (var x = 0; x < bpp; x += bpc) {
       oi = _write(bpc, row, x, out, oi);
     }
-    for (var x = bpp, l = row.length; x < l; x += bpc) {
+    final l = row.length;
+    for (var x = bpp; x < l; x += bpc) {
       for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
         out[oi++] = (row[x + c2] - row[(x + c2) - bpp]) & 0xff;
       }
@@ -303,7 +308,8 @@ class PngEncoder extends Encoder {
   int _filterUp(Uint8List row, Uint8List? prevRow, int bpc,
       Uint8List out, int oi) {
     out[oi++] = PngFilter.up.index;
-    for (var x = 0, l = row.length; x < l; x += bpc) {
+    final l = row.length;
+    for (var x = 0; x < l; x += bpc) {
       for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
         final b = prevRow != null ? prevRow[x + c2] : 0;
         out[oi++] = (row[x + c2] - b) & 0xff;
@@ -315,7 +321,8 @@ class PngEncoder extends Encoder {
   int _filterAverage(Uint8List row, Uint8List? prevRow, int bpc, int bpp,
       Uint8List out, int oi) {
     out[oi++] = PngFilter.average.index;
-    for (var x = 0, l = row.length; x < l; x += bpc) {
+    final l = row.length;
+    for (var x = 0; x < l; x += bpc) {
       for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
         final _x = x + c2;
         final p1 = _x < bpp ? 0 : row[_x - bpp];
@@ -343,7 +350,8 @@ class PngEncoder extends Encoder {
   int _filterPaeth(Uint8List row, Uint8List? prevRow, int bpc, int bpp,
       Uint8List out, int oi) {
     out[oi++] = PngFilter.paeth.index;
-    for (var x = 0, l = row.length; x < l; x += bpc) {
+    final l = row.length;
+    for (var x = 0; x < l; x += bpc) {
       for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
         final _x = x + c2;
         final p0 = _x < bpp ? 0 : row[_x - bpp];

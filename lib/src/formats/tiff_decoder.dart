@@ -81,7 +81,8 @@ class TiffDecoder extends Decoder {
     ..width = info!.width
     ..height = info!.height
     ..frameType = FrameType.page;
-    for (var i = 0, len = numFrames(); i < len; ++i) {
+    final len = numFrames();
+    for (var i = 0; i < len; ++i) {
       final image = decodeFrame(i);
       anim.addFrame(image!);
     }

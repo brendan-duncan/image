@@ -42,7 +42,8 @@ class GifColorMap {
       return _palette;
     }
     final p = PaletteUint8(_palette.numColors, 4);
-    for (var i = 0, l = _palette.numColors; i < l; ++i) {
+    final l = _palette.numColors;
+    for (var i = 0; i < l; ++i) {
       p.setColor(i, red(i), green(i), blue(i), alpha(i));
     }
     return p;

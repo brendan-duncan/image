@@ -59,7 +59,8 @@ class PngDecoder extends Decoder {
       switch (chunkType) {
         case 'tEXt':
           final txtData = _input.readBytes(chunkSize).toUint8List();
-          for (var i = 0, l = txtData.length; i < l; ++i) {
+          final l = txtData.length;
+          for (var i = 0; i < l; ++i) {
             if (txtData[i] == 0) {
               final key = latin1.decode(txtData.sublist(0, i));
               final text = latin1.decode(txtData.sublist(i + 1));
@@ -270,7 +271,8 @@ class PngDecoder extends Decoder {
     if (!_info.isAnimated || frame == 0) {
       final dataBlocks = <Uint8List>[];
       var totalSize = 0;
-      for (var i = 0, len = _info.idat.length; i < len; ++i) {
+      final len = _info.idat.length;
+      for (var i = 0; i < len; ++i) {
         _input.offset = _info.idat[i];
         final chunkSize = _input.readUint32();
         final chunkType = _input.readString(4);

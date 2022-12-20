@@ -37,7 +37,8 @@ class OctreeQuantizer extends Quantizer {
     _getNodes(nodes, _root);
 
     palette = PaletteUint8(nodes.length, 3);
-    for (var i = 0, l = nodes.length; i < l; ++i) {
+    final l = nodes.length;
+    for (var i = 0; i < l; ++i) {
       final n = nodes[i]
       ..paletteIndex = i;
       palette.setColor(i, n.r, n.g, n.b);

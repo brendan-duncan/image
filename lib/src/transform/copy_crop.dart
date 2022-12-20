@@ -50,8 +50,10 @@ Image copyCropCircle(Image src, {int? radius, int? centerX, int? centerY}) {
     iccp: src.iccProfile, format: src.format, numChannels: src.numChannels,
     palette: src.palette);
 
-  for (var yi = 0, sy = tly, dh = dst.height; yi < dh; ++yi, ++sy) {
-    for (var xi = 0, sx = tlx, dw = radius * 2; xi < dw; ++xi, ++sx) {
+  final dh = dst.height;
+  final dw = radius * 2;
+  for (var yi = 0, sy = tly; yi < dh; ++yi, ++sy) {
+    for (var xi = 0, sx = tlx; xi < dw; ++xi, ++sx) {
       if ((xi - radius) * (xi - radius) + (yi - radius) * (yi - radius) <=
           radius * radius) {
         dst.setPixel(xi, yi, src.getPixelSafe(sx, sy));

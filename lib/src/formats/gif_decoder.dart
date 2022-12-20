@@ -297,7 +297,8 @@ class GifDecoder extends Decoder {
 
   void _updateImage(Image image, int y, GifColorMap? colorMap, Uint8List line) {
     if (colorMap != null) {
-      for (var x = 0, width = line.length; x < width; ++x) {
+      final width = line.length;
+      for (var x = 0; x < width; ++x) {
         image.setPixelColor(x, y, line[x]);
       }
     }
