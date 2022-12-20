@@ -1,6 +1,7 @@
 # image
 
-[![Build Status](https://travis-ci.org/brendan-duncan/image.svg?branch=master)](https://travis-ci.org/brendan-duncan/image)
+[![Dart CI](https://github.com/brendan-duncan/image/actions/workflows/build.yaml/badge.svg)](https://github.com/brendan-duncan/image/actions/workflows/build.yaml)
+[![pub package](https://img.shields.io/pub/v/image.svg)](https://pub.dev/packages/image)
 
 ## Overview
 

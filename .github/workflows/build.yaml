@@ -1,0 +1,29 @@
+name: Dart CI
+
+on:
+  schedule:
+    # “At 00:00 (UTC) on Sunday.”
+    - cron: '0 0 * * 0'
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image:  google/dart:dev
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: pub get
+        run: pub get
+
+      - name: dart analyze
+        run: dart analyze --fatal-infos
+
+      - name: dart test
+        run: dart test test/main.dart
