@@ -7,7 +7,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -26,4 +26,4 @@ jobs:
         run: dart analyze --fatal-infos
 
       - name: dart test
-        run: dart test test/main.dart
+        run: dart test
