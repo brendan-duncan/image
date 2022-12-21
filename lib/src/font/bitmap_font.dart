@@ -116,7 +116,7 @@ class BitmapFont {
       return 0;
     }
     final c = ch.codeUnits[0];
-    if (!characters.containsKey(ch)) {
+    if (!characters.containsKey(c)) {
       return base ~/ 2;
     }
     return characters[c]!.xadvance;
