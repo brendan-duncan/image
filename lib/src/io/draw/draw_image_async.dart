@@ -1,6 +1,5 @@
 import 'dart:isolate';
 
-import '../../color/color.dart';
 import '../../draw/draw_image.dart';
 import '../../image/image.dart';
 

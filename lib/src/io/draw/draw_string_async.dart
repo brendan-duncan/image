@@ -45,7 +45,7 @@ Future<void> _drawString(_DrawString p) async {
 
 /// Asynchronous call to [drawString].
 Future<void> drawStringAsync(Image image, BitmapFont font, int x, int y,
-    String string, {Color? color, bool rightJustify = false}) async {
+    String string, { Color? color, bool rightJustify = false }) async {
   final port = ReceivePort();
   await Isolate.spawn(_drawString,
       _DrawString(port.sendPort, image, font, x, y, string, color,
@@ -55,7 +55,7 @@ Future<void> drawStringAsync(Image image, BitmapFont font, int x, int y,
 
 /// Asynchronous call to [drawStringWrap]
 Future<void> drawStringWrapAsync(Image image, BitmapFont font, int x, int y,
-    String string, {Color? color}) async {
+    String string, { Color? color }) async {
   final port = ReceivePort();
   await Isolate.spawn(_drawString,
       _DrawString(port.sendPort, image, font, x, y, string, color,
@@ -64,8 +64,8 @@ Future<void> drawStringWrapAsync(Image image, BitmapFont font, int x, int y,
 }
 
 /// Asynchronous call to [drawStringCentered
-Future<void> drawStringCenteredAsync(Image image, BitmapFont font, String string,
-    {int? x, int? y, Color? color}) async {
+Future<void> drawStringCenteredAsync(Image image, BitmapFont font,
+    String string, { int? x, int? y, Color? color }) async {
   final port = ReceivePort();
   await Isolate.spawn(_drawString,
       _DrawString(port.sendPort, image, font, x, y, string, color,

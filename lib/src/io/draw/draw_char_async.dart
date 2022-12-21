@@ -22,8 +22,7 @@ Future<void> _drawChar(_DrawChar p) async {
   Isolate.exit(p.port);
 }
 
-/// Draw a single character from [char] horizontally into [image] at position
-/// [x],[y] with the given [color].
+/// Asynchronously call [drawChar].
 Future<void> drawCharAsync(Image image, BitmapFont font, int x, int y,
     String char, {Color? color}) async {
   final port = ReceivePort();
