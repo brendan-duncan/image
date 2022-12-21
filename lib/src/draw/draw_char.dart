@@ -5,11 +5,11 @@ import 'draw_pixel.dart';
 
 /// Draw a single character from [char] horizontally into [image] at position
 /// [x],[y] with the given [color].
-Image drawChar(Image image, BitmapFont font, int x, int y, String char,
+void drawChar(Image image, BitmapFont font, int x, int y, String char,
     {Color? color}) {
   final c = char.codeUnits[0];
   if (!font.characters.containsKey(c)) {
-    return image;
+    return;
   }
 
   final ch = font.characters[c]!;
@@ -28,5 +28,5 @@ Image drawChar(Image image, BitmapFont font, int x, int y, String char,
     }
   }
 
-  return image;
+  return;
 }

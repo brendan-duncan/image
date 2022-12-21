@@ -16,7 +16,7 @@ Future<void> _copyResizeCropSquare(_CopyResizeCropSquare p) async {
 }
 
 /// Returns a resized and square cropped copy of the [src] image of [size] size.
-Future<Image> copyResizeAsync(Image src, int size) async {
+Future<Image> copyResizeCropSquareAsync(Image src, int size) async {
   final port = ReceivePort();
   await Isolate.spawn(_copyResizeCropSquare,
       _CopyResizeCropSquare(port.sendPort, src, size));

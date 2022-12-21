@@ -10,10 +10,10 @@ typedef _MarkPixel = void Function(int y, int x);
 
 /// Fill the 4-connected shape containing [x],[y] in the image [src] with the
 /// given [color].
-Image fillFlood(Image src, int x, int y, Color color,
+void fillFlood(Image src, int x, int y, Color color,
     {num threshold = 0.0, bool compareAlpha = false}) {
   if (color.a == 0) {
-    return src;
+    return;
   }
 
   final visited = Uint8List(src.width * src.height);
@@ -48,7 +48,6 @@ Image fillFlood(Image src, int x, int y, Color color,
   }
 
   _fill4(src, x, y, array, mark, visited);
-  return src;
 }
 
 /// Create a mask describing the 4-connected shape containing [x],[y] in the

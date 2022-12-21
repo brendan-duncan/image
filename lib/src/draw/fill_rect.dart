@@ -5,9 +5,9 @@ import '../image/image.dart';
 
 /// Fill a rectangle in the image [src] with the given [color] with the corners
 /// [x1],[y1] and [x2],[y2].
-Image fillRect(Image src, int x1, int y1, int x2, int y2, Color color) {
+void fillRect(Image src, int x1, int y1, int x2, int y2, Color color) {
   if (color.a == 0) {
-    return src;
+    return;
   }
 
   final _x0 = min(x1, x2).clamp(0, src.width - 1);
@@ -35,6 +35,4 @@ Image fillRect(Image src, int x1, int y1, int x2, int y2, Color color) {
        ..a = color.a;
     }
   }
-
-  return src;
 }

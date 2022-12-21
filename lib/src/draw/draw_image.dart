@@ -16,7 +16,7 @@ import 'draw_pixel.dart';
 /// but if the regions overlap the results will be unpredictable.
 ///
 /// if [center] is true, the [src] will be centered in [dst].
-Image drawImage(Image dst, Image src, {
+void drawImage(Image dst, Image src, {
     int? dstX,
     int? dstY,
     int? dstW,
@@ -67,6 +67,4 @@ Image drawImage(Image dst, Image src, {
       }
     }
   }
-
-  return dst;
 }

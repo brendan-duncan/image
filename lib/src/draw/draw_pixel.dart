@@ -2,19 +2,19 @@ import '../color/color.dart';
 import '../image/image.dart';
 
 /// Draw a single pixel into the image, applying alpha and opacity blending.
-Image drawPixel(Image image, int x, int y, Color c, [double? overrideAlpha]) {
+void drawPixel(Image image, int x, int y, Color c, [double? overrideAlpha]) {
   final a = overrideAlpha != null ? overrideAlpha :
       c.length < 4 ? 1.0 : c.a / c.maxChannelValue;
 
   if (a == 0) {
-    return image;
+    return;
   }
 
   if (image.isBoundsSafe(x, y)) {
     final dst = image.getPixel(x, y);
     if (a == 1.0 || image.hasPalette) {
       dst.set(c);
-      return image;
+      return;
     }
 
     final invA = 1.0 - a;
@@ -23,6 +23,4 @@ Image drawPixel(Image image, int x, int y, Color c, [double? overrideAlpha]) {
       ..b = (c.b * a) + (dst.b * invA)
       ..a = dst.maxChannelValue;
   }
-
-  return image;
 }
