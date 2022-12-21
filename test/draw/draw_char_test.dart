@@ -1,22 +1,25 @@
-import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
-
 import '../test_util.dart';
 
 void drawCharTest() {
-  test('drawChar', () {
-    final i0 = Image(256, 256)
-    ..clear(ColorRgb8(128, 128));
+  test('drawChar', () async {
+    final cmd = CreateImageCmd(256, 256)
+        ..fill(ColorRgb8(128, 128))
+        ..drawChar(arial24, 50, 50, "H")
+        ..drawChar(arial24, 70, 70, "e",
+            color: ColorRgba8(255))
+        ..drawChar(arial24, 90, 90, "l",
+            color: ColorRgba8(0, 255))
+        ..drawChar(arial24, 110, 110, "l",
+            color: ColorRgba8(0, 0, 255))
+        ..drawChar(arial24, 130, 130, "o",
+            color: ColorRgba8(255, 0, 0, 128))
+        ..writeToFile('$testOutputPath/draw/draw_char.png');
 
-    drawChar(i0, arial24, 50, 50, "H");
-    drawChar(i0, arial24, 70, 70, "e", color: ColorRgba8(255));
-    drawChar(i0, arial24, 90, 90, "l", color: ColorRgba8(0, 255));
-    drawChar(i0, arial24, 110, 110, "l", color: ColorRgba8(0, 0, 255));
-    drawChar(i0, arial24, 130, 130, "o", color: ColorRgba8(255, 0, 0, 128));
-
-    File('$testOutputPath/draw/draw_char_0.png')
-      ..createSync(recursive: true)
-      ..writeAsBytesSync(encodePng(i0));
+    final image = await cmd.getImageAsync();
+    expect(image, isNotNull);
+    expect(image?.width, equals(256));
+    expect(image?.height, equals(256));
   });
 }

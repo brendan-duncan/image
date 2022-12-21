@@ -14,8 +14,8 @@ import 'fill_test.dart';
 
 void drawTests() {
   group('draw', () {
-    drawPixelTest();
     drawCharTest();
+    drawPixelTest();
     drawCircleTest();
     drawImageTest();
     drawLineTest();

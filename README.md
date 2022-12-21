@@ -9,8 +9,8 @@ This is a work in progress major update for the Image library.
 
 A Dart library providing the ability to load, save and manipulate images in a variety of different file formats.
 
-The library is written entirely in Dart and has no reliance on `dart:io`, so it can be used for both 
-server and web applications.
+The library is written entirely in Dart and has no reliance on `dart:io`, so it can be used for command-line, Flutter, 
+and web applications.
 
 ### Performance Warning
 Because this library is written entirely in Dart and is a not native executed library, its performance
@@ -57,7 +57,7 @@ void main() async {
   final image = DIL.Image(256, 256);
   for (var pixel in image) {
     pixel.r = pixel.x;
-    pixel.y = pixel.y;
+    pixel.g = pixel.y;
   }
   final png = DIL.encodePng(image);
   await File('image.png').writeAsBytes(png);
@@ -65,15 +65,21 @@ void main() async {
 ```
 
 
-Load an image asynchronously and resize it as a thumbnail. 
+The ImageCommand API allows for asynchronous processing of images. 
 ```dart
 import 'package:image/image_io.dart' as DIL;
 
-// Decode and resize an image asynchronously, saving it to a thumbnail file.
 void main(List<String> args) async {
   final path = args.isNotEmpty ? args[0] : 'test.png';
-  final image = await decodeImageFileAsync(path);
-  final resized = await copyResizeAsync(image, width: 64);
-  await File('thumbnail.png').writeAsBytes(DIL.encodePng(resized));
+  final cmd = DIL.ImageCommand()
+    // Decode the image file at the given path
+    ..decodeImageFile(path)
+    // Resize the image to a width of 64 pixels and a height that maintains the aspect ratio of the original. 
+    ..copyResize(width: 64)
+    // Write the image to a PNG file (determined by the suffix of the file path). 
+    ..writeToFile('thumbnail.png');
+  // On platforms that support Isolates, execute the image commands asynchronously on an isolate thread.
+  // Otherwise, the commands will be executed synchronously.
+  await cmd.executeAsync();
 }
 ```
