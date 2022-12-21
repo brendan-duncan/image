@@ -17,12 +17,12 @@ final _aLut = Uint8List(256);
 /// You can load your own font, or use one of the existing ones
 /// such as: arial14, arial24, or arial48.
 ///  Fonts can be create with a tool such as: https://ttf2fnt.com/
-void drawString(Image image, BitmapFont font, int x, int y, String string,
+Image drawString(Image image, BitmapFont font, int x, int y, String string,
     {Color? color, bool rightJustify = false}) {
   if (color != null) {
     final ca = color.a;
     if (ca == 0) {
-      return;
+      return image;
     }
     final da = ca / 255.0;
     final dr = color.r / 255.0;
@@ -86,12 +86,14 @@ void drawString(Image image, BitmapFont font, int x, int y, String string,
     y = y+stringHeight;
     x = origX;
   }
+
+  return image;
 }
 
 /// Same as drawString except the strings will wrap around to create multiple
 /// lines. You can load your own font, or use one of the existing ones
 /// such as: arial14, arial24, or arial48.
-void drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
+Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
     {Color? color}) {
 
   final stringHeight = _findStringHeight(font, string);
@@ -117,7 +119,7 @@ void drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
     if ((x2 + wordWidth) > image.width) {
       // If there is a word that won't fit the starting x, stop drawing
       if ((x == x2) || (x + wordWidth > image.width)) {
-        return;
+        return image;
       }
 
       drawString(image, font, x, y, subString, color: color);
@@ -136,6 +138,8 @@ void drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
       drawString(image, font, x, y, subString, color: color);
     }
   }
+
+  return image;
 }
 
 /// Draw a string horizontally into [image] at position
@@ -146,7 +150,7 @@ void drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
 ///
 /// You can load your own font, or use one of the existing ones
 /// such as: arial14, arial24, or arial48.
-void drawStringCentered(Image image, BitmapFont font, String string,
+Image drawStringCentered(Image image, BitmapFont font, String string,
     {int? x, int? y, Color? color}) {
   var stringWidth = 0;
   var stringHeight = 0;
@@ -177,7 +181,7 @@ void drawStringCentered(Image image, BitmapFont font, String string,
     yPos = y;
   }
 
-  drawString(image, font, xPos, yPos, string, color: color);
+  return drawString(image, font, xPos, yPos, string, color: color);
 }
 
 int _findStringHeight(BitmapFont font, String string) {

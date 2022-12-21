@@ -25,51 +25,52 @@ class _DrawString {
       this.color, this.mode, this.rightJustify);
 }
 
-Future<void> _drawString(_DrawString p) async {
+Future<Image> _drawString(_DrawString p) async {
+  Image res;
   switch (p.mode) {
     case _DrawStringMode.drawString:
-      drawString(p.image, p.font, p.x!, p.y!, p.string, color: p.color,
+      res = drawString(p.image, p.font, p.x!, p.y!, p.string, color: p.color,
           rightJustify: p.rightJustify);
       break;
     case _DrawStringMode.drawStringWrap:
-      drawStringWrap(p.image, p.font, p.x!, p.y!, p.string, color: p.color);
+      res = drawStringWrap(p.image, p.font, p.x!, p.y!, p.string,
+          color: p.color);
       break;
     case _DrawStringMode.drawStringCentered:
-      drawStringCentered(p.image, p.font, p.string,
+      res = drawStringCentered(p.image, p.font, p.string,
           x: p.x, y: p.y, color: p.color);
       break;
   }
 
-  Isolate.exit(p.port);
+  Isolate.exit(p.port, res);
 }
 
 /// Asynchronous call to [drawString].
-Future<void> drawStringAsync(Image image, BitmapFont font, int x, int y,
+Future<Image> drawStringAsync(Image image, BitmapFont font, int x, int y,
     String string, { Color? color, bool rightJustify = false }) async {
   final port = ReceivePort();
   await Isolate.spawn(_drawString,
       _DrawString(port.sendPort, image, font, x, y, string, color,
           _DrawStringMode.drawString, rightJustify));
-  return port.first;
+  return await port.first as Image;
 }
 
-/// Asynchronous call to [drawStringWrap]
-Future<void> drawStringWrapAsync(Image image, BitmapFont font, int x, int y,
+/// Asynchronous call to [drawStringWrap].
+Future<Image> drawStringWrapAsync(Image image, BitmapFont font, int x, int y,
     String string, { Color? color }) async {
   final port = ReceivePort();
   await Isolate.spawn(_drawString,
       _DrawString(port.sendPort, image, font, x, y, string, color,
           _DrawStringMode.drawStringWrap, false));
-  return port.first;
+  return await port.first as Image;
 }
 
-/// Asynchronous call to [drawStringCentered
-Future<void> drawStringCenteredAsync(Image image, BitmapFont font,
+/// Asynchronous call to [drawStringCentered].
+Future<Image> drawStringCenteredAsync(Image image, BitmapFont font,
     String string, { int? x, int? y, Color? color }) async {
   final port = ReceivePort();
   await Isolate.spawn(_drawString,
       _DrawString(port.sendPort, image, font, x, y, string, color,
           _DrawStringMode.drawStringCentered, false));
-  return port.first;
+  return await port.first as Image;
 }
-

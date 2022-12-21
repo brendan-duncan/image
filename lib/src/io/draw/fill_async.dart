@@ -11,15 +11,15 @@ class _Fill {
   _Fill(this.port, this.image, this.color);
 }
 
-Future<void> _fill(_Fill p) async {
-  fill(p.image, p.color);
-  Isolate.exit(p.port);
+Future<Image> _fill(_Fill p) async {
+  final res = fill(p.image, p.color);
+  Isolate.exit(p.port, res);
 }
 
 /// Asynchronous call to [fill].
-Future<void> fillAsync(Image image, int x, int y, int radius,
+Future<Image> fillAsync(Image image, int x, int y, int radius,
     Color color) async {
   final port = ReceivePort();
   await Isolate.spawn(_fill, _Fill(port.sendPort, image, color));
-  return port.first;
+  return await port.first as Image;
 }

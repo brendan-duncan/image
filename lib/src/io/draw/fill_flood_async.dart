@@ -18,19 +18,19 @@ class _FillFlood {
       this.compareAlpha, this.fillValue);
 }
 
-Future<void> _fillFlood(_FillFlood p) async {
-  fillFlood(p.image, p.x, p.y, p.color!, threshold: p.threshold,
+Future<Image> _fillFlood(_FillFlood p) async {
+  final res = fillFlood(p.image, p.x, p.y, p.color!, threshold: p.threshold,
       compareAlpha: p.compareAlpha);
-  Isolate.exit(p.port);
+  Isolate.exit(p.port, res);
 }
 
 /// Asynchronous call to [fillFlood].
-Future<void> fillFloodAsync(Image image, int x, int y, Color color,
+Future<Image> fillFloodAsync(Image image, int x, int y, Color color,
     {num threshold = 0.0, bool compareAlpha = false}) async {
   final port = ReceivePort();
   await Isolate.spawn(_fillFlood, _FillFlood(port.sendPort, image, x, y, color,
       threshold, compareAlpha, 255));
-  return port.first;
+  return await port.first as Image;
 }
 
 Future<Uint8List> _maskFlood(_FillFlood p) async {

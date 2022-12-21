@@ -17,16 +17,17 @@ class _DrawRect {
       this.color, this.thickness);
 }
 
-Future<void> _drawRect(_DrawRect p) async {
-  drawRect(p.image, p.x1, p.y1, p.x2, p.y2, p.color, thickness: p.thickness);
-  Isolate.exit(p.port);
+Future<Image> _drawRect(_DrawRect p) async {
+  final res = drawRect(p.image, p.x1, p.y1, p.x2, p.y2, p.color,
+      thickness: p.thickness);
+  Isolate.exit(p.port, res);
 }
 
 /// Asynchronous call to [drawRect].
-Future<void> drawRectAsync(Image image, int x1, int y1, int x2, int y2,
+Future<Image> drawRectAsync(Image image, int x1, int y1, int x2, int y2,
     Color color, { num thickness = 1 }) async {
   final port = ReceivePort();
   await Isolate.spawn(_drawRect,
       _DrawRect(port.sendPort, image, x1, y1, x2, y2, color, thickness));
-  return port.first;
+  return await port.first as Image;
 }

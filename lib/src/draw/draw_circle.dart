@@ -6,9 +6,10 @@ import 'draw_pixel.dart';
 
 /// Draw a circle into the [image] with a center of [x0],[y0] and
 /// the given [radius] and [color].
-void drawCircle(Image image, int x0, int y0, int radius, Color color) {
+Image drawCircle(Image image, int x0, int y0, int radius, Color color) {
   final points = _calculateCircumference(image, x0, y0, radius);
   _draw(image, points, color);
+  return image;
 }
 
 /// Draw and fill a circle into the [image] with a center of [x0],[y0]
@@ -21,7 +22,7 @@ void drawCircle(Image image, int x0, int y0, int radius, Color color) {
 ///
 /// Once found, it draws a line connecting those two points. The circle is thus
 /// filled one vertical slice at a time (each slice being 1-pixel wide).
-void fillCircle(Image image, int x0, int y0, int radius, Color color) {
+Image fillCircle(Image image, int x0, int y0, int radius, Color color) {
   final points = _calculateCircumference(image, x0, y0, radius)
       // sort points by x-coordinate and then by y-coordinate
       ..sort((a, b) => (a.x == b.x) ? a.y.compareTo(b.y) : a.x.compareTo(b.x));
@@ -39,6 +40,7 @@ void fillCircle(Image image, int x0, int y0, int radius, Color color) {
     }
   }
   drawLine(image, start.xi, start.yi, end.xi, end.yi, color);
+  return image;
 }
 
 /// Calculate the pixels that make up the circumference of a circle on the

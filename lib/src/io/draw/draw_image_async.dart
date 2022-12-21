@@ -22,15 +22,15 @@ class _DrawImage {
       this.blend, this.center);
 }
 
-Future<void> _drawImage(_DrawImage p) async {
-  drawImage(p.dst, p.src, dstX: p.dstX, dstY: p.dstY, dstW: p.dstW,
+Future<Image> _drawImage(_DrawImage p) async {
+  final res = drawImage(p.dst, p.src, dstX: p.dstX, dstY: p.dstY, dstW: p.dstW,
       dstH: p.dstH, srcX: p.srcX, srcY: p.srcY, srcW: p.srcW, srcH: p.srcH,
       blend: p.blend, center: p.center);
-  Isolate.exit(p.port);
+  Isolate.exit(p.port, res);
 }
 
 /// Asynchronous call to [drawImage].
-Future<void> drawImageAsync(Image dst, Image src, {
+Future<Image> drawImageAsync(Image dst, Image src, {
     int? dstX,
     int? dstY,
     int? dstW,
@@ -46,5 +46,5 @@ Future<void> drawImageAsync(Image dst, Image src, {
       _DrawImage(port.sendPort, dst, src, dstX, dstY, dstW,
           dstH, srcX, srcY, srcW, srcH,
           blend, center));
-  return port.first;
+  return await port.first as Image;
 }

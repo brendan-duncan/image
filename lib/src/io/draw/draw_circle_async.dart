@@ -14,31 +14,31 @@ class _DrawCircle {
   _DrawCircle(this.port, this.image, this.x, this.y, this.radius, this.color);
 }
 
-Future<void> _drawCircle(_DrawCircle p) async {
-  drawCircle(p.image, p.x, p.y, p.radius, p.color);
-  Isolate.exit(p.port);
+Future<Image> _drawCircle(_DrawCircle p) async {
+  final res = drawCircle(p.image, p.x, p.y, p.radius, p.color);
+  Isolate.exit(p.port, res);
 }
 
 /// Asynchronous call to [drawCircle].
-Future<void> drawCircleAsync(Image image, int x, int y, int radius,
+Future<Image> drawCircleAsync(Image image, int x, int y, int radius,
     Color color) async {
   final port = ReceivePort();
   await Isolate.spawn(_drawCircle,
       _DrawCircle(port.sendPort, image, x, y, radius, color));
-  return port.first;
+  return await port.first as Image;
 }
 
-Future<void> _fillCircle(_DrawCircle p) async {
-  fillCircle(p.image, p.x, p.y, p.radius, p.color);
-  Isolate.exit(p.port);
+Future<Image> _fillCircle(_DrawCircle p) async {
+  final res = fillCircle(p.image, p.x, p.y, p.radius, p.color);
+  Isolate.exit(p.port, res);
 }
 
 /// Asynchronous call to [fillCircle].
-Future<void> fillCircleAsync(Image image, int x, int y, int radius,
+Future<Image> fillCircleAsync(Image image, int x, int y, int radius,
     Color color) async {
   final port = ReceivePort();
   await Isolate.spawn(_fillCircle,
       _DrawCircle(port.sendPort, image, x, y, radius, color));
-  return port.first;
+  return await port.first as Image;
 }
 

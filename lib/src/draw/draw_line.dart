@@ -10,11 +10,11 @@ import 'draw_pixel.dart';
 ///
 /// If [antialias] is true then the line is drawn with smooth edges.
 /// [thickness] determines how thick the line should be drawn, in pixels.
-void drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
+Image drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
     { bool antialias = false, num thickness = 1 }) {
   final line = [x1, y1, x2, y2];
   if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
-    return;
+    return image;
   }
 
   x1 = line[0];
@@ -32,7 +32,7 @@ void drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
     thickness == 1
         ? drawPixel(image, x1, y1, c)
         : fillCircle(image, x1, y1, radius, c);
-    return;
+    return image;
   }
 
   // Axis-aligned lines
@@ -58,7 +58,7 @@ void drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
         }
       }
     }
-    return;
+    return image;
   } else if (dy == 0) {
     if (dx < 0) {
       for (var x = x2; x <= x1; ++x) {
@@ -81,7 +81,7 @@ void drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
         }
       }
     }
-    return;
+    return image;
   }
 
   // 16-bit unsigned int xor.
@@ -226,7 +226,7 @@ void drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
       }
     }
 
-    return;
+    return image;
   }
 
   // Antialias Line
@@ -308,4 +308,6 @@ void drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
       }
     }
   }
+
+  return image;
 }

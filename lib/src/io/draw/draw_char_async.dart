@@ -17,16 +17,16 @@ class _DrawChar {
       this.color);
 }
 
-Future<void> _drawChar(_DrawChar p) async {
-  drawChar(p.image, p.font, p.x, p.y, p.char, color: p.color);
-  Isolate.exit(p.port);
+Future<Image> _drawChar(_DrawChar p) async {
+  final res = drawChar(p.image, p.font, p.x, p.y, p.char, color: p.color);
+  Isolate.exit(p.port, res);
 }
 
 /// Asynchronously call [drawChar].
-Future<void> drawCharAsync(Image image, BitmapFont font, int x, int y,
+Future<Image> drawCharAsync(Image image, BitmapFont font, int x, int y,
     String char, {Color? color}) async {
   final port = ReceivePort();
   await Isolate.spawn(_drawChar,
       _DrawChar(port.sendPort, image, font, x, y, char, color));
-  return port.first;
+  return await port.first as Image;
 }
