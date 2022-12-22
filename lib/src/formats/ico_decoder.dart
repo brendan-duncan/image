@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import '../image/animation.dart';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
 import '../util/output_buffer.dart';
@@ -32,23 +31,31 @@ class IcoDecoder extends Decoder {
   }
 
   @override
-  Animation decodeAnimation(Uint8List bytes) {
-    final anim = Animation()
-      ..frameType = FrameType.sequence;
-
+  Image? decode(Uint8List bytes, { int? frame }) {
     final info = startDecode(bytes);
     if (info == null) {
-      return anim;
+      return null;
     }
 
+    if (_icoInfo!.images.length == 1 || frame != null) {
+      return decodeFrame(frame ?? 0);
+    }
+
+    Image? firstImage;
     for (var i = 0; i < _icoInfo!.images.length; i++) {
       final frame = decodeFrame(i);
-      if (frame != null) {
-        anim.frames.add(frame);
+      if (frame == null) {
+        continue;
+      }
+      if (firstImage == null) {
+        firstImage = frame
+        ..frameType = FrameType.sequence;
+      } else {
+        firstImage.addFrame(frame);
       }
     }
 
-    return anim;
+    return firstImage;
   }
 
   @override
@@ -64,7 +71,7 @@ class IcoDecoder extends Decoder {
 
     final png = PngDecoder();
     if (png.isValidFile(imageBuffer as Uint8List)) {
-      return png.decodeImage(imageBuffer);
+      return png.decode(imageBuffer);
     }
 
     // should be bmp.
@@ -143,15 +150,6 @@ class IcoDecoder extends Decoder {
       }
     }
     return decodeFrame(largestFrame);
-  }
-
-  @override
-  Image? decodeImage(Uint8List bytes, {int frame = 0}) {
-    final info = startDecode(bytes);
-    if (info == null) {
-      return null;
-    }
-    return decodeFrame(frame);
   }
 
   @override

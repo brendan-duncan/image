@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import '../image/animation.dart';
 import '../image/image.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
@@ -25,31 +24,31 @@ class PsdDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
-  Image? decodeImage(Uint8List bytes, {int frame = 0}) {
-    startDecode(bytes);
-    return decodeFrame(frame);
-  }
-
-  /// Decode all of the frames from an animation. If the file is not an
-  /// animation, a single frame animation is returned. If there was a problem
-  /// decoding the file, null is returned.
-  @override
-  Animation? decodeAnimation(Uint8List bytes) {
+  Image? decode(Uint8List bytes, { int? frame }) {
     if (startDecode(bytes) == null) {
       return null;
     }
 
-    final anim = Animation()
-    ..width = info!.width
-    ..height = info!.height
-    ..frameType = FrameType.page;
     final len = numFrames();
-    for (var i = 0; i < len; ++i) {
-      final image = decodeFrame(i);
-      anim.addFrame(image!);
+    if (len == 1 || frame != null) {
+      return decodeFrame(frame ?? 0);
     }
 
-    return anim;
+    Image? firstImage;
+    for (var i = 0; i < len; ++i) {
+      final frame = decodeFrame(i);
+      if (frame == null) {
+        continue;
+      }
+      if (firstImage == null) {
+        firstImage = frame;
+        frame.frameType = FrameType.page;
+      } else {
+        firstImage.addFrame(frame);
+      }
+    }
+
+    return firstImage;
   }
 
   /// Start decoding the data as an animation sequence, but don't actually

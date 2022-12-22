@@ -7,7 +7,7 @@ import '../test_util.dart';
 void pixelateTest() {
   test('pixelate', () {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
-    final i0 = PngDecoder().decodeImage(bytes)!;
+    final i0 = decodePng(bytes)!;
     final i1 = i0.clone();
     pixelate(i0, 10);
     File('$testOutputPath/filter/pixelate_upperLeft.png')

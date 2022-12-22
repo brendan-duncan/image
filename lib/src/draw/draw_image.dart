@@ -47,22 +47,25 @@ Image drawImage(Image dst, Image src, {
     dstY = height ~/ 2;
   }
 
+  final dy = srcH / dstH;
+  final dx = srcW / dstW;
+  final yCache = List<int>.generate(dstH, (y) => srcY! + (y * dy).toInt(),
+      growable: false);
+  final xCache = List<int>.generate(dstW, (x) => srcX! + (x * dx).toInt(),
+      growable: false);
+
   Pixel? p;
   if (blend) {
     for (var y = 0; y < dstH; ++y) {
       for (var x = 0; x < dstW; ++x) {
-        final stepX = (x * (srcW / dstW)).toInt();
-        final stepY = (y * (srcH / dstH)).toInt();
-        p = src.getPixel(srcX + stepX, srcY + stepY, p);
+        p = src.getPixel(xCache[x], yCache[y], p);
         drawPixel(dst, dstX + x, dstY + y, p);
       }
     }
   } else {
     for (var y = 0; y < dstH; ++y) {
       for (var x = 0; x < dstW; ++x) {
-        final stepX = (x * (srcW / dstW)).toInt();
-        final stepY = (y * (srcH / dstH)).toInt();
-        p = src.getPixel(srcX + stepX, srcY + stepY, p);
+        p = src.getPixel(xCache[x], yCache[y], p);
         dst.setPixel(dstX + x, dstY + y, p);
       }
     }

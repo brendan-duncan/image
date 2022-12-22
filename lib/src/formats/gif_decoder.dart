@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import '../color/color_uint8.dart';
-import '../image/animation.dart';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
 import 'decoder.dart';
@@ -148,27 +147,17 @@ class GifDecoder extends Decoder {
   }
 
   @override
-  Image? decodeImage(Uint8List bytes, {int frame = 0}) {
-    if (startDecode(bytes) == null) {
-      return null;
-    }
-    return decodeFrame(frame);
-  }
-
-  /// Decode all of the frames of an animated gif. For single image gifs,
-  /// this will return an animation with a single frame.
-  @override
-  Animation? decodeAnimation(Uint8List bytes) {
+  Image? decode(Uint8List bytes, { int? frame }) {
     if (startDecode(bytes) == null) {
       return null;
     }
 
-    final anim = Animation()
-    ..width = info!.width
-    ..height = info!.height
-    ..loopCount = _repeat;
+    if (info!.numFrames == 1 || frame != null) {
+      return decodeFrame(frame ?? 0);
+    }
 
-    Image? lastImage = null;
+    Image? firstImage;
+    Image? lastImage;
     for (var i = 0; i < info!.numFrames; ++i) {
       final frame = info!.frames[i];
       final image = decodeFrame(i);
@@ -176,18 +165,19 @@ class GifDecoder extends Decoder {
         return null;
       }
 
-      if (lastImage == null) {
+      image.frameDuration = frame.duration * 10; // Convert to MS
+
+      if (firstImage == null || lastImage == null) {
+        firstImage = image;
         lastImage = image;
-        lastImage.frameInfo.duration = frame.duration * 10; // Convert to MS
-        anim.addFrame(lastImage);
+        image.loopCount = _repeat;
         continue;
       }
 
       if (image.width == lastImage.width && image.height == lastImage.height &&
           frame.x == 0 && frame.y == 0 && frame.clearFrame) {
         lastImage = image;
-        lastImage.frameInfo.duration = frame.duration * 10; // Convert to MS
-        anim.addFrame(lastImage);
+        firstImage.addFrame(lastImage);
         continue;
       }
 
@@ -197,10 +187,12 @@ class GifDecoder extends Decoder {
 
         lastImage = Image(lastImage.width, lastImage.height, numChannels: 1,
             palette: colorMap.getPalette())
-        ..clear(colorMap.color(info!.backgroundColor!.r as int));
+          ..clear(colorMap.color(info!.backgroundColor!.r as int));
       } else {
         lastImage = new Image.from(lastImage);
       }
+
+      lastImage.frameDuration = image.frameDuration;
 
       for (var p in image) {
         if (p.a != 0) {
@@ -208,11 +200,10 @@ class GifDecoder extends Decoder {
         }
       }
 
-      lastImage.frameInfo.duration = frame.duration * 10; // Convert 1/100 sec to ms.
-      anim.addFrame(lastImage);
+      firstImage.addFrame(lastImage);
     }
 
-    return anim;
+    return firstImage;
   }
 
   InternalGifImageDesc? _skipImage() {

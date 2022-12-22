@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import '../exif/exif_data.dart';
-import '../image/animation.dart';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
 import 'decoder.dart';
@@ -54,7 +53,7 @@ class TiffDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
-  Image? decodeImage(Uint8List bytes, {int frame = 0}) {
+  Image? decode(Uint8List bytes, { int? frame }) {
     _input = InputBuffer(bytes);
 
     info = _readHeader(_input);
@@ -62,32 +61,24 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    final image = info!.images[frame].decode(_input)
-    ..exif = ExifData.fromInputBuffer(InputBuffer(bytes));
+    final len = numFrames();
+    if (len == 1 || frame != 0) {
+      return decodeFrame(frame ?? 0);
+    }
 
-    return image;
-  }
-
-  /// Decode all of the frames from an animation. If the file is not an
-  /// animation, a single frame animation is returned. If there was a problem
-  /// decoding the file, null is returned.
-  @override
-  Animation? decodeAnimation(Uint8List data) {
-    if (startDecode(data) == null) {
+    final image = decodeFrame(0);
+    if (image == null) {
       return null;
     }
-
-    final anim = Animation()
-    ..width = info!.width
-    ..height = info!.height
+    image..exif = ExifData.fromInputBuffer(InputBuffer(bytes))
     ..frameType = FrameType.page;
-    final len = numFrames();
-    for (var i = 0; i < len; ++i) {
-      final image = decodeFrame(i);
-      anim.addFrame(image!);
+
+    for (var i = 1; i < len; ++i) {
+      final frame = decodeFrame(i);
+      image.addFrame(frame);
     }
 
-    return anim;
+    return image;
   }
 
   // Read the TIFF header and IFD blocks.

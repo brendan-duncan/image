@@ -23,7 +23,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
         });
@@ -44,7 +44,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
         });
@@ -67,7 +67,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
         });
@@ -89,7 +89,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
         });
@@ -113,7 +113,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
         });
@@ -135,7 +135,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
         });
@@ -159,7 +159,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
         });
@@ -182,7 +182,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
         });
@@ -205,7 +205,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
         });
@@ -228,7 +228,7 @@ void pngTest() {
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
 
-          final image2 = PngDecoder().decodeImage(png)!;
+          final image2 = PngDecoder().decode(png)!;
           expect(image2, isNotNull);
           testImageEquals(image, image2);
 
@@ -242,7 +242,7 @@ void pngTest() {
 
     test('decode', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
-      final image = PngDecoder().decodeImage(bytes)!;
+      final image = PngDecoder().decode(bytes)!;
       expect(image.width, equals(300));
       expect(image.height, equals(186));
       expect(image.numChannels, equals(3));
@@ -281,7 +281,7 @@ void pngTest() {
 
     test('decode palette', () {
       final bytes = File('test/_data/png/buck_8.png').readAsBytesSync();
-      final image = PngDecoder().decodeImage(bytes)!;
+      final image = PngDecoder().decode(bytes)!;
       expect(image.width, equals(300));
       expect(image.height, equals(186));
       expect(image.numChannels, equals(3));
@@ -295,7 +295,7 @@ void pngTest() {
     });
 
     test('encode filter:none', () {
-      final png = PngEncoder(filter: PngFilter.none).encodeImage(buck24Image!);
+      final png = PngEncoder(filter: PngFilter.none).encode(buck24Image!);
       final file = File('$testOutputPath/png/encode_filter_none.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
@@ -306,7 +306,7 @@ void pngTest() {
     });
 
     test('encode filter:sub', () {
-      final png = PngEncoder(filter: PngFilter.sub).encodeImage(buck24Image!);
+      final png = PngEncoder(filter: PngFilter.sub).encode(buck24Image!);
       final file = File('$testOutputPath/png/encode_filter_sub.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
@@ -317,7 +317,7 @@ void pngTest() {
     });
 
     test('encode filter:up', () {
-      final png = PngEncoder(filter: PngFilter.up).encodeImage(buck24Image!);
+      final png = PngEncoder(filter: PngFilter.up).encode(buck24Image!);
       final file = File('$testOutputPath/png/encode_filter_up.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
@@ -328,7 +328,7 @@ void pngTest() {
     });
 
     test('encode filter:average', () {
-      final png = PngEncoder(filter: PngFilter.sub).encodeImage(buck24Image!);
+      final png = PngEncoder(filter: PngFilter.sub).encode(buck24Image!);
       final file = File('$testOutputPath/png/encode_filter_average.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
@@ -339,7 +339,7 @@ void pngTest() {
     });
 
     test('encode filter:paeth', () {
-      final png = PngEncoder().encodeImage(buck24Image!);
+      final png = PngEncoder().encode(buck24Image!);
       final file = File('$testOutputPath/png/encode_filter_paeth.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
@@ -358,11 +358,11 @@ void pngTest() {
 
       for (var f in files) {
         final bytes = File(f[0] as String).readAsBytesSync();
-        final anim = PngDecoder().decodeAnimation(bytes)!;
-        expect(anim.length, equals(f[1]));
+        final anim = PngDecoder().decode(bytes)!;
+        expect(anim.numFrames, equals(f[1]));
 
-        for (var i = 0; i < anim.length; ++i) {
-          final png = PngEncoder().encodeImage(anim[i]);
+        for (var i = 0; i < anim.numFrames; ++i) {
+          final png = PngEncoder().encode(anim.getFrame(i));
           File('$testOutputPath/png/${f[2]}-$i.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
@@ -371,15 +371,15 @@ void pngTest() {
     });
 
     test('encodeAnimation', () {
-      final anim = Animation()
+      final anim = Image(480, 120)
       ..loopCount = 10;
       for (var i = 0; i < 10; i++) {
-        final image = Image(480, 120);
-        drawString(image, arial48, 100, 60, i.toString());
-        anim.addFrame(image);
+        final frame = i == 0 ? anim : anim.addFrame();
+        drawString(frame, arial48, 100, 60, i.toString());
+
       }
 
-      final png = encodePngAnimation(anim);
+      final png = encodePng(anim);
       File('$testOutputPath/png/encodeAnimation.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
@@ -388,21 +388,21 @@ void pngTest() {
 
     test('textData', () {
       final img = Image(16, 16, textData: {"foo":"bar"});
-      final png = PngEncoder().encodeImage(img);
-      final img2 = PngDecoder().decodeImage(png);
+      final png = PngEncoder().encode(img);
+      final img2 = PngDecoder().decode(png);
       expect(img2?.width, equals(img.width));
       expect(img2?.textData?["foo"], equals("bar"));
     });
 
     test('iCCP', () {
       final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
-      final image = PngDecoder().decodeImage(bytes)!;
+      final image = PngDecoder().decode(bytes)!;
       expect(image.iccProfile, isNotNull);
       expect(image.iccProfile!.data, isNotNull);
 
-      final png = PngEncoder().encodeImage(image);
+      final png = PngEncoder().encode(image);
 
-      final image2 = PngDecoder().decodeImage(png)!;
+      final image2 = PngDecoder().decode(png)!;
       expect(image2.iccProfile, isNotNull);
       expect(image2.iccProfile!.data, isNotNull);
       expect(image2.iccProfile!.data.length,
@@ -451,34 +451,34 @@ void pngTest() {
         // x* png's are corrupted and are supposed to crash.
         if (name.startsWith('x')) {
           try {
-            final image = PngDecoder().decodeImage(file.readAsBytesSync());
+            final image = PngDecoder().decode(file.readAsBytesSync());
             expect(image, isNull);
           } catch (e) {
             // noop
           }
         } else {
-          final anim = PngDecoder().decodeAnimation(file.readAsBytesSync());
+          final anim = PngDecoder().decode(file.readAsBytesSync());
           expect(anim, isNotNull);
           if (anim != null) {
-            if (anim.length == 1) {
-              final png = PngEncoder().encodeImage(anim[0]);
+            if (anim.numFrames == 1) {
+              final png = PngEncoder().encode(anim);
               File('$testOutputPath/png/$name.png')
                 ..createSync(recursive: true)
                 ..writeAsBytesSync(png);
 
-              final i1 = PngDecoder().decodeImage(png);
+              final i1 = PngDecoder().decode(png);
               expect(i1, isNotNull);
-              expect(i1!.width, equals(anim[0].width));
-              expect(i1.height, equals(anim[0].height));
-              expect(i1.format, equals(anim[0].format));
-              expect(i1.numChannels, equals(anim[0].numChannels));
+              expect(i1!.width, equals(anim.width));
+              expect(i1.height, equals(anim.height));
+              expect(i1.format, equals(anim.format));
+              expect(i1.numChannels, equals(anim.numChannels));
               for (var p in i1) {
-                final p2 = anim[0].getPixel(p.x, p.y);
+                final p2 = anim.getPixel(p.x, p.y);
                 expect(p, equals(p2));
               }
             } else {
-              for (var i = 0; i < anim.length; ++i) {
-                final png = PngEncoder().encodeImage(anim[i]);
+              for (var i = 0; i < anim.numFrames; ++i) {
+                final png = PngEncoder().encode(anim.getFrame(i));
                 File('$testOutputPath/png/$name-$i.png')
                   ..createSync(recursive: true)
                   ..writeAsBytesSync(png);

@@ -40,7 +40,7 @@ void onFileLoaded(Event event) {
   }
 
   // If a decoder was found, decode the file contents into an image.
-  final image = decoder.decodeImage(bytes);
+  final image = decoder.decode(bytes);
 
   // If the image was able to be decoded, we can display it in a couple
   // different ways. We could encode it to a format that can be displayed

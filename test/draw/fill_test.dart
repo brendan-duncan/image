@@ -7,7 +7,8 @@ import '../test_util.dart';
 
 void fillTest() {
   test('fill', () async {
-    final cmd = CreateImageCmd(256, 256)
+    final cmd = Command()
+        ..createImage(256, 256)
         ..fill(ColorRgba8(120, 64, 85, 90))
         ..encodePng();
 

@@ -1,14 +1,14 @@
 import '../../formats/formats.dart';
-import '../image_command.dart';
+import '../command.dart';
 import '_file_access.dart'
-    if (dart.library.io) '_file_access_io.dart'
-    if (dart.library.js) '_file_access_html.dart';
+if (dart.library.io) '_file_access_io.dart'
+if (dart.library.js) '_file_access_html.dart';
 
-class WriteToFileCmd extends ImageCommand {
-  ImageCommand? input;
+class WriteToFileCmd extends Command {
   String path;
 
-  WriteToFileCmd(this.input, this.path);
+  WriteToFileCmd(Command? input, this.path)
+      : super(input);
 
   @override
   void executeCommand() {

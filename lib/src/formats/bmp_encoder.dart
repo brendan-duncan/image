@@ -15,7 +15,7 @@ class BmpEncoder extends Encoder {
     return x + 4 - y;
   }
   @override
-  Uint8List encodeImage(Image image) {
+  Uint8List encode(Image image, { bool singleFrame = false }) {
     final out = OutputBuffer();
 
     var bpp = image.bitsPerChannel * image.data!.numChannels;

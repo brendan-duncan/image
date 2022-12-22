@@ -22,12 +22,14 @@ class ImageDataUint8 extends ImageData {
       : data = Uint8List(width * height)
       , super(width, height, 1);
 
-  ImageDataUint8.from(ImageDataUint8 other)
-      : data = Uint8List.fromList(other.data)
+  ImageDataUint8.from(ImageDataUint8 other, { bool skipPixels = false })
+      : data = skipPixels ? Uint8List(other.data.length)
+          : Uint8List.fromList(other.data)
       , palette = other.palette?.clone()
       , super(other.width, other.height, other.numChannels);
 
-  ImageDataUint8 clone() => ImageDataUint8.from(this);
+  ImageDataUint8 clone({ bool noPixels = false }) =>
+      ImageDataUint8.from(this, skipPixels: noPixels);
 
   Format get format => Format.uint8;
 

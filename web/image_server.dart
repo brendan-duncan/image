@@ -23,12 +23,12 @@ void main(List<String> argv) {
     return;
   }
 
-  final image = decoder.decodeImage(fileBytes)!;
+  final image = decoder.decode(fileBytes)!;
 
   // ... do something with image ...
 
   // Save the image as a PNG
-  final png = PngEncoder().encodeImage(image);
+  final png = PngEncoder().encode(image);
   // Write the PNG to disk
   File('$filename.png').writeAsBytesSync(png);
 }

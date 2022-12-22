@@ -1,6 +1,5 @@
 import '../color/color_uint8.dart';
 import '../draw/draw_image.dart';
-import '../image/animation.dart';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
@@ -110,62 +109,49 @@ class WebPDecoder extends Decoder {
 
   /// Decode a WebP formatted file stored in [bytes] into an Image.
   /// If it's not a valid webp file, null is returned.
-  /// If the webp file stores animated frames, only the first image will
-  /// be returned. Use [decodeAnimation] to decode the full animation.
   @override
-  Image? decodeImage(List<int> bytes, {int frame = 0}) {
-    startDecode(bytes);
-    _info!.frame = 0;
-    _info!.numFrames = 1;
-    return decodeFrame(frame);
-  }
-
-  /// Decode all of the frames of an animated webp. For single image webps,
-  /// this will return an animation with a single frame.
-  @override
-  Animation? decodeAnimation(List<int> bytes) {
+  Image? decode(List<int> bytes, { int? frame }) {
     if (startDecode(bytes) == null) {
       return null;
     }
 
-    final anim = Animation()
-    ..width = _info!.width
-    ..height = _info!.height
-    ..loopCount = _info!.animLoopCount;
+    if (!_info!.hasAnimation || frame != null) {
+      return decodeFrame(frame ?? 0);
+    }
 
-    if (_info!.hasAnimation) {
-      var lastImage = Image(_info!.width, _info!.height);
-      for (var i = 0; i < _info!.numFrames; ++i) {
-        _info!.frame = i;
+    Image? firstImage;
+    Image? lastImage;
+    for (var i = 0; i < _info!.numFrames; ++i) {
+      _info!.frame = i;
+      final frame = _info!.frames[i];
+      final image = decodeFrame(i);
+      if (image == null) {
+        continue;
+      }
+
+      image.frameDuration = frame.duration;
+
+      if (firstImage == null || lastImage == null) {
+        firstImage = Image(_info!.width, _info!.height,
+            numChannels: image.numChannels, format: image.format);
+        lastImage = firstImage;
+      } else {
         lastImage = Image.from(lastImage);
-
-        final frame = _info!.frames[i];
-        final image = decodeFrame(i);
-        if (image == null) {
-          return null;
-        }
 
         if (frame.clearFrame) {
           lastImage.clear();
         }
-        drawImage(lastImage, image, dstX: frame.x, dstY: frame.y);
-
-        lastImage.frameInfo.duration = frame.duration;
-        anim.addFrame(lastImage);
-      }
-    } else {
-      final image = decodeImage(bytes);
-      if (image == null) {
-        return null;
       }
 
-      anim.addFrame(image);
+      drawImage(lastImage, image, dstX: frame.x, dstY: frame.y, blend: false);
+
+      firstImage.addFrame(lastImage);
     }
 
-    return anim;
+    return firstImage;
   }
 
-  Image? _decodeFrame(InputBuffer input, {int frame = 0}) {
+  Image? _decodeFrame(InputBuffer input, { int frame = 0 }) {
     final webp = InternalWebPInfo();
     if (!_getInfo(input, webp)) {
       return null;
@@ -175,7 +161,7 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
-    webp..frame = _info!.frame
+    webp..frame = frame
     ..numFrames = _info!.numFrames;
 
     if (webp.hasAnimation) {

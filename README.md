@@ -56,16 +56,32 @@ import 'package:image/image.dart' as DIL;
 void main() async {
   final image = DIL.Image(256, 256);
   for (var pixel in image) {
-    pixel.r = pixel.x;
-    pixel.g = pixel.y;
+    pixel..r = pixel.x
+    ..g = pixel.y;
   }
   final png = DIL.encodePng(image);
   await File('image.png').writeAsBytes(png);
 }
 ```
 
+An ImageCommand API lets you perform these functions either synchronously or asynchronously.
+```dart
+import 'package:image/image_io.dart' as DIL;
+void main() async {
+  final cmd = DIL.ImageCommand()
+      ..createImage(256, 256)
+      ..filter((image) {
+        for (var pixel in image) {
+          pixel..r = pixel.x
+          ..g = pixel.y;
+        }
+      })
+      ..encodePngFile('image.png');
+  await cmd.executeAsync();
+}
+```
 
-The ImageCommand API allows for asynchronous processing of images. 
+To asynchronously load an image file, resize it, and save it as a thumbnail: 
 ```dart
 import 'package:image/image_io.dart' as DIL;
 

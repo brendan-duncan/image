@@ -1,15 +1,15 @@
 import '../../transform/copy_resize.dart';
 import '../../util/interpolation.dart';
-import '../image_command.dart';
+import '../command.dart';
 
-class CopyResizeCmd extends ImageCommand {
-  ImageCommand? input;
+class CopyResizeCmd extends Command {
   int? width;
   int? height;
   Interpolation interpolation;
 
-  CopyResizeCmd(this.input, { this.width, this.height,
-      this.interpolation = Interpolation.nearest });
+  CopyResizeCmd(Command? input, { this.width, this.height,
+      this.interpolation = Interpolation.nearest })
+      : super(input);
 
   @override
   void executeCommand() {

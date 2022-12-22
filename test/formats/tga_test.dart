@@ -17,16 +17,16 @@ void tgaTest() {
         continue;
       }
 
-      final name = f.path.split(RegExp(r'(/|\\)')).last;
+      final name = f.uri.pathSegments.last;
       test(name, () {
         final bytes = f.readAsBytesSync();
-        final image = TgaDecoder().decodeImage(bytes);
+        final image = TgaDecoder().decode(bytes);
         if (image == null) {
           throw ImageException('Unable to decode TGA Image: $name.');
         }
 
         //final png = PngEncoder().encodeImage(image);
-        final png = TgaEncoder().encodeImage(image);
+        final png = TgaEncoder().encode(image);
         File('$testOutputPath/tga/$name.tga')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
@@ -37,19 +37,19 @@ void tgaTest() {
       final bytes = File('test/_data/tga/globe.tga').readAsBytesSync();
 
       // Decode the image from file.
-      final image = TgaDecoder().decodeImage(bytes)!;
+      final image = TgaDecoder().decode(bytes)!;
       expect(image.width, equals(128));
       expect(image.height, equals(128));
 
       // Encode the image as a tga
-      final tga = TgaEncoder().encodeImage(image);
+      final tga = TgaEncoder().encode(image);
 
       File('$testOutputPath/tga/globe.tga')
         ..createSync(recursive: true)
         ..writeAsBytesSync(tga);
 
       // Decode the encoded image, make sure it's the same as the original.
-      final image2 = TgaDecoder().decodeImage(tga)!;
+      final image2 = TgaDecoder().decode(tga)!;
       expect(image2.width, equals(128));
       expect(image2.height, equals(128));
     });

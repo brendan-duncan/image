@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import '../image/animation.dart';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
@@ -42,7 +41,7 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  Image? decodeImage(Uint8List bytes, {int frame = 0}) {
+  Image? decode(Uint8List bytes, { int? frame }) {
     final jpeg = JpegData()
     ..read(bytes);
 
@@ -51,20 +50,5 @@ class JpegDecoder extends Decoder {
     }
 
     return jpeg.getImage();
-  }
-
-  @override
-  Animation? decodeAnimation(Uint8List bytes) {
-    final image = decodeImage(bytes);
-    if (image == null) {
-      return null;
-    }
-
-    final anim = Animation()
-    ..width = image.width
-    ..height = image.height
-    ..addFrame(image);
-
-    return anim;
   }
 }

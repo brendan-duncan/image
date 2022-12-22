@@ -4,7 +4,8 @@ import '../test_util.dart';
 
 void drawCharTest() {
   test('drawChar', () async {
-    final cmd = CreateImageCmd(256, 256)
+    final cmd = Command()
+        ..createImage(256, 256)
         ..fill(ColorRgb8(128, 128))
         ..drawChar(arial24, 50, 50, "H")
         ..drawChar(arial24, 70, 70, "e",

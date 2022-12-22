@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import '../image/animation.dart';
 import '../image/image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
@@ -14,13 +13,16 @@ abstract class WinEncoder extends Encoder {
   int bitsPerPixelOrYHotSpot(int index);
 
   @override
-  Uint8List encodeImage(Image image) => encodeImages([image]);
+  Uint8List encode(Image image, { bool singleFrame = false }) {
+    if (image.hasAnimation && !singleFrame) {
+      return encodeImages(image.frames);
+    } else {
+      return encodeImages([image]);
+    }
+  }
 
   @override
   bool get supportsAnimation => true;
-
-  @override
-  Uint8List encodeAnimation(Animation anim) => encodeImages(anim.frames);
 
   Uint8List encodeImages(List<Image> images) {
     final count = images.length;
@@ -51,7 +53,7 @@ abstract class WinEncoder extends Encoder {
       ..writeUint16(bitsPerPixelOrYHotSpot(i));
 
       // Use png instead of bmp encoded data, it's supported since Windows Vista
-      final data = PngEncoder().encodeImage(img);
+      final data = PngEncoder().encode(img);
 
       out..writeUint32(data.length) // size of the image's data in bytes
       ..writeUint32(offset); // offset of data from the beginning of the file

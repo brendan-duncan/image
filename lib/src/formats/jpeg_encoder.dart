@@ -38,7 +38,7 @@ class JpegEncoder extends Encoder {
   }
 
   @override
-  Uint8List encodeImage(Image image) {
+  Uint8List encode(Image image, { bool singleFrame = false }) {
     final fp = OutputBuffer(bigEndian: true);
 
     // Add JPEG headers

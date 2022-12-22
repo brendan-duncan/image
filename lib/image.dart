@@ -2,14 +2,7 @@
 /// manipulate, and save various image file formats.
 library image;
 
-export 'src/cmd/draw/draw_char_cmd.dart';
-export 'src/cmd/draw/fill_cmd.dart';
-export 'src/cmd/formats/decode_image_file_cmd.dart';
-export 'src/cmd/formats/write_to_file_cmd.dart';
-export 'src/cmd/image/create_image_cmd.dart';
-export 'src/cmd/image/image_cmd.dart';
-export 'src/cmd/image_command.dart';
-export 'src/cmd/transform/copy_resize_cmd.dart';
+export 'src/cmd/command.dart';
 
 export 'src/color/channel.dart';
 export 'src/color/channel_iterator.dart';
@@ -161,8 +154,6 @@ export 'src/formats/webp_decoder.dart';
 export 'src/hdr/hdr_bloom.dart';
 export 'src/hdr/hdr_to_ldr.dart';
 export 'src/hdr/reinhard_tone_map.dart';
-export 'src/image/animation.dart';
-export 'src/image/frame_info.dart';
 export 'src/image/icc_profile.dart';
 export 'src/image/image.dart';
 export 'src/image/image_data.dart';

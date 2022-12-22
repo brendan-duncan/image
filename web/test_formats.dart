@@ -55,14 +55,14 @@ void main() {
 
         // Some of the files are animated, so always decode to animation.
         // Single image files will decode to a single framed animation.
-        final anim = decoder.decodeAnimation(bytes);
+        final anim = decoder.decode(bytes);
         if (anim == null) {
           return;
         }
 
         // If it's a single image, dump the decoded image into the canvas.
-        if (anim.length == 1) {
-          final image = anim.frames[0];
+        if (anim.numFrames == 1) {
+          final image = anim;
 
           //Image newImage = copyResize(image, 2000, -1, CUBIC);
           final newImage = image;

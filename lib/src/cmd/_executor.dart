@@ -1,21 +1,20 @@
 import 'dart:typed_data';
 
 import '../image/image.dart';
+import 'command.dart';
 import 'execute_result.dart';
-import 'image_command.dart';
 
-
-Future<ExecuteResult> executeCommandAsync(ImageCommand? command) async =>
+Future<ExecuteResult> executeCommandAsync(Command? command) async =>
     throw UnsupportedError('Cannot use without dart:html or dart:io');
 
-Image? executeCommandImage(ImageCommand? command) =>
+Image? executeCommandImage(Command? command) =>
     throw UnsupportedError('Cannot use without dart:html or dart:io');
 
-Future<Image?> executeCommandImageAsync(ImageCommand? command) async =>
+Future<Image?> executeCommandImageAsync(Command? command) async =>
     throw UnsupportedError('Cannot use without dart:html or dart:io');
 
-Uint8List? executeCommandBytes(ImageCommand? command) =>
+Uint8List? executeCommandBytes(Command? command) =>
     throw UnsupportedError('Cannot use without dart:html or dart:io');
 
-Future<Uint8List?> executeCommandBytesAsync(ImageCommand? command) async =>
+Future<Uint8List?> executeCommandBytesAsync(Command? command) async =>
     throw UnsupportedError('Cannot use without dart:html or dart:io');

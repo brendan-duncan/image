@@ -2,12 +2,12 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import '../image/image.dart';
+import 'command.dart';
 import 'execute_result.dart';
-import 'image_command.dart';
 
 class _Params {
   final SendPort port;
-  final ImageCommand? command;
+  final Command? command;
   _Params(this.port, this.command);
 }
 
@@ -28,29 +28,29 @@ Future<ExecuteResult> _getResult(_Params p) {
   Isolate.exit(p.port, ExecuteResult(p.command?.image, p.command?.bytes));
 }
 
-Future<ExecuteResult> executeCommandAsync(ImageCommand? command) async {
+Future<ExecuteResult> executeCommandAsync(Command? command) async {
   final port = ReceivePort();
   await Isolate.spawn(_getResult, _Params(port.sendPort, command));
   return await port.first as ExecuteResult;
 }
 
-Image? executeCommandImage(ImageCommand? command) {
+Image? executeCommandImage(Command? command) {
   command?.execute();
   return command?.image;
 }
 
-Future<Image?> executeCommandImageAsync(ImageCommand? command) async {
+Future<Image?> executeCommandImageAsync(Command? command) async {
   final port = ReceivePort();
   await Isolate.spawn(_getImage, _Params(port.sendPort, command));
   return await port.first as Image?;
 }
 
-Uint8List? executeCommandBytes(ImageCommand? command) {
+Uint8List? executeCommandBytes(Command? command) {
   command?.execute();
   return command?.bytes;
 }
 
-Future<Uint8List?> executeCommandBytesAsync(ImageCommand? command) async {
+Future<Uint8List?> executeCommandBytesAsync(Command? command) async {
   final port = ReceivePort();
   await Isolate.spawn(_getBytes, _Params(port.sendPort, command));
   return await port.first as Uint8List?;

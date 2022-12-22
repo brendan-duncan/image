@@ -15,11 +15,13 @@ class ImageDataInt16 extends ImageData {
       : data = Int16List(width * height * numChannels)
       , super(width, height, numChannels);
 
-  ImageDataInt16.from(ImageDataInt16 other)
-      : data = Int16List.fromList(other.data)
+  ImageDataInt16.from(ImageDataInt16 other, { bool skipPixels = false })
+      : data = skipPixels ? Int16List(other.data.length)
+          : Int16List.fromList(other.data)
       , super(other.width, other.height, other.numChannels);
 
-  ImageDataInt16 clone() => ImageDataInt16.from(this);
+  ImageDataInt16 clone({ bool noPixels = false }) =>
+      ImageDataInt16.from(this, skipPixels: noPixels);
 
   Format get format => Format.int16;
 

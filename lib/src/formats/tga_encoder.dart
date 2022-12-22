@@ -7,7 +7,7 @@ import 'encoder.dart';
 /// Encode a TGA image. This only supports the 24-bit uncompressed format.
 class TgaEncoder extends Encoder {
   @override
-  Uint8List encodeImage(Image image) {
+  Uint8List encode(Image image, { bool singleFrame = false }) {
     final out = OutputBuffer(bigEndian: true);
 
     final header = List<int>.filled(18, 0);

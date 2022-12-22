@@ -8,7 +8,6 @@ import '../color/format.dart';
 import '../exif/exif_data.dart';
 import '../util/image_exception.dart';
 import '../util/interpolation.dart';
-import 'frame_info.dart';
 import 'icc_profile.dart';
 import 'image_data.dart';
 import 'image_data_float16.dart';
@@ -35,44 +34,93 @@ import 'palette_uint32.dart';
 import 'palette_uint8.dart';
 import 'pixel.dart';
 
+/// The type of image this frame represents. Multi-page formats, such as
+/// Tiff, can represent the frames of an animation as pages in a document.
+enum FrameType {
+  /// The frames of this document are to be interpreted as animation.
+  animation,
+  /// The frames of this document are to be interpreted as pages of a document.
+  page,
+  /// The frames of this document are to be interpreted as a sequence of images.
+  sequence
+}
+
+/// An Image is a container for [ImageData] and other various meta-data
+/// representing an image in memory.
 class Image extends Iterable<Pixel> {
   ImageData? data;
+  /// Named non-color channels used by this image.
   Map<String, ImageData>? extraChannels;
-  FrameInfo? _frameInfo;
   IccProfile? iccProfile;
   Map<String, String>? textData;
   ExifData? _exif;
+  /// The suggested background color to clear the canvas with.
+  Color? backgroundColor;
+  /// How many times should the animation loop (0 means forever)?
+  int loopCount;
+  /// How should the frames be interpreted?  If [FrameType.animation], the
+  /// frames are part of an animated sequence. If [FrameType.page], the frames
+  /// are the pages of a document.
+  FrameType frameType;
+  /// The list of sub-frames for the image, if it's an animation. An image
+  /// is considered animated if it has more than one frame, as the first
+  /// frame will be the image itself.
+  late List<Image> frames = [];
+  /// How long this frame should be displayed, in milliseconds.
+  /// A duration of 0 indicates no delay and the next frame will be drawn
+  /// as quickly as it can.
+  int frameDuration;
+  /// Index of this image in the parent animations frame list.
+  int frameIndex;
 
   /// Creates an image with the given dimensions and format.
   Image(int width, int height,
       { Format format = Format.uint8, int numChannels = 3,
-        bool isFrame = false,
         bool withPalette = false,
         Format paletteFormat = Format.uint8,
         Palette? palette, ExifData? exif,
-        IccProfile? iccp, this.textData }) {
+        IccProfile? iccp, this.textData, this.loopCount = 0,
+        this.frameType = FrameType.sequence, this.backgroundColor = null,
+        this.frameDuration = 0, this.frameIndex = 0 }) {
+    frames.add(this);
     _initialize(width, height, format: format, numChannels: numChannels,
-        isFrame: isFrame, withPalette: withPalette,
+        withPalette: withPalette,
         paletteFormat: paletteFormat, palette: palette, exif: exif,
         iccp: iccp);
   }
 
   /// Creates a copy of the given Image [other].
-  Image.from(Image other)
-      : data = other.data?.clone()
-      , _frameInfo = other._frameInfo?.clone()
+  Image.from(Image other, { bool noAnimation = false, bool noPixels = false })
+      : data = other.data?.clone(noPixels: noPixels)
       , _exif = other._exif?.clone()
-      , iccProfile = other.iccProfile?.clone() {
+      , iccProfile = other.iccProfile?.clone()
+      , frameType = other.frameType
+      , loopCount = other.loopCount
+      , backgroundColor = other.backgroundColor?.clone()
+      , frameDuration = other.frameDuration
+      , frameIndex = other.frameIndex {
     if (other.extraChannels != null) {
       extraChannels = Map<String, ImageData>.from(other.extraChannels!);
     }
     if (other.textData != null) {
       textData = Map<String, String>.from(other.textData!);
     }
+    frames.add(this);
+    if (!noAnimation && other.hasAnimation) {
+      final numFrames = other.numFrames;
+      for (var fi = 1; fi < numFrames; ++fi) {
+        final frame = other.frames[fi];
+        addFrame(Image.from(frame));
+      }
+    }
   }
 
   /// Creates an empty image.
-  Image.empty();
+  Image.empty()
+      : loopCount = 0
+      , frameType = FrameType.sequence
+      , frameDuration = 0
+      , frameIndex = 0;
 
   /// Create an image from raw data in [bytes].
   ///
@@ -88,15 +136,16 @@ class Image extends Iterable<Pixel> {
   Image.fromBytes(int width, int height, ByteBuffer bytes,
       { Format format = Format.uint8, int numChannels = 3,
         int? rowStride,
-        bool isFrame = false,
         bool withPalette = false,
         Format paletteFormat = Format.uint8,
         Palette? palette, ExifData? exif,
-        IccProfile? iccp, this.textData }) {
+        IccProfile? iccp, this.textData, this.loopCount = 0,
+        this.frameType = FrameType.sequence, this.backgroundColor = null,
+        this.frameDuration = 0, this.frameIndex = 0 }) {
+    frames.add(this);
     _initialize(width, height, format: format, numChannels: numChannels,
-        isFrame: isFrame, withPalette: withPalette,
-        paletteFormat: paletteFormat, palette: palette, exif: exif,
-        iccp: iccp);
+        withPalette: withPalette, paletteFormat: paletteFormat,
+        palette: palette, exif: exif, iccp: iccp);
 
     if (data == null) {
       return;
@@ -117,9 +166,33 @@ class Image extends Iterable<Pixel> {
     }
   }
 
+
+  /// An image is considered animated if it has more than one frame, as the
+  /// first image in the frames list is the image itself.
+  bool get hasAnimation => frames.length > 1;
+
+  /// The number of frames in this Image. An Image will have at least one
+  /// frame, itself, so it's considered animated if it has more than one
+  /// frame.
+  int get numFrames => frames.length;
+
+  /// Get a frame from this image. If the Image is not animated, this
+  /// Image will be returned; otherwise the particular frame Image will
+  /// be returned.
+  Image getFrame(int index) => frames[index];
+
+  /// Add a frame to the animation of this Image.
+  Image addFrame([Image? image]) {
+    image ??= Image.from(this, noAnimation: true, noPixels: true);
+    image.frameIndex = frames.length;
+    if (frames.last != image) {
+      frames.add(image);
+    }
+    return image;
+  }
+
   void _initialize(int width, int height,
       { Format format = Format.uint8, int numChannels = 3,
-        bool isFrame = false,
         bool withPalette = false,
         Format paletteFormat = Format.uint8,
         Palette? palette, ExifData? exif,
@@ -131,9 +204,6 @@ class Image extends Iterable<Pixel> {
     this.iccProfile = iccp;
     if (exif != null) {
       _exif = ExifData.from(exif);
-    }
-    if (isFrame) {
-      _frameInfo = FrameInfo();
     }
     if (palette == null && withPalette && supportsPalette) {
       palette = _createPalette(paletteFormat, numChannels);
@@ -213,19 +283,6 @@ class Image extends Iterable<Pixel> {
   /// The general type of the format, whether it's Uint data, Int data, or
   /// Float data (regardless of precision).
   FormatType get formatType => data?.formatType ?? FormatType.uint;
-
-  /// If the image has animation frame info.
-  bool get hasFrameInfo => _frameInfo != null;
-
-  /// The animation frame metadata for the image.
-  FrameInfo get frameInfo {
-    if (_frameInfo == null) {
-      _frameInfo = FrameInfo();
-    }
-    return _frameInfo!;
-  }
-
-  void set frameInfo(FrameInfo f) => _frameInfo = f;
 
   /// The exif metadata for the image. If an ExifData hasn't been created
   /// for the image yet, one will be added.
@@ -491,9 +548,11 @@ class Image extends Iterable<Pixel> {
 
     final newImage = Image(width, height, format: format,
         numChannels: numChannels,
-        exif: _exif?.clone(), iccp: iccProfile?.clone())
-    ..textData = textData != null ? Map<String, String>.from(textData!) : null
-    .._frameInfo = _frameInfo?.clone();
+        exif: _exif?.clone(), iccp: iccProfile?.clone(),
+        backgroundColor: backgroundColor?.clone(),
+        frameType: frameType, loopCount: loopCount,
+        frameDuration: frameDuration)
+    ..textData = textData != null ? Map<String, String>.from(textData!) : null;
 
     Pixel? p2;
     for (var p in newImage) {

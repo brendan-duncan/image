@@ -13,7 +13,7 @@ void curTest() {
       ..clear(ColorRgb8(100, 200, 255));
 
       // Encode the image to CUR
-      final png = CurEncoder().encodeImage(image);
+      final png = CurEncoder().encode(image);
       File('$testOutputPath/cur/encode.cur')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);

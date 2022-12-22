@@ -16,21 +16,21 @@ void bmpTest() {
       final name = f.uri.pathSegments.last;
       test(name, () {
         final bytes = f.readAsBytesSync();
-        final image = BmpDecoder().decodeImage(bytes);
+        final image = BmpDecoder().decode(bytes);
         if (image == null) {
           throw ImageException('Unable to decode BMP Image: $name.');
         }
 
-        final bmp = BmpEncoder().encodeImage(image);
+        final bmp = BmpEncoder().encode(image);
         File('$testOutputPath/bmp/$name.bmp')
           ..createSync(recursive: true)
           ..writeAsBytesSync(bmp);
 
-        final image2 = BmpDecoder().decodeImage(bmp)!;
+        final image2 = BmpDecoder().decode(bmp)!;
 
         testImageEquals(image2, image);
 
-        final bmp2 = BmpEncoder().encodeImage(image2);
+        final bmp2 = BmpEncoder().encode(image2);
         File('$testOutputPath/bmp/${name}2.bmp')
           ..createSync(recursive: true)
           ..writeAsBytesSync(bmp2);

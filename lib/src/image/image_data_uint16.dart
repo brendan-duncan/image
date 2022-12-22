@@ -15,11 +15,13 @@ class ImageDataUint16 extends ImageData {
       : data = Uint16List(width * height * numChannels)
       , super(width, height, numChannels);
 
-  ImageDataUint16.from(ImageDataUint16 other)
-      : data = Uint16List.fromList(other.data)
+  ImageDataUint16.from(ImageDataUint16 other, { bool skipPixels = false })
+      : data = skipPixels ? Uint16List(other.data.length)
+          : Uint16List.fromList(other.data)
       , super(other.width, other.height, other.numChannels);
 
-  ImageDataUint16 clone() => ImageDataUint16.from(this);
+  ImageDataUint16 clone({ bool noPixels = false }) =>
+      ImageDataUint16.from(this, skipPixels: noPixels);
 
   Format get format => Format.uint16;
 

@@ -114,7 +114,7 @@ List<int> findTrim(Image src,
 /// and can be any combination of [Trim.top], [Trim.bottom], [Trim.left],
 /// and [Trim.right].
 Image trim(Image src,
-    {TrimMode mode = TrimMode.transparent, Trim sides = Trim.all}) {
+    { TrimMode mode = TrimMode.transparent, Trim sides = Trim.all }) {
   if (mode == TrimMode.transparent && src.numChannels == 3) {
     return Image.from(src);
   }

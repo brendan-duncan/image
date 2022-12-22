@@ -7,7 +7,7 @@ import '../test_util.dart';
 void grayscaleTest() {
   test('grayscale', () {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
-    final i0 = PngDecoder().decodeImage(bytes)!;
+    final i0 = decodePng(bytes)!;
     grayscale(i0);
     File('$testOutputPath/filter/grayscale.png')
       ..createSync(recursive: true)

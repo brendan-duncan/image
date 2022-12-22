@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import '../filter/dither_image.dart';
-import '../image/animation.dart';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/neural_quantizer.dart';
@@ -32,7 +31,7 @@ class GifEncoder extends Encoder {
   /// This adds the frame passed to [image].
   /// After the last frame has been added, [finish] is required to be called.
   /// Optional frame [duration] is in 1/100 sec.
-  void addFrame(Image image, {int? duration}) {
+  void addFrame(Image image, { int? duration }) {
     if (output == null) {
       output = OutputBuffer();
 
@@ -79,6 +78,7 @@ class GifEncoder extends Encoder {
     } else {
       _lastImage = image;
     }
+
     _lastImageDuration = duration;
   }
 
@@ -117,25 +117,23 @@ class GifEncoder extends Encoder {
 
   /// Encode a single frame image.
   @override
-  Uint8List encodeImage(Image image) {
-    addFrame(image);
+  Uint8List encode(Image image, { bool singleFrame = false }) {
+    if (!image.hasAnimation || singleFrame) {
+      addFrame(image);
+      return finish()!;
+    }
+
+    repeat = image.loopCount;
+    for (var f in image.frames) {
+      // Convert ms to 1/100 sec.
+      addFrame(f, duration: f.frameDuration ~/ 10);
+    }
     return finish()!;
   }
 
   /// Does this encoder support animation?
   @override
   bool get supportsAnimation => true;
-
-  /// Encode an animation.
-  @override
-  Uint8List encodeAnimation(Animation anim) {
-    repeat = anim.loopCount;
-    for (var f in anim) {
-      // Convert ms to 1/100 sec.
-      addFrame(f, duration: f.frameInfo.duration ~/ 10);
-    }
-    return finish()!;
-  }
 
   void _addImage(Image image, int width, int height) {
     if (!image.hasPalette) {
@@ -388,13 +386,14 @@ class GifEncoder extends Encoder {
       }
     }
 
-    const dispose = 0; // dispose = no action
+    const dispose = 2; // dispose: 0 = no action, 2 = clear
+    final fields = 0 | // 1:3 reserved
+        (dispose << 2) | // 4:6 disposal
+        0 | // 7   user input - 0 = none
+        hasTransparency; // 8   transparency flag
 
     // packed fields
-    output!.writeByte(0 | // 1:3 reserved
-        dispose | // 4:6 disposal
-        0 | // 7   user input - 0 = none
-        hasTransparency); // 8   transparency flag
+    output!.writeByte(fields);
 
     output!.writeUint16(_lastImageDuration ?? delay); // delay x 1/100 sec
     output!.writeByte(transparentIndex); // transparent color index

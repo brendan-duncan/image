@@ -15,11 +15,13 @@ class ImageDataFloat64 extends ImageData {
       : data = Float64List(width * height * 4 * numChannels)
       , super(width, height, numChannels);
 
-  ImageDataFloat64.from(ImageDataFloat64 other)
-      : data = Float64List.fromList(other.data)
+  ImageDataFloat64.from(ImageDataFloat64 other, { bool skipPixels = false })
+      : data = skipPixels ? Float64List(other.data.length)
+          : Float64List.fromList(other.data)
       , super(other.width, other.height, other.numChannels);
 
-  ImageDataFloat64 clone() => ImageDataFloat64.from(this);
+  ImageDataFloat64 clone({ bool noPixels = false }) =>
+      ImageDataFloat64.from(this, skipPixels: noPixels);
 
   Format get format => Format.float64;
 

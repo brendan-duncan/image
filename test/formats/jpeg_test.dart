@@ -8,7 +8,7 @@ void jpegTest() {
   group('jpg', () {
     test('decode', () {
       final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
-      final image = JpegDecoder().decodeImage(fb)!;
+      final image = JpegDecoder().decode(fb)!;
       expect(image.width, equals(300));
       expect(image.height, equals(186));
       expect(image.numChannels, equals(3));
@@ -19,7 +19,7 @@ void jpegTest() {
 
     test('encode', () {
       final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
-      final image = JpegDecoder().decodeImage(fb)!;
+      final image = JpegDecoder().decode(fb)!;
       File('$testOutputPath/jpg/encode.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(image));
@@ -27,7 +27,7 @@ void jpegTest() {
 
     test('progressive', () {
       final fb = File('test/_data/jpg/progress.jpg').readAsBytesSync();
-      final image = JpegDecoder().decodeImage(fb)!;
+      final image = JpegDecoder().decode(fb)!;
       expect(image.width, 341);
       expect(image.height, 486);
       File('$testOutputPath/jpg/progressive.png')
@@ -37,11 +37,11 @@ void jpegTest() {
 
     test('exif', () {
       final fb = File('test/_data/jpg/big_buck_bunny.jpg').readAsBytesSync();
-      final image = JpegDecoder().decodeImage(fb)!;
+      final image = JpegDecoder().decode(fb)!;
       image.exif.imageIfd['XResolution'] = [300,1];
       image.exif.imageIfd['YResolution'] = [300,1];
-      final jpg = JpegEncoder().encodeImage(image);
-      final image2 = JpegDecoder().decodeImage(jpg)!;
+      final jpg = JpegEncoder().encode(image);
+      final image2 = JpegDecoder().decode(jpg)!;
       expect(image.exif.imageIfd['XResolution'],
           equals(image2.exif.imageIfd['XResolution']));
       expect(image.exif.imageIfd['YResolution'],
@@ -55,19 +55,19 @@ void jpegTest() {
         continue;
       }
 
-      final name = f.path.split(RegExp(r'(/|\\)')).last;
+      final name = f.uri.pathSegments.last;
       test(name, () {
         final bytes = f.readAsBytesSync();
         expect(JpegDecoder().isValidFile(bytes), equals(true));
 
-        final image = JpegDecoder().decodeImage(bytes)!;
-        final outJpg = JpegEncoder().encodeImage(image);
+        final image = JpegDecoder().decode(bytes)!;
+        final outJpg = JpegEncoder().encode(image);
         File('$testOutputPath/jpg/$name.jpg')
           ..createSync(recursive: true)
           ..writeAsBytesSync(outJpg);
 
         // Make sure we can read what we just wrote.
-        final image2 = JpegDecoder().decodeImage(outJpg)!;
+        final image2 = JpegDecoder().decode(outJpg)!;
         expect(image.width, equals(image2.width));
         expect(image.height, equals(image2.height));
       });
@@ -75,19 +75,19 @@ void jpegTest() {
 
     for (var i = 1; i < 9; ++i) {
       test('exif/orientation_$i/landscape', () {
-        final image = JpegDecoder().decodeImage(
+        final image = JpegDecoder().decode(
             File('test/_data/jpg/landscape_$i.jpg').readAsBytesSync())!;
         File('$testOutputPath/jpg/landscape_$i.jpg')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(JpegEncoder().encodeImage(image));
+          ..writeAsBytesSync(JpegEncoder().encode(image));
       });
 
       test('exif/orientation_$i/portrait', () {
-        final image = JpegDecoder().decodeImage(
+        final image = JpegDecoder().decode(
             File('test/_data/jpg/portrait_$i.jpg').readAsBytesSync())!;
         File('$testOutputPath/jpg/portrait_$i.jpg')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(JpegEncoder().encodeImage(image));
+          ..writeAsBytesSync(JpegEncoder().encode(image));
       });
     }
   });

@@ -337,7 +337,7 @@ class TiffImage {
         byteData = InputBuffer(outData);
       } else if (compression == TiffCompression.oldJpeg) {
         final data = p.toList(0, byteCount);
-        final tile = JpegDecoder().decodeImage(data as Uint8List);
+        final tile = JpegDecoder().decode(data as Uint8List);
         if (tile != null) {
           _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight);
         }

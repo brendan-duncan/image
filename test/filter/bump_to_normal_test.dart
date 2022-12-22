@@ -7,7 +7,7 @@ import '../test_util.dart';
 void bumpToNormalTest() {
   test('bumpToNormal', () {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
-    final i0 = PngDecoder().decodeImage(bytes)!;
+    final i0 = decodePng(bytes)!;
     bumpToNormal(i0);
     File('$testOutputPath/filter/bumpToNormal.png')
       ..createSync(recursive: true)

@@ -17,7 +17,7 @@ void psdTest() {
 
       final name = f.uri.pathSegments.last;
       test(name, () {
-        final psd = PsdDecoder().decodeImage(f.readAsBytesSync());
+        final psd = PsdDecoder().decode(f.readAsBytesSync());
         expect(psd, isNotNull);
         File('$testOutputPath/psd/$name.png')
           ..createSync(recursive: true)

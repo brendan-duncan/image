@@ -13,7 +13,7 @@ void exrTest() {
       ..startDecode(bytes);
       final img = dec.decodeFrame(0)!;
 
-      final png = PngEncoder().encodeImage(img);
+      final png = PngEncoder().encode(img);
       File('$testOutputPath/exr/grid.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);

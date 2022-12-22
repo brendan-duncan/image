@@ -38,7 +38,7 @@ void pvrtcTest() {
 
     test('encode_rgba_4bpp', () {
       final bytes = File('test/_data/png/alpha_edge.png').readAsBytesSync();
-      final image = PngDecoder().decodeImage(bytes)!;
+      final image = PngDecoder().decode(bytes)!;
 
       File('$testOutputPath/pvr/alpha_before.png')
         ..createSync(recursive: true)

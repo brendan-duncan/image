@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import '../image/animation.dart';
 import '../image/image.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
@@ -41,26 +40,11 @@ class ExrDecoder extends Decoder {
   }
 
   @override
-  Image? decodeImage(Uint8List bytes, {int frame = 0}) {
+  Image? decode(Uint8List bytes, { int? frame }) {
     if (startDecode(bytes) == null) {
       return null;
     }
 
-    return decodeFrame(frame);
-  }
-
-  @override
-  Animation? decodeAnimation(Uint8List bytes) {
-    final image = decodeImage(bytes);
-    if (image == null) {
-      return null;
-    }
-
-    final anim = Animation()
-    ..width = image.width
-    ..height = image.height
-    ..addFrame(image);
-
-    return anim;
+    return decodeFrame(frame ?? 0);
   }
 }

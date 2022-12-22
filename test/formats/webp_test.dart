@@ -10,12 +10,14 @@ void webpTest() {
     group('decode lossless', () {
       const name = 'test';
       test('$name.webp', () {
-        final webp = decodeWebP(File('$path/$name.webp').readAsBytesSync())!;
-        final png = decodePng(File('$path/$name.png').readAsBytesSync())!;
+        final webp = decodeWebP(File('$path/$name.webp').readAsBytesSync());
+        expect(webp, isNotNull);
+        final png = decodePng(File('$path/$name.png').readAsBytesSync());
+        expect(png, isNotNull);
         File('$testOutputPath/webp/$name.png')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(PngEncoder().encodeImage(webp));
-        testImageEquals(webp, png);
+          ..writeAsBytesSync(PngEncoder().encode(webp!));
+        testImageEquals(webp, png!);
       });
     });
 
@@ -56,15 +58,15 @@ void webpTest() {
     group('decode', () {
       test('validate', () {
         var bytes = File('test/_data/webp/2b.webp').readAsBytesSync();
-        final image = WebPDecoder().decodeImage(bytes)!;
-        final png = PngEncoder().encodeImage(image);
+        final image = WebPDecoder().decode(bytes)!;
+        final png = PngEncoder().encode(image);
         File('$testOutputPath/webp/decode.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
 
         // Validate decoding.
         bytes = File('test/_data/webp/2b.png').readAsBytesSync();
-        final debugImage = PngDecoder().decodeImage(bytes)!;
+        final debugImage = PngDecoder().decode(bytes)!;
 
         testImageEquals(image, debugImage);
       });
@@ -77,12 +79,12 @@ void webpTest() {
         final name = f.uri.pathSegments.last;
         test(name, () {
           final List<int> bytes = f.readAsBytesSync();
-          final image = WebPDecoder().decodeImage(bytes);
+          final image = WebPDecoder().decode(bytes);
           if (image == null) {
             throw ImageException('Unable to decode WebP Image: $name.');
           }
 
-          final png = PngEncoder().encodeImage(image);
+          final png = PngEncoder().encode(image);
           File('$testOutputPath/webp/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(png);
@@ -94,17 +96,17 @@ void webpTest() {
       test('transparent animation', () {
         const path = 'test/_data/webp/animated_transparency.webp';
         final bytes = File(path).readAsBytesSync();
-        final anim = WebPDecoder().decodeAnimation(bytes)!;
+        final anim = WebPDecoder().decode(bytes)!;
 
         expect(anim.numFrames, equals(20));
-        expect(anim.frames[2].getPixel(0, 0), equals([0, 0, 0]));
 
         for (var i = 0; i < anim.numFrames; ++i) {
-          final image = anim.frames[i];
+          final image = anim.getFrame(i);
           File('$testOutputPath/webp/animated_transparency_$i.png')
             ..createSync(recursive: true)
-            ..writeAsBytesSync(PngEncoder().encodeImage(image));
+            ..writeAsBytesSync(PngEncoder().encode(image));
         }
+        expect(anim.getFrame(2).getPixel(0, 0), equals([0, 0, 0, 0]));
       });
     });
   });

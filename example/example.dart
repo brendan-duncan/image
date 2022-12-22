@@ -1,7 +1,7 @@
 import 'package:image/image.dart' as DIL;
 
 void main() async {
-  final cmd = DIL.ImageCommand()
+  final cmd = DIL.Command()
     // Read a WebP image from a file.
     ..decodeImageFile('test.webp')
     // Resize the image so its width is 120 and height maintains aspect ratio.

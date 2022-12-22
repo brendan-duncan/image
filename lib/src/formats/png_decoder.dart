@@ -6,7 +6,6 @@ import 'package:archive/archive.dart';
 import '../color/color_uint8.dart';
 import '../color/format.dart';
 import '../draw/draw_image.dart';
-import '../image/animation.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/palette_uint8.dart';
@@ -440,30 +439,17 @@ class PngDecoder extends Decoder {
   }
 
   @override
-  Image? decodeImage(Uint8List bytes, {int frame = 0}) {
-    if (startDecode(bytes) == null) {
-      return null;
-    }
-    return decodeFrame(frame);
-  }
-
-  @override
-  Animation? decodeAnimation(Uint8List bytes) {
+  Image? decode(Uint8List bytes, { int? frame }) {
     if (startDecode(bytes) == null) {
       return null;
     }
 
-    final anim = Animation()
-    ..width = _info.width
-    ..height = _info.height;
-
-    if (!_info.isAnimated) {
-      final image = decodeFrame(0)!;
-      anim.addFrame(image);
-      return anim;
+    if (!_info.isAnimated || frame != null) {
+      return decodeFrame(frame ?? 0)!;
     }
 
-    Image? lastImage = null;
+    Image? firstImage;
+    Image? lastImage;
     for (var i = 0; i < _info.numFrames; ++i) {
       final frame = _info.frames[i];
       final image = decodeFrame(i);
@@ -471,28 +457,28 @@ class PngDecoder extends Decoder {
         continue;
       }
 
-      if (lastImage == null) {
-        lastImage = image;
+      if (firstImage == null || lastImage == null) {
+        firstImage = image;
+        lastImage = image
         // Convert to MS
-        lastImage.frameInfo.duration = (frame.delay * 1000).toInt();
-        anim.addFrame(lastImage);
+        ..frameDuration = (frame.delay * 1000).toInt();
         continue;
       }
 
       if (image.width == lastImage.width && image.height == lastImage.height &&
           frame.xOffset == 0 && frame.yOffset == 0 &&
           frame.blend == PngBlendMode.source) {
-        lastImage = image;
+        lastImage = image
         // Convert to MS
-        lastImage.frameInfo.duration = (frame.delay * 1000).toInt();
-        anim.addFrame(lastImage);
+        ..frameDuration = (frame.delay * 1000).toInt();
+        firstImage.addFrame(lastImage);
         continue;
       }
 
       final dispose = frame.dispose;
       if (dispose == PngDisposeMode.background) {
         lastImage = Image.from(lastImage)
-        ..clear(_info.backgroundColor);
+          ..clear(_info.backgroundColor);
       } else if (dispose == PngDisposeMode.previous) {
         lastImage = Image.from(lastImage);
       } else {
@@ -500,17 +486,17 @@ class PngDecoder extends Decoder {
       }
 
       // Convert to MS
-      lastImage.frameInfo.duration = (frame.delay * 1000).toInt();
+      lastImage.frameDuration = (frame.delay * 1000).toInt();
 
       drawImage(lastImage, image,
           dstX: frame.xOffset,
           dstY: frame.yOffset,
           blend: frame.blend == PngBlendMode.over);
 
-      anim.addFrame(lastImage);
+      firstImage.addFrame(lastImage);
     }
 
-    return anim;
+    return firstImage;
   }
 
   // Process a pass of an interlaced image.

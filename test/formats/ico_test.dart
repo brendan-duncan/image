@@ -13,7 +13,7 @@ void icoTest() {
       ..clear(ColorRgb8(100, 200, 255));
 
       // Encode the image to ICO
-      final ico = IcoEncoder().encodeImage(image);
+      final ico = IcoEncoder().encode(image);
       File('$testOutputPath/ico/encode.ico')
         ..createSync(recursive: true)
         ..writeAsBytesSync(ico);

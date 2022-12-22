@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 
 import '../color/format.dart';
-import '../image/animation.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/palette.dart';
@@ -111,24 +110,20 @@ class PngEncoder extends Encoder {
   @override
   bool get supportsAnimation => true;
 
-  /// Encode an animation.
+  /// Encode [image] to the PNG format.
   @override
-  Uint8List encodeAnimation(Animation anim) {
-    isAnimated = true;
-    _frames = anim.frames.length;
-    repeat = anim.loopCount;
-
-    for (var f in anim) {
-      addFrame(f);
+  Uint8List encode(Image image, { bool singleFrame = false }) {
+    if (!image.hasAnimation || singleFrame) {
+      isAnimated = false;
+      addFrame(image);
+    } else {
+      isAnimated = true;
+      _frames = image.frames.length;
+      repeat = image.loopCount;
+      for (var f in image.frames) {
+        addFrame(f);
+      }
     }
-    return finish()!;
-  }
-
-  /// Encode a single frame image.
-  @override
-  Uint8List encodeImage(Image image) {
-    isAnimated = false;
-    addFrame(image);
     return finish()!;
   }
 
@@ -164,12 +159,12 @@ class PngEncoder extends Encoder {
     ..writeUint32(sequenceNumber)
     ..writeUint32(image.width)
     ..writeUint32(image.height)
-    ..writeUint32(image.frameInfo.xOffset)
-    ..writeUint32(image.frameInfo.yOffset)
-    ..writeUint16(image.frameInfo.duration)
+    ..writeUint32(0) // xOffset
+    ..writeUint32(0) // yOffset
+    ..writeUint16(image.frameDuration)
     ..writeUint16(1000) // delay denominator
-    ..writeByte(image.frameInfo.disposeMethod.index)
-    ..writeByte(image.frameInfo.blendMethod.index);
+    ..writeByte(0) // dispose method
+    ..writeByte(0); // blend method
     _writeChunk(output!, 'fcTL', chunk.getBytes());
   }
 

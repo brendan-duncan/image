@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import '../color/format.dart';
-import '../image/animation.dart';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
 import 'bmp/bmp_info.dart';
@@ -98,30 +97,12 @@ class BmpDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
-  Image? decodeImage(Uint8List data, {int frame = 0}) {
+  Image? decode(Uint8List data, { int? frame }) {
     if (!isValidFile(data)) {
       return null;
     }
     startDecode(data);
-    return decodeFrame(frame);
-  }
-
-  /// Decode all of the frames from an animation. If the file is not an
-  /// animation, a single frame animation is returned. If there was a problem
-  /// decoding the file, null is returned.
-  @override
-  Animation? decodeAnimation(Uint8List data) {
-    if (!isValidFile(data)) {
-      return null;
-    }
-    final image = decodeImage(data)!;
-
-    final anim = Animation()
-    ..width = image.width
-    ..height = image.height
-    ..addFrame(image);
-
-    return anim;
+    return decodeFrame(frame ?? 0);
   }
 }
 

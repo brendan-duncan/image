@@ -11,7 +11,7 @@ import 'tiff/tiff_image.dart';
 /// Encode am [Image] to the TIFF format.
 class TiffEncoder extends Encoder {
   @override
-  Uint8List encodeImage(Image image) {
+  Uint8List encode(Image image, { bool singleFrame = false }) {
     final out = OutputBuffer();
     _writeHeader(out);
     _writeImage(out, image);

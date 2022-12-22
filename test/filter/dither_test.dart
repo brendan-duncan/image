@@ -7,7 +7,7 @@ import '../test_util.dart';
 void ditherTest() {
   test('dither', () {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
-    final i0 = PngDecoder().decodeImage(bytes)!;
+    final i0 = decodePng(bytes)!;
 
     var id = ditherImage(i0);
     File('$testOutputPath/filter/dither_FloydSteinberg.bmp')

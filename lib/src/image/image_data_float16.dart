@@ -16,11 +16,13 @@ class ImageDataFloat16 extends ImageData {
       : data = Uint16List(width * height * numChannels)
       , super(width, height, numChannels);
 
-  ImageDataFloat16.from(ImageDataFloat16 other)
-      : data = Uint16List.fromList(other.data)
+  ImageDataFloat16.from(ImageDataFloat16 other, { bool skipPixels = false })
+      : data = skipPixels ? Uint16List(other.data.length) :
+          Uint16List.fromList(other.data)
       , super(other.width, other.height, other.numChannels);
 
-  ImageDataFloat16 clone() => ImageDataFloat16.from(this);
+  ImageDataFloat16 clone({ bool noPixels = false }) =>
+      ImageDataFloat16.from(this, skipPixels: noPixels);
 
   Format get format => Format.float16;
 

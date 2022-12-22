@@ -7,7 +7,7 @@ import '../test_util.dart';
 void gaussianBlurTest() {
   test('gaussianBlur', () {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
-    final i0 = PngDecoder().decodeImage(bytes)!;
+    final i0 = decodePng(bytes)!;
     gaussianBlur(i0, 10);
     File('$testOutputPath/filter/gaussianBlur.png')
       ..createSync(recursive: true)

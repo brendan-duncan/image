@@ -1,12 +1,12 @@
 import '../../color/color.dart';
 import '../../draw/fill.dart';
-import '../image_command.dart';
+import '../command.dart';
 
-class FillCmd extends ImageCommand {
-  ImageCommand? input;
+class FillCmd extends Command {
   Color color;
 
-  FillCmd(this.input, this.color);
+  FillCmd(Command? input, this.color)
+      : super(input);
 
   @override
   void executeCommand() {

@@ -1,3 +1,4 @@
+import 'cmd/cmd_tests.dart';
 import 'color/color_tests.dart';
 import 'draw/draw_tests.dart';
 import 'exif/exif_tests.dart';
@@ -9,6 +10,7 @@ import 'transform/transform_tests.dart';
 import 'util/util_tests.dart';
 
 void main() {
+  cmdTests();
   colorTests();
   exifTests();
   fontTests();

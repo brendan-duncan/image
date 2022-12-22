@@ -1,7 +1,7 @@
 import '../../image/image.dart';
-import '../image_command.dart';
+import '../command.dart';
 
-class ImageCmd extends ImageCommand {
+class ImageCmd extends Command {
   ImageCmd(Image image) {
     this.image = image;
   }

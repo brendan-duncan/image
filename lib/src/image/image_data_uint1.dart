@@ -28,13 +28,15 @@ class ImageDataUint1 extends ImageData {
     data = Uint8List(max(rowStride * height, 1));
   }
 
-  ImageDataUint1.from(ImageDataUint1 other)
-      : data = Uint8List.fromList(other.data)
+  ImageDataUint1.from(ImageDataUint1 other, { bool skipPixels = false })
+      : data = skipPixels ? Uint8List(other.data.length)
+          : Uint8List.fromList(other.data)
       , rowStride = other.width * other.numChannels
       , palette = other.palette?.clone()
       , super(other.width, other.height, other.numChannels);
 
-  ImageDataUint1 clone() => ImageDataUint1.from(this);
+  ImageDataUint1 clone({ bool noPixels = false }) =>
+      ImageDataUint1.from(this, skipPixels: noPixels);
 
   Format get format => Format.uint1;
 

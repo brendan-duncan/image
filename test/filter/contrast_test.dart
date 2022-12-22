@@ -7,7 +7,7 @@ import '../test_util.dart';
 void contrastTest() {
   test('contrast', () {
     final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
-    final i0 = PngDecoder().decodeImage(bytes)!;
+    final i0 = decodePng(bytes)!;
     contrast(i0, 150);
     File('$testOutputPath/filter/contrast.png')
       ..createSync(recursive: true)

@@ -15,11 +15,13 @@ class ImageDataFloat32 extends ImageData {
       : data = Float32List(width * height * numChannels)
       , super(width, height, numChannels);
 
-  ImageDataFloat32.from(ImageDataFloat32 other)
-      : data = Float32List.fromList(other.data)
+  ImageDataFloat32.from(ImageDataFloat32 other, { bool skipPixels = false })
+      : data = skipPixels ? Float32List(other.data.length)
+          : Float32List.fromList(other.data)
       , super(other.width, other.height, other.numChannels);
 
-  ImageDataFloat32 clone() => ImageDataFloat32.from(this);
+  ImageDataFloat32 clone({ bool noPixels = false }) =>
+      ImageDataFloat32.from(this, skipPixels: noPixels);
 
   Format get format => Format.float32;
 
