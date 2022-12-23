@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the decodeFrame method from the PngDecoder class, for the Dart programming language.">
+  <title>decodeFrame method - PngDecoder class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/PngDecoder-class.html">PngDecoder</a></li>
+    <li class="self-crumb">decodeFrame method</li>
+  </ol>
+  <div class="self-name">decodeFrame</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">decodeFrame</span> method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
+
+<span class="returntype"><a href="../../image/Image-class.html">Image</a>?</span>
+<span class="name ">decodeFrame</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="decodeFrame-param-frame"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">frame</span></span></li>
+</ol>)
+
+      <div class="features"><span class="feature">override</span></div>
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Decode the frame (assuming <a href="../../image/PngDecoder/startDecode.html">startDecode</a> has already been called).</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">@override
+Image? decodeFrame(int frame) {
+  Uint8List imageData;
+
+  int? width = _info.width;
+  int? height = _info.height;
+
+  if (!_info.isAnimated || frame == 0) {
+    final dataBlocks = &lt;Uint8List&gt;[];
+    var totalSize = 0;
+    final len = _info.idat.length;
+    for (var i = 0; i &lt; len; ++i) {
+      _input.offset = _info.idat[i];
+      final chunkSize = _input.readUint32();
+      final chunkType = _input.readString(4);
+      final data = _input.readBytes(chunkSize).toUint8List();
+      totalSize += data.length;
+      dataBlocks.add(data);
+      final crc = _input.readUint32();
+      final computedCrc = _crc(chunkType, data);
+      if (crc != computedCrc) {
+        throw ImageException(&#39;Invalid $chunkType checksum&#39;);
+      }
+    }
+    imageData = Uint8List(totalSize);
+    var offset = 0;
+    for (var data in dataBlocks) {
+      imageData.setAll(offset, data);
+      offset += data.length;
+    }
+  } else {
+    if (frame &lt; 0 || frame &gt;= _info.frames.length) {
+      throw ImageException(&#39;Invalid Frame Number: $frame&#39;);
+    }
+
+    final f = _info.frames[frame] as InternalPngFrame;
+    width = f.width;
+    height = f.height;
+    var totalSize = 0;
+    final dataBlocks = &lt;Uint8List&gt;[];
+    for (var i = 0; i &lt; f.fdat.length; ++i) {
+      _input.offset = f.fdat[i];
+      final chunkSize = _input.readUint32();
+      _input..readString(4) &#47;&#47; fDat chunk header
+      ..skip(4); &#47;&#47; sequence number
+      final data = _input.readBytes(chunkSize - 4).toUint8List();
+      totalSize += data.length;
+      dataBlocks.add(data);
+    }
+    imageData = Uint8List(totalSize);
+    var offset = 0;
+    for (var data in dataBlocks) {
+      imageData.setAll(offset, data);
+      offset += data.length;
+    }
+  }
+
+  var numChannels = _info.colorType == PngColorType.indexed ? 1
+      : _info.colorType == PngColorType.grayscale ? 1
+      : _info.colorType == PngColorType.grayscaleAlpha ? 2
+      : _info.colorType == PngColorType.rgba ? 4
+      : 3;
+
+  List&lt;int&gt; uncompressed;
+  try {
+    uncompressed = const ZLibDecoder().decodeBytes(imageData);
+  } catch (error) {
+    print(error);
+    return null;
+  }
+
+  &#47;&#47; input is the decompressed data.
+  final input = InputBuffer(uncompressed, bigEndian: true);
+  _resetBits();
+
+  PaletteUint8? palette;
+
+  &#47;&#47; Non-indexed PNGs may have a palette, but it only provides a suggested
+  &#47;&#47; set of colors to which an RGB color can be quantized if not displayed
+  &#47;&#47; directly. In this case, just ignore the palette.
+  if (_info.colorType == PngColorType.indexed) {
+    if (_info.palette != null) {
+      final p = _info.palette!;
+      final numColors = p.length ~&#47; 3;
+      final t = _info.transparency;
+      final tl = t != null ? t.length : 0;
+      final nc = t != null ? 4 : 3;
+      palette = PaletteUint8(numColors, nc);
+      for (var i = 0, pi = 0; i &lt; numColors; ++i, pi += 3) {
+        var a = 255;
+        if (nc == 4 &amp;&amp; i &lt; tl) {
+          a = t![i];
+        }
+        palette.setColor(i, p[pi]!, p[pi + 1]!, p[pi + 2]!, a);
+      }
+    }
+  }
+
+  &#47;&#47; grayscale images with no palette but with transparency, get
+  &#47;&#47; converted to a indexed palette image.
+  if (_info.colorType == PngColorType.grayscale &amp;&amp;
+      _info.transparency != null &amp;&amp; palette == null &amp;&amp;
+      _info.bits &lt;= 8) {
+    final t = _info.transparency!;
+    final nt = t.length;
+    final numColors = 1 &lt;&lt; _info.bits;
+    palette = PaletteUint8(numColors, 4);
+    &#47;&#47; palette color are 8-bit, so convert the grayscale bit value to the
+    &#47;&#47; 8-bit palette value.
+    final to8bit = _info.bits == 1 ? 255
+        : _info.bits == 2 ? 85
+        : _info.bits == 4 ? 17
+        : 1;
+    for (var i = 0; i &lt; numColors; ++i) {
+      final g = i * to8bit;
+      palette.setColor(i, g, g, g, 255);
+    }
+    for (var i = 0; i &lt; nt; i += 2) {
+      final ti = ((t[i] &amp; 0xff) &lt;&lt; 8) | (t[i + 1] &amp; 0xff);
+      if (ti &lt; numColors) {
+        palette.set(ti, 3, 0);
+      }
+    }
+  }
+
+  final format = _info.bits == 1 ? Format.uint1
+      : _info.bits == 2 ? Format.uint2
+      : _info.bits == 4 ? Format.uint4
+      : _info.bits == 16 ? Format.uint16
+      : Format.uint8;
+
+  if (_info.colorType == PngColorType.grayscale &amp;&amp;
+      _info.transparency != null &amp;&amp; _info.bits &gt; 8) {
+    numChannels = 4;
+  }
+
+  if (_info.colorType == PngColorType.rgb &amp;&amp; _info.transparency != null) {
+    numChannels = 4;
+  }
+
+  final image = Image(width, height, numChannels: numChannels,
+      palette: palette, format: format);
+
+  final origW = _info.width;
+  final origH = _info.height;
+  _info..width = width
+  ..height = height;
+
+  final w = width;
+  final h = height;
+  _progressY = 0;
+  if (_info.interlaceMethod != 0) {
+    _processPass(input, image, 0, 0, 8, 8, (w + 7) &gt;&gt; 3, (h + 7) &gt;&gt; 3);
+    _processPass(input, image, 4, 0, 8, 8, (w + 3) &gt;&gt; 3, (h + 7) &gt;&gt; 3);
+    _processPass(input, image, 0, 4, 4, 8, (w + 3) &gt;&gt; 2, (h + 3) &gt;&gt; 3);
+    _processPass(input, image, 2, 0, 4, 4, (w + 1) &gt;&gt; 2, (h + 3) &gt;&gt; 2);
+    _processPass(input, image, 0, 2, 2, 4, (w + 1) &gt;&gt; 1, (h + 1) &gt;&gt; 2);
+    _processPass(input, image, 1, 0, 2, 2, w &gt;&gt; 1, (h + 1) &gt;&gt; 1);
+    _processPass(input, image, 0, 1, 1, 2, w, h &gt;&gt; 1);
+  } else {
+    _process(input, image);
+  }
+
+  _info..width = origW
+  ..height = origH;
+
+  if (_info.iCCPData != null) {
+    image.iccProfile = IccProfile(
+        _info.iCCPName, IccProfileCompression.deflate, _info.iCCPData!);
+  }
+
+  if (_info.textData.isNotEmpty) {
+    image.addTextData(_info.textData);
+  }
+
+  return image;
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/PngDecoder-class.html">PngDecoder</a></li>
+  <li class="self-crumb">decodeFrame method</li>
+</ol>
+
+
+    <h5>PngDecoder class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/PngDecoder-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/PngDecoder/PngDecoder.html">PngDecoder</a></li>
+
+
+        <li class="section-title">
+          <a href="../../image/PngDecoder-class.html#instance-properties">Properties</a>
+        </li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li><a href="../../image/PngDecoder/info.html">info</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+
+        <li class="section-title"><a href="../../image/PngDecoder-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../image/PngDecoder/decode.html">decode</a></li>
+          <li><a href="../../image/PngDecoder/decodeFrame.html">decodeFrame</a></li>
+          <li><a href="../../image/PngDecoder/isValidFile.html">isValidFile</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li><a href="../../image/PngDecoder/numFrames.html">numFrames</a></li>
+          <li><a href="../../image/PngDecoder/startDecode.html">startDecode</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../image/PngDecoder-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

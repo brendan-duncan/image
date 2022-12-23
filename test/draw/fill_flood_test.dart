@@ -10,7 +10,7 @@ void fillFloodTest() {
     drawCircle(img, 50, 50, 49, ColorRgb8(255));
     fillFlood(img, 50, 50, ColorRgb8(0, 255), threshold: 1);
 
-    File('$testOutputPath/draw/fillFlood.png')
+    File('$testOutputPath/draw/fill_flood.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(img));
   });

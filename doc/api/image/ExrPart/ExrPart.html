@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the ExrPart constructor from Class ExrPart from the image library, for the Dart programming language.">
+  <title>ExrPart constructor - ExrPart - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/ExrPart-class.html">ExrPart</a></li>
+    <li class="self-crumb">ExrPart constructor</li>
+  </ol>
+  <div class="self-name">ExrPart</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-constructor">ExrPart</span> constructor 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+      <span class="name ">ExrPart</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span></li>
+<li><span class="parameter" id="-param-_tiled"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">_tiled</span>, </span></li>
+<li><span class="parameter" id="-param-input"><span class="type-annotation"><a href="../../image/InputBuffer-class.html">InputBuffer</a></span> <span class="parameter-name">input</span></span></li>
+</ol>)
+    </section>
+
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">ExrPart(this.index, this._tiled, InputBuffer input) {
+  &#47;&#47;_type = _tiled ? ExrPart._typeTile : ExrPart._typeScanline;
+
+  var colorFormat = Format.float16;
+  final extraChannels = &lt;String,ImageData&gt;{};
+
+  while (true) {
+    final name = input.readString();
+    if (name.isEmpty) {
+      break;
+    }
+
+    final type = input.readString();
+    final size = input.readUint32();
+    final value = input.readBytes(size);
+
+    attributes[name] = ExrAttribute(name, type, size, value);
+
+    switch (name) {
+      case &#39;channels&#39;:
+        while (true) {
+          final channel = ExrChannel(value);
+          if (!channel.isValid) {
+            break;
+          }
+          if (channel.isColorChannel) {
+            numColorChannels++;
+            if (channel.dataType == ExrChannelType.half) {
+              colorFormat = Format.float16;
+            } else if (channel.dataType == ExrChannelType.float) {
+              colorFormat = Format.float32;
+            } else {
+              colorFormat = Format.uint32;
+            }
+          } else {
+            final name = channel.name;
+            if (channel.dataType == ExrChannelType.half) {
+              extraChannels[name] = ImageDataFloat16(width, height, 1);
+            } else if (channel.dataType == ExrChannelType.float) {
+              extraChannels[name] = ImageDataFloat32(width, height, 1);
+            } else if (channel.dataType == ExrChannelType.uint) {
+              extraChannels[name] = ImageDataUint32(width, height, 1);
+            }
+          }
+          channels.add(channel);
+        }
+        break;
+      case &#39;chromaticities&#39;:
+        chromaticities = Float32List(8);
+        chromaticities[0] = value.readFloat32();
+        chromaticities[1] = value.readFloat32();
+        chromaticities[2] = value.readFloat32();
+        chromaticities[3] = value.readFloat32();
+        chromaticities[4] = value.readFloat32();
+        chromaticities[5] = value.readFloat32();
+        chromaticities[6] = value.readFloat32();
+        chromaticities[7] = value.readFloat32();
+        break;
+      case &#39;compression&#39;:
+        _compressionType = ExrCompressorType.values[value.readByte()];
+        break;
+      case &#39;dataWindow&#39;:
+        dataWindow = [
+          value.readInt32(),
+          value.readInt32(),
+          value.readInt32(),
+          value.readInt32()
+        ];
+        width = (dataWindow[2] - dataWindow[0]) + 1;
+        height = (dataWindow[3] - dataWindow[1]) + 1;
+        break;
+      case &#39;displayWindow&#39;:
+        displayWindow = [
+          value.readInt32(),
+          value.readInt32(),
+          value.readInt32(),
+          value.readInt32()
+        ];
+        break;
+      case &#39;lineOrder&#39;:
+        &#47;&#47;_lineOrder = value.readByte();
+        break;
+      case &#39;pixelAspectRatio&#39;:
+        pixelAspectRatio = value.readFloat32();
+        break;
+      case &#39;screenWindowCenter&#39;:
+        screenWindowCenterX = value.readFloat32();
+        screenWindowCenterY = value.readFloat32();
+        break;
+      case &#39;screenWindowWidth&#39;:
+        screenWindowWidth = value.readFloat32();
+        break;
+      case &#39;tiles&#39;:
+        _tileWidth = value.readUint32();
+        _tileHeight = value.readUint32();
+        final mode = value.readByte();
+        _tileLevelMode = mode &amp; 0xf;
+        _tileRoundingMode = (mode &gt;&gt; 4) &amp; 0xf;
+        break;
+      case &#39;type&#39;:
+        final s = value.readString();
+        if (s == &#39;deepscanline&#39;) {
+          &#47;&#47;this._type = TYPE_DEEP_SCANLINE;
+        } else if (s == &#39;deeptile&#39;) {
+          &#47;&#47;this._type = TYPE_DEEP_TILE;
+        } else {
+          throw ImageException(&#39;EXR Invalid type: $s&#39;);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  framebuffer = Image(width, height, numChannels: numColorChannels,
+      format: colorFormat);
+
+  for (var name in extraChannels.keys) {
+    framebuffer!.setExtraChannel(name, extraChannels[name]!);
+  }
+
+  if (_tiled) {
+    _numXLevels = _calculateNumXLevels(left, right, top, bottom);
+    _numYLevels = _calculateNumYLevels(left, right, top, bottom);
+    if (_tileLevelMode != _ripmapLevels) {
+      _numYLevels = 1;
+    }
+
+    _numXTiles = _calculateNumTiles(_numXLevels!, left, right, _tileWidth,
+        _tileRoundingMode);
+
+    _numYTiles = _calculateNumTiles(_numYLevels!, top, bottom, _tileHeight,
+        _tileRoundingMode);
+
+    _bytesPerPixel = _calculateBytesPerPixel();
+    _maxBytesPerTileLine = _bytesPerPixel * _tileWidth!;
+    &#47;&#47;_tileBufferSize = _maxBytesPerTileLine * _tileHeight;
+
+    _compressor = ExrCompressor(_compressionType, this, _maxBytesPerTileLine,
+        _tileHeight);
+
+    var lx = 0;
+    var ly = 0;
+    _offsets = List&lt;Uint32List&gt;.generate(_numXLevels! * _numYLevels!, (l) {
+      final result = Uint32List(_numXTiles![lx]! * _numYTiles![ly]!);
+      ++lx;
+      if (lx == _numXLevels) {
+        lx = 0;
+        ++ly;
+      }
+      return result;
+    });
+  } else {
+    _bytesPerLine = Uint32List(height + 1);
+    for (var ch in channels) {
+      final nBytes = ch.dataSize * width ~&#47; ch.xSampling;
+      for (var y = 0; y &lt; height; ++y) {
+        if ((y + top) % ch.ySampling == 0) {
+          _bytesPerLine[y] += nBytes;
+        }
+      }
+    }
+
+    var maxBytesPerLine = 0;
+    for (var y = 0; y &lt; height; ++y) {
+      maxBytesPerLine = max(maxBytesPerLine, _bytesPerLine[y]);
+    }
+
+    _compressor = ExrCompressor(_compressionType, this, maxBytesPerLine);
+
+    _linesInBuffer = _compressor!.numScanLines();
+    &#47;&#47;_lineBufferSize = maxBytesPerLine * _linesInBuffer;
+
+    _offsetInLineBuffer = Uint32List(_bytesPerLine.length);
+
+    var offset = 0;
+    for (var i = 0; i &lt;= _bytesPerLine.length - 1; ++i) {
+      if (i % _linesInBuffer == 0) {
+        offset = 0;
+      }
+      _offsetInLineBuffer![i] = offset;
+      offset += _bytesPerLine[i];
+    }
+
+    final numOffsets = ((height + _linesInBuffer) ~&#47; _linesInBuffer) - 1;
+    _offsets = [Uint32List(numOffsets)];
+  }
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/ExrPart-class.html">ExrPart</a></li>
+  <li class="self-crumb">ExrPart constructor</li>
+</ol>
+
+
+    <h5>ExrPart class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/ExrPart-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/ExrPart/ExrPart.html">ExrPart</a></li>
+
+
+        <li class="section-title">
+          <a href="../../image/ExrPart-class.html#instance-properties">Properties</a>
+        </li>
+          <li><a href="../../image/ExrPart/attributes.html">attributes</a></li>
+          <li><a href="../../image/ExrPart/bottom.html">bottom</a></li>
+          <li><a href="../../image/ExrPart/channels.html">channels</a></li>
+          <li><a href="../../image/ExrPart/chromaticities.html">chromaticities</a></li>
+          <li><a href="../../image/ExrPart/dataWindow.html">dataWindow</a></li>
+          <li><a href="../../image/ExrPart/displayWindow.html">displayWindow</a></li>
+          <li><a href="../../image/ExrPart/framebuffer.html">framebuffer</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li><a href="../../image/ExrPart/height.html">height</a></li>
+          <li><a href="../../image/ExrPart/index.html">index</a></li>
+          <li><a href="../../image/ExrPart/isValid.html">isValid</a></li>
+          <li><a href="../../image/ExrPart/left.html">left</a></li>
+          <li><a href="../../image/ExrPart/numColorChannels.html">numColorChannels</a></li>
+          <li><a href="../../image/ExrPart/pixelAspectRatio.html">pixelAspectRatio</a></li>
+          <li><a href="../../image/ExrPart/right.html">right</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+          <li><a href="../../image/ExrPart/screenWindowCenterX.html">screenWindowCenterX</a></li>
+          <li><a href="../../image/ExrPart/screenWindowCenterY.html">screenWindowCenterY</a></li>
+          <li><a href="../../image/ExrPart/screenWindowWidth.html">screenWindowWidth</a></li>
+          <li><a href="../../image/ExrPart/top.html">top</a></li>
+          <li><a href="../../image/ExrPart/width.html">width</a></li>
+
+        <li class="section-title"><a href="../../image/ExrPart-class.html#instance-methods">Methods</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../image/ExrPart-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-left-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

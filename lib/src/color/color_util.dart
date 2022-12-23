@@ -143,8 +143,8 @@ void alphaBlendPixel(Pixel dst, Pixel src, [int fraction = 0xff]) {
 num getLuminanceRgb(num r, num g, num b) => 0.299 * r + 0.587 * g + 0.114 * b;
 
 /// Convert an HSL color to RGB, where h is specified in normalized degrees
-/// [0, 1] (where 1 is 360-degrees); s and l are in the range [0, 1].
-/// Returns a list [r, g, b] with values in the range [0, 255].
+/// \[0, 1\] (where 1 is 360-degrees); s and l are in the range \[0, 1\].
+/// Returns a list \[r, g, b\] with values in the range \[0, 255\].
 List<int> hslToRgb(num hue, num saturation, num lightness) {
   if (saturation == 0) {
     final gray = (lightness * 255.0).toInt();
@@ -183,8 +183,8 @@ List<int> hslToRgb(num hue, num saturation, num lightness) {
 }
 
 /// Convert an HSV color to RGB, where h is specified in normalized degrees
-/// [0, 1] (where 1 is 360-degrees); s and l are in the range [0, 1].
-/// Returns a list [r, g, b] with values in the range [0, 255].
+/// \[0, 1\] (where 1 is 360-degrees); s and l are in the range \[0, 1\].
+/// Returns a list \[r, g, b\] with values in the range \[0, 255\].
 List<int> hsvToRgb(num hue, num saturation, num brightness) {
   if (saturation == 0) {
     final gray = (brightness * 255.0).round();
@@ -239,8 +239,8 @@ List<int> hsvToRgb(num hue, num saturation, num brightness) {
   }
 }
 
-/// Convert an RGB color to HSL, where r, g and b are in the range [0, 255].
-/// Returns a list [h, s, l] with values in the range [0, 1].
+/// Convert an RGB color to HSL, where r, g and b are in the range \[0, 255\].
+/// Returns a list \[h, s, l\] with values in the range \[0, 1\].
 List<num> rgbToHsl(num r, num g, num b) {
   r /= 255.0;
   g /= 255.0;
@@ -327,7 +327,7 @@ List<int> xyzToRgb(num x, num y, num z) {
 }
 
 /// Convert a CMYK color to RGB, where c, m, y, k values are in the range
-/// [0, 255]. Returns a list [r, g, b] with values in the range [0, 255].
+/// \[0, 255\]. Returns a list \[r, g, b\] with values in the range \[0, 255\].
 List<int> cmykToRgb(num c, num m, num y, num k) {
   c /= 255.0;
   m /= 255.0;

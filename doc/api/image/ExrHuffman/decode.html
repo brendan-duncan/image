@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the decode method from the ExrHuffman class, for the Dart programming language.">
+  <title>decode method - ExrHuffman class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/ExrHuffman-class.html">ExrHuffman</a></li>
+    <li class="self-crumb">decode static method</li>
+  </ol>
+  <div class="self-name">decode</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">decode</span> static method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype">void</span>
+<span class="name ">decode</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="decode-param-hcode"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span>&gt;</span></span> <span class="parameter-name">hcode</span>, </span></li>
+<li><span class="parameter" id="decode-param-hdecod"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../image/ExrHufDec-class.html">ExrHufDec</a></span>&gt;</span></span> <span class="parameter-name">hdecod</span>, </span></li>
+<li><span class="parameter" id="decode-param-input"><span class="type-annotation"><a href="../../image/InputBuffer-class.html">InputBuffer</a></span> <span class="parameter-name">input</span>, </span></li>
+<li><span class="parameter" id="decode-param-ni"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">ni</span>, </span></li>
+<li><span class="parameter" id="decode-param-rlc"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">rlc</span>, </span></li>
+<li><span class="parameter" id="decode-param-no"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">no</span>, </span></li>
+<li><span class="parameter" id="decode-param-out"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint16List-class.html">Uint16List</a>?</span> <span class="parameter-name">out</span></span></li>
+</ol>)
+
+      
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">static void decode(List&lt;int&gt; hcode, List&lt;ExrHufDec&gt; hdecod, InputBuffer input,
+    int ni, int rlc, int no, Uint16List? out) {
+  final cLc = [0, 0];
+  final ie = input.offset + (ni + 7) ~&#47; 8; &#47;&#47; input byte size
+  var oi = 0;
+
+  &#47;&#47; Loop on input bytes
+
+  while (input.offset &lt; ie) {
+    getChar(cLc, input);
+
+    &#47;&#47; Access decoding table
+    while (cLc[1] &gt;= _huffmanDecodingBits) {
+      final pl = hdecod[(cLc[0] &gt;&gt; (cLc[1] - _huffmanDecodingBits)) &amp;
+          _huffmanDecodingMask];
+
+      if (pl.len != 0) {
+        &#47;&#47; Get short code
+        cLc[1] -= pl.len;
+        oi = getCode(pl.lit, rlc, cLc, input, out, oi, no);
+      } else {
+        if (pl.p == null) {
+          throw ImageException(&#39;Error in Huffman-encoded data &#39;
+              &#39;(invalid code).&#39;);
+        }
+
+        &#47;&#47; Search long code
+        int j;
+        for (j = 0; j &lt; pl.lit; j++) {
+          final l = hufLength(hcode[pl.p![j]]);
+
+          while (cLc[1] &lt; l &amp;&amp; input.offset &lt; ie) {
+            &#47;&#47; get more bits
+            getChar(cLc, input);
+          }
+
+          if (cLc[1] &gt;= l) {
+            if (hufCode(hcode[pl.p![j]]) ==
+                ((cLc[0] &gt;&gt; (cLc[1] - l)) &amp; ((1 &lt;&lt; l) - 1))) {
+              &#47;&#47; Found : get long code
+              cLc[1] -= l;
+              oi = getCode(pl.p![j], rlc, cLc, input, out, oi, no);
+              break;
+            }
+          }
+        }
+
+        if (j == pl.lit) {
+          throw ImageException(&#39;Error in Huffman-encoded data &#39;
+              &#39;(invalid code).&#39;);
+        }
+      }
+    }
+  }
+
+  &#47;&#47; Get remaining (short) codes
+  final i = (8 - ni) &amp; 7;
+  cLc[0] &gt;&gt;= i;
+  cLc[1] -= i;
+
+  while (cLc[1] &gt; 0) {
+    final pl = hdecod[(cLc[0] &lt;&lt; (_huffmanDecodingBits - cLc[1])) &amp;
+        _huffmanDecodingMask];
+
+    if (pl.len != 0) {
+      cLc[1] -= pl.len;
+      oi = getCode(pl.lit, rlc, cLc, input, out, oi, no);
+    } else {
+      throw ImageException(&#39;Error in Huffman-encoded data &#39;
+          &#39;(invalid code).&#39;);
+    }
+  }
+
+  if (oi != no) {
+    throw ImageException(&#39;Error in Huffman-encoded data &#39;
+        &#39;(decoded data are shorter than expected).&#39;);
+  }
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/ExrHuffman-class.html">ExrHuffman</a></li>
+  <li class="self-crumb">decode static method</li>
+</ol>
+
+
+    <h5>ExrHuffman class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/ExrHuffman-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/ExrHuffman/ExrHuffman.html">ExrHuffman</a></li>
+
+
+        <li class="section-title">
+          <a href="../../image/ExrHuffman-class.html#instance-properties">Properties</a>
+        </li>
+          <li><a href="../../image/ExrHuffman/fixWarnings.html">fixWarnings</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+
+        <li class="section-title inherited"><a href="../../image/ExrHuffman-class.html#instance-methods">Methods</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../image/ExrHuffman-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+        <li class="section-title"><a href="../../image/ExrHuffman-class.html#static-methods">Static methods</a></li>
+          <li><a href="../../image/ExrHuffman/buildDecTable.html">buildDecTable</a></li>
+          <li><a href="../../image/ExrHuffman/canonicalCodeTable.html">canonicalCodeTable</a></li>
+          <li><a href="../../image/ExrHuffman/decode.html">decode</a></li>
+          <li><a href="../../image/ExrHuffman/getBits.html">getBits</a></li>
+          <li><a href="../../image/ExrHuffman/getChar.html">getChar</a></li>
+          <li><a href="../../image/ExrHuffman/getCode.html">getCode</a></li>
+          <li><a href="../../image/ExrHuffman/hufCode.html">hufCode</a></li>
+          <li><a href="../../image/ExrHuffman/hufLength.html">hufLength</a></li>
+          <li><a href="../../image/ExrHuffman/uncompress.html">uncompress</a></li>
+          <li><a href="../../image/ExrHuffman/unpackEncTable.html">unpackEncTable</a></li>
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

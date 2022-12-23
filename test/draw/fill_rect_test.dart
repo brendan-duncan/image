@@ -11,7 +11,7 @@ void fillRectTest() {
     fillRect(i0, 50, 50, 150, 150, ColorRgb8(255));
     fillRect(i0, 100, 100, 200, 200, ColorRgba8(0, 255, 0, 128));
 
-    File('$testOutputPath/draw/fill_rect_0.png')
+    File('$testOutputPath/draw/fill_rect.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
 

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the encodeRgba4bpp method from the PvrtcEncoder class, for the Dart programming language.">
+  <title>encodeRgba4bpp method - PvrtcEncoder class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/PvrtcEncoder-class.html">PvrtcEncoder</a></li>
+    <li class="self-crumb">encodeRgba4bpp method</li>
+  </ol>
+  <div class="self-name">encodeRgba4bpp</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">encodeRgba4bpp</span> method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span>
+<span class="name ">encodeRgba4bpp</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="encodeRgba4bpp-param-bitmap"><span class="type-annotation"><a href="../../image/Image-class.html">Image</a></span> <span class="parameter-name">bitmap</span></span></li>
+</ol>)
+
+      
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Uint8List encodeRgba4bpp(Image bitmap) {
+  if (bitmap.width != bitmap.height) {
+    throw ImageException(&#39;PVRTC requires a square image.&#39;);
+  }
+
+  if (!BitUtility.isPowerOf2(bitmap.width)) {
+    throw ImageException(&#39;PVRTC requires a power-of-two sized image.&#39;);
+  }
+
+  final size = bitmap.width;
+  final blocks = size ~&#47; 4;
+  final blockMask = blocks - 1;
+
+  &#47;&#47; Allocate enough data for encoding the image.
+  final outputData = Uint8List((bitmap.width * bitmap.height) ~&#47; 2);
+  final packet = PvrtcPacket(outputData);
+  final p0 = PvrtcPacket(outputData);
+  final p1 = PvrtcPacket(outputData);
+  final p2 = PvrtcPacket(outputData);
+  final p3 = PvrtcPacket(outputData);
+
+  for (var y = 0, y4 = 0; y &lt; blocks; ++y, y4 += 4) {
+    for (var x = 0, x4 = 0; x &lt; blocks; ++x, x4 += 4) {
+      final cbb = _calculateBoundingBoxRgba(bitmap, x4, y4);
+      packet..setBlock(x, y)
+      ..usePunchthroughAlpha = false
+      ..setColorRgbaA(cbb.min as PvrtcColorRgba)
+      ..setColorRgbaB(cbb.max as PvrtcColorRgba);
+    }
+  }
+
+  const factors = PvrtcPacket.bilinearFactors;
+
+  for (var y = 0, y4 = 0; y &lt; blocks; ++y, y4 += 4) {
+    for (var x = 0, x4 = 0; x &lt; blocks; ++x, x4 += 4) {
+      var factorIndex = 0;
+      var modulationData = 0;
+
+      for (var py = 0; py &lt; 4; ++py) {
+        final yOffset = (py &lt; 2) ? -1 : 0;
+        final y0 = (y + yOffset) &amp; blockMask;
+        final y1 = (y0 + 1) &amp; blockMask;
+
+        for (var px = 0; px &lt; 4; ++px) {
+          final xOffset = (px &lt; 2) ? -1 : 0;
+          final x0 = (x + xOffset) &amp; blockMask;
+          final x1 = (x0 + 1) &amp; blockMask;
+
+          p0.setBlock(x0, y0);
+          p1.setBlock(x1, y0);
+          p2.setBlock(x0, y1);
+          p3.setBlock(x1, y1);
+
+          final ca = p0.getColorRgbaA() * factors[factorIndex][0] +
+              p1.getColorRgbaA() * factors[factorIndex][1] +
+              p2.getColorRgbaA() * factors[factorIndex][2] +
+              p3.getColorRgbaA() * factors[factorIndex][3];
+
+          final cb = p0.getColorRgbaB() * factors[factorIndex][0] +
+              p1.getColorRgbaB() * factors[factorIndex][1] +
+              p2.getColorRgbaB() * factors[factorIndex][2] +
+              p3.getColorRgbaB() * factors[factorIndex][3];
+
+          &#47;&#47;final pi = pixelIndex + ((py * size + px) * 4);
+          final bp = bitmap.getPixel(x4 + px, y4 + py);
+          final r = bp.r as int;
+          final g = bp.g as int;
+          final b = bp.b as int;
+          final a = bp.a as int;
+
+          final d = cb - ca;
+          final p = PvrtcColorRgba(r * 16, g * 16, b * 16, a * 16);
+          final v = p - ca;
+
+          &#47;&#47; PVRTC uses weightings of 0, 3&#47;8, 5&#47;8 and 1
+          &#47;&#47; The boundaries for these are 3&#47;16, 1&#47;2 (=8&#47;16), 13&#47;16
+          final projection = v.dotProd(d) * 16;
+          final lengthSquared = d.dotProd(d);
+
+          if (projection &gt; 3 * lengthSquared) {
+            modulationData++;
+          }
+          if (projection &gt; 8 * lengthSquared) {
+            modulationData++;
+          }
+          if (projection &gt; 13 * lengthSquared) {
+            modulationData++;
+          }
+
+          modulationData = BitUtility.rotateRight(modulationData, 2);
+
+          factorIndex++;
+        }
+      }
+
+      packet..setBlock(x, y)
+      ..modulationData = modulationData;
+    }
+  }
+
+  return outputData;
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/PvrtcEncoder-class.html">PvrtcEncoder</a></li>
+  <li class="self-crumb">encodeRgba4bpp method</li>
+</ol>
+
+
+    <h5>PvrtcEncoder class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/PvrtcEncoder-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/PvrtcEncoder/PvrtcEncoder.html">PvrtcEncoder</a></li>
+
+
+        <li class="section-title inherited">
+          <a href="../../image/PvrtcEncoder-class.html#instance-properties">Properties</a>
+        </li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+
+        <li class="section-title"><a href="../../image/PvrtcEncoder-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../image/PvrtcEncoder/encodePvr.html">encodePvr</a></li>
+          <li><a href="../../image/PvrtcEncoder/encodeRgb4bpp.html">encodeRgb4bpp</a></li>
+          <li><a href="../../image/PvrtcEncoder/encodeRgba4bpp.html">encodeRgba4bpp</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../image/PvrtcEncoder-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

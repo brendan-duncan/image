@@ -10,7 +10,7 @@ void drawLineTest() {
     drawLine(i0, 255, 0, 0, 255, ColorRgb8(255),
         antialias: true, thickness: 4);
 
-    File('$testOutputPath/draw/draw_line_0.png')
+    File('$testOutputPath/draw/draw_line.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the decodePVR2 method from the PvrtcDecoder class, for the Dart programming language.">
+  <title>decodePVR2 method - PvrtcDecoder class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/PvrtcDecoder-class.html">PvrtcDecoder</a></li>
+    <li class="self-crumb">decodePVR2 method</li>
+  </ol>
+  <div class="self-name">decodePVR2</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">decodePVR2</span> method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="../../image/Image-class.html">Image</a>?</span>
+<span class="name ">decodePVR2</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="decodePVR2-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span></li>
+</ol>)
+
+      
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Image? decodePVR2(Uint8List data) {
+  final length = data.length;
+
+  const headerSize = 52;
+  const pvrTexCubemap = 1 &lt;&lt; 12;
+  const pvrPixelTypeMask = 0xff;
+  const pvrTypeRgba4444 = 0x10;
+  const pvrTypeRgba5551 = 0x11;
+  const pvrTypeRgba8888 = 0x12;
+  const pvrTypeRgb565 = 0x13;
+  const pvrTypeRgb555 = 0x14;
+  const pvrTypeRgb888 = 0x15;
+  const pvrTypeI8 = 0x16;
+  const pvrTypeAI8 = 0x17;
+  const pvrTypePvrtc2 = 0x18;
+  const pvrTypePvrtc4 = 0x19;
+
+  if (length &lt; headerSize) {
+    return null;
+  }
+
+  final input = InputBuffer(data);
+  &#47;&#47; Header
+  final size = input.readUint32();
+  final height = input.readUint32();
+  final width = input.readUint32();
+  &#47;*int mipcount =*&#47; input.readUint32();
+  final flags = input.readUint32();
+  &#47;*int texdatasize =*&#47; input.readUint32();
+  final bpp = input.readUint32();
+  &#47;*int rmask =*&#47; input..readUint32()
+  &#47;*int gmask =*&#47; ..readUint32()
+  &#47;*int bmask =*&#47; ..readUint32();
+  final amask = input.readUint32();
+  final magic = input.readUint32();
+  var numtex = input.readUint32();
+
+  if (size != headerSize || magic != 0x21525650) {
+    return null;
+  }
+
+  if (numtex &lt; 1) {
+    numtex = (flags &amp; pvrTexCubemap) != 0 ? 6 : 1;
+  }
+
+  if (numtex != 1) {
+    &#47;&#47; only 1 surface supported currently
+    return null;
+  }
+
+  if (width * height * bpp &#47; 8 &gt; length - headerSize) {
+    return null;
+  }
+
+  final pType = flags &amp; pvrPixelTypeMask;
+
+  switch (pType) {
+    case pvrTypeRgba4444:
+      final image = Image(width, height, numChannels: 4);
+      for (var p in image) {
+        final v1 = input.readByte();
+        final v2 = input.readByte();
+        final a = (v1 &amp; 0x0f) &lt;&lt; 4;
+        final b = v1 &amp; 0xf0;
+        final g = (v2 &amp; 0x0f) &lt;&lt; 4;
+        final r = v2 &amp; 0xf0;
+
+        p..r = r
+        ..g = g
+        ..b = b
+        ..a = a;
+      }
+      return image;
+    case pvrTypeRgba5551:
+      final image = Image(width, height, numChannels: 4);
+      for (var p in image) {
+        final v = input.readUint16();
+        final r = (v &amp; 0xf800) &gt;&gt; 8;
+        final g = (v &amp; 0x07c0) &gt;&gt; 3;
+        final b = (v &amp; 0x003e) &lt;&lt; 2;
+        final a = (v &amp; 0x0001) != 0 ? 255 : 0;
+        p..r = r
+        ..g = g
+        ..b = b
+        ..a = a;
+      }
+      return image;
+    case pvrTypeRgba8888:
+      final image = Image(width, height, numChannels: 4);
+      for (var p in image) {
+        p..r = input.readByte()
+        ..g = input.readByte()
+        ..b = input.readByte()
+        ..a = input.readByte();
+      }
+      return image;
+    case pvrTypeRgb565:
+      final image = Image(width, height);
+      for (var p in image) {
+        final v = input.readUint16();
+        final b = (v &amp; 0x001f) &lt;&lt; 3;
+        final g = (v &amp; 0x07e0) &gt;&gt; 3;
+        final r = (v &amp; 0xf800) &gt;&gt; 8;
+        p..r = r
+        ..g = g
+        ..b = b;
+      }
+      return image;
+    case pvrTypeRgb555:
+      final image = Image(width, height);
+      for (var p in image) {
+        final v = input.readUint16();
+        final r = (v &amp; 0x001f) &lt;&lt; 3;
+        final g = (v &amp; 0x03e0) &gt;&gt; 2;
+        final b = (v &amp; 0x7c00) &gt;&gt; 7;
+        p..r = r
+        ..g = g
+        ..b = b;
+      }
+      return image;
+    case pvrTypeRgb888:
+      final image = Image(width, height);
+      for (var p in image) {
+        p..r = input.readByte()
+        ..g = input.readByte()
+        ..b = input.readByte();
+      }
+      return image;
+    case pvrTypeI8:
+      final image = Image(width, height, numChannels: 1);
+      for (var p in image) {
+        final i = input.readByte();
+        p.r = i;
+      }
+      return image;
+    case pvrTypeAI8:
+      final image = Image(width, height, numChannels: 2);
+      for (var p in image) {
+        final i = input.readByte();
+        final a = input.readByte();
+        p..r = i
+        ..g = a;
+      }
+      return image;
+    case pvrTypePvrtc2:
+      &#47;&#47; Currently unsupported
+      return null;
+    case pvrTypePvrtc4:
+      return amask == 0
+          ? decodeRgb4bpp(width, height, input.toUint8List())
+          : decodeRgba4bpp(width, height, input.toUint8List());
+  }
+
+  &#47;&#47; Unknown format
+  return null;
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/PvrtcDecoder-class.html">PvrtcDecoder</a></li>
+  <li class="self-crumb">decodePVR2 method</li>
+</ol>
+
+
+    <h5>PvrtcDecoder class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/PvrtcDecoder-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/PvrtcDecoder/PvrtcDecoder.html">PvrtcDecoder</a></li>
+
+
+        <li class="section-title inherited">
+          <a href="../../image/PvrtcDecoder-class.html#instance-properties">Properties</a>
+        </li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+
+        <li class="section-title"><a href="../../image/PvrtcDecoder-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodeApplePVRTC.html">decodeApplePVRTC</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodePvr.html">decodePvr</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodePVR2.html">decodePVR2</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodePVR3.html">decodePVR3</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodeRgb4bpp.html">decodeRgb4bpp</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodeRgba4bpp.html">decodeRgba4bpp</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../image/PvrtcDecoder-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

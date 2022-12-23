@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the decodePixel method from the IcoBmpInfo class, for the Dart programming language.">
+  <title>decodePixel method - IcoBmpInfo class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/IcoBmpInfo-class.html">IcoBmpInfo</a></li>
+    <li class="self-crumb">decodePixel method</li>
+  </ol>
+  <div class="self-name">decodePixel</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">decodePixel</span> method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype">void</span>
+<span class="name ">decodePixel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="decodePixel-param-input"><span class="type-annotation"><a href="../../image/InputBuffer-class.html">InputBuffer</a></span> <span class="parameter-name">input</span>, </span></li>
+<li><span class="parameter" id="decodePixel-param-pixel"><span class="type-annotation">void</span> <span class="parameter-name">pixel</span>(<ol class="parameter-list"><li><span class="parameter" id="param-r"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">r</span>, </span></li>
+<li><span class="parameter" id="param-g"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">g</span>, </span></li>
+<li><span class="parameter" id="param-b"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">b</span>, </span></li>
+<li><span class="parameter" id="param-a"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">a</span></span></li>
+</ol>
+)</span></li>
+</ol>)
+
+      <div class="features"><span class="feature">inherited</span></div>
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">void decodePixel(InputBuffer input,
+    void Function(num r, num g, num b, num a) pixel) {
+  if (palette != null) {
+    if (bitsPerPixel == 1) {
+      final bi = input.readByte();
+      for (var i = 7; i &gt;= 0; --i) {
+        final b = (bi &gt;&gt; i) &amp; 0x1;
+        pixel(b, 0, 0, 0);
+      }
+      return;
+    } else if (bitsPerPixel == 2) {
+      final bi = input.readByte();
+      for (var i = 6; i &gt;= 0; i -= 2) {
+        final b = (bi &gt;&gt; i) &amp; 0x2;
+        pixel(b, 0, 0, 0);
+      }
+    } else if (bitsPerPixel == 4) {
+      final bi = input.readByte();
+      final b1 = (bi &gt;&gt; 4) &amp; 0xf;
+      pixel(b1, 0, 0, 0);
+      final b2 = bi &amp; 0xf;
+      pixel(b2, 0, 0, 0);
+      return;
+    } else if (bitsPerPixel == 8) {
+      final b = input.readByte();
+      pixel(b, 0, 0, 0);
+      return;
+    }
+  }
+
+  if (compression == BmpCompression.bitfields &amp;&amp; bitsPerPixel == 32) {
+    final p = input.readUint32();
+    final r = (((p &amp; redMask) &gt;&gt; _redShift) * _redScale).toInt();
+    final g = (((p &amp; greenMask) &gt;&gt; _greenShift) * _greenScale).toInt();
+    final b = (((p &amp; blueMask) &gt;&gt; _blueShift) * _blueScale).toInt();
+    final a = ignoreAlphaChannel ? 255
+        : (((p &amp; alphaMask) &gt;&gt; _alphaShift) * _alphaScale).toInt();
+    return pixel(r, g, b, a);
+  } else if (bitsPerPixel == 32 &amp;&amp; compression == BmpCompression.none) {
+    final b = input.readByte();
+    final g = input.readByte();
+    final r = input.readByte();
+    final a = input.readByte();
+    return pixel(r, g, b, ignoreAlphaChannel ? 255 : a);
+  } else if (bitsPerPixel == 24) {
+    final b = input.readByte();
+    final g = input.readByte();
+    final r = input.readByte();
+    return pixel(r, g, b, 255);
+  } else if (bitsPerPixel == 16) {
+    final p = input.readUint16();
+    final r = (((p &amp; redMask) &gt;&gt; _redShift) * _redScale).toInt();
+    final g = (((p &amp; greenMask) &gt;&gt; _greenShift) * _greenScale).toInt();
+    final b = (((p &amp; blueMask) &gt;&gt; _blueShift) * _blueScale).toInt();
+    final a = ignoreAlphaChannel ? 255
+        : (((p &amp; alphaMask) &gt;&gt; _alphaShift) * _alphaScale).toInt();
+    return pixel(r, g, b, a);
+  } else {
+    throw ImageException(
+        &#39;Unsupported bitsPerPixel ($bitsPerPixel) or&#39;
+            &#39; compression ($compression).&#39;);
+  }
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/IcoBmpInfo-class.html">IcoBmpInfo</a></li>
+  <li class="self-crumb">decodePixel method</li>
+</ol>
+
+
+    <h5>IcoBmpInfo class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/IcoBmpInfo-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/IcoBmpInfo/IcoBmpInfo.html">IcoBmpInfo</a></li>
+
+
+        <li class="section-title">
+          <a href="../../image/IcoBmpInfo-class.html#instance-properties">Properties</a>
+        </li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/alphaMask.html">alphaMask</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/backgroundColor.html">backgroundColor</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/bitsPerPixel.html">bitsPerPixel</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/blueMask.html">blueMask</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/compression.html">compression</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/greenMask.html">greenMask</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/header.html">header</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/headerSize.html">headerSize</a></li>
+          <li><a href="../../image/IcoBmpInfo/height.html">height</a></li>
+          <li><a href="../../image/IcoBmpInfo/ignoreAlphaChannel.html">ignoreAlphaChannel</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/imageSize.html">imageSize</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/importantColors.html">importantColors</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/numFrames.html">numFrames</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/palette.html">palette</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/planes.html">planes</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/readBottomUp.html">readBottomUp</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/redMask.html">redMask</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/totalColors.html">totalColors</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/width.html">width</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/xppm.html">xppm</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/yppm.html">yppm</a></li>
+
+        <li class="section-title inherited"><a href="../../image/IcoBmpInfo-class.html#instance-methods">Methods</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/decodePixel.html">decodePixel</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li class="inherited"><a href="../../image/IcoBmpInfo/readPalette.html">readPalette</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../image/IcoBmpInfo-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

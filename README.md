@@ -39,13 +39,9 @@ will not be as fast as a native library.
 
 - CUR
 
-## [Documentation](https://github.com/brendan-duncan/image/wiki)
+## [Documentation](doc/dart_image_library.md)
 
-## [API](https://pub.dev/documentation/image/latest/image/image-library.html)
-
-## [Examples](https://github.com/brendan-duncan/image/wiki/Examples)
-
-## [Format Decoding Functions](https://github.com/brendan-duncan/image/wiki#format-decoding-functions)
+## [API](doc/api/index.html)
 
 ## Examples
 
@@ -64,30 +60,13 @@ void main() async {
 }
 ```
 
-An ImageCommand API lets you perform these functions either synchronously or asynchronously.
-```dart
-import 'package:image/image_io.dart' as DIL;
-void main() async {
-  final cmd = DIL.ImageCommand()
-      ..createImage(256, 256)
-      ..filter((image) {
-        for (var pixel in image) {
-          pixel..r = pixel.x
-          ..g = pixel.y;
-        }
-      })
-      ..encodePngFile('image.png');
-  await cmd.executeAsync();
-}
-```
-
 To asynchronously load an image file, resize it, and save it as a thumbnail: 
 ```dart
 import 'package:image/image_io.dart' as DIL;
 
 void main(List<String> args) async {
   final path = args.isNotEmpty ? args[0] : 'test.png';
-  final cmd = DIL.ImageCommand()
+  final cmd = DIL.Command()
     // Decode the image file at the given path
     ..decodeImageFile(path)
     // Resize the image to a width of 64 pixels and a height that maintains the aspect ratio of the original. 

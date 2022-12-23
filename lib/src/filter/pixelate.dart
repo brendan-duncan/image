@@ -24,46 +24,52 @@ Image pixelate(Image src, int blockSize,
   final bs = blockSize - 1;
 
   for (final frame in src.frames) {
+    final w = frame.width;
+    final h = frame.height;
     switch (mode) {
       case PixelateMode.upperLeft:
-        for (var y = 0; y < frame.height; y += blockSize) {
-          for (var x = 0; x < frame.width; x += blockSize) {
-            if (frame.isBoundsSafe(x, y)) {
-              final c = frame.getPixel(x, y);
-              fillRect(frame, x, y, x + bs, y + bs, c);
-            }
-          }
+        for (final p in frame) {
+          final x2 = (p.x ~/ blockSize) * blockSize;
+          final y2 = (p.y ~/ blockSize) * blockSize;
+          final p2 = frame.getPixel(x2, y2);
+          p.set(p2);
         }
         break;
       case PixelateMode.average:
-        for (var y = 0; y < frame.height; y += blockSize) {
-          for (var x = 0; x < frame.width; x += blockSize) {
-            num a = 0;
-            num r = 0;
-            num g = 0;
-            num b = 0;
-            var total = 0;
-
-            for (var cy = 0; cy < blockSize; ++cy) {
-              for (var cx = 0; cx < blockSize; ++cx) {
-                if (!frame.isBoundsSafe(x + cx, y + cy)) {
-                  continue;
-                }
-                final c = frame.getPixel(x + cx, y + cy);
-                a += c.a;
-                r += c.r;
-                g += c.g;
-                b += c.b;
-                total++;
+        num r = 0;
+        num g = 0;
+        num b = 0;
+        num a = 0;
+        var lx = -1;
+        var ly = -1;
+        for (final p in frame) {
+          final x2 = (p.x ~/ blockSize) * blockSize;
+          final y2 = (p.y ~/ blockSize) * blockSize;
+          if (x2 != lx || y2 <= ly) {
+            lx = x2;
+            ly = y2;
+            r = 0;
+            g = 0;
+            b = 0;
+            a = 0;
+            for (var by = 0, by2 = y2; by < blockSize && by2 < h; ++by, ++by2) {
+              for (var bx = 0, bx2 = x2; bx < blockSize && bx2 < w;
+                  ++bx, ++bx2) {
+                final p2 = frame.getPixel(bx2, by2);
+                r += p2.r;
+                g += p2.g;
+                b += p2.b;
+                a += p2.a;
               }
             }
-
-            if (total > 0) {
-              final c = frame.getColor(r / total, g / total, b / total,
-                  a / total);
-              fillRect(frame, x, y, x + bs, y + bs, c);
-            }
+            final total = blockSize * blockSize;
+            r /= total;
+            g /= total;
+            b /= total;
+            a /= total;
           }
+
+          p.setColor(r, g, b, a);
         }
         break;
     }

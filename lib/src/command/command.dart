@@ -424,6 +424,22 @@ class Command {
         amount: amount);
   }
 
+  /// Run an arbitrary function on the image within the Command graph.
+  /// A FilterFunction is in the `form Image function(Image)`. A new Image
+  /// can be returned, replacing the given Image; or the given Image can be
+  /// returned.
+  ///
+  /// @example
+  /// final image = Command()
+  /// ..createImage(256, 256)
+  /// ..filter((image) {
+  ///   for (final pixel in image) {
+  ///     pixel.r = pixel.x;
+  ///     pixel.g = pixel.y;
+  ///   }
+  ///   return image;
+  /// })
+  /// ..getImage();
   void filter(FilterFunction filter) {
     subCommand = FilterCmd(subCommand, filter);
   }

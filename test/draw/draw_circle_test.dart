@@ -10,7 +10,7 @@ void drawCircleTest() {
 
     drawCircle(i0, 128, 128, 100, ColorRgba8(255));
 
-    File('$testOutputPath/draw/draw_circle_0.png')
+    File('$testOutputPath/draw/draw_circle.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

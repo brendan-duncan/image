@@ -12,7 +12,7 @@ void drawStringTest() {
     drawString(i0, arial24, 200, 80, "Right Justified", rightJustify: true);
     drawStringCentered(i0, arial24, "Centered");
 
-    File('$testOutputPath/draw/draw_string_0.png')
+    File('$testOutputPath/draw/draw_string.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
   });

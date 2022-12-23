@@ -10,14 +10,14 @@ import 'transform/transform_tests.dart';
 import 'util/util_tests.dart';
 
 void main() {
-  commandTests();
+  /*commandTests();
   colorTests();
   exifTests();
   fontTests();
   utilTests();
   imageTests();
-  drawTests();
+  drawTests();*/
   filterTests();
-  transformTests();
-  formatTests();
+  //transformTests();
+  //formatTests();
 }

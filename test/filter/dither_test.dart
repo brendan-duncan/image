@@ -10,28 +10,28 @@ void ditherTest() {
     final i0 = decodePng(bytes)!;
 
     var id = ditherImage(i0);
-    File('$testOutputPath/filter/dither_FloydSteinberg.bmp')
+    File('$testOutputPath/filter/dither_FloydSteinberg.png')
       ..createSync(recursive: true)
-      ..writeAsBytesSync(encodeBmp(id));
+      ..writeAsBytesSync(encodePng(id));
 
     id = ditherImage(i0, kernel: DitherKernel.atkinson);
-    File('$testOutputPath/filter/dither_Atkinson.bmp')
+    File('$testOutputPath/filter/dither_Atkinson.png')
       ..createSync(recursive: true)
-      ..writeAsBytesSync(encodeBmp(id));
+      ..writeAsBytesSync(encodePng(id));
 
     id = ditherImage(i0, kernel: DitherKernel.falseFloydSteinberg);
-    File('$testOutputPath/filter/dither_FalseFloydSteinberg.bmp')
+    File('$testOutputPath/filter/dither_FalseFloydSteinberg.png')
       ..createSync(recursive: true)
-      ..writeAsBytesSync(encodeBmp(id));
+      ..writeAsBytesSync(encodePng(id));
 
     id = ditherImage(i0, kernel: DitherKernel.stucki);
-    File('$testOutputPath/filter/dither_Stucki.bmp')
+    File('$testOutputPath/filter/dither_Stucki.png')
       ..createSync(recursive: true)
-      ..writeAsBytesSync(encodeBmp(id));
+      ..writeAsBytesSync(encodePng(id));
 
     id = ditherImage(i0, kernel: DitherKernel.none);
-    File('$testOutputPath/filter/dither_None.bmp')
+    File('$testOutputPath/filter/dither_None.png')
       ..createSync(recursive: true)
-      ..writeAsBytesSync(encodeBmp(id));
+      ..writeAsBytesSync(encodePng(id));
   });
 }

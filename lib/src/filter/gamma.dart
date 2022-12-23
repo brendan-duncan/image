@@ -6,9 +6,9 @@ import '../image/image.dart';
 Image gamma(Image src, { num gamma = 2.2 }) {
   for (final frame in src.frames) {
     for (final p in frame) {
-      p..r = pow(p.r, 1.0 / gamma)
-      ..g = pow(p.g, 1.0 / gamma)
-      ..b = pow(p.b, 1.0 / gamma);
+      p..r = pow(p.r / p.maxChannelValue, gamma) * p.maxChannelValue
+      ..g = pow(p.g / p.maxChannelValue, gamma) * p.maxChannelValue
+      ..b = pow(p.b / p.maxChannelValue, gamma) * p.maxChannelValue;
     }
   }
   return src;

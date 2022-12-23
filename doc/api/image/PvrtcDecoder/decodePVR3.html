@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the decodePVR3 method from the PvrtcDecoder class, for the Dart programming language.">
+  <title>decodePVR3 method - PvrtcDecoder class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/PvrtcDecoder-class.html">PvrtcDecoder</a></li>
+    <li class="self-crumb">decodePVR3 method</li>
+  </ol>
+  <div class="self-name">decodePVR3</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">decodePVR3</span> method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="../../image/Image-class.html">Image</a>?</span>
+<span class="name ">decodePVR3</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="decodePVR3-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span></li>
+</ol>)
+
+      
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Image? decodePVR3(Uint8List data) {
+  &#47;&#47;const PVR3_PVRTC_2BPP_RGB = 0;
+  &#47;&#47;const PVR3_PVRTC_2BPP_RGBA = 1;
+  const pvr3Pvrtc4bppRgb = 2;
+  const pvr3Pvrtc4bppRgba = 3;
+  &#47;*const PVR3_PVRTC2_2BPP = 4;
+  const PVR3_PVRTC2_4BPP = 5;
+  const PVR3_ETC1 = 6;
+  const PVR3_DXT1 = 7;
+  const PVR3_DXT2 = 8;
+  const PVR3_DXT3 = 9;
+  const PVR3_DXT4 = 10;
+  const PVR3_DXT5 = 11;
+  const PVR3_BC1 = 7;
+  const PVR3_BC2 = 9;
+  const PVR3_BC3 = 11;
+  const PVR3_BC4 = 12;
+  const PVR3_BC5 = 13;
+  const PVR3_BC6 = 14;
+  const PVR3_BC7 = 15;
+  const PVR3_UYVY = 16;
+  const PVR3_YUY2 = 17;
+  const PVR3_BW_1BPP = 18;
+  const PVR3_R9G9B9E5 = 19;
+  const PVR3_RGBG8888 = 20;
+  const PVR3_GRGB8888 = 21;
+  const PVR3_ETC2_RGB = 22;
+  const PVR3_ETC2_RGBA = 23;
+  const PVR3_ETC2_RGB_A1 = 24;
+  const PVR3_EAC_R11_U = 25;
+  const PVR3_EAC_R11_S = 26;
+  const PVR3_EAC_RG11_U = 27;
+  const PVR3_EAC_RG11_S = 28;*&#47;
+
+  final input = InputBuffer(data);
+
+  &#47;&#47; Header
+  final version = input.readUint32();
+  if (version != 0x03525650) {
+    return null;
+  }
+
+  &#47;*int flags =*&#47; input.readUint32();
+  final format = input.readUint32();
+  final order = [
+    input.readByte(),
+    input.readByte(),
+    input.readByte(),
+    input..readByte()
+  ];
+  &#47;*int colorspace =*&#47; input..readUint32()
+  &#47;*int channeltype =*&#47; ..readUint32();
+  final height = input.readUint32();
+  final width = input.readUint32();
+  &#47;*int depth =*&#47; input..readUint32()
+  &#47;*int num_surfaces =*&#47; ..readUint32()
+  &#47;*int num_faces =*&#47; ..readUint32()
+  &#47;*int mipcount =*&#47; ..readUint32();
+  final metadataSize = input.readUint32();
+
+  input.skip(metadataSize);
+
+  if (order[0] == 0) {
+    switch (format) {
+      case pvr3Pvrtc4bppRgb:
+        return decodeRgb4bpp(width, height, input.toUint8List());
+      case pvr3Pvrtc4bppRgba:
+        return decodeRgba4bpp(width, height, input.toUint8List());
+      &#47;*case PVR3_PVRTC_2BPP_RGB:
+        return null;
+      case PVR3_PVRTC_2BPP_RGBA:
+        return null;
+      case PVR3_PVRTC2_2BPP:
+        return null;
+      case PVR3_PVRTC2_4BPP:
+        return null;
+      case PVR3_ETC1:
+        return null;
+      case PVR3_DXT1:
+        return null;
+      case PVR3_DXT2:
+        return null;
+      case PVR3_DXT3:
+        return null;
+      case PVR3_DXT4:
+        return null;
+      case PVR3_DXT5:
+        return null;
+      case PVR3_BC1:
+        return null;
+      case PVR3_BC2:
+        return null;
+      case PVR3_BC3:
+        return null;
+      case PVR3_BC4:
+        return null;
+      case PVR3_BC5:
+        return null;
+      case PVR3_BC6:
+        return null;
+      case PVR3_BC7:
+        return null;
+      case PVR3_UYVY:
+        return null;
+      case PVR3_YUY2:
+        return null;
+      case PVR3_BW_1BPP:
+        return null;
+      case PVR3_R9G9B9E5:
+        return null;
+      case PVR3_RGBG8888:
+        return null;
+      case PVR3_GRGB8888:
+        return null;
+      case PVR3_ETC2_RGB:
+        return null;
+      case PVR3_ETC2_RGBA:
+        return null;
+      case PVR3_ETC2_RGB_A1:
+        return null;
+      case PVR3_EAC_R11_U:
+        return null;
+      case PVR3_EAC_R11_S:
+        return null;
+      case PVR3_EAC_RG11_U:
+        return null;
+      case PVR3_EAC_RG11_S:
+        return null;*&#47;
+    }
+  }
+
+  return null;
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/PvrtcDecoder-class.html">PvrtcDecoder</a></li>
+  <li class="self-crumb">decodePVR3 method</li>
+</ol>
+
+
+    <h5>PvrtcDecoder class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/PvrtcDecoder-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/PvrtcDecoder/PvrtcDecoder.html">PvrtcDecoder</a></li>
+
+
+        <li class="section-title inherited">
+          <a href="../../image/PvrtcDecoder-class.html#instance-properties">Properties</a>
+        </li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+
+        <li class="section-title"><a href="../../image/PvrtcDecoder-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodeApplePVRTC.html">decodeApplePVRTC</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodePvr.html">decodePvr</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodePVR2.html">decodePVR2</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodePVR3.html">decodePVR3</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodeRgb4bpp.html">decodeRgb4bpp</a></li>
+          <li><a href="../../image/PvrtcDecoder/decodeRgba4bpp.html">decodeRgba4bpp</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../image/PvrtcDecoder-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

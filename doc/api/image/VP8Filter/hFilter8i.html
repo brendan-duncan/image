@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the hFilter8i method from the VP8Filter class, for the Dart programming language.">
+  <title>hFilter8i method - VP8Filter class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/VP8Filter-class.html">VP8Filter</a></li>
+    <li class="self-crumb">hFilter8i method</li>
+  </ol>
+  <div class="self-name">hFilter8i</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">hFilter8i</span> method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype">void</span>
+<span class="name ">hFilter8i</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="hFilter8i-param-u"><span class="type-annotation"><a href="../../image/InputBuffer-class.html">InputBuffer</a></span> <span class="parameter-name">u</span>, </span></li>
+<li><span class="parameter" id="hFilter8i-param-v"><span class="type-annotation"><a href="../../image/InputBuffer-class.html">InputBuffer</a></span> <span class="parameter-name">v</span>, </span></li>
+<li><span class="parameter" id="hFilter8i-param-stride"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">stride</span>, </span></li>
+<li><span class="parameter" id="hFilter8i-param-thresh"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">thresh</span>, </span></li>
+<li><span class="parameter" id="hFilter8i-param-ithresh"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">ithresh</span>, </span></li>
+<li><span class="parameter" id="hFilter8i-param-hevThresh"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">hevThresh</span></span></li>
+</ol>)
+
+      
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">void hFilter8i(InputBuffer u, InputBuffer v, int stride, int thresh,
+    int ithresh, int hevThresh) {
+  final u2 = InputBuffer.from(u, offset: 4);
+  final v2 = InputBuffer.from(v, offset: 4);
+  _filterLoop24(u2, 1, stride, 8, thresh, ithresh, hevThresh);
+  _filterLoop24(v2, 1, stride, 8, thresh, ithresh, hevThresh);
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/VP8Filter-class.html">VP8Filter</a></li>
+  <li class="self-crumb">hFilter8i method</li>
+</ol>
+
+
+    <h5>VP8Filter class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/VP8Filter-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/VP8Filter/VP8Filter.html">VP8Filter</a></li>
+
+
+        <li class="section-title inherited">
+          <a href="../../image/VP8Filter-class.html#instance-properties">Properties</a>
+        </li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+
+        <li class="section-title"><a href="../../image/VP8Filter-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../image/VP8Filter/hFilter16.html">hFilter16</a></li>
+          <li><a href="../../image/VP8Filter/hFilter16i.html">hFilter16i</a></li>
+          <li><a href="../../image/VP8Filter/hFilter8.html">hFilter8</a></li>
+          <li><a href="../../image/VP8Filter/hFilter8i.html">hFilter8i</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li><a href="../../image/VP8Filter/simpleHFilter16.html">simpleHFilter16</a></li>
+          <li><a href="../../image/VP8Filter/simpleHFilter16i.html">simpleHFilter16i</a></li>
+          <li><a href="../../image/VP8Filter/simpleVFilter16.html">simpleVFilter16</a></li>
+          <li><a href="../../image/VP8Filter/simpleVFilter16i.html">simpleVFilter16i</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+          <li><a href="../../image/VP8Filter/transform.html">transform</a></li>
+          <li><a href="../../image/VP8Filter/transformAC3.html">transformAC3</a></li>
+          <li><a href="../../image/VP8Filter/transformDC.html">transformDC</a></li>
+          <li><a href="../../image/VP8Filter/transformDCUV.html">transformDCUV</a></li>
+          <li><a href="../../image/VP8Filter/transformOne.html">transformOne</a></li>
+          <li><a href="../../image/VP8Filter/transformUV.html">transformUV</a></li>
+          <li><a href="../../image/VP8Filter/vFilter16.html">vFilter16</a></li>
+          <li><a href="../../image/VP8Filter/vFilter16i.html">vFilter16i</a></li>
+          <li><a href="../../image/VP8Filter/vFilter8.html">vFilter8</a></li>
+          <li><a href="../../image/VP8Filter/vFilter8i.html">vFilter8i</a></li>
+
+        <li class="section-title inherited"><a href="../../image/VP8Filter-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+        <li class="section-title"><a href="../../image/VP8Filter-class.html#static-properties">Static properties</a></li>
+          <li><a href="../../image/VP8Filter/abs0.html">abs0</a></li>
+          <li><a href="../../image/VP8Filter/abs1.html">abs1</a></li>
+          <li><a href="../../image/VP8Filter/clip1.html">clip1</a></li>
+          <li><a href="../../image/VP8Filter/sclip1.html">sclip1</a></li>
+          <li><a href="../../image/VP8Filter/sclip2.html">sclip2</a></li>
+
+        <li class="section-title"><a href="../../image/VP8Filter-class.html#static-methods">Static methods</a></li>
+          <li><a href="../../image/VP8Filter/dc16.html">dc16</a></li>
+          <li><a href="../../image/VP8Filter/dc16NoLeft.html">dc16NoLeft</a></li>
+          <li><a href="../../image/VP8Filter/dc16NoTop.html">dc16NoTop</a></li>
+          <li><a href="../../image/VP8Filter/dc16NoTopLeft.html">dc16NoTopLeft</a></li>
+          <li><a href="../../image/VP8Filter/dc8uv.html">dc8uv</a></li>
+          <li><a href="../../image/VP8Filter/dc8uvNoLeft.html">dc8uvNoLeft</a></li>
+          <li><a href="../../image/VP8Filter/dc8uvNoTop.html">dc8uvNoTop</a></li>
+          <li><a href="../../image/VP8Filter/dc8uvNoTopLeft.html">dc8uvNoTopLeft</a></li>
+          <li><a href="../../image/VP8Filter/he16.html">he16</a></li>
+          <li><a href="../../image/VP8Filter/he8uv.html">he8uv</a></li>
+          <li><a href="../../image/VP8Filter/put16.html">put16</a></li>
+          <li><a href="../../image/VP8Filter/put8x8uv.html">put8x8uv</a></li>
+          <li><a href="../../image/VP8Filter/trueMotion.html">trueMotion</a></li>
+          <li><a href="../../image/VP8Filter/ve16.html">ve16</a></li>
+          <li><a href="../../image/VP8Filter/ve8uv.html">ve8uv</a></li>
+
+        <li class="section-title"><a href="../../image/VP8Filter-class.html#constants">Constants</a></li>
+          <li><a href="../../image/VP8Filter/kC1-constant.html">kC1</a></li>
+          <li><a href="../../image/VP8Filter/kC2-constant.html">kC2</a></li>
+          <li><a href="../../image/VP8Filter/predChroma8-constant.html">predChroma8</a></li>
+          <li><a href="../../image/VP8Filter/predLuma4-constant.html">predLuma4</a></li>
+          <li><a href="../../image/VP8Filter/predLuma16-constant.html">predLuma16</a></li>
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

@@ -1,7 +1,7 @@
 import '../image/image.dart';
 
 /// Find the minimum and maximum color value in the image.
-/// Returns a list as [min, max].
+/// Returns a list as \[min, max\].
 List<num> minMax(Image image) {
   var first = true;
   num min = 0;

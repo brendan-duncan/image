@@ -22,16 +22,16 @@ class SeparableKernel {
 
   /// Apply the kernel to the [src] image, storing the results in [dst],
   /// for a single dimension. If [horizontal is true, the filter will be
-  /// applied to the horizontal axis, otherwise it will be appied to the
+  /// applied to the horizontal axis, otherwise it will be applied to the
   /// vertical axis.
-  void apply(Image src, Image dst, {bool horizontal = true}) {
+  void apply(Image src, Image dst, { bool horizontal = true }) {
     if (horizontal) {
       for (var y = 0; y < src.height; ++y) {
-        _applyCoeffsLine(src, dst, y, src.width, horizontal);
+        _applyCoefficientsLine(src, dst, y, src.width, horizontal);
       }
     } else {
       for (var x = 0; x < src.width; ++x) {
-        _applyCoeffsLine(src, dst, x, src.height, horizontal);
+        _applyCoefficientsLine(src, dst, x, src.height, horizontal);
       }
     }
   }
@@ -53,7 +53,7 @@ class SeparableKernel {
     return x;
   }
 
-  void _applyCoeffsLine(Image src, Image dst, int y, int width,
+  void _applyCoefficientsLine(Image src, Image dst, int y, int width,
       bool horizontal) {
     for (var x = 0; x < width; x++) {
       num r = 0.0;

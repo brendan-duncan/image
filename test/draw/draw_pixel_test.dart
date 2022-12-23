@@ -14,7 +14,7 @@ void drawPixelTest() {
       }
     }
 
-    File('$testOutputPath/draw/draw_pixel_0.png')
+    File('$testOutputPath/draw/draw_pixel.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(i0));
 

@@ -38,7 +38,7 @@ enum TrimMode {
 }
 
 /// Find the crop area to be used by the trim function. Returns the
-/// coordinates as [x, y, width, height]. You could pass these coordinates
+/// coordinates as \[x, y, width, height\]. You could pass these coordinates
 /// to the copyCrop function to crop the image.
 List<int> findTrim(Image src,
     {TrimMode mode = TrimMode.transparent, Trim sides = Trim.all}) {
@@ -114,7 +114,7 @@ List<int> findTrim(Image src,
 /// and can be any combination of [Trim.top], [Trim.bottom], [Trim.left],
 /// and [Trim.right].
 Image trim(Image src,
-    { TrimMode mode = TrimMode.transparent, Trim sides = Trim.all }) {
+    { TrimMode mode = TrimMode.topLeftColor, Trim sides = Trim.all }) {
   if (mode == TrimMode.transparent && src.numChannels == 3) {
     return Image.from(src);
   }
