@@ -14,12 +14,12 @@ void trimTest() {
     expect(trimmed.width, equals(64));
     expect(trimmed.height, equals(56));
 
-    trimmed = trim(image, mode: TrimMode.topLeftColor);
-    File('$testOutputPath/transform/trim_topLeftColor.png')
+    trimmed = trim(image, mode: TrimMode.transparent);
+    File('$testOutputPath/transform/trim_transparent.png')
       ..createSync(recursive: true)
       ..writeAsBytesSync(encodePng(trimmed));
-    expect(trimmed.width, equals(64));
-    expect(trimmed.height, equals(56));
+    expect(trimmed.width, equals(image.width));
+    expect(trimmed.height, equals(image.height));
 
     trimmed = trim(image, mode: TrimMode.bottomRightColor);
     File('$testOutputPath/transform/trim_bottomRightColor.png')

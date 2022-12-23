@@ -1,4 +1,3 @@
-import '../draw/fill_rect.dart';
 import '../image/image.dart';
 
 enum PixelateMode {
@@ -20,8 +19,6 @@ Image pixelate(Image src, int blockSize,
   if (blockSize <= 1) {
     return src;
   }
-
-  final bs = blockSize - 1;
 
   for (final frame in src.frames) {
     final w = frame.width;
