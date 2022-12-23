@@ -4,15 +4,15 @@ import '../util/point.dart';
 import 'draw_line.dart';
 import 'draw_pixel.dart';
 
-/// Draw a circle into the [image] with a center of [x0],[y0] and
+/// Draw a circle into the [image] with a center of [x],[y] and
 /// the given [radius] and [color].
-Image drawCircle(Image image, int x0, int y0, int radius, Color color) {
-  final points = _calculateCircumference(image, x0, y0, radius);
+Image drawCircle(Image image, int x, int y, int radius, Color color) {
+  final points = _calculateCircumference(image, x, y, radius);
   _draw(image, points, color);
   return image;
 }
 
-/// Draw and fill a circle into the [image] with a center of [x0],[y0]
+/// Draw and fill a circle into the [image] with a center of [x],[y]
 /// and the given [radius] and [color].
 ///
 /// The algorithm uses the same logic as [drawCircle] to calculate each point
@@ -22,8 +22,8 @@ Image drawCircle(Image image, int x0, int y0, int radius, Color color) {
 ///
 /// Once found, it draws a line connecting those two points. The circle is thus
 /// filled one vertical slice at a time (each slice being 1-pixel wide).
-Image fillCircle(Image image, int x0, int y0, int radius, Color color) {
-  final points = _calculateCircumference(image, x0, y0, radius)
+Image fillCircle(Image image, int x, int y, int radius, Color color) {
+  final points = _calculateCircumference(image, x, y, radius)
       // sort points by x-coordinate and then by y-coordinate
       ..sort((a, b) => (a.x == b.x) ? a.y.compareTo(b.y) : a.x.compareTo(b.x));
 

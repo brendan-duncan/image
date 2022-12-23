@@ -11,7 +11,7 @@ typedef _MarkPixel = void Function(int y, int x);
 /// Fill the 4-connected shape containing [x],[y] in the image [src] with the
 /// given [color].
 Image fillFlood(Image src, int x, int y, Color color,
-    {num threshold = 0.0, bool compareAlpha = false}) {
+    { num threshold = 0.0, bool compareAlpha = false }) {
   if (color.a == 0) {
     return src;
   }

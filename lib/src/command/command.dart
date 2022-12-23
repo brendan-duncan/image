@@ -25,8 +25,16 @@ import '_executor.dart'
 if (dart.library.io) '_executor_io.dart'
 if (dart.library.js) '_executor_html.dart';
 import 'draw/draw_char_cmd.dart';
+import 'draw/draw_circle_cmd.dart';
+import 'draw/draw_image_cmd.dart';
+import 'draw/draw_line_cmd.dart';
+import 'draw/draw_pixel_cmd.dart';
+import 'draw/draw_rect_cmd.dart';
 import 'draw/draw_string_cmd.dart';
+import 'draw/fill_circle_cmd.dart';
 import 'draw/fill_cmd.dart';
+import 'draw/fill_flood_cmd.dart';
+import 'draw/fill_rect_cmd.dart';
 import 'filter/adjust_color_cmd.dart';
 import 'filter/bump_to_normal_cmd.dart';
 import 'filter/color_offset_cmd.dart';
@@ -292,8 +300,38 @@ class Command {
 
 
   // draw
-  void fill(Color color) {
-    subCommand = FillCmd(subCommand, color);
+  void drawChar(BitmapFont font, int x, int y,
+      String char, { Color? color }) {
+    subCommand = DrawCharCmd(subCommand, font, x, y, char,
+        color: color);
+  }
+
+  void drawCircle(int x, int y, int radius, Color color) {
+    subCommand = DrawCircleCmd(subCommand, x, y, radius, color);
+  }
+
+  void drawImage(Command? src, { int? dstX, int? dstY, int? dstW, int? dstH,
+      int? srcX, int? srcY, int? srcW, int? srcH, bool blend = true,
+      bool center = false }) {
+    subCommand = DrawImageCmd(subCommand, src, dstX: dstX, dstY: dstY,
+        dstW: dstW, dstH: dstH, srcX: srcX, srcY: srcY, srcW: srcW, srcH: srcH,
+        blend: blend, center: center);
+  }
+
+  void drawLine(int x1, int y1, int x2, int y2, Color c,
+      { bool antialias = false, num thickness = 1 }) {
+    subCommand = DrawLineCmd(subCommand, x1, y1, x2, y2, c,
+        antialias: antialias, thickness: thickness);
+  }
+
+  void drawPixel(int x, int y, Color color) {
+    subCommand = DrawPixelCmd(subCommand, x, y, color);
+  }
+
+  void drawRect(int x1, int y1, int x2, int y2, Color c,
+      { num thickness = 1 }) {
+    subCommand = DrawRectCmd(subCommand, x1, y1, x2, y2, c,
+        thickness: thickness);
   }
 
   void drawString(BitmapFont font, int x, int y,
@@ -302,10 +340,22 @@ class Command {
         color: color);
   }
 
-  void drawChar(BitmapFont font, int x, int y,
-      String char, { Color? color }) {
-    subCommand = DrawCharCmd(subCommand, font, x, y, char,
-        color: color);
+  void fill(Color color) {
+    subCommand = FillCmd(subCommand, color);
+  }
+
+  void fillCircle(int x, int y, int radius, Color color) {
+    subCommand = FillCircleCmd(subCommand, x, y, radius, color);
+  }
+
+  void fillFlood(int x, int y, Color color,
+      { num threshold = 0.0, bool compareAlpha = false }) {
+    subCommand = FillFloodCmd(subCommand, x, y, color, threshold: threshold,
+        compareAlpha: compareAlpha);
+  }
+
+  void fillRect(int x1, int y1, int x2, int y2, Color c) {
+    subCommand = FillRectCmd(subCommand, x1, y1, x2, y2, c);
   }
 
   // filter
