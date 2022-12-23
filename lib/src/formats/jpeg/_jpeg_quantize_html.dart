@@ -412,10 +412,10 @@ Image getImageFromJpeg(JpegData jpeg) {
             final cr = component3Line![x3];
             ck = component4Line![x4];
 
-            cc = 255 - ((cy + 1.402 * (cr - 128)).toInt()).clamp(0, 255);
+            cc = 255 - (cy + 1.402 * (cr - 128)).toInt().clamp(0, 255);
             cm = 255 - ((cy - 0.3441363 * (cb - 128) - 0.71413636 *
                 (cr - 128)).clamp(0, 255).toInt());
-            cy = 255 - ((cy + 1.772 * (cb - 128)).toInt()).clamp(0, 255);
+            cy = 255 - (cy + 1.772 * (cb - 128)).toInt().clamp(0, 255);
           }
 
           final r = shiftR(cc * ck, 8);

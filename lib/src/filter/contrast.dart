@@ -27,10 +27,12 @@ Image? contrast(Image? src, num contrast) {
     }
   }
 
-  for (var p in src) {
-    p..r = _contrast[p.r as int]
-    ..g = _contrast[p.g as int]
-    ..b = _contrast[p.b as int];
+  for (final frame in src.frames) {
+    for (final p in frame) {
+      p..r = _contrast[p.r as int]
+      ..g = _contrast[p.g as int]
+      ..b = _contrast[p.b as int];
+    }
   }
 
   return src;

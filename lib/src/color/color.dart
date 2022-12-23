@@ -17,10 +17,13 @@ abstract class Color extends Iterable<num> {
 
   num get r;
   void set r(num r);
+
   num get g;
   void set g(num g);
+
   num get b;
   void set b(num b);
+
   num get a;
   void set a(num a);
 

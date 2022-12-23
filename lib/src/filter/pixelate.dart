@@ -23,48 +23,50 @@ Image pixelate(Image src, int blockSize,
 
   final bs = blockSize - 1;
 
-  switch (mode) {
-    case PixelateMode.upperLeft:
-      for (var y = 0; y < src.height; y += blockSize) {
-        for (var x = 0; x < src.width; x += blockSize) {
-          if (src.isBoundsSafe(x, y)) {
-            final c = src.getPixel(x, y);
-            fillRect(src, x, y, x + bs, y + bs, c);
-          }
-        }
-      }
-      break;
-    case PixelateMode.average:
-      for (var y = 0; y < src.height; y += blockSize) {
-        for (var x = 0; x < src.width; x += blockSize) {
-          num a = 0;
-          num r = 0;
-          num g = 0;
-          num b = 0;
-          var total = 0;
-
-          for (var cy = 0; cy < blockSize; ++cy) {
-            for (var cx = 0; cx < blockSize; ++cx) {
-              if (!src.isBoundsSafe(x + cx, y + cy)) {
-                continue;
-              }
-              final c = src.getPixel(x + cx, y + cy);
-              a += c.a;
-              r += c.r;
-              g += c.g;
-              b += c.b;
-              total++;
+  for (final frame in src.frames) {
+    switch (mode) {
+      case PixelateMode.upperLeft:
+        for (var y = 0; y < frame.height; y += blockSize) {
+          for (var x = 0; x < frame.width; x += blockSize) {
+            if (frame.isBoundsSafe(x, y)) {
+              final c = frame.getPixel(x, y);
+              fillRect(frame, x, y, x + bs, y + bs, c);
             }
           }
+        }
+        break;
+      case PixelateMode.average:
+        for (var y = 0; y < frame.height; y += blockSize) {
+          for (var x = 0; x < frame.width; x += blockSize) {
+            num a = 0;
+            num r = 0;
+            num g = 0;
+            num b = 0;
+            var total = 0;
 
-          if (total > 0) {
-            final c = src.getColor(r / total, g / total, b / total, a / total);
-            fillRect(src, x, y, x + bs, y + bs, c);
+            for (var cy = 0; cy < blockSize; ++cy) {
+              for (var cx = 0; cx < blockSize; ++cx) {
+                if (!frame.isBoundsSafe(x + cx, y + cy)) {
+                  continue;
+                }
+                final c = frame.getPixel(x + cx, y + cy);
+                a += c.a;
+                r += c.r;
+                g += c.g;
+                b += c.b;
+                total++;
+              }
+            }
+
+            if (total > 0) {
+              final c = frame.getColor(r / total, g / total, b / total,
+                  a / total);
+              fillRect(frame, x, y, x + bs, y + bs, c);
+            }
           }
         }
-      }
-      break;
+        break;
+    }
   }
-
   return src;
 }

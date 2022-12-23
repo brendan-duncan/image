@@ -1,11 +1,15 @@
+import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:meta/meta.dart';
-
+import '../color/channel.dart';
 import '../color/color.dart';
 import '../color/format.dart';
 import '../exif/exif_data.dart';
 import '../filter/dither_image.dart';
+import '../filter/noise.dart';
+import '../filter/pixelate.dart';
+import '../filter/quantize.dart';
+import '../filter/separable_kernel.dart';
 import '../font/bitmap_font.dart';
 import '../formats/png_encoder.dart';
 import '../image/icc_profile.dart';
@@ -13,15 +17,40 @@ import '../image/image.dart';
 import '../image/palette.dart';
 import '../transform/flip.dart';
 import '../transform/trim.dart';
+import '../util/internal.dart';
 import '../util/interpolation.dart';
 import '../util/point.dart';
+import '../util/quantizer.dart';
 import '_executor.dart'
 if (dart.library.io) '_executor_io.dart'
 if (dart.library.js) '_executor_html.dart';
 import 'draw/draw_char_cmd.dart';
 import 'draw/draw_string_cmd.dart';
 import 'draw/fill_cmd.dart';
+import 'filter/adjust_color_cmd.dart';
+import 'filter/bump_to_normal_cmd.dart';
+import 'filter/color_offset_cmd.dart';
+import 'filter/contrast_cmd.dart';
+import 'filter/convolution_cmd.dart';
+import 'filter/dither_image_cmd.dart';
+import 'filter/drop_shadow_cmd.dart';
+import 'filter/emboss_cmd.dart';
 import 'filter/filter_cmd.dart';
+import 'filter/gamma_cmd.dart';
+import 'filter/gaussian_blur_cmd.dart';
+import 'filter/grayscale_cmd.dart';
+import 'filter/invert_cmd.dart';
+import 'filter/noise_cmd.dart';
+import 'filter/normalize_cmd.dart';
+import 'filter/pixelate_cmd.dart';
+import 'filter/quantize_cmd.dart';
+import 'filter/remap_colors_cmd.dart';
+import 'filter/scale_rgba_cmd.dart';
+import 'filter/separable_convolution_cmd.dart';
+import 'filter/sepia_cmd.dart';
+import 'filter/smooth_cmd.dart';
+import 'filter/sobel_cmd.dart';
+import 'filter/vignette_cmd.dart';
 import 'formats/bmp_cmd.dart';
 import 'formats/cur_cmd.dart';
 import 'formats/decode_image_cmd.dart';
@@ -278,6 +307,120 @@ class Command {
 
   // filter
 
+  void adjustColor({ Color? blacks, Color? whites, Color? mids,
+        num? contrast, num? saturation, num? brightness,
+        num? gamma, num? exposure, num? hue, num? amount }) {
+    subCommand = AdjustColorCmd(subCommand, blacks: blacks, whites: whites,
+        mids: mids, contrast: contrast, saturation: saturation,
+        brightness: brightness, gamma: gamma, exposure: exposure,
+        hue: hue, amount: amount);
+  }
+
+  void bumpToNormal({ num strength = 2.0 }) {
+    subCommand = BumpToNormalCmd(subCommand, strength: strength);
+  }
+
+  void colorOffset({ num red = 0, num green = 0, num blue = 0,
+      num alpha = 0 }) {
+    subCommand = ColorOffsetCmd(subCommand, red: red, green: green, blue: blue,
+        alpha: alpha);
+  }
+
+  void contrast(num amount) {
+    subCommand = ContrastCmd(subCommand, amount: amount);
+  }
+
+  void convolution(List<num> filter, { num div = 1.0, num offset = 0.0 }) {
+    subCommand = ConvolutionCmd(subCommand, filter, div: div, offset: offset);
+  }
+
+  void ditherImage({ Quantizer? quantizer,
+    DitherKernel kernel = DitherKernel.floydSteinberg,
+    bool serpentine = false }) {
+    subCommand = DitherImageCmd(subCommand, quantizer: quantizer,
+        kernel: kernel, serpentine: serpentine);
+  }
+
+  void dropShadow(int hShadow, int vShadow, int blur, { Color? shadowColor }) {
+    subCommand = DropShadowCmd(subCommand, hShadow, vShadow, blur,
+        shadowColor: shadowColor);
+  }
+
+  void emboss() {
+    subCommand = EmbossCmd(subCommand);
+  }
+
+  void gamma({ num gamma = 2.2 }) {
+    subCommand = GammaCmd(subCommand, gamma: gamma);
+  }
+
+  void gaussianBlur(int radius) {
+    subCommand = GaussianBlurCmd(subCommand, radius);
+  }
+
+  void grayscale() {
+    subCommand = GrayscaleCmd(subCommand);
+  }
+
+  void invert() {
+    subCommand = InvertCmd(subCommand);
+  }
+
+  void noise(num sigma, { NoiseType type = NoiseType.gaussian,
+      Random? random }) {
+    subCommand = NoiseCmd(subCommand, sigma, type: type, random: random);
+  }
+
+  void normalize(num minValue, num maxValue) {
+    subCommand = NormalizeCmd(subCommand, minValue, maxValue);
+  }
+
+  void pixelate(int blockSize, { PixelateMode mode = PixelateMode.upperLeft }) {
+    subCommand = PixelateCmd(subCommand, blockSize, mode: mode);
+  }
+
+  void quantize({ int numberOfColors = 256,
+        QuantizeMethod method = QuantizeMethod.neuralNet,
+        DitherKernel dither = DitherKernel.none,
+        bool ditherSerpentine = false }) {
+    subCommand = QuantizeCmd(subCommand, numberOfColors: numberOfColors,
+        method: method, dither: dither, ditherSerpentine: ditherSerpentine);
+  }
+
+  void remapColors({ Channel red = Channel.red,
+        Channel green = Channel.green,
+        Channel blue = Channel.blue,
+        Channel alpha = Channel.alpha }) {
+    subCommand = RemapColorsCmd(subCommand, red: red, green: green, blue: blue,
+        alpha: alpha);
+  }
+
+  void scaleRgba(Color s) {
+    subCommand = ScaleRgbaCmd(subCommand, s);
+  }
+
+  void separableConvolution(SeparableKernel kernel) {
+    subCommand = SeparableConvolutionCmd(subCommand, kernel);
+  }
+
+  void sepia({ num amount = 1.0 }) {
+    subCommand = SepiaCmd(subCommand, amount: amount);
+  }
+
+  void smooth(num weight) {
+    subCommand = SmoothCmd(subCommand, weight);
+  }
+
+  void sobel({ num amount = 1.0 }) {
+    subCommand = SobelCmd(subCommand, amount: amount);
+  }
+
+  void vignette({ num start = 0.3, num end = 0.75,
+      num amount = 0.8 }) {
+    subCommand = VignetteCmd(subCommand, start: start, end: end,
+        amount: amount);
+  }
+
   void filter(FilterFunction filter) {
     subCommand = FilterCmd(subCommand, filter);
   }
@@ -369,7 +512,7 @@ class Command {
     return subCommand.bytes;
   }
 
-  @protected
+  @internal
   void executeIfDirty() {
     if (dirty) {
       dirty = false;
@@ -377,13 +520,13 @@ class Command {
     }
   }
 
-  @protected
+  @internal
   void executeCommand() { }
 
-  @protected
+  @internal
   Command get subCommand => _subCommand ?? this;
 
-  @protected
+  @internal
   set subCommand(Command? cmd) {
     _subCommand = cmd;
     firstSubCommand ??= cmd;

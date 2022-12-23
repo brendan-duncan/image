@@ -10,27 +10,30 @@ import '../image/image.dart';
 Image convolution(Image src, List<num> filter,
     { num div = 1.0, num offset = 0.0 }) {
   final tmp = Image.from(src);
-  for (var c in tmp) {
-    num r = 0.0;
-    num g = 0.0;
-    num b = 0.0;
-    final a = c.a;
-    for (var j = 0, fi = 0; j < 3; ++j) {
-      final yv = min(max(c.y - 1 + j, 0), src.height - 1);
-      for (var i = 0; i < 3; ++i, ++fi) {
-        final xv = min(max(c.x - 1 + i, 0), src.width - 1);
-        final c2 = tmp.getPixel(xv, yv);
-        r += c2.r * filter[fi];
-        g += c2.g * filter[fi];
-        b += c2.b * filter[fi];
+  for (final frame in src.frames) {
+    final tmpFrame = tmp.frames[frame.frameIndex];
+    for (final c in tmpFrame) {
+      num r = 0.0;
+      num g = 0.0;
+      num b = 0.0;
+      final a = c.a;
+      for (var j = 0, fi = 0; j < 3; ++j) {
+        final yv = min(max(c.y - 1 + j, 0), src.height - 1);
+        for (var i = 0; i < 3; ++i, ++fi) {
+          final xv = min(max(c.x - 1 + i, 0), src.width - 1);
+          final c2 = tmpFrame.getPixel(xv, yv);
+          r += c2.r * filter[fi];
+          g += c2.g * filter[fi];
+          b += c2.b * filter[fi];
+        }
       }
+
+      r = ((r / div) + offset).clamp(0, 255);
+      g = ((g / div) + offset).clamp(0, 255);
+      b = ((b / div) + offset).clamp(0, 255);
+
+      frame.setPixelColor(c.x, c.y, r, g, b, a);
     }
-
-    r = ((r / div) + offset).clamp(0, 255);
-    g = ((g / div) + offset).clamp(0, 255);
-    b = ((b / div) + offset).clamp(0, 255);
-
-    src.setPixelColor(c.x, c.y, r, g, b, a);
   }
 
   return src;

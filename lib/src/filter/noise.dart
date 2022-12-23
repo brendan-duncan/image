@@ -32,78 +32,80 @@ Image noise(Image image, num sigma,
     nSigma = -nSigma * (M - m) / 100.0;
   }
 
-  switch (type) {
-    case NoiseType.gaussian:
-      for (var p in image) {
-        final r = p.r + nSigma * grand(random);
-        final g = p.g + nSigma * grand(random);
-        final b = p.b + nSigma * grand(random);
-        final a = p.a;
-        p.setColor(r, g, b, a);
-      }
-      break;
-    case NoiseType.uniform:
-      for (var p in image) {
-        final r = p.r + nSigma * crand(random);
-        final g = p.g + nSigma * crand(random);
-        final b = p.b + nSigma * crand(random);
-        final a = p.a;
-        p.setColor(r, g, b, a);
-      }
-      break;
-    case NoiseType.saltAndPepper:
-      if (nSigma < 0) {
-        nSigma = -nSigma;
-      }
-      if (M == m) {
-        m = 0;
-        M = 255;
-      }
-      for (var p in image) {
-        if (random.nextDouble() * 100.0 < nSigma) {
-          final r = random.nextDouble() < 0.5 ? M : m;
-          final g = random.nextDouble() < 0.5 ? M : m;
-          final b = random.nextDouble() < 0.5 ? M : m;
+  for (final frame in image.frames) {
+    switch (type) {
+      case NoiseType.gaussian:
+        for (var p in frame) {
+          final r = p.r + nSigma * grand(random);
+          final g = p.g + nSigma * grand(random);
+          final b = p.b + nSigma * grand(random);
           final a = p.a;
           p.setColor(r, g, b, a);
         }
-      }
-      break;
-    case NoiseType.poisson:
-      for (var p in image) {
-        final r = prand(random, p.r.toDouble());
-        final g = prand(random, p.g.toDouble());
-        final b = prand(random, p.b.toDouble());
-        final a = p.a;
-        p.setColor(r, g, b, a);
-      }
-      break;
-    case NoiseType.rice:
-      final num sqrt2 = sqrt(2.0);
-      for (var p in image) {
-        var val0 = p.r / sqrt2;
-        var re = val0 + nSigma * grand(random);
-        var im = val0 + nSigma * grand(random);
-        var val = sqrt(re * re + im * im);
-        final r = val.toInt();
+        break;
+      case NoiseType.uniform:
+        for (var p in frame) {
+          final r = p.r + nSigma * crand(random);
+          final g = p.g + nSigma * crand(random);
+          final b = p.b + nSigma * crand(random);
+          final a = p.a;
+          p.setColor(r, g, b, a);
+        }
+        break;
+      case NoiseType.saltAndPepper:
+        if (nSigma < 0) {
+          nSigma = -nSigma;
+        }
+        if (M == m) {
+          m = 0;
+          M = 255;
+        }
+        for (var p in frame) {
+          if (random.nextDouble() * 100.0 < nSigma) {
+            final r = random.nextDouble() < 0.5 ? M : m;
+            final g = random.nextDouble() < 0.5 ? M : m;
+            final b = random.nextDouble() < 0.5 ? M : m;
+            final a = p.a;
+            p.setColor(r, g, b, a);
+          }
+        }
+        break;
+      case NoiseType.poisson:
+        for (var p in frame) {
+          final r = prand(random, p.r.toDouble());
+          final g = prand(random, p.g.toDouble());
+          final b = prand(random, p.b.toDouble());
+          final a = p.a;
+          p.setColor(r, g, b, a);
+        }
+        break;
+      case NoiseType.rice:
+        final num sqrt2 = sqrt(2.0);
+        for (var p in frame) {
+          var val0 = p.r / sqrt2;
+          var re = val0 + nSigma * grand(random);
+          var im = val0 + nSigma * grand(random);
+          var val = sqrt(re * re + im * im);
+          final r = val.toInt();
 
-        val0 = p.g / sqrt2;
-        re = val0 + nSigma * grand(random);
-        im = val0 + nSigma * grand(random);
-        val = sqrt(re * re + im * im);
-        final g = val.toInt();
+          val0 = p.g / sqrt2;
+          re = val0 + nSigma * grand(random);
+          im = val0 + nSigma * grand(random);
+          val = sqrt(re * re + im * im);
+          final g = val.toInt();
 
-        val0 = p.b / sqrt2;
-        re = val0 + nSigma * grand(random);
-        im = val0 + nSigma * grand(random);
-        val = sqrt(re * re + im * im);
-        final b = val.toInt();
+          val0 = p.b / sqrt2;
+          re = val0 + nSigma * grand(random);
+          im = val0 + nSigma * grand(random);
+          val = sqrt(re * re + im * im);
+          final b = val.toInt();
 
-        final a = p.a;
+          final a = p.a;
 
-        p.setColor(r, g, b, a);
-      }
-      break;
+          p.setColor(r, g, b, a);
+        }
+        break;
+    }
   }
 
   return image;

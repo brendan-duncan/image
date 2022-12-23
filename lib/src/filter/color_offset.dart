@@ -4,11 +4,13 @@ import '../image/image.dart';
 /// colors, a per-channel brightness.
 Image colorOffset(Image src,
     { num red = 0, num green = 0, num blue = 0, num alpha = 0 }) {
-  for (var p in src) {
-    p..r += red
-    ..g += green
-    ..b += blue
-    ..a += alpha;
+  for (final frame in src.frames) {
+    for (var p in frame) {
+      p..r += red
+      ..g += green
+      ..b += blue
+      ..a += alpha;
+    }
   }
   return src;
 }

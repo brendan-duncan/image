@@ -16,21 +16,23 @@ Image remapColors(Image src,
     Channel blue = Channel.blue,
     Channel alpha = Channel.alpha }) {
   final List<num> l = [0, 0, 0, 0, 0];
-  for (var p in src) {
-    l[0] = p.r;
-    l[1] = p.g;
-    l[2] = p.b;
-    l[3] = p.a;
-    if (red == Channel.luminance ||
-        green == Channel.luminance ||
-        blue == Channel.luminance ||
-        alpha == Channel.luminance) {
-      l[4] = getLuminanceRgb(l[0], l[1], l[2]);
+  for (final frame in src.frames) {
+    for (final p in frame) {
+      l[0] = p.r;
+      l[1] = p.g;
+      l[2] = p.b;
+      l[3] = p.a;
+      if (red == Channel.luminance ||
+          green == Channel.luminance ||
+          blue == Channel.luminance ||
+          alpha == Channel.luminance) {
+        l[4] = getLuminanceRgb(l[0], l[1], l[2]);
+      }
+      p..r = l[red.index]
+      ..g = l[green.index]
+      ..b = l[blue.index]
+      ..a = l[alpha.index];
     }
-    p..r = l[red.index]
-    ..g = l[green.index]
-    ..b = l[blue.index]
-    ..a = l[alpha.index];
   }
   return src;
 }

@@ -13,6 +13,7 @@ abstract class Pixel extends Iterator<Pixel> implements Color {
 
   int get x;
   void set x(int value);
+
   int get y;
   void set y(int value);
 

@@ -13,18 +13,19 @@ Image normalize(Image src, num minValue, num maxValue) {
 
   if (min == max) {
     return src;
-    //return fill(src, minValue);
   }
 
   final fm = min.toDouble();
   final fM = max.toDouble();
 
   if (min != a || max != b) {
-    for (var p in src) {
-      p..r = (p.r - fm) / (fM - fm) * (b - a) + a
-      ..g = (p.g - fm) / (fM - fm) * (b - a) + a
-      ..b = (p.b - fm) / (fM - fm) * (b - a) + a
-      ..a = (p.a - fm) / (fM - fm) * (b - a) + a;
+    for (var frame in src.frames) {
+      for (var p in frame) {
+        p..r = (p.r - fm) / (fM - fm) * (b - a) + a
+        ..g = (p.g - fm) / (fM - fm) * (b - a) + a
+        ..b = (p.b - fm) / (fM - fm) * (b - a) + a
+        ..a = (p.a - fm) / (fM - fm) * (b - a) + a;
+      }
     }
   }
 

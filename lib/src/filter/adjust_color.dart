@@ -112,73 +112,75 @@ Image adjustColor(Image src,
 
   final invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
 
-  for (var p in src) {
-    final num or = p.r / 255.0;
-    final num og = p.g / 255.0;
-    final num ob = p.b / 255.0;
+  for (final frame in src.frames) {
+    for (var p in frame) {
+      final num or = p.r / 255.0;
+      final num og = p.g / 255.0;
+      final num ob = p.b / 255.0;
 
-    var r = or;
-    var g = og;
-    var b = ob;
+      var r = or;
+      var g = og;
+      var b = ob;
 
-    if (useBlacksWhitesMids) {
-      r = pow((r + br) * wr, mr);
-      g = pow((g + bg) * wg, mg);
-      b = pow((b + bb) * wb, mb);
+      if (useBlacksWhitesMids) {
+        r = pow((r + br) * wr, mr);
+        g = pow((g + bg) * wg, mg);
+        b = pow((b + bb) * wb, mb);
+      }
+
+      if (brightness != null && brightness != 1.0) {
+        final _b = brightness.clamp(0, 1000);
+        r *= _b;
+        g *= _b;
+        b *= _b;
+      }
+
+      if (saturation != null) {
+        final num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
+
+        r = lum * invSaturation + r * saturation;
+        g = lum * invSaturation + g * saturation;
+        b = lum * invSaturation + b * saturation;
+      }
+
+      if (contrast != null) {
+        r = avgLumR * invContrast + r * contrast;
+        g = avgLumG * invContrast + g * contrast;
+        b = avgLumB * invContrast + b * contrast;
+      }
+
+      if (gamma != null) {
+        r = pow(r, gamma);
+        g = pow(g, gamma);
+        b = pow(b, gamma);
+      }
+
+      if (exposure != null) {
+        r = r * exposure;
+        g = g * exposure;
+        b = b * exposure;
+      }
+
+      if (hue != null && hue != 0.0) {
+        final hr = r * hueR + g * hueG + b * hueB;
+        final hg = r * hueB + g * hueR + b * hueG;
+        final hb = r * hueG + g * hueB + b * hueR;
+
+        r = hr;
+        g = hg;
+        b = hb;
+      }
+
+      if (amount != null) {
+        r = r * amount + or * invAmount;
+        g = g * amount + og * invAmount;
+        b = b * amount + ob * invAmount;
+      }
+
+      p..r = r * p.maxChannelValue
+      ..g = g * p.maxChannelValue
+      ..b = b * p.maxChannelValue;
     }
-
-    if (brightness != null && brightness != 1.0) {
-      final _b = brightness.clamp(0, 1000);
-      r *= _b;
-      g *= _b;
-      b *= _b;
-    }
-
-    if (saturation != null) {
-      final num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
-
-      r = lum * invSaturation + r * saturation;
-      g = lum * invSaturation + g * saturation;
-      b = lum * invSaturation + b * saturation;
-    }
-
-    if (contrast != null) {
-      r = avgLumR * invContrast + r * contrast;
-      g = avgLumG * invContrast + g * contrast;
-      b = avgLumB * invContrast + b * contrast;
-    }
-
-    if (gamma != null) {
-      r = pow(r, gamma);
-      g = pow(g, gamma);
-      b = pow(b, gamma);
-    }
-
-    if (exposure != null) {
-      r = r * exposure;
-      g = g * exposure;
-      b = b * exposure;
-    }
-
-    if (hue != null && hue != 0.0) {
-      final hr = r * hueR + g * hueG + b * hueB;
-      final hg = r * hueB + g * hueR + b * hueG;
-      final hb = r * hueG + g * hueB + b * hueR;
-
-      r = hr;
-      g = hg;
-      b = hb;
-    }
-
-    if (amount != null) {
-      r = r * amount + or * invAmount;
-      g = g * amount + og * invAmount;
-      b = b * amount + ob * invAmount;
-    }
-
-    p..r = r * p.maxChannelValue
-    ..g = g * p.maxChannelValue
-    ..b = b * p.maxChannelValue;
   }
 
   return src;
