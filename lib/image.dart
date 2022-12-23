@@ -2,8 +2,6 @@
 /// manipulate, and save various image file formats.
 library image;
 
-export 'src/cmd/command.dart';
-
 export 'src/color/channel.dart';
 export 'src/color/channel_iterator.dart';
 export 'src/color/color.dart';
@@ -21,6 +19,7 @@ export 'src/color/color_uint4.dart';
 export 'src/color/color_uint8.dart';
 export 'src/color/color_util.dart';
 export 'src/color/format.dart';
+export 'src/command/command.dart';
 export 'src/draw/draw_char.dart';
 export 'src/draw/draw_circle.dart';
 export 'src/draw/draw_image.dart';
@@ -197,6 +196,7 @@ export 'src/image/pixel_uint8.dart';
 export 'src/image/pixel_undefined.dart';
 export 'src/transform/bake_orientation.dart';
 export 'src/transform/copy_crop.dart';
+export 'src/transform/copy_crop_circle.dart';
 export 'src/transform/copy_flip.dart';
 export 'src/transform/copy_rectify.dart';
 export 'src/transform/copy_resize.dart';

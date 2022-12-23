@@ -121,12 +121,19 @@ Image trim(Image src,
 
   final crop = findTrim(src, mode: mode, sides: sides);
 
-  final dst = Image(crop[2], crop[3], format: src.format,
-      palette: src.palette, numChannels: src.numChannels, exif: src.exif,
-      iccp: src.iccProfile);
+  Image? firstFrame;
+  for (var frame in src.frames) {
+    final dst = firstFrame?.addFrame() ??
+      Image.fromResized(frame, crop[2], crop[3]);
+    firstFrame ??= dst;
 
-  drawImage(dst, src,
-      srcX: crop[0], srcY: crop[1], srcW: crop[2], srcH: crop[3], blend: false);
+    drawImage(dst, src,
+        srcX: crop[0],
+        srcY: crop[1],
+        srcW: crop[2],
+        srcH: crop[3],
+        blend: false);
+  }
 
-  return dst;
+  return firstFrame!;
 }

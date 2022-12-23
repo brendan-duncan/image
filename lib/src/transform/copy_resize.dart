@@ -43,13 +43,9 @@ Image copyResize(Image src, { int? width, int? height,
   Image? firstFrame;
   final numFrames = src.numFrames;
   for (var i = 0; i < numFrames; ++i) {
-    final frame = src.hasAnimation ? src.frames[i] : src;
-    final dst = firstFrame?.addFrame() ?? Image(width, height,
-          numChannels: src.numChannels, format: src.format,
-          palette: src.palette, exif: src.exif, iccp: src.iccProfile,
-          backgroundColor: src.backgroundColor?.clone(),
-          loopCount: src.loopCount, frameType: src.frameType,
-          frameDuration: src.frameDuration);
+    final frame = src.frames[i];
+    final dst = firstFrame?.addFrame() ??
+        Image.fromResized(frame, width, height);
     firstFrame ??= dst;
 
     final dy = frame.height / height;

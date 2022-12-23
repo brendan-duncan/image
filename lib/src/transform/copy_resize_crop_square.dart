@@ -17,10 +17,6 @@ Image copyResizeCropSquare(Image src, int size) {
     width = (size * (src.width / src.height)).toInt();
   }
 
-  final dst = Image(size, size, numChannels: src.numChannels,
-      format: src.format, palette: src.palette, exif: src.exif,
-      iccp: src.iccProfile);
-
   final dy = src.height / height;
   final dx = src.width / width;
 
@@ -32,12 +28,18 @@ Image copyResizeCropSquare(Image src, int size) {
     scaleX[x] = ((x + xOffset) * dx).toInt();
   }
 
-  for (var y = 0; y < size; ++y) {
-    final y2 = ((y + yOffset) * dy).toInt();
-    for (var x = 0; x < size; ++x) {
-      dst.setPixel(x, y, src.getPixel(scaleX[x], y2));
+  Image? firstFrame;
+  for (final frame in src.frames) {
+    final dst = firstFrame?.addFrame() ?? Image.fromResized(frame, size, size);
+    firstFrame ??= dst;
+
+    for (var y = 0; y < size; ++y) {
+      final y2 = ((y + yOffset) * dy).toInt();
+      for (var x = 0; x < size; ++x) {
+        dst.setPixel(x, y, frame.getPixel(scaleX[x], y2));
+      }
     }
   }
 
-  return dst;
+   return firstFrame!;
 }

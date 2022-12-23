@@ -10,41 +10,15 @@ Image copyRotate(Image src, num angle,
 
   // Optimized version for orthogonal angles.
   if ((nAngle % 90.0) == 0.0) {
-    final wm1 = src.width - 1;
-    final hm1 = src.height - 1;
-
     final iAngle = nAngle ~/ 90.0;
     switch (iAngle) {
       case 1: // 90 deg.
-        final dst = Image(src.height, src.width,
-            numChannels: src.numChannels, format: src.format,
-            palette: src.palette, exif: src.exif, iccp: src.iccProfile);
-        for (var y = 0; y < dst.height; ++y) {
-          for (var x = 0; x < dst.width; ++x) {
-            dst.setPixel(x, y, src.getPixel(y, hm1 - x));
-          }
-        }
-        return dst;
+        return _rotate90(src);
+        /**/
       case 2: // 180 deg.
-        final dst = Image(src.width, src.height,
-            numChannels: src.numChannels, format: src.format,
-            palette: src.palette, exif: src.exif, iccp: src.iccProfile);
-        for (var y = 0; y < dst.height; ++y) {
-          for (var x = 0; x < dst.width; ++x) {
-            dst.setPixel(x, y, src.getPixel(wm1 - x, hm1 - y));
-          }
-        }
-        return dst;
+        return _rotate180(src);
       case 3: // 270 deg.
-        final dst = Image(src.height, src.width,
-            numChannels: src.numChannels, format: src.format,
-            palette: src.palette, exif: src.exif, iccp: src.iccProfile);
-        for (var y = 0; y < dst.height; ++y) {
-          for (var x = 0; x < dst.width; ++x) {
-            dst.setPixel(x, y, src.getPixel(wm1 - y, x));
-          }
-        }
-        return dst;
+        return _rotate270(src);
       default: // 0 deg.
         return Image.from(src);
     }
@@ -77,4 +51,53 @@ Image copyRotate(Image src, num angle,
   }
 
   return dst;
+}
+
+Image _rotate90(Image src) {
+  Image? firstFrame;
+  for (final frame in src.frames) {
+    final dst = firstFrame?.addFrame() ??
+        Image.fromResized(frame, frame.height, frame.width);
+    firstFrame ??= dst;
+    final hm1 = frame.height - 1;
+    for (var y = 0; y < dst.height; ++y) {
+      for (var x = 0; x < dst.width; ++x) {
+        dst.setPixel(x, y, frame.getPixel(y, hm1 - x));
+      }
+    }
+  }
+  return firstFrame!;
+}
+
+Image _rotate180(Image src) {
+  Image? firstFrame;
+  for (final frame in src.frames) {
+    final wm1 = frame.width - 1;
+    final hm1 = frame.height - 1;
+    final dst = firstFrame?.addFrame() ??
+        Image.from(frame, noAnimation: true, noPixels: true);
+    firstFrame ??= dst;
+    for (var y = 0; y < dst.height; ++y) {
+      for (var x = 0; x < dst.width; ++x) {
+        dst.setPixel(x, y, frame.getPixel(wm1 - x, hm1 - y));
+      }
+    }
+  }
+  return firstFrame!;
+}
+
+Image _rotate270(Image src) {
+  Image? firstFrame;
+  for (final frame in src.frames) {
+    final wm1 = src.width - 1;
+    final dst = firstFrame?.addFrame() ??
+        Image.fromResized(frame, frame.height, frame.width);
+    firstFrame ??= dst;
+    for (var y = 0; y < dst.height; ++y) {
+      for (var x = 0; x < dst.width; ++x) {
+        dst.setPixel(x, y, frame.getPixel(wm1 - y, x));
+      }
+    }
+  }
+  return firstFrame!;
 }

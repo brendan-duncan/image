@@ -89,6 +89,33 @@ class Image extends Iterable<Pixel> {
         iccp: iccp);
   }
 
+  Image.fromResized(Image other, int width, int height)
+      : _exif = other._exif?.clone()
+      , iccProfile = other.iccProfile?.clone()
+      , frameType = other.frameType
+      , loopCount = other.loopCount
+      , backgroundColor = other.backgroundColor?.clone()
+      , frameDuration = other.frameDuration
+      , frameIndex = other.frameIndex {
+
+    _createImageData(width, height, other.format,
+        other.numChannels, other.palette);
+
+    if (other.extraChannels != null) {
+      extraChannels = Map<String, ImageData>.from(other.extraChannels!);
+    }
+    if (other.textData != null) {
+      textData = Map<String, String>.from(other.textData!);
+    }
+    frames.add(this);
+
+    final numFrames = other.numFrames;
+    for (var fi = 1; fi < numFrames; ++fi) {
+      final frame = other.frames[fi];
+      addFrame(Image.fromResized(frame, width, height));
+    }
+  }
+
   /// Creates a copy of the given Image [other].
   Image.from(Image other, { bool noAnimation = false, bool noPixels = false })
       : data = other.data?.clone(noPixels: noPixels)
@@ -166,7 +193,6 @@ class Image extends Iterable<Pixel> {
     }
   }
 
-
   /// An image is considered animated if it has more than one frame, as the
   /// first image in the frames list is the image itself.
   bool get hasAnimation => frames.length > 1;
@@ -209,6 +235,11 @@ class Image extends Iterable<Pixel> {
       palette = _createPalette(paletteFormat, numChannels);
     }
 
+    _createImageData(width, height, format, numChannels, palette);
+  }
+
+  void _createImageData(int width, int height, Format format, int numChannels,
+      Palette? palette) {
     switch (format) {
       case Format.uint1:
         if (palette == null) {

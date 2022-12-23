@@ -6,7 +6,7 @@ import '_file_access.dart'
 if (dart.library.io) '_file_access_io.dart'
 if (dart.library.js) '_file_access_html.dart';
 
-/// Decode a JPEG Image from byte [data].
+// Decode a JPEG Image from byte [data].
 class DecodeJpgCmd extends Command {
   Uint8List data;
 
@@ -18,7 +18,7 @@ class DecodeJpgCmd extends Command {
   }
 }
 
-/// Decode a JPEG from a file at the given [path].
+// Decode a JPEG from a file at the given [path].
 class DecodeJpgFileCmd extends Command {
   String path;
 
@@ -31,7 +31,7 @@ class DecodeJpgFileCmd extends Command {
   }
 }
 
-/// Encode an Image to the JPEG format.
+// Encode an Image to the JPEG format.
 class EncodeJpgCmd extends Command {
   int quality;
 
@@ -48,8 +48,8 @@ class EncodeJpgCmd extends Command {
   }
 }
 
-/// Encode an Image to the JPEG format and write it to a file at the given
-/// [path].
+// Encode an Image to the JPEG format and write it to a file at the given
+// [path].
 class EncodeJpgFileCmd extends EncodeJpgCmd {
   String path;
 

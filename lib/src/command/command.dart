@@ -11,7 +11,10 @@ import '../formats/png_encoder.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/palette.dart';
+import '../transform/flip.dart';
+import '../transform/trim.dart';
 import '../util/interpolation.dart';
+import '../util/point.dart';
 import '_executor.dart'
 if (dart.library.io) '_executor_io.dart'
 if (dart.library.js) '_executor_html.dart';
@@ -19,14 +22,31 @@ import 'draw/draw_char_cmd.dart';
 import 'draw/draw_string_cmd.dart';
 import 'draw/fill_cmd.dart';
 import 'filter/filter_cmd.dart';
+import 'formats/bmp_cmd.dart';
+import 'formats/cur_cmd.dart';
 import 'formats/decode_image_cmd.dart';
+import 'formats/exr_cmd.dart';
 import 'formats/gif_cmd.dart';
+import 'formats/ico_cmd.dart';
 import 'formats/jpg_cmd.dart';
 import 'formats/png_cmd.dart';
+import 'formats/psd_cmd.dart';
+import 'formats/tga_cmd.dart';
+import 'formats/tiff_cmd.dart';
+import 'formats/webp_cmd.dart';
 import 'formats/write_to_file_cmd.dart';
 import 'image/create_image_cmd.dart';
 import 'image/for_each_frame_cmd.dart';
+import 'transform/bake_orientation_cmd.dart';
+import 'transform/copy_crop_circle_cmd.dart';
+import 'transform/copy_crop_cmd.dart';
+import 'transform/copy_flip_cmd.dart';
+import 'transform/copy_rectify_cmd.dart';
 import 'transform/copy_resize_cmd.dart';
+import 'transform/copy_resize_crop_square_cmd.dart';
+import 'transform/copy_rotate_cmd.dart';
+import 'transform/flip_cmd.dart';
+import 'transform/trim_cmd.dart';
 
 final currentFrameStack = <Image?>[];
 Image? get currentFrame => currentFrameStack.isEmpty ? null
@@ -48,7 +68,6 @@ class Command {
   Command([this.input = null]);
 
   // image
-
   void createImage(int width, int height,
       { Format format = Format.uint8, int numChannels = 3,
         bool withPalette = false,
@@ -75,6 +94,42 @@ class Command {
     subCommand = WriteToFileCmd(subCommand, path);
   }
 
+  // Bmp
+  void decodeBmp(Uint8List data) {
+    subCommand = DecodeBmpCmd(data);
+  }
+
+  void decodeBmpFile(String path) {
+    subCommand = DecodeBmpFileCmd(path);
+  }
+
+  void encodeBmp() {
+    subCommand = EncodeBmpCmd(subCommand);
+  }
+
+  void encodeBmpFile(String path) {
+    subCommand = EncodeBmpFileCmd(subCommand, path);
+  }
+
+  // Cur
+  void encodeCur() {
+    subCommand = EncodeCurCmd(subCommand);
+  }
+
+  void encodeCurFile(String path) {
+    subCommand = EncodeCurFileCmd(subCommand, path);
+  }
+
+  // Exr
+  void decodeExr(Uint8List data) {
+    subCommand = DecodeExrCmd(data);
+  }
+
+  void decodeExrFile(String path) {
+    subCommand = DecodeExrFileCmd(path);
+  }
+
+  // Gif
   void decodeGif(Uint8List data) {
     subCommand = DecodeGifCmd(data);
   }
@@ -98,6 +153,24 @@ class Command {
         ditherSerpentine: ditherSerpentine);
   }
 
+  // Ico
+  void decodeIco(Uint8List data) {
+    subCommand = DecodeIcoCmd(data);
+  }
+
+  void decodeIcoFile(String path) {
+    subCommand = DecodeIcoFileCmd(path);
+  }
+
+  void encodeIco() {
+    subCommand = EncodeIcoCmd(subCommand);
+  }
+
+  void encodeIcoFile(String path) {
+    subCommand = EncodeIcoFileCmd(subCommand, path);
+  }
+
+  // Jpeg
   void decodeJpg(Uint8List data) {
     subCommand = DecodeJpgCmd(data);
   }
@@ -114,6 +187,7 @@ class Command {
     subCommand = EncodeJpgFileCmd(subCommand, path, quality: quality);
   }
 
+  // Png
   void decodePng(Uint8List data) {
     subCommand = DecodePngCmd(data);
   }
@@ -132,8 +206,60 @@ class Command {
         filter: filter);
   }
 
-  // draw
+  // Psd
+  void decodePsd(Uint8List data) {
+    subCommand = DecodePsdCmd(data);
+  }
 
+  void decodePsdFile(String path) {
+    subCommand = DecodePsdFileCmd(path);
+  }
+
+  // Tga
+  void decodeTga(Uint8List data) {
+    subCommand = DecodeTgaCmd(data);
+  }
+
+  void decodeTgaFile(String path) {
+    subCommand = DecodeTgaFileCmd(path);
+  }
+
+  void encodeTga() {
+    subCommand = EncodeTgaCmd(subCommand);
+  }
+
+  void encodeTgaFile(String path) {
+    subCommand = EncodeBmpFileCmd(subCommand, path);
+  }
+
+  // Tiff
+  void decodeTiff(Uint8List data) {
+    subCommand = DecodeTiffCmd(data);
+  }
+
+  void decodeTiffFile(String path) {
+    subCommand = DecodeTiffFileCmd(path);
+  }
+
+  void encodeTiff() {
+    subCommand = EncodeTiffCmd(subCommand);
+  }
+
+  void encodeTiffFile(String path) {
+    subCommand = EncodeTiffFileCmd(subCommand, path);
+  }
+
+  // WebP
+  void decodeWebP(Uint8List data) {
+    subCommand = DecodeWebPCmd(data);
+  }
+
+  void decodeWebPFile(String path) {
+    subCommand = DecodeWebPFileCmd(path);
+  }
+
+
+  // draw
   void fill(Color color) {
     subCommand = FillCmd(subCommand, color);
   }
@@ -157,12 +283,55 @@ class Command {
   }
 
   // transform
+  void bakeOrientation() {
+    subCommand = BakeOrientationCmd(subCommand);
+  }
+
+  void copyCropCircle({ int? radius, int? centerX, int? centerY }) {
+    subCommand = CopyCropCircleCmd(subCommand, radius: radius, centerX: centerX,
+        centerY: centerY);
+  }
+
+  void copyCrop(int x, int y, int w, int h) {
+    subCommand = CopyCropCmd(subCommand, x, y, w, h);
+  }
+
+  void copyFlip(FlipDirection direction) {
+    subCommand = CopyFlipCmd(subCommand, direction);
+  }
+
+  void copyRectify({ required Point topLeft,
+      required Point topRight,
+      required Point bottomLeft,
+      required Point bottomRight }) {
+    subCommand = CopyRectifyCmd(subCommand, topLeft, topRight,
+        bottomLeft, bottomRight);
+  }
 
   void copyResize({ int? width, int? height,
     Interpolation interpolation = Interpolation.nearest }) {
     subCommand = CopyResizeCmd(subCommand, width: width, height: height,
         interpolation: interpolation);
   }
+
+  void copyResizeCropSquare(int size) {
+    subCommand = CopyResizeCropSquareCmd(subCommand, size);
+  }
+
+  void copyRotate(num angle,
+      { Interpolation interpolation = Interpolation.nearest }) {
+    subCommand = CopyRotateCmd(subCommand, angle, interpolation: interpolation);
+  }
+
+  void flip(FlipDirection direction) {
+    subCommand = FlipCmd(subCommand, direction);
+  }
+
+  void trim({ TrimMode mode = TrimMode.transparent, Trim sides = Trim.all }) {
+    subCommand = TrimCmd(subCommand, mode: mode, sides: sides);
+  }
+
+  //
 
   void execute() {
     subCommand.executeIfDirty();
