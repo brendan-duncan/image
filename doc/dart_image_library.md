@@ -14,7 +14,7 @@ web applications.
 
 ## [Commands and Async Execution](commands.md)
 
-## [Image Processing Filters](filters.md)
+## [Image Processing](filters.md)
 
 ## [Font Rendering](fonts.md)
 
