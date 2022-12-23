@@ -1,4 +1,4 @@
-# Image
+# Image Data
 
 The Image class stores a raster image, that is, a rectangle of pixel data. Images can be created or loaded
 from encoded formats such as JPEG or PNG.

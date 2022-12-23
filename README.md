@@ -7,10 +7,11 @@ This is a work in progress major update for the Image library.
 
 ## Overview
 
-A Dart library providing the ability to load, save and manipulate images in a variety of different file formats.
+The Dart Image Library (DIL) provides the ability to load, save, and manipulate images
+in a variety of image file formats.
 
-The library is written entirely in Dart and has no reliance on `dart:io`, so it can be used for command-line, Flutter, 
-and web applications.
+The library can be used with both dart:io and dart:html, for command-line, Flutter, and
+web applications.
 
 ### Performance Warning
 Because this library is written entirely in Dart and is a not native executed library, its performance
