@@ -81,9 +81,12 @@ You can use the Decoder classes directly to decode images, and access their addi
 
 ```dart
 final decoder = PngDecoder();
-decoder.isValidFile(fileBytes); // Returns true if the file is a valid PNG image.
-Image? image = decoder.decode(fileBytes); // Decodes the PNG image, returning null if the file is not a PNG.
-// Starts decoding the PNG but does not decode the image data yet. 
+// Returns true if the file is a valid PNG image.
+decoder.isValidFile(fileBytes);
+// Decodes the PNG image, returning null if the file is not a PNG.
+Image? image = decoder.decode(fileBytes);
+
+// startDecode will decode just the information from the image file without decoding the image data. 
 DecodeInfo? info = decoder.startDecode(fileBytes);
 if (info != null) {
   int width = info.width; // The width of the PNG image.
@@ -96,4 +99,30 @@ if (info != null) {
 int numFrames = decoder.numFrames; // How many frames can be decoded.
 Image? frame0 = decoder.decodeFrame(0); // Decode the 1st frame if it's animated, otherwise the image itself.
 ```
-Each format has its own DecodeInfo derived class for specific data from that format. 
+Each format has its own DecodeInfo derived class for specific data from that format.
+
+```dart
+// Determine the format of the given file and return its Decoder. This will need to attempt to decode the image
+// with the known decoders, returning with the first decoder it finds that seems to support the data, so it is
+// preferable to use a specific format decoder if you know what the format is.
+Decoder? findDecoderForData(Uint8List fileBytes);
+
+// Return the decoder based on the file name extension.
+Decoder? getDecoderForNamedImage(String filename);
+```
+
+## Encoder Classes
+
+Like Decoders, each format that supports encoding has an Encoder class.
+```dart
+final encoder = PngEncoder();
+// Encode the image to the PNG format.
+Uint8List fileBytes = encoder.encode(image);
+// Does the encoder support encoding multi-frame images?
+bool supportsAnimation = encoder.supportsAnimation;
+```
+You can also find the encoder for the format that uses a particular file extension.
+```dart
+// Return the encoder based on the file name extension.
+Encoder? getEncoderForNamedImage(String filename);
+```

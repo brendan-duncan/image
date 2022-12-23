@@ -15,7 +15,9 @@ class FilterCmd extends Command {
     input?.executeIfDirty();
     final img = input?.image;
     if (img != null) {
-      _filter(img);
+      for (final frame in img.frames) {
+        _filter(frame);
+      }
     }
     image = img;
   }

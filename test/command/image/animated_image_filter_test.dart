@@ -3,13 +3,14 @@ import 'package:test/test.dart';
 
 import '../../test_util.dart';
 
-void forEachFrameTest() {
-  test('forEachFrameCmd', () {
+void animatedImageFilterTest() {
+  test('animatedImageFilter', () {
     Command()
       ..decodeGifFile('test/_data/gif/cars.gif')
-      ..forEachFrame(Command()..filter((image) {
-        drawString(image, arial14, 10, 10, '${currentFrame?.frameIndex}');
-      }))
+      //..forEachFrame(Command()..filter((image) {
+      ..filter((image) {
+        drawString(image, arial14, 10, 10, '${image.frameIndex}');
+      })//)
       ..writeToFile('$testOutputPath/cmd/cars.gif')
       ..execute();
   });

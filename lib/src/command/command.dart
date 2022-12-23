@@ -65,7 +65,7 @@ import 'formats/tiff_cmd.dart';
 import 'formats/webp_cmd.dart';
 import 'formats/write_to_file_cmd.dart';
 import 'image/create_image_cmd.dart';
-import 'image/for_each_frame_cmd.dart';
+import 'image/image_cmd.dart';
 import 'transform/bake_orientation_cmd.dart';
 import 'transform/copy_crop_circle_cmd.dart';
 import 'transform/copy_crop_cmd.dart';
@@ -97,6 +97,13 @@ class Command {
   Command([this.input = null]);
 
   // image
+
+  /// Use a specific Image.
+  void withImage(Image image) {
+    subCommand = ImageCmd(image);
+  }
+
+  /// Create an Image.
   void createImage(int width, int height,
       { Format format = Format.uint8, int numChannels = 3,
         bool withPalette = false,
@@ -107,10 +114,6 @@ class Command {
         numChannels: numChannels, withPalette: withPalette,
         paletteFormat: paletteFormat, palette: palette, exif: exif,
         iccp: iccp, textData: textData);
-  }
-
-  void forEachFrame(Command toExecute) {
-    subCommand = ForEachFrameCmd(subCommand, toExecute);
   }
 
   // formats
