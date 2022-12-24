@@ -5,7 +5,7 @@ description: >-
   and save images with various image file formats including PNG, JPEG, GIF, BMP, WebP,
   TIFF, TGA, PSD, PVR, and OpenEXR.
 homepage: https://github.com/brendan-duncan/image
-documentation: https://github.com/brendan-duncan/image/wiki
+documentation: https://github.com/brendan-duncan/image/doc/dart_image_library.md
 
 environment:
   sdk: '>=2.15.0 <3.0.0'
