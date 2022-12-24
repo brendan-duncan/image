@@ -36,7 +36,7 @@ web applications.
 
 - CUR
 
-## [Documentation](doc/dart_image_library.md)
+## [Documentation](doc/README.md)
 
 ## Examples
 
