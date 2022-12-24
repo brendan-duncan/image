@@ -14,9 +14,9 @@ class DropShadowCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.dropShadow(img, hShadow, vShadow, blur,
-        shadowColor: shadowColor) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.dropShadow(img, hShadow, vShadow, blur,
+        shadowColor: shadowColor) : null;
   }
 }

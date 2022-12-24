@@ -16,9 +16,9 @@ class QuantizeCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.quantize(img, numberOfColors: numberOfColors,
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.quantize(img, numberOfColors: numberOfColors,
         method: method, dither: dither, ditherSerpentine: ditherSerpentine)
         : null;
   }

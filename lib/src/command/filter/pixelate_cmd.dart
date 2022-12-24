@@ -11,8 +11,8 @@ class PixelateCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.pixelate(img, blockSize, mode: mode) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.pixelate(img, blockSize, mode: mode) : null;
   }
 }

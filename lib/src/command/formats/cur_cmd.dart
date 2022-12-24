@@ -11,10 +11,10 @@ class EncodeCurCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    image = input?.image;
-    if (image != null) {
-      bytes = encodeCur(image!);
+    input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      outputBytes = encodeCur(outputImage!);
     }
   }
 }
@@ -30,8 +30,8 @@ class EncodeCurFileCmd extends EncodeCurCmd {
   @override
   void executeCommand() {
     super.executeCommand();
-    if (bytes != null) {
-      writeFile(path, bytes!);
+    if (outputBytes != null) {
+      writeFile(path, outputBytes!);
     }
   }
 }

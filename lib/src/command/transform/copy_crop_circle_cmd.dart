@@ -11,9 +11,9 @@ class CopyCropCircleCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ?
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ?
         copyCropCircle(img, radius: radius, centerX: centerX, centerY: centerY)
         : null;
   }

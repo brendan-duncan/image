@@ -13,9 +13,9 @@ class CopyResizeCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? copyResize(img, width: width, height: height,
-        interpolation: interpolation) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? copyResize(img, width: width, height: height,
+        interpolation: interpolation) : null;
   }
 }

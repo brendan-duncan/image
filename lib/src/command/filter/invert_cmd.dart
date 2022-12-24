@@ -7,8 +7,8 @@ class InvertCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.invert(img) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.invert(img) : null;
   }
 }

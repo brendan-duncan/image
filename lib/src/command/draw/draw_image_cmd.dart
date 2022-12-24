@@ -21,11 +21,10 @@ class DrawImageCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    src?.executeIfDirty();
-    final dst = input?.image;
-    final srcImg = src?.image;
-    image = dst != null && srcImg != null ?
+    input?.execute();
+    final dst = input?.outputImage;
+    final srcImg = src?.getImage();
+    outputImage = dst != null && srcImg != null ?
       drawImage(dst, srcImg, dstX: dstX, dstY: dstY,
           dstW: dstW, dstH: dstH, srcX: srcX, srcY: srcY, srcW: srcW,
           srcH: srcH, blend: blend, center: center) : null;

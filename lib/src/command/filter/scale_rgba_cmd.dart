@@ -10,8 +10,8 @@ class ScaleRgbaCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.scaleRgba(img, s) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.scaleRgba(img, s) : null;
   }
 }

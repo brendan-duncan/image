@@ -15,9 +15,9 @@ class FillFloodCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? fillFlood(img, x, y, color, threshold: threshold,
-        compareAlpha: compareAlpha) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? fillFlood(img, x, y, color,
+        threshold: threshold, compareAlpha: compareAlpha) : null;
   }
 }

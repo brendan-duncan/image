@@ -14,7 +14,7 @@ class DecodeExrCmd extends Command {
 
   @override
   void executeCommand() {
-    image = decodeExr(data);
+    outputImage = decodeExr(data);
   }
 }
 
@@ -27,6 +27,6 @@ class DecodeExrFileCmd extends Command {
   @override
   void executeCommand() {
     final bytes = readFile(path);
-    image = bytes != null ? decodeExr(bytes) : null;
+    outputImage = bytes != null ? decodeExr(bytes) : null;
   }
 }

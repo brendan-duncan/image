@@ -14,7 +14,7 @@ class DecodePsdCmd extends Command {
 
   @override
   void executeCommand() {
-    image = decodePsd(data);
+    outputImage = decodePsd(data);
   }
 }
 
@@ -27,6 +27,6 @@ class DecodePsdFileCmd extends Command {
   @override
   void executeCommand() {
     final bytes = readFile(path);
-    image = bytes != null ? decodePsd(bytes) : null;
+    outputImage = bytes != null ? decodePsd(bytes) : null;
   }
 }

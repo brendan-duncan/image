@@ -10,8 +10,8 @@ class NormalizeCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.normalize(img, minValue, maxValue) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.normalize(img, minValue, maxValue) : null;
   }
 }

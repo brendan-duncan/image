@@ -30,11 +30,11 @@ class AdjustColorCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.adjustColor(img, blacks: blacks, whites: whites,
-        mids: mids, contrast: _contrast, saturation: saturation,
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.adjustColor(img, blacks: blacks,
+        whites: whites, mids: mids, contrast: _contrast, saturation: saturation,
         brightness: brightness, gamma: _gamma, exposure: exposure,
-        hue: hue, amount: amount) : img;
+        hue: hue, amount: amount) : null;
   }
 }

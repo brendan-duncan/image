@@ -7,8 +7,8 @@ class BakeOrientationCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? bakeOrientation(img) : null;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? bakeOrientation(img) : null;
   }
 }

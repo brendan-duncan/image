@@ -10,8 +10,8 @@ class FillCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? fill(img, color) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? fill(img, color) : null;
   }
 }

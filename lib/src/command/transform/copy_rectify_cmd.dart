@@ -14,9 +14,10 @@ class CopyRectifyCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? copyRectify(img, topLeft: topLeft, topRight: topRight,
-        bottomLeft: bottomLeft, bottomRight: bottomRight) : null;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? copyRectify(img, topLeft: topLeft,
+        topRight: topRight, bottomLeft: bottomLeft, bottomRight: bottomRight)
+        : null;
   }
 }

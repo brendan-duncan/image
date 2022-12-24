@@ -12,9 +12,9 @@ class ConvolutionCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.convolution(img, flt, div: div, offset: offset)
-        : null;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.convolution(img, flt, div: div,
+        offset: offset) : null;
   }
 }

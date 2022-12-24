@@ -6,25 +6,25 @@ import 'execute_result.dart';
 
 Future<ExecuteResult> executeCommandAsync(Command? command) async {
   command?.execute();
-  return ExecuteResult(command?.image, command?.bytes);
+  return ExecuteResult(command?.outputImage, command?.outputBytes);
 }
 
 Image? executeCommandImage(Command? command) {
   command?.execute();
-  return command?.image;
+  return command?.outputImage;
 }
 
 Future<Image?> executeCommandImageAsync(Command? command) async {
   command?.execute();
-  return command?.image;
+  return command?.outputImage;
 }
 
 Uint8List? executeCommandBytes(Command? command) {
   command?.execute();
-  return command?.bytes;
+  return command?.outputBytes;
 }
 
 Future<Uint8List?> executeCommandBytesAsync(Command? command) async {
   command?.execute();
-  return command?.bytes;
+  return command?.outputBytes;
 }

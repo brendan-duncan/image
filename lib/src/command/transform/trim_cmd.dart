@@ -11,8 +11,8 @@ class TrimCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? trim(img, mode: mode, sides: sides) : null;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? trim(img, mode: mode, sides: sides) : null;
   }
 }

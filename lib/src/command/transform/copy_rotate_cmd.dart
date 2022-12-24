@@ -12,9 +12,9 @@ class CopyRotateCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ?
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ?
         copyRotate(img, angle, interpolation: interpolation) : null;
   }
 }

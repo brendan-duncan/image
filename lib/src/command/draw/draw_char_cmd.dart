@@ -16,8 +16,9 @@ class DrawCharCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? drawChar(img, font, x, y, char, color: color) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? drawChar(img, font, x, y, char, color: color)
+        : null;
   }
 }

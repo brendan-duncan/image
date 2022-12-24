@@ -14,7 +14,7 @@ class DecodeTgaCmd extends Command {
 
   @override
   void executeCommand() {
-    image = decodeTga(data);
+    outputImage = decodeTga(data);
   }
 }
 
@@ -27,7 +27,7 @@ class DecodeTgaFileCmd extends Command {
   @override
   void executeCommand() {
     final bytes = readFile(path);
-    image = bytes != null ? decodeTga(bytes) : null;
+    outputImage = bytes != null ? decodeTga(bytes) : null;
   }
 }
 
@@ -38,10 +38,10 @@ class EncodeTgaCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    image = input?.image;
-    if (image != null) {
-      bytes = encodeTga(image!);
+    input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      outputBytes = encodeTga(outputImage!);
     }
   }
 }
@@ -57,8 +57,8 @@ class EncodeTgaFileCmd extends EncodeTgaCmd {
   @override
   void executeCommand() {
     super.executeCommand();
-    if (bytes != null) {
-      writeFile(path, bytes!);
+    if (outputBytes != null) {
+      writeFile(path, outputBytes!);
     }
   }
 }

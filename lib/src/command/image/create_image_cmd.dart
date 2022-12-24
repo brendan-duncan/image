@@ -24,7 +24,7 @@ class CreateImageCmd extends Command {
 
   @override
   void executeCommand() {
-    image = Image(width, height, format: format, numChannels: numChannels,
+    outputImage = Image(width, height, format: format, numChannels: numChannels,
         withPalette: withPalette,
         paletteFormat: paletteFormat, palette: palette, exif: exif, iccp: iccp,
         textData: textData);

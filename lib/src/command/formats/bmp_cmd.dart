@@ -14,7 +14,7 @@ class DecodeBmpCmd extends Command {
 
   @override
   void executeCommand() {
-    image = decodeBmp(data);
+    outputImage = decodeBmp(data);
   }
 }
 
@@ -27,7 +27,7 @@ class DecodeBmpFileCmd extends Command {
   @override
   void executeCommand() {
     final bytes = readFile(path);
-    image = bytes != null ? decodeBmp(bytes) : null;
+    outputImage = bytes != null ? decodeBmp(bytes) : null;
   }
 }
 
@@ -38,10 +38,10 @@ class EncodeBmpCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    image = input?.image;
-    if (image != null) {
-      bytes = encodeBmp(image!);
+    input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      outputBytes = encodeBmp(outputImage!);
     }
   }
 }
@@ -57,8 +57,8 @@ class EncodeBmpFileCmd extends EncodeBmpCmd {
   @override
   void executeCommand() {
     super.executeCommand();
-    if (bytes != null) {
-      writeFile(path, bytes!);
+    if (outputBytes != null) {
+      writeFile(path, outputBytes!);
     }
   }
 }

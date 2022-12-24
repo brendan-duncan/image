@@ -14,7 +14,7 @@ class DecodeIcoCmd extends Command {
 
   @override
   void executeCommand() {
-    image = decodeIco(data);
+    outputImage = decodeIco(data);
   }
 }
 
@@ -27,7 +27,7 @@ class DecodeIcoFileCmd extends Command {
   @override
   void executeCommand() {
     final bytes = readFile(path);
-    image = bytes != null ? decodeIco(bytes) : null;
+    outputImage = bytes != null ? decodeIco(bytes) : null;
   }
 }
 
@@ -38,10 +38,10 @@ class EncodeIcoCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    image = input?.image;
-    if (image != null) {
-      bytes = encodeIco(image!);
+    input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      outputBytes = encodeIco(outputImage!);
     }
   }
 }
@@ -57,8 +57,8 @@ class EncodeIcoFileCmd extends EncodeIcoCmd {
   @override
   void executeCommand() {
     super.executeCommand();
-    if (bytes != null) {
-      writeFile(path, bytes!);
+    if (outputBytes != null) {
+      writeFile(path, outputBytes!);
     }
   }
 }

@@ -9,8 +9,8 @@ class SmoothCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.smooth(img, weight) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.smooth(img, weight) : null;
   }
 }

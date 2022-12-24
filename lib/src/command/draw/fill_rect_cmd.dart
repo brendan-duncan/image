@@ -14,8 +14,8 @@ class FillRectCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? fillRect(img, x1, y1, x2, y2, c) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? fillRect(img, x1, y1, x2, y2, c) : null;
   }
 }

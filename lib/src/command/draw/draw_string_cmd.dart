@@ -16,8 +16,9 @@ class DrawStringCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? drawString(img, font, x, y, char, color: color) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? drawString(img, font, x, y, char, color: color)
+        : null;
   }
 }

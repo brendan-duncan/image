@@ -9,8 +9,8 @@ class FlipCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? flip(img, direction) : null;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? flip(img, direction) : null;
   }
 }

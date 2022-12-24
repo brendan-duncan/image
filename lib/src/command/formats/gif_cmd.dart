@@ -15,7 +15,7 @@ class DecodeGifCmd extends Command {
 
   @override
   void executeCommand() {
-    image = decodeGif(data);
+    outputImage = decodeGif(data);
   }
 }
 
@@ -28,7 +28,7 @@ class DecodeGifFileCmd extends Command {
   @override
   void executeCommand() {
     final bytes = readFile(path);
-    image = bytes != null ? decodeGif(bytes) : null;
+    outputImage = bytes != null ? decodeGif(bytes) : null;
   }
 }
 
@@ -46,10 +46,10 @@ class EncodeGifCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    image = input?.image;
-    if (image != null) {
-      bytes = encodeGif(image!, samplingFactor: samplingFactor,
+    input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      outputBytes = encodeGif(outputImage!, samplingFactor: samplingFactor,
           dither: dither, ditherSerpentine: ditherSerpentine);
     }
   }
@@ -70,8 +70,8 @@ class EncodeGifFileCmd extends EncodeGifCmd {
   @override
   void executeCommand() {
     super.executeCommand();
-    if (bytes != null) {
-      writeFile(path, bytes!);
+    if (outputBytes != null) {
+      writeFile(path, outputBytes!);
     }
   }
 }

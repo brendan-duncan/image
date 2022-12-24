@@ -12,8 +12,8 @@ class FilterCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
+    input?.execute();
+    final img = input?.outputImage;
     final newImages = <Image>[];
     var hasNewImage = false;
     if (img != null) {
@@ -27,14 +27,14 @@ class FilterCmd extends Command {
     }
 
     if (hasNewImage) {
-      image = newImages.first == img ? Image.from(img!, noAnimation: true)
+      outputImage = newImages.first == img ? Image.from(img!, noAnimation: true)
           : newImages[0];
       final numFrames = newImages.length;
       for (var i = 1; i < numFrames; ++i) {
-        image!.addFrame(newImages[i]);
+        outputImage!.addFrame(newImages[i]);
       }
     } else {
-      image = img;
+      outputImage = img;
     }
   }
 }

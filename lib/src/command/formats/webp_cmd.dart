@@ -14,7 +14,7 @@ class DecodeWebPCmd extends Command {
 
   @override
   void executeCommand() {
-    image = decodeWebP(data);
+    outputImage = decodeWebP(data);
   }
 }
 
@@ -27,6 +27,6 @@ class DecodeWebPFileCmd extends Command {
   @override
   void executeCommand() {
     final bytes = readFile(path);
-    image = bytes != null ? decodeWebP(bytes) : null;
+    outputImage = bytes != null ? decodeWebP(bytes) : null;
   }
 }

@@ -13,19 +13,20 @@ class _Params {
 
 Future<Image?> _getImage(_Params p) {
   p.command?.execute();
-  final res = p.command?.image;
+  final res = p.command?.outputImage;
   Isolate.exit(p.port, res);
 }
 
 Future<Uint8List?> _getBytes(_Params p) {
   p.command?.execute();
-  final res = p.command?.bytes;
+  final res = p.command?.outputBytes;
   Isolate.exit(p.port, res);
 }
 
 Future<ExecuteResult> _getResult(_Params p) {
   p.command?.execute();
-  Isolate.exit(p.port, ExecuteResult(p.command?.image, p.command?.bytes));
+  Isolate.exit(p.port, ExecuteResult(p.command?.outputImage,
+      p.command?.outputBytes));
 }
 
 Future<ExecuteResult> executeCommandAsync(Command? command) async {
@@ -36,7 +37,7 @@ Future<ExecuteResult> executeCommandAsync(Command? command) async {
 
 Image? executeCommandImage(Command? command) {
   command?.execute();
-  return command?.image;
+  return command?.outputImage;
 }
 
 Future<Image?> executeCommandImageAsync(Command? command) async {
@@ -47,7 +48,7 @@ Future<Image?> executeCommandImageAsync(Command? command) async {
 
 Uint8List? executeCommandBytes(Command? command) {
   command?.execute();
-  return command?.bytes;
+  return command?.outputBytes;
 }
 
 Future<Uint8List?> executeCommandBytesAsync(Command? command) async {

@@ -12,9 +12,9 @@ class VignetteCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.vignette(img, start: start, end: end,
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.vignette(img, start: start, end: end,
         amount: amount) : null;
   }
 }

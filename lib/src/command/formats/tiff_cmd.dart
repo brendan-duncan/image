@@ -14,7 +14,7 @@ class DecodeTiffCmd extends Command {
 
   @override
   void executeCommand() {
-    image = decodeTiff(data);
+    outputImage = decodeTiff(data);
   }
 }
 
@@ -27,7 +27,7 @@ class DecodeTiffFileCmd extends Command {
   @override
   void executeCommand() {
     final bytes = readFile(path);
-    image = bytes != null ? decodeTiff(bytes) : null;
+    outputImage = bytes != null ? decodeTiff(bytes) : null;
   }
 }
 
@@ -38,10 +38,10 @@ class EncodeTiffCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    image = input?.image;
-    if (image != null) {
-      bytes = encodeTiff(image!);
+    input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      outputBytes = encodeTiff(outputImage!);
     }
   }
 }
@@ -57,8 +57,8 @@ class EncodeTiffFileCmd extends EncodeTiffCmd {
   @override
   void executeCommand() {
     super.executeCommand();
-    if (bytes != null) {
-      writeFile(path, bytes!);
+    if (outputBytes != null) {
+      writeFile(path, outputBytes!);
     }
   }
 }

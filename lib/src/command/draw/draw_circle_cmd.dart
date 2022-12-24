@@ -13,8 +13,8 @@ class DrawCircleCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? drawCircle(img, x, y, radius, color) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? drawCircle(img, x, y, radius, color) : null;
   }
 }

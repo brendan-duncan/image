@@ -14,8 +14,9 @@ class NoiseCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.noise(img, sigma, type: type, random: random) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.noise(img, sigma, type: type, random: random)
+        : null;
   }
 }

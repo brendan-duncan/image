@@ -12,33 +12,33 @@ class WriteToFileCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    image = input?.image;
-    bytes = input?.bytes;
+    input?.execute();
+    outputImage = input?.outputImage;
+    outputBytes = input?.outputBytes;
 
-    if (bytes == null && image != null) {
+    if (outputBytes == null && outputImage != null) {
       final ext = path.split('.').last.toLowerCase();
       if (ext == 'png') {
-        bytes = encodePng(image!);
+        outputBytes = encodePng(outputImage!);
       } else if (ext == 'jpg' || ext == 'jpeg') {
-        bytes = encodeJpg(image!);
+        outputBytes = encodeJpg(outputImage!);
       } else if (ext == 'gif') {
-        bytes = encodeGif(image!);
+        outputBytes = encodeGif(outputImage!);
       } else if (ext == 'tga') {
-        bytes = encodeTga(image!);
+        outputBytes = encodeTga(outputImage!);
       } else if (ext == 'bmp') {
-        bytes = encodeBmp(image!);
+        outputBytes = encodeBmp(outputImage!);
       } else if (ext == 'tif' || ext == 'tiff') {
-        bytes = encodeBmp(image!);
+        outputBytes = encodeBmp(outputImage!);
       } else if (ext == 'cur') {
-        bytes = encodeCur(image!);
+        outputBytes = encodeCur(outputImage!);
       } else if (ext == 'ico') {
-        bytes = encodeIco(image!);
+        outputBytes = encodeIco(outputImage!);
       }
     }
 
-    if (bytes != null) {
-      writeFile(path, bytes!);
+    if (outputBytes != null) {
+      writeFile(path, outputBytes!);
     }
   }
 }

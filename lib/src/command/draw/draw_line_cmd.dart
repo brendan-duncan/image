@@ -17,9 +17,9 @@ class DrawLineCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? drawLine(img, x1, y1, x2, y2, c, antialias: antialias,
-        thickness: thickness) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? drawLine(img, x1, y1, x2, y2, c,
+        antialias: antialias, thickness: thickness) : null;
   }
 }

@@ -12,8 +12,8 @@ class CopyCropCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? copyCrop(img, x, y, w, h) : null;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? copyCrop(img, x, y, w, h) : null;
   }
 }

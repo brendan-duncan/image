@@ -13,9 +13,9 @@ class DitherImageCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    final img = input?.image;
-    image = img != null ? g.ditherImage(img, quantizer: quantizer,
-        kernel: kernel, serpentine: serpentine) : img;
+    input?.execute();
+    final img = input?.outputImage;
+    outputImage = img != null ? g.ditherImage(img, quantizer: quantizer,
+        kernel: kernel, serpentine: serpentine) : null;
   }
 }

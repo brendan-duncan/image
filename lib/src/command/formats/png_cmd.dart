@@ -15,7 +15,7 @@ class DecodePngCmd extends Command {
 
   @override
   void executeCommand() {
-    image = decodePng(_data);
+    outputImage = decodePng(_data);
   }
 }
 
@@ -29,7 +29,7 @@ class DecodePngFileCmd extends Command {
   @override
   void executeCommand() {
     final bytes = readFile(_path);
-    image = bytes != null ? decodePng(bytes) : null;
+    outputImage = bytes != null ? decodePng(bytes) : null;
   }
 }
 
@@ -46,10 +46,10 @@ class EncodePngCmd extends Command {
 
   @override
   void executeCommand() {
-    input?.executeIfDirty();
-    image = input?.image;
-    if (image != null) {
-      bytes = encodePng(image!, level: _level, filter: _filter);
+    input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      outputBytes = encodePng(outputImage!, level: _level, filter: _filter);
     }
   }
 }
@@ -67,8 +67,8 @@ class EncodePngFileCmd extends EncodePngCmd {
   @override
   void executeCommand() {
     super.executeCommand();
-    if (bytes != null) {
-      writeFile(_path, bytes!);
+    if (outputBytes != null) {
+      writeFile(_path, outputBytes!);
     }
   }
 }
