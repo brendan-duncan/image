@@ -2,9 +2,6 @@ import 'dart:typed_data';
 
 import '../../formats/formats.dart';
 import '../command.dart';
-import '_file_access.dart'
-if (dart.library.io) '_file_access_io.dart'
-if (dart.library.js) '_file_access_html.dart';
 
 // Decode a ICO Image from byte [data].
 class DecodeIcoCmd extends Command {
@@ -26,8 +23,7 @@ class DecodeIcoFileCmd extends Command {
 
   @override
   Future<void> executeCommand() async {
-    final bytes = await readFile(path);
-    outputImage = bytes != null ? decodeIco(bytes) : null;
+    outputImage = await decodeIcoFile(path);
   }
 }
 
@@ -56,9 +52,10 @@ class EncodeIcoFileCmd extends EncodeIcoCmd {
 
   @override
   Future<void> executeCommand() async {
-    await super.executeCommand();
-    if (outputBytes != null) {
-      await writeFile(path, outputBytes!);
+    await input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      await encodeIcoFile(path, outputImage!);
     }
   }
 }

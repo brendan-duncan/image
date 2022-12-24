@@ -3,9 +3,6 @@ import 'dart:typed_data';
 import '../../formats/formats.dart';
 import '../../formats/png_encoder.dart';
 import '../command.dart';
-import '_file_access.dart'
-if (dart.library.io) '_file_access_io.dart'
-if (dart.library.js) '_file_access_html.dart';
 
 /// Decode a PNG Image from byte data.
 class DecodePngCmd extends Command {
@@ -21,15 +18,13 @@ class DecodePngCmd extends Command {
 
 /// Decode a PNG Image from a file at the given path.
 class DecodePngFileCmd extends Command {
-  final String _path;
+  final String path;
 
-  DecodePngFileCmd(String path)
-      : _path = path;
+  DecodePngFileCmd(this.path);
 
   @override
   Future<void> executeCommand() async {
-    final bytes = await readFile(_path);
-    outputImage = bytes != null ? decodePng(bytes) : null;
+    outputImage = await decodePngFile(path);
   }
 }
 
@@ -57,18 +52,19 @@ class EncodePngCmd extends Command {
 /// Encode an Image to the PNG format and write it to a file at the given
 /// path.
 class EncodePngFileCmd extends EncodePngCmd {
-  final String _path;
+  final String path;
 
-  EncodePngFileCmd(Command? input, String path, { int level = 6,
+  EncodePngFileCmd(Command? input, this.path, { int level = 6,
       PngFilter filter = PngFilter.paeth })
-      : _path = path
-      , super(input, level: level, filter: filter);
+      : super(input, level: level, filter: filter);
 
   @override
   Future<void> executeCommand() async {
-    await super.executeCommand();
-    if (outputBytes != null) {
-      await writeFile(_path, outputBytes!);
+    await input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      await encodePngFile(path, outputImage!, level: _level,
+          filter: _filter);
     }
   }
 }

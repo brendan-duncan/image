@@ -20,9 +20,7 @@ export 'src/color/color_uint8.dart';
 export 'src/color/color_util.dart';
 export 'src/color/format.dart';
 export 'src/command/command.dart';
-export 'src/command/executor.dart'
-if (dart.library.io) 'src/command/executor_io.dart'
-if (dart.library.js) 'src/command/executor_html.dart';
+export 'src/command/executor.dart';
 export 'src/draw/draw_char.dart';
 export 'src/draw/draw_circle.dart';
 export 'src/draw/draw_image.dart';
@@ -208,6 +206,7 @@ export 'src/transform/copy_rotate.dart';
 export 'src/transform/flip.dart';
 export 'src/transform/trim.dart';
 export 'src/util/clip_line.dart';
+export 'src/util/file_access.dart';
 export 'src/util/float16.dart';
 export 'src/util/image_exception.dart';
 export 'src/util/input_buffer.dart';

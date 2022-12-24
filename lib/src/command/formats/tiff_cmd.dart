@@ -2,9 +2,6 @@ import 'dart:typed_data';
 
 import '../../formats/formats.dart';
 import '../command.dart';
-import '_file_access.dart'
-if (dart.library.io) '_file_access_io.dart'
-if (dart.library.js) '_file_access_html.dart';
 
 // Decode a TIFF Image from byte [data].
 class DecodeTiffCmd extends Command {
@@ -26,8 +23,7 @@ class DecodeTiffFileCmd extends Command {
 
   @override
   Future<void> executeCommand() async {
-    final bytes = await readFile(path);
-    outputImage = bytes != null ? decodeTiff(bytes) : null;
+    outputImage = await decodeTiffFile(path);
   }
 }
 
@@ -56,9 +52,10 @@ class EncodeTiffFileCmd extends EncodeTiffCmd {
 
   @override
   Future<void> executeCommand() async {
-    await super.executeCommand();
-    if (outputBytes != null) {
-      await writeFile(path, outputBytes!);
+    await input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      await encodeTiffFile(path, outputImage!);
     }
   }
 }

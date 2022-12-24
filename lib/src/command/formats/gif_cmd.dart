@@ -3,9 +3,6 @@ import 'dart:typed_data';
 import '../../filter/dither_image.dart';
 import '../../formats/formats.dart';
 import '../command.dart';
-import '_file_access.dart'
-if (dart.library.io) '_file_access_io.dart'
-if (dart.library.js) '_file_access_html.dart';
 
 /// Decode a GIF Image from byte [data].
 class DecodeGifCmd extends Command {
@@ -27,8 +24,7 @@ class DecodeGifFileCmd extends Command {
 
   @override
   Future<void> executeCommand() async {
-    final bytes = await readFile(path);
-    outputImage = bytes != null ? decodeGif(bytes) : null;
+    outputImage = await decodeGifFile(path);
   }
 }
 
@@ -69,9 +65,11 @@ class EncodeGifFileCmd extends EncodeGifCmd {
 
   @override
   Future<void> executeCommand() async {
-    await super.executeCommand();
-    if (outputBytes != null) {
-      await writeFile(path, outputBytes!);
+    await input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      await encodeGifFile(path, outputImage!, samplingFactor: samplingFactor,
+          dither: dither, ditherSerpentine: ditherSerpentine);
     }
   }
 }

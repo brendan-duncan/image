@@ -2084,7 +2084,7 @@ of <code>src</code> and <code>height</code>.
 </dd>
 
         <dt id="decodeBmp" class="callable">
-  <span class="name"><a href="../image/decodeBmp.html">decodeBmp</a></span><span class="signature">(<wbr><span class="parameter" id="decodeBmp-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span>, </span><span class="parameter" id="decodeBmp-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
+  <span class="name"><a href="../image/decodeBmp.html">decodeBmp</a></span><span class="signature">(<wbr><span class="parameter" id="decodeBmp-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span></span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a>?</span>
   </span>
   
@@ -2096,8 +2096,22 @@ of <code>src</code> and <code>height</code>.
 
 </dd>
 
+        <dt id="decodeBmpFile" class="callable">
+  <span class="name"><a href="../image/decodeBmpFile.html">decodeBmpFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeBmpFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a BMP formatted image from a file. If the platform does not support
+dart:io, null will be returned.
+  
+
+</dd>
+
         <dt id="decodeExr" class="callable">
-  <span class="name"><a href="../image/decodeExr.html">decodeExr</a></span><span class="signature">(<wbr><span class="parameter" id="decodeExr-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span>, </span><span class="parameter" id="decodeExr-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
+  <span class="name"><a href="../image/decodeExr.html">decodeExr</a></span><span class="signature">(<wbr><span class="parameter" id="decodeExr-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span></span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a>?</span>
   </span>
   
@@ -2105,6 +2119,20 @@ of <code>src</code> and <code>height</code>.
 </dt>
 <dd>
   Decode an OpenEXR formatted image. EXR is a high dynamic range format.
+  
+
+</dd>
+
+        <dt id="decodeExrFile" class="callable">
+  <span class="name"><a href="../image/decodeExrFile.html">decodeExrFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeExrFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a EXR formatted image from a file. If the platform does not support
+dart:io, null will be returned.
   
 
 </dd>
@@ -2122,6 +2150,20 @@ of <code>src</code> and <code>height</code>.
 
 </dd>
 
+        <dt id="decodeGifFile" class="callable">
+  <span class="name"><a href="../image/decodeGifFile.html">decodeGifFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeGifFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="decodeGifFile-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a GIF formatted image from a file. If the platform does not support
+dart:io, null will be returned.
+  
+
+</dd>
+
         <dt id="decodeIco" class="callable">
   <span class="name"><a href="../image/decodeIco.html">decodeIco</a></span><span class="signature">(<wbr><span class="parameter" id="decodeIco-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span>, </span><span class="parameter" id="decodeIco-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a>?</span>
@@ -2131,6 +2173,20 @@ of <code>src</code> and <code>height</code>.
 </dt>
 <dd>
   Decode an ICO image.
+  
+
+</dd>
+
+        <dt id="decodeIcoFile" class="callable">
+  <span class="name"><a href="../image/decodeIcoFile.html">decodeIcoFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeIcoFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="decodeIcoFile-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a ICO formatted image from a file. If the platform does not support
+dart:io, null will be returned.
   
 
 </dd>
@@ -2151,6 +2207,22 @@ it is much slower than using an explicit decoder.
 
 </dd>
 
+        <dt id="decodeImageFile" class="callable">
+  <span class="name"><a href="../image/decodeImageFile.html">decodeImageFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeImageFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="decodeImageFile-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode an image from a file path. For platforms that do not support dart:io,
+such as the web, this will return null.
+<strong>WARNING</strong> Since this will check the image data against all known decoders,
+it is much slower than using an explicit decoder.
+  
+
+</dd>
+
         <dt id="decodeJpg" class="callable">
   <span class="name"><a href="../image/decodeJpg.html">decodeJpg</a></span><span class="signature">(<wbr><span class="parameter" id="decodeJpg-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span></span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a>?</span>
@@ -2164,6 +2236,20 @@ it is much slower than using an explicit decoder.
 
 </dd>
 
+        <dt id="decodeJpgFile" class="callable">
+  <span class="name"><a href="../image/decodeJpgFile.html">decodeJpgFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeJpgFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a JPG formatted image from a file. If the platform does not support
+dart:io, null will be returned.
+  
+
+</dd>
+
         <dt id="decodePng" class="callable">
   <span class="name"><a href="../image/decodePng.html">decodePng</a></span><span class="signature">(<wbr><span class="parameter" id="decodePng-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span>, </span><span class="parameter" id="decodePng-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a>?</span>
@@ -2172,13 +2258,27 @@ it is much slower than using an explicit decoder.
 
 </dt>
 <dd>
-  Decode a PNG formatted image.
+  Decode a PNG formatted <a href="../image/Image-class.html">Image</a>.
+  
+
+</dd>
+
+        <dt id="decodePngFile" class="callable">
+  <span class="name"><a href="../image/decodePngFile.html">decodePngFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodePngFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a PNG formatted image from a file. If the platform does not support
+dart:io, null will be returned.
   
 
 </dd>
 
         <dt id="decodePsd" class="callable">
-  <span class="name"><a href="../image/decodePsd.html">decodePsd</a></span><span class="signature">(<wbr><span class="parameter" id="decodePsd-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span>, </span><span class="parameter" id="decodePsd-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
+  <span class="name"><a href="../image/decodePsd.html">decodePsd</a></span><span class="signature">(<wbr><span class="parameter" id="decodePsd-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span></span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a>?</span>
   </span>
   
@@ -2186,6 +2286,20 @@ it is much slower than using an explicit decoder.
 </dt>
 <dd>
   Decode a Photoshop PSD formatted image.
+  
+
+</dd>
+
+        <dt id="decodePsdFile" class="callable">
+  <span class="name"><a href="../image/decodePsdFile.html">decodePsdFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodePsdFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a PSD formatted image from a file. If the platform does not support
+dart:io, null will be returned.
   
 
 </dd>
@@ -2198,7 +2312,21 @@ it is much slower than using an explicit decoder.
 
 </dt>
 <dd>
-  Decode a Targa formatted image.
+  Decode a TGA formatted image.
+  
+
+</dd>
+
+        <dt id="decodeTgaFile" class="callable">
+  <span class="name"><a href="../image/decodeTgaFile.html">decodeTgaFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeTgaFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a TGA formatted image from a file. If the platform does not support
+dart:io, null will be returned.
   
 
 </dd>
@@ -2216,6 +2344,20 @@ it is much slower than using an explicit decoder.
 
 </dd>
 
+        <dt id="decodeTiffFile" class="callable">
+  <span class="name"><a href="../image/decodeTiffFile.html">decodeTiffFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeTiffFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="decodeTiffFile-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a TIFF formatted image from a file. If the platform does not support
+dart:io, null will be returned.
+  
+
+</dd>
+
         <dt id="decodeWebP" class="callable">
   <span class="name"><a href="../image/decodeWebP.html">decodeWebP</a></span><span class="signature">(<wbr><span class="parameter" id="decodeWebP-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span>, </span><span class="parameter" id="decodeWebP-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a>?</span>
@@ -2225,6 +2367,20 @@ it is much slower than using an explicit decoder.
 </dt>
 <dd>
   Decode a WebP formatted image
+  
+
+</dd>
+
+        <dt id="decodeWebPFile" class="callable">
+  <span class="name"><a href="../image/decodeWebPFile.html">decodeWebPFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeWebPFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="decodeWebPFile-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decode a WebP formatted image from a file. If the platform does not support
+dart:io, null will be returned.
   
 
 </dd>
@@ -2407,6 +2563,19 @@ such as: arial14, arial24, or arial48.
 
 </dd>
 
+        <dt id="encodeBmpFile" class="callable">
+  <span class="name"><a href="../image/encodeBmpFile.html">encodeBmpFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeBmpFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeBmpFile-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Encode an <code>image</code> to a TIFF file at the given <code>path</code>.
+  
+
+</dd>
+
         <dt id="encodeCur" class="callable">
   <span class="name"><a href="../image/encodeCur.html">encodeCur</a></span><span class="signature">(<wbr><span class="parameter" id="encodeCur-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="encodeCur-param-singleFrame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">singleFrame</span> = <span class="default-value">false</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span>
@@ -2416,6 +2585,19 @@ such as: arial14, arial24, or arial48.
 </dt>
 <dd>
   Encode an <a href="../image/Image-class.html">Image</a> to the CUR format.
+  
+
+</dd>
+
+        <dt id="encodeCurFile" class="callable">
+  <span class="name"><a href="../image/encodeCurFile.html">encodeCurFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeCurFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeCurFile-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="encodeCurFile-param-singleFrame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">singleFrame</span> = <span class="default-value">false</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Encode an <code>image</code> to a CUR file at the given <code>path</code>.
   
 
 </dd>
@@ -2433,6 +2615,19 @@ such as: arial14, arial24, or arial48.
 
 </dd>
 
+        <dt id="encodeGifFile" class="callable">
+  <span class="name"><a href="../image/encodeGifFile.html">encodeGifFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeGifFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeGifFile-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="encodeGifFile-param-singleFrame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">singleFrame</span> = <span class="default-value">false</span>, </span><span class="parameter" id="encodeGifFile-param-repeat"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">repeat</span> = <span class="default-value">0</span>, </span><span class="parameter" id="encodeGifFile-param-samplingFactor"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">samplingFactor</span> = <span class="default-value">10</span>, </span><span class="parameter" id="encodeGifFile-param-dither"><span class="type-annotation"><a href="../image/DitherKernel.html">DitherKernel</a></span> <span class="parameter-name">dither</span> = <span class="default-value">DitherKernel.floydSteinberg</span>, </span><span class="parameter" id="encodeGifFile-param-ditherSerpentine"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">ditherSerpentine</span> = <span class="default-value">false</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Encode an <code>image</code> to a GIF file at the given <code>path</code>.
+  
+
+</dd>
+
         <dt id="encodeIco" class="callable">
   <span class="name"><a href="../image/encodeIco.html">encodeIco</a></span><span class="signature">(<wbr><span class="parameter" id="encodeIco-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="encodeIco-param-singleFrame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">singleFrame</span> = <span class="default-value">false</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span>
@@ -2446,6 +2641,35 @@ such as: arial14, arial24, or arial48.
 
 </dd>
 
+        <dt id="encodeIcoFile" class="callable">
+  <span class="name"><a href="../image/encodeIcoFile.html">encodeIcoFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeIcoFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeIcoFile-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="encodeIcoFile-param-singleFrame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">singleFrame</span> = <span class="default-value">false</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Encode an <code>image</code> to a ICO file at the given <code>path</code>.
+  
+
+</dd>
+
+        <dt id="encodeImageFile" class="callable">
+  <span class="name"><a href="../image/encodeImageFile.html">encodeImageFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeImageFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeImageFile-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Encode the <code>image</code> to a file at the given <code>path</code>. The format of the image
+file is determined from the extension of the file. If the image was
+successfully written to the file, true will be returned, otherwise false.
+For platforms that do not support dart:io, false will be returned.
+  
+
+</dd>
+
         <dt id="encodeJpg" class="callable">
   <span class="name"><a href="../image/encodeJpg.html">encodeJpg</a></span><span class="signature">(<wbr><span class="parameter" id="encodeJpg-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="encodeJpg-param-quality">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">quality</span> = <span class="default-value">100</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span>
@@ -2454,7 +2678,20 @@ such as: arial14, arial24, or arial48.
 
 </dt>
 <dd>
-  Encode an image to the JPEG format.
+  Encode an <code>image</code> to the JPEG format.
+  
+
+</dd>
+
+        <dt id="encodeJpgFile" class="callable">
+  <span class="name"><a href="../image/encodeJpgFile.html">encodeJpgFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeJpgFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeJpgFile-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="encodeJpgFile-param-quality">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">quality</span> = <span class="default-value">100</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Encode an <code>image</code> to a JPG file at the given <code>path</code>.
   
 
 </dd>
@@ -2472,6 +2709,19 @@ such as: arial14, arial24, or arial48.
 
 </dd>
 
+        <dt id="encodePngFile" class="callable">
+  <span class="name"><a href="../image/encodePngFile.html">encodePngFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodePngFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodePngFile-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="encodePngFile-param-singleFrame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">singleFrame</span> = <span class="default-value">false</span>, </span><span class="parameter" id="encodePngFile-param-level"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">level</span> = <span class="default-value">6</span>, </span><span class="parameter" id="encodePngFile-param-filter"><span class="type-annotation"><a href="../image/PngFilter.html">PngFilter</a></span> <span class="parameter-name">filter</span> = <span class="default-value">PngFilter.paeth</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Encode an <code>image</code> to a PNG file at the given <code>path</code>.
+  
+
+</dd>
+
         <dt id="encodeTga" class="callable">
   <span class="name"><a href="../image/encodeTga.html">encodeTga</a></span><span class="signature">(<wbr><span class="parameter" id="encodeTga-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span>
@@ -2480,7 +2730,20 @@ such as: arial14, arial24, or arial48.
 
 </dt>
 <dd>
-  Encode an image to the Targa format.
+  Encode an image to the TGA format.
+  
+
+</dd>
+
+        <dt id="encodeTgaFile" class="callable">
+  <span class="name"><a href="../image/encodeTgaFile.html">encodeTgaFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeTgaFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeTgaFile-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Encode an <code>image</code> to a TGA file at the given <code>path</code>.
   
 
 </dd>
@@ -2494,6 +2757,19 @@ such as: arial14, arial24, or arial48.
 </dt>
 <dd>
   
+  
+
+</dd>
+
+        <dt id="encodeTiffFile" class="callable">
+  <span class="name"><a href="../image/encodeTiffFile.html">encodeTiffFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeTiffFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeTiffFile-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="encodeTiffFile-param-singleFrame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">singleFrame</span> = <span class="default-value">false</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Encode an <code>image</code> to a TIFF file at the given <code>path</code>.
   
 
 </dd>
@@ -2992,6 +3268,19 @@ to the range <code>minValue</code>, <code>maxValue</code> inclusive.
 
 </dd>
 
+        <dt id="readFile" class="callable">
+  <span class="name"><a href="../image/readFile.html">readFile</a></span><span class="signature">(<wbr><span class="parameter" id="readFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="readFont" class="callable">
   <span class="name"><a href="../image/readFont.html">readFont</a></span><span class="signature">(<wbr><span class="parameter" id="readFont-param-font"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">font</span>, </span><span class="parameter" id="readFont-param-map"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">map</span></span>)
     <span class="returntype parameter">&#8594; <a href="../image/BitmapFont-class.html">BitmapFont</a></span>
@@ -3172,6 +3461,19 @@ given <code>kernel</code>.
 
 </dd>
 
+        <dt id="supportsFileAccess" class="callable">
+  <span class="name"><a href="../image/supportsFileAccess.html">supportsFileAccess</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="trim" class="callable">
   <span class="name"><a href="../image/trim.html">trim</a></span><span class="signature">(<wbr><span class="parameter" id="trim-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="trim-param-mode">{<span class="type-annotation"><a href="../image/TrimMode.html">TrimMode</a></span> <span class="parameter-name">mode</span> = <span class="default-value">TrimMode.topLeftColor</span>, </span><span class="parameter" id="trim-param-sides"><span class="type-annotation"><a href="../image/Trim-class.html">Trim</a></span> <span class="parameter-name">sides</span> = <span class="default-value">Trim.all</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
@@ -3241,6 +3543,19 @@ meet the <code>mode</code> criteria (not transparent or a different color).
         <dt id="vignette" class="callable">
   <span class="name"><a href="../image/vignette.html">vignette</a></span><span class="signature">(<wbr><span class="parameter" id="vignette-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="vignette-param-start">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">start</span> = <span class="default-value">0.3</span>, </span><span class="parameter" id="vignette-param-end"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">end</span> = <span class="default-value">0.75</span>, </span><span class="parameter" id="vignette-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">0.8</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="writeFile" class="callable">
+  <span class="name"><a href="../image/writeFile.html">writeFile</a></span><span class="signature">(<wbr><span class="parameter" id="writeFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="writeFile-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">bytes</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
   </span>
   
 
@@ -3787,16 +4102,27 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/copyRotate.html">copyRotate</a></li>
         <li><a href="../image/crand.html">crand</a></li>
         <li><a href="../image/decodeBmp.html">decodeBmp</a></li>
+        <li><a href="../image/decodeBmpFile.html">decodeBmpFile</a></li>
         <li><a href="../image/decodeExr.html">decodeExr</a></li>
+        <li><a href="../image/decodeExrFile.html">decodeExrFile</a></li>
         <li><a href="../image/decodeGif.html">decodeGif</a></li>
+        <li><a href="../image/decodeGifFile.html">decodeGifFile</a></li>
         <li><a href="../image/decodeIco.html">decodeIco</a></li>
+        <li><a href="../image/decodeIcoFile.html">decodeIcoFile</a></li>
         <li><a href="../image/decodeImage.html">decodeImage</a></li>
+        <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
         <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
+        <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
         <li><a href="../image/decodePng.html">decodePng</a></li>
+        <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
         <li><a href="../image/decodePsd.html">decodePsd</a></li>
+        <li><a href="../image/decodePsdFile.html">decodePsdFile</a></li>
         <li><a href="../image/decodeTga.html">decodeTga</a></li>
+        <li><a href="../image/decodeTgaFile.html">decodeTgaFile</a></li>
         <li><a href="../image/decodeTiff.html">decodeTiff</a></li>
+        <li><a href="../image/decodeTiffFile.html">decodeTiffFile</a></li>
         <li><a href="../image/decodeWebP.html">decodeWebP</a></li>
+        <li><a href="../image/decodeWebPFile.html">decodeWebPFile</a></li>
         <li><a href="../image/ditherImage.html">ditherImage</a></li>
         <li><a href="../image/drawChar.html">drawChar</a></li>
         <li><a href="../image/drawCircle.html">drawCircle</a></li>
@@ -3810,13 +4136,22 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
         <li><a href="../image/encodeBmp.html">encodeBmp</a></li>
+        <li><a href="../image/encodeBmpFile.html">encodeBmpFile</a></li>
         <li><a href="../image/encodeCur.html">encodeCur</a></li>
+        <li><a href="../image/encodeCurFile.html">encodeCurFile</a></li>
         <li><a href="../image/encodeGif.html">encodeGif</a></li>
+        <li><a href="../image/encodeGifFile.html">encodeGifFile</a></li>
         <li><a href="../image/encodeIco.html">encodeIco</a></li>
+        <li><a href="../image/encodeIcoFile.html">encodeIcoFile</a></li>
+        <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
+        <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
+        <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodeTga.html">encodeTga</a></li>
+        <li><a href="../image/encodeTgaFile.html">encodeTgaFile</a></li>
         <li><a href="../image/encodeTiff.html">encodeTiff</a></li>
+        <li><a href="../image/encodeTiffFile.html">encodeTiffFile</a></li>
         <li><a href="../image/executeCommandAsync.html">executeCommandAsync</a></li>
         <li><a href="../image/executeCommandBytes.html">executeCommandBytes</a></li>
         <li><a href="../image/executeCommandBytesAsync.html">executeCommandBytesAsync</a></li>
@@ -3853,6 +4188,7 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/pixelate.html">pixelate</a></li>
         <li><a href="../image/prand.html">prand</a></li>
         <li><a href="../image/quantize.html">quantize</a></li>
+        <li><a href="../image/readFile.html">readFile</a></li>
         <li><a href="../image/readFont.html">readFont</a></li>
         <li><a href="../image/readFontZip.html">readFontZip</a></li>
         <li><a href="../image/reinhardToneMap.html">reinhardToneMap</a></li>
@@ -3866,12 +4202,14 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/sepia.html">sepia</a></li>
         <li><a href="../image/smooth.html">smooth</a></li>
         <li><a href="../image/sobel.html">sobel</a></li>
+        <li><a href="../image/supportsFileAccess.html">supportsFileAccess</a></li>
         <li><a href="../image/trim.html">trim</a></li>
         <li><a href="../image/uint32ToAlpha.html">uint32ToAlpha</a></li>
         <li><a href="../image/uint32ToBlue.html">uint32ToBlue</a></li>
         <li><a href="../image/uint32ToGreen.html">uint32ToGreen</a></li>
         <li><a href="../image/uint32ToRed.html">uint32ToRed</a></li>
         <li><a href="../image/vignette.html">vignette</a></li>
+        <li><a href="../image/writeFile.html">writeFile</a></li>
         <li><a href="../image/xyzToLab.html">xyzToLab</a></li>
         <li><a href="../image/xyzToRgb.html">xyzToRgb</a></li>
 

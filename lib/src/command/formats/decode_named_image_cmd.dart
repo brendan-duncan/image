@@ -19,4 +19,3 @@ class DecodeNamedImageCmd extends Command {
     }
   }
 }
-

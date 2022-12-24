@@ -32,9 +32,7 @@ import 'draw/fill_circle_cmd.dart';
 import 'draw/fill_cmd.dart';
 import 'draw/fill_flood_cmd.dart';
 import 'draw/fill_rect_cmd.dart';
-import 'executor.dart'
-if (dart.library.io) 'executor_io.dart'
-if (dart.library.js) 'executor_html.dart';
+import 'executor.dart';
 import 'filter/adjust_color_cmd.dart';
 import 'filter/bump_to_normal_cmd.dart';
 import 'filter/color_offset_cmd.dart';
@@ -74,7 +72,9 @@ import 'formats/tga_cmd.dart';
 import 'formats/tiff_cmd.dart';
 import 'formats/webp_cmd.dart';
 import 'formats/write_to_file_cmd.dart';
+import 'image/add_frames_cmd.dart';
 import 'image/convert_cmd.dart';
+import 'image/copy_image_cmd.dart';
 import 'image/create_image_cmd.dart';
 import 'image/image_cmd.dart';
 import 'transform/bake_orientation_cmd.dart';
@@ -131,6 +131,14 @@ class Command {
   void convert({ int? numChannels, Format? format }) {
     subCommand = ConvertCmd(subCommand, numChannels: numChannels,
         format: format);
+  }
+
+  void copy() {
+    subCommand = CopyImageCmd(subCommand);
+  }
+
+  void addFrames(int count, AddFramesCallback callback) {
+    subCommand = AddFramesCmd(subCommand, count, callback);
   }
 
   // formats
