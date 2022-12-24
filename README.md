@@ -42,8 +42,6 @@ will not be as fast as a native library.
 
 ## [Documentation](doc/dart_image_library.md)
 
-## [API](doc/api/index.html)
-
 ## Examples
 
 Create an image, set pixel values, save it to a PNG.
