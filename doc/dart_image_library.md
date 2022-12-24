@@ -22,5 +22,5 @@ web applications.
 
 ## [High Dynamic Range Images](hdr.md)
 
-## [API]()
+## [API](https://brendan-duncan.github.io/image/doc/api)
 
