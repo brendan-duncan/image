@@ -1,4 +1,4 @@
-/// The Dart Image Library (DIL) provides the ability to load, save, and
+/// The Dart Image Library provides the ability to load, save, and
 /// manipulate images in a variety of image file formats.
 library image;
 

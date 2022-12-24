@@ -19,7 +19,7 @@ void _addControl(String label, String value, DivElement parent,
       final d = double.parse(amountEdit.value!);
       callback(d);
     } catch (e) {
-      print(e);
+      //print(e);
     }
   });
   amountLabel.htmlFor = '${label}_edit';
@@ -51,7 +51,7 @@ void testSepia() {
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
-    print(t.elapsedMilliseconds / 1000.0);
+    //print(t.elapsedMilliseconds / 1000.0);
   }
 
   _addControl('Amount', amount.toString(), sidebar, (num v) {
@@ -84,7 +84,7 @@ void testSobel() {
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
-    print(t.elapsedMilliseconds / 1000.0);
+    //print(t.elapsedMilliseconds / 1000.0);
   }
 
   _addControl('Amount', amount.toString(), sidebar, (num v) {
@@ -117,7 +117,7 @@ void testGaussian() {
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
-    print(t.elapsedMilliseconds / 1000.0);
+    //print(t.elapsedMilliseconds / 1000.0);
   }
 
   _addControl('Radius', radius.toString(), sidebar, (num v) {
@@ -152,7 +152,7 @@ void testVignette() {
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
-    print(t.elapsedMilliseconds / 1000.0);
+    //print(t.elapsedMilliseconds / 1000.0);
   }
 
   _addControl('Start', start.toString(), sidebar, (num v) {
@@ -195,7 +195,7 @@ void testPixelate() {
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
-    print(t.elapsedMilliseconds / 1000.0);
+    //print(t.elapsedMilliseconds / 1000.0);
   }
 
   _addControl('blockSize', blockSize.toString(), sidebar, (num v) {
@@ -232,7 +232,7 @@ void testColorOffset() {
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
-    print(t.elapsedMilliseconds / 1000.0);
+    //print(t.elapsedMilliseconds / 1000.0);
   }
 
   _addControl('red', red.toString(), sidebar, (num v) {
@@ -295,7 +295,7 @@ void testAdjustColor() {
     canvas.context2D.putImageData(filterImageData, 0, 0);
 
     logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
-    print(t.elapsedMilliseconds / 1000.0);
+    //print(t.elapsedMilliseconds / 1000.0);
   }
 
   _addControl('Contrast', contrast.toString(), sidebar, (num v) {

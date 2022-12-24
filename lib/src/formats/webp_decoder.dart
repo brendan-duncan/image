@@ -256,7 +256,7 @@ class WebPDecoder extends Decoder {
           webp!.xmp = input.readString(size);
           break;
         default:
-          print('UNKNOWN WEBP TAG: $tag');
+          //print('UNKNOWN WEBP TAG: $tag');
           input.skip(diskSize);
           break;
       }

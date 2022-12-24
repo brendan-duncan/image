@@ -7,7 +7,7 @@ This is a work in progress major update for the Image library.
 
 ## Overview
 
-The Dart Image Library (DIL) provides the ability to load, save, and manipulate images
+The Dart Image Library provides the ability to load, save, and manipulate images
 in a variety of image file formats.
 
 The library can be used with both dart:io and dart:html, for command-line, Flutter, and
@@ -43,25 +43,25 @@ web applications.
 Create an image, set pixel values, save it to a PNG.
 ```dart
 import 'dart:io';
-import 'package:image/image.dart' as DIL;
+import 'package:image/image.dart' as img;
 void main() async {
-  final image = DIL.Image(256, 256);
+  final image = img.Image(256, 256);
   for (var pixel in image) {
     pixel..r = pixel.x
     ..g = pixel.y;
   }
-  final png = DIL.encodePng(image);
+  final png = img.encodePng(image);
   await File('image.png').writeAsBytes(png);
 }
 ```
 
 To asynchronously load an image file, resize it, and save it as a thumbnail: 
 ```dart
-import 'package:image/image_io.dart' as DIL;
+import 'package:image/image_io.dart' as img;
 
 void main(List<String> args) async {
   final path = args.isNotEmpty ? args[0] : 'test.png';
-  final cmd = DIL.Command()
+  final cmd = img.Command()
     // Decode the image file at the given path
     ..decodeImageFile(path)
     // Resize the image to a width of 64 pixels and a height that maintains the aspect ratio of the original. 

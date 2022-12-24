@@ -310,7 +310,7 @@ class TiffImage {
           decoder.decode(InputBuffer.from(p, length: byteCount),
               byteData.buffer);
         } catch (e) {
-          print(e);
+          //print(e);
         }
         // Horizontal Differencing Predictor
         if (predictor == 2) {

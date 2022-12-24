@@ -74,7 +74,7 @@ class GifDecoder extends Decoder {
         }
       }
     } catch (error) {
-      print(error);
+      //
     }
 
     //_numFrames = info.numFrames;

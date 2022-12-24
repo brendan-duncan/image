@@ -327,7 +327,7 @@ class PngDecoder extends Decoder {
     try {
       uncompressed = const ZLibDecoder().decodeBytes(imageData);
     } catch (error) {
-      print(error);
+      //print(error);
       return null;
     }
 

@@ -41,9 +41,6 @@ void testImageEquals(Image image, Image image2) {
   final c = image.iterator..moveNext();
   for (var p2 in image2) {
     final p1 = c.current;
-    if (p1 != p2) {
-      print('$p1 $p2');
-    }
     expect(p2, equals(p1));
     c.moveNext();
   }

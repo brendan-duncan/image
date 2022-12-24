@@ -1,7 +1,7 @@
 name: image
 version: 4.0.0
 description: >-
-  Dart Image Library (DIL) provides server and web apps the ability to load, manipulate,
+  Dart Image Library provides server and web apps the ability to load, manipulate,
   and save images with various image file formats including PNG, JPEG, GIF, BMP, WebP,
   TIFF, TGA, PSD, PVR, and OpenEXR.
 homepage: https://github.com/brendan-duncan/image

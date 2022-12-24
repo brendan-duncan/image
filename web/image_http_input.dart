@@ -35,7 +35,7 @@ void onFileLoaded(Event event) {
   // Find a decoder that is able to decode the given file contents.
   final decoder = findDecoderForData(bytes);
   if (decoder == null) {
-    print('Could not find format decoder for file');
+    //print('Could not find format decoder for file');
     return;
   }
 
