@@ -59,8 +59,8 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">fillCircle</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fillCircle-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span></li>
-<li><span class="parameter" id="fillCircle-param-x0"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x0</span>, </span></li>
-<li><span class="parameter" id="fillCircle-param-y0"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y0</span>, </span></li>
+<li><span class="parameter" id="fillCircle-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span></li>
+<li><span class="parameter" id="fillCircle-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span></li>
 <li><span class="parameter" id="fillCircle-param-radius"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">radius</span>, </span></li>
 <li><span class="parameter" id="fillCircle-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span></span></li>
 </ol>)
@@ -70,7 +70,7 @@
     </section>
     
 <section class="desc markdown">
-  <p>Draw and fill a circle into the <code>image</code> with a center of <code>x0</code>,<code>y0</code>
+  <p>Draw and fill a circle into the <code>image</code> with a center of <code>x</code>,<code>y</code>
 and the given <code>radius</code> and <code>color</code>.</p>
 <p>The algorithm uses the same logic as <a href="../image/drawCircle.html">drawCircle</a> to calculate each point
 around the circle's circumference. Then it iterates through every point,
@@ -84,8 +84,8 @@ filled one vertical slice at a time (each slice being 1-pixel wide).</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image fillCircle(Image image, int x0, int y0, int radius, Color color) {
-  final points = _calculateCircumference(image, x0, y0, radius)
+  <pre class="language-dart"><code class="language-dart">Image fillCircle(Image image, int x, int y, int radius, Color color) {
+  final points = _calculateCircumference(image, x, y, radius)
       &#47;&#47; sort points by x-coordinate and then by y-coordinate
       ..sort((a, b) =&gt; (a.x == b.x) ? a.y.compareTo(b.y) : a.x.compareTo(b.x));
 

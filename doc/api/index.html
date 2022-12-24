@@ -49,15 +49,16 @@
   <div id="dartdoc-main-content" class="main-content">
       
 <section class="desc markdown">
-  <h1 id="dart-image-library-dil">Dart Image Library (DIL)</h1>
+  <h1 id="dart-image-library">Dart Image Library</h1>
 <p><a href="https://github.com/brendan-duncan/image/actions/workflows/build.yaml"><img src="https://github.com/brendan-duncan/image/actions/workflows/build.yaml/badge.svg?branch=4.0" alt="Dart CI"></a>
 <a href="https://pub.dev/packages/image"><img src="https://img.shields.io/pub/v/image.svg" alt="pub package"></a></p>
 <h2 id="note">NOTE</h2>
 <p>This is a work in progress major update for the Image library.</p>
 <h2 id="overview">Overview</h2>
-<p>A Dart library providing the ability to load, save and manipulate images in a variety of different file formats.</p>
-<p>The library is written entirely in Dart and has no reliance on <code>dart:io</code>, so it can be used for command-line, Flutter,
-and web applications.</p>
+<p>The Dart Image Library (DIL) provides the ability to load, save, and manipulate images
+in a variety of image file formats.</p>
+<p>The library can be used with both dart:io and dart:html, for command-line, Flutter, and
+web applications.</p>
 <h3 id="performance-warning">Performance Warning</h3>
 <p>Because this library is written entirely in Dart and is a not native executed library, its performance
 will not be as fast as a native library.</p>
@@ -83,10 +84,8 @@ will not be as fast as a native library.</p>
 <ul>
 <li>CUR</li>
 </ul>
-<h2 id="documentationhttpsgithubcombrendan-duncanimagewiki"><a href="https://github.com/brendan-duncan/image/wiki">Documentation</a></h2>
-<h2 id="apihttpspubdevdocumentationimagelatestimageimage-libraryhtml"><a href="https://pub.dev/documentation/image/latest/image/image-library.html">API</a></h2>
-<h2 id="exampleshttpsgithubcombrendan-duncanimagewikiexamples"><a href="https://github.com/brendan-duncan/image/wiki/Examples">Examples</a></h2>
-<h2 id="format-decoding-functionshttpsgithubcombrendan-duncanimagewikiformat-decoding-functions"><a href="https://github.com/brendan-duncan/image/wiki#format-decoding-functions">Format Decoding Functions</a></h2>
+<h2 id="documentationdocdart_image_librarymd"><a href="doc/dart_image_library.md">Documentation</a></h2>
+<h2 id="apidocapiindexhtml"><a href="doc/api/index.html">API</a></h2>
 <h2 id="examples">Examples</h2>
 <p>Create an image, set pixel values, save it to a PNG.</p>
 <pre class="language-dart"><code class="language-dart">import 'dart:io';
@@ -101,27 +100,12 @@ void main() async {
   await File('image.png').writeAsBytes(png);
 }
 </code></pre>
-<p>An ImageCommand API lets you perform these functions either synchronously or asynchronously.</p>
-<pre class="language-dart"><code class="language-dart">import 'package:image/image_io.dart' as DIL;
-void main() async {
-  final cmd = DIL.ImageCommand()
-      ..createImage(256, 256)
-      ..filter((image) {
-        for (var pixel in image) {
-          pixel..r = pixel.x
-          ..g = pixel.y;
-        }
-      })
-      ..encodePngFile('image.png');
-  await cmd.executeAsync();
-}
-</code></pre>
 <p>To asynchronously load an image file, resize it, and save it as a thumbnail:</p>
 <pre class="language-dart"><code class="language-dart">import 'package:image/image_io.dart' as DIL;
 
 void main(List&lt;String&gt; args) async {
   final path = args.isNotEmpty ? args[0] : 'test.png';
-  final cmd = DIL.ImageCommand()
+  final cmd = DIL.Command()
     // Decode the image file at the given path
     ..decodeImageFile(path)
     // Resize the image to a width of 64 pixels and a height that maintains the aspect ratio of the original. 
