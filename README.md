@@ -13,10 +13,6 @@ in a variety of image file formats.
 The library can be used with both dart:io and dart:html, for command-line, Flutter, and
 web applications.
 
-### Performance Warning
-Because this library is written entirely in Dart and is a not native executed library, its performance
-will not be as fast as a native library.
-
 ### Supported Image Formats
 
 **Read/Write**
