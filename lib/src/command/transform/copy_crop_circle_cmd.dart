@@ -10,8 +10,8 @@ class CopyCropCircleCmd extends Command {
       : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     final img = input?.outputImage;
     outputImage = img != null ?
         copyCropCircle(img, radius: radius, centerX: centerX, centerY: centerY)

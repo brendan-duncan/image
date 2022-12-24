@@ -13,7 +13,7 @@ class DecodeIcoCmd extends Command {
   DecodeIcoCmd(this.data);
 
   @override
-  void executeCommand() {
+  Future<void> executeCommand() async {
     outputImage = decodeIco(data);
   }
 }
@@ -25,8 +25,8 @@ class DecodeIcoFileCmd extends Command {
   DecodeIcoFileCmd(this.path);
 
   @override
-  void executeCommand() {
-    final bytes = readFile(path);
+  Future<void> executeCommand() async {
+    final bytes = await readFile(path);
     outputImage = bytes != null ? decodeIco(bytes) : null;
   }
 }
@@ -37,8 +37,8 @@ class EncodeIcoCmd extends Command {
       : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
       outputBytes = encodeIco(outputImage!);
@@ -55,10 +55,10 @@ class EncodeIcoFileCmd extends EncodeIcoCmd {
       : super(input);
 
   @override
-  void executeCommand() {
-    super.executeCommand();
+  Future<void> executeCommand() async {
+    await super.executeCommand();
     if (outputBytes != null) {
-      writeFile(path, outputBytes!);
+      await writeFile(path, outputBytes!);
     }
   }
 }

@@ -13,7 +13,7 @@ class DecodeJpgCmd extends Command {
   DecodeJpgCmd(this.data);
 
   @override
-  void executeCommand() {
+  Future<void> executeCommand() async {
     outputImage = decodeJpg(data);
   }
 }
@@ -25,8 +25,8 @@ class DecodeJpgFileCmd extends Command {
   DecodeJpgFileCmd(this.path);
 
   @override
-  void executeCommand() {
-    final bytes = readFile(path);
+  Future<void> executeCommand() async {
+    final bytes = await readFile(path);
     outputImage = bytes != null ? decodeJpg(bytes) : null;
   }
 }
@@ -39,8 +39,8 @@ class EncodeJpgCmd extends Command {
       : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
       outputBytes = encodeJpg(outputImage!, quality: quality);
@@ -57,10 +57,10 @@ class EncodeJpgFileCmd extends EncodeJpgCmd {
       : super(input, quality: quality);
 
   @override
-  void executeCommand() {
-    super.executeCommand();
+  Future<void> executeCommand() async {
+    await super.executeCommand();
     if (outputBytes != null) {
-      writeFile(path, outputBytes!);
+      await writeFile(path, outputBytes!);
     }
   }
 }

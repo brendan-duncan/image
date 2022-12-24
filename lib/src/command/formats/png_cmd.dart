@@ -14,7 +14,7 @@ class DecodePngCmd extends Command {
   DecodePngCmd(this._data);
 
   @override
-  void executeCommand() {
+  Future<void> executeCommand() async {
     outputImage = decodePng(_data);
   }
 }
@@ -27,8 +27,8 @@ class DecodePngFileCmd extends Command {
       : _path = path;
 
   @override
-  void executeCommand() {
-    final bytes = readFile(_path);
+  Future<void> executeCommand() async {
+    final bytes = await readFile(_path);
     outputImage = bytes != null ? decodePng(bytes) : null;
   }
 }
@@ -45,8 +45,8 @@ class EncodePngCmd extends Command {
       , super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
       outputBytes = encodePng(outputImage!, level: _level, filter: _filter);
@@ -65,10 +65,10 @@ class EncodePngFileCmd extends EncodePngCmd {
       , super(input, level: level, filter: filter);
 
   @override
-  void executeCommand() {
-    super.executeCommand();
+  Future<void> executeCommand() async {
+    await super.executeCommand();
     if (outputBytes != null) {
-      writeFile(_path, outputBytes!);
+      await writeFile(_path, outputBytes!);
     }
   }
 }

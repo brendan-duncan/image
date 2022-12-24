@@ -11,8 +11,8 @@ class WriteToFileCmd extends Command {
       : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = input?.outputImage;
     outputBytes = input?.outputBytes;
 
@@ -38,7 +38,7 @@ class WriteToFileCmd extends Command {
     }
 
     if (outputBytes != null) {
-      writeFile(path, outputBytes!);
+      await writeFile(path, outputBytes!);
     }
   }
 }

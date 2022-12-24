@@ -1,11 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-Uint8List? readFile(String path) =>
-    File(path).readAsBytesSync();
+Future<Uint8List?> readFile(String path) => File(path).readAsBytes();
 
-void writeFile(String path, Uint8List bytes) {
-  File(path)
-    ..createSync(recursive: true)
-    ..writeAsBytesSync(bytes);
+Future<void> writeFile(String path, Uint8List bytes) async {
+  final fp = File(path);
+  await fp.create(recursive: true);
+  await fp.writeAsBytes(bytes);
 }

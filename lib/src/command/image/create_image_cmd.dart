@@ -23,7 +23,7 @@ class CreateImageCmd extends Command {
       this.textData });
 
   @override
-  void executeCommand() {
+  Future<void> executeCommand() async {
     outputImage = Image(width, height, format: format, numChannels: numChannels,
         withPalette: withPalette,
         paletteFormat: paletteFormat, palette: palette, exif: exif, iccp: iccp,

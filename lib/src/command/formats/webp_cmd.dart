@@ -13,7 +13,7 @@ class DecodeWebPCmd extends Command {
   DecodeWebPCmd(this.data);
 
   @override
-  void executeCommand() {
+  Future<void> executeCommand() async {
     outputImage = decodeWebP(data);
   }
 }
@@ -25,8 +25,8 @@ class DecodeWebPFileCmd extends Command {
   DecodeWebPFileCmd(this.path);
 
   @override
-  void executeCommand() {
-    final bytes = readFile(path);
+  Future<void> executeCommand() async {
+    final bytes = await readFile(path);
     outputImage = bytes != null ? decodeWebP(bytes) : null;
   }
 }

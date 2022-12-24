@@ -70,6 +70,6 @@ void main(List<String> args) async {
     ..writeToFile('thumbnail.png');
   // On platforms that support Isolates, execute the image commands asynchronously on an isolate thread.
   // Otherwise, the commands will be executed synchronously.
-  await cmd.executeAsync();
+  await cmd.executeThread();
 }
 ```

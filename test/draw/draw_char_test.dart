@@ -18,7 +18,7 @@ void drawCharTest() {
             color: ColorRgba8(255, 0, 0, 128))
         ..writeToFile('$testOutputPath/draw/draw_char.png');
 
-    final image = await cmd.getImageAsync();
+    final image = await cmd.getImageThread();
     expect(image, isNotNull);
     expect(image?.width, equals(256));
     expect(image?.height, equals(256));

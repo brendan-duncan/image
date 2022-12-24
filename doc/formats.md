@@ -130,7 +130,7 @@ Each format has its own DecodeInfo derived class for specific data from that for
 Decoder? findDecoderForData(Uint8List fileBytes);
 
 // Return the decoder based on the file name extension.
-Decoder? getDecoderForNamedImage(String filename);
+Decoder? findDecoderForNamedImage(String filename);
 ```
 
 ## Encoder Classes
@@ -146,5 +146,5 @@ bool supportsAnimation = encoder.supportsAnimation;
 You can also find the encoder for the format that uses a particular file extension.
 ```dart
 // Return the encoder based on the file name extension.
-Encoder? getEncoderForNamedImage(String filename);
+Encoder? findEncoderForNamedImage(String filename);
 ```

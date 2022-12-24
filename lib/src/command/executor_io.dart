@@ -11,22 +11,22 @@ class _Params {
   _Params(this.port, this.command);
 }
 
-Future<Image?> _getImage(_Params p) {
-  p.command?.execute();
+Future<Image?> _getImage(_Params p) async {
+  await p.command?.execute();
   final res = p.command?.outputImage;
   Isolate.exit(p.port, res);
 }
 
-Future<Uint8List?> _getBytes(_Params p) {
-  p.command?.execute();
+Future<Uint8List?> _getBytes(_Params p) async {
+  await p.command?.execute();
   final res = p.command?.outputBytes;
   Isolate.exit(p.port, res);
 }
 
-Future<ExecuteResult> _getResult(_Params p) {
-  p.command?.execute();
+Future<ExecuteResult> _getResult(_Params p) async {
+  await p.command?.execute();
   Isolate.exit(p.port, ExecuteResult(p.command?.outputImage,
-      p.command?.outputBytes));
+      p.command?.outputBytes, p.command?.outputObject));
 }
 
 Future<ExecuteResult> executeCommandAsync(Command? command) async {
@@ -35,8 +35,8 @@ Future<ExecuteResult> executeCommandAsync(Command? command) async {
   return await port.first as ExecuteResult;
 }
 
-Image? executeCommandImage(Command? command) {
-  command?.execute();
+Future<Image?> executeCommandImage(Command? command) async {
+  await command?.execute();
   return command?.outputImage;
 }
 
@@ -46,8 +46,8 @@ Future<Image?> executeCommandImageAsync(Command? command) async {
   return await port.first as Image?;
 }
 
-Uint8List? executeCommandBytes(Command? command) {
-  command?.execute();
+Future<Uint8List?> executeCommandBytes(Command? command) async {
+  await command?.execute();
   return command?.outputBytes;
 }
 

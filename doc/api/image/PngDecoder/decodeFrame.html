@@ -145,7 +145,7 @@ Image? decodeFrame(int frame) {
   try {
     uncompressed = const ZLibDecoder().decodeBytes(imageData);
   } catch (error) {
-    print(error);
+    &#47;&#47;print(error);
     return null;
   }
 

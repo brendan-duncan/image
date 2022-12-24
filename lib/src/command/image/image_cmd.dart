@@ -7,5 +7,5 @@ class ImageCmd extends Command {
   }
 
   @override
-  void executeCommand() { }
+  Future<void> executeCommand() async { }
 }

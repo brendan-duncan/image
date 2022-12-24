@@ -25,7 +25,7 @@ import 'webp_decoder.dart';
 
 /// Return the [Decoder] that can decode image with the given [name],
 /// by looking at the file extension.
-Decoder? getDecoderForNamedImage(String name) {
+Decoder? findDecoderForNamedImage(String name) {
   final n = name.toLowerCase();
   if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
     return JpegDecoder();
@@ -62,7 +62,7 @@ Decoder? getDecoderForNamedImage(String name) {
 
 /// Return the [Encoder] that can decode image with the given [name],
 /// by looking at the file extension.
-Encoder? getEncoderForNamedImage(String name) {
+Encoder? findEncoderForNamedImage(String name) {
   final n = name.toLowerCase();
   if (n.endsWith('.jpg') || n.endsWith('.jpeg')) {
     return JpegEncoder();

@@ -20,10 +20,9 @@ class DrawImageCmd extends Command {
       : super(dst);
 
   @override
-  void executeCommand() {
-    input?.execute();
-    final dst = input?.outputImage;
-    final srcImg = src?.getImage();
+  Future<void> executeCommand() async {
+    final dst = await input?.getImage();
+    final srcImg = await src?.getImage();
     outputImage = dst != null && srcImg != null ?
       drawImage(dst, srcImg, dstX: dstX, dstY: dstY,
           dstW: dstW, dstH: dstH, srcX: srcX, srcY: srcY, srcW: srcW,

@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 import '../../test_util.dart';
 
 void filterTest() {
-  test('filter', () {
+  test('filter', () async {
     Command()
       ..decodeGifFile('test/_data/gif/cars.gif')
       //..forEachFrame(Command()..filter((image) {

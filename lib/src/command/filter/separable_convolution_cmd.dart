@@ -9,8 +9,8 @@ class SeparableConvolutionCmd extends Command {
       : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     final img = input?.outputImage;
     outputImage = img != null ? g.separableConvolution(img, kernel) : null;
   }

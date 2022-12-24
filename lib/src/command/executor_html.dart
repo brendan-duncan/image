@@ -5,26 +5,27 @@ import 'command.dart';
 import 'execute_result.dart';
 
 Future<ExecuteResult> executeCommandAsync(Command? command) async {
-  command?.execute();
-  return ExecuteResult(command?.outputImage, command?.outputBytes);
+  await command?.execute();
+  return ExecuteResult(command?.outputImage, command?.outputBytes,
+      command?.outputObject);
 }
 
-Image? executeCommandImage(Command? command) {
-  command?.execute();
+Future<Image?> executeCommandImage(Command? command) async {
+  await command?.execute();
   return command?.outputImage;
 }
 
 Future<Image?> executeCommandImageAsync(Command? command) async {
-  command?.execute();
+  await command?.execute();
   return command?.outputImage;
 }
 
-Uint8List? executeCommandBytes(Command? command) {
-  command?.execute();
+Future<Uint8List?> executeCommandBytes(Command? command) async {
+  await command?.execute();
   return command?.outputBytes;
 }
 
 Future<Uint8List?> executeCommandBytesAsync(Command? command) async {
-  command?.execute();
+  await command?.execute();
   return command?.outputBytes;
 }

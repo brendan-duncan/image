@@ -1,5 +1,5 @@
 import 'dart:typed_data';
 
-Uint8List? readFile(String path) => null;
+Future<Uint8List?> readFile(String path) async => null;
 
-void writeFile(String path, Uint8List bytes) { }
+Future<void> writeFile(String path, Uint8List bytes) async { }

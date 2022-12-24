@@ -7,5 +7,6 @@ import '../util/internal.dart';
 class ExecuteResult {
   Image? image;
   Uint8List? bytes;
-  ExecuteResult(this.image, this.bytes);
+  Object? object;
+  ExecuteResult(this.image, this.bytes, this.object);
 }

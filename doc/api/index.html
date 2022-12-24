@@ -81,7 +81,7 @@ web applications.</p>
 <ul>
 <li>CUR</li>
 </ul>
-<h2 id="documentationdocdart_image_librarymd"><a href="doc/dart_image_library.md">Documentation</a></h2>
+<h2 id="documentationdocreadmemd"><a href="doc/README.md">Documentation</a></h2>
 <h2 id="examples">Examples</h2>
 <p>Create an image, set pixel values, save it to a PNG.</p>
 <pre class="language-dart"><code class="language-dart">import 'dart:io';
@@ -110,7 +110,7 @@ void main(List&lt;String&gt; args) async {
     ..writeToFile('thumbnail.png');
   // On platforms that support Isolates, execute the image commands asynchronously on an isolate thread.
   // Otherwise, the commands will be executed synchronously.
-  await cmd.executeAsync();
+  await cmd.executeThread();
 }
 </code></pre>
 </section>

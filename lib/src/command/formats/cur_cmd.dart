@@ -10,8 +10,8 @@ class EncodeCurCmd extends Command {
       : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
       outputBytes = encodeCur(outputImage!);
@@ -28,10 +28,10 @@ class EncodeCurFileCmd extends EncodeCurCmd {
       : super(input);
 
   @override
-  void executeCommand() {
-    super.executeCommand();
+  Future<void> executeCommand() async {
+    await super.executeCommand();
     if (outputBytes != null) {
-      writeFile(path, outputBytes!);
+      await writeFile(path, outputBytes!);
     }
   }
 }

@@ -56,7 +56,7 @@
 
     
 <section class="desc markdown">
-  <p>The Dart Image Library (DIL) provides the ability to load, save, and
+  <p>The Dart Image Library provides the ability to load, save, and
 manipulate images in a variety of image file formats.</p>
 </section>
 
@@ -261,7 +261,7 @@ example name: Roboto-Black.ttf
 </dt>
 <dd>
   Base class for commands that create, load, manipulate, and save images.
-Commands are not executed until either the <a href="../image/Command/execute.html">execute</a> or <a href="../image/Command/executeAsync.html">executeAsync</a>
+Commands are not executed until either the <a href="../image/Command/execute.html">execute</a> or <a href="../image/Command/executeThread.html">executeThread</a>
 methods are called.
 </dd>
 
@@ -2498,6 +2498,71 @@ such as: arial14, arial24, or arial48.
 
 </dd>
 
+        <dt id="executeCommandAsync" class="callable">
+  <span class="name"><a href="../image/executeCommandAsync.html">executeCommandAsync</a></span><span class="signature">(<wbr><span class="parameter" id="executeCommandAsync-param-command"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">command</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">ExecuteResult</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="executeCommandBytes" class="callable">
+  <span class="name"><a href="../image/executeCommandBytes.html">executeCommandBytes</a></span><span class="signature">(<wbr><span class="parameter" id="executeCommandBytes-param-command"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">command</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="executeCommandBytesAsync" class="callable">
+  <span class="name"><a href="../image/executeCommandBytesAsync.html">executeCommandBytesAsync</a></span><span class="signature">(<wbr><span class="parameter" id="executeCommandBytesAsync-param-command"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">command</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="executeCommandImage" class="callable">
+  <span class="name"><a href="../image/executeCommandImage.html">executeCommandImage</a></span><span class="signature">(<wbr><span class="parameter" id="executeCommandImage-param-command"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">command</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="executeCommandImageAsync" class="callable">
+  <span class="name"><a href="../image/executeCommandImageAsync.html">executeCommandImageAsync</a></span><span class="signature">(<wbr><span class="parameter" id="executeCommandImageAsync-param-command"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">command</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
         <dt id="fill" class="callable">
   <span class="name"><a href="../image/fill.html">fill</a></span><span class="signature">(<wbr><span class="parameter" id="fill-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span><span class="parameter" id="fill-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span></span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
@@ -2565,6 +2630,34 @@ given <code>color</code>.
 Use this is you don't know the type of image it is.
 <strong>WARNING</strong> Since this will check the image data against all known decoders,
 it is much slower than using an explicit decoder.
+  
+
+</dd>
+
+        <dt id="findDecoderForNamedImage" class="callable">
+  <span class="name"><a href="../image/findDecoderForNamedImage.html">findDecoderForNamedImage</a></span><span class="signature">(<wbr><span class="parameter" id="findDecoderForNamedImage-param-name"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../image/Decoder-class.html">Decoder</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Return the <a href="../image/Decoder-class.html">Decoder</a> that can decode image with the given <code>name</code>,
+by looking at the file extension.
+  
+
+</dd>
+
+        <dt id="findEncoderForNamedImage" class="callable">
+  <span class="name"><a href="../image/findEncoderForNamedImage.html">findEncoderForNamedImage</a></span><span class="signature">(<wbr><span class="parameter" id="findEncoderForNamedImage-param-name"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../image/Encoder-class.html">Encoder</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Return the <a href="../image/Encoder-class.html">Encoder</a> that can decode image with the given <code>name</code>,
+by looking at the file extension.
   
 
 </dd>
@@ -2662,34 +2755,6 @@ or <a href="../image/FlipDirection.html">FlipDirection.both</a>.
   Apply gaussian blur to the <code>src</code> image. <code>radius</code> determines how many pixels
 away from the current pixel should contribute to the blur, where 0 is no
 blur and the larger the radius, the stronger the blur.
-  
-
-</dd>
-
-        <dt id="getDecoderForNamedImage" class="callable">
-  <span class="name"><a href="../image/getDecoderForNamedImage.html">getDecoderForNamedImage</a></span><span class="signature">(<wbr><span class="parameter" id="getDecoderForNamedImage-param-name"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../image/Decoder-class.html">Decoder</a>?</span>
-  </span>
-  
-
-</dt>
-<dd>
-  Return the <a href="../image/Decoder-class.html">Decoder</a> that can decode image with the given <code>name</code>,
-by looking at the file extension.
-  
-
-</dd>
-
-        <dt id="getEncoderForNamedImage" class="callable">
-  <span class="name"><a href="../image/getEncoderForNamedImage.html">getEncoderForNamedImage</a></span><span class="signature">(<wbr><span class="parameter" id="getEncoderForNamedImage-param-name"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../image/Encoder-class.html">Encoder</a>?</span>
-  </span>
-  
-
-</dt>
-<dd>
-  Return the <a href="../image/Encoder-class.html">Encoder</a> that can decode image with the given <code>name</code>,
-by looking at the file extension.
   
 
 </dd>
@@ -3752,11 +3817,18 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodeTga.html">encodeTga</a></li>
         <li><a href="../image/encodeTiff.html">encodeTiff</a></li>
+        <li><a href="../image/executeCommandAsync.html">executeCommandAsync</a></li>
+        <li><a href="../image/executeCommandBytes.html">executeCommandBytes</a></li>
+        <li><a href="../image/executeCommandBytesAsync.html">executeCommandBytesAsync</a></li>
+        <li><a href="../image/executeCommandImage.html">executeCommandImage</a></li>
+        <li><a href="../image/executeCommandImageAsync.html">executeCommandImageAsync</a></li>
         <li><a href="../image/fill.html">fill</a></li>
         <li><a href="../image/fillCircle.html">fillCircle</a></li>
         <li><a href="../image/fillFlood.html">fillFlood</a></li>
         <li><a href="../image/fillRect.html">fillRect</a></li>
         <li><a href="../image/findDecoderForData.html">findDecoderForData</a></li>
+        <li><a href="../image/findDecoderForNamedImage.html">findDecoderForNamedImage</a></li>
+        <li><a href="../image/findEncoderForNamedImage.html">findEncoderForNamedImage</a></li>
         <li><a href="../image/findTrim.html">findTrim</a></li>
         <li><a href="../image/flip.html">flip</a></li>
         <li><a href="../image/flipHorizontal.html">flipHorizontal</a></li>
@@ -3764,8 +3836,6 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/flipVertical.html">flipVertical</a></li>
         <li><a href="../image/gamma.html">gamma</a></li>
         <li><a href="../image/gaussianBlur.html">gaussianBlur</a></li>
-        <li><a href="../image/getDecoderForNamedImage.html">getDecoderForNamedImage</a></li>
-        <li><a href="../image/getEncoderForNamedImage.html">getEncoderForNamedImage</a></li>
         <li><a href="../image/getLuminanceRgb.html">getLuminanceRgb</a></li>
         <li><a href="../image/grand.html">grand</a></li>
         <li><a href="../image/grayscale.html">grayscale</a></li>

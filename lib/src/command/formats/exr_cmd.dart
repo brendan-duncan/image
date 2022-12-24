@@ -13,7 +13,7 @@ class DecodeExrCmd extends Command {
   DecodeExrCmd(this.data);
 
   @override
-  void executeCommand() {
+  Future<void> executeCommand() async {
     outputImage = decodeExr(data);
   }
 }
@@ -25,8 +25,8 @@ class DecodeExrFileCmd extends Command {
   DecodeExrFileCmd(this.path);
 
   @override
-  void executeCommand() {
-    final bytes = readFile(path);
+  Future<void> executeCommand() async {
+    final bytes = await readFile(path);
     outputImage = bytes != null ? decodeExr(bytes) : null;
   }
 }

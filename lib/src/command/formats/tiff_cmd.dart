@@ -13,7 +13,7 @@ class DecodeTiffCmd extends Command {
   DecodeTiffCmd(this.data);
 
   @override
-  void executeCommand() {
+  Future<void> executeCommand() async {
     outputImage = decodeTiff(data);
   }
 }
@@ -25,8 +25,8 @@ class DecodeTiffFileCmd extends Command {
   DecodeTiffFileCmd(this.path);
 
   @override
-  void executeCommand() {
-    final bytes = readFile(path);
+  Future<void> executeCommand() async {
+    final bytes = await readFile(path);
     outputImage = bytes != null ? decodeTiff(bytes) : null;
   }
 }
@@ -37,8 +37,8 @@ class EncodeTiffCmd extends Command {
       : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
       outputBytes = encodeTiff(outputImage!);
@@ -55,10 +55,10 @@ class EncodeTiffFileCmd extends EncodeTiffCmd {
       : super(input);
 
   @override
-  void executeCommand() {
-    super.executeCommand();
+  Future<void> executeCommand() async {
+    await super.executeCommand();
     if (outputBytes != null) {
-      writeFile(path, outputBytes!);
+      await writeFile(path, outputBytes!);
     }
   }
 }

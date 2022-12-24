@@ -14,7 +14,7 @@ class DecodeGifCmd extends Command {
   DecodeGifCmd(this.data);
 
   @override
-  void executeCommand() {
+  Future<void> executeCommand() async {
     outputImage = decodeGif(data);
   }
 }
@@ -26,8 +26,8 @@ class DecodeGifFileCmd extends Command {
   DecodeGifFileCmd(this.path);
 
   @override
-  void executeCommand() {
-    final bytes = readFile(path);
+  Future<void> executeCommand() async {
+    final bytes = await readFile(path);
     outputImage = bytes != null ? decodeGif(bytes) : null;
   }
 }
@@ -45,8 +45,8 @@ class EncodeGifCmd extends Command {
     : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
       outputBytes = encodeGif(outputImage!, samplingFactor: samplingFactor,
@@ -68,10 +68,10 @@ class EncodeGifFileCmd extends EncodeGifCmd {
           ditherSerpentine: ditherSerpentine);
 
   @override
-  void executeCommand() {
-    super.executeCommand();
+  Future<void> executeCommand() async {
+    await super.executeCommand();
     if (outputBytes != null) {
-      writeFile(path, outputBytes!);
+      await writeFile(path, outputBytes!);
     }
   }
 }

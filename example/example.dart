@@ -9,6 +9,6 @@ void main() async {
     // Save the image to a PNG file.
     ..writeToFile('thumbnail.png');
 
-  // Execute the image commands asynchronously
-  await cmd.executeAsync();
+  // Execute the image commands in an isolate thread
+  await cmd.executeThread();
 }

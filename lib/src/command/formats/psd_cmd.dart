@@ -13,7 +13,7 @@ class DecodePsdCmd extends Command {
   DecodePsdCmd(this.data);
 
   @override
-  void executeCommand() {
+  Future<void> executeCommand() async {
     outputImage = decodePsd(data);
   }
 }
@@ -25,8 +25,8 @@ class DecodePsdFileCmd extends Command {
   DecodePsdFileCmd(this.path);
 
   @override
-  void executeCommand() {
-    final bytes = readFile(path);
+  Future<void> executeCommand() async {
+    final bytes = await readFile(path);
     outputImage = bytes != null ? decodePsd(bytes) : null;
   }
 }

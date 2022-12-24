@@ -20,6 +20,9 @@ export 'src/color/color_uint8.dart';
 export 'src/color/color_util.dart';
 export 'src/color/format.dart';
 export 'src/command/command.dart';
+export 'src/command/executor.dart'
+if (dart.library.io) 'src/command/executor_io.dart'
+if (dart.library.js) 'src/command/executor_html.dart';
 export 'src/draw/draw_char.dart';
 export 'src/draw/draw_circle.dart';
 export 'src/draw/draw_image.dart';

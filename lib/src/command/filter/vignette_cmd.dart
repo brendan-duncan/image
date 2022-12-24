@@ -11,8 +11,8 @@ class VignetteCmd extends Command {
       : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     final img = input?.outputImage;
     outputImage = img != null ? g.vignette(img, start: start, end: end,
         amount: amount) : null;

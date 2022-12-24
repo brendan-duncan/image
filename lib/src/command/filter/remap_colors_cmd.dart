@@ -15,8 +15,8 @@ class RemapColorsCmd extends Command {
       : super(input);
 
   @override
-  void executeCommand() {
-    input?.execute();
+  Future<void> executeCommand() async {
+    await input?.execute();
     final img = input?.outputImage;
     outputImage = img != null ? g.remapColors(img, red: red, green: green,
         blue: blue, alpha: alpha) : null;
