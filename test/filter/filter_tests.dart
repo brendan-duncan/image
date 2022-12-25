@@ -1,7 +1,12 @@
 import 'package:test/test.dart';
 
 import 'adjust_color_test.dart';
+import 'billboard_test.dart';
+import 'black_and_white_test.dart';
+import 'bleach_bypass_test.dart';
+import 'bulge_distortion_test.dart';
 import 'bump_to_normal_test.dart';
+import 'chromatic_aberration_test.dart';
 import 'color_offset_test.dart';
 import 'contrast_test.dart';
 import 'convolution_test.dart';
@@ -27,7 +32,12 @@ import 'vignette_test.dart';
 void filterTests() {
   group('filter', () {
     adjustColorTest();
+    billboardTest();
+    blackAndWhiteTest();
+    bleachBypassTest();
+    bulgeDistortionTest();
     bumpToNormalTest();
+    chromaticAberrationTest();
     colorOffsetTest();
     contrastTest();
     convolutionTest();

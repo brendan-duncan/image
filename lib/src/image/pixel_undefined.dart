@@ -33,6 +33,14 @@ class PixelUndefined extends Iterable<num> implements Pixel {
   void set b(num b) {}
   num get a => 0;
   void set a(num a) {}
+  num get rNormalized => 0;
+  void set rNormalized(num v) {}
+  num get gNormalized => 0;
+  void set gNormalized(num v) {}
+  num get bNormalized => 0;
+  void set bNormalized(num v) {}
+  num get aNormalized => 0;
+  void set aNormalized(num v) {}
   void set(Color c) {}
   void setColor(num r, [num g = 0, num b = 0, num a = 0]) {}
   void setPosition(int x, int y) {}

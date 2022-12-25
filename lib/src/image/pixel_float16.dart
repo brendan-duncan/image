@@ -115,6 +115,18 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
     }
   }
 
+  num get rNormalized => r / maxChannelValue;
+  void set rNormalized(num v) => r = v * maxChannelValue;
+
+  num get gNormalized => g / maxChannelValue;
+  void set gNormalized(num v) => g = v * maxChannelValue;
+
+  num get bNormalized => b / maxChannelValue;
+  void set bNormalized(num v) => b = v * maxChannelValue;
+
+  num get aNormalized => a / maxChannelValue;
+  void set aNormalized(num v) => a = v * maxChannelValue;
+
   void set(Color c) {
     if (numChannels > 0) {
       r = c.r;

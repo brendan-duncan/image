@@ -78,6 +78,18 @@ class ColorUint2 extends Iterable<num> implements Color {
   num get a => getChannel(3);
   void set a(num v) => setChannel(3, v);
 
+  num get rNormalized => r / maxChannelValue;
+  void set rNormalized(num v) => r = v * maxChannelValue;
+
+  num get gNormalized => g / maxChannelValue;
+  void set gNormalized(num v) => g = v * maxChannelValue;
+
+  num get bNormalized => b / maxChannelValue;
+  void set bNormalized(num v) => b = v * maxChannelValue;
+
+  num get aNormalized => a / maxChannelValue;
+  void set aNormalized(num v) => a = v * maxChannelValue;
+
   void set(Color c) {
     setColor(c.r, c.g, c.b, c.a);
   }

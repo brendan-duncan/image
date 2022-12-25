@@ -34,7 +34,12 @@ import 'draw/fill_flood_cmd.dart';
 import 'draw/fill_rect_cmd.dart';
 import 'executor.dart';
 import 'filter/adjust_color_cmd.dart';
+import 'filter/billboard_cmd.dart';
+import 'filter/black_and_white_cmd.dart';
+import 'filter/bleach_bypass_cmd.dart';
+import 'filter/bulge_distortion_cmd.dart';
 import 'filter/bump_to_normal_cmd.dart';
+import 'filter/chromatic_aberration_cmd.dart';
 import 'filter/color_offset_cmd.dart';
 import 'filter/contrast_cmd.dart';
 import 'filter/convolution_cmd.dart';
@@ -393,8 +398,30 @@ class Command {
         hue: hue, amount: amount);
   }
 
+  void billboard({ num grid = 10 }) {
+    subCommand = BillboardCmd(subCommand, grid: grid);
+  }
+
+  void blackAndWhite({ num threshold = 0.5 }) {
+    subCommand = BlackAndWhiteCmd(subCommand, threshold: threshold);
+  }
+
+  void bleachBypass() {
+    subCommand = BleachBypassCmd(subCommand);
+  }
+
+  void bulgeDistortion({ int? centerX, int? centerY,
+      num? radius, num scale = 0.5 }) {
+    subCommand = BulgeDistortionCmd(subCommand, centerX: centerX,
+        centerY: centerY, radius: radius, scale: scale);
+  }
+
   void bumpToNormal({ num strength = 2.0 }) {
     subCommand = BumpToNormalCmd(subCommand, strength: strength);
+  }
+
+  void chromaticAberration({ int shift = 5 }) {
+    subCommand = ChromaticAberrationCmd(subCommand, shift: shift);
   }
 
   void colorOffset({ num red = 0, num green = 0, num blue = 0,

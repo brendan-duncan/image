@@ -58,7 +58,9 @@
       
 
 <span class="returntype"><a href="../../image/Image-class.html">Image</a></span>
-<span class="name ">clone</span>(<wbr>)
+<span class="name ">clone</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="clone-param-noAnimation">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">noAnimation</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="clone-param-noPixels"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">noPixels</span> = <span class="default-value">false</span>}</span></li>
+</ol>)
 
       
 
@@ -72,7 +74,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image clone() =&gt; Image.from(this);</code></pre>
+  <pre class="language-dart"><code class="language-dart">Image clone({ bool noAnimation = false, bool noPixels = false }) =&gt;
+    Image.from(this, noAnimation: noAnimation, noPixels: noPixels);</code></pre>
 </section>
 
 

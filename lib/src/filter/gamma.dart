@@ -2,7 +2,7 @@ import 'dart:math';
 
 import '../image/image.dart';
 
-/// Apply gamma scaling to the HDR image, in-place.
+/// Apply gamma scaling
 Image gamma(Image src, { num gamma = 2.2 }) {
   for (final frame in src.frames) {
     for (final p in frame) {

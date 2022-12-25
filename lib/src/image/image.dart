@@ -297,7 +297,8 @@ class Image extends Iterable<Pixel> {
   }
 
   /// Create a copy of this image.
-  Image clone() => Image.from(this);
+  Image clone({ bool noAnimation = false, bool noPixels = false }) =>
+      Image.from(this, noAnimation: noAnimation, noPixels: noPixels);
 
   /// String representation of the image.
   String toString() => 'Image($width, $height, ${format.name}, $numChannels)';

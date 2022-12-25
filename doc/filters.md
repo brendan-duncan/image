@@ -8,10 +8,30 @@ color filters, transformations into other images (resize, crop), or basic drawin
 * **[adjustColor](https://brendan-duncan.github.io/image/doc/api/image/adjustColor.html)**
 
 ![adjustColor](images/filter/adjustColor.png)
+
+* **[billboard](https://brendan-duncan.github.io/image/doc/api/image/billboard.html)**
+
+![billboard](images/filter/billboard.png)
+
+* **[blackAndWhite](https://brendan-duncan.github.io/image/doc/api/image/blackAndWhite.html)**
+
+![blackAndWhite](images/filter/blackAndWhite.png)
+
+* **[bleachBypass](https://brendan-duncan.github.io/image/doc/api/image/bleachBypass.html)**
+
+![bleachBypass](images/filter/bleachBypass.png)
+
+* **[bulgeDistortion](https://brendan-duncan.github.io/image/doc/api/image/bulgeDistortion.html)**
+
+![bulgeDistortion](images/filter/bulgeDistortion.png)
   
 * **[bumpToNormal](https://brendan-duncan.github.io/image/doc/api/image/bumpToNormal.html)**
 
 ![bumpToNormal](images/filter/bumpToNormal.png)
+
+* **[chromaticAberration](https://brendan-duncan.github.io/image/doc/api/image/chromaticAberration.html)**
+
+![chromaticAberration](images/filter/chromaticAberration.png)
 
 * **[colorOffset](https://brendan-duncan.github.io/image/doc/api/image/colorOffset.html)**
 
