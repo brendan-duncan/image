@@ -77,6 +77,10 @@ color filters, transformations into other images (resize, crop), or basic drawin
 
 ![invert](images/filter/invert.png)
 
+* **[maskAlpha](https://brendan-duncan.github.io/image/doc/api/image/maskAlpha.html)**
+
+![maskAlpha](images/filter/maskAlpha.png)
+
 * **[noise](https://brendan-duncan.github.io/image/doc/api/image/noise.html)**
 
 ![noise](images/filter/noise.png)

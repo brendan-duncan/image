@@ -18,6 +18,7 @@ import 'gamma_test.dart';
 import 'gaussian_blur_test.dart';
 import 'grayscale_test.dart';
 import 'invert_test.dart';
+import 'mask_alpha_test.dart';
 import 'noise_test.dart';
 import 'normalize_test.dart';
 import 'pixelate_test.dart';
@@ -49,6 +50,7 @@ void filterTests() {
     gaussianBlurTest();
     grayscaleTest();
     invertTest();
+    maskAlphaTest();
     noiseTest();
     normalizeTest();
     pixelateTest();

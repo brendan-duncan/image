@@ -52,6 +52,7 @@ import 'filter/gamma_cmd.dart';
 import 'filter/gaussian_blur_cmd.dart';
 import 'filter/grayscale_cmd.dart';
 import 'filter/invert_cmd.dart';
+import 'filter/mask_alpha_cmd.dart';
 import 'filter/noise_cmd.dart';
 import 'filter/normalize_cmd.dart';
 import 'filter/pixelate_cmd.dart';
@@ -475,6 +476,12 @@ class Command {
 
   void invert() {
     subCommand = InvertCmd(subCommand);
+  }
+
+  void maskAlpha(Command? mask, { Channel maskChannel = Channel.luminance,
+      bool scaleMask = false }) {
+    subCommand = MaskAlphaCmd(subCommand, mask, maskChannel: maskChannel,
+        scaleMask: scaleMask);
   }
 
   void noise(num sigma, { NoiseType type = NoiseType.gaussian,

@@ -54,6 +54,7 @@ export 'src/filter/gamma.dart';
 export 'src/filter/gaussian_blur.dart';
 export 'src/filter/grayscale.dart';
 export 'src/filter/invert.dart';
+export 'src/filter/mask_alpha.dart';
 export 'src/filter/noise.dart';
 export 'src/filter/normalize.dart';
 export 'src/filter/pixelate.dart';
