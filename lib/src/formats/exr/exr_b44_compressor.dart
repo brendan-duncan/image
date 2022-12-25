@@ -6,6 +6,7 @@ import '../../util/internal.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';
 
+@internal
 abstract class ExrB44Compressor extends ExrCompressor {
   factory ExrB44Compressor(ExrPart header, int? maxScanLineSize,
       int numScanLines, bool optFlatFields) = InternalExrB44Compressor;

@@ -13,10 +13,6 @@ color filters, transformations into other images (resize, crop), or basic drawin
 
 ![billboard](images/filter/billboard.png)
 
-* **[blackAndWhite](https://brendan-duncan.github.io/image/doc/api/image/blackAndWhite.html)**
-
-![blackAndWhite](images/filter/blackAndWhite.png)
-
 * **[bleachBypass](https://brendan-duncan.github.io/image/doc/api/image/bleachBypass.html)**
 
 ![bleachBypass](images/filter/bleachBypass.png)
@@ -73,13 +69,17 @@ color filters, transformations into other images (resize, crop), or basic drawin
 
 ![grayscale](images/filter/grayscale.png)
 
+* **[imageMask](https://brendan-duncan.github.io/image/doc/api/image/imageMask.html)**
+
+![imageMask](images/filter/imageMask.png)
+
 * **[invert](https://brendan-duncan.github.io/image/doc/api/image/invert.html)**
 
 ![invert](images/filter/invert.png)
 
-* **[maskAlpha](https://brendan-duncan.github.io/image/doc/api/image/maskAlpha.html)**
+* **[luminanceThreshold](https://brendan-duncan.github.io/image/doc/api/image/luminanceThreshold.html)**
 
-![maskAlpha](images/filter/maskAlpha.png)
+![luminanceThreshold](images/filter/luminanceThreshold.png)
 
 * **[noise](https://brendan-duncan.github.io/image/doc/api/image/noise.html)**
 
@@ -113,6 +113,10 @@ color filters, transformations into other images (resize, crop), or basic drawin
 
 ![sepia](images/filter/sepia.png)
 
+* **[sketch](https://brendan-duncan.github.io/image/doc/api/image/sketch.html)**
+
+![sketch](images/filter/sketch.png)
+
 * **[smooth](https://brendan-duncan.github.io/image/doc/api/image/smooth.html)**
 
 ![smooth](images/filter/smooth.png)
@@ -120,6 +124,10 @@ color filters, transformations into other images (resize, crop), or basic drawin
 * **[sobel](https://brendan-duncan.github.io/image/doc/api/image/sobel.html)**
 
 ![sobel](images/filter/sobel.png)
+
+* **[stretchDistortion](https://brendan-duncan.github.io/image/doc/api/image/stretchDistortion.html)**
+
+![stretchDistortion](images/filter/stretchDistortion.png)
 
 * **[vignette](https://brendan-duncan.github.io/image/doc/api/image/vignette.html)**
 

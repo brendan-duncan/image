@@ -2,7 +2,6 @@ import 'package:test/test.dart';
 
 import 'adjust_color_test.dart';
 import 'billboard_test.dart';
-import 'black_and_white_test.dart';
 import 'bleach_bypass_test.dart';
 import 'bulge_distortion_test.dart';
 import 'bump_to_normal_test.dart';
@@ -17,8 +16,9 @@ import 'emboss_test.dart';
 import 'gamma_test.dart';
 import 'gaussian_blur_test.dart';
 import 'grayscale_test.dart';
+import 'image_mask_test.dart';
 import 'invert_test.dart';
-import 'mask_alpha_test.dart';
+import 'luminance_threshold_test.dart';
 import 'noise_test.dart';
 import 'normalize_test.dart';
 import 'pixelate_test.dart';
@@ -27,15 +27,16 @@ import 'remap_colors_test.dart';
 import 'scale_rgba_test.dart';
 import 'separable_convolution_test.dart';
 import 'sepia_test.dart';
+import 'sketch_test.dart';
 import 'smooth_test.dart';
 import 'sobel_test.dart';
+import 'stretch_distortion_test.dart';
 import 'vignette_test.dart';
 
 void filterTests() {
   group('filter', () {
     adjustColorTest();
     billboardTest();
-    blackAndWhiteTest();
     bleachBypassTest();
     bulgeDistortionTest();
     bumpToNormalTest();
@@ -49,8 +50,9 @@ void filterTests() {
     gammaTest();
     gaussianBlurTest();
     grayscaleTest();
+    imageMaskTest();
     invertTest();
-    maskAlphaTest();
+    luminanceThresholdTest();
     noiseTest();
     normalizeTest();
     pixelateTest();
@@ -59,8 +61,10 @@ void filterTests() {
     scaleRgbaTest();
     separableConvolutionTest();
     sepiaTest();
+    sketchTest();
     smoothTest();
     sobelTest();
+    stretchDistortionTest();
     vignetteTest();
     dropShadowTest();
   });

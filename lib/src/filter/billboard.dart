@@ -4,7 +4,7 @@ import '../image/image.dart';
 import '../util/math_util.dart';
 
 ///
-Image billboard(Image src, { num grid = 10 }) {
+Image billboard(Image src, { num grid = 10, num amount = 1 }) {
   const rs = 0.2025;// pow(0.45, 2.0);
 
   for (final frame in src.frames) {
@@ -50,9 +50,9 @@ Image billboard(Image src, { num grid = 10 }) {
       g = mix(lf * g, 0.1, gr);
       b = mix(lf * b, 0.1, gr);
 
-      p..r = (r * p.maxChannelValue)
-      ..g = (g * p.maxChannelValue)
-      ..b = (b * p.maxChannelValue);
+      p..r = mix(p.r, r * p.maxChannelValue, amount)
+      ..g = mix(p.g, g * p.maxChannelValue, amount)
+      ..b = mix(p.b, b * p.maxChannelValue, amount);
     }
   }
   return src;

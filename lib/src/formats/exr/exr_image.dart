@@ -13,7 +13,7 @@ class ExrImage implements DecodeInfo {
   int width = 0;
   int height = 0;
   /// An EXR image has one or more parts, each of which contains a framebuffer.
-  final List<InternalExrPart> _parts = [];
+  final List<ExrPart> _parts = [];
 
   ExrImage(Uint8List bytes) {
     final input = InputBuffer(bytes);
@@ -52,8 +52,8 @@ class ExrImage implements DecodeInfo {
       throw ImageException('Error reading image header');
     }
 
-    for (var part in _parts) {
-      part.readOffsets(input);
+    for (final part in _parts) {
+      (part as InternalExrPart).readOffsets(input);
     }
 
     _readImage(input);
@@ -101,13 +101,14 @@ class ExrImage implements DecodeInfo {
 
   void _readImage(InputBuffer input) {
     //final bool multiPart = _isMultiPart();
-    for (var part in _parts) {
+    for (final part in _parts) {
+      final p = part as InternalExrPart;
       width = max(width, part.width);
       height = max(height, part.height);
-      if (part.tiled) {
-        _readTiledPart(part, input);
+      if (p.tiled) {
+        _readTiledPart(p, input);
       } else {
-        _readScanlinePart(part, input);
+        _readScanlinePart(p, input);
       }
     }
   }

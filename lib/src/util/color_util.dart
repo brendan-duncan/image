@@ -1,20 +1,20 @@
 import 'dart:math';
 
-import '../util/image_exception.dart';
-import 'color.dart';
-import 'color_float16.dart';
-import 'color_float32.dart';
-import 'color_float64.dart';
-import 'color_int16.dart';
-import 'color_int32.dart';
-import 'color_int8.dart';
-import 'color_uint1.dart';
-import 'color_uint16.dart';
-import 'color_uint2.dart';
-import 'color_uint32.dart';
-import 'color_uint4.dart';
-import 'color_uint8.dart';
-import 'format.dart';
+import '../color/color.dart';
+import '../color/color_float16.dart';
+import '../color/color_float32.dart';
+import '../color/color_float64.dart';
+import '../color/color_int16.dart';
+import '../color/color_int32.dart';
+import '../color/color_int8.dart';
+import '../color/color_uint1.dart';
+import '../color/color_uint16.dart';
+import '../color/color_uint2.dart';
+import '../color/color_uint32.dart';
+import '../color/color_uint4.dart';
+import '../color/color_uint8.dart';
+import '../color/format.dart';
+import 'image_exception.dart';
 
 int uint32ToRed(int c) => c & 0xff;
 
@@ -106,38 +106,13 @@ Color convertColor(Color c, { Format? format, int? numChannels, num? alpha }) {
     }
 }
 
+/// Returns the luminance (grayscale) value of the color.
+num getLuminance(Color c) =>
+    0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
 
-/*/// Returns a new color of [src] alpha-blended onto [dst]. The opacity of [src]
-/// is additionally scaled by [fraction] / 255.
-void alphaBlendPixel(Pixel dst, Pixel src, [int fraction = 0xff]) {
-  final srcAlpha = src.a;
-  if (srcAlpha == 255 && fraction == 0xff) {
-    // src is fully opaque, nothing to blend
-    dst.setColor(src.r, src.g, src.b, src.a);
-    return;
-  }
-  if (srcAlpha == 0 && fraction == 0xff) {
-    // src is fully transparent, nothing to blend
-    return;
-  }
-  var a = (srcAlpha / 255.0);
-  if (fraction != 0xff) {
-    a *= (fraction / 255.0);
-  }
-
-  final sr = (getRed(src) * a).round();
-  final sg = (getGreen(src) * a).round();
-  final sb = (getBlue(src) * a).round();
-  final sa = (srcAlpha * a).round();
-
-  final dr = (getRed(dst) * (1.0 - a)).round();
-  final dg = (getGreen(dst) * (1.0 - a)).round();
-  final db = (getBlue(dst) * (1.0 - a)).round();
-  final da = (getAlpha(dst) * (1.0 - a)).round();
-
-  return getColor(sr + dr, sg + dg, sb + db, sa + da);
-}*/
-
+/// Returns the normalized \[0, 1\] luminance (grayscale) value of the color.
+num getLuminanceNormalized(Color c) =>
+    0.299 * c.rNormalized + 0.587 * c.gNormalized + 0.114 * c.bNormalized;
 
 /// Returns the luminance (grayscale) value of the color.
 num getLuminanceRgb(num r, num g, num b) => 0.299 * r + 0.587 * g + 0.114 * b;

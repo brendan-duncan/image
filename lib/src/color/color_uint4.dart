@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import '../util/color_util.dart';
 import 'channel_iterator.dart';
 import 'color.dart';
-import 'color_util.dart';
 import 'format.dart';
 
 /// A 4-bit color value.
@@ -95,6 +95,9 @@ class ColorUint4 extends Iterable<num> implements Color {
 
   num get aNormalized => a / maxChannelValue;
   void set aNormalized(num v) => a = v * maxChannelValue;
+
+  num get luminance => getLuminance(this);
+  num get luminanceNormalized => getLuminanceNormalized(this);
 
   void set(Color c) {
     setColor(c.r, c.g, c.b, c.a);

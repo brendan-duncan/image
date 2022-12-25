@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 
+@internal
 class WebPFilters {
   // Filters.
   static const filterNone = 0;

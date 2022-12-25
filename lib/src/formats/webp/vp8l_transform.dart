@@ -2,8 +2,10 @@ import 'dart:typed_data';
 
 import '../../util/bit_utils.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'vp8l.dart';
 
+@internal
 enum VP8LImageTransformType {
   predictor,
   crossColor,
@@ -11,6 +13,7 @@ enum VP8LImageTransformType {
   colorIndexing
 }
 
+@internal
 class VP8LTransform {
   VP8LImageTransformType type = VP8LImageTransformType.predictor;
   int xsize = 0;

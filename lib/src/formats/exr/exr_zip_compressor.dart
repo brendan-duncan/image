@@ -4,15 +4,18 @@ import 'package:archive/archive.dart';
 
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';
 
+@internal
 abstract class ExrZipCompressor extends ExrCompressor {
   factory ExrZipCompressor(
           ExrPart header, int? maxScanLineSize, int numScanLines) =
       InternalExrZipCompressor;
 }
 
+@internal
 class InternalExrZipCompressor extends InternalExrCompressor
     implements ExrZipCompressor {
   ZLibDecoder zlib = const ZLibDecoder();

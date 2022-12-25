@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
+import '../../util/internal.dart';
 import 'vp8.dart';
 
+@internal
 class VP8FrameHeader {
   bool? keyFrame;
   int? profile; // uint8
@@ -9,6 +11,7 @@ class VP8FrameHeader {
   late int partitionLength; // uint32
 }
 
+@internal
 class VP8PictureHeader {
   int? width; // uint16
   int? height; // uint16
@@ -19,6 +22,7 @@ class VP8PictureHeader {
 }
 
 // Segment features
+@internal
 class VP8SegmentHeader {
   bool useSegment = false;
 
@@ -45,6 +49,7 @@ class VP8BandProbas {
 }
 
 // Struct collecting all frame-persistent probabilities.
+@internal
 class VP8Proba {
   Uint8List segments = Uint8List(VP8.mbFeatureTreeProbs);
 
@@ -63,6 +68,7 @@ class VP8Proba {
 }
 
 // Filter parameters
+@internal
 class VP8FilterHeader {
   late bool simple; // 0=complex, 1=simple
   int? level; // [0..63]
@@ -76,6 +82,7 @@ class VP8FilterHeader {
 // Informations about the macroblocks.
 
 // filter specs
+@internal
 class VP8FInfo {
   int fLimit = 0; // uint8_t, filter limit in [3..189], or 0 if no filtering
   int? fInnerLevel = 0; // uint8_t, inner limit in [1..63]
@@ -84,6 +91,7 @@ class VP8FInfo {
 }
 
 // Top/Left Contexts used for syntax-parsing
+@internal
 class VP8MB {
   int nz =
       0; // uint8_t, non-zero AC/DC coeffs (4bit for luma + 4bit for chroma)
@@ -91,6 +99,7 @@ class VP8MB {
 }
 
 // Dequantization matrices
+@internal
 class VP8QuantMatrix {
   Int32List y1Mat = Int32List(2);
   Int32List y2Mat = Int32List(2);
@@ -101,6 +110,7 @@ class VP8QuantMatrix {
 }
 
 // Data needed to reconstruct a macroblock
+@internal
 class VP8MBData {
   // 384 coeffs = (16+4+4) * 4*4
   Int16List coeffs = Int16List(384);
@@ -125,12 +135,14 @@ class VP8MBData {
 }
 
 // Saved top samples, per macroblock. Fits into a cache-line.
+@internal
 class VP8TopSamples {
   Uint8List y = Uint8List(16);
   Uint8List u = Uint8List(8);
   Uint8List v = Uint8List(8);
 }
 
+@internal
 class VP8Random {
   late int _index1;
   late int _index2;

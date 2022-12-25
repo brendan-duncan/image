@@ -1,6 +1,6 @@
+import '../util/color_util.dart';
 import 'channel_iterator.dart';
 import 'color.dart';
-import 'color_util.dart';
 import 'format.dart';
 
 /// A 1-bit color with channel values in the range \[0, 1\].
@@ -85,6 +85,9 @@ class ColorUint1 extends Iterable<num> implements Color {
 
   num get aNormalized => a / maxChannelValue;
   void set aNormalized(num v) => a = v * maxChannelValue;
+
+  num get luminance => getLuminance(this);
+  num get luminanceNormalized => getLuminanceNormalized(this);
 
   void set(Color c) {
     setColor(c.r, c.g, c.b, c.a);

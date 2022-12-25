@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import '../color/channel_iterator.dart';
 import '../color/color.dart';
-import '../color/color_util.dart';
+import '../util/color_util.dart';
 import '../color/format.dart';
 import '../util/float16.dart';
 import 'image.dart';
@@ -126,6 +126,9 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
 
   num get aNormalized => a / maxChannelValue;
   void set aNormalized(num v) => a = v * maxChannelValue;
+
+  num get luminance => getLuminance(this);
+  num get luminanceNormalized => getLuminanceNormalized(this);
 
   void set(Color c) {
     if (numChannels > 0) {

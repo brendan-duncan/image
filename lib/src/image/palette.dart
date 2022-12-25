@@ -40,15 +40,31 @@ abstract class Palette {
   /// fewer colors or channels, 0 will be returned.
   num getRed(int index);
 
+  /// Set the red channel of the palette entry at [index]. If the palette has
+  /// fewer colors or channels, it will be ignored.
+  void setRed(int index, num value);
+
   /// Get the green channel of the palette entry at [index]. If the palette has
   /// fewer colors or channels, 0 will be returned.
   num getGreen(int index);
+
+  /// Set the green channel of the palette entry at [index]. If the palette has
+  /// fewer colors or channels, it will be ignored.
+  void setGreen(int index, num value);
 
   /// Get the blue channel of the palette entry at [index]. If the palette has
   /// fewer colors or channels, 0 will be returned.
   num getBlue(int index);
 
+  /// Set the blue channel of the palette entry at [index]. If the palette has
+  /// fewer colors or channels, it will be ignored.
+  void setBlue(int index, num value);
+
   /// Get the alpha channel of the palette entry at [index]. If the palette has
   /// fewer colors or channels, 0 will be returned.
   num getAlpha(int index);
+
+  /// Set the alpha channel of the palette entry at [index]. If the palette has
+  /// fewer colors or channels, it will be ignored.
+  void setAlpha(int index, num value);
 }

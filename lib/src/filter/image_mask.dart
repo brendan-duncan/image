@@ -6,7 +6,7 @@ import '../image/image.dart';
 /// the luminance (grayscale) of the mask image. If [scaleMask] is true,
 /// and [mask] is a different resolution than [src], [mask] will be scaled
 /// to the resolution of [src].
-Image maskAlpha(Image src, Image mask,
+Image imageMask(Image src, Image mask,
     { Channel maskChannel = Channel.luminance, bool scaleMask = false }) {
   final dx = mask.width / src.width;
   final dy = mask.height / src.height;

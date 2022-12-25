@@ -4,17 +4,20 @@ import 'package:archive/archive.dart';
 
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import '../../util/output_buffer.dart';
 import 'exr_channel.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';
 
+@internal
 abstract class ExrPxr24Compressor extends ExrCompressor {
   factory ExrPxr24Compressor(
           ExrPart header, int? maxScanLineSize, int numScanLines) =
       InternalExrPxr24Compressor;
 }
 
+@internal
 class InternalExrPxr24Compressor extends InternalExrCompressor
     implements ExrPxr24Compressor {
   InternalExrPxr24Compressor(

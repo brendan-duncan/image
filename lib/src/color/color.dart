@@ -39,6 +39,9 @@ abstract class Color extends Iterable<num> {
   num get aNormalized;
   void set aNormalized(num v);
 
+  num get luminance;
+  num get luminanceNormalized;
+
   void set(Color c);
   void setColor(num r, [num g = 0, num b = 0, num a = 0]);
 

@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import '../../util/internal.dart';
 import 'jpeg_component.dart';
 
+@internal
 class JpegFrame {
   bool? extended;
   bool? progressive;

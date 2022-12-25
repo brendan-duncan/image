@@ -1,5 +1,5 @@
 import '../color/channel.dart';
-import '../color/color_util.dart';
+import '../util/color_util.dart';
 import '../image/image.dart';
 
 /// Remap the color channels of the image.

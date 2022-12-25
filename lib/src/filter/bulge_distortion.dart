@@ -1,10 +1,11 @@
 import 'dart:math';
 
 import '../image/image.dart';
+import '../util/interpolation.dart';
 
-/// Apply gamma scaling to the HDR image, in-place.
 Image bulgeDistortion(Image src, { int? centerX, int? centerY,
-    num? radius, num scale = 0.5 }) {
+    num? radius, num scale = 0.5,
+    Interpolation interpolation = Interpolation.nearest }) {
   for (final frame in src.frames) {
     final orig = frame.clone(noAnimation: true);
     final w = frame.width;
@@ -30,7 +31,7 @@ Image bulgeDistortion(Image src, { int? centerX, int? centerY,
       x += cx;
       y += cy;
 
-      p.set(orig.getPixel(x.floor(), y.floor()));
+      p.set(orig.getPixelInterpolate(x, y, interpolation));
     }
   }
   return src;

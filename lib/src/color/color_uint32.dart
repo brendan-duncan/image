@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import '../util/color_util.dart';
 import 'channel_iterator.dart';
 import 'color.dart';
-import 'color_util.dart';
 import 'format.dart';
 
 class ColorUint32 extends Iterable<num> implements Color {
@@ -85,6 +85,9 @@ class ColorUint32 extends Iterable<num> implements Color {
 
   num get aNormalized => a / maxChannelValue;
   void set aNormalized(num v) => a = v * maxChannelValue;
+
+  num get luminance => getLuminance(this);
+  num get luminanceNormalized => getLuminanceNormalized(this);
 
   void set(Color c) {
     r = c.r;

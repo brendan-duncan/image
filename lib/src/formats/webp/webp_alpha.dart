@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'vp8l.dart';
 import 'vp8l_transform.dart';
 import 'webp_filters.dart';
 import 'webp_info.dart';
 
+@internal
 class WebPAlpha {
   InputBuffer input;
   int width = 0;

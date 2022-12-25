@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
-import '../../color/color_util.dart';
+import '../../util/color_util.dart';
 import '../../color/format.dart';
 import '../../exif/exif_tag.dart';
 import '../../exif/ifd_value.dart';

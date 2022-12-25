@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import '../image/image.dart';
+import '../util/math_util.dart';
 
 ///
 Image colorHalftone(Image src, { num amount = 1, int? centerX, int? centerY,
@@ -42,9 +43,19 @@ Image colorHalftone(Image src, { num amount = 1, int? centerX, int? centerY,
       cmyK = (cmyK * 10 - 5 + _pattern(x, y, cx, cy, angle + 0.78539))
           .clamp(0, 1);
 
-      p..rNormalized = 1 - cmyC - cmyK
-      ..gNormalized = 1 - cmyM - cmyK
-      ..bNormalized = 1 - cmyY - cmyK;
+      final r = (1 - cmyC - cmyK) * p.maxChannelValue;
+      final g = (1 - cmyM - cmyK) * p.maxChannelValue;
+      final b = (1 - cmyY - cmyK) * p.maxChannelValue;
+
+      if (amount != 1) {
+        p..r = mix(p.r, r, amount)
+        ..g = mix(p.g, g, amount)
+        ..b = mix(p.b, b, amount);
+      } else {
+        p..r = r
+        ..g = g
+        ..b = b;
+      }
     }
   }
   return src;

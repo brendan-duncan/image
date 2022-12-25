@@ -4,7 +4,7 @@ import '../command.dart';
 class SobelCmd extends Command {
   num amount;
 
-  SobelCmd(Command? input, { this.amount = 100.0 })
+  SobelCmd(Command? input, { this.amount = 1.0 })
       : super(input);
 
   @override

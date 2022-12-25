@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 
+@internal
 class ExrHuffman {
   static void uncompress(
       InputBuffer compressed, int nCompressed, Uint16List? raw, int nRaw) {

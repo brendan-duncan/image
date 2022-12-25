@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import '../color/color.dart';
-import '../color/color_util.dart';
+import '../util/color_util.dart';
 import '../image/image.dart';
 
 typedef _TestPixel = bool Function(int y, int x);

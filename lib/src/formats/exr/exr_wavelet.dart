@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
 import '../../util/bit_utils.dart';
+import '../../util/internal.dart';
 
+@internal
 class ExrWavelet {
   static void decode(Uint16List input, int si, int nx, int ox, int ny,
       int oy, int mx) {

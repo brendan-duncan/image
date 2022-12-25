@@ -4,7 +4,7 @@ import '../command.dart';
 class SepiaCmd extends Command {
   num amount;
 
-  SepiaCmd(Command? input, { this.amount = 100.0 })
+  SepiaCmd(Command? input, { this.amount = 1.0 })
       : super(input);
 
   @override

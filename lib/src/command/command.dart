@@ -35,7 +35,6 @@ import 'draw/fill_rect_cmd.dart';
 import 'executor.dart';
 import 'filter/adjust_color_cmd.dart';
 import 'filter/billboard_cmd.dart';
-import 'filter/black_and_white_cmd.dart';
 import 'filter/bleach_bypass_cmd.dart';
 import 'filter/bulge_distortion_cmd.dart';
 import 'filter/bump_to_normal_cmd.dart';
@@ -51,8 +50,9 @@ import 'filter/filter_cmd.dart';
 import 'filter/gamma_cmd.dart';
 import 'filter/gaussian_blur_cmd.dart';
 import 'filter/grayscale_cmd.dart';
+import 'filter/image_mask_cmd.dart';
 import 'filter/invert_cmd.dart';
-import 'filter/mask_alpha_cmd.dart';
+import 'filter/luminance_threshold_cmd.dart';
 import 'filter/noise_cmd.dart';
 import 'filter/normalize_cmd.dart';
 import 'filter/pixelate_cmd.dart';
@@ -61,8 +61,10 @@ import 'filter/remap_colors_cmd.dart';
 import 'filter/scale_rgba_cmd.dart';
 import 'filter/separable_convolution_cmd.dart';
 import 'filter/sepia_cmd.dart';
+import 'filter/sketch_cmd.dart';
 import 'filter/smooth_cmd.dart';
 import 'filter/sobel_cmd.dart';
+import 'filter/stretch_distortion_cmd.dart';
 import 'filter/vignette_cmd.dart';
 import 'formats/bmp_cmd.dart';
 import 'formats/cur_cmd.dart';
@@ -400,22 +402,20 @@ class Command {
         hue: hue, amount: amount);
   }
 
-  void billboard({ num grid = 10 }) {
-    subCommand = BillboardCmd(subCommand, grid: grid);
+  void billboard({ num grid = 10, num amount = 1 }) {
+    subCommand = BillboardCmd(subCommand, grid: grid, amount: amount);
   }
 
-  void blackAndWhite({ num threshold = 0.5 }) {
-    subCommand = BlackAndWhiteCmd(subCommand, threshold: threshold);
-  }
-
-  void bleachBypass() {
-    subCommand = BleachBypassCmd(subCommand);
+  void bleachBypass({ num amount = 1}) {
+    subCommand = BleachBypassCmd(subCommand, amount: amount);
   }
 
   void bulgeDistortion({ int? centerX, int? centerY,
-      num? radius, num scale = 0.5 }) {
+      num? radius, num scale = 0.5,
+      Interpolation interpolation = Interpolation.nearest }) {
     subCommand = BulgeDistortionCmd(subCommand, centerX: centerX,
-        centerY: centerY, radius: radius, scale: scale);
+        centerY: centerY, radius: radius, scale: scale,
+        interpolation: interpolation);
   }
 
   void bumpToNormal({ num strength = 2.0 }) {
@@ -438,8 +438,8 @@ class Command {
         alpha: alpha);
   }
 
-  void contrast(num amount) {
-    subCommand = ContrastCmd(subCommand, amount: amount);
+  void contrast(num c) {
+    subCommand = ContrastCmd(subCommand, contrast: c);
   }
 
   void convolution(List<num> filter, { num div = 1.0, num offset = 0.0 }) {
@@ -470,17 +470,23 @@ class Command {
     subCommand = GaussianBlurCmd(subCommand, radius);
   }
 
-  void grayscale() {
-    subCommand = GrayscaleCmd(subCommand);
+  void grayscale({ num amount = 1}) {
+    subCommand = GrayscaleCmd(subCommand, amount: amount);
   }
 
   void invert() {
     subCommand = InvertCmd(subCommand);
   }
 
-  void maskAlpha(Command? mask, { Channel maskChannel = Channel.luminance,
+  void luminanceThreshold({ num threshold = 0.5, bool outputColor = false,
+      num amount = 1 }) {
+    subCommand = LuminanceThresholdCmd(subCommand, threshold: threshold,
+        outputColor: outputColor, amount: amount);
+  }
+
+  void imageMask(Command? mask, { Channel maskChannel = Channel.luminance,
       bool scaleMask = false }) {
-    subCommand = MaskAlphaCmd(subCommand, mask, maskChannel: maskChannel,
+    subCommand = ImageMaskCmd(subCommand, mask, maskChannel: maskChannel,
         scaleMask: scaleMask);
   }
 
@@ -521,16 +527,26 @@ class Command {
     subCommand = SeparableConvolutionCmd(subCommand, kernel);
   }
 
-  void sepia({ num amount = 1.0 }) {
+  void sepia({ num amount = 1 }) {
     subCommand = SepiaCmd(subCommand, amount: amount);
+  }
+
+  void sketch({ num amount = 1 }) {
+    subCommand = SketchCmd(subCommand, amount: amount);
   }
 
   void smooth(num weight) {
     subCommand = SmoothCmd(subCommand, weight);
   }
 
-  void sobel({ num amount = 1.0 }) {
+  void sobel({ num amount = 1 }) {
     subCommand = SobelCmd(subCommand, amount: amount);
+  }
+
+  void stretchDistortion({ int? centerX, int? centerY,
+    Interpolation interpolation = Interpolation.nearest }) {
+    subCommand = StretchDistortionCmd(subCommand, centerX: centerX,
+        centerY: centerY, interpolation: interpolation);
   }
 
   void vignette({ num start = 0.3, num end = 0.75,

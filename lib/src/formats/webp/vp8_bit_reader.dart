@@ -1,5 +1,7 @@
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 
+@internal
 class VP8BitReader {
   InputBuffer input;
 

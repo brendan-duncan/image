@@ -1,5 +1,8 @@
 import 'dart:typed_data';
 
+import '../../util/internal.dart';
+
+@internal
 class VP8LColorCache {
   final Uint32List colors; // color entries
   final int hashShift; // Hash shift: 32 - hash_bits.

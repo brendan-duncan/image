@@ -17,4 +17,8 @@ class PaletteUndefined extends Palette {
   num getGreen(int index) => 0;
   num getBlue(int index) => 0;
   num getAlpha(int index) => 0;
+  void setRed(int index, num value) {}
+  void setGreen(int index, num value) {}
+  void setBlue(int index, num value) {}
+  void setAlpha(int index, num value) {}
 }

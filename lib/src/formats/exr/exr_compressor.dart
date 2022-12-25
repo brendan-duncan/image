@@ -10,6 +10,7 @@ import 'exr_pxr24_compressor.dart';
 import 'exr_rle_compressor.dart';
 import 'exr_zip_compressor.dart';
 
+@internal
 enum ExrCompressorType {
   none,
   rle,
@@ -21,6 +22,7 @@ enum ExrCompressorType {
   b44a
 }
 
+@internal
 abstract class ExrCompressor {
   int decodedWidth = 0;
   int decodedHeight = 0;

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../../color/color_util.dart';
+import '../../util/color_util.dart';
 import '../../image/image.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
@@ -12,6 +12,7 @@ import 'webp_huffman.dart';
 import 'webp_info.dart';
 
 // WebP lossless format.
+@internal
 class VP8L {
   InputBuffer input;
   VP8LBitReader br;

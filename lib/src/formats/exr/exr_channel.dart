@@ -1,12 +1,15 @@
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 
+@internal
 enum ExrChannelType {
   uint,
   half,
   float
 }
 
+@internal
 enum ExrChannelName {
   red,
   green,
@@ -29,6 +32,7 @@ enum ExrChannelName {
 // Z: Distance of the front of a sample from the viewer
 // ZBack: Distance of the back of a sample from the viewer
 // id: A numerical identifier for the object represented by a sample.
+@internal
 class ExrChannel {
   late String name;
   late ExrChannelName nameType;

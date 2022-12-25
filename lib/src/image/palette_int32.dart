@@ -74,4 +74,9 @@ class PaletteInt32 extends Palette {
     index *= numChannels;
     return data[index + 3];
   }
+
+  void setRed(int index, num value) => set(index, 0, value);
+  void setGreen(int index, num value) => set(index, 1, value);
+  void setBlue(int index, num value) => set(index, 2, value);
+  void setAlpha(int index, num value) => set(index, 3, value);
 }

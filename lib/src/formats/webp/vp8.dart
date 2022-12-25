@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../../image/image.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'vp8_bit_reader.dart';
 import 'vp8_filter.dart';
 import 'vp8_types.dart';
@@ -9,6 +10,7 @@ import 'webp_alpha.dart';
 import 'webp_info.dart';
 
 // WebP lossy format.
+@internal
 class VP8 {
   InputBuffer input;
   final InternalWebPInfo _webp;

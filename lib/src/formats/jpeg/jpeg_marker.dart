@@ -1,3 +1,6 @@
+import '../../util/internal.dart';
+
+@internal
 class JpegMarker {
   static const sof0 = 0xc0;
   static const sof1 = 0xc1;

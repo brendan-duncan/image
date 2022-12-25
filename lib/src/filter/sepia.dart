@@ -1,4 +1,4 @@
-import '../color/color_util.dart';
+import '../util/color_util.dart';
 import '../image/image.dart';
 
 /// Apply sepia tone to the image.
@@ -11,13 +11,13 @@ Image sepia(Image src, { num amount = 1.0 }) {
 
   for (final frame in src.frames) {
     for (var p in frame) {
-      final r = p.r;
-      final g = p.g;
-      final b = p.b;
+      final r = p.rNormalized;
+      final g = p.gNormalized;
+      final b = p.bNormalized;
       final y = getLuminanceRgb(r, g, b);
-      p..r = (amount * (y + 38)) + ((1.0 - amount) * r)
-      ..g = (amount * (y + 18)) + ((1.0 - amount) * g)
-      ..b = (amount * (y - 31)) + ((1.0 - amount) * b);
+      p..rNormalized = (amount * (y + 0.15)) + ((1.0 - amount) * r)
+      ..gNormalized = (amount * (y + 0.07)) + ((1.0 - amount) * g)
+      ..bNormalized = (amount * (y - 0.12)) + ((1.0 - amount) * b);
     }
   }
 

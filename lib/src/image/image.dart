@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import '../color/color.dart';
 import '../color/color_uint8.dart';
-import '../color/color_util.dart';
+import '../util/color_util.dart';
 import '../color/format.dart';
 import '../exif/exif_data.dart';
 import '../util/image_exception.dart';

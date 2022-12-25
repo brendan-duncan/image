@@ -2,8 +2,10 @@ import 'dart:typed_data';
 
 import '../../util/bit_utils.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'vp8.dart';
 
+@internal
 class VP8Filter {
   VP8Filter() {
     _initTables();

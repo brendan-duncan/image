@@ -4,6 +4,7 @@ import '../../exif/exif_data.dart';
 import '../../image/image.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import '_component_data.dart';
 import 'jpeg_adobe.dart';
 import 'jpeg_component.dart';
@@ -16,6 +17,7 @@ import 'jpeg_quantize_stub.dart'
     if (dart.library.js) '_jpeg_quantize_html.dart';
 import 'jpeg_scan.dart';
 
+@internal
 class JpegData {
   static const dctZigZag = [
     0, 1, 8, 16, 9, 2, 3, 10,

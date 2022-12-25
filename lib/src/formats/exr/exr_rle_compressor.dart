@@ -2,15 +2,18 @@ import 'dart:typed_data';
 
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import '../../util/output_buffer.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';
 
+@internal
 abstract class ExrRleCompressor extends ExrCompressor {
   factory ExrRleCompressor(ExrPart header, int? maxScanLineSize) =
       InternalExrRleCompressor;
 }
 
+@internal
 class InternalExrRleCompressor extends InternalExrCompressor
     implements ExrRleCompressor {
   InternalExrRleCompressor(ExrPart header, this._maxScanLineSize)
