@@ -7,6 +7,7 @@ import 'bleach_bypass_test.dart';
 import 'bulge_distortion_test.dart';
 import 'bump_to_normal_test.dart';
 import 'chromatic_aberration_test.dart';
+import 'color_halftone_test.dart';
 import 'color_offset_test.dart';
 import 'contrast_test.dart';
 import 'convolution_test.dart';
@@ -38,6 +39,7 @@ void filterTests() {
     bulgeDistortionTest();
     bumpToNormalTest();
     chromaticAberrationTest();
+    colorHalftoneTest();
     colorOffsetTest();
     contrastTest();
     convolutionTest();

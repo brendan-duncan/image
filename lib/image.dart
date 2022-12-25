@@ -43,6 +43,7 @@ export 'src/filter/bleach_bypass.dart';
 export 'src/filter/bulge_distortion.dart';
 export 'src/filter/bump_to_normal.dart';
 export 'src/filter/chromatic_aberration.dart';
+export 'src/filter/color_halftone.dart';
 export 'src/filter/color_offset.dart';
 export 'src/filter/contrast.dart';
 export 'src/filter/convolution.dart';

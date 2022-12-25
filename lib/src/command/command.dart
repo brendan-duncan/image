@@ -40,6 +40,7 @@ import 'filter/bleach_bypass_cmd.dart';
 import 'filter/bulge_distortion_cmd.dart';
 import 'filter/bump_to_normal_cmd.dart';
 import 'filter/chromatic_aberration_cmd.dart';
+import 'filter/color_halftone_cmd.dart';
 import 'filter/color_offset_cmd.dart';
 import 'filter/contrast_cmd.dart';
 import 'filter/convolution_cmd.dart';
@@ -422,6 +423,12 @@ class Command {
 
   void chromaticAberration({ int shift = 5 }) {
     subCommand = ChromaticAberrationCmd(subCommand, shift: shift);
+  }
+
+  void colorHalftone({ num amount = 1, int? centerX, int? centerY,
+      num angle = 180, num size = 5 }) {
+    subCommand = ColorHalftoneCmd(subCommand, amount: amount,
+        centerX: centerX, centerY: centerY, angle: angle, size: size);
   }
 
   void colorOffset({ num red = 0, num green = 0, num blue = 0,

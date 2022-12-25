@@ -33,6 +33,10 @@ color filters, transformations into other images (resize, crop), or basic drawin
 
 ![chromaticAberration](images/filter/chromaticAberration.png)
 
+* **[colorHalftone](https://brendan-duncan.github.io/image/doc/api/image/colorHalftone.html)**
+
+![colorHalftone](images/filter/colorHalftone.png)
+
 * **[colorOffset](https://brendan-duncan.github.io/image/doc/api/image/colorOffset.html)**
 
 ![colorOffset](images/filter/colorOffset.png)

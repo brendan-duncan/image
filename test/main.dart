@@ -17,7 +17,7 @@ void main() {
   utilTests();
   imageTests();
   drawTests();
-  filterTests();
   transformTests();
   formatTests();
+  filterTests();
 }
