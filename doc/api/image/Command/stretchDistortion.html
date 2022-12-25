@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the blackAndWhite method from the Command class, for the Dart programming language.">
-  <title>blackAndWhite method - Command class - image library - Dart API</title>
+  <meta name="description" content="API docs for the stretchDistortion method from the Command class, for the Dart programming language.">
+  <title>stretchDistortion method - Command class - image library - Dart API</title>
 
 
   
@@ -31,9 +31,9 @@
     <li><a href="../../index.html">image</a></li>
     <li><a href="../../image/image-library.html">image</a></li>
     <li><a href="../../image/Command-class.html">Command</a></li>
-    <li class="self-crumb">blackAndWhite method</li>
+    <li class="self-crumb">stretchDistortion method</li>
   </ol>
-  <div class="self-name">blackAndWhite</div>
+  <div class="self-name">stretchDistortion</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -50,7 +50,7 @@
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
-<h1><span class="kind-method">blackAndWhite</span> method 
+<h1><span class="kind-method">stretchDistortion</span> method 
     <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
 </h1></div>
 
@@ -58,7 +58,9 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">blackAndWhite</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="blackAndWhite-param-threshold">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.5</span>}</span></li>
+<span class="name ">stretchDistortion</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="stretchDistortion-param-centerX">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span></li>
+<li><span class="parameter" id="stretchDistortion-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span></li>
+<li><span class="parameter" id="stretchDistortion-param-interpolation"><span class="type-annotation"><a href="../../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
 </ol>)
 
       
@@ -70,8 +72,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void blackAndWhite({ num threshold = 0.5 }) {
-  subCommand = BlackAndWhiteCmd(subCommand, threshold: threshold);
+  <pre class="language-dart"><code class="language-dart">void stretchDistortion({ int? centerX, int? centerY,
+  Interpolation interpolation = Interpolation.nearest }) {
+  subCommand = StretchDistortionCmd(subCommand, centerX: centerX,
+      centerY: centerY, interpolation: interpolation);
 }</code></pre>
 </section>
 
@@ -89,7 +93,7 @@
   <li><a href="../../index.html">image</a></li>
   <li><a href="../../image/image-library.html">image</a></li>
   <li><a href="../../image/Command-class.html">Command</a></li>
-  <li class="self-crumb">blackAndWhite method</li>
+  <li class="self-crumb">stretchDistortion method</li>
 </ol>
 
 
@@ -118,7 +122,6 @@
           <li><a href="../../image/Command/adjustColor.html">adjustColor</a></li>
           <li><a href="../../image/Command/bakeOrientation.html">bakeOrientation</a></li>
           <li><a href="../../image/Command/billboard.html">billboard</a></li>
-          <li><a href="../../image/Command/blackAndWhite.html">blackAndWhite</a></li>
           <li><a href="../../image/Command/bleachBypass.html">bleachBypass</a></li>
           <li><a href="../../image/Command/bulgeDistortion.html">bulgeDistortion</a></li>
           <li><a href="../../image/Command/bumpToNormal.html">bumpToNormal</a></li>
@@ -204,7 +207,9 @@
           <li><a href="../../image/Command/getImageThread.html">getImageThread</a></li>
           <li><a href="../../image/Command/grayscale.html">grayscale</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
+          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
+          <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/noise.html">noise</a></li>
           <li><a href="../../image/Command/normalize.html">normalize</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
@@ -215,8 +220,10 @@
           <li><a href="../../image/Command/separableConvolution.html">separableConvolution</a></li>
           <li><a href="../../image/Command/sepia.html">sepia</a></li>
           <li><a href="../../image/Command/setDirty.html">setDirty</a></li>
+          <li><a href="../../image/Command/sketch.html">sketch</a></li>
           <li><a href="../../image/Command/smooth.html">smooth</a></li>
           <li><a href="../../image/Command/sobel.html">sobel</a></li>
+          <li><a href="../../image/Command/stretchDistortion.html">stretchDistortion</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
           <li><a href="../../image/Command/trim.html">trim</a></li>
           <li><a href="../../image/Command/vignette.html">vignette</a></li>

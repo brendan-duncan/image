@@ -2,12 +2,12 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
-import '../../util/color_util.dart';
 import '../../color/format.dart';
 import '../../exif/exif_tag.dart';
 import '../../exif/ifd_value.dart';
 import '../../image/image.dart';
 import '../../util/bit_utils.dart';
+import '../../util/color_util.dart';
 import '../../util/float16.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';

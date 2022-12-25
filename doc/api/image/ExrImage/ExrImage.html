@@ -103,8 +103,8 @@
     throw ImageException(&#39;Error reading image header&#39;);
   }
 
-  for (var part in _parts) {
-    part.readOffsets(input);
+  for (final part in _parts) {
+    (part as InternalExrPart).readOffsets(input);
   }
 
   _readImage(input);

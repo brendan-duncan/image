@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the blackAndWhite function from the image library, for the Dart programming language.">
-  <title>blackAndWhite function - image library - Dart API</title>
+  <meta name="description" content="API docs for the luminanceThreshold function from the image library, for the Dart programming language.">
+  <title>luminanceThreshold function - image library - Dart API</title>
 
 
   
@@ -30,9 +30,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">image</a></li>
     <li><a href="../image/image-library.html">image</a></li>
-    <li class="self-crumb">blackAndWhite function</li>
+    <li class="self-crumb">luminanceThreshold function</li>
   </ol>
-  <div class="self-name">blackAndWhite</div>
+  <div class="self-name">luminanceThreshold</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,7 +49,7 @@
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
-<h1><span class="kind-function">blackAndWhite</span> function 
+<h1><span class="kind-function">luminanceThreshold</span> function 
     <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
  
 </h1></div>
@@ -58,8 +58,10 @@
         
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
-<span class="name ">blackAndWhite</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="blackAndWhite-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="blackAndWhite-param-threshold">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.5</span>}</span></li>
+<span class="name ">luminanceThreshold</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="luminanceThreshold-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
+<li><span class="parameter" id="luminanceThreshold-param-threshold">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.5</span>, </span></li>
+<li><span class="parameter" id="luminanceThreshold-param-outputColor"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">outputColor</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="luminanceThreshold-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>}</span></li>
 </ol>)
 
         
@@ -71,16 +73,25 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image blackAndWhite(Image src, { num threshold = 0.5 }) {
+  <pre class="language-dart"><code class="language-dart">Image luminanceThreshold(Image src, { num threshold = 0.5,
+    bool outputColor = false, num amount = 1 }) {
   for (final frame in src.frames) {
     for (final p in frame) {
       final y = 0.3 * p.rNormalized +
           0.59 * p.gNormalized +
           0.11 * p.bNormalized;
-      final y2 = y &lt; threshold ? 0 : p.maxChannelValue;
-      p..r = y2
-      ..g = y2
-      ..b = y2;
+      if (outputColor) {
+        final l = max(0, y - threshold);
+        final sl = sign(l);
+        p..r = mix(p.r, p.r * sl, amount)
+        ..g = mix(p.g, p.g * sl, amount)
+        ..b *= mix(p.b, p.b * sl, amount);
+      } else {
+        final y2 = y &lt; threshold ? 0 : p.maxChannelValue;
+        p..r = mix(p.r, y2, amount)
+        ..g = mix(p.g, y2, amount)
+        ..b = mix(p.b, y2, amount);
+      }
     }
   }
   return src;
@@ -100,7 +111,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
   <li><a href="../index.html">image</a></li>
   <li><a href="../image/image-library.html">image</a></li>
-  <li class="self-crumb">blackAndWhite function</li>
+  <li class="self-crumb">luminanceThreshold function</li>
 </ol>
 
 
@@ -323,7 +334,6 @@
         <li><a href="../image/adjustColor.html">adjustColor</a></li>
         <li><a href="../image/bakeOrientation.html">bakeOrientation</a></li>
         <li><a href="../image/billboard.html">billboard</a></li>
-        <li><a href="../image/blackAndWhite.html">blackAndWhite</a></li>
         <li><a href="../image/bleachBypass.html">bleachBypass</a></li>
         <li><a href="../image/bulgeDistortion.html">bulgeDistortion</a></li>
         <li><a href="../image/bumpToNormal.html">bumpToNormal</a></li>
@@ -414,6 +424,8 @@
         <li><a href="../image/flipVertical.html">flipVertical</a></li>
         <li><a href="../image/gamma.html">gamma</a></li>
         <li><a href="../image/gaussianBlur.html">gaussianBlur</a></li>
+        <li><a href="../image/getLuminance.html">getLuminance</a></li>
+        <li><a href="../image/getLuminanceNormalized.html">getLuminanceNormalized</a></li>
         <li><a href="../image/getLuminanceRgb.html">getLuminanceRgb</a></li>
         <li><a href="../image/grand.html">grand</a></li>
         <li><a href="../image/grayscale.html">grayscale</a></li>
@@ -421,9 +433,11 @@
         <li><a href="../image/hdrToLdr.html">hdrToLdr</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
+        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>
+        <li><a href="../image/luminanceThreshold.html">luminanceThreshold</a></li>
         <li><a href="../image/maskFlood.html">maskFlood</a></li>
         <li><a href="../image/minMax.html">minMax</a></li>
         <li><a href="../image/noise.html">noise</a></li>
@@ -443,8 +457,10 @@
         <li><a href="../image/scaleRgba.html">scaleRgba</a></li>
         <li><a href="../image/separableConvolution.html">separableConvolution</a></li>
         <li><a href="../image/sepia.html">sepia</a></li>
+        <li><a href="../image/sketch.html">sketch</a></li>
         <li><a href="../image/smooth.html">smooth</a></li>
         <li><a href="../image/sobel.html">sobel</a></li>
+        <li><a href="../image/stretchDistortion.html">stretchDistortion</a></li>
         <li><a href="../image/supportsFileAccess.html">supportsFileAccess</a></li>
         <li><a href="../image/trim.html">trim</a></li>
         <li><a href="../image/uint32ToAlpha.html">uint32ToAlpha</a></li>

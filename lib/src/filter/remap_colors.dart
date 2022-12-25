@@ -1,6 +1,6 @@
 import '../color/channel.dart';
-import '../util/color_util.dart';
 import '../image/image.dart';
+import '../util/color_util.dart';
 
 /// Remap the color channels of the image.
 /// [red], [green], [blue] and [alpha] should be set to one of the following:

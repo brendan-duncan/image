@@ -1,5 +1,5 @@
-import '../util/color_util.dart';
 import '../image/image.dart';
+import '../util/color_util.dart';
 import '../util/math_util.dart';
 
 /// Convert the image to grayscale.

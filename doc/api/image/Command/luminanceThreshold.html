@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the executeAsync method from the Command class, for the Dart programming language.">
-  <title>executeAsync method - Command class - image library - Dart API</title>
+  <meta name="description" content="API docs for the luminanceThreshold method from the Command class, for the Dart programming language.">
+  <title>luminanceThreshold method - Command class - image library - Dart API</title>
 
 
   
@@ -31,9 +31,9 @@
     <li><a href="../../index.html">image</a></li>
     <li><a href="../../image/image-library.html">image</a></li>
     <li><a href="../../image/Command-class.html">Command</a></li>
-    <li class="self-crumb">executeAsync method</li>
+    <li class="self-crumb">luminanceThreshold method</li>
   </ol>
-  <div class="self-name">executeAsync</div>
+  <div class="self-name">luminanceThreshold</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -50,15 +50,18 @@
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
-<h1><span class="kind-method">executeAsync</span> method 
+<h1><span class="kind-method">luminanceThreshold</span> method 
     <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
 </h1></div>
 
     <section class="multi-line-signature">
       
 
-<span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">executeAsync</span>(<wbr>)
+<span class="returntype">void</span>
+<span class="name ">luminanceThreshold</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="luminanceThreshold-param-threshold">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.5</span>, </span></li>
+<li><span class="parameter" id="luminanceThreshold-param-outputColor"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">outputColor</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="luminanceThreshold-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>}</span></li>
+</ol>)
 
       
 
@@ -69,20 +72,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; executeAsync() async {
-  final cmdOrThis = subCommand;
-  if (cmdOrThis.dirty) {
-    await executeCommandAsync(cmdOrThis).then((value) {
-      cmdOrThis
-        ..dirty = false
-        ..outputImage = value.image
-        ..outputBytes = value.bytes;
-      if (_subCommand != null) {
-        outputImage = _subCommand!.outputImage;
-        outputBytes = _subCommand!.outputBytes;
-      }
-    });
-  }
+  <pre class="language-dart"><code class="language-dart">void luminanceThreshold({ num threshold = 0.5, bool outputColor = false,
+    num amount = 1 }) {
+  subCommand = LuminanceThresholdCmd(subCommand, threshold: threshold,
+      outputColor: outputColor, amount: amount);
 }</code></pre>
 </section>
 
@@ -100,7 +93,7 @@
   <li><a href="../../index.html">image</a></li>
   <li><a href="../../image/image-library.html">image</a></li>
   <li><a href="../../image/Command-class.html">Command</a></li>
-  <li class="self-crumb">executeAsync method</li>
+  <li class="self-crumb">luminanceThreshold method</li>
 </ol>
 
 
@@ -120,17 +113,25 @@
           <li><a href="../../image/Command/input.html">input</a></li>
           <li><a href="../../image/Command/outputBytes.html">outputBytes</a></li>
           <li><a href="../../image/Command/outputImage.html">outputImage</a></li>
+          <li><a href="../../image/Command/outputObject.html">outputObject</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
           <li><a href="../../image/Command/subCommand.html">subCommand</a></li>
 
         <li class="section-title"><a href="../../image/Command-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../image/Command/addFrames.html">addFrames</a></li>
           <li><a href="../../image/Command/adjustColor.html">adjustColor</a></li>
           <li><a href="../../image/Command/bakeOrientation.html">bakeOrientation</a></li>
+          <li><a href="../../image/Command/billboard.html">billboard</a></li>
+          <li><a href="../../image/Command/bleachBypass.html">bleachBypass</a></li>
+          <li><a href="../../image/Command/bulgeDistortion.html">bulgeDistortion</a></li>
           <li><a href="../../image/Command/bumpToNormal.html">bumpToNormal</a></li>
+          <li><a href="../../image/Command/chromaticAberration.html">chromaticAberration</a></li>
+          <li><a href="../../image/Command/colorHalftone.html">colorHalftone</a></li>
           <li><a href="../../image/Command/colorOffset.html">colorOffset</a></li>
           <li><a href="../../image/Command/contrast.html">contrast</a></li>
           <li><a href="../../image/Command/convert.html">convert</a></li>
           <li><a href="../../image/Command/convolution.html">convolution</a></li>
+          <li><a href="../../image/Command/copy.html">copy</a></li>
           <li><a href="../../image/Command/copyCrop.html">copyCrop</a></li>
           <li><a href="../../image/Command/copyCropCircle.html">copyCropCircle</a></li>
           <li><a href="../../image/Command/copyFlip.html">copyFlip</a></li>
@@ -189,9 +190,9 @@
           <li><a href="../../image/Command/encodeTiff.html">encodeTiff</a></li>
           <li><a href="../../image/Command/encodeTiffFile.html">encodeTiffFile</a></li>
           <li><a href="../../image/Command/execute.html">execute</a></li>
-          <li><a href="../../image/Command/executeAsync.html">executeAsync</a></li>
           <li><a href="../../image/Command/executeCommand.html">executeCommand</a></li>
           <li><a href="../../image/Command/executeIfDirty.html">executeIfDirty</a></li>
+          <li><a href="../../image/Command/executeThread.html">executeThread</a></li>
           <li><a href="../../image/Command/fill.html">fill</a></li>
           <li><a href="../../image/Command/fillCircle.html">fillCircle</a></li>
           <li><a href="../../image/Command/fillFlood.html">fillFlood</a></li>
@@ -201,12 +202,14 @@
           <li><a href="../../image/Command/gamma.html">gamma</a></li>
           <li><a href="../../image/Command/gaussianBlur.html">gaussianBlur</a></li>
           <li><a href="../../image/Command/getBytes.html">getBytes</a></li>
-          <li><a href="../../image/Command/getBytesAsync.html">getBytesAsync</a></li>
+          <li><a href="../../image/Command/getBytesThread.html">getBytesThread</a></li>
           <li><a href="../../image/Command/getImage.html">getImage</a></li>
-          <li><a href="../../image/Command/getImageAsync.html">getImageAsync</a></li>
+          <li><a href="../../image/Command/getImageThread.html">getImageThread</a></li>
           <li><a href="../../image/Command/grayscale.html">grayscale</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
+          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
+          <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/noise.html">noise</a></li>
           <li><a href="../../image/Command/normalize.html">normalize</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
@@ -217,8 +220,10 @@
           <li><a href="../../image/Command/separableConvolution.html">separableConvolution</a></li>
           <li><a href="../../image/Command/sepia.html">sepia</a></li>
           <li><a href="../../image/Command/setDirty.html">setDirty</a></li>
+          <li><a href="../../image/Command/sketch.html">sketch</a></li>
           <li><a href="../../image/Command/smooth.html">smooth</a></li>
           <li><a href="../../image/Command/sobel.html">sobel</a></li>
+          <li><a href="../../image/Command/stretchDistortion.html">stretchDistortion</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
           <li><a href="../../image/Command/trim.html">trim</a></li>
           <li><a href="../../image/Command/vignette.html">vignette</a></li>

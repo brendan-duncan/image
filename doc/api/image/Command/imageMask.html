@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the withImage method from the Command class, for the Dart programming language.">
-  <title>withImage method - Command class - image library - Dart API</title>
+  <meta name="description" content="API docs for the imageMask method from the Command class, for the Dart programming language.">
+  <title>imageMask method - Command class - image library - Dart API</title>
 
 
   
@@ -31,9 +31,9 @@
     <li><a href="../../index.html">image</a></li>
     <li><a href="../../image/image-library.html">image</a></li>
     <li><a href="../../image/Command-class.html">Command</a></li>
-    <li class="self-crumb">withImage method</li>
+    <li class="self-crumb">imageMask method</li>
   </ol>
-  <div class="self-name">withImage</div>
+  <div class="self-name">imageMask</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -50,7 +50,7 @@
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
-<h1><span class="kind-method">withImage</span> method 
+<h1><span class="kind-method">imageMask</span> method 
     <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
 </h1></div>
 
@@ -58,23 +58,24 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">withImage</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="withImage-param-image"><span class="type-annotation"><a href="../../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span></span></li>
+<span class="name ">imageMask</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="imageMask-param-mask"><span class="type-annotation"><a href="../../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="imageMask-param-maskChannel">{<span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>, </span></li>
+<li><span class="parameter" id="imageMask-param-scaleMask"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">scaleMask</span> = <span class="default-value">false</span>}</span></li>
 </ol>)
 
       
 
     </section>
     
-<section class="desc markdown">
-  <p>Use a specific Image.</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void withImage(Image image) {
-  subCommand = ImageCmd(image);
+  <pre class="language-dart"><code class="language-dart">void imageMask(Command? mask, { Channel maskChannel = Channel.luminance,
+    bool scaleMask = false }) {
+  subCommand = ImageMaskCmd(subCommand, mask, maskChannel: maskChannel,
+      scaleMask: scaleMask);
 }</code></pre>
 </section>
 
@@ -92,7 +93,7 @@
   <li><a href="../../index.html">image</a></li>
   <li><a href="../../image/image-library.html">image</a></li>
   <li><a href="../../image/Command-class.html">Command</a></li>
-  <li class="self-crumb">withImage method</li>
+  <li class="self-crumb">imageMask method</li>
 </ol>
 
 
@@ -106,22 +107,31 @@
         <li class="section-title">
           <a href="../../image/Command-class.html#instance-properties">Properties</a>
         </li>
-          <li><a href="../../image/Command/bytes.html">bytes</a></li>
           <li><a href="../../image/Command/dirty.html">dirty</a></li>
           <li><a href="../../image/Command/firstSubCommand.html">firstSubCommand</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
-          <li><a href="../../image/Command/image.html">image</a></li>
           <li><a href="../../image/Command/input.html">input</a></li>
+          <li><a href="../../image/Command/outputBytes.html">outputBytes</a></li>
+          <li><a href="../../image/Command/outputImage.html">outputImage</a></li>
+          <li><a href="../../image/Command/outputObject.html">outputObject</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
           <li><a href="../../image/Command/subCommand.html">subCommand</a></li>
 
         <li class="section-title"><a href="../../image/Command-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../image/Command/addFrames.html">addFrames</a></li>
           <li><a href="../../image/Command/adjustColor.html">adjustColor</a></li>
           <li><a href="../../image/Command/bakeOrientation.html">bakeOrientation</a></li>
+          <li><a href="../../image/Command/billboard.html">billboard</a></li>
+          <li><a href="../../image/Command/bleachBypass.html">bleachBypass</a></li>
+          <li><a href="../../image/Command/bulgeDistortion.html">bulgeDistortion</a></li>
           <li><a href="../../image/Command/bumpToNormal.html">bumpToNormal</a></li>
+          <li><a href="../../image/Command/chromaticAberration.html">chromaticAberration</a></li>
+          <li><a href="../../image/Command/colorHalftone.html">colorHalftone</a></li>
           <li><a href="../../image/Command/colorOffset.html">colorOffset</a></li>
           <li><a href="../../image/Command/contrast.html">contrast</a></li>
+          <li><a href="../../image/Command/convert.html">convert</a></li>
           <li><a href="../../image/Command/convolution.html">convolution</a></li>
+          <li><a href="../../image/Command/copy.html">copy</a></li>
           <li><a href="../../image/Command/copyCrop.html">copyCrop</a></li>
           <li><a href="../../image/Command/copyCropCircle.html">copyCropCircle</a></li>
           <li><a href="../../image/Command/copyFlip.html">copyFlip</a></li>
@@ -138,9 +148,11 @@
           <li><a href="../../image/Command/decodeGifFile.html">decodeGifFile</a></li>
           <li><a href="../../image/Command/decodeIco.html">decodeIco</a></li>
           <li><a href="../../image/Command/decodeIcoFile.html">decodeIcoFile</a></li>
+          <li><a href="../../image/Command/decodeImage.html">decodeImage</a></li>
           <li><a href="../../image/Command/decodeImageFile.html">decodeImageFile</a></li>
           <li><a href="../../image/Command/decodeJpg.html">decodeJpg</a></li>
           <li><a href="../../image/Command/decodeJpgFile.html">decodeJpgFile</a></li>
+          <li><a href="../../image/Command/decodeNamedImage.html">decodeNamedImage</a></li>
           <li><a href="../../image/Command/decodePng.html">decodePng</a></li>
           <li><a href="../../image/Command/decodePngFile.html">decodePngFile</a></li>
           <li><a href="../../image/Command/decodePsd.html">decodePsd</a></li>
@@ -153,6 +165,11 @@
           <li><a href="../../image/Command/decodeWebPFile.html">decodeWebPFile</a></li>
           <li><a href="../../image/Command/ditherImage.html">ditherImage</a></li>
           <li><a href="../../image/Command/drawChar.html">drawChar</a></li>
+          <li><a href="../../image/Command/drawCircle.html">drawCircle</a></li>
+          <li><a href="../../image/Command/drawImage.html">drawImage</a></li>
+          <li><a href="../../image/Command/drawLine.html">drawLine</a></li>
+          <li><a href="../../image/Command/drawPixel.html">drawPixel</a></li>
+          <li><a href="../../image/Command/drawRect.html">drawRect</a></li>
           <li><a href="../../image/Command/drawString.html">drawString</a></li>
           <li><a href="../../image/Command/dropShadow.html">dropShadow</a></li>
           <li><a href="../../image/Command/emboss.html">emboss</a></li>
@@ -173,20 +190,26 @@
           <li><a href="../../image/Command/encodeTiff.html">encodeTiff</a></li>
           <li><a href="../../image/Command/encodeTiffFile.html">encodeTiffFile</a></li>
           <li><a href="../../image/Command/execute.html">execute</a></li>
-          <li><a href="../../image/Command/executeAsync.html">executeAsync</a></li>
           <li><a href="../../image/Command/executeCommand.html">executeCommand</a></li>
           <li><a href="../../image/Command/executeIfDirty.html">executeIfDirty</a></li>
+          <li><a href="../../image/Command/executeThread.html">executeThread</a></li>
           <li><a href="../../image/Command/fill.html">fill</a></li>
+          <li><a href="../../image/Command/fillCircle.html">fillCircle</a></li>
+          <li><a href="../../image/Command/fillFlood.html">fillFlood</a></li>
+          <li><a href="../../image/Command/fillRect.html">fillRect</a></li>
           <li><a href="../../image/Command/filter.html">filter</a></li>
           <li><a href="../../image/Command/flip.html">flip</a></li>
           <li><a href="../../image/Command/gamma.html">gamma</a></li>
           <li><a href="../../image/Command/gaussianBlur.html">gaussianBlur</a></li>
           <li><a href="../../image/Command/getBytes.html">getBytes</a></li>
-          <li><a href="../../image/Command/getBytesAsync.html">getBytesAsync</a></li>
+          <li><a href="../../image/Command/getBytesThread.html">getBytesThread</a></li>
           <li><a href="../../image/Command/getImage.html">getImage</a></li>
-          <li><a href="../../image/Command/getImageAsync.html">getImageAsync</a></li>
+          <li><a href="../../image/Command/getImageThread.html">getImageThread</a></li>
           <li><a href="../../image/Command/grayscale.html">grayscale</a></li>
+          <li><a href="../../image/Command/image.html">image</a></li>
+          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
+          <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/noise.html">noise</a></li>
           <li><a href="../../image/Command/normalize.html">normalize</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
@@ -197,12 +220,13 @@
           <li><a href="../../image/Command/separableConvolution.html">separableConvolution</a></li>
           <li><a href="../../image/Command/sepia.html">sepia</a></li>
           <li><a href="../../image/Command/setDirty.html">setDirty</a></li>
+          <li><a href="../../image/Command/sketch.html">sketch</a></li>
           <li><a href="../../image/Command/smooth.html">smooth</a></li>
           <li><a href="../../image/Command/sobel.html">sobel</a></li>
+          <li><a href="../../image/Command/stretchDistortion.html">stretchDistortion</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
           <li><a href="../../image/Command/trim.html">trim</a></li>
           <li><a href="../../image/Command/vignette.html">vignette</a></li>
-          <li><a href="../../image/Command/withImage.html">withImage</a></li>
           <li><a href="../../image/Command/writeToFile.html">writeToFile</a></li>
 
         <li class="section-title inherited"><a href="../../image/Command-class.html#operators">Operators</a></li>

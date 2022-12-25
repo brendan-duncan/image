@@ -10,7 +10,7 @@ import 'transform/transform_tests.dart';
 import 'util/util_tests.dart';
 
 void main() {
-  /*commandTests();
+  commandTests();
   colorTests();
   exifTests();
   fontTests();
@@ -18,6 +18,6 @@ void main() {
   imageTests();
   drawTests();
   transformTests();
-  formatTests();*/
+  formatTests();
   filterTests();
 }

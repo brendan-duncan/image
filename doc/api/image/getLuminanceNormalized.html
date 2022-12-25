@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the getEncoderForNamedImage function from the image library, for the Dart programming language.">
-  <title>getEncoderForNamedImage function - image library - Dart API</title>
+  <meta name="description" content="API docs for the getLuminanceNormalized function from the image library, for the Dart programming language.">
+  <title>getLuminanceNormalized function - image library - Dart API</title>
 
 
   
@@ -30,9 +30,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">image</a></li>
     <li><a href="../image/image-library.html">image</a></li>
-    <li class="self-crumb">getEncoderForNamedImage function</li>
+    <li class="self-crumb">getLuminanceNormalized function</li>
   </ol>
-  <div class="self-name">getEncoderForNamedImage</div>
+  <div class="self-name">getLuminanceNormalized</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,7 +49,7 @@
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
-<h1><span class="kind-function">getEncoderForNamedImage</span> function 
+<h1><span class="kind-function">getLuminanceNormalized</span> function 
     <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
  
 </h1></div>
@@ -57,8 +57,8 @@
     <section class="multi-line-signature">
         
 
-<span class="returntype"><a href="../image/Encoder-class.html">Encoder</a>?</span>
-<span class="name ">getEncoderForNamedImage</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getEncoderForNamedImage-param-name"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span></li>
+<span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>
+<span class="name ">getLuminanceNormalized</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getLuminanceNormalized-param-c"><span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">c</span></span></li>
 </ol>)
 
         
@@ -66,42 +66,15 @@
     </section>
     
 <section class="desc markdown">
-  <p>Return the <a href="../image/Encoder-class.html">Encoder</a> that can decode image with the given <code>name</code>,
-by looking at the file extension.</p>
+  <p>Returns the normalized [0, 1] luminance (grayscale) value of the color.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Encoder? getEncoderForNamedImage(String name) {
-  final n = name.toLowerCase();
-  if (n.endsWith(&#39;.jpg&#39;) || n.endsWith(&#39;.jpeg&#39;)) {
-    return JpegEncoder();
-  }
-  if (n.endsWith(&#39;.png&#39;)) {
-    return PngEncoder();
-  }
-  if (n.endsWith(&#39;.tga&#39;)) {
-    return TgaEncoder();
-  }
-  if (n.endsWith(&#39;.gif&#39;)) {
-    return GifEncoder();
-  }
-  if (n.endsWith(&#39;.tif&#39;) || n.endsWith(&#39;.tiff&#39;)) {
-    return TiffEncoder();
-  }
-  if (n.endsWith(&#39;.bmp&#39;)) {
-    return BmpEncoder();
-  }
-  if (n.endsWith(&#39;.ico&#39;)) {
-    return IcoEncoder();
-  }
-  if (n.endsWith(&#39;.cur&#39;)) {
-    return IcoEncoder();
-  }
-  return null;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">num getLuminanceNormalized(Color c) =&gt;
+    0.299 * c.rNormalized + 0.587 * c.gNormalized + 0.114 * c.bNormalized;</code></pre>
 </section>
 
 
@@ -117,7 +90,7 @@ by looking at the file extension.</p>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
   <li><a href="../index.html">image</a></li>
   <li><a href="../image/image-library.html">image</a></li>
-  <li class="self-crumb">getEncoderForNamedImage function</li>
+  <li class="self-crumb">getLuminanceNormalized function</li>
 </ol>
 
 
@@ -339,9 +312,14 @@ by looking at the file extension.</p>
       <li class="section-title"><a href="../image/image-library.html#functions">Functions</a></li>
         <li><a href="../image/adjustColor.html">adjustColor</a></li>
         <li><a href="../image/bakeOrientation.html">bakeOrientation</a></li>
+        <li><a href="../image/billboard.html">billboard</a></li>
+        <li><a href="../image/bleachBypass.html">bleachBypass</a></li>
+        <li><a href="../image/bulgeDistortion.html">bulgeDistortion</a></li>
         <li><a href="../image/bumpToNormal.html">bumpToNormal</a></li>
+        <li><a href="../image/chromaticAberration.html">chromaticAberration</a></li>
         <li><a href="../image/clipLine.html">clipLine</a></li>
         <li><a href="../image/cmykToRgb.html">cmykToRgb</a></li>
+        <li><a href="../image/colorHalftone.html">colorHalftone</a></li>
         <li><a href="../image/colorOffset.html">colorOffset</a></li>
         <li><a href="../image/contrast.html">contrast</a></li>
         <li><a href="../image/convertColor.html">convertColor</a></li>
@@ -356,16 +334,27 @@ by looking at the file extension.</p>
         <li><a href="../image/copyRotate.html">copyRotate</a></li>
         <li><a href="../image/crand.html">crand</a></li>
         <li><a href="../image/decodeBmp.html">decodeBmp</a></li>
+        <li><a href="../image/decodeBmpFile.html">decodeBmpFile</a></li>
         <li><a href="../image/decodeExr.html">decodeExr</a></li>
+        <li><a href="../image/decodeExrFile.html">decodeExrFile</a></li>
         <li><a href="../image/decodeGif.html">decodeGif</a></li>
+        <li><a href="../image/decodeGifFile.html">decodeGifFile</a></li>
         <li><a href="../image/decodeIco.html">decodeIco</a></li>
+        <li><a href="../image/decodeIcoFile.html">decodeIcoFile</a></li>
         <li><a href="../image/decodeImage.html">decodeImage</a></li>
+        <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
         <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
+        <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
         <li><a href="../image/decodePng.html">decodePng</a></li>
+        <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
         <li><a href="../image/decodePsd.html">decodePsd</a></li>
+        <li><a href="../image/decodePsdFile.html">decodePsdFile</a></li>
         <li><a href="../image/decodeTga.html">decodeTga</a></li>
+        <li><a href="../image/decodeTgaFile.html">decodeTgaFile</a></li>
         <li><a href="../image/decodeTiff.html">decodeTiff</a></li>
+        <li><a href="../image/decodeTiffFile.html">decodeTiffFile</a></li>
         <li><a href="../image/decodeWebP.html">decodeWebP</a></li>
+        <li><a href="../image/decodeWebPFile.html">decodeWebPFile</a></li>
         <li><a href="../image/ditherImage.html">ditherImage</a></li>
         <li><a href="../image/drawChar.html">drawChar</a></li>
         <li><a href="../image/drawCircle.html">drawCircle</a></li>
@@ -379,18 +368,34 @@ by looking at the file extension.</p>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
         <li><a href="../image/encodeBmp.html">encodeBmp</a></li>
+        <li><a href="../image/encodeBmpFile.html">encodeBmpFile</a></li>
         <li><a href="../image/encodeCur.html">encodeCur</a></li>
+        <li><a href="../image/encodeCurFile.html">encodeCurFile</a></li>
         <li><a href="../image/encodeGif.html">encodeGif</a></li>
+        <li><a href="../image/encodeGifFile.html">encodeGifFile</a></li>
         <li><a href="../image/encodeIco.html">encodeIco</a></li>
+        <li><a href="../image/encodeIcoFile.html">encodeIcoFile</a></li>
+        <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
+        <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
+        <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodeTga.html">encodeTga</a></li>
+        <li><a href="../image/encodeTgaFile.html">encodeTgaFile</a></li>
         <li><a href="../image/encodeTiff.html">encodeTiff</a></li>
+        <li><a href="../image/encodeTiffFile.html">encodeTiffFile</a></li>
+        <li><a href="../image/executeCommandAsync.html">executeCommandAsync</a></li>
+        <li><a href="../image/executeCommandBytes.html">executeCommandBytes</a></li>
+        <li><a href="../image/executeCommandBytesAsync.html">executeCommandBytesAsync</a></li>
+        <li><a href="../image/executeCommandImage.html">executeCommandImage</a></li>
+        <li><a href="../image/executeCommandImageAsync.html">executeCommandImageAsync</a></li>
         <li><a href="../image/fill.html">fill</a></li>
         <li><a href="../image/fillCircle.html">fillCircle</a></li>
         <li><a href="../image/fillFlood.html">fillFlood</a></li>
         <li><a href="../image/fillRect.html">fillRect</a></li>
         <li><a href="../image/findDecoderForData.html">findDecoderForData</a></li>
+        <li><a href="../image/findDecoderForNamedImage.html">findDecoderForNamedImage</a></li>
+        <li><a href="../image/findEncoderForNamedImage.html">findEncoderForNamedImage</a></li>
         <li><a href="../image/findTrim.html">findTrim</a></li>
         <li><a href="../image/flip.html">flip</a></li>
         <li><a href="../image/flipHorizontal.html">flipHorizontal</a></li>
@@ -398,8 +403,8 @@ by looking at the file extension.</p>
         <li><a href="../image/flipVertical.html">flipVertical</a></li>
         <li><a href="../image/gamma.html">gamma</a></li>
         <li><a href="../image/gaussianBlur.html">gaussianBlur</a></li>
-        <li><a href="../image/getDecoderForNamedImage.html">getDecoderForNamedImage</a></li>
-        <li><a href="../image/getEncoderForNamedImage.html">getEncoderForNamedImage</a></li>
+        <li><a href="../image/getLuminance.html">getLuminance</a></li>
+        <li><a href="../image/getLuminanceNormalized.html">getLuminanceNormalized</a></li>
         <li><a href="../image/getLuminanceRgb.html">getLuminanceRgb</a></li>
         <li><a href="../image/grand.html">grand</a></li>
         <li><a href="../image/grayscale.html">grayscale</a></li>
@@ -407,9 +412,11 @@ by looking at the file extension.</p>
         <li><a href="../image/hdrToLdr.html">hdrToLdr</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
+        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>
+        <li><a href="../image/luminanceThreshold.html">luminanceThreshold</a></li>
         <li><a href="../image/maskFlood.html">maskFlood</a></li>
         <li><a href="../image/minMax.html">minMax</a></li>
         <li><a href="../image/noise.html">noise</a></li>
@@ -417,6 +424,7 @@ by looking at the file extension.</p>
         <li><a href="../image/pixelate.html">pixelate</a></li>
         <li><a href="../image/prand.html">prand</a></li>
         <li><a href="../image/quantize.html">quantize</a></li>
+        <li><a href="../image/readFile.html">readFile</a></li>
         <li><a href="../image/readFont.html">readFont</a></li>
         <li><a href="../image/readFontZip.html">readFontZip</a></li>
         <li><a href="../image/reinhardToneMap.html">reinhardToneMap</a></li>
@@ -428,14 +436,18 @@ by looking at the file extension.</p>
         <li><a href="../image/scaleRgba.html">scaleRgba</a></li>
         <li><a href="../image/separableConvolution.html">separableConvolution</a></li>
         <li><a href="../image/sepia.html">sepia</a></li>
+        <li><a href="../image/sketch.html">sketch</a></li>
         <li><a href="../image/smooth.html">smooth</a></li>
         <li><a href="../image/sobel.html">sobel</a></li>
+        <li><a href="../image/stretchDistortion.html">stretchDistortion</a></li>
+        <li><a href="../image/supportsFileAccess.html">supportsFileAccess</a></li>
         <li><a href="../image/trim.html">trim</a></li>
         <li><a href="../image/uint32ToAlpha.html">uint32ToAlpha</a></li>
         <li><a href="../image/uint32ToBlue.html">uint32ToBlue</a></li>
         <li><a href="../image/uint32ToGreen.html">uint32ToGreen</a></li>
         <li><a href="../image/uint32ToRed.html">uint32ToRed</a></li>
         <li><a href="../image/vignette.html">vignette</a></li>
+        <li><a href="../image/writeFile.html">writeFile</a></li>
         <li><a href="../image/xyzToLab.html">xyzToLab</a></li>
         <li><a href="../image/xyzToRgb.html">xyzToRgb</a></li>
 

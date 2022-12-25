@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import '../image/image.dart';
-import 'grayscale.dart';
 
 /// Apply Sobel edge detection filtering to the [src] Image.
 Image sobel(Image src, { num amount = 1.0 }) {

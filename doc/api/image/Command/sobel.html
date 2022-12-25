@@ -58,7 +58,7 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">sobel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="sobel-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1.0</span>}</span></li>
+<span class="name ">sobel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="sobel-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>}</span></li>
 </ol>)
 
       
@@ -70,7 +70,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void sobel({ num amount = 1.0 }) {
+  <pre class="language-dart"><code class="language-dart">void sobel({ num amount = 1 }) {
   subCommand = SobelCmd(subCommand, amount: amount);
 }</code></pre>
 </section>
@@ -118,7 +118,6 @@
           <li><a href="../../image/Command/adjustColor.html">adjustColor</a></li>
           <li><a href="../../image/Command/bakeOrientation.html">bakeOrientation</a></li>
           <li><a href="../../image/Command/billboard.html">billboard</a></li>
-          <li><a href="../../image/Command/blackAndWhite.html">blackAndWhite</a></li>
           <li><a href="../../image/Command/bleachBypass.html">bleachBypass</a></li>
           <li><a href="../../image/Command/bulgeDistortion.html">bulgeDistortion</a></li>
           <li><a href="../../image/Command/bumpToNormal.html">bumpToNormal</a></li>
@@ -204,7 +203,9 @@
           <li><a href="../../image/Command/getImageThread.html">getImageThread</a></li>
           <li><a href="../../image/Command/grayscale.html">grayscale</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
+          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
+          <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/noise.html">noise</a></li>
           <li><a href="../../image/Command/normalize.html">normalize</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
@@ -215,8 +216,10 @@
           <li><a href="../../image/Command/separableConvolution.html">separableConvolution</a></li>
           <li><a href="../../image/Command/sepia.html">sepia</a></li>
           <li><a href="../../image/Command/setDirty.html">setDirty</a></li>
+          <li><a href="../../image/Command/sketch.html">sketch</a></li>
           <li><a href="../../image/Command/smooth.html">smooth</a></li>
           <li><a href="../../image/Command/sobel.html">sobel</a></li>
+          <li><a href="../../image/Command/stretchDistortion.html">stretchDistortion</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
           <li><a href="../../image/Command/trim.html">trim</a></li>
           <li><a href="../../image/Command/vignette.html">vignette</a></li>

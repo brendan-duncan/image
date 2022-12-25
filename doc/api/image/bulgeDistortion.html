@@ -62,23 +62,22 @@
 <li><span class="parameter" id="bulgeDistortion-param-centerX">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span></li>
 <li><span class="parameter" id="bulgeDistortion-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span></li>
 <li><span class="parameter" id="bulgeDistortion-param-radius"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">radius</span>, </span></li>
-<li><span class="parameter" id="bulgeDistortion-param-scale"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">scale</span> = <span class="default-value">0.5</span>}</span></li>
+<li><span class="parameter" id="bulgeDistortion-param-scale"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">scale</span> = <span class="default-value">0.5</span>, </span></li>
+<li><span class="parameter" id="bulgeDistortion-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
 </ol>)
 
         
 
     </section>
     
-<section class="desc markdown">
-  <p>Apply gamma scaling to the HDR image, in-place.</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Image bulgeDistortion(Image src, { int? centerX, int? centerY,
-    num? radius, num scale = 0.5 }) {
+    num? radius, num scale = 0.5,
+    Interpolation interpolation = Interpolation.nearest }) {
   for (final frame in src.frames) {
     final orig = frame.clone(noAnimation: true);
     final w = frame.width;
@@ -104,7 +103,7 @@
       x += cx;
       y += cy;
 
-      p.set(orig.getPixel(x.floor(), y.floor()));
+      p.set(orig.getPixelInterpolate(x, y, interpolation));
     }
   }
   return src;
@@ -347,7 +346,6 @@
         <li><a href="../image/adjustColor.html">adjustColor</a></li>
         <li><a href="../image/bakeOrientation.html">bakeOrientation</a></li>
         <li><a href="../image/billboard.html">billboard</a></li>
-        <li><a href="../image/blackAndWhite.html">blackAndWhite</a></li>
         <li><a href="../image/bleachBypass.html">bleachBypass</a></li>
         <li><a href="../image/bulgeDistortion.html">bulgeDistortion</a></li>
         <li><a href="../image/bumpToNormal.html">bumpToNormal</a></li>
@@ -438,6 +436,8 @@
         <li><a href="../image/flipVertical.html">flipVertical</a></li>
         <li><a href="../image/gamma.html">gamma</a></li>
         <li><a href="../image/gaussianBlur.html">gaussianBlur</a></li>
+        <li><a href="../image/getLuminance.html">getLuminance</a></li>
+        <li><a href="../image/getLuminanceNormalized.html">getLuminanceNormalized</a></li>
         <li><a href="../image/getLuminanceRgb.html">getLuminanceRgb</a></li>
         <li><a href="../image/grand.html">grand</a></li>
         <li><a href="../image/grayscale.html">grayscale</a></li>
@@ -445,9 +445,11 @@
         <li><a href="../image/hdrToLdr.html">hdrToLdr</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
+        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>
+        <li><a href="../image/luminanceThreshold.html">luminanceThreshold</a></li>
         <li><a href="../image/maskFlood.html">maskFlood</a></li>
         <li><a href="../image/minMax.html">minMax</a></li>
         <li><a href="../image/noise.html">noise</a></li>
@@ -467,8 +469,10 @@
         <li><a href="../image/scaleRgba.html">scaleRgba</a></li>
         <li><a href="../image/separableConvolution.html">separableConvolution</a></li>
         <li><a href="../image/sepia.html">sepia</a></li>
+        <li><a href="../image/sketch.html">sketch</a></li>
         <li><a href="../image/smooth.html">smooth</a></li>
         <li><a href="../image/sobel.html">sobel</a></li>
+        <li><a href="../image/stretchDistortion.html">stretchDistortion</a></li>
         <li><a href="../image/supportsFileAccess.html">supportsFileAccess</a></li>
         <li><a href="../image/trim.html">trim</a></li>
         <li><a href="../image/uint32ToAlpha.html">uint32ToAlpha</a></li>

@@ -59,7 +59,8 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">billboard</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="billboard-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="billboard-param-grid">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">grid</span> = <span class="default-value">10</span>}</span></li>
+<li><span class="parameter" id="billboard-param-grid">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">grid</span> = <span class="default-value">10</span>, </span></li>
+<li><span class="parameter" id="billboard-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>}</span></li>
 </ol>)
 
         
@@ -71,7 +72,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image billboard(Image src, { num grid = 10 }) {
+  <pre class="language-dart"><code class="language-dart">Image billboard(Image src, { num grid = 10, num amount = 1 }) {
   const rs = 0.2025;&#47;&#47; pow(0.45, 2.0);
 
   for (final frame in src.frames) {
@@ -117,9 +118,9 @@
       g = mix(lf * g, 0.1, gr);
       b = mix(lf * b, 0.1, gr);
 
-      p..r = (r * p.maxChannelValue)
-      ..g = (g * p.maxChannelValue)
-      ..b = (b * p.maxChannelValue);
+      p..r = mix(p.r, r * p.maxChannelValue, amount)
+      ..g = mix(p.g, g * p.maxChannelValue, amount)
+      ..b = mix(p.b, b * p.maxChannelValue, amount);
     }
   }
   return src;
@@ -362,7 +363,6 @@
         <li><a href="../image/adjustColor.html">adjustColor</a></li>
         <li><a href="../image/bakeOrientation.html">bakeOrientation</a></li>
         <li><a href="../image/billboard.html">billboard</a></li>
-        <li><a href="../image/blackAndWhite.html">blackAndWhite</a></li>
         <li><a href="../image/bleachBypass.html">bleachBypass</a></li>
         <li><a href="../image/bulgeDistortion.html">bulgeDistortion</a></li>
         <li><a href="../image/bumpToNormal.html">bumpToNormal</a></li>
@@ -453,6 +453,8 @@
         <li><a href="../image/flipVertical.html">flipVertical</a></li>
         <li><a href="../image/gamma.html">gamma</a></li>
         <li><a href="../image/gaussianBlur.html">gaussianBlur</a></li>
+        <li><a href="../image/getLuminance.html">getLuminance</a></li>
+        <li><a href="../image/getLuminanceNormalized.html">getLuminanceNormalized</a></li>
         <li><a href="../image/getLuminanceRgb.html">getLuminanceRgb</a></li>
         <li><a href="../image/grand.html">grand</a></li>
         <li><a href="../image/grayscale.html">grayscale</a></li>
@@ -460,9 +462,11 @@
         <li><a href="../image/hdrToLdr.html">hdrToLdr</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
+        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>
+        <li><a href="../image/luminanceThreshold.html">luminanceThreshold</a></li>
         <li><a href="../image/maskFlood.html">maskFlood</a></li>
         <li><a href="../image/minMax.html">minMax</a></li>
         <li><a href="../image/noise.html">noise</a></li>
@@ -482,8 +486,10 @@
         <li><a href="../image/scaleRgba.html">scaleRgba</a></li>
         <li><a href="../image/separableConvolution.html">separableConvolution</a></li>
         <li><a href="../image/sepia.html">sepia</a></li>
+        <li><a href="../image/sketch.html">sketch</a></li>
         <li><a href="../image/smooth.html">smooth</a></li>
         <li><a href="../image/sobel.html">sobel</a></li>
+        <li><a href="../image/stretchDistortion.html">stretchDistortion</a></li>
         <li><a href="../image/supportsFileAccess.html">supportsFileAccess</a></li>
         <li><a href="../image/trim.html">trim</a></li>
         <li><a href="../image/uint32ToAlpha.html">uint32ToAlpha</a></li>

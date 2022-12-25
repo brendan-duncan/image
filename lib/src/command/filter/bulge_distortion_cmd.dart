@@ -1,6 +1,6 @@
 import '../../filter/bulge_distortion.dart';
-import '../command.dart';
 import '../../util/interpolation.dart';
+import '../command.dart';
 
 class BulgeDistortionCmd extends Command {
   int? centerX;

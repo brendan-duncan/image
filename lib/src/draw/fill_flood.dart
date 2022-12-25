@@ -2,8 +2,8 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import '../color/color.dart';
-import '../util/color_util.dart';
 import '../image/image.dart';
+import '../util/color_util.dart';
 
 typedef _TestPixel = bool Function(int y, int x);
 typedef _MarkPixel = void Function(int y, int x);

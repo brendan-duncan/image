@@ -3,9 +3,9 @@ import 'dart:typed_data';
 
 import '../color/color.dart';
 import '../color/color_uint8.dart';
-import '../util/color_util.dart';
 import '../color/format.dart';
 import '../exif/exif_data.dart';
+import '../util/color_util.dart';
 import '../util/image_exception.dart';
 import '../util/interpolation.dart';
 import 'icc_profile.dart';

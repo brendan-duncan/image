@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import '../color/channel_iterator.dart';
 import '../color/color.dart';
-import '../util/color_util.dart';
 import '../color/format.dart';
+import '../util/color_util.dart';
 import 'image.dart';
 import 'image_data_uint2.dart';
 import 'palette.dart';

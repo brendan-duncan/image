@@ -2,9 +2,9 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import '../../color/color.dart';
-import '../../util/color_util.dart';
 import '../../image/image.dart';
 import '../../image/pixel.dart';
+import '../../util/color_util.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import '../decode_info.dart';

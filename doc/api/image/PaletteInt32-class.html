@@ -312,6 +312,34 @@ palette has fewer channels than <code>channel</code>, the value will be ignored.
 
 </dd>
 
+        <dt id="setAlpha" class="callable">
+  <span class="name"><a href="../image/PaletteInt32/setAlpha.html">setAlpha</a></span><span class="signature">(<wbr><span class="parameter" id="setAlpha-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="setAlpha-param-value"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">value</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Set the alpha channel of the palette entry at <code>index</code>. If the palette has
+fewer colors or channels, it will be ignored.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="setBlue" class="callable">
+  <span class="name"><a href="../image/PaletteInt32/setBlue.html">setBlue</a></span><span class="signature">(<wbr><span class="parameter" id="setBlue-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="setBlue-param-value"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">value</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Set the blue channel of the palette entry at <code>index</code>. If the palette has
+fewer colors or channels, it will be ignored.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
         <dt id="setColor" class="callable">
   <span class="name"><a href="../image/PaletteInt32/setColor.html">setColor</a></span><span class="signature">(<wbr><span class="parameter" id="setColor-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="setColor-param-r"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">r</span>, </span><span class="parameter" id="setColor-param-g">[<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">g</span> = <span class="default-value">0</span>, </span><span class="parameter" id="setColor-param-b"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">b</span> = <span class="default-value">0</span>, </span><span class="parameter" id="setColor-param-a"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">a</span> = <span class="default-value">0</span>]</span>)
     <span class="returntype parameter">&#8594; void</span>
@@ -322,6 +350,34 @@ palette has fewer channels than <code>channel</code>, the value will be ignored.
 <dd>
   Set the RGBA color of a palette entry at <code>index</code>. If the palette has fewer
 channels than are set, the unsupported channels will be ignored.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="setGreen" class="callable">
+  <span class="name"><a href="../image/PaletteInt32/setGreen.html">setGreen</a></span><span class="signature">(<wbr><span class="parameter" id="setGreen-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="setGreen-param-value"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">value</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Set the green channel of the palette entry at <code>index</code>. If the palette has
+fewer colors or channels, it will be ignored.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="setRed" class="callable">
+  <span class="name"><a href="../image/PaletteInt32/setRed.html">setRed</a></span><span class="signature">(<wbr><span class="parameter" id="setRed-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="setRed-param-value"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">value</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Set the red channel of the palette entry at <code>index</code>. If the palette has
+fewer colors or channels, it will be ignored.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
@@ -615,7 +671,6 @@ channels than are set, the unsupported channels will be ignored.
         <li><a href="../image/adjustColor.html">adjustColor</a></li>
         <li><a href="../image/bakeOrientation.html">bakeOrientation</a></li>
         <li><a href="../image/billboard.html">billboard</a></li>
-        <li><a href="../image/blackAndWhite.html">blackAndWhite</a></li>
         <li><a href="../image/bleachBypass.html">bleachBypass</a></li>
         <li><a href="../image/bulgeDistortion.html">bulgeDistortion</a></li>
         <li><a href="../image/bumpToNormal.html">bumpToNormal</a></li>
@@ -706,6 +761,8 @@ channels than are set, the unsupported channels will be ignored.
         <li><a href="../image/flipVertical.html">flipVertical</a></li>
         <li><a href="../image/gamma.html">gamma</a></li>
         <li><a href="../image/gaussianBlur.html">gaussianBlur</a></li>
+        <li><a href="../image/getLuminance.html">getLuminance</a></li>
+        <li><a href="../image/getLuminanceNormalized.html">getLuminanceNormalized</a></li>
         <li><a href="../image/getLuminanceRgb.html">getLuminanceRgb</a></li>
         <li><a href="../image/grand.html">grand</a></li>
         <li><a href="../image/grayscale.html">grayscale</a></li>
@@ -713,9 +770,11 @@ channels than are set, the unsupported channels will be ignored.
         <li><a href="../image/hdrToLdr.html">hdrToLdr</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
+        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>
+        <li><a href="../image/luminanceThreshold.html">luminanceThreshold</a></li>
         <li><a href="../image/maskFlood.html">maskFlood</a></li>
         <li><a href="../image/minMax.html">minMax</a></li>
         <li><a href="../image/noise.html">noise</a></li>
@@ -735,8 +794,10 @@ channels than are set, the unsupported channels will be ignored.
         <li><a href="../image/scaleRgba.html">scaleRgba</a></li>
         <li><a href="../image/separableConvolution.html">separableConvolution</a></li>
         <li><a href="../image/sepia.html">sepia</a></li>
+        <li><a href="../image/sketch.html">sketch</a></li>
         <li><a href="../image/smooth.html">smooth</a></li>
         <li><a href="../image/sobel.html">sobel</a></li>
+        <li><a href="../image/stretchDistortion.html">stretchDistortion</a></li>
         <li><a href="../image/supportsFileAccess.html">supportsFileAccess</a></li>
         <li><a href="../image/trim.html">trim</a></li>
         <li><a href="../image/uint32ToAlpha.html">uint32ToAlpha</a></li>
@@ -814,7 +875,11 @@ channels than are set, the unsupported channels will be ignored.
           <li><a href="../image/PaletteInt32/getRed.html">getRed</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
           <li><a href="../image/PaletteInt32/set.html">set</a></li>
+          <li><a href="../image/PaletteInt32/setAlpha.html">setAlpha</a></li>
+          <li><a href="../image/PaletteInt32/setBlue.html">setBlue</a></li>
           <li><a href="../image/PaletteInt32/setColor.html">setColor</a></li>
+          <li><a href="../image/PaletteInt32/setGreen.html">setGreen</a></li>
+          <li><a href="../image/PaletteInt32/setRed.html">setRed</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
           <li class="inherited"><a href="../image/Palette/toUint8List.html">toUint8List</a></li>
 
