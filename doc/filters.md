@@ -49,6 +49,10 @@ color filters, transformations into other images (resize, crop), or basic drawin
 
 ![ditherImage](images/filter/ditherImage.png)
 
+* **[dotScreen](https://brendan-duncan.github.io/image/doc/api/image/dotScreen.html)**
+
+![dotScreen](images/filter/dotScreen.png)
+
 * **[dropShadow](https://brendan-duncan.github.io/image/doc/api/image/dropShadow.html)**
 
 ![dropShadow](images/filter/dropShadow.png)

@@ -44,6 +44,7 @@ import 'filter/color_offset_cmd.dart';
 import 'filter/contrast_cmd.dart';
 import 'filter/convolution_cmd.dart';
 import 'filter/dither_image_cmd.dart';
+import 'filter/dot_screen_cmd.dart';
 import 'filter/drop_shadow_cmd.dart';
 import 'filter/edge_glow_cmd.dart';
 import 'filter/emboss_cmd.dart';
@@ -452,6 +453,12 @@ class Command {
     bool serpentine = false }) {
     subCommand = DitherImageCmd(subCommand, quantizer: quantizer,
         kernel: kernel, serpentine: serpentine);
+  }
+
+  void dotScreen({ num angle = 180, num size = 5.75, int? centerX,
+        int? centerY, num amount = 1 }) {
+    subCommand = DotScreenCmd(subCommand, angle: angle, size: size,
+        centerX: centerX, centerY: centerY, amount: amount);
   }
 
   void dropShadow(int hShadow, int vShadow, int blur, { Color? shadowColor }) {

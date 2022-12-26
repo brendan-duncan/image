@@ -46,6 +46,7 @@ export 'src/filter/color_offset.dart';
 export 'src/filter/contrast.dart';
 export 'src/filter/convolution.dart';
 export 'src/filter/dither_image.dart';
+export 'src/filter/dot_screen.dart';
 export 'src/filter/drop_shadow.dart';
 export 'src/filter/edge_glow.dart';
 export 'src/filter/emboss.dart';

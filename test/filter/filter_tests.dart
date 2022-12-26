@@ -11,6 +11,7 @@ import 'color_offset_test.dart';
 import 'contrast_test.dart';
 import 'convolution_test.dart';
 import 'dither_test.dart';
+import 'dot_screen_test.dart';
 import 'drop_shadow_test.dart';
 import 'edge_glow_test.dart';
 import 'emboss_test.dart';
@@ -49,6 +50,7 @@ void filterTests() {
     contrastTest();
     convolutionTest();
     ditherTest();
+    dotScreenTest();
     edgeGlowTest();
     embossTest();
     gammaTest();
