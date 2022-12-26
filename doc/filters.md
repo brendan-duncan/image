@@ -53,6 +53,10 @@ color filters, transformations into other images (resize, crop), or basic drawin
 
 ![dropShadow](images/filter/dropShadow.png)
 
+* **[edgeGlow](https://brendan-duncan.github.io/image/doc/api/image/edgeGlow.html)**
+
+![edgeGlow](images/filter/edgeGlow.png)
+
 * **[emboss](https://brendan-duncan.github.io/image/doc/api/image/emboss.html)**
 
 ![emboss](images/filter/emboss.png)
@@ -69,6 +73,10 @@ color filters, transformations into other images (resize, crop), or basic drawin
 
 ![grayscale](images/filter/grayscale.png)
 
+* **[hexagonPixelate](https://brendan-duncan.github.io/image/doc/api/image/hexagonPixelate.html)**
+
+![hexagonPixelate](images/filter/hexagonPixelate.png)
+
 * **[imageMask](https://brendan-duncan.github.io/image/doc/api/image/imageMask.html)**
 
 ![imageMask](images/filter/imageMask.png)
@@ -80,6 +88,10 @@ color filters, transformations into other images (resize, crop), or basic drawin
 * **[luminanceThreshold](https://brendan-duncan.github.io/image/doc/api/image/luminanceThreshold.html)**
 
 ![luminanceThreshold](images/filter/luminanceThreshold.png)
+
+* **[monochrome](https://brendan-duncan.github.io/image/doc/api/image/monochrome.html)**
+
+![monochrome](images/filter/monochrome.png)
 
 * **[noise](https://brendan-duncan.github.io/image/doc/api/image/noise.html)**
 

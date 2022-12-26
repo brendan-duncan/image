@@ -45,14 +45,17 @@ import 'filter/contrast_cmd.dart';
 import 'filter/convolution_cmd.dart';
 import 'filter/dither_image_cmd.dart';
 import 'filter/drop_shadow_cmd.dart';
+import 'filter/edge_glow_cmd.dart';
 import 'filter/emboss_cmd.dart';
 import 'filter/filter_cmd.dart';
 import 'filter/gamma_cmd.dart';
 import 'filter/gaussian_blur_cmd.dart';
 import 'filter/grayscale_cmd.dart';
+import 'filter/hexagon_pixelate_cmd.dart';
 import 'filter/image_mask_cmd.dart';
 import 'filter/invert_cmd.dart';
 import 'filter/luminance_threshold_cmd.dart';
+import 'filter/monochrome_cmd.dart';
 import 'filter/noise_cmd.dart';
 import 'filter/normalize_cmd.dart';
 import 'filter/pixelate_cmd.dart';
@@ -438,8 +441,10 @@ class Command {
     subCommand = ContrastCmd(subCommand, contrast: c);
   }
 
-  void convolution(List<num> filter, { num div = 1.0, num offset = 0.0 }) {
-    subCommand = ConvolutionCmd(subCommand, filter, div: div, offset: offset);
+  void convolution(List<num> filter, { num div = 1.0, num offset = 0.0,
+      num amount = 1 }) {
+    subCommand = ConvolutionCmd(subCommand, filter, div: div, offset: offset,
+        amount: amount);
   }
 
   void ditherImage({ Quantizer? quantizer,
@@ -454,8 +459,12 @@ class Command {
         shadowColor: shadowColor);
   }
 
-  void emboss() {
-    subCommand = EmbossCmd(subCommand);
+  void edgeGlow({ num amount = 1 }) {
+    subCommand = EdgeGlowCmd(subCommand, amount: amount);
+  }
+
+  void emboss({ num amount = 1 }) {
+    subCommand = EmbossCmd(subCommand, amount: amount);
   }
 
   void gamma({ num gamma = 2.2 }) {
@@ -466,8 +475,14 @@ class Command {
     subCommand = GaussianBlurCmd(subCommand, radius);
   }
 
-  void grayscale({ num amount = 1}) {
+  void grayscale({ num amount = 1 }) {
     subCommand = GrayscaleCmd(subCommand, amount: amount);
+  }
+
+  void hexagonPixelate({ int? centerX, int? centerY, int size = 5,
+      num amount = 1 }) {
+    subCommand = HexagonPixelateCmd(subCommand, centerX: centerX,
+        centerY: centerY, size: size, amount: amount);
   }
 
   void invert() {
@@ -484,6 +499,10 @@ class Command {
       bool scaleMask = false }) {
     subCommand = ImageMaskCmd(subCommand, mask, maskChannel: maskChannel,
         scaleMask: scaleMask);
+  }
+
+  void monochrome({ Color? color, num amount = 1 }) {
+    subCommand = MonochromeCmd(subCommand, color: color, amount: amount);
   }
 
   void noise(num sigma, { NoiseType type = NoiseType.gaussian,
