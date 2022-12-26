@@ -97,10 +97,6 @@ import 'transform/copy_rotate_cmd.dart';
 import 'transform/flip_cmd.dart';
 import 'transform/trim_cmd.dart';
 
-final currentFrameStack = <Image?>[];
-Image? get currentFrame => currentFrameStack.isEmpty ? null
-    : currentFrameStack.last;
-
 /// Base class for commands that create, load, manipulate, and save images.
 /// Commands are not executed until either the [execute] or [executeThread]
 /// methods are called.
