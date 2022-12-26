@@ -11,9 +11,10 @@ class PixelUndefined extends Iterable<num> implements Pixel {
   PixelUndefined clone() => PixelUndefined();
   ImageData get image => nullImageData;
   int get x => 0;
-  void set x(int value) {}
   int get y => 0;
-  void set y(int value) {}
+  num get xNormalized => 0;
+  num get yNormalized => 0;
+  void setPositionNormalized(num x, num y) {}
   int get width => 0;
   int get height => 0;
   int get length => 0;
@@ -21,6 +22,7 @@ class PixelUndefined extends Iterable<num> implements Pixel {
   Format get format => Format.uint8;
   bool get isLdrFormat => false;
   bool get isHdrFormat => false;
+  bool get isValid => false;
   num operator[](int index) => 0;
   void operator[]=(int index, num value) {}
   num get index => 0;

@@ -10,23 +10,23 @@ import 'palette.dart';
 import 'pixel.dart';
 
 class PixelUint2 extends Iterable<num> implements Pixel {
-  int x;
-  int y;
+  int _x;
+  int _y;
   int _index;
   int _bitIndex;
   int _rowOffset;
   final ImageDataUint2 image;
 
   PixelUint2.imageData(this.image)
-      : x = -1
-      , y = 0
+      : _x = -1
+      , _y = 0
       , _index = 0
       , _bitIndex = -2
       , _rowOffset = 0;
 
   PixelUint2.image(Image image)
-      : x = -1
-      , y = 0
+      : _x = -1
+      , _y = 0
       , _index = 0
       , _bitIndex = -2
       , _rowOffset = 0
@@ -34,8 +34,8 @@ class PixelUint2 extends Iterable<num> implements Pixel {
           : ImageDataUint2(0, 0, 0);
 
   PixelUint2.from(PixelUint2 other)
-      : x = other.x
-      , y = other.y
+      : _x = other._x
+      , _y = other._y
       , _index = other._index
       , _bitIndex = other._bitIndex
       , _rowOffset = other._rowOffset
@@ -55,28 +55,44 @@ class PixelUint2 extends Iterable<num> implements Pixel {
   bool get isLdrFormat => image.isLdrFormat;
   bool get isHdrFormat => image.isHdrFormat;
 
+  bool get isValid => x >= 0 && x < (image.width - 1) &&
+      y >= 0 && y < (image.height - 1);
+
   int get bitsPerPixel => image.palette != null ? 2 : image.numChannels << 1;
 
+  int get x => _x;
+  int get y => _y;
+
+  /// The normalized x coordinate of the pixel, in the range \[0, 1\].
+  num get xNormalized => width > 1 ? _x / (width - 1) : 0;
+
+  /// The normalized y coordinate of the pixel, in the range \[0, 1\].
+  num get yNormalized => height > 1 ? _y / (height - 1) : 0;
+
+  /// Set the normalized coordinates of the pixel, in the range \[0, 1\].
+  void setPositionNormalized(num x, num y) =>
+      setPosition((x * (width - 1)).floor(), (y * (height - 1)).floor());
+
   void setPosition(int x, int y) {
-    this.x = x;
-    this.y = y;
+    this._x = x;
+    this._y = y;
     final bpp = bitsPerPixel;
-    _rowOffset = y * image.rowStride;
-    _index = _rowOffset + ((x * bpp) >> 3);
-    _bitIndex = (x * bpp) & 0x7;
+    _rowOffset = _y * image.rowStride;
+    _index = _rowOffset + ((_x * bpp) >> 3);
+    _bitIndex = (_x * bpp) & 0x7;
   }
 
   Pixel get current => this;
 
   bool moveNext() {
-    x++;
+    _x++;
     if (x == width) {
-      x = 0;
-      y++;
+      _x = 0;
+      _y++;
       _bitIndex = 0;
       _index++;
       _rowOffset += image.rowStride;
-      return y < height;
+      return _y < height;
     }
 
     final nc = numChannels;

@@ -10,26 +10,26 @@ import 'palette.dart';
 import 'pixel.dart';
 
 class PixelInt8 extends Iterable<num> implements Pixel {
-  int x;
-  int y;
+  int _x;
+  int _y;
   int _index;
   final ImageDataInt8 image;
 
   PixelInt8.imageData(this.image)
-      : x = -1
-      , y = -1
+      : _x = -1
+      , _y = -1
       , _index = -image.numChannels;
 
   PixelInt8.image(Image image)
-      : x = -1
-      , y = -1
+      : _x = -1
+      , _y = -1
       , _index = -image.numChannels
       , image = image.data is ImageDataInt8 ? image.data as ImageDataInt8
       : ImageDataInt8(0, 0, 0);
 
   PixelInt8.from(PixelInt8 other)
-      : x = other.x
-      , y = other.y
+      : _x = other.x
+      , _y = other.y
       , _index = other._index
       , image = other.image;
 
@@ -47,19 +47,35 @@ class PixelInt8 extends Iterable<num> implements Pixel {
   bool get isLdrFormat => image.isLdrFormat;
   bool get isHdrFormat => image.isHdrFormat;
 
+  bool get isValid => x >= 0 && x < (image.width - 1) &&
+      y >= 0 && y < (image.height - 1);
+
+  int get x => _x;
+  int get y => _y;
+
+  /// The normalized x coordinate of the pixel, in the range \[0, 1\].
+  num get xNormalized => width > 1 ? _x / (width - 1) : 0;
+
+  /// The normalized y coordinate of the pixel, in the range \[0, 1\].
+  num get yNormalized => height > 1 ? _y / (height - 1) : 0;
+
+  /// Set the normalized coordinates of the pixel, in the range \[0, 1\].
+  void setPositionNormalized(num x, num y) =>
+      setPosition((x * (width - 1)).floor(), (y * (height - 1)).floor());
+
   void setPosition(int x, int y) {
-    this.x = x;
-    this.y = y;
-    _index = y * image.width * image.numChannels + (x * image.numChannels);
+    this._x = x;
+    this._y = y;
+    _index = _y * image.width * image.numChannels + (_x * image.numChannels);
   }
 
   Pixel get current => this;
 
   bool moveNext() {
-    x++;
-    if (x == width) {
-      x = 0;
-      y++;
+    _x++;
+    if (_x == width) {
+      _x = 0;
+      _y++;
     }
     _index += numChannels;
     return _index < image.data.length;

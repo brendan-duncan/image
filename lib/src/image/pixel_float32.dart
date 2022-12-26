@@ -10,26 +10,26 @@ import 'palette.dart';
 import 'pixel.dart';
 
 class PixelFloat32 extends Iterable<num> implements Pixel {
-  int x;
-  int y;
+  int _x;
+  int _y;
   int _index;
   final ImageDataFloat32 image;
 
   PixelFloat32.imageData(this.image)
-      : x = -1
-      , y = -1
+      : _x = -1
+      , _y = -1
       , _index = -image.numChannels;
 
   PixelFloat32.image(Image image)
-      : x = -1
-      , y = -1
+      : _x = -1
+      , _y = -1
       , _index = -image.numChannels
       , image = image.data is ImageDataFloat32 ? image.data as ImageDataFloat32
           : ImageDataFloat32(0, 0, 0);
 
   PixelFloat32.from(PixelFloat32 other)
-      : x = other.x
-      , y = other.y
+      : _x = other._x
+      , _y = other._y
       , _index = other._index
       , image = other.image;
 
@@ -47,19 +47,35 @@ class PixelFloat32 extends Iterable<num> implements Pixel {
   bool get isLdrFormat => image.isLdrFormat;
   bool get isHdrFormat => image.isHdrFormat;
 
+  bool get isValid => x >= 0 && x < (image.width - 1) &&
+      y >= 0 && y < (image.height - 1);
+
+  int get x => _x;
+  int get y => _y;
+
+  /// The normalized x coordinate of the pixel, in the range \[0, 1\].
+  num get xNormalized => width > 1 ? x / (width - 1) : 0;
+
+  /// The normalized y coordinate of the pixel, in the range \[0, 1\].
+  num get yNormalized => height > 1 ? y / (height - 1) : 0;
+
+  /// Set the normalized coordinates of the pixel, in the range \[0, 1\].
+  void setPositionNormalized(num x, num y) =>
+      setPosition((x * (width - 1)).floor(), (y * (height - 1)).floor());
+
   void setPosition(int x, int y) {
-    this.x = x;
-    this.y = y;
-    _index = y * image.width * image.numChannels + (x * image.numChannels);
+    this._x = x;
+    this._y = y;
+    _index = _y * image.width * image.numChannels + (_x * image.numChannels);
   }
 
   Pixel get current => this;
 
   bool moveNext() {
-    x++;
-    if (x == width) {
-      x = 0;
-      y++;
+    _x++;
+    if (_x == width) {
+      _x = 0;
+      _y++;
     }
     _index += numChannels;
     return _index < image.data.length;
