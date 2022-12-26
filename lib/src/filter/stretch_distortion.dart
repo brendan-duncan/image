@@ -29,7 +29,7 @@ Image stretchDistortion(Image src, { int? centerX, int? centerY,
       final x = ((ncX / 2 + 0.5) * w).clamp(0, w - 1);
       final y = ((ncY / 2 + 0.5) * h).clamp(0, h - 1);
 
-      final p2 = orig.getPixelInterpolate(x, y, interpolation);
+      final p2 = orig.getPixelInterpolate(x, y, interpolation: interpolation);
 
       p..r = p2.r
       ..g = p2.g

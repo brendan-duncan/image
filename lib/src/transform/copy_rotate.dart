@@ -46,7 +46,7 @@ Image copyRotate(Image src, num angle,
     final y = p.y;
     final x2 = w2 + (x - dw2) * ca + (y - dh2) * sa;
     final y2 = h2 - (x - dw2) * sa + (y - dh2) * ca;
-    final c = src.getPixelInterpolate(x2, y2, interpolation);
+    final c = src.getPixelInterpolate(x2, y2, interpolation: interpolation);
     dst.setPixel(x, y, c);
   }
 

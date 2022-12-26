@@ -96,7 +96,8 @@ Image copyResize(Image src, { int? width, int? height,
         final y2 = y * dy;
         for (var x = 0; x < width; ++x) {
           final x2 = x * dx;
-          dst.setPixel(x, y, frame.getPixelInterpolate(x2, y2, interpolation));
+          dst.setPixel(x, y, frame.getPixelInterpolate(x2, y2,
+              interpolation: interpolation));
         }
       }
     }

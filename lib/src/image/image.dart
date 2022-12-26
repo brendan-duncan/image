@@ -422,7 +422,7 @@ class Image extends Iterable<Pixel> {
   /// Get the pixel using the given [interpolation] type for non-integer pixel
   /// coordinates.
   Color getPixelInterpolate(num fx, num fy,
-      [Interpolation interpolation = Interpolation.linear]) {
+    { Interpolation interpolation = Interpolation.linear }) {
     if (interpolation == Interpolation.cubic) {
       return getPixelCubic(fx, fy);
     } else if (interpolation == Interpolation.linear) {

@@ -31,7 +31,7 @@ Image bulgeDistortion(Image src, { int? centerX, int? centerY,
       x += cx;
       y += cy;
 
-      p.set(orig.getPixelInterpolate(x, y, interpolation));
+      p.set(orig.getPixelInterpolate(x, y, interpolation: interpolation));
     }
   }
   return src;
