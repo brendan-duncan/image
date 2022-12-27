@@ -1,15 +1,7 @@
-import 'dart:typed_data';
-
 import '../color/color.dart';
-import '../color/color_uint8.dart';
 import '../font/bitmap_font.dart';
 import '../image/image.dart';
 import 'draw_pixel.dart';
-
-final _rLut = Uint8List(256);
-final _gLut = Uint8List(256);
-final _bLut = Uint8List(256);
-final _aLut = Uint8List(256);
 
 /// Draw a string horizontally into [image] horizontally into [image] at
 /// position [x],[y] with the given [color].
@@ -18,28 +10,14 @@ final _aLut = Uint8List(256);
 /// such as: arial14, arial24, or arial48.
 ///  Fonts can be create with a tool such as: https://ttf2fnt.com/
 Image drawString(Image image, BitmapFont font, int x, int y, String string,
-    {Color? color, bool rightJustify = false}) {
-  if (color != null) {
-    final ca = color.a;
-    if (ca == 0) {
-      return image;
-    }
-    final da = ca / 255.0;
-    final dr = color.r / 255.0;
-    final dg = color.g / 255.0;
-    final db = color.b / 255.0;
-    for (var i = 1; i < 256; ++i) {
-      _rLut[i] = (dr * i).toInt();
-      _gLut[i] = (dg * i).toInt();
-      _bLut[i] = (db * i).toInt();
-      _aLut[i] = (da * i).toInt();
-    }
+    { Color? color, bool rightJustify = false }) {
+  if (color?.a == 0) {
+    return image;
   }
 
   final stringHeight = _findStringHeight(font, string);
   final origX = x;
   final substrings = string.split(new RegExp(r"[(\n|\r)]"));
-  final _c = ColorRgba8();
 
   for (var ss in substrings) {
     final chars = ss.codeUnits;
@@ -68,15 +46,8 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
       for (var yi = y; yi < y2; ++yi) {
         for (var xi = x; xi < x2; ++xi, cIter.moveNext()) {
           final p = cIter.current;
-          if (color != null) {
-            _c..r = _rLut[p.r as int]
-              ..g = _gLut[p.g as int]
-              ..b = _bLut[p.b as int]
-              ..a = _aLut[p.a as int];
-            drawPixel(image, xi + ch.xOffset, yi + ch.yOffset, _c);
-          } else {
-            drawPixel(image, xi + ch.xOffset, yi + ch.yOffset, p);
-          }
+          drawPixel(image, xi + ch.xOffset, yi + ch.yOffset, p,
+              filter: color);
         }
       }
 

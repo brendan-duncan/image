@@ -52,6 +52,7 @@ import 'filter/filter_cmd.dart';
 import 'filter/gamma_cmd.dart';
 import 'filter/gaussian_blur_cmd.dart';
 import 'filter/grayscale_cmd.dart';
+import 'filter/hdr_to_ldr_cmd.dart';
 import 'filter/hexagon_pixelate_cmd.dart';
 import 'filter/image_mask_cmd.dart';
 import 'filter/invert_cmd.dart';
@@ -61,6 +62,7 @@ import 'filter/noise_cmd.dart';
 import 'filter/normalize_cmd.dart';
 import 'filter/pixelate_cmd.dart';
 import 'filter/quantize_cmd.dart';
+import 'filter/reinhard_tonemap_cmd.dart';
 import 'filter/remap_colors_cmd.dart';
 import 'filter/scale_rgba_cmd.dart';
 import 'filter/separable_convolution_cmd.dart';
@@ -504,6 +506,10 @@ class Command {
     subCommand = GrayscaleCmd(subCommand, amount: amount);
   }
 
+  void hdrToLdr({ num? exposure }) {
+    subCommand = HdrToLdrCmd(subCommand, exposure: exposure);
+  }
+
   void hexagonPixelate({ int? centerX, int? centerY, int size = 5,
       num amount = 1 }) {
     subCommand = HexagonPixelateCmd(subCommand, centerX: centerX,
@@ -549,6 +555,10 @@ class Command {
         bool ditherSerpentine = false }) {
     subCommand = QuantizeCmd(subCommand, numberOfColors: numberOfColors,
         method: method, dither: dither, ditherSerpentine: ditherSerpentine);
+  }
+
+  void reinhardTonemap() {
+    subCommand = ReinhardTonemapCmd(subCommand);
   }
 
   void remapColors({ Channel red = Channel.red,

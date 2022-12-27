@@ -262,8 +262,8 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
     for (var x = x1; x <= x2; x++) {
       final wstart = y - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
-        drawPixel(image, x, w, c, ((frac >> 8) & 0xff) / 255);
-        drawPixel(image, x, w + 1, c, ((_xor(frac) >> 8) & 0xff) / 255);
+        drawPixel(image, x, w, c, alpha: ((frac >> 8) & 0xff) / 255);
+        drawPixel(image, x, w + 1, c, alpha: ((_xor(frac) >> 8) & 0xff) / 255);
       }
 
       frac += inc;
@@ -294,8 +294,8 @@ Image drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
     for (var y = y1; y <= y2; y++) {
       final wstart = x - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
-        drawPixel(image, w, y, c, ((frac >> 8) & 0xff) / 255);
-        drawPixel(image, w + 1, y, c, ((_xor(frac) >> 8) & 0xff) / 255);
+        drawPixel(image, w, y, c, alpha: ((frac >> 8) & 0xff) / 255);
+        drawPixel(image, w + 1, y, c, alpha: ((_xor(frac) >> 8) & 0xff) / 255);
       }
 
       frac += inc;

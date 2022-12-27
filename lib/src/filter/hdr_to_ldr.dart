@@ -4,7 +4,7 @@ import '../image/image.dart';
 
 /// Convert a high dynamic range image to a low dynamic range image,
 /// with optional exposure control.
-Image hdrToLdr(Image hdr, {num? exposure}) {
+Image hdrToLdr(Image hdr, { num? exposure }) {
   num _knee(num x, num f) => math.log(x * f + 1.0) / f;
 
   num _gamma(num h, num m) {
@@ -24,13 +24,15 @@ Image hdrToLdr(Image hdr, {num? exposure}) {
       ? math.pow(2.0, (exposure + 2.47393).clamp(-20.0, 20.0))
       : 1.0;
 
+  final nc = hdr.numChannels;
+
   for (var y = 0; y < hdr.height; ++y) {
     for (var x = 0; x < hdr.width; ++x) {
       final hp = hdr.getPixel(x, y);
 
-      var r = hp.r;
-      var g = hdr.numChannels == 1 ? r : hp.g;
-      var b = hdr.numChannels == 1 ? r : hp.b;
+      var r = hp.rNormalized;
+      var g = nc == 1 ? r : hp.gNormalized;
+      var b = nc == 1 ? r : hp.bNormalized;
 
       if (r.isInfinite || r.isNaN) {
         r = 0.0;
@@ -48,9 +50,9 @@ Image hdrToLdr(Image hdr, {num? exposure}) {
         gi = _gamma(g, m);
         bi = _gamma(b, m);
       } else {
-        ri = r * 255.0;
-        gi = g * 255.0;
-        bi = b * 255.0;
+        ri = r.clamp(0, 1) * 255.0;
+        gi = g.clamp(0, 1) * 255.0;
+        bi = b.clamp(0, 1) * 255.0;
       }
 
       // Normalize the color
@@ -66,12 +68,14 @@ Image hdrToLdr(Image hdr, {num? exposure}) {
         if (a.isInfinite || a.isNaN) {
           a = 1.0;
         }
-        image.setPixelColor(x, y, ri.clamp(0, 255).toInt(),
+        image.setPixelColor(x, y,
+            ri.clamp(0, 255).toInt(),
             gi.clamp(0, 255).toInt(),
             bi.clamp(0, 255).toInt(),
             (a * 255.0).clamp(0, 255).toInt());
       } else {
-        image.setPixelColor(x, y, ri.clamp(0, 255).toInt(),
+        image.setPixelColor(x, y,
+            ri.clamp(0, 255).toInt(),
             gi.clamp(0, 255).toInt(),
             bi.clamp(0, 255).toInt());
       }

@@ -3,7 +3,7 @@ import 'dart:math';
 import '../image/image.dart';
 
 /// Applies Reinhard tone mapping to the hdr image, in-place.
-Image reinhardToneMap(Image hdr) {
+Image reinhardTonemap(Image hdr) {
   const yw = [0.212671, 0.715160, 0.072169];
 
   // Compute world adaptation luminance, _Ywa_

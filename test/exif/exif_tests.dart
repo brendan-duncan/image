@@ -1,8 +1,8 @@
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-void exifTests() {
-  group('exif', () {
+void main() {
+  group('Exif', () {
     test('write/read', () {
       final exif = ExifData();
       exif.imageIfd[0] = IfdShortValue(124);

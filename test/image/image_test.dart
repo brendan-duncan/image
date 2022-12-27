@@ -3,8 +3,8 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 
-void imageTest() {
-  group('image', () {
+void main() {
+  group('Image', () {
     test('empty', () {
       final i0 = Image.empty();
       expect(i0.isValid, equals(false));

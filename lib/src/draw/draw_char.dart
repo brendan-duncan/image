@@ -21,7 +21,7 @@ Image drawChar(Image image, BitmapFont font, int x, int y, String char,
     for (var xi = x; xi < x2; ++xi, cIter.moveNext()) {
       final cp = cIter.current;
       if (color != null) {
-        drawPixel(image, xi, yi, color, cp.a / cp.maxChannelValue);
+        drawPixel(image, xi, yi, color, alpha: cp.aNormalized);
       } else {
         drawPixel(image, xi, yi, cIter.current);
       }

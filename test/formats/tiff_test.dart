@@ -2,103 +2,105 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-import '../test_util.dart';
+import '../_test_util.dart';
 
-void tiffTest() {
-  group('tiff', () {
-    const name = 'cmyk';
-    test(name, () {
-      final bytes = File('test/_data/tiff/$name.tif').readAsBytesSync();
-      final i0 = decodeTiff(bytes)!;
-      final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
-      File('$testOutputPath/tif/$name.png')
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(encodePng(i1));
-    });
+void main() {
+  group('Format', () {
+    group('tiff', () {
+      const name = 'cmyk';
+      test(name, () {
+        final bytes = File('test/_data/tiff/$name.tif').readAsBytesSync();
+        final i0 = decodeTiff(bytes)!;
+        final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
+        File('$testOutputPath/tif/$name.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(encodePng(i1));
+      });
 
-    final dir = Directory('test/_data/tiff');
-    final files = dir.listSync();
+      final dir = Directory('test/_data/tiff');
+      final files = dir.listSync();
 
-    group('getInfo', () {
-      for (var f in files.whereType<File>()) {
-        if (!f.path.endsWith('.tif')) {
-          continue;
-        }
+      group('getInfo', () {
+        for (var f in files.whereType<File>()) {
+          if (!f.path.endsWith('.tif')) {
+            continue;
+          }
 
-        final name = f.uri.pathSegments.last;
-        test(name, () {
-          final bytes = f.readAsBytesSync();
+          final name = f.uri.pathSegments.last;
+          test(name, () {
+            final bytes = f.readAsBytesSync();
 
-          final info = TiffDecoder().startDecode(bytes);
-          expect(info, isNotNull);
-          final expectedInfo = _expectedInfo[name];
-          if (info != null && expectedInfo != null) {
-            expect(info.width, equals(expectedInfo['width']));
-            expect(info.height, equals(expectedInfo['height']));
-            expect(info.bigEndian, equals(expectedInfo['bigEndian']));
-            final images = expectedInfo['images'] as List;
-            expect(info.images.length, equals(images.length));
-            for (var i = 0; i < info.images.length; ++i) {
-              final i1 = info.images[i];
-              final i2 = images[i] as Map;
-              expect(i1.width, equals(i2['width']));
-              expect(i1.height, equals(i2['height']));
-              expect(i1.photometricType, equals(i2['photometricType']));
-              expect(i1.compression, equals(i2['compression']));
-              expect(i1.bitsPerSample, equals(i2['bitsPerSample']));
-              expect(i1.samplesPerPixel, equals(i2['samplesPerPixel']));
-              expect(i1.imageType, equals(i2['imageType']));
-              expect(i1.tiled, equals(i2['tiled']));
-              expect(i1.tileWidth, equals(i2['tileWidth']));
-              expect(i1.tileHeight, equals(i2['tileHeight']));
-              expect(i1.predictor, equals(i2['predictor']));
-              if (i1.colorMap == null) {
-                expect(i2['colorMap'], isNull);
-              } else {
-                expect(i2['colorMap'], isNotNull);
-                final cm = i2['colorMap'] as List;
-                expect(i1.colorMap!, equals(cm));
+            final info = TiffDecoder().startDecode(bytes);
+            expect(info, isNotNull);
+            final expectedInfo = _expectedInfo[name];
+            if (info != null && expectedInfo != null) {
+              expect(info.width, equals(expectedInfo['width']));
+              expect(info.height, equals(expectedInfo['height']));
+              expect(info.bigEndian, equals(expectedInfo['bigEndian']));
+              final images = expectedInfo['images'] as List;
+              expect(info.images.length, equals(images.length));
+              for (var i = 0; i < info.images.length; ++i) {
+                final i1 = info.images[i];
+                final i2 = images[i] as Map;
+                expect(i1.width, equals(i2['width']));
+                expect(i1.height, equals(i2['height']));
+                expect(i1.photometricType, equals(i2['photometricType']));
+                expect(i1.compression, equals(i2['compression']));
+                expect(i1.bitsPerSample, equals(i2['bitsPerSample']));
+                expect(i1.samplesPerPixel, equals(i2['samplesPerPixel']));
+                expect(i1.imageType, equals(i2['imageType']));
+                expect(i1.tiled, equals(i2['tiled']));
+                expect(i1.tileWidth, equals(i2['tileWidth']));
+                expect(i1.tileHeight, equals(i2['tileHeight']));
+                expect(i1.predictor, equals(i2['predictor']));
+                if (i1.colorMap == null) {
+                  expect(i2['colorMap'], isNull);
+                } else {
+                  expect(i2['colorMap'], isNotNull);
+                  final cm = i2['colorMap'] as List;
+                  expect(i1.colorMap!, equals(cm));
+                }
               }
             }
-          }
-        });
-      }
-    });
-
-    group('decode', () {
-      for (var f in files.whereType<File>()) {
-        if (!f.path.endsWith('.tif')) {
-          continue;
+          });
         }
+      });
 
-        final name = f.uri.pathSegments.last;
-        test(name, () {
-          final bytes = f.readAsBytesSync();
-          final image = decodeTiff(bytes);
-          expect(image, isNotNull);
+      group('decode', () {
+        for (var f in files.whereType<File>()) {
+          if (!f.path.endsWith('.tif')) {
+            continue;
+          }
 
-          final i0 = image!;
-          final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
+          final name = f.uri.pathSegments.last;
+          test(name, () {
+            final bytes = f.readAsBytesSync();
+            final image = decodeTiff(bytes);
+            expect(image, isNotNull);
 
-          File('$testOutputPath/tif/$name.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(encodePng(i1));
+            final i0 = image!;
+            final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
 
-          final tif = encodeTiff(image);
-          File('$testOutputPath/tif/$name.tif')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(tif);
+            File('$testOutputPath/tif/$name.png')
+              ..createSync(recursive: true)
+              ..writeAsBytesSync(encodePng(i1));
 
-          final i2 = decodeTiff(tif)!;
-          expect(i2.width, equals(image.width));
-          expect(i2.height, equals(image.height));
+            final tif = encodeTiff(image);
+            File('$testOutputPath/tif/$name.tif')
+              ..createSync(recursive: true)
+              ..writeAsBytesSync(tif);
 
-          final i3 = i2.isHdrFormat ? i2.convert(format: Format.uint8) : i2;
-          File('$testOutputPath/tif/$name-2.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(encodePng(i3));
-        });
-      }
+            final i2 = decodeTiff(tif)!;
+            expect(i2.width, equals(image.width));
+            expect(i2.height, equals(image.height));
+
+            final i3 = i2.isHdrFormat ? i2.convert(format: Format.uint8) : i2;
+            File('$testOutputPath/tif/$name-2.png')
+              ..createSync(recursive: true)
+              ..writeAsBytesSync(encodePng(i3));
+          });
+        }
+      });
     });
   });
 }
