@@ -1,4 +1,5 @@
-import '../draw/draw_image.dart';
+import '../draw/blend_mode.dart';
+import '../draw/composite_image.dart';
 import '../image/image.dart';
 
 class Trim {
@@ -127,12 +128,12 @@ Image trim(Image src,
       Image.fromResized(frame, width: crop[2], height: crop[3]);
     firstFrame ??= dst;
 
-    drawImage(dst, src,
+    compositeImage(dst, src,
         srcX: crop[0],
         srcY: crop[1],
         srcW: crop[2],
         srcH: crop[3],
-        blend: false);
+        blend: BlendMode.direct);
   }
 
   return firstFrame!;

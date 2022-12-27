@@ -1,8 +1,9 @@
 import '../image/image.dart';
 import '../image/pixel.dart';
+import 'blend_mode.dart';
 import 'draw_pixel.dart';
 
-/// Draw the image [src] onto the image [dst].
+/// Composite the image [src] onto the image [dst].
 ///
 /// In other words, drawImage will take an rectangular area from src of
 /// width [srcW] and height [srcH] at position ([srcX],[srcY]) and place it
@@ -16,7 +17,7 @@ import 'draw_pixel.dart';
 /// but if the regions overlap the results will be unpredictable.
 ///
 /// if [center] is true, the [src] will be centered in [dst].
-Image drawImage(Image dst, Image src, {
+Image compositeImage(Image dst, Image src, {
     int? dstX,
     int? dstY,
     int? dstW,
@@ -25,7 +26,7 @@ Image drawImage(Image dst, Image src, {
     int? srcY,
     int? srcW,
     int? srcH,
-    bool blend = true,
+    BlendMode blend = BlendMode.alpha,
     bool center = false }) {
   dstX ??= 0;
   dstY ??= 0;
@@ -54,22 +55,34 @@ Image drawImage(Image dst, Image src, {
   final xCache = List<int>.generate(dstW, (x) => srcX! + (x * dx).toInt(),
       growable: false);
 
-  Pixel? p;
-  if (blend) {
-    for (var y = 0; y < dstH; ++y) {
-      for (var x = 0; x < dstW; ++x) {
-        p = src.getPixel(xCache[x], yCache[y], p);
-        drawPixel(dst, dstX + x, dstY + y, p);
-      }
-    }
+  if (blend == BlendMode.direct) {
+    _directComposite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache);
   } else {
-    for (var y = 0; y < dstH; ++y) {
-      for (var x = 0; x < dstW; ++x) {
-        p = src.getPixel(xCache[x], yCache[y], p);
-        dst.setPixel(dstX + x, dstY + y, p);
-      }
-    }
+    _composite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache, blend);
   }
 
   return dst;
+}
+
+void _directComposite(Image src, Image dst, int dstX, int dstY,
+    int dstW, int dstH, List<int> xCache, List<int> yCache) {
+  Pixel? p;
+  for (var y = 0; y < dstH; ++y) {
+    for (var x = 0; x < dstW; ++x) {
+      p = src.getPixel(xCache[x], yCache[y], p);
+      dst.setPixel(dstX + x, dstY + y, p);
+    }
+  }
+}
+
+void _composite(Image src, Image dst, int dstX, int dstY,
+    int dstW, int dstH, List<int> xCache, List<int> yCache,
+    BlendMode blend) {
+  Pixel? p;
+  for (var y = 0; y < dstH; ++y) {
+    for (var x = 0; x < dstW; ++x) {
+      p = src.getPixel(xCache[x], yCache[y], p);
+      drawPixel(dst, dstX + x, dstY + y, p, blend: blend);
+    }
+  }
 }

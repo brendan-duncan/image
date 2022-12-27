@@ -14,7 +14,7 @@ void main() {
 
       final i1 = Image(width: 256, height: 256)
       ..clear(ColorRgb8(255, 255, 255));
-      drawImage(i1, id);
+      compositeImage(i1, id);
 
       File('$testOutputPath/filter/dropShadow.png')
         ..createSync(recursive: true)

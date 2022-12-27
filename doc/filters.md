@@ -294,6 +294,8 @@ Returns a new Image.
 
 ![drawString](images/draw/draw_string.png)
 
-* **[drawImage](https://brendan-duncan.github.io/image/doc/api/image/drawImage.html)**
+* Image **[compositeImage](https://brendan-duncan.github.io/image/doc/api/image/compositeImage.html)**
+(Image dst, Image src, { int? dstX, int? dstY, int? dstW, int? dstH,
+int? srcX, int? srcY, int? srcW, int? srcH, BlendMode blend = BlendMode.alpha, bool center = false })
 
-![drawImage](images/draw/draw_image.png)
+![drawImage](images/draw/compositeImage.png)

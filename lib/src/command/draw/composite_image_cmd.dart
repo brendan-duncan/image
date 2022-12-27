@@ -1,7 +1,8 @@
-import '../../draw/draw_image.dart';
+import '../../draw/blend_mode.dart';
+import '../../draw/composite_image.dart';
 import '../command.dart';
 
-class DrawImageCmd extends Command {
+class CompositeImageCmd extends Command {
   Command? src;
   int? dstX;
   int? dstY;
@@ -11,12 +12,12 @@ class DrawImageCmd extends Command {
   int? srcY;
   int? srcW;
   int? srcH;
-  bool blend;
+  BlendMode blend;
   bool center;
 
-  DrawImageCmd(Command? dst, this.src, {
+  CompositeImageCmd(Command? dst, this.src, {
       this.dstX, this.dstY, this.dstW, this.dstH, this.srcX, this.srcY,
-      this.srcW, this.srcH, this.blend = true, this.center = false })
+      this.srcW, this.srcH, this.blend = BlendMode.alpha, this.center = false })
       : super(dst);
 
   @override
@@ -24,7 +25,7 @@ class DrawImageCmd extends Command {
     final dst = await input?.getImage();
     final srcImg = await src?.getImage();
     outputImage = dst != null && srcImg != null ?
-      drawImage(dst, srcImg, dstX: dstX, dstY: dstY,
+      compositeImage(dst, srcImg, dstX: dstX, dstY: dstY,
           dstW: dstW, dstH: dstH, srcX: srcX, srcY: srcY, srcW: srcW,
           srcH: srcH, blend: blend, center: center) : null;
   }

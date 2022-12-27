@@ -1,7 +1,7 @@
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../color/color_uint8.dart';
-import '../draw/draw_image.dart';
+import '../draw/composite_image.dart';
 import '../image/image.dart';
 import 'gaussian_blur.dart';
 import 'remap_colors.dart';
@@ -50,7 +50,7 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
       numChannels: 4)
   ..clear(ColorRgba8(255, 255, 255, 0));
 
-  drawImage(dst, src, dstX: shadowOffsetX, dstY: shadowOffsetY);
+  compositeImage(dst, src, dstX: shadowOffsetX, dstY: shadowOffsetY);
 
   remapColors(dst,
       red: Channel.alpha, green: Channel.alpha, blue: Channel.alpha);
@@ -59,7 +59,7 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
 
   gaussianBlur(dst, blur);
 
-  drawImage(dst, src, dstX: imageOffsetX, dstY: imageOffsetY);
+  compositeImage(dst, src, dstX: imageOffsetX, dstY: imageOffsetY);
 
   return dst;
 }

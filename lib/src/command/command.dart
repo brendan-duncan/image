@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../color/format.dart';
+import '../draw/blend_mode.dart';
 import '../exif/exif_data.dart';
 import '../filter/dither_image.dart';
 import '../filter/noise.dart';
@@ -21,9 +22,9 @@ import '../util/internal.dart';
 import '../util/interpolation.dart';
 import '../util/point.dart';
 import '../util/quantizer.dart';
+import 'draw/composite_image_cmd.dart';
 import 'draw/draw_char_cmd.dart';
 import 'draw/draw_circle_cmd.dart';
-import 'draw/draw_image_cmd.dart';
 import 'draw/draw_line_cmd.dart';
 import 'draw/draw_pixel_cmd.dart';
 import 'draw/draw_rect_cmd.dart';
@@ -363,10 +364,10 @@ class Command {
     subCommand = DrawCircleCmd(subCommand, x, y, radius, color);
   }
 
-  void drawImage(Command? src, { int? dstX, int? dstY, int? dstW, int? dstH,
-      int? srcX, int? srcY, int? srcW, int? srcH, bool blend = true,
-      bool center = false }) {
-    subCommand = DrawImageCmd(subCommand, src, dstX: dstX, dstY: dstY,
+  void compositeImage(Command? src, { int? dstX, int? dstY, int? dstW,
+      int? dstH, int? srcX, int? srcY, int? srcW, int? srcH,
+      BlendMode blend = BlendMode.alpha, bool center = false }) {
+    subCommand = CompositeImageCmd(subCommand, src, dstX: dstX, dstY: dstY,
         dstW: dstW, dstH: dstH, srcX: srcX, srcY: srcY, srcW: srcW, srcH: srcH,
         blend: blend, center: center);
   }

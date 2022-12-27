@@ -5,7 +5,7 @@ import '../../_test_util.dart';
 
 void main() {
   group('Command', () {
-    test('drawImage', () {
+    test('compositeImage', () {
       final fg = Command()
         ..decodeTgaFile('test/_data/tga/globe.tga')
         ..convert(numChannels: 4)
@@ -20,8 +20,8 @@ void main() {
 
       Command()
         ..decodePngFile('test/_data/png/buck_24.png')
-        ..drawImage(fg, dstX: 50, dstY: 50)
-        ..writeToFile('$testOutputPath/cmd/draw_image.png')
+        ..compositeImage(fg, dstX: 50, dstY: 50)
+        ..writeToFile('$testOutputPath/cmd/compositeImage.png')
         ..execute();
     });
   });

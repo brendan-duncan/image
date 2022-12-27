@@ -5,7 +5,8 @@ import 'package:archive/archive.dart';
 
 import '../color/color_uint8.dart';
 import '../color/format.dart';
-import '../draw/draw_image.dart';
+import '../draw/blend_mode.dart';
+import '../draw/composite_image.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/palette_uint8.dart';
@@ -488,10 +489,11 @@ class PngDecoder extends Decoder {
       // Convert to MS
       lastImage.frameDuration = (frame.delay * 1000).toInt();
 
-      drawImage(lastImage, image,
+      compositeImage(lastImage, image,
           dstX: frame.xOffset,
           dstY: frame.yOffset,
-          blend: frame.blend == PngBlendMode.over);
+          blend: frame.blend == PngBlendMode.over ? BlendMode.alpha
+              : BlendMode.direct);
 
       firstImage.addFrame(lastImage);
     }
