@@ -3,7 +3,7 @@ import '../image/image.dart';
 
 /// Draw a single pixel into the image, applying alpha and opacity blending.
 /// If [filter] is provided, the color c will be scaled by the [filter]
-/// color. If [overrideAlpha] is provided, it will be used in place of the
+/// color. If [alpha] is provided, it will be used in place of the
 /// color alpha, as a normalized color value \[0, 1\].
 Image drawPixel(Image image, int x, int y, Color c, { Color? filter,
     num? alpha }) {
