@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -6,27 +7,16 @@ import 'package:test/test.dart';
 import '../_test_util.dart';
 
 void main() {
+  final r = Random();
   group('Draw', () {
     test('drawPixel.uint8', () {
       final i0 = Image(width: 256, height: 256);
-      for (int y = 0; y < 256; ++y) {
-        for (int x = 0; x < 256; ++x) {
-          drawPixel(i0, x, y, ColorRgba8(x, y));
-        }
+      for (var i = 0; i < 10000; ++i) {
+        final x = r.nextInt(i0.width - 1);
+        final y = r.nextInt(i0.height - 1);
+        drawPixel(i0, x, y, ColorRgb8(x, y));
       }
-
-      File('$testOutputPath/draw/draw_pixel.png')
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(encodePng(i0));
-
-      // Overlay blue pixels at half transparency
-      for (int y = 0; y < 256; ++y) {
-        for (int x = 0; x < 256; ++x) {
-          drawPixel(i0, x, y, ColorRgba8(0, 0, 255, 128));
-        }
-      }
-
-      File('$testOutputPath/draw/draw_pixel_1.png')
+      File('$testOutputPath/draw/drawPixel.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });

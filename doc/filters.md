@@ -282,9 +282,11 @@ Returns a new Image.
 
 ![drawLine](images/draw/draw_line.png)
 
-* **[drawPixel](https://brendan-duncan.github.io/image/doc/api/image/drawPixel.html)**
+* Image **[drawPixel](https://brendan-duncan.github.io/image/doc/api/image/drawPixel.html)**
+(Image image, int x, int y, Color c, { Color? filter,
+  num? alpha, BlendMode blend = BlendMode.alpha })
 
-![drawPixel](images/draw/draw_pixel.png)
+![drawPixel](images/draw/drawPixel.png)
 
 * **[drawRect](https://brendan-duncan.github.io/image/doc/api/image/drawRect.html)**
 
