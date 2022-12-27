@@ -6,7 +6,7 @@ import 'ico_test.dart';
 import 'jpeg_test.dart';
 import 'png_test.dart';
 import 'psd_test.dart';
-import 'pvrtc_test.dart';
+import 'pvr_test.dart';
 import 'tga_test.dart';
 import 'tiff_test.dart';
 import 'webp_test.dart';
@@ -23,5 +23,5 @@ void formatTests() {
   tiffTest();
   psdTest();
   exrTest();
-  pvrtcTest();
+  pvrTest();
 }

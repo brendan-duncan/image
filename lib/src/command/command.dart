@@ -81,6 +81,7 @@ import 'formats/ico_cmd.dart';
 import 'formats/jpg_cmd.dart';
 import 'formats/png_cmd.dart';
 import 'formats/psd_cmd.dart';
+import 'formats/pvr_cmd.dart';
 import 'formats/tga_cmd.dart';
 import 'formats/tiff_cmd.dart';
 import 'formats/webp_cmd.dart';
@@ -121,18 +122,18 @@ class Command {
 
   /// Use a specific Image.
   void image(Image image) {
-    subCommand = ImageCmd(image);
+    subCommand = ImageCmd(subCommand, image);
   }
 
   /// Create an Image.
-  void createImage(int width, int height,
-      { Format format = Format.uint8, int numChannels = 3,
+  void createImage({ required int width, required int height,
+        Format format = Format.uint8, int numChannels = 3,
         bool withPalette = false,
         Format paletteFormat = Format.uint8,
         Palette? palette, ExifData? exif,
         IccProfile? iccp, Map<String, String>? textData }) {
-    subCommand = CreateImageCmd(width, height, format: format,
-        numChannels: numChannels, withPalette: withPalette,
+    subCommand = CreateImageCmd(subCommand, width: width, height: height,
+        format: format, numChannels: numChannels, withPalette: withPalette,
         paletteFormat: paletteFormat, palette: palette, exif: exif,
         iccp: iccp, textData: textData);
   }
@@ -152,15 +153,15 @@ class Command {
 
   // formats
   void decodeImage(Uint8List data) {
-    subCommand = DecodeImageCmd(data);
+    subCommand = DecodeImageCmd(subCommand, data);
   }
 
   void decodeNamedImage(String path, Uint8List data) {
-    subCommand = DecodeNamedImageCmd(path, data);
+    subCommand = DecodeNamedImageCmd(subCommand, path, data);
   }
 
   void decodeImageFile(String path) {
-    subCommand = DecodeImageFileCmd(path);
+    subCommand = DecodeImageFileCmd(subCommand, path);
   }
 
   void writeToFile(String path) {
@@ -169,11 +170,11 @@ class Command {
 
   // Bmp
   void decodeBmp(Uint8List data) {
-    subCommand = DecodeBmpCmd(data);
+    subCommand = DecodeBmpCmd(subCommand, data);
   }
 
   void decodeBmpFile(String path) {
-    subCommand = DecodeBmpFileCmd(path);
+    subCommand = DecodeBmpFileCmd(subCommand, path);
   }
 
   void encodeBmp() {
@@ -195,20 +196,20 @@ class Command {
 
   // Exr
   void decodeExr(Uint8List data) {
-    subCommand = DecodeExrCmd(data);
+    subCommand = DecodeExrCmd(subCommand, data);
   }
 
   void decodeExrFile(String path) {
-    subCommand = DecodeExrFileCmd(path);
+    subCommand = DecodeExrFileCmd(subCommand, path);
   }
 
   // Gif
   void decodeGif(Uint8List data) {
-    subCommand = DecodeGifCmd(data);
+    subCommand = DecodeGifCmd(subCommand, data);
   }
 
   void decodeGifFile(String path) {
-    subCommand = DecodeGifFileCmd(path);
+    subCommand = DecodeGifFileCmd(subCommand, path);
   }
 
   void encodeGif({ int samplingFactor = 10,
@@ -228,11 +229,11 @@ class Command {
 
   // Ico
   void decodeIco(Uint8List data) {
-    subCommand = DecodeIcoCmd(data);
+    subCommand = DecodeIcoCmd(subCommand, data);
   }
 
   void decodeIcoFile(String path) {
-    subCommand = DecodeIcoFileCmd(path);
+    subCommand = DecodeIcoFileCmd(subCommand, path);
   }
 
   void encodeIco() {
@@ -245,11 +246,11 @@ class Command {
 
   // Jpeg
   void decodeJpg(Uint8List data) {
-    subCommand = DecodeJpgCmd(data);
+    subCommand = DecodeJpgCmd(subCommand, data);
   }
 
   void decodeJpgFile(String path) {
-    subCommand = DecodeJpgFileCmd(path);
+    subCommand = DecodeJpgFileCmd(subCommand, path);
   }
 
   void encodeJpg({ int quality = 100 }) {
@@ -262,11 +263,11 @@ class Command {
 
   // Png
   void decodePng(Uint8List data) {
-    subCommand = DecodePngCmd(data);
+    subCommand = DecodePngCmd(subCommand, data);
   }
 
   void decodePngFile(String path) {
-    subCommand = DecodePngFileCmd(path);
+    subCommand = DecodePngFileCmd(subCommand, path);
   }
 
   void encodePng({ int level = 6, PngFilter filter = PngFilter.paeth }) {
@@ -281,20 +282,37 @@ class Command {
 
   // Psd
   void decodePsd(Uint8List data) {
-    subCommand = DecodePsdCmd(data);
+    subCommand = DecodePsdCmd(subCommand, data);
   }
 
   void decodePsdFile(String path) {
-    subCommand = DecodePsdFileCmd(path);
+    subCommand = DecodePsdFileCmd(subCommand, path);
+  }
+
+  // Pvr
+  void decodePvr(Uint8List data) {
+    subCommand = DecodePvrCmd(subCommand, data);
+  }
+
+  void decodePvrFile(String path) {
+    subCommand = DecodePvrFileCmd(subCommand, path);
+  }
+
+  void encodePvr() {
+    subCommand = EncodePvrCmd(subCommand);
+  }
+
+  void encodePvrFile(String path) {
+    subCommand = EncodePvrFileCmd(subCommand, path);
   }
 
   // Tga
   void decodeTga(Uint8List data) {
-    subCommand = DecodeTgaCmd(data);
+    subCommand = DecodeTgaCmd(subCommand, data);
   }
 
   void decodeTgaFile(String path) {
-    subCommand = DecodeTgaFileCmd(path);
+    subCommand = DecodeTgaFileCmd(subCommand, path);
   }
 
   void encodeTga() {
@@ -302,16 +320,16 @@ class Command {
   }
 
   void encodeTgaFile(String path) {
-    subCommand = EncodeBmpFileCmd(subCommand, path);
+    subCommand = EncodeTgaFileCmd(subCommand, path);
   }
 
   // Tiff
   void decodeTiff(Uint8List data) {
-    subCommand = DecodeTiffCmd(data);
+    subCommand = DecodeTiffCmd(subCommand, data);
   }
 
   void decodeTiffFile(String path) {
-    subCommand = DecodeTiffFileCmd(path);
+    subCommand = DecodeTiffFileCmd(subCommand, path);
   }
 
   void encodeTiff() {
@@ -324,11 +342,11 @@ class Command {
 
   // WebP
   void decodeWebP(Uint8List data) {
-    subCommand = DecodeWebPCmd(data);
+    subCommand = DecodeWebPCmd(subCommand, data);
   }
 
   void decodeWebPFile(String path) {
-    subCommand = DecodeWebPFileCmd(path);
+    subCommand = DecodeWebPFileCmd(subCommand, path);
   }
 
 

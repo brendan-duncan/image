@@ -7,10 +7,12 @@ import '../command.dart';
 class DecodeIcoCmd extends Command {
   Uint8List data;
 
-  DecodeIcoCmd(this.data);
+  DecodeIcoCmd(Command? input, this.data)
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = decodeIco(data);
   }
 }
@@ -19,10 +21,12 @@ class DecodeIcoCmd extends Command {
 class DecodeIcoFileCmd extends Command {
   String path;
 
-  DecodeIcoFileCmd(this.path);
+  DecodeIcoFileCmd(Command? input, this.path)
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = await decodeIcoFile(path);
   }
 }

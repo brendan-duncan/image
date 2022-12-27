@@ -1,14 +1,15 @@
 import 'dart:typed_data';
 
-import '../../image/image.dart';
-import '../../util/image_exception.dart';
-import '../../util/output_buffer.dart';
-import 'pvrtc_bit_utility.dart';
-import 'pvrtc_color.dart';
-import 'pvrtc_color_bounding_box.dart';
-import 'pvrtc_packet.dart';
+import '../image/image.dart';
+import '../util/image_exception.dart';
+import '../util/output_buffer.dart';
+import 'encoder.dart';
+import 'pvr/pvr_bit_utility.dart';
+import 'pvr/pvr_color.dart';
+import 'pvr/pvr_color_bounding_box.dart';
+import 'pvr/pvr_packet.dart';
 
-enum PvrtcFormat {
+enum PvrFormat {
   auto,
   rgb2,
   rgba2,
@@ -18,34 +19,40 @@ enum PvrtcFormat {
 
 // Ported from Jeffrey Lim's PVRTC encoder/decoder,
 // https://bitbucket.org/jthlim/pvrtccompressor
-class PvrtcEncoder {
-  Uint8List encodePvr(Image bitmap, { PvrtcFormat format = PvrtcFormat.auto }) {
+class PvrEncoder extends Encoder {
+  final PvrFormat format;
+
+  PvrEncoder({ this.format = PvrFormat.auto });
+
+  Uint8List encode(Image image, { bool singleFrame = false } ) {
     final output = OutputBuffer();
+
+    var format = this.format;
 
     Uint8List pvrtc;
     switch (format) {
-      case PvrtcFormat.auto:
-        if (bitmap.numChannels == 3) {
-          pvrtc = encodeRgb4bpp(bitmap);
-          format = PvrtcFormat.rgb4;
+      case PvrFormat.auto:
+        if (image.numChannels == 3) {
+          pvrtc = encodeRgb4bpp(image);
+          format = PvrFormat.rgb4;
         } else {
-          pvrtc = encodeRgba4bpp(bitmap);
-          format = PvrtcFormat.rgba4;
+          pvrtc = encodeRgba4bpp(image);
+          format = PvrFormat.rgba4;
         }
         break;
-      case PvrtcFormat.rgb2:
+      case PvrFormat.rgb2:
         //pvrtc = encodeRgb2bpp(bitmap);
-        pvrtc = encodeRgb4bpp(bitmap);
+        pvrtc = encodeRgb4bpp(image);
         break;
-      case PvrtcFormat.rgba2:
+      case PvrFormat.rgba2:
         //pvrtc = encodeRgba2bpp(bitmap);
-        pvrtc = encodeRgba4bpp(bitmap);
+        pvrtc = encodeRgba4bpp(image);
         break;
-      case PvrtcFormat.rgb4:
-        pvrtc = encodeRgb4bpp(bitmap);
+      case PvrFormat.rgb4:
+        pvrtc = encodeRgb4bpp(image);
         break;
-      case PvrtcFormat.rgba4:
-        pvrtc = encodeRgba4bpp(bitmap);
+      case PvrFormat.rgba4:
+        pvrtc = encodeRgba4bpp(image);
         break;
     }
 
@@ -55,8 +62,8 @@ class PvrtcEncoder {
     const channelOrder = 0;
     const colorSpace = 0;
     const channelType = 0;
-    final height = bitmap.height;
-    final width = bitmap.width;
+    final height = image.height;
+    final width = image.width;
     const depth = 1;
     const numSurfaces = 1;
     const numFaces = 1;
@@ -86,7 +93,7 @@ class PvrtcEncoder {
       throw ImageException('PVRTC requires a square image.');
     }
 
-    if (!BitUtility.isPowerOf2(bitmap.width)) {
+    if (!PvrBitUtility.isPowerOf2(bitmap.width)) {
       throw ImageException('PVRTC requires a power-of-two sized image.');
     }
 
@@ -96,23 +103,23 @@ class PvrtcEncoder {
 
     // Allocate enough data for encoding the image.
     final outputData = Uint8List((bitmap.width * bitmap.height) ~/ 2);
-    final packet = PvrtcPacket(outputData);
-    final p0 = PvrtcPacket(outputData);
-    final p1 = PvrtcPacket(outputData);
-    final p2 = PvrtcPacket(outputData);
-    final p3 = PvrtcPacket(outputData);
+    final packet = PvrPacket(outputData);
+    final p0 = PvrPacket(outputData);
+    final p1 = PvrPacket(outputData);
+    final p2 = PvrPacket(outputData);
+    final p3 = PvrPacket(outputData);
 
     for (var y = 0; y < blocks; ++y) {
       for (var x = 0; x < blocks; ++x) {
         final cbb = _calculateBoundingBoxRgb(bitmap, x, y);
         packet..setBlock(x, y)
         ..usePunchthroughAlpha = false
-        ..setColorRgbA(cbb.min as PvrtcColorRgb)
-        ..setColorRgbB(cbb.max as PvrtcColorRgb);
+        ..setColorRgbA(cbb.min as PvrColorRgb)
+        ..setColorRgbB(cbb.max as PvrColorRgb);
       }
     }
 
-    const factors = PvrtcPacket.bilinearFactors;
+    const factors = PvrPacket.bilinearFactors;
 
     for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
       for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
@@ -151,7 +158,7 @@ class PvrtcEncoder {
             final b = _p.b.toInt();
 
             final d = cb - ca;
-            final p = PvrtcColorRgb(r * 16, g * 16, b * 16);
+            final p = PvrColorRgb(r * 16, g * 16, b * 16);
             final v = p - ca;
 
             // PVRTC uses weightings of 0, 3/8, 5/8 and 1
@@ -168,7 +175,7 @@ class PvrtcEncoder {
               modulationData++;
             }
 
-            modulationData = BitUtility.rotateRight(modulationData, 2);
+            modulationData = PvrBitUtility.rotateRight(modulationData, 2);
 
             factorIndex++;
           }
@@ -187,7 +194,7 @@ class PvrtcEncoder {
       throw ImageException('PVRTC requires a square image.');
     }
 
-    if (!BitUtility.isPowerOf2(bitmap.width)) {
+    if (!PvrBitUtility.isPowerOf2(bitmap.width)) {
       throw ImageException('PVRTC requires a power-of-two sized image.');
     }
 
@@ -197,23 +204,23 @@ class PvrtcEncoder {
 
     // Allocate enough data for encoding the image.
     final outputData = Uint8List((bitmap.width * bitmap.height) ~/ 2);
-    final packet = PvrtcPacket(outputData);
-    final p0 = PvrtcPacket(outputData);
-    final p1 = PvrtcPacket(outputData);
-    final p2 = PvrtcPacket(outputData);
-    final p3 = PvrtcPacket(outputData);
+    final packet = PvrPacket(outputData);
+    final p0 = PvrPacket(outputData);
+    final p1 = PvrPacket(outputData);
+    final p2 = PvrPacket(outputData);
+    final p3 = PvrPacket(outputData);
 
     for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
       for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
         final cbb = _calculateBoundingBoxRgba(bitmap, x4, y4);
         packet..setBlock(x, y)
         ..usePunchthroughAlpha = false
-        ..setColorRgbaA(cbb.min as PvrtcColorRgba)
-        ..setColorRgbaB(cbb.max as PvrtcColorRgba);
+        ..setColorRgbaA(cbb.min as PvrColorRgba)
+        ..setColorRgbaB(cbb.max as PvrColorRgba);
       }
     }
 
-    const factors = PvrtcPacket.bilinearFactors;
+    const factors = PvrPacket.bilinearFactors;
 
     for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
       for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
@@ -253,7 +260,7 @@ class PvrtcEncoder {
             final a = bp.a as int;
 
             final d = cb - ca;
-            final p = PvrtcColorRgba(r * 16, g * 16, b * 16, a * 16);
+            final p = PvrColorRgba(r * 16, g * 16, b * 16, a * 16);
             final v = p - ca;
 
             // PVRTC uses weightings of 0, 3/8, 5/8 and 1
@@ -271,7 +278,7 @@ class PvrtcEncoder {
               modulationData++;
             }
 
-            modulationData = BitUtility.rotateRight(modulationData, 2);
+            modulationData = PvrBitUtility.rotateRight(modulationData, 2);
 
             factorIndex++;
           }
@@ -285,15 +292,15 @@ class PvrtcEncoder {
     return outputData;
   }
 
-  static PvrtcColorBoundingBox _calculateBoundingBoxRgb(Image bitmap,
+  static PvrColorBoundingBox _calculateBoundingBoxRgb(Image bitmap,
       int blockX, int blockY) {
 
-    PvrtcColorRgb _pixel(int x, int y) {
+    PvrColorRgb _pixel(int x, int y) {
       final p = bitmap.getPixel(blockX + x, blockY + y);
-      return PvrtcColorRgb(p.r as int, p.g as int, p.b as int);
+      return PvrColorRgb(p.r as int, p.g as int, p.b as int);
     }
 
-    final cbb = PvrtcColorBoundingBox(_pixel(0,0), _pixel(0,0))
+    final cbb = PvrColorBoundingBox(_pixel(0,0), _pixel(0,0))
     ..add(_pixel(1, 0))
     ..add(_pixel(2, 0))
     ..add(_pixel(3, 0))
@@ -316,15 +323,15 @@ class PvrtcEncoder {
     return cbb;
   }
 
-  static PvrtcColorBoundingBox _calculateBoundingBoxRgba(Image bitmap,
+  static PvrColorBoundingBox _calculateBoundingBoxRgba(Image bitmap,
       int blockX, int blockY) {
 
-    PvrtcColorRgba _pixel(int x, int y) {
+    PvrColorRgba _pixel(int x, int y) {
       final p = bitmap.getPixel(blockX + x, blockY + y);
-      return PvrtcColorRgba(p.r as int, p.g as int, p.b as int, p.a as int);
+      return PvrColorRgba(p.r as int, p.g as int, p.b as int, p.a as int);
     }
 
-    final cbb = PvrtcColorBoundingBox(_pixel(0,0), _pixel(0,0))
+    final cbb = PvrColorBoundingBox(_pixel(0,0), _pixel(0,0))
     ..add(_pixel(1, 0))
     ..add(_pixel(2, 0))
     ..add(_pixel(3, 0))

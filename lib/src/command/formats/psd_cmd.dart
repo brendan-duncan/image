@@ -7,10 +7,12 @@ import '../command.dart';
 class DecodePsdCmd extends Command {
   Uint8List data;
 
-  DecodePsdCmd(this.data);
+  DecodePsdCmd(Command? input, this.data)
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = decodePsd(data);
   }
 }
@@ -19,10 +21,12 @@ class DecodePsdCmd extends Command {
 class DecodePsdFileCmd extends Command {
   String path;
 
-  DecodePsdFileCmd(this.path);
+  DecodePsdFileCmd(Command? input, this.path)
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = await decodePsdFile(path);
   }
 }

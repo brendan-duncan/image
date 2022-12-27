@@ -40,9 +40,9 @@ class PngInfo implements DecodeInfo {
   List<int>? transparency;
   double? gamma;
   Color? backgroundColor;
-  String iCCPName = '';
-  int iCCPCompression = 0;
-  Uint8List? iCCPData;
+  String iccpName = '';
+  int iccpCompression = 0;
+  Uint8List? iccpData;
   Map<String, String> textData = {};
 
   // APNG extensions

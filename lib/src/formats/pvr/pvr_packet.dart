@@ -1,21 +1,21 @@
 import 'dart:typed_data';
 
-import 'pvrtc_bit_utility.dart';
-import 'pvrtc_color.dart';
+import 'pvr_bit_utility.dart';
+import 'pvr_color.dart';
 
 // Ported from Jeffrey Lim's PVRTC encoder/decoder,
 // https://bitbucket.org/jthlim/pvrtccompressor
-class PvrtcPacket {
+class PvrPacket {
   Uint32List rawData;
   int index = 0;
 
-  PvrtcPacket(TypedData data)
+  PvrPacket(TypedData data)
       : rawData = Uint32List.view(data.buffer);
 
   void setBlock(int x, int y) => setIndex(_getMortonNumber(x, y));
 
   void setIndex(int i) {
-    // A PvrtcPacket uses 2 uint32 values, so get the physical index
+    // A PvrPacket uses 2 uint32 values, so get the physical index
     // from the logical index by multiplying by 2.
     index = i << 1;
     // Pull in the values from the raw data.
@@ -65,125 +65,125 @@ class PvrtcPacket {
     colorData = _getColorData();
   }
 
-  void setColorRgbA(PvrtcColorRgb c) {
-    final r = BitUtility.bitScale8To5Floor[c.r];
-    final g = BitUtility.bitScale8To5Floor[c.g];
-    final b = BitUtility.bitScale8To4Floor[c.b];
+  void setColorRgbA(PvrColorRgb c) {
+    final r = PvrBitUtility.bitScale8To5Floor[c.r];
+    final g = PvrBitUtility.bitScale8To5Floor[c.g];
+    final b = PvrBitUtility.bitScale8To4Floor[c.b];
     colorA = r << 9 | g << 4 | b;
     colorAIsOpaque = true;
   }
 
-  void setColorRgbaA(PvrtcColorRgba c) {
-    final a = BitUtility.bitScale8To3Floor[c.a];
+  void setColorRgbaA(PvrColorRgba c) {
+    final a = PvrBitUtility.bitScale8To3Floor[c.a];
     if (a == 7) {
-      final r = BitUtility.bitScale8To5Floor[c.r];
-      final g = BitUtility.bitScale8To5Floor[c.g];
-      final b = BitUtility.bitScale8To4Floor[c.b];
+      final r = PvrBitUtility.bitScale8To5Floor[c.r];
+      final g = PvrBitUtility.bitScale8To5Floor[c.g];
+      final b = PvrBitUtility.bitScale8To4Floor[c.b];
       colorA = r << 9 | g << 4 | b;
       colorAIsOpaque = true;
     } else {
-      final r = BitUtility.bitScale8To4Floor[c.r];
-      final g = BitUtility.bitScale8To4Floor[c.g];
-      final b = BitUtility.bitScale8To3Floor[c.b];
+      final r = PvrBitUtility.bitScale8To4Floor[c.r];
+      final g = PvrBitUtility.bitScale8To4Floor[c.g];
+      final b = PvrBitUtility.bitScale8To3Floor[c.b];
       colorA = a << 11 | r << 7 | g << 3 | b;
       colorAIsOpaque = false;
     }
   }
 
-  void setColorRgbB(PvrtcColorRgb c) {
-    final r = BitUtility.bitScale8To5Ceil[c.r];
-    final g = BitUtility.bitScale8To5Ceil[c.g];
-    final b = BitUtility.bitScale8To5Ceil[c.b];
+  void setColorRgbB(PvrColorRgb c) {
+    final r = PvrBitUtility.bitScale8To5Ceil[c.r];
+    final g = PvrBitUtility.bitScale8To5Ceil[c.g];
+    final b = PvrBitUtility.bitScale8To5Ceil[c.b];
     colorB = r << 10 | g << 5 | b;
     colorBIsOpaque = false;
   }
 
-  void setColorRgbaB(PvrtcColorRgba c) {
-    final a = BitUtility.bitScale8To3Ceil[c.a];
+  void setColorRgbaB(PvrColorRgba c) {
+    final a = PvrBitUtility.bitScale8To3Ceil[c.a];
     if (a == 7) {
-      final r = BitUtility.bitScale8To5Ceil[c.r];
-      final g = BitUtility.bitScale8To5Ceil[c.g];
-      final b = BitUtility.bitScale8To5Ceil[c.b];
+      final r = PvrBitUtility.bitScale8To5Ceil[c.r];
+      final g = PvrBitUtility.bitScale8To5Ceil[c.g];
+      final b = PvrBitUtility.bitScale8To5Ceil[c.b];
       colorB = r << 10 | g << 5 | b;
       colorBIsOpaque = true;
     } else {
-      final r = BitUtility.bitScale8To4Ceil[c.r];
-      final g = BitUtility.bitScale8To4Ceil[c.g];
-      final b = BitUtility.bitScale8To4Ceil[c.b];
+      final r = PvrBitUtility.bitScale8To4Ceil[c.r];
+      final g = PvrBitUtility.bitScale8To4Ceil[c.g];
+      final b = PvrBitUtility.bitScale8To4Ceil[c.b];
       colorB = a << 12 | r << 8 | g << 4 | b;
       colorBIsOpaque = false;
     }
   }
 
-  PvrtcColorRgb getColorRgbA() {
+  PvrColorRgb getColorRgbA() {
     if (colorAIsOpaque) {
       final r = colorA >> 9;
       final g = colorA >> 4 & 0x1f;
       final b = colorA & 0xf;
-      return PvrtcColorRgb(BitUtility.bitScale5To8[r],
-          BitUtility.bitScale5To8[g], BitUtility.bitScale4To8[b]);
+      return PvrColorRgb(PvrBitUtility.bitScale5To8[r],
+          PvrBitUtility.bitScale5To8[g], PvrBitUtility.bitScale4To8[b]);
     } else {
       final r = (colorA >> 7) & 0xf;
       final g = (colorA >> 3) & 0xf;
       final b = colorA & 7;
-      return PvrtcColorRgb(BitUtility.bitScale4To8[r],
-          BitUtility.bitScale4To8[g], BitUtility.bitScale3To8[b]);
+      return PvrColorRgb(PvrBitUtility.bitScale4To8[r],
+          PvrBitUtility.bitScale4To8[g], PvrBitUtility.bitScale3To8[b]);
     }
   }
 
-  PvrtcColorRgba getColorRgbaA() {
+  PvrColorRgba getColorRgbaA() {
     if (colorAIsOpaque) {
       final r = colorA >> 9;
       final g = colorA >> 4 & 0x1f;
       final b = colorA & 0xf;
-      return PvrtcColorRgba(BitUtility.bitScale5To8[r],
-          BitUtility.bitScale5To8[g], BitUtility.bitScale4To8[b], 255);
+      return PvrColorRgba(PvrBitUtility.bitScale5To8[r],
+          PvrBitUtility.bitScale5To8[g], PvrBitUtility.bitScale4To8[b], 255);
     } else {
       final a = colorA >> 11 & 7;
       final r = (colorA >> 7) & 0xf;
       final g = (colorA >> 3) & 0xf;
       final b = colorA & 7;
-      return PvrtcColorRgba(
-          BitUtility.bitScale4To8[r],
-          BitUtility.bitScale4To8[g],
-          BitUtility.bitScale3To8[b],
-          BitUtility.bitScale3To8[a]);
+      return PvrColorRgba(
+          PvrBitUtility.bitScale4To8[r],
+          PvrBitUtility.bitScale4To8[g],
+          PvrBitUtility.bitScale3To8[b],
+          PvrBitUtility.bitScale3To8[a]);
     }
   }
 
-  PvrtcColorRgb getColorRgbB() {
+  PvrColorRgb getColorRgbB() {
     if (colorBIsOpaque) {
       final r = colorB >> 10;
       final g = colorB >> 5 & 0x1f;
       final b = colorB & 0x1f;
-      return PvrtcColorRgb(BitUtility.bitScale5To8[r],
-          BitUtility.bitScale5To8[g], BitUtility.bitScale5To8[b]);
+      return PvrColorRgb(PvrBitUtility.bitScale5To8[r],
+          PvrBitUtility.bitScale5To8[g], PvrBitUtility.bitScale5To8[b]);
     } else {
       final r = colorB >> 8 & 0xf;
       final g = colorB >> 4 & 0xf;
       final b = colorB & 0xf;
-      return PvrtcColorRgb(BitUtility.bitScale4To8[r],
-          BitUtility.bitScale4To8[g], BitUtility.bitScale4To8[b]);
+      return PvrColorRgb(PvrBitUtility.bitScale4To8[r],
+          PvrBitUtility.bitScale4To8[g], PvrBitUtility.bitScale4To8[b]);
     }
   }
 
-  PvrtcColorRgba getColorRgbaB() {
+  PvrColorRgba getColorRgbaB() {
     if (colorBIsOpaque) {
       final r = colorB >> 10;
       final g = colorB >> 5 & 0x1f;
       final b = colorB & 0x1f;
-      return PvrtcColorRgba(BitUtility.bitScale5To8[r],
-          BitUtility.bitScale5To8[g], BitUtility.bitScale5To8[b], 255);
+      return PvrColorRgba(PvrBitUtility.bitScale5To8[r],
+          PvrBitUtility.bitScale5To8[g], PvrBitUtility.bitScale5To8[b], 255);
     } else {
       final a = colorB >> 12 & 7;
       final r = colorB >> 8 & 0xf;
       final g = colorB >> 4 & 0xf;
       final b = colorB & 0xf;
-      return PvrtcColorRgba(
-          BitUtility.bitScale4To8[r],
-          BitUtility.bitScale4To8[g],
-          BitUtility.bitScale4To8[b],
-          BitUtility.bitScale3To8[a]);
+      return PvrColorRgba(
+          PvrBitUtility.bitScale4To8[r],
+          PvrBitUtility.bitScale4To8[g],
+          PvrBitUtility.bitScale4To8[b],
+          PvrBitUtility.bitScale3To8[a]);
     }
   }
 

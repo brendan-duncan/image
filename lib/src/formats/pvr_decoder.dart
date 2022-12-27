@@ -1,68 +1,145 @@
 import 'dart:typed_data';
 
-import '../../image/image.dart';
-import '../../util/input_buffer.dart';
-import 'pvrtc_packet.dart';
+import '../image/image.dart';
+import '../util/input_buffer.dart';
+import 'decode_info.dart';
+import 'decoder.dart';
+import 'pvr/pvr_info.dart';
+import 'pvr/pvr_packet.dart';
 
 // Ported from Jeffrey Lim's PVRTC encoder/decoder,
 // https://bitbucket.org/jthlim/pvrtccompressor
-class PvrtcDecoder {
-  Image? decodePvr(Uint8List data) {
+class PvrDecoder extends Decoder {
+  Uint8List? _data;
+  DecodeInfo? _info;
+
+  @override
+  bool isValidFile(Uint8List bytes) => startDecode(bytes) != null;
+
+  @override
+  DecodeInfo? startDecode(Uint8List bytes) {
     // Use a heuristic to detect potential apple PVRTC formats
-    if (_countBits(data.length) == 1) {
+    if (_countBits(bytes.length) == 1) {
       // very likely to be apple PVRTC
-      final image = decodeApplePVRTC(data);
-      if (image != null) {
-        return image;
+      final info = _decodeApplePvrtcHeader(bytes);
+      if (info != null) {
+        _data = bytes;
+        return _info = info;
       }
     }
 
-    final input = InputBuffer(data);
-    final magic = input.readUint32();
-    if (magic == 0x03525650) {
-      return decodePVR3(data);
+    var info = _decodePvr3Header(bytes);
+    if (info != null) {
+      _data = bytes;
+      return _info = info;
     }
 
-    return decodePVR2(data);
+    info = _decodePvr2Header(bytes);
+    if (info != null) {
+      _data = bytes;
+      return _info = info;
+    }
+
+    return null;
   }
 
-  Image? decodeApplePVRTC(Uint8List data) {
-    // additional heuristic
-    const headerSize = 52;
-    if (data.length > headerSize) {
-      final input = InputBuffer(data);
-      // Header
-      final size = input.readUint32();
-      if (size == headerSize) {
-        return null;
-      }
-      /*int height =*/ input..readUint32()
-      /*int width =*/ ..readUint32()
-      /*int mipCount =*/ ..readUint32()
-      /*int flags =*/ ..readUint32()
-      /*int texDataSize =*/ ..readUint32()
-      /*int bpp =*/ ..readUint32()
-      /*int rMask =*/ ..readUint32()
-      /*int gMask =*/ ..readUint32()
-      /*int bMask =*/ ..readUint32();
+  DecodeInfo? _decodePvr3Header(Uint8List bytes) {
+    final input = InputBuffer(bytes);
 
-      final magic = input.readUint32();
-      if (magic == 0x21525650) {
-        // this looks more like a PowerVR file.
-        return null;
-      }
+    final size = input.readUint32();
+    if (size != _pvrHeaderSize) {
+      return null;
     }
 
-    //const PVRTC2 = 1;
-    //const PVRTC4 = 2;
+    final version = input.readUint32();
+    const pvr3Signature = 0x03525650;
+    if (version != pvr3Signature) {
+      return null;
+    }
+
+    final info = Pvr3Info()
+    ..flags = input.readUint32()
+    ..format = input.readUint32()
+    ..order[0] = input.readByte()
+    ..order[1] = input.readByte()
+    ..order[2] = input.readByte()
+    ..order[3] = input.readByte()
+    ..colorSpace = input.readUint32()
+    ..channelType = input.readUint32()
+    ..height = input.readUint32()
+    ..width = input.readUint32()
+    ..depth = input.readUint32()
+    ..numSurfaces = input.readUint32()
+    ..numFaces = input.readUint32()
+    ..mipCount = input.readUint32()
+    ..metadataSize = input.readUint32();
+
+    return info;
+  }
+
+  DecodeInfo? _decodePvr2Header(Uint8List bytes) {
+    final input = InputBuffer(bytes);
+
+    final size = input.readUint32();
+    if (size != _pvrHeaderSize) {
+      return null;
+    }
+
+    final info = Pvr2Info()
+    ..height = input.readUint32()
+    ..width = input.readUint32()
+    ..mipCount = input.readUint32()
+    ..flags = input.readUint32()
+    ..texDataSize = input.readUint32()
+    ..bitsPerPixel = input.readUint32()
+    ..redMask = input.readUint32()
+    ..greenMask = input.readUint32()
+    ..blueMask = input.readUint32()
+    ..alphaMask = input.readUint32()
+    ..magic = input.readUint32()
+    ..numTex = input.readUint32();
+
+    const pvr2Signature = 0x21525650;
+    if (info.magic != pvr2Signature) {
+      return null;
+    }
+
+    return info;
+  }
+
+  DecodeInfo? _decodeApplePvrtcHeader(Uint8List bytes) {
+    final fileSize = bytes.length;
+
+    final input = InputBuffer(bytes);
+
+    // Header
+    final sz = input.readUint32();
+    if (sz != 0) {
+      return null;
+    }
+
+    final info = PvrAppleInfo()
+    ..height = input.readUint32()
+    ..width = input.readUint32()
+    ..mipCount = input.readUint32()
+    ..flags = input.readUint32()
+    ..texDataSize = input.readUint32()
+    ..bitsPerPixel= input.readUint32()
+    ..redMask = input.readUint32()
+    ..greenMask = input.readUint32()
+    ..blueMask = input.readUint32()
+    ..magic = input.readUint32();
+
+    const appleSignature = 0x21525650;
+    if (info.magic == appleSignature) {
+      return null;
+    }
 
     var mode = 1;
     var res = 8;
-    final size = data.length;
-    //int format = 0;
 
     // this is a tough one, could be 2bpp 8x8, 4bpp 8x8
-    if (size == 32) {
+    if (fileSize == 32) {
       // assume 4bpp, 8x8
       mode = 0;
       res = 8;
@@ -75,14 +152,14 @@ class PvrtcDecoder {
       while (shift < 10) {
         final s2 = shift << 1;
 
-        if ((test2bpp << s2) & size != 0) {
+        if ((test2bpp << s2) & fileSize != 0) {
           res = 16 << shift;
           mode = 1;
           //format = PVRTC2;
           break;
         }
 
-        if ((test4bpp << s2) & size != 0) {
+        if ((test4bpp << s2) & fileSize != 0) {
           res = 16 << shift;
           mode = 0;
           //format = PVRTC4;
@@ -109,13 +186,45 @@ class PvrtcDecoder {
       return null;
     }
 
-    return decodeRgba4bpp(width, height, data);
+    info..width = width
+    ..height = height
+    ..bitsPerPixel = bpp;
+
+    return info;
   }
 
-  Image? decodePVR2(Uint8List data) {
+  @override
+  int numFrames() => 1;
+
+  @override
+  Image? decodeFrame(int frame) {
+    if (_info == null || _data == null) {
+      return null;
+    }
+
+    if (_info is PvrAppleInfo) {
+      return _decodeRgba4bpp(_info!.width, _info!.height, _data!);
+    } else if (_info is Pvr2Info) {
+      return _decodePvr2(_data!);
+    } else if (_info is Pvr3Info) {
+      return _decodePvr3(_data!);
+    }
+
+    return null;
+  }
+
+  @override
+  Image? decode(Uint8List bytes, { int? frame }) {
+    if (startDecode(bytes) == null) {
+      return null;
+    }
+    return decodeFrame(frame ?? 0);
+  }
+
+
+  Image? _decodePvr2(Uint8List data) {
     final length = data.length;
 
-    const headerSize = 52;
     const pvrTexCubemap = 1 << 12;
     const pvrPixelTypeMask = 0xff;
     const pvrTypeRgba4444 = 0x10;
@@ -129,48 +238,36 @@ class PvrtcDecoder {
     const pvrTypePvrtc2 = 0x18;
     const pvrTypePvrtc4 = 0x19;
 
-    if (length < headerSize) {
+    if (length < _pvrHeaderSize || _info == null) {
       return null;
     }
 
-    final input = InputBuffer(data);
+    final info = _info! as Pvr2Info;
+
+    final input = InputBuffer(data)
+    ..skip(_pvrHeaderSize);
     // Header
-    final size = input.readUint32();
-    final height = input.readUint32();
-    final width = input.readUint32();
-    /*int mipcount =*/ input.readUint32();
-    final flags = input.readUint32();
-    /*int texdatasize =*/ input.readUint32();
-    final bpp = input.readUint32();
-    /*int rmask =*/ input..readUint32()
-    /*int gmask =*/ ..readUint32()
-    /*int bmask =*/ ..readUint32();
-    final amask = input.readUint32();
-    final magic = input.readUint32();
-    var numtex = input.readUint32();
 
-    if (size != headerSize || magic != 0x21525650) {
-      return null;
+    var numTex = info.numTex;
+    if (numTex < 1) {
+      numTex = (info.flags & pvrTexCubemap) != 0 ? 6 : 1;
     }
 
-    if (numtex < 1) {
-      numtex = (flags & pvrTexCubemap) != 0 ? 6 : 1;
-    }
-
-    if (numtex != 1) {
+    if (numTex != 1) {
       // only 1 surface supported currently
       return null;
     }
 
-    if (width * height * bpp / 8 > length - headerSize) {
+    if (info.width * info.height * info.bitsPerPixel / 8 >
+        length - _pvrHeaderSize) {
       return null;
     }
 
-    final pType = flags & pvrPixelTypeMask;
+    final pType = info.flags & pvrPixelTypeMask;
 
     switch (pType) {
       case pvrTypeRgba4444:
-        final image = Image(width, height, numChannels: 4);
+        final image = Image(info.width, info.height, numChannels: 4);
         for (var p in image) {
           final v1 = input.readByte();
           final v2 = input.readByte();
@@ -186,7 +283,7 @@ class PvrtcDecoder {
         }
         return image;
       case pvrTypeRgba5551:
-        final image = Image(width, height, numChannels: 4);
+        final image = Image(info.width, info.height, numChannels: 4);
         for (var p in image) {
           final v = input.readUint16();
           final r = (v & 0xf800) >> 8;
@@ -200,7 +297,7 @@ class PvrtcDecoder {
         }
         return image;
       case pvrTypeRgba8888:
-        final image = Image(width, height, numChannels: 4);
+        final image = Image(info.width, info.height, numChannels: 4);
         for (var p in image) {
           p..r = input.readByte()
           ..g = input.readByte()
@@ -209,7 +306,7 @@ class PvrtcDecoder {
         }
         return image;
       case pvrTypeRgb565:
-        final image = Image(width, height);
+        final image = Image(info.width, info.height);
         for (var p in image) {
           final v = input.readUint16();
           final b = (v & 0x001f) << 3;
@@ -221,7 +318,7 @@ class PvrtcDecoder {
         }
         return image;
       case pvrTypeRgb555:
-        final image = Image(width, height);
+        final image = Image(info.width, info.height);
         for (var p in image) {
           final v = input.readUint16();
           final r = (v & 0x001f) << 3;
@@ -233,7 +330,7 @@ class PvrtcDecoder {
         }
         return image;
       case pvrTypeRgb888:
-        final image = Image(width, height);
+        final image = Image(info.width, info.height);
         for (var p in image) {
           p..r = input.readByte()
           ..g = input.readByte()
@@ -241,35 +338,41 @@ class PvrtcDecoder {
         }
         return image;
       case pvrTypeI8:
-        final image = Image(width, height, numChannels: 1);
+        final image = Image(info.width, info.height, numChannels: 1);
         for (var p in image) {
           final i = input.readByte();
           p.r = i;
         }
         return image;
       case pvrTypeAI8:
-        final image = Image(width, height, numChannels: 2);
+        final image = Image(info.width, info.height, numChannels: 4);
         for (var p in image) {
-          final i = input.readByte();
           final a = input.readByte();
+          final i = input.readByte();
           p..r = i
-          ..g = a;
+          ..g = i
+          ..b = i
+          ..a = a;
         }
         return image;
       case pvrTypePvrtc2:
         // Currently unsupported
         return null;
       case pvrTypePvrtc4:
-        return amask == 0
-            ? decodeRgb4bpp(width, height, input.toUint8List())
-            : decodeRgba4bpp(width, height, input.toUint8List());
+        return info.alphaMask == 0
+            ? _decodeRgb4bpp(info.width, info.height, input.toUint8List())
+            : _decodeRgba4bpp(info.width, info.height, input.toUint8List());
     }
 
     // Unknown format
     return null;
   }
 
-  Image? decodePVR3(Uint8List data) {
+  Image? _decodePvr3(Uint8List data) {
+    if (_info is! Pvr3Info) {
+      return null;
+    }
+
     //const PVR3_PVRTC_2BPP_RGB = 0;
     //const PVR3_PVRTC_2BPP_RGBA = 1;
     const pvr3Pvrtc4bppRgb = 2;
@@ -303,40 +406,19 @@ class PvrtcDecoder {
     const PVR3_EAC_RG11_U = 27;
     const PVR3_EAC_RG11_S = 28;*/
 
-    final input = InputBuffer(data);
+    final input = InputBuffer(data)
+    ..skip(_pvrHeaderSize);
 
-    // Header
-    final version = input.readUint32();
-    if (version != 0x03525650) {
-      return null;
-    }
+    final info = _info as Pvr3Info;
 
-    /*int flags =*/ input.readUint32();
-    final format = input.readUint32();
-    final order = [
-      input.readByte(),
-      input.readByte(),
-      input.readByte(),
-      input..readByte()
-    ];
-    /*int colorspace =*/ input..readUint32()
-    /*int channeltype =*/ ..readUint32();
-    final height = input.readUint32();
-    final width = input.readUint32();
-    /*int depth =*/ input..readUint32()
-    /*int num_surfaces =*/ ..readUint32()
-    /*int num_faces =*/ ..readUint32()
-    /*int mipcount =*/ ..readUint32();
-    final metadataSize = input.readUint32();
+    input.skip(info.metadataSize);
 
-    input.skip(metadataSize);
-
-    if (order[0] == 0) {
-      switch (format) {
+    if (info.order[0] == 0) {
+      switch (info.format) {
         case pvr3Pvrtc4bppRgb:
-          return decodeRgb4bpp(width, height, input.toUint8List());
+          return _decodeRgb4bpp(info.width, info.height, input.toUint8List());
         case pvr3Pvrtc4bppRgba:
-          return decodeRgba4bpp(width, height, input.toUint8List());
+          return _decodeRgba4bpp(info.width, info.height, input.toUint8List());
         /*case PVR3_PVRTC_2BPP_RGB:
           return null;
         case PVR3_PVRTC_2BPP_RGBA:
@@ -412,19 +494,19 @@ class PvrtcDecoder {
     return x;
   }
 
-  Image decodeRgb4bpp(int width, int height, TypedData data) {
+  Image _decodeRgb4bpp(int width, int height, TypedData data) {
     final result = Image(width, height);
 
     final blocks = width ~/ 4;
     final blockMask = blocks - 1;
 
-    final packet = PvrtcPacket(data);
-    final p0 = PvrtcPacket(data);
-    final p1 = PvrtcPacket(data);
-    final p2 = PvrtcPacket(data);
-    final p3 = PvrtcPacket(data);
-    const factors = PvrtcPacket.bilinearFactors;
-    const weights = PvrtcPacket.weights;
+    final packet = PvrPacket(data);
+    final p0 = PvrPacket(data);
+    final p1 = PvrPacket(data);
+    final p2 = PvrPacket(data);
+    final p3 = PvrPacket(data);
+    const factors = PvrPacket.bilinearFactors;
+    const weights = PvrPacket.weights;
 
     for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
       for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
@@ -476,19 +558,19 @@ class PvrtcDecoder {
     return result;
   }
 
-  Image decodeRgba4bpp(int width, int height, TypedData data) {
+  Image _decodeRgba4bpp(int width, int height, TypedData data) {
     final result = Image(width, height, numChannels: 4);
 
     final blocks = width ~/ 4;
     final blockMask = blocks - 1;
 
-    final packet = PvrtcPacket(data);
-    final p0 = PvrtcPacket(data);
-    final p1 = PvrtcPacket(data);
-    final p2 = PvrtcPacket(data);
-    final p3 = PvrtcPacket(data);
-    const factors = PvrtcPacket.bilinearFactors;
-    const weights = PvrtcPacket.weights;
+    final packet = PvrPacket(data);
+    final p0 = PvrPacket(data);
+    final p1 = PvrPacket(data);
+    final p2 = PvrPacket(data);
+    final p3 = PvrPacket(data);
+    const factors = PvrPacket.bilinearFactors;
+    const weights = PvrPacket.weights;
 
     for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
       for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
@@ -540,4 +622,6 @@ class PvrtcDecoder {
 
     return result;
   }
+
+  static const _pvrHeaderSize = 52;
 }

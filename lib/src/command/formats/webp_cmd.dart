@@ -7,10 +7,12 @@ import '../command.dart';
 class DecodeWebPCmd extends Command {
   Uint8List data;
 
-  DecodeWebPCmd(this.data);
+  DecodeWebPCmd(Command? input, this.data)
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = decodeWebP(data);
   }
 }
@@ -19,10 +21,12 @@ class DecodeWebPCmd extends Command {
 class DecodeWebPFileCmd extends Command {
   String path;
 
-  DecodeWebPFileCmd(this.path);
+  DecodeWebPFileCmd(Command? input, this.path)
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = await decodeWebPFile(path);
   }
 }

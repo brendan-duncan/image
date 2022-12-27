@@ -229,11 +229,11 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'iCCP':
-          _info.iCCPName = _input.readString();
-          _info.iCCPCompression = _input.readByte(); // 0: deflate
-          chunkSize -= _info.iCCPName.length + 2;
+          _info.iccpName = _input.readString();
+          _info.iccpCompression = _input.readByte(); // 0: deflate
+          chunkSize -= _info.iccpName.length + 2;
           final profile = _input.readBytes(chunkSize);
-          _info.iCCPData = profile.toUint8List();
+          _info.iccpData = profile.toUint8List();
           _input.skip(4); // CRC
           break;
         default:
@@ -426,9 +426,9 @@ class PngDecoder extends Decoder {
     _info..width = origW
     ..height = origH;
 
-    if (_info.iCCPData != null) {
+    if (_info.iccpData != null) {
       image.iccProfile = IccProfile(
-          _info.iCCPName, IccProfileCompression.deflate, _info.iCCPData!);
+          _info.iccpName, IccProfileCompression.deflate, _info.iccpData!);
     }
 
     if (_info.textData.isNotEmpty) {

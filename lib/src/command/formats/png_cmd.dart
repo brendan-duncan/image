@@ -8,10 +8,12 @@ import '../command.dart';
 class DecodePngCmd extends Command {
   final Uint8List _data;
 
-  DecodePngCmd(this._data);
+  DecodePngCmd(Command? input, this._data)
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = decodePng(_data);
   }
 }
@@ -20,10 +22,12 @@ class DecodePngCmd extends Command {
 class DecodePngFileCmd extends Command {
   final String path;
 
-  DecodePngFileCmd(this.path);
+  DecodePngFileCmd(Command? input, this.path)
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = await decodePngFile(path);
   }
 }

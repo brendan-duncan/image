@@ -6,10 +6,12 @@ import '../command.dart';
 class DecodeImageCmd extends Command {
   Uint8List data;
 
-  DecodeImageCmd(this.data);
+  DecodeImageCmd(Command? input, this.data)
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
+    await input?.execute();
     outputImage = decodeImage(data);
   }
 }

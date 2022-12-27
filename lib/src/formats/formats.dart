@@ -18,6 +18,8 @@ import 'jpeg_encoder.dart';
 import 'png_decoder.dart';
 import 'png_encoder.dart';
 import 'psd_decoder.dart';
+import 'pvr_decoder.dart';
+import 'pvr_encoder.dart';
 import 'tga_decoder.dart';
 import 'tga_encoder.dart';
 import 'tiff_decoder.dart';
@@ -58,6 +60,9 @@ Decoder? findDecoderForNamedImage(String name) {
   if (n.endsWith('.ico')) {
     return IcoDecoder();
   }
+  if (n.endsWith('.pvr')) {
+    return PvrDecoder();
+  }
   return null;
 }
 
@@ -88,6 +93,9 @@ Encoder? findEncoderForNamedImage(String name) {
   }
   if (n.endsWith('.cur')) {
     return IcoEncoder();
+  }
+  if (n.endsWith('.pvr')) {
+    return PvrEncoder();
   }
   return null;
 }
@@ -150,6 +158,11 @@ Decoder? findDecoderForData(List<int> data) {
   final ico = IcoDecoder();
   if (ico.isValidFile(bytes)) {
     return ico;
+  }
+
+  final pvr = PvrDecoder();
+  if (pvr.isValidFile(bytes)) {
+    return pvr;
   }
 
   return null;
@@ -467,5 +480,33 @@ Future<bool> encodeIcoFile(String path, Image image,
     return false;
   }
   final bytes = IcoEncoder().encode(image, singleFrame: singleFrame);
+  return writeFile(path, bytes);
+}
+
+/// Decode an PVR image.
+Image? decodePvr(Uint8List bytes, { int? frame }) =>
+    PvrDecoder().decode(bytes, frame: frame);
+
+/// Decode a PVR formatted image from a file. If the platform does not support
+/// dart:io, null will be returned.
+Future<Image?> decodePvrFile(String path, { int? frame }) async {
+  final bytes = await readFile(path);
+  if (bytes == null) {
+    return null;
+  }
+  return PvrDecoder().decode(bytes, frame: frame);
+}
+
+/// Encode an image to the PVR format.
+Uint8List encodePvr(Image image, { bool singleFrame = false }) =>
+    PvrEncoder().encode(image, singleFrame: singleFrame);
+
+/// Encode an [image] to a PVR file at the given [path].
+Future<bool> encodePvrFile(String path, Image image,
+    { bool singleFrame = false }) async {
+  if (!supportsFileAccess()) {
+    return false;
+  }
+  final bytes = PvrEncoder().encode(image, singleFrame: singleFrame);
   return writeFile(path, bytes);
 }

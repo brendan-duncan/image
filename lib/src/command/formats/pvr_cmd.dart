@@ -3,37 +3,37 @@ import 'dart:typed_data';
 import '../../formats/formats.dart';
 import '../command.dart';
 
-// Decode a TGA Image from byte [data].
-class DecodeTgaCmd extends Command {
+// Decode a PVR Image from byte [data].
+class DecodePvrCmd extends Command {
   Uint8List data;
 
-  DecodeTgaCmd(Command? input, this.data)
+  DecodePvrCmd(Command? input, this.data)
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     await input?.execute();
-    outputImage = decodeTga(data);
+    outputImage = decodePvr(data);
   }
 }
 
-// Decode a TGA from a file at the given [path].
-class DecodeTgaFileCmd extends Command {
+// Decode a PVR from a file at the given [path].
+class DecodePvrFileCmd extends Command {
   String path;
 
-  DecodeTgaFileCmd(Command? input, this.path)
+  DecodePvrFileCmd(Command? input, this.path)
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     await input?.execute();
-    outputImage = await decodeTgaFile(path);
+    outputImage = await decodePvrFile(path);
   }
 }
 
-// Encode an Image to the TGA format.
-class EncodeTgaCmd extends Command {
-  EncodeTgaCmd(Command? input)
+// Encode an Image to the PVR format.
+class EncodePvrCmd extends Command {
+  EncodePvrCmd(Command? input)
       : super(input);
 
   @override
@@ -41,17 +41,17 @@ class EncodeTgaCmd extends Command {
     await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
-      outputBytes = encodeTga(outputImage!);
+      outputBytes = encodePvr(outputImage!);
     }
   }
 }
 
-// Encode an Image to the TGA format and write it to a file at the given
+// Encode an Image to the PVR format and write it to a file at the given
 // [path].
-class EncodeTgaFileCmd extends EncodeTgaCmd {
+class EncodePvrFileCmd extends EncodePvrCmd {
   String path;
 
-  EncodeTgaFileCmd(Command? input, this.path)
+  EncodePvrFileCmd(Command? input, this.path)
       : super(input);
 
   @override
@@ -59,7 +59,7 @@ class EncodeTgaFileCmd extends EncodeTgaCmd {
     await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
-      await encodeTgaFile(path, outputImage!);
+      await encodePvrFile(path, outputImage!);
     }
   }
 }

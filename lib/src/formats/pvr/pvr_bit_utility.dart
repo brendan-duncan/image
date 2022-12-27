@@ -1,4 +1,4 @@
-class BitUtility {
+class PvrBitUtility {
   static bool isPowerOf2(int x) => (x & (x - 1)) == 0;
 
   static int rotateRight(int value, int shift) =>
