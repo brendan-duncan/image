@@ -17,12 +17,12 @@ class PixelInt8 extends Iterable<num> implements Pixel {
 
   PixelInt8.imageData(this.image)
       : _x = -1
-      , _y = -1
+      , _y = 0
       , _index = -image.numChannels;
 
   PixelInt8.image(Image image)
       : _x = -1
-      , _y = -1
+      , _y = 0
       , _index = -image.numChannels
       , image = image.data is ImageDataInt8 ? image.data as ImageDataInt8
       : ImageDataInt8(0, 0, 0);

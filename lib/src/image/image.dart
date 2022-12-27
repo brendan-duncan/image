@@ -587,8 +587,7 @@ class Image extends Iterable<Pixel> {
     Pixel? p2;
     for (var p in newImage) {
       p2 = getPixel(p.x, p.y, p2);
-      final c = convertColor(p2, format: format, numChannels: numChannels,
-          alpha: alpha);
+      final c = convertColor(p2, to: p, alpha: alpha);
       p.set(c);
     }
 

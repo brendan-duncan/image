@@ -28,15 +28,18 @@ int rgbaToUint32(int r, int g, int b, int a) =>
     r.clamp(0,255) | (g.clamp(0,255) << 8) | (b.clamp(0,255) << 16) |
     (a.clamp(0,255) << 24);
 
-void _convertColor(Color c, Color c2, Format format, int numChannels, num a) {
+void _convertColor(Color c, Color c2, num a) {
+  final numChannels = c2.length;
+  final format = c2.format;
+  final fromFormat = c.format;
   final cl = c.length;
   if (numChannels <= cl) {
     for (var ci = 0; ci < numChannels; ++ci) {
-      c2[ci] = convertFormatValue(c[ci], c.format, format);
+      c2[ci] = convertFormatValue(c[ci], fromFormat, format);
     }
   } else {
     for (var ci = 0; ci < cl; ++ci) {
-      c2[ci] = convertFormatValue(c[ci], c.format, format);
+      c2[ci] = convertFormatValue(c[ci], fromFormat, format);
     }
     final v = cl == 1 ? c2[0] : 0;
     for (var ci = cl; ci < numChannels; ++ci) {
@@ -45,9 +48,10 @@ void _convertColor(Color c, Color c2, Format format, int numChannels, num a) {
   }
 }
 
-Color convertColor(Color c, { Format? format, int? numChannels, num? alpha }) {
-  format ??= c.format;
-  numChannels ??= c.length;
+Color convertColor(Color c, { Color? to, Format? format, int? numChannels,
+    num? alpha }) {
+  format = to?.format ?? format ?? c.format;
+  numChannels = to?.length ?? numChannels ?? c.length;
   alpha ??= 0;
 
   if (format == c.format && numChannels == c.length) {
@@ -56,52 +60,52 @@ Color convertColor(Color c, { Format? format, int? numChannels, num? alpha }) {
 
   switch (format) {
     case Format.uint8:
-      final c2 = ColorUint8(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorUint8(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.uint1:
-      final c2 = ColorUint1(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorUint1(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.uint2:
-      final c2 = ColorUint2(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorUint2(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.uint4:
-      final c2 = ColorUint4(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorUint4(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.uint16:
-      final c2 = ColorUint16(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorUint16(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.uint32:
-      final c2 = ColorUint32(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorUint32(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.int8:
-      final c2 = ColorInt8(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorInt8(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.int16:
-      final c2 = ColorInt16(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorInt16(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.int32:
-      final c2 = ColorInt32(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorInt32(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.float16:
-      final c2 = ColorFloat16(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorFloat16(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.float32:
-      final c2 = ColorFloat32(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorFloat32(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     case Format.float64:
-      final c2 = ColorFloat64(numChannels);
-      _convertColor(c, c2, format, numChannels, alpha);
+      final c2 = to ?? ColorFloat64(numChannels);
+      _convertColor(c, c2, alpha);
       return c2;
     }
 }

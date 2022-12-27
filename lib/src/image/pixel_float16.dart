@@ -18,12 +18,12 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
 
   PixelFloat16.imageData(this.image)
       : _x = -1
-      , _y = -1
+      , _y = 0
       , _index = -image.numChannels;
 
   PixelFloat16.image(Image image)
       : _x = -1
-      , _y = -1
+      , _y = 0
       , _index = -image.numChannels
       , image = image.data is ImageDataFloat16 ? image.data as ImageDataFloat16
           : ImageDataFloat16(0, 0, 0);
