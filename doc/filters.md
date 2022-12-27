@@ -1,4 +1,4 @@
-# Filtering, Transforming, and Drawing
+# Image Processing
 
 The Dart Image Library provides a number of functions for modifying images, by applying
 color filters, transformations into other images (resize, crop), or basic drawing.
