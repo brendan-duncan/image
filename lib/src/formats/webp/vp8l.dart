@@ -52,7 +52,7 @@ class VP8L {
 
     _allocateInternalBuffers32b();
 
-    image = Image(webp.width, webp.height, numChannels: 4);
+    image = Image(width: webp.width, height: webp.height, numChannels: 4);
 
     if (!_decodeImageData(_pixels!, webp.width, webp.height, webp.height,
         _processRows)) {

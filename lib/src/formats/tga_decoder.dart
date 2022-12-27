@@ -59,7 +59,7 @@ class TgaDecoder extends Decoder {
     }
 
     input.offset = info!.imageOffset!;
-    final image = Image(info!.width, info!.height,
+    final image = Image(width: info!.width, height: info!.height,
         numChannels: info!.bpp == 32 ? 4 : 3);
     for (var y = image.height - 1; y >= 0; --y) {
       for (var x = 0; x < image.width; ++x) {

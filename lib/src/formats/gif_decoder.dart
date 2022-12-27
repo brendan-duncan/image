@@ -185,8 +185,8 @@ class GifDecoder extends Decoder {
         final colorMap = (frame.colorMap != null)
             ? frame.colorMap! : info!.globalColorMap!;
 
-        lastImage = Image(lastImage.width, lastImage.height, numChannels: 1,
-            palette: colorMap.getPalette())
+        lastImage = Image(width: lastImage.width, height: lastImage.height,
+            numChannels: 1, palette: colorMap.getPalette())
           ..clear(colorMap.color(info!.backgroundColor!.r as int));
       } else {
         lastImage = new Image.from(lastImage);
@@ -257,7 +257,7 @@ class GifDecoder extends Decoder {
 
     _pixelCount = width * height;
 
-    final image = Image(width, height, numChannels: 1,
+    final image = Image(width: width, height: height, numChannels: 1,
         palette: colorMap.getPalette());
 
     final line = Uint8List(width);

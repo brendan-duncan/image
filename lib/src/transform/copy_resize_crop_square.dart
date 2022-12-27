@@ -30,7 +30,8 @@ Image copyResizeCropSquare(Image src, int size) {
 
   Image? firstFrame;
   for (final frame in src.frames) {
-    final dst = firstFrame?.addFrame() ?? Image.fromResized(frame, size, size);
+    final dst = firstFrame?.addFrame() ??
+        Image.fromResized(frame, width: size, height: size);
     firstFrame ??= dst;
 
     for (var y = 0; y < size; ++y) {

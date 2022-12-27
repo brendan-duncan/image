@@ -267,7 +267,8 @@ class PvrDecoder extends Decoder {
 
     switch (pType) {
       case pvrTypeRgba4444:
-        final image = Image(info.width, info.height, numChannels: 4);
+        final image = Image(width: info.width, height: info.height,
+            numChannels: 4);
         for (var p in image) {
           final v1 = input.readByte();
           final v2 = input.readByte();
@@ -283,7 +284,8 @@ class PvrDecoder extends Decoder {
         }
         return image;
       case pvrTypeRgba5551:
-        final image = Image(info.width, info.height, numChannels: 4);
+        final image = Image(width: info.width, height: info.height,
+            numChannels: 4);
         for (var p in image) {
           final v = input.readUint16();
           final r = (v & 0xf800) >> 8;
@@ -297,7 +299,8 @@ class PvrDecoder extends Decoder {
         }
         return image;
       case pvrTypeRgba8888:
-        final image = Image(info.width, info.height, numChannels: 4);
+        final image = Image(width: info.width, height: info.height,
+            numChannels: 4);
         for (var p in image) {
           p..r = input.readByte()
           ..g = input.readByte()
@@ -306,7 +309,7 @@ class PvrDecoder extends Decoder {
         }
         return image;
       case pvrTypeRgb565:
-        final image = Image(info.width, info.height);
+        final image = Image(width: info.width, height: info.height);
         for (var p in image) {
           final v = input.readUint16();
           final b = (v & 0x001f) << 3;
@@ -318,7 +321,7 @@ class PvrDecoder extends Decoder {
         }
         return image;
       case pvrTypeRgb555:
-        final image = Image(info.width, info.height);
+        final image = Image(width: info.width, height: info.height);
         for (var p in image) {
           final v = input.readUint16();
           final r = (v & 0x001f) << 3;
@@ -330,7 +333,7 @@ class PvrDecoder extends Decoder {
         }
         return image;
       case pvrTypeRgb888:
-        final image = Image(info.width, info.height);
+        final image = Image(width: info.width, height: info.height);
         for (var p in image) {
           p..r = input.readByte()
           ..g = input.readByte()
@@ -338,14 +341,16 @@ class PvrDecoder extends Decoder {
         }
         return image;
       case pvrTypeI8:
-        final image = Image(info.width, info.height, numChannels: 1);
+        final image = Image(width: info.width, height: info.height,
+            numChannels: 1);
         for (var p in image) {
           final i = input.readByte();
           p.r = i;
         }
         return image;
       case pvrTypeAI8:
-        final image = Image(info.width, info.height, numChannels: 4);
+        final image = Image(width: info.width, height: info.height,
+            numChannels: 4);
         for (var p in image) {
           final a = input.readByte();
           final i = input.readByte();
@@ -495,7 +500,7 @@ class PvrDecoder extends Decoder {
   }
 
   Image _decodeRgb4bpp(int width, int height, TypedData data) {
-    final result = Image(width, height);
+    final result = Image(width: width, height: height);
 
     final blocks = width ~/ 4;
     final blockMask = blocks - 1;
@@ -559,7 +564,7 @@ class PvrDecoder extends Decoder {
   }
 
   Image _decodeRgba4bpp(int width, int height, TypedData data) {
-    final result = Image(width, height, numChannels: 4);
+    final result = Image(width: width, height: height, numChannels: 4);
 
     final blocks = width ~/ 4;
     final blockMask = blocks - 1;

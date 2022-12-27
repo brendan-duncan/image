@@ -7,7 +7,7 @@ import '../test_util.dart';
 
 void drawPixelTest() {
   test('drawPixel.uint8', () {
-    final i0 = Image(256, 256);
+    final i0 = Image(width: 256, height: 256);
     for (int y = 0; y < 256; ++y) {
       for (int x = 0; x < 256; ++x) {
         drawPixel(i0, x, y, ColorRgba8(x, y));

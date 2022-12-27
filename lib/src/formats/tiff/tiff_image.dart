@@ -251,8 +251,8 @@ class TiffImage {
         photometricType == TiffPhotometricType.palette;
     final numChannels = hasPalette ? 3 : samplesPerPixel;
 
-    final image = Image(width, height, format: format, numChannels: numChannels,
-        withPalette: hasPalette);
+    final image = Image(width: width, height: height, format: format,
+        numChannels: numChannels, withPalette: hasPalette);
 
     if (hasPalette) {
       final p = image.palette!;

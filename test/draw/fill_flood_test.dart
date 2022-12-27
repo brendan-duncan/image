@@ -6,7 +6,7 @@ import '../test_util.dart';
 
 void fillFloodTest() {
   test('fillFlood', () {
-    final img = Image(100, 100);
+    final img = Image(width: 100, height: 100);
     drawCircle(img, 50, 50, 49, ColorRgb8(255));
     fillFlood(img, 50, 50, ColorRgb8(0, 255), threshold: 1);
 

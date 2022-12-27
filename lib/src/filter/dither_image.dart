@@ -77,7 +77,7 @@ Image ditherImage(Image image, { Quantizer? quantizer,
   var direction = serpentine ? -1 : 1;
 
   final palette = quantizer.palette;
-  final indexedImage = Image(width, height, numChannels: 1,
+  final indexedImage = Image(width: width, height: height, numChannels: 1,
       palette: palette);
 
   final pIter = image.iterator..moveNext();

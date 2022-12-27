@@ -400,7 +400,7 @@ class PngDecoder extends Decoder {
       numChannels = 4;
     }
 
-    final image = Image(width, height, numChannels: numChannels,
+    final image = Image(width: width, height: height, numChannels: numChannels,
         palette: palette, format: format);
 
     final origW = _info.width;

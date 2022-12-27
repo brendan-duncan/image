@@ -6,7 +6,7 @@ import '../test_util.dart';
 
 void fillCircleTest() {
   test('fillCircle', () {
-    final i0 = Image(256, 256);
+    final i0 = Image(width: 256, height: 256);
 
     fillCircle(i0, 128, 128, 100, ColorRgba8(255, 255, 0, 128));
 

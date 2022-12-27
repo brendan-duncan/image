@@ -56,7 +56,7 @@ class VP8 {
       return null;
     }
 
-    output = Image(webp.width, webp.height, numChannels: 4);
+    output = Image(width: webp.width, height: webp.height, numChannels: 4);
 
     // Will allocate memory and prepare everything.
     if (!_initFrame()) {

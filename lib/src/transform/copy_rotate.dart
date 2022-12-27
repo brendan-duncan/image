@@ -37,7 +37,7 @@ Image copyRotate(Image src, num angle,
   final dw2 = 0.5 * (ux + vx);
   final dh2 = 0.5 * (uy + vy);
 
-  final dst = Image((ux + vx).toInt(), (uy + vy).toInt(),
+  final dst = Image(width: (ux + vx).toInt(), height: (uy + vy).toInt(),
       format: src.format, numChannels: src.numChannels, palette: src.palette,
       exif: src.exif, iccp: src.iccProfile);
 
@@ -57,7 +57,7 @@ Image _rotate90(Image src) {
   Image? firstFrame;
   for (final frame in src.frames) {
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, frame.height, frame.width);
+        Image.fromResized(frame, width: frame.height, height: frame.width);
     firstFrame ??= dst;
     final hm1 = frame.height - 1;
     for (var y = 0; y < dst.height; ++y) {
@@ -91,7 +91,7 @@ Image _rotate270(Image src) {
   for (final frame in src.frames) {
     final wm1 = src.width - 1;
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, frame.height, frame.width);
+        Image.fromResized(frame, width: frame.height, height: frame.width);
     firstFrame ??= dst;
     for (var y = 0; y < dst.height; ++y) {
       for (var x = 0; x < dst.width; ++x) {

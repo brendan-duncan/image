@@ -59,7 +59,7 @@ void gifTest() {
     }
 
     test('encodeAnimation', () {
-      final anim = Image(480, 120)
+      final anim = Image(width: 480, height: 120)
       ..loopCount = 10;
       for (var i = 0; i < 10; i++) {
         final image = i == 0 ? anim : anim.addFrame();
@@ -77,7 +77,7 @@ void gifTest() {
     });
 
     test('encodeAnimation with variable FPS', () {
-      final anim = Image(480, 120);
+      final anim = Image(width: 480, height: 120);
       for (var i = 1; i <= 3; i++) {
         final image = i == 1 ? anim : anim.addFrame()
         ..frameDuration = i * 1000;

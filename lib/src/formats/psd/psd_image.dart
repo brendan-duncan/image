@@ -110,7 +110,7 @@ class PsdImage implements DecodeInfo {
       return mergedImage!;
     }
 
-    mergedImage = Image(width, height, numChannels: 4);
+    mergedImage = Image(width: width, height: height, numChannels: 4);
     mergedImage!.clear();
 
     //final pixels = mergedImage!.getBytes();
@@ -517,7 +517,8 @@ class PsdImage implements DecodeInfo {
     final numChannels = channelList.length;
     final ns = (bitDepth == 8) ? 1 : (bitDepth == 16) ? 2 : -1;
 
-    final output = Image(width, height, numChannels: numChannels);
+    final output = Image(width: width, height: height,
+        numChannels: numChannels);
 
     if (ns == -1) {
       throw ImageException('PSD: unsupported bit depth: $bitDepth');

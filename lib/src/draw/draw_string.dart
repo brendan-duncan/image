@@ -51,7 +51,7 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
         }
 
         final ch = font.characters[c]!;
-        x -= ch.xadvance;
+        x -= ch.xAdvance;
       }
     }
     for (var c in chars) {
@@ -73,14 +73,14 @@ Image drawString(Image image, BitmapFont font, int x, int y, String string,
               ..g = _gLut[p.g as int]
               ..b = _bLut[p.b as int]
               ..a = _aLut[p.a as int];
-            drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, _c);
+            drawPixel(image, xi + ch.xOffset, yi + ch.yOffset, _c);
           } else {
-            drawPixel(image, xi + ch.xoffset, yi + ch.yoffset, p);
+            drawPixel(image, xi + ch.xOffset, yi + ch.yOffset, p);
           }
         }
       }
 
-      x += ch.xadvance;
+      x += ch.xAdvance;
     }
 
     y = y+stringHeight;
@@ -114,7 +114,7 @@ Image drawStringWrap(Image image, BitmapFont font, int x, int y, String string,
         continue;
       }
       final ch = font.characters[c]!;
-      wordWidth += ch.xadvance;
+      wordWidth += ch.xAdvance;
     }
     if ((x2 + wordWidth) > image.width) {
       // If there is a word that won't fit the starting x, stop drawing
@@ -162,9 +162,9 @@ Image drawStringCentered(Image image, BitmapFont font, String string,
         continue;
       }
       final ch = font.characters[c]!;
-      stringWidth += ch.xadvance;
-      if (ch.height + ch.yoffset > stringHeight) {
-        stringHeight = ch.height + ch.yoffset;
+      stringWidth += ch.xAdvance;
+      if (ch.height + ch.yOffset > stringHeight) {
+        stringHeight = ch.height + ch.yOffset;
       }
     }
   }
@@ -192,8 +192,8 @@ int _findStringHeight(BitmapFont font, String string) {
       continue;
     }
     final ch = font.characters[c]!;
-    if (ch.height + ch.yoffset > stringHeight) {
-      stringHeight = ch.height + ch.yoffset;
+    if (ch.height + ch.yOffset > stringHeight) {
+      stringHeight = ch.height + ch.yOffset;
     }
   }
   return (stringHeight * 1.05).round();

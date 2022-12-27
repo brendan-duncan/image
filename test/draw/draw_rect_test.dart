@@ -6,7 +6,7 @@ import '../test_util.dart';
 
 void drawRectTest() {
   test('drawRect', () {
-    final i0 = Image(256, 256);
+    final i0 = Image(width: 256, height: 256);
 
     drawRect(i0, 50, 50, 150, 150, ColorRgb8(255));
     drawRect(i0, 100, 100, 200, 200, ColorRgba8(0, 255, 0, 128),

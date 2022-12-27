@@ -602,7 +602,7 @@ class Command {
   ///
   /// @example
   /// final image = Command()
-  /// ..createImage(256, 256)
+  /// ..createImage(width: 256, height: 256)
   /// ..filter((image) {
   ///   for (final pixel in image) {
   ///     pixel.r = pixel.x;

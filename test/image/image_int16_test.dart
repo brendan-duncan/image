@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void imageInt16Test() {
   test('int16', () {
-    final i1 = Image(2, 2, format: Format.int16, numChannels: 1);
+    final i1 = Image(width: 2, height: 2, format: Format.int16, numChannels: 1);
     expect(i1.width, equals(2));
     expect(i1.height, equals(2));
     expect(i1.numChannels, equals(1));
@@ -17,7 +17,7 @@ void imageInt16Test() {
     expect(i1.getPixel(0, 1), equals([-75]));
     expect(i1.getPixel(1, 1), equals([-115]));
 
-    final i2 = Image(2, 2, format: Format.int16, numChannels: 2);
+    final i2 = Image(width: 2, height: 2, format: Format.int16, numChannels: 2);
     expect(i2.width, equals(2));
     expect(i2.height, equals(2));
     expect(i2.numChannels, equals(2));
@@ -30,7 +30,7 @@ void imageInt16Test() {
     expect(i2.getPixel(0, 1), equals([-58, 52]));
     expect(i2.getPixel(1, 1), equals([110, 84]));
 
-    final i3 = Image(2, 2, format: Format.int16);
+    final i3 = Image(width: 2, height: 2, format: Format.int16);
     expect(i3.width, equals(2));
     expect(i3.height, equals(2));
     expect(i3.numChannels, equals(3));
@@ -43,7 +43,7 @@ void imageInt16Test() {
     expect(i3.getPixel(0, 1), equals([-58, 52, 5]));
     expect(i3.getPixel(1, 1), equals([110, 84, 94]));
 
-    final i4 = Image(2, 2, format: Format.int16, numChannels: 4);
+    final i4 = Image(width: 2, height: 2, format: Format.int16, numChannels: 4);
     expect(i4.width, equals(2));
     expect(i4.height, equals(2));
     expect(i4.numChannels, equals(4));

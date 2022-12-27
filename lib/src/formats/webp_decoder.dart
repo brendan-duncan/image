@@ -132,7 +132,7 @@ class WebPDecoder extends Decoder {
       image.frameDuration = frame.duration;
 
       if (firstImage == null || lastImage == null) {
-        firstImage = Image(_info!.width, _info!.height,
+        firstImage = Image(width: _info!.width, height: _info!.height,
             numChannels: image.numChannels, format: image.format);
         lastImage = firstImage;
       } else {

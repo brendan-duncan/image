@@ -151,8 +151,8 @@ class ExrPart {
       }
     }
 
-    framebuffer = Image(width, height, numChannels: numColorChannels,
-        format: colorFormat);
+    framebuffer = Image(width: width, height: height,
+        numChannels: numColorChannels, format: colorFormat);
 
     for (var name in extraChannels.keys) {
       framebuffer!.setExtraChannel(name, extraChannels[name]!);

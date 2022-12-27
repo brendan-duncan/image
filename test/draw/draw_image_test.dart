@@ -6,8 +6,8 @@ import '../test_util.dart';
 
 void drawImageTest() {
   test('drawImage', () {
-    final i0 = Image(256, 256);
-    final i1 = Image(256, 256, numChannels: 4);
+    final i0 = Image(width: 256, height: 256);
+    final i1 = Image(width: 256, height: 256, numChannels: 4);
 
     i0.clear(ColorRgba8(255));
     for (var p in i1) {

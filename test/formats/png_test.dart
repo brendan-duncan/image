@@ -10,7 +10,8 @@ void pngTest() {
     Image? buck24Image;
 
     group('b1_1', () {
-      final image = Image(32, 32, format: Format.uint1, numChannels: 1);
+      final image = Image(width: 32, height: 32,
+          format: Format.uint1, numChannels: 1);
       for (var p in image) {
         final c = p.x < (32 - p.y) ? 1 : 0;
         p.r = c;
@@ -31,7 +32,8 @@ void pngTest() {
     });
 
     group('b1_1', () {
-      final image = Image(32, 32, format: Format.uint1, numChannels: 1);
+      final image = Image(width: 32, height: 32, format: Format.uint1,
+          numChannels: 1);
       for (var p in image) {
         final c = p.x < (32 - p.y) ? 1 : 0;
         p.r = c;
@@ -52,7 +54,8 @@ void pngTest() {
     });
 
     group('b1_1p', () {
-      final image = Image(32, 32, format: Format.uint1, withPalette: true);
+      final image = Image(width: 32, height: 32, format: Format.uint1,
+          withPalette: true);
       image.palette!.setColor(0, 255);
       image.palette!.setColor(1, 0, 255);
       for (var p in image) {
@@ -75,7 +78,8 @@ void pngTest() {
     });
 
     group('b2_1', () {
-      final image = Image(32, 32, format: Format.uint2, numChannels: 1);
+      final image = Image(width: 32, height: 32, format: Format.uint2,
+          numChannels: 1);
       for (var p in image) {
         final c = p.x < (32 - p.y) ? 3 : 0;
         p.r = c;
@@ -97,7 +101,8 @@ void pngTest() {
     });
 
     group('b2_1p', () {
-      final image = Image(32, 32, format: Format.uint2, withPalette: true);
+      final image = Image(width: 32, height: 32, format: Format.uint2,
+          withPalette: true);
       for (var i = 0; i < 4; ++i) {
         image.palette!.setColor(i, i * 85, i * 85, i * 85);
       }
@@ -121,7 +126,8 @@ void pngTest() {
     });
 
     group('b4_1', () {
-      final image = Image(32, 32, format: Format.uint4, numChannels: 1);
+      final image = Image(width: 32, height: 32, format: Format.uint4,
+          numChannels: 1);
       for (var p in image) {
         final c = p.x < (32 - p.y) ? 31 : 0;
         p.r = c;
@@ -143,7 +149,8 @@ void pngTest() {
     });
 
     group('b4_1p', () {
-      final image = Image(32, 32, format: Format.uint4, withPalette: true);
+      final image = Image(width: 32, height: 32, format: Format.uint4,
+          withPalette: true);
       for (var i = 0; i < 16; ++i) {
         image.palette!.setColor(i, i * 17, i * 17, i * 17);
       }
@@ -167,7 +174,7 @@ void pngTest() {
     });
 
     group('b8_3', () {
-      final image = Image(32, 32);
+      final image = Image(width: 32, height: 32);
       for (var p in image) {
         final c = p.x < (32 - p.y) ? 255 : 0;
         p..r = c
@@ -190,7 +197,7 @@ void pngTest() {
     });
 
     group('b8_3p', () {
-      final image = Image(32, 32, withPalette: true);
+      final image = Image(width: 32, height: 32, withPalette: true);
       for (var i = 0; i < 256; ++i) {
         image.palette!.setColor(i, i, i, i);
       }
@@ -213,7 +220,7 @@ void pngTest() {
     });
 
     group('b16_3', () {
-      final image = Image(32, 32, format: Format.uint16);
+      final image = Image(width: 32, height: 32, format: Format.uint16);
       for (var p in image) {
         final c = p.x * 2114;
         p..r = c
@@ -259,7 +266,8 @@ void pngTest() {
       for (var i = 0; i < 256; ++i) {
         palette.setColor(i, (i * 2) % 256, (i * 8) % 256, i);
       }
-      final image = Image(256, 256, numChannels: 1, palette: palette);
+      final image = Image(width: 256, height: 256, numChannels: 1,
+          palette: palette);
       for (var p in image) {
         p.index = p.x % 256;
       }
@@ -371,7 +379,7 @@ void pngTest() {
     });
 
     test('encodeAnimation', () {
-      final anim = Image(480, 120)
+      final anim = Image(width: 480, height: 120)
       ..loopCount = 10;
       for (var i = 0; i < 10; i++) {
         final frame = i == 0 ? anim : anim.addFrame();
@@ -387,7 +395,7 @@ void pngTest() {
 
 
     test('textData', () {
-      final img = Image(16, 16, textData: {"foo":"bar"});
+      final img = Image(width: 16, height: 16, textData: {"foo":"bar"});
       final png = PngEncoder().encode(img);
       final img2 = PngDecoder().decode(png);
       expect(img2?.width, equals(img.width));

@@ -4,7 +4,8 @@ import 'package:test/test.dart';
 void imageUint16Test() {
   group('uint16', () {
     test('nc:1', () {
-      final i1 = Image(2, 2, format: Format.uint16, numChannels: 1);
+      final i1 = Image(width: 2, height: 2, format: Format.uint16,
+          numChannels: 1);
       expect(i1.width, equals(2));
       expect(i1.height, equals(2));
       expect(i1.numChannels, equals(1));
@@ -20,7 +21,8 @@ void imageUint16Test() {
     });
 
     test('nc:2', () {
-      final i2 = Image(2, 2, format: Format.uint16, numChannels: 2);
+      final i2 = Image(width: 2, height: 2, format: Format.uint16,
+          numChannels: 2);
       expect(i2.width, equals(2));
       expect(i2.height, equals(2));
       expect(i2.numChannels, equals(2));
@@ -35,7 +37,7 @@ void imageUint16Test() {
     });
 
     test('nc:3', () {
-      final i3 = Image(32, 32, format: Format.uint16);
+      final i3 = Image(width: 32, height: 32, format: Format.uint16);
       expect(i3.width, equals(32));
       expect(i3.height, equals(32));
       expect(i3.numChannels, equals(3));
@@ -59,7 +61,8 @@ void imageUint16Test() {
     });
 
     test('nc:4', () {
-      final i4 = Image(2, 2, format: Format.uint16, numChannels: 4);
+      final i4 = Image(width: 2, height: 2, format: Format.uint16,
+          numChannels: 4);
       expect(i4.width, equals(2));
       expect(i4.height, equals(2));
       expect(i4.numChannels, equals(4));

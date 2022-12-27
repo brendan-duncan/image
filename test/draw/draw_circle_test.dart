@@ -6,7 +6,7 @@ import '../test_util.dart';
 
 void drawCircleTest() {
   test('drawCircle', () {
-    final i0 = Image(256, 256);
+    final i0 = Image(width: 256, height: 256);
 
     drawCircle(i0, 128, 128, 100, ColorRgba8(255));
 

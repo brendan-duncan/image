@@ -9,7 +9,7 @@ import '../test_util.dart';
 void icoTest() {
   group('ico', () {
     test('encode', () {
-      final image = Image(64, 64)
+      final image = Image(width: 64, height: 64)
       ..clear(ColorRgb8(100, 200, 255));
 
       // Encode the image to ICO
@@ -18,7 +18,7 @@ void icoTest() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(ico);
 
-      final image2 = Image(64, 64)
+      final image2 = Image(width: 64, height: 64)
       ..clear(ColorRgb8(100, 255, 200));
 
       final ico2 = IcoEncoder().encodeImages([image, image2]);
@@ -26,7 +26,7 @@ void icoTest() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(ico2);
 
-      final image3 = Image(32, 64)
+      final image3 = Image(width: 32, height: 64)
       ..clear(ColorRgb8(255, 100, 200));
 
       final ico3 = IcoEncoder().encodeImages([image, image2, image3]);

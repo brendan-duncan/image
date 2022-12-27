@@ -17,7 +17,8 @@ Image hdrToLdr(Image hdr, {num? exposure}) {
     return math.pow(x, 0.4545) * 84.66;
   }
 
-  final image = Image(hdr.width, hdr.height, numChannels: hdr.numChannels);
+  final image = Image(width: hdr.width, height: hdr.height,
+      numChannels: hdr.numChannels);
 
   final m = (exposure != null)
       ? math.pow(2.0, (exposure + 2.47393).clamp(-20.0, 20.0))

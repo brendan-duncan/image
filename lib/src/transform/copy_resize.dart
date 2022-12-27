@@ -45,7 +45,7 @@ Image copyResize(Image src, { int? width, int? height,
   for (var i = 0; i < numFrames; ++i) {
     final frame = src.frames[i];
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, width, height);
+        Image.fromResized(frame, width: width, height: height);
     firstFrame ??= dst;
 
     final dy = frame.height / height;

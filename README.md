@@ -45,7 +45,7 @@ Create an image, set pixel values, save it to a PNG.
 import 'dart:io';
 import 'package:image/image.dart' as img;
 void main() async {
-  final image = img.Image(256, 256);
+  final image = img.Image(width: 256, height: 256);
   for (var pixel in image) {
     pixel..r = pixel.x
     ..g = pixel.y;

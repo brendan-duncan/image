@@ -27,8 +27,8 @@ class CreateImageCmd extends Command {
   @override
   Future<void> executeCommand() async {
     await input?.execute();
-    outputImage = Image(width, height, format: format, numChannels: numChannels,
-        withPalette: withPalette,
+    outputImage = Image(width: width, height: height, format: format,
+        numChannels: numChannels, withPalette: withPalette,
         paletteFormat: paletteFormat, palette: palette, exif: exif, iccp: iccp,
         textData: textData);
   }

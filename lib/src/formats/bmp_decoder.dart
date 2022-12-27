@@ -38,7 +38,7 @@ class BmpDecoder extends Decoder {
   @override
   Image decodeFrame(int frame) {
     if (info == null) {
-      return Image(0, 0);
+      return Image.empty();
     }
 
     final _info = info!;
@@ -61,8 +61,8 @@ class BmpDecoder extends Decoder {
         : Format.uint8;
     final palette = forceRgba ? null : _info.palette;
 
-    final image = Image(_info.width, _info.height, format: format,
-        numChannels: nc, palette: palette);
+    final image = Image(width: _info.width, height: _info.height,
+        format: format, numChannels: nc, palette: palette);
 
     for (var y = image.height - 1; y >= 0; --y) {
       final line = _info.readBottomUp ? y : image.height - 1 - y;

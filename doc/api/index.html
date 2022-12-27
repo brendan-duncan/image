@@ -87,7 +87,7 @@ web applications.</p>
 <pre class="language-dart"><code class="language-dart">import 'dart:io';
 import 'package:image/image.dart' as img;
 void main() async {
-  final image = img.Image(256, 256);
+  final image = img.Image(width: 256, height: 256);
   for (var pixel in image) {
     pixel..r = pixel.x
     ..g = pixel.y;

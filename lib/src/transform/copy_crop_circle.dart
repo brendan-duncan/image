@@ -28,7 +28,8 @@ Image copyCropCircle(Image src, { int? radius, int? centerX, int? centerY }) {
   final numFrames = src.numFrames;
   for (var i = 0; i < numFrames; ++i) {
     final frame = src.frames[i];
-    final dst = firstFrame?.addFrame() ?? Image.fromResized(frame, wh, wh);
+    final dst = firstFrame?.addFrame() ??
+        Image.fromResized(frame, width: wh, height: wh);
     firstFrame ??= dst;
 
     final dh = dst.height;

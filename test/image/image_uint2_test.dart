@@ -4,7 +4,8 @@ import 'package:test/test.dart';
 void imageUint2Test() {
   group('uint2', () {
     test('nc:1', () {
-      final i1 = Image(32, 32, format: Format.uint2, numChannels: 1);
+      final i1 = Image(width: 32, height: 32, format: Format.uint2,
+          numChannels: 1);
       expect(i1.width, equals(32));
       expect(i1.height, equals(32));
       expect(i1.numChannels, equals(1));
@@ -27,7 +28,8 @@ void imageUint2Test() {
     });
 
     test('nc:2', () {
-      final i2 = Image(32, 32, format: Format.uint2, numChannels: 2);
+      final i2 = Image(width: 32, height: 32, format: Format.uint2,
+          numChannels: 2);
       expect(i2.width, equals(32));
       expect(i2.height, equals(32));
       expect(i2.numChannels, equals(2));
@@ -51,7 +53,7 @@ void imageUint2Test() {
     });
 
     test('nc:3', () {
-      final i3 = Image(32, 32, format: Format.uint2);
+      final i3 = Image(width: 32, height: 32, format: Format.uint2);
       expect(i3.width, equals(32));
       expect(i3.height, equals(32));
       expect(i3.numChannels, equals(3));
@@ -77,7 +79,8 @@ void imageUint2Test() {
     });
 
     test('nc:4', () {
-      final i4 = Image(32, 32, format: Format.uint2, numChannels: 4);
+      final i4 = Image(width: 32, height: 32, format: Format.uint2,
+          numChannels: 4);
       expect(i4.width, equals(32));
       expect(i4.height, equals(32));
       expect(i4.numChannels, equals(4));
@@ -104,7 +107,8 @@ void imageUint2Test() {
 
     test('nc:3p', () {
       const w = 4;
-      final i5 = Image(w, w, format: Format.uint2, withPalette: true);
+      final i5 = Image(width: w, height: w, format: Format.uint2,
+          withPalette: true);
       expect(i5.width, equals(w));
       expect(i5.height, equals(w));
       expect(i5.numChannels, equals(3));
@@ -145,8 +149,8 @@ void imageUint2Test() {
     });
 
     test('nc:4p', () {
-      final i6 = Image(2, 2, format: Format.uint2, numChannels: 4,
-          withPalette: true);
+      final i6 = Image(width: 2, height: 2, format: Format.uint2,
+          numChannels: 4, withPalette: true);
       expect(i6.width, equals(2));
       expect(i6.height, equals(2));
       expect(i6.numChannels, equals(4));

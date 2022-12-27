@@ -9,7 +9,7 @@ import '../test_util.dart';
 void curTest() {
   group('cur', () {
     test('encode', () {
-      final image = Image(64, 64)
+      final image = Image(width: 64, height: 64)
       ..clear(ColorRgb8(100, 200, 255));
 
       // Encode the image to CUR
@@ -18,7 +18,7 @@ void curTest() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(png);
 
-      final image2 = Image(64, 64)
+      final image2 = Image(width: 64, height: 64)
       ..clear(ColorRgb8(100, 255, 200));
 
       final png2 = CurEncoder(hotSpots: {1: Point(64, 64), 0: Point(64, 64)})
@@ -27,7 +27,7 @@ void curTest() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(png2);
 
-      final image3 = Image(32, 64)
+      final image3 = Image(width: 32, height: 64)
       ..clear(ColorRgb8(255, 100, 200));
 
       final png3 = CurEncoder().encodeImages([image, image2, image3]);

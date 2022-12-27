@@ -25,7 +25,7 @@ void main() {
   const w_2 = width / 2.0;
   const aspect = 0.5;
 
-  final image = Image(width, height);
+  final image = Image(width: width, height: height);
   for (var p in image) {
     final x = p.x;
     final y = p.y;

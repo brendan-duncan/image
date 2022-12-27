@@ -6,7 +6,7 @@ import '../test_util.dart';
 
 void neuralQuantizerTest() {
   group('neuralQuantizer', () {
-    final img = Image(256, 256);
+    final img = Image(width: 256, height: 256);
     for (var p in img) {
       p..r = p.x
       ..g = p.y;

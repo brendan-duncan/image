@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 void imageUint8Test() {
   group('uint8', () {
     test('nc:1', () {
-      final i1 = Image(2, 2, numChannels: 1);
+      final i1 = Image(width: 2, height: 2, numChannels: 1);
       expect(i1.width, equals(2));
       expect(i1.height, equals(2));
       expect(i1.numChannels, equals(1));
@@ -29,7 +29,7 @@ void imageUint8Test() {
     });
 
     test('nc:2', () {
-      final i2 = Image(2, 2, numChannels: 2);
+      final i2 = Image(width: 2, height: 2, numChannels: 2);
       expect(i2.width, equals(2));
       expect(i2.height, equals(2));
       expect(i2.numChannels, equals(2));
@@ -53,7 +53,7 @@ void imageUint8Test() {
     });
 
     test('nc:3', () {
-      final i3 = Image(2, 2);
+      final i3 = Image(width: 2, height: 2);
       expect(i3.width, equals(2));
       expect(i3.height, equals(2));
       expect(i3.numChannels, equals(3));
@@ -66,7 +66,7 @@ void imageUint8Test() {
       expect(i3.getPixel(0, 1), equals([128, 52, 5]));
       expect(i3.getPixel(1, 1), equals([255, 84, 94]));
 
-      final i3b = Image(2, 2);
+      final i3b = Image(width: 2, height: 2);
       expect(i3b.width, equals(2));
       expect(i3b.height, equals(2));
       expect(i3b.numChannels, equals(3));
@@ -82,7 +82,7 @@ void imageUint8Test() {
     });
 
     test('nc:4', () {
-      final i4 = Image(2, 2, numChannels: 4);
+      final i4 = Image(width: 2, height: 2, numChannels: 4);
       expect(i4.width, equals(2));
       expect(i4.height, equals(2));
       expect(i4.numChannels, equals(4));
@@ -106,7 +106,7 @@ void imageUint8Test() {
     });
 
     test('nc:3p', () {
-      final i5 = Image(2, 2, withPalette: true);
+      final i5 = Image(width: 2, height: 2, withPalette: true);
       expect(i5.width, equals(2));
       expect(i5.height, equals(2));
       expect(i5.numChannels, equals(3));
@@ -139,7 +139,7 @@ void imageUint8Test() {
     });
 
     test('nc:4p', () {
-      final i6 = Image(2, 2, numChannels: 4, withPalette: true);
+      final i6 = Image(width: 2, height: 2, numChannels: 4, withPalette: true);
       expect(i6.width, equals(2));
       expect(i6.height, equals(2));
       expect(i6.numChannels, equals(4));
@@ -166,7 +166,7 @@ void imageUint8Test() {
     });
 
     test('uint8.convert', () {
-      final i1 = Image(2, 2, numChannels: 1)
+      final i1 = Image(width: 2, height: 2, numChannels: 1)
       ..setPixelColor(0, 0, 32)
       ..setPixelColor(1, 0, 64)
       ..setPixelColor(0, 1, 128)

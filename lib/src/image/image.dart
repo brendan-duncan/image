@@ -74,11 +74,9 @@ class Image extends Iterable<Pixel> {
   int frameIndex;
 
   /// Creates an image with the given dimensions and format.
-  Image(int width, int height,
-      { Format format = Format.uint8, int numChannels = 3,
-        bool withPalette = false,
-        Format paletteFormat = Format.uint8,
-        Palette? palette, ExifData? exif,
+  Image({ required int width, required int height, Format format = Format.uint8,
+      int numChannels = 3, bool withPalette = false,
+      Format paletteFormat = Format.uint8, Palette? palette, ExifData? exif,
         IccProfile? iccp, this.textData, this.loopCount = 0,
         this.frameType = FrameType.sequence, this.backgroundColor = null,
         this.frameDuration = 0, this.frameIndex = 0 }) {
@@ -89,7 +87,7 @@ class Image extends Iterable<Pixel> {
         iccp: iccp);
   }
 
-  Image.fromResized(Image other, int width, int height)
+  Image.fromResized(Image other, { required int width, required int height })
       : _exif = other._exif?.clone()
       , iccProfile = other.iccProfile?.clone()
       , frameType = other.frameType
@@ -112,7 +110,7 @@ class Image extends Iterable<Pixel> {
     final numFrames = other.numFrames;
     for (var fi = 1; fi < numFrames; ++fi) {
       final frame = other.frames[fi];
-      addFrame(Image.fromResized(frame, width, height));
+      addFrame(Image.fromResized(frame, width: width, height: height));
     }
   }
 
@@ -578,7 +576,7 @@ class Image extends Iterable<Pixel> {
     numChannels ??= this.numChannels;
     alpha ??= this.maxChannelValue;
 
-    final newImage = Image(width, height, format: format,
+    final newImage = Image(width: width, height: height, format: format,
         numChannels: numChannels,
         exif: _exif?.clone(), iccp: iccProfile?.clone(),
         backgroundColor: backgroundColor?.clone(),

@@ -9,7 +9,7 @@ void imageTest() {
       final i0 = Image.empty();
       expect(i0.isValid, equals(false));
 
-      final i1 = Image(0, 0);
+      final i1 = Image.empty();
       expect(i1.isValid, equals(false));
     });
 
@@ -44,7 +44,7 @@ void imageTest() {
     });
 
     test('getPixel iterator', () {
-      final i0 = Image(10, 10);
+      final i0 = Image(width: 10, height: 10);
       final p = i0.getPixel(0, 5);
       int x = 0;
       int y = 5;
@@ -60,7 +60,7 @@ void imageTest() {
     });
 
     test('getRange', () {
-      final i0 = Image(10, 10);
+      final i0 = Image(width: 10, height: 10);
       int x = 0;
       int y = 0;
       final iter = i0.getRange(0, 0, 10, 10);

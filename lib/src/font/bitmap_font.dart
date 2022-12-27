@@ -119,7 +119,7 @@ class BitmapFont {
     if (!characters.containsKey(c)) {
       return base ~/ 2;
     }
-    return characters[c]!.xadvance;
+    return characters[c]!.xAdvance;
   }
 
   Iterable<XmlElement> _childElements(XmlNode n) =>
@@ -394,16 +394,16 @@ class BitmapFontCharacter {
   final int id;
   final int width;
   final int height;
-  final int xoffset;
-  final int yoffset;
-  final int xadvance;
+  final int xOffset;
+  final int yOffset;
+  final int xAdvance;
   final int page;
   final int channel;
   final Image image;
 
-  BitmapFontCharacter(this.id, this.width, this.height, this.xoffset,
-      this.yoffset, this.xadvance, this.page, this.channel)
-      : image = Image(width, height, numChannels: 4);
+  BitmapFontCharacter(this.id, this.width, this.height, this.xOffset,
+      this.yOffset, this.xAdvance, this.page, this.channel)
+      : image = Image(width: width, height: height, numChannels: 4);
 
   @override
   String toString() {
@@ -411,9 +411,9 @@ class BitmapFontCharacter {
       'id': id,
       'width': width,
       'height': height,
-      'xoffset': xoffset,
-      'yoffset': yoffset,
-      'xadvance': xadvance,
+      'xOffset': xOffset,
+      'yOffset': yOffset,
+      'xAdvance': xAdvance,
       'page': page,
       'channel': channel
     };
