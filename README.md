@@ -7,8 +7,8 @@ This is a work in progress major update for the Image library.
 
 ## Overview
 
-The Dart Image Library provides the ability to load, save, and manipulate images
-in a variety of image file formats.
+The Dart Image Library provides the ability to load, save, and [manipulate](doc/filters.md) images
+in a variety of [image file formats](doc/formats.md).
 
 The library can be used with both dart:io and dart:html, for command-line, Flutter, and
 web applications.
@@ -23,7 +23,7 @@ web applications.
 - BMP
 - TIFF
 - TGA
-- PVRTC
+- PVR
 - ICO
 
 **Read Only**
