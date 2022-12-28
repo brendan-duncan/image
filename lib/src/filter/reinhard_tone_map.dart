@@ -8,7 +8,7 @@ Image reinhardTonemap(Image hdr) {
 
   // Compute world adaptation luminance, _Ywa_
   var ywa = 0.0;
-  for (var p in hdr) {
+  for (final p in hdr) {
     final r = p.r;
     final g = p.g;
     final b = p.b;
@@ -22,7 +22,7 @@ Image reinhardTonemap(Image hdr) {
 
   final invY2 = 1.0 / (ywa * ywa);
 
-  for (var p in hdr) {
+  for (final p in hdr) {
     final r = p.r;
     final g = p.g;
     final b = p.b;

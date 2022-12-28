@@ -23,7 +23,7 @@ void main() {
 
         i1.clear(ColorRgba8(5));
         var total = 0;
-        for (var p in i1) {
+        for (final p in i1) {
           for (var c in p) {
             total += c as int;
           }
@@ -47,7 +47,7 @@ void main() {
 
         i2.clear(ColorRgba8(5, 10));
         var total = 0;
-        for (var p in i2) {
+        for (final p in i2) {
           for (var c in p) {
             total += c as int;
           }
@@ -76,7 +76,7 @@ void main() {
 
         i3.clear(ColorRgba8(5, 10, 5));
         var total = 0;
-        for (var p in i3) {
+        for (final p in i3) {
           for (var c in p) {
             total += c as int;
           }
@@ -106,7 +106,7 @@ void main() {
 
         i4.clear(ColorRgba8(5, 10, 5, 10));
         var total = 0;
-        for (var p in i4) {
+        for (final p in i4) {
           for (var c in p) {
             total += c as int;
           }
@@ -133,14 +133,14 @@ void main() {
 
         i5.clear(ColorRgba8(50, 10, 5, 10));
         var total = 0;
-        for (var p in i5) {
+        for (final p in i5) {
           for (var c in p) {
             total += c as int;
           }
         }
         expect(total, equals((123 + 42 + 86) * 4));
 
-        for (var p in i5) {
+        for (final p in i5) {
           final i = p.index;
           i5.setPixel(p.x, p.y, p);
           expect(p.index, equals(i));
@@ -167,7 +167,7 @@ void main() {
 
         i6.clear(ColorRgba8(50, 10, 5, 10));
         var total = 0;
-        for (var p in i6) {
+        for (final p in i6) {
           for (var c in p) {
             total += c as int;
           }

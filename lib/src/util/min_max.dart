@@ -6,7 +6,7 @@ List<num> minMax(Image image) {
   var first = true;
   num min = 0;
   num max = 0;
-  for (var p in image) {
+  for (final p in image) {
     for (var c in p) {
       if (first || c < min) {
         min = c;

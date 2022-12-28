@@ -10,7 +10,7 @@ Image sepia(Image src, { num amount = 1.0 }) {
   }
 
   for (final frame in src.frames) {
-    for (var p in frame) {
+    for (final p in frame) {
       final r = p.rNormalized;
       final g = p.gNormalized;
       final b = p.bNormalized;

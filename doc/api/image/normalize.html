@@ -93,7 +93,7 @@ to the range <code>minValue</code>, <code>maxValue</code> inclusive.</p>
 
   if (min != a || max != b) {
     for (var frame in src.frames) {
-      for (var p in frame) {
+      for (final p in frame) {
         p..r = (p.r - fm) &#47; (fM - fm) * (b - a) + a
         ..g = (p.g - fm) &#47; (fM - fm) * (b - a) + a
         ..b = (p.b - fm) &#47; (fM - fm) * (b - a) + a

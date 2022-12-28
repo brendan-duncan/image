@@ -19,7 +19,7 @@ void main() {
         expect(i1.getPixel(1, 0), equals([3]));
         expect(i1.getPixel(0, 1), equals([1]));
         expect(i1.getPixel(1, 1), equals([2]));
-        for (var p in i1) {
+        for (final p in i1) {
           final p2 = i1.getPixel(p.x, p.y);
           expect(p2, equals(p));
           final v = p.x & 0x3;
@@ -43,7 +43,7 @@ void main() {
         expect(i2.getPixel(1, 0), equals([3, 0]));
         expect(i2.getPixel(0, 1), equals([2, 1]));
         expect(i2.getPixel(1, 1), equals([1, 2]));
-        for (var p in i2) {
+        for (final p in i2) {
           final p2 = i2.getPixel(p.x, p.y);
           expect(p2, equals(p));
           final v = p.x & 0x3;
@@ -68,7 +68,7 @@ void main() {
         expect(i3.getPixel(1, 0), equals([3, 0, 3]));
         expect(i3.getPixel(0, 1), equals([2, 1, 0]));
         expect(i3.getPixel(1, 1), equals([3, 1, 3]));
-        for (var p in i3) {
+        for (final p in i3) {
           final p2 = i3.getPixel(p.x, p.y);
           expect(p2, equals(p));
           final v = p.x & 0x3;
@@ -94,7 +94,7 @@ void main() {
         expect(i4.getPixel(1, 0), equals([3, 2, 1, 0]));
         expect(i4.getPixel(0, 1), equals([1, 0, 3, 2]));
         expect(i4.getPixel(1, 1), equals([2, 3, 0, 1]));
-        for (var p in i4) {
+        for (final p in i4) {
           final p2 = i4.getPixel(p.x, p.y);
           expect(p2, equals(p));
           final v = p.x & 0x3;
@@ -141,7 +141,7 @@ void main() {
         expect(p.index, equals(3));
 
         var total2 = 0;
-        for (var p in i5) {
+        for (final p in i5) {
           p.index = p.x;
           total2 += p.index as int;
         }

@@ -104,7 +104,7 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
   for (final frame in image.frames) {
     switch (type) {
       case NoiseType.gaussian:
-        for (var p in frame) {
+        for (final p in frame) {
           final r = p.r + nSigma * grand(random);
           final g = p.g + nSigma * grand(random);
           final b = p.b + nSigma * grand(random);
@@ -113,7 +113,7 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
         }
         break;
       case NoiseType.uniform:
-        for (var p in frame) {
+        for (final p in frame) {
           final r = p.r + nSigma * crand(random);
           final g = p.g + nSigma * crand(random);
           final b = p.b + nSigma * crand(random);
@@ -129,7 +129,7 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
           m = 0;
           M = 255;
         }
-        for (var p in frame) {
+        for (final p in frame) {
           if (random.nextDouble() * 100.0 &lt; nSigma) {
             final r = random.nextDouble() &lt; 0.5 ? M : m;
             final g = random.nextDouble() &lt; 0.5 ? M : m;
@@ -140,7 +140,7 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
         }
         break;
       case NoiseType.poisson:
-        for (var p in frame) {
+        for (final p in frame) {
           final r = prand(random, p.r.toDouble());
           final g = prand(random, p.g.toDouble());
           final b = prand(random, p.b.toDouble());
@@ -150,7 +150,7 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
         break;
       case NoiseType.rice:
         final num sqrt2 = sqrt(2.0);
-        for (var p in frame) {
+        for (final p in frame) {
           var val0 = p.r &#47; sqrt2;
           var re = val0 + nSigma * grand(random);
           var im = val0 + nSigma * grand(random);

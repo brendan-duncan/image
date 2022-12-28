@@ -20,7 +20,7 @@ Image normalize(Image src, num minValue, num maxValue) {
 
   if (min != a || max != b) {
     for (var frame in src.frames) {
-      for (var p in frame) {
+      for (final p in frame) {
         p..r = (p.r - fm) / (fM - fm) * (b - a) + a
         ..g = (p.g - fm) / (fM - fm) * (b - a) + a
         ..b = (p.b - fm) / (fM - fm) * (b - a) + a

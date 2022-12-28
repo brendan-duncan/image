@@ -129,7 +129,7 @@
   switch (pType) {
     case pvrTypeRgba4444:
       final image = Image(width, height, numChannels: 4);
-      for (var p in image) {
+      for (final p in image) {
         final v1 = input.readByte();
         final v2 = input.readByte();
         final a = (v1 &amp; 0x0f) &lt;&lt; 4;
@@ -145,7 +145,7 @@
       return image;
     case pvrTypeRgba5551:
       final image = Image(width, height, numChannels: 4);
-      for (var p in image) {
+      for (final p in image) {
         final v = input.readUint16();
         final r = (v &amp; 0xf800) &gt;&gt; 8;
         final g = (v &amp; 0x07c0) &gt;&gt; 3;
@@ -159,7 +159,7 @@
       return image;
     case pvrTypeRgba8888:
       final image = Image(width, height, numChannels: 4);
-      for (var p in image) {
+      for (final p in image) {
         p..r = input.readByte()
         ..g = input.readByte()
         ..b = input.readByte()
@@ -168,7 +168,7 @@
       return image;
     case pvrTypeRgb565:
       final image = Image(width, height);
-      for (var p in image) {
+      for (final p in image) {
         final v = input.readUint16();
         final b = (v &amp; 0x001f) &lt;&lt; 3;
         final g = (v &amp; 0x07e0) &gt;&gt; 3;
@@ -180,7 +180,7 @@
       return image;
     case pvrTypeRgb555:
       final image = Image(width, height);
-      for (var p in image) {
+      for (final p in image) {
         final v = input.readUint16();
         final r = (v &amp; 0x001f) &lt;&lt; 3;
         final g = (v &amp; 0x03e0) &gt;&gt; 2;
@@ -192,7 +192,7 @@
       return image;
     case pvrTypeRgb888:
       final image = Image(width, height);
-      for (var p in image) {
+      for (final p in image) {
         p..r = input.readByte()
         ..g = input.readByte()
         ..b = input.readByte();
@@ -200,14 +200,14 @@
       return image;
     case pvrTypeI8:
       final image = Image(width, height, numChannels: 1);
-      for (var p in image) {
+      for (final p in image) {
         final i = input.readByte();
         p.r = i;
       }
       return image;
     case pvrTypeAI8:
       final image = Image(width, height, numChannels: 2);
-      for (var p in image) {
+      for (final p in image) {
         final i = input.readByte();
         final a = input.readByte();
         p..r = i

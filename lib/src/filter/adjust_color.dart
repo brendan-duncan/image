@@ -113,7 +113,7 @@ Image adjustColor(Image src,
   final invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
 
   for (final frame in src.frames) {
-    for (var p in frame) {
+    for (final p in frame) {
       final num or = p.r / 255.0;
       final num og = p.g / 255.0;
       final num ob = p.b / 255.0;

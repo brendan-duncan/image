@@ -78,7 +78,7 @@
 
   &#47;&#47; Compute world adaptation luminance, _Ywa_
   var ywa = 0.0;
-  for (var p in hdr) {
+  for (final p in hdr) {
     final r = p.r;
     final g = p.g;
     final b = p.b;
@@ -92,7 +92,7 @@
 
   final invY2 = 1.0 &#47; (ywa * ywa);
 
-  for (var p in hdr) {
+  for (final p in hdr) {
     final r = p.r;
     final g = p.g;
     final b = p.b;

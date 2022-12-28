@@ -50,7 +50,7 @@ void main() {
             expect(a2.height, equals(anim.height));
             for (var frame in anim.frames) {
               final i2 = a2.frames[frame.frameIndex];
-              for (var p in frame) {
+              for (final p in frame) {
                 final p2 = i2.getPixel(p.x, p.y);
                 expect(p, equals(p2));
               }

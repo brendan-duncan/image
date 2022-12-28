@@ -94,7 +94,7 @@
     final frame = src.frames[i];
     final dst = firstFrame?.addFrame() ?? Image.fromResized(frame, w, h);
     firstFrame ??= dst;
-    for (var p in dst) {
+    for (final p in dst) {
       p.set(frame.getPixel(x + p.x, y + p.y));
     }
   }

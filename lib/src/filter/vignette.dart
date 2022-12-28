@@ -19,7 +19,7 @@ Image vignette(Image src, { num start = 0.3, num end = 0.75,
   final w = src.width - 1;
   final invAmt = 1.0 - amount;
   for (final frame in src.frames) {
-    for (var p in frame) {
+    for (final p in frame) {
       final dy = 0.5 - (p.y / h);
       final dx = 0.5 - (p.x / w);
       num d = sqrt(dx * dx + dy * dy);

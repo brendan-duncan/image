@@ -13,7 +13,7 @@ Image monochrome(Image src, { Color? color, num amount = 1 }) {
   final nb = color?.bNormalized ?? 0.3;
 
   for (final frame in src.frames) {
-    for (var p in frame) {
+    for (final p in frame) {
       final y = p.luminanceNormalized;
 
       final r = y < 0.5 ? (2 * y * nr) : 1 - 2 * (1 - y) * (1 - nr);

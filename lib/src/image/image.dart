@@ -585,7 +585,7 @@ class Image extends Iterable<Pixel> {
     ..textData = textData != null ? Map<String, String>.from(textData!) : null;
 
     Pixel? p2;
-    for (var p in newImage) {
+    for (final p in newImage) {
       p2 = getPixel(p.x, p.y, p2);
       final c = convertColor(p2, to: p, alpha: alpha);
       p.set(c);

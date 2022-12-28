@@ -194,7 +194,7 @@ class GifDecoder extends Decoder {
 
       lastImage.frameDuration = image.frameDuration;
 
-      for (var p in image) {
+      for (final p in image) {
         if (p.a != 0) {
           lastImage.setPixel(p.x + frame.x, p.y + frame.y, p);
         }

@@ -15,7 +15,7 @@ int hashImage(Image image) {
 
   final rgbaDouble = Float64List(4);
   final rgba8 = Uint8List.view(rgbaDouble.buffer);
-  for (var p in image) {
+  for (final p in image) {
     for (var ci = 0; ci < p.length; ++ci) {
       rgbaDouble[ci] = p[ci].toDouble();
     }

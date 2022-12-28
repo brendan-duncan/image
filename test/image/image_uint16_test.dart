@@ -51,7 +51,7 @@ void main() {
         expect(i3.getPixel(0, 1), equals([58, 52, 5]));
         expect(i3.getPixel(1, 1), equals([110, 84, 94]));
 
-        for (var p in i3) {
+        for (final p in i3) {
           final c = p.x * 2114;
           p..r = c
           ..g = c

@@ -101,7 +101,7 @@ to set the new alpha channel. If <code>alpha</code> is not provided, then the
   ..textData = textData != null ? Map&lt;String, String&gt;.from(textData!) : null;
 
   Pixel? p2;
-  for (var p in newImage) {
+  for (final p in newImage) {
     p2 = getPixel(p.x, p.y, p2);
     final c = convertColor(p2, format: format, numChannels: numChannels,
         alpha: alpha);

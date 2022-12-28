@@ -13,7 +13,7 @@ class OctreeQuantizer extends Quantizer {
   OctreeQuantizer(Image image, {int numberOfColors = 256})
       : _root = _OctreeNode(0, 0, null) {
     final heap = _HeapNode();
-    for (var p in image) {
+    for (final p in image) {
       final r = p.r as int;
       final g = p.g as int;
       final b = p.b as int;

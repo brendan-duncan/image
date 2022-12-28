@@ -8,7 +8,7 @@ void main() {
   group('Util', () {
     group('neuralQuantizer', () {
       final img = Image(width: 256, height: 256);
-      for (var p in img) {
+      for (final p in img) {
         p..r = p.x
         ..g = p.y;
       }

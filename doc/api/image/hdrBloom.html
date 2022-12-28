@@ -94,7 +94,7 @@
     &#47;&#47; Apply bloom filter to image pixels
     var offset = 0;
     final bloomImage = Float32List(3 * hdr.width * hdr.height);
-    for (var p in hdr) {
+    for (final p in hdr) {
       final x = p.x;
       final y = p.y;
       &#47;&#47; Compute bloom for pixel _(x,y)_
@@ -137,7 +137,7 @@
 
     &#47;&#47; Mix bloom effect into each pixel
     offset = 0;
-    for (var p in hdr) {
+    for (final p in hdr) {
       p..r = _lerp(weight, p.r.toDouble(), bloomImage[offset])
       ..g = _lerp(weight, p.g.toDouble(), bloomImage[offset + 1])
       ..b = _lerp(weight, p.b.toDouble(), bloomImage[offset + 2]);

@@ -20,7 +20,7 @@ void main() {
         expect(i1.getPixel(0, 1), equals([5]));
         expect(i1.getPixel(1, 1), equals([15]));
 
-        for (var p in i1) {
+        for (final p in i1) {
           final p2 = i1.getPixel(p.x, p.y);
           expect(p2, equals(p), reason: '${p2.x} ${p2.y}');
           final v = p.x & 0xf;
@@ -45,7 +45,7 @@ void main() {
         expect(i2.getPixel(0, 1), equals([7, 14]));
         expect(i2.getPixel(1, 1), equals([15, 2]));
 
-        for (var p in i2) {
+        for (final p in i2) {
           final p2 = i2.getPixel(p.x, p.y);
           expect(p2, equals(p));
           final v = p.x & 0xf;
@@ -72,7 +72,7 @@ void main() {
         expect(i3.getPixel(0, 1), equals([2, 11, 9]));
         expect(i3.getPixel(i3.width - 1, i3.height - 1), equals([3, 1, 13]));
 
-        for (var p in i3) {
+        for (final p in i3) {
           final p2 = i3.getPixel(p.x, p.y);
           expect(p2, equals(p));
           final v = p.x & 0xf;
@@ -98,7 +98,7 @@ void main() {
         expect(i4.getPixel(1, 0), equals([3, 12, 1, 0]));
         expect(i4.getPixel(0, 1), equals([1, 0, 15, 2]));
         expect(i4.getPixel(1, 1), equals([2, 13, 0, 1]));
-        for (var p in i4) {
+        for (final p in i4) {
           final p2 = i4.getPixel(p.x, p.y);
           expect(p2, equals(p));
           final v = p.x & 0xf;
@@ -134,7 +134,7 @@ void main() {
           i5.palette!.setColor(i, i, i, i);
         }
 
-        for (var p in i5) {
+        for (final p in i5) {
           final p2 = i5.getPixel(p.x, p.y);
           expect(p2, equals(p));
           final v = p.x & 0xf;

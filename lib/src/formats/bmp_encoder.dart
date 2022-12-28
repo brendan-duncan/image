@@ -23,7 +23,7 @@ class BmpEncoder extends Encoder {
       bpp = 16;
     }
 
-    final compression = bpp == 32 ? BmpCompression.bitfields
+    final compression = bpp > 8 ? BmpCompression.bitfields
         : BmpCompression.none;
 
     final imageStride = image.rowStride;
@@ -33,15 +33,11 @@ class BmpEncoder extends Encoder {
         ? List<int>.filled(rowPaddingSize, 0xff) : null;
 
     final imageFileSize = fileStride * image.height;
-
-    //final bitmaskSize = bpp == 32 ? 16 : 0;
-
     final headerInfoSize = bpp > 8 ? 124 : 40;
     final headerSize = headerInfoSize + 14;
     final paletteSize = (image.palette?.numColors ?? 0) * 4;
     final origImageOffset = headerSize + paletteSize;
     final imageOffset = _roundToMultiple(origImageOffset);
-    //final imageOffset = origImageOffset;
     final gapSize = imageOffset - origImageOffset;
     final fileSize = imageFileSize + headerSize + paletteSize + gapSize;
 
@@ -64,10 +60,15 @@ class BmpEncoder extends Encoder {
     ..writeUint32(bpp == 8 ? 255 : 0); // importantColors
 
     if (bpp > 8) {
-      out..writeUint32(0x00ff0000) // redMask
-        ..writeUint32(0x0000ff00) // greenMask
-        ..writeUint32(0x000000ff) // blueMask
-        ..writeUint32(0xff000000) // alphaMask
+      final blueMask = bpp == 16 ? 0xf : 0xff;
+      final greenMask = bpp == 16 ? 0xf0 : 0xff00;
+      final redMask = bpp == 16 ? 0xf00 : 0xff0000;
+      final alphaMask = bpp == 16 ? 0xf000 : 0xff000000;
+
+      out..writeUint32(redMask) // redMask
+        ..writeUint32(greenMask) // greenMask
+        ..writeUint32(blueMask) // blueMask
+        ..writeUint32(alphaMask) // alphaMask
         ..writeUint32(sRgb) // CSType
         ..writeUint32(0) // endpoints.red.x
         ..writeUint32(0) // endpoints.red.y
@@ -183,39 +184,34 @@ class BmpEncoder extends Encoder {
       return out.getBytes();
     }
 
+    final hasAlpha = image.numChannels == 4;
+    final h = image.height;
+    final w = image.width;
     if (bpp == 16) {
-      final h = image.height;
-      final w = image.width;
       for (var y = h - 1; y >= 0; --y) {
         for (var x = 0; x < w; ++x) {
           final p = image.getPixel(x, y);
-          final c = (p.r.toInt().clamp(0,15) << 10) |
-              (p.g.toInt().clamp(0,15) << 5) |
-              (p.b.toInt().clamp(0,15));
-          out.writeUint16(c);
+          out..writeByte((p.g.toInt() << 4) | p.b.toInt())
+          ..writeByte((p.a.toInt() << 4) | p.r.toInt());
         }
         if (rowPadding != null) {
           out.writeBytes(rowPadding);
         }
       }
-      return out.getBytes();
-    }
-
-    final hasAlpha = image.numChannels == 4;
-    final h = image.height;
-    final w = image.width;
-    for (var y = h - 1; y >= 0; --y) {
-      for (var x = 0; x < w; ++x) {
-        final p = image.getPixel(x, y);
-        out..writeByte(p.b.toInt())
-        ..writeByte(p.g.toInt())
-        ..writeByte(p.r.toInt());
-        if (hasAlpha) {
-          out.writeByte(p.a.toInt());
+    } else {
+      for (var y = h - 1; y >= 0; --y) {
+        for (var x = 0; x < w; ++x) {
+          final p = image.getPixel(x, y);
+          out..writeByte(p.b.toInt())
+          ..writeByte(p.g.toInt())
+          ..writeByte(p.r.toInt());
+          if (hasAlpha) {
+            out.writeByte(p.a.toInt());
+          }
         }
-      }
-      if (rowPadding != null) {
-        out.writeBytes(rowPadding);
+        if (rowPadding != null) {
+          out.writeBytes(rowPadding);
+        }
       }
     }
 

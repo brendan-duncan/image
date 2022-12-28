@@ -26,7 +26,7 @@ void main() {
   const aspect = 0.5;
 
   final image = Image(width: width, height: height);
-  for (var p in image) {
+  for (final p in image) {
     final x = p.x;
     final y = p.y;
     final pi = (y - h_2) / (0.5 * zoom * aspect * height) + moveY;

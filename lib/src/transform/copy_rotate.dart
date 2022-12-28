@@ -41,7 +41,7 @@ Image copyRotate(Image src, num angle,
       format: src.format, numChannels: src.numChannels, palette: src.palette,
       exif: src.exif, iccp: src.iccProfile);
 
-  for (var p in dst) {
+  for (final p in dst) {
     final x = p.x;
     final y = p.y;
     final x2 = w2 + (x - dw2) * ca + (y - dh2) * sa;

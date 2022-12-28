@@ -15,7 +15,7 @@ Image sketch(Image src, { num amount = 1 }) {
     final width = frame.width;
     final height = frame.height;
     final orig = Image.from(frame, noAnimation: true);
-    for (var p in frame) {
+    for (final p in frame) {
       final ny = (p.y - 1).clamp(0, height - 1);
       final py = (p.y + 1).clamp(0, height - 1);
       final nx = (p.x - 1).clamp(0, width - 1);

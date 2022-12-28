@@ -11,7 +11,7 @@ void main() {
       final i1 = Image(width: 256, height: 256, numChannels: 4);
 
       i0.clear(ColorRgba8(255));
-      for (var p in i1) {
+      for (final p in i1) {
         p..r = p.x
         ..g = p.y
         ..a = p.y;
@@ -26,7 +26,7 @@ void main() {
 
       var fg = decodeTga(File('test/_data/tga/globe.tga').readAsBytesSync())!;
       fg = fg.convert(numChannels: 4);
-      for (var p in fg) {
+      for (final p in fg) {
         if (p.r == 0 && p.g == 0 && p.b == 0) {
           p.a = 0;
         }

@@ -35,7 +35,7 @@ Image noise(Image image, num sigma,
   for (final frame in image.frames) {
     switch (type) {
       case NoiseType.gaussian:
-        for (var p in frame) {
+        for (final p in frame) {
           final r = p.r + nSigma * grand(random);
           final g = p.g + nSigma * grand(random);
           final b = p.b + nSigma * grand(random);
@@ -44,7 +44,7 @@ Image noise(Image image, num sigma,
         }
         break;
       case NoiseType.uniform:
-        for (var p in frame) {
+        for (final p in frame) {
           final r = p.r + nSigma * crand(random);
           final g = p.g + nSigma * crand(random);
           final b = p.b + nSigma * crand(random);
@@ -60,7 +60,7 @@ Image noise(Image image, num sigma,
           m = 0;
           M = 255;
         }
-        for (var p in frame) {
+        for (final p in frame) {
           if (random.nextDouble() * 100.0 < nSigma) {
             final r = random.nextDouble() < 0.5 ? M : m;
             final g = random.nextDouble() < 0.5 ? M : m;
@@ -71,7 +71,7 @@ Image noise(Image image, num sigma,
         }
         break;
       case NoiseType.poisson:
-        for (var p in frame) {
+        for (final p in frame) {
           final r = prand(random, p.r.toDouble());
           final g = prand(random, p.g.toDouble());
           final b = prand(random, p.b.toDouble());
@@ -81,7 +81,7 @@ Image noise(Image image, num sigma,
         break;
       case NoiseType.rice:
         final num sqrt2 = sqrt(2.0);
-        for (var p in frame) {
+        for (final p in frame) {
           var val0 = p.r / sqrt2;
           var re = val0 + nSigma * grand(random);
           var im = val0 + nSigma * grand(random);

@@ -530,7 +530,7 @@ class PsdImage implements DecodeInfo {
     final channel_1 = channels[-1];
 
     var si = -ns;
-    for (var p in output) {
+    for (final p in output) {
       si += ns;
       switch (colorMode) {
         case PsdColorMode.rgb:

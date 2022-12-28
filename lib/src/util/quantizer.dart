@@ -24,7 +24,7 @@ abstract class Quantizer {
 
     final ti = target.iterator..moveNext();
 
-    for (var p in image) {
+    for (final p in image) {
       final t = ti.current;
       t[0] = getColorIndex(p);
       ti.moveNext();

@@ -16,7 +16,7 @@ Image invert(Image src) {
     } else {
 
       if (max != 0.0) {
-        for (var p in frame) {
+        for (final p in frame) {
           p..r = max - p.r
           ..g = max - p.g
           ..b = max - p.b;

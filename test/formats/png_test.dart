@@ -13,7 +13,7 @@ void main() {
       group('b1_1', () {
         final image = Image(width: 32, height: 32,
             format: Format.uint1, numChannels: 1);
-        for (var p in image) {
+        for (final p in image) {
           final c = p.x < (32 - p.y) ? 1 : 0;
           p.r = c;
         }
@@ -35,7 +35,7 @@ void main() {
       group('b1_1', () {
         final image = Image(width: 32, height: 32, format: Format.uint1,
             numChannels: 1);
-        for (var p in image) {
+        for (final p in image) {
           final c = p.x < (32 - p.y) ? 1 : 0;
           p.r = c;
         }
@@ -59,7 +59,7 @@ void main() {
             withPalette: true);
         image.palette!.setColor(0, 255);
         image.palette!.setColor(1, 0, 255);
-        for (var p in image) {
+        for (final p in image) {
           final c = p.x < (32 - p.y) ? 1 : 0;
           p.index = c;
         }
@@ -81,7 +81,7 @@ void main() {
       group('b2_1', () {
         final image = Image(width: 32, height: 32, format: Format.uint2,
             numChannels: 1);
-        for (var p in image) {
+        for (final p in image) {
           final c = p.x < (32 - p.y) ? 3 : 0;
           p.r = c;
         }
@@ -107,7 +107,7 @@ void main() {
         for (var i = 0; i < 4; ++i) {
           image.palette!.setColor(i, i * 85, i * 85, i * 85);
         }
-        for (var p in image) {
+        for (final p in image) {
           p.r = p.x >> 3;
         }
 
@@ -129,7 +129,7 @@ void main() {
       group('b4_1', () {
         final image = Image(width: 32, height: 32, format: Format.uint4,
             numChannels: 1);
-        for (var p in image) {
+        for (final p in image) {
           final c = p.x < (32 - p.y) ? 31 : 0;
           p.r = c;
         }
@@ -155,7 +155,7 @@ void main() {
         for (var i = 0; i < 16; ++i) {
           image.palette!.setColor(i, i * 17, i * 17, i * 17);
         }
-        for (var p in image) {
+        for (final p in image) {
           p.r = p.x >> 1;
         }
 
@@ -176,7 +176,7 @@ void main() {
 
       group('b8_3', () {
         final image = Image(width: 32, height: 32);
-        for (var p in image) {
+        for (final p in image) {
           final c = p.x < (32 - p.y) ? 255 : 0;
           p..r = c
           ..g = c
@@ -202,7 +202,7 @@ void main() {
         for (var i = 0; i < 256; ++i) {
           image.palette!.setColor(i, i, i, i);
         }
-        for (var p in image) {
+        for (final p in image) {
           p.r = p.x * 8;
         }
 
@@ -222,7 +222,7 @@ void main() {
 
       group('b16_3', () {
         final image = Image(width: 32, height: 32, format: Format.uint16);
-        for (var p in image) {
+        for (final p in image) {
           final c = p.x * 2114;
           p..r = c
           ..g = c
@@ -240,7 +240,7 @@ void main() {
             expect(image2, isNotNull);
             testImageEquals(image, image2);
 
-            for (var p in image2) {
+            for (final p in image2) {
               final c = p.x * 2114;
               expect(p, equals([c, c, c]));
             }
@@ -269,7 +269,7 @@ void main() {
         }
         final image = Image(width: 256, height: 256, numChannels: 1,
             palette: palette);
-        for (var p in image) {
+        for (final p in image) {
           p.index = p.x % 256;
         }
 
@@ -282,7 +282,7 @@ void main() {
         expect(image2!.width, equals(image.width));
         expect(image2.height, equals(image.height));
         final p2 = image2.iterator..moveNext();
-        for (var p in image) {
+        for (final p in image) {
           expect(p, equals(p2.current));
           p2.moveNext();
         }
@@ -481,7 +481,7 @@ void main() {
                 expect(i1.height, equals(anim.height));
                 expect(i1.format, equals(anim.format));
                 expect(i1.numChannels, equals(anim.numChannels));
-                for (var p in i1) {
+                for (final p in i1) {
                   final p2 = anim.getPixel(p.x, p.y);
                   expect(p, equals(p2));
                 }

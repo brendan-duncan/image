@@ -5,7 +5,7 @@ import '../image/image.dart';
 Image colorOffset(Image src,
     { num red = 0, num green = 0, num blue = 0, num alpha = 0 }) {
   for (final frame in src.frames) {
-    for (var p in frame) {
+    for (final p in frame) {
       p..r += red
       ..g += green
       ..b += blue
