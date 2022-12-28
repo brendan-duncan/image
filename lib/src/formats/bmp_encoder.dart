@@ -23,6 +23,9 @@ class BmpEncoder extends Encoder {
       bpp = 16;
     }
 
+    final compression = bpp == 32 ? BmpCompression.bitfields
+        : BmpCompression.none;
+
     final imageStride = image.rowStride;
     final fileStride = ((image.width * bpp + 31) ~/ 32) * 4;
     final rowPaddingSize = fileStride - imageStride;
@@ -31,31 +34,58 @@ class BmpEncoder extends Encoder {
 
     final imageFileSize = fileStride * image.height;
 
-    const headerSize = 54;
-    const headerInfoSize = 40;
+    //final bitmaskSize = bpp == 32 ? 16 : 0;
+
+    final headerInfoSize = bpp > 8 ? 124 : 40;
+    final headerSize = headerInfoSize + 14;
     final paletteSize = (image.palette?.numColors ?? 0) * 4;
     final origImageOffset = headerSize + paletteSize;
     final imageOffset = _roundToMultiple(origImageOffset);
+    //final imageOffset = origImageOffset;
     final gapSize = imageOffset - origImageOffset;
     final fileSize = imageFileSize + headerSize + paletteSize + gapSize;
 
-    out..writeUint16(BmpFileHeader.bmpHeaderFiletype)
-    ..writeUint32(fileSize)
+    const sRgb = 0x73524742;
 
+    out..writeUint16(BmpFileHeader.signature)
+    ..writeUint32(fileSize)
     ..writeUint32(0) // reserved
     ..writeUint32(imageOffset) // offset to image data
-
     ..writeUint32(headerInfoSize)
     ..writeUint32(image.width)
     ..writeUint32(image.height)
     ..writeUint16(1) // planes
     ..writeUint16(bpp) // bits per pixel
-    ..writeUint32(BmpCompression.none.index) // compression, none
+    ..writeUint32(compression.index) // compression
     ..writeUint32(imageFileSize)
-    ..writeUint32(0) // hr
-    ..writeUint32(0) // vr
-    ..writeUint32(0) // totalColors
-    ..writeUint32(0); // importantColors
+    ..writeUint32(11811) // hr
+    ..writeUint32(11811) // vr
+    ..writeUint32(bpp == 8 ? 255 : 0) // totalColors
+    ..writeUint32(bpp == 8 ? 255 : 0); // importantColors
+
+    if (bpp > 8) {
+      out..writeUint32(0x00ff0000) // redMask
+        ..writeUint32(0x0000ff00) // greenMask
+        ..writeUint32(0x000000ff) // blueMask
+        ..writeUint32(0xff000000) // alphaMask
+        ..writeUint32(sRgb) // CSType
+        ..writeUint32(0) // endpoints.red.x
+        ..writeUint32(0) // endpoints.red.y
+        ..writeUint32(0) // endpoints.red.z
+        ..writeUint32(0) // endpoints.green.x
+        ..writeUint32(0) // endpoints.green.y
+        ..writeUint32(0) // endpoints.green.z
+        ..writeUint32(0) // endpoints.blue.x
+        ..writeUint32(0) // endpoints.blue.y
+        ..writeUint32(0) // endpoints.blue.z
+        ..writeUint32(0) // gammaRed
+        ..writeUint32(0) // gammaGreen
+        ..writeUint32(0) // gammaBlue
+        ..writeUint32(2) // intent LCS_GM_GRAPHICS
+        ..writeUint32(0) // profileData
+        ..writeUint32(0) // profileSize
+        ..writeUint32(0); // reserved
+    }
 
     if (bpp == 1 || bpp == 2 || bpp == 4 || bpp == 8) {
       if (image.hasPalette) {
@@ -171,6 +201,7 @@ class BmpEncoder extends Encoder {
       return out.getBytes();
     }
 
+    final hasAlpha = image.numChannels == 4;
     final h = image.height;
     final w = image.width;
     for (var y = h - 1; y >= 0; --y) {
@@ -179,7 +210,7 @@ class BmpEncoder extends Encoder {
         out..writeByte(p.b.toInt())
         ..writeByte(p.g.toInt())
         ..writeByte(p.r.toInt());
-        if (image.numChannels == 4) {
+        if (hasAlpha) {
           out.writeByte(p.a.toInt());
         }
       }

@@ -45,10 +45,10 @@ class BmpFileHeader {
       return false;
     }
     final type = InputBuffer.from(b).readUint16();
-    return type == bmpHeaderFiletype;
+    return type == signature;
   }
 
-  static const bmpHeaderFiletype = 0x4d42; // BM
+  static const signature = 0x4d42; // BM
 }
 
 class BmpInfo implements DecodeInfo {
@@ -81,7 +81,7 @@ class BmpInfo implements DecodeInfo {
 
   final int _startPos;
 
-  BmpInfo(InputBuffer p, {BmpFileHeader? fileHeader})
+  BmpInfo(InputBuffer p, { BmpFileHeader? fileHeader })
       : header = fileHeader ?? BmpFileHeader(p)
       , _startPos = p.offset
       , headerSize = p.readUint32()
@@ -95,12 +95,11 @@ class BmpInfo implements DecodeInfo {
       , yppm = p.readInt32()
       , totalColors = p.readUint32()
       , importantColors = p.readUint32() {
-
     // BMP allows > 4 bit per channel for 16bpp, so we have to scale it
     // up to 8-bit
     const maxChannelValue = 255.0;
 
-    if (compression == BmpCompression.bitfields ||
+    if (headerSize > 40 || compression == BmpCompression.bitfields ||
         compression == BmpCompression.alphaBitfields) {
       redMask = p.readUint32();
       _redShift = countTrailingZeroBits(redMask);
@@ -117,7 +116,7 @@ class BmpInfo implements DecodeInfo {
       final blueDepth = blueMask >> _blueShift;
       _blueScale = redDepth > 0 ? maxChannelValue / blueDepth : 0;
 
-      if (compression == BmpCompression.alphaBitfields) {
+      if (headerSize > 40 || compression == BmpCompression.alphaBitfields) {
         alphaMask = p.readUint32();
         _alphaShift = countTrailingZeroBits(alphaMask);
         final alphaDepth = alphaMask >> _alphaShift;

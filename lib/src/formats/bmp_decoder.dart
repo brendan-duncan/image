@@ -48,7 +48,7 @@ class BmpDecoder extends Decoder {
     final bpp = _info.bitsPerPixel;
     final rowStride = ((_info.width * bpp + 31) ~/ 32) * 4;
     final nc = forceRgba ? 4
-        : bpp == 1 || bpp == 4 || bpp == 8 ? 1 : bpp == 32 ? 3 : 3;
+        : bpp == 1 || bpp == 4 || bpp == 8 ? 1 : bpp == 32 ? 4 : 3;
     final format = forceRgba ? Format.uint8
         : bpp == 1 ? Format.uint1
         : bpp == 2 ? Format.uint2
@@ -58,6 +58,7 @@ class BmpDecoder extends Decoder {
         // up to 8-bit
         : bpp == 16 ? Format.uint8
         : bpp == 24 ? Format.uint8
+        : bpp == 32 ? Format.uint8
         : Format.uint8;
     final palette = forceRgba ? null : _info.palette;
 
@@ -98,10 +99,9 @@ class BmpDecoder extends Decoder {
   /// decoding the file, null is returned.
   @override
   Image? decode(Uint8List data, { int? frame }) {
-    if (!isValidFile(data)) {
+    if (startDecode(data) == null) {
       return null;
     }
-    startDecode(data);
     return decodeFrame(frame ?? 0);
   }
 }

@@ -76,7 +76,7 @@ class IcoDecoder extends Decoder {
 
     // should be bmp.
     final dummyBmpHeader = OutputBuffer(size: 14)
-      ..writeUint16(BmpFileHeader.bmpHeaderFiletype)
+      ..writeUint16(BmpFileHeader.signature)
       ..writeUint32(imageInfo.bytesSize)
       ..writeUint32(0)
       ..writeUint32(0);
