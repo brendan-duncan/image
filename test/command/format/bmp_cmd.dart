@@ -8,11 +8,11 @@ import '../../_test_util.dart';
 void main() {
   group('Command', () {
     test('bmp', () async {
-      /*await (Command()
+      await (Command()
         ..decodeBmpFile('test/_data/bmp/buck_24.bmp')
         ..writeToFile('$testOutputPath/cmd/buck_24.bmp'))
         .execute();
-      expect(File('$testOutputPath/cmd/buck_24.bmp').existsSync(), isTrue);*/
+      expect(File('$testOutputPath/cmd/buck_24.bmp').existsSync(), isTrue);
 
       await (Command()
         ..createImage(width: 256, height: 256, format: Format.uint4,
