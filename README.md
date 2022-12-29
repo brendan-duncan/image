@@ -57,7 +57,7 @@ void main() async {
 
 To asynchronously load an image file, resize it, and save it as a thumbnail: 
 ```dart
-import 'package:image/image_io.dart' as img;
+import 'package:image/image.dart' as img;
 
 void main(List<String> args) async {
   final path = args.isNotEmpty ? args[0] : 'test.png';
