@@ -600,10 +600,10 @@ class Command {
         centerY: centerY, interpolation: interpolation);
   }
 
-  void vignette({ num start = 0.3, num end = 0.75,
+  void vignette({ num start = 0.3, num end = 0.75, Color? color,
       num amount = 0.8 }) {
     subCommand = VignetteCmd(subCommand, start: start, end: end,
-        amount: amount);
+        color: color, amount: amount);
   }
 
   /// Run an arbitrary function on the image within the Command graph.

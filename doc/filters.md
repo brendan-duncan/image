@@ -196,7 +196,7 @@ color filters, transformations into other images (resize, crop), or basic drawin
 ![stretchDistortion](images/filter/stretchDistortion.png)
 
 * Image **[vignette](https://brendan-duncan.github.io/image/doc/api/image/vignette.html)**
-(Image src, { num start = 0.3, num end = 0.75, num amount = 0.8 })
+(Image src, { num start = 0.3, num end = 0.75, Color? color, num amount = 0.8 })
 
 ![vignette](images/filter/vignette.png)
 
