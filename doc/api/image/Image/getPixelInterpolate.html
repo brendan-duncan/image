@@ -60,7 +60,7 @@
 <span class="returntype"><a href="../../image/Color-class.html">Color</a></span>
 <span class="name ">getPixelInterpolate</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getPixelInterpolate-param-fx"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">fx</span>, </span></li>
 <li><span class="parameter" id="getPixelInterpolate-param-fy"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">fy</span>, </span></li>
-<li><span class="parameter" id="getPixelInterpolate-param-interpolation">[<span class="type-annotation"><a href="../../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.linear</span>]</span></li>
+<li><span class="parameter" id="getPixelInterpolate-param-interpolation">{<span class="type-annotation"><a href="../../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.linear</span>}</span></li>
 </ol>)
 
       
@@ -77,7 +77,7 @@ coordinates.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Color getPixelInterpolate(num fx, num fy,
-    [Interpolation interpolation = Interpolation.linear]) {
+  { Interpolation interpolation = Interpolation.linear }) {
   if (interpolation == Interpolation.cubic) {
     return getPixelCubic(fx, fy);
   } else if (interpolation == Interpolation.linear) {
@@ -148,6 +148,7 @@ coordinates.</p>
           <li><a href="../../image/Image/lengthInBytes.html">lengthInBytes</a></li>
           <li><a href="../../image/Image/loopCount.html">loopCount</a></li>
           <li><a href="../../image/Image/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/Image/maxIndexValue.html">maxIndexValue</a></li>
           <li><a href="../../image/Image/numChannels.html">numChannels</a></li>
           <li><a href="../../image/Image/numFrames.html">numFrames</a></li>
           <li><a href="../../image/Image/palette.html">palette</a></li>

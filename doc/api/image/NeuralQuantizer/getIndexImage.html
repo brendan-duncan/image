@@ -74,8 +74,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Image getIndexImage(Image image) {
-  final target = Image(image.width, image.height, numChannels: 1,
-      palette: palette);
+  final target = Image(width: image.width, height: image.height,
+      numChannels: 1, palette: palette);
 
   final ti = target.iterator..moveNext();
 

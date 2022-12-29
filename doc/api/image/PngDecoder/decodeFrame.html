@@ -218,7 +218,7 @@ Image? decodeFrame(int frame) {
     numChannels = 4;
   }
 
-  final image = Image(width, height, numChannels: numChannels,
+  final image = Image(width: width, height: height, numChannels: numChannels,
       palette: palette, format: format);
 
   final origW = _info.width;
@@ -244,9 +244,9 @@ Image? decodeFrame(int frame) {
   _info..width = origW
   ..height = origH;
 
-  if (_info.iCCPData != null) {
+  if (_info.iccpData != null) {
     image.iccProfile = IccProfile(
-        _info.iCCPName, IccProfileCompression.deflate, _info.iCCPData!);
+        _info.iccpName, IccProfileCompression.deflate, _info.iccpData!);
   }
 
   if (_info.textData.isNotEmpty) {

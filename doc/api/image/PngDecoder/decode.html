@@ -133,10 +133,11 @@ Image? decode(Uint8List bytes, { int? frame }) {
     &#47;&#47; Convert to MS
     lastImage.frameDuration = (frame.delay * 1000).toInt();
 
-    drawImage(lastImage, image,
+    compositeImage(lastImage, image,
         dstX: frame.xOffset,
         dstY: frame.yOffset,
-        blend: frame.blend == PngBlendMode.over);
+        blend: frame.blend == PngBlendMode.over ? BlendMode.alpha
+            : BlendMode.direct);
 
     firstImage.addFrame(lastImage);
   }

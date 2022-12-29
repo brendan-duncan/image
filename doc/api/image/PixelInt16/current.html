@@ -68,29 +68,7 @@
 
 
 <section class="desc markdown">
-  <p>The current element.</p>
-<p>If the iterator has not yet been moved to the first element
-(<a href="../../image/PixelInt16/moveNext.html">moveNext</a> has not been called yet),
-or if the iterator has been moved past the last element of the <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable-class.html">Iterable</a>
-(<a href="../../image/PixelInt16/moveNext.html">moveNext</a> has returned false),
-then <a href="../../image/PixelInt16/current.html">current</a> is unspecified.
-An <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterator-class.html">Iterator</a> may either throw or return an iterator specific default value
-in that case.</p>
-<p>The <code>current</code> getter should keep its value until the next call to
-<a href="../../image/PixelInt16/moveNext.html">moveNext</a>, even if an underlying collection changes.
-After a successful call to <code>moveNext</code>, the user doesn't need to cache
-the current value, but can keep reading it from the iterator.</p>
-<pre class="language-dart"><code class="language-dart">final colors = ['blue', 'yellow', 'red'];
-var colorsIterator = colors.iterator;
-while (colorsIterator.moveNext()) {
-  print(colorsIterator.current);
-}
-</code></pre>
-<p>The output of the example is:</p>
-<pre class="language-dart"><code>blue
-yellow
-red
-</code></pre>
+  <p>The current pixel (this), for using Pixel as an iterator.</p>
 </section>
 
 
@@ -150,12 +128,14 @@ red
           <li><a href="../../image/PixelInt16/isHdrFormat.html">isHdrFormat</a></li>
           <li><a href="../../image/PixelInt16/isLdrFormat.html">isLdrFormat</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/isNotEmpty.html">isNotEmpty</a></li>
+          <li><a href="../../image/PixelInt16/isValid.html">isValid</a></li>
           <li><a href="../../image/PixelInt16/iterator.html">iterator</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/last.html">last</a></li>
           <li><a href="../../image/PixelInt16/length.html">length</a></li>
           <li><a href="../../image/PixelInt16/luminance.html">luminance</a></li>
           <li><a href="../../image/PixelInt16/luminanceNormalized.html">luminanceNormalized</a></li>
           <li><a href="../../image/PixelInt16/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/PixelInt16/maxIndexValue.html">maxIndexValue</a></li>
           <li><a href="../../image/PixelInt16/numChannels.html">numChannels</a></li>
           <li><a href="../../image/PixelInt16/palette.html">palette</a></li>
           <li><a href="../../image/PixelInt16/r.html">r</a></li>
@@ -164,7 +144,9 @@ red
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/single.html">single</a></li>
           <li><a href="../../image/PixelInt16/width.html">width</a></li>
           <li><a href="../../image/PixelInt16/x.html">x</a></li>
+          <li><a href="../../image/PixelInt16/xNormalized.html">xNormalized</a></li>
           <li><a href="../../image/PixelInt16/y.html">y</a></li>
+          <li><a href="../../image/PixelInt16/yNormalized.html">yNormalized</a></li>
 
         <li class="section-title"><a href="../../image/PixelInt16-class.html#instance-methods">Methods</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/any.html">any</a></li>
@@ -188,6 +170,7 @@ red
           <li><a href="../../image/PixelInt16/set.html">set</a></li>
           <li><a href="../../image/PixelInt16/setColor.html">setColor</a></li>
           <li><a href="../../image/PixelInt16/setPosition.html">setPosition</a></li>
+          <li><a href="../../image/PixelInt16/setPositionNormalized.html">setPositionNormalized</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

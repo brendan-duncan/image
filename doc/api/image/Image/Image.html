@@ -56,9 +56,9 @@
 
     <section class="multi-line-signature">
       
-      <span class="name ">Image</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="-param-width"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span></li>
-<li><span class="parameter" id="-param-height"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>, </span></li>
-<li><span class="parameter" id="-param-format">{<span class="type-annotation"><a href="../../image/Format.html">Format</a></span> <span class="parameter-name">format</span> = <span class="default-value">Format.uint8</span>, </span></li>
+      <span class="name ">Image</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="-param-width">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span></li>
+<li><span class="parameter" id="-param-height"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>, </span></li>
+<li><span class="parameter" id="-param-format"><span class="type-annotation"><a href="../../image/Format.html">Format</a></span> <span class="parameter-name">format</span> = <span class="default-value">Format.uint8</span>, </span></li>
 <li><span class="parameter" id="-param-numChannels"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">numChannels</span> = <span class="default-value">3</span>, </span></li>
 <li><span class="parameter" id="-param-withPalette"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withPalette</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="-param-paletteFormat"><span class="type-annotation"><a href="../../image/Format.html">Format</a></span> <span class="parameter-name">paletteFormat</span> = <span class="default-value">Format.uint8</span>, </span></li>
@@ -83,11 +83,9 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image(int width, int height,
-    { Format format = Format.uint8, int numChannels = 3,
-      bool withPalette = false,
-      Format paletteFormat = Format.uint8,
-      Palette? palette, ExifData? exif,
+  <pre class="language-dart"><code class="language-dart">Image({ required int width, required int height, Format format = Format.uint8,
+    int numChannels = 3, bool withPalette = false,
+    Format paletteFormat = Format.uint8, Palette? palette, ExifData? exif,
       IccProfile? iccp, this.textData, this.loopCount = 0,
       this.frameType = FrameType.sequence, this.backgroundColor = null,
       this.frameDuration = 0, this.frameIndex = 0 }) {
@@ -160,6 +158,7 @@
           <li><a href="../../image/Image/lengthInBytes.html">lengthInBytes</a></li>
           <li><a href="../../image/Image/loopCount.html">loopCount</a></li>
           <li><a href="../../image/Image/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/Image/maxIndexValue.html">maxIndexValue</a></li>
           <li><a href="../../image/Image/numChannels.html">numChannels</a></li>
           <li><a href="../../image/Image/numFrames.html">numFrames</a></li>
           <li><a href="../../image/Image/palette.html">palette</a></li>

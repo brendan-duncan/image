@@ -65,27 +65,8 @@
     </section>
     
 <section class="desc markdown">
-  <p>Advances the iterator to the next element of the iteration.</p>
-<p>Should be called before reading <a href="../../image/PixelUint4/current.html">current</a>.
-If the call to <code>moveNext</code> returns <code>true</code>,
-then <a href="../../image/PixelUint4/current.html">current</a> will contain the next element of the iteration
-until <code>moveNext</code> is called again.
-If the call returns <code>false</code>, there are no further elements
-and <a href="../../image/PixelUint4/current.html">current</a> should not be used any more.</p>
-<p>It is safe to call <a href="../../image/PixelUint4/moveNext.html">moveNext</a> after it has already returned <code>false</code>,
-but it must keep returning <code>false</code> and not have any other effect.</p>
-<p>A call to <code>moveNext</code> may throw for various reasons,
-including a concurrent change to an underlying collection.
-If that happens, the iterator may be in an inconsistent
-state, and any further behavior of the iterator is unspecified,
-including the effect of reading <a href="../../image/PixelUint4/current.html">current</a>.</p>
-<pre class="language-dart"><code class="language-dart">final colors = ['blue', 'yellow', 'red'];
-final colorsIterator = colors.iterator;
-print(colorsIterator.moveNext()); // true
-print(colorsIterator.moveNext()); // true
-print(colorsIterator.moveNext()); // true
-print(colorsIterator.moveNext()); // false
-</code></pre>
+  <p>Move to the next pixel, returning false if it moved past the end of
+the image data.</p>
 </section>
 
 
@@ -93,14 +74,14 @@ print(colorsIterator.moveNext()); // false
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">bool moveNext() {
-  x++;
-  if (x == width) {
+  _x++;
+  if (_x == width) {
     &#47;&#47; skip row stride padding bits
-    x = 0;
-    y++;
+    _x = 0;
+    _y++;
     _bitIndex = 0;
-    _index = y * image.rowStride;
-    return y &lt; height;
+    _index = _y * image.rowStride;
+    return _y &lt; height;
   }
 
   final nc = image.numChannels;
@@ -172,12 +153,14 @@ print(colorsIterator.moveNext()); // false
           <li><a href="../../image/PixelUint4/isHdrFormat.html">isHdrFormat</a></li>
           <li><a href="../../image/PixelUint4/isLdrFormat.html">isLdrFormat</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/isNotEmpty.html">isNotEmpty</a></li>
+          <li><a href="../../image/PixelUint4/isValid.html">isValid</a></li>
           <li><a href="../../image/PixelUint4/iterator.html">iterator</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/last.html">last</a></li>
           <li><a href="../../image/PixelUint4/length.html">length</a></li>
           <li><a href="../../image/PixelUint4/luminance.html">luminance</a></li>
           <li><a href="../../image/PixelUint4/luminanceNormalized.html">luminanceNormalized</a></li>
           <li><a href="../../image/PixelUint4/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/PixelUint4/maxIndexValue.html">maxIndexValue</a></li>
           <li><a href="../../image/PixelUint4/numChannels.html">numChannels</a></li>
           <li><a href="../../image/PixelUint4/palette.html">palette</a></li>
           <li><a href="../../image/PixelUint4/r.html">r</a></li>
@@ -186,7 +169,9 @@ print(colorsIterator.moveNext()); // false
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/single.html">single</a></li>
           <li><a href="../../image/PixelUint4/width.html">width</a></li>
           <li><a href="../../image/PixelUint4/x.html">x</a></li>
+          <li><a href="../../image/PixelUint4/xNormalized.html">xNormalized</a></li>
           <li><a href="../../image/PixelUint4/y.html">y</a></li>
+          <li><a href="../../image/PixelUint4/yNormalized.html">yNormalized</a></li>
 
         <li class="section-title"><a href="../../image/PixelUint4-class.html#instance-methods">Methods</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/any.html">any</a></li>
@@ -212,6 +197,7 @@ print(colorsIterator.moveNext()); // false
           <li><a href="../../image/PixelUint4/setChannel.html">setChannel</a></li>
           <li><a href="../../image/PixelUint4/setColor.html">setColor</a></li>
           <li><a href="../../image/PixelUint4/setPosition.html">setPosition</a></li>
+          <li><a href="../../image/PixelUint4/setPositionNormalized.html">setPositionNormalized</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

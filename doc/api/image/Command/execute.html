@@ -57,7 +57,7 @@
     <section class="multi-line-signature">
       
 
-<span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../image/Command-class.html">Command</a></span>&gt;</span></span>
 <span class="name ">execute</span>(<wbr>)
 
       
@@ -69,13 +69,14 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; execute() async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;Command&gt; execute() async {
   await subCommand.executeIfDirty();
   if (_subCommand != null) {
     outputImage = _subCommand!.outputImage;
     outputBytes = _subCommand!.outputBytes;
     outputObject = _subCommand!.outputObject;
   }
+  return this;
 }</code></pre>
 </section>
 
@@ -128,6 +129,7 @@
           <li><a href="../../image/Command/chromaticAberration.html">chromaticAberration</a></li>
           <li><a href="../../image/Command/colorHalftone.html">colorHalftone</a></li>
           <li><a href="../../image/Command/colorOffset.html">colorOffset</a></li>
+          <li><a href="../../image/Command/compositeImage.html">compositeImage</a></li>
           <li><a href="../../image/Command/contrast.html">contrast</a></li>
           <li><a href="../../image/Command/convert.html">convert</a></li>
           <li><a href="../../image/Command/convolution.html">convolution</a></li>
@@ -157,6 +159,8 @@
           <li><a href="../../image/Command/decodePngFile.html">decodePngFile</a></li>
           <li><a href="../../image/Command/decodePsd.html">decodePsd</a></li>
           <li><a href="../../image/Command/decodePsdFile.html">decodePsdFile</a></li>
+          <li><a href="../../image/Command/decodePvr.html">decodePvr</a></li>
+          <li><a href="../../image/Command/decodePvrFile.html">decodePvrFile</a></li>
           <li><a href="../../image/Command/decodeTga.html">decodeTga</a></li>
           <li><a href="../../image/Command/decodeTgaFile.html">decodeTgaFile</a></li>
           <li><a href="../../image/Command/decodeTiff.html">decodeTiff</a></li>
@@ -164,14 +168,15 @@
           <li><a href="../../image/Command/decodeWebP.html">decodeWebP</a></li>
           <li><a href="../../image/Command/decodeWebPFile.html">decodeWebPFile</a></li>
           <li><a href="../../image/Command/ditherImage.html">ditherImage</a></li>
+          <li><a href="../../image/Command/dotScreen.html">dotScreen</a></li>
           <li><a href="../../image/Command/drawChar.html">drawChar</a></li>
           <li><a href="../../image/Command/drawCircle.html">drawCircle</a></li>
-          <li><a href="../../image/Command/drawImage.html">drawImage</a></li>
           <li><a href="../../image/Command/drawLine.html">drawLine</a></li>
           <li><a href="../../image/Command/drawPixel.html">drawPixel</a></li>
           <li><a href="../../image/Command/drawRect.html">drawRect</a></li>
           <li><a href="../../image/Command/drawString.html">drawString</a></li>
           <li><a href="../../image/Command/dropShadow.html">dropShadow</a></li>
+          <li><a href="../../image/Command/edgeGlow.html">edgeGlow</a></li>
           <li><a href="../../image/Command/emboss.html">emboss</a></li>
           <li><a href="../../image/Command/encodeBmp.html">encodeBmp</a></li>
           <li><a href="../../image/Command/encodeBmpFile.html">encodeBmpFile</a></li>
@@ -185,6 +190,8 @@
           <li><a href="../../image/Command/encodeJpgFile.html">encodeJpgFile</a></li>
           <li><a href="../../image/Command/encodePng.html">encodePng</a></li>
           <li><a href="../../image/Command/encodePngFile.html">encodePngFile</a></li>
+          <li><a href="../../image/Command/encodePvr.html">encodePvr</a></li>
+          <li><a href="../../image/Command/encodePvrFile.html">encodePvrFile</a></li>
           <li><a href="../../image/Command/encodeTga.html">encodeTga</a></li>
           <li><a href="../../image/Command/encodeTgaFile.html">encodeTgaFile</a></li>
           <li><a href="../../image/Command/encodeTiff.html">encodeTiff</a></li>
@@ -206,15 +213,19 @@
           <li><a href="../../image/Command/getImage.html">getImage</a></li>
           <li><a href="../../image/Command/getImageThread.html">getImageThread</a></li>
           <li><a href="../../image/Command/grayscale.html">grayscale</a></li>
+          <li><a href="../../image/Command/hdrToLdr.html">hdrToLdr</a></li>
+          <li><a href="../../image/Command/hexagonPixelate.html">hexagonPixelate</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
           <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
           <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
+          <li><a href="../../image/Command/monochrome.html">monochrome</a></li>
           <li><a href="../../image/Command/noise.html">noise</a></li>
           <li><a href="../../image/Command/normalize.html">normalize</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
           <li><a href="../../image/Command/pixelate.html">pixelate</a></li>
           <li><a href="../../image/Command/quantize.html">quantize</a></li>
+          <li><a href="../../image/Command/reinhardTonemap.html">reinhardTonemap</a></li>
           <li><a href="../../image/Command/remapColors.html">remapColors</a></li>
           <li><a href="../../image/Command/scaleRgba.html">scaleRgba</a></li>
           <li><a href="../../image/Command/separableConvolution.html">separableConvolution</a></li>

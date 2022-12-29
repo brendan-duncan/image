@@ -85,7 +85,7 @@ image, as animated frames may only occupy a subset of the canvas.</p>
   <pre class="language-dart"><code class="language-dart">@override
 Image decodeFrame(int frame) {
   if (info == null) {
-    return Image(0, 0);
+    return Image.empty();
   }
 
   final _info = info!;
@@ -95,7 +95,7 @@ Image decodeFrame(int frame) {
   final bpp = _info.bitsPerPixel;
   final rowStride = ((_info.width * bpp + 31) ~&#47; 32) * 4;
   final nc = forceRgba ? 4
-      : bpp == 1 || bpp == 4 || bpp == 8 ? 1 : bpp == 32 ? 3 : 3;
+      : bpp == 1 || bpp == 4 || bpp == 8 ? 1 : bpp == 32 ? 4 : 3;
   final format = forceRgba ? Format.uint8
       : bpp == 1 ? Format.uint1
       : bpp == 2 ? Format.uint2
@@ -105,11 +105,12 @@ Image decodeFrame(int frame) {
       &#47;&#47; up to 8-bit
       : bpp == 16 ? Format.uint8
       : bpp == 24 ? Format.uint8
+      : bpp == 32 ? Format.uint8
       : Format.uint8;
   final palette = forceRgba ? null : _info.palette;
 
-  final image = Image(_info.width, _info.height, format: format,
-      numChannels: nc, palette: palette);
+  final image = Image(width: _info.width, height: _info.height,
+      format: format, numChannels: nc, palette: palette);
 
   for (var y = image.height - 1; y &gt;= 0; --y) {
     final line = _info.readBottomUp ? y : image.height - 1 - y;

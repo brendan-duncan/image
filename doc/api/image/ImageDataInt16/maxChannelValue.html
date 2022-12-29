@@ -69,8 +69,9 @@
 
 <section class="desc markdown">
   <p>The maximum value of a pixel channel, based on the <a href="../../image/ImageDataInt16/format.html">format</a> of the image.
-Float format images will have a maxChannelValue of 1.0, though they can
-have values above that.</p>
+If the image has a <a href="../../image/ImageData/palette.html">palette</a>, this will be the maximum value of a palette
+color channel. Float format images will have a maxChannelValue of 1.0,
+though they can have values above that.</p>
 </section>
 
 
@@ -128,6 +129,7 @@ have values above that.</p>
           <li><a href="../../image/ImageDataInt16/length.html">length</a></li>
           <li><a href="../../image/ImageDataInt16/lengthInBytes.html">lengthInBytes</a></li>
           <li><a href="../../image/ImageDataInt16/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/ImageDataInt16/maxIndexValue.html">maxIndexValue</a></li>
           <li class="inherited"><a href="../../image/ImageData/numChannels.html">numChannels</a></li>
           <li class="inherited"><a href="../../image/ImageData/palette.html">palette</a></li>
           <li><a href="../../image/ImageDataInt16/rowStride.html">rowStride</a></li>

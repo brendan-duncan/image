@@ -89,7 +89,7 @@ Image? decodeFrame(int frame) {
   }
 
   input.offset = info!.imageOffset!;
-  final image = Image(info!.width, info!.height,
+  final image = Image(width: info!.width, height: info!.height,
       numChannels: info!.bpp == 32 ? 4 : 3);
   for (var y = image.height - 1; y &gt;= 0; --y) {
     for (var x = 0; x &lt; image.width; ++x) {

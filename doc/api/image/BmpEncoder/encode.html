@@ -86,10 +86,74 @@ encoded if the encoder supports animation.</p>
 Uint8List encode(Image image, { bool singleFrame = false }) {
   final out = OutputBuffer();
 
+  final nc = image.numChannels;
+  var palette = image.palette;
+  final format = image.format;
+
+  if (format == Format.uint1 &amp;&amp; nc == 1 &amp;&amp; palette == null) {
+    &#47;&#47; add palette
+    palette = PaletteUint8(2, 3)
+      ..setColor(0, 0)
+      ..setColor(1, 255, 255, 255);
+  } else if (format == Format.uint1 &amp;&amp; nc == 2) {
+    &#47;&#47; =&gt; uint2 palette
+    image = image.convert(format: Format.uint2, numChannels: 1,
+        withPalette: true);
+    palette = image.palette;
+  } else if (format == Format.uint1 &amp;&amp; nc == 3 &amp;&amp; palette == null) {
+    &#47;&#47; =&gt; uint4 palette
+    image = image.convert(format: Format.uint4, withPalette: true);
+    palette = image.palette;
+  } else if (format == Format.uint1 &amp;&amp; nc == 4) {
+    &#47;&#47; =&gt; uint8,4 - only 32bpp supports alpha
+    image = image.convert(format: Format.uint8, numChannels: 4);
+  } else if (format == Format.uint2 &amp;&amp; nc == 1 &amp;&amp; palette == null) {
+    &#47;&#47; =&gt; uint2 palette
+    image = image.convert(format: Format.uint2, withPalette: true);
+    palette = image.palette;
+  } else if (format == Format.uint2 &amp;&amp; nc == 2) {
+    &#47;&#47; =&gt; uint8 palette
+    image = image.convert(format: Format.uint8, withPalette: true);
+    palette = image.palette;
+  } else if (format == Format.uint2 &amp;&amp; nc == 3 &amp;&amp; palette == null) {
+    &#47;&#47; =&gt; uint8 palette
+    image = image.convert(format: Format.uint8, withPalette: true);
+    palette = image.palette;
+  } else if (format == Format.uint2 &amp;&amp; nc == 4) {
+    &#47;&#47; =&gt; uint8 palette
+    image = image.convert(format: Format.uint8, withPalette: true);
+    palette = image.palette;
+  } else if (format == Format.uint4 &amp;&amp; nc == 1 &amp;&amp; palette == null) {
+    &#47;&#47; =&gt; uint8 palette
+    image = image.convert(format: Format.uint8, withPalette: true);
+    palette = image.palette;
+  } else if (format == Format.uint4 &amp;&amp; nc == 2) {
+    &#47;&#47; =&gt; uint8,3
+    image = image.convert(format: Format.uint8, numChannels: 3);
+  } else if (format == Format.uint4 &amp;&amp; nc == 3 &amp;&amp; palette == null) {
+    &#47;&#47; =&gt; uint8,3
+    image = image.convert(format: Format.uint8, numChannels: 3);
+  } else if (format == Format.uint4 &amp;&amp; nc == 4) {
+    &#47;&#47; =&gt; uint8,4
+    image = image.convert(format: Format.uint8, numChannels: 4);
+  } else if (format == Format.uint8 &amp;&amp; nc == 1 &amp;&amp; palette == null) {
+    &#47;&#47; =&gt; uint8 palette
+    image = image.convert(format: Format.uint8, withPalette: true);
+  } else if (format == Format.uint8 &amp;&amp; nc == 2) {
+    &#47;&#47; =&gt; uint8,3
+    image.convert(format: Format.uint8, numChannels: 3);
+  } else if (image.isHdrFormat) {
+    &#47;&#47; =&gt; uint8,[3,4]
+    image = image.convert(format: Format.uint8);
+  }
+
   var bpp = image.bitsPerChannel * image.data!.numChannels;
   if (bpp == 12) {
     bpp = 16;
   }
+
+  final compression = bpp &gt; 8 ? BmpCompression.bitfields
+      : BmpCompression.none;
 
   final imageStride = image.rowStride;
   final fileStride = ((image.width * bpp + 31) ~&#47; 32) * 4;
@@ -98,36 +162,64 @@ Uint8List encode(Image image, { bool singleFrame = false }) {
       ? List&lt;int&gt;.filled(rowPaddingSize, 0xff) : null;
 
   final imageFileSize = fileStride * image.height;
-
-  const headerSize = 54;
-  const headerInfoSize = 40;
+  final headerInfoSize = bpp &gt; 8 ? 124 : 40;
+  final headerSize = headerInfoSize + 14;
   final paletteSize = (image.palette?.numColors ?? 0) * 4;
   final origImageOffset = headerSize + paletteSize;
   final imageOffset = _roundToMultiple(origImageOffset);
   final gapSize = imageOffset - origImageOffset;
   final fileSize = imageFileSize + headerSize + paletteSize + gapSize;
 
-  out..writeUint16(BmpFileHeader.bmpHeaderFiletype)
-  ..writeUint32(fileSize)
+  const sRgb = 0x73524742;
 
+  out..writeUint16(BmpFileHeader.signature)
+  ..writeUint32(fileSize)
   ..writeUint32(0) &#47;&#47; reserved
   ..writeUint32(imageOffset) &#47;&#47; offset to image data
-
   ..writeUint32(headerInfoSize)
   ..writeUint32(image.width)
   ..writeUint32(image.height)
   ..writeUint16(1) &#47;&#47; planes
   ..writeUint16(bpp) &#47;&#47; bits per pixel
-  ..writeUint32(BmpCompression.none.index) &#47;&#47; compression, none
+  ..writeUint32(compression.index) &#47;&#47; compression
   ..writeUint32(imageFileSize)
-  ..writeUint32(0) &#47;&#47; hr
-  ..writeUint32(0) &#47;&#47; vr
-  ..writeUint32(0) &#47;&#47; totalColors
-  ..writeUint32(0); &#47;&#47; importantColors
+  ..writeUint32(11811) &#47;&#47; hr
+  ..writeUint32(11811) &#47;&#47; vr
+  ..writeUint32(bpp == 8 ? 255 : 0) &#47;&#47; totalColors
+  ..writeUint32(bpp == 8 ? 255 : 0); &#47;&#47; importantColors
+
+  if (bpp &gt; 8) {
+    final blueMask = bpp == 16 ? 0xf : 0xff;
+    final greenMask = bpp == 16 ? 0xf0 : 0xff00;
+    final redMask = bpp == 16 ? 0xf00 : 0xff0000;
+    final alphaMask = bpp == 16 ? 0xf000 : 0xff000000;
+
+    out..writeUint32(redMask) &#47;&#47; redMask
+      ..writeUint32(greenMask) &#47;&#47; greenMask
+      ..writeUint32(blueMask) &#47;&#47; blueMask
+      ..writeUint32(alphaMask) &#47;&#47; alphaMask
+      ..writeUint32(sRgb) &#47;&#47; CSType
+      ..writeUint32(0) &#47;&#47; endpoints.red.x
+      ..writeUint32(0) &#47;&#47; endpoints.red.y
+      ..writeUint32(0) &#47;&#47; endpoints.red.z
+      ..writeUint32(0) &#47;&#47; endpoints.green.x
+      ..writeUint32(0) &#47;&#47; endpoints.green.y
+      ..writeUint32(0) &#47;&#47; endpoints.green.z
+      ..writeUint32(0) &#47;&#47; endpoints.blue.x
+      ..writeUint32(0) &#47;&#47; endpoints.blue.y
+      ..writeUint32(0) &#47;&#47; endpoints.blue.z
+      ..writeUint32(0) &#47;&#47; gammaRed
+      ..writeUint32(0) &#47;&#47; gammaGreen
+      ..writeUint32(0) &#47;&#47; gammaBlue
+      ..writeUint32(2) &#47;&#47; intent LCS_GM_GRAPHICS
+      ..writeUint32(0) &#47;&#47; profileData
+      ..writeUint32(0) &#47;&#47; profileSize
+      ..writeUint32(0); &#47;&#47; reserved
+  }
 
   if (bpp == 1 || bpp == 2 || bpp == 4 || bpp == 8) {
-    if (image.hasPalette) {
-      final palette = image.palette!;
+    if (palette != null) {
+      &#47;&#47;final palette = image.palette!;
       final l = palette.numColors;
       for (var pi = 0; pi &lt; l; ++pi) {
         out..writeByte(palette.getBlue(pi).toInt())
@@ -221,38 +313,34 @@ Uint8List encode(Image image, { bool singleFrame = false }) {
     return out.getBytes();
   }
 
+  final hasAlpha = image.numChannels == 4;
+  final h = image.height;
+  final w = image.width;
   if (bpp == 16) {
-    final h = image.height;
-    final w = image.width;
     for (var y = h - 1; y &gt;= 0; --y) {
       for (var x = 0; x &lt; w; ++x) {
         final p = image.getPixel(x, y);
-        final c = (p.r.toInt().clamp(0,15) &lt;&lt; 10) |
-            (p.g.toInt().clamp(0,15) &lt;&lt; 5) |
-            (p.b.toInt().clamp(0,15));
-        out.writeUint16(c);
+        out..writeByte((p.g.toInt() &lt;&lt; 4) | p.b.toInt())
+        ..writeByte((p.a.toInt() &lt;&lt; 4) | p.r.toInt());
       }
       if (rowPadding != null) {
         out.writeBytes(rowPadding);
       }
     }
-    return out.getBytes();
-  }
-
-  final h = image.height;
-  final w = image.width;
-  for (var y = h - 1; y &gt;= 0; --y) {
-    for (var x = 0; x &lt; w; ++x) {
-      final p = image.getPixel(x, y);
-      out..writeByte(p.b.toInt())
-      ..writeByte(p.g.toInt())
-      ..writeByte(p.r.toInt());
-      if (image.numChannels == 4) {
-        out.writeByte(p.a.toInt());
+  } else {
+    for (var y = h - 1; y &gt;= 0; --y) {
+      for (var x = 0; x &lt; w; ++x) {
+        final p = image.getPixel(x, y);
+        out..writeByte(p.b.toInt())
+        ..writeByte(p.g.toInt())
+        ..writeByte(p.r.toInt());
+        if (hasAlpha) {
+          out.writeByte(p.a.toInt());
+        }
       }
-    }
-    if (rowPadding != null) {
-      out.writeBytes(rowPadding);
+      if (rowPadding != null) {
+        out.writeBytes(rowPadding);
+      }
     }
   }
 

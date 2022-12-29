@@ -57,8 +57,8 @@
     <section class="multi-line-signature">
       
       <span class="name ">Image.fromResized</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fromResized-param-other"><span class="type-annotation"><a href="../../image/Image-class.html">Image</a></span> <span class="parameter-name">other</span>, </span></li>
-<li><span class="parameter" id="fromResized-param-width"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span></li>
-<li><span class="parameter" id="fromResized-param-height"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span></span></li>
+<li><span class="parameter" id="fromResized-param-width">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span></li>
+<li><span class="parameter" id="fromResized-param-height"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>}</span></li>
 </ol>)
     </section>
 
@@ -68,7 +68,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image.fromResized(Image other, int width, int height)
+  <pre class="language-dart"><code class="language-dart">Image.fromResized(Image other, { required int width, required int height })
     : _exif = other._exif?.clone()
     , iccProfile = other.iccProfile?.clone()
     , frameType = other.frameType
@@ -91,7 +91,7 @@
   final numFrames = other.numFrames;
   for (var fi = 1; fi &lt; numFrames; ++fi) {
     final frame = other.frames[fi];
-    addFrame(Image.fromResized(frame, width, height));
+    addFrame(Image.fromResized(frame, width: width, height: height));
   }
 }</code></pre>
 </section>
@@ -157,6 +157,7 @@
           <li><a href="../../image/Image/lengthInBytes.html">lengthInBytes</a></li>
           <li><a href="../../image/Image/loopCount.html">loopCount</a></li>
           <li><a href="../../image/Image/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/Image/maxIndexValue.html">maxIndexValue</a></li>
           <li><a href="../../image/Image/numChannels.html">numChannels</a></li>
           <li><a href="../../image/Image/numFrames.html">numFrames</a></li>
           <li><a href="../../image/Image/palette.html">palette</a></li>

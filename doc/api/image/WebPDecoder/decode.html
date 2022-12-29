@@ -103,7 +103,7 @@ Image? decode(List&lt;int&gt; bytes, { int? frame }) {
     image.frameDuration = frame.duration;
 
     if (firstImage == null || lastImage == null) {
-      firstImage = Image(_info!.width, _info!.height,
+      firstImage = Image(width: _info!.width, height: _info!.height,
           numChannels: image.numChannels, format: image.format);
       lastImage = firstImage;
     } else {
@@ -114,7 +114,8 @@ Image? decode(List&lt;int&gt; bytes, { int? frame }) {
       }
     }
 
-    drawImage(lastImage, image, dstX: frame.x, dstY: frame.y, blend: false);
+    compositeImage(lastImage, image, dstX: frame.x, dstY: frame.y,
+        blend: BlendMode.direct);
 
     firstImage.addFrame(lastImage);
   }

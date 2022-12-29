@@ -70,7 +70,7 @@
   <pre class="language-dart"><code class="language-dart">ImageDataUint4.from(ImageDataUint4 other, { bool skipPixels = false })
     : data = skipPixels ? Uint8List(other.data.length)
         : Uint8List.fromList(other.data)
-    , rowStride = other.width * other.numChannels
+    , rowStride = other.rowStride
     , palette = other.palette?.clone()
     , super(other.width, other.height, other.numChannels);</code></pre>
 </section>
@@ -123,6 +123,7 @@
           <li><a href="../../image/ImageDataUint4/length.html">length</a></li>
           <li><a href="../../image/ImageDataUint4/lengthInBytes.html">lengthInBytes</a></li>
           <li><a href="../../image/ImageDataUint4/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/ImageDataUint4/maxIndexValue.html">maxIndexValue</a></li>
           <li class="inherited"><a href="../../image/ImageData/numChannels.html">numChannels</a></li>
           <li><a href="../../image/ImageDataUint4/palette.html">palette</a></li>
           <li><a href="../../image/ImageDataUint4/rowStride.html">rowStride</a></li>

@@ -83,10 +83,9 @@ decoding the file, null is returned.</p>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 Image? decode(Uint8List data, { int? frame }) {
-  if (!isValidFile(data)) {
+  if (startDecode(data) == null) {
     return null;
   }
-  startDecode(data);
   return decodeFrame(frame ?? 0);
 }</code></pre>
 </section>

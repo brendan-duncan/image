@@ -60,7 +60,8 @@
 <span class="returntype"><a href="../../image/Image-class.html">Image</a></span>
 <span class="name ">convert</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="convert-param-format">{<span class="type-annotation"><a href="../../image/Format.html">Format</a>?</span> <span class="parameter-name">format</span>, </span></li>
 <li><span class="parameter" id="convert-param-numChannels"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">numChannels</span>, </span></li>
-<li><span class="parameter" id="convert-param-alpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">alpha</span>}</span></li>
+<li><span class="parameter" id="convert-param-alpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">alpha</span>, </span></li>
+<li><span class="parameter" id="convert-param-withPalette"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withPalette</span> = <span class="default-value">false</span>}</span></li>
 </ol>)
 
       
@@ -72,40 +73,74 @@
 If the new number of channels is 4 and the current image does
 not have an alpha channel, then the given <code>alpha</code> value will be used
 to set the new alpha channel. If <code>alpha</code> is not provided, then the
-<a href="../../image/Image/maxChannelValue.html">maxChannelValue</a> will be used to set the alpha.</p>
+<a href="../../image/Image/maxChannelValue.html">maxChannelValue</a> will be used to set the alpha. If <code>withPalette</code> is
+true, and to target format and numChannels has fewer than 256 colors,
+then the new image will be converted to use a palette.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image convert({Format? format, int? numChannels, num? alpha}) {
-  if (format == null || format == this.format) {
-    if (numChannels == null || numChannels == this.numChannels) {
-      &#47;&#47; Same format and number of channels
-      return Image.from(this);
-    }
-    &#47;&#47; Same format, different number of channels
-  }
-
+  <pre class="language-dart"><code class="language-dart">Image convert({ Format? format, int? numChannels, num? alpha,
+    bool withPalette = false }) {
   format ??= this.format;
   numChannels ??= this.numChannels;
-  alpha ??= this.maxChannelValue;
+  alpha ??= formatMaxValue[format];
 
-  final newImage = Image(width, height, format: format,
-      numChannels: numChannels,
+  if (withPalette &amp;&amp; (numChannels &gt;= 4 ||
+      !(format == Format.uint1 || format == Format.uint2 ||
+          format == Format.uint4 ||
+          (format == Format.uint8 &amp;&amp; numChannels == 1))) ||
+      (format.index &lt; Format.uint8.index &amp;&amp;
+          this.format.index &gt;= Format.uint8.index)) {
+    withPalette = false;
+  }
+
+  if (format == this.format &amp;&amp; numChannels == this.numChannels &amp;&amp;
+      (!withPalette || palette != null)) {
+    &#47;&#47; Same format and number of channels
+    return Image.from(this);
+  }
+
+  final newImage = Image(width: width, height: height, format: format,
+      numChannels: numChannels, withPalette: withPalette,
       exif: _exif?.clone(), iccp: iccProfile?.clone(),
       backgroundColor: backgroundColor?.clone(),
       frameType: frameType, loopCount: loopCount,
       frameDuration: frameDuration)
   ..textData = textData != null ? Map&lt;String, String&gt;.from(textData!) : null;
 
-  Pixel? p2;
-  for (final p in newImage) {
-    p2 = getPixel(p.x, p.y, p2);
-    final c = convertColor(p2, format: format, numChannels: numChannels,
-        alpha: alpha);
-    p.set(c);
+  final pal = newImage.palette;
+  final f = newImage.palette?.format ?? format;
+  if (pal != null) {
+    final usedColors = &lt;int, int&gt;{};
+    var numColors = 0;
+    final op = getPixel(0, 0);
+    Color? c;
+    for (final np in newImage) {
+      final nr = (op.rNormalized * 255).floor();
+      final ng = (op.gNormalized * 255).floor();
+      final nb = (op.bNormalized * 255).floor();
+      final h = rgbaToUint32(nr, ng, nb, 0);
+      if (usedColors.containsKey(h)) {
+        np.index = usedColors[h]!;
+      } else {
+        usedColors[h] = numColors;
+        np.index = numColors;
+        c = convertColor(op, to: c, format: f, numChannels: numChannels,
+            alpha: alpha);
+        pal.setColor(numColors, c.r, c.g, c.b);
+        numColors++;
+      }
+      op.moveNext();
+    }
+  } else {
+    final op = getPixel(0, 0);
+    for (final np in newImage) {
+      convertColor(op, to: np, alpha: alpha);
+      op.moveNext();
+    }
   }
 
   return newImage;
@@ -173,6 +208,7 @@ to set the new alpha channel. If <code>alpha</code> is not provided, then the
           <li><a href="../../image/Image/lengthInBytes.html">lengthInBytes</a></li>
           <li><a href="../../image/Image/loopCount.html">loopCount</a></li>
           <li><a href="../../image/Image/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/Image/maxIndexValue.html">maxIndexValue</a></li>
           <li><a href="../../image/Image/numChannels.html">numChannels</a></li>
           <li><a href="../../image/Image/numFrames.html">numFrames</a></li>
           <li><a href="../../image/Image/palette.html">palette</a></li>

@@ -69,14 +69,15 @@
 
 <section class="desc markdown">
   <p>The maximum value of a pixel channel, based on the <a href="../../image/ImageDataUint2/format.html">format</a> of the image.
-Float format images will have a maxChannelValue of 1.0, though they can
-have values above that.</p>
+If the image has a <a href="../../image/ImageDataUint2/palette.html">palette</a>, this will be the maximum value of a palette
+color channel. Float format images will have a maxChannelValue of 1.0,
+though they can have values above that.</p>
 </section>
 
 
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">num get maxChannelValue =&gt; 3;</code></pre>
+  <pre class="language-dart"><code class="language-dart">num get maxChannelValue =&gt; palette?.maxChannelValue ?? 3;</code></pre>
 </section>
 
 </section>
@@ -129,6 +130,7 @@ have values above that.</p>
           <li><a href="../../image/ImageDataUint2/length.html">length</a></li>
           <li><a href="../../image/ImageDataUint2/lengthInBytes.html">lengthInBytes</a></li>
           <li><a href="../../image/ImageDataUint2/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/ImageDataUint2/maxIndexValue.html">maxIndexValue</a></li>
           <li class="inherited"><a href="../../image/ImageData/numChannels.html">numChannels</a></li>
           <li><a href="../../image/ImageDataUint2/palette.html">palette</a></li>
           <li><a href="../../image/ImageDataUint2/rowStride.html">rowStride</a></li>

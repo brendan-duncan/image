@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the reinhardToneMap function from the image library, for the Dart programming language.">
-  <title>reinhardToneMap function - image library - Dart API</title>
+  <meta name="description" content="API docs for the reinhardTonemap function from the image library, for the Dart programming language.">
+  <title>reinhardTonemap function - image library - Dart API</title>
 
 
   
@@ -30,9 +30,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">image</a></li>
     <li><a href="../image/image-library.html">image</a></li>
-    <li class="self-crumb">reinhardToneMap function</li>
+    <li class="self-crumb">reinhardTonemap function</li>
   </ol>
-  <div class="self-name">reinhardToneMap</div>
+  <div class="self-name">reinhardTonemap</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,7 +49,7 @@
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
-<h1><span class="kind-function">reinhardToneMap</span> function 
+<h1><span class="kind-function">reinhardTonemap</span> function 
     <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
  
 </h1></div>
@@ -58,7 +58,7 @@
         
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
-<span class="name ">reinhardToneMap</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="reinhardToneMap-param-hdr"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">hdr</span></span></li>
+<span class="name ">reinhardTonemap</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="reinhardTonemap-param-hdr"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">hdr</span></span></li>
 </ol>)
 
         
@@ -73,7 +73,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image reinhardToneMap(Image hdr) {
+  <pre class="language-dart"><code class="language-dart">Image reinhardTonemap(Image hdr) {
   const yw = [0.212671, 0.715160, 0.072169];
 
   &#47;&#47; Compute world adaptation luminance, _Ywa_
@@ -123,7 +123,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
   <li><a href="../index.html">image</a></li>
   <li><a href="../image/image-library.html">image</a></li>
-  <li class="self-crumb">reinhardToneMap function</li>
+  <li class="self-crumb">reinhardTonemap function</li>
 </ol>
 
 
@@ -240,8 +240,11 @@
         <li><a href="../image/Point-class.html">Point</a></li>
         <li><a href="../image/PsdDecoder-class.html">PsdDecoder</a></li>
         <li><a href="../image/PsdImage-class.html">PsdImage</a></li>
-        <li><a href="../image/PvrtcDecoder-class.html">PvrtcDecoder</a></li>
-        <li><a href="../image/PvrtcEncoder-class.html">PvrtcEncoder</a></li>
+        <li><a href="../image/Pvr2Info-class.html">Pvr2Info</a></li>
+        <li><a href="../image/Pvr3Info-class.html">Pvr3Info</a></li>
+        <li><a href="../image/PvrAppleInfo-class.html">PvrAppleInfo</a></li>
+        <li><a href="../image/PvrDecoder-class.html">PvrDecoder</a></li>
+        <li><a href="../image/PvrEncoder-class.html">PvrEncoder</a></li>
         <li><a href="../image/SeparableKernel-class.html">SeparableKernel</a></li>
         <li><a href="../image/TgaDecoder-class.html">TgaDecoder</a></li>
         <li><a href="../image/TgaEncoder-class.html">TgaEncoder</a></li>
@@ -269,8 +272,6 @@
         <li><a href="../image/arial14.html">arial14</a></li>
         <li><a href="../image/arial24.html">arial24</a></li>
         <li><a href="../image/arial48.html">arial48</a></li>
-        <li><a href="../image/currentFrame.html">currentFrame</a></li>
-        <li><a href="../image/currentFrameStack.html">currentFrameStack</a></li>
         <li><a href="../image/exifGpsTags.html">exifGpsTags</a></li>
         <li><a href="../image/exifImageTags.html">exifImageTags</a></li>
         <li><a href="../image/exifInteropTags.html">exifInteropTags</a></li>
@@ -287,6 +288,7 @@
         <li><a href="../image/cmykToRgb.html">cmykToRgb</a></li>
         <li><a href="../image/colorHalftone.html">colorHalftone</a></li>
         <li><a href="../image/colorOffset.html">colorOffset</a></li>
+        <li><a href="../image/compositeImage.html">compositeImage</a></li>
         <li><a href="../image/contrast.html">contrast</a></li>
         <li><a href="../image/convertColor.html">convertColor</a></li>
         <li><a href="../image/convertFormatValue.html">convertFormatValue</a></li>
@@ -315,6 +317,8 @@
         <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
         <li><a href="../image/decodePsd.html">decodePsd</a></li>
         <li><a href="../image/decodePsdFile.html">decodePsdFile</a></li>
+        <li><a href="../image/decodePvr.html">decodePvr</a></li>
+        <li><a href="../image/decodePvrFile.html">decodePvrFile</a></li>
         <li><a href="../image/decodeTga.html">decodeTga</a></li>
         <li><a href="../image/decodeTgaFile.html">decodeTgaFile</a></li>
         <li><a href="../image/decodeTiff.html">decodeTiff</a></li>
@@ -322,9 +326,9 @@
         <li><a href="../image/decodeWebP.html">decodeWebP</a></li>
         <li><a href="../image/decodeWebPFile.html">decodeWebPFile</a></li>
         <li><a href="../image/ditherImage.html">ditherImage</a></li>
+        <li><a href="../image/dotScreen.html">dotScreen</a></li>
         <li><a href="../image/drawChar.html">drawChar</a></li>
         <li><a href="../image/drawCircle.html">drawCircle</a></li>
-        <li><a href="../image/drawImage.html">drawImage</a></li>
         <li><a href="../image/drawLine.html">drawLine</a></li>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
@@ -332,6 +336,7 @@
         <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
         <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
+        <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
         <li><a href="../image/encodeBmp.html">encodeBmp</a></li>
         <li><a href="../image/encodeBmpFile.html">encodeBmpFile</a></li>
@@ -346,6 +351,8 @@
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
+        <li><a href="../image/encodePvr.html">encodePvr</a></li>
+        <li><a href="../image/encodePvrFile.html">encodePvrFile</a></li>
         <li><a href="../image/encodeTga.html">encodeTga</a></li>
         <li><a href="../image/encodeTgaFile.html">encodeTgaFile</a></li>
         <li><a href="../image/encodeTiff.html">encodeTiff</a></li>
@@ -374,8 +381,8 @@
         <li><a href="../image/getLuminanceRgb.html">getLuminanceRgb</a></li>
         <li><a href="../image/grand.html">grand</a></li>
         <li><a href="../image/grayscale.html">grayscale</a></li>
-        <li><a href="../image/hdrBloom.html">hdrBloom</a></li>
         <li><a href="../image/hdrToLdr.html">hdrToLdr</a></li>
+        <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
         <li><a href="../image/imageMask.html">imageMask</a></li>
@@ -385,6 +392,7 @@
         <li><a href="../image/luminanceThreshold.html">luminanceThreshold</a></li>
         <li><a href="../image/maskFlood.html">maskFlood</a></li>
         <li><a href="../image/minMax.html">minMax</a></li>
+        <li><a href="../image/monochrome.html">monochrome</a></li>
         <li><a href="../image/noise.html">noise</a></li>
         <li><a href="../image/normalize.html">normalize</a></li>
         <li><a href="../image/pixelate.html">pixelate</a></li>
@@ -393,7 +401,7 @@
         <li><a href="../image/readFile.html">readFile</a></li>
         <li><a href="../image/readFont.html">readFont</a></li>
         <li><a href="../image/readFontZip.html">readFontZip</a></li>
-        <li><a href="../image/reinhardToneMap.html">reinhardToneMap</a></li>
+        <li><a href="../image/reinhardTonemap.html">reinhardTonemap</a></li>
         <li><a href="../image/remapColors.html">remapColors</a></li>
         <li><a href="../image/rgbaToUint32.html">rgbaToUint32</a></li>
         <li><a href="../image/rgbToHsl.html">rgbToHsl</a></li>
@@ -418,6 +426,7 @@
         <li><a href="../image/xyzToRgb.html">xyzToRgb</a></li>
 
       <li class="section-title"><a href="../image/image-library.html#enums">Enums</a></li>
+        <li><a href="../image/BlendMode.html">BlendMode</a></li>
         <li><a href="../image/Channel.html">Channel</a></li>
         <li><a href="../image/DitherKernel.html">DitherKernel</a></li>
         <li><a href="../image/FlipDirection.html">FlipDirection</a></li>
@@ -435,7 +444,7 @@
         <li><a href="../image/PngFilter.html">PngFilter</a></li>
         <li><a href="../image/PngFilterType.html">PngFilterType</a></li>
         <li><a href="../image/PsdColorMode.html">PsdColorMode</a></li>
-        <li><a href="../image/PvrtcFormat.html">PvrtcFormat</a></li>
+        <li><a href="../image/PvrFormat.html">PvrFormat</a></li>
         <li><a href="../image/QuantizeMethod.html">QuantizeMethod</a></li>
         <li><a href="../image/TiffFormat.html">TiffFormat</a></li>
         <li><a href="../image/TiffImageType.html">TiffImageType</a></li>
