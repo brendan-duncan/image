@@ -16,6 +16,8 @@ web applications.
 
 ## [Image Processing](filters.md)
 
+## [Flutter](flutter.md)
+
 ## [Font Rendering](fonts.md)
 
 ## [EXIF Data](exif.md)
