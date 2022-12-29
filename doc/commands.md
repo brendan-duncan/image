@@ -98,9 +98,9 @@ void image(Image image);
 
 /// Create an Image.
 void createImage({ required int width, required int height,
-Format format = Format.uint8, int numChannels = 3,
-bool withPalette = false, Format paletteFormat = Format.uint8,
-Palette? palette, ExifData? exif, IccProfile? iccp, Map<String, String>? textData });
+    Format format = Format.uint8, int numChannels = 3,
+    bool withPalette = false, Format paletteFormat = Format.uint8,
+    Palette? palette, ExifData? exif, IccProfile? iccp, Map<String, String>? textData });
 
 /// Convert an image by changing its format or number of channels.
 void convert({ int? numChannels, Format? format, num? alpha,
