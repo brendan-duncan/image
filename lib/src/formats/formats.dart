@@ -195,6 +195,18 @@ Future<Image?> decodeImageFile(String path, { int? frame }) async {
   return decodeImage(bytes, frame: frame);
 }
 
+/// Encode the [image] to the format determined by the file extension of [path].
+/// If a format wasn't able to be identified, null will be returned.
+/// Otherwise the encoded format bytes of the image will be returned.
+Uint8List? encodeNamedImage(String path, Image image) {
+  final encoder = findEncoderForNamedImage(path);
+  if (encoder == null) {
+    return null;
+  }
+  return encoder.encode(image);
+
+}
+
 /// Encode the [image] to a file at the given [path]. The format of the image
 /// file is determined from the extension of the file. If the image was
 /// successfully written to the file, true will be returned, otherwise false.

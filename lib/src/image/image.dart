@@ -156,17 +156,18 @@ class Image extends Iterable<Pixel> {
   /// For example, given an Html Canvas, you could create an image:
   /// var bytes = canvas.getContext('2d').getImageData(0, 0,
   ///   canvas.width, canvas.height).data;
-  /// var image = Image.fromBytes(canvas.width, canvas.height, canvasBytes,
-  ///                             numChannels: 4);
-  Image.fromBytes(int width, int height, ByteBuffer bytes,
-      { Format format = Format.uint8, int numChannels = 3,
-        int? rowStride,
-        bool withPalette = false,
-        Format paletteFormat = Format.uint8,
-        Palette? palette, ExifData? exif,
-        IccProfile? iccp, this.textData, this.loopCount = 0,
-        this.frameType = FrameType.sequence, this.backgroundColor = null,
-        this.frameDuration = 0, this.frameIndex = 0 }) {
+  /// var image = Image.fromBytes(width: canvas.width, height: canvas.height,
+  ///     bytes: canvasBytes, numChannels: 4);
+  Image.fromBytes({ required int width, required int height,
+      required ByteBuffer bytes,
+      Format format = Format.uint8, int numChannels = 3,
+      int? rowStride,
+      bool withPalette = false,
+      Format paletteFormat = Format.uint8,
+      Palette? palette, ExifData? exif,
+      IccProfile? iccp, this.textData, this.loopCount = 0,
+      this.frameType = FrameType.sequence, this.backgroundColor = null,
+      this.frameDuration = 0, this.frameIndex = 0 }) {
     frames.add(this);
     _initialize(width, height, format: format, numChannels: numChannels,
         withPalette: withPalette, paletteFormat: paletteFormat,

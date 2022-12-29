@@ -31,25 +31,58 @@ Image? decodeImage(Uint8List data);
 Will guess the format by trying to parse it with the supported decoders. It won't do a full decode to determine if the
 data is valid for a decoder, but it is still slower than using an explicit decode function as listed below.
 
+You can also load an image directly from a file given its path, on platforms that support dart:io.
+```dart
+Future<Image?> decodeImageFile(String path, { int? frame }) async;
+```
+
+## Encoding Images
+
+You can encode an image to a file format using a format specific encode function, or the general:
+```dart
+Uint8List? encodeNamedImage(String path, Image image);
+
+Future<bool> encodeImageFile(String path, Image image) async;
+```
+
 ## Decoding and Encoding Specific Formats
 
 ### JPEG: decoding, encoding
 ```dart
 Image? decodeJpg(Uint8List bytes);
 
+// Decode an image file directly from the file on platforms that support dart:io.
+Future<Image?> decodeJpgFile(String path) async;
+
 Uint8List encodeJpg(Image image, { int quality = 100 });
+
+Future<bool> encodeJpgFile(String path, Image image, { int quality = 100 }) async;
 ```
 ### PNG: decoding, encoding
 ```dart
 Image? decodePng(Uint8List bytes);
 
+Future<Image?> decodePngFile(String path) async;
+
 Uint8List encodePng(Image image, { int level = 6, PngFilter filter = PngFilter.paeth });
+
+Future<bool> encodePngFile(String path, Image image,
+    { bool singleFrame = false, int level = 6, PngFilter filter = PngFilter.paeth }) async;
 ```
 ### GIF: decoding, encoding
 ```dart
 Image? decodeGif(Uint8List bytes);
 
+Future<Image?> decodeGifFile(String path, { int? frame }) async;
+
 Uint8List encodeGif(Image image, {
+    int repeat = 0,
+    int samplingFactor = 10,
+    DitherKernel dither = DitherKernel.floydSteinberg,
+    bool ditherSerpentine = false });
+
+Future<bool> encodeGifFile(String path, Image image, {
+    bool singleFrame = false,
     int repeat = 0,
     int samplingFactor = 10,
     DitherKernel dither = DitherKernel.floydSteinberg,
@@ -58,42 +91,80 @@ Uint8List encodeGif(Image image, {
 ### WebP: decoding only
 ```dart
 Image? decodeWebP(Uint8List bytes);
+
+Future<Image?> decodeWebPFile(String path, { int? frame }) async;
 ```
 ### BMP: decoding, encoding
 ```dart
 Image? decodeBmp(Uint8List bytes);
 
+Future<Image?> decodeBmpFile(String path) async;
+
 Uint8List encodeBmp(Image image);
+
+Future<bool> encodeBmpFile(String path, Image image) async;
 ```
 ### TGA: decoding, encoding
 ```dart
 Image? decodeTga(Uint8List bytes);
 
+Future<Image?> decodeTgaFile(String path) async;
+
 Uint8List encodeTga(Image image);
+
+Future<bool> encodeTgaFile(String path, Image image) async;
 ```
 ### TIFF: decoding, encoding
 ```dart
 Image? decodeTiff(Uint8List bytes);
 
+Future<Image?> decodeTiffFile(String path, { int? frame }) async;
+
 Uint8List encodeTiff(Image image);
+
+Uint8List encodeTiff(Image image, { bool singleFrame = false });
 ```
 ### OpenEXR: decoding only
 ```dart
 Image? decodeExr(Uint8List bytes);
+
+Future<Image?> decodeExrFile(String path) async;
 ```
-### PSD: decoding only
+### Photoshop PSD: decoding only
 ```dart
 Image? decodePsd(Uint8List bytes);
+
+Future<Image?> decodePsdFile(String path) async;
 ```
 ### ICO: decoding, encoding
 ```dart
 Image? decodeIco(Uint8List bytes);
 
+Future<Image?> decodeIcoFile(String path, { int? frame }) async;
+
 Uint8List encodeIco(Image image);
+
+Future<bool> encodeIcoFile(String path, Image image,
+    { bool singleFrame = false }) async;
 ```
 ### CUR: encoding only
 ```dart
 Uint8List encodeCur(Image image);
+
+Future<bool> encodeCurFile(String path, Image image,
+    { bool singleFrame = false }) async;
+```
+
+### PVR: decoding, encoding
+```dart
+Image? decodePvr(Uint8List bytes, { int? frame });
+
+Future<Image?> decodePvrFile(String path, { int? frame }) async;
+
+Uint8List encodePvr(Image image, { bool singleFrame = false });
+
+Future<bool> encodePvrFile(String path, Image image,
+    { bool singleFrame = false }) async;
 ```
 
 ## Decoder Classes

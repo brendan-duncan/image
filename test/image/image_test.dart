@@ -26,7 +26,8 @@ void main() {
           bytes[i++] = x < 256 ? 0 : 255;
         }
       }
-      final img = Image.fromBytes(w, h, bytes.buffer, rowStride: stride);
+      final img = Image.fromBytes(width: w, height: h, bytes: bytes.buffer,
+          rowStride: stride);
       expect(img.width, equals(w));
       expect(img.height, equals(h));
       expect(img.numChannels, equals(3));

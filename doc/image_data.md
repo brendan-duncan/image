@@ -95,6 +95,43 @@ for (final frame in image.frames) { // Iterate over the frames of the image.
 ```
 Frames are always stored as full images, meaning they don't support blend modes, clear states, or partial frames.
 
+## Creating Images
+
+Images can be created by [decoding](formats.md) them from an image file, or by manually creating them.
+
+```dart
+// Create an image with the default uint8 format and default number of channels, 3.
+final rgb8 = Image(width: 256, height: 256);
+// Create an 8-bit rgba image.
+final rgba8 = Image(width: 256, height: 256, numChannels: 4);
+// Create an 8-bit image with an rgb palette.
+final rgbPalette = Image(width: 256, height: 256, withPalette: true);
+// Create an 8-bit image with an rgba palette.
+final rgbaPalette = Image(width: 256, height: 256, numChannels: 4, withPalette: true);
+// Create a 1-bit, 1-channel Image.
+final bitmap = Image(width: 256, height: 256, format: Format.uint1, numChannels: 1);
+// Create a 16-bit floating point rgba image.
+final float16Image = Image(width: 256, height: 256, format: Format.float16);
+```
+
+### Copying images
+
+```dart
+// Create a copy of rgb8
+final copyRgb8 = Image.from(rgb8);
+// You can also use the clone method
+final copyRgba8 = rgba8.clone();
+```
+
+### Creating images from external image data
+
+```dart
+final image = Image.fromBytes(width: externalImageWidth, height: externalImageHeight,
+    bytes: externalImageBytes, rowStride: externalImageRowStride, numChannels: externalImageNumChannels);
+```
+**rowStride** tells the library how many bytes are in a pixel row of the external image data. By default it will
+assume (width * bytesPerPixel) for the rowStride, depending on the format of the image.
+
 ## Converting Images
 
 Images will be decoded to a format as close to the encoded format as possible. Decoding a GIF will remain a

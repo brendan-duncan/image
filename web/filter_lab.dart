@@ -1,11 +1,11 @@
 import 'dart:html';
 
-import 'package:image/image.dart' as Ix;
+import 'package:image/image.dart' as img;
 
 late ImageData filterImageData;
 late CanvasElement canvas;
 late DivElement logDiv;
-late Ix.Image origImage;
+late img.Image origImage;
 
 void _addControl(String label, String value, DivElement parent,
     void Function(double) callback) {
@@ -40,8 +40,8 @@ void testSepia() {
 
   void _apply() {
     final t = Stopwatch()..start();
-    var image = Ix.Image.from(origImage);
-    image = Ix.sepia(image, amount: amount);
+    var image = img.Image.from(origImage);
+    image = img.sepia(image, amount: amount);
 
     // Fill the buffer with our image data.
     filterImageData.data.setRange(0, filterImageData.data.length,
@@ -74,8 +74,8 @@ void testSobel() {
 
   void _apply() {
     final t = Stopwatch()..start();
-    var image = Ix.Image.from(origImage);
-    image = Ix.sobel(image, amount: amount);
+    var image = img.Image.from(origImage);
+    image = img.sobel(image, amount: amount);
 
     // Fill the buffer with our image data.
     filterImageData.data.setRange(0, filterImageData.data.length,
@@ -107,8 +107,8 @@ void testGaussian() {
 
   void _apply() {
     final t = Stopwatch()..start();
-    var image = Ix.Image.from(origImage);
-    image = Ix.gaussianBlur(image, radius);
+    var image = img.Image.from(origImage);
+    image = img.gaussianBlur(image, radius);
 
     // Fill the buffer with our image data.
     filterImageData.data.setRange(0, filterImageData.data.length,
@@ -142,8 +142,8 @@ void testVignette() {
 
   void _apply() {
     final t = Stopwatch()..start();
-    var image = Ix.Image.from(origImage);
-    image = Ix.vignette(image, start: start, end: end, amount: amount);
+    var image = img.Image.from(origImage);
+    image = img.vignette(image, start: start, end: end, amount: amount);
 
     // Fill the buffer with our image data.
     filterImageData.data.setRange(0, filterImageData.data.length,
@@ -185,8 +185,8 @@ void testPixelate() {
 
   void _apply() {
     final t = Stopwatch()..start();
-    var image = Ix.Image.from(origImage);
-    image = Ix.pixelate(image, blockSize);
+    var image = img.Image.from(origImage);
+    image = img.pixelate(image, blockSize);
 
     // Fill the buffer with our image data.
     filterImageData.data.setRange(0, filterImageData.data.length,
@@ -221,8 +221,8 @@ void testColorOffset() {
 
   void _apply() {
     final t = Stopwatch()..start();
-    var image = Ix.Image.from(origImage);
-    image = Ix.colorOffset(image, red: red, green: green, blue: blue,
+    var image = img.Image.from(origImage);
+    image = img.colorOffset(image, red: red, green: green, blue: blue,
         alpha: alpha);
 
     // Fill the buffer with our image data.
@@ -276,9 +276,9 @@ void testAdjustColor() {
 
   void _apply() {
     final t = Stopwatch()..start();
-    var image = Ix.Image.from(origImage);
+    var image = img.Image.from(origImage);
 
-    image = Ix.adjustColor(image,
+    image = img.adjustColor(image,
         contrast: contrast,
         saturation: saturation,
         brightness: brightness,
@@ -359,20 +359,23 @@ void main() {
     }
   });
 
-  final img = ImageElement(src: 'res/big_buck_bunny.jpg');
-  img.onLoad.listen((e) {
+  final image = ImageElement(src: 'res/big_buck_bunny.jpg');
+  image.onLoad.listen((e) {
     final c = CanvasElement()
-    ..width = img.width
-    ..height = img.height
-    ..context2D.drawImage(img, 0, 0);
+    ..width = image.width
+    ..height = image.height
+    ..context2D.drawImage(image, 0, 0);
 
-    final imageData = c.context2D.getImageData(0, 0, img.width!, img.height!);
-    origImage = Ix.Image.fromBytes(img.width!, img.height!,
-        imageData.data.buffer, numChannels: 4);
+    final imageData = c.context2D.getImageData(0, 0, image.width!,
+        image.height!);
 
-    canvas.width = img.width;
-    canvas.height = img.height;
-    filterImageData = canvas.context2D.createImageData(img.width, img.height);
+    origImage = img.Image.fromBytes(width: image.width!, height: image.height!,
+        bytes: imageData.data.buffer, numChannels: 4);
+
+    canvas.width = image.width;
+    canvas.height = image.height;
+    filterImageData = canvas.context2D.createImageData(image.width,
+        image.height);
 
     testSepia();
   });
