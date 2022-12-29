@@ -42,6 +42,8 @@ class ImageDataFloat32 extends ImageData {
 
   num get maxChannelValue => 1.0;
 
+  num get maxIndexValue => 1.0;
+
   int get rowStride => width * numChannels * 4;
 
   bool get isHdrFormat => true;

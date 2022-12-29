@@ -677,16 +677,17 @@ class Command {
 
   //
 
-  Future<void> execute() async {
+  Future<Command> execute() async {
     await subCommand.executeIfDirty();
     if (_subCommand != null) {
       outputImage = _subCommand!.outputImage;
       outputBytes = _subCommand!.outputBytes;
       outputObject = _subCommand!.outputObject;
     }
+    return this;
   }
 
-  Future<void> executeThread() async {
+  Future<Command> executeThread() async {
     final cmdOrThis = subCommand;
     if (cmdOrThis.dirty) {
       await executeCommandAsync(cmdOrThis).then((value) {
@@ -702,6 +703,7 @@ class Command {
         }
       });
     }
+    return this;
   }
 
   Future<Image?> getImage() async {

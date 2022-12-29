@@ -15,28 +15,37 @@ void main() {
         }
 
         final name = f.uri.pathSegments.last;
-        test(name, () {
-          final bytes = f.readAsBytesSync();
-          final image = BmpDecoder().decode(bytes);
-          if (image == null) {
-            throw ImageException('Unable to decode BMP Image: $name.');
-          }
+        test(name, () async {
+          final image = await (Command()
+            ..decodeBmp(f.readAsBytesSync())
+            ..writeToFile('$testOutputPath/bmp/$name.bmp'))
+            .getImage();
+          expect(image, isNotNull);
 
-          final bmp = BmpEncoder().encode(image);
-          File('$testOutputPath/bmp/$name.bmp')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(bmp);
+          final image2 = await (Command()
+            ..decodeBmpFile('$testOutputPath/bmp/$name.bmp')
+            ..writeToFile('$testOutputPath/bmp/${name}2.bmp'))
+            .getImage();
+          expect(image2, isNotNull);
 
-          final image2 = BmpDecoder().decode(bmp)!;
-
-          testImageEquals(image2, image);
-
-          final bmp2 = BmpEncoder().encode(image2);
-          File('$testOutputPath/bmp/${name}2.bmp')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(bmp2);
+          testImageEquals(image2!, image!);
         });
       }
+
+      test('uint4', () async {
+        await (Command()
+          ..createImage(width: 256, height: 256, format: Format.uint4)
+          ..filter((image) {
+            for (final p in image) {
+              p..r = p.x ~/ p.maxChannelValue
+                ..g = p.y ~/ p.maxChannelValue
+                ..a = p.maxChannelValue - (p.y ~/ p.maxChannelValue);
+            }
+            return image;
+          })
+          ..writeToFile('$testOutputPath/bmp/bmp_16.bmp'))
+            .execute();
+      });
     });
   });
 }

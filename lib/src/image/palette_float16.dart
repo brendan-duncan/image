@@ -20,6 +20,7 @@ class PaletteFloat16 extends Palette {
   int get lengthInBytes => data.lengthInBytes;
   ByteBuffer get buffer => data.buffer;
   Format get format => Format.float16;
+  num get maxChannelValue => 1.0;
 
   void set(int index, int channel, num value) {
     if (channel < numChannels) {

@@ -52,6 +52,7 @@ class PixelUint1 extends Iterable<num> implements Pixel {
   Uint8List get data => image.data;
   int get imageLength => image.length;
   num get maxChannelValue => image.maxChannelValue;
+  num get maxIndexValue => image.maxIndexValue;
   Format get format => Format.uint1;
   bool get isLdrFormat => image.isLdrFormat;
   bool get isHdrFormat => image.isHdrFormat;
@@ -103,8 +104,8 @@ class PixelUint1 extends Iterable<num> implements Pixel {
       }
     } else {
       final bpp = image.numChannels;
-      _bitIndex = (x * bpp) & 0x7;
-      _index = _rowOffset + ((x * bpp) >> 3);
+      _bitIndex = (_x * bpp) & 0x7;
+      _index = _rowOffset + ((_x * bpp) >> 3);
     }
 
     return _index < imageLength;
@@ -117,6 +118,8 @@ class PixelUint1 extends Iterable<num> implements Pixel {
       bi += 8;
       i++;
     }
+    if (i >= image.data.length)
+      return 0;
     return (image.data[i] >> bi) & 0x1;
   }
 

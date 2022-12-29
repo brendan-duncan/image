@@ -47,6 +47,7 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   int get height => image.height;
   Uint8List get data => image.data;
   num get maxChannelValue => image.maxChannelValue;
+  num get maxIndexValue => image.maxIndexValue;
   Format get format => Format.uint4;
   bool get isLdrFormat => image.isLdrFormat;
   bool get isHdrFormat => image.isHdrFormat;

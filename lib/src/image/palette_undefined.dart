@@ -9,6 +9,7 @@ class PaletteUndefined extends Palette {
   PaletteUndefined clone() => PaletteUndefined();
   int get lengthInBytes => 0;
   Format get format => Format.uint8;
+  int get maxChannelValue => 0;
   ByteBuffer get buffer => Uint8List(0).buffer;
   void set(int index, int channel, num value) {}
   void setColor(int index, num r, [num g = 0, num b = 0, num a = 0]) {}

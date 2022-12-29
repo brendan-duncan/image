@@ -1,3 +1,4 @@
+import '../image/palette.dart';
 import '../util/color_util.dart';
 import 'channel_iterator.dart';
 import 'color.dart';
@@ -37,8 +38,11 @@ class ColorUint1 extends Iterable<num> implements Color {
 
   Format get format => Format.uint1;
   num get maxChannelValue => 1;
+  num get maxIndexValue => 1;
   bool get isLdrFormat => true;
   bool get isHdrFormat => false;
+  bool get hasPalette => false;
+  Palette? get palette => null;
 
   int getChannel(int ci) => ci < length ? ((data >> (7 - ci)) & 0x1) : 0;
 

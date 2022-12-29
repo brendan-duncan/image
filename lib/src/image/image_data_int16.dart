@@ -40,6 +40,8 @@ class ImageDataInt16 extends ImageData {
 
   num get maxChannelValue => 0x7fff;
 
+  num get maxIndexValue => 0x7fff;
+
   bool get isHdrFormat => true;
 
   int get bitsPerChannel => 16;

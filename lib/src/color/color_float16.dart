@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../image/palette.dart';
 import '../util/color_util.dart';
 import '../util/float16.dart';
 import 'channel_iterator.dart';
@@ -43,8 +44,11 @@ class ColorFloat16 extends Iterable<num> implements Color {
   Format get format => Format.float16;
   int get length => data.length;
   num get maxChannelValue => 1.0;
+  num get maxIndexValue => 1.0;
   bool get isLdrFormat => false;
   bool get isHdrFormat => true;
+  bool get hasPalette => false;
+  Palette? get palette => null;
 
   num operator[](int index) => index < data.length ?
       Float16.float16ToDouble(data[index]) : 0;

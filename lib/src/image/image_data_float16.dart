@@ -45,6 +45,8 @@ class ImageDataFloat16 extends ImageData {
 
   num get maxChannelValue => 1.0;
 
+  num get maxIndexValue => 1.0;
+
   bool get isHdrFormat => true;
 
   Color getColor(num r, num g, num b, [num? a]) =>

@@ -19,6 +19,7 @@ class PaletteInt8 extends Palette {
   int get lengthInBytes => data.lengthInBytes;
   ByteBuffer get buffer => data.buffer;
   Format get format => Format.int8;
+  num get maxChannelValue => 0x7f;
 
   void set(int index, int channel, num value) {
     if (channel < numChannels) {

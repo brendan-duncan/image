@@ -44,6 +44,8 @@ class ImageDataInt32 extends ImageData {
 
   num get maxChannelValue => 0x7fffffff;
 
+  num get maxIndexValue => 0x7fffffff;
+
   bool get isHdrFormat => true;
 
   Color getColor(num r, num g, num b, [num? a]) =>

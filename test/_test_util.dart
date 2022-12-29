@@ -45,3 +45,39 @@ void testImageEquals(Image image, Image image2) {
     c.moveNext();
   }
 }
+
+Future<void> testImageConversions(Image image) async {
+  for (final format in Format.values) {
+    for (var nc = 1; nc <= 4; ++nc) {
+      final ic = image.convert(format: format, numChannels: nc,
+          withPalette: true);
+      expect(ic.width, equals(image.width));
+      expect(ic.height, equals(image.height));
+      expect(ic.format, equals(format));
+      expect(ic.numChannels, equals(nc));
+      /*if (nc < 4 &&
+          (format == Format.uint1 || format == Format.uint2 ||
+              format == Format.uint4 ||
+              (format == Format.uint8 && nc == 1))) {
+        expect(ic.palette, isNotNull);
+      } else {
+        expect(ic.palette, isNull);
+      }*/
+
+      final oc = ic.convert(format: Format.uint8, numChannels: 4);
+      final fnc = image.hasPalette ? 1 : image.numChannels;
+      final dbgName = '$testOutputPath/image/${image.format.name}/'
+          '${image.format.name}_${fnc}_to_${format.name}_$nc.png';
+      //print(dbgName);
+      await encodePngFile(dbgName, oc);
+
+      /*final op = image.getPixel(0, 0);
+      for (final np in ic) {
+        final nr = (np.rNormalized * 255).floor();
+        final or = (op.rNormalized * 255).floor();
+        expect(nr, equals(or));
+        op.moveNext();
+      }*/
+    }
+  }
+}

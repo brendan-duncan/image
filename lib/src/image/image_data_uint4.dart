@@ -34,7 +34,7 @@ class ImageDataUint4 extends ImageData {
   ImageDataUint4.from(ImageDataUint4 other, { bool skipPixels = false })
       : data = skipPixels ? Uint8List(other.data.length)
           : Uint8List.fromList(other.data)
-      , rowStride = other.width * other.numChannels
+      , rowStride = other.rowStride
       , palette = other.palette?.clone()
       , super(other.width, other.height, other.numChannels);
 
@@ -56,7 +56,9 @@ class ImageDataUint4 extends ImageData {
 
   int get length => data.lengthInBytes;
 
-  num get maxChannelValue => 15;
+  num get maxChannelValue => palette?.maxChannelValue ?? 15;
+
+  num get maxIndexValue => 15;
 
   bool get isHdrFormat => false;
 

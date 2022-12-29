@@ -19,6 +19,7 @@ class PaletteUint32 extends Palette {
   int get lengthInBytes => data.lengthInBytes;
   ByteBuffer get buffer => data.buffer;
   Format get format => Format.uint32;
+  num get maxChannelValue => 0xffffffff;
 
   void set(int index, int channel, num value) {
     if (channel < numChannels) {

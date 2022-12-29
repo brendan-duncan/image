@@ -37,12 +37,13 @@ class PixelUint32 extends Iterable<num> implements Pixel {
 
   int get length => image.numChannels;
   int get numChannels => image.numChannels;
-  bool get hasPalette => image.hasPalette;
+  bool get hasPalette => false;
   Palette? get palette => null;
   int get width => image.width;
   int get height => image.height;
   Uint32List get data => image.data;
   num get maxChannelValue => image.maxChannelValue;
+  num get maxIndexValue => image.maxIndexValue;
   Format get format => Format.uint32;
   bool get isLdrFormat => image.isLdrFormat;
   bool get isHdrFormat => image.isHdrFormat;
@@ -76,6 +77,9 @@ class PixelUint32 extends Iterable<num> implements Pixel {
     if (_x == width) {
       _x = 0;
       _y++;
+      if (_y == height) {
+        return false;
+      }
     }
     _index += numChannels;
     return _index < image.data.length;

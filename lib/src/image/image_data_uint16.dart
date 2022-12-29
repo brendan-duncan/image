@@ -33,6 +33,8 @@ class ImageDataUint16 extends ImageData {
 
   num get maxChannelValue => 0xffff;
 
+  num get maxIndexValue => 0xffff;
+
   int get rowStride => width * numChannels * 2;
 
   PixelUint16 get iterator => PixelUint16.imageData(this);

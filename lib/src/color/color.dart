@@ -1,3 +1,4 @@
+import '../image/palette.dart';
 import 'format.dart';
 
 abstract class Color extends Iterable<num> {
@@ -5,9 +6,12 @@ abstract class Color extends Iterable<num> {
 
   int get length;
   num get maxChannelValue;
+  num get maxIndexValue;
   Format get format;
   bool get isLdrFormat;
   bool get isHdrFormat;
+  bool get hasPalette;
+  Palette? get palette;
 
   num operator[](int index);
   void operator[]=(int index, num value);

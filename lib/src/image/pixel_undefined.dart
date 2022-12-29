@@ -3,6 +3,7 @@ import '../color/color.dart';
 import '../color/format.dart';
 import 'image_data.dart';
 import 'image_data_uint8.dart';
+import 'palette.dart';
 import 'pixel.dart';
 
 /// Represents an invalid pixel.
@@ -18,10 +19,13 @@ class PixelUndefined extends Iterable<num> implements Pixel {
   int get width => 0;
   int get height => 0;
   int get length => 0;
-  num get maxChannelValue => 255;
+  num get maxChannelValue => 0;
+  num get maxIndexValue => 0;
   Format get format => Format.uint8;
   bool get isLdrFormat => false;
   bool get isHdrFormat => false;
+  bool get hasPalette => false;
+  Palette? get palette => null;
   bool get isValid => false;
   num operator[](int index) => 0;
   void operator[]=(int index, num value) {}

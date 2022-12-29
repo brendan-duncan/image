@@ -12,6 +12,8 @@ abstract class Palette {
   /// The number of channels per color.
   final int numChannels;
 
+  num get maxChannelValue;
+
   Palette(this.numColors, this.numChannels);
 
   /// Create a copy of the Palette.

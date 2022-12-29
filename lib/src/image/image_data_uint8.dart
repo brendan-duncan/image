@@ -50,7 +50,9 @@ class ImageDataUint8 extends ImageData {
 
   int get length => data.lengthInBytes;
 
-  num get maxChannelValue => 255;
+  num get maxChannelValue => palette?.maxChannelValue ?? 255;
+
+  num get maxIndexValue => 255;
 
   bool get isHdrFormat => false;
 

@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('Image', () {
-    test('int32', () {
+    test('int32', () async {
       final i1 = Image(width: 2, height: 2, format: Format.int32,
           numChannels: 1);
       expect(i1.width, equals(2));

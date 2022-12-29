@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../image/palette.dart';
 import '../util/color_util.dart';
 import 'channel_iterator.dart';
 import 'color.dart';
@@ -36,9 +37,12 @@ class ColorInt16 extends Iterable<num> implements Color {
 
   Format get format => Format.int16;
   int get length => data.length;
-  num get maxChannelValue => 255;
+  num get maxChannelValue => 0x7fff;
+  num get maxIndexValue => 0x7fff;
   bool get isLdrFormat => false;
   bool get isHdrFormat => true;
+  bool get hasPalette => false;
+  Palette? get palette => null;
 
   num operator[](int index) => index < data.length ? data[index] : 0;
   void operator[]=(int index, num value) {

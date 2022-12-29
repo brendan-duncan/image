@@ -543,10 +543,16 @@ class Image extends Iterable<Pixel> {
   void setPixelColor(int x, int y, num r, [num g = 0, num b = 0, num a = 0]) =>
       data?.setPixelColor(x, y, r, g, b, a);
 
-  /// The maximum value of a pixel color channel. In the case of the float
-  /// image formats, the maxChannelValue will be 1.0, even though channel values
-  /// can exceed that.
+  /// The maximum value of a pixel channel, based on the [format] of the image.
+  /// If the image has a [palette], this will be the maximum value of a palette
+  /// color channel. Float format images will have a maxChannelValue of 1.0,
+  /// though they can have values above that.
   num get maxChannelValue => data?.maxChannelValue ?? 0;
+
+  /// The maximum value of a palette index, based on the [format] of the image.
+  /// This differs from [maxChannelValue] in that it will not be affected by
+  /// the format of the [palette].
+  num get maxIndexValue => data?.maxIndexValue ?? 0;
 
   /// Is true if this image format supports using a palette.
   bool get supportsPalette => format == Format.uint1 ||
@@ -562,33 +568,68 @@ class Image extends Iterable<Pixel> {
   /// If the new number of channels is 4 and the current image does
   /// not have an alpha channel, then the given [alpha] value will be used
   /// to set the new alpha channel. If [alpha] is not provided, then the
-  /// [maxChannelValue] will be used to set the alpha.
-  Image convert({Format? format, int? numChannels, num? alpha}) {
-    if (format == null || format == this.format) {
-      if (numChannels == null || numChannels == this.numChannels) {
-        // Same format and number of channels
-        return Image.from(this);
-      }
-      // Same format, different number of channels
-    }
-
+  /// [maxChannelValue] will be used to set the alpha. If [withPalette] is
+  /// true, and to target format and numChannels has fewer than 256 colors,
+  /// then the new image will be converted to use a palette.
+  Image convert({ Format? format, int? numChannels, num? alpha,
+      bool withPalette = false }) {
     format ??= this.format;
     numChannels ??= this.numChannels;
-    alpha ??= this.maxChannelValue;
+    alpha ??= formatMaxValue[format];
+
+    if (withPalette && (numChannels >= 4 ||
+        !(format == Format.uint1 || format == Format.uint2 ||
+            format == Format.uint4 ||
+            (format == Format.uint8 && numChannels == 1))) ||
+        (format.index < Format.uint8.index &&
+            this.format.index >= Format.uint8.index)) {
+      withPalette = false;
+    }
+
+    if (format == this.format && numChannels == this.numChannels &&
+        (!withPalette || palette != null)) {
+      // Same format and number of channels
+      return Image.from(this);
+    }
 
     final newImage = Image(width: width, height: height, format: format,
-        numChannels: numChannels,
+        numChannels: numChannels, withPalette: withPalette,
         exif: _exif?.clone(), iccp: iccProfile?.clone(),
         backgroundColor: backgroundColor?.clone(),
         frameType: frameType, loopCount: loopCount,
         frameDuration: frameDuration)
     ..textData = textData != null ? Map<String, String>.from(textData!) : null;
 
-    Pixel? p2;
-    for (final p in newImage) {
-      p2 = getPixel(p.x, p.y, p2);
-      final c = convertColor(p2, to: p, alpha: alpha);
-      p.set(c);
+    final pal = newImage.palette;
+    final f = newImage.palette?.format ?? format;
+    if (pal != null) {
+      final usedColors = <int, int>{};
+      var numColors = 0;
+      final op = getPixel(0, 0);
+      Color? c;
+      for (final np in newImage) {
+        final nr = (op.rNormalized * 255).floor();
+        final ng = (op.gNormalized * 255).floor();
+        final nb = (op.bNormalized * 255).floor();
+        final h = rgbaToUint32(nr, ng, nb, 0);
+        if (usedColors.containsKey(h)) {
+          np.index = usedColors[h]!;
+        } else {
+          usedColors[h] = numColors;
+          np.index = numColors;
+          c = convertColor(op, to: c, format: f, numChannels: numChannels,
+              alpha: alpha);
+          pal.setColor(numColors, c.r, c.g, c.b);
+          numColors++;
+        }
+        op.moveNext();
+      }
+    } else {
+      final op = getPixel(0, 0);
+      for (final np in newImage) {
+        convertColor(op, to: np, alpha: alpha);
+        op.moveNext();
+      }
     }
 
     return newImage;

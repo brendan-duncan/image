@@ -32,9 +32,15 @@ abstract class ImageData extends Iterable<Pixel> {
   int get bitsPerChannel;
 
   /// The maximum value of a pixel channel, based on the [format] of the image.
-  /// Float format images will have a maxChannelValue of 1.0, though they can
-  /// have values above that.
+  /// If the image has a [palette], this will be the maximum value of a palette
+  /// color channel. Float format images will have a maxChannelValue of 1.0,
+  /// though they can have values above that.
   num get maxChannelValue;
+
+  /// The maximum value of a palette index, based on the [format] of the image.
+  /// This differs from [maxChannelValue] in that it will not be affected by
+  /// the format of the [palette].
+  num get maxIndexValue;
 
   /// True if the image has a palette. If the image has a palette, then the
   /// image data has 1 channel for the palette index of the pixel.

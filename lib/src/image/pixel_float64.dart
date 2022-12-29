@@ -43,6 +43,7 @@ class PixelFloat64 extends Iterable<num> implements Pixel {
   int get height => image.height;
   Float64List get data => image.data;
   num get maxChannelValue => image.maxChannelValue;
+  num get maxIndexValue => image.maxIndexValue;
   Format get format => Format.float64;
   bool get isLdrFormat => image.isLdrFormat;
   bool get isHdrFormat => image.isHdrFormat;
@@ -76,6 +77,9 @@ class PixelFloat64 extends Iterable<num> implements Pixel {
     if (_x == width) {
       _x = 0;
       _y++;
+      if (_y == height) {
+        return false;
+      }
     }
     _index += numChannels;
     return _index < image.data.length;

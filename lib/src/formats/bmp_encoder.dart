@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
+import '../color/format.dart';
 import '../image/image.dart';
+import '../image/palette_uint8.dart';
 import '../util/output_buffer.dart';
 import 'bmp/bmp_info.dart';
 import 'encoder.dart';
@@ -17,6 +19,67 @@ class BmpEncoder extends Encoder {
   @override
   Uint8List encode(Image image, { bool singleFrame = false }) {
     final out = OutputBuffer();
+
+    final nc = image.numChannels;
+    var palette = image.palette;
+    final format = image.format;
+
+    if (format == Format.uint1 && nc == 1 && palette == null) {
+      // add palette
+      palette = PaletteUint8(2, 3)
+        ..setColor(0, 0)
+        ..setColor(1, 255, 255, 255);
+    } else if (format == Format.uint1 && nc == 2) {
+      // => uint2 palette
+      image = image.convert(format: Format.uint2, numChannels: 1,
+          withPalette: true);
+      palette = image.palette;
+    } else if (format == Format.uint1 && nc == 3 && palette == null) {
+      // => uint4 palette
+      image = image.convert(format: Format.uint4, withPalette: true);
+      palette = image.palette;
+    } else if (format == Format.uint1 && nc == 4) {
+      // => uint8,4 - only 32bpp supports alpha
+      image = image.convert(format: Format.uint8, numChannels: 4);
+    } else if (format == Format.uint2 && nc == 1 && palette == null) {
+      // => uint2 palette
+      image = image.convert(format: Format.uint2, withPalette: true);
+      palette = image.palette;
+    } else if (format == Format.uint2 && nc == 2) {
+      // => uint8 palette
+      image = image.convert(format: Format.uint8, withPalette: true);
+      palette = image.palette;
+    } else if (format == Format.uint2 && nc == 3 && palette == null) {
+      // => uint8 palette
+      image = image.convert(format: Format.uint8, withPalette: true);
+      palette = image.palette;
+    } else if (format == Format.uint2 && nc == 4) {
+      // => uint8 palette
+      image = image.convert(format: Format.uint8, withPalette: true);
+      palette = image.palette;
+    } else if (format == Format.uint4 && nc == 1 && palette == null) {
+      // => uint8 palette
+      image = image.convert(format: Format.uint8, withPalette: true);
+      palette = image.palette;
+    } else if (format == Format.uint4 && nc == 2) {
+      // => uint8,3
+      image = image.convert(format: Format.uint8, numChannels: 3);
+    } else if (format == Format.uint4 && nc == 3 && palette == null) {
+      // => uint8,3
+      image = image.convert(format: Format.uint8, numChannels: 3);
+    } else if (format == Format.uint4 && nc == 4) {
+      // => uint8,4
+      image = image.convert(format: Format.uint8, numChannels: 4);
+    } else if (format == Format.uint8 && nc == 1 && palette == null) {
+      // => uint8 palette
+      image = image.convert(format: Format.uint8, withPalette: true);
+    } else if (format == Format.uint8 && nc == 2) {
+      // => uint8,3
+      image.convert(format: Format.uint8, numChannels: 3);
+    } else if (image.isHdrFormat) {
+      // => uint8,[3,4]
+      image = image.convert(format: Format.uint8);
+    }
 
     var bpp = image.bitsPerChannel * image.data!.numChannels;
     if (bpp == 12) {
@@ -89,8 +152,8 @@ class BmpEncoder extends Encoder {
     }
 
     if (bpp == 1 || bpp == 2 || bpp == 4 || bpp == 8) {
-      if (image.hasPalette) {
-        final palette = image.palette!;
+      if (palette != null) {
+        //final palette = image.palette!;
         final l = palette.numColors;
         for (var pi = 0; pi < l; ++pi) {
           out..writeByte(palette.getBlue(pi).toInt())

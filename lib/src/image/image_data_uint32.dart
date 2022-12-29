@@ -35,6 +35,8 @@ class ImageDataUint32 extends ImageData {
 
   num get maxChannelValue => 0xffffffff;
 
+  num get maxIndexValue => 0xffffffff;
+
   PixelUint32 get iterator => PixelUint32.imageData(this);
 
   Iterator<Pixel> getRange(int x, int y, int width, int height) =>
