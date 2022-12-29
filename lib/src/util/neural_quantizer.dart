@@ -73,7 +73,7 @@ class NeuralQuantizer extends Quantizer {
   @override
   Color getQuantizedColor(Color c) {
     final i = getColorIndex(c);
-    final out = c.length == 4 ? ColorRgba8() : ColorRgb8()
+    final out = c.length == 4 ? ColorRgba8(0, 0, 0, 255) : ColorRgb8(0, 0, 0)
     ..r = palette.get(i, 0)
     ..g = palette.get(i, 1)
     ..b = palette.get(i, 2);

@@ -370,10 +370,11 @@ class Command {
 
   void compositeImage(Command? src, { int? dstX, int? dstY, int? dstW,
       int? dstH, int? srcX, int? srcY, int? srcW, int? srcH,
-      BlendMode blend = BlendMode.alpha, bool center = false }) {
+      BlendMode blend = BlendMode.alpha, bool center = false, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
     subCommand = CompositeImageCmd(subCommand, src, dstX: dstX, dstY: dstY,
         dstW: dstW, dstH: dstH, srcX: srcX, srcY: srcY, srcW: srcW, srcH: srcH,
-        blend: blend, center: center);
+        blend: blend, center: center, mask: mask, maskChannel: maskChannel);
   }
 
   void drawLine(int x1, int y1, int x2, int y2, Color c,
@@ -382,8 +383,10 @@ class Command {
         antialias: antialias, thickness: thickness);
   }
 
-  void drawPixel(int x, int y, Color color) {
-    subCommand = DrawPixelCmd(subCommand, x, y, color);
+  void drawPixel(int x, int y, Color color, { Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = DrawPixelCmd(subCommand, x, y, color, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void drawRect(int x1, int y1, int x2, int y2, Color c,
@@ -414,8 +417,10 @@ class Command {
         compareAlpha: compareAlpha);
   }
 
-  void fillRect(int x1, int y1, int x2, int y2, Color c) {
-    subCommand = FillRectCmd(subCommand, x1, y1, x2, y2, c);
+  void fillRect(int x1, int y1, int x2, int y2, Color c, { Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = FillRectCmd(subCommand, x1, y1, x2, y2, c, mask: mask,
+        maskChannel: maskChannel);
   }
 
   // filter

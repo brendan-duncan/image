@@ -140,7 +140,7 @@ class ColorUint8 extends Iterable<num> implements Color {
 }
 
 class ColorRgb8 extends ColorUint8 {
-  ColorRgb8([int r = 0, int g = 0, int b = 0])
+  ColorRgb8(int r, int g, int b)
       : super.rgb(r, g, b);
 
   ColorRgb8.from(ColorUint8 other)
@@ -152,7 +152,7 @@ class ColorRgb8 extends ColorUint8 {
 }
 
 class ColorRgba8 extends ColorUint8 {
-  ColorRgba8([int r = 0, int g = 0, int b = 0, int a = 255])
+  ColorRgba8(int r, int g, int b, int a)
     : super.rgba(r, g, b, a);
 
   ColorRgba8.from(ColorUint8 other)

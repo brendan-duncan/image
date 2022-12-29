@@ -6,11 +6,11 @@ import '../_test_util.dart';
 
 void main() {
   group('Draw', () {
-    test('compositeImage', () {
+    test('compositeImage', () async {
       final i0 = Image(width: 256, height: 256);
       final i1 = Image(width: 256, height: 256, numChannels: 4);
 
-      i0.clear(ColorRgba8(255));
+      i0.clear(ColorRgba8(255, 0, 0, 255));
       for (final p in i1) {
         p..r = p.x
         ..g = p.y
@@ -20,7 +20,7 @@ void main() {
       compositeImage(i0, i1, dstX: 50, dstY: 50, dstW: 100, dstH: 100);
       compositeImage(i0, i1, dstX: 100, dstY: 100, dstW: 100, dstH: 100);
 
-      File('$testOutputPath/draw/draw_image_1.png')
+      File('$testOutputPath/draw/compositeImage_1.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
 
@@ -32,7 +32,7 @@ void main() {
         }
       }
 
-      final origBg = decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+      final origBg = (await decodePngFile('test/_data/png/buck_24.png'))!;
 
       {
         final bg = origBg.clone();
@@ -57,6 +57,21 @@ void main() {
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(bg));
       }
+
+      final mask = Command()
+        ..createImage(width: 256, height: 256)
+        ..fill(ColorRgb8(0, 0, 0))
+        ..fillCircle(128, 128, 30, ColorRgb8(255, 255, 255))
+        ..gaussianBlur(5);
+
+      final fgCmd = Command()..image(fg);
+
+      await (Command()
+          ..image(origBg)
+          ..copy()
+          ..compositeImage(fgCmd, dstX: 50, dstY: 50, mask: mask)
+          ..writeToFile('$testOutputPath/draw/compositeImage_mask.png')
+      ).execute();
     });
   });
 }

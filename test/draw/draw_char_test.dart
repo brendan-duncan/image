@@ -7,14 +7,14 @@ void main() {
     test('drawChar', () async {
       final cmd = Command()
           ..createImage(width: 256, height: 256)
-          ..fill(ColorRgb8(128, 128))
+          ..fill(ColorRgb8(128, 128, 0))
           ..drawChar(arial24, 50, 50, "H")
           ..drawChar(arial24, 70, 70, "e",
-              color: ColorRgba8(255))
+              color: ColorRgba8(255, 0, 0, 255))
           ..drawChar(arial24, 90, 90, "l",
-              color: ColorRgba8(0, 255))
+              color: ColorRgba8(0, 255, 0, 255))
           ..drawChar(arial24, 110, 110, "l",
-              color: ColorRgba8(0, 0, 255))
+              color: ColorRgba8(0, 0, 255, 255))
           ..drawChar(arial24, 130, 130, "o",
               color: ColorRgba8(255, 0, 0, 128))
           ..writeToFile('$testOutputPath/draw/draw_char.png');

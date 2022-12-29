@@ -8,8 +8,9 @@ void main() {
   group('Draw', () {
     test('drawString', () {
       final i0 = Image(width: 256, height: 256)
-      ..clear(ColorRgb8(128, 128));
-      drawString(i0, arial24, 50, 50, "Hello", color: ColorRgba8(255));
+      ..clear(ColorRgb8(128, 128, 0));
+      drawString(i0, arial24, 50, 50, "Hello",
+          color: ColorRgba8(255, 0, 0, 255));
       drawString(i0, arial24, 200, 80, "Right Justified", rightJustify: true);
       drawStringCentered(i0, arial24, "Centered");
 

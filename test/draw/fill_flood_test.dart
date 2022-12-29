@@ -8,8 +8,8 @@ void main() {
   group('Draw', () {
     test('fillFlood', () {
       final img = Image(width: 100, height: 100);
-      drawCircle(img, 50, 50, 49, ColorRgb8(255));
-      fillFlood(img, 50, 50, ColorRgb8(0, 255), threshold: 1);
+      drawCircle(img, 50, 50, 49, ColorRgb8(255, 0, 0));
+      fillFlood(img, 50, 50, ColorRgb8(0, 255, 0), threshold: 1);
 
       File('$testOutputPath/draw/fill_flood.png')
         ..createSync(recursive: true)

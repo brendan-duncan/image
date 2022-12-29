@@ -27,13 +27,13 @@ void main() {
 
       final mask = Command()
         ..createImage(width: 256, height: 256)
-        ..fill(ColorRgb8())
-        ..fillCircle(128, 128, 100, ColorRgb8(255, 255, 255));
+        ..fill(ColorRgb8(0, 0, 0))
+        ..fillCircle(128, 128, 50, ColorRgb8(255, 255, 255));
 
       await (Command()
           ..createImage(width: 256, height: 256)
           ..fill(ColorRgb8(255, 255, 255))
-          ..fill(ColorRgb8(255), mask: mask)
+          ..fill(ColorRgb8(255, 0, 0), mask: mask)
           ..writeToFile('$testOutputPath/draw/fill_mask.png'))
           .execute();
     });

@@ -9,7 +9,7 @@ void main() {
     test('drawRect', () {
       final i0 = Image(width: 256, height: 256);
 
-      drawRect(i0, 50, 50, 150, 150, ColorRgb8(255));
+      drawRect(i0, 50, 50, 150, 150, ColorRgb8(255, 0, 0));
       drawRect(i0, 100, 100, 200, 200, ColorRgba8(0, 255, 0, 128),
           thickness: 14);
 

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
@@ -10,7 +11,8 @@ import 'blend_mode.dart';
 /// color. If [alpha] is provided, it will be used in place of the
 /// color alpha, as a normalized color value \[0, 1\].
 Image drawPixel(Image image, int x, int y, Color c, { Color? filter,
-    num? alpha, BlendMode blend = BlendMode.alpha }) {
+    num? alpha, BlendMode blend = BlendMode.alpha, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   if (!image.isBoundsSafe(x, y)) {
     return image;
   }
@@ -22,13 +24,16 @@ Image drawPixel(Image image, int x, int y, Color c, { Color? filter,
     }
   }
 
+  final msk = mask?.getPixel(x, y).getChannelNormalized(maskChannel) ?? 1;
+
   var overlayR = filter != null ? c.rNormalized * filter.rNormalized
       : c.rNormalized;
   var overlayG = filter != null ? c.gNormalized * filter.gNormalized
       : c.gNormalized;
   var overlayB = filter != null ? c.bNormalized * filter.bNormalized
       : c.bNormalized;
-  final overlayA = alpha != null ? alpha : c.length < 4 ? 1.0 : c.aNormalized;
+  final overlayA = (alpha != null ? alpha : c.length < 4 ? 1.0
+      : c.aNormalized) * msk;
 
   if (overlayA == 0) {
     return image;

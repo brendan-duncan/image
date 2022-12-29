@@ -14,7 +14,7 @@ void main() {
       for (var i = 0; i < 10000; ++i) {
         final x = r.nextInt(i0.width - 1);
         final y = r.nextInt(i0.height - 1);
-        drawPixel(i0, x, y, ColorRgb8(x, y));
+        drawPixel(i0, x, y, ColorRgb8(x, y, 0));
       }
       File('$testOutputPath/draw/drawPixel.png')
         ..createSync(recursive: true)

@@ -1,3 +1,4 @@
+import '../../color/channel.dart';
 import '../../color/color.dart';
 import '../../draw/blend_mode.dart';
 import '../../draw/draw_pixel.dart';
@@ -10,17 +11,21 @@ class DrawPixelCmd extends Command {
   final Color? _filter;
   double? alpha;
   BlendMode blend;
+  Command? mask;
+  Channel maskChannel;
 
   DrawPixelCmd(Command? input, this.x, this.y, this.color, { Color? filter,
-      this.alpha, this.blend = BlendMode.alpha })
+      this.alpha, this.blend = BlendMode.alpha, this.mask,
+      this.maskChannel = Channel.luminance })
       : this._filter = filter
       , super(input);
 
   @override
   Future<void> executeCommand() async {
-    await input?.execute();
-    final img = input?.outputImage;
+    final img = await input?.getImage();
+    final maskImg = await mask?.getImage();
     outputImage = img != null ? drawPixel(img, x, y, color, filter: _filter,
-        alpha: alpha, blend: blend) : null;
+        alpha: alpha, blend: blend, mask: maskImg, maskChannel: maskChannel)
+        : null;
   }
 }

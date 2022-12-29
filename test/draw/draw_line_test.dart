@@ -8,7 +8,7 @@ void main() {
     test('drawLine', () {
       final i0 = Image(width: 256, height: 256);
       drawLine(i0, 0, 0, 255, 255, ColorRgb8(255, 255, 255));
-      drawLine(i0, 255, 0, 0, 255, ColorRgb8(255),
+      drawLine(i0, 255, 0, 0, 255, ColorRgb8(255, 0, 0),
           antialias: true, thickness: 4);
 
       File('$testOutputPath/draw/draw_line.png')

@@ -1,5 +1,7 @@
+import '../color/channel.dart';
 import '../image/image.dart';
 import '../image/pixel.dart';
+import '../util/math_util.dart';
 import 'blend_mode.dart';
 import 'draw_pixel.dart';
 
@@ -27,7 +29,9 @@ Image compositeImage(Image dst, Image src, {
     int? srcW,
     int? srcH,
     BlendMode blend = BlendMode.alpha,
-    bool center = false }) {
+    bool center = false,
+    Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   dstX ??= 0;
   dstY ??= 0;
   srcX ??= 0;
@@ -56,33 +60,57 @@ Image compositeImage(Image dst, Image src, {
       growable: false);
 
   if (blend == BlendMode.direct) {
-    _directComposite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache);
+    _directComposite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache,
+        mask, maskChannel);
   } else {
-    _composite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache, blend);
+    _composite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache, blend,
+        mask, maskChannel);
   }
 
   return dst;
 }
 
 void _directComposite(Image src, Image dst, int dstX, int dstY,
-    int dstW, int dstH, List<int> xCache, List<int> yCache) {
+    int dstW, int dstH, List<int> xCache, List<int> yCache, Image? mask,
+    Channel maskChannel) {
   Pixel? p;
-  for (var y = 0; y < dstH; ++y) {
-    for (var x = 0; x < dstW; ++x) {
-      p = src.getPixel(xCache[x], yCache[y], p);
-      dst.setPixel(dstX + x, dstY + y, p);
+  if (mask != null) {
+    for (var y = 0; y < dstH; ++y) {
+      for (var x = 0; x < dstW; ++x) {
+        final sx = xCache[x];
+        final sy = yCache[y];
+        p = src.getPixel(sx, sy, p);
+        final m = mask.getPixel(sx, sy).getChannelNormalized(maskChannel);
+        if (m == 1) {
+          dst.setPixel(dstX + x, dstY + y, p);
+        } else {
+          final dp = dst.getPixel(dstX + x, dstY + y);
+          dp..r = mix(dp.r, p.r, m)
+          ..g = mix(dp.g, p.g, m)
+          ..b = mix(dp.b, p.b, m)
+          ..a = mix(dp.a, p.a, m);
+        }
+      }
+    }
+  } else {
+    for (var y = 0; y < dstH; ++y) {
+      for (var x = 0; x < dstW; ++x) {
+        p = src.getPixel(xCache[x], yCache[y], p);
+        dst.setPixel(dstX + x, dstY + y, p);
+      }
     }
   }
 }
 
 void _composite(Image src, Image dst, int dstX, int dstY,
     int dstW, int dstH, List<int> xCache, List<int> yCache,
-    BlendMode blend) {
+    BlendMode blend, Image? mask, Channel maskChannel) {
   Pixel? p;
   for (var y = 0; y < dstH; ++y) {
     for (var x = 0; x < dstW; ++x) {
       p = src.getPixel(xCache[x], yCache[y], p);
-      drawPixel(dst, dstX + x, dstY + y, p, blend: blend);
+      drawPixel(dst, dstX + x, dstY + y, p, blend: blend, mask: mask,
+          maskChannel: maskChannel);
     }
   }
 }

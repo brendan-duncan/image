@@ -14,10 +14,8 @@ class FillCmd extends Command {
 
   @override
   Future<void> executeCommand() async {
-    await input?.execute();
-    final img = input?.outputImage;
-    await mask?.execute();
-    final maskImg = mask?.outputImage;
+    final img = await input?.getImage();
+    final maskImg = await mask?.getImage();
     outputImage = img != null ? fill(img, color, mask: maskImg,
         maskChannel: maskChannel) : null;
   }

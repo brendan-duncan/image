@@ -8,7 +8,7 @@ void main() {
   group('Filter', () {
     test('dropShadow', () {
       final i0 = Image(width: 256, height: 256, numChannels: 4);
-      drawStringCentered(i0, arial48, 'Shadow', color: ColorRgb8(255));
+      drawStringCentered(i0, arial48, 'Shadow', color: ColorRgb8(255, 0, 0));
 
       final id = dropShadow(i0, -5, 5, 3);
 
