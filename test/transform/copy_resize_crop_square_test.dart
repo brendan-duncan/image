@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -6,15 +5,15 @@ import '../_test_util.dart';
 
 void main() {
   group('Transform', () {
-    test('copyResizeCropSquare', () {
-      final img = decodePng(File('test/_data/png/buck_24.png')
-          .readAsBytesSync())!;
-      final i0 = copyResizeCropSquare(img, 64);
-      expect(i0.width, equals(64));
+    test('copyResizeCropSquare', () async {
+      final i0 = await (Command()
+      ..decodePngFile('test/_data/png/buck_24.png')
+      ..copyResizeCropSquare(64)
+      ..writeToFile('$testOutputPath/transform/copyResizeCropSquare.png'))
+      .getImage();
+      expect(i0, isNotNull);
+      expect(i0!.width, equals(64));
       expect(i0.height, equals(64));
-      File('$testOutputPath/transform/copyResizeCropSquare.png')
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(encodePng(i0));
     });
   });
 }

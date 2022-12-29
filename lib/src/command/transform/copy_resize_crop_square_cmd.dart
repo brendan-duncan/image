@@ -1,16 +1,20 @@
+import '../../image/interpolation.dart';
 import '../../transform/copy_resize_crop_square.dart';
 import '../command.dart';
 
 class CopyResizeCropSquareCmd extends Command {
   int size;
+  Interpolation interpolation;
 
-  CopyResizeCropSquareCmd(Command? input, this.size)
+  CopyResizeCropSquareCmd(Command? input, this.size,
+      { this.interpolation = Interpolation.nearest })
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     await input?.execute();
     final img = input?.outputImage;
-    outputImage = img != null ? copyResizeCropSquare(img, size) : null;
+    outputImage = img != null ? copyResizeCropSquare(img, size,
+        interpolation: interpolation) : null;
   }
 }

@@ -202,83 +202,122 @@ color filters, transformations into other images (resize, crop), or basic drawin
 
 ## Transform Functions
 
-* **[bakeOrientation](https://brendan-duncan.github.io/image/doc/api/image/bakeOrientation.html)**
+* Image **[bakeOrientation](https://brendan-duncan.github.io/image/doc/api/image/bakeOrientation.html)**
+(Image image)
 
 If the image has orientation EXIF data, flip the image so its pixels are oriented and remove
-the EXIF orientation. Returns a new Image.
+the EXIF orientation. **Returns a new Image.**
 
-* **[copyCrop](https://brendan-duncan.github.io/image/doc/api/image/copyCrop.html)**
-Returns a new Image.
+* Image **[copyCrop](https://brendan-duncan.github.io/image/doc/api/image/copyCrop.html)**
+(Image src, int x, int y, int w, int h)
+ 
+**Returns a new Image.**
 
 ![copyCrop](images/transform/copyCrop.png)
 
-* **[copyCropCircle](https://brendan-duncan.github.io/image/doc/api/image/copyCropCircle.html)**
-Returns a new Image.
+* Image **[copyCropCircle](https://brendan-duncan.github.io/image/doc/api/image/copyCropCircle.html)**
+(Image src, { int? radius, int? centerX, int? centerY })
+
+**Returns a new Image.**
 
 ![copyCropCircle](images/transform/copyCropCircle.png)
 
-* **[copyFlip](https://brendan-duncan.github.io/image/doc/api/image/copyFlip.html)**
-Returns a new Image.
+* Image **[copyFlip](https://brendan-duncan.github.io/image/doc/api/image/copyFlip.html)**
+(Image src, FlipDirection direction)
+
+**Returns a new Image.**
 
 ![copyFlip](images/transform/copyFlip_b.png)
 
-* **[copyRectify](https://brendan-duncan.github.io/image/doc/api/image/copyRectify.html)**
-Returns a new Image.
+* Image **[copyRectify](https://brendan-duncan.github.io/image/doc/api/image/copyRectify.html)**
+(Image src,
+  { required Point topLeft,
+  required Point topRight,
+  required Point bottomLeft,
+  required Point bottomRight,
+  Interpolation interpolation = Interpolation.nearest,
+  Image? toImage })
+
+**Returns a new Image.**
 
 ![copyRectify](images/transform/copyRectify_orig.jpg) ![copyRectify](images/transform/copyRectify.png)
 
-* **[copyResize](https://brendan-duncan.github.io/image/doc/api/image/copyResize.html)**
-Returns a new Image.
+* Image **[copyResize](https://brendan-duncan.github.io/image/doc/api/image/copyResize.html)**
+(Image src, { int? width, int? height, Interpolation interpolation = Interpolation.nearest })
+
+**Returns a new Image.**
 
 ![copyResize](images/transform/copyResize.png)
 
-* **[copyResizeCropSquare](https://brendan-duncan.github.io/image/doc/api/image/copyResizeCropSquare.html)**
-Returns a new Image.
+* Image **[copyResizeCropSquare](https://brendan-duncan.github.io/image/doc/api/image/copyResizeCropSquare.html)**
+(Image src, int size, { Interpolation interpolation = Interpolation.nearest })
+
+**Returns a new Image.**
 
 ![copyResizeCropSquare](images/transform/copyResizeCropSquare.png)
 
-* **[copyRotate](https://brendan-duncan.github.io/image/doc/api/image/copyRotate.html)**
-Returns a new Image.
+* Image **[copyRotate](https://brendan-duncan.github.io/image/doc/api/image/copyRotate.html)**
+(Image src, num angle, { Interpolation interpolation = Interpolation.nearest })
+
+**Returns a new Image.**
 
 ![copyRotate](images/transform/copyRotate_45.png)
 
-* **[flip](https://brendan-duncan.github.io/image/doc/api/image/flip.html)**
+* Image **[flip](https://brendan-duncan.github.io/image/doc/api/image/flip.html)**
+(Image src, FlipDirection direction)
+ 
 Flips the image in-place.
 
 ![flip](images/transform/flip_v.png)
 
-* **[trim](https://brendan-duncan.github.io/image/doc/api/image/trim.html)**
-Returns a new Image.
+* Image **[trim](https://brendan-duncan.github.io/image/doc/api/image/trim.html)**
+(Image src,
+  { TrimMode mode = TrimMode.topLeftColor, Trim sides = Trim.all })
+
+**Returns a new Image.**
 
 ![trim orig](images/transform/trim_orig.png) ![trim](images/transform/trim.png)
 
+* List\<int\> [findTrim](https://brendan-duncan.github.io/image/doc/api/image/findTrim.html)
+(Image src, { TrimMode mode = TrimMode.transparent, Trim sides = Trim.all })
+
+
 ## Draw Functions
 
-* **[fill](https://brendan-duncan.github.io/image/doc/api/image/fill.html)**
+* Image **[fill](https://brendan-duncan.github.io/image/doc/api/image/fill.html)**
+(Image image, Color color)
 
 ![fill](images/draw/fill.png)
 
-* **[fillCircle](https://brendan-duncan.github.io/image/doc/api/image/fillCircle.html)**
+* Image **[fillCircle](https://brendan-duncan.github.io/image/doc/api/image/fillCircle.html)**
+(Image image, int x, int y, int radius, Color color)
 
 ![fillCircle](images/draw/fill_circle.png)
 
-* **[fillRect](https://brendan-duncan.github.io/image/doc/api/image/fillRect.html)**
+* Image **[fillRect](https://brendan-duncan.github.io/image/doc/api/image/fillRect.html)**
+(Image src, int x1, int y1, int x2, int y2, Color color)
 
 ![fillRect](images/draw/fill_rect.png)
 
-* **[fillFlood](https://brendan-duncan.github.io/image/doc/api/image/fillFlood.html)**
+* Image **[fillFlood](https://brendan-duncan.github.io/image/doc/api/image/fillFlood.html)**
+(Image src, int x, int y, Color color,
+  { num threshold = 0.0, bool compareAlpha = false })
 
 ![fillFlood](images/draw/fill_flood.png)
 
-* **[drawChar](https://brendan-duncan.github.io/image/doc/api/image/drawChar.html)**
+* Image **[drawChar](https://brendan-duncan.github.io/image/doc/api/image/drawChar.html)**
+(Image image, BitmapFont font, int x, int y, String char, { Color? color })
 
 ![drawChar](images/draw/draw_char.png)
 
-* **[drawCircle](https://brendan-duncan.github.io/image/doc/api/image/drawCircle.html)**
+* Image **[drawCircle](https://brendan-duncan.github.io/image/doc/api/image/drawCircle.html)**
+(Image image, int x, int y, int radius, Color color)
 
 ![drawCircle](images/draw/draw_circle.png)
 
-* **[drawLine](https://brendan-duncan.github.io/image/doc/api/image/drawLine.html)**
+* Image **[drawLine](https://brendan-duncan.github.io/image/doc/api/image/drawLine.html)**
+(Image image, int x1, int y1, int x2, int y2, Color c,
+  { bool antialias = false, num thickness = 1 })
 
 ![drawLine](images/draw/draw_line.png)
 
@@ -288,11 +327,15 @@ Returns a new Image.
 
 ![drawPixel](images/draw/drawPixel.png)
 
-* **[drawRect](https://brendan-duncan.github.io/image/doc/api/image/drawRect.html)**
-
+* Image **[drawRect](https://brendan-duncan.github.io/image/doc/api/image/drawRect.html)**
+(Image dst, int x1, int y1, int x2, int y2, Color color,
+  { num thickness = 1 })
+ 
 ![drawRect](images/draw/draw_rect.png)
 
-* **[drawString](https://brendan-duncan.github.io/image/doc/api/image/drawString.html)**
+* Image **[drawString](https://brendan-duncan.github.io/image/doc/api/image/drawString.html)**
+(Image image, BitmapFont font, int x, int y, String string,
+  { Color? color, bool rightJustify = false })
 
 ![drawString](images/draw/draw_string.png)
 

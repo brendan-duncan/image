@@ -1,3 +1,4 @@
+import '../../image/interpolation.dart';
 import '../../transform/copy_rectify.dart';
 import '../../util/point.dart';
 import '../command.dart';
@@ -7,9 +8,10 @@ class CopyRectifyCmd extends Command {
   Point topRight;
   Point bottomLeft;
   Point bottomRight;
+  Interpolation interpolation;
 
   CopyRectifyCmd(Command? input, this.topLeft, this.topRight,
-      this.bottomLeft, this.bottomRight)
+      this.bottomLeft, this.bottomRight, this.interpolation)
       : super(input);
 
   @override

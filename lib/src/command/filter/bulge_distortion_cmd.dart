@@ -1,5 +1,5 @@
 import '../../filter/bulge_distortion.dart';
-import '../../util/interpolation.dart';
+import '../../image/interpolation.dart';
 import '../command.dart';
 
 class BulgeDistortionCmd extends Command {

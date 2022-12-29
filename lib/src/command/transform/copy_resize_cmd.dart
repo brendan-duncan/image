@@ -1,5 +1,5 @@
+import '../../image/interpolation.dart';
 import '../../transform/copy_resize.dart';
-import '../../util/interpolation.dart';
 import '../command.dart';
 
 class CopyResizeCmd extends Command {

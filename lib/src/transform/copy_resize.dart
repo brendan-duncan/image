@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import '../image/image.dart';
+import '../image/interpolation.dart';
 import '../util/image_exception.dart';
-import '../util/interpolation.dart';
 import 'bake_orientation.dart';
 
 /// Returns a resized copy of the [src] Image.

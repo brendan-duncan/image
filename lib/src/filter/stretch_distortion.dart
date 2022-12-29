@@ -1,5 +1,5 @@
 import '../image/image.dart';
-import '../util/interpolation.dart';
+import '../image/interpolation.dart';
 import '../util/math_util.dart';
 
 Image stretchDistortion(Image src, { int? centerX, int? centerY,

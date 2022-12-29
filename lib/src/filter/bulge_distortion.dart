@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import '../image/image.dart';
-import '../util/interpolation.dart';
+import '../image/interpolation.dart';
 
 Image bulgeDistortion(Image src, { int? centerX, int? centerY,
     num? radius, num scale = 0.5,

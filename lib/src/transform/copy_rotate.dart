@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import '../image/image.dart';
-import '../util/interpolation.dart';
+import '../image/interpolation.dart';
 
   /// Returns a copy of the [src] image, rotated by [angle] degrees.
 Image copyRotate(Image src, num angle,

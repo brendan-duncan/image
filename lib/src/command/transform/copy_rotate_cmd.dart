@@ -1,5 +1,5 @@
+import '../../image/interpolation.dart';
 import '../../transform/copy_rotate.dart';
-import '../../util/interpolation.dart';
 import '../command.dart';
 
 class CopyRotateCmd extends Command {

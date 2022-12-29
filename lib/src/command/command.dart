@@ -15,11 +15,11 @@ import '../font/bitmap_font.dart';
 import '../formats/png_encoder.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
+import '../image/interpolation.dart';
 import '../image/palette.dart';
 import '../transform/flip.dart';
 import '../transform/trim.dart';
 import '../util/internal.dart';
-import '../util/interpolation.dart';
 import '../util/point.dart';
 import '../util/quantizer.dart';
 import 'draw/composite_image_cmd.dart';
@@ -647,9 +647,10 @@ class Command {
   void copyRectify({ required Point topLeft,
       required Point topRight,
       required Point bottomLeft,
-      required Point bottomRight }) {
+      required Point bottomRight,
+      Interpolation interpolation = Interpolation.nearest }) {
     subCommand = CopyRectifyCmd(subCommand, topLeft, topRight,
-        bottomLeft, bottomRight);
+        bottomLeft, bottomRight, interpolation);
   }
 
   void copyResize({ int? width, int? height,
@@ -658,8 +659,10 @@ class Command {
         interpolation: interpolation);
   }
 
-  void copyResizeCropSquare(int size) {
-    subCommand = CopyResizeCropSquareCmd(subCommand, size);
+  void copyResizeCropSquare(int size,
+      { Interpolation interpolation = Interpolation.nearest }) {
+    subCommand = CopyResizeCropSquareCmd(subCommand, size,
+        interpolation: interpolation);
   }
 
   void copyRotate(num angle,

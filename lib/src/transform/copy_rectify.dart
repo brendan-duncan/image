@@ -1,4 +1,5 @@
 import '../image/image.dart';
+import '../image/interpolation.dart';
 import '../util/point.dart';
 
 /// Returns a copy of the [src] image, where the given rectangle
@@ -8,6 +9,7 @@ Image copyRectify(Image src,
     required Point topRight,
     required Point bottomLeft,
     required Point bottomRight,
+    Interpolation interpolation = Interpolation.nearest,
     Image? toImage }) {
   Image? firstFrame;
   for (final frame in src.frames) {
@@ -23,7 +25,12 @@ Image copyRectify(Image src,
             topRight * u * (1 - v) +
             bottomLeft * (1 - u) * v +
             bottomRight * u * v;
-        final srcPixel = frame.getPixel(srcPixelCoord.xi, srcPixelCoord.yi);
+
+        final srcPixel = interpolation == Interpolation.nearest ?
+            frame.getPixel(srcPixelCoord.xi, srcPixelCoord.yi) :
+            frame.getPixelInterpolate(srcPixelCoord.x, srcPixelCoord.y,
+                interpolation: interpolation);
+
         dst.setPixel(x, y, srcPixel);
       }
     }
