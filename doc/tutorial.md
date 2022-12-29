@@ -154,7 +154,7 @@ void main(List<String> argv) {
 ```dart
 import 'package:image/image.dart' as img;
 
-List<Image> splitImage({ img.Image inputImage, int horizontalPieceCount, int verticalPieceCount }) {
+List<img.Image> splitImage(img.Image inputImage, int horizontalPieceCount, int verticalPieceCount) {
   img.Image image = inputImage;
 
   final xLength = (image.width / horizontalPieceCount).round();
