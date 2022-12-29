@@ -27,8 +27,8 @@ options for high performance execution. One way to help keep the performance iss
 multi-threading. For platforms that support it (not the web), Dart provides Isolates as its solution for
 multi-threading.
 
-The Command.executeThread() method will execute the commands in a separate isolate thread, resolving the promise when
-it has finished. 
+The **Command.executeThread()** method will execute the commands in a separate isolate thread, resolving the promise
+when it has finished. 
 
 For platforms that do not support Isolates, executeThread will be the same as execute and run in the main thread.
 
@@ -60,7 +60,7 @@ You can get the last image that was processed from the command with
 ```dart
 Image? image = await cmd.getImage();
 ```
-If the command hadn't been executed yet, getImage will execute the command. You can als use
+If the command hadn't been executed yet, getImage will execute the command. You can also use
 ```dart
 Image? image = await cmd.getImageThread();
 ```
