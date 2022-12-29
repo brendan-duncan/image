@@ -15,7 +15,8 @@ void main() {
         final font = readFontZip(fontZip);
 
         final img = copyResize(image, width: 400);
-        drawString(img, font, 10, 50, 'Testing Font 1: Hello World');
+        drawString(img, 'Testing Font 1: Hello World',
+            font: font, x: 10, y: 50);
 
         File('$testOutputPath/font/font_zip_xml.jpg')
           ..createSync(recursive: true)
@@ -27,7 +28,7 @@ void main() {
         final font = readFontZip(fontZip);
 
         final img = copyResize(image, width: 400);
-        drawString(img, font, 10, 50, 'Testing Font 2: Hello World',
+        drawString(img, 'Testing Font 2: Hello World', font: font, x: 10, y: 50,
             color: ColorRgba8(255, 0, 0, 128));
 
         File('$testOutputPath/font/font_zip_text.jpg')
@@ -37,7 +38,8 @@ void main() {
 
       test('arial_14', () {
         final img = copyResize(image, width: 400);
-        drawString(img, arial14, 10, 50, 'Testing Arial 14: Hello World',
+        drawString(img, 'Testing Arial 14: Hello World',
+            font: arial14, x: 10, y: 50,
             color: ColorRgba8(255, 0, 0, 128));
 
         File('$testOutputPath/font/font_arial_14.jpg')
@@ -47,7 +49,8 @@ void main() {
 
       test('arial_24', () {
         final img = copyResize(image, width: 400);
-        drawString(img, arial24, 10, 50, 'Testing Arial 24: Hello World',
+        drawString(img, 'Testing Arial 24: Hello World',
+            font: arial24, x: 10, y: 50,
             color: ColorRgba8(255, 0, 0, 128));
 
         File('$testOutputPath/font/font_arial_24.jpg')
@@ -57,7 +60,8 @@ void main() {
 
       test('arial_48', () {
         final img = copyResize(image, width: 400);
-        drawString(img, arial48, 10, 50, 'Testing Arial 48: Hello World',
+        drawString(img, 'Testing Arial 48: Hello World',
+            font: arial48, x: 10, y: 50,
             color: ColorRgba8(255, 0, 0, 128));
 
         File('$testOutputPath/font/font_arial_48.jpg')
@@ -67,7 +71,7 @@ void main() {
 
       test('drawStringCenteredY', () {
         final img = copyResize(image, width: 400);
-        drawStringCentered(img, arial24, 'Testing Arial 24: Hello World',
+        drawString(img, 'Testing Arial 24: Hello World', font: arial24,
             y: 50, color: ColorRgba8(255, 0, 0, 128));
 
         File('$testOutputPath/font/y_centered.jpg')
@@ -77,7 +81,7 @@ void main() {
 
       test('drawStringCenteredY', () {
         final img = copyResize(image, width: 400);
-        drawStringCentered(img, arial24, 'Testing Arial 24: Hello World',
+        drawString(img, 'Testing Arial 24: Hello World', font: arial24,
             x: 10, color: ColorRgba8(255, 0, 0, 128));
 
         File('$testOutputPath/font/x_centered.jpg')
@@ -87,8 +91,8 @@ void main() {
 
       test('drawStringCenteredXY', () {
         final img = copyResize(image, width: 400);
-        drawStringCentered(img, arial24, 'Testing Arial 24: Hello World',
-            color: ColorRgba8(255, 0, 0, 128));
+        drawString(img, 'Testing Arial 24: Hello World',
+            font: arial24, color: ColorRgba8(255, 0, 0, 128));
 
         File('$testOutputPath/font/xy_centered.jpg')
           ..createSync(recursive: true)

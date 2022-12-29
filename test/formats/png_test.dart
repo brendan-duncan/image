@@ -384,8 +384,7 @@ void main() {
         ..loopCount = 10;
         for (var i = 0; i < 10; i++) {
           final frame = i == 0 ? anim : anim.addFrame();
-          drawString(frame, arial48, 100, 60, i.toString());
-
+          drawString(frame, i.toString(), font: arial48, x: 100, y: 60);
         }
 
         final png = encodePng(anim);

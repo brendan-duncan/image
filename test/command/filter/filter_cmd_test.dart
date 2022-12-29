@@ -9,7 +9,7 @@ void main() {
       Command()
         ..decodeGifFile('test/_data/gif/cars.gif')
         ..filter((image) =>
-          drawString(image, arial14, 10, 10, '${image.frameIndex}')
+          drawString(image, '${image.frameIndex}', font: arial14, x: 10, y: 10)
         )
         ..writeToFile('$testOutputPath/cmd/cars.gif')
         ..execute();

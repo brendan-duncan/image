@@ -1,3 +1,4 @@
+import '../../color/channel.dart';
 import '../../color/color.dart';
 import '../../draw/draw_circle.dart';
 import '../command.dart';
@@ -7,14 +8,19 @@ class DrawCircleCmd extends Command {
   int y;
   int radius;
   Color color;
+  Command? mask;
+  Channel maskChannel;
 
-  DrawCircleCmd(Command? input, this.x, this.y, this.radius, this.color)
+  DrawCircleCmd(Command? input, { required this.x, required this.y,
+      required this.radius, required this.color, this.mask,
+      this.maskChannel = Channel.luminance })
       : super(input);
 
   @override
   Future<void> executeCommand() async {
-    await input?.execute();
-    final img = input?.outputImage;
-    outputImage = img != null ? drawCircle(img, x, y, radius, color) : null;
+    final img = await input?.getImage();
+    final maskImg = await mask?.getImage();
+    outputImage = img != null ? drawCircle(img, x: x, y: y, radius: radius,
+        color: color, mask: maskImg, maskChannel: maskChannel) : null;
   }
 }

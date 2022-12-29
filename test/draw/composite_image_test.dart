@@ -45,7 +45,7 @@ void main() {
       {
         final bg = origBg.clone();
         compositeImage(bg, fg, dstX: 50, dstY: 50, dstW: 200, dstH: 200);
-        File('$testOutputPath/draw/compositeImage_2.png')
+        File('$testOutputPath/draw/compositeImage_scaled.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(bg));
       }
@@ -60,8 +60,9 @@ void main() {
 
       final mask = Command()
         ..createImage(width: 256, height: 256)
-        ..fill(ColorRgb8(0, 0, 0))
-        ..fillCircle(128, 128, 30, ColorRgb8(255, 255, 255))
+        ..fill(color: ColorRgb8(0, 0, 0))
+        ..fillCircle(x: 128, y: 128, radius: 30,
+            color: ColorRgb8(255, 255, 255))
         ..gaussianBlur(5);
 
       final fgCmd = Command()..image(fg);

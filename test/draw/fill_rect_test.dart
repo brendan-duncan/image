@@ -9,8 +9,10 @@ void main() {
     test('fillRect', () async {
       final i0 = Image(width: 256, height: 256);
 
-      fillRect(i0, 50, 50, 150, 150, ColorRgb8(255, 0, 0));
-      fillRect(i0, 100, 100, 200, 200, ColorRgba8(0, 255, 0, 128));
+      fillRect(i0, x1: 50, y1: 50, x2: 150, y2: 150,
+          color: ColorRgb8(255, 0, 0));
+      fillRect(i0, x1: 100, y1: 100, x2: 200, y2: 200,
+          color: ColorRgba8(0, 255, 0, 128));
 
       File('$testOutputPath/draw/fill_rect.png')
         ..createSync(recursive: true)
@@ -25,14 +27,18 @@ void main() {
 
       final mask = Command()
         ..createImage(width: 256, height: 256)
-        ..fill(ColorRgb8(0, 0, 0))
-        ..fillCircle(128, 128, 50, ColorRgb8(255, 255, 255));
+        ..fill(color: ColorRgb8(0, 0, 0))
+        ..fillCircle(x: 128, y: 128, radius: 50,
+            color: ColorRgb8(255, 255, 255))
+        ..gaussianBlur(10);
 
       await (Command()
           ..createImage(width: 256, height: 256)
-          ..fill(ColorRgb8(255, 255, 255))
-          ..fillRect(50, 50, 150, 150, ColorRgb8(255, 0, 0))
-          ..fillRect(100, 100, 200, 200, ColorRgba8(0, 255, 0, 128), mask: mask,
+          ..fill(color: ColorRgb8(255, 255, 255))
+          ..fillRect(x1: 50, y1: 50, x2: 150, y2: 150,
+              color: ColorRgb8(255, 0, 0))
+          ..fillRect(x1: 100, y1: 100, x2: 200, y2: 200,
+              color: ColorRgba8(0, 255, 0, 128), mask: mask,
               maskChannel: Channel.red)
           ..writeToFile('$testOutputPath/draw/fill_rect_mask.png')
       ).execute();

@@ -10,7 +10,7 @@ void main() {
     test('fill', () async {
       final cmd = Command()
           ..createImage(width: 256, height: 256)
-          ..fill(ColorRgba8(120, 64, 85, 90))
+          ..fill(color: ColorRgba8(120, 64, 85, 90))
           ..encodePng();
 
       final png = await cmd.getBytesThread();
@@ -27,13 +27,15 @@ void main() {
 
       final mask = Command()
         ..createImage(width: 256, height: 256)
-        ..fill(ColorRgb8(0, 0, 0))
-        ..fillCircle(128, 128, 50, ColorRgb8(255, 255, 255));
+        ..fill(color: ColorRgb8(0, 0, 0))
+        ..fillCircle(x: 128, y: 128, radius: 50,
+            color: ColorRgb8(255, 255, 255))
+        ..gaussianBlur(10);
 
       await (Command()
           ..createImage(width: 256, height: 256)
-          ..fill(ColorRgb8(255, 255, 255))
-          ..fill(ColorRgb8(255, 0, 0), mask: mask)
+          ..fill(color: ColorRgb8(255, 255, 255))
+          ..fill(color: ColorRgb8(255, 0, 0), mask: mask)
           ..writeToFile('$testOutputPath/draw/fill_mask.png'))
           .execute();
     });

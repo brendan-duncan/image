@@ -358,14 +358,18 @@ class Command {
 
 
   // draw
-  void drawChar(BitmapFont font, int x, int y,
-      String char, { Color? color }) {
-    subCommand = DrawCharCmd(subCommand, font, x, y, char,
-        color: color);
+  void drawChar(String char, { required BitmapFont font, required int x,
+      required int y, Color? color, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = DrawCharCmd(subCommand, char, font: font, x: x, y: y,
+        color: color, mask: mask, maskChannel: maskChannel);
   }
 
-  void drawCircle(int x, int y, int radius, Color color) {
-    subCommand = DrawCircleCmd(subCommand, x, y, radius, color);
+  void drawCircle({ required int x, required int y, required int radius,
+      required Color color, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = DrawCircleCmd(subCommand, x: x, y: y, radius: radius,
+      color: color, mask: mask, maskChannel: maskChannel);
   }
 
   void compositeImage(Command? src, { int? dstX, int? dstY, int? dstW,
@@ -377,10 +381,13 @@ class Command {
         blend: blend, center: center, mask: mask, maskChannel: maskChannel);
   }
 
-  void drawLine(int x1, int y1, int x2, int y2, Color c,
-      { bool antialias = false, num thickness = 1 }) {
-    subCommand = DrawLineCmd(subCommand, x1, y1, x2, y2, c,
-        antialias: antialias, thickness: thickness);
+  void drawLine({ required int x1, required int y1, required int x2,
+      required int y2, required Color color,
+      bool antialias = false, num thickness = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = DrawLineCmd(subCommand, x1: x1, y1: y1, x2: x2, y2: y2,
+        color: color, antialias: antialias, thickness: thickness, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void drawPixel(int x, int y, Color color, { Command? mask,
@@ -389,38 +396,49 @@ class Command {
         maskChannel: maskChannel);
   }
 
-  void drawRect(int x1, int y1, int x2, int y2, Color c,
-      { num thickness = 1 }) {
-    subCommand = DrawRectCmd(subCommand, x1, y1, x2, y2, c,
-        thickness: thickness);
-  }
-
-  void drawString(BitmapFont font, int x, int y,
-      String char, { Color? color }) {
-    subCommand = DrawStringCmd(subCommand, font, x, y, char,
-        color: color);
-  }
-
-  void fill(Color color, { Command? mask,
-      Channel maskChannel = Channel.luminance }) {
-    subCommand = FillCmd(subCommand, color, mask: mask,
+  void drawRect({ required int x1, required int y1, required int x2,
+      required int y2, required Color color, num thickness = 1,
+      Command? mask, Channel maskChannel = Channel.luminance }) {
+    subCommand = DrawRectCmd(subCommand, x1: x1, y1: y1, x2: x2, y2: y2,
+        color: color, thickness: thickness, mask: mask,
         maskChannel: maskChannel);
   }
 
-  void fillCircle(int x, int y, int radius, Color color) {
-    subCommand = FillCircleCmd(subCommand, x, y, radius, color);
-  }
-
-  void fillFlood(int x, int y, Color color,
-      { num threshold = 0.0, bool compareAlpha = false }) {
-    subCommand = FillFloodCmd(subCommand, x, y, color, threshold: threshold,
-        compareAlpha: compareAlpha);
-  }
-
-  void fillRect(int x1, int y1, int x2, int y2, Color c, { Command? mask,
+  void drawString(String string, { required BitmapFont font, required int x,
+      required int y, Color? color, bool wrap = false,
+      bool rightJustify = false, Command? mask,
       Channel maskChannel = Channel.luminance }) {
-    subCommand = FillRectCmd(subCommand, x1, y1, x2, y2, c, mask: mask,
+    subCommand = DrawStringCmd(subCommand, string, font: font, x: x, y: y,
+        color: color, wrap: wrap, rightJustify: rightJustify, mask: mask,
         maskChannel: maskChannel);
+  }
+
+  void fill({ required Color color, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = FillCmd(subCommand, color: color, mask: mask,
+        maskChannel: maskChannel);
+  }
+
+  void fillCircle({ required int x, required int y, required int radius,
+      required Color color, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = FillCircleCmd(subCommand, x: x, y: y, radius: radius,
+        color: color, mask: mask, maskChannel: maskChannel);
+  }
+
+  void fillFlood({ required int x, required int y, required Color color,
+        num threshold = 0.0, bool compareAlpha = false, Command? mask,
+        Channel maskChannel = Channel.luminance }) {
+    subCommand = FillFloodCmd(subCommand, x: x, y: y, color: color,
+        threshold: threshold, compareAlpha: compareAlpha, mask: mask,
+        maskChannel: maskChannel);
+  }
+
+  void fillRect({ required int x1, required int y1, required int x2,
+      required int y2, required Color color, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = FillRectCmd(subCommand, x1: x1, y1: y1, x2: x2, y2: y2,
+        color: color, mask: mask, maskChannel: maskChannel);
   }
 
   // filter

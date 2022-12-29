@@ -64,7 +64,7 @@ void main() {
         ..loopCount = 10;
         for (var i = 0; i < 10; i++) {
           final image = i == 0 ? anim : anim.addFrame();
-          drawString(image, arial48, 100, 60, i.toString());
+          drawString(image, i.toString(), font: arial48, x: 100, y: 60);
         }
 
         final gif = encodeGif(anim);
@@ -82,7 +82,8 @@ void main() {
         for (var i = 1; i <= 3; i++) {
           final image = i == 1 ? anim : anim.addFrame()
           ..frameDuration = i * 1000;
-          drawString(image, arial24, 50, 50, 'This frame is $i second(s) long');
+          drawString(image, 'This frame is $i second(s) long', font: arial24,
+              x: 50, y: 50);
         }
 
         const name = 'encodeAnimation_variable_fps';

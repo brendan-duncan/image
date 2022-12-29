@@ -9,16 +9,17 @@ void main() {
     test('drawRect', () {
       final i0 = Image(width: 256, height: 256);
 
-      drawRect(i0, 50, 50, 150, 150, ColorRgb8(255, 0, 0));
-      drawRect(i0, 100, 100, 200, 200, ColorRgba8(0, 255, 0, 128),
-          thickness: 14);
+      drawRect(i0, x1: 50, y1: 50, x2: 150, y2: 150,
+          color: ColorRgb8(255, 0, 0));
+      drawRect(i0, x1: 100, y1: 100, x2: 200, y2: 200,
+          color: ColorRgba8(0, 255, 0, 128), thickness: 14);
 
       var p = i0.getPixel(50, 50);
       expect(p, equals([255, 0, 0]));
       p = i0.getPixel(100, 100);
       expect(p, equals([0, 128, 0]));
 
-      File('$testOutputPath/draw/draw_rect.png')
+      File('$testOutputPath/draw/drawRect.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });

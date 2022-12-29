@@ -9,9 +9,10 @@ void main() {
     test('drawCircle', () {
       final i0 = Image(width: 256, height: 256);
 
-      drawCircle(i0, 128, 128, 100, ColorRgba8(255, 0, 0, 255));
+      drawCircle(i0, x: 128, y: 128, radius: 100,
+          color: ColorRgba8(255, 0, 0, 255));
 
-      File('$testOutputPath/draw/draw_circle.png')
+      File('$testOutputPath/draw/drawCircle.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });
