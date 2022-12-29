@@ -79,7 +79,7 @@ color filters, transformations into other images (resize, crop), or basic drawin
 ![dropShadow](images/filter/dropShadow.png)
 
 * Image **[edgeGlow](https://brendan-duncan.github.io/image/doc/api/image/edgeGlow.html)**
-(Image src, { num amount = 1.0 })
+(Image src, { num amount = 1 })
 
 ![edgeGlow](images/filter/edgeGlow.png)
 
@@ -170,7 +170,7 @@ color filters, transformations into other images (resize, crop), or basic drawin
 ![separableConvolution](images/filter/separableConvolution.png)
 
 * Image **[sepia](https://brendan-duncan.github.io/image/doc/api/image/sepia.html)**
-(Image src, { num amount = 1.0 })
+(Image src, { num amount = 1 })
 
 ![sepia](images/filter/sepia.png)
 
@@ -185,7 +185,7 @@ color filters, transformations into other images (resize, crop), or basic drawin
 ![smooth](images/filter/smooth.png)
 
 * Image **[sobel](https://brendan-duncan.github.io/image/doc/api/image/sobel.html)**
-(Image src, { num amount = 1.0 })
+(Image src, { num amount = 1 })
 
 ![sobel](images/filter/sobel.png)
 

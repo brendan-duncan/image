@@ -141,15 +141,19 @@ class Command {
         iccp: iccp, textData: textData);
   }
 
-  void convert({ int? numChannels, Format? format }) {
+  /// Convert an image by changing its format or number of channels.
+  void convert({ int? numChannels, Format? format, num? alpha,
+    bool withPalette = false }) {
     subCommand = ConvertCmd(subCommand, numChannels: numChannels,
-        format: format);
+        format: format, alpha: alpha, withPalette: withPalette);
   }
 
+  /// Create a copy of the current image.
   void copy() {
     subCommand = CopyImageCmd(subCommand);
   }
 
+  /// Add animation frames to an image.
   void addFrames(int count, AddFramesCallback callback) {
     subCommand = AddFramesCmd(subCommand, count, callback);
   }

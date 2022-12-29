@@ -28,8 +28,360 @@ multi-threading. For platforms that support it (not the web), Dart provides Isol
 multi-threading.
 
 The Command.executeThread() method will execute the commands in a separate isolate thread, resolving the promise when
-it has finished. There is some performance overhead to running in an Isolate thread as it has to copy the Image data
-from the Isolate to the main thread, but it has the benefit of not locking up the main thread. 
+it has finished. 
 
 For platforms that do not support Isolates, executeThread will be the same as execute and run in the main thread.
 
+NOTE: There is some performance overhead to running in an Isolate thread as it has to copy the Image data
+from the Isolate to the main thread, but it has the benefit of not locking up the main thread.
+
+## Chaining Commands
+
+The Command class doesn't do anything itself, but when you call one of its methods, it will chain a sub-command.
+
+```dart
+final cmd = Command() // Creates a Command object, which doesn't do anything itself.
+// Add a decodePngFile sub-command to the Command object
+..decodePngFile('image.png')
+// Add a vignette sub-command, which gets its input from the previous sub-command
+..vignette() 
+// Add a writeToFile sub-command, which gets its input from the previous sub-command.
+..writeToFile('processedImage.png'); 
+```
+Commands aren't invoked until the execute or executeThread method is called. executeThread will run the command in
+an Isolate thread on platforms that support Isolates.
+```dart 
+await cmd.execute();
+```
+
+Although execute does not run in a separate thread, it is still async because it may have file IO operations. 
+
+You can get the last image that was processed from the command with
+```dart
+Image? image = await cmd.getImage();
+```
+If the command hadn't been executed yet, getImage will execute the command. You can als use
+```dart
+Image? image = await cmd.getImageThread();
+```
+Which will execute the command in an Isolate thread, if it hadn't already been executed.
+
+If a command encoded an image to an image format, you can get the bytes from the last encoder command with
+```dart
+Uint8List? bytes = await cmd.getBytes();
+```
+or
+```dart
+Uint8List? bytes = await cmd.getBytesThread();
+```
+to execute the command, if needed, in an Isolate thread and return the bytes from the last encoder command. 
+
+You can chain together multiple image and encoder commands.
+```dart
+await (Command()
+..decodePngFile('image1.png')
+..sepia()
+..writeToFile('image1_out.png')
+..decodeImageFile('image2.png')
+..sketch()
+..writeToFile('image2_out.png'))
+.execute();
+```
+
+## Commands
+Commands are created from methods of the Command class.
+
+### Image Creation Commands
+```dart
+/// Use a specific Image.
+void image(Image image);
+
+/// Create an Image.
+void createImage({ required int width, required int height,
+Format format = Format.uint8, int numChannels = 3,
+bool withPalette = false, Format paletteFormat = Format.uint8,
+Palette? palette, ExifData? exif, IccProfile? iccp, Map<String, String>? textData });
+
+/// Convert an image by changing its format or number of channels.
+void convert({ int? numChannels, Format? format, num? alpha,
+  bool withPalette = false });
+
+/// Create a copy of the current image.
+void copy();
+
+/// Add animation frames to an image.
+void addFrames(int count, AddFramesCallback callback);
+```
+
+### Image Decoding / Encoding Commands
+```dart
+void decodeImage(Uint8List data);
+
+void decodeNamedImage(String path, Uint8List data);
+
+void decodeImageFile(String path);
+
+void writeToFile(String path);
+
+void decodeBmp(Uint8List data);
+
+void decodeBmpFile(String path);
+
+void encodeBmp();
+
+void encodeBmpFile(String path);
+
+void encodeCur();
+
+void encodeCurFile(String path);
+
+void decodeExr(Uint8List data);
+
+void decodeExrFile(String path);
+
+void decodeGif(Uint8List data);
+
+void decodeGifFile(String path);
+
+void encodeGif({ int samplingFactor = 10,
+    DitherKernel dither = DitherKernel.floydSteinberg,
+    bool ditherSerpentine = false });
+
+void encodeGifFile(String path, { int samplingFactor = 10,
+    DitherKernel dither = DitherKernel.floydSteinberg,
+    bool ditherSerpentine = false });
+
+void decodeIco(Uint8List data);
+
+void decodeIcoFile(String path);
+
+void encodeIco();
+
+void encodeIcoFile(String path);
+
+void decodeJpg(Uint8List data);
+
+void decodeJpgFile(String path);
+
+void encodeJpg({ int quality = 100 });
+
+void encodeJpgFile(String path, { int quality = 100 });
+
+void decodePng(Uint8List data);
+
+void decodePngFile(String path);
+
+void encodePng({ int level = 6, PngFilter filter = PngFilter.paeth });
+
+void encodePngFile(String path, { int level = 6,
+    PngFilter filter = PngFilter.paeth });
+
+void decodePsd(Uint8List data);
+
+void decodePsdFile(String path);
+
+void decodePvr(Uint8List data);
+
+void decodePvrFile(String path);
+
+void encodePvr();
+
+void encodePvrFile(String path);
+
+void decodeTga(Uint8List data);
+
+void decodeTgaFile(String path);
+
+void encodeTga();
+
+void encodeTgaFile(String path);
+
+void decodeTiff(Uint8List data);
+
+void decodeTiffFile(String path);
+
+void encodeTiff();
+
+void encodeTiffFile(String path);
+
+void decodeWebP(Uint8List data);
+
+void decodeWebPFile(String path);
+```
+
+### Draw Commands
+```dart
+void drawChar(BitmapFont font, int x, int y,
+    String char, { Color? color });
+
+void drawCircle(int x, int y, int radius, Color color);
+
+void compositeImage(Command? src, { int? dstX, int? dstY, int? dstW,
+  int? dstH, int? srcX, int? srcY, int? srcW, int? srcH,
+  BlendMode blend = BlendMode.alpha, bool center = false });
+
+void drawLine(int x1, int y1, int x2, int y2, Color c,
+    { bool antialias = false, num thickness = 1 });
+
+void drawPixel(int x, int y, Color color);
+
+void drawRect(int x1, int y1, int x2, int y2, Color c,
+    { num thickness = 1 });
+
+void drawString(BitmapFont font, int x, int y,
+    String char, { Color? color });
+
+void fill(Color color);
+
+void fillCircle(int x, int y, int radius, Color color);
+
+void fillFlood(int x, int y, Color color,
+    { num threshold = 0.0, bool compareAlpha = false });
+
+void fillRect(int x1, int y1, int x2, int y2, Color c);
+```
+
+### Filtering Commands
+```dart
+void adjustColor({ Color? blacks, Color? whites, Color? mids,
+  num? contrast, num? saturation, num? brightness,
+  num? gamma, num? exposure, num? hue, num? amount });
+
+void billboard({ num grid = 10, num amount = 1 });
+
+void bleachBypass({ num amount = 1});
+
+void bulgeDistortion({ int? centerX, int? centerY,
+    num? radius, num scale = 0.5,
+    Interpolation interpolation = Interpolation.nearest });
+
+void bumpToNormal({ num strength = 2.0 });
+
+void chromaticAberration({ int shift = 5 }) ;
+
+void colorHalftone({ num amount = 1, int? centerX, int? centerY,
+    num angle = 180, num size = 5 });
+
+void colorOffset({ num red = 0, num green = 0, num blue = 0,
+    num alpha = 0 });
+
+void contrast(num c);
+
+void convolution(List<num> filter, { num div = 1.0, num offset = 0.0,
+    num amount = 1 });
+
+void ditherImage({ Quantizer? quantizer,
+    DitherKernel kernel = DitherKernel.floydSteinberg,
+    bool serpentine = false });
+
+void dotScreen({ num angle = 180, num size = 5.75, int? centerX,
+    int? centerY, num amount = 1 });
+
+void dropShadow(int hShadow, int vShadow, int blur, { Color? shadowColor });
+
+void edgeGlow({ num amount = 1 });
+
+void emboss({ num amount = 1 });
+
+void gamma({ num gamma = 2.2 });
+
+void gaussianBlur(int radius);
+
+void grayscale({ num amount = 1 });
+
+void hdrToLdr({ num? exposure });
+
+void hexagonPixelate({ int? centerX, int? centerY, int size = 5,
+    num amount = 1 });
+
+void invert();
+
+void luminanceThreshold({ num threshold = 0.5, bool outputColor = false,
+    num amount = 1 });
+
+void imageMask(Command? mask, { Channel maskChannel = Channel.luminance,
+    bool scaleMask = false });
+
+void monochrome({ Color? color, num amount = 1 });
+
+void noise(num sigma, { NoiseType type = NoiseType.gaussian, Random? random });
+
+void normalize(num minValue, num maxValue);
+
+void pixelate(int blockSize, { PixelateMode mode = PixelateMode.upperLeft });
+
+void quantize({ int numberOfColors = 256,
+    QuantizeMethod method = QuantizeMethod.neuralNet,
+    DitherKernel dither = DitherKernel.none,
+    bool ditherSerpentine = false });
+
+void reinhardTonemap();
+
+void remapColors({ Channel red = Channel.red, Channel green = Channel.green,
+    Channel blue = Channel.blue, Channel alpha = Channel.alpha });
+
+void scaleRgba(Color s);
+
+void separableConvolution(SeparableKernel kernel);
+
+void sepia({ num amount = 1 });
+
+void sketch({ num amount = 1 });
+
+void smooth(num weight);
+
+void sobel({ num amount = 1 });
+
+void stretchDistortion({ int? centerX, int? centerY,
+    Interpolation interpolation = Interpolation.nearest });
+
+void vignette({ num start = 0.3, num end = 0.75, Color? color, num amount = 0.8 });
+
+// Run an arbitrary function on the image within the Command graph.
+// A FilterFunction is in the `form Image function(Image)`. A new Image
+// can be returned, replacing the given Image; or the given Image can be
+// returned.
+//
+// @example
+// final image = Command()
+// ..createImage(width: 256, height: 256)
+// ..filter((image) {
+//   for (final pixel in image) {
+//     pixel.r = pixel.x;
+//     pixel.g = pixel.y;
+//   }
+//   return image;
+// })
+// ..getImage();
+void filter(FilterFunction filter);
+```
+
+### Transform Commands
+```dart
+void bakeOrientation();
+
+void copyCropCircle({ int? radius, int? centerX, int? centerY });
+
+void copyCrop(int x, int y, int w, int h);
+
+void copyFlip(FlipDirection direction);
+
+void copyRectify({ required Point topLeft,
+    required Point topRight,
+    required Point bottomLeft,
+    required Point bottomRight,
+    Interpolation interpolation = Interpolation.nearest });
+
+void copyResize({ int? width, int? height,
+    Interpolation interpolation = Interpolation.nearest });
+
+void copyResizeCropSquare(int size,
+    { Interpolation interpolation = Interpolation.nearest });
+
+void copyRotate(num angle,
+    { Interpolation interpolation = Interpolation.nearest });
+
+void flip(FlipDirection direction);
+
+void trim({ TrimMode mode = TrimMode.transparent, Trim sides = Trim.all });
+```
