@@ -2,9 +2,6 @@
 [![Dart CI](https://github.com/brendan-duncan/image/actions/workflows/build.yaml/badge.svg?branch=4.0)](https://github.com/brendan-duncan/image/actions/workflows/build.yaml)
 [![pub package](https://img.shields.io/pub/v/image.svg)](https://pub.dev/packages/image)
 
-## NOTE
-This is a work in progress major update for the Image library.
-
 ## Overview
 
 The Dart Image Library provides the ability to load, save, and [manipulate](doc/filters.md) images
@@ -13,7 +10,9 @@ in a variety of [image file formats](doc/formats.md).
 The library can be used with both dart:io and dart:html, for command-line, Flutter, and
 web applications.
 
-### Supported Image Formats
+NOTE: 4.0 is a major revision from the previous verion of the library.
+
+### [Supported Image Formats](doc/formats.md)
 
 **Read/Write**
 
