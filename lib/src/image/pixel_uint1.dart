@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../color/channel.dart';
 import '../color/channel_iterator.dart';
 import '../color/color.dart';
 import '../color/format.dart';
@@ -123,10 +124,10 @@ class PixelUint1 extends Iterable<num> implements Pixel {
     return (image.data[i] >> bi) & 0x1;
   }
 
-  num get(int ci) => palette == null ? numChannels > ci ? _get(ci)  : 0
+  num _getChannel(int ci) => palette == null ? numChannels > ci ? _get(ci)  : 0
       : palette!.get(_get(0), ci);
 
-  void setChannel(int ci, num value) {
+  void _setChannel(int ci, num value) {
     if (ci >= image.numChannels) {
       return;
     }
@@ -146,28 +147,28 @@ class PixelUint1 extends Iterable<num> implements Pixel {
     data[i] = v;
   }
 
-  num operator[](int ci) => get(ci);
+  num operator[](int ci) => _getChannel(ci);
 
-  void operator[]=(int ci, num value) => setChannel(ci, value);
+  void operator[]=(int ci, num value) => _setChannel(ci, value);
 
   num get index => _get(0);
-  void set index(num i) => setChannel(0, i);
+  void set index(num i) => _setChannel(0, i);
 
-  num get r => get(0);
+  num get r => _getChannel(0);
 
-  void set r(num r) => setChannel(0, r);
+  void set r(num r) => _setChannel(0, r);
 
-  num get g => get(1);
+  num get g => _getChannel(1);
 
-  void set g(num g) => setChannel(1, g);
+  void set g(num g) => _setChannel(1, g);
 
-  num get b => get(2);
+  num get b => _getChannel(2);
 
-  void set b(num b) => setChannel(2, b);
+  void set b(num b) => _setChannel(2, b);
 
-  num get a => get(3);
+  num get a => _getChannel(3);
 
-  void set a(num a) => setChannel(3, a);
+  void set a(num a) => _setChannel(3, a);
 
   num get rNormalized => r / maxChannelValue;
   void set rNormalized(num v) => r = v * maxChannelValue;
@@ -184,6 +185,13 @@ class PixelUint1 extends Iterable<num> implements Pixel {
   num get luminance => getLuminance(this);
   num get luminanceNormalized => getLuminanceNormalized(this);
 
+  num getChannel(Channel channel) => channel == Channel.luminance ?
+      luminance : channel.index < numChannels ? _getChannel(channel.index)
+      : 0;
+
+  num getChannelNormalized(Channel channel) =>
+      getChannel(channel) / maxChannelValue;
+
   void set(Color c) {
     r = c.r;
     g = c.g;
@@ -194,13 +202,13 @@ class PixelUint1 extends Iterable<num> implements Pixel {
   void setColor(num r, [num g = 0, num b = 0, num a = 0]) {
     final nc = image.numChannels;
     if (nc > 0) {
-      setChannel(0, r);
+      _setChannel(0, r);
       if (nc > 1) {
-        setChannel(1, g);
+        _setChannel(1, g);
         if (nc > 2) {
-          setChannel(2, b);
+          _setChannel(2, b);
           if (nc > 3) {
-            setChannel(3, a);
+            _setChannel(3, a);
           }
         }
       }
@@ -218,19 +226,19 @@ class PixelUint1 extends Iterable<num> implements Pixel {
       if (other.length != nc) {
         return false;
       }
-      if (get(0) != other[0]) {
+      if (_getChannel(0) != other[0]) {
         return false;
       }
       if (nc > 1) {
-        if (get(1) != other[1]) {
+        if (_getChannel(1) != other[1]) {
           return false;
         }
         if (nc > 2) {
-          if (get(2) != other[2]) {
+          if (_getChannel(2) != other[2]) {
             return false;
           }
           if (nc > 3) {
-            if (get(3) != other[3]) {
+            if (_getChannel(3) != other[3]) {
               return false;
             }
           }

@@ -1,5 +1,6 @@
 import '../image/palette.dart';
 import '../util/color_util.dart';
+import 'channel.dart';
 import 'channel_iterator.dart';
 import 'color.dart';
 import 'format.dart';
@@ -47,9 +48,10 @@ class ColorUint2 extends Iterable<num> implements Color {
   bool get hasPalette => false;
   Palette? get palette => null;
 
-  int getChannel(int ci) => (data >> (6 - (ci << 1))) & 0x3;
 
-  void setChannel(int ci, num value) {
+  int _getChannel(int ci) => ci < length ? (data >> (6 - (ci << 1))) & 0x3 : 0;
+
+  void _setChannel(int ci, num value) {
     if (ci >= length) {
       return;
     }
@@ -64,23 +66,23 @@ class ColorUint2 extends Iterable<num> implements Color {
     data = (data & mask) | (x << (6 - (ci << 1)));
   }
 
-  num operator[](int index) => getChannel(index);
-  void operator[]=(int index, num value) => setChannel(index, value);
+  num operator[](int index) => _getChannel(index);
+  void operator[]=(int index, num value) => _setChannel(index, value);
 
   num get index => r;
   void set index(num i) => r = i;
 
-  num get r => getChannel(0);
-  void set r(num v) => setChannel(0, v);
+  num get r => _getChannel(0);
+  void set r(num v) => _setChannel(0, v);
 
-  num get g => getChannel(1);
-  void set g(num v) => setChannel(1, v);
+  num get g => _getChannel(1);
+  void set g(num v) => _setChannel(1, v);
 
-  num get b => getChannel(2);
-  void set b(num v) => setChannel(2, v);
+  num get b => _getChannel(2);
+  void set b(num v) => _setChannel(2, v);
 
-  num get a => getChannel(3);
-  void set a(num v) => setChannel(3, v);
+  num get a => _getChannel(3);
+  void set a(num v) => _setChannel(3, v);
 
   num get rNormalized => r / maxChannelValue;
   void set rNormalized(num v) => r = v * maxChannelValue;
@@ -96,6 +98,12 @@ class ColorUint2 extends Iterable<num> implements Color {
 
   num get luminance => getLuminance(this);
   num get luminanceNormalized => getLuminanceNormalized(this);
+
+  num getChannel(Channel channel) => channel == Channel.luminance ?
+      luminance : _getChannel(channel.index);
+
+  num getChannelNormalized(Channel channel) =>
+      getChannel(channel) / maxChannelValue;
 
   void set(Color c) {
     setColor(c.r, c.g, c.b, c.a);

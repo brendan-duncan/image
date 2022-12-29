@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../image/palette.dart';
 import '../util/color_util.dart';
 import '../util/float16.dart';
+import 'channel.dart';
 import 'channel_iterator.dart';
 import 'color.dart';
 import 'format.dart';
@@ -104,6 +105,13 @@ class ColorFloat16 extends Iterable<num> implements Color {
 
   num get luminance => getLuminance(this);
   num get luminanceNormalized => getLuminanceNormalized(this);
+
+  num getChannel(Channel channel) => channel == Channel.luminance ?
+      luminance : channel.index < data.length
+          ? Float16.float16ToDouble(data[channel.index]) : 0;
+
+  num getChannelNormalized(Channel channel) =>
+      getChannel(channel) / maxChannelValue;
 
   void set(Color c) {
     r = c.r;

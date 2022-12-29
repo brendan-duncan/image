@@ -398,8 +398,10 @@ class Command {
         color: color);
   }
 
-  void fill(Color color) {
-    subCommand = FillCmd(subCommand, color);
+  void fill(Color color, { Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = FillCmd(subCommand, color, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void fillCircle(int x, int y, int radius, Color color) {

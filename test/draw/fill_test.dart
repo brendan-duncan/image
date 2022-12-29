@@ -24,6 +24,18 @@ void main() {
       expect(img?.width, equals(256));
       expect(img?.height, equals(256));
       expect(img?.getPixel(0, 0), equals([120, 64, 85]));
+
+      final mask = Command()
+        ..createImage(width: 256, height: 256)
+        ..fill(ColorRgb8())
+        ..fillCircle(128, 128, 100, ColorRgb8(255, 255, 255));
+
+      await (Command()
+          ..createImage(width: 256, height: 256)
+          ..fill(ColorRgb8(255, 255, 255))
+          ..fill(ColorRgb8(255), mask: mask)
+          ..writeToFile('$testOutputPath/draw/fill_mask.png'))
+          .execute();
     });
   });
 }
