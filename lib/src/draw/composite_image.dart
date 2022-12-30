@@ -20,17 +20,9 @@ import 'draw_pixel.dart';
 ///
 /// if [center] is true, the [src] will be centered in [dst].
 Image compositeImage(Image dst, Image src, {
-    int? dstX,
-    int? dstY,
-    int? dstW,
-    int? dstH,
-    int? srcX,
-    int? srcY,
-    int? srcW,
-    int? srcH,
-    BlendMode blend = BlendMode.alpha,
-    bool center = false,
-    Image? mask,
+    int? dstX, int? dstY, int? dstW, int? dstH, int? srcX, int? srcY,
+    int? srcW, int? srcH, BlendMode blend = BlendMode.alpha,
+    bool center = false, Image? mask,
     Channel maskChannel = Channel.luminance }) {
   dstX ??= 0;
   dstY ??= 0;
