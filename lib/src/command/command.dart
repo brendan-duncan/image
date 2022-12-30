@@ -123,7 +123,7 @@ class Command {
 
   Command([this.input = null]);
 
-  // image
+  // Image commands
 
   /// Use a specific Image.
   void image(Image image) {
@@ -156,11 +156,20 @@ class Command {
   }
 
   /// Add animation frames to an image.
-  void addFrames(int count, AddFramesCallback callback) {
+  void addFrames(int count, AddFramesFunction callback) {
     subCommand = AddFramesCmd(subCommand, count, callback);
   }
 
-  // formats
+  /// Call a callback for each frame of an animation.
+  ///
+  /// This is really the same thing as the filter Command, but makes the intent
+  /// a bit clearer.
+  void forEachFrame(FilterFunction callback) {
+    subCommand = FilterCmd(subCommand, callback);
+  }
+
+  // Formats Commands
+
   void decodeImage(Uint8List data) {
     subCommand = DecodeImageCmd(subCommand, data);
   }
@@ -359,7 +368,8 @@ class Command {
   }
 
 
-  // draw
+  // Draw Commands
+
   void drawChar(String char, { required BitmapFont font, required int x,
       required int y, Color? color, Command? mask,
       Channel maskChannel = Channel.luminance }) {
@@ -455,7 +465,7 @@ class Command {
         color: color, mask: mask, maskChannel: maskChannel);
   }
 
-  // filter
+  // Filter Commands
 
   void adjustColor({ Color? blacks, Color? whites, Color? mids,
         num? contrast, num? saturation, num? brightness,

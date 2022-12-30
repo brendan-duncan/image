@@ -110,7 +110,12 @@ void convert({ int? numChannels, Format? format, num? alpha,
 void copy();
 
 /// Add animation frames to an image.
-void addFrames(int count, AddFramesCallback callback);
+/// typedef AddFramesFunction = Image? Function(int frameIndex);
+void addFrames(int count, AddFramesFunction callback);
+
+/// Call a callback function for each frame of an animated image.
+/// typedef FilterFunction = Image Function(Image image);
+void forEachFrame(FilterFunction callback);
 ```
 
 ### Format Decoding / Encoding Commands
@@ -409,6 +414,8 @@ void vignette({ num start = 0.3, num end = 0.75, Color? color,
 ///   return image;
 /// })
 /// ..getImage();
+/// 
+/// typedef FilterFunction = Image Function(Image image);
 void filter(FilterFunction filter);
 ```
 

@@ -1,11 +1,11 @@
 import '../../image/image.dart';
 import '../command.dart';
 
-typedef AddFramesCallback = Image? Function(int frameIndex);
+typedef AddFramesFunction = Image? Function(int frameIndex);
 
 class AddFramesCmd extends Command {
   int count;
-  AddFramesCallback callback;
+  AddFramesFunction callback;
   AddFramesCmd(Command? input, this.count, this.callback)
       : super(input);
 
