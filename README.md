@@ -4,17 +4,18 @@
 
 ## Overview
 
-The Dart Image Library provides the ability to load, save, and [manipulate](doc/filters.md) images
-in a variety of [image file formats](doc/formats.md).
+The Dart Image Library provides the ability to load, save, and
+[manipulate](https://github.com/brendan-duncan/image/blob/main/doc/filters.md) images
+in a variety of image file [formats](https://github.com/brendan-duncan/image/blob/main/doc/formats.md).
 
 The library can be used with both dart:io and dart:html, for command-line, Flutter, and
 web applications.
 
 NOTE: 4.0 is a major revision from the previous version of the library.
 
-## [Documentation](doc/README.md)
+## [Documentation](https://github.com/brendan-duncan/image/blob/main/doc/README.md)
 
-### [Supported Image Formats](doc/formats.md)
+### [Supported Image Formats](https://github.com/brendan-duncan/image/blob/main/doc/formats.md)
 
 **Read/Write**
 
