@@ -419,9 +419,10 @@ void bakeOrientation();
 
 void copyCropCircle({ int? radius, int? centerX, int? centerY });
 
-void copyCrop(int x, int y, int w, int h);
+void copyCrop({ required int x, required int y, required int width,
+  required int height });
 
-void copyFlip(FlipDirection direction);
+void copyFlip({ required FlipDirection direction });
 
 void copyRectify({ required Point topLeft,
   required Point topRight,
@@ -432,13 +433,13 @@ void copyRectify({ required Point topLeft,
 void copyResize({ int? width, int? height,
   Interpolation interpolation = Interpolation.nearest });
 
-void copyResizeCropSquare(int size,
-    { Interpolation interpolation = Interpolation.nearest });
+void copyResizeCropSquare({ required int size,
+  Interpolation interpolation = Interpolation.nearest });
 
-void copyRotate(num angle,
-    { Interpolation interpolation = Interpolation.nearest });
+void copyRotate({ required num angle,
+  Interpolation interpolation = Interpolation.nearest });
 
-void flip(FlipDirection direction);
+void flip({ required FlipDirection direction });
 
 void trim({ TrimMode mode = TrimMode.transparent, Trim sides = Trim.all });
 ```

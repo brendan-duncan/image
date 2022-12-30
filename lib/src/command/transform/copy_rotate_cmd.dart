@@ -6,8 +6,8 @@ class CopyRotateCmd extends Command {
   num angle;
   Interpolation interpolation;
 
-  CopyRotateCmd(Command? input, this.angle,
-      { this.interpolation = Interpolation.nearest })
+  CopyRotateCmd(Command? input, { required this.angle,
+      this.interpolation = Interpolation.nearest })
       : super(input);
 
   @override
@@ -15,6 +15,6 @@ class CopyRotateCmd extends Command {
     await input?.execute();
     final img = input?.outputImage;
     outputImage = img != null ?
-        copyRotate(img, angle, interpolation: interpolation) : null;
+        copyRotate(img, angle: angle, interpolation: interpolation) : null;
   }
 }

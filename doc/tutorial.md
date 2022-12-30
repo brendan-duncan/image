@@ -3,16 +3,14 @@
 ## Load an image, resize it, and save it as a thumbnail jpeg
 
 ```dart
-import 'dart:io';
 import 'package:image/image.dart' as img;
 void main() {
   // Read a jpeg image from file.
   final image = img.decodeJpg(File('test.jpg').readAsBytesSync());
   // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
   final thumbnail = img.copyResize(image, width: 120);
-   
-  // Save the thumbnail as a jpeg.
-  File('out/thumbnail-test.png').writeAsBytesSync(img.encodeJpg(thumbnail));
+  // Save the thumbnail to a jpeg file.
+  encodeToJpgFile('out/thumbnail-test.png', thumbnail);
 }
 ```
 
@@ -29,7 +27,7 @@ void main() async {
   // Resize the image to a width of 120 and a height that maintains the aspect ratio
   ..copyResize(width: 120)
   // Apply a blur to the image 
-  ..gaussianBlur(5)
+  ..gaussianBlur(radius: 5)
   // Save the resized image to a PNG image file 
   ..writeToFile('thumbnail.png'))
   // executeThread will run the commands in an Isolate thread
@@ -78,13 +76,13 @@ void main() async {
   // Create an image, with the default uint8 format and default number of channels, 3. 
   ..createImage(width: 256, height: 256)
   // Fill the image with a solid color (blue)
-  ..fill(img.ColorRgb8(0, 0, 255)))
+  ..fill(color: img.ColorRgb8(0, 0, 255)))
   // Draw some text using the built-in 24pt Arial font
-  ..drawString(img.arial24, 0, 0, 'Hello World')
+  ..drawString('Hello World', font: img.arial24, x: 0, y: 0)
   // Draw a red line
-  ..drawLine(0, 0, 256, 256, color: img.ColorRgb8(255, 0, 0), thickness: 3)
+  ..drawLine(x1: 0, y1: 0, x2: 256, y2: 256, color: img.ColorRgb8(255, 0, 0), thickness: 3)
   // Blur the image
-  ..gaussianBlur(10)
+  ..gaussianBlur(radius: 10)
   // Save the image to disk as a PNG.
   ..writeToFile('test.png'))
   // Execute the command sequence.
@@ -140,8 +138,8 @@ void main(List<String> argv) {
     if (trimRect == null) {
       trimRect = img.findTrim(image, mode: img.TrimMode.transparent);
     }
-    final trimmed = img.copyCrop(image, trimRect[0], trimRect[1], 
-                             trimRect[2], trimRect[3]);
+    final trimmed = img.copyCrop(image, x: trimRect[0], y: trimRect[1], 
+                             width: trimRect[2], height: trimRect[3]);
 
     String name = f.uri.pathSegments.last;
     img.encodeImageFile('$path/trimmed-$name', trimmed);
@@ -157,13 +155,13 @@ import 'package:image/image.dart' as img;
 List<img.Image> splitImage(img.Image inputImage, int horizontalPieceCount, int verticalPieceCount) {
   img.Image image = inputImage;
 
-  final xLength = (image.width / horizontalPieceCount).round();
-  final yLength = (image.height / verticalPieceCount).round();
+  final pieceWidth = (image.width / horizontalPieceCount).round();
+  final pieceHeight = (image.height / verticalPieceCount).round();
   final pieceList = List<imglib.Image>.empty(growable: true);
 
-  for (var y = 0; y < verticalPieceCount; y++) {
-    for (var x = 0; x < horizontalPieceCount; x++) {
-      pieceList.add(img.copyCrop(image, x, y, x * xLength, y * yLength));
+  for (var y = 0; y < image.height; y += pieceHieght) {
+    for (var x = 0; x < image.width; x += pieceWidth) {
+      pieceList.add(img.copyCrop(image, x: x, y: y, width: pieceWidth, height: pieceHeight));
     }
   }
   

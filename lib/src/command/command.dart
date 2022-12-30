@@ -726,7 +726,8 @@ class Command {
     subCommand = FilterCmd(subCommand, filter);
   }
 
-  // transform
+  // Transform Commands
+
   void bakeOrientation() {
     subCommand = BakeOrientationCmd(subCommand);
   }
@@ -736,12 +737,14 @@ class Command {
         centerY: centerY);
   }
 
-  void copyCrop(int x, int y, int w, int h) {
-    subCommand = CopyCropCmd(subCommand, x, y, w, h);
+  void copyCrop({ required int x, required int y, required int width,
+      required int height }) {
+    subCommand = CopyCropCmd(subCommand, x: x, y: y, width: width,
+        height: height);
   }
 
-  void copyFlip(FlipDirection direction) {
-    subCommand = CopyFlipCmd(subCommand, direction);
+  void copyFlip({ required FlipDirection direction }) {
+    subCommand = CopyFlipCmd(subCommand, direction: direction);
   }
 
   void copyRectify({ required Point topLeft,
@@ -749,8 +752,9 @@ class Command {
       required Point bottomLeft,
       required Point bottomRight,
       Interpolation interpolation = Interpolation.nearest }) {
-    subCommand = CopyRectifyCmd(subCommand, topLeft, topRight,
-        bottomLeft, bottomRight, interpolation);
+    subCommand = CopyRectifyCmd(subCommand, topLeft: topLeft,
+        topRight: topRight, bottomLeft: bottomLeft,
+        bottomRight: bottomRight, interpolation: interpolation);
   }
 
   void copyResize({ int? width, int? height,
@@ -759,19 +763,20 @@ class Command {
         interpolation: interpolation);
   }
 
-  void copyResizeCropSquare(int size,
-      { Interpolation interpolation = Interpolation.nearest }) {
-    subCommand = CopyResizeCropSquareCmd(subCommand, size,
+  void copyResizeCropSquare({ required int size,
+      Interpolation interpolation = Interpolation.nearest }) {
+    subCommand = CopyResizeCropSquareCmd(subCommand, size: size,
         interpolation: interpolation);
   }
 
-  void copyRotate(num angle,
-      { Interpolation interpolation = Interpolation.nearest }) {
-    subCommand = CopyRotateCmd(subCommand, angle, interpolation: interpolation);
+  void copyRotate({ required num angle,
+      Interpolation interpolation = Interpolation.nearest }) {
+    subCommand = CopyRotateCmd(subCommand, angle: angle,
+        interpolation: interpolation);
   }
 
-  void flip(FlipDirection direction) {
-    subCommand = FlipCmd(subCommand, direction);
+  void flip({ required FlipDirection direction }) {
+    subCommand = FlipCmd(subCommand, direction: direction);
   }
 
   void trim({ TrimMode mode = TrimMode.transparent, Trim sides = Trim.all }) {

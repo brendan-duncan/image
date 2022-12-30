@@ -360,7 +360,7 @@ the EXIF orientation. Returns a new Image.
 ### [copyCrop](https://brendan-duncan.github.io/image/doc/api/image/copyCrop.html)
 
 ```dart
-Image copyCrop(Image src, int x, int y, int w, int h)
+Image copyCrop(Image src, { required int x, required int y, required int width, required int height })
  ```
 
 Returns a new Image.
@@ -380,7 +380,7 @@ Returns a new Image.
 ### [copyFlip](https://brendan-duncan.github.io/image/doc/api/image/copyFlip.html)
 
 ```dart
-Image copyFlip(Image src, FlipDirection direction)
+Image copyFlip(Image src, { required FlipDirection direction })
 ```
 
 Returns a new Image.
@@ -416,7 +416,7 @@ Returns a new Image.
 ### [copyResizeCropSquare](https://brendan-duncan.github.io/image/doc/api/image/copyResizeCropSquare.html)
 
 ```dart
-Image copyResizeCropSquare(Image src, int size, { Interpolation interpolation = Interpolation.nearest })
+Image copyResizeCropSquare(Image src, { required int size, Interpolation interpolation = Interpolation.nearest })
 ```
 
 Returns a new Image.
@@ -426,7 +426,7 @@ Returns a new Image.
 ### [copyRotate](https://brendan-duncan.github.io/image/doc/api/image/copyRotate.html)
 
 ```dart
-Image copyRotate(Image src, num angle, { Interpolation interpolation = Interpolation.nearest })
+Image copyRotate(Image src, { required num angle, Interpolation interpolation = Interpolation.nearest })
 ```
 
 Returns a new Image.
@@ -436,7 +436,7 @@ Returns a new Image.
 ### [flip](https://brendan-duncan.github.io/image/doc/api/image/flip.html)
 
 ```dart
-Image flip(Image src, FlipDirection direction)
+Image flip(Image src, { required FlipDirection direction })
 ```
 
 Flips the image in-place.

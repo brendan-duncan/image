@@ -140,19 +140,20 @@ paletted 8-bit image, and 1-bit per pixel BMP or TIFF will remain 1-bit per pixe
 Sometimes it's necessary to convert an image to a different format.
 
 ```dart
-Image u8 = image.convert(format: uint8); // Convert the image to the uint8 format, with the same number of channels.
+// Convert the image to the uint8 format, with the same number of channels.
+Image u8 = image.convert(format: Format.uint8);
 // Convert to an RGBA image. If an alpha channel needs to be added, set the alpha of all pixels to the max value of
 // the format.
 Image rgba = image.convert(numChannels: 4, alpha: image.maxChannelValue);
 // Convert to an 8-bit RGBA image, setting all alpha channels to 255 if an alpha channel needed to be added.
-Image u8rgba = image.convert(format: uint8, numChannels: 4, alpha: 255);
+Image u8rgba = image.convert(format: Format.uint8, numChannels: 4, alpha: 255);
 ```
 
 In addition to converting an entire image, you can convert pixel colors individually.
 ```dart
 final pixel = image.getPixel(0, 0);
 // Convert the pixel color to an 8-bit rgba color.
-final u8rgba = pixel.convert(format: uint8, numChannels: 4, alpha: 255);
+final u8rgba = pixel.convert(format: Format.uint8, numChannels: 4, alpha: 255);
 ```
 
 ## Pixel Access
@@ -183,6 +184,31 @@ print(pixel.height); // The height of hte image the pixel belongs to.
 ```
 If the pixel has fewer channels than is set from the Pixel object, the value will be ignored, and 0 will be returned
 when asked.
+
+### Normalized Color Values
+
+Pixels and Colors provide accessors for normalized color channels. Normalized color channels are always in the range
+[0, 1], a result of dividing the channel by the maxChannelValue of the color. You can get and set a channel value
+using normalized channels. This makes it trivial to translate colors between different formats.
+
+```dart
+pixel.r = 51;
+final rn = pixel.rNormalized; // rNormalized will be 0.2 (51/255)
+pixel.rNormalized = 0.5; // Set the normalized value of the red channel. The red value will be 127 (0.5 * 255).floor().
+```
+
+### Pixel Luminance (aka Brightness or Grayscale)
+
+Pixels provide a convenience fake channel called **luminance**. It is not available from channel iterators,
+but chas a getter. This will calculate the luminance (grayscale) of the pixels color.
+
+```dart
+pixel.r = 128;
+pixel.g = 255;
+pixel.b = 40;
+print(pixel.luminance); // The luminance of the color is 192
+print(pixel.luminanceNormalized); // The normalized luminance of the color is approximately 0.75.
+```
 
 ### Pixels of Palette Images
 

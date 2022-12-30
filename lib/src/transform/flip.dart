@@ -12,7 +12,7 @@ enum FlipDirection {
 /// Flips the [src] image using the given [direction], which can be one of:
 /// [FlipDirection.horizontal], [FlipDirection.vertical],
 /// or [FlipDirection.both].
-Image flip(Image src, FlipDirection direction) {
+Image flip(Image src, { required FlipDirection direction }) {
   switch (direction) {
     case FlipDirection.horizontal:
       flipHorizontal(src);

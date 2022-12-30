@@ -5,7 +5,7 @@ import '../image/interpolation.dart';
 import '../util/image_exception.dart';
 
 /// Returns a resized and square cropped copy of the [src] image of [size] size.
-Image copyResizeCropSquare(Image src, int size, {
+Image copyResizeCropSquare(Image src, { required int size,
     Interpolation interpolation = Interpolation.nearest }) {
   if (size <= 0) {
     throw ImageException('Invalid size');

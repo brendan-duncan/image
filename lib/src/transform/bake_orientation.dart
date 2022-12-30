@@ -22,17 +22,17 @@ Image bakeOrientation(Image image) {
     case 2:
       return flipHorizontal(bakedImage);
     case 3:
-      return flip(bakedImage, FlipDirection.both);
+      return flip(bakedImage, direction: FlipDirection.both);
     case 4:
-      return flipHorizontal(copyRotate(bakedImage, 180));
+      return flipHorizontal(copyRotate(bakedImage, angle: 180));
     case 5:
-      return flipHorizontal(copyRotate(bakedImage, 90));
+      return flipHorizontal(copyRotate(bakedImage, angle: 90));
     case 6:
-      return copyRotate(bakedImage, 90);
+      return copyRotate(bakedImage, angle: 90);
     case 7:
-      return flipHorizontal(copyRotate(bakedImage, -90));
+      return flipHorizontal(copyRotate(bakedImage, angle: -90));
     case 8:
-      return copyRotate(bakedImage, -90);
+      return copyRotate(bakedImage, angle: -90);
   }
   return bakedImage;
 }

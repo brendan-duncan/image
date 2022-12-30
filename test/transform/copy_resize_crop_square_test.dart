@@ -8,7 +8,7 @@ void main() {
     test('copyResizeCropSquare', () async {
       final i0 = await (Command()
       ..decodePngFile('test/_data/png/buck_24.png')
-      ..copyResizeCropSquare(64)
+      ..copyResizeCropSquare(size: 64)
       ..writeToFile('$testOutputPath/transform/copyResizeCropSquare.png'))
       .getImage();
       expect(i0, isNotNull);

@@ -42,7 +42,7 @@ enum TrimMode {
 /// coordinates as \[x, y, width, height\]. You could pass these coordinates
 /// to the copyCrop function to crop the image.
 List<int> findTrim(Image src,
-    {TrimMode mode = TrimMode.transparent, Trim sides = Trim.all}) {
+    { TrimMode mode = TrimMode.transparent, Trim sides = Trim.all }) {
   var h = src.height;
   var w = src.width;
 

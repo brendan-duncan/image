@@ -12,7 +12,7 @@ void main() {
       final i4 = img.convert(numChannels: 4);
 
       for (var i = 0; i < 360; i += 45) {
-        final i0 = copyRotate(i4, i);
+        final i0 = copyRotate(i4, angle: i);
         expect(i0.numChannels, equals(i4.numChannels));
         File('$testOutputPath/transform/copyRotate_$i.png')
           ..createSync(recursive: true)

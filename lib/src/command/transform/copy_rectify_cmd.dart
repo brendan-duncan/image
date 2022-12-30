@@ -10,8 +10,9 @@ class CopyRectifyCmd extends Command {
   Point bottomRight;
   Interpolation interpolation;
 
-  CopyRectifyCmd(Command? input, this.topLeft, this.topRight,
-      this.bottomLeft, this.bottomRight, this.interpolation)
+  CopyRectifyCmd(Command? input, { required this.topLeft,
+      required this.topRight, required this.bottomLeft,
+      required this.bottomRight, this.interpolation = Interpolation.nearest })
       : super(input);
 
   @override

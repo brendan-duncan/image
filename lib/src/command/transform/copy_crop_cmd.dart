@@ -4,16 +4,18 @@ import '../command.dart';
 class CopyCropCmd extends Command {
   int x;
   int y;
-  int w;
-  int h;
+  int width;
+  int height;
 
-  CopyCropCmd(Command? input, this.x, this.y, this.w, this.h)
+  CopyCropCmd(Command? input, { required this.x, required this.y,
+      required this.width, required this.height })
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     await input?.execute();
     final img = input?.outputImage;
-    outputImage = img != null ? copyCrop(img, x, y, w, h) : null;
+    outputImage = img != null ? copyCrop(img, x: x, y: y, width: width,
+        height: height) : null;
   }
 }

@@ -5,13 +5,13 @@ import '../command.dart';
 class CopyFlipCmd extends Command {
   FlipDirection direction;
 
-  CopyFlipCmd(Command? input, this.direction)
+  CopyFlipCmd(Command? input, { required this.direction })
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     await input?.execute();
     final img = input?.outputImage;
-    outputImage = img != null ? copyFlip(img, direction) : null;
+    outputImage = img != null ? copyFlip(img, direction: direction) : null;
   }
 }
