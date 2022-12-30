@@ -68,32 +68,7 @@
 
 
 <section class="desc markdown">
-  <p>The hash code for this object.</p>
-<p>A hash code is a single integer which represents the state of the object
-that affects <a href="../../image/Color/operator_equals.html">operator ==</a> comparisons.</p>
-<p>All objects have hash codes.
-The default hash code implemented by <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object-class.html">Object</a>
-represents only the identity of the object,
-the same way as the default <a href="../../image/Color/operator_equals.html">operator ==</a> implementation only considers objects
-equal if they are identical (see <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/identityHashCode.html">identityHashCode</a>).</p>
-<p>If <a href="../../image/Color/operator_equals.html">operator ==</a> is overridden to use the object state instead,
-the hash code must also be changed to represent that state,
-otherwise the object cannot be used in hash based data structures
-like the default <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Set-class.html">Set</a> and <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Map-class.html">Map</a> implementations.</p>
-<p>Hash codes must be the same for objects that are equal to each other
-according to <a href="../../image/Color/operator_equals.html">operator ==</a>.
-The hash code of an object should only change if the object changes
-in a way that affects equality.
-There are no further requirements for the hash codes.
-They need not be consistent between executions of the same program
-and there are no distribution guarantees.</p>
-<p>Objects that are not equal are allowed to have the same hash code.
-It is even technically allowed that all instances have the same hash code,
-but if clashes happen too often,
-it may reduce the efficiency of hash-based data structures
-like <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-collection/HashSet-class.html">HashSet</a> or <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-collection/HashMap-class.html">HashMap</a>.</p>
-<p>If a subclass overrides <a href="../../image/Color/hashCode.html">hashCode</a>, it should override the
-<a href="../../image/Color/operator_equals.html">operator ==</a> operator as well to maintain consistency.</p>
+  <p>Compute a hashCode for this color.</p>
 </section>
 
 
@@ -173,6 +148,8 @@ like <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-collection/HashSet-cl
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/fold.html">fold</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/followedBy.html">followedBy</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/forEach.html">forEach</a></li>
+          <li><a href="../../image/Color/getChannel.html">getChannel</a></li>
+          <li><a href="../../image/Color/getChannelNormalized.html">getChannelNormalized</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/join.html">join</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/lastWhere.html">lastWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/map.html">map</a></li>

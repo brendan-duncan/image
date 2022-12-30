@@ -59,11 +59,13 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">fillRect</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fillRect-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="fillRect-param-x1"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span></li>
-<li><span class="parameter" id="fillRect-param-y1"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span></li>
-<li><span class="parameter" id="fillRect-param-x2"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span></li>
-<li><span class="parameter" id="fillRect-param-y2"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span></li>
-<li><span class="parameter" id="fillRect-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span></span></li>
+<li><span class="parameter" id="fillRect-param-x1">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-y1"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-x2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-y2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -79,7 +81,9 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image fillRect(Image src, int x1, int y1, int x2, int y2, Color color) {
+  <pre class="language-dart"><code class="language-dart">Image fillRect(Image src, { required int x1, required int y1, required int x2,
+    required int y2, required Color color, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   if (color.a == 0) {
     return src;
   }
@@ -92,21 +96,21 @@
   final _h = (_y1 - _y0) + 1;
 
   &#47;&#47; If no blending is necessary, use a faster fill method.
-  if (color.a == color.maxChannelValue) {
+  if (color.a == color.maxChannelValue &amp;&amp; mask == null) {
     final iter = src.getRange(_x0, _y0, _w, _h);
     while (iter.moveNext()) {
       iter.current.set(color);
     }
   } else {
     final a = color.a &#47; color.maxChannelValue;
-    final invA = 1.0 - a;
     final iter = src.getRange(_x0, _y0, _w, _h);
     while (iter.moveNext()) {
       final p = iter.current;
-      p..r = (color.r * a) + (p.r * invA)
-       ..g = (color.g * a) + (p.g * invA)
-       ..b = (color.b * a) + (p.b * invA)
-       ..a = color.a;
+      final m = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel) ?? 1;
+      p..r = mix(p.r, color.r, a * m)
+       ..g = mix(p.g, color.g, a * m)
+       ..b = mix(p.b, color.b, a * m)
+       ..a = p.a * (1 - (color.a * m));
     }
   }
 
@@ -300,6 +304,7 @@
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -337,8 +342,6 @@
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -353,6 +356,7 @@
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -389,7 +393,6 @@
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

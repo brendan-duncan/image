@@ -142,7 +142,7 @@
 
 </dt>
 <dd>
-  
+  Alpha channel.
   <div class="features"><span class="feature">read / write</span><span class="feature">override</span></div>
 
 </dd>
@@ -153,7 +153,7 @@
 
 </dt>
 <dd>
-  
+  Normalized [0, 1] alpha.
   <div class="features"><span class="feature">read / write</span><span class="feature">override</span></div>
 
 </dd>
@@ -164,7 +164,7 @@
 
 </dt>
 <dd>
-  
+  Blue channel.
   <div class="features"><span class="feature">read / write</span><span class="feature">override</span></div>
 
 </dd>
@@ -175,7 +175,7 @@
 
 </dt>
 <dd>
-  
+  Normalized [0, 1] blue.
   <div class="features"><span class="feature">read / write</span><span class="feature">override</span></div>
 
 </dd>
@@ -208,7 +208,7 @@
 
 </dt>
 <dd>
-  
+  The <a href="../image/Format.html">Format</a> of the color.
   <div class="features"><span class="feature">read-only</span><span class="feature">override</span></div>
 
 </dd>
@@ -219,7 +219,7 @@
 
 </dt>
 <dd>
-  
+  Green channel.
   <div class="features"><span class="feature">read / write</span><span class="feature">override</span></div>
 
 </dd>
@@ -230,7 +230,7 @@
 
 </dt>
 <dd>
-  
+  Normalized [0, 1] green.
   <div class="features"><span class="feature">read / write</span><span class="feature">override</span></div>
 
 </dd>
@@ -252,7 +252,7 @@
 
 </dt>
 <dd>
-  
+  True if the color uses a palette.
   <div class="features"><span class="feature">read-only</span><span class="feature">override</span></div>
 
 </dd>
@@ -263,7 +263,7 @@
 
 </dt>
 <dd>
-  
+  Palette index value (or red channel if there is no palette).
   <div class="features"><span class="feature">read / write</span><span class="feature">override</span></div>
 
 </dd>
@@ -285,7 +285,7 @@
 
 </dt>
 <dd>
-  
+  True if the format is high dynamic range.
   <div class="features"><span class="feature">read-only</span><span class="feature">override</span></div>
 
 </dd>
@@ -296,7 +296,7 @@
 
 </dt>
 <dd>
-  
+  True if the format is low dynamic range.
   <div class="features"><span class="feature">read-only</span><span class="feature">override</span></div>
 
 </dd>
@@ -352,7 +352,7 @@
 
 </dt>
 <dd>
-  
+  The luminance (grayscale) of the color.
   <div class="features"><span class="feature">read-only</span><span class="feature">override</span></div>
 
 </dd>
@@ -374,7 +374,7 @@
 
 </dt>
 <dd>
-  
+  The maximum value for a color channel.
   <div class="features"><span class="feature">read-only</span><span class="feature">override</span></div>
 
 </dd>
@@ -385,7 +385,7 @@
 
 </dt>
 <dd>
-  
+  The maximum value for a palette index.
   <div class="features"><span class="feature">read-only</span><span class="feature">override</span></div>
 
 </dd>
@@ -396,7 +396,7 @@
 
 </dt>
 <dd>
-  
+  The palette used by the color, or null.
   <div class="features"><span class="feature">read-only</span><span class="feature">override</span></div>
 
 </dd>
@@ -407,7 +407,7 @@
 
 </dt>
 <dd>
-  
+  Red channel.
   <div class="features"><span class="feature">read / write</span><span class="feature">override</span></div>
 
 </dd>
@@ -418,7 +418,7 @@
 
 </dt>
 <dd>
-  
+  Normalized [0, 1] red.
   <div class="features"><span class="feature">read / write</span><span class="feature">override</span></div>
 
 </dd>
@@ -488,7 +488,7 @@
 
 </dt>
 <dd>
-  
+  Returns a copy of the color.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
@@ -514,7 +514,10 @@
 
 </dt>
 <dd>
-  
+  Convert the <code>format</code> and/or the <code>numChannels</code> of the color. If
+<code>numChannels</code> is 4 and the current color does not have an alpha value,
+then <code>alpha</code> can specify what value to use for the new alpha channel.
+If <code>alpha</code> is not given, then <a href="../image/ColorUint16/maxChannelValue.html">maxChannelValue</a> will be used.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
@@ -611,6 +614,34 @@ element of the collection with an existing value
 
 </dd>
 
+        <dt id="getChannel" class="callable">
+  <span class="name"><a href="../image/ColorUint16/getChannel.html">getChannel</a></span><span class="signature">(<wbr><span class="parameter" id="getChannel-param-channel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">channel</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Get a <code>channel</code> from the color. If the channel isn't available,
+0 will be returned.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="getChannelNormalized" class="callable">
+  <span class="name"><a href="../image/ColorUint16/getChannelNormalized.html">getChannelNormalized</a></span><span class="signature">(<wbr><span class="parameter" id="getChannelNormalized-param-channel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">channel</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Get the normalized [0, 1] value of a <code>channel</code> from the color. If the
+channel isn't available, 0 will be returned.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
         <dt id="join" class="callable inherited">
   <span class="name"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/join.html">join</a></span><span class="signature">(<wbr><span class="parameter" id="join-param-separator">[<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">separator</span> = <span class="default-value">&quot;&quot;</span>]</span>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span>
@@ -685,7 +716,7 @@ of the collection using the provided function.
 
 </dt>
 <dd>
-  
+  The the values of this color to the given <code>color</code>.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
@@ -698,7 +729,7 @@ of the collection using the provided function.
 
 </dt>
 <dd>
-  
+  Set the individual <code>r</code>, <code>g</code>, <code>b</code>, and <code>a</code> channels of the color.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
@@ -863,7 +894,7 @@ predicate <code>test</code>.
 
 </dt>
 <dd>
-  
+  Gets a channel from the color by its index.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
@@ -1073,6 +1104,7 @@ predicate <code>test</code>.
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -1110,8 +1142,6 @@ predicate <code>test</code>.
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -1126,6 +1156,7 @@ predicate <code>test</code>.
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -1162,7 +1193,6 @@ predicate <code>test</code>.
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>
@@ -1292,6 +1322,8 @@ predicate <code>test</code>.
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/fold.html">fold</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/followedBy.html">followedBy</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/forEach.html">forEach</a></li>
+          <li><a href="../image/ColorUint16/getChannel.html">getChannel</a></li>
+          <li><a href="../image/ColorUint16/getChannelNormalized.html">getChannelNormalized</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/join.html">join</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/lastWhere.html">lastWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/map.html">map</a></li>

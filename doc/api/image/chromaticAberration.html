@@ -59,19 +59,25 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">chromaticAberration</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="chromaticAberration-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="chromaticAberration-param-shift">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">shift</span> = <span class="default-value">5</span>}</span></li>
+<li><span class="parameter" id="chromaticAberration-param-shift">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">shift</span> = <span class="default-value">5</span>, </span></li>
+<li><span class="parameter" id="chromaticAberration-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="chromaticAberration-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
 
     </section>
     
+<section class="desc markdown">
+  <p>Apply chromatic aberration filter to the image.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image chromaticAberration(Image src, { int shift = 5 }) {
+  <pre class="language-dart"><code class="language-dart">Image chromaticAberration(Image src, { int shift = 5,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   for (final frame in src.frames) {
     final orig = frame.clone(noAnimation: true);
     final w = frame.width - 1;
@@ -80,8 +86,16 @@
       final shiftRight = (p.x + shift).clamp(0, w);
       final lc = orig.getPixel(shiftLeft, p.y);
       final rc = orig.getPixel(shiftRight, p.y);
-      p..r = rc.r
-      ..b = lc.b;
+
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+
+      if (msk == null) {
+        p..r = rc.r
+        ..b = lc.b;
+      } else {
+        p..r = mix(p.r, rc.r, msk)
+        ..b = mix(p.b, lc.b, msk);
+      }
     }
   }
   return src;
@@ -274,6 +288,7 @@
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -311,8 +326,6 @@
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -327,6 +340,7 @@
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -363,7 +377,6 @@
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

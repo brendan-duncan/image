@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the drawStringCentered function from the image library, for the Dart programming language.">
-  <title>drawStringCentered function - image library - Dart API</title>
+  <meta name="description" content="API docs for the copyImageChannels function from the image library, for the Dart programming language.">
+  <title>copyImageChannels function - image library - Dart API</title>
 
 
   
@@ -30,9 +30,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">image</a></li>
     <li><a href="../image/image-library.html">image</a></li>
-    <li class="self-crumb">drawStringCentered function</li>
+    <li class="self-crumb">copyImageChannels function</li>
   </ol>
-  <div class="self-name">drawStringCentered</div>
+  <div class="self-name">copyImageChannels</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,7 +49,7 @@
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
-<h1><span class="kind-function">drawStringCentered</span> function 
+<h1><span class="kind-function">copyImageChannels</span> function 
     <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
  
 </h1></div>
@@ -58,12 +58,15 @@
         
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
-<span class="name ">drawStringCentered</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="drawStringCentered-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span></li>
-<li><span class="parameter" id="drawStringCentered-param-font"><span class="type-annotation"><a href="../image/BitmapFont-class.html">BitmapFont</a></span> <span class="parameter-name">font</span>, </span></li>
-<li><span class="parameter" id="drawStringCentered-param-string"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">string</span>, </span></li>
-<li><span class="parameter" id="drawStringCentered-param-x">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">x</span>, </span></li>
-<li><span class="parameter" id="drawStringCentered-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">y</span>, </span></li>
-<li><span class="parameter" id="drawStringCentered-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>}</span></li>
+<span class="name ">copyImageChannels</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyImageChannels-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
+<li><span class="parameter" id="copyImageChannels-param-from">{<span>required</span> <span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">from</span>, </span></li>
+<li><span class="parameter" id="copyImageChannels-param-scaled"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">scaled</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="copyImageChannels-param-red"><span class="type-annotation"><a href="../image/Channel.html">Channel</a>?</span> <span class="parameter-name">red</span>, </span></li>
+<li><span class="parameter" id="copyImageChannels-param-green"><span class="type-annotation"><a href="../image/Channel.html">Channel</a>?</span> <span class="parameter-name">green</span>, </span></li>
+<li><span class="parameter" id="copyImageChannels-param-blue"><span class="type-annotation"><a href="../image/Channel.html">Channel</a>?</span> <span class="parameter-name">blue</span>, </span></li>
+<li><span class="parameter" id="copyImageChannels-param-alpha"><span class="type-annotation"><a href="../image/Channel.html">Channel</a>?</span> <span class="parameter-name">alpha</span>, </span></li>
+<li><span class="parameter" id="copyImageChannels-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="copyImageChannels-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -71,51 +74,52 @@
     </section>
     
 <section class="desc markdown">
-  <p>Draw a string horizontally into <code>image</code> at position
-<code>x</code>,<code>y</code> with the given <code>color</code>.
-If x is omitted text is automatically centered into <code>image</code>
-If y is omitted text is automatically centered into <code>image</code>.
-If both x and y are provided it has the same behaviour of drawString method.</p>
-<p>You can load your own font, or use one of the existing ones
-such as: arial14, arial24, or arial48.</p>
+  <p>Copy channels from the <code>from</code> image to the <code>src</code> image. If <code>scaled</code> is
+true, then the from image will be scaled to the src image resolution.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image drawStringCentered(Image image, BitmapFont font, String string,
-    {int? x, int? y, Color? color}) {
-  var stringWidth = 0;
-  var stringHeight = 0;
-
-  if (x == null || y == null) {
-    final chars = string.codeUnits;
-    for (var c in chars) {
-      if (!font.characters.containsKey(c)) {
-        continue;
+  <pre class="language-dart"><code class="language-dart">Image copyImageChannels(Image src, { required Image from, bool scaled = false,
+    Channel? red, Channel? green, Channel? blue, Channel? alpha,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
+  final dx = from.width &#47; src.width;
+  final dy = from.height &#47; src.height;
+  final fromPixel = from.getPixel(0, 0);
+  for (final frame in src.frames) {
+    for (final p in frame) {
+      if (scaled) {
+        fromPixel.setPosition((p.x * dx).floor(), (p.y * dy).floor());
+      } else {
+        fromPixel.setPosition(p.x, p.y);
       }
-      final ch = font.characters[c]!;
-      stringWidth += ch.xAdvance;
-      if (ch.height + ch.yOffset &gt; stringHeight) {
-        stringHeight = ch.height + ch.yOffset;
+
+      final r = red != null ? fromPixel.getChannelNormalized(red)
+          : p.rNormalized;
+      final g = green != null ? fromPixel.getChannelNormalized(green)
+          : p.gNormalized;
+      final b = blue != null ? fromPixel.getChannelNormalized(blue)
+          : p.bNormalized;
+      final a = alpha != null ? fromPixel.getChannelNormalized(alpha)
+          : p.aNormalized;
+
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      if (msk == null) {
+        p..rNormalized = r
+        ..gNormalized = g
+        ..bNormalized = b
+        ..aNormalized = a;
+      } else {
+        p..rNormalized = mix(p.r, r, msk)
+        ..gNormalized = mix(p.g, g, msk)
+        ..bNormalized = mix(p.b, b, msk)
+        ..aNormalized = mix(p.a, a, msk);
       }
     }
   }
-
-  int xPos, yPos;
-  if (x == null) {
-    xPos = (image.width &#47; 2).round() - (stringWidth &#47; 2).round();
-  } else {
-    xPos = x;
-  }
-  if (y == null) {
-    yPos = (image.height &#47; 2).round() - (stringHeight &#47; 2).round();
-  } else {
-    yPos = y;
-  }
-
-  return drawString(image, font, xPos, yPos, string, color: color);
+  return src;
 }</code></pre>
 </section>
 
@@ -132,7 +136,7 @@ such as: arial14, arial24, or arial48.</p>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
   <li><a href="../index.html">image</a></li>
   <li><a href="../image/image-library.html">image</a></li>
-  <li class="self-crumb">drawStringCentered function</li>
+  <li class="self-crumb">copyImageChannels function</li>
 </ol>
 
 
@@ -305,6 +309,7 @@ such as: arial14, arial24, or arial48.</p>
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -342,8 +347,6 @@ such as: arial14, arial24, or arial48.</p>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -358,6 +361,7 @@ such as: arial14, arial24, or arial48.</p>
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -394,7 +398,6 @@ such as: arial14, arial24, or arial48.</p>
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

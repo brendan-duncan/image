@@ -59,13 +59,15 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">drawLine</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="drawLine-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span></li>
-<li><span class="parameter" id="drawLine-param-x1"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span></li>
-<li><span class="parameter" id="drawLine-param-y1"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span></li>
-<li><span class="parameter" id="drawLine-param-x2"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span></li>
-<li><span class="parameter" id="drawLine-param-y2"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span></li>
-<li><span class="parameter" id="drawLine-param-c"><span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">c</span>, </span></li>
-<li><span class="parameter" id="drawLine-param-antialias">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">antialias</span> = <span class="default-value">false</span>, </span></li>
-<li><span class="parameter" id="drawLine-param-thickness"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">thickness</span> = <span class="default-value">1</span>}</span></li>
+<li><span class="parameter" id="drawLine-param-x1">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span></li>
+<li><span class="parameter" id="drawLine-param-y1"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span></li>
+<li><span class="parameter" id="drawLine-param-x2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span></li>
+<li><span class="parameter" id="drawLine-param-y2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span></li>
+<li><span class="parameter" id="drawLine-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span></li>
+<li><span class="parameter" id="drawLine-param-antialias"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">antialias</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="drawLine-param-thickness"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">thickness</span> = <span class="default-value">1</span>, </span></li>
+<li><span class="parameter" id="drawLine-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="drawLine-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -82,8 +84,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image drawLine(Image image, int x1, int y1, int x2, int y2, Color c,
-    { bool antialias = false, num thickness = 1 }) {
+  <pre class="language-dart"><code class="language-dart">Image drawLine(Image image, { required int x1, required int y1,
+    required int x2, required int y2, required Color color,
+    bool antialias = false, num thickness = 1, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   final line = [x1, y1, x2, y2];
   if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
     return image;
@@ -102,8 +106,9 @@
   &#47;&#47; Drawing a single point.
   if (dx == 0 &amp;&amp; dy == 0) {
     thickness == 1
-        ? drawPixel(image, x1, y1, c)
-        : fillCircle(image, x1, y1, radius, c);
+        ? drawPixel(image, x1, y1, color, mask: mask, maskChannel: maskChannel)
+        : fillCircle(image, x: x1, y: y1, radius: radius, color: color,
+            mask: mask, maskChannel: maskChannel);
     return image;
   }
 
@@ -112,20 +117,22 @@
     if (dy &lt; 0) {
       for (var y = y2; y &lt;= y1; ++y) {
         if (thickness &lt;= 1) {
-          drawPixel(image, x1, y, c);
+          drawPixel(image, x1, y, color, mask: mask, maskChannel: maskChannel);
         } else {
           for (var i = 0; i &lt; thickness; i++) {
-            drawPixel(image, x1 - radius + i, y, c);
+            drawPixel(image, x1 - radius + i, y, color, mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
     } else {
       for (var y = y1; y &lt;= y2; ++y) {
         if (thickness &lt;= 1) {
-          drawPixel(image, x1, y, c);
+          drawPixel(image, x1, y, color, mask: mask, maskChannel: maskChannel);
         } else {
           for (var i = 0; i &lt; thickness; i++) {
-            drawPixel(image, x1 - radius + i, y, c);
+            drawPixel(image, x1 - radius + i, y, color, mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
@@ -135,20 +142,22 @@
     if (dx &lt; 0) {
       for (var x = x2; x &lt;= x1; ++x) {
         if (thickness &lt;= 1) {
-          drawPixel(image, x, y1, c);
+          drawPixel(image, x, y1, color, mask: mask, maskChannel: maskChannel);
         } else {
           for (var i = 0; i &lt; thickness; i++) {
-            drawPixel(image, x, y1 - radius + i, c);
+            drawPixel(image, x, y1 - radius + i, color, mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
     } else {
       for (var x = x1; x &lt;= x2; ++x) {
         if (thickness &lt;= 1) {
-          drawPixel(image, x, y1, c);
+          drawPixel(image, x, y1, color, mask: mask, maskChannel: maskChannel);
         } else {
           for (var i = 0; i &lt; thickness; i++) {
-            drawPixel(image, x, y1 - radius + i, c);
+            drawPixel(image, x, y1 - radius + i, color, mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
@@ -198,7 +207,7 @@
       &#47;&#47; Set up line thickness
       var wstart = (y - wid &#47; 2).toInt();
       for (var w = wstart; w &lt; wstart + wid; w++) {
-        drawPixel(image, x, w, c);
+        drawPixel(image, x, w, color, mask: mask, maskChannel: maskChannel);
       }
 
       if (((y2 - y1) * ydirflag) &gt; 0) {
@@ -212,7 +221,7 @@
           }
           wstart = (y - wid &#47; 2).toInt();
           for (var w = wstart; w &lt; wstart + wid; w++) {
-            drawPixel(image, x, w, c);
+            drawPixel(image, x, w, color, mask: mask, maskChannel: maskChannel);
           }
         }
       } else {
@@ -226,7 +235,7 @@
           }
           wstart = (y - wid &#47; 2).toInt();
           for (var w = wstart; w &lt; wstart + wid; w++) {
-            drawPixel(image, x, w, c);
+            drawPixel(image, x, w, color, mask: mask, maskChannel: maskChannel);
           }
         }
       }
@@ -264,7 +273,7 @@
       &#47;&#47; Set up line thickness
       var wstart = (x - wid &#47; 2).toInt();
       for (var w = wstart; w &lt; wstart + wid; w++) {
-        drawPixel(image, w, y, c);
+        drawPixel(image, w, y, color, mask: mask, maskChannel: maskChannel);
       }
 
       if (((x2 - x1) * xdirflag) &gt; 0) {
@@ -278,7 +287,7 @@
           }
           wstart = (x - wid &#47; 2).toInt();
           for (var w = wstart; w &lt; wstart + wid; w++) {
-            drawPixel(image, w, y, c);
+            drawPixel(image, w, y, color, mask: mask, maskChannel: maskChannel);
           }
         }
       } else {
@@ -292,7 +301,7 @@
           }
           wstart = (x - wid &#47; 2).toInt();
           for (var w = wstart; w &lt; wstart + wid; w++) {
-            drawPixel(image, w, y, c);
+            drawPixel(image, w, y, color, mask: mask, maskChannel: maskChannel);
           }
         }
       }
@@ -334,8 +343,12 @@
     for (var x = x1; x &lt;= x2; x++) {
       final wstart = y - wid ~&#47; 2;
       for (var w = wstart; w &lt; wstart + wid; w++) {
-        drawPixel(image, x, w, c, alpha: ((frac &gt;&gt; 8) &amp; 0xff) &#47; 255);
-        drawPixel(image, x, w + 1, c, alpha: ((_xor(frac) &gt;&gt; 8) &amp; 0xff) &#47; 255);
+        drawPixel(image, x, w, color, alpha: ((frac &gt;&gt; 8) &amp; 0xff) &#47; 255,
+            mask: mask, maskChannel: maskChannel);
+
+        drawPixel(image, x, w + 1, color,
+            alpha: ((_xor(frac) &gt;&gt; 8) &amp; 0xff) &#47; 255, mask: mask,
+            maskChannel: maskChannel);
       }
 
       frac += inc;
@@ -366,8 +379,12 @@
     for (var y = y1; y &lt;= y2; y++) {
       final wstart = x - wid ~&#47; 2;
       for (var w = wstart; w &lt; wstart + wid; w++) {
-        drawPixel(image, w, y, c, alpha: ((frac &gt;&gt; 8) &amp; 0xff) &#47; 255);
-        drawPixel(image, w + 1, y, c, alpha: ((_xor(frac) &gt;&gt; 8) &amp; 0xff) &#47; 255);
+        drawPixel(image, w, y, color, alpha: ((frac &gt;&gt; 8) &amp; 0xff) &#47; 255,
+            mask: mask, maskChannel: maskChannel);
+
+        drawPixel(image, w + 1, y, color,
+            alpha: ((_xor(frac) &gt;&gt; 8) &amp; 0xff) &#47; 255, mask: mask,
+            maskChannel: maskChannel);
       }
 
       frac += inc;
@@ -571,6 +588,7 @@
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -608,8 +626,6 @@
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -624,6 +640,7 @@
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -660,7 +677,6 @@
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

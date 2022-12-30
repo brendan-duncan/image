@@ -60,7 +60,9 @@
 <span class="returntype">void</span>
 <span class="name ">apply</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="apply-param-src"><span class="type-annotation"><a href="../../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
 <li><span class="parameter" id="apply-param-dst"><span class="type-annotation"><a href="../../image/Image-class.html">Image</a></span> <span class="parameter-name">dst</span>, </span></li>
-<li><span class="parameter" id="apply-param-horizontal">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">horizontal</span> = <span class="default-value">true</span>}</span></li>
+<li><span class="parameter" id="apply-param-horizontal">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">horizontal</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="apply-param-mask"><span class="type-annotation"><a href="../../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="apply-param-maskChannel"><span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
       
@@ -78,14 +80,17 @@ vertical axis.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void apply(Image src, Image dst, { bool horizontal = true }) {
+  <pre class="language-dart"><code class="language-dart">void apply(Image src, Image dst, { bool horizontal = true,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   if (horizontal) {
     for (var y = 0; y &lt; src.height; ++y) {
-      _applyCoefficientsLine(src, dst, y, src.width, horizontal);
+      _applyCoefficientsLine(src, dst, y, src.width, horizontal,
+          mask, maskChannel);
     }
   } else {
     for (var x = 0; x &lt; src.width; ++x) {
-      _applyCoefficientsLine(src, dst, x, src.height, horizontal);
+      _applyCoefficientsLine(src, dst, x, src.height, horizontal,
+          mask, maskChannel);
     }
   }
 }</code></pre>

@@ -68,7 +68,9 @@
 <li><span class="parameter" id="adjustColor-param-gamma"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">gamma</span>, </span></li>
 <li><span class="parameter" id="adjustColor-param-exposure"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">exposure</span>, </span></li>
 <li><span class="parameter" id="adjustColor-param-hue"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">hue</span>, </span></li>
-<li><span class="parameter" id="adjustColor-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">amount</span>}</span></li>
+<li><span class="parameter" id="adjustColor-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span></li>
+<li><span class="parameter" id="adjustColor-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="adjustColor-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -107,17 +109,11 @@ by 45 degrees.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Image adjustColor(Image src,
-    { Color? blacks,
-      Color? whites,
-      Color? mids,
-      num? contrast,
-      num? saturation,
-      num? brightness,
-      num? gamma,
-      num? exposure,
-      num? hue,
-      num? amount }) {
-  if (amount == 0.0) {
+    { Color? blacks, Color? whites, Color? mids, num? contrast,
+      num? saturation, num? brightness, num? gamma, num? exposure,
+      num? hue, num amount = 1, Image? mask,
+      Channel maskChannel = Channel.luminance }) {
+  if (amount == 0) {
     return src;
   }
 
@@ -126,7 +122,7 @@ by 45 degrees.</p>
   brightness = brightness?.clamp(0, 1);
   gamma = gamma?.clamp(0, 1000);
   exposure = exposure?.clamp(0, 1000);
-  amount = amount?.clamp(0, 1000);
+  amount = amount.clamp(0, 1000);
 
   const degToRad = 0.0174532925;
   const avgLumR = 0.5;
@@ -141,17 +137,17 @@ by 45 degrees.</p>
   late num wr, wg, wb;
   late num mr, mg, mb;
   if (useBlacksWhitesMids) {
-    br = blacks != null ? blacks.r &#47; blacks.maxChannelValue : 0;
-    bg = blacks != null ? blacks.g &#47; blacks.maxChannelValue : 0;
-    bb = blacks != null ? blacks.b &#47; blacks.maxChannelValue : 0;
+    br = blacks?.rNormalized ?? 0;
+    bg = blacks?.gNormalized ?? 0;
+    bb = blacks?.bNormalized ?? 0;
 
-    wr = whites != null ? whites.r &#47; whites.maxChannelValue : 0;
-    wg = whites != null ? whites.g &#47; whites.maxChannelValue : 0;
-    wb = whites != null ? whites.b &#47; whites.maxChannelValue : 0;
+    wr = whites?.rNormalized ?? 0;
+    wg = whites?.gNormalized ?? 0;
+    wb = whites?.bNormalized ?? 0;
 
-    mr = mids != null ? mids.r &#47; mids.maxChannelValue : 0;
-    mg = mids != null ? mids.g &#47; mids.maxChannelValue : 0;
-    mb = mids != null ? mids.b &#47; mids.maxChannelValue : 0;
+    mr = mids?.rNormalized ?? 0;
+    mg = mids?.gNormalized ?? 0;
+    mb = mids?.bNormalized ?? 0;
 
     mr = 1.0 &#47; (1.0 + 2.0 * (mr - 0.5));
     mg = 1.0 &#47; (1.0 + 2.0 * (mg - 0.5));
@@ -179,13 +175,11 @@ by 45 degrees.</p>
     hueB = ((sqrt(3.0) * s - c) + 1.0) &#47; 3.0;
   }
 
-  final invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
-
   for (final frame in src.frames) {
     for (final p in frame) {
-      final num or = p.r &#47; 255.0;
-      final num og = p.g &#47; 255.0;
-      final num ob = p.b &#47; 255.0;
+      final or = p.rNormalized;
+      final og = p.gNormalized;
+      final ob = p.bNormalized;
 
       var r = or;
       var g = og;
@@ -240,15 +234,17 @@ by 45 degrees.</p>
         b = hb;
       }
 
-      if (amount != null) {
-        r = r * amount + or * invAmount;
-        g = g * amount + og * invAmount;
-        b = b * amount + ob * invAmount;
-      }
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel)
+          ?? 1;
+      final blend = msk * amount;
 
-      p..r = r * p.maxChannelValue
-      ..g = g * p.maxChannelValue
-      ..b = b * p.maxChannelValue;
+      r = mix(or, r, blend);
+      g = mix(og, g, blend);
+      b = mix(ob, b, blend);
+
+      p..rNormalized = r
+      ..gNormalized = g
+      ..bNormalized = b;
     }
   }
 
@@ -442,6 +438,7 @@ by 45 degrees.</p>
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -479,8 +476,6 @@ by 45 degrees.</p>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -495,6 +490,7 @@ by 45 degrees.</p>
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -531,7 +527,6 @@ by 45 degrees.</p>
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

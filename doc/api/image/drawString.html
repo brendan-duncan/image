@@ -59,12 +59,15 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">drawString</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="drawString-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span></li>
-<li><span class="parameter" id="drawString-param-font"><span class="type-annotation"><a href="../image/BitmapFont-class.html">BitmapFont</a></span> <span class="parameter-name">font</span>, </span></li>
-<li><span class="parameter" id="drawString-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span></li>
-<li><span class="parameter" id="drawString-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span></li>
 <li><span class="parameter" id="drawString-param-string"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">string</span>, </span></li>
-<li><span class="parameter" id="drawString-param-color">{<span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>, </span></li>
-<li><span class="parameter" id="drawString-param-rightJustify"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">rightJustify</span> = <span class="default-value">false</span>}</span></li>
+<li><span class="parameter" id="drawString-param-font">{<span>required</span> <span class="type-annotation"><a href="../image/BitmapFont-class.html">BitmapFont</a></span> <span class="parameter-name">font</span>, </span></li>
+<li><span class="parameter" id="drawString-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">x</span>, </span></li>
+<li><span class="parameter" id="drawString-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">y</span>, </span></li>
+<li><span class="parameter" id="drawString-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>, </span></li>
+<li><span class="parameter" id="drawString-param-rightJustify"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">rightJustify</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="drawString-param-wrap"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">wrap</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="drawString-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="drawString-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -73,7 +76,9 @@
     
 <section class="desc markdown">
   <p>Draw a string horizontally into <code>image</code> horizontally into <code>image</code> at
-position <code>x</code>,<code>y</code> with the given <code>color</code>.</p>
+position <code>x</code>,<code>y</code> with the given <code>color</code>.
+If <code>x</code> is not specified, the string will be centered horizontally.
+If <code>y</code> is not specified, the string will be centered vertically.</p>
 <p>You can load your own font, or use one of the existing ones
 such as: arial14, arial24, or arial48.
 Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://ttf2fnt.com/</a></p>
@@ -83,14 +88,82 @@ Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image drawString(Image image, BitmapFont font, int x, int y, String string,
-    { Color? color, bool rightJustify = false }) {
+  <pre class="language-dart"><code class="language-dart">Image drawString(Image image, String string, { required BitmapFont font,
+    int? x, int? y, Color? color, bool rightJustify = false, bool wrap = false,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   if (color?.a == 0) {
     return image;
   }
 
-  final stringHeight = _findStringHeight(font, string);
-  final origX = x;
+  var stringWidth = 0;
+  var stringHeight = 0;
+
+  if (x == null || y == null) {
+    final chars = string.codeUnits;
+    for (var c in chars) {
+      if (!font.characters.containsKey(c)) {
+        continue;
+      }
+      final ch = font.characters[c]!;
+      stringWidth += ch.xAdvance;
+      if (ch.height + ch.yOffset &gt; stringHeight) {
+        stringHeight = ch.height + ch.yOffset;
+      }
+    }
+  }
+
+  var sx = x ?? (image.width &#47; 2).round() - (stringWidth &#47; 2).round();
+  var sy = y ?? (image.height &#47; 2).round() - (stringHeight &#47; 2).round();
+
+  if (wrap) {
+    final words = string.split(new RegExp(r&quot;\s+&quot;));
+    var subString = &quot;&quot;;
+    var x2 = sx;
+
+    for (var w in words) {
+      final ws = StringBuffer()
+        ..write(w)
+        ..write(&#39; &#39;);
+      w = ws.toString();
+      final chars = w.codeUnits;
+      var wordWidth = 0;
+      for (var c in chars) {
+        if (!font.characters.containsKey(c)) {
+          wordWidth += font.base ~&#47; 2;
+          continue;
+        }
+        final ch = font.characters[c]!;
+        wordWidth += ch.xAdvance;
+      }
+      if ((x2 + wordWidth) &gt; image.width) {
+        &#47;&#47; If there is a word that won&#39;t fit the starting x, stop drawing
+        if ((sx == x2) || (sx + wordWidth &gt; image.width)) {
+          return image;
+        }
+
+        drawString(image, subString, font: font, x: sx, y: sy, color: color,
+            mask: mask, maskChannel: maskChannel, rightJustify: rightJustify);
+
+        subString = &quot;&quot;;
+        x2 = sx;
+        sy += stringHeight;
+        subString += w;
+        x2 += wordWidth;
+      } else {
+        subString += w;
+        x2 += wordWidth;
+      }
+
+      if (subString.length &gt; 0) {
+        drawString(image, subString, font: font, x: sx, y: sy, color: color,
+            mask: mask, maskChannel: maskChannel, rightJustify: rightJustify);
+      }
+    }
+
+    return image;
+  }
+
+  final origX = sx;
   final substrings = string.split(new RegExp(r&quot;[(\n|\r)]&quot;));
 
   for (var ss in substrings) {
@@ -98,38 +171,38 @@ Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://
     if (rightJustify == true) {
       for (var c in chars) {
         if (!font.characters.containsKey(c)) {
-          x -= font.base ~&#47; 2;
+          sx -= font.base ~&#47; 2;
           continue;
         }
 
         final ch = font.characters[c]!;
-        x -= ch.xAdvance;
+        sx -= ch.xAdvance;
       }
     }
     for (var c in chars) {
       if (!font.characters.containsKey(c)) {
-        x += font.base ~&#47; 2;
+        sx += font.base ~&#47; 2;
         continue;
       }
 
       final ch = font.characters[c]!;
 
-      final x2 = x + ch.width;
-      final y2 = y + ch.height;
+      final x2 = sx + ch.width;
+      final y2 = sy + ch.height;
       final cIter = ch.image.iterator..moveNext();
-      for (var yi = y; yi &lt; y2; ++yi) {
-        for (var xi = x; xi &lt; x2; ++xi, cIter.moveNext()) {
+      for (var yi = sy; yi &lt; y2; ++yi) {
+        for (var xi = sx; xi &lt; x2; ++xi, cIter.moveNext()) {
           final p = cIter.current;
           drawPixel(image, xi + ch.xOffset, yi + ch.yOffset, p,
-              filter: color);
+              filter: color, mask: mask, maskChannel: maskChannel);
         }
       }
 
-      x += ch.xAdvance;
+      sx += ch.xAdvance;
     }
 
-    y = y+stringHeight;
-    x = origX;
+    sy = sy + stringHeight;
+    sx = origX;
   }
 
   return image;
@@ -322,6 +395,7 @@ Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -359,8 +433,6 @@ Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -375,6 +447,7 @@ Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -411,7 +484,6 @@ Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

@@ -61,7 +61,8 @@
 <span class="name ">copyRectify</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyRectify-param-topLeft">{<span>required</span> <span class="type-annotation"><a href="../../image/Point-class.html">Point</a></span> <span class="parameter-name">topLeft</span>, </span></li>
 <li><span class="parameter" id="copyRectify-param-topRight"><span>required</span> <span class="type-annotation"><a href="../../image/Point-class.html">Point</a></span> <span class="parameter-name">topRight</span>, </span></li>
 <li><span class="parameter" id="copyRectify-param-bottomLeft"><span>required</span> <span class="type-annotation"><a href="../../image/Point-class.html">Point</a></span> <span class="parameter-name">bottomLeft</span>, </span></li>
-<li><span class="parameter" id="copyRectify-param-bottomRight"><span>required</span> <span class="type-annotation"><a href="../../image/Point-class.html">Point</a></span> <span class="parameter-name">bottomRight</span>}</span></li>
+<li><span class="parameter" id="copyRectify-param-bottomRight"><span>required</span> <span class="type-annotation"><a href="../../image/Point-class.html">Point</a></span> <span class="parameter-name">bottomRight</span>, </span></li>
+<li><span class="parameter" id="copyRectify-param-interpolation"><span class="type-annotation"><a href="../../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
 </ol>)
 
       
@@ -76,9 +77,10 @@
   <pre class="language-dart"><code class="language-dart">void copyRectify({ required Point topLeft,
     required Point topRight,
     required Point bottomLeft,
-    required Point bottomRight }) {
+    required Point bottomRight,
+    Interpolation interpolation = Interpolation.nearest }) {
   subCommand = CopyRectifyCmd(subCommand, topLeft, topRight,
-      bottomLeft, bottomRight);
+      bottomLeft, bottomRight, interpolation);
 }</code></pre>
 </section>
 
@@ -139,6 +141,7 @@
           <li><a href="../../image/Command/copyCrop.html">copyCrop</a></li>
           <li><a href="../../image/Command/copyCropCircle.html">copyCropCircle</a></li>
           <li><a href="../../image/Command/copyFlip.html">copyFlip</a></li>
+          <li><a href="../../image/Command/copyImageChannels.html">copyImageChannels</a></li>
           <li><a href="../../image/Command/copyRectify.html">copyRectify</a></li>
           <li><a href="../../image/Command/copyResize.html">copyResize</a></li>
           <li><a href="../../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -218,7 +221,6 @@
           <li><a href="../../image/Command/hdrToLdr.html">hdrToLdr</a></li>
           <li><a href="../../image/Command/hexagonPixelate.html">hexagonPixelate</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
-          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
           <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/monochrome.html">monochrome</a></li>

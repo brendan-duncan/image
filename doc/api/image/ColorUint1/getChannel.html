@@ -57,20 +57,25 @@
     <section class="multi-line-signature">
       
 
-<span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span>
-<span class="name ">getChannel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getChannel-param-ci"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">ci</span></span></li>
+<span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>
+<span class="name ">getChannel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getChannel-param-channel"><span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">channel</span></span></li>
 </ol>)
 
-      
+      <div class="features"><span class="feature">override</span></div>
 
     </section>
     
+<section class="desc markdown">
+  <p>Get a <code>channel</code> from the color. If the channel isn't available,
+0 will be returned.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">int getChannel(int ci) =&gt; ci &lt; length ? ((data &gt;&gt; (7 - ci)) &amp; 0x1) : 0;</code></pre>
+  <pre class="language-dart"><code class="language-dart">num getChannel(Channel channel) =&gt; channel == Channel.luminance ?
+    luminance : _getChannel(channel.index);</code></pre>
 </section>
 
 
@@ -148,13 +153,13 @@
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/followedBy.html">followedBy</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/forEach.html">forEach</a></li>
           <li><a href="../../image/ColorUint1/getChannel.html">getChannel</a></li>
+          <li><a href="../../image/ColorUint1/getChannelNormalized.html">getChannelNormalized</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/join.html">join</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/lastWhere.html">lastWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/map.html">map</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
           <li><a href="../../image/ColorUint1/set.html">set</a></li>
-          <li><a href="../../image/ColorUint1/setChannel.html">setChannel</a></li>
           <li><a href="../../image/ColorUint1/setColor.html">setColor</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>

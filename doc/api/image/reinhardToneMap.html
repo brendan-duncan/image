@@ -58,7 +58,9 @@
         
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
-<span class="name ">reinhardTonemap</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="reinhardTonemap-param-hdr"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">hdr</span></span></li>
+<span class="name ">reinhardTonemap</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="reinhardTonemap-param-hdr"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">hdr</span>, </span></li>
+<li><span class="parameter" id="reinhardTonemap-param-mask">{<span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="reinhardTonemap-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -73,7 +75,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image reinhardTonemap(Image hdr) {
+  <pre class="language-dart"><code class="language-dart">Image reinhardTonemap(Image hdr, { Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   const yw = [0.212671, 0.715160, 0.072169];
 
   &#47;&#47; Compute world adaptation luminance, _Ywa_
@@ -101,9 +104,16 @@
 
     final s = (1.0 + lum * invY2) &#47; (1.0 + lum);
 
-    p..r = r * s
-    ..g = g * s
-    ..b = b * s;
+    final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+    if (msk == null) {
+      p..r = r * s
+      ..g = g * s
+      ..b = b * s;
+    } else {
+      p..r = mix(p.r, r * s, msk)
+      ..g = mix(p.g, g * s, msk)
+      ..b = mix(p.b, b * s, msk);
+    }
   }
 
   return hdr;
@@ -296,6 +306,7 @@
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -333,8 +344,6 @@
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -349,6 +358,7 @@
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -385,7 +395,6 @@
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

@@ -62,20 +62,25 @@
 <li><span class="parameter" id="hexagonPixelate-param-centerX">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span></li>
 <li><span class="parameter" id="hexagonPixelate-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span></li>
 <li><span class="parameter" id="hexagonPixelate-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span> = <span class="default-value">5</span>, </span></li>
-<li><span class="parameter" id="hexagonPixelate-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>}</span></li>
+<li><span class="parameter" id="hexagonPixelate-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span></li>
+<li><span class="parameter" id="hexagonPixelate-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="hexagonPixelate-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
 
     </section>
     
+<section class="desc markdown">
+  <p>Apply the hexagon pixelate filter to the image.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Image hexagonPixelate(Image src, { int? centerX, int? centerY, int size = 5,
-    num amount = 1 }) {
+    num amount = 1, Image? mask, Channel maskChannel = Channel.luminance }) {
   for (final frame in src.frames) {
     final w = frame.width - 1;
     final h = frame.height - 1;
@@ -155,9 +160,12 @@
       final y = (ny * h).clamp(0, h);
       final newColor = orig.getPixel(x.floor(), y.floor());
 
-      p..r = mix(p.r, newColor.r, amount)
-      ..g = mix(p.g, newColor.g, amount)
-      ..b = mix(p.b, newColor.b, amount);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      p..r = mix(p.r, newColor.r, mx)
+      ..g = mix(p.g, newColor.g, mx)
+      ..b = mix(p.b, newColor.b, mx);
     }
   }
   return src;
@@ -350,6 +358,7 @@
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -387,8 +396,6 @@
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -403,6 +410,7 @@
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -439,7 +447,6 @@
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

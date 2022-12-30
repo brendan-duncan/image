@@ -60,36 +60,60 @@
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">vignette</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="vignette-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
 <li><span class="parameter" id="vignette-param-start">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">start</span> = <span class="default-value">0.3</span>, </span></li>
-<li><span class="parameter" id="vignette-param-end"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">end</span> = <span class="default-value">0.75</span>, </span></li>
-<li><span class="parameter" id="vignette-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">0.8</span>}</span></li>
+<li><span class="parameter" id="vignette-param-end"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">end</span> = <span class="default-value">0.85</span>, </span></li>
+<li><span class="parameter" id="vignette-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">0.9</span>, </span></li>
+<li><span class="parameter" id="vignette-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>, </span></li>
+<li><span class="parameter" id="vignette-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="vignette-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
 
     </section>
     
+<section class="desc markdown">
+  <p>Apply a vignette filter to the image.
+<code>start</code> is the inner radius from the center of the image, where the fade to
+<code>color</code> starts to be applied; and <code>end</code> is the outer radius of the
+vignette effect where the <code>color</code> is fully applied. The radius values are in
+normalized percentage of the image size [0, 1].
+<code>amount</code> controls the blend of the effect with the original image.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image vignette(Image src, { num start = 0.3, num end = 0.75,
-    num amount = 0.8 }) {
+  <pre class="language-dart"><code class="language-dart">Image vignette(Image src, { num start = 0.3, num end = 0.85,
+    num amount = 0.9, Color? color, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   final h = src.height - 1;
   final w = src.width - 1;
-  final invAmt = 1.0 - amount;
+  final cr = color?.rNormalized ?? 0;
+  final cg = color?.gNormalized ?? 0;
+  final cb = color?.bNormalized ?? 0;
+  final ca = color?.aNormalized ?? 1;
+  final aspect = w &#47; h;
   for (final frame in src.frames) {
     for (final p in frame) {
+      final dx = (0.5 - (p.x &#47; w)) * aspect;
       final dy = 0.5 - (p.y &#47; h);
-      final dx = 0.5 - (p.x &#47; w);
+
       num d = sqrt(dx * dx + dy * dy);
-      d = _smoothStep(end, start, d);
-      final r = p.r;
-      final g = p.g;
-      final b = p.b;
-      p..r = amount * r * d + invAmt * r
-      ..g = amount * g * d + invAmt * g
-      ..b = amount * b * d + invAmt * b;
+      d = 1 - _smoothStep(end, start, d);
+
+      final r = mix(p.rNormalized, cr, d) * p.maxChannelValue;
+      final g = mix(p.gNormalized, cg, d) * p.maxChannelValue;
+      final b = mix(p.bNormalized, cb, d) * p.maxChannelValue;
+      final a = mix(p.aNormalized, ca, d) * p.maxChannelValue;
+
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      p..r = mix(p.r, r, mx)
+      ..g = mix(p.g, g, mx)
+      ..b = mix(p.b, b, mx)
+      ..a = mix(p.a, a, mx);
     }
   }
   return src;
@@ -282,6 +306,7 @@
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -319,8 +344,6 @@
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -335,6 +358,7 @@
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -371,7 +395,6 @@
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

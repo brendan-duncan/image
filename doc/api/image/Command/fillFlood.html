@@ -58,11 +58,13 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">fillFlood</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fillFlood-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span></li>
-<li><span class="parameter" id="fillFlood-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span></li>
-<li><span class="parameter" id="fillFlood-param-color"><span class="type-annotation"><a href="../../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span></li>
-<li><span class="parameter" id="fillFlood-param-threshold">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.0</span>, </span></li>
-<li><span class="parameter" id="fillFlood-param-compareAlpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">compareAlpha</span> = <span class="default-value">false</span>}</span></li>
+<span class="name ">fillFlood</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fillFlood-param-x">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-color"><span>required</span> <span class="type-annotation"><a href="../../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-threshold"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.0</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-compareAlpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">compareAlpha</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-mask"><span class="type-annotation"><a href="../../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-maskChannel"><span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
       
@@ -74,10 +76,12 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void fillFlood(int x, int y, Color color,
-    { num threshold = 0.0, bool compareAlpha = false }) {
-  subCommand = FillFloodCmd(subCommand, x, y, color, threshold: threshold,
-      compareAlpha: compareAlpha);
+  <pre class="language-dart"><code class="language-dart">void fillFlood({ required int x, required int y, required Color color,
+      num threshold = 0.0, bool compareAlpha = false, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+  subCommand = FillFloodCmd(subCommand, x: x, y: y, color: color,
+      threshold: threshold, compareAlpha: compareAlpha, mask: mask,
+      maskChannel: maskChannel);
 }</code></pre>
 </section>
 
@@ -138,6 +142,7 @@
           <li><a href="../../image/Command/copyCrop.html">copyCrop</a></li>
           <li><a href="../../image/Command/copyCropCircle.html">copyCropCircle</a></li>
           <li><a href="../../image/Command/copyFlip.html">copyFlip</a></li>
+          <li><a href="../../image/Command/copyImageChannels.html">copyImageChannels</a></li>
           <li><a href="../../image/Command/copyRectify.html">copyRectify</a></li>
           <li><a href="../../image/Command/copyResize.html">copyResize</a></li>
           <li><a href="../../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -217,7 +222,6 @@
           <li><a href="../../image/Command/hdrToLdr.html">hdrToLdr</a></li>
           <li><a href="../../image/Command/hexagonPixelate.html">hexagonPixelate</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
-          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
           <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/monochrome.html">monochrome</a></li>

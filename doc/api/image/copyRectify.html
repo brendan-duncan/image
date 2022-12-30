@@ -63,6 +63,7 @@
 <li><span class="parameter" id="copyRectify-param-topRight"><span>required</span> <span class="type-annotation"><a href="../image/Point-class.html">Point</a></span> <span class="parameter-name">topRight</span>, </span></li>
 <li><span class="parameter" id="copyRectify-param-bottomLeft"><span>required</span> <span class="type-annotation"><a href="../image/Point-class.html">Point</a></span> <span class="parameter-name">bottomLeft</span>, </span></li>
 <li><span class="parameter" id="copyRectify-param-bottomRight"><span>required</span> <span class="type-annotation"><a href="../image/Point-class.html">Point</a></span> <span class="parameter-name">bottomRight</span>, </span></li>
+<li><span class="parameter" id="copyRectify-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>, </span></li>
 <li><span class="parameter" id="copyRectify-param-toImage"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">toImage</span>}</span></li>
 </ol>)
 
@@ -84,6 +85,7 @@ has been mapped to the full image.</p>
     required Point topRight,
     required Point bottomLeft,
     required Point bottomRight,
+    Interpolation interpolation = Interpolation.nearest,
     Image? toImage }) {
   Image? firstFrame;
   for (final frame in src.frames) {
@@ -99,7 +101,12 @@ has been mapped to the full image.</p>
             topRight * u * (1 - v) +
             bottomLeft * (1 - u) * v +
             bottomRight * u * v;
-        final srcPixel = frame.getPixel(srcPixelCoord.xi, srcPixelCoord.yi);
+
+        final srcPixel = interpolation == Interpolation.nearest ?
+            frame.getPixel(srcPixelCoord.xi, srcPixelCoord.yi) :
+            frame.getPixelInterpolate(srcPixelCoord.x, srcPixelCoord.y,
+                interpolation: interpolation);
+
         dst.setPixel(x, y, srcPixel);
       }
     }
@@ -295,6 +302,7 @@ has been mapped to the full image.</p>
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -332,8 +340,6 @@ has been mapped to the full image.</p>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -348,6 +354,7 @@ has been mapped to the full image.</p>
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -384,7 +391,6 @@ has been mapped to the full image.</p>
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

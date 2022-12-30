@@ -59,11 +59,13 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">fillFlood</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fillFlood-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="fillFlood-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span></li>
-<li><span class="parameter" id="fillFlood-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span></li>
-<li><span class="parameter" id="fillFlood-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span></li>
-<li><span class="parameter" id="fillFlood-param-threshold">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.0</span>, </span></li>
-<li><span class="parameter" id="fillFlood-param-compareAlpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">compareAlpha</span> = <span class="default-value">false</span>}</span></li>
+<li><span class="parameter" id="fillFlood-param-x">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-threshold"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.0</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-compareAlpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">compareAlpha</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="fillFlood-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -79,8 +81,9 @@ given <code>color</code>.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image fillFlood(Image src, int x, int y, Color color,
-    { num threshold = 0.0, bool compareAlpha = false }) {
+  <pre class="language-dart"><code class="language-dart">Image fillFlood(Image src, { required int x, required int y,
+    required Color color, num threshold = 0.0, bool compareAlpha = false,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   if (color.a == 0) {
     return src;
   }
@@ -111,8 +114,20 @@ given <code>color</code>.</p>
         visited[y * src.width + x] == 0 &amp;&amp; src.getPixel(x, y) != srcColor;
   }
 
+  Pixel? p;
   void mark(int y, int x) {
-    src.setPixel(x, y, color);
+    if (mask != null) {
+      final m = mask.getPixel(x, y).getChannelNormalized(maskChannel);
+      if (m &gt; 0) {
+        p = src.getPixel(x, y, p);
+        p!..r = mix(p!.r, color.r, m)
+        ..g = mix(p!.g, color.g, m)
+        ..b = mix(p!.b, color.b, m)
+        ..a = mix(p!.a, color.a, m);
+      }
+    } else {
+      src.setPixel(x, y, color);
+    }
     visited[y * src.width + x] = 1;
   }
 
@@ -308,6 +323,7 @@ given <code>color</code>.</p>
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -345,8 +361,6 @@ given <code>color</code>.</p>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -361,6 +375,7 @@ given <code>color</code>.</p>
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -397,7 +412,6 @@ given <code>color</code>.</p>
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

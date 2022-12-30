@@ -60,19 +60,25 @@
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">billboard</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="billboard-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
 <li><span class="parameter" id="billboard-param-grid">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">grid</span> = <span class="default-value">10</span>, </span></li>
-<li><span class="parameter" id="billboard-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>}</span></li>
+<li><span class="parameter" id="billboard-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span></li>
+<li><span class="parameter" id="billboard-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="billboard-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
 
     </section>
     
+<section class="desc markdown">
+  <p>Apply the billboard filter to the image.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image billboard(Image src, { num grid = 10, num amount = 1 }) {
+  <pre class="language-dart"><code class="language-dart">Image billboard(Image src, { num grid = 10, num amount = 1, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   const rs = 0.2025;&#47;&#47; pow(0.45, 2.0);
 
   for (final frame in src.frames) {
@@ -118,9 +124,12 @@
       g = mix(lf * g, 0.1, gr);
       b = mix(lf * b, 0.1, gr);
 
-      p..r = mix(p.r, r * p.maxChannelValue, amount)
-      ..g = mix(p.g, g * p.maxChannelValue, amount)
-      ..b = mix(p.b, b * p.maxChannelValue, amount);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      p..r = mix(p.r, r * p.maxChannelValue, mx)
+      ..g = mix(p.g, g * p.maxChannelValue, mx)
+      ..b = mix(p.b, b * p.maxChannelValue, mx);
     }
   }
   return src;
@@ -313,6 +322,7 @@
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -350,8 +360,6 @@
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -366,6 +374,7 @@
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -402,7 +411,6 @@
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

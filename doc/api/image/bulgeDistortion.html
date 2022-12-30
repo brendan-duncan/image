@@ -63,7 +63,9 @@
 <li><span class="parameter" id="bulgeDistortion-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span></li>
 <li><span class="parameter" id="bulgeDistortion-param-radius"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">radius</span>, </span></li>
 <li><span class="parameter" id="bulgeDistortion-param-scale"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">scale</span> = <span class="default-value">0.5</span>, </span></li>
-<li><span class="parameter" id="bulgeDistortion-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
+<li><span class="parameter" id="bulgeDistortion-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>, </span></li>
+<li><span class="parameter" id="bulgeDistortion-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="bulgeDistortion-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -77,7 +79,8 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Image bulgeDistortion(Image src, { int? centerX, int? centerY,
     num? radius, num scale = 0.5,
-    Interpolation interpolation = Interpolation.nearest }) {
+    Interpolation interpolation = Interpolation.nearest,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   for (final frame in src.frames) {
     final orig = frame.clone(noAnimation: true);
     final w = frame.width;
@@ -103,7 +106,17 @@
       x += cx;
       y += cy;
 
-      p.set(orig.getPixelInterpolate(x, y, interpolation: interpolation));
+      final p2 = orig.getPixelInterpolate(x, y, interpolation: interpolation);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+
+      if (msk == null) {
+        p.set(p2);
+      } else {
+        p..r = mix(p.r, p2.r, msk)
+        ..g = mix(p.g, p2.g, msk)
+        ..b = mix(p.b, p2.b, msk)
+        ..a = mix(p.a, p2.a, msk);
+      }
     }
   }
   return src;
@@ -296,6 +309,7 @@
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -333,8 +347,6 @@
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -349,6 +361,7 @@
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -385,7 +398,6 @@
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

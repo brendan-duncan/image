@@ -58,11 +58,13 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">fillRect</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fillRect-param-x1"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span></li>
-<li><span class="parameter" id="fillRect-param-y1"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span></li>
-<li><span class="parameter" id="fillRect-param-x2"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span></li>
-<li><span class="parameter" id="fillRect-param-y2"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span></li>
-<li><span class="parameter" id="fillRect-param-c"><span class="type-annotation"><a href="../../image/Color-class.html">Color</a></span> <span class="parameter-name">c</span></span></li>
+<span class="name ">fillRect</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fillRect-param-x1">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-y1"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-x2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-y2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-color"><span>required</span> <span class="type-annotation"><a href="../../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-mask"><span class="type-annotation"><a href="../../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="fillRect-param-maskChannel"><span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
       
@@ -74,8 +76,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void fillRect(int x1, int y1, int x2, int y2, Color c) {
-  subCommand = FillRectCmd(subCommand, x1, y1, x2, y2, c);
+  <pre class="language-dart"><code class="language-dart">void fillRect({ required int x1, required int y1, required int x2,
+    required int y2, required Color color, Command? mask,
+    Channel maskChannel = Channel.luminance }) {
+  subCommand = FillRectCmd(subCommand, x1: x1, y1: y1, x2: x2, y2: y2,
+      color: color, mask: mask, maskChannel: maskChannel);
 }</code></pre>
 </section>
 
@@ -136,6 +141,7 @@
           <li><a href="../../image/Command/copyCrop.html">copyCrop</a></li>
           <li><a href="../../image/Command/copyCropCircle.html">copyCropCircle</a></li>
           <li><a href="../../image/Command/copyFlip.html">copyFlip</a></li>
+          <li><a href="../../image/Command/copyImageChannels.html">copyImageChannels</a></li>
           <li><a href="../../image/Command/copyRectify.html">copyRectify</a></li>
           <li><a href="../../image/Command/copyResize.html">copyResize</a></li>
           <li><a href="../../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -215,7 +221,6 @@
           <li><a href="../../image/Command/hdrToLdr.html">hdrToLdr</a></li>
           <li><a href="../../image/Command/hexagonPixelate.html">hexagonPixelate</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
-          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
           <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/monochrome.html">monochrome</a></li>

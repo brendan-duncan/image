@@ -66,33 +66,7 @@
     </section>
     
 <section class="desc markdown">
-  <p>The equality operator.</p>
-<p>The default behavior for all <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object-class.html">Object</a>s is to return true if and
-only if this object and <code>other</code> are the same object.</p>
-<p>Override this method to specify a different equality relation on
-a class. The overriding method must still be an equivalence relation.
-That is, it must be:</p>
-<ul>
-<li>
-<p>Total: It must return a boolean for all arguments. It should never throw.</p>
-</li>
-<li>
-<p>Reflexive: For all objects <code>o</code>, <code>o == o</code> must be true.</p>
-</li>
-<li>
-<p>Symmetric: For all objects <code>o1</code> and <code>o2</code>, <code>o1 == o2</code> and <code>o2 == o1</code> must
-either both be true, or both be false.</p>
-</li>
-<li>
-<p>Transitive: For all objects <code>o1</code>, <code>o2</code>, and <code>o3</code>, if <code>o1 == o2</code> and
-<code>o2 == o3</code> are true, then <code>o1 == o3</code> must be true.</p>
-</li>
-</ul>
-<p>The method should also be consistent over time,
-so whether two objects are equal should only change
-if at least one of the objects was modified.</p>
-<p>If a subclass overrides the equality operator, it should override
-the <a href="../../image/Color/hashCode.html">hashCode</a> method as well to maintain consistency.</p>
+  <p>Tests if this color is equivalent to another <a href="../../image/Color-class.html">Color</a>.</p>
 </section>
 
 
@@ -171,6 +145,8 @@ the <a href="../../image/Color/hashCode.html">hashCode</a> method as well to mai
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/fold.html">fold</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/followedBy.html">followedBy</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/forEach.html">forEach</a></li>
+          <li><a href="../../image/Color/getChannel.html">getChannel</a></li>
+          <li><a href="../../image/Color/getChannelNormalized.html">getChannelNormalized</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/join.html">join</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/lastWhere.html">lastWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/map.html">map</a></li>

@@ -59,8 +59,11 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">pixelate</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="pixelate-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="pixelate-param-blockSize"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">blockSize</span>, </span></li>
-<li><span class="parameter" id="pixelate-param-mode">{<span class="type-annotation"><a href="../image/PixelateMode.html">PixelateMode</a></span> <span class="parameter-name">mode</span> = <span class="default-value">PixelateMode.upperLeft</span>}</span></li>
+<li><span class="parameter" id="pixelate-param-size">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span></li>
+<li><span class="parameter" id="pixelate-param-mode"><span class="type-annotation"><a href="../image/PixelateMode.html">PixelateMode</a></span> <span class="parameter-name">mode</span> = <span class="default-value">PixelateMode.upperLeft</span>, </span></li>
+<li><span class="parameter" id="pixelate-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span></li>
+<li><span class="parameter" id="pixelate-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="pixelate-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -69,7 +72,7 @@
     
 <section class="desc markdown">
   <p>Pixelate the <code>src</code> image.</p>
-<p><code>blockSize</code> determines the size of the pixelated blocks.
+<p><code>size</code> determines the size of the pixelated blocks.
 If <code>mode</code> is <a href="../image/PixelateMode.html">PixelateMode.upperLeft</a> then the upper-left corner of the
 block will be used for the block color. Otherwise if <code>mode</code> is
 <a href="../image/PixelateMode.html">PixelateMode.average</a>, the average of all the pixels in the block will be
@@ -80,9 +83,10 @@ used for the block color.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image pixelate(Image src, int blockSize,
-    { PixelateMode mode = PixelateMode.upperLeft }) {
-  if (blockSize &lt;= 1) {
+  <pre class="language-dart"><code class="language-dart">Image pixelate(Image src, { required int size,
+    PixelateMode mode = PixelateMode.upperLeft, num amount = 1, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
+  if (size &lt;= 1) {
     return src;
   }
 
@@ -92,10 +96,20 @@ used for the block color.</p>
     switch (mode) {
       case PixelateMode.upperLeft:
         for (final p in frame) {
-          final x2 = (p.x ~&#47; blockSize) * blockSize;
-          final y2 = (p.y ~&#47; blockSize) * blockSize;
+          final x2 = (p.x ~&#47; size) * size;
+          final y2 = (p.y ~&#47; size) * size;
           final p2 = frame.getPixel(x2, y2);
-          p.set(p2);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          final mx = (msk ?? 1) * amount;
+          if (mx == 1) {
+            p.set(p2);
+          } else {
+            p..r = mix(p.r, p2.r, mx)
+            ..g = mix(p.g, p2.g, mx)
+            ..b = mix(p.b, p2.b, mx)
+            ..a = mix(p.a, p2.a, mx);
+          }
         }
         break;
       case PixelateMode.average:
@@ -106,8 +120,11 @@ used for the block color.</p>
         var lx = -1;
         var ly = -1;
         for (final p in frame) {
-          final x2 = (p.x ~&#47; blockSize) * blockSize;
-          final y2 = (p.y ~&#47; blockSize) * blockSize;
+          final x2 = (p.x ~&#47; size) * size;
+          final y2 = (p.y ~&#47; size) * size;
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          final mx = (msk ?? 1) * amount;
           if (x2 != lx || y2 &lt;= ly) {
             lx = x2;
             ly = y2;
@@ -115,8 +132,8 @@ used for the block color.</p>
             g = 0;
             b = 0;
             a = 0;
-            for (var by = 0, by2 = y2; by &lt; blockSize &amp;&amp; by2 &lt; h; ++by, ++by2) {
-              for (var bx = 0, bx2 = x2; bx &lt; blockSize &amp;&amp; bx2 &lt; w;
+            for (var by = 0, by2 = y2; by &lt; size &amp;&amp; by2 &lt; h; ++by, ++by2) {
+              for (var bx = 0, bx2 = x2; bx &lt; size &amp;&amp; bx2 &lt; w;
                   ++bx, ++bx2) {
                 final p2 = frame.getPixel(bx2, by2);
                 r += p2.r;
@@ -125,14 +142,17 @@ used for the block color.</p>
                 a += p2.a;
               }
             }
-            final total = blockSize * blockSize;
+            final total = size * size;
             r &#47;= total;
             g &#47;= total;
             b &#47;= total;
             a &#47;= total;
           }
 
-          p.setColor(r, g, b, a);
+          p..r = mix(p.r, r, mx)
+          ..g = mix(p.g, g, mx)
+          ..b = mix(p.b, b, mx)
+          ..a = mix(p.a, a, mx);
         }
         break;
     }
@@ -327,6 +347,7 @@ used for the block color.</p>
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -364,8 +385,6 @@ used for the block color.</p>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -380,6 +399,7 @@ used for the block color.</p>
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -416,7 +436,6 @@ used for the block color.</p>
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

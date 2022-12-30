@@ -59,21 +59,27 @@
 
 <span class="returntype">void</span>
 <span class="name ">convert</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="convert-param-numChannels">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">numChannels</span>, </span></li>
-<li><span class="parameter" id="convert-param-format"><span class="type-annotation"><a href="../../image/Format.html">Format</a>?</span> <span class="parameter-name">format</span>}</span></li>
+<li><span class="parameter" id="convert-param-format"><span class="type-annotation"><a href="../../image/Format.html">Format</a>?</span> <span class="parameter-name">format</span>, </span></li>
+<li><span class="parameter" id="convert-param-alpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">alpha</span>, </span></li>
+<li><span class="parameter" id="convert-param-withPalette"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withPalette</span> = <span class="default-value">false</span>}</span></li>
 </ol>)
 
       
 
     </section>
     
+<section class="desc markdown">
+  <p>Convert an image by changing its format or number of channels.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void convert({ int? numChannels, Format? format }) {
+  <pre class="language-dart"><code class="language-dart">void convert({ int? numChannels, Format? format, num? alpha,
+  bool withPalette = false }) {
   subCommand = ConvertCmd(subCommand, numChannels: numChannels,
-      format: format);
+      format: format, alpha: alpha, withPalette: withPalette);
 }</code></pre>
 </section>
 
@@ -134,6 +140,7 @@
           <li><a href="../../image/Command/copyCrop.html">copyCrop</a></li>
           <li><a href="../../image/Command/copyCropCircle.html">copyCropCircle</a></li>
           <li><a href="../../image/Command/copyFlip.html">copyFlip</a></li>
+          <li><a href="../../image/Command/copyImageChannels.html">copyImageChannels</a></li>
           <li><a href="../../image/Command/copyRectify.html">copyRectify</a></li>
           <li><a href="../../image/Command/copyResize.html">copyResize</a></li>
           <li><a href="../../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -213,7 +220,6 @@
           <li><a href="../../image/Command/hdrToLdr.html">hdrToLdr</a></li>
           <li><a href="../../image/Command/hexagonPixelate.html">hexagonPixelate</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
-          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
           <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/monochrome.html">monochrome</a></li>

@@ -58,10 +58,12 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">convolution</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="convolution-param-filter"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>&gt;</span></span> <span class="parameter-name">filter</span>, </span></li>
-<li><span class="parameter" id="convolution-param-div">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">div</span> = <span class="default-value">1.0</span>, </span></li>
-<li><span class="parameter" id="convolution-param-offset"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">offset</span> = <span class="default-value">0.0</span>, </span></li>
-<li><span class="parameter" id="convolution-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>}</span></li>
+<span class="name ">convolution</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="convolution-param-filter">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>&gt;</span></span> <span class="parameter-name">filter</span>, </span></li>
+<li><span class="parameter" id="convolution-param-div"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">div</span> = <span class="default-value">1.0</span>, </span></li>
+<li><span class="parameter" id="convolution-param-offset"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">offset</span> = <span class="default-value">0</span>, </span></li>
+<li><span class="parameter" id="convolution-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span></li>
+<li><span class="parameter" id="convolution-param-mask"><span class="type-annotation"><a href="../../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="convolution-param-maskChannel"><span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
       
@@ -73,10 +75,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void convolution(List&lt;num&gt; filter, { num div = 1.0, num offset = 0.0,
-    num amount = 1 }) {
-  subCommand = ConvolutionCmd(subCommand, filter, div: div, offset: offset,
-      amount: amount);
+  <pre class="language-dart"><code class="language-dart">void convolution({ required List&lt;num&gt; filter, num div = 1.0, num offset = 0,
+    num amount = 1, Command? mask,
+    Channel maskChannel = Channel.luminance }) {
+  subCommand = ConvolutionCmd(subCommand, filter: filter, div: div,
+      offset: offset, amount: amount, mask: mask, maskChannel: maskChannel);
 }</code></pre>
 </section>
 
@@ -137,6 +140,7 @@
           <li><a href="../../image/Command/copyCrop.html">copyCrop</a></li>
           <li><a href="../../image/Command/copyCropCircle.html">copyCropCircle</a></li>
           <li><a href="../../image/Command/copyFlip.html">copyFlip</a></li>
+          <li><a href="../../image/Command/copyImageChannels.html">copyImageChannels</a></li>
           <li><a href="../../image/Command/copyRectify.html">copyRectify</a></li>
           <li><a href="../../image/Command/copyResize.html">copyResize</a></li>
           <li><a href="../../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -216,7 +220,6 @@
           <li><a href="../../image/Command/hdrToLdr.html">hdrToLdr</a></li>
           <li><a href="../../image/Command/hexagonPixelate.html">hexagonPixelate</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
-          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
           <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/monochrome.html">monochrome</a></li>

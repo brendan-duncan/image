@@ -56,10 +56,10 @@
 
     <section class="multi-line-signature">
       
-      <span class="name ">Image.fromBytes</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fromBytes-param-width"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span></li>
-<li><span class="parameter" id="fromBytes-param-height"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>, </span></li>
-<li><span class="parameter" id="fromBytes-param-bytes"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/ByteBuffer-class.html">ByteBuffer</a></span> <span class="parameter-name">bytes</span>, </span></li>
-<li><span class="parameter" id="fromBytes-param-format">{<span class="type-annotation"><a href="../../image/Format.html">Format</a></span> <span class="parameter-name">format</span> = <span class="default-value">Format.uint8</span>, </span></li>
+      <span class="name ">Image.fromBytes</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fromBytes-param-width">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span></li>
+<li><span class="parameter" id="fromBytes-param-height"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>, </span></li>
+<li><span class="parameter" id="fromBytes-param-bytes"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/ByteBuffer-class.html">ByteBuffer</a></span> <span class="parameter-name">bytes</span>, </span></li>
+<li><span class="parameter" id="fromBytes-param-format"><span class="type-annotation"><a href="../../image/Format.html">Format</a></span> <span class="parameter-name">format</span> = <span class="default-value">Format.uint8</span>, </span></li>
 <li><span class="parameter" id="fromBytes-param-numChannels"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">numChannels</span> = <span class="default-value">3</span>, </span></li>
 <li><span class="parameter" id="fromBytes-param-rowStride"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">rowStride</span>, </span></li>
 <li><span class="parameter" id="fromBytes-param-withPalette"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withPalette</span> = <span class="default-value">false</span>, </span></li>
@@ -85,23 +85,24 @@ Image object stores colors in Format.rgba format.</p>
 <p>For example, given an Html Canvas, you could create an image:
 var bytes = canvas.getContext('2d').getImageData(0, 0,
 canvas.width, canvas.height).data;
-var image = Image.fromBytes(canvas.width, canvas.height, canvasBytes,
-numChannels: 4);</p>
+var image = Image.fromBytes(width: canvas.width, height: canvas.height,
+bytes: canvasBytes, numChannels: 4);</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image.fromBytes(int width, int height, ByteBuffer bytes,
-    { Format format = Format.uint8, int numChannels = 3,
-      int? rowStride,
-      bool withPalette = false,
-      Format paletteFormat = Format.uint8,
-      Palette? palette, ExifData? exif,
-      IccProfile? iccp, this.textData, this.loopCount = 0,
-      this.frameType = FrameType.sequence, this.backgroundColor = null,
-      this.frameDuration = 0, this.frameIndex = 0 }) {
+  <pre class="language-dart"><code class="language-dart">Image.fromBytes({ required int width, required int height,
+    required ByteBuffer bytes,
+    Format format = Format.uint8, int numChannels = 3,
+    int? rowStride,
+    bool withPalette = false,
+    Format paletteFormat = Format.uint8,
+    Palette? palette, ExifData? exif,
+    IccProfile? iccp, this.textData, this.loopCount = 0,
+    this.frameType = FrameType.sequence, this.backgroundColor = null,
+    this.frameDuration = 0, this.frameIndex = 0 }) {
   frames.add(this);
   _initialize(width, height, format: format, numChannels: numChannels,
       withPalette: withPalette, paletteFormat: paletteFormat,

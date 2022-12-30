@@ -59,8 +59,10 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">normalize</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="normalize-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="normalize-param-minValue"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">minValue</span>, </span></li>
-<li><span class="parameter" id="normalize-param-maxValue"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">maxValue</span></span></li>
+<li><span class="parameter" id="normalize-param-min">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">min</span>, </span></li>
+<li><span class="parameter" id="normalize-param-max"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">max</span>, </span></li>
+<li><span class="parameter" id="normalize-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="normalize-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -69,35 +71,48 @@
     
 <section class="desc markdown">
   <p>Linearly normalize the colors of the image. All color values will be mapped
-to the range <code>minValue</code>, <code>maxValue</code> inclusive.</p>
+to the range <code>min</code>, <code>max</code> inclusive.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image normalize(Image src, num minValue, num maxValue) {
-  final a = minValue &lt; maxValue ? minValue : maxValue;
-  final b = minValue &lt; maxValue ? maxValue : minValue;
+  <pre class="language-dart"><code class="language-dart">Image normalize(Image src, { required num min, required num max,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
+  final num a = min &lt; max ? min : max;
+  final num b = min &lt; max ? max : min;
 
   final mM = minMax(src);
-  final min = mM[0];
-  final max = mM[1];
+  final mn = mM[0];
+  final mx = mM[1];
 
-  if (min == max) {
+  if (mn == mx) {
     return src;
   }
 
-  final fm = min.toDouble();
-  final fM = max.toDouble();
+  final fm = mn.toDouble();
+  final fM = mx.toDouble();
 
-  if (min != a || max != b) {
+  if (mn != a || mx != b) {
     for (var frame in src.frames) {
       for (final p in frame) {
-        p..r = (p.r - fm) &#47; (fM - fm) * (b - a) + a
-        ..g = (p.g - fm) &#47; (fM - fm) * (b - a) + a
-        ..b = (p.b - fm) &#47; (fM - fm) * (b - a) + a
-        ..a = (p.a - fm) &#47; (fM - fm) * (b - a) + a;
+        final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+        if (msk == null) {
+          p..r = (p.r - fm) &#47; (fM - fm) * (b - a) + a
+          ..g = (p.g - fm) &#47; (fM - fm) * (b - a) + a
+          ..b = (p.b - fm) &#47; (fM - fm) * (b - a) + a
+          ..a = (p.a - fm) &#47; (fM - fm) * (b - a) + a;
+        } else {
+          final xr = (p.r - fm) &#47; (fM - fm) * (b - a) + a;
+          final xg = (p.g - fm) &#47; (fM - fm) * (b - a) + a;
+          final xb = (p.b - fm) &#47; (fM - fm) * (b - a) + a;
+          final xa = (p.a - fm) &#47; (fM - fm) * (b - a) + a;
+          p..r = mix(p.r, xr, msk)
+          ..g = mix(p.g, xg, msk)
+          ..b = mix(p.b, xb, msk)
+          ..a = mix(p.a, xa, msk);
+        }
       }
     }
   }
@@ -292,6 +307,7 @@ to the range <code>minValue</code>, <code>maxValue</code> inclusive.</p>
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -329,8 +345,6 @@ to the range <code>minValue</code>, <code>maxValue</code> inclusive.</p>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -345,6 +359,7 @@ to the range <code>minValue</code>, <code>maxValue</code> inclusive.</p>
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -381,7 +396,6 @@ to the range <code>minValue</code>, <code>maxValue</code> inclusive.</p>
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

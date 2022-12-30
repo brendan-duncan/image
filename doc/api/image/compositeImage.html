@@ -69,7 +69,9 @@
 <li><span class="parameter" id="compositeImage-param-srcW"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">srcW</span>, </span></li>
 <li><span class="parameter" id="compositeImage-param-srcH"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">srcH</span>, </span></li>
 <li><span class="parameter" id="compositeImage-param-blend"><span class="type-annotation"><a href="../image/BlendMode.html">BlendMode</a></span> <span class="parameter-name">blend</span> = <span class="default-value">BlendMode.alpha</span>, </span></li>
-<li><span class="parameter" id="compositeImage-param-center"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">center</span> = <span class="default-value">false</span>}</span></li>
+<li><span class="parameter" id="compositeImage-param-center"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">center</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="compositeImage-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="compositeImage-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -95,16 +97,10 @@ but if the regions overlap the results will be unpredictable.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Image compositeImage(Image dst, Image src, {
-    int? dstX,
-    int? dstY,
-    int? dstW,
-    int? dstH,
-    int? srcX,
-    int? srcY,
-    int? srcW,
-    int? srcH,
-    BlendMode blend = BlendMode.alpha,
-    bool center = false }) {
+    int? dstX, int? dstY, int? dstW, int? dstH, int? srcX, int? srcY,
+    int? srcW, int? srcH, BlendMode blend = BlendMode.alpha,
+    bool center = false, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   dstX ??= 0;
   dstY ??= 0;
   srcX ??= 0;
@@ -133,9 +129,11 @@ but if the regions overlap the results will be unpredictable.</p>
       growable: false);
 
   if (blend == BlendMode.direct) {
-    _directComposite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache);
+    _directComposite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache,
+        mask, maskChannel);
   } else {
-    _composite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache, blend);
+    _composite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache, blend,
+        mask, maskChannel);
   }
 
   return dst;
@@ -328,6 +326,7 @@ but if the regions overlap the results will be unpredictable.</p>
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -365,8 +364,6 @@ but if the regions overlap the results will be unpredictable.</p>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -381,6 +378,7 @@ but if the regions overlap the results will be unpredictable.</p>
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -417,7 +415,6 @@ but if the regions overlap the results will be unpredictable.</p>
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

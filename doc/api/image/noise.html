@@ -61,7 +61,9 @@
 <span class="name ">noise</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="noise-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span>, </span></li>
 <li><span class="parameter" id="noise-param-sigma"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">sigma</span>, </span></li>
 <li><span class="parameter" id="noise-param-type">{<span class="type-annotation"><a href="../image/NoiseType.html">NoiseType</a></span> <span class="parameter-name">type</span> = <span class="default-value">NoiseType.gaussian</span>, </span></li>
-<li><span class="parameter" id="noise-param-random"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-math/Random-class.html">Random</a>?</span> <span class="parameter-name">random</span>}</span></li>
+<li><span class="parameter" id="noise-param-random"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-math/Random-class.html">Random</a>?</span> <span class="parameter-name">random</span>, </span></li>
+<li><span class="parameter" id="noise-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="noise-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
@@ -80,7 +82,8 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Image noise(Image image, num sigma,
-    { NoiseType type = NoiseType.gaussian, Random? random }) {
+    { NoiseType type = NoiseType.gaussian, Random? random,
+      Image? mask, Channel maskChannel = Channel.luminance }) {
   random ??= Random();
 
   var nSigma = sigma;
@@ -109,7 +112,16 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
           final g = p.g + nSigma * grand(random);
           final b = p.b + nSigma * grand(random);
           final a = p.a;
-          p.setColor(r, g, b, a);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          if (msk == null) {
+            p.setColor(r, g, b, a);
+          } else {
+            p..r = mix(p.r, r, msk)
+            ..g = mix(p.g, g, msk)
+            ..b = mix(p.b, b, msk)
+            ..a = mix(p.a, a, msk);
+          }
         }
         break;
       case NoiseType.uniform:
@@ -118,7 +130,16 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
           final g = p.g + nSigma * crand(random);
           final b = p.b + nSigma * crand(random);
           final a = p.a;
-          p.setColor(r, g, b, a);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          if (msk == null) {
+            p.setColor(r, g, b, a);
+          } else {
+            p..r = mix(p.r, r, msk)
+            ..g = mix(p.g, g, msk)
+            ..b = mix(p.b, b, msk)
+            ..a = mix(p.a, a, msk);
+          }
         }
         break;
       case NoiseType.saltAndPepper:
@@ -135,7 +156,16 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
             final g = random.nextDouble() &lt; 0.5 ? M : m;
             final b = random.nextDouble() &lt; 0.5 ? M : m;
             final a = p.a;
-            p.setColor(r, g, b, a);
+            final msk = mask?.getPixel(p.x, p.y)
+                .getChannelNormalized(maskChannel);
+            if (msk == null) {
+              p.setColor(r, g, b, a);
+            } else {
+              p..r = mix(p.r, r, msk)
+              ..g = mix(p.g, g, msk)
+              ..b = mix(p.b, b, msk)
+              ..a = mix(p.a, a, msk);
+            }
           }
         }
         break;
@@ -145,7 +175,16 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
           final g = prand(random, p.g.toDouble());
           final b = prand(random, p.b.toDouble());
           final a = p.a;
-          p.setColor(r, g, b, a);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          if (msk == null) {
+            p.setColor(r, g, b, a);
+          } else {
+            p..r = mix(p.r, r, msk)
+            ..g = mix(p.g, g, msk)
+            ..b = mix(p.b, b, msk)
+            ..a = mix(p.a, a, msk);
+          }
         }
         break;
       case NoiseType.rice:
@@ -171,7 +210,16 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
 
           final a = p.a;
 
-          p.setColor(r, g, b, a);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          if (msk == null) {
+            p.setColor(r, g, b, a);
+          } else {
+            p..r = mix(p.r, r, msk)
+            ..g = mix(p.g, g, msk)
+            ..b = mix(p.b, b, msk)
+            ..a = mix(p.a, a, msk);
+          }
         }
         break;
     }
@@ -367,6 +415,7 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -404,8 +453,6 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -420,6 +467,7 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -456,7 +504,6 @@ or <a href="../image/NoiseType.html">NoiseType.rice</a>.</p>
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

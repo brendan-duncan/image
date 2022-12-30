@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the setChannel method from the PixelUint2 class, for the Dart programming language.">
-  <title>setChannel method - PixelUint2 class - image library - Dart API</title>
+  <meta name="description" content="API docs for the getChannel method from the PixelFloat64 class, for the Dart programming language.">
+  <title>getChannel method - PixelFloat64 class - image library - Dart API</title>
 
 
   
@@ -30,10 +30,10 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">image</a></li>
     <li><a href="../../image/image-library.html">image</a></li>
-    <li><a href="../../image/PixelUint2-class.html">PixelUint2</a></li>
-    <li class="self-crumb">setChannel method</li>
+    <li><a href="../../image/PixelFloat64-class.html">PixelFloat64</a></li>
+    <li class="self-crumb">getChannel method</li>
   </ol>
-  <div class="self-name">setChannel</div>
+  <div class="self-name">getChannel</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -50,46 +50,33 @@
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
-<h1><span class="kind-method">setChannel</span> method 
+<h1><span class="kind-method">getChannel</span> method 
     <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
 </h1></div>
 
     <section class="multi-line-signature">
       
 
-<span class="returntype">void</span>
-<span class="name ">setChannel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="setChannel-param-ci"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">ci</span>, </span></li>
-<li><span class="parameter" id="setChannel-param-value"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">value</span></span></li>
+<span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>
+<span class="name ">getChannel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getChannel-param-channel"><span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">channel</span></span></li>
 </ol>)
 
-      
+      <div class="features"><span class="feature">override</span></div>
 
     </section>
     
+<section class="desc markdown">
+  <p>Get a <code>channel</code> from the color. If the channel isn't available,
+0 will be returned.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void setChannel(int ci, num value) {
-  if (ci &gt;= image.numChannels) {
-    return;
-  }
-
-  var i = _index;
-  var bi = 6 - (_bitIndex + (ci &lt;&lt; 1));
-  if (bi &lt; 0) {
-    i++;
-    bi += 8;
-  }
-
-  var v = data[i];
-  final vi = value.toInt().clamp(0, 3);
-  const _mask = [ 0xfc, 0xf3, 0xcf, 0x3f ];
-  final mask = _mask[bi &gt;&gt; 1];
-  v = (v &amp; mask) | (vi &lt;&lt; bi);
-  data[i] = v;
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">num getChannel(Channel channel) =&gt; channel == Channel.luminance ?
+    luminance : channel.index &lt; numChannels ? data[_index + channel.index]
+    : 0;</code></pre>
 </section>
 
 
@@ -105,69 +92,68 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
   <li><a href="../../index.html">image</a></li>
   <li><a href="../../image/image-library.html">image</a></li>
-  <li><a href="../../image/PixelUint2-class.html">PixelUint2</a></li>
-  <li class="self-crumb">setChannel method</li>
+  <li><a href="../../image/PixelFloat64-class.html">PixelFloat64</a></li>
+  <li class="self-crumb">getChannel method</li>
 </ol>
 
 
-    <h5>PixelUint2 class</h5>
+    <h5>PixelFloat64 class</h5>
     <ol>
 
-        <li class="section-title"><a href="../../image/PixelUint2-class.html#constructors">Constructors</a></li>
-          <li><a href="../../image/PixelUint2/PixelUint2.from.html">from</a></li>
-          <li><a href="../../image/PixelUint2/PixelUint2.image.html">image</a></li>
-          <li><a href="../../image/PixelUint2/PixelUint2.imageData.html">imageData</a></li>
+        <li class="section-title"><a href="../../image/PixelFloat64-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/PixelFloat64/PixelFloat64.from.html">from</a></li>
+          <li><a href="../../image/PixelFloat64/PixelFloat64.image.html">image</a></li>
+          <li><a href="../../image/PixelFloat64/PixelFloat64.imageData.html">imageData</a></li>
 
 
         <li class="section-title">
-          <a href="../../image/PixelUint2-class.html#instance-properties">Properties</a>
+          <a href="../../image/PixelFloat64-class.html#instance-properties">Properties</a>
         </li>
-          <li><a href="../../image/PixelUint2/a.html">a</a></li>
-          <li><a href="../../image/PixelUint2/aNormalized.html">aNormalized</a></li>
-          <li><a href="../../image/PixelUint2/b.html">b</a></li>
-          <li><a href="../../image/PixelUint2/bitsPerPixel.html">bitsPerPixel</a></li>
-          <li><a href="../../image/PixelUint2/bNormalized.html">bNormalized</a></li>
-          <li><a href="../../image/PixelUint2/current.html">current</a></li>
-          <li><a href="../../image/PixelUint2/data.html">data</a></li>
+          <li><a href="../../image/PixelFloat64/a.html">a</a></li>
+          <li><a href="../../image/PixelFloat64/aNormalized.html">aNormalized</a></li>
+          <li><a href="../../image/PixelFloat64/b.html">b</a></li>
+          <li><a href="../../image/PixelFloat64/bNormalized.html">bNormalized</a></li>
+          <li><a href="../../image/PixelFloat64/current.html">current</a></li>
+          <li><a href="../../image/PixelFloat64/data.html">data</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/first.html">first</a></li>
-          <li><a href="../../image/PixelUint2/format.html">format</a></li>
-          <li><a href="../../image/PixelUint2/g.html">g</a></li>
-          <li><a href="../../image/PixelUint2/gNormalized.html">gNormalized</a></li>
-          <li><a href="../../image/PixelUint2/hashCode.html">hashCode</a></li>
-          <li><a href="../../image/PixelUint2/hasPalette.html">hasPalette</a></li>
-          <li><a href="../../image/PixelUint2/height.html">height</a></li>
-          <li><a href="../../image/PixelUint2/image.html">image</a></li>
-          <li><a href="../../image/PixelUint2/index.html">index</a></li>
+          <li><a href="../../image/PixelFloat64/format.html">format</a></li>
+          <li><a href="../../image/PixelFloat64/g.html">g</a></li>
+          <li><a href="../../image/PixelFloat64/gNormalized.html">gNormalized</a></li>
+          <li><a href="../../image/PixelFloat64/hashCode.html">hashCode</a></li>
+          <li><a href="../../image/PixelFloat64/hasPalette.html">hasPalette</a></li>
+          <li><a href="../../image/PixelFloat64/height.html">height</a></li>
+          <li><a href="../../image/PixelFloat64/image.html">image</a></li>
+          <li><a href="../../image/PixelFloat64/index.html">index</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/isEmpty.html">isEmpty</a></li>
-          <li><a href="../../image/PixelUint2/isHdrFormat.html">isHdrFormat</a></li>
-          <li><a href="../../image/PixelUint2/isLdrFormat.html">isLdrFormat</a></li>
+          <li><a href="../../image/PixelFloat64/isHdrFormat.html">isHdrFormat</a></li>
+          <li><a href="../../image/PixelFloat64/isLdrFormat.html">isLdrFormat</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/isNotEmpty.html">isNotEmpty</a></li>
-          <li><a href="../../image/PixelUint2/isValid.html">isValid</a></li>
-          <li><a href="../../image/PixelUint2/iterator.html">iterator</a></li>
+          <li><a href="../../image/PixelFloat64/isValid.html">isValid</a></li>
+          <li><a href="../../image/PixelFloat64/iterator.html">iterator</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/last.html">last</a></li>
-          <li><a href="../../image/PixelUint2/length.html">length</a></li>
-          <li><a href="../../image/PixelUint2/luminance.html">luminance</a></li>
-          <li><a href="../../image/PixelUint2/luminanceNormalized.html">luminanceNormalized</a></li>
-          <li><a href="../../image/PixelUint2/maxChannelValue.html">maxChannelValue</a></li>
-          <li><a href="../../image/PixelUint2/maxIndexValue.html">maxIndexValue</a></li>
-          <li><a href="../../image/PixelUint2/numChannels.html">numChannels</a></li>
-          <li><a href="../../image/PixelUint2/palette.html">palette</a></li>
-          <li><a href="../../image/PixelUint2/r.html">r</a></li>
-          <li><a href="../../image/PixelUint2/rNormalized.html">rNormalized</a></li>
+          <li><a href="../../image/PixelFloat64/length.html">length</a></li>
+          <li><a href="../../image/PixelFloat64/luminance.html">luminance</a></li>
+          <li><a href="../../image/PixelFloat64/luminanceNormalized.html">luminanceNormalized</a></li>
+          <li><a href="../../image/PixelFloat64/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/PixelFloat64/maxIndexValue.html">maxIndexValue</a></li>
+          <li><a href="../../image/PixelFloat64/numChannels.html">numChannels</a></li>
+          <li><a href="../../image/PixelFloat64/palette.html">palette</a></li>
+          <li><a href="../../image/PixelFloat64/r.html">r</a></li>
+          <li><a href="../../image/PixelFloat64/rNormalized.html">rNormalized</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/single.html">single</a></li>
-          <li><a href="../../image/PixelUint2/width.html">width</a></li>
-          <li><a href="../../image/PixelUint2/x.html">x</a></li>
-          <li><a href="../../image/PixelUint2/xNormalized.html">xNormalized</a></li>
-          <li><a href="../../image/PixelUint2/y.html">y</a></li>
-          <li><a href="../../image/PixelUint2/yNormalized.html">yNormalized</a></li>
+          <li><a href="../../image/PixelFloat64/width.html">width</a></li>
+          <li><a href="../../image/PixelFloat64/x.html">x</a></li>
+          <li><a href="../../image/PixelFloat64/xNormalized.html">xNormalized</a></li>
+          <li><a href="../../image/PixelFloat64/y.html">y</a></li>
+          <li><a href="../../image/PixelFloat64/yNormalized.html">yNormalized</a></li>
 
-        <li class="section-title"><a href="../../image/PixelUint2-class.html#instance-methods">Methods</a></li>
+        <li class="section-title"><a href="../../image/PixelFloat64-class.html#instance-methods">Methods</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/any.html">any</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/cast.html">cast</a></li>
-          <li><a href="../../image/PixelUint2/clone.html">clone</a></li>
+          <li><a href="../../image/PixelFloat64/clone.html">clone</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/contains.html">contains</a></li>
-          <li><a href="../../image/PixelUint2/convert.html">convert</a></li>
+          <li><a href="../../image/PixelFloat64/convert.html">convert</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/elementAt.html">elementAt</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/every.html">every</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/expand.html">expand</a></li>
@@ -175,18 +161,18 @@
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/fold.html">fold</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/followedBy.html">followedBy</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/forEach.html">forEach</a></li>
-          <li><a href="../../image/PixelUint2/get.html">get</a></li>
+          <li><a href="../../image/PixelFloat64/getChannel.html">getChannel</a></li>
+          <li><a href="../../image/PixelFloat64/getChannelNormalized.html">getChannelNormalized</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/join.html">join</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/lastWhere.html">lastWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/map.html">map</a></li>
-          <li><a href="../../image/PixelUint2/moveNext.html">moveNext</a></li>
+          <li><a href="../../image/PixelFloat64/moveNext.html">moveNext</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
-          <li><a href="../../image/PixelUint2/set.html">set</a></li>
-          <li><a href="../../image/PixelUint2/setChannel.html">setChannel</a></li>
-          <li><a href="../../image/PixelUint2/setColor.html">setColor</a></li>
-          <li><a href="../../image/PixelUint2/setPosition.html">setPosition</a></li>
-          <li><a href="../../image/PixelUint2/setPositionNormalized.html">setPositionNormalized</a></li>
+          <li><a href="../../image/PixelFloat64/set.html">set</a></li>
+          <li><a href="../../image/PixelFloat64/setColor.html">setColor</a></li>
+          <li><a href="../../image/PixelFloat64/setPosition.html">setPosition</a></li>
+          <li><a href="../../image/PixelFloat64/setPositionNormalized.html">setPositionNormalized</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>
@@ -198,10 +184,10 @@
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/where.html">where</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/whereType.html">whereType</a></li>
 
-        <li class="section-title"><a href="../../image/PixelUint2-class.html#operators">Operators</a></li>
-          <li><a href="../../image/PixelUint2/operator_equals.html">operator ==</a></li>
-          <li><a href="../../image/PixelUint2/operator_get.html">operator []</a></li>
-          <li><a href="../../image/PixelUint2/operator_put.html">operator []=</a></li>
+        <li class="section-title"><a href="../../image/PixelFloat64-class.html#operators">Operators</a></li>
+          <li><a href="../../image/PixelFloat64/operator_equals.html">operator ==</a></li>
+          <li><a href="../../image/PixelFloat64/operator_get.html">operator []</a></li>
+          <li><a href="../../image/PixelFloat64/operator_put.html">operator []=</a></li>
 
 
 

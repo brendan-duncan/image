@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the imageMask function from the image library, for the Dart programming language.">
-  <title>imageMask function - image library - Dart API</title>
+  <meta name="description" content="API docs for the encodeNamedImage function from the image library, for the Dart programming language.">
+  <title>encodeNamedImage function - image library - Dart API</title>
 
 
   
@@ -30,9 +30,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">image</a></li>
     <li><a href="../image/image-library.html">image</a></li>
-    <li class="self-crumb">imageMask function</li>
+    <li class="self-crumb">encodeNamedImage function</li>
   </ol>
-  <div class="self-name">imageMask</div>
+  <div class="self-name">encodeNamedImage</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,7 +49,7 @@
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
-<h1><span class="kind-function">imageMask</span> function 
+<h1><span class="kind-function">encodeNamedImage</span> function 
     <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
  
 </h1></div>
@@ -57,11 +57,9 @@
     <section class="multi-line-signature">
         
 
-<span class="returntype"><a href="../image/Image-class.html">Image</a></span>
-<span class="name ">imageMask</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="imageMask-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="imageMask-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">mask</span>, </span></li>
-<li><span class="parameter" id="imageMask-param-maskChannel">{<span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>, </span></li>
-<li><span class="parameter" id="imageMask-param-scaleMask"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">scaleMask</span> = <span class="default-value">false</span>}</span></li>
+<span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a>?</span>
+<span class="name ">encodeNamedImage</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="encodeNamedImage-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span></li>
+<li><span class="parameter" id="encodeNamedImage-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span></span></li>
 </ol>)
 
         
@@ -69,47 +67,22 @@
     </section>
     
 <section class="desc markdown">
-  <p>Use the <code>mask</code> image to set the alpha channel of the <code>src</code> image.
-<code>maskChannel</code> determines which channel of the <code>mask</code> image to use, or
-the luminance (grayscale) of the mask image. If <code>scaleMask</code> is true,
-and <code>mask</code> is a different resolution than <code>src</code>, <code>mask</code> will be scaled
-to the resolution of <code>src</code>.</p>
+  <p>Encode the <code>image</code> to the format determined by the file extension of <code>path</code>.
+If a format wasn't able to be identified, null will be returned.
+Otherwise the encoded format bytes of the image will be returned.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image imageMask(Image src, Image mask,
-    { Channel maskChannel = Channel.luminance, bool scaleMask = false }) {
-  final dx = mask.width &#47; src.width;
-  final dy = mask.height &#47; src.height;
-  final maskPixel = mask.getPixel(0, 0);
-  for (final frame in src.frames) {
-    for (final p in frame) {
-      if (scaleMask) {
-        maskPixel.setPosition((p.x * dx).floor(), (p.y * dy).floor());
-      } else {
-        maskPixel.setPosition(p.x, p.y);
-      }
-
-      if (maskChannel == Channel.luminance) {
-        final lr = maskPixel.r * 0.2125;
-        final lg = maskPixel.g * 0.7154;
-        final lb = maskPixel.b * 0.0721;
-        final l = lr + lg + lb;
-        p.a = l * maskPixel.a;
-      } else {
-        final m = maskPixel[maskChannel.index];
-        if (maskChannel == Channel.alpha) {
-          p.a = m;
-        } else {
-          p.a = m * maskPixel.a;
-        }
-      }
-    }
+  <pre class="language-dart"><code class="language-dart">Uint8List? encodeNamedImage(String path, Image image) {
+  final encoder = findEncoderForNamedImage(path);
+  if (encoder == null) {
+    return null;
   }
-  return src;
+  return encoder.encode(image);
+
 }</code></pre>
 </section>
 
@@ -126,7 +99,7 @@ to the resolution of <code>src</code>.</p>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
   <li><a href="../index.html">image</a></li>
   <li><a href="../image/image-library.html">image</a></li>
-  <li class="self-crumb">imageMask function</li>
+  <li class="self-crumb">encodeNamedImage function</li>
 </ol>
 
 
@@ -299,6 +272,7 @@ to the resolution of <code>src</code>.</p>
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -336,8 +310,6 @@ to the resolution of <code>src</code>.</p>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -352,6 +324,7 @@ to the resolution of <code>src</code>.</p>
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -388,7 +361,6 @@ to the resolution of <code>src</code>.</p>
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

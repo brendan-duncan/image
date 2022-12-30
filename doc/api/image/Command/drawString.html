@@ -58,11 +58,15 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">drawString</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="drawString-param-font"><span class="type-annotation"><a href="../../image/BitmapFont-class.html">BitmapFont</a></span> <span class="parameter-name">font</span>, </span></li>
-<li><span class="parameter" id="drawString-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span></li>
-<li><span class="parameter" id="drawString-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span></li>
-<li><span class="parameter" id="drawString-param-char"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">char</span>, </span></li>
-<li><span class="parameter" id="drawString-param-color">{<span class="type-annotation"><a href="../../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>}</span></li>
+<span class="name ">drawString</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="drawString-param-string"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">string</span>, </span></li>
+<li><span class="parameter" id="drawString-param-font">{<span>required</span> <span class="type-annotation"><a href="../../image/BitmapFont-class.html">BitmapFont</a></span> <span class="parameter-name">font</span>, </span></li>
+<li><span class="parameter" id="drawString-param-x"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span></li>
+<li><span class="parameter" id="drawString-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span></li>
+<li><span class="parameter" id="drawString-param-color"><span class="type-annotation"><a href="../../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>, </span></li>
+<li><span class="parameter" id="drawString-param-wrap"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">wrap</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="drawString-param-rightJustify"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">rightJustify</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="drawString-param-mask"><span class="type-annotation"><a href="../../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="drawString-param-maskChannel"><span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
       
@@ -74,10 +78,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void drawString(BitmapFont font, int x, int y,
-    String char, { Color? color }) {
-  subCommand = DrawStringCmd(subCommand, font, x, y, char,
-      color: color);
+  <pre class="language-dart"><code class="language-dart">void drawString(String string, { required BitmapFont font, required int x,
+    required int y, Color? color, bool wrap = false,
+    bool rightJustify = false, Command? mask,
+    Channel maskChannel = Channel.luminance }) {
+  subCommand = DrawStringCmd(subCommand, string, font: font, x: x, y: y,
+      color: color, wrap: wrap, rightJustify: rightJustify, mask: mask,
+      maskChannel: maskChannel);
 }</code></pre>
 </section>
 
@@ -138,6 +145,7 @@
           <li><a href="../../image/Command/copyCrop.html">copyCrop</a></li>
           <li><a href="../../image/Command/copyCropCircle.html">copyCropCircle</a></li>
           <li><a href="../../image/Command/copyFlip.html">copyFlip</a></li>
+          <li><a href="../../image/Command/copyImageChannels.html">copyImageChannels</a></li>
           <li><a href="../../image/Command/copyRectify.html">copyRectify</a></li>
           <li><a href="../../image/Command/copyResize.html">copyResize</a></li>
           <li><a href="../../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -217,7 +225,6 @@
           <li><a href="../../image/Command/hdrToLdr.html">hdrToLdr</a></li>
           <li><a href="../../image/Command/hexagonPixelate.html">hexagonPixelate</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
-          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
           <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/monochrome.html">monochrome</a></li>

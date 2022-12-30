@@ -63,20 +63,26 @@
 <li><span class="parameter" id="colorHalftone-param-centerX"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span></li>
 <li><span class="parameter" id="colorHalftone-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span></li>
 <li><span class="parameter" id="colorHalftone-param-angle"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span> = <span class="default-value">180</span>, </span></li>
-<li><span class="parameter" id="colorHalftone-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">size</span> = <span class="default-value">5</span>}</span></li>
+<li><span class="parameter" id="colorHalftone-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">size</span> = <span class="default-value">5</span>, </span></li>
+<li><span class="parameter" id="colorHalftone-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="colorHalftone-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
         
 
     </section>
     
+<section class="desc markdown">
+  <p>Apply color halftone filter to the image.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Image colorHalftone(Image src, { num amount = 1, int? centerX, int? centerY,
-    num angle = 180, num size = 5 }) {
+    num angle = 180, num size = 5,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   angle = angle * 0.0174533;
 
   num _pattern(int x, int y, int cx, int cy, num angle) {
@@ -118,10 +124,13 @@
       final g = (1 - cmyM - cmyK) * p.maxChannelValue;
       final b = (1 - cmyY - cmyK) * p.maxChannelValue;
 
-      if (amount != 1) {
-        p..r = mix(p.r, r, amount)
-        ..g = mix(p.g, g, amount)
-        ..b = mix(p.b, b, amount);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      if (mx != 1) {
+        p..r = mix(p.r, r, mx)
+        ..g = mix(p.g, g, mx)
+        ..b = mix(p.b, b, mx);
       } else {
         p..r = r
         ..g = g
@@ -319,6 +328,7 @@
         <li><a href="../image/copyCrop.html">copyCrop</a></li>
         <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
         <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
         <li><a href="../image/copyRectify.html">copyRectify</a></li>
         <li><a href="../image/copyResize.html">copyResize</a></li>
         <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -356,8 +366,6 @@
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
-        <li><a href="../image/drawStringCentered.html">drawStringCentered</a></li>
-        <li><a href="../image/drawStringWrap.html">drawStringWrap</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
         <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
         <li><a href="../image/emboss.html">emboss</a></li>
@@ -372,6 +380,7 @@
         <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
         <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
         <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
         <li><a href="../image/encodePng.html">encodePng</a></li>
         <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
         <li><a href="../image/encodePvr.html">encodePvr</a></li>
@@ -408,7 +417,6 @@
         <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
         <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
         <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
-        <li><a href="../image/imageMask.html">imageMask</a></li>
         <li><a href="../image/invert.html">invert</a></li>
         <li><a href="../image/labToRgb.html">labToRgb</a></li>
         <li><a href="../image/labToXyz.html">labToXyz</a></li>

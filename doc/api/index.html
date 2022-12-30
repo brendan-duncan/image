@@ -52,14 +52,13 @@
   <h1 id="dart-image-library">Dart Image Library</h1>
 <p><a href="https://github.com/brendan-duncan/image/actions/workflows/build.yaml"><img src="https://github.com/brendan-duncan/image/actions/workflows/build.yaml/badge.svg?branch=4.0" alt="Dart CI"></a>
 <a href="https://pub.dev/packages/image"><img src="https://img.shields.io/pub/v/image.svg" alt="pub package"></a></p>
-<h2 id="note">NOTE</h2>
-<p>This is a work in progress major update for the Image library.</p>
 <h2 id="overview">Overview</h2>
 <p>The Dart Image Library provides the ability to load, save, and <a href="doc/filters.md">manipulate</a> images
 in a variety of <a href="doc/formats.md">image file formats</a>.</p>
 <p>The library can be used with both dart:io and dart:html, for command-line, Flutter, and
 web applications.</p>
-<h3 id="supported-image-formats">Supported Image Formats</h3>
+<p>NOTE: 4.0 is a major revision from the previous verion of the library.</p>
+<h3 id="supported-image-formatsdocformatsmd"><a href="doc/formats.md">Supported Image Formats</a></h3>
 <p><strong>Read/Write</strong></p>
 <ul>
 <li>JPG</li>
@@ -97,7 +96,7 @@ void main() async {
 }
 </code></pre>
 <p>To asynchronously load an image file, resize it, and save it as a thumbnail:</p>
-<pre class="language-dart"><code class="language-dart">import 'package:image/image_io.dart' as img;
+<pre class="language-dart"><code class="language-dart">import 'package:image/image.dart' as img;
 
 void main(List&lt;String&gt; args) async {
   final path = args.isNotEmpty ? args[0] : 'test.png';

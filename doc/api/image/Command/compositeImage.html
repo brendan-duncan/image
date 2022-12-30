@@ -68,7 +68,9 @@
 <li><span class="parameter" id="compositeImage-param-srcW"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">srcW</span>, </span></li>
 <li><span class="parameter" id="compositeImage-param-srcH"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">srcH</span>, </span></li>
 <li><span class="parameter" id="compositeImage-param-blend"><span class="type-annotation"><a href="../../image/BlendMode.html">BlendMode</a></span> <span class="parameter-name">blend</span> = <span class="default-value">BlendMode.alpha</span>, </span></li>
-<li><span class="parameter" id="compositeImage-param-center"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">center</span> = <span class="default-value">false</span>}</span></li>
+<li><span class="parameter" id="compositeImage-param-center"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">center</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="compositeImage-param-mask"><span class="type-annotation"><a href="../../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span></li>
+<li><span class="parameter" id="compositeImage-param-maskChannel"><span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span></li>
 </ol>)
 
       
@@ -82,10 +84,11 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void compositeImage(Command? src, { int? dstX, int? dstY, int? dstW,
     int? dstH, int? srcX, int? srcY, int? srcW, int? srcH,
-    BlendMode blend = BlendMode.alpha, bool center = false }) {
+    BlendMode blend = BlendMode.alpha, bool center = false, Command? mask,
+    Channel maskChannel = Channel.luminance }) {
   subCommand = CompositeImageCmd(subCommand, src, dstX: dstX, dstY: dstY,
       dstW: dstW, dstH: dstH, srcX: srcX, srcY: srcY, srcW: srcW, srcH: srcH,
-      blend: blend, center: center);
+      blend: blend, center: center, mask: mask, maskChannel: maskChannel);
 }</code></pre>
 </section>
 
@@ -146,6 +149,7 @@
           <li><a href="../../image/Command/copyCrop.html">copyCrop</a></li>
           <li><a href="../../image/Command/copyCropCircle.html">copyCropCircle</a></li>
           <li><a href="../../image/Command/copyFlip.html">copyFlip</a></li>
+          <li><a href="../../image/Command/copyImageChannels.html">copyImageChannels</a></li>
           <li><a href="../../image/Command/copyRectify.html">copyRectify</a></li>
           <li><a href="../../image/Command/copyResize.html">copyResize</a></li>
           <li><a href="../../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
@@ -225,7 +229,6 @@
           <li><a href="../../image/Command/hdrToLdr.html">hdrToLdr</a></li>
           <li><a href="../../image/Command/hexagonPixelate.html">hexagonPixelate</a></li>
           <li><a href="../../image/Command/image.html">image</a></li>
-          <li><a href="../../image/Command/imageMask.html">imageMask</a></li>
           <li><a href="../../image/Command/invert.html">invert</a></li>
           <li><a href="../../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
           <li><a href="../../image/Command/monochrome.html">monochrome</a></li>
