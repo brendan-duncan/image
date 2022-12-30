@@ -21,22 +21,6 @@ enum IfdValueType {
   double
 }
 
-const ifdValueTypeString = [
-  'none',
-  'byte',
-  'ascii',
-  'short',
-  'long',
-  'rational',
-  'sByte',
-  'undefined',
-  'sShort',
-  'sLong',
-  'sRational',
-  'single',
-  'double'
-];
-
 const ifdValueTypeSize = [
   0,
   1,
@@ -61,7 +45,7 @@ abstract class IfdValue {
 
   int get dataSize => ifdValueTypeSize[type.index] * length;
 
-  String get typeString => ifdValueTypeString[type.index];
+  String get typeString => type.name;
 
   bool toBool([int index = 0]) => false;
   int toInt([int index = 0]) => 0;

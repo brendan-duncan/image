@@ -7,6 +7,7 @@ import 'channel_iterator.dart';
 import 'color.dart';
 import 'format.dart';
 
+/// A 64-bit floating point color.
 class ColorFloat64 extends Iterable<num> implements Color {
   final Float64List data;
 

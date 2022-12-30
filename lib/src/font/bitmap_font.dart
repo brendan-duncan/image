@@ -15,28 +15,9 @@ BitmapFont readFontZip(List<int> bytes) => BitmapFont.fromZip(bytes);
 BitmapFont readFont(String font, Image map) => BitmapFont.fromFnt(font, map);
 
 /// A bitmap font that can be used with drawString and drawChar functions.
-/// If you want use own fonts following with this steps:
-///     1. Get your .ttf file - important is to select file with specific style
-///     which you want
-///         for example when you download .ttf file from google fonts: select
-///         file from /static folder
-///         example name: Roboto-Black.ttf
-///     2. Convert ttf file to fnt zip with page: https://ttf2fnt.com/
-///     3. Create dart file with code:
-///       void main() {
-///         String fileName = 'YourFontName-Style.zip';
-///         // your file has to be in the same folder as this program
-///         File file = File('$fileName');
-///         List<int> bytes = file.readAsBytesSync();
-///         print(bytes);
-///       }
-///     4. Change fileName in code above to your file name
-///     5. Run this program
-///     6. Copy results
-///     7. Create dart file in your project with code:
-///       final BitmapFont fontNameSizeStyle =
-///           BitmapFont.fromZip(_FONTNAME_SIZE_STYLE);
-///       const List<int> _FONTNAME_SIZE_STYLE = <PASTE_HERE>
+///
+/// See https://github.com/brendan-duncan/image/blob/main/doc/fonts.md
+/// for more information.
 class BitmapFont {
   String face = '';
   int size = 0;

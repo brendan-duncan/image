@@ -8,6 +8,7 @@ import 'channel_iterator.dart';
 import 'color.dart';
 import 'format.dart';
 
+/// A 16-bit floating point color.
 class ColorFloat16 extends Iterable<num> implements Color {
   final Uint16List data;
 

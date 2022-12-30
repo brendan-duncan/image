@@ -1,3 +1,4 @@
+/// The format of a color or image.
 enum Format {
   uint1,
   uint2,

@@ -7,7 +7,7 @@ import 'channel_iterator.dart';
 import 'color.dart';
 import 'format.dart';
 
-/// A 4-bit color value.
+/// A 4-bit unsigned int color with channel values in the range \[0, 15].
 class ColorUint4 extends Iterable<num> implements Color {
   final int length;
   Uint8List data;

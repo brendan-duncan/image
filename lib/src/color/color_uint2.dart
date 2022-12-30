@@ -5,7 +5,7 @@ import 'channel_iterator.dart';
 import 'color.dart';
 import 'format.dart';
 
-/// A 2-bit color value.
+/// A 2-bit unsigned int color with channel values in the range \[0, 3].
 class ColorUint2 extends Iterable<num> implements Color {
   final int length;
   late int data;

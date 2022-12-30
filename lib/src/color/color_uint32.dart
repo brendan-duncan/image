@@ -7,6 +7,7 @@ import 'channel_iterator.dart';
 import 'color.dart';
 import 'format.dart';
 
+/// A 32-bit unsigned int color.
 class ColorUint32 extends Iterable<num> implements Color {
   final Uint32List data;
 

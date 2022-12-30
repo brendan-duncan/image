@@ -7,6 +7,9 @@ enum QuantizerType {
   neural
 }
 
+/// Abstract class for color quantizers, which reduce the total number of colors
+/// used by an image to a given maximum, used to convert images to palette
+/// images.
 abstract class Quantizer {
   Palette get palette;
 
