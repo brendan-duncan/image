@@ -27,11 +27,13 @@ import 'draw/draw_char_cmd.dart';
 import 'draw/draw_circle_cmd.dart';
 import 'draw/draw_line_cmd.dart';
 import 'draw/draw_pixel_cmd.dart';
+import 'draw/draw_polygon_cmd.dart';
 import 'draw/draw_rect_cmd.dart';
 import 'draw/draw_string_cmd.dart';
 import 'draw/fill_circle_cmd.dart';
 import 'draw/fill_cmd.dart';
 import 'draw/fill_flood_cmd.dart';
+import 'draw/fill_polygon_cmd.dart';
 import 'draw/fill_rect_cmd.dart';
 import 'executor.dart';
 import 'filter/adjust_color_cmd.dart';
@@ -396,6 +398,12 @@ class Command {
         maskChannel: maskChannel);
   }
 
+  void drawPolygon({ required List<Point> vertices, required Color color,
+      Command? mask, Channel maskChannel = Channel.luminance }) {
+    subCommand = DrawPolygonCmd(subCommand, vertices: vertices,
+        color: color, mask: mask, maskChannel: maskChannel);
+  }
+
   void drawRect({ required int x1, required int y1, required int x2,
       required int y2, required Color color, num thickness = 1,
       Command? mask, Channel maskChannel = Channel.luminance }) {
@@ -432,6 +440,12 @@ class Command {
     subCommand = FillFloodCmd(subCommand, x: x, y: y, color: color,
         threshold: threshold, compareAlpha: compareAlpha, mask: mask,
         maskChannel: maskChannel);
+  }
+
+  void fillPolygon({ required List<Point> vertices, required Color color,
+    Command? mask, Channel maskChannel = Channel.luminance }) {
+    subCommand = FillPolygonCmd(subCommand, vertices: vertices,
+        color: color, mask: mask, maskChannel: maskChannel);
   }
 
   void fillRect({ required int x1, required int y1, required int x2,

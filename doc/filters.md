@@ -514,6 +514,15 @@ Image drawPixel(Image image, int x, int y, Color c, { Color? filter,
 
 ![drawPixel](images/draw/drawPixel.png)
 
+### [drawPolygon](https://brendan-duncan.github.io/image/doc/api/image/drawPolygon.html)
+
+```dart
+Image drawPolygon(Image src, { required List<Point> vertices,
+    required Color color, Image? mask, Channel maskChannel = Channel.luminance })
+```
+
+![drawPolygon](images/draw/drawPolygon.png)
+
 ### [drawRect](https://brendan-duncan.github.io/image/doc/api/image/drawRect.html)
 
 ```dart
@@ -562,6 +571,15 @@ Image fillFlood(Image src, { required int x, required int y,
 ```
 
 ![fillFlood](images/draw/fillFlood.png)
+
+### [fillPolygon](https://brendan-duncan.github.io/image/doc/api/image/fillPolygon.html)
+
+```dart
+Image drawPolygon(Image src, { required List<Point> vertices,
+    required Color color, Image? mask, Channel maskChannel = Channel.luminance })
+```
+
+![fillPolygon](images/draw/fillPolygon.png)
 
 ### [fillRect](https://brendan-duncan.github.io/image/doc/api/image/fillRect.html)
 
