@@ -114,8 +114,7 @@ Image? decode(List&lt;int&gt; bytes, { int? frame }) {
       }
     }
 
-    compositeImage(lastImage, image, dstX: frame.x, dstY: frame.y,
-        blend: BlendMode.direct);
+    compositeImage(lastImage, image, dstX: frame.x, dstY: frame.y);
 
     firstImage.addFrame(lastImage);
   }

@@ -59,8 +59,8 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">copyRotate</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyRotate-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="copyRotate-param-angle"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span>, </span></li>
-<li><span class="parameter" id="copyRotate-param-interpolation">{<span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
+<li><span class="parameter" id="copyRotate-param-angle">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span>, </span></li>
+<li><span class="parameter" id="copyRotate-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
 </ol>)
 
         
@@ -75,8 +75,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image copyRotate(Image src, num angle,
-  { Interpolation interpolation = Interpolation.nearest }) {
+  <pre class="language-dart"><code class="language-dart">Image copyRotate(Image src, { required num angle,
+  Interpolation interpolation = Interpolation.nearest }) {
 final num nAngle = angle % 360.0;
 
 &#47;&#47; Optimized version for orthogonal angles.
@@ -108,20 +108,26 @@ final h2 = 0.5 * src.height;
 final dw2 = 0.5 * (ux + vx);
 final dh2 = 0.5 * (uy + vy);
 
-final dst = Image(width: (ux + vx).toInt(), height: (uy + vy).toInt(),
-    format: src.format, numChannels: src.numChannels, palette: src.palette,
-    exif: src.exif, iccp: src.iccProfile);
+Image? firstFrame;
+final numFrames = src.numFrames;
+for (var i = 0; i &lt; numFrames; ++i) {
+  final frame = src.frames[i];
+  final dst = firstFrame?.addFrame() ??
+      Image.fromResized(src, width: (ux + vx).toInt(),
+          height: (uy + vy).toInt(), noAnimation: true);
+  firstFrame ??= dst;
 
-for (final p in dst) {
-  final x = p.x;
-  final y = p.y;
-  final x2 = w2 + (x - dw2) * ca + (y - dh2) * sa;
-  final y2 = h2 - (x - dw2) * sa + (y - dh2) * ca;
-  final c = src.getPixelInterpolate(x2, y2, interpolation: interpolation);
-  dst.setPixel(x, y, c);
+  for (final p in dst) {
+    final x = p.x;
+    final y = p.y;
+    final x2 = w2 + (x - dw2) * ca + (y - dh2) * sa;
+    final y2 = h2 - (x - dw2) * sa + (y - dh2) * ca;
+    final c = frame.getPixelInterpolate(x2, y2, interpolation: interpolation);
+    dst.setPixel(x, y, c);
+  }
 }
 
-return dst;
+return firstFrame!;
 }</code></pre>
 </section>
 
@@ -281,7 +287,6 @@ return dst;
         <li><a href="../image/formatSize-constant.html">formatSize</a></li>
         <li><a href="../image/formatToFormatType-constant.html">formatToFormatType</a></li>
         <li><a href="../image/ifdValueTypeSize-constant.html">ifdValueTypeSize</a></li>
-        <li><a href="../image/ifdValueTypeString-constant.html">ifdValueTypeString</a></li>
 
       <li class="section-title"><a href="../image/image-library.html#properties">Properties</a></li>
         <li><a href="../image/arial14.html">arial14</a></li>
@@ -329,6 +334,7 @@ return dst;
         <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
         <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
         <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
+        <li><a href="../image/decodeNamedImage.html">decodeNamedImage</a></li>
         <li><a href="../image/decodePng.html">decodePng</a></li>
         <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
         <li><a href="../image/decodePsd.html">decodePsd</a></li>

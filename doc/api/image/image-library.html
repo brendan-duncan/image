@@ -71,28 +71,6 @@ manipulate images in a variety of image file formats.</p>
 </dt>
 <dd>
   A bitmap font that can be used with drawString and drawChar functions.
-If you want use own fonts following with this steps:
-1. Get your .ttf file - important is to select file with specific style
-which you want
-for example when you download .ttf file from google fonts: select
-file from /static folder
-example name: Roboto-Black.ttf
-2. Convert ttf file to fnt zip with page: <a href="https://ttf2fnt.com/">https://ttf2fnt.com/</a>
-    3. Create dart file with code:
-      void main() {
-        String fileName = 'YourFontName-Style.zip';
-        // your file has to be in the same folder as this program
-        File file = File('$fileName');
-        List<int> bytes = file.readAsBytesSync();
-        print(bytes);
-      }
-    4. Change fileName in code above to your file name
-    5. Run this program
-    6. Copy results
-    7. Create dart file in your project with code:
-      final BitmapFont fontNameSizeStyle =
-          BitmapFont.fromZip(_FONTNAME_SIZE_STYLE);
-      const List<int> _FONTNAME_SIZE_STYLE = &lt;PASTE_HERE&gt;</int></int>
 </dd>
 
         <dt id="BitmapFontCharacter">
@@ -124,7 +102,7 @@ example name: Roboto-Black.ttf
 
 </dt>
 <dd>
-  
+  An iterator over the channels of a <a href="../image/Color-class.html">Color</a>.
 </dd>
 
         <dt id="Color">
@@ -141,7 +119,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  
+  A 16-bit floating point color.
 </dd>
 
         <dt id="ColorFloat32">
@@ -149,7 +127,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  
+  A 32-bit floating point color.
 </dd>
 
         <dt id="ColorFloat64">
@@ -157,7 +135,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  
+  A 64-bit floating point color.
 </dd>
 
         <dt id="ColorInt16">
@@ -165,7 +143,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  
+  A 16-bit integer color.
 </dd>
 
         <dt id="ColorInt32">
@@ -173,7 +151,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  
+  A 32-bit integer color.
 </dd>
 
         <dt id="ColorInt8">
@@ -181,7 +159,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  
+  A 8-bit integer color.
 </dd>
 
         <dt id="ColorRgb8">
@@ -205,7 +183,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  A 1-bit color with channel values in the range [0, 1].
+  A 1-bit unsigned int color with channel values in the range [0, 1].
 </dd>
 
         <dt id="ColorUint16">
@@ -213,7 +191,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  
+  A 16-bit unsigned int color with channel values in the range [0, 65535].
 </dd>
 
         <dt id="ColorUint2">
@@ -221,7 +199,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  A 2-bit color value.
+  A 2-bit unsigned int color with channel values in the range [0, 3].
 </dd>
 
         <dt id="ColorUint32">
@@ -229,7 +207,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  
+  A 32-bit unsigned int color.
 </dd>
 
         <dt id="ColorUint4">
@@ -237,7 +215,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  A 4-bit color value.
+  A 4-bit unsigned int color with channel values in the range [0, 15].
 </dd>
 
         <dt id="ColorUint8">
@@ -245,7 +223,7 @@ and Pixel classes. Colors are iterable, iterating over its channels.
 
 </dt>
 <dd>
-  
+  An 8-bit unsigned int color with channel values in the range [0, 255].
 </dd>
 
         <dt id="Command">
@@ -1114,7 +1092,7 @@ lossy+alpha, and animated WebP images.
 
 </dt>
 <dd>
-  
+  Features gathered from the bitstream
 </dd>
 
       </dl>
@@ -1198,21 +1176,6 @@ lossy+alpha, and animated WebP images.
 
     <div>
       <span class="signature"><code>[0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8]</code></span>
-    </div>
-</dd>
-
-        <dt id="ifdValueTypeString" class="constant">
-    <span class="name "><a href="../image/ifdValueTypeString-constant.html">ifdValueTypeString</a></span>
-  <span class="signature">&#8594; const <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span>&gt;</span></span>
-  
-
-</dt>
-<dd>
-  
-  
-
-    <div>
-      <span class="signature"><code>[&#39;none&#39;, &#39;byte&#39;, &#39;ascii&#39;, &#39;short&#39;, &#39;long&#39;, &#39;rational&#39;, &#39;sByte&#39;, &#39;undefined&#39;, &#39;sShort&#39;, &#39;sLong&#39;, &#39;sRational&#39;, &#3…</code></span>
     </div>
 </dd>
 
@@ -1516,7 +1479,7 @@ list of 9 numbers.
 </dd>
 
         <dt id="copyCrop" class="callable">
-  <span class="name"><a href="../image/copyCrop.html">copyCrop</a></span><span class="signature">(<wbr><span class="parameter" id="copyCrop-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="copyCrop-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="copyCrop-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="copyCrop-param-w"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">w</span>, </span><span class="parameter" id="copyCrop-param-h"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">h</span></span>)
+  <span class="name"><a href="../image/copyCrop.html">copyCrop</a></span><span class="signature">(<wbr><span class="parameter" id="copyCrop-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="copyCrop-param-x">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="copyCrop-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="copyCrop-param-width"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span><span class="parameter" id="copyCrop-param-height"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
   </span>
   
@@ -1546,7 +1509,7 @@ provided, the vertical mid-point of the image will be used.
 </dd>
 
         <dt id="copyFlip" class="callable">
-  <span class="name"><a href="../image/copyFlip.html">copyFlip</a></span><span class="signature">(<wbr><span class="parameter" id="copyFlip-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="copyFlip-param-direction"><span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span></span>)
+  <span class="name"><a href="../image/copyFlip.html">copyFlip</a></span><span class="signature">(<wbr><span class="parameter" id="copyFlip-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="copyFlip-param-direction">{<span>required</span> <span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
   </span>
   
@@ -1604,7 +1567,7 @@ of <code>src</code> and <code>height</code>.
 </dd>
 
         <dt id="copyResizeCropSquare" class="callable">
-  <span class="name"><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></span><span class="signature">(<wbr><span class="parameter" id="copyResizeCropSquare-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="copyResizeCropSquare-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span><span class="parameter" id="copyResizeCropSquare-param-interpolation">{<span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
+  <span class="name"><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></span><span class="signature">(<wbr><span class="parameter" id="copyResizeCropSquare-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="copyResizeCropSquare-param-size">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span><span class="parameter" id="copyResizeCropSquare-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
   </span>
   
@@ -1617,7 +1580,7 @@ of <code>src</code> and <code>height</code>.
 </dd>
 
         <dt id="copyRotate" class="callable">
-  <span class="name"><a href="../image/copyRotate.html">copyRotate</a></span><span class="signature">(<wbr><span class="parameter" id="copyRotate-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="copyRotate-param-angle"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span>, </span><span class="parameter" id="copyRotate-param-interpolation">{<span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
+  <span class="name"><a href="../image/copyRotate.html">copyRotate</a></span><span class="signature">(<wbr><span class="parameter" id="copyRotate-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="copyRotate-param-angle">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span>, </span><span class="parameter" id="copyRotate-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
   </span>
   
@@ -1805,6 +1768,20 @@ it is much slower than using an explicit decoder.
 <dd>
   Decode a JPG formatted image from a file. If the platform does not support
 dart:io, null will be returned.
+  
+
+</dd>
+
+        <dt id="decodeNamedImage" class="callable">
+  <span class="name"><a href="../image/decodeNamedImage.html">decodeNamedImage</a></span><span class="signature">(<wbr><span class="parameter" id="decodeNamedImage-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="decodeNamedImage-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span>, </span><span class="parameter" id="decodeNamedImage-param-frame">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">frame</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Decodes the given image file bytes, using the filename extension to
+determine the decoder.
   
 
 </dd>
@@ -2594,7 +2571,7 @@ to the copyCrop function to crop the image.
 </dd>
 
         <dt id="flip" class="callable">
-  <span class="name"><a href="../image/flip.html">flip</a></span><span class="signature">(<wbr><span class="parameter" id="flip-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="flip-param-direction"><span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span></span>)
+  <span class="name"><a href="../image/flip.html">flip</a></span><span class="signature">(<wbr><span class="parameter" id="flip-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="flip-param-direction">{<span>required</span> <span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
   </span>
   
@@ -3335,7 +3312,7 @@ normalized percentage of the image size [0, 1].
 
 </dt>
 <dd>
-  
+  A channel of a color
 </dd>
 
         <dt id="DitherKernel">
@@ -3359,7 +3336,7 @@ normalized percentage of the image size [0, 1].
 
 </dt>
 <dd>
-  
+  The format of a color or image.
 </dd>
 
         <dt id="FormatType">
@@ -3705,7 +3682,6 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/formatSize-constant.html">formatSize</a></li>
         <li><a href="../image/formatToFormatType-constant.html">formatToFormatType</a></li>
         <li><a href="../image/ifdValueTypeSize-constant.html">ifdValueTypeSize</a></li>
-        <li><a href="../image/ifdValueTypeString-constant.html">ifdValueTypeString</a></li>
 
       <li class="section-title"><a href="../image/image-library.html#properties">Properties</a></li>
         <li><a href="../image/arial14.html">arial14</a></li>
@@ -3753,6 +3729,7 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
         <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
         <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
+        <li><a href="../image/decodeNamedImage.html">decodeNamedImage</a></li>
         <li><a href="../image/decodePng.html">decodePng</a></li>
         <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
         <li><a href="../image/decodePsd.html">decodePsd</a></li>

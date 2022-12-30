@@ -58,7 +58,7 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">copyFlip</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyFlip-param-direction"><span class="type-annotation"><a href="../../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span></span></li>
+<span class="name ">copyFlip</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyFlip-param-direction">{<span>required</span> <span class="type-annotation"><a href="../../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span>}</span></li>
 </ol>)
 
       
@@ -70,8 +70,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void copyFlip(FlipDirection direction) {
-  subCommand = CopyFlipCmd(subCommand, direction);
+  <pre class="language-dart"><code class="language-dart">void copyFlip({ required FlipDirection direction }) {
+  subCommand = CopyFlipCmd(subCommand, direction: direction);
 }</code></pre>
 </section>
 
@@ -204,6 +204,7 @@
           <li><a href="../../image/Command/fillRect.html">fillRect</a></li>
           <li><a href="../../image/Command/filter.html">filter</a></li>
           <li><a href="../../image/Command/flip.html">flip</a></li>
+          <li><a href="../../image/Command/forEachFrame.html">forEachFrame</a></li>
           <li><a href="../../image/Command/gamma.html">gamma</a></li>
           <li><a href="../../image/Command/gaussianBlur.html">gaussianBlur</a></li>
           <li><a href="../../image/Command/getBytes.html">getBytes</a></li>

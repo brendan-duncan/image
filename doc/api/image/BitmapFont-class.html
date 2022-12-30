@@ -56,29 +56,9 @@
 
     
 <section class="desc markdown">
-  <p>A bitmap font that can be used with drawString and drawChar functions.
-If you want use own fonts following with this steps:
-1. Get your .ttf file - important is to select file with specific style
-which you want
-for example when you download .ttf file from google fonts: select
-file from /static folder
-example name: Roboto-Black.ttf
-2. Convert ttf file to fnt zip with page: <a href="https://ttf2fnt.com/">https://ttf2fnt.com/</a>
-    3. Create dart file with code:
-      void main() {
-        String fileName = 'YourFontName-Style.zip';
-        // your file has to be in the same folder as this program
-        File file = File('$fileName');
-        List<int> bytes = file.readAsBytesSync();
-        print(bytes);
-      }
-    4. Change fileName in code above to your file name
-    5. Run this program
-    6. Copy results
-    7. Create dart file in your project with code:
-      final BitmapFont fontNameSizeStyle =
-          BitmapFont.fromZip(_FONTNAME_SIZE_STYLE);
-      const List<int> _FONTNAME_SIZE_STYLE = &lt;PASTE_HERE&gt;</int></int></p>
+  <p>A bitmap font that can be used with drawString and drawChar functions.</p>
+<p>See <a href="https://github.com/brendan-duncan/image/blob/main/doc/fonts.md">https://github.com/brendan-duncan/image/blob/main/doc/fonts.md</a>
+for more information.</p>
 </section>
 
 
@@ -583,7 +563,6 @@ character <code>ch</code>.
         <li><a href="../image/formatSize-constant.html">formatSize</a></li>
         <li><a href="../image/formatToFormatType-constant.html">formatToFormatType</a></li>
         <li><a href="../image/ifdValueTypeSize-constant.html">ifdValueTypeSize</a></li>
-        <li><a href="../image/ifdValueTypeString-constant.html">ifdValueTypeString</a></li>
 
       <li class="section-title"><a href="../image/image-library.html#properties">Properties</a></li>
         <li><a href="../image/arial14.html">arial14</a></li>
@@ -631,6 +610,7 @@ character <code>ch</code>.
         <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
         <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
         <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
+        <li><a href="../image/decodeNamedImage.html">decodeNamedImage</a></li>
         <li><a href="../image/decodePng.html">decodePng</a></li>
         <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
         <li><a href="../image/decodePsd.html">decodePsd</a></li>

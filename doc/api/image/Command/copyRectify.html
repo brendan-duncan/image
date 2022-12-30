@@ -79,8 +79,9 @@
     required Point bottomLeft,
     required Point bottomRight,
     Interpolation interpolation = Interpolation.nearest }) {
-  subCommand = CopyRectifyCmd(subCommand, topLeft, topRight,
-      bottomLeft, bottomRight, interpolation);
+  subCommand = CopyRectifyCmd(subCommand, topLeft: topLeft,
+      topRight: topRight, bottomLeft: bottomLeft,
+      bottomRight: bottomRight, interpolation: interpolation);
 }</code></pre>
 </section>
 
@@ -213,6 +214,7 @@
           <li><a href="../../image/Command/fillRect.html">fillRect</a></li>
           <li><a href="../../image/Command/filter.html">filter</a></li>
           <li><a href="../../image/Command/flip.html">flip</a></li>
+          <li><a href="../../image/Command/forEachFrame.html">forEachFrame</a></li>
           <li><a href="../../image/Command/gamma.html">gamma</a></li>
           <li><a href="../../image/Command/gaussianBlur.html">gaussianBlur</a></li>
           <li><a href="../../image/Command/getBytes.html">getBytes</a></li>

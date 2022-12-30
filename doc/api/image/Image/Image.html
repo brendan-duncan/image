@@ -86,9 +86,9 @@
   <pre class="language-dart"><code class="language-dart">Image({ required int width, required int height, Format format = Format.uint8,
     int numChannels = 3, bool withPalette = false,
     Format paletteFormat = Format.uint8, Palette? palette, ExifData? exif,
-      IccProfile? iccp, this.textData, this.loopCount = 0,
-      this.frameType = FrameType.sequence, this.backgroundColor = null,
-      this.frameDuration = 0, this.frameIndex = 0 }) {
+    IccProfile? iccp, this.textData, this.loopCount = 0,
+    this.frameType = FrameType.sequence, this.backgroundColor = null,
+    this.frameDuration = 0, this.frameIndex = 0 }) {
   frames.add(this);
   _initialize(width, height, format: format, numChannels: numChannels,
       withPalette: withPalette,

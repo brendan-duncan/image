@@ -57,7 +57,7 @@
 in a variety of <a href="doc/formats.md">image file formats</a>.</p>
 <p>The library can be used with both dart:io and dart:html, for command-line, Flutter, and
 web applications.</p>
-<p>NOTE: 4.0 is a major revision from the previous verion of the library.</p>
+<p>NOTE: 4.0 is a major revision from the previous version of the library.</p>
 <h3 id="supported-image-formatsdocformatsmd"><a href="doc/formats.md">Supported Image Formats</a></h3>
 <p><strong>Read/Write</strong></p>
 <ul>
@@ -86,12 +86,18 @@ web applications.</p>
 <pre class="language-dart"><code class="language-dart">import 'dart:io';
 import 'package:image/image.dart' as img;
 void main() async {
+  // Create a 256x256 8-bit (default) rgb (default) image.
   final image = img.Image(width: 256, height: 256);
+  // Iterate over its pixels
   for (var pixel in image) {
+    // Set the pixels red value to its x position value, creating a gradient.
     pixel..r = pixel.x
+    // Set the pixels green value to its y position value.
     ..g = pixel.y;
   }
+  // Encode the resulting image to the PNG image format.
   final png = img.encodePng(image);
+  // Write the PNG formatted data to a file.
   await File('image.png').writeAsBytes(png);
 }
 </code></pre>

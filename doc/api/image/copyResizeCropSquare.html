@@ -59,8 +59,8 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">copyResizeCropSquare</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyResizeCropSquare-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="copyResizeCropSquare-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span></li>
-<li><span class="parameter" id="copyResizeCropSquare-param-interpolation">{<span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
+<li><span class="parameter" id="copyResizeCropSquare-param-size">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span></li>
+<li><span class="parameter" id="copyResizeCropSquare-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
 </ol>)
 
         
@@ -75,7 +75,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image copyResizeCropSquare(Image src, int size, {
+  <pre class="language-dart"><code class="language-dart">Image copyResizeCropSquare(Image src, { required int size,
     Interpolation interpolation = Interpolation.nearest }) {
   if (size &lt;= 0) {
     throw ImageException(&#39;Invalid size&#39;);
@@ -107,7 +107,7 @@
   Image? firstFrame;
   for (final frame in src.frames) {
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, width: size, height: size);
+        Image.fromResized(frame, width: size, height: size, noAnimation: true);
     firstFrame ??= dst;
 
     if (interpolation == Interpolation.nearest) {
@@ -286,7 +286,6 @@
         <li><a href="../image/formatSize-constant.html">formatSize</a></li>
         <li><a href="../image/formatToFormatType-constant.html">formatToFormatType</a></li>
         <li><a href="../image/ifdValueTypeSize-constant.html">ifdValueTypeSize</a></li>
-        <li><a href="../image/ifdValueTypeString-constant.html">ifdValueTypeString</a></li>
 
       <li class="section-title"><a href="../image/image-library.html#properties">Properties</a></li>
         <li><a href="../image/arial14.html">arial14</a></li>
@@ -334,6 +333,7 @@
         <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
         <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
         <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
+        <li><a href="../image/decodeNamedImage.html">decodeNamedImage</a></li>
         <li><a href="../image/decodePng.html">decodePng</a></li>
         <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
         <li><a href="../image/decodePsd.html">decodePsd</a></li>

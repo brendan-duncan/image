@@ -190,7 +190,7 @@ methods are called.</p>
     <h2>Methods</h2>
     <dl class="callables">
         <dt id="addFrames" class="callable">
-  <span class="name"><a href="../image/Command/addFrames.html">addFrames</a></span><span class="signature">(<wbr><span class="parameter" id="addFrames-param-count"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">count</span>, </span><span class="parameter" id="addFrames-param-callback"><span class="type-annotation">AddFramesCallback</span> <span class="parameter-name">callback</span></span>)
+  <span class="name"><a href="../image/Command/addFrames.html">addFrames</a></span><span class="signature">(<wbr><span class="parameter" id="addFrames-param-count"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">count</span>, </span><span class="parameter" id="addFrames-param-callback"><span class="type-annotation">AddFramesFunction</span> <span class="parameter-name">callback</span></span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -385,7 +385,7 @@ methods are called.</p>
 </dd>
 
         <dt id="copyCrop" class="callable">
-  <span class="name"><a href="../image/Command/copyCrop.html">copyCrop</a></span><span class="signature">(<wbr><span class="parameter" id="copyCrop-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="copyCrop-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="copyCrop-param-w"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">w</span>, </span><span class="parameter" id="copyCrop-param-h"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">h</span></span>)
+  <span class="name"><a href="../image/Command/copyCrop.html">copyCrop</a></span><span class="signature">(<wbr><span class="parameter" id="copyCrop-param-x">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="copyCrop-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="copyCrop-param-width"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span><span class="parameter" id="copyCrop-param-height"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>}</span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -411,7 +411,7 @@ methods are called.</p>
 </dd>
 
         <dt id="copyFlip" class="callable">
-  <span class="name"><a href="../image/Command/copyFlip.html">copyFlip</a></span><span class="signature">(<wbr><span class="parameter" id="copyFlip-param-direction"><span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span></span>)
+  <span class="name"><a href="../image/Command/copyFlip.html">copyFlip</a></span><span class="signature">(<wbr><span class="parameter" id="copyFlip-param-direction">{<span>required</span> <span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span>}</span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -463,7 +463,7 @@ methods are called.</p>
 </dd>
 
         <dt id="copyResizeCropSquare" class="callable">
-  <span class="name"><a href="../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></span><span class="signature">(<wbr><span class="parameter" id="copyResizeCropSquare-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span><span class="parameter" id="copyResizeCropSquare-param-interpolation">{<span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
+  <span class="name"><a href="../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></span><span class="signature">(<wbr><span class="parameter" id="copyResizeCropSquare-param-size">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span><span class="parameter" id="copyResizeCropSquare-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -476,7 +476,7 @@ methods are called.</p>
 </dd>
 
         <dt id="copyRotate" class="callable">
-  <span class="name"><a href="../image/Command/copyRotate.html">copyRotate</a></span><span class="signature">(<wbr><span class="parameter" id="copyRotate-param-angle"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span>, </span><span class="parameter" id="copyRotate-param-interpolation">{<span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
+  <span class="name"><a href="../image/Command/copyRotate.html">copyRotate</a></span><span class="signature">(<wbr><span class="parameter" id="copyRotate-param-angle">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span>, </span><span class="parameter" id="copyRotate-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -1350,7 +1350,7 @@ returned.
 </dd>
 
         <dt id="flip" class="callable">
-  <span class="name"><a href="../image/Command/flip.html">flip</a></span><span class="signature">(<wbr><span class="parameter" id="flip-param-direction"><span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span></span>)
+  <span class="name"><a href="../image/Command/flip.html">flip</a></span><span class="signature">(<wbr><span class="parameter" id="flip-param-direction">{<span>required</span> <span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span>}</span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -1358,6 +1358,19 @@ returned.
 </dt>
 <dd>
   
+  
+
+</dd>
+
+        <dt id="forEachFrame" class="callable">
+  <span class="name"><a href="../image/Command/forEachFrame.html">forEachFrame</a></span><span class="signature">(<wbr><span class="parameter" id="forEachFrame-param-callback"><span class="type-annotation">FilterFunction</span> <span class="parameter-name">callback</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Call a callback for each frame of an animation.
   
 
 </dd>
@@ -1961,7 +1974,6 @@ returned.
         <li><a href="../image/formatSize-constant.html">formatSize</a></li>
         <li><a href="../image/formatToFormatType-constant.html">formatToFormatType</a></li>
         <li><a href="../image/ifdValueTypeSize-constant.html">ifdValueTypeSize</a></li>
-        <li><a href="../image/ifdValueTypeString-constant.html">ifdValueTypeString</a></li>
 
       <li class="section-title"><a href="../image/image-library.html#properties">Properties</a></li>
         <li><a href="../image/arial14.html">arial14</a></li>
@@ -2009,6 +2021,7 @@ returned.
         <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
         <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
         <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
+        <li><a href="../image/decodeNamedImage.html">decodeNamedImage</a></li>
         <li><a href="../image/decodePng.html">decodePng</a></li>
         <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
         <li><a href="../image/decodePsd.html">decodePsd</a></li>
@@ -2266,6 +2279,7 @@ returned.
           <li><a href="../image/Command/fillRect.html">fillRect</a></li>
           <li><a href="../image/Command/filter.html">filter</a></li>
           <li><a href="../image/Command/flip.html">flip</a></li>
+          <li><a href="../image/Command/forEachFrame.html">forEachFrame</a></li>
           <li><a href="../image/Command/gamma.html">gamma</a></li>
           <li><a href="../image/Command/gaussianBlur.html">gaussianBlur</a></li>
           <li><a href="../image/Command/getBytes.html">getBytes</a></li>

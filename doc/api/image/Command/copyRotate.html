@@ -58,8 +58,8 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">copyRotate</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyRotate-param-angle"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span>, </span></li>
-<li><span class="parameter" id="copyRotate-param-interpolation">{<span class="type-annotation"><a href="../../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
+<span class="name ">copyRotate</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyRotate-param-angle">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span>, </span></li>
+<li><span class="parameter" id="copyRotate-param-interpolation"><span class="type-annotation"><a href="../../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
 </ol>)
 
       
@@ -71,9 +71,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void copyRotate(num angle,
-    { Interpolation interpolation = Interpolation.nearest }) {
-  subCommand = CopyRotateCmd(subCommand, angle, interpolation: interpolation);
+  <pre class="language-dart"><code class="language-dart">void copyRotate({ required num angle,
+    Interpolation interpolation = Interpolation.nearest }) {
+  subCommand = CopyRotateCmd(subCommand, angle: angle,
+      interpolation: interpolation);
 }</code></pre>
 </section>
 
@@ -206,6 +207,7 @@
           <li><a href="../../image/Command/fillRect.html">fillRect</a></li>
           <li><a href="../../image/Command/filter.html">filter</a></li>
           <li><a href="../../image/Command/flip.html">flip</a></li>
+          <li><a href="../../image/Command/forEachFrame.html">forEachFrame</a></li>
           <li><a href="../../image/Command/gamma.html">gamma</a></li>
           <li><a href="../../image/Command/gaussianBlur.html">gaussianBlur</a></li>
           <li><a href="../../image/Command/getBytes.html">getBytes</a></li>

@@ -59,7 +59,7 @@
 
 <span class="returntype">void</span>
 <span class="name ">addFrames</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="addFrames-param-count"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">count</span>, </span></li>
-<li><span class="parameter" id="addFrames-param-callback"><span class="type-annotation">AddFramesCallback</span> <span class="parameter-name">callback</span></span></li>
+<li><span class="parameter" id="addFrames-param-callback"><span class="type-annotation">AddFramesFunction</span> <span class="parameter-name">callback</span></span></li>
 </ol>)
 
       
@@ -74,7 +74,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void addFrames(int count, AddFramesCallback callback) {
+  <pre class="language-dart"><code class="language-dart">void addFrames(int count, AddFramesFunction callback) {
   subCommand = AddFramesCmd(subCommand, count, callback);
 }</code></pre>
 </section>
@@ -208,6 +208,7 @@
           <li><a href="../../image/Command/fillRect.html">fillRect</a></li>
           <li><a href="../../image/Command/filter.html">filter</a></li>
           <li><a href="../../image/Command/flip.html">flip</a></li>
+          <li><a href="../../image/Command/forEachFrame.html">forEachFrame</a></li>
           <li><a href="../../image/Command/gamma.html">gamma</a></li>
           <li><a href="../../image/Command/gaussianBlur.html">gaussianBlur</a></li>
           <li><a href="../../image/Command/getBytes.html">getBytes</a></li>

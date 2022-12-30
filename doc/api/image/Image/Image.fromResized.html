@@ -58,7 +58,8 @@
       
       <span class="name ">Image.fromResized</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="fromResized-param-other"><span class="type-annotation"><a href="../../image/Image-class.html">Image</a></span> <span class="parameter-name">other</span>, </span></li>
 <li><span class="parameter" id="fromResized-param-width">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span></li>
-<li><span class="parameter" id="fromResized-param-height"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>}</span></li>
+<li><span class="parameter" id="fromResized-param-height"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>, </span></li>
+<li><span class="parameter" id="fromResized-param-noAnimation"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">noAnimation</span> = <span class="default-value">false</span>}</span></li>
 </ol>)
     </section>
 
@@ -68,7 +69,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image.fromResized(Image other, { required int width, required int height })
+  <pre class="language-dart"><code class="language-dart">Image.fromResized(Image other, { required int width, required int height,
+    bool noAnimation = false })
     : _exif = other._exif?.clone()
     , iccProfile = other.iccProfile?.clone()
     , frameType = other.frameType
@@ -76,7 +78,6 @@
     , backgroundColor = other.backgroundColor?.clone()
     , frameDuration = other.frameDuration
     , frameIndex = other.frameIndex {
-
   _createImageData(width, height, other.format,
       other.numChannels, other.palette);
 
@@ -88,10 +89,12 @@
   }
   frames.add(this);
 
-  final numFrames = other.numFrames;
-  for (var fi = 1; fi &lt; numFrames; ++fi) {
-    final frame = other.frames[fi];
-    addFrame(Image.fromResized(frame, width: width, height: height));
+  if (!noAnimation) {
+    final numFrames = other.numFrames;
+    for (var fi = 1; fi &lt; numFrames; ++fi) {
+      final frame = other.frames[fi];
+      addFrame(Image.fromResized(frame, width: width, height: height));
+    }
   }
 }</code></pre>
 </section>

@@ -59,7 +59,7 @@
 
 <span class="returntype"><a href="../image/Image-class.html">Image</a></span>
 <span class="name ">flip</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="flip-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span></li>
-<li><span class="parameter" id="flip-param-direction"><span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span></span></li>
+<li><span class="parameter" id="flip-param-direction">{<span>required</span> <span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span>}</span></li>
 </ol>)
 
         
@@ -76,7 +76,7 @@ or <a href="../image/FlipDirection.html">FlipDirection.both</a>.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Image flip(Image src, FlipDirection direction) {
+  <pre class="language-dart"><code class="language-dart">Image flip(Image src, { required FlipDirection direction }) {
   switch (direction) {
     case FlipDirection.horizontal:
       flipHorizontal(src);
@@ -249,7 +249,6 @@ or <a href="../image/FlipDirection.html">FlipDirection.both</a>.</p>
         <li><a href="../image/formatSize-constant.html">formatSize</a></li>
         <li><a href="../image/formatToFormatType-constant.html">formatToFormatType</a></li>
         <li><a href="../image/ifdValueTypeSize-constant.html">ifdValueTypeSize</a></li>
-        <li><a href="../image/ifdValueTypeString-constant.html">ifdValueTypeString</a></li>
 
       <li class="section-title"><a href="../image/image-library.html#properties">Properties</a></li>
         <li><a href="../image/arial14.html">arial14</a></li>
@@ -297,6 +296,7 @@ or <a href="../image/FlipDirection.html">FlipDirection.both</a>.</p>
         <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
         <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
         <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
+        <li><a href="../image/decodeNamedImage.html">decodeNamedImage</a></li>
         <li><a href="../image/decodePng.html">decodePng</a></li>
         <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
         <li><a href="../image/decodePsd.html">decodePsd</a></li>

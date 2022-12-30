@@ -58,8 +58,8 @@
       
 
 <span class="returntype">void</span>
-<span class="name ">copyResizeCropSquare</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyResizeCropSquare-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span></li>
-<li><span class="parameter" id="copyResizeCropSquare-param-interpolation">{<span class="type-annotation"><a href="../../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
+<span class="name ">copyResizeCropSquare</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="copyResizeCropSquare-param-size">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span></li>
+<li><span class="parameter" id="copyResizeCropSquare-param-interpolation"><span class="type-annotation"><a href="../../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span></li>
 </ol>)
 
       
@@ -71,9 +71,9 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void copyResizeCropSquare(int size,
-    { Interpolation interpolation = Interpolation.nearest }) {
-  subCommand = CopyResizeCropSquareCmd(subCommand, size,
+  <pre class="language-dart"><code class="language-dart">void copyResizeCropSquare({ required int size,
+    Interpolation interpolation = Interpolation.nearest }) {
+  subCommand = CopyResizeCropSquareCmd(subCommand, size: size,
       interpolation: interpolation);
 }</code></pre>
 </section>
@@ -207,6 +207,7 @@
           <li><a href="../../image/Command/fillRect.html">fillRect</a></li>
           <li><a href="../../image/Command/filter.html">filter</a></li>
           <li><a href="../../image/Command/flip.html">flip</a></li>
+          <li><a href="../../image/Command/forEachFrame.html">forEachFrame</a></li>
           <li><a href="../../image/Command/gamma.html">gamma</a></li>
           <li><a href="../../image/Command/gaussianBlur.html">gaussianBlur</a></li>
           <li><a href="../../image/Command/getBytes.html">getBytes</a></li>
