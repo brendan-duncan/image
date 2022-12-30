@@ -37,7 +37,7 @@ Image copyResizeCropSquare(Image src, { required int size,
   Image? firstFrame;
   for (final frame in src.frames) {
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, width: size, height: size);
+        Image.fromResized(frame, width: size, height: size, noAnimation: true);
     firstFrame ??= dst;
 
     if (interpolation == Interpolation.nearest) {

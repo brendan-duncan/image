@@ -25,7 +25,8 @@ void main() {
   const w_2 = width / 2.0;
   const aspect = 0.5;
 
-  final image = Image(width: width, height: height);
+  // Canvas expects RGBA pixel data
+  final image = Image(width: width, height: height, numChannels: 4);
   for (final p in image) {
     final x = p.x;
     final y = p.y;
@@ -48,14 +49,14 @@ void main() {
     }
 
     if (i == maxIterations) {
-      image.setPixelColor(x, y, 0);
+      image.setPixelColor(x, y, 0, 255);
     } else {
       final z = sqrt(newRe * newRe + newIm * newIm);
       final b = 256.0 *
           logN(1.75 + i - logN(logN(z, log2), log2), log2) /
           log2MaxIterations;
       final brightness = b.toInt();
-      image.setPixelColor(x, y, brightness, brightness, 255);
+      image.setPixelColor(x, y, brightness, brightness, 255, 255);
     }
   }
 

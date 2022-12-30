@@ -867,7 +867,7 @@ class VP8 {
     rgba[3] = 0xff;
   }
 
-  void _upsample(
+  void _upSample(
       InputBuffer topY,
       InputBuffer? bottomY,
       InputBuffer topU,
@@ -991,10 +991,10 @@ class VP8 {
 
     if (y == 0) {
       // First line is special cased. We mirror the u/v samples at boundary.
-      _upsample(curY, null, curU, curV, curU, curV, dst, null, mbW);
+      _upSample(curY, null, curU, curV, curU, curV, dst, null, mbW);
     } else {
       // We can finish the left-over line from previous call.
-      _upsample(_tmpY, curY, topU, topV, curU, curV,
+      _upSample(_tmpY, curY, topU, topV, curU, curV,
           InputBuffer.from(dst, offset: -stride), dst, mbW);
       ++numLinesOut;
     }
@@ -1009,7 +1009,7 @@ class VP8 {
       curV.offset += _cacheUVStride!;
       dst.offset += 2 * stride;
       curY.offset += 2 * _cacheYStride!;
-      _upsample(InputBuffer.from(curY, offset: -_cacheYStride!), curY, topU,
+      _upSample(InputBuffer.from(curY, offset: -_cacheYStride!), curY, topU,
           topV, curU, curV, InputBuffer.from(dst, offset: -stride), dst, mbW);
     }
 
@@ -1026,7 +1026,7 @@ class VP8 {
     } else {
       // Process the very last row of even-sized picture
       if ((yEnd & 1) == 0) {
-        _upsample(curY, null, curU, curV, curU, curV,
+        _upSample(curY, null, curU, curV, curU, curV,
             InputBuffer.from(dst, offset: stride), null, mbW);
       }
     }

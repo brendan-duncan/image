@@ -125,7 +125,8 @@ Image trim(Image src,
   Image? firstFrame;
   for (var frame in src.frames) {
     final dst = firstFrame?.addFrame() ??
-      Image.fromResized(frame, width: crop[2], height: crop[3]);
+      Image.fromResized(frame, width: crop[2], height: crop[3],
+          noAnimation: true);
     firstFrame ??= dst;
 
     compositeImage(dst, src,

@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
+import '../_test_util.dart';
+
 
 void main() {
   group('Image', () {
@@ -72,6 +74,42 @@ void main() {
         if (x == 10) {
           x = 0;
           y++;
+        }
+      }
+    });
+
+    test('convert', () async {
+      final rgba8p = Image(width: 256, height: 256, numChannels: 4,
+          withPalette: true)
+      ..addFrame(Image(width: 256, height: 256, numChannels: 4,
+          withPalette: true));
+
+      for (final frame in rgba8p.frames) {
+        for (var pi = 0; pi < frame.palette!.numColors; ++pi) {
+          frame.palette!.setColor(pi, pi, pi, pi, 255);
+        }
+        for (final p in frame) {
+          p.index = ((frame.frameIndex * 10) + p.x) % 255;
+        }
+      }
+
+      await encodeGifFile('$testOutputPath/image/convert_1.gif', rgba8p);
+
+      final rgba8 = rgba8p.convert(numChannels: 4, alpha: 255);
+
+      expect(rgba8.numFrames, equals(2));
+      expect(rgba8.hasPalette, equals(false));
+      expect(rgba8.numChannels, equals(4));
+      expect(rgba8.frames[1].hasPalette, equals(false));
+      expect(rgba8.frames[1].numChannels, equals(4));
+
+      for (final frame in rgba8.frames) {
+        for (final p in frame) {
+          final v = ((frame.frameIndex * 10) + p.x) % 255;
+          expect(p.r, equals(v));
+          expect(p.g, equals(v));
+          expect(p.b, equals(v));
+          expect(p.a, equals(255));
         }
       }
     });

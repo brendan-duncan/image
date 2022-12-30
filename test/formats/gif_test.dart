@@ -8,11 +8,23 @@ void main() {
   group('Format', () {
     group('gif', () {
       test('cmd', () async {
-        Command()
+        await (Command()
             ..decodeGifFile('test/_data/gif/cars.gif')
             ..copyResize(width: 64)
-            ..encodeGifFile('$testOutputPath/gif/cars_cmd.gif')
-            ..execute();
+            ..encodeGifFile('$testOutputPath/gif/cars_cmd.gif'))
+            .execute();
+      });
+
+      test('convert animated', () async {
+        final anim = await decodeGifFile('test/_data/gif/cars.gif');
+        final rgba8 = anim!.convert(format: Format.uint8, numChannels: 4,
+            alpha: 255);
+        expect(rgba8.numFrames, equals(anim.numFrames));
+        for (final frame in rgba8.frames) {
+          await encodePngFile('$testOutputPath/gif/cars_${frame.frameIndex}.png',
+              frame, singleFrame: true);
+        }
+        await encodePngFile('$testOutputPath/gif/cars.png', rgba8);
       });
 
       final dir = Directory('test/_data/gif');

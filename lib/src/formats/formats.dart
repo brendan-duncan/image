@@ -177,6 +177,16 @@ Image? decodeImage(Uint8List data, { int? frame }) {
   return decoder?.decode(data, frame: frame);
 }
 
+/// Decodes the given image file bytes, using the filename extension to
+/// determine the decoder.
+Image? decodeNamedImage(String path, Uint8List data, { int? frame }) {
+  final decoder = findDecoderForNamedImage(path);
+  if (decoder != null) {
+    return decoder.decode(data, frame: frame);
+  }
+  return decodeImage(data, frame: frame);
+}
+
 /// Decode an image from a file path. For platforms that do not support dart:io,
 /// such as the web, this will return null.
 /// **WARNING** Since this will check the image data against all known decoders,

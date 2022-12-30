@@ -57,13 +57,13 @@ void main() {
         }
 
         final name = f.uri.pathSegments.last;
-        test(name, () {
+        test(name, () async {
           final bytes = f.readAsBytesSync();
           expect(JpegDecoder().isValidFile(bytes), equals(true));
 
           final image = JpegDecoder().decode(bytes)!;
           final outJpg = JpegEncoder().encode(image);
-          File('$testOutputPath/jpg/$name.jpg')
+          File('$testOutputPath/jpg/$name')
             ..createSync(recursive: true)
             ..writeAsBytesSync(outJpg);
 

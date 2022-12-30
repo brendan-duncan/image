@@ -1,5 +1,4 @@
 import '../color/color_uint8.dart';
-import '../draw/blend_mode.dart';
 import '../draw/composite_image.dart';
 import '../image/image.dart';
 import '../util/image_exception.dart';
@@ -144,8 +143,7 @@ class WebPDecoder extends Decoder {
         }
       }
 
-      compositeImage(lastImage, image, dstX: frame.x, dstY: frame.y,
-          blend: BlendMode.direct);
+      compositeImage(lastImage, image, dstX: frame.x, dstY: frame.y);
 
       firstImage.addFrame(lastImage);
     }

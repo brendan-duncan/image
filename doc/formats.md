@@ -26,10 +26,15 @@ Dart Image Library supports a wide range of image file formats for both decoding
 
 Sometimes you don't know what the format of an image file is.
 ```dart
-Image? decodeImage(Uint8List data);
+Image? decodeImage(Uint8List data, { int? frame });
 ```
 Will guess the format by trying to parse it with the supported decoders. It won't do a full decode to determine if the
 data is valid for a decoder, but it is still slower than using an explicit decode function as listed below.
+
+If you know the image file name, you can use the filename extension to determine the decoder to use.
+```dart
+Image? decodeNamedImage(String path, Uint8List data, { int? frame });
+```
 
 You can also load an image directly from a file given its path, on platforms that support dart:io.
 ```dart

@@ -77,9 +77,9 @@ class Image extends Iterable<Pixel> {
   Image({ required int width, required int height, Format format = Format.uint8,
       int numChannels = 3, bool withPalette = false,
       Format paletteFormat = Format.uint8, Palette? palette, ExifData? exif,
-        IccProfile? iccp, this.textData, this.loopCount = 0,
-        this.frameType = FrameType.sequence, this.backgroundColor = null,
-        this.frameDuration = 0, this.frameIndex = 0 }) {
+      IccProfile? iccp, this.textData, this.loopCount = 0,
+      this.frameType = FrameType.sequence, this.backgroundColor = null,
+      this.frameDuration = 0, this.frameIndex = 0 }) {
     frames.add(this);
     _initialize(width, height, format: format, numChannels: numChannels,
         withPalette: withPalette,
@@ -87,7 +87,8 @@ class Image extends Iterable<Pixel> {
         iccp: iccp);
   }
 
-  Image.fromResized(Image other, { required int width, required int height })
+  Image.fromResized(Image other, { required int width, required int height,
+      bool noAnimation = false })
       : _exif = other._exif?.clone()
       , iccProfile = other.iccProfile?.clone()
       , frameType = other.frameType
@@ -95,7 +96,6 @@ class Image extends Iterable<Pixel> {
       , backgroundColor = other.backgroundColor?.clone()
       , frameDuration = other.frameDuration
       , frameIndex = other.frameIndex {
-
     _createImageData(width, height, other.format,
         other.numChannels, other.palette);
 
@@ -107,10 +107,12 @@ class Image extends Iterable<Pixel> {
     }
     frames.add(this);
 
-    final numFrames = other.numFrames;
-    for (var fi = 1; fi < numFrames; ++fi) {
-      final frame = other.frames[fi];
-      addFrame(Image.fromResized(frame, width: width, height: height));
+    if (!noAnimation) {
+      final numFrames = other.numFrames;
+      for (var fi = 1; fi < numFrames; ++fi) {
+        final frame = other.frames[fi];
+        addFrame(Image.fromResized(frame, width: width, height: height));
+      }
     }
   }
 
@@ -573,7 +575,7 @@ class Image extends Iterable<Pixel> {
   /// true, and to target format and numChannels has fewer than 256 colors,
   /// then the new image will be converted to use a palette.
   Image convert({ Format? format, int? numChannels, num? alpha,
-      bool withPalette = false }) {
+      bool withPalette = false, bool noAnimation = false }) {
     format ??= this.format;
     numChannels ??= this.numChannels;
     alpha ??= formatMaxValue[format];
@@ -588,52 +590,73 @@ class Image extends Iterable<Pixel> {
     }
 
     if (format == this.format && numChannels == this.numChannels &&
-        (!withPalette || palette != null)) {
+        ((!withPalette && palette == null) ||
+            (withPalette && palette != null))) {
       // Same format and number of channels
       return Image.from(this);
     }
 
-    final newImage = Image(width: width, height: height, format: format,
-        numChannels: numChannels, withPalette: withPalette,
-        exif: _exif?.clone(), iccp: iccProfile?.clone(),
-        backgroundColor: backgroundColor?.clone(),
-        frameType: frameType, loopCount: loopCount,
-        frameDuration: frameDuration)
-    ..textData = textData != null ? Map<String, String>.from(textData!) : null;
+    Image? firstFrame;
+    for (final frame in frames) {
+      final newImage = Image(width: frame.width,
+          height: frame.height,
+          format: format,
+          numChannels: numChannels,
+          withPalette: withPalette,
+          exif: frame._exif?.clone(),
+          iccp: frame.iccProfile?.clone(),
+          backgroundColor: frame.backgroundColor?.clone(),
+          frameType: frame.frameType,
+          loopCount: frame.loopCount,
+          frameDuration: frame.frameDuration)
+        ..textData = frame.textData != null
+            ? Map<String, String>.from(frame.textData!)
+            : null;
 
-    final pal = newImage.palette;
-    final f = newImage.palette?.format ?? format;
-    if (pal != null) {
-      final usedColors = <int, int>{};
-      var numColors = 0;
-      final op = getPixel(0, 0);
-      Color? c;
-      for (final np in newImage) {
-        final nr = (op.rNormalized * 255).floor();
-        final ng = (op.gNormalized * 255).floor();
-        final nb = (op.bNormalized * 255).floor();
-        final h = rgbaToUint32(nr, ng, nb, 0);
-        if (usedColors.containsKey(h)) {
-          np.index = usedColors[h]!;
-        } else {
-          usedColors[h] = numColors;
-          np.index = numColors;
-          c = convertColor(op, to: c, format: f, numChannels: numChannels,
-              alpha: alpha);
-          pal.setColor(numColors, c.r, c.g, c.b);
-          numColors++;
-        }
-        op.moveNext();
+      if (firstFrame != null) {
+        firstFrame.addFrame(newImage);
+      } else {
+        firstFrame = newImage;
       }
-    } else {
-      final op = getPixel(0, 0);
-      for (final np in newImage) {
-        convertColor(op, to: np, alpha: alpha);
-        op.moveNext();
+
+      final pal = newImage.palette;
+      final f = newImage.palette?.format ?? format;
+      if (pal != null) {
+        final usedColors = <int, int>{};
+        var numColors = 0;
+        final op = frame.getPixel(0, 0);
+        Color? c;
+        for (final np in newImage) {
+          final nr = (op.rNormalized * 255).floor();
+          final ng = (op.gNormalized * 255).floor();
+          final nb = (op.bNormalized * 255).floor();
+          final h = rgbaToUint32(nr, ng, nb, 0);
+          if (usedColors.containsKey(h)) {
+            np.index = usedColors[h]!;
+          } else {
+            usedColors[h] = numColors;
+            np.index = numColors;
+            c = convertColor(op, to: c, format: f, numChannels: numChannels,
+                alpha: alpha);
+            pal.setColor(numColors, c.r, c.g, c.b);
+            numColors++;
+          }
+          op.moveNext();
+        }
+      } else {
+        final op = frame.getPixel(0, 0);
+        for (final np in newImage) {
+          convertColor(op, to: np, alpha: alpha);
+          op.moveNext();
+        }
+      }
+
+      if (noAnimation) {
+        break;
       }
     }
 
-    return newImage;
+    return firstFrame!;
   }
 
   /// Add text metadata to the image.

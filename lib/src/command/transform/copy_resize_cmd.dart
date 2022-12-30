@@ -13,8 +13,7 @@ class CopyResizeCmd extends Command {
 
   @override
   Future<void> executeCommand() async {
-    await input?.execute();
-    final img = input?.outputImage;
+    final img = await input?.getImage();
     outputImage = img != null ? copyResize(img, width: width, height: height,
         interpolation: interpolation) : null;
   }

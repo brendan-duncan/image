@@ -57,7 +57,11 @@ Color convertColor(Color c, { Color? to, Format? format, int? numChannels,
   alpha ??= 0;
 
   if (format == fromFormat && numChannels == c.length) {
-    return c.clone();
+    if (to == null) {
+      return c.clone();
+    }
+    to.set(c);
+    return to;
   }
 
   switch (format) {

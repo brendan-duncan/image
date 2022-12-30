@@ -13,7 +13,7 @@ enum WebPFormat {
   animated
 }
 
-// Features gathered from the bitstream
+/// Features gathered from the bitstream
 class WebPInfo implements DecodeInfo {
   @override
   int width = 0;
@@ -22,28 +22,28 @@ class WebPInfo implements DecodeInfo {
   @override
   Color? backgroundColor = null;
 
-  // True if the bitstream contains an alpha channel.
+  /// True if the bitstream contains an alpha channel.
   bool hasAlpha = false;
 
-  // True if the bitstream is an animation.
+  /// True if the bitstream is an animation.
   bool hasAnimation = false;
 
-  // 0 = undefined (/mixed), 1 = lossy, 2 = lossless, 3 = animated
+  /// 0 = undefined (/mixed), 1 = lossy, 2 = lossless, 3 = animated
   WebPFormat format = WebPFormat.undefined;
 
-  // ICCP data.
+  /// ICCP data.
   Uint8List? iccp;
 
-  // EXIF data string.
+  /// EXIF data string.
   String exif = '';
 
-  // XMP data string.
+  /// XMP data string.
   String xmp = '';
 
-  // How many times the animation should loop.
+  /// How many times the animation should loop.
   int animLoopCount = 0;
 
-  // Information about each animation frame.
+  /// Information about each animation frame.
   List<WebPFrame> frames = [];
 
   @override

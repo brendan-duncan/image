@@ -14,3 +14,18 @@ for (final frame in image.frames) { // Iterate over the frames of the image.
 }
 ```
 Frames are always stored as full images, meaning they don't support blend modes, clear states, or partial frames.
+
+## Filters and Transforms for Animated Images
+
+Most filters and transforms will apply to all frames of an animated image.
+
+```dart
+// Decode an animated PNG file.
+final anim = await decodePngFile('animated.png');
+// Resize the animation to 128x*, maintaining the aspect ratio of the frames
+final resizedAnim = copyResize(anim, width: 128);
+// Apply smoothing to the resized animation
+smooth(resizedAnim, weight: 0.8);
+// Save the animation to an animated GIF
+encodeGifFile('resized_animated.gif', resizedAnim);
+```

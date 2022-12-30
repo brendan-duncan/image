@@ -37,27 +37,34 @@ Image copyRotate(Image src, { required num angle,
   final dw2 = 0.5 * (ux + vx);
   final dh2 = 0.5 * (uy + vy);
 
-  final dst = Image(width: (ux + vx).toInt(), height: (uy + vy).toInt(),
-      format: src.format, numChannels: src.numChannels, palette: src.palette,
-      exif: src.exif, iccp: src.iccProfile);
+  Image? firstFrame;
+  final numFrames = src.numFrames;
+  for (var i = 0; i < numFrames; ++i) {
+    final frame = src.frames[i];
+    final dst = firstFrame?.addFrame() ??
+        Image.fromResized(src, width: (ux + vx).toInt(),
+            height: (uy + vy).toInt(), noAnimation: true);
+    firstFrame ??= dst;
 
-  for (final p in dst) {
-    final x = p.x;
-    final y = p.y;
-    final x2 = w2 + (x - dw2) * ca + (y - dh2) * sa;
-    final y2 = h2 - (x - dw2) * sa + (y - dh2) * ca;
-    final c = src.getPixelInterpolate(x2, y2, interpolation: interpolation);
-    dst.setPixel(x, y, c);
+    for (final p in dst) {
+      final x = p.x;
+      final y = p.y;
+      final x2 = w2 + (x - dw2) * ca + (y - dh2) * sa;
+      final y2 = h2 - (x - dw2) * sa + (y - dh2) * ca;
+      final c = frame.getPixelInterpolate(x2, y2, interpolation: interpolation);
+      dst.setPixel(x, y, c);
+    }
   }
 
-  return dst;
+  return firstFrame!;
 }
 
 Image _rotate90(Image src) {
   Image? firstFrame;
   for (final frame in src.frames) {
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, width: frame.height, height: frame.width);
+        Image.fromResized(frame, width: frame.height, height: frame.width,
+            noAnimation: true);
     firstFrame ??= dst;
     final hm1 = frame.height - 1;
     for (var y = 0; y < dst.height; ++y) {
@@ -91,7 +98,8 @@ Image _rotate270(Image src) {
   for (final frame in src.frames) {
     final wm1 = src.width - 1;
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, width: frame.height, height: frame.width);
+        Image.fromResized(frame, width: frame.height, height: frame.width,
+            noAnimation: true);
     firstFrame ??= dst;
     for (var y = 0; y < dst.height; ++y) {
       for (var x = 0; x < dst.width; ++x) {

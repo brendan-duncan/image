@@ -18,14 +18,12 @@ void main() {
   // The list of images we'll be decoding, representing a wide range
   // of formats and sub-formats.
   final images = [
-    'penguins.jpg',
-    'puppies.jpg',
     '1_webp_ll.webp',
     '1.webp',
     '3_webp_a.webp',
-    'BladeRunner_lossy.webp',
-    'cars.gif',
     'trees.png',
+    'cars.gif',
+    'animated_lossy.webp',
     'animated.png',
   ];
 
@@ -44,63 +42,51 @@ void main() {
         label.text = name;
 
         // Create a canvas to put our decoded image into.
-        final c = CanvasElement();
-        document.body!.append(c);
+        final canvas = CanvasElement();
+        document.body!.append(canvas);
 
-        // Find the best decoder for the image.
-        final decoder = findDecoderForData(bytes);
-        if (decoder == null) {
+        // Finds the best decoder for the image.
+        final image = decodeNamedImage(name, bytes);
+        if (image == null) {
           return;
         }
 
-        // Some of the files are animated, so always decode to animation.
-        // Single image files will decode to a single framed animation.
-        final anim = decoder.decode(bytes);
-        if (anim == null) {
-          return;
-        }
+        // Canvas only supports rgba8, so make sure the image is in that format.
+        final rgba8 = image.convert(format: Format.uint8, numChannels: 4,
+            alpha: 255);
+
+        canvas..width = rgba8.width
+        ..height = rgba8.height;
+
+        // Create a buffer that the canvas can draw.
+        final canvasData = canvas.context2D.createImageData(canvas.width,
+            canvas.height);
 
         // If it's a single image, dump the decoded image into the canvas.
-        if (anim.numFrames == 1) {
-          final image = anim;
-
-          //Image newImage = copyResize(image, 2000, -1, CUBIC);
-          final newImage = image;
-
-          c..width = newImage.width
-          ..height = newImage.height;
-
-          // Create a buffer that the canvas can draw.
-          final d = c.context2D.createImageData(c.width, c.height);
+        if (rgba8.numFrames == 1) {
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length, newImage.toUint8List());
+          canvasData.data.setRange(0, canvasData.data.length,
+              rgba8.toUint8List());
           // Draw the buffer onto the canvas.
-          c.context2D.putImageData(d, 0, 0);
+          canvas.context2D.putImageData(canvasData, 0, 0);
 
           return;
         }
 
         // A multi-frame animation, use a timer to draw frames.
-        // TODO this is currently not using the timing information in the
-        // [Animation], and using a hard-coded delay instead.
-
-        // Setup the canvas size to the size of the first image.
-        c..width = anim.frames[0].width
-        ..height = anim.frames[0].height;
-        // Create a buffer that the canvas can draw.
-        final d = c.context2D.createImageData(c.width, c.height);
-
-        var frame = 0;
+        var f = 0;
         Timer.periodic(const Duration(milliseconds: 40), (t) {
-          final image = anim.frames[frame++];
-          if (frame >= anim.numFrames) {
-            frame = 0;
+          final frame = rgba8.frames[f++];
+          if (f >= rgba8.numFrames) {
+            f = 0;
           }
 
           // Fill the buffer with our image data.
-          d.data.setRange(0, d.data.length, image.toUint8List());
+          canvasData.data.setRange(0, canvasData.data.length,
+              frame.toUint8List());
+
           // Draw the buffer onto the canvas.
-          c.context2D.putImageData(d, 0, 0);
+          canvas.context2D.putImageData(canvasData, 0, 0);
         });
       }
     })

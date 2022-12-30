@@ -163,8 +163,8 @@ class PngEncoder extends Encoder {
     ..writeUint32(0) // yOffset
     ..writeUint16(image.frameDuration)
     ..writeUint16(1000) // delay denominator
-    ..writeByte(0) // dispose method
-    ..writeByte(0); // blend method
+    ..writeByte(0) // dispose method 0: APNG_DISPOSE_OP_NONE
+    ..writeByte(0); // blend method 0: APNG_BLEND_OP_SOURCE
     _writeChunk(output!, 'fcTL', chunk.getBytes());
   }
 

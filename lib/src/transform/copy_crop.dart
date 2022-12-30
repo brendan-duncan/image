@@ -18,7 +18,8 @@ Image copyCrop(Image src, { required int x, required int y, required int width,
   for (var i = 0; i < numFrames; ++i) {
     final frame = src.frames[i];
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, width: width, height: height);
+        Image.fromResized(frame, width: width, height: height,
+            noAnimation: true);
     firstFrame ??= dst;
     for (final p in dst) {
       p.set(frame.getPixel(x + p.x, y + p.y));
