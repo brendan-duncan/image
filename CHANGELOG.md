@@ -1,3 +1,9 @@
+## 3.3.0 - December 29, 2022
+
+- Improved EXIF data management
+- Fix character code issue with BitmapFont.
+- This is the last 3.x update before the big 4.0 release.
+
 ## 3.2.2 - October 15, 2022
 
 - Fix transparency issue with animated GIF images.
