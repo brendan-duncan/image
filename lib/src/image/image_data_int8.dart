@@ -53,7 +53,7 @@ class ImageDataInt8 extends ImageData {
           : ColorInt8.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
 
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
-    if (pixel == null || pixel is! PixelInt8 || pixel.data != this) {
+    if (pixel == null || pixel is! PixelInt8 || pixel.image != this) {
       pixel = PixelInt8.imageData(this);
     }
     pixel.setPosition(x, y);

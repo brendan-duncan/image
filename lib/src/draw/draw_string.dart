@@ -78,7 +78,7 @@ Image drawString(Image image, String string, { required BitmapFont font,
         x2 += wordWidth;
       }
 
-      if (subString.length > 0) {
+      if (subString.isNotEmpty) {
         drawString(image, subString, font: font, x: sx, y: sy, color: color,
             mask: mask, maskChannel: maskChannel, rightJustify: rightJustify);
       }

@@ -92,8 +92,9 @@ class ExifData extends IfdContainer {
       ..writeUint16(0x002a)
       ..writeUint32(8); // offset to first ifd block
 
-    if (directories['ifd0'] == null)
+    if (directories['ifd0'] == null) {
       directories['ifd0'] = IfdDirectory();
+    }
 
     var dataOffset = 8; // offset to first ifd block, from start of tiff header
     final offsets = <String,int>{};
@@ -306,8 +307,9 @@ class ExifData extends IfdContainer {
 
     final entry = _ExifEntry(tag, null);
 
-    if (format > IfdValueType.values.length)
+    if (format > IfdValueType.values.length) {
       return entry;
+    }
 
     final f = IfdValueType.values[format];
     final fsize = ifdValueTypeSize[format];

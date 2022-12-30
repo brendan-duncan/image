@@ -32,8 +32,9 @@ class IfdContainer {
   }
 
   IfdDirectory operator[](String ifdName) {
-    if (!directories.containsKey(ifdName))
+    if (!directories.containsKey(ifdName)) {
       directories[ifdName] = IfdDirectory();
+    }
     return directories[ifdName]!;
   }
 

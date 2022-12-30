@@ -63,7 +63,7 @@ class ImageDataUint8 extends ImageData {
               b.clamp(0, 255).toInt(), a.clamp(0, 255).toInt());
 
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
-    if (pixel == null || pixel is! PixelUint8 || pixel.data != this) {
+    if (pixel == null || pixel is! PixelUint8 || pixel.image != this) {
       pixel = PixelUint8.imageData(this);
     }
     pixel.setPosition(x, y);

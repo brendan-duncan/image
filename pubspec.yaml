@@ -20,4 +20,5 @@ dev_dependencies:
   build_test: ^2.1.4
   build_web_compilers: ^3.2.1
   http: ^0.13.0
+  lints: ^2.0.1
   test: ^1.16.0

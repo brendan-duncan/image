@@ -157,7 +157,7 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
-    if (webp.format == 0) {
+    if (webp.format == WebPFormat.undefined) {
       return null;
     }
 
@@ -273,7 +273,7 @@ class WebPDecoder extends Decoder {
       webp.hasAlpha = webp.alphaData != null;
     }
 
-    return webp.format != 0;
+    return webp.format != WebPFormat.undefined;
   }
 
   bool _getVp8xInfo(InputBuffer input, WebPInfo? webp) {

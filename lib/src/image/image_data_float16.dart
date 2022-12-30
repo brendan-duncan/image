@@ -53,7 +53,7 @@ class ImageDataFloat16 extends ImageData {
       a == null ? ColorFloat16.rgb(r, g, b) : ColorFloat16.rgba(r, g, b, a);
 
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
-    if (pixel == null || pixel is! PixelFloat16 || pixel.data != this) {
+    if (pixel == null || pixel is! PixelFloat16 || pixel.image != this) {
       pixel = PixelFloat16.imageData(this);
     }
     pixel.setPosition(x, y);

@@ -53,7 +53,7 @@ class ImageDataUint16 extends ImageData {
           : ColorUint16.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
 
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
-    if (pixel == null || pixel is! PixelUint16 || pixel.data != this) {
+    if (pixel == null || pixel is! PixelUint16 || pixel.image != this) {
       pixel = PixelUint16.imageData(this);
     }
     pixel.setPosition(x, y);

@@ -52,7 +52,7 @@ class ImageDataFloat64 extends ImageData {
       a == null ? ColorFloat64.rgb(r, g, b) : ColorFloat64.rgba(r, g, b, a);
 
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
-    if (pixel == null || pixel is! PixelFloat64 || pixel.data != this) {
+    if (pixel == null || pixel is! PixelFloat64 || pixel.image != this) {
       pixel = PixelFloat64.imageData(this);
     }
     pixel.setPosition(x, y);

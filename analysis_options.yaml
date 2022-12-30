@@ -1,3 +1,4 @@
+include: package:lints/core.yaml
 linter:
   rules:
   - avoid_print

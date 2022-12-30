@@ -119,8 +119,9 @@ class PixelUint1 extends Iterable<num> implements Pixel {
       bi += 8;
       i++;
     }
-    if (i >= image.data.length)
+    if (i >= image.data.length) {
       return 0;
+    }
     return (image.data[i] >> bi) & 0x1;
   }
 
