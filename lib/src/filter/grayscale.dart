@@ -1,9 +1,11 @@
+import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/color_util.dart';
 import '../util/math_util.dart';
 
 /// Convert the image to grayscale.
-Image grayscale(Image src, { num amount = 1 }) {
+Image grayscale(Image src, { num amount = 1, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   for (final frame in src.frames) {
     if (frame.hasPalette) {
       final p = frame.palette!;
@@ -26,10 +28,12 @@ Image grayscale(Image src, { num amount = 1 }) {
     } else {
       for (final p in frame) {
         final l = getLuminanceRgb(p.r, p.g, p.b);
-        if (amount != 1) {
-          p..r = mix(p.r, l, amount)
-          ..g = mix(p.g, l, amount)
-          ..b = mix(p.b, l, amount);
+        final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+        final mx = (msk ?? 1) * amount;
+        if (mx != 1) {
+          p..r = mix(p.r, l, mx)
+          ..g = mix(p.g, l, mx)
+          ..b = mix(p.b, l, mx);
         } else {
           p..r = l
           ..g = l

@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
 
-///
+/// Apply color halftone filter to the image.
 Image colorHalftone(Image src, { num amount = 1, int? centerX, int? centerY,
-    num angle = 180, num size = 5 }) {
+    num angle = 180, num size = 5,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   angle = angle * 0.0174533;
 
   num _pattern(int x, int y, int cx, int cy, num angle) {
@@ -47,10 +49,13 @@ Image colorHalftone(Image src, { num amount = 1, int? centerX, int? centerY,
       final g = (1 - cmyM - cmyK) * p.maxChannelValue;
       final b = (1 - cmyY - cmyK) * p.maxChannelValue;
 
-      if (amount != 1) {
-        p..r = mix(p.r, r, amount)
-        ..g = mix(p.g, g, amount)
-        ..b = mix(p.b, b, amount);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      if (mx != 1) {
+        p..r = mix(p.r, r, mx)
+        ..g = mix(p.g, g, mx)
+        ..b = mix(p.b, b, mx);
       } else {
         p..r = r
         ..g = g

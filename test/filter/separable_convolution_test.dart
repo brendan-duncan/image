@@ -27,7 +27,7 @@ void main() {
       // Normalize the coefficients
       kernel.scaleCoefficients(1.0 / sum);
 
-      separableConvolution(i0, kernel);
+      separableConvolution(i0, kernel: kernel);
 
       File('$testOutputPath/filter/separableConvolution.png')
         ..createSync(recursive: true)

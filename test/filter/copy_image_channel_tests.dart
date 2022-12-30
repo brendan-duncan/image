@@ -6,7 +6,7 @@ import '../_test_util.dart';
 
 void main() {
   group('Filter', () {
-    test('imageMask', () {
+    test('copyImageChannels', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!.convert(numChannels: 4);
 
@@ -14,8 +14,9 @@ void main() {
       fillCircle(maskImage, x: 128, y: 128, radius: 128,
           color: ColorRgb8(255, 255, 255));
 
-      imageMask(i0, maskImage, scaleMask: true);
-      File('$testOutputPath/filter/imageMask.png')
+      copyImageChannels(i0, from: maskImage, scaled: true,
+          alpha: Channel.luminance);
+      File('$testOutputPath/filter/copyImageChannels.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });

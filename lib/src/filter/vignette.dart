@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
@@ -22,7 +23,8 @@ num _smoothStep(num edge0, num edge1, num x) {
 /// normalized percentage of the image size \[0, 1\].
 /// [amount] controls the blend of the effect with the original image.
 Image vignette(Image src, { num start = 0.3, num end = 0.85,
-    num amount = 0.9, Color? color }) {
+    num amount = 0.9, Color? color, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   final h = src.height - 1;
   final w = src.width - 1;
   final cr = color?.rNormalized ?? 0;
@@ -43,10 +45,13 @@ Image vignette(Image src, { num start = 0.3, num end = 0.85,
       final b = mix(p.bNormalized, cb, d) * p.maxChannelValue;
       final a = mix(p.aNormalized, ca, d) * p.maxChannelValue;
 
-      p..r = mix(p.r, r, amount)
-      ..g = mix(p.g, g, amount)
-      ..b = mix(p.b, b, amount)
-      ..a = mix(p.a, a, amount);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      p..r = mix(p.r, r, mx)
+      ..g = mix(p.g, g, mx)
+      ..b = mix(p.b, b, mx)
+      ..a = mix(p.a, a, mx);
     }
   }
   return src;

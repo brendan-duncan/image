@@ -17,7 +17,7 @@ void main() {
       const filter = [ 0,  1, 0,
                        1, -4, 1,
                        0,  1, 0 ];
-      convolution(i0, filter, div: 1, offset: 0);
+      convolution(i0, filter: filter, div: 1, offset: 0);
       File('$testOutputPath/filter/convolution.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));

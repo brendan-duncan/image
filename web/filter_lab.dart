@@ -108,7 +108,7 @@ void testGaussian() {
   void _apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
-    image = img.gaussianBlur(image, radius);
+    image = img.gaussianBlur(image, radius: radius);
 
     // Fill the buffer with our image data.
     filterImageData.data.setRange(0, filterImageData.data.length,
@@ -186,7 +186,7 @@ void testPixelate() {
   void _apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
-    image = img.pixelate(image, blockSize);
+    image = img.pixelate(image, size: blockSize);
 
     // Fill the buffer with our image data.
     filterImageData.data.setRange(0, filterImageData.data.length,

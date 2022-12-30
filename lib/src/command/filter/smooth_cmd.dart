@@ -1,16 +1,21 @@
+import '../../color/channel.dart';
 import '../../filter/smooth.dart' as g;
 import '../command.dart';
 
 class SmoothCmd extends Command {
   num weight;
+  Command? mask;
+  Channel maskChannel;
 
-  SmoothCmd(Command? input, this.weight)
+  SmoothCmd(Command? input, { required this.weight, this.mask,
+      this.maskChannel = Channel.luminance })
       : super(input);
 
   @override
   Future<void> executeCommand() async {
-    await input?.execute();
-    final img = input?.outputImage;
-    outputImage = img != null ? g.smooth(img, weight) : null;
+    final img = await input?.getImage();
+    final maskImg = await mask?.getImage();
+    outputImage = img != null ? g.smooth(img, weight: weight,
+        mask: maskImg, maskChannel: maskChannel) : null;
   }
 }

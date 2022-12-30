@@ -1,12 +1,14 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
 
 /// Apply sketch filter to the image.
 ///
-/// [amount] controls the strength of the effect, in the range 0.0 - 1.0.
-Image sketch(Image src, { num amount = 1 }) {
+/// [amount] controls the strength of the effect, in the range \[0, 1\].
+Image sketch(Image src, { num amount = 1, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   if (amount == 0) {
     return src;
   }
@@ -42,9 +44,12 @@ Image sketch(Image src, { num amount = 1 }) {
       final g = (mag * p.g).clamp(0, p.maxChannelValue);
       final b = (mag * p.b).clamp(0, p.maxChannelValue);
 
-      p..r = mix(p.r, r, amount)
-      ..g = mix(p.g, g, amount)
-      ..b = mix(p.b, b, amount);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      p..r = mix(p.r, r, mx)
+      ..g = mix(p.g, g, mx)
+      ..b = mix(p.b, b, mx);
     }
   }
 

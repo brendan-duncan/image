@@ -1,4 +1,6 @@
+import '../color/channel.dart';
 import '../image/image.dart';
+import '../util/math_util.dart';
 
 /// A kernel object to use with separableConvolution filtering.
 class SeparableKernel {
@@ -24,14 +26,17 @@ class SeparableKernel {
   /// for a single dimension. If [horizontal is true, the filter will be
   /// applied to the horizontal axis, otherwise it will be applied to the
   /// vertical axis.
-  void apply(Image src, Image dst, { bool horizontal = true }) {
+  void apply(Image src, Image dst, { bool horizontal = true,
+      Image? mask, Channel maskChannel = Channel.luminance }) {
     if (horizontal) {
       for (var y = 0; y < src.height; ++y) {
-        _applyCoefficientsLine(src, dst, y, src.width, horizontal);
+        _applyCoefficientsLine(src, dst, y, src.width, horizontal,
+            mask, maskChannel);
       }
     } else {
       for (var x = 0; x < src.width; ++x) {
-        _applyCoefficientsLine(src, dst, x, src.height, horizontal);
+        _applyCoefficientsLine(src, dst, x, src.height, horizontal,
+            mask, maskChannel);
       }
     }
   }
@@ -54,7 +59,7 @@ class SeparableKernel {
   }
 
   void _applyCoefficientsLine(Image src, Image dst, int y, int width,
-      bool horizontal) {
+      bool horizontal, Image? mask, Channel maskChannel) {
     for (var x = 0; x < width; x++) {
       num r = 0.0;
       num g = 0.0;
@@ -73,12 +78,16 @@ class SeparableKernel {
         a += c * sc.a;
       }
 
-      final c = src.getColor(r, g, b, a);
+      final p = horizontal ? dst.getPixel(x, y) : dst.getPixel(y, x);
 
-      if (horizontal) {
-        dst.setPixel(x, y, c);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      if (msk == null) {
+        p.setColor(r, g, b, a);
       } else {
-        dst.setPixel(y, x, c);
+        p..r = mix(p.r, r, msk)
+        ..g = mix(p.g, g, msk)
+        ..b = mix(p.b, b, msk)
+        ..a = mix(p.a, a, msk);
       }
     }
   }

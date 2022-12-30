@@ -3,9 +3,9 @@ import '../../util/quantizer.dart';
 import '../command.dart';
 
 class DitherImageCmd extends Command {
-  Quantizer? quantizer;
-  g.DitherKernel kernel;
-  bool serpentine;
+  final Quantizer? quantizer;
+  final g.DitherKernel kernel;
+  final bool serpentine;
 
   DitherImageCmd(Command? input, { this.quantizer,
       this.kernel = g.DitherKernel.floydSteinberg, this.serpentine = false })

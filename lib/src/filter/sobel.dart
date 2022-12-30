@@ -1,14 +1,14 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../image/image.dart';
 
 /// Apply Sobel edge detection filtering to the [src] Image.
-Image sobel(Image src, { num amount = 1.0 }) {
+Image sobel(Image src, { num amount = 1, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   if (amount == 0.0) {
     return src;
   }
-
-  final num invAmount = 1.0 - amount;
 
   for (final frame in src.frames) {
     final orig = Image.from(frame, noAnimation: true);
@@ -37,9 +37,13 @@ Image sobel(Image src, { num amount = 1.0 }) {
 
       final mag = sqrt(h * h + v * v) * p.maxChannelValue;
 
-      p..r = mag * amount + p.r * invAmount
-      ..g = mag * amount + p.g * invAmount
-      ..b = mag * amount + p.b * invAmount;
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+      final invMx = 1 - mx;
+
+      p..r = mag * mx + p.r * invMx
+      ..g = mag * mx + p.g * invMx
+      ..b = mag * mx + p.b * invMx;
     }
   }
 

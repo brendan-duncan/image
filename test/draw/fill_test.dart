@@ -30,7 +30,7 @@ void main() {
         ..fill(color: ColorRgb8(0, 0, 0))
         ..fillCircle(x: 128, y: 128, radius: 50,
             color: ColorRgb8(255, 255, 255))
-        ..gaussianBlur(10);
+        ..gaussianBlur(radius: 10);
 
       await (Command()
           ..createImage(width: 256, height: 256)

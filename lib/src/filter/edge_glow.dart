@@ -1,10 +1,12 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
 
 /// Apply the edge glow filter to the [src] Image.
-Image edgeGlow(Image src, { num amount = 1.0 }) {
+Image edgeGlow(Image src, { num amount = 1, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   if (amount == 0.0) {
     return src;
   }
@@ -51,9 +53,12 @@ Image edgeGlow(Image src, { num amount = 1.0 }) {
       final g = (rrG * 2 * t5.gNormalized) * p.maxChannelValue;
       final b = (rrB * 2 * t5.bNormalized) * p.maxChannelValue;
 
-      p..r = mix(p.r, r, amount)
-        ..g = mix(p.g, g, amount)
-        ..b = mix(p.b, b, amount);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      p..r = mix(p.r, r, mx)
+        ..g = mix(p.g, g, mx)
+        ..b = mix(p.b, b, mx);
     }
   }
 

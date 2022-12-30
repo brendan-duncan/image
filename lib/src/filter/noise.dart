@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../image/image.dart';
+import '../util/math_util.dart';
 import '../util/min_max.dart';
 import '../util/random.dart';
 
@@ -11,7 +13,8 @@ enum NoiseType { gaussian, uniform, saltAndPepper, poisson, rice }
 /// [NoiseType.uniform], [NoiseType.saltAndPepper], [NoiseType.poisson],
 /// or [NoiseType.rice].
 Image noise(Image image, num sigma,
-    { NoiseType type = NoiseType.gaussian, Random? random }) {
+    { NoiseType type = NoiseType.gaussian, Random? random,
+      Image? mask, Channel maskChannel = Channel.luminance }) {
   random ??= Random();
 
   var nSigma = sigma;
@@ -40,7 +43,16 @@ Image noise(Image image, num sigma,
           final g = p.g + nSigma * grand(random);
           final b = p.b + nSigma * grand(random);
           final a = p.a;
-          p.setColor(r, g, b, a);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          if (msk == null) {
+            p.setColor(r, g, b, a);
+          } else {
+            p..r = mix(p.r, r, msk)
+            ..g = mix(p.g, g, msk)
+            ..b = mix(p.b, b, msk)
+            ..a = mix(p.a, a, msk);
+          }
         }
         break;
       case NoiseType.uniform:
@@ -49,7 +61,16 @@ Image noise(Image image, num sigma,
           final g = p.g + nSigma * crand(random);
           final b = p.b + nSigma * crand(random);
           final a = p.a;
-          p.setColor(r, g, b, a);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          if (msk == null) {
+            p.setColor(r, g, b, a);
+          } else {
+            p..r = mix(p.r, r, msk)
+            ..g = mix(p.g, g, msk)
+            ..b = mix(p.b, b, msk)
+            ..a = mix(p.a, a, msk);
+          }
         }
         break;
       case NoiseType.saltAndPepper:
@@ -66,7 +87,16 @@ Image noise(Image image, num sigma,
             final g = random.nextDouble() < 0.5 ? M : m;
             final b = random.nextDouble() < 0.5 ? M : m;
             final a = p.a;
-            p.setColor(r, g, b, a);
+            final msk = mask?.getPixel(p.x, p.y)
+                .getChannelNormalized(maskChannel);
+            if (msk == null) {
+              p.setColor(r, g, b, a);
+            } else {
+              p..r = mix(p.r, r, msk)
+              ..g = mix(p.g, g, msk)
+              ..b = mix(p.b, b, msk)
+              ..a = mix(p.a, a, msk);
+            }
           }
         }
         break;
@@ -76,7 +106,16 @@ Image noise(Image image, num sigma,
           final g = prand(random, p.g.toDouble());
           final b = prand(random, p.b.toDouble());
           final a = p.a;
-          p.setColor(r, g, b, a);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          if (msk == null) {
+            p.setColor(r, g, b, a);
+          } else {
+            p..r = mix(p.r, r, msk)
+            ..g = mix(p.g, g, msk)
+            ..b = mix(p.b, b, msk)
+            ..a = mix(p.a, a, msk);
+          }
         }
         break;
       case NoiseType.rice:
@@ -102,7 +141,16 @@ Image noise(Image image, num sigma,
 
           final a = p.a;
 
-          p.setColor(r, g, b, a);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          if (msk == null) {
+            p.setColor(r, g, b, a);
+          } else {
+            p..r = mix(p.r, r, msk)
+            ..g = mix(p.g, g, msk)
+            ..b = mix(p.b, b, msk)
+            ..a = mix(p.a, a, msk);
+          }
         }
         break;
     }

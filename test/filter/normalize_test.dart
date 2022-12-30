@@ -9,7 +9,7 @@ void main() {
     test('normalize', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
-      normalize(i0, 50, 150);
+      normalize(i0, min: 50, max: 150);
       File('$testOutputPath/filter/normalize.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));

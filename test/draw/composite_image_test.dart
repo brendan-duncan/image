@@ -63,7 +63,7 @@ void main() {
         ..fill(color: ColorRgb8(0, 0, 0))
         ..fillCircle(x: 128, y: 128, radius: 30,
             color: ColorRgb8(255, 255, 255))
-        ..gaussianBlur(5);
+        ..gaussianBlur(radius: 5);
 
       final fgCmd = Command()..image(fg);
 

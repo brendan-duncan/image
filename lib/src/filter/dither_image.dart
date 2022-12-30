@@ -4,7 +4,7 @@ import '../image/image.dart';
 import '../util/neural_quantizer.dart';
 import '../util/quantizer.dart';
 
-// From http://jsbin.com/iXofIji/2/edit by PAEz
+/// The pattern to use for dithering
 enum DitherKernel {
   none,
   falseFloydSteinberg,
@@ -58,6 +58,8 @@ const _ditherKernels = [
   ]
 ];
 
+/// Dither an image to reduce banding patterns when reducing the number of
+/// colors.
 Image ditherImage(Image image, { Quantizer? quantizer,
     DitherKernel kernel = DitherKernel.floydSteinberg,
     bool serpentine = false }) {

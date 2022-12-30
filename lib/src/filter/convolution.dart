@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
 
@@ -8,8 +9,9 @@ import '../util/math_util.dart';
 ///
 /// The rgb channels will be divided by [div] and add [offset], allowing
 /// filters to normalize and offset the filtered pixel value.
-Image convolution(Image src, List<num> filter,
-    { num div = 1.0, num offset = 0.0, num amount = 1 }) {
+Image convolution(Image src, { required List<num> filter,
+    num div = 1.0, num offset = 0.0, num amount = 1,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   final tmp = Image.from(src);
   for (final frame in src.frames) {
     final tmpFrame = tmp.frames[frame.frameIndex];
@@ -33,9 +35,13 @@ Image convolution(Image src, List<num> filter,
       b = ((b / div) + offset).clamp(0, 255);
 
       final p = frame.getPixel(c.x, c.y);
-      p..r = mix(p.r, r, amount)
-      ..g = mix(p.g, g, amount)
-      ..b = mix(p.b, b, amount);
+
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      p..r = mix(p.r, r, mx)
+      ..g = mix(p.g, g, mx)
+      ..b = mix(p.b, b, mx);
     }
   }
 

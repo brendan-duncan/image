@@ -1,8 +1,13 @@
+import '../../color/channel.dart';
 import '../../filter/reinhard_tone_map.dart' as g;
 import '../command.dart';
 
 class ReinhardTonemapCmd extends Command {
-  ReinhardTonemapCmd(Command? input)
+  Command? mask;
+  Channel maskChannel;
+
+  ReinhardTonemapCmd(Command? input, { this.mask,
+      this.maskChannel = Channel.luminance })
       : super(input);
 
   @override

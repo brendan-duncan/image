@@ -44,6 +44,7 @@ import 'filter/color_halftone_cmd.dart';
 import 'filter/color_offset_cmd.dart';
 import 'filter/contrast_cmd.dart';
 import 'filter/convolution_cmd.dart';
+import 'filter/copy_image_channels_cmd.dart';
 import 'filter/dither_image_cmd.dart';
 import 'filter/dot_screen_cmd.dart';
 import 'filter/drop_shadow_cmd.dart';
@@ -55,7 +56,6 @@ import 'filter/gaussian_blur_cmd.dart';
 import 'filter/grayscale_cmd.dart';
 import 'filter/hdr_to_ldr_cmd.dart';
 import 'filter/hexagon_pixelate_cmd.dart';
-import 'filter/image_mask_cmd.dart';
 import 'filter/invert_cmd.dart';
 import 'filter/luminance_threshold_cmd.dart';
 import 'filter/monochrome_cmd.dart';
@@ -445,57 +445,78 @@ class Command {
 
   void adjustColor({ Color? blacks, Color? whites, Color? mids,
         num? contrast, num? saturation, num? brightness,
-        num? gamma, num? exposure, num? hue, num? amount }) {
+        num? gamma, num? exposure, num? hue, num amount = 1, Command? mask,
+    Channel maskChannel = Channel.luminance }) {
     subCommand = AdjustColorCmd(subCommand, blacks: blacks, whites: whites,
         mids: mids, contrast: contrast, saturation: saturation,
         brightness: brightness, gamma: gamma, exposure: exposure,
-        hue: hue, amount: amount);
+        hue: hue, amount: amount, mask: mask, maskChannel: maskChannel);
   }
 
-  void billboard({ num grid = 10, num amount = 1 }) {
-    subCommand = BillboardCmd(subCommand, grid: grid, amount: amount);
+  void billboard({ num grid = 10, num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = BillboardCmd(subCommand, grid: grid, amount: amount,
+        mask: mask, maskChannel: maskChannel);
   }
 
-  void bleachBypass({ num amount = 1}) {
-    subCommand = BleachBypassCmd(subCommand, amount: amount);
+  void bleachBypass({ num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = BleachBypassCmd(subCommand, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void bulgeDistortion({ int? centerX, int? centerY,
       num? radius, num scale = 0.5,
-      Interpolation interpolation = Interpolation.nearest }) {
+      Interpolation interpolation = Interpolation.nearest, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
     subCommand = BulgeDistortionCmd(subCommand, centerX: centerX,
         centerY: centerY, radius: radius, scale: scale,
-        interpolation: interpolation);
+        interpolation: interpolation, mask: mask, maskChannel: maskChannel);
   }
 
-  void bumpToNormal({ num strength = 2.0 }) {
+  void bumpToNormal({ num strength = 2 }) {
     subCommand = BumpToNormalCmd(subCommand, strength: strength);
   }
 
-  void chromaticAberration({ int shift = 5 }) {
-    subCommand = ChromaticAberrationCmd(subCommand, shift: shift);
+  void chromaticAberration({ int shift = 5, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = ChromaticAberrationCmd(subCommand, shift: shift, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void colorHalftone({ num amount = 1, int? centerX, int? centerY,
-      num angle = 180, num size = 5 }) {
+      num angle = 180, num size = 5, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
     subCommand = ColorHalftoneCmd(subCommand, amount: amount,
-        centerX: centerX, centerY: centerY, angle: angle, size: size);
+        centerX: centerX, centerY: centerY, angle: angle, size: size,
+        mask: mask, maskChannel: maskChannel);
   }
 
   void colorOffset({ num red = 0, num green = 0, num blue = 0,
-      num alpha = 0 }) {
+      num alpha = 0, Command? mask, Channel maskChannel = Channel.luminance }) {
     subCommand = ColorOffsetCmd(subCommand, red: red, green: green, blue: blue,
-        alpha: alpha);
+        alpha: alpha, mask: mask, maskChannel: maskChannel);
   }
 
-  void contrast(num c) {
-    subCommand = ContrastCmd(subCommand, contrast: c);
+  void contrast({ required num contrast, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = ContrastCmd(subCommand, contrast: contrast, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void convolution(List<num> filter, { num div = 1.0, num offset = 0.0,
-      num amount = 1 }) {
-    subCommand = ConvolutionCmd(subCommand, filter, div: div, offset: offset,
-        amount: amount);
+  void convolution({ required List<num> filter, num div = 1.0, num offset = 0,
+      num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = ConvolutionCmd(subCommand, filter: filter, div: div,
+        offset: offset, amount: amount, mask: mask, maskChannel: maskChannel);
+  }
+
+  void copyImageChannels({ required Command? from, bool scaled = false,
+    Channel? red, Channel? green, Channel? blue, Channel? alpha,
+    Command? mask, Channel maskChannel = Channel.luminance}) {
+    subCommand = CopyImageChannelsCmd(subCommand, from: from, scaled: scaled,
+        red: red, green: green, blue: blue, alpha: alpha, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void ditherImage({ Quantizer? quantizer,
@@ -506,9 +527,11 @@ class Command {
   }
 
   void dotScreen({ num angle = 180, num size = 5.75, int? centerX,
-        int? centerY, num amount = 1 }) {
+        int? centerY, num amount = 1, Command? mask,
+        Channel maskChannel = Channel.luminance }) {
     subCommand = DotScreenCmd(subCommand, angle: angle, size: size,
-        centerX: centerX, centerY: centerY, amount: amount);
+        centerX: centerX, centerY: centerY, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void dropShadow(int hShadow, int vShadow, int blur, { Color? shadowColor }) {
@@ -516,24 +539,34 @@ class Command {
         shadowColor: shadowColor);
   }
 
-  void edgeGlow({ num amount = 1 }) {
-    subCommand = EdgeGlowCmd(subCommand, amount: amount);
+  void edgeGlow({ num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = EdgeGlowCmd(subCommand, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void emboss({ num amount = 1 }) {
-    subCommand = EmbossCmd(subCommand, amount: amount);
+  void emboss({ num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = EmbossCmd(subCommand, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void gamma({ num gamma = 2.2 }) {
-    subCommand = GammaCmd(subCommand, gamma: gamma);
+  void gamma({ required num gamma, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = GammaCmd(subCommand, gamma: gamma, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void gaussianBlur(int radius) {
-    subCommand = GaussianBlurCmd(subCommand, radius);
+  void gaussianBlur({ required int radius, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = GaussianBlurCmd(subCommand, radius: radius, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void grayscale({ num amount = 1 }) {
-    subCommand = GrayscaleCmd(subCommand, amount: amount);
+  void grayscale({ num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = GrayscaleCmd(subCommand, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void hdrToLdr({ num? exposure }) {
@@ -541,42 +574,49 @@ class Command {
   }
 
   void hexagonPixelate({ int? centerX, int? centerY, int size = 5,
-      num amount = 1 }) {
+      num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
     subCommand = HexagonPixelateCmd(subCommand, centerX: centerX,
-        centerY: centerY, size: size, amount: amount);
+        centerY: centerY, size: size, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void invert() {
-    subCommand = InvertCmd(subCommand);
+  void invert({ Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = InvertCmd(subCommand, mask: mask, maskChannel: maskChannel);
   }
 
   void luminanceThreshold({ num threshold = 0.5, bool outputColor = false,
-      num amount = 1 }) {
+      num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
     subCommand = LuminanceThresholdCmd(subCommand, threshold: threshold,
-        outputColor: outputColor, amount: amount);
+        outputColor: outputColor, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void imageMask(Command? mask, { Channel maskChannel = Channel.luminance,
-      bool scaleMask = false }) {
-    subCommand = ImageMaskCmd(subCommand, mask, maskChannel: maskChannel,
-        scaleMask: scaleMask);
-  }
-
-  void monochrome({ Color? color, num amount = 1 }) {
-    subCommand = MonochromeCmd(subCommand, color: color, amount: amount);
+  void monochrome({ Color? color, num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = MonochromeCmd(subCommand, color: color, amount: amount,
+        mask: mask, maskChannel: maskChannel);
   }
 
   void noise(num sigma, { NoiseType type = NoiseType.gaussian,
-      Random? random }) {
-    subCommand = NoiseCmd(subCommand, sigma, type: type, random: random);
+      Random? random, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = NoiseCmd(subCommand, sigma, type: type, random: random,
+        mask: mask, maskChannel: maskChannel);
   }
 
-  void normalize(num minValue, num maxValue) {
-    subCommand = NormalizeCmd(subCommand, minValue, maxValue);
+  void normalize({ required num min, required num max, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = NormalizeCmd(subCommand, min: min, max: max, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void pixelate(int blockSize, { PixelateMode mode = PixelateMode.upperLeft }) {
-    subCommand = PixelateCmd(subCommand, blockSize, mode: mode);
+  void pixelate({ required int size, PixelateMode mode = PixelateMode.upperLeft,
+      Command? mask, Channel maskChannel = Channel.luminance }) {
+    subCommand = PixelateCmd(subCommand, size: size, mode: mode, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void quantize({ int numberOfColors = 256,
@@ -587,8 +627,10 @@ class Command {
         method: method, dither: dither, ditherSerpentine: ditherSerpentine);
   }
 
-  void reinhardTonemap() {
-    subCommand = ReinhardTonemapCmd(subCommand);
+  void reinhardTonemap({ Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = ReinhardTonemapCmd(subCommand, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void remapColors({ Channel red = Channel.red,
@@ -599,40 +641,55 @@ class Command {
         alpha: alpha);
   }
 
-  void scaleRgba(Color s) {
-    subCommand = ScaleRgbaCmd(subCommand, s);
+  void scaleRgba({ required Color scale, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = ScaleRgbaCmd(subCommand, scale: scale, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void separableConvolution(SeparableKernel kernel) {
-    subCommand = SeparableConvolutionCmd(subCommand, kernel);
+  void separableConvolution({ required SeparableKernel kernel, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = SeparableConvolutionCmd(subCommand, kernel: kernel, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void sepia({ num amount = 1 }) {
-    subCommand = SepiaCmd(subCommand, amount: amount);
+  void sepia({ num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = SepiaCmd(subCommand, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void sketch({ num amount = 1 }) {
-    subCommand = SketchCmd(subCommand, amount: amount);
+  void sketch({ num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = SketchCmd(subCommand, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void smooth(num weight) {
-    subCommand = SmoothCmd(subCommand, weight);
+  void smooth({ required num weight, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = SmoothCmd(subCommand, weight: weight, mask: mask,
+        maskChannel: maskChannel);
   }
 
-  void sobel({ num amount = 1 }) {
-    subCommand = SobelCmd(subCommand, amount: amount);
+  void sobel({ num amount = 1, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
+    subCommand = SobelCmd(subCommand, amount: amount, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void stretchDistortion({ int? centerX, int? centerY,
-    Interpolation interpolation = Interpolation.nearest }) {
+      Interpolation interpolation = Interpolation.nearest, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
     subCommand = StretchDistortionCmd(subCommand, centerX: centerX,
-        centerY: centerY, interpolation: interpolation);
+        centerY: centerY, interpolation: interpolation, mask: mask,
+        maskChannel: maskChannel);
   }
 
   void vignette({ num start = 0.3, num end = 0.75, Color? color,
-      num amount = 0.8 }) {
+      num amount = 0.8, Command? mask,
+      Channel maskChannel = Channel.luminance }) {
     subCommand = VignetteCmd(subCommand, start: start, end: end,
-        color: color, amount: amount);
+        color: color, amount: amount, mask: mask, maskChannel: maskChannel);
   }
 
   /// Run an arbitrary function on the image within the Command graph.

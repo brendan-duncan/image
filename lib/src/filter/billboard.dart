@@ -1,10 +1,12 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
 
-///
-Image billboard(Image src, { num grid = 10, num amount = 1 }) {
+/// Apply the billboard filter to the image.
+Image billboard(Image src, { num grid = 10, num amount = 1, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
   const rs = 0.2025;// pow(0.45, 2.0);
 
   for (final frame in src.frames) {
@@ -50,9 +52,12 @@ Image billboard(Image src, { num grid = 10, num amount = 1 }) {
       g = mix(lf * g, 0.1, gr);
       b = mix(lf * b, 0.1, gr);
 
-      p..r = mix(p.r, r * p.maxChannelValue, amount)
-      ..g = mix(p.g, g * p.maxChannelValue, amount)
-      ..b = mix(p.b, b * p.maxChannelValue, amount);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final mx = (msk ?? 1) * amount;
+
+      p..r = mix(p.r, r * p.maxChannelValue, mx)
+      ..g = mix(p.g, g * p.maxChannelValue, mx)
+      ..b = mix(p.b, b * p.maxChannelValue, mx);
     }
   }
   return src;

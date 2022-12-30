@@ -1,17 +1,22 @@
+import '../../color/channel.dart';
 import '../../filter/normalize.dart' as g;
 import '../command.dart';
 
 class NormalizeCmd extends Command {
-  num minValue;
-  num maxValue;
+  num min;
+  num max;
+  Command? mask;
+  Channel maskChannel;
 
-  NormalizeCmd(Command? input, this.minValue, this.maxValue)
+  NormalizeCmd(Command? input, { required this.min, required this.max,
+      this.mask, this.maskChannel = Channel.luminance })
       : super(input);
 
   @override
   Future<void> executeCommand() async {
-    await input?.execute();
-    final img = input?.outputImage;
-    outputImage = img != null ? g.normalize(img, minValue, maxValue) : null;
+    final img = await input?.getImage();
+    final maskImg = await mask?.getImage();
+    outputImage = img != null ? g.normalize(img, min: min, max: max,
+        mask: maskImg, maskChannel: maskChannel) : null;
   }
 }

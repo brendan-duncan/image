@@ -1,11 +1,14 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '../util/math_util.dart';
 
 Image bulgeDistortion(Image src, { int? centerX, int? centerY,
     num? radius, num scale = 0.5,
-    Interpolation interpolation = Interpolation.nearest }) {
+    Interpolation interpolation = Interpolation.nearest,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   for (final frame in src.frames) {
     final orig = frame.clone(noAnimation: true);
     final w = frame.width;
@@ -31,7 +34,17 @@ Image bulgeDistortion(Image src, { int? centerX, int? centerY,
       x += cx;
       y += cy;
 
-      p.set(orig.getPixelInterpolate(x, y, interpolation: interpolation));
+      final p2 = orig.getPixelInterpolate(x, y, interpolation: interpolation);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+
+      if (msk == null) {
+        p.set(p2);
+      } else {
+        p..r = mix(p.r, p2.r, msk)
+        ..g = mix(p.g, p2.g, msk)
+        ..b = mix(p.b, p2.b, msk)
+        ..a = mix(p.a, p2.a, msk);
+      }
     }
   }
   return src;

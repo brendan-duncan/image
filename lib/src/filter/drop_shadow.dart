@@ -55,9 +55,9 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
   remapColors(dst,
       red: Channel.alpha, green: Channel.alpha, blue: Channel.alpha);
 
-  scaleRgba(dst, shadowColor);
+  scaleRgba(dst, scale: shadowColor);
 
-  gaussianBlur(dst, blur);
+  gaussianBlur(dst, radius: blur);
 
   compositeImage(dst, src, dstX: imageOffsetX, dstY: imageOffsetY);
 

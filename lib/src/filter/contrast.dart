@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
+import '../color/channel.dart';
 import '../image/image.dart';
+import '../util/math_util.dart';
 
 num? _lastContrast;
 late Uint8List _contrast;
@@ -10,7 +12,8 @@ late Uint8List _contrast;
 /// [contrast] values below 100 will decrees the contrast of the image,
 /// and values above 100 will increase the contrast. A contrast of of 100
 /// will have no affect.
-Image contrast(Image src, num contrast) {
+Image contrast(Image src, { required num contrast,
+    Image? mask, Channel maskChannel = Channel.luminance }) {
   if (contrast == 100.0) {
     return src;
   }
@@ -29,9 +32,16 @@ Image contrast(Image src, num contrast) {
 
   for (final frame in src.frames) {
     for (final p in frame) {
-      p..r = _contrast[p.r as int]
-      ..g = _contrast[p.g as int]
-      ..b = _contrast[p.b as int];
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      if (msk == null) {
+        p..r = _contrast[p.r as int]
+        ..g = _contrast[p.g as int]
+        ..b = _contrast[p.b as int];
+      } else {
+        p..r = mix(p.r, _contrast[p.r as int], msk)
+        ..g = mix(p.g, _contrast[p.g as int], msk)
+        ..b = mix(p.b, _contrast[p.b as int], msk);
+      }
     }
   }
 

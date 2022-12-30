@@ -16,8 +16,7 @@ class QuantizeCmd extends Command {
 
   @override
   Future<void> executeCommand() async {
-    await input?.execute();
-    final img = input?.outputImage;
+    final img = await input?.getImage();
     outputImage = img != null ? g.quantize(img, numberOfColors: numberOfColors,
         method: method, dither: dither, ditherSerpentine: ditherSerpentine)
         : null;

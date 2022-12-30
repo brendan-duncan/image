@@ -1,7 +1,9 @@
 import 'dart:math';
 
+import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
+import '../util/math_util.dart';
 
 /// Adjust the color of the [src] image using various color transformations.
 ///
@@ -37,18 +39,13 @@ import '../image/image.dart';
 ///
 /// [amount] controls how much affect this filter has on the [src] image, where
 /// 0.0 has no effect and 1.0 has full effect.
+///
 Image adjustColor(Image src,
-    { Color? blacks,
-      Color? whites,
-      Color? mids,
-      num? contrast,
-      num? saturation,
-      num? brightness,
-      num? gamma,
-      num? exposure,
-      num? hue,
-      num? amount }) {
-  if (amount == 0.0) {
+    { Color? blacks, Color? whites, Color? mids, num? contrast,
+      num? saturation, num? brightness, num? gamma, num? exposure,
+      num? hue, num amount = 1, Image? mask,
+      Channel maskChannel = Channel.luminance }) {
+  if (amount == 0) {
     return src;
   }
 
@@ -57,7 +54,7 @@ Image adjustColor(Image src,
   brightness = brightness?.clamp(0, 1);
   gamma = gamma?.clamp(0, 1000);
   exposure = exposure?.clamp(0, 1000);
-  amount = amount?.clamp(0, 1000);
+  amount = amount.clamp(0, 1000);
 
   const degToRad = 0.0174532925;
   const avgLumR = 0.5;
@@ -72,17 +69,17 @@ Image adjustColor(Image src,
   late num wr, wg, wb;
   late num mr, mg, mb;
   if (useBlacksWhitesMids) {
-    br = blacks != null ? blacks.r / blacks.maxChannelValue : 0;
-    bg = blacks != null ? blacks.g / blacks.maxChannelValue : 0;
-    bb = blacks != null ? blacks.b / blacks.maxChannelValue : 0;
+    br = blacks?.rNormalized ?? 0;
+    bg = blacks?.gNormalized ?? 0;
+    bb = blacks?.bNormalized ?? 0;
 
-    wr = whites != null ? whites.r / whites.maxChannelValue : 0;
-    wg = whites != null ? whites.g / whites.maxChannelValue : 0;
-    wb = whites != null ? whites.b / whites.maxChannelValue : 0;
+    wr = whites?.rNormalized ?? 0;
+    wg = whites?.gNormalized ?? 0;
+    wb = whites?.bNormalized ?? 0;
 
-    mr = mids != null ? mids.r / mids.maxChannelValue : 0;
-    mg = mids != null ? mids.g / mids.maxChannelValue : 0;
-    mb = mids != null ? mids.b / mids.maxChannelValue : 0;
+    mr = mids?.rNormalized ?? 0;
+    mg = mids?.gNormalized ?? 0;
+    mb = mids?.bNormalized ?? 0;
 
     mr = 1.0 / (1.0 + 2.0 * (mr - 0.5));
     mg = 1.0 / (1.0 + 2.0 * (mg - 0.5));
@@ -110,13 +107,11 @@ Image adjustColor(Image src,
     hueB = ((sqrt(3.0) * s - c) + 1.0) / 3.0;
   }
 
-  final invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
-
   for (final frame in src.frames) {
     for (final p in frame) {
-      final num or = p.r / 255.0;
-      final num og = p.g / 255.0;
-      final num ob = p.b / 255.0;
+      final or = p.rNormalized;
+      final og = p.gNormalized;
+      final ob = p.bNormalized;
 
       var r = or;
       var g = og;
@@ -171,15 +166,17 @@ Image adjustColor(Image src,
         b = hb;
       }
 
-      if (amount != null) {
-        r = r * amount + or * invAmount;
-        g = g * amount + og * invAmount;
-        b = b * amount + ob * invAmount;
-      }
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel)
+          ?? 1;
+      final blend = msk * amount;
 
-      p..r = r * p.maxChannelValue
-      ..g = g * p.maxChannelValue
-      ..b = b * p.maxChannelValue;
+      r = mix(or, r, blend);
+      g = mix(og, g, blend);
+      b = mix(ob, b, blend);
+
+      p..rNormalized = r
+      ..gNormalized = g
+      ..bNormalized = b;
     }
   }
 
