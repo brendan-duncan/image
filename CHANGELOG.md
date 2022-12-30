@@ -1,11 +1,16 @@
-## 4.0.0 -
+## 4.0.0 - December 30, 2022
 
 - Major update of the Dart Image Library. Includes support for:
-  - 1, 2, 4, 8, 16, and 32 bit images, with 1, 2, 3, or 4 channels per pixel.
-  - 16, 32, and 64 bit floating-point images.
-  - Palette images with 1, 2, 4, and 8 bit colors.
+  - Major overhaul of the API. Dart has changed a lot in the 10 years since this library was written,
+    so the API has been modernized. 
+  - Flexible ImageData, with support for 1, 2, 4, 8, 16, and 32 bit images, and 1-4 channels per pixel.
+  - 16, 32, and 64-bit floating-point format images.
+  - 8, 16, and 32-bit integer format images.
+  - Palette images with 1, 2, 4, and 8-bit colors.
   - Improved pixel access API.
-  - Async API for platforms that support isolates.
+  - Merged HDR and Animation functionality into the single Image class.
+  - New Command API with support for executing on Isolate threads.
+  - New filters and drawing commands.
 
 ## 3.2.2 - October 15, 2022
 
