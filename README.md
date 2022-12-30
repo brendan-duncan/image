@@ -12,6 +12,8 @@ web applications.
 
 NOTE: 4.0 is a major revision from the previous version of the library.
 
+## [Documentation](doc/README.md)
+
 ### [Supported Image Formats](doc/formats.md)
 
 **Read/Write**
@@ -34,8 +36,6 @@ NOTE: 4.0 is a major revision from the previous version of the library.
 **Write Only**
 
 - CUR
-
-## [Documentation](doc/README.md)
 
 ## Examples
 
