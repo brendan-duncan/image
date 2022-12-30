@@ -2055,6 +2055,19 @@ color alpha, as a normalized color value [0, 1].
 
 </dd>
 
+        <dt id="drawPolygon" class="callable">
+  <span class="name"><a href="../image/drawPolygon.html">drawPolygon</a></span><span class="signature">(<wbr><span class="parameter" id="drawPolygon-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="drawPolygon-param-vertices">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Point-class.html">Point</a></span>&gt;</span></span> <span class="parameter-name">vertices</span>, </span><span class="parameter" id="drawPolygon-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="drawPolygon-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="drawPolygon-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Fill a polygon defined by the given <code>vertices</code>.
+  
+
+</dd>
+
         <dt id="drawRect" class="callable">
   <span class="name"><a href="../image/drawRect.html">drawRect</a></span><span class="signature">(<wbr><span class="parameter" id="drawRect-param-dst"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">dst</span>, </span><span class="parameter" id="drawRect-param-x1">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span><span class="parameter" id="drawRect-param-y1"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span><span class="parameter" id="drawRect-param-x2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span><span class="parameter" id="drawRect-param-y2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span><span class="parameter" id="drawRect-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="drawRect-param-thickness"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">thickness</span> = <span class="default-value">1</span>, </span><span class="parameter" id="drawRect-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="drawRect-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
     <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
@@ -2490,6 +2503,19 @@ and the given <code>radius</code> and <code>color</code>.
 <dd>
   Fill the 4-connected shape containing <code>x</code>,<code>y</code> in the image <code>src</code> with the
 given <code>color</code>.
+  
+
+</dd>
+
+        <dt id="fillPolygon" class="callable">
+  <span class="name"><a href="../image/fillPolygon.html">fillPolygon</a></span><span class="signature">(<wbr><span class="parameter" id="fillPolygon-param-src"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">src</span>, </span><span class="parameter" id="fillPolygon-param-vertices">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Point-class.html">Point</a></span>&gt;</span></span> <span class="parameter-name">vertices</span>, </span><span class="parameter" id="fillPolygon-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="fillPolygon-param-mask"><span class="type-annotation"><a href="../image/Image-class.html">Image</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="fillPolygon-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; <a href="../image/Image-class.html">Image</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Fill a polygon defined by the given <code>vertices</code>.
   
 
 </dd>
@@ -3745,6 +3771,7 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/drawCircle.html">drawCircle</a></li>
         <li><a href="../image/drawLine.html">drawLine</a></li>
         <li><a href="../image/drawPixel.html">drawPixel</a></li>
+        <li><a href="../image/drawPolygon.html">drawPolygon</a></li>
         <li><a href="../image/drawRect.html">drawRect</a></li>
         <li><a href="../image/drawString.html">drawString</a></li>
         <li><a href="../image/dropShadow.html">dropShadow</a></li>
@@ -3778,6 +3805,7 @@ Tiff, can represent the frames of an animation as pages in a document.
         <li><a href="../image/fill.html">fill</a></li>
         <li><a href="../image/fillCircle.html">fillCircle</a></li>
         <li><a href="../image/fillFlood.html">fillFlood</a></li>
+        <li><a href="../image/fillPolygon.html">fillPolygon</a></li>
         <li><a href="../image/fillRect.html">fillRect</a></li>
         <li><a href="../image/findDecoderForData.html">findDecoderForData</a></li>
         <li><a href="../image/findDecoderForNamedImage.html">findDecoderForNamedImage</a></li>
