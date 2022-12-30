@@ -6,17 +6,17 @@ import 'package:image/image.dart';
 void main() {
   final theImg = document.getElementById('testimage') as ImageElement;
 
-  final cvs = document.createElement('canvas') as CanvasElement;
-  cvs.width = theImg.width;
-  cvs.height = theImg.height;
+  final cvs = document.createElement('canvas') as CanvasElement
+  ..width = theImg.width
+  ..height = theImg.height;
 
-  final ctx = cvs.getContext('2d') as CanvasRenderingContext2D;
-
-  ctx.drawImage(theImg, 0, 0);
+  final ctx = cvs.getContext('2d') as CanvasRenderingContext2D
+  ..drawImage(theImg, 0, 0);
 
   final bytes = ctx.getImageData(0, 0, cvs.width!, cvs.height!).data;
 
-  final image = Image.fromBytes(cvs.width!, cvs.height!, bytes);
+  final image = Image.fromBytes(width: cvs.width!, height: cvs.height!,
+      bytes: bytes.buffer);
 
   final jpg = encodeJpg(image, quality: 25);
 

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the convert method from the ColorFloat32 class, for the Dart programming language.">
+  <title>convert method - ColorFloat32 class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/ColorFloat32-class.html">ColorFloat32</a></li>
+    <li class="self-crumb">convert method</li>
+  </ol>
+  <div class="self-name">convert</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">convert</span> method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="../../image/Color-class.html">Color</a></span>
+<span class="name ">convert</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="convert-param-format">{<span class="type-annotation"><a href="../../image/Format.html">Format</a>?</span> <span class="parameter-name">format</span>, </span></li>
+<li><span class="parameter" id="convert-param-numChannels"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">numChannels</span>, </span></li>
+<li><span class="parameter" id="convert-param-alpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">alpha</span>}</span></li>
+</ol>)
+
+      <div class="features"><span class="feature">override</span></div>
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Convert the <code>format</code> and/or the <code>numChannels</code> of the color. If
+<code>numChannels</code> is 4 and the current color does not have an alpha value,
+then <code>alpha</code> can specify what value to use for the new alpha channel.
+If <code>alpha</code> is not given, then <a href="../../image/ColorFloat32/maxChannelValue.html">maxChannelValue</a> will be used.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Color convert({ Format? format, int? numChannels, num? alpha }) =&gt;
+    convertColor(this, format: format, numChannels: numChannels,
+        alpha: alpha);</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/ColorFloat32-class.html">ColorFloat32</a></li>
+  <li class="self-crumb">convert method</li>
+</ol>
+
+
+    <h5>ColorFloat32 class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/ColorFloat32-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/ColorFloat32/ColorFloat32.html">ColorFloat32</a></li>
+          <li><a href="../../image/ColorFloat32/ColorFloat32.from.html">from</a></li>
+          <li><a href="../../image/ColorFloat32/ColorFloat32.fromList.html">fromList</a></li>
+          <li><a href="../../image/ColorFloat32/ColorFloat32.rgb.html">rgb</a></li>
+          <li><a href="../../image/ColorFloat32/ColorFloat32.rgba.html">rgba</a></li>
+
+
+        <li class="section-title">
+          <a href="../../image/ColorFloat32-class.html#instance-properties">Properties</a>
+        </li>
+          <li><a href="../../image/ColorFloat32/a.html">a</a></li>
+          <li><a href="../../image/ColorFloat32/aNormalized.html">aNormalized</a></li>
+          <li><a href="../../image/ColorFloat32/b.html">b</a></li>
+          <li><a href="../../image/ColorFloat32/bNormalized.html">bNormalized</a></li>
+          <li><a href="../../image/ColorFloat32/data.html">data</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/first.html">first</a></li>
+          <li><a href="../../image/ColorFloat32/format.html">format</a></li>
+          <li><a href="../../image/ColorFloat32/g.html">g</a></li>
+          <li><a href="../../image/ColorFloat32/gNormalized.html">gNormalized</a></li>
+          <li><a href="../../image/ColorFloat32/hashCode.html">hashCode</a></li>
+          <li><a href="../../image/ColorFloat32/hasPalette.html">hasPalette</a></li>
+          <li><a href="../../image/ColorFloat32/index.html">index</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/isEmpty.html">isEmpty</a></li>
+          <li><a href="../../image/ColorFloat32/isHdrFormat.html">isHdrFormat</a></li>
+          <li><a href="../../image/ColorFloat32/isLdrFormat.html">isLdrFormat</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/isNotEmpty.html">isNotEmpty</a></li>
+          <li><a href="../../image/ColorFloat32/iterator.html">iterator</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/last.html">last</a></li>
+          <li><a href="../../image/ColorFloat32/length.html">length</a></li>
+          <li><a href="../../image/ColorFloat32/luminance.html">luminance</a></li>
+          <li><a href="../../image/ColorFloat32/luminanceNormalized.html">luminanceNormalized</a></li>
+          <li><a href="../../image/ColorFloat32/maxChannelValue.html">maxChannelValue</a></li>
+          <li><a href="../../image/ColorFloat32/maxIndexValue.html">maxIndexValue</a></li>
+          <li><a href="../../image/ColorFloat32/palette.html">palette</a></li>
+          <li><a href="../../image/ColorFloat32/r.html">r</a></li>
+          <li><a href="../../image/ColorFloat32/rNormalized.html">rNormalized</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/single.html">single</a></li>
+
+        <li class="section-title"><a href="../../image/ColorFloat32-class.html#instance-methods">Methods</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/any.html">any</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/cast.html">cast</a></li>
+          <li><a href="../../image/ColorFloat32/clone.html">clone</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/contains.html">contains</a></li>
+          <li><a href="../../image/ColorFloat32/convert.html">convert</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/elementAt.html">elementAt</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/every.html">every</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/expand.html">expand</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/firstWhere.html">firstWhere</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/fold.html">fold</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/followedBy.html">followedBy</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/forEach.html">forEach</a></li>
+          <li><a href="../../image/ColorFloat32/getChannel.html">getChannel</a></li>
+          <li><a href="../../image/ColorFloat32/getChannelNormalized.html">getChannelNormalized</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/join.html">join</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/lastWhere.html">lastWhere</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/map.html">map</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
+          <li><a href="../../image/ColorFloat32/set.html">set</a></li>
+          <li><a href="../../image/ColorFloat32/setColor.html">setColor</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/take.html">take</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/takeWhile.html">takeWhile</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/toList.html">toList</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/toSet.html">toSet</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/toString.html">toString</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/where.html">where</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/whereType.html">whereType</a></li>
+
+        <li class="section-title"><a href="../../image/ColorFloat32-class.html#operators">Operators</a></li>
+          <li><a href="../../image/ColorFloat32/operator_equals.html">operator ==</a></li>
+          <li><a href="../../image/ColorFloat32/operator_get.html">operator []</a></li>
+          <li><a href="../../image/ColorFloat32/operator_put.html">operator []=</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

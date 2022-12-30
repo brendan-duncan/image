@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="generator" content="made with love by dartdoc 6.1.5">
+  <meta name="description" content="image API docs, for the Dart programming language.">
+  <title>image - Dart API docs</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="static-assets/github.css?v1">
+  <link rel="stylesheet" href="static-assets/styles.css?v1">
+  <link rel="icon" href="static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="https://github.com/brendan-duncan/image">image package</a></li>
+  </ol>
+  <div class="self-name">image</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      
+<section class="desc markdown">
+  <h1 id="dart-image-library">Dart Image Library</h1>
+<p><a href="https://github.com/brendan-duncan/image/actions/workflows/build.yaml"><img src="https://github.com/brendan-duncan/image/actions/workflows/build.yaml/badge.svg?branch=4.0" alt="Dart CI"></a>
+<a href="https://pub.dev/packages/image"><img src="https://img.shields.io/pub/v/image.svg" alt="pub package"></a></p>
+<h2 id="overview">Overview</h2>
+<p>The Dart Image Library provides the ability to load, save, and <a href="doc/filters.md">manipulate</a> images
+in a variety of <a href="doc/formats.md">image file formats</a>.</p>
+<p>The library can be used with both dart:io and dart:html, for command-line, Flutter, and
+web applications.</p>
+<p>NOTE: 4.0 is a major revision from the previous verion of the library.</p>
+<h3 id="supported-image-formatsdocformatsmd"><a href="doc/formats.md">Supported Image Formats</a></h3>
+<p><strong>Read/Write</strong></p>
+<ul>
+<li>JPG</li>
+<li>PNG / Animated APNG</li>
+<li>GIF / Animated GIF</li>
+<li>BMP</li>
+<li>TIFF</li>
+<li>TGA</li>
+<li>PVR</li>
+<li>ICO</li>
+</ul>
+<p><strong>Read Only</strong></p>
+<ul>
+<li>WebP / Animated WebP</li>
+<li>PSD</li>
+<li>EXR</li>
+</ul>
+<p><strong>Write Only</strong></p>
+<ul>
+<li>CUR</li>
+</ul>
+<h2 id="documentationdocreadmemd"><a href="doc/README.md">Documentation</a></h2>
+<h2 id="examples">Examples</h2>
+<p>Create an image, set pixel values, save it to a PNG.</p>
+<pre class="language-dart"><code class="language-dart">import 'dart:io';
+import 'package:image/image.dart' as img;
+void main() async {
+  final image = img.Image(width: 256, height: 256);
+  for (var pixel in image) {
+    pixel..r = pixel.x
+    ..g = pixel.y;
+  }
+  final png = img.encodePng(image);
+  await File('image.png').writeAsBytes(png);
+}
+</code></pre>
+<p>To asynchronously load an image file, resize it, and save it as a thumbnail:</p>
+<pre class="language-dart"><code class="language-dart">import 'package:image/image.dart' as img;
+
+void main(List&lt;String&gt; args) async {
+  final path = args.isNotEmpty ? args[0] : 'test.png';
+  final cmd = img.Command()
+    // Decode the image file at the given path
+    ..decodeImageFile(path)
+    // Resize the image to a width of 64 pixels and a height that maintains the aspect ratio of the original. 
+    ..copyResize(width: 64)
+    // Write the image to a PNG file (determined by the suffix of the file path). 
+    ..writeToFile('thumbnail.png');
+  // On platforms that support Isolates, execute the image commands asynchronously on an isolate thread.
+  // Otherwise, the commands will be executed synchronously.
+  await cmd.executeThread();
+}
+</code></pre>
+</section>
+
+
+      <section class="summary">
+          <h2>Libraries</h2>
+        <dl>
+          <dt id="image">
+  <span class="name"><a href="image/image-library.html">image</a></span> 
+
+</dt>
+<dd>The Dart Image Library provides the ability to load, save, and
+manipulate images in a variety of image file formats.
+</dd>
+
+        </dl>
+      </section>
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="https://github.com/brendan-duncan/image">image package</a></li>
+</ol>
+
+
+    <h5 class="hidden-xs"><span class="package-name">image</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Libraries</li>
+      <li><a href="image/image-library.html">image</a></li>
+</ol>
+
+  </div>
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div>
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="static-assets/highlight.pack.js?v1"></script>
+<script src="static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

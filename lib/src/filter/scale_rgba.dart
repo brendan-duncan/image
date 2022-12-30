@@ -1,16 +1,26 @@
-import '../image.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../image/image.dart';
+import '../util/math_util.dart';
 
-Image scaleRgba(Image src, int r, int g, int b, int a) {
-  final num dr = r / 255.0;
-  final num dg = g / 255.0;
-  final num db = b / 255.0;
-  final num da = a / 255.0;
-  final bytes = src.getBytes();
-  for (var i = 0, len = bytes.length; i < len; i += 4) {
-    bytes[i] = (bytes[i] * dr).floor();
-    bytes[i + 1] = (bytes[i + 1] * dg).floor();
-    bytes[i + 2] = (bytes[i + 2] * db).floor();
-    bytes[i + 3] = (bytes[i + 3] * da).floor();
+Image scaleRgba(Image src, { required Color scale, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
+  final dr = scale.rNormalized;
+  final dg = scale.gNormalized;
+  final db = scale.bNormalized;
+  final da = scale.aNormalized;
+  for (final frame in src.frames) {
+    for (final p in frame) {
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      if (msk == null) {
+        p.setColor(p.r * dr, p.g * dg, p.b * db, p.a * da);
+      } else {
+        p..r = mix(p.r, p.r * dr, msk)
+        ..g = mix(p.g, p.g * dg, msk)
+        ..b = mix(p.b, p.b * db, msk)
+        ..a = mix(p.a, p.a * da, msk);
+      }
+    }
   }
   return src;
 }

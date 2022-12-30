@@ -2,19 +2,22 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import '../../util/output_buffer.dart';
 import 'exr_channel.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';
 
+@internal
 abstract class ExrPxr24Compressor extends ExrCompressor {
   factory ExrPxr24Compressor(
           ExrPart header, int? maxScanLineSize, int numScanLines) =
       InternalExrPxr24Compressor;
 }
 
+@internal
 class InternalExrPxr24Compressor extends InternalExrCompressor
     implements ExrPxr24Compressor {
   InternalExrPxr24Compressor(
@@ -47,15 +50,15 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     height ??= header.linesInBuffer;
 
     final minX = x;
-    var maxX = x + width! - 1;
+    var maxX = x + width - 1;
     final minY = y;
-    var maxY = y + height! - 1;
+    var maxY = y + height - 1;
 
-    if (maxX > header.width!) {
-      maxX = header.width! - 1;
+    if (maxX > header.width) {
+      maxX = header.width - 1;
     }
-    if (maxY > header.height!) {
-      maxY = header.height! - 1;
+    if (maxY > header.height) {
+      maxY = header.height - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;
@@ -72,8 +75,8 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
         final n = numSamples(ch.xSampling, minX, maxX);
         pixel[0] = 0;
 
-        switch (ch.type) {
-          case ExrChannel.TYPE_UINT:
+        switch (ch.dataType) {
+          case ExrChannelType.uint:
             ptr[0] = tmpEnd;
             ptr[1] = ptr[0] + n;
             ptr[2] = ptr[1] + n;
@@ -88,7 +91,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
               }
             }
             break;
-          case ExrChannel.TYPE_HALF:
+          case ExrChannelType.half:
             ptr[0] = tmpEnd;
             ptr[1] = ptr[0] + n;
             tmpEnd = ptr[1] + n;
@@ -101,7 +104,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
               }
             }
             break;
-          case ExrChannel.TYPE_FLOAT:
+          case ExrChannelType.float:
             ptr[0] = tmpEnd;
             ptr[1] = ptr[0] + n;
             ptr[2] = ptr[1] + n;
@@ -120,7 +123,7 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
       }
     }
 
-    return _output!.getBytes() as Uint8List;
+    return _output!.getBytes();
   }
 
   final _zlib = const ZLibDecoder();

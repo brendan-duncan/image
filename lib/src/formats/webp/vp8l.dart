@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-import '../../color.dart';
-import '../../image.dart';
-import '../../image_exception.dart';
-import '../../internal/internal.dart';
+import '../../image/image.dart';
+import '../../util/color_util.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'vp8l_bit_reader.dart';
 import 'vp8l_color_cache.dart';
 import 'vp8l_transform.dart';
@@ -12,27 +12,29 @@ import 'webp_huffman.dart';
 import 'webp_info.dart';
 
 // WebP lossless format.
+@internal
 class VP8L {
   InputBuffer input;
   VP8LBitReader br;
   WebPInfo webp;
   Image? image;
 
-  VP8L(this.input, this.webp) : br = VP8LBitReader(input);
+  VP8L(this.input, this.webp)
+      : br = VP8LBitReader(input);
 
   bool decodeHeader() {
     final signature = br.readBits(8);
-    if (signature != VP8L_MAGIC_BYTE) {
+    if (signature != vp8lMagicByte) {
       return false;
     }
 
-    webp.format = WebPInfo.FORMAT_LOSSLESS;
-    webp.width = br.readBits(14) + 1;
-    webp.height = br.readBits(14) + 1;
-    webp.hasAlpha = br.readBits(1) != 0;
+    webp..format = WebPFormat.lossless
+    ..width = br.readBits(14) + 1
+    ..height = br.readBits(14) + 1
+    ..hasAlpha = br.readBits(1) != 0;
     final version = br.readBits(3);
 
-    if (version != VP8L_VERSION) {
+    if (version != vp8lVersion) {
       return false;
     }
 
@@ -50,10 +52,10 @@ class VP8L {
 
     _allocateInternalBuffers32b();
 
-    image = Image(webp.width, webp.height);
+    image = Image(width: webp.width, height: webp.height, numChannels: 4);
 
-    if (!_decodeImageData(
-        _pixels!, webp.width, webp.height, webp.height, _processRows)) {
+    if (!_decodeImageData(_pixels!, webp.width, webp.height, webp.height,
+        _processRows)) {
       return null;
     }
 
@@ -66,7 +68,7 @@ class VP8L {
     // first row in the row-blocks. Not needed for paletted alpha.
     final cacheTopPixels = webp.width;
     // Scratch buffer for temporary BGRA storage. Not needed for paletted alpha.
-    final cachePixels = webp.width * _NUM_ARGB_CACHE_ROWS;
+    final cachePixels = webp.width * _numArgbCacheRows;
     final totalNumPixels = numPixels + cacheTopPixels + cachePixels;
 
     final pixels32 = Uint32List(totalNumPixels);
@@ -96,25 +98,25 @@ class VP8L {
     if ((_transformsSeen & (1 << type)) != 0) {
       return false;
     }
-    _transformsSeen |= (1 << type);
+    _transformsSeen |= 1 << type;
 
     final transform = VP8LTransform();
     _transforms.add(transform);
 
-    transform.type = type;
-    transform.xsize = transformSize[0];
-    transform.ysize = transformSize[1];
+    transform..type = VP8LImageTransformType.values[type]
+    ..xsize = transformSize[0]
+    ..ysize = transformSize[1];
 
-    switch (type) {
-      case VP8LTransform.PREDICTOR_TRANSFORM:
-      case VP8LTransform.CROSS_COLOR_TRANSFORM:
+    switch (transform.type) {
+      case VP8LImageTransformType.predictor:
+      case VP8LImageTransformType.crossColor:
         transform.bits = br.readBits(3) + 2;
         transform.data = _decodeImageStream(
             _subSampleSize(transform.xsize, transform.bits),
             _subSampleSize(transform.ysize, transform.bits),
             false);
         break;
-      case VP8LTransform.COLOR_INDEXING_TRANSFORM:
+      case VP8LImageTransformType.colorIndexing:
         final numColors = br.readBits(8) + 1;
         final bits = (numColors > 16)
             ? 0
@@ -128,7 +130,7 @@ class VP8L {
         transform.data = _decodeImageStream(numColors, 1, false);
         ok = _expandColorMap(numColors, transform);
         break;
-      case VP8LTransform.SUBTRACT_GREEN:
+      case VP8LImageTransformType.subtractGreen:
         break;
       default:
         throw ImageException('Invalid WebP transform type: $type');
@@ -157,15 +159,15 @@ class VP8L {
     // Color cache
     if (br.readBits(1) != 0) {
       colorCacheBits = br.readBits(4);
-      final ok = (colorCacheBits >= 1 && colorCacheBits <= MAX_CACHE_BITS);
+      final ok = colorCacheBits >= 1 && colorCacheBits <= maxCacheBits;
       if (!ok) {
         throw ImageException('Invalid Color Cache');
       }
     }
 
     // Read the Huffman codes (may recurse).
-    if (!_readHuffmanCodes(
-        transformXsize, transformYsize, colorCacheBits, isLevel0)) {
+    if (!_readHuffmanCodes(transformXsize, transformYsize,
+        colorCacheBits, isLevel0)) {
       throw ImageException('Invalid Huffman Codes');
     }
 
@@ -177,8 +179,8 @@ class VP8L {
       _colorCacheSize = 0;
     }
 
-    webp.width = transformXsize;
-    webp.height = transformYsize;
+    webp..width = transformXsize
+    ..height = transformYsize;
     final numBits = _huffmanSubsampleBits;
     _huffmanXsize = _subSampleSize(transformXsize, numBits);
     _huffmanMask = (numBits == 0) ? ~0 : (1 << numBits) - 1;
@@ -204,13 +206,8 @@ class VP8L {
     return data;
   }
 
-  bool _decodeImageData(
-    Uint32List data,
-    int width,
-    int height,
-    int lastRow,
-    void Function(int)? processFunc,
-  ) {
+  bool _decodeImageData(Uint32List data, int width, int height, int lastRow,
+      void Function(int)? processFunc) {
     var row = _lastPixel ~/ width;
     var col = _lastPixel % width;
 
@@ -221,7 +218,7 @@ class VP8L {
     final srcEnd = width * height; // End of data
     final srcLast = width * lastRow; // Last pixel to decode
 
-    const lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
+    const lenCodeLimit = numLiteralCodes + numLengthCodes;
     final colorCacheLimit = lenCodeLimit + _colorCacheSize;
 
     final colorCache = (_colorCacheSize > 0) ? _colorCache : null;
@@ -236,17 +233,17 @@ class VP8L {
       }
 
       br.fillBitWindow();
-      final code = htreeGroup.htrees[_GREEN].readSymbol(br);
+      final code = htreeGroup.htrees[_green].readSymbol(br);
 
-      if (code < NUM_LITERAL_CODES) {
+      if (code < numLiteralCodes) {
         // Literal
-        final red = htreeGroup.htrees[_RED].readSymbol(br);
+        final red = htreeGroup.htrees[_red].readSymbol(br);
         final green = code;
         br.fillBitWindow();
-        final blue = htreeGroup.htrees[_BLUE].readSymbol(br);
-        final alpha = htreeGroup.htrees[_ALPHA].readSymbol(br);
+        final blue = htreeGroup.htrees[_blue].readSymbol(br);
+        final alpha = htreeGroup.htrees[_alpha].readSymbol(br);
 
-        final c = getColor(blue, green, red, alpha);
+        final c = rgbaToUint32(blue, green, red, alpha);
         data[src] = c;
 
         ++src;
@@ -255,7 +252,7 @@ class VP8L {
         if (col >= width) {
           col = 0;
           ++row;
-          if ((row % _NUM_ARGB_CACHE_ROWS == 0) && (processFunc != null)) {
+          if ((row % _numArgbCacheRows == 0) && (processFunc != null)) {
             processFunc(row);
           }
 
@@ -268,9 +265,9 @@ class VP8L {
         }
       } else if (code < lenCodeLimit) {
         // Backward reference
-        final lengthSym = code - NUM_LITERAL_CODES;
+        final lengthSym = code - numLiteralCodes;
         final length = _getCopyLength(lengthSym);
-        final distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
+        final distSymbol = htreeGroup.htrees[_dist].readSymbol(br);
 
         br.fillBitWindow();
         final distCode = _getCopyDistance(distSymbol);
@@ -289,7 +286,7 @@ class VP8L {
         while (col >= width) {
           col -= width;
           ++row;
-          if ((row % _NUM_ARGB_CACHE_ROWS == 0) && (processFunc != null)) {
+          if ((row % _numArgbCacheRows == 0) && (processFunc != null)) {
             processFunc(row);
           }
         }
@@ -321,7 +318,7 @@ class VP8L {
         if (col >= width) {
           col = 0;
           ++row;
-          if ((row % _NUM_ARGB_CACHE_ROWS == 0) && (processFunc != null)) {
+          if ((row % _numArgbCacheRows == 0) && (processFunc != null)) {
             processFunc(row);
           }
 
@@ -360,13 +357,13 @@ class VP8L {
     // call to ReadSymbol() for red/blue/alpha channels.
     for (var i = 0; i < _numHtreeGroups; ++i) {
       final htrees = _htreeGroups[i].htrees;
-      if (htrees[_RED].numNodes > 1) {
+      if (htrees[_red].numNodes > 1) {
         return false;
       }
-      if (htrees[_BLUE].numNodes > 1) {
+      if (htrees[_blue].numNodes > 1) {
         return false;
       }
-      if (htrees[_ALPHA].numNodes > 1) {
+      if (htrees[_alpha].numNodes > 1) {
         return false;
       }
     }
@@ -404,7 +401,7 @@ class VP8L {
     var pos = _lastPixel; // current position
     final end = width * height; // End of data
     final last = width * lastRow; // Last pixel to decode
-    const lenCodeLimit = NUM_LITERAL_CODES + NUM_LENGTH_CODES;
+    const lenCodeLimit = numLiteralCodes + numLengthCodes;
     final mask = _huffmanMask;
 
     while (!br.isEOS && pos < last) {
@@ -415,8 +412,8 @@ class VP8L {
 
       br.fillBitWindow();
 
-      final code = htreeGroup.htrees[_GREEN].readSymbol(br);
-      if (code < NUM_LITERAL_CODES) {
+      final code = htreeGroup.htrees[_green].readSymbol(br);
+      if (code < numLiteralCodes) {
         // Literal
         _pixels8[pos] = code;
         ++pos;
@@ -424,15 +421,15 @@ class VP8L {
         if (col >= width) {
           col = 0;
           ++row;
-          if (row % _NUM_ARGB_CACHE_ROWS == 0) {
+          if (row % _numArgbCacheRows == 0) {
             _extractPalettedAlphaRows(row);
           }
         }
       } else if (code < lenCodeLimit) {
         // Backward reference
-        final lengthSym = code - NUM_LITERAL_CODES;
+        final lengthSym = code - numLiteralCodes;
         final length = _getCopyLength(lengthSym);
-        final distSymbol = htreeGroup.htrees[_DIST].readSymbol(br);
+        final distSymbol = htreeGroup.htrees[_dist].readSymbol(br);
 
         br.fillBitWindow();
 
@@ -454,7 +451,7 @@ class VP8L {
         while (col >= width) {
           col -= width;
           ++row;
-          if (row % _NUM_ARGB_CACHE_ROWS == 0) {
+          if (row % _numArgbCacheRows == 0) {
             _extractPalettedAlphaRows(row);
           }
         }
@@ -490,9 +487,8 @@ class VP8L {
     final startRow = _lastRow;
     final endRow = startRow + numRows;
     final rowsOut = InputBuffer(_opaque!, offset: _ioWidth! * startRow);
-    final transform = _transforms[0];
-
-    transform.colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);
+    _transforms[0].colorIndexInverseTransformAlpha(startRow, endRow, rows,
+        rowsOut);
   }
 
   // Processes (transforms, scales & color-converts) the rows decoded after the
@@ -513,12 +509,13 @@ class VP8L {
     for (var y = 0, pi = _argbCache!, dy = _lastRow; y < numRows; ++y, ++dy) {
       for (var x = 0; x < webp.width; ++x, ++pi) {
         final c = _pixels![pi];
-        final r = getRed(c);
-        final g = getGreen(c);
-        final b = getBlue(c);
-        final a = getAlpha(c);
+
+        final r = uint32ToRed(c);
+        final g = uint32ToGreen(c);
+        final b = uint32ToBlue(c);
+        final a = uint32ToAlpha(c);
         // rearrange the ARGB webp color to RGBA image color.
-        image!.setPixel(x, dy, getColor(b, g, r, a));
+        image!.setPixelColor(x, dy, b, g, r, a);
       }
     }
 
@@ -537,23 +534,22 @@ class VP8L {
     _pixels!.setRange(rowsOut, rowsOut + cachePixs, _pixels!, rowsIn);
 
     while (n-- > 0) {
-      final transform = _transforms[n];
-      transform.inverseTransform(
+      _transforms[n].inverseTransform(
           startRow, endRow, _pixels!, rowsIn, _pixels!, rowsOut);
       rowsIn = rowsOut;
     }
   }
 
-  bool _readHuffmanCodes(
-      int xsize, int ysize, int colorCacheBits, bool allowRecursion) {
+  bool _readHuffmanCodes(int xSize, int ySize, int colorCacheBits,
+      bool allowRecursion) {
     Uint32List? huffmanImage;
     var numHtreeGroups = 1;
 
     if (allowRecursion && br.readBits(1) != 0) {
       // use meta Huffman codes.
       final huffmanPrecision = br.readBits(3) + 2;
-      final huffmanXsize = _subSampleSize(xsize, huffmanPrecision);
-      final huffmanYsize = _subSampleSize(ysize, huffmanPrecision);
+      final huffmanXsize = _subSampleSize(xSize, huffmanPrecision);
+      final huffmanYsize = _subSampleSize(ySize, huffmanPrecision);
       final huffmanPixs = huffmanXsize * huffmanYsize;
 
       huffmanImage = _decodeImageStream(huffmanXsize, huffmanYsize, false);
@@ -576,8 +572,8 @@ class VP8L {
         numHtreeGroups, (_) => HTreeGroup(),
         growable: false);
     for (var i = 0; i < numHtreeGroups; ++i) {
-      for (var j = 0; j < HUFFMAN_CODES_PER_META_CODE; ++j) {
-        var alphabetSize = ALPHABET_SIZE[j];
+      for (var j = 0; j < huffmanCodesPerMetaCode; ++j) {
+        var alphabetSize = _alphabetSize[j];
         if (j == 0 && colorCacheBits > 0) {
           alphabetSize += 1 << colorCacheBits;
         }
@@ -625,17 +621,17 @@ class VP8L {
           codeLengths, codes, symbols, alphabetSize, numSymbols);
     } else {
       // Decode Huffman-coded code lengths.
-      final codeLengthCodeLengths = Int32List(_NUM_CODE_LENGTH_CODES);
+      final codeLengthCodeLengths = Int32List(_numCodeLengthCodes);
 
       final numCodes = br.readBits(4) + 4;
-      if (numCodes > _NUM_CODE_LENGTH_CODES) {
+      if (numCodes > _numCodeLengthCodes) {
         return false;
       }
 
       final codeLengths = Int32List(alphabetSize);
 
       for (var i = 0; i < numCodes; ++i) {
-        codeLengthCodeLengths[_CODE_LENGTH_CODE_ORDER[i]] = br.readBits(3);
+        codeLengthCodeLengths[_codeLengthCodeOrder[i]] = br.readBits(3);
       }
 
       ok = _readHuffmanCodeLengths(
@@ -653,52 +649,52 @@ class VP8L {
       List<int> codeLengthCodeLengths, int numSymbols, List<int> codeLengths) {
     //bool ok = false;
     int symbol;
-    int max_symbol;
-    var prev_code_len = DEFAULT_CODE_LENGTH;
+    int maxSymbol;
+    var prevCodeLen = defaultCodeLength;
     final tree = HuffmanTree();
 
-    if (!tree.buildImplicit(codeLengthCodeLengths, _NUM_CODE_LENGTH_CODES)) {
+    if (!tree.buildImplicit(codeLengthCodeLengths, _numCodeLengthCodes)) {
       return false;
     }
 
     if (br.readBits(1) != 0) {
       // use length
-      final length_nbits = 2 + 2 * br.readBits(3);
-      max_symbol = 2 + br.readBits(length_nbits);
-      if (max_symbol > numSymbols) {
+      final lengthNBits = 2 + 2 * br.readBits(3);
+      maxSymbol = 2 + br.readBits(lengthNBits);
+      if (maxSymbol > numSymbols) {
         return false;
       }
     } else {
-      max_symbol = numSymbols;
+      maxSymbol = numSymbols;
     }
 
     symbol = 0;
     while (symbol < numSymbols) {
-      int code_len;
-      if (max_symbol-- == 0) {
+      int codeLen;
+      if (maxSymbol-- == 0) {
         break;
       }
 
       br.fillBitWindow();
 
-      code_len = tree.readSymbol(br);
+      codeLen = tree.readSymbol(br);
 
-      if (code_len < _CODE_LENGTH_LITERALS) {
-        codeLengths[symbol++] = code_len;
-        if (code_len != 0) {
-          prev_code_len = code_len;
+      if (codeLen < _codeLengthLiterals) {
+        codeLengths[symbol++] = codeLen;
+        if (codeLen != 0) {
+          prevCodeLen = codeLen;
         }
       } else {
-        final usePrev = (code_len == _CODE_LENGTH_REPEAT_CODE);
-        final slot = code_len - _CODE_LENGTH_LITERALS;
-        final extra_bits = _CODE_LENGTH_EXTRA_BITS[slot];
-        final repeat_offset = _CODE_LENGTH_REPEAT_OFFSETS[slot];
-        var repeat = br.readBits(extra_bits) + repeat_offset;
+        final usePrev = codeLen == _codeLengthRepeatCode;
+        final slot = codeLen - _codeLengthLiterals;
+        final extraBits = _codeLengthExtraBits[slot];
+        final repeatOffset = _codeLengthRepeatOffsets[slot];
+        var repeat = br.readBits(extraBits) + repeatOffset;
 
         if (symbol + repeat > numSymbols) {
           return false;
         } else {
-          final length = usePrev ? prev_code_len : 0;
+          final length = usePrev ? prevCodeLen : 0;
           while (repeat-- > 0) {
             codeLengths[symbol++] = length;
           }
@@ -721,10 +717,10 @@ class VP8L {
   int _getCopyLength(int lengthSymbol) => _getCopyDistance(lengthSymbol);
 
   int _planeCodeToDistance(int xsize, int planeCode) {
-    if (planeCode > _CODE_TO_PLANE_CODES) {
-      return planeCode - _CODE_TO_PLANE_CODES;
+    if (planeCode > _codeToPlaneCodes) {
+      return planeCode - _codeToPlaneCodes;
     } else {
-      final distCode = _CODE_TO_PLANE[planeCode - 1];
+      final distCode = _codeToPlane[planeCode - 1];
       final yoffset = distCode >> 4;
       final xoffset = 8 - (distCode & 0xf);
       final dist = yoffset * xsize + xoffset;
@@ -777,17 +773,17 @@ class VP8L {
     return _htreeGroups[metaIndex];
   }
 
-  static const _GREEN = 0;
-  static const _RED = 1;
-  static const _BLUE = 2;
-  static const _ALPHA = 3;
-  static const _DIST = 4;
+  static const _green = 0;
+  static const _red = 1;
+  static const _blue = 2;
+  static const _alpha = 3;
+  static const _dist = 4;
 
-  static const _NUM_ARGB_CACHE_ROWS = 16;
+  static const _numArgbCacheRows = 16;
 
-  static const _NUM_CODE_LENGTH_CODES = 19;
+  static const _numCodeLengthCodes = 19;
 
-  static const _CODE_LENGTH_CODE_ORDER = <int>[
+  static const _codeLengthCodeOrder = <int>[
     17,
     18,
     0,
@@ -809,8 +805,8 @@ class VP8L {
     15
   ];
 
-  static const _CODE_TO_PLANE_CODES = 120;
-  static const _CODE_TO_PLANE = <int>[
+  static const _codeToPlaneCodes = 120;
+  static const _codeToPlane = <int>[
     0x18,
     0x07,
     0x17,
@@ -933,21 +929,21 @@ class VP8L {
     0x70
   ];
 
-  static const _CODE_LENGTH_LITERALS = 16;
-  static const _CODE_LENGTH_REPEAT_CODE = 16;
-  static const List<int> _CODE_LENGTH_EXTRA_BITS = [2, 3, 7];
-  static const List<int> _CODE_LENGTH_REPEAT_OFFSETS = [3, 3, 11];
+  static const _codeLengthLiterals = 16;
+  static const _codeLengthRepeatCode = 16;
+  static const _codeLengthExtraBits = [2, 3, 7];
+  static const _codeLengthRepeatOffsets = [3, 3, 11];
 
-  static const List<int> ALPHABET_SIZE = [
-    NUM_LITERAL_CODES + NUM_LENGTH_CODES,
-    NUM_LITERAL_CODES,
-    NUM_LITERAL_CODES,
-    NUM_LITERAL_CODES,
-    NUM_DISTANCE_CODES
+  static const _alphabetSize = [
+    numLiteralCodes + numLengthCodes,
+    numLiteralCodes,
+    numLiteralCodes,
+    numLiteralCodes,
+    numDistanceCodes
   ];
 
-  static const VP8L_MAGIC_BYTE = 0x2f;
-  static const VP8L_VERSION = 0;
+  static const vp8lMagicByte = 0x2f;
+  static const vp8lVersion = 0;
 
   int _lastPixel = 0;
   int _lastRow = 0;
@@ -973,17 +969,17 @@ class VP8L {
   int? _ioWidth;
   int? _ioHeight;
 
-  static const ARGB_BLACK = 0xff000000;
-  static const MAX_CACHE_BITS = 11;
-  static const HUFFMAN_CODES_PER_META_CODE = 5;
+  static const argbBlack = 0xff000000;
+  static const maxCacheBits = 11;
+  static const huffmanCodesPerMetaCode = 5;
 
-  static const DEFAULT_CODE_LENGTH = 8;
-  static const MAX_ALLOWED_CODE_LENGTH = 15;
+  static const defaultCodeLength = 8;
+  static const maxAllowedCodeLength = 15;
 
-  static const NUM_LITERAL_CODES = 256;
-  static const NUM_LENGTH_CODES = 24;
-  static const NUM_DISTANCE_CODES = 40;
-  static const CODE_LENGTH_CODES = 19;
+  static const numLiteralCodes = 256;
+  static const numLengthCodes = 24;
+  static const numDistanceCodes = 40;
+  static const codeLengthCodes = 19;
 }
 
 @internal

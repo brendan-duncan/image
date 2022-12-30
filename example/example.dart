@@ -1,15 +1,13 @@
-import 'dart:io';
-import 'package:image/image.dart';
+import 'package:image/image.dart' as img;
 
-void main() {
-  // Read an image from file (webp in this case).
-  // decodeImage will identify the format of the image and use the appropriate
-  // decoder.
-  final image = decodeImage(File('test.webp').readAsBytesSync())!;
-
-  // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-  final thumbnail = copyResize(image, width: 120);
-
-  // Save the thumbnail as a PNG.
-  File('thumbnail.png').writeAsBytesSync(encodePng(thumbnail));
+void main() async {
+  await (img.Command()
+  // Read a WebP image from a file.
+  ..decodeWebPFile('test.webp')
+  // Resize the image so its width is 120 and height maintains aspect ratio.
+  ..copyResize(width: 120)
+  // Save the image to a PNG file.
+  ..writeToFile('thumbnail.png'))
+  // Execute the image commands in an isolate thread
+  .executeThread();
 }

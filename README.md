@@ -1,85 +1,74 @@
-# image
-
-[![Dart CI](https://github.com/brendan-duncan/image/actions/workflows/build.yaml/badge.svg)](https://github.com/brendan-duncan/image/actions/workflows/build.yaml)
+# Dart Image Library
+[![Dart CI](https://github.com/brendan-duncan/image/actions/workflows/build.yaml/badge.svg?branch=4.0)](https://github.com/brendan-duncan/image/actions/workflows/build.yaml)
 [![pub package](https://img.shields.io/pub/v/image.svg)](https://pub.dev/packages/image)
 
 ## Overview
 
-A Dart library providing the ability to load, save and manipulate images in a variety of different file formats.
+The Dart Image Library provides the ability to load, save, and [manipulate](doc/filters.md) images
+in a variety of [image file formats](doc/formats.md).
 
-The library is written entirely in Dart and has no reliance on `dart:io`, so it can be used for both 
-server and web applications.
+The library can be used with both dart:io and dart:html, for command-line, Flutter, and
+web applications.
 
-### Performance Warning
-Because this library is written entirely in Dart and is a not native executed library, its performance
-will not be as fast as a native library.
+NOTE: 4.0 is a major revision from the previous version of the library.
 
-### Supported Image Formats
+### [Supported Image Formats](doc/formats.md)
 
 **Read/Write**
 
+- JPG
 - PNG / Animated APNG
-- JPEG
-- Targa
 - GIF / Animated GIF
-- PVR(PVRTC)
-- ICO
 - BMP
+- TIFF
+- TGA
+- PVR
+- ICO
 
 **Read Only**
 
 - WebP / Animated WebP
-- TIFF
-- Photoshop PSD
-- OpenEXR
+- PSD
+- EXR
 
 **Write Only**
 
 - CUR
 
-## [Documentation](https://github.com/brendan-duncan/image/wiki)
+## [Documentation](doc/README.md)
 
-## [API](https://pub.dev/documentation/image/latest/image/image-library.html)
+## Examples
 
-## [Examples](https://github.com/brendan-duncan/image/wiki/Examples)
-
-## [Format Decoding Functions](https://github.com/brendan-duncan/image/wiki#format-decoding-functions)
-
-## Example
-
-Load an image asynchronously and resize it as a thumbnail. 
+Create an image, set pixel values, save it to a PNG.
 ```dart
 import 'dart:io';
-import 'dart:isolate';
-import 'package:image/image.dart';
-
-class DecodeParam {
-  final File file;
-  final SendPort sendPort;
-  DecodeParam(this.file, this.sendPort);
-}
-
-void decodeIsolate(DecodeParam param) {
-  // Read an image from file (webp in this case).
-  // decodeImage will identify the format of the image and use the appropriate
-  // decoder.
-  var image = decodeImage(param.file.readAsBytesSync())!;
-  // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-  var thumbnail = copyResize(image, width: 120);
-  param.sendPort.send(thumbnail);
-}
-
-// Decode and process an image file in a separate thread (isolate) to avoid
-// stalling the main UI thread.
+import 'package:image/image.dart' as img;
 void main() async {
-  var receivePort = ReceivePort();
+  final image = img.Image(width: 256, height: 256);
+  for (var pixel in image) {
+    pixel..r = pixel.x
+    ..g = pixel.y;
+  }
+  final png = img.encodePng(image);
+  await File('image.png').writeAsBytes(png);
+}
+```
 
-  await Isolate.spawn(
-      decodeIsolate, DecodeParam(File('test.webp'), receivePort.sendPort));
+To asynchronously load an image file, resize it, and save it as a thumbnail: 
+```dart
+import 'package:image/image.dart' as img;
 
-  // Get the processed image from the isolate.
-  var image = await receivePort.first as Image;
-
-  await File('thumbnail.png').writeAsBytes(encodePng(image));
+void main(List<String> args) async {
+  final path = args.isNotEmpty ? args[0] : 'test.png';
+  final cmd = img.Command()
+    // Decode the image file at the given path
+    ..decodeImageFile(path)
+    // Resize the image to a width of 64 pixels and a height that maintains the aspect ratio of the original. 
+    ..copyResize(width: 64)
+    // Write the image to a PNG file (determined by the suffix of the file path). 
+    ..writeToFile('thumbnail.png');
+  // On platforms that support Isolates, execute the image commands asynchronously on an isolate thread.
+  // Otherwise, the commands will be executed synchronously.
+  await cmd.executeThread();
 }
 ```

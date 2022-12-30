@@ -7,7 +7,7 @@ class PsdLayerData {
 
   factory PsdLayerData(String tag, InputBuffer data) {
     switch (tag) {
-      case PsdLayerSectionDivider.TAG:
+      case PsdLayerSectionDivider.tagName:
         return PsdLayerSectionDivider(tag, data);
       default:
         return PsdLayerAdditionalData(tag, data);

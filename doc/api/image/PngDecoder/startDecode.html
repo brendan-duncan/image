@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the startDecode method from the PngDecoder class, for the Dart programming language.">
+  <title>startDecode method - PngDecoder class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/PngDecoder-class.html">PngDecoder</a></li>
+    <li class="self-crumb">startDecode method</li>
+  </ol>
+  <div class="self-name">startDecode</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">startDecode</span> method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
+
+<span class="returntype"><a href="../../image/DecodeInfo-class.html">DecodeInfo</a>?</span>
+<span class="name ">startDecode</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="startDecode-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span></li>
+</ol>)
+
+      <div class="features"><span class="feature">override</span></div>
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Start decoding the data as an animation sequence, but don't actually
+process the frames until they are requested with decodeFrame.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">@override
+DecodeInfo? startDecode(Uint8List data) {
+  _input = InputBuffer(data, bigEndian: true);
+
+  final pngHeader = _input.readBytes(8);
+  const expectedHeader = [137, 80, 78, 71, 13, 10, 26, 10];
+  for (var i = 0; i &lt; 8; ++i) {
+    if (pngHeader[i] != expectedHeader[i]) {
+      return null;
+    }
+  }
+
+  while (true) {
+    final inputPos = _input.position;
+    var chunkSize = _input.readUint32();
+    final chunkType = _input.readString(4);
+    switch (chunkType) {
+      case &#39;tEXt&#39;:
+        final txtData = _input.readBytes(chunkSize).toUint8List();
+        final l = txtData.length;
+        for (var i = 0; i &lt; l; ++i) {
+          if (txtData[i] == 0) {
+            final key = latin1.decode(txtData.sublist(0, i));
+            final text = latin1.decode(txtData.sublist(i + 1));
+            _info.textData[key] = text;
+            break;
+          }
+        }
+        _input.skip(4);&#47;&#47;crc
+        break;
+      case &#39;IHDR&#39;:
+        final hdr = InputBuffer.from(_input.readBytes(chunkSize));
+        final Uint8List hdrBytes = hdr.toUint8List();
+        _info.width = hdr.readUint32();
+        _info.height = hdr.readUint32();
+        _info.bits = hdr.readByte();
+        _info.colorType = hdr.readByte();
+        _info.compressionMethod = hdr.readByte();
+        _info.filterMethod = hdr.readByte();
+        _info.interlaceMethod = hdr.readByte();
+
+        &#47;&#47; Validate some of the info in the header to make sure we support
+        &#47;&#47; the proposed image data.
+        if (!PngColorType.isValid(_info.colorType)) {
+          return null;
+        }
+
+        if (_info.filterMethod != 0) {
+          return null;
+        }
+
+        switch (_info.colorType) {
+          case PngColorType.grayscale:
+            if (![1, 2, 4, 8, 16].contains(_info.bits)) {
+              return null;
+            }
+            break;
+          case PngColorType.rgb:
+            if (![8, 16].contains(_info.bits)) {
+              return null;
+            }
+            break;
+          case PngColorType.indexed:
+            if (![1, 2, 4, 8].contains(_info.bits)) {
+              return null;
+            }
+            break;
+          case PngColorType.grayscaleAlpha:
+            if (![8, 16].contains(_info.bits)) {
+              return null;
+            }
+            break;
+          case PngColorType.rgba:
+            if (![8, 16].contains(_info.bits)) {
+              return null;
+            }
+            break;
+        }
+
+        final crc = _input.readUint32();
+        final computedCrc = _crc(chunkType, hdrBytes);
+        if (crc != computedCrc) {
+          throw ImageException(&#39;Invalid $chunkType checksum&#39;);
+        }
+        break;
+      case &#39;PLTE&#39;:
+        _info.palette = _input.readBytes(chunkSize).toUint8List();
+        final crc = _input.readUint32();
+        final computedCrc = _crc(chunkType, _info.palette as List&lt;int&gt;);
+        if (crc != computedCrc) {
+          throw ImageException(&#39;Invalid $chunkType checksum&#39;);
+        }
+        break;
+      case &#39;tRNS&#39;:
+        _info.transparency = _input.readBytes(chunkSize).toUint8List();
+        final crc = _input.readUint32();
+        final computedCrc = _crc(chunkType, _info.transparency!);
+        if (crc != computedCrc) {
+          throw ImageException(&#39;Invalid $chunkType checksum&#39;);
+        }
+        break;
+      case &#39;IEND&#39;:
+        &#47;&#47; End of the image.
+        _input.skip(4); &#47;&#47; CRC
+        break;
+      &#47;*case &#39;eXif&#39;: &#47;&#47; TODO: parse exif
+        {
+          final exifData = _input.readBytes(chunkSize);
+          final exif = ExifData.fromInputBuffer(exifData);
+          _input.skip(4); &#47;&#47; CRC
+          break;
+        }*&#47;
+      case &#39;gAMA&#39;:
+        if (chunkSize != 4) {
+          throw ImageException(&#39;Invalid gAMA chunk&#39;);
+        }
+        final gammaInt = _input.readUint32();
+        _input.skip(4); &#47;&#47; CRC
+        &#47;&#47; A gamma of 1.0 doesn&#39;t have any affect, so pretend we didn&#39;t get
+        &#47;&#47; a gamma in that case.
+        if (gammaInt != 100000) {
+          _info.gamma = gammaInt &#47; 100000.0;
+        }
+        break;
+      case &#39;IDAT&#39;:
+        _info.idat.add(inputPos);
+        _input.skip(chunkSize);
+        _input.skip(4); &#47;&#47; CRC
+        break;
+      case &#39;acTL&#39;: &#47;&#47; Animation control chunk
+        _info.numFrames = _input.readUint32();
+        _info.repeat = _input.readUint32();
+        _input.skip(4); &#47;&#47; CRC
+        break;
+      case &#39;fcTL&#39;: &#47;&#47; Frame control chunk
+        final frame = InternalPngFrame(
+          sequenceNumber: _input.readUint32(),
+          width: _input.readUint32(),
+          height: _input.readUint32(),
+          xOffset: _input.readUint32(),
+          yOffset: _input.readUint32(),
+          delayNum: _input.readUint16(),
+          delayDen: _input.readUint16(),
+          dispose: PngDisposeMode.values[_input.readByte()],
+          blend: PngBlendMode.values[_input.readByte()]
+        );
+        _info.frames.add(frame);
+        _input.skip(4); &#47;&#47; CRC
+        break;
+      case &#39;fdAT&#39;:
+        &#47;*int sequenceNumber =*&#47; _input.readUint32();
+        final frame = _info.frames.last as InternalPngFrame;
+        frame.fdat.add(inputPos);
+        _input.skip(chunkSize - 4);
+        _input.skip(4); &#47;&#47; CRC
+        break;
+      case &#39;bKGD&#39;:
+        if (_info.colorType == PngColorType.indexed) {
+          final paletteIndex = _input.readByte();
+          chunkSize--;
+          final p3 = paletteIndex * 3;
+          final r = _info.palette![p3]!;
+          final g = _info.palette![p3 + 1]!;
+          final b = _info.palette![p3 + 2]!;
+          if (_info.transparency != null) {
+            final isTransparent = _info.transparency!.contains(paletteIndex);
+            _info.backgroundColor = ColorRgba8(r, g, b,
+                isTransparent ? 0 : 255);
+          } else {
+            _info.backgroundColor = ColorRgb8(r, g, b);
+          }
+        } else if (_info.colorType == PngColorType.grayscale ||
+            _info.colorType == PngColorType.grayscaleAlpha) {
+          &#47;*int gray =*&#47; _input.readUint16();
+          chunkSize -= 2;
+        } else if (_info.colorType == PngColorType.rgb ||
+            _info.colorType == PngColorType.rgba) {
+          &#47;*int r =*&#47; _input..readUint16()
+          &#47;*int g =*&#47;
+          ..readUint16()
+          &#47;*int b =*&#47;
+          ..readUint16();
+          chunkSize -= 24;
+        }
+        if (chunkSize &gt; 0) {
+          _input.skip(chunkSize);
+        }
+        _input.skip(4); &#47;&#47; CRC
+        break;
+      case &#39;iCCP&#39;:
+        _info.iccpName = _input.readString();
+        _info.iccpCompression = _input.readByte(); &#47;&#47; 0: deflate
+        chunkSize -= _info.iccpName.length + 2;
+        final profile = _input.readBytes(chunkSize);
+        _info.iccpData = profile.toUint8List();
+        _input.skip(4); &#47;&#47; CRC
+        break;
+      default:
+        &#47;&#47;print(&#39;Skipping $chunkType&#39;);
+        _input.skip(chunkSize);
+        _input.skip(4); &#47;&#47; CRC
+        break;
+    }
+
+    if (chunkType == &#39;IEND&#39;) {
+      break;
+    }
+
+    if (_input.isEOS) {
+      return null;
+    }
+  }
+
+  return _info;
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/PngDecoder-class.html">PngDecoder</a></li>
+  <li class="self-crumb">startDecode method</li>
+</ol>
+
+
+    <h5>PngDecoder class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/PngDecoder-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/PngDecoder/PngDecoder.html">PngDecoder</a></li>
+
+
+        <li class="section-title">
+          <a href="../../image/PngDecoder-class.html#instance-properties">Properties</a>
+        </li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li><a href="../../image/PngDecoder/info.html">info</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+
+        <li class="section-title"><a href="../../image/PngDecoder-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../image/PngDecoder/decode.html">decode</a></li>
+          <li><a href="../../image/PngDecoder/decodeFrame.html">decodeFrame</a></li>
+          <li><a href="../../image/PngDecoder/isValidFile.html">isValidFile</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li><a href="../../image/PngDecoder/numFrames.html">numFrames</a></li>
+          <li><a href="../../image/PngDecoder/startDecode.html">startDecode</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../image/PngDecoder-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

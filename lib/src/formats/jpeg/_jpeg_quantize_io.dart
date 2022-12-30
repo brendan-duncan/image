@@ -1,17 +1,12 @@
 import 'dart:typed_data';
-import '../../color.dart';
+
 import '../../exif/exif_data.dart';
-import '../../image.dart';
-import '../../image_exception.dart';
+import '../../image/image.dart';
+import '../../util/image_exception.dart';
 import '_component_data.dart';
 import 'jpeg_data.dart';
 
-late final Uint8List _dctClip = _createDctClip();
-int _clamp8(int i) => i < 0
-    ? 0
-    : i > 255
-        ? 255
-        : i;
+final _dctClip = _createDctClip();
 
 const _dctClipOffset = 256;
 const _dctClipLength = 768;
@@ -42,18 +37,18 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
   final p = dataIn;
 
   // IDCT constants (20.12 fixed point format)
-  const COS_1 = 4017; // cos(pi/16)*4096
-  const SIN_1 = 799; // sin(pi/16)*4096
-  const COS_3 = 3406; // cos(3*pi/16)*4096
-  const SIN_3 = 2276; // sin(3*pi/16)*4096
-  const COS_6 = 1567; // cos(6*pi/16)*4096
-  const SIN_6 = 3784; // sin(6*pi/16)*4096
-  const SQRT_2 = 5793; // sqrt(2)*4096
-  const SQRT_1D2 = 2896; // sqrt(2) / 2
+  const cos1 = 4017; // cos(pi/16)*4096
+  const sin1 = 799; // sin(pi/16)*4096
+  const cos3 = 3406; // cos(3*pi/16)*4096
+  const sin3 = 2276; // sin(3*pi/16)*4096
+  const cos6 = 1567; // cos(6*pi/16)*4096
+  const sin6 = 3784; // sin(6*pi/16)*4096
+  const sqrt2 = 5793; // sqrt(2)*4096
+  const sqrt102 = 2896; // sqrt(2) / 2
 
   // de-quantize
   for (var i = 0; i < 64; i++) {
-    p[i] = (coefBlock[i] * quantizationTable[i]);
+    p[i] = coefBlock[i] * quantizationTable[i];
   }
 
   // inverse DCT on rows
@@ -67,7 +62,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
         p[5 + row] == 0 &&
         p[6 + row] == 0 &&
         p[7 + row] == 0) {
-      final t = ((SQRT_2 * p[0 + row] + 512) >> 10);
+      final t = (sqrt2 * p[0 + row] + 512) >> 10;
       p[row + 0] = t;
       p[row + 1] = t;
       p[row + 2] = t;
@@ -80,52 +75,52 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
     }
 
     // stage 4
-    var v0 = ((SQRT_2 * p[0 + row] + 128) >> 8);
-    var v1 = ((SQRT_2 * p[4 + row] + 128) >> 8);
+    var v0 = (sqrt2 * p[0 + row] + 128) >> 8;
+    var v1 = (sqrt2 * p[4 + row] + 128) >> 8;
     var v2 = p[2 + row];
     var v3 = p[6 + row];
-    var v4 = ((SQRT_1D2 * (p[1 + row] - p[7 + row]) + 128) >> 8);
-    var v7 = ((SQRT_1D2 * (p[1 + row] + p[7 + row]) + 128) >> 8);
-    var v5 = (p[3 + row] << 4);
-    var v6 = (p[5 + row] << 4);
+    var v4 = (sqrt102 * (p[1 + row] - p[7 + row]) + 128) >> 8;
+    var v7 = (sqrt102 * (p[1 + row] + p[7 + row]) + 128) >> 8;
+    var v5 = p[3 + row] << 4;
+    var v6 = p[5 + row] << 4;
 
     // stage 3
-    var t = ((v0 - v1 + 1) >> 1);
-    v0 = ((v0 + v1 + 1) >> 1);
+    var t = (v0 - v1 + 1) >> 1;
+    v0 = (v0 + v1 + 1) >> 1;
     v1 = t;
-    t = ((v2 * SIN_6 + v3 * COS_6 + 128) >> 8);
-    v2 = ((v2 * COS_6 - v3 * SIN_6 + 128) >> 8);
+    t = (v2 * sin6 + v3 * cos6 + 128) >> 8;
+    v2 = (v2 * cos6 - v3 * sin6 + 128) >> 8;
     v3 = t;
-    t = ((v4 - v6 + 1) >> 1);
-    v4 = ((v4 + v6 + 1) >> 1);
+    t = (v4 - v6 + 1) >> 1;
+    v4 = (v4 + v6 + 1) >> 1;
     v6 = t;
-    t = ((v7 + v5 + 1) >> 1);
-    v5 = ((v7 - v5 + 1) >> 1);
+    t = (v7 + v5 + 1) >> 1;
+    v5 = (v7 - v5 + 1) >> 1;
     v7 = t;
 
     // stage 2
-    t = ((v0 - v3 + 1) >> 1);
-    v0 = ((v0 + v3 + 1) >> 1);
+    t = (v0 - v3 + 1) >> 1;
+    v0 = (v0 + v3 + 1) >> 1;
     v3 = t;
-    t = ((v1 - v2 + 1) >> 1);
-    v1 = ((v1 + v2 + 1) >> 1);
+    t = (v1 - v2 + 1) >> 1;
+    v1 = (v1 + v2 + 1) >> 1;
     v2 = t;
-    t = ((v4 * SIN_3 + v7 * COS_3 + 2048) >> 12);
-    v4 = ((v4 * COS_3 - v7 * SIN_3 + 2048) >> 12);
+    t = (v4 * sin3 + v7 * cos3 + 2048) >> 12;
+    v4 = (v4 * cos3 - v7 * sin3 + 2048) >> 12;
     v7 = t;
-    t = ((v5 * SIN_1 + v6 * COS_1 + 2048) >> 12);
-    v5 = ((v5 * COS_1 - v6 * SIN_1 + 2048) >> 12);
+    t = (v5 * sin1 + v6 * cos1 + 2048) >> 12;
+    v5 = (v5 * cos1 - v6 * sin1 + 2048) >> 12;
     v6 = t;
 
     // stage 1
-    p[0 + row] = (v0 + v7);
-    p[7 + row] = (v0 - v7);
-    p[1 + row] = (v1 + v6);
-    p[6 + row] = (v1 - v6);
-    p[2 + row] = (v2 + v5);
-    p[5 + row] = (v2 - v5);
-    p[3 + row] = (v3 + v4);
-    p[4 + row] = (v3 - v4);
+    p[0 + row] = v0 + v7;
+    p[7 + row] = v0 - v7;
+    p[1 + row] = v1 + v6;
+    p[6 + row] = v1 - v6;
+    p[2 + row] = v2 + v5;
+    p[5 + row] = v2 - v5;
+    p[3 + row] = v3 + v4;
+    p[4 + row] = v3 - v4;
   }
 
   // inverse DCT on columns
@@ -140,7 +135,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
         p[5 * 8 + col] == 0 &&
         p[6 * 8 + col] == 0 &&
         p[7 * 8 + col] == 0) {
-      final t = ((SQRT_2 * dataIn[i] + 8192) >> 14);
+      final t = (sqrt2 * dataIn[i] + 8192) >> 14;
       p[0 * 8 + col] = t;
       p[1 * 8 + col] = t;
       p[2 * 8 + col] = t;
@@ -153,52 +148,52 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
     }
 
     // stage 4
-    var v0 = ((SQRT_2 * p[0 * 8 + col] + 2048) >> 12);
-    var v1 = ((SQRT_2 * p[4 * 8 + col] + 2048) >> 12);
+    var v0 = (sqrt2 * p[0 * 8 + col] + 2048) >> 12;
+    var v1 = (sqrt2 * p[4 * 8 + col] + 2048) >> 12;
     var v2 = p[2 * 8 + col];
     var v3 = p[6 * 8 + col];
-    var v4 = ((SQRT_1D2 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048) >> 12);
-    var v7 = ((SQRT_1D2 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048) >> 12);
+    var v4 = (sqrt102 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048) >> 12;
+    var v7 = (sqrt102 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048) >> 12;
     var v5 = p[3 * 8 + col];
     var v6 = p[5 * 8 + col];
 
     // stage 3
-    var t = ((v0 - v1 + 1) >> 1);
-    v0 = ((v0 + v1 + 1) >> 1);
+    var t = (v0 - v1 + 1) >> 1;
+    v0 = (v0 + v1 + 1) >> 1;
     v1 = t;
-    t = ((v2 * SIN_6 + v3 * COS_6 + 2048) >> 12);
-    v2 = ((v2 * COS_6 - v3 * SIN_6 + 2048) >> 12);
+    t = (v2 * sin6 + v3 * cos6 + 2048) >> 12;
+    v2 = (v2 * cos6 - v3 * sin6 + 2048) >> 12;
     v3 = t;
-    t = ((v4 - v6 + 1) >> 1);
-    v4 = ((v4 + v6 + 1) >> 1);
+    t = (v4 - v6 + 1) >> 1;
+    v4 = (v4 + v6 + 1) >> 1;
     v6 = t;
-    t = ((v7 + v5 + 1) >> 1);
-    v5 = ((v7 - v5 + 1) >> 1);
+    t = (v7 + v5 + 1) >> 1;
+    v5 = (v7 - v5 + 1) >> 1;
     v7 = t;
 
     // stage 2
-    t = ((v0 - v3 + 1) >> 1);
-    v0 = ((v0 + v3 + 1) >> 1);
+    t = (v0 - v3 + 1) >> 1;
+    v0 = (v0 + v3 + 1) >> 1;
     v3 = t;
-    t = ((v1 - v2 + 1) >> 1);
-    v1 = ((v1 + v2 + 1) >> 1);
+    t = (v1 - v2 + 1) >> 1;
+    v1 = (v1 + v2 + 1) >> 1;
     v2 = t;
-    t = ((v4 * SIN_3 + v7 * COS_3 + 2048) >> 12);
-    v4 = ((v4 * COS_3 - v7 * SIN_3 + 2048) >> 12);
+    t = (v4 * sin3 + v7 * cos3 + 2048) >> 12;
+    v4 = (v4 * cos3 - v7 * sin3 + 2048) >> 12;
     v7 = t;
-    t = ((v5 * SIN_1 + v6 * COS_1 + 2048) >> 12);
-    v5 = ((v5 * COS_1 - v6 * SIN_1 + 2048) >> 12);
+    t = (v5 * sin1 + v6 * cos1 + 2048) >> 12;
+    v5 = (v5 * cos1 - v6 * sin1 + 2048) >> 12;
     v6 = t;
 
     // stage 1
-    p[0 * 8 + col] = (v0 + v7);
-    p[7 * 8 + col] = (v0 - v7);
-    p[1 * 8 + col] = (v1 + v6);
-    p[6 * 8 + col] = (v1 - v6);
-    p[2 * 8 + col] = (v2 + v5);
-    p[5 * 8 + col] = (v2 - v5);
-    p[3 * 8 + col] = (v3 + v4);
-    p[4 * 8 + col] = (v3 - v4);
+    p[0 * 8 + col] = v0 + v7;
+    p[7 * 8 + col] = v0 - v7;
+    p[1 * 8 + col] = v1 + v6;
+    p[6 * 8 + col] = v1 - v6;
+    p[2 * 8 + col] = v2 + v5;
+    p[5 * 8 + col] = v2 - v5;
+    p[3 * 8 + col] = v3 + v4;
+    p[4 * 8 + col] = v3 - v4;
   }
 
   // convert to 8-bit integers
@@ -209,7 +204,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 
 Image getImageFromJpeg(JpegData jpeg) {
   final orientation =
-    jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.Orientation! : 0;
+    jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.orientation! : 0;
 
   final w = jpeg.width!;
   final h = jpeg.height!;
@@ -217,11 +212,10 @@ Image getImageFromJpeg(JpegData jpeg) {
   final width = flipWidthHeight ? h : w;
   final height = flipWidthHeight ? w : h;
 
-  final image = Image(width, height, channels: Channels.rgb);
-
+  final image = Image(width: width, height: height)
   // Copy exif data, except for ORIENTATION which we're baking.
-  image.exif = ExifData.from(jpeg.exif);
-  image.exif.imageIfd.Orientation = null;
+  ..exif = ExifData.from(jpeg.exif)
+  ..exif.imageIfd.orientation = null;
 
   ComponentData component1;
   ComponentData component2;
@@ -231,8 +225,6 @@ Image getImageFromJpeg(JpegData jpeg) {
   Uint8List? component2Line;
   Uint8List? component3Line;
   Uint8List? component4Line;
-  var offset = 0;
-  int Y, Cb, Cr, K, C, M, Ye, R, G, B;
   var colorTransform = false;
 
   final h1 = h - 1;
@@ -249,24 +241,24 @@ Image getImageFromJpeg(JpegData jpeg) {
         component1Line = lines[y1];
         for (var x = 0; x < w; x++) {
           final x1 = x >> hShift1;
-          Y = component1Line![x1];
-          final c = getColor(Y, Y, Y);
+          final cy = component1Line![x1];
+
           if (orientation == 2) {
-            image.setPixel(w1 - x, y, c);
+            image.setPixelColor(w1 - x, y,  cy, cy, cy);
           } else if (orientation == 3) {
-            image.setPixel(w1 - x, h1 - y, c);
+            image.setPixelColor(w1 - x, h1 - y,  cy, cy, cy);
           } else if (orientation == 4) {
-            image.setPixel(x, h1 - y, c);
+            image.setPixelColor(x, h1 - y,  cy, cy, cy);
           } else if (orientation == 5) {
-            image.setPixel(y, x, c);
+            image.setPixelColor(y, x,  cy, cy, cy);
           } else if (orientation == 6) {
-            image.setPixel(h1 - y, x, c);
+            image.setPixelColor(h1 - y, x,  cy, cy, cy);
           } else if (orientation == 7) {
-            image.setPixel(h1 - y, w1 - x, c);
+            image.setPixelColor(h1 - y, w1 - x,  cy, cy, cy);
           } else if (orientation == 8) {
-            image.setPixel(y, w1 - x, c);
+            image.setPixelColor(y, w1 - x,  cy, cy, cy);
           } else {
-            image[offset++] = c;
+            image.setPixelColor(x, y, cy, cy, cy);
           }
         }
       }
@@ -290,11 +282,11 @@ Image getImageFromJpeg(JpegData jpeg) {
             int x1 = x >> hShift1;
             int x2 = x >> hShift2;
 
-            Y = component1Line[x1];
-            //data[offset++] = Y;
+            final cy = component1Line[x1];
+            //data[offset++] = cy;
 
-            Y = component2Line[x2];
-            //data[offset++] = Y;
+            cy = component2Line[x2];
+            //data[offset++] = cy;
           }
         }
         break;*/
@@ -331,33 +323,33 @@ Image getImageFromJpeg(JpegData jpeg) {
           final x2 = x >> hShift2;
           final x3 = x >> hShift3;
 
-          Y = component1Line![x1] << 8;
-          Cb = component2Line![x2] - 128;
-          Cr = component3Line![x3] - 128;
+          final cy = component1Line![x1] << 8;
+          final cb = component2Line![x2] - 128;
+          final cr = component3Line![x3] - 128;
 
-          R = (Y + 359 * Cr + 128);
-          G = (Y - 88 * Cb - 183 * Cr + 128);
-          B = (Y + 454 * Cb + 128);
-          R = _clamp8(R >> 8);
-          G = _clamp8(G >> 8);
-          B = _clamp8(B >> 8);
-          final c = getColor(R, G, B);
+          var r = cy + 359 * cr + 128;
+          var g = cy - 88 * cb - 183 * cr + 128;
+          var b = cy + 454 * cb + 128;
+          r = (r >> 8).clamp(0, 255);
+          g = (g >> 8).clamp(0, 255);
+          b = (b >> 8).clamp(0, 255);
+
           if (orientation == 2) {
-            image.setPixel(w1 - x, y, c);
+            image.setPixelColor(w1 - x, y, r, g, b);
           } else if (orientation == 3) {
-            image.setPixel(w1 - x, h1 - y, c);
+            image.setPixelColor(w1 - x, h1 - y, r, g, b);
           } else if (orientation == 4) {
-            image.setPixel(x, h1 - y, c);
+            image.setPixelColor(x, h1 - y, r, g, b);
           } else if (orientation == 5) {
-            image.setPixel(y, x, c);
+            image.setPixelColor(y, x, r, g, b);
           } else if (orientation == 6) {
-            image.setPixel(h1 - y, x, c);
+            image.setPixelColor(h1 - y, x, r, g, b);
           } else if (orientation == 7) {
-            image.setPixel(h1 - y, w1 - x, c);
+            image.setPixelColor(h1 - y, w1 - x, r, g, b);
           } else if (orientation == 8) {
-            image.setPixel(y, w1 - x, c);
+            image.setPixelColor(y, w1 - x, r, g, b);
           } else {
-            image[offset++] = c;
+            image.setPixelColor(x, y, r, g, b);
           }
         }
       }
@@ -406,44 +398,43 @@ Image getImageFromJpeg(JpegData jpeg) {
           final x2 = x >> hShift2;
           final x3 = x >> hShift3;
           final x4 = x >> hShift4;
+          int cc, cm, cy, ck;
           if (!colorTransform) {
-            C = component1Line![x1];
-            M = component2Line![x2];
-            Ye = component3Line![x3];
-            K = component4Line![x4];
+            cc = component1Line![x1];
+            cm = component2Line![x2];
+            cy = component3Line![x3];
+            ck = component4Line![x4];
           } else {
-            Y = component1Line![x1];
-            Cb = component2Line![x2];
-            Cr = component3Line![x3];
-            K = component4Line![x4];
+            cy = component1Line![x1];
+            final cb = component2Line![x2];
+            final cr = component3Line![x3];
+            ck = component4Line![x4];
 
-            C = 255 - _clamp8((Y + 1.402 * (Cr - 128)).toInt());
-            M = 255 -
-                _clamp8((Y - 0.3441363 * (Cb - 128) - 0.71413636 * (Cr - 128))
-                    .toInt());
-            Ye = 255 - _clamp8((Y + 1.772 * (Cb - 128)).toInt());
+            cc = 255 - (cy + 1.402 * (cr - 128)).toInt().clamp(0, 255);
+            cm = 255 - (cy - 0.3441363 * (cb - 128) - 0.71413636 *
+                (cr - 128)).toInt().clamp(0, 255);
+            cy = 255 - (cy + 1.772 * (cb - 128)).toInt().clamp(0, 255);
           }
-          R = (C * K) >> 8;
-          G = (M * K) >> 8;
-          B = (Ye * K) >> 8;
+          final r = (cc * ck) >> 8;
+          final g = (cm * ck) >> 8;
+          final b = (cy * ck) >> 8;
 
-          final c = getColor(R, G, B);
           if (orientation == 2) {
-            image.setPixel(w1 - x, y, c);
+            image.setPixelColor(w1 - x, y, r, g, b);
           } else if (orientation == 3) {
-            image.setPixel(w1 - x, h1 - y, c);
+            image.setPixelColor(w1 - x, h1 - y, r, g, b);
           } else if (orientation == 4) {
-            image.setPixel(x, h1 - y, c);
+            image.setPixelColor(x, h1 - y, r, g, b);
           } else if (orientation == 5) {
-            image.setPixel(y, x, c);
+            image.setPixelColor(y, x, r, g, b);
           } else if (orientation == 6) {
-            image.setPixel(h1 - y, x, c);
+            image.setPixelColor(h1 - y, x, r, g, b);
           } else if (orientation == 7) {
-            image.setPixel(h1 - y, w1 - x, c);
+            image.setPixelColor(h1 - y, w1 - x, r, g, b);
           } else if (orientation == 8) {
-            image.setPixel(y, w1 - x, c);
+            image.setPixelColor(y, w1 - x, r, g, b);
           } else {
-            image[offset++] = c;
+            image.setPixelColor(x, y, r, g, b);
           }
         }
       }

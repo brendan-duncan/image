@@ -1,37 +1,55 @@
 import 'dart:typed_data';
 
-import '../animation.dart';
-import '../image.dart';
-import '../util/dither_pixels.dart';
+import '../filter/dither_image.dart';
+import '../image/image.dart';
+import '../util/image_exception.dart';
 import '../util/neural_quantizer.dart';
+import '../util/octree_quantizer.dart';
 import '../util/output_buffer.dart';
+import '../util/quantizer.dart';
 import 'encoder.dart';
 
 class GifEncoder extends Encoder {
-  int delay, repeat, samplingFactor;
+  int delay;
+  int repeat;
+  int numColors;
+  QuantizerType quantizerType;
+  int samplingFactor;
   DitherKernel dither;
   bool ditherSerpentine;
 
   GifEncoder(
-      {this.delay = 80,
-      this.repeat = 0,
-      this.samplingFactor = 10,
-      this.dither = DitherKernel.FloydSteinberg,
-      this.ditherSerpentine = false})
+      { this.delay = 80,
+        this.repeat = 0,
+        this.numColors = 256,
+        this.quantizerType = QuantizerType.neural,
+        this.samplingFactor = 10,
+        this.dither = DitherKernel.floydSteinberg,
+        this.ditherSerpentine = false })
       : _encodedFrames = 0;
 
   /// This adds the frame passed to [image].
   /// After the last frame has been added, [finish] is required to be called.
   /// Optional frame [duration] is in 1/100 sec.
-  void addFrame(Image image, {int? duration}) {
+  void addFrame(Image image, { int? duration }) {
     if (output == null) {
       output = OutputBuffer();
 
-      _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
-      _lastImage =
-          ditherPixels(image, _lastColorMap!, dither, ditherSerpentine);
-      _lastImageDuration = duration;
+      if (!image.hasPalette) {
+        if (quantizerType == QuantizerType.neural) {
+          _lastColorMap = NeuralQuantizer(image, numberOfColors: numColors,
+              samplingFactor: samplingFactor);
+        } else {
+          _lastColorMap = OctreeQuantizer(image, numberOfColors: numColors);
+        }
 
+        _lastImage = ditherImage(image, quantizer: _lastColorMap!,
+            kernel: dither, serpentine: ditherSerpentine);
+      } else {
+        _lastImage = image;
+      }
+
+      _lastImageDuration = duration;
       _width = image.width;
       _height = image.height;
       return;
@@ -42,13 +60,25 @@ class GifEncoder extends Encoder {
       _writeApplicationExt();
     }
 
-    _writeGraphicsCtrlExt();
+    _writeGraphicsCtrlExt(_lastImage!);
 
-    _addImage(_lastImage, _width, _height, _lastColorMap!.colorMap, 256);
+    _addImage(_lastImage!, _width, _height);
     _encodedFrames++;
 
-    _lastColorMap = NeuralQuantizer(image, samplingFactor: samplingFactor);
-    _lastImage = ditherPixels(image, _lastColorMap!, dither, ditherSerpentine);
+    if (!image.hasPalette) {
+      if (quantizerType == QuantizerType.neural) {
+        _lastColorMap = NeuralQuantizer(image, numberOfColors: numColors,
+            samplingFactor: samplingFactor);
+      } else {
+        _lastColorMap = OctreeQuantizer(image, numberOfColors: numColors);
+      }
+
+      _lastImage = ditherImage(image, quantizer: _lastColorMap!, kernel: dither,
+          serpentine: ditherSerpentine);
+    } else {
+      _lastImage = image;
+    }
+
     _lastImageDuration = duration;
   }
 
@@ -59,8 +89,8 @@ class GifEncoder extends Encoder {
   /// [addFrame] will not encode the first image passed and after that
   /// always encode the previous image. Hence, the last image needs to be
   /// encoded here.
-  List<int>? finish() {
-    List<int>? bytes;
+  Uint8List? finish() {
+    Uint8List? bytes;
     if (output == null) {
       return bytes;
     }
@@ -69,10 +99,10 @@ class GifEncoder extends Encoder {
       _writeHeader(_width, _height);
       _writeApplicationExt();
     } else {
-      _writeGraphicsCtrlExt();
+      _writeGraphicsCtrlExt(_lastImage!);
     }
 
-    _addImage(_lastImage, _width, _height, _lastColorMap!.colorMap, 256);
+    _addImage(_lastImage!, _width, _height);
 
     output!.writeByte(_terminateRecordType);
 
@@ -87,8 +117,17 @@ class GifEncoder extends Encoder {
 
   /// Encode a single frame image.
   @override
-  List<int> encodeImage(Image image) {
-    addFrame(image);
+  Uint8List encode(Image image, { bool singleFrame = false }) {
+    if (!image.hasAnimation || singleFrame) {
+      addFrame(image);
+      return finish()!;
+    }
+
+    repeat = image.loopCount;
+    for (var f in image.frames) {
+      // Convert ms to 1/100 sec.
+      addFrame(f, duration: f.frameDuration ~/ 10);
+    }
     return finish()!;
   }
 
@@ -96,42 +135,57 @@ class GifEncoder extends Encoder {
   @override
   bool get supportsAnimation => true;
 
-  /// Encode an animation.
-  @override
-  List<int>? encodeAnimation(Animation anim) {
-    repeat = anim.loopCount;
-    for (var f in anim) {
-      addFrame(
-        f,
-        duration: f.duration ~/ 10, // Convert ms to 1/100 sec.
-      );
+  void _addImage(Image image, int width, int height) {
+    if (!image.hasPalette) {
+      throw ImageException('GIF can only encode palette images.');
     }
-    return finish();
-  }
 
-  void _addImage(Uint8List? image, int width, int height, Uint8List colorMap,
-      int numColors) {
+    final palette = image.palette!;
+    final numColors = palette.numColors;
+
+    final out = output!
+
     // Image desc
-    output!.writeByte(_imageDescRecordType);
-    output!.writeUint16(0); // image position x,y = 0,0
-    output!.writeUint16(0);
-    output!.writeUint16(width); // image size
-    output!.writeUint16(height);
+    ..writeByte(_imageDescRecordType)
+    ..writeUint16(0) // image position x,y = 0,0
+    ..writeUint16(0)
+    ..writeUint16(width) // image size
+    ..writeUint16(height);
+
+    final paletteBytes = palette.toUint8List();
 
     // Local Color Map
     // (0x80: Use LCM, 0x07: Palette Size (7 = 8-bit))
-    output!.writeByte(0x87);
-    output!.writeBytes(colorMap);
+    out.writeByte(0x87);
+
+    final numChannels = palette.numChannels;
+    if (numChannels == 3) {
+      out.writeBytes(paletteBytes);
+    } else if (numChannels == 4) {
+      for (var i = 0, pi = 0; i < numColors; ++i, pi += 4) {
+        out..writeByte(paletteBytes[pi])
+        ..writeByte(paletteBytes[pi + 1])
+        ..writeByte(paletteBytes[pi + 2]);
+      }
+    } else if (numChannels == 1 || numChannels == 2) {
+      for (var i = 0, pi = 0; i < numColors; ++i, pi += numChannels) {
+        final g = paletteBytes[pi];
+        out..writeByte(g)
+        ..writeByte(g)
+        ..writeByte(g);
+      }
+    }
+
     for (var i = numColors; i < 256; ++i) {
-      output!.writeByte(0);
-      output!.writeByte(0);
-      output!.writeByte(0);
+      out..writeByte(0)
+      ..writeByte(0)
+      ..writeByte(0);
     }
 
     _encodeLZW(image, width, height);
   }
 
-  void _encodeLZW(Uint8List? image, int width, int height) {
+  void _encodeLZW(Image image, int width, int height) {
     _curAccum = 0;
     _curBits = 0;
     _blockSize = 0;
@@ -140,36 +194,39 @@ class GifEncoder extends Encoder {
     const initCodeSize = 8;
     output!.writeByte(initCodeSize);
 
-    final hTab = Int32List(_hsize);
-    final codeTab = Int32List(_hsize);
-    var remaining = width * height;
-    var curPixel = 0;
+    final hTab = Int32List(_hSize);
+    final codeTab = Int32List(_hSize);
+    final pIter = image.iterator..moveNext();
 
     _initBits = initCodeSize + 1;
     _nBits = _initBits;
     _maxCode = (1 << _nBits) - 1;
     _clearCode = 1 << (_initBits - 1);
-    _EOFCode = _clearCode + 1;
+    _eofCode = _clearCode + 1;
     _clearFlag = false;
     _freeEnt = _clearCode + 2;
+    var pFinished = false;
 
     int _nextPixel() {
-      if (remaining == 0) {
+      if (pFinished) {
         return _eof;
       }
-      --remaining;
-      return image![curPixel++] & 0xff;
+      final r = pIter.current.index as int;
+      if (!pIter.moveNext()) {
+        pFinished = true;
+      }
+      return r;
     }
 
     var ent = _nextPixel();
 
-    var hshift = 0;
-    for (var fcode = _hsize; fcode < 65536; fcode *= 2) {
-      hshift++;
+    var hShift = 0;
+    for (var fCode = _hSize; fCode < 65536; fCode *= 2) {
+      hShift++;
     }
-    hshift = 8 - hshift;
+    hShift = 8 - hShift;
 
-    const hSizeReg = _hsize;
+    const hSizeReg = _hSize;
     for (var i = 0; i < hSizeReg; ++i) {
       hTab[i] = -1;
     }
@@ -183,7 +240,7 @@ class GifEncoder extends Encoder {
       var c = _nextPixel();
       while (c != _eof) {
         final fcode = (c << _bits) + ent;
-        var i = (c << hshift) ^ ent; // xor hashing
+        var i = (c << hShift) ^ ent; // xor hashing
 
         if (hTab[i] == fcode) {
           ent = codeTab[i];
@@ -218,7 +275,7 @@ class GifEncoder extends Encoder {
           codeTab[i] = _freeEnt++; // code -> hashtable
           hTab[i] = fcode;
         } else {
-          for (var i = 0; i < _hsize; ++i) {
+          for (var i = 0; i < _hSize; ++i) {
             hTab[i] = -1;
           }
           _freeEnt = _clearCode + 2;
@@ -231,7 +288,7 @@ class GifEncoder extends Encoder {
     }
 
     _output(ent);
-    _output(_EOFCode);
+    _output(_eofCode);
 
     output!.writeByte(0);
   }
@@ -240,7 +297,7 @@ class GifEncoder extends Encoder {
     _curAccum &= _masks[_curBits];
 
     if (_curBits > 0) {
-      _curAccum |= (code! << _curBits);
+      _curAccum |= code! << _curBits;
     } else {
       _curAccum = code!;
     }
@@ -270,7 +327,7 @@ class GifEncoder extends Encoder {
       }
     }
 
-    if (code == _EOFCode) {
+    if (code == _eofCode) {
       // At EOF, write the rest of the buffer.
       while (_curBits > 0) {
         _addToBlock(_curAccum & 0xff);
@@ -306,22 +363,40 @@ class GifEncoder extends Encoder {
     output!.writeByte(0); // block terminator
   }
 
-  void _writeGraphicsCtrlExt() {
+  void _writeGraphicsCtrlExt(Image image) {
     output!.writeByte(_extensionRecordType);
     output!.writeByte(_graphicControlExt);
     output!.writeByte(4); // data block size
 
-    const transparency = 0;
-    const dispose = 0; // dispose = no action
+    var transparentIndex = 0;
+    var hasTransparency = 0;
+    final palette = image.palette!;
+    final nc = palette.numChannels;
+    final pa = nc - 1;
+    if (nc == 4 || nc == 2) {
+      final p = palette.toUint8List();
+      final l = palette.numColors;
+      for (var i = 0, pi = pa; i < l; ++i, pi += nc) {
+        final a = p[pi];
+        if (a == 0) {
+          hasTransparency = 1;
+          transparentIndex = pi;
+          break;
+        }
+      }
+    }
+
+    const dispose = 2; // dispose: 0 = no action, 2 = clear
+    final fields = 0 | // 1:3 reserved
+        (dispose << 2) | // 4:6 disposal
+        0 | // 7   user input - 0 = none
+        hasTransparency; // 8   transparency flag
 
     // packed fields
-    output!.writeByte(0 | // 1:3 reserved
-        dispose | // 4:6 disposal
-        0 | // 7   user input - 0 = none
-        transparency); // 8   transparency flag
+    output!.writeByte(fields);
 
     output!.writeUint16(_lastImageDuration ?? delay); // delay x 1/100 sec
-    output!.writeByte(0); // transparent color index
+    output!.writeByte(transparentIndex); // transparent color index
     output!.writeByte(0); // block terminator
   }
 
@@ -335,9 +410,9 @@ class GifEncoder extends Encoder {
     output!.writeByte(0); // aspect
   }
 
-  Uint8List? _lastImage;
+  Image? _lastImage;
   int? _lastImageDuration;
-  NeuralQuantizer? _lastColorMap;
+  Quantizer? _lastColorMap;
   late int _width;
   late int _height;
   int _encodedFrames;
@@ -346,7 +421,7 @@ class GifEncoder extends Encoder {
   int _curBits = 0;
   int _nBits = 0;
   int _initBits = 0;
-  int _EOFCode = 0;
+  int _eofCode = 0;
   int _maxCode = 0;
   int _clearCode = 0;
   int _freeEnt = 0;
@@ -367,7 +442,7 @@ class GifEncoder extends Encoder {
 
   static const _eof = -1;
   static const _bits = 12;
-  static const _hsize = 5003; // 80% occupancy
+  static const _hSize = 5003; // 80% occupancy
   static const _masks = [
     0x0000,
     0x0001,

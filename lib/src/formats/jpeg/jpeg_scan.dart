@@ -1,9 +1,12 @@
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
-import 'jpeg.dart';
+import '../../util/internal.dart';
 import 'jpeg_component.dart';
+import 'jpeg_data.dart';
 import 'jpeg_frame.dart';
+import 'jpeg_marker.dart';
 
+@internal
 class JpegScan {
   InputBuffer input;
   JpegFrame frame;
@@ -64,10 +67,9 @@ class JpegScan {
 
     int? mcuExpected;
     if (componentsLength == 1) {
-      mcuExpected =
-          (components[0].blocksPerLine * components[0].blocksPerColumn);
+      mcuExpected = components[0].blocksPerLine * components[0].blocksPerColumn;
     } else {
-      mcuExpected = (mcusPerLine * frame.mcusPerColumn);
+      mcuExpected = mcusPerLine * frame.mcusPerColumn;
     }
 
     if (resetInterval == null || resetInterval == 0) {
@@ -109,7 +111,7 @@ class JpegScan {
       final m1 = input[0];
       final m2 = input[1];
       if (m1 == 0xff) {
-        if (m2 >= Jpeg.M_RST0 && m2 <= Jpeg.M_RST7) {
+        if (m2 >= JpegMarker.rst0 && m2 <= JpegMarker.rst7) {
           input.offset += 2;
         } else {
           break;
@@ -132,8 +134,8 @@ class JpegScan {
     if (bitsData == 0xff) {
       final nextByte = input.readByte();
       if (nextByte != 0) {
-        throw ImageException(
-            'unexpected marker: ${((bitsData << 8) | nextByte).toRadixString(16)}');
+        final marker = ((bitsData << 8) | nextByte).toRadixString(16);
+        throw ImageException('unexpected marker: $marker');
       }
     }
 
@@ -161,7 +163,7 @@ class JpegScan {
       if (bit == null) {
         return null;
       }
-      n = ((n << 1) | bit);
+      n = (n << 1) | bit;
       length--;
     }
     return n;
@@ -201,7 +203,7 @@ class JpegScan {
 
       s = _receiveAndExtend(s);
 
-      final z = Jpeg.dctZigZag[k];
+      final z = JpegData.dctZigZag[k];
       zz[z] = s;
       k++;
     }
@@ -215,7 +217,7 @@ class JpegScan {
   }
 
   void _decodeDCSuccessive(JpegComponent component, List<int> zz) {
-    zz[0] = (zz[0] | (_readBit()! << successive));
+    zz[0] = zz[0] | (_readBit()! << successive);
   }
 
   void _decodeACFirst(JpegComponent component, List zz) {
@@ -231,15 +233,15 @@ class JpegScan {
       final r = rs >> 4;
       if (s == 0) {
         if (r < 15) {
-          eobrun = (_receive(r)! + (1 << r) - 1);
+          eobrun = _receive(r)! + (1 << r) - 1;
           break;
         }
         k += 16;
         continue;
       }
       k += r;
-      final z = Jpeg.dctZigZag[k];
-      zz[z] = (_receiveAndExtend(s) * (1 << successive));
+      final z = JpegData.dctZigZag[k];
+      zz[z] = _receiveAndExtend(s) * (1 << successive);
       k++;
     }
   }
@@ -250,7 +252,7 @@ class JpegScan {
     var s = 0;
     var r = 0;
     while (k <= e) {
-      final z = Jpeg.dctZigZag[k];
+      final z = JpegData.dctZigZag[k];
       switch (successiveACState) {
         case 0: // initial state
           final rs = _decodeHuffman(component.huffmanTableAC);
@@ -259,7 +261,7 @@ class JpegScan {
           r = rs >> 4;
           if (s == 0) {
             if (r < 15) {
-              eobrun = (_receive(r)! + (1 << r));
+              eobrun = _receive(r)! + (1 << r);
               successiveACState = 4;
             } else {
               r = 16;
@@ -276,7 +278,7 @@ class JpegScan {
         case 1: // skipping r zero items
         case 2:
           if (zz[z] != 0) {
-            zz[z] += (_readBit()! << successive);
+            zz[z] += _readBit()! << successive;
           } else {
             r--;
             if (r == 0) {
@@ -286,15 +288,15 @@ class JpegScan {
           break;
         case 3: // set value for a zero item
           if (zz[z] != 0) {
-            zz[z] += (_readBit()! << successive);
+            zz[z] += _readBit()! << successive;
           } else {
-            zz[z] = (successiveACNextValue << successive);
+            zz[z] = successiveACNextValue << successive;
             successiveACState = 0;
           }
           break;
         case 4: // eob
           if (zz[z] != 0) {
-            zz[z] += (_readBit()! << successive);
+            zz[z] += _readBit()! << successive;
           }
           break;
       }
@@ -314,7 +316,7 @@ class JpegScan {
       int mcu,
       int row,
       int col) {
-    final mcuRow = (mcu ~/ mcusPerLine);
+    final mcuRow = mcu ~/ mcusPerLine;
     final mcuCol = mcu % mcusPerLine;
     final blockRow = mcuRow * component.vSamples + row;
     final blockCol = mcuCol * component.hSamples + col;

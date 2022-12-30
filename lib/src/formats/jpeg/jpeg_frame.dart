@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import '../../util/internal.dart';
 import 'jpeg_component.dart';
 
+@internal
 class JpegFrame {
   bool? extended;
   bool? progressive;
@@ -43,9 +45,9 @@ class JpegFrame {
               growable: false),
           growable: false);
 
-      component.blocksPerLine = blocksPerLine;
-      component.blocksPerColumn = blocksPerColumn;
-      component.blocks = blocks;
+      component..blocksPerLine = blocksPerLine
+      ..blocksPerColumn = blocksPerColumn
+      ..blocks = blocks;
     }
   }
 }

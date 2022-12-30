@@ -1,13 +1,15 @@
-import '../color.dart';
-import '../image.dart';
+import '../color/channel.dart';
+import '../image/image.dart';
+import '../util/math_util.dart';
 
-/// A kernel object to use with [separableConvolution] filtering.
+/// A kernel object to use with separableConvolution filtering.
 class SeparableKernel {
   final List<num> coefficients;
   final int size;
 
-  /// Create a separable convolution kernel for the given [radius].
-  SeparableKernel(this.size) : coefficients = List<num>.filled(2 * size + 1, 0);
+  /// Create a separable convolution kernel for the given [size].
+  SeparableKernel(this.size)
+      : coefficients = List<num>.filled(2 * size + 1, 0);
 
   /// Get the number of coefficients in the kernel.
   int get length => coefficients.length;
@@ -22,16 +24,19 @@ class SeparableKernel {
 
   /// Apply the kernel to the [src] image, storing the results in [dst],
   /// for a single dimension. If [horizontal is true, the filter will be
-  /// applied to the horizontal axis, otherwise it will be appied to the
+  /// applied to the horizontal axis, otherwise it will be applied to the
   /// vertical axis.
-  void apply(Image src, Image dst, {bool horizontal = true}) {
+  void apply(Image src, Image dst, { bool horizontal = true,
+      Image? mask, Channel maskChannel = Channel.luminance }) {
     if (horizontal) {
       for (var y = 0; y < src.height; ++y) {
-        _applyCoeffsLine(src, dst, y, src.width, horizontal);
+        _applyCoefficientsLine(src, dst, y, src.width, horizontal,
+            mask, maskChannel);
       }
     } else {
       for (var x = 0; x < src.width; ++x) {
-        _applyCoeffsLine(src, dst, x, src.height, horizontal);
+        _applyCoefficientsLine(src, dst, x, src.height, horizontal,
+            mask, maskChannel);
       }
     }
   }
@@ -53,8 +58,8 @@ class SeparableKernel {
     return x;
   }
 
-  void _applyCoeffsLine(
-      Image src, Image dst, int y, int width, bool horizontal) {
+  void _applyCoefficientsLine(Image src, Image dst, int y, int width,
+      bool horizontal, Image? mask, Channel maskChannel) {
     for (var x = 0; x < width; x++) {
       num r = 0.0;
       num g = 0.0;
@@ -62,27 +67,27 @@ class SeparableKernel {
       num a = 0.0;
 
       for (var j = -size, j2 = 0; j <= size; ++j, ++j2) {
-        final coeff = coefficients[j2];
+        final c = coefficients[j2];
         final gr = _reflect(width, x + j);
 
-        final sc = (horizontal) ? src.getPixel(gr, y) : src.getPixel(y, gr);
+        final sc = horizontal ? src.getPixel(gr, y) : src.getPixel(y, gr);
 
-        r += coeff * getRed(sc);
-        g += coeff * getGreen(sc);
-        b += coeff * getBlue(sc);
-        a += coeff * getAlpha(sc);
+        r += c * sc.r;
+        g += c * sc.g;
+        b += c * sc.b;
+        a += c * sc.a;
       }
 
-      final c = getColor(
-          (r > 255.0 ? 255.0 : r).toInt(),
-          (g > 255.0 ? 255.0 : g).toInt(),
-          (b > 255.0 ? 255.0 : b).toInt(),
-          (a > 255.0 ? 255.0 : a).toInt());
+      final p = horizontal ? dst.getPixel(x, y) : dst.getPixel(y, x);
 
-      if (horizontal) {
-        dst.setPixel(x, y, c);
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      if (msk == null) {
+        p.setColor(r, g, b, a);
       } else {
-        dst.setPixel(y, x, c);
+        p..r = mix(p.r, r, msk)
+        ..g = mix(p.g, g, msk)
+        ..b = mix(p.b, b, msk)
+        ..a = mix(p.a, a, msk);
       }
     }
   }

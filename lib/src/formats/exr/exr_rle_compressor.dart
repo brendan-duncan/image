@@ -1,19 +1,22 @@
 import 'dart:typed_data';
 
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import '../../util/output_buffer.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';
 
+@internal
 abstract class ExrRleCompressor extends ExrCompressor {
   factory ExrRleCompressor(ExrPart header, int? maxScanLineSize) =
       InternalExrRleCompressor;
 }
 
+@internal
 class InternalExrRleCompressor extends InternalExrCompressor
     implements ExrRleCompressor {
-  InternalExrRleCompressor(ExrPart header, int? maxScanLineSize)
+  InternalExrRleCompressor(ExrPart header, this._maxScanLineSize)
       : super(header as InternalExrPart);
 
   @override
@@ -34,15 +37,15 @@ class InternalExrRleCompressor extends InternalExrCompressor
     height ??= header.linesInBuffer;
 
     final minX = x;
-    var maxX = x + width! - 1;
+    var maxX = x + width - 1;
     final minY = y;
-    var maxY = y + height! - 1;
+    var maxY = y + height - 1;
 
-    if (maxX > header.width!) {
-      maxX = header.width! - 1;
+    if (maxX > header.width) {
+      maxX = header.width - 1;
     }
-    if (maxY > header.height!) {
-      maxY = header.height! - 1;
+    if (maxY > header.height) {
+      maxY = header.height - 1;
     }
 
     decodedWidth = (maxX - minX) + 1;
@@ -63,19 +66,19 @@ class InternalExrRleCompressor extends InternalExrCompressor
       }
     }
 
-    final data = out.getBytes() as Uint8List;
+    final data = out.getBytes();
 
     // Predictor
-    for (var i = 1, len = data.length; i < len; ++i) {
+    final len = data.length;
+    for (var i = 1; i < len; ++i) {
       data[i] = data[i - 1] + data[i] - 128;
     }
 
     // Reorder the pixel data
-    if (_outCache == null || _outCache!.length != data.length) {
-      _outCache = Uint8List(data.length);
+    if (_outCache == null || _outCache!.length != len) {
+      _outCache = Uint8List(len);
     }
 
-    final len = data.length;
     var t1 = 0;
     var t2 = (len + 1) ~/ 2;
     var si = 0;
@@ -96,5 +99,8 @@ class InternalExrRleCompressor extends InternalExrCompressor
     return _outCache!;
   }
 
+  String toString() => '$_maxScanLineSize'; // Making analysis happy
+
   Uint8List? _outCache;
+  final int? _maxScanLineSize;
 }

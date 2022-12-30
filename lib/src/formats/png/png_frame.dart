@@ -1,32 +1,44 @@
-import '../../internal/internal.dart';
+import '../../util/internal.dart';
+
+enum PngDisposeMode {
+  none,
+  background,
+  previous
+}
+
+enum PngBlendMode {
+  source,
+  over
+}
 
 // Decodes a frame from a PNG animation.
 class PngFrame {
-  // DisposeMode
-  static const APNG_DISPOSE_OP_NONE = 0;
-  static const APNG_DISPOSE_OP_BACKGROUND = 1;
-  static const APNG_DISPOSE_OP_PREVIOUS = 2;
-  // BlendMode
-  static const APNG_BLEND_OP_SOURCE = 0;
-  static const APNG_BLEND_OP_OVER = 1;
+  int sequenceNumber;
+  int width;
+  int height;
+  int xOffset;
+  int yOffset;
+  int delayNum;
+  int delayDen;
+  PngDisposeMode dispose;
+  PngBlendMode blend;
 
-  int? sequenceNumber;
-  int? width;
-  int? height;
-  int? xOffset;
-  int? yOffset;
-  int? delayNum;
-  int? delayDen;
-  int? dispose;
-  int? blend;
+  PngFrame({this.sequenceNumber = 0, this.width = 0, this.height = 0,
+    this.xOffset = 0, this.yOffset = 0, this.delayNum = 0, this.delayDen = 0,
+    this.dispose = PngDisposeMode.none, this.blend = PngBlendMode.source });
 
-  final List<int> _fdat = [];
-
-  double get delay => delayNum == null || delayDen == null ? 0 :
-    delayDen != 0 ? delayNum! / delayDen! : 0;
+  double get delay => delayNum == 0 || delayDen == 0 ? 0 : delayNum / delayDen;
 }
 
 @internal
 class InternalPngFrame extends PngFrame {
-  List<int> get fdat => _fdat;
+  InternalPngFrame({int sequenceNumber = 0, int width = 0, int height = 0,
+    int xOffset = 0, int yOffset = 0, int delayNum = 0, int delayDen = 0,
+    PngDisposeMode dispose = PngDisposeMode.none,
+    PngBlendMode blend = PngBlendMode.source })
+      : super(sequenceNumber: sequenceNumber, width: width, height: height,
+          xOffset: xOffset, yOffset: yOffset, delayNum: delayNum,
+          delayDen: delayDen, dispose: dispose, blend: blend);
+
+  final fdat = <int>[];
 }

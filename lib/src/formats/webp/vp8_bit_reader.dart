@@ -1,5 +1,7 @@
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 
+@internal
 class VP8BitReader {
   InputBuffer input;
 
@@ -24,7 +26,7 @@ class VP8BitReader {
   }
 
   int getSigned(int v) {
-    final split = (_range >> 1);
+    final split = _range >> 1;
     final bit = _bitUpdate(split);
     _shift();
     return bit != 0 ? -v : v;
@@ -53,7 +55,7 @@ class VP8BitReader {
     }
 
     final pos = _bits;
-    final value = (_value >> pos);
+    final value = _value >> pos;
     if (value > split) {
       _range -= split + 1;
       _value -= (split + 1) << pos;
@@ -65,18 +67,18 @@ class VP8BitReader {
   }
 
   void _shift() {
-    final shift = LOG_2_RANGE[_range];
-    _range = NEW_RANGE[_range];
+    final shift = _log2Range[_range];
+    _range = _newRange[_range];
     _bits -= shift;
   }
 
   void _loadNewBytes() {
-    // Read 'BITS' bits at a time if possible.
+    // Read 8 bits at a time if possible.
     if (input.length >= 1) {
       // convert memory type to register type (with some zero'ing!)
       final bits = input.readByte();
-      _value = bits | (_value << BITS);
-      _bits += (BITS);
+      _value = bits | (_value << 8);
+      _bits += 8;
     } else {
       _loadFinalBytes(); // no need to be inlined
     }
@@ -96,10 +98,8 @@ class VP8BitReader {
     }
   }
 
-  static const BITS = 8;
-
   // Read a bit with proba 'prob'. Speed-critical function!
-  static const List<int> LOG_2_RANGE = [
+  static const _log2Range = [
     7,
     6,
     6,
@@ -230,7 +230,7 @@ class VP8BitReader {
     0
   ];
 
-  static const List<int> NEW_RANGE = [
+  static const _newRange = [
     127,
     127,
     191,

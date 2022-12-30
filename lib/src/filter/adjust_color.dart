@@ -1,8 +1,9 @@
 import 'dart:math';
 
-import '../color.dart';
-import '../image.dart';
-import '../internal/clamp.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../image/image.dart';
+import '../util/math_util.dart';
 
 /// Adjust the color of the [src] image using various color transformations.
 ///
@@ -38,18 +39,13 @@ import '../internal/clamp.dart';
 ///
 /// [amount] controls how much affect this filter has on the [src] image, where
 /// 0.0 has no effect and 1.0 has full effect.
+///
 Image adjustColor(Image src,
-    {int? blacks,
-    int? whites,
-    int? mids,
-    num? contrast,
-    num? saturation,
-    num? brightness,
-    num? gamma,
-    num? exposure,
-    num? hue,
-    num? amount}) {
-  if (amount == 0.0) {
+    { Color? blacks, Color? whites, Color? mids, num? contrast,
+      num? saturation, num? brightness, num? gamma, num? exposure,
+      num? hue, num amount = 1, Image? mask,
+      Channel maskChannel = Channel.luminance }) {
+  if (amount == 0) {
     return src;
   }
 
@@ -58,9 +54,9 @@ Image adjustColor(Image src,
   brightness = brightness?.clamp(0, 1);
   gamma = gamma?.clamp(0, 1000);
   exposure = exposure?.clamp(0, 1000);
-  amount = amount?.clamp(0, 1000);
+  amount = amount.clamp(0, 1000);
 
-  const DEG_TO_RAD = 0.0174532925;
+  const degToRad = 0.0174532925;
   const avgLumR = 0.5;
   const avgLumG = 0.5;
   const avgLumB = 0.5;
@@ -73,17 +69,17 @@ Image adjustColor(Image src,
   late num wr, wg, wb;
   late num mr, mg, mb;
   if (useBlacksWhitesMids) {
-    br = blacks != null ? getRed(blacks) / 255.0 : 0.0;
-    bg = blacks != null ? getGreen(blacks) / 255.0 : 0.0;
-    bb = blacks != null ? getBlue(blacks) / 255.0 : 0.0;
+    br = blacks?.rNormalized ?? 0;
+    bg = blacks?.gNormalized ?? 0;
+    bb = blacks?.bNormalized ?? 0;
 
-    wr = whites != null ? getRed(whites) / 255.0 : 1.0;
-    wg = whites != null ? getGreen(whites) / 255.0 : 1.0;
-    wb = whites != null ? getBlue(whites) / 255.0 : 1.0;
+    wr = whites?.rNormalized ?? 0;
+    wg = whites?.gNormalized ?? 0;
+    wb = whites?.bNormalized ?? 0;
 
-    mr = mids != null ? getRed(mids) / 255.0 : 0.5;
-    mg = mids != null ? getGreen(mids) / 255.0 : 0.5;
-    mb = mids != null ? getBlue(mids) / 255.0 : 0.5;
+    mr = mids?.rNormalized ?? 0;
+    mg = mids?.gNormalized ?? 0;
+    mb = mids?.bNormalized ?? 0;
 
     mr = 1.0 / (1.0 + 2.0 * (mr - 0.5));
     mg = 1.0 / (1.0 + 2.0 * (mg - 0.5));
@@ -102,7 +98,7 @@ Image adjustColor(Image src,
   late num hueG;
   late num hueB;
   if (hue != null) {
-    hue *= DEG_TO_RAD;
+    hue *= degToRad;
     final s = sin(hue);
     final c = cos(hue);
 
@@ -111,76 +107,77 @@ Image adjustColor(Image src,
     hueB = ((sqrt(3.0) * s - c) + 1.0) / 3.0;
   }
 
-  final invAmount = amount != null ? 1.0 - amount.clamp(0, 1) : 0.0;
+  for (final frame in src.frames) {
+    for (final p in frame) {
+      final or = p.rNormalized;
+      final og = p.gNormalized;
+      final ob = p.bNormalized;
 
-  final pixels = src.getBytes();
-  for (var i = 0, len = pixels.length; i < len; i += 4) {
-    final num or = pixels[i] / 255.0;
-    final num og = pixels[i + 1] / 255.0;
-    final num ob = pixels[i + 2] / 255.0;
+      var r = or;
+      var g = og;
+      var b = ob;
 
-    var r = or;
-    var g = og;
-    var b = ob;
+      if (useBlacksWhitesMids) {
+        r = pow((r + br) * wr, mr);
+        g = pow((g + bg) * wg, mg);
+        b = pow((b + bb) * wb, mb);
+      }
 
-    if (useBlacksWhitesMids) {
-      r = pow((r + br) * wr, mr);
-      g = pow((g + bg) * wg, mg);
-      b = pow((b + bb) * wb, mb);
+      if (brightness != null && brightness != 1.0) {
+        final _b = brightness.clamp(0, 1000);
+        r *= _b;
+        g *= _b;
+        b *= _b;
+      }
+
+      if (saturation != null) {
+        final num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
+
+        r = lum * invSaturation + r * saturation;
+        g = lum * invSaturation + g * saturation;
+        b = lum * invSaturation + b * saturation;
+      }
+
+      if (contrast != null) {
+        r = avgLumR * invContrast + r * contrast;
+        g = avgLumG * invContrast + g * contrast;
+        b = avgLumB * invContrast + b * contrast;
+      }
+
+      if (gamma != null) {
+        r = pow(r, gamma);
+        g = pow(g, gamma);
+        b = pow(b, gamma);
+      }
+
+      if (exposure != null) {
+        r = r * exposure;
+        g = g * exposure;
+        b = b * exposure;
+      }
+
+      if (hue != null && hue != 0.0) {
+        final hr = r * hueR + g * hueG + b * hueB;
+        final hg = r * hueB + g * hueR + b * hueG;
+        final hb = r * hueG + g * hueB + b * hueR;
+
+        r = hr;
+        g = hg;
+        b = hb;
+      }
+
+      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel)
+          ?? 1;
+      final blend = msk * amount;
+
+      r = mix(or, r, blend);
+      g = mix(og, g, blend);
+      b = mix(ob, b, blend);
+
+      p..rNormalized = r
+      ..gNormalized = g
+      ..bNormalized = b;
     }
-
-    if (brightness != null && brightness != 1.0) {
-      var b = brightness.clamp(0, 1000);
-      r *= b;
-      g *= b;
-      b *= b;
-    }
-
-    if (saturation != null) {
-      final num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
-
-      r = lum * invSaturation + r * saturation;
-      g = lum * invSaturation + g * saturation;
-      b = lum * invSaturation + b * saturation;
-    }
-
-    if (contrast != null) {
-      r = avgLumR * invContrast + r * contrast;
-      g = avgLumG * invContrast + g * contrast;
-      b = avgLumB * invContrast + b * contrast;
-    }
-
-    if (gamma != null) {
-      r = pow(r, gamma);
-      g = pow(g, gamma);
-      b = pow(b, gamma);
-    }
-
-    if (exposure != null) {
-      r = r * exposure;
-      g = g * exposure;
-      b = b * exposure;
-    }
-
-    if (hue != null && hue != 0.0) {
-      final hr = r * hueR + g * hueG + b * hueB;
-      final hg = r * hueB + g * hueR + b * hueG;
-      final hb = r * hueG + g * hueB + b * hueR;
-
-      r = hr;
-      g = hg;
-      b = hb;
-    }
-
-    if (amount != null) {
-      r = r * amount + or * invAmount;
-      g = g * amount + og * invAmount;
-      b = b * amount + ob * invAmount;
-    }
-
-    pixels[i] = clamp255((r * 255.0).toInt());
-    pixels[i + 1] = clamp255((g * 255.0).toInt());
-    pixels[i + 2] = clamp255((b * 255.0).toInt());
   }
 
   return src;

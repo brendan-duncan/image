@@ -1,33 +1,42 @@
 import 'dart:math';
 
-import '../color.dart';
-import '../image.dart';
-import '../internal/clamp.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../image/image.dart';
+import '../util/math_util.dart';
 
 /// Fill a rectangle in the image [src] with the given [color] with the corners
 /// [x1],[y1] and [x2],[y2].
-Image fillRect(Image src, int x1, int y1, int x2, int y2, int color) {
-  final _x0 = clamp(min(x1, x2), 0, src.width - 1);
-  final _y0 = clamp(min(y1, y2), 0, src.height - 1);
-  final _x1 = clamp(max(x1, x2), 0, src.width - 1);
-  final _y1 = clamp(max(y1, y2), 0, src.height - 1);
+Image fillRect(Image src, { required int x1, required int y1, required int x2,
+    required int y2, required Color color, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
+  if (color.a == 0) {
+    return src;
+  }
+
+  final _x0 = min(x1, x2).clamp(0, src.width - 1);
+  final _y0 = min(y1, y2).clamp(0, src.height - 1);
+  final _x1 = max(x1, x2).clamp(0, src.width - 1);
+  final _y1 = max(y1, y2).clamp(0, src.height - 1);
+  final _w = (_x1 - _x0) + 1;
+  final _h = (_y1 - _y0) + 1;
 
   // If no blending is necessary, use a faster fill method.
-  if (getAlpha(color) == 255) {
-    final w = src.width;
-    var start = _y0 * w + _x0;
-    var end = start + (_x1 - _x0) + 1;
-    for (var sy = _y0; sy <= _y1; ++sy) {
-      src.data.fillRange(start, end, color);
-      start += w;
-      end += w;
+  if (color.a == color.maxChannelValue && mask == null) {
+    final iter = src.getRange(_x0, _y0, _w, _h);
+    while (iter.moveNext()) {
+      iter.current.set(color);
     }
   } else {
-    for (var sy = _y0; sy <= _y1; ++sy) {
-      var pi = sy * src.width + _x0;
-      for (var sx = _x0; sx <= _x1; ++sx, ++pi) {
-        src[pi] = alphaBlendColors(src[pi], color);
-      }
+    final a = color.a / color.maxChannelValue;
+    final iter = src.getRange(_x0, _y0, _w, _h);
+    while (iter.moveNext()) {
+      final p = iter.current;
+      final m = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel) ?? 1;
+      p..r = mix(p.r, color.r, a * m)
+       ..g = mix(p.g, color.g, a * m)
+       ..b = mix(p.b, color.b, a * m)
+       ..a = p.a * (1 - (color.a * m));
     }
   }
 

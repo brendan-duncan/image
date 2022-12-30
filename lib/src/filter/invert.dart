@@ -1,12 +1,40 @@
-import '../image.dart';
+import '../color/channel.dart';
+import '../image/image.dart';
+import '../util/math_util.dart';
 
 /// Invert the colors of the [src] image.
-Image invert(Image src) {
-  final p = src.getBytes();
-  for (var i = 0, len = p.length; i < len; i += 4) {
-    p[i] = 255 - p[i];
-    p[i + 1] = 255 - p[i + 1];
-    p[i + 2] = 255 - p[i + 2];
+Image invert(Image src, { Image? mask,
+    Channel maskChannel = Channel.luminance }) {
+  final max = src.maxChannelValue;
+  for (final frame in src.frames) {
+    if (src.hasPalette) {
+      final p = frame.palette!;
+      final numColors = p.numColors;
+      for (var i = 0; i < numColors; ++i) {
+        final r = max - p.getRed(i);
+        final g = max - p.getGreen(i);
+        final b = max - p.getBlue(i);
+        p.setColor(i, r, g, b);
+      }
+    } else {
+
+      if (max != 0.0) {
+        for (final p in frame) {
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+
+          if (msk == null) {
+            p..r = max - p.r
+            ..g = max - p.g
+            ..b = max - p.b;
+          } else {
+            p..r = mix(p.r, max - p.r, msk)
+            ..g = mix(p.g, max - p.g, msk)
+            ..b = mix(p.b, max - p.b, msk);
+          }
+        }
+      }
+    }
   }
   return src;
 }

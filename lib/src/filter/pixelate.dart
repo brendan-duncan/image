@@ -1,71 +1,94 @@
-import '../color.dart';
-import '../draw/fill_rect.dart';
-import '../image.dart';
+import '../color/channel.dart';
+import '../image/image.dart';
+import '../util/math_util.dart';
 
 enum PixelateMode {
   /// Use the top-left pixel of a block for the block color.
   upperLeft,
-
   /// Use the average of the pixels within a block for the block color.
   average
 }
 
 /// Pixelate the [src] image.
 ///
-/// [blockSize] determines the size of the pixelated blocks.
-/// If [mode] is [PixelateMode.upperLeft] then the upper-left corner of the block
-/// will be used for the block color. Otherwise if [mode] is [PixelateMode.average],
-/// the average of all the pixels in the block will be used for the block color.
-Image pixelate(Image src, int blockSize,
-    {PixelateMode mode = PixelateMode.upperLeft}) {
-  if (blockSize <= 1) {
+/// [size] determines the size of the pixelated blocks.
+/// If [mode] is [PixelateMode.upperLeft] then the upper-left corner of the
+/// block will be used for the block color. Otherwise if [mode] is
+/// [PixelateMode.average], the average of all the pixels in the block will be
+/// used for the block color.
+Image pixelate(Image src, { required int size,
+    PixelateMode mode = PixelateMode.upperLeft, num amount = 1, Image? mask,
+    Channel maskChannel = Channel.luminance }) {
+  if (size <= 1) {
     return src;
   }
 
-  final bs = blockSize - 1;
-
-  switch (mode) {
-    case PixelateMode.upperLeft:
-      for (var y = 0; y < src.height; y += blockSize) {
-        for (var x = 0; x < src.width; x += blockSize) {
-          if (src.boundsSafe(x, y)) {
-            final c = src.getPixel(x, y);
-            fillRect(src, x, y, x + bs, y + bs, c);
+  for (final frame in src.frames) {
+    final w = frame.width;
+    final h = frame.height;
+    switch (mode) {
+      case PixelateMode.upperLeft:
+        for (final p in frame) {
+          final x2 = (p.x ~/ size) * size;
+          final y2 = (p.y ~/ size) * size;
+          final p2 = frame.getPixel(x2, y2);
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          final mx = (msk ?? 1) * amount;
+          if (mx == 1) {
+            p.set(p2);
+          } else {
+            p..r = mix(p.r, p2.r, mx)
+            ..g = mix(p.g, p2.g, mx)
+            ..b = mix(p.b, p2.b, mx)
+            ..a = mix(p.a, p2.a, mx);
           }
         }
-      }
-      break;
-    case PixelateMode.average:
-      for (var y = 0; y < src.height; y += blockSize) {
-        for (var x = 0; x < src.width; x += blockSize) {
-          var a = 0;
-          var r = 0;
-          var g = 0;
-          var b = 0;
-          var total = 0;
-
-          for (var cy = 0; cy < blockSize; ++cy) {
-            for (var cx = 0; cx < blockSize; ++cx) {
-              if (!src.boundsSafe(x + cx, y + cy)) {
-                continue;
+        break;
+      case PixelateMode.average:
+        num r = 0;
+        num g = 0;
+        num b = 0;
+        num a = 0;
+        var lx = -1;
+        var ly = -1;
+        for (final p in frame) {
+          final x2 = (p.x ~/ size) * size;
+          final y2 = (p.y ~/ size) * size;
+          final msk = mask?.getPixel(p.x, p.y)
+              .getChannelNormalized(maskChannel);
+          final mx = (msk ?? 1) * amount;
+          if (x2 != lx || y2 <= ly) {
+            lx = x2;
+            ly = y2;
+            r = 0;
+            g = 0;
+            b = 0;
+            a = 0;
+            for (var by = 0, by2 = y2; by < size && by2 < h; ++by, ++by2) {
+              for (var bx = 0, bx2 = x2; bx < size && bx2 < w;
+                  ++bx, ++bx2) {
+                final p2 = frame.getPixel(bx2, by2);
+                r += p2.r;
+                g += p2.g;
+                b += p2.b;
+                a += p2.a;
               }
-              final c = src.getPixel(x + cx, y + cy);
-              a += getAlpha(c);
-              r += getRed(c);
-              g += getGreen(c);
-              b += getBlue(c);
-              total++;
             }
+            final total = size * size;
+            r /= total;
+            g /= total;
+            b /= total;
+            a /= total;
           }
 
-          if (total > 0) {
-            final c = getColor(r ~/ total, g ~/ total, b ~/ total, a ~/ total);
-            fillRect(src, x, y, x + bs, y + bs, c);
-          }
+          p..r = mix(p.r, r, mx)
+          ..g = mix(p.g, g, mx)
+          ..b = mix(p.b, b, mx)
+          ..a = mix(p.a, a, mx);
         }
-      }
-      break;
+        break;
+    }
   }
-
   return src;
 }

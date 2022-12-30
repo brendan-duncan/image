@@ -1,6 +1,6 @@
-import '../color.dart';
-import '../image.dart';
-import '../transform/copy_into.dart';
+import '../draw/blend_mode.dart';
+import '../draw/composite_image.dart';
+import '../image/image.dart';
 
 class Trim {
   /// Trim the image down from the top.
@@ -29,18 +29,18 @@ enum TrimMode {
   /// Trim an image to the top-left and bottom-right most non-transparent pixels
   transparent,
 
-  /// Trim an image to the top-left and bottom-right most pixels that are not the
-  /// same as the top-left most pixel of the image.
+  /// Trim an image to the top-left and bottom-right most pixels that are not
+  /// the same as the top-left most pixel of the image.
   topLeftColor,
 
-  /// Trim an image to the top-left and bottom-right most pixels that are not the
-  /// same as the bottom-right most pixel of the image.
+  /// Trim an image to the top-left and bottom-right most pixels that are not
+  /// the same as the bottom-right most pixel of the image.
   bottomRightColor
 }
 
 /// Find the crop area to be used by the trim function. Returns the
-/// coordinates as [x, y, width, height]. You could pass these coordinates
-/// to the [copyCrop] function to crop the image.
+/// coordinates as \[x, y, width, height\]. You could pass these coordinates
+/// to the copyCrop function to crop the image.
 List<int> findTrim(Image src,
     {TrimMode mode = TrimMode.transparent, Trim sides = Trim.all}) {
   var h = src.height;
@@ -52,29 +52,29 @@ List<int> findTrim(Image src,
           ? src.getPixel(w - 1, h - 1)
           : 0;
 
-  var xmin = w;
-  var xmax = 0;
-  int? ymin;
-  var ymax = 0;
+  var xMin = w;
+  var xMax = 0;
+  int? yMin;
+  var yMax = 0;
 
   for (var y = 0; y < h; ++y) {
     var first = true;
     for (var x = 0; x < w; ++x) {
       final c = src.getPixel(x, y);
-      if ((mode == TrimMode.transparent && getAlpha(c) != 0) ||
+      if ((mode == TrimMode.transparent && c.a != 0) ||
           (mode != TrimMode.transparent && (c != bg))) {
-        if (xmin > x) {
-          xmin = x;
+        if (xMin > x) {
+          xMin = x;
         }
-        if (xmax < x) {
-          xmax = x;
+        if (xMax < x) {
+          xMax = x;
         }
-        ymin ??= y;
+        yMin ??= y;
 
-        ymax = y;
+        yMax = y;
 
         if (first) {
-          x = xmax;
+          x = xMax;
           first = false;
         }
       }
@@ -82,27 +82,27 @@ List<int> findTrim(Image src,
   }
 
   // A trim wasn't found
-  if (ymin == null) {
+  if (yMin == null) {
     return [0, 0, w, h];
   }
 
   if (sides & Trim.top == false) {
-    ymin = 0;
+    yMin = 0;
   }
   if (sides & Trim.bottom == false) {
-    ymax = h - 1;
+    yMax = h - 1;
   }
   if (sides & Trim.left == false) {
-    xmin = 0;
+    xMin = 0;
   }
   if (sides & Trim.right == false) {
-    xmax = w - 1;
+    xMax = w - 1;
   }
 
-  w = 1 + xmax - xmin; // Image width in pixels
-  h = 1 + ymax - ymin; // Image height in pixels
+  w = 1 + xMax - xMin; // Image width in pixels
+  h = 1 + yMax - yMin; // Image height in pixels
 
-  return [xmin, ymin, w, h];
+  return [xMin, yMin, w, h];
 }
 
 /// Automatically crops the image by finding the corners of the image that
@@ -115,17 +115,26 @@ List<int> findTrim(Image src,
 /// and can be any combination of [Trim.top], [Trim.bottom], [Trim.left],
 /// and [Trim.right].
 Image trim(Image src,
-    {TrimMode mode = TrimMode.transparent, Trim sides = Trim.all}) {
-  if (mode == TrimMode.transparent && src.channels == Channels.rgb) {
+    { TrimMode mode = TrimMode.topLeftColor, Trim sides = Trim.all }) {
+  if (mode == TrimMode.transparent && src.numChannels == 3) {
     return Image.from(src);
   }
 
   final crop = findTrim(src, mode: mode, sides: sides);
 
-  final dst = Image(crop[2], crop[3], exif: src.exif, iccp: src.iccProfile);
+  Image? firstFrame;
+  for (var frame in src.frames) {
+    final dst = firstFrame?.addFrame() ??
+      Image.fromResized(frame, width: crop[2], height: crop[3]);
+    firstFrame ??= dst;
 
-  copyInto(dst, src,
-      srcX: crop[0], srcY: crop[1], srcW: crop[2], srcH: crop[3], blend: false);
+    compositeImage(dst, src,
+        srcX: crop[0],
+        srcY: crop[1],
+        srcW: crop[2],
+        srcH: crop[3],
+        blend: BlendMode.direct);
+  }
 
-  return dst;
+  return firstFrame!;
 }

@@ -15,30 +15,30 @@ bool clipLine(List<int> line, List<int> rect) {
   final xmax = rect[2];
   final ymax = rect[3];
 
-  const INSIDE = 0; // 0000
-  const LEFT = 1; // 0001
-  const RIGHT = 2; // 0010
-  const BOTTOM = 4; // 0100
-  const TOP = 8; // 1000
+  const inside = 0; // 0000
+  const left = 1; // 0001
+  const right = 2; // 0010
+  const bottom = 4; // 0100
+  const top = 8; // 1000
 
   // Compute the bit code for a point (x, y) using the clip rectangle
   // bounded diagonally by (xmin, ymin), and (xmax, ymax)
   int _computeOutCode(int x, int y) {
-    var code = INSIDE; // initialised as being inside of clip window
+    var code = inside; // initialised as being inside of clip window
     if (x < xmin) {
       // to the left of clip window
-      code |= LEFT;
+      code |= left;
     } else if (x > xmax) {
       // to the right of clip window
-      code |= RIGHT;
+      code |= right;
     }
 
     if (y < ymin) {
       // below the clip window
-      code |= BOTTOM;
+      code |= bottom;
     } else if (y > ymax) {
       // above the clip window
-      code |= TOP;
+      code |= top;
     }
 
     return code;
@@ -68,19 +68,19 @@ bool clipLine(List<int> line, List<int> rect) {
       int? x, y;
       // Now find the intersection point;
       // use formulas y = y0 + slope * (x - x0), x = x0 + (1 / slope) * (y - y0)
-      if ((outcodeOut & TOP) != 0) {
+      if ((outcodeOut & top) != 0) {
         // point is above the clip rectangle
         x = x0 + (x1 - x0) * (ymax - y0) ~/ (y1 - y0);
         y = ymax;
-      } else if ((outcodeOut & BOTTOM) != 0) {
+      } else if ((outcodeOut & bottom) != 0) {
         // point is below the clip rectangle
         x = x0 + (x1 - x0) * (ymin - y0) ~/ (y1 - y0);
         y = ymin;
-      } else if ((outcodeOut & RIGHT) != 0) {
+      } else if ((outcodeOut & right) != 0) {
         // point is to the right of clip rectangle
         y = y0 + (y1 - y0) * (xmax - x0) ~/ (x1 - x0);
         x = xmax;
-      } else if ((outcodeOut & LEFT) != 0) {
+      } else if ((outcodeOut & left) != 0) {
         // point is to the left of clip rectangle
         y = y0 + (y1 - y0) * (xmin - x0) ~/ (x1 - x0);
         x = xmin;

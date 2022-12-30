@@ -1,15 +1,15 @@
-import '../animation.dart';
-import '../image.dart';
+import 'dart:typed_data';
+
+import '../image/image.dart';
 
 /// Base class for image format encoders.
 abstract class Encoder {
-  /// Encode a single image.
-  List<int> encodeImage(Image image);
+  /// Encode an [image] to an image format.
+  /// If [singleFrame] is true, only the one Image will be encoded;
+  /// otherwise if image has animation, all frames of the [image] will be
+  /// encoded if the encoder supports animation.
+  Uint8List encode(Image image, { bool singleFrame = false });
 
-  /// Does this encoder support animation?
+  /// True if the encoder supports animated Images; otherwise false.
   bool get supportsAnimation => false;
-
-  /// Encode an animation. Not all formats support animation, and null
-  /// will be returned if not.
-  List<int>? encodeAnimation(Animation anim) => null;
 }

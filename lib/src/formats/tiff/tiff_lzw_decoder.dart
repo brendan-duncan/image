@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 
 class LzwDecoder {
@@ -82,7 +82,7 @@ class LzwDecoder {
     var c = code;
     _buffer[_bufferLength++] = _table[c];
     c = _prefix[c];
-    while (c != NO_SUCH_CODE) {
+    while (c != _noSuchCode) {
       _buffer[_bufferLength++] = _table[c];
       c = _prefix[c];
     }
@@ -98,21 +98,21 @@ class LzwDecoder {
       if (_bytePointer >= _dataLength) {
         return 257;
       }
-      _nextData = (((_nextData << 8) + _data[_bytePointer++])) & 0xffffffff;
+      _nextData = ((_nextData << 8) + _data[_bytePointer++]) & 0xffffffff;
       _nextBits += 8;
     }
 
     _nextBits -= _bitsToGet;
-    final code = (_nextData >> _nextBits) & AND_TABLE[_bitsToGet - 9];
+    final code = (_nextData >> _nextBits) & _andTable[_bitsToGet - 9];
 
     return code;
   }
 
   // Initialize the string table.
   void _initializeStringTable() {
-    _table = Uint8List(LZ_MAX_CODE + 1);
-    _prefix = Uint32List(LZ_MAX_CODE + 1);
-    _prefix.fillRange(0, _prefix.length, NO_SUCH_CODE);
+    _table = Uint8List(_lzMaxCode + 1);
+    _prefix = Uint32List(_lzMaxCode + 1);
+    _prefix.fillRange(0, _prefix.length, _noSuchCode);
 
     for (var i = 0; i < 256; i++) {
       _table[i] = i;
@@ -140,7 +140,7 @@ class LzwDecoder {
   int? _tableIndex;
   late int _bufferLength;
 
-  static const LZ_MAX_CODE = 4095;
-  static const NO_SUCH_CODE = 4098;
-  static const List<int> AND_TABLE = [511, 1023, 2047, 4095];
+  static const _lzMaxCode = 4095;
+  static const _noSuchCode = 4098;
+  static const _andTable = [511, 1023, 2047, 4095];
 }

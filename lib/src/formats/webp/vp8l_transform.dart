@@ -1,17 +1,21 @@
 import 'dart:typed_data';
 
-import '../../internal/bit_operators.dart';
+import '../../util/bit_utils.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'vp8l.dart';
 
-class VP8LTransform {
-  // enum VP8LImageTransformType
-  static const PREDICTOR_TRANSFORM = 0;
-  static const CROSS_COLOR_TRANSFORM = 1;
-  static const SUBTRACT_GREEN = 2;
-  static const COLOR_INDEXING_TRANSFORM = 3;
+@internal
+enum VP8LImageTransformType {
+  predictor,
+  crossColor,
+  subtractGreen,
+  colorIndexing
+}
 
-  int type = 0;
+@internal
+class VP8LTransform {
+  VP8LImageTransformType type = VP8LImageTransformType.predictor;
   int xsize = 0;
   int ysize = 0;
   Uint32List? data;
@@ -22,11 +26,11 @@ class VP8LTransform {
     final width = xsize;
 
     switch (type) {
-      case SUBTRACT_GREEN:
+      case VP8LImageTransformType.subtractGreen:
         addGreenToBlueAndRed(
             outData, rowsOut, rowsOut + (rowEnd - rowStart) * width);
         break;
-      case PREDICTOR_TRANSFORM:
+      case VP8LImageTransformType.predictor:
         predictorInverseTransform(rowStart, rowEnd, outData, rowsOut);
         if (rowEnd != ysize) {
           // The last predicted row in this iteration will be the top-pred row
@@ -37,10 +41,10 @@ class VP8LTransform {
           outData.setRange(start, end, inData, offset);
         }
         break;
-      case CROSS_COLOR_TRANSFORM:
+      case VP8LImageTransformType.crossColor:
         colorSpaceInverseTransform(rowStart, rowEnd, outData, rowsOut);
         break;
-      case COLOR_INDEXING_TRANSFORM:
+      case VP8LImageTransformType.colorIndexing:
         if (rowsIn == rowsOut && bits > 0) {
           // Move packed pixels to the end of unpacked region, so that unpacking
           // can occur seamlessly.
@@ -64,30 +68,30 @@ class VP8LTransform {
     }
   }
 
-  void colorIndexInverseTransformAlpha(
-      int yStart, int yEnd, InputBuffer src, InputBuffer dst) {
+  void colorIndexInverseTransformAlpha(int yStart, int yEnd, InputBuffer src,
+      InputBuffer dst) {
     final bitsPerPixel = 8 >> bits;
     final width = xsize;
     final colorMap = data;
     if (bitsPerPixel < 8) {
       final pixelsPerByte = 1 << bits;
       final countMask = pixelsPerByte - 1;
-      final bit_mask = (1 << bitsPerPixel) - 1;
+      final bitMask = (1 << bitsPerPixel) - 1;
       for (var y = yStart; y < yEnd; ++y) {
-        var packed_pixels = 0;
+        var packedPixels = 0;
         for (var x = 0; x < width; ++x) {
           // We need to load fresh 'packed_pixels' once every
           // 'pixels_per_byte' increments of x. Fortunately, pixels_per_byte
           // is a power of 2, so can just use a mask for that, instead of
           // decrementing a counter.
           if ((x & countMask) == 0) {
-            packed_pixels = _getAlphaIndex(src[0]);
+            packedPixels = _getAlphaIndex(src[0]);
             src.offset++;
           }
-          final p = _getAlphaValue(colorMap![packed_pixels & bit_mask]);
+          final p = _getAlphaValue(colorMap![packedPixels & bitMask]);
           dst[0] = p;
           dst.offset++;
-          packed_pixels >>= bitsPerPixel;
+          packedPixels >>= bitsPerPixel;
         }
       }
     } else {
@@ -110,19 +114,19 @@ class VP8LTransform {
     if (bitsPerPixel < 8) {
       final pixelsPerByte = 1 << bits;
       final countMask = pixelsPerByte - 1;
-      final bit_mask = (1 << bitsPerPixel) - 1;
+      final bitMask = (1 << bitsPerPixel) - 1;
       for (var y = yStart; y < yEnd; ++y) {
-        var packed_pixels = 0;
+        var packedPixels = 0;
         for (var x = 0; x < width; ++x) {
-          // We need to load fresh 'packed_pixels' once every
+          // We need to load fresh 'packedPixels' once every
           // 'pixels_per_byte' increments of x. Fortunately, pixels_per_byte
           // is a power of 2, so can just use a mask for that, instead of
           // decrementing a counter.
           if ((x & countMask) == 0) {
-            packed_pixels = _getARGBIndex(inData[src++]);
+            packedPixels = _getARGBIndex(inData[src++]);
           }
-          outData[dst++] = _getARGBValue(colorMap![packed_pixels & bit_mask]);
-          packed_pixels >>= bitsPerPixel;
+          outData[dst++] = _getARGBValue(colorMap![packedPixels & bitMask]);
+          packedPixels >>= bitsPerPixel;
         }
       }
     } else {
@@ -196,12 +200,12 @@ class VP8LTransform {
       // .. the rest:
       final k = (this.data![predModeSrc++] >> 8) & 0xf;
 
-      var predFunc = PREDICTORS[k];
+      var predFunc = _predictors[k];
       for (var x = 1; x < width; ++x) {
         if ((x & mask) == 0) {
           // start of tile. Read predictor function.
           final k = ((this.data![predModeSrc++]) >> 8) & 0xf;
-          predFunc = PREDICTORS[k];
+          predFunc = _predictors[k];
         }
         final d = outData[data + x - 1];
         final pred = predFunc(outData, d, data + x - width);
@@ -223,8 +227,8 @@ class VP8LTransform {
   void addGreenToBlueAndRed(Uint32List pixels, int data, int dataEnd) {
     while (data < dataEnd) {
       final argb = pixels[data];
-      final green = ((argb >> 8) & 0xff);
-      var redBlue = (argb & 0x00ff00ff);
+      final green = (argb >> 8) & 0xff;
+      var redBlue = argb & 0x00ff00ff;
       redBlue += (green << 16) | green;
       redBlue &= 0x00ff00ff;
       pixels[data++] = (argb & 0xff00ff00) | redBlue;
@@ -300,18 +304,18 @@ class VP8LTransform {
   }
 
   static int _select(int a, int b, int c) {
-    final pa_minus_pb = _sub3((a >> 24), (b >> 24), (c >> 24)) +
+    final paMinusPb = _sub3(a >> 24, b >> 24, c >> 24) +
         _sub3((a >> 16) & 0xff, (b >> 16) & 0xff, (c >> 16) & 0xff) +
         _sub3((a >> 8) & 0xff, (b >> 8) & 0xff, (c >> 8) & 0xff) +
-        _sub3((a) & 0xff, (b) & 0xff, (c) & 0xff);
-    return (pa_minus_pb <= 0) ? a : b;
+        _sub3(a & 0xff, b & 0xff, c & 0xff);
+    return (paMinusPb <= 0) ? a : b;
   }
 
   //--------------------------------------------------------------------------
   // Predictors
 
   static int _predictor0(Uint32List pixels, int left, int top) =>
-      VP8L.ARGB_BLACK;
+      VP8L.argbBlack;
 
   static int _predictor1(Uint32List pixels, int left, int top) => left;
 
@@ -350,7 +354,7 @@ class VP8LTransform {
   static int _predictor13(Uint32List pixels, int left, int top) =>
       _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
 
-  static final PREDICTORS = [
+  static final _predictors = [
     _predictor0,
     _predictor1,
     _predictor2,
@@ -423,7 +427,7 @@ class _VP8LMultipliers {
       newBlue &= 0xff;
     }
 
-    final c = (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | (newBlue);
+    final c = (argb & 0xff00ff00) | ((newRed << 16) & 0xffffffff) | newBlue;
     return c;
   }
 

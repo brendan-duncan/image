@@ -7,8 +7,8 @@ class OutputBuffer {
   bool bigEndian;
 
   /// Create a byte buffer for writing.
-  OutputBuffer({int? size = _BLOCK_SIZE, this.bigEndian = false})
-      : _buffer = Uint8List(size ?? _BLOCK_SIZE),
+  OutputBuffer({int? size = _blockSize, this.bigEndian = false})
+      : _buffer = Uint8List(size ?? _blockSize),
         length = 0;
 
   void rewind() {
@@ -16,11 +16,11 @@ class OutputBuffer {
   }
 
   /// Get the resulting bytes from the buffer.
-  List<int> getBytes() => Uint8List.view(_buffer.buffer, 0, length);
+  Uint8List getBytes() => Uint8List.view(_buffer.buffer, 0, length);
 
   /// Clear the buffer.
   void clear() {
-    _buffer = Uint8List(_BLOCK_SIZE);
+    _buffer = Uint8List(_blockSize);
     length = 0;
   }
 
@@ -67,10 +67,10 @@ class OutputBuffer {
       writeByte((value >> 24) & 0xff);
       writeByte((value >> 16) & 0xff);
       writeByte((value >> 8) & 0xff);
-      writeByte((value) & 0xff);
+      writeByte(value & 0xff);
       return;
     }
-    writeByte((value) & 0xff);
+    writeByte(value & 0xff);
     writeByte((value >> 8) & 0xff);
     writeByte((value >> 16) & 0xff);
     writeByte((value >> 24) & 0xff);
@@ -118,13 +118,13 @@ class OutputBuffer {
     writeByte(b[7]);
   }
 
-  /// Return the subset of the buffer in the range [start:end].
+  /// Return the subset of the buffer in the range \[start, end\].
   /// If [start] or [end] are < 0 then it is relative to the end of the buffer.
   /// If [end] is not specified (or null), then it is the end of the buffer.
   /// This is equivalent to the python list range operator.
   List<int> subset(int start, [int? end]) {
     if (start < 0) {
-      start = (length) + start;
+      start = length + start;
     }
 
     if (end == null) {
@@ -141,13 +141,13 @@ class OutputBuffer {
     final blockSize = (required != null)
         ? required
         : (_buffer.isEmpty)
-            ? _BLOCK_SIZE
+            ? _blockSize
             : (_buffer.length * 2);
-    final newBuffer = Uint8List(_buffer.length + blockSize);
-    newBuffer.setRange(0, _buffer.length, _buffer);
+    final newBuffer = Uint8List(_buffer.length + blockSize)
+    ..setRange(0, _buffer.length, _buffer);
     _buffer = newBuffer;
   }
 
-  static const _BLOCK_SIZE = 0x2000; // 8k block-size
+  static const _blockSize = 0x2000; // 8k block-size
   Uint8List _buffer;
 }

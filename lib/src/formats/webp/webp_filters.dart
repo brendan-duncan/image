@@ -1,25 +1,27 @@
 import 'dart:typed_data';
 
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 
+@internal
 class WebPFilters {
   // Filters.
-  static const FILTER_NONE = 0;
-  static const FILTER_HORIZONTAL = 1;
-  static const FILTER_VERTICAL = 2;
-  static const FILTER_GRADIENT = 3;
-  static const FILTER_LAST = FILTER_GRADIENT + 1; // end marker
-  static const FILTER_BEST = 5;
-  static const FILTER_FAST = 6;
+  static const filterNone = 0;
+  static const filterHorizontal = 1;
+  static const filterVertical = 2;
+  static const fitlerGradient = 3;
+  static const fitlerLast = fitlerGradient + 1; // end marker
+  static const fitlerBest = 5;
+  static const filterFast = 6;
 
-  static const FILTERS = [
+  static const filters = [
     null, // WEBP_FILTER_NONE
     horizontalFilter, // WEBP_FILTER_HORIZONTAL
     verticalFilter, // WEBP_FILTER_VERTICAL
     gradientFilter // WEBP_FILTER_GRADIENT
   ];
 
-  static const UNFILTERS = [
+  static const unfilters = [
     null, // WEBP_FILTER_NONE
     horizontalUnfilter, // WEBP_FILTER_HORIZONTAL
     verticalUnfilter, // WEBP_FILTER_VERTICAL
@@ -44,8 +46,8 @@ class WebPFilters {
   }
 
   static void verticalUnfilter(int width, int height, int stride, int row,
-      int num_rows, Uint8List data) {
-    _doVerticalFilter(data, width, height, stride, row, num_rows, true, data);
+      int numRows, Uint8List data) {
+    _doVerticalFilter(data, width, height, stride, row, numRows, true, data);
   }
 
   static void gradientFilter(Uint8List data, int width, int height, int stride,
@@ -55,8 +57,8 @@ class WebPFilters {
   }
 
   static void gradientUnfilter(int width, int height, int stride, int row,
-      int num_rows, Uint8List data) {
-    _doGradientFilter(data, width, height, stride, row, num_rows, true, data);
+      int numRows, Uint8List data) {
+    _doGradientFilter(data, width, height, stride, row, numRows, true, data);
   }
 
   static void _predictLine(InputBuffer src, InputBuffer pred, InputBuffer dst,
@@ -107,7 +109,7 @@ class WebPFilters {
   static void _doVerticalFilter(Uint8List src, int width, int height,
       int stride, int row, int numRows, bool inverse, Uint8List out) {
     final startOffset = row * stride;
-    final last_row = row + numRows;
+    final lastRow = row + numRows;
     final s = InputBuffer(src, offset: startOffset);
     final o = InputBuffer(out, offset: startOffset);
     final preds = InputBuffer.from(inverse ? o : s);
@@ -127,7 +129,7 @@ class WebPFilters {
     }
 
     // Filter line-by-line.
-    while (row < last_row) {
+    while (row < lastRow) {
       _predictLine(s, preds, o, width, inverse);
       ++row;
       preds.offset += stride;

@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
+import '../../util/internal.dart';
 import 'vp8.dart';
 
+@internal
 class VP8FrameHeader {
   bool? keyFrame;
   int? profile; // uint8
@@ -9,6 +11,7 @@ class VP8FrameHeader {
   late int partitionLength; // uint32
 }
 
+@internal
 class VP8PictureHeader {
   int? width; // uint16
   int? height; // uint16
@@ -19,6 +22,7 @@ class VP8PictureHeader {
 }
 
 // Segment features
+@internal
 class VP8SegmentHeader {
   bool useSegment = false;
 
@@ -29,10 +33,10 @@ class VP8SegmentHeader {
   bool absoluteDelta = true;
 
   // quantization changes
-  Int8List quantizer = Int8List(VP8.NUM_MB_SEGMENTS);
+  Int8List quantizer = Int8List(VP8.numMbSegments);
 
   // filter strength for segments
-  Int8List filterStrength = Int8List(VP8.NUM_MB_SEGMENTS);
+  Int8List filterStrength = Int8List(VP8.numMbSegments);
 }
 
 // All the probas associated to one band
@@ -40,22 +44,23 @@ class VP8BandProbas {
   List<Uint8List> probas;
   VP8BandProbas()
       : probas = List<Uint8List>.generate(
-            VP8.NUM_CTX, (_) => Uint8List(VP8.NUM_PROBAS),
+            VP8.numCtx, (_) => Uint8List(VP8.numProbas),
             growable: false);
 }
 
 // Struct collecting all frame-persistent probabilities.
+@internal
 class VP8Proba {
-  Uint8List segments = Uint8List(VP8.MB_FEATURE_TREE_PROBS);
+  Uint8List segments = Uint8List(VP8.mbFeatureTreeProbs);
 
   // Type: 0:Intra16-AC  1:Intra16-DC   2:Chroma   3:Intra4
   List<List<VP8BandProbas>> bands;
 
   VP8Proba()
       : bands = List<List<VP8BandProbas>>.generate(
-            VP8.NUM_TYPES,
+            VP8.numTypes,
             (_) => List<VP8BandProbas>.generate(
-                VP8.NUM_BANDS, (_) => VP8BandProbas(),
+                VP8.numBands, (_) => VP8BandProbas(),
                 growable: false),
             growable: false) {
     segments.fillRange(0, segments.length, 255);
@@ -63,19 +68,21 @@ class VP8Proba {
 }
 
 // Filter parameters
+@internal
 class VP8FilterHeader {
   late bool simple; // 0=complex, 1=simple
   int? level; // [0..63]
   late int sharpness; // [0..7]
   late bool useLfDelta;
-  Int32List refLfDelta = Int32List(VP8.NUM_REF_LF_DELTAS);
-  Int32List modeLfDelta = Int32List(VP8.NUM_MODE_LF_DELTAS);
+  Int32List refLfDelta = Int32List(VP8.numRefLfDeltas);
+  Int32List modeLfDelta = Int32List(VP8.numModeLfDeltas);
 }
 
 //------------------------------------------------------------------------------
 // Informations about the macroblocks.
 
 // filter specs
+@internal
 class VP8FInfo {
   int fLimit = 0; // uint8_t, filter limit in [3..189], or 0 if no filtering
   int? fInnerLevel = 0; // uint8_t, inner limit in [1..63]
@@ -84,6 +91,7 @@ class VP8FInfo {
 }
 
 // Top/Left Contexts used for syntax-parsing
+@internal
 class VP8MB {
   int nz =
       0; // uint8_t, non-zero AC/DC coeffs (4bit for luma + 4bit for chroma)
@@ -91,6 +99,7 @@ class VP8MB {
 }
 
 // Dequantization matrices
+@internal
 class VP8QuantMatrix {
   Int32List y1Mat = Int32List(2);
   Int32List y2Mat = Int32List(2);
@@ -101,6 +110,7 @@ class VP8QuantMatrix {
 }
 
 // Data needed to reconstruct a macroblock
+@internal
 class VP8MBData {
   // 384 coeffs = (16+4+4) * 4*4
   Int16List coeffs = Int16List(384);
@@ -125,52 +135,54 @@ class VP8MBData {
 }
 
 // Saved top samples, per macroblock. Fits into a cache-line.
+@internal
 class VP8TopSamples {
   Uint8List y = Uint8List(16);
   Uint8List u = Uint8List(8);
   Uint8List v = Uint8List(8);
 }
 
+@internal
 class VP8Random {
   late int _index1;
   late int _index2;
-  final _table = Uint32List(RANDOM_TABLE_SIZE);
+  final _table = Uint32List(randomTableSize);
   late int _amplitude;
 
   // Initializes random generator with an amplitude 'dithering' in range [0..1].
   VP8Random(double dithering) {
-    _table.setRange(0, RANDOM_TABLE_SIZE, _RANDOM_TABLE);
+    _table.setRange(0, randomTableSize, _randomTable);
     _index1 = 0;
     _index2 = 31;
     _amplitude = (dithering < 0.0)
         ? 0
         : (dithering > 1.0)
-            ? (1 << RANDOM_DITHER_FIX)
-            : ((1 << RANDOM_DITHER_FIX) * dithering).toInt();
+            ? (1 << randomDitherFix)
+            : ((1 << randomDitherFix) * dithering).toInt();
   }
 
   // Returns a centered pseudo-random number with 'num_bits' amplitude.
   // (uses D.Knuth's Difference-based random generator).
-  // 'amp' is in RANDOM_DITHER_FIX fixed-point precision.
+  // 'amp' is in randomDitherFix fixed-point precision.
   int randomBits2(int numBits, int amp) {
     var diff = _table[_index1] - _table[_index2];
     if (diff < 0) {
-      diff += (1 << 31);
+      diff += 1 << 31;
     }
 
     _table[_index1] = diff;
 
-    if (++_index1 == RANDOM_TABLE_SIZE) {
+    if (++_index1 == randomTableSize) {
       _index1 = 0;
     }
-    if (++_index2 == RANDOM_TABLE_SIZE) {
+    if (++_index2 == randomTableSize) {
       _index2 = 0;
     }
 
     // sign-extend, 0-center
     diff = (diff << 1) >> (32 - numBits);
     // restrict range
-    diff = (diff * amp) >> RANDOM_DITHER_FIX;
+    diff = (diff * amp) >> randomDitherFix;
     // shift back to 0.5-center
     diff += 1 << (numBits - 1);
 
@@ -180,11 +192,11 @@ class VP8Random {
   int randomBits(int numBits) => randomBits2(numBits, _amplitude);
 
   // fixed-point precision for dithering
-  static const RANDOM_DITHER_FIX = 8;
-  static const RANDOM_TABLE_SIZE = 55;
+  static const randomDitherFix = 8;
+  static const randomTableSize = 55;
 
   // 31b-range values
-  static const List<int> _RANDOM_TABLE = [
+  static const List<int> _randomTable = [
     0x0de15230,
     0x03b31886,
     0x775faccb,

@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 import 'vp8l.dart';
 import 'vp8l_transform.dart';
 import 'webp_filters.dart';
 import 'webp_info.dart';
 
+@internal
 class WebPAlpha {
   InputBuffer input;
   int width = 0;
@@ -24,12 +26,12 @@ class WebPAlpha {
     rsrv = (b >> 6) & 0x03;
 
     if (isValid) {
-      if (method == ALPHA_NO_COMPRESSION) {
+      if (method == _alphaNoCompression) {
         final alphaDecodedSize = width * height;
         if (input.length < alphaDecodedSize) {
           rsrv = 1;
         }
-      } else if (method == ALPHA_LOSSLESS_COMPRESSION) {
+      } else if (method == _alphaLosslessCompression) {
         if (!_decodeAlphaHeader()) {
           rsrv = 1;
         }
@@ -40,10 +42,10 @@ class WebPAlpha {
   }
 
   bool get isValid {
-    if (method < ALPHA_NO_COMPRESSION ||
-        method > ALPHA_LOSSLESS_COMPRESSION ||
-        filter >= WebPFilters.FILTER_LAST ||
-        preProcessing > ALPHA_PREPROCESSED_LEVELS ||
+    if (method < _alphaNoCompression ||
+        method > _alphaLosslessCompression ||
+        filter >= WebPFilters.fitlerLast ||
+        preProcessing > _alphaPreprocessedLevels ||
         rsrv != 0) {
       return false;
     }
@@ -55,9 +57,9 @@ class WebPAlpha {
       return false;
     }
 
-    final unfilterFunc = WebPFilters.UNFILTERS[filter];
+    final unfilterFunc = WebPFilters.unfilters[filter];
 
-    if (method == ALPHA_NO_COMPRESSION) {
+    if (method == _alphaNoCompression) {
       final offset = row * width;
       final numPixels = numRows * width;
 
@@ -72,7 +74,7 @@ class WebPAlpha {
       unfilterFunc(width, height, width, row, numRows, output);
     }
 
-    if (preProcessing == ALPHA_PREPROCESSED_LEVELS) {
+    if (preProcessing == _alphaPreprocessedLevels) {
       if (!_dequantizeLevels(output, width, height, row, numRows)) {
         return false;
       }
@@ -86,12 +88,12 @@ class WebPAlpha {
   }
 
   bool _dequantizeLevels(
-      Uint8List data, int width, int height, int row, int num_rows) {
+      Uint8List data, int width, int height, int row, int numRows) {
     if (width <= 0 ||
         height <= 0 ||
         row < 0 ||
-        num_rows < 0 ||
-        row + num_rows > height) {
+        numRows < 0 ||
+        row + numRows > height) {
       return false;
     }
     return true;
@@ -107,13 +109,13 @@ class WebPAlpha {
   }
 
   bool _decodeAlphaHeader() {
-    final webp = WebPInfo();
-    webp.width = width;
-    webp.height = height;
+    final webp = WebPInfo()
+    ..width = width
+    ..height = height;
 
-    _vp8l = InternalVP8L(input, webp);
-    _vp8l.ioWidth = width;
-    _vp8l.ioHeight = height;
+    _vp8l = InternalVP8L(input, webp)
+    ..ioWidth = width
+    ..ioHeight = height;
 
     _vp8l.decodeImageStream(webp.width, webp.height, true);
 
@@ -121,7 +123,7 @@ class WebPAlpha {
     // doesn't use color cache (a frequent case), we will use DecodeAlphaData()
     // method that only needs allocation of 1 byte per pixel (alpha channel).
     if (_vp8l.transforms.length == 1 &&
-        _vp8l.transforms[0].type == VP8LTransform.COLOR_INDEXING_TRANSFORM &&
+        _vp8l.transforms[0].type == VP8LImageTransformType.colorIndexing &&
         _vp8l.is8bOptimizable()) {
       _use8bDecode = true;
       _vp8l.allocateInternalBuffers8b();
@@ -142,7 +144,7 @@ class WebPAlpha {
   bool _use8bDecode = false;
 
   // Alpha related constants.
-  static const ALPHA_NO_COMPRESSION = 0;
-  static const ALPHA_LOSSLESS_COMPRESSION = 1;
-  static const ALPHA_PREPROCESSED_LEVELS = 1;
+  static const _alphaNoCompression = 0;
+  static const _alphaLosslessCompression = 1;
+  static const _alphaPreprocessedLevels = 1;
 }

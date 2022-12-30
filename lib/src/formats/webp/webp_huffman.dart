@@ -1,18 +1,18 @@
 import 'dart:typed_data';
 
-import '../../internal/internal.dart';
+import '../../util/internal.dart';
 import 'vp8l.dart';
 import 'vp8l_bit_reader.dart';
 
 // Huffman Tree.
 @internal
 class HuffmanTree {
-  static const HUFF_LUT_BITS = 7;
-  static const HUFF_LUT = (1 << HUFF_LUT_BITS);
+  static const huffmanLutBits = 7;
+  static const huffmanLut = 1 << huffmanLutBits;
   // Fast lookup for short bit lengths.
-  Uint8List lutBits = Uint8List(HUFF_LUT);
-  Int16List lutSymbol = Int16List(HUFF_LUT);
-  Int16List lutJump = Int16List(HUFF_LUT);
+  final _lutBits = Uint8List(huffmanLut);
+  final _lutSymbol = Int16List(huffmanLut);
+  final _lutJump = Int16List(huffmanLut);
 
   // all the nodes, starting at root, stored as a single int array, where
   // each node occupies two ints as [symbol, children].
@@ -37,7 +37,7 @@ class HuffmanTree {
     tree = Int32List(maxNodes << 1);
     tree[1] = -1;
     numNodes = 1;
-    lutBits.fillRange(0, lutBits.length, 255);
+    _lutBits.fillRange(0, _lutBits.length, 255);
 
     return true;
   }
@@ -123,17 +123,17 @@ class HuffmanTree {
     var bits = br.prefetchBits();
     var newBitPos = br.bitPos;
     // Check if we find the bit combination from the Huffman lookup table.
-    final lut_ix = bits & (HUFF_LUT - 1);
-    final lut_bits = lutBits[lut_ix];
+    final lutIx = bits & (huffmanLut - 1);
+    final lutBits = _lutBits[lutIx];
 
-    if (lut_bits <= HUFF_LUT_BITS) {
-      br.bitPos = br.bitPos + lut_bits;
-      return lutSymbol[lut_ix];
+    if (lutBits <= huffmanLutBits) {
+      br.bitPos = br.bitPos + lutBits;
+      return _lutSymbol[lutIx];
     }
 
-    node += lutJump[lut_ix];
-    newBitPos += HUFF_LUT_BITS;
-    bits >>= HUFF_LUT_BITS;
+    node += _lutJump[lutIx];
+    newBitPos += huffmanLutBits;
+    bits >>= huffmanLutBits;
 
     // Decode the value from a binary tree.
     do {
@@ -148,20 +148,20 @@ class HuffmanTree {
   }
 
   bool _addSymbol(int symbol, int code, int codeLength) {
-    var step = HUFF_LUT_BITS;
+    var step = huffmanLutBits;
     int baseCode;
     var node = 0;
 
-    if (codeLength <= HUFF_LUT_BITS) {
+    if (codeLength <= huffmanLutBits) {
       baseCode = _reverseBitsShort(code, codeLength);
-      for (var i = 0; i < (1 << (HUFF_LUT_BITS - codeLength)); ++i) {
+      for (var i = 0; i < (1 << (huffmanLutBits - codeLength)); ++i) {
         final idx = baseCode | (i << codeLength);
-        lutSymbol[idx] = symbol;
-        lutBits[idx] = codeLength;
+        _lutSymbol[idx] = symbol;
+        _lutBits[idx] = codeLength;
       }
     } else {
       baseCode = _reverseBitsShort(
-          (code >> (codeLength - HUFF_LUT_BITS)), HUFF_LUT_BITS);
+          code >> codeLength - huffmanLutBits, huffmanLutBits);
     }
 
     while (codeLength-- > 0) {
@@ -184,7 +184,7 @@ class HuffmanTree {
       node += _nodeChildren(node) + ((code >> codeLength) & 1);
 
       if (--step == 0) {
-        lutJump[baseCode] = node;
+        _lutJump[baseCode] = node;
       }
     }
 
@@ -203,7 +203,7 @@ class HuffmanTree {
   }
 
   // Pre-reversed 4-bit values.
-  static const List<int> _REVERSED_BITS = [
+  static const List<int> _reversedBits = [
     0x0,
     0x8,
     0x4,
@@ -223,11 +223,11 @@ class HuffmanTree {
   ];
 
   int _reverseBitsShort(int bits, int numBits) {
-    final v = (_REVERSED_BITS[bits & 0xf] << 4) | _REVERSED_BITS[bits >> 4];
+    final v = (_reversedBits[bits & 0xf] << 4) | _reversedBits[bits >> 4];
     return v >> (8 - numBits);
   }
 
-  bool _isFull() => (numNodes == maxNodes);
+  bool _isFull() => numNodes == maxNodes;
 
   int _nextNode(int node, int rightChild) =>
       node + _nodeChildren(node) + rightChild;
@@ -262,9 +262,9 @@ class HuffmanTree {
       List<int> codeLengths, int codeLengthsSize, List<int> huffCodes) {
     int symbol;
     int codeLen;
-    final codeLengthHist = Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    final codeLengthHist = Int32List(VP8L.maxAllowedCodeLength + 1);
     int currCode;
-    final nextCodes = Int32List(VP8L.MAX_ALLOWED_CODE_LENGTH + 1);
+    final nextCodes = Int32List(VP8L.maxAllowedCodeLength + 1);
     var maxCodeLength = 0;
 
     // Calculate max code length.
@@ -274,7 +274,7 @@ class HuffmanTree {
       }
     }
 
-    if (maxCodeLength > VP8L.MAX_ALLOWED_CODE_LENGTH) {
+    if (maxCodeLength > VP8L.maxAllowedCodeLength) {
       return false;
     }
 
@@ -317,7 +317,7 @@ class HTreeGroup {
 
   HTreeGroup()
       : htrees = List<HuffmanTree>.generate(
-            VP8L.HUFFMAN_CODES_PER_META_CODE, (_) => HuffmanTree(),
+            VP8L.huffmanCodesPerMetaCode, (_) => HuffmanTree(),
             growable: false);
 
   HuffmanTree operator [](int index) => htrees[index];

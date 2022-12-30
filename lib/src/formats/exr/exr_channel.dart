@@ -1,66 +1,54 @@
-import '../../image_exception.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../../util/internal.dart';
 
+@internal
+enum ExrChannelType {
+  uint,
+  half,
+  float
+}
+
+@internal
+enum ExrChannelName {
+  red,
+  green,
+  blue,
+  alpha,
+  other
+}
+
+// Standard channel names are:
+// A: Alpha/Opacity
+// R: Red value of a sample
+// G: Green value of a sample
+// B: Blue value of a sample
+// Y: Luminance
+// RY: Chroma RY
+// BY: Chroma BY
+// AR: Red for colored mattes
+// GR: Green for colored mattes
+// BR: Blue for colored mattes
+// Z: Distance of the front of a sample from the viewer
+// ZBack: Distance of the back of a sample from the viewer
+// id: A numerical identifier for the object represented by a sample.
+@internal
 class ExrChannel {
-  static const TYPE_UINT = 0;
-  static const TYPE_HALF = 1;
-  static const TYPE_FLOAT = 2;
-
-  // Channel Names
-
-  /// Luminance
-  static const String Y = 'Y';
-
-  /// Chroma RY
-  static const String RY = 'RY';
-
-  /// Chroma BY
-  static const String BY = 'BY';
-
-  /// Red for colored mattes
-  static const String AR = 'AR';
-
-  /// Green for colored mattes
-  static const String AG = 'AG';
-
-  /// Blue for colored mattes
-  static const String AB = 'AB';
-
-  /// Distance of the front of a sample from the viewer
-  static const String Z = 'Z';
-
-  /// Distance of the back of a sample from the viewer
-  static const String ZBack = 'ZBack';
-
-  /// Alpha/opacity
-  static const String A = 'A';
-
-  /// Red value of a sample
-  static const String R = 'R';
-
-  /// Green value of a sample
-  static const String G = 'G';
-
-  /// Blue value of a sample
-  static const String B = 'B';
-
-  /// A numerical identifier for the object represented by a sample.
-  static const String ID = 'id';
-
-  String? name;
-  late int type;
-  late int size;
+  late String name;
+  late ExrChannelName nameType;
+  late ExrChannelType dataType; ///< The data type of the channel
+  late int dataSize; ///< bytes per pixel
   late bool pLinear;
   late int xSampling;
   late int ySampling;
+  late bool isColorChannel;
 
   ExrChannel(InputBuffer input) {
     name = input.readString();
-    if (name == null || name!.isEmpty) {
-      name = null;
+    if (name.isEmpty) {
       return;
     }
-    type = input.readUint32();
+    dataType = ExrChannelType.values[input.readUint32()];
     final i = input.readByte();
     assert(i == 0 || i == 1);
     pLinear = i == 1;
@@ -68,20 +56,37 @@ class ExrChannel {
     xSampling = input.readUint32();
     ySampling = input.readUint32();
 
-    switch (type) {
-      case TYPE_UINT:
-        size = 4;
+    if (name == 'R') {
+      isColorChannel = true;
+      nameType = ExrChannelName.red;
+    } else if (name == 'G') {
+      isColorChannel = true;
+      nameType = ExrChannelName.green;
+    } else if (name == 'B') {
+      isColorChannel = true;
+      nameType = ExrChannelName.blue;
+    } else if (name == 'A') {
+      isColorChannel = true;
+      nameType = ExrChannelName.alpha;
+    } else {
+      isColorChannel = false;
+      nameType = ExrChannelName.other;
+    }
+
+    switch (dataType) {
+      case ExrChannelType.uint:
+        dataSize = 4;
         break;
-      case TYPE_HALF:
-        size = 2;
+      case ExrChannelType.half:
+        dataSize = 2;
         break;
-      case TYPE_FLOAT:
-        size = 4;
+      case ExrChannelType.float:
+        dataSize = 4;
         break;
       default:
-        throw ImageException('EXR Invalid pixel type: $type');
+        throw ImageException('EXR Invalid pixel type: $dataType');
     }
   }
 
-  bool get isValid => name != null;
+  bool get isValid => name.isNotEmpty;
 }

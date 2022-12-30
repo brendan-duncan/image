@@ -1,4 +1,6 @@
-import '../image.dart';
+import 'dart:typed_data';
+
+import '../image/image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 import 'png_encoder.dart';
@@ -11,21 +13,30 @@ abstract class WinEncoder extends Encoder {
   int bitsPerPixelOrYHotSpot(int index);
 
   @override
-  List<int> encodeImage(Image image) => encodeImages([image]);
+  Uint8List encode(Image image, { bool singleFrame = false }) {
+    if (image.hasAnimation && !singleFrame) {
+      return encodeImages(image.frames);
+    } else {
+      return encodeImages([image]);
+    }
+  }
 
-  List<int> encodeImages(List<Image> images) {
+  @override
+  bool get supportsAnimation => true;
+
+  Uint8List encodeImages(List<Image> images) {
     final count = images.length;
 
-    final out = OutputBuffer();
+    final out = OutputBuffer()
 
     // header
-    out.writeUint16(0); // reserved
-    out.writeUint16(type); // type: ICO => 1; CUR => 2
-    out.writeUint16(count);
+    ..writeUint16(0) // reserved
+    ..writeUint16(type) // type: ICO => 1; CUR => 2
+    ..writeUint16(count);
 
     var offset = 6 + count * 16; // file header with image directory byte size
 
-    final imageDatas = [<int>[]];
+    final imageDataList = [<int>[]];
 
     var i = 0;
     for (var img in images) {
@@ -33,27 +44,27 @@ abstract class WinEncoder extends Encoder {
         throw Exception('ICO and CUR support only sizes until 256');
       }
 
-      out.writeByte(img.width); // image width in pixels
-      out.writeByte(img.height); // image height in pixels
+      out..writeByte(img.width) // image width in pixels
+      ..writeByte(img.height) // image height in pixels
       // Color count, should be 0 if more than 256 colors
-      out.writeByte(0);
-      out.writeByte(0); // Reserved
-      out.writeUint16(colorPlanesOrXHotSpot(i));
-      out.writeUint16(bitsPerPixelOrYHotSpot(i));
+      ..writeByte(0)
+      ..writeByte(0) // Reserved
+      ..writeUint16(colorPlanesOrXHotSpot(i))
+      ..writeUint16(bitsPerPixelOrYHotSpot(i));
 
       // Use png instead of bmp encoded data, it's supported since Windows Vista
-      final data = PngEncoder().encodeImage(img);
+      final data = PngEncoder().encode(img);
 
-      out.writeUint32(data.length); // size of the image's data in bytes
-      out.writeUint32(offset); // offset of data from the beginning of the file
+      out..writeUint32(data.length) // size of the image's data in bytes
+      ..writeUint32(offset); // offset of data from the beginning of the file
 
       // add the size of bytes to get the new begin of the next image
       offset += data.length;
       i++;
-      imageDatas.add(data);
+      imageDataList.add(data);
     }
 
-    for (var imageData in imageDatas) {
+    for (var imageData in imageDataList) {
       out.writeBytes(imageData);
     }
 

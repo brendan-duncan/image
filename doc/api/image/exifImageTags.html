@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the exifImageTags property from the image library, for the Dart programming language.">
+  <title>exifImageTags property - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">image</a></li>
+    <li><a href="../image/image-library.html">image</a></li>
+    <li class="self-crumb">exifImageTags property</li>
+  </ol>
+  <div class="self-name">exifImageTags</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-top-level-property">exifImageTags</span> top-level property 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+ 
+</h1></div>
+
+        <section class="multi-line-signature">
+          
+          <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span>, <span class="type-parameter"><a href="../image/ExifTag-class.html">ExifTag</a></span>&gt;</span>
+          <span class="name ">exifImageTags</span>
+          <div class="features"><span class="feature">final</span></div>
+
+        </section>
+        
+
+        
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">final exifImageTags = &lt;int, ExifTag&gt;{
+  0x000B: ExifTag(&#39;ProcessingSoftware&#39;, IfdValueType.ascii),
+  0x00FE: ExifTag(&#39;SubfileType&#39;, IfdValueType.long),
+  0x00FF: ExifTag(&#39;OldSubfileType&#39;, IfdValueType.long),
+  0x0100: ExifTag(&#39;ImageWidth&#39;, IfdValueType.long),
+  0x0101: ExifTag(&#39;ImageLength&#39;, IfdValueType.long),
+  0x0102: ExifTag(&#39;BitsPerSample&#39;, IfdValueType.short),
+  0x0103: ExifTag(&#39;Compression&#39;, IfdValueType.short),
+  0x0106: ExifTag(&#39;PhotometricInterpretation&#39;, IfdValueType.short),
+  0x0107: ExifTag(&#39;Thresholding&#39;, IfdValueType.short),
+  0x0108: ExifTag(&#39;CellWidth&#39;, IfdValueType.short),
+  0x0109: ExifTag(&#39;CellLength&#39;, IfdValueType.short),
+  0x010A: ExifTag(&#39;FillOrder&#39;, IfdValueType.short),
+  0x010D: ExifTag(&#39;DocumentName&#39;, IfdValueType.ascii),
+  0x010E: ExifTag(&#39;ImageDescription&#39;, IfdValueType.ascii),
+  0x010F: ExifTag(&#39;Make&#39;, IfdValueType.ascii),
+  0x0110: ExifTag(&#39;Model&#39;, IfdValueType.ascii),
+  0x0111: ExifTag(&#39;StripOffsets&#39;, IfdValueType.long),
+  0x0112: ExifTag(&#39;Orientation&#39;, IfdValueType.short),
+  0x0115: ExifTag(&#39;SamplesPerPixel&#39;, IfdValueType.short),
+  0x0116: ExifTag(&#39;RowsPerStrip&#39;, IfdValueType.long),
+  0x0117: ExifTag(&#39;StripByteCounts&#39;, IfdValueType.long),
+  0x0118: ExifTag(&#39;MinSampleValue&#39;, IfdValueType.short),
+  0x0119: ExifTag(&#39;MaxSampleValue&#39;, IfdValueType.short),
+  0x011A: ExifTag(&#39;XResolution&#39;, IfdValueType.rational),
+  0x011B: ExifTag(&#39;YResolution&#39;, IfdValueType.rational),
+  0x011C: ExifTag(&#39;PlanarConfiguration&#39;, IfdValueType.short),
+  0x011D: ExifTag(&#39;PageName&#39;, IfdValueType.ascii),
+  0x011E: ExifTag(&#39;XPosition&#39;, IfdValueType.rational),
+  0x011F: ExifTag(&#39;YPosition&#39;, IfdValueType.rational),
+  0x0122: ExifTag(&#39;GrayResponseUnit&#39;, IfdValueType.short),
+  0x0123: ExifTag(&#39;GrayResponseCurve&#39;),
+  0x0124: ExifTag(&#39;T4Options&#39;),
+  0x0125: ExifTag(&#39;T6Options&#39;),
+  0x0128: ExifTag(&#39;ResolutionUnit&#39;, IfdValueType.short),
+  0x0129: ExifTag(&#39;PageNumber&#39;, IfdValueType.short, 2),
+  0x012C: ExifTag(&#39;ColorResponseUnit&#39;),
+  0x012D: ExifTag(&#39;TransferFunction&#39;, IfdValueType.short, 768),
+  0x0131: ExifTag(&#39;Software&#39;, IfdValueType.ascii),
+  0x0132: ExifTag(&#39;DateTime&#39;, IfdValueType.ascii),
+  0x013B: ExifTag(&#39;Artist&#39;, IfdValueType.ascii),
+  0x013C: ExifTag(&#39;HostComputer&#39;, IfdValueType.ascii),
+  0x013D: ExifTag(&#39;Predictor&#39;, IfdValueType.short),
+  0x013E: ExifTag(&#39;WhitePoint&#39;, IfdValueType.rational, 2),
+  0x013F: ExifTag(&#39;PrimaryChromaticities&#39;, IfdValueType.rational, 6),
+  0x0140: ExifTag(&#39;ColorMap&#39;),
+  0x0141: ExifTag(&#39;HalftoneHints&#39;, IfdValueType.short, 2),
+  0x0142: ExifTag(&#39;TileWidth&#39;, IfdValueType.long),
+  0x0143: ExifTag(&#39;TileLength&#39;, IfdValueType.long),
+  0x0144: ExifTag(&#39;TileOffsets&#39;),
+  0x0145: ExifTag(&#39;TileByteCounts&#39;),
+  0x0146: ExifTag(&#39;BadFaxLines&#39;),
+  0x0147: ExifTag(&#39;CleanFaxData&#39;),
+  0x0148: ExifTag(&#39;ConsecutiveBadFaxLines&#39;),
+  0x014C: ExifTag(&#39;InkSet&#39;),
+  0x014D: ExifTag(&#39;InkNames&#39;),
+  0x014E: ExifTag(&#39;NumberofInks&#39;),
+  0x0150: ExifTag(&#39;DotRange&#39;),
+  0x0151: ExifTag(&#39;TargetPrinter&#39;, IfdValueType.ascii),
+  0x0152: ExifTag(&#39;ExtraSamples&#39;),
+  0x0153: ExifTag(&#39;SampleFormat&#39;),
+  0x0154: ExifTag(&#39;SMinSampleValue&#39;),
+  0x0155: ExifTag(&#39;SMaxSampleValue&#39;),
+  0x0156: ExifTag(&#39;TransferRange&#39;),
+  0x0157: ExifTag(&#39;ClipPath&#39;),
+  0x0200: ExifTag(&#39;JPEGProc&#39;),
+  0x0201: ExifTag(&#39;JPEGInterchangeFormat&#39;),
+  0x0202: ExifTag(&#39;JPEGInterchangeFormatLength&#39;),
+  0x0211: ExifTag(&#39;YCbCrCoefficients&#39;, IfdValueType.rational, 3),
+  0x0212: ExifTag(&#39;YCbCrSubSampling&#39;, IfdValueType.short),
+  0x0213: ExifTag(&#39;YCbCrPositioning&#39;, IfdValueType.short),
+  0x0214: ExifTag(&#39;ReferenceBlackWhite&#39;, IfdValueType.rational, 6),
+  0x02BC: ExifTag(&#39;ApplicationNotes&#39;, IfdValueType.short), &#47;&#47; XPM Info
+  0x4746: ExifTag(&#39;Rating&#39;, IfdValueType.short),
+  0x828D: ExifTag(&#39;CFARepeatPatternDim&#39;),
+  0x828E: ExifTag(&#39;CFAPattern&#39;),
+  0x828F: ExifTag(&#39;BatteryLevel&#39;),
+  0x8298: ExifTag(&#39;Copyright&#39;, IfdValueType.ascii),
+  0x829A: ExifTag(&#39;ExposureTime&#39;, IfdValueType.rational),
+  0x829D: ExifTag(&#39;FNumber&#39;, IfdValueType.rational),
+  0x83BB: ExifTag(&#39;IPTC-NAA&#39;, IfdValueType.long),
+  0x8769: ExifTag(&#39;ExifOffset&#39;), &#47;&#47; Exif Tags
+  0x8773: ExifTag(&#39;InterColorProfile&#39;),
+  0x8822: ExifTag(&#39;ExposureProgram&#39;, IfdValueType.short),
+  0x8824: ExifTag(&#39;SpectralSensitivity&#39;, IfdValueType.ascii),
+  0x8825: ExifTag(&#39;GPSOffset&#39;), &#47;&#47; GPS tags
+  0x8827: ExifTag(&#39;ISOSpeed&#39;, IfdValueType.long),
+  0x8828: ExifTag(&#39;OECF&#39;),
+  0x8830: ExifTag(&#39;SensitivityType&#39;, IfdValueType.short),
+  0x8832: ExifTag(&#39;RecommendedExposureIndex&#39;, IfdValueType.long),
+  0x8833: ExifTag(&#39;ISOSpeed&#39;, IfdValueType.long),
+  0x9000: ExifTag(&#39;ExifVersion&#39;, IfdValueType.undefined),
+  0x9003: ExifTag(&#39;DateTimeOriginal&#39;, IfdValueType.ascii),
+  0x9004: ExifTag(&#39;DateTimeDigitized&#39;, IfdValueType.ascii),
+  0x9010: ExifTag(&#39;OffsetTime&#39;, IfdValueType.ascii),
+  0x9011: ExifTag(&#39;OffsetTimeOriginal&#39;, IfdValueType.ascii),
+  0x9012: ExifTag(&#39;OffsetTimeDigitized&#39;, IfdValueType.ascii),
+  0x9101: ExifTag(&#39;ComponentsConfiguration&#39;, ),
+  0x9102: ExifTag(&#39;CompressedBitsPerPixel&#39;),
+  0x9201: ExifTag(&#39;ShutterSpeedValue&#39;),
+  0x9202: ExifTag(&#39;ApertureValue&#39;),
+  0x9203: ExifTag(&#39;BrightnessValue&#39;),
+  0x9204: ExifTag(&#39;ExposureBiasValue&#39;),
+  0x9205: ExifTag(&#39;MaxApertureValue&#39;),
+  0x9206: ExifTag(&#39;SubjectDistance&#39;),
+  0x9207: ExifTag(&#39;MeteringMode&#39;),
+  0x9208: ExifTag(&#39;LightSource&#39;),
+  0x9209: ExifTag(&#39;Flash&#39;),
+  0x920A: ExifTag(&#39;FocalLength&#39;),
+  0x9214: ExifTag(&#39;SubjectArea&#39;),
+  0x927C: ExifTag(&#39;MakerNote&#39;),
+  0x9286: ExifTag(&#39;UserComment&#39;),
+  0x9290: ExifTag(&#39;SubSecTime&#39;),
+  0x9291: ExifTag(&#39;SubSecTimeOriginal&#39;),
+  0x9292: ExifTag(&#39;SubSecTimeDigitized&#39;),
+  0x9C9B: ExifTag(&#39;XPTitle&#39;),
+  0x9C9C: ExifTag(&#39;XPComment&#39;),
+  0x9C9D: ExifTag(&#39;XPAuthor&#39;),
+  0x9C9E: ExifTag(&#39;XPKeywords&#39;),
+  0x9C9F: ExifTag(&#39;XPSubject&#39;),
+  0xA000: ExifTag(&#39;FlashPixVersion&#39;),
+  0xA001: ExifTag(&#39;ColorSpace&#39;, IfdValueType.short),
+  0xA002: ExifTag(&#39;ExifImageWidth&#39;, IfdValueType.short),
+  0xA003: ExifTag(&#39;ExifImageLength&#39;, IfdValueType.short),
+  0xA004: ExifTag(&#39;RelatedSoundFile&#39;),
+  0xA005: ExifTag(&#39;InteroperabilityOffset&#39;),
+  0xA20B: ExifTag(&#39;FlashEnergy&#39;), &#47;&#47; 0x920B in TIFF&#47;EP
+  0xA20C: ExifTag(&#39;SpatialFrequencyResponse&#39;),
+  0xA20E: ExifTag(&#39;FocalPlaneXResolution&#39;),
+  0xA20F: ExifTag(&#39;FocalPlaneYResolution&#39;),
+  0xA210: ExifTag(&#39;FocalPlaneResolutionUnit&#39;),
+  0xA214: ExifTag(&#39;SubjectLocation&#39;),
+  0xA215: ExifTag(&#39;ExposureIndex&#39;),
+  0xA217: ExifTag(&#39;SensingMethod&#39;),
+  0xA300: ExifTag(&#39;FileSource&#39;),
+  0xA301: ExifTag(&#39;SceneType&#39;),
+  0xA302: ExifTag(&#39;CVAPattern&#39;),
+  0xA401: ExifTag(&#39;CustomRendered&#39;),
+  0xA402: ExifTag(&#39;ExposureMode&#39;),
+  0xA403: ExifTag(&#39;WhiteBalance&#39;),
+  0xA404: ExifTag(&#39;DigitalZoomRatio&#39;),
+  0xA405: ExifTag(&#39;FocalLengthIn35mmFilm&#39;),
+  0xA406: ExifTag(&#39;SceneCaptureType&#39;),
+  0xA407: ExifTag(&#39;GainControl&#39;),
+  0xA408: ExifTag(&#39;Contrast&#39;),
+  0xA409: ExifTag(&#39;Saturation&#39;),
+  0xA40A: ExifTag(&#39;Sharpness&#39;),
+  0xA40B: ExifTag(&#39;DeviceSettingDescription&#39;),
+  0xA40C: ExifTag(&#39;SubjectDistanceRange&#39;),
+  0xA420: ExifTag(&#39;ImageUniqueID&#39;),
+  0xA430: ExifTag(&#39;CameraOwnerName&#39;, IfdValueType.ascii),
+  0xA431: ExifTag(&#39;BodySerialNumber&#39;, IfdValueType.ascii),
+  0xA432: ExifTag(&#39;LensSpecification&#39;),
+  0xA433: ExifTag(&#39;LensMake&#39;, IfdValueType.ascii),
+  0xA434: ExifTag(&#39;LensModel&#39;, IfdValueType.ascii),
+  0xA435: ExifTag(&#39;LensSerialNumber&#39;, IfdValueType.ascii),
+  0xA500: ExifTag(&#39;Gamma&#39;, IfdValueType.rational),
+  0xC4A5: ExifTag(&#39;PrintIM&#39;),
+  0xEA1C: ExifTag(&#39;Padding&#39;),
+  0xEA1D: ExifTag(&#39;OffsetSchema&#39;),
+  0xFDE8: ExifTag(&#39;OwnerName&#39;, IfdValueType.ascii),
+  0xFDE9: ExifTag(&#39;SerialNumber&#39;, IfdValueType.ascii),
+};</code></pre>
+</section>
+
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../index.html">image</a></li>
+  <li><a href="../image/image-library.html">image</a></li>
+  <li class="self-crumb">exifImageTags property</li>
+</ol>
+
+
+    <h5>image library</h5>
+    <ol>
+      <li class="section-title"><a href="../image/image-library.html#classes">Classes</a></li>
+        <li><a href="../image/BitmapFont-class.html">BitmapFont</a></li>
+        <li><a href="../image/BitmapFontCharacter-class.html">BitmapFontCharacter</a></li>
+        <li><a href="../image/BmpDecoder-class.html">BmpDecoder</a></li>
+        <li><a href="../image/BmpEncoder-class.html">BmpEncoder</a></li>
+        <li><a href="../image/ChannelIterator-class.html">ChannelIterator</a></li>
+        <li><a href="../image/Color-class.html">Color</a></li>
+        <li><a href="../image/ColorFloat16-class.html">ColorFloat16</a></li>
+        <li><a href="../image/ColorFloat32-class.html">ColorFloat32</a></li>
+        <li><a href="../image/ColorFloat64-class.html">ColorFloat64</a></li>
+        <li><a href="../image/ColorInt16-class.html">ColorInt16</a></li>
+        <li><a href="../image/ColorInt32-class.html">ColorInt32</a></li>
+        <li><a href="../image/ColorInt8-class.html">ColorInt8</a></li>
+        <li><a href="../image/ColorRgb8-class.html">ColorRgb8</a></li>
+        <li><a href="../image/ColorRgba8-class.html">ColorRgba8</a></li>
+        <li><a href="../image/ColorUint1-class.html">ColorUint1</a></li>
+        <li><a href="../image/ColorUint16-class.html">ColorUint16</a></li>
+        <li><a href="../image/ColorUint2-class.html">ColorUint2</a></li>
+        <li><a href="../image/ColorUint32-class.html">ColorUint32</a></li>
+        <li><a href="../image/ColorUint4-class.html">ColorUint4</a></li>
+        <li><a href="../image/ColorUint8-class.html">ColorUint8</a></li>
+        <li><a href="../image/Command-class.html">Command</a></li>
+        <li><a href="../image/DecodeInfo-class.html">DecodeInfo</a></li>
+        <li><a href="../image/Decoder-class.html">Decoder</a></li>
+        <li><a href="../image/DibDecoder-class.html">DibDecoder</a></li>
+        <li><a href="../image/Encoder-class.html">Encoder</a></li>
+        <li><a href="../image/ExifData-class.html">ExifData</a></li>
+        <li><a href="../image/ExifTag-class.html">ExifTag</a></li>
+        <li><a href="../image/ExifUndefinedValue-class.html">ExifUndefinedValue</a></li>
+        <li><a href="../image/ExrDecoder-class.html">ExrDecoder</a></li>
+        <li><a href="../image/ExrImage-class.html">ExrImage</a></li>
+        <li><a href="../image/Float16-class.html">Float16</a></li>
+        <li><a href="../image/GifColorMap-class.html">GifColorMap</a></li>
+        <li><a href="../image/GifDecoder-class.html">GifDecoder</a></li>
+        <li><a href="../image/GifEncoder-class.html">GifEncoder</a></li>
+        <li><a href="../image/GifImageDesc-class.html">GifImageDesc</a></li>
+        <li><a href="../image/GifInfo-class.html">GifInfo</a></li>
+        <li><a href="../image/IccProfile-class.html">IccProfile</a></li>
+        <li><a href="../image/IcoBmpInfo-class.html">IcoBmpInfo</a></li>
+        <li><a href="../image/IcoDecoder-class.html">IcoDecoder</a></li>
+        <li><a href="../image/IcoInfo-class.html">IcoInfo</a></li>
+        <li><a href="../image/IcoInfoImage-class.html">IcoInfoImage</a></li>
+        <li><a href="../image/IfdAsciiValue-class.html">IfdAsciiValue</a></li>
+        <li><a href="../image/IfdByteValue-class.html">IfdByteValue</a></li>
+        <li><a href="../image/IfdContainer-class.html">IfdContainer</a></li>
+        <li><a href="../image/IfdDirectory-class.html">IfdDirectory</a></li>
+        <li><a href="../image/IfdDoubleValue-class.html">IfdDoubleValue</a></li>
+        <li><a href="../image/IfdLongValue-class.html">IfdLongValue</a></li>
+        <li><a href="../image/IfdRationalValue-class.html">IfdRationalValue</a></li>
+        <li><a href="../image/IfdSByteValue-class.html">IfdSByteValue</a></li>
+        <li><a href="../image/IfdShortValue-class.html">IfdShortValue</a></li>
+        <li><a href="../image/IfdSingleValue-class.html">IfdSingleValue</a></li>
+        <li><a href="../image/IfdSLongValue-class.html">IfdSLongValue</a></li>
+        <li><a href="../image/IfdSRationalValue-class.html">IfdSRationalValue</a></li>
+        <li><a href="../image/IfdSShortValue-class.html">IfdSShortValue</a></li>
+        <li><a href="../image/IfdValue-class.html">IfdValue</a></li>
+        <li><a href="../image/Image-class.html">Image</a></li>
+        <li><a href="../image/ImageData-class.html">ImageData</a></li>
+        <li><a href="../image/ImageDataFloat16-class.html">ImageDataFloat16</a></li>
+        <li><a href="../image/ImageDataFloat32-class.html">ImageDataFloat32</a></li>
+        <li><a href="../image/ImageDataFloat64-class.html">ImageDataFloat64</a></li>
+        <li><a href="../image/ImageDataInt16-class.html">ImageDataInt16</a></li>
+        <li><a href="../image/ImageDataInt32-class.html">ImageDataInt32</a></li>
+        <li><a href="../image/ImageDataInt8-class.html">ImageDataInt8</a></li>
+        <li><a href="../image/ImageDataUint1-class.html">ImageDataUint1</a></li>
+        <li><a href="../image/ImageDataUint16-class.html">ImageDataUint16</a></li>
+        <li><a href="../image/ImageDataUint2-class.html">ImageDataUint2</a></li>
+        <li><a href="../image/ImageDataUint32-class.html">ImageDataUint32</a></li>
+        <li><a href="../image/ImageDataUint4-class.html">ImageDataUint4</a></li>
+        <li><a href="../image/ImageDataUint8-class.html">ImageDataUint8</a></li>
+        <li><a href="../image/InputBuffer-class.html">InputBuffer</a></li>
+        <li><a href="../image/JpegDecoder-class.html">JpegDecoder</a></li>
+        <li><a href="../image/JpegEncoder-class.html">JpegEncoder</a></li>
+        <li><a href="../image/JpegInfo-class.html">JpegInfo</a></li>
+        <li><a href="../image/NeuralQuantizer-class.html">NeuralQuantizer</a></li>
+        <li><a href="../image/OctreeQuantizer-class.html">OctreeQuantizer</a></li>
+        <li><a href="../image/OutputBuffer-class.html">OutputBuffer</a></li>
+        <li><a href="../image/Palette-class.html">Palette</a></li>
+        <li><a href="../image/PaletteFloat16-class.html">PaletteFloat16</a></li>
+        <li><a href="../image/PaletteFloat32-class.html">PaletteFloat32</a></li>
+        <li><a href="../image/PaletteFloat64-class.html">PaletteFloat64</a></li>
+        <li><a href="../image/PaletteInt16-class.html">PaletteInt16</a></li>
+        <li><a href="../image/PaletteInt32-class.html">PaletteInt32</a></li>
+        <li><a href="../image/PaletteInt8-class.html">PaletteInt8</a></li>
+        <li><a href="../image/PaletteUint16-class.html">PaletteUint16</a></li>
+        <li><a href="../image/PaletteUint32-class.html">PaletteUint32</a></li>
+        <li><a href="../image/PaletteUint8-class.html">PaletteUint8</a></li>
+        <li><a href="../image/PaletteUndefined-class.html">PaletteUndefined</a></li>
+        <li><a href="../image/Pixel-class.html">Pixel</a></li>
+        <li><a href="../image/PixelFloat16-class.html">PixelFloat16</a></li>
+        <li><a href="../image/PixelFloat32-class.html">PixelFloat32</a></li>
+        <li><a href="../image/PixelFloat64-class.html">PixelFloat64</a></li>
+        <li><a href="../image/PixelInt16-class.html">PixelInt16</a></li>
+        <li><a href="../image/PixelInt32-class.html">PixelInt32</a></li>
+        <li><a href="../image/PixelInt8-class.html">PixelInt8</a></li>
+        <li><a href="../image/PixelRangeIterator-class.html">PixelRangeIterator</a></li>
+        <li><a href="../image/PixelUint1-class.html">PixelUint1</a></li>
+        <li><a href="../image/PixelUint16-class.html">PixelUint16</a></li>
+        <li><a href="../image/PixelUint2-class.html">PixelUint2</a></li>
+        <li><a href="../image/PixelUint32-class.html">PixelUint32</a></li>
+        <li><a href="../image/PixelUint4-class.html">PixelUint4</a></li>
+        <li><a href="../image/PixelUint8-class.html">PixelUint8</a></li>
+        <li><a href="../image/PixelUndefined-class.html">PixelUndefined</a></li>
+        <li><a href="../image/PngColorType-class.html">PngColorType</a></li>
+        <li><a href="../image/PngDecoder-class.html">PngDecoder</a></li>
+        <li><a href="../image/PngEncoder-class.html">PngEncoder</a></li>
+        <li><a href="../image/PngFrame-class.html">PngFrame</a></li>
+        <li><a href="../image/PngInfo-class.html">PngInfo</a></li>
+        <li><a href="../image/Point-class.html">Point</a></li>
+        <li><a href="../image/PsdDecoder-class.html">PsdDecoder</a></li>
+        <li><a href="../image/PsdImage-class.html">PsdImage</a></li>
+        <li><a href="../image/Pvr2Info-class.html">Pvr2Info</a></li>
+        <li><a href="../image/Pvr3Info-class.html">Pvr3Info</a></li>
+        <li><a href="../image/PvrAppleInfo-class.html">PvrAppleInfo</a></li>
+        <li><a href="../image/PvrDecoder-class.html">PvrDecoder</a></li>
+        <li><a href="../image/PvrEncoder-class.html">PvrEncoder</a></li>
+        <li><a href="../image/SeparableKernel-class.html">SeparableKernel</a></li>
+        <li><a href="../image/TgaDecoder-class.html">TgaDecoder</a></li>
+        <li><a href="../image/TgaEncoder-class.html">TgaEncoder</a></li>
+        <li><a href="../image/TgaInfo-class.html">TgaInfo</a></li>
+        <li><a href="../image/TiffCompression-class.html">TiffCompression</a></li>
+        <li><a href="../image/TiffDecoder-class.html">TiffDecoder</a></li>
+        <li><a href="../image/TiffEncoder-class.html">TiffEncoder</a></li>
+        <li><a href="../image/TiffImage-class.html">TiffImage</a></li>
+        <li><a href="../image/TiffInfo-class.html">TiffInfo</a></li>
+        <li><a href="../image/Trim-class.html">Trim</a></li>
+        <li><a href="../image/WebPDecoder-class.html">WebPDecoder</a></li>
+        <li><a href="../image/WebPInfo-class.html">WebPInfo</a></li>
+
+
+
+      <li class="section-title"><a href="../image/image-library.html#constants">Constants</a></li>
+        <li><a href="../image/exifTagNameToID-constant.html">exifTagNameToID</a></li>
+        <li><a href="../image/formatMaxValue-constant.html">formatMaxValue</a></li>
+        <li><a href="../image/formatSize-constant.html">formatSize</a></li>
+        <li><a href="../image/formatToFormatType-constant.html">formatToFormatType</a></li>
+        <li><a href="../image/ifdValueTypeSize-constant.html">ifdValueTypeSize</a></li>
+        <li><a href="../image/ifdValueTypeString-constant.html">ifdValueTypeString</a></li>
+
+      <li class="section-title"><a href="../image/image-library.html#properties">Properties</a></li>
+        <li><a href="../image/arial14.html">arial14</a></li>
+        <li><a href="../image/arial24.html">arial24</a></li>
+        <li><a href="../image/arial48.html">arial48</a></li>
+        <li><a href="../image/exifGpsTags.html">exifGpsTags</a></li>
+        <li><a href="../image/exifImageTags.html">exifImageTags</a></li>
+        <li><a href="../image/exifInteropTags.html">exifInteropTags</a></li>
+
+      <li class="section-title"><a href="../image/image-library.html#functions">Functions</a></li>
+        <li><a href="../image/adjustColor.html">adjustColor</a></li>
+        <li><a href="../image/bakeOrientation.html">bakeOrientation</a></li>
+        <li><a href="../image/billboard.html">billboard</a></li>
+        <li><a href="../image/bleachBypass.html">bleachBypass</a></li>
+        <li><a href="../image/bulgeDistortion.html">bulgeDistortion</a></li>
+        <li><a href="../image/bumpToNormal.html">bumpToNormal</a></li>
+        <li><a href="../image/chromaticAberration.html">chromaticAberration</a></li>
+        <li><a href="../image/clipLine.html">clipLine</a></li>
+        <li><a href="../image/cmykToRgb.html">cmykToRgb</a></li>
+        <li><a href="../image/colorHalftone.html">colorHalftone</a></li>
+        <li><a href="../image/colorOffset.html">colorOffset</a></li>
+        <li><a href="../image/compositeImage.html">compositeImage</a></li>
+        <li><a href="../image/contrast.html">contrast</a></li>
+        <li><a href="../image/convertColor.html">convertColor</a></li>
+        <li><a href="../image/convertFormatValue.html">convertFormatValue</a></li>
+        <li><a href="../image/convolution.html">convolution</a></li>
+        <li><a href="../image/copyCrop.html">copyCrop</a></li>
+        <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
+        <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
+        <li><a href="../image/copyRectify.html">copyRectify</a></li>
+        <li><a href="../image/copyResize.html">copyResize</a></li>
+        <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
+        <li><a href="../image/copyRotate.html">copyRotate</a></li>
+        <li><a href="../image/crand.html">crand</a></li>
+        <li><a href="../image/decodeBmp.html">decodeBmp</a></li>
+        <li><a href="../image/decodeBmpFile.html">decodeBmpFile</a></li>
+        <li><a href="../image/decodeExr.html">decodeExr</a></li>
+        <li><a href="../image/decodeExrFile.html">decodeExrFile</a></li>
+        <li><a href="../image/decodeGif.html">decodeGif</a></li>
+        <li><a href="../image/decodeGifFile.html">decodeGifFile</a></li>
+        <li><a href="../image/decodeIco.html">decodeIco</a></li>
+        <li><a href="../image/decodeIcoFile.html">decodeIcoFile</a></li>
+        <li><a href="../image/decodeImage.html">decodeImage</a></li>
+        <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
+        <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
+        <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
+        <li><a href="../image/decodePng.html">decodePng</a></li>
+        <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
+        <li><a href="../image/decodePsd.html">decodePsd</a></li>
+        <li><a href="../image/decodePsdFile.html">decodePsdFile</a></li>
+        <li><a href="../image/decodePvr.html">decodePvr</a></li>
+        <li><a href="../image/decodePvrFile.html">decodePvrFile</a></li>
+        <li><a href="../image/decodeTga.html">decodeTga</a></li>
+        <li><a href="../image/decodeTgaFile.html">decodeTgaFile</a></li>
+        <li><a href="../image/decodeTiff.html">decodeTiff</a></li>
+        <li><a href="../image/decodeTiffFile.html">decodeTiffFile</a></li>
+        <li><a href="../image/decodeWebP.html">decodeWebP</a></li>
+        <li><a href="../image/decodeWebPFile.html">decodeWebPFile</a></li>
+        <li><a href="../image/ditherImage.html">ditherImage</a></li>
+        <li><a href="../image/dotScreen.html">dotScreen</a></li>
+        <li><a href="../image/drawChar.html">drawChar</a></li>
+        <li><a href="../image/drawCircle.html">drawCircle</a></li>
+        <li><a href="../image/drawLine.html">drawLine</a></li>
+        <li><a href="../image/drawPixel.html">drawPixel</a></li>
+        <li><a href="../image/drawPolygon.html">drawPolygon</a></li>
+        <li><a href="../image/drawRect.html">drawRect</a></li>
+        <li><a href="../image/drawString.html">drawString</a></li>
+        <li><a href="../image/dropShadow.html">dropShadow</a></li>
+        <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
+        <li><a href="../image/emboss.html">emboss</a></li>
+        <li><a href="../image/encodeBmp.html">encodeBmp</a></li>
+        <li><a href="../image/encodeBmpFile.html">encodeBmpFile</a></li>
+        <li><a href="../image/encodeCur.html">encodeCur</a></li>
+        <li><a href="../image/encodeCurFile.html">encodeCurFile</a></li>
+        <li><a href="../image/encodeGif.html">encodeGif</a></li>
+        <li><a href="../image/encodeGifFile.html">encodeGifFile</a></li>
+        <li><a href="../image/encodeIco.html">encodeIco</a></li>
+        <li><a href="../image/encodeIcoFile.html">encodeIcoFile</a></li>
+        <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
+        <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
+        <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
+        <li><a href="../image/encodePng.html">encodePng</a></li>
+        <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
+        <li><a href="../image/encodePvr.html">encodePvr</a></li>
+        <li><a href="../image/encodePvrFile.html">encodePvrFile</a></li>
+        <li><a href="../image/encodeTga.html">encodeTga</a></li>
+        <li><a href="../image/encodeTgaFile.html">encodeTgaFile</a></li>
+        <li><a href="../image/encodeTiff.html">encodeTiff</a></li>
+        <li><a href="../image/encodeTiffFile.html">encodeTiffFile</a></li>
+        <li><a href="../image/executeCommandAsync.html">executeCommandAsync</a></li>
+        <li><a href="../image/executeCommandBytes.html">executeCommandBytes</a></li>
+        <li><a href="../image/executeCommandBytesAsync.html">executeCommandBytesAsync</a></li>
+        <li><a href="../image/executeCommandImage.html">executeCommandImage</a></li>
+        <li><a href="../image/executeCommandImageAsync.html">executeCommandImageAsync</a></li>
+        <li><a href="../image/fill.html">fill</a></li>
+        <li><a href="../image/fillCircle.html">fillCircle</a></li>
+        <li><a href="../image/fillFlood.html">fillFlood</a></li>
+        <li><a href="../image/fillPolygon.html">fillPolygon</a></li>
+        <li><a href="../image/fillRect.html">fillRect</a></li>
+        <li><a href="../image/findDecoderForData.html">findDecoderForData</a></li>
+        <li><a href="../image/findDecoderForNamedImage.html">findDecoderForNamedImage</a></li>
+        <li><a href="../image/findEncoderForNamedImage.html">findEncoderForNamedImage</a></li>
+        <li><a href="../image/findTrim.html">findTrim</a></li>
+        <li><a href="../image/flip.html">flip</a></li>
+        <li><a href="../image/flipHorizontal.html">flipHorizontal</a></li>
+        <li><a href="../image/flipHorizontalVertical.html">flipHorizontalVertical</a></li>
+        <li><a href="../image/flipVertical.html">flipVertical</a></li>
+        <li><a href="../image/gamma.html">gamma</a></li>
+        <li><a href="../image/gaussianBlur.html">gaussianBlur</a></li>
+        <li><a href="../image/getLuminance.html">getLuminance</a></li>
+        <li><a href="../image/getLuminanceNormalized.html">getLuminanceNormalized</a></li>
+        <li><a href="../image/getLuminanceRgb.html">getLuminanceRgb</a></li>
+        <li><a href="../image/grand.html">grand</a></li>
+        <li><a href="../image/grayscale.html">grayscale</a></li>
+        <li><a href="../image/hdrToLdr.html">hdrToLdr</a></li>
+        <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
+        <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
+        <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
+        <li><a href="../image/invert.html">invert</a></li>
+        <li><a href="../image/labToRgb.html">labToRgb</a></li>
+        <li><a href="../image/labToXyz.html">labToXyz</a></li>
+        <li><a href="../image/luminanceThreshold.html">luminanceThreshold</a></li>
+        <li><a href="../image/maskFlood.html">maskFlood</a></li>
+        <li><a href="../image/minMax.html">minMax</a></li>
+        <li><a href="../image/monochrome.html">monochrome</a></li>
+        <li><a href="../image/noise.html">noise</a></li>
+        <li><a href="../image/normalize.html">normalize</a></li>
+        <li><a href="../image/pixelate.html">pixelate</a></li>
+        <li><a href="../image/prand.html">prand</a></li>
+        <li><a href="../image/quantize.html">quantize</a></li>
+        <li><a href="../image/readFile.html">readFile</a></li>
+        <li><a href="../image/readFont.html">readFont</a></li>
+        <li><a href="../image/readFontZip.html">readFontZip</a></li>
+        <li><a href="../image/reinhardTonemap.html">reinhardTonemap</a></li>
+        <li><a href="../image/remapColors.html">remapColors</a></li>
+        <li><a href="../image/rgbaToUint32.html">rgbaToUint32</a></li>
+        <li><a href="../image/rgbToHsl.html">rgbToHsl</a></li>
+        <li><a href="../image/rgbToLab.html">rgbToLab</a></li>
+        <li><a href="../image/rgbToXyz.html">rgbToXyz</a></li>
+        <li><a href="../image/scaleRgba.html">scaleRgba</a></li>
+        <li><a href="../image/separableConvolution.html">separableConvolution</a></li>
+        <li><a href="../image/sepia.html">sepia</a></li>
+        <li><a href="../image/sketch.html">sketch</a></li>
+        <li><a href="../image/smooth.html">smooth</a></li>
+        <li><a href="../image/sobel.html">sobel</a></li>
+        <li><a href="../image/stretchDistortion.html">stretchDistortion</a></li>
+        <li><a href="../image/supportsFileAccess.html">supportsFileAccess</a></li>
+        <li><a href="../image/trim.html">trim</a></li>
+        <li><a href="../image/uint32ToAlpha.html">uint32ToAlpha</a></li>
+        <li><a href="../image/uint32ToBlue.html">uint32ToBlue</a></li>
+        <li><a href="../image/uint32ToGreen.html">uint32ToGreen</a></li>
+        <li><a href="../image/uint32ToRed.html">uint32ToRed</a></li>
+        <li><a href="../image/vignette.html">vignette</a></li>
+        <li><a href="../image/writeFile.html">writeFile</a></li>
+        <li><a href="../image/xyzToLab.html">xyzToLab</a></li>
+        <li><a href="../image/xyzToRgb.html">xyzToRgb</a></li>
+
+      <li class="section-title"><a href="../image/image-library.html#enums">Enums</a></li>
+        <li><a href="../image/BlendMode.html">BlendMode</a></li>
+        <li><a href="../image/Channel.html">Channel</a></li>
+        <li><a href="../image/DitherKernel.html">DitherKernel</a></li>
+        <li><a href="../image/FlipDirection.html">FlipDirection</a></li>
+        <li><a href="../image/Format.html">Format</a></li>
+        <li><a href="../image/FormatType.html">FormatType</a></li>
+        <li><a href="../image/FrameType.html">FrameType</a></li>
+        <li><a href="../image/IccProfileCompression.html">IccProfileCompression</a></li>
+        <li><a href="../image/IcoType.html">IcoType</a></li>
+        <li><a href="../image/IfdValueType.html">IfdValueType</a></li>
+        <li><a href="../image/Interpolation.html">Interpolation</a></li>
+        <li><a href="../image/NoiseType.html">NoiseType</a></li>
+        <li><a href="../image/PixelateMode.html">PixelateMode</a></li>
+        <li><a href="../image/PngBlendMode.html">PngBlendMode</a></li>
+        <li><a href="../image/PngDisposeMode.html">PngDisposeMode</a></li>
+        <li><a href="../image/PngFilter.html">PngFilter</a></li>
+        <li><a href="../image/PngFilterType.html">PngFilterType</a></li>
+        <li><a href="../image/PsdColorMode.html">PsdColorMode</a></li>
+        <li><a href="../image/PvrFormat.html">PvrFormat</a></li>
+        <li><a href="../image/QuantizeMethod.html">QuantizeMethod</a></li>
+        <li><a href="../image/TiffFormat.html">TiffFormat</a></li>
+        <li><a href="../image/TiffImageType.html">TiffImageType</a></li>
+        <li><a href="../image/TiffPhotometricType.html">TiffPhotometricType</a></li>
+        <li><a href="../image/TrimMode.html">TrimMode</a></li>
+        <li><a href="../image/WebPFormat.html">WebPFormat</a></li>
+
+
+      <li class="section-title"><a href="../image/image-library.html#exceptions">Exceptions</a></li>
+        <li><a href="../image/ImageException-class.html">ImageException</a></li>
+</ol>
+
+  </div><!--/.sidebar-offcanvas-left-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the renderImage method from the PsdImage class, for the Dart programming language.">
+  <title>renderImage method - PsdImage class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">image</a></li>
+    <li><a href="../../image/image-library.html">image</a></li>
+    <li><a href="../../image/PsdImage-class.html">PsdImage</a></li>
+    <li class="self-crumb">renderImage method</li>
+  </ol>
+  <div class="self-name">renderImage</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">renderImage</span> method 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="../../image/Image-class.html">Image</a></span>
+<span class="name ">renderImage</span>(<wbr>)
+
+      
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Image renderImage() {
+  if (mergedImage != null) {
+    return mergedImage!;
+  }
+
+  mergedImage = Image(width: width, height: height, numChannels: 4);
+  mergedImage!.clear();
+
+  &#47;&#47;final pixels = mergedImage!.getBytes();
+
+  for (var li = 0; li &lt; layers.length; ++li) {
+    final layer = layers[li];
+    if (!layer.isVisible()) {
+      continue;
+    }
+
+    final opacity = layer.opacity &#47; 255.0;
+    final blendMode = layer.blendMode;
+
+    &#47;&#47;int ns = depth == 16 ? 2 : 1;
+    &#47;&#47;final srcP = layer.layerImage.getBytes();
+    final src = layer.layerImage;
+
+    for (var y = 0, sy = layer.top!; y &lt; layer.height; ++y, ++sy) {
+      &#47;&#47;var di = (layer.top! + y) * width * 4 + layer.left! * 4;
+      final dy = layer.top! + y;
+      for (int? x = 0, sx = layer.left; x! &lt; layer.width; ++x, ++sx) {
+        final srcP = src.getPixel(x, y);
+        final br = srcP.r.toInt();
+        final bg = srcP.g.toInt();
+        final bb = srcP.b.toInt();
+        final ba = srcP.a.toInt();
+
+        if (sx! &gt;= 0 &amp;&amp; sx &lt; width &amp;&amp; sy &gt;= 0 &amp;&amp; sy &lt; height) {
+          final dx = layer.left! + x;
+          final p = mergedImage!.getPixel(dx, dy);
+          final ar = p.r.toInt();
+          final ag = p.g.toInt();
+          final ab = p.b.toInt();
+          final aa = p.a.toInt();
+
+          _blend(ar, ag, ab, aa, br, bg, bb, ba, blendMode, opacity, p);
+        }
+      }
+    }
+  }
+
+  return mergedImage!;
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">image</a></li>
+  <li><a href="../../image/image-library.html">image</a></li>
+  <li><a href="../../image/PsdImage-class.html">PsdImage</a></li>
+  <li class="self-crumb">renderImage method</li>
+</ol>
+
+
+    <h5>PsdImage class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../image/PsdImage-class.html#constructors">Constructors</a></li>
+          <li><a href="../../image/PsdImage/PsdImage.html">PsdImage</a></li>
+
+
+        <li class="section-title">
+          <a href="../../image/PsdImage-class.html#instance-properties">Properties</a>
+        </li>
+          <li><a href="../../image/PsdImage/backgroundColor.html">backgroundColor</a></li>
+          <li><a href="../../image/PsdImage/channels.html">channels</a></li>
+          <li><a href="../../image/PsdImage/colorMode.html">colorMode</a></li>
+          <li><a href="../../image/PsdImage/depth.html">depth</a></li>
+          <li><a href="../../image/PsdImage/hasAlpha.html">hasAlpha</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li><a href="../../image/PsdImage/height.html">height</a></li>
+          <li><a href="../../image/PsdImage/imageResources.html">imageResources</a></li>
+          <li><a href="../../image/PsdImage/isValid.html">isValid</a></li>
+          <li><a href="../../image/PsdImage/layers.html">layers</a></li>
+          <li><a href="../../image/PsdImage/mergedImage.html">mergedImage</a></li>
+          <li><a href="../../image/PsdImage/mergeImageChannels.html">mergeImageChannels</a></li>
+          <li><a href="../../image/PsdImage/numFrames.html">numFrames</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+          <li><a href="../../image/PsdImage/signature.html">signature</a></li>
+          <li><a href="../../image/PsdImage/version.html">version</a></li>
+          <li><a href="../../image/PsdImage/width.html">width</a></li>
+
+        <li class="section-title"><a href="../../image/PsdImage-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../image/PsdImage/decode.html">decode</a></li>
+          <li><a href="../../image/PsdImage/decodeImage.html">decodeImage</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li><a href="../../image/PsdImage/renderImage.html">renderImage</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../image/PsdImage-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+        <li class="section-title"><a href="../../image/PsdImage-class.html#static-methods">Static methods</a></li>
+          <li><a href="../../image/PsdImage/createImageFromChannels.html">createImageFromChannels</a></li>
+
+        <li class="section-title"><a href="../../image/PsdImage-class.html#constants">Constants</a></li>
+          <li><a href="../../image/PsdImage/psdSignature-constant.html">psdSignature</a></li>
+          <li><a href="../../image/PsdImage/resourceBlockSignature-constant.html">resourceBlockSignature</a></li>
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

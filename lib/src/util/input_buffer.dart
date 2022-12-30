@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import '../image_exception.dart';
-import '../internal/bit_operators.dart';
+import 'bit_utils.dart';
+import 'image_exception.dart';
 
 /// A buffer that can be read as a stream of bytes.
 class InputBuffer {
@@ -83,9 +83,8 @@ class InputBuffer {
   /// returned is relative to the start of the buffer, or -1 if the [value]
   /// was not found.
   int indexOf(int value, [int offset = 0]) {
-    for (var i = this.offset + offset, end = this.offset + length;
-        i < end;
-        ++i) {
+    final end = this.offset + length;
+    for (var i = this.offset + offset; i < end; ++i) {
       if (buffer[i] == value) {
         return i - start;
       }

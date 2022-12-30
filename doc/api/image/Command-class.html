@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the Command class from the image library, for the Dart programming language.">
+  <title>Command class - image library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">image</a></li>
+    <li><a href="../image/image-library.html">image</a></li>
+    <li class="self-crumb">Command class</li>
+  </ol>
+  <div class="self-name">Command</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span class="material-symbols-outlined">
+        brightness_4
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-class">Command</span> class 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+ 
+</h1></div>
+
+    
+<section class="desc markdown">
+  <p>Base class for commands that create, load, manipulate, and save images.
+Commands are not executed until either the <a href="../image/Command/execute.html">execute</a> or <a href="../image/Command/executeThread.html">executeThread</a>
+methods are called.</p>
+</section>
+
+
+
+    
+  <section class="summary offset-anchor" id="constructors">
+    <h2>Constructors</h2>
+
+    <dl class="constructor-summary-list">
+        <dt id="Command" class="callable">
+          <span class="name"><a href="../image/Command/Command.html">Command</a></span><span class="signature">(<span class="parameter" id="-param-input">[<span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">input</span> = <span class="default-value">null</span>]</span>)</span>
+        </dt>
+        <dd>
+          
+        </dd>
+    </dl>
+  </section>
+
+    <section class="summary offset-anchor" id="instance-properties">
+      <h2>Properties</h2>
+
+      <dl class="properties">
+        <dt id="dirty" class="property">
+  <span class="name"><a href="../image/Command/dirty.html">dirty</a></span>
+  <span class="signature">&#8596; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> 
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">read / write</span></div>
+
+</dd>
+
+        <dt id="firstSubCommand" class="property">
+  <span class="name"><a href="../image/Command/firstSubCommand.html">firstSubCommand</a></span>
+  <span class="signature">&#8596; <a href="../image/Command-class.html">Command</a>?</span> 
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">read / write</span></div>
+
+</dd>
+
+        <dt id="hashCode" class="property inherited">
+  <span class="name"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> 
+
+</dt>
+<dd class="inherited">
+  The hash code for this object.
+  <div class="features"><span class="feature">read-only</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="input" class="property">
+  <span class="name"><a href="../image/Command/input.html">input</a></span>
+  <span class="signature">&#8596; <a href="../image/Command-class.html">Command</a>?</span> 
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">read / write</span></div>
+
+</dd>
+
+        <dt id="outputBytes" class="property">
+  <span class="name"><a href="../image/Command/outputBytes.html">outputBytes</a></span>
+  <span class="signature">&#8596; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a>?</span> 
+
+</dt>
+<dd>
+  Output bytes generated by the command.
+  <div class="features"><span class="feature">read / write</span></div>
+
+</dd>
+
+        <dt id="outputImage" class="property">
+  <span class="name"><a href="../image/Command/outputImage.html">outputImage</a></span>
+  <span class="signature">&#8596; <a href="../image/Image-class.html">Image</a>?</span> 
+
+</dt>
+<dd>
+  Output Image generated by the command.
+  <div class="features"><span class="feature">read / write</span></div>
+
+</dd>
+
+        <dt id="outputObject" class="property">
+  <span class="name"><a href="../image/Command/outputObject.html">outputObject</a></span>
+  <span class="signature">&#8596; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object-class.html">Object</a>?</span> 
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">read / write</span></div>
+
+</dd>
+
+        <dt id="runtimeType" class="property inherited">
+  <span class="name"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Type-class.html">Type</a></span> 
+
+</dt>
+<dd class="inherited">
+  A representation of the runtime type of the object.
+  <div class="features"><span class="feature">read-only</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="subCommand" class="property">
+  <span class="name"><a href="../image/Command/subCommand.html">subCommand</a></span>
+  <span class="signature">&#8596; <a href="../image/Command-class.html">Command</a></span> 
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">read / write</span></div>
+
+</dd>
+
+      </dl>
+    </section>
+
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-methods">
+    <h2>Methods</h2>
+    <dl class="callables">
+        <dt id="addFrames" class="callable">
+  <span class="name"><a href="../image/Command/addFrames.html">addFrames</a></span><span class="signature">(<wbr><span class="parameter" id="addFrames-param-count"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">count</span>, </span><span class="parameter" id="addFrames-param-callback"><span class="type-annotation">AddFramesCallback</span> <span class="parameter-name">callback</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Add animation frames to an image.
+  
+
+</dd>
+
+        <dt id="adjustColor" class="callable">
+  <span class="name"><a href="../image/Command/adjustColor.html">adjustColor</a></span><span class="signature">(<wbr><span class="parameter" id="adjustColor-param-blacks">{<span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">blacks</span>, </span><span class="parameter" id="adjustColor-param-whites"><span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">whites</span>, </span><span class="parameter" id="adjustColor-param-mids"><span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">mids</span>, </span><span class="parameter" id="adjustColor-param-contrast"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">contrast</span>, </span><span class="parameter" id="adjustColor-param-saturation"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">saturation</span>, </span><span class="parameter" id="adjustColor-param-brightness"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">brightness</span>, </span><span class="parameter" id="adjustColor-param-gamma"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">gamma</span>, </span><span class="parameter" id="adjustColor-param-exposure"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">exposure</span>, </span><span class="parameter" id="adjustColor-param-hue"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">hue</span>, </span><span class="parameter" id="adjustColor-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="adjustColor-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="adjustColor-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="bakeOrientation" class="callable">
+  <span class="name"><a href="../image/Command/bakeOrientation.html">bakeOrientation</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="billboard" class="callable">
+  <span class="name"><a href="../image/Command/billboard.html">billboard</a></span><span class="signature">(<wbr><span class="parameter" id="billboard-param-grid">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">grid</span> = <span class="default-value">10</span>, </span><span class="parameter" id="billboard-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="billboard-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="billboard-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="bleachBypass" class="callable">
+  <span class="name"><a href="../image/Command/bleachBypass.html">bleachBypass</a></span><span class="signature">(<wbr><span class="parameter" id="bleachBypass-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="bleachBypass-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="bleachBypass-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="bulgeDistortion" class="callable">
+  <span class="name"><a href="../image/Command/bulgeDistortion.html">bulgeDistortion</a></span><span class="signature">(<wbr><span class="parameter" id="bulgeDistortion-param-centerX">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span><span class="parameter" id="bulgeDistortion-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span><span class="parameter" id="bulgeDistortion-param-radius"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">radius</span>, </span><span class="parameter" id="bulgeDistortion-param-scale"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">scale</span> = <span class="default-value">0.5</span>, </span><span class="parameter" id="bulgeDistortion-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>, </span><span class="parameter" id="bulgeDistortion-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="bulgeDistortion-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="bumpToNormal" class="callable">
+  <span class="name"><a href="../image/Command/bumpToNormal.html">bumpToNormal</a></span><span class="signature">(<wbr><span class="parameter" id="bumpToNormal-param-strength">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">strength</span> = <span class="default-value">2</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="chromaticAberration" class="callable">
+  <span class="name"><a href="../image/Command/chromaticAberration.html">chromaticAberration</a></span><span class="signature">(<wbr><span class="parameter" id="chromaticAberration-param-shift">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">shift</span> = <span class="default-value">5</span>, </span><span class="parameter" id="chromaticAberration-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="chromaticAberration-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="colorHalftone" class="callable">
+  <span class="name"><a href="../image/Command/colorHalftone.html">colorHalftone</a></span><span class="signature">(<wbr><span class="parameter" id="colorHalftone-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="colorHalftone-param-centerX"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span><span class="parameter" id="colorHalftone-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span><span class="parameter" id="colorHalftone-param-angle"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span> = <span class="default-value">180</span>, </span><span class="parameter" id="colorHalftone-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">size</span> = <span class="default-value">5</span>, </span><span class="parameter" id="colorHalftone-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="colorHalftone-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="colorOffset" class="callable">
+  <span class="name"><a href="../image/Command/colorOffset.html">colorOffset</a></span><span class="signature">(<wbr><span class="parameter" id="colorOffset-param-red">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">red</span> = <span class="default-value">0</span>, </span><span class="parameter" id="colorOffset-param-green"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">green</span> = <span class="default-value">0</span>, </span><span class="parameter" id="colorOffset-param-blue"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">blue</span> = <span class="default-value">0</span>, </span><span class="parameter" id="colorOffset-param-alpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">alpha</span> = <span class="default-value">0</span>, </span><span class="parameter" id="colorOffset-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="colorOffset-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="compositeImage" class="callable">
+  <span class="name"><a href="../image/Command/compositeImage.html">compositeImage</a></span><span class="signature">(<wbr><span class="parameter" id="compositeImage-param-src"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">src</span>, </span><span class="parameter" id="compositeImage-param-dstX">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">dstX</span>, </span><span class="parameter" id="compositeImage-param-dstY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">dstY</span>, </span><span class="parameter" id="compositeImage-param-dstW"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">dstW</span>, </span><span class="parameter" id="compositeImage-param-dstH"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">dstH</span>, </span><span class="parameter" id="compositeImage-param-srcX"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">srcX</span>, </span><span class="parameter" id="compositeImage-param-srcY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">srcY</span>, </span><span class="parameter" id="compositeImage-param-srcW"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">srcW</span>, </span><span class="parameter" id="compositeImage-param-srcH"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">srcH</span>, </span><span class="parameter" id="compositeImage-param-blend"><span class="type-annotation"><a href="../image/BlendMode.html">BlendMode</a></span> <span class="parameter-name">blend</span> = <span class="default-value">BlendMode.alpha</span>, </span><span class="parameter" id="compositeImage-param-center"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">center</span> = <span class="default-value">false</span>, </span><span class="parameter" id="compositeImage-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="compositeImage-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="contrast" class="callable">
+  <span class="name"><a href="../image/Command/contrast.html">contrast</a></span><span class="signature">(<wbr><span class="parameter" id="contrast-param-contrast">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">contrast</span>, </span><span class="parameter" id="contrast-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="contrast-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="convert" class="callable">
+  <span class="name"><a href="../image/Command/convert.html">convert</a></span><span class="signature">(<wbr><span class="parameter" id="convert-param-numChannels">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">numChannels</span>, </span><span class="parameter" id="convert-param-format"><span class="type-annotation"><a href="../image/Format.html">Format</a>?</span> <span class="parameter-name">format</span>, </span><span class="parameter" id="convert-param-alpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">alpha</span>, </span><span class="parameter" id="convert-param-withPalette"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withPalette</span> = <span class="default-value">false</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Convert an image by changing its format or number of channels.
+  
+
+</dd>
+
+        <dt id="convolution" class="callable">
+  <span class="name"><a href="../image/Command/convolution.html">convolution</a></span><span class="signature">(<wbr><span class="parameter" id="convolution-param-filter">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>&gt;</span></span> <span class="parameter-name">filter</span>, </span><span class="parameter" id="convolution-param-div"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">div</span> = <span class="default-value">1.0</span>, </span><span class="parameter" id="convolution-param-offset"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">offset</span> = <span class="default-value">0</span>, </span><span class="parameter" id="convolution-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="convolution-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="convolution-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="copy" class="callable">
+  <span class="name"><a href="../image/Command/copy.html">copy</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Create a copy of the current image.
+  
+
+</dd>
+
+        <dt id="copyCrop" class="callable">
+  <span class="name"><a href="../image/Command/copyCrop.html">copyCrop</a></span><span class="signature">(<wbr><span class="parameter" id="copyCrop-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="copyCrop-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="copyCrop-param-w"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">w</span>, </span><span class="parameter" id="copyCrop-param-h"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">h</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="copyCropCircle" class="callable">
+  <span class="name"><a href="../image/Command/copyCropCircle.html">copyCropCircle</a></span><span class="signature">(<wbr><span class="parameter" id="copyCropCircle-param-radius">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">radius</span>, </span><span class="parameter" id="copyCropCircle-param-centerX"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span><span class="parameter" id="copyCropCircle-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="copyFlip" class="callable">
+  <span class="name"><a href="../image/Command/copyFlip.html">copyFlip</a></span><span class="signature">(<wbr><span class="parameter" id="copyFlip-param-direction"><span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="copyImageChannels" class="callable">
+  <span class="name"><a href="../image/Command/copyImageChannels.html">copyImageChannels</a></span><span class="signature">(<wbr><span class="parameter" id="copyImageChannels-param-from">{<span>required</span> <span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">from</span>, </span><span class="parameter" id="copyImageChannels-param-scaled"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">scaled</span> = <span class="default-value">false</span>, </span><span class="parameter" id="copyImageChannels-param-red"><span class="type-annotation"><a href="../image/Channel.html">Channel</a>?</span> <span class="parameter-name">red</span>, </span><span class="parameter" id="copyImageChannels-param-green"><span class="type-annotation"><a href="../image/Channel.html">Channel</a>?</span> <span class="parameter-name">green</span>, </span><span class="parameter" id="copyImageChannels-param-blue"><span class="type-annotation"><a href="../image/Channel.html">Channel</a>?</span> <span class="parameter-name">blue</span>, </span><span class="parameter" id="copyImageChannels-param-alpha"><span class="type-annotation"><a href="../image/Channel.html">Channel</a>?</span> <span class="parameter-name">alpha</span>, </span><span class="parameter" id="copyImageChannels-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="copyImageChannels-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="copyRectify" class="callable">
+  <span class="name"><a href="../image/Command/copyRectify.html">copyRectify</a></span><span class="signature">(<wbr><span class="parameter" id="copyRectify-param-topLeft">{<span>required</span> <span class="type-annotation"><a href="../image/Point-class.html">Point</a></span> <span class="parameter-name">topLeft</span>, </span><span class="parameter" id="copyRectify-param-topRight"><span>required</span> <span class="type-annotation"><a href="../image/Point-class.html">Point</a></span> <span class="parameter-name">topRight</span>, </span><span class="parameter" id="copyRectify-param-bottomLeft"><span>required</span> <span class="type-annotation"><a href="../image/Point-class.html">Point</a></span> <span class="parameter-name">bottomLeft</span>, </span><span class="parameter" id="copyRectify-param-bottomRight"><span>required</span> <span class="type-annotation"><a href="../image/Point-class.html">Point</a></span> <span class="parameter-name">bottomRight</span>, </span><span class="parameter" id="copyRectify-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="copyResize" class="callable">
+  <span class="name"><a href="../image/Command/copyResize.html">copyResize</a></span><span class="signature">(<wbr><span class="parameter" id="copyResize-param-width">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">width</span>, </span><span class="parameter" id="copyResize-param-height"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">height</span>, </span><span class="parameter" id="copyResize-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="copyResizeCropSquare" class="callable">
+  <span class="name"><a href="../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></span><span class="signature">(<wbr><span class="parameter" id="copyResizeCropSquare-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span><span class="parameter" id="copyResizeCropSquare-param-interpolation">{<span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="copyRotate" class="callable">
+  <span class="name"><a href="../image/Command/copyRotate.html">copyRotate</a></span><span class="signature">(<wbr><span class="parameter" id="copyRotate-param-angle"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span>, </span><span class="parameter" id="copyRotate-param-interpolation">{<span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="createImage" class="callable">
+  <span class="name"><a href="../image/Command/createImage.html">createImage</a></span><span class="signature">(<wbr><span class="parameter" id="createImage-param-width">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span>, </span><span class="parameter" id="createImage-param-height"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">height</span>, </span><span class="parameter" id="createImage-param-format"><span class="type-annotation"><a href="../image/Format.html">Format</a></span> <span class="parameter-name">format</span> = <span class="default-value">Format.uint8</span>, </span><span class="parameter" id="createImage-param-numChannels"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">numChannels</span> = <span class="default-value">3</span>, </span><span class="parameter" id="createImage-param-withPalette"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withPalette</span> = <span class="default-value">false</span>, </span><span class="parameter" id="createImage-param-paletteFormat"><span class="type-annotation"><a href="../image/Format.html">Format</a></span> <span class="parameter-name">paletteFormat</span> = <span class="default-value">Format.uint8</span>, </span><span class="parameter" id="createImage-param-palette"><span class="type-annotation"><a href="../image/Palette-class.html">Palette</a>?</span> <span class="parameter-name">palette</span>, </span><span class="parameter" id="createImage-param-exif"><span class="type-annotation"><a href="../image/ExifData-class.html">ExifData</a>?</span> <span class="parameter-name">exif</span>, </span><span class="parameter" id="createImage-param-iccp"><span class="type-annotation"><a href="../image/IccProfile-class.html">IccProfile</a>?</span> <span class="parameter-name">iccp</span>, </span><span class="parameter" id="createImage-param-textData"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">textData</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Create an Image.
+  
+
+</dd>
+
+        <dt id="decodeBmp" class="callable">
+  <span class="name"><a href="../image/Command/decodeBmp.html">decodeBmp</a></span><span class="signature">(<wbr><span class="parameter" id="decodeBmp-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeBmpFile" class="callable">
+  <span class="name"><a href="../image/Command/decodeBmpFile.html">decodeBmpFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeBmpFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeExr" class="callable">
+  <span class="name"><a href="../image/Command/decodeExr.html">decodeExr</a></span><span class="signature">(<wbr><span class="parameter" id="decodeExr-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeExrFile" class="callable">
+  <span class="name"><a href="../image/Command/decodeExrFile.html">decodeExrFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeExrFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeGif" class="callable">
+  <span class="name"><a href="../image/Command/decodeGif.html">decodeGif</a></span><span class="signature">(<wbr><span class="parameter" id="decodeGif-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeGifFile" class="callable">
+  <span class="name"><a href="../image/Command/decodeGifFile.html">decodeGifFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeGifFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeIco" class="callable">
+  <span class="name"><a href="../image/Command/decodeIco.html">decodeIco</a></span><span class="signature">(<wbr><span class="parameter" id="decodeIco-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeIcoFile" class="callable">
+  <span class="name"><a href="../image/Command/decodeIcoFile.html">decodeIcoFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeIcoFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeImage" class="callable">
+  <span class="name"><a href="../image/Command/decodeImage.html">decodeImage</a></span><span class="signature">(<wbr><span class="parameter" id="decodeImage-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeImageFile" class="callable">
+  <span class="name"><a href="../image/Command/decodeImageFile.html">decodeImageFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeImageFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeJpg" class="callable">
+  <span class="name"><a href="../image/Command/decodeJpg.html">decodeJpg</a></span><span class="signature">(<wbr><span class="parameter" id="decodeJpg-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeJpgFile" class="callable">
+  <span class="name"><a href="../image/Command/decodeJpgFile.html">decodeJpgFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeJpgFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeNamedImage" class="callable">
+  <span class="name"><a href="../image/Command/decodeNamedImage.html">decodeNamedImage</a></span><span class="signature">(<wbr><span class="parameter" id="decodeNamedImage-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="decodeNamedImage-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodePng" class="callable">
+  <span class="name"><a href="../image/Command/decodePng.html">decodePng</a></span><span class="signature">(<wbr><span class="parameter" id="decodePng-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodePngFile" class="callable">
+  <span class="name"><a href="../image/Command/decodePngFile.html">decodePngFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodePngFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodePsd" class="callable">
+  <span class="name"><a href="../image/Command/decodePsd.html">decodePsd</a></span><span class="signature">(<wbr><span class="parameter" id="decodePsd-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodePsdFile" class="callable">
+  <span class="name"><a href="../image/Command/decodePsdFile.html">decodePsdFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodePsdFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodePvr" class="callable">
+  <span class="name"><a href="../image/Command/decodePvr.html">decodePvr</a></span><span class="signature">(<wbr><span class="parameter" id="decodePvr-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodePvrFile" class="callable">
+  <span class="name"><a href="../image/Command/decodePvrFile.html">decodePvrFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodePvrFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeTga" class="callable">
+  <span class="name"><a href="../image/Command/decodeTga.html">decodeTga</a></span><span class="signature">(<wbr><span class="parameter" id="decodeTga-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeTgaFile" class="callable">
+  <span class="name"><a href="../image/Command/decodeTgaFile.html">decodeTgaFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeTgaFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeTiff" class="callable">
+  <span class="name"><a href="../image/Command/decodeTiff.html">decodeTiff</a></span><span class="signature">(<wbr><span class="parameter" id="decodeTiff-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeTiffFile" class="callable">
+  <span class="name"><a href="../image/Command/decodeTiffFile.html">decodeTiffFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeTiffFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeWebP" class="callable">
+  <span class="name"><a href="../image/Command/decodeWebP.html">decodeWebP</a></span><span class="signature">(<wbr><span class="parameter" id="decodeWebP-param-data"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a></span> <span class="parameter-name">data</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="decodeWebPFile" class="callable">
+  <span class="name"><a href="../image/Command/decodeWebPFile.html">decodeWebPFile</a></span><span class="signature">(<wbr><span class="parameter" id="decodeWebPFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="ditherImage" class="callable">
+  <span class="name"><a href="../image/Command/ditherImage.html">ditherImage</a></span><span class="signature">(<wbr><span class="parameter" id="ditherImage-param-quantizer">{<span class="type-annotation">Quantizer?</span> <span class="parameter-name">quantizer</span>, </span><span class="parameter" id="ditherImage-param-kernel"><span class="type-annotation"><a href="../image/DitherKernel.html">DitherKernel</a></span> <span class="parameter-name">kernel</span> = <span class="default-value">DitherKernel.floydSteinberg</span>, </span><span class="parameter" id="ditherImage-param-serpentine"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">serpentine</span> = <span class="default-value">false</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="dotScreen" class="callable">
+  <span class="name"><a href="../image/Command/dotScreen.html">dotScreen</a></span><span class="signature">(<wbr><span class="parameter" id="dotScreen-param-angle">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">angle</span> = <span class="default-value">180</span>, </span><span class="parameter" id="dotScreen-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">size</span> = <span class="default-value">5.75</span>, </span><span class="parameter" id="dotScreen-param-centerX"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span><span class="parameter" id="dotScreen-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span><span class="parameter" id="dotScreen-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="dotScreen-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="dotScreen-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="drawChar" class="callable">
+  <span class="name"><a href="../image/Command/drawChar.html">drawChar</a></span><span class="signature">(<wbr><span class="parameter" id="drawChar-param-char"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">char</span>, </span><span class="parameter" id="drawChar-param-font">{<span>required</span> <span class="type-annotation"><a href="../image/BitmapFont-class.html">BitmapFont</a></span> <span class="parameter-name">font</span>, </span><span class="parameter" id="drawChar-param-x"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="drawChar-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="drawChar-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>, </span><span class="parameter" id="drawChar-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="drawChar-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="drawCircle" class="callable">
+  <span class="name"><a href="../image/Command/drawCircle.html">drawCircle</a></span><span class="signature">(<wbr><span class="parameter" id="drawCircle-param-x">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="drawCircle-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="drawCircle-param-radius"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">radius</span>, </span><span class="parameter" id="drawCircle-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="drawCircle-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="drawCircle-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="drawLine" class="callable">
+  <span class="name"><a href="../image/Command/drawLine.html">drawLine</a></span><span class="signature">(<wbr><span class="parameter" id="drawLine-param-x1">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span><span class="parameter" id="drawLine-param-y1"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span><span class="parameter" id="drawLine-param-x2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span><span class="parameter" id="drawLine-param-y2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span><span class="parameter" id="drawLine-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="drawLine-param-antialias"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">antialias</span> = <span class="default-value">false</span>, </span><span class="parameter" id="drawLine-param-thickness"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">thickness</span> = <span class="default-value">1</span>, </span><span class="parameter" id="drawLine-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="drawLine-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="drawPixel" class="callable">
+  <span class="name"><a href="../image/Command/drawPixel.html">drawPixel</a></span><span class="signature">(<wbr><span class="parameter" id="drawPixel-param-x"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="drawPixel-param-y"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="drawPixel-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="drawPixel-param-mask">{<span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="drawPixel-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="drawPolygon" class="callable">
+  <span class="name"><a href="../image/Command/drawPolygon.html">drawPolygon</a></span><span class="signature">(<wbr><span class="parameter" id="drawPolygon-param-vertices">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Point-class.html">Point</a></span>&gt;</span></span> <span class="parameter-name">vertices</span>, </span><span class="parameter" id="drawPolygon-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="drawPolygon-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="drawPolygon-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="drawRect" class="callable">
+  <span class="name"><a href="../image/Command/drawRect.html">drawRect</a></span><span class="signature">(<wbr><span class="parameter" id="drawRect-param-x1">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span><span class="parameter" id="drawRect-param-y1"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span><span class="parameter" id="drawRect-param-x2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span><span class="parameter" id="drawRect-param-y2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span><span class="parameter" id="drawRect-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="drawRect-param-thickness"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">thickness</span> = <span class="default-value">1</span>, </span><span class="parameter" id="drawRect-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="drawRect-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="drawString" class="callable">
+  <span class="name"><a href="../image/Command/drawString.html">drawString</a></span><span class="signature">(<wbr><span class="parameter" id="drawString-param-string"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">string</span>, </span><span class="parameter" id="drawString-param-font">{<span>required</span> <span class="type-annotation"><a href="../image/BitmapFont-class.html">BitmapFont</a></span> <span class="parameter-name">font</span>, </span><span class="parameter" id="drawString-param-x"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="drawString-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="drawString-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>, </span><span class="parameter" id="drawString-param-wrap"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">wrap</span> = <span class="default-value">false</span>, </span><span class="parameter" id="drawString-param-rightJustify"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">rightJustify</span> = <span class="default-value">false</span>, </span><span class="parameter" id="drawString-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="drawString-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="dropShadow" class="callable">
+  <span class="name"><a href="../image/Command/dropShadow.html">dropShadow</a></span><span class="signature">(<wbr><span class="parameter" id="dropShadow-param-hShadow"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">hShadow</span>, </span><span class="parameter" id="dropShadow-param-vShadow"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">vShadow</span>, </span><span class="parameter" id="dropShadow-param-blur"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">blur</span>, </span><span class="parameter" id="dropShadow-param-shadowColor">{<span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">shadowColor</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="edgeGlow" class="callable">
+  <span class="name"><a href="../image/Command/edgeGlow.html">edgeGlow</a></span><span class="signature">(<wbr><span class="parameter" id="edgeGlow-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="edgeGlow-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="edgeGlow-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="emboss" class="callable">
+  <span class="name"><a href="../image/Command/emboss.html">emboss</a></span><span class="signature">(<wbr><span class="parameter" id="emboss-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="emboss-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="emboss-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeBmp" class="callable">
+  <span class="name"><a href="../image/Command/encodeBmp.html">encodeBmp</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeBmpFile" class="callable">
+  <span class="name"><a href="../image/Command/encodeBmpFile.html">encodeBmpFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeBmpFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeCur" class="callable">
+  <span class="name"><a href="../image/Command/encodeCur.html">encodeCur</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeCurFile" class="callable">
+  <span class="name"><a href="../image/Command/encodeCurFile.html">encodeCurFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeCurFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeGif" class="callable">
+  <span class="name"><a href="../image/Command/encodeGif.html">encodeGif</a></span><span class="signature">(<wbr><span class="parameter" id="encodeGif-param-samplingFactor">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">samplingFactor</span> = <span class="default-value">10</span>, </span><span class="parameter" id="encodeGif-param-dither"><span class="type-annotation"><a href="../image/DitherKernel.html">DitherKernel</a></span> <span class="parameter-name">dither</span> = <span class="default-value">DitherKernel.floydSteinberg</span>, </span><span class="parameter" id="encodeGif-param-ditherSerpentine"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">ditherSerpentine</span> = <span class="default-value">false</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeGifFile" class="callable">
+  <span class="name"><a href="../image/Command/encodeGifFile.html">encodeGifFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeGifFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeGifFile-param-samplingFactor">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">samplingFactor</span> = <span class="default-value">10</span>, </span><span class="parameter" id="encodeGifFile-param-dither"><span class="type-annotation"><a href="../image/DitherKernel.html">DitherKernel</a></span> <span class="parameter-name">dither</span> = <span class="default-value">DitherKernel.floydSteinberg</span>, </span><span class="parameter" id="encodeGifFile-param-ditherSerpentine"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">ditherSerpentine</span> = <span class="default-value">false</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeIco" class="callable">
+  <span class="name"><a href="../image/Command/encodeIco.html">encodeIco</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeIcoFile" class="callable">
+  <span class="name"><a href="../image/Command/encodeIcoFile.html">encodeIcoFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeIcoFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeJpg" class="callable">
+  <span class="name"><a href="../image/Command/encodeJpg.html">encodeJpg</a></span><span class="signature">(<wbr><span class="parameter" id="encodeJpg-param-quality">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">quality</span> = <span class="default-value">100</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeJpgFile" class="callable">
+  <span class="name"><a href="../image/Command/encodeJpgFile.html">encodeJpgFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeJpgFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodeJpgFile-param-quality">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">quality</span> = <span class="default-value">100</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodePng" class="callable">
+  <span class="name"><a href="../image/Command/encodePng.html">encodePng</a></span><span class="signature">(<wbr><span class="parameter" id="encodePng-param-level">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">level</span> = <span class="default-value">6</span>, </span><span class="parameter" id="encodePng-param-filter"><span class="type-annotation"><a href="../image/PngFilter.html">PngFilter</a></span> <span class="parameter-name">filter</span> = <span class="default-value">PngFilter.paeth</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodePngFile" class="callable">
+  <span class="name"><a href="../image/Command/encodePngFile.html">encodePngFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodePngFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span>, </span><span class="parameter" id="encodePngFile-param-level">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">level</span> = <span class="default-value">6</span>, </span><span class="parameter" id="encodePngFile-param-filter"><span class="type-annotation"><a href="../image/PngFilter.html">PngFilter</a></span> <span class="parameter-name">filter</span> = <span class="default-value">PngFilter.paeth</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodePvr" class="callable">
+  <span class="name"><a href="../image/Command/encodePvr.html">encodePvr</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodePvrFile" class="callable">
+  <span class="name"><a href="../image/Command/encodePvrFile.html">encodePvrFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodePvrFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeTga" class="callable">
+  <span class="name"><a href="../image/Command/encodeTga.html">encodeTga</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeTgaFile" class="callable">
+  <span class="name"><a href="../image/Command/encodeTgaFile.html">encodeTgaFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeTgaFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeTiff" class="callable">
+  <span class="name"><a href="../image/Command/encodeTiff.html">encodeTiff</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="encodeTiffFile" class="callable">
+  <span class="name"><a href="../image/Command/encodeTiffFile.html">encodeTiffFile</a></span><span class="signature">(<wbr><span class="parameter" id="encodeTiffFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="execute" class="callable">
+  <span class="name"><a href="../image/Command/execute.html">execute</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Command-class.html">Command</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="executeCommand" class="callable">
+  <span class="name"><a href="../image/Command/executeCommand.html">executeCommand</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="executeIfDirty" class="callable">
+  <span class="name"><a href="../image/Command/executeIfDirty.html">executeIfDirty</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="executeThread" class="callable">
+  <span class="name"><a href="../image/Command/executeThread.html">executeThread</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Command-class.html">Command</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="fill" class="callable">
+  <span class="name"><a href="../image/Command/fill.html">fill</a></span><span class="signature">(<wbr><span class="parameter" id="fill-param-color">{<span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="fill-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="fill-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="fillCircle" class="callable">
+  <span class="name"><a href="../image/Command/fillCircle.html">fillCircle</a></span><span class="signature">(<wbr><span class="parameter" id="fillCircle-param-x">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="fillCircle-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="fillCircle-param-radius"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">radius</span>, </span><span class="parameter" id="fillCircle-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="fillCircle-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="fillCircle-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="fillFlood" class="callable">
+  <span class="name"><a href="../image/Command/fillFlood.html">fillFlood</a></span><span class="signature">(<wbr><span class="parameter" id="fillFlood-param-x">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x</span>, </span><span class="parameter" id="fillFlood-param-y"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y</span>, </span><span class="parameter" id="fillFlood-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="fillFlood-param-threshold"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.0</span>, </span><span class="parameter" id="fillFlood-param-compareAlpha"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">compareAlpha</span> = <span class="default-value">false</span>, </span><span class="parameter" id="fillFlood-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="fillFlood-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="fillPolygon" class="callable">
+  <span class="name"><a href="../image/Command/fillPolygon.html">fillPolygon</a></span><span class="signature">(<wbr><span class="parameter" id="fillPolygon-param-vertices">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Point-class.html">Point</a></span>&gt;</span></span> <span class="parameter-name">vertices</span>, </span><span class="parameter" id="fillPolygon-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="fillPolygon-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="fillPolygon-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="fillRect" class="callable">
+  <span class="name"><a href="../image/Command/fillRect.html">fillRect</a></span><span class="signature">(<wbr><span class="parameter" id="fillRect-param-x1">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x1</span>, </span><span class="parameter" id="fillRect-param-y1"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y1</span>, </span><span class="parameter" id="fillRect-param-x2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">x2</span>, </span><span class="parameter" id="fillRect-param-y2"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">y2</span>, </span><span class="parameter" id="fillRect-param-color"><span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">color</span>, </span><span class="parameter" id="fillRect-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="fillRect-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="filter" class="callable">
+  <span class="name"><a href="../image/Command/filter.html">filter</a></span><span class="signature">(<wbr><span class="parameter" id="filter-param-filter"><span class="type-annotation">FilterFunction</span> <span class="parameter-name">filter</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Run an arbitrary function on the image within the Command graph.
+A FilterFunction is in the <code>form Image function(Image)</code>. A new Image
+can be returned, replacing the given Image; or the given Image can be
+returned.
+  
+
+</dd>
+
+        <dt id="flip" class="callable">
+  <span class="name"><a href="../image/Command/flip.html">flip</a></span><span class="signature">(<wbr><span class="parameter" id="flip-param-direction"><span class="type-annotation"><a href="../image/FlipDirection.html">FlipDirection</a></span> <span class="parameter-name">direction</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="gamma" class="callable">
+  <span class="name"><a href="../image/Command/gamma.html">gamma</a></span><span class="signature">(<wbr><span class="parameter" id="gamma-param-gamma">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">gamma</span>, </span><span class="parameter" id="gamma-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="gamma-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="gaussianBlur" class="callable">
+  <span class="name"><a href="../image/Command/gaussianBlur.html">gaussianBlur</a></span><span class="signature">(<wbr><span class="parameter" id="gaussianBlur-param-radius">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">radius</span>, </span><span class="parameter" id="gaussianBlur-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="gaussianBlur-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getBytes" class="callable">
+  <span class="name"><a href="../image/Command/getBytes.html">getBytes</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getBytesThread" class="callable">
+  <span class="name"><a href="../image/Command/getBytesThread.html">getBytesThread</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-typed_data/Uint8List-class.html">Uint8List</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getImage" class="callable">
+  <span class="name"><a href="../image/Command/getImage.html">getImage</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="getImageThread" class="callable">
+  <span class="name"><a href="../image/Command/getImageThread.html">getImageThread</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../image/Image-class.html">Image</a>?</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="grayscale" class="callable">
+  <span class="name"><a href="../image/Command/grayscale.html">grayscale</a></span><span class="signature">(<wbr><span class="parameter" id="grayscale-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="grayscale-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="grayscale-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="hdrToLdr" class="callable">
+  <span class="name"><a href="../image/Command/hdrToLdr.html">hdrToLdr</a></span><span class="signature">(<wbr><span class="parameter" id="hdrToLdr-param-exposure">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a>?</span> <span class="parameter-name">exposure</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="hexagonPixelate" class="callable">
+  <span class="name"><a href="../image/Command/hexagonPixelate.html">hexagonPixelate</a></span><span class="signature">(<wbr><span class="parameter" id="hexagonPixelate-param-centerX">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span><span class="parameter" id="hexagonPixelate-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span><span class="parameter" id="hexagonPixelate-param-size"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span> = <span class="default-value">5</span>, </span><span class="parameter" id="hexagonPixelate-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="hexagonPixelate-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="hexagonPixelate-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="image" class="callable">
+  <span class="name"><a href="../image/Command/image.html">image</a></span><span class="signature">(<wbr><span class="parameter" id="image-param-image"><span class="type-annotation"><a href="../image/Image-class.html">Image</a></span> <span class="parameter-name">image</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Use a specific Image.
+  
+
+</dd>
+
+        <dt id="invert" class="callable">
+  <span class="name"><a href="../image/Command/invert.html">invert</a></span><span class="signature">(<wbr><span class="parameter" id="invert-param-mask">{<span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="invert-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="luminanceThreshold" class="callable">
+  <span class="name"><a href="../image/Command/luminanceThreshold.html">luminanceThreshold</a></span><span class="signature">(<wbr><span class="parameter" id="luminanceThreshold-param-threshold">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">threshold</span> = <span class="default-value">0.5</span>, </span><span class="parameter" id="luminanceThreshold-param-outputColor"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">outputColor</span> = <span class="default-value">false</span>, </span><span class="parameter" id="luminanceThreshold-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="luminanceThreshold-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="luminanceThreshold-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="monochrome" class="callable">
+  <span class="name"><a href="../image/Command/monochrome.html">monochrome</a></span><span class="signature">(<wbr><span class="parameter" id="monochrome-param-color">{<span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>, </span><span class="parameter" id="monochrome-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="monochrome-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="monochrome-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="noise" class="callable">
+  <span class="name"><a href="../image/Command/noise.html">noise</a></span><span class="signature">(<wbr><span class="parameter" id="noise-param-sigma"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">sigma</span>, </span><span class="parameter" id="noise-param-type">{<span class="type-annotation"><a href="../image/NoiseType.html">NoiseType</a></span> <span class="parameter-name">type</span> = <span class="default-value">NoiseType.gaussian</span>, </span><span class="parameter" id="noise-param-random"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-math/Random-class.html">Random</a>?</span> <span class="parameter-name">random</span>, </span><span class="parameter" id="noise-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="noise-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="normalize" class="callable">
+  <span class="name"><a href="../image/Command/normalize.html">normalize</a></span><span class="signature">(<wbr><span class="parameter" id="normalize-param-min">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">min</span>, </span><span class="parameter" id="normalize-param-max"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">max</span>, </span><span class="parameter" id="normalize-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="normalize-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="noSuchMethod" class="callable inherited">
+  <span class="name"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
+    <span class="returntype parameter">&#8594; dynamic</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Invoked when a non-existent method or property is accessed.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="pixelate" class="callable">
+  <span class="name"><a href="../image/Command/pixelate.html">pixelate</a></span><span class="signature">(<wbr><span class="parameter" id="pixelate-param-size">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">size</span>, </span><span class="parameter" id="pixelate-param-mode"><span class="type-annotation"><a href="../image/PixelateMode.html">PixelateMode</a></span> <span class="parameter-name">mode</span> = <span class="default-value">PixelateMode.upperLeft</span>, </span><span class="parameter" id="pixelate-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="pixelate-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="quantize" class="callable">
+  <span class="name"><a href="../image/Command/quantize.html">quantize</a></span><span class="signature">(<wbr><span class="parameter" id="quantize-param-numberOfColors">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">numberOfColors</span> = <span class="default-value">256</span>, </span><span class="parameter" id="quantize-param-method"><span class="type-annotation"><a href="../image/QuantizeMethod.html">QuantizeMethod</a></span> <span class="parameter-name">method</span> = <span class="default-value">QuantizeMethod.neuralNet</span>, </span><span class="parameter" id="quantize-param-dither"><span class="type-annotation"><a href="../image/DitherKernel.html">DitherKernel</a></span> <span class="parameter-name">dither</span> = <span class="default-value">DitherKernel.none</span>, </span><span class="parameter" id="quantize-param-ditherSerpentine"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">ditherSerpentine</span> = <span class="default-value">false</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="reinhardTonemap" class="callable">
+  <span class="name"><a href="../image/Command/reinhardTonemap.html">reinhardTonemap</a></span><span class="signature">(<wbr><span class="parameter" id="reinhardTonemap-param-mask">{<span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="reinhardTonemap-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="remapColors" class="callable">
+  <span class="name"><a href="../image/Command/remapColors.html">remapColors</a></span><span class="signature">(<wbr><span class="parameter" id="remapColors-param-red">{<span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">red</span> = <span class="default-value">Channel.red</span>, </span><span class="parameter" id="remapColors-param-green"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">green</span> = <span class="default-value">Channel.green</span>, </span><span class="parameter" id="remapColors-param-blue"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">blue</span> = <span class="default-value">Channel.blue</span>, </span><span class="parameter" id="remapColors-param-alpha"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">alpha</span> = <span class="default-value">Channel.alpha</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="scaleRgba" class="callable">
+  <span class="name"><a href="../image/Command/scaleRgba.html">scaleRgba</a></span><span class="signature">(<wbr><span class="parameter" id="scaleRgba-param-scale">{<span>required</span> <span class="type-annotation"><a href="../image/Color-class.html">Color</a></span> <span class="parameter-name">scale</span>, </span><span class="parameter" id="scaleRgba-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="scaleRgba-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="separableConvolution" class="callable">
+  <span class="name"><a href="../image/Command/separableConvolution.html">separableConvolution</a></span><span class="signature">(<wbr><span class="parameter" id="separableConvolution-param-kernel">{<span>required</span> <span class="type-annotation"><a href="../image/SeparableKernel-class.html">SeparableKernel</a></span> <span class="parameter-name">kernel</span>, </span><span class="parameter" id="separableConvolution-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="separableConvolution-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="sepia" class="callable">
+  <span class="name"><a href="../image/Command/sepia.html">sepia</a></span><span class="signature">(<wbr><span class="parameter" id="sepia-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="sepia-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="sepia-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="setDirty" class="callable">
+  <span class="name"><a href="../image/Command/setDirty.html">setDirty</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="sketch" class="callable">
+  <span class="name"><a href="../image/Command/sketch.html">sketch</a></span><span class="signature">(<wbr><span class="parameter" id="sketch-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="sketch-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="sketch-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="smooth" class="callable">
+  <span class="name"><a href="../image/Command/smooth.html">smooth</a></span><span class="signature">(<wbr><span class="parameter" id="smooth-param-weight">{<span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">weight</span>, </span><span class="parameter" id="smooth-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="smooth-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="sobel" class="callable">
+  <span class="name"><a href="../image/Command/sobel.html">sobel</a></span><span class="signature">(<wbr><span class="parameter" id="sobel-param-amount">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">1</span>, </span><span class="parameter" id="sobel-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="sobel-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="stretchDistortion" class="callable">
+  <span class="name"><a href="../image/Command/stretchDistortion.html">stretchDistortion</a></span><span class="signature">(<wbr><span class="parameter" id="stretchDistortion-param-centerX">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerX</span>, </span><span class="parameter" id="stretchDistortion-param-centerY"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">centerY</span>, </span><span class="parameter" id="stretchDistortion-param-interpolation"><span class="type-annotation"><a href="../image/Interpolation.html">Interpolation</a></span> <span class="parameter-name">interpolation</span> = <span class="default-value">Interpolation.nearest</span>, </span><span class="parameter" id="stretchDistortion-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="stretchDistortion-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="toString" class="callable inherited">
+  <span class="name"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  A string representation of this object.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="trim" class="callable">
+  <span class="name"><a href="../image/Command/trim.html">trim</a></span><span class="signature">(<wbr><span class="parameter" id="trim-param-mode">{<span class="type-annotation"><a href="../image/TrimMode.html">TrimMode</a></span> <span class="parameter-name">mode</span> = <span class="default-value">TrimMode.transparent</span>, </span><span class="parameter" id="trim-param-sides"><span class="type-annotation"><a href="../image/Trim-class.html">Trim</a></span> <span class="parameter-name">sides</span> = <span class="default-value">Trim.all</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="vignette" class="callable">
+  <span class="name"><a href="../image/Command/vignette.html">vignette</a></span><span class="signature">(<wbr><span class="parameter" id="vignette-param-start">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">start</span> = <span class="default-value">0.3</span>, </span><span class="parameter" id="vignette-param-end"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">end</span> = <span class="default-value">0.75</span>, </span><span class="parameter" id="vignette-param-color"><span class="type-annotation"><a href="../image/Color-class.html">Color</a>?</span> <span class="parameter-name">color</span>, </span><span class="parameter" id="vignette-param-amount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">amount</span> = <span class="default-value">0.8</span>, </span><span class="parameter" id="vignette-param-mask"><span class="type-annotation"><a href="../image/Command-class.html">Command</a>?</span> <span class="parameter-name">mask</span>, </span><span class="parameter" id="vignette-param-maskChannel"><span class="type-annotation"><a href="../image/Channel.html">Channel</a></span> <span class="parameter-name">maskChannel</span> = <span class="default-value">Channel.luminance</span>}</span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+        <dt id="writeToFile" class="callable">
+  <span class="name"><a href="../image/Command/writeToFile.html">writeToFile</a></span><span class="signature">(<wbr><span class="parameter" id="writeToFile-param-path"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span> <span class="parameter-name">path</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  
+  
+
+</dd>
+
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor inherited"
+      id="operators">
+    <h2>Operators</h2>
+    <dl class="callables">
+        <dt id="operator ==" class="callable inherited">
+  <span class="name"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  The equality operator.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+    
+    
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../index.html">image</a></li>
+  <li><a href="../image/image-library.html">image</a></li>
+  <li class="self-crumb">Command class</li>
+</ol>
+
+
+    <h5>image library</h5>
+    <ol>
+      <li class="section-title"><a href="../image/image-library.html#classes">Classes</a></li>
+        <li><a href="../image/BitmapFont-class.html">BitmapFont</a></li>
+        <li><a href="../image/BitmapFontCharacter-class.html">BitmapFontCharacter</a></li>
+        <li><a href="../image/BmpDecoder-class.html">BmpDecoder</a></li>
+        <li><a href="../image/BmpEncoder-class.html">BmpEncoder</a></li>
+        <li><a href="../image/ChannelIterator-class.html">ChannelIterator</a></li>
+        <li><a href="../image/Color-class.html">Color</a></li>
+        <li><a href="../image/ColorFloat16-class.html">ColorFloat16</a></li>
+        <li><a href="../image/ColorFloat32-class.html">ColorFloat32</a></li>
+        <li><a href="../image/ColorFloat64-class.html">ColorFloat64</a></li>
+        <li><a href="../image/ColorInt16-class.html">ColorInt16</a></li>
+        <li><a href="../image/ColorInt32-class.html">ColorInt32</a></li>
+        <li><a href="../image/ColorInt8-class.html">ColorInt8</a></li>
+        <li><a href="../image/ColorRgb8-class.html">ColorRgb8</a></li>
+        <li><a href="../image/ColorRgba8-class.html">ColorRgba8</a></li>
+        <li><a href="../image/ColorUint1-class.html">ColorUint1</a></li>
+        <li><a href="../image/ColorUint16-class.html">ColorUint16</a></li>
+        <li><a href="../image/ColorUint2-class.html">ColorUint2</a></li>
+        <li><a href="../image/ColorUint32-class.html">ColorUint32</a></li>
+        <li><a href="../image/ColorUint4-class.html">ColorUint4</a></li>
+        <li><a href="../image/ColorUint8-class.html">ColorUint8</a></li>
+        <li><a href="../image/Command-class.html">Command</a></li>
+        <li><a href="../image/DecodeInfo-class.html">DecodeInfo</a></li>
+        <li><a href="../image/Decoder-class.html">Decoder</a></li>
+        <li><a href="../image/DibDecoder-class.html">DibDecoder</a></li>
+        <li><a href="../image/Encoder-class.html">Encoder</a></li>
+        <li><a href="../image/ExifData-class.html">ExifData</a></li>
+        <li><a href="../image/ExifTag-class.html">ExifTag</a></li>
+        <li><a href="../image/ExifUndefinedValue-class.html">ExifUndefinedValue</a></li>
+        <li><a href="../image/ExrDecoder-class.html">ExrDecoder</a></li>
+        <li><a href="../image/ExrImage-class.html">ExrImage</a></li>
+        <li><a href="../image/Float16-class.html">Float16</a></li>
+        <li><a href="../image/GifColorMap-class.html">GifColorMap</a></li>
+        <li><a href="../image/GifDecoder-class.html">GifDecoder</a></li>
+        <li><a href="../image/GifEncoder-class.html">GifEncoder</a></li>
+        <li><a href="../image/GifImageDesc-class.html">GifImageDesc</a></li>
+        <li><a href="../image/GifInfo-class.html">GifInfo</a></li>
+        <li><a href="../image/IccProfile-class.html">IccProfile</a></li>
+        <li><a href="../image/IcoBmpInfo-class.html">IcoBmpInfo</a></li>
+        <li><a href="../image/IcoDecoder-class.html">IcoDecoder</a></li>
+        <li><a href="../image/IcoInfo-class.html">IcoInfo</a></li>
+        <li><a href="../image/IcoInfoImage-class.html">IcoInfoImage</a></li>
+        <li><a href="../image/IfdAsciiValue-class.html">IfdAsciiValue</a></li>
+        <li><a href="../image/IfdByteValue-class.html">IfdByteValue</a></li>
+        <li><a href="../image/IfdContainer-class.html">IfdContainer</a></li>
+        <li><a href="../image/IfdDirectory-class.html">IfdDirectory</a></li>
+        <li><a href="../image/IfdDoubleValue-class.html">IfdDoubleValue</a></li>
+        <li><a href="../image/IfdLongValue-class.html">IfdLongValue</a></li>
+        <li><a href="../image/IfdRationalValue-class.html">IfdRationalValue</a></li>
+        <li><a href="../image/IfdSByteValue-class.html">IfdSByteValue</a></li>
+        <li><a href="../image/IfdShortValue-class.html">IfdShortValue</a></li>
+        <li><a href="../image/IfdSingleValue-class.html">IfdSingleValue</a></li>
+        <li><a href="../image/IfdSLongValue-class.html">IfdSLongValue</a></li>
+        <li><a href="../image/IfdSRationalValue-class.html">IfdSRationalValue</a></li>
+        <li><a href="../image/IfdSShortValue-class.html">IfdSShortValue</a></li>
+        <li><a href="../image/IfdValue-class.html">IfdValue</a></li>
+        <li><a href="../image/Image-class.html">Image</a></li>
+        <li><a href="../image/ImageData-class.html">ImageData</a></li>
+        <li><a href="../image/ImageDataFloat16-class.html">ImageDataFloat16</a></li>
+        <li><a href="../image/ImageDataFloat32-class.html">ImageDataFloat32</a></li>
+        <li><a href="../image/ImageDataFloat64-class.html">ImageDataFloat64</a></li>
+        <li><a href="../image/ImageDataInt16-class.html">ImageDataInt16</a></li>
+        <li><a href="../image/ImageDataInt32-class.html">ImageDataInt32</a></li>
+        <li><a href="../image/ImageDataInt8-class.html">ImageDataInt8</a></li>
+        <li><a href="../image/ImageDataUint1-class.html">ImageDataUint1</a></li>
+        <li><a href="../image/ImageDataUint16-class.html">ImageDataUint16</a></li>
+        <li><a href="../image/ImageDataUint2-class.html">ImageDataUint2</a></li>
+        <li><a href="../image/ImageDataUint32-class.html">ImageDataUint32</a></li>
+        <li><a href="../image/ImageDataUint4-class.html">ImageDataUint4</a></li>
+        <li><a href="../image/ImageDataUint8-class.html">ImageDataUint8</a></li>
+        <li><a href="../image/InputBuffer-class.html">InputBuffer</a></li>
+        <li><a href="../image/JpegDecoder-class.html">JpegDecoder</a></li>
+        <li><a href="../image/JpegEncoder-class.html">JpegEncoder</a></li>
+        <li><a href="../image/JpegInfo-class.html">JpegInfo</a></li>
+        <li><a href="../image/NeuralQuantizer-class.html">NeuralQuantizer</a></li>
+        <li><a href="../image/OctreeQuantizer-class.html">OctreeQuantizer</a></li>
+        <li><a href="../image/OutputBuffer-class.html">OutputBuffer</a></li>
+        <li><a href="../image/Palette-class.html">Palette</a></li>
+        <li><a href="../image/PaletteFloat16-class.html">PaletteFloat16</a></li>
+        <li><a href="../image/PaletteFloat32-class.html">PaletteFloat32</a></li>
+        <li><a href="../image/PaletteFloat64-class.html">PaletteFloat64</a></li>
+        <li><a href="../image/PaletteInt16-class.html">PaletteInt16</a></li>
+        <li><a href="../image/PaletteInt32-class.html">PaletteInt32</a></li>
+        <li><a href="../image/PaletteInt8-class.html">PaletteInt8</a></li>
+        <li><a href="../image/PaletteUint16-class.html">PaletteUint16</a></li>
+        <li><a href="../image/PaletteUint32-class.html">PaletteUint32</a></li>
+        <li><a href="../image/PaletteUint8-class.html">PaletteUint8</a></li>
+        <li><a href="../image/PaletteUndefined-class.html">PaletteUndefined</a></li>
+        <li><a href="../image/Pixel-class.html">Pixel</a></li>
+        <li><a href="../image/PixelFloat16-class.html">PixelFloat16</a></li>
+        <li><a href="../image/PixelFloat32-class.html">PixelFloat32</a></li>
+        <li><a href="../image/PixelFloat64-class.html">PixelFloat64</a></li>
+        <li><a href="../image/PixelInt16-class.html">PixelInt16</a></li>
+        <li><a href="../image/PixelInt32-class.html">PixelInt32</a></li>
+        <li><a href="../image/PixelInt8-class.html">PixelInt8</a></li>
+        <li><a href="../image/PixelRangeIterator-class.html">PixelRangeIterator</a></li>
+        <li><a href="../image/PixelUint1-class.html">PixelUint1</a></li>
+        <li><a href="../image/PixelUint16-class.html">PixelUint16</a></li>
+        <li><a href="../image/PixelUint2-class.html">PixelUint2</a></li>
+        <li><a href="../image/PixelUint32-class.html">PixelUint32</a></li>
+        <li><a href="../image/PixelUint4-class.html">PixelUint4</a></li>
+        <li><a href="../image/PixelUint8-class.html">PixelUint8</a></li>
+        <li><a href="../image/PixelUndefined-class.html">PixelUndefined</a></li>
+        <li><a href="../image/PngColorType-class.html">PngColorType</a></li>
+        <li><a href="../image/PngDecoder-class.html">PngDecoder</a></li>
+        <li><a href="../image/PngEncoder-class.html">PngEncoder</a></li>
+        <li><a href="../image/PngFrame-class.html">PngFrame</a></li>
+        <li><a href="../image/PngInfo-class.html">PngInfo</a></li>
+        <li><a href="../image/Point-class.html">Point</a></li>
+        <li><a href="../image/PsdDecoder-class.html">PsdDecoder</a></li>
+        <li><a href="../image/PsdImage-class.html">PsdImage</a></li>
+        <li><a href="../image/Pvr2Info-class.html">Pvr2Info</a></li>
+        <li><a href="../image/Pvr3Info-class.html">Pvr3Info</a></li>
+        <li><a href="../image/PvrAppleInfo-class.html">PvrAppleInfo</a></li>
+        <li><a href="../image/PvrDecoder-class.html">PvrDecoder</a></li>
+        <li><a href="../image/PvrEncoder-class.html">PvrEncoder</a></li>
+        <li><a href="../image/SeparableKernel-class.html">SeparableKernel</a></li>
+        <li><a href="../image/TgaDecoder-class.html">TgaDecoder</a></li>
+        <li><a href="../image/TgaEncoder-class.html">TgaEncoder</a></li>
+        <li><a href="../image/TgaInfo-class.html">TgaInfo</a></li>
+        <li><a href="../image/TiffCompression-class.html">TiffCompression</a></li>
+        <li><a href="../image/TiffDecoder-class.html">TiffDecoder</a></li>
+        <li><a href="../image/TiffEncoder-class.html">TiffEncoder</a></li>
+        <li><a href="../image/TiffImage-class.html">TiffImage</a></li>
+        <li><a href="../image/TiffInfo-class.html">TiffInfo</a></li>
+        <li><a href="../image/Trim-class.html">Trim</a></li>
+        <li><a href="../image/WebPDecoder-class.html">WebPDecoder</a></li>
+        <li><a href="../image/WebPInfo-class.html">WebPInfo</a></li>
+
+
+
+      <li class="section-title"><a href="../image/image-library.html#constants">Constants</a></li>
+        <li><a href="../image/exifTagNameToID-constant.html">exifTagNameToID</a></li>
+        <li><a href="../image/formatMaxValue-constant.html">formatMaxValue</a></li>
+        <li><a href="../image/formatSize-constant.html">formatSize</a></li>
+        <li><a href="../image/formatToFormatType-constant.html">formatToFormatType</a></li>
+        <li><a href="../image/ifdValueTypeSize-constant.html">ifdValueTypeSize</a></li>
+        <li><a href="../image/ifdValueTypeString-constant.html">ifdValueTypeString</a></li>
+
+      <li class="section-title"><a href="../image/image-library.html#properties">Properties</a></li>
+        <li><a href="../image/arial14.html">arial14</a></li>
+        <li><a href="../image/arial24.html">arial24</a></li>
+        <li><a href="../image/arial48.html">arial48</a></li>
+        <li><a href="../image/exifGpsTags.html">exifGpsTags</a></li>
+        <li><a href="../image/exifImageTags.html">exifImageTags</a></li>
+        <li><a href="../image/exifInteropTags.html">exifInteropTags</a></li>
+
+      <li class="section-title"><a href="../image/image-library.html#functions">Functions</a></li>
+        <li><a href="../image/adjustColor.html">adjustColor</a></li>
+        <li><a href="../image/bakeOrientation.html">bakeOrientation</a></li>
+        <li><a href="../image/billboard.html">billboard</a></li>
+        <li><a href="../image/bleachBypass.html">bleachBypass</a></li>
+        <li><a href="../image/bulgeDistortion.html">bulgeDistortion</a></li>
+        <li><a href="../image/bumpToNormal.html">bumpToNormal</a></li>
+        <li><a href="../image/chromaticAberration.html">chromaticAberration</a></li>
+        <li><a href="../image/clipLine.html">clipLine</a></li>
+        <li><a href="../image/cmykToRgb.html">cmykToRgb</a></li>
+        <li><a href="../image/colorHalftone.html">colorHalftone</a></li>
+        <li><a href="../image/colorOffset.html">colorOffset</a></li>
+        <li><a href="../image/compositeImage.html">compositeImage</a></li>
+        <li><a href="../image/contrast.html">contrast</a></li>
+        <li><a href="../image/convertColor.html">convertColor</a></li>
+        <li><a href="../image/convertFormatValue.html">convertFormatValue</a></li>
+        <li><a href="../image/convolution.html">convolution</a></li>
+        <li><a href="../image/copyCrop.html">copyCrop</a></li>
+        <li><a href="../image/copyCropCircle.html">copyCropCircle</a></li>
+        <li><a href="../image/copyFlip.html">copyFlip</a></li>
+        <li><a href="../image/copyImageChannels.html">copyImageChannels</a></li>
+        <li><a href="../image/copyRectify.html">copyRectify</a></li>
+        <li><a href="../image/copyResize.html">copyResize</a></li>
+        <li><a href="../image/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
+        <li><a href="../image/copyRotate.html">copyRotate</a></li>
+        <li><a href="../image/crand.html">crand</a></li>
+        <li><a href="../image/decodeBmp.html">decodeBmp</a></li>
+        <li><a href="../image/decodeBmpFile.html">decodeBmpFile</a></li>
+        <li><a href="../image/decodeExr.html">decodeExr</a></li>
+        <li><a href="../image/decodeExrFile.html">decodeExrFile</a></li>
+        <li><a href="../image/decodeGif.html">decodeGif</a></li>
+        <li><a href="../image/decodeGifFile.html">decodeGifFile</a></li>
+        <li><a href="../image/decodeIco.html">decodeIco</a></li>
+        <li><a href="../image/decodeIcoFile.html">decodeIcoFile</a></li>
+        <li><a href="../image/decodeImage.html">decodeImage</a></li>
+        <li><a href="../image/decodeImageFile.html">decodeImageFile</a></li>
+        <li><a href="../image/decodeJpg.html">decodeJpg</a></li>
+        <li><a href="../image/decodeJpgFile.html">decodeJpgFile</a></li>
+        <li><a href="../image/decodePng.html">decodePng</a></li>
+        <li><a href="../image/decodePngFile.html">decodePngFile</a></li>
+        <li><a href="../image/decodePsd.html">decodePsd</a></li>
+        <li><a href="../image/decodePsdFile.html">decodePsdFile</a></li>
+        <li><a href="../image/decodePvr.html">decodePvr</a></li>
+        <li><a href="../image/decodePvrFile.html">decodePvrFile</a></li>
+        <li><a href="../image/decodeTga.html">decodeTga</a></li>
+        <li><a href="../image/decodeTgaFile.html">decodeTgaFile</a></li>
+        <li><a href="../image/decodeTiff.html">decodeTiff</a></li>
+        <li><a href="../image/decodeTiffFile.html">decodeTiffFile</a></li>
+        <li><a href="../image/decodeWebP.html">decodeWebP</a></li>
+        <li><a href="../image/decodeWebPFile.html">decodeWebPFile</a></li>
+        <li><a href="../image/ditherImage.html">ditherImage</a></li>
+        <li><a href="../image/dotScreen.html">dotScreen</a></li>
+        <li><a href="../image/drawChar.html">drawChar</a></li>
+        <li><a href="../image/drawCircle.html">drawCircle</a></li>
+        <li><a href="../image/drawLine.html">drawLine</a></li>
+        <li><a href="../image/drawPixel.html">drawPixel</a></li>
+        <li><a href="../image/drawPolygon.html">drawPolygon</a></li>
+        <li><a href="../image/drawRect.html">drawRect</a></li>
+        <li><a href="../image/drawString.html">drawString</a></li>
+        <li><a href="../image/dropShadow.html">dropShadow</a></li>
+        <li><a href="../image/edgeGlow.html">edgeGlow</a></li>
+        <li><a href="../image/emboss.html">emboss</a></li>
+        <li><a href="../image/encodeBmp.html">encodeBmp</a></li>
+        <li><a href="../image/encodeBmpFile.html">encodeBmpFile</a></li>
+        <li><a href="../image/encodeCur.html">encodeCur</a></li>
+        <li><a href="../image/encodeCurFile.html">encodeCurFile</a></li>
+        <li><a href="../image/encodeGif.html">encodeGif</a></li>
+        <li><a href="../image/encodeGifFile.html">encodeGifFile</a></li>
+        <li><a href="../image/encodeIco.html">encodeIco</a></li>
+        <li><a href="../image/encodeIcoFile.html">encodeIcoFile</a></li>
+        <li><a href="../image/encodeImageFile.html">encodeImageFile</a></li>
+        <li><a href="../image/encodeJpg.html">encodeJpg</a></li>
+        <li><a href="../image/encodeJpgFile.html">encodeJpgFile</a></li>
+        <li><a href="../image/encodeNamedImage.html">encodeNamedImage</a></li>
+        <li><a href="../image/encodePng.html">encodePng</a></li>
+        <li><a href="../image/encodePngFile.html">encodePngFile</a></li>
+        <li><a href="../image/encodePvr.html">encodePvr</a></li>
+        <li><a href="../image/encodePvrFile.html">encodePvrFile</a></li>
+        <li><a href="../image/encodeTga.html">encodeTga</a></li>
+        <li><a href="../image/encodeTgaFile.html">encodeTgaFile</a></li>
+        <li><a href="../image/encodeTiff.html">encodeTiff</a></li>
+        <li><a href="../image/encodeTiffFile.html">encodeTiffFile</a></li>
+        <li><a href="../image/executeCommandAsync.html">executeCommandAsync</a></li>
+        <li><a href="../image/executeCommandBytes.html">executeCommandBytes</a></li>
+        <li><a href="../image/executeCommandBytesAsync.html">executeCommandBytesAsync</a></li>
+        <li><a href="../image/executeCommandImage.html">executeCommandImage</a></li>
+        <li><a href="../image/executeCommandImageAsync.html">executeCommandImageAsync</a></li>
+        <li><a href="../image/fill.html">fill</a></li>
+        <li><a href="../image/fillCircle.html">fillCircle</a></li>
+        <li><a href="../image/fillFlood.html">fillFlood</a></li>
+        <li><a href="../image/fillPolygon.html">fillPolygon</a></li>
+        <li><a href="../image/fillRect.html">fillRect</a></li>
+        <li><a href="../image/findDecoderForData.html">findDecoderForData</a></li>
+        <li><a href="../image/findDecoderForNamedImage.html">findDecoderForNamedImage</a></li>
+        <li><a href="../image/findEncoderForNamedImage.html">findEncoderForNamedImage</a></li>
+        <li><a href="../image/findTrim.html">findTrim</a></li>
+        <li><a href="../image/flip.html">flip</a></li>
+        <li><a href="../image/flipHorizontal.html">flipHorizontal</a></li>
+        <li><a href="../image/flipHorizontalVertical.html">flipHorizontalVertical</a></li>
+        <li><a href="../image/flipVertical.html">flipVertical</a></li>
+        <li><a href="../image/gamma.html">gamma</a></li>
+        <li><a href="../image/gaussianBlur.html">gaussianBlur</a></li>
+        <li><a href="../image/getLuminance.html">getLuminance</a></li>
+        <li><a href="../image/getLuminanceNormalized.html">getLuminanceNormalized</a></li>
+        <li><a href="../image/getLuminanceRgb.html">getLuminanceRgb</a></li>
+        <li><a href="../image/grand.html">grand</a></li>
+        <li><a href="../image/grayscale.html">grayscale</a></li>
+        <li><a href="../image/hdrToLdr.html">hdrToLdr</a></li>
+        <li><a href="../image/hexagonPixelate.html">hexagonPixelate</a></li>
+        <li><a href="../image/hslToRgb.html">hslToRgb</a></li>
+        <li><a href="../image/hsvToRgb.html">hsvToRgb</a></li>
+        <li><a href="../image/invert.html">invert</a></li>
+        <li><a href="../image/labToRgb.html">labToRgb</a></li>
+        <li><a href="../image/labToXyz.html">labToXyz</a></li>
+        <li><a href="../image/luminanceThreshold.html">luminanceThreshold</a></li>
+        <li><a href="../image/maskFlood.html">maskFlood</a></li>
+        <li><a href="../image/minMax.html">minMax</a></li>
+        <li><a href="../image/monochrome.html">monochrome</a></li>
+        <li><a href="../image/noise.html">noise</a></li>
+        <li><a href="../image/normalize.html">normalize</a></li>
+        <li><a href="../image/pixelate.html">pixelate</a></li>
+        <li><a href="../image/prand.html">prand</a></li>
+        <li><a href="../image/quantize.html">quantize</a></li>
+        <li><a href="../image/readFile.html">readFile</a></li>
+        <li><a href="../image/readFont.html">readFont</a></li>
+        <li><a href="../image/readFontZip.html">readFontZip</a></li>
+        <li><a href="../image/reinhardTonemap.html">reinhardTonemap</a></li>
+        <li><a href="../image/remapColors.html">remapColors</a></li>
+        <li><a href="../image/rgbaToUint32.html">rgbaToUint32</a></li>
+        <li><a href="../image/rgbToHsl.html">rgbToHsl</a></li>
+        <li><a href="../image/rgbToLab.html">rgbToLab</a></li>
+        <li><a href="../image/rgbToXyz.html">rgbToXyz</a></li>
+        <li><a href="../image/scaleRgba.html">scaleRgba</a></li>
+        <li><a href="../image/separableConvolution.html">separableConvolution</a></li>
+        <li><a href="../image/sepia.html">sepia</a></li>
+        <li><a href="../image/sketch.html">sketch</a></li>
+        <li><a href="../image/smooth.html">smooth</a></li>
+        <li><a href="../image/sobel.html">sobel</a></li>
+        <li><a href="../image/stretchDistortion.html">stretchDistortion</a></li>
+        <li><a href="../image/supportsFileAccess.html">supportsFileAccess</a></li>
+        <li><a href="../image/trim.html">trim</a></li>
+        <li><a href="../image/uint32ToAlpha.html">uint32ToAlpha</a></li>
+        <li><a href="../image/uint32ToBlue.html">uint32ToBlue</a></li>
+        <li><a href="../image/uint32ToGreen.html">uint32ToGreen</a></li>
+        <li><a href="../image/uint32ToRed.html">uint32ToRed</a></li>
+        <li><a href="../image/vignette.html">vignette</a></li>
+        <li><a href="../image/writeFile.html">writeFile</a></li>
+        <li><a href="../image/xyzToLab.html">xyzToLab</a></li>
+        <li><a href="../image/xyzToRgb.html">xyzToRgb</a></li>
+
+      <li class="section-title"><a href="../image/image-library.html#enums">Enums</a></li>
+        <li><a href="../image/BlendMode.html">BlendMode</a></li>
+        <li><a href="../image/Channel.html">Channel</a></li>
+        <li><a href="../image/DitherKernel.html">DitherKernel</a></li>
+        <li><a href="../image/FlipDirection.html">FlipDirection</a></li>
+        <li><a href="../image/Format.html">Format</a></li>
+        <li><a href="../image/FormatType.html">FormatType</a></li>
+        <li><a href="../image/FrameType.html">FrameType</a></li>
+        <li><a href="../image/IccProfileCompression.html">IccProfileCompression</a></li>
+        <li><a href="../image/IcoType.html">IcoType</a></li>
+        <li><a href="../image/IfdValueType.html">IfdValueType</a></li>
+        <li><a href="../image/Interpolation.html">Interpolation</a></li>
+        <li><a href="../image/NoiseType.html">NoiseType</a></li>
+        <li><a href="../image/PixelateMode.html">PixelateMode</a></li>
+        <li><a href="../image/PngBlendMode.html">PngBlendMode</a></li>
+        <li><a href="../image/PngDisposeMode.html">PngDisposeMode</a></li>
+        <li><a href="../image/PngFilter.html">PngFilter</a></li>
+        <li><a href="../image/PngFilterType.html">PngFilterType</a></li>
+        <li><a href="../image/PsdColorMode.html">PsdColorMode</a></li>
+        <li><a href="../image/PvrFormat.html">PvrFormat</a></li>
+        <li><a href="../image/QuantizeMethod.html">QuantizeMethod</a></li>
+        <li><a href="../image/TiffFormat.html">TiffFormat</a></li>
+        <li><a href="../image/TiffImageType.html">TiffImageType</a></li>
+        <li><a href="../image/TiffPhotometricType.html">TiffPhotometricType</a></li>
+        <li><a href="../image/TrimMode.html">TrimMode</a></li>
+        <li><a href="../image/WebPFormat.html">WebPFormat</a></li>
+
+
+      <li class="section-title"><a href="../image/image-library.html#exceptions">Exceptions</a></li>
+        <li><a href="../image/ImageException-class.html">ImageException</a></li>
+</ol>
+
+  </div>
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+    <ol>
+
+        <li class="section-title"><a href="../image/Command-class.html#constructors">Constructors</a></li>
+          <li><a href="../image/Command/Command.html">Command</a></li>
+
+
+        <li class="section-title">
+          <a href="../image/Command-class.html#instance-properties">Properties</a>
+        </li>
+          <li><a href="../image/Command/dirty.html">dirty</a></li>
+          <li><a href="../image/Command/firstSubCommand.html">firstSubCommand</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li><a href="../image/Command/input.html">input</a></li>
+          <li><a href="../image/Command/outputBytes.html">outputBytes</a></li>
+          <li><a href="../image/Command/outputImage.html">outputImage</a></li>
+          <li><a href="../image/Command/outputObject.html">outputObject</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/runtimeType.html">runtimeType</a></li>
+          <li><a href="../image/Command/subCommand.html">subCommand</a></li>
+
+        <li class="section-title"><a href="../image/Command-class.html#instance-methods">Methods</a></li>
+          <li><a href="../image/Command/addFrames.html">addFrames</a></li>
+          <li><a href="../image/Command/adjustColor.html">adjustColor</a></li>
+          <li><a href="../image/Command/bakeOrientation.html">bakeOrientation</a></li>
+          <li><a href="../image/Command/billboard.html">billboard</a></li>
+          <li><a href="../image/Command/bleachBypass.html">bleachBypass</a></li>
+          <li><a href="../image/Command/bulgeDistortion.html">bulgeDistortion</a></li>
+          <li><a href="../image/Command/bumpToNormal.html">bumpToNormal</a></li>
+          <li><a href="../image/Command/chromaticAberration.html">chromaticAberration</a></li>
+          <li><a href="../image/Command/colorHalftone.html">colorHalftone</a></li>
+          <li><a href="../image/Command/colorOffset.html">colorOffset</a></li>
+          <li><a href="../image/Command/compositeImage.html">compositeImage</a></li>
+          <li><a href="../image/Command/contrast.html">contrast</a></li>
+          <li><a href="../image/Command/convert.html">convert</a></li>
+          <li><a href="../image/Command/convolution.html">convolution</a></li>
+          <li><a href="../image/Command/copy.html">copy</a></li>
+          <li><a href="../image/Command/copyCrop.html">copyCrop</a></li>
+          <li><a href="../image/Command/copyCropCircle.html">copyCropCircle</a></li>
+          <li><a href="../image/Command/copyFlip.html">copyFlip</a></li>
+          <li><a href="../image/Command/copyImageChannels.html">copyImageChannels</a></li>
+          <li><a href="../image/Command/copyRectify.html">copyRectify</a></li>
+          <li><a href="../image/Command/copyResize.html">copyResize</a></li>
+          <li><a href="../image/Command/copyResizeCropSquare.html">copyResizeCropSquare</a></li>
+          <li><a href="../image/Command/copyRotate.html">copyRotate</a></li>
+          <li><a href="../image/Command/createImage.html">createImage</a></li>
+          <li><a href="../image/Command/decodeBmp.html">decodeBmp</a></li>
+          <li><a href="../image/Command/decodeBmpFile.html">decodeBmpFile</a></li>
+          <li><a href="../image/Command/decodeExr.html">decodeExr</a></li>
+          <li><a href="../image/Command/decodeExrFile.html">decodeExrFile</a></li>
+          <li><a href="../image/Command/decodeGif.html">decodeGif</a></li>
+          <li><a href="../image/Command/decodeGifFile.html">decodeGifFile</a></li>
+          <li><a href="../image/Command/decodeIco.html">decodeIco</a></li>
+          <li><a href="../image/Command/decodeIcoFile.html">decodeIcoFile</a></li>
+          <li><a href="../image/Command/decodeImage.html">decodeImage</a></li>
+          <li><a href="../image/Command/decodeImageFile.html">decodeImageFile</a></li>
+          <li><a href="../image/Command/decodeJpg.html">decodeJpg</a></li>
+          <li><a href="../image/Command/decodeJpgFile.html">decodeJpgFile</a></li>
+          <li><a href="../image/Command/decodeNamedImage.html">decodeNamedImage</a></li>
+          <li><a href="../image/Command/decodePng.html">decodePng</a></li>
+          <li><a href="../image/Command/decodePngFile.html">decodePngFile</a></li>
+          <li><a href="../image/Command/decodePsd.html">decodePsd</a></li>
+          <li><a href="../image/Command/decodePsdFile.html">decodePsdFile</a></li>
+          <li><a href="../image/Command/decodePvr.html">decodePvr</a></li>
+          <li><a href="../image/Command/decodePvrFile.html">decodePvrFile</a></li>
+          <li><a href="../image/Command/decodeTga.html">decodeTga</a></li>
+          <li><a href="../image/Command/decodeTgaFile.html">decodeTgaFile</a></li>
+          <li><a href="../image/Command/decodeTiff.html">decodeTiff</a></li>
+          <li><a href="../image/Command/decodeTiffFile.html">decodeTiffFile</a></li>
+          <li><a href="../image/Command/decodeWebP.html">decodeWebP</a></li>
+          <li><a href="../image/Command/decodeWebPFile.html">decodeWebPFile</a></li>
+          <li><a href="../image/Command/ditherImage.html">ditherImage</a></li>
+          <li><a href="../image/Command/dotScreen.html">dotScreen</a></li>
+          <li><a href="../image/Command/drawChar.html">drawChar</a></li>
+          <li><a href="../image/Command/drawCircle.html">drawCircle</a></li>
+          <li><a href="../image/Command/drawLine.html">drawLine</a></li>
+          <li><a href="../image/Command/drawPixel.html">drawPixel</a></li>
+          <li><a href="../image/Command/drawPolygon.html">drawPolygon</a></li>
+          <li><a href="../image/Command/drawRect.html">drawRect</a></li>
+          <li><a href="../image/Command/drawString.html">drawString</a></li>
+          <li><a href="../image/Command/dropShadow.html">dropShadow</a></li>
+          <li><a href="../image/Command/edgeGlow.html">edgeGlow</a></li>
+          <li><a href="../image/Command/emboss.html">emboss</a></li>
+          <li><a href="../image/Command/encodeBmp.html">encodeBmp</a></li>
+          <li><a href="../image/Command/encodeBmpFile.html">encodeBmpFile</a></li>
+          <li><a href="../image/Command/encodeCur.html">encodeCur</a></li>
+          <li><a href="../image/Command/encodeCurFile.html">encodeCurFile</a></li>
+          <li><a href="../image/Command/encodeGif.html">encodeGif</a></li>
+          <li><a href="../image/Command/encodeGifFile.html">encodeGifFile</a></li>
+          <li><a href="../image/Command/encodeIco.html">encodeIco</a></li>
+          <li><a href="../image/Command/encodeIcoFile.html">encodeIcoFile</a></li>
+          <li><a href="../image/Command/encodeJpg.html">encodeJpg</a></li>
+          <li><a href="../image/Command/encodeJpgFile.html">encodeJpgFile</a></li>
+          <li><a href="../image/Command/encodePng.html">encodePng</a></li>
+          <li><a href="../image/Command/encodePngFile.html">encodePngFile</a></li>
+          <li><a href="../image/Command/encodePvr.html">encodePvr</a></li>
+          <li><a href="../image/Command/encodePvrFile.html">encodePvrFile</a></li>
+          <li><a href="../image/Command/encodeTga.html">encodeTga</a></li>
+          <li><a href="../image/Command/encodeTgaFile.html">encodeTgaFile</a></li>
+          <li><a href="../image/Command/encodeTiff.html">encodeTiff</a></li>
+          <li><a href="../image/Command/encodeTiffFile.html">encodeTiffFile</a></li>
+          <li><a href="../image/Command/execute.html">execute</a></li>
+          <li><a href="../image/Command/executeCommand.html">executeCommand</a></li>
+          <li><a href="../image/Command/executeIfDirty.html">executeIfDirty</a></li>
+          <li><a href="../image/Command/executeThread.html">executeThread</a></li>
+          <li><a href="../image/Command/fill.html">fill</a></li>
+          <li><a href="../image/Command/fillCircle.html">fillCircle</a></li>
+          <li><a href="../image/Command/fillFlood.html">fillFlood</a></li>
+          <li><a href="../image/Command/fillPolygon.html">fillPolygon</a></li>
+          <li><a href="../image/Command/fillRect.html">fillRect</a></li>
+          <li><a href="../image/Command/filter.html">filter</a></li>
+          <li><a href="../image/Command/flip.html">flip</a></li>
+          <li><a href="../image/Command/gamma.html">gamma</a></li>
+          <li><a href="../image/Command/gaussianBlur.html">gaussianBlur</a></li>
+          <li><a href="../image/Command/getBytes.html">getBytes</a></li>
+          <li><a href="../image/Command/getBytesThread.html">getBytesThread</a></li>
+          <li><a href="../image/Command/getImage.html">getImage</a></li>
+          <li><a href="../image/Command/getImageThread.html">getImageThread</a></li>
+          <li><a href="../image/Command/grayscale.html">grayscale</a></li>
+          <li><a href="../image/Command/hdrToLdr.html">hdrToLdr</a></li>
+          <li><a href="../image/Command/hexagonPixelate.html">hexagonPixelate</a></li>
+          <li><a href="../image/Command/image.html">image</a></li>
+          <li><a href="../image/Command/invert.html">invert</a></li>
+          <li><a href="../image/Command/luminanceThreshold.html">luminanceThreshold</a></li>
+          <li><a href="../image/Command/monochrome.html">monochrome</a></li>
+          <li><a href="../image/Command/noise.html">noise</a></li>
+          <li><a href="../image/Command/normalize.html">normalize</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li><a href="../image/Command/pixelate.html">pixelate</a></li>
+          <li><a href="../image/Command/quantize.html">quantize</a></li>
+          <li><a href="../image/Command/reinhardTonemap.html">reinhardTonemap</a></li>
+          <li><a href="../image/Command/remapColors.html">remapColors</a></li>
+          <li><a href="../image/Command/scaleRgba.html">scaleRgba</a></li>
+          <li><a href="../image/Command/separableConvolution.html">separableConvolution</a></li>
+          <li><a href="../image/Command/sepia.html">sepia</a></li>
+          <li><a href="../image/Command/setDirty.html">setDirty</a></li>
+          <li><a href="../image/Command/sketch.html">sketch</a></li>
+          <li><a href="../image/Command/smooth.html">smooth</a></li>
+          <li><a href="../image/Command/sobel.html">sobel</a></li>
+          <li><a href="../image/Command/stretchDistortion.html">stretchDistortion</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
+          <li><a href="../image/Command/trim.html">trim</a></li>
+          <li><a href="../image/Command/vignette.html">vignette</a></li>
+          <li><a href="../image/Command/writeToFile.html">writeToFile</a></li>
+
+        <li class="section-title inherited"><a href="../image/Command-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    image
+      4.0.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

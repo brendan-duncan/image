@@ -1,48 +1,53 @@
-import 'dart:typed_data';
-
-import '../../../image.dart';
-import '../../color.dart';
+import '../../color/color_uint8.dart';
+import '../../image/palette_uint8.dart';
 
 class GifColorMap {
   int bitsPerPixel;
   int numColors;
   int? transparent;
-  final Uint8List colors;
+  final PaletteUint8 _palette;
 
   GifColorMap(this.numColors)
-      : colors = Uint8List(numColors * 3),
+      : _palette = PaletteUint8(numColors, 3),
         bitsPerPixel = _bitSize(numColors);
 
   GifColorMap.from(GifColorMap other)
     : bitsPerPixel = other.bitsPerPixel
     , numColors = other.numColors
     , transparent = other.transparent
-    , colors = Uint8List.fromList(other.colors);
+    , _palette = PaletteUint8.from(other._palette);
 
-  int operator [](int index) => colors[index];
-
-  operator []=(int index, int value) => colors[index] = value;
-
-  int color(int index) {
-    final ci = index * 3;
-    final a = (index == transparent) ? 0 : 255;
-    return getColor(colors[ci], colors[ci + 1], colors[ci + 2], a);
+  ColorUint8 color(int index) {
+    final r = red(index);
+    final g = green(index);
+    final b = blue(index);
+    final a = alpha(index);
+    return ColorUint8.rgba(r, g, b, a);
   }
 
   void setColor(int index, int r, int g, int b) {
-    final ci = index * 3;
-    colors[ci] = r;
-    colors[ci + 1] = g;
-    colors[ci + 2] = b;
+    _palette.setColor(index, r, g, b);
   }
 
-  int red(int color) => colors[color * 3];
+  int red(int color) => _palette.getRed(color) as int;
 
-  int green(int color) => colors[color * 3 + 1];
+  int green(int color) => _palette.getGreen(color) as int;
 
-  int blue(int color) => colors[color * 3 + 2];
+  int blue(int color) => _palette.getBlue(color) as int;
 
   int alpha(int color) => (color == transparent) ? 0 : 255;
+
+  PaletteUint8 getPalette() {
+    if (transparent == null) {
+      return _palette;
+    }
+    final p = PaletteUint8(_palette.numColors, 4);
+    final l = _palette.numColors;
+    for (var i = 0; i < l; ++i) {
+      p.setColor(i, red(i), green(i), blue(i), alpha(i));
+    }
+    return p;
+  }
 
   static int _bitSize(int n) {
     for (var i = 1; i <= 8; i++) {
