@@ -387,7 +387,7 @@ class GifEncoder extends Encoder {
         final a = p[pi];
         if (a == 0) {
           hasTransparency = 1;
-          transparentIndex = pi;
+          transparentIndex = i;
           break;
         }
       }

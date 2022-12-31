@@ -7,6 +7,16 @@ import '../_test_util.dart';
 void main() {
   group('Format', () {
     group('gif', () {
+      test('transparencyAnim', () async {
+        final g1 = await decodePngFile('test/_data/png/g1.png');
+        final g2 = await decodePngFile('test/_data/png/g2.png');
+        final g3 = await decodePngFile('test/_data/png/g3.png');
+        g1!.addFrame(g2);
+        g1.addFrame(g3);
+        await encodeGifFile('$testOutputPath/gif/transparencyAnim.gif', g1);
+        await encodePngFile('$testOutputPath/gif/transparencyAnim.png', g1);
+      });
+
       test('cmd', () async {
         await (Command()
             ..decodeGifFile('test/_data/gif/cars.gif')
