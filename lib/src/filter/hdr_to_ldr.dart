@@ -5,13 +5,13 @@ import '../image/image.dart';
 /// Convert a high dynamic range image to a low dynamic range image,
 /// with optional exposure control.
 Image hdrToLdr(Image hdr, { num? exposure }) {
-  num _knee(num x, num f) => math.log(x * f + 1.0) / f;
+  num knee(num x, num f) => math.log(x * f + 1.0) / f;
 
-  num _gamma(num h, num m) {
+  num gamma(num h, num m) {
     var x = math.max(0, h * m);
 
     if (x > 1.0) {
-      x = 1.0 + _knee(x - 1, 0.184874);
+      x = 1.0 + knee(x - 1, 0.184874);
     }
 
     return math.pow(x, 0.4545) * 84.66;
@@ -46,9 +46,9 @@ Image hdrToLdr(Image hdr, { num? exposure }) {
 
       num ri, gi, bi;
       if (exposure != null) {
-        ri = _gamma(r, m);
-        gi = _gamma(g, m);
-        bi = _gamma(b, m);
+        ri = gamma(r, m);
+        gi = gamma(g, m);
+        bi = gamma(b, m);
       } else {
         ri = r.clamp(0, 1) * 255.0;
         gi = g.clamp(0, 1) * 255.0;
@@ -68,13 +68,13 @@ Image hdrToLdr(Image hdr, { num? exposure }) {
         if (a.isInfinite || a.isNaN) {
           a = 1.0;
         }
-        image.setPixelColor(x, y,
+        image.setPixelRgba(x, y,
             ri.clamp(0, 255).toInt(),
             gi.clamp(0, 255).toInt(),
             bi.clamp(0, 255).toInt(),
             (a * 255.0).clamp(0, 255).toInt());
       } else {
-        image.setPixelColor(x, y,
+        image.setPixelRgb(x, y,
             ri.clamp(0, 255).toInt(),
             gi.clamp(0, 255).toInt(),
             bi.clamp(0, 255).toInt());

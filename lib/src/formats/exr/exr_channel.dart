@@ -1,6 +1,6 @@
+import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 
 @internal
 enum ExrChannelType {

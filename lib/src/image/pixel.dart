@@ -38,14 +38,18 @@ abstract class Pixel extends Iterator<Pixel> implements Color {
 
   /// Move to the next pixel, returning false if it moved past the end of
   /// the image data.
+  @override
   bool moveNext();
 
   /// The current pixel (this), for using Pixel as an iterator.
+  @override
   Pixel get current;
 
   /// Tests if this pixel has the same values as the given pixel or color.
+  @override
   bool operator==(Object? other);
 
   /// Calculate the hash code for this pixel.
+  @override
   int get hashCode;
 }

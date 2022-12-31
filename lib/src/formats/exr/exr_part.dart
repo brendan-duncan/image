@@ -7,9 +7,9 @@ import '../../image/image_data.dart';
 import '../../image/image_data_float16.dart';
 import '../../image/image_data_float32.dart';
 import '../../image/image_data_uint32.dart';
+import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 import 'exr_attribute.dart';
 import 'exr_channel.dart';
 import 'exr_compressor.dart';
@@ -329,12 +329,12 @@ class ExrPart {
           (i) => (_levelSize(min, max, i, rmode) + size! - 1) ~/ size,
           growable: false);
 
-  int _levelSize(int _min, int _max, int l, int? rmode) {
+  int _levelSize(int mn, int mx, int l, int? rmode) {
     if (l < 0) {
       throw ImageException('Argument not in valid range.');
     }
 
-    final a = (_max - _min) + 1;
+    final a = (mx - mn) + 1;
     final b = 1 << l;
     var size = a ~/ b;
 

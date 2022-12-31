@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import '../../util/_internal.dart';
 import '../../util/bit_utils.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 import 'vp8l.dart';
 
 @internal

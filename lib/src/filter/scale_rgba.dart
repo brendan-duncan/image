@@ -13,7 +13,7 @@ Image scaleRgba(Image src, { required Color scale, Image? mask,
     for (final p in frame) {
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       if (msk == null) {
-        p.setColor(p.r * dr, p.g * dg, p.b * db, p.a * da);
+        p.setRgba(p.r * dr, p.g * dg, p.b * db, p.a * da);
       } else {
         p..r = mix(p.r, p.r * dr, msk)
         ..g = mix(p.g, p.g * dg, msk)

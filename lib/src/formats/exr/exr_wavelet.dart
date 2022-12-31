@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
+import '../../util/_internal.dart';
 import '../../util/bit_utils.dart';
-import '../../util/internal.dart';
 
 @internal
 class ExrWavelet {

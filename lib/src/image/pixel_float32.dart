@@ -14,6 +14,7 @@ class PixelFloat32 extends Iterable<num> implements Pixel {
   int _x;
   int _y;
   int _index;
+  @override
   final ImageDataFloat32 image;
 
   PixelFloat32.imageData(this.image)
@@ -34,45 +35,65 @@ class PixelFloat32 extends Iterable<num> implements Pixel {
       , _index = other._index
       , image = other.image;
 
+  @override
   PixelFloat32 clone() => PixelFloat32.from(this);
 
+  @override
   int get length => image.numChannels;
   int get numChannels => image.numChannels;
+  @override
   bool get hasPalette => image.hasPalette;
+  @override
   Palette? get palette => null;
+  @override
   int get width => image.width;
+  @override
   int get height => image.height;
   Float32List get data => image.data;
+  @override
   num get maxChannelValue => image.maxChannelValue;
+  @override
   num get maxIndexValue => image.maxIndexValue;
+  @override
   Format get format => Format.float32;
+  @override
   bool get isLdrFormat => image.isLdrFormat;
+  @override
   bool get isHdrFormat => image.isHdrFormat;
 
+  @override
   bool get isValid => x >= 0 && x < (image.width - 1) &&
       y >= 0 && y < (image.height - 1);
 
+  @override
   int get x => _x;
+  @override
   int get y => _y;
 
   /// The normalized x coordinate of the pixel, in the range \[0, 1\].
+  @override
   num get xNormalized => width > 1 ? x / (width - 1) : 0;
 
   /// The normalized y coordinate of the pixel, in the range \[0, 1\].
+  @override
   num get yNormalized => height > 1 ? y / (height - 1) : 0;
 
   /// Set the normalized coordinates of the pixel, in the range \[0, 1\].
+  @override
   void setPositionNormalized(num x, num y) =>
       setPosition((x * (width - 1)).floor(), (y * (height - 1)).floor());
 
+  @override
   void setPosition(int x, int y) {
-    this._x = x;
-    this._y = y;
+    _x = x;
+    _y = y;
     _index = _y * image.width * image.numChannels + (_x * image.numChannels);
   }
 
+  @override
   Pixel get current => this;
 
+  @override
   bool moveNext() {
     _x++;
     if (_x == width) {
@@ -88,55 +109,80 @@ class PixelFloat32 extends Iterable<num> implements Pixel {
 
   bool nextPixel() => moveNext();
 
+  @override
   num operator[](int i) => i < numChannels ? data[_index + i] : 0;
 
+  @override
   void operator[]=(int i, num value) {
     if (i < numChannels) {
       data[_index + i] = value.toDouble();
     }
   }
 
+  @override
   num get index => r;
-  void set index(num i) => r = i;
+  @override
+  set index(num i) => r = i;
 
+  @override
   num get r => numChannels > 0 ? data[_index] : 0;
 
-  void set r(num r) { if (numChannels > 0) data[_index] = r.toDouble(); }
+  @override
+  set r(num r) { if (numChannels > 0) data[_index] = r.toDouble(); }
 
+  @override
   num get g => numChannels > 1 ? data[_index + 1]  : 0;
 
-  void set g(num g) { if (numChannels > 1) data[_index + 1] = g.toDouble(); }
+  @override
+  set g(num g) { if (numChannels > 1) data[_index + 1] = g.toDouble(); }
 
+  @override
   num get b => numChannels > 2 ? data[_index + 2]  : 0;
 
-  void set b(num b) { if (numChannels > 2) data[_index + 2] = b.toDouble(); }
+  @override
+  set b(num b) { if (numChannels > 2) data[_index + 2] = b.toDouble(); }
 
+  @override
   num get a => numChannels > 3 ? data[_index + 3]  : 1;
 
-  void set a(num a) { if (numChannels > 3) data[_index + 3] = a.toDouble(); }
+  @override
+  set a(num a) { if (numChannels > 3) data[_index + 3] = a.toDouble(); }
 
+  @override
   num get rNormalized => r / maxChannelValue;
-  void set rNormalized(num v) => r = v * maxChannelValue;
+  @override
+  set rNormalized(num v) => r = v * maxChannelValue;
 
+  @override
   num get gNormalized => g / maxChannelValue;
-  void set gNormalized(num v) => g = v * maxChannelValue;
+  @override
+  set gNormalized(num v) => g = v * maxChannelValue;
 
+  @override
   num get bNormalized => b / maxChannelValue;
-  void set bNormalized(num v) => b = v * maxChannelValue;
+  @override
+  set bNormalized(num v) => b = v * maxChannelValue;
 
+  @override
   num get aNormalized => a / maxChannelValue;
-  void set aNormalized(num v) => a = v * maxChannelValue;
+  @override
+  set aNormalized(num v) => a = v * maxChannelValue;
 
+  @override
   num get luminance => getLuminance(this);
+  @override
   num get luminanceNormalized => getLuminanceNormalized(this);
 
+  @override
   num getChannel(Channel channel) => channel == Channel.luminance ?
       luminance : channel.index < numChannels ? data[_index + channel.index]
       : 0;
 
+  @override
   num getChannelNormalized(Channel channel) =>
       getChannel(channel) / maxChannelValue;
 
+  @override
   void set(Color c) {
     r = c.r;
     g = c.g;
@@ -144,7 +190,19 @@ class PixelFloat32 extends Iterable<num> implements Pixel {
     a = c.a;
   }
 
-  void setColor(num r, [num g = 0, num b = 0, num a = 0]) {
+  @override
+  void setRgb(num r, num g, num b) {
+    data[_index] = r.toDouble();
+    if (numChannels > 1) {
+      data[_index + 1] = g.toDouble();
+      if (numChannels > 2) {
+        data[_index + 2] = b.toDouble();
+      }
+    }
+  }
+
+  @override
+  void setRgba(num r, num g, num b, num a) {
     data[_index] = r.toDouble();
     if (numChannels > 1) {
       data[_index + 1] = g.toDouble();
@@ -157,8 +215,10 @@ class PixelFloat32 extends Iterable<num> implements Pixel {
     }
   }
 
+  @override
   ChannelIterator get iterator => ChannelIterator(this);
 
+  @override
   bool operator==(Object? other) {
     if (other is PixelFloat32) {
       return hashCode == other.hashCode;
@@ -190,8 +250,10 @@ class PixelFloat32 extends Iterable<num> implements Pixel {
     return false;
   }
 
+  @override
   int get hashCode => Object.hashAll(toList());
 
+  @override
   Color convert({ Format? format, int? numChannels, num? alpha }) =>
       convertColor(this, format: format, numChannels: numChannels,
           alpha: alpha);

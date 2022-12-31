@@ -17,7 +17,7 @@ class DrawPixelCmd extends Command {
   DrawPixelCmd(Command? input, this.x, this.y, this.color, { Color? filter,
       this.alpha, this.blend = BlendMode.alpha, this.mask,
       this.maskChannel = Channel.luminance })
-      : this._filter = filter
+      : _filter = filter
       , super(input);
 
   @override

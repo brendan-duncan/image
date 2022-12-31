@@ -244,21 +244,21 @@ Image getImageFromJpeg(JpegData jpeg) {
           final cy = component1Line![x1];
 
           if (orientation == 2) {
-            image.setPixelColor(w1 - x, y,  cy, cy, cy);
+            image.setPixelRgb(w1 - x, y,  cy, cy, cy);
           } else if (orientation == 3) {
-            image.setPixelColor(w1 - x, h1 - y,  cy, cy, cy);
+            image.setPixelRgb(w1 - x, h1 - y,  cy, cy, cy);
           } else if (orientation == 4) {
-            image.setPixelColor(x, h1 - y,  cy, cy, cy);
+            image.setPixelRgb(x, h1 - y,  cy, cy, cy);
           } else if (orientation == 5) {
-            image.setPixelColor(y, x,  cy, cy, cy);
+            image.setPixelRgb(y, x,  cy, cy, cy);
           } else if (orientation == 6) {
-            image.setPixelColor(h1 - y, x,  cy, cy, cy);
+            image.setPixelRgb(h1 - y, x,  cy, cy, cy);
           } else if (orientation == 7) {
-            image.setPixelColor(h1 - y, w1 - x,  cy, cy, cy);
+            image.setPixelRgb(h1 - y, w1 - x,  cy, cy, cy);
           } else if (orientation == 8) {
-            image.setPixelColor(y, w1 - x,  cy, cy, cy);
+            image.setPixelRgb(y, w1 - x,  cy, cy, cy);
           } else {
-            image.setPixelColor(x, y, cy, cy, cy);
+            image.setPixelRgb(x, y, cy, cy, cy);
           }
         }
       }
@@ -335,21 +335,21 @@ Image getImageFromJpeg(JpegData jpeg) {
           b = (b >> 8).clamp(0, 255);
 
           if (orientation == 2) {
-            image.setPixelColor(w1 - x, y, r, g, b);
+            image.setPixelRgb(w1 - x, y, r, g, b);
           } else if (orientation == 3) {
-            image.setPixelColor(w1 - x, h1 - y, r, g, b);
+            image.setPixelRgb(w1 - x, h1 - y, r, g, b);
           } else if (orientation == 4) {
-            image.setPixelColor(x, h1 - y, r, g, b);
+            image.setPixelRgb(x, h1 - y, r, g, b);
           } else if (orientation == 5) {
-            image.setPixelColor(y, x, r, g, b);
+            image.setPixelRgb(y, x, r, g, b);
           } else if (orientation == 6) {
-            image.setPixelColor(h1 - y, x, r, g, b);
+            image.setPixelRgb(h1 - y, x, r, g, b);
           } else if (orientation == 7) {
-            image.setPixelColor(h1 - y, w1 - x, r, g, b);
+            image.setPixelRgb(h1 - y, w1 - x, r, g, b);
           } else if (orientation == 8) {
-            image.setPixelColor(y, w1 - x, r, g, b);
+            image.setPixelRgb(y, w1 - x, r, g, b);
           } else {
-            image.setPixelColor(x, y, r, g, b);
+            image.setPixelRgb(x, y, r, g, b);
           }
         }
       }
@@ -420,21 +420,21 @@ Image getImageFromJpeg(JpegData jpeg) {
           final b = (cy * ck) >> 8;
 
           if (orientation == 2) {
-            image.setPixelColor(w1 - x, y, r, g, b);
+            image.setPixelRgb(w1 - x, y, r, g, b);
           } else if (orientation == 3) {
-            image.setPixelColor(w1 - x, h1 - y, r, g, b);
+            image.setPixelRgb(w1 - x, h1 - y, r, g, b);
           } else if (orientation == 4) {
-            image.setPixelColor(x, h1 - y, r, g, b);
+            image.setPixelRgb(x, h1 - y, r, g, b);
           } else if (orientation == 5) {
-            image.setPixelColor(y, x, r, g, b);
+            image.setPixelRgb(y, x, r, g, b);
           } else if (orientation == 6) {
-            image.setPixelColor(h1 - y, x, r, g, b);
+            image.setPixelRgb(h1 - y, x, r, g, b);
           } else if (orientation == 7) {
-            image.setPixelColor(h1 - y, w1 - x, r, g, b);
+            image.setPixelRgb(h1 - y, w1 - x, r, g, b);
           } else if (orientation == 8) {
-            image.setPixelColor(y, w1 - x, r, g, b);
+            image.setPixelRgb(y, w1 - x, r, g, b);
           } else {
-            image.setPixelColor(x, y, r, g, b);
+            image.setPixelRgb(x, y, r, g, b);
           }
         }
       }

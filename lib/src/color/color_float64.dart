@@ -35,72 +35,106 @@ class ColorFloat64 extends Iterable<num> implements Color {
     data[3] = a.toDouble();
   }
 
+  @override
   ColorFloat64 clone() => ColorFloat64.from(this);
 
+  @override
   Format get format => Format.float64;
+  @override
   int get length => data.length;
+  @override
   num get maxChannelValue => 1.0;
+  @override
   num get maxIndexValue => 1.0;
+  @override
   bool get isLdrFormat => true;
+  @override
   bool get isHdrFormat => false;
+  @override
   bool get hasPalette => false;
+  @override
   Palette? get palette => null;
 
+  @override
   num operator[](int index) => index < data.length ? data[index] : 0;
+  @override
   void operator[]=(int index, num value) {
     if (index < data.length) {
       data[index] = value.toDouble();
     }
   }
 
+  @override
   num get index => r;
-  void set index(num i) => r = i;
+  @override
+  set index(num i) => r = i;
 
+  @override
   num get r => data.isNotEmpty ? data[0] : 0;
-  void set r(num r) => data.isNotEmpty ? data[0] = r.toDouble() : 0;
+  @override
+  set r(num r) => data.isNotEmpty ? data[0] = r.toDouble() : 0;
 
+  @override
   num get g => data.length > 1 ? data[1] : 0;
-  void set g(num g) {
+  @override
+  set g(num g) {
     if (data.length > 1) {
       data[1] = g.toDouble();
     }
   }
 
+  @override
   num get b => data.length > 2 ? data[2] : 0;
-  void set b(num b) {
+  @override
+  set b(num b) {
     if (data.length > 2) {
       data[2] = b.toDouble();
     }
   }
 
+  @override
   num get a => data.length > 3 ? data[3] : 1;
-  void set a(num a) {
+  @override
+  set a(num a) {
     if (data.length > 3) {
       data[3] = a.toDouble();
     }
   }
 
+  @override
   num get rNormalized => r / maxChannelValue;
-  void set rNormalized(num v) => r = v * maxChannelValue;
+  @override
+  set rNormalized(num v) => r = v * maxChannelValue;
 
+  @override
   num get gNormalized => g / maxChannelValue;
-  void set gNormalized(num v) => g = v * maxChannelValue;
+  @override
+  set gNormalized(num v) => g = v * maxChannelValue;
 
+  @override
   num get bNormalized => b / maxChannelValue;
-  void set bNormalized(num v) => b = v * maxChannelValue;
+  @override
+  set bNormalized(num v) => b = v * maxChannelValue;
 
+  @override
   num get aNormalized => a / maxChannelValue;
-  void set aNormalized(num v) => a = v * maxChannelValue;
+  @override
+  set aNormalized(num v) => a = v * maxChannelValue;
 
+  @override
   num get luminance => getLuminance(this);
-  num get luminanceNormalized => getLuminanceNormalized(this);
+  @override
+  get luminanceNormalized => getLuminanceNormalized(this);
 
+  @override
   num getChannel(Channel channel) => channel == Channel.luminance ?
       luminance : channel.index < data.length ? data[channel.index] : 0;
 
+  @override
   num getChannelNormalized(Channel channel) =>
       getChannel(channel) / maxChannelValue;
 
+  @override
   void set(Color c) {
     r = c.r;
     g = c.g;
@@ -108,7 +142,20 @@ class ColorFloat64 extends Iterable<num> implements Color {
     a = c.a;
   }
 
-  void setColor(num r, [num g = 0, num b = 0, num a = 0]) {
+  @override
+  void setRgb(num r, num g, num b) {
+    data[0] = r.toDouble();
+    final nc = data.length;
+    if (nc > 1) {
+      data[1] = g.toDouble();
+      if (nc > 2) {
+        data[2] = b.toDouble();
+      }
+    }
+  }
+
+  @override
+  void setRgba(num r, num g, num b, num a) {
     data[0] = r.toDouble();
     final nc = data.length;
     if (nc > 1) {
@@ -122,15 +169,19 @@ class ColorFloat64 extends Iterable<num> implements Color {
     }
   }
 
+  @override
   ChannelIterator get iterator => ChannelIterator(this);
 
+  @override
   bool operator==(Object? other) =>
       other is Color &&
           other.length == length &&
           other.hashCode == hashCode;
 
+  @override
   int get hashCode => Object.hashAll(toList());
 
+  @override
   Color convert({ Format? format, int? numChannels, num? alpha }) =>
       convertColor(this, format: format, numChannels: numChannels,
           alpha: alpha);

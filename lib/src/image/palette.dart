@@ -25,9 +25,13 @@ abstract class Palette {
   /// A Uint8List view of the palette buffer storage.
   Uint8List toUint8List() => Uint8List.view(buffer);
 
+  /// Set the RGB color of a palette entry at [index]. If the palette has fewer
+  /// channels than are set, the unsupported channels will be ignored.
+  void setRgb(int index, num r, num g, num b);
+
   /// Set the RGBA color of a palette entry at [index]. If the palette has fewer
   /// channels than are set, the unsupported channels will be ignored.
-  void setColor(int index, num r, [num g = 0, num b = 0, num a = 0]);
+  void setRgba(int index, num r, num g, num b, num a);
 
   /// Set a specific [channel] [value] of the palette entry at [index]. If the
   /// palette has fewer channels than [channel], the value will be ignored.

@@ -26,7 +26,9 @@ enum PsdColorMode {
 class PsdImage implements DecodeInfo {
   static const psdSignature = 0x38425053; // '8BPS'
 
+  @override
   int width = 0;
+  @override
   int height = 0;
   int? signature;
   int? version;
@@ -39,6 +41,7 @@ class PsdImage implements DecodeInfo {
   final imageResources = <int, PsdImageResource>{};
   bool hasAlpha = false;
 
+  @override
   Color? get backgroundColor => null;
 
   PsdImage(List<int> bytes) {

@@ -68,20 +68,20 @@ class JpegEncoder extends Encoder {
           final row = pos >> 3; // / 8
           final col = pos & 7; // % 8
 
-          var _y = y + row;
-          var _x = x + col;
+          var yy = y + row;
+          var xx = x + col;
 
-          if (_y >= height) {
+          if (yy >= height) {
             // padding bottom
-            _y -= y + 1 + row - height;
+            yy -= y + 1 + row - height;
           }
 
-          if (_x >= width) {
+          if (xx >= width) {
             // padding right
-            _x -= (x + col) - width + 1;
+            xx -= (x + col) - width + 1;
           }
 
-          final p = image.getPixel(_x, _y);
+          final p = image.getPixel(xx, yy);
           final r = p.r.toInt();
           final g = p.g.toInt();
           final b = p.b.toInt();

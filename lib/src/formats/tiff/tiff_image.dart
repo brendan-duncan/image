@@ -259,7 +259,7 @@ class TiffImage {
       final cm = colorMap!;
       final numColors = cm.length ~/ 3;
       for (var i = 0; i < numColors; ++i) {
-        p.setColor(cm[colorMapRed + i],
+        p.setRgb(i, cm[colorMapRed + i],
             cm[colorMapGreen + i],
             cm[colorMapBlue + i]);
       }
@@ -358,7 +358,7 @@ class TiffImage {
               } else if (bitsPerSample == 16) {
                 sample = Float16.float16ToDouble(byteData.readUint16());
               }
-              image.setPixelColor(px, py, sample);
+              image.setPixelRgb(px, py, sample, 0, 0);
             } else {
               var sample = 0;
               if (bitsPerSample == 8) {
@@ -380,7 +380,7 @@ class TiffImage {
                 sample = mx - sample;
               }
 
-              image.setPixelColor(px, py, sample);
+              image.setPixelRgb(px, py, sample, 0, 0);
             }
           } else if (samplesPerPixel == 2) {
             var gray = 0;
@@ -408,7 +408,7 @@ class TiffImage {
                   : byteData.readUint32();
             }
 
-            image.setPixelColor(px, py, gray, alpha);
+            image.setPixelRgb(px, py, gray, alpha, 0);
           } else if (samplesPerPixel == 3) {
             if (sampleFormat == TiffFormat.float) {
               var r = 0.0;
@@ -427,7 +427,7 @@ class TiffImage {
                 g = Float16.float16ToDouble(byteData.readUint16());
                 b = Float16.float16ToDouble(byteData.readUint16());
               }
-              image.setPixelColor(px, py, r, g, b);
+              image.setPixelRgb(px, py, r, g, b);
             } else {
               var r = 0;
               var g = 0;
@@ -464,7 +464,7 @@ class TiffImage {
                     : byteData.readUint32();
               }
 
-              image.setPixelColor(px, py, r, g, b);
+              image.setPixelRgb(px, py, r, g, b);
             }
           } else if (samplesPerPixel >= 4) {
             if (sampleFormat == TiffFormat.float) {
@@ -488,7 +488,7 @@ class TiffImage {
                 b = Float16.float16ToDouble(byteData.readUint16());
                 a = Float16.float16ToDouble(byteData.readUint16());
               }
-              image.setPixelColor(px, py, r, g, b, a);
+              image.setPixelRgba(px, py, r, g, b, a);
             } else {
               var r = 0;
               var g = 0;
@@ -543,7 +543,7 @@ class TiffImage {
                 a = image.maxChannelValue as int;
               }
 
-              image.setPixelColor(px, py, r, g, b, a);
+              image.setPixelRgba(px, py, r, g, b, a);
             }
           }
         }
@@ -690,9 +690,9 @@ class TiffImage {
           break;
         }
         if (br.readBits(1) == 0) {
-          image.setPixelColor(px, py, black);
+          image.setPixelRgb(px, py, black, 0, 0);
         } else {
-          image.setPixelColor(px, py, white);
+          image.setPixelRgb(px, py, white, 0, 0);
         }
       }
       br.flushByte();

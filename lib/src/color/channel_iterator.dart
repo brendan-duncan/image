@@ -7,10 +7,12 @@ class ChannelIterator extends Iterator<num> {
 
   ChannelIterator(this.color);
 
+  @override
   bool moveNext() {
     index++;
     return index < color.length;
   }
 
+  @override
   num get current => color[index];
 }

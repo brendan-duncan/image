@@ -17,7 +17,7 @@ Image dotScreen(Image src, { num angle = 180, num size = 5.75, int? centerX,
     final cntX = (centerX ?? w ~/ 2) / w;
     final cntY = (centerY ?? h ~/ 2) / h;
 
-    num _pattern(num cntX, num cntY, num tx, num ty) {
+    num pattern(num cntX, num cntY, num tx, num ty) {
       final texX = (tx - cntX) * w;
       final texY = (ty - cntY) * h;
       final pointX = (c * texX - s * texY) * size;
@@ -27,8 +27,8 @@ Image dotScreen(Image src, { num angle = 180, num size = 5.75, int? centerX,
 
     for (final p in frame) {
       final average = p.luminanceNormalized;
-      final pattern = _pattern(cntX, cntY, p.x / w, p.y / h);
-      final c = (average * 10 - 5 + pattern) * p.maxChannelValue;
+      final pat = pattern(cntX, cntY, p.x / w, p.y / h);
+      final c = (average * 10 - 5 + pat) * p.maxChannelValue;
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       final mx = (msk ?? 1) * amount;
       p..r = mix(p.r, c, mx)

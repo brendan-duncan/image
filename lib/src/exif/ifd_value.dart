@@ -51,15 +51,18 @@ abstract class IfdValue {
   int toInt([int index = 0]) => 0;
   double toDouble([int index = 0]) => 0.0;
   Uint8List toData() => Uint8List(0);
+  @override
   String toString() => "";
   Rational toRational([int index = 0]) => Rational(0, 1);
 
+  @override
   bool operator ==(Object other) =>
       other is IfdValue &&
       type == other.type &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => 0;
 
   void write(OutputBuffer out);
@@ -85,26 +88,39 @@ class IfdByteValue extends IfdValue {
   IfdByteValue.data(InputBuffer data, int count)
       : value = Uint8List.fromList(data.readBytes(count).toUint8List());
 
+  @override
   IfdValue clone() => IfdByteValue.list(value);
+
+  @override
   IfdValueType get type => IfdValueType.byte;
+  
+  @override
   int get length => value.length;
 
+  @override
   bool operator ==(Object other) =>
       other is IfdByteValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   int toInt([int index = 0]) => value[index];
+
+  @override
   void setInt(int v, [int index = 0]) { value[index] = v; }
 
+  @override
   Uint8List toData() => value;
 
+  @override
   void write(OutputBuffer out) {
     out.writeBytes(value);
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -121,24 +137,35 @@ class IfdAsciiValue extends IfdValue {
 
   IfdAsciiValue.string(this.value);
 
+  @override
   IfdValue clone() => IfdAsciiValue.string(value);
+
+  @override
   IfdValueType get type => IfdValueType.ascii;
+
+  @override
   int get length => value.length;
 
+  @override
   bool operator ==(Object other) =>
       other is IfdAsciiValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   Uint8List toData() => Uint8List.fromList(value.codeUnits);
 
+  @override
   void write(OutputBuffer out) {
     out.writeBytes(value.codeUnits);
   }
 
+  @override
   String toString() => value;
+  @override
   void setString(String v) { value = v; }
 }
 
@@ -160,20 +187,30 @@ class IfdShortValue extends IfdValue {
     }
   }
 
+  @override
   IfdValue clone() => IfdShortValue.list(value);
+
+  @override
   IfdValueType get type => IfdValueType.short;
+
+  @override
   int get length => value.length;
 
+  @override
   bool operator ==(Object other) =>
       other is IfdShortValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   int toInt([int index = 0]) => value[index];
+  @override
   void setInt(int v, [int index = 0]) { value[index] = v; }
 
+  @override
   void write(OutputBuffer out) {
     final l = value.length;
     for (var i = 0; i < l; ++i) {
@@ -181,6 +218,7 @@ class IfdShortValue extends IfdValue {
     }
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -202,22 +240,33 @@ class IfdLongValue extends IfdValue {
     }
   }
 
+  @override
   IfdValue clone() => IfdLongValue.list(value);
+
+  @override
   IfdValueType get type => IfdValueType.long;
+
+  @override
   int get length => value.length;
 
-    bool operator ==(Object other) =>
+  @override
+  bool operator ==(Object other) =>
     other is IfdLongValue &&
         length == other.length &&
         hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   int toInt([int index = 0]) => value[index];
+  @override
   void setInt(int v, [int index = 0]) { value[index] = v; }
 
+  @override
   Uint8List toData() => Uint8List.view(value.buffer);
 
+  @override
   void write(OutputBuffer out) {
     final l = value.length;
     for (int i = 0; i < l; ++i) {
@@ -225,6 +274,7 @@ class IfdLongValue extends IfdValue {
     }
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -244,26 +294,38 @@ class IfdRationalValue extends IfdValue {
     : value = List<Rational>.generate(count, (i) =>
         Rational(data.readUint32(), data.readUint32()));
 
+  @override
   IfdValue clone() => IfdRationalValue.list(value);
+
+  @override
   IfdValueType get type => IfdValueType.rational;
+
+  @override
   int get length => value.length;
 
+  @override
   int toInt([int index = 0]) => value[index].toInt();
+  @override
   double toDouble([int index = 0]) => value[index].toDouble();
+  @override
   Rational toRational([int index = 0]) => value[index];
 
+  @override
   bool operator ==(Object other) =>
       other is IfdRationalValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   void setRational(int numerator, int denomitator, [int index = 0]) {
     value[index].numerator = numerator;
     value[index].denominator = denomitator;
   }
 
+  @override
   void write(OutputBuffer out) {
     for (var v in value) {
       out..writeUint32(v.numerator)
@@ -271,6 +333,7 @@ class IfdRationalValue extends IfdValue {
     }
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -289,26 +352,36 @@ class IfdSByteValue extends IfdValue {
       : value = Int8List.fromList(
           Int8List.view(data.toUint8List().buffer, 0, count));
 
+  @override
   IfdValue clone() => IfdSByteValue.list(value);
+  @override
   IfdValueType get type => IfdValueType.sByte;
+  @override
   int get length => value.length;
 
+  @override
   bool operator ==(Object other) =>
       other is IfdSByteValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   int toInt([int index = 0]) => value[index];
+  @override
   void setInt(int v, [int index = 0]) { value[index] = v; }
 
+  @override
   Uint8List toData() => Uint8List.view(value.buffer);
 
+  @override
   void write(OutputBuffer out) {
     out.writeBytes(Uint8List.view(value.buffer));
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -330,22 +403,32 @@ class IfdSShortValue extends IfdValue {
     }
   }
 
+  @override
   IfdValue clone() => IfdSShortValue.list(value);
+  @override
   IfdValueType get type => IfdValueType.sShort;
+  @override
   int get length => value.length;
 
-  bool operator ==(Object other) =>
+  @override
+  bool operator==(Object other) =>
       other is IfdSShortValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   int toInt([int index = 0]) => value[index];
+
+  @override
   void setInt(int v, [int index = 0]) { value[index] = v; }
 
+  @override
   Uint8List toData() => Uint8List.view(value.buffer);
 
+  @override
   void write(OutputBuffer out) {
     final v = Int16List(1);
     final vb = Uint16List.view(v.buffer);
@@ -356,6 +439,7 @@ class IfdSShortValue extends IfdValue {
     }
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -377,22 +461,34 @@ class IfdSLongValue extends IfdValue {
     }
   }
 
+  @override
   IfdValue clone() => IfdSLongValue.list(value);
+
+  @override
   IfdValueType get type => IfdValueType.sLong;
+
+  @override
   int get length => value.length;
 
-  bool operator ==(Object other) =>
+  @override
+  bool operator==(Object other) =>
       other is IfdSLongValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   int toInt([int index = 0]) => value[index];
+
+  @override
   void setInt(int v, [int index = 0]) { value[index] = v; }
 
+  @override
   Uint8List toData() => Uint8List.view(value.buffer);
 
+  @override
   void write(OutputBuffer out) {
     final l = value.length;
     for (var i = 0; i < l; ++i) {
@@ -400,6 +496,7 @@ class IfdSLongValue extends IfdValue {
     }
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -419,25 +516,37 @@ class IfdSRationalValue extends IfdValue {
   IfdSRationalValue.list(List<Rational> value)
       : value = List<Rational>.from(value);
 
+  @override
   IfdValue clone() => IfdSRationalValue.list(value);
+
+  @override
   IfdValueType get type => IfdValueType.sRational;
+
+  @override
   int get length => value.length;
 
-  bool operator ==(Object other) =>
+  @override
+  bool operator==(Object other) =>
       other is IfdSRationalValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   int toInt([int index = 0]) => value[index].toInt();
+
+  @override
   double toDouble([int index = 0]) => value[index].toDouble();
 
+  @override
   void setRational(int numerator, int denomitator, [int index = 0]) {
     value[index].numerator = numerator;
     value[index].denominator = denomitator;
   }
 
+  @override
   void write(OutputBuffer out) {
     for (var v in value) {
       out..writeUint32(int32ToUint32(v.numerator))
@@ -445,6 +554,7 @@ class IfdSRationalValue extends IfdValue {
     }
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -466,22 +576,34 @@ class IfdSingleValue extends IfdValue {
     }
   }
 
+  @override
   IfdValue clone() => IfdSingleValue.list(value);
+
+  @override
   IfdValueType get type => IfdValueType.single;
+
+  @override
   int get length => value.length;
 
-  bool operator ==(Object other) =>
+  @override
+  bool operator==(Object other) =>
       other is IfdSingleValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   Uint8List toData() => Uint8List.view(value.buffer);
 
+  @override
   double toDouble([int index = 0]) => value[index];
+
+  @override
   void setDouble(double v, [int index = 0]) { value[index] = v; }
 
+  @override
   void write(OutputBuffer out) {
     final l = value.length;
     for (var i = 0; i < l; ++i) {
@@ -489,6 +611,7 @@ class IfdSingleValue extends IfdValue {
     }
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -510,22 +633,34 @@ class IfdDoubleValue extends IfdValue {
     }
   }
 
+  @override
   IfdValue clone() => IfdDoubleValue.list(value);
+
+  @override
   IfdValueType get type => IfdValueType.double;
+
+  @override
   int get length => value.length;
 
-  bool operator ==(Object other) =>
+  @override
+  bool operator==(Object other) =>
       other is IfdDoubleValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   double toDouble([int index = 0]) => value[index];
+
+  @override
   void setDouble(double v, [int index = 0]) { value[index] = v; }
 
+  @override
   Uint8List toData() => Uint8List.view(value.buffer);
 
+  @override
   void write(OutputBuffer out) {
     final l = value.length;
     for (var i = 0; i < l; ++i) {
@@ -533,6 +668,7 @@ class IfdDoubleValue extends IfdValue {
     }
   }
 
+  @override
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
@@ -545,22 +681,32 @@ class ExifUndefinedValue extends IfdValue {
   ExifUndefinedValue.data(InputBuffer data, int count)
       : value = Uint8List.fromList(data.readBytes(count).toUint8List());
 
+  @override
   IfdValue clone() => ExifUndefinedValue.list(value);
+
+  @override
   IfdValueType get type => IfdValueType.undefined;
+
+  @override
   int get length => value.length;
 
+  @override
   Uint8List toData() => value;
 
-  bool operator ==(Object other) =>
+  @override
+  bool operator==(Object other) =>
       other is ExifUndefinedValue &&
       length == other.length &&
       hashCode == other.hashCode;
 
+  @override
   int get hashCode => Object.hashAll(value);
 
+  @override
   void write(OutputBuffer out) {
     out.writeBytes(value);
   }
 
+  @override
   String toString() => '<data>';
 }

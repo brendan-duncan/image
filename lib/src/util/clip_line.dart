@@ -23,7 +23,7 @@ bool clipLine(List<int> line, List<int> rect) {
 
   // Compute the bit code for a point (x, y) using the clip rectangle
   // bounded diagonally by (xmin, ymin), and (xmax, ymax)
-  int _computeOutCode(int x, int y) {
+  int computeOutCode(int x, int y) {
     var code = inside; // initialised as being inside of clip window
     if (x < xmin) {
       // to the left of clip window
@@ -46,8 +46,8 @@ bool clipLine(List<int> line, List<int> rect) {
 
   // compute outcodes for P0, P1, and whatever point lies outside the clip
   // rectangle
-  var outcode0 = _computeOutCode(x0, y0);
-  var outcode1 = _computeOutCode(x1, y1);
+  var outcode0 = computeOutCode(x0, y0);
+  var outcode1 = computeOutCode(x1, y1);
   var accept = false;
 
   while (true) {
@@ -91,11 +91,11 @@ bool clipLine(List<int> line, List<int> rect) {
       if (outcodeOut == outcode0) {
         x0 = x!;
         y0 = y!;
-        outcode0 = _computeOutCode(x0, y0);
+        outcode0 = computeOutCode(x0, y0);
       } else {
         x1 = x!;
         y1 = y!;
-        outcode1 = _computeOutCode(x1, y1);
+        outcode1 = computeOutCode(x1, y1);
       }
     }
   }

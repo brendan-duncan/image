@@ -93,7 +93,7 @@ Image drawLine(Image image, { required int x1, required int y1,
   }
 
   // 16-bit unsigned int xor.
-  int _xor(int n) => (~n + 0x10000) & 0xffff;
+  int xor(int n) => (~n + 0x10000) & 0xffff;
 
   if (!antialias) {
     dx = dx.abs();
@@ -274,7 +274,7 @@ Image drawLine(Image image, { required int x1, required int y1,
             mask: mask, maskChannel: maskChannel);
 
         drawPixel(image, x, w + 1, color,
-            alpha: ((_xor(frac) >> 8) & 0xff) / 255, mask: mask,
+            alpha: ((xor(frac) >> 8) & 0xff) / 255, mask: mask,
             maskChannel: maskChannel);
       }
 
@@ -310,7 +310,7 @@ Image drawLine(Image image, { required int x1, required int y1,
             mask: mask, maskChannel: maskChannel);
 
         drawPixel(image, w + 1, y, color,
-            alpha: ((_xor(frac) >> 8) & 0xff) / 255, mask: mask,
+            alpha: ((xor(frac) >> 8) & 0xff) / 255, mask: mask,
             maskChannel: maskChannel);
       }
 

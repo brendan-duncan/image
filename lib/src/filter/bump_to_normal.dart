@@ -34,7 +34,7 @@ Image bumpToNormal(Image src, { num strength = 2.0 }) {
         final nZ = dw;
 
         dest.frames[frame.frameIndex]
-        .setPixelColor(x, y, nX * mx, nY * mx, nZ * mx);
+            .setPixelRgb(x, y, nX * mx, nY * mx, nZ * mx);
       }
     }
   }

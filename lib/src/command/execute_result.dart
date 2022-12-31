@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import '../image/image.dart';
-import '../util/internal.dart';
+import '../util/_internal.dart';
 
 @internal
 class ExecuteResult {

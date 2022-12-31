@@ -15,6 +15,7 @@ class PixelRangeIterator extends Iterator<Pixel> {
     pixel.setPosition(x - 1, y);
   }
 
+  @override
   bool moveNext() {
     if ((pixel.x + 1) > x2) {
       pixel.setPosition(x1, pixel.y + 1);
@@ -23,5 +24,6 @@ class PixelRangeIterator extends Iterator<Pixel> {
     return pixel.moveNext();
   }
 
+  @override
   Pixel get current => pixel;
 }

@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import '../../color/color.dart';
-import '../../util/internal.dart';
+import '../../util/_internal.dart';
 import '../decode_info.dart';
 import 'png_frame.dart';
 
@@ -29,7 +29,9 @@ enum PngFilterType {
 }
 
 class PngInfo implements DecodeInfo {
+  @override
   int width = 0;
+  @override
   int height = 0;
   int bits = 0;
   int colorType = -1;
@@ -39,6 +41,7 @@ class PngInfo implements DecodeInfo {
   List<int?>? palette;
   List<int>? transparency;
   double? gamma;
+  @override
   Color? backgroundColor;
   String iccpName = '';
   int iccpCompression = 0;
@@ -46,6 +49,7 @@ class PngInfo implements DecodeInfo {
   Map<String, String> textData = {};
 
   // APNG extensions
+  @override
   int numFrames = 1;
   int repeat = 0;
   final frames = <PngFrame>[];

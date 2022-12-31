@@ -207,7 +207,7 @@ class GifEncoder extends Encoder {
     _freeEnt = _clearCode + 2;
     var pFinished = false;
 
-    int _nextPixel() {
+    int nextPixel() {
       if (pFinished) {
         return _eof;
       }
@@ -218,7 +218,7 @@ class GifEncoder extends Encoder {
       return r;
     }
 
-    var ent = _nextPixel();
+    var ent = nextPixel();
 
     var hShift = 0;
     for (var fCode = _hSize; fCode < 65536; fCode *= 2) {
@@ -237,14 +237,14 @@ class GifEncoder extends Encoder {
     while (outerLoop) {
       outerLoop = false;
 
-      var c = _nextPixel();
+      var c = nextPixel();
       while (c != _eof) {
         final fcode = (c << _bits) + ent;
         var i = (c << hShift) ^ ent; // xor hashing
 
         if (hTab[i] == fcode) {
           ent = codeTab[i];
-          c = _nextPixel();
+          c = nextPixel();
           continue;
         } else if (hTab[i] >= 0) {
           // non-empty slot
@@ -283,7 +283,7 @@ class GifEncoder extends Encoder {
           _output(_clearCode);
         }
 
-        c = _nextPixel();
+        c = nextPixel();
       }
     }
 

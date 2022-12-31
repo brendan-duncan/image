@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import '../../color/color.dart';
+import '../../util/_internal.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 import '../decode_info.dart';
 import 'webp_frame.dart';
 
@@ -20,7 +20,7 @@ class WebPInfo implements DecodeInfo {
   @override
   int height = 0;
   @override
-  Color? backgroundColor = null;
+  Color? backgroundColor;
 
   /// True if the bitstream contains an alpha channel.
   bool hasAlpha = false;

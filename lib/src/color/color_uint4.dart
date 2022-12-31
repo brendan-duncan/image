@@ -9,6 +9,7 @@ import 'format.dart';
 
 /// A 4-bit unsigned int color with channel values in the range \[0, 15].
 class ColorUint4 extends Iterable<num> implements Color {
+  @override
   final int length;
   Uint8List data;
 
@@ -22,7 +23,7 @@ class ColorUint4 extends Iterable<num> implements Color {
   ColorUint4.fromList(List<int> color)
       : length = color.length
       , data = Uint8List(color.length < 3 ? 1 : 2) {
-    setColor(length > 0 ? color[0] : 0,
+    setRgba(length > 0 ? color[0] : 0,
         length > 1 ? color[1] : 0,
         length > 2 ? color[2] : 0,
         length > 3 ? color[3] : 0);
@@ -31,23 +32,31 @@ class ColorUint4 extends Iterable<num> implements Color {
   ColorUint4.rgb(int r, int g, int b)
       : length = 3
       , data = Uint8List(2) {
-    setColor(r, g, b);
+    setRgb(r, g, b);
   }
 
   ColorUint4.rgba(int r, int g, int b, int a)
       : length = 4
       , data = Uint8List(2) {
-    setColor(r, g, b, a);
+    setRgba(r, g, b, a);
   }
 
+  @override
   ColorUint4 clone() => ColorUint4.from(this);
 
+  @override
   Format get format => Format.uint4;
+  @override
   num get maxChannelValue => 15;
+  @override
   num get maxIndexValue => 15;
+  @override
   bool get isLdrFormat => true;
+  @override
   bool get isHdrFormat => false;
+  @override
   bool get hasPalette => false;
+  @override
   Palette? get palette => null;
 
   int _getChannel(int ci) => ci < 0 || ci >= length ? 0
@@ -60,7 +69,7 @@ class ColorUint4 extends Iterable<num> implements Color {
     }
     final vi = value.toInt().clamp(0, 15);
     int i = 0;
-    if (ci > 2) {
+    if (ci > 1) {
       ci &= 0x1;
       i = 1;
     }
@@ -71,67 +80,108 @@ class ColorUint4 extends Iterable<num> implements Color {
     }
   }
 
+  @override
   num operator[](int index) => _getChannel(index);
+
+  @override
   void operator[]=(int index, num value) => _setChannel(index, value);
 
+  @override
   num get index => r;
-  void set index(num i) => r = i;
 
+  @override
+  set index(num i) => r = i;
+
+  @override
   num get r => _getChannel(0);
-  void set r(num v) => _setChannel(0, v);
 
+  @override
+  set r(num v) => _setChannel(0, v);
+
+  @override
   num get g => _getChannel(1);
-  void set g(num v) => _setChannel(1, v);
 
+  @override
+  set g(num v) => _setChannel(1, v);
+
+  @override
   num get b => _getChannel(2);
-  void set b(num v) => _setChannel(2, v);
 
+  @override
+  set b(num v) => _setChannel(2, v);
+
+  @override
   num get a => _getChannel(3);
-  void set a(num v) => _setChannel(3, v);
 
+  @override
+  set a(num v) => _setChannel(3, v);
+
+  @override
   num get rNormalized => r / maxChannelValue;
-  void set rNormalized(num v) => r = v * maxChannelValue;
+  @override
+  set rNormalized(num v) => r = v * maxChannelValue;
 
+  @override
   num get gNormalized => g / maxChannelValue;
-  void set gNormalized(num v) => g = v * maxChannelValue;
+  @override
+  set gNormalized(num v) => g = v * maxChannelValue;
 
+  @override
   num get bNormalized => b / maxChannelValue;
-  void set bNormalized(num v) => b = v * maxChannelValue;
+  @override
+  set bNormalized(num v) => b = v * maxChannelValue;
 
+  @override
   num get aNormalized => a / maxChannelValue;
-  void set aNormalized(num v) => a = v * maxChannelValue;
+  @override
+  set aNormalized(num v) => a = v * maxChannelValue;
 
+  @override
   num get luminance => getLuminance(this);
+  @override
   num get luminanceNormalized => getLuminanceNormalized(this);
 
+  @override
   num getChannel(Channel channel) => channel == Channel.luminance ?
       luminance : _getChannel(channel.index);
 
+  @override
   num getChannelNormalized(Channel channel) =>
       getChannel(channel) / maxChannelValue;
 
+  @override
   void set(Color c) {
-    setColor(c.r, c.g, c.b, c.a);
+    setRgba(c.r, c.g, c.b, c.a);
   }
 
-  void setColor(num r, [num g = 0, num b = 0, num a = 0]) {
-    final ri = r.toInt().clamp(0, 15) & 0xf;
-    final gi = g.toInt().clamp(0, 15) & 0xf;
-    final bi = b.toInt().clamp(0, 15) & 0xf;
-    final ai = a.toInt().clamp(0, 15) & 0xf;
-    data[0] = (ri << 4) | gi;
-    data[1] = (bi << 4) | ai;
+  @override
+  void setRgb(num r, num g, num b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
   }
 
+  @override
+  void setRgba(num r, num g, num b, num a) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+    this.a = a;
+  }
+
+  @override
   ChannelIterator get iterator => ChannelIterator(this);
 
+  @override
   bool operator==(Object? other) =>
       other is Color &&
           other.length == length &&
           other.hashCode == hashCode;
 
+  @override
   int get hashCode => Object.hashAll(toList());
 
+  @override
   Color convert({ Format? format, int? numChannels, num? alpha }) =>
       convertColor(this, format: format, numChannels: numChannels,
           alpha: alpha);

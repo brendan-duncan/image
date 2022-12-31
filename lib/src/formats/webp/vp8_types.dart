@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../../util/internal.dart';
+import '../../util/_internal.dart';
 import 'vp8.dart';
 
 @internal

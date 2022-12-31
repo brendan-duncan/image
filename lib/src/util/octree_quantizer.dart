@@ -7,6 +7,7 @@ import 'quantizer.dart';
 // Color quantization using octree,
 // from https://rosettacode.org/wiki/Color_quantization/C
 class OctreeQuantizer extends Quantizer {
+  @override
   late PaletteUint8 palette;
   final _OctreeNode _root;
 
@@ -41,13 +42,15 @@ class OctreeQuantizer extends Quantizer {
     for (var i = 0; i < l; ++i) {
       final n = nodes[i]
       ..paletteIndex = i;
-      palette.setColor(i, n.r, n.g, n.b);
+      palette.setRgb(i, n.r, n.g, n.b);
     }
   }
 
+  @override
   int getColorIndex(Color c) =>
     getColorIndexRgb(c.r.toInt(), c.g.toInt(), c.b.toInt());
 
+  @override
   int getColorIndexRgb(int r, int g, int b) {
     _OctreeNode? root = _root;
     for (var bit = 1 << 7; bit != 0; bit >>= 1) {

@@ -41,79 +41,120 @@ class ColorFloat16 extends Iterable<num> implements Color {
     data[3] = Float16.doubleToFloat16(a.toDouble());
   }
 
+  @override
   ColorFloat16 clone() => ColorFloat16.from(this);
 
+  @override
   Format get format => Format.float16;
+
+  @override
   int get length => data.length;
+
+  @override
   num get maxChannelValue => 1.0;
+
+  @override
   num get maxIndexValue => 1.0;
+
+  @override
   bool get isLdrFormat => false;
+
+  @override
   bool get isHdrFormat => true;
+
+  @override
   bool get hasPalette => false;
+
+  @override
   Palette? get palette => null;
 
+  @override
   num operator[](int index) => index < data.length ?
       Float16.float16ToDouble(data[index]) : 0;
 
+  @override
   void operator[]=(int index, num value) {
     if (index < data.length) {
       data[index] = Float16.doubleToFloat16(value.toDouble());
     }
   }
 
+  @override
   num get index => r;
-  void set index(num i) => r = i;
+  @override
+  set index(num i) => r = i;
 
+  @override
   num get r => data.isNotEmpty ? Float16.float16ToDouble(data[0]) : 0;
-  void set r(num v) {
+  @override
+  set r(num v) {
     if (data.isNotEmpty) {
       data[0] = Float16.doubleToFloat16(v.toDouble());
     }
   }
 
+  @override
   num get g => data.length > 1 ? Float16.float16ToDouble(data[1]) : 0;
-  void set g(num v) {
+  @override
+  set g(num v) {
     if (data.length > 1) {
       data[1] = Float16.doubleToFloat16(v.toDouble());
     }
   }
 
+  @override
   num get b => data.length > 2 ? Float16.float16ToDouble(data[2]) : 0;
-  void set b(num v) {
+  @override
+  set b(num v) {
     if (data.length > 2) {
       data[2] = Float16.doubleToFloat16(v.toDouble());
     }
   }
 
+  @override
   num get a => data.length > 3 ? Float16.float16ToDouble(data[3]) : 0;
-  void set a(num v) {
+  @override
+  set a(num v) {
     if (data.length > 3) {
       data[3] = Float16.doubleToFloat16(v.toDouble());
     }
   }
 
+  @override
   num get rNormalized => r / maxChannelValue;
-  void set rNormalized(num v) => r = v * maxChannelValue;
+  @override
+  set rNormalized(num v) => r = v * maxChannelValue;
 
+  @override
   num get gNormalized => g / maxChannelValue;
-  void set gNormalized(num v) => g = v * maxChannelValue;
+  @override
+  set gNormalized(num v) => g = v * maxChannelValue;
 
+  @override
   num get bNormalized => b / maxChannelValue;
-  void set bNormalized(num v) => b = v * maxChannelValue;
+  @override
+  set bNormalized(num v) => b = v * maxChannelValue;
 
+  @override
   num get aNormalized => a / maxChannelValue;
-  void set aNormalized(num v) => a = v * maxChannelValue;
+  @override
+  set aNormalized(num v) => a = v * maxChannelValue;
 
+  @override
   num get luminance => getLuminance(this);
+  @override
   num get luminanceNormalized => getLuminanceNormalized(this);
 
+  @override
   num getChannel(Channel channel) => channel == Channel.luminance ?
       luminance : channel.index < data.length
           ? Float16.float16ToDouble(data[channel.index]) : 0;
 
+  @override
   num getChannelNormalized(Channel channel) =>
       getChannel(channel) / maxChannelValue;
 
+  @override
   void set(Color c) {
     r = c.r;
     g = c.g;
@@ -121,7 +162,20 @@ class ColorFloat16 extends Iterable<num> implements Color {
     a = c.a;
   }
 
-  void setColor(num r, [num g = 0, num b = 0, num a = 0]) {
+  @override
+  void setRgb(num r, num g, num b) {
+    data[0] = Float16.doubleToFloat16(r.toDouble());
+    final nc = data.length;
+    if (nc > 1) {
+      data[1] = Float16.doubleToFloat16(g.toDouble());
+      if (nc > 2) {
+        data[2] = Float16.doubleToFloat16(b.toDouble());
+      }
+    }
+  }
+
+  @override
+  void setRgba(num r, num g, num b, num a) {
     data[0] = Float16.doubleToFloat16(r.toDouble());
     final nc = data.length;
     if (nc > 1) {
@@ -135,15 +189,19 @@ class ColorFloat16 extends Iterable<num> implements Color {
     }
   }
 
+  @override
   ChannelIterator get iterator => ChannelIterator(this);
 
+  @override
   bool operator==(Object? other) =>
       other is Color &&
       other.length == length &&
       other.hashCode == hashCode;
 
+  @override
   int get hashCode => Object.hashAll(toList());
 
+  @override
   Color convert({ Format? format, int? numChannels, num? alpha }) =>
       convertColor(this, format: format, numChannels: numChannels,
           alpha: alpha);

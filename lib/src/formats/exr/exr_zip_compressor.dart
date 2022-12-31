@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
+import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';
 
@@ -87,6 +87,7 @@ class InternalExrZipCompressor extends InternalExrCompressor
     return _outCache!;
   }
 
+  @override
   String toString() => '$_maxScanLines'; // Making analysis happy
 
   final int? _maxScanLines;

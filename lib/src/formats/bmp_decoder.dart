@@ -41,12 +41,12 @@ class BmpDecoder extends Decoder {
       return Image.empty();
     }
 
-    final _info = info!;
+    final inf = info!;
 
-    _input.offset = _info.header.imageOffset;
+    _input.offset = inf.header.imageOffset;
 
-    final bpp = _info.bitsPerPixel;
-    final rowStride = ((_info.width * bpp + 31) ~/ 32) * 4;
+    final bpp = inf.bitsPerPixel;
+    final rowStride = ((inf.width * bpp + 31) ~/ 32) * 4;
     final nc = forceRgba ? 4
         : bpp == 1 || bpp == 4 || bpp == 8 ? 1 : bpp == 32 ? 4 : 3;
     final format = forceRgba ? Format.uint8
@@ -60,29 +60,29 @@ class BmpDecoder extends Decoder {
         : bpp == 24 ? Format.uint8
         : bpp == 32 ? Format.uint8
         : Format.uint8;
-    final palette = forceRgba ? null : _info.palette;
+    final palette = forceRgba ? null : inf.palette;
 
-    final image = Image(width: _info.width, height: _info.height,
+    final image = Image(width: inf.width, height: inf.height,
         format: format, numChannels: nc, palette: palette);
 
     for (var y = image.height - 1; y >= 0; --y) {
-      final line = _info.readBottomUp ? y : image.height - 1 - y;
+      final line = inf.readBottomUp ? y : image.height - 1 - y;
       final row = _input.readBytes(rowStride);
       final w = image.width;
       var x = 0;
       final p = image.getPixel(0, line);
       while (x < w) {
-        _info.decodePixel(row, (r, g, b, a) {
+        inf.decodePixel(row, (r, g, b, a) {
           if (x < w) {
-            if (forceRgba && _info.palette != null) {
+            if (forceRgba && inf.palette != null) {
               final pi = r as int;
-              final pr = _info.palette!.getRed(pi);
-              final pg = _info.palette!.getGreen(pi);
-              final pb = _info.palette!.getBlue(pi);
-              final pa = _info.palette!.getAlpha(pi);
-              p.setColor(pr, pg, pb, pa);
+              final pr = inf.palette!.getRed(pi);
+              final pg = inf.palette!.getGreen(pi);
+              final pb = inf.palette!.getBlue(pi);
+              final pa = inf.palette!.getAlpha(pi);
+              p.setRgba(pr, pg, pb, pa);
             } else {
-              p.setColor(r, g, b, a);
+              p.setRgba(r, g, b, a);
             }
             p.moveNext();
             x++;

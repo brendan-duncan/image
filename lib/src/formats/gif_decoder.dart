@@ -81,33 +81,33 @@ class GifDecoder extends Decoder {
     return info;
   }
 
-  void _readApplicationExt(InputBuffer _input) {
-    final blockSize = _input.readByte();
-    final tag = _input.readString(blockSize);
+  void _readApplicationExt(InputBuffer input) {
+    final blockSize = input.readByte();
+    final tag = input.readString(blockSize);
     if (tag == 'NETSCAPE2.0') {
-      final b1 = _input.readByte();
-      final b2 = _input.readByte();
+      final b1 = input.readByte();
+      final b2 = input.readByte();
       if (b1 == 0x03 && b2 == 0x01) {
-        _repeat = _input.readUint16();
+        _repeat = input.readUint16();
       }
     } else {
       _skipRemainder();
     }
   }
 
-  void _readGraphicsControlExt(InputBuffer _input) {
-    /*int blockSize =*/ _input.readByte();
-    final b = _input.readByte();
-    final duration = _input.readUint16();
-    final transparent = _input.readByte();
-    /*int endBlock =*/ _input.readByte();
+  void _readGraphicsControlExt(InputBuffer input) {
+    /*int blockSize =*/ input.readByte();
+    final b = input.readByte();
+    final duration = input.readUint16();
+    final transparent = input.readByte();
+    /*int endBlock =*/ input.readByte();
     final disposalMethod = (b >> 2) & 0x7;
     //int userInput = (b >> 1) & 0x1;
     final transparentFlag = b & 0x1;
 
-    final recordType = _input.peekBytes(1)[0];
+    final recordType = input.peekBytes(1)[0];
     if (recordType == imageDescRecordType) {
-      _input.skip(1);
+      input.skip(1);
       final gifImage = _skipImage();
       if (gifImage == null) {
         return;
@@ -189,7 +189,7 @@ class GifDecoder extends Decoder {
             numChannels: 1, palette: colorMap.getPalette())
           ..clear(colorMap.color(info!.backgroundColor!.r as int));
       } else {
-        lastImage = new Image.from(lastImage);
+        lastImage = Image.from(lastImage);
       }
 
       lastImage.frameDuration = image.frameDuration;
@@ -290,7 +290,7 @@ class GifDecoder extends Decoder {
     if (colorMap != null) {
       final width = line.length;
       for (var x = 0; x < width; ++x) {
-        image.setPixelColor(x, y, line[x]);
+        image.setPixelRgb(x, y, line[x], 0, 0);
       }
     }
   }

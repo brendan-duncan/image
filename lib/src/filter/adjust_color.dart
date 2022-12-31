@@ -124,10 +124,10 @@ Image adjustColor(Image src,
       }
 
       if (brightness != null && brightness != 1.0) {
-        final _b = brightness.clamp(0, 1000);
-        r *= _b;
-        g *= _b;
-        b *= _b;
+        final tb = brightness.clamp(0, 1000);
+        r *= tb;
+        g *= tb;
+        b *= tb;
       }
 
       if (saturation != null) {

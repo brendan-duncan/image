@@ -40,7 +40,7 @@ Image drawString(Image image, String string, { required BitmapFont font,
   var sy = y ?? (image.height / 2).round() - (stringHeight / 2).round();
 
   if (wrap) {
-    final words = string.split(new RegExp(r"\s+"));
+    final words = string.split(RegExp(r"\s+"));
     var subString = "";
     var x2 = sx;
 
@@ -88,7 +88,7 @@ Image drawString(Image image, String string, { required BitmapFont font,
   }
 
   final origX = sx;
-  final substrings = string.split(new RegExp(r"[(\n|\r)]"));
+  final substrings = string.split(RegExp(r"[(\n|\r)]"));
 
   for (var ss in substrings) {
     final chars = ss.codeUnits;

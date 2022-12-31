@@ -551,7 +551,7 @@ class PvrDecoder extends Decoder {
             final r = (ca.r * w[0] + cb.r * w[1]) >> 7;
             final g = (ca.g * w[0] + cb.g * w[1]) >> 7;
             final b = (ca.b * w[0] + cb.b * w[1]) >> 7;
-            result.setPixelColor(px + x4, py + y4, r, g, b);
+            result.setPixelRgb(px + x4, py + y4, r, g, b);
 
             mod >>= 2;
             factorIndex++;
@@ -616,7 +616,7 @@ class PvrDecoder extends Decoder {
             final g = (ca.g * w[0] + cb.g * w[1]) >> 7;
             final b = (ca.b * w[0] + cb.b * w[1]) >> 7;
             final a = (ca.a * w[2] + cb.a * w[3]) >> 7;
-            result.setPixelColor(px + x4, py + y4, r, g, b, a);
+            result.setPixelRgba(px + x4, py + y4, r, g, b, a);
 
             mod >>= 2;
             factorIndex++;

@@ -4,7 +4,7 @@ import '../command.dart';
 class ImageCmd extends Command {
   ImageCmd(Command? input, Image image)
       : super(input) {
-    this.outputImage = image;
+    outputImage = image;
   }
 
   @override

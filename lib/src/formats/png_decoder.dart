@@ -354,7 +354,7 @@ class PngDecoder extends Decoder {
           if (nc == 4 && i < tl) {
             a = t![i];
           }
-          palette.setColor(i, p[pi]!, p[pi + 1]!, p[pi + 2]!, a);
+          palette.setRgba(i, p[pi]!, p[pi + 1]!, p[pi + 2]!, a);
         }
       }
     }
@@ -376,7 +376,7 @@ class PngDecoder extends Decoder {
           : 1;
       for (var i = 0; i < numColors; ++i) {
         final g = i * to8bit;
-        palette.setColor(i, g, g, g, 255);
+        palette.setRgba(i, g, g, g, 255);
       }
       for (var i = 0; i < nt; i += 2) {
         final ti = ((t[i] & 0xff) << 8) | (t[i + 1] & 0xff);
@@ -751,17 +751,17 @@ class PngDecoder extends Decoder {
   }
 
   // Get the color with the list of components.
-  void _setPixel(Pixel _p, List<int> raw) {
+  void _setPixel(Pixel p, List<int> raw) {
     switch (_info.colorType) {
       case PngColorType.grayscale:
         if (_info.transparency != null && _info.bits > 8) {
           final t = _info.transparency!;
           final a = ((t[0] & 0xff) << 24) | (t[1] & 0xff);
           final g = raw[0];
-          _p.setColor(g, g, g, g != a ? _p.maxChannelValue : 0);
+          p.setRgba(g, g, g, g != a ? p.maxChannelValue : 0);
           return;
         }
-        _p.setColor(raw[0]);
+        p.setRgb(raw[0], 0, 0);
         return;
       case PngColorType.rgb:
         final r = raw[0];
@@ -774,21 +774,21 @@ class PngDecoder extends Decoder {
           final tg = ((t[2] & 0xff) << 8) | (t[3] & 0xff);
           final tb = ((t[4] & 0xff) << 8) | (t[5] & 0xff);
           if (raw[0] != tr || raw[1] != tg || raw[2] != tb) {
-            _p.setColor(r, g, b, _p.maxChannelValue);
+            p.setRgba(r, g, b, p.maxChannelValue);
             return;
           }
         }
 
-        _p.setColor(r, g, b);
+        p.setRgb(r, g, b);
         return;
       case PngColorType.indexed:
-        _p.index = raw[0];
+        p.index = raw[0];
         return;
       case PngColorType.grayscaleAlpha:
-        _p.setColor(raw[0], raw[1]);
+        p.setRgb(raw[0], raw[1], 0);
         return;
       case PngColorType.rgba:
-        _p.setColor(raw[0], raw[1], raw[2], raw[3]);
+        p.setRgba(raw[0], raw[1], raw[2], raw[3]);
         return;
     }
 

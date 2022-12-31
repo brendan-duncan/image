@@ -18,11 +18,14 @@ class Rational {
 
   double toDouble() => denominator == 0 ? 0.0 : numerator / denominator;
 
+  @override
   bool operator ==(Object other) =>
       other is Rational &&
           numerator == other.numerator && denominator == other.denominator;
 
+  @override
   int get hashCode => Object.hash(numerator, denominator);
 
+  @override
   String toString() => '$numerator/$denominator';
 }

@@ -10,7 +10,9 @@ import 'exr_channel.dart';
 import 'exr_part.dart';
 
 class ExrImage implements DecodeInfo {
+  @override
   int width = 0;
+  @override
   int height = 0;
   /// An EXR image has one or more parts, each of which contains a framebuffer.
   final List<ExrPart> _parts = [];
@@ -59,10 +61,12 @@ class ExrImage implements DecodeInfo {
     _readImage(input);
   }
 
+  @override
   Color? get backgroundColor => null;
 
   List<ExrPart> get parts => _parts;
 
+  @override
   int get numFrames => 1;
 
   /// Parse just enough of the file to identify that it's an EXR image.
@@ -196,7 +200,7 @@ class ExrImage implements DecodeInfo {
                     p[ch.nameType.index] = v;
                   } else {
                     final slice = framebuffer.getExtraChannel(ch.name);
-                    slice?.setPixelColor(tx, ty, v);
+                    slice?.setPixelRgb(tx, ty, v, 0, 0);
                   }
                 }
               }
@@ -285,7 +289,7 @@ class ExrImage implements DecodeInfo {
               p[ci] = v;
             } else {
               final slice = framebuffer.getExtraChannel(ch.name);
-              slice?.setPixelColor(xx, yy, v);
+              slice?.setPixelRgb(xx, yy, v, 0, 0);
             }
           }
         }

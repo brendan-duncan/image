@@ -27,8 +27,8 @@ class BmpEncoder extends Encoder {
     if (format == Format.uint1 && nc == 1 && palette == null) {
       // add palette
       palette = PaletteUint8(2, 3)
-        ..setColor(0, 0)
-        ..setColor(1, 255, 255, 255);
+        ..setRgb(0, 0, 0, 0)
+        ..setRgb(1, 255, 255, 255);
     } else if (format == Format.uint1 && nc == 2) {
       // => uint2 palette
       image = image.convert(format: Format.uint2, numChannels: 1,

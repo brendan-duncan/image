@@ -9,21 +9,21 @@ import 'package:image/image.dart' as img;
 void main() {
   final images = querySelectorAll('img');
 
-  for (var _img in images) {
-    final imgElem = _img as ImageElement;
+  for (var e in images) {
+    final imgElem = e as ImageElement;
     if (imgElem.src!.toLowerCase().endsWith('.exr')) {
       final req = HttpRequest()
       ..open('GET', imgElem.src!)
-      ..overrideMimeType('text\/plain; charset=x-user-defined');
+      ..overrideMimeType('text/plain; charset=x-user-defined');
       req.onLoadEnd.listen((e) {
         if (req.status == 200) {
           // Get the bytes from the image file
-          final _bytes = req.responseText!
+          final b = req.responseText!
               .split('')
               .map((e) => String.fromCharCode(e.codeUnitAt(0) & 0xff))
               .join()
               .codeUnits;
-          final bytes = Uint8List.fromList(_bytes);
+          final bytes = Uint8List.fromList(b);
 
           // Decode the EXR image
           final image = img.decodeExr(bytes);

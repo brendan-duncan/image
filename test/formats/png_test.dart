@@ -7,7 +7,7 @@ import '../_test_util.dart';
 void main() {
   group('Format', () {
     group('png', () {
-      const _buck24Hash = 817446904;
+      const buck24Hash = 817446904;
       Image? buck24Image;
 
       group('b1_1', () {
@@ -57,8 +57,8 @@ void main() {
       group('b1_1p', () {
         final image = Image(width: 32, height: 32, format: Format.uint1,
             withPalette: true);
-        image.palette!.setColor(0, 255);
-        image.palette!.setColor(1, 0, 255);
+        image.palette!.setRgb(0, 255, 0, 0);
+        image.palette!.setRgb(1, 0, 255, 0);
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 1 : 0;
           p.index = c;
@@ -105,7 +105,7 @@ void main() {
         final image = Image(width: 32, height: 32, format: Format.uint2,
             withPalette: true);
         for (var i = 0; i < 4; ++i) {
-          image.palette!.setColor(i, i * 85, i * 85, i * 85);
+          image.palette!.setRgb(i, i * 85, i * 85, i * 85);
         }
         for (final p in image) {
           p.r = p.x >> 3;
@@ -153,7 +153,7 @@ void main() {
         final image = Image(width: 32, height: 32, format: Format.uint4,
             withPalette: true);
         for (var i = 0; i < 16; ++i) {
-          image.palette!.setColor(i, i * 17, i * 17, i * 17);
+          image.palette!.setRgb(i, i * 17, i * 17, i * 17);
         }
         for (final p in image) {
           p.r = p.x >> 1;
@@ -200,7 +200,7 @@ void main() {
       group('b8_3p', () {
         final image = Image(width: 32, height: 32, withPalette: true);
         for (var i = 0; i < 256; ++i) {
-          image.palette!.setColor(i, i, i, i);
+          image.palette!.setRgb(i, i, i, i);
         }
         for (final p in image) {
           p.r = p.x * 8;
@@ -257,7 +257,7 @@ void main() {
         expect(image.format, equals(Format.uint8));
 
         final hash = hashImage(image);
-        expect(hash, equals(_buck24Hash));
+        expect(hash, equals(buck24Hash));
 
         buck24Image = image;
       });
@@ -265,7 +265,7 @@ void main() {
       test('encode palette', () {
         final palette = PaletteUint8(256, 3);
         for (var i = 0; i < 256; ++i) {
-          palette.setColor(i, (i * 2) % 256, (i * 8) % 256, i);
+          palette.setRgb(i, (i * 2) % 256, (i * 8) % 256, i);
         }
         final image = Image(width: 256, height: 256, numChannels: 1,
             palette: palette);
@@ -311,7 +311,7 @@ void main() {
 
         final png2 = decodePng(file.readAsBytesSync());
         final hash = hashImage(png2!);
-        expect(hash, equals(_buck24Hash));
+        expect(hash, equals(buck24Hash));
       });
 
       test('encode filter:sub', () {
@@ -322,7 +322,7 @@ void main() {
 
         final png2 = decodePng(file.readAsBytesSync());
         final hash = hashImage(png2!);
-        expect(hash, equals(_buck24Hash));
+        expect(hash, equals(buck24Hash));
       });
 
       test('encode filter:up', () {
@@ -333,7 +333,7 @@ void main() {
 
         final png2 = decodePng(file.readAsBytesSync());
         final hash = hashImage(png2!);
-        expect(hash, equals(_buck24Hash));
+        expect(hash, equals(buck24Hash));
       });
 
       test('encode filter:average', () {
@@ -344,7 +344,7 @@ void main() {
 
         final png2 = decodePng(file.readAsBytesSync());
         final hash = hashImage(png2!);
-        expect(hash, equals(_buck24Hash));
+        expect(hash, equals(buck24Hash));
       });
 
       test('encode filter:paeth', () {
@@ -355,7 +355,7 @@ void main() {
 
         final png2 = decodePng(file.readAsBytesSync());
         final hash = hashImage(png2!);
-        expect(hash, equals(_buck24Hash));
+        expect(hash, equals(buck24Hash));
       });
 
       test('decodeAnimation', () {

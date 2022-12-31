@@ -207,7 +207,7 @@ class BmpInfo implements DecodeInfo {
       final g = input.readByte();
       final r = input.readByte();
       final a = input.readByte(); // ignored
-      palette!.setColor(i, r, g, b, a);
+      palette!.setRgba(i, r, g, b, a);
     }
   }
 

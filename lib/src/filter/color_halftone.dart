@@ -10,7 +10,7 @@ Image colorHalftone(Image src, { num amount = 1, int? centerX, int? centerY,
     Image? mask, Channel maskChannel = Channel.luminance }) {
   angle = angle * 0.0174533;
 
-  num _pattern(int x, int y, int cx, int cy, num angle) {
+  num pattern(int x, int y, int cx, int cy, num angle) {
     final scale = 3.14159 / size;
     final s = sin(angle);
     final c = cos(angle);
@@ -36,13 +36,13 @@ Image colorHalftone(Image src, { num amount = 1, int? centerX, int? centerY,
       cmyC = (cmyC - cmyK) / (1 - cmyK);
       cmyM = (cmyM - cmyK) / (1 - cmyK);
       cmyY = (cmyY - cmyK) / (1 - cmyK);
-      cmyC = (cmyC * 10 - 3 + _pattern(x, y, cx, cy, angle + 0.26179))
+      cmyC = (cmyC * 10 - 3 + pattern(x, y, cx, cy, angle + 0.26179))
           .clamp(0, 1);
-      cmyM = (cmyM * 10 - 3 + _pattern(x, y, cx, cy, angle + 1.30899))
+      cmyM = (cmyM * 10 - 3 + pattern(x, y, cx, cy, angle + 1.30899))
           .clamp(0, 1);
-      cmyY = (cmyY * 10 - 3 + _pattern(x, y, cx, cy, angle))
+      cmyY = (cmyY * 10 - 3 + pattern(x, y, cx, cy, angle))
           .clamp(0, 1);
-      cmyK = (cmyK * 10 - 5 + _pattern(x, y, cx, cy, angle + 0.78539))
+      cmyK = (cmyK * 10 - 5 + pattern(x, y, cx, cy, angle + 0.78539))
           .clamp(0, 1);
 
       final r = (1 - cmyC - cmyK) * p.maxChannelValue;

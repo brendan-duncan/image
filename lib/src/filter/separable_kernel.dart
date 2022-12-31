@@ -82,7 +82,7 @@ class SeparableKernel {
 
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       if (msk == null) {
-        p.setColor(r, g, b, a);
+        p.setRgba(r, g, b, a);
       } else {
         p..r = mix(p.r, r, msk)
         ..g = mix(p.g, g, msk)

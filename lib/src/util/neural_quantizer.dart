@@ -35,6 +35,7 @@ import 'quantizer.dart';
 /// Compute a color map with a given number of colors that best represents
 /// the given image.
 class NeuralQuantizer extends Quantizer {
+  @override
   late PaletteUint8 palette;
 
   int samplingFactor;
@@ -59,6 +60,7 @@ class NeuralQuantizer extends Quantizer {
   int get numColors => netSize;
 
   /// Find the index of the closest color to [c] in the colorMap.
+  @override
   int getColorIndex(Color c) {
     final r = c.r.toInt();
     final g = c.g.toInt();
@@ -67,6 +69,7 @@ class NeuralQuantizer extends Quantizer {
   }
 
   /// Find the index of the closest color to [r],[g],[b] in the colorMap.
+  @override
   int getColorIndexRgb(int r, int g, int b) => _inxSearch(b, g, r);
 
   /// Find the color closest to [c] in the colorMap.
@@ -126,7 +129,7 @@ class NeuralQuantizer extends Quantizer {
 
   void _copyColorMap() {
     for (var i = 0; i < netSize; ++i) {
-      palette.setColor(i,
+      palette.setRgb(i,
           _palette.get(i, 2).abs(),
           _palette.get(i, 1).abs(),
           _palette.get(i, 0).abs());

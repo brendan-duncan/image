@@ -16,6 +16,7 @@ class PixelUint1 extends Iterable<num> implements Pixel {
   int _index;
   int _bitIndex;
   int _rowOffset;
+  @override
   final ImageDataUint1 image;
 
   PixelUint1.imageData(this.image)
@@ -42,49 +43,81 @@ class PixelUint1 extends Iterable<num> implements Pixel {
       , _rowOffset = other._rowOffset
       , image = other.image;
 
+  @override
   PixelUint1 clone() => PixelUint1.from(this);
 
+  @override
   int get length => palette?.numChannels ?? image.numChannels;
-  int get numChannels => palette?.numChannels ?? image.numChannels;
+
+  int get numChannels => image.numChannels;
+
+  @override
   bool get hasPalette => image.hasPalette;
+
+  @override
   Palette? get palette => image.palette;
+
+  @override
   int get width => image.width;
+
+  @override
   int get height => image.height;
+
   Uint8List get data => image.data;
+
   int get imageLength => image.length;
+
+  @override
   num get maxChannelValue => image.maxChannelValue;
+
+  @override
   num get maxIndexValue => image.maxIndexValue;
+
+  @override
   Format get format => Format.uint1;
+
+  @override
   bool get isLdrFormat => image.isLdrFormat;
+
+  @override
   bool get isHdrFormat => image.isHdrFormat;
 
+  @override
   bool get isValid => x >= 0 && x < (image.width - 1) &&
       y >= 0 && y < (image.height - 1);
 
+  @override
   int get x => _x;
+  @override
   int get y => _y;
 
   /// The normalized x coordinate of the pixel, in the range \[0, 1\].
+  @override
   num get xNormalized => width > 1 ? _x / (width - 1) : 0;
 
   /// The normalized y coordinate of the pixel, in the range \[0, 1\].
+  @override
   num get yNormalized => height > 1 ? _y / (height - 1) : 0;
 
   /// Set the normalized coordinates of the pixel, in the range \[0, 1\].
+  @override
   void setPositionNormalized(num x, num y) =>
       setPosition((x * (width - 1)).floor(), (y * (height - 1)).floor());
 
+  @override
   void setPosition(int x, int y) {
-    this._x = x;
-    this._y = y;
+    _x = x;
+    _y = y;
     final bpp = image.numChannels;
     _rowOffset = _y * image.rowStride;
     _index = _rowOffset + ((_x * bpp) >> 3);
     _bitIndex = (_x * bpp) & 0x7;
   }
 
+  @override
   Pixel get current => this;
 
+  @override
   bool moveNext() {
     _x++;
     if (_x == width) {
@@ -142,57 +175,78 @@ class PixelUint1 extends Iterable<num> implements Pixel {
 
     var v = data[i];
     final vi = value.toInt().clamp(0, 1);
-    const _mask = [ 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f ];
-    final mask = _mask[bi];
+    const msk = [ 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f ];
+    final mask = msk[bi];
     v = (v & mask) | (vi << bi);
     data[i] = v;
   }
 
+  @override
   num operator[](int ci) => _getChannel(ci);
 
+  @override
   void operator[]=(int ci, num value) => _setChannel(ci, value);
 
+  @override
   num get index => _get(0);
-  void set index(num i) => _setChannel(0, i);
+  @override
+  set index(num i) => _setChannel(0, i);
 
+  @override
   num get r => _getChannel(0);
+  @override
+  set r(num r) => _setChannel(0, r);
 
-  void set r(num r) => _setChannel(0, r);
-
+  @override
   num get g => _getChannel(1);
+  @override
+  set g(num g) => _setChannel(1, g);
 
-  void set g(num g) => _setChannel(1, g);
-
+  @override
   num get b => _getChannel(2);
+  @override
+  set b(num b) => _setChannel(2, b);
 
-  void set b(num b) => _setChannel(2, b);
-
+  @override
   num get a => _getChannel(3);
+  @override
+  set a(num a) => _setChannel(3, a);
 
-  void set a(num a) => _setChannel(3, a);
-
+  @override
   num get rNormalized => r / maxChannelValue;
-  void set rNormalized(num v) => r = v * maxChannelValue;
+  @override
+  set rNormalized(num v) => r = v * maxChannelValue;
 
+  @override
   num get gNormalized => g / maxChannelValue;
-  void set gNormalized(num v) => g = v * maxChannelValue;
+  @override
+  set gNormalized(num v) => g = v * maxChannelValue;
 
+  @override
   num get bNormalized => b / maxChannelValue;
-  void set bNormalized(num v) => b = v * maxChannelValue;
+  @override
+  set bNormalized(num v) => b = v * maxChannelValue;
 
+  @override
   num get aNormalized => a / maxChannelValue;
-  void set aNormalized(num v) => a = v * maxChannelValue;
+  @override
+  set aNormalized(num v) => a = v * maxChannelValue;
 
+  @override
   num get luminance => getLuminance(this);
+  @override
   num get luminanceNormalized => getLuminanceNormalized(this);
 
+  @override
   num getChannel(Channel channel) => channel == Channel.luminance ?
       luminance : channel.index < numChannels ? _getChannel(channel.index)
       : 0;
 
+  @override
   num getChannelNormalized(Channel channel) =>
       getChannel(channel) / maxChannelValue;
 
+  @override
   void set(Color c) {
     r = c.r;
     g = c.g;
@@ -200,7 +254,22 @@ class PixelUint1 extends Iterable<num> implements Pixel {
     a = c.a;
   }
 
-  void setColor(num r, [num g = 0, num b = 0, num a = 0]) {
+  @override
+  void setRgb(num r, num g, num b) {
+    final nc = image.numChannels;
+    if (nc > 0) {
+      _setChannel(0, r);
+      if (nc > 1) {
+        _setChannel(1, g);
+        if (nc > 2) {
+          _setChannel(2, b);
+        }
+      }
+    }
+  }
+
+  @override
+  void setRgba(num r, num g, num b, num a) {
     final nc = image.numChannels;
     if (nc > 0) {
       _setChannel(0, r);
@@ -216,8 +285,10 @@ class PixelUint1 extends Iterable<num> implements Pixel {
     }
   }
 
+  @override
   ChannelIterator get iterator => ChannelIterator(this);
 
+  @override
   bool operator==(Object? other) {
     if (other is PixelUint1) {
       return hashCode == other.hashCode;
@@ -250,8 +321,10 @@ class PixelUint1 extends Iterable<num> implements Pixel {
     return false;
   }
 
+  @override
   int get hashCode => Object.hashAll(toList());
 
+  @override
   Color convert({ Format? format, int? numChannels, num? alpha }) =>
       convertColor(this, format: format, numChannels: numChannels,
           alpha: alpha);

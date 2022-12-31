@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import '../../util/internal.dart';
+import '../../util/_internal.dart';
 import 'jpeg_component.dart';
 
 @internal

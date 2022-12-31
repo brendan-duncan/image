@@ -38,7 +38,7 @@ void testSepia() {
 
   num amount = 1.0;
 
-  void _apply() {
+  void apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.sepia(image, amount: amount);
@@ -56,10 +56,10 @@ void testSepia() {
 
   _addControl('Amount', amount.toString(), sidebar, (num v) {
     amount = v;
-    _apply();
+    apply();
   });
 
-  _apply();
+  apply();
 }
 
 void testSobel() {
@@ -72,7 +72,7 @@ void testSobel() {
 
   num amount = 1.0;
 
-  void _apply() {
+  void apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.sobel(image, amount: amount);
@@ -89,10 +89,10 @@ void testSobel() {
 
   _addControl('Amount', amount.toString(), sidebar, (num v) {
     amount = v;
-    _apply();
+    apply();
   });
 
-  _apply();
+  apply();
 }
 
 void testGaussian() {
@@ -105,7 +105,7 @@ void testGaussian() {
 
   var radius = 5;
 
-  void _apply() {
+  void apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.gaussianBlur(image, radius: radius);
@@ -122,10 +122,10 @@ void testGaussian() {
 
   _addControl('Radius', radius.toString(), sidebar, (num v) {
     radius = v.toInt();
-    _apply();
+    apply();
   });
 
-  _apply();
+  apply();
 }
 
 void testVignette() {
@@ -140,7 +140,7 @@ void testVignette() {
   num end = 0.75;
   num amount = 1.0;
 
-  void _apply() {
+  void apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.vignette(image, start: start, end: end, amount: amount);
@@ -157,20 +157,20 @@ void testVignette() {
 
   _addControl('Start', start.toString(), sidebar, (num v) {
     start = v;
-    _apply();
+    apply();
   });
 
   _addControl('End', end.toString(), sidebar, (num v) {
     end = v;
-    _apply();
+    apply();
   });
 
   _addControl('Amount', amount.toString(), sidebar, (num v) {
     amount = v;
-    _apply();
+    apply();
   });
 
-  _apply();
+  apply();
 }
 
 void testPixelate() {
@@ -183,7 +183,7 @@ void testPixelate() {
 
   var blockSize = 5;
 
-  void _apply() {
+  void apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.pixelate(image, size: blockSize);
@@ -200,10 +200,10 @@ void testPixelate() {
 
   _addControl('blockSize', blockSize.toString(), sidebar, (num v) {
     blockSize = v.toInt();
-    _apply();
+    apply();
   });
 
-  _apply();
+  apply();
 }
 
 void testColorOffset() {
@@ -219,7 +219,7 @@ void testColorOffset() {
   var blue = 0;
   var alpha = 0;
 
-  void _apply() {
+  void apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.colorOffset(image, red: red, green: green, blue: blue,
@@ -237,25 +237,25 @@ void testColorOffset() {
 
   _addControl('red', red.toString(), sidebar, (num v) {
     red = v.toInt();
-    _apply();
+    apply();
   });
 
   _addControl('green', red.toString(), sidebar, (num v) {
     green = v.toInt();
-    _apply();
+    apply();
   });
 
   _addControl('blue', red.toString(), sidebar, (num v) {
     blue = v.toInt();
-    _apply();
+    apply();
   });
 
   _addControl('alpha', red.toString(), sidebar, (num v) {
     alpha = v.toInt();
-    _apply();
+    apply();
   });
 
-  _apply();
+  apply();
 }
 
 void testAdjustColor() {
@@ -274,7 +274,7 @@ void testAdjustColor() {
   num hue = 0.0;
   num amount = 1.0;
 
-  void _apply() {
+  void apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
 
@@ -300,40 +300,40 @@ void testAdjustColor() {
 
   _addControl('Contrast', contrast.toString(), sidebar, (num v) {
     contrast = v;
-    _apply();
+    apply();
   });
 
   _addControl('Saturation', saturation.toString(), sidebar, (num v) {
     saturation = v;
-    _apply();
+    apply();
   });
 
   _addControl('Brightness', brightness.toString(), sidebar, (num v) {
     brightness = v;
-    _apply();
+    apply();
   });
 
   _addControl('Gamma', gamma.toString(), sidebar, (num v) {
     gamma = v;
-    _apply();
+    apply();
   });
 
   _addControl('Exposure', exposure.toString(), sidebar, (num v) {
     exposure = v;
-    _apply();
+    apply();
   });
 
   _addControl('Hue', hue.toString(), sidebar, (num v) {
     hue = v;
-    _apply();
+    apply();
   });
 
   _addControl('Amount', amount.toString(), sidebar, (num v) {
     amount = v;
-    _apply();
+    apply();
   });
 
-  _apply();
+  apply();
 }
 
 void main() {

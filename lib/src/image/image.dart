@@ -78,7 +78,7 @@ class Image extends Iterable<Pixel> {
       int numChannels = 3, bool withPalette = false,
       Format paletteFormat = Format.uint8, Palette? palette, ExifData? exif,
       IccProfile? iccp, this.textData, this.loopCount = 0,
-      this.frameType = FrameType.sequence, this.backgroundColor = null,
+      this.frameType = FrameType.sequence, this.backgroundColor,
       this.frameDuration = 0, this.frameIndex = 0 }) {
     frames.add(this);
     _initialize(width, height, format: format, numChannels: numChannels,
@@ -168,7 +168,7 @@ class Image extends Iterable<Pixel> {
       Format paletteFormat = Format.uint8,
       Palette? palette, ExifData? exif,
       IccProfile? iccp, this.textData, this.loopCount = 0,
-      this.frameType = FrameType.sequence, this.backgroundColor = null,
+      this.frameType = FrameType.sequence, this.backgroundColor,
       this.frameDuration = 0, this.frameIndex = 0 }) {
     frames.add(this);
     _initialize(width, height, format: format, numChannels: numChannels,
@@ -228,7 +228,7 @@ class Image extends Iterable<Pixel> {
       throw ImageException('Invalid number of channels for image $numChannels.'
           ' Must be between 1 and 4.');
     }
-    this.iccProfile = iccp;
+    iccProfile = iccp;
     if (exif != null) {
       _exif = ExifData.from(exif);
     }
@@ -302,6 +302,7 @@ class Image extends Iterable<Pixel> {
       Image.from(this, noAnimation: noAnimation, noPixels: noPixels);
 
   /// String representation of the image.
+  @override
   String toString() => 'Image($width, $height, ${format.name}, $numChannels)';
 
   /// The width of the image in pixels.
@@ -320,9 +321,7 @@ class Image extends Iterable<Pixel> {
   /// The exif metadata for the image. If an ExifData hasn't been created
   /// for the image yet, one will be added.
   ExifData get exif {
-    if (_exif == null) {
-      _exif = ExifData();
-    }
+    _exif ??= ExifData();
     return _exif!;
   }
 
@@ -339,9 +338,7 @@ class Image extends Iterable<Pixel> {
       return;
     }
 
-    if (extraChannels == null) {
-      extraChannels = {};
-    }
+    extraChannels ??={};
 
     if (data == null) {
       extraChannels!.remove(name);
@@ -356,6 +353,7 @@ class Image extends Iterable<Pixel> {
 
   /// Returns a pixel iterator for iterating over all of the pixels in the
   /// image.
+  @override
   Iterator<Pixel> get iterator => data!.iterator;
 
   /// returns a pixel iterator for iterating over a rectangular range of pixels
@@ -442,7 +440,7 @@ class Image extends Iterable<Pixel> {
     final dx = fx - x;
     final dy = fy - y;
 
-    num _linear(num icc, num inc, num icn, num inn) =>
+    num linear(num icc, num inc, num icn, num inn) =>
         icc + dx * (inc - icc + dy * (icc + inn - icn - inc)) +
             dy * (icn - icc);
 
@@ -452,10 +450,10 @@ class Image extends Iterable<Pixel> {
     final inn = nx >= width || ny >= height ? icc : getPixelSafe(nx, ny);
 
     return getColor(
-        _linear(icc.r, inc.r, icn.r, inn.r),
-        _linear(icc.g, inc.g, icn.g, inn.g),
-        _linear(icc.b, inc.b, icn.b, inn.b),
-        _linear(icc.a, inc.a, icn.a, inn.a));
+        linear(icc.r, inc.r, icn.r, inn.r),
+        linear(icc.g, inc.g, icn.g, inn.g),
+        linear(icc.b, inc.b, icn.b, inn.b),
+        linear(icc.a, inc.a, icn.a, inn.a));
   }
 
   /// Get the pixel using cubic interpolation for non-integer pixel
@@ -473,7 +471,7 @@ class Image extends Iterable<Pixel> {
     final dx = fx - x;
     final dy = fy - y;
 
-    num _cubic(num dx, num ipp, num icp, num inp, num iap) =>
+    num cubic(num dx, num ipp, num icp, num inp, num iap) =>
         icp + 0.5 * (dx * (-ipp + inp) +
         dx * dx * (2 * ipp - 5 * icp + 4 * inp - iap) +
         dx * dx * dx * (-ipp + 3 * icp - 3 * inp + iap));
@@ -485,44 +483,44 @@ class Image extends Iterable<Pixel> {
     final inp = py < 0 || nx >= width ? icc : getPixelSafe(nx, py);
     final iap = ax >= width || py < 0 ? icc : getPixelSafe(ax, py);
 
-    final ip0 = _cubic(dx, ipp.r, icp.r, inp.r, iap.r);
-    final ip1 = _cubic(dx, ipp.g, icp.g, inp.g, iap.g);
-    final ip2 = _cubic(dx, ipp.b, icp.b, inp.b, iap.b);
-    final ip3 = _cubic(dx, ipp.a, icp.a, inp.a, iap.a);
+    final ip0 = cubic(dx, ipp.r, icp.r, inp.r, iap.r);
+    final ip1 = cubic(dx, ipp.g, icp.g, inp.g, iap.g);
+    final ip2 = cubic(dx, ipp.b, icp.b, inp.b, iap.b);
+    final ip3 = cubic(dx, ipp.a, icp.a, inp.a, iap.a);
 
     final ipc = px < 0 ? icc : getPixelSafe(px, y);
     final inc = nx >= width ? icc : getPixelSafe(nx, y);
     final iac = ax >= width ? icc : getPixelSafe(ax, y);
 
-    final ic0 = _cubic(dx, ipc.r, icc.r, inc.r, iac.r);
-    final ic1 = _cubic(dx, ipc.g, icc.g, inc.g, iac.g);
-    final ic2 = _cubic(dx, ipc.b, icc.b, inc.b, iac.b);
-    final ic3 = _cubic(dx, ipc.a, icc.a, inc.a, iac.a);
+    final ic0 = cubic(dx, ipc.r, icc.r, inc.r, iac.r);
+    final ic1 = cubic(dx, ipc.g, icc.g, inc.g, iac.g);
+    final ic2 = cubic(dx, ipc.b, icc.b, inc.b, iac.b);
+    final ic3 = cubic(dx, ipc.a, icc.a, inc.a, iac.a);
 
     final ipn = px < 0 || ny >= height ? icc : getPixelSafe(px, ny);
     final icn = ny >= height ? icc : getPixelSafe(x, ny);
     final inn = nx >= width || ny >= height ? icc : getPixelSafe(nx, ny);
     final ian = ax >= width || ny >= height ? icc : getPixelSafe(ax, ny);
 
-    final in0 = _cubic(dx, ipn.r, icn.r, inn.r, ian.r);
-    final in1 = _cubic(dx, ipn.g, icn.g, inn.g, ian.g);
-    final in2 = _cubic(dx, ipn.b, icn.b, inn.b, ian.b);
-    final in3 = _cubic(dx, ipn.a, icn.a, inn.a, ian.a);
+    final in0 = cubic(dx, ipn.r, icn.r, inn.r, ian.r);
+    final in1 = cubic(dx, ipn.g, icn.g, inn.g, ian.g);
+    final in2 = cubic(dx, ipn.b, icn.b, inn.b, ian.b);
+    final in3 = cubic(dx, ipn.a, icn.a, inn.a, ian.a);
 
     final ipa = px < 0 || ay >= height ? icc : getPixelSafe(px, ay);
     final ica = ay >= height ? icc : getPixelSafe(x, ay);
     final ina = nx >= width || ay >= height ? icc : getPixelSafe(nx, ay);
     final iaa = ax >= width || ay >= height ? icc : getPixelSafe(ax, ay);
 
-    final ia0 = _cubic(dx, ipa.r, ica.r, ina.r, iaa.r);
-    final ia1 = _cubic(dx, ipa.g, ica.g, ina.g, iaa.g);
-    final ia2 = _cubic(dx, ipa.b, ica.b, ina.b, iaa.b);
-    final ia3 = _cubic(dx, ipa.a, ica.a, ina.a, iaa.a);
+    final ia0 = cubic(dx, ipa.r, ica.r, ina.r, iaa.r);
+    final ia1 = cubic(dx, ipa.g, ica.g, ina.g, iaa.g);
+    final ia2 = cubic(dx, ipa.b, ica.b, ina.b, iaa.b);
+    final ia3 = cubic(dx, ipa.a, ica.a, ina.a, iaa.a);
 
-    final c0 = _cubic(dy, ip0, ic0, in0, ia0);
-    final c1 = _cubic(dy, ip1, ic1, in1, ia1);
-    final c2 = _cubic(dy, ip2, ic2, in2, ia2);
-    final c3 = _cubic(dy, ip3, ic3, in3, ia3);
+    final c0 = cubic(dy, ip0, ic0, in0, ia0);
+    final c1 = cubic(dy, ip1, ic1, in1, ia1);
+    final c2 = cubic(dy, ip2, ic2, in2, ia2);
+    final c3 = cubic(dy, ip3, ic3, in3, ia3);
 
     return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
   }
@@ -533,18 +531,30 @@ class Image extends Iterable<Pixel> {
     if (c is Pixel) {
       if (c.image.hasPalette) {
         if (hasPalette) {
-          data?.setPixelColor(x, y, c.index);
+          data?.setPixelRgb(x, y, c.index, 0, 0);
           return;
         }
       }
     }
-    data?.setPixelColor(x, y, c.r, c.g, c.b, c.a);
+    data?.setPixelRgba(x, y, c.r, c.g, c.b, c.a);
   }
+
+  /// Set the index value for palette images, or the red channel otherwise.
+  void setPixelIndex(int x, int y, num i) =>
+      data?.setPixelR(x, y, i);
+
+  void setPixelR(int x, int y, num i) =>
+      data?.setPixelR(x, y, i);
+
+  /// Set the color of the [Pixel] at the given coordinates to the given
+  /// color values [r], [g], [b].
+  void setPixelRgb(int x, int y, num r, num g, num b) =>
+      data?.setPixelRgb(x, y, r, g, b);
 
   /// Set the color of the [Pixel] at the given coordinates to the given
   /// color values [r], [g], [b], and [a].
-  void setPixelColor(int x, int y, num r, [num g = 0, num b = 0, num a = 0]) =>
-      data?.setPixelColor(x, y, r, g, b, a);
+  void setPixelRgba(int x, int y, num r, num g, num b, num a) =>
+      data?.setPixelRgba(x, y, r, g, b, a);
 
   /// The maximum value of a pixel channel, based on the [format] of the image.
   /// If the image has a [palette], this will be the maximum value of a palette
@@ -638,7 +648,7 @@ class Image extends Iterable<Pixel> {
             np.index = numColors;
             c = convertColor(op, to: c, format: f, numChannels: numChannels,
                 alpha: alpha);
-            pal.setColor(numColors, c.r, c.g, c.b);
+            pal.setRgb(numColors, c.r, c.g, c.b);
             numColors++;
           }
           op.moveNext();
@@ -661,10 +671,8 @@ class Image extends Iterable<Pixel> {
 
   /// Add text metadata to the image.
   void addTextData(Map<String, String> data) {
-    if (textData == null) {
-      textData = {};
-    }
-    for (var key in data.keys) {
+    textData ??= {};
+    for (final key in data.keys) {
       textData![key] = data[key]!;
     }
   }

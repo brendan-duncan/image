@@ -11,6 +11,7 @@ import 'pixel_uint8.dart';
 
 class ImageDataUint8 extends ImageData {
   final Uint8List data;
+  @override
   final Palette? palette;
 
   ImageDataUint8(int width, int height, int numChannels)
@@ -28,40 +29,55 @@ class ImageDataUint8 extends ImageData {
       , palette = other.palette?.clone()
       , super(other.width, other.height, other.numChannels);
 
+  @override
   ImageDataUint8 clone({ bool noPixels = false }) =>
       ImageDataUint8.from(this, skipPixels: noPixels);
 
+  @override
   Format get format => Format.uint8;
 
+  @override
   FormatType get formatType => FormatType.uint;
 
+  @override
   ByteBuffer get buffer => data.buffer;
 
+  @override
   int get rowStride => width * numChannels;
 
+  @override
   int get bitsPerChannel => 8;
 
+  @override
   PixelUint8 get iterator => PixelUint8.imageData(this);
 
+  @override
   Iterator<Pixel> getRange(int x, int y, int width, int height) =>
       PixelRangeIterator(PixelUint8.imageData(this), x, y, width, height);
 
+  @override
   int get lengthInBytes => data.lengthInBytes;
 
+  @override
   int get length => data.lengthInBytes;
 
+  @override
   num get maxChannelValue => palette?.maxChannelValue ?? 255;
 
+  @override
   num get maxIndexValue => 255;
 
+  @override
   bool get isHdrFormat => false;
 
+  @override
   Color getColor(num r, num g, num b, [num? a]) =>
       a == null ? ColorRgb8(r.clamp(0, 255).toInt(), g.clamp(0, 255).toInt(),
               b.clamp(0, 255).toInt())
           : ColorRgba8(r.clamp(0, 255).toInt(), g.clamp(0, 255).toInt(),
               b.clamp(0, 255).toInt(), a.clamp(0, 255).toInt());
 
+  @override
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
     if (pixel == null || pixel is! PixelUint8 || pixel.image != this) {
       pixel = PixelUint8.imageData(this);
@@ -70,7 +86,26 @@ class ImageDataUint8 extends ImageData {
     return pixel;
   }
 
-  void setPixelColor(int x, int y, num r, [num g = 0, num b = 0, num a = 255]) {
+  @override
+  void setPixelR(int x, int y, num i) {
+    final index = y * rowStride + (x * numChannels);
+    data[index] = i.toInt();
+  }
+
+  @override
+  void setPixelRgb(int x, int y, num r, num g, num b) {
+    final index = y * rowStride + (x * numChannels);
+    data[index] = r.toInt();
+    if (numChannels > 1) {
+      data[index + 1] = g.toInt();
+      if (numChannels > 2) {
+        data[index + 2] = b.toInt();
+      }
+    }
+  }
+
+  @override
+  void setPixelRgba(int x, int y, num r, num g, num b, num a) {
     final index = y * rowStride + (x * numChannels);
     data[index] = r.toInt();
     if (numChannels > 1) {
@@ -84,8 +119,10 @@ class ImageDataUint8 extends ImageData {
     }
   }
 
+  @override
   String toString() => 'ImageDataUint8($width, $height, $numChannels)';
 
+  @override
   void clear([Color? c]) {
     final c8 = c?.convert(format: Format.uint8);
     if (numChannels == 1) {

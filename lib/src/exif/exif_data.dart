@@ -54,6 +54,7 @@ class ExifData extends IfdContainer {
     return exifImageTags[tag]!.name;
   }
 
+  @override
   String toString() {
     final s = StringBuffer();
     for (var name in directories.keys) {

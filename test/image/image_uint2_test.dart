@@ -13,10 +13,10 @@ void main() {
         expect(i1.height, equals(32));
         expect(i1.numChannels, equals(1));
         expect(i1.format, Format.uint2);
-        i1..setPixelColor(0, 0, 1)
-        ..setPixelColor(1, 0, 3)
-        ..setPixelColor(0, 1, 1)
-        ..setPixelColor(1, 1, 2);
+        i1..setPixelRgb(0, 0, 1, 0, 0)
+        ..setPixelRgb(1, 0, 3, 0, 0)
+        ..setPixelRgb(0, 1, 1, 0, 0)
+        ..setPixelRgb(1, 1, 2, 0, 0);
         expect(i1.getPixel(0, 0), equals([1]));
         expect(i1.getPixel(1, 0), equals([3]));
         expect(i1.getPixel(0, 1), equals([1]));
@@ -39,10 +39,10 @@ void main() {
         expect(i2.height, equals(32));
         expect(i2.numChannels, equals(2));
         expect(i2.format, Format.uint2);
-        i2..setPixelColor(0, 0, 0, 3)
-        ..setPixelColor(1, 0, 3)
-        ..setPixelColor(0, 1, 2, 1)
-        ..setPixelColor(1, 1, 1, 2);
+        i2..setPixelRgb(0, 0, 0, 3, 0)
+        ..setPixelRgb(1, 0, 3, 0, 0)
+        ..setPixelRgb(0, 1, 2, 1, 0)
+        ..setPixelRgb(1, 1, 1, 2, 0);
         expect(i2.getPixel(0, 0), equals([0, 3]));
         expect(i2.getPixel(1, 0), equals([3, 0]));
         expect(i2.getPixel(0, 1), equals([2, 1]));
@@ -66,10 +66,10 @@ void main() {
         expect(i3.numChannels, equals(3));
         expect(i3.format, Format.uint2);
 
-        i3..setPixelColor(0, 0, 3, 0, 3)
-        ..setPixelColor(1, 0, 3, 0, 3)
-        ..setPixelColor(0, 1, 2, 1)
-        ..setPixelColor(1, 1, 3, 1, 3);
+        i3..setPixelRgb(0, 0, 3, 0, 3)
+        ..setPixelRgb(1, 0, 3, 0, 3)
+        ..setPixelRgb(0, 1, 2, 1, 0)
+        ..setPixelRgb(1, 1, 3, 1, 3);
         expect(i3.getPixel(0, 0), equals([3, 0, 3]));
         expect(i3.getPixel(1, 0), equals([3, 0, 3]));
         expect(i3.getPixel(0, 1), equals([2, 1, 0]));
@@ -93,10 +93,10 @@ void main() {
         expect(i4.height, equals(32));
         expect(i4.numChannels, equals(4));
         expect(i4.format, Format.uint2);
-        i4..setPixelColor(0, 0, 0, 1, 2, 3)
-        ..setPixelColor(1, 0, 3, 2, 1)
-        ..setPixelColor(0, 1, 1, 0, 3, 2)
-        ..setPixelColor(1, 1, 2, 3, 0, 1);
+        i4..setPixelRgba(0, 0, 0, 1, 2, 3)
+        ..setPixelRgba(1, 0, 3, 2, 1, 0)
+        ..setPixelRgba(0, 1, 1, 0, 3, 2)
+        ..setPixelRgba(1, 1, 2, 3, 0, 1);
         expect(i4.getPixel(0, 0), equals([0, 1, 2, 3]));
         expect(i4.getPixel(1, 0), equals([3, 2, 1, 0]));
         expect(i4.getPixel(0, 1), equals([1, 0, 3, 2]));
@@ -123,14 +123,14 @@ void main() {
         expect(i5.height, equals(w));
         expect(i5.numChannels, equals(3));
         expect(i5.palette!.numChannels, equals(3));
-        i5.palette!.setColor(0, 123, 42, 86);
-        i5.palette!.setColor(1, 84, 231, 52);
-        i5.palette!.setColor(2, 41, 151, 252);
-        i5.palette!.setColor(3, 184, 31, 152);
-        i5..setPixelColor(0, 0, 0)
-        ..setPixelColor(1, 0, 1)
-        ..setPixelColor(0, 1, 2)
-        ..setPixelColor(1, 1, 3);
+        i5.palette!.setRgb(0, 123, 42, 86);
+        i5.palette!.setRgb(1, 84, 231, 52);
+        i5.palette!.setRgb(2, 41, 151, 252);
+        i5.palette!.setRgb(3, 184, 31, 152);
+        i5..setPixelRgb(0, 0, 0, 0, 0)
+        ..setPixelRgb(1, 0, 1, 0, 0)
+        ..setPixelRgb(0, 1, 2, 0, 0)
+        ..setPixelRgb(1, 1, 3, 0, 0);
         expect(i5.getPixel(0, 0), equals([123, 42, 86]));
         expect(i5.getPixel(1, 0), equals([84, 231, 52]));
         expect(i5.getPixel(0, 1), equals([41, 151, 252]));
@@ -167,14 +167,14 @@ void main() {
         expect(i6.height, equals(32));
         expect(i6.numChannels, equals(4));
         expect(i6.palette!.numChannels, equals(4));
-        i6.palette!.setColor(0, 123, 42, 86, 54);
-        i6.palette!.setColor(1, 84, 231, 52, 192);
-        i6.palette!.setColor(2, 41, 151, 252, 8);
-        i6.palette!.setColor(3, 184, 31, 152, 131);
-        i6..setPixelColor(0, 0, 0)
-        ..setPixelColor(1, 0, 1)
-        ..setPixelColor(0, 1, 3)
-        ..setPixelColor(1, 1, 2);
+        i6.palette!.setRgba(0, 123, 42, 86, 54);
+        i6.palette!.setRgba(1, 84, 231, 52, 192);
+        i6.palette!.setRgba(2, 41, 151, 252, 8);
+        i6.palette!.setRgba(3, 184, 31, 152, 131);
+        i6..setPixelRgb(0, 0, 0, 0, 0)
+        ..setPixelRgb(1, 0, 1, 0, 0)
+        ..setPixelRgb(0, 1, 3, 0, 0)
+        ..setPixelRgb(1, 1, 2, 0, 0);
         expect(i6.getPixel(0, 0), equals([123, 42, 86, 54]));
         expect(i6.getPixel(1, 0), equals([84, 231, 52, 192]));
         expect(i6.getPixel(0, 1), equals([184, 31, 152, 131]));

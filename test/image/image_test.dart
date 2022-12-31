@@ -86,7 +86,7 @@ void main() {
 
       for (final frame in rgba8p.frames) {
         for (var pi = 0; pi < frame.palette!.numColors; ++pi) {
-          frame.palette!.setColor(pi, pi, pi, pi, 255);
+          frame.palette!.setRgba(pi, pi, pi, pi, 255);
         }
         for (final p in frame) {
           p.index = ((frame.frameIndex * 10) + p.x) % 255;

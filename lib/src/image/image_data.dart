@@ -53,6 +53,7 @@ abstract class ImageData extends Iterable<Pixel> {
   int get lengthInBytes;
 
   /// The size of the image data in bytes.
+  @override
   int get length;
 
   /// The [ByteBuffer] storage of the image.
@@ -71,17 +72,28 @@ abstract class ImageData extends Iterable<Pixel> {
   Pixel getPixel(int x, int y, [Pixel? pixel]);
 
   void setPixel(int x, int y, Color p) {
-    setPixelColor(x, y, p.r, p.g, p.b, p.a);
+    setPixelRgba(x, y, p.r, p.g, p.b, p.a);
   }
 
-  void setPixelColor(int x, int y, num r, [num g = 0, num b = 0, num a = 255]);
+  /// Set the red channel of the pixel, or the index value for palette images.
+  void setPixelR(int x, int y, num i);
 
-  void setPixelColorSafe(int x, int y, num r,
-      [num g = 0, num b = 0, num a = 255]) {
+  void setPixelRgb(int x, int y, num r, num g, num b);
+
+  void setPixelRgba(int x, int y, num r, num g, num b, num a);
+
+  void setPixelRgbSafe(int x, int y, num r, num g, num b) {
     if (x < 0 || x >= width || y < 0 || y >= height) {
       return;
     }
-    setPixelColor(x, y, r, g, b, a);
+    setPixelRgb(x, y, r, g, b);
+  }
+
+  void setPixelRgbaSafe(int x, int y, num r, num g, num b, num a) {
+    if (x < 0 || x >= width || y < 0 || y >= height) {
+      return;
+    }
+    setPixelRgba(x, y, r, g, b, a);
   }
 
   /// Set all of the pixels to the Color [c], or all values to 0 if [c] is not

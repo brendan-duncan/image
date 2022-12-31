@@ -1,4 +1,4 @@
-import '../../util/internal.dart';
+import '../../util/_internal.dart';
 
 enum PngDisposeMode {
   none,

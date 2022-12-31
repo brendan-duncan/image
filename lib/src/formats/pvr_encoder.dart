@@ -24,6 +24,7 @@ class PvrEncoder extends Encoder {
 
   PvrEncoder({ this.format = PvrFormat.auto });
 
+  @override
   Uint8List encode(Image image, { bool singleFrame = false } ) {
     final output = OutputBuffer();
 
@@ -152,10 +153,10 @@ class PvrEncoder extends Encoder {
                 p3.getColorRgbB() * factors[factorIndex][3];
 
             //final pi = pixelIndex + ((py * size + px) * 4);
-            final _p = bitmap.getPixel(x4 + px, y4 + py);
-            final r = _p.r.toInt();
-            final g = _p.g.toInt();
-            final b = _p.b.toInt();
+            final pi = bitmap.getPixel(x4 + px, y4 + py);
+            final r = pi.r.toInt();
+            final g = pi.g.toInt();
+            final b = pi.b.toInt();
 
             final d = cb - ca;
             final p = PvrColorRgb(r * 16, g * 16, b * 16);
@@ -295,30 +296,30 @@ class PvrEncoder extends Encoder {
   static PvrColorBoundingBox _calculateBoundingBoxRgb(Image bitmap,
       int blockX, int blockY) {
 
-    PvrColorRgb _pixel(int x, int y) {
+    PvrColorRgb pixel(int x, int y) {
       final p = bitmap.getPixel(blockX + x, blockY + y);
       return PvrColorRgb(p.r as int, p.g as int, p.b as int);
     }
 
-    final cbb = PvrColorBoundingBox(_pixel(0,0), _pixel(0,0))
-    ..add(_pixel(1, 0))
-    ..add(_pixel(2, 0))
-    ..add(_pixel(3, 0))
+    final cbb = PvrColorBoundingBox(pixel(0,0), pixel(0,0))
+    ..add(pixel(1, 0))
+    ..add(pixel(2, 0))
+    ..add(pixel(3, 0))
 
-    ..add(_pixel(0, 1))
-    ..add(_pixel(1, 1))
-    ..add(_pixel(1, 2))
-    ..add(_pixel(1, 3))
+    ..add(pixel(0, 1))
+    ..add(pixel(1, 1))
+    ..add(pixel(1, 2))
+    ..add(pixel(1, 3))
 
-    ..add(_pixel(2, 0))
-    ..add(_pixel(2, 1))
-    ..add(_pixel(2, 2))
-    ..add(_pixel(2, 3))
+    ..add(pixel(2, 0))
+    ..add(pixel(2, 1))
+    ..add(pixel(2, 2))
+    ..add(pixel(2, 3))
 
-    ..add(_pixel(3, 0))
-    ..add(_pixel(3, 1))
-    ..add(_pixel(3, 2))
-    ..add(_pixel(3, 3));
+    ..add(pixel(3, 0))
+    ..add(pixel(3, 1))
+    ..add(pixel(3, 2))
+    ..add(pixel(3, 3));
 
     return cbb;
   }
@@ -326,30 +327,30 @@ class PvrEncoder extends Encoder {
   static PvrColorBoundingBox _calculateBoundingBoxRgba(Image bitmap,
       int blockX, int blockY) {
 
-    PvrColorRgba _pixel(int x, int y) {
+    PvrColorRgba pixel(int x, int y) {
       final p = bitmap.getPixel(blockX + x, blockY + y);
       return PvrColorRgba(p.r as int, p.g as int, p.b as int, p.a as int);
     }
 
-    final cbb = PvrColorBoundingBox(_pixel(0,0), _pixel(0,0))
-    ..add(_pixel(1, 0))
-    ..add(_pixel(2, 0))
-    ..add(_pixel(3, 0))
+    final cbb = PvrColorBoundingBox(pixel(0,0), pixel(0,0))
+    ..add(pixel(1, 0))
+    ..add(pixel(2, 0))
+    ..add(pixel(3, 0))
 
-    ..add(_pixel(0, 1))
-    ..add(_pixel(1, 1))
-    ..add(_pixel(1, 2))
-    ..add(_pixel(1, 3))
+    ..add(pixel(0, 1))
+    ..add(pixel(1, 1))
+    ..add(pixel(1, 2))
+    ..add(pixel(1, 3))
 
-    ..add(_pixel(2, 0))
-    ..add(_pixel(2, 1))
-    ..add(_pixel(2, 2))
-    ..add(_pixel(2, 3))
+    ..add(pixel(2, 0))
+    ..add(pixel(2, 1))
+    ..add(pixel(2, 2))
+    ..add(pixel(2, 3))
 
-    ..add(_pixel(3, 0))
-    ..add(_pixel(3, 1))
-    ..add(_pixel(3, 2))
-    ..add(_pixel(3, 3));
+    ..add(pixel(3, 0))
+    ..add(pixel(3, 1))
+    ..add(pixel(3, 2))
+    ..add(pixel(3, 3));
 
     return cbb;
   }

@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 import 'exr_compressor.dart';
 import 'exr_part.dart';
 
@@ -35,6 +35,7 @@ class InternalExrB44Compressor extends InternalExrCompressor
   }
 
   // Making analysis happy
+  @override
   String toString() => '$_maxScanLineSize $_optFlatFields';
 
   final int? _maxScanLineSize;

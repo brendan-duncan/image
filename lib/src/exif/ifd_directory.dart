@@ -6,7 +6,7 @@ import 'ifd_container.dart';
 import 'ifd_value.dart';
 
 class IfdDirectory {
-  final data = Map<int, IfdValue>();
+  final data = <int, IfdValue>{};
   final sub = IfdContainer();
 
   Iterable<int> get keys => data.keys;

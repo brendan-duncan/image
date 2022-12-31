@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 import 'exr_b44_compressor.dart';
 import 'exr_part.dart';
 import 'exr_piz_compressor.dart';

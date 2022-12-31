@@ -1,5 +1,5 @@
+import '../../util/_internal.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 
 // Decodes a frame from a WebP animation.
 class WebPFrame {

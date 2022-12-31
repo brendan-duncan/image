@@ -14,22 +14,22 @@ Image fillRect(Image src, { required int x1, required int y1, required int x2,
     return src;
   }
 
-  final _x0 = min(x1, x2).clamp(0, src.width - 1);
-  final _y0 = min(y1, y2).clamp(0, src.height - 1);
-  final _x1 = max(x1, x2).clamp(0, src.width - 1);
-  final _y1 = max(y1, y2).clamp(0, src.height - 1);
-  final _w = (_x1 - _x0) + 1;
-  final _h = (_y1 - _y0) + 1;
+  final xx0 = min(x1, x2).clamp(0, src.width - 1);
+  final yy0 = min(y1, y2).clamp(0, src.height - 1);
+  final xx1 = max(x1, x2).clamp(0, src.width - 1);
+  final yy1 = max(y1, y2).clamp(0, src.height - 1);
+  final ww = (xx1 - xx0) + 1;
+  final hh = (yy1 - yy0) + 1;
 
   // If no blending is necessary, use a faster fill method.
   if (color.a == color.maxChannelValue && mask == null) {
-    final iter = src.getRange(_x0, _y0, _w, _h);
+    final iter = src.getRange(xx0, yy0, ww, hh);
     while (iter.moveNext()) {
       iter.current.set(color);
     }
   } else {
     final a = color.a / color.maxChannelValue;
-    final iter = src.getRange(_x0, _y0, _w, _h);
+    final iter = src.getRange(xx0, yy0, ww, hh);
     while (iter.moveNext()) {
       final p = iter.current;
       final m = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel) ?? 1;

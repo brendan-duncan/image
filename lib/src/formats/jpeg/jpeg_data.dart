@@ -2,9 +2,9 @@ import 'dart:typed_data';
 
 import '../../exif/exif_data.dart';
 import '../../image/image.dart';
+import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 import '_component_data.dart';
 import 'jpeg_adobe.dart';
 import 'jpeg_component.dart';

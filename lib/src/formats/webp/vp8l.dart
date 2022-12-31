@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import '../../image/image.dart';
+import '../../util/_internal.dart';
 import '../../util/color_util.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
-import '../../util/internal.dart';
 import 'vp8l_bit_reader.dart';
 import 'vp8l_color_cache.dart';
 import 'vp8l_transform.dart';
@@ -515,7 +515,7 @@ class VP8L {
         final b = uint32ToBlue(c);
         final a = uint32ToAlpha(c);
         // rearrange the ARGB webp color to RGBA image color.
-        image!.setPixelColor(x, dy, b, g, r, a);
+        image!.setPixelRgba(x, dy, b, g, r, a);
       }
     }
 

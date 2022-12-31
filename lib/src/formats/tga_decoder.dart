@@ -67,7 +67,7 @@ class TgaDecoder extends Decoder {
         final g = input.readByte();
         final r = input.readByte();
         final a = info!.bpp == 32 ? input.readByte() : 255;
-        image.setPixelColor(x, y, r, g, b, a);
+        image.setPixelRgba(x, y, r, g, b, a);
       }
     }
 

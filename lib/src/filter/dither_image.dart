@@ -64,9 +64,7 @@ Image ditherImage(Image image, { Quantizer? quantizer,
     DitherKernel kernel = DitherKernel.floydSteinberg,
     bool serpentine = false }) {
 
-  if (quantizer == null) {
-    quantizer = NeuralQuantizer(image);
-  }
+  quantizer ??= NeuralQuantizer(image);
 
   if (kernel == DitherKernel.none) {
     return quantizer.getIndexImage(image);
@@ -99,7 +97,7 @@ Image ditherImage(Image image, { Quantizer? quantizer,
 
       // Get converted color
       var idx = quantizer.getColorIndexRgb(r1, g1, b1);
-      indexedImage.setPixelColor(x, y, idx);
+      indexedImage.setPixelRgb(x, y, idx, 0, 0);
 
       final r2 = palette.get(idx, 0);
       final g2 = palette.get(idx, 1);

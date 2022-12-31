@@ -319,10 +319,10 @@ class PngEncoder extends Encoder {
     final l = row.length;
     for (var x = 0; x < l; x += bpc) {
       for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
-        final _x = x + c2;
-        final p1 = _x < bpp ? 0 : row[_x - bpp];
-        final p2 = prevRow == null ? 0 : prevRow[_x];
-        final p3 = row[_x];
+        final x2 = x + c2;
+        final p1 = x2 < bpp ? 0 : row[x2 - bpp];
+        final p2 = prevRow == null ? 0 : prevRow[x2];
+        final p3 = row[x2];
         out[oi++] = p3 - ((p1 + p2) >> 1);
       }
     }
@@ -348,11 +348,11 @@ class PngEncoder extends Encoder {
     final l = row.length;
     for (var x = 0; x < l; x += bpc) {
       for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
-        final _x = x + c2;
-        final p0 = _x < bpp ? 0 : row[_x - bpp];
-        final p1 = prevRow == null ? 0 : prevRow[_x];
-        final p2 = _x < bpp || prevRow == null ? 0 : prevRow[_x - bpp];
-        final p = row[_x];
+        final x2 = x + c2;
+        final p0 = x2 < bpp ? 0 : row[x2 - bpp];
+        final p1 = prevRow == null ? 0 : prevRow[x2];
+        final p2 = x2 < bpp || prevRow == null ? 0 : prevRow[x2 - bpp];
+        final p = row[x2];
         final pi = _paethPredictor(p0, p1, p2);
         out[oi++] = (p - pi) & 0xff;
       }

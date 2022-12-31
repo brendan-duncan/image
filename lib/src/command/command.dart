@@ -19,7 +19,7 @@ import '../image/interpolation.dart';
 import '../image/palette.dart';
 import '../transform/flip.dart';
 import '../transform/trim.dart';
-import '../util/internal.dart';
+import '../util/_internal.dart';
 import '../util/point.dart';
 import '../util/quantizer.dart';
 import 'draw/composite_image_cmd.dart';
@@ -121,7 +121,7 @@ class Command {
   Uint8List? outputBytes;
   Object? outputObject;
 
-  Command([this.input = null]);
+  Command([this.input]);
 
   // Image commands
 

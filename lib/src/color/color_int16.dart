@@ -35,72 +35,106 @@ class ColorInt16 extends Iterable<num> implements Color {
     data[3] = a;
   }
 
+  @override
   ColorInt16 clone() => ColorInt16.from(this);
 
+  @override
   Format get format => Format.int16;
+  @override
   int get length => data.length;
+  @override
   num get maxChannelValue => 0x7fff;
+  @override
   num get maxIndexValue => 0x7fff;
+  @override
   bool get isLdrFormat => false;
+  @override
   bool get isHdrFormat => true;
+  @override
   bool get hasPalette => false;
+  @override
   Palette? get palette => null;
 
+  @override
   num operator[](int index) => index < data.length ? data[index] : 0;
+  @override
   void operator[]=(int index, num value) {
     if (index < data.length) {
       data[index] = value.toInt();
     }
   }
 
+  @override
   num get index => r;
-  void set index(num i) => r = i;
+  @override
+  set index(num i) => r = i;
 
+  @override
   num get r => data.isNotEmpty ? data[0] : 0;
-  void set r(num r) => data.isNotEmpty ? data[0] = r.toInt() : 0;
+  @override
+  set r(num r) => data.isNotEmpty ? data[0] = r.toInt() : 0;
 
+  @override
   num get g => data.length > 1 ? data[1] : 0;
-  void set g(num g) {
+  @override
+  set g(num g) {
     if (data.length > 1) {
       data[1] = g.toInt();
     }
   }
 
+  @override
   num get b => data.length > 2 ? data[2] : 0;
-  void set b(num b) {
+  @override
+  set b(num b) {
     if (data.length > 2) {
       data[2] = b.toInt();
     }
   }
 
+  @override
   num get a => data.length > 3 ? data[3] : 0;
-  void set a(num a) {
+  @override
+  set a(num a) {
     if (data.length > 3) {
       data[3] = a.toInt();
     }
   }
 
+  @override
   num get rNormalized => r / maxChannelValue;
-  void set rNormalized(num v) => r = v * maxChannelValue;
+  @override
+  set rNormalized(num v) => r = v * maxChannelValue;
 
+  @override
   num get gNormalized => g / maxChannelValue;
-  void set gNormalized(num v) => g = v * maxChannelValue;
+  @override
+  set gNormalized(num v) => g = v * maxChannelValue;
 
+  @override
   num get bNormalized => b / maxChannelValue;
-  void set bNormalized(num v) => b = v * maxChannelValue;
+  @override
+  set bNormalized(num v) => b = v * maxChannelValue;
 
+  @override
   num get aNormalized => a / maxChannelValue;
-  void set aNormalized(num v) => a = v * maxChannelValue;
+  @override
+  set aNormalized(num v) => a = v * maxChannelValue;
 
+  @override
   num get luminance => getLuminance(this);
+  @override
   num get luminanceNormalized => getLuminanceNormalized(this);
 
+  @override
   num getChannel(Channel channel) => channel == Channel.luminance ?
       luminance : channel.index < data.length ? data[channel.index] : 0;
 
+  @override
   num getChannelNormalized(Channel channel) =>
       getChannel(channel) / maxChannelValue;
 
+  @override
   void set(Color c) {
     r = c.r;
     g = c.g;
@@ -108,7 +142,20 @@ class ColorInt16 extends Iterable<num> implements Color {
     a = c.a;
   }
 
-  void setColor(num r, [num g = 0, num b = 0, num a = 0]) {
+  @override
+  void setRgb(num r, num g, num b) {
+    data[0] = r.toInt();
+    final nc = data.length;
+    if (nc > 1) {
+      data[1] = g.toInt();
+      if (nc > 2) {
+        data[2] = b.toInt();
+      }
+    }
+  }
+
+  @override
+  void setRgba(num r, num g, num b, num a) {
     data[0] = r.toInt();
     final nc = data.length;
     if (nc > 1) {
@@ -122,15 +169,19 @@ class ColorInt16 extends Iterable<num> implements Color {
     }
   }
 
+  @override
   ChannelIterator get iterator => ChannelIterator(this);
 
+  @override
   bool operator==(Object? other) =>
       other is Color &&
           other.length == length &&
           other.hashCode == hashCode;
 
+  @override
   int get hashCode => Object.hashAll(toList());
 
+  @override
   Color convert({ Format? format, int? numChannels, num? alpha }) =>
       convertColor(this, format: format, numChannels: numChannels,
           alpha: alpha);
