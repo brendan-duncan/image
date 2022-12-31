@@ -7,7 +7,9 @@ import '../color/format.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/palette.dart';
+import '../util/neural_quantizer.dart';
 import '../util/output_buffer.dart';
+import '../util/quantizer.dart';
 import 'encoder.dart';
 import 'png/png_info.dart';
 
@@ -15,6 +17,8 @@ enum PngFilter { none, sub, up, average, paeth }
 
 /// Encode an image to the PNG format.
 class PngEncoder extends Encoder {
+  Quantizer? _globalQuantizer;
+
   PngEncoder({this.filter = PngFilter.paeth, this.level});
 
   int _numChannels(Image image) => image.hasPalette ? 1 : image.numChannels;
@@ -40,7 +44,11 @@ class PngEncoder extends Encoder {
       }
 
       if (image.hasPalette) {
-        _writePalette(image.palette!);
+        if (_globalQuantizer != null) {
+          _writePalette(_globalQuantizer!.palette);
+        } else {
+          _writePalette(image.palette!);
+        }
       }
 
       if (isAnimated) {
@@ -114,8 +122,24 @@ class PngEncoder extends Encoder {
       isAnimated = true;
       _frames = image.frames.length;
       repeat = image.loopCount;
-      for (var f in image.frames) {
-        addFrame(f);
+
+      if (image.hasPalette) {
+        final q = NeuralQuantizer(image);
+        _globalQuantizer = q;
+        for (final frame in image.frames) {
+          if (frame != image) {
+            q.addImage(frame);
+          }
+        }
+      }
+
+      for (final frame in image.frames) {
+        if (_globalQuantizer != null) {
+          final newImage = _globalQuantizer!.getIndexImage(frame);
+          addFrame(newImage);
+        } else {
+          addFrame(frame);
+        }
       }
     }
     return finish()!;
@@ -161,7 +185,7 @@ class PngEncoder extends Encoder {
       ..writeUint32(0) // yOffset
       ..writeUint16(image.frameDuration)
       ..writeUint16(1000) // delay denominator
-      ..writeByte(0) // dispose method 0: APNG_DISPOSE_OP_NONE
+      ..writeByte(1) // dispose method 0: APNG_DISPOSE_OP_NONE
       ..writeByte(0); // blend method 0: APNG_BLEND_OP_SOURCE
     _writeChunk(output!, 'fcTL', chunk.getBytes());
   }
@@ -195,7 +219,8 @@ class PngEncoder extends Encoder {
       final chunk = OutputBuffer(size: palette.numColors, bigEndian: true);
       final nc = palette.numColors;
       for (var i = 0; i < nc; ++i) {
-        chunk.writeByte(palette.getAlpha(i).toInt());
+        final a = palette.getAlpha(i).toInt();
+        chunk.writeByte(a);
       }
       _writeChunk(output!, 'tRNS', chunk.getBytes());
     }

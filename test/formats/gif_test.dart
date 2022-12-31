@@ -14,7 +14,6 @@ void main() {
         g1!.addFrame(g2);
         g1.addFrame(g3);
         await encodeGifFile('$testOutputPath/gif/transparencyAnim.gif', g1);
-        await encodePngFile('$testOutputPath/gif/transparencyAnim.png', g1);
       });
 
       test('cmd', () async {

@@ -10,6 +10,16 @@ void main() {
       const buck24Hash = 817446904;
       Image? buck24Image;
 
+      test('transparencyAnim', () async {
+        final g1 = await decodePngFile('test/_data/png/g1.png');
+        final g2 = await decodePngFile('test/_data/png/g2.png');
+        final g3 = await decodePngFile('test/_data/png/g3.png');
+        g1!.addFrame(g2);
+        g1.addFrame(g3);
+
+        await encodePngFile('$testOutputPath/png/transparencyAnim.png', g1);
+      });
+
       group('b1_1', () {
         final image = Image(width: 32, height: 32,
             format: Format.uint1, numChannels: 1);
