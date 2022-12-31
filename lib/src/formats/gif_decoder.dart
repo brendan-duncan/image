@@ -113,8 +113,9 @@ class GifDecoder extends Decoder {
         return;
       }
 
-      gifImage..duration = duration
-      ..clearFrame = disposalMethod == 2;
+      gifImage
+        ..duration = duration
+        ..clearFrame = disposalMethod == 2;
 
       if (transparentFlag != 0) {
         if (gifImage.colorMap == null && info!.globalColorMap != null) {
@@ -147,7 +148,7 @@ class GifDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, { int? frame }) {
+  Image? decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -174,19 +175,25 @@ class GifDecoder extends Decoder {
         continue;
       }
 
-      if (image.width == lastImage.width && image.height == lastImage.height &&
-          frame.x == 0 && frame.y == 0 && frame.clearFrame) {
+      if (image.width == lastImage.width &&
+          image.height == lastImage.height &&
+          frame.x == 0 &&
+          frame.y == 0 &&
+          frame.clearFrame) {
         lastImage = image;
         firstImage.addFrame(lastImage);
         continue;
       }
 
       if (frame.clearFrame) {
-        final colorMap = (frame.colorMap != null)
-            ? frame.colorMap! : info!.globalColorMap!;
+        final colorMap =
+            (frame.colorMap != null) ? frame.colorMap! : info!.globalColorMap!;
 
-        lastImage = Image(width: lastImage.width, height: lastImage.height,
-            numChannels: 1, palette: colorMap.getPalette())
+        lastImage = Image(
+            width: lastImage.width,
+            height: lastImage.height,
+            numChannels: 1,
+            palette: colorMap.getPalette())
           ..clear(colorMap.color(info!.backgroundColor!.r as int));
       } else {
         lastImage = Image.from(lastImage);
@@ -253,11 +260,15 @@ class GifDecoder extends Decoder {
     }
 
     final colorMap = (gifImage.colorMap != null)
-        ? gifImage.colorMap! : info!.globalColorMap!;
+        ? gifImage.colorMap!
+        : info!.globalColorMap!;
 
     _pixelCount = width * height;
 
-    final image = Image(width: width, height: height, numChannels: 1,
+    final image = Image(
+        width: width,
+        height: height,
+        numChannels: 1,
         palette: colorMap.getPalette());
 
     final line = Uint8List(width);

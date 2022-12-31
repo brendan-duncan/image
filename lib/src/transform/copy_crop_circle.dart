@@ -7,7 +7,7 @@ import '../image/image.dart';
 /// a radius filling the image will be used. If [centerX] is not provided,
 /// the horizontal mid-point of the image will be used. If [centerY] is not
 /// provided, the vertical mid-point of the image will be used.
-Image copyCropCircle(Image src, { int? radius, int? centerX, int? centerY }) {
+Image copyCropCircle(Image src, {int? radius, int? centerX, int? centerY}) {
   centerX ??= src.width ~/ 2;
   centerY ??= src.height ~/ 2;
   radius ??= min(src.width, src.height) ~/ 2;

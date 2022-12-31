@@ -11,7 +11,7 @@ import 'tiff/tiff_image.dart';
 /// Encode am [Image] to the TIFF format.
 class TiffEncoder extends Encoder {
   @override
-  Uint8List encode(Image image, { bool singleFrame = false }) {
+  Uint8List encode(Image image, {bool singleFrame = false}) {
     final out = OutputBuffer();
     _writeHeader(out);
     _writeImage(out, image);
@@ -20,9 +20,10 @@ class TiffEncoder extends Encoder {
   }
 
   void _writeHeader(OutputBuffer out) {
-    out..writeUint16(littleEndian) // byteOrder
-    ..writeUint16(signature) // TIFF signature
-    ..writeUint32(8); // Offset to the start of the IFD tags
+    out
+      ..writeUint16(littleEndian) // byteOrder
+      ..writeUint16(signature) // TIFF signature
+      ..writeUint32(8); // Offset to the start of the IFD tags
   }
 
   void _writeImage(OutputBuffer out, Image image) {
@@ -30,17 +31,20 @@ class TiffEncoder extends Encoder {
 
     _writeEntryUint32(out, exifTagNameToID['ImageWidth']!, image.width);
     _writeEntryUint32(out, exifTagNameToID['ImageLength']!, image.height);
-    _writeEntryUint16(out, exifTagNameToID['BitsPerSample']!,
-        image.bitsPerChannel);
-    _writeEntryUint16(out, exifTagNameToID['Compression']!,
-        TiffCompression.none);
-    _writeEntryUint16(out, exifTagNameToID['PhotometricInterpretation']!,
-        image.numChannels == 1 ? TiffPhotometricType.blackIsZero.index
+    _writeEntryUint16(
+        out, exifTagNameToID['BitsPerSample']!, image.bitsPerChannel);
+    _writeEntryUint16(
+        out, exifTagNameToID['Compression']!, TiffCompression.none);
+    _writeEntryUint16(
+        out,
+        exifTagNameToID['PhotometricInterpretation']!,
+        image.numChannels == 1
+            ? TiffPhotometricType.blackIsZero.index
             : TiffPhotometricType.rgb.index);
-    _writeEntryUint16(out, exifTagNameToID['SamplesPerPixel']!,
-        image.numChannels);
-    _writeEntryUint16(out, exifTagNameToID['SampleFormat']!,
-        _getSampleFormat(image).index);
+    _writeEntryUint16(
+        out, exifTagNameToID['SamplesPerPixel']!, image.numChannels);
+    _writeEntryUint16(
+        out, exifTagNameToID['SampleFormat']!, _getSampleFormat(image).index);
 
     _writeEntryUint32(out, exifTagNameToID['RowsPerStrip']!, image.height);
     _writeEntryUint16(out, exifTagNameToID['PlanarConfiguration']!, 1);
@@ -62,18 +66,20 @@ class TiffEncoder extends Encoder {
   }
 
   void _writeEntryUint16(OutputBuffer out, int tag, int data) {
-    out..writeUint16(tag)
-    ..writeUint16(IfdValueType.short.index)
-    ..writeUint32(1) // number of values
-    ..writeUint16(data)
-    ..writeUint16(0); // pad to 4 bytes
+    out
+      ..writeUint16(tag)
+      ..writeUint16(IfdValueType.short.index)
+      ..writeUint32(1) // number of values
+      ..writeUint16(data)
+      ..writeUint16(0); // pad to 4 bytes
   }
 
   void _writeEntryUint32(OutputBuffer out, int tag, int data) {
-    out..writeUint16(tag)
-    ..writeUint16(IfdValueType.long.index)
-    ..writeUint32(1) // number of values
-    ..writeUint32(data);
+    out
+      ..writeUint16(tag)
+      ..writeUint16(IfdValueType.long.index)
+      ..writeUint32(1) // number of values
+      ..writeUint32(data);
   }
 
   static const littleEndian = 0x4949;

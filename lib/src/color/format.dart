@@ -14,11 +14,7 @@ enum Format {
   float64
 }
 
-enum FormatType {
-  uint,
-  int,
-  float
-}
+enum FormatType { uint, int, float }
 
 const formatToFormatType = <Format, FormatType>{
   Format.uint1: FormatType.uint,
@@ -291,18 +287,24 @@ num convertFormatValue(num value, Format from, Format to) {
         case Format.uint32:
           return (value.clamp(0, 1) * 0xffffffff).toInt();
         case Format.int8:
-          return (value < 0 ? value.clamp(-1, 1) * 128
-              : value.clamp(-1,1) * 127).toInt();
+          return (value < 0
+                  ? value.clamp(-1, 1) * 128
+                  : value.clamp(-1, 1) * 127)
+              .toInt();
         case Format.int16:
-          return (value < 0 ? value.clamp(-1, 1) * 32768
-              : value.clamp(-1,1) * 32767).toInt();
+          return (value < 0
+                  ? value.clamp(-1, 1) * 32768
+                  : value.clamp(-1, 1) * 32767)
+              .toInt();
         case Format.int32:
-          return (value < 0 ? value.clamp(-1, 1) * 2147483648
-              : value.clamp(-1,1) * 2147483647).toInt();
+          return (value < 0
+                  ? value.clamp(-1, 1) * 2147483648
+                  : value.clamp(-1, 1) * 2147483647)
+              .toInt();
         case Format.float16:
         case Format.float32:
         case Format.float64:
-          return value ;
+          return value;
       }
   }
 }

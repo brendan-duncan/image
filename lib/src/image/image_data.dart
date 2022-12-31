@@ -12,7 +12,7 @@ abstract class ImageData extends Iterable<Pixel> {
 
   ImageData(this.width, this.height, this.numChannels);
 
-  ImageData clone({ bool noPixels = false });
+  ImageData clone({bool noPixels = false});
 
   /// The channel [Format] of the image.
   Format get format;

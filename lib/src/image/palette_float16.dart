@@ -8,12 +8,12 @@ class PaletteFloat16 extends Palette {
   final Uint16List data;
 
   PaletteFloat16(int numColors, int numChannels)
-      : data = Uint16List(numColors * numChannels)
-      , super(numColors, numChannels);
+      : data = Uint16List(numColors * numChannels),
+        super(numColors, numChannels);
 
   PaletteFloat16.from(PaletteFloat16 other)
-      : data = Uint16List.fromList(other.data)
-      , super(other.numColors, other.numChannels);
+      : data = Uint16List.fromList(other.data),
+        super(other.numColors, other.numChannels);
 
   @override
   PaletteFloat16 clone() => PaletteFloat16.from(this);
@@ -63,10 +63,9 @@ class PaletteFloat16 extends Palette {
   }
 
   @override
-  num get(int index, int channel) =>
-      channel < numChannels ?
-      Float16.float16ToDouble(data[index * numChannels + channel]) :
-      0.0;
+  num get(int index, int channel) => channel < numChannels
+      ? Float16.float16ToDouble(data[index * numChannels + channel])
+      : 0.0;
 
   @override
   num getRed(int index) {

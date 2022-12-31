@@ -5,10 +5,13 @@ import '../color/format.dart';
 abstract class Palette {
   /// The size of the palette data in bytes.
   int get lengthInBytes;
+
   /// The byte buffer storage of the palette data.
   ByteBuffer get buffer;
+
   /// The number of colors stored in the palette.
   final int numColors;
+
   /// The number of channels per color.
   final int numChannels;
 

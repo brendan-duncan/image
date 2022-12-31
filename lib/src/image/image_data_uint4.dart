@@ -18,30 +18,34 @@ class ImageDataUint4 extends ImageData {
   final Palette? palette;
 
   ImageDataUint4(int width, int height, int numChannels)
-      : rowStride = numChannels == 2 ? width
-          : numChannels == 4 ? width * 2
-          : numChannels == 3 ? (width * 1.5).ceil()
-          : (width / 2).ceil()
-      , palette = null
-      , super(width, height, numChannels) {
+      : rowStride = numChannels == 2
+            ? width
+            : numChannels == 4
+                ? width * 2
+                : numChannels == 3
+                    ? (width * 1.5).ceil()
+                    : (width / 2).ceil(),
+        palette = null,
+        super(width, height, numChannels) {
     data = Uint8List(max(rowStride * height, 1));
   }
 
   ImageDataUint4.palette(int width, int height, this.palette)
-      : rowStride = (width / 2).ceil()
-      , super(width, height, 1) {
+      : rowStride = (width / 2).ceil(),
+        super(width, height, 1) {
     data = Uint8List(max(rowStride * height, 1));
   }
 
-  ImageDataUint4.from(ImageDataUint4 other, { bool skipPixels = false })
-      : data = skipPixels ? Uint8List(other.data.length)
-          : Uint8List.fromList(other.data)
-      , rowStride = other.rowStride
-      , palette = other.palette?.clone()
-      , super(other.width, other.height, other.numChannels);
+  ImageDataUint4.from(ImageDataUint4 other, {bool skipPixels = false})
+      : data = skipPixels
+            ? Uint8List(other.data.length)
+            : Uint8List.fromList(other.data),
+        rowStride = other.rowStride,
+        palette = other.palette?.clone(),
+        super(other.width, other.height, other.numChannels);
 
   @override
-  ImageDataUint4 clone({ bool noPixels = false }) =>
+  ImageDataUint4 clone({bool noPixels = false}) =>
       ImageDataUint4.from(this, skipPixels: noPixels);
 
   @override
@@ -79,9 +83,9 @@ class ImageDataUint4 extends ImageData {
   int get bitsPerChannel => 4;
 
   @override
-  Color getColor(num r, num g, num b, [num? a]) =>
-      a == null ? ColorUint4.rgb(r.toInt(), g.toInt(), b.toInt())
-          : ColorUint4.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
+  Color getColor(num r, num g, num b, [num? a]) => a == null
+      ? ColorUint4.rgb(r.toInt(), g.toInt(), b.toInt())
+      : ColorUint4.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
 
   @override
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
@@ -128,5 +132,5 @@ class ImageDataUint4 extends ImageData {
   String toString() => 'ImageDataUint4($width, $height, $numChannels)';
 
   @override
-  void clear([Color? c]) { }
+  void clear([Color? c]) {}
 }

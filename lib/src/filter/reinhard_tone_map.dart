@@ -5,8 +5,8 @@ import '../image/image.dart';
 import '../util/math_util.dart';
 
 /// Applies Reinhard tone mapping to the hdr image, in-place.
-Image reinhardTonemap(Image hdr, { Image? mask,
-    Channel maskChannel = Channel.luminance }) {
+Image reinhardTonemap(Image hdr,
+    {Image? mask, Channel maskChannel = Channel.luminance}) {
   const yw = [0.212671, 0.715160, 0.072169];
 
   // Compute world adaptation luminance, _Ywa_
@@ -36,13 +36,15 @@ Image reinhardTonemap(Image hdr, { Image? mask,
 
     final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
     if (msk == null) {
-      p..r = r * s
-      ..g = g * s
-      ..b = b * s;
+      p
+        ..r = r * s
+        ..g = g * s
+        ..b = b * s;
     } else {
-      p..r = mix(p.r, r * s, msk)
-      ..g = mix(p.g, g * s, msk)
-      ..b = mix(p.b, b * s, msk);
+      p
+        ..r = mix(p.r, r * s, msk)
+        ..g = mix(p.g, g * s, msk)
+        ..b = mix(p.b, b * s, msk);
     }
   }
 

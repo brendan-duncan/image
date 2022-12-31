@@ -45,9 +45,10 @@ class JpegFrame {
               growable: false),
           growable: false);
 
-      component..blocksPerLine = blocksPerLine
-      ..blocksPerColumn = blocksPerColumn
-      ..blocks = blocks;
+      component
+        ..blocksPerLine = blocksPerLine
+        ..blocksPerColumn = blocksPerColumn
+        ..blocks = blocks;
     }
   }
 }

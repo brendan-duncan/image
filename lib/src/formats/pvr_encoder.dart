@@ -9,23 +9,17 @@ import 'pvr/pvr_color.dart';
 import 'pvr/pvr_color_bounding_box.dart';
 import 'pvr/pvr_packet.dart';
 
-enum PvrFormat {
-  auto,
-  rgb2,
-  rgba2,
-  rgb4,
-  rgba4
-}
+enum PvrFormat { auto, rgb2, rgba2, rgb4, rgba4 }
 
 // Ported from Jeffrey Lim's PVRTC encoder/decoder,
 // https://bitbucket.org/jthlim/pvrtccompressor
 class PvrEncoder extends Encoder {
   final PvrFormat format;
 
-  PvrEncoder({ this.format = PvrFormat.auto });
+  PvrEncoder({this.format = PvrFormat.auto});
 
   @override
-  Uint8List encode(Image image, { bool singleFrame = false } ) {
+  Uint8List encode(Image image, {bool singleFrame = false}) {
     final output = OutputBuffer();
 
     var format = this.format;
@@ -71,20 +65,21 @@ class PvrEncoder extends Encoder {
     const mipmapCount = 1;
     const metaDataSize = 0;
 
-    output..writeUint32(version)
-    ..writeUint32(flags)
-    ..writeUint32(pixelFormat)
-    ..writeUint32(channelOrder)
-    ..writeUint32(colorSpace)
-    ..writeUint32(channelType)
-    ..writeUint32(height)
-    ..writeUint32(width)
-    ..writeUint32(depth)
-    ..writeUint32(numSurfaces)
-    ..writeUint32(numFaces)
-    ..writeUint32(mipmapCount)
-    ..writeUint32(metaDataSize)
-    ..writeBytes(pvrtc);
+    output
+      ..writeUint32(version)
+      ..writeUint32(flags)
+      ..writeUint32(pixelFormat)
+      ..writeUint32(channelOrder)
+      ..writeUint32(colorSpace)
+      ..writeUint32(channelType)
+      ..writeUint32(height)
+      ..writeUint32(width)
+      ..writeUint32(depth)
+      ..writeUint32(numSurfaces)
+      ..writeUint32(numFaces)
+      ..writeUint32(mipmapCount)
+      ..writeUint32(metaDataSize)
+      ..writeBytes(pvrtc);
 
     return output.getBytes();
   }
@@ -113,10 +108,11 @@ class PvrEncoder extends Encoder {
     for (var y = 0; y < blocks; ++y) {
       for (var x = 0; x < blocks; ++x) {
         final cbb = _calculateBoundingBoxRgb(bitmap, x, y);
-        packet..setBlock(x, y)
-        ..usePunchthroughAlpha = false
-        ..setColorRgbA(cbb.min as PvrColorRgb)
-        ..setColorRgbB(cbb.max as PvrColorRgb);
+        packet
+          ..setBlock(x, y)
+          ..usePunchthroughAlpha = false
+          ..setColorRgbA(cbb.min as PvrColorRgb)
+          ..setColorRgbB(cbb.max as PvrColorRgb);
       }
     }
 
@@ -182,8 +178,9 @@ class PvrEncoder extends Encoder {
           }
         }
 
-        packet..setBlock(x, y)
-        ..modulationData = modulationData;
+        packet
+          ..setBlock(x, y)
+          ..modulationData = modulationData;
       }
     }
 
@@ -214,10 +211,11 @@ class PvrEncoder extends Encoder {
     for (var y = 0, y4 = 0; y < blocks; ++y, y4 += 4) {
       for (var x = 0, x4 = 0; x < blocks; ++x, x4 += 4) {
         final cbb = _calculateBoundingBoxRgba(bitmap, x4, y4);
-        packet..setBlock(x, y)
-        ..usePunchthroughAlpha = false
-        ..setColorRgbaA(cbb.min as PvrColorRgba)
-        ..setColorRgbaB(cbb.max as PvrColorRgba);
+        packet
+          ..setBlock(x, y)
+          ..usePunchthroughAlpha = false
+          ..setColorRgbaA(cbb.min as PvrColorRgba)
+          ..setColorRgbaB(cbb.max as PvrColorRgba);
       }
     }
 
@@ -285,72 +283,65 @@ class PvrEncoder extends Encoder {
           }
         }
 
-        packet..setBlock(x, y)
-        ..modulationData = modulationData;
+        packet
+          ..setBlock(x, y)
+          ..modulationData = modulationData;
       }
     }
 
     return outputData;
   }
 
-  static PvrColorBoundingBox _calculateBoundingBoxRgb(Image bitmap,
-      int blockX, int blockY) {
-
+  static PvrColorBoundingBox _calculateBoundingBoxRgb(
+      Image bitmap, int blockX, int blockY) {
     PvrColorRgb pixel(int x, int y) {
       final p = bitmap.getPixel(blockX + x, blockY + y);
       return PvrColorRgb(p.r as int, p.g as int, p.b as int);
     }
 
-    final cbb = PvrColorBoundingBox(pixel(0,0), pixel(0,0))
-    ..add(pixel(1, 0))
-    ..add(pixel(2, 0))
-    ..add(pixel(3, 0))
-
-    ..add(pixel(0, 1))
-    ..add(pixel(1, 1))
-    ..add(pixel(1, 2))
-    ..add(pixel(1, 3))
-
-    ..add(pixel(2, 0))
-    ..add(pixel(2, 1))
-    ..add(pixel(2, 2))
-    ..add(pixel(2, 3))
-
-    ..add(pixel(3, 0))
-    ..add(pixel(3, 1))
-    ..add(pixel(3, 2))
-    ..add(pixel(3, 3));
+    final cbb = PvrColorBoundingBox(pixel(0, 0), pixel(0, 0))
+      ..add(pixel(1, 0))
+      ..add(pixel(2, 0))
+      ..add(pixel(3, 0))
+      ..add(pixel(0, 1))
+      ..add(pixel(1, 1))
+      ..add(pixel(1, 2))
+      ..add(pixel(1, 3))
+      ..add(pixel(2, 0))
+      ..add(pixel(2, 1))
+      ..add(pixel(2, 2))
+      ..add(pixel(2, 3))
+      ..add(pixel(3, 0))
+      ..add(pixel(3, 1))
+      ..add(pixel(3, 2))
+      ..add(pixel(3, 3));
 
     return cbb;
   }
 
-  static PvrColorBoundingBox _calculateBoundingBoxRgba(Image bitmap,
-      int blockX, int blockY) {
-
+  static PvrColorBoundingBox _calculateBoundingBoxRgba(
+      Image bitmap, int blockX, int blockY) {
     PvrColorRgba pixel(int x, int y) {
       final p = bitmap.getPixel(blockX + x, blockY + y);
       return PvrColorRgba(p.r as int, p.g as int, p.b as int, p.a as int);
     }
 
-    final cbb = PvrColorBoundingBox(pixel(0,0), pixel(0,0))
-    ..add(pixel(1, 0))
-    ..add(pixel(2, 0))
-    ..add(pixel(3, 0))
-
-    ..add(pixel(0, 1))
-    ..add(pixel(1, 1))
-    ..add(pixel(1, 2))
-    ..add(pixel(1, 3))
-
-    ..add(pixel(2, 0))
-    ..add(pixel(2, 1))
-    ..add(pixel(2, 2))
-    ..add(pixel(2, 3))
-
-    ..add(pixel(3, 0))
-    ..add(pixel(3, 1))
-    ..add(pixel(3, 2))
-    ..add(pixel(3, 3));
+    final cbb = PvrColorBoundingBox(pixel(0, 0), pixel(0, 0))
+      ..add(pixel(1, 0))
+      ..add(pixel(2, 0))
+      ..add(pixel(3, 0))
+      ..add(pixel(0, 1))
+      ..add(pixel(1, 1))
+      ..add(pixel(1, 2))
+      ..add(pixel(1, 3))
+      ..add(pixel(2, 0))
+      ..add(pixel(2, 1))
+      ..add(pixel(2, 2))
+      ..add(pixel(2, 3))
+      ..add(pixel(3, 0))
+      ..add(pixel(3, 1))
+      ..add(pixel(3, 2))
+      ..add(pixel(3, 3));
 
     return cbb;
   }

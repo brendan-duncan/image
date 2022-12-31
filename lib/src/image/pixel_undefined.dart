@@ -9,7 +9,7 @@ import 'pixel.dart';
 
 /// Represents an invalid pixel.
 class PixelUndefined extends Iterable<num> implements Pixel {
-  static final nullImageData = ImageDataUint8(0,0,0);
+  static final nullImageData = ImageDataUint8(0, 0, 0);
   @override
   PixelUndefined clone() => PixelUndefined();
   @override
@@ -47,9 +47,9 @@ class PixelUndefined extends Iterable<num> implements Pixel {
   @override
   bool get isValid => false;
   @override
-  num operator[](int index) => 0;
+  num operator [](int index) => 0;
   @override
-  void operator[]=(int index, num value) {}
+  void operator []=(int index, num value) {}
   @override
   num get index => 0;
   @override
@@ -107,11 +107,11 @@ class PixelUndefined extends Iterable<num> implements Pixel {
   @override
   bool moveNext() => false;
   @override
-  bool operator==(Object? other) => other is PixelUndefined;
+  bool operator ==(Object? other) => other is PixelUndefined;
   @override
   int get hashCode => 0;
   @override
   ChannelIterator get iterator => ChannelIterator(this);
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) => this;
+  Color convert({Format? format, int? numChannels, num? alpha}) => this;
 }

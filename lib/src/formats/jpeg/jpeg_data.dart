@@ -138,8 +138,9 @@ class JpegData {
     }
 
     if (frame != null) {
-      info..width = frame!.samplesPerLine!
-      ..height = frame!.scanLines!;
+      info
+        ..width = frame!.samplesPerLine!
+        ..height = frame!.scanLines!;
     }
     frame = null;
     frames.clear();
@@ -328,13 +329,13 @@ class JpegData {
           appData[3] == 0x46 &&
           appData[4] == 0) {
         jfif = JpegJfif()
-        ..majorVersion = appData[5]
-        ..minorVersion = appData[6]
-        ..densityUnits = appData[7]
-        ..xDensity = (appData[8] << 8) | appData[9]
-        ..yDensity = (appData[10] << 8) | appData[11]
-        ..thumbWidth = appData[12]
-        ..thumbHeight = appData[13];
+          ..majorVersion = appData[5]
+          ..minorVersion = appData[6]
+          ..densityUnits = appData[7]
+          ..xDensity = (appData[8] << 8) | appData[9]
+          ..yDensity = (appData[10] << 8) | appData[11]
+          ..thumbWidth = appData[12]
+          ..thumbHeight = appData[13];
         final thumbSize = 3 * jfif.thumbWidth * jfif.thumbHeight;
         jfif.thumbData = appData.subset(14 + thumbSize, offset: 14);
       }
@@ -419,8 +420,8 @@ class JpegData {
       final v = x & 15;
       final qId = block.readByte();
       frame!.componentsOrder.add(componentId);
-      frame!.components[componentId] = JpegComponent(h, v,
-          quantizationTables, qId);
+      frame!.components[componentId] =
+          JpegComponent(h, v, quantizationTables, qId);
     }
 
     frame!.prepare();

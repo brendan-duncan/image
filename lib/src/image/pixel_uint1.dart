@@ -20,28 +20,29 @@ class PixelUint1 extends Iterable<num> implements Pixel {
   final ImageDataUint1 image;
 
   PixelUint1.imageData(this.image)
-      : _x = -1
-      , _y = 0
-      , _index = 0
-      , _bitIndex = -1
-      , _rowOffset = 0;
+      : _x = -1,
+        _y = 0,
+        _index = 0,
+        _bitIndex = -1,
+        _rowOffset = 0;
 
   PixelUint1.image(Image image)
-      : _x = -1
-      , _y = 0
-      , _index = 0
-      , _bitIndex = -1
-      , _rowOffset = 0
-      , image = image.data is ImageDataUint1 ? image.data as ImageDataUint1
-          : ImageDataUint1(0, 0, 0);
+      : _x = -1,
+        _y = 0,
+        _index = 0,
+        _bitIndex = -1,
+        _rowOffset = 0,
+        image = image.data is ImageDataUint1
+            ? image.data as ImageDataUint1
+            : ImageDataUint1(0, 0, 0);
 
   PixelUint1.from(PixelUint1 other)
-      : _x = other._x
-      , _y = other._y
-      , _index = other._index
-      , _bitIndex = other._bitIndex
-      , _rowOffset = other._rowOffset
-      , image = other.image;
+      : _x = other._x,
+        _y = other._y,
+        _index = other._index,
+        _bitIndex = other._bitIndex,
+        _rowOffset = other._rowOffset,
+        image = other.image;
 
   @override
   PixelUint1 clone() => PixelUint1.from(this);
@@ -83,8 +84,8 @@ class PixelUint1 extends Iterable<num> implements Pixel {
   bool get isHdrFormat => image.isHdrFormat;
 
   @override
-  bool get isValid => x >= 0 && x < (image.width - 1) &&
-      y >= 0 && y < (image.height - 1);
+  bool get isValid =>
+      x >= 0 && x < (image.width - 1) && y >= 0 && y < (image.height - 1);
 
   @override
   int get x => _x;
@@ -158,7 +159,10 @@ class PixelUint1 extends Iterable<num> implements Pixel {
     return (image.data[i] >> bi) & 0x1;
   }
 
-  num _getChannel(int ci) => palette == null ? numChannels > ci ? _get(ci)  : 0
+  num _getChannel(int ci) => palette == null
+      ? numChannels > ci
+          ? _get(ci)
+          : 0
       : palette!.get(_get(0), ci);
 
   void _setChannel(int ci, num value) {
@@ -175,17 +179,17 @@ class PixelUint1 extends Iterable<num> implements Pixel {
 
     var v = data[i];
     final vi = value.toInt().clamp(0, 1);
-    const msk = [ 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f ];
+    const msk = [0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f];
     final mask = msk[bi];
     v = (v & mask) | (vi << bi);
     data[i] = v;
   }
 
   @override
-  num operator[](int ci) => _getChannel(ci);
+  num operator [](int ci) => _getChannel(ci);
 
   @override
-  void operator[]=(int ci, num value) => _setChannel(ci, value);
+  void operator []=(int ci, num value) => _setChannel(ci, value);
 
   @override
   num get index => _get(0);
@@ -238,9 +242,11 @@ class PixelUint1 extends Iterable<num> implements Pixel {
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance ?
-      luminance : channel.index < numChannels ? _getChannel(channel.index)
-      : 0;
+  num getChannel(Channel channel) => channel == Channel.luminance
+      ? luminance
+      : channel.index < numChannels
+          ? _getChannel(channel.index)
+          : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -289,7 +295,7 @@ class PixelUint1 extends Iterable<num> implements Pixel {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator==(Object? other) {
+  bool operator ==(Object? other) {
     if (other is PixelUint1) {
       return hashCode == other.hashCode;
     }
@@ -325,7 +331,7 @@ class PixelUint1 extends Iterable<num> implements Pixel {
   int get hashCode => Object.hashAll(toList());
 
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) =>
-      convertColor(this, format: format, numChannels: numChannels,
-          alpha: alpha);
+  Color convert({Format? format, int? numChannels, num? alpha}) =>
+      convertColor(this,
+          format: format, numChannels: numChannels, alpha: alpha);
 }

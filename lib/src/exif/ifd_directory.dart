@@ -16,7 +16,7 @@ class IfdDirectory {
 
   bool containsKey(int tag) => data.containsKey(tag);
 
-  IfdValue? operator[](Object? tag) {
+  IfdValue? operator [](Object? tag) {
     if (tag is String) {
       tag = exifTagNameToID[tag];
     }
@@ -26,7 +26,7 @@ class IfdDirectory {
     return null;
   }
 
-  void operator[]=(Object? tag, Object? value) {
+  void operator []=(Object? tag, Object? value) {
     if (tag is String) {
       tag = exifTagNameToID[tag];
     }
@@ -74,16 +74,16 @@ class IfdDirectory {
             case IfdValueType.rational:
               if (value is List<Rational> && value.length == tagCount) {
                 data[tag] = IfdRationalValue.list(value);
-              } else if (tagCount == 1 && value is List<int> &&
+              } else if (tagCount == 1 &&
+                  value is List<int> &&
                   value.length == 2) {
                 data[tag] = IfdRationalValue(value[0], value[1]);
               } else if (tagCount == 1 && value is Rational) {
                 data[tag] = IfdRationalValue.from(value);
               } else if (value is List<List<int>> && value.length == tagCount) {
-                data[tag] = IfdRationalValue.list(
-                    List<Rational>.generate(value.length,
-                            (index) => Rational(value[index][0],
-                                value[index][1])));
+                data[tag] = IfdRationalValue.list(List<Rational>.generate(
+                    value.length,
+                    (index) => Rational(value[index][0], value[index][1])));
               }
               break;
             case IfdValueType.sByte:
@@ -115,16 +115,16 @@ class IfdDirectory {
             case IfdValueType.sRational:
               if (value is List<Rational> && value.length == tagCount) {
                 data[tag] = IfdSRationalValue.list(value);
-              } else if (tagCount == 1 && value is List<int> &&
+              } else if (tagCount == 1 &&
+                  value is List<int> &&
                   value.length == 2) {
                 data[tag] = IfdSRationalValue(value[0], value[1]);
               } else if (tagCount == 1 && value is Rational) {
                 data[tag] = IfdSRationalValue.from(value);
               } else if (value is List<List<int>> && value.length == tagCount) {
-                data[tag] = IfdSRationalValue.list(
-                    List<Rational>.generate(value.length,
-                            (index) => Rational(value[index][0],
-                                value[index][1])));
+                data[tag] = IfdSRationalValue.list(List<Rational>.generate(
+                    value.length,
+                    (index) => Rational(value[index][0], value[index][1])));
               }
               break;
             case IfdValueType.single:

@@ -17,8 +17,7 @@ class PsdLayerSectionDivider extends PsdLayerData {
   String? key;
   int subType = subTypeNormal;
 
-  PsdLayerSectionDivider(String tag, InputBuffer data)
-      : super.type(tag) {
+  PsdLayerSectionDivider(String tag, InputBuffer data) : super.type(tag) {
     final len = data.length;
 
     type = data.readUint32();

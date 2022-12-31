@@ -3,8 +3,7 @@ import '../command.dart';
 
 // Encode an Image to the Cur format.
 class EncodeCurCmd extends Command {
-  EncodeCurCmd(Command? input)
-      : super(input);
+  EncodeCurCmd(Command? input) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -21,8 +20,7 @@ class EncodeCurCmd extends Command {
 class EncodeCurFileCmd extends Command {
   String path;
 
-  EncodeCurFileCmd(Command? input, this.path)
-      : super(input);
+  EncodeCurFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

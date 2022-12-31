@@ -13,8 +13,8 @@ void main() {
     final imgElem = e as ImageElement;
     if (imgElem.src!.toLowerCase().endsWith('.exr')) {
       final req = HttpRequest()
-      ..open('GET', imgElem.src!)
-      ..overrideMimeType('text/plain; charset=x-user-defined');
+        ..open('GET', imgElem.src!)
+        ..overrideMimeType('text/plain; charset=x-user-defined');
       req.onLoadEnd.listen((e) {
         if (req.status == 200) {
           // Get the bytes from the image file

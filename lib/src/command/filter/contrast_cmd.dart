@@ -7,16 +7,18 @@ class ContrastCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  ContrastCmd(Command? input, { num contrast = 100.0, this.mask,
-      this.maskChannel = Channel.luminance })
-      : _contrast = contrast
-      , super(input);
+  ContrastCmd(Command? input,
+      {num contrast = 100.0, this.mask, this.maskChannel = Channel.luminance})
+      : _contrast = contrast,
+        super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? g.contrast(img, contrast: _contrast,
-        mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? g.contrast(img,
+            contrast: _contrast, mask: maskImg, maskChannel: maskChannel)
+        : null;
   }
 }

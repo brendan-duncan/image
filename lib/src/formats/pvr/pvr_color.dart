@@ -75,8 +75,7 @@ class PvrColorRgba extends PvrColorRgbCore<PvrColorRgba> {
   @override
   PvrColorRgba copy() => PvrColorRgba.from(this);
 
-  PvrColorRgba operator *(int x) =>
-      PvrColorRgba(r * x, g * x, b * x, a * x);
+  PvrColorRgba operator *(int x) => PvrColorRgba(r * x, g * x, b * x, a * x);
 
   PvrColorRgba operator +(PvrColorRgba x) =>
       PvrColorRgba(r + x.r, g + x.g, b + x.b, a + x.a);

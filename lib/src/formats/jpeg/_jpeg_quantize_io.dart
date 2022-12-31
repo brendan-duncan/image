@@ -204,7 +204,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 
 Image getImageFromJpeg(JpegData jpeg) {
   final orientation =
-    jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.orientation! : 0;
+      jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.orientation! : 0;
 
   final w = jpeg.width!;
   final h = jpeg.height!;
@@ -213,9 +213,9 @@ Image getImageFromJpeg(JpegData jpeg) {
   final height = flipWidthHeight ? w : h;
 
   final image = Image(width: width, height: height)
-  // Copy exif data, except for ORIENTATION which we're baking.
-  ..exif = ExifData.from(jpeg.exif)
-  ..exif.imageIfd.orientation = null;
+    // Copy exif data, except for ORIENTATION which we're baking.
+    ..exif = ExifData.from(jpeg.exif)
+    ..exif.imageIfd.orientation = null;
 
   ComponentData component1;
   ComponentData component2;
@@ -244,19 +244,19 @@ Image getImageFromJpeg(JpegData jpeg) {
           final cy = component1Line![x1];
 
           if (orientation == 2) {
-            image.setPixelRgb(w1 - x, y,  cy, cy, cy);
+            image.setPixelRgb(w1 - x, y, cy, cy, cy);
           } else if (orientation == 3) {
-            image.setPixelRgb(w1 - x, h1 - y,  cy, cy, cy);
+            image.setPixelRgb(w1 - x, h1 - y, cy, cy, cy);
           } else if (orientation == 4) {
-            image.setPixelRgb(x, h1 - y,  cy, cy, cy);
+            image.setPixelRgb(x, h1 - y, cy, cy, cy);
           } else if (orientation == 5) {
-            image.setPixelRgb(y, x,  cy, cy, cy);
+            image.setPixelRgb(y, x, cy, cy, cy);
           } else if (orientation == 6) {
-            image.setPixelRgb(h1 - y, x,  cy, cy, cy);
+            image.setPixelRgb(h1 - y, x, cy, cy, cy);
           } else if (orientation == 7) {
-            image.setPixelRgb(h1 - y, w1 - x,  cy, cy, cy);
+            image.setPixelRgb(h1 - y, w1 - x, cy, cy, cy);
           } else if (orientation == 8) {
-            image.setPixelRgb(y, w1 - x,  cy, cy, cy);
+            image.setPixelRgb(y, w1 - x, cy, cy, cy);
           } else {
             image.setPixelRgb(x, y, cy, cy, cy);
           }
@@ -411,8 +411,10 @@ Image getImageFromJpeg(JpegData jpeg) {
             ck = component4Line![x4];
 
             cc = 255 - (cy + 1.402 * (cr - 128)).toInt().clamp(0, 255);
-            cm = 255 - (cy - 0.3441363 * (cb - 128) - 0.71413636 *
-                (cr - 128)).toInt().clamp(0, 255);
+            cm = 255 -
+                (cy - 0.3441363 * (cb - 128) - 0.71413636 * (cr - 128))
+                    .toInt()
+                    .clamp(0, 255);
             cy = 255 - (cy + 1.772 * (cb - 128)).toInt().clamp(0, 255);
           }
           final r = (cc * ck) >> 8;

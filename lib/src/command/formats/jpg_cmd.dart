@@ -7,8 +7,7 @@ import '../command.dart';
 class DecodeJpgCmd extends Command {
   Uint8List data;
 
-  DecodeJpgCmd(Command? input, this.data)
-      : super(input);
+  DecodeJpgCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -21,8 +20,7 @@ class DecodeJpgCmd extends Command {
 class DecodeJpgFileCmd extends Command {
   String path;
 
-  DecodeJpgFileCmd(Command? input, this.path)
-      : super(input);
+  DecodeJpgFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -35,8 +33,7 @@ class DecodeJpgFileCmd extends Command {
 class EncodeJpgCmd extends Command {
   int quality;
 
-  EncodeJpgCmd(Command? input, { this.quality = 100 })
-      : super(input);
+  EncodeJpgCmd(Command? input, {this.quality = 100}) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -53,7 +50,7 @@ class EncodeJpgCmd extends Command {
 class EncodeJpgFileCmd extends EncodeJpgCmd {
   String path;
 
-  EncodeJpgFileCmd(Command? input, this.path, { int quality = 100 })
+  EncodeJpgFileCmd(Command? input, this.path, {int quality = 100})
       : super(input, quality: quality);
 
   @override

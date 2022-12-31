@@ -6,12 +6,7 @@ import '../../util/input_buffer.dart';
 import '../decode_info.dart';
 import 'webp_frame.dart';
 
-enum WebPFormat {
-  undefined,
-  lossy,
-  lossless,
-  animated
-}
+enum WebPFormat { undefined, lossy, lossless, animated }
 
 /// Features gathered from the bitstream
 class WebPInfo implements DecodeInfo {

@@ -4,8 +4,7 @@ import '../color/format.dart';
 import 'palette.dart';
 
 class PaletteUndefined extends Palette {
-  PaletteUndefined()
-      : super(0, 0);
+  PaletteUndefined() : super(0, 0);
   @override
   PaletteUndefined clone() => PaletteUndefined();
   @override

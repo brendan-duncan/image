@@ -43,7 +43,7 @@ class NeuralQuantizer extends Quantizer {
   /// 10 is a reasonable [samplingFactor] according to
   /// https://scientificgems.wordpress.com/stuff/neuquant-fast-high-quality-image-quantization/.
   NeuralQuantizer(Image image,
-      { int numberOfColors = 256, this.samplingFactor = 10 }) {
+      {int numberOfColors = 256, this.samplingFactor = 10}) {
     _initialize(numberOfColors);
     addImage(image);
   }
@@ -77,9 +77,9 @@ class NeuralQuantizer extends Quantizer {
   Color getQuantizedColor(Color c) {
     final i = getColorIndex(c);
     final out = c.length == 4 ? ColorRgba8(0, 0, 0, 255) : ColorRgb8(0, 0, 0)
-    ..r = palette.get(i, 0)
-    ..g = palette.get(i, 1)
-    ..b = palette.get(i, 2);
+      ..r = palette.get(i, 0)
+      ..g = palette.get(i, 1)
+      ..b = palette.get(i, 2);
     if (c.length == 4) {
       out.a = c.a;
     }
@@ -129,9 +129,7 @@ class NeuralQuantizer extends Quantizer {
 
   void _copyColorMap() {
     for (var i = 0; i < netSize; ++i) {
-      palette.setRgb(i,
-          _palette.get(i, 2).abs(),
-          _palette.get(i, 1).abs(),
+      palette.setRgb(i, _palette.get(i, 2).abs(), _palette.get(i, 1).abs(),
           _palette.get(i, 0).abs());
     }
   }
@@ -238,20 +236,24 @@ class NeuralQuantizer extends Quantizer {
       // swap p (i) and q (smallPos) entries
       if (i != smallPos) {
         var j = _palette.get(q, 0);
-        _palette..set(q, 0, _palette.get(p, 0))
-        ..set(p, 0, j);
+        _palette
+          ..set(q, 0, _palette.get(p, 0))
+          ..set(p, 0, j);
 
         j = _palette.get(q, 1);
-        _palette..set(q, 1, _palette.get(p, 1))
-        ..set(p, 1, j);
+        _palette
+          ..set(q, 1, _palette.get(p, 1))
+          ..set(p, 1, j);
 
         j = _palette.get(q, 2);
-        _palette..set(q, 2, _palette.get(p, 2))
-        ..set(p, 2, j);
+        _palette
+          ..set(q, 2, _palette.get(p, 2))
+          ..set(p, 2, j);
 
         j = _palette.get(q, 3);
-        _palette..set(q, 3, _palette.get(p, 3))
-        ..set(p, 3, j);
+        _palette
+          ..set(q, 3, _palette.get(p, 3))
+          ..set(p, 3, j);
       }
 
       // smallVal entry is now in position i

@@ -11,24 +11,19 @@ import 'format.dart';
 class ColorUint16 extends Iterable<num> implements Color {
   final Uint16List data;
 
-  ColorUint16(int numChannels)
-      : data = Uint16List(numChannels);
+  ColorUint16(int numChannels) : data = Uint16List(numChannels);
 
-  ColorUint16.from(ColorUint16 other)
-      : data = Uint16List.fromList(other.data);
+  ColorUint16.from(ColorUint16 other) : data = Uint16List.fromList(other.data);
 
-  ColorUint16.fromList(List<int> color)
-      : data = Uint16List.fromList(color);
+  ColorUint16.fromList(List<int> color) : data = Uint16List.fromList(color);
 
-  ColorUint16.rgb(int r, int g, int b)
-      : data = Uint16List(3) {
+  ColorUint16.rgb(int r, int g, int b) : data = Uint16List(3) {
     data[0] = r;
     data[1] = g;
     data[2] = b;
   }
 
-  ColorUint16.rgba(int r, int g, int b, int a)
-      : data = Uint16List(4) {
+  ColorUint16.rgba(int r, int g, int b, int a) : data = Uint16List(4) {
     data[0] = r;
     data[1] = g;
     data[2] = b;
@@ -56,9 +51,9 @@ class ColorUint16 extends Iterable<num> implements Color {
   Palette? get palette => null;
 
   @override
-  num operator[](int index) => index < data.length ? data[index] : 0;
+  num operator [](int index) => index < data.length ? data[index] : 0;
   @override
-  void operator[]=(int index, num value) {
+  void operator []=(int index, num value) {
     if (index < data.length) {
       data[index] = value.toInt();
     }
@@ -127,8 +122,11 @@ class ColorUint16 extends Iterable<num> implements Color {
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance ?
-      luminance : channel.index < data.length ? data[channel.index] : 0;
+  num getChannel(Channel channel) => channel == Channel.luminance
+      ? luminance
+      : channel.index < data.length
+          ? data[channel.index]
+          : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -173,16 +171,14 @@ class ColorUint16 extends Iterable<num> implements Color {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator==(Object? other) =>
-      other is Color &&
-          other.length == length &&
-          other.hashCode == hashCode;
+  bool operator ==(Object? other) =>
+      other is Color && other.length == length && other.hashCode == hashCode;
 
   @override
   int get hashCode => Object.hashAll(toList());
 
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) =>
-      convertColor(this, format: format, numChannels: numChannels,
-          alpha: alpha);
+  Color convert({Format? format, int? numChannels, num? alpha}) =>
+      convertColor(this,
+          format: format, numChannels: numChannels, alpha: alpha);
 }

@@ -11,10 +11,10 @@ import '../util/color_util.dart';
 /// remapColors(src, alpha: Channel.luminance)
 /// will set the alpha channel to the luminance (grayscale) of the image.
 Image remapColors(Image src,
-    { Channel red = Channel.red,
+    {Channel red = Channel.red,
     Channel green = Channel.green,
     Channel blue = Channel.blue,
-    Channel alpha = Channel.alpha }) {
+    Channel alpha = Channel.alpha}) {
   final List<num> l = [0, 0, 0, 0, 0];
   for (final frame in src.frames) {
     for (final p in frame) {
@@ -28,10 +28,11 @@ Image remapColors(Image src,
           alpha == Channel.luminance) {
         l[4] = getLuminanceRgb(l[0], l[1], l[2]);
       }
-      p..r = l[red.index]
-      ..g = l[green.index]
-      ..b = l[blue.index]
-      ..a = l[alpha.index];
+      p
+        ..r = l[red.index]
+        ..g = l[green.index]
+        ..b = l[blue.index]
+        ..a = l[alpha.index];
     }
   }
   return src;

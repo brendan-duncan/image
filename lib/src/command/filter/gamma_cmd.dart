@@ -7,16 +7,17 @@ class GammaCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  GammaCmd(Command? input, { num gamma = 2.2, this.mask,
-    this.maskChannel = Channel.luminance })
-      : _gamma = gamma
-      , super(input);
+  GammaCmd(Command? input,
+      {num gamma = 2.2, this.mask, this.maskChannel = Channel.luminance})
+      : _gamma = gamma,
+        super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? g.gamma(img, gamma: _gamma,
-        mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? g.gamma(img, gamma: _gamma, mask: maskImg, maskChannel: maskChannel)
+        : null;
   }
 }

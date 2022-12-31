@@ -4,8 +4,7 @@ import '../command.dart';
 class DecodeImageFileCmd extends Command {
   String path;
 
-  DecodeImageFileCmd(Command? input, this.path)
-      : super(input);
+  DecodeImageFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

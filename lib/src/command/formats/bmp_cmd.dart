@@ -7,8 +7,7 @@ import '../command.dart';
 class DecodeBmpCmd extends Command {
   Uint8List data;
 
-  DecodeBmpCmd(Command? input, this.data)
-      : super(input);
+  DecodeBmpCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -21,8 +20,7 @@ class DecodeBmpCmd extends Command {
 class DecodeBmpFileCmd extends Command {
   String path;
 
-  DecodeBmpFileCmd(Command? input, this.path)
-      : super(input);
+  DecodeBmpFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -33,8 +31,7 @@ class DecodeBmpFileCmd extends Command {
 
 // Encode an Image to the BMP format.
 class EncodeBmpCmd extends Command {
-  EncodeBmpCmd(Command? input)
-      : super(input);
+  EncodeBmpCmd(Command? input) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -51,8 +48,7 @@ class EncodeBmpCmd extends Command {
 class EncodeBmpFileCmd extends Command {
   String path;
 
-  EncodeBmpFileCmd(Command? input, this.path)
-      : super(input);
+  EncodeBmpFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

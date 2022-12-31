@@ -12,8 +12,10 @@ late Uint8List _contrast;
 /// [contrast] values below 100 will decrees the contrast of the image,
 /// and values above 100 will increase the contrast. A contrast of of 100
 /// will have no affect.
-Image contrast(Image src, { required num contrast,
-    Image? mask, Channel maskChannel = Channel.luminance }) {
+Image contrast(Image src,
+    {required num contrast,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   if (contrast == 100.0) {
     return src;
   }
@@ -26,7 +28,8 @@ Image contrast(Image src, { required num contrast,
     _contrast = Uint8List(256);
     for (var i = 0; i < 256; ++i) {
       _contrast[i] = (((((i / 255.0) - 0.5) * contrast) + 0.5) * 255.0)
-          .clamp(0, 255).toInt();
+          .clamp(0, 255)
+          .toInt();
     }
   }
 
@@ -34,13 +37,15 @@ Image contrast(Image src, { required num contrast,
     for (final p in frame) {
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       if (msk == null) {
-        p..r = _contrast[p.r as int]
-        ..g = _contrast[p.g as int]
-        ..b = _contrast[p.b as int];
+        p
+          ..r = _contrast[p.r as int]
+          ..g = _contrast[p.g as int]
+          ..b = _contrast[p.b as int];
       } else {
-        p..r = mix(p.r, _contrast[p.r as int], msk)
-        ..g = mix(p.g, _contrast[p.g as int], msk)
-        ..b = mix(p.b, _contrast[p.b as int], msk);
+        p
+          ..r = mix(p.r, _contrast[p.r as int], msk)
+          ..g = mix(p.g, _contrast[p.g as int], msk)
+          ..b = mix(p.b, _contrast[p.b as int], msk);
       }
     }
   }

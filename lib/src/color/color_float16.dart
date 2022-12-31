@@ -12,29 +12,25 @@ import 'format.dart';
 class ColorFloat16 extends Iterable<num> implements Color {
   final Uint16List data;
 
-  ColorFloat16(int numChannels)
-      : data = Uint16List(numChannels);
+  ColorFloat16(int numChannels) : data = Uint16List(numChannels);
 
   ColorFloat16.from(ColorFloat16 other)
       : data = Uint16List.fromList(other.data);
 
-  ColorFloat16.fromList(List<double> color)
-      : data = Uint16List(color.length) {
+  ColorFloat16.fromList(List<double> color) : data = Uint16List(color.length) {
     final l = color.length;
     for (var i = 0; i < l; ++i) {
       data[i] = Float16.doubleToFloat16(color[i]);
     }
   }
 
-  ColorFloat16.rgb(num r, num g, num b)
-      : data = Uint16List(3) {
+  ColorFloat16.rgb(num r, num g, num b) : data = Uint16List(3) {
     data[0] = Float16.doubleToFloat16(r.toDouble());
     data[1] = Float16.doubleToFloat16(g.toDouble());
     data[2] = Float16.doubleToFloat16(b.toDouble());
   }
 
-  ColorFloat16.rgba(num r, num g, num b, num a)
-      : data = Uint16List(4) {
+  ColorFloat16.rgba(num r, num g, num b, num a) : data = Uint16List(4) {
     data[0] = Float16.doubleToFloat16(r.toDouble());
     data[1] = Float16.doubleToFloat16(g.toDouble());
     data[2] = Float16.doubleToFloat16(b.toDouble());
@@ -69,11 +65,11 @@ class ColorFloat16 extends Iterable<num> implements Color {
   Palette? get palette => null;
 
   @override
-  num operator[](int index) => index < data.length ?
-      Float16.float16ToDouble(data[index]) : 0;
+  num operator [](int index) =>
+      index < data.length ? Float16.float16ToDouble(data[index]) : 0;
 
   @override
-  void operator[]=(int index, num value) {
+  void operator []=(int index, num value) {
     if (index < data.length) {
       data[index] = Float16.doubleToFloat16(value.toDouble());
     }
@@ -146,9 +142,11 @@ class ColorFloat16 extends Iterable<num> implements Color {
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance ?
-      luminance : channel.index < data.length
-          ? Float16.float16ToDouble(data[channel.index]) : 0;
+  num getChannel(Channel channel) => channel == Channel.luminance
+      ? luminance
+      : channel.index < data.length
+          ? Float16.float16ToDouble(data[channel.index])
+          : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -193,16 +191,14 @@ class ColorFloat16 extends Iterable<num> implements Color {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator==(Object? other) =>
-      other is Color &&
-      other.length == length &&
-      other.hashCode == hashCode;
+  bool operator ==(Object? other) =>
+      other is Color && other.length == length && other.hashCode == hashCode;
 
   @override
   int get hashCode => Object.hashAll(toList());
 
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) =>
-      convertColor(this, format: format, numChannels: numChannels,
-          alpha: alpha);
+  Color convert({Format? format, int? numChannels, num? alpha}) =>
+      convertColor(this,
+          format: format, numChannels: numChannels, alpha: alpha);
 }

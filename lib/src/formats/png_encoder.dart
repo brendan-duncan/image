@@ -11,27 +11,21 @@ import '../util/output_buffer.dart';
 import 'encoder.dart';
 import 'png/png_info.dart';
 
-enum PngFilter {
-  none,
-  sub,
-  up,
-  average,
-  paeth
-}
+enum PngFilter { none, sub, up, average, paeth }
 
 /// Encode an image to the PNG format.
 class PngEncoder extends Encoder {
-  PngEncoder({ this.filter = PngFilter.paeth, this.level });
+  PngEncoder({this.filter = PngFilter.paeth, this.level});
 
-  int _numChannels(Image image) =>
-      image.hasPalette ? 1 : image.numChannels;
+  int _numChannels(Image image) => image.hasPalette ? 1 : image.numChannels;
 
   void addFrame(Image image) {
     // PNG can't encode HDR formats, and can only encode formats with fewer
     // than 8 bits if they have a palette. In the case of incompatible
     // formats, convert them to uint8.
     if ((image.isHdrFormat && image.format != Format.uint16) ||
-        (image.bitsPerChannel < 8 && !image.hasPalette &&
+        (image.bitsPerChannel < 8 &&
+            !image.hasPalette &&
             image.numChannels > 1)) {
       image = image.convert(format: Format.uint8);
     }
@@ -59,8 +53,8 @@ class PngEncoder extends Encoder {
     final channelBytes = image.format == Format.uint16 ? 2 : 1;
 
     // Include room for the filter bytes (1 byte per row).
-    final filteredImage = Uint8List((image.width * image.height * nc *
-        channelBytes) + image.height);
+    final filteredImage = Uint8List(
+        (image.width * image.height * nc * channelBytes) + image.height);
 
     _filter(image, filteredImage);
 
@@ -82,8 +76,8 @@ class PngEncoder extends Encoder {
     } else {
       // fdAT chunk
       final fdat = OutputBuffer(bigEndian: true)
-      ..writeUint32(sequenceNumber)
-      ..writeBytes(compressed);
+        ..writeUint32(sequenceNumber)
+        ..writeBytes(compressed);
       _writeChunk(output!, 'fdAT', fdat.getBytes());
 
       sequenceNumber++;
@@ -112,7 +106,7 @@ class PngEncoder extends Encoder {
 
   /// Encode [image] to the PNG format.
   @override
-  Uint8List encode(Image image, { bool singleFrame = false }) {
+  Uint8List encode(Image image, {bool singleFrame = false}) {
     if (!image.hasAnimation || singleFrame) {
       isAnimated = false;
       addFrame(image);
@@ -133,60 +127,66 @@ class PngEncoder extends Encoder {
 
     // IHDR chunk
     final chunk = OutputBuffer(bigEndian: true)
-    ..writeUint32(image.width) // width
-    ..writeUint32(image.height)  // height
-    ..writeByte(image.bitsPerChannel) // bit depth
-    ..writeByte(image.hasPalette ? PngColorType.indexed
-        : image.numChannels == 1 ? PngColorType.grayscale
-        : image.numChannels == 2 ? PngColorType.grayscaleAlpha
-        : image.numChannels == 3 ? PngColorType.rgb
-        : PngColorType.rgba)
-    ..writeByte(0) // compression method: 0:deflate
-    ..writeByte(0) // filter method: 0:adaptive
-    ..writeByte(0); // interlace method: 0:no interlace
+      ..writeUint32(image.width) // width
+      ..writeUint32(image.height) // height
+      ..writeByte(image.bitsPerChannel) // bit depth
+      ..writeByte(image.hasPalette
+          ? PngColorType.indexed
+          : image.numChannels == 1
+              ? PngColorType.grayscale
+              : image.numChannels == 2
+                  ? PngColorType.grayscaleAlpha
+                  : image.numChannels == 3
+                      ? PngColorType.rgb
+                      : PngColorType.rgba)
+      ..writeByte(0) // compression method: 0:deflate
+      ..writeByte(0) // filter method: 0:adaptive
+      ..writeByte(0); // interlace method: 0:no interlace
     _writeChunk(output!, 'IHDR', chunk.getBytes());
   }
 
   void _writeAnimationControlChunk() {
     final chunk = OutputBuffer(bigEndian: true)
-    ..writeUint32(_frames) // number of frames
-    ..writeUint32(repeat); // loop count
+      ..writeUint32(_frames) // number of frames
+      ..writeUint32(repeat); // loop count
     _writeChunk(output!, 'acTL', chunk.getBytes());
   }
 
   void _writeFrameControlChunk(Image image) {
     final chunk = OutputBuffer(bigEndian: true)
-    ..writeUint32(sequenceNumber)
-    ..writeUint32(image.width)
-    ..writeUint32(image.height)
-    ..writeUint32(0) // xOffset
-    ..writeUint32(0) // yOffset
-    ..writeUint16(image.frameDuration)
-    ..writeUint16(1000) // delay denominator
-    ..writeByte(0) // dispose method 0: APNG_DISPOSE_OP_NONE
-    ..writeByte(0); // blend method 0: APNG_BLEND_OP_SOURCE
+      ..writeUint32(sequenceNumber)
+      ..writeUint32(image.width)
+      ..writeUint32(image.height)
+      ..writeUint32(0) // xOffset
+      ..writeUint32(0) // yOffset
+      ..writeUint16(image.frameDuration)
+      ..writeUint16(1000) // delay denominator
+      ..writeByte(0) // dispose method 0: APNG_DISPOSE_OP_NONE
+      ..writeByte(0); // blend method 0: APNG_BLEND_OP_SOURCE
     _writeChunk(output!, 'fcTL', chunk.getBytes());
   }
 
   void _writeTextChunk(String keyword, String text) {
     final chunk = OutputBuffer(bigEndian: true)
-    ..writeBytes(latin1.encode(keyword))
-    ..writeByte(0)
-    ..writeBytes(latin1.encode(text));
+      ..writeBytes(latin1.encode(keyword))
+      ..writeByte(0)
+      ..writeBytes(latin1.encode(text));
     _writeChunk(output!, 'tEXt', chunk.getBytes());
   }
 
   void _writePalette(Palette palette) {
-    if (palette.format == Format.uint8 && palette.numChannels == 3 &&
+    if (palette.format == Format.uint8 &&
+        palette.numChannels == 3 &&
         palette.numColors == 256) {
       _writeChunk(output!, 'PLTE', palette.toUint8List());
     } else {
       final chunk = OutputBuffer(size: palette.numColors * 3, bigEndian: true);
       final nc = palette.numColors;
       for (var i = 0; i < nc; ++i) {
-        chunk..writeByte(palette.getRed(i).toInt())
-        ..writeByte(palette.getGreen(i).toInt())
-        ..writeByte(palette.getBlue(i).toInt());
+        chunk
+          ..writeByte(palette.getRed(i).toInt())
+          ..writeByte(palette.getGreen(i).toInt())
+          ..writeByte(palette.getBlue(i).toInt());
       }
       _writeChunk(output!, 'PLTE', chunk.getBytes());
     }
@@ -204,23 +204,24 @@ class PngEncoder extends Encoder {
   void _writeICCPChunk(OutputBuffer? out, IccProfile iccp) {
     final chunk = OutputBuffer(bigEndian: true)
 
-    // name
-    ..writeBytes(iccp.name.codeUnits)
-    ..writeByte(0)
+      // name
+      ..writeBytes(iccp.name.codeUnits)
+      ..writeByte(0)
 
-    // compression
-    ..writeByte(0) // 0 - deflate
+      // compression
+      ..writeByte(0) // 0 - deflate
 
-    // profile data
-    ..writeBytes(iccp.compressed());
+      // profile data
+      ..writeBytes(iccp.compressed());
 
     _writeChunk(output!, 'iCCP', chunk.getBytes());
   }
 
   void _writeChunk(OutputBuffer out, String type, List<int> chunk) {
-    out..writeUint32(chunk.length)
-    ..writeBytes(type.codeUnits)
-    ..writeBytes(chunk);
+    out
+      ..writeUint32(chunk.length)
+      ..writeBytes(type.codeUnits)
+      ..writeBytes(chunk);
     final crc = _crc(type, chunk);
     out.writeUint32(crc);
   }
@@ -300,8 +301,8 @@ class PngEncoder extends Encoder {
     return oi;
   }
 
-  int _filterUp(Uint8List row, Uint8List? prevRow, int bpc,
-      Uint8List out, int oi) {
+  int _filterUp(
+      Uint8List row, Uint8List? prevRow, int bpc, Uint8List out, int oi) {
     out[oi++] = PngFilter.up.index;
     final l = row.length;
     for (var x = 0; x < l; x += bpc) {
@@ -373,5 +374,5 @@ class PngEncoder extends Encoder {
   int sequenceNumber = 0;
   bool isAnimated = false;
   OutputBuffer? output;
-  Map<String,String>? textData;
+  Map<String, String>? textData;
 }

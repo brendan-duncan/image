@@ -21,7 +21,8 @@ class Rational {
   @override
   bool operator ==(Object other) =>
       other is Rational &&
-          numerator == other.numerator && denominator == other.denominator;
+      numerator == other.numerator &&
+      denominator == other.denominator;
 
   @override
   int get hashCode => Object.hash(numerator, denominator);

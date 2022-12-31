@@ -12,16 +12,17 @@ class ImageDataUint32 extends ImageData {
   final Uint32List data;
 
   ImageDataUint32(int width, int height, int numChannels)
-      : data = Uint32List(width * height * numChannels)
-      , super(width, height, numChannels);
+      : data = Uint32List(width * height * numChannels),
+        super(width, height, numChannels);
 
-  ImageDataUint32.from(ImageDataUint32 other, { bool skipPixels = false })
-      : data = skipPixels ? Uint32List(other.data.length)
-          : Uint32List.fromList(other.data)
-      , super(other.width, other.height, other.numChannels);
+  ImageDataUint32.from(ImageDataUint32 other, {bool skipPixels = false})
+      : data = skipPixels
+            ? Uint32List(other.data.length)
+            : Uint32List.fromList(other.data),
+        super(other.width, other.height, other.numChannels);
 
   @override
-  ImageDataUint32 clone({ bool noPixels = false }) =>
+  ImageDataUint32 clone({bool noPixels = false}) =>
       ImageDataUint32.from(this, skipPixels: noPixels);
 
   @override
@@ -62,9 +63,9 @@ class ImageDataUint32 extends ImageData {
   bool get isHdrFormat => true;
 
   @override
-  Color getColor(num r, num g, num b, [num? a]) =>
-      a == null ? ColorUint32.rgb(r.toInt(), g.toInt(), b.toInt())
-          : ColorUint32.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
+  Color getColor(num r, num g, num b, [num? a]) => a == null
+      ? ColorUint32.rgb(r.toInt(), g.toInt(), b.toInt())
+      : ColorUint32.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
 
   @override
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
@@ -112,5 +113,5 @@ class ImageDataUint32 extends ImageData {
   String toString() => 'ImageDataUint32($width, $height, $numChannels)';
 
   @override
-  void clear([Color? c]) { }
+  void clear([Color? c]) {}
 }

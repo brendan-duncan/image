@@ -19,8 +19,7 @@ class VP8L {
   WebPInfo webp;
   Image? image;
 
-  VP8L(this.input, this.webp)
-      : br = VP8LBitReader(input);
+  VP8L(this.input, this.webp) : br = VP8LBitReader(input);
 
   bool decodeHeader() {
     final signature = br.readBits(8);
@@ -28,10 +27,11 @@ class VP8L {
       return false;
     }
 
-    webp..format = WebPFormat.lossless
-    ..width = br.readBits(14) + 1
-    ..height = br.readBits(14) + 1
-    ..hasAlpha = br.readBits(1) != 0;
+    webp
+      ..format = WebPFormat.lossless
+      ..width = br.readBits(14) + 1
+      ..height = br.readBits(14) + 1
+      ..hasAlpha = br.readBits(1) != 0;
     final version = br.readBits(3);
 
     if (version != vp8lVersion) {
@@ -54,8 +54,8 @@ class VP8L {
 
     image = Image(width: webp.width, height: webp.height, numChannels: 4);
 
-    if (!_decodeImageData(_pixels!, webp.width, webp.height, webp.height,
-        _processRows)) {
+    if (!_decodeImageData(
+        _pixels!, webp.width, webp.height, webp.height, _processRows)) {
       return null;
     }
 
@@ -103,9 +103,10 @@ class VP8L {
     final transform = VP8LTransform();
     _transforms.add(transform);
 
-    transform..type = VP8LImageTransformType.values[type]
-    ..xsize = transformSize[0]
-    ..ysize = transformSize[1];
+    transform
+      ..type = VP8LImageTransformType.values[type]
+      ..xsize = transformSize[0]
+      ..ysize = transformSize[1];
 
     switch (transform.type) {
       case VP8LImageTransformType.predictor:
@@ -166,8 +167,8 @@ class VP8L {
     }
 
     // Read the Huffman codes (may recurse).
-    if (!_readHuffmanCodes(transformXsize, transformYsize,
-        colorCacheBits, isLevel0)) {
+    if (!_readHuffmanCodes(
+        transformXsize, transformYsize, colorCacheBits, isLevel0)) {
       throw ImageException('Invalid Huffman Codes');
     }
 
@@ -179,8 +180,9 @@ class VP8L {
       _colorCacheSize = 0;
     }
 
-    webp..width = transformXsize
-    ..height = transformYsize;
+    webp
+      ..width = transformXsize
+      ..height = transformYsize;
     final numBits = _huffmanSubsampleBits;
     _huffmanXsize = _subSampleSize(transformXsize, numBits);
     _huffmanMask = (numBits == 0) ? ~0 : (1 << numBits) - 1;
@@ -487,8 +489,8 @@ class VP8L {
     final startRow = _lastRow;
     final endRow = startRow + numRows;
     final rowsOut = InputBuffer(_opaque!, offset: _ioWidth! * startRow);
-    _transforms[0].colorIndexInverseTransformAlpha(startRow, endRow, rows,
-        rowsOut);
+    _transforms[0]
+        .colorIndexInverseTransformAlpha(startRow, endRow, rows, rowsOut);
   }
 
   // Processes (transforms, scales & color-converts) the rows decoded after the
@@ -540,8 +542,8 @@ class VP8L {
     }
   }
 
-  bool _readHuffmanCodes(int xSize, int ySize, int colorCacheBits,
-      bool allowRecursion) {
+  bool _readHuffmanCodes(
+      int xSize, int ySize, int colorCacheBits, bool allowRecursion) {
     Uint32List? huffmanImage;
     var numHtreeGroups = 1;
 

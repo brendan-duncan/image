@@ -13,20 +13,17 @@ class PngColorType {
   static const rgba = 6;
 
   static bool isValid(int? value) =>
-      value == grayscale || value == rgb || value == indexed ||
-      value == grayscaleAlpha || value == rgba;
+      value == grayscale ||
+      value == rgb ||
+      value == indexed ||
+      value == grayscaleAlpha ||
+      value == rgba;
 
   const PngColorType(this.value);
   final int value;
 }
 
-enum PngFilterType {
-  none,
-  sub,
-  up,
-  average,
-  paeth
-}
+enum PngFilterType { none, sub, up, average, paeth }
 
 class PngInfo implements DecodeInfo {
   @override

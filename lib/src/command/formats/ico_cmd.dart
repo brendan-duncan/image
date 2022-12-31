@@ -7,8 +7,7 @@ import '../command.dart';
 class DecodeIcoCmd extends Command {
   Uint8List data;
 
-  DecodeIcoCmd(Command? input, this.data)
-      : super(input);
+  DecodeIcoCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -21,8 +20,7 @@ class DecodeIcoCmd extends Command {
 class DecodeIcoFileCmd extends Command {
   String path;
 
-  DecodeIcoFileCmd(Command? input, this.path)
-      : super(input);
+  DecodeIcoFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -33,8 +31,7 @@ class DecodeIcoFileCmd extends Command {
 
 // Encode an Image to the ICO format.
 class EncodeIcoCmd extends Command {
-  EncodeIcoCmd(Command? input)
-      : super(input);
+  EncodeIcoCmd(Command? input) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -51,8 +48,7 @@ class EncodeIcoCmd extends Command {
 class EncodeIcoFileCmd extends EncodeIcoCmd {
   String path;
 
-  EncodeIcoFileCmd(Command? input, this.path)
-      : super(input);
+  EncodeIcoFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

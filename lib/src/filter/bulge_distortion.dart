@@ -5,10 +5,14 @@ import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../util/math_util.dart';
 
-Image bulgeDistortion(Image src, { int? centerX, int? centerY,
-    num? radius, num scale = 0.5,
+Image bulgeDistortion(Image src,
+    {int? centerX,
+    int? centerY,
+    num? radius,
+    num scale = 0.5,
     Interpolation interpolation = Interpolation.nearest,
-    Image? mask, Channel maskChannel = Channel.luminance }) {
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   for (final frame in src.frames) {
     final orig = frame.clone(noAnimation: true);
     final w = frame.width;
@@ -28,7 +32,7 @@ Image bulgeDistortion(Image src, { int? centerX, int? centerY,
       if (dist < radSqr) {
         final percent = 1 - ((radSqr - dist) / radSqr) * scale;
         final percentSqr = percent * percent;
-        x *=  percentSqr;
+        x *= percentSqr;
         y *= percentSqr;
       }
       x += cx;
@@ -40,10 +44,11 @@ Image bulgeDistortion(Image src, { int? centerX, int? centerY,
       if (msk == null) {
         p.set(p2);
       } else {
-        p..r = mix(p.r, p2.r, msk)
-        ..g = mix(p.g, p2.g, msk)
-        ..b = mix(p.b, p2.b, msk)
-        ..a = mix(p.a, p2.a, msk);
+        p
+          ..r = mix(p.r, p2.r, msk)
+          ..g = mix(p.g, p2.g, msk)
+          ..b = mix(p.b, p2.b, msk)
+          ..a = mix(p.a, p2.a, msk);
       }
     }
   }

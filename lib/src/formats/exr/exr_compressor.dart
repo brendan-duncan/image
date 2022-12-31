@@ -11,24 +11,16 @@ import 'exr_rle_compressor.dart';
 import 'exr_zip_compressor.dart';
 
 @internal
-enum ExrCompressorType {
-  none,
-  rle,
-  zips,
-  zip,
-  piz,
-  pxr24,
-  b44,
-  b44a
-}
+enum ExrCompressorType { none, rle, zips, zip, piz, pxr24, b44, b44a }
 
 @internal
 abstract class ExrCompressor {
   int decodedWidth = 0;
   int decodedHeight = 0;
 
-  factory ExrCompressor(ExrCompressorType type, ExrPart hdr,
-      int? maxScanLineSize, [int? numScanLines]) {
+  factory ExrCompressor(
+      ExrCompressorType type, ExrPart hdr, int? maxScanLineSize,
+      [int? numScanLines]) {
     switch (type) {
       case ExrCompressorType.rle:
         return ExrRleCompressor(hdr, maxScanLineSize);
@@ -41,8 +33,8 @@ abstract class ExrCompressor {
       case ExrCompressorType.pxr24:
         return ExrPxr24Compressor(hdr, maxScanLineSize, numScanLines ?? 16);
       case ExrCompressorType.b44:
-        return ExrB44Compressor(hdr, maxScanLineSize, numScanLines ?? 32,
-            false);
+        return ExrB44Compressor(
+            hdr, maxScanLineSize, numScanLines ?? 32, false);
       case ExrCompressorType.b44a:
         return ExrB44Compressor(hdr, maxScanLineSize, numScanLines ?? 32, true);
       default:
@@ -50,8 +42,8 @@ abstract class ExrCompressor {
     }
   }
 
-  factory ExrCompressor.tile(ExrCompressorType type, int tileLineSize,
-      int numTileLines, ExrPart hdr) {
+  factory ExrCompressor.tile(
+      ExrCompressorType type, int tileLineSize, int numTileLines, ExrPart hdr) {
     switch (type) {
       case ExrCompressorType.rle:
         return ExrRleCompressor(hdr, tileLineSize * numTileLines);

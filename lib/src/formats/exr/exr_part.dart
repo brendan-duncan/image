@@ -16,19 +16,26 @@ import 'exr_compressor.dart';
 
 class ExrPart {
   final int index;
+
   /// The framebuffer for this exr part.
   Image? framebuffer;
+
   /// The channels present in this part.
   List<ExrChannel> channels = [];
   int numColorChannels = 0;
+
   /// The extra attributes read from the part header.
   Map<String, ExrAttribute> attributes = {};
+
   /// The display window (see the openexr documentation).
   List<int>? displayWindow;
+
   /// The data window (see the openexr documentation).
   late List<int> dataWindow;
+
   /// width of the data window
   int width = 0;
+
   /// Height of the data window
   int height = 0;
   double pixelAspectRatio = 1.0;
@@ -41,7 +48,7 @@ class ExrPart {
     //_type = _tiled ? ExrPart._typeTile : ExrPart._typeScanline;
 
     var colorFormat = Format.float16;
-    final extraChannels = <String,ImageData>{};
+    final extraChannels = <String, ImageData>{};
 
     while (true) {
       final name = input.readString();
@@ -151,8 +158,11 @@ class ExrPart {
       }
     }
 
-    framebuffer = Image(width: width, height: height,
-        numChannels: numColorChannels, format: colorFormat);
+    framebuffer = Image(
+        width: width,
+        height: height,
+        numChannels: numColorChannels,
+        format: colorFormat);
 
     for (var name in extraChannels.keys) {
       framebuffer!.setExtraChannel(name, extraChannels[name]!);
@@ -165,18 +175,18 @@ class ExrPart {
         _numYLevels = 1;
       }
 
-      _numXTiles = _calculateNumTiles(_numXLevels!, left, right, _tileWidth,
-          _tileRoundingMode);
+      _numXTiles = _calculateNumTiles(
+          _numXLevels!, left, right, _tileWidth, _tileRoundingMode);
 
-      _numYTiles = _calculateNumTiles(_numYLevels!, top, bottom, _tileHeight,
-          _tileRoundingMode);
+      _numYTiles = _calculateNumTiles(
+          _numYLevels!, top, bottom, _tileHeight, _tileRoundingMode);
 
       _bytesPerPixel = _calculateBytesPerPixel();
       _maxBytesPerTileLine = _bytesPerPixel * _tileWidth!;
       //_tileBufferSize = _maxBytesPerTileLine * _tileHeight;
 
-      _compressor = ExrCompressor(_compressionType, this, _maxBytesPerTileLine,
-          _tileHeight);
+      _compressor = ExrCompressor(
+          _compressionType, this, _maxBytesPerTileLine, _tileHeight);
 
       var lx = 0;
       var ly = 0;
@@ -323,8 +333,8 @@ class ExrPart {
     return bytesPerPixel;
   }
 
-  List<int> _calculateNumTiles(int numLevels, int min, int max, int? size,
-      int? rmode) =>
+  List<int> _calculateNumTiles(
+          int numLevels, int min, int max, int? size, int? rmode) =>
       List<int>.generate(numLevels,
           (i) => (_levelSize(min, max, i, rmode) + size! - 1) ~/ size,
           growable: false);

@@ -41,10 +41,18 @@ import '../util/math_util.dart';
 /// 0.0 has no effect and 1.0 has full effect.
 ///
 Image adjustColor(Image src,
-    { Color? blacks, Color? whites, Color? mids, num? contrast,
-      num? saturation, num? brightness, num? gamma, num? exposure,
-      num? hue, num amount = 1, Image? mask,
-      Channel maskChannel = Channel.luminance }) {
+    {Color? blacks,
+    Color? whites,
+    Color? mids,
+    num? contrast,
+    num? saturation,
+    num? brightness,
+    num? gamma,
+    num? exposure,
+    num? hue,
+    num amount = 1,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   if (amount == 0) {
     return src;
   }
@@ -166,17 +174,18 @@ Image adjustColor(Image src,
         b = hb;
       }
 
-      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel)
-          ?? 1;
+      final msk =
+          mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel) ?? 1;
       final blend = msk * amount;
 
       r = mix(or, r, blend);
       g = mix(og, g, blend);
       b = mix(ob, b, blend);
 
-      p..rNormalized = r
-      ..gNormalized = g
-      ..bNormalized = b;
+      p
+        ..rNormalized = r
+        ..gNormalized = g
+        ..bNormalized = b;
     }
   }
 

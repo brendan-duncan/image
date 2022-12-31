@@ -13,7 +13,7 @@ abstract class WinEncoder extends Encoder {
   int bitsPerPixelOrYHotSpot(int index);
 
   @override
-  Uint8List encode(Image image, { bool singleFrame = false }) {
+  Uint8List encode(Image image, {bool singleFrame = false}) {
     if (image.hasAnimation && !singleFrame) {
       return encodeImages(image.frames);
     } else {
@@ -29,10 +29,10 @@ abstract class WinEncoder extends Encoder {
 
     final out = OutputBuffer()
 
-    // header
-    ..writeUint16(0) // reserved
-    ..writeUint16(type) // type: ICO => 1; CUR => 2
-    ..writeUint16(count);
+      // header
+      ..writeUint16(0) // reserved
+      ..writeUint16(type) // type: ICO => 1; CUR => 2
+      ..writeUint16(count);
 
     var offset = 6 + count * 16; // file header with image directory byte size
 
@@ -44,19 +44,21 @@ abstract class WinEncoder extends Encoder {
         throw Exception('ICO and CUR support only sizes until 256');
       }
 
-      out..writeByte(img.width) // image width in pixels
-      ..writeByte(img.height) // image height in pixels
-      // Color count, should be 0 if more than 256 colors
-      ..writeByte(0)
-      ..writeByte(0) // Reserved
-      ..writeUint16(colorPlanesOrXHotSpot(i))
-      ..writeUint16(bitsPerPixelOrYHotSpot(i));
+      out
+        ..writeByte(img.width) // image width in pixels
+        ..writeByte(img.height) // image height in pixels
+        // Color count, should be 0 if more than 256 colors
+        ..writeByte(0)
+        ..writeByte(0) // Reserved
+        ..writeUint16(colorPlanesOrXHotSpot(i))
+        ..writeUint16(bitsPerPixelOrYHotSpot(i));
 
       // Use png instead of bmp encoded data, it's supported since Windows Vista
       final data = PngEncoder().encode(img);
 
-      out..writeUint32(data.length) // size of the image's data in bytes
-      ..writeUint32(offset); // offset of data from the beginning of the file
+      out
+        ..writeUint32(data.length) // size of the image's data in bytes
+        ..writeUint32(offset); // offset of data from the beginning of the file
 
       // add the size of bytes to get the new begin of the next image
       offset += data.length;

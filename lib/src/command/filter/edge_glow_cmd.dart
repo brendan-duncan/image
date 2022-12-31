@@ -7,15 +7,17 @@ class EdgeGlowCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  EdgeGlowCmd(Command? input, { this.amount = 1, this.mask,
-      this.maskChannel = Channel.luminance })
+  EdgeGlowCmd(Command? input,
+      {this.amount = 1, this.mask, this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? g.edgeGlow(img, amount: amount,
-        mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? g.edgeGlow(img,
+            amount: amount, mask: maskImg, maskChannel: maskChannel)
+        : null;
   }
 }

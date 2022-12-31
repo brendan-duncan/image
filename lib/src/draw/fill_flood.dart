@@ -13,9 +13,14 @@ typedef _MarkPixel = void Function(int y, int x);
 
 /// Fill the 4-connected shape containing [x],[y] in the image [src] with the
 /// given [color].
-Image fillFlood(Image src, { required int x, required int y,
-    required Color color, num threshold = 0.0, bool compareAlpha = false,
-    Image? mask, Channel maskChannel = Channel.luminance }) {
+Image fillFlood(Image src,
+    {required int x,
+    required int y,
+    required Color color,
+    num threshold = 0.0,
+    bool compareAlpha = false,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   if (color.a == 0) {
     return src;
   }
@@ -52,10 +57,11 @@ Image fillFlood(Image src, { required int x, required int y,
       final m = mask.getPixel(x, y).getChannelNormalized(maskChannel);
       if (m > 0) {
         p = src.getPixel(x, y, p);
-        p!..r = mix(p!.r, color.r, m)
-        ..g = mix(p!.g, color.g, m)
-        ..b = mix(p!.b, color.b, m)
-        ..a = mix(p!.a, color.a, m);
+        p!
+          ..r = mix(p!.r, color.r, m)
+          ..g = mix(p!.g, color.g, m)
+          ..b = mix(p!.b, color.b, m)
+          ..a = mix(p!.a, color.a, m);
       }
     } else {
       src.setPixel(x, y, color);
@@ -71,7 +77,7 @@ Image fillFlood(Image src, { required int x, required int y,
 /// Create a mask describing the 4-connected shape containing [x],[y] in the
 /// image [src].
 Uint8List maskFlood(Image src, int x, int y,
-    { num threshold = 0.0, bool compareAlpha = false, int fillValue = 255 }) {
+    {num threshold = 0.0, bool compareAlpha = false, int fillValue = 255}) {
   final visited = Uint8List(src.width * src.height);
 
   Color srcColor = src.getPixel(x, y);
@@ -133,8 +139,8 @@ num _colorDistance(List<num> c1, List<num> c2, bool compareAlpha) {
   }
 }
 
-bool _testPixelLabColorDistance(Image src, int x, int y,
-    List<num> refColor, num threshold) {
+bool _testPixelLabColorDistance(
+    Image src, int x, int y, List<num> refColor, num threshold) {
   final pixel = src.getPixel(x, y);
   final compareAlpha = refColor.length > 3;
   final pixelColor = rgbToLab(pixel.r, pixel.g, pixel.b);

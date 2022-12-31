@@ -5,15 +5,16 @@ import '../util/point.dart';
 /// Returns a copy of the [src] image, where the given rectangle
 /// has been mapped to the full image.
 Image copyRectify(Image src,
-    { required Point topLeft,
+    {required Point topLeft,
     required Point topRight,
     required Point bottomLeft,
     required Point bottomRight,
     Interpolation interpolation = Interpolation.nearest,
-    Image? toImage }) {
+    Image? toImage}) {
   Image? firstFrame;
   for (final frame in src.frames) {
-    final dst = firstFrame?.addFrame() ?? toImage ??
+    final dst = firstFrame?.addFrame() ??
+        toImage ??
         Image.from(frame, noAnimation: true);
     firstFrame ??= dst;
     for (var y = 0; y < dst.height; ++y) {
@@ -26,9 +27,9 @@ Image copyRectify(Image src,
             bottomLeft * (1 - u) * v +
             bottomRight * u * v;
 
-        final srcPixel = interpolation == Interpolation.nearest ?
-            frame.getPixel(srcPixelCoord.xi, srcPixelCoord.yi) :
-            frame.getPixelInterpolate(srcPixelCoord.x, srcPixelCoord.y,
+        final srcPixel = interpolation == Interpolation.nearest
+            ? frame.getPixel(srcPixelCoord.xi, srcPixelCoord.yi)
+            : frame.getPixelInterpolate(srcPixelCoord.x, srcPixelCoord.y,
                 interpolation: interpolation);
 
         dst.setPixel(x, y, srcPixel);

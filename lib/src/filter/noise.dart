@@ -13,8 +13,10 @@ enum NoiseType { gaussian, uniform, saltAndPepper, poisson, rice }
 /// [NoiseType.uniform], [NoiseType.saltAndPepper], [NoiseType.poisson],
 /// or [NoiseType.rice].
 Image noise(Image image, num sigma,
-    { NoiseType type = NoiseType.gaussian, Random? random,
-      Image? mask, Channel maskChannel = Channel.luminance }) {
+    {NoiseType type = NoiseType.gaussian,
+    Random? random,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   random ??= Random();
 
   var nSigma = sigma;
@@ -43,15 +45,16 @@ Image noise(Image image, num sigma,
           final g = p.g + nSigma * grand(random);
           final b = p.b + nSigma * grand(random);
           final a = p.a;
-          final msk = mask?.getPixel(p.x, p.y)
-              .getChannelNormalized(maskChannel);
+          final msk =
+              mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
           if (msk == null) {
             p.setRgba(r, g, b, a);
           } else {
-            p..r = mix(p.r, r, msk)
-            ..g = mix(p.g, g, msk)
-            ..b = mix(p.b, b, msk)
-            ..a = mix(p.a, a, msk);
+            p
+              ..r = mix(p.r, r, msk)
+              ..g = mix(p.g, g, msk)
+              ..b = mix(p.b, b, msk)
+              ..a = mix(p.a, a, msk);
           }
         }
         break;
@@ -61,15 +64,16 @@ Image noise(Image image, num sigma,
           final g = p.g + nSigma * crand(random);
           final b = p.b + nSigma * crand(random);
           final a = p.a;
-          final msk = mask?.getPixel(p.x, p.y)
-              .getChannelNormalized(maskChannel);
+          final msk =
+              mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
           if (msk == null) {
             p.setRgba(r, g, b, a);
           } else {
-            p..r = mix(p.r, r, msk)
-            ..g = mix(p.g, g, msk)
-            ..b = mix(p.b, b, msk)
-            ..a = mix(p.a, a, msk);
+            p
+              ..r = mix(p.r, r, msk)
+              ..g = mix(p.g, g, msk)
+              ..b = mix(p.b, b, msk)
+              ..a = mix(p.a, a, msk);
           }
         }
         break;
@@ -87,15 +91,16 @@ Image noise(Image image, num sigma,
             final g = random.nextDouble() < 0.5 ? M : m;
             final b = random.nextDouble() < 0.5 ? M : m;
             final a = p.a;
-            final msk = mask?.getPixel(p.x, p.y)
-                .getChannelNormalized(maskChannel);
+            final msk =
+                mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
             if (msk == null) {
               p.setRgba(r, g, b, a);
             } else {
-              p..r = mix(p.r, r, msk)
-              ..g = mix(p.g, g, msk)
-              ..b = mix(p.b, b, msk)
-              ..a = mix(p.a, a, msk);
+              p
+                ..r = mix(p.r, r, msk)
+                ..g = mix(p.g, g, msk)
+                ..b = mix(p.b, b, msk)
+                ..a = mix(p.a, a, msk);
             }
           }
         }
@@ -106,15 +111,16 @@ Image noise(Image image, num sigma,
           final g = prand(random, p.g.toDouble());
           final b = prand(random, p.b.toDouble());
           final a = p.a;
-          final msk = mask?.getPixel(p.x, p.y)
-              .getChannelNormalized(maskChannel);
+          final msk =
+              mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
           if (msk == null) {
             p.setRgba(r, g, b, a);
           } else {
-            p..r = mix(p.r, r, msk)
-            ..g = mix(p.g, g, msk)
-            ..b = mix(p.b, b, msk)
-            ..a = mix(p.a, a, msk);
+            p
+              ..r = mix(p.r, r, msk)
+              ..g = mix(p.g, g, msk)
+              ..b = mix(p.b, b, msk)
+              ..a = mix(p.a, a, msk);
           }
         }
         break;
@@ -141,15 +147,16 @@ Image noise(Image image, num sigma,
 
           final a = p.a;
 
-          final msk = mask?.getPixel(p.x, p.y)
-              .getChannelNormalized(maskChannel);
+          final msk =
+              mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
           if (msk == null) {
             p.setRgba(r, g, b, a);
           } else {
-            p..r = mix(p.r, r, msk)
-            ..g = mix(p.g, g, msk)
-            ..b = mix(p.b, b, msk)
-            ..a = mix(p.a, a, msk);
+            p
+              ..r = mix(p.r, r, msk)
+              ..g = mix(p.g, g, msk)
+              ..b = mix(p.b, b, msk)
+              ..a = mix(p.a, a, msk);
           }
         }
         break;

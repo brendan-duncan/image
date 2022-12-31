@@ -2,8 +2,7 @@ import '../../transform/bake_orientation.dart';
 import '../command.dart';
 
 class BakeOrientationCmd extends Command {
-  BakeOrientationCmd(Command? input)
-      : super(input);
+  BakeOrientationCmd(Command? input) : super(input);
 
   @override
   Future<void> executeCommand() async {

@@ -7,8 +7,7 @@ class DecodeNamedImageCmd extends Command {
   String name;
   Uint8List data;
 
-  DecodeNamedImageCmd(Command? input, this.name, this.data)
-      : super(input);
+  DecodeNamedImageCmd(Command? input, this.name, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {

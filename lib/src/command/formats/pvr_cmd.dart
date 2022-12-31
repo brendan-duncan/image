@@ -7,8 +7,7 @@ import '../command.dart';
 class DecodePvrCmd extends Command {
   Uint8List data;
 
-  DecodePvrCmd(Command? input, this.data)
-      : super(input);
+  DecodePvrCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -21,8 +20,7 @@ class DecodePvrCmd extends Command {
 class DecodePvrFileCmd extends Command {
   String path;
 
-  DecodePvrFileCmd(Command? input, this.path)
-      : super(input);
+  DecodePvrFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -33,8 +31,7 @@ class DecodePvrFileCmd extends Command {
 
 // Encode an Image to the PVR format.
 class EncodePvrCmd extends Command {
-  EncodePvrCmd(Command? input)
-      : super(input);
+  EncodePvrCmd(Command? input) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -51,8 +48,7 @@ class EncodePvrCmd extends Command {
 class EncodePvrFileCmd extends EncodePvrCmd {
   String path;
 
-  EncodePvrFileCmd(Command? input, this.path)
-      : super(input);
+  EncodePvrFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

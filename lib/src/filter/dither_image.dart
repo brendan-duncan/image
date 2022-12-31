@@ -60,10 +60,10 @@ const _ditherKernels = [
 
 /// Dither an image to reduce banding patterns when reducing the number of
 /// colors.
-Image ditherImage(Image image, { Quantizer? quantizer,
+Image ditherImage(Image image,
+    {Quantizer? quantizer,
     DitherKernel kernel = DitherKernel.floydSteinberg,
-    bool serpentine = false }) {
-
+    bool serpentine = false}) {
   quantizer ??= NeuralQuantizer(image);
 
   if (kernel == DitherKernel.none) {
@@ -77,8 +77,8 @@ Image ditherImage(Image image, { Quantizer? quantizer,
   var direction = serpentine ? -1 : 1;
 
   final palette = quantizer.palette;
-  final indexedImage = Image(width: width, height: height, numChannels: 1,
-      palette: palette);
+  final indexedImage =
+      Image(width: width, height: height, numChannels: 1, palette: palette);
 
   final pIter = image.iterator..moveNext();
 
@@ -121,9 +121,10 @@ Image ditherImage(Image image, { Quantizer? quantizer,
           idx = index + x1 + (y1 * width);
           idx *= 4;
           final p2 = image.getPixel(x1, y1);
-          p2..r = max(0, min(255, (p2.r + er * d).toInt()))
-          ..g = max(0, min(255, (p2.g + er * d).toInt()))
-          ..b = max(0, min(255, (p2.b + er * d).toInt()));
+          p2
+            ..r = max(0, min(255, (p2.r + er * d).toInt()))
+            ..g = max(0, min(255, (p2.g + er * d).toInt()))
+            ..b = max(0, min(255, (p2.b + er * d).toInt()));
         }
       }
     }

@@ -13,17 +13,31 @@ class DrawRectCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  DrawRectCmd(Command? input, { required this.x1, required this.y1,
-      required this.x2, required this.y2, required this.color,
-      this.thickness = 1, this.mask, this.maskChannel = Channel.luminance })
+  DrawRectCmd(Command? input,
+      {required this.x1,
+      required this.y1,
+      required this.x2,
+      required this.y2,
+      required this.color,
+      this.thickness = 1,
+      this.mask,
+      this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? drawRect(img, x1: x1, y1: y1, x2: x2, y2: y2,
-        color: color, thickness: thickness, mask: maskImg,
-        maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? drawRect(img,
+            x1: x1,
+            y1: y1,
+            x2: x2,
+            y2: y2,
+            color: color,
+            thickness: thickness,
+            mask: maskImg,
+            maskChannel: maskChannel)
+        : null;
   }
 }

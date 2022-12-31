@@ -2,10 +2,7 @@ import '../color/color.dart';
 import '../image/image.dart';
 import '../image/palette.dart';
 
-enum QuantizerType {
-  octree,
-  neural
-}
+enum QuantizerType { octree, neural }
 
 /// Abstract class for color quantizers, which reduce the total number of colors
 /// used by an image to a given maximum, used to convert images to palette
@@ -22,8 +19,11 @@ abstract class Quantizer {
 
   /// Convert the [image] to a palette image.
   Image getIndexImage(Image image) {
-    final target = Image(width: image.width, height: image.height,
-        numChannels: 1, palette: palette);
+    final target = Image(
+        width: image.width,
+        height: image.height,
+        numChannels: 1,
+        palette: palette);
 
     final ti = target.iterator..moveNext();
 

@@ -5,9 +5,12 @@ import '../image/image.dart';
 import '../util/math_util.dart';
 
 /// Apply the billboard filter to the image.
-Image billboard(Image src, { num grid = 10, num amount = 1, Image? mask,
-    Channel maskChannel = Channel.luminance }) {
-  const rs = 0.2025;// pow(0.45, 2.0);
+Image billboard(Image src,
+    {num grid = 10,
+    num amount = 1,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
+  const rs = 0.2025; // pow(0.45, 2.0);
 
   for (final frame in src.frames) {
     final w = frame.width;
@@ -20,8 +23,8 @@ Image billboard(Image src, { num grid = 10, num amount = 1, Image? mask,
       final uvX = p.x / (w - 1);
       final uvY = p.y / (h - 1);
 
-      final offX = (uvX  / (grid * stepX)).floor();
-      final offY = (uvY  / (grid * stepY)).floor();
+      final offX = (uvX / (grid * stepX)).floor();
+      final offY = (uvY / (grid * stepY)).floor();
 
       final x2 = ((offX * grid * stepX) * (w - 1)).floor();
       final y2 = ((offY * grid * stepY) * (h - 1)).floor();
@@ -55,9 +58,10 @@ Image billboard(Image src, { num grid = 10, num amount = 1, Image? mask,
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       final mx = (msk ?? 1) * amount;
 
-      p..r = mix(p.r, r * p.maxChannelValue, mx)
-      ..g = mix(p.g, g * p.maxChannelValue, mx)
-      ..b = mix(p.b, b * p.maxChannelValue, mx);
+      p
+        ..r = mix(p.r, r * p.maxChannelValue, mx)
+        ..g = mix(p.g, g * p.maxChannelValue, mx)
+        ..b = mix(p.b, b * p.maxChannelValue, mx);
     }
   }
   return src;

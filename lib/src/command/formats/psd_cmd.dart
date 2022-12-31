@@ -7,8 +7,7 @@ import '../command.dart';
 class DecodePsdCmd extends Command {
   Uint8List data;
 
-  DecodePsdCmd(Command? input, this.data)
-      : super(input);
+  DecodePsdCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -21,8 +20,7 @@ class DecodePsdCmd extends Command {
 class DecodePsdFileCmd extends Command {
   String path;
 
-  DecodePsdFileCmd(Command? input, this.path)
-      : super(input);
+  DecodePsdFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

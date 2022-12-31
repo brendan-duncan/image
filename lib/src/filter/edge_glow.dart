@@ -5,8 +5,8 @@ import '../image/image.dart';
 import '../util/math_util.dart';
 
 /// Apply the edge glow filter to the [src] Image.
-Image edgeGlow(Image src, { num amount = 1, Image? mask,
-    Channel maskChannel = Channel.luminance }) {
+Image edgeGlow(Image src,
+    {num amount = 1, Image? mask, Channel maskChannel = Channel.luminance}) {
   if (amount == 0.0) {
     return src;
   }
@@ -31,19 +31,43 @@ Image edgeGlow(Image src, { num amount = 1, Image? mask,
       final t8 = orig.getPixel(p.x, py);
       final t9 = orig.getPixel(px, py);
 
-      final xxR = t1.rNormalized + 2 * t2.rNormalized + t3.rNormalized -
-          t7.rNormalized - 2 * t8.rNormalized - t9.rNormalized;
-      final xxG = t1.gNormalized + 2 * t2.gNormalized + t3.gNormalized -
-          t7.gNormalized - 2 * t8.gNormalized - t9.gNormalized;
-      final xxB = t1.bNormalized + 2 * t2.bNormalized + t3.bNormalized -
-          t7.bNormalized - 2 * t8.bNormalized - t9.bNormalized;
+      final xxR = t1.rNormalized +
+          2 * t2.rNormalized +
+          t3.rNormalized -
+          t7.rNormalized -
+          2 * t8.rNormalized -
+          t9.rNormalized;
+      final xxG = t1.gNormalized +
+          2 * t2.gNormalized +
+          t3.gNormalized -
+          t7.gNormalized -
+          2 * t8.gNormalized -
+          t9.gNormalized;
+      final xxB = t1.bNormalized +
+          2 * t2.bNormalized +
+          t3.bNormalized -
+          t7.bNormalized -
+          2 * t8.bNormalized -
+          t9.bNormalized;
 
-      final yyR = t1.rNormalized - t3.rNormalized + 2 * t4.rNormalized -
-          2 * t6.rNormalized + t7.rNormalized - t9.rNormalized;
-      final yyG = t1.gNormalized - t3.gNormalized + 2 * t4.gNormalized -
-          2 * t6.gNormalized + t7.gNormalized - t9.gNormalized;
-      final yyB = t1.bNormalized - t3.bNormalized + 2 * t4.bNormalized -
-          2 * t6.bNormalized + t7.bNormalized - t9.bNormalized;
+      final yyR = t1.rNormalized -
+          t3.rNormalized +
+          2 * t4.rNormalized -
+          2 * t6.rNormalized +
+          t7.rNormalized -
+          t9.rNormalized;
+      final yyG = t1.gNormalized -
+          t3.gNormalized +
+          2 * t4.gNormalized -
+          2 * t6.gNormalized +
+          t7.gNormalized -
+          t9.gNormalized;
+      final yyB = t1.bNormalized -
+          t3.bNormalized +
+          2 * t4.bNormalized -
+          2 * t6.bNormalized +
+          t7.bNormalized -
+          t9.bNormalized;
 
       final rrR = sqrt(xxR * xxR + yyR * yyR);
       final rrG = sqrt(xxG * xxG + yyG * yyG);
@@ -56,7 +80,8 @@ Image edgeGlow(Image src, { num amount = 1, Image? mask,
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       final mx = (msk ?? 1) * amount;
 
-      p..r = mix(p.r, r, mx)
+      p
+        ..r = mix(p.r, r, mx)
         ..g = mix(p.g, g, mx)
         ..b = mix(p.b, b, mx);
     }

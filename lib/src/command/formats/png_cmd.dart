@@ -8,8 +8,7 @@ import '../command.dart';
 class DecodePngCmd extends Command {
   final Uint8List _data;
 
-  DecodePngCmd(Command? input, this._data)
-      : super(input);
+  DecodePngCmd(Command? input, this._data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -22,8 +21,7 @@ class DecodePngCmd extends Command {
 class DecodePngFileCmd extends Command {
   final String path;
 
-  DecodePngFileCmd(Command? input, this.path)
-      : super(input);
+  DecodePngFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -37,11 +35,11 @@ class EncodePngCmd extends Command {
   final int _level;
   final PngFilter _filter;
 
-  EncodePngCmd(Command? input, { int level = 6,
-      PngFilter filter = PngFilter.paeth })
-      : _level = level
-      , _filter = filter
-      , super(input);
+  EncodePngCmd(Command? input,
+      {int level = 6, PngFilter filter = PngFilter.paeth})
+      : _level = level,
+        _filter = filter,
+        super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -58,8 +56,8 @@ class EncodePngCmd extends Command {
 class EncodePngFileCmd extends EncodePngCmd {
   final String path;
 
-  EncodePngFileCmd(Command? input, this.path, { int level = 6,
-      PngFilter filter = PngFilter.paeth })
+  EncodePngFileCmd(Command? input, this.path,
+      {int level = 6, PngFilter filter = PngFilter.paeth})
       : super(input, level: level, filter: filter);
 
   @override
@@ -67,8 +65,7 @@ class EncodePngFileCmd extends EncodePngCmd {
     await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
-      await encodePngFile(path, outputImage!, level: _level,
-          filter: _filter);
+      await encodePngFile(path, outputImage!, level: _level, filter: _filter);
     }
   }
 }

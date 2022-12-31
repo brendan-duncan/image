@@ -8,9 +8,11 @@ import '../image/image.dart';
 import '../util/point.dart';
 
 /// Fill a polygon defined by the given [vertices].
-Image fillPolygon(Image src, { required List<Point> vertices,
-    required Color color, Image? mask,
-    Channel maskChannel = Channel.luminance }) {
+Image fillPolygon(Image src,
+    {required List<Point> vertices,
+    required Color color,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   if (color.a == 0) {
     return src;
   }
@@ -27,8 +29,13 @@ Image fillPolygon(Image src, { required List<Point> vertices,
   }
 
   if (numVertices == 2) {
-    return drawLine(src, x1: vertices[0].xi, y1: vertices[0].yi,
-        x2: vertices[1].xi, y2: vertices[1].yi, color: color, mask: mask,
+    return drawLine(src,
+        x1: vertices[0].xi,
+        y1: vertices[0].yi,
+        x2: vertices[1].xi,
+        y2: vertices[1].yi,
+        color: color,
+        mask: mask,
         maskChannel: maskChannel);
   }
 
@@ -58,12 +65,12 @@ Image fillPolygon(Image src, { required List<Point> vertices,
   yMax = min(yMax, src.height - 1);
 
   final inter = List<num>.filled(40, 0);
-  final vi = List<int>.generate(numVertices + 1,
-          (i) => i < numVertices ? i : 0);
+  final vi =
+      List<int>.generate(numVertices + 1, (i) => i < numVertices ? i : 0);
 
   for (var yi = yMin, y = yMin + 0.5; yi <= yMax; ++yi, ++y) {
     var c = 0;
-    for(var i = 0; i < numVertices;  ++i) {
+    for (var i = 0; i < numVertices; ++i) {
       final v1 = vertices[vi[i]];
       final v2 = vertices[vi[i + 1]];
 

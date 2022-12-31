@@ -9,8 +9,7 @@ class PvrPacket {
   Uint32List rawData;
   int index = 0;
 
-  PvrPacket(TypedData data)
-      : rawData = Uint32List.view(data.buffer);
+  PvrPacket(TypedData data) : rawData = Uint32List.view(data.buffer);
 
   void setBlock(int x, int y) => setIndex(_getMortonNumber(x, y));
 
@@ -188,11 +187,11 @@ class PvrPacket {
   }
 
   int _getColorData() =>
-    (usePunchthroughAlpha ? 1 : 0) |
-    ((colorA & _bits14) << 1) |
-    ((colorAIsOpaque ? 1 : 0) << 15) |
-    ((colorB & _bits15) << 16) |
-    ((colorBIsOpaque ? 1 : 0) << 31);
+      (usePunchthroughAlpha ? 1 : 0) |
+      ((colorA & _bits14) << 1) |
+      ((colorAIsOpaque ? 1 : 0) << 15) |
+      ((colorB & _bits15) << 16) |
+      ((colorBIsOpaque ? 1 : 0) << 31);
 
   void _update() {
     final x = colorData;
@@ -204,10 +203,10 @@ class PvrPacket {
   }
 
   static int _getMortonNumber(int x, int y) =>
-    _mortonTable[x >> 8] << 17 |
-    _mortonTable[y >> 8] << 16 |
-    _mortonTable[x & 0xff] << 1 |
-    _mortonTable[y & 0xff];
+      _mortonTable[x >> 8] << 17 |
+      _mortonTable[y >> 8] << 16 |
+      _mortonTable[x & 0xff] << 1 |
+      _mortonTable[y & 0xff];
 
   bool _usePunchthroughAlpha = false;
   int _colorA = 0;

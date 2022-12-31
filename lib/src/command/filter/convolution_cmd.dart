@@ -10,18 +10,28 @@ class ConvolutionCmd extends Command {
   final Command? mask;
   final Channel maskChannel;
 
-  ConvolutionCmd(Command? input, { required List<num> filter,
-      this.div = 1.0, this.offset = 0, this.amount = 1, this.mask,
-      this.maskChannel = Channel.luminance })
-      : _filter = filter
-      , super(input);
+  ConvolutionCmd(Command? input,
+      {required List<num> filter,
+      this.div = 1.0,
+      this.offset = 0,
+      this.amount = 1,
+      this.mask,
+      this.maskChannel = Channel.luminance})
+      : _filter = filter,
+        super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? g.convolution(img, filter: _filter, div: div,
-        offset: offset, amount: amount, mask: maskImg,
-        maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? g.convolution(img,
+            filter: _filter,
+            div: div,
+            offset: offset,
+            amount: amount,
+            mask: maskImg,
+            maskChannel: maskChannel)
+        : null;
   }
 }

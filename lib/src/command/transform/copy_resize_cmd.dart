@@ -7,14 +7,16 @@ class CopyResizeCmd extends Command {
   int? height;
   Interpolation interpolation;
 
-  CopyResizeCmd(Command? input, { this.width, this.height,
-      this.interpolation = Interpolation.nearest })
+  CopyResizeCmd(Command? input,
+      {this.width, this.height, this.interpolation = Interpolation.nearest})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
-    outputImage = img != null ? copyResize(img, width: width, height: height,
-        interpolation: interpolation) : null;
+    outputImage = img != null
+        ? copyResize(img,
+            width: width, height: height, interpolation: interpolation)
+        : null;
   }
 }

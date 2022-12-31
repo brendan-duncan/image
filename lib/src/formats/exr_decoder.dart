@@ -40,7 +40,7 @@ class ExrDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, { int? frame }) {
+  Image? decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }

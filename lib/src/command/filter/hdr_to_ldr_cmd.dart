@@ -4,8 +4,7 @@ import '../command.dart';
 class HdrToLdrCmd extends Command {
   num? exposure;
 
-  HdrToLdrCmd(Command? input, { this.exposure })
-      : super(input);
+  HdrToLdrCmd(Command? input, {this.exposure}) : super(input);
 
   @override
   Future<void> executeCommand() async {

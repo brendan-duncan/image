@@ -81,25 +81,26 @@ class BmpInfo implements DecodeInfo {
 
   final int _startPos;
 
-  BmpInfo(InputBuffer p, { BmpFileHeader? fileHeader })
-      : header = fileHeader ?? BmpFileHeader(p)
-      , _startPos = p.offset
-      , headerSize = p.readUint32()
-      , width = p.readInt32()
-      , _height = p.readInt32()
-      , planes = p.readUint16()
-      , bitsPerPixel = p.readUint16()
-      , compression = BmpCompression.values[p.readUint32()]
-      , imageSize = p.readUint32()
-      , xppm = p.readInt32()
-      , yppm = p.readInt32()
-      , totalColors = p.readUint32()
-      , importantColors = p.readUint32() {
+  BmpInfo(InputBuffer p, {BmpFileHeader? fileHeader})
+      : header = fileHeader ?? BmpFileHeader(p),
+        _startPos = p.offset,
+        headerSize = p.readUint32(),
+        width = p.readInt32(),
+        _height = p.readInt32(),
+        planes = p.readUint16(),
+        bitsPerPixel = p.readUint16(),
+        compression = BmpCompression.values[p.readUint32()],
+        imageSize = p.readUint32(),
+        xppm = p.readInt32(),
+        yppm = p.readInt32(),
+        totalColors = p.readUint32(),
+        importantColors = p.readUint32() {
     // BMP allows > 4 bit per channel for 16bpp, so we have to scale it
     // up to 8-bit
     const maxChannelValue = 255.0;
 
-    if (headerSize > 40 || compression == BmpCompression.bitfields ||
+    if (headerSize > 40 ||
+        compression == BmpCompression.bitfields ||
         compression == BmpCompression.alphaBitfields) {
       redMask = p.readUint32();
       _redShift = countTrailingZeroBits(redMask);
@@ -211,8 +212,8 @@ class BmpInfo implements DecodeInfo {
     }
   }
 
-  void decodePixel(InputBuffer input,
-      void Function(num r, num g, num b, num a) pixel) {
+  void decodePixel(
+      InputBuffer input, void Function(num r, num g, num b, num a) pixel) {
     if (palette != null) {
       if (bitsPerPixel == 1) {
         final bi = input.readByte();
@@ -246,7 +247,8 @@ class BmpInfo implements DecodeInfo {
       final r = (((p & redMask) >> _redShift) * _redScale).toInt();
       final g = (((p & greenMask) >> _greenShift) * _greenScale).toInt();
       final b = (((p & blueMask) >> _blueShift) * _blueScale).toInt();
-      final a = ignoreAlphaChannel ? 255
+      final a = ignoreAlphaChannel
+          ? 255
           : (((p & alphaMask) >> _alphaShift) * _alphaScale).toInt();
       return pixel(r, g, b, a);
     } else if (bitsPerPixel == 32 && compression == BmpCompression.none) {
@@ -265,13 +267,13 @@ class BmpInfo implements DecodeInfo {
       final r = (((p & redMask) >> _redShift) * _redScale).toInt();
       final g = (((p & greenMask) >> _greenShift) * _greenScale).toInt();
       final b = (((p & blueMask) >> _blueShift) * _blueScale).toInt();
-      final a = ignoreAlphaChannel ? 255
+      final a = ignoreAlphaChannel
+          ? 255
           : (((p & alphaMask) >> _alphaShift) * _alphaScale).toInt();
       return pixel(r, g, b, a);
     } else {
-      throw ImageException(
-          'Unsupported bitsPerPixel ($bitsPerPixel) or'
-              ' compression ($compression).');
+      throw ImageException('Unsupported bitsPerPixel ($bitsPerPixel) or'
+          ' compression ($compression).');
     }
   }
 }

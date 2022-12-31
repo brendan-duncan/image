@@ -4,8 +4,7 @@ import '../command.dart';
 class BumpToNormalCmd extends Command {
   num strength;
 
-  BumpToNormalCmd(Command? input, { this.strength = 2.0 })
-      : super(input);
+  BumpToNormalCmd(Command? input, {this.strength = 2.0}) : super(input);
 
   @override
   Future<void> executeCommand() async {

@@ -6,8 +6,7 @@ import '../command.dart';
 class DecodeImageCmd extends Command {
   Uint8List data;
 
-  DecodeImageCmd(Command? input, this.data)
-      : super(input);
+  DecodeImageCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {

@@ -7,15 +7,17 @@ class GaussianBlurCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  GaussianBlurCmd(Command? input, { required this.radius, this.mask,
-      this.maskChannel = Channel.luminance })
+  GaussianBlurCmd(Command? input,
+      {required this.radius, this.mask, this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? g.gaussianBlur(img, radius: radius,
-        mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? g.gaussianBlur(img,
+            radius: radius, mask: maskImg, maskChannel: maskChannel)
+        : null;
   }
 }

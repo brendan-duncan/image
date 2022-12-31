@@ -207,7 +207,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 
 Image getImageFromJpeg(JpegData jpeg) {
   final orientation =
-    jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.orientation! : 0;
+      jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.orientation! : 0;
   final w = jpeg.width!;
   final h = jpeg.height!;
   final flipWidthHeight = orientation >= 5 && orientation <= 8;
@@ -215,9 +215,9 @@ Image getImageFromJpeg(JpegData jpeg) {
   final height = flipWidthHeight ? w : h;
 
   final image = Image(width: width, height: height)
-  // Copy exif data, except for Orientation which we're baking.
-  ..exif = ExifData.from(jpeg.exif)
-  ..exif.imageIfd.orientation = null;
+    // Copy exif data, except for Orientation which we're baking.
+    ..exif = ExifData.from(jpeg.exif)
+    ..exif.imageIfd.orientation = null;
 
   ComponentData component1;
   ComponentData component2;
@@ -400,7 +400,7 @@ Image getImageFromJpeg(JpegData jpeg) {
           final x2 = x >> hShift2;
           final x3 = x >> hShift3;
           final x4 = x >> hShift4;
-          int cc, cm,cy, ck;
+          int cc, cm, cy, ck;
           if (!colorTransform) {
             cc = component1Line![x1];
             cm = component2Line![x2];
@@ -413,8 +413,10 @@ Image getImageFromJpeg(JpegData jpeg) {
             ck = component4Line![x4];
 
             cc = 255 - (cy + 1.402 * (cr - 128)).toInt().clamp(0, 255);
-            cm = 255 - ((cy - 0.3441363 * (cb - 128) - 0.71413636 *
-                (cr - 128)).clamp(0, 255).toInt());
+            cm = 255 -
+                ((cy - 0.3441363 * (cb - 128) - 0.71413636 * (cr - 128))
+                    .clamp(0, 255)
+                    .toInt());
             cy = 255 - (cy + 1.772 * (cb - 128)).toInt().clamp(0, 255);
           }
 

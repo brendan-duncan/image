@@ -18,27 +18,28 @@ class ImageDataUint1 extends ImageData {
   final Palette? palette;
 
   ImageDataUint1(int width, int height, int numChannels)
-      : rowStride = ((width * numChannels) / 8).ceil()
-      , palette = null
-      , super(width, height, numChannels) {
-    data = Uint8List(max(rowStride * height, 1));
-  }
-  
-  ImageDataUint1.palette(int width, int height, this.palette)
-      : rowStride = (width / 8).ceil()
-      , super(width, height, 1) {
+      : rowStride = ((width * numChannels) / 8).ceil(),
+        palette = null,
+        super(width, height, numChannels) {
     data = Uint8List(max(rowStride * height, 1));
   }
 
-  ImageDataUint1.from(ImageDataUint1 other, { bool skipPixels = false })
-      : data = skipPixels ? Uint8List(other.data.length)
-          : Uint8List.fromList(other.data)
-      , rowStride = other.rowStride
-      , palette = other.palette?.clone()
-      , super(other.width, other.height, other.numChannels);
+  ImageDataUint1.palette(int width, int height, this.palette)
+      : rowStride = (width / 8).ceil(),
+        super(width, height, 1) {
+    data = Uint8List(max(rowStride * height, 1));
+  }
+
+  ImageDataUint1.from(ImageDataUint1 other, {bool skipPixels = false})
+      : data = skipPixels
+            ? Uint8List(other.data.length)
+            : Uint8List.fromList(other.data),
+        rowStride = other.rowStride,
+        palette = other.palette?.clone(),
+        super(other.width, other.height, other.numChannels);
 
   @override
-  ImageDataUint1 clone({ bool noPixels = false }) =>
+  ImageDataUint1 clone({bool noPixels = false}) =>
       ImageDataUint1.from(this, skipPixels: noPixels);
 
   @override
@@ -76,9 +77,9 @@ class ImageDataUint1 extends ImageData {
       PixelRangeIterator(PixelUint1.imageData(this), x, y, width, height);
 
   @override
-  Color getColor(num r, num g, num b, [num? a]) =>
-      a == null ? ColorUint1.rgb(r.toInt(), g.toInt(), b.toInt())
-          : ColorUint1.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
+  Color getColor(num r, num g, num b, [num? a]) => a == null
+      ? ColorUint1.rgb(r.toInt(), g.toInt(), b.toInt())
+      : ColorUint1.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
 
   @override
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
@@ -125,5 +126,5 @@ class ImageDataUint1 extends ImageData {
   String toString() => 'ImageDataUint1($width, $height, $numChannels)';
 
   @override
-  void clear([Color? c]) { }
+  void clear([Color? c]) {}
 }

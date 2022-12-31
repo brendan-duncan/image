@@ -3,20 +3,10 @@ import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 
 @internal
-enum ExrChannelType {
-  uint,
-  half,
-  float
-}
+enum ExrChannelType { uint, half, float }
 
 @internal
-enum ExrChannelName {
-  red,
-  green,
-  blue,
-  alpha,
-  other
-}
+enum ExrChannelName { red, green, blue, alpha, other }
 
 // Standard channel names are:
 // A: Alpha/Opacity
@@ -36,8 +26,12 @@ enum ExrChannelName {
 class ExrChannel {
   late String name;
   late ExrChannelName nameType;
-  late ExrChannelType dataType; ///< The data type of the channel
-  late int dataSize; ///< bytes per pixel
+  late ExrChannelType dataType;
+
+  ///< The data type of the channel
+  late int dataSize;
+
+  ///< bytes per pixel
   late bool pLinear;
   late int xSampling;
   late int ySampling;

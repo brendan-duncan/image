@@ -12,16 +12,17 @@ class ImageDataInt8 extends ImageData {
   final Int8List data;
 
   ImageDataInt8(int width, int height, int numChannels)
-      : data = Int8List(width * height * numChannels)
-      , super(width, height, numChannels);
+      : data = Int8List(width * height * numChannels),
+        super(width, height, numChannels);
 
-  ImageDataInt8.from(ImageDataInt8 other, { bool skipPixels = false })
-      : data = skipPixels ? Int8List(other.data.length)
-          : Int8List.fromList(other.data)
-      , super(other.width, other.height, other.numChannels);
+  ImageDataInt8.from(ImageDataInt8 other, {bool skipPixels = false})
+      : data = skipPixels
+            ? Int8List(other.data.length)
+            : Int8List.fromList(other.data),
+        super(other.width, other.height, other.numChannels);
 
   @override
-  ImageDataInt8 clone({ bool noPixels = false }) =>
+  ImageDataInt8 clone({bool noPixels = false}) =>
       ImageDataInt8.from(this, skipPixels: noPixels);
 
   @override
@@ -62,9 +63,9 @@ class ImageDataInt8 extends ImageData {
   int get bitsPerChannel => 8;
 
   @override
-  Color getColor(num r, num g, num b, [num? a]) =>
-      a == null ? ColorInt8.rgb(r.toInt(), g.toInt(), b.toInt())
-          : ColorInt8.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
+  Color getColor(num r, num g, num b, [num? a]) => a == null
+      ? ColorInt8.rgb(r.toInt(), g.toInt(), b.toInt())
+      : ColorInt8.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
 
   @override
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
@@ -112,5 +113,5 @@ class ImageDataInt8 extends ImageData {
   String toString() => 'ImageDataInt8($width, $height, $numChannels)';
 
   @override
-  void clear([Color? c]) { }
+  void clear([Color? c]) {}
 }

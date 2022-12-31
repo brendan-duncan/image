@@ -11,7 +11,7 @@ class BmpDecoder extends Decoder {
   BmpInfo? info;
   bool forceRgba;
 
-  BmpDecoder({ this.forceRgba = false });
+  BmpDecoder({this.forceRgba = false});
 
   /// Is the given file a valid BMP image?
   @override
@@ -47,23 +47,40 @@ class BmpDecoder extends Decoder {
 
     final bpp = inf.bitsPerPixel;
     final rowStride = ((inf.width * bpp + 31) ~/ 32) * 4;
-    final nc = forceRgba ? 4
-        : bpp == 1 || bpp == 4 || bpp == 8 ? 1 : bpp == 32 ? 4 : 3;
-    final format = forceRgba ? Format.uint8
-        : bpp == 1 ? Format.uint1
-        : bpp == 2 ? Format.uint2
-        : bpp == 4 ? Format.uint4
-        : bpp == 8 ? Format.uint8
-        // BMP allows > 4 bit per channel for 16bpp, so we have to scale it
-        // up to 8-bit
-        : bpp == 16 ? Format.uint8
-        : bpp == 24 ? Format.uint8
-        : bpp == 32 ? Format.uint8
-        : Format.uint8;
+    final nc = forceRgba
+        ? 4
+        : bpp == 1 || bpp == 4 || bpp == 8
+            ? 1
+            : bpp == 32
+                ? 4
+                : 3;
+    final format = forceRgba
+        ? Format.uint8
+        : bpp == 1
+            ? Format.uint1
+            : bpp == 2
+                ? Format.uint2
+                : bpp == 4
+                    ? Format.uint4
+                    : bpp == 8
+                        ? Format.uint8
+                        // BMP allows > 4 bit per channel for 16bpp, so we have
+                        // to scale it up to 8-bit
+                        : bpp == 16
+                            ? Format.uint8
+                            : bpp == 24
+                                ? Format.uint8
+                                : bpp == 32
+                                    ? Format.uint8
+                                    : Format.uint8;
     final palette = forceRgba ? null : inf.palette;
 
-    final image = Image(width: inf.width, height: inf.height,
-        format: format, numChannels: nc, palette: palette);
+    final image = Image(
+        width: inf.width,
+        height: inf.height,
+        format: format,
+        numChannels: nc,
+        palette: palette);
 
     for (var y = image.height - 1; y >= 0; --y) {
       final line = inf.readBottomUp ? y : image.height - 1 - y;
@@ -98,7 +115,7 @@ class BmpDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
-  Image? decode(Uint8List data, { int? frame }) {
+  Image? decode(Uint8List data, {int? frame}) {
     if (startDecode(data) == null) {
       return null;
     }
@@ -107,7 +124,7 @@ class BmpDecoder extends Decoder {
 }
 
 class DibDecoder extends BmpDecoder {
-  DibDecoder(InputBuffer input, BmpInfo info, { bool forceRgba = false })
+  DibDecoder(InputBuffer input, BmpInfo info, {bool forceRgba = false})
       : super(forceRgba: forceRgba) {
     _input = input;
     this.info = info;

@@ -10,15 +10,23 @@ class DrawPolygonCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  DrawPolygonCmd(Command? input, { required this.vertices, required this.color,
-      this.mask, this.maskChannel = Channel.luminance })
+  DrawPolygonCmd(Command? input,
+      {required this.vertices,
+      required this.color,
+      this.mask,
+      this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? drawPolygon(img, vertices: vertices,
-        color: color, mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? drawPolygon(img,
+            vertices: vertices,
+            color: color,
+            mask: maskImg,
+            maskChannel: maskChannel)
+        : null;
   }
 }

@@ -9,14 +9,15 @@ class DropShadowCmd extends Command {
   Color? shadowColor;
 
   DropShadowCmd(Command? input, this.hShadow, this.vShadow, this.blur,
-      { this.shadowColor })
+      {this.shadowColor})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     await input?.execute();
     final img = input?.outputImage;
-    outputImage = img != null ? g.dropShadow(img, hShadow, vShadow, blur,
-        shadowColor: shadowColor) : null;
+    outputImage = img != null
+        ? g.dropShadow(img, hShadow, vShadow, blur, shadowColor: shadowColor)
+        : null;
   }
 }

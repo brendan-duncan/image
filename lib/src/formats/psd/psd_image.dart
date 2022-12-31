@@ -280,10 +280,11 @@ class PsdImage implements DecodeInfo {
         break;
     }
 
-    p..r = ((ar * (1.0 - da)) + (r * da)).toInt()
-    ..g = ((ag * (1.0 - da)) + (g * da)).toInt()
-    ..b = ((ab * (1.0 - da)) + (b * da)).toInt()
-    ..a = ((aa * (1.0 - da)) + (a * da)).toInt();
+    p
+      ..r = ((ar * (1.0 - da)) + (r * da)).toInt()
+      ..g = ((ag * (1.0 - da)) + (g * da)).toInt()
+      ..b = ((ab * (1.0 - da)) + (b * da)).toInt()
+      ..a = ((aa * (1.0 - da)) + (a * da)).toInt();
   }
 
   static int _blendLighten(int a, int b) => max(a, b);
@@ -468,19 +469,20 @@ class PsdImage implements DecodeInfo {
     len = _layerAndMaskData!.readUint32();
     final maskData = _layerAndMaskData!.readBytes(len);
     if (len > 0) {
-      /*int colorSpace =*/ maskData..readUint16()
-      /*int rc =*/
-      ..readUint16()
-      /*int gc =*/
-      ..readUint16()
-      /*int bc =*/
-      ..readUint16()
-      /*int ac =*/
-      ..readUint16()
-      /*int opacity =*/
-      ..readUint16() // 0-100
-      /*int kind =*/
-      ..readByte();
+      /*int colorSpace =*/ maskData
+        ..readUint16()
+        /*int rc =*/
+        ..readUint16()
+        /*int gc =*/
+        ..readUint16()
+        /*int bc =*/
+        ..readUint16()
+        /*int ac =*/
+        ..readUint16()
+        /*int opacity =*/
+        ..readUint16() // 0-100
+        /*int kind =*/
+        ..readByte();
     }
   }
 
@@ -503,8 +505,8 @@ class PsdImage implements DecodeInfo {
           width, height, depth, compression, lineLengths, i));
     }
 
-    mergedImage = createImageFromChannels(colorMode, depth, width, height,
-        mergeImageChannels);
+    mergedImage = createImageFromChannels(
+        colorMode, depth, width, height, mergeImageChannels);
   }
 
   static int _ch(List<int> data, int si, int ns) =>
@@ -518,10 +520,14 @@ class PsdImage implements DecodeInfo {
     }
 
     final numChannels = channelList.length;
-    final ns = (bitDepth == 8) ? 1 : (bitDepth == 16) ? 2 : -1;
+    final ns = (bitDepth == 8)
+        ? 1
+        : (bitDepth == 16)
+            ? 2
+            : -1;
 
-    final output = Image(width: width, height: height,
-        numChannels: numChannels);
+    final output =
+        Image(width: width, height: height, numChannels: numChannels);
 
     if (ns == -1) {
       throw ImageException('PSD: unsupported bit depth: $bitDepth');
@@ -541,14 +547,15 @@ class PsdImage implements DecodeInfo {
           p.g = _ch(channel1!.data, si, ns);
           p.b = _ch(channel2!.data, si, ns);
           p.a = numChannels >= 4 ? _ch(channel_1!.data, si, ns) : 255;
-          
+
           if (p.a != 0) {
             // Photoshop/Gimp blend the image against white (argh!),
             // which is not what we want for compositing. Invert the blend
             // operation to try and undo the damage.
-            p..r = (((p.r + p.a) - 255) * 255) / p.a
-            ..g = (((p.g + p.a) - 255) * 255) / p.a
-            ..b = (((p.b + p.a) - 255) * 255) / p.a;
+            p
+              ..r = (((p.r + p.a) - 255) * 255) / p.a
+              ..g = (((p.g + p.a) - 255) * 255) / p.a
+              ..b = (((p.b + p.a) - 255) * 255) / p.a;
           }
           break;
         case PsdColorMode.lab:

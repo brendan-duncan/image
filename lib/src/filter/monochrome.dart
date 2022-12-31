@@ -4,8 +4,11 @@ import '../image/image.dart';
 import '../util/math_util.dart';
 
 /// [amount] controls the strength of the effect, in the range \[0, 1\].
-Image monochrome(Image src, { Color? color, num amount = 1,
-    Image? mask, Channel maskChannel = Channel.luminance }) {
+Image monochrome(Image src,
+    {Color? color,
+    num amount = 1,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   if (amount == 0) {
     return src;
   }
@@ -23,9 +26,10 @@ Image monochrome(Image src, { Color? color, num amount = 1,
       final b = y < 0.5 ? (2 * y * nb) : 1 - 2 * (1 - y) * (1 - nb);
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       final mx = (msk ?? 1) * amount;
-      p..r = mix(p.r, r * p.maxChannelValue, mx)
-      ..g = mix(p.g, g * p.maxChannelValue, mx)
-      ..b = mix(p.b, b * p.maxChannelValue, mx);
+      p
+        ..r = mix(p.r, r * p.maxChannelValue, mx)
+        ..g = mix(p.g, g * p.maxChannelValue, mx)
+        ..b = mix(p.b, b * p.maxChannelValue, mx);
     }
   }
 

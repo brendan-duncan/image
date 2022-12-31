@@ -6,8 +6,7 @@ typedef AddFramesFunction = Image? Function(int frameIndex);
 class AddFramesCmd extends Command {
   int count;
   AddFramesFunction callback;
-  AddFramesCmd(Command? input, this.count, this.callback)
-      : super(input);
+  AddFramesCmd(Command? input, this.count, this.callback) : super(input);
 
   @override
   Future<void> executeCommand() async {

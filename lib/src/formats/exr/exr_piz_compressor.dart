@@ -67,14 +67,14 @@ class InternalExrPizCompressor extends InternalExrCompressor
 
     for (var i = 0; i < numChannels; ++i) {
       final ch = channels[i];
-      final cd = _channelData[i]!
-      ..start = tmpBufferEnd;
+      final cd = _channelData[i]!..start = tmpBufferEnd;
 
-      cd..end = cd.start
-      ..nx = numSamples(ch.xSampling, minX, maxX)
-      ..ny = numSamples(ch.ySampling, minY, maxY)
-      ..ys = ch.ySampling
-      ..size = ch.dataSize ~/ 2; //2=size(HALF)
+      cd
+        ..end = cd.start
+        ..nx = numSamples(ch.xSampling, minX, maxX)
+        ..ny = numSamples(ch.ySampling, minY, maxY)
+        ..ys = ch.ySampling
+        ..size = ch.dataSize ~/ 2; //2=size(HALF)
 
       tmpBufferEnd += cd.nx * cd.ny * cd.size;
     }

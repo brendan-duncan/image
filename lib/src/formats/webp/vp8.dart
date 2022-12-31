@@ -35,18 +35,20 @@ class VP8 {
       return false; // first frame is invisible!
     }
 
-    _frameHeader..keyFrame = (bits & 1) == 0
-    ..profile = (bits >> 1) & 7
-    ..show = (bits >> 4) & 1
-    ..partitionLength = bits >> 5;
+    _frameHeader
+      ..keyFrame = (bits & 1) == 0
+      ..profile = (bits >> 1) & 7
+      ..show = (bits >> 4) & 1
+      ..partitionLength = bits >> 5;
 
     final signature = input.readUint24();
     if (signature != vp8Signature) {
       return false;
     }
 
-    webp..width = input.readUint16()
-    ..height = input.readUint16();
+    webp
+      ..width = input.readUint16()
+      ..height = input.readUint16();
 
     return true;
   }
@@ -81,10 +83,11 @@ class VP8 {
       _dqm[i] = VP8QuantMatrix();
     }
 
-    _picHeader..width = webp.width
-    ..height = webp.height
-    ..xscale = (webp.width >> 8) >> 6
-    ..yscale = (webp.height >> 8) >> 6;
+    _picHeader
+      ..width = webp.width
+      ..height = webp.height
+      ..xscale = (webp.width >> 8) >> 6
+      ..yscale = (webp.height >> 8) >> 6;
 
     _cropTop = 0;
     _cropLeft = 0;
@@ -99,8 +102,9 @@ class VP8 {
     br = VP8BitReader(input.subset(_frameHeader.partitionLength));
     input.skip(_frameHeader.partitionLength);
 
-    _picHeader..colorspace = br.get()
-    ..clampType = br.get();
+    _picHeader
+      ..colorspace = br.get()
+      ..clampType = br.get();
 
     if (!_parseSegmentHeader(_segmentHeader, _proba)) {
       return false;
@@ -154,10 +158,10 @@ class VP8 {
 
   bool _parseFilterHeader() {
     final hdr = _filterHeader
-    ..simple = br.get() != 0
-    ..level = br.getValue(6)
-    ..sharpness = br.getValue(3)
-    ..useLfDelta = br.get() != 0;
+      ..simple = br.get() != 0
+      ..level = br.getValue(6)
+      ..sharpness = br.getValue(3)
+      ..useLfDelta = br.get() != 0;
     if (hdr.useLfDelta) {
       if (br.get() != 0) {
         // update lf-delta?
@@ -175,7 +179,11 @@ class VP8 {
       }
     }
 
-    _filterType = (hdr.level == 0) ? 0 : hdr.simple ? 1 : 2;
+    _filterType = (hdr.level == 0)
+        ? 0
+        : hdr.simple
+            ? 1
+            : 2;
 
     return true;
   }
@@ -316,7 +324,11 @@ class VP8 {
             }
           }
 
-          level = (level! < 0) ? 0 : (level > 63) ? 63 : level;
+          level = (level! < 0)
+              ? 0
+              : (level > 63)
+                  ? 63
+                  : level;
           if (level > 0) {
             int? iLevel = level;
             if (hdr.sharpness > 0) {
@@ -335,9 +347,14 @@ class VP8 {
               iLevel = 1;
             }
 
-            info..fInnerLevel = iLevel
-            ..fLimit = 2 * level + iLevel
-            ..hevThresh = (level >= 40) ? 2 : (level >= 15) ? 1 : 0;
+            info
+              ..fInnerLevel = iLevel
+              ..fLimit = 2 * level + iLevel
+              ..hevThresh = (level >= 40)
+                  ? 2
+                  : (level >= 15)
+                      ? 1
+                      : 0;
           } else {
             info.fLimit = 0; // no filtering
           }
@@ -371,14 +388,14 @@ class VP8 {
     final extraY = extraRows * _cacheYStride!;
     final extraUv = (extraRows ~/ 2) * _cacheUVStride!;
 
-    _cacheY = InputBuffer(Uint8List(16 * _cacheYStride! + extraY),
-        offset: extraY);
+    _cacheY =
+        InputBuffer(Uint8List(16 * _cacheYStride! + extraY), offset: extraY);
 
-    _cacheU = InputBuffer(Uint8List(8 * _cacheUVStride! + extraUv),
-        offset: extraUv);
+    _cacheU =
+        InputBuffer(Uint8List(8 * _cacheUVStride! + extraUv), offset: extraUv);
 
-    _cacheV = InputBuffer(Uint8List(8 * _cacheUVStride! + extraUv),
-        offset: extraUv);
+    _cacheV =
+        InputBuffer(Uint8List(8 * _cacheUVStride! + extraUv), offset: extraUv);
 
     _tmpY = InputBuffer(Uint8List(webp.width));
 
@@ -452,8 +469,8 @@ class VP8 {
 
       // Prepare for next scanline
       _mbInfo[0]
-      ..nz = 0
-      ..nzDc = 0;
+        ..nz = 0
+        ..nzDc = 0;
       _intraL.fillRange(0, _intraL.length, bDcPred);
       _mbX = 0;
 
@@ -710,20 +727,24 @@ class VP8 {
 
       final hevThresh = fInfo.hevThresh;
       if (mbX > 0) {
-        _dsp..hFilter16(yDst, yBps!, limit + 4, iLevel, hevThresh)
-        ..hFilter8(uDst, vDst, uvBps!, limit + 4, iLevel, hevThresh);
+        _dsp
+          ..hFilter16(yDst, yBps!, limit + 4, iLevel, hevThresh)
+          ..hFilter8(uDst, vDst, uvBps!, limit + 4, iLevel, hevThresh);
       }
       if (fInfo.fInner) {
-        _dsp..hFilter16i(yDst, yBps!, limit, iLevel, hevThresh)
-        ..hFilter8i(uDst, vDst, uvBps!, limit, iLevel!, hevThresh);
+        _dsp
+          ..hFilter16i(yDst, yBps!, limit, iLevel, hevThresh)
+          ..hFilter8i(uDst, vDst, uvBps!, limit, iLevel!, hevThresh);
       }
       if (mbY > 0) {
-        _dsp..vFilter16(yDst, yBps!, limit + 4, iLevel, hevThresh)
-        ..vFilter8(uDst, vDst, uvBps!, limit + 4, iLevel, hevThresh);
+        _dsp
+          ..vFilter16(yDst, yBps!, limit + 4, iLevel, hevThresh)
+          ..vFilter8(uDst, vDst, uvBps!, limit + 4, iLevel, hevThresh);
       }
       if (fInfo.fInner) {
-        _dsp..vFilter16i(yDst, yBps!, limit, iLevel, hevThresh)
-        ..vFilter8i(uDst, vDst, uvBps!, limit, iLevel!, hevThresh);
+        _dsp
+          ..vFilter16i(yDst, yBps!, limit, iLevel, hevThresh)
+          ..vFilter8i(uDst, vDst, uvBps!, limit, iLevel!, hevThresh);
       }
     }
   }
@@ -834,7 +855,7 @@ class VP8 {
       return false;
     }
 
-    /*int numLinesOut = */_emitFancyRGB(mbY, mbW, mbH);
+    /*int numLinesOut = */ _emitFancyRGB(mbY, mbW, mbH);
     _emitAlphaRGB(mbY, mbW, mbH);
 
     //_lastY += numLinesOut;
@@ -845,7 +866,9 @@ class VP8 {
   int _clip8(int v) {
     final d = ((v & xorYuvMask2) == 0)
         ? (v >> yuvFix2)
-        : (v < 0) ? 0 : 255;
+        : (v < 0)
+            ? 0
+            : 255;
     return d;
   }
 
@@ -1083,8 +1106,9 @@ class VP8 {
       if (!block.isIntra4x4) {
         left.nzDc = mb.nzDc = 0;
       }
-      block..nonZeroY = 0
-      ..nonZeroUV = 0;
+      block
+        ..nonZeroY = 0
+        ..nonZeroUV = 0;
     }
 
     if (_filterType! > 0) {
@@ -1188,12 +1212,13 @@ class VP8 {
     mb.nz = outTopNz;
     leftMb.nz = outLeftNz;
 
-    block..nonZeroY = nonZeroY
-    ..nonZeroUV = nonZeroUV
-    // We look at the mode-code of each block and check if some blocks have less
-    // than three non-zero coeffs (code < 2). This is to avoid dithering flat
-    // and empty blocks.
-    ..dither = (nonZeroUV & 0xaaaa) != 0 ? 0 : q!.dither;
+    block
+      ..nonZeroY = nonZeroY
+      ..nonZeroUV = nonZeroUV
+      // We look at the mode-code of each block and check if some blocks have
+      // less than three non-zero coeffs (code < 2). This is to avoid dithering
+      // flat and empty blocks.
+      ..dither = (nonZeroUV & 0xaaaa) != 0 ? 0 : q!.dither;
 
     // will be used for further optimization
     return (nonZeroY | nonZeroUV) == 0;
@@ -1371,8 +1396,8 @@ class VP8 {
     final left = _intraL;
 
     final block = _mbData[_mbX]
-    // decide for B_PRED first
-    ..isIntra4x4 = br.getBit(145) == 0;
+      // decide for B_PRED first
+      ..isIntra4x4 = br.getBit(145) == 0;
 
     if (!block.isIntra4x4) {
       // Hardcoded 16x16 intra-mode decision tree.
@@ -1539,7 +1564,11 @@ class VP8 {
   // compressed layer data (if present)
   //Uint8List _layerData;
 
-  static int _clip(int v, int M) => v < 0 ? 0 : v > M ? M : v;
+  static int _clip(int v, int M) => v < 0
+      ? 0
+      : v > M
+          ? M
+          : v;
 
   static const kYModesIntra4 = [
     -bDcPred,

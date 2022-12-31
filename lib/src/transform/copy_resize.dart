@@ -10,14 +10,15 @@ import 'bake_orientation.dart';
 /// ratio of [src] and [width].
 /// If [width] isn't specified, then it will be determined by the aspect ratio
 /// of [src] and [height].
-Image copyResize(Image src, { int? width, int? height,
-    Interpolation interpolation = Interpolation.nearest }) {
+Image copyResize(Image src,
+    {int? width,
+    int? height,
+    Interpolation interpolation = Interpolation.nearest}) {
   if (width == null && height == null) {
     throw ImageException('Invalid size');
   }
 
-  if (src.exif.imageIfd.hasOrientation &&
-      src.exif.imageIfd.orientation != 1) {
+  if (src.exif.imageIfd.hasOrientation && src.exif.imageIfd.orientation != 1) {
     src = bakeOrientation(src);
   }
 
@@ -45,8 +46,8 @@ Image copyResize(Image src, { int? width, int? height,
   for (var i = 0; i < numFrames; ++i) {
     final frame = src.frames[i];
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, width: width, height: height,
-            noAnimation: true);
+        Image.fromResized(frame,
+            width: width, height: height, noAnimation: true);
     firstFrame ??= dst;
 
     final dy = frame.height / height;
@@ -97,8 +98,8 @@ Image copyResize(Image src, { int? width, int? height,
         final y2 = y * dy;
         for (var x = 0; x < width; ++x) {
           final x2 = x * dx;
-          dst.setPixel(x, y, frame.getPixelInterpolate(x2, y2,
-              interpolation: interpolation));
+          dst.setPixel(x, y,
+              frame.getPixelInterpolate(x2, y2, interpolation: interpolation));
         }
       }
     }

@@ -15,22 +15,23 @@ class ImageDataUint8 extends ImageData {
   final Palette? palette;
 
   ImageDataUint8(int width, int height, int numChannels)
-      : data = Uint8List(width * height * numChannels)
-      , palette = null
-      , super(width, height, numChannels);
+      : data = Uint8List(width * height * numChannels),
+        palette = null,
+        super(width, height, numChannels);
 
   ImageDataUint8.palette(int width, int height, this.palette)
-      : data = Uint8List(width * height)
-      , super(width, height, 1);
+      : data = Uint8List(width * height),
+        super(width, height, 1);
 
-  ImageDataUint8.from(ImageDataUint8 other, { bool skipPixels = false })
-      : data = skipPixels ? Uint8List(other.data.length)
-          : Uint8List.fromList(other.data)
-      , palette = other.palette?.clone()
-      , super(other.width, other.height, other.numChannels);
+  ImageDataUint8.from(ImageDataUint8 other, {bool skipPixels = false})
+      : data = skipPixels
+            ? Uint8List(other.data.length)
+            : Uint8List.fromList(other.data),
+        palette = other.palette?.clone(),
+        super(other.width, other.height, other.numChannels);
 
   @override
-  ImageDataUint8 clone({ bool noPixels = false }) =>
+  ImageDataUint8 clone({bool noPixels = false}) =>
       ImageDataUint8.from(this, skipPixels: noPixels);
 
   @override
@@ -71,11 +72,11 @@ class ImageDataUint8 extends ImageData {
   bool get isHdrFormat => false;
 
   @override
-  Color getColor(num r, num g, num b, [num? a]) =>
-      a == null ? ColorRgb8(r.clamp(0, 255).toInt(), g.clamp(0, 255).toInt(),
-              b.clamp(0, 255).toInt())
-          : ColorRgba8(r.clamp(0, 255).toInt(), g.clamp(0, 255).toInt(),
-              b.clamp(0, 255).toInt(), a.clamp(0, 255).toInt());
+  Color getColor(num r, num g, num b, [num? a]) => a == null
+      ? ColorRgb8(r.clamp(0, 255).toInt(), g.clamp(0, 255).toInt(),
+          b.clamp(0, 255).toInt())
+      : ColorRgba8(r.clamp(0, 255).toInt(), g.clamp(0, 255).toInt(),
+          b.clamp(0, 255).toInt(), a.clamp(0, 255).toInt());
 
   @override
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
@@ -126,31 +127,32 @@ class ImageDataUint8 extends ImageData {
   void clear([Color? c]) {
     final c8 = c?.convert(format: Format.uint8);
     if (numChannels == 1) {
-      final ri = c8 == null ? 0 : (c8.r as int).clamp(0,255);
+      final ri = c8 == null ? 0 : (c8.r as int).clamp(0, 255);
       data.fillRange(0, data.length, ri);
     } else if (numChannels == 2) {
-      final ri = c8 == null ? 0 : (c8.r as int).clamp(0,255);
-      final gi = c8 == null ? 0 : (c8.g as int).clamp(0,255);
+      final ri = c8 == null ? 0 : (c8.r as int).clamp(0, 255);
+      final gi = c8 == null ? 0 : (c8.g as int).clamp(0, 255);
       final rg = (gi << 8) | ri;
       final u16 = Uint16List.view(data.buffer);
       u16.fillRange(0, u16.length, rg);
     } else if (numChannels == 4) {
-      final ri = c8 == null ? 0 : (c8.r as int).clamp(0,255);
-      final gi = c8 == null ? 0 : (c8.g as int).clamp(0,255);
-      final bi = c8 == null ? 0 : (c8.b as int).clamp(0,255);
-      final ai = c8 == null ? 0 : (c8.a as int).clamp(0,255);
+      final ri = c8 == null ? 0 : (c8.r as int).clamp(0, 255);
+      final gi = c8 == null ? 0 : (c8.g as int).clamp(0, 255);
+      final bi = c8 == null ? 0 : (c8.b as int).clamp(0, 255);
+      final ai = c8 == null ? 0 : (c8.a as int).clamp(0, 255);
       final rgba = (ai << 24) | (bi << 16) | (gi << 8) | ri;
       final u32 = Uint32List.view(data.buffer);
       u32.fillRange(0, u32.length, rgba);
     } else {
-      final ri = c8 == null ? 0 : (c8.r as int).clamp(0,255);
-      final gi = c8 == null ? 0 : (c8.g as int).clamp(0,255);
-      final bi = c8 == null ? 0 : (c8.b as int).clamp(0,255);
+      final ri = c8 == null ? 0 : (c8.r as int).clamp(0, 255);
+      final gi = c8 == null ? 0 : (c8.g as int).clamp(0, 255);
+      final bi = c8 == null ? 0 : (c8.b as int).clamp(0, 255);
       // rgb is the slow case since we can't pack the channels
       for (final p in this) {
-        p..r = ri
-        ..g = gi
-        ..b = bi;
+        p
+          ..r = ri
+          ..g = gi
+          ..b = bi;
       }
     }
   }

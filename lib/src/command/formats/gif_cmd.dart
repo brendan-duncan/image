@@ -8,8 +8,7 @@ import '../command.dart';
 class DecodeGifCmd extends Command {
   Uint8List data;
 
-  DecodeGifCmd(Command? input, this.data)
-      : super(input);
+  DecodeGifCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -22,8 +21,7 @@ class DecodeGifCmd extends Command {
 class DecodeGifFileCmd extends Command {
   String path;
 
-  DecodeGifFileCmd(Command? input, this.path)
-      : super(input);
+  DecodeGifFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -38,19 +36,21 @@ class EncodeGifCmd extends Command {
   DitherKernel dither;
   bool ditherSerpentine;
 
-  EncodeGifCmd(Command? input, {
-      this.samplingFactor = 10,
+  EncodeGifCmd(Command? input,
+      {this.samplingFactor = 10,
       this.dither = DitherKernel.floydSteinberg,
-      this.ditherSerpentine = false })
-    : super(input);
+      this.ditherSerpentine = false})
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
     await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
-      outputBytes = encodeGif(outputImage!, samplingFactor: samplingFactor,
-          dither: dither, ditherSerpentine: ditherSerpentine);
+      outputBytes = encodeGif(outputImage!,
+          samplingFactor: samplingFactor,
+          dither: dither,
+          ditherSerpentine: ditherSerpentine);
     }
   }
 }
@@ -60,20 +60,24 @@ class EncodeGifCmd extends Command {
 class EncodeGifFileCmd extends EncodeGifCmd {
   String path;
 
-  EncodeGifFileCmd(Command? input, this.path, {
-      int samplingFactor = 10,
+  EncodeGifFileCmd(Command? input, this.path,
+      {int samplingFactor = 10,
       DitherKernel dither = DitherKernel.floydSteinberg,
-      bool ditherSerpentine = false })
-      : super(input, samplingFactor: samplingFactor, dither: dither,
-          ditherSerpentine: ditherSerpentine);
+      bool ditherSerpentine = false})
+      : super(input,
+            samplingFactor: samplingFactor,
+            dither: dither,
+            ditherSerpentine: ditherSerpentine);
 
   @override
   Future<void> executeCommand() async {
     await input?.execute();
     outputImage = input?.outputImage;
     if (outputImage != null) {
-      await encodeGifFile(path, outputImage!, samplingFactor: samplingFactor,
-          dither: dither, ditherSerpentine: ditherSerpentine);
+      await encodeGifFile(path, outputImage!,
+          samplingFactor: samplingFactor,
+          dither: dither,
+          ditherSerpentine: ditherSerpentine);
     }
   }
 }

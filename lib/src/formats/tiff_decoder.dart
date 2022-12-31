@@ -53,7 +53,7 @@ class TiffDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
-  Image? decode(Uint8List bytes, { int? frame }) {
+  Image? decode(Uint8List bytes, {int? frame}) {
     _input = InputBuffer(bytes);
 
     info = _readHeader(_input);
@@ -70,8 +70,9 @@ class TiffDecoder extends Decoder {
     if (image == null) {
       return null;
     }
-    image..exif = ExifData.fromInputBuffer(InputBuffer(bytes))
-    ..frameType = FrameType.page;
+    image
+      ..exif = ExifData.fromInputBuffer(InputBuffer(bytes))
+      ..frameType = FrameType.page;
 
     for (var i = 1; i < len; ++i) {
       final frame = decodeFrame(i);
@@ -105,8 +106,7 @@ class TiffDecoder extends Decoder {
     var offset = p.readUint32();
     info.ifdOffset = offset;
 
-    final p2 = InputBuffer.from(p)
-    ..offset = offset;
+    final p2 = InputBuffer.from(p)..offset = offset;
 
     while (offset != 0) {
       TiffImage img;
@@ -120,8 +120,9 @@ class TiffDecoder extends Decoder {
       }
       info.images.add(img);
       if (info.images.length == 1) {
-        info..width = info.images[0].width
-        ..height = info.images[0].height;
+        info
+          ..width = info.images[0].width
+          ..height = info.images[0].height;
       }
 
       offset = p2.readUint32();

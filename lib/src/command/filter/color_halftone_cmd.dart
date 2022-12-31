@@ -11,8 +11,13 @@ class ColorHalftoneCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  ColorHalftoneCmd(Command? input, { this.amount = 1, this.centerX,
-      this.centerY, this.angle = 180, this.size = 5, this.mask,
+  ColorHalftoneCmd(Command? input,
+      {this.amount = 1,
+      this.centerX,
+      this.centerY,
+      this.angle = 180,
+      this.size = 5,
+      this.mask,
       this.maskChannel = Channel.luminance})
       : super(input);
 
@@ -20,8 +25,15 @@ class ColorHalftoneCmd extends Command {
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? colorHalftone(img, amount: amount,
-        centerX: centerX, centerY: centerY, angle: angle, size: size,
-        mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? colorHalftone(img,
+            amount: amount,
+            centerX: centerX,
+            centerY: centerY,
+            angle: angle,
+            size: size,
+            mask: maskImg,
+            maskChannel: maskChannel)
+        : null;
   }
 }

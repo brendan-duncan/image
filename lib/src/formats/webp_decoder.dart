@@ -110,7 +110,7 @@ class WebPDecoder extends Decoder {
   /// Decode a WebP formatted file stored in [bytes] into an Image.
   /// If it's not a valid webp file, null is returned.
   @override
-  Image? decode(List<int> bytes, { int? frame }) {
+  Image? decode(List<int> bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -132,8 +132,11 @@ class WebPDecoder extends Decoder {
       image.frameDuration = frame.duration;
 
       if (firstImage == null || lastImage == null) {
-        firstImage = Image(width: _info!.width, height: _info!.height,
-            numChannels: image.numChannels, format: image.format);
+        firstImage = Image(
+            width: _info!.width,
+            height: _info!.height,
+            numChannels: image.numChannels,
+            format: image.format);
         lastImage = firstImage;
       } else {
         lastImage = Image.from(lastImage);
@@ -151,7 +154,7 @@ class WebPDecoder extends Decoder {
     return firstImage;
   }
 
-  Image? _decodeFrame(InputBuffer input, { int frame = 0 }) {
+  Image? _decodeFrame(InputBuffer input, {int frame = 0}) {
     final webp = InternalWebPInfo();
     if (!_getInfo(input, webp)) {
       return null;
@@ -161,8 +164,9 @@ class WebPDecoder extends Decoder {
       return null;
     }
 
-    webp..frame = frame
-    ..numFrames = _info!.numFrames;
+    webp
+      ..frame = frame
+      ..numFrames = _info!.numFrames;
 
     if (webp.hasAnimation) {
       if (frame >= webp.frames.length || frame < 0) {
@@ -298,9 +302,10 @@ class WebPDecoder extends Decoder {
     final h = input.readUint24() + 1;
 
     webp!.width = w;
-    webp..height = h
-    ..hasAnimation = anim != 0
-    ..hasAlpha = alpha != 0;
+    webp
+      ..height = h
+      ..hasAnimation = anim != 0
+      ..hasAlpha = alpha != 0;
 
     return true;
   }
@@ -312,8 +317,9 @@ class WebPDecoder extends Decoder {
     final r = (c >> 8) & 0xff;
     final g = (c >> 16) & 0xff;
     final b = (c >> 24) & 0xff;
-    webp..backgroundColor = ColorRgba8(r, g, b, a)
-    ..animLoopCount = input.readUint16();
+    webp
+      ..backgroundColor = ColorRgba8(r, g, b, a)
+      ..animLoopCount = input.readUint16();
     return true;
   }
 

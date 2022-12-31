@@ -6,8 +6,8 @@ class ReinhardTonemapCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  ReinhardTonemapCmd(Command? input, { this.mask,
-      this.maskChannel = Channel.luminance })
+  ReinhardTonemapCmd(Command? input,
+      {this.mask, this.maskChannel = Channel.luminance})
       : super(input);
 
   @override

@@ -7,8 +7,7 @@ import '../command.dart';
 class DecodeTgaCmd extends Command {
   Uint8List data;
 
-  DecodeTgaCmd(Command? input, this.data)
-      : super(input);
+  DecodeTgaCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -21,8 +20,7 @@ class DecodeTgaCmd extends Command {
 class DecodeTgaFileCmd extends Command {
   String path;
 
-  DecodeTgaFileCmd(Command? input, this.path)
-      : super(input);
+  DecodeTgaFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -33,8 +31,7 @@ class DecodeTgaFileCmd extends Command {
 
 // Encode an Image to the TGA format.
 class EncodeTgaCmd extends Command {
-  EncodeTgaCmd(Command? input)
-      : super(input);
+  EncodeTgaCmd(Command? input) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -51,8 +48,7 @@ class EncodeTgaCmd extends Command {
 class EncodeTgaFileCmd extends EncodeTgaCmd {
   String path;
 
-  EncodeTgaFileCmd(Command? input, this.path)
-      : super(input);
+  EncodeTgaFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

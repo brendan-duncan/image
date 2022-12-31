@@ -59,7 +59,9 @@ class TgaDecoder extends Decoder {
     }
 
     input.offset = info!.imageOffset!;
-    final image = Image(width: info!.width, height: info!.height,
+    final image = Image(
+        width: info!.width,
+        height: info!.height,
         numChannels: info!.bpp == 32 ? 4 : 3);
     for (var y = image.height - 1; y >= 0; --y) {
       for (var x = 0; x < image.width; ++x) {
@@ -75,7 +77,7 @@ class TgaDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, { int? frame }) {
+  Image? decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }

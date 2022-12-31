@@ -68,8 +68,8 @@ class VP8LTransform {
     }
   }
 
-  void colorIndexInverseTransformAlpha(int yStart, int yEnd, InputBuffer src,
-      InputBuffer dst) {
+  void colorIndexInverseTransformAlpha(
+      int yStart, int yEnd, InputBuffer src, InputBuffer dst) {
     final bitsPerPixel = 8 >> bits;
     final width = xsize;
     final colorMap = data;

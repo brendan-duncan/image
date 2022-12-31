@@ -13,31 +13,28 @@ class ColorUint4 extends Iterable<num> implements Color {
   final int length;
   Uint8List data;
 
-  ColorUint4(this.length)
-      : data = Uint8List(length < 3 ? 1 : 2);
+  ColorUint4(this.length) : data = Uint8List(length < 3 ? 1 : 2);
 
   ColorUint4.from(ColorUint4 other)
-      : length = other.length
-      , data = Uint8List.fromList(other.data);
+      : length = other.length,
+        data = Uint8List.fromList(other.data);
 
   ColorUint4.fromList(List<int> color)
-      : length = color.length
-      , data = Uint8List(color.length < 3 ? 1 : 2) {
-    setRgba(length > 0 ? color[0] : 0,
-        length > 1 ? color[1] : 0,
-        length > 2 ? color[2] : 0,
-        length > 3 ? color[3] : 0);
+      : length = color.length,
+        data = Uint8List(color.length < 3 ? 1 : 2) {
+    setRgba(length > 0 ? color[0] : 0, length > 1 ? color[1] : 0,
+        length > 2 ? color[2] : 0, length > 3 ? color[3] : 0);
   }
 
   ColorUint4.rgb(int r, int g, int b)
-      : length = 3
-      , data = Uint8List(2) {
+      : length = 3,
+        data = Uint8List(2) {
     setRgb(r, g, b);
   }
 
   ColorUint4.rgba(int r, int g, int b, int a)
-      : length = 4
-      , data = Uint8List(2) {
+      : length = 4,
+        data = Uint8List(2) {
     setRgba(r, g, b, a);
   }
 
@@ -59,9 +56,11 @@ class ColorUint4 extends Iterable<num> implements Color {
   @override
   Palette? get palette => null;
 
-  int _getChannel(int ci) => ci < 0 || ci >= length ? 0
-      : ci < 2 ? (data[0] >> (4 - (ci << 2))) & 0xf
-      : (data[1] >> (4 - ((ci & 0x1) << 2)) & 0xf);
+  int _getChannel(int ci) => ci < 0 || ci >= length
+      ? 0
+      : ci < 2
+          ? (data[0] >> (4 - (ci << 2))) & 0xf
+          : (data[1] >> (4 - ((ci & 0x1) << 2)) & 0xf);
 
   void _setChannel(int ci, num value) {
     if (ci >= length) {
@@ -81,10 +80,10 @@ class ColorUint4 extends Iterable<num> implements Color {
   }
 
   @override
-  num operator[](int index) => _getChannel(index);
+  num operator [](int index) => _getChannel(index);
 
   @override
-  void operator[]=(int index, num value) => _setChannel(index, value);
+  void operator []=(int index, num value) => _setChannel(index, value);
 
   @override
   num get index => r;
@@ -142,8 +141,8 @@ class ColorUint4 extends Iterable<num> implements Color {
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance ?
-      luminance : _getChannel(channel.index);
+  num getChannel(Channel channel) =>
+      channel == Channel.luminance ? luminance : _getChannel(channel.index);
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -173,16 +172,14 @@ class ColorUint4 extends Iterable<num> implements Color {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator==(Object? other) =>
-      other is Color &&
-          other.length == length &&
-          other.hashCode == hashCode;
+  bool operator ==(Object? other) =>
+      other is Color && other.length == length && other.hashCode == hashCode;
 
   @override
   int get hashCode => Object.hashAll(toList());
 
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) =>
-      convertColor(this, format: format, numChannels: numChannels,
-          alpha: alpha);
+  Color convert({Format? format, int? numChannels, num? alpha}) =>
+      convertColor(this,
+          format: format, numChannels: numChannels, alpha: alpha);
 }

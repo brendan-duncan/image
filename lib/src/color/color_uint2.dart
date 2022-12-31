@@ -11,31 +11,28 @@ class ColorUint2 extends Iterable<num> implements Color {
   final int length;
   late int data;
 
-  ColorUint2(this.length)
-      : data = 0;
+  ColorUint2(this.length) : data = 0;
 
   ColorUint2.from(ColorUint2 other)
-      : length = other.length
-      , data = other.data;
+      : length = other.length,
+        data = other.data;
 
   ColorUint2.fromList(List<int> color)
-      : length = color.length
-      , data = 0 {
-    setRgba(length > 0 ? color[0] : 0,
-        length > 1 ? color[1] : 0,
-        length > 2 ? color[2] : 0,
-        length > 3 ? color[3] : 0);
+      : length = color.length,
+        data = 0 {
+    setRgba(length > 0 ? color[0] : 0, length > 1 ? color[1] : 0,
+        length > 2 ? color[2] : 0, length > 3 ? color[3] : 0);
   }
 
   ColorUint2.rgb(int r, int g, int b)
-      : length = 3
-      , data = 0 {
+      : length = 3,
+        data = 0 {
     setRgb(r, g, b);
   }
 
   ColorUint2.rgba(int r, int g, int b, int a)
-      : length = 4
-      , data = 0 {
+      : length = 4,
+        data = 0 {
     setRgba(r, g, b, a);
   }
 
@@ -64,10 +61,12 @@ class ColorUint2 extends Iterable<num> implements Color {
       return;
     }
 
-    const msk = [~(0x3 << (6 - (0 << 1))) & 0xff,
+    const msk = [
+      ~(0x3 << (6 - (0 << 1))) & 0xff,
       ~(0x3 << (6 - (1 << 1))) & 0xff,
       ~(0x3 << (6 - (2 << 1))) & 0xff,
-      ~(0x3 << (6 - (3 << 1))) & 0xff];
+      ~(0x3 << (6 - (3 << 1))) & 0xff
+    ];
 
     final mask = msk[ci];
     final x = value.toInt() & 0x3;
@@ -75,9 +74,9 @@ class ColorUint2 extends Iterable<num> implements Color {
   }
 
   @override
-  num operator[](int index) => _getChannel(index);
+  num operator [](int index) => _getChannel(index);
   @override
-  void operator[]=(int index, num value) => _setChannel(index, value);
+  void operator []=(int index, num value) => _setChannel(index, value);
 
   @override
   num get index => r;
@@ -130,8 +129,8 @@ class ColorUint2 extends Iterable<num> implements Color {
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance ?
-      luminance : _getChannel(channel.index);
+  num getChannel(Channel channel) =>
+      channel == Channel.luminance ? luminance : _getChannel(channel.index);
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -161,16 +160,14 @@ class ColorUint2 extends Iterable<num> implements Color {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator==(Object? other) =>
-      other is Color &&
-          other.length == length &&
-          other.hashCode == hashCode;
+  bool operator ==(Object? other) =>
+      other is Color && other.length == length && other.hashCode == hashCode;
 
   @override
   int get hashCode => Object.hashAll(toList());
 
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) =>
-      convertColor(this, format: format, numChannels: numChannels,
-          alpha: alpha);
+  Color convert({Format? format, int? numChannels, num? alpha}) =>
+      convertColor(this,
+          format: format, numChannels: numChannels, alpha: alpha);
 }

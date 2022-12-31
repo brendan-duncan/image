@@ -4,8 +4,7 @@ import '../command.dart';
 class FlipCmd extends Command {
   FlipDirection direction;
 
-  FlipCmd(Command? input, { required this.direction })
-      : super(input);
+  FlipCmd(Command? input, {required this.direction}) : super(input);
 
   @override
   Future<void> executeCommand() async {

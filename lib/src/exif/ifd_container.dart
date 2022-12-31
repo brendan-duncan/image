@@ -3,12 +3,12 @@ import 'ifd_directory.dart';
 class IfdContainer {
   Map<String, IfdDirectory> directories;
 
-  IfdContainer()
-      : directories = {};
+  IfdContainer() : directories = {};
 
   IfdContainer.from(IfdContainer? other)
       : directories = other == null
-          ? {} : Map<String, IfdDirectory>.from(other.directories);
+            ? {}
+            : Map<String, IfdDirectory>.from(other.directories);
 
   Iterable<String> get keys => directories.keys;
   Iterable<IfdDirectory> get values => directories.values;
@@ -31,14 +31,14 @@ class IfdContainer {
     directories.clear();
   }
 
-  IfdDirectory operator[](String ifdName) {
+  IfdDirectory operator [](String ifdName) {
     if (!directories.containsKey(ifdName)) {
       directories[ifdName] = IfdDirectory();
     }
     return directories[ifdName]!;
   }
 
-  void operator[]=(String ifdName, IfdDirectory value) {
+  void operator []=(String ifdName, IfdDirectory value) {
     directories[ifdName] = value;
   }
 }

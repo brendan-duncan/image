@@ -25,8 +25,10 @@ int uint32ToBlue(int c) => (c >> 16) & 0xff;
 int uint32ToAlpha(int c) => (c >> 24) & 0xff;
 
 int rgbaToUint32(int r, int g, int b, int a) =>
-    r.clamp(0,255) | (g.clamp(0,255) << 8) | (b.clamp(0,255) << 16) |
-    (a.clamp(0,255) << 24);
+    r.clamp(0, 255) |
+    (g.clamp(0, 255) << 8) |
+    (b.clamp(0, 255) << 16) |
+    (a.clamp(0, 255) << 24);
 
 Color _convertColor(Color c, Color c2, num a) {
   final numChannels = c2.length;
@@ -49,8 +51,8 @@ Color _convertColor(Color c, Color c2, num a) {
   return c2;
 }
 
-Color convertColor(Color c, { Color? to, Format? format, int? numChannels,
-    num? alpha }) {
+Color convertColor(Color c,
+    {Color? to, Format? format, int? numChannels, num? alpha}) {
   final fromFormat = c.palette?.format ?? c.format;
   format = to?.format ?? format ?? c.format;
   numChannels = to?.length ?? numChannels ?? c.length;
@@ -101,12 +103,11 @@ Color convertColor(Color c, { Color? to, Format? format, int? numChannels,
     case Format.float64:
       final c2 = to ?? ColorFloat64(numChannels);
       return _convertColor(c, c2, alpha);
-    }
+  }
 }
 
 /// Returns the luminance (grayscale) value of the color.
-num getLuminance(Color c) =>
-    0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
+num getLuminance(Color c) => 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
 
 /// Returns the normalized \[0, 1\] luminance (grayscale) value of the color.
 num getLuminanceNormalized(Color c) =>

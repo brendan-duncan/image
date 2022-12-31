@@ -7,8 +7,7 @@ import '../command.dart';
 class DecodeTiffCmd extends Command {
   Uint8List data;
 
-  DecodeTiffCmd(Command? input, this.data)
-      : super(input);
+  DecodeTiffCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -21,8 +20,7 @@ class DecodeTiffCmd extends Command {
 class DecodeTiffFileCmd extends Command {
   String path;
 
-  DecodeTiffFileCmd(Command? input, this.path)
-      : super(input);
+  DecodeTiffFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -33,8 +31,7 @@ class DecodeTiffFileCmd extends Command {
 
 // Encode an Image to the TIFF format.
 class EncodeTiffCmd extends Command {
-  EncodeTiffCmd(Command? input)
-      : super(input);
+  EncodeTiffCmd(Command? input) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -51,8 +48,7 @@ class EncodeTiffCmd extends Command {
 class EncodeTiffFileCmd extends EncodeTiffCmd {
   String path;
 
-  EncodeTiffFileCmd(Command? input, this.path)
-      : super(input);
+  EncodeTiffFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

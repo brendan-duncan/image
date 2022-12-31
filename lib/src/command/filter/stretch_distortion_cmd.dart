@@ -10,17 +10,25 @@ class StretchDistortionCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  StretchDistortionCmd(Command? input, { this.centerX, this.centerY,
-      this.interpolation = Interpolation.nearest, this.mask,
-      this.maskChannel = Channel.luminance })
+  StretchDistortionCmd(Command? input,
+      {this.centerX,
+      this.centerY,
+      this.interpolation = Interpolation.nearest,
+      this.mask,
+      this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? stretchDistortion(img, centerX: centerX,
-        centerY: centerY, interpolation: interpolation,
-        mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? stretchDistortion(img,
+            centerX: centerX,
+            centerY: centerY,
+            interpolation: interpolation,
+            mask: maskImg,
+            maskChannel: maskChannel)
+        : null;
   }
 }

@@ -12,16 +12,17 @@ class ImageDataFloat64 extends ImageData {
   final Float64List data;
 
   ImageDataFloat64(int width, int height, int numChannels)
-      : data = Float64List(width * height * 4 * numChannels)
-      , super(width, height, numChannels);
+      : data = Float64List(width * height * 4 * numChannels),
+        super(width, height, numChannels);
 
-  ImageDataFloat64.from(ImageDataFloat64 other, { bool skipPixels = false })
-      : data = skipPixels ? Float64List(other.data.length)
-          : Float64List.fromList(other.data)
-      , super(other.width, other.height, other.numChannels);
+  ImageDataFloat64.from(ImageDataFloat64 other, {bool skipPixels = false})
+      : data = skipPixels
+            ? Float64List(other.data.length)
+            : Float64List.fromList(other.data),
+        super(other.width, other.height, other.numChannels);
 
   @override
-  ImageDataFloat64 clone({ bool noPixels = false }) =>
+  ImageDataFloat64 clone({bool noPixels = false}) =>
       ImageDataFloat64.from(this, skipPixels: noPixels);
 
   @override
@@ -111,5 +112,5 @@ class ImageDataFloat64 extends ImageData {
   String toString() => 'ImageDataFloat64($width, $height, $numChannels)';
 
   @override
-  void clear([Color? c]) { }
+  void clear([Color? c]) {}
 }

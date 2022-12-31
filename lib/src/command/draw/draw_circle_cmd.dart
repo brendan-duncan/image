@@ -11,16 +11,27 @@ class DrawCircleCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  DrawCircleCmd(Command? input, { required this.x, required this.y,
-      required this.radius, required this.color, this.mask,
-      this.maskChannel = Channel.luminance })
+  DrawCircleCmd(Command? input,
+      {required this.x,
+      required this.y,
+      required this.radius,
+      required this.color,
+      this.mask,
+      this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? drawCircle(img, x: x, y: y, radius: radius,
-        color: color, mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? drawCircle(img,
+            x: x,
+            y: y,
+            radius: radius,
+            color: color,
+            mask: maskImg,
+            maskChannel: maskChannel)
+        : null;
   }
 }

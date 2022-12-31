@@ -12,14 +12,11 @@ import 'bit_utils.dart';
 class Float16 {
   int _h;
 
-  Float16([num? f])
-      : _h = f == null ? 0 : doubleToFloat16(f);
+  Float16([num? f]) : _h = f == null ? 0 : doubleToFloat16(f);
 
-  Float16.from(Float16 other)
-    : _h = other._h;
+  Float16.from(Float16 other) : _h = other._h;
 
-  Float16.fromBits(int bits)
-      : _h = bits;
+  Float16.fromBits(int bits) : _h = bits;
 
   static double float16ToDouble(int bits) => _toFloatFloat32[bits];
 
@@ -357,7 +354,7 @@ class Float16 {
     return (s << 31) | (e << 23) | m;
   }
 
-  static Float32List get  _toFloatFloat32 =>
+  static Float32List get _toFloatFloat32 =>
       _toFloatFloat32Data != null ? _toFloatFloat32Data! : _initialize();
 
   static Float32List? _toFloatFloat32Data;

@@ -28,7 +28,7 @@ abstract class Decoder {
   /// Otherwise if the image is animated and [frame] is null, the returned
   /// [Image] will include all frames. If there was a problem decoding the
   /// [Image], null will be returned.
-  Image? decode(Uint8List bytes, { int? frame });
+  Image? decode(Uint8List bytes, {int? frame});
 
   /// Start decoding the data as an animation sequence, but don't actually
   /// process the frames until they are requested with decodeFrame.

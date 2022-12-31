@@ -12,16 +12,17 @@ class ImageDataInt16 extends ImageData {
   final Int16List data;
 
   ImageDataInt16(int width, int height, int numChannels)
-      : data = Int16List(width * height * numChannels)
-      , super(width, height, numChannels);
+      : data = Int16List(width * height * numChannels),
+        super(width, height, numChannels);
 
-  ImageDataInt16.from(ImageDataInt16 other, { bool skipPixels = false })
-      : data = skipPixels ? Int16List(other.data.length)
-          : Int16List.fromList(other.data)
-      , super(other.width, other.height, other.numChannels);
+  ImageDataInt16.from(ImageDataInt16 other, {bool skipPixels = false})
+      : data = skipPixels
+            ? Int16List(other.data.length)
+            : Int16List.fromList(other.data),
+        super(other.width, other.height, other.numChannels);
 
   @override
-  ImageDataInt16 clone({ bool noPixels = false }) =>
+  ImageDataInt16 clone({bool noPixels = false}) =>
       ImageDataInt16.from(this, skipPixels: noPixels);
 
   @override
@@ -62,9 +63,9 @@ class ImageDataInt16 extends ImageData {
   int get rowStride => width * numChannels * 2;
 
   @override
-  Color getColor(num r, num g, num b, [num? a]) =>
-      a == null ? ColorInt16.rgb(r.toInt(), g.toInt(), b.toInt())
-          : ColorInt16.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
+  Color getColor(num r, num g, num b, [num? a]) => a == null
+      ? ColorInt16.rgb(r.toInt(), g.toInt(), b.toInt())
+      : ColorInt16.rgba(r.toInt(), g.toInt(), b.toInt(), a.toInt());
 
   @override
   Pixel getPixel(int x, int y, [Pixel? pixel]) {
@@ -112,5 +113,5 @@ class ImageDataInt16 extends ImageData {
   String toString() => 'ImageDataInt16($width, $height, $numChannels)';
 
   @override
-  void clear([Color? c]) { }
+  void clear([Color? c]) {}
 }

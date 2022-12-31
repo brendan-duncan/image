@@ -19,11 +19,19 @@ import 'draw_pixel.dart';
 /// but if the regions overlap the results will be unpredictable.
 ///
 /// if [center] is true, the [src] will be centered in [dst].
-Image compositeImage(Image dst, Image src, {
-    int? dstX, int? dstY, int? dstW, int? dstH, int? srcX, int? srcY,
-    int? srcW, int? srcH, BlendMode blend = BlendMode.alpha,
-    bool center = false, Image? mask,
-    Channel maskChannel = Channel.luminance }) {
+Image compositeImage(Image dst, Image src,
+    {int? dstX,
+    int? dstY,
+    int? dstW,
+    int? dstH,
+    int? srcX,
+    int? srcY,
+    int? srcW,
+    int? srcH,
+    BlendMode blend = BlendMode.alpha,
+    bool center = false,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   dstX ??= 0;
   dstY ??= 0;
   srcX ??= 0;
@@ -52,18 +60,26 @@ Image compositeImage(Image dst, Image src, {
       growable: false);
 
   if (blend == BlendMode.direct) {
-    _directComposite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache,
-        mask, maskChannel);
+    _directComposite(
+        src, dst, dstX, dstY, dstW, dstH, xCache, yCache, mask, maskChannel);
   } else {
-    _composite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache, blend,
-        mask, maskChannel);
+    _composite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache, blend, mask,
+        maskChannel);
   }
 
   return dst;
 }
 
-void _directComposite(Image src, Image dst, int dstX, int dstY,
-    int dstW, int dstH, List<int> xCache, List<int> yCache, Image? mask,
+void _directComposite(
+    Image src,
+    Image dst,
+    int dstX,
+    int dstY,
+    int dstW,
+    int dstH,
+    List<int> xCache,
+    List<int> yCache,
+    Image? mask,
     Channel maskChannel) {
   Pixel? p;
   if (mask != null) {
@@ -77,10 +93,11 @@ void _directComposite(Image src, Image dst, int dstX, int dstY,
           dst.setPixel(dstX + x, dstY + y, p);
         } else {
           final dp = dst.getPixel(dstX + x, dstY + y);
-          dp..r = mix(dp.r, p.r, m)
-          ..g = mix(dp.g, p.g, m)
-          ..b = mix(dp.b, p.b, m)
-          ..a = mix(dp.a, p.a, m);
+          dp
+            ..r = mix(dp.r, p.r, m)
+            ..g = mix(dp.g, p.g, m)
+            ..b = mix(dp.b, p.b, m)
+            ..a = mix(dp.a, p.a, m);
         }
       }
     }
@@ -94,15 +111,24 @@ void _directComposite(Image src, Image dst, int dstX, int dstY,
   }
 }
 
-void _composite(Image src, Image dst, int dstX, int dstY,
-    int dstW, int dstH, List<int> xCache, List<int> yCache,
-    BlendMode blend, Image? mask, Channel maskChannel) {
+void _composite(
+    Image src,
+    Image dst,
+    int dstX,
+    int dstY,
+    int dstW,
+    int dstH,
+    List<int> xCache,
+    List<int> yCache,
+    BlendMode blend,
+    Image? mask,
+    Channel maskChannel) {
   Pixel? p;
   for (var y = 0; y < dstH; ++y) {
     for (var x = 0; x < dstW; ++x) {
       p = src.getPixel(xCache[x], yCache[y], p);
-      drawPixel(dst, dstX + x, dstY + y, p, blend: blend, mask: mask,
-          maskChannel: maskChannel);
+      drawPixel(dst, dstX + x, dstY + y, p,
+          blend: blend, mask: mask, maskChannel: maskChannel);
     }
   }
 }

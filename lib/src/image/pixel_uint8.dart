@@ -18,22 +18,23 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   final ImageDataUint8 image;
 
   PixelUint8.imageData(this.image)
-      : _x = -1
-      , _y = 0
-      , _index = -image.numChannels;
+      : _x = -1,
+        _y = 0,
+        _index = -image.numChannels;
 
   PixelUint8.image(Image image)
-      : _x = -1
-      , _y = 0
-      , _index = -image.numChannels
-      , image = image.data is ImageDataUint8 ? image.data as ImageDataUint8
-          : ImageDataUint8(0, 0, 0);
+      : _x = -1,
+        _y = 0,
+        _index = -image.numChannels,
+        image = image.data is ImageDataUint8
+            ? image.data as ImageDataUint8
+            : ImageDataUint8(0, 0, 0);
 
   PixelUint8.from(PixelUint8 other)
-      : _x = other.x
-      , _y = other.y
-      , _index = other._index
-      , image = other.image;
+      : _x = other.x,
+        _y = other.y,
+        _index = other._index,
+        image = other.image;
 
   @override
   PixelUint8 clone() => PixelUint8.from(this);
@@ -73,8 +74,8 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   bool get isHdrFormat => image.isHdrFormat;
 
   @override
-  bool get isValid => x >= 0 && x < (image.width - 1) &&
-      y >= 0 && y < (image.height - 1);
+  bool get isValid =>
+      x >= 0 && x < (image.width - 1) && y >= 0 && y < (image.height - 1);
 
   @override
   int get x => _x;
@@ -120,15 +121,17 @@ class PixelUint8 extends Iterable<num> implements Pixel {
 
   void updateCache() {}
 
-  num get(int ci) => palette != null ?
-      palette!.get(data[_index], ci) :
-      ci < numChannels ? data[_index + ci] : 0;
+  num get(int ci) => palette != null
+      ? palette!.get(data[_index], ci)
+      : ci < numChannels
+          ? data[_index + ci]
+          : 0;
 
   @override
-  num operator[](int ci) => get(ci);
+  num operator [](int ci) => get(ci);
 
   @override
-  void operator[]=(int ci, num value) {
+  void operator []=(int ci, num value) {
     if (ci < numChannels) {
       data[_index + ci] = value.clamp(0, 255).toInt();
     }
@@ -140,7 +143,10 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   set index(num i) => data[_index] = i.clamp(0, 255).toInt();
 
   @override
-  num get r => palette == null ? numChannels > 0 ? data[_index] : 0
+  num get r => palette == null
+      ? numChannels > 0
+          ? data[_index]
+          : 0
       : palette!.getRed(data[_index]);
 
   @override
@@ -151,7 +157,10 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num get g => palette == null ? numChannels > 1 ? data[_index + 1]  : 0
+  num get g => palette == null
+      ? numChannels > 1
+          ? data[_index + 1]
+          : 0
       : palette!.getGreen(data[_index]);
 
   @override
@@ -162,7 +171,10 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num get b => palette == null ? numChannels > 2 ? data[_index + 2]  : 0
+  num get b => palette == null
+      ? numChannels > 2
+          ? data[_index + 2]
+          : 0
       : palette!.getBlue(data[_index]);
 
   @override
@@ -173,7 +185,10 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num get a => palette == null ? numChannels > 3 ? data[_index + 3]  : 255
+  num get a => palette == null
+      ? numChannels > 3
+          ? data[_index + 3]
+          : 255
       : palette!.getAlpha(data[_index]);
 
   @override
@@ -209,9 +224,11 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance ?
-      luminance : channel.index < numChannels ? data[_index + channel.index]
-      : 0;
+  num getChannel(Channel channel) => channel == Channel.luminance
+      ? luminance
+      : channel.index < numChannels
+          ? data[_index + channel.index]
+          : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -262,7 +279,7 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator==(Object? other) {
+  bool operator ==(Object? other) {
     if (other is PixelUint8) {
       return hashCode == other.hashCode;
     }
@@ -298,7 +315,7 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   int get hashCode => Object.hashAll(toList());
 
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) =>
-      convertColor(this, format: format, numChannels: numChannels,
-          alpha: alpha);
+  Color convert({Format? format, int? numChannels, num? alpha}) =>
+      convertColor(this,
+          format: format, numChannels: numChannels, alpha: alpha);
 }

@@ -5,8 +5,8 @@ import '../image/interpolation.dart';
 import '../util/image_exception.dart';
 
 /// Returns a resized and square cropped copy of the [src] image of [size] size.
-Image copyResizeCropSquare(Image src, { required int size,
-    Interpolation interpolation = Interpolation.nearest }) {
+Image copyResizeCropSquare(Image src,
+    {required int size, Interpolation interpolation = Interpolation.nearest}) {
   if (size <= 0) {
     throw ImageException('Invalid size');
   }
@@ -25,8 +25,8 @@ Image copyResizeCropSquare(Image src, { required int size,
   final xOffset = (width - size) ~/ 2;
   final yOffset = (height - size) ~/ 2;
 
-  final scaleX = interpolation == Interpolation.nearest ? Int32List(size)
-      : null;
+  final scaleX =
+      interpolation == Interpolation.nearest ? Int32List(size) : null;
 
   if (scaleX != null) {
     for (var x = 0; x < size; ++x) {
@@ -56,5 +56,5 @@ Image copyResizeCropSquare(Image src, { required int size,
     }
   }
 
-   return firstFrame!;
+  return firstFrame!;
 }

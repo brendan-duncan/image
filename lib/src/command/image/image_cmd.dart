@@ -2,8 +2,7 @@ import '../../image/image.dart';
 import '../command.dart';
 
 class ImageCmd extends Command {
-  ImageCmd(Command? input, Image image)
-      : super(input) {
+  ImageCmd(Command? input, Image image) : super(input) {
     outputImage = image;
   }
 

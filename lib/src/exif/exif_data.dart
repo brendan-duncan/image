@@ -6,14 +6,11 @@ import 'ifd_directory.dart';
 import 'ifd_value.dart';
 
 class ExifData extends IfdContainer {
-  ExifData()
-    : super();
+  ExifData() : super();
 
-  ExifData.from(ExifData? other)
-    : super.from(other);
+  ExifData.from(ExifData? other) : super.from(other);
 
-  ExifData.fromInputBuffer(InputBuffer input)
-    : super() {
+  ExifData.fromInputBuffer(InputBuffer input) : super() {
     read(input);
   }
 
@@ -87,7 +84,8 @@ class ExifData extends IfdContainer {
   void write(OutputBuffer out) {
     final saveEndian = out.bigEndian;
 
-    out..bigEndian = true
+    out
+      ..bigEndian = true
       // Tiff header
       ..writeUint16(0x4d4d) // big endian
       ..writeUint16(0x002a)
@@ -98,7 +96,7 @@ class ExifData extends IfdContainer {
     }
 
     var dataOffset = 8; // offset to first ifd block, from start of tiff header
-    final offsets = <String,int>{};
+    final offsets = <String, int>{};
 
     for (var name in directories.keys) {
       final ifd = directories[name]!;
@@ -196,7 +194,8 @@ class ExifData extends IfdContainer {
     for (var tag in ifd.keys) {
       final value = ifd[tag]!;
 
-      out..writeUint16(tag)
+      out
+        ..writeUint16(tag)
         ..writeUint16(value.type.index)
         ..writeUint32(value.length);
 
@@ -232,13 +231,15 @@ class ExifData extends IfdContainer {
 
     // Tiff header
     final endian = block.readUint16();
-    if (endian == 0x4949) { // II
+    if (endian == 0x4949) {
+      // II
       block.bigEndian = false;
       if (block.readUint16() != 0x2a00) {
         block.bigEndian = saveEndian;
         return false;
       }
-    } else if (endian == 0x4d4d) { // MM
+    } else if (endian == 0x4d4d) {
+      // MM
       block.bigEndian = true;
       if (block.readUint16() != 0x002a) {
         block.bigEndian = saveEndian;
@@ -257,8 +258,8 @@ class ExifData extends IfdContainer {
 
       final directory = IfdDirectory();
       final numEntries = block.readUint16();
-      final dir = List<_ExifEntry>.generate(numEntries, (i) =>
-          _readEntry(block, blockOffset));
+      final dir = List<_ExifEntry>.generate(
+          numEntries, (i) => _readEntry(block, blockOffset));
 
       for (var entry in dir) {
         if (entry.value != null) {
@@ -279,13 +280,14 @@ class ExifData extends IfdContainer {
 
     for (var d in directories.values) {
       for (var dt in subTags.keys) {
-        if (d.containsKey(dt)) { // ExifOffset
+        if (d.containsKey(dt)) {
+          // ExifOffset
           final ifdOffset = d[dt]!.toInt();
           block.offset = blockOffset + ifdOffset;
           final directory = IfdDirectory();
           final numEntries = block.readUint16();
-          final dir = List<_ExifEntry>.generate(numEntries, (i) =>
-              _readEntry(block, blockOffset));
+          final dir = List<_ExifEntry>.generate(
+              numEntries, (i) => _readEntry(block, blockOffset));
 
           for (var entry in dir) {
             if (entry.value != null) {

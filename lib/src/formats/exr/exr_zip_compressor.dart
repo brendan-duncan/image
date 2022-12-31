@@ -20,8 +20,8 @@ class InternalExrZipCompressor extends InternalExrCompressor
     implements ExrZipCompressor {
   ZLibDecoder zlib = const ZLibDecoder();
 
-  InternalExrZipCompressor(ExrPart header, this._maxScanLines,
-      this._numScanLines)
+  InternalExrZipCompressor(
+      ExrPart header, this._maxScanLines, this._numScanLines)
       : super(header as InternalExrPart);
 
   @override

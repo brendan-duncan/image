@@ -5,8 +5,8 @@ import '../../util/bit_utils.dart';
 
 @internal
 class ExrWavelet {
-  static void decode(Uint16List input, int si, int nx, int ox, int ny,
-      int oy, int mx) {
+  static void decode(
+      Uint16List input, int si, int nx, int ox, int ny, int oy, int mx) {
     final w14 = mx < (1 << 14);
     final n = (nx > ny) ? ny : nx;
     var p = 1;

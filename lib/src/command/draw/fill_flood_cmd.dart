@@ -12,17 +12,29 @@ class FillFloodCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  FillFloodCmd(Command? input, { required this.x, required this.y,
-      required this.color, this.threshold = 0.0, this.compareAlpha = false,
-      this.mask, this.maskChannel = Channel.luminance })
+  FillFloodCmd(Command? input,
+      {required this.x,
+      required this.y,
+      required this.color,
+      this.threshold = 0.0,
+      this.compareAlpha = false,
+      this.mask,
+      this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? fillFlood(img, x: x, y: y, color: color,
-        threshold: threshold, compareAlpha: compareAlpha,
-        mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? fillFlood(img,
+            x: x,
+            y: y,
+            color: color,
+            threshold: threshold,
+            compareAlpha: compareAlpha,
+            mask: maskImg,
+            maskChannel: maskChannel)
+        : null;
   }
 }

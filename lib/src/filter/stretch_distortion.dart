@@ -3,9 +3,12 @@ import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../util/math_util.dart';
 
-Image stretchDistortion(Image src, { int? centerX, int? centerY,
+Image stretchDistortion(Image src,
+    {int? centerX,
+    int? centerY,
     Interpolation interpolation = Interpolation.nearest,
-    Image? mask, Channel maskChannel = Channel.luminance }) {
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   for (final frame in src.frames) {
     final orig = frame.clone(noAnimation: true);
     final w = frame.width - 1;
@@ -36,13 +39,15 @@ Image stretchDistortion(Image src, { int? centerX, int? centerY,
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
 
       if (msk == null) {
-        p..r = p2.r
-        ..g = p2.g
-        ..b = p2.b;
+        p
+          ..r = p2.r
+          ..g = p2.g
+          ..b = p2.b;
       } else {
-        p..r = mix(p.r, p2.r, msk)
-        ..g = mix(p.g, p2.g, msk)
-        ..b = mix(p.b, p2.b, msk);
+        p
+          ..r = mix(p.r, p2.r, msk)
+          ..g = mix(p.g, p2.g, msk)
+          ..b = mix(p.b, p2.b, msk);
       }
     }
   }

@@ -10,15 +10,23 @@ class FillPolygonCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  FillPolygonCmd(Command? input, { required this.vertices, required this.color,
-      this.mask, this.maskChannel = Channel.luminance })
+  FillPolygonCmd(Command? input,
+      {required this.vertices,
+      required this.color,
+      this.mask,
+      this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? fillPolygon(img, vertices: vertices,
-        color: color, mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? fillPolygon(img,
+            vertices: vertices,
+            color: color,
+            mask: maskImg,
+            maskChannel: maskChannel)
+        : null;
   }
 }

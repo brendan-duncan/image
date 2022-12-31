@@ -12,16 +12,17 @@ class ImageDataFloat32 extends ImageData {
   final Float32List data;
 
   ImageDataFloat32(int width, int height, int numChannels)
-      : data = Float32List(width * height * numChannels)
-      , super(width, height, numChannels);
+      : data = Float32List(width * height * numChannels),
+        super(width, height, numChannels);
 
-  ImageDataFloat32.from(ImageDataFloat32 other, { bool skipPixels = false })
-      : data = skipPixels ? Float32List(other.data.length)
-          : Float32List.fromList(other.data)
-      , super(other.width, other.height, other.numChannels);
+  ImageDataFloat32.from(ImageDataFloat32 other, {bool skipPixels = false})
+      : data = skipPixels
+            ? Float32List(other.data.length)
+            : Float32List.fromList(other.data),
+        super(other.width, other.height, other.numChannels);
 
   @override
-  ImageDataFloat32 clone({ bool noPixels = false }) =>
+  ImageDataFloat32 clone({bool noPixels = false}) =>
       ImageDataFloat32.from(this, skipPixels: noPixels);
 
   @override
@@ -111,5 +112,5 @@ class ImageDataFloat32 extends ImageData {
   String toString() => 'ImageDataFloat32($width, $height, $numChannels)';
 
   @override
-  void clear([Color? c]) { }
+  void clear([Color? c]) {}
 }

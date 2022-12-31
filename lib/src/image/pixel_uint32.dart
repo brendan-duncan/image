@@ -18,22 +18,23 @@ class PixelUint32 extends Iterable<num> implements Pixel {
   final ImageDataUint32 image;
 
   PixelUint32.imageData(this.image)
-      : _x = -1
-      , _y = 0
-      , _index = -image.numChannels;
+      : _x = -1,
+        _y = 0,
+        _index = -image.numChannels;
 
   PixelUint32.image(Image image)
-      : _x = -1
-      , _y = 0
-      , _index = -image.numChannels
-      , image = image.data is ImageDataUint32 ? image.data as ImageDataUint32
-          : ImageDataUint32(0, 0, 0);
+      : _x = -1,
+        _y = 0,
+        _index = -image.numChannels,
+        image = image.data is ImageDataUint32
+            ? image.data as ImageDataUint32
+            : ImageDataUint32(0, 0, 0);
 
   PixelUint32.from(PixelUint32 other)
-      : _x = other._x
-      , _y = other._y
-      , _index = other._index
-      , image = other.image;
+      : _x = other._x,
+        _y = other._y,
+        _index = other._index,
+        image = other.image;
 
   @override
   PixelUint32 clone() => PixelUint32.from(this);
@@ -62,8 +63,8 @@ class PixelUint32 extends Iterable<num> implements Pixel {
   bool get isHdrFormat => image.isHdrFormat;
 
   @override
-  bool get isValid => x >= 0 && x < (image.width - 1) &&
-      y >= 0 && y < (image.height - 1);
+  bool get isValid =>
+      x >= 0 && x < (image.width - 1) && y >= 0 && y < (image.height - 1);
 
   @override
   int get x => _x;
@@ -108,10 +109,10 @@ class PixelUint32 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num operator[](int i) => i < numChannels ? data[_index + i] : 0;
+  num operator [](int i) => i < numChannels ? data[_index + i] : 0;
 
   @override
-  void operator[]=(int i, num value) {
+  void operator []=(int i, num value) {
     if (i < numChannels) {
       data[_index + i] = value.toInt();
     }
@@ -126,25 +127,35 @@ class PixelUint32 extends Iterable<num> implements Pixel {
   num get r => numChannels > 0 ? data[_index] : 0;
 
   @override
-  set r(num r) { if (numChannels > 0) { data[_index] = r.toInt(); } }
+  set r(num r) {
+    if (numChannels > 0) {
+      data[_index] = r.toInt();
+    }
+  }
 
   @override
-  num get g => numChannels > 1 ? data[_index + 1]  : 0;
+  num get g => numChannels > 1 ? data[_index + 1] : 0;
 
   @override
-  set g(num g) { if (image.numChannels > 1) data[_index + 1] = g.toInt(); }
+  set g(num g) {
+    if (image.numChannels > 1) data[_index + 1] = g.toInt();
+  }
 
   @override
-  num get b => numChannels > 2 ? data[_index + 2]  : 0;
+  num get b => numChannels > 2 ? data[_index + 2] : 0;
 
   @override
-  set b(num b) { if (image.numChannels > 2) data[_index + 2] = b.toInt(); }
+  set b(num b) {
+    if (image.numChannels > 2) data[_index + 2] = b.toInt();
+  }
 
   @override
-  num get a => numChannels > 3 ? data[_index + 3]  : 0;
+  num get a => numChannels > 3 ? data[_index + 3] : 0;
 
   @override
-  set a(num a) { if (image.numChannels > 3) data[_index + 3] = a.toInt(); }
+  set a(num a) {
+    if (image.numChannels > 3) data[_index + 3] = a.toInt();
+  }
 
   @override
   num get rNormalized => r / maxChannelValue;
@@ -172,9 +183,11 @@ class PixelUint32 extends Iterable<num> implements Pixel {
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance ?
-      luminance : channel.index < numChannels ? data[_index + channel.index]
-      : 0;
+  num getChannel(Channel channel) => channel == Channel.luminance
+      ? luminance
+      : channel.index < numChannels
+          ? data[_index + channel.index]
+          : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -221,7 +234,7 @@ class PixelUint32 extends Iterable<num> implements Pixel {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator==(Object? other) {
+  bool operator ==(Object? other) {
     if (other is PixelUint32) {
       return hashCode == other.hashCode;
     }
@@ -256,7 +269,7 @@ class PixelUint32 extends Iterable<num> implements Pixel {
   int get hashCode => Object.hashAll(toList());
 
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) =>
-      convertColor(this, format: format, numChannels: numChannels,
-          alpha: alpha);
+  Color convert({Format? format, int? numChannels, num? alpha}) =>
+      convertColor(this,
+          format: format, numChannels: numChannels, alpha: alpha);
 }

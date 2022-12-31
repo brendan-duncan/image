@@ -8,15 +8,17 @@ class ScaleRgbaCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  ScaleRgbaCmd(Command? input, { required this.scale, this.mask,
-      this.maskChannel = Channel.luminance })
+  ScaleRgbaCmd(Command? input,
+      {required this.scale, this.mask, this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? g.scaleRgba(img, scale: scale,
-        mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? g.scaleRgba(img,
+            scale: scale, mask: maskImg, maskChannel: maskChannel)
+        : null;
   }
 }

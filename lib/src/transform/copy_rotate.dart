@@ -3,9 +3,9 @@ import 'dart:math';
 import '../image/image.dart';
 import '../image/interpolation.dart';
 
-  /// Returns a copy of the [src] image, rotated by [angle] degrees.
-Image copyRotate(Image src, { required num angle,
-    Interpolation interpolation = Interpolation.nearest }) {
+/// Returns a copy of the [src] image, rotated by [angle] degrees.
+Image copyRotate(Image src,
+    {required num angle, Interpolation interpolation = Interpolation.nearest}) {
   final num nAngle = angle % 360.0;
 
   // Optimized version for orthogonal angles.
@@ -14,7 +14,7 @@ Image copyRotate(Image src, { required num angle,
     switch (iAngle) {
       case 1: // 90 deg.
         return _rotate90(src);
-        /**/
+      /**/
       case 2: // 180 deg.
         return _rotate180(src);
       case 3: // 270 deg.
@@ -42,8 +42,10 @@ Image copyRotate(Image src, { required num angle,
   for (var i = 0; i < numFrames; ++i) {
     final frame = src.frames[i];
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(src, width: (ux + vx).toInt(),
-            height: (uy + vy).toInt(), noAnimation: true);
+        Image.fromResized(src,
+            width: (ux + vx).toInt(),
+            height: (uy + vy).toInt(),
+            noAnimation: true);
     firstFrame ??= dst;
 
     for (final p in dst) {
@@ -63,8 +65,8 @@ Image _rotate90(Image src) {
   Image? firstFrame;
   for (final frame in src.frames) {
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, width: frame.height, height: frame.width,
-            noAnimation: true);
+        Image.fromResized(frame,
+            width: frame.height, height: frame.width, noAnimation: true);
     firstFrame ??= dst;
     final hm1 = frame.height - 1;
     for (var y = 0; y < dst.height; ++y) {
@@ -98,8 +100,8 @@ Image _rotate270(Image src) {
   for (final frame in src.frames) {
     final wm1 = src.width - 1;
     final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame, width: frame.height, height: frame.width,
-            noAnimation: true);
+        Image.fromResized(frame,
+            width: frame.height, height: frame.width, noAnimation: true);
     firstFrame ??= dst;
     for (var y = 0; y < dst.height; ++y) {
       for (var x = 0; x < dst.width; ++x) {

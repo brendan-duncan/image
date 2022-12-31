@@ -47,7 +47,7 @@ abstract class Pixel extends Iterator<Pixel> implements Color {
 
   /// Tests if this pixel has the same values as the given pixel or color.
   @override
-  bool operator==(Object? other);
+  bool operator ==(Object? other);
 
   /// Calculate the hash code for this pixel.
   @override

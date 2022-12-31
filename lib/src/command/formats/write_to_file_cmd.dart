@@ -5,8 +5,7 @@ import '../command.dart';
 class WriteToFileCmd extends Command {
   String path;
 
-  WriteToFileCmd(Command? input, this.path)
-      : super(input);
+  WriteToFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

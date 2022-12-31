@@ -8,15 +8,17 @@ class SeparableConvolutionCmd extends Command {
   Command? mask;
   Channel maskChannel;
 
-  SeparableConvolutionCmd(Command? input, { required this.kernel, this.mask,
-      this.maskChannel = Channel.luminance })
+  SeparableConvolutionCmd(Command? input,
+      {required this.kernel, this.mask, this.maskChannel = Channel.luminance})
       : super(input);
 
   @override
   Future<void> executeCommand() async {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
-    outputImage = img != null ? g.separableConvolution(img, kernel: kernel,
-        mask: maskImg, maskChannel: maskChannel) : null;
+    outputImage = img != null
+        ? g.separableConvolution(img,
+            kernel: kernel, mask: maskImg, maskChannel: maskChannel)
+        : null;
   }
 }

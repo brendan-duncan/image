@@ -1,8 +1,7 @@
 import '../command.dart';
 
 class CopyImageCmd extends Command {
-  CopyImageCmd(Command? input)
-      : super(input);
+  CopyImageCmd(Command? input) : super(input);
 
   @override
   Future<void> executeCommand() async {

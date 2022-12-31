@@ -58,21 +58,21 @@ class PvrDecoder extends Decoder {
     }
 
     final info = Pvr3Info()
-    ..flags = input.readUint32()
-    ..format = input.readUint32()
-    ..order[0] = input.readByte()
-    ..order[1] = input.readByte()
-    ..order[2] = input.readByte()
-    ..order[3] = input.readByte()
-    ..colorSpace = input.readUint32()
-    ..channelType = input.readUint32()
-    ..height = input.readUint32()
-    ..width = input.readUint32()
-    ..depth = input.readUint32()
-    ..numSurfaces = input.readUint32()
-    ..numFaces = input.readUint32()
-    ..mipCount = input.readUint32()
-    ..metadataSize = input.readUint32();
+      ..flags = input.readUint32()
+      ..format = input.readUint32()
+      ..order[0] = input.readByte()
+      ..order[1] = input.readByte()
+      ..order[2] = input.readByte()
+      ..order[3] = input.readByte()
+      ..colorSpace = input.readUint32()
+      ..channelType = input.readUint32()
+      ..height = input.readUint32()
+      ..width = input.readUint32()
+      ..depth = input.readUint32()
+      ..numSurfaces = input.readUint32()
+      ..numFaces = input.readUint32()
+      ..mipCount = input.readUint32()
+      ..metadataSize = input.readUint32();
 
     return info;
   }
@@ -86,18 +86,18 @@ class PvrDecoder extends Decoder {
     }
 
     final info = Pvr2Info()
-    ..height = input.readUint32()
-    ..width = input.readUint32()
-    ..mipCount = input.readUint32()
-    ..flags = input.readUint32()
-    ..texDataSize = input.readUint32()
-    ..bitsPerPixel = input.readUint32()
-    ..redMask = input.readUint32()
-    ..greenMask = input.readUint32()
-    ..blueMask = input.readUint32()
-    ..alphaMask = input.readUint32()
-    ..magic = input.readUint32()
-    ..numTex = input.readUint32();
+      ..height = input.readUint32()
+      ..width = input.readUint32()
+      ..mipCount = input.readUint32()
+      ..flags = input.readUint32()
+      ..texDataSize = input.readUint32()
+      ..bitsPerPixel = input.readUint32()
+      ..redMask = input.readUint32()
+      ..greenMask = input.readUint32()
+      ..blueMask = input.readUint32()
+      ..alphaMask = input.readUint32()
+      ..magic = input.readUint32()
+      ..numTex = input.readUint32();
 
     const pvr2Signature = 0x21525650;
     if (info.magic != pvr2Signature) {
@@ -119,16 +119,16 @@ class PvrDecoder extends Decoder {
     }
 
     final info = PvrAppleInfo()
-    ..height = input.readUint32()
-    ..width = input.readUint32()
-    ..mipCount = input.readUint32()
-    ..flags = input.readUint32()
-    ..texDataSize = input.readUint32()
-    ..bitsPerPixel= input.readUint32()
-    ..redMask = input.readUint32()
-    ..greenMask = input.readUint32()
-    ..blueMask = input.readUint32()
-    ..magic = input.readUint32();
+      ..height = input.readUint32()
+      ..width = input.readUint32()
+      ..mipCount = input.readUint32()
+      ..flags = input.readUint32()
+      ..texDataSize = input.readUint32()
+      ..bitsPerPixel = input.readUint32()
+      ..redMask = input.readUint32()
+      ..greenMask = input.readUint32()
+      ..blueMask = input.readUint32()
+      ..magic = input.readUint32();
 
     const appleSignature = 0x21525650;
     if (info.magic == appleSignature) {
@@ -186,9 +186,10 @@ class PvrDecoder extends Decoder {
       return null;
     }
 
-    info..width = width
-    ..height = height
-    ..bitsPerPixel = bpp;
+    info
+      ..width = width
+      ..height = height
+      ..bitsPerPixel = bpp;
 
     return info;
   }
@@ -214,13 +215,12 @@ class PvrDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, { int? frame }) {
+  Image? decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }
     return decodeFrame(frame ?? 0);
   }
-
 
   Image? _decodePvr2(Uint8List data) {
     final length = data.length;
@@ -244,8 +244,7 @@ class PvrDecoder extends Decoder {
 
     final info = _info! as Pvr2Info;
 
-    final input = InputBuffer(data)
-    ..skip(_pvrHeaderSize);
+    final input = InputBuffer(data)..skip(_pvrHeaderSize);
     // Header
 
     var numTex = info.numTex;
@@ -267,8 +266,8 @@ class PvrDecoder extends Decoder {
 
     switch (pType) {
       case pvrTypeRgba4444:
-        final image = Image(width: info.width, height: info.height,
-            numChannels: 4);
+        final image =
+            Image(width: info.width, height: info.height, numChannels: 4);
         for (final p in image) {
           final v1 = input.readByte();
           final v2 = input.readByte();
@@ -277,35 +276,38 @@ class PvrDecoder extends Decoder {
           final g = (v2 & 0x0f) << 4;
           final r = v2 & 0xf0;
 
-          p..r = r
-          ..g = g
-          ..b = b
-          ..a = a;
+          p
+            ..r = r
+            ..g = g
+            ..b = b
+            ..a = a;
         }
         return image;
       case pvrTypeRgba5551:
-        final image = Image(width: info.width, height: info.height,
-            numChannels: 4);
+        final image =
+            Image(width: info.width, height: info.height, numChannels: 4);
         for (final p in image) {
           final v = input.readUint16();
           final r = (v & 0xf800) >> 8;
           final g = (v & 0x07c0) >> 3;
           final b = (v & 0x003e) << 2;
           final a = (v & 0x0001) != 0 ? 255 : 0;
-          p..r = r
-          ..g = g
-          ..b = b
-          ..a = a;
+          p
+            ..r = r
+            ..g = g
+            ..b = b
+            ..a = a;
         }
         return image;
       case pvrTypeRgba8888:
-        final image = Image(width: info.width, height: info.height,
-            numChannels: 4);
+        final image =
+            Image(width: info.width, height: info.height, numChannels: 4);
         for (final p in image) {
-          p..r = input.readByte()
-          ..g = input.readByte()
-          ..b = input.readByte()
-          ..a = input.readByte();
+          p
+            ..r = input.readByte()
+            ..g = input.readByte()
+            ..b = input.readByte()
+            ..a = input.readByte();
         }
         return image;
       case pvrTypeRgb565:
@@ -315,9 +317,10 @@ class PvrDecoder extends Decoder {
           final b = (v & 0x001f) << 3;
           final g = (v & 0x07e0) >> 3;
           final r = (v & 0xf800) >> 8;
-          p..r = r
-          ..g = g
-          ..b = b;
+          p
+            ..r = r
+            ..g = g
+            ..b = b;
         }
         return image;
       case pvrTypeRgb555:
@@ -327,37 +330,40 @@ class PvrDecoder extends Decoder {
           final r = (v & 0x001f) << 3;
           final g = (v & 0x03e0) >> 2;
           final b = (v & 0x7c00) >> 7;
-          p..r = r
-          ..g = g
-          ..b = b;
+          p
+            ..r = r
+            ..g = g
+            ..b = b;
         }
         return image;
       case pvrTypeRgb888:
         final image = Image(width: info.width, height: info.height);
         for (final p in image) {
-          p..r = input.readByte()
-          ..g = input.readByte()
-          ..b = input.readByte();
+          p
+            ..r = input.readByte()
+            ..g = input.readByte()
+            ..b = input.readByte();
         }
         return image;
       case pvrTypeI8:
-        final image = Image(width: info.width, height: info.height,
-            numChannels: 1);
+        final image =
+            Image(width: info.width, height: info.height, numChannels: 1);
         for (final p in image) {
           final i = input.readByte();
           p.r = i;
         }
         return image;
       case pvrTypeAI8:
-        final image = Image(width: info.width, height: info.height,
-            numChannels: 4);
+        final image =
+            Image(width: info.width, height: info.height, numChannels: 4);
         for (final p in image) {
           final a = input.readByte();
           final i = input.readByte();
-          p..r = i
-          ..g = i
-          ..b = i
-          ..a = a;
+          p
+            ..r = i
+            ..g = i
+            ..b = i
+            ..a = a;
         }
         return image;
       case pvrTypePvrtc2:
@@ -411,8 +417,7 @@ class PvrDecoder extends Decoder {
     const PVR3_EAC_RG11_U = 27;
     const PVR3_EAC_RG11_S = 28;*/
 
-    final input = InputBuffer(data)
-    ..skip(_pvrHeaderSize);
+    final input = InputBuffer(data)..skip(_pvrHeaderSize);
 
     final info = _info as Pvr3Info;
 

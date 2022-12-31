@@ -19,32 +19,34 @@ class GifEncoder extends Encoder {
   bool ditherSerpentine;
 
   GifEncoder(
-      { this.delay = 80,
-        this.repeat = 0,
-        this.numColors = 256,
-        this.quantizerType = QuantizerType.neural,
-        this.samplingFactor = 10,
-        this.dither = DitherKernel.floydSteinberg,
-        this.ditherSerpentine = false })
+      {this.delay = 80,
+      this.repeat = 0,
+      this.numColors = 256,
+      this.quantizerType = QuantizerType.neural,
+      this.samplingFactor = 10,
+      this.dither = DitherKernel.floydSteinberg,
+      this.ditherSerpentine = false})
       : _encodedFrames = 0;
 
   /// This adds the frame passed to [image].
   /// After the last frame has been added, [finish] is required to be called.
   /// Optional frame [duration] is in 1/100 sec.
-  void addFrame(Image image, { int? duration }) {
+  void addFrame(Image image, {int? duration}) {
     if (output == null) {
       output = OutputBuffer();
 
       if (!image.hasPalette) {
         if (quantizerType == QuantizerType.neural) {
-          _lastColorMap = NeuralQuantizer(image, numberOfColors: numColors,
-              samplingFactor: samplingFactor);
+          _lastColorMap = NeuralQuantizer(image,
+              numberOfColors: numColors, samplingFactor: samplingFactor);
         } else {
           _lastColorMap = OctreeQuantizer(image, numberOfColors: numColors);
         }
 
-        _lastImage = ditherImage(image, quantizer: _lastColorMap!,
-            kernel: dither, serpentine: ditherSerpentine);
+        _lastImage = ditherImage(image,
+            quantizer: _lastColorMap!,
+            kernel: dither,
+            serpentine: ditherSerpentine);
       } else {
         _lastImage = image;
       }
@@ -67,13 +69,15 @@ class GifEncoder extends Encoder {
 
     if (!image.hasPalette) {
       if (quantizerType == QuantizerType.neural) {
-        _lastColorMap = NeuralQuantizer(image, numberOfColors: numColors,
-            samplingFactor: samplingFactor);
+        _lastColorMap = NeuralQuantizer(image,
+            numberOfColors: numColors, samplingFactor: samplingFactor);
       } else {
         _lastColorMap = OctreeQuantizer(image, numberOfColors: numColors);
       }
 
-      _lastImage = ditherImage(image, quantizer: _lastColorMap!, kernel: dither,
+      _lastImage = ditherImage(image,
+          quantizer: _lastColorMap!,
+          kernel: dither,
           serpentine: ditherSerpentine);
     } else {
       _lastImage = image;
@@ -117,7 +121,7 @@ class GifEncoder extends Encoder {
 
   /// Encode a single frame image.
   @override
-  Uint8List encode(Image image, { bool singleFrame = false }) {
+  Uint8List encode(Image image, {bool singleFrame = false}) {
     if (!image.hasAnimation || singleFrame) {
       addFrame(image);
       return finish()!;
@@ -145,12 +149,12 @@ class GifEncoder extends Encoder {
 
     final out = output!
 
-    // Image desc
-    ..writeByte(_imageDescRecordType)
-    ..writeUint16(0) // image position x,y = 0,0
-    ..writeUint16(0)
-    ..writeUint16(width) // image size
-    ..writeUint16(height);
+      // Image desc
+      ..writeByte(_imageDescRecordType)
+      ..writeUint16(0) // image position x,y = 0,0
+      ..writeUint16(0)
+      ..writeUint16(width) // image size
+      ..writeUint16(height);
 
     final paletteBytes = palette.toUint8List();
 
@@ -163,23 +167,26 @@ class GifEncoder extends Encoder {
       out.writeBytes(paletteBytes);
     } else if (numChannels == 4) {
       for (var i = 0, pi = 0; i < numColors; ++i, pi += 4) {
-        out..writeByte(paletteBytes[pi])
-        ..writeByte(paletteBytes[pi + 1])
-        ..writeByte(paletteBytes[pi + 2]);
+        out
+          ..writeByte(paletteBytes[pi])
+          ..writeByte(paletteBytes[pi + 1])
+          ..writeByte(paletteBytes[pi + 2]);
       }
     } else if (numChannels == 1 || numChannels == 2) {
       for (var i = 0, pi = 0; i < numColors; ++i, pi += numChannels) {
         final g = paletteBytes[pi];
-        out..writeByte(g)
-        ..writeByte(g)
-        ..writeByte(g);
+        out
+          ..writeByte(g)
+          ..writeByte(g)
+          ..writeByte(g);
       }
     }
 
     for (var i = numColors; i < 256; ++i) {
-      out..writeByte(0)
-      ..writeByte(0)
-      ..writeByte(0);
+      out
+        ..writeByte(0)
+        ..writeByte(0)
+        ..writeByte(0);
     }
 
     _encodeLZW(image, width, height);

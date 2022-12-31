@@ -231,10 +231,10 @@ class VP8Filter {
       // vertical pass
       final a = src[si] + src[si + 8]; // [-4096, 4094]
       final b = src[si] - src[si + 8]; // [-4095, 4095]
-      final c = _mul(src[si + 4], kC2) -
-          _mul(src[si + 12], kC1); // [-3783, 3783]
-      final d = _mul(src[si + 4], kC1) +
-          _mul(src[si + 12], kC2); // [-3785, 3781]
+      final c =
+          _mul(src[si + 4], kC2) - _mul(src[si + 12], kC1); // [-3783, 3783]
+      final d =
+          _mul(src[si + 4], kC1) + _mul(src[si + 12], kC2); // [-3785, 3781]
       t[tmp++] = a + d; // [-7881, 7875]
       t[tmp++] = b + c; // [-7878, 7878]
       t[tmp++] = b - c; // [-7878, 7878]
@@ -269,8 +269,8 @@ class VP8Filter {
   void transform(InputBuffer src, InputBuffer dst, bool doTwo) {
     transformOne(src, dst);
     if (doTwo) {
-      transformOne(InputBuffer.from(src, offset: 16),
-          InputBuffer.from(dst, offset: 4));
+      transformOne(
+          InputBuffer.from(src, offset: 16), InputBuffer.from(dst, offset: 4));
     }
   }
 
@@ -411,8 +411,8 @@ class VP8Filter {
     dst[_dst(0, 3)] = _avg3(j, K, l);
     dst[_dst(0, 2)] = dst[_dst(1, 3)] = _avg3(i, j, K);
     dst[_dst(0, 1)] = dst[_dst(1, 2)] = dst[_dst(2, 3)] = _avg3(x, i, j);
-    dst[_dst(0, 0)] = dst[_dst(1, 1)] = dst[_dst(2, 2)] = dst[_dst(3, 3)] =
-        _avg3(a, x, i);
+    dst[_dst(0, 0)] =
+        dst[_dst(1, 1)] = dst[_dst(2, 2)] = dst[_dst(3, 3)] = _avg3(a, x, i);
     dst[_dst(1, 0)] = dst[_dst(2, 1)] = dst[_dst(3, 2)] = _avg3(b, a, x);
     dst[_dst(2, 0)] = dst[_dst(3, 1)] = _avg3(c, b, a);
     dst[_dst(3, 0)] = _avg3(d, c, b);
@@ -629,8 +629,18 @@ class VP8Filter {
     put8x8uv(0x80, dst);
   }
 
-  static const predLuma4 = [_dc4, _tm4, _ve4, _he4, _rd4, _vr4, _ld4,
-    _vl4, _hd4, _hu4];
+  static const predLuma4 = [
+    _dc4,
+    _tm4,
+    _ve4,
+    _he4,
+    _rd4,
+    _vr4,
+    _ld4,
+    _vl4,
+    _hd4,
+    _hu4
+  ];
 
   static const predLuma16 = [
     dc16,

@@ -14,6 +14,7 @@ class ExrImage implements DecodeInfo {
   int width = 0;
   @override
   int height = 0;
+
   /// An EXR image has one or more parts, each of which contains a framebuffer.
   final List<ExrPart> _parts = [];
 
@@ -145,8 +146,9 @@ class ExrImage implements DecodeInfo {
 
             final tileX = imgData.readUint32();
             final tileY = imgData.readUint32();
-            imgData..readUint32() // levelX
-            ..readUint32(); // levelY
+            imgData
+              ..readUint32() // levelX
+              ..readUint32(); // levelY
             final dataSize = imgData.readUint32();
             final data = imgData.readBytes(dataSize);
 

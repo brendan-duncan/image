@@ -8,24 +8,31 @@ abstract class Color extends Iterable<num> {
   /// The number of channels used by the color.
   @override
   int get length;
+
   /// The maximum value for a color channel.
   num get maxChannelValue;
+
   /// The maximum value for a palette index.
   num get maxIndexValue;
+
   /// The [Format] of the color.
   Format get format;
+
   /// True if the format is low dynamic range.
   bool get isLdrFormat;
+
   /// True if the format is high dynamic range.
   bool get isHdrFormat;
+
   /// True if the color uses a palette.
   bool get hasPalette;
+
   /// The palette used by the color, or null.
   Palette? get palette;
 
   /// Gets a channel from the color by its index.
-  num operator[](int index);
-  void operator[]=(int index, num value);
+  num operator [](int index);
+  void operator []=(int index, num value);
 
   /// Palette index value (or red channel if there is no palette).
   num get index;
@@ -91,11 +98,11 @@ abstract class Color extends Iterable<num> {
   /// [numChannels] is 4 and the current color does not have an alpha value,
   /// then [alpha] can specify what value to use for the new alpha channel.
   /// If [alpha] is not given, then [maxChannelValue] will be used.
-  Color convert({ Format? format, int? numChannels, num? alpha });
+  Color convert({Format? format, int? numChannels, num? alpha});
 
   /// Tests if this color is equivalent to another [Color].
   @override
-  bool operator==(Object? other);
+  bool operator ==(Object? other);
 
   /// Compute a hashCode for this color.
   @override

@@ -11,24 +11,19 @@ import 'format.dart';
 class ColorUint8 extends Iterable<num> implements Color {
   final Uint8List data;
 
-  ColorUint8(int numChannels)
-      : data = Uint8List(numChannels);
+  ColorUint8(int numChannels) : data = Uint8List(numChannels);
 
-  ColorUint8.from(ColorUint8 other)
-      : data = Uint8List.fromList(other.data);
+  ColorUint8.from(ColorUint8 other) : data = Uint8List.fromList(other.data);
 
-  ColorUint8.fromList(List<int> color)
-      : data = Uint8List.fromList(color);
+  ColorUint8.fromList(List<int> color) : data = Uint8List.fromList(color);
 
-  ColorUint8.rgb(int r, int g, int b)
-      : data = Uint8List(3) {
+  ColorUint8.rgb(int r, int g, int b) : data = Uint8List(3) {
     data[0] = r;
     data[1] = g;
     data[2] = b;
   }
 
-  ColorUint8.rgba(int r, int g, int b, int a)
-      : data = Uint8List(4) {
+  ColorUint8.rgba(int r, int g, int b, int a) : data = Uint8List(4) {
     data[0] = r;
     data[1] = g;
     data[2] = b;
@@ -56,9 +51,9 @@ class ColorUint8 extends Iterable<num> implements Color {
   Palette? get palette => null;
 
   @override
-  num operator[](int index) => index < data.length ? data[index] : 0;
+  num operator [](int index) => index < data.length ? data[index] : 0;
   @override
-  void operator[]=(int index, num value) {
+  void operator []=(int index, num value) {
     if (index < data.length) {
       data[index] = value.toInt();
     }
@@ -131,8 +126,11 @@ class ColorUint8 extends Iterable<num> implements Color {
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance ?
-      luminance : channel.index < data.length ? data[channel.index] : 0;
+  num getChannel(Channel channel) => channel == Channel.luminance
+      ? luminance
+      : channel.index < data.length
+          ? data[channel.index]
+          : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -177,26 +175,22 @@ class ColorUint8 extends Iterable<num> implements Color {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator==(Object? other) =>
-      other is Color &&
-      other.length == length &&
-      other.hashCode == hashCode;
+  bool operator ==(Object? other) =>
+      other is Color && other.length == length && other.hashCode == hashCode;
 
   @override
   int get hashCode => Object.hashAll(toList());
 
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) =>
-      convertColor(this, format: format, numChannels: numChannels,
-          alpha: alpha);
+  Color convert({Format? format, int? numChannels, num? alpha}) =>
+      convertColor(this,
+          format: format, numChannels: numChannels, alpha: alpha);
 }
 
 class ColorRgb8 extends ColorUint8 {
-  ColorRgb8(int r, int g, int b)
-      : super.rgb(r, g, b);
+  ColorRgb8(int r, int g, int b) : super.rgb(r, g, b);
 
-  ColorRgb8.from(ColorUint8 other)
-      : super(3) {
+  ColorRgb8.from(ColorUint8 other) : super(3) {
     data[0] = other[0] as int;
     data[1] = other[1] as int;
     data[2] = other[2] as int;
@@ -204,11 +198,9 @@ class ColorRgb8 extends ColorUint8 {
 }
 
 class ColorRgba8 extends ColorUint8 {
-  ColorRgba8(int r, int g, int b, int a)
-    : super.rgba(r, g, b, a);
+  ColorRgba8(int r, int g, int b, int a) : super.rgba(r, g, b, a);
 
-  ColorRgba8.from(ColorUint8 other)
-      : super(4) {
+  ColorRgba8.from(ColorUint8 other) : super(4) {
     data[0] = other[0] as int;
     data[1] = other[1] as int;
     data[2] = other[2] as int;

@@ -172,14 +172,14 @@ Decoder? findDecoderForData(List<int> data) {
 /// file and using that decoder to decode the file into a single frame [Image].
 /// **WARNING** Since this will check the image data against all known decoders,
 /// it is much slower than using an explicit decoder.
-Image? decodeImage(Uint8List data, { int? frame }) {
+Image? decodeImage(Uint8List data, {int? frame}) {
   final decoder = findDecoderForData(data);
   return decoder?.decode(data, frame: frame);
 }
 
 /// Decodes the given image file bytes, using the filename extension to
 /// determine the decoder.
-Image? decodeNamedImage(String path, Uint8List data, { int? frame }) {
+Image? decodeNamedImage(String path, Uint8List data, {int? frame}) {
   final decoder = findDecoderForNamedImage(path);
   if (decoder != null) {
     return decoder.decode(data, frame: frame);
@@ -191,7 +191,7 @@ Image? decodeNamedImage(String path, Uint8List data, { int? frame }) {
 /// such as the web, this will return null.
 /// **WARNING** Since this will check the image data against all known decoders,
 /// it is much slower than using an explicit decoder.
-Future<Image?> decodeImageFile(String path, { int? frame }) async {
+Future<Image?> decodeImageFile(String path, {int? frame}) async {
   final bytes = await readFile(path);
   if (bytes == null) {
     return null;
@@ -214,7 +214,6 @@ Uint8List? encodeNamedImage(String path, Image image) {
     return null;
   }
   return encoder.encode(image);
-
 }
 
 /// Encode the [image] to a file at the given [path]. The format of the image
@@ -247,12 +246,12 @@ Future<Image?> decodeJpgFile(String path) async {
 }
 
 /// Encode an [image] to the JPEG format.
-Uint8List encodeJpg(Image image, { int quality = 100 }) =>
+Uint8List encodeJpg(Image image, {int quality = 100}) =>
     JpegEncoder(quality: quality).encode(image);
 
 /// Encode an [image] to a JPG file at the given [path].
 Future<bool> encodeJpgFile(String path, Image image,
-    { int quality = 100 }) async {
+    {int quality = 100}) async {
   if (!supportsFileAccess()) {
     return false;
   }
@@ -261,7 +260,7 @@ Future<bool> encodeJpgFile(String path, Image image,
 }
 
 /// Decode a PNG formatted [Image].
-Image? decodePng(Uint8List bytes, { int? frame }) =>
+Image? decodePng(Uint8List bytes, {int? frame}) =>
     PngDecoder().decode(bytes, frame: frame);
 
 /// Decode a PNG formatted image from a file. If the platform does not support
@@ -275,15 +274,18 @@ Future<Image?> decodePngFile(String path) async {
 }
 
 /// Encode an image to the PNG format.
-Uint8List encodePng(Image image, { bool singleFrame = false, int level = 6,
-    PngFilter filter = PngFilter.paeth }) =>
+Uint8List encodePng(Image image,
+        {bool singleFrame = false,
+        int level = 6,
+        PngFilter filter = PngFilter.paeth}) =>
     PngEncoder(filter: filter, level: level)
         .encode(image, singleFrame: singleFrame);
 
 /// Encode an [image] to a PNG file at the given [path].
 Future<bool> encodePngFile(String path, Image image,
-    { bool singleFrame = false, int level = 6,
-      PngFilter filter = PngFilter.paeth }) async {
+    {bool singleFrame = false,
+    int level = 6,
+    PngFilter filter = PngFilter.paeth}) async {
   if (!supportsFileAccess()) {
     return false;
   }
@@ -293,7 +295,7 @@ Future<bool> encodePngFile(String path, Image image,
 }
 
 /// Decode a TGA formatted image.
-Image? decodeTga(Uint8List bytes, { int? frame }) =>
+Image? decodeTga(Uint8List bytes, {int? frame}) =>
     TgaDecoder().decode(bytes, frame: frame);
 
 /// Decode a TGA formatted image from a file. If the platform does not support
@@ -319,12 +321,12 @@ Future<bool> encodeTgaFile(String path, Image image) async {
 }
 
 /// Decode a WebP formatted image
-Image? decodeWebP(Uint8List bytes, { int? frame }) =>
+Image? decodeWebP(Uint8List bytes, {int? frame}) =>
     WebPDecoder().decode(bytes, frame: frame);
 
 /// Decode a WebP formatted image from a file. If the platform does not support
 /// dart:io, null will be returned.
-Future<Image?> decodeWebPFile(String path, { int? frame }) async {
+Future<Image?> decodeWebPFile(String path, {int? frame}) async {
   final bytes = await readFile(path);
   if (bytes == null) {
     return null;
@@ -333,12 +335,12 @@ Future<Image?> decodeWebPFile(String path, { int? frame }) async {
 }
 
 /// Decode a GIF formatted image.
-Image? decodeGif(Uint8List bytes, { int? frame }) =>
+Image? decodeGif(Uint8List bytes, {int? frame}) =>
     GifDecoder().decode(bytes, frame: frame);
 
 /// Decode a GIF formatted image from a file. If the platform does not support
 /// dart:io, null will be returned.
-Future<Image?> decodeGifFile(String path, { int? frame }) async {
+Future<Image?> decodeGifFile(String path, {int? frame}) async {
   final bytes = await readFile(path);
   if (bytes == null) {
     return null;
@@ -356,39 +358,43 @@ Future<Image?> decodeGifFile(String path, { int? frame }) async {
 /// If you know that you have less than 256 colors in your frames
 /// anyway, you should supply a very large [samplingFactor] for maximum
 /// performance.
-Uint8List encodeGif(Image image, {
-    bool singleFrame = false,
-    int repeat = 0,
-    int samplingFactor = 10,
-    DitherKernel dither = DitherKernel.floydSteinberg,
-    bool ditherSerpentine = false }) =>
-    GifEncoder(samplingFactor: samplingFactor, dither: dither,
-        ditherSerpentine: ditherSerpentine).encode(image,
-            singleFrame: singleFrame);
+Uint8List encodeGif(Image image,
+        {bool singleFrame = false,
+        int repeat = 0,
+        int samplingFactor = 10,
+        DitherKernel dither = DitherKernel.floydSteinberg,
+        bool ditherSerpentine = false}) =>
+    GifEncoder(
+            samplingFactor: samplingFactor,
+            dither: dither,
+            ditherSerpentine: ditherSerpentine)
+        .encode(image, singleFrame: singleFrame);
 
 /// Encode an [image] to a GIF file at the given [path].
-Future<bool> encodeGifFile(String path, Image image, {
-    bool singleFrame = false,
+Future<bool> encodeGifFile(String path, Image image,
+    {bool singleFrame = false,
     int repeat = 0,
     int samplingFactor = 10,
     DitherKernel dither = DitherKernel.floydSteinberg,
-    bool ditherSerpentine = false }) async {
+    bool ditherSerpentine = false}) async {
   if (!supportsFileAccess()) {
     return false;
   }
-  final bytes = GifEncoder(samplingFactor: samplingFactor, dither: dither,
-      ditherSerpentine: ditherSerpentine)
+  final bytes = GifEncoder(
+          samplingFactor: samplingFactor,
+          dither: dither,
+          ditherSerpentine: ditherSerpentine)
       .encode(image, singleFrame: singleFrame);
   return writeFile(path, bytes);
 }
 
 /// Decode a TIFF formatted image.
-Image? decodeTiff(Uint8List bytes, { int? frame }) =>
+Image? decodeTiff(Uint8List bytes, {int? frame}) =>
     TiffDecoder().decode(bytes, frame: frame);
 
 /// Decode a TIFF formatted image from a file. If the platform does not support
 /// dart:io, null will be returned.
-Future<Image?> decodeTiffFile(String path, { int? frame }) async {
+Future<Image?> decodeTiffFile(String path, {int? frame}) async {
   final bytes = await readFile(path);
   if (bytes == null) {
     return null;
@@ -396,12 +402,12 @@ Future<Image?> decodeTiffFile(String path, { int? frame }) async {
   return TiffDecoder().decode(bytes, frame: frame);
 }
 
-Uint8List encodeTiff(Image image, { bool singleFrame = false }) =>
+Uint8List encodeTiff(Image image, {bool singleFrame = false}) =>
     TiffEncoder().encode(image, singleFrame: singleFrame);
 
 /// Encode an [image] to a TIFF file at the given [path].
 Future<bool> encodeTiffFile(String path, Image image,
-    { bool singleFrame = false }) async {
+    {bool singleFrame = false}) async {
   if (!supportsFileAccess()) {
     return false;
   }
@@ -410,8 +416,7 @@ Future<bool> encodeTiffFile(String path, Image image,
 }
 
 /// Decode a Photoshop PSD formatted image.
-Image? decodePsd(Uint8List bytes) =>
-    PsdDecoder().decode(bytes);
+Image? decodePsd(Uint8List bytes) => PsdDecoder().decode(bytes);
 
 /// Decode a PSD formatted image from a file. If the platform does not support
 /// dart:io, null will be returned.
@@ -424,8 +429,7 @@ Future<Image?> decodePsdFile(String path) async {
 }
 
 /// Decode an OpenEXR formatted image. EXR is a high dynamic range format.
-Image? decodeExr(Uint8List bytes) =>
-    ExrDecoder().decode(bytes);
+Image? decodeExr(Uint8List bytes) => ExrDecoder().decode(bytes);
 
 /// Decode a EXR formatted image from a file. If the platform does not support
 /// dart:io, null will be returned.
@@ -438,8 +442,7 @@ Future<Image?> decodeExrFile(String path) async {
 }
 
 /// Decode a BMP formatted image.
-Image? decodeBmp(Uint8List bytes) =>
-    BmpDecoder().decode(bytes);
+Image? decodeBmp(Uint8List bytes) => BmpDecoder().decode(bytes);
 
 /// Decode a BMP formatted image from a file. If the platform does not support
 /// dart:io, null will be returned.
@@ -464,12 +467,12 @@ Future<bool> encodeBmpFile(String path, Image image) async {
 }
 
 /// Encode an [Image] to the CUR format.
-Uint8List encodeCur(Image image, { bool singleFrame = false }) =>
+Uint8List encodeCur(Image image, {bool singleFrame = false}) =>
     CurEncoder().encode(image, singleFrame: singleFrame);
 
 /// Encode an [image] to a CUR file at the given [path].
 Future<bool> encodeCurFile(String path, Image image,
-    { bool singleFrame = false }) async {
+    {bool singleFrame = false}) async {
   if (!supportsFileAccess()) {
     return false;
   }
@@ -478,12 +481,12 @@ Future<bool> encodeCurFile(String path, Image image,
 }
 
 /// Decode an ICO image.
-Image? decodeIco(Uint8List bytes, { int? frame }) =>
+Image? decodeIco(Uint8List bytes, {int? frame}) =>
     IcoDecoder().decode(bytes, frame: frame);
 
 /// Decode a ICO formatted image from a file. If the platform does not support
 /// dart:io, null will be returned.
-Future<Image?> decodeIcoFile(String path, { int? frame }) async {
+Future<Image?> decodeIcoFile(String path, {int? frame}) async {
   final bytes = await readFile(path);
   if (bytes == null) {
     return null;
@@ -492,12 +495,12 @@ Future<Image?> decodeIcoFile(String path, { int? frame }) async {
 }
 
 /// Encode an image to the ICO format.
-Uint8List encodeIco(Image image, { bool singleFrame = false }) =>
+Uint8List encodeIco(Image image, {bool singleFrame = false}) =>
     IcoEncoder().encode(image, singleFrame: singleFrame);
 
 /// Encode an [image] to a ICO file at the given [path].
 Future<bool> encodeIcoFile(String path, Image image,
-    { bool singleFrame = false }) async {
+    {bool singleFrame = false}) async {
   if (!supportsFileAccess()) {
     return false;
   }
@@ -506,12 +509,12 @@ Future<bool> encodeIcoFile(String path, Image image,
 }
 
 /// Decode an PVR image.
-Image? decodePvr(Uint8List bytes, { int? frame }) =>
+Image? decodePvr(Uint8List bytes, {int? frame}) =>
     PvrDecoder().decode(bytes, frame: frame);
 
 /// Decode a PVR formatted image from a file. If the platform does not support
 /// dart:io, null will be returned.
-Future<Image?> decodePvrFile(String path, { int? frame }) async {
+Future<Image?> decodePvrFile(String path, {int? frame}) async {
   final bytes = await readFile(path);
   if (bytes == null) {
     return null;
@@ -520,12 +523,12 @@ Future<Image?> decodePvrFile(String path, { int? frame }) async {
 }
 
 /// Encode an image to the PVR format.
-Uint8List encodePvr(Image image, { bool singleFrame = false }) =>
+Uint8List encodePvr(Image image, {bool singleFrame = false}) =>
     PvrEncoder().encode(image, singleFrame: singleFrame);
 
 /// Encode an [image] to a PVR file at the given [path].
 Future<bool> encodePvrFile(String path, Image image,
-    { bool singleFrame = false }) async {
+    {bool singleFrame = false}) async {
   if (!supportsFileAccess()) {
     return false;
   }

@@ -7,8 +7,8 @@ import '../util/math_util.dart';
 /// Apply sketch filter to the image.
 ///
 /// [amount] controls the strength of the effect, in the range \[0, 1\].
-Image sketch(Image src, { num amount = 1, Image? mask,
-    Channel maskChannel = Channel.luminance }) {
+Image sketch(Image src,
+    {num amount = 1, Image? mask, Channel maskChannel = Channel.luminance}) {
   if (amount == 0) {
     return src;
   }
@@ -32,11 +32,11 @@ Image sketch(Image src, { num amount = 1, Image? mask,
       final bottom = orig.getPixel(p.x, py).luminanceNormalized;
       final top = orig.getPixel(p.x, ny).luminanceNormalized;
 
-      final h = -topLeft - 2 * top - topRight + bottomLeft + 2 * bottom +
-          bottomRight;
+      final h =
+          -topLeft - 2 * top - topRight + bottomLeft + 2 * bottom + bottomRight;
 
-      final v = -bottomLeft - 2 * left - topLeft + bottomRight + 2 * right +
-          topRight;
+      final v =
+          -bottomLeft - 2 * left - topLeft + bottomRight + 2 * right + topRight;
 
       final mag = 1 - sqrt(h * h + v * v);
 
@@ -47,9 +47,10 @@ Image sketch(Image src, { num amount = 1, Image? mask,
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       final mx = (msk ?? 1) * amount;
 
-      p..r = mix(p.r, r, mx)
-      ..g = mix(p.g, g, mx)
-      ..b = mix(p.b, b, mx);
+      p
+        ..r = mix(p.r, r, mx)
+        ..g = mix(p.g, g, mx)
+        ..b = mix(p.b, b, mx);
     }
   }
 

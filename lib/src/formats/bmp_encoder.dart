@@ -16,8 +16,9 @@ class BmpEncoder extends Encoder {
     }
     return x + 4 - y;
   }
+
   @override
-  Uint8List encode(Image image, { bool singleFrame = false }) {
+  Uint8List encode(Image image, {bool singleFrame = false}) {
     final out = OutputBuffer();
 
     final nc = image.numChannels;
@@ -31,8 +32,8 @@ class BmpEncoder extends Encoder {
         ..setRgb(1, 255, 255, 255);
     } else if (format == Format.uint1 && nc == 2) {
       // => uint2 palette
-      image = image.convert(format: Format.uint2, numChannels: 1,
-          withPalette: true);
+      image = image.convert(
+          format: Format.uint2, numChannels: 1, withPalette: true);
       palette = image.palette;
     } else if (format == Format.uint1 && nc == 3 && palette == null) {
       // => uint4 palette
@@ -86,14 +87,14 @@ class BmpEncoder extends Encoder {
       bpp = 16;
     }
 
-    final compression = bpp > 8 ? BmpCompression.bitfields
-        : BmpCompression.none;
+    final compression =
+        bpp > 8 ? BmpCompression.bitfields : BmpCompression.none;
 
     final imageStride = image.rowStride;
     final fileStride = ((image.width * bpp + 31) ~/ 32) * 4;
     final rowPaddingSize = fileStride - imageStride;
-    final rowPadding = rowPaddingSize > 0
-        ? List<int>.filled(rowPaddingSize, 0xff) : null;
+    final rowPadding =
+        rowPaddingSize > 0 ? List<int>.filled(rowPaddingSize, 0xff) : null;
 
     final imageFileSize = fileStride * image.height;
     final headerInfoSize = bpp > 8 ? 124 : 40;
@@ -106,21 +107,22 @@ class BmpEncoder extends Encoder {
 
     const sRgb = 0x73524742;
 
-    out..writeUint16(BmpFileHeader.signature)
-    ..writeUint32(fileSize)
-    ..writeUint32(0) // reserved
-    ..writeUint32(imageOffset) // offset to image data
-    ..writeUint32(headerInfoSize)
-    ..writeUint32(image.width)
-    ..writeUint32(image.height)
-    ..writeUint16(1) // planes
-    ..writeUint16(bpp) // bits per pixel
-    ..writeUint32(compression.index) // compression
-    ..writeUint32(imageFileSize)
-    ..writeUint32(11811) // hr
-    ..writeUint32(11811) // vr
-    ..writeUint32(bpp == 8 ? 255 : 0) // totalColors
-    ..writeUint32(bpp == 8 ? 255 : 0); // importantColors
+    out
+      ..writeUint16(BmpFileHeader.signature)
+      ..writeUint32(fileSize)
+      ..writeUint32(0) // reserved
+      ..writeUint32(imageOffset) // offset to image data
+      ..writeUint32(headerInfoSize)
+      ..writeUint32(image.width)
+      ..writeUint32(image.height)
+      ..writeUint16(1) // planes
+      ..writeUint16(bpp) // bits per pixel
+      ..writeUint32(compression.index) // compression
+      ..writeUint32(imageFileSize)
+      ..writeUint32(11811) // hr
+      ..writeUint32(11811) // vr
+      ..writeUint32(bpp == 8 ? 255 : 0) // totalColors
+      ..writeUint32(bpp == 8 ? 255 : 0); // importantColors
 
     if (bpp > 8) {
       final blueMask = bpp == 16 ? 0xf : 0xff;
@@ -128,7 +130,8 @@ class BmpEncoder extends Encoder {
       final redMask = bpp == 16 ? 0xf00 : 0xff0000;
       final alphaMask = bpp == 16 ? 0xf000 : 0xff000000;
 
-      out..writeUint32(redMask) // redMask
+      out
+        ..writeUint32(redMask) // redMask
         ..writeUint32(greenMask) // greenMask
         ..writeUint32(blueMask) // blueMask
         ..writeUint32(alphaMask) // alphaMask
@@ -156,44 +159,48 @@ class BmpEncoder extends Encoder {
         //final palette = image.palette!;
         final l = palette.numColors;
         for (var pi = 0; pi < l; ++pi) {
-          out..writeByte(palette.getBlue(pi).toInt())
-          ..writeByte(palette.getGreen(pi).toInt())
-          ..writeByte(palette.getRed(pi).toInt())
-          ..writeByte(0);
+          out
+            ..writeByte(palette.getBlue(pi).toInt())
+            ..writeByte(palette.getGreen(pi).toInt())
+            ..writeByte(palette.getRed(pi).toInt())
+            ..writeByte(0);
         }
       } else {
         if (bpp == 1) {
-          out..writeByte(0)
-          ..writeByte(0)
-          ..writeByte(0)
-          ..writeByte(0)
-
-          ..writeByte(255)
-          ..writeByte(255)
-          ..writeByte(255)
-          ..writeByte(0);
+          out
+            ..writeByte(0)
+            ..writeByte(0)
+            ..writeByte(0)
+            ..writeByte(0)
+            ..writeByte(255)
+            ..writeByte(255)
+            ..writeByte(255)
+            ..writeByte(0);
         } else if (bpp == 2) {
           for (var pi = 0; pi < 4; ++pi) {
             final v = pi * 85;
-            out..writeByte(v)
-            ..writeByte(v)
-            ..writeByte(v)
-            ..writeByte(0);
+            out
+              ..writeByte(v)
+              ..writeByte(v)
+              ..writeByte(v)
+              ..writeByte(0);
           }
         } else if (bpp == 4) {
           for (var pi = 0; pi < 16; ++pi) {
             final v = pi * 17;
-            out..writeByte(v)
-            ..writeByte(v)
-            ..writeByte(v)
-            ..writeByte(0);
+            out
+              ..writeByte(v)
+              ..writeByte(v)
+              ..writeByte(v)
+              ..writeByte(0);
           }
         } else if (bpp == 8) {
           for (var pi = 0; pi < 256; ++pi) {
-            out..writeByte(pi)
-            ..writeByte(pi)
-            ..writeByte(pi)
-            ..writeByte(0);
+            out
+              ..writeByte(pi)
+              ..writeByte(pi)
+              ..writeByte(pi)
+              ..writeByte(0);
           }
         }
       }
@@ -254,8 +261,9 @@ class BmpEncoder extends Encoder {
       for (var y = h - 1; y >= 0; --y) {
         for (var x = 0; x < w; ++x) {
           final p = image.getPixel(x, y);
-          out..writeByte((p.g.toInt() << 4) | p.b.toInt())
-          ..writeByte((p.a.toInt() << 4) | p.r.toInt());
+          out
+            ..writeByte((p.g.toInt() << 4) | p.b.toInt())
+            ..writeByte((p.a.toInt() << 4) | p.r.toInt());
         }
         if (rowPadding != null) {
           out.writeBytes(rowPadding);
@@ -265,9 +273,10 @@ class BmpEncoder extends Encoder {
       for (var y = h - 1; y >= 0; --y) {
         for (var x = 0; x < w; ++x) {
           final p = image.getPixel(x, y);
-          out..writeByte(p.b.toInt())
-          ..writeByte(p.g.toInt())
-          ..writeByte(p.r.toInt());
+          out
+            ..writeByte(p.b.toInt())
+            ..writeByte(p.g.toInt())
+            ..writeByte(p.r.toInt());
           if (hasAlpha) {
             out.writeByte(p.a.toInt());
           }

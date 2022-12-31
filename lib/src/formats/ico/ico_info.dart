@@ -3,11 +3,7 @@ import '../../util/input_buffer.dart';
 import '../bmp/bmp_info.dart';
 import '../decode_info.dart';
 
-enum IcoType {
-  invalid,
-  ico,
-  cur
-}
+enum IcoType { invalid, ico, cur }
 
 class IcoInfo implements DecodeInfo {
   @override
@@ -40,30 +36,32 @@ class IcoInfo implements DecodeInfo {
 
     final imageCount = input.readUint16();
 
-    final images = List<IcoInfoImage>.generate(imageCount,
+    final images = List<IcoInfoImage>.generate(
+        imageCount,
         (e) => IcoInfoImage(
-          width: input.readByte(),
-          height: input.readByte(),
-          colorPalette: input.readByte(),
-          // ignore 1 byte
-          colorPlanes: (input..skip(1)).readUint16(),
-          bitsPerPixel: input.readUint16(),
-          bytesSize: input.readUint32(),
-          bytesOffset: input.readUint32(),
-        ));
+              width: input.readByte(),
+              height: input.readByte(),
+              colorPalette: input.readByte(),
+              // ignore 1 byte
+              colorPlanes: (input..skip(1)).readUint16(),
+              bitsPerPixel: input.readUint16(),
+              bytesSize: input.readUint32(),
+              bytesOffset: input.readUint32(),
+            ));
 
     return IcoInfo(type: type, numFrames: imageCount, images: images);
   }
 }
 
 class IcoInfoImage {
-  IcoInfoImage({ required this.width,
-        required this.height,
-        required this.colorPalette,
-        required this.bytesSize,
-        required this.bytesOffset,
-        required this.colorPlanes,
-        required this.bitsPerPixel });
+  IcoInfoImage(
+      {required this.width,
+      required this.height,
+      required this.colorPalette,
+      required this.bytesSize,
+      required this.bytesOffset,
+      required this.colorPlanes,
+      required this.bitsPerPixel});
 
   final int width;
   final int height;

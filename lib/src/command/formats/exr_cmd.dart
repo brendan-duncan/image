@@ -7,8 +7,7 @@ import '../command.dart';
 class DecodeExrCmd extends Command {
   Uint8List data;
 
-  DecodeExrCmd(Command? input, this.data)
-      : super(input);
+  DecodeExrCmd(Command? input, this.data) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -21,8 +20,7 @@ class DecodeExrCmd extends Command {
 class DecodeExrFileCmd extends Command {
   String path;
 
-  DecodeExrFileCmd(Command? input, this.path)
-      : super(input);
+  DecodeExrFileCmd(Command? input, this.path) : super(input);
 
   @override
   Future<void> executeCommand() async {

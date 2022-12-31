@@ -42,7 +42,7 @@ enum TrimMode {
 /// coordinates as \[x, y, width, height\]. You could pass these coordinates
 /// to the copyCrop function to crop the image.
 List<int> findTrim(Image src,
-    { TrimMode mode = TrimMode.transparent, Trim sides = Trim.all }) {
+    {TrimMode mode = TrimMode.transparent, Trim sides = Trim.all}) {
   var h = src.height;
   var w = src.width;
 
@@ -115,7 +115,7 @@ List<int> findTrim(Image src,
 /// and can be any combination of [Trim.top], [Trim.bottom], [Trim.left],
 /// and [Trim.right].
 Image trim(Image src,
-    { TrimMode mode = TrimMode.topLeftColor, Trim sides = Trim.all }) {
+    {TrimMode mode = TrimMode.topLeftColor, Trim sides = Trim.all}) {
   if (mode == TrimMode.transparent && src.numChannels == 3) {
     return Image.from(src);
   }
@@ -125,8 +125,8 @@ Image trim(Image src,
   Image? firstFrame;
   for (var frame in src.frames) {
     final dst = firstFrame?.addFrame() ??
-      Image.fromResized(frame, width: crop[2], height: crop[3],
-          noAnimation: true);
+        Image.fromResized(frame,
+            width: crop[2], height: crop[3], noAnimation: true);
     firstFrame ??= dst;
 
     compositeImage(dst, src,

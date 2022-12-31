@@ -304,7 +304,9 @@ final exifImageTags = <int, ExifTag>{
   0x9010: ExifTag('OffsetTime', IfdValueType.ascii),
   0x9011: ExifTag('OffsetTimeOriginal', IfdValueType.ascii),
   0x9012: ExifTag('OffsetTimeDigitized', IfdValueType.ascii),
-  0x9101: ExifTag('ComponentsConfiguration', ),
+  0x9101: ExifTag(
+    'ComponentsConfiguration',
+  ),
   0x9102: ExifTag('CompressedBitsPerPixel'),
   0x9201: ExifTag('ShutterSpeedValue'),
   0x9202: ExifTag('ApertureValue'),

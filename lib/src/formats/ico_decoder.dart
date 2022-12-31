@@ -31,7 +31,7 @@ class IcoDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, { int? frame }) {
+  Image? decode(Uint8List bytes, {int? frame}) {
     final info = startDecode(bytes);
     if (info == null) {
       return null;
@@ -48,8 +48,7 @@ class IcoDecoder extends Decoder {
         continue;
       }
       if (firstImage == null) {
-        firstImage = frame
-        ..frameType = FrameType.sequence;
+        firstImage = frame..frameType = FrameType.sequence;
       } else {
         firstImage.addFrame(frame);
       }
@@ -97,8 +96,9 @@ class IcoDecoder extends Decoder {
     }
 
     bmpInfo.header.imageOffset = offset;
-    dummyBmpHeader..length -= 4
-    ..writeUint32(offset);
+    dummyBmpHeader
+      ..length -= 4
+      ..writeUint32(offset);
     final inp = InputBuffer(imageBuffer);
     final bmp = DibDecoder(inp, bmpInfo, forceRgba: true);
 
@@ -109,8 +109,8 @@ class IcoDecoder extends Decoder {
     }
 
     final padding = 32 - bmpInfo.width % 32;
-    final rowLength = (padding == 32 ? bmpInfo.width
-        : bmpInfo.width + padding) ~/ 8;
+    final rowLength =
+        (padding == 32 ? bmpInfo.width : bmpInfo.width + padding) ~/ 8;
 
     // AND bitmask
     for (var y = 0; y < bmpInfo.height; y++) {
@@ -155,4 +155,3 @@ class IcoDecoder extends Decoder {
   @override
   int numFrames() => _icoInfo?.numFrames ?? 0;
 }
-

@@ -11,10 +11,16 @@ import 'fill_circle.dart';
 ///
 /// If [antialias] is true then the line is drawn with smooth edges.
 /// [thickness] determines how thick the line should be drawn, in pixels.
-Image drawLine(Image image, { required int x1, required int y1,
-    required int x2, required int y2, required Color color,
-    bool antialias = false, num thickness = 1, Image? mask,
-    Channel maskChannel = Channel.luminance }) {
+Image drawLine(Image image,
+    {required int x1,
+    required int y1,
+    required int x2,
+    required int y2,
+    required Color color,
+    bool antialias = false,
+    num thickness = 1,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   final line = [x1, y1, x2, y2];
   if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
     return image;
@@ -34,8 +40,13 @@ Image drawLine(Image image, { required int x1, required int y1,
   if (dx == 0 && dy == 0) {
     thickness == 1
         ? drawPixel(image, x1, y1, color, mask: mask, maskChannel: maskChannel)
-        : fillCircle(image, x: x1, y: y1, radius: radius, color: color,
-            mask: mask, maskChannel: maskChannel);
+        : fillCircle(image,
+            x: x1,
+            y: y1,
+            radius: radius,
+            color: color,
+            mask: mask,
+            maskChannel: maskChannel);
     return image;
   }
 
@@ -47,8 +58,8 @@ Image drawLine(Image image, { required int x1, required int y1,
           drawPixel(image, x1, y, color, mask: mask, maskChannel: maskChannel);
         } else {
           for (var i = 0; i < thickness; i++) {
-            drawPixel(image, x1 - radius + i, y, color, mask: mask,
-                maskChannel: maskChannel);
+            drawPixel(image, x1 - radius + i, y, color,
+                mask: mask, maskChannel: maskChannel);
           }
         }
       }
@@ -58,8 +69,8 @@ Image drawLine(Image image, { required int x1, required int y1,
           drawPixel(image, x1, y, color, mask: mask, maskChannel: maskChannel);
         } else {
           for (var i = 0; i < thickness; i++) {
-            drawPixel(image, x1 - radius + i, y, color, mask: mask,
-                maskChannel: maskChannel);
+            drawPixel(image, x1 - radius + i, y, color,
+                mask: mask, maskChannel: maskChannel);
           }
         }
       }
@@ -72,8 +83,8 @@ Image drawLine(Image image, { required int x1, required int y1,
           drawPixel(image, x, y1, color, mask: mask, maskChannel: maskChannel);
         } else {
           for (var i = 0; i < thickness; i++) {
-            drawPixel(image, x, y1 - radius + i, color, mask: mask,
-                maskChannel: maskChannel);
+            drawPixel(image, x, y1 - radius + i, color,
+                mask: mask, maskChannel: maskChannel);
           }
         }
       }
@@ -83,8 +94,8 @@ Image drawLine(Image image, { required int x1, required int y1,
           drawPixel(image, x, y1, color, mask: mask, maskChannel: maskChannel);
         } else {
           for (var i = 0; i < thickness; i++) {
-            drawPixel(image, x, y1 - radius + i, color, mask: mask,
-                maskChannel: maskChannel);
+            drawPixel(image, x, y1 - radius + i, color,
+                mask: mask, maskChannel: maskChannel);
           }
         }
       }
@@ -270,11 +281,14 @@ Image drawLine(Image image, { required int x1, required int y1,
     for (var x = x1; x <= x2; x++) {
       final wstart = y - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
-        drawPixel(image, x, w, color, alpha: ((frac >> 8) & 0xff) / 255,
-            mask: mask, maskChannel: maskChannel);
+        drawPixel(image, x, w, color,
+            alpha: ((frac >> 8) & 0xff) / 255,
+            mask: mask,
+            maskChannel: maskChannel);
 
         drawPixel(image, x, w + 1, color,
-            alpha: ((xor(frac) >> 8) & 0xff) / 255, mask: mask,
+            alpha: ((xor(frac) >> 8) & 0xff) / 255,
+            mask: mask,
             maskChannel: maskChannel);
       }
 
@@ -306,11 +320,14 @@ Image drawLine(Image image, { required int x1, required int y1,
     for (var y = y1; y <= y2; y++) {
       final wstart = x - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
-        drawPixel(image, w, y, color, alpha: ((frac >> 8) & 0xff) / 255,
-            mask: mask, maskChannel: maskChannel);
+        drawPixel(image, w, y, color,
+            alpha: ((frac >> 8) & 0xff) / 255,
+            mask: mask,
+            maskChannel: maskChannel);
 
         drawPixel(image, w + 1, y, color,
-            alpha: ((xor(frac) >> 8) & 0xff) / 255, mask: mask,
+            alpha: ((xor(frac) >> 8) & 0xff) / 255,
+            mask: mask,
             maskChannel: maskChannel);
       }
 

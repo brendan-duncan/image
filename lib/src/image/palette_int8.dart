@@ -7,12 +7,12 @@ class PaletteInt8 extends Palette {
   final Int8List data;
 
   PaletteInt8(int numPixelColors, int numChannels)
-      : data = Int8List(numPixelColors * numChannels)
-      , super(numPixelColors, numChannels);
+      : data = Int8List(numPixelColors * numChannels),
+        super(numPixelColors, numChannels);
 
   PaletteInt8.from(PaletteInt8 other)
-      : data = Int8List.fromList(other.data)
-      , super(other.numColors, other.numChannels);
+      : data = Int8List.fromList(other.data),
+        super(other.numColors, other.numChannels);
 
   @override
   PaletteInt8 clone() => PaletteInt8.from(this);
@@ -63,9 +63,7 @@ class PaletteInt8 extends Palette {
 
   @override
   num get(int index, int channel) =>
-      channel < numChannels ?
-      data[index * numChannels + channel] :
-      0;
+      channel < numChannels ? data[index * numChannels + channel] : 0;
 
   @override
   num getRed(int index) {

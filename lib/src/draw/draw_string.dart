@@ -12,9 +12,15 @@ import 'draw_pixel.dart';
 /// You can load your own font, or use one of the existing ones
 /// such as: arial14, arial24, or arial48.
 ///  Fonts can be create with a tool such as: https://ttf2fnt.com/
-Image drawString(Image image, String string, { required BitmapFont font,
-    int? x, int? y, Color? color, bool rightJustify = false, bool wrap = false,
-    Image? mask, Channel maskChannel = Channel.luminance }) {
+Image drawString(Image image, String string,
+    {required BitmapFont font,
+    int? x,
+    int? y,
+    Color? color,
+    bool rightJustify = false,
+    bool wrap = false,
+    Image? mask,
+    Channel maskChannel = Channel.luminance}) {
   if (color?.a == 0) {
     return image;
   }
@@ -65,8 +71,14 @@ Image drawString(Image image, String string, { required BitmapFont font,
           return image;
         }
 
-        drawString(image, subString, font: font, x: sx, y: sy, color: color,
-            mask: mask, maskChannel: maskChannel, rightJustify: rightJustify);
+        drawString(image, subString,
+            font: font,
+            x: sx,
+            y: sy,
+            color: color,
+            mask: mask,
+            maskChannel: maskChannel,
+            rightJustify: rightJustify);
 
         subString = "";
         x2 = sx;
@@ -79,8 +91,14 @@ Image drawString(Image image, String string, { required BitmapFont font,
       }
 
       if (subString.isNotEmpty) {
-        drawString(image, subString, font: font, x: sx, y: sy, color: color,
-            mask: mask, maskChannel: maskChannel, rightJustify: rightJustify);
+        drawString(image, subString,
+            font: font,
+            x: sx,
+            y: sy,
+            color: color,
+            mask: mask,
+            maskChannel: maskChannel,
+            rightJustify: rightJustify);
       }
     }
 

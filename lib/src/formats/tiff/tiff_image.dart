@@ -202,7 +202,8 @@ class TiffImage {
         }
         break;
       case TiffPhotometricType.yCbCr:
-        if (compression == TiffCompression.jpeg && bitsPerSample == 8 &&
+        if (compression == TiffCompression.jpeg &&
+            bitsPerSample == 8 &&
             samplesPerPixel == 3) {
           imageType = TiffImageType.rgb;
         } else {
@@ -235,32 +236,46 @@ class TiffImage {
   Image decode(InputBuffer p) {
     final isFloat = sampleFormat == TiffFormat.float;
     final isInt = sampleFormat == TiffFormat.int;
-    final format = bitsPerSample == 1 ? Format.uint1
-        : bitsPerSample == 2 ? Format.uint2
-        : bitsPerSample == 4 ? Format.uint4
-        : isFloat && bitsPerSample == 16 ? Format.float16
-        : isFloat && bitsPerSample == 32 ? Format.float32
-        : isFloat && bitsPerSample == 64 ? Format.float64
-        : isInt && bitsPerSample == 8 ? Format.int8
-        : isInt && bitsPerSample == 16 ? Format.int16
-        : isInt && bitsPerSample == 32 ? Format.int32
-        : bitsPerSample == 16 ? Format.uint16
-        : bitsPerSample == 32 ? Format.uint32
-        : Format.uint8;
-    final hasPalette = colorMap != null &&
-        photometricType == TiffPhotometricType.palette;
+    final format = bitsPerSample == 1
+        ? Format.uint1
+        : bitsPerSample == 2
+            ? Format.uint2
+            : bitsPerSample == 4
+                ? Format.uint4
+                : isFloat && bitsPerSample == 16
+                    ? Format.float16
+                    : isFloat && bitsPerSample == 32
+                        ? Format.float32
+                        : isFloat && bitsPerSample == 64
+                            ? Format.float64
+                            : isInt && bitsPerSample == 8
+                                ? Format.int8
+                                : isInt && bitsPerSample == 16
+                                    ? Format.int16
+                                    : isInt && bitsPerSample == 32
+                                        ? Format.int32
+                                        : bitsPerSample == 16
+                                            ? Format.uint16
+                                            : bitsPerSample == 32
+                                                ? Format.uint32
+                                                : Format.uint8;
+    final hasPalette =
+        colorMap != null && photometricType == TiffPhotometricType.palette;
     final numChannels = hasPalette ? 3 : samplesPerPixel;
 
-    final image = Image(width: width, height: height, format: format,
-        numChannels: numChannels, withPalette: hasPalette);
+    final image = Image(
+        width: width,
+        height: height,
+        format: format,
+        numChannels: numChannels,
+        withPalette: hasPalette);
 
     if (hasPalette) {
       final p = image.palette!;
       final cm = colorMap!;
       final numColors = cm.length ~/ 3;
       for (var i = 0; i < numColors; ++i) {
-        p.setRgb(i, cm[colorMapRed + i],
-            cm[colorMapGreen + i],
+        p.setRgb(i, cm[colorMapRed + i], cm[colorMapGreen + i],
             cm[colorMapBlue + i]);
       }
     }
@@ -299,7 +314,9 @@ class TiffImage {
     }
 
     InputBuffer byteData;
-    if (bitsPerSample == 8 || bitsPerSample == 16 || bitsPerSample == 32 ||
+    if (bitsPerSample == 8 ||
+        bitsPerSample == 16 ||
+        bitsPerSample == 32 ||
         bitsPerSample == 64) {
       if (compression == TiffCompression.none) {
         byteData = p;
@@ -307,8 +324,8 @@ class TiffImage {
         byteData = InputBuffer(Uint8List(bytesInThisTile));
         final decoder = LzwDecoder();
         try {
-          decoder.decode(InputBuffer.from(p, length: byteCount),
-              byteData.buffer);
+          decoder.decode(
+              InputBuffer.from(p, length: byteCount), byteData.buffer);
         } catch (e) {
           //print(e);
         }
@@ -553,8 +570,8 @@ class TiffImage {
     }
   }
 
-  void _jpegToImage(Image tile, Image image, int outX, int outY,
-      int tileWidth, int tileHeight) {
+  void _jpegToImage(Image tile, Image image, int outX, int outY, int tileWidth,
+      int tileHeight) {
     final width = tileWidth;
     final height = tileHeight;
     for (var y = 0; y < height; y++) {
@@ -633,8 +650,8 @@ class TiffImage {
     } else if (compression == TiffCompression.lzw) {
       byteData = InputBuffer(Uint8List(tileWidth * tileHeight));
 
-      LzwDecoder().decode(InputBuffer.from(p, length: byteCount),
-          byteData.buffer);
+      LzwDecoder()
+          .decode(InputBuffer.from(p, length: byteCount), byteData.buffer);
 
       // Horizontal Differencing Predictor
       if (predictor == 2) {
@@ -741,12 +758,7 @@ class TiffImage {
   }
 }
 
-enum TiffFormat {
-  invalid,
-  uint,
-  int,
-  float
-}
+enum TiffFormat { invalid, uint, int, float }
 
 enum TiffPhotometricType {
   whiteIsZero, // = 0

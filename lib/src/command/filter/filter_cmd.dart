@@ -7,8 +7,7 @@ typedef FilterFunction = Image Function(Image image);
 class FilterCmd extends Command {
   final FilterFunction _filter;
 
-  FilterCmd(Command? input, this._filter)
-      : super(input);
+  FilterCmd(Command? input, this._filter) : super(input);
 
   @override
   Future<void> executeCommand() async {
@@ -27,7 +26,8 @@ class FilterCmd extends Command {
     }
 
     if (hasNewImage) {
-      outputImage = newImages.first == img ? Image.from(img!, noAnimation: true)
+      outputImage = newImages.first == img
+          ? Image.from(img!, noAnimation: true)
           : newImages[0];
       final numFrames = newImages.length;
       for (var i = 1; i < numFrames; ++i) {

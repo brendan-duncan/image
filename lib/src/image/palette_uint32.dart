@@ -7,12 +7,12 @@ class PaletteUint32 extends Palette {
   final Uint32List data;
 
   PaletteUint32(int numColors, int numChannels)
-      : data = Uint32List(numColors * numChannels)
-      , super(numColors, numChannels);
+      : data = Uint32List(numColors * numChannels),
+        super(numColors, numChannels);
 
   PaletteUint32.from(PaletteUint32 other)
-      : data = Uint32List.fromList(other.data)
-      , super(other.numColors, other.numChannels);
+      : data = Uint32List.fromList(other.data),
+        super(other.numColors, other.numChannels);
 
   @override
   PaletteUint32 clone() => PaletteUint32.from(this);
@@ -63,9 +63,7 @@ class PaletteUint32 extends Palette {
 
   @override
   num get(int index, int channel) =>
-      channel < numChannels ?
-      data[index * numChannels + channel] :
-      0;
+      channel < numChannels ? data[index * numChannels + channel] : 0;
 
   @override
   num getRed(int index) {

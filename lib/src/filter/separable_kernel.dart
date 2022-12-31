@@ -8,8 +8,7 @@ class SeparableKernel {
   final int size;
 
   /// Create a separable convolution kernel for the given [size].
-  SeparableKernel(this.size)
-      : coefficients = List<num>.filled(2 * size + 1, 0);
+  SeparableKernel(this.size) : coefficients = List<num>.filled(2 * size + 1, 0);
 
   /// Get the number of coefficients in the kernel.
   int get length => coefficients.length;
@@ -26,17 +25,19 @@ class SeparableKernel {
   /// for a single dimension. If [horizontal is true, the filter will be
   /// applied to the horizontal axis, otherwise it will be applied to the
   /// vertical axis.
-  void apply(Image src, Image dst, { bool horizontal = true,
-      Image? mask, Channel maskChannel = Channel.luminance }) {
+  void apply(Image src, Image dst,
+      {bool horizontal = true,
+      Image? mask,
+      Channel maskChannel = Channel.luminance}) {
     if (horizontal) {
       for (var y = 0; y < src.height; ++y) {
-        _applyCoefficientsLine(src, dst, y, src.width, horizontal,
-            mask, maskChannel);
+        _applyCoefficientsLine(
+            src, dst, y, src.width, horizontal, mask, maskChannel);
       }
     } else {
       for (var x = 0; x < src.width; ++x) {
-        _applyCoefficientsLine(src, dst, x, src.height, horizontal,
-            mask, maskChannel);
+        _applyCoefficientsLine(
+            src, dst, x, src.height, horizontal, mask, maskChannel);
       }
     }
   }
@@ -84,10 +85,11 @@ class SeparableKernel {
       if (msk == null) {
         p.setRgba(r, g, b, a);
       } else {
-        p..r = mix(p.r, r, msk)
-        ..g = mix(p.g, g, msk)
-        ..b = mix(p.b, b, msk)
-        ..a = mix(p.a, a, msk);
+        p
+          ..r = mix(p.r, r, msk)
+          ..g = mix(p.g, g, msk)
+          ..b = mix(p.b, b, msk)
+          ..a = mix(p.a, a, msk);
       }
     }
   }

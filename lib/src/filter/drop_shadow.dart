@@ -9,7 +9,7 @@ import 'scale_rgba.dart';
 
 /// Create a drop-shadow effect for the image.
 Image dropShadow(Image src, int hShadow, int vShadow, int blur,
-    { Color? shadowColor }) {
+    {Color? shadowColor}) {
   if (blur < 0) {
     blur = 0;
   }
@@ -46,9 +46,9 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur,
     newImageHeight = shadowHeight + shadowOffsetY + vShadow;
   }
 
-  final dst = Image(width: newImageWidth, height: newImageHeight,
-      numChannels: 4)
-  ..clear(ColorRgba8(255, 255, 255, 0));
+  final dst =
+      Image(width: newImageWidth, height: newImageHeight, numChannels: 4)
+        ..clear(ColorRgba8(255, 255, 255, 0));
 
   compositeImage(dst, src, dstX: shadowOffsetX, dstY: shadowOffsetY);
 

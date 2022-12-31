@@ -45,8 +45,8 @@ class WebPFilters {
         data, width, height, stride, 0, height, false, filteredData);
   }
 
-  static void verticalUnfilter(int width, int height, int stride, int row,
-      int numRows, Uint8List data) {
+  static void verticalUnfilter(
+      int width, int height, int stride, int row, int numRows, Uint8List data) {
     _doVerticalFilter(data, width, height, stride, row, numRows, true, data);
   }
 
@@ -56,8 +56,8 @@ class WebPFilters {
         data, width, height, stride, 0, height, false, filteredData);
   }
 
-  static void gradientUnfilter(int width, int height, int stride, int row,
-      int numRows, Uint8List data) {
+  static void gradientUnfilter(
+      int width, int height, int stride, int row, int numRows, Uint8List data) {
     _doGradientFilter(data, width, height, stride, row, numRows, true, data);
   }
 

@@ -25,8 +25,10 @@ Future<Uint8List?> _getBytes(_Params p) async {
 
 Future<ExecuteResult> _getResult(_Params p) async {
   await p.command?.execute();
-  Isolate.exit(p.port, ExecuteResult(p.command?.outputImage,
-      p.command?.outputBytes, p.command?.outputObject));
+  Isolate.exit(
+      p.port,
+      ExecuteResult(p.command?.outputImage, p.command?.outputBytes,
+          p.command?.outputObject));
 }
 
 Future<ExecuteResult> executeCommandAsync(Command? command) async {

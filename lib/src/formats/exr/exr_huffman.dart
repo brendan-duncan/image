@@ -23,7 +23,9 @@ class ExrHuffman {
     compressed.skip(4); // tableLength
     final nBits = compressed.readUint32();
 
-    if (im < 0 || im >= _huffmanEncodingSize || iM < 0 ||
+    if (im < 0 ||
+        im >= _huffmanEncodingSize ||
+        iM < 0 ||
         iM >= _huffmanEncodingSize) {
       throw ImageException('Invalid huffman table size');
     }
@@ -31,8 +33,9 @@ class ExrHuffman {
     compressed.skip(4);
 
     final freq = List<int>.filled(_huffmanEncodingSize, 0);
-    final hdec = List<ExrHufDec>.generate(_huffmanDecodingSize, (_) =>
-        ExrHufDec(), growable: false);
+    final hdec = List<ExrHufDec>.generate(
+        _huffmanDecodingSize, (_) => ExrHufDec(),
+        growable: false);
 
     unpackEncTable(compressed, nCompressed - 20, im, iM, freq);
 
@@ -58,8 +61,8 @@ class ExrHuffman {
 
       // Access decoding table
       while (cLc[1] >= _huffmanDecodingBits) {
-        final pl = hdecod[(cLc[0] >> (cLc[1] - _huffmanDecodingBits)) &
-            _huffmanDecodingMask];
+        final pl = hdecod[
+            (cLc[0] >> (cLc[1] - _huffmanDecodingBits)) & _huffmanDecodingMask];
 
         if (pl.len != 0) {
           // Get short code
@@ -106,8 +109,8 @@ class ExrHuffman {
     cLc[1] -= i;
 
     while (cLc[1] > 0) {
-      final pl = hdecod[(cLc[0] << (_huffmanDecodingBits - cLc[1])) &
-          _huffmanDecodingMask];
+      final pl = hdecod[
+          (cLc[0] << (_huffmanDecodingBits - cLc[1])) & _huffmanDecodingMask];
 
       if (pl.len != 0) {
         cLc[1] -= pl.len;
@@ -209,8 +212,9 @@ class ExrHuffman {
                 '(invalid code table entry).');
           }
 
-          pl..len = l
-          ..lit = im;
+          pl
+            ..len = l
+            ..lit = im;
         }
       }
     }

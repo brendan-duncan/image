@@ -9,11 +9,10 @@ late img.Image origImage;
 
 void _addControl(String label, String value, DivElement parent,
     void Function(double) callback) {
-  final amountLabel = LabelElement()
-  ..text = '$label:';
+  final amountLabel = LabelElement()..text = '$label:';
   final amountEdit = InputElement()
-  ..value = value
-  ..id = '${label}_edit';
+    ..value = value
+    ..id = '${label}_edit';
   amountEdit.onChange.listen((e) {
     try {
       final d = double.parse(amountEdit.value!);
@@ -24,16 +23,15 @@ void _addControl(String label, String value, DivElement parent,
   });
   amountLabel.htmlFor = '${label}_edit';
   parent.append(amountLabel)
-  ..append(amountEdit)
-  ..append(ParagraphElement());
+    ..append(amountEdit)
+    ..append(ParagraphElement());
 }
 
 void testSepia() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1')
-  ..text = 'Sepia';
+  final label = Element.tag('h1')..text = 'Sepia';
   sidebar.children.add(label);
 
   num amount = 1.0;
@@ -44,8 +42,8 @@ void testSepia() {
     image = img.sepia(image, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.toUint8List());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.toUint8List());
 
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
@@ -66,8 +64,7 @@ void testSobel() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1')
-  ..text = 'Sepia';
+  final label = Element.tag('h1')..text = 'Sepia';
   sidebar.children.add(label);
 
   num amount = 1.0;
@@ -78,8 +75,8 @@ void testSobel() {
     image = img.sobel(image, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.toUint8List());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -99,8 +96,7 @@ void testGaussian() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1')
-  ..text = 'Gaussian Blur';
+  final label = Element.tag('h1')..text = 'Gaussian Blur';
   sidebar.children.add(label);
 
   var radius = 5;
@@ -111,8 +107,8 @@ void testGaussian() {
     image = img.gaussianBlur(image, radius: radius);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.toUint8List());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -132,8 +128,7 @@ void testVignette() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1')
-  ..text = 'Vignette';
+  final label = Element.tag('h1')..text = 'Vignette';
   sidebar.children.add(label);
 
   num start = 0.3;
@@ -146,8 +141,8 @@ void testVignette() {
     image = img.vignette(image, start: start, end: end, amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.toUint8List());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -177,8 +172,7 @@ void testPixelate() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1')
-  ..text = 'Pixelate';
+  final label = Element.tag('h1')..text = 'Pixelate';
   sidebar.children.add(label);
 
   var blockSize = 5;
@@ -189,8 +183,8 @@ void testPixelate() {
     image = img.pixelate(image, size: blockSize);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.toUint8List());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -210,8 +204,7 @@ void testColorOffset() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1')
-  ..text = 'Pixelate';
+  final label = Element.tag('h1')..text = 'Pixelate';
   sidebar.children.add(label);
 
   var red = 0;
@@ -222,12 +215,12 @@ void testColorOffset() {
   void apply() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
-    image = img.colorOffset(image, red: red, green: green, blue: blue,
-        alpha: alpha);
+    image = img.colorOffset(image,
+        red: red, green: green, blue: blue, alpha: alpha);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.toUint8List());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -262,8 +255,7 @@ void testAdjustColor() {
   final sidebar = document.querySelector('#sidebar') as DivElement;
   sidebar.children.clear();
 
-  final label = Element.tag('h1')
-  ..text = 'Adjust Color';
+  final label = Element.tag('h1')..text = 'Adjust Color';
   sidebar.children.add(label);
 
   num contrast = 1.0;
@@ -288,8 +280,8 @@ void testAdjustColor() {
         amount: amount);
 
     // Fill the buffer with our image data.
-    filterImageData.data.setRange(0, filterImageData.data.length,
-        image.toUint8List());
+    filterImageData.data
+        .setRange(0, filterImageData.data.length, image.toUint8List());
     // Draw the buffer onto the canvas.
     canvas.context2D.clearRect(0, 0, canvas.width!, canvas.height!);
     canvas.context2D.putImageData(filterImageData, 0, 0);
@@ -362,20 +354,23 @@ void main() {
   final image = ImageElement(src: 'res/big_buck_bunny.jpg');
   image.onLoad.listen((e) {
     final c = CanvasElement()
-    ..width = image.width
-    ..height = image.height
-    ..context2D.drawImage(image, 0, 0);
+      ..width = image.width
+      ..height = image.height
+      ..context2D.drawImage(image, 0, 0);
 
-    final imageData = c.context2D.getImageData(0, 0, image.width!,
-        image.height!);
+    final imageData =
+        c.context2D.getImageData(0, 0, image.width!, image.height!);
 
-    origImage = img.Image.fromBytes(width: image.width!, height: image.height!,
-        bytes: imageData.data.buffer, numChannels: 4);
+    origImage = img.Image.fromBytes(
+        width: image.width!,
+        height: image.height!,
+        bytes: imageData.data.buffer,
+        numChannels: 4);
 
     canvas.width = image.width;
     canvas.height = image.height;
-    filterImageData = canvas.context2D.createImageData(image.width,
-        image.height);
+    filterImageData =
+        canvas.context2D.createImageData(image.width, image.height);
 
     testSepia();
   });

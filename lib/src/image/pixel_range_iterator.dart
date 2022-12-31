@@ -8,10 +8,10 @@ class PixelRangeIterator extends Iterator<Pixel> {
   int y2;
 
   PixelRangeIterator(this.pixel, int x, int y, int width, int height)
-      : x1 = x
-      , y1 = y
-      , x2 = x + width - 1
-      , y2 = y + height - 1 {
+      : x1 = x,
+        y1 = y,
+        x2 = x + width - 1,
+        y2 = y + height - 1 {
     pixel.setPosition(x - 1, y);
   }
 

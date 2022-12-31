@@ -3,8 +3,8 @@ import '../image/image.dart';
 import '../util/math_util.dart';
 
 /// Apply chromatic aberration filter to the image.
-Image chromaticAberration(Image src, { int shift = 5,
-    Image? mask, Channel maskChannel = Channel.luminance }) {
+Image chromaticAberration(Image src,
+    {int shift = 5, Image? mask, Channel maskChannel = Channel.luminance}) {
   for (final frame in src.frames) {
     final orig = frame.clone(noAnimation: true);
     final w = frame.width - 1;
@@ -17,11 +17,13 @@ Image chromaticAberration(Image src, { int shift = 5,
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
 
       if (msk == null) {
-        p..r = rc.r
-        ..b = lc.b;
+        p
+          ..r = rc.r
+          ..b = lc.b;
       } else {
-        p..r = mix(p.r, rc.r, msk)
-        ..b = mix(p.b, lc.b, msk);
+        p
+          ..r = mix(p.r, rc.r, msk)
+          ..b = mix(p.b, lc.b, msk);
       }
     }
   }

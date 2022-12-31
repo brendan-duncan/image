@@ -19,25 +19,26 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   final ImageDataUint4 image;
 
   PixelUint4.imageData(this.image)
-      : _x = -1
-      , _y = 0
-      , _index = 0
-      , _bitIndex = -(image.numChannels << 2);
+      : _x = -1,
+        _y = 0,
+        _index = 0,
+        _bitIndex = -(image.numChannels << 2);
 
   PixelUint4.image(Image image)
-      : _x = -1
-      , _y = 0
-      , _index = 0
-      , _bitIndex = -(image.numChannels << 2)
-      , image = image.data is ImageDataUint4 ? image.data as ImageDataUint4
-          : ImageDataUint4(0, 0, 0);
+      : _x = -1,
+        _y = 0,
+        _index = 0,
+        _bitIndex = -(image.numChannels << 2),
+        image = image.data is ImageDataUint4
+            ? image.data as ImageDataUint4
+            : ImageDataUint4(0, 0, 0);
 
   PixelUint4.from(PixelUint4 other)
-      : _x = other._x
-      , _y = other._y
-      , _index = other._index
-      , _bitIndex = other._bitIndex
-      , image = other.image;
+      : _x = other._x,
+        _y = other._y,
+        _index = other._index,
+        _bitIndex = other._bitIndex,
+        image = other.image;
 
   @override
   PixelUint4 clone() => PixelUint4.from(this);
@@ -77,8 +78,8 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   bool get isHdrFormat => image.isHdrFormat;
 
   @override
-  bool get isValid => x >= 0 && x < (image.width - 1) &&
-      y >= 0 && y < (image.height - 1);
+  bool get isValid =>
+      x >= 0 && x < (image.width - 1) && y >= 0 && y < (image.height - 1);
 
   @override
   int get x => _x;
@@ -105,10 +106,13 @@ class PixelUint4 extends Iterable<num> implements Pixel {
     final bpp = image.numChannels * 4;
     final w = image.width;
     final rowStride = image.rowStride;
-    _index = bpp == 4 ? _y * rowStride + (_x >> 1)
-        : bpp == 8 ? _y * w + _x
-        : bpp == 16 ? _y * rowStride + (_x << 1)
-        : _y * rowStride + ((_x * bpp) >> 3);
+    _index = bpp == 4
+        ? _y * rowStride + (_x >> 1)
+        : bpp == 8
+            ? _y * w + _x
+            : bpp == 16
+                ? _y * rowStride + (_x << 1)
+                : _y * rowStride + ((_x * bpp) >> 3);
     _bitIndex = bpp > 7 ? (_x * bpp) & 0x4 : (_x * bpp) & 0x7;
   }
 
@@ -156,7 +160,10 @@ class PixelUint4 extends Iterable<num> implements Pixel {
     return (image.data[i] >> bi) & 0xf;
   }
 
-  num _getChannel(int ci) => palette == null ? numChannels > ci ? _get(ci)  : 0
+  num _getChannel(int ci) => palette == null
+      ? numChannels > ci
+          ? _get(ci)
+          : 0
       : palette!.get(_get(0), ci);
 
   void _setChannel(int ci, num value) {
@@ -180,9 +187,9 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num operator[](int i) => _getChannel(i);
+  num operator [](int i) => _getChannel(i);
   @override
-  void operator[]=(int i, num value) => _setChannel(i, value);
+  void operator []=(int i, num value) => _setChannel(i, value);
 
   @override
   num get index => _get(0);
@@ -235,9 +242,11 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance ?
-      luminance : channel.index < numChannels ? _getChannel(channel.index)
-      : 0;
+  num getChannel(Channel channel) => channel == Channel.luminance
+      ? luminance
+      : channel.index < numChannels
+          ? _getChannel(channel.index)
+          : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -286,7 +295,7 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator==(Object? other) {
+  bool operator ==(Object? other) {
     if (other is PixelUint4) {
       return hashCode == other.hashCode;
     }
@@ -322,7 +331,7 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   int get hashCode => Object.hashAll(toList());
 
   @override
-  Color convert({ Format? format, int? numChannels, num? alpha }) =>
-      convertColor(this, format: format, numChannels: numChannels,
-          alpha: alpha);
+  Color convert({Format? format, int? numChannels, num? alpha}) =>
+      convertColor(this,
+          format: format, numChannels: numChannels, alpha: alpha);
 }

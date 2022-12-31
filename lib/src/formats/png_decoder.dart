@@ -68,7 +68,7 @@ class PngDecoder extends Decoder {
               break;
             }
           }
-          _input.skip(4);//crc
+          _input.skip(4); //crc
           break;
         case 'IHDR':
           final hdr = InputBuffer.from(_input.readBytes(chunkSize));
@@ -176,16 +176,15 @@ class PngDecoder extends Decoder {
           break;
         case 'fcTL': // Frame control chunk
           final frame = InternalPngFrame(
-            sequenceNumber: _input.readUint32(),
-            width: _input.readUint32(),
-            height: _input.readUint32(),
-            xOffset: _input.readUint32(),
-            yOffset: _input.readUint32(),
-            delayNum: _input.readUint16(),
-            delayDen: _input.readUint16(),
-            dispose: PngDisposeMode.values[_input.readByte()],
-            blend: PngBlendMode.values[_input.readByte()]
-          );
+              sequenceNumber: _input.readUint32(),
+              width: _input.readUint32(),
+              height: _input.readUint32(),
+              xOffset: _input.readUint32(),
+              yOffset: _input.readUint32(),
+              delayNum: _input.readUint16(),
+              delayDen: _input.readUint16(),
+              dispose: PngDisposeMode.values[_input.readByte()],
+              blend: PngBlendMode.values[_input.readByte()]);
           _info.frames.add(frame);
           _input.skip(4); // CRC
           break;
@@ -206,8 +205,8 @@ class PngDecoder extends Decoder {
             final b = _info.palette![p3 + 2]!;
             if (_info.transparency != null) {
               final isTransparent = _info.transparency!.contains(paletteIndex);
-              _info.backgroundColor = ColorRgba8(r, g, b,
-                  isTransparent ? 0 : 255);
+              _info.backgroundColor =
+                  ColorRgba8(r, g, b, isTransparent ? 0 : 255);
             } else {
               _info.backgroundColor = ColorRgb8(r, g, b);
             }
@@ -217,11 +216,12 @@ class PngDecoder extends Decoder {
             chunkSize -= 2;
           } else if (_info.colorType == PngColorType.rgb ||
               _info.colorType == PngColorType.rgba) {
-            /*int r =*/ _input..readUint16()
-            /*int g =*/
-            ..readUint16()
-            /*int b =*/
-            ..readUint16();
+            /*int r =*/ _input
+              ..readUint16()
+              /*int g =*/
+              ..readUint16()
+              /*int b =*/
+              ..readUint16();
             chunkSize -= 24;
           }
           if (chunkSize > 0) {
@@ -304,8 +304,9 @@ class PngDecoder extends Decoder {
       for (var i = 0; i < f.fdat.length; ++i) {
         _input.offset = f.fdat[i];
         final chunkSize = _input.readUint32();
-        _input..readString(4) // fDat chunk header
-        ..skip(4); // sequence number
+        _input
+          ..readString(4) // fDat chunk header
+          ..skip(4); // sequence number
         final data = _input.readBytes(chunkSize - 4).toUint8List();
         totalSize += data.length;
         dataBlocks.add(data);
@@ -318,11 +319,15 @@ class PngDecoder extends Decoder {
       }
     }
 
-    var numChannels = _info.colorType == PngColorType.indexed ? 1
-        : _info.colorType == PngColorType.grayscale ? 1
-        : _info.colorType == PngColorType.grayscaleAlpha ? 2
-        : _info.colorType == PngColorType.rgba ? 4
-        : 3;
+    var numChannels = _info.colorType == PngColorType.indexed
+        ? 1
+        : _info.colorType == PngColorType.grayscale
+            ? 1
+            : _info.colorType == PngColorType.grayscaleAlpha
+                ? 2
+                : _info.colorType == PngColorType.rgba
+                    ? 4
+                    : 3;
 
     List<int> uncompressed;
     try {
@@ -362,7 +367,8 @@ class PngDecoder extends Decoder {
     // grayscale images with no palette but with transparency, get
     // converted to a indexed palette image.
     if (_info.colorType == PngColorType.grayscale &&
-        _info.transparency != null && palette == null &&
+        _info.transparency != null &&
+        palette == null &&
         _info.bits <= 8) {
       final t = _info.transparency!;
       final nt = t.length;
@@ -370,10 +376,13 @@ class PngDecoder extends Decoder {
       palette = PaletteUint8(numColors, 4);
       // palette color are 8-bit, so convert the grayscale bit value to the
       // 8-bit palette value.
-      final to8bit = _info.bits == 1 ? 255
-          : _info.bits == 2 ? 85
-          : _info.bits == 4 ? 17
-          : 1;
+      final to8bit = _info.bits == 1
+          ? 255
+          : _info.bits == 2
+              ? 85
+              : _info.bits == 4
+                  ? 17
+                  : 1;
       for (var i = 0; i < numColors; ++i) {
         final g = i * to8bit;
         palette.setRgba(i, g, g, g, 255);
@@ -386,14 +395,19 @@ class PngDecoder extends Decoder {
       }
     }
 
-    final format = _info.bits == 1 ? Format.uint1
-        : _info.bits == 2 ? Format.uint2
-        : _info.bits == 4 ? Format.uint4
-        : _info.bits == 16 ? Format.uint16
-        : Format.uint8;
+    final format = _info.bits == 1
+        ? Format.uint1
+        : _info.bits == 2
+            ? Format.uint2
+            : _info.bits == 4
+                ? Format.uint4
+                : _info.bits == 16
+                    ? Format.uint16
+                    : Format.uint8;
 
     if (_info.colorType == PngColorType.grayscale &&
-        _info.transparency != null && _info.bits > 8) {
+        _info.transparency != null &&
+        _info.bits > 8) {
       numChannels = 4;
     }
 
@@ -401,13 +415,18 @@ class PngDecoder extends Decoder {
       numChannels = 4;
     }
 
-    final image = Image(width: width, height: height, numChannels: numChannels,
-        palette: palette, format: format);
+    final image = Image(
+        width: width,
+        height: height,
+        numChannels: numChannels,
+        palette: palette,
+        format: format);
 
     final origW = _info.width;
     final origH = _info.height;
-    _info..width = width
-    ..height = height;
+    _info
+      ..width = width
+      ..height = height;
 
     final w = width;
     final h = height;
@@ -424,8 +443,9 @@ class PngDecoder extends Decoder {
       _process(input, image);
     }
 
-    _info..width = origW
-    ..height = origH;
+    _info
+      ..width = origW
+      ..height = origH;
 
     if (_info.iccpData != null) {
       image.iccProfile = IccProfile(
@@ -440,7 +460,7 @@ class PngDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, { int? frame }) {
+  Image? decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -461,25 +481,26 @@ class PngDecoder extends Decoder {
       if (firstImage == null || lastImage == null) {
         firstImage = image;
         lastImage = image
-        // Convert to MS
-        ..frameDuration = (frame.delay * 1000).toInt();
+          // Convert to MS
+          ..frameDuration = (frame.delay * 1000).toInt();
         continue;
       }
 
-      if (image.width == lastImage.width && image.height == lastImage.height &&
-          frame.xOffset == 0 && frame.yOffset == 0 &&
+      if (image.width == lastImage.width &&
+          image.height == lastImage.height &&
+          frame.xOffset == 0 &&
+          frame.yOffset == 0 &&
           frame.blend == PngBlendMode.source) {
         lastImage = image
-        // Convert to MS
-        ..frameDuration = (frame.delay * 1000).toInt();
+          // Convert to MS
+          ..frameDuration = (frame.delay * 1000).toInt();
         firstImage.addFrame(lastImage);
         continue;
       }
 
       final dispose = frame.dispose;
       if (dispose == PngDisposeMode.background) {
-        lastImage = Image.from(lastImage)
-          ..clear(_info.backgroundColor);
+        lastImage = Image.from(lastImage)..clear(_info.backgroundColor);
       } else if (dispose == PngDisposeMode.previous) {
         lastImage = Image.from(lastImage);
       } else {
@@ -492,7 +513,8 @@ class PngDecoder extends Decoder {
       compositeImage(lastImage, image,
           dstX: frame.xOffset,
           dstY: frame.yOffset,
-          blend: frame.blend == PngBlendMode.over ? BlendMode.alpha
+          blend: frame.blend == PngBlendMode.over
+              ? BlendMode.alpha
               : BlendMode.direct);
 
       firstImage.addFrame(lastImage);
@@ -520,7 +542,8 @@ class PngDecoder extends Decoder {
 
     final pixel = [0, 0, 0, 0];
 
-    for (var srcY = 0, dstY = yOffset, ri = 0; srcY < passHeight;
+    for (var srcY = 0, dstY = yOffset, ri = 0;
+        srcY < passHeight;
         ++srcY, dstY += yStep, ri = 1 - ri, _progressY++) {
       final filterType = PngFilterType.values[input.readByte()];
       inData[ri] = input.readBytes(rowBytes).toUint8List();
@@ -541,7 +564,8 @@ class PngDecoder extends Decoder {
       final blockHeight = xStep;
       final blockWidth = xStep - xOffset;
 
-      for (var srcX = 0, dstX = xOffset; srcX < passWidth;
+      for (var srcX = 0, dstX = xOffset;
+          srcX < passWidth;
           ++srcX, dstX += xStep) {
         _readPixel(rowInput, pixel);
         _setPixel(image.getPixel(dstX, dstY), pixel);
@@ -605,8 +629,8 @@ class PngDecoder extends Decoder {
     }
   }
 
-  void _unfilter(PngFilterType filterType, int bpp, List<int> row,
-      List<int>? prevRow) {
+  void _unfilter(
+      PngFilterType filterType, int bpp, List<int> row, List<int>? prevRow) {
     final rowBytes = row.length;
 
     switch (filterType) {

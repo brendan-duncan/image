@@ -21,11 +21,11 @@ class WebPFrame {
   late bool clearFrame;
 
   WebPFrame(InputBuffer input, int size)
-      : x = input.readUint24() * 2
-      , y = input.readUint24() * 2
-      , width = input.readUint24() + 1
-      , height = input.readUint24() + 1
-      , duration = input.readUint24() {
+      : x = input.readUint24() * 2,
+        y = input.readUint24() * 2,
+        width = input.readUint24() + 1,
+        height = input.readUint24() + 1,
+        duration = input.readUint24() {
     final b = input.readByte();
     _reserved = (b & 0x7f) >> 7;
     clearFrame = (b & 0x1) != 0;
@@ -45,8 +45,7 @@ class WebPFrame {
 
 @internal
 class InternalWebPFrame extends WebPFrame {
-  InternalWebPFrame(InputBuffer input, int size)
-      : super(input, size);
+  InternalWebPFrame(InputBuffer input, int size) : super(input, size);
 
   int get framePosition => _framePosition;
   int get frameSize => _frameSize;
