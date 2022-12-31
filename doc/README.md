@@ -26,4 +26,4 @@ web applications.
 
 ## [Animated Images](animation.md)
 
-## [API](https://brendan-duncan.github.io/image/doc/api/image/image-library.html)
+## [API](https://pub.dev/documentation/image/latest)
