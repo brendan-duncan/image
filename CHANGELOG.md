@@ -1,3 +1,7 @@
+## 4.0.2 - December 30, 2022
+
+- No changes, dart formatted code and fix documentation link.
+
 ## 4.0.1 - December 30, 2022
 
 - Use strict analyzer settings, clean up warnings.
