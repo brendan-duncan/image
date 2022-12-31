@@ -249,9 +249,6 @@ class PixelUint8 extends Iterable<num> implements Pixel {
       if (numChannels > 1) {
         data[_index + 1] = g.toInt();
         if (numChannels > 2) {
-          if ((_index + 2) >= data.length) {
-            print('!');
-          }
           data[_index + 2] = b.toInt();
           if (numChannels > 3) {
             data[_index + 3] = a.toInt();
