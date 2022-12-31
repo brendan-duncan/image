@@ -1,3 +1,7 @@
+## 4.0.3 - December 30, 2022
+
+- Fix for encoding GIF transparency.
+
 ## 4.0.2 - December 30, 2022
 
 - No changes, dart formatted code and fix documentation link.
