@@ -1,3 +1,7 @@
+## 4.0.1 - December 30, 2022
+
+- Use strict analyzer settings, clean up warnings.
+
 ## 4.0.0 - December 30, 2022
 
 - Major update of the Dart Image Library. Includes support for:
