@@ -56,6 +56,11 @@
 
     <section class="multi-line-signature">
       
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
 
 <span class="returntype">void</span>
 <span class="name ">setRational</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="setRational-param-numerator"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">numerator</span>, </span></li>
@@ -72,7 +77,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void setRational(int numerator, int denomitator, [int index = 0]) {
+  <pre class="language-dart"><code class="language-dart">@override
+void setRational(int numerator, int denomitator, [int index = 0]) {
   value[index].numerator = numerator;
   value[index].denominator = denomitator;
 }</code></pre>

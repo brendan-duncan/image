@@ -134,10 +134,10 @@
               p3.getColorRgbB() * factors[factorIndex][3];
 
           &#47;&#47;final pi = pixelIndex + ((py * size + px) * 4);
-          final _p = bitmap.getPixel(x4 + px, y4 + py);
-          final r = _p.r.toInt();
-          final g = _p.g.toInt();
-          final b = _p.b.toInt();
+          final pi = bitmap.getPixel(x4 + px, y4 + py);
+          final r = pi.r.toInt();
+          final g = pi.g.toInt();
+          final b = pi.b.toInt();
 
           final d = cb - ca;
           final p = PvrColorRgb(r * 16, g * 16, b * 16);

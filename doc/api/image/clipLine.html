@@ -97,7 +97,7 @@ true is returned.</p>
 
   &#47;&#47; Compute the bit code for a point (x, y) using the clip rectangle
   &#47;&#47; bounded diagonally by (xmin, ymin), and (xmax, ymax)
-  int _computeOutCode(int x, int y) {
+  int computeOutCode(int x, int y) {
     var code = inside; &#47;&#47; initialised as being inside of clip window
     if (x &lt; xmin) {
       &#47;&#47; to the left of clip window
@@ -120,8 +120,8 @@ true is returned.</p>
 
   &#47;&#47; compute outcodes for P0, P1, and whatever point lies outside the clip
   &#47;&#47; rectangle
-  var outcode0 = _computeOutCode(x0, y0);
-  var outcode1 = _computeOutCode(x1, y1);
+  var outcode0 = computeOutCode(x0, y0);
+  var outcode1 = computeOutCode(x1, y1);
   var accept = false;
 
   while (true) {
@@ -165,11 +165,11 @@ true is returned.</p>
       if (outcodeOut == outcode0) {
         x0 = x!;
         y0 = y!;
-        outcode0 = _computeOutCode(x0, y0);
+        outcode0 = computeOutCode(x0, y0);
       } else {
         x1 = x!;
         y1 = y!;
-        outcode1 = _computeOutCode(x1, y1);
+        outcode1 = computeOutCode(x1, y1);
       }
     }
   }

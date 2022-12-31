@@ -171,7 +171,7 @@ Image? decodeFrame(int frame) {
         if (nc == 4 &amp;&amp; i &lt; tl) {
           a = t![i];
         }
-        palette.setColor(i, p[pi]!, p[pi + 1]!, p[pi + 2]!, a);
+        palette.setRgba(i, p[pi]!, p[pi + 1]!, p[pi + 2]!, a);
       }
     }
   }
@@ -193,7 +193,7 @@ Image? decodeFrame(int frame) {
         : 1;
     for (var i = 0; i &lt; numColors; ++i) {
       final g = i * to8bit;
-      palette.setColor(i, g, g, g, 255);
+      palette.setRgba(i, g, g, g, 255);
     }
     for (var i = 0; i &lt; nt; i += 2) {
       final ti = ((t[i] &amp; 0xff) &lt;&lt; 8) | (t[i + 1] &amp; 0xff);

@@ -83,7 +83,7 @@ coordinates.</p>
   final dx = fx - x;
   final dy = fy - y;
 
-  num _linear(num icc, num inc, num icn, num inn) =&gt;
+  num linear(num icc, num inc, num icn, num inn) =&gt;
       icc + dx * (inc - icc + dy * (icc + inn - icn - inc)) +
           dy * (icn - icc);
 
@@ -93,10 +93,10 @@ coordinates.</p>
   final inn = nx &gt;= width || ny &gt;= height ? icc : getPixelSafe(nx, ny);
 
   return getColor(
-      _linear(icc.r, inc.r, icn.r, inn.r),
-      _linear(icc.g, inc.g, icn.g, inn.g),
-      _linear(icc.b, inc.b, icn.b, inn.b),
-      _linear(icc.a, inc.a, icn.a, inn.a));
+      linear(icc.r, inc.r, icn.r, inn.r),
+      linear(icc.g, inc.g, icn.g, inn.g),
+      linear(icc.b, inc.b, icn.b, inn.b),
+      linear(icc.a, inc.a, icn.a, inn.a));
 }</code></pre>
 </section>
 
@@ -206,7 +206,10 @@ coordinates.</p>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
           <li><a href="../../image/Image/setExtraChannel.html">setExtraChannel</a></li>
           <li><a href="../../image/Image/setPixel.html">setPixel</a></li>
-          <li><a href="../../image/Image/setPixelColor.html">setPixelColor</a></li>
+          <li><a href="../../image/Image/setPixelIndex.html">setPixelIndex</a></li>
+          <li><a href="../../image/Image/setPixelR.html">setPixelR</a></li>
+          <li><a href="../../image/Image/setPixelRgb.html">setPixelRgb</a></li>
+          <li><a href="../../image/Image/setPixelRgba.html">setPixelRgba</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

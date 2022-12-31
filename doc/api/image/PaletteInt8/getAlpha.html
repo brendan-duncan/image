@@ -56,6 +56,11 @@
 
     <section class="multi-line-signature">
       
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
 
 <span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>
 <span class="name ">getAlpha</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getAlpha-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span></span></li>
@@ -74,7 +79,8 @@ fewer colors or channels, 0 will be returned.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">num getAlpha(int index) {
+  <pre class="language-dart"><code class="language-dart">@override
+num getAlpha(int index) {
   if (numChannels &lt; 4) {
     return 0;
   }
@@ -133,9 +139,10 @@ fewer colors or channels, 0 will be returned.</p>
           <li><a href="../../image/PaletteInt8/set.html">set</a></li>
           <li><a href="../../image/PaletteInt8/setAlpha.html">setAlpha</a></li>
           <li><a href="../../image/PaletteInt8/setBlue.html">setBlue</a></li>
-          <li><a href="../../image/PaletteInt8/setColor.html">setColor</a></li>
           <li><a href="../../image/PaletteInt8/setGreen.html">setGreen</a></li>
           <li><a href="../../image/PaletteInt8/setRed.html">setRed</a></li>
+          <li><a href="../../image/PaletteInt8/setRgb.html">setRgb</a></li>
+          <li><a href="../../image/PaletteInt8/setRgba.html">setRgba</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
           <li class="inherited"><a href="../../image/Palette/toUint8List.html">toUint8List</a></li>
 

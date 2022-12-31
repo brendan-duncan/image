@@ -106,8 +106,7 @@ color alpha, as a normalized color value [0, 1].</p>
       : c.gNormalized;
   var overlayB = filter != null ? c.bNormalized * filter.bNormalized
       : c.bNormalized;
-  final overlayA = (alpha != null ? alpha : c.length &lt; 4 ? 1.0
-      : c.aNormalized) * msk;
+  final overlayA = (alpha ?? (c.length &lt; 4 ? 1.0 : c.aNormalized)) * msk;
 
   if (overlayA == 0) {
     return image;

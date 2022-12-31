@@ -76,7 +76,7 @@
   final p = PaletteUint8(_palette.numColors, 4);
   final l = _palette.numColors;
   for (var i = 0; i &lt; l; ++i) {
-    p.setColor(i, red(i), green(i), blue(i), alpha(i));
+    p.setRgba(i, red(i), green(i), blue(i), alpha(i));
   }
   return p;
 }</code></pre>

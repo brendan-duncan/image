@@ -56,6 +56,11 @@
 
     <section class="multi-line-signature">
       
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
 
 <span class="returntype"><a href="../../image/ImageDataFloat64-class.html">ImageDataFloat64</a></span>
 <span class="name ">clone</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="clone-param-noPixels">{<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">noPixels</span> = <span class="default-value">false</span>}</span></li>
@@ -70,7 +75,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">ImageDataFloat64 clone({ bool noPixels = false }) =&gt;
+  <pre class="language-dart"><code class="language-dart">@override
+ImageDataFloat64 clone({ bool noPixels = false }) =&gt;
     ImageDataFloat64.from(this, skipPixels: noPixels);</code></pre>
 </section>
 
@@ -151,8 +157,11 @@
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
           <li class="inherited"><a href="../../image/ImageData/setPixel.html">setPixel</a></li>
-          <li><a href="../../image/ImageDataFloat64/setPixelColor.html">setPixelColor</a></li>
-          <li class="inherited"><a href="../../image/ImageData/setPixelColorSafe.html">setPixelColorSafe</a></li>
+          <li><a href="../../image/ImageDataFloat64/setPixelR.html">setPixelR</a></li>
+          <li><a href="../../image/ImageDataFloat64/setPixelRgb.html">setPixelRgb</a></li>
+          <li><a href="../../image/ImageDataFloat64/setPixelRgba.html">setPixelRgba</a></li>
+          <li class="inherited"><a href="../../image/ImageData/setPixelRgbaSafe.html">setPixelRgbaSafe</a></li>
+          <li class="inherited"><a href="../../image/ImageData/setPixelRgbSafe.html">setPixelRgbSafe</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

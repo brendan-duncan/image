@@ -76,13 +76,13 @@ with optional exposure control.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Image hdrToLdr(Image hdr, { num? exposure }) {
-  num _knee(num x, num f) =&gt; math.log(x * f + 1.0) &#47; f;
+  num knee(num x, num f) =&gt; math.log(x * f + 1.0) &#47; f;
 
-  num _gamma(num h, num m) {
+  num gamma(num h, num m) {
     var x = math.max(0, h * m);
 
     if (x &gt; 1.0) {
-      x = 1.0 + _knee(x - 1, 0.184874);
+      x = 1.0 + knee(x - 1, 0.184874);
     }
 
     return math.pow(x, 0.4545) * 84.66;
@@ -117,9 +117,9 @@ with optional exposure control.</p>
 
       num ri, gi, bi;
       if (exposure != null) {
-        ri = _gamma(r, m);
-        gi = _gamma(g, m);
-        bi = _gamma(b, m);
+        ri = gamma(r, m);
+        gi = gamma(g, m);
+        bi = gamma(b, m);
       } else {
         ri = r.clamp(0, 1) * 255.0;
         gi = g.clamp(0, 1) * 255.0;
@@ -139,13 +139,13 @@ with optional exposure control.</p>
         if (a.isInfinite || a.isNaN) {
           a = 1.0;
         }
-        image.setPixelColor(x, y,
+        image.setPixelRgba(x, y,
             ri.clamp(0, 255).toInt(),
             gi.clamp(0, 255).toInt(),
             bi.clamp(0, 255).toInt(),
             (a * 255.0).clamp(0, 255).toInt());
       } else {
-        image.setPixelColor(x, y,
+        image.setPixelRgb(x, y,
             ri.clamp(0, 255).toInt(),
             gi.clamp(0, 255).toInt(),
             bi.clamp(0, 255).toInt());

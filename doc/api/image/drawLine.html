@@ -166,7 +166,7 @@
   }
 
   &#47;&#47; 16-bit unsigned int xor.
-  int _xor(int n) =&gt; (~n + 0x10000) &amp; 0xffff;
+  int xor(int n) =&gt; (~n + 0x10000) &amp; 0xffff;
 
   if (!antialias) {
     dx = dx.abs();
@@ -347,7 +347,7 @@
             mask: mask, maskChannel: maskChannel);
 
         drawPixel(image, x, w + 1, color,
-            alpha: ((_xor(frac) &gt;&gt; 8) &amp; 0xff) &#47; 255, mask: mask,
+            alpha: ((xor(frac) &gt;&gt; 8) &amp; 0xff) &#47; 255, mask: mask,
             maskChannel: maskChannel);
       }
 
@@ -383,7 +383,7 @@
             mask: mask, maskChannel: maskChannel);
 
         drawPixel(image, w + 1, y, color,
-            alpha: ((_xor(frac) &gt;&gt; 8) &amp; 0xff) &#47; 255, mask: mask,
+            alpha: ((xor(frac) &gt;&gt; 8) &amp; 0xff) &#47; 255, mask: mask,
             maskChannel: maskChannel);
       }
 

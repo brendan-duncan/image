@@ -113,20 +113,20 @@ Uint8List encode(Image image, { bool singleFrame = false }) {
         final row = pos &gt;&gt; 3; &#47;&#47; &#47; 8
         final col = pos &amp; 7; &#47;&#47; % 8
 
-        var _y = y + row;
-        var _x = x + col;
+        var yy = y + row;
+        var xx = x + col;
 
-        if (_y &gt;= height) {
+        if (yy &gt;= height) {
           &#47;&#47; padding bottom
-          _y -= y + 1 + row - height;
+          yy -= y + 1 + row - height;
         }
 
-        if (_x &gt;= width) {
+        if (xx &gt;= width) {
           &#47;&#47; padding right
-          _x -= (x + col) - width + 1;
+          xx -= (x + col) - width + 1;
         }
 
-        final p = image.getPixel(_x, _y);
+        final p = image.getPixel(xx, yy);
         final r = p.r.toInt();
         final g = p.g.toInt();
         final b = p.b.toInt();

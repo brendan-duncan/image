@@ -126,7 +126,7 @@ Image? decode(Uint8List bytes, { int? frame }) {
           numChannels: 1, palette: colorMap.getPalette())
         ..clear(colorMap.color(info!.backgroundColor!.r as int));
     } else {
-      lastImage = new Image.from(lastImage);
+      lastImage = Image.from(lastImage);
     }
 
     lastImage.frameDuration = image.frameDuration;

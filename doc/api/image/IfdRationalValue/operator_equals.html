@@ -56,6 +56,11 @@
 
     <section class="multi-line-signature">
       
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
 
 <span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/bool-class.html">bool</a></span>
 <span class="name ">operator ==</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span></li>
@@ -99,7 +104,8 @@ the <a href="../../image/IfdRationalValue/hashCode.html">hashCode</a> method as 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">bool operator ==(Object other) =&gt;
+  <pre class="language-dart"><code class="language-dart">@override
+bool operator ==(Object other) =&gt;
     other is IfdRationalValue &amp;&amp;
     length == other.length &amp;&amp;
     hashCode == other.hashCode;</code></pre>

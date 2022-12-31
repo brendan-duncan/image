@@ -93,8 +93,8 @@ Uint8List encode(Image image, { bool singleFrame = false }) {
   if (format == Format.uint1 &amp;&amp; nc == 1 &amp;&amp; palette == null) {
     &#47;&#47; add palette
     palette = PaletteUint8(2, 3)
-      ..setColor(0, 0)
-      ..setColor(1, 255, 255, 255);
+      ..setRgb(0, 0, 0, 0)
+      ..setRgb(1, 255, 255, 255);
   } else if (format == Format.uint1 &amp;&amp; nc == 2) {
     &#47;&#47; =&gt; uint2 palette
     image = image.convert(format: Format.uint2, numChannels: 1,

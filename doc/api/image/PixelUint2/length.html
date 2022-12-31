@@ -60,6 +60,11 @@
 
 <section class="multi-line-signature">
   
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
   <span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span>
   <span class="name ">length</span>
   <div class="features"><span class="feature">override</span></div>
@@ -77,7 +82,8 @@ Some iterables have a more efficient way to find the number of elements.</p>
 
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">int get length =&gt; palette?.numChannels ?? image.numChannels;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override
+int get length =&gt; palette?.numChannels ?? image.numChannels;</code></pre>
 </section>
 
 </section>
@@ -174,9 +180,10 @@ Some iterables have a more efficient way to find the number of elements.</p>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
           <li><a href="../../image/PixelUint2/set.html">set</a></li>
-          <li><a href="../../image/PixelUint2/setColor.html">setColor</a></li>
           <li><a href="../../image/PixelUint2/setPosition.html">setPosition</a></li>
           <li><a href="../../image/PixelUint2/setPositionNormalized.html">setPositionNormalized</a></li>
+          <li><a href="../../image/PixelUint2/setRgb.html">setRgb</a></li>
+          <li><a href="../../image/PixelUint2/setRgba.html">setRgba</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

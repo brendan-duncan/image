@@ -97,7 +97,7 @@
     final cm = colorMap!;
     final numColors = cm.length ~&#47; 3;
     for (var i = 0; i &lt; numColors; ++i) {
-      p.setColor(cm[colorMapRed + i],
+      p.setRgb(i, cm[colorMapRed + i],
           cm[colorMapGreen + i],
           cm[colorMapBlue + i]);
     }

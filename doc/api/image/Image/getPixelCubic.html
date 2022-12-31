@@ -88,7 +88,7 @@ coordinates.</p>
   final dx = fx - x;
   final dy = fy - y;
 
-  num _cubic(num dx, num ipp, num icp, num inp, num iap) =&gt;
+  num cubic(num dx, num ipp, num icp, num inp, num iap) =&gt;
       icp + 0.5 * (dx * (-ipp + inp) +
       dx * dx * (2 * ipp - 5 * icp + 4 * inp - iap) +
       dx * dx * dx * (-ipp + 3 * icp - 3 * inp + iap));
@@ -100,44 +100,44 @@ coordinates.</p>
   final inp = py &lt; 0 || nx &gt;= width ? icc : getPixelSafe(nx, py);
   final iap = ax &gt;= width || py &lt; 0 ? icc : getPixelSafe(ax, py);
 
-  final ip0 = _cubic(dx, ipp.r, icp.r, inp.r, iap.r);
-  final ip1 = _cubic(dx, ipp.g, icp.g, inp.g, iap.g);
-  final ip2 = _cubic(dx, ipp.b, icp.b, inp.b, iap.b);
-  final ip3 = _cubic(dx, ipp.a, icp.a, inp.a, iap.a);
+  final ip0 = cubic(dx, ipp.r, icp.r, inp.r, iap.r);
+  final ip1 = cubic(dx, ipp.g, icp.g, inp.g, iap.g);
+  final ip2 = cubic(dx, ipp.b, icp.b, inp.b, iap.b);
+  final ip3 = cubic(dx, ipp.a, icp.a, inp.a, iap.a);
 
   final ipc = px &lt; 0 ? icc : getPixelSafe(px, y);
   final inc = nx &gt;= width ? icc : getPixelSafe(nx, y);
   final iac = ax &gt;= width ? icc : getPixelSafe(ax, y);
 
-  final ic0 = _cubic(dx, ipc.r, icc.r, inc.r, iac.r);
-  final ic1 = _cubic(dx, ipc.g, icc.g, inc.g, iac.g);
-  final ic2 = _cubic(dx, ipc.b, icc.b, inc.b, iac.b);
-  final ic3 = _cubic(dx, ipc.a, icc.a, inc.a, iac.a);
+  final ic0 = cubic(dx, ipc.r, icc.r, inc.r, iac.r);
+  final ic1 = cubic(dx, ipc.g, icc.g, inc.g, iac.g);
+  final ic2 = cubic(dx, ipc.b, icc.b, inc.b, iac.b);
+  final ic3 = cubic(dx, ipc.a, icc.a, inc.a, iac.a);
 
   final ipn = px &lt; 0 || ny &gt;= height ? icc : getPixelSafe(px, ny);
   final icn = ny &gt;= height ? icc : getPixelSafe(x, ny);
   final inn = nx &gt;= width || ny &gt;= height ? icc : getPixelSafe(nx, ny);
   final ian = ax &gt;= width || ny &gt;= height ? icc : getPixelSafe(ax, ny);
 
-  final in0 = _cubic(dx, ipn.r, icn.r, inn.r, ian.r);
-  final in1 = _cubic(dx, ipn.g, icn.g, inn.g, ian.g);
-  final in2 = _cubic(dx, ipn.b, icn.b, inn.b, ian.b);
-  final in3 = _cubic(dx, ipn.a, icn.a, inn.a, ian.a);
+  final in0 = cubic(dx, ipn.r, icn.r, inn.r, ian.r);
+  final in1 = cubic(dx, ipn.g, icn.g, inn.g, ian.g);
+  final in2 = cubic(dx, ipn.b, icn.b, inn.b, ian.b);
+  final in3 = cubic(dx, ipn.a, icn.a, inn.a, ian.a);
 
   final ipa = px &lt; 0 || ay &gt;= height ? icc : getPixelSafe(px, ay);
   final ica = ay &gt;= height ? icc : getPixelSafe(x, ay);
   final ina = nx &gt;= width || ay &gt;= height ? icc : getPixelSafe(nx, ay);
   final iaa = ax &gt;= width || ay &gt;= height ? icc : getPixelSafe(ax, ay);
 
-  final ia0 = _cubic(dx, ipa.r, ica.r, ina.r, iaa.r);
-  final ia1 = _cubic(dx, ipa.g, ica.g, ina.g, iaa.g);
-  final ia2 = _cubic(dx, ipa.b, ica.b, ina.b, iaa.b);
-  final ia3 = _cubic(dx, ipa.a, ica.a, ina.a, iaa.a);
+  final ia0 = cubic(dx, ipa.r, ica.r, ina.r, iaa.r);
+  final ia1 = cubic(dx, ipa.g, ica.g, ina.g, iaa.g);
+  final ia2 = cubic(dx, ipa.b, ica.b, ina.b, iaa.b);
+  final ia3 = cubic(dx, ipa.a, ica.a, ina.a, iaa.a);
 
-  final c0 = _cubic(dy, ip0, ic0, in0, ia0);
-  final c1 = _cubic(dy, ip1, ic1, in1, ia1);
-  final c2 = _cubic(dy, ip2, ic2, in2, ia2);
-  final c3 = _cubic(dy, ip3, ic3, in3, ia3);
+  final c0 = cubic(dy, ip0, ic0, in0, ia0);
+  final c1 = cubic(dy, ip1, ic1, in1, ia1);
+  final c2 = cubic(dy, ip2, ic2, in2, ia2);
+  final c3 = cubic(dy, ip3, ic3, in3, ia3);
 
   return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
 }</code></pre>
@@ -249,7 +249,10 @@ coordinates.</p>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
           <li><a href="../../image/Image/setExtraChannel.html">setExtraChannel</a></li>
           <li><a href="../../image/Image/setPixel.html">setPixel</a></li>
-          <li><a href="../../image/Image/setPixelColor.html">setPixelColor</a></li>
+          <li><a href="../../image/Image/setPixelIndex.html">setPixelIndex</a></li>
+          <li><a href="../../image/Image/setPixelR.html">setPixelR</a></li>
+          <li><a href="../../image/Image/setPixelRgb.html">setPixelRgb</a></li>
+          <li><a href="../../image/Image/setPixelRgba.html">setPixelRgba</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

@@ -147,7 +147,7 @@ then the new image will be converted to use a palette.</p>
           np.index = numColors;
           c = convertColor(op, to: c, format: f, numChannels: numChannels,
               alpha: alpha);
-          pal.setColor(numColors, c.r, c.g, c.b);
+          pal.setRgb(numColors, c.r, c.g, c.b);
           numColors++;
         }
         op.moveNext();
@@ -275,7 +275,10 @@ then the new image will be converted to use a palette.</p>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
           <li><a href="../../image/Image/setExtraChannel.html">setExtraChannel</a></li>
           <li><a href="../../image/Image/setPixel.html">setPixel</a></li>
-          <li><a href="../../image/Image/setPixelColor.html">setPixelColor</a></li>
+          <li><a href="../../image/Image/setPixelIndex.html">setPixelIndex</a></li>
+          <li><a href="../../image/Image/setPixelR.html">setPixelR</a></li>
+          <li><a href="../../image/Image/setPixelRgb.html">setPixelRgb</a></li>
+          <li><a href="../../image/Image/setPixelRgba.html">setPixelRgba</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

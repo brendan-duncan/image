@@ -56,6 +56,11 @@
 
     <section class="multi-line-signature">
       
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
 
 <span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span>
 <span class="name ">getChannel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getChannel-param-channel"><span class="type-annotation"><a href="../../image/Channel.html">Channel</a></span> <span class="parameter-name">channel</span></span></li>
@@ -74,7 +79,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">num getChannel(Channel channel) =&gt; channel == Channel.luminance ?
+  <pre class="language-dart"><code class="language-dart">@override
+num getChannel(Channel channel) =&gt; channel == Channel.luminance ?
     luminance : channel.index &lt; data.length ? data[channel.index] : 0;</code></pre>
 </section>
 
@@ -160,7 +166,8 @@
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
           <li><a href="../../image/ColorFloat64/set.html">set</a></li>
-          <li><a href="../../image/ColorFloat64/setColor.html">setColor</a></li>
+          <li><a href="../../image/ColorFloat64/setRgb.html">setRgb</a></li>
+          <li><a href="../../image/ColorFloat64/setRgba.html">setRgba</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

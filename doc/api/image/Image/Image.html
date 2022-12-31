@@ -68,7 +68,7 @@
 <li><span class="parameter" id="-param-textData"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">textData</span>, </span></li>
 <li><span class="parameter" id="-param-loopCount"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">loopCount</span> = <span class="default-value">0</span>, </span></li>
 <li><span class="parameter" id="-param-frameType"><span class="type-annotation"><a href="../../image/FrameType.html">FrameType</a></span> <span class="parameter-name">frameType</span> = <span class="default-value">FrameType.sequence</span>, </span></li>
-<li><span class="parameter" id="-param-backgroundColor"><span class="type-annotation"><a href="../../image/Color-class.html">Color</a>?</span> <span class="parameter-name">backgroundColor</span> = <span class="default-value">null</span>, </span></li>
+<li><span class="parameter" id="-param-backgroundColor"><span class="type-annotation"><a href="../../image/Color-class.html">Color</a>?</span> <span class="parameter-name">backgroundColor</span>, </span></li>
 <li><span class="parameter" id="-param-frameDuration"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">frameDuration</span> = <span class="default-value">0</span>, </span></li>
 <li><span class="parameter" id="-param-frameIndex"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">frameIndex</span> = <span class="default-value">0</span>}</span></li>
 </ol>)
@@ -87,7 +87,7 @@
     int numChannels = 3, bool withPalette = false,
     Format paletteFormat = Format.uint8, Palette? palette, ExifData? exif,
     IccProfile? iccp, this.textData, this.loopCount = 0,
-    this.frameType = FrameType.sequence, this.backgroundColor = null,
+    this.frameType = FrameType.sequence, this.backgroundColor,
     this.frameDuration = 0, this.frameIndex = 0 }) {
   frames.add(this);
   _initialize(width, height, format: format, numChannels: numChannels,
@@ -203,7 +203,10 @@
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
           <li><a href="../../image/Image/setExtraChannel.html">setExtraChannel</a></li>
           <li><a href="../../image/Image/setPixel.html">setPixel</a></li>
-          <li><a href="../../image/Image/setPixelColor.html">setPixelColor</a></li>
+          <li><a href="../../image/Image/setPixelIndex.html">setPixelIndex</a></li>
+          <li><a href="../../image/Image/setPixelR.html">setPixelR</a></li>
+          <li><a href="../../image/Image/setPixelRgb.html">setPixelRgb</a></li>
+          <li><a href="../../image/Image/setPixelRgba.html">setPixelRgba</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

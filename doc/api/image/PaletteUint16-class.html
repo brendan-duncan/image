@@ -351,20 +351,6 @@ fewer colors or channels, it will be ignored.
 
 </dd>
 
-        <dt id="setColor" class="callable">
-  <span class="name"><a href="../image/PaletteUint16/setColor.html">setColor</a></span><span class="signature">(<wbr><span class="parameter" id="setColor-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="setColor-param-r"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">r</span>, </span><span class="parameter" id="setColor-param-g">[<span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">g</span> = <span class="default-value">0</span>, </span><span class="parameter" id="setColor-param-b"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">b</span> = <span class="default-value">0</span>, </span><span class="parameter" id="setColor-param-a"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">a</span> = <span class="default-value">0</span>]</span>)
-    <span class="returntype parameter">&#8594; void</span>
-  </span>
-  
-
-</dt>
-<dd>
-  Set the RGBA color of a palette entry at <code>index</code>. If the palette has fewer
-channels than are set, the unsupported channels will be ignored.
-  <div class="features"><span class="feature">override</span></div>
-
-</dd>
-
         <dt id="setGreen" class="callable">
   <span class="name"><a href="../image/PaletteUint16/setGreen.html">setGreen</a></span><span class="signature">(<wbr><span class="parameter" id="setGreen-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="setGreen-param-value"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">value</span></span>)
     <span class="returntype parameter">&#8594; void</span>
@@ -389,6 +375,34 @@ fewer colors or channels, it will be ignored.
 <dd>
   Set the red channel of the palette entry at <code>index</code>. If the palette has
 fewer colors or channels, it will be ignored.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="setRgb" class="callable">
+  <span class="name"><a href="../image/PaletteUint16/setRgb.html">setRgb</a></span><span class="signature">(<wbr><span class="parameter" id="setRgb-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="setRgb-param-r"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">r</span>, </span><span class="parameter" id="setRgb-param-g"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">g</span>, </span><span class="parameter" id="setRgb-param-b"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">b</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Set the RGB color of a palette entry at <code>index</code>. If the palette has fewer
+channels than are set, the unsupported channels will be ignored.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="setRgba" class="callable">
+  <span class="name"><a href="../image/PaletteUint16/setRgba.html">setRgba</a></span><span class="signature">(<wbr><span class="parameter" id="setRgba-param-index"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span> <span class="parameter-name">index</span>, </span><span class="parameter" id="setRgba-param-r"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">r</span>, </span><span class="parameter" id="setRgba-param-g"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">g</span>, </span><span class="parameter" id="setRgba-param-b"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">b</span>, </span><span class="parameter" id="setRgba-param-a"><span class="type-annotation"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/num-class.html">num</a></span> <span class="parameter-name">a</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Set the RGBA color of a palette entry at <code>index</code>. If the palette has fewer
+channels than are set, the unsupported channels will be ignored.
   <div class="features"><span class="feature">override</span></div>
 
 </dd>
@@ -828,9 +842,10 @@ fewer colors or channels, it will be ignored.
           <li><a href="../image/PaletteUint16/set.html">set</a></li>
           <li><a href="../image/PaletteUint16/setAlpha.html">setAlpha</a></li>
           <li><a href="../image/PaletteUint16/setBlue.html">setBlue</a></li>
-          <li><a href="../image/PaletteUint16/setColor.html">setColor</a></li>
           <li><a href="../image/PaletteUint16/setGreen.html">setGreen</a></li>
           <li><a href="../image/PaletteUint16/setRed.html">setRed</a></li>
+          <li><a href="../image/PaletteUint16/setRgb.html">setRgb</a></li>
+          <li><a href="../image/PaletteUint16/setRgba.html">setRgba</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Object/toString.html">toString</a></li>
           <li class="inherited"><a href="../image/Palette/toUint8List.html">toUint8List</a></li>
 

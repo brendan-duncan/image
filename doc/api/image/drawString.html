@@ -116,7 +116,7 @@ Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://
   var sy = y ?? (image.height &#47; 2).round() - (stringHeight &#47; 2).round();
 
   if (wrap) {
-    final words = string.split(new RegExp(r&quot;\s+&quot;));
+    final words = string.split(RegExp(r&quot;\s+&quot;));
     var subString = &quot;&quot;;
     var x2 = sx;
 
@@ -154,7 +154,7 @@ Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://
         x2 += wordWidth;
       }
 
-      if (subString.length &gt; 0) {
+      if (subString.isNotEmpty) {
         drawString(image, subString, font: font, x: sx, y: sy, color: color,
             mask: mask, maskChannel: maskChannel, rightJustify: rightJustify);
       }
@@ -164,7 +164,7 @@ Fonts can be create with a tool such as: <a href="https://ttf2fnt.com/">https://
   }
 
   final origX = sx;
-  final substrings = string.split(new RegExp(r&quot;[(\n|\r)]&quot;));
+  final substrings = string.split(RegExp(r&quot;[(\n|\r)]&quot;));
 
   for (var ss in substrings) {
     final chars = ss.codeUnits;

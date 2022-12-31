@@ -71,8 +71,9 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">IfdDirectory operator[](String ifdName) {
-  if (!directories.containsKey(ifdName))
+  if (!directories.containsKey(ifdName)) {
     directories[ifdName] = IfdDirectory();
+  }
   return directories[ifdName]!;
 }</code></pre>
 </section>

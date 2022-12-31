@@ -74,10 +74,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void addTextData(Map&lt;String, String&gt; data) {
-  if (textData == null) {
-    textData = {};
-  }
-  for (var key in data.keys) {
+  textData ??= {};
+  for (final key in data.keys) {
     textData![key] = data[key]!;
   }
 }</code></pre>
@@ -189,7 +187,10 @@
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/reduce.html">reduce</a></li>
           <li><a href="../../image/Image/setExtraChannel.html">setExtraChannel</a></li>
           <li><a href="../../image/Image/setPixel.html">setPixel</a></li>
-          <li><a href="../../image/Image/setPixelColor.html">setPixelColor</a></li>
+          <li><a href="../../image/Image/setPixelIndex.html">setPixelIndex</a></li>
+          <li><a href="../../image/Image/setPixelR.html">setPixelR</a></li>
+          <li><a href="../../image/Image/setPixelRgb.html">setPixelRgb</a></li>
+          <li><a href="../../image/Image/setPixelRgba.html">setPixelRgba</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/singleWhere.html">singleWhere</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skip.html">skip</a></li>
           <li class="inherited"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/Iterable/skipWhile.html">skipWhile</a></li>

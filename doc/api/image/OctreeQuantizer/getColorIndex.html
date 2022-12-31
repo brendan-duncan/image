@@ -56,6 +56,11 @@
 
     <section class="multi-line-signature">
       
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
 
 <span class="returntype"><a href="https://api.dart.dev/dev/3.0.0-46.0.dev/dart-core/int-class.html">int</a></span>
 <span class="name ">getColorIndex</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="getColorIndex-param-c"><span class="type-annotation"><a href="../../image/Color-class.html">Color</a></span> <span class="parameter-name">c</span></span></li>
@@ -70,7 +75,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">int getColorIndex(Color c) =&gt;
+  <pre class="language-dart"><code class="language-dart">@override
+int getColorIndex(Color c) =&gt;
   getColorIndexRgb(c.r.toInt(), c.g.toInt(), c.b.toInt());</code></pre>
 </section>
 

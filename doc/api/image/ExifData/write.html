@@ -79,8 +79,9 @@
     ..writeUint16(0x002a)
     ..writeUint32(8); &#47;&#47; offset to first ifd block
 
-  if (directories[&#39;ifd0&#39;] == null)
+  if (directories[&#39;ifd0&#39;] == null) {
     directories[&#39;ifd0&#39;] = IfdDirectory();
+  }
 
   var dataOffset = 8; &#47;&#47; offset to first ifd block, from start of tiff header
   final offsets = &lt;String,int&gt;{};
