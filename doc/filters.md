@@ -490,7 +490,7 @@ Image drawChar(Image image, String char, { required BitmapFont font,
 
 ```dart
 Image drawCircle(Image image, { required int x, required int y,
-    required int radius, required Color color,
+    required int radius, required Color color, bool antialias = false,
     Image? mask, Channel maskChannel = Channel.luminance })
 ```
 

@@ -415,6 +415,7 @@ class Command {
       required int y,
       required int radius,
       required Color color,
+      bool antialias = false,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = DrawCircleCmd(subCommand,
@@ -422,6 +423,7 @@ class Command {
         y: y,
         radius: radius,
         color: color,
+        antialias: antialias,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -1042,9 +1044,10 @@ class Command {
       {required int x,
       required int y,
       required int width,
-      required int height}) {
-    subCommand =
-        CopyCropCmd(subCommand, x: x, y: y, width: width, height: height);
+      required int height,
+      num radius = 0}) {
+    subCommand = CopyCropCmd(subCommand,
+        x: x, y: y, width: width, height: height, radius: radius);
   }
 
   void copyFlip({required FlipDirection direction}) {

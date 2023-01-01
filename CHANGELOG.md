@@ -1,6 +1,7 @@
 ## 4.0.5 - January 01, 2023
 
 - Improved antialiasing for drawLine
+- Add antialias arg for drawCirlce
 - Added radius argument to drawRect, fillRect, copyCrop, and copyResizeCropSquare to support rounded rectangles.
 - Add Image.getPixelClamped method.
 

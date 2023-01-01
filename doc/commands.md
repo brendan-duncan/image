@@ -220,7 +220,7 @@ void drawChar(String char, { required BitmapFont font, required int x,
   required int y, Color? color, Command? mask, Channel maskChannel = Channel.luminance });
 
 void drawCircle({ required int x, required int y, required int radius,
-  required Color color, Command? mask, Channel maskChannel = Channel.luminance });
+  required Color color, bool antialias = false, Command? mask, Channel maskChannel = Channel.luminance });
 
 void compositeImage(Command? src, { int? dstX, int? dstY, int? dstW,
   int? dstH, int? srcX, int? srcY, int? srcW, int? srcH,
@@ -239,7 +239,7 @@ void drawPolygon({ required List<Point> vertices, required Color color,
   Command? mask, Channel maskChannel = Channel.luminance });
 
 void drawRect({ required int x1, required int y1, required int x2,
-  required int y2, required Color color, num thickness = 1,
+  required int y2, required Color color, num thickness = 1, num radius = 0,
   Command? mask, Channel maskChannel = Channel.luminance });
 
 void drawString(String string, { required BitmapFont font, required int x,
@@ -262,7 +262,7 @@ void fillPolygon({ required List<Point> vertices, required Color color,
   Command? mask, Channel maskChannel = Channel.luminance });
 
 void fillRect({ required int x1, required int y1, required int x2,
-  required int y2, required Color color, Command? mask,
+  required int y2, required Color color, num radius = 0, Command? mask,
   Channel maskChannel = Channel.luminance });
 ```
 
@@ -427,7 +427,7 @@ void bakeOrientation();
 void copyCropCircle({ int? radius, int? centerX, int? centerY });
 
 void copyCrop({ required int x, required int y, required int width,
-  required int height });
+  required int height, num radius = 0 });
 
 void copyFlip({ required FlipDirection direction });
 
@@ -441,7 +441,8 @@ void copyResize({ int? width, int? height,
   Interpolation interpolation = Interpolation.nearest });
 
 void copyResizeCropSquare({ required int size,
-  Interpolation interpolation = Interpolation.nearest });
+  Interpolation interpolation = Interpolation.nearest,
+  num radius = 0});
 
 void copyRotate({ required num angle,
   Interpolation interpolation = Interpolation.nearest });

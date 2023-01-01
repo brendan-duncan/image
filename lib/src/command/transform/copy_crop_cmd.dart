@@ -6,12 +6,14 @@ class CopyCropCmd extends Command {
   int y;
   int width;
   int height;
+  num radius;
 
   CopyCropCmd(Command? input,
       {required this.x,
       required this.y,
       required this.width,
-      required this.height})
+      required this.height,
+      this.radius = 0})
       : super(input);
 
   @override
@@ -19,7 +21,8 @@ class CopyCropCmd extends Command {
     await input?.execute();
     final img = input?.outputImage;
     outputImage = img != null
-        ? copyCrop(img, x: x, y: y, width: width, height: height)
+        ? copyCrop(img,
+            x: x, y: y, width: width, height: height, radius: radius)
         : null;
   }
 }
