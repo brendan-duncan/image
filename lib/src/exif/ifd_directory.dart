@@ -5,14 +5,54 @@ import 'exif_tag.dart';
 import 'ifd_container.dart';
 import 'ifd_value.dart';
 
+/// An EXIF IfdDirectory stores a collection of IFD tags and values.
 class IfdDirectory {
   final data = <int, IfdValue>{};
   final sub = IfdContainer();
 
+  IfdDirectory();
+
+  IfdDirectory.from(IfdDirectory other) {
+    copy(other);
+  }
+
   Iterable<int> get keys => data.keys;
+
   Iterable<IfdValue> get values => data.values;
 
   bool get isEmpty => data.isEmpty && sub.isEmpty;
+
+  IfdDirectory clone() => IfdDirectory.from(this);
+
+  void copy(IfdDirectory other) {
+    other.data.forEach((tag, value) => data[tag] = value.clone());
+  }
+
+  /// The size in bytes of the data written by this directory. Can be used to
+  /// calculate end-of-block offsets.
+  int getDataSize() {
+    final numEntries = values.length;
+    var dataOffset = 2 + (12 * numEntries) + 4;
+    for (var value in values) {
+      final dataSize = value.dataSize;
+      if (dataSize > 4) {
+        dataOffset += dataSize;
+      }
+    }
+    // storage for sub-ifd blocks
+    for (var subName in sub.keys) {
+      final subIfd = sub[subName];
+      var subSize = 2 + (12 * subIfd.values.length);
+      for (var value in subIfd.values) {
+        final dataSize = value.dataSize;
+        if (dataSize > 4) {
+          subSize += dataSize;
+        }
+      }
+      dataOffset += subSize;
+    }
+    return dataOffset;
+  }
 
   bool containsKey(int tag) => data.containsKey(tag);
 
@@ -43,106 +83,102 @@ class IfdDirectory {
         final tagInfo = exifImageTags[tag];
         if (tagInfo != null) {
           final tagType = tagInfo.type;
-          final tagCount = tagInfo.count;
+          //final tagCount = tagInfo.count;
           switch (tagType) {
             case IfdValueType.byte:
-              if (value is List<int> && value.length == tagCount) {
+              if (value is List<int>) {
                 data[tag] = IfdByteValue.list(Uint8List.fromList(value));
-              } else if (value is int && tagCount == 1) {
+              } else if (value is int) {
                 data[tag] = IfdByteValue(value);
               }
               break;
             case IfdValueType.ascii:
               if (value is String) {
-                data[tag] = IfdAsciiValue(value);
+                data[tag] = IfdValueAscii(value);
               }
               break;
             case IfdValueType.short:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = IfdShortValue.list(Uint16List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = IfdShortValue(value);
+              if (value is List<int>) {
+                data[tag] = IfdValueShort.list(Uint16List.fromList(value));
+              } else if (value is int) {
+                data[tag] = IfdValueShort(value);
               }
               break;
             case IfdValueType.long:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = IfdLongValue.list(Uint32List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = IfdLongValue(value);
+              if (value is List<int>) {
+                data[tag] = IfdValueLong.list(Uint32List.fromList(value));
+              } else if (value is int) {
+                data[tag] = IfdValueLong(value);
               }
               break;
             case IfdValueType.rational:
-              if (value is List<Rational> && value.length == tagCount) {
-                data[tag] = IfdRationalValue.list(value);
-              } else if (tagCount == 1 &&
-                  value is List<int> &&
-                  value.length == 2) {
-                data[tag] = IfdRationalValue(value[0], value[1]);
-              } else if (tagCount == 1 && value is Rational) {
-                data[tag] = IfdRationalValue.from(value);
-              } else if (value is List<List<int>> && value.length == tagCount) {
-                data[tag] = IfdRationalValue.list(List<Rational>.generate(
+              if (value is List<Rational>) {
+                data[tag] = IfdValueRational.list(value);
+              } else if (value is List<int> && value.length == 2) {
+                data[tag] = IfdValueRational(value[0], value[1]);
+              } else if (value is Rational) {
+                data[tag] = IfdValueRational.from(value);
+              } else if (value is List<List<int>>) {
+                data[tag] = IfdValueRational.list(List<Rational>.generate(
                     value.length,
                     (index) => Rational(value[index][0], value[index][1])));
               }
               break;
             case IfdValueType.sByte:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = IfdSByteValue.list(Int8List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = IfdSByteValue(value);
+              if (value is List<int>) {
+                data[tag] = IfdValueSByte.list(Int8List.fromList(value));
+              } else if (value is int) {
+                data[tag] = IfdValueSByte(value);
               }
               break;
             case IfdValueType.undefined:
               if (value is List<int>) {
-                data[tag] = ExifUndefinedValue.list(Uint8List.fromList(value));
+                data[tag] = IfdValueUndefined.list(Uint8List.fromList(value));
               }
               break;
             case IfdValueType.sShort:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = IfdSShortValue.list(Int16List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = IfdSShortValue(value);
+              if (value is List<int>) {
+                data[tag] = IfdValueSShort.list(Int16List.fromList(value));
+              } else if (value is int) {
+                data[tag] = IfdValueSShort(value);
               }
               break;
             case IfdValueType.sLong:
-              if (value is List<int> && value.length == tagCount) {
-                data[tag] = IfdSLongValue.list(Int32List.fromList(value));
-              } else if (value is int && tagCount == 1) {
-                data[tag] = IfdSLongValue(value);
+              if (value is List<int>) {
+                data[tag] = IfdValueSLong.list(Int32List.fromList(value));
+              } else if (value is int) {
+                data[tag] = IfdValueSLong(value);
               }
               break;
             case IfdValueType.sRational:
-              if (value is List<Rational> && value.length == tagCount) {
-                data[tag] = IfdSRationalValue.list(value);
-              } else if (tagCount == 1 &&
-                  value is List<int> &&
-                  value.length == 2) {
-                data[tag] = IfdSRationalValue(value[0], value[1]);
-              } else if (tagCount == 1 && value is Rational) {
-                data[tag] = IfdSRationalValue.from(value);
-              } else if (value is List<List<int>> && value.length == tagCount) {
-                data[tag] = IfdSRationalValue.list(List<Rational>.generate(
+              if (value is List<Rational>) {
+                data[tag] = IfdValueSRational.list(value);
+              } else if (value is List<int> && value.length == 2) {
+                data[tag] = IfdValueSRational(value[0], value[1]);
+              } else if (value is Rational) {
+                data[tag] = IfdValueSRational.from(value);
+              } else if (value is List<List<int>>) {
+                data[tag] = IfdValueSRational.list(List<Rational>.generate(
                     value.length,
                     (index) => Rational(value[index][0], value[index][1])));
               }
               break;
             case IfdValueType.single:
-              if (value is List<double> && value.length == tagCount) {
-                data[tag] = IfdSingleValue.list(Float32List.fromList(value));
-              } else if (value is double && tagCount == 1) {
-                data[tag] = IfdSingleValue(value);
-              } else if (value is int && tagCount == 1) {
-                data[tag] = IfdSingleValue(value.toDouble());
+              if (value is List<double>) {
+                data[tag] = IfdValueSingle.list(Float32List.fromList(value));
+              } else if (value is double) {
+                data[tag] = IfdValueSingle(value);
+              } else if (value is int) {
+                data[tag] = IfdValueSingle(value.toDouble());
               }
               break;
             case IfdValueType.double:
-              if (value is List<double> && value.length == tagCount) {
-                data[tag] = IfdDoubleValue.list(Float64List.fromList(value));
-              } else if (value is double && tagCount == 1) {
-                data[tag] = IfdDoubleValue(value);
-              } else if (value is int && tagCount == 1) {
-                data[tag] = IfdDoubleValue(value.toDouble());
+              if (value is List<double>) {
+                data[tag] = IfdValueDouble.list(Float64List.fromList(value));
+              } else if (value is double) {
+                data[tag] = IfdValueDouble(value);
+              } else if (value is int) {
+                data[tag] = IfdValueDouble(value.toDouble());
               }
               break;
             case IfdValueType.none:
@@ -159,7 +195,7 @@ class IfdDirectory {
     if (value == null) {
       data.remove(0x010e);
     } else {
-      data[0x010e] = IfdAsciiValue(value);
+      data[0x010e] = IfdValueAscii(value);
     }
   }
 
@@ -169,7 +205,7 @@ class IfdDirectory {
     if (value == null) {
       data.remove(0x010f);
     } else {
-      data[0x010f] = IfdAsciiValue(value);
+      data[0x010f] = IfdValueAscii(value);
     }
   }
 
@@ -179,7 +215,7 @@ class IfdDirectory {
     if (value == null) {
       data.remove(0x0110);
     } else {
-      data[0x0110] = IfdAsciiValue(value);
+      data[0x0110] = IfdValueAscii(value);
     }
   }
 
@@ -189,17 +225,17 @@ class IfdDirectory {
     if (value == null) {
       data.remove(0x0112);
     } else {
-      data[0x0112] = IfdShortValue(value);
+      data[0x0112] = IfdValueShort(value);
     }
   }
 
   bool _setRational(int tag, Object? value) {
     if (value is Rational) {
-      data[tag] = IfdRationalValue.from(value);
+      data[tag] = IfdValueRational.from(value);
       return true;
     } else if (value is List<int>) {
       if (value.length == 2) {
-        data[tag] = IfdRationalValue.from(Rational(value[0], value[1]));
+        data[tag] = IfdValueRational.from(Rational(value[0], value[1]));
         return true;
       }
     }
@@ -228,7 +264,7 @@ class IfdDirectory {
     if (value == null) {
       data.remove(0x0128);
     } else {
-      data[0x0128] = IfdShortValue(value);
+      data[0x0128] = IfdValueShort(value);
     }
   }
 
@@ -238,7 +274,7 @@ class IfdDirectory {
     if (value == null) {
       data.remove(0x0100);
     } else {
-      data[0x0100] = IfdShortValue(value);
+      data[0x0100] = IfdValueShort(value);
     }
   }
 
@@ -248,7 +284,7 @@ class IfdDirectory {
     if (value == null) {
       data.remove(0x0101);
     } else {
-      data[0x0101] = IfdShortValue(value);
+      data[0x0101] = IfdValueShort(value);
     }
   }
 
@@ -258,7 +294,7 @@ class IfdDirectory {
     if (value == null) {
       data.remove(0x0131);
     } else {
-      data[0x0131] = IfdAsciiValue(value);
+      data[0x0131] = IfdValueAscii(value);
     }
   }
 
@@ -268,7 +304,7 @@ class IfdDirectory {
     if (value == null) {
       data.remove(0x8298);
     } else {
-      data[0x8298] = IfdAsciiValue(value);
+      data[0x8298] = IfdValueAscii(value);
     }
   }
 }

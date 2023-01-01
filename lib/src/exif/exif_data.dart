@@ -5,6 +5,7 @@ import 'ifd_container.dart';
 import 'ifd_directory.dart';
 import 'ifd_value.dart';
 
+/// Stores EXIF data for an Image.
 class ExifData extends IfdContainer {
   ExifData() : super();
 
@@ -81,6 +82,8 @@ class ExifData extends IfdContainer {
     return s.toString();
   }
 
+  int getDataSize() => 8 + (directories['ifd0']?.getDataSize() ?? 0);
+
   void write(OutputBuffer out) {
     final saveEndian = out.bigEndian;
 
@@ -103,19 +106,19 @@ class ExifData extends IfdContainer {
       offsets[name] = dataOffset;
 
       if (ifd.sub.containsKey('exif')) {
-        ifd[0x8769] = IfdLongValue(0);
+        ifd[0x8769] = IfdValueLong(0);
       } else {
         ifd.data.remove(0x8769);
       }
 
       if (ifd.sub.containsKey('interop')) {
-        ifd[0xA005] = IfdLongValue(0);
+        ifd[0xA005] = IfdValueLong(0);
       } else {
         ifd.data.remove(0xA005);
       }
 
       if (ifd.sub.containsKey('gps')) {
-        ifd[0x8825] = IfdLongValue(0);
+        ifd[0x8825] = IfdValueLong(0);
       } else {
         ifd.data.remove(0x8825);
       }
@@ -191,13 +194,27 @@ class ExifData extends IfdContainer {
 
   int _writeDirectory(OutputBuffer out, IfdDirectory ifd, int dataOffset) {
     out.writeUint16(ifd.keys.length);
+    final stripOffsetTag = exifTagNameToID['StripOffsets'];
     for (var tag in ifd.keys) {
       final value = ifd[tag]!;
 
+      // Special-case StripOffsets, used by TIFF, that if it points to
+      // Undefined value type, then its storing the image data and should
+      // be translated to the StripOffsets long type.
+      final tagType =
+          tag == stripOffsetTag && value.type == IfdValueType.undefined
+              ? IfdValueType.long
+              : value.type;
+
+      final tagLength =
+          tag == stripOffsetTag && value.type == IfdValueType.undefined
+              ? 1
+              : value.length;
+
       out
         ..writeUint16(tag)
-        ..writeUint16(value.type.index)
-        ..writeUint32(value.length);
+        ..writeUint16(tagType.index)
+        ..writeUint32(tagLength);
 
       var size = value.dataSize;
       if (size <= 4) {
@@ -335,40 +352,40 @@ class ExifData extends IfdContainer {
       case IfdValueType.none:
         break;
       case IfdValueType.sByte:
-        entry.value = IfdSByteValue.data(data, count);
+        entry.value = IfdValueSByte.data(data, count);
         break;
       case IfdValueType.byte:
         entry.value = IfdByteValue.data(data, count);
         break;
       case IfdValueType.undefined:
-        entry.value = ExifUndefinedValue.data(data, count);
+        entry.value = IfdValueUndefined.data(data, count);
         break;
       case IfdValueType.ascii:
-        entry.value = IfdAsciiValue.data(data, count);
+        entry.value = IfdValueAscii.data(data, count);
         break;
       case IfdValueType.short:
-        entry.value = IfdShortValue.data(data, count);
+        entry.value = IfdValueShort.data(data, count);
         break;
       case IfdValueType.long:
-        entry.value = IfdLongValue.data(data, count);
+        entry.value = IfdValueLong.data(data, count);
         break;
       case IfdValueType.rational:
-        entry.value = IfdRationalValue.data(data, count);
+        entry.value = IfdValueRational.data(data, count);
         break;
       case IfdValueType.sRational:
-        entry.value = IfdSRationalValue.data(data, count);
+        entry.value = IfdValueSRational.data(data, count);
         break;
       case IfdValueType.sShort:
-        entry.value = IfdSShortValue.data(data, count);
+        entry.value = IfdValueSShort.data(data, count);
         break;
       case IfdValueType.sLong:
-        entry.value = IfdSLongValue.data(data, count);
+        entry.value = IfdValueSLong.data(data, count);
         break;
       case IfdValueType.single:
-        entry.value = IfdSingleValue.data(data, count);
+        entry.value = IfdValueSingle.data(data, count);
         break;
       case IfdValueType.double:
-        entry.value = IfdDoubleValue.data(data, count);
+        entry.value = IfdValueDouble.data(data, count);
         break;
     }
 

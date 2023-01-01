@@ -37,27 +37,27 @@ class TiffEntry {
       case IfdValueType.byte:
         return value = IfdByteValue.data(data, count);
       case IfdValueType.ascii:
-        return value = IfdAsciiValue.data(data, count);
+        return value = IfdValueAscii.data(data, count);
       case IfdValueType.undefined:
         return value = IfdByteValue.data(data, count);
       case IfdValueType.short:
-        return value = IfdShortValue.data(data, count);
+        return value = IfdValueShort.data(data, count);
       case IfdValueType.long:
-        return value = IfdLongValue.data(data, count);
+        return value = IfdValueLong.data(data, count);
       case IfdValueType.rational:
-        return value = IfdRationalValue.data(data, count);
+        return value = IfdValueRational.data(data, count);
       case IfdValueType.single:
-        return value = IfdSingleValue.data(data, count);
+        return value = IfdValueSingle.data(data, count);
       case IfdValueType.double:
-        return value = IfdDoubleValue.data(data, count);
+        return value = IfdValueDouble.data(data, count);
       case IfdValueType.sByte:
-        return value = IfdSByteValue.data(data, count);
+        return value = IfdValueSByte.data(data, count);
       case IfdValueType.sShort:
-        return value = IfdSShortValue.data(data, count);
+        return value = IfdValueSShort.data(data, count);
       case IfdValueType.sLong:
-        return value = IfdSLongValue.data(data, count);
+        return value = IfdValueSLong.data(data, count);
       case IfdValueType.sRational:
-        return value = IfdSRationalValue.data(data, count);
+        return value = IfdValueSRational.data(data, count);
       case IfdValueType.none:
         return null;
     }

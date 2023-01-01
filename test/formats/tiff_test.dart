@@ -7,6 +7,50 @@ import '../_test_util.dart';
 void main() {
   group('Format', () {
     group('tiff', () {
+      test('encode', () async {
+        final i0 = Image(width: 256, height: 256);
+        for (final p in i0) {
+          p
+            ..r = p.x
+            ..g = p.y;
+        }
+        await encodeTiffFile('$testOutputPath/tif/colors.tif', i0);
+        final i1 = await decodeTiffFile('$testOutputPath/tif/colors.tif');
+        expect(i1, isNotNull);
+        expect(i1!.width, equals(i0.width));
+        expect(i1.height, equals(i0.height));
+        for (final p in i1) {
+          expect(p.r, equals(p.x));
+          expect(p.g, equals(p.y));
+          expect(p.b, equals(0));
+          expect(p.a, equals(255));
+        }
+
+        final i3p = Image(width: 256, height: 256, numChannels: 4,
+            withPalette: true);
+        for (var i = 0; i < 256; ++i) {
+          i3p.palette!.setRgb(i, i, i, i);
+        }
+        for (final p in i3p) {
+          p.index = p.x;
+        }
+        await encodeTiffFile('$testOutputPath/tif/palette.tif', i3p);
+        final i3p2 = await decodeTiffFile('$testOutputPath/tif/palette.tif');
+        expect(i3p2, isNotNull);
+        expect(i3p2!.width, equals(i3p.width));
+        expect(i3p2.height, equals(i3p.height));
+        expect(i3p2.hasPalette, isTrue);
+        for (final p in i3p2) {
+          expect(p.r, equals(p.x));
+          expect(p.g, equals(p.x));
+          expect(p.b, equals(p.x));
+          expect(p.a, equals(255));
+        }
+
+        final img = (await decodeJpgFile('test/_data/jpg/big_buck_bunny.jpg'))!;
+        await encodeTiffFile('$testOutputPath/tif/big_buck_bunny.tif', img);
+      });
+
       const name = 'cmyk';
       test(name, () {
         final bytes = File('test/_data/tiff/$name.tif').readAsBytesSync();
@@ -90,8 +134,9 @@ void main() {
               ..createSync(recursive: true)
               ..writeAsBytesSync(tif);
 
-            final i2 = decodeTiff(tif)!;
-            expect(i2.width, equals(image.width));
+            final i2 = decodeTiff(tif);
+            expect(i2, isNotNull);
+            expect(i2!.width, equals(image.width));
             expect(i2.height, equals(image.height));
 
             final i3 = i2.isHdrFormat ? i2.convert(format: Format.uint8) : i2;

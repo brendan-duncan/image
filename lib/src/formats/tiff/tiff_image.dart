@@ -43,6 +43,7 @@ class TiffImage {
   int? t4Options = 0;
   int? t6Options = 0;
   int? extraSamples;
+  int colorMapSamples = 0;
   List<int>? colorMap;
   // Starting index in the [colorMap] for the red channel.
   late int colorMapRed;
@@ -81,7 +82,8 @@ class TiffImage {
       } else if (tag == exifTagNameToID['ImageLength']) {
         height = entry.read()?.toInt() ?? 0;
       } else if (tag == exifTagNameToID['PhotometricInterpretation']) {
-        final pt = entry.read()?.toInt() ?? TiffPhotometricType.values.length;
+        final v = entry.read();
+        final pt = v?.toInt() ?? TiffPhotometricType.values.length;
         if (pt < TiffPhotometricType.values.length) {
           photometricType = TiffPhotometricType.values[pt];
         } else {
@@ -99,11 +101,20 @@ class TiffImage {
         final v = entry.read()?.toInt() ?? 0;
         sampleFormat = TiffFormat.values[v];
       } else if (tag == exifTagNameToID['ColorMap']) {
-        colorMap = entry.read()?.toData();
-        colorMapRed = 0;
-        colorMapGreen = colorMap!.length ~/ 3;
-        colorMapBlue = colorMapGreen * 2;
+        final v = entry.read();
+        if (v != null) {
+          colorMap = v.toData().buffer.asUint16List();
+          colorMapRed = 0;
+          colorMapGreen = colorMap!.length ~/ 3;
+          colorMapBlue = colorMapGreen * 2;
+        }
       }
+    }
+
+    if (colorMap != null && photometricType == TiffPhotometricType.palette) {
+      // Only support RGB palettes.
+      colorMapSamples = 3;
+      samplesPerPixel = 1;
     }
 
     if (width == 0 || height == 0) {
@@ -192,6 +203,7 @@ class TiffImage {
         break;
       case TiffPhotometricType.palette:
         if (samplesPerPixel == 1 &&
+            colorMap != null &&
             (bitsPerSample == 4 || bitsPerSample == 8 || bitsPerSample == 16)) {
           imageType = TiffImageType.palette;
         }
@@ -273,7 +285,8 @@ class TiffImage {
     if (hasPalette) {
       final p = image.palette!;
       final cm = colorMap!;
-      final numColors = cm.length ~/ 3;
+      const numChannels = 3; // Only support RGB palettes
+      final numColors = cm.length ~/ numChannels;
       for (var i = 0; i < numColors; ++i) {
         p.setRgb(i, cm[colorMapRed + i], cm[colorMapGreen + i],
             cm[colorMapBlue + i]);
@@ -375,7 +388,7 @@ class TiffImage {
               } else if (bitsPerSample == 16) {
                 sample = Float16.float16ToDouble(byteData.readUint16());
               }
-              image.setPixelRgb(px, py, sample, 0, 0);
+              image.setPixelR(px, py, sample);
             } else {
               var sample = 0;
               if (bitsPerSample == 8) {
@@ -397,7 +410,7 @@ class TiffImage {
                 sample = mx - sample;
               }
 
-              image.setPixelRgb(px, py, sample, 0, 0);
+              image.setPixelR(px, py, sample);
             }
           } else if (samplesPerPixel == 2) {
             var gray = 0;

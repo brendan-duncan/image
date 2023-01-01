@@ -1,16 +1,24 @@
 import 'ifd_directory.dart';
 
+/// An EXIF container of one or more named EXIF IFD directories.
+///
+/// The typical directory for image EXIF data is ifd0. Sometimes an image
+/// may have additional image data, such as for a thumbnail, which would be
+/// contained in a directory ifd1.
+///
+/// Directories may also have sub-containers, such as for GPS data.
 class IfdContainer {
   Map<String, IfdDirectory> directories;
 
   IfdContainer() : directories = {};
 
-  IfdContainer.from(IfdContainer? other)
-      : directories = other == null
-            ? {}
-            : Map<String, IfdDirectory>.from(other.directories);
+  IfdContainer.from(IfdContainer? other) : directories = {} {
+    other?.directories
+        .forEach((key, value) => directories[key] = value.clone());
+  }
 
   Iterable<String> get keys => directories.keys;
+
   Iterable<IfdDirectory> get values => directories.values;
 
   bool get isEmpty {

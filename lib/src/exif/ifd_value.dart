@@ -27,6 +27,7 @@ abstract class IfdValue {
   IfdValue clone();
 
   IfdValueType get type;
+
   int get length;
 
   int get dataSize => ifdValueTypeSize[type.index] * length;
@@ -34,11 +35,16 @@ abstract class IfdValue {
   String get typeString => type.name;
 
   bool toBool([int index = 0]) => false;
+
   int toInt([int index = 0]) => 0;
+
   double toDouble([int index = 0]) => 0.0;
+
   Uint8List toData() => Uint8List(0);
+
   @override
   String toString() => "";
+
   Rational toRational([int index = 0]) => Rational(0, 1);
 
   @override
@@ -54,9 +60,13 @@ abstract class IfdValue {
   void write(OutputBuffer out);
 
   void setBool(bool v, [int index = 0]) {}
+
   void setInt(int v, [int index = 0]) {}
+
   void setDouble(double v, [int index = 0]) {}
+
   void setRational(int numerator, int denomitator, [int index = 0]) {}
+
   void setString(String v) {}
 }
 
@@ -110,20 +120,20 @@ class IfdByteValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class IfdAsciiValue extends IfdValue {
+class IfdValueAscii extends IfdValue {
   String value;
 
-  IfdAsciiValue(this.value);
+  IfdValueAscii(this.value);
 
-  IfdAsciiValue.list(List<int> value) : value = String.fromCharCodes(value);
+  IfdValueAscii.list(List<int> value) : value = String.fromCharCodes(value);
 
-  IfdAsciiValue.data(InputBuffer data, int count)
+  IfdValueAscii.data(InputBuffer data, int count)
       : value = count == 0 ? data.readString() : data.readString(count - 1);
 
-  IfdAsciiValue.string(this.value);
+  IfdValueAscii.string(this.value);
 
   @override
-  IfdValue clone() => IfdAsciiValue.string(value);
+  IfdValue clone() => IfdValueAscii.string(value);
 
   @override
   IfdValueType get type => IfdValueType.ascii;
@@ -133,7 +143,7 @@ class IfdAsciiValue extends IfdValue {
 
   @override
   bool operator ==(Object other) =>
-      other is IfdAsciiValue &&
+      other is IfdValueAscii &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -150,29 +160,30 @@ class IfdAsciiValue extends IfdValue {
 
   @override
   String toString() => value;
+
   @override
   void setString(String v) {
     value = v;
   }
 }
 
-class IfdShortValue extends IfdValue {
+class IfdValueShort extends IfdValue {
   Uint16List value;
 
-  IfdShortValue(int value) : value = Uint16List(1) {
+  IfdValueShort(int value) : value = Uint16List(1) {
     this.value[0] = value;
   }
 
-  IfdShortValue.list(List<int> value) : value = Uint16List.fromList(value);
+  IfdValueShort.list(List<int> value) : value = Uint16List.fromList(value);
 
-  IfdShortValue.data(InputBuffer data, int count) : value = Uint16List(count) {
+  IfdValueShort.data(InputBuffer data, int count) : value = Uint16List(count) {
     for (int i = 0; i < count; ++i) {
       value[i] = data.readUint16();
     }
   }
 
   @override
-  IfdValue clone() => IfdShortValue.list(value);
+  IfdValue clone() => IfdValueShort.list(value);
 
   @override
   IfdValueType get type => IfdValueType.short;
@@ -182,7 +193,7 @@ class IfdShortValue extends IfdValue {
 
   @override
   bool operator ==(Object other) =>
-      other is IfdShortValue &&
+      other is IfdValueShort &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -191,10 +202,14 @@ class IfdShortValue extends IfdValue {
 
   @override
   int toInt([int index = 0]) => value[index];
+
   @override
   void setInt(int v, [int index = 0]) {
     value[index] = v;
   }
+
+  @override
+  Uint8List toData() => value.buffer.asUint8List();
 
   @override
   void write(OutputBuffer out) {
@@ -208,23 +223,23 @@ class IfdShortValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class IfdLongValue extends IfdValue {
+class IfdValueLong extends IfdValue {
   Uint32List value;
 
-  IfdLongValue(int value) : value = Uint32List(1) {
+  IfdValueLong(int value) : value = Uint32List(1) {
     this.value[0] = value;
   }
 
-  IfdLongValue.list(List<int> value) : value = Uint32List.fromList(value);
+  IfdValueLong.list(List<int> value) : value = Uint32List.fromList(value);
 
-  IfdLongValue.data(InputBuffer data, int count) : value = Uint32List(count) {
+  IfdValueLong.data(InputBuffer data, int count) : value = Uint32List(count) {
     for (int i = 0; i < count; ++i) {
       value[i] = data.readUint32();
     }
   }
 
   @override
-  IfdValue clone() => IfdLongValue.list(value);
+  IfdValue clone() => IfdValueLong.list(value);
 
   @override
   IfdValueType get type => IfdValueType.long;
@@ -234,7 +249,7 @@ class IfdLongValue extends IfdValue {
 
   @override
   bool operator ==(Object other) =>
-      other is IfdLongValue &&
+      other is IfdValueLong &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -249,7 +264,7 @@ class IfdLongValue extends IfdValue {
   }
 
   @override
-  Uint8List toData() => Uint8List.view(value.buffer);
+  Uint8List toData() => value.buffer.asUint8List();
 
   @override
   void write(OutputBuffer out) {
@@ -263,24 +278,24 @@ class IfdLongValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class IfdRationalValue extends IfdValue {
+class IfdValueRational extends IfdValue {
   List<Rational> value;
 
-  IfdRationalValue(int numerator, int denominator)
+  IfdValueRational(int numerator, int denominator)
       : value = [Rational(numerator, denominator)];
 
-  IfdRationalValue.from(Rational r)
+  IfdValueRational.from(Rational r)
       : value = [Rational(r.numerator, r.denominator)];
 
-  IfdRationalValue.list(List<Rational> value)
+  IfdValueRational.list(List<Rational> value)
       : value = List<Rational>.from(value);
 
-  IfdRationalValue.data(InputBuffer data, int count)
+  IfdValueRational.data(InputBuffer data, int count)
       : value = List<Rational>.generate(
             count, (i) => Rational(data.readUint32(), data.readUint32()));
 
   @override
-  IfdValue clone() => IfdRationalValue.list(value);
+  IfdValue clone() => IfdValueRational.list(value);
 
   @override
   IfdValueType get type => IfdValueType.rational;
@@ -290,14 +305,16 @@ class IfdRationalValue extends IfdValue {
 
   @override
   int toInt([int index = 0]) => value[index].toInt();
+
   @override
   double toDouble([int index = 0]) => value[index].toDouble();
+
   @override
   Rational toRational([int index = 0]) => value[index];
 
   @override
   bool operator ==(Object other) =>
-      other is IfdRationalValue &&
+      other is IfdValueRational &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -323,29 +340,31 @@ class IfdRationalValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class IfdSByteValue extends IfdValue {
+class IfdValueSByte extends IfdValue {
   Int8List value;
 
-  IfdSByteValue(int value) : value = Int8List(1) {
+  IfdValueSByte(int value) : value = Int8List(1) {
     this.value[0] = value;
   }
 
-  IfdSByteValue.list(List<int> value) : value = Int8List.fromList(value);
+  IfdValueSByte.list(List<int> value) : value = Int8List.fromList(value);
 
-  IfdSByteValue.data(InputBuffer data, int count)
+  IfdValueSByte.data(InputBuffer data, int count)
       : value = Int8List.fromList(
             Int8List.view(data.toUint8List().buffer, 0, count));
 
   @override
-  IfdValue clone() => IfdSByteValue.list(value);
+  IfdValue clone() => IfdValueSByte.list(value);
+
   @override
   IfdValueType get type => IfdValueType.sByte;
+
   @override
   int get length => value.length;
 
   @override
   bool operator ==(Object other) =>
-      other is IfdSByteValue &&
+      other is IfdValueSByte &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -354,13 +373,14 @@ class IfdSByteValue extends IfdValue {
 
   @override
   int toInt([int index = 0]) => value[index];
+
   @override
   void setInt(int v, [int index = 0]) {
     value[index] = v;
   }
 
   @override
-  Uint8List toData() => Uint8List.view(value.buffer);
+  Uint8List toData() => value.buffer.asUint8List();
 
   @override
   void write(OutputBuffer out) {
@@ -371,31 +391,33 @@ class IfdSByteValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class IfdSShortValue extends IfdValue {
+class IfdValueSShort extends IfdValue {
   Int16List value;
 
-  IfdSShortValue(int value) : value = Int16List(1) {
+  IfdValueSShort(int value) : value = Int16List(1) {
     this.value[0] = value;
   }
 
-  IfdSShortValue.list(List<int> value) : value = Int16List.fromList(value);
+  IfdValueSShort.list(List<int> value) : value = Int16List.fromList(value);
 
-  IfdSShortValue.data(InputBuffer data, int count) : value = Int16List(count) {
+  IfdValueSShort.data(InputBuffer data, int count) : value = Int16List(count) {
     for (int i = 0; i < count; ++i) {
       value[i] = data.readInt16();
     }
   }
 
   @override
-  IfdValue clone() => IfdSShortValue.list(value);
+  IfdValue clone() => IfdValueSShort.list(value);
+
   @override
   IfdValueType get type => IfdValueType.sShort;
+
   @override
   int get length => value.length;
 
   @override
   bool operator ==(Object other) =>
-      other is IfdSShortValue &&
+      other is IfdValueSShort &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -411,7 +433,7 @@ class IfdSShortValue extends IfdValue {
   }
 
   @override
-  Uint8List toData() => Uint8List.view(value.buffer);
+  Uint8List toData() => value.buffer.asUint8List();
 
   @override
   void write(OutputBuffer out) {
@@ -428,23 +450,23 @@ class IfdSShortValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class IfdSLongValue extends IfdValue {
+class IfdValueSLong extends IfdValue {
   Int32List value;
 
-  IfdSLongValue(int value) : value = Int32List(1) {
+  IfdValueSLong(int value) : value = Int32List(1) {
     this.value[0] = value;
   }
 
-  IfdSLongValue.list(List<int> value) : value = Int32List.fromList(value);
+  IfdValueSLong.list(List<int> value) : value = Int32List.fromList(value);
 
-  IfdSLongValue.data(InputBuffer data, int count) : value = Int32List(count) {
+  IfdValueSLong.data(InputBuffer data, int count) : value = Int32List(count) {
     for (int i = 0; i < count; ++i) {
       value[i] = data.readInt32();
     }
   }
 
   @override
-  IfdValue clone() => IfdSLongValue.list(value);
+  IfdValue clone() => IfdValueSLong.list(value);
 
   @override
   IfdValueType get type => IfdValueType.sLong;
@@ -454,7 +476,7 @@ class IfdSLongValue extends IfdValue {
 
   @override
   bool operator ==(Object other) =>
-      other is IfdSLongValue &&
+      other is IfdValueSLong &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -470,7 +492,7 @@ class IfdSLongValue extends IfdValue {
   }
 
   @override
-  Uint8List toData() => Uint8List.view(value.buffer);
+  Uint8List toData() => value.buffer.asUint8List();
 
   @override
   void write(OutputBuffer out) {
@@ -484,23 +506,23 @@ class IfdSLongValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class IfdSRationalValue extends IfdValue {
+class IfdValueSRational extends IfdValue {
   List<Rational> value;
 
-  IfdSRationalValue(int numerator, int denominator)
+  IfdValueSRational(int numerator, int denominator)
       : value = [Rational(numerator, denominator)];
 
-  IfdSRationalValue.from(Rational value) : value = [value];
+  IfdValueSRational.from(Rational value) : value = [value];
 
-  IfdSRationalValue.data(InputBuffer data, int count)
+  IfdValueSRational.data(InputBuffer data, int count)
       : value = List<Rational>.generate(
             count, (i) => Rational(data.readInt32(), data.readInt32()));
 
-  IfdSRationalValue.list(List<Rational> value)
+  IfdValueSRational.list(List<Rational> value)
       : value = List<Rational>.from(value);
 
   @override
-  IfdValue clone() => IfdSRationalValue.list(value);
+  IfdValue clone() => IfdValueSRational.list(value);
 
   @override
   IfdValueType get type => IfdValueType.sRational;
@@ -510,7 +532,7 @@ class IfdSRationalValue extends IfdValue {
 
   @override
   bool operator ==(Object other) =>
-      other is IfdSRationalValue &&
+      other is IfdValueSRational &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -542,16 +564,16 @@ class IfdSRationalValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class IfdSingleValue extends IfdValue {
+class IfdValueSingle extends IfdValue {
   Float32List value;
 
-  IfdSingleValue(double value) : value = Float32List(1) {
+  IfdValueSingle(double value) : value = Float32List(1) {
     this.value[0] = value;
   }
 
-  IfdSingleValue.list(List<double> value) : value = Float32List.fromList(value);
+  IfdValueSingle.list(List<double> value) : value = Float32List.fromList(value);
 
-  IfdSingleValue.data(InputBuffer data, int count)
+  IfdValueSingle.data(InputBuffer data, int count)
       : value = Float32List(count) {
     for (int i = 0; i < count; ++i) {
       value[i] = data.readFloat32();
@@ -559,7 +581,7 @@ class IfdSingleValue extends IfdValue {
   }
 
   @override
-  IfdValue clone() => IfdSingleValue.list(value);
+  IfdValue clone() => IfdValueSingle.list(value);
 
   @override
   IfdValueType get type => IfdValueType.single;
@@ -569,7 +591,7 @@ class IfdSingleValue extends IfdValue {
 
   @override
   bool operator ==(Object other) =>
-      other is IfdSingleValue &&
+      other is IfdValueSingle &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -577,7 +599,7 @@ class IfdSingleValue extends IfdValue {
   int get hashCode => Object.hashAll(value);
 
   @override
-  Uint8List toData() => Uint8List.view(value.buffer);
+  Uint8List toData() => value.buffer.asUint8List();
 
   @override
   double toDouble([int index = 0]) => value[index];
@@ -599,16 +621,16 @@ class IfdSingleValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class IfdDoubleValue extends IfdValue {
+class IfdValueDouble extends IfdValue {
   Float64List value;
 
-  IfdDoubleValue(double value) : value = Float64List(1) {
+  IfdValueDouble(double value) : value = Float64List(1) {
     this.value[0] = value;
   }
 
-  IfdDoubleValue.list(List<double> value) : value = Float64List.fromList(value);
+  IfdValueDouble.list(List<double> value) : value = Float64List.fromList(value);
 
-  IfdDoubleValue.data(InputBuffer data, int count)
+  IfdValueDouble.data(InputBuffer data, int count)
       : value = Float64List(count) {
     for (int i = 0; i < count; ++i) {
       value[i] = data.readFloat32();
@@ -616,7 +638,7 @@ class IfdDoubleValue extends IfdValue {
   }
 
   @override
-  IfdValue clone() => IfdDoubleValue.list(value);
+  IfdValue clone() => IfdValueDouble.list(value);
 
   @override
   IfdValueType get type => IfdValueType.double;
@@ -626,7 +648,7 @@ class IfdDoubleValue extends IfdValue {
 
   @override
   bool operator ==(Object other) =>
-      other is IfdDoubleValue &&
+      other is IfdValueDouble &&
       length == other.length &&
       hashCode == other.hashCode;
 
@@ -642,7 +664,7 @@ class IfdDoubleValue extends IfdValue {
   }
 
   @override
-  Uint8List toData() => Uint8List.view(value.buffer);
+  Uint8List toData() => value.buffer.asUint8List();
 
   @override
   void write(OutputBuffer out) {
@@ -656,16 +678,16 @@ class IfdDoubleValue extends IfdValue {
   String toString() => value.length == 1 ? '${value[0]}' : '$value';
 }
 
-class ExifUndefinedValue extends IfdValue {
+class IfdValueUndefined extends IfdValue {
   Uint8List value;
 
-  ExifUndefinedValue.list(List<int> value) : value = Uint8List.fromList(value);
+  IfdValueUndefined.list(List<int> value) : value = Uint8List.fromList(value);
 
-  ExifUndefinedValue.data(InputBuffer data, int count)
+  IfdValueUndefined.data(InputBuffer data, int count)
       : value = Uint8List.fromList(data.readBytes(count).toUint8List());
 
   @override
-  IfdValue clone() => ExifUndefinedValue.list(value);
+  IfdValue clone() => IfdValueUndefined.list(value);
 
   @override
   IfdValueType get type => IfdValueType.undefined;
@@ -678,7 +700,7 @@ class ExifUndefinedValue extends IfdValue {
 
   @override
   bool operator ==(Object other) =>
-      other is ExifUndefinedValue &&
+      other is IfdValueUndefined &&
       length == other.length &&
       hashCode == other.hashCode;
 

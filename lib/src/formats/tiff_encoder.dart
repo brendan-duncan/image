@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import '../color/format.dart';
-import '../exif/exif_tag.dart';
+import '../exif/exif_data.dart';
 import '../exif/ifd_value.dart';
 import '../image/image.dart';
 import '../util/output_buffer.dart';
@@ -13,45 +13,60 @@ class TiffEncoder extends Encoder {
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
     final out = OutputBuffer();
-    _writeHeader(out);
-    _writeImage(out, image);
-    out.writeUint32(0); // no offset to the next image
+
+    // TIFF is really just an EXIF structure (or, really, EXIF is just a TIFF
+    // structure).
+
+    final exif = ExifData();
+    if (image.hasExif) {
+      exif.imageIfd.copy(image.exif.imageIfd);
+    }
+
+    // TODO: support encoding HDR images to TIFF.
+    if (image.isHdrFormat) {
+      image = image.convert(format: Format.uint8);
+    }
+
+    final type = image.numChannels == 1
+        ? TiffPhotometricType.blackIsZero.index
+        : image.hasPalette
+            ? TiffPhotometricType.palette.index
+            : TiffPhotometricType.rgb.index;
+
+    final nc = image.numChannels;
+
+    final ifd0 = exif.imageIfd;
+    ifd0['ImageWidth'] = image.width;
+    ifd0['ImageHeight'] = image.height;
+    ifd0['BitsPerSample'] = image.bitsPerChannel;
+    ifd0['SampleFormat'] = _getSampleFormat(image).index;
+    ifd0['SamplesPerPixel'] = image.hasPalette ? 1 : nc;
+    ifd0['Compression'] = TiffCompression.none;
+    ifd0['PhotometricInterpretation'] = type;
+    ifd0['RowsPerStrip'] = image.height;
+    ifd0['PlanarConfiguration'] = 1;
+    ifd0['TileWidth'] = image.width;
+    ifd0['TileLength'] = image.height;
+    ifd0['StripByteCounts'] = image.lengthInBytes;
+    ifd0['StripOffsets'] = IfdValueUndefined.list(image.toUint8List());
+
+    if (image.hasPalette) {
+      final p = image.palette!;
+      // Only support RGB palettes
+      const numCh = 3;
+      final numC = p.numColors;
+      final colorMap = Uint16List(numC * numCh);
+      for (var c = 0, ci = 0; c < numCh; ++c) {
+        for (var i = 0; i < numC; ++i) {
+          colorMap[ci++] = p.get(i, c).toInt() << 8;
+        }
+      }
+      ifd0['ColorMap'] = colorMap;
+    }
+
+    exif.write(out);
+
     return out.getBytes();
-  }
-
-  void _writeHeader(OutputBuffer out) {
-    out
-      ..writeUint16(littleEndian) // byteOrder
-      ..writeUint16(signature) // TIFF signature
-      ..writeUint32(8); // Offset to the start of the IFD tags
-  }
-
-  void _writeImage(OutputBuffer out, Image image) {
-    out.writeUint16(11); // number of IFD entries
-
-    _writeEntryUint32(out, exifTagNameToID['ImageWidth']!, image.width);
-    _writeEntryUint32(out, exifTagNameToID['ImageLength']!, image.height);
-    _writeEntryUint16(
-        out, exifTagNameToID['BitsPerSample']!, image.bitsPerChannel);
-    _writeEntryUint16(
-        out, exifTagNameToID['Compression']!, TiffCompression.none);
-    _writeEntryUint16(
-        out,
-        exifTagNameToID['PhotometricInterpretation']!,
-        image.numChannels == 1
-            ? TiffPhotometricType.blackIsZero.index
-            : TiffPhotometricType.rgb.index);
-    _writeEntryUint16(
-        out, exifTagNameToID['SamplesPerPixel']!, image.numChannels);
-    _writeEntryUint16(
-        out, exifTagNameToID['SampleFormat']!, _getSampleFormat(image).index);
-
-    _writeEntryUint32(out, exifTagNameToID['RowsPerStrip']!, image.height);
-    _writeEntryUint16(out, exifTagNameToID['PlanarConfiguration']!, 1);
-    _writeEntryUint32(out, exifTagNameToID['StripByteCounts']!,
-        image.width * image.height * 4);
-    _writeEntryUint32(out, exifTagNameToID['StripOffsets']!, out.length + 4);
-    out.writeBytes(image.toUint8List());
   }
 
   TiffFormat _getSampleFormat(Image image) {
@@ -64,24 +79,4 @@ class TiffEncoder extends Encoder {
         return TiffFormat.float;
     }
   }
-
-  void _writeEntryUint16(OutputBuffer out, int tag, int data) {
-    out
-      ..writeUint16(tag)
-      ..writeUint16(IfdValueType.short.index)
-      ..writeUint32(1) // number of values
-      ..writeUint16(data)
-      ..writeUint16(0); // pad to 4 bytes
-  }
-
-  void _writeEntryUint32(OutputBuffer out, int tag, int data) {
-    out
-      ..writeUint16(tag)
-      ..writeUint16(IfdValueType.long.index)
-      ..writeUint32(1) // number of values
-      ..writeUint32(data);
-  }
-
-  static const littleEndian = 0x4949;
-  static const signature = 42;
 }

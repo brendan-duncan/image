@@ -356,6 +356,8 @@ class Image extends Iterable<Pixel> {
   /// Float data (regardless of precision).
   FormatType get formatType => data?.formatType ?? FormatType.uint;
 
+  bool get hasExif => _exif != null;
+
   /// The exif metadata for the image. If an ExifData hasn't been created
   /// for the image yet, one will be added.
   ExifData get exif {
