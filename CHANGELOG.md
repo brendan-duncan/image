@@ -1,3 +1,9 @@
+## 4.0.4 - December 31, 2022
+
+- Fix for animated PNG with palette images, which needed a global palette for all frames.
+- Fix TIFF encoder for palette images.
+- Cleaned up EXIF classes.
+
 ## 4.0.3 - December 30, 2022
 
 - Fix for encoding GIF transparency.
