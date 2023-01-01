@@ -249,6 +249,9 @@ Image drawLine(Image image,
   }
 
   // Antialias Line
+  if(thickness == 1) {
+    return _drawLineWu(image, x1: x1, y1: y1, x2: x2, y2: y2, color: color);
+  }
 
   final ag = (dy.abs() < dx.abs()) ? cos(atan2(dy, dx)) : sin(atan2(dy, dx));
 
@@ -339,6 +342,125 @@ Image drawLine(Image image,
         frac += 65536;
         x--;
       }
+    }
+  }
+
+  return image;
+}
+
+/// [Xiaolin Wu's line algorithm](https://en.wikipedia.org/wiki/Xiaolin_Wu's_line_algorithm)
+Image _drawLineWu(Image image,
+    {required int x1,
+      required int y1,
+      required int x2,
+      required int y2,
+      required Color color,
+      // bool antialias = false,
+      // num thickness = 1,
+      Image? mask,
+      Channel maskChannel = Channel.luminance}) {
+  final line = [x1, y1, x2, y2];
+  if (!clipLine(line, [0, 0, image.width - 1, image.height - 1])) {
+    return image;
+  }
+
+  x1 = line[0];
+  y1 = line[1];
+  x2 = line[2];
+  y2 = line[3];
+
+  final bool steep = (y2 - y1).abs() > (x2 - x1).abs();
+
+  int t;
+  if(steep) {
+    t = x1; x1 = y1; y1 = t;
+    t = x2; x2 = y2; y2 = t;
+  }
+  if(x1 > x2) {
+    t = x1; x1 = x2; x2 = t;
+    t = y1; y1 = y2; y2 = t;
+  }
+
+  final int dx = x2 - x1;
+  final int dy = y2 - y1;
+
+  final double gradient = dx == 1 ? 1.0 : dy.toDouble() / dx.toDouble();
+
+  // handle first endpoint
+  int xend = (x1 + 0.5).floor();
+  double yend = y1 + gradient * (xend - x1);
+  double xgap = 1 - (x1 + 0.5 - (x1 + 0.5).floor());
+  final int xpxl1 = xend; // this will be used in the main loop
+  final int ypxl1 = yend.floor();
+
+  if (steep) {
+    drawPixel(image, ypxl1, xpxl1, color,
+        alpha: (1 - (yend - yend.floor())) * xgap,
+        mask: mask,
+        maskChannel: maskChannel);
+    drawPixel(image, ypxl1 + 1, xpxl1, color,
+        alpha: (yend - yend.floor()) * xgap,
+        mask: mask,
+        maskChannel: maskChannel);
+  } else {
+    drawPixel(image, xpxl1, ypxl1, color,
+        alpha: (1 - (yend - yend.floor())) * xgap,
+        mask: mask,
+        maskChannel: maskChannel);
+    drawPixel(image, xpxl1, ypxl1 + 1, color,
+        alpha: (yend - yend.floor()) * xgap,
+        mask: mask,
+        maskChannel: maskChannel);
+  }
+
+  double intery = yend + gradient; // first y-intersection for the main loop
+
+  // handle second endpoint
+  xend = (x2 + 0.5).floor();
+  yend = y2 + gradient * (xend - x2);
+  xgap = x2 + 0.5 - (x2 + 0.5).floor();
+  final int xpxl2 = xend; //this will be used in the main loop
+  final int ypxl2 = yend.floor();
+
+  if (steep) {
+    drawPixel(image, ypxl2, xpxl2, color,
+        alpha: (1.0 - (yend - yend.floor())) * xgap,
+        mask: mask,
+        maskChannel: maskChannel);
+    drawPixel(image, ypxl2 + 1, xpxl2, color,
+        alpha: (yend - yend.floor()) * xgap,
+        mask: mask,
+        maskChannel: maskChannel);
+
+    // main loop
+    for (int x = xpxl1 + 1; x <= xpxl2 - 1; x++) {
+      drawPixel(image, intery.floor(), x, color,
+          alpha: 1.0 - (intery - intery.floor()),
+          mask: mask,
+          maskChannel: maskChannel);
+      drawPixel(image, intery.floor() + 1, x, color,
+          alpha: intery - intery.floor(), mask: mask, maskChannel: maskChannel);
+      intery = intery + gradient;
+    }
+  } else {
+    drawPixel(image, xpxl2, ypxl2, color,
+        alpha: (1.0 - (yend - yend.floor())) * xgap,
+        mask: mask,
+        maskChannel: maskChannel);
+    drawPixel(image, xpxl2, ypxl2 + 1, color,
+        alpha: (yend - yend.floor()) * xgap,
+        mask: mask,
+        maskChannel: maskChannel);
+
+    // main loop
+    for (int x = xpxl1 + 1; x <= xpxl2 - 1; x++) {
+      drawPixel(image, x, intery.floor(), color,
+          alpha: 1.0 - (intery - intery.floor()),
+          mask: mask,
+          maskChannel: maskChannel);
+      drawPixel(image, x, intery.floor() + 1, color,
+          alpha: intery - intery.floor(), mask: mask, maskChannel: maskChannel);
+      intery = intery + gradient;
     }
   }
 
