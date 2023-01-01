@@ -8,6 +8,7 @@ class FillCircleCmd extends Command {
   int y;
   int radius;
   Color color;
+  bool antialias;
   Command? mask;
   Channel maskChannel;
 
@@ -16,6 +17,7 @@ class FillCircleCmd extends Command {
       required this.y,
       required this.radius,
       required this.color,
+      this.antialias = false,
       this.mask,
       this.maskChannel = Channel.luminance})
       : super(input);
@@ -30,6 +32,7 @@ class FillCircleCmd extends Command {
             y: y,
             radius: radius,
             color: color,
+            antialias: antialias,
             mask: maskImg,
             maskChannel: maskChannel)
         : null;

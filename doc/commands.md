@@ -251,7 +251,7 @@ void fill({ required Color color, Command? mask,
   Channel maskChannel = Channel.luminance });
 
 void fillCircle({ required int x, required int y, required int radius,
-  required Color color, Command? mask,
+  required Color color, bool antialias = false, Command? mask,
   Channel maskChannel = Channel.luminance });
 
 void fillFlood({ required int x, required int y, required Color color,

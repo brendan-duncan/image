@@ -548,6 +548,7 @@ class Command {
       required int y,
       required int radius,
       required Color color,
+      bool antialias = false,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = FillCircleCmd(subCommand,
@@ -555,6 +556,7 @@ class Command {
         y: y,
         radius: radius,
         color: color,
+        antialias: antialias,
         mask: mask,
         maskChannel: maskChannel);
   }

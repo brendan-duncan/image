@@ -559,8 +559,8 @@ Channel maskChannel = Channel.luminance })
 
 ```dart
 Image fillCircle(Image image, { required int x, required int y,
-  required int radius, required Color color, Image? mask,
-  Channel maskChannel = Channel.luminance})
+  required int radius, required Color color, bool antialias = false, 
+  Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 ![fillCircle](images/draw/fillCircle.png)
