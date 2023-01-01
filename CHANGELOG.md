@@ -1,3 +1,9 @@
+## 4.0.5 - January 01, 2023
+
+- Improved antialiasing for drawLine
+- Added radius argument to drawRect, fillRect, copyCrop, and copyResizeCropSquare to support rounded rectangles.
+- Add Image.getPixelClamped method.
+
 ## 4.0.4 - December 31, 2022
 
 - Fix for animated PNG with palette images, which needed a global palette for all frames.
