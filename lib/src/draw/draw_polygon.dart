@@ -9,6 +9,8 @@ import '../util/point.dart';
 Image drawPolygon(Image src,
     {required List<Point> vertices,
     required Color color,
+    bool antialias = false,
+    num thickness = 1,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (color.a == 0) {
@@ -33,6 +35,8 @@ Image drawPolygon(Image src,
         x2: vertices[1].xi,
         y2: vertices[1].yi,
         color: color,
+        antialias: antialias,
+        thickness: thickness,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -44,6 +48,8 @@ Image drawPolygon(Image src,
         x2: vertices[i + 1].xi,
         y2: vertices[i + 1].yi,
         color: color,
+        antialias: antialias,
+        thickness: thickness,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -54,6 +60,8 @@ Image drawPolygon(Image src,
       x2: vertices[0].xi,
       y2: vertices[0].yi,
       color: color,
+      antialias: antialias,
+      thickness: thickness,
       mask: mask,
       maskChannel: maskChannel);
 
