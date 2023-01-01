@@ -455,7 +455,15 @@ class Image extends Iterable<Pixel> {
     if (x < 0 || x >= width || y < 0 || y >= height) {
       return Pixel.undefined;
     }
-    return data?.getPixel(x, y, pixel) ?? Pixel.undefined;
+    return getPixel(x, y, pixel);
+  }
+
+  /// Get the pixel from the given [x], [y] coordinate. If the pixel coordinates
+  /// are out of range of the image, they will be clamped to the resolution.
+  Pixel getPixelClamped(int x, int y, [Pixel? pixel]) {
+    x = x.clamp(0, width - 1);
+    y = y.clamp(0, height - 1);
+    return getPixel(x, y, pixel);
   }
 
   /// Get the pixel using the given [interpolation] type for non-integer pixel
