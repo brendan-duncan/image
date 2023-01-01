@@ -360,12 +360,14 @@ the EXIF orientation. Returns a new Image.
 ### [copyCrop](https://brendan-duncan.github.io/image/doc/api/image/copyCrop.html)
 
 ```dart
-Image copyCrop(Image src, { required int x, required int y, required int width, required int height })
+Image copyCrop(Image src, { required int x, required int y, required int width, required int height,
+    num radius = 0})
  ```
 
-Returns a new Image.
+The radius argument is used to round the corners of the crop. Returns a new Image.
 
 ![copyCrop](images/transform/copyCrop.png)
+![copyCrop](images/transform/copyCrop_rounded.png)
 
 ### [copyCropCircle](https://brendan-duncan.github.io/image/doc/api/image/copyCropCircle.html)
 
@@ -416,12 +418,13 @@ Returns a new Image.
 ### [copyResizeCropSquare](https://brendan-duncan.github.io/image/doc/api/image/copyResizeCropSquare.html)
 
 ```dart
-Image copyResizeCropSquare(Image src, { required int size, Interpolation interpolation = Interpolation.nearest })
+Image copyResizeCropSquare(Image src, { required int size, num radius = 1, Interpolation interpolation = Interpolation.nearest })
 ```
 
-Returns a new Image.
+The radius argument is used to round the corners of the crop. Returns a new Image.
 
 ![copyResizeCropSquare](images/transform/copyResizeCropSquare.png)
+![copyResizeCropSquare](images/transform/copyResizeCropSquare_rounded.png)
 
 ### [copyRotate](https://brendan-duncan.github.io/image/doc/api/image/copyRotate.html)
 
@@ -527,7 +530,7 @@ Image drawPolygon(Image src, { required List<Point> vertices,
 
 ```dart
 Image drawRect(Image dst, { required int x1, required int y1, required int x2,
-    required int y2, required Color color, num thickness = 1, Image? mask,
+    required int y2, required Color color, num radius = 0, num thickness = 1, Image? mask,
     Channel maskChannel = Channel.luminance })
 ```
 
@@ -585,7 +588,7 @@ Image drawPolygon(Image src, { required List<Point> vertices,
 
 ```dart
 Image fillRect(Image src, { required int x1, required int y1, required int x2,
-    required int y2, required Color color, Image? mask,
+    required int y2, required Color color, num Radius = 0, Image? mask,
     Channel maskChannel = Channel.luminance })
 ```
 

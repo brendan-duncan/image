@@ -14,7 +14,7 @@ Image drawCircle(Image image,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   final points = calculateCircumference(image, x, y, radius);
-  for (var pt in points) {
+  for (final pt in points) {
     drawPixel(image, pt.xi, pt.yi, color, mask: mask, maskChannel: maskChannel);
   }
   return image;

@@ -9,6 +9,7 @@ class DrawRectCmd extends Command {
   int x2;
   int y2;
   Color color;
+  num radius;
   num thickness;
   Command? mask;
   Channel maskChannel;
@@ -20,6 +21,7 @@ class DrawRectCmd extends Command {
       required this.y2,
       required this.color,
       this.thickness = 1,
+      this.radius = 0,
       this.mask,
       this.maskChannel = Channel.luminance})
       : super(input);
@@ -36,6 +38,7 @@ class DrawRectCmd extends Command {
             y2: y2,
             color: color,
             thickness: thickness,
+            radius: radius,
             mask: maskImg,
             maskChannel: maskChannel)
         : null;

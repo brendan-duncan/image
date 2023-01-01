@@ -14,6 +14,13 @@ void main() {
       expect(i0, isNotNull);
       expect(i0!.width, equals(64));
       expect(i0.height, equals(64));
+
+      await (Command()
+        ..decodePngFile('test/_data/png/buck_24.png')
+        ..copyResizeCropSquare(size: 64, radius: 20)
+        ..writeToFile(
+            '$testOutputPath/transform/copyResizeCropSquare_rounded.png'))
+        .execute();
     });
   });
 }

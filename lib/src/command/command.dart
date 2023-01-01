@@ -497,6 +497,7 @@ class Command {
       required int x2,
       required int y2,
       required Color color,
+      num radius = 0,
       num thickness = 1,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
@@ -506,6 +507,7 @@ class Command {
         x2: x2,
         y2: y2,
         color: color,
+        radius: radius,
         thickness: thickness,
         mask: mask,
         maskChannel: maskChannel);
@@ -588,6 +590,7 @@ class Command {
       required int x2,
       required int y2,
       required Color color,
+      num radius = 0,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = FillRectCmd(subCommand,
@@ -596,6 +599,7 @@ class Command {
         x2: x2,
         y2: y2,
         color: color,
+        radius: radius,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -1071,9 +1075,10 @@ class Command {
 
   void copyResizeCropSquare(
       {required int size,
+      num radius = 0,
       Interpolation interpolation = Interpolation.nearest}) {
     subCommand = CopyResizeCropSquareCmd(subCommand,
-        size: size, interpolation: interpolation);
+        size: size, radius: radius, interpolation: interpolation);
   }
 
   void copyRotate(

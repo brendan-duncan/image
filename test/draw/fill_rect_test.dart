@@ -11,17 +11,20 @@ void main() {
 
       fillRect(i0, x1: 50, y1: 50, x2: 150, y2: 150,
           color: ColorRgb8(255, 0, 0));
+
       fillRect(i0, x1: 100, y1: 100, x2: 200, y2: 200,
           color: ColorRgba8(0, 255, 0, 128));
 
-      File('$testOutputPath/draw/fill_rect.png')
+      fillRect(i0, x1: 75, y1: 75, x2: 175, y2: 175, radius: 20,
+          color: ColorRgba8(255, 255, 0, 128));
+
+      File('$testOutputPath/draw/fillRect.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
 
       var p = i0.getPixel(51, 51);
       expect(p, equals([255, 0, 0]));
-      p = i0.getPixel(101, 101);
-      expect(p, equals([127, 128, 0]));
+
       p = i0.getPixel(195, 195);
       expect(p, equals([0, 128, 0]));
 
@@ -40,7 +43,7 @@ void main() {
           ..fillRect(x1: 100, y1: 100, x2: 200, y2: 200,
               color: ColorRgba8(0, 255, 0, 128), mask: mask,
               maskChannel: Channel.red)
-          ..writeToFile('$testOutputPath/draw/fill_rect_mask.png')
+          ..writeToFile('$testOutputPath/draw/fillRect_mask.png')
       ).execute();
     });
   });

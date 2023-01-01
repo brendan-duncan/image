@@ -9,6 +9,7 @@ class FillRectCmd extends Command {
   int x2;
   int y2;
   Color color;
+  num radius;
   Command? mask;
   Channel maskChannel;
 
@@ -18,6 +19,7 @@ class FillRectCmd extends Command {
       required this.x2,
       required this.y2,
       required this.color,
+      this.radius = 0,
       this.mask,
       this.maskChannel = Channel.luminance})
       : super(input);
@@ -33,6 +35,7 @@ class FillRectCmd extends Command {
             x2: x2,
             y2: y2,
             color: color,
+            radius: radius,
             mask: maskImg,
             maskChannel: maskChannel)
         : null;

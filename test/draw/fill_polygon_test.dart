@@ -6,7 +6,7 @@ import '../_test_util.dart';
 
 void main() {
   group('Draw', () {
-    test('fillPolygon', () {
+    test('fillPolygon', () async {
       final i0 = Image(width: 256, height: 256);
 
       final vertices = <Point>[Point(50, 50), Point(200, 20),
