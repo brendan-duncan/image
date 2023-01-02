@@ -16,6 +16,10 @@ web applications.
 
 ## [Image Processing](filters.md)
 
+## [Transform Functions (crop, resize)](transform.md)
+
+## [Drawing Functions](draw.md)
+
 ## [Flutter](flutter.md)
 
 ## [Font Rendering](fonts.md)
