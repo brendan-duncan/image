@@ -33,15 +33,17 @@ Image drawCircle(Image image,
     }
 
     final radiusSqr = radius * radius;
+
     final quarter = (radius / sqrt2).round();
-    for (var i = 0; i < quarter; ++i) {
+    for (var i = 0; i <= quarter; ++i) {
       final j = sqrt(radiusSqr - (i * i));
       final frc = fract(j);
+      final frc2 = frc * ((i == quarter) ? 0.25 : 1);
       final flr = j.floor();
       drawPixel4(x, y, i, flr, 1 - frc);
-      drawPixel4(x, y, i, flr + 1, frc);
+      drawPixel4(x, y, i, flr + 1, frc2);
       drawPixel4(x, y, flr, i, 1 - frc);
-      drawPixel4(x, y, flr + 1, i, frc);
+      drawPixel4(x, y, flr + 1, i, frc2);
     }
 
     return image;

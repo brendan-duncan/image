@@ -3,7 +3,6 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
-import '../util/math_util.dart';
 import 'draw_pixel.dart';
 
 /// Draw and fill a circle into the [image] with a center of [x],[y]
@@ -17,34 +16,6 @@ Image fillCircle(Image image,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   final radiusSqr = radius * radius;
-  const antialias = true;
-  if (antialias) {
-    void drawPixel4(int x, int y, int dx, int dy, num alpha) {
-      alpha *= color.aNormalized;
-      drawPixel(image, x + dx, y + dy, color,
-          alpha: alpha, mask: mask, maskChannel: maskChannel);
-
-      drawPixel(image, x - dx, y - dy, color,
-          alpha: alpha, mask: mask, maskChannel: maskChannel);
-
-      drawPixel(image, x - dx, y + dy, color,
-          alpha: alpha, mask: mask, maskChannel: maskChannel);
-
-      drawPixel(image, x + dx, y - dy, color,
-          alpha: alpha, mask: mask, maskChannel: maskChannel);
-    }
-
-    final quarter = (radius / sqrt2).round();
-    for (var i = 0; i < quarter; ++i) {
-      final j = sqrt(radiusSqr - (i * i));
-      final frc = fract(j);
-      final flr = j.floor();
-      drawPixel4(x, y, i, flr, 1 - frc);
-      drawPixel4(x, y, i, flr + 1, frc);
-      drawPixel4(x, y, flr, i, 1 - frc);
-      drawPixel4(x, y, flr + 1, i, frc);
-    }
-  }
 
   final x1 = max(0, x - radius);
   final y1 = max(0, y - radius);
@@ -53,11 +24,36 @@ Image fillCircle(Image image,
   final range = image.getRange(x1, y1, (x2 - x1) + 1, (y2 - y1) + 1);
   while (range.moveNext()) {
     final p = range.current;
-    final dx = p.x - x;
-    final dy = p.y - y;
-    final d2 = sqrt(dx * dx + dy * dy);
-    if (d2 < radius) {
-      drawPixel(image, p.x, p.y, color, mask: mask, maskChannel: maskChannel);
+    if (antialias) {
+      final dx1 = p.x - x;
+      final dy1 = p.y - y;
+      final d1 = dx1 * dx1 + dy1 * dy1;
+      final dx2 = (p.x + 1) - x;
+      final dy2 = p.y - y;
+      final d2 = dx2 * dx2 + dy2 * dy2;
+      final dx3 = (p.x + 1) - x;
+      final dy3 = (p.y + 1) - y;
+      final d3 = dx3 * dx3 + dy3 * dy3;
+      final dx4 = p.x - x;
+      final dy4 = (p.y + 1) - y;
+      final d4 = dx4 * dx4 + dy4 * dy4;
+      final r1 = d1 <= radiusSqr ? 1 : 0;
+      final r2 = d2 <= radiusSqr ? 1 : 0;
+      final r3 = d3 <= radiusSqr ? 1 : 0;
+      final r4 = d4 <= radiusSqr ? 1 : 0;
+      final a = r1 + r2 + r3 + r4;
+      if (a > 0) {
+        final alpha = color.aNormalized * (a / 4);
+        drawPixel(image, p.x, p.y, color,
+            alpha: alpha, mask: mask, maskChannel: maskChannel);
+      }
+    } else {
+      final dx = p.x - x;
+      final dy = p.y - y;
+      final d2 = dx * dx + dy * dy;
+      if (d2 < radiusSqr) {
+        drawPixel(image, p.x, p.y, color, mask: mask, maskChannel: maskChannel);
+      }
     }
   }
 
