@@ -470,12 +470,15 @@ class Image extends Iterable<Pixel> {
   /// coordinates.
   Color getPixelInterpolate(num fx, num fy,
       {Interpolation interpolation = Interpolation.linear}) {
-    if (interpolation == Interpolation.cubic) {
-      return getPixelCubic(fx, fy);
-    } else if (interpolation == Interpolation.linear) {
-      return getPixelLinear(fx, fy);
+    switch (interpolation) {
+      case Interpolation.nearest:
+        return getPixelSafe(fx.toInt(), fy.toInt());
+      case Interpolation.linear:
+      case Interpolation.average:
+        return getPixelLinear(fx, fy);
+      case Interpolation.cubic:
+        return getPixelCubic(fx, fy);
     }
-    return getPixelSafe(fx.toInt(), fy.toInt());
   }
 
   /// Get the pixel using linear interpolation for non-integer pixel
