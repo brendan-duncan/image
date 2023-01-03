@@ -9,6 +9,28 @@ An image can have 1, 2, 3, or 4 color channels. An RGB image would have 3 channe
 and an RGBA image would have 4 channels. An image can have a palette, in which case it would have
 1 channel, where each pixel is an index into the palette.
 
+### ChannelOrder
+
+ImageData stores color channels in RGBA order for 4 channel images, and RGB order for 3 channel images.
+Sometimes external image data requires alternative channel ordering, such as ABGR.
+The [ChannelOrder](https://pub.dev/documentation/image/latest/image/ChannelOrder.html) enum
+defines channel ordering, and certain Image functions can use that to convert the incoming or outgoing
+image data.
+
+[Image.fromBytes](https://pub.dev/documentation/image/latest/image/Image/Image.fromBytes.html) can take an optional
+`ChannelOrder order` argument to specify the order of the color channels
+in image data coming from an external source. If the external image data is defined in BGRA order, you can specify
+`Image.fromBytes(order: ChannelOrder.bgra, ...)` to make sure the Image is created with the correct colors.
+
+[Image.getBytes({ChannelOrder? order})](https://pub.dev/documentation/image/latest/image/Image/Image.getBytes.html)
+will return the image data as a Uint8List, and if order is specified and
+the channels need to be rearranged from RGBA, it will return a new byte buffer with the channel order as requested. 
+
+[Image.remapChannels(ChannelOrder order)](https://pub.dev/documentation/image/latest/image/Image/Image.remapChannels.html) 
+will remap the colors of the Image to the requested order in-place. That
+means `image.remapChannels(ChannelOrder.bgra).getBytes()` will return the re-arranged channel image data, without the
+need to create a new image data buffer.
+
 ### Format
 
 The ImageData class stores the pixel data of the Image and can support a wide range of data formats.
@@ -41,6 +63,7 @@ int stride = image.rowStride; // The number of bytes for a single row of pixels.
 int size = image.lengthInBytes; // The number of bytes to store all pixel data.
 ByteBuffer buffer = image.buffer; // The buffer used to store the pixel data.
 Uint8List bytes = image.toUint8List(); // A Uint8List view of the pixel data buffer.
+Uint8List bytes = image.getBytes(order: ChannelOrder.abgr); // Like toUint8List, but can remap the color channels.
 int numChannels = image.numChannels; // The number of channels per pixel.
 bool isLdr = image.isLdrFormat; // Is the pixel format a low dynamic range format?
 bool isHdr = image.isHdrFormat; // Is the pixel format a high dynamic range format?

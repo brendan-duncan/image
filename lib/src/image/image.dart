@@ -535,6 +535,66 @@ class Image extends Iterable<Pixel> {
   /// The number of bits per color channel.
   int get bitsPerChannel => data?.bitsPerChannel ?? 0;
 
+  /// Remap the color channels to the given [order]. Normally Image color
+  /// channels are stored in rgba order for 4 channel images, and
+  /// rgb order for 3 channel images. This method lets you re-arrange the
+  /// color channels in-place without needing to clone the image for preparing
+  /// image data for external usage that requires alternative channel ordering.
+  void remapChannels(ChannelOrder order) {
+    if (numChannels == 4) {
+      if (order == ChannelOrder.abgr ||
+          order == ChannelOrder.argb ||
+          order == ChannelOrder.bgra) {
+        if (order == ChannelOrder.abgr) {
+          for (final p in this) {
+            final r = p.r;
+            final g = p.g;
+            final b = p.b;
+            final a = p.a;
+            p
+              ..r = a
+              ..g = b
+              ..b = g
+              ..a = r;
+          }
+        } else if (order == ChannelOrder.argb) {
+          for (final p in this) {
+            final r = p.r;
+            final g = p.g;
+            final b = p.b;
+            final a = p.a;
+            p
+              ..r = a
+              ..g = r
+              ..b = g
+              ..a = b;
+          }
+        } else if (order == ChannelOrder.bgra) {
+          for (final p in this) {
+            final r = p.r;
+            final g = p.g;
+            final b = p.b;
+            final a = p.a;
+            p
+              ..r = b
+              ..g = g
+              ..b = r
+              ..a = a;
+          }
+        }
+      }
+    } else if (numChannels == 3) {
+      if (order == ChannelOrder.bgr) {
+        for (final p in this) {
+          final r = p.r;
+          p
+            ..r = p.b
+            ..b = r;
+        }
+      }
+    }
+  }
+
   /// Returns true if the given pixel coordinates is within the dimensions
   /// of the image.
   bool isBoundsSafe(int x, int y) =>
