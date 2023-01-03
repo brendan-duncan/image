@@ -11,14 +11,14 @@ the blending value. Where the mask channel is full intensity, the filter has ful
 the mask channel is 0, it has no effect; and values in between will blend the filter with the original
 image.
 
-Using a mask image to blend the [sketch](https://brendan-duncan.github.io/image/doc/api/image/sketch.html) filter:
+Using a mask image to blend the [sketch](https://pub.dev/documentation/image/latest/image/sketch.html) filter:
 
 ![mask](images/filter/mask.png) 
 ![sketchMask](images/filter/sketch_mask.png)
 
 ## Filter Functions
 
-### [adjustColor](https://brendan-duncan.github.io/image/doc/api/image/adjustColor.html)
+### [adjustColor](https://pub.dev/documentation/image/latest/image/adjustColor.html)
 
 ```dart
 Image adjustColor(Image src,
@@ -28,7 +28,7 @@ num? hue, num amount = 1, Image? mask, Channel maskChannel = Channel.luminance }
 
 ![adjustColor](images/filter/adjustColor.png)
 
-### [billboard](https://brendan-duncan.github.io/image/doc/api/image/billboard.html)
+### [billboard](https://pub.dev/documentation/image/latest/image/billboard.html)
 
 ```dart
 Image billboard(Image src, { num grid = 10, num amount = 1, Image? mask, Channel maskChannel = Channel.luminance })
@@ -36,7 +36,7 @@ Image billboard(Image src, { num grid = 10, num amount = 1, Image? mask, Channel
 
 ![billboard](images/filter/billboard.png)
 
-### [bleachBypass](https://brendan-duncan.github.io/image/doc/api/image/bleachBypass.html)
+### [bleachBypass](https://pub.dev/documentation/image/latest/image/bleachBypass.html)
 
 ```dart
 Image bleachBypass(Image src, { num amount = 1, Image? mask, Channel maskChannel = Channel.luminance })
@@ -44,7 +44,7 @@ Image bleachBypass(Image src, { num amount = 1, Image? mask, Channel maskChannel
 
 ![bleachBypass](images/filter/bleachBypass.png)
 
-### [bulgeDistortion](https://brendan-duncan.github.io/image/doc/api/image/bulgeDistortion.html)
+### [bulgeDistortion](https://pub.dev/documentation/image/latest/image/bulgeDistortion.html)
 
 ```dart
 Image bulgeDistortion(Image src, { int? centerX, int? centerY, num? radius, num scale = 0.5,
@@ -53,7 +53,7 @@ Image bulgeDistortion(Image src, { int? centerX, int? centerY, num? radius, num 
 
 ![bulgeDistortion](images/filter/bulgeDistortion.png)
   
-### [bumpToNormal](https://brendan-duncan.github.io/image/doc/api/image/bumpToNormal.html)
+### [bumpToNormal](https://pub.dev/documentation/image/latest/image/bumpToNormal.html)
 
 ```dart
 Image bumpToNormal(Image src, { num strength = 2 })
@@ -61,7 +61,7 @@ Image bumpToNormal(Image src, { num strength = 2 })
 
 ![bumpToNormal](images/filter/bumpToNormal.png)
 
-### [chromaticAberration](https://brendan-duncan.github.io/image/doc/api/image/chromaticAberration.html)
+### [chromaticAberration](https://pub.dev/documentation/image/latest/image/chromaticAberration.html)
 
 ```dart
 Image chromaticAberration(Image src, { int shift = 5, Image? mask, Channel maskChannel = Channel.luminance })
@@ -69,7 +69,7 @@ Image chromaticAberration(Image src, { int shift = 5, Image? mask, Channel maskC
 
 ![chromaticAberration](images/filter/chromaticAberration.png)
 
-### [colorHalftone](https://brendan-duncan.github.io/image/doc/api/image/colorHalftone.html)
+### [colorHalftone](https://pub.dev/documentation/image/latest/image/colorHalftone.html)
 
 ```dart
 Image colorHalftone(Image src, { num amount = 1, int? centerX, int? centerY,
@@ -78,7 +78,7 @@ Image colorHalftone(Image src, { num amount = 1, int? centerX, int? centerY,
 
 ![colorHalftone](images/filter/colorHalftone.png)
 
-### [colorOffset](https://brendan-duncan.github.io/image/doc/api/image/colorOffset.html)
+### [colorOffset](https://pub.dev/documentation/image/latest/image/colorOffset.html)
 
 ```dart
 Image colorOffset(Image src, { num red = 0, num green = 0, num blue = 0, num alpha = 0,
@@ -87,7 +87,7 @@ Image colorOffset(Image src, { num red = 0, num green = 0, num blue = 0, num alp
 
 ![colorOffset](images/filter/colorOffset.png)
 
-### [contrast](https://brendan-duncan.github.io/image/doc/api/image/contrast.html)
+### [contrast](https://pub.dev/documentation/image/latest/image/contrast.html)
 
 ```dart
 Image contrast(Image src, { required num contrast, Image? mask, Channel maskChannel = Channel.luminance })
@@ -95,7 +95,7 @@ Image contrast(Image src, { required num contrast, Image? mask, Channel maskChan
 
 ![contrast](images/filter/contrast.png)
 
-### [convolution](https://brendan-duncan.github.io/image/doc/api/image/convolution.html)
+### [convolution](https://pub.dev/documentation/image/latest/image/convolution.html)
 
 ```dart
 Image convolution(Image src, { required List<num> filter,
@@ -104,7 +104,7 @@ Image convolution(Image src, { required List<num> filter,
 
 ![convolution](images/filter/convolution.png)
 
-### [copyImageChannels](https://brendan-duncan.github.io/image/doc/api/image/copyImageChannels.html)
+### [copyImageChannels](https://pub.dev/documentation/image/latest/image/copyImageChannels.html)
 
 ```dart
 Image copyImageChannels(Image src, { required Image from, bool scaled = false,
@@ -114,7 +114,7 @@ Image copyImageChannels(Image src, { required Image from, bool scaled = false,
 
 ![copyImageChannels](images/filter/copyImageChannels.png)
 
-### [ditherImage](https://brendan-duncan.github.io/image/doc/api/image/ditherImage.html)
+### [ditherImage](https://pub.dev/documentation/image/latest/image/ditherImage.html)
 
 ```dart
 Image ditherImage(Image image, { Quantizer? quantizer,
@@ -124,7 +124,7 @@ Image ditherImage(Image image, { Quantizer? quantizer,
 
 ![ditherImage](images/filter/ditherImage.png)
 
-### [dotScreen](https://brendan-duncan.github.io/image/doc/api/image/dotScreen.html)
+### [dotScreen](https://pub.dev/documentation/image/latest/image/dotScreen.html)
 
 ```dart
 Image dotScreen(Image src, { num angle = 180, num size = 5.75, int? centerX,
@@ -134,7 +134,7 @@ Image dotScreen(Image src, { num angle = 180, num size = 5.75, int? centerX,
 
 ![dotScreen](images/filter/dotScreen.png)
 
-### [dropShadow](https://brendan-duncan.github.io/image/doc/api/image/dropShadow.html)
+### [dropShadow](https://pub.dev/documentation/image/latest/image/dropShadow.html)
 
 ```dart
 Image dropShadow(Image src, int hShadow, int vShadow, int blur, { Color? shadowColor })
@@ -142,7 +142,7 @@ Image dropShadow(Image src, int hShadow, int vShadow, int blur, { Color? shadowC
 
 ![dropShadow](images/filter/dropShadow.png)
 
-### [edgeGlow](https://brendan-duncan.github.io/image/doc/api/image/edgeGlow.html)
+### [edgeGlow](https://pub.dev/documentation/image/latest/image/edgeGlow.html)
 
 ```dart
 Image edgeGlow(Image src, { num amount = 1, Image? mask, Channel maskChannel = Channel.luminance })
@@ -150,7 +150,7 @@ Image edgeGlow(Image src, { num amount = 1, Image? mask, Channel maskChannel = C
 
 ![edgeGlow](images/filter/edgeGlow.png)
 
-### [emboss](https://brendan-duncan.github.io/image/doc/api/image/emboss.html)
+### [emboss](https://pub.dev/documentation/image/latest/image/emboss.html)
 
 ```dart
 Image emboss(Image src, { num amount = 1, Image? mask, Channel maskChannel = Channel.luminance })
@@ -158,7 +158,7 @@ Image emboss(Image src, { num amount = 1, Image? mask, Channel maskChannel = Cha
 
 ![emboss](images/filter/emboss.png)
 
-### [gamma](https://brendan-duncan.github.io/image/doc/api/image/gamma.html)
+### [gamma](https://pub.dev/documentation/image/latest/image/gamma.html)
 
 ```dart
 Image gamma(Image src, { required num gamma, Image? mask, Channel maskChannel = Channel.luminance })
@@ -166,7 +166,7 @@ Image gamma(Image src, { required num gamma, Image? mask, Channel maskChannel = 
 
 ![gamma](images/filter/gamma.png)
 
-### [gaussianBlur](https://brendan-duncan.github.io/image/doc/api/image/gaussianBlur.html)
+### [gaussianBlur](https://pub.dev/documentation/image/latest/image/gaussianBlur.html)
 
 ```dart
 Image gaussianBlur(Image src, { required int radius, Image? mask, Channel maskChannel = Channel.luminance })
@@ -174,7 +174,7 @@ Image gaussianBlur(Image src, { required int radius, Image? mask, Channel maskCh
 
 ![gaussianBlur](images/filter/gaussianBlur.png)
 
-### [grayscale](https://brendan-duncan.github.io/image/doc/api/image/grayscale.html)
+### [grayscale](https://pub.dev/documentation/image/latest/image/grayscale.html)
 
 ```dart
 Image grayscale(Image src, { num amount = 1, Image? mask, Channel maskChannel = Channel.luminance })
@@ -182,7 +182,7 @@ Image grayscale(Image src, { num amount = 1, Image? mask, Channel maskChannel = 
 
 ![grayscale](images/filter/grayscale.png)
 
-### [hdrToLdr](https://brendan-duncan.github.io/image/doc/api/image/hdrToLdr.html)
+### [hdrToLdr](https://pub.dev/documentation/image/latest/image/hdrToLdr.html)
 
 ```dart
 Image hdrToLdr(Image hdr, { num? exposure })
@@ -190,7 +190,7 @@ Image hdrToLdr(Image hdr, { num? exposure })
 
 ![hdrToLdr](images/filter/hdrToLdr.png)
 
-### [hexagonPixelate](https://brendan-duncan.github.io/image/doc/api/image/hexagonPixelate.html)
+### [hexagonPixelate](https://pub.dev/documentation/image/latest/image/hexagonPixelate.html)
 
 ```dart
 Image hexagonPixelate(Image src, { int? centerX, int? centerY, int size = 5,
@@ -199,7 +199,7 @@ Image hexagonPixelate(Image src, { int? centerX, int? centerY, int size = 5,
 
 ![hexagonPixelate](images/filter/hexagonPixelate.png)
 
-### [invert](https://brendan-duncan.github.io/image/doc/api/image/invert.html)
+### [invert](https://pub.dev/documentation/image/latest/image/invert.html)
 
 ```dart
 Image invert(Image src, { Image? mask, Channel maskChannel = Channel.luminance })
@@ -207,7 +207,7 @@ Image invert(Image src, { Image? mask, Channel maskChannel = Channel.luminance }
 
 ![invert](images/filter/invert.png)
 
-### [luminanceThreshold](https://brendan-duncan.github.io/image/doc/api/image/luminanceThreshold.html)
+### [luminanceThreshold](https://pub.dev/documentation/image/latest/image/luminanceThreshold.html)
 
 ```dart
 Image luminanceThreshold(Image src, { num threshold = 0.5,
@@ -216,7 +216,7 @@ Image luminanceThreshold(Image src, { num threshold = 0.5,
 
 ![luminanceThreshold](images/filter/luminanceThreshold.png)
 
-### [monochrome](https://brendan-duncan.github.io/image/doc/api/image/monochrome.html)
+### [monochrome](https://pub.dev/documentation/image/latest/image/monochrome.html)
 
 ```dart
 Image monochrome(Image src, { Color? color, num amount = 1,
@@ -225,7 +225,7 @@ Image monochrome(Image src, { Color? color, num amount = 1,
 
 ![monochrome](images/filter/monochrome.png)
 
-### [noise](https://brendan-duncan.github.io/image/doc/api/image/noise.html)
+### [noise](https://pub.dev/documentation/image/latest/image/noise.html)
 
 ```dart
 Image noise(Image image, num sigma, { NoiseType type = NoiseType.gaussian, Random? random,
@@ -234,7 +234,7 @@ Image noise(Image image, num sigma, { NoiseType type = NoiseType.gaussian, Rando
 
 ![noise](images/filter/noise.png)
 
-### [normalize](https://brendan-duncan.github.io/image/doc/api/image/normalize.html)
+### [normalize](https://pub.dev/documentation/image/latest/image/normalize.html)
 
 ```dart
 Image normalize(Image src, { required num min, required num max,
@@ -243,7 +243,7 @@ Image normalize(Image src, { required num min, required num max,
 
 ![normalize](images/filter/normalize.png)
 
-### [pixelate](https://brendan-duncan.github.io/image/doc/api/image/pixelate.html)
+### [pixelate](https://pub.dev/documentation/image/latest/image/pixelate.html)
 
 ```dart
 Image pixelate(Image src, { required int size,
@@ -253,7 +253,7 @@ Image pixelate(Image src, { required int size,
 
 ![pixelate](images/filter/pixelate_upperLeft.png)
 
-### [quantize](https://brendan-duncan.github.io/image/doc/api/image/quantize.html)
+### [quantize](https://pub.dev/documentation/image/latest/image/quantize.html)
 
 ```dart
 Image quantize(Image src, { int numberOfColors = 256, QuantizeMethod method = QuantizeMethod.neuralNet,
@@ -262,7 +262,7 @@ Image quantize(Image src, { int numberOfColors = 256, QuantizeMethod method = Qu
 
 ![quantize](images/filter/quantize.png)
 
-### [reinhardTonemap](https://brendan-duncan.github.io/image/doc/api/image/reinhardTonemap.html)
+### [reinhardTonemap](https://pub.dev/documentation/image/latest/image/reinhardTonemap.html)
 
 ```dart
 Image reinhardTonemap(Image hdr, { Image? mask, Channel maskChannel = Channel.luminance })
@@ -270,7 +270,7 @@ Image reinhardTonemap(Image hdr, { Image? mask, Channel maskChannel = Channel.lu
 
 ![reinhardTonemap](images/filter/reinhardTonemap.png)
 
-### [remapColors](https://brendan-duncan.github.io/image/doc/api/image/remapColors.html)
+### [remapColors](https://pub.dev/documentation/image/latest/image/remapColors.html)
 
 ```dart
 Image remapColors(Image src, { Channel red = Channel.red, Channel green = Channel.green,
@@ -279,7 +279,7 @@ Image remapColors(Image src, { Channel red = Channel.red, Channel green = Channe
 
 ![remapColors](images/filter/remapColors.png)
 
-### [scaleRgba](https://brendan-duncan.github.io/image/doc/api/image/scaleRgba.html)
+### [scaleRgba](https://pub.dev/documentation/image/latest/image/scaleRgba.html)
 
 ```dart
 Image scaleRgba(Image src, { required Color scale, Image? mask, Channel maskChannel = Channel.luminance })
@@ -287,7 +287,7 @@ Image scaleRgba(Image src, { required Color scale, Image? mask, Channel maskChan
 
 ![scaleRgba](images/filter/scaleRgba.png)
 
-### [separableConvolution](https://brendan-duncan.github.io/image/doc/api/image/separableConvolution.html)
+### [separableConvolution](https://pub.dev/documentation/image/latest/image/separableConvolution.html)
 
 ```dart
 Image separableConvolution(Image src, { required SeparableKernel kernel,
@@ -296,7 +296,7 @@ Image separableConvolution(Image src, { required SeparableKernel kernel,
 
 ![separableConvolution](images/filter/separableConvolution.png)
 
-### [sepia](https://brendan-duncan.github.io/image/doc/api/image/sepia.html)
+### [sepia](https://pub.dev/documentation/image/latest/image/sepia.html)
 
 ```dart
 Image sepia(Image src, { num amount = 1, Image? mask, Channel maskChannel = Channel.luminance })
@@ -304,7 +304,7 @@ Image sepia(Image src, { num amount = 1, Image? mask, Channel maskChannel = Chan
 
 ![sepia](images/filter/sepia.png)
 
-### [sketch](https://brendan-duncan.github.io/image/doc/api/image/sketch.html)
+### [sketch](https://pub.dev/documentation/image/latest/image/sketch.html)
 
 ```dart
 Image sketch(Image src, { num amount = 1, Image? mask, Channel maskChannel = Channel.luminance })
@@ -312,7 +312,7 @@ Image sketch(Image src, { num amount = 1, Image? mask, Channel maskChannel = Cha
 
 ![sketch](images/filter/sketch.png)
 
-### [smooth](https://brendan-duncan.github.io/image/doc/api/image/smooth.html)
+### [smooth](https://pub.dev/documentation/image/latest/image/smooth.html)
 
 ```dart
 Image smooth(Image src, { required num weight, Image? mask, Channel maskChannel = Channel.luminance })
@@ -320,7 +320,7 @@ Image smooth(Image src, { required num weight, Image? mask, Channel maskChannel 
 
 ![smooth](images/filter/smooth.png)
 
-### [sobel](https://brendan-duncan.github.io/image/doc/api/image/sobel.html)
+### [sobel](https://pub.dev/documentation/image/latest/image/sobel.html)
 
 ```dart
 Image sobel(Image src, { num amount = 1, Image? mask, Channel maskChannel = Channel.luminance })
@@ -328,7 +328,7 @@ Image sobel(Image src, { num amount = 1, Image? mask, Channel maskChannel = Chan
 
 ![sobel](images/filter/sobel.png)
 
-### [stretchDistortion](https://brendan-duncan.github.io/image/doc/api/image/stretchDistortion.html)
+### [stretchDistortion](https://pub.dev/documentation/image/latest/image/stretchDistortion.html)
 
 ```dart
 Image stretchDistortion(Image src, { int? centerX, int? centerY,
@@ -337,7 +337,7 @@ Image stretchDistortion(Image src, { int? centerX, int? centerY,
 
 ![stretchDistortion](images/filter/stretchDistortion.png)
 
-### [vignette](https://brendan-duncan.github.io/image/doc/api/image/vignette.html)
+### [vignette](https://pub.dev/documentation/image/latest/image/vignette.html)
 
 ```dart
 Image vignette(Image src, { num start = 0.3, num end = 0.85,

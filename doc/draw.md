@@ -11,14 +11,14 @@ the blending value. Where the mask channel is full intensity, the filter has ful
 the mask channel is 0, it has no effect; and values in between will blend the filter with the original
 image.
 
-Using a mask image to blend the [sketch](https://brendan-duncan.github.io/image/doc/api/image/sketch.html) filter:
+Using a mask image to blend the [sketch](https://pub.dev/documentation/image/latest/image/sketch.html) filter:
 
 ![mask](images/filter/mask.png)
 ![sketchMask](images/filter/sketch_mask.png)
 
 ## Draw Functions
 
-### [compositeImage](https://brendan-duncan.github.io/image/doc/api/image/compositeImage.html)
+### [compositeImage](https://pub.dev/documentation/image/latest/image/compositeImage.html)
 
 ```dart  
 Image compositeImage(Image dst, Image src, {
@@ -30,7 +30,7 @@ Image compositeImage(Image dst, Image src, {
 
 ![compositeImage](images/draw/compositeImage.png)
 
-### [drawChar](https://brendan-duncan.github.io/image/doc/api/image/drawChar.html)
+### [drawChar](https://pub.dev/documentation/image/latest/image/drawChar.html)
 
 ```dart
 Image drawChar(Image image, String char, { required BitmapFont font,
@@ -40,7 +40,7 @@ Image drawChar(Image image, String char, { required BitmapFont font,
 
 ![drawChar](images/draw/drawChar.png)
 
-### [drawCircle](https://brendan-duncan.github.io/image/doc/api/image/drawCircle.html)
+### [drawCircle](https://pub.dev/documentation/image/latest/image/drawCircle.html)
 
 ```dart
 Image drawCircle(Image image, { required int x, required int y,
@@ -50,7 +50,7 @@ Image drawCircle(Image image, { required int x, required int y,
 
 ![drawCircle](images/draw/drawCircle.png)
 
-### [drawLine](https://brendan-duncan.github.io/image/doc/api/image/drawLine.html)
+### [drawLine](https://pub.dev/documentation/image/latest/image/drawLine.html)
 
 ```dart
 Image drawLine(Image image, { required int x1, required int y1,
@@ -61,7 +61,7 @@ Image drawLine(Image image, { required int x1, required int y1,
 
 ![drawLine](images/draw/drawLine.png)
 
-### [drawPixel](https://brendan-duncan.github.io/image/doc/api/image/drawPixel.html)
+### [drawPixel](https://pub.dev/documentation/image/latest/image/drawPixel.html)
 
 ```dart
 Image drawPixel(Image image, int x, int y, Color c, { Color? filter,
@@ -71,16 +71,16 @@ Image drawPixel(Image image, int x, int y, Color c, { Color? filter,
 
 ![drawPixel](images/draw/drawPixel.png)
 
-### [drawPolygon](https://brendan-duncan.github.io/image/doc/api/image/drawPolygon.html)
+### [drawPolygon](https://pub.dev/documentation/image/latest/image/drawPolygon.html)
 
 ```dart
 Image drawPolygon(Image src, { required List<Point> vertices,
-    required Color color, Image? mask, Channel maskChannel = Channel.luminance })
+    required Color color, bool antialias = false, Image? mask, Channel maskChannel = Channel.luminance })
 ```
 
 ![drawPolygon](images/draw/drawPolygon.png)
 
-### [drawRect](https://brendan-duncan.github.io/image/doc/api/image/drawRect.html)
+### [drawRect](https://pub.dev/documentation/image/latest/image/drawRect.html)
 
 ```dart
 Image drawRect(Image dst, { required int x1, required int y1, required int x2,
@@ -90,7 +90,7 @@ Image drawRect(Image dst, { required int x1, required int y1, required int x2,
 
 ![drawRect](images/draw/drawRect.png)
 
-### [drawString](https://brendan-duncan.github.io/image/doc/api/image/drawString.html)
+### [drawString](https://pub.dev/documentation/image/latest/image/drawString.html)
 
 ```dart
 Image drawString(Image image, String string, { required BitmapFont font,
@@ -100,7 +100,7 @@ Image drawString(Image image, String string, { required BitmapFont font,
 
 ![drawString](images/draw/drawString.png)
 
-### [fill](https://brendan-duncan.github.io/image/doc/api/image/fill.html)
+### [fill](https://pub.dev/documentation/image/latest/image/fill.html)
 
 ```dart
 Image fill(Image image, { required Color color, Image? mask,
@@ -109,7 +109,7 @@ Channel maskChannel = Channel.luminance })
 
 ![fill](images/draw/fill.png)
 
-### [fillCircle](https://brendan-duncan.github.io/image/doc/api/image/fillCircle.html)
+### [fillCircle](https://pub.dev/documentation/image/latest/image/fillCircle.html)
 
 ```dart
 Image fillCircle(Image image, { required int x, required int y,
@@ -119,7 +119,7 @@ Image fillCircle(Image image, { required int x, required int y,
 
 ![fillCircle](images/draw/fillCircle.png)
 
-### [fillFlood](https://brendan-duncan.github.io/image/doc/api/image/fillFlood.html)
+### [fillFlood](https://pub.dev/documentation/image/latest/image/fillFlood.html)
 
 ```dart
 Image fillFlood(Image src, { required int x, required int y,
@@ -129,16 +129,16 @@ Image fillFlood(Image src, { required int x, required int y,
 
 ![fillFlood](images/draw/fillFlood.png)
 
-### [fillPolygon](https://brendan-duncan.github.io/image/doc/api/image/fillPolygon.html)
+### [fillPolygon](https://pub.dev/documentation/image/latest/image/fillPolygon.html)
 
 ```dart
-Image drawPolygon(Image src, { required List<Point> vertices,
+Image fillPolygon(Image src, { required List<Point> vertices,
     required Color color, Image? mask, Channel maskChannel = Channel.luminance })
 ```
 
 ![fillPolygon](images/draw/fillPolygon.png)
 
-### [fillRect](https://brendan-duncan.github.io/image/doc/api/image/fillRect.html)
+### [fillRect](https://pub.dev/documentation/image/latest/image/fillRect.html)
 
 ```dart
 Image fillRect(Image src, { required int x1, required int y1, required int x2,
