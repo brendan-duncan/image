@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../color/channel_order.dart';
 import '../color/color.dart';
 import '../color/format.dart';
 import 'palette.dart';
@@ -60,28 +61,110 @@ abstract class ImageData extends Iterable<Pixel> {
   ByteBuffer get buffer;
 
   /// The storage data of the image.
-  Uint8List toUint8List() => Uint8List.view(buffer);
+  Uint8List toUint8List() => buffer.asUint8List();
+
+  /// Similar to toUint8List, but will convert the channels of the image pixels
+  /// to the given [order]. If that happens, the returned bytes will be a copy
+  /// and not a direct view of the image data.
+  Uint8List getBytes({ChannelOrder? order}) {
+    if (order == null) {
+      return toUint8List();
+    }
+
+    if (numChannels == 4) {
+      if (order == ChannelOrder.abgr ||
+          order == ChannelOrder.argb ||
+          order == ChannelOrder.bgra) {
+        final tempImage = clone();
+        if (order == ChannelOrder.abgr) {
+          for (final p in tempImage) {
+            final r = p.r;
+            final g = p.g;
+            final b = p.b;
+            final a = p.a;
+            p
+              ..r = a
+              ..g = b
+              ..b = g
+              ..a = r;
+          }
+        } else if (order == ChannelOrder.argb) {
+          for (final p in tempImage) {
+            final r = p.r;
+            final g = p.g;
+            final b = p.b;
+            final a = p.a;
+            p
+              ..r = a
+              ..g = r
+              ..b = g
+              ..a = b;
+          }
+        } else if (order == ChannelOrder.bgra) {
+          for (final p in tempImage) {
+            final r = p.r;
+            final g = p.g;
+            final b = p.b;
+            final a = p.a;
+            p
+              ..r = b
+              ..g = g
+              ..b = r
+              ..a = a;
+          }
+        }
+        return tempImage.toUint8List();
+      }
+    } else if (numChannels == 3) {
+      if (order == ChannelOrder.bgr) {
+        final tempImage = clone();
+        for (final p in tempImage) {
+          final r = p.r;
+          p
+            ..r = p.b
+            ..b = r;
+        }
+        return tempImage.toUint8List();
+      }
+    }
+
+    return toUint8List();
+  }
 
   /// The size, in bytes, of a row if pixels in the data.
   int get rowStride;
 
+  /// Returns a pixel iterator for iterating over a rectangular range of pixels
+  /// in the image.
   Iterator<Pixel> getRange(int x, int y, int width, int height);
 
+  /// Create a [Color] object with the format and number of channels of the
+  /// image.
   Color getColor(num r, num g, num b, [num? a]);
 
+  /// Return the [Pixel] at the given coordinates. If [pixel] is provided,
+  /// it will be updated and returned rather than allocating a new [Pixel].
   Pixel getPixel(int x, int y, [Pixel? pixel]);
 
-  void setPixel(int x, int y, Color p) {
-    setPixelRgba(x, y, p.r, p.g, p.b, p.a);
+  /// Set the color of the pixel at the given coordinates to the color of the
+  /// given Color [c].
+  void setPixel(int x, int y, Color c) {
+    setPixelRgba(x, y, c.r, c.g, c.b, c.a);
   }
 
   /// Set the red channel of the pixel, or the index value for palette images.
   void setPixelR(int x, int y, num i);
 
+  /// Set the color of the [Pixel] at the given coordinates to the given
+  /// color values [r], [g], [b].
   void setPixelRgb(int x, int y, num r, num g, num b);
 
+  /// Set the color of the [Pixel] at the given coordinates to the given
+  /// color values [r], [g], [b], and [a].
   void setPixelRgba(int x, int y, num r, num g, num b, num a);
 
+  /// Calls setPixelRgb, but ensures [x] and [y] are within the extents
+  /// of the image, otherwise it returns without setting the pixel.
   void setPixelRgbSafe(int x, int y, num r, num g, num b) {
     if (x < 0 || x >= width || y < 0 || y >= height) {
       return;
@@ -89,6 +172,8 @@ abstract class ImageData extends Iterable<Pixel> {
     setPixelRgb(x, y, r, g, b);
   }
 
+  /// Calls setPixelRgba, but ensures [x] and [y] are within the extents
+  /// of the image, otherwise it returns without setting the pixel.
   void setPixelRgbaSafe(int x, int y, num r, num g, num b, num a) {
     if (x < 0 || x >= width || y < 0 || y >= height) {
       return;

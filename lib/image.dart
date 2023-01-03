@@ -4,6 +4,7 @@ library image;
 
 export 'src/color/channel.dart';
 export 'src/color/channel_iterator.dart';
+export 'src/color/channel_order.dart';
 export 'src/color/color.dart';
 export 'src/color/color_float16.dart';
 export 'src/color/color_float32.dart';

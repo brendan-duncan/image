@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import '../color/channel_order.dart';
 import '../color/color.dart';
 import '../color/color_uint8.dart';
 import '../color/format.dart';
@@ -178,6 +179,17 @@ class Image extends Iterable<Pixel> {
   /// An HTML canvas element stores colors in Format.rgba format; a Flutter
   /// Image object stores colors in Format.rgba format.
   ///
+  /// [rowStride] is the row stride, in bytes, of the source data [bytes].
+  /// This may be different than the rowStride of the [Image], as some data
+  /// sources align rows to different byte alignments and include padding.
+  ///
+  /// [order] can be used if the source [bytes] has a different channel order
+  /// than RGBA. [ChannelOrder].bgra will rearrange the color channels from
+  /// BGRA to what Image wants, RGBA.
+  ///
+  /// If [numChannels] and [order] are not provided, a default of 3 for
+  /// [numChannels] and [ChannelOrder].rgba for [order] will be assumed.
+  ///
   /// For example, given an Html Canvas, you could create an image:
   /// var bytes = canvas.getContext('2d').getImageData(0, 0,
   ///   canvas.width, canvas.height).data;
@@ -188,13 +200,14 @@ class Image extends Iterable<Pixel> {
       required int height,
       required ByteBuffer bytes,
       Format format = Format.uint8,
-      int numChannels = 3,
+      int? numChannels,
       int? rowStride,
       bool withPalette = false,
       Format paletteFormat = Format.uint8,
       Palette? palette,
       ExifData? exif,
       IccProfile? iccp,
+      ChannelOrder? order,
       this.textData,
       this.loopCount = 0,
       this.frameType = FrameType.sequence,
@@ -202,6 +215,43 @@ class Image extends Iterable<Pixel> {
       this.frameDuration = 0,
       this.frameIndex = 0}) {
     frames.add(this);
+
+    numChannels ??= order != null ? channelOrderLength[order] : 3;
+
+    if (numChannels! < 0 || numChannels > 4) {
+      throw ImageException('An Image can only have 1-4 channels.');
+    }
+
+    order ??= numChannels == 3
+        ? ChannelOrder.rgb
+        : numChannels == 4
+            ? ChannelOrder.rgba
+            : numChannels == 1
+                ? ChannelOrder.red
+                : ChannelOrder.grayAlpha;
+
+    if (numChannels == 1) {
+      // There is only one channel order
+      order = ChannelOrder.red;
+    } else if (numChannels == 2) {
+      // There is only one channel order
+      order = ChannelOrder.grayAlpha;
+    } else if (numChannels == 3) {
+      if (order != ChannelOrder.rgb && order != ChannelOrder.bgr) {
+        // The user asked for a channel order that conflicts with the number
+        // of channels.
+        order = ChannelOrder.rgb;
+      }
+    } else if (numChannels == 4) {
+      if (order != ChannelOrder.rgba &&
+          order != ChannelOrder.abgr &&
+          order != ChannelOrder.argb) {
+        // The user asked for a channel order that conflicts with the number
+        // of channels.
+        order = ChannelOrder.rgba;
+      }
+    }
+
     _initialize(width, height,
         format: format,
         numChannels: numChannels,
@@ -215,8 +265,8 @@ class Image extends Iterable<Pixel> {
       return;
     }
 
-    final dataView = data!.toUint8List();
-    final byteView = Uint8List.view(bytes);
+    final toBytes = data!.toUint8List();
+    final fromBytes = Uint8List.view(bytes);
 
     rowStride ??= width * numChannels * formatSize[format]!;
     final dataStride = data!.rowStride;
@@ -225,8 +275,53 @@ class Image extends Iterable<Pixel> {
     var dOff = 0;
     var bOff = 0;
     for (int y = 0; y < height; ++y, bOff += rowStride, dOff += dataStride) {
-      final bRow = byteView.getRange(bOff, bOff + stride);
-      dataView.setRange(dOff, dOff + dataStride, bRow);
+      final bRow = fromBytes.getRange(bOff, bOff + stride);
+      toBytes.setRange(dOff, dOff + dataStride, bRow);
+    }
+
+    if (numChannels == 3 && order == ChannelOrder.bgr) {
+      for (final p in this) {
+        final r = p.r;
+        p
+          ..r = p.b
+          ..b = r;
+      }
+    } else if (numChannels == 4 && order == ChannelOrder.abgr) {
+      for (final p in this) {
+        final r = p.r;
+        final g = p.g;
+        final b = p.b;
+        final a = p.a;
+        p
+          ..r = a
+          ..g = b
+          ..b = g
+          ..a = r;
+      }
+    } else if (numChannels == 4 && order == ChannelOrder.argb) {
+      for (final p in this) {
+        final r = p.r;
+        final g = p.g;
+        final b = p.b;
+        final a = p.a;
+        p
+          ..r = a
+          ..g = r
+          ..b = g
+          ..a = b;
+      }
+    } else if (numChannels == 4 && order == ChannelOrder.bgra) {
+      for (final p in this) {
+        final r = p.r;
+        final g = p.g;
+        final b = p.b;
+        final a = p.a;
+        p
+          ..r = b
+          ..g = g
+          ..b = r
+          ..a = a;
+      }
     }
   }
 
@@ -396,7 +491,7 @@ class Image extends Iterable<Pixel> {
   @override
   Iterator<Pixel> get iterator => data!.iterator;
 
-  /// returns a pixel iterator for iterating over a rectangular range of pixels
+  /// Returns a pixel iterator for iterating over a rectangular range of pixels
   /// in the image.
   Iterator<Pixel> getRange(int x, int y, int width, int height) =>
       data!.getRange(x, y, width, height);
@@ -408,7 +503,13 @@ class Image extends Iterable<Pixel> {
   ByteBuffer get buffer => data?.buffer ?? Uint8List(0).buffer;
 
   /// Get a Uint8List view of the image storage data.
-  Uint8List toUint8List() => data?.toUint8List() ?? Uint8List(0);
+  Uint8List toUint8List() => data?.toUint8List() ?? buffer.asUint8List();
+
+  /// Similar to toUint8List, but will convert the channels of the image pixels
+  /// to the given [order]. If that happens, the returned bytes will be a copy
+  /// and not a direct view of the image data.
+  Uint8List getBytes({ChannelOrder? order}) =>
+      data?.getBytes(order: order) ?? toUint8List();
 
   /// The length in bytes of the image data buffer.
   int get lengthInBytes => data?.buffer.lengthInBytes ?? 0;
@@ -596,6 +697,7 @@ class Image extends Iterable<Pixel> {
   /// Set the index value for palette images, or the red channel otherwise.
   void setPixelIndex(int x, int y, num i) => data?.setPixelR(x, y, i);
 
+  /// Set the red (or index) color channel of a pixel.
   void setPixelR(int x, int y, num i) => data?.setPixelR(x, y, i);
 
   /// Set the color of the [Pixel] at the given coordinates to the given
