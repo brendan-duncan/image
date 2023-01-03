@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import '../image/image.dart';
+import '../util/_antialias_circle.dart';
+import '../util/math_util.dart';
 
 /// Returns a circle cropped copy of [src], centered at [centerX] and
 /// [centerY] and with the given [radius]. If [radius] is not provided,
@@ -23,6 +25,7 @@ Image copyCropCircle(Image src, {int? radius, int? centerX, int? centerY}) {
   final tly = centerY - radius; //topLeft.y
 
   final wh = radius * 2;
+  final radiusSqr = radius * radius;
 
   Image? firstFrame;
   final numFrames = src.numFrames;
@@ -36,9 +39,19 @@ Image copyCropCircle(Image src, {int? radius, int? centerX, int? centerY}) {
     final dw = radius * 2;
     for (var yi = 0, sy = tly; yi < dh; ++yi, ++sy) {
       for (var xi = 0, sx = tlx; xi < dw; ++xi, ++sx) {
-        if ((xi - radius) * (xi - radius) + (yi - radius) * (yi - radius) <=
-            radius * radius) {
-          dst.setPixel(xi, yi, frame.getPixelSafe(sx, sy));
+        final p = frame.getPixel(sx, sy);
+        final a = antialiasCircle(p, centerX, centerY, radiusSqr);
+
+        if (a != 1) {
+          final dp = dst.getPixel(xi, yi);
+
+          dp
+            ..r = mix(dp.r, p.r, a)
+            ..g = mix(dp.g, p.g, a)
+            ..b = mix(dp.b, p.b, a)
+            ..a = mix(dp.a, p.a, a);
+        } else {
+          dst.setPixel(xi, yi, p);
         }
       }
     }

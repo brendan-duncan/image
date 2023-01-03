@@ -3,9 +3,8 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
-import '_calculate_circumference.dart';
+import '_draw_antialias_circle.dart';
 import 'draw_line.dart';
-import 'draw_pixel.dart';
 
 /// Draw a rectangle in the image [dst] with the [color].
 Image drawRect(Image dst,
@@ -31,9 +30,6 @@ Image drawRect(Image dst,
     drawLine(dst, x1: x0 + rad, y1: y1, x2: x1 - rad, y2: y1, color: color);
     drawLine(dst, x1: x0, y1: y0 + rad, x2: x0, y2: y1 - rad, color: color);
 
-    final points = calculateCircumference(dst, 0, 0, rad)
-      ..sort((a, b) => (a.x == b.x) ? a.y.compareTo(b.y) : a.x.compareTo(b.x));
-
     final c1x = x0 + rad;
     final c1y = y0 + rad;
     final c2x = x1 - rad;
@@ -43,26 +39,42 @@ Image drawRect(Image dst,
     final c4x = x0 + rad;
     final c4y = y1 - rad;
 
-    for (final pt in points) {
-      final x = pt.xi;
-      final y = pt.yi;
-      if (x < 0 && y < 0) {
-        drawPixel(dst, c1x + x, c1y + y, color,
-            mask: mask, maskChannel: maskChannel);
-      }
-      if (x > 0 && y < 0) {
-        drawPixel(dst, c2x + x, c2y + y, color,
-            mask: mask, maskChannel: maskChannel);
-      }
-      if (x > 0 && y > 0) {
-        drawPixel(dst, c3x + x, c3y + y, color,
-            mask: mask, maskChannel: maskChannel);
-      }
-      if (x < 0 && y > 0) {
-        drawPixel(dst, c4x + x, c4y + y, color,
-            mask: mask, maskChannel: maskChannel);
-      }
-    }
+    drawAntialiasCircle(dst,
+        x: c1x,
+        y: c1y,
+        radius: rad,
+        color: color,
+        maskChannel: maskChannel,
+        mask: mask,
+        quadrants: topLeftQuadrant);
+
+    drawAntialiasCircle(dst,
+        x: c2x,
+        y: c2y,
+        radius: rad,
+        color: color,
+        maskChannel: maskChannel,
+        mask: mask,
+        quadrants: topRightQuadrant);
+
+    drawAntialiasCircle(dst,
+        x: c3x,
+        y: c3y,
+        radius: rad,
+        color: color,
+        maskChannel: maskChannel,
+        mask: mask,
+        quadrants: bottomRightQuadrant);
+
+    drawAntialiasCircle(dst,
+        x: c4x,
+        y: c4y,
+        radius: rad,
+        color: color,
+        maskChannel: maskChannel,
+        mask: mask,
+        quadrants: bottomLeftQuadrant);
+
     return dst;
   }
 

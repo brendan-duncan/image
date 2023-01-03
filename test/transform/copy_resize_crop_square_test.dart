@@ -17,6 +17,7 @@ void main() {
 
       await (Command()
         ..decodePngFile('test/_data/png/buck_24.png')
+        ..convert(numChannels: 4)
         ..copyResizeCropSquare(size: 64, radius: 20)
         ..writeToFile(
             '$testOutputPath/transform/copyResizeCropSquare_rounded.png'))

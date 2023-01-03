@@ -18,7 +18,8 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0_1));
 
-      final i0_2 = copyCrop(i0, x: 50, y: 50, width: 100, height: 100,
+      final i1 = i0.convert(numChannels: 4);
+      final i0_2 = copyCrop(i1, x: 50, y: 50, width: 100, height: 100,
           radius: 20);
       expect(i0_2.width, equals(100));
       expect(i0_2.height, equals(100));

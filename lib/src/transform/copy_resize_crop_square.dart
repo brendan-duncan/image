@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '../util/_antialias_circle.dart';
 import '../util/image_exception.dart';
+import '../util/math_util.dart';
 
 /// Returns a resized and square cropped copy of the [src] image of [size] size.
 Image copyResizeCropSquare(Image src,
@@ -52,47 +54,41 @@ Image copyResizeCropSquare(Image src,
       final y2 = size - 1;
       final c1x = x1 + rad;
       final c1y = y1 + rad;
-      final c2x = x2 - rad;
+      final c2x = x2 - rad + 1;
       final c2y = y1 + rad;
-      final c3x = x2 - rad;
-      final c3y = y2 - rad;
+      final c3x = x2 - rad + 1;
+      final c3y = y2 - rad + 1;
       final c4x = x1 + rad;
-      final c4y = y2 - rad;
+      final c4y = y2 - rad + 1;
 
       final iter = dst.getRange(x1, y1, width, height);
       while (iter.moveNext()) {
         final p = iter.current;
         final px = p.x;
         final py = p.y;
+
+        num a = 1;
         if (px < c1x && py < c1y) {
-          final dx = px - c1x;
-          final dy = py - c1y;
-          final d2 = dx * dx + dy * dy;
-          if (d2 > rad2) {
+          a = antialiasCircle(p, c1x, c1y, rad2);
+          if (a == 0) {
             p.setRgba(0, 0, 0, 0);
             continue;
           }
         } else if (px > c2x && py < c2y) {
-          final dx = px - c2x;
-          final dy = py - c2y;
-          final d2 = dx * dx + dy * dy;
-          if (d2 > rad2) {
+          a = antialiasCircle(p, c2x, c2y, rad2);
+          if (a == 0) {
             p.setRgba(0, 0, 0, 0);
             continue;
           }
         } else if (px > c3x && py > c3y) {
-          final dx = px - c3x;
-          final dy = py - c3y;
-          final d2 = dx * dx + dy * dy;
-          if (d2 > rad2) {
+          a = antialiasCircle(p, c3x, c3y, rad2);
+          if (a == 0) {
             p.setRgba(0, 0, 0, 0);
             continue;
           }
         } else if (px < c4x && py > c4y) {
-          final dx = px - c4x;
-          final dy = py - c4y;
-          final d2 = dx * dx + dy * dy;
-          if (d2 > rad2) {
+          a = antialiasCircle(p, c4x, c4y, rad2);
+          if (a == 0) {
             p.setRgba(0, 0, 0, 0);
             continue;
           }
@@ -100,11 +96,30 @@ Image copyResizeCropSquare(Image src,
 
         if (interpolation == Interpolation.nearest) {
           final sy = ((p.y + yOffset) * dy).toInt();
-          p.set(frame.getPixel(scaleX![p.x], sy));
+          final sp = frame.getPixel(scaleX![p.x], sy);
+          if (a == 1) {
+            p.set(sp);
+          } else {
+            p
+              ..r = mix(p.r, sp.r, a)
+              ..g = mix(p.g, sp.g, a)
+              ..b = mix(p.b, sp.b, a)
+              ..a = mix(p.a, sp.a, a);
+          }
         } else {
           final x = p.x * dx;
           final y = p.y * dy;
-          p.set(frame.getPixelInterpolate(x, y, interpolation: interpolation));
+          final sp =
+              frame.getPixelInterpolate(x, y, interpolation: interpolation);
+          if (a == 1) {
+            p.set(sp);
+          } else {
+            p
+              ..r = mix(p.r, sp.r, a)
+              ..g = mix(p.g, sp.g, a)
+              ..b = mix(p.b, sp.b, a)
+              ..a = mix(p.a, sp.a, a);
+          }
         }
       }
 

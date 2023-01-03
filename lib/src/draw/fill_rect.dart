@@ -3,6 +3,7 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
+import '../util/_antialias_circle.dart';
 import '../util/math_util.dart';
 
 /// Fill a rectangle in the image [src] with the given [color] with the corners
@@ -31,50 +32,45 @@ Image fillRect(Image src,
   if (radius > 0) {
     final rad = radius.round();
     final rad2 = rad * rad;
-    final c1x = x1 + rad;
-    final c1y = y1 + rad;
-    final c2x = x2 - rad;
-    final c2y = y1 + rad;
-    final c3x = x2 - rad;
-    final c3y = y2 - rad;
-    final c4x = x1 + rad;
-    final c4y = y2 - rad;
+    final c1x = xx0 + rad;
+    final c1y = yy0 + rad;
+    final c2x = xx1 - rad + 1;
+    final c2y = yy0 + rad;
+    final c3x = xx1 - rad + 1;
+    final c3y = yy1 - rad + 1;
+    final c4x = xx0 + rad;
+    final c4y = yy1 - rad + 1;
 
-    final a = color.a / color.maxChannelValue;
     final iter = src.getRange(xx0, yy0, ww, hh);
     while (iter.moveNext()) {
       final p = iter.current;
-      final x = p.x;
-      final y = p.y;
-      if (x < c1x && y < c1y) {
-        final dx = x - c1x;
-        final dy = y - c1y;
-        final d2 = dx * dx + dy * dy;
-        if (d2 > rad2) {
+      final px = p.x;
+      final py = p.y;
+
+      num a = 1;
+      if (px < c1x && py < c1y) {
+        a = antialiasCircle(p, c1x, c1y, rad2);
+        if (a == 0) {
           continue;
         }
-      } else if (x > c2x && y < c2y) {
-        final dx = x - c2x;
-        final dy = y - c2y;
-        final d2 = dx * dx + dy * dy;
-        if (d2 > rad2) {
+      } else if (px > c2x && py < c2y) {
+        a = antialiasCircle(p, c2x, c2y, rad2);
+        if (a == 0) {
           continue;
         }
-      } else if (x > c3x && y > c3y) {
-        final dx = x - c3x;
-        final dy = y - c3y;
-        final d2 = dx * dx + dy * dy;
-        if (d2 > rad2) {
+      } else if (px > c3x && py > c3y) {
+        a = antialiasCircle(p, c3x, c3y, rad2);
+        if (a == 0) {
           continue;
         }
-      } else if (x < c4x && y > c4y) {
-        final dx = x - c4x;
-        final dy = y - c4y;
-        final d2 = dx * dx + dy * dy;
-        if (d2 > rad2) {
+      } else if (px < c4x && py > c4y) {
+        a = antialiasCircle(p, c4x, c4y, rad2);
+        if (a == 0) {
           continue;
         }
       }
+
+      a *= color.aNormalized;
 
       final m = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel) ?? 1;
       p
