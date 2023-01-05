@@ -1,3 +1,9 @@
+## 4.0.6 - January 04, 2023
+
+- `Image.remapChannels(ChannelOrder order)` to remap the order of channels from rgb to bgr, etc.
+- `Image.getBytes({ChannelOrder? order})` will return the image data, optionally reordering the channels.
+- Image.fromBytes can take an optional `ChannelOrder? order` named arg to specify the channel order of the input data. 
+
 ## 4.0.5 - January 01, 2023
 
 - Improved antialiasing for drawLine
