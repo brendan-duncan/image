@@ -28,22 +28,35 @@ void main() {
           bytes[i++] = x < 256 ? 0 : 255;
         }
       }
+
       final img = Image.fromBytes(width: w, height: h, bytes: bytes.buffer,
           rowStride: stride);
       expect(img.width, equals(w));
       expect(img.height, equals(h));
       expect(img.numChannels, equals(3));
-      var differs = false;
-      for (var y = 0; y < w && !differs; ++y) {
-        for (var x = 0; x < h; ++x) {
-          final p = img.getPixel(x, y);
-          if (p.r != x || p.g != y || p.b != 0) {
-            differs = true;
-            break;
-          }
-        }
+      for (final p in img) {
+        expect(p.r, equals(p.x));
+        expect(p.g, equals(p.y));
+        expect(p.b, equals(0));
       }
-      expect(differs, equals(false));
+
+      final img2 = Image.fromBytes(width: w, height: h, bytes: bytes.buffer,
+        rowStride: stride, order: ChannelOrder.bgr);
+      expect(img.width, equals(w));
+      expect(img.height, equals(h));
+      expect(img.numChannels, equals(3));
+      for (final p in img2) {
+        expect(p.r, equals(0));
+        expect(p.g, equals(p.y));
+        expect(p.b, equals(p.x));
+      }
+
+      img2.remapChannels(ChannelOrder.bgr);
+      for (final p in img2) {
+        expect(p.r, equals(p.x));
+        expect(p.g, equals(p.y));
+        expect(p.b, equals(0));
+      }
     });
 
     test('getPixel iterator', () {
