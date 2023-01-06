@@ -1,3 +1,7 @@
+## 4.0.7 - January 05, 2023
+
+- Fix Image.getRangeIterator skipping last line.
+
 ## 4.0.6 - January 04, 2023
 
 - `Image.remapChannels(ChannelOrder order)` to remap the order of channels from rgb to bgr, etc.
