@@ -1,3 +1,8 @@
+## 4.0.8 - January 08, 2023
+
+- Fix ChannelOrder.bgra.
+- Add Image.hasAlpha getter property that will be true if the Image has an alpha channel. 
+
 ## 4.0.7 - January 05, 2023
 
 - Fix Image.getRangeIterator skipping last line.
