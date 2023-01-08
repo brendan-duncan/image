@@ -76,8 +76,8 @@ void main() {
 
       final img = Image.fromBytes(width: 256, height: 256, bytes: bytes.buffer,
         rowStride: stride, order: ChannelOrder.bgra);
-      expect(img.width, equals(256));
-      expect(img.height, equals(256));
+      expect(img.width, equals(w));
+      expect(img.height, equals(h));
       expect(img.numChannels, equals(4));
       for (final p in img) {
         expect(p.r, equals(128));
