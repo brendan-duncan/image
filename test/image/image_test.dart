@@ -59,6 +59,42 @@ void main() {
       }
     });
 
+    test('fromBytes order', () {
+      const w = 256;
+      const h = 256;
+      const w2 = 300;
+      const stride = w2 * 4;
+      final bytes = Uint8List(h * stride);
+      for (var y = 0, i = 0; y < h; ++y) {
+        for (var x = 0; x < w2; ++x) {
+          bytes[i++] = 255;
+          bytes[i++] = 200;
+          bytes[i++] = 128;
+          bytes[i++] = 64;
+        }
+      }
+
+      final img = Image.fromBytes(width: 256, height: 256, bytes: bytes.buffer,
+        rowStride: stride, order: ChannelOrder.bgra);
+      expect(img.width, equals(256));
+      expect(img.height, equals(256));
+      expect(img.numChannels, equals(4));
+      for (final p in img) {
+        expect(p.r, equals(128));
+        expect(p.g, equals(200));
+        expect(p.b, equals(255));
+        expect(p.a, equals(64));
+      }
+
+      img.remapChannels(ChannelOrder.bgra);
+      for (final p in img) {
+        expect(p.r, equals(255));
+        expect(p.g, equals(200));
+        expect(p.b, equals(128));
+        expect(p.a, equals(64));
+      }
+    });
+
     test('getPixel iterator', () {
       final i0 = Image(width: 10, height: 10);
       final p = i0.getPixel(0, 5);

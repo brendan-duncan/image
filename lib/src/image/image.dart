@@ -243,7 +243,8 @@ class Image extends Iterable<Pixel> {
         order = ChannelOrder.rgb;
       }
     } else if (numChannels == 4) {
-      if (order != ChannelOrder.rgba &&
+      if (order != ChannelOrder.bgra &&
+          order != ChannelOrder.rgba &&
           order != ChannelOrder.abgr &&
           order != ChannelOrder.argb) {
         // The user asked for a channel order that conflicts with the number
@@ -534,6 +535,9 @@ class Image extends Iterable<Pixel> {
 
   /// The number of bits per color channel.
   int get bitsPerChannel => data?.bitsPerChannel ?? 0;
+
+  /// True if the Image has an alpha channel.
+  bool get hasAlpha => numChannels == 4;
 
   /// Remap the color channels to the given [order]. Normally Image color
   /// channels are stored in rgba order for 4 channel images, and

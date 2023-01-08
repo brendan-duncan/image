@@ -14,6 +14,7 @@ enum ChannelOrder {
 /// The number of channels for each ChannelOrder.
 const channelOrderLength = <ChannelOrder, int>{
   ChannelOrder.rgba: 4,
+  ChannelOrder.bgra: 4,
   ChannelOrder.abgr: 4,
   ChannelOrder.argb: 4,
   ChannelOrder.rgb: 3,
