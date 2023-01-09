@@ -438,6 +438,7 @@ class Command {
       int? srcW,
       int? srcH,
       BlendMode blend = BlendMode.alpha,
+      bool linearBlend = false,
       bool center = false,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
@@ -451,6 +452,7 @@ class Command {
         srcW: srcW,
         srcH: srcH,
         blend: blend,
+        linearBlend: linearBlend,
         center: center,
         mask: mask,
         maskChannel: maskChannel);
@@ -479,9 +481,15 @@ class Command {
   }
 
   void drawPixel(int x, int y, Color color,
-      {Command? mask, Channel maskChannel = Channel.luminance}) {
+      {BlendMode blend = BlendMode.alpha,
+      bool linearBlend = false,
+      Command? mask,
+      Channel maskChannel = Channel.luminance}) {
     subCommand = DrawPixelCmd(subCommand, x, y, color,
-        mask: mask, maskChannel: maskChannel);
+        blend: blend,
+        linearBlend: linearBlend,
+        mask: mask,
+        maskChannel: maskChannel);
   }
 
   void drawPolygon(

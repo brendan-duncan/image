@@ -14,6 +14,7 @@ class CompositeImageCmd extends Command {
   int? srcW;
   int? srcH;
   BlendMode blend;
+  bool linearBlend;
   bool center;
   Command? mask;
   Channel maskChannel;
@@ -28,6 +29,7 @@ class CompositeImageCmd extends Command {
       this.srcW,
       this.srcH,
       this.blend = BlendMode.alpha,
+      this.linearBlend = false,
       this.center = false,
       this.mask,
       this.maskChannel = Channel.luminance})
@@ -49,6 +51,7 @@ class CompositeImageCmd extends Command {
             srcW: srcW,
             srcH: srcH,
             blend: blend,
+            linearBlend: linearBlend,
             center: center,
             mask: maskImg,
             maskChannel: maskChannel)

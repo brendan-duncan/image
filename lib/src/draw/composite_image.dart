@@ -29,6 +29,7 @@ Image compositeImage(Image dst, Image src,
     int? srcW,
     int? srcH,
     BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     bool center = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
@@ -63,8 +64,8 @@ Image compositeImage(Image dst, Image src,
     _directComposite(
         src, dst, dstX, dstY, dstW, dstH, xCache, yCache, mask, maskChannel);
   } else {
-    _composite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache, blend, mask,
-        maskChannel);
+    _composite(src, dst, dstX, dstY, dstW, dstH, xCache, yCache, blend,
+        linearBlend, mask, maskChannel);
   }
 
   return dst;
@@ -121,6 +122,7 @@ void _composite(
     List<int> xCache,
     List<int> yCache,
     BlendMode blend,
+    bool linearBlend,
     Image? mask,
     Channel maskChannel) {
   Pixel? p;
@@ -128,7 +130,10 @@ void _composite(
     for (var x = 0; x < dstW; ++x) {
       p = src.getPixel(xCache[x], yCache[y], p);
       drawPixel(dst, dstX + x, dstY + y, p,
-          blend: blend, mask: mask, maskChannel: maskChannel);
+          blend: blend,
+          linearBlend: linearBlend,
+          mask: mask,
+          maskChannel: maskChannel);
     }
   }
 }

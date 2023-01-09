@@ -11,6 +11,7 @@ class DrawPixelCmd extends Command {
   final Color? _filter;
   double? alpha;
   BlendMode blend;
+  bool linearBlend;
   Command? mask;
   Channel maskChannel;
 
@@ -18,6 +19,7 @@ class DrawPixelCmd extends Command {
       {Color? filter,
       this.alpha,
       this.blend = BlendMode.alpha,
+      this.linearBlend = false,
       this.mask,
       this.maskChannel = Channel.luminance})
       : _filter = filter,
@@ -32,6 +34,7 @@ class DrawPixelCmd extends Command {
             filter: _filter,
             alpha: alpha,
             blend: blend,
+            linearBlend: linearBlend,
             mask: maskImg,
             maskChannel: maskChannel)
         : null;

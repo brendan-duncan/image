@@ -14,6 +14,7 @@ Image drawPixel(Image image, int x, int y, Color c,
     {Color? filter,
     num? alpha,
     BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (!image.isBoundsSafe(x, y)) {
@@ -35,6 +36,7 @@ Image drawPixel(Image image, int x, int y, Color c,
       filter != null ? c.gNormalized * filter.gNormalized : c.gNormalized;
   var overlayB =
       filter != null ? c.bNormalized * filter.bNormalized : c.bNormalized;
+
   final overlayA = (alpha ?? (c.length < 4 ? 1.0 : c.aNormalized)) * msk;
 
   if (overlayA == 0) {
@@ -231,16 +233,35 @@ Image drawPixel(Image image, int x, int y, Color c,
 
   final invA = 1.0 - overlayA;
 
-  final r = (overlayR * overlayA) + (baseR * baseA * invA);
-  final g = (overlayG * overlayA) + (baseG * baseA * invA);
-  final b = (overlayB * overlayA) + (baseB * baseA * invA);
-  final a = overlayA + baseA * invA;
+  if (linearBlend) {
+    final lbr = pow(baseR, 2.2);
+    final lbg = pow(baseG, 2.2);
+    final lbb = pow(baseB, 2.2);
+    final lor = pow(overlayR, 2.2);
+    final log = pow(overlayG, 2.2);
+    final lob = pow(overlayB, 2.2);
+    final r = pow(lor * overlayA + lbr * baseA * invA, 1.0 / 2.2);
+    final g = pow(log * overlayA + lbg * baseA * invA, 1.0 / 2.2);
+    final b = pow(lob * overlayA + lbb * baseA * invA, 1.0 / 2.2);
+    final a = overlayA + baseA * invA;
 
-  dst
-    ..rNormalized = r
-    ..gNormalized = g
-    ..bNormalized = b
-    ..aNormalized = a;
+    dst
+      ..rNormalized = r
+      ..gNormalized = g
+      ..bNormalized = b
+      ..aNormalized = a;
+  } else {
+    final r = overlayR * overlayA + baseR * baseA * invA;
+    final g = overlayG * overlayA + baseG * baseA * invA;
+    final b = overlayB * overlayA + baseB * baseA * invA;
+    final a = overlayA + baseA * invA;
+
+    dst
+      ..rNormalized = r
+      ..gNormalized = g
+      ..bNormalized = b
+      ..aNormalized = a;
+  }
 
   return image;
 }
