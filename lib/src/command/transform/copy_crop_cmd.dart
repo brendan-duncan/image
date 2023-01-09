@@ -7,13 +7,15 @@ class CopyCropCmd extends Command {
   int width;
   int height;
   num radius;
+  bool antialias;
 
   CopyCropCmd(Command? input,
       {required this.x,
       required this.y,
       required this.width,
       required this.height,
-      this.radius = 0})
+      this.radius = 0,
+      this.antialias = false})
       : super(input);
 
   @override
@@ -22,7 +24,12 @@ class CopyCropCmd extends Command {
     final img = input?.outputImage;
     outputImage = img != null
         ? copyCrop(img,
-            x: x, y: y, width: width, height: height, radius: radius)
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            radius: radius,
+            antialias: antialias)
         : null;
   }
 }

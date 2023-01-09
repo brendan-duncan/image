@@ -21,8 +21,8 @@ void main() {
       });
 
       group('b1_1', () {
-        final image = Image(width: 32, height: 32,
-            format: Format.uint1, numChannels: 1);
+        final image =
+            Image(width: 32, height: 32, format: Format.uint1, numChannels: 1);
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 1 : 0;
           p.r = c;
@@ -43,8 +43,8 @@ void main() {
       });
 
       group('b1_1', () {
-        final image = Image(width: 32, height: 32, format: Format.uint1,
-            numChannels: 1);
+        final image =
+            Image(width: 32, height: 32, format: Format.uint1, numChannels: 1);
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 1 : 0;
           p.r = c;
@@ -65,8 +65,8 @@ void main() {
       });
 
       group('b1_1p', () {
-        final image = Image(width: 32, height: 32, format: Format.uint1,
-            withPalette: true);
+        final image = Image(
+            width: 32, height: 32, format: Format.uint1, withPalette: true);
         image.palette!.setRgb(0, 255, 0, 0);
         image.palette!.setRgb(1, 0, 255, 0);
         for (final p in image) {
@@ -89,8 +89,8 @@ void main() {
       });
 
       group('b2_1', () {
-        final image = Image(width: 32, height: 32, format: Format.uint2,
-            numChannels: 1);
+        final image =
+            Image(width: 32, height: 32, format: Format.uint2, numChannels: 1);
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 3 : 0;
           p.r = c;
@@ -112,8 +112,8 @@ void main() {
       });
 
       group('b2_1p', () {
-        final image = Image(width: 32, height: 32, format: Format.uint2,
-            withPalette: true);
+        final image = Image(
+            width: 32, height: 32, format: Format.uint2, withPalette: true);
         for (var i = 0; i < 4; ++i) {
           image.palette!.setRgb(i, i * 85, i * 85, i * 85);
         }
@@ -137,8 +137,8 @@ void main() {
       });
 
       group('b4_1', () {
-        final image = Image(width: 32, height: 32, format: Format.uint4,
-            numChannels: 1);
+        final image =
+            Image(width: 32, height: 32, format: Format.uint4, numChannels: 1);
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 31 : 0;
           p.r = c;
@@ -160,8 +160,8 @@ void main() {
       });
 
       group('b4_1p', () {
-        final image = Image(width: 32, height: 32, format: Format.uint4,
-            withPalette: true);
+        final image = Image(
+            width: 32, height: 32, format: Format.uint4, withPalette: true);
         for (var i = 0; i < 16; ++i) {
           image.palette!.setRgb(i, i * 17, i * 17, i * 17);
         }
@@ -188,9 +188,10 @@ void main() {
         final image = Image(width: 32, height: 32);
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 255 : 0;
-          p..r = c
-          ..g = c
-          ..b = c;
+          p
+            ..r = c
+            ..g = c
+            ..b = c;
         }
 
         for (var filter in PngFilter.values) {
@@ -234,9 +235,10 @@ void main() {
         final image = Image(width: 32, height: 32, format: Format.uint16);
         for (final p in image) {
           final c = p.x * 2114;
-          p..r = c
-          ..g = c
-          ..b = c;
+          p
+            ..r = c
+            ..g = c
+            ..b = c;
         }
 
         for (var filter in PngFilter.values) {
@@ -277,8 +279,8 @@ void main() {
         for (var i = 0; i < 256; ++i) {
           palette.setRgb(i, (i * 2) % 256, (i * 8) % 256, i);
         }
-        final image = Image(width: 256, height: 256, numChannels: 1,
-            palette: palette);
+        final image =
+            Image(width: 256, height: 256, numChannels: 1, palette: palette);
         for (final p in image) {
           p.index = p.x % 256;
         }
@@ -390,8 +392,7 @@ void main() {
       });
 
       test('encodeAnimation', () {
-        final anim = Image(width: 480, height: 120)
-        ..loopCount = 10;
+        final anim = Image(width: 480, height: 120)..loopCount = 10;
         for (var i = 0; i < 10; i++) {
           final frame = i == 0 ? anim : anim.addFrame();
           drawString(frame, i.toString(), font: arial48, x: 100, y: 60);
@@ -403,9 +404,8 @@ void main() {
           ..writeAsBytesSync(png);
       });
 
-
       test('textData', () {
-        final img = Image(width: 16, height: 16, textData: {"foo":"bar"});
+        final img = Image(width: 16, height: 16, textData: {"foo": "bar"});
         final png = PngEncoder().encode(img);
         final img2 = PngDecoder().decode(png);
         expect(img2?.width, equals(img.width));

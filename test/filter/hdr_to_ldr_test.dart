@@ -14,7 +14,6 @@ void main() {
       File('$testOutputPath/filter/hdrToLdr.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(ldr));
-
     });
   });
 }

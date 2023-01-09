@@ -7,21 +7,27 @@ void main() {
   group('Transform', () {
     test('copyResizeCropSquare', () async {
       final i0 = await (Command()
-      ..decodePngFile('test/_data/png/buck_24.png')
-      ..copyResizeCropSquare(size: 64)
-      ..writeToFile('$testOutputPath/transform/copyResizeCropSquare.png'))
-      .getImage();
+            ..decodePngFile('test/_data/png/buck_24.png')
+            ..copyResizeCropSquare(size: 64)
+            ..writeToFile('$testOutputPath/transform/copyResizeCropSquare.png'))
+          .getImage();
       expect(i0, isNotNull);
       expect(i0!.width, equals(64));
       expect(i0.height, equals(64));
 
       await (Command()
-        ..decodePngFile('test/_data/png/buck_24.png')
-        ..convert(numChannels: 4)
-        ..copyResizeCropSquare(size: 64, radius: 20)
-        ..writeToFile(
-            '$testOutputPath/transform/copyResizeCropSquare_rounded.png'))
-        .execute();
+            ..createImage(width: 64, height: 64)
+            ..fill(color: ColorRgb8(255, 255, 255))
+            ..compositeImage(Command()
+              ..createImage(width: 64, height: 64, numChannels: 4)
+              ..fill(color: ColorRgba8(0, 0, 0, 0))
+              ..compositeImage(Command()
+                ..decodePngFile('test/_data/png/buck_24.png')
+                ..convert(numChannels: 4)
+                ..copyResizeCropSquare(size: 64, radius: 20)))
+            ..writeToFile(
+                '$testOutputPath/transform/copyResizeCropSquare_rounded.png'))
+          .execute();
     });
   });
 }

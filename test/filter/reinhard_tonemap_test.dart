@@ -15,7 +15,6 @@ void main() {
       File('$testOutputPath/filter/reinhardTonemap.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(ldr));
-
     });
   });
 }

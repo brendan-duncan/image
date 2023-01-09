@@ -7,8 +7,8 @@ import '../_test_util.dart';
 void main() {
   group('Transform', () {
     test('copyRectify', () {
-      final img = decodeJpg(
-          File('test/_data/jpg/oblique.jpg').readAsBytesSync())!;
+      final img =
+          decodeJpg(File('test/_data/jpg/oblique.jpg').readAsBytesSync())!;
 
       final i0 = copyRectify(img,
           topLeft: Point(16, 32),

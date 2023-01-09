@@ -15,7 +15,9 @@ void main() {
       await encodePngFile('$testOutputPath/filter/vignette_2.png', v2);
 
       final v3 = vignette(img.clone().convert(numChannels: 4),
-          color: ColorRgba8(255, 255, 255, 0), start: 0.65, end: 0.95,
+          color: ColorRgba8(255, 255, 255, 0),
+          start: 0.65,
+          end: 0.95,
           amount: 0.5);
       await encodePngFile('$testOutputPath/filter/vignette_3.png', v3);
     });

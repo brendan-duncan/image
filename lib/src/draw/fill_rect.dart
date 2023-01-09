@@ -3,7 +3,7 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
-import '../util/_antialias_circle.dart';
+import '../util/_circle_test.dart';
 import '../util/math_util.dart';
 
 /// Fill a rectangle in the image [src] with the given [color] with the corners
@@ -49,22 +49,22 @@ Image fillRect(Image src,
 
       num a = 1;
       if (px < c1x && py < c1y) {
-        a = antialiasCircle(p, c1x, c1y, rad2);
+        a = circleTest(p, c1x, c1y, rad2);
         if (a == 0) {
           continue;
         }
       } else if (px > c2x && py < c2y) {
-        a = antialiasCircle(p, c2x, c2y, rad2);
+        a = circleTest(p, c2x, c2y, rad2);
         if (a == 0) {
           continue;
         }
       } else if (px > c3x && py > c3y) {
-        a = antialiasCircle(p, c3x, c3y, rad2);
+        a = circleTest(p, c3x, c3y, rad2);
         if (a == 0) {
           continue;
         }
       } else if (px < c4x && py > c4y) {
-        a = antialiasCircle(p, c4x, c4y, rad2);
+        a = circleTest(p, c4x, c4y, rad2);
         if (a == 0) {
           continue;
         }

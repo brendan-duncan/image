@@ -3,7 +3,14 @@ import '../image/pixel.dart';
 /// Test if the pixel [p] is within the circle centered at [x],[y] with a
 /// squared radius of [rad2]. This will test the corners, edges, and center
 /// of the pixel and return the ratio of samples within the circle.
-num antialiasCircle(Pixel p, int x, int y, num rad2) {
+num circleTest(Pixel p, int x, int y, num rad2, {bool antialias = true}) {
+  /*if (!antialias) {
+    final dx1 = p.x - x;
+    final dy1 = p.y - y;
+    final d1 = dx1 * dx1 + dy1 * dy1;
+    return d1 <= rad2 ? 1 : 0;
+  }*/
+
   var total = 0;
   final dx1 = p.x - x;
   final dy1 = p.y - y;
@@ -61,5 +68,9 @@ num antialiasCircle(Pixel p, int x, int y, num rad2) {
   final r9 = d9 <= rad2 ? 1 : 0;
   total += r9;
 
-  return total / 9;
+  return antialias
+      ? total / 9
+      : total > 0
+          ? 1
+          : 0;
 }

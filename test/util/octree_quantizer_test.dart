@@ -9,8 +9,9 @@ void main() {
     group('octreeQuantizer', () {
       final img = Image(width: 256, height: 256);
       for (final p in img) {
-        p..r = p.x
-        ..g = p.y;
+        p
+          ..r = p.x
+          ..g = p.y;
       }
 
       final quantizer = OctreeQuantizer(img);

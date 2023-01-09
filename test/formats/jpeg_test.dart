@@ -39,8 +39,8 @@ void main() {
       test('exif', () {
         final fb = File('test/_data/jpg/big_buck_bunny.jpg').readAsBytesSync();
         final image = JpegDecoder().decode(fb)!;
-        image.exif.imageIfd['XResolution'] = [300,1];
-        image.exif.imageIfd['YResolution'] = [300,1];
+        image.exif.imageIfd['XResolution'] = [300, 1];
+        image.exif.imageIfd['YResolution'] = [300, 1];
         final jpg = JpegEncoder().encode(image);
         final image2 = JpegDecoder().decode(jpg)!;
         expect(image.exif.imageIfd['XResolution'],

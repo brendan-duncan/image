@@ -26,8 +26,8 @@ void main() {
           expect(p.a, equals(255));
         }
 
-        final i3p = Image(width: 256, height: 256, numChannels: 4,
-            withPalette: true);
+        final i3p =
+            Image(width: 256, height: 256, numChannels: 4, withPalette: true);
         for (var i = 0; i < 256; ++i) {
           i3p.palette!.setRgb(i, i, i, i);
         }
@@ -155,8 +155,8 @@ const _expectedInfo = {
     'width': 10,
     'height': 8,
     'bigEndian': true,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 10,
         'height': 8,
         'photometricType': TiffPhotometricType.blackIsZero,
@@ -175,8 +175,8 @@ const _expectedInfo = {
     'width': 100,
     'height': 100,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 100,
         'height': 100,
         'photometricType': TiffPhotometricType.whiteIsZero,
@@ -195,8 +195,8 @@ const _expectedInfo = {
     'width': 100,
     'height': 100,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 100,
         'height': 100,
         'photometricType': TiffPhotometricType.whiteIsZero,
@@ -215,8 +215,8 @@ const _expectedInfo = {
     'width': 100,
     'height': 100,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 100,
         'height': 100,
         'photometricType': TiffPhotometricType.whiteIsZero,
@@ -235,8 +235,8 @@ const _expectedInfo = {
     'width': 300,
     'height': 225,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 300,
         'height': 225,
         'photometricType': TiffPhotometricType.whiteIsZero,
@@ -255,8 +255,8 @@ const _expectedInfo = {
     'width': 300,
     'height': 225,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 300,
         'height': 225,
         'photometricType': TiffPhotometricType.whiteIsZero,
@@ -275,8 +275,8 @@ const _expectedInfo = {
     'width': 300,
     'height': 225,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 300,
         'height': 225,
         'photometricType': TiffPhotometricType.whiteIsZero,
@@ -295,8 +295,8 @@ const _expectedInfo = {
     'width': 300,
     'height': 225,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 300,
         'height': 225,
         'photometricType': TiffPhotometricType.whiteIsZero,
@@ -315,8 +315,8 @@ const _expectedInfo = {
     'width': 300,
     'height': 225,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 300,
         'height': 225,
         'photometricType': TiffPhotometricType.whiteIsZero,
@@ -335,8 +335,8 @@ const _expectedInfo = {
     'width': 300,
     'height': 225,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 300,
         'height': 225,
         'photometricType': TiffPhotometricType.cmyk,
@@ -355,8 +355,8 @@ const _expectedInfo = {
     'width': 10,
     'height': 8,
     'bigEndian': true,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 10,
         'height': 8,
         'photometricType': TiffPhotometricType.blackIsZero,
@@ -375,8 +375,8 @@ const _expectedInfo = {
     'width': 10,
     'height': 8,
     'bigEndian': true,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 10,
         'height': 8,
         'photometricType': TiffPhotometricType.blackIsZero,
@@ -395,8 +395,8 @@ const _expectedInfo = {
     'width': 10,
     'height': 8,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 10,
         'height': 8,
         'photometricType': TiffPhotometricType.blackIsZero,
@@ -415,8 +415,8 @@ const _expectedInfo = {
     'width': 420,
     'height': 420,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 420,
         'height': 420,
         'photometricType': TiffPhotometricType.rgb,
@@ -435,8 +435,8 @@ const _expectedInfo = {
     'width': 420,
     'height': 420,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 420,
         'height': 420,
         'photometricType': TiffPhotometricType.blackIsZero,
@@ -455,8 +455,8 @@ const _expectedInfo = {
     'width': 420,
     'height': 420,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 420,
         'height': 420,
         'photometricType': TiffPhotometricType.rgb,
@@ -475,8 +475,8 @@ const _expectedInfo = {
     'width': 10,
     'height': 8,
     'bigEndian': true,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 10,
         'height': 8,
         'photometricType': TiffPhotometricType.blackIsZero,
@@ -495,8 +495,8 @@ const _expectedInfo = {
     'width': 256,
     'height': 256,
     'bigEndian': true,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 256,
         'height': 256,
         'photometricType': TiffPhotometricType.rgb,
@@ -515,8 +515,8 @@ const _expectedInfo = {
     'width': 300,
     'height': 225,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 300,
         'height': 225,
         'photometricType': TiffPhotometricType.rgb,
@@ -535,8 +535,8 @@ const _expectedInfo = {
     'width': 300,
     'height': 225,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 300,
         'height': 225,
         'photometricType': TiffPhotometricType.rgb,
@@ -555,8 +555,8 @@ const _expectedInfo = {
     'width': 300,
     'height': 225,
     'bigEndian': false,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 300,
         'height': 225,
         'photometricType': TiffPhotometricType.rgb,
@@ -575,8 +575,8 @@ const _expectedInfo = {
     'width': 10,
     'height': 8,
     'bigEndian': true,
-    'images': <Map<String,Object>>[
-      <String,Object>{
+    'images': <Map<String, Object>>[
+      <String, Object>{
         'width': 10,
         'height': 8,
         'photometricType': TiffPhotometricType.blackIsZero,

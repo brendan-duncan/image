@@ -11,7 +11,7 @@ void main() {
     group('ico', () {
       test('encode', () {
         final image = Image(width: 64, height: 64)
-        ..clear(ColorRgb8(100, 200, 255));
+          ..clear(ColorRgb8(100, 200, 255));
 
         // Encode the image to ICO
         final ico = IcoEncoder().encode(image);
@@ -20,7 +20,7 @@ void main() {
           ..writeAsBytesSync(ico);
 
         final image2 = Image(width: 64, height: 64)
-        ..clear(ColorRgb8(100, 255, 200));
+          ..clear(ColorRgb8(100, 255, 200));
 
         final ico2 = IcoEncoder().encodeImages([image, image2]);
         File('$testOutputPath/ico/encode2.ico')
@@ -28,7 +28,7 @@ void main() {
           ..writeAsBytesSync(ico2);
 
         final image3 = Image(width: 32, height: 64)
-        ..clear(ColorRgb8(255, 100, 200));
+          ..clear(ColorRgb8(255, 100, 200));
 
         final ico3 = IcoEncoder().encodeImages([image, image2, image3]);
         File('$testOutputPath/ico/encode3.ico')

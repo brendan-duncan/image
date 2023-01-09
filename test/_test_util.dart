@@ -49,8 +49,8 @@ void testImageEquals(Image image, Image image2) {
 Future<void> testImageConversions(Image image) async {
   for (final format in Format.values) {
     for (var nc = 1; nc <= 4; ++nc) {
-      final ic = image.convert(format: format, numChannels: nc,
-          withPalette: true);
+      final ic =
+          image.convert(format: format, numChannels: nc, withPalette: true);
       expect(ic.width, equals(image.width));
       expect(ic.height, equals(image.height));
       expect(ic.format, equals(format));

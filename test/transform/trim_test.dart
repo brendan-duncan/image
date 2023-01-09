@@ -7,8 +7,8 @@ import '../_test_util.dart';
 void main() {
   group('Transform', () {
     test('trim', () {
-      final image = decodePng(File('test/_data/png/trim.png')
-          .readAsBytesSync())!;
+      final image =
+          decodePng(File('test/_data/png/trim.png').readAsBytesSync())!;
       var trimmed = trim(image);
       File('$testOutputPath/transform/trim.png')
         ..createSync(recursive: true)

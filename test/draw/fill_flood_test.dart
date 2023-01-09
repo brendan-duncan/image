@@ -22,12 +22,16 @@ void main() {
         ..gaussianBlur(radius: 5);
 
       await (Command()
-        ..createImage(width: 100, height: 100)
-        ..drawCircle(x: 50, y: 50, radius: 49, color: ColorRgb8(255, 0, 0))
-        ..fillFlood(x: 50, y: 50, color: ColorRgb8(0, 255, 0),
-            threshold: 1, mask: mask)
-        ..writeToFile('$testOutputPath/draw/fillFlood_mask.png')
-      ).execute();
+            ..createImage(width: 100, height: 100)
+            ..drawCircle(x: 50, y: 50, radius: 49, color: ColorRgb8(255, 0, 0))
+            ..fillFlood(
+                x: 50,
+                y: 50,
+                color: ColorRgb8(0, 255, 0),
+                threshold: 1,
+                mask: mask)
+            ..writeToFile('$testOutputPath/draw/fillFlood_mask.png'))
+          .execute();
     });
   });
 }

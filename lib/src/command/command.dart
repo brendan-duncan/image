@@ -1037,9 +1037,13 @@ class Command {
     subCommand = BakeOrientationCmd(subCommand);
   }
 
-  void copyCropCircle({int? radius, int? centerX, int? centerY}) {
+  void copyCropCircle(
+      {int? radius, int? centerX, int? centerY, bool antialias = true}) {
     subCommand = CopyCropCircleCmd(subCommand,
-        radius: radius, centerX: centerX, centerY: centerY);
+        radius: radius,
+        centerX: centerX,
+        centerY: centerY,
+        antialias: antialias);
   }
 
   void copyCrop(
@@ -1047,9 +1051,15 @@ class Command {
       required int y,
       required int width,
       required int height,
-      num radius = 0}) {
+      num radius = 0,
+      bool antialias = true}) {
     subCommand = CopyCropCmd(subCommand,
-        x: x, y: y, width: width, height: height, radius: radius);
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+        radius: radius,
+        antialias: antialias);
   }
 
   void copyFlip({required FlipDirection direction}) {
@@ -1081,9 +1091,13 @@ class Command {
   void copyResizeCropSquare(
       {required int size,
       num radius = 0,
-      Interpolation interpolation = Interpolation.nearest}) {
+      Interpolation interpolation = Interpolation.nearest,
+      bool antialias = true}) {
     subCommand = CopyResizeCropSquareCmd(subCommand,
-        size: size, radius: radius, interpolation: interpolation);
+        size: size,
+        radius: radius,
+        interpolation: interpolation,
+        antialias: antialias);
   }
 
   void copyRotate(

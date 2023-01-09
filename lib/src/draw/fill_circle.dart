@@ -3,7 +3,7 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
-import '../util/_antialias_circle.dart';
+import '../util/_circle_test.dart';
 import 'draw_pixel.dart';
 
 /// Draw and fill a circle into the [image] with a center of [x],[y]
@@ -26,7 +26,7 @@ Image fillCircle(Image image,
   while (range.moveNext()) {
     final p = range.current;
     if (antialias) {
-      final a = antialiasCircle(p, x, y, radiusSqr);
+      final a = circleTest(p, x, y, radiusSqr, antialias: antialias);
       if (a > 0) {
         final alpha = color.aNormalized * a;
         drawPixel(image, p.x, p.y, color,

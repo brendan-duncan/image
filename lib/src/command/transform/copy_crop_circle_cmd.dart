@@ -5,8 +5,10 @@ class CopyCropCircleCmd extends Command {
   int? radius;
   int? centerX;
   int? centerY;
+  bool antialias;
 
-  CopyCropCircleCmd(Command? input, {this.radius, this.centerX, this.centerY})
+  CopyCropCircleCmd(Command? input,
+      {this.radius, this.centerX, this.centerY, this.antialias = true})
       : super(input);
 
   @override
@@ -15,7 +17,10 @@ class CopyCropCircleCmd extends Command {
     final img = input?.outputImage;
     outputImage = img != null
         ? copyCropCircle(img,
-            radius: radius, centerX: centerX, centerY: centerY)
+            radius: radius,
+            centerX: centerX,
+            centerY: centerY,
+            antialias: antialias)
         : null;
   }
 }

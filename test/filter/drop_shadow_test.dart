@@ -13,7 +13,7 @@ void main() {
       final id = dropShadow(i0, -5, 5, 3);
 
       final i1 = Image(width: 256, height: 256)
-      ..clear(ColorRgb8(255, 255, 255));
+        ..clear(ColorRgb8(255, 255, 255));
       compositeImage(i1, id);
 
       File('$testOutputPath/filter/dropShadow.png')

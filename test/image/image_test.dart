@@ -4,7 +4,6 @@ import 'package:test/test.dart';
 
 import '../_test_util.dart';
 
-
 void main() {
   group('Image', () {
     test('empty', () {
@@ -29,8 +28,8 @@ void main() {
         }
       }
 
-      final img = Image.fromBytes(width: w, height: h, bytes: bytes.buffer,
-          rowStride: stride);
+      final img = Image.fromBytes(
+          width: w, height: h, bytes: bytes.buffer, rowStride: stride);
       expect(img.width, equals(w));
       expect(img.height, equals(h));
       expect(img.numChannels, equals(3));
@@ -40,8 +39,12 @@ void main() {
         expect(p.b, equals(0));
       }
 
-      final img2 = Image.fromBytes(width: w, height: h, bytes: bytes.buffer,
-        rowStride: stride, order: ChannelOrder.bgr);
+      final img2 = Image.fromBytes(
+          width: w,
+          height: h,
+          bytes: bytes.buffer,
+          rowStride: stride,
+          order: ChannelOrder.bgr);
       expect(img.width, equals(w));
       expect(img.height, equals(h));
       expect(img.numChannels, equals(3));
@@ -74,8 +77,12 @@ void main() {
         }
       }
 
-      final img = Image.fromBytes(width: 256, height: 256, bytes: bytes.buffer,
-        rowStride: stride, order: ChannelOrder.bgra);
+      final img = Image.fromBytes(
+          width: 256,
+          height: 256,
+          bytes: bytes.buffer,
+          rowStride: stride,
+          order: ChannelOrder.bgra);
       expect(img.width, equals(w));
       expect(img.height, equals(h));
       expect(img.numChannels, equals(4));
@@ -128,10 +135,10 @@ void main() {
     });
 
     test('convert', () async {
-      final rgba8p = Image(width: 256, height: 256, numChannels: 4,
-          withPalette: true)
-      ..addFrame(Image(width: 256, height: 256, numChannels: 4,
-          withPalette: true));
+      final rgba8p = Image(
+          width: 256, height: 256, numChannels: 4, withPalette: true)
+        ..addFrame(
+            Image(width: 256, height: 256, numChannels: 4, withPalette: true));
 
       for (final frame in rgba8p.frames) {
         for (var pi = 0; pi < frame.palette!.numColors; ++pi) {

@@ -1,15 +1,15 @@
 import 'dart:math';
 
 import '../image/image.dart';
-import '../util/_antialias_circle.dart';
-import '../util/math_util.dart';
+import '../util/_circle_test.dart';
 
 /// Returns a circle cropped copy of [src], centered at [centerX] and
 /// [centerY] and with the given [radius]. If [radius] is not provided,
 /// a radius filling the image will be used. If [centerX] is not provided,
 /// the horizontal mid-point of the image will be used. If [centerY] is not
 /// provided, the vertical mid-point of the image will be used.
-Image copyCropCircle(Image src, {int? radius, int? centerX, int? centerY}) {
+Image copyCropCircle(Image src,
+    {int? radius, int? centerX, int? centerY, bool antialias = true}) {
   centerX ??= src.width ~/ 2;
   centerY ??= src.height ~/ 2;
   radius ??= min(src.width, src.height) ~/ 2;
@@ -40,16 +40,11 @@ Image copyCropCircle(Image src, {int? radius, int? centerX, int? centerY}) {
     for (var yi = 0, sy = tly; yi < dh; ++yi, ++sy) {
       for (var xi = 0, sx = tlx; xi < dw; ++xi, ++sx) {
         final p = frame.getPixel(sx, sy);
-        final a = antialiasCircle(p, centerX, centerY, radiusSqr);
+        final a =
+            circleTest(p, centerX, centerY, radiusSqr, antialias: antialias);
 
         if (a != 1) {
-          final dp = dst.getPixel(xi, yi);
-
-          dp
-            ..r = mix(dp.r, p.r, a)
-            ..g = mix(dp.g, p.g, a)
-            ..b = mix(dp.b, p.b, a)
-            ..a = mix(dp.a, p.a, a);
+          dst.getPixel(xi, yi).setRgba(p.r, p.g, p.b, p.a * a);
         } else {
           dst.setPixel(xi, yi, p);
         }

@@ -18,20 +18,21 @@ void main() {
 
       test('cmd', () async {
         await (Command()
-            ..decodeGifFile('test/_data/gif/cars.gif')
-            ..copyResize(width: 64)
-            ..encodeGifFile('$testOutputPath/gif/cars_cmd.gif'))
+              ..decodeGifFile('test/_data/gif/cars.gif')
+              ..copyResize(width: 64)
+              ..encodeGifFile('$testOutputPath/gif/cars_cmd.gif'))
             .execute();
       });
 
       test('convert animated', () async {
         final anim = await decodeGifFile('test/_data/gif/cars.gif');
-        final rgba8 = anim!.convert(format: Format.uint8, numChannels: 4,
-            alpha: 255);
+        final rgba8 =
+            anim!.convert(format: Format.uint8, numChannels: 4, alpha: 255);
         expect(rgba8.numFrames, equals(anim.numFrames));
         for (final frame in rgba8.frames) {
-          await encodePngFile('$testOutputPath/gif/cars_${frame.frameIndex}.png',
-              frame, singleFrame: true);
+          await encodePngFile(
+              '$testOutputPath/gif/cars_${frame.frameIndex}.png', frame,
+              singleFrame: true);
         }
         await encodePngFile('$testOutputPath/gif/cars.png', rgba8);
       });
@@ -81,8 +82,7 @@ void main() {
       }
 
       test('encodeAnimation', () {
-        final anim = Image(width: 480, height: 120)
-        ..loopCount = 10;
+        final anim = Image(width: 480, height: 120)..loopCount = 10;
         for (var i = 0; i < 10; i++) {
           final image = i == 0 ? anim : anim.addFrame();
           drawString(image, i.toString(), font: arial48, x: 100, y: 60);
@@ -102,9 +102,9 @@ void main() {
         final anim = Image(width: 480, height: 120);
         for (var i = 1; i <= 3; i++) {
           final image = i == 1 ? anim : anim.addFrame()
-          ..frameDuration = i * 1000;
-          drawString(image, 'This frame is $i second(s) long', font: arial24,
-              x: 50, y: 50);
+            ..frameDuration = i * 1000;
+          drawString(image, 'This frame is $i second(s) long',
+              font: arial24, x: 50, y: 50);
         }
 
         const name = 'encodeAnimation_variable_fps';
@@ -122,8 +122,8 @@ void main() {
       });
 
       test('encode_small_gif', () {
-        final image = decodeGif(
-            File('test/_data/gif/buck_24.gif').readAsBytesSync())!;
+        final image =
+            decodeGif(File('test/_data/gif/buck_24.gif').readAsBytesSync())!;
         final resized = copyResize(image, width: 16, height: 16);
         final gif = encodeGif(resized);
         File('$testOutputPath/gif/encode_small_gif.gif')

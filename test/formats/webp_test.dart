@@ -9,8 +9,8 @@ void main() {
     const path = 'test/_data/webp';
     group('webp', () {
       test('animated_lossy', () async {
-        final anim = await decodeWebPFile(
-            'test/_data/webp/animated_lossy.webp');
+        final anim =
+            await decodeWebPFile('test/_data/webp/animated_lossy.webp');
         expect(anim, isNotNull);
         for (final frame in anim!.frames) {
           await encodePngFile(
@@ -56,12 +56,12 @@ void main() {
               expect(data.width, equals(_webpTests[name]!['width']));
               expect(data.height, equals(_webpTests[name]!['height']));
               expect(data.hasAlpha, equals(_webpTests[name]!['hasAlpha']));
-              expect(data.hasAnimation,
-                  equals(_webpTests[name]!['hasAnimation']));
+              expect(
+                  data.hasAnimation, equals(_webpTests[name]!['hasAnimation']));
 
               if (data.hasAnimation) {
-                expect(webp.numFrames(),
-                    equals(_webpTests[name]!['numFrames']));
+                expect(
+                    webp.numFrames(), equals(_webpTests[name]!['numFrames']));
               }
             }
           });
