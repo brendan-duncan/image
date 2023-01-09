@@ -24,6 +24,7 @@ Using a mask image to blend the [sketch](https://pub.dev/documentation/image/lat
 Image compositeImage(Image dst, Image src, {
     int? dstX, int? dstY, int? dstW, int? dstH, int? srcX, int? srcY,
     int? srcW, int? srcH, BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     bool center = false, Image? mask,
     Channel maskChannel = Channel.luminance })
 ```
@@ -65,7 +66,8 @@ Image drawLine(Image image, { required int x1, required int y1,
 
 ```dart
 Image drawPixel(Image image, int x, int y, Color c, { Color? filter,
-    num? alpha, BlendMode blend = BlendMode.alpha, Image? mask,
+    num? alpha, BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false, Image? mask,
     Channel maskChannel = Channel.luminance })
 ```
 

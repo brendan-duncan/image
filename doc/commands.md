@@ -224,7 +224,8 @@ void drawCircle({ required int x, required int y, required int radius,
 
 void compositeImage(Command? src, { int? dstX, int? dstY, int? dstW,
   int? dstH, int? srcX, int? srcY, int? srcW, int? srcH,
-  BlendMode blend = BlendMode.alpha, bool center = false, Command? mask,
+  BlendMode blend = BlendMode.alpha, bool linearBlend = false,
+  bool center = false, Command? mask,
   Channel maskChannel = Channel.luminance });
 
 void drawLine({ required int x1, required int y1, required int x2,
@@ -232,8 +233,9 @@ void drawLine({ required int x1, required int y1, required int x2,
   bool antialias = false, num thickness = 1, Command? mask,
   Channel maskChannel = Channel.luminance });
 
-void drawPixel(int x, int y, Color color, { Command? mask,
-  Channel maskChannel = Channel.luminance });
+void drawPixel(int x, int y, Color color, {
+  BlendMode blend = BlendMode.alpha, bool linearBlend = false,
+  Command? mask, Channel maskChannel = Channel.luminance });
 
 void drawPolygon({ required List<Point> vertices, required Color color,
   Command? mask, Channel maskChannel = Channel.luminance });
