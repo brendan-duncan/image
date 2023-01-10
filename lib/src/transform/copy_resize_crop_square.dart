@@ -15,6 +15,12 @@ Image copyResizeCropSquare(Image src,
     throw ImageException('Invalid size');
   }
 
+  // You can't interpolate index pixels, so we need to convert the image
+  // to a non-palette image if non-nearest interpolation is used.
+  if (interpolation != Interpolation.nearest && src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
+
   var height = size;
   var width = size;
   if (src.width < src.height) {

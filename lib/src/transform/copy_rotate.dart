@@ -8,6 +8,12 @@ Image copyRotate(Image src,
     {required num angle, Interpolation interpolation = Interpolation.nearest}) {
   final num nAngle = angle % 360.0;
 
+  // You can't interpolate index pixels, so we need to convert the image
+  // to a non-palette image if non-nearest interpolation is used.
+  if (interpolation != Interpolation.nearest && src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
+
   // Optimized version for orthogonal angles.
   if ((nAngle % 90.0) == 0.0) {
     final iAngle = nAngle ~/ 90.0;

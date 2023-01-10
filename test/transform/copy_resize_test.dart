@@ -16,5 +16,13 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });
+
+    test('copyResize palette', () async {
+      final img = await decodePngFile('test/_data/png/test.png');
+      final i0 = copyResize(img!, width: 64,
+          interpolation: Interpolation.cubic);
+      await encodePngFile('$testOutputPath/transform/copyResize_palette.png',
+          i0);
+    });
   });
 }

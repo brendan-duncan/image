@@ -11,6 +11,12 @@ Image copyRectify(Image src,
     required Point bottomRight,
     Interpolation interpolation = Interpolation.nearest,
     Image? toImage}) {
+  // You can't interpolate index pixels, so we need to convert the image
+  // to a non-palette image if non-nearest interpolation is used.
+  if (interpolation != Interpolation.nearest && src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
+
   Image? firstFrame;
   for (final frame in src.frames) {
     final dst = firstFrame?.addFrame() ??
