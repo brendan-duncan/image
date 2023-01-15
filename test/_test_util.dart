@@ -6,7 +6,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 final testOutputPath = '${Directory.systemTemp.createTempSync().path}/out';
-//const testOutputPath = './out';
+//const testOutputPath = './_out';
 
 int hashImage(Image image) {
   var hash = 0;

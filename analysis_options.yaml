@@ -84,8 +84,3 @@ linter:
   - unnecessary_string_interpolations
   - use_string_buffers
   - void_checks
-
-analyzer:
-  strong-mode:
-    implicit-casts: false
-    implicit-dynamic: false

@@ -169,5 +169,13 @@ void main() {
         }
       }
     });
+    test('alpha_bmp_1bpp', () async {
+      final img = await decodePngFile('test/_data/png/alpha_bmp.png');
+      final bg = Image(width: img!.width, height: img.height)
+        ..clear(ColorRgb8(255, 255, 255));
+      compositeImage(bg, img);
+      final bpp1 = bg.convert(format: Format.uint1, numChannels: 1);
+      await encodeBmpFile('$testOutputPath/bmp/alpha_bmp_cvt.bmp', bpp1);
+    });
   });
 }

@@ -35,7 +35,10 @@ Color _convertColor(Color c, Color c2, num a) {
   final format = c2.format;
   final fromFormat = c.palette?.format ?? c.format;
   final cl = c.length;
-  if (numChannels <= cl) {
+  if (numChannels == 1) {
+    final g = c.length > 2 ? c.luminance : c[0];
+    c2[0] = convertFormatValue(g, fromFormat, format);
+  } else if (numChannels <= cl) {
     for (var ci = 0; ci < numChannels; ++ci) {
       c2[ci] = convertFormatValue(c[ci], fromFormat, format);
     }

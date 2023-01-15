@@ -9,13 +9,13 @@ import 'encoder.dart';
 
 /// Encode a BMP image.
 class BmpEncoder extends Encoder {
-  int _roundToMultiple(int x) {
+  /*int _roundToMultiple(int x) {
     final y = x & 0x3;
     if (y == 0) {
       return x;
     }
     return x + 4 - y;
-  }
+  }*/
 
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
@@ -101,7 +101,7 @@ class BmpEncoder extends Encoder {
     final headerSize = headerInfoSize + 14;
     final paletteSize = (image.palette?.numColors ?? 0) * 4;
     final origImageOffset = headerSize + paletteSize;
-    final imageOffset = _roundToMultiple(origImageOffset);
+    final imageOffset = origImageOffset; //_roundToMultiple(origImageOffset);
     final gapSize = imageOffset - origImageOffset;
     final fileSize = imageFileSize + headerSize + paletteSize + gapSize;
 
