@@ -1,3 +1,8 @@
+## 4.0.9 - January 1, 2023
+
+- Fix offset error with BMP encoder for images with < 8 bits per pixel
+- Improve quality of converting 3-channel image to 1-channel.
+
 ## 4.0.8 - January 08, 2023
 
 - Fix ChannelOrder.bgra.
