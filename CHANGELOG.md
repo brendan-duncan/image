@@ -1,5 +1,9 @@
 ## 4.0.9 - January 1, 2023
 
+- Fix last-minute typo from previous release.
+
+## 4.0.9 - January 1, 2023
+
 - Fix offset error with BMP encoder for images with < 8 bits per pixel
 - Improve quality of converting 3-channel image to 1-channel.
 
