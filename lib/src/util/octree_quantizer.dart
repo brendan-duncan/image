@@ -65,7 +65,7 @@ class OctreeQuantizer extends Quantizer {
     return root?.paletteIndex ?? 0;
   }
 
-  void _getNodes(List nodes, _OctreeNode node) {
+  void _getNodes(List<_OctreeNode> nodes, _OctreeNode node) {
     if (node.childCount == 0) {
       nodes.add(node);
       return;

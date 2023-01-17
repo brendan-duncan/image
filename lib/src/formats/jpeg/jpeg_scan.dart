@@ -1,6 +1,7 @@
 import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '_jpeg_huffman.dart';
 import 'jpeg_component.dart';
 import 'jpeg_data.dart';
 import 'jpeg_frame.dart';
@@ -143,16 +144,17 @@ class JpegScan {
     return (bitsData >> 7) & 1;
   }
 
-  int? _decodeHuffman(List tree) {
-    dynamic node = tree;
+  int? _decodeHuffman(List<HuffmanNode?> tree) {
+    HuffmanNode? node = HuffmanParent(tree);
     int? bit;
     while ((bit = _readBit()) != null) {
-      node = (node as List)[bit!];
-      if (node is num) {
-        return node.toInt();
+      if (node is HuffmanParent) {
+        node = node.children[bit!];
+      }
+      if (node is HuffmanValue) {
+        return node.value;
       }
     }
-
     return null;
   }
 
@@ -180,7 +182,7 @@ class JpegScan {
     return n + (-1 << length) + 1;
   }
 
-  void _decodeBaseline(JpegComponent component, List zz) {
+  void _decodeBaseline(JpegComponent component, List<int> zz) {
     final t = _decodeHuffman(component.huffmanTableDC);
     final diff = t == 0 ? 0 : _receiveAndExtend(t);
     component.pred += diff;
@@ -209,7 +211,7 @@ class JpegScan {
     }
   }
 
-  void _decodeDCFirst(JpegComponent component, List zz) {
+  void _decodeDCFirst(JpegComponent component, List<int> zz) {
     final t = _decodeHuffman(component.huffmanTableDC);
     final diff = (t == 0) ? 0 : (_receiveAndExtend(t) << successive);
     component.pred += diff;
@@ -220,7 +222,7 @@ class JpegScan {
     zz[0] = zz[0] | (_readBit()! << successive);
   }
 
-  void _decodeACFirst(JpegComponent component, List zz) {
+  void _decodeACFirst(JpegComponent component, List<int> zz) {
     if (eobrun > 0) {
       eobrun--;
       return;

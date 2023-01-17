@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import '_jpeg_huffman.dart';
+
 class JpegComponent {
   int hSamples;
   int vSamples;
@@ -8,8 +10,8 @@ class JpegComponent {
   late int blocksPerLine;
   late int blocksPerColumn;
   late List<List<List<int>>> blocks;
-  late List huffmanTableDC;
-  late List huffmanTableAC;
+  late List<HuffmanNode?> huffmanTableDC;
+  late List<HuffmanNode?> huffmanTableAC;
   late int pred;
 
   JpegComponent(this.hSamples, this.vSamples, this.quantizationTableList,

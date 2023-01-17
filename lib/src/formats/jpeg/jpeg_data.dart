@@ -6,6 +6,7 @@ import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import '_component_data.dart';
+import '_jpeg_huffman.dart';
 import 'jpeg_adobe.dart';
 import 'jpeg_component.dart';
 import 'jpeg_frame.dart';
@@ -50,8 +51,8 @@ class JpegData {
   final quantizationTables =
       List<Int16List?>.filled(numQuantizationTables, null);
   final frames = <JpegFrame?>[];
-  final huffmanTablesAC = <List?>[];
-  final huffmanTablesDC = <List?>[];
+  final huffmanTablesAC = List<List<HuffmanNode?>?>.empty(growable: true);
+  final huffmanTablesDC = List<List<HuffmanNode?>?>.empty(growable: true);
   final components = <ComponentData>[];
 
   bool validate(List<int> bytes) {
@@ -439,12 +440,9 @@ class JpegData {
         count += bits[j];
       }
 
-      final huffmanValues = Uint8List(count);
-      for (var j = 0; j < count; j++) {
-        huffmanValues[j] = block.readByte();
-      }
+      final huffmanValues = block.readBytes(count).toUint8List();
 
-      List ht;
+      List<List<HuffmanNode?>?> ht;
       if (index & 0x10 != 0) {
         // AC table definition
         index -= 0x10;
@@ -507,7 +505,8 @@ class JpegData {
         .decode();
   }
 
-  List? _buildHuffmanTable(Uint8List codeLengths, Uint8List values) {
+  List<HuffmanNode?> _buildHuffmanTable(
+      Uint8List codeLengths, Uint8List values) {
     var k = 0;
     final code = <_JpegHuffman>[];
     var length = 16;
@@ -527,7 +526,7 @@ class JpegData {
         if (p.children.length <= p.index) {
           p.children.length = p.index + 1;
         }
-        p.children[p.index] = values[k];
+        p.children[p.index] = HuffmanValue(values[k]);
         while (p.index > 0) {
           p = code.removeLast();
         }
@@ -539,7 +538,7 @@ class JpegData {
           if (p.children.length <= p.index) {
             p.children.length = p.index + 1;
           }
-          p.children[p.index] = q.children;
+          p.children[p.index] = HuffmanParent(q.children);
           p = q;
         }
         k++;
@@ -552,7 +551,7 @@ class JpegData {
         if (p.children.length <= p.index) {
           p.children.length = p.index + 1;
         }
-        p.children[p.index] = q.children;
+        p.children[p.index] = HuffmanParent(q.children);
         p = q;
       }
     }
@@ -602,6 +601,6 @@ class JpegData {
 }
 
 class _JpegHuffman {
-  final children = <dynamic>[];
+  final children = <HuffmanNode?>[];
   int index = 0;
 }

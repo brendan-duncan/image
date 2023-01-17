@@ -120,8 +120,9 @@ class ColorFloat64 extends Iterable<num> implements Color {
 
   @override
   num get luminance => getLuminance(this);
+
   @override
-  get luminanceNormalized => getLuminanceNormalized(this);
+  num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
   num getChannel(Channel channel) => channel == Channel.luminance

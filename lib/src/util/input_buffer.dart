@@ -44,7 +44,7 @@ class InputBuffer {
   int operator [](int index) => buffer[offset + index];
 
   /// Set a buffer element relative to the current position.
-  operator []=(int index, int value) => buffer[offset + index] = value;
+  void operator []=(int index, int value) => buffer[offset + index] = value;
 
   /// Copy data from [other] to this buffer, at [start] offset from the
   /// current read position, and [length] number of bytes. [offset] is
