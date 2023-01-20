@@ -1,3 +1,7 @@
+## 4.0.11 - 
+
+- Add decodeJpgExif and injectJpgExif functions to process JPG exif data without needing to decode the image.
+
 ## 4.0.10 - January 1, 2023
 
 - Fix last-minute typo from previous release.
