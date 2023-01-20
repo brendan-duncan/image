@@ -18,9 +18,9 @@ void main() async {
 
         final jpg2 = injectJpgExif(jpg, exif);
         expect(jpg2, isNotNull);
-        await (File('$testOutputPath/jpg/inject_exif.jpg')
-              ..create(recursive: true))
-            .writeAsBytes(jpg2!);
+        File('$testOutputPath/jpg/inject_exif.jpg')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(jpg2!);
 
         final image = JpegDecoder().decode(jpg2);
         expect(image, isNotNull);
