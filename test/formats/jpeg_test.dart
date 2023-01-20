@@ -4,9 +4,29 @@ import 'package:test/test.dart';
 
 import '../_test_util.dart';
 
-void main() {
+void main() async {
   group('Format', () {
     group('jpg', () {
+      test('decode / inject Exif', () async {
+        final jpg = await File('test/_data/jpg/buck_24.jpg').readAsBytes();
+        final exif = decodeJpgExif(jpg);
+        expect(exif, isNotNull);
+        expect(exif!.imageIfd['Orientation']?.toInt(), equals(1));
+
+        exif.imageIfd['Orientation'] = 4;
+        expect(exif.imageIfd['Orientation']?.toInt(), equals(4));
+
+        final jpg2 = injectJpgExif(jpg, exif);
+        expect(jpg2, isNotNull);
+        await (File('$testOutputPath/jpg/inject_exif.jpg')
+              ..create(recursive: true))
+            .writeAsBytes(jpg2!);
+
+        final image = JpegDecoder().decode(jpg2);
+        expect(image, isNotNull);
+        encodeJpgFile('$testOutputPath/jpg/inject_exif2.jpg', image!);
+      });
+
       test('decode', () {
         final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
         final image = JpegDecoder().decode(fb)!;

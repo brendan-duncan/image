@@ -43,11 +43,13 @@ class OutputBuffer {
   }
 
   void writeBuffer(InputBuffer bytes) {
-    while (length + bytes.length > _buffer.length) {
-      _expandBuffer((length + bytes.length) - _buffer.length);
+    final bytesLength = bytes.length;
+    final requiredLength = length + bytesLength;
+    while (requiredLength > _buffer.length) {
+      _expandBuffer(requiredLength - _buffer.length);
     }
-    _buffer.setRange(length, length + bytes.length, bytes.buffer, bytes.offset);
-    length += bytes.length;
+    _buffer.setRange(length, requiredLength, bytes.buffer, bytes.offset);
+    length += bytesLength;
   }
 
   /// Write a 16-bit word to the end of the buffer.

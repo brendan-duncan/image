@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../exif/exif_data.dart';
 import '../filter/dither_image.dart';
 import '../image/image.dart';
 import '../util/file_access.dart';
@@ -13,6 +14,7 @@ import 'gif_decoder.dart';
 import 'gif_encoder.dart';
 import 'ico_decoder.dart';
 import 'ico_encoder.dart';
+import 'jpeg/jpeg_util.dart';
 import 'jpeg_decoder.dart';
 import 'jpeg_encoder.dart';
 import 'png_decoder.dart';
@@ -257,6 +259,19 @@ Future<bool> encodeJpgFile(String path, Image image,
   }
   final bytes = JpegEncoder(quality: quality).encode(image);
   return writeFile(path, bytes);
+}
+
+/// Decode only the [ExifData] from a JPEG file, returning null if it was
+/// unable to.
+ExifData? decodeJpgExif(Uint8List jpeg) {
+  return JpegUtil().decodeExif(jpeg);
+}
+
+/// Inject [ExifData] into a JPEG file, replacing any existing EXIF data.
+/// The new JPEG file bytes will be returned, otherwise null if there was an
+/// issue.
+Uint8List? injectJpgExif(Uint8List jpeg, ExifData exif) {
+  return JpegUtil().injectExif(exif, jpeg);
 }
 
 /// Decode a PNG formatted [Image].
