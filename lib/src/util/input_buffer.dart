@@ -126,7 +126,8 @@ class InputBuffer {
         }
         codes.add(c);
       }
-      throw ImageException('EOF reached without finding string terminator');
+      throw ImageException(
+          'EOF reached without finding string terminator (length: $len)');
     }
 
     final s = readBytes(len);
@@ -145,7 +146,8 @@ class InputBuffer {
       }
       codes.add(c);
     }
-    throw ImageException('EOF reached without finding string terminator');
+    return utf8.decode(codes, allowMalformed: true);
+    //throw ImageException('EOF reached without finding utf8 string terminator');
   }
 
   /// Read a 16-bit word from the stream.

@@ -18,7 +18,7 @@ class ExifData extends IfdContainer {
   ExifData clone() => ExifData.from(this);
 
   bool hasTag(int tag) {
-    for (var directory in directories.values) {
+    for (final directory in directories.values) {
       if (directory.containsKey(tag)) {
         return true;
       }
@@ -37,7 +37,7 @@ class ExifData extends IfdContainer {
   IfdDirectory get interopIfd => this['ifd0'].sub['interop'];
 
   IfdValue? getTag(int tag) {
-    for (var directory in directories.values) {
+    for (final directory in directories.values) {
       if (directory.containsKey(tag)) {
         return directory[tag];
       }
@@ -55,10 +55,10 @@ class ExifData extends IfdContainer {
   @override
   String toString() {
     final s = StringBuffer();
-    for (var name in directories.keys) {
+    for (final name in directories.keys) {
       s.write('$name\n');
       final directory = directories[name]!;
-      for (var tag in directory.keys) {
+      for (final tag in directory.keys) {
         final value = directory[tag];
         if (value == null) {
           s.write('\t${getTagName(tag)}\n');
@@ -66,10 +66,10 @@ class ExifData extends IfdContainer {
           s.write('\t${getTagName(tag)}: $value\n');
         }
       }
-      for (var subName in directory.sub.keys) {
+      for (final subName in directory.sub.keys) {
         s.write('$subName\n');
         final subDirectory = directory.sub[subName];
-        for (var tag in subDirectory.keys) {
+        for (final tag in subDirectory.keys) {
           final value = subDirectory[tag];
           if (value == null) {
             s.write('\t${getTagName(tag)}\n');
@@ -101,7 +101,7 @@ class ExifData extends IfdContainer {
     var dataOffset = 8; // offset to first ifd block, from start of tiff header
     final offsets = <String, int>{};
 
-    for (var name in directories.keys) {
+    for (final name in directories.keys) {
       final ifd = directories[name]!;
       offsets[name] = dataOffset;
 
@@ -127,7 +127,7 @@ class ExifData extends IfdContainer {
       dataOffset += 2 + (12 * ifd.values.length) + 4;
 
       // storage for large tag values
-      for (var value in ifd.values) {
+      for (final value in ifd.values) {
         final dataSize = value.dataSize;
         if (dataSize > 4) {
           dataOffset += dataSize;
@@ -135,11 +135,11 @@ class ExifData extends IfdContainer {
       }
 
       // storage for sub-ifd blocks
-      for (var subName in ifd.sub.keys) {
+      for (final subName in ifd.sub.keys) {
         final subIfd = ifd.sub[subName];
         offsets[subName] = dataOffset;
         int subSize = 2 + (12 * subIfd.values.length);
-        for (var value in subIfd.values) {
+        for (final value in subIfd.values) {
           final dataSize = value.dataSize;
           if (dataSize > 4) {
             subSize += dataSize;
@@ -180,7 +180,7 @@ class ExifData extends IfdContainer {
 
       _writeDirectoryLargeValues(out, ifd);
 
-      for (var subName in ifd.sub.keys) {
+      for (final subName in ifd.sub.keys) {
         final subIfd = ifd.sub[subName];
         final subOffset = offsets[subName]!;
         final dataOffset = subOffset + 2 + (12 * subIfd.values.length);
@@ -195,7 +195,7 @@ class ExifData extends IfdContainer {
   int _writeDirectory(OutputBuffer out, IfdDirectory ifd, int dataOffset) {
     out.writeUint16(ifd.keys.length);
     final stripOffsetTag = exifTagNameToID['StripOffsets'];
-    for (var tag in ifd.keys) {
+    for (final tag in ifd.keys) {
       final value = ifd[tag]!;
 
       // Special-case StripOffsets, used by TIFF, that if it points to
@@ -232,7 +232,7 @@ class ExifData extends IfdContainer {
   }
 
   void _writeDirectoryLargeValues(OutputBuffer out, IfdDirectory ifd) {
-    for (var value in ifd.values) {
+    for (final value in ifd.values) {
       final size = value.dataSize;
       if (size > 4) {
         value.write(out);
@@ -278,7 +278,7 @@ class ExifData extends IfdContainer {
       final dir = List<_ExifEntry>.generate(
           numEntries, (i) => _readEntry(block, blockOffset));
 
-      for (var entry in dir) {
+      for (final entry in dir) {
         if (entry.value != null) {
           directory[entry.tag] = entry.value!;
         }
@@ -295,8 +295,8 @@ class ExifData extends IfdContainer {
       0x8825: 'gps',
     };
 
-    for (var d in directories.values) {
-      for (var dt in subTags.keys) {
+    for (final d in directories.values) {
+      for (final dt in subTags.keys) {
         if (d.containsKey(dt)) {
           // ExifOffset
           final ifdOffset = d[dt]!.toInt();
@@ -306,7 +306,7 @@ class ExifData extends IfdContainer {
           final dir = List<_ExifEntry>.generate(
               numEntries, (i) => _readEntry(block, blockOffset));
 
-          for (var entry in dir) {
+          for (final entry in dir) {
             if (entry.value != null) {
               directory[entry.tag] = entry.value!;
             }

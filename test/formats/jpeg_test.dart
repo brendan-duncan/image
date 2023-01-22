@@ -7,6 +7,13 @@ import '../_test_util.dart';
 void main() async {
   group('Format', () {
     group('jpg', () {
+      test('exif', () async {
+        final jpg = await File('test/_data/jpg/kodak-dc210.jpg').readAsBytes();
+        final img = decodeJpg(jpg);
+        expect(img, isNotNull);
+        expect(img!.hasExif, isTrue);
+      });
+
       test('decode / inject Exif', () async {
         final jpg = await File('test/_data/jpg/buck_24.jpg').readAsBytes();
         final exif = decodeJpgExif(jpg);
@@ -69,7 +76,7 @@ void main() async {
             equals(image2.exif.imageIfd['YResolution']));
       });
 
-      final dir = Directory('test/_data/jpg');
+      /*final dir = Directory('test/_data/jpg');
       final files = dir.listSync(recursive: true);
       for (var f in files.whereType<File>()) {
         if (!f.path.endsWith('.jpg')) {
@@ -110,7 +117,7 @@ void main() async {
             ..createSync(recursive: true)
             ..writeAsBytesSync(JpegEncoder().encode(image));
         });
-      }
+      }*/
     });
   });
 }

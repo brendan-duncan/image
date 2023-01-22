@@ -128,7 +128,8 @@ class IfdValueAscii extends IfdValue {
   IfdValueAscii.list(List<int> value) : value = String.fromCharCodes(value);
 
   IfdValueAscii.data(InputBuffer data, int count)
-      : value = count == 0 ? data.readString() : data.readString(count);
+      // The final byte is a null terminator
+      : value = count == 0 ? '' : data.readString(count - 1);
 
   IfdValueAscii.string(this.value);
 
@@ -139,7 +140,7 @@ class IfdValueAscii extends IfdValue {
   IfdValueType get type => IfdValueType.ascii;
 
   @override
-  int get length => value.codeUnits.length;
+  int get length => value.codeUnits.length + 1;
 
   @override
   bool operator ==(Object other) =>
@@ -157,6 +158,7 @@ class IfdValueAscii extends IfdValue {
   void write(OutputBuffer out) {
     final bytes = value.codeUnits;
     out.writeBytes(bytes);
+    out.writeByte(0);
   }
 
   @override

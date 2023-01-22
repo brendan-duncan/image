@@ -1,6 +1,8 @@
 ## 4.0.11 - 
 
 - Add decodeJpgExif and injectJpgExif functions to process JPG exif data without needing to decode the image.
+- Fix EXIF parse exception from empty strings.
+- Fix EXIF string data not writing out null character.
 
 ## 4.0.10 - January 1, 2023
 

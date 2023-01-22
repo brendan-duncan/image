@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import '../util/rational.dart';
@@ -186,6 +187,17 @@ class IfdDirectory {
           }
         }
       }
+    }
+  }
+
+  bool get hasUserComment => data.containsKey(0x9286);
+  String? get userComment =>
+      utf8.decode(data[0x9286]?.toData() ?? [], allowMalformed: true);
+  set userComment(String? value) {
+    if (value == null) {
+      data.remove(0x9286);
+    } else {
+      data[0x9286] = IfdValueUndefined.list(value.codeUnits);
     }
   }
 
