@@ -11,6 +11,7 @@ void main() {
       exif.imageIfd[3] = IfdValueSLong(-42141);
       exif.imageIfd[4] = IfdValueRational(72, 1);
       exif.imageIfd[5] = IfdValueSRational(-50, 5);
+      exif.imageIfd[6] = IfdValueAscii('this is an exif string');
 
       exif.imageIfd.sub['exif'][0] = IfdValueShort(124);
       exif.imageIfd.sub['exif'][1] = IfdValueLong(52141);
@@ -18,6 +19,8 @@ void main() {
       exif.imageIfd.sub['exif'][3] = IfdValueSLong(-42141);
       exif.imageIfd.sub['exif'][4] = IfdValueRational(72, 1);
       exif.imageIfd.sub['exif'][5] = IfdValueSRational(-50, 5);
+      exif.imageIfd.sub['exif'][6] =
+          IfdValueAscii('this is an exif string');
 
       exif.thumbnailIfd[0] = IfdValueShort(124);
       exif.thumbnailIfd[1] = IfdValueLong(52141);
