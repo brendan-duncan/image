@@ -157,8 +157,9 @@ class IfdValueAscii extends IfdValue {
   @override
   void write(OutputBuffer out) {
     final bytes = value.codeUnits;
-    out.writeBytes(bytes);
-    out.writeByte(0);
+    out
+      ..writeBytes(bytes)
+      ..writeByte(0);
   }
 
   @override

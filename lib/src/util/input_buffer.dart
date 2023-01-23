@@ -147,7 +147,6 @@ class InputBuffer {
       codes.add(c);
     }
     return utf8.decode(codes, allowMalformed: true);
-    //throw ImageException('EOF reached without finding utf8 string terminator');
   }
 
   /// Read a 16-bit word from the stream.

@@ -263,16 +263,13 @@ Future<bool> encodeJpgFile(String path, Image image,
 
 /// Decode only the [ExifData] from a JPEG file, returning null if it was
 /// unable to.
-ExifData? decodeJpgExif(Uint8List jpeg) {
-  return JpegUtil().decodeExif(jpeg);
-}
+ExifData? decodeJpgExif(Uint8List jpeg) => JpegUtil().decodeExif(jpeg);
 
 /// Inject [ExifData] into a JPEG file, replacing any existing EXIF data.
 /// The new JPEG file bytes will be returned, otherwise null if there was an
 /// issue.
-Uint8List? injectJpgExif(Uint8List jpeg, ExifData exif) {
-  return JpegUtil().injectExif(exif, jpeg);
-}
+Uint8List? injectJpgExif(Uint8List jpeg, ExifData exif) =>
+    JpegUtil().injectExif(exif, jpeg);
 
 /// Decode a PNG formatted [Image].
 Image? decodePng(Uint8List bytes, {int? frame}) =>

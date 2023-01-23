@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:image/image.dart';
-
+import '../../exif/exif_data.dart';
+import '../../util/input_buffer.dart';
+import '../../util/output_buffer.dart';
 import 'jpeg_marker.dart';
 
 class JpegUtil {
@@ -61,7 +62,7 @@ class JpegUtil {
 
     // Check to see if the JPEG file has an EXIF block
     var hasExifBlock = false;
-    int startOffset = input.offset;
+    final startOffset = input.offset;
     marker = _nextMarker(input);
     while (!hasExifBlock && marker != JpegMarker.eoi && !input.isEOS) {
       if (marker == JpegMarker.app1) {
