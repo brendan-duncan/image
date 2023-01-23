@@ -68,6 +68,9 @@ class PaletteUint8 extends Palette {
   @override
   num getRed(int index) {
     index *= numChannels;
+    if (index >= data.length) {
+      return 0;
+    }
     return data[index];
   }
 
@@ -77,6 +80,9 @@ class PaletteUint8 extends Palette {
       return 0;
     }
     index *= numChannels;
+    if (index >= data.length) {
+      return 0;
+    }
     return data[index + 1];
   }
 
@@ -86,6 +92,9 @@ class PaletteUint8 extends Palette {
       return 0;
     }
     index *= numChannels;
+    if (index >= data.length) {
+      return 0;
+    }
     return data[index + 2];
   }
 
@@ -95,6 +104,9 @@ class PaletteUint8 extends Palette {
       return 255;
     }
     index *= numChannels;
+    if (index >= data.length) {
+      return 0;
+    }
     return data[index + 3];
   }
 
