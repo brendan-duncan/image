@@ -1,4 +1,10 @@
-## 4.0.11 - 
+## 4.0.12 - January 23, 2023
+
+- Fix EXIF parsing little endian data
+- Fix bounds errors with filter functions and palette images.
+- Fix BMP encoding palette rgba images by converting them to 32-bit rgba.
+
+## 4.0.11 - January 22, 2023
 
 - Add decodeJpgExif and injectJpgExif functions to process JPG exif data without needing to decode the image.
 - Fix EXIF parse exception from empty strings.
