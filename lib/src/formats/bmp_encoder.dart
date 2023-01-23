@@ -80,6 +80,8 @@ class BmpEncoder extends Encoder {
     } else if (image.isHdrFormat) {
       // => uint8,[3,4]
       image = image.convert(format: Format.uint8);
+    } else if (image.hasPalette && image.numChannels == 4) {
+      image = image.convert(numChannels: 4);
     }
 
     var bpp = image.bitsPerChannel * image.data!.numChannels;
@@ -101,7 +103,8 @@ class BmpEncoder extends Encoder {
     final headerSize = headerInfoSize + 14;
     final paletteSize = (image.palette?.numColors ?? 0) * 4;
     final origImageOffset = headerSize + paletteSize;
-    final imageOffset = origImageOffset; //_roundToMultiple(origImageOffset);
+    final imageOffset = origImageOffset;
+    //final imageOffset = _roundToMultiple(origImageOffset);
     final gapSize = imageOffset - origImageOffset;
     final fileSize = imageFileSize + headerSize + paletteSize + gapSize;
 
