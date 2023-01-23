@@ -251,7 +251,7 @@ class ExifData extends IfdContainer {
     if (endian == 0x4949) {
       // II
       block.bigEndian = false;
-      if (block.readUint16() != 0x2a00) {
+      if (block.readUint16() != 0x002a) {
         block.bigEndian = saveEndian;
         return false;
       }

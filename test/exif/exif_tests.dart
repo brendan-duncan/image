@@ -12,6 +12,7 @@ void main() {
       exif.imageIfd[4] = IfdValueRational(72, 1);
       exif.imageIfd[5] = IfdValueSRational(-50, 5);
       exif.imageIfd[6] = IfdValueAscii('this is an exif string');
+      exif.imageIfd[7] = IfdValueUndefined.list([1,2,3,4]);
 
       exif.imageIfd.sub['exif'][0] = IfdValueShort(124);
       exif.imageIfd.sub['exif'][1] = IfdValueLong(52141);
@@ -20,6 +21,7 @@ void main() {
       exif.imageIfd.sub['exif'][4] = IfdValueRational(72, 1);
       exif.imageIfd.sub['exif'][5] = IfdValueSRational(-50, 5);
       exif.imageIfd.sub['exif'][6] = IfdValueAscii('this is an exif string');
+      exif.imageIfd.sub['exif'][7] = IfdValueUndefined.list([5,6,7,8]);
 
       exif.thumbnailIfd[0] = IfdValueShort(124);
       exif.thumbnailIfd[1] = IfdValueLong(52141);
@@ -27,6 +29,7 @@ void main() {
       exif.thumbnailIfd[3] = IfdValueSLong(-42141);
       exif.thumbnailIfd[4] = IfdValueRational(72, 1);
       exif.thumbnailIfd[5] = IfdValueSRational(-50, 5);
+      exif.thumbnailIfd[7] = IfdValueUndefined.list([9,10,11,12]);
 
       final out = OutputBuffer();
       exif.write(out);
