@@ -38,25 +38,37 @@ Image flipVertical(Image src) {
     final w = frame.width;
     final h = frame.height;
     final h2 = h ~/ 2;
-    for (var y = 0, y2 = h - 1; y < h2; ++y, --y2) {
-      for (var x = 0; x < w; ++x) {
-        final p1 = frame.getPixel(x, y);
-        final p2 = frame.getPixel(x, y2);
-        var t = p1.r;
-        p1.r = p2.r;
-        p2.r = t;
+    if (src.hasPalette) {
+      for (var y = 0, y2 = h - 1; y < h2; ++y, --y2) {
+        for (var x = 0; x < w; ++x) {
+          final p1 = frame.getPixel(x, y);
+          final p2 = frame.getPixel(x, y2);
+          final t = p1.index;
+          p1.index = p2.index;
+          p2.index = t;
+        }
+      }
+    } else {
+      for (var y = 0, y2 = h - 1; y < h2; ++y, --y2) {
+        for (var x = 0; x < w; ++x) {
+          final p1 = frame.getPixel(x, y);
+          final p2 = frame.getPixel(x, y2);
+          var t = p1.r;
+          p1.r = p2.r;
+          p2.r = t;
 
-        t = p1.g;
-        p1.g = p2.g;
-        p2.g = t;
+          t = p1.g;
+          p1.g = p2.g;
+          p2.g = t;
 
-        t = p1.b;
-        p1.b = p2.b;
-        p2.b = t;
+          t = p1.b;
+          p1.b = p2.b;
+          p2.b = t;
 
-        t = p1.a;
-        p1.a = p2.a;
-        p2.a = t;
+          t = p1.a;
+          p1.a = p2.a;
+          p2.a = t;
+        }
       }
     }
   }
@@ -71,25 +83,37 @@ Image flipHorizontal(Image src) {
     final w = frame.width;
     final h = frame.height;
     final w2 = w ~/ 2;
-    for (var y = 0; y < h; ++y) {
-      for (var x = 0, x2 = w - 1; x < w2; ++x, --x2) {
-        final p1 = frame.getPixel(x, y);
-        final p2 = frame.getPixel(x2, y);
-        var t = p1.r;
-        p1.r = p2.r;
-        p2.r = t;
+    if (src.hasPalette) {
+      for (var y = 0; y < h; ++y) {
+        for (var x = 0, x2 = w - 1; x < w2; ++x, --x2) {
+          final p1 = frame.getPixel(x, y);
+          final p2 = frame.getPixel(x2, y);
+          final t = p1.index;
+          p1.index = p2.index;
+          p2.index = t;
+        }
+      }
+    } else {
+      for (var y = 0; y < h; ++y) {
+        for (var x = 0, x2 = w - 1; x < w2; ++x, --x2) {
+          final p1 = frame.getPixel(x, y);
+          final p2 = frame.getPixel(x2, y);
+          var t = p1.r;
+          p1.r = p2.r;
+          p2.r = t;
 
-        t = p1.g;
-        p1.g = p2.g;
-        p2.g = t;
+          t = p1.g;
+          p1.g = p2.g;
+          p2.g = t;
 
-        t = p1.b;
-        p1.b = p2.b;
-        p2.b = t;
+          t = p1.b;
+          p1.b = p2.b;
+          p2.b = t;
 
-        t = p1.a;
-        p1.a = p2.a;
-        p2.a = t;
+          t = p1.a;
+          p1.a = p2.a;
+          p2.a = t;
+        }
       }
     }
   }
@@ -105,25 +129,37 @@ Image flipHorizontalVertical(Image src) {
     final h = frame.height;
     final h2 = h ~/ 2;
 
-    for (var y = 0, y2 = h - 1; y < h2; ++y, --y2) {
-      for (var x = 0, x2 = w - 1; x < w; ++x, --x2) {
-        final p1 = frame.getPixel(x, y);
-        final p2 = frame.getPixel(x2, y2);
-        var t = p1.r;
-        p1.r = p2.r;
-        p2.r = t;
+    if (frame.hasPalette) {
+      for (var y = 0, y2 = h - 1; y < h2; ++y, --y2) {
+        for (var x = 0, x2 = w - 1; x < w; ++x, --x2) {
+          final p1 = frame.getPixel(x, y);
+          final p2 = frame.getPixel(x2, y2);
+          final t = p1.index;
+          p1.index = p2.index;
+          p2.index = t;
+        }
+      }
+    } else {
+      for (var y = 0, y2 = h - 1; y < h2; ++y, --y2) {
+        for (var x = 0, x2 = w - 1; x < w; ++x, --x2) {
+          final p1 = frame.getPixel(x, y);
+          final p2 = frame.getPixel(x2, y2);
+          var t = p1.r;
+          p1.r = p2.r;
+          p2.r = t;
 
-        t = p1.g;
-        p1.g = p2.g;
-        p2.g = t;
+          t = p1.g;
+          p1.g = p2.g;
+          p2.g = t;
 
-        t = p1.b;
-        p1.b = p2.b;
-        p2.b = t;
+          t = p1.b;
+          p1.b = p2.b;
+          p2.b = t;
 
-        t = p1.a;
-        p1.a = p2.a;
-        p2.a = t;
+          t = p1.a;
+          p1.a = p2.a;
+          p2.a = t;
+        }
       }
     }
   }

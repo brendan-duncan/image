@@ -53,6 +53,10 @@ Image compositeImage(Image dst, Image src,
     dstY = height ~/ 2;
   }
 
+  if (dst.hasPalette) {
+    dst.convert(numChannels: dst.numChannels);
+  }
+
   final dy = srcH / dstH;
   final dx = srcW / dstW;
   final yCache = List<int>.generate(dstH, (y) => srcY! + (y * dy).toInt(),

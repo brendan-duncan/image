@@ -19,6 +19,10 @@ Image copyCrop(Image src,
     height = src.height - y;
   }
 
+  if (radius > 0 && src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
+
   Image? firstFrame;
   final numFrames = src.numFrames;
   for (var i = 0; i < numFrames; ++i) {

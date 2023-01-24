@@ -18,10 +18,9 @@ Image copyResize(Image src,
     throw ImageException('Invalid size');
   }
 
-  // You can't interpolate index pixels, so we need to convert the image
-  // to a non-palette image if non-nearest interpolation is used.
-  if (interpolation != Interpolation.nearest && src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+  // You can't interpolate index pixels
+  if (src.hasPalette) {
+    interpolation = Interpolation.nearest;
   }
 
   if (src.exif.imageIfd.hasOrientation && src.exif.imageIfd.orientation != 1) {

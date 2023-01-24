@@ -10,6 +10,12 @@ void main() {
       const buck24Hash = 817446904;
       Image? buck24Image;
 
+      test('hungry_180', () async {
+        final png = (await decodePngFile('test/_data/png/hungry_180.png'))!;
+        flip(png, direction: FlipDirection.horizontal);
+        encodePngFile('$testOutputPath/png/hungry_180_flip.png', png);
+      });
+
       test('transparencyAnim', () async {
         final g1 = await decodePngFile('test/_data/png/g1.png');
         final g2 = await decodePngFile('test/_data/png/g2.png');

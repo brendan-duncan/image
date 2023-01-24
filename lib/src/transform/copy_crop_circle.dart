@@ -27,6 +27,10 @@ Image copyCropCircle(Image src,
   final wh = radius * 2;
   final radiusSqr = radius * radius;
 
+  if (src.hasPalette) {
+    src = src.convert(numChannels: 4);
+  }
+
   Image? firstFrame;
   final numFrames = src.numFrames;
   for (var i = 0; i < numFrames; ++i) {
