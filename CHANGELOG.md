@@ -1,3 +1,7 @@
+## 4.0.13 - January 30, 2023
+
+- Fix transform functions for palette images.
+
 ## 4.0.12 - January 23, 2023
 
 - Fix EXIF parsing little endian data
