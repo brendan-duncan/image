@@ -52,14 +52,21 @@ Image copyRotate(Image src,
             height: (uy + vy).toInt(),
             noAnimation: true);
     firstFrame ??= dst;
+    final bg = frame.backgroundColor ?? src.backgroundColor;
+    if (bg != null) {
+      dst.clear(bg);
+    }
 
     for (final p in dst) {
       final x = p.x;
       final y = p.y;
       final x2 = w2 + (x - dw2) * ca + (y - dh2) * sa;
       final y2 = h2 - (x - dw2) * sa + (y - dh2) * ca;
-      final c = frame.getPixelInterpolate(x2, y2, interpolation: interpolation);
-      dst.setPixel(x, y, c);
+      if (frame.isBoundsSafe(x2, y2)) {
+        final c = frame.getPixelInterpolate(
+            x2, y2, interpolation: interpolation);
+        dst.setPixel(x, y, c);
+      }
     }
   }
 

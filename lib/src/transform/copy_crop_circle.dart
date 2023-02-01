@@ -39,6 +39,11 @@ Image copyCropCircle(Image src,
         Image.fromResized(frame, width: wh, height: wh, noAnimation: true);
     firstFrame ??= dst;
 
+    final bg = frame.backgroundColor ?? src.backgroundColor;
+    if (bg != null) {
+      dst.clear(bg);
+    }
+
     final dh = dst.height;
     final dw = radius * 2;
     for (var yi = 0, sy = tly; yi < dh; ++yi, ++sy) {

@@ -601,7 +601,7 @@ class Image extends Iterable<Pixel> {
 
   /// Returns true if the given pixel coordinates is within the dimensions
   /// of the image.
-  bool isBoundsSafe(int x, int y) =>
+  bool isBoundsSafe(num x, num y) =>
       x >= 0 && y >= 0 && x < width && y < height;
 
   /// Create a [Color] object with the format and number of channels of the
