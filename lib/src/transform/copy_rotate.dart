@@ -63,8 +63,8 @@ Image copyRotate(Image src,
       final x2 = w2 + (x - dw2) * ca + (y - dh2) * sa;
       final y2 = h2 - (x - dw2) * sa + (y - dh2) * ca;
       if (frame.isBoundsSafe(x2, y2)) {
-        final c = frame.getPixelInterpolate(
-            x2, y2, interpolation: interpolation);
+        final c =
+            frame.getPixelInterpolate(x2, y2, interpolation: interpolation);
         dst.setPixel(x, y, c);
       }
     }

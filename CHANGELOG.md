@@ -1,3 +1,7 @@
+## 4.0.14 - February 11, 2023
+
+- Use Image.backgroundColor for copyRotate, copyCropCircle, and other functions that reveal background pixels. 
+
 ## 4.0.13 - January 30, 2023
 
 - Fix transform functions for palette images.
