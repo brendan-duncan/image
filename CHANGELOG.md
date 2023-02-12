@@ -1,3 +1,7 @@
+## 4.0.15 - February 11, 2023
+
+- Fix JPEG encoder for non uint8 format images.
+
 ## 4.0.14 - February 11, 2023
 
 - Use Image.backgroundColor for copyRotate, copyCropCircle, and other functions that reveal background pixels. 
