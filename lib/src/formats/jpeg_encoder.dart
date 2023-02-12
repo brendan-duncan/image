@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import '../color/color.dart';
+import '../color/format.dart';
 import '../exif/exif_data.dart';
 import '../image/image.dart';
 import '../util/output_buffer.dart';
@@ -81,7 +83,10 @@ class JpegEncoder extends Encoder {
             xx -= (x + col) - width + 1;
           }
 
-          final p = image.getPixel(xx, yy);
+          Color p = image.getPixel(xx, yy);
+          if (p.format != Format.uint8) {
+            p = p.convert(format: Format.uint8);
+          }
           final r = p.r.toInt();
           final g = p.g.toInt();
           final b = p.b.toInt();
