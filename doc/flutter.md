@@ -49,7 +49,7 @@ import 'package:image/image.dart' as img;
 Future<img.Image> convertFlutterUiToImage(ui.Image uiImage) async {
   final uiBytes = await uiImage.toByteData();
 
-  final image = Image.fromBytes(width: id.width, height: id.height,
+  final image = img.Image.fromBytes(width: id.width, height: id.height,
       bytes: uiBytes!.buffer,
       numChannels: 4);
 
