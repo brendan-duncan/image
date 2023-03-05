@@ -24,17 +24,25 @@ Future<Uint8List?> _getBytes(_Params p) async {
 }
 
 Future<ExecuteResult> _getResult(_Params p) async {
-  await p.command?.execute();
+  Object? exception;
+  try {
+    await p.command?.execute();
+  } catch (e) {
+    exception = e;
+  }
   Isolate.exit(
       p.port,
       ExecuteResult(p.command?.outputImage, p.command?.outputBytes,
-          p.command?.outputObject));
+          p.command?.outputObject,
+          exception: exception));
 }
 
 Future<ExecuteResult> executeCommandAsync(Command? command) async {
   final port = ReceivePort();
   await Isolate.spawn(_getResult, _Params(port.sendPort, command));
-  return await port.first as ExecuteResult;
+  final result = await port.first as ExecuteResult;
+  if (result.exception != null) throw result.exception!;
+  return result;
 }
 
 Future<Image?> executeCommandImage(Command? command) async {
