@@ -8,5 +8,6 @@ class ExecuteResult {
   Image? image;
   Uint8List? bytes;
   Object? object;
-  ExecuteResult(this.image, this.bytes, this.object);
+  Object? exception;
+  ExecuteResult(this.image, this.bytes, this.object, {this.exception});
 }
