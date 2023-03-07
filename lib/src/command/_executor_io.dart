@@ -41,7 +41,13 @@ Future<ExecuteResult> executeCommandAsync(Command? command) async {
   final port = ReceivePort();
   await Isolate.spawn(_getResult, _Params(port.sendPort, command));
   final result = await port.first as ExecuteResult;
-  if (result.exception != null) throw result.exception!;
+  // Don't throw instances of classes that don't extend either 'Exception' or
+  // 'Error'.
+  if (result.exception is Error) {
+    throw result.exception as Error;
+  } else if (result.exception is Exception) {
+    throw result.exception as Exception;
+  }
   return result;
 }
 
