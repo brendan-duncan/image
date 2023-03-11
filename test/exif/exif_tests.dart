@@ -34,9 +34,10 @@ void main() {
       final out = OutputBuffer();
       exif.write(out);
 
-      final exif2 = ExifData();
+      final exif1 = ExifData();
       final input = InputBuffer(out.getBytes());
-      exif2.read(input);
+      exif1.read(input);
+      final exif2 = exif1.clone();
 
       expect(exif2.imageIfd.values.length, equals(exif.imageIfd.values.length));
       for (int i = 0; i < exif2.imageIfd.values.length; ++i) {

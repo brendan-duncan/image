@@ -27,6 +27,7 @@ class IfdDirectory {
 
   void copy(IfdDirectory other) {
     other.data.forEach((tag, value) => data[tag] = value.clone());
+    other.sub.directories.forEach((tag, value) => sub.directories[tag] = value.clone());
   }
 
   /// The size in bytes of the data written by this directory. Can be used to
