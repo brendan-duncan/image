@@ -199,7 +199,7 @@ class Image extends Iterable<Pixel> {
       {required int width,
       required int height,
       required ByteBuffer bytes,
-      int bytesOffset,
+      int bytesOffset = 0,
       Format format = Format.uint8,
       int? numChannels,
       int? rowStride,
