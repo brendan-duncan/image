@@ -199,6 +199,7 @@ class Image extends Iterable<Pixel> {
       {required int width,
       required int height,
       required ByteBuffer bytes,
+      int bytesOffset = 0,
       Format format = Format.uint8,
       int? numChannels,
       int? rowStride,
@@ -267,7 +268,7 @@ class Image extends Iterable<Pixel> {
     }
 
     final toBytes = data!.toUint8List();
-    final fromBytes = Uint8List.view(bytes);
+    final fromBytes = Uint8List.view(bytes, bytesOffset);
 
     rowStride ??= width * numChannels * formatSize[format]!;
     final dataStride = data!.rowStride;
