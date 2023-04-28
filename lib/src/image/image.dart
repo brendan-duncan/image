@@ -270,7 +270,7 @@ class Image extends Iterable<Pixel> {
     final toBytes = data!.toUint8List();
     final fromBytes = Uint8List.view(bytes, bytesOffset);
 
-    rowStride ??= width * numChannels * formatSize[format]!;
+    rowStride ??= getRowStride(width, numChannels, format);
     final dataStride = data!.rowStride;
     final stride = min(rowStride, dataStride);
 

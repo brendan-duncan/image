@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -12,6 +13,13 @@ void main() {
 
       final i1 = Image.empty();
       expect(i1.isValid, equals(false));
+    });
+
+    test('rowStride', () {
+      for (final format in Format.values) {
+        final img = Image(width: 10, height: 1, format: format);
+        expect(img.rowStride, getRowStride(10, 3, format));
+      }
     });
 
     test('fromBytes', () {
