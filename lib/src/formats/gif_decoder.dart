@@ -54,6 +54,17 @@ class GifDecoder extends Decoder {
             if (gifImage == null) {
               return info;
             }
+            gifImage
+              ..duration = _duration
+              ..clearFrame = _disposalMethod == 2;
+            if (_transparentFlag != 0) {
+              if (gifImage.colorMap == null && info!.globalColorMap != null) {
+                gifImage.colorMap = GifColorMap.from(info!.globalColorMap!);
+              }
+              if (gifImage.colorMap != null) {
+                gifImage.colorMap!.transparent = _transparent;
+              }
+            }
             info!.frames.add(gifImage);
             break;
           case extensionRecordType:
@@ -95,15 +106,20 @@ class GifDecoder extends Decoder {
     }
   }
 
+  var _transparentFlag = 0;
+  var _disposalMethod = 0;
+  var _transparent = 0;
+  var _duration = 0;
+
   void _readGraphicsControlExt(InputBuffer input) {
     /*int blockSize =*/ input.readByte();
     final b = input.readByte();
-    final duration = input.readUint16();
-    final transparent = input.readByte();
+    _duration = input.readUint16();
+    _transparent = input.readByte();
     /*int endBlock =*/ input.readByte();
-    final disposalMethod = (b >> 2) & 0x7;
+    _disposalMethod = (b >> 2) & 0x7;
     //int userInput = (b >> 1) & 0x1;
-    final transparentFlag = b & 0x1;
+    _transparentFlag = b & 0x1;
 
     final recordType = input.peekBytes(1)[0];
     if (recordType == imageDescRecordType) {
@@ -114,15 +130,15 @@ class GifDecoder extends Decoder {
       }
 
       gifImage
-        ..duration = duration
-        ..clearFrame = disposalMethod == 2;
+        ..duration = _duration
+        ..clearFrame = _disposalMethod == 2;
 
-      if (transparentFlag != 0) {
+      if (_transparentFlag != 0) {
         if (gifImage.colorMap == null && info!.globalColorMap != null) {
           gifImage.colorMap = GifColorMap.from(info!.globalColorMap!);
         }
         if (gifImage.colorMap != null) {
-          gifImage.colorMap!.transparent = transparent;
+          gifImage.colorMap!.transparent = _transparent;
         }
       }
 
