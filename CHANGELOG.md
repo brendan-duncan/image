@@ -1,3 +1,8 @@
+## 4.0.16 - April 27, 2023
+
+- Fix GIF decoder not decoding some animation files transparency and frame duration.
+- Fix default rowStride for Image.fromBytes.
+
 ## 4.0.15 - February 11, 2023
 
 - Fix JPEG encoder for non uint8 format images.
