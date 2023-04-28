@@ -62,10 +62,13 @@ const formatMaxValue = <Format, int>{
 };
 
 int getRowStride(int width, int numChannels, Format format) =>
-  (format == Format.uint1) ? ((width * numChannels) / 8).ceil() :
-    (format == Format.uint2) ? ((width * numChannels) / 4).ceil() :
-    (format == Format.uint4) ? ((width * numChannels) / 2).ceil() :
-    width * numChannels * formatSize[format]!;
+    (format == Format.uint1)
+        ? ((width * numChannels) / 8).ceil()
+        : (format == Format.uint2)
+            ? ((width * numChannels) / 4).ceil()
+            : (format == Format.uint4)
+                ? ((width * numChannels) / 2).ceil()
+                : width * numChannels * formatSize[format]!;
 
 /// Convert a value from the [from] [Format] to the [to] Format.
 num convertFormatValue(num value, Format from, Format to) {

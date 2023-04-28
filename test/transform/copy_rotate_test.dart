@@ -9,7 +9,7 @@ void main() {
     test('copyRotate', () {
       final img =
           decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!
-      ..backgroundColor = ColorRgb8(255, 255, 255);
+            ..backgroundColor = ColorRgb8(255, 255, 255);
       for (var i = 0; i < 360; i += 45) {
         final i0 = copyRotate(img, angle: i);
         expect(i0.numChannels, equals(img.numChannels));
