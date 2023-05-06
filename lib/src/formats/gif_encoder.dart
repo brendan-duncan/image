@@ -102,9 +102,8 @@ class GifEncoder extends Encoder {
     if (_encodedFrames == 0) {
       _writeHeader(_width, _height);
       _writeApplicationExt();
-    } else {
-      _writeGraphicsCtrlExt(_lastImage!);
     }
+    _writeGraphicsCtrlExt(_lastImage!);
 
     _addImage(_lastImage!, _width, _height);
 
