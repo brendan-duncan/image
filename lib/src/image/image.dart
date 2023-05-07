@@ -632,7 +632,7 @@ class Image extends Iterable<Pixel> {
     return getPixel(x, y, pixel);
   }
 
-  int getPixelIndex(int x, int y) => data?.getPixel(x, y)?.index.toInt() ?? 0;
+  int getPixelIndex(int x, int y) => data?.getPixel(x, y).index.toInt() ?? 0;
 
   /// Get the pixel using the given [interpolation] type for non-integer pixel
   /// coordinates.
