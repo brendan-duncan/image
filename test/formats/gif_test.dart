@@ -12,6 +12,25 @@ void main() {
         await encodeGifFile('$testOutputPath/gif/hand_anim.gif', g1!);
       });
 
+      test('hand_anim resize', () async {
+        final g1 = await decodeGifFile('test/_data/gif/hand_anim.gif');
+        final g2 = copyResize(
+          g1!,
+          width: g1.width ~/ 2,
+          height: g1.height ~/ 2
+        );
+        for (var f in g2.frames) {
+          final p1 = g1.frames[f.frameIndex].getPixel(0, 0);
+          final p2 = f.getPixel(0, 0);
+          expect(p1, equals(p2));
+          final g3 = encodeGif(f, singleFrame: true);
+          File('$testOutputPath/gif/hand_${f.frameIndex}.gif')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(g3);
+        }
+        await encodeGifFile('$testOutputPath/gif/hand_anim_resize.gif', g2);
+      });
+
       test('transparencyAnim', () async {
         final g1 = await decodePngFile('test/_data/png/g1.png');
         final g2 = await decodePngFile('test/_data/png/g2.png');

@@ -21,6 +21,29 @@ void main() {
       }
     });
 
+    test('fromResized', () {
+      final i1 = Image(width: 20, height: 20, withPalette: true,
+          numChannels: 4);
+
+      i1..addFrame(Image(width: 20, height: 20, palette: i1.palette))
+      ..addFrame(Image(width: 20, height: 20, palette: i1.palette));
+
+      for (var i = 0; i < 256; ++i) {
+        i1.palette?.setRgba(i, i, i, i, i);
+      }
+
+      final i2 = Image.fromResized(i1, width: 10, height: 10);
+
+      for (final img in i2.frames) {
+        for (var i = 0; i < 256; ++i) {
+          expect(img.palette?.get(i, 0), equals(i));
+          expect(img.palette?.get(i, 1), equals(i));
+          expect(img.palette?.get(i, 2), equals(i));
+          expect(img.palette?.get(i, 3), equals(i));
+        }
+      }
+    });
+
     test('fromBytes', () {
       const w = 256;
       const h = 256;

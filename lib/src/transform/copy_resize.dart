@@ -50,9 +50,9 @@ Image copyResize(Image src,
   final numFrames = src.numFrames;
   for (var i = 0; i < numFrames; ++i) {
     final frame = src.frames[i];
-    final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame,
-            width: width, height: height, noAnimation: true);
+    final dst = Image.fromResized(frame,
+        width: width, height: height, noAnimation: true);
+    firstFrame?.addFrame(dst);
     firstFrame ??= dst;
 
     final dy = frame.height / height;
@@ -91,10 +91,19 @@ Image copyResize(Image src,
         }
       }
     } else if (interpolation == Interpolation.nearest) {
-      for (var y = 0; y < height; ++y) {
-        final y2 = (y * dy).toInt();
-        for (var x = 0; x < width; ++x) {
-          dst.setPixel(x, y, frame.getPixel(scaleX[x], y2));
+      if (frame.hasPalette) {
+        for (var y = 0; y < height; ++y) {
+          final y2 = (y * dy).toInt();
+          for (var x = 0; x < width; ++x) {
+            dst.setPixelIndex(x, y, frame.getPixelIndex(scaleX[x], y2));
+          }
+        }
+      } else {
+        for (var y = 0; y < height; ++y) {
+          final y2 = (y * dy).toInt();
+          for (var x = 0; x < width; ++x) {
+            dst.setPixel(x, y, frame.getPixel(scaleX[x], y2));
+          }
         }
       }
     } else {
