@@ -1,3 +1,8 @@
+## 4.0.17 - May 06, 2023
+
+- Fix resizing multi-frame palette images.
+- Fix transparency issue with encodeGif.  
+
 ## 4.0.16 - April 27, 2023
 
 - Fix GIF decoder not decoding some animation files transparency and frame duration.
