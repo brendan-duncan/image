@@ -70,11 +70,13 @@ class JpegEncoder extends Encoder {
 
     if (chroma == JpegChroma.yuv444) {
       // 4:4:4 chroma: process 8x8 blocks.
-      final ydu = Float32List(64), udu = Float32List(64), vdu = Float32List(64);
+      final ydu = Float32List(64);
+      final udu = Float32List(64);
+      final vdu = Float32List(64);
 
       for (int y = 0; y < height; y += 8) {
         for (int x = 0; x < width; x += 8) {
-          _yuv444(image, x, y, width, height, ydu, udu, vdu);
+          _calculateYUV(image, x, y, width, height, ydu, udu, vdu);
           dcy = _processDU(fp, ydu, _fdtblY, dcy, _ydcHuffman, _yacHuffman);
           dcu = _processDU(fp, udu, _fdtblUv, dcu, _uvdcHuffman, _uvacHuffman);
           dcv = _processDU(fp, vdu, _fdtblUv, dcv, _uvdcHuffman, _uvacHuffman);
@@ -85,14 +87,15 @@ class JpegEncoder extends Encoder {
       final ydu = List<Float32List>.generate(4, (i) => Float32List(64));
       final udu = List<Float32List>.generate(4, (i) => Float32List(64));
       final vdu = List<Float32List>.generate(4, (i) => Float32List(64));
-      final sudu = Float32List(64), svdu = Float32List(64);
+      final sudu = Float32List(64);
+      final svdu = Float32List(64);
 
       for (int y = 0; y < height; y += 16) {
         for (int x = 0; x < width; x += 16) {
-          _yuv444(image, x, y, width, height, ydu[0], udu[0], vdu[0]);
-          _yuv444(image, x + 8, y, width, height, ydu[1], udu[1], vdu[1]);
-          _yuv444(image, x, y + 8, width, height, ydu[2], udu[2], vdu[2]);
-          _yuv444(image, x + 8, y + 8, width, height, ydu[3], udu[3], vdu[3]);
+          _calculateYUV(image, x, y, width, height, ydu[0], udu[0], vdu[0]);
+          _calculateYUV(image, x + 8, y, width, height, ydu[1], udu[1], vdu[1]);
+          _calculateYUV(image, x, y + 8, width, height, ydu[2], udu[2], vdu[2]);
+          _calculateYUV(image, x + 8, y + 8, width, height, ydu[3], udu[3], vdu[3]);
           _downsampleDU(sudu, udu[0], udu[1], udu[2], udu[3]);
           _downsampleDU(svdu, vdu[0], vdu[1], vdu[2], vdu[3]);
           dcy = _processDU(fp, ydu[0], _fdtblY, dcy, _ydcHuffman, _yacHuffman);
@@ -118,7 +121,7 @@ class JpegEncoder extends Encoder {
     return fp.getBytes();
   }
 
-  void _yuv444(
+  void _calculateYUV(
     Image image,
     int x,
     int y,
