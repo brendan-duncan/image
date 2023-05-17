@@ -8,6 +8,12 @@ import '../util/output_buffer.dart';
 import 'encoder.dart';
 import 'jpeg/jpeg_marker.dart';
 
+/// JPEG Chroma (sub)sampling format.
+enum JpegChroma {
+  yuv444,
+  yuv420,
+}
+
 /// Encode an image to the JPEG format.
 ///
 /// Derived from:
@@ -40,7 +46,11 @@ class JpegEncoder extends Encoder {
   }
 
   @override
-  Uint8List encode(Image image, {bool singleFrame = false}) {
+  Uint8List encode(
+    Image image, {
+    JpegChroma chroma = JpegChroma.yuv444,
+    bool singleFrame = false,
+  }) {
     final fp = OutputBuffer(bigEndian: true);
 
     // Add JPEG headers
@@ -48,77 +58,51 @@ class JpegEncoder extends Encoder {
     _writeAPP0(fp);
     _writeAPP1(fp, image.exif);
     _writeDQT(fp);
-    _writeSOF0(fp, image.width, image.height);
+    _writeSOF0(fp, image.width, image.height, chroma);
     _writeDHT(fp);
     _writeSOS(fp);
 
-    // Encode 8x8 macroblocks
-    int? dcy = 0;
-    int? dcu = 0;
-    int? dcv = 0;
-
     _resetBits();
 
+    int dcy = 0, dcu = 0, dcv = 0;
     final width = image.width;
     final height = image.height;
 
-    var y = 0;
-    while (y < height) {
-      var x = 0;
-      while (x < width) {
-        for (var pos = 0; pos < 64; pos++) {
-          final row = pos >> 3; // / 8
-          final col = pos & 7; // % 8
+    if (chroma == JpegChroma.yuv444) {
+      // 4:4:4 chroma: process 8x8 blocks.
+      final ydu = Float32List(64), udu = Float32List(64), vdu = Float32List(64);
 
-          var yy = y + row;
-          var xx = x + col;
-
-          if (yy >= height) {
-            // padding bottom
-            yy -= y + 1 + row - height;
-          }
-
-          if (xx >= width) {
-            // padding right
-            xx -= (x + col) - width + 1;
-          }
-
-          Color p = image.getPixel(xx, yy);
-          if (p.format != Format.uint8) {
-            p = p.convert(format: Format.uint8);
-          }
-          final r = p.r.toInt();
-          final g = p.g.toInt();
-          final b = p.b.toInt();
-
-          // calculate YUV values
-          _ydu[pos] = ((_rgbYuvTable[r] +
-                      _rgbYuvTable[(g + 256)] +
-                      _rgbYuvTable[(b + 512)]) >>
-                  16) -
-              128.0;
-
-          _udu[pos] = ((_rgbYuvTable[(r + 768)] +
-                      _rgbYuvTable[(g + 1024)] +
-                      _rgbYuvTable[(b + 1280)]) >>
-                  16) -
-              128.0;
-
-          _vdu[pos] = ((_rgbYuvTable[(r + 1280)] +
-                      _rgbYuvTable[(g + 1536)] +
-                      _rgbYuvTable[(b + 1792)]) >>
-                  16) -
-              128.0;
+      for (int y = 0; y < height; y += 8) {
+        for (int x = 0; x < width; x += 8) {
+          _yuv444(image, x, y, width, height, ydu, udu, vdu);
+          dcy = _processDU(fp, ydu, _fdtblY, dcy, _ydcHuffman, _yacHuffman);
+          dcu = _processDU(fp, udu, _fdtblUv, dcu, _uvdcHuffman, _uvacHuffman);
+          dcv = _processDU(fp, vdu, _fdtblUv, dcv, _uvdcHuffman, _uvacHuffman);
         }
-
-        dcy = _processDU(fp, _ydu, _fdtblY, dcy!, _ydcHuffman, _yacHuffman);
-        dcu = _processDU(fp, _udu, _fdtblUv, dcu!, _uvdcHuffman, _uvacHuffman);
-        dcv = _processDU(fp, _vdu, _fdtblUv, dcv!, _uvdcHuffman, _uvacHuffman);
-
-        x += 8;
       }
+    } else {
+      // 4:2:0 chroma: process 8x8 blocks and prepare subsampled U and V.
+      final ydu = List<Float32List>.generate(4, (i) => Float32List(64));
+      final udu = List<Float32List>.generate(4, (i) => Float32List(64));
+      final vdu = List<Float32List>.generate(4, (i) => Float32List(64));
+      final sudu = Float32List(64), svdu = Float32List(64);
 
-      y += 8;
+      for (int y = 0; y < height; y += 16) {
+        for (int x = 0; x < width; x += 16) {
+          _yuv444(image, x, y, width, height, ydu[0], udu[0], vdu[0]);
+          _yuv444(image, x + 8, y, width, height, ydu[1], udu[1], vdu[1]);
+          _yuv444(image, x, y + 8, width, height, ydu[2], udu[2], vdu[2]);
+          _yuv444(image, x + 8, y + 8, width, height, ydu[3], udu[3], vdu[3]);
+          _downsampleDU(sudu, udu[0], udu[1], udu[2], udu[3]);
+          _downsampleDU(svdu, vdu[0], vdu[1], vdu[2], vdu[3]);
+          dcy = _processDU(fp, ydu[0], _fdtblY, dcy, _ydcHuffman, _yacHuffman);
+          dcy = _processDU(fp, ydu[1], _fdtblY, dcy, _ydcHuffman, _yacHuffman);
+          dcy = _processDU(fp, ydu[2], _fdtblY, dcy, _ydcHuffman, _yacHuffman);
+          dcy = _processDU(fp, ydu[3], _fdtblY, dcy, _ydcHuffman, _yacHuffman);
+          dcu = _processDU(fp, sudu, _fdtblUv, dcu, _uvdcHuffman, _uvacHuffman);
+          dcv = _processDU(fp, svdu, _fdtblUv, dcv, _uvdcHuffman, _uvacHuffman);
+        }
+      }
     }
 
     ////////////////////////////////////////////////////////////////
@@ -132,6 +116,71 @@ class JpegEncoder extends Encoder {
     _writeMarker(fp, JpegMarker.eoi);
 
     return fp.getBytes();
+  }
+
+  void _yuv444(
+    Image image,
+    int x,
+    int y,
+    int width,
+    int height,
+    Float32List ydu,
+    Float32List udu,
+    Float32List vdu,
+  ) {
+    for (var pos = 0; pos < 64; pos++) {
+      final row = pos >> 3; // / 8
+      final col = pos & 7; // % 8
+
+      var yy = y + row;
+      var xx = x + col;
+
+      if (yy >= height) {
+        // padding bottom
+        yy -= y + 1 + row - height;
+      }
+
+      if (xx >= width) {
+        // padding right
+        xx -= (x + col) - width + 1;
+      }
+
+      Color p = image.getPixel(xx, yy);
+      if (p.format != Format.uint8) {
+        p = p.convert(format: Format.uint8);
+      }
+      final r = p.r.toInt();
+      final g = p.g.toInt();
+      final b = p.b.toInt();
+
+      // calculate YUV values
+      ydu[pos] = ((_rgbYuvTable[r]
+                  + _rgbYuvTable[(g + 256)]
+                  + _rgbYuvTable[(b + 512)]) >> 16) - 128.0;
+      udu[pos] = ((_rgbYuvTable[(r + 768)]
+                  + _rgbYuvTable[(g + 1024)]
+                  + _rgbYuvTable[(b + 1280)]) >> 16) - 128.0;
+      vdu[pos] = ((_rgbYuvTable[(r + 1280)]
+                  + _rgbYuvTable[(g + 1536)]
+                  + _rgbYuvTable[(b + 1792)]) >> 16) - 128.0;
+    }
+  }
+
+  // Downsamples from four input lists, storing average values into duOut.
+  void _downsampleDU(
+    Float32List duOut,
+    Float32List duIn1,
+    Float32List duIn2,
+    Float32List duIn3,
+    Float32List duIn4,
+  ) {
+    for (var posOut = 0; posOut < 64; posOut++) {
+      final Float32List du = posOut < 32
+          ? posOut % 8 < 4 ? duIn1 : duIn2
+          : posOut % 8 < 4 ? duIn3 : duIn4;
+      final int pos = (((posOut % 32) ~/ 8) << 4) + ((posOut % 4) << 1);
+      duOut[posOut] = (du[pos] + du[pos + 1] + du[pos + 8] + du[pos + 9]) / 4;
+    }
   }
 
   void _writeMarker(OutputBuffer fp, int marker) {
@@ -542,7 +591,7 @@ class JpegEncoder extends Encoder {
       ..writeBytes(exifBytes);
   }
 
-  void _writeSOF0(OutputBuffer out, int width, int height) {
+  void _writeSOF0( OutputBuffer out, int width, int height, JpegChroma chroma) {
     _writeMarker(out, JpegMarker.sof0);
     out
       ..writeUint16(17) // length, truecolor YUV JPG
@@ -551,7 +600,7 @@ class JpegEncoder extends Encoder {
       ..writeUint16(width)
       ..writeByte(3) // nrofcomponents
       ..writeByte(1) // IdY
-      ..writeByte(0x11) // HVY
+      ..writeByte(chroma == JpegChroma.yuv444 ? 0x11 : 0x22) // HVY
       ..writeByte(0) // QTY
       ..writeByte(2) // IdU
       ..writeByte(0x11) // HVU
@@ -628,8 +677,14 @@ class JpegEncoder extends Encoder {
       ..writeByte(0); // Bf
   }
 
-  int? _processDU(OutputBuffer out, List<double> cdu, List<double> fdtbl,
-      int dc, List<List<int>?>? htdc, List<List<int>?> htac) {
+  int _processDU(
+    OutputBuffer out,
+    List<double> cdu,
+    List<double> fdtbl,
+    int dc,
+    List<List<int>?>? htdc,
+    List<List<int>?> htac,
+  ) {
     final eob = htac[0x00];
     final m16Zeroes = htac[0xf0];
     int pos;
@@ -729,9 +784,6 @@ class JpegEncoder extends Encoder {
   final _outputfDCTQuant = List<int?>.filled(64, null);
   final _du = List<int?>.filled(64, null);
 
-  final Float32List _ydu = Float32List(64);
-  final Float32List _udu = Float32List(64);
-  final Float32List _vdu = Float32List(64);
   final Int32List _rgbYuvTable = Int32List(2048);
   int? _currentQuality;
 
