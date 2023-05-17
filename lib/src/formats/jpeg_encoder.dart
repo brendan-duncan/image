@@ -594,7 +594,7 @@ class JpegEncoder extends Encoder {
       ..writeBytes(exifBytes);
   }
 
-  void _writeSOF0( OutputBuffer out, int width, int height, JpegChroma chroma) {
+  void _writeSOF0(OutputBuffer out, int width, int height, JpegChroma chroma) {
     _writeMarker(out, JpegMarker.sof0);
     out
       ..writeUint16(17) // length, truecolor YUV JPG
