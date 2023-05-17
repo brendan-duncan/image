@@ -248,16 +248,23 @@ Future<Image?> decodeJpgFile(String path) async {
 }
 
 /// Encode an [image] to the JPEG format.
-Uint8List encodeJpg(Image image, {int quality = 100}) =>
-    JpegEncoder(quality: quality).encode(image);
+Uint8List encodeJpg(
+  Image image, {
+  int quality = 100,
+  JpegChroma chroma = JpegChroma.yuv444,
+}) => JpegEncoder(quality: quality).encode(image, chroma: chroma);
 
 /// Encode an [image] to a JPG file at the given [path].
-Future<bool> encodeJpgFile(String path, Image image,
-    {int quality = 100}) async {
+Future<bool> encodeJpgFile(
+  String path,
+  Image image, {
+  int quality = 100,
+  JpegChroma chroma = JpegChroma.yuv444,
+}) async {
   if (!supportsFileAccess()) {
     return false;
   }
-  final bytes = JpegEncoder(quality: quality).encode(image);
+  final bytes = JpegEncoder(quality: quality).encode(image, chroma: chroma);
   return writeFile(path, bytes);
 }
 
