@@ -59,9 +59,9 @@ Image? decodeJpg(Uint8List bytes);
 // Decode an image file directly from the file on platforms that support dart:io.
 Future<Image?> decodeJpgFile(String path) async;
 
-Uint8List encodeJpg(Image image, { int quality = 100 });
+Uint8List encodeJpg(Image image, { int quality = 100, chroma: JpegChroma.yuv444 });
 
-Future<bool> encodeJpgFile(String path, Image image, { int quality = 100 }) async;
+Future<bool> encodeJpgFile(String path, Image image, { int quality = 100, chroma: JpegChroma.yuv444 }) async;
 ```
 ### PNG: decoding, encoding
 ```dart

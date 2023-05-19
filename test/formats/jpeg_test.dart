@@ -45,12 +45,20 @@ void main() async {
           ..writeAsBytesSync(encodePng(image));
       });
 
-      test('encode', () {
+      test('encode (default 4:4:4 chroma)', () {
         final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
         final image = JpegDecoder().decode(fb)!;
         File('$testOutputPath/jpg/encode.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodeJpg(image));
+      });
+
+      test('encode (4:2:0 chroma)', () {
+        final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
+        final image = JpegDecoder().decode(fb)!;
+        File('$testOutputPath/jpg/encode.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(encodeJpg(image, chroma: JpegChroma.yuv420));
       });
 
       test('progressive', () {
