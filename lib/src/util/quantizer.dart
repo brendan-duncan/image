@@ -26,9 +26,10 @@ abstract class Quantizer {
         palette: palette);
 
     final ti = target.iterator..moveNext();
-    target..frameIndex = image.frameIndex
-    ..frameType = image.frameType
-    ..frameDuration = image.frameDuration;
+    target
+      ..frameIndex = image.frameIndex
+      ..frameType = image.frameType
+      ..frameDuration = image.frameDuration;
 
     for (final p in image) {
       final t = ti.current;

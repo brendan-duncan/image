@@ -252,7 +252,8 @@ Uint8List encodeJpg(
   Image image, {
   int quality = 100,
   JpegChroma chroma = JpegChroma.yuv444,
-}) => JpegEncoder(quality: quality).encode(image, chroma: chroma);
+}) =>
+    JpegEncoder(quality: quality).encode(image, chroma: chroma);
 
 /// Encode an [image] to a JPG file at the given [path].
 Future<bool> encodeJpgFile(

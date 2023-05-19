@@ -95,7 +95,8 @@ class JpegEncoder extends Encoder {
           _calculateYUV(image, x, y, width, height, ydu[0], udu[0], vdu[0]);
           _calculateYUV(image, x + 8, y, width, height, ydu[1], udu[1], vdu[1]);
           _calculateYUV(image, x, y + 8, width, height, ydu[2], udu[2], vdu[2]);
-          _calculateYUV(image, x + 8, y + 8, width, height, ydu[3], udu[3], vdu[3]);
+          _calculateYUV(
+              image, x + 8, y + 8, width, height, ydu[3], udu[3], vdu[3]);
           _downsampleDU(sudu, udu[0], udu[1], udu[2], udu[3]);
           _downsampleDU(svdu, vdu[0], vdu[1], vdu[2], vdu[3]);
           dcy = _processDU(fp, ydu[0], _fdtblY, dcy, _ydcHuffman, _yacHuffman);
@@ -157,15 +158,21 @@ class JpegEncoder extends Encoder {
       final b = p.b.toInt();
 
       // calculate YUV values
-      ydu[pos] = ((_rgbYuvTable[r]
-                  + _rgbYuvTable[(g + 256)]
-                  + _rgbYuvTable[(b + 512)]) >> 16) - 128.0;
-      udu[pos] = ((_rgbYuvTable[(r + 768)]
-                  + _rgbYuvTable[(g + 1024)]
-                  + _rgbYuvTable[(b + 1280)]) >> 16) - 128.0;
-      vdu[pos] = ((_rgbYuvTable[(r + 1280)]
-                  + _rgbYuvTable[(g + 1536)]
-                  + _rgbYuvTable[(b + 1792)]) >> 16) - 128.0;
+      ydu[pos] = ((_rgbYuvTable[r] +
+                  _rgbYuvTable[(g + 256)] +
+                  _rgbYuvTable[(b + 512)]) >>
+              16) -
+          128.0;
+      udu[pos] = ((_rgbYuvTable[(r + 768)] +
+                  _rgbYuvTable[(g + 1024)] +
+                  _rgbYuvTable[(b + 1280)]) >>
+              16) -
+          128.0;
+      vdu[pos] = ((_rgbYuvTable[(r + 1280)] +
+                  _rgbYuvTable[(g + 1536)] +
+                  _rgbYuvTable[(b + 1792)]) >>
+              16) -
+          128.0;
     }
   }
 
@@ -179,8 +186,12 @@ class JpegEncoder extends Encoder {
   ) {
     for (var posOut = 0; posOut < 64; posOut++) {
       final Float32List du = posOut < 32
-          ? posOut % 8 < 4 ? duIn1 : duIn2
-          : posOut % 8 < 4 ? duIn3 : duIn4;
+          ? posOut % 8 < 4
+              ? duIn1
+              : duIn2
+          : posOut % 8 < 4
+              ? duIn3
+              : duIn4;
       final int pos = (((posOut % 32) ~/ 8) << 4) + ((posOut % 4) << 1);
       duOut[posOut] = (du[pos] + du[pos + 1] + du[pos + 8] + du[pos + 9]) / 4;
     }
