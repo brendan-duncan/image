@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../color/format.dart';
 import '../image/image.dart';
 import '../image/palette_uint8.dart';
+import '../image/pixel.dart';
 import '../util/output_buffer.dart';
 import 'bmp/bmp_info.dart';
 import 'encoder.dart';
@@ -261,28 +262,32 @@ class BmpEncoder extends Encoder {
     final h = image.height;
     final w = image.width;
     if (bpp == 16) {
+      Pixel? p;
       for (var y = h - 1; y >= 0; --y) {
+        p = image.getPixel(0, y, p);
         for (var x = 0; x < w; ++x) {
-          final p = image.getPixel(x, y);
           out
             ..writeByte((p.g.toInt() << 4) | p.b.toInt())
             ..writeByte((p.a.toInt() << 4) | p.r.toInt());
+          p.moveNext();
         }
         if (rowPadding != null) {
           out.writeBytes(rowPadding);
         }
       }
     } else {
+      Pixel? p;
       for (var y = h - 1; y >= 0; --y) {
+        p = image.getPixel(0, y, p);
         for (var x = 0; x < w; ++x) {
-          final p = image.getPixel(x, y);
           out
-            ..writeByte(p.b.toInt())
-            ..writeByte(p.g.toInt())
-            ..writeByte(p.r.toInt());
+            ..writeByte(p.b as int)
+            ..writeByte(p.g as int)
+            ..writeByte(p.r as int);
           if (hasAlpha) {
-            out.writeByte(p.a.toInt());
+            out.writeByte(p.a as int);
           }
+          p.moveNext();
         }
         if (rowPadding != null) {
           out.writeBytes(rowPadding);
