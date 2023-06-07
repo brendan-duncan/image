@@ -637,7 +637,7 @@ class IfdValueDouble extends IfdValue {
   IfdValueDouble.data(InputBuffer data, int count)
       : value = Float64List(count) {
     for (int i = 0; i < count; ++i) {
-      value[i] = data.readFloat32();
+      value[i] = data.readFloat64();
     }
   }
 
