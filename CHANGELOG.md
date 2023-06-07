@@ -1,3 +1,7 @@
+## 4.0.18 -
+
+- Fix reading 64-bit double EXIF values.
+
 ## 4.0.17 - May 06, 2023
 
 - Fix resizing multi-frame palette images.
