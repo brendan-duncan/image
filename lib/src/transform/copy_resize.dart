@@ -29,11 +29,10 @@ Image copyResize(Image src,
 
   // this block sets [width] and [height] if null or negative.
   if (height == null || height <= 0) {
-    height = (width! * (src.height / src.width)).toInt();
+    height = (width! * (src.height / src.width)).round();
   }
-
   if (width == null || width <= 0) {
-    width = (height * (src.width / src.height)).toInt();
+    width = (height * (src.width / src.height)).round();
   }
 
   if (width == src.width && height == src.height) {
