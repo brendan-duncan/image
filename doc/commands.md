@@ -431,7 +431,7 @@ void copyCropCircle({ int? radius, int? centerX, int? centerY });
 void copyCrop({ required int x, required int y, required int width,
   required int height, num radius = 0 });
 
-void copyExpandCanvas({ required int newWidth, required int newHeight, 
+void copyExpandCanvas({ int? newWidth, int? newHeight, int? padding,
   ExpandCanvasPosition position = ExpandCanvasPosition.center,
   Color? backgroundColor, 
   Image? toImage });

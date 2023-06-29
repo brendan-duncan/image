@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:image/src/command/transform/copy_expand_canvas.dart';
+import 'package:image/src/command/transform/copy_expand_canvas_cmd.dart';
 
 import '../color/channel.dart';
 import '../color/color.dart';
@@ -1074,16 +1074,25 @@ class Command {
   }
 
   void copyExpandCanvas({
-    required int newWidth,
-    required int newHeight,
+    int? newWidth,
+    int? newHeight,
+    int? padding,
     ExpandCanvasPosition position = ExpandCanvasPosition.center,
     Color? backgroundColor,
     Image? toImage,
   }) {
+    if ((newWidth == null || newHeight == null) && padding == null) {
+      throw ArgumentError('Either new dimensions or padding must be provided');
+    }
+    if (newWidth != null && newHeight != null && padding != null) {
+      throw ArgumentError('Cannot provide both new dimensions and padding');
+    }
+
     subCommand = CopyExpandCanvasCmd(
       subCommand,
       newWidth: newWidth,
       newHeight: newHeight,
+      padding: padding,
       position: position,
       backgroundColor: backgroundColor,
       toImage: toImage,

@@ -18,17 +18,31 @@ enum ExpandCanvasPosition {
 /// the canvas is filled with the specified color or transparent if
 /// no color is provided.
 Image copyExpandCanvas(Image src,
-    {required int newWidth,
-    required int newHeight,
+    {int? newWidth,
+    int? newHeight,
+    int? padding,
     ExpandCanvasPosition position = ExpandCanvasPosition.center,
     Color? backgroundColor,
     Image? toImage}) {
+  // Ensure either newWidth and newHeight or padding are provided
+  if ((newWidth == null || newHeight == null) && padding == null) {
+    throw ArgumentError('Either new dimensions or padding must be provided');
+  } else if ((newWidth != null && newHeight != null) && padding != null) {
+    throw ArgumentError('Cannot provide both new dimensions and padding');
+  }
+
+  // If padding is provided, calculate the new dimensions
+  if (padding != null) {
+    newWidth = src.width + padding * 2;
+    newHeight = src.height + padding * 2;
+  }
+
   // Convert the image if it has a palette
   final Image srcConverted =
       src.hasPalette ? src.convert(numChannels: src.numChannels) : src;
 
   // Check if new dimensions are larger or equal to the original image
-  if (newWidth < srcConverted.width || newHeight < srcConverted.height) {
+  if (newWidth! < srcConverted.width || newHeight! < srcConverted.height) {
     throw ArgumentError(
         'New dimensions must be larger or equal to the original image');
   }

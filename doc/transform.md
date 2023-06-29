@@ -48,14 +48,15 @@ Returns a new Image.
 
 ```dart
 Image copyExpandCanvas(Image src,
-  {required int newWidth,
-  required int newHeight,
+  {int? newWidth,
+  int? newHeight,
+  int? padding,
   ExpandCanvasPosition position = ExpandCanvasPosition.center,
   Color? backgroundColor,
   Image? toImage})
 ```
 
-Returns a new image, where the original image has been placed on a new canvas of specified size at a specified location. The rest of the canvas is filled with the specified color or transparent if no color is provided. Throws an ArgumentError if the new dimensions are smaller than the original image or if the provided image does not match the new dimensions.
+Returns a new image, where the original image has been placed on a new canvas of specified size at a specified location. The rest of the canvas is filled with the specified color or transparent if no color is provided. Throws an ArgumentError if both dimensions and padding are provided, or if the new dimensions or padding would result in a smaller canvas than the original image, or if the provided image does not match the new dimensions.
 
 You can position the original image on the new canvas using the ExpandCanvasPosition enum, which includes the following options: topLeft, topCenter, topRight, centerLeft, center, centerRight, bottomLeft, bottomCenter, and bottomRight. By default, the image is positioned in the center.
 

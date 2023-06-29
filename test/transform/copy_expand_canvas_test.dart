@@ -59,8 +59,37 @@ void main() {
       File('$testOutputPath/transform/copyExpandCanvas_toImage.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(expandedCanvas));
+    });
 
-      print(testOutputPath);
+    // Test with only padding parameter
+    test('copyExpandCanvas - with padding', () {
+      final img =
+          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+
+      final expandedCanvas = copyExpandCanvas(
+        img,
+        padding: 50,
+      );
+
+      File('$testOutputPath/transform/copyExpandCanvas_padding.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(expandedCanvas));
+    });
+
+    // Test with both new dimensions and padding parameters
+    test('copyExpandCanvas - with new dimensions and padding', () {
+      final img =
+          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+
+      expect(
+        () => copyExpandCanvas(
+          img,
+          newWidth: img.width * 2,
+          newHeight: img.height * 2,
+          padding: 50,
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
     });
   });
 }
