@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:image/src/command/transform/copy_expand_canvas.dart';
+
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../color/format.dart';
@@ -17,6 +19,7 @@ import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../image/palette.dart';
+import '../transform/copy_expand_canvas.dart';
 import '../transform/flip.dart';
 import '../transform/trim.dart';
 import '../util/_internal.dart';
@@ -1068,6 +1071,23 @@ class Command {
         height: height,
         radius: radius,
         antialias: antialias);
+  }
+
+  void copyExpandCanvas({
+    required int newWidth,
+    required int newHeight,
+    ExpandCanvasPosition position = ExpandCanvasPosition.center,
+    Color? backgroundColor,
+    Image? toImage,
+  }) {
+    subCommand = CopyExpandCanvasCmd(
+      subCommand,
+      newWidth: newWidth,
+      newHeight: newHeight,
+      position: position,
+      backgroundColor: backgroundColor,
+      toImage: toImage,
+    );
   }
 
   void copyFlip({required FlipDirection direction}) {
