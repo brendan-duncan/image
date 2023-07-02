@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:image/src/command/transform/copy_expand_canvas_cmd.dart';
+
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../color/format.dart';
@@ -17,6 +19,7 @@ import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../image/palette.dart';
+import '../transform/copy_expand_canvas.dart';
 import '../transform/flip.dart';
 import '../transform/trim.dart';
 import '../util/_internal.dart';
@@ -1068,6 +1071,32 @@ class Command {
         height: height,
         radius: radius,
         antialias: antialias);
+  }
+
+  void copyExpandCanvas({
+    int? newWidth,
+    int? newHeight,
+    int? padding,
+    ExpandCanvasPosition position = ExpandCanvasPosition.center,
+    Color? backgroundColor,
+    Image? toImage,
+  }) {
+    if ((newWidth == null || newHeight == null) && padding == null) {
+      throw ArgumentError('Either new dimensions or padding must be provided');
+    }
+    if (newWidth != null && newHeight != null && padding != null) {
+      throw ArgumentError('Cannot provide both new dimensions and padding');
+    }
+
+    subCommand = CopyExpandCanvasCmd(
+      subCommand,
+      newWidth: newWidth,
+      newHeight: newHeight,
+      padding: padding,
+      position: position,
+      backgroundColor: backgroundColor,
+      toImage: toImage,
+    );
   }
 
   void copyFlip({required FlipDirection direction}) {

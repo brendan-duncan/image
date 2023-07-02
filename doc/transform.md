@@ -44,6 +44,27 @@ Image copyFlip(Image src, { required FlipDirection direction })
 
 Returns a new Image.
 
+### [copyExpandCanvas](https://pub.dev/documentation/image/latest/image/copyExpandCanvas.html)
+
+```dart
+Image copyExpandCanvas(Image src,
+  {int? newWidth,
+  int? newHeight,
+  int? padding,
+  ExpandCanvasPosition position = ExpandCanvasPosition.center,
+  Color? backgroundColor,
+  Image? toImage})
+```
+
+Returns a new image, where the original image has been placed on a new canvas of specified size at a specified location. The rest of the canvas is filled with the specified color or transparent if no color is provided. Throws an ArgumentError if both dimensions and padding are provided, or if the new dimensions or padding would result in a smaller canvas than the original image, or if the provided image does not match the new dimensions.
+
+You can position the original image on the new canvas using the ExpandCanvasPosition enum, which includes the following options: topLeft, topCenter, topRight, centerLeft, center, centerRight, bottomLeft, bottomCenter, and bottomRight. By default, the image is positioned in the center.
+
+You can also pass an existing image using the toImage parameter. This image will be modified and returned by the function. If you don't provide an image, a new one will be created with the specified dimensions.
+
+![copyExpandCanvas](images/transform/copyExpandCanvas.png)
+
+
 ![copyFlip](images/transform/copyFlip_b.png)
 
 ### [copyRectify](https://pub.dev/documentation/image/latest/image/copyRectify.html)
