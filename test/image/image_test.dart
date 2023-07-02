@@ -22,11 +22,12 @@ void main() {
     });
 
     test('fromResized', () {
-      final i1 = Image(width: 20, height: 20, withPalette: true,
-          numChannels: 4);
+      final i1 =
+          Image(width: 20, height: 20, withPalette: true, numChannels: 4);
 
-      i1..addFrame(Image(width: 20, height: 20, palette: i1.palette))
-      ..addFrame(Image(width: 20, height: 20, palette: i1.palette));
+      i1
+        ..addFrame(Image(width: 20, height: 20, palette: i1.palette))
+        ..addFrame(Image(width: 20, height: 20, palette: i1.palette));
 
       for (var i = 0; i < 256; ++i) {
         i1.palette?.setRgba(i, i, i, i, i);

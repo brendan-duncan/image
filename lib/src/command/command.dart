@@ -1,8 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:image/src/command/transform/copy_expand_canvas_cmd.dart';
-
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../color/format.dart';
@@ -102,6 +100,7 @@ import 'image/image_cmd.dart';
 import 'transform/bake_orientation_cmd.dart';
 import 'transform/copy_crop_circle_cmd.dart';
 import 'transform/copy_crop_cmd.dart';
+import 'transform/copy_expand_canvas_cmd.dart';
 import 'transform/copy_flip_cmd.dart';
 import 'transform/copy_rectify_cmd.dart';
 import 'transform/copy_resize_cmd.dart';
