@@ -6,8 +6,8 @@ import '../command.dart';
 
 class DrawStringCmd extends Command {
   BitmapFont font;
-  int x;
-  int y;
+  int? x;
+  int? y;
   String string;
   bool rightJustify;
   bool wrap;
@@ -17,8 +17,8 @@ class DrawStringCmd extends Command {
 
   DrawStringCmd(Command? input, this.string,
       {required this.font,
-      required this.x,
-      required this.y,
+      this.x,
+      this.y,
       this.color,
       this.wrap = false,
       this.rightJustify = false,
