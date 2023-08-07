@@ -223,6 +223,7 @@ export 'src/transform/copy_resize_crop_square.dart';
 export 'src/transform/copy_rotate.dart';
 export 'src/transform/flip.dart';
 export 'src/transform/trim.dart';
+export 'src/transform/copy_expand_canvas.dart';
 export 'src/util/clip_line.dart';
 export 'src/util/color_util.dart';
 export 'src/util/file_access.dart';
