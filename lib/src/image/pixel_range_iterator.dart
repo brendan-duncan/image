@@ -1,6 +1,6 @@
 import 'pixel.dart';
 
-class PixelRangeIterator extends Iterator<Pixel> {
+class PixelRangeIterator implements Iterator<Pixel> {
   Pixel pixel;
   int x1;
   int y1;
