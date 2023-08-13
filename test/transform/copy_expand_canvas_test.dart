@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:image/image.dart';
-import 'package:image/src/transform/copy_expand_canvas.dart';
 import 'package:test/test.dart';
 
 import '../_test_util.dart';

@@ -1,5 +1,7 @@
-import '../../../image.dart';
+import '../../color/color.dart';
+import '../../image/image.dart';
 import '../../transform/copy_expand_canvas.dart';
+import '../command.dart';
 
 class CopyExpandCanvasCmd extends Command {
   int? newWidth;
