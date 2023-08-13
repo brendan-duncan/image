@@ -59,7 +59,6 @@ Image adjustColor(Image src,
 
   contrast = contrast?.clamp(0, 1);
   saturation = saturation?.clamp(0, 1);
-  brightness = brightness?.clamp(0, 1);
   gamma = gamma?.clamp(0, 1000);
   exposure = exposure?.clamp(0, 1000);
   amount = amount.clamp(0, 1000);
