@@ -28,17 +28,15 @@ Image drawString(Image image, String string,
   var stringWidth = 0;
   var stringHeight = 0;
 
-  if (x == null || y == null) {
-    final chars = string.codeUnits;
-    for (var c in chars) {
-      if (!font.characters.containsKey(c)) {
-        continue;
-      }
-      final ch = font.characters[c]!;
-      stringWidth += ch.xAdvance;
-      if (ch.height + ch.yOffset > stringHeight) {
-        stringHeight = ch.height + ch.yOffset;
-      }
+  final chars = string.codeUnits;
+  for (var c in chars) {
+    if (!font.characters.containsKey(c)) {
+      continue;
+    }
+    final ch = font.characters[c]!;
+    stringWidth += ch.xAdvance;
+    if (ch.height + ch.yOffset > stringHeight) {
+      stringHeight = ch.height + ch.yOffset;
     }
   }
 
