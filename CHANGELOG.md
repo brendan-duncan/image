@@ -1,3 +1,7 @@
+## 4.1.0
+
+- Update pub dependencies.
+
 ## 4.0.18 -
 
 - Fix reading 64-bit double EXIF values.
