@@ -86,10 +86,15 @@ Returns a new Image.
 ### [copyResize](https://pub.dev/documentation/image/latest/image/copyResize.html)
 
 ```dart
-Image copyResize(Image src, { int? width, int? height, Interpolation interpolation = Interpolation.nearest })
+Image copyResize(Image src, { int? width, int? height, bool? maintainAspect, Color? backgroundColor, Interpolation interpolation = Interpolation.nearest })
 ```
-
-Returns a new Image.
+Returns a resized copy of the src image.
+* If width is set but not height, height will be calculated to maintain the aspect ratio of src.
+* If height is set but not width, width will be calculated to maintain the aspect ratio of src.
+* If both width and height are set:
+  * If maintainAspect is not set or is false, src will be stretched.
+  * If maintainAspect is true, src will fill the new resolution without changing the aspect ratio, using backgroundColor
+as the padding color.
 
 ![copyResize](images/transform/copyResize.png)
 
