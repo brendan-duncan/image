@@ -1,3 +1,7 @@
+## 4.1.2
+
+- No changes, removing unnecessary files in 4.1.1.
+
 ## 4.1.1
 
 - Add maintainAspect and backgroundColor to copyResize to resize width and 
