@@ -1,3 +1,10 @@
+## 4.1.1
+
+- Add maintainAspect and backgroundColor to copyResize to resize width and 
+height of an image, without stretching the source (using background color to pad).
+- drawString will word-wrap even when x or y is set.
+- Don't clamp brightness in adjustColor.
+
 ## 4.1.0
 
 - Update pub dependencies.
