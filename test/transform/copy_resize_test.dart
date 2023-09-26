@@ -6,13 +6,49 @@ import '../_test_util.dart';
 
 void main() {
   group('Transform', () {
-    test('copyResize', () {
+    test('copyResize nearest', () {
       final img =
           decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
       final i0 = copyResize(img, width: 64);
       expect(i0.width, equals(64));
       expect(i0.height, equals(40));
       File('$testOutputPath/transform/copyResize.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
+
+    test('copyResize average', () {
+      final img =
+          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+      final i0 =
+          copyResize(img, width: 64, interpolation: Interpolation.average);
+      expect(i0.width, equals(64));
+      expect(i0.height, equals(40));
+      File('$testOutputPath/transform/copyResize_average.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
+
+    test('copyResize linear', () {
+      final img =
+          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+      final i0 =
+          copyResize(img, width: 64, interpolation: Interpolation.linear);
+      expect(i0.width, equals(64));
+      expect(i0.height, equals(40));
+      File('$testOutputPath/transform/copyResize_linear.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
+
+    test('copyResize cubic', () {
+      final img =
+          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+      final i0 =
+          copyResize(img, width: 64, interpolation: Interpolation.cubic);
+      expect(i0.width, equals(64));
+      expect(i0.height, equals(40));
+      File('$testOutputPath/transform/copyResize_cubic.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });

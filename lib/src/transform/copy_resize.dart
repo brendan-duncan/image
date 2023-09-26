@@ -102,17 +102,17 @@ Image copyResize(Image src,
 
     if (interpolation == Interpolation.average) {
       for (var y = 0; y < h; ++y) {
-        final y1 = (y * dy).toInt();
-        var y2 = ((y + 1) * dy).toInt();
-        if (y2 == y1) {
-          y2++;
+        final ay1 = (y * dy).toInt();
+        var ay2 = ((y + 1) * dy).toInt();
+        if (ay2 == ay1) {
+          ay2++;
         }
 
         for (var x = 0; x < w; ++x) {
-          final x1 = (x * dx).toInt();
-          var x2 = ((x + 1) * dx).toInt();
-          if (x2 == x1) {
-            x2++;
+          final ax1 = (x * dx).toInt();
+          var ax2 = ((x + 1) * dx).toInt();
+          if (ax2 == ax1) {
+            ax2++;
           }
 
           num r = 0;
@@ -120,8 +120,8 @@ Image copyResize(Image src,
           num b = 0;
           num a = 0;
           var np = 0;
-          for (var sy = y1; sy < y2; ++sy) {
-            for (var sx = x1; sx < x2; ++sx, ++np) {
+          for (var sy = ay1; sy < ay2; ++sy) {
+            for (var sx = ax1; sx < ax2; ++sx, ++np) {
               final s = frame.getPixel(sx, sy);
               r += s.r;
               g += s.g;
@@ -153,13 +153,13 @@ Image copyResize(Image src,
     } else {
       // Copy the pixels from this image to the new image.
       for (var y = 0; y < h; ++y) {
-        final y2 = y * dy;
+        final sy2 = y * dy;
         for (var x = 0; x < w; ++x) {
-          final x2 = x * dx;
+          final sx2 = x * dx;
           dst.setPixel(
               x,
               y,
-              frame.getPixelInterpolate(x1 + x2, y1 + y2,
+              frame.getPixelInterpolate(x1 + sx2, y1 + sy2,
                   interpolation: interpolation));
         }
       }
