@@ -1,3 +1,7 @@
+## 4.1.3 - September 25, 2023
+
+- Fix crash in copyResize for non-nearest interpolation modes.
+
 ## 4.1.2
 
 - No changes, removing unnecessary files in 4.1.1.
