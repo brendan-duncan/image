@@ -410,6 +410,20 @@ void main() {
           ..writeAsBytesSync(png);
       });
 
+      test('encodeAnimation with mulitple single frame Images', () {
+        final encoder = PngEncoder()..start(10);
+        for (var i = 0; i < 10; i++) {
+          final frame = Image(width: 480, height: 120)..loopCount = 10;
+          drawString(frame, i.toString(), font: arial48, x: 100, y: 60);
+          encoder.addFrame(frame);
+        }
+
+        final png = encoder.finish()!;
+        File('$testOutputPath/png/encodeAnimation.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(png);
+      });
+
       test('textData', () {
         final img = Image(width: 16, height: 16, textData: {"foo": "bar"});
         final png = PngEncoder().encode(img);

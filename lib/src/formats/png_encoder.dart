@@ -92,6 +92,17 @@ class PngEncoder extends Encoder {
     }
   }
 
+  /// Start encoding a PNG.
+  ///
+  /// Call this method once before calling addFrame.
+  void start(int frameCount) {
+      _frames = frameCount;
+      isAnimated = frameCount > 1;
+  }
+
+  /// Finish encoding a PNG, and return the resulting bytes.
+  ///
+  /// Call this method to finalize the encoding, after all addFrame calls.
   Uint8List? finish() {
     Uint8List? bytes;
 
@@ -116,11 +127,10 @@ class PngEncoder extends Encoder {
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
     if (!image.hasAnimation || singleFrame) {
-      isAnimated = false;
+      start(1);
       addFrame(image);
     } else {
-      isAnimated = true;
-      _frames = image.frames.length;
+      start(image.frames.length);
       repeat = image.loopCount;
 
       if (image.hasPalette) {
