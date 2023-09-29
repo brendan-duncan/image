@@ -15,7 +15,7 @@ class ImageDataUint2 extends ImageData {
   @override
   final int rowStride;
   @override
-  final Palette? palette;
+  Palette? palette;
 
   ImageDataUint2(int width, int height, int numChannels)
       : rowStride = ((width * (numChannels << 1)) / 8).ceil(),

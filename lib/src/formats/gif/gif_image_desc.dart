@@ -10,7 +10,7 @@ class GifImageDesc {
   late bool interlaced;
   GifColorMap? colorMap;
   int duration = 80;
-  bool clearFrame = true;
+  int disposal = 0;
 
   GifImageDesc(InputBuffer input) {
     x = input.readUint16();

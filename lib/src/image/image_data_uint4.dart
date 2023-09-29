@@ -15,7 +15,7 @@ class ImageDataUint4 extends ImageData {
   @override
   final int rowStride;
   @override
-  final Palette? palette;
+  Palette? palette;
 
   ImageDataUint4(int width, int height, int numChannels)
       : rowStride = numChannels == 2

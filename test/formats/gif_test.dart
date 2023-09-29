@@ -7,6 +7,11 @@ import '../_test_util.dart';
 void main() {
   group('Format', () {
     group('gif', () {
+      test('anim_palette', () async {
+        final g1 = await decodeGifFile('test/_data/gif/anim_palette.gif');
+        await encodeGifFile('$testOutputPath/gif/anim_palette.gif', g1!);
+      });
+
       test('hand_anim', () async {
         final g1 = await decodeGifFile('test/_data/gif/hand_anim.gif');
         await encodeGifFile('$testOutputPath/gif/hand_anim.gif', g1!);

@@ -12,7 +12,7 @@ import 'pixel_uint8.dart';
 class ImageDataUint8 extends ImageData {
   final Uint8List data;
   @override
-  final Palette? palette;
+  Palette? palette;
 
   ImageDataUint8(int width, int height, int numChannels)
       : data = Uint8List(width * height * numChannels),

@@ -29,6 +29,18 @@ class GifColorMap {
     _palette.setRgb(index, r, g, b);
   }
 
+  int findColor(num r, num g, num b, num a) {
+    for (var i = 0; i < numColors; ++i) {
+      if (_palette.getRed(i) == r &&
+          _palette.getGreen(i) == g &&
+          _palette.getBlue(i) == b &&
+          _palette.getAlpha(i) == a) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   int red(int color) => _palette.getRed(color) as int;
 
   int green(int color) => _palette.getGreen(color) as int;

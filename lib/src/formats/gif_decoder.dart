@@ -56,7 +56,7 @@ class GifDecoder extends Decoder {
             }
             gifImage
               ..duration = _duration
-              ..clearFrame = _disposalMethod == 2;
+              ..disposal = _disposalMethod;
             if (_transparentFlag != 0) {
               if (gifImage.colorMap == null && info!.globalColorMap != null) {
                 gifImage.colorMap = GifColorMap.from(info!.globalColorMap!);
@@ -131,7 +131,7 @@ class GifDecoder extends Decoder {
 
       gifImage
         ..duration = _duration
-        ..clearFrame = _disposalMethod == 2;
+        ..disposal = _disposalMethod;
 
       if (_transparentFlag != 0) {
         if (gifImage.colorMap == null && info!.globalColorMap != null) {
@@ -195,35 +195,49 @@ class GifDecoder extends Decoder {
           image.height == lastImage.height &&
           frame.x == 0 &&
           frame.y == 0 &&
-          frame.clearFrame) {
+          frame.disposal == 2) {
         lastImage = image;
         firstImage.addFrame(lastImage);
         continue;
       }
 
-      if (frame.clearFrame) {
-        final colorMap =
-            (frame.colorMap != null) ? frame.colorMap! : info!.globalColorMap!;
+      final colorMap =
+          (frame.colorMap != null) ? frame.colorMap! : info!.globalColorMap!;
 
-        lastImage = Image(
-            width: lastImage.width,
-            height: lastImage.height,
-            numChannels: 1,
-            palette: colorMap.getPalette())
-          ..clear(colorMap.color(info!.backgroundColor!.r as int));
-      } else {
-        lastImage = Image.from(lastImage);
-      }
+      final nextImage = Image(
+          width: lastImage.width,
+          height: lastImage.height,
+          numChannels: 1,
+          palette: colorMap.getPalette());
 
-      lastImage.frameDuration = image.frameDuration;
-
-      for (final p in image) {
-        if (p.a != 0) {
-          lastImage.setPixel(p.x + frame.x, p.y + frame.y, p);
+      if (frame.disposal == 2) {
+        nextImage.clear(colorMap.color(info!.backgroundColor!.r as int));
+      } else if (frame.disposal != 3) {
+        final nextBytes = nextImage.toUint8List();
+        final lastBytes = lastImage.toUint8List();
+        final lp = lastImage.palette!;
+        for (var i = 0, l = nextBytes.length; i < l; ++i) {
+          final lc = lastBytes[i];
+          final nc = colorMap.findColor(lp.getRed(lc),
+              lp.getGreen(lc),
+              lp.getBlue(lc),
+              lp.getAlpha(lc));
+          if (nc != -1) {
+            nextBytes[i] = nc;
+          }
         }
       }
 
-      firstImage.addFrame(lastImage);
+      nextImage.frameDuration = image.frameDuration;
+
+      for (final p in image) {
+        if (p.a != 0) {
+          nextImage.setPixel(p.x + frame.x, p.y + frame.y, p);
+        }
+      }
+
+      firstImage.addFrame(nextImage);
+      lastImage = nextImage;
     }
 
     return firstImage;
