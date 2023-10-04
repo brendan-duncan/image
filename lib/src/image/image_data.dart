@@ -50,7 +50,7 @@ abstract class ImageData extends Iterable<Pixel> {
   /// The [Palette] of the image, or null if the image does not have one.
   Palette? get palette => null;
 
-  set palette(Palette? p) { }
+  set palette(Palette? p) {}
 
   /// The size of the image data in bytes
   int get lengthInBytes;

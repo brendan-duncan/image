@@ -96,8 +96,8 @@ class PngEncoder extends Encoder {
   ///
   /// Call this method once before calling addFrame.
   void start(int frameCount) {
-      _frames = frameCount;
-      isAnimated = frameCount > 1;
+    _frames = frameCount;
+    isAnimated = frameCount > 1;
   }
 
   /// Finish encoding a PNG, and return the resulting bytes.

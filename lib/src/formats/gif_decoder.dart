@@ -218,10 +218,8 @@ class GifDecoder extends Decoder {
         final lp = lastImage.palette!;
         for (var i = 0, l = nextBytes.length; i < l; ++i) {
           final lc = lastBytes[i];
-          final nc = colorMap.findColor(lp.getRed(lc),
-              lp.getGreen(lc),
-              lp.getBlue(lc),
-              lp.getAlpha(lc));
+          final nc = colorMap.findColor(
+              lp.getRed(lc), lp.getGreen(lc), lp.getBlue(lc), lp.getAlpha(lc));
           if (nc != -1) {
             nextBytes[i] = nc;
           }

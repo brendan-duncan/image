@@ -44,8 +44,7 @@ void main() {
     test('copyResize cubic', () {
       final img =
           decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
-      final i0 =
-          copyResize(img, width: 64, interpolation: Interpolation.cubic);
+      final i0 = copyResize(img, width: 64, interpolation: Interpolation.cubic);
       expect(i0.width, equals(64));
       expect(i0.height, equals(40));
       File('$testOutputPath/transform/copyResize_cubic.png')

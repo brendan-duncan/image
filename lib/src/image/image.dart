@@ -534,7 +534,9 @@ class Image extends Iterable<Pixel> {
   /// The palette if the image has one, null otherwise.
   Palette? get palette => data?.palette;
 
-  set palette(Palette? p) { data?.palette = p; }
+  set palette(Palette? p) {
+    data?.palette = p;
+  }
 
   /// The number of bits per color channel.
   int get bitsPerChannel => data?.bitsPerChannel ?? 0;
