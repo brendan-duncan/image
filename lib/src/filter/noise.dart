@@ -41,9 +41,9 @@ Image noise(Image image, num sigma,
     switch (type) {
       case NoiseType.gaussian:
         for (final p in frame) {
-          final r = p.r + nSigma * grand(random);
-          final g = p.g + nSigma * grand(random);
-          final b = p.b + nSigma * grand(random);
+          final r = (p.r + nSigma * grand(random)).clamp(0, p.maxChannelValue);
+          final g = (p.g + nSigma * grand(random)).clamp(0, p.maxChannelValue);
+          final b = (p.b + nSigma * grand(random)).clamp(0, p.maxChannelValue);
           final a = p.a;
           final msk =
               mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
@@ -60,9 +60,9 @@ Image noise(Image image, num sigma,
         break;
       case NoiseType.uniform:
         for (final p in frame) {
-          final r = p.r + nSigma * crand(random);
-          final g = p.g + nSigma * crand(random);
-          final b = p.b + nSigma * crand(random);
+          final r = (p.r + nSigma * crand(random)).clamp(0, p.maxChannelValue);
+          final g = (p.g + nSigma * crand(random)).clamp(0, p.maxChannelValue);
+          final b = (p.b + nSigma * crand(random)).clamp(0, p.maxChannelValue);
           final a = p.a;
           final msk =
               mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
@@ -87,9 +87,9 @@ Image noise(Image image, num sigma,
         }
         for (final p in frame) {
           if (random.nextDouble() * 100.0 < nSigma) {
-            final r = random.nextDouble() < 0.5 ? M : m;
-            final g = random.nextDouble() < 0.5 ? M : m;
-            final b = random.nextDouble() < 0.5 ? M : m;
+            final r = (random.nextDouble() < 0.5 ? M : m).clamp(0, p.maxChannelValue);
+            final g = (random.nextDouble() < 0.5 ? M : m).clamp(0, p.maxChannelValue);
+            final b = (random.nextDouble() < 0.5 ? M : m).clamp(0, p.maxChannelValue);
             final a = p.a;
             final msk =
                 mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
@@ -107,9 +107,9 @@ Image noise(Image image, num sigma,
         break;
       case NoiseType.poisson:
         for (final p in frame) {
-          final r = prand(random, p.r.toDouble());
-          final g = prand(random, p.g.toDouble());
-          final b = prand(random, p.b.toDouble());
+          final r = prand(random, p.r.toDouble()).clamp(0, p.maxChannelValue);
+          final g = prand(random, p.g.toDouble()).clamp(0, p.maxChannelValue);
+          final b = prand(random, p.b.toDouble()).clamp(0, p.maxChannelValue);
           final a = p.a;
           final msk =
               mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
@@ -131,19 +131,19 @@ Image noise(Image image, num sigma,
           var re = val0 + nSigma * grand(random);
           var im = val0 + nSigma * grand(random);
           var val = sqrt(re * re + im * im);
-          final r = val.toInt();
+          final r = val.toInt().clamp(0, p.maxChannelValue);
 
           val0 = p.g / sqrt2;
           re = val0 + nSigma * grand(random);
           im = val0 + nSigma * grand(random);
           val = sqrt(re * re + im * im);
-          final g = val.toInt();
+          final g = val.toInt().clamp(0, p.maxChannelValue);
 
           val0 = p.b / sqrt2;
           re = val0 + nSigma * grand(random);
           im = val0 + nSigma * grand(random);
           val = sqrt(re * re + im * im);
-          final b = val.toInt();
+          final b = val.toInt().clamp(0, p.maxChannelValue);
 
           final a = p.a;
 
