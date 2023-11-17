@@ -136,7 +136,8 @@ class WebPDecoder extends Decoder {
             width: _info!.width,
             height: _info!.height,
             numChannels: image.numChannels,
-            format: image.format);
+            format: image.format,
+            frameDuration: image.frameDuration);
         lastImage = firstImage;
       } else {
         lastImage = Image.from(lastImage);
