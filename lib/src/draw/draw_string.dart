@@ -44,60 +44,67 @@ Image drawString(Image image, String string,
   var sy = y ?? (image.height / 2).round() - (stringHeight / 2).round();
 
   if (wrap) {
-    final words = string.split(RegExp(r"\s+"));
-    var subString = "";
-    var x2 = sx;
+    final sentences = string.split(RegExp(r'\n'));
 
-    for (var w in words) {
-      final ws = StringBuffer()
-        ..write(w)
-        ..write(' ');
-      w = ws.toString();
-      final chars = w.codeUnits;
-      var wordWidth = 0;
-      for (var c in chars) {
-        if (!font.characters.containsKey(c)) {
-          wordWidth += font.base ~/ 2;
-          continue;
+    for (var sentence in sentences) {
+      final words = sentence.split(RegExp(r"\s+"));
+      var subString = "";
+      var x2 = sx;
+
+      for (var w in words) {
+        final ws = StringBuffer()
+          ..write(w)
+          ..write(' ');
+        w = ws.toString();
+        final chars = w.codeUnits;
+        var wordWidth = 0;
+        for (var c in chars) {
+          if (c == 10) break;
+          if (!font.characters.containsKey(c)) {
+            wordWidth += font.base ~/ 2;
+            continue;
+          }
+          final ch = font.characters[c]!;
+          wordWidth += ch.xAdvance;
         }
-        final ch = font.characters[c]!;
-        wordWidth += ch.xAdvance;
-      }
-      if ((x2 + wordWidth) > image.width) {
-        // If there is a word that won't fit the starting x, stop drawing
-        if ((sx == x2) || (sx + wordWidth > image.width)) {
-          return image;
+        if ((x2 + wordWidth) > image.width) {
+          // If there is a word that won't fit the starting x, stop drawing
+          if ((sx == x2) || (sx + wordWidth > image.width)) {
+            return image;
+          }
+
+          drawString(image, subString,
+              font: font,
+              x: sx,
+              y: sy,
+              color: color,
+              mask: mask,
+              maskChannel: maskChannel,
+              rightJustify: rightJustify);
+
+          subString = "";
+          x2 = sx;
+          sy += stringHeight;
+          subString += w;
+          x2 += wordWidth;
+        } else {
+          subString += w;
+          x2 += wordWidth;
         }
 
-        drawString(image, subString,
-            font: font,
-            x: sx,
-            y: sy,
-            color: color,
-            mask: mask,
-            maskChannel: maskChannel,
-            rightJustify: rightJustify);
-
-        subString = "";
-        x2 = sx;
-        sy += stringHeight;
-        subString += w;
-        x2 += wordWidth;
-      } else {
-        subString += w;
-        x2 += wordWidth;
+        if (subString.isNotEmpty) {
+          drawString(image, subString,
+              font: font,
+              x: sx,
+              y: sy,
+              color: color,
+              mask: mask,
+              maskChannel: maskChannel,
+              rightJustify: rightJustify);
+        }
       }
 
-      if (subString.isNotEmpty) {
-        drawString(image, subString,
-            font: font,
-            x: sx,
-            y: sy,
-            color: color,
-            mask: mask,
-            maskChannel: maskChannel,
-            rightJustify: rightJustify);
-      }
+      sy += stringHeight;
     }
 
     return image;
@@ -106,8 +113,11 @@ Image drawString(Image image, String string,
   final origX = sx;
   final substrings = string.split(RegExp(r"[\n|\r]"));
 
+  // print(substrings);
+
   for (var ss in substrings) {
     final chars = ss.codeUnits;
+    // print("$ss = $chars");
     if (rightJustify == true) {
       for (var c in chars) {
         if (!font.characters.containsKey(c)) {
