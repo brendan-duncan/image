@@ -36,8 +36,6 @@ linter:
     - avoid_private_typedef_functions
     - avoid_redundant_argument_values
     - avoid_renaming_method_parameters
-    - avoid_returning_null
-    - avoid_returning_null_for_future
     - avoid_returning_null_for_void
     - avoid_returning_this
     - avoid_single_cascade_in_expression_statements

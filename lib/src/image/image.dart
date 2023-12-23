@@ -176,13 +176,14 @@ class Image extends Iterable<Pixel> {
   /// Create an image from raw data in [bytes].
   ///
   /// [format] defines the data type of pixel channel values. [Format].uint8
-  /// is the most typical format for images, where each pixel value is an unsigned
-  /// byte with values in the range [0, 255].
+  /// is the most typical format for images, where each pixel value is an
+  /// unsigned byte with values in the range [0, 255].
   ///
   /// [rowStride] is the row stride, in bytes, of the source data [bytes].
   /// This may be different than the rowStride of the [Image], as some data
-  /// sources align rows to different byte alignments and include padding. [byteOffset]
-  /// can be specified to start reading the [bytes] data starting from that value.
+  /// sources align rows to different byte alignments and include padding.
+  /// [bytesOffset] can be specified to start reading the [bytes] data starting
+  /// from that value.
   ///
   /// [numChannels] can be used to specify the number of pixel channels in the
   /// [bytes] data, defaulting to 3.
