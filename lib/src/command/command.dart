@@ -1119,9 +1119,15 @@ class Command {
   void copyResize(
       {int? width,
       int? height,
+      bool? maintainAspect,
+      Color? backgroundColor,
       Interpolation interpolation = Interpolation.nearest}) {
     subCommand = CopyResizeCmd(subCommand,
-        width: width, height: height, interpolation: interpolation);
+        width: width,
+        height: height,
+        maintainAspect: maintainAspect,
+        backgroundColor: backgroundColor,
+        interpolation: interpolation);
   }
 
   void copyResizeCropSquare(
