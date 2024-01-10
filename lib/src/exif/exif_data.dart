@@ -286,7 +286,12 @@ class ExifData extends IfdContainer {
       directories['ifd$index'] = directory;
       index++;
 
-      ifdOffset = block.readUint32();
+      final nextIfdOffset = block.readUint32();
+      if (nextIfdOffset == ifdOffset) {
+        break;
+      } else {
+        ifdOffset = nextIfdOffset;
+      }
     }
 
     const subTags = {
