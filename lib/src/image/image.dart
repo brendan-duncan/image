@@ -511,9 +511,19 @@ class Image extends Iterable<Pixel> {
 
   /// Similar to toUint8List, but will convert the channels of the image pixels
   /// to the given [order]. If that happens, the returned bytes will be a copy
-  /// and not a direct view of the image data.
-  Uint8List getBytes({ChannelOrder? order}) =>
-      data?.getBytes(order: order) ?? toUint8List();
+  /// and not a direct view of the image data. If the number of channels needed
+  /// by [order] differs from what the image has, the bytes will come from a
+  /// converted image. If the converted image needs an alpha channel added,
+  /// then you can use the [alpha] argument to specify the value of the
+  /// added alpha channel.
+  Uint8List getBytes({ChannelOrder? order, num? alpha}) {
+    var self = this;
+    if (channelOrderLength[order] != numChannels) {
+      self = convert(numChannels: channelOrderLength[order], alpha: alpha);
+    }
+    return self.data?.getBytes(order: order,
+        inPlace: self != this) ?? toUint8List();
+  }
 
   /// The length in bytes of the image data buffer.
   int get lengthInBytes => data?.buffer.lengthInBytes ?? 0;

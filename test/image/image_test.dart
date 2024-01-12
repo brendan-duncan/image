@@ -200,6 +200,7 @@ void main() {
         }
       }
     });
+
     test('alpha_bmp_1bpp', () async {
       final img = await decodePngFile('test/_data/png/alpha_bmp.png');
       final bg = Image(width: img!.width, height: img.height)
@@ -207,6 +208,17 @@ void main() {
       compositeImage(bg, img);
       final bpp1 = bg.convert(format: Format.uint1, numChannels: 1);
       await encodeBmpFile('$testOutputPath/bmp/alpha_bmp_cvt.bmp', bpp1);
+    });
+
+    test('GetBytes rgb->argb', () {
+      final i1 = Image(width: 1, height: 1)
+      ..setPixelRgb(0, 0, 32, 64, 128);
+      final b1 = i1.getBytes(order: ChannelOrder.argb);
+      expect(b1.length, equals(4));
+      expect(b1[0], equals(255));
+      expect(b1[1], equals(32));
+      expect(b1[2], equals(64));
+      expect(b1[3], equals(128));
     });
   });
 }

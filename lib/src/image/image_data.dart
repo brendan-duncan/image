@@ -68,7 +68,7 @@ abstract class ImageData extends Iterable<Pixel> {
   /// Similar to toUint8List, but will convert the channels of the image pixels
   /// to the given [order]. If that happens, the returned bytes will be a copy
   /// and not a direct view of the image data.
-  Uint8List getBytes({ChannelOrder? order}) {
+  Uint8List getBytes({ChannelOrder? order, bool inPlace = false}) {
     if (order == null) {
       return toUint8List();
     }
@@ -77,7 +77,7 @@ abstract class ImageData extends Iterable<Pixel> {
       if (order == ChannelOrder.abgr ||
           order == ChannelOrder.argb ||
           order == ChannelOrder.bgra) {
-        final tempImage = clone();
+        final tempImage = inPlace ? this : clone();
         if (order == ChannelOrder.abgr) {
           for (final p in tempImage) {
             final r = p.r;
@@ -119,7 +119,7 @@ abstract class ImageData extends Iterable<Pixel> {
       }
     } else if (numChannels == 3) {
       if (order == ChannelOrder.bgr) {
-        final tempImage = clone();
+        final tempImage = inPlace ? this : clone();
         for (final p in tempImage) {
           final r = p.r;
           p
