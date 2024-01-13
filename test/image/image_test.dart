@@ -211,8 +211,7 @@ void main() {
     });
 
     test('GetBytes rgb->argb', () {
-      final i1 = Image(width: 1, height: 1)
-      ..setPixelRgb(0, 0, 32, 64, 128);
+      final i1 = Image(width: 1, height: 1)..setPixelRgb(0, 0, 32, 64, 128);
       final b1 = i1.getBytes(order: ChannelOrder.argb);
       expect(b1.length, equals(4));
       expect(b1[0], equals(255));

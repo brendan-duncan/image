@@ -521,8 +521,8 @@ class Image extends Iterable<Pixel> {
     if (channelOrderLength[order] != numChannels) {
       self = convert(numChannels: channelOrderLength[order], alpha: alpha);
     }
-    return self.data?.getBytes(order: order,
-        inPlace: self != this) ?? toUint8List();
+    return self.data?.getBytes(order: order, inPlace: self != this) ??
+        toUint8List();
   }
 
   /// The length in bytes of the image data buffer.
