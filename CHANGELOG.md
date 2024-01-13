@@ -1,3 +1,11 @@
+## 4.1.4 - January 12, 2024
+
+- Fix Image.getBytes when ChannelOrder has a different number of channels than the image.
+- copyResize command accepts maintainAspect and backgroundColor args.
+- Fix EXIF decoder when image has bad IFD offsets.
+- Improve drawString handling of new line characters when wrap is true.
+- Improve GIF animation decoding when each frame has its own palette. 
+
 ## 4.1.3 - September 25, 2023
 
 - Fix crash in copyResize for non-nearest interpolation modes.
