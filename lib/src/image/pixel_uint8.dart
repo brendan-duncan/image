@@ -158,42 +158,54 @@ class PixelUint8 extends Iterable<num> implements Pixel {
 
   @override
   num get g => palette == null
-      ? numChannels > 1
-          ? data[_index + 1]
-          : 0
+      ? numChannels == 2
+          ? data[_index]
+          : numChannels > 1
+              ? data[_index + 1]
+              : 0
       : palette!.getGreen(data[_index]);
 
   @override
   set g(num g) {
-    if (image.numChannels > 1) {
+    if (numChannels == 2) {
+      data[_index] = g.clamp(0, 255).toInt();
+    } else if (image.numChannels > 1) {
       data[_index + 1] = g.clamp(0, 255).toInt();
     }
   }
 
   @override
   num get b => palette == null
-      ? numChannels > 2
-          ? data[_index + 2]
-          : 0
+      ? numChannels == 2
+          ? data[_index]
+          : numChannels > 2
+              ? data[_index + 2]
+              : 0
       : palette!.getBlue(data[_index]);
 
   @override
   set b(num b) {
-    if (image.numChannels > 2) {
+    if (numChannels == 2) {
+      data[_index] = b.clamp(0, 255).toInt();
+    } else if (image.numChannels > 2) {
       data[_index + 2] = b.clamp(0, 255).toInt();
     }
   }
 
   @override
   num get a => palette == null
-      ? numChannels > 3
-          ? data[_index + 3]
-          : 255
+      ? numChannels == 2
+          ? data[_index + 1]
+          : numChannels > 3
+              ? data[_index + 3]
+              : 255
       : palette!.getAlpha(data[_index]);
 
   @override
   set a(num a) {
-    if (image.numChannels > 3) {
+    if (numChannels == 2) {
+      data[_index + 1] = a.clamp(0, 255).toInt();
+    } else if (image.numChannels > 3) {
       data[_index + 3] = a.clamp(0, 255).toInt();
     }
   }
@@ -219,9 +231,10 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   set aNormalized(num v) => a = v * maxChannelValue;
 
   @override
-  num get luminance => getLuminance(this);
+  num get luminance => numChannels == 2 ? r : getLuminance(this);
   @override
-  num get luminanceNormalized => getLuminanceNormalized(this);
+  num get luminanceNormalized =>
+      numChannels == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
   num getChannel(Channel channel) => channel == Channel.luminance

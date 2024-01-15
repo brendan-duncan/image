@@ -44,12 +44,27 @@ Color _convertColor(Color c, Color c2, num a) {
       c2[ci] = convertFormatValue(c[ci], fromFormat, format);
     }
   } else {
-    for (var ci = 0; ci < cl; ++ci) {
-      c2[ci] = convertFormatValue(c[ci], fromFormat, format);
-    }
-    final v = cl == 1 ? c2[0] : 0;
-    for (var ci = cl; ci < numChannels; ++ci) {
-      c2[ci] = ci == 3 ? a : v;
+    if (cl == 2) {
+      final l = convertFormatValue(c[0], fromFormat, format);
+      if (numChannels == 3) {
+        c2[0] = l;
+        c2[1] = l;
+        c2[2] = l;
+      } else {
+        final a = convertFormatValue(c[1], fromFormat, format);
+        c2[0] = l;
+        c2[1] = l;
+        c2[2] = l;
+        c2[3] = a;
+      }
+    } else {
+      for (var ci = 0; ci < cl; ++ci) {
+        c2[ci] = convertFormatValue(c[ci], fromFormat, format);
+      }
+      final v = cl == 1 ? c2[0] : 0;
+      for (var ci = cl; ci < numChannels; ++ci) {
+        c2[ci] = ci == 3 ? a : v;
+      }
     }
   }
   return c2;

@@ -10,6 +10,13 @@ void main() {
       const buck24Hash = 817446904;
       Image? buck24Image;
 
+      test('luminanceAlpha', () async {
+        final png = (await decodePngFile('test/_data/png/png_LA.png'))!;
+        expect(png.numChannels, equals(2));
+        final rgba = png.convert(numChannels: 4);
+        await encodePngFile('$testOutputPath/png/png_LA_rgba.png', rgba);
+      });
+
       test('hungry_180', () async {
         final png = (await decodePngFile('test/_data/png/hungry_180.png'))!;
         flip(png, direction: FlipDirection.horizontal);
