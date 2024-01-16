@@ -554,7 +554,7 @@ class Image extends Iterable<Pixel> {
   int get bitsPerChannel => data?.bitsPerChannel ?? 0;
 
   /// True if the Image has an alpha channel.
-  bool get hasAlpha => numChannels == 4;
+  bool get hasAlpha => numChannels == 2 || numChannels == 4;
 
   /// Remap the color channels to the given [order]. Normally Image color
   /// channels are stored in rgba order for 4 channel images, and
