@@ -279,7 +279,7 @@ class Image extends Iterable<Pixel> {
     var dOff = 0;
     var bOff = 0;
     for (int y = 0; y < height; ++y, bOff += rowStride, dOff += dataStride) {
-      final bRow = fromBytes.getRange(bOff, bOff + stride);
+      final bRow = Uint8List.sublistView(fromBytes, bOff, bOff + stride);
       toBytes.setRange(dOff, dOff + dataStride, bRow);
     }
 
