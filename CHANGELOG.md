@@ -1,3 +1,7 @@
+## 4.1.6 - January 31, 2024
+
+- Incomplete or JPEGs with errors will now finish loading. 
+
 ## 4.1.5 - January 31, 2024
 
 - Optimize copying bytes in Image.fromBytes
