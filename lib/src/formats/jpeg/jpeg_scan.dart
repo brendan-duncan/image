@@ -135,8 +135,9 @@ class JpegScan {
     if (bitsData == 0xff) {
       final nextByte = input.readByte();
       if (nextByte != 0) {
-        final marker = ((bitsData << 8) | nextByte).toRadixString(16);
-        throw ImageException('unexpected marker: $marker');
+        //final marker = ((bitsData << 8) | nextByte).toRadixString(16);
+        //throw ImageException('unexpected marker: $marker');
+        return null;
       }
     }
 
@@ -172,10 +173,16 @@ class JpegScan {
   }
 
   int _receiveAndExtend(int? length) {
+    if (length == null) {
+      return 0;
+    }
     if (length == 1) {
       return _readBit() == 1 ? 1 : -1;
     }
-    final n = _receive(length!)!;
+    final n = _receive(length);
+    if (n == null) {
+      return 0;
+    }
     if (n >= (1 << (length - 1))) {
       return n;
     }
@@ -183,14 +190,17 @@ class JpegScan {
   }
 
   void _decodeBaseline(JpegComponent component, List<int> zz) {
-    final t = _decodeHuffman(component.huffmanTableDC);
+    int? t = _decodeHuffman(component.huffmanTableDC);
     final diff = t == 0 ? 0 : _receiveAndExtend(t);
     component.pred += diff;
     zz[0] = component.pred;
 
     var k = 1;
     while (k < 64) {
-      final rs = _decodeHuffman(component.huffmanTableAC)!;
+      final rs = _decodeHuffman(component.huffmanTableAC);
+      if (rs == null) {
+        break;
+      }
       var s = rs & 15;
       final r = rs >> 4;
       if (s == 0) {

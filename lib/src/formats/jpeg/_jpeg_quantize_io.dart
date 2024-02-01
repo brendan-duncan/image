@@ -198,7 +198,11 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 
   // convert to 8-bit integers
   for (var i = 0; i < 64; ++i) {
-    dataOut[i] = _dctClip[(_dctClipOffset + 128 + ((p[i] + 8) >> 4))];
+    final index = _dctClipOffset + 128 + ((p[i] + 8) >> 4);
+    if (index < 0) {
+      break;
+    }
+    dataOut[i] = _dctClip[index];
   }
 }
 
