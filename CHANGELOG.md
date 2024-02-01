@@ -1,3 +1,8 @@
+## 4.1.5 - January 31, 2024
+
+- Optimize copying bytes in Image.fromBytes
+- 2 channel images are treated as Luminance-Alpha
+
 ## 4.1.4 - January 12, 2024
 
 - Fix Image.getBytes when ChannelOrder has a different number of channels than the image.
