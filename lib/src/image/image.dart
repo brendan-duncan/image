@@ -518,7 +518,7 @@ class Image extends Iterable<Pixel> {
   /// added alpha channel.
   Uint8List getBytes({ChannelOrder? order, num? alpha}) {
     var self = this;
-    if (channelOrderLength[order] != numChannels) {
+    if (order != null && channelOrderLength[order] != numChannels) {
       self = convert(numChannels: channelOrderLength[order], alpha: alpha);
     }
     return self.data?.getBytes(order: order, inPlace: self != this) ??
