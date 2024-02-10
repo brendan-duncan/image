@@ -190,7 +190,7 @@ class JpegScan {
   }
 
   void _decodeBaseline(JpegComponent component, List<int> zz) {
-    int? t = _decodeHuffman(component.huffmanTableDC);
+    final t = _decodeHuffman(component.huffmanTableDC);
     final diff = t == 0 ? 0 : _receiveAndExtend(t);
     component.pred += diff;
     zz[0] = component.pred;
