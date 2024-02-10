@@ -17,7 +17,7 @@ class Point {
   Point operator +(Point rhs) => Point(x + rhs.x, y + rhs.y);
 
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
       other is Point && x == other.x && y == other.y;
 
   @override

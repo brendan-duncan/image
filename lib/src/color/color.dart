@@ -102,7 +102,7 @@ abstract class Color extends Iterable<num> {
 
   /// Tests if this color is equivalent to another [Color].
   @override
-  bool operator ==(Object? other);
+  bool operator ==(Object other);
 
   /// Compute a hashCode for this color.
   @override

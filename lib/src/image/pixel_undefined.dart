@@ -107,7 +107,7 @@ class PixelUndefined extends Iterable<num> implements Pixel {
   @override
   bool moveNext() => false;
   @override
-  bool operator ==(Object? other) => other is PixelUndefined;
+  bool operator ==(Object other) => other is PixelUndefined;
   @override
   int get hashCode => 0;
   @override

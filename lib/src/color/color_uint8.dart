@@ -175,7 +175,7 @@ class ColorUint8 extends Iterable<num> implements Color {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator ==(Object? other) =>
+  bool operator ==(Object other) =>
       other is Color && other.length == length && other.hashCode == hashCode;
 
   @override

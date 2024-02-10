@@ -267,7 +267,7 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator ==(Object? other) {
+  bool operator ==(Object other) {
     if (other is PixelFloat16) {
       return hashCode == other.hashCode;
     }

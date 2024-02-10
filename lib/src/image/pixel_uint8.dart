@@ -292,7 +292,7 @@ class PixelUint8 extends Iterable<num> implements Pixel {
   ChannelIterator get iterator => ChannelIterator(this);
 
   @override
-  bool operator ==(Object? other) {
+  bool operator ==(Object other) {
     if (other is PixelUint8) {
       return hashCode == other.hashCode;
     }
