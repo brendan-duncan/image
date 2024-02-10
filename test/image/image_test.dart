@@ -213,7 +213,7 @@ void main() {
     test('GetBytes', () {
       final i1 = Image(width: 10, height: 10)..setPixelRgb(0, 0, 32, 64, 128);
       final b1 = i1.getBytes();
-      expect(b1.length, equals(10*10*3));
+      expect(b1.length, equals(10 * 10 * 3));
       expect(b1[0], equals(32));
       expect(b1[1], equals(64));
       expect(b1[2], equals(128));
