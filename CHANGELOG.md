@@ -1,3 +1,8 @@
+## 4.1.7 - February 10, 2024
+
+- JPEG images will finish decoding even if the file is incomplete or has errors.
+- Fix performance bug with Image.getBytes
+
 ## 4.1.6 - January 31, 2024
 
 - Incomplete or JPEGs with errors will now finish loading. 
