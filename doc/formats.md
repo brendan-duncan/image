@@ -18,6 +18,7 @@ Dart Image Library supports a wide range of image file formats for both decoding
 * WebP + Animated WebP
 * Photoshop PSD
 * OpenEXR
+* PNM (PBM, PGM, PPM)
 
 ### Write Only
 * CUR
@@ -170,6 +171,12 @@ Uint8List encodePvr(Image image, { bool singleFrame = false });
 
 Future<bool> encodePvrFile(String path, Image image,
     { bool singleFrame = false }) async;
+```
+### PNM: decoding
+```dart
+Image? decodePnm(Uint8List bytes);
+
+Future<Image?> decodePnmFile(String path) async;
 ```
 
 ## Decoder Classes

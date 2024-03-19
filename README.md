@@ -33,6 +33,7 @@ NOTE: 4.0 is a major revision from the previous version of the library.
 - WebP / Animated WebP
 - PSD
 - EXR
+- PNM (PBM, PGM, PPM)
 
 **Write Only**
 

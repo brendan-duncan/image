@@ -136,6 +136,19 @@ class InputBuffer {
     return str;
   }
 
+  String readStringLine([int maxLength = 256]) {
+    final codes = <int>[];
+    while (!isEOS) {
+      final c = readByte();
+      codes.add(c);
+      if (c == 10 || codes.length >= maxLength) {
+        // '\n'
+        return String.fromCharCodes(codes);
+      }
+    }
+    return String.fromCharCodes(codes);
+  }
+
   /// Read a null-terminated UTF-8 string.
   String readStringUtf8() {
     final codes = <int>[];

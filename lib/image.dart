@@ -123,6 +123,7 @@ export 'src/formats/png/png_frame.dart' hide InternalPngFrame;
 export 'src/formats/png/png_info.dart' hide InternalPngInfo;
 export 'src/formats/png_decoder.dart';
 export 'src/formats/png_encoder.dart';
+export 'src/formats/pnm_decoder.dart';
 //export 'src/formats/psd/effect/psd_bevel_effect.dart';
 //export 'src/formats/psd/effect/psd_drop_shadow_effect.dart';
 //export 'src/formats/psd/effect/psd_effect.dart';

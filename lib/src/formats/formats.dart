@@ -19,6 +19,7 @@ import 'jpeg_decoder.dart';
 import 'jpeg_encoder.dart';
 import 'png_decoder.dart';
 import 'png_encoder.dart';
+import 'pnm_decoder.dart';
 import 'psd_decoder.dart';
 import 'pvr_decoder.dart';
 import 'pvr_encoder.dart';
@@ -64,6 +65,12 @@ Decoder? findDecoderForNamedImage(String name) {
   }
   if (n.endsWith('.pvr')) {
     return PvrDecoder();
+  }
+  if (n.endsWith('.pnm') ||
+      n.endsWith('.pbm') ||
+      n.endsWith('.pgm') ||
+      n.endsWith('.ppm')) {
+    return PnmDecoder();
   }
   return null;
 }
@@ -165,6 +172,11 @@ Decoder? findDecoderForData(List<int> data) {
   final pvr = PvrDecoder();
   if (pvr.isValidFile(bytes)) {
     return pvr;
+  }
+
+  final pnm = PnmDecoder();
+  if (pnm.isValidFile(bytes)) {
+    return pnm;
   }
 
   return null;
@@ -312,6 +324,18 @@ Future<bool> encodePngFile(String path, Image image,
   final bytes = PngEncoder(level: level, filter: filter)
       .encode(image, singleFrame: singleFrame);
   return writeFile(path, bytes);
+}
+
+/// Decode a PNM formatted [Image].
+Image? decodePnm(Uint8List bytes) => PnmDecoder().decode(bytes);
+
+/// Decode a PNM formatted image from a file.
+Future<Image?> decodePnmFile(String path) async {
+  final bytes = await readFile(path);
+  if (bytes == null) {
+    return null;
+  }
+  return PngDecoder().decode(bytes);
 }
 
 /// Decode a TGA formatted image.
