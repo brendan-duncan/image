@@ -927,7 +927,9 @@ class Image extends Iterable<Pixel> {
     }
   }
 
-  int _numPixelColors(Format format) => format == Format.uint1
+  int _numPixelColors(
+          Format
+              format) => /*format == Format.uint1
       ? 2
       : format == Format.uint2
           ? 4
@@ -935,9 +937,8 @@ class Image extends Iterable<Pixel> {
               ? 16
               : format == Format.uint8
                   ? 256
-                  : format == Format.uint16
-                      ? 65536
-                      : 0;
+                  :*/
+      format == Format.uint16 ? 65536 : 256;
 
   Palette? _createPalette(
       Format format, Format paletteFormat, int numChannels) {
