@@ -121,8 +121,8 @@ class PixelUint16 extends Iterable<num> implements Pixel {
   num get(int ci) => palette != null
       ? palette!.get(data[_index], ci)
       : ci < numChannels
-      ? data[_index + ci]
-      : 0;
+          ? data[_index + ci]
+          : 0;
 
   @override
   num operator [](int i) => get(i);
@@ -142,7 +142,9 @@ class PixelUint16 extends Iterable<num> implements Pixel {
 
   @override
   num get r => palette == null
-      ? numChannels > 0 ? data[_index] : 0
+      ? numChannels > 0
+          ? data[_index]
+          : 0
       : palette!.getRed(data[_index]);
 
   @override
@@ -154,7 +156,9 @@ class PixelUint16 extends Iterable<num> implements Pixel {
 
   @override
   num get g => palette == null
-      ? numChannels > 1 ? data[_index + 1] : 0
+      ? numChannels > 1
+          ? data[_index + 1]
+          : 0
       : palette!.getGreen(data[_index]);
 
   @override
@@ -166,7 +170,9 @@ class PixelUint16 extends Iterable<num> implements Pixel {
 
   @override
   num get b => palette == null
-      ? numChannels > 2 ? data[_index + 2] : 0
+      ? numChannels > 2
+          ? data[_index + 2]
+          : 0
       : palette!.getBlue(data[_index]);
 
   @override
@@ -178,7 +184,9 @@ class PixelUint16 extends Iterable<num> implements Pixel {
 
   @override
   num get a => palette == null
-      ? numChannels > 3 ? data[_index + 3] : 0
+      ? numChannels > 3
+          ? data[_index + 3]
+          : 0
       : palette!.getAlpha(data[_index]);
 
   @override

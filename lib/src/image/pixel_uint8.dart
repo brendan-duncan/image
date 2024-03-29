@@ -237,9 +237,8 @@ class PixelUint8 extends Iterable<num> implements Pixel {
       numChannels == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance
-      ? luminance
-      : get(channel.index);
+  num getChannel(Channel channel) =>
+      channel == Channel.luminance ? luminance : get(channel.index);
 
   @override
   num getChannelNormalized(Channel channel) =>

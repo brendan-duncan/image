@@ -939,7 +939,8 @@ class Image extends Iterable<Pixel> {
                       ? 65536
                       : 0;
 
-  Palette? _createPalette(Format format, Format paletteFormat, int numChannels) {
+  Palette? _createPalette(
+      Format format, Format paletteFormat, int numChannels) {
     switch (paletteFormat) {
       case Format.uint1:
         return null;

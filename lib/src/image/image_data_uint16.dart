@@ -67,7 +67,6 @@ class ImageDataUint16 extends ImageData {
   @override
   int get length => data.lengthInBytes;
 
-
   @override
   bool get isHdrFormat => true;
 
