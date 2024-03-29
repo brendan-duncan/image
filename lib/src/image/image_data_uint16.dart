@@ -4,21 +4,29 @@ import '../color/color.dart';
 import '../color/color_uint16.dart';
 import '../color/format.dart';
 import 'image_data.dart';
+import 'palette.dart';
 import 'pixel.dart';
 import 'pixel_range_iterator.dart';
 import 'pixel_uint16.dart';
 
 class ImageDataUint16 extends ImageData {
   final Uint16List data;
+  @override
+  Palette? palette;
 
   ImageDataUint16(int width, int height, int numChannels)
       : data = Uint16List(width * height * numChannels),
         super(width, height, numChannels);
 
+  ImageDataUint16.palette(int width, int height, this.palette)
+      : data = Uint16List(width * height),
+        super(width, height, 1);
+
   ImageDataUint16.from(ImageDataUint16 other, {bool skipPixels = false})
       : data = skipPixels
             ? Uint16List(other.data.length)
             : Uint16List.fromList(other.data),
+        palette = other.palette?.clone(),
         super(other.width, other.height, other.numChannels);
 
   @override
@@ -38,7 +46,7 @@ class ImageDataUint16 extends ImageData {
   int get bitsPerChannel => 16;
 
   @override
-  num get maxChannelValue => 0xffff;
+  num get maxChannelValue => palette?.maxChannelValue ?? 0xffff;
 
   @override
   num get maxIndexValue => 0xffff;
@@ -58,6 +66,7 @@ class ImageDataUint16 extends ImageData {
 
   @override
   int get length => data.lengthInBytes;
+
 
   @override
   bool get isHdrFormat => true;

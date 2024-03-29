@@ -280,16 +280,23 @@ class TiffImage {
         height: height,
         format: format,
         numChannels: numChannels,
-        withPalette: hasPalette);
+        withPalette: hasPalette,
+        paletteFormat: format);
 
     if (hasPalette) {
       final p = image.palette!;
       final cm = colorMap!;
       const numChannels = 3; // Only support RGB palettes
       final numColors = cm.length ~/ numChannels;
-      for (var i = 0; i < numColors; ++i) {
-        p.setRgb(i, cm[colorMapRed + i], cm[colorMapGreen + i],
-            cm[colorMapBlue + i]);
+      var ri = colorMapRed;
+      var gi = colorMapGreen;
+      var bi = colorMapBlue;
+      final colorMapSize = cm.length;
+      for (var i = 0; i < numColors; ++i, ++ri, ++gi, ++bi) {
+        if (bi >= colorMapSize) {
+          break;
+        }
+        p.setRgb(i, cm[ri], cm[gi], cm[bi]);
       }
     }
 

@@ -370,9 +370,8 @@ class Image extends Iterable<Pixel> {
       _exif = ExifData.from(exif);
     }
     if (palette == null && withPalette && supportsPalette) {
-      palette = _createPalette(paletteFormat, numChannels);
+      palette = _createPalette(format, paletteFormat, numChannels);
     }
-
     _createImageData(width, height, format, numChannels, palette);
   }
 
@@ -408,7 +407,11 @@ class Image extends Iterable<Pixel> {
         }
         break;
       case Format.uint16:
-        data = ImageDataUint16(width, height, numChannels);
+        if (palette == null) {
+          data = ImageDataUint16(width, height, numChannels);
+        } else {
+          data = ImageDataUint16.palette(width, height, palette);
+        }
         break;
       case Format.uint32:
         data = ImageDataUint32(width, height, numChannels);
@@ -809,7 +812,8 @@ class Image extends Iterable<Pixel> {
       format == Format.uint1 ||
       format == Format.uint2 ||
       format == Format.uint4 ||
-      format == Format.uint8;
+      format == Format.uint8 ||
+      format == Format.uint16;
 
   /// Set all pixels in the image to the given [color]. If no color is provided
   /// the image will be initialized to 0.
@@ -923,7 +927,7 @@ class Image extends Iterable<Pixel> {
     }
   }
 
-  int get _numPixelColors => format == Format.uint1
+  int _numPixelColors(Format format) => format == Format.uint1
       ? 2
       : format == Format.uint2
           ? 4
@@ -931,9 +935,11 @@ class Image extends Iterable<Pixel> {
               ? 16
               : format == Format.uint8
                   ? 256
-                  : 0;
+                  : format == Format.uint16
+                      ? 65536
+                      : 0;
 
-  Palette? _createPalette(Format paletteFormat, int numChannels) {
+  Palette? _createPalette(Format format, Format paletteFormat, int numChannels) {
     switch (paletteFormat) {
       case Format.uint1:
         return null;
@@ -942,23 +948,23 @@ class Image extends Iterable<Pixel> {
       case Format.uint4:
         return null;
       case Format.uint8:
-        return PaletteUint8(_numPixelColors, numChannels);
+        return PaletteUint8(_numPixelColors(format), numChannels);
       case Format.uint16:
-        return PaletteUint16(_numPixelColors, numChannels);
+        return PaletteUint16(_numPixelColors(format), numChannels);
       case Format.uint32:
-        return PaletteUint32(_numPixelColors, numChannels);
+        return PaletteUint32(_numPixelColors(format), numChannels);
       case Format.int8:
-        return PaletteInt8(_numPixelColors, numChannels);
+        return PaletteInt8(_numPixelColors(format), numChannels);
       case Format.int16:
-        return PaletteInt16(_numPixelColors, numChannels);
+        return PaletteInt16(_numPixelColors(format), numChannels);
       case Format.int32:
-        return PaletteInt32(_numPixelColors, numChannels);
+        return PaletteInt32(_numPixelColors(format), numChannels);
       case Format.float16:
-        return PaletteFloat16(_numPixelColors, numChannels);
+        return PaletteFloat16(_numPixelColors(format), numChannels);
       case Format.float32:
-        return PaletteFloat32(_numPixelColors, numChannels);
+        return PaletteFloat32(_numPixelColors(format), numChannels);
       case Format.float64:
-        return PaletteFloat64(_numPixelColors, numChannels);
+        return PaletteFloat64(_numPixelColors(format), numChannels);
     }
   }
 }

@@ -7,6 +7,25 @@ import '../_test_util.dart';
 void main() {
   group('Format', () {
     group('tiff', () {
+      test('16bit colormap', () async {
+        final bytes = File('test/_data/tiff/CNSW_crop.tif').readAsBytesSync();
+        final i1 = decodeTiff(bytes);
+        expect(i1, isNotNull);
+        final o1 = i1!.convert(format: Format.uint8);
+        File('$testOutputPath/tif/CNSW_crop.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(encodePng(o1));
+      });
+
+      /*test('rgb.tiff', () async {
+        final bytes = File('test/_data/tiff/rgb.tif').readAsBytesSync();
+        final i0 = decodeTiff(bytes);
+        expect(i0, isNotNull);
+        File('$testOutputPath/tif/rgb.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(encodePng(i0!));
+      });*/
+
       test('encode', () async {
         final i0 = Image(width: 256, height: 256);
         for (final p in i0) {

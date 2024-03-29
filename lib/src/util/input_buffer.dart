@@ -241,7 +241,7 @@ class InputBuffer {
     if (buffer is Uint8List) {
       return toUint8List(offset, length);
     }
-    final s = start + offset + offset;
+    final s = start + this.offset + offset;
     final e = (length <= 0) ? end : s + length;
     return buffer.sublist(s, e);
   }

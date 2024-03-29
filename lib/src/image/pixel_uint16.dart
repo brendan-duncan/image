@@ -40,25 +40,35 @@ class PixelUint16 extends Iterable<num> implements Pixel {
   PixelUint16 clone() => PixelUint16.from(this);
 
   @override
-  int get length => image.numChannels;
+  int get length => palette?.numChannels ?? image.numChannels;
+
   int get numChannels => image.numChannels;
+
   @override
   bool get hasPalette => image.hasPalette;
+
   @override
-  Palette? get palette => null;
+  Palette? get palette => image.palette;
+
   @override
   int get width => image.width;
+
   @override
   int get height => image.height;
   Uint16List get data => image.data;
+
   @override
   num get maxChannelValue => image.maxChannelValue;
+
   @override
   num get maxIndexValue => image.maxIndexValue;
+
   @override
   Format get format => Format.uint16;
+
   @override
   bool get isLdrFormat => image.isLdrFormat;
+
   @override
   bool get isHdrFormat => image.isHdrFormat;
 
@@ -104,12 +114,18 @@ class PixelUint16 extends Iterable<num> implements Pixel {
         return false;
       }
     }
-    _index += numChannels;
+    _index += palette == null ? numChannels : 1;
     return _index < image.data.length;
   }
 
+  num get(int ci) => palette != null
+      ? palette!.get(data[_index], ci)
+      : ci < numChannels
+      ? data[_index + ci]
+      : 0;
+
   @override
-  num operator [](int i) => i < numChannels ? data[_index + i] : 0;
+  num operator [](int i) => get(i);
 
   @override
   void operator []=(int i, num value) {
@@ -120,11 +136,14 @@ class PixelUint16 extends Iterable<num> implements Pixel {
 
   @override
   num get index => r;
+
   @override
   set index(num i) => r = i;
 
   @override
-  num get r => numChannels > 0 ? data[_index] : 0;
+  num get r => palette == null
+      ? numChannels > 0 ? data[_index] : 0
+      : palette!.getRed(data[_index]);
 
   @override
   set r(num r) {
@@ -134,60 +153,74 @@ class PixelUint16 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num get g => numChannels > 1 ? data[_index + 1] : 0;
+  num get g => palette == null
+      ? numChannels > 1 ? data[_index + 1] : 0
+      : palette!.getGreen(data[_index]);
 
   @override
   set g(num g) {
-    if (image.numChannels > 1) data[_index + 1] = g.toInt();
+    if (image.numChannels > 1) {
+      data[_index + 1] = g.toInt();
+    }
   }
 
   @override
-  num get b => numChannels > 2 ? data[_index + 2] : 0;
+  num get b => palette == null
+      ? numChannels > 2 ? data[_index + 2] : 0
+      : palette!.getBlue(data[_index]);
 
   @override
   set b(num b) {
-    if (image.numChannels > 2) data[_index + 2] = b.toInt();
+    if (image.numChannels > 2) {
+      data[_index + 2] = b.toInt();
+    }
   }
 
   @override
-  num get a => numChannels > 3 ? data[_index + 3] : 0;
+  num get a => palette == null
+      ? numChannels > 3 ? data[_index + 3] : 0
+      : palette!.getAlpha(data[_index]);
 
   @override
   set a(num a) {
-    if (image.numChannels > 3) data[_index + 3] = a.toInt();
+    if (image.numChannels > 3) {
+      data[_index + 3] = a.toInt();
+    }
   }
 
   @override
   num get rNormalized => r / maxChannelValue;
+
   @override
   set rNormalized(num v) => r = v * maxChannelValue;
 
   @override
   num get gNormalized => g / maxChannelValue;
+
   @override
   set gNormalized(num v) => g = v * maxChannelValue;
 
   @override
   num get bNormalized => b / maxChannelValue;
+
   @override
   set bNormalized(num v) => b = v * maxChannelValue;
 
   @override
   num get aNormalized => a / maxChannelValue;
+
   @override
   set aNormalized(num v) => a = v * maxChannelValue;
 
   @override
   num get luminance => getLuminance(this);
+
   @override
   num get luminanceNormalized => getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) => channel == Channel.luminance
-      ? luminance
-      : channel.index < numChannels
-          ? data[_index + channel.index]
-          : 0;
+  num getChannel(Channel channel) =>
+      channel == Channel.luminance ? luminance : get(channel.index);
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -239,22 +272,23 @@ class PixelUint16 extends Iterable<num> implements Pixel {
       return hashCode == other.hashCode;
     }
     if (other is List<int>) {
-      if (other.length != numChannels) {
+      final nc = palette != null ? palette!.numChannels : numChannels;
+      if (other.length != nc) {
         return false;
       }
-      if (data[_index] != other[0]) {
+      if (get(0) != other[0]) {
         return false;
       }
-      if (numChannels > 1) {
-        if (data[_index + 1] != other[1]) {
+      if (nc > 1) {
+        if (get(1) != other[1]) {
           return false;
         }
-        if (numChannels > 2) {
-          if (data[_index + 2] != other[2]) {
+        if (nc > 2) {
+          if (get(2) != other[2]) {
             return false;
           }
-          if (numChannels > 3) {
-            if (data[_index + 3] != other[3]) {
+          if (nc > 3) {
+            if (get(3) != other[3]) {
               return false;
             }
           }
