@@ -16,7 +16,7 @@ void main() {
           ..writeAsBytesSync(encodePng(i0!));
       });
 
-      /*test('16bit colormap', () async {
+      test('16bit colormap', () async {
         final bytes = File('test/_data/tiff/CNSW_crop.tif').readAsBytesSync();
         final i1 = decodeTiff(bytes);
         expect(i1, isNotNull);
@@ -164,7 +164,7 @@ void main() {
               ..writeAsBytesSync(encodePng(i3));
           });
         }
-      });*/
+      });
     });
   });
 }
