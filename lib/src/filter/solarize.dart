@@ -1,20 +1,24 @@
 import '../image/image.dart';
 import '../util/min_max.dart';
 
+  enum Modes {
+    highlights,
+    shadows
+  }
 /// Solarize the colors of the [src] image - Started from invert.dart file.
-Image solarize(Image src, {required int threshold, required String mode}) {
-  /// threshold should be int from 1 to 254; mode should either 'shadow' or ' '
-  /// mode ' ' is normal solarization, bright objetcs become black
-  /// mode shadow will solarize the shadows like a Man Ray photograph
+Image solarize(Image src, {required int threshold, required int md}) {
+  /// threshold should be int from 1 to 254; mode should either '0' or '1'
+  /// mode '0' is normal solarization, bright objetcs become black
+  /// mode '1' will solarize the shadows like a Man Ray photograph
   final max = src.maxChannelValue;
   final trld = (max * (threshold / 255)).toInt();
-
+  final mode = Modes.values[md].toString();
   for (final frame in src.frames) {
     if (src.hasPalette) {
       final p = frame.palette!;
       final numColors = p.numColors;
       for (var i = 0; i < numColors; ++i) {
-        if (mode == "") {
+        if (mode == "highlights") {
           if (p.getGreen(i) > trld) {
             final r = max - p.getRed(i);
             final g = max - p.getGreen(i);
@@ -43,7 +47,7 @@ Image solarize(Image src, {required int threshold, required String mode}) {
     } else {
       if (max != 0.0) {
         for (final p in frame) {
-          if (mode == "") {
+          if (mode == "highlights") {
             if (p.g > trld) {
               p
                 ..r = max - p.r
