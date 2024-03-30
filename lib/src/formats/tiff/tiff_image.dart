@@ -383,8 +383,8 @@ class TiffImage {
         throw ImageException('Unsupported Compression Type: $compression');
       }
 
-      for (var y = 0, py = outY; y < tileHeight && py < height; ++y, ++py) {
-        for (var x = 0, px = outX; x < tileWidth && px < width; ++x, ++px) {
+      for (var y = 0, py = outY; y < tileHeight; ++y, ++py) {
+        for (var x = 0, px = outX; x < tileWidth; ++x, ++px) {
           if (samplesPerPixel == 1) {
             if (sampleFormat == TiffFormat.float) {
               num sample = 0;
@@ -395,7 +395,9 @@ class TiffImage {
               } else if (bitsPerSample == 16) {
                 sample = Float16.float16ToDouble(byteData.readUint16());
               }
-              image.setPixelR(px, py, sample);
+              if (px < width && py < height) {
+                image.setPixelR(px, py, sample);
+              }
             } else {
               var sample = 0;
               if (bitsPerSample == 8) {
@@ -417,7 +419,9 @@ class TiffImage {
                 sample = mx - sample;
               }
 
-              image.setPixelR(px, py, sample);
+              if (px < width && py < height) {
+                image.setPixelR(px, py, sample);
+              }
             }
           } else if (samplesPerPixel == 2) {
             var gray = 0;
@@ -445,7 +449,9 @@ class TiffImage {
                   : byteData.readUint32();
             }
 
-            image.setPixelRgb(px, py, gray, alpha, 0);
+            if (px < width && py < height) {
+              image.setPixelRgb(px, py, gray, alpha, 0);
+            }
           } else if (samplesPerPixel == 3) {
             if (sampleFormat == TiffFormat.float) {
               var r = 0.0;
@@ -464,7 +470,9 @@ class TiffImage {
                 g = Float16.float16ToDouble(byteData.readUint16());
                 b = Float16.float16ToDouble(byteData.readUint16());
               }
-              image.setPixelRgb(px, py, r, g, b);
+              if (px < width && py < height) {
+                image.setPixelRgb(px, py, r, g, b);
+              }
             } else {
               var r = 0;
               var g = 0;
@@ -501,7 +509,9 @@ class TiffImage {
                     : byteData.readUint32();
               }
 
-              image.setPixelRgb(px, py, r, g, b);
+              if (px < width && py < height) {
+                image.setPixelRgb(px, py, r, g, b);
+              }
             }
           } else if (samplesPerPixel >= 4) {
             if (sampleFormat == TiffFormat.float) {
@@ -525,7 +535,9 @@ class TiffImage {
                 b = Float16.float16ToDouble(byteData.readUint16());
                 a = Float16.float16ToDouble(byteData.readUint16());
               }
-              image.setPixelRgba(px, py, r, g, b, a);
+              if (px < width && py < height) {
+                image.setPixelRgba(px, py, r, g, b, a);
+              }
             } else {
               var r = 0;
               var g = 0;
@@ -580,7 +592,9 @@ class TiffImage {
                 a = image.maxChannelValue as int;
               }
 
-              image.setPixelRgba(px, py, r, g, b, a);
+              if (px < width && py < height) {
+                image.setPixelRgba(px, py, r, g, b, a);
+              }
             }
           }
         }
