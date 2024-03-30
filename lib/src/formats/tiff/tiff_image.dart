@@ -366,7 +366,7 @@ class TiffImage {
         _decodePackBits(p, bytesInThisTile, byteData.buffer);
       } else if (compression == TiffCompression.deflate) {
         final data = p.toList(0, byteCount);
-        final outData = Inflate(data).getBytes();
+        final outData = const ZLibDecoder().decodeBytes(data);
         byteData = InputBuffer(outData);
       } else if (compression == TiffCompression.zip) {
         final data = p.toList(0, byteCount);
@@ -708,7 +708,7 @@ class TiffImage {
       byteData = InputBuffer(outData);
     } else if (compression == TiffCompression.deflate) {
       final data = p.toList(0, byteCount);
-      final outData = Inflate(data).getBytes();
+      final outData = const ZLibDecoder().decodeBytes(data);
       byteData = InputBuffer(outData);
     } else if (compression == TiffCompression.none) {
       byteData = p;
