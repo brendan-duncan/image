@@ -328,6 +328,15 @@ Image sobel(Image src, { num amount = 1, Image? mask, Channel maskChannel = Chan
 
 ![sobel](images/filter/sobel.png)
 
+### [solarize](https://pub.dev/documentation/image/latest/image/solarize.html)
+
+```dart
+enum SolarizeMode { highlights, shadows }
+Image solarize(Image src, { required int threshold, SolarizeMode mode = SolarizeMode.highlights })
+```
+
+![solarize](images/filter/solarize_highlights.png)
+
 ### [stretchDistortion](https://pub.dev/documentation/image/latest/image/stretchDistortion.html)
 
 ```dart

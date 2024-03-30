@@ -77,6 +77,7 @@ export 'src/filter/sepia.dart';
 export 'src/filter/sketch.dart';
 export 'src/filter/smooth.dart';
 export 'src/filter/sobel.dart';
+export 'src/filter/solarize.dart';
 export 'src/filter/stretch_distortion.dart';
 export 'src/filter/vignette.dart';
 export 'src/font/arial_14.dart';
