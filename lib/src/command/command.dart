@@ -527,8 +527,8 @@ class Command {
 
   void drawString(String string,
       {required BitmapFont font,
-      required int x,
-      required int y,
+      int? x,
+      int? y,
       Color? color,
       bool wrap = false,
       bool rightJustify = false,
