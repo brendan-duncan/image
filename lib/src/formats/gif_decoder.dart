@@ -213,7 +213,7 @@ class GifDecoder extends Decoder {
       if (frame.disposal == 2) {
         nextImage.clear(colorMap.color(info!.backgroundColor!.r as int));
       } else if (frame.disposal != 3) {
-        final nextBytes = nextImage.toUint8List();
+        /*final nextBytes = nextImage.toUint8List();
         final lastBytes = lastImage.toUint8List();
         final lp = lastImage.palette!;
         for (var i = 0, l = nextBytes.length; i < l; ++i) {
@@ -223,7 +223,7 @@ class GifDecoder extends Decoder {
           if (nc != -1) {
             nextBytes[i] = nc;
           }
-        }
+        }*/
       }
 
       nextImage.frameDuration = image.frameDuration;
