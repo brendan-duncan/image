@@ -255,7 +255,8 @@ Future<Image?> decodeImageFile(String path, {int? frame}) async {
 
   final decoder = findDecoderForNamedImage(path);
   if (decoder != null) {
-    return decoder.decode(bytes, frame: frame);
+    return decoder.decode(bytes, frame: frame) ??
+        decodeImage(bytes, frame: frame);
   }
 
   return decodeImage(bytes, frame: frame);
