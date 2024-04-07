@@ -11,7 +11,7 @@ import '../util/math_util.dart';
 ///
 /// [whites] defines the white level of the image, as a color.
 ///
-/// [mids] defines the mid level of hte image, as a color.
+/// [mids] defines the mid level of the image, as a color.
 ///
 /// [contrast] increases (> 1) / decreases (< 1) the contrast of the image by
 /// pushing colors away/toward neutral gray, where at 0.0 the image is entirely
@@ -57,8 +57,8 @@ Image adjustColor(Image src,
     return src;
   }
 
-  contrast = contrast?.clamp(0, 1);
-  saturation = saturation?.clamp(0, 1);
+  contrast = contrast?.clamp(0, 2);
+  saturation = saturation?.clamp(0, 2);
   gamma = gamma?.clamp(0, 1000);
   exposure = exposure?.clamp(0, 1000);
   amount = amount.clamp(0, 1000);
@@ -94,8 +94,8 @@ Image adjustColor(Image src,
   }
 
   final num invSaturation =
-      saturation != null ? 1.0 - saturation.clamp(0, 1) : 0.0;
-  final num invContrast = contrast != null ? 1.0 - contrast.clamp(0, 1) : 0.0;
+      saturation != null ? 1.0 - saturation.clamp(0, 2) : 0.0;
+  final num invContrast = contrast != null ? 1.0 - contrast.clamp(0, 2) : 0.0;
 
   if (exposure != null) {
     exposure = pow(2.0, exposure);
