@@ -83,7 +83,7 @@ class GifDecoder extends Decoder {
             }
             break;
           case terminateRecordType:
-          //_numFrames = info.numFrames;
+            //_numFrames = info.numFrames;
             return info;
           default:
             break;
@@ -207,7 +207,7 @@ class GifDecoder extends Decoder {
       }
 
       final colorMap =
-      (frame.colorMap != null) ? frame.colorMap! : info!.globalColorMap!;
+          (frame.colorMap != null) ? frame.colorMap! : info!.globalColorMap!;
 
       final nextImage = Image(
           width: lastImage.width,
@@ -310,8 +310,8 @@ class GifDecoder extends Decoder {
       final row = gifImage.y;
       for (var i = 0, j = 0; i < 4; ++i) {
         for (var y = row + interlacedOffset[i];
-        y < row + height;
-        y += interlacedJump[i], ++j) {
+            y < row + height;
+            y += interlacedJump[i], ++j) {
           if (!_getLine(line)) {
             return image;
           }
