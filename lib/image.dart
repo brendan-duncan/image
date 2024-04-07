@@ -111,6 +111,7 @@ export 'src/formats/gif_decoder.dart';
 export 'src/formats/gif_encoder.dart';
 export 'src/formats/ico/ico_info.dart';
 export 'src/formats/ico_decoder.dart';
+export 'src/formats/image_format.dart';
 export 'src/formats/jpeg/jpeg_adobe.dart';
 export 'src/formats/jpeg/jpeg_component.dart';
 export 'src/formats/jpeg/jpeg_data.dart';
