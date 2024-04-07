@@ -7,6 +7,7 @@ import 'decoder.dart';
 import 'gif/gif_color_map.dart';
 import 'gif/gif_image_desc.dart';
 import 'gif/gif_info.dart';
+import 'image_format.dart';
 
 /// A decoder for the GIF image format. This supports both single frame and
 /// animated GIF files, and transparency.
@@ -18,6 +19,9 @@ class GifDecoder extends Decoder {
       startDecode(bytes);
     }
   }
+
+  @override
+  ImageFormat get format => ImageFormat.gif;
 
   /// Is the given file a valid Gif image?
   @override

@@ -15,12 +15,16 @@ import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 import 'png/png_frame.dart';
 import 'png/png_info.dart';
 
 /// Decode a PNG encoded image.
 class PngDecoder extends Decoder {
   final _info = InternalPngInfo();
+
+  @override
+  ImageFormat get format => ImageFormat.png;
 
   /// Is the given file a valid PNG image?
   @override

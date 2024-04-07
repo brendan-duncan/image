@@ -5,6 +5,7 @@ import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 import 'jpeg/jpeg_data.dart';
 import 'jpeg/jpeg_info.dart';
 
@@ -12,6 +13,9 @@ import 'jpeg/jpeg_info.dart';
 class JpegDecoder extends Decoder {
   JpegInfo? info;
   InputBuffer? input;
+
+  @override
+  ImageFormat get format => ImageFormat.jpg;
 
   /// Is the given file a valid JPEG image?
   @override

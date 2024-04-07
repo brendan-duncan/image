@@ -4,6 +4,7 @@ import '../exif/exif_data.dart';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 import 'tiff/tiff_image.dart';
 import 'tiff/tiff_info.dart';
 
@@ -11,6 +12,9 @@ class TiffDecoder extends Decoder {
   TiffInfo? info;
   ExifData? exif;
   late InputBuffer _input;
+
+  @override
+  ImageFormat get format => ImageFormat.tiff;
 
   /// Is the given file a valid TIFF image?
   @override

@@ -4,6 +4,7 @@ import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 import 'webp/vp8.dart';
 import 'webp/vp8l.dart';
 import 'webp/webp_frame.dart';
@@ -19,6 +20,9 @@ class WebPDecoder extends Decoder {
       startDecode(bytes);
     }
   }
+
+  @override
+  ImageFormat get format => ImageFormat.webp;
 
   WebPInfo? get info => _info;
 

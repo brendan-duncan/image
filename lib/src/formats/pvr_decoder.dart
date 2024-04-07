@@ -4,6 +4,7 @@ import '../image/image.dart';
 import '../util/input_buffer.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 import 'pvr/pvr_info.dart';
 import 'pvr/pvr_packet.dart';
 
@@ -12,6 +13,9 @@ import 'pvr/pvr_packet.dart';
 class PvrDecoder extends Decoder {
   Uint8List? _data;
   DecodeInfo? _info;
+
+  @override
+  ImageFormat get format => ImageFormat.pvr;
 
   @override
   bool isValidFile(Uint8List bytes) => startDecode(bytes) != null;
