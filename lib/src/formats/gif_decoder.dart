@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../color/color_uint8.dart';
 import '../image/image.dart';
+import '../util/color_util.dart';
 import '../util/input_buffer.dart';
 import 'decoder.dart';
 import 'gif/gif_color_map.dart';
@@ -82,7 +83,7 @@ class GifDecoder extends Decoder {
             }
             break;
           case terminateRecordType:
-            //_numFrames = info.numFrames;
+          //_numFrames = info.numFrames;
             return info;
           default:
             break;
@@ -206,7 +207,7 @@ class GifDecoder extends Decoder {
       }
 
       final colorMap =
-          (frame.colorMap != null) ? frame.colorMap! : info!.globalColorMap!;
+      (frame.colorMap != null) ? frame.colorMap! : info!.globalColorMap!;
 
       final nextImage = Image(
           width: lastImage.width,
@@ -217,7 +218,7 @@ class GifDecoder extends Decoder {
       if (frame.disposal == 2) {
         nextImage.clear(colorMap.color(info!.backgroundColor!.r as int));
       } else if (frame.disposal != 3) {
-        /*final nextBytes = nextImage.toUint8List();
+        final nextBytes = nextImage.toUint8List();
         final lastBytes = lastImage.toUint8List();
         final lp = lastImage.palette!;
         for (var i = 0, l = nextBytes.length; i < l; ++i) {
@@ -227,7 +228,7 @@ class GifDecoder extends Decoder {
           if (nc != -1) {
             nextBytes[i] = nc;
           }
-        }*/
+        }
       }
 
       nextImage.frameDuration = image.frameDuration;
@@ -309,8 +310,8 @@ class GifDecoder extends Decoder {
       final row = gifImage.y;
       for (var i = 0, j = 0; i < 4; ++i) {
         for (var y = row + interlacedOffset[i];
-            y < row + height;
-            y += interlacedJump[i], ++j) {
+        y < row + height;
+        y += interlacedJump[i], ++j) {
           if (!_getLine(line)) {
             return image;
           }
