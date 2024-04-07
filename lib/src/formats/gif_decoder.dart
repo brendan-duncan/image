@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import '../color/color_uint8.dart';
 import '../image/image.dart';
-import '../util/color_util.dart';
 import '../util/input_buffer.dart';
 import 'decoder.dart';
 import 'gif/gif_color_map.dart';
