@@ -30,15 +30,32 @@ class GifColorMap {
   }
 
   int findColor(num r, num g, num b, num a) {
+    num closestDistance = -1;
+    var closestIndex = -1;
     for (var i = 0; i < numColors; ++i) {
-      if (_palette.getRed(i) == r &&
-          _palette.getGreen(i) == g &&
-          _palette.getBlue(i) == b &&
-          _palette.getAlpha(i) == a) {
+      final pr = _palette.getRed(i);
+      final pg = _palette.getGreen(i);
+      final pb = _palette.getBlue(i);
+      final pa = _palette.getAlpha(i);
+      if (pr == r && pg == g && pb == b && pa == a) {
         return i;
       }
+      final dr = r - pr;
+      final dg = g - pg;
+      final db = b - pb;
+      final da = a - pa;
+      final d2 = (dr * dr) + (dg * dg) + (db * db) + (da * da);
+      if (closestIndex == -1) {
+        closestIndex = i;
+        closestDistance = d2;
+      } else {
+        if (d2 < closestDistance) {
+          closestIndex = i;
+          closestDistance = d2;
+        }
+      }
     }
-    return -1;
+    return closestIndex;
   }
 
   int red(int color) => _palette.getRed(color) as int;
