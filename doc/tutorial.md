@@ -159,13 +159,13 @@ List<img.Image> splitImage(img.Image inputImage, int horizontalPieceCount, int v
   final pieceHeight = (image.height / verticalPieceCount).round();
   final pieceList = List<imglib.Image>.empty(growable: true);
 
-  for (var y = 0; y < image.height; y += pieceHieght) {
+  for (var y = 0; y < image.height; y += pieceHeight) {
     for (var x = 0; x < image.width; x += pieceWidth) {
       pieceList.add(img.copyCrop(image, x: x, y: y, width: pieceWidth, height: pieceHeight));
     }
   }
   
-  return outputImageList;
+  return pieceList;
 }
 ```
 
