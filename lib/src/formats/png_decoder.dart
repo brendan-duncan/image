@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
+import '../../image.dart';
 import '../color/color_uint8.dart';
 import '../color/format.dart';
 import '../draw/blend_mode.dart';
@@ -179,16 +180,25 @@ class PngDecoder extends Decoder {
           _input.skip(4); // CRC
           break;
         case 'fcTL': // Frame control chunk
+          final sequenceNumber = _input.readUint32();
+          final width = _input.readUint32();
+          final height = _input.readUint32();
+          final xOffset = _input.readUint32();
+          final yOffset = _input.readUint32();
+          final delayNum = _input.readUint16();
+          final delayDen = _input.readUint16();
+          final dispose = _input.readByte();
+          final blend = _input.readByte();
           final frame = InternalPngFrame(
-              sequenceNumber: _input.readUint32(),
-              width: _input.readUint32(),
-              height: _input.readUint32(),
-              xOffset: _input.readUint32(),
-              yOffset: _input.readUint32(),
-              delayNum: _input.readUint16(),
-              delayDen: _input.readUint16(),
-              dispose: PngDisposeMode.values[_input.readByte()],
-              blend: PngBlendMode.values[_input.readByte()]);
+              sequenceNumber: sequenceNumber,
+              width: width,
+              height: height,
+              xOffset: xOffset,
+              yOffset: yOffset,
+              delayNum: delayNum,
+              delayDen: delayDen,
+              dispose: PngDisposeMode.values[dispose],
+              blend: PngBlendMode.values[blend]);
           _info.frames.add(frame);
           _input.skip(4); // CRC
           break;
@@ -483,12 +493,14 @@ class PngDecoder extends Decoder {
       }
 
       if (firstImage == null || lastImage == null) {
-        firstImage = image;
-        lastImage = image
+        firstImage = image.convert(numChannels: image.numChannels);
+        lastImage = firstImage
           // Convert to MS
           ..frameDuration = (frame.delay * 1000).toInt();
         continue;
       }
+
+      final prevFrame = _info.frames[i - 1];
 
       if (image.width == lastImage.width &&
           image.height == lastImage.height &&
@@ -502,19 +514,34 @@ class PngDecoder extends Decoder {
         continue;
       }
 
-      final dispose = frame.dispose;
+      lastImage = Image.from(firstImage.getFrame(i - 1));
+
+      final dispose = prevFrame.dispose;
       if (dispose == PngDisposeMode.background) {
-        lastImage = Image.from(lastImage)..clear(_info.backgroundColor);
-      } else if (dispose == PngDisposeMode.previous) {
-        lastImage = Image.from(lastImage);
-      } else {
-        lastImage = Image.from(lastImage);
+        fillRect(lastImage,
+            x1: prevFrame.xOffset,
+            y1: prevFrame.yOffset,
+            x2: prevFrame.xOffset + prevFrame.width - 1,
+            y2: prevFrame.yOffset + prevFrame.height - 1,
+            color: _info.backgroundColor ?? ColorRgba8(0, 0, 0, 0),
+            alphaBlend: false);
+      } else if (dispose == PngDisposeMode.previous && i > 1) {
+        final prevImage = firstImage.getFrame(i - 2);
+        lastImage = compositeImage(lastImage, prevImage,
+            dstX: prevFrame.xOffset,
+            dstY: prevFrame.yOffset,
+            dstW: prevFrame.width,
+            dstH: prevFrame.height,
+            srcX: prevFrame.xOffset,
+            srcY: prevFrame.yOffset,
+            srcW: prevFrame.width,
+            srcH: prevFrame.height);
       }
 
       // Convert to MS
       lastImage.frameDuration = (frame.delay * 1000).toInt();
 
-      compositeImage(lastImage, image,
+      lastImage = compositeImage(lastImage, image,
           dstX: frame.xOffset,
           dstY: frame.yOffset,
           blend: frame.blend == PngBlendMode.over
