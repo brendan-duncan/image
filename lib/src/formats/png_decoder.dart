@@ -3,11 +3,11 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
-import '../../image.dart';
 import '../color/color_uint8.dart';
 import '../color/format.dart';
 import '../draw/blend_mode.dart';
 import '../draw/composite_image.dart';
+import '../draw/fill_rect.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/palette_uint8.dart';
