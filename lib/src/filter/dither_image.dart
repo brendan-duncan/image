@@ -60,6 +60,7 @@ const _ditherKernels = [
 
 /// Dither an image to reduce banding patterns when reducing the number of
 /// colors.
+/// Derived from http://jsbin.com/iXofIji/2/edit
 Image ditherImage(Image image,
     {Quantizer? quantizer,
     DitherKernel kernel = DitherKernel.floydSteinberg,
@@ -80,15 +81,18 @@ Image ditherImage(Image image,
   final indexedImage =
       Image(width: width, height: height, numChannels: 1, palette: palette);
 
-  final pIter = image.iterator..moveNext();
+  final imageCopy = image.clone();
 
-  var index = 0;
+  final pIter = imageCopy.iterator..moveNext();
+
   for (var y = 0; y < height; y++) {
-    if (serpentine) direction = direction * -1;
+    if (serpentine) {
+      direction = direction * -1;
+    }
 
     final x0 = direction == 1 ? 0 : width - 1;
     final x1 = direction == 1 ? width : 0;
-    for (var x = x0; x != x1; x += direction, ++index, pIter.moveNext()) {
+    for (var x = x0; x != x1; x += direction, pIter.moveNext()) {
       // Get original color
       final pc = pIter.current;
       final r1 = pc[0].toInt();
@@ -96,8 +100,8 @@ Image ditherImage(Image image,
       final b1 = pc[2].toInt();
 
       // Get converted color
-      var idx = quantizer.getColorIndexRgb(r1, g1, b1);
-      indexedImage.setPixelRgb(x, y, idx, 0, 0);
+      final idx = quantizer.getColorIndexRgb(r1, g1, b1);
+      indexedImage.setPixelIndex(x, y, idx);
 
       final r2 = palette.get(idx, 0);
       final g2 = palette.get(idx, 1);
@@ -118,13 +122,13 @@ Image ditherImage(Image image,
         final y1 = ds[i][2].toInt();
         if (x1 + x >= 0 && x1 + x < width && y1 + y >= 0 && y1 + y < height) {
           final d = ds[i][0];
-          idx = index + x1 + (y1 * width);
-          idx *= 4;
-          final p2 = image.getPixel(x1, y1);
+          final nx = x + x1;
+          final ny = y + y1;
+          final p2 = imageCopy.getPixel(nx, ny);
           p2
-            ..r = max(0, min(255, (p2.r + er * d).toInt()))
-            ..g = max(0, min(255, (p2.g + er * d).toInt()))
-            ..b = max(0, min(255, (p2.b + er * d).toInt()));
+            ..r = p2.r + er * d
+            ..g = p2.g + eg * d
+            ..b = p2.b + eb * d;
         }
       }
     }
