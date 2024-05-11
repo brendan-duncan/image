@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../filter/dither_image.dart';
 import '../image/image.dart';
+import '../util/binary_quantizer.dart';
 import '../util/image_exception.dart';
 import '../util/neural_quantizer.dart';
 import '../util/octree_quantizer.dart';
@@ -39,8 +40,10 @@ class GifEncoder extends Encoder {
         if (quantizerType == QuantizerType.neural) {
           _lastColorMap = NeuralQuantizer(image,
               numberOfColors: numColors, samplingFactor: samplingFactor);
-        } else {
+        } else if (quantizerType == QuantizerType.octree) {
           _lastColorMap = OctreeQuantizer(image, numberOfColors: numColors);
+        } else if (quantizerType == QuantizerType.binary) {
+          _lastColorMap = BinaryQuantizer();
         }
 
         _lastImage = ditherImage(image,
@@ -71,8 +74,10 @@ class GifEncoder extends Encoder {
       if (quantizerType == QuantizerType.neural) {
         _lastColorMap = NeuralQuantizer(image,
             numberOfColors: numColors, samplingFactor: samplingFactor);
-      } else {
+      } else if (quantizerType == QuantizerType.octree) {
         _lastColorMap = OctreeQuantizer(image, numberOfColors: numColors);
+      } else if (quantizerType == QuantizerType.binary) {
+        _lastColorMap = BinaryQuantizer();
       }
 
       _lastImage = ditherImage(image,

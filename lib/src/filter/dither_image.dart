@@ -116,7 +116,9 @@ Image ditherImage(Image image,
       for (var i = i0; i != i1; i += direction) {
         final x1 = ds[i][1].toInt();
         final y1 = ds[i][2].toInt();
-        if ((x1 + x) >= 0 && (x1 + x) < width && (y1 + y) >= 0 &&
+        if ((x1 + x) >= 0 &&
+            (x1 + x) < width &&
+            (y1 + y) >= 0 &&
             (y1 + y) < height) {
           final d = ds[i][0];
           final nx = x + x1;

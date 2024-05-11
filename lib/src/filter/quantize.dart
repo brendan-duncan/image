@@ -1,10 +1,11 @@
 import '../image/image.dart';
+import '../util/binary_quantizer.dart';
 import '../util/neural_quantizer.dart';
 import '../util/octree_quantizer.dart';
 import '../util/quantizer.dart';
 import 'dither_image.dart';
 
-enum QuantizeMethod { neuralNet, octree }
+enum QuantizeMethod { neuralNet, octree, binary }
 
 /// Quantize the number of colors in image to 256.
 Image quantize(Image src,
@@ -16,8 +17,10 @@ Image quantize(Image src,
 
   if (method == QuantizeMethod.octree || numberOfColors < 4) {
     quantizer = OctreeQuantizer(src, numberOfColors: numberOfColors);
-  } else {
+  } else if (method == QuantizeMethod.octree) {
     quantizer = NeuralQuantizer(src, numberOfColors: numberOfColors);
+  } else {
+    quantizer = BinaryQuantizer();
   }
 
   return ditherImage(src,

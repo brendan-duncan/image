@@ -32,12 +32,18 @@ void main() {
         ..writeAsBytesSync(encodePng(q1));
 
       final i2 = decodePng(bytes)!;
-      final q2 =
-          quantize(grayscale(i2), numberOfColors: 2,
-              dither: DitherKernel.floydSteinberg);
+      final q2 = quantize(grayscale(i2),
+          numberOfColors: 2, dither: DitherKernel.floydSteinberg);
       File('$testOutputPath/filter/quantize_neural_dither.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(q2));
+
+      final i3 = decodePng(File('test/_data/png/david.png').readAsBytesSync())!;
+      final q3 = quantize(i3,
+          method: QuantizeMethod.binary, dither: DitherKernel.floydSteinberg);
+      File('$testOutputPath/filter/quantize_binary.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(q3));
     });
   });
 }

@@ -2,7 +2,7 @@ import '../color/color.dart';
 import '../image/image.dart';
 import '../image/palette.dart';
 
-enum QuantizerType { octree, neural }
+enum QuantizerType { octree, neural, binary }
 
 /// Abstract class for color quantizers, which reduce the total number of colors
 /// used by an image to a given maximum, used to convert images to palette
