@@ -33,7 +33,8 @@ void main() {
 
       final i2 = decodePng(bytes)!;
       final q2 =
-          quantize(i2, numberOfColors: 32, dither: DitherKernel.floydSteinberg);
+          quantize(grayscale(i2), numberOfColors: 2,
+              dither: DitherKernel.floydSteinberg);
       File('$testOutputPath/filter/quantize_neural_dither.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(q2));

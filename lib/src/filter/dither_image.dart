@@ -81,8 +81,6 @@ Image ditherImage(Image image,
 
   final imageCopy = image.clone();
 
-  final pIter = imageCopy.iterator..moveNext();
-
   for (var y = 0; y < height; y++) {
     if (serpentine) {
       direction = direction * -1;
@@ -90,9 +88,9 @@ Image ditherImage(Image image,
 
     final x0 = direction == 1 ? 0 : width - 1;
     final x1 = direction == 1 ? width : 0;
-    for (var x = x0; x != x1; x += direction, pIter.moveNext()) {
+    for (var x = x0; x != x1; x += direction) {
       // Get original color
-      final pc = pIter.current;
+      final pc = imageCopy.getPixel(x, y);
       final r1 = pc[0].toInt();
       final g1 = pc[1].toInt();
       final b1 = pc[2].toInt();
@@ -118,7 +116,8 @@ Image ditherImage(Image image,
       for (var i = i0; i != i1; i += direction) {
         final x1 = ds[i][1].toInt();
         final y1 = ds[i][2].toInt();
-        if (x1 + x >= 0 && x1 + x < width && y1 + y >= 0 && y1 + y < height) {
+        if ((x1 + x) >= 0 && (x1 + x) < width && (y1 + y) >= 0 &&
+            (y1 + y) < height) {
           final d = ds[i][0];
           final nx = x + x1;
           final ny = y + y1;
