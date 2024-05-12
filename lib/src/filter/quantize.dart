@@ -17,7 +17,7 @@ Image quantize(Image src,
 
   if (method == QuantizeMethod.octree || numberOfColors < 4) {
     quantizer = OctreeQuantizer(src, numberOfColors: numberOfColors);
-  } else if (method == QuantizeMethod.octree) {
+  } else if (method == QuantizeMethod.neuralNet) {
     quantizer = NeuralQuantizer(src, numberOfColors: numberOfColors);
   } else {
     quantizer = BinaryQuantizer();

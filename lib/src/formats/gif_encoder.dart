@@ -42,7 +42,7 @@ class GifEncoder extends Encoder {
               numberOfColors: numColors, samplingFactor: samplingFactor);
         } else if (quantizerType == QuantizerType.octree) {
           _lastColorMap = OctreeQuantizer(image, numberOfColors: numColors);
-        } else if (quantizerType == QuantizerType.binary) {
+        } else {
           _lastColorMap = BinaryQuantizer();
         }
 
@@ -76,7 +76,7 @@ class GifEncoder extends Encoder {
             numberOfColors: numColors, samplingFactor: samplingFactor);
       } else if (quantizerType == QuantizerType.octree) {
         _lastColorMap = OctreeQuantizer(image, numberOfColors: numColors);
-      } else if (quantizerType == QuantizerType.binary) {
+      } else {
         _lastColorMap = BinaryQuantizer();
       }
 
