@@ -19,7 +19,9 @@ Image contrast(Image src,
   if (contrast == 100.0) {
     return src;
   }
-
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   if (contrast != _lastContrast) {
     _lastContrast = contrast;
 

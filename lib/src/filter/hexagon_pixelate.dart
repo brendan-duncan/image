@@ -10,6 +10,9 @@ Image hexagonPixelate(Image src,
     num amount = 1,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     final w = frame.width - 1;
     final h = frame.height - 1;

@@ -10,7 +10,9 @@ Image sepia(Image src,
   if (amount == 0) {
     return src;
   }
-
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     for (final p in frame) {
       final r = p.rNormalized;

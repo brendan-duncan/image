@@ -12,6 +12,10 @@ Image billboard(Image src,
     Channel maskChannel = Channel.luminance}) {
   const rs = 0.2025; // pow(0.45, 2.0);
 
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
+
   for (final frame in src.frames) {
     final w = frame.width;
     final h = frame.height;

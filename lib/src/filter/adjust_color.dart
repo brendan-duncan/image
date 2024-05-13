@@ -57,6 +57,10 @@ Image adjustColor(Image src,
     return src;
   }
 
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
+
   contrast = contrast?.clamp(0, 2);
   saturation = saturation?.clamp(0, 2);
   gamma = gamma?.clamp(0, 1000);

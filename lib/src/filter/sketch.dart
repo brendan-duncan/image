@@ -12,7 +12,9 @@ Image sketch(Image src,
   if (amount == 0) {
     return src;
   }
-
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     final width = frame.width;
     final height = frame.height;

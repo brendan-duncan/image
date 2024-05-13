@@ -26,7 +26,9 @@ Image pixelate(Image src,
   if (size <= 1) {
     return src;
   }
-
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     final w = frame.width;
     final h = frame.height;

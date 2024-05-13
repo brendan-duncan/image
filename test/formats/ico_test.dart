@@ -9,6 +9,16 @@ import '../_test_util.dart';
 void main() {
   group('Format', () {
     group('ico', () {
+      test('encode palette', () async {
+        var img = await decodePngFile('test/_data/png/buck_8.png');
+        img = copyResize(img!, width: 256);
+        img = vignette(img);
+        final ico = IcoEncoder().encode(img);
+        File('$testOutputPath/ico/buck_8.ico')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(ico);
+      });
+
       test('encode', () {
         final image = Image(width: 64, height: 64)
           ..clear(ColorRgb8(100, 200, 255));

@@ -8,7 +8,12 @@ import '../image/image.dart';
 /// height and 1 a high value. The optional [strength] parameter allows to set
 /// the strength of the normal image.
 Image bumpToNormal(Image src, {num strength = 2.0}) {
-  final dest = Image.from(src);
+  Image dest;
+  if (src.hasPalette) {
+    dest = src.convert(numChannels: src.numChannels);
+  } else {
+    dest = Image.from(src);
+  }
 
   final mx = src.maxChannelValue;
   for (final frame in src.frames) {

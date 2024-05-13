@@ -13,6 +13,9 @@ Image bulgeDistortion(Image src,
     Interpolation interpolation = Interpolation.nearest,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     final orig = frame.clone(noAnimation: true);
     final w = frame.width;

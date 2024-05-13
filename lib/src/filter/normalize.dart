@@ -20,7 +20,9 @@ Image normalize(Image src,
   if (mn == mx) {
     return src;
   }
-
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   final fm = mn.toDouble();
   final fM = mx.toDouble();
 
