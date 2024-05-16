@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../../exif/exif_data.dart';
 import '../../image/image.dart';
 import '../../util/_internal.dart';
 import '../../util/input_buffer.dart';
@@ -68,6 +69,11 @@ class VP8 {
     // Main decoding loop
     if (!_parseFrame()) {
       return null;
+    }
+
+    if (webp.exif.isNotEmpty) {
+      final input = InputBuffer(webp.exif.codeUnits);
+      output!.exif = ExifData.fromInputBuffer(input);
     }
 
     return output;

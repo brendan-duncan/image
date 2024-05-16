@@ -8,13 +8,19 @@ void main() {
   group('Format', () {
     const path = 'test/_data/webp';
     group('webp', () {
+      test('exif', () async {
+        final webp = await decodeWebPFile('test/_data/webp/buck_24.webp');
+        expect(webp, isNotNull);
+        expect(webp!.exif.imageIfd['Orientation'], IfdValueShort(1));
+      });
+
       test('animated_lossy', () async {
         final anim =
             await decodeWebPFile('test/_data/webp/animated_lossy.webp');
         expect(anim, isNotNull);
         for (final frame in anim!.frames) {
           await encodePngFile(
-              '$testOutputPath/webp/aniamted_lossy_${frame.frameIndex}.png',
+              '$testOutputPath/webp/animated_lossy_${frame.frameIndex}.png',
               frame);
         }
       });

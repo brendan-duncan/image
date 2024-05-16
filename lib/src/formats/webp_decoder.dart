@@ -1,3 +1,4 @@
+import '../../image.dart';
 import '../color/color_uint8.dart';
 import '../draw/composite_image.dart';
 import '../image/image.dart';
@@ -229,13 +230,13 @@ class WebPDecoder extends Decoder {
           webp!.vp8Position = input.position;
           webp.vp8Size = size;
           webp.format = WebPFormat.lossy;
-          found = true;
+          //found = true;
           break;
         case 'VP8L':
           webp!.vp8Position = input.position;
           webp.vp8Size = size;
           webp.format = WebPFormat.lossless;
-          found = true;
+          //found = true;
           break;
         case 'ALPH':
           webp!.alphaData =
