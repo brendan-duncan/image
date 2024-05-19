@@ -4,6 +4,7 @@ import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 import 'webp/vp8.dart';
 import 'webp/vp8l.dart';
 import 'webp/webp_frame.dart';
@@ -19,6 +20,9 @@ class WebPDecoder extends Decoder {
       startDecode(bytes);
     }
   }
+
+  @override
+  ImageFormat get format => ImageFormat.webp;
 
   WebPInfo? get info => _info;
 
@@ -207,8 +211,7 @@ class WebPDecoder extends Decoder {
   }
 
   bool _getInfo(InputBuffer input, InternalWebPInfo? webp) {
-    var found = false;
-    while (!input.isEOS && !found) {
+    while (!input.isEOS) {
       final tag = input.readString(4);
       final size = input.readUint32();
       // For odd sized chunks, there's a 1 byte padding at the end.
@@ -225,13 +228,11 @@ class WebPDecoder extends Decoder {
           webp!.vp8Position = input.position;
           webp.vp8Size = size;
           webp.format = WebPFormat.lossy;
-          found = true;
           break;
         case 'VP8L':
           webp!.vp8Position = input.position;
           webp.vp8Size = size;
           webp.format = WebPFormat.lossless;
-          found = true;
           break;
         case 'ALPH':
           webp!.alphaData =

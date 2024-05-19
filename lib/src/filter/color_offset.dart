@@ -11,6 +11,9 @@ Image colorOffset(Image src,
     num alpha = 0,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     for (final p in frame) {
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);

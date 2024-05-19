@@ -9,6 +9,9 @@ Image gamma(Image src,
     {required num gamma,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     for (final p in frame) {
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);

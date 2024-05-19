@@ -12,7 +12,9 @@ Image monochrome(Image src,
   if (amount == 0) {
     return src;
   }
-
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   final nr = color?.rNormalized ?? 0.45;
   final ng = color?.gNormalized ?? 0.6;
   final nb = color?.bNormalized ?? 0.3;

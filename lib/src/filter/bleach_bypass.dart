@@ -7,6 +7,9 @@ Image bleachBypass(Image src,
   const luminanceR = 0.2125;
   const luminanceG = 0.7154;
   const luminanceB = 0.0721;
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     for (final p in frame) {
       final r = p.rNormalized;

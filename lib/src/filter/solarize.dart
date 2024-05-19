@@ -11,6 +11,9 @@ Image solarize(Image src,
     {required int threshold, SolarizeMode mode = SolarizeMode.highlights}) {
   final max = src.maxChannelValue;
   final thresholdRange = (max * (threshold / 255)).toInt();
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     if (src.hasPalette) {
       final p = frame.palette!;

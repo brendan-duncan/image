@@ -10,6 +10,9 @@ Image separableConvolution(Image src,
     {required SeparableKernel kernel,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   final tmp = Image.from(src);
   // Apply the filter horizontally
   kernel

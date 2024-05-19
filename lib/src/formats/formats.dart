@@ -14,6 +14,7 @@ import 'gif_decoder.dart';
 import 'gif_encoder.dart';
 import 'ico_decoder.dart';
 import 'ico_encoder.dart';
+import 'image_format.dart';
 import 'jpeg/jpeg_util.dart';
 import 'jpeg_decoder.dart';
 import 'jpeg_encoder.dart';
@@ -107,6 +108,47 @@ Encoder? findEncoderForNamedImage(String name) {
     return PvrEncoder();
   }
   return null;
+}
+
+/// Find the [ImageFormat] for the given file data.
+ImageFormat findFormatForData(List<int> data) {
+  final decoder = findDecoderForData(data);
+  if (decoder == null) {
+    return ImageFormat.invalid;
+  }
+  return decoder.format;
+}
+
+/// Create a [Decoder] for the given [format] type.
+Decoder? createDecoderForFormat(ImageFormat format) {
+  switch (format) {
+    case ImageFormat.bmp:
+      return BmpDecoder();
+    case ImageFormat.exr:
+      return ExrDecoder();
+    case ImageFormat.gif:
+      return GifDecoder();
+    case ImageFormat.ico:
+      return IcoDecoder();
+    case ImageFormat.jpg:
+      return JpegDecoder();
+    case ImageFormat.png:
+      return PngDecoder();
+    case ImageFormat.pnm:
+      return PnmDecoder();
+    case ImageFormat.psd:
+      return PsdDecoder();
+    case ImageFormat.pvr:
+      return PvrDecoder();
+    case ImageFormat.tga:
+      return TgaDecoder();
+    case ImageFormat.tiff:
+      return TiffDecoder();
+    case ImageFormat.webp:
+      return WebPDecoder();
+    default:
+      return null;
+  }
 }
 
 /// Find a [Decoder] that is able to decode the given image [data].
@@ -213,7 +255,8 @@ Future<Image?> decodeImageFile(String path, {int? frame}) async {
 
   final decoder = findDecoderForNamedImage(path);
   if (decoder != null) {
-    return decoder.decode(bytes, frame: frame);
+    return decoder.decode(bytes, frame: frame) ??
+        decodeImage(bytes, frame: frame);
   }
 
   return decodeImage(bytes, frame: frame);

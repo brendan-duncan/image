@@ -4,6 +4,7 @@ import '../image/image.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'exr/exr_image.dart';
+import 'image_format.dart';
 
 /// Decode an OpenEXR formatted image.
 ///
@@ -20,6 +21,9 @@ class ExrDecoder extends Decoder {
   ExrImage? exrImage;
 
   ExrDecoder();
+
+  @override
+  ImageFormat get format => ImageFormat.exr;
 
   @override
   bool isValidFile(Uint8List bytes) => ExrImage.isValidFile(bytes);

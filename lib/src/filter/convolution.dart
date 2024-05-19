@@ -16,6 +16,9 @@ Image convolution(Image src,
     num amount = 1,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   final tmp = Image.from(src);
   for (final frame in src.frames) {
     final tmpFrame = tmp.frames[frame.frameIndex];

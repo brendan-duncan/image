@@ -5,6 +5,9 @@ import '../util/math_util.dart';
 /// Invert the colors of the [src] image.
 Image invert(Image src,
     {Image? mask, Channel maskChannel = Channel.luminance}) {
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   final max = src.maxChannelValue;
   for (final frame in src.frames) {
     if (src.hasPalette) {

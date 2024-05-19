@@ -5,6 +5,7 @@ import '../image/palette.dart';
 import '../util/input_buffer.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 import 'tga/tga_info.dart';
 
 /// Decode a TGA image. This only supports the 24-bit and 32-bit uncompressed
@@ -12,6 +13,9 @@ import 'tga/tga_info.dart';
 class TgaDecoder extends Decoder {
   TgaInfo? info;
   late InputBuffer input;
+
+  @override
+  ImageFormat get format => ImageFormat.tga;
 
   /// Is the given file a valid TGA image?
   @override

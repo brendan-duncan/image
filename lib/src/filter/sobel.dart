@@ -9,7 +9,9 @@ Image sobel(Image src,
   if (amount == 0.0) {
     return src;
   }
-
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     final orig = Image.from(frame, noAnimation: true);
     final width = frame.width;

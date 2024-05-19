@@ -7,6 +7,7 @@ import 'decoder.dart';
 import 'gif/gif_color_map.dart';
 import 'gif/gif_image_desc.dart';
 import 'gif/gif_info.dart';
+import 'image_format.dart';
 
 /// A decoder for the GIF image format. This supports both single frame and
 /// animated GIF files, and transparency.
@@ -18,6 +19,9 @@ class GifDecoder extends Decoder {
       startDecode(bytes);
     }
   }
+
+  @override
+  ImageFormat get format => ImageFormat.gif;
 
   /// Is the given file a valid Gif image?
   @override
@@ -213,15 +217,28 @@ class GifDecoder extends Decoder {
       if (frame.disposal == 2) {
         nextImage.clear(colorMap.color(info!.backgroundColor!.r as int));
       } else if (frame.disposal != 3) {
-        final nextBytes = nextImage.toUint8List();
-        final lastBytes = lastImage.toUint8List();
-        final lp = lastImage.palette!;
-        for (var i = 0, l = nextBytes.length; i < l; ++i) {
-          final lc = lastBytes[i];
-          final nc = colorMap.findColor(
-              lp.getRed(lc), lp.getGreen(lc), lp.getBlue(lc), lp.getAlpha(lc));
-          if (nc != -1) {
-            nextBytes[i] = nc;
+        if (frame.x != 0 ||
+            frame.y != 0 ||
+            frame.width != lastImage.width ||
+            frame.height != lastImage.height) {
+          if (frame.colorMap != null) {
+            final lp = lastImage.palette!;
+            final remapColors = <int, int>{};
+            for (var ci = 0; ci < colorMap.numColors; ++ci) {
+              final nc = colorMap.findColor(lp.getRed(ci), lp.getGreen(ci),
+                  lp.getBlue(ci), lp.getAlpha(ci));
+              remapColors[ci] = nc;
+            }
+
+            final nextBytes = nextImage.toUint8List();
+            final lastBytes = lastImage.toUint8List();
+            for (var i = 0, l = nextBytes.length; i < l; ++i) {
+              final lc = lastBytes[i];
+              final nc = remapColors[lc];
+              if (nc != -1) {
+                nextBytes[i] = nc!;
+              }
+            }
           }
         }
       }

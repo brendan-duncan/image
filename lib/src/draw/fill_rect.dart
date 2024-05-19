@@ -15,9 +15,10 @@ Image fillRect(Image src,
     required int y2,
     required Color color,
     num radius = 0,
+    bool alphaBlend = true,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
-  if (color.a == 0) {
+  if (alphaBlend && color.a == 0) {
     return src;
   }
 
@@ -84,7 +85,7 @@ Image fillRect(Image src,
   }
 
   // If no blending is necessary, use a faster fill method.
-  if (color.a == color.maxChannelValue && mask == null) {
+  if (!alphaBlend || (color.a == color.maxChannelValue && mask == null)) {
     final iter = src.getRange(xx0, yy0, ww, hh);
     while (iter.moveNext()) {
       iter.current.set(color);

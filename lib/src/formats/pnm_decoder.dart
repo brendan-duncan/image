@@ -6,6 +6,7 @@ import '../image/image.dart';
 import '../util/input_buffer.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 
 enum PnmFormat { invalid, pbm, pgm2, pgm5, ppm3, ppm6 }
 
@@ -33,6 +34,9 @@ class PnmDecoder extends Decoder {
   PnmInfo? info;
   InputBuffer? input;
   final _tokens = <String>[];
+
+  @override
+  ImageFormat get format => ImageFormat.pnm;
 
   /// Is the given file a valid TGA image?
   @override

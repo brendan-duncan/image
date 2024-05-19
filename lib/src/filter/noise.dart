@@ -26,7 +26,9 @@ Image noise(Image image, num sigma,
   if (nSigma == 0.0 && type != NoiseType.poisson) {
     return image;
   }
-
+  if (image.hasPalette) {
+    image = image.convert(numChannels: image.numChannels);
+  }
   if (nSigma < 0.0 || type == NoiseType.saltAndPepper) {
     final mM = minMax(image);
     m = mM[0];

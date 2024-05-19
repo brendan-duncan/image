@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../image/image.dart';
 import 'decode_info.dart';
+import 'image_format.dart';
 
 /// Base class for image format decoders.
 ///
@@ -19,6 +20,8 @@ import 'decode_info.dart';
 /// animation. The terms 'animation' and 'frames' simply refer to 'pages' in
 /// this case.
 abstract class Decoder {
+  ImageFormat get format => ImageFormat.invalid;
+
   /// A light-weight function to test if the given file is able to be decoded
   /// by this Decoder.
   bool isValidFile(Uint8List bytes);

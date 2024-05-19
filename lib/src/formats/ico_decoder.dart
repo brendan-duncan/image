@@ -8,6 +8,7 @@ import 'bmp_decoder.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'ico/ico_info.dart';
+import 'image_format.dart';
 import 'png_decoder.dart';
 
 /// Decodes an ICO formatted [Image].
@@ -16,6 +17,9 @@ import 'png_decoder.dart';
 class IcoDecoder extends Decoder {
   InputBuffer? _input;
   IcoInfo? _icoInfo;
+
+  @override
+  ImageFormat get format => ImageFormat.ico;
 
   @override
   bool isValidFile(Uint8List bytes) {

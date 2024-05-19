@@ -13,6 +13,9 @@ Image dotScreen(Image src,
     num amount = 1,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   angle = angle * 0.0174533;
   final s = sin(angle);
   final c = cos(angle);

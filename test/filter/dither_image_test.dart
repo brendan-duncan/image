@@ -10,13 +10,13 @@ void main() {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
 
-      var id = ditherImage(i0);
-      File('$testOutputPath/filter/dither_FloydSteinberg.png')
+      var id = ditherImage(i0, kernel: DitherKernel.atkinson);
+      File('$testOutputPath/filter/dither_Atkinson.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(id));
 
-      id = ditherImage(i0, kernel: DitherKernel.atkinson);
-      File('$testOutputPath/filter/dither_Atkinson.png')
+      id = ditherImage(i0);
+      File('$testOutputPath/filter/dither_FloydSteinberg.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(id));
 

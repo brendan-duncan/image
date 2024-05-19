@@ -5,6 +5,7 @@ import '../image/image.dart';
 import '../util/input_buffer.dart';
 import 'bmp/bmp_info.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 
 class BmpDecoder extends Decoder {
   late InputBuffer _input;
@@ -12,6 +13,9 @@ class BmpDecoder extends Decoder {
   bool forceRgba;
 
   BmpDecoder({this.forceRgba = false});
+
+  @override
+  ImageFormat get format => ImageFormat.bmp;
 
   /// Is the given file a valid BMP image?
   @override

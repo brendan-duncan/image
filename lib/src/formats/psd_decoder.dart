@@ -3,11 +3,15 @@ import 'dart:typed_data';
 import '../image/image.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
+import 'image_format.dart';
 import 'psd/psd_image.dart';
 
 /// Decode a Photoshop PSD image.
 class PsdDecoder extends Decoder {
   PsdImage? info;
+
+  @override
+  ImageFormat get format => ImageFormat.psd;
 
   /// A light-weight function to test if the given file is able to be decoded
   /// by this Decoder.

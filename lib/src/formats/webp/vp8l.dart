@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../../exif/exif_data.dart';
 import '../../image/image.dart';
 import '../../util/_internal.dart';
 import '../../util/color_util.dart';
@@ -57,6 +58,11 @@ class VP8L {
     if (!_decodeImageData(
         _pixels!, webp.width, webp.height, webp.height, _processRows)) {
       return null;
+    }
+
+    if (webp.exif.isNotEmpty) {
+      final input = InputBuffer(webp.exif.codeUnits);
+      image!.exif = ExifData.fromInputBuffer(input);
     }
 
     return image;

@@ -214,6 +214,12 @@ Decoder? findDecoderForData(Uint8List fileBytes);
 
 // Return the decoder based on the file name extension.
 Decoder? findDecoderForNamedImage(String filename);
+
+// Find the [ImageFormat] for the given file data.
+ImageFormat findFormatForData(List<int> data);
+
+// Create a [Decoder] for the given [format] type.
+Decoder? createDecoderForFormat(ImageFormat format);
 ```
 
 ## Encoder Classes

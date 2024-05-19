@@ -29,6 +29,9 @@ Image vignette(Image src,
     Color? color,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   final h = src.height - 1;
   final w = src.width - 1;
   final cr = color?.rNormalized ?? 0;

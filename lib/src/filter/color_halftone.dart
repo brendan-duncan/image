@@ -14,7 +14,9 @@ Image colorHalftone(Image src,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   angle = angle * 0.0174533;
-
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   num pattern(int x, int y, int cx, int cy, num angle) {
     final scale = 3.14159 / size;
     final s = sin(angle);

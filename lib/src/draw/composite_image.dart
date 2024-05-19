@@ -54,7 +54,7 @@ Image compositeImage(Image dst, Image src,
   }
 
   if (dst.hasPalette) {
-    dst.convert(numChannels: dst.numChannels);
+    dst = dst.convert(numChannels: dst.numChannels);
   }
 
   final dy = srcH / dstH;

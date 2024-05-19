@@ -11,6 +11,9 @@ Image scaleRgba(Image src,
   final dg = scale.gNormalized;
   final db = scale.bNormalized;
   final da = scale.aNormalized;
+  if (src.hasPalette) {
+    src = src.convert(numChannels: src.numChannels);
+  }
   for (final frame in src.frames) {
     for (final p in frame) {
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);

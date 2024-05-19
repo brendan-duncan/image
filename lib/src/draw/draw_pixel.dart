@@ -37,7 +37,10 @@ Image drawPixel(Image image, int x, int y, Color c,
   var overlayB =
       filter != null ? c.bNormalized * filter.bNormalized : c.bNormalized;
 
-  final overlayA = (alpha ?? (c.length < 4 ? 1.0 : c.aNormalized)) * msk;
+  final a = (c.length < 4 ? 1.0 : c.aNormalized) *
+      ((filter == null || filter.length < 4) ? 1.0 : filter.aNormalized);
+
+  final overlayA = (alpha ?? a) * msk;
 
   if (overlayA == 0) {
     return image;
