@@ -42,7 +42,8 @@ Image contrast(Image src,
     } else {
       if (contrast != _lastContrast) {
         _lastContrast = contrast;
-/// 0.12 is an arbitrary adjustment to use 100 as mid point
+
+        /// 0.12 is an arbitrary adjustment to use 100 as mid point
         contrast = (contrast / 100.0) - 0.12;
         _contrast = Uint8List(256);
         for (var i = 0; i < 256; ++i) {

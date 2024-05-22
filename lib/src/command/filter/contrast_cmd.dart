@@ -6,9 +6,13 @@ class ContrastCmd extends Command {
   final num _contrast;
   Command? mask;
   Channel maskChannel;
+  g.ContrastMode mode;
 
   ContrastCmd(Command? input,
-      {num contrast = 100.0, this.mask, this.maskChannel = Channel.luminance})
+      {num contrast = 100.0,
+      this.mask,
+      this.maskChannel = Channel.luminance,
+      this.mode = g.ContrastMode.proportional})
       : _contrast = contrast,
         super(input);
 
