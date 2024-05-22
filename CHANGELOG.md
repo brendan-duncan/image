@@ -1,3 +1,19 @@
+## 4.2.0 - May 22, 2024
+
+- Fix decoding EXIF data from WebP.
+- Add ContrastMode.scurve to contrast filter.
+- Filter functions will auto-convert palette images
+- Add BinaryQuantizer.
+- Fix ditherImage not returning dithered image.
+- Fix APNG decoding.
+- drawString should use alpha color.
+- Improve performance of animated GIF decoding.
+- Fix TIFF tile decoding
+- Add solarize filter function
+- Fix decoding TIFF with ZLIB decoding
+- Add PNM format decoder.
+- Add support for uint16 palettes.
+
 ## 4.1.7 - February 10, 2024
 
 - JPEG images will finish decoding even if the file is incomplete or has errors.
