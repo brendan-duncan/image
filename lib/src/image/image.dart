@@ -361,10 +361,6 @@ class Image extends Iterable<Pixel> {
       Palette? palette,
       ExifData? exif,
       IccProfile? iccp}) {
-    if (numChannels < 1 || numChannels > 4) {
-      throw ImageException('Invalid number of channels for image $numChannels.'
-          ' Must be between 1 and 4.');
-    }
     iccProfile = iccp;
     if (exif != null) {
       _exif = ExifData.from(exif);

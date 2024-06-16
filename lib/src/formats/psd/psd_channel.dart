@@ -106,11 +106,17 @@ class PsdChannel {
       if (n < 0) {
         n = 1 - n;
         final b = src.readByte();
+        if ((dstIndex + n) > dst.length) {
+          n = dst.length - dstIndex;
+        }
         for (var i = 0; i < n; ++i) {
           dst[dstIndex++] = b;
         }
       } else {
         n++;
+        if ((dstIndex + n) > dst.length) {
+          n = dst.length - dstIndex;
+        }
         for (var i = 0; i < n; ++i) {
           dst[dstIndex++] = src.readByte();
         }
