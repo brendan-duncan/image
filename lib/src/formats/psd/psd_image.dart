@@ -57,10 +57,10 @@ class PsdImage implements DecodeInfo {
     _input!.readBytes(len);
 
     len = _input!.readUint32();
-    _imageResourceData = _input!.readBytes(len);
+    /*_imageResourceData =*/ _input!.readBytes(len);
 
     len = _input!.readUint32();
-    _layerAndMaskData = _input!.readBytes(len);
+    /*_layerAndMaskData =*/ _input!.readBytes(len);
 
     _imageData = _input!.readBytes(_input!.length);
   }
@@ -85,16 +85,16 @@ class PsdImage implements DecodeInfo {
     // Image Resource Block:
     // Image resources are used to store non-pixel data associated with images,
     // such as pen tool paths.
-    _readImageResources();
+    //_readImageResources();
 
-    _readLayerAndMaskData();
+    //_readLayerAndMaskData();
 
     _readMergeImageData();
 
     _input = null;
     //_colorData = null;
-    _imageResourceData = null;
-    _layerAndMaskData = null;
+    //_imageResourceData = null;
+    //_layerAndMaskData = null;
     _imageData = null;
 
     return true;
@@ -408,7 +408,7 @@ class PsdImage implements DecodeInfo {
     // TODO support indexed and duotone images.
   }
 
-  void _readImageResources() {
+  /*void _readImageResources() {
     _imageResourceData!.rewind();
     while (!_imageResourceData!.isEOS) {
       final blockSignature = _imageResourceData!.readUint32();
@@ -433,9 +433,9 @@ class PsdImage implements DecodeInfo {
             PsdImageResource(blockId, blockName, blockData);
       }
     }
-  }
+  }*/
 
-  void _readLayerAndMaskData() {
+  /*void _readLayerAndMaskData() {
     _layerAndMaskData!.rewind();
     var len = _layerAndMaskData!.readUint32();
     if ((len & 1) != 0) {
@@ -484,7 +484,7 @@ class PsdImage implements DecodeInfo {
         /*int kind =*/
         ..readByte();
     }
-  }
+  }*/
 
   void _readMergeImageData() {
     _imageData!.rewind();
@@ -602,7 +602,7 @@ class PsdImage implements DecodeInfo {
   late InputBuffer? _input;
 
   //InputBuffer _colorData;
-  late InputBuffer? _imageResourceData;
-  late InputBuffer? _layerAndMaskData;
+  //late InputBuffer? _imageResourceData;
+  //late InputBuffer? _layerAndMaskData;
   late InputBuffer? _imageData;
 }
