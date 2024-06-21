@@ -32,7 +32,7 @@ class IccProfile {
   /// Returns the uncompressed data of the ICC Profile, decompressing the stored
   /// data as necessary.
   Uint8List decompressed() {
-    if (compression == IccProfileCompression.deflate) {
+    if (compression == IccProfileCompression.none) {
       return data;
     }
     data = const ZLibDecoder().decodeBytes(data) as Uint8List;
