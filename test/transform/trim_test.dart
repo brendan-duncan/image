@@ -30,5 +30,21 @@ void main() {
       expect(trimmed.width, equals(64));
       expect(trimmed.height, equals(56));
     });
+
+    test('trim_issue', () {
+      final image =
+          decodePng(File('test/_data/png/trim_issue.png').readAsBytesSync())!;
+      final trimmed = trim(image, mode: TrimMode.transparent);
+      File('$testOutputPath/transform/trim_issue.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(trimmed));
+      expect(trimmed.width, equals(465));
+      expect(trimmed.height, equals(150));
+
+      final image2 = decodePng(
+          File('test/_data/png/trim_issue_assert.png').readAsBytesSync());
+      expect(image2, isNotNull);
+      testImageEquals(trimmed, image2!);
+    });
   });
 }
