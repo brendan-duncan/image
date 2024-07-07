@@ -53,7 +53,7 @@ Image compositeImage(Image dst, Image src,
     dstY = height ~/ 2;
   }
 
-  if (dst.hasPalette) {
+  if (blend != BlendMode.direct && dst.hasPalette) {
     dst = dst.convert(numChannels: dst.numChannels);
   }
 
