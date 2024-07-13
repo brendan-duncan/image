@@ -82,7 +82,7 @@ abstract class Color extends Iterable<num> {
   /// channel isn't available, 0 will be returned.
   num getChannelNormalized(Channel channel);
 
-  /// The the values of this color to the given [color].
+  /// Set the values of this color to the given [color].
   void set(Color color);
 
   /// Set the individual [r], [g], [b] channels of the color.
