@@ -91,7 +91,7 @@ Image colorOffset(Image src, { num red = 0, num green = 0, num blue = 0, num alp
 
 ```dart
 Image contrast(Image src, { required num contrast, Image? mask, Channel maskChannel = Channel.luminance,
-    ContrastMode mode = ContrastMode.proprtional})
+    ContrastMode mode = ContrastMode.proportional})
 ```
 
 ![contrast](images/filter/contrast.png)
