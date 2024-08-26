@@ -19,7 +19,7 @@ enum PngFilter { none, sub, up, average, paeth }
 class PngEncoder extends Encoder {
   Quantizer? _globalQuantizer;
 
-  PngEncoder({this.filter = PngFilter.paeth, this.level});
+  PngEncoder({this.filter = PngFilter.paeth, this.level, this.pixelDimensions});
 
   int _numChannels(Image image) => image.hasPalette ? 1 : image.numChannels;
 
@@ -72,6 +72,14 @@ class PngEncoder extends Encoder {
       for (var key in image.textData!.keys) {
         _writeTextChunk(key, image.textData![key]!);
       }
+    }
+
+    if (pixelDimensions != null) {
+      final phys = OutputBuffer(bigEndian: true)
+        ..writeUint32(pixelDimensions!.xPxPerUnit)
+        ..writeUint32(pixelDimensions!.yPxPerUnit)
+        ..writeByte(pixelDimensions!.unitSpecifier);
+      _writeChunk(output!, 'pHYs', phys.getBytes());
     }
 
     if (isAnimated) {
@@ -410,4 +418,5 @@ class PngEncoder extends Encoder {
   bool isAnimated = false;
   OutputBuffer? output;
   Map<String, String>? textData;
+  PngPhysicalPixelDimensions? pixelDimensions;
 }

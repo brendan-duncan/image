@@ -439,6 +439,23 @@ void main() {
         expect(img2?.textData?["foo"], equals("bar"));
       });
 
+      test('pHYs', () {
+        final img = Image(width: 16, height: 16);
+        const phys1 = PngPhysicalPixelDimensions(
+            xPxPerUnit: 1000,
+            yPxPerUnit: 1000,
+            unitSpecifier: PngPhysicalPixelDimensions.unitMeter);
+        final png1 = PngEncoder(pixelDimensions: phys1).encode(img);
+        final dec1 = PngDecoder()..decode(png1);
+        expect(dec1.info.pixelDimensions, phys1);
+
+        final phys2 = PngPhysicalPixelDimensions.dpi(144, 288);
+        final png2 = PngEncoder(pixelDimensions: phys2).encode(img);
+        final dec2 = PngDecoder()..decode(png2);
+        expect(dec2.info.pixelDimensions, isNot(phys1));
+        expect(dec2.info.pixelDimensions, phys2);
+      });
+
       test('iCCP', () {
         final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
         final image = PngDecoder().decode(bytes)!;
