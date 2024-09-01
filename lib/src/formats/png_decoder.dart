@@ -75,6 +75,15 @@ class PngDecoder extends Decoder {
           }
           _input.skip(4); //crc
           break;
+        case 'pHYs':
+          final physData = InputBuffer.from(_input.readBytes(chunkSize));
+          final x = physData.readUint32();
+          final y = physData.readUint32();
+          final unit = physData.readByte();
+          _info.pixelDimensions = PngPhysicalPixelDimensions(
+              xPxPerUnit: x, yPxPerUnit: y, unitSpecifier: unit);
+          _input.skip(4); // CRC
+          break;
         case 'IHDR':
           final hdr = InputBuffer.from(_input.readBytes(chunkSize));
           final Uint8List hdrBytes = hdr.toUint8List();
