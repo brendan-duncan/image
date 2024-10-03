@@ -342,4 +342,14 @@ class IfdDirectory {
     }
   }
 
+  bool get hasGPSDate => data.containsKey(0x001D);
+  String? get gpsDate => data[0x001D]?.toString();
+  set gpsDate(String? value) {
+    if (value == null) {
+      data.remove(0x001D);
+    } else {
+      data[0x001D] = IfdValueAscii(value);
+    }
+  }
+
 }
