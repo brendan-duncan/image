@@ -385,6 +385,9 @@ class TiffImage {
 
       for (var y = 0, py = outY; y < tileHeight; ++y, ++py) {
         for (var x = 0, px = outX; x < tileWidth; ++x, ++px) {
+          if (byteData.isEOS) {
+            break;
+          }
           if (samplesPerPixel == 1) {
             if (sampleFormat == TiffFormat.float) {
               num sample = 0;
