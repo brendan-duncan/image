@@ -321,4 +321,25 @@ class IfdDirectory {
       data[0x8298] = IfdValueAscii(value);
     }
   }
+  
+  bool get hasGPSLatitude => data.containsKey(0x0002);
+  double? get gpsLatitude => data[0x0002]?.toDouble();
+  set gpsLatitude(double? value) {
+    if (value == null) {
+      data.remove(0x0002);
+    } else {
+      data[0x0002] = IfdValueDouble(value);
+    }
+  }
+
+  bool get hasGPSLongitude => data.containsKey(0x0004);
+  double? get gpsLongitude => data[0x0004]?.toDouble();
+  set gpsLongitude(double? value) {
+    if (value == null) {
+      data.remove(0x0004);
+    } else {
+      data[0x0004] = IfdValueDouble(value);
+    }
+  }
+
 }
