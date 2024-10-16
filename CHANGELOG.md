@@ -1,3 +1,11 @@
+## 4.3.0 - October 15, 2024
+
+- Fix exceptions loading some PSD files.
+- Fix trim for palette images.
+- Fix ICC decompression.
+- Add physical size handling to PNG.
+- Fix TIFF out of bounds error.
+
 ## 4.2.0 - May 22, 2024
 
 - Fix decoding EXIF data from WebP.
