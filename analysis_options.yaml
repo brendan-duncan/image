@@ -1,4 +1,4 @@
-include: package:lints/recommended.yaml
+include: package:lints/core.yaml
 analyzer:
   language:
     strict-casts: true

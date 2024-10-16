@@ -32,7 +32,7 @@ List<Point> calculateCircumference(Image image, int x0, int y0, int radius) {
   for (var f = 1 - radius, ddFx = 0, ddFy = -(radius << 1), x = 0, y = radius;
       x < y;) {
     if (f >= 0) {
-      f += (ddFy += 2);
+      f += ddFy += 2;
       --y;
     }
     ++x;
