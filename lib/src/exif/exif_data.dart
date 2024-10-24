@@ -272,6 +272,9 @@ class ExifData extends IfdContainer {
     var index = 0;
     while (ifdOffset > 0) {
       block.offset = blockOffset + ifdOffset;
+      if (block.length < 2) {
+        break;
+      }
 
       final directory = IfdDirectory();
       final numEntries = block.readUint16();
