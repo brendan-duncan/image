@@ -832,7 +832,9 @@ class Image extends Iterable<Pixel> {
     numChannels ??= this.numChannels;
     alpha ??= formatMaxValue[format];
 
-    if (withPalette &&
+    // Commented out because it causes problems converting a uint8 w/ palette
+    // to a uint1 w/ palette
+    /*if (withPalette &&
             (numChannels >= 4 ||
                 !(format == Format.uint1 ||
                     format == Format.uint2 ||
@@ -841,7 +843,7 @@ class Image extends Iterable<Pixel> {
         (format.index < Format.uint8.index &&
             this.format.index >= Format.uint8.index)) {
       withPalette = false;
-    }
+    }*/
 
     if (format == this.format &&
         numChannels == this.numChannels &&
