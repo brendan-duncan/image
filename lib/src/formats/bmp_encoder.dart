@@ -99,10 +99,13 @@ class BmpEncoder extends Encoder {
     final rowPadding =
         rowPaddingSize > 0 ? List<int>.filled(rowPaddingSize, 0xff) : null;
 
+
+    final implicitPaletteSize = bpp >= 1 && bpp <= 8 ? 1 << bpp : 0;
+
     final imageFileSize = fileStride * image.height;
     final headerInfoSize = bpp > 8 ? 124 : 40;
     final headerSize = headerInfoSize + 14;
-    final paletteSize = (image.palette?.numColors ?? 0) * 4;
+    final paletteSize = (image.palette?.numColors ?? implicitPaletteSize) * 4;
     final origImageOffset = headerSize + paletteSize;
     final imageOffset = origImageOffset;
     //final imageOffset = _roundToMultiple(origImageOffset);
