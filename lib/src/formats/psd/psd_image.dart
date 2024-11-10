@@ -143,7 +143,7 @@ class PsdImage implements DecodeInfo {
         //var di = (layer.top! + y) * width * 4 + layer.left! * 4;
         final dy = layer.top! + y;
         for (int? x = 0, sx = layer.left; x! < layer.width; ++x, ++sx) {
-          final srcP = src.getPixel(x, y);
+          final srcP = src!.getPixel(x, y);
           final br = srcP.r.toInt();
           final bg = srcP.g.toInt();
           final bb = srcP.b.toInt();

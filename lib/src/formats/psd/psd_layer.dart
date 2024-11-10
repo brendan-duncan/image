@@ -80,7 +80,7 @@ class PsdLayer {
   Map<String, PsdLayerData> additionalData = {};
   List<PsdLayer> children = [];
   PsdLayer? parent;
-  late Image layerImage;
+  Image? layerImage;
   List<PsdEffect> effects = [];
 
   static const signature = 0x3842494d; // '8BIM'
