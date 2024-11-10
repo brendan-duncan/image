@@ -41,6 +41,15 @@ class PsdImage implements DecodeInfo {
   final imageResources = <int, PsdImageResource>{};
   bool hasAlpha = false;
 
+  static const resourceBlockSignature = 0x3842494d; // '8BIM'
+
+  late InputBuffer? _input;
+
+  //InputBuffer? _colorData;
+  InputBuffer? _imageResourceData;
+  InputBuffer? _layerAndMaskData;
+  InputBuffer? _imageData;
+
   @override
   Color? get backgroundColor => null;
 
@@ -53,14 +62,13 @@ class PsdImage implements DecodeInfo {
     }
 
     var len = _input!.readUint32();
-    /*_colorData =*/
-    _input!.readBytes(len);
+    /*_colorData =*/ _input!.readBytes(len);
 
     len = _input!.readUint32();
-    /*_imageResourceData =*/ _input!.readBytes(len);
+    _imageResourceData = _input!.readBytes(len);
 
     len = _input!.readUint32();
-    /*_layerAndMaskData =*/ _input!.readBytes(len);
+    _layerAndMaskData = _input!.readBytes(len);
 
     _imageData = _input!.readBytes(_input!.length);
   }
@@ -85,16 +93,16 @@ class PsdImage implements DecodeInfo {
     // Image Resource Block:
     // Image resources are used to store non-pixel data associated with images,
     // such as pen tool paths.
-    //_readImageResources();
+    _readImageResources();
 
-    //_readLayerAndMaskData();
+    _readLayerAndMaskData();
 
     _readMergeImageData();
 
     _input = null;
     //_colorData = null;
-    //_imageResourceData = null;
-    //_layerAndMaskData = null;
+    _imageResourceData = null;
+    _layerAndMaskData = null;
     _imageData = null;
 
     return true;
@@ -408,7 +416,7 @@ class PsdImage implements DecodeInfo {
     // TODO support indexed and duotone images.
   }
 
-  /*void _readImageResources() {
+  void _readImageResources() {
     _imageResourceData!.rewind();
     while (!_imageResourceData!.isEOS) {
       final blockSignature = _imageResourceData!.readUint32();
@@ -433,9 +441,9 @@ class PsdImage implements DecodeInfo {
             PsdImageResource(blockId, blockName, blockData);
       }
     }
-  }*/
+  }
 
-  /*void _readLayerAndMaskData() {
+  void _readLayerAndMaskData() {
     _layerAndMaskData!.rewind();
     var len = _layerAndMaskData!.readUint32();
     if ((len & 1) != 0) {
@@ -484,7 +492,7 @@ class PsdImage implements DecodeInfo {
         /*int kind =*/
         ..readByte();
     }
-  }*/
+  }
 
   void _readMergeImageData() {
     _imageData!.rewind();
@@ -509,8 +517,8 @@ class PsdImage implements DecodeInfo {
         colorMode, depth, width, height, mergeImageChannels);
   }
 
-  static int _ch(List<int> data, int si, int ns) =>
-      ns == 1 ? data[si] : ((data[si] << 8) | data[si + 1]) >> 8;
+  static int _ch(List<int>? data, int si, int ns) =>
+      data == null ? 0 : ns == 1 ? data[si] : ((data[si] << 8) | data[si + 1]) >> 8;
 
   static Image createImageFromChannels(PsdColorMode? colorMode, int? bitDepth,
       int width, int height, List<PsdChannel> channelList) {
@@ -596,13 +604,4 @@ class PsdImage implements DecodeInfo {
 
     return output;
   }
-
-  static const resourceBlockSignature = 0x3842494d; // '8BIM'
-
-  late InputBuffer? _input;
-
-  //InputBuffer _colorData;
-  //late InputBuffer? _imageResourceData;
-  //late InputBuffer? _layerAndMaskData;
-  late InputBuffer? _imageData;
 }
