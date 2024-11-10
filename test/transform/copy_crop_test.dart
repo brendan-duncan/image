@@ -12,8 +12,8 @@ void main() {
         g1!,
         x: 0,
         y: 0,
-        width: 500,   // this is just the width of the original animation
-        height: 375,  // this is just the height of the original animation
+        width: 500, // this is just the width of the original animation
+        height: 375, // this is just the height of the original animation
         radius: 100,
       );
       await encodeGifFile('$testOutputPath/transform/copyCrop_radius.gif', g2);

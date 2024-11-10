@@ -517,8 +517,11 @@ class PsdImage implements DecodeInfo {
         colorMode, depth, width, height, mergeImageChannels);
   }
 
-  static int _ch(List<int>? data, int si, int ns) =>
-      data == null ? 0 : ns == 1 ? data[si] : ((data[si] << 8) | data[si + 1]) >> 8;
+  static int _ch(List<int>? data, int si, int ns) => data == null
+      ? 0
+      : ns == 1
+          ? data[si]
+          : ((data[si] << 8) | data[si + 1]) >> 8;
 
   static Image createImageFromChannels(PsdColorMode? colorMode, int? bitDepth,
       int width, int height, List<PsdChannel> channelList) {
