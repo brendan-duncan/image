@@ -31,7 +31,7 @@ void main() {
             if (layerImg != null) {
               File('$testOutputPath/psd/${name}_${li}_${layer.name}.png')
                 ..createSync(recursive: true)
-                ..writeAsBytesSync(encodePng(layerImg!));
+                ..writeAsBytesSync(encodePng(layerImg));
             }
             ++li;
           }
