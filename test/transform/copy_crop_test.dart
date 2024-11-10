@@ -6,6 +6,20 @@ import '../_test_util.dart';
 
 void main() {
   group('Transform', () {
+    test('crop with radius', () async {
+      final g1 = await decodeGifFile('test/_data/gif/homer.gif');
+      final g2 = copyCrop(
+        g1!,
+        x: 0,
+        y: 0,
+        width: 500,   // this is just the width of the original animation
+        height: 375,  // this is just the height of the original animation
+        radius: 100,
+      );
+      await encodeGifFile('$testOutputPath/transform/copyCrop_radius.gif', g2);
+      await encodePngFile('$testOutputPath/transform/copyCrop_radius.png', g2);
+    });
+
     test('copyCrop', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = PngDecoder().decode(bytes)!;
