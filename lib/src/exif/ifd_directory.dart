@@ -321,6 +321,16 @@ class IfdDirectory {
       data[0x8298] = IfdValueAscii(value);
     }
   }
+    
+  bool get hasGPSLatitudeRef => data.containsKey(0x0001);
+  String? get gpsLatitudeRef => data[0x0001]?.toString();
+  set gpsLatitudeRef(String? value) {
+    if (value == null) {
+      data.remove(0x0001);
+    } else {
+      data[0x0001] = IfdValueAscii(value);
+    }
+  }
   
   bool get hasGPSLatitude => data.containsKey(0x0002);
   double? get gpsLatitude => data[0x0002]?.toDouble();
@@ -331,7 +341,17 @@ class IfdDirectory {
       data[0x0002] = IfdValueDouble(value);
     }
   }
-
+  
+  bool get hasGPSLongitudeRef => data.containsKey(0x0003);
+  String? get gpsLongitudeRef => data[0x0003]?.toString();
+  set gpsLongitudeRef(String? value) {
+    if (value == null) {
+      data.remove(0x0003);
+    } else {
+      data[0x0003] = IfdValueAscii(value);
+    }
+  }
+  
   bool get hasGPSLongitude => data.containsKey(0x0004);
   double? get gpsLongitude => data[0x0004]?.toDouble();
   set gpsLongitude(double? value) {
@@ -341,6 +361,17 @@ class IfdDirectory {
       data[0x0004] = IfdValueDouble(value);
     }
   }
+
+  void setGpsLocation({
+    required double latitude,
+    required double longitude,
+  }) {
+    gpsLatitude = latitude.abs();
+    gpsLongitude = longitude.abs();
+    gpsLatitudeRef = latitude < 0.0 ? 'S' : 'N';
+    gpsLongitudeRef = longitude < 0.0 ? 'W' : 'E';
+  }
+
 
   bool get hasGPSDate => data.containsKey(0x001D);
   String? get gpsDate => data[0x001D]?.toString();
