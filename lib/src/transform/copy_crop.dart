@@ -48,7 +48,7 @@ Image copyCrop(Image src,
       final c4x = x1 + rad - 1;
       final c4y = y2 - rad + 1;
 
-      final iter = src.getRange(x1, y1, width, height);
+      final iter = frame.getRange(x1, y1, width, height);
       while (iter.moveNext()) {
         final p = iter.current;
         final px = p.x;

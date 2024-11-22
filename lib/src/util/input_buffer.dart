@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'bit_utils.dart';
@@ -16,14 +17,16 @@ class InputBuffer {
   InputBuffer(this.buffer,
       {this.bigEndian = false, this.offset = 0, int? length})
       : start = offset,
-        end = (length == null) ? buffer.length : offset + length;
+        end = min(
+            buffer.length, (length == null) ? buffer.length : offset + length);
 
   /// Create a copy of [other].
   InputBuffer.from(InputBuffer other, {int offset = 0, int? length})
       : buffer = other.buffer,
         offset = other.offset + offset,
         start = other.start,
-        end = (length == null) ? other.end : other.offset + offset + length,
+        end = min(other.buffer.length,
+            (length == null) ? other.end : other.offset + offset + length),
         bigEndian = other.bigEndian;
 
   ///  The current read position relative to the start of the buffer.

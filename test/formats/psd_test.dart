@@ -11,18 +11,30 @@ void main() {
     final files = dir.listSync();
 
     group('psd', () {
-      for (var f in files.whereType<File>()) {
+      for (final f in files.whereType<File>()) {
         if (!f.path.endsWith('.psd')) {
           continue;
         }
 
         final name = f.uri.pathSegments.last;
         test(name, () {
-          final psd = PsdDecoder().decode(f.readAsBytesSync());
+          final decoder = PsdDecoder();
+          final psd = decoder.decode(f.readAsBytesSync());
           expect(psd, isNotNull);
           File('$testOutputPath/psd/$name.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(encodePng(psd!));
+
+          var li = 0;
+          for (final layer in decoder.info!.layers) {
+            final layerImg = layer.layerImage;
+            if (layerImg != null) {
+              File('$testOutputPath/psd/${name}_${li}_${layer.name}.png')
+                ..createSync(recursive: true)
+                ..writeAsBytesSync(encodePng(layerImg));
+            }
+            ++li;
+          }
         });
       }
     });

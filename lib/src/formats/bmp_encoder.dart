@@ -99,10 +99,12 @@ class BmpEncoder extends Encoder {
     final rowPadding =
         rowPaddingSize > 0 ? List<int>.filled(rowPaddingSize, 0xff) : null;
 
+    final implicitPaletteSize = bpp >= 1 && bpp <= 8 ? 1 << bpp : 0;
+
     final imageFileSize = fileStride * image.height;
     final headerInfoSize = bpp > 8 ? 124 : 40;
     final headerSize = headerInfoSize + 14;
-    final paletteSize = (image.palette?.numColors ?? 0) * 4;
+    final paletteSize = implicitPaletteSize * 4;
     final origImageOffset = headerSize + paletteSize;
     final imageOffset = origImageOffset;
     //final imageOffset = _roundToMultiple(origImageOffset);
@@ -161,12 +163,22 @@ class BmpEncoder extends Encoder {
     if (bpp == 1 || bpp == 2 || bpp == 4 || bpp == 8) {
       if (palette != null) {
         //final palette = image.palette!;
-        final l = palette.numColors;
-        for (var pi = 0; pi < l; ++pi) {
+        final l = palette.numColors > implicitPaletteSize
+            ? implicitPaletteSize
+            : palette.numColors;
+        var pi = 0;
+        for (pi = 0; pi < l; ++pi) {
           out
             ..writeByte(palette.getBlue(pi).toInt())
             ..writeByte(palette.getGreen(pi).toInt())
             ..writeByte(palette.getRed(pi).toInt())
+            ..writeByte(0);
+        }
+        for (; pi < implicitPaletteSize; ++pi) {
+          out
+            ..writeByte(0)
+            ..writeByte(0)
+            ..writeByte(0)
             ..writeByte(0);
         }
       } else {

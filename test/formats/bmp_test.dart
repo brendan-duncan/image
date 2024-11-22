@@ -32,6 +32,24 @@ void main() {
         });
       }
 
+      test('uint1', () async {
+        await (Command()
+              ..createImage(width: 256, height: 256)
+              ..filter((image) {
+                for (final p in image) {
+                  p
+                    ..r = p.x % 255
+                    ..g = p.y % 255;
+                }
+                return image;
+              })
+              ..grayscale()
+              ..quantize(numberOfColors: 2, dither: DitherKernel.floydSteinberg)
+              ..convert(format: Format.uint1, withPalette: true)
+              ..writeToFile('$testOutputPath/bmp/bmp_1.bmp'))
+            .execute();
+      });
+
       test('uint4', () async {
         await (Command()
               ..createImage(width: 256, height: 256, format: Format.uint4)

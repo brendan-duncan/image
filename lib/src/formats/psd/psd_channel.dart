@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import '../../util/image_exception.dart';
@@ -19,7 +20,7 @@ class PsdChannel {
 
   int id;
   int? dataLength;
-  late Uint8List data;
+  Uint8List? data;
 
   PsdChannel(this.id, this.dataLength);
 
@@ -38,6 +39,9 @@ class PsdChannel {
 
   void readPlane(InputBuffer input, int width, int height, int? bitDepth,
       [int? compression, Uint16List? lineLengths, int planeNum = 0]) {
+    if (input.length < 2) {
+      return;
+    }
     compression ??= input.readUint16();
 
     switch (compression) {
@@ -70,7 +74,7 @@ class PsdChannel {
     }
     if (len > input.length) {
       data = Uint8List(len);
-      data.fillRange(0, len, 255);
+      data!.fillRange(0, len, 255);
       return;
     }
 
@@ -88,23 +92,27 @@ class PsdChannel {
     var pos = 0;
     var lineIndex = planeNum * height;
     if (lineIndex >= lineLengths.length) {
-      data.fillRange(0, data.length, 255);
+      data!.fillRange(0, data!.length, 255);
       return;
     }
 
     for (var i = 0; i < height; ++i) {
       final len = lineLengths[lineIndex++];
       final s = input.readBytes(len);
-      _decodeRLE(s, data, pos);
+      _decodeRLE(s, data!, pos);
       pos += width;
     }
   }
 
   void _decodeRLE(InputBuffer src, Uint8List dst, int dstIndex) {
     while (!src.isEOS) {
-      var n = src.readInt8();
+      var n = 0;
+      n = src.readInt8();
       if (n < 0) {
         n = 1 - n;
+        if (src.isEOS) {
+          break;
+        }
         final b = src.readByte();
         if ((dstIndex + n) > dst.length) {
           n = dst.length - dstIndex;
@@ -117,6 +125,7 @@ class PsdChannel {
         if ((dstIndex + n) > dst.length) {
           n = dst.length - dstIndex;
         }
+        n = min(n, src.length);
         for (var i = 0; i < n; ++i) {
           dst[dstIndex++] = src.readByte();
         }

@@ -1,4 +1,4 @@
-include: package:lints/recommended.yaml
+include: package:lints/core.yaml
 analyzer:
   language:
     strict-casts: true
@@ -62,7 +62,6 @@ linter:
     - non_constant_identifier_names
     - only_throw_errors
     - overridden_fields
-    - package_api_docs
     - package_names
     - package_prefixed_library_names
     - prefer_asserts_in_initializer_lists
