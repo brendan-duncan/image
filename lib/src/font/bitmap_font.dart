@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 
@@ -206,7 +205,7 @@ class BitmapFont {
                   '$filename');
             }
 
-            final image = PngDecoder().decode(imageFile.content as Uint8List);
+            final image = PngDecoder().decode(imageFile.content);
 
             fontPages[id] = image;
           }

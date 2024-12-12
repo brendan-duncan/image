@@ -1,3 +1,7 @@
+## 4.4.0 - December 12, 2024
+
+- Upgrade to Archive 4.0 dependency
+
 ## 4.3.0 - October 15, 2024
 
 - Fix exceptions loading some PSD files.
