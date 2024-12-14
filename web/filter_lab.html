@@ -1,34 +1,56 @@
 <!DOCTYPE html>
 
 <html>
-  <head>
-  	<meta charset="utf-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>filter_lab</title>
-    <link rel="stylesheet" href="res/filter_lab.css" />
-  </head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>filter_lab</title>
+  <link rel="stylesheet" href="res/filter_lab.css" />
+</head>
 
-  <body>
-    <div id="toolbar">
-      <h1>Dart Image: Filter Lab</h1>
-    </div>
-    <div id="sidebar"></div>
-    <div id="editor">
-      <div class="contents">
-        <select id="FilterType">
-          <option>Sepia</option>
-          <option>Sobel</option>
-          <option>Vignette</option>
-          <option>Pixelate</option>
-          <option>Gaussian</option>
-          <option>Adjust Color</option>
-          <option>Color Offset</option>
-        </select>
-        <canvas id="filter_canvas"></canvas>
-        <div id="log"></div>
-      </div>
-    </div>
+<body>
+<div id="toolbar">
+  <h1>Dart Image: Filter Lab</h1>
+</div>
+<div id="sidebar"></div>
+<div id="editor">
+  <div class="contents">
+    <select id="FilterType">
+      <option>Sepia</option>
+      <option>Sobel</option>
+      <option>Vignette</option>
+      <option>Pixelate</option>
+      <option>Gaussian</option>
+      <option>Adjust Color</option>
+      <option>Color Offset</option>
+    </select>
+    <canvas id="filter_canvas"></canvas>
+    <div id="log"></div>
+  </div>
+</div>
 
-    <script src="filter_lab.dart.js"></script>
-  </body>
+<script>
+  (async function () {
+      let dart2wasm_runtime;
+      let moduleInstance;
+      try {
+          const dartModulePromise = WebAssembly.compileStreaming(fetch('filter_lab.wasm'));
+          const imports = {};
+          dart2wasm_runtime = await import('./filter_lab.mjs');
+          moduleInstance = await dart2wasm_runtime.instantiate(dartModulePromise, imports);
+      } catch (exception) {
+          console.error(`Failed to fetch and instantiate wasm module: ${exception}`);
+          console.error('See https://dart.dev/web/wasm for more information.');
+      }
+
+      if (moduleInstance) {
+          try {
+              await dart2wasm_runtime.invoke(moduleInstance);
+          } catch (exception) {
+              console.error(`Exception while invoking test: ${exception}`);
+          }
+      }
+  })();
+</script>
+</body>
 </html>

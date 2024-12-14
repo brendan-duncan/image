@@ -7,7 +7,7 @@ homepage: https://github.com/brendan-duncan/image
 documentation: https://github.com/brendan-duncan/image/blob/main/doc/README.md
 
 environment:
-  sdk: '>=2.15.0 <4.0.0'
+  sdk: '>=3.2.0 <4.0.0'
 
 dependencies:
   archive: ^4.0.1
@@ -20,3 +20,4 @@ dev_dependencies:
   http: ^1.1.0
   lints: ^2.0.1
   test: ^1.16.0
+  web: ^1.1.0
