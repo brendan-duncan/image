@@ -103,8 +103,6 @@ Image copyExpandCanvas(Image src,
       xPos = newWidth - srcConverted.width;
       yPos = newHeight - srcConverted.height;
       break;
-    default:
-      throw ArgumentError('Invalid position provided');
   }
 
   // Copy the original image to the new frames/canvas

@@ -139,8 +139,6 @@ class VP8L {
         break;
       case VP8LImageTransformType.subtractGreen:
         break;
-      default:
-        throw ImageException('Invalid WebP transform type: $type');
     }
 
     return ok;

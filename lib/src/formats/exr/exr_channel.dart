@@ -1,5 +1,4 @@
 import '../../util/_internal.dart';
-import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 
 @internal
@@ -77,8 +76,6 @@ class ExrChannel {
       case ExrChannelType.float:
         dataSize = 4;
         break;
-      default:
-        throw ImageException('EXR Invalid pixel type: $dataType');
     }
   }
 

@@ -718,8 +718,6 @@ class PngDecoder extends Decoder {
           row[x] = (row[x] + paeth) & 0xff;
         }
         break;
-      default:
-        throw ImageException('Invalid filter value: $filterType');
     }
   }
 
