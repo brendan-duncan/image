@@ -28,7 +28,8 @@ Image drawPixel(Image image, int x, int y, Color c,
     }
   }
 
-  final msk = mask?.getPixel(x, y).getChannelNormalized(maskChannel) ?? 1;
+  final maskPixel = mask?.getPixelSafe(x, y);
+  final msk = maskPixel?.getChannelNormalized(maskChannel) ?? 1;
 
   var overlayR =
       filter != null ? c.rNormalized * filter.rNormalized : c.rNormalized;

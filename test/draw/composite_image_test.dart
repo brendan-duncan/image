@@ -6,6 +6,18 @@ import '../_test_util.dart';
 
 void main() {
   group('Draw', () {
+    test('compositeImage2', () async {
+      final mask = (await decodePngFile('test/_data/png/logo.png'))!;
+      final fg = (await decodePngFile('test/_data/png/colors.png'))!;
+      final bg = (await decodePngFile('test/_data/png/buck_24.png'))!;
+
+      compositeImage(bg, fg, mask: mask);
+
+      File('$testOutputPath/draw/compositeImage2.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(bg));
+    });
+
     test('compositeImage', () async {
       final i0 = Image(width: 256, height: 256);
       final i1 = Image(width: 256, height: 256, numChannels: 4);
