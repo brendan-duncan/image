@@ -16,7 +16,8 @@ void main() {
         Point(30, 150)
       ];
 
-      drawPolygon(i0, vertices: vertices, color: ColorRgb8(255, 0, 0));
+      drawPolygon(i0,
+          vertices: vertices, color: const ConstColorRgb8(255, 0, 0));
 
       drawPolygon(i0,
           vertices: vertices.map((p) => Point(p.x + 20, p.y + 20)).toList(),
@@ -26,7 +27,7 @@ void main() {
 
       drawPolygon(i0,
           vertices: vertices.map((p) => Point(p.x + 40, p.y + 40)).toList(),
-          color: ColorRgb8(0, 0, 255),
+          color: const ConstColorRgb8(0, 0, 255),
           antialias: true);
 
       File('$testOutputPath/draw/drawPolygon.png')

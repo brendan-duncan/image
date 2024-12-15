@@ -18,6 +18,7 @@ export 'src/color/color_uint2.dart';
 export 'src/color/color_uint32.dart';
 export 'src/color/color_uint4.dart';
 export 'src/color/color_uint8.dart';
+export 'src/color/const_color_uint8.dart';
 export 'src/color/format.dart';
 export 'src/command/command.dart';
 export 'src/command/executor.dart';
