@@ -1,3 +1,8 @@
+## 4.5.0 - December 14, 2024
+
+- Fix gif animation decoder
+- Add ConstColorRgba8, ConstColorRgb8 for const color creation.
+
 ## 4.4.0 - December 12, 2024
 
 - Upgrade to Archive 4.0 dependency

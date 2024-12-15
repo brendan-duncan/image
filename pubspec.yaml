@@ -1,5 +1,5 @@
 name: image
-version: 4.4.0
+version: 4.5.0
 description: >-
   Dart Image Library provides server and web apps the ability to load, manipulate,
   and save images with various image file formats.
