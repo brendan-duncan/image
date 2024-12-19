@@ -206,8 +206,8 @@ class BitmapFont {
                   '$filename');
             }
 
-            final image = PngDecoder()
-                .decode(castToUint8List(imageFile.content));
+            final image =
+                PngDecoder().decode(castToUint8List(imageFile.content));
 
             fontPages[id] = image;
           }
