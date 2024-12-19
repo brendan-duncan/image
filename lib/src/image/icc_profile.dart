@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
+import '../util/_cast.dart';
 
 enum IccProfileCompression { none, deflate }
 
@@ -35,7 +36,7 @@ class IccProfile {
     if (compression == IccProfileCompression.none) {
       return data;
     }
-    data = const ZLibDecoder().decodeBytes(data);
+    data = castToUint8List(const ZLibDecoder().decodeBytes(data));
     compression = IccProfileCompression.none;
     return data;
   }

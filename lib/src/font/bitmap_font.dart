@@ -3,6 +3,7 @@ import 'package:xml/xml.dart';
 
 import '../formats/png_decoder.dart';
 import '../image/image.dart';
+import '../util/_cast.dart';
 import '../util/image_exception.dart';
 
 /// Decode a [BitmapFont] from the contents of a zip file that stores the
@@ -205,7 +206,8 @@ class BitmapFont {
                   '$filename');
             }
 
-            final image = PngDecoder().decode(imageFile.content);
+            final image = PngDecoder()
+                .decode(castToUint8List(imageFile.content));
 
             fontPages[id] = image;
           }
