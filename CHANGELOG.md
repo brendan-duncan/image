@@ -1,3 +1,7 @@
+## 4.5.1 - December 18, 2024
+
+- Make image library compatible with archive 3.x
+
 ## 4.5.0 - December 14, 2024
 
 - Fix gif animation decoder
