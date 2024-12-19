@@ -1,3 +1,7 @@
+## 4.5.2 - December 19, 2024
+
+- Reduce Min SDK version to 3.0.
+
 ## 4.5.1 - December 18, 2024
 
 - Make image library compatible with archive 3.x
