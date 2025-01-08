@@ -75,7 +75,8 @@ Image fillPolygon(Image src,
         if (v1.y <= y && v2.y > y || v2.y <= y && v1.y > y) {
           // Ray intersects the edge (vertical check)
           final vt = (y - v1.y) / (v2.y - v1.y);
-          if (x < v1.x + vt * (v2.x - v1.x)) { // Horizontal check
+          if (x < v1.x + vt * (v2.x - v1.x)) {
+            // Horizontal check
             intersections++;
           }
         }
