@@ -3,6 +3,7 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
+import '../util/color_util.dart';
 import '../util/math_util.dart';
 
 /// Adjust the color of the [src] image using various color transformations.
@@ -62,7 +63,6 @@ Image adjustColor(Image src,
   }
 
   contrast = contrast?.clamp(0, 2);
-  saturation = saturation?.clamp(0, 2);
   gamma = gamma?.clamp(0, 1000);
   exposure = exposure?.clamp(0, 1000);
   amount = amount.clamp(0, 1000);
@@ -71,9 +71,6 @@ Image adjustColor(Image src,
   const avgLumR = 0.5;
   const avgLumG = 0.5;
   const avgLumB = 0.5;
-  const lumCoeffR = 0.2125;
-  const lumCoeffG = 0.7154;
-  const lumCoeffB = 0.0721;
 
   final useBlacksWhitesMids = blacks != null || whites != null || mids != null;
   late num br, bg, bb;
@@ -97,8 +94,6 @@ Image adjustColor(Image src,
     mb = 1.0 / (1.0 + 2.0 * (mb - 0.5));
   }
 
-  final num invSaturation =
-      saturation != null ? 1.0 - saturation : 0.0;
   final num invContrast = contrast != null ? 1.0 - contrast : 0.0;
 
   if (exposure != null) {
@@ -117,6 +112,8 @@ Image adjustColor(Image src,
     hueG = (-sqrt(3.0) * s - c) / 3.0;
     hueB = ((sqrt(3.0) * s - c) + 1.0) / 3.0;
   }
+
+  final hsv = <num>[0.0, 0.0, 0.0];
 
   for (final frame in src.frames) {
     for (final p in frame) {
@@ -142,10 +139,12 @@ Image adjustColor(Image src,
       }
 
       if (saturation != null) {
-        final num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
-        r = lum * invSaturation + r * saturation;
-        g = lum * invSaturation + g * saturation;
-        b = lum * invSaturation + b * saturation;
+        rgbToHsv(r, g, b, hsv);
+        hsv[1] *= saturation;
+        hsvToRgb(hsv[0], hsv[1], hsv[2], hsv);
+        r = hsv[0];
+        g = hsv[1];
+        b = hsv[2];
       }
 
       if (contrast != null) {

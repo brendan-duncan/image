@@ -14,7 +14,6 @@ import '../color/color_uint32.dart';
 import '../color/color_uint4.dart';
 import '../color/color_uint8.dart';
 import '../color/format.dart';
-import 'image_exception.dart';
 
 int uint32ToRed(int c) => c & 0xff;
 
@@ -138,10 +137,13 @@ num getLuminanceRgb(num r, num g, num b) => 0.299 * r + 0.587 * g + 0.114 * b;
 /// Convert an HSL color to RGB, where h is specified in normalized degrees
 /// \[0, 1\] (where 1 is 360-degrees); s and l are in the range \[0, 1\].
 /// Returns a list \[r, g, b\] with values in the range \[0, 255\].
-List<int> hslToRgb(num hue, num saturation, num lightness) {
+void hslToRgb(num hue, num saturation, num lightness, List<int> rgb) {
   if (saturation == 0) {
     final gray = (lightness * 255.0).toInt();
-    return [gray, gray, gray];
+    rgb[0] = gray;
+    rgb[1] = gray;
+    rgb[2] = gray;
+    return;
   }
 
   num hue2rgb(num p, num q, num t) {
@@ -172,63 +174,93 @@ List<int> hslToRgb(num hue, num saturation, num lightness) {
   final g = hue2rgb(p, q, hue);
   final b = hue2rgb(p, q, hue - 1.0 / 3.0);
 
-  return [(r * 255.0).round(), (g * 255.0).round(), (b * 255.0).round()];
+  rgb[0] = (r * 255.0).round();
+  rgb[1] = (g * 255.0).round();
+  rgb[2] = (b * 255.0).round();
+}
+
+/// Convert an RGB color to HSV.
+void rgbToHsv(num r, num g, num b, List<num> hsv) {
+  final minCh = min(r, min(g, b));
+  final maxCh = max(r, max(g, b));
+  final delta = maxCh - minCh;
+
+  if (maxCh == 0 || delta == 0) {
+    hsv[0] = 0;
+    hsv[1] = 0;
+    hsv[2] = 0;
+    return;
+  }
+
+  num h, s, v;
+  v = maxCh;
+  s = delta / maxCh; // s
+
+  if (r == maxCh) {
+    h = (g - b) / delta; // between yellow & magenta
+  } else if (g == maxCh) {
+    h = 2 + (b - r) / delta; // between cyan & yellow
+  } else {
+    h = 4 + (r - g) / delta; // between magenta & cyan
+  }
+  h *= 60; // degrees
+  if (h < 0) {
+    h += 360;
+  }
+  hsv[0] = h;
+  hsv[1] = s;
+  hsv[2] = v;
 }
 
 /// Convert an HSV color to RGB, where h is specified in normalized degrees
 /// \[0, 1\] (where 1 is 360-degrees); s and l are in the range \[0, 1\].
 /// Returns a list \[r, g, b\] with values in the range \[0, 255\].
-List<int> hsvToRgb(num hue, num saturation, num brightness) {
-  if (saturation == 0) {
-    final gray = (brightness * 255.0).round();
-    return [gray, gray, gray];
+void hsvToRgb(num h, num s, num v, List<num> rgb) {
+  if (s == 0) {
+    rgb[0] = v.clamp(0, 1);
+    rgb[1] = v.clamp(0, 1);
+    rgb[2] = v.clamp(0, 1);
+    return;
   }
 
-  final num h = (hue - hue.floor()) * 6.0;
-  final f = h - h.floor();
-  final num p = brightness * (1.0 - saturation);
-  final num q = brightness * (1.0 - saturation * f);
-  final num t = brightness * (1.0 - (saturation * (1.0 - f)));
+  h /= 60.0;
+  final i = h.floor();
+  final f = h - i;
+  final p = (v * (1 - s)).clamp(0, 1);
+  final q = (v * (1 - s * f)).clamp(0, 1);
+  final t = (v * (1 - s * (1 - f))).clamp(0, 1);
 
-  switch (h.toInt()) {
+  switch (i) {
     case 0:
-      return [
-        (brightness * 255.0).round(),
-        (t * 255.0).round(),
-        (p * 255.0).round()
-      ];
+      rgb[0] = v;
+      rgb[1] = t;
+      rgb[2] = p;
+      return;
     case 1:
-      return [
-        (q * 255.0).round(),
-        (brightness * 255.0).round(),
-        (p * 255.0).round()
-      ];
+      rgb[0] = q;
+      rgb[1] = v;
+      rgb[2] = p;
+      return;
     case 2:
-      return [
-        (p * 255.0).round(),
-        (brightness * 255.0).round(),
-        (t * 255.0).round()
-      ];
+      rgb[0] = p;
+      rgb[1] = v;
+      rgb[2] = t;
+      return;
     case 3:
-      return [
-        (p * 255.0).round(),
-        (q * 255.0).round(),
-        (brightness * 255.0).round()
-      ];
+      rgb[0] = p;
+      rgb[1] = q;
+      rgb[2] = v;
+      return;
     case 4:
-      return [
-        (t * 255.0).round(),
-        (p * 255.0).round(),
-        (brightness * 255.0).round()
-      ];
-    case 5:
-      return [
-        (brightness * 255.0).round(),
-        (p * 255.0).round(),
-        (q * 255.0).round()
-      ];
-    default:
-      throw ImageException('invalid hue');
+      rgb[0] = t;
+      rgb[1] = p;
+      rgb[2] = v;
+      return;
+    default: // case 5
+      rgb[0] = v;
+      rgb[1] = p;
+      rgb[2] = q;
+      return;
   }
 }
 
