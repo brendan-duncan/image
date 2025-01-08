@@ -1,3 +1,7 @@
+## 4.5.3 - December 20, 2024 
+
+- Improve fillPolygon to better handle concave polygons.
+
 ## 4.5.2 - December 19, 2024
 
 - Reduce Min SDK version to 3.0.
