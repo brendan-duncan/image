@@ -25,6 +25,7 @@ class TiffImage {
   int compression = 1;
   int bitsPerSample = 1;
   int samplesPerPixel = 1;
+  int channelsPerPixel = 1;
   TiffFormat sampleFormat = TiffFormat.uint;
   TiffImageType imageType = TiffImageType.invalid;
   bool isWhiteZero = false;
@@ -133,6 +134,8 @@ class TiffImage {
       isWhiteZero = true;
     }
 
+    channelsPerPixel = samplesPerPixel;
+
     if (hasTag(exifTagNameToID['TileOffsets']!)) {
       tiled = true;
       // Image is in tiled format
@@ -235,6 +238,16 @@ class TiffImage {
           }
         }
         break;
+      case TiffPhotometricType.cmyk:
+        if (bitsPerSample % 8 == 0) {
+          imageType = TiffImageType.generic;
+        }
+        if (samplesPerPixel == 4) {
+          channelsPerPixel = 3;
+        } else if (samplesPerPixel == 5) {
+          channelsPerPixel = 4;
+        }
+        break;
       default: // Other including CMYK, CIE L*a*b*, unknown.
         if (bitsPerSample % 8 == 0) {
           imageType = TiffImageType.generic;
@@ -273,7 +286,7 @@ class TiffImage {
                                                 : Format.uint8;
     final hasPalette =
         colorMap != null && photometricType == TiffPhotometricType.palette;
-    final numChannels = hasPalette ? 3 : samplesPerPixel;
+    final numChannels = hasPalette ? 3 : channelsPerPixel;
 
     final image = Image(
         width: width,
@@ -548,6 +561,7 @@ class TiffImage {
               var g = 0;
               var b = 0;
               var a = 0;
+              var alpha = image.maxChannelValue as int;
               if (bitsPerSample == 8) {
                 r = sampleFormat == TiffFormat.int
                     ? byteData.readInt8()
@@ -561,6 +575,11 @@ class TiffImage {
                 a = sampleFormat == TiffFormat.int
                     ? byteData.readInt8()
                     : byteData.readByte();
+                if (samplesPerPixel == 5) {
+                  alpha = sampleFormat == TiffFormat.int
+                      ? byteData.readInt8()
+                      : byteData.readByte();
+                }
               } else if (bitsPerSample == 16) {
                 r = sampleFormat == TiffFormat.int
                     ? byteData.readInt16()
@@ -574,6 +593,11 @@ class TiffImage {
                 a = sampleFormat == TiffFormat.int
                     ? byteData.readInt16()
                     : byteData.readUint16();
+                if (samplesPerPixel == 5) {
+                  alpha = sampleFormat == TiffFormat.int
+                      ? byteData.readInt16()
+                      : byteData.readUint16();
+                }
               } else if (bitsPerSample == 32) {
                 r = sampleFormat == TiffFormat.int
                     ? byteData.readInt32()
@@ -587,6 +611,11 @@ class TiffImage {
                 a = sampleFormat == TiffFormat.int
                     ? byteData.readInt32()
                     : byteData.readUint32();
+                if (samplesPerPixel == 5) {
+                  alpha = sampleFormat == TiffFormat.int
+                      ? byteData.readInt32()
+                      : byteData.readUint32();
+                }
               }
 
               if (photometricType == TiffPhotometricType.cmyk) {
@@ -594,7 +623,7 @@ class TiffImage {
                 r = rgb[0];
                 g = rgb[1];
                 b = rgb[2];
-                a = image.maxChannelValue as int;
+                a = alpha;
               }
 
               if (px < width && py < height) {
