@@ -217,10 +217,18 @@ void rgbToHsv(num r, num g, num b, List<num> hsv) {
 /// Returns a list \[r, g, b\] with values in the range \[0, 255\].
 void hsvToRgb(num h, num s, num v, List<num> rgb) {
   if (s == 0) {
-    rgb[0] = v.clamp(0, 1);
-    rgb[1] = v.clamp(0, 1);
-    rgb[2] = v.clamp(0, 1);
+    final g = v.clamp(0, 1);
+    rgb[0] = g;
+    rgb[1] = g;
+    rgb[2] = g;
     return;
+  }
+
+  while (h < 0) {
+    h += 360;
+  }
+  while (h > 360) {
+    h -= 360;
   }
 
   h /= 60.0;

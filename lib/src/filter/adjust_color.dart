@@ -67,7 +67,6 @@ Image adjustColor(Image src,
   exposure = exposure?.clamp(0, 1000);
   amount = amount.clamp(0, 1000);
 
-  const degToRad = 0.0174532925;
   const avgLumR = 0.5;
   const avgLumG = 0.5;
   const avgLumB = 0.5;
@@ -100,19 +99,6 @@ Image adjustColor(Image src,
     exposure = pow(2.0, exposure);
   }
 
-  late num hueR;
-  late num hueG;
-  late num hueB;
-  if (hue != null) {
-    hue *= degToRad;
-    final s = sin(hue);
-    final c = cos(hue);
-
-    hueR = (2.0 * c) / 3.0;
-    hueG = (-sqrt(3.0) * s - c) / 3.0;
-    hueB = ((sqrt(3.0) * s - c) + 1.0) / 3.0;
-  }
-
   final hsv = <num>[0.0, 0.0, 0.0];
 
   for (final frame in src.frames) {
@@ -138,9 +124,10 @@ Image adjustColor(Image src,
         b *= tb;
       }
 
-      if (saturation != null) {
+      if (saturation != null || hue != null) {
         rgbToHsv(r, g, b, hsv);
-        hsv[1] *= saturation;
+        hsv[0] += hue ?? 0.0;
+        hsv[1] *= saturation ?? 1.0;
         hsvToRgb(hsv[0], hsv[1], hsv[2], hsv);
         r = hsv[0];
         g = hsv[1];
@@ -163,16 +150,6 @@ Image adjustColor(Image src,
         r = r * exposure;
         g = g * exposure;
         b = b * exposure;
-      }
-
-      if (hue != null && hue != 0.0) {
-        final hr = r * hueR + g * hueG + b * hueB;
-        final hg = r * hueB + g * hueR + b * hueG;
-        final hb = r * hueG + g * hueB + b * hueR;
-
-        r = hr;
-        g = hg;
-        b = hb;
       }
 
       final msk =
