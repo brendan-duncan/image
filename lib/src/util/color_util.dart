@@ -321,16 +321,14 @@ List<int> xyzToRgb(num x, num y, num z) {
 
 /// Convert a CMYK color to RGB, where c, m, y, k values are in the range
 /// \[0, 255\]. Returns a list \[r, g, b\] with values in the range \[0, 255\].
-List<int> cmykToRgb(num c, num m, num y, num k) {
+void cmykToRgb(num c, num m, num y, num k, List<int> rgb) {
   c /= 255.0;
   m /= 255.0;
   y /= 255.0;
   k /= 255.0;
-  return [
-    (255.0 * (1.0 - c) * (1.0 - k)).round(),
-    (255.0 * (1.0 - m) * (1.0 - k)).round(),
-    (255.0 * (1.0 - y) * (1.0 - k)).round()
-  ];
+  rgb[0] = (255.0 * (1.0 - c) * (1.0 - k)).round();
+  rgb[1] = (255.0 * (1.0 - m) * (1.0 - k)).round();
+  rgb[2] = (255.0 * (1.0 - y) * (1.0 - k)).round();
 }
 
 /// Convert a CIE-L*ab color to RGB.

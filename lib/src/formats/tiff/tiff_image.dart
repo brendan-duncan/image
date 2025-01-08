@@ -383,6 +383,8 @@ class TiffImage {
         throw ImageException('Unsupported Compression Type: $compression');
       }
 
+      final rgb = [0, 0, 0];
+
       for (var y = 0, py = outY; y < tileHeight; ++y, ++py) {
         for (var x = 0, px = outX; x < tileWidth; ++x, ++px) {
           if (byteData.isEOS) {
@@ -588,10 +590,10 @@ class TiffImage {
               }
 
               if (photometricType == TiffPhotometricType.cmyk) {
-                final rgba = cmykToRgb(r, g, b, a);
-                r = rgba[0];
-                g = rgba[1];
-                b = rgba[2];
+                cmykToRgb(r, g, b, a, rgb);
+                r = rgb[0];
+                g = rgb[1];
+                b = rgb[2];
                 a = image.maxChannelValue as int;
               }
 
