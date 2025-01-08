@@ -98,8 +98,8 @@ Image adjustColor(Image src,
   }
 
   final num invSaturation =
-      saturation != null ? 1.0 - saturation.clamp(0, 2) : 0.0;
-  final num invContrast = contrast != null ? 1.0 - contrast.clamp(0, 2) : 0.0;
+      saturation != null ? 1.0 - saturation : 0.0;
+  final num invContrast = contrast != null ? 1.0 - contrast : 0.0;
 
   if (exposure != null) {
     exposure = pow(2.0, exposure);
@@ -143,7 +143,6 @@ Image adjustColor(Image src,
 
       if (saturation != null) {
         final num lum = r * lumCoeffR + g * lumCoeffG + b * lumCoeffB;
-
         r = lum * invSaturation + r * saturation;
         g = lum * invSaturation + g * saturation;
         b = lum * invSaturation + b * saturation;
@@ -186,9 +185,9 @@ Image adjustColor(Image src,
       b = mix(ob, b, blend);
 
       p
-        ..rNormalized = r
-        ..gNormalized = g
-        ..bNormalized = b;
+        ..rNormalized = r.clamp(0.0, 1.0)
+        ..gNormalized = g.clamp(0.0, 1.0)
+        ..bNormalized = b.clamp(0.0, 1.0);
     }
   }
 
