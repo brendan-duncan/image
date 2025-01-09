@@ -400,7 +400,7 @@ class TiffImage {
 
       for (var y = 0, py = outY; y < tileHeight; ++y, ++py) {
         for (var x = 0, px = outX; x < tileWidth; ++x, ++px) {
-          if (byteData.isEOS) {
+          if (byteData.isEOS || px >= width || py >= height) {
             break;
           }
           if (samplesPerPixel == 1) {
