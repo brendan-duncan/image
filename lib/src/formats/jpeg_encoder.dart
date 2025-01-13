@@ -160,9 +160,10 @@ class JpegEncoder extends Encoder {
         final backgroundColor = image.backgroundColor ?? _backgroundColor;
         final a = p.aNormalized;
         final invA = 1.0 - a;
-        p..r = (p.r * a + backgroundColor.r * invA).round()
-        ..g = (p.g * a + backgroundColor.r * invA).round()
-        ..b = (p.b * a + backgroundColor.r * invA).round();
+        p
+          ..r = (p.r * a + backgroundColor.r * invA).round()
+          ..g = (p.g * a + backgroundColor.r * invA).round()
+          ..b = (p.b * a + backgroundColor.r * invA).round();
       }
       final r = p.r.toInt();
       final g = p.g.toInt();
