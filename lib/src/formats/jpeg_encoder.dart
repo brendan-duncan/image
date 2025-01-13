@@ -123,7 +123,7 @@ class JpegEncoder extends Encoder {
     return fp.getBytes();
   }
 
-  static const _black = const ConstColorRgb8(0, 0, 0);
+  static const _backgroundColor = const ConstColorRgb8(255, 255, 255);
 
   void _calculateYUV(
     Image image,
@@ -157,7 +157,7 @@ class JpegEncoder extends Encoder {
         p = p.convert(format: Format.uint8);
       }
       if (p.length > 3) {
-        final backgroundColor = image.backgroundColor ?? _black;
+        final backgroundColor = image.backgroundColor ?? _backgroundColor;
         final a = p.aNormalized;
         final invA = 1.0 - a;
         p..r = (p.r * a + backgroundColor.r * invA).round()
