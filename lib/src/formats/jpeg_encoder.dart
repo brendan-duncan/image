@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../../image.dart';
 import '../color/color.dart';
 import '../color/format.dart';
 import '../exif/exif_data.dart';
@@ -122,6 +123,8 @@ class JpegEncoder extends Encoder {
     return fp.getBytes();
   }
 
+  static const _black = const ConstColorRgb8(0, 0, 0);
+
   void _calculateYUV(
     Image image,
     int x,
@@ -152,6 +155,14 @@ class JpegEncoder extends Encoder {
       Color p = image.getPixel(xx, yy);
       if (p.format != Format.uint8) {
         p = p.convert(format: Format.uint8);
+      }
+      if (p.length > 3) {
+        final backgroundColor = image.backgroundColor ?? _black;
+        final a = p.aNormalized;
+        final invA = 1.0 - a;
+        p..r = (p.r * a + backgroundColor.r * invA).round()
+        ..g = (p.g * a + backgroundColor.r * invA).round()
+        ..b = (p.b * a + backgroundColor.r * invA).round();
       }
       final r = p.r.toInt();
       final g = p.g.toInt();
