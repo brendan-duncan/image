@@ -227,6 +227,7 @@ export 'src/transform/copy_resize.dart';
 export 'src/transform/copy_resize_crop_square.dart';
 export 'src/transform/copy_rotate.dart';
 export 'src/transform/flip.dart';
+export 'src/transform/resize.dart';
 export 'src/transform/trim.dart';
 export 'src/util/binary_quantizer.dart';
 export 'src/util/clip_line.dart';

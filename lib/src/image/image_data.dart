@@ -7,8 +7,8 @@ import 'palette.dart';
 import 'pixel.dart';
 
 abstract class ImageData extends Iterable<Pixel> {
-  final int width;
-  final int height;
+  int width;
+  int height;
   final int numChannels;
 
   ImageData(this.width, this.height, this.numChannels);
