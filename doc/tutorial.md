@@ -157,7 +157,7 @@ List<img.Image> splitImage(img.Image inputImage, int horizontalPieceCount, int v
 
   final pieceWidth = (image.width / horizontalPieceCount).round();
   final pieceHeight = (image.height / verticalPieceCount).round();
-  final pieceList = List<imglib.Image>.empty(growable: true);
+  final pieceList = List<img.Image>.empty(growable: true);
 
   for (var y = 0; y < image.height; y += pieceHeight) {
     for (var x = 0; x < image.width; x += pieceWidth) {
