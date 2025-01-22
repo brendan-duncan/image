@@ -141,7 +141,8 @@ class JpegData {
     if (frame != null) {
       info
         ..width = frame!.samplesPerLine!
-        ..height = frame!.scanLines!;
+        ..height = frame!.scanLines!
+        ..numComponents = frame!.components.length;
     }
     frame = null;
     frames.clear();

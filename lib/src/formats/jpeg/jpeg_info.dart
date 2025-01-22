@@ -10,4 +10,7 @@ class JpegInfo implements DecodeInfo {
   int get numFrames => 1;
   @override
   Color? get backgroundColor => null;
+
+  /// The number of components in the image
+  int numComponents = 0;
 }
