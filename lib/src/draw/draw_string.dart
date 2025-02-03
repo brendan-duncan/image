@@ -4,7 +4,7 @@ import '../font/bitmap_font.dart';
 import '../image/image.dart';
 import 'draw_pixel.dart';
 
-/// Draw a string horizontally into [image] horizontally into [image] at
+/// Draw a string horizontally into [image] at
 /// position [x],[y] with the given [color].
 /// If [x] is not specified, the string will be centered horizontally.
 /// If [y] is not specified, the string will be centered vertically.
