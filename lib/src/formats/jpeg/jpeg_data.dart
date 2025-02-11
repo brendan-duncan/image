@@ -15,7 +15,7 @@ import 'jpeg_jfif.dart';
 import 'jpeg_marker.dart';
 import 'jpeg_quantize_stub.dart'
     if (dart.library.io) '_jpeg_quantize_io.dart'
-    if (dart.library.js) '_jpeg_quantize_html.dart';
+    if (dart.library.js_interop) '_jpeg_quantize_html.dart';
 import 'jpeg_scan.dart';
 
 @internal
