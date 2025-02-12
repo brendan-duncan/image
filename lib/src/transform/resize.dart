@@ -9,10 +9,10 @@ import 'copy_resize.dart';
 
 Image resize(Image src,
     {int? width,
-      int? height,
-      bool? maintainAspect,
-      Color? backgroundColor,
-      Interpolation interpolation = Interpolation.nearest}) {
+    int? height,
+    bool? maintainAspect,
+    Color? backgroundColor,
+    Interpolation interpolation = Interpolation.nearest}) {
   if (width == null && height == null) {
     throw ImageException('Invalid size');
   }
@@ -75,8 +75,11 @@ Image resize(Image src,
   }
 
   if ((width * height) > (src.width * src.height)) {
-    return copyResize(src, width: width, height: height,
-        maintainAspect: maintainAspect, backgroundColor: backgroundColor,
+    return copyResize(src,
+        width: width,
+        height: height,
+        maintainAspect: maintainAspect,
+        backgroundColor: backgroundColor,
         interpolation: interpolation);
   }
 

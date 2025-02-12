@@ -7,15 +7,13 @@ import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import '_component_data.dart';
 import '_jpeg_huffman.dart';
+import '_jpeg_quantize_html.dart' if (dart.library.io) '_jpeg_quantize_io.dart';
 import 'jpeg_adobe.dart';
 import 'jpeg_component.dart';
 import 'jpeg_frame.dart';
 import 'jpeg_info.dart';
 import 'jpeg_jfif.dart';
 import 'jpeg_marker.dart';
-import 'jpeg_quantize_stub.dart'
-    if (dart.library.io) '_jpeg_quantize_io.dart'
-    if (dart.library.js) '_jpeg_quantize_html.dart';
 import 'jpeg_scan.dart';
 
 @internal

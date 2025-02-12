@@ -1,3 +1,1 @@
-export '_executor.dart'
-    if (dart.library.io) '_executor_io.dart'
-    if (dart.library.js) '_executor_html.dart';
+export '_executor_html.dart' if (dart.library.io) '_executor_io.dart';

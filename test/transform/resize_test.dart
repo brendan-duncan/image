@@ -20,8 +20,7 @@ void main() {
     test('resize average', () {
       final img =
           decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
-      final i0 =
-          resize(img, width: 64, interpolation: Interpolation.average);
+      final i0 = resize(img, width: 64, interpolation: Interpolation.average);
       expect(i0.width, equals(64));
       expect(i0.height, equals(40));
       File('$testOutputPath/transform/resize_average.png')
@@ -32,8 +31,7 @@ void main() {
     test('resize linear', () {
       final img =
           decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
-      final i0 =
-          resize(img, width: 64, interpolation: Interpolation.linear);
+      final i0 = resize(img, width: 64, interpolation: Interpolation.linear);
       expect(i0.width, equals(64));
       expect(i0.height, equals(40));
       File('$testOutputPath/transform/resize_linear.png')
@@ -168,10 +166,8 @@ void main() {
 
     test('resize palette', () async {
       final img = await decodePngFile('test/_data/png/test.png');
-      final i0 =
-          resize(img!, width: 64, interpolation: Interpolation.cubic);
-      await encodePngFile(
-          '$testOutputPath/transform/resize_palette.png', i0);
+      final i0 = resize(img!, width: 64, interpolation: Interpolation.cubic);
+      await encodePngFile('$testOutputPath/transform/resize_palette.png', i0);
     });
   });
 }
