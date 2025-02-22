@@ -13,7 +13,7 @@ class InputBuffer {
   int offset;
   bool bigEndian;
 
-  /// Create a InputStream for reading from a List<int>
+  /// Create a InputStream for reading from a List&lt;int&rt;
   InputBuffer(this.buffer,
       {this.bigEndian = false, this.offset = 0, int? length})
       : start = offset,

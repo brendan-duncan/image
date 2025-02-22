@@ -1,6 +1,6 @@
 /// Clip a line to a rectangle using the Cohen–Sutherland clipping algorithm.
-/// [line] is a list of 4 ints <x1, y1, x2, y2>.
-/// [rect] is a list of 4 ints <x1, y1, x2, y2>.
+/// [line] is a list of 4 ints &lt;x1, y1, x2, y2&gt;.
+/// [rect] is a list of 4 ints &lt;x1, y1, x2, y2&gt;.
 /// Results are stored in [line].
 /// If [line] falls completely outside of [rect], false is returned, otherwise
 /// true is returned.
