@@ -1,6 +1,12 @@
-## 4.5.3 - December 20, 2024 
+## 4.5.3 - February 21, 2024 
 
 - Improve fillPolygon to better handle concave polygons.
+- Update conditional imports to be compatible with WASM.
+- Fix TIFF 5-channel CMYK decoding
+- Fix adjustColor color corruption
+- Improve adjustColor saturation calculations
+- Fix alpha color handling in JPEG encoder
+- Change the default background color to white instead of black
 
 ## 4.5.2 - December 19, 2024
 
