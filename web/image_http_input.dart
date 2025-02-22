@@ -1,29 +1,31 @@
 import 'dart:convert';
-import 'dart:html';
+import 'dart:js_interop';
 import 'dart:typed_data';
-
 import 'package:image/image.dart';
+import 'package:web/web.dart';
 
-late InputElement fileInput;
+late HTMLInputElement fileInput;
 
 void main() {
   // There are at least two ways to get a file into an html dart app:
   // using a file Input element, or an AJAX HttpRequest.
 
+  // TODO: how do you do this with package:web?
   // This example demonstrates using a file Input element.
-  fileInput = querySelector('#file') as InputElement;
+  //fileInput = document.querySelector('#file') as HTMLInputElement;
 
-  fileInput.addEventListener('change', onFileChanged);
+  //fileInput.addEventListener('change', onFileChanged);
 }
 
 /// Called when the user has selected a file.
 void onFileChanged(Event event) {
-  final files = fileInput.files as FileList;
-  final file = files.item(0)!;
+  //final files = fileInput.files as FileList;
+  //final file = files.item(0)!;
 
-  FileReader()
-    ..addEventListener('load', onFileLoaded)
-    ..readAsArrayBuffer(file);
+  // TODO: how do you do this with package:web?
+  //FileReader()
+  //..addEventListener('load', onFileLoaded)
+  //..readAsArrayBuffer(file);
 }
 
 /// Called when the file has been read.
@@ -48,20 +50,22 @@ void onFileLoaded(Event event) {
   // a canvas.
   if (image != null) {
     // Add a separator to the html page
-    document.body!.append(ParagraphElement());
+    document.body!.append(HTMLParagraphElement());
 
     // Draw the image into a canvas. First create a canvas at the correct
     // resolution.
-    final c = CanvasElement();
+    final c = HTMLCanvasElement();
     document.body!.append(c);
     c
       ..width = image.width
       ..height = image.height;
 
     // Create a buffer that the canvas can draw.
-    final d = c.context2D.createImageData(c.width, c.height);
+    final d = c.context2D.createImageData(c.width.toJS, c.height);
+
+    // TODO: how do you do this with package:web?
     // Fill the buffer with our image data.
-    d.data.setRange(0, d.data.length, image.toUint8List());
+    //d.data.setRange(0, d.data.length, image.toUint8List());
     // Draw the buffer onto the canvas.
     c.context2D.putImageData(d, 0, 0);
 
@@ -73,7 +77,7 @@ void onFileLoaded(Event event) {
     final png = encodePng(image);
     // base64 encode the png
     final png64 = base64Encode(png);
-    final img = ImageElement(src: 'data:image/png;base64,$png64');
+    final img = HTMLImageElement()..src = 'data:image/png;base64,$png64';
     document.body!.append(img);
   }
 

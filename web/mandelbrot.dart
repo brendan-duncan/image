@@ -1,6 +1,7 @@
-import 'dart:html';
+import 'dart:js_interop';
 import 'dart:math';
 import 'package:image/image.dart';
+import 'package:web/web.dart';
 
 double logN(num x, num div) => log(x) / div;
 
@@ -10,7 +11,9 @@ void main() {
   const height = 1024;
 
   // Create a canvas to put our decoded image into.
-  final c = CanvasElement(width: width, height: height);
+  final c = HTMLCanvasElement()
+    ..width = width
+    ..height = height;
   document.body!.append(c);
 
   const zoom = 1.0;
@@ -61,9 +64,9 @@ void main() {
   }
 
   // Create a buffer that the canvas can draw.
-  final d = c.context2D.createImageData(image.width, image.height);
+  final d = c.context2D.createImageData(image.width.toJS, image.height);
   // Fill the buffer with our image data.
-  d.data.setRange(0, d.data.length, image.toUint8List());
+  //d.data.set(image.toUint8List().toJS); // ?????
   // Draw the buffer onto the canvas.
   c.context2D.putImageData(d, 0, 0);
 }

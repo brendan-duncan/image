@@ -7,6 +7,34 @@ import '../_test_util.dart';
 void main() {
   group('Transform', () {
     test('resize nearest', () {
+      final img = decodePng(
+          File('C:/Users/brend/Downloads/imagetest_original.png')
+              .readAsBytesSync())!;
+      final i0 = copyResize(img, width: 500);
+      File('$testOutputPath/transform/imagetest_nearest.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+
+      final i1 =
+          copyResize(img, width: 500, interpolation: Interpolation.linear);
+      File('$testOutputPath/transform/imagetest_linear.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i1));
+
+      final i2 =
+          copyResize(img, width: 500, interpolation: Interpolation.cubic);
+      File('$testOutputPath/transform/imagetest_cubic.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i2));
+
+      final i3 =
+          copyResize(img, width: 500, interpolation: Interpolation.average);
+      File('$testOutputPath/transform/imagetest_average.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i3));
+    });
+
+    test('resize nearest', () {
       final img =
           decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
       final i0 = resize(img, width: 64);
