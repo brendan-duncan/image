@@ -1,2 +1,5 @@
 doc/
 test/
+_out/
+web/
+example/
