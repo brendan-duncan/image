@@ -213,8 +213,8 @@ void rgbToHsv(num r, num g, num b, List<num> hsv) {
 }
 
 /// Convert an HSV color to RGB, where h is specified in normalized degrees
-/// \[0, 1\] (where 1 is 360-degrees); s and l are in the range \[0, 1\].
-/// Returns a list \[r, g, b\] with values in the range \[0, 255\].
+/// \[0, 360\]; s and l are in the range \[0, 1\].
+/// Returns a list \[r, g, b\] with values in the range \[0, 1\].
 void hsvToRgb(num h, num s, num v, List<num> rgb) {
   if (s == 0) {
     final g = v.clamp(0, 1);
