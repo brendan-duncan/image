@@ -90,5 +90,20 @@ void main() {
         throwsA(isA<ArgumentError>()),
       );
     });
+
+    test('copyExpandCanvas - alpha image', () {
+      final img =
+          decodePng(File('test/_data/png/alpha.png').readAsBytesSync())!;
+
+      final expandedCanvas = copyExpandCanvas(
+        img,
+        newWidth: img.width * 2,
+        newHeight: img.height * 2,
+        backgroundColor: ColorRgb8(255, 255, 255),
+      );
+      File('$testOutputPath/transform/copyExpandCanvas_alpha.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(expandedCanvas));
+    });
   });
 }

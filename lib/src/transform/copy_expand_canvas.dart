@@ -1,4 +1,5 @@
 import '../color/color.dart';
+import '../draw/draw_pixel.dart';
 import '../image/image.dart';
 
 enum ExpandCanvasPosition {
@@ -120,7 +121,11 @@ Image copyExpandCanvas(Image src,
       if (xPos + p.x >= newWidth || yPos + p.y >= newHeight) {
         continue;
       }
-      expandedCanvasFrame.setPixel(xPos + p.x, yPos + p.y, p);
+      if (p.a == p.maxChannelValue) {
+        expandedCanvasFrame.setPixel(xPos + p.x, yPos + p.y, p);
+      } else {
+        drawPixel(expandedCanvasFrame, xPos + p.x, yPos + p.y, p);
+      }
     }
   }
 
