@@ -9,7 +9,7 @@ late img.Image origImage;
 
 void _addControl(String label, String value, HTMLDivElement parent,
     void Function(double) callback) {
-  final amountLabel = HTMLLabelElement()..text = '$label:';
+  final amountLabel = HTMLLabelElement()..textContent = '$label:';
   final amountEdit = HTMLInputElement()
     ..value = value
     ..id = '${label}_edit';
@@ -39,7 +39,7 @@ HTMLDivElement _getSidebar() {
 void testSepia() {
   final sidebar = _getSidebar();
 
-  final label = HTMLHeadingElement.h1()..text = 'Sepia';
+  final label = HTMLHeadingElement.h1()..textContent = 'Sepia';
   sidebar.appendChild(label);
 
   num amount = 1.0;
@@ -48,7 +48,7 @@ void testSepia() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.sepia(image, amount: amount);
-    logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
+    logDiv.textContent = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     final imageBytes = Uint8ClampedList.view(image.toUint8List().buffer);
     final imageData =
         ImageData(imageBytes.toJS, image.width, image.height.toJS);
@@ -68,7 +68,7 @@ void testSepia() {
 void testSobel() {
   final sidebar = _getSidebar();
 
-  final label = HTMLHeadingElement.h1()..text = 'Sobel';
+  final label = HTMLHeadingElement.h1()..textContent = 'Sobel';
   sidebar.appendChild(label);
 
   num amount = 1.0;
@@ -77,7 +77,7 @@ void testSobel() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.sobel(image, amount: amount);
-    logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
+    logDiv.textContent = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     final imageBytes = Uint8ClampedList.view(image.toUint8List().buffer);
     final imageData =
         ImageData(imageBytes.toJS, image.width, image.height.toJS);
@@ -96,7 +96,7 @@ void testSobel() {
 
 void testGaussian() {
   final sidebar = _getSidebar();
-  final label = HTMLHeadingElement.h1()..text = 'Gaussian Blur';
+  final label = HTMLHeadingElement.h1()..textContent = 'Gaussian Blur';
   sidebar.appendChild(label);
 
   var radius = 5;
@@ -105,7 +105,7 @@ void testGaussian() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.gaussianBlur(image, radius: radius);
-    logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
+    logDiv.textContent = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     final imageBytes = Uint8ClampedList.view(image.toUint8List().buffer);
     final imageData =
         ImageData(imageBytes.toJS, image.width, image.height.toJS);
@@ -124,7 +124,7 @@ void testGaussian() {
 
 void testVignette() {
   final sidebar = _getSidebar();
-  final label = HTMLHeadingElement.h1()..text = 'Vignette';
+  final label = HTMLHeadingElement.h1()..textContent = 'Vignette';
   sidebar.appendChild(label);
 
   num start = 0.3;
@@ -135,7 +135,7 @@ void testVignette() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.vignette(image, start: start, end: end, amount: amount);
-    logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
+    logDiv.textContent = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     final imageBytes = Uint8ClampedList.view(image.toUint8List().buffer);
     final imageData =
         ImageData(imageBytes.toJS, image.width, image.height.toJS);
@@ -164,7 +164,7 @@ void testVignette() {
 
 void testPixelate() {
   final sidebar = _getSidebar();
-  final label = HTMLHeadingElement.h1()..text = 'Pixelate';
+  final label = HTMLHeadingElement.h1()..textContent = 'Pixelate';
   sidebar.appendChild(label);
 
   var blockSize = 5;
@@ -173,7 +173,7 @@ void testPixelate() {
     final t = Stopwatch()..start();
     var image = img.Image.from(origImage);
     image = img.pixelate(image, size: blockSize);
-    logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
+    logDiv.textContent = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     final imageBytes = Uint8ClampedList.view(image.toUint8List().buffer);
     final imageData =
         ImageData(imageBytes.toJS, image.width, image.height.toJS);
@@ -192,7 +192,7 @@ void testPixelate() {
 
 void testColorOffset() {
   final sidebar = _getSidebar();
-  final label = HTMLHeadingElement.h1()..text = 'Color Offset';
+  final label = HTMLHeadingElement.h1()..textContent = 'Color Offset';
   sidebar.appendChild(label);
 
   var red = 0;
@@ -205,7 +205,7 @@ void testColorOffset() {
     var image = img.Image.from(origImage);
     image = img.colorOffset(image,
         red: red, green: green, blue: blue, alpha: alpha);
-    logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
+    logDiv.textContent = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     final imageBytes = Uint8ClampedList.view(image.toUint8List().buffer);
     final imageData =
         ImageData(imageBytes.toJS, image.width, image.height.toJS);
@@ -239,7 +239,7 @@ void testColorOffset() {
 
 void testAdjustColor() {
   final sidebar = _getSidebar();
-  final label = HTMLHeadingElement.h1()..text = 'Adjust Color';
+  final label = HTMLHeadingElement.h1()..textContent = 'Adjust Color';
   sidebar.appendChild(label);
 
   num contrast = 1.0;
@@ -261,7 +261,7 @@ void testAdjustColor() {
         exposure: exposure,
         hue: hue,
         amount: amount);
-    logDiv.text = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
+    logDiv.textContent = 'TIME: ${t.elapsedMilliseconds / 1000.0}';
     final imageBytes = Uint8ClampedList.view(image.toUint8List().buffer);
     final imageData =
         ImageData(imageBytes.toJS, image.width, image.height.toJS);

@@ -36,7 +36,7 @@ void main() async {
 
       final label = HTMLDivElement();
       document.body!.append(label);
-      label.text = name;
+      label.textContent = name;
 
       // Create a canvas to put our decoded image into.
       final canvas = HTMLCanvasElement();
