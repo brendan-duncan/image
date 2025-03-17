@@ -74,11 +74,18 @@ Image fillRect(Image src,
       a *= color.aNormalized;
 
       final m = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel) ?? 1;
+      final am = a * m;
+
+      final pr = mix(p.r, color.r, am);
+      final pg = mix(p.g, color.g, am);
+      final pb = mix(p.b, color.b, am);
+      final pa = p.a * (1.0 - am) + color.a;
+
       p
-        ..r = mix(p.r, color.r, a * m)
-        ..g = mix(p.g, color.g, a * m)
-        ..b = mix(p.b, color.b, a * m)
-        ..a = p.a * (1 - (color.a * m));
+        ..r = pr
+        ..g = pg
+        ..b = pb
+        ..a = pa;
     }
 
     return src;

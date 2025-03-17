@@ -7,7 +7,7 @@ import '../_test_util.dart';
 void main() {
   group('Draw', () {
     test('fillRect', () async {
-      final i0 = Image(width: 256, height: 256);
+      final i0 = Image(width: 256, height: 256, numChannels: 4);
 
       fillRect(i0,
           x1: 50, y1: 50, x2: 150, y2: 150, color: ColorRgb8(255, 0, 0));
@@ -32,10 +32,10 @@ void main() {
         ..writeAsBytesSync(encodePng(i0));
 
       var p = i0.getPixel(51, 51);
-      expect(p, equals([255, 0, 0]));
+      expect(p, equals([255, 0, 0, 255]));
 
       p = i0.getPixel(195, 195);
-      expect(p, equals([0, 128, 0]));
+      expect(p, equals([0, 128, 0, 0]));
 
       final mask = Command()
         ..createImage(width: 256, height: 256)
