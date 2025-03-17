@@ -35,7 +35,7 @@ void main() {
       expect(p, equals([255, 0, 0, 255]));
 
       p = i0.getPixel(195, 195);
-      expect(p, equals([0, 128, 0, 0]));
+      expect(p, equals([0, 128, 0, 128]));
 
       final mask = Command()
         ..createImage(width: 256, height: 256)

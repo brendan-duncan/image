@@ -103,11 +103,12 @@ Image fillRect(Image src,
     while (iter.moveNext()) {
       final p = iter.current;
       final m = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel) ?? 1;
+      final am = color.a * m;
       p
         ..r = mix(p.r, color.r, a * m)
         ..g = mix(p.g, color.g, a * m)
         ..b = mix(p.b, color.b, a * m)
-        ..a = p.a * (1 - (color.a * m));
+        ..a = p.a * (1 - am) + am;
     }
   }
 
