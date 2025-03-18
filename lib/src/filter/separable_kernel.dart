@@ -61,6 +61,12 @@ class SeparableKernel {
 
   void _applyCoefficientsLine(Image src, Image dst, int y, int width,
       bool horizontal, Image? mask, Channel maskChannel) {
+    final srcPixel = src.getPixelSafe(0, 0);
+    final dstPixel = dst.getPixelSafe(0, 0);
+    if ((!srcPixel.isValid) || (!dstPixel.isValid)) {
+      return;
+    }
+
     for (var x = 0; x < width; x++) {
       num r = 0.0;
       num g = 0.0;
@@ -71,25 +77,27 @@ class SeparableKernel {
         final c = coefficients[j2];
         final gr = _reflect(width, x + j);
 
-        final sc = horizontal ? src.getPixel(gr, y) : src.getPixel(y, gr);
+        horizontal ? srcPixel.setPosition(gr, y) : srcPixel.setPosition(y, gr);
 
-        r += c * sc.r;
-        g += c * sc.g;
-        b += c * sc.b;
-        a += c * sc.a;
+        r += c * srcPixel.r;
+        g += c * srcPixel.g;
+        b += c * srcPixel.b;
+        a += c * srcPixel.a;
       }
 
-      final p = horizontal ? dst.getPixel(x, y) : dst.getPixel(y, x);
+      horizontal ? dstPixel.setPosition(x, y) : dstPixel.setPosition(y, x);
 
-      final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
+      final msk = mask
+          ?.getPixel(dstPixel.x, dstPixel.y)
+          .getChannelNormalized(maskChannel);
       if (msk == null) {
-        p.setRgba(r, g, b, a);
+        dstPixel.setRgba(r, g, b, a);
       } else {
-        p
-          ..r = mix(p.r, r, msk)
-          ..g = mix(p.g, g, msk)
-          ..b = mix(p.b, b, msk)
-          ..a = mix(p.a, a, msk);
+        dstPixel
+          ..r = mix(dstPixel.r, r, msk)
+          ..g = mix(dstPixel.g, g, msk)
+          ..b = mix(dstPixel.b, b, msk)
+          ..a = mix(dstPixel.a, a, msk);
       }
     }
   }
