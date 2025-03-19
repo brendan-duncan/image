@@ -173,5 +173,43 @@ void main() {
       await encodePngFile(
           '$testOutputPath/transform/copyResize_palette.png', i0);
     });
+
+    test('copyResize nearest smaller color correctness', () {
+      final img =
+          decodeBmp(File('test/_data/bmp/rgba24.bmp').readAsBytesSync())!;
+      final i0 = copyResize(img, width: 64); // 256x256 => 64x64
+      expect(i0.width, equals(64));
+      expect(i0.height, equals(64));
+      for (int y = 0; y < 64; y += 6) {
+        for (int x = 0; x < 64; x += 8) {
+          expect(i0.getPixel(x, y), equals(img.getPixel(x * 4, y * 4)),
+              reason: 'Pixel color at ($x,$y) in resized image is not correct');
+        }
+      }
+      File('$testOutputPath/transform/copyResize_color_nearest_smaller_1.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
+
+    test('copyResize nearest larger color correctness', () {
+      final img =
+          decodeBmp(File('test/_data/bmp/rgba24.bmp').readAsBytesSync())!;
+      final i0 = copyResize(img,
+          width: 360); // 256x256 => 360x360 = 1.40625 times each side
+      expect(i0.width, equals(360));
+      expect(i0.height, equals(360));
+      for (int y = 0; y < 360; y += 8) {
+        for (int x = 0; x < 360; x += 12) {
+          expect(
+              i0.getPixel(x, y),
+              equals(
+                  img.getPixel((x / 1.40625).toInt(), (y / 1.40625).toInt())),
+              reason: 'Pixel color at ($x,$y) in resized image is not correct');
+        }
+      }
+      File('$testOutputPath/transform/copyResize_color_nearest_larger_1.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
   });
 }
