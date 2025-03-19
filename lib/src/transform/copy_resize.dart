@@ -83,6 +83,11 @@ Image copyResize(Image src,
   for (var x = 0; x < w; ++x) {
     scaleX[x] = (x * dx).toInt();
   }
+  final scaleY = Int32List(h);
+  final dy = src.height / h;
+  for (var y = 0; y < h; ++y) {
+    scaleY[y] = (y * dy).toInt();
+  }
 
   Image? firstFrame;
   final numFrames = src.numFrames;
@@ -143,10 +148,16 @@ Image copyResize(Image src,
           }
         }
       } else {
+        final srcPixel = frame.getPixelSafe(0, 0);
         for (var y = 0; y < h; ++y) {
-          final y2 = (y * dy).toInt();
           for (var x = 0; x < w; ++x) {
-            dst.setPixel(x1 + x, y1 + y, frame.getPixel(scaleX[x], y2));
+            frame.getPixel(scaleX[x], scaleY[y], srcPixel);
+            dst.setPixelRgba(
+                x1 + x, y1 + y, srcPixel.r, srcPixel.g, srcPixel.b, srcPixel.a);
+            // Not calling setPixel which triggers runtime type checking
+            // mainly for hasPalette routine. Palette images are treated in
+            // the above if-else block.
+            //dst.setPixel(x1 + x, y1 + y, frame.getPixel(scaleX[x], y2));
           }
         }
       }
