@@ -211,5 +211,28 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });
+
+    test('copyResize average larger color correctness', () {
+      final img =
+          decodeBmp(File('test/_data/bmp/rgba24.bmp').readAsBytesSync())!;
+      final i0 = copyResize(img,
+          width: 600,
+          interpolation: Interpolation
+              .average); // 256x256 => 600x600 = 2.34375 times each side
+      expect(i0.width, equals(600));
+      expect(i0.height, equals(600));
+      for (int y = 0; y < 600; y += 12) {
+        for (int x = 0; x < 600; x += 16) {
+          expect(
+              i0.getPixel(x, y),
+              equals(
+                  img.getPixel((x / 2.34375).toInt(), (y / 2.34375).toInt())),
+              reason: 'Pixel color at ($x,$y) in resized image is not correct');
+        }
+      }
+      File('$testOutputPath/transform/copyResize_color_average_larger_1.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
   });
 }
