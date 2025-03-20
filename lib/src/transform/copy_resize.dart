@@ -106,6 +106,7 @@ Image copyResize(Image src,
     }
 
     if (interpolation == Interpolation.average) {
+      final srcPixel = frame.getPixelSafe(0, 0);
       for (var y = 0; y < h; ++y) {
         final ay1 = (y * dy).toInt();
         var ay2 = ((y + 1) * dy).toInt();
@@ -127,15 +128,14 @@ Image copyResize(Image src,
           var np = 0;
           for (var sy = ay1; sy < ay2; ++sy) {
             for (var sx = ax1; sx < ax2; ++sx, ++np) {
-              final s = frame.getPixel(sx, sy);
-              r += s.r;
-              g += s.g;
-              b += s.b;
-              a += s.a;
+              frame.getPixel(sx, sy, srcPixel);
+              r += srcPixel.r;
+              g += srcPixel.g;
+              b += srcPixel.b;
+              a += srcPixel.a;
             }
           }
-          dst.setPixel(
-              x1 + x, y1 + y, dst.getColor(r / np, g / np, b / np, a / np));
+          dst.setPixelRgba(x1 + x, y1 + y, r / np, g / np, b / np, a / np);
         }
       }
     } else if (interpolation == Interpolation.nearest) {
