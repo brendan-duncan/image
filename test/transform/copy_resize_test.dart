@@ -279,6 +279,35 @@ void main() {
         ..writeAsBytesSync(encodePng(i0));
     });
 
+    test('copyResize linear larger color correctness', () {
+      final img =
+          decodeBmp(File('test/_data/bmp/rgba24.bmp').readAsBytesSync())!;
+      final i0 =
+          copyResize(img, width: 272, interpolation: Interpolation.linear);
+      // 256x256 => 272x272 = 1.0625 times each side
+      expect(i0.width, equals(272));
+      expect(i0.height, equals(272));
+      for (int y = 0; y < 272; y += 8) {
+        for (int x = 0; x < 272; x += 12) {
+          final out = i0.getPixel(x, y);
+          final ori = img.getPixel((x / 1.0625).toInt(), (y / 1.0625).toInt());
+          expect(out.r, closeTo(ori.r, 7),
+              reason:
+                  'Pixel color red at ($x,$y) in resized image is not correct');
+          expect(out.g, closeTo(ori.g, 7),
+              reason:
+                  'Pixel color red at ($x,$y) in resized image is not correct');
+          expect(out.b, closeTo(ori.b, 7),
+              reason:
+                  'Pixel color red at ($x,$y) in resized image is not correct');
+        }
+      }
+
+      File('$testOutputPath/transform/copyResize_color_linear_larger_1.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
+
     test('copyResize cubic smaller maintainAspect color correctness', () {
       final img =
           decodeBmp(File('test/_data/bmp/rgba24.bmp').readAsBytesSync())!;
