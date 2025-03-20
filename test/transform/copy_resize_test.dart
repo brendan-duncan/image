@@ -279,7 +279,7 @@ void main() {
         ..writeAsBytesSync(encodePng(i0));
     });
 
-    test('copyResize linear smaller maintainAspect color correctness', () {
+    test('copyResize cubic smaller maintainAspect color correctness', () {
       final img =
           decodeBmp(File('test/_data/bmp/rgba24.bmp').readAsBytesSync())!;
       final i0 = copyResize(img,
