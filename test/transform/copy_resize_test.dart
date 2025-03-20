@@ -296,10 +296,10 @@ void main() {
                   'Pixel color red at ($x,$y) in resized image is not correct');
           expect(out.g, closeTo(ori.g, 7),
               reason:
-                  'Pixel color red at ($x,$y) in resized image is not correct');
+                  'Pixel color green at ($x,$y) in resized image is not correct');
           expect(out.b, closeTo(ori.b, 7),
               reason:
-                  'Pixel color red at ($x,$y) in resized image is not correct');
+                  'Pixel color blue at ($x,$y) in resized image is not correct');
         }
       }
 
