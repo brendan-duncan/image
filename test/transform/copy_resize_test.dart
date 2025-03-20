@@ -234,5 +234,93 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });
+
+    test('copyResize linear smaller maintainAspect color correctness', () {
+      final img =
+          decodeBmp(File('test/_data/bmp/rgba24.bmp').readAsBytesSync())!;
+      final i0 = copyResize(img,
+          width: 128,
+          height: 256,
+          maintainAspect: true,
+          backgroundColor: ColorUint8.fromList([253, 254, 252]),
+          interpolation: Interpolation.linear);
+      expect(i0.width, equals(128));
+      expect(i0.height, equals(256));
+
+      //  Intended output, O is the resized original image, B is background:
+      //  BBBBBBB
+      //  BBBBBBB
+      //  OOOOOOO
+      //  OOOOOOO
+      //  OOOOOOO
+      //  OOOOOOO
+      //  BBBBBBB
+      //  BBBBBBB
+      for (int y = 64; y < 64 + 128; y += 6) {
+        for (int x = 0; x < 128; x += 6) {
+          expect(i0.getPixel(x, y),
+              equals(img.getPixel((x * 2).toInt(), ((y - 64) * 2).toInt())),
+              reason: 'Pixel color at ($x,$y) in resized image is not correct');
+        }
+      }
+
+      // There should be empty space denoted by backgroundColor
+      expect(i0.getPixel(0, 63), equals(ColorUint8.fromList([253, 254, 252])));
+      expect(
+          i0.getPixel(127, 63), equals(ColorUint8.fromList([253, 254, 252])));
+      expect(i0.getPixel(0, 64 + 128),
+          equals(ColorUint8.fromList([253, 254, 252])));
+      expect(i0.getPixel(127, 64 + 128),
+          equals(ColorUint8.fromList([253, 254, 252])));
+
+      File(
+          '$testOutputPath/transform/copyResize_color_linear_smaller_aspect_1.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
+
+    test('copyResize linear smaller maintainAspect color correctness', () {
+      final img =
+          decodeBmp(File('test/_data/bmp/rgba24.bmp').readAsBytesSync())!;
+      final i0 = copyResize(img,
+          width: 128,
+          height: 256,
+          maintainAspect: true,
+          backgroundColor: ColorUint8.fromList([253, 254, 252]),
+          interpolation: Interpolation.cubic);
+      expect(i0.width, equals(128));
+      expect(i0.height, equals(256));
+
+      //  Intended output, O is the resized original image, B is background:
+      //  BBBBBBB
+      //  BBBBBBB
+      //  OOOOOOO
+      //  OOOOOOO
+      //  OOOOOOO
+      //  OOOOOOO
+      //  BBBBBBB
+      //  BBBBBBB
+      for (int y = 64; y < 64 + 128; y += 6) {
+        for (int x = 0; x < 128; x += 6) {
+          expect(i0.getPixel(x, y),
+              equals(img.getPixel((x * 2).toInt(), ((y - 64) * 2).toInt())),
+              reason: 'Pixel color at ($x,$y) in resized image is not correct');
+        }
+      }
+
+      // There should be empty space denoted by backgroundColor
+      expect(i0.getPixel(0, 63), equals(ColorUint8.fromList([253, 254, 252])));
+      expect(
+          i0.getPixel(127, 63), equals(ColorUint8.fromList([253, 254, 252])));
+      expect(i0.getPixel(0, 64 + 128),
+          equals(ColorUint8.fromList([253, 254, 252])));
+      expect(i0.getPixel(127, 64 + 128),
+          equals(ColorUint8.fromList([253, 254, 252])));
+
+      File(
+          '$testOutputPath/transform/copyResize_color_cubic_smaller_aspect_1.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
   });
 }
