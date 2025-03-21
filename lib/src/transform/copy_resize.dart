@@ -83,6 +83,11 @@ Image copyResize(Image src,
   for (var x = 0; x < w; ++x) {
     scaleX[x] = (x * dx).toInt();
   }
+  final scaleY = Int32List(h);
+  final dy = src.height / h;
+  for (var y = 0; y < h; ++y) {
+    scaleY[y] = (y * dy).toInt();
+  }
 
   Image? firstFrame;
   final numFrames = src.numFrames;
@@ -101,6 +106,7 @@ Image copyResize(Image src,
     }
 
     if (interpolation == Interpolation.average) {
+      final srcPixel = frame.getPixelSafe(0, 0);
       for (var y = 0; y < h; ++y) {
         final ay1 = (y * dy).toInt();
         var ay2 = ((y + 1) * dy).toInt();
@@ -122,15 +128,14 @@ Image copyResize(Image src,
           var np = 0;
           for (var sy = ay1; sy < ay2; ++sy) {
             for (var sx = ax1; sx < ax2; ++sx, ++np) {
-              final s = frame.getPixel(sx, sy);
-              r += s.r;
-              g += s.g;
-              b += s.b;
-              a += s.a;
+              frame.getPixel(sx, sy, srcPixel);
+              r += srcPixel.r;
+              g += srcPixel.g;
+              b += srcPixel.b;
+              a += srcPixel.a;
             }
           }
-          dst.setPixel(
-              x1 + x, y1 + y, dst.getColor(r / np, g / np, b / np, a / np));
+          dst.setPixelRgba(x1 + x, y1 + y, r / np, g / np, b / np, a / np);
         }
       }
     } else if (interpolation == Interpolation.nearest) {
@@ -143,11 +148,58 @@ Image copyResize(Image src,
           }
         }
       } else {
+        final srcPixel = frame.getPixelSafe(0, 0);
         for (var y = 0; y < h; ++y) {
-          final y2 = (y * dy).toInt();
           for (var x = 0; x < w; ++x) {
-            dst.setPixel(x1 + x, y1 + y, frame.getPixel(scaleX[x], y2));
+            frame.getPixel(scaleX[x], scaleY[y], srcPixel);
+            dst.setPixelRgba(
+                x1 + x, y1 + y, srcPixel.r, srcPixel.g, srcPixel.b, srcPixel.a);
+            // Not calling setPixel which triggers runtime type checking
+            // mainly for hasPalette routine. Palette images are treated in
+            // the above if-else block.
+            //dst.setPixel(x1 + x, y1 + y, frame.getPixel(scaleX[x], y2));
           }
+        }
+      }
+    } else if (interpolation == Interpolation.linear) {
+      // 4 predefined pixel object for 4 vertices
+      final icc = frame.getPixelSafe(0, 0);
+      final icn = frame.getPixelSafe(0, 0);
+      final inc = frame.getPixelSafe(0, 0);
+      final inn = frame.getPixelSafe(0, 0);
+
+      num linear(num icc, num inc, num icn, num inn, num kx, num ky) =>
+          icc +
+          kx * (inc - icc + ky * (icc + inn - icn - inc)) +
+          ky * (icn - icc);
+
+      // Copy the pixels from this image to the new image.
+      for (var y = 0; y < h; ++y) {
+        final sy2 = y * dy;
+        for (var x = 0; x < w; ++x) {
+          final sx2 = x * dx;
+          final fx = sx2.clamp(0, frame.width - 1);
+          final fy = sy2.clamp(0, frame.height - 1);
+          final ix = fx.toInt();
+          final iy = fy.toInt();
+          final kx = fx - ix;
+          final ky = fy - iy;
+          final nx = (ix + 1).clamp(0, frame.width - 1);
+          final ny = (iy + 1).clamp(0, frame.height - 1);
+
+          frame
+            ..getPixel(ix, iy, icc)
+            ..getPixel(ix, ny, icn)
+            ..getPixel(nx, iy, inc)
+            ..getPixel(nx, ny, inn);
+
+          dst.setPixelRgba(
+              x1 + x,
+              y1 + y,
+              linear(icc.r, inc.r, icn.r, inn.r, kx, ky),
+              linear(icc.g, inc.g, icn.g, inn.g, kx, ky),
+              linear(icc.b, inc.b, icn.b, inn.b, kx, ky),
+              linear(icc.a, inc.a, icn.a, inn.a, kx, ky));
         }
       }
     } else {
@@ -157,9 +209,9 @@ Image copyResize(Image src,
         for (var x = 0; x < w; ++x) {
           final sx2 = x * dx;
           dst.setPixel(
-              x,
-              y,
-              frame.getPixelInterpolate(x1 + sx2, y1 + sy2,
+              x1 + x,
+              y1 + y,
+              frame.getPixelInterpolate(sx2, sy2,
                   interpolation: interpolation));
         }
       }
