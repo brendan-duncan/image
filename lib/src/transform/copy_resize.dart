@@ -187,10 +187,11 @@ Image copyResize(Image src,
           final nx = (ix + 1).clamp(0, frame.width - 1);
           final ny = (iy + 1).clamp(0, frame.height - 1);
 
-          frame.getPixel(ix, iy, icc);
-          frame.getPixel(ix, ny, icn);
-          frame.getPixel(nx, iy, inc);
-          frame.getPixel(nx, ny, inn);
+          frame
+            ..getPixel(ix, iy, icc)
+            ..getPixel(ix, ny, icn)
+            ..getPixel(nx, iy, inc)
+            ..getPixel(nx, ny, inn);
 
           dst.setPixelRgba(
               x1 + x,
