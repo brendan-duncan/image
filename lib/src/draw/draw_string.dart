@@ -111,7 +111,7 @@ Image drawString(Image image, String string,
   }
 
   final origX = sx;
-  final substrings = string.split(RegExp(r"[\n|\r]"));
+  final substrings = string.split(RegExp(r"[\n\r]"));
 
   // print(substrings);
 
