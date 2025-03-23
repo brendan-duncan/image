@@ -1,3 +1,10 @@
+## 4.5.4 - March 23, 2024
+
+- Fix for fillRect for images that that have alpha.
+- Fix copyExpandCanvas for images with alpha.
+- Improved performance for copyResize.
+- Improved performance for gaussianBlur.
+
 ## 4.5.3 - February 21, 2024 
 
 - Improve fillPolygon to better handle concave polygons.
