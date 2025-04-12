@@ -217,7 +217,8 @@ Image getImageFromJpeg(JpegData jpeg) {
   final image = Image(width: width, height: height)
     // Copy exif data, except for Orientation which we're baking.
     ..exif = ExifData.from(jpeg.exif)
-    ..exif.imageIfd.orientation = null;
+    ..exif.imageIfd.orientation = null
+    ..iccProfile = jpeg.iccProfile;
 
   ComponentData component1;
   ComponentData component2;

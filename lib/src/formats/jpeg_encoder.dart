@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../../image.dart';
 import '../color/color.dart';
 import '../color/const_color_uint8.dart';
 import '../color/format.dart';
@@ -57,7 +58,10 @@ class JpegEncoder extends Encoder {
     // Add JPEG headers
     _writeMarker(fp, JpegMarker.soi);
     _writeAPP0(fp);
-    _writeAPP1(fp, image.exif);
+    _writeExif(fp, image.exif);
+    if (image.iccProfile != null) {
+      _writeICCProfile(fp, image.iccProfile!);
+    }
     _writeDQT(fp);
     _writeSOF0(fp, image.width, image.height, chroma);
     _writeDHT(fp);
@@ -598,7 +602,7 @@ class JpegEncoder extends Encoder {
       ..writeByte(0); // thumbnheight
   }
 
-  void _writeAPP1(OutputBuffer out, ExifData exif) {
+  void _writeExif(OutputBuffer out, ExifData exif) {
     if (exif.isEmpty) {
       return;
     }
@@ -615,6 +619,17 @@ class JpegEncoder extends Encoder {
       ..writeUint32(exifSignature)
       ..writeUint16(0)
       ..writeBytes(exifBytes);
+  }
+
+  void _writeICCProfile(OutputBuffer out, IccProfile profile) {
+    _writeMarker(out, JpegMarker.app2);
+    final profileData = profile.decompressed();
+    final blockSize = 12 + 2 + profileData.length;
+    final signature = [0x49, 0x43, 0x43, 0x5F, 0x50, 0x52, 0x4F, 0x46,
+      0x49, 0x4C, 0x45, 0x00];
+    out..writeUint16(blockSize)
+    ..writeBytes(signature)
+    ..writeBytes(profileData);
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height, JpegChroma chroma) {

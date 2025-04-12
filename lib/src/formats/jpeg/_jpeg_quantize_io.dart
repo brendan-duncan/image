@@ -449,5 +449,9 @@ Image getImageFromJpeg(JpegData jpeg) {
       throw ImageException('Unsupported color mode');
   }
 
+  if (jpeg.iccProfile != null) {
+    image.iccProfile = jpeg.iccProfile;
+  }
+
   return image;
 }

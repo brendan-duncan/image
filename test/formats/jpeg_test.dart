@@ -7,6 +7,19 @@ import '../_test_util.dart';
 void main() async {
   group('Format', () {
     group('jpg', () {
+      test('png icc_profile', () async {
+        final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
+        final image = PngDecoder().decode(bytes)!;
+        encodeJpgFile('$testOutputPath/jpg/png_icc_profile_data.jpg', image!);
+      });
+
+      test('icc_profile', () async {
+        final jpg = await File('test/_data/jpg/icc_profile_data.jpg').readAsBytes();
+        final img = decodeJpg(jpg);
+        expect(img, isNotNull);
+        encodeJpgFile('$testOutputPath/jpg/icc_profile_data.jpg', img!);
+      });
+
       test('exif', () async {
         final jpg = await File('test/_data/jpg/kodak-dc210.jpg').readAsBytes();
         final img = decodeJpg(jpg);
@@ -84,7 +97,7 @@ void main() async {
             equals(image2.exif.imageIfd['YResolution']));
       });
 
-      /*final dir = Directory('test/_data/jpg');
+      final dir = Directory('test/_data/jpg');
       final files = dir.listSync(recursive: true);
       for (var f in files.whereType<File>()) {
         if (!f.path.endsWith('.jpg')) {
@@ -125,7 +138,7 @@ void main() async {
             ..createSync(recursive: true)
             ..writeAsBytesSync(JpegEncoder().encode(image));
         });
-      }*/
+      }
     });
   });
 }

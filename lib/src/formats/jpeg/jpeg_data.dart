@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../../exif/exif_data.dart';
+import '../../image/icc_profile.dart';
 import '../../image/image.dart';
 import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
@@ -45,6 +46,7 @@ class JpegData {
   JpegFrame? frame;
   int? resetInterval;
   String? comment;
+  IccProfile? iccProfile;
   final exif = ExifData();
   final quantizationTables =
       List<Int16List?>.filled(numQuantizationTables, null);
@@ -304,6 +306,23 @@ class JpegData {
     return c;
   }
 
+  void _readIccProfile(InputBuffer block) {
+    const iccProfileSignature = [
+      0x49, 0x43, 0x43, 0x5F, 0x50, 0x52, 0x4F, 0x46,
+      0x49, 0x4C, 0x45, 0x00
+    ]; // "ICC_PROFILE\0"
+    for (var i = 0; i < iccProfileSignature.length; i++) {
+      final b = block.readByte();
+      if (b != iccProfileSignature[i]) {
+        return;
+      }
+    }
+
+    final data = block.toUint8List();
+    iccProfile = new IccProfile("ICC_PROFILE", IccProfileCompression.none,
+        data);
+  }
+
   void _readExifData(InputBuffer block) {
     // Exif Header
     const exifSignature = 0x45786966; // Exif\0\0
@@ -342,6 +361,8 @@ class JpegData {
     } else if (marker == JpegMarker.app1) {
       // 'EXIF\0'
       _readExifData(appData);
+    } else if (marker == JpegMarker.app2) {
+      _readIccProfile(appData);
     } else if (marker == JpegMarker.app14) {
       // 'Adobe\0'
       if (appData[0] == 0x41 &&
