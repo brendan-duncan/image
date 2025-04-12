@@ -10,7 +10,7 @@ void main() async {
       test('png icc_profile', () async {
         final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
         final image = PngDecoder().decode(bytes)!;
-        encodeJpgFile('$testOutputPath/jpg/png_icc_profile_data.jpg', image!);
+        encodeJpgFile('$testOutputPath/jpg/png_icc_profile_data.jpg', image);
       });
 
       test('icc_profile', () async {

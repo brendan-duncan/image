@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-import '../../image.dart';
 import '../color/color.dart';
 import '../color/const_color_uint8.dart';
 import '../color/format.dart';
 import '../exif/exif_data.dart';
+import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
