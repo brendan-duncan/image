@@ -625,11 +625,24 @@ class JpegEncoder extends Encoder {
     _writeMarker(out, JpegMarker.app2);
     final profileData = profile.decompressed();
     final blockSize = 12 + 2 + profileData.length;
-    final signature = [0x49, 0x43, 0x43, 0x5F, 0x50, 0x52, 0x4F, 0x46,
-      0x49, 0x4C, 0x45, 0x00];
-    out..writeUint16(blockSize)
-    ..writeBytes(signature)
-    ..writeBytes(profileData);
+    final signature = [
+      0x49,
+      0x43,
+      0x43,
+      0x5F,
+      0x50,
+      0x52,
+      0x4F,
+      0x46,
+      0x49,
+      0x4C,
+      0x45,
+      0x00
+    ];
+    out
+      ..writeUint16(blockSize)
+      ..writeBytes(signature)
+      ..writeBytes(profileData);
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height, JpegChroma chroma) {

@@ -308,8 +308,18 @@ class JpegData {
 
   void _readIccProfile(InputBuffer block) {
     const iccProfileSignature = [
-      0x49, 0x43, 0x43, 0x5F, 0x50, 0x52, 0x4F, 0x46,
-      0x49, 0x4C, 0x45, 0x00
+      0x49,
+      0x43,
+      0x43,
+      0x5F,
+      0x50,
+      0x52,
+      0x4F,
+      0x46,
+      0x49,
+      0x4C,
+      0x45,
+      0x00
     ]; // "ICC_PROFILE\0"
     for (var i = 0; i < iccProfileSignature.length; i++) {
       final b = block.readByte();
@@ -319,8 +329,8 @@ class JpegData {
     }
 
     final data = block.toUint8List();
-    iccProfile = new IccProfile("ICC_PROFILE", IccProfileCompression.none,
-        data);
+    iccProfile =
+        new IccProfile("ICC_PROFILE", IccProfileCompression.none, data);
   }
 
   void _readExifData(InputBuffer block) {

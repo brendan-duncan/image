@@ -14,7 +14,8 @@ void main() async {
       });
 
       test('icc_profile', () async {
-        final jpg = await File('test/_data/jpg/icc_profile_data.jpg').readAsBytes();
+        final jpg =
+            await File('test/_data/jpg/icc_profile_data.jpg').readAsBytes();
         final img = decodeJpg(jpg);
         expect(img, isNotNull);
         encodeJpgFile('$testOutputPath/jpg/icc_profile_data.jpg', img!);
