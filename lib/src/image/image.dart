@@ -347,7 +347,7 @@ class Image extends Iterable<Pixel> {
   Image addFrame([Image? image]) {
     image ??= Image.from(this, noAnimation: true, noPixels: true);
     image.frameIndex = frames.length;
-    if (frames.last != image) {
+    if (frames.isEmpty || frames.last != image) {
       frames.add(image);
     }
     return image;
