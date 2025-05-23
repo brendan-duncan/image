@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import '../color/color.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '../util/color_util.dart';
 import '../util/image_exception.dart';
 import 'bake_orientation.dart';
 
@@ -109,29 +110,40 @@ Image copyResize(Image src,
     switch (interpolation) {
       case Interpolation.lanczos:
         // implementation based on https://github.com/Megakuul/image_scaler/blob/main/lib/lanczos.dart
-        final srcPixel = frame.getPixelSafe(0, 0);
-        double _kernel(double x, int a) {
-          if (x == 0) return 1;
-          if (x.abs() >= a) return 0;
-          return a * sin(pi * x) * sin(pi * x / a) / (pi * pi * x * x);
+
+        // Use oklab color space
+        final buffer = Float32x4List(frame.height * frame.width);
+        final px = frame.getPixelSafe(0, 0);
+        for (var x = 0; x < frame.width; x++) {
+          for (var y = 0; y < frame.height; y++) {
+            frame.getPixel(x, y, px);
+            final alpha = px.aNormalized.toDouble();
+            final [
+              l,
+              a,
+              b,
+            ] = rgbToOklab(px.r, px.g, px.b);
+            buffer[frame.width * y + x] =
+                Float32x4(l * alpha, a * alpha, b * alpha, alpha);
+          }
         }
 
+        // use factor only for down sampling
         final lanczosXScale = frame.width > w ? dx : 1;
         final lanczosYScale = frame.height > h ? dy : 1;
 
-        const areaSize = 1;
+        const areaSize = 3;
         const maxAreaDiameter = (areaSize * 2) + 1;
 
         double iX;
         double iY;
 
-        double tWeight;
-        final rgbStack = Uint32List(4);
-
+        Float32x4 tWeight;
+        Float32x4 labStack;
         double _dx;
         double _dy;
         double d;
-        double curWeight;
+        Float32x4 curWeight;
 
         ({int x, int y}) iAreaTLAnchor, iAreaBRAnchor;
 
@@ -151,8 +163,8 @@ Image copyResize(Image src,
               y: (iAreaTLAnchor.y + maxAreaDiameter).clamp(0, frame.height),
             );
 
-            tWeight = 0;
-            rgbStack.fillRange(0, 3, 0);
+            tWeight = Float32x4.zero();
+            labStack = Float32x4.zero();
 
             for (var iXArea = iAreaTLAnchor.x;
                 iXArea < iAreaBRAnchor.x;
@@ -163,25 +175,27 @@ Image copyResize(Image src,
                 _dx = (iXArea - iX).abs() / lanczosXScale;
                 _dy = (iYArea - iY).abs() / lanczosYScale;
                 d = sqrt(_dx * _dx + _dy * _dy);
-                curWeight = _kernel(d, areaSize);
-
-                frame.getPixel(iXArea, iYArea, srcPixel);
-                rgbStack[0] += (srcPixel.r * curWeight).round();
-                rgbStack[1] += (srcPixel.g * curWeight).round();
-                rgbStack[2] += (srcPixel.b * curWeight).round();
-                rgbStack[3] += (srcPixel.a * curWeight).round();
-
+                curWeight = Float32x4.splat(_lanczosKernel(d, areaSize));
+                labStack += buffer[frame.width * iYArea + iXArea] * curWeight;
                 tWeight += curWeight;
               }
             }
 
+            labStack /= tWeight;
+            final alpha = labStack.w;
+            labStack /= Float32x4.splat(alpha);
+            final [
+              r,
+              g,
+              b,
+            ] = oklabToRgb(labStack.x, labStack.y, labStack.z);
             dst.setPixelRgba(
               x1 + x,
               y1 + y,
-              (rgbStack[0] / tWeight).clamp(0, 255).round(),
-              (rgbStack[1] / tWeight).clamp(0, 255).round(),
-              (rgbStack[2] / tWeight).clamp(0, 255).round(),
-              (rgbStack[3] / tWeight).clamp(0, 255).round(),
+              r.clamp(0, 255).round(),
+              g.clamp(0, 255).round(),
+              b.clamp(0, 255).round(),
+              (alpha * 255).clamp(0, 255).round(),
             );
           }
         }
@@ -299,4 +313,13 @@ Image copyResize(Image src,
   }
 
   return firstFrame!;
+}
+
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
+double _lanczosKernel(double x, int a) {
+  if (x == 0) return 1;
+  if (x.abs() >= a) return 0;
+  return a * sin(pi * x) * sin(pi * x / a) / (pi * pi * x * x);
 }

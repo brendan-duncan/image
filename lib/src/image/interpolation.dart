@@ -13,7 +13,7 @@ enum Interpolation {
   average,
 
   /// Computationally heavy and extremely slow algorithm with good results.
-  /// Slowest, highest Quality.
+  /// Slowest, provides highest quality for downscaling.
   lanczos,
   ;
 }

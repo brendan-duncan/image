@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import '../color/color.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '../util/color_util.dart';
 import '../util/image_exception.dart';
 import 'bake_orientation.dart';
 import 'copy_resize.dart';
@@ -107,31 +108,45 @@ Image resize(Image src,
     switch (interpolation) {
       case Interpolation.lanczos:
         // implementation based on https://github.com/Megakuul/image_scaler/blob/main/lib/lanczos.dart
-        double _kernel(double x, int a) {
-          if (x == 0) return 1;
-          if (x.abs() >= a) return 0;
-          return a * sin(pi * x) * sin(pi * x / a) / (pi * pi * x * x);
+
+        // Use oklab color space
+        final buffer = Float32x4List(frame.height * frame.width);
+        final px = frame.getPixelSafe(0, 0);
+        for (var x = 0; x < frame.width; x++) {
+          for (var y = 0; y < frame.height; y++) {
+            frame.getPixel(x, y, px);
+            final alpha = px.aNormalized.toDouble();
+            final [
+              l,
+              a,
+              b,
+            ] = rgbToOklab(px.r, px.g, px.b);
+            buffer[frame.width * y + x] =
+                Float32x4(l * alpha, a * alpha, b * alpha, alpha);
+          }
         }
 
+        // use factor only for down sampling
         final lanczosXScale = frame.width > w ? dx : 1;
         final lanczosYScale = frame.height > h ? dy : 1;
 
-        const areaSize = 1;
+        const areaSize = 3;
         const maxAreaDiameter = (areaSize * 2) + 1;
 
         double iX;
         double iY;
 
-        double tWeight;
-        final rgbStack = Uint32List(4);
-
+        Float32x4 tWeight;
+        Float32x4 labStack;
         double _dx;
         double _dy;
         double d;
-        double curWeight;
+        Float32x4 curWeight;
 
         ({int x, int y}) iAreaTLAnchor, iAreaBRAnchor;
 
+        dst.data!.width = width;
+        dst.data!.height = height;
         for (var x = 0; x < w; ++x) {
           iX = x * dx;
           for (var y = 0; y < h; ++y) {
@@ -148,8 +163,8 @@ Image resize(Image src,
               y: (iAreaTLAnchor.y + maxAreaDiameter).clamp(0, frame.height),
             );
 
-            tWeight = 0;
-            rgbStack.fillRange(0, 3, 0);
+            tWeight = Float32x4.zero();
+            labStack = Float32x4.zero();
 
             for (var iXArea = iAreaTLAnchor.x;
                 iXArea < iAreaBRAnchor.x;
@@ -160,32 +175,32 @@ Image resize(Image src,
                 _dx = (iXArea - iX).abs() / lanczosXScale;
                 _dy = (iYArea - iY).abs() / lanczosYScale;
                 d = sqrt(_dx * _dx + _dy * _dy);
-                curWeight = _kernel(d, areaSize);
-
-                final px = frame.getPixel(iXArea, iYArea);
-                rgbStack[0] += (px.r * curWeight).round();
-                rgbStack[1] += (px.g * curWeight).round();
-                rgbStack[2] += (px.b * curWeight).round();
-                rgbStack[3] += (px.a * curWeight).round();
-
+                curWeight = Float32x4.splat(_lanczosKernel(d, areaSize));
+                labStack += buffer[frame.width * iYArea + iXArea] * curWeight;
                 tWeight += curWeight;
               }
             }
 
-            final c = dst.getColor(
-              (rgbStack[0] / tWeight).clamp(0, 255).round(),
-              (rgbStack[1] / tWeight).clamp(0, 255).round(),
-              (rgbStack[2] / tWeight).clamp(0, 255).round(),
-              (rgbStack[3] / tWeight).clamp(0, 255).round(),
+            labStack /= tWeight;
+            final alpha = labStack.w;
+            labStack /= Float32x4.splat(alpha);
+            final [
+              r,
+              g,
+              b,
+            ] = oklabToRgb(labStack.x, labStack.y, labStack.z);
+            dst.setPixelRgba(
+              x1 + x,
+              y1 + y,
+              r.clamp(0, 255).round(),
+              g.clamp(0, 255).round(),
+              b.clamp(0, 255).round(),
+              (alpha * 255).clamp(0, 255).round(),
             );
-
-            dst.data!.width = width;
-            dst.data!.height = height;
-            dst.setPixel(x1 + x, y1 + y, c);
-            dst.data!.width = origWidth;
-            dst.data!.height = origHeight;
           }
         }
+        dst.data!.width = origWidth;
+        dst.data!.height = origHeight;
       case Interpolation.average:
         for (var y = 0; y < h; ++y) {
           final ay1 = (y * dy).toInt();
@@ -270,4 +285,13 @@ Image resize(Image src,
   }
 
   return src;
+}
+
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
+double _lanczosKernel(double x, int a) {
+  if (x == 0) return 1;
+  if (x.abs() >= a) return 0;
+  return a * sin(pi * x) * sin(pi * x / a) / (pi * pi * x * x);
 }
