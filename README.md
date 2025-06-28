@@ -20,7 +20,7 @@ NOTE: 4.0 is a major revision from the previous version of the library.
 **Read/Write**
 
 - JPG
-- PNG / Animated APNG
+- PNG / Animated PNG
 - GIF / Animated GIF
 - BMP
 - TIFF
