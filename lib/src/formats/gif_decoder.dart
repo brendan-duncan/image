@@ -179,9 +179,9 @@ class GifDecoder extends Decoder {
 
     Image? firstImage;
     Image? lastImage;
-    for (var i = 0; i < info!.numFrames; ++i) {
-      final frame = info!.frames[i];
-      final image = decodeFrame(i);
+    for (var frameIndex = 0; frameIndex < info!.numFrames; ++frameIndex) {
+      final frame = info!.frames[frameIndex];
+      final image = decodeFrame(frameIndex);
       if (image == null) {
         return null;
       }
@@ -215,7 +215,9 @@ class GifDecoder extends Decoder {
           palette: colorMap.getPalette());
 
       if (frame.disposal == 2) {
-        nextImage.clear(colorMap.color(info!.backgroundColor!.r as int));
+        final imageBytes = nextImage.toUint8List();
+        imageBytes.fillRange(0, imageBytes.length - 1,
+            info!.backgroundColor!.r as int);
       } else if (frame.disposal != 3) {
         if (frame.colorMap != null) {
           final lp = lastImage.palette!;
@@ -230,9 +232,9 @@ class GifDecoder extends Decoder {
           final lastBytes = lastImage.toUint8List();
           for (var i = 0, l = nextBytes.length; i < l; ++i) {
             final lc = lastBytes[i];
-            final nc = remapColors[lc];
+            final nc = remapColors[lc]!;
             if (nc != -1) {
-              nextBytes[i] = nc!;
+              nextBytes[i] = nc;
             }
           }
         }
