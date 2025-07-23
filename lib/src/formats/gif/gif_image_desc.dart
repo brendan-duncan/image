@@ -11,6 +11,7 @@ class GifImageDesc {
   GifColorMap? colorMap;
   int duration = 80;
   int disposal = 0;
+  int transparent = -1;
 
   GifImageDesc(InputBuffer input) {
     x = input.readUint16();

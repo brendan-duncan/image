@@ -32,6 +32,9 @@ class GifColorMap {
   int findColor(num r, num g, num b, num a) {
     num closestDistance = -1;
     var closestIndex = -1;
+    if (a == 0 && transparent != null) {
+      return transparent!;
+    }
     for (var i = 0; i < numColors; ++i) {
       final pr = _palette.getRed(i);
       final pg = _palette.getGreen(i);
