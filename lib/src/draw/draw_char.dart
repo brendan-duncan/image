@@ -2,6 +2,7 @@ import '../color/channel.dart';
 import '../color/color.dart';
 import '../font/bitmap_font.dart';
 import '../image/image.dart';
+import 'blend_mode.dart';
 import 'draw_pixel.dart';
 
 /// Draw a single character from [char] horizontally into [image] at position
@@ -11,6 +12,7 @@ Image drawChar(Image image, String char,
     required int x,
     required int y,
     Color? color,
+    BlendMode blend = BlendMode.alpha,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   final c = char.codeUnits[0];
@@ -28,10 +30,13 @@ Image drawChar(Image image, String char,
       final cp = cIter.current;
       if (color != null) {
         drawPixel(image, xi, yi, color,
-            alpha: cp.aNormalized, mask: mask, maskChannel: maskChannel);
+            alpha: cp.aNormalized,
+            blend: blend,
+            mask: mask,
+            maskChannel: maskChannel);
       } else {
         drawPixel(image, xi, yi, cIter.current,
-            mask: mask, maskChannel: maskChannel);
+            blend: blend, mask: mask, maskChannel: maskChannel);
       }
     }
   }

@@ -5,3 +5,4 @@ pubspec.lock
 .packages
 .DS_Store
 _out/
+build

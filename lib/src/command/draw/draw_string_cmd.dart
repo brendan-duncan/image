@@ -1,5 +1,6 @@
 import '../../color/channel.dart';
 import '../../color/color.dart';
+import '../../draw/blend_mode.dart';
 import '../../draw/draw_string.dart';
 import '../../font/bitmap_font.dart';
 import '../command.dart';
@@ -12,6 +13,7 @@ class DrawStringCmd extends Command {
   bool rightJustify;
   bool wrap;
   Color? color;
+  BlendMode blend;
   Command? mask;
   Channel maskChannel;
 
@@ -22,6 +24,7 @@ class DrawStringCmd extends Command {
       this.color,
       this.wrap = false,
       this.rightJustify = false,
+      this.blend = BlendMode.alpha,
       this.mask,
       this.maskChannel = Channel.luminance})
       : super(input);
@@ -38,6 +41,7 @@ class DrawStringCmd extends Command {
             color: color,
             rightJustify: rightJustify,
             wrap: wrap,
+            blend: blend,
             mask: maskImg,
             maskChannel: maskChannel)
         : null;

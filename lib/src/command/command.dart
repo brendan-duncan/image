@@ -401,6 +401,7 @@ class Command {
       required int x,
       required int y,
       Color? color,
+      BlendMode blend = BlendMode.alpha,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = DrawCharCmd(subCommand, char,
@@ -408,6 +409,7 @@ class Command {
         x: x,
         y: y,
         color: color,
+        blend: blend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -418,6 +420,7 @@ class Command {
       required int radius,
       required Color color,
       bool antialias = false,
+      BlendMode blend = BlendMode.alpha,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = DrawCircleCmd(subCommand,
@@ -426,6 +429,7 @@ class Command {
         radius: radius,
         color: color,
         antialias: antialias,
+        blend: blend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -468,6 +472,7 @@ class Command {
       required Color color,
       bool antialias = false,
       num thickness = 1,
+      BlendMode blend = BlendMode.alpha,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = DrawLineCmd(subCommand,
@@ -478,6 +483,7 @@ class Command {
         color: color,
         antialias: antialias,
         thickness: thickness,
+        blend: blend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -497,10 +503,15 @@ class Command {
   void drawPolygon(
       {required List<Point> vertices,
       required Color color,
+      BlendMode blend = BlendMode.alpha,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = DrawPolygonCmd(subCommand,
-        vertices: vertices, color: color, mask: mask, maskChannel: maskChannel);
+        vertices: vertices,
+        color: color,
+        blend: blend,
+        mask: mask,
+        maskChannel: maskChannel);
   }
 
   void drawRect(
@@ -511,6 +522,7 @@ class Command {
       required Color color,
       num radius = 0,
       num thickness = 1,
+      BlendMode blend = BlendMode.alpha,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = DrawRectCmd(subCommand,
@@ -521,6 +533,7 @@ class Command {
         color: color,
         radius: radius,
         thickness: thickness,
+        blend: blend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -532,6 +545,7 @@ class Command {
       Color? color,
       bool wrap = false,
       bool rightJustify = false,
+      BlendMode blend = BlendMode.alpha,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = DrawStringCmd(subCommand, string,
@@ -541,6 +555,7 @@ class Command {
         color: color,
         wrap: wrap,
         rightJustify: rightJustify,
+        blend: blend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -559,6 +574,7 @@ class Command {
       required int radius,
       required Color color,
       bool antialias = false,
+      BlendMode blend = BlendMode.alpha,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = FillCircleCmd(subCommand,
@@ -567,6 +583,7 @@ class Command {
         radius: radius,
         color: color,
         antialias: antialias,
+        blend: blend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -592,10 +609,15 @@ class Command {
   void fillPolygon(
       {required List<Point> vertices,
       required Color color,
+      BlendMode blend = BlendMode.alpha,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = FillPolygonCmd(subCommand,
-        vertices: vertices, color: color, mask: mask, maskChannel: maskChannel);
+        vertices: vertices,
+        color: color,
+        blend: blend,
+        mask: mask,
+        maskChannel: maskChannel);
   }
 
   void fillRect(

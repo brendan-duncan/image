@@ -6,14 +6,16 @@ import '../draw/draw_line.dart';
 import '../draw/draw_pixel.dart';
 import '../image/image.dart';
 import '../util/point.dart';
+import 'blend_mode.dart';
 
 /// Fill a polygon defined by the given [vertices].
 Image fillPolygon(Image src,
     {required List<Point> vertices,
+    BlendMode blend = BlendMode.alpha,
     required Color color,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
-  if (color.a == 0) {
+  if (blend == BlendMode.alpha && color.a == 0) {
     return src;
   }
 
@@ -25,7 +27,7 @@ Image fillPolygon(Image src,
 
   if (numVertices == 1) {
     return drawPixel(src, vertices[0].xi, vertices[0].yi, color,
-        mask: mask, maskChannel: maskChannel);
+        blend: blend, mask: mask, maskChannel: maskChannel);
   }
 
   if (numVertices == 2) {
@@ -35,6 +37,7 @@ Image fillPolygon(Image src,
         x2: vertices[1].xi,
         y2: vertices[1].yi,
         color: color,
+        blend: blend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -83,7 +86,8 @@ Image fillPolygon(Image src,
       }
       // Even number of intersections means inside
       if (intersections & 0x1 == 1) {
-        drawPixel(src, xi, yi, color, mask: mask, maskChannel: maskChannel);
+        drawPixel(src, xi, yi, color,
+            blend: blend, mask: mask, maskChannel: maskChannel);
       }
     }
   }

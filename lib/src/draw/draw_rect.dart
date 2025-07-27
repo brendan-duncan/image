@@ -4,6 +4,7 @@ import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
 import '_draw_antialias_circle.dart';
+import 'blend_mode.dart';
 import 'draw_line.dart';
 
 /// Draw a rectangle in the image [dst] with the [color].
@@ -15,6 +16,7 @@ Image drawRect(Image dst,
     required Color color,
     num thickness = 1,
     num radius = 0,
+    BlendMode blend = BlendMode.alpha,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   final x0 = min(x1, x2);
@@ -25,10 +27,21 @@ Image drawRect(Image dst,
   // Draw a rounded rectangle
   if (radius > 0) {
     final rad = radius.round();
-    drawLine(dst, x1: x0 + rad, y1: y0, x2: x1 - rad, y2: y0, color: color);
-    drawLine(dst, x1: x1, y1: y0 + rad, x2: x1, y2: y1 - rad, color: color);
-    drawLine(dst, x1: x0 + rad, y1: y1, x2: x1 - rad, y2: y1, color: color);
-    drawLine(dst, x1: x0, y1: y0 + rad, x2: x0, y2: y1 - rad, color: color);
+    drawLine(
+      dst,
+      x1: x0 + rad,
+      y1: y0,
+      x2: x1 - rad,
+      y2: y0,
+      color: color,
+      blend: blend,
+    );
+    drawLine(dst,
+        x1: x1, y1: y0 + rad, x2: x1, y2: y1 - rad, color: color, blend: blend);
+    drawLine(dst,
+        x1: x0 + rad, y1: y1, x2: x1 - rad, y2: y1, color: color, blend: blend);
+    drawLine(dst,
+        x1: x0, y1: y0 + rad, x2: x0, y2: y1 - rad, color: color, blend: blend);
 
     final c1x = x0 + rad;
     final c1y = y0 + rad;
@@ -44,6 +57,7 @@ Image drawRect(Image dst,
         y: c1y,
         radius: rad,
         color: color,
+        blend: blend,
         maskChannel: maskChannel,
         mask: mask,
         quadrants: topLeftQuadrant);
@@ -53,6 +67,7 @@ Image drawRect(Image dst,
         y: c2y,
         radius: rad,
         color: color,
+        blend: blend,
         maskChannel: maskChannel,
         mask: mask,
         quadrants: topRightQuadrant);
@@ -62,6 +77,7 @@ Image drawRect(Image dst,
         y: c3y,
         radius: rad,
         color: color,
+        blend: blend,
         maskChannel: maskChannel,
         mask: mask,
         quadrants: bottomRightQuadrant);
@@ -71,6 +87,7 @@ Image drawRect(Image dst,
         y: c4y,
         radius: rad,
         color: color,
+        blend: blend,
         maskChannel: maskChannel,
         mask: mask,
         quadrants: bottomLeftQuadrant);
@@ -87,6 +104,7 @@ Image drawRect(Image dst,
       y2: y0,
       color: color,
       thickness: thickness,
+      blend: blend,
       mask: mask,
       maskChannel: maskChannel);
 
@@ -97,6 +115,7 @@ Image drawRect(Image dst,
       y2: y1,
       color: color,
       thickness: thickness,
+      blend: blend,
       mask: mask,
       maskChannel: maskChannel);
 
@@ -115,6 +134,7 @@ Image drawRect(Image dst,
       y2: by1,
       color: color,
       thickness: thickness,
+      blend: blend,
       mask: mask,
       maskChannel: maskChannel);
 
@@ -125,6 +145,7 @@ Image drawRect(Image dst,
       y2: by1,
       color: color,
       thickness: thickness,
+      blend: blend,
       mask: mask,
       maskChannel: maskChannel);
 

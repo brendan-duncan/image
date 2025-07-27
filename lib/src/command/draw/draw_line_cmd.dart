@@ -1,5 +1,6 @@
 import '../../color/channel.dart';
 import '../../color/color.dart';
+import '../../draw/blend_mode.dart';
 import '../../draw/draw_line.dart';
 import '../command.dart';
 
@@ -11,6 +12,7 @@ class DrawLineCmd extends Command {
   Color color;
   bool antialias;
   num thickness;
+  BlendMode blend;
   Command? mask;
   Channel maskChannel;
 
@@ -22,6 +24,7 @@ class DrawLineCmd extends Command {
       required this.color,
       this.antialias = false,
       this.thickness = 1,
+      this.blend = BlendMode.alpha,
       this.mask,
       this.maskChannel = Channel.luminance})
       : super(input);
@@ -39,6 +42,7 @@ class DrawLineCmd extends Command {
             color: color,
             antialias: antialias,
             thickness: thickness,
+            blend: blend,
             mask: maskImg,
             maskChannel: maskChannel)
         : null;
