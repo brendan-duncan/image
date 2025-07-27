@@ -1,6 +1,12 @@
 import 'dart:math';
 
-import '../../image.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../image/image.dart';
+import '../util/clip_line.dart';
+import 'blend_mode.dart';
+import 'draw_pixel.dart';
+import 'fill_circle.dart';
 
 /// Draw a line into [image].
 ///

@@ -1,4 +1,8 @@
-import '../../../image.dart';
+import '../../color/channel.dart';
+import '../../color/color.dart';
+import '../../draw/blend_mode.dart';
+import '../../draw/draw_rect.dart';
+import '../command.dart';
 
 class DrawRectCmd extends Command {
   int x1;

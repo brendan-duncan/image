@@ -1,6 +1,10 @@
-import '../../image.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../image/image.dart';
 import '_calculate_circumference.dart';
 import '_draw_antialias_circle.dart';
+import 'blend_mode.dart';
+import 'draw_pixel.dart';
 
 /// Draw a circle into the [image] with a center of [x],[y] and
 /// the given [radius] and [color].

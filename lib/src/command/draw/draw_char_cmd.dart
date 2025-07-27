@@ -1,4 +1,9 @@
-import '../../../image.dart';
+import '../../color/channel.dart';
+import '../../color/color.dart';
+import '../../draw/blend_mode.dart';
+import '../../draw/draw_char.dart';
+import '../../font/bitmap_font.dart';
+import '../command.dart';
 
 class DrawCharCmd extends Command {
   BitmapFont font;

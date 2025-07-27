@@ -1,7 +1,11 @@
 import 'dart:math';
 
-import '../../image.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../image/image.dart';
 import '_draw_antialias_circle.dart';
+import 'blend_mode.dart';
+import 'draw_line.dart';
 
 /// Draw a rectangle in the image [dst] with the [color].
 Image drawRect(Image dst,

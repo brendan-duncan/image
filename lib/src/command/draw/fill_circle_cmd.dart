@@ -1,4 +1,8 @@
-import '../../../image.dart';
+import '../../color/channel.dart';
+import '../../color/color.dart';
+import '../../draw/blend_mode.dart';
+import '../../draw/fill_circle.dart';
+import '../command.dart';
 
 class FillCircleCmd extends Command {
   int x;

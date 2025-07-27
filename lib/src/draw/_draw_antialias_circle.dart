@@ -1,7 +1,11 @@
 import 'dart:math';
 
-import '../../image.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../image/image.dart';
 import '../util/math_util.dart';
+import 'blend_mode.dart';
+import 'draw_pixel.dart';
 
 const topLeftQuadrant = 1;
 const topRightQuadrant = 2;

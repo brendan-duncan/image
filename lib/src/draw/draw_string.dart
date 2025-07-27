@@ -1,4 +1,9 @@
-import '../../image.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../font/bitmap_font.dart';
+import '../image/image.dart';
+import 'blend_mode.dart';
+import 'draw_pixel.dart';
 
 /// Draw a string horizontally into [image] at
 /// position [x],[y] with the given [color].

@@ -1,4 +1,8 @@
-import '../../../image.dart';
+import '../../color/channel.dart';
+import '../../color/color.dart';
+import '../../draw/blend_mode.dart';
+import '../../draw/draw_line.dart';
+import '../command.dart';
 
 class DrawLineCmd extends Command {
   int x1;

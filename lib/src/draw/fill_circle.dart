@@ -1,7 +1,11 @@
 import 'dart:math';
 
-import '../../image.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../image/image.dart';
 import '../util/_circle_test.dart';
+import 'blend_mode.dart';
+import 'draw_pixel.dart';
 
 /// Draw and fill a circle into the [image] with a center of [x],[y]
 /// and the given [radius] and [color].

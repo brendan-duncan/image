@@ -1,6 +1,12 @@
 import 'dart:math';
 
-import '../../image.dart';
+import '../color/channel.dart';
+import '../color/color.dart';
+import '../draw/draw_line.dart';
+import '../draw/draw_pixel.dart';
+import '../image/image.dart';
+import '../util/point.dart';
+import 'blend_mode.dart';
 
 /// Fill a polygon defined by the given [vertices].
 Image fillPolygon(Image src,

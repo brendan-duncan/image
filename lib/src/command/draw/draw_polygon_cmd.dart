@@ -1,4 +1,9 @@
-import '../../../image.dart';
+import '../../color/channel.dart';
+import '../../color/color.dart';
+import '../../draw/blend_mode.dart';
+import '../../draw/draw_polygon.dart';
+import '../../util/point.dart';
+import '../command.dart';
 
 class DrawPolygonCmd extends Command {
   List<Point> vertices;
