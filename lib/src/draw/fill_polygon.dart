@@ -9,7 +9,7 @@ Image fillPolygon(Image src,
     required Color color,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
-  if (color.a == 0) {
+  if (blend == BlendMode.alpha && color.a == 0) {
     return src;
   }
 

@@ -18,7 +18,7 @@ Image drawString(Image image, String string,
     BlendMode blend = BlendMode.alpha,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
-  if (color?.a == 0) {
+  if (blend == BlendMode.alpha && color?.a == 0) {
     return image;
   }
 
