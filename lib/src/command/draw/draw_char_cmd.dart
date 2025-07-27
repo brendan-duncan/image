@@ -1,8 +1,4 @@
-import '../../color/channel.dart';
-import '../../color/color.dart';
-import '../../draw/draw_char.dart';
-import '../../font/bitmap_font.dart';
-import '../command.dart';
+import '../../../image.dart';
 
 class DrawCharCmd extends Command {
   BitmapFont font;
@@ -10,6 +6,7 @@ class DrawCharCmd extends Command {
   int y;
   String char;
   Color? color;
+  BlendMode blend;
   Command? mask;
   Channel maskChannel;
 
@@ -18,6 +15,7 @@ class DrawCharCmd extends Command {
       required this.x,
       required this.y,
       this.color,
+      this.blend = BlendMode.alpha,
       this.mask,
       this.maskChannel = Channel.luminance})
       : super(input);
@@ -32,6 +30,7 @@ class DrawCharCmd extends Command {
             x: x,
             y: y,
             color: color,
+            blend: blend,
             mask: maskImg,
             maskChannel: maskChannel)
         : null;

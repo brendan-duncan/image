@@ -1,12 +1,11 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-final testOutputPath = '${Directory.systemTemp.createTempSync().path}/out';
-//const testOutputPath = './_out';
+// final testOutputPath = '${Directory.systemTemp.createTempSync().path}/out';
+const testOutputPath = './_out';
 
 int hashImage(Image image) {
   var hash = 0;

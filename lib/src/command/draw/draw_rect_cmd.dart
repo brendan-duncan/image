@@ -1,7 +1,4 @@
-import '../../color/channel.dart';
-import '../../color/color.dart';
-import '../../draw/draw_rect.dart';
-import '../command.dart';
+import '../../../image.dart';
 
 class DrawRectCmd extends Command {
   int x1;
@@ -11,6 +8,7 @@ class DrawRectCmd extends Command {
   Color color;
   num radius;
   num thickness;
+  BlendMode blend;
   Command? mask;
   Channel maskChannel;
 
@@ -22,6 +20,7 @@ class DrawRectCmd extends Command {
       required this.color,
       this.thickness = 1,
       this.radius = 0,
+      this.blend = BlendMode.alpha,
       this.mask,
       this.maskChannel = Channel.luminance})
       : super(input);
@@ -39,6 +38,7 @@ class DrawRectCmd extends Command {
             color: color,
             thickness: thickness,
             radius: radius,
+            blend: blend,
             mask: maskImg,
             maskChannel: maskChannel)
         : null;

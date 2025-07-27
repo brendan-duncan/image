@@ -1,7 +1,4 @@
-import '../../color/channel.dart';
-import '../../color/color.dart';
-import '../../draw/draw_circle.dart';
-import '../command.dart';
+import '../../../image.dart';
 
 class DrawCircleCmd extends Command {
   int x;
@@ -9,6 +6,7 @@ class DrawCircleCmd extends Command {
   int radius;
   Color color;
   bool antialias;
+  BlendMode blend;
   Command? mask;
   Channel maskChannel;
 
@@ -18,6 +16,7 @@ class DrawCircleCmd extends Command {
       required this.radius,
       required this.color,
       this.antialias = false,
+      this.blend = BlendMode.alpha,
       this.mask,
       this.maskChannel = Channel.luminance})
       : super(input);
@@ -33,6 +32,7 @@ class DrawCircleCmd extends Command {
             radius: radius,
             color: color,
             antialias: antialias,
+            blend: blend,
             mask: maskImg,
             maskChannel: maskChannel)
         : null;

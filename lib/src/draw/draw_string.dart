@@ -1,8 +1,4 @@
-import '../color/channel.dart';
-import '../color/color.dart';
-import '../font/bitmap_font.dart';
-import '../image/image.dart';
-import 'draw_pixel.dart';
+import '../../image.dart';
 
 /// Draw a string horizontally into [image] at
 /// position [x],[y] with the given [color].
@@ -19,6 +15,7 @@ Image drawString(Image image, String string,
     Color? color,
     bool rightJustify = false,
     bool wrap = false,
+    BlendMode blend = BlendMode.alpha,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (color?.a == 0) {
@@ -78,6 +75,7 @@ Image drawString(Image image, String string,
               x: sx,
               y: sy,
               color: color,
+              blend: blend,
               mask: mask,
               maskChannel: maskChannel,
               rightJustify: rightJustify);
@@ -98,6 +96,7 @@ Image drawString(Image image, String string,
               x: sx,
               y: sy,
               color: color,
+              blend: blend,
               mask: mask,
               maskChannel: maskChannel,
               rightJustify: rightJustify);
@@ -144,7 +143,10 @@ Image drawString(Image image, String string,
         for (var xi = sx; xi < x2; ++xi, cIter.moveNext()) {
           final p = cIter.current;
           drawPixel(image, xi + ch.xOffset, yi + ch.yOffset, p,
-              filter: color, mask: mask, maskChannel: maskChannel);
+              filter: color,
+              blend: blend,
+              mask: mask,
+              maskChannel: maskChannel);
         }
       }
 

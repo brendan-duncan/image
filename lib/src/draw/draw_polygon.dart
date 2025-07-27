@@ -1,9 +1,4 @@
-import '../color/channel.dart';
-import '../color/color.dart';
-import '../draw/draw_line.dart';
-import '../draw/draw_pixel.dart';
-import '../image/image.dart';
-import '../util/point.dart';
+import '../../image.dart';
 
 /// Fill a polygon defined by the given [vertices].
 Image drawPolygon(Image src,
@@ -11,6 +6,7 @@ Image drawPolygon(Image src,
     required Color color,
     bool antialias = false,
     num thickness = 1,
+    BlendMode blend = BlendMode.alpha,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (color.a == 0) {
@@ -25,7 +21,7 @@ Image drawPolygon(Image src,
 
   if (numVertices == 1) {
     return drawPixel(src, vertices[0].xi, vertices[0].yi, color,
-        mask: mask, maskChannel: maskChannel);
+        blend: blend, mask: mask, maskChannel: maskChannel);
   }
 
   if (numVertices == 2) {
@@ -37,6 +33,7 @@ Image drawPolygon(Image src,
         color: color,
         antialias: antialias,
         thickness: thickness,
+        blend: blend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -50,6 +47,7 @@ Image drawPolygon(Image src,
         color: color,
         antialias: antialias,
         thickness: thickness,
+        blend: blend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -62,6 +60,7 @@ Image drawPolygon(Image src,
       color: color,
       antialias: antialias,
       thickness: thickness,
+      blend: blend,
       mask: mask,
       maskChannel: maskChannel);
 

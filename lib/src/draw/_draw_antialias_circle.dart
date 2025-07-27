@@ -1,10 +1,7 @@
 import 'dart:math';
 
-import '../color/channel.dart';
-import '../color/color.dart';
-import '../image/image.dart';
+import '../../image.dart';
 import '../util/math_util.dart';
-import 'draw_pixel.dart';
 
 const topLeftQuadrant = 1;
 const topRightQuadrant = 2;
@@ -21,31 +18,32 @@ Image drawAntialiasCircle(Image image,
     required int radius,
     required Color color,
     int quadrants = allQuadrants,
+    BlendMode blend = BlendMode.alpha,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   void drawPixel4(int x, int y, int dx, int dy, num alpha) {
     // bottom right
     if (quadrants & bottomRightQuadrant != 0) {
       drawPixel(image, x + dx, y + dy, color,
-          alpha: alpha, mask: mask, maskChannel: maskChannel);
+          alpha: alpha, blend: blend, mask: mask, maskChannel: maskChannel);
     }
 
     // bottom left
     if (quadrants & bottomLeftQuadrant != 0) {
       drawPixel(image, x - dx, y + dy, color,
-          alpha: alpha, mask: mask, maskChannel: maskChannel);
+          alpha: alpha, blend: blend, mask: mask, maskChannel: maskChannel);
     }
 
     // upper right
     if (quadrants & topRightQuadrant != 0) {
       drawPixel(image, x + dx, y - dy, color,
-          alpha: alpha, mask: mask, maskChannel: maskChannel);
+          alpha: alpha, blend: blend, mask: mask, maskChannel: maskChannel);
     }
 
     // upper left
     if (quadrants & topLeftQuadrant != 0) {
       drawPixel(image, x - dx, y - dy, color,
-          alpha: alpha, mask: mask, maskChannel: maskChannel);
+          alpha: alpha, blend: blend, mask: mask, maskChannel: maskChannel);
     }
   }
 
