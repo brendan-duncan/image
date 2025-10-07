@@ -1,11 +1,11 @@
-## 4.5.4 - March 23, 2024
+## 4.5.4 - March 23, 2025
 
 - Fix for fillRect for images that that have alpha.
 - Fix copyExpandCanvas for images with alpha.
 - Improved performance for copyResize.
 - Improved performance for gaussianBlur.
 
-## 4.5.3 - February 21, 2024 
+## 4.5.3 - February 22, 2025
 
 - Improve fillPolygon to better handle concave polygons.
 - Update conditional imports to be compatible with WASM.
@@ -63,7 +63,7 @@
 
 ## 4.1.6 - January 31, 2024
 
-- Incomplete or JPEGs with errors will now finish loading. 
+- Incomplete or JPEGs with errors will now finish loading.
 
 ## 4.1.5 - January 31, 2024
 
@@ -76,7 +76,7 @@
 - copyResize command accepts maintainAspect and backgroundColor args.
 - Fix EXIF decoder when image has bad IFD offsets.
 - Improve drawString handling of new line characters when wrap is true.
-- Improve GIF animation decoding when each frame has its own palette. 
+- Improve GIF animation decoding when each frame has its own palette.
 
 ## 4.1.3 - September 25, 2023
 
@@ -88,8 +88,8 @@
 
 ## 4.1.1
 
-- Add maintainAspect and backgroundColor to copyResize to resize width and 
-height of an image, without stretching the source (using background color to pad).
+- Add maintainAspect and backgroundColor to copyResize to resize width and
+  height of an image, without stretching the source (using background color to pad).
 - drawString will word-wrap even when x or y is set.
 - Don't clamp brightness in adjustColor.
 
@@ -104,7 +104,7 @@ height of an image, without stretching the source (using background color to pad
 ## 4.0.17 - May 06, 2023
 
 - Fix resizing multi-frame palette images.
-- Fix transparency issue with encodeGif.  
+- Fix transparency issue with encodeGif.
 
 ## 4.0.16 - April 27, 2023
 
@@ -117,7 +117,7 @@ height of an image, without stretching the source (using background color to pad
 
 ## 4.0.14 - February 11, 2023
 
-- Use Image.backgroundColor for copyRotate, copyCropCircle, and other functions that reveal background pixels. 
+- Use Image.backgroundColor for copyRotate, copyCropCircle, and other functions that reveal background pixels.
 
 ## 4.0.13 - January 30, 2023
 
@@ -147,7 +147,7 @@ height of an image, without stretching the source (using background color to pad
 ## 4.0.8 - January 08, 2023
 
 - Fix ChannelOrder.bgra.
-- Add Image.hasAlpha getter property that will be true if the Image has an alpha channel. 
+- Add Image.hasAlpha getter property that will be true if the Image has an alpha channel.
 
 ## 4.0.7 - January 05, 2023
 
@@ -157,7 +157,7 @@ height of an image, without stretching the source (using background color to pad
 
 - `Image.remapChannels(ChannelOrder order)` to remap the order of channels from rgb to bgr, etc.
 - `Image.getBytes({ChannelOrder? order})` will return the image data, optionally reordering the channels.
-- Image.fromBytes can take an optional `ChannelOrder? order` named arg to specify the channel order of the input data. 
+- Image.fromBytes can take an optional `ChannelOrder? order` named arg to specify the channel order of the input data.
 
 ## 4.0.5 - January 01, 2023
 
@@ -189,7 +189,7 @@ height of an image, without stretching the source (using background color to pad
 
 - Major update of the Dart Image Library. Includes support for:
   - Major overhaul of the API. Dart has changed a lot in the 10 years since this library was written,
-    so the API has been modernized. 
+    so the API has been modernized.
   - Flexible ImageData, with support for 1, 2, 4, 8, 16, and 32 bit images, and 1-4 channels per pixel.
   - 16, 32, and 64-bit floating-point format images.
   - 8, 16, and 32-bit integer format images.
@@ -320,7 +320,6 @@ height of an image, without stretching the source (using background color to pad
 - Fix index out of range bug in drawImage.
 - Fix transparency with animated WebP images.
 
-
 ## 2.1.11 - December 30, 2019
 
 - Fix GIF animation loopCount encoding. Some viewers were not seeing the repeat count correctly.
@@ -420,7 +419,7 @@ height of an image, without stretching the source (using background color to pad
 
 - Re-added decoding of orientation exif value from jpeg images.
 - Added bake_orientation function, which will rotate an image so that it physically matches its orientation exif value,
-useful for rotating an image prior to exporting it to a format that does not support exif data.
+  useful for rotating an image prior to exporting it to a format that does not support exif data.
 
 ## 2.0.1 - May 28, 2018
 
@@ -433,16 +432,16 @@ Update SDK dependency to a 2.0 development release.
 
 ## 1.1.33 - May 16, 2018
 
-  Maintain EXIF data from JPEG images.
+Maintain EXIF data from JPEG images.
 
 ## 1.1.32 - May 9, 2018
 
-  Remove the use of `part` and `part of` in the main library.
+Remove the use of `part` and `part of` in the main library.
 
 ## 1.1.30 - March 10, 2018
 
-  Update pubspec to account for the new version of xml package that has been
-  published.
+Update pubspec to account for the new version of xml package that has been
+published.
 
 ## 1.1.29 - September 18, 2017
 
@@ -458,68 +457,55 @@ Update SDK dependency to a 2.0 development release.
 
 - Fix crash decoding some jpeg images.
 
-
 ## 1.1.24 - January 23, 2015
 
 - PVR encoding/decoding
 - Fix 16-bit tiff decoding
 
-
 ## 1.1.23 - September 15, 2014
 
 - Fix alpha for PSD images.
 
-
 ## 1.1.22 - July 31, 2014
 
 - Various bug fixes
-
 
 ## 1.1.21 - June 19, 2014
 
 - Add drawImage function
 - Update XML dependency to 2.0.0
 
-
 ## 1.1.20 - April 26, 2014
 
 - Fix OpenEXR decoder for dart2js
-
 
 ## 1.1.19 - April 15, 2014
 
 - OpenEXR fixes.
 
-
 ## 1.1.18 - April 06, 2014
 
 - Added OpenEXR format decoder.
-
 
 ## 1.1.17 - April 02, 2014
 
 - Add Photoshop PSD format decoder
 
-
 ## 1.1.16 - March 24, 2014
 
 - Fix JPEG encoder for compression quality < 100.
-
 
 ## 1.1.15 - March 10, 2014
 
 - Update to new version of archive.
 
-
 ## 1.1.14 - February 26, 2014
 
 - Optimizations
 
-
 ## 1.1.13 - February 16, 2014
 
 - Added TIFF decoder
-
 
 ## 1.1.10 - February 11, 2014
 
@@ -527,11 +513,9 @@ Update SDK dependency to a 2.0 development release.
 - Improved JPEG decoding performance
 - Various bug fixes
 
-
 ## 1.1.8 - February 01, 2014
 
 - Added GIF decoding support, including animated gifs.
-
 
 ## 1.1.7 - January 28, 2014
 
