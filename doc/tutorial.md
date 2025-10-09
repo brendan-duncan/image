@@ -46,7 +46,7 @@ import 'package:image/image.dart' as img;
 // The returned Image will be accessing the data of the canvas directly, so any changes you
 // make to the pixels of Image will apply to the canvas.
 img.Image getImageFromCanvas(CanvasElement canvas) {
-  var imageData = canvas.context2D.getImageData(0, 0, canvas.width, canvas.height);
+  final imageData = canvas.context2D.getImageData(0, 0, canvas.width, canvas.height);
   // Create an Image from the canvas image data.
   return img.Image.fromBytes(width: canvas.width, height: canvas.height, bytes: imageData.data, numChannels: 4);
 }
@@ -77,7 +77,7 @@ void main() async {
   // Create an image, with the default uint8 format and default number of channels, 3.
   ..createImage(width: 256, height: 256)
   // Fill the image with a solid color (blue)
-  ..fill(color: img.ColorRgb8(0, 0, 255)))
+  ..fill(color: img.ColorRgb8(0, 0, 255))
   // Draw some text using the built-in 24pt Arial font
   ..drawString('Hello World', font: img.arial24, x: 0, y: 0)
   // Draw a red line
@@ -99,7 +99,7 @@ img.Image grayscaleAlpha(img.Image image) {
   // Convert the image to RGBA (if it doesn't already have an alpha channel.
   final rgba = image.convert(numChannels: 4);
   // Map the luminance (grayscale) of the image to the alpha channel.
-  return remapColors(rgba, alpha: img.Channel.luminance);
+  return img.remapColors(rgba, alpha: img.Channel.luminance);
 }
 ```
 
