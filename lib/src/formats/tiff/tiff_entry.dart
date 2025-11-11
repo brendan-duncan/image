@@ -58,6 +58,7 @@ class TiffEntry {
         return value = IfdValueSLong.data(data, count);
       case IfdValueType.sRational:
         return value = IfdValueSRational.data(data, count);
+      case IfdValueType.ifd:
       case IfdValueType.none:
         return null;
     }

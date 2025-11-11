@@ -186,6 +186,8 @@ class IfdDirectory {
               break;
             case IfdValueType.none:
               break;
+            case IfdValueType.ifd:
+              break;
           }
         }
       }

@@ -720,3 +720,37 @@ class IfdValueUndefined extends IfdValue {
   @override
   String toString() => '<data>';
 }
+
+class IfdValueIfd extends IfdValue {
+  int offset;
+
+  IfdValueIfd.data(int ifdOffset)
+    : offset = ifdOffset;
+
+  @override
+  IfdValue clone() => IfdValueIfd.data(offset);
+
+  @override
+  IfdValueType get type => IfdValueType.ifd;
+
+  @override
+  int get length => 4;
+
+  @override
+  bool operator ==(Object other) =>
+      other is IfdValueIfd && 
+      offset == other.offset &&
+      length == other.length &&
+      hashCode == other.hashCode;
+
+  @override
+  int get hashCode => offset;
+
+  @override
+  void write(OutputBuffer out) {
+    // TODO: implement write
+  }
+
+  @override
+  String toString() => 'Ifd@$offset';
+}
