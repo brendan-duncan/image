@@ -18,10 +18,11 @@ enum IfdValueType {
   sLong,
   sRational,
   single,
-  double
+  double,
+  ifd,
 }
 
-const ifdValueTypeSize = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
+const ifdValueTypeSize = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8, 4];
 
 abstract class IfdValue {
   IfdValue clone();
