@@ -60,10 +60,6 @@ class TiffImage {
     for (var i = 0; i < numDirEntries; ++i) {
       final tag = p.readUint16();
       final ti = p.readUint16();
-      if (ti > 13) {
-        // Unknown value type: Ignore tag
-        continue;
-      }
       final type = IfdValueType.values[ti];
       final typeSize = ifdValueTypeSize[ti];
       final count = p.readUint32();
