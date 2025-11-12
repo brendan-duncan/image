@@ -396,7 +396,9 @@ class ExifData extends IfdContainer {
         entry.value = IfdValueDouble.data(data, count);
         break;
       case IfdValueType.ifd:
-        entry.value = IfdValueIfd.data(0);
+        if (count == 1) {
+          entry.value = IfdValueIfd.data(data);
+        }
         break;
     }
 

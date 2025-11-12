@@ -140,8 +140,10 @@ void main() {
             final bytes = f.readAsBytesSync();
             final image = decodeTiff(bytes);
             expect(image, isNotNull);
+            expect(image!.width, isNot(0));
+            expect(image.height, isNot(0));
 
-            final i0 = image!;
+            final i0 = image;
             final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
 
             File('$testOutputPath/tif/$name.png')
