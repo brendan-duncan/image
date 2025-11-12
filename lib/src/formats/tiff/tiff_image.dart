@@ -60,9 +60,14 @@ class TiffImage {
     for (var i = 0; i < numDirEntries; ++i) {
       final tag = p.readUint16();
       final ti = p.readUint16();
+      final count = p.readUint32();
+      if (ti > 13 || ti < 0) {
+        // Ignore invalid tag types
+        p.skip(4);
+        continue;
+      }
       final type = IfdValueType.values[ti];
       final typeSize = ifdValueTypeSize[ti];
-      final count = p.readUint32();
       var valueOffset = 0;
       // The value for the tag is either stored in another location,
       // or within the tag itself (if the size fits in 4 bytes).
@@ -385,7 +390,8 @@ class TiffImage {
         final data = p.toList(0, byteCount);
         final outData = const ZLibDecoder().decodeBytes(data);
         byteData = InputBuffer(outData);
-      } else if (compression == TiffCompression.oldJpeg) {
+      } else if (compression == TiffCompression.oldJpeg || 
+        compression == TiffCompression.jpeg) {
         final data = p.toList(0, byteCount);
         final tile = JpegDecoder().decode(data as Uint8List);
         if (tile != null) {
