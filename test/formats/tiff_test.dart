@@ -168,6 +168,24 @@ void main() {
           });
         }
       });
+
+      test("multipageTiff", () {
+        final f = files.whereType<File>()
+          .firstWhere((x) => x.path.endsWith("UF1_id1cS2300G0C2.tif"));
+        final bytes = f.readAsBytesSync();
+        final image = decodeTiff(bytes);
+        expect(image, isNotNull);
+        expect(image!.frames, isNotNull);
+        expect(image.frames.length, equals(8));
+        for (int i = 0; i < image.frames.length; i++) {
+          expect(image.frames[i].width, isNot(0));
+          expect(image.frames[i].height, isNot(0));
+        }
+
+        final image2 = decodeTiff(bytes, frame: 2);
+        expect(image2, isNotNull);
+        expect(image.frames[2].width, equals(image2!.width));
+      });
     });
   });
 }
