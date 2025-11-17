@@ -65,9 +65,14 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
+    // By default decode all frames and include the metadata in the result.
+    // Most tif images have only a single image.
     final len = numFrames();
-    if (len == 1 || frame != 0) {
-      return decodeFrame(frame ?? 0);
+    if (frame != null) {
+      if (frame >= len) {
+        throw RangeError.range(frame, 0, len - 1);
+      }
+      return decodeFrame(frame);
     }
 
     final image = decodeFrame(0);

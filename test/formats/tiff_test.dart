@@ -142,6 +142,7 @@ void main() {
             expect(image, isNotNull);
             expect(image!.width, isNot(0));
             expect(image.height, isNot(0));
+            expect(image.exif, isNotNull);
 
             final i0 = image;
             final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
