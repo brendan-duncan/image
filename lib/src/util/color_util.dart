@@ -188,7 +188,7 @@ void rgbToHsv(num r, num g, num b, List<num> hsv) {
   if (maxCh == 0 || delta == 0) {
     hsv[0] = 0;
     hsv[1] = 0;
-    hsv[2] = 0;
+    hsv[2] = maxCh;
     return;
   }
 
