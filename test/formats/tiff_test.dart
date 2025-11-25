@@ -140,8 +140,11 @@ void main() {
             final bytes = f.readAsBytesSync();
             final image = decodeTiff(bytes);
             expect(image, isNotNull);
+            expect(image!.width, isNot(0));
+            expect(image.height, isNot(0));
+            expect(image.exif, isNotNull);
 
-            final i0 = image!;
+            final i0 = image;
             final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
 
             File('$testOutputPath/tif/$name.png')
@@ -164,6 +167,24 @@ void main() {
               ..writeAsBytesSync(encodePng(i3));
           });
         }
+      });
+
+      test("multipageTiff", () {
+        final f = files.whereType<File>()
+          .firstWhere((x) => x.path.endsWith("UF1_id1cS2300G0C2.tif"));
+        final bytes = f.readAsBytesSync();
+        final image = decodeTiff(bytes);
+        expect(image, isNotNull);
+        expect(image!.frames, isNotNull);
+        expect(image.frames.length, equals(8));
+        for (int i = 0; i < image.frames.length; i++) {
+          expect(image.frames[i].width, isNot(0));
+          expect(image.frames[i].height, isNot(0));
+        }
+
+        final image2 = decodeTiff(bytes, frame: 2);
+        expect(image2, isNotNull);
+        expect(image.frames[2].width, equals(image2!.width));
       });
     });
   });

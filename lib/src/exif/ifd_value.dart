@@ -18,10 +18,11 @@ enum IfdValueType {
   sLong,
   sRational,
   single,
-  double
+  double,
+  ifd,
 }
 
-const ifdValueTypeSize = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
+const ifdValueTypeSize = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8, 4];
 
 abstract class IfdValue {
   IfdValue clone();
@@ -718,4 +719,65 @@ class IfdValueUndefined extends IfdValue {
 
   @override
   String toString() => '<data>';
+}
+
+class IfdValueIfd extends IfdValue {
+  int offset;
+
+  IfdValueIfd(int value) : offset = value {
+  }
+
+  IfdValueIfd.data(InputBuffer data) : offset = 0 {
+    offset = data.readInt32();
+  }
+
+  @override
+  IfdValue clone() => IfdValueLong(offset);
+
+  @override
+  IfdValueType get type => IfdValueType.ifd;
+
+  @override
+  int get length => 1;
+
+  @override
+  bool operator ==(Object other) =>
+      other is IfdValueIfd &&
+      length == other.length &&
+      offset == other.offset &&
+      hashCode == other.hashCode;
+
+  @override
+  int get hashCode => offset;
+
+  @override
+  int toInt([int index = 0]) {
+    if (index != 0) {
+      throw RangeError("Ifd tags must have exactly one entry (the offset)");
+    }
+    return offset;
+  } 
+
+  @override
+  void setInt(int v, [int index = 0]) {
+    if (index != 0) {
+      throw RangeError("Ifd tags must have exactly one entry (the offset)");
+    }
+    offset = v;
+  }
+
+  @override
+  Uint8List toData() => Uint8List.fromList([
+    offset >> 24, 
+    offset >> 16, 
+    offset >> 8, 
+    offset]);
+
+  @override
+  void write(OutputBuffer out) {
+    out.writeUint32(offset);
+  }
+
+  @override
+  String toString() => 'Ifd@$offset';
 }

@@ -184,6 +184,11 @@ class IfdDirectory {
                 data[tag] = IfdValueDouble(value.toDouble());
               }
               break;
+            case IfdValueType.ifd:
+              if (value is int) {
+                data[tag] = IfdValueIfd(value);
+              }
+              break;
             case IfdValueType.none:
               break;
           }
