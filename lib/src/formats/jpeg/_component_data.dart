@@ -10,6 +10,8 @@ class ComponentData {
   int vScaleShift;
   ComponentData(this.hSamples, this.maxHSamples, this.vSamples,
       this.maxVSamples, this.lines)
-      : hScaleShift = (hSamples == 1 && maxHSamples == 2) ? 1 : 0,
-        vScaleShift = (vSamples == 1 && maxVSamples == 2) ? 1 : 0;
+      : hScaleShift = hSamples == maxHSamples ? 0 :
+          hSamples == 1 && maxHSamples == 4 ? 2 : 1,
+        vScaleShift = vSamples == maxVSamples ? 0 :
+          vSamples == 1 && maxVSamples == 4 ? 2 : 1;
 }

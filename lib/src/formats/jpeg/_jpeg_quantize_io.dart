@@ -318,18 +318,18 @@ Image getImageFromJpeg(JpegData jpeg) {
         final y2 = y >> vShift2;
         final y3 = y >> vShift3;
 
-        component1Line = lines1[y1];
-        component2Line = lines2[y2];
-        component3Line = lines3[y3];
+        component1Line = lines1[y1]!;
+        component2Line = lines2[y2]!;
+        component3Line = lines3[y3]!;
 
         for (var x = 0; x < w; x++) {
           final x1 = x >> hShift1;
           final x2 = x >> hShift2;
           final x3 = x >> hShift3;
 
-          final cy = component1Line![x1] << 8;
-          final cb = component2Line![x2] - 128;
-          final cr = component3Line![x3] - 128;
+          final cy = component1Line[x1] << 8;
+          final cb = component2Line[x2] - 128;
+          final cr = component3Line[x3] - 128;
 
           var r = cy + 359 * cr + 128;
           var g = cy - 88 * cb - 183 * cr + 128;
