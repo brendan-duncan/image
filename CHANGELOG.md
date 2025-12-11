@@ -1,3 +1,8 @@
+## 4.5.5 - December 11, 2025
+
+- Bumped dependency versions
+- Fixed issue where App1 marker would not be written when Exif data is injected into jpegs without exif block. Also fixed wrong IFD1 pointer.
+
 ## 4.5.4 - March 23, 2025
 
 - Fix for fillRect for images that that have alpha.
