@@ -169,8 +169,6 @@ class IfdDirectory {
             case IfdValueType.single:
               if (value is List<double>) {
                 data[tag] = IfdValueSingle.list(Float32List.fromList(value));
-              } else if (value is double) {
-                data[tag] = IfdValueSingle(value);
               } else if (value is num) {
                 data[tag] = IfdValueSingle(value.toDouble());
               }
@@ -178,8 +176,6 @@ class IfdDirectory {
             case IfdValueType.double:
               if (value is List<double>) {
                 data[tag] = IfdValueDouble.list(Float64List.fromList(value));
-              } else if (value is double) {
-                data[tag] = IfdValueDouble(value);
               } else if (value is num) {
                 data[tag] = IfdValueDouble(value.toDouble());
               }
