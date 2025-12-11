@@ -55,38 +55,40 @@ class JpegUtil {
 
     final output = OutputBuffer(size: jpeg.length, bigEndian: true);
 
-    var marker = _nextMarker(input, output);
+    var marker = _nextMarker(input);
     if (marker != JpegMarker.soi) {
       return null;
     }
 
     // Check to see if the JPEG file has an EXIF block
     var hasExifBlock = false;
+    var exifBlockEndOffset = 0;
     final startOffset = input.offset;
+    var exifBlockStartOffset = startOffset;
     marker = _nextMarker(input);
     while (!hasExifBlock && marker != JpegMarker.eoi && !input.isEOS) {
       if (marker == JpegMarker.app1) {
         final block = _readBlock(input);
         final signature = block?.readUint32();
         if (signature == exifSignature) {
+          exifBlockEndOffset = input.offset;
           hasExifBlock = true;
           break;
         }
       } else {
         _skipBlock(input);
       }
+      exifBlockStartOffset = startOffset;
       marker = _nextMarker(input);
     }
 
-    input.offset = startOffset;
+    input.offset = 0;
 
     // If the JPEG file does not have an EXIF block, add a new one.
     if (!hasExifBlock) {
+      output.writeBuffer(input.readBytes(startOffset));
       // Write APP1 marker then the EXIF block. When there is no existing
       // APP1 segment the marker bytes won't have been written to `output`.
-      output
-        ..writeByte(0xff)
-        ..writeByte(JpegMarker.app1);
       _writeAPP1(output, exif);
       // No need to parse the remaining individual blocks, just write out
       // the remainder of the file.
@@ -94,25 +96,14 @@ class JpegUtil {
       return output.getBytes();
     }
 
-    marker = _nextMarker(input, output);
-    while (marker != JpegMarker.eoi && !input.isEOS) {
-      if (marker == JpegMarker.app1) {
-        final saveOffset = input.offset;
-        input.skip(2); // block length
-        final signature = input.readUint32();
-        input.offset = saveOffset;
-        if (signature == exifSignature) {
-          _skipBlock(input);
-          _writeAPP1(output, exif);
-          // No need to parse the remaining individual blocks, just write out
-          // the remainder of the file.
-          output.writeBuffer(input.readBytes(input.length));
-          return output.getBytes();
-        }
-      }
-      _skipBlock(input, output);
-      marker = _nextMarker(input, output);
-    }
+    // Write out the image file up until the exif block
+    output.writeBuffer(input.readBytes(exifBlockStartOffset));
+    // write the new exif block
+    _writeAPP1(output, exif);
+    // skip the exif block from the source
+    input.offset = exifBlockEndOffset;
+    // write out the remainder of the image file
+    output.writeBuffer(input.readBytes(input.length));
 
     return output.getBytes();
   }
@@ -143,6 +134,8 @@ class JpegUtil {
     final exifBytes = exifData.getBytes();
 
     out
+      ..writeByte(0xff)
+      ..writeByte(JpegMarker.app1)
       ..writeUint16(exifBytes.length + 8)
       ..writeUint32(exifSignature)
       ..writeUint16(0)

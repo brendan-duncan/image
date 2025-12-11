@@ -7,6 +7,36 @@ import '../_test_util.dart';
 void main() async {
   group('Format', () {
     group('jpg', () {
+      test('inject new exif', () {
+        final fb = File('test/_data/jpg/jpeg444.jpg').readAsBytesSync();
+        final exif = ExifData();
+        exif.imageIfd['xResolution'] = [300, 1];
+        exif.imageIfd['yResolution'] = [300, 1];
+        final jpg = injectJpgExif(fb, exif);
+        expect(jpg, isNotNull);
+        final image2 = JpegDecoder().decode(jpg!);
+        expect(image2, isNotNull);
+        expect(exif.imageIfd['XResolution'],
+            equals(image2!.exif.imageIfd['XResolution']));
+        expect(exif.imageIfd['YResolution'],
+            equals(image2.exif.imageIfd['YResolution']));
+      });
+
+      test('inject replacement exif', () {
+        final fb = File('test/_data/jpg/big_buck_bunny.jpg').readAsBytesSync();
+        final exif = ExifData();
+        exif.imageIfd['xResolution'] = [300, 1];
+        exif.imageIfd['yResolution'] = [300, 1];
+        final jpg = injectJpgExif(fb, exif);
+        expect(jpg, isNotNull);
+        final image2 = JpegDecoder().decode(jpg!);
+        expect(image2, isNotNull);
+        expect(exif.imageIfd['XResolution'],
+            equals(image2!.exif.imageIfd['XResolution']));
+        expect(exif.imageIfd['YResolution'],
+            equals(image2.exif.imageIfd['YResolution']));
+      });
+
       test('png icc_profile', () async {
         final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
         final image = PngDecoder().decode(bytes)!;
