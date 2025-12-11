@@ -1,3 +1,17 @@
+## 4.6.0 - December 11, 2025
+
+- Fix issues with injectJpegExif corrupting jpeg files.
+- Clean up validation errors causing Wasm builds to fail.
+- Fix issue with Jpeg subsampling causing some images to fail to load.
+- Fix rgbToHsv function
+- Fix jpeg RGB-to-YUV conversion and background blending logic.
+- Decode and encode ICC profile data for JPEG
+- Added export for ICO encoder
+- Fix error adding frame to an empty image
+- Fix GIF decoder animation frame clear color
+- GIF animation frame background transparency.
+- Fixes for TIFF decoding
+
 ## 4.5.4 - March 23, 2025
 
 - Fix for fillRect for images that that have alpha.
