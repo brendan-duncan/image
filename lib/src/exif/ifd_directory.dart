@@ -63,7 +63,7 @@ class IfdDirectory {
     if (tag is String) {
       tag = exifTagNameToID[tag];
     }
-    if (tag is int) {
+    if (tag is num) {
       return data[tag];
     }
     return null;
@@ -91,8 +91,8 @@ class IfdDirectory {
             case IfdValueType.byte:
               if (value is List<int>) {
                 data[tag] = IfdByteValue.list(Uint8List.fromList(value));
-              } else if (value is int) {
-                data[tag] = IfdByteValue(value);
+              } else if (value is num) {
+                data[tag] = IfdByteValue(value.toInt());
               }
               break;
             case IfdValueType.ascii:
@@ -103,15 +103,15 @@ class IfdDirectory {
             case IfdValueType.short:
               if (value is List<int>) {
                 data[tag] = IfdValueShort.list(Uint16List.fromList(value));
-              } else if (value is int) {
-                data[tag] = IfdValueShort(value);
+              } else if (value is num) {
+                data[tag] = IfdValueShort(value.toInt());
               }
               break;
             case IfdValueType.long:
               if (value is List<int>) {
                 data[tag] = IfdValueLong.list(Uint32List.fromList(value));
-              } else if (value is int) {
-                data[tag] = IfdValueLong(value);
+              } else if (value is num) {
+                data[tag] = IfdValueLong(value.toInt());
               }
               break;
             case IfdValueType.rational:
@@ -130,8 +130,8 @@ class IfdDirectory {
             case IfdValueType.sByte:
               if (value is List<int>) {
                 data[tag] = IfdValueSByte.list(Int8List.fromList(value));
-              } else if (value is int) {
-                data[tag] = IfdValueSByte(value);
+              } else if (value is num) {
+                data[tag] = IfdValueSByte(value.toInt());
               }
               break;
             case IfdValueType.undefined:
@@ -142,15 +142,15 @@ class IfdDirectory {
             case IfdValueType.sShort:
               if (value is List<int>) {
                 data[tag] = IfdValueSShort.list(Int16List.fromList(value));
-              } else if (value is int) {
-                data[tag] = IfdValueSShort(value);
+              } else if (value is num) {
+                data[tag] = IfdValueSShort(value.toInt());
               }
               break;
             case IfdValueType.sLong:
               if (value is List<int>) {
                 data[tag] = IfdValueSLong.list(Int32List.fromList(value));
-              } else if (value is int) {
-                data[tag] = IfdValueSLong(value);
+              } else if (value is num) {
+                data[tag] = IfdValueSLong(value.toInt());
               }
               break;
             case IfdValueType.sRational:
@@ -171,7 +171,7 @@ class IfdDirectory {
                 data[tag] = IfdValueSingle.list(Float32List.fromList(value));
               } else if (value is double) {
                 data[tag] = IfdValueSingle(value);
-              } else if (value is int) {
+              } else if (value is num) {
                 data[tag] = IfdValueSingle(value.toDouble());
               }
               break;
@@ -180,13 +180,13 @@ class IfdDirectory {
                 data[tag] = IfdValueDouble.list(Float64List.fromList(value));
               } else if (value is double) {
                 data[tag] = IfdValueDouble(value);
-              } else if (value is int) {
+              } else if (value is num) {
                 data[tag] = IfdValueDouble(value.toDouble());
               }
               break;
             case IfdValueType.ifd:
-              if (value is int) {
-                data[tag] = IfdValueIfd(value);
+              if (value is num) {
+                data[tag] = IfdValueIfd(value.toInt());
               }
               break;
             case IfdValueType.none:

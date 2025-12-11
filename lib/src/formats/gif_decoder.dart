@@ -220,8 +220,8 @@ class GifDecoder extends Decoder {
         if (frame.transparent != -1) {
           imageBytes.fillRange(0, imageBytes.length - 1, frame.transparent);
         } else {
-          imageBytes.fillRange(0, imageBytes.length - 1,
-              info!.backgroundColor!.r as int);
+          imageBytes.fillRange(
+              0, imageBytes.length - 1, info!.backgroundColor!.r as int);
         }
       } else if (frame.disposal != 3) {
         if (frame.colorMap != null) {

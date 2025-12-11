@@ -84,8 +84,9 @@ class JpegUtil {
     if (!hasExifBlock) {
       // Write APP1 marker then the EXIF block. When there is no existing
       // APP1 segment the marker bytes won't have been written to `output`.
-      output..writeByte(0xff)
-      ..writeByte(JpegMarker.app1);
+      output
+        ..writeByte(0xff)
+        ..writeByte(JpegMarker.app1);
       _writeAPP1(output, exif);
       // No need to parse the remaining individual blocks, just write out
       // the remainder of the file.

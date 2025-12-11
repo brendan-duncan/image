@@ -16,6 +16,7 @@ analyzer:
 
 linter:
   rules:
+    - avoid_double_and_int_checks
     - avoid_dynamic_calls
     - avoid_print
     - camel_case_types

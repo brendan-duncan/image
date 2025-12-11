@@ -390,8 +390,8 @@ class TiffImage {
         final data = p.toList(0, byteCount);
         final outData = const ZLibDecoder().decodeBytes(data);
         byteData = InputBuffer(outData);
-      } else if (compression == TiffCompression.oldJpeg || 
-        compression == TiffCompression.jpeg) {
+      } else if (compression == TiffCompression.oldJpeg ||
+          compression == TiffCompression.jpeg) {
         final data = p.toList(0, byteCount);
         final tile = JpegDecoder().decode(data as Uint8List);
         if (tile != null) {

@@ -724,8 +724,7 @@ class IfdValueUndefined extends IfdValue {
 class IfdValueIfd extends IfdValue {
   int offset;
 
-  IfdValueIfd(int value) : offset = value {
-  }
+  IfdValueIfd(int value) : offset = value {}
 
   IfdValueIfd.data(InputBuffer data) : offset = 0 {
     offset = data.readInt32();
@@ -756,7 +755,7 @@ class IfdValueIfd extends IfdValue {
       throw RangeError("Ifd tags must have exactly one entry (the offset)");
     }
     return offset;
-  } 
+  }
 
   @override
   void setInt(int v, [int index = 0]) {
@@ -767,11 +766,8 @@ class IfdValueIfd extends IfdValue {
   }
 
   @override
-  Uint8List toData() => Uint8List.fromList([
-    offset >> 24, 
-    offset >> 16, 
-    offset >> 8, 
-    offset]);
+  Uint8List toData() =>
+      Uint8List.fromList([offset >> 24, offset >> 16, offset >> 8, offset]);
 
   @override
   void write(OutputBuffer out) {

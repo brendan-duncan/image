@@ -36,7 +36,7 @@ Color _convertColor(Color c, Color c2, num a) {
   final cl = c.length;
   if (numChannels == 1) {
     final g = c.length > 2 ? c.luminance : c[0];
-    final gi = (c[0] is int) ? g.floor() : g;
+    final gi = g.floor();
     c2[0] = convertFormatValue(gi, fromFormat, format);
   } else if (numChannels <= cl) {
     for (var ci = 0; ci < numChannels; ++ci) {
