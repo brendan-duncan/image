@@ -1,7 +1,10 @@
-## 4.5.5 - December 11, 2025
+## 4.5.5 - December 14, 2025
 
 - Bumped dependency versions
 - Fixed issue where App1 marker would not be written when Exif data is injected into jpegs without exif block. Also fixed wrong IFD1 pointer.
+- Improved robustness of EXIF injection and reading:
+- Skips malformed EXIF sub-IFDs (e.g., bad GPSInfo pointers) during reading and injection, preventing RangeErrors and crashes.
+- Allows injecting new EXIF (including GPS) data into files with broken EXIF blocks.
 
 ## 4.5.4 - March 23, 2025
 
