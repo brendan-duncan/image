@@ -314,20 +314,26 @@ class ExifData extends IfdContainer {
     for (final d in directories.values) {
       for (final dt in subTags.keys) {
         if (d.containsKey(dt)) {
-          // ExifOffset
-          final ifdOffset = d[dt]!.toInt();
-          block.offset = blockOffset + ifdOffset;
-          final directory = IfdDirectory();
-          final numEntries = block.readUint16();
-          final dir = List<_ExifEntry>.generate(
-              numEntries, (i) => _readEntry(block, blockOffset));
+          try {
+            // ExifOffset
+            final ifdOffset = d[dt]!.toInt();
+            block.offset = blockOffset + ifdOffset;
+            final directory = IfdDirectory();
+            final numEntries = block.readUint16();
+            final dir = List<_ExifEntry>.generate(
+                numEntries, (i) => _readEntry(block, blockOffset));
 
-          for (final entry in dir) {
-            if (entry.value != null) {
-              directory[entry.tag] = entry.value!;
+            for (final entry in dir) {
+              if (entry.value != null) {
+                directory[entry.tag] = entry.value!;
+              }
             }
+            d.sub[subTags[dt]!] = directory;
+          } catch (e) {
+            // Malformed sub-IFD (e.g., GPS), skip it
+            // Optionally log or collect error info here
+            continue;
           }
-          d.sub[subTags[dt]!] = directory;
         }
       }
     }

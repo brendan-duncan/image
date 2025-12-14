@@ -69,23 +69,29 @@ class JpegUtil {
       if (marker == JpegMarker.app1) {
         // Save current offset to restore if not EXIF
         final blockStart = input.offset;
-        if (input.length - input.offset < 2) {
-          break;
-        }
-        final blockLength = input.readUint16();
-        if (blockLength < 2 || input.length - input.offset < blockLength - 2) {
-          break;
-        }
-        // Peek at the signature
-        if (blockLength >= 6) {
-          final signature = input.readUint32();
-          if (signature == exifSignature) {
-            hasExifBlock = true;
+        try {
+          if (input.length - input.offset < 2) {
             break;
           }
+          final blockLength = input.readUint16();
+          if (blockLength < 2 || input.length - input.offset < blockLength - 2){
+            break;
+          }
+          // Peek at the signature
+          if (blockLength >= 6) {
+            final signature = input.readUint32();
+            if (signature == exifSignature) {
+              hasExifBlock = true;
+              break;
+            }
+          }
+          // Not EXIF, skip the rest of the block
+          input.offset = blockStart + blockLength;
+        } catch (e) {
+          // Malformed EXIF block, skip it
+          input.offset = blockStart;
+          _skipBlock(input);
         }
-        // Not EXIF, skip the rest of the block
-        input.offset = blockStart + blockLength;
       } else {
         _skipBlock(input);
       }

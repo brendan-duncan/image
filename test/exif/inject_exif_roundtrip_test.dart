@@ -2,29 +2,51 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:image/image.dart';
 import 'package:image/src/formats/jpeg/jpeg_util.dart';
+import 'package:intl/intl.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('injectExif -> decodeExif roundtrip', () {
-    final file = File('test/_data/jpg/jpgwithoutexifblock.jpg');
-    expect(file.existsSync(), isTrue, reason: 'test image must exist');
+  final dir = Directory('test/_data/jpg');
+  final jpgFiles = dir
+      .listSync()
+      .whereType<File>()
+      .where((f) => f.path.toLowerCase().endsWith('.jpg'))
+      .toList();
 
-    final origBytes = file.readAsBytesSync();
-    // Work on a copy of the original bytes so the on-disk file is not altered.
-    final bytes = Uint8List.fromList(origBytes);
+  for (final file in jpgFiles) {
+    test('injectExif realistic tags roundtrip: \\${file.path}', () async {
+      expect(file.existsSync(), isTrue, reason: 'test image must exist');
 
-    // Build a minimal ExifData and inject it. Set the tag on the image IFD
-    // because `make` is a property of an IfdDirectory, not ExifData itself.
-    final exif = ExifData();
-    exif.imageIfd.make = 'dart-image-test';
+      final orig = await file.readAsBytes();
+      final ExifData? exif = JpegUtil().decodeExif(orig);
 
-    final injected = JpegUtil().injectExif(exif, bytes);
-    expect(injected, isNotNull, reason: 'injectExif should return data');
+      // Ensure EXIF container and required directories exist
+      final ExifData data = exif ?? ExifData();
 
-    final decoded = JpegUtil().decodeExif(injected!);
-    expect(decoded, isNotNull, reason: 'decodeExif should parse injected EXIF');
+      final fmt = DateFormat('yyyy:MM:dd HH:mm:ss');
+      final dt = fmt.format(DateTime.now());
 
-    // Verify the tag round-trips (make lives on the image IFD)
-    expect(decoded!.imageIfd.make, equals('dart-image-test'));
-  });
+      // Write tags by name into proper directories
+      data.imageIfd['DateTime'] = dt;
+      data.exifIfd['DateTimeOriginal'] = dt;
+      data.exifIfd['DateTimeDigitized'] = dt;
+
+      final Uint8List? out = JpegUtil().injectExif(data, orig);
+      expect(out, isNotNull, reason: 'injectExif should return data');
+
+      final ExifData? decoded = JpegUtil().decodeExif(out!);
+      expect(decoded, isNotNull, reason: 'decodeExif should parse injected EXIF');
+
+      // Verify the tag round-trips (extract string from IfdValueAscii)
+      String? getAsciiValue(dynamic v) {
+        if (v == null) return null;
+        if (v is String) return v;
+        if (v is IfdValueAscii) return v.value;
+        return v.toString();
+      }
+      expect(getAsciiValue(decoded!.imageIfd['DateTime']), equals(dt));
+      expect(getAsciiValue(decoded.exifIfd['DateTimeOriginal']), equals(dt));
+      expect(getAsciiValue(decoded.exifIfd['DateTimeDigitized']), equals(dt));
+    });
+  }
 }
