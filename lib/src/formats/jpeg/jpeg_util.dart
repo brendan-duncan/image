@@ -61,17 +61,31 @@ class JpegUtil {
     }
 
     // Check to see if the JPEG file has an EXIF block
+
     var hasExifBlock = false;
     final startOffset = input.offset;
     marker = _nextMarker(input);
     while (!hasExifBlock && marker != JpegMarker.eoi && !input.isEOS) {
       if (marker == JpegMarker.app1) {
-        final block = _readBlock(input);
-        final signature = block?.readUint32();
-        if (signature == exifSignature) {
-          hasExifBlock = true;
+        // Save current offset to restore if not EXIF
+        final blockStart = input.offset;
+        if (input.length - input.offset < 2) {
           break;
         }
+        final blockLength = input.readUint16();
+        if (blockLength < 2 || input.length - input.offset < blockLength - 2) {
+          break;
+        }
+        // Peek at the signature
+        if (blockLength >= 6) {
+          final signature = input.readUint32();
+          if (signature == exifSignature) {
+            hasExifBlock = true;
+            break;
+          }
+        }
+        // Not EXIF, skip the rest of the block
+        input.offset = blockStart + blockLength;
       } else {
         _skipBlock(input);
       }
