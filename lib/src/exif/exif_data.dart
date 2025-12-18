@@ -98,10 +98,20 @@ class ExifData extends IfdContainer {
       directories['ifd0'] = IfdDirectory();
     }
 
+    // Ensure deterministic ordering: IFD0 must be written first. Use an
+    // explicit list of directory names so offsets and next-pointer values
+    // are calculated consistently regardless of map insertion order.
+    final dirNames = <String>['ifd0'];
+    for (final k in directories.keys) {
+      if (k != 'ifd0') {
+        dirNames.add(k);
+      }
+    }
+
     var dataOffset = 8; // offset to first ifd block, from start of tiff header
     final offsets = <String, int>{};
 
-    for (final name in directories.keys) {
+    for (final name in dirNames) {
       final ifd = directories[name]!;
       offsets[name] = dataOffset;
 
@@ -149,10 +159,10 @@ class ExifData extends IfdContainer {
       }
     }
 
-    final numIfd = directories.keys.length;
+    final numIfd = dirNames.length;
     for (int i = 0; i < numIfd; ++i) {
-      final name = directories.keys.elementAt(i);
-      final ifd = directories.values.elementAt(i);
+      final name = dirNames[i];
+      final ifd = directories[name]!;
 
       if (ifd.sub.containsKey('exif')) {
         ifd[0x8769]!.setInt(offsets['exif']!);
@@ -174,7 +184,7 @@ class ExifData extends IfdContainer {
       if (i == numIfd - 1) {
         out.writeUint32(0);
       } else {
-        final nextName = directories.keys.elementAt(i + 1);
+        final nextName = dirNames[i + 1];
         out.writeUint32(offsets[nextName]!);
       }
 
@@ -306,20 +316,26 @@ class ExifData extends IfdContainer {
     for (final d in directories.values) {
       for (final dt in subTags.keys) {
         if (d.containsKey(dt)) {
-          // ExifOffset
-          final ifdOffset = d[dt]!.toInt();
-          block.offset = blockOffset + ifdOffset;
-          final directory = IfdDirectory();
-          final numEntries = block.readUint16();
-          final dir = List<_ExifEntry>.generate(
-              numEntries, (i) => _readEntry(block, blockOffset));
+          try {
+            // ExifOffset
+            final ifdOffset = d[dt]!.toInt();
+            block.offset = blockOffset + ifdOffset;
+            final directory = IfdDirectory();
+            final numEntries = block.readUint16();
+            final dir = List<_ExifEntry>.generate(
+                numEntries, (i) => _readEntry(block, blockOffset));
 
-          for (final entry in dir) {
-            if (entry.value != null) {
-              directory[entry.tag] = entry.value!;
+            for (final entry in dir) {
+              if (entry.value != null) {
+                directory[entry.tag] = entry.value!;
+              }
             }
+            d.sub[subTags[dt]!] = directory;
+          } catch (e) {
+            // Malformed sub-IFD (e.g., GPS), skip it
+            // Optionally log or collect error info here
+            continue;
           }
-          d.sub[subTags[dt]!] = directory;
         }
       }
     }

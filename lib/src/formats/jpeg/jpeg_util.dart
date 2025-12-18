@@ -61,6 +61,7 @@ class JpegUtil {
     }
 
     // Check to see if the JPEG file has an EXIF block
+
     var hasExifBlock = false;
     var exifBlockEndOffset = 0;
     final startOffset = input.offset;
