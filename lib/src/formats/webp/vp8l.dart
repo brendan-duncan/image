@@ -240,7 +240,7 @@ class VP8L {
     final colorCache = (_colorCacheSize > 0) ? _colorCache : null;
     final mask = _huffmanMask;
 
-    while (!br.isEOS && src < srcLast) {
+    while (src < srcLast) {
       // Only update when changing tile. Note we could use this test:
       // if "((((prev_col ^ col) | prev_row ^ row)) > mask)" -> tile changed
       // but that's actually slower and needs storing the previous col/row.
@@ -312,10 +312,6 @@ class VP8L {
         }
       } else {
         code = htreeGroup.readSymbol(_green, br);
-      }
-
-      if (br.isEOS) {
-        break;
       }
 
       if (code < _numLiteralCodes) {

@@ -9,6 +9,7 @@ void main() {
     const path = 'test/_data/webp';
 
     const files = [
+      'error2',
       'fig_sharp',
       'fig_noisy',
       'dem',
@@ -34,6 +35,12 @@ void main() {
           File('$testOutputPath/webp/$file.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(PngEncoder().encode(webp!));
+          if (File('$path/$file.png').existsSync()) {
+            final png = decodePng(File('$path/$file.png').readAsBytesSync())!;
+            final png4 = png.numChannels != 4 ?
+                png.convert(numChannels: 4, alpha: 255) : png;
+            testImageEquals(webp, png4);
+          }
         });
       }
     });

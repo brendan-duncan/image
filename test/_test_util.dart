@@ -41,7 +41,8 @@ void testImageEquals(Image image, Image image2) {
   final c = image.iterator..moveNext();
   for (var p2 in image2) {
     final p1 = c.current;
-    expect(p2, equals(p1));
+    expect(p2, equals(p1),
+        reason: 'At Pixel ${p2.x},${p2.y} / ${image.width} ${image.height}');
     c.moveNext();
   }
 }
