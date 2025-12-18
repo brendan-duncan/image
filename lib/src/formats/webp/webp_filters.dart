@@ -9,10 +9,10 @@ class WebPFilters {
   static const filterNone = 0;
   static const filterHorizontal = 1;
   static const filterVertical = 2;
-  static const fitlerGradient = 3;
-  static const fitlerLast = fitlerGradient + 1; // end marker
-  static const fitlerBest = 5;
-  static const filterFast = 6;
+  static const filterGradient = 3;
+  static const filterLast = filterGradient + 1; // end marker
+  static const filterBest = 5;
+  static const fitterFast = 6;
 
   static const filters = [
     null, // WEBP_FILTER_NONE

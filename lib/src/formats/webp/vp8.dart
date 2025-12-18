@@ -430,7 +430,7 @@ class VP8 {
         // vertical or horizontal filtering of the previous macroblock can
         // modify some abutting pixels.
         _tlMbX = (_cropLeft - extraPixels) ~/ 16;
-        _tlMbY = (_cropTop! - extraPixels) ~/ 16;
+        _tlMbY = (_cropTop - extraPixels) ~/ 16;
         if (_tlMbX < 0) {
           _tlMbX = 0;
         }
@@ -440,7 +440,7 @@ class VP8 {
       }
 
       // We need some 'extra' pixels on the right/bottom.
-      _brMbY = (_cropBottom! + 15 + extraPixels) ~/ 16;
+      _brMbY = (_cropBottom + 15 + extraPixels) ~/ 16;
       _brMbX = (_cropRight + 15 + extraPixels) ~/ 16;
       if (_brMbX! > _mbWidth!) {
         _brMbX = _mbWidth;
@@ -784,8 +784,8 @@ class VP8 {
     final mbY = _mbY;
     final isFirstRow = mbY == 0;
     final isLastRow = mbY >= _brMbY! - 1;
-    int? yStart = macroBlockVPos(mbY);
-    int? yEnd = macroBlockVPos(mbY + 1);
+    var yStart = macroBlockVPos(mbY);
+    var yEnd = macroBlockVPos(mbY + 1);
 
     if (useFilter) {
       _filterRow();
@@ -810,20 +810,20 @@ class VP8 {
       yEnd -= extraYRows;
     }
 
-    if (yEnd > _cropBottom!) {
+    if (yEnd > _cropBottom) {
       yEnd = _cropBottom; // make sure we don't overflow on last row.
     }
 
     _a = null;
-    if (_alphaData != null && yStart < yEnd!) {
+    if (_alphaData != null && yStart < yEnd) {
       _a = _decompressAlphaRows(yStart, yEnd - yStart);
       if (_a == null) {
         return false;
       }
     }
 
-    if (yStart < _cropTop!) {
-      final deltaY = _cropTop! - yStart;
+    if (yStart < _cropTop) {
+      final deltaY = _cropTop - yStart;
       yStart = _cropTop;
 
       _y.offset += _cacheYStride! * deltaY;
@@ -835,7 +835,7 @@ class VP8 {
       }
     }
 
-    if (yStart! < yEnd!) {
+    if (yStart < yEnd) {
       _y.offset += _cropLeft;
       _u.offset += _cropLeft >> 1;
       _v.offset += _cropLeft >> 1;
@@ -843,7 +843,7 @@ class VP8 {
         _a!.offset += _cropLeft;
       }
 
-      _put(yStart - _cropTop!, _cropRight - _cropLeft, yEnd - yStart);
+      _put(yStart - _cropTop, _cropRight - _cropLeft, yEnd - yStart);
     }
 
     // rotate top samples if needed
@@ -889,6 +889,7 @@ class VP8 {
     rgb[0] = _yuvToR(y, v);
     rgb[1] = _yuvToG(y, u, v);
     rgb[2] = _yuvToB(y, u);
+    //print('$y $u $v -> ${rgb[0]} ${rgb[1]} ${rgb[2]}');
   }
 
   void _yuvToRgba(int y, int u, int v, InputBuffer rgba) {
@@ -989,9 +990,9 @@ class VP8 {
 
     //final dst = InputBuffer(output!.getBytes(), offset: startY * stride + 3);
 
-    if (_cropTop! + mbY + mbH == _cropBottom) {
+    if (_cropTop + mbY + mbH == _cropBottom) {
       // If it's the very last call, we process all the remaining rows!
-      numRows = _cropBottom! - _cropTop! - startY;
+      numRows = _cropBottom - _cropTop - startY;
     }
 
     for (var y = 0; y < numRows; ++y) {
@@ -1044,7 +1045,7 @@ class VP8 {
 
     // move to last row
     curY.offset += _cacheYStride!;
-    if (_cropTop! + yEnd < _cropBottom!) {
+    if (_cropTop + yEnd < _cropBottom) {
       // Save the unfinished samples for next call (as we're not done yet).
       _tmpY.memcpy(0, mbW, curY);
       _tmpU.memcpy(0, uvW, curU);
@@ -1076,9 +1077,11 @@ class VP8 {
       _alpha = WebPAlpha(_alphaData!, width, height);
     }
 
-    if (!_alpha.isAlphaDecoded) {
-      if (!_alpha.decode(row, numRows, _alphaPlane)) {
-        return null;
+    if (_alpha != null) {
+      if (!_alpha!.isAlphaDecoded) {
+        if (!_alpha!.decode(row, numRows, _alphaPlane)) {
+          return null;
+        }
       }
     }
 
@@ -1464,10 +1467,10 @@ class VP8 {
   final _filterHeader = VP8FilterHeader();
   final _segmentHeader = VP8SegmentHeader();
 
-  late int _cropLeft;
-  late int _cropRight;
-  int? _cropTop;
-  int? _cropBottom;
+  int _cropLeft = 0;
+  int _cropRight = 0;
+  int _cropTop = 0;
+  int _cropBottom = 0;
 
   // Width in macroblock units.
   int? _mbWidth;
@@ -1555,7 +1558,7 @@ class VP8 {
 
   // Alpha
   // alpha-plane decoder object
-  late WebPAlpha _alpha;
+  WebPAlpha? _alpha;
 
   // compressed alpha data (if present)
   InputBuffer? _alphaData;

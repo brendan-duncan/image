@@ -7,6 +7,37 @@ import '../_test_util.dart';
 void main() {
   group('Format', () {
     const path = 'test/_data/webp';
+
+    const files = [
+      'fig_sharp',
+      'fig_noisy',
+      'dem',
+      'error',
+      '1_webp_ll',
+      '1_webp_a',
+      '2_webp_ll',
+      '2_webp_a',
+      '3_webp_ll',
+      '3_webp_a',
+      '4_webp_ll',
+      '4_webp_a',
+      '5_webp_ll',
+      '5_webp_a',
+      'test'
+    ];
+
+    group('decode', () {
+      for (var file in files) {
+        test(file, () async {
+          final webp = decodeWebP(File('$path/$file.webp').readAsBytesSync());
+          expect(webp, isNotNull);
+          File('$testOutputPath/webp/$file.png')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync(PngEncoder().encode(webp!));
+        });
+      }
+    });
+
     group('webp', () {
       test('exif', () async {
         final webp = await decodeWebPFile('test/_data/webp/buck_24.webp');
@@ -23,20 +54,6 @@ void main() {
               '$testOutputPath/webp/animated_lossy_${frame.frameIndex}.png',
               frame);
         }
-      });
-
-      group('decode lossless', () {
-        const name = 'test';
-        test('$name.webp', () {
-          final webp = decodeWebP(File('$path/$name.webp').readAsBytesSync());
-          expect(webp, isNotNull);
-          final png = decodePng(File('$path/$name.png').readAsBytesSync());
-          expect(png, isNotNull);
-          File('$testOutputPath/webp/$name.png')
-            ..createSync(recursive: true)
-            ..writeAsBytesSync(PngEncoder().encode(webp!));
-          testImageEquals(webp, png!);
-        });
       });
 
       final dir = Directory('test/_data/webp');

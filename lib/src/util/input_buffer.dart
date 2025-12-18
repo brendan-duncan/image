@@ -49,6 +49,11 @@ class InputBuffer {
   /// Set a buffer element relative to the current position.
   void operator []=(int index, int value) => buffer[offset + index] = value;
 
+  InputBuffer operator +(int offset) => InputBuffer(buffer,
+      bigEndian: bigEndian,
+      offset: this.offset + offset,
+      length: this.length - offset);
+
   /// Copy data from [other] to this buffer, at [start] offset from the
   /// current read position, and [length] number of bytes. [offset] is
   /// the offset in [other] to start reading.

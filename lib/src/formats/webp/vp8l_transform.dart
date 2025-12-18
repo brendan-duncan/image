@@ -21,31 +21,32 @@ class VP8LTransform {
   Uint32List? data;
   int bits = 0;
 
-  void inverseTransform(int rowStart, int rowEnd, Uint32List inData, int rowsIn,
-      Uint32List outData, int rowsOut) {
+  void inverseTransform(int rowStart, int rowEnd, Uint32List inData, int inPtr,
+      Uint32List outData, int outPtr) {
     final width = xsize;
 
     switch (type) {
       case VP8LImageTransformType.subtractGreen:
-        addGreenToBlueAndRed(
-            outData, rowsOut, rowsOut + (rowEnd - rowStart) * width);
+        addGreenToBlueAndRed(outData, outPtr, (rowEnd - rowStart) * width);
         break;
       case VP8LImageTransformType.predictor:
-        predictorInverseTransform(rowStart, rowEnd, outData, rowsOut);
+        predictorInverseTransform(
+            rowStart, rowEnd, inData, inPtr, outData, outPtr);
         if (rowEnd != ysize) {
           // The last predicted row in this iteration will be the top-pred row
           // for the first row in next iteration.
-          final start = rowsOut - width;
+          final start = outPtr - width;
           final end = start + width;
-          final offset = rowsOut + (rowEnd - rowStart - 1) * width;
+          final offset = outPtr + (rowEnd - rowStart - 1) * width;
           outData.setRange(start, end, inData, offset);
         }
         break;
       case VP8LImageTransformType.crossColor:
-        colorSpaceInverseTransform(rowStart, rowEnd, outData, rowsOut);
+        colorSpaceInverseTransform(
+            rowStart, rowEnd, inData, inPtr, outData, outPtr);
         break;
       case VP8LImageTransformType.colorIndexing:
-        if (rowsIn == rowsOut && bits > 0) {
+        if (inPtr == outPtr && bits > 0) {
           // Move packed pixels to the end of unpacked region, so that unpacking
           // can occur seamlessly.
           // Also, note that this is the only transform that applies on
@@ -55,14 +56,14 @@ class VP8LTransform {
           final inStride =
               (rowEnd - rowStart) * InternalVP8L.subSampleSize(xsize, bits);
 
-          final src = rowsOut + outStride - inStride;
-          outData.setRange(src, src + inStride, inData, rowsOut);
+          final src = outPtr + outStride - inStride;
+          outData.setRange(src, src + inStride, inData, outPtr);
 
           colorIndexInverseTransform(
-              rowStart, rowEnd, inData, src, outData, rowsOut);
+              rowStart, rowEnd, inData, src, outData, outPtr);
         } else {
           colorIndexInverseTransform(
-              rowStart, rowEnd, inData, rowsIn, outData, rowsOut);
+              rowStart, rowEnd, inData, inPtr, outData, outPtr);
         }
         break;
     }
@@ -140,8 +141,8 @@ class VP8LTransform {
   }
 
   // Color space inverse transform.
-  void colorSpaceInverseTransform(
-      int yStart, int yEnd, Uint32List outData, int data) {
+  void colorSpaceInverseTransform(int yStart, int yEnd, Uint32List inData,
+      int inPtr, Uint32List outData, int outPtr) {
     final width = xsize;
     final mask = (1 << bits) - 1;
     final tilesPerRow = InternalVP8L.subSampleSize(width, bits);
@@ -157,10 +158,11 @@ class VP8LTransform {
           m.colorCode = this.data![pred++];
         }
 
-        outData[data + x] = m.transformColor(outData[data + x], true);
+        outData[outPtr + x] = m.transformColor(inData[inPtr + x], true);
       }
 
-      data += width;
+      outPtr += width;
+      inPtr += width;
       ++y;
 
       if ((y & mask) == 0) {
@@ -169,50 +171,93 @@ class VP8LTransform {
     }
   }
 
+  int _addPixels(int a, int b) {
+    final alphaAndGreen = (a & 0xff00ff00) + (b & 0xff00ff00);
+    final redAndBlue = (a & 0x00ff00ff) + (b & 0x00ff00ff);
+    return (alphaAndGreen & 0xff00ff00) | (redAndBlue & 0x00ff00ff);
+  }
+
   // Inverse prediction.
-  void predictorInverseTransform(
-      int yStart, int yEnd, Uint32List outData, int data) {
+  void predictorInverseTransform(int yStart, int yEnd, Uint32List inData,
+      int inPtr, Uint32List outData, int outPtr) {
     final width = xsize;
+
     if (yStart == 0) {
-      // First Row follows the L (mode=1) mode.
-      final pred0 = _predictor0(outData, outData[data - 1], 0);
-      _addPixelsEq(outData, data, pred0);
-      for (var x = 1; x < width; ++x) {
-        final pred1 = _predictor1(outData, outData[data + x - 1], 0);
-        _addPixelsEq(outData, data + x, pred1);
+      //PredictorAdd0_C(in, NULL, 1, out);
+      outData[outPtr] = _addPixels(inData[inPtr], VP8L.argbBlack);
+
+      //PredictorAdd1_C(in + 1, NULL, width - 1, out + 1);
+      {
+        final inPtr1 = inPtr + 1;
+        final outPtr1 = outPtr + 1;
+        final length = width - 1;
+        var left = outData[outPtr];
+        for (var i = 0; i < length; ++i) {
+          left = _addPixels(inData[inPtr1 + i], left);
+          outData[outPtr1 + i] = left;
+        }
       }
-      data += width;
+
+      inPtr += width;
+      outPtr += width;
       ++yStart;
     }
 
     var y = yStart;
-    final mask = (1 << bits) - 1;
+    final tileWidth = 1 << bits;
+    final mask = tileWidth - 1;
     final tilesPerRow = InternalVP8L.subSampleSize(width, bits);
     var predModeBase = (y >> bits) * tilesPerRow; //this.data +
 
     while (y < yEnd) {
-      final pred2 = _predictor2(outData, outData[data - 1], data - width);
-      var predModeSrc = predModeBase; //this.data +
+      var predModeSrc = predModeBase;
 
       // First pixel follows the T (mode=2) mode.
-      _addPixelsEq(outData, data, pred2);
-
-      // .. the rest:
-      final k = (this.data![predModeSrc++] >> 8) & 0xf;
-
-      var predFunc = _predictors[k];
-      for (var x = 1; x < width; ++x) {
-        if ((x & mask) == 0) {
-          // start of tile. Read predictor function.
-          final k = ((this.data![predModeSrc++]) >> 8) & 0xf;
-          predFunc = _predictors[k];
-        }
-        final d = outData[data + x - 1];
-        final pred = predFunc(outData, d, data + x - width);
-        _addPixelsEq(outData, data + x, pred);
+      //PredictorAdd2_C(in, out - width, 1, out);
+      {
+        // VP8LPredictor2_C(&out[-1], out - width);
+        final pred = outData[outPtr - width];
+        outData[outPtr] = _addPixels(inData[inPtr], pred);
       }
 
-      data += width;
+      var x = 1;
+      while (x < width) {
+        final predIndex = (data![predModeSrc++] >> 8) & 0xf;
+        final predFunc = _predictors[predIndex];
+        var xEnd = (x & ~mask) + tileWidth;
+        if (xEnd > width) {
+          xEnd = width;
+        }
+
+        // pred_func(in + x, out + x - width, x_end - x, out + x);
+        final inPtr2 = inPtr + x;
+        final upperPtr2 = outPtr + x - width;
+        final numPixels = xEnd - x;
+        final outPtr2 = outPtr + x;
+
+        if (predIndex == 0) {
+          for (var i = 0; i < numPixels; ++i) {
+            outData[outPtr2 + i] =
+                _addPixels(inData[inPtr2 + i], VP8L.argbBlack);
+          }
+        } else if (predIndex == 1) {
+          var left = outData[outPtr2 - 1];
+          for (var i = 0; i < numPixels; ++i) {
+            left = _addPixels(inData[inPtr2 + i], left);
+            outData[outPtr2 + i] = left;
+          }
+        } else {
+          for (var i = 0; i < numPixels; ++i) {
+            final pred =
+                predFunc(outData[outPtr2 + i - 1], outData, upperPtr2 + i);
+            outData[outPtr2 + i] = _addPixels(inData[inPtr2 + i], pred);
+          }
+        }
+        x = xEnd;
+      }
+
+      inPtr += width;
+      outPtr += width;
       ++y;
 
       if ((y & mask) == 0) {
@@ -224,14 +269,14 @@ class VP8LTransform {
 
   // Add green to blue and red channels (i.e. perform the inverse transform of
   // 'subtract green').
-  void addGreenToBlueAndRed(Uint32List pixels, int data, int dataEnd) {
-    while (data < dataEnd) {
-      final argb = pixels[data];
+  void addGreenToBlueAndRed(Uint32List data, int ptr, int length) {
+    for (var i = 0; i < length; ++i) {
+      final argb = data[ptr + i];
       final green = (argb >> 8) & 0xff;
       var redBlue = argb & 0x00ff00ff;
       redBlue += (green << 16) | green;
       redBlue &= 0x00ff00ff;
-      pixels[data++] = (argb & 0xff00ff00) | redBlue;
+      data[ptr + i] = (argb & 0xff00ff00) | redBlue;
     }
   }
 
@@ -242,14 +287,6 @@ class VP8LTransform {
   static int _getARGBValue(int val) => val;
 
   static int _getAlphaValue(int val) => (val >> 8) & 0xff;
-
-  // In-place sum of each component with mod 256.
-  static void _addPixelsEq(Uint32List pixels, int a, int b) {
-    final pa = pixels[a];
-    final alphaAndGreen = (pa & 0xff00ff00) + (b & 0xff00ff00);
-    final redAndBlue = (pa & 0x00ff00ff) + (b & 0x00ff00ff);
-    pixels[a] = (alphaAndGreen & 0xff00ff00) | (redAndBlue & 0x00ff00ff);
-  }
 
   static int _average2(int a0, int a1) =>
       (((a0 ^ a1) & 0xfefefefe) >> 1) + (a0 & a1);
@@ -314,45 +351,45 @@ class VP8LTransform {
   //--------------------------------------------------------------------------
   // Predictors
 
-  static int _predictor0(Uint32List pixels, int left, int top) =>
+  static int _predictor0(int left, Uint32List data, int topPtr) =>
       VP8L.argbBlack;
 
-  static int _predictor1(Uint32List pixels, int left, int top) => left;
+  static int _predictor1(int left, Uint32List data, int topPtr) => left;
 
-  static int _predictor2(Uint32List pixels, int left, int top) => pixels[top];
+  static int _predictor2(int left, Uint32List data, int topPtr) => data[topPtr];
 
-  static int _predictor3(Uint32List pixels, int left, int top) =>
-      pixels[top + 1];
+  static int _predictor3(int left, Uint32List data, int topPtr) =>
+      data[topPtr + 1];
 
-  static int _predictor4(Uint32List pixels, int left, int top) =>
-      pixels[top - 1];
+  static int _predictor4(int left, Uint32List data, int topPtr) =>
+      data[topPtr - 1];
 
-  static int _predictor5(Uint32List pixels, int left, int top) =>
-      _average3(left, pixels[top], pixels[top + 1]);
+  static int _predictor5(int left, Uint32List data, int topPtr) =>
+      _average3(left, data[topPtr], data[topPtr + 1]);
 
-  static int _predictor6(Uint32List pixels, int left, int top) =>
-      _average2(left, pixels[top - 1]);
+  static int _predictor6(int left, Uint32List data, int topPtr) =>
+      _average2(left, data[topPtr - 1]);
 
-  static int _predictor7(Uint32List pixels, int left, int top) =>
-      _average2(left, pixels[top]);
+  static int _predictor7(int left, Uint32List data, int topPtr) =>
+      _average2(left, data[topPtr]);
 
-  static int _predictor8(Uint32List pixels, int left, int top) =>
-      _average2(pixels[top - 1], pixels[top]);
+  static int _predictor8(int left, Uint32List data, int topPtr) =>
+      _average2(data[topPtr - 1], data[topPtr]);
 
-  static int _predictor9(Uint32List pixels, int left, int top) =>
-      _average2(pixels[top], pixels[top + 1]);
+  static int _predictor9(int left, Uint32List data, int topPtr) =>
+      _average2(data[topPtr], data[topPtr + 1]);
 
-  static int _predictor10(Uint32List pixels, int left, int top) =>
-      _average4(left, pixels[top - 1], pixels[top], pixels[top + 1]);
+  static int _predictor10(int left, Uint32List data, int topPtr) =>
+      _average4(left, data[topPtr - 1], data[topPtr], data[topPtr + 1]);
 
-  static int _predictor11(Uint32List pixels, int left, int top) =>
-      _select(pixels[top], left, pixels[top - 1]);
+  static int _predictor11(int left, Uint32List data, int topPtr) =>
+      _select(data[topPtr], left, data[topPtr - 1]);
 
-  static int _predictor12(Uint32List pixels, int left, int top) =>
-      _clampedAddSubtractFull(left, pixels[top], pixels[top - 1]);
+  static int _predictor12(int left, Uint32List data, int topPtr) =>
+      _clampedAddSubtractFull(left, data[topPtr], data[topPtr - 1]);
 
-  static int _predictor13(Uint32List pixels, int left, int top) =>
-      _clampedAddSubtractHalf(left, pixels[top], pixels[top - 1]);
+  static int _predictor13(int left, Uint32List data, int topPtr) =>
+      _clampedAddSubtractHalf(left, data[topPtr], data[topPtr - 1]);
 
   static final _predictors = [
     _predictor0,

@@ -44,7 +44,7 @@ class WebPAlpha {
   bool get isValid {
     if (method < _alphaNoCompression ||
         method > _alphaLosslessCompression ||
-        filter >= WebPFilters.fitlerLast ||
+        filter >= WebPFilters.filterLast ||
         preProcessing > _alphaPreprocessedLevels ||
         rsrv != 0) {
       return false;
@@ -80,7 +80,7 @@ class WebPAlpha {
       }
     }
 
-    if (row + numRows == height) {
+    if (row + numRows >= height) {
       isAlphaDecoded = true;
     }
 
@@ -129,7 +129,7 @@ class WebPAlpha {
       _vp8l.allocateInternalBuffers8b();
     } else {
       _use8bDecode = false;
-      _vp8l.allocateInternalBuffers32b();
+      _vp8l.allocateInternalBuffers32b(width);
     }
 
     return true;
