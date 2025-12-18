@@ -1,3 +1,7 @@
+## 4.7.1 - December 18, 2025
+
+- Fix issue decoding the last row of lossless webp images.
+
 ## 4.7.0 - December 17, 2025
 
 - Major update to the WebP decoder to resolve errors decoding some files.
