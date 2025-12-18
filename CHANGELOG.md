@@ -1,3 +1,11 @@
+## 4.7.0 - December 17, 2025
+
+- Major update to the WebP decoder to resolve errors decoding some files.
+- Fixed issue where App1 marker would not be written when Exif data is injected into jpegs without exif block. Also fixed wrong IFD1 pointer.
+- Improved robustness of EXIF injection and reading:
+- Skips malformed EXIF sub-IFDs (e.g., bad GPSInfo pointers) during reading and injection, preventing RangeErrors and crashes.
+- Allows injecting new EXIF (including GPS) data into files with broken EXIF blocks.
+
 ## 4.6.0 - December 11, 2025
 
 - Fix issues with injectJpegExif corrupting jpeg files.
