@@ -37,8 +37,9 @@ void main() {
             ..writeAsBytesSync(PngEncoder().encode(webp!));
           if (File('$path/$file.png').existsSync()) {
             final png = decodePng(File('$path/$file.png').readAsBytesSync())!;
-            final png4 = png.numChannels != 4 ?
-                png.convert(numChannels: 4, alpha: 255) : png;
+            final png4 = png.numChannels != 4
+                ? png.convert(numChannels: 4, alpha: 255)
+                : png;
             testImageEquals(webp, png4);
           }
         });
