@@ -10,7 +10,6 @@ import 'vp8l_bit_reader.dart';
 import 'vp8l_color_cache.dart';
 import 'vp8l_transform.dart';
 import 'webp_alpha.dart';
-import 'webp_filters.dart';
 import 'webp_huffman.dart';
 import 'webp_info.dart';
 
