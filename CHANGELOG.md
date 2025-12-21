@@ -1,3 +1,7 @@
+## 4.7.2 - December 21, 2025
+
+- Change meta dependency back after it was unecessarily raised.
+
 ## 4.7.1 - December 18, 2025
 
 - Fix issue decoding the last row of lossless webp images.
