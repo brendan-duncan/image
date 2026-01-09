@@ -3,9 +3,28 @@ import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/color_util.dart';
 import '../util/math_util.dart';
+import '../color/format.dart';
 
 enum HistogramEqualizeMode { grayscale, color }
 
+/// Spread the histogram of the input image into a relatively linear cumulative
+/// distribution.
+///
+/// The output dynamic range can be specified by setting [outputRangeMin] or
+/// [outputRangeMax]. By default, the output range is set to
+/// [0..maxChannelValue]. Out-of-bound inputs will be clamped.
+///
+/// The [mode] argument specifies whether the transformation operates in
+/// `grayscale` or `color` mode. In `grayscale` mode, the histogram is spread
+/// based on pixel luminance. In `color` mode, pixels are first transformed to
+/// HSL space, stretched along the L dimension, and then converted back to RGB
+/// space to preserve color accuracy.
+///
+/// Note: This function only works with discrete intensity levels and images
+/// with 3 or more channels. Any floating-point image will be converted to
+/// [Format.uint8] internally. If you need higher precision than 256 intensity
+/// levels, convert your input image to a higher-precision format (e.g.
+/// [Format.uint16] or [Format.uint32]) before calling this function.
 Image histogramEqualization(Image src,
     {HistogramEqualizeMode mode = HistogramEqualizeMode.grayscale,
     num? outputRangeMin,
@@ -13,7 +32,17 @@ Image histogramEqualization(Image src,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = src.convert(numChannels: max(src.numChannels, 3));
+  }
+  // The algorithm only works with discrete intensity levels at the moment.
+  if (src.formatType == FormatType.float) {
+    src =
+        src.convert(format: Format.uint8, numChannels: max(src.numChannels, 3));
+  }
+  // The luminance accessor of a pixel object with channel < 3 is
+  // ill-formed, this is a work around.
+  if (src.numChannels < 3) {
+    src = src.convert(numChannels: 3);
   }
 
   outputRangeMin = min(max(0, outputRangeMin ?? 0), src.maxChannelValue);
@@ -62,6 +91,32 @@ Image histogramEqualization(Image src,
   return src;
 }
 
+/// Linearly stretch the histogram of the input image to span the available
+/// dynamic range. This function finds the low and high bounds of the histogram
+/// and rescales intensity levels linearly as follows:
+/// `I_out = (I_in - Low) * (Out_max - Out_min) / (High - Low) + Out_min`
+///
+/// The [stretchClipRatio] parameter controls how many intensity levels at both
+/// ends of the histogram are ignored. By default, [stretchClipRatio] is set to
+/// `0.015`, meaning that pixels with intensities below the 1.5th percentile or
+/// above the 98.5th percentile are clipped and mapped to the corresponding
+/// ends of the output dynamic range.
+///
+/// The output dynamic range can be specified by setting [outputRangeMin] or
+/// [outputRangeMax]. By default, the output range is set to
+/// [0..maxChannelValue]. Out-of-bound inputs will be clamped.
+///
+/// The [mode] argument specifies whether the transformation operates in
+/// `grayscale` or `color` mode. In `grayscale` mode, the histogram is spread
+/// based on pixel luminance. In `color` mode, pixels are first transformed to
+/// HSL space, stretched along the L dimension, and then converted back to RGB
+/// space to preserve color accuracy.
+///
+/// Note: This function only works with discrete intensity levels and images
+/// with 3 or more channels. Any floating-point image will be converted to
+/// [Format.uint8] internally. If you need higher precision than 256 intensity
+/// levels, convert your input image to a higher-precision format (e.g.
+/// [Format.uint16] or [Format.uint32]) before calling this function.
 Image histogramStretch(Image src,
     {HistogramEqualizeMode mode = HistogramEqualizeMode.grayscale,
     num? outputRangeMin,
@@ -70,7 +125,17 @@ Image histogramStretch(Image src,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = src.convert(numChannels: max(src.numChannels, 3));
+  }
+  // The algorithm only works with discrete intensity levels at the moment.
+  if (src.formatType == FormatType.float) {
+    src =
+        src.convert(format: Format.uint8, numChannels: max(src.numChannels, 3));
+  }
+  // The luminance accessor of a pixel object with channel < 3 is
+  // ill-formed, this is a work around.
+  if (src.numChannels < 3) {
+    src = src.convert(numChannels: 3);
   }
 
   outputRangeMin = min(max(0, outputRangeMin ?? 0), src.maxChannelValue);
@@ -114,12 +179,14 @@ Image histogramStretch(Image src,
         src.maxChannelValue.ceil() + 1, (x) => x,
         growable: false);
     // works out a new mapping by re-scaling dynamic range
+    final inputDynamicRange = highPercentileBin - lowPercentileBin;
+    final outputDynamicRange = outputRangeMax - outputRangeMin;
     for (var l = 0; l < H.length; ++l) {
-      Hmap[l] = ((l - lowPercentileBin) /
-                  (highPercentileBin - lowPercentileBin) *
-                  (outputRangeMax - outputRangeMin) +
-              outputRangeMin)
-          .round();
+      final newIntensityLv =
+          (l - lowPercentileBin) * outputDynamicRange / inputDynamicRange +
+              outputRangeMin;
+      Hmap[l] =
+          max(outputRangeMin, min(newIntensityLv.round(), outputDynamicRange));
       //print(Hmap[l]);
     }
 

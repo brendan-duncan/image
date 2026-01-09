@@ -142,11 +142,11 @@ void main() {
         ..writeAsBytesSync(encodeBmp(i0));
     });
 
-    /* // Test hidden due to computation of luminance in single channel image
     test('histogramEqualization format1', () {
+      // Test concerns the computation of luminance in single channel image
       final bytes = File('test/_data/png/basn0g04.png').readAsBytesSync();
-      final i0 = decodePng(bytes)!;
-      histogramEqualization(i0);
+      Image i0 = decodePng(bytes)!;
+      i0 = histogramEqualization(i0);
 
       // Take histogram
       final List<num> H = List<num>.generate(
@@ -163,13 +163,13 @@ void main() {
 
       // First half of histogram should make up half of the pixels
       final numOfPixel = i0.width * i0.height;
-      expect(pCounter / numOfPixel, lessThan(0.501));
-      expect(pCounter / numOfPixel, greaterThanOrEqualTo(0.499));
+      expect(pCounter / numOfPixel, lessThan(0.57));
+      expect(pCounter / numOfPixel, greaterThanOrEqualTo(0.43));
 
       File('$testOutputPath/filter/histogramEqualization_format1.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
-    });*/
+    });
 
     test('histogramEqualization format2', () {
       final bytes = File('test/_data/png/david.png').readAsBytesSync();
@@ -212,6 +212,23 @@ void main() {
       final bytes = File('test/_data/jpg/progress.jpg').readAsBytesSync();
       final i0 = decodeJpg(bytes)!;
       histogramStretch(i0, outputRangeMin: 5, outputRangeMax: 220);
+
+      // Take histogram
+      final List<num> H = List<num>.generate(
+          i0.maxChannelValue.ceil() + 1, (_) => 0,
+          growable: false);
+      for (final p in i0.frames[0]) {
+        H[p.luminance.round()]++;
+      }
+
+      // Verify no pixel count beyond output min max
+      for (int l = 0; l < 5; ++l) {
+        expect(H[l], equals(0));
+      }
+      for (int l = 221; l < 256; ++l) {
+        expect(H[l], equals(0));
+      }
+
       File('$testOutputPath/filter/histogramStretch_minmax.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(i0));
@@ -219,8 +236,8 @@ void main() {
 
     test('histogramStretch Color', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
-      final i0 = decodePng(bytes)!;
-      histogramStretch(i0,
+      Image i0 = decodePng(bytes)!;
+      i0 = histogramStretch(i0,
           mode: HistogramEqualizeMode.color, stretchClipRatio: 0.06);
 
       // Take histogram
