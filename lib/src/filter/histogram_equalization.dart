@@ -56,14 +56,19 @@ Image histogramEqualization(Image src,
         src.maxChannelValue.ceil() + 1, (_) => 0,
         growable: false);
 
+    num validPixelCounts = 0;
     for (final p in frame) {
+      if ((src.hasAlpha) && (p.a == 0)) {
+        continue;
+      }
       final l = mode == HistogramEqualizeMode.grayscale
           ? p.luminance
           : rgbToHsl(p.r, p.g, p.b)[2] * src.maxChannelValue;
       H[l.round()]++;
+      validPixelCounts++;
     }
 
-    final double numPixelPerBin = frame.width * frame.height / numOutputBin;
+    final double numPixelPerBin = validPixelCounts / numOutputBin;
     final List<num> Hmap = List<num>.generate(
         src.maxChannelValue.ceil() + 1, (x) => x,
         growable: false);
@@ -143,18 +148,20 @@ Image histogramStretch(Image src,
       min(max(0, outputRangeMax ?? src.maxChannelValue), src.maxChannelValue);
 
   for (final frame in src.frames) {
-    final int numPixel = frame.width * frame.height;
-
     // Take histogram
     final List<num> H = List<num>.generate(
         src.maxChannelValue.ceil() + 1, (_) => 0,
         growable: false);
-
+    num validPixelCounts = 0;
     for (final p in frame) {
+      if ((src.hasAlpha) && (p.a == 0)) {
+        continue;
+      }
       final l = mode == HistogramEqualizeMode.grayscale
           ? p.luminance
           : (rgbToHsl(p.r, p.g, p.b)[2] * src.maxChannelValue);
       H[l.round()]++;
+      validPixelCounts++;
     }
 
     // Find the high & low percentile
@@ -163,10 +170,10 @@ Image histogramStretch(Image src,
     num pCounter = 0;
     for (var l = 0; l < H.length; ++l) {
       pCounter += H[l];
-      if (pCounter / numPixel < stretchClipRatio) {
+      if (pCounter / validPixelCounts < stretchClipRatio) {
         lowPercentileBin++;
       }
-      if (pCounter / numPixel < 1 - stretchClipRatio) {
+      if (pCounter / validPixelCounts < 1 - stretchClipRatio) {
         highPercentileBin++;
       }
     }

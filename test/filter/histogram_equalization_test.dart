@@ -199,6 +199,91 @@ void main() {
         ..writeAsBytesSync(encodePng(i0));
     });
 
+    test('histogramEqualization format3', () {
+      // Grayscale uint4 single channel image
+      final bytes = File('test/_data/png/cten0g04.png').readAsBytesSync();
+      Image i0 = decodePng(bytes)!;
+      i0 = histogramEqualization(i0);
+
+      File('$testOutputPath/filter/histogramEqualization_format3.png')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodePng(i0));
+    });
+
+    test('histogramEqualization format4', () {
+      // Color uint8 4 channel image
+      final bytes = File('test/_data/tga/buck_32_rle.tga').readAsBytesSync();
+      Image i0 = decodeTga(bytes)!;
+      i0 = histogramEqualization(i0);
+
+      File('$testOutputPath/filter/histogramEqualization_format4.tga')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodeTga(i0));
+    });
+
+    test('histogramEqualization format5', () {
+      // Animated gif (30 frames)
+      final bytes = File('test/_data/gif/cars.gif').readAsBytesSync();
+      Image i0 = decodeGif(bytes)!;
+      i0 = histogramEqualization(i0, mode: HistogramEqualizeMode.color);
+
+      // Take histogram
+      final List<num> H = List<num>.generate(
+          i0.maxChannelValue.ceil() + 1, (_) => 0,
+          growable: false);
+      for (final p in i0.frames[15]) {
+        H[p.luminance.round()]++;
+      }
+
+      int pCounter = 0;
+      for (int l = 0; l < 128; ++l) {
+        pCounter += H[l].floor();
+      }
+
+      // First half of histogram should make up half of the pixels
+      final numOfPixel = i0.width * i0.height;
+      expect(pCounter / numOfPixel, lessThan(0.55));
+      expect(pCounter / numOfPixel, greaterThanOrEqualTo(0.45));
+
+      File('$testOutputPath/filter/histogramEqualization_format5.gif')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodeGif(i0));
+    });
+
+    test('histogramEqualization format6', () {
+      // Known issue: Palette convertion eliminates transparency of pixels
+      // An egg bouncing in a transparent background
+      final bytes = File('test/_data/gif/bounce.gif').readAsBytesSync();
+      Image i0 = decodeGif(bytes)!;
+      i0 = histogramEqualization(i0);
+
+      // Take histogram
+      final List<num> H = List<num>.generate(
+          i0.maxChannelValue.ceil() + 1, (_) => 0,
+          growable: false);
+      num validPixelCounts = 0;
+      for (final p in i0.frames[15]) {
+        if ((i0.hasAlpha) && (p.a == 0)) {
+          continue;
+        }
+        H[p.luminance.round()]++;
+        validPixelCounts++;
+      }
+
+      int pCounter = 0;
+      for (int l = 0; l < 128; ++l) {
+        pCounter += H[l].floor();
+      }
+
+      // Dark pixels make up a small portion of the image
+      expect(pCounter / validPixelCounts, lessThan(0.51));
+      expect(pCounter / validPixelCounts, greaterThanOrEqualTo(0.49));
+
+      File('$testOutputPath/filter/histogramEqualization_format6.gif')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodeGif(i0));
+    });
+
     test('histogramStretch_jpg1', () {
       final bytes = File('test/_data/jpg/oblique.jpg').readAsBytesSync();
       final i0 = decodeJpg(bytes)!;
@@ -259,6 +344,41 @@ void main() {
       File('$testOutputPath/filter/histogramStretch_color.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+    });
+
+    test('histogramStretch format1', () {
+      // Known issue: Palette convertion eliminates transparency of pixels
+      // An egg bouncing in a transparent background
+      final bytes = File('test/_data/gif/bounce.gif').readAsBytesSync();
+      Image i0 = decodeGif(bytes)!;
+      i0 = histogramStretch(i0,
+          mode: HistogramEqualizeMode.color, outputRangeMax: 200);
+
+      // Take histogram
+      final List<num> H = List<num>.generate(
+          i0.maxChannelValue.ceil() + 1, (_) => 0,
+          growable: false);
+      num validPixelCounts = 0;
+      for (final p in i0.frames[15]) {
+        if ((i0.hasAlpha) && (p.a == 0)) {
+          continue;
+        }
+        H[p.luminance.round()]++;
+        validPixelCounts++;
+      }
+
+      int pCounter = 0;
+      for (int l = 0; l < 100; ++l) {
+        pCounter += H[l].floor();
+      }
+
+      // Dark pixels make up a small portion of the image
+      expect(pCounter / validPixelCounts, lessThan(0.30));
+      expect(pCounter / validPixelCounts, greaterThanOrEqualTo(0.20));
+
+      File('$testOutputPath/filter/histogramStretch_format1.gif')
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(encodeGif(i0));
     });
   });
 }
