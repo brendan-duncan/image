@@ -658,17 +658,17 @@ class VP8L {
     var n = _transforms.length;
     final cachePixels = webp.width * numRows;
     final endRow = startRow + numRows;
-    var rowsIn = rows;
     final rowsOut = _argbCache;
+
+    // Copy input data to output buffer before applying inverse transforms.
+    // This is needed because some transforms (like subtractGreen) operate
+    // in-place on the output buffer.
+    _pixels!.setRange(rowsOut, rowsOut + cachePixels, _pixels!, rows);
 
     // Inverse transforms.
     while (n-- > 0) {
       _transforms[n].inverseTransform(
-          startRow, endRow, _pixels!, rowsIn, _pixels!, rowsOut);
-      rowsIn = rowsOut;
-    }
-    if (rowsIn != rowsOut) {
-      _pixels!.setRange(rowsOut, rowsOut + cachePixels, _pixels!, rowsIn);
+          startRow, endRow, _pixels!, rowsOut, _pixels!, rowsOut);
     }
   }
 

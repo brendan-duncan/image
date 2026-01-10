@@ -64,6 +64,23 @@ void main() {
         }
       });
 
+      // Regression: lossless webp with subtractGreen transform decoded as blank
+      test('lossless with subtractGreen transform', () async {
+        final image =
+            await decodeWebPFile('test/_data/webp/test_animated.webp');
+        expect(image, isNotNull);
+
+        var hasVisiblePixel = false;
+        for (final pixel in image!) {
+          if (pixel.a > 0 && (pixel.r > 0 || pixel.g > 0 || pixel.b > 0)) {
+            hasVisiblePixel = true;
+            break;
+          }
+        }
+        expect(hasVisiblePixel, isTrue,
+            reason: 'VP8L lossless decoding produced blank image');
+      });
+
       final dir = Directory('test/_data/webp');
       final files = dir.listSync();
       group('getInfo', () {
