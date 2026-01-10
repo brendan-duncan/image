@@ -76,7 +76,6 @@ Image histogramEqualization(Image src,
     // works out a new mapping from scanning the darkest up to mid luminance
     for (var l = 0; l < H.length / 2; ++l) {
       Hmap[l] = (pCounter / numPixelPerBin).round() + outputRangeMin;
-      //print("$l:, ${Hmap[l]}");
       pCounter += H[l];
     }
 
@@ -84,7 +83,6 @@ Image histogramEqualization(Image src,
     // works out a new mapping from scanning the brightest down to mid luminance
     for (var l = H.length - 1; l >= H.length / 2; --l) {
       Hmap[l] = outputRangeMax - (pCounter ~/ numPixelPerBin).round();
-      //print("$l: ${Hmap[l]}");
       pCounter += H[l];
     }
 
@@ -194,7 +192,6 @@ Image histogramStretch(Image src,
               outputRangeMin;
       Hmap[l] =
           max(outputRangeMin, min(newIntensityLv.round(), outputDynamicRange));
-      //print(Hmap[l]);
     }
 
     // produce output
@@ -209,6 +206,9 @@ void _applyHistogramTransform(Image frame, List<num> Hmap,
     HistogramEqualizeMode mode, num maxChannelValue,
     {Image? mask, Channel maskChannel = Channel.luminance}) {
   for (final p in frame) {
+    if ((frame.hasAlpha) && (p.a == 0)) {
+      continue;
+    }
     if (mode == HistogramEqualizeMode.grayscale) {
       final newl = Hmap[p.luminance.round()];
 
