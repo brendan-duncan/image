@@ -1,9 +1,10 @@
 import 'dart:math';
+
 import '../color/channel.dart';
+import '../color/format.dart';
 import '../image/image.dart';
 import '../util/color_util.dart';
 import '../util/math_util.dart';
-import '../color/format.dart';
 
 enum HistogramEqualizeMode { grayscale, color }
 
