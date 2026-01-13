@@ -27,10 +27,12 @@ void main() {
     test('histogramEqualization Color', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
-      histogramEqualization(i0,
-          mode: HistogramEqualizeMode.color,
-          outputRangeMin: -20, // illegal values should take no effect
-          outputRangeMax: 999); // illegal values should take no effect
+      histogramEqualization(
+        i0,
+        mode: HistogramEqualizeMode.color,
+        outputRangeMin: -20, // illegal values should take no effect
+        outputRangeMax: 999,
+      ); // illegal values should take no effect
       File('$testOutputPath/filter/histogramEqualization_color.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
@@ -45,8 +47,10 @@ void main() {
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       for (final p in i0.frames[0]) {
         H[p.luminance.round()]++;
       }
@@ -75,8 +79,10 @@ void main() {
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       for (final p in i0.frames[0]) {
         H[p.luminance.round()]++;
       }
@@ -113,8 +119,10 @@ void main() {
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       for (final p in i0.frames[0]) {
         H[p.luminance.round()]++;
       }
@@ -150,8 +158,10 @@ void main() {
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       for (final p in i0.frames[0]) {
         H[p.luminance.round()]++;
       }
@@ -178,8 +188,10 @@ void main() {
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       for (final p in i0.frames[0]) {
         H[p.luminance.round()]++;
       }
@@ -229,8 +241,10 @@ void main() {
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       for (final p in i0.frames[15]) {
         H[p.luminance.round()]++;
       }
@@ -259,8 +273,10 @@ void main() {
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       num validPixelCounts = 0;
       for (final p in i0.frames[15]) {
         if ((i0.hasAlpha) && (p.a == 0)) {
@@ -300,8 +316,10 @@ void main() {
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       for (final p in i0.frames[0]) {
         H[p.luminance.round()]++;
       }
@@ -322,13 +340,18 @@ void main() {
     test('histogramStretch Color', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       Image i0 = decodePng(bytes)!;
-      i0 = histogramStretch(i0,
-          mode: HistogramEqualizeMode.color, stretchClipRatio: 0.06);
+      i0 = histogramStretch(
+        i0,
+        mode: HistogramEqualizeMode.color,
+        stretchClipRatio: 0.06,
+      );
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       for (final p in i0.frames[0]) {
         H[p.luminance.round()]++;
       }
@@ -351,13 +374,18 @@ void main() {
       // An egg bouncing in a transparent background
       final bytes = File('test/_data/gif/bounce.gif').readAsBytesSync();
       Image i0 = decodeGif(bytes)!;
-      i0 = histogramStretch(i0,
-          mode: HistogramEqualizeMode.color, outputRangeMax: 200);
+      i0 = histogramStretch(
+        i0,
+        mode: HistogramEqualizeMode.color,
+        outputRangeMax: 200,
+      );
 
       // Take histogram
       final List<num> H = List<num>.generate(
-          i0.maxChannelValue.ceil() + 1, (_) => 0,
-          growable: false);
+        i0.maxChannelValue.ceil() + 1,
+        (_) => 0,
+        growable: false,
+      );
       num validPixelCounts = 0;
       for (final p in i0.frames[15]) {
         if ((i0.hasAlpha) && (p.a == 0)) {

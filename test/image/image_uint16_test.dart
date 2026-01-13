@@ -7,8 +7,12 @@ void main() {
   group('Image', () {
     group('uint16', () {
       test('nc:1', () async {
-        final i1 =
-            Image(width: 32, height: 32, format: Format.uint16, numChannels: 1);
+        final i1 = Image(
+          width: 32,
+          height: 32,
+          format: Format.uint16,
+          numChannels: 1,
+        );
         expect(i1.width, equals(32));
         expect(i1.height, equals(32));
         expect(i1.numChannels, equals(1));
@@ -27,8 +31,12 @@ void main() {
       });
 
       test('nc:2', () async {
-        final i2 =
-            Image(width: 32, height: 32, format: Format.uint16, numChannels: 2);
+        final i2 = Image(
+          width: 32,
+          height: 32,
+          format: Format.uint16,
+          numChannels: 2,
+        );
         expect(i2.width, equals(32));
         expect(i2.height, equals(32));
         expect(i2.numChannels, equals(2));
@@ -74,8 +82,12 @@ void main() {
       });
 
       test('nc:4', () async {
-        final i4 =
-            Image(width: 32, height: 32, format: Format.uint16, numChannels: 4);
+        final i4 = Image(
+          width: 32,
+          height: 32,
+          format: Format.uint16,
+          numChannels: 4,
+        );
         expect(i4.width, equals(32));
         expect(i4.height, equals(32));
         expect(i4.numChannels, equals(4));

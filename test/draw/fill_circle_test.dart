@@ -9,13 +9,18 @@ void main() {
       await (Command()
             ..createImage(width: 256, height: 256, numChannels: 4)
             ..fillCircle(
-                x: 128,
-                y: 128,
-                radius: 100,
-                antialias: true,
-                color: ColorRgba8(255, 255, 0, 200))
+              x: 128,
+              y: 128,
+              radius: 100,
+              antialias: true,
+              color: ColorRgba8(255, 255, 0, 200),
+            )
             ..fillCircle(
-                x: 128, y: 128, radius: 50, color: ColorRgba8(0, 255, 0, 255))
+              x: 128,
+              y: 128,
+              radius: 50,
+              color: ColorRgba8(0, 255, 0, 255),
+            )
             ..writeToFile('$testOutputPath/draw/fillCircle.png'))
           .execute();
     });
@@ -24,18 +29,20 @@ void main() {
       await (Command()
             ..createImage(width: 256, height: 256, numChannels: 4)
             ..fillCircle(
-                x: 128,
-                y: 128,
-                radius: 100,
-                antialias: true,
-                color: ColorRgba8(255, 255, 0, 200))
+              x: 128,
+              y: 128,
+              radius: 100,
+              antialias: true,
+              color: ColorRgba8(255, 255, 0, 200),
+            )
             ..fillCircle(
-                x: 128,
-                y: 128,
-                radius: 50,
-                // Will force setting a central area to transparent
-                color: ColorRgba8(0, 255, 0, 0),
-                blend: BlendMode.direct)
+              x: 128,
+              y: 128,
+              radius: 50,
+              // Will force setting a central area to transparent
+              color: ColorRgba8(0, 255, 0, 0),
+              blend: BlendMode.direct,
+            )
             ..writeToFile('$testOutputPath/draw/fillCircleWithBlendDirect.png'))
           .execute();
     });

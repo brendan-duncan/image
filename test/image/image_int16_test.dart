@@ -6,8 +6,12 @@ import '../_test_util.dart';
 void main() {
   group('Image', () {
     test('int16', () async {
-      final i1 =
-          Image(width: 2, height: 2, format: Format.int16, numChannels: 1);
+      final i1 = Image(
+        width: 2,
+        height: 2,
+        format: Format.int16,
+        numChannels: 1,
+      );
       expect(i1.width, equals(2));
       expect(i1.height, equals(2));
       expect(i1.numChannels, equals(1));
@@ -24,8 +28,12 @@ void main() {
 
       await testImageConversions(i1);
 
-      final i2 =
-          Image(width: 2, height: 2, format: Format.int16, numChannels: 2);
+      final i2 = Image(
+        width: 2,
+        height: 2,
+        format: Format.int16,
+        numChannels: 2,
+      );
       expect(i2.width, equals(2));
       expect(i2.height, equals(2));
       expect(i2.numChannels, equals(2));
@@ -57,8 +65,12 @@ void main() {
 
       await testImageConversions(i3);
 
-      final i4 =
-          Image(width: 2, height: 2, format: Format.int16, numChannels: 4);
+      final i4 = Image(
+        width: 2,
+        height: 2,
+        format: Format.int16,
+        numChannels: 4,
+      );
       expect(i4.width, equals(2));
       expect(i4.height, equals(2));
       expect(i4.numChannels, equals(4));

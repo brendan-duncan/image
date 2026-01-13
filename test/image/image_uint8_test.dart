@@ -156,8 +156,12 @@ void main() {
       });
 
       test('nc:4p', () async {
-        final i6 =
-            Image(width: 32, height: 32, numChannels: 4, withPalette: true);
+        final i6 = Image(
+          width: 32,
+          height: 32,
+          numChannels: 4,
+          withPalette: true,
+        );
         expect(i6.width, equals(32));
         expect(i6.height, equals(32));
         expect(i6.numChannels, equals(4));

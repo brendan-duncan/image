@@ -13,7 +13,7 @@ void main() {
         Point(50, 50),
         Point(200, 20),
         Point(120, 70),
-        Point(30, 150)
+        Point(30, 150),
       ];
 
       fillPolygon(i0, vertices: vertices, color: ColorRgb8(176, 0, 0));

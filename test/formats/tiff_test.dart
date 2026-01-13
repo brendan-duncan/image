@@ -45,8 +45,12 @@ void main() {
           expect(p.a, equals(255));
         }
 
-        final i3p =
-            Image(width: 256, height: 256, numChannels: 4, withPalette: true);
+        final i3p = Image(
+          width: 256,
+          height: 256,
+          numChannels: 4,
+          withPalette: true,
+        );
         for (var i = 0; i < 256; ++i) {
           i3p.palette!.setRgb(i, i, i, i);
         }
@@ -170,9 +174,9 @@ void main() {
       });
 
       test("multipageTiff", () {
-        final f = files
-            .whereType<File>()
-            .firstWhere((x) => x.path.endsWith("UF1_id1cS2300G0C2.tif"));
+        final f = files.whereType<File>().firstWhere(
+              (x) => x.path.endsWith("UF1_id1cS2300G0C2.tif"),
+            );
         final bytes = f.readAsBytesSync();
         final image = decodeTiff(bytes);
         expect(image, isNotNull);

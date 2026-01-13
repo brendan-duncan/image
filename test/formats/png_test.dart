@@ -34,8 +34,12 @@ void main() {
       });
 
       group('b1_1', () {
-        final image =
-            Image(width: 32, height: 32, format: Format.uint1, numChannels: 1);
+        final image = Image(
+          width: 32,
+          height: 32,
+          format: Format.uint1,
+          numChannels: 1,
+        );
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 1 : 0;
           p.r = c;
@@ -56,8 +60,12 @@ void main() {
       });
 
       group('b1_1', () {
-        final image =
-            Image(width: 32, height: 32, format: Format.uint1, numChannels: 1);
+        final image = Image(
+          width: 32,
+          height: 32,
+          format: Format.uint1,
+          numChannels: 1,
+        );
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 1 : 0;
           p.r = c;
@@ -79,7 +87,11 @@ void main() {
 
       group('b1_1p', () {
         final image = Image(
-            width: 32, height: 32, format: Format.uint1, withPalette: true);
+          width: 32,
+          height: 32,
+          format: Format.uint1,
+          withPalette: true,
+        );
         image.palette!.setRgb(0, 255, 0, 0);
         image.palette!.setRgb(1, 0, 255, 0);
         for (final p in image) {
@@ -102,8 +114,12 @@ void main() {
       });
 
       group('b2_1', () {
-        final image =
-            Image(width: 32, height: 32, format: Format.uint2, numChannels: 1);
+        final image = Image(
+          width: 32,
+          height: 32,
+          format: Format.uint2,
+          numChannels: 1,
+        );
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 3 : 0;
           p.r = c;
@@ -126,7 +142,11 @@ void main() {
 
       group('b2_1p', () {
         final image = Image(
-            width: 32, height: 32, format: Format.uint2, withPalette: true);
+          width: 32,
+          height: 32,
+          format: Format.uint2,
+          withPalette: true,
+        );
         for (var i = 0; i < 4; ++i) {
           image.palette!.setRgb(i, i * 85, i * 85, i * 85);
         }
@@ -150,8 +170,12 @@ void main() {
       });
 
       group('b4_1', () {
-        final image =
-            Image(width: 32, height: 32, format: Format.uint4, numChannels: 1);
+        final image = Image(
+          width: 32,
+          height: 32,
+          format: Format.uint4,
+          numChannels: 1,
+        );
         for (final p in image) {
           final c = p.x < (32 - p.y) ? 31 : 0;
           p.r = c;
@@ -174,7 +198,11 @@ void main() {
 
       group('b4_1p', () {
         final image = Image(
-            width: 32, height: 32, format: Format.uint4, withPalette: true);
+          width: 32,
+          height: 32,
+          format: Format.uint4,
+          withPalette: true,
+        );
         for (var i = 0; i < 16; ++i) {
           image.palette!.setRgb(i, i * 17, i * 17, i * 17);
         }
@@ -292,8 +320,12 @@ void main() {
         for (var i = 0; i < 256; ++i) {
           palette.setRgb(i, (i * 2) % 256, (i * 8) % 256, i);
         }
-        final image =
-            Image(width: 256, height: 256, numChannels: 1, palette: palette);
+        final image = Image(
+          width: 256,
+          height: 256,
+          numChannels: 1,
+          palette: palette,
+        );
         for (final p in image) {
           p.index = p.x % 256;
         }
@@ -387,7 +419,7 @@ void main() {
         const files = [
           ['test/_data/png/apng/test_apng.png', 2, 'test_apng'],
           ['test/_data/png/apng/test_apng2.png', 60, 'test_apng2'],
-          ['test/_data/png/apng/test_apng3.png', 19, 'test_apng3']
+          ['test/_data/png/apng/test_apng3.png', 19, 'test_apng3'],
         ];
 
         for (var f in files) {
@@ -442,9 +474,10 @@ void main() {
       test('pHYs', () {
         final img = Image(width: 16, height: 16);
         const phys1 = PngPhysicalPixelDimensions(
-            xPxPerUnit: 1000,
-            yPxPerUnit: 1000,
-            unitSpecifier: PngPhysicalPixelDimensions.unitMeter);
+          xPxPerUnit: 1000,
+          yPxPerUnit: 1000,
+          unitSpecifier: PngPhysicalPixelDimensions.unitMeter,
+        );
         final png1 = PngEncoder(pixelDimensions: phys1).encode(img);
         final dec1 = PngDecoder()..decode(png1);
         expect(dec1.info.pixelDimensions, phys1);
@@ -467,8 +500,10 @@ void main() {
         final image2 = PngDecoder().decode(png)!;
         expect(image2.iccProfile, isNotNull);
         expect(image2.iccProfile!.data, isNotNull);
-        expect(image2.iccProfile!.data.length,
-            equals(image.iccProfile!.data.length));
+        expect(
+          image2.iccProfile!.data.length,
+          equals(image.iccProfile!.data.length),
+        );
       });
 
       final dir = Directory('test/_data/png');

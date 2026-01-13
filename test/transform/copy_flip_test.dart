@@ -7,8 +7,9 @@ import '../_test_util.dart';
 void main() {
   group('Transform', () {
     test('copyFlip', () {
-      final img =
-          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+      final img = decodePng(
+        File('test/_data/png/buck_24.png').readAsBytesSync(),
+      )!;
 
       final ih = copyFlip(img, direction: FlipDirection.horizontal);
       expect(ih.numChannels, equals(ih.numChannels));

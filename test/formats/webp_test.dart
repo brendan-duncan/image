@@ -24,7 +24,7 @@ void main() {
       '4_webp_a',
       '5_webp_ll',
       '5_webp_a',
-      'test'
+      'test',
     ];
 
     group('decode', () {
@@ -54,20 +54,23 @@ void main() {
       });
 
       test('animated_lossy', () async {
-        final anim =
-            await decodeWebPFile('test/_data/webp/animated_lossy.webp');
+        final anim = await decodeWebPFile(
+          'test/_data/webp/animated_lossy.webp',
+        );
         expect(anim, isNotNull);
         for (final frame in anim!.frames) {
           await encodePngFile(
-              '$testOutputPath/webp/animated_lossy_${frame.frameIndex}.png',
-              frame);
+            '$testOutputPath/webp/animated_lossy_${frame.frameIndex}.png',
+            frame,
+          );
         }
       });
 
       // Regression: lossless webp with subtractGreen transform decoded as blank
       test('lossless with subtractGreen transform', () async {
-        final image =
-            await decodeWebPFile('test/_data/webp/test_animated.webp');
+        final image = await decodeWebPFile(
+          'test/_data/webp/test_animated.webp',
+        );
         expect(image, isNotNull);
 
         var hasVisiblePixel = false;
@@ -77,8 +80,11 @@ void main() {
             break;
           }
         }
-        expect(hasVisiblePixel, isTrue,
-            reason: 'VP8L lossless decoding produced blank image');
+        expect(
+          hasVisiblePixel,
+          isTrue,
+          reason: 'VP8L lossless decoding produced blank image',
+        );
       });
 
       final dir = Directory('test/_data/webp');
@@ -105,11 +111,15 @@ void main() {
               expect(data.height, equals(_webpTests[name]!['height']));
               expect(data.hasAlpha, equals(_webpTests[name]!['hasAlpha']));
               expect(
-                  data.hasAnimation, equals(_webpTests[name]!['hasAnimation']));
+                data.hasAnimation,
+                equals(_webpTests[name]!['hasAnimation']),
+              );
 
               if (data.hasAnimation) {
                 expect(
-                    webp.numFrames(), equals(_webpTests[name]!['numFrames']));
+                  webp.numFrames(),
+                  equals(_webpTests[name]!['numFrames']),
+                );
               }
             }
           });
@@ -180,112 +190,112 @@ const _webpTests = {
     'width': 550,
     'height': 368,
     'hasAlpha': false,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '1_webp_a.webp': {
     'format': WebPFormat.lossy,
     'width': 400,
     'height': 301,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '1_webp_ll.webp': {
     'format': WebPFormat.lossless,
     'width': 400,
     'height': 301,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '2.webp': {
     'format': WebPFormat.lossy,
     'width': 550,
     'height': 404,
     'hasAlpha': false,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '2b.webp': {
     'format': WebPFormat.lossy,
     'width': 75,
     'height': 55,
     'hasAlpha': false,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '2_webp_a.webp': {
     'format': WebPFormat.lossy,
     'width': 386,
     'height': 395,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '2_webp_ll.webp': {
     'format': WebPFormat.lossless,
     'width': 386,
     'height': 395,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '3.webp': {
     'format': WebPFormat.lossy,
     'width': 1280,
     'height': 720,
     'hasAlpha': false,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '3_webp_a.webp': {
     'format': WebPFormat.lossy,
     'width': 800,
     'height': 600,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '3_webp_ll.webp': {
     'format': WebPFormat.lossless,
     'width': 800,
     'height': 600,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '4.webp': {
     'format': WebPFormat.lossy,
     'width': 1024,
     'height': 772,
     'hasAlpha': false,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '4_webp_a.webp': {
     'format': WebPFormat.lossy,
     'width': 421,
     'height': 163,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '4_webp_ll.webp': {
     'format': WebPFormat.lossless,
     'width': 421,
     'height': 163,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '5.webp': {
     'format': WebPFormat.lossy,
     'width': 1024,
     'height': 752,
     'hasAlpha': false,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '5_webp_a.webp': {
     'format': WebPFormat.lossy,
     'width': 300,
     'height': 300,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   '5_webp_ll.webp': {
     'format': WebPFormat.lossless,
     'width': 300,
     'height': 300,
     'hasAlpha': true,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   'BladeRunner.webp': {
     'format': WebPFormat.animated,
@@ -293,7 +303,7 @@ const _webpTests = {
     'height': 224,
     'hasAlpha': true,
     'hasAnimation': true,
-    'numFrames': 75
+    'numFrames': 75,
   },
   'BladeRunner_lossy.webp': {
     'format': WebPFormat.animated,
@@ -301,14 +311,14 @@ const _webpTests = {
     'height': 224,
     'hasAlpha': true,
     'hasAnimation': true,
-    'numFrames': 75
+    'numFrames': 75,
   },
   'red.webp': {
     'format': WebPFormat.lossy,
     'width': 32,
     'height': 32,
     'hasAlpha': false,
-    'hasAnimation': false
+    'hasAnimation': false,
   },
   'SteamEngine.webp': {
     'format': WebPFormat.animated,
@@ -316,7 +326,7 @@ const _webpTests = {
     'height': 240,
     'hasAlpha': true,
     'hasAnimation': true,
-    'numFrames': 31
+    'numFrames': 31,
   },
   'SteamEngine_lossy.webp': {
     'format': WebPFormat.animated,
@@ -324,6 +334,6 @@ const _webpTests = {
     'height': 240,
     'hasAlpha': true,
     'hasAnimation': true,
-    'numFrames': 31
-  }
+    'numFrames': 31,
+  },
 };

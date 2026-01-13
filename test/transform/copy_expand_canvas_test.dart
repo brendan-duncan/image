@@ -8,8 +8,9 @@ void main() {
   group('Transform', () {
     for (ExpandCanvasPosition position in ExpandCanvasPosition.values) {
       test('copyExpandCanvas - $position', () {
-        final img =
-            decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+        final img = decodePng(
+          File('test/_data/png/buck_24.png').readAsBytesSync(),
+        )!;
 
         final expandedCanvas = copyExpandCanvas(
           img,
@@ -27,8 +28,9 @@ void main() {
 
     // Test with default parameters
     test('copyExpandCanvas - default parameters', () {
-      final img =
-          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+      final img = decodePng(
+        File('test/_data/png/buck_24.png').readAsBytesSync(),
+      )!;
 
       final expandedCanvas = copyExpandCanvas(
         img,
@@ -43,8 +45,9 @@ void main() {
 
     // Test with toImage parameter
     test('copyExpandCanvas - with toImage', () {
-      final img =
-          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+      final img = decodePng(
+        File('test/_data/png/buck_24.png').readAsBytesSync(),
+      )!;
 
       final toImage = Image(width: img.width * 2, height: img.height * 2);
 
@@ -62,13 +65,11 @@ void main() {
 
     // Test with only padding parameter
     test('copyExpandCanvas - with padding', () {
-      final img =
-          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+      final img = decodePng(
+        File('test/_data/png/buck_24.png').readAsBytesSync(),
+      )!;
 
-      final expandedCanvas = copyExpandCanvas(
-        img,
-        padding: 50,
-      );
+      final expandedCanvas = copyExpandCanvas(img, padding: 50);
 
       File('$testOutputPath/transform/copyExpandCanvas_padding.png')
         ..createSync(recursive: true)
@@ -77,8 +78,9 @@ void main() {
 
     // Test with both new dimensions and padding parameters
     test('copyExpandCanvas - with new dimensions and padding', () {
-      final img =
-          decodePng(File('test/_data/png/buck_24.png').readAsBytesSync())!;
+      final img = decodePng(
+        File('test/_data/png/buck_24.png').readAsBytesSync(),
+      )!;
 
       expect(
         () => copyExpandCanvas(
@@ -92,8 +94,9 @@ void main() {
     });
 
     test('copyExpandCanvas - alpha image', () {
-      final img =
-          decodePng(File('test/_data/png/alpha.png').readAsBytesSync())!;
+      final img = decodePng(
+        File('test/_data/png/alpha.png').readAsBytesSync(),
+      )!;
 
       final expandedCanvas = copyExpandCanvas(
         img,

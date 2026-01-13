@@ -15,10 +15,11 @@ void main() {
         ..createImage(width: img.width, height: img.height)
         ..fill(color: ColorRgb8(0, 0, 0))
         ..fillCircle(
-            x: img.width ~/ 2,
-            y: img.height ~/ 2,
-            radius: 50,
-            color: ColorRgb8(255, 255, 255))
+          x: img.width ~/ 2,
+          y: img.height ~/ 2,
+          radius: 50,
+          color: ColorRgb8(255, 255, 255),
+        )
         ..gaussianBlur(radius: 10);
 
       await (Command()

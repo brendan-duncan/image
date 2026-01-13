@@ -46,12 +46,16 @@ void main() {
       expect(exif2.imageIfd.sub.keys.length, equals(1));
       expect(exif2.imageIfd.sub.keys.elementAt(0), equals('exif'));
       for (int i = 0; i < exif2.imageIfd.sub['exif'].values.length; ++i) {
-        expect(exif2.imageIfd.sub['exif'][i],
-            equals(exif.imageIfd.sub['exif'][i]));
+        expect(
+          exif2.imageIfd.sub['exif'][i],
+          equals(exif.imageIfd.sub['exif'][i]),
+        );
       }
 
-      expect(exif2.thumbnailIfd.values.length,
-          equals(exif.thumbnailIfd.values.length));
+      expect(
+        exif2.thumbnailIfd.values.length,
+        equals(exif.thumbnailIfd.values.length),
+      );
       for (int i = 0; i < exif2.thumbnailIfd.values.length; ++i) {
         expect(exif2.thumbnailIfd[i], equals(exif.thumbnailIfd[i]));
       }

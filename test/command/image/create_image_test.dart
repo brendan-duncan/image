@@ -33,9 +33,13 @@ void main() {
           .execute();
 
       expect(
-          File('$testOutputPath/cmd/createImage_1.png').existsSync(), isTrue);
+        File('$testOutputPath/cmd/createImage_1.png').existsSync(),
+        isTrue,
+      );
       expect(
-          File('$testOutputPath/cmd/createImage_2.png').existsSync(), isTrue);
+        File('$testOutputPath/cmd/createImage_2.png').existsSync(),
+        isTrue,
+      );
     });
 
     test('Futures', () async {

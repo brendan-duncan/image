@@ -35,8 +35,11 @@ void main() {
       expect(out, isNotNull, reason: 'injectExif should return data');
 
       final ExifData? decoded = JpegUtil().decodeExif(out!);
-      expect(decoded, isNotNull,
-          reason: 'decodeExif should parse injected EXIF');
+      expect(
+        decoded,
+        isNotNull,
+        reason: 'decodeExif should parse injected EXIF',
+      );
 
       // Verify the tag round-trips (extract string from IfdValueAscii)
       String? getAsciiValue(dynamic v) {

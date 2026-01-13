@@ -22,8 +22,9 @@ void main() {
         final image2 = Image(width: 64, height: 64)
           ..clear(ColorRgb8(100, 255, 200));
 
-        final png2 = CurEncoder(hotSpots: {1: Point(64, 64), 0: Point(64, 64)})
-            .encodeImages([image, image2]);
+        final png2 = CurEncoder(
+          hotSpots: {1: Point(64, 64), 0: Point(64, 64)},
+        ).encodeImages([image, image2]);
         File('$testOutputPath/cur/encode2.cur')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png2);

@@ -16,10 +16,14 @@ void main() async {
         expect(jpg, isNotNull);
         final image2 = JpegDecoder().decode(jpg!);
         expect(image2, isNotNull);
-        expect(exif.imageIfd['XResolution'],
-            equals(image2!.exif.imageIfd['XResolution']));
-        expect(exif.imageIfd['YResolution'],
-            equals(image2.exif.imageIfd['YResolution']));
+        expect(
+          exif.imageIfd['XResolution'],
+          equals(image2!.exif.imageIfd['XResolution']),
+        );
+        expect(
+          exif.imageIfd['YResolution'],
+          equals(image2.exif.imageIfd['YResolution']),
+        );
       });
 
       test('inject replacement exif', () {
@@ -31,10 +35,14 @@ void main() async {
         expect(jpg, isNotNull);
         final image2 = JpegDecoder().decode(jpg!);
         expect(image2, isNotNull);
-        expect(exif.imageIfd['XResolution'],
-            equals(image2!.exif.imageIfd['XResolution']));
-        expect(exif.imageIfd['YResolution'],
-            equals(image2.exif.imageIfd['YResolution']));
+        expect(
+          exif.imageIfd['XResolution'],
+          equals(image2!.exif.imageIfd['XResolution']),
+        );
+        expect(
+          exif.imageIfd['YResolution'],
+          equals(image2.exif.imageIfd['YResolution']),
+        );
       });
 
       test('png icc_profile', () async {
@@ -44,8 +52,9 @@ void main() async {
       });
 
       test('icc_profile', () async {
-        final jpg =
-            await File('test/_data/jpg/icc_profile_data.jpg').readAsBytes();
+        final jpg = await File(
+          'test/_data/jpg/icc_profile_data.jpg',
+        ).readAsBytes();
         final img = decodeJpg(jpg);
         expect(img, isNotNull);
         encodeJpgFile('$testOutputPath/jpg/icc_profile_data.jpg', img!);
@@ -122,10 +131,14 @@ void main() async {
         image.exif.imageIfd['YResolution'] = [300, 1];
         final jpg = JpegEncoder().encode(image);
         final image2 = JpegDecoder().decode(jpg)!;
-        expect(image.exif.imageIfd['XResolution'],
-            equals(image2.exif.imageIfd['XResolution']));
-        expect(image.exif.imageIfd['YResolution'],
-            equals(image2.exif.imageIfd['YResolution']));
+        expect(
+          image.exif.imageIfd['XResolution'],
+          equals(image2.exif.imageIfd['XResolution']),
+        );
+        expect(
+          image.exif.imageIfd['YResolution'],
+          equals(image2.exif.imageIfd['YResolution']),
+        );
       });
 
       final dir = Directory('test/_data/jpg');
@@ -156,7 +169,8 @@ void main() async {
       for (var i = 1; i < 9; ++i) {
         test('exif/orientation_$i/landscape', () {
           final image = JpegDecoder().decode(
-              File('test/_data/jpg/landscape_$i.jpg').readAsBytesSync())!;
+            File('test/_data/jpg/landscape_$i.jpg').readAsBytesSync(),
+          )!;
           File('$testOutputPath/jpg/landscape_$i.jpg')
             ..createSync(recursive: true)
             ..writeAsBytesSync(JpegEncoder().encode(image));
@@ -164,7 +178,8 @@ void main() async {
 
         test('exif/orientation_$i/portrait', () {
           final image = JpegDecoder().decode(
-              File('test/_data/jpg/portrait_$i.jpg').readAsBytesSync())!;
+            File('test/_data/jpg/portrait_$i.jpg').readAsBytesSync(),
+          )!;
           File('$testOutputPath/jpg/portrait_$i.jpg')
             ..createSync(recursive: true)
             ..writeAsBytesSync(JpegEncoder().encode(image));
