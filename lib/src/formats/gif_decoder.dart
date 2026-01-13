@@ -227,7 +227,8 @@ class GifDecoder extends Decoder {
         if (frame.colorMap != null) {
           final lp = lastImage.palette!;
           final remapColors = <int, int>{};
-          for (var ci = 0; ci < colorMap.numColors; ++ci) {
+          // Map colors from lastImage palette to current frame's colorMap
+          for (var ci = 0; ci < lp.numColors; ++ci) {
             final nc = colorMap.findColor(lp.getRed(ci), lp.getGreen(ci),
                 lp.getBlue(ci), lp.getAlpha(ci));
             remapColors[ci] = nc;
@@ -237,8 +238,8 @@ class GifDecoder extends Decoder {
           final lastBytes = lastImage.toUint8List();
           for (var i = 0, l = nextBytes.length; i < l; ++i) {
             final lc = lastBytes[i];
-            final nc = remapColors[lc]!;
-            if (nc != -1) {
+            final nc = remapColors[lc];
+            if (nc != null && nc != -1) {
               nextBytes[i] = nc;
             }
           }
