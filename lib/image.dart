@@ -62,6 +62,7 @@ export 'src/filter/gaussian_blur.dart';
 export 'src/filter/grayscale.dart';
 export 'src/filter/hdr_to_ldr.dart';
 export 'src/filter/hexagon_pixelate.dart';
+export 'src/filter/histogram_equalization.dart';
 export 'src/filter/invert.dart';
 export 'src/filter/luminance_threshold.dart';
 export 'src/filter/monochrome.dart';
