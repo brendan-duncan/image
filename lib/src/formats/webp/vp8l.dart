@@ -355,10 +355,6 @@ class VP8L {
         final distCode = _getCopyDistance(distSymbol);
         final dist = _planeCodeToDistance(width, distCode);
 
-        if (br.isEOS) {
-          break;
-        }
-
         if (src < dist || srcEnd - src < length) {
           return false;
         } else {

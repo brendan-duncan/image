@@ -8,6 +8,14 @@ void main() {
   group('Format', () {
     const path = 'test/_data/webp';
 
+    test('webp invalid decode', () async {
+      final webp = decodeWebP(File('$path/invalid_last_row.webp').readAsBytesSync());
+      expect(webp, isNotNull);
+      expect(webp!.getPixel(0, webp.height - 2).a, isNot(0));
+      // guard against bug where the last decoded row is empty
+      expect(webp!.getPixel(0, webp.height - 1).a, isNot(0));
+    });
+
     const files = [
       'error2',
       'fig_sharp',
@@ -27,7 +35,7 @@ void main() {
       'test',
     ];
 
-    group('decode', () {
+    group('decode webp', () {
       for (var file in files) {
         test(file, () async {
           final webp = decodeWebP(File('$path/$file.webp').readAsBytesSync());

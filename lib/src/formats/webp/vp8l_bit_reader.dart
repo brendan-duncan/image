@@ -7,6 +7,7 @@ import '../../util/input_buffer.dart';
 @internal
 class VP8LBitReader {
   int bitPos = 0;
+  bool _isEOS = true;
 
   VP8LBitReader(this._input) {
     _buffer8 = Uint8List.view(_buffer.buffer);
@@ -18,6 +19,7 @@ class VP8LBitReader {
     _buffer8[5] = _input.readByte();
     _buffer8[6] = _input.readByte();
     _buffer8[7] = _input.readByte();
+    _isEOS = false;
   }
 
   // Return the prefetched bits, so they can be looked up.
@@ -34,7 +36,7 @@ class VP8LBitReader {
     return b2;
   }
 
-  bool get isEOS => _input.isEOS && bitPos >= lBits;
+  bool get isEOS => _isEOS;//_input.isEOS && bitPos >= lBits;
 
   // Advances the read buffer by 4 bytes to make room for reading next 32 bits.
   void fillBitWindow() {
@@ -53,6 +55,7 @@ class VP8LBitReader {
       _shiftBytes();
       return value;
     } else {
+      _isEOS = true;
       throw ImageException('Not enough data in input.');
     }
   }
