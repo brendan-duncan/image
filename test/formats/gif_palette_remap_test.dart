@@ -5,8 +5,8 @@ void main() {
   group('Format', () {
     group('gif', () {
       test('palette_remap - regression test for color remap issue', () async {
-        // This test ensures that animated GIFs with varying local color 
-        // palettes across frames can be decoded without null pointer 
+        // This test ensures that animated GIFs with varying local color
+        // palettes across frames can be decoded without null pointer
         // exceptions.
         //
         // Regression test for issue where remapColors map was built using

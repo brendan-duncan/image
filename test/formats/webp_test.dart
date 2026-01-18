@@ -9,11 +9,12 @@ void main() {
     const path = 'test/_data/webp';
 
     test('webp invalid decode', () async {
-      final webp = decodeWebP(File('$path/invalid_last_row.webp').readAsBytesSync());
+      final webp =
+          decodeWebP(File('$path/invalid_last_row.webp').readAsBytesSync());
       expect(webp, isNotNull);
       expect(webp!.getPixel(0, webp.height - 2).a, isNot(0));
       // guard against bug where the last decoded row is empty
-      expect(webp!.getPixel(0, webp.height - 1).a, isNot(0));
+      expect(webp.getPixel(0, webp.height - 1).a, isNot(0));
     });
 
     const files = [

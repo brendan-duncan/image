@@ -36,7 +36,7 @@ class VP8LBitReader {
     return b2;
   }
 
-  bool get isEOS => _isEOS;//_input.isEOS && bitPos >= lBits;
+  bool get isEOS => _isEOS; //_input.isEOS && bitPos >= lBits;
 
   // Advances the read buffer by 4 bytes to make room for reading next 32 bits.
   void fillBitWindow() {
