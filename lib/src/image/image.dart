@@ -654,6 +654,8 @@ class Image extends Iterable<Pixel> {
   Color getPixelInterpolate(num fx, num fy,
       {Interpolation interpolation = Interpolation.linear}) {
     switch (interpolation) {
+      case Interpolation.lanczos:
+        return getPixelLanczos(fx, fy);
       case Interpolation.nearest:
         return getPixelSafe(fx.toInt(), fy.toInt());
       case Interpolation.linear:
@@ -662,6 +664,59 @@ class Image extends Iterable<Pixel> {
       case Interpolation.cubic:
         return getPixelCubic(fx, fy);
     }
+  }
+
+  Color getPixelLanczos(num fx, num fy) {
+    double _kernel(double x, int a) {
+      if (x == 0) return 1;
+      if (x.abs() >= a) return 0;
+      return a * sin(pi * x) * sin(pi * x / a) / (pi * pi * x * x);
+    }
+
+    const areaSize = 1;
+    const maxAreaDiameter = (areaSize * 2) + 1;
+
+    // TODO: Works good enough for downscaling, but not sure how to implement it for upscaling?
+    const lanczosXScale = maxAreaDiameter / areaSize;
+    const lanczosYScale = maxAreaDiameter / areaSize;
+
+    // Top Left Area Anchor
+    final iAreaTLAnchor = (
+      x: (fx - areaSize < 0 ? 0 : fx - areaSize).toInt(),
+      y: (fy - areaSize < 0 ? 0 : fy - areaSize).toInt()
+    );
+    // Bottom Right Area Anchor
+    final iAreaBRAnchor = (
+      x: (iAreaTLAnchor.x + maxAreaDiameter).clamp(0, width),
+      y: (iAreaTLAnchor.y + maxAreaDiameter).clamp(0, height),
+    );
+
+    double tWeight = 0;
+
+    double _dx;
+    double _dy;
+    double d;
+    double curWeight = 0;
+
+    num r = 0, g = 0, b = 0, a = 0;
+    for (var iXArea = iAreaTLAnchor.x; iXArea < iAreaBRAnchor.x; iXArea++) {
+      for (var iYArea = iAreaTLAnchor.y; iYArea < iAreaBRAnchor.y; iYArea++) {
+        _dx = (iXArea - fx).abs() / lanczosXScale;
+        _dy = (iYArea - fy).abs() / lanczosYScale;
+        d = sqrt(_dx * _dx + _dy * _dy);
+        curWeight = _kernel(d, areaSize);
+
+        final px = getPixel(iXArea, iYArea);
+        r += (px.r * curWeight).round();
+        g += (px.g * curWeight).round();
+        b += (px.b * curWeight).round();
+        a += (px.a * curWeight).round();
+
+        tWeight += curWeight;
+      }
+    }
+
+    return getColor(r / tWeight, g / tWeight, b / tWeight, a / tWeight);
   }
 
   /// Get the pixel using linear interpolation for non-integer pixel

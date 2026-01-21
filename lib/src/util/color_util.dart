@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import '../color/color.dart';
 import '../color/color_float16.dart';
@@ -549,4 +550,144 @@ List<num> rgbToLab(num r, num g, num b) {
   }
 
   return [(116.0 * y) - 16, 500.0 * (x - y), 200.0 * (y - z)];
+}
+
+// Src: http://www.ericbrasseur.org/gamma.html?i=1
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
+double _rgbToLinear(double s) {
+  const a = 0.055;
+  return s <= 0.04045 ? s / 12.92 : pow((s + a) / (1 + a), 2.4).toDouble();
+}
+
+// Src: http://www.ericbrasseur.org/gamma.html?i=1
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
+double _linearToRgb(double s) {
+  const a = 0.055;
+  return s <= 0.0031308 ? 12.92 * s : (1 + a) * pow(s, 1 / 2.4) - a;
+}
+
+List<double> rgbToOklab(num r, num g, num b) {
+  r = _rgbToLinear(r / 255);
+  g = _rgbToLinear(g / 255);
+  b = _rgbToLinear(b / 255);
+  final l = pow(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b, 1 / 3);
+  final m = pow(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b, 1 / 3);
+  final s = pow(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b, 1 / 3);
+  return [
+    l * 0.2104542553 + m * 0.7936177850 + s * -0.0040720468, // L
+    l * 1.9779984951 + m * -2.4285922050 + s * 0.4505937099, // a
+    l * 0.0259040371 + m * 0.7827717662 + s * -0.8086757660, // b
+  ];
+  // SIMD is slower on average, likely because we lose more time on allocations
+  /*
+  var lms = Float32x4(
+        0.4122214708,
+        0.2119034982,
+        0.0883024619,
+        0,
+      ).scale(r.toDouble()) +
+      Float32x4(
+        0.5363325363,
+        0.6806995451,
+        0.2817188376,
+        0,
+      ).scale(g.toDouble()) +
+      Float32x4(
+        0.0514459929,
+        0.1073969566,
+        0.6299787005,
+        0,
+      ).scale(b.toDouble());
+  final l = pow(lms.x, 1 / 3).toDouble();
+  final m = pow(lms.y, 1 / 3).toDouble();
+  final s = pow(lms.z, 1 / 3).toDouble();
+  // actually lab now
+  lms = Float32x4(
+        0.2104542553,
+        1.9779984951,
+        0.0259040371,
+        0,
+      ).scale(l) +
+      Float32x4(
+        0.7936177850,
+        -2.4285922050,
+        0.7827717662,
+        0,
+      ).scale(m) +
+      Float32x4(
+        -0.0040720468,
+        0.4505937099,
+        -0.8086757660,
+        0,
+      ).scale(s);
+  return [
+    lms.x,
+    lms.y,
+    lms.z,
+  ];
+  */
+}
+
+List<num> oklabToRgb(num l, num a, num b) {
+  /*
+  final lum = pow(l + a * 0.3963377774 + b * 0.2158037573, 3);
+  final m = pow(l + a * -0.1055613458 + b * -0.0638541728, 3);
+  final s = pow(l + a * -0.0894841775 + b * -1.2914855480, 3);
+
+  return [
+    255 *
+        _linearToRgb(lum * 4.0767416621 + m * -3.3077115913 + s * 0.2309699292),
+    255 *
+        _linearToRgb(
+            lum * -1.2684380046 + m * 2.6097574011 + s * -0.3413193965),
+    255 *
+        _linearToRgb(
+            lum * -0.0041960863 + m * -0.7034186147 + s * 1.7076147010),
+  ];
+  */
+  // SIMD is faster on average, likely because we use multiplication instead of
+  // power function
+
+  var lms = Float32x4.splat(l.toDouble()) +
+      Float32x4(
+        0.3963377774,
+        -0.1055613458,
+        -0.0894841775,
+        0,
+      ).scale(a.toDouble()) +
+      Float32x4(
+        0.2158037573,
+        -0.0638541728,
+        -1.2914855480,
+        0,
+      ).scale(b.toDouble());
+  lms = lms * lms * lms;
+
+  final res = Float32x4(
+        4.0767416621,
+        -1.2684380046,
+        -0.0041960863,
+        0,
+      ).scale(lms.x) +
+      Float32x4(
+        -3.3077115913,
+        2.6097574011,
+        -0.7034186147,
+        0,
+      ).scale(lms.y) +
+      Float32x4(
+        0.2309699292,
+        -0.3413193965,
+        1.7076147010,
+        0,
+      ).scale(lms.z);
+  return [
+    255 * _linearToRgb(res.x),
+    255 * _linearToRgb(res.y),
+    255 * _linearToRgb(res.z),
+  ];
 }

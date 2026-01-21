@@ -6,9 +6,14 @@ enum Interpolation {
   /// Linearly blend between the neighboring pixels.
   linear,
 
-  /// Cubic blend between the neighboring pixels. Slowest, highest Quality.
+  /// Cubic blend between the neighboring pixels. Slow, high Quality.
   cubic,
 
   /// Average the colors of the neighboring pixels.
-  average
+  average,
+
+  /// Computationally heavy and extremely slow algorithm with good results.
+  /// Slowest, provides highest quality for downscaling.
+  lanczos,
+  ;
 }
