@@ -297,7 +297,8 @@ Image getImageFromJpeg(JpegData jpeg) {
     case 3:
       // The default transform for three components is true
       // Determine if this is YCbCr or RGB based on markers
-      // JFIF indicates YCbCr, Adobe APP14 can specify transform, default to YCbCr
+      // JFIF indicates YCbCr, Adobe APP14 can specify transform, default to
+      // YCbCr
       colorTransform = true;
       if (jpeg.adobe != null) {
         // Adobe transform: 0=unknown, 1=YCbCr->RGB, 2=YCCK->CMYK
