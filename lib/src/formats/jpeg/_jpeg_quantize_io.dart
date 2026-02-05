@@ -296,7 +296,13 @@ Image getImageFromJpeg(JpegData jpeg) {
         break;*/
     case 3:
       // The default transform for three components is true
+      // Determine if this is YCbCr or RGB based on markers
+      // JFIF indicates YCbCr, Adobe APP14 can specify transform, default to YCbCr
       colorTransform = true;
+      if (jpeg.adobe != null) {
+        // Adobe transform: 0=unknown, 1=YCbCr->RGB, 2=YCCK->CMYK
+        colorTransform = jpeg.adobe!.transformCode == 1;
+      }
 
       component1 = jpeg.components[0];
       component2 = jpeg.components[1];
@@ -327,16 +333,21 @@ Image getImageFromJpeg(JpegData jpeg) {
           final x2 = x >> hShift2;
           final x3 = x >> hShift3;
 
-          final cy = component1Line[x1] << 8;
-          final cb = component2Line[x2] - 128;
-          final cr = component3Line[x3] - 128;
+          var r = component1Line[x1];
+          var g = component2Line[x2];
+          var b = component3Line[x3];
 
-          var r = cy + 359 * cr + 128;
-          var g = cy - 88 * cb - 183 * cr + 128;
-          var b = cy + 454 * cb + 128;
-          r = (r >> 8).clamp(0, 255);
-          g = (g >> 8).clamp(0, 255);
-          b = (b >> 8).clamp(0, 255);
+          if (colorTransform) {
+            final cy = r << 8;
+            final cb = g - 128;
+            final cr = b - 128;
+            // 1.402 * 256 ≈ 359
+            r = ((cy + (359 * cr)) >> 8).clamp(0, 255);
+            // 0.34414 * 256 ≈ 88, 0.71414 * 256 ≈ 183
+            g = ((cy - (88 * cb) - (183 * cr)) >> 8).clamp(0, 255);
+            // 1.772 * 256 ≈ 454
+            b = (cy + (454 * cb) >> 8).clamp(0, 255);
+          }
 
           if (orientation == 2) {
             image.setPixelRgb(w1 - x, y, r, g, b);
