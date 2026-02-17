@@ -19,7 +19,7 @@ import 'jpeg_scan.dart';
 
 @internal
 class JpegData {
-  static const dctZigZag = [
+  static final dctZigZag = Uint8List.fromList([
     0, 1, 8, 16, 9, 2, 3, 10,
     17, 24, 32, 25, 18, 11, 4, 5,
     12, 19, 26, 33, 40, 48, 41, 34,
@@ -30,7 +30,7 @@ class JpegData {
     53, 60, 61, 54, 47, 55, 62, 63,
     63, 63, 63, 63, 63, 63, 63, 63, // extra entries for safety in decoder
     63, 63, 63, 63, 63, 63, 63, 63
-  ];
+  ]);
 
   static const dctSize = 8; // The basic DCT block is 8x8 samples
   static const dctSize2 = 64; // DCTSIZE squared; # of elements in a block
@@ -158,14 +158,15 @@ class JpegData {
       throw ImageException('Only single frame JPEGs supported');
     }
 
-    for (var i = 0; i < frame!.componentsOrder.length; ++i) {
-      final component = frame!.components[frame!.componentsOrder[i]]!;
+    final f = frame!;
+    for (var i = 0; i < f.componentsOrder.length; ++i) {
+      final component = f.components[f.componentsOrder[i]]!;
       components.add(ComponentData(
           component.hSamples,
-          frame!.maxHSamples,
+          f.maxHSamples,
           component.vSamples,
-          frame!.maxVSamples,
-          _buildComponentData(frame, component)));
+          f.maxVSamples,
+          _buildComponentData(f, component)));
     }
   }
 
@@ -381,11 +382,12 @@ class JpegData {
           appData[3] == 0x62 &&
           appData[4] == 0x65 &&
           appData[5] == 0) {
-        adobe = JpegAdobe();
-        adobe!.version = appData[6];
-        adobe!.flags0 = (appData[7] << 8) | appData[8];
-        adobe!.flags1 = (appData[9] << 8) | appData[10];
-        adobe!.transformCode = appData[11];
+        final a = JpegAdobe()
+          ..version = appData[6]
+          ..flags0 = (appData[7] << 8) | appData[8]
+          ..flags1 = (appData[9] << 8) | appData[10]
+          ..transformCode = appData[11];
+        adobe = a;
       }
     } else if (marker == JpegMarker.com) {
       // Comment
@@ -435,12 +437,12 @@ class JpegData {
       throw ImageException('Duplicate JPG frame data found.');
     }
 
-    frame = JpegFrame();
-    frame!.extended = marker == JpegMarker.sof1;
-    frame!.progressive = marker == JpegMarker.sof2;
-    frame!.precision = block.readByte();
-    frame!.scanLines = block.readUint16();
-    frame!.samplesPerLine = block.readUint16();
+    final f = JpegFrame()
+      ..extended = (marker == JpegMarker.sof1)
+      ..progressive = (marker == JpegMarker.sof2)
+      ..precision = block.readByte()
+      ..scanLines = block.readUint16()
+      ..samplesPerLine = block.readUint16();
 
     final numComponents = block.readByte();
 
@@ -450,13 +452,13 @@ class JpegData {
       final h = (x >> 4) & 15;
       final v = x & 15;
       final qId = block.readByte();
-      frame!.componentsOrder.add(componentId);
-      frame!.components[componentId] =
-          JpegComponent(h, v, quantizationTables, qId);
+      f.componentsOrder.add(componentId);
+      f.components[componentId] = JpegComponent(h, v, quantizationTables, qId);
     }
 
-    frame!.prepare();
-    frames.add(frame);
+    f.prepare();
+    frame = f;
+    frames.add(f);
   }
 
   void _readDHT(InputBuffer block) {
@@ -500,15 +502,17 @@ class JpegData {
       throw ImageException('Invalid SOS block');
     }
 
-    final components = List<JpegComponent>.generate(n, (i) {
+    final f = frame!;
+    final components = <JpegComponent>[];
+    for (var i = 0; i < n; i++) {
       final id = block.readByte();
       final c = block.readByte();
 
-      if (!frame!.components.containsKey(id)) {
+      if (!f.components.containsKey(id)) {
         throw ImageException('Invalid Component in SOS block');
       }
 
-      final component = frame!.components[id]!;
+      final component = f.components[id]!;
 
       final dcTblNo = (c >> 4) & 15;
       final acTblNo = c & 15;
@@ -520,8 +524,8 @@ class JpegData {
         component.huffmanTableAC = huffmanTablesAC[acTblNo]!;
       }
 
-      return component;
-    });
+      components.add(component);
+    }
 
     final spectralStart = block.readByte();
     final spectralEnd = block.readByte();
@@ -530,8 +534,8 @@ class JpegData {
     final ah = (successiveApproximation >> 4) & 15;
     final al = successiveApproximation & 15;
 
-    JpegScan(input, frame!, components, resetInterval, spectralStart,
-            spectralEnd, ah, al)
+    JpegScan(input, f, components, resetInterval, spectralStart, spectralEnd,
+            ah, al)
         .decode();
   }
 
@@ -553,9 +557,6 @@ class JpegData {
     for (var i = 0; i < length; i++) {
       for (var j = 0; j < codeLengths[i]; j++) {
         p = code.removeLast();
-        if (p.children.length <= p.index) {
-          p.children.length = p.index + 1;
-        }
         p.children[p.index] = HuffmanValue(values[k]);
         while (p.index > 0) {
           p = code.removeLast();
@@ -565,9 +566,6 @@ class JpegData {
         while (code.length <= i) {
           q = _JpegHuffman();
           code.add(q);
-          if (p.children.length <= p.index) {
-            p.children.length = p.index + 1;
-          }
           p.children[p.index] = HuffmanParent(q.children);
           p = q;
         }
@@ -575,12 +573,8 @@ class JpegData {
       }
 
       if ((i + 1) < length) {
-        // p here points to last code
         q = _JpegHuffman();
         code.add(q);
-        if (p.children.length <= p.index) {
-          p.children.length = p.index + 1;
-        }
         p.children[p.index] = HuffmanParent(q.children);
         p = q;
       }
@@ -590,7 +584,7 @@ class JpegData {
   }
 
   List<Uint8List?> _buildComponentData(
-      JpegFrame? frame, JpegComponent component) {
+      JpegFrame frame, JpegComponent component) {
     final blocksPerLine = component.blocksPerLine;
     final blocksPerColumn = component.blocksPerColumn;
     final samplesPerLine = blocksPerLine << 3;
@@ -607,15 +601,11 @@ class JpegData {
 
       for (var blockCol = 0; blockCol < blocksPerLine; blockCol++) {
         quantizeAndInverse(component.quantizationTable!,
-            component.blocks[blockRow][blockCol] as Int32List, r, R);
+            component.blocks[blockRow][blockCol], r, R);
 
-        var offset = 0;
         final sample = blockCol << 3;
         for (var j = 0; j < 8; j++) {
-          final line = lines[scanLine + j];
-          for (var i = 0; i < 8; i++) {
-            line![sample + i] = r[offset++];
-          }
+          lines[scanLine + j]?.setRange(sample, sample + 8, r, j << 3);
         }
       }
     }
@@ -631,6 +621,6 @@ class JpegData {
 }
 
 class _JpegHuffman {
-  final children = <HuffmanNode?>[];
+  final children = List<HuffmanNode?>.filled(2, null);
   int index = 0;
 }

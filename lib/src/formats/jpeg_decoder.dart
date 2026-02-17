@@ -19,7 +19,12 @@ class JpegDecoder extends Decoder {
 
   /// Is the given file a valid JPEG image?
   @override
-  bool isValidFile(Uint8List data) => JpegData().validate(data);
+  bool isValidFile(Uint8List data) {
+    if (data.length < 2 || data[0] != 0xff || data[1] != 0xd8) {
+      return false;
+    }
+    return JpegData().validate(data);
+  }
 
   @override
   DecodeInfo? startDecode(Uint8List bytes) {

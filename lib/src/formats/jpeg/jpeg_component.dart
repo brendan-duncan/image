@@ -9,7 +9,7 @@ class JpegComponent {
   int quantizationIndex;
   late int blocksPerLine;
   late int blocksPerColumn;
-  late List<List<List<int>>> blocks;
+  late List<List<Int32List>> blocks;
   late List<HuffmanNode?> huffmanTableDC;
   late List<HuffmanNode?> huffmanTableAC;
   late int pred;

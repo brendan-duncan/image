@@ -26,17 +26,14 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
   const dctClipOffset = 256;
   const dctClipLength = 768;
   if (_dctClip == null) {
-    _dctClip = Uint8List(dctClipLength);
-    int i;
-    for (i = -256; i < 0; ++i) {
-      _dctClip![dctClipOffset + i] = 0;
+    final clip = Uint8List(dctClipLength);
+    for (var i = 0; i < 256; ++i) {
+      clip[dctClipOffset + i] = i;
     }
-    for (i = 0; i < 256; ++i) {
-      _dctClip![dctClipOffset + i] = i;
+    for (var i = 256; i < 512; ++i) {
+      clip[dctClipOffset + i] = 255;
     }
-    for (i = 256; i < 512; ++i) {
-      _dctClip![dctClipOffset + i] = 255;
-    }
+    _dctClip = clip;
   }
 
   // IDCT constants (20.12 fixed point format)
@@ -129,36 +126,44 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
   // inverse DCT on columns
   for (var i = 0; i < 8; ++i) {
     final col = i;
+    final p0 = col;
+    final p1 = 8 + col;
+    final p2 = 16 + col;
+    final p3 = 24 + col;
+    final p4 = 32 + col;
+    final p5 = 40 + col;
+    final p6 = 48 + col;
+    final p7 = 56 + col;
 
     // check for all-zero AC coefficients
-    if (p[1 * 8 + col] == 0 &&
-        p[2 * 8 + col] == 0 &&
-        p[3 * 8 + col] == 0 &&
-        p[4 * 8 + col] == 0 &&
-        p[5 * 8 + col] == 0 &&
-        p[6 * 8 + col] == 0 &&
-        p[7 * 8 + col] == 0) {
+    if (p[p1] == 0 &&
+        p[p2] == 0 &&
+        p[p3] == 0 &&
+        p[p4] == 0 &&
+        p[p5] == 0 &&
+        p[p6] == 0 &&
+        p[p7] == 0) {
       final t = shiftR(sqrt2 * dataIn[i] + 8192, 14);
-      p[0 * 8 + col] = t;
-      p[1 * 8 + col] = t;
-      p[2 * 8 + col] = t;
-      p[3 * 8 + col] = t;
-      p[4 * 8 + col] = t;
-      p[5 * 8 + col] = t;
-      p[6 * 8 + col] = t;
-      p[7 * 8 + col] = t;
+      p[p0] = t;
+      p[p1] = t;
+      p[p2] = t;
+      p[p3] = t;
+      p[p4] = t;
+      p[p5] = t;
+      p[p6] = t;
+      p[p7] = t;
       continue;
     }
 
     // stage 4
-    var v0 = shiftR(sqrt2 * p[0 * 8 + col] + 2048, 12);
-    var v1 = shiftR(sqrt2 * p[4 * 8 + col] + 2048, 12);
-    var v2 = p[2 * 8 + col];
-    var v3 = p[6 * 8 + col];
-    var v4 = shiftR(sqrt102 * (p[1 * 8 + col] - p[7 * 8 + col]) + 2048, 12);
-    var v7 = shiftR(sqrt102 * (p[1 * 8 + col] + p[7 * 8 + col]) + 2048, 12);
-    var v5 = p[3 * 8 + col];
-    var v6 = p[5 * 8 + col];
+    var v0 = shiftR(sqrt2 * p[p0] + 2048, 12);
+    var v1 = shiftR(sqrt2 * p[p4] + 2048, 12);
+    var v2 = p[p2];
+    var v3 = p[p6];
+    var v4 = shiftR(sqrt102 * (p[p1] - p[p7]) + 2048, 12);
+    var v7 = shiftR(sqrt102 * (p[p1] + p[p7]) + 2048, 12);
+    var v5 = p[p3];
+    var v6 = p[p5];
 
     // stage 3
     var t = shiftR(v0 - v1 + 1, 1);
@@ -189,14 +194,14 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
     v6 = t;
 
     // stage 1
-    p[0 * 8 + col] = v0 + v7;
-    p[7 * 8 + col] = v0 - v7;
-    p[1 * 8 + col] = v1 + v6;
-    p[6 * 8 + col] = v1 - v6;
-    p[2 * 8 + col] = v2 + v5;
-    p[5 * 8 + col] = v2 - v5;
-    p[3 * 8 + col] = v3 + v4;
-    p[4 * 8 + col] = v3 - v4;
+    p[p0] = v0 + v7;
+    p[p7] = v0 - v7;
+    p[p1] = v1 + v6;
+    p[p6] = v1 - v6;
+    p[p2] = v2 + v5;
+    p[p5] = v2 - v5;
+    p[p3] = v3 + v4;
+    p[p4] = v3 - v4;
   }
 
   // convert to 8-bit integers
@@ -233,35 +238,47 @@ Image getImageFromJpeg(JpegData jpeg) {
   final h1 = h - 1;
   final w1 = w - 1;
 
+  void Function(int x, int y, num r, num g, num b) setPixel;
+  switch (orientation) {
+    case 2:
+      setPixel = (x, y, r, g, b) => image.setPixelRgb(w1 - x, y, r, g, b);
+      break;
+    case 3:
+      setPixel = (x, y, r, g, b) => image.setPixelRgb(w1 - x, h1 - y, r, g, b);
+      break;
+    case 4:
+      setPixel = (x, y, r, g, b) => image.setPixelRgb(x, h1 - y, r, g, b);
+      break;
+    case 5:
+      setPixel = (x, y, r, g, b) => image.setPixelRgb(y, x, r, g, b);
+      break;
+    case 6:
+      setPixel = (x, y, r, g, b) => image.setPixelRgb(h1 - y, x, r, g, b);
+      break;
+    case 7:
+      setPixel = (x, y, r, g, b) => image.setPixelRgb(h1 - y, w1 - x, r, g, b);
+      break;
+    case 8:
+      setPixel = (x, y, r, g, b) => image.setPixelRgb(y, w1 - x, r, g, b);
+      break;
+    default:
+      setPixel = image.setPixelRgb;
+      break;
+  }
+
   switch (jpeg.components.length) {
     case 1:
       component1 = jpeg.components[0];
       final lines = component1.lines;
       final hShift1 = component1.hScaleShift;
       final vShift1 = component1.vScaleShift;
-      for (var y = 0; y < jpeg.height!; y++) {
+      for (var y = 0; y < h; y++) {
         final y1 = y >> vShift1;
         component1Line = lines[y1];
-        for (var x = 0; x < jpeg.width!; x++) {
+        for (var x = 0; x < w; x++) {
           final x1 = x >> hShift1;
           final cy = component1Line![x1];
-          if (orientation == 2) {
-            image.setPixelRgb(w1 - x, y, cy, cy, cy);
-          } else if (orientation == 3) {
-            image.setPixelRgb(w1 - x, h1 - y, cy, cy, cy);
-          } else if (orientation == 4) {
-            image.setPixelRgb(x, h1 - y, cy, cy, cy);
-          } else if (orientation == 5) {
-            image.setPixelRgb(y, x, cy, cy, cy);
-          } else if (orientation == 6) {
-            image.setPixelRgb(h1 - y, x, cy, cy, cy);
-          } else if (orientation == 7) {
-            image.setPixelRgb(h1 - y, w1 - x, cy, cy, cy);
-          } else if (orientation == 8) {
-            image.setPixelRgb(y, w1 - x, cy, cy, cy);
-          } else {
-            image.setPixelRgb(x, y, cy, cy, cy);
-          }
+          setPixel(x, y, cy, cy, cy);
         }
       }
       break;
@@ -318,7 +335,7 @@ Image getImageFromJpeg(JpegData jpeg) {
       final hShift3 = component3.hScaleShift;
       final vShift3 = component3.vScaleShift;
 
-      for (var y = 0; y < jpeg.height!; y++) {
+      for (var y = 0; y < h; y++) {
         final y1 = y >> vShift1;
         final y2 = y >> vShift2;
         final y3 = y >> vShift3;
@@ -327,7 +344,7 @@ Image getImageFromJpeg(JpegData jpeg) {
         component2Line = lines2[y2];
         component3Line = lines3[y3];
 
-        for (var x = 0; x < jpeg.width!; x++) {
+        for (var x = 0; x < w; x++) {
           final x1 = x >> hShift1;
           final x2 = x >> hShift2;
           final x3 = x >> hShift3;
@@ -340,31 +357,12 @@ Image getImageFromJpeg(JpegData jpeg) {
             final cy = r << 8;
             final cb = g - 128;
             final cr = b - 128;
-            // 1.402 * 256 ≈ 359
             r = shiftR(cy + (359 * cr), 8).clamp(0, 255);
-            // 0.34414 * 256 ≈ 88, 0.71414 * 256 ≈ 183
             g = shiftR(cy - (88 * cb) - (183 * cr), 8).clamp(0, 255);
-            // 1.772 * 256 ≈ 454
             b = shiftR(cy + (454 * cb), 8).clamp(0, 255);
           }
 
-          if (orientation == 2) {
-            image.setPixelRgb(w1 - x, y, r, g, b);
-          } else if (orientation == 3) {
-            image.setPixelRgb(w1 - x, h1 - y, r, g, b);
-          } else if (orientation == 4) {
-            image.setPixelRgb(x, h1 - y, r, g, b);
-          } else if (orientation == 5) {
-            image.setPixelRgb(y, x, r, g, b);
-          } else if (orientation == 6) {
-            image.setPixelRgb(h1 - y, x, r, g, b);
-          } else if (orientation == 7) {
-            image.setPixelRgb(h1 - y, w1 - x, r, g, b);
-          } else if (orientation == 8) {
-            image.setPixelRgb(y, w1 - x, r, g, b);
-          } else {
-            image.setPixelRgb(x, y, r, g, b);
-          }
+          setPixel(x, y, r, g, b);
         }
       }
       break;
@@ -398,7 +396,7 @@ Image getImageFromJpeg(JpegData jpeg) {
       final hShift4 = component4.hScaleShift;
       final vShift4 = component4.vScaleShift;
 
-      for (var y = 0; y < jpeg.height!; y++) {
+      for (var y = 0; y < h; y++) {
         final y1 = y >> vShift1;
         final y2 = y >> vShift2;
         final y3 = y >> vShift3;
@@ -407,7 +405,7 @@ Image getImageFromJpeg(JpegData jpeg) {
         component2Line = lines2[y2];
         component3Line = lines3[y3];
         component4Line = lines4[y4];
-        for (var x = 0; x < jpeg.width!; x++) {
+        for (var x = 0; x < w; x++) {
           final x1 = x >> hShift1;
           final x2 = x >> hShift2;
           final x3 = x >> hShift3;
@@ -424,35 +422,21 @@ Image getImageFromJpeg(JpegData jpeg) {
             final cr = component3Line![x3];
             ck = component4Line![x4];
 
-            cc = 255 - (cy + 1.402 * (cr - 128)).toInt().clamp(0, 255);
+            final crShifted = cr - 128;
+            final cbShifted = cb - 128;
+            final cyScaled = cy << 8;
+            cc = 255 - shiftR(cyScaled + 359 * crShifted, 8).clamp(0, 255);
             cm = 255 -
-                ((cy - 0.3441363 * (cb - 128) - 0.71413636 * (cr - 128))
-                    .clamp(0, 255)
-                    .toInt());
-            cy = 255 - (cy + 1.772 * (cb - 128)).toInt().clamp(0, 255);
+                shiftR(cyScaled - 88 * cbShifted - 183 * crShifted, 8)
+                    .clamp(0, 255);
+            cy = 255 - shiftR(cyScaled + 454 * cbShifted, 8).clamp(0, 255);
           }
 
           final r = shiftR(cc * ck, 8);
           final g = shiftR(cm * ck, 8);
           final b = shiftR(cy * ck, 8);
 
-          if (orientation == 2) {
-            image.setPixelRgb(w1 - x, y, r, g, b);
-          } else if (orientation == 3) {
-            image.setPixelRgb(w1 - x, h1 - y, r, g, b);
-          } else if (orientation == 4) {
-            image.setPixelRgb(x, h1 - y, r, g, b);
-          } else if (orientation == 5) {
-            image.setPixelRgb(y, x, r, g, b);
-          } else if (orientation == 6) {
-            image.setPixelRgb(h1 - y, x, r, g, b);
-          } else if (orientation == 7) {
-            image.setPixelRgb(h1 - y, w1 - x, r, g, b);
-          } else if (orientation == 8) {
-            image.setPixelRgb(y, w1 - x, r, g, b);
-          } else {
-            image.setPixelRgb(x, y, r, g, b);
-          }
+          setPixel(x, y, r, g, b);
         }
       }
       break;
