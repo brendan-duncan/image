@@ -1,6 +1,7 @@
-## 4.7.2 - December 21, 2025
+## 4.8.0 - February 17, 2026
 
-- Change meta dependency back after it was unecessarily raised.
+- Fix JPEG decoding issue with Adobe RGB color transformations.
+- Feature: Histogram equalize and stretch 
 
 ## 4.7.1 - December 18, 2025
 
