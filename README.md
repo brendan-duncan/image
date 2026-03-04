@@ -27,10 +27,10 @@ NOTE: 4.0 is a major revision from the previous version of the library.
 - TGA
 - PVR
 - ICO
+- (Read) WebP / Animated WebP, (Write) Lossless WebP
 
 **Read Only**
 
-- WebP / Animated WebP
 - PSD
 - EXR
 - PNM (PBM, PGM, PPM)

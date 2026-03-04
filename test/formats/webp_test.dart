@@ -41,9 +41,9 @@ void main() {
         test(file, () async {
           final webp = decodeWebP(File('$path/$file.webp').readAsBytesSync());
           expect(webp, isNotNull);
-          File('$testOutputPath/webp/$file.png')
+          File('$testOutputPath/webp/$file.webp')
             ..createSync(recursive: true)
-            ..writeAsBytesSync(PngEncoder().encode(webp!));
+            ..writeAsBytesSync(encodeWebP(webp!));
           if (File('$path/$file.png').existsSync()) {
             final png = decodePng(File('$path/$file.png').readAsBytesSync())!;
             final png4 = png.numChannels != 4
@@ -68,8 +68,8 @@ void main() {
         );
         expect(anim, isNotNull);
         for (final frame in anim!.frames) {
-          await encodePngFile(
-            '$testOutputPath/webp/animated_lossy_${frame.frameIndex}.png',
+          await encodeWebPFile(
+            '$testOutputPath/webp/animated_lossy_${frame.frameIndex}.webp',
             frame,
           );
         }
@@ -139,10 +139,10 @@ void main() {
         test('validate', () {
           var bytes = File('test/_data/webp/2b.webp').readAsBytesSync();
           final image = WebPDecoder().decode(bytes)!;
-          final png = PngEncoder().encode(image);
-          File('$testOutputPath/webp/decode.png')
+          final webpBytes = encodeWebP(image);
+          File('$testOutputPath/webp/decode.webp')
             ..createSync(recursive: true)
-            ..writeAsBytesSync(png);
+            ..writeAsBytesSync(webpBytes);
 
           // Validate decoding.
           bytes = File('test/_data/webp/2b.png').readAsBytesSync();
@@ -164,10 +164,10 @@ void main() {
               throw ImageException('Unable to decode WebP Image: $name.');
             }
 
-            final png = PngEncoder().encode(image);
-            File('$testOutputPath/webp/$name.png')
+            final webpBytes = encodeWebP(image);
+            File('$testOutputPath/webp/$name.webp')
               ..createSync(recursive: true)
-              ..writeAsBytesSync(png);
+              ..writeAsBytesSync(webpBytes);
           });
         }
       });
@@ -182,11 +182,136 @@ void main() {
 
           for (var i = 0; i < anim.numFrames; ++i) {
             final image = anim.getFrame(i);
-            File('$testOutputPath/webp/animated_transparency_$i.png')
+            File('$testOutputPath/webp/animated_transparency_$i.webp')
               ..createSync(recursive: true)
-              ..writeAsBytesSync(PngEncoder().encode(image));
+              ..writeAsBytesSync(encodeWebP(image));
           }
           expect(anim.getFrame(2).getPixel(0, 0), equals([0, 0, 0, 0]));
+        });
+      });
+
+      group('encode', () {
+        test('round-trip lossless', () {
+          // Decode a lossless webp, encode it, decode again, compare.
+          final bytes =
+              File('test/_data/webp/1_webp_ll.webp').readAsBytesSync();
+          final original = WebPDecoder().decode(bytes)!;
+
+          final encoded = encodeWebP(original);
+          final decoded = WebPDecoder().decode(encoded);
+          expect(decoded, isNotNull);
+          expect(decoded!.width, equals(original.width));
+          expect(decoded.height, equals(original.height));
+
+          // Pixel-exact comparison
+          for (var y = 0; y < original.height; y++) {
+            for (var x = 0; x < original.width; x++) {
+              final op = original.getPixel(x, y);
+              final dp = decoded.getPixel(x, y);
+              expect(dp.r, equals(op.r), reason: 'R mismatch at ($x,$y)');
+              expect(dp.g, equals(op.g), reason: 'G mismatch at ($x,$y)');
+              expect(dp.b, equals(op.b), reason: 'B mismatch at ($x,$y)');
+              expect(dp.a, equals(op.a), reason: 'A mismatch at ($x,$y)');
+            }
+          }
+        });
+
+        test('encode rgb image', () {
+          // Create a simple 3-channel image and encode it.
+          final image = Image(width: 4, height: 4, numChannels: 3);
+          for (var y = 0; y < 4; y++) {
+            for (var x = 0; x < 4; x++) {
+              image.getPixel(x, y)
+                ..r = (x * 60)
+                ..g = (y * 60)
+                ..b = 128;
+            }
+          }
+
+          final encoded = encodeWebP(image);
+          final decoded = WebPDecoder().decode(encoded);
+          expect(decoded, isNotNull);
+          expect(decoded!.width, equals(4));
+          expect(decoded.height, equals(4));
+
+          for (var y = 0; y < 4; y++) {
+            for (var x = 0; x < 4; x++) {
+              final dp = decoded.getPixel(x, y);
+              expect(dp.r.toInt(), equals(x * 60));
+              expect(dp.g.toInt(), equals(y * 60));
+              expect(dp.b.toInt(), equals(128));
+              expect(dp.a.toInt(), equals(255));
+            }
+          }
+        });
+
+        test('encode rgba image with alpha', () {
+          // Create a 4-channel image with varying alpha.
+          final image = Image(width: 4, height: 4, numChannels: 4);
+          for (var y = 0; y < 4; y++) {
+            for (var x = 0; x < 4; x++) {
+              image.getPixel(x, y)
+                ..r = 100
+                ..g = 150
+                ..b = 200
+                ..a = (x + y * 4) * 16; // 0, 16, 32, ...
+            }
+          }
+
+          final encoded = encodeWebP(image);
+          final decoded = WebPDecoder().decode(encoded);
+          expect(decoded, isNotNull);
+          expect(decoded!.width, equals(4));
+          expect(decoded.height, equals(4));
+
+          for (var y = 0; y < 4; y++) {
+            for (var x = 0; x < 4; x++) {
+              final dp = decoded.getPixel(x, y);
+              expect(dp.r.toInt(), equals(100));
+              expect(dp.g.toInt(), equals(150));
+              expect(dp.b.toInt(), equals(200));
+              expect(dp.a.toInt(), equals((x + y * 4) * 16));
+            }
+          }
+        });
+
+        test('encodeWebPFile', () async {
+          final image = Image(width: 2, height: 2, numChannels: 4);
+          image.getPixel(0, 0)
+            ..r = 255
+            ..g = 0
+            ..b = 0
+            ..a = 255;
+          image.getPixel(1, 0)
+            ..r = 0
+            ..g = 255
+            ..b = 0
+            ..a = 128;
+          image.getPixel(0, 1)
+            ..r = 0
+            ..g = 0
+            ..b = 255
+            ..a = 64;
+          image.getPixel(1, 1)
+            ..r = 255
+            ..g = 255
+            ..b = 0
+            ..a = 0;
+
+          final filePath = '$testOutputPath/webp/encode_test.webp';
+          File(filePath).parent.createSync(recursive: true);
+          await encodeWebPFile(filePath, image);
+          expect(File(filePath).existsSync(), isTrue);
+
+          final readBack = File(filePath).readAsBytesSync();
+          final decoded = WebPDecoder().decode(readBack);
+          expect(decoded, isNotNull);
+          expect(decoded!.width, equals(2));
+          expect(decoded.height, equals(2));
+          expect(decoded.getPixel(0, 0).r.toInt(), equals(255));
+          expect(decoded.getPixel(1, 0).g.toInt(), equals(255));
+          expect(decoded.getPixel(0, 1).b.toInt(), equals(255));
+          expect(decoded.getPixel(1, 1).a.toInt(), equals(0));
         });
       });
     });

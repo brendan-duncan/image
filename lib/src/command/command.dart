@@ -394,6 +394,14 @@ class Command {
     subCommand = DecodeWebPFileCmd(subCommand, path);
   }
 
+  void encodeWebP() {
+    subCommand = EncodeWebPCmd(subCommand);
+  }
+
+  void encodeWebPFile(String path) {
+    subCommand = EncodeWebPFileCmd(subCommand, path);
+  }
+
   // Draw Commands
 
   void drawChar(String char,
