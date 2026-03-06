@@ -82,22 +82,21 @@ class WebPEncoder extends Encoder {
     _applyPredictorTransform(
         r, g, b, a, width, height, predBlockW, predBlockSize, predModes);
 
-    final bw = _BitWriter();
-
-    // Write Subtract Green Transform
-    bw.writeBits(1, 1); // has_transform = 1
-    bw.writeBits(2, 2); // transform_type = 2 (SUBTRACT_GREEN)
-
-    // Write Predictor Transform
-    bw.writeBits(1, 1); // has_transform = 1
-    bw.writeBits(0, 2); // transform_type = 0 (PREDICTOR)
-    bw.writeBits(predSizeBits - 2, 3); // predictor block size bits (5 - 2 = 3)
+    final bw = _BitWriter()
+      // Write Subtract Green Transform
+      ..writeBits(1, 1) // has_transform = 1
+      ..writeBits(2, 2) // transform_type = 2 (SUBTRACT_GREEN)
+      // Write Predictor Transform
+      ..writeBits(1, 1) // has_transform = 1
+      ..writeBits(0, 2) // transform_type = 0 (PREDICTOR)
+      ..writeBits(predSizeBits - 2, 3); // predictor block size bits (5 - 2 = 3)
     _writePredictorSubImage(bw, predBlockW, predBlockH, predModes);
 
     // Finish transforms
-    bw.writeBits(0, 1); // has_transform = 0
-    bw.writeBits(0, 1); // no color cache
-    bw.writeBits(0, 1); // no meta Huffman codes
+    bw
+      ..writeBits(0, 1) // has_transform = 0
+      ..writeBits(0, 1) // no color cache
+      ..writeBits(0, 1); // no meta Huffman codes
 
     // Tokenize into literals and LZ77 back-references using a hash chain.
     // Token encoding:

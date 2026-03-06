@@ -218,7 +218,7 @@ void main() {
 
         test('encode rgb image', () {
           // Create a simple 3-channel image and encode it.
-          final image = Image(width: 4, height: 4, numChannels: 3);
+          final image = Image(width: 4, height: 4);
           for (var y = 0; y < 4; y++) {
             for (var x = 0; x < 4; x++) {
               image.getPixel(x, y)
