@@ -28,3 +28,34 @@ class DecodeWebPFileCmd extends Command {
     outputImage = await decodeWebPFile(path);
   }
 }
+
+// Encode an Image to the WebP format.
+class EncodeWebPCmd extends Command {
+  EncodeWebPCmd(Command? input) : super(input);
+
+  @override
+  Future<void> executeCommand() async {
+    await input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      outputBytes = encodeWebP(outputImage!);
+    }
+  }
+}
+
+// Encode an Image to the WebP format and write it to a file at the given
+// [path].
+class EncodeWebPFileCmd extends Command {
+  String path;
+
+  EncodeWebPFileCmd(Command? input, this.path) : super(input);
+
+  @override
+  Future<void> executeCommand() async {
+    await input?.execute();
+    outputImage = input?.outputImage;
+    if (outputImage != null) {
+      await encodeWebPFile(path, outputImage!);
+    }
+  }
+}

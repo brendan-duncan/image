@@ -29,6 +29,7 @@ import 'tga_encoder.dart';
 import 'tiff_decoder.dart';
 import 'tiff_encoder.dart';
 import 'webp_decoder.dart';
+import 'webp_encoder.dart';
 
 /// Return the [Decoder] that can decode image with the given [name],
 /// by looking at the file extension.
@@ -106,6 +107,9 @@ Encoder? findEncoderForNamedImage(String name) {
   }
   if (n.endsWith('.pvr')) {
     return PvrEncoder();
+  }
+  if (n.endsWith('.webp')) {
+    return WebPEncoder();
   }
   return null;
 }
@@ -419,6 +423,18 @@ Future<Image?> decodeWebPFile(String path, {int? frame}) async {
     return null;
   }
   return WebPDecoder().decode(bytes, frame: frame);
+}
+
+/// Encode an image to the WebP format (lossless).
+Uint8List encodeWebP(Image image) => WebPEncoder().encode(image);
+
+/// Encode an [image] to a WebP file at the given [path].
+Future<bool> encodeWebPFile(String path, Image image) async {
+  if (!supportsFileAccess()) {
+    return false;
+  }
+  final bytes = WebPEncoder().encode(image);
+  return writeFile(path, bytes);
 }
 
 /// Decode a GIF formatted image.

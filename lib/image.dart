@@ -177,6 +177,7 @@ export 'src/formats/tiff_encoder.dart';
 //export 'src/formats/webp/webp_frame.dart' hide InternalWebPFrame;
 export 'src/formats/webp/webp_info.dart' hide InternalWebPInfo;
 export 'src/formats/webp_decoder.dart';
+export 'src/formats/webp_encoder.dart';
 export 'src/image/icc_profile.dart';
 export 'src/image/image.dart';
 export 'src/image/image_data.dart';
