@@ -3,7 +3,7 @@ import 'dart:io';
 
 void main(List<String> args) {
   final input = args.isNotEmpty ? args[0] : 'benchmark/results.json';
-  final outPath = args.length > 1 ? args[1] : 'doc/benchmark_report.md';
+  final outPath = args.length > 1 ? args[1] : 'benchmark/benchmark_report.md';
 
   final data = jsonDecode(File(input).readAsStringSync()) as List;
   final buffer = StringBuffer();
