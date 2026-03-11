@@ -18,6 +18,7 @@ import 'image_format.dart';
 import 'jpeg/jpeg_util.dart';
 import 'jpeg_decoder.dart';
 import 'jpeg_encoder.dart';
+import 'png/png_info.dart';
 import 'png_decoder.dart';
 import 'png_encoder.dart';
 import 'pnm_decoder.dart';
@@ -356,8 +357,9 @@ Future<Image?> decodePngFile(String path) async {
 Uint8List encodePng(Image image,
         {bool singleFrame = false,
         int level = 6,
-        PngFilter filter = PngFilter.paeth}) =>
-    PngEncoder(filter: filter, level: level)
+        PngFilter filter = PngFilter.paeth,
+        PngCicpData? cicpData}) =>
+    PngEncoder(filter: filter, level: level, cicpData: cicpData)
         .encode(image, singleFrame: singleFrame);
 
 /// Encode an [image] to a PNG file at the given [path].
