@@ -1,0 +1,28 @@
+name: Build Native Prebuilts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
+      - name: Build Android prebuilts
+        run: ./tool/build_prebuilt_native.sh android
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Add iOS Rust targets
+        run: |
+          rustup target add aarch64-apple-ios
+          rustup target add aarch64-apple-ios-sim
+          rustup target add x86_64-apple-ios
+      - name: Build iOS prebuilts
+        run: ./tool/build_prebuilt_native.sh ios
