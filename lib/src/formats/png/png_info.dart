@@ -25,6 +25,70 @@ class PngColorType {
 
 enum PngFilterType { none, sub, up, average, paeth }
 
+/// Colour information for the image from a cICP chunk, also known as
+/// "Coding-independent code points" (CICP).
+///
+/// The values are defined by ITU-T H.273. Presence of a cICP chunk signals
+/// that the image pixel data uses the specified colour space (typically
+/// Display P3 or BT.2020) instead of the default sRGB assumed by older
+/// decoders.
+///
+/// See <https://www.w3.org/TR/png-3/#cICP-chunk>.
+class PngCicpData {
+  /// Colour primaries, as defined in ITU-T H.273 Table 2.
+  ///
+  /// Common values:
+  /// - 1 = BT.709 / sRGB
+  /// - 9 = BT.2020
+  /// - 12 = Display P3
+  final int colourPrimaries;
+
+  /// Transfer characteristics, as defined in ITU-T H.273 Table 3.
+  ///
+  /// Common values:
+  /// - 1 = BT.709 (≈ sRGB)
+  /// - 13 = sRGB / Display P3
+  /// - 16 = ST 2084 (PQ, HDR)
+  final int transferCharacteristics;
+
+  /// Matrix coefficients, as defined in ITU-T H.273 Table 4.
+  ///
+  /// For still images this MUST be 0 (identity / RGB).
+  final int matrixCoefficients;
+
+  /// Video full range flag.
+  ///
+  /// 0 = narrow / limited range (16–235).
+  /// 1 = full range (0–255).
+  final int videoFullRangeFlag;
+
+  const PngCicpData({
+    required this.colourPrimaries,
+    required this.transferCharacteristics,
+    required this.matrixCoefficients,
+    required this.videoFullRangeFlag,
+  });
+
+  @override
+  int get hashCode => Object.hash(colourPrimaries, transferCharacteristics,
+      matrixCoefficients, videoFullRangeFlag);
+
+  @override
+  bool operator ==(Object other) =>
+      other is PngCicpData &&
+      other.colourPrimaries == colourPrimaries &&
+      other.transferCharacteristics == transferCharacteristics &&
+      other.matrixCoefficients == matrixCoefficients &&
+      other.videoFullRangeFlag == videoFullRangeFlag;
+
+  @override
+  String toString() => 'PngCicpData('
+      'primaries=$colourPrimaries, '
+      'transfer=$transferCharacteristics, '
+      'matrix=$matrixCoefficients, '
+      'fullRange=$videoFullRangeFlag)';
+}
+
 /// The intended physical pixel size of the image.
 /// See <https://www.w3.org/TR/png-3/#11pHYs>.
 class PngPhysicalPixelDimensions {
@@ -90,6 +154,7 @@ class PngInfo implements DecodeInfo {
   Uint8List? iccpData;
   Map<String, String> textData = {};
   PngPhysicalPixelDimensions? pixelDimensions;
+  PngCicpData? cicpData;
 
   // APNG extensions
   @override
