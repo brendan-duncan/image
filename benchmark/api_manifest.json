@@ -1,0 +1,1772 @@
+[
+  {
+    "kind": "enum",
+    "name": "Channel",
+    "file": "src/color/channel.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ChannelIterator",
+    "file": "src/color/channel_iterator.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "ChannelOrder",
+    "file": "src/color/channel_order.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorFloat16",
+    "file": "src/color/color_float16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorFloat32",
+    "file": "src/color/color_float32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorFloat64",
+    "file": "src/color/color_float64.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorInt16",
+    "file": "src/color/color_int16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorInt32",
+    "file": "src/color/color_int32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorInt8",
+    "file": "src/color/color_int8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorUint1",
+    "file": "src/color/color_uint1.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorUint16",
+    "file": "src/color/color_uint16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorUint2",
+    "file": "src/color/color_uint2.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorUint32",
+    "file": "src/color/color_uint32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorUint4",
+    "file": "src/color/color_uint4.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorUint8",
+    "file": "src/color/color_uint8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorRgb8",
+    "file": "src/color/color_uint8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ColorRgba8",
+    "file": "src/color/color_uint8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ConstColorUint8",
+    "file": "src/color/const_color_uint8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ConstColorR8",
+    "file": "src/color/const_color_uint8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ConstColorRg8",
+    "file": "src/color/const_color_uint8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ConstColorRgb8",
+    "file": "src/color/const_color_uint8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ConstColorRgba8",
+    "file": "src/color/const_color_uint8.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "Format",
+    "file": "src/color/format.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "FormatType",
+    "file": "src/color/format.dart"
+  },
+  {
+    "kind": "function",
+    "name": "getRowStride",
+    "file": "src/color/format.dart"
+  },
+  {
+    "kind": "function",
+    "name": "convertFormatValue",
+    "file": "src/color/format.dart"
+  },
+  {
+    "kind": "class",
+    "name": "Command",
+    "file": "src/command/command.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "BlendMode",
+    "file": "src/draw/blend_mode.dart"
+  },
+  {
+    "kind": "function",
+    "name": "compositeImage",
+    "file": "src/draw/composite_image.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_directComposite",
+    "file": "src/draw/composite_image.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_composite",
+    "file": "src/draw/composite_image.dart"
+  },
+  {
+    "kind": "function",
+    "name": "drawChar",
+    "file": "src/draw/draw_char.dart"
+  },
+  {
+    "kind": "function",
+    "name": "drawCircle",
+    "file": "src/draw/draw_circle.dart"
+  },
+  {
+    "kind": "function",
+    "name": "drawLine",
+    "file": "src/draw/draw_line.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_drawLineWu",
+    "file": "src/draw/draw_line.dart"
+  },
+  {
+    "kind": "function",
+    "name": "drawPixel",
+    "file": "src/draw/draw_pixel.dart"
+  },
+  {
+    "kind": "function",
+    "name": "drawPolygon",
+    "file": "src/draw/draw_polygon.dart"
+  },
+  {
+    "kind": "function",
+    "name": "drawRect",
+    "file": "src/draw/draw_rect.dart"
+  },
+  {
+    "kind": "function",
+    "name": "drawString",
+    "file": "src/draw/draw_string.dart"
+  },
+  {
+    "kind": "function",
+    "name": "fill",
+    "file": "src/draw/fill.dart"
+  },
+  {
+    "kind": "function",
+    "name": "fillCircle",
+    "file": "src/draw/fill_circle.dart"
+  },
+  {
+    "kind": "typedef",
+    "name": "_TestPixel",
+    "file": "src/draw/fill_flood.dart"
+  },
+  {
+    "kind": "typedef",
+    "name": "_MarkPixel",
+    "file": "src/draw/fill_flood.dart"
+  },
+  {
+    "kind": "function",
+    "name": "fillFlood",
+    "file": "src/draw/fill_flood.dart"
+  },
+  {
+    "kind": "function",
+    "name": "maskFlood",
+    "file": "src/draw/fill_flood.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_setAlpha",
+    "file": "src/draw/fill_flood.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_colorDistance",
+    "file": "src/draw/fill_flood.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_testPixelLabColorDistance",
+    "file": "src/draw/fill_flood.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_fill4",
+    "file": "src/draw/fill_flood.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_fill4Core",
+    "file": "src/draw/fill_flood.dart"
+  },
+  {
+    "kind": "function",
+    "name": "fillPolygon",
+    "file": "src/draw/fill_polygon.dart"
+  },
+  {
+    "kind": "function",
+    "name": "fillRect",
+    "file": "src/draw/fill_rect.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ExifData",
+    "file": "src/exif/exif_data.dart"
+  },
+  {
+    "kind": "class",
+    "name": "_ExifEntry",
+    "file": "src/exif/exif_data.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ExifTag",
+    "file": "src/exif/exif_tag.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdContainer",
+    "file": "src/exif/ifd_container.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdDirectory",
+    "file": "src/exif/ifd_directory.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "IfdValueType",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdByteValue",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueAscii",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueShort",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueLong",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueRational",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueSByte",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueSShort",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueSLong",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueSRational",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueSingle",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueDouble",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueUndefined",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IfdValueIfd",
+    "file": "src/exif/ifd_value.dart"
+  },
+  {
+    "kind": "function",
+    "name": "adjustColor",
+    "file": "src/filter/adjust_color.dart"
+  },
+  {
+    "kind": "function",
+    "name": "billboard",
+    "file": "src/filter/billboard.dart"
+  },
+  {
+    "kind": "function",
+    "name": "bleachBypass",
+    "file": "src/filter/bleach_bypass.dart"
+  },
+  {
+    "kind": "function",
+    "name": "bulgeDistortion",
+    "file": "src/filter/bulge_distortion.dart"
+  },
+  {
+    "kind": "function",
+    "name": "bumpToNormal",
+    "file": "src/filter/bump_to_normal.dart"
+  },
+  {
+    "kind": "function",
+    "name": "chromaticAberration",
+    "file": "src/filter/chromatic_aberration.dart"
+  },
+  {
+    "kind": "function",
+    "name": "colorHalftone",
+    "file": "src/filter/color_halftone.dart"
+  },
+  {
+    "kind": "function",
+    "name": "colorOffset",
+    "file": "src/filter/color_offset.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "ContrastMode",
+    "file": "src/filter/contrast.dart"
+  },
+  {
+    "kind": "function",
+    "name": "contrast",
+    "file": "src/filter/contrast.dart"
+  },
+  {
+    "kind": "function",
+    "name": "convolution",
+    "file": "src/filter/convolution.dart"
+  },
+  {
+    "kind": "function",
+    "name": "copyImageChannels",
+    "file": "src/filter/copy_image_channels.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "DitherKernel",
+    "file": "src/filter/dither_image.dart"
+  },
+  {
+    "kind": "function",
+    "name": "ditherImage",
+    "file": "src/filter/dither_image.dart"
+  },
+  {
+    "kind": "function",
+    "name": "dotScreen",
+    "file": "src/filter/dot_screen.dart"
+  },
+  {
+    "kind": "function",
+    "name": "dropShadow",
+    "file": "src/filter/drop_shadow.dart"
+  },
+  {
+    "kind": "function",
+    "name": "edgeGlow",
+    "file": "src/filter/edge_glow.dart"
+  },
+  {
+    "kind": "function",
+    "name": "emboss",
+    "file": "src/filter/emboss.dart"
+  },
+  {
+    "kind": "function",
+    "name": "gamma",
+    "file": "src/filter/gamma.dart"
+  },
+  {
+    "kind": "function",
+    "name": "gaussianBlur",
+    "file": "src/filter/gaussian_blur.dart"
+  },
+  {
+    "kind": "function",
+    "name": "grayscale",
+    "file": "src/filter/grayscale.dart"
+  },
+  {
+    "kind": "function",
+    "name": "hdrToLdr",
+    "file": "src/filter/hdr_to_ldr.dart"
+  },
+  {
+    "kind": "function",
+    "name": "hexagonPixelate",
+    "file": "src/filter/hexagon_pixelate.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "HistogramEqualizeMode",
+    "file": "src/filter/histogram_equalization.dart"
+  },
+  {
+    "kind": "function",
+    "name": "histogramEqualization",
+    "file": "src/filter/histogram_equalization.dart"
+  },
+  {
+    "kind": "function",
+    "name": "histogramStretch",
+    "file": "src/filter/histogram_equalization.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_applyHistogramTransform",
+    "file": "src/filter/histogram_equalization.dart"
+  },
+  {
+    "kind": "function",
+    "name": "invert",
+    "file": "src/filter/invert.dart"
+  },
+  {
+    "kind": "function",
+    "name": "luminanceThreshold",
+    "file": "src/filter/luminance_threshold.dart"
+  },
+  {
+    "kind": "function",
+    "name": "monochrome",
+    "file": "src/filter/monochrome.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "NoiseType",
+    "file": "src/filter/noise.dart"
+  },
+  {
+    "kind": "function",
+    "name": "noise",
+    "file": "src/filter/noise.dart"
+  },
+  {
+    "kind": "function",
+    "name": "normalize",
+    "file": "src/filter/normalize.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "PixelateMode",
+    "file": "src/filter/pixelate.dart"
+  },
+  {
+    "kind": "function",
+    "name": "pixelate",
+    "file": "src/filter/pixelate.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "QuantizeMethod",
+    "file": "src/filter/quantize.dart"
+  },
+  {
+    "kind": "function",
+    "name": "quantize",
+    "file": "src/filter/quantize.dart"
+  },
+  {
+    "kind": "function",
+    "name": "reinhardTonemap",
+    "file": "src/filter/reinhard_tone_map.dart"
+  },
+  {
+    "kind": "function",
+    "name": "remapColors",
+    "file": "src/filter/remap_colors.dart"
+  },
+  {
+    "kind": "function",
+    "name": "scaleRgba",
+    "file": "src/filter/scale_rgba.dart"
+  },
+  {
+    "kind": "function",
+    "name": "separableConvolution",
+    "file": "src/filter/separable_convolution.dart"
+  },
+  {
+    "kind": "class",
+    "name": "SeparableKernel",
+    "file": "src/filter/separable_kernel.dart"
+  },
+  {
+    "kind": "function",
+    "name": "sepia",
+    "file": "src/filter/sepia.dart"
+  },
+  {
+    "kind": "function",
+    "name": "sketch",
+    "file": "src/filter/sketch.dart"
+  },
+  {
+    "kind": "function",
+    "name": "smooth",
+    "file": "src/filter/smooth.dart"
+  },
+  {
+    "kind": "function",
+    "name": "sobel",
+    "file": "src/filter/sobel.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "SolarizeMode",
+    "file": "src/filter/solarize.dart"
+  },
+  {
+    "kind": "function",
+    "name": "solarize",
+    "file": "src/filter/solarize.dart"
+  },
+  {
+    "kind": "function",
+    "name": "stretchDistortion",
+    "file": "src/filter/stretch_distortion.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_smoothStep",
+    "file": "src/filter/vignette.dart"
+  },
+  {
+    "kind": "function",
+    "name": "vignette",
+    "file": "src/filter/vignette.dart"
+  },
+  {
+    "kind": "function",
+    "name": "readFontZip",
+    "file": "src/font/bitmap_font.dart"
+  },
+  {
+    "kind": "function",
+    "name": "readFont",
+    "file": "src/font/bitmap_font.dart"
+  },
+  {
+    "kind": "class",
+    "name": "BitmapFont",
+    "file": "src/font/bitmap_font.dart"
+  },
+  {
+    "kind": "class",
+    "name": "BitmapFontCharacter",
+    "file": "src/font/bitmap_font.dart"
+  },
+  {
+    "kind": "class",
+    "name": "BmpDecoder",
+    "file": "src/formats/bmp_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "DibDecoder",
+    "file": "src/formats/bmp_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "BmpEncoder",
+    "file": "src/formats/bmp_encoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ExrImage",
+    "file": "src/formats/exr/exr_image.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ExrDecoder",
+    "file": "src/formats/exr_decoder.dart"
+  },
+  {
+    "kind": "function",
+    "name": "findDecoderForNamedImage",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "findEncoderForNamedImage",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "findFormatForData",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "createDecoderForFormat",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "findDecoderForData",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeImage",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeNamedImage",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeImageFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeNamedImage",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeImageFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeJpg",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeJpgFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeJpg",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeJpgFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeJpgExif",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "injectJpgExif",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodePng",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodePngFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodePng",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodePngFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodePnm",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodePnmFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeTga",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeTgaFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeTga",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeTgaFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeWebP",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeWebPFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeGif",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeGifFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeGif",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeGifFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeTiff",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeTiffFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeTiff",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeTiffFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodePsd",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodePsdFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeExr",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeExrFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeBmp",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeBmpFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeBmp",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeBmpFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeCur",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeCurFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeIco",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodeIcoFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeIco",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodeIcoFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodePvr",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "decodePvrFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodePvr",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "function",
+    "name": "encodePvrFile",
+    "file": "src/formats/formats.dart"
+  },
+  {
+    "kind": "class",
+    "name": "GifColorMap",
+    "file": "src/formats/gif/gif_color_map.dart"
+  },
+  {
+    "kind": "class",
+    "name": "GifInfo",
+    "file": "src/formats/gif/gif_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "GifDecoder",
+    "file": "src/formats/gif_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "GifEncoder",
+    "file": "src/formats/gif_encoder.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "IcoType",
+    "file": "src/formats/ico/ico_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IcoInfo",
+    "file": "src/formats/ico/ico_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IcoInfoImage",
+    "file": "src/formats/ico/ico_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IcoBmpInfo",
+    "file": "src/formats/ico/ico_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IcoDecoder",
+    "file": "src/formats/ico_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IcoEncoder",
+    "file": "src/formats/ico_encoder.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "ImageFormat",
+    "file": "src/formats/image_format.dart"
+  },
+  {
+    "kind": "class",
+    "name": "JpegAdobe",
+    "file": "src/formats/jpeg/jpeg_adobe.dart"
+  },
+  {
+    "kind": "class",
+    "name": "JpegComponent",
+    "file": "src/formats/jpeg/jpeg_component.dart"
+  },
+  {
+    "kind": "class",
+    "name": "JpegData",
+    "file": "src/formats/jpeg/jpeg_data.dart"
+  },
+  {
+    "kind": "class",
+    "name": "_JpegHuffman",
+    "file": "src/formats/jpeg/jpeg_data.dart"
+  },
+  {
+    "kind": "class",
+    "name": "JpegFrame",
+    "file": "src/formats/jpeg/jpeg_frame.dart"
+  },
+  {
+    "kind": "class",
+    "name": "JpegInfo",
+    "file": "src/formats/jpeg/jpeg_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "JpegJfif",
+    "file": "src/formats/jpeg/jpeg_jfif.dart"
+  },
+  {
+    "kind": "class",
+    "name": "JpegScan",
+    "file": "src/formats/jpeg/jpeg_scan.dart"
+  },
+  {
+    "kind": "class",
+    "name": "JpegDecoder",
+    "file": "src/formats/jpeg_decoder.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "JpegChroma",
+    "file": "src/formats/jpeg_encoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "JpegEncoder",
+    "file": "src/formats/jpeg_encoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PngDecoder",
+    "file": "src/formats/png_decoder.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "PngFilter",
+    "file": "src/formats/png_encoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PngEncoder",
+    "file": "src/formats/png_encoder.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "PnmFormat",
+    "file": "src/formats/pnm_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PnmInfo",
+    "file": "src/formats/pnm_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PnmDecoder",
+    "file": "src/formats/pnm_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdBevelEffect",
+    "file": "src/formats/psd/effect/psd_bevel_effect.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdDropShadowEffect",
+    "file": "src/formats/psd/effect/psd_drop_shadow_effect.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdEffect",
+    "file": "src/formats/psd/effect/psd_effect.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdInnerGlowEffect",
+    "file": "src/formats/psd/effect/psd_inner_glow_effect.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdInnerShadowEffect",
+    "file": "src/formats/psd/effect/psd_inner_shadow_effect.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdOuterGlowEffect",
+    "file": "src/formats/psd/effect/psd_outer_glow_effect.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdSolidFillEffect",
+    "file": "src/formats/psd/effect/psd_solid_fill_effect.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdLayerAdditionalData",
+    "file": "src/formats/psd/layer_data/psd_layer_additional_data.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdLayerSectionDivider",
+    "file": "src/formats/psd/layer_data/psd_layer_section_divider.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdBlendingRanges",
+    "file": "src/formats/psd/psd_blending_ranges.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdChannel",
+    "file": "src/formats/psd/psd_channel.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "PsdColorMode",
+    "file": "src/formats/psd/psd_image.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdImage",
+    "file": "src/formats/psd/psd_image.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdImageResource",
+    "file": "src/formats/psd/psd_image_resource.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdBlendMode",
+    "file": "src/formats/psd/psd_layer.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdFlag",
+    "file": "src/formats/psd/psd_layer.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdLayer",
+    "file": "src/formats/psd/psd_layer.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdLayerData",
+    "file": "src/formats/psd/psd_layer_data.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdMask",
+    "file": "src/formats/psd/psd_mask.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PsdDecoder",
+    "file": "src/formats/psd_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "Pvr2Info",
+    "file": "src/formats/pvr/pvr_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "Pvr3Info",
+    "file": "src/formats/pvr/pvr_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PvrAppleInfo",
+    "file": "src/formats/pvr/pvr_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PvrDecoder",
+    "file": "src/formats/pvr_decoder.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "PvrFormat",
+    "file": "src/formats/pvr_encoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PvrEncoder",
+    "file": "src/formats/pvr_encoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "TgaInfo",
+    "file": "src/formats/tga/tga_info.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "TgaImageType",
+    "file": "src/formats/tga/tga_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "TgaDecoder",
+    "file": "src/formats/tga_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "TgaEncoder",
+    "file": "src/formats/tga_encoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "TiffImage",
+    "file": "src/formats/tiff/tiff_image.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "TiffFormat",
+    "file": "src/formats/tiff/tiff_image.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "TiffPhotometricType",
+    "file": "src/formats/tiff/tiff_image.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "TiffImageType",
+    "file": "src/formats/tiff/tiff_image.dart"
+  },
+  {
+    "kind": "class",
+    "name": "TiffCompression",
+    "file": "src/formats/tiff/tiff_image.dart"
+  },
+  {
+    "kind": "class",
+    "name": "TiffInfo",
+    "file": "src/formats/tiff/tiff_info.dart"
+  },
+  {
+    "kind": "class",
+    "name": "TiffDecoder",
+    "file": "src/formats/tiff_decoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "TiffEncoder",
+    "file": "src/formats/tiff_encoder.dart"
+  },
+  {
+    "kind": "class",
+    "name": "WebPDecoder",
+    "file": "src/formats/webp_decoder.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "IccProfileCompression",
+    "file": "src/image/icc_profile.dart"
+  },
+  {
+    "kind": "class",
+    "name": "IccProfile",
+    "file": "src/image/icc_profile.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "FrameType",
+    "file": "src/image/image.dart"
+  },
+  {
+    "kind": "class",
+    "name": "Image",
+    "file": "src/image/image.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataFloat16",
+    "file": "src/image/image_data_float16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataFloat32",
+    "file": "src/image/image_data_float32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataFloat64",
+    "file": "src/image/image_data_float64.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataInt16",
+    "file": "src/image/image_data_int16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataInt32",
+    "file": "src/image/image_data_int32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataInt8",
+    "file": "src/image/image_data_int8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataUint1",
+    "file": "src/image/image_data_uint1.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataUint16",
+    "file": "src/image/image_data_uint16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataUint2",
+    "file": "src/image/image_data_uint2.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataUint32",
+    "file": "src/image/image_data_uint32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataUint4",
+    "file": "src/image/image_data_uint4.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageDataUint8",
+    "file": "src/image/image_data_uint8.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "Interpolation",
+    "file": "src/image/interpolation.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteFloat16",
+    "file": "src/image/palette_float16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteFloat32",
+    "file": "src/image/palette_float32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteFloat64",
+    "file": "src/image/palette_float64.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteInt16",
+    "file": "src/image/palette_int16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteInt32",
+    "file": "src/image/palette_int32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteInt8",
+    "file": "src/image/palette_int8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteUint16",
+    "file": "src/image/palette_uint16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteUint32",
+    "file": "src/image/palette_uint32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteUint8",
+    "file": "src/image/palette_uint8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PaletteUndefined",
+    "file": "src/image/palette_undefined.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelFloat16",
+    "file": "src/image/pixel_float16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelFloat32",
+    "file": "src/image/pixel_float32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelFloat64",
+    "file": "src/image/pixel_float64.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelInt16",
+    "file": "src/image/pixel_int16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelInt32",
+    "file": "src/image/pixel_int32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelInt8",
+    "file": "src/image/pixel_int8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelRangeIterator",
+    "file": "src/image/pixel_range_iterator.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelUint1",
+    "file": "src/image/pixel_uint1.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelUint16",
+    "file": "src/image/pixel_uint16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelUint2",
+    "file": "src/image/pixel_uint2.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelUint32",
+    "file": "src/image/pixel_uint32.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelUint4",
+    "file": "src/image/pixel_uint4.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelUint8",
+    "file": "src/image/pixel_uint8.dart"
+  },
+  {
+    "kind": "class",
+    "name": "PixelUndefined",
+    "file": "src/image/pixel_undefined.dart"
+  },
+  {
+    "kind": "function",
+    "name": "bakeOrientation",
+    "file": "src/transform/bake_orientation.dart"
+  },
+  {
+    "kind": "function",
+    "name": "copyCrop",
+    "file": "src/transform/copy_crop.dart"
+  },
+  {
+    "kind": "function",
+    "name": "copyCropCircle",
+    "file": "src/transform/copy_crop_circle.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "ExpandCanvasPosition",
+    "file": "src/transform/copy_expand_canvas.dart"
+  },
+  {
+    "kind": "function",
+    "name": "copyExpandCanvas",
+    "file": "src/transform/copy_expand_canvas.dart"
+  },
+  {
+    "kind": "function",
+    "name": "copyFlip",
+    "file": "src/transform/copy_flip.dart"
+  },
+  {
+    "kind": "function",
+    "name": "copyRectify",
+    "file": "src/transform/copy_rectify.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_linear",
+    "file": "src/transform/copy_resize.dart"
+  },
+  {
+    "kind": "function",
+    "name": "copyResize",
+    "file": "src/transform/copy_resize.dart"
+  },
+  {
+    "kind": "function",
+    "name": "copyResizeCropSquare",
+    "file": "src/transform/copy_resize_crop_square.dart"
+  },
+  {
+    "kind": "function",
+    "name": "copyRotate",
+    "file": "src/transform/copy_rotate.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_rotate90",
+    "file": "src/transform/copy_rotate.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_rotate180",
+    "file": "src/transform/copy_rotate.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_rotate270",
+    "file": "src/transform/copy_rotate.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "FlipDirection",
+    "file": "src/transform/flip.dart"
+  },
+  {
+    "kind": "function",
+    "name": "flip",
+    "file": "src/transform/flip.dart"
+  },
+  {
+    "kind": "function",
+    "name": "flipVertical",
+    "file": "src/transform/flip.dart"
+  },
+  {
+    "kind": "function",
+    "name": "flipHorizontal",
+    "file": "src/transform/flip.dart"
+  },
+  {
+    "kind": "function",
+    "name": "flipHorizontalVertical",
+    "file": "src/transform/flip.dart"
+  },
+  {
+    "kind": "function",
+    "name": "resize",
+    "file": "src/transform/resize.dart"
+  },
+  {
+    "kind": "class",
+    "name": "Trim",
+    "file": "src/transform/trim.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "TrimMode",
+    "file": "src/transform/trim.dart"
+  },
+  {
+    "kind": "function",
+    "name": "findTrim",
+    "file": "src/transform/trim.dart"
+  },
+  {
+    "kind": "function",
+    "name": "trim",
+    "file": "src/transform/trim.dart"
+  },
+  {
+    "kind": "class",
+    "name": "BinaryQuantizer",
+    "file": "src/util/binary_quantizer.dart"
+  },
+  {
+    "kind": "function",
+    "name": "clipLine",
+    "file": "src/util/clip_line.dart"
+  },
+  {
+    "kind": "function",
+    "name": "uint32ToRed",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "uint32ToGreen",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "uint32ToBlue",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "uint32ToAlpha",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "rgbaToUint32",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "_convertColor",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "convertColor",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "getLuminance",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "getLuminanceNormalized",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "getLuminanceRgb",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "hslToRgb",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "rgbToHsv",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "hsvToRgb",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "rgbToHsl",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "labToXyz",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "xyzToRgb",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "cmykToRgb",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "labToRgb",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "rgbToXyz",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "xyzToLab",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "function",
+    "name": "rgbToLab",
+    "file": "src/util/color_util.dart"
+  },
+  {
+    "kind": "class",
+    "name": "Float16",
+    "file": "src/util/float16.dart"
+  },
+  {
+    "kind": "class",
+    "name": "ImageException",
+    "file": "src/util/image_exception.dart"
+  },
+  {
+    "kind": "class",
+    "name": "InputBuffer",
+    "file": "src/util/input_buffer.dart"
+  },
+  {
+    "kind": "function",
+    "name": "minMax",
+    "file": "src/util/min_max.dart"
+  },
+  {
+    "kind": "class",
+    "name": "NeuralQuantizer",
+    "file": "src/util/neural_quantizer.dart"
+  },
+  {
+    "kind": "class",
+    "name": "OctreeQuantizer",
+    "file": "src/util/octree_quantizer.dart"
+  },
+  {
+    "kind": "class",
+    "name": "_OctreeNode",
+    "file": "src/util/octree_quantizer.dart"
+  },
+  {
+    "kind": "class",
+    "name": "_HeapNode",
+    "file": "src/util/octree_quantizer.dart"
+  },
+  {
+    "kind": "class",
+    "name": "OutputBuffer",
+    "file": "src/util/output_buffer.dart"
+  },
+  {
+    "kind": "class",
+    "name": "Point",
+    "file": "src/util/point.dart"
+  },
+  {
+    "kind": "enum",
+    "name": "QuantizerType",
+    "file": "src/util/quantizer.dart"
+  },
+  {
+    "kind": "function",
+    "name": "crand",
+    "file": "src/util/random.dart"
+  },
+  {
+    "kind": "function",
+    "name": "grand",
+    "file": "src/util/random.dart"
+  },
+  {
+    "kind": "function",
+    "name": "prand",
+    "file": "src/util/random.dart"
+  }
+]
