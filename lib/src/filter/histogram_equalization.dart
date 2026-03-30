@@ -192,7 +192,7 @@ Image histogramStretch(Image src,
           (l - lowPercentileBin) * outputDynamicRange / inputDynamicRange +
               outputRangeMin;
       Hmap[l] =
-          max(outputRangeMin, min(newIntensityLv.round(), outputDynamicRange));
+          max(outputRangeMin, min(newIntensityLv.round(), outputRangeMax));
     }
 
     // produce output

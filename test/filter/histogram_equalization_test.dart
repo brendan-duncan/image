@@ -331,6 +331,7 @@ void main() {
       for (int l = 221; l < 256; ++l) {
         expect(H[l], equals(0));
       }
+      expect(H[220], greaterThan(0));
 
       File('$testOutputPath/filter/histogramStretch_minmax.jpg')
         ..createSync(recursive: true)
