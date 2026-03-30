@@ -68,6 +68,7 @@ Image histogramEqualization(Image src,
       H[l.round()]++;
       validPixelCounts++;
     }
+    if (validPixelCounts == 0) continue;
 
     final double numPixelPerBin = validPixelCounts / numOutputBin;
     final List<num> Hmap = List<num>.generate(
@@ -162,6 +163,7 @@ Image histogramStretch(Image src,
       H[l.round()]++;
       validPixelCounts++;
     }
+    if (validPixelCounts == 0) continue;
 
     // Find the high & low percentile
     int lowPercentileBin = 0;
@@ -211,7 +213,13 @@ void _applyHistogramTransform(Image frame, List<num> Hmap,
       continue;
     }
     if (mode == HistogramEqualizeMode.grayscale) {
-      final newl = Hmap[p.luminance.round()];
+      final oriLuminance = p.luminance;
+      final oriLuminanceInt = oriLuminance.round();
+      final residual = oriLuminance - oriLuminanceInt;
+
+      final newl = (Hmap[oriLuminanceInt] * (1 - residual) +
+              Hmap[min(oriLuminanceInt + 1, Hmap.length - 1)] * residual)
+          .round();
 
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       if (msk == null) {
@@ -228,7 +236,13 @@ void _applyHistogramTransform(Image frame, List<num> Hmap,
     } else {
       // color mode
       final hsl = rgbToHsl(p.r, p.g, p.b);
-      final newl = Hmap[(hsl[2] * maxChannelValue).round()];
+      final oriLuminance = hsl[2] * maxChannelValue;
+      final oriLuminanceInt = oriLuminance.round();
+      final residual = oriLuminance - oriLuminanceInt;
+      final newl = (Hmap[oriLuminanceInt] * (1 - residual) +
+              Hmap[min(oriLuminanceInt + 1, Hmap.length - 1)] * residual)
+          .round();
+
       final List<int> newRGB = [0, 0, 0];
       hslToRgb(hsl[0], hsl[1], newl / maxChannelValue, newRGB);
 
