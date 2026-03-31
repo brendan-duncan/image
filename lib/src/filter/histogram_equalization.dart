@@ -213,12 +213,12 @@ void _applyHistogramTransform(Image frame, List<num> Hmap,
       continue;
     }
     if (mode == HistogramEqualizeMode.grayscale) {
-      final oriLuminance = p.luminance;
-      final oriLuminanceInt = oriLuminance.round();
-      final residual = oriLuminance - oriLuminanceInt;
+      final oriLuminance = p.luminance.clamp(0, maxChannelValue);
+      final baseIndex = min(oriLuminance.floor(), Hmap.length - 1);
+      final frac = oriLuminance - baseIndex;
 
-      final newl = (Hmap[oriLuminanceInt] * (1 - residual) +
-              Hmap[min(oriLuminanceInt + 1, Hmap.length - 1)] * residual)
+      final newl = (Hmap[baseIndex] * (1 - frac) +
+              Hmap[min(baseIndex + 1, Hmap.length - 1)] * frac)
           .round();
 
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
@@ -236,11 +236,11 @@ void _applyHistogramTransform(Image frame, List<num> Hmap,
     } else {
       // color mode
       final hsl = rgbToHsl(p.r, p.g, p.b);
-      final oriLuminance = hsl[2] * maxChannelValue;
-      final oriLuminanceInt = oriLuminance.round();
-      final residual = oriLuminance - oriLuminanceInt;
-      final newl = (Hmap[oriLuminanceInt] * (1 - residual) +
-              Hmap[min(oriLuminanceInt + 1, Hmap.length - 1)] * residual)
+      final oriLuminance = hsl[2].clamp(0, 1) * maxChannelValue;
+      final baseIndex = min(oriLuminance.floor(), Hmap.length - 1);
+      final frac = oriLuminance - baseIndex;
+      final newl = (Hmap[baseIndex] * (1 - frac) +
+              Hmap[min(baseIndex + 1, Hmap.length - 1)] * frac)
           .round();
 
       final List<int> newRGB = [0, 0, 0];
