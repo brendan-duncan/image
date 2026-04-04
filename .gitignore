@@ -6,3 +6,8 @@ pubspec.lock
 .DS_Store
 _out/
 build
+*.dart.js
+*.map
+*.deps
+*.mjs
+*.support.js
