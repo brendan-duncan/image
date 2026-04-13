@@ -9,11 +9,11 @@ class ApiSymbol {
   final String? parent;
 
   Map<String, Object?> toJson() => {
-        'kind': kind,
-        'name': name,
-        'file': file,
-        if (parent != null) 'parent': parent,
-      };
+    'kind': kind,
+    'name': name,
+    'file': file,
+    if (parent != null) 'parent': parent,
+  };
 }
 
 List<String> readExports(String root) {
@@ -73,8 +73,9 @@ List<ApiSymbol> parseSymbols(String root, String relPath) {
     }
 
     // top-level function: returnType name(
-    final funcMatch = RegExp(r'^([A-Za-z0-9_<>,\[\]\? ]+)\s+(\w+)\s*\(')
-        .firstMatch(trimmed);
+    final funcMatch = RegExp(
+      r'^([A-Za-z0-9_<>,\[\]\? ]+)\s+(\w+)\s*\(',
+    ).firstMatch(trimmed);
     if (funcMatch != null) {
       final name = funcMatch.group(2)!;
       if (name != 'operator') {
@@ -96,10 +97,10 @@ List<ApiSymbol> collectApi(String root) {
 }
 
 void writeManifest(String root, List<ApiSymbol> symbols) {
-  final out = File('$root/benchmark/api_manifest.json');
-  out.createSync(recursive: true);
   final json = symbols.map((s) => s.toJson()).toList();
-  out.writeAsStringSync(_prettyJson(json));
+  File('$root/benchmark/api_manifest.json')
+    ..createSync(recursive: true)
+    ..writeAsStringSync(_prettyJson(json));
 }
 
 String _prettyJson(Object value) {
@@ -113,7 +114,7 @@ void _writeJson(StringBuffer sb, Object? value, int indent) {
   if (value is List) {
     sb.writeln('[');
     for (var i = 0; i < value.length; i++) {
-      sb.write('${pad}  ');
+      sb.write('$pad  ');
       _writeJson(sb, value[i], indent + 1);
       if (i != value.length - 1) sb.write(',');
       sb.writeln();
@@ -124,7 +125,7 @@ void _writeJson(StringBuffer sb, Object? value, int indent) {
     final keys = value.keys.toList();
     for (var i = 0; i < keys.length; i++) {
       final k = keys[i];
-      sb.write('${pad}  "${_escape(k.toString())}": ');
+      sb.write('$pad  "${_escape(k.toString())}": ');
       _writeJson(sb, value[k], indent + 1);
       if (i != keys.length - 1) sb.write(',');
       sb.writeln();

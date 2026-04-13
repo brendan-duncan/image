@@ -4,7 +4,8 @@ import '../color/channel_order.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
 import 'transform_backend_stub.dart'
-    if (dart.library.ffi) 'transform_backend_ffi.dart' as backend;
+    if (dart.library.ffi) 'transform_backend_ffi.dart'
+    as backend;
 
 enum ImageBackendMode { auto, nativeOnly, dartOnly }
 
@@ -12,9 +13,7 @@ ImageBackendMode _imageBackendMode = ImageBackendMode.auto;
 
 ImageBackendMode get imageBackendMode => _imageBackendMode;
 
-set imageBackendMode(ImageBackendMode mode) {
-  _imageBackendMode = mode;
-}
+set imageBackendMode(ImageBackendMode mode) => _imageBackendMode = mode;
 
 bool get nativeImageBackendAvailable => backend.nativeImageBackendAvailable;
 
@@ -67,23 +66,21 @@ Image createNativeImageFromRgba({
   required Uint8List bytes,
   required int width,
   required int height,
-}) {
-  return Image.fromBytes(
-    width: width,
-    height: height,
-    bytes: bytes.buffer,
-    bytesOffset: bytes.offsetInBytes,
-    numChannels: 4,
-    order: ChannelOrder.rgba,
-    exif: template.hasExif ? template.exif.clone() : null,
-    iccp: template.iccProfile?.clone(),
-    textData: template.textData != null
-        ? Map<String, String>.from(template.textData!)
-        : null,
-    loopCount: template.loopCount,
-    frameType: template.frameType,
-    backgroundColor: template.backgroundColor?.clone(),
-    frameDuration: template.frameDuration,
-    frameIndex: template.frameIndex,
-  );
-}
+}) => Image.fromBytes(
+  width: width,
+  height: height,
+  bytes: bytes.buffer,
+  bytesOffset: bytes.offsetInBytes,
+  numChannels: 4,
+  order: ChannelOrder.rgba,
+  exif: template.hasExif ? template.exif.clone() : null,
+  iccp: template.iccProfile?.clone(),
+  textData: template.textData != null
+      ? Map<String, String>.from(template.textData!)
+      : null,
+  loopCount: template.loopCount,
+  frameType: template.frameType,
+  backgroundColor: template.backgroundColor?.clone(),
+  frameDuration: template.frameDuration,
+  frameIndex: template.frameIndex,
+);

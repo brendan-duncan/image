@@ -11,7 +11,8 @@ Future<void> main(List<String> args) async {
 
     final packageRoot = input.packageRoot;
     final targetOs = input.config.code.targetOS.name.toLowerCase();
-    final architecture = input.config.code.targetArchitecture.name.toLowerCase();
+    final architecture = input.config.code.targetArchitecture.name
+        .toLowerCase();
     final iosSdkType = targetOs == 'ios'
         ? input.config.code.iOS.targetSdk.type.toLowerCase()
         : null;
@@ -52,27 +53,24 @@ Uri? _prebuiltAssetForTarget(
   required String? iosSdkType,
 }) {
   final relativePath = switch ((targetOs, architecture)) {
-    ('android', 'arm64') => 'native/prebuilt/android/arm64-v8a/libimage_native.so',
-    ('android', 'arm') => 'native/prebuilt/android/armeabi-v7a/libimage_native.so',
+    ('android', 'arm64') =>
+      'native/prebuilt/android/arm64-v8a/libimage_native.so',
+    ('android', 'arm') =>
+      'native/prebuilt/android/armeabi-v7a/libimage_native.so',
     ('android', 'x64') => 'native/prebuilt/android/x86_64/libimage_native.so',
     ('ios', _) => _iosPrebuiltAssetPath(
-        architecture: architecture,
-        sdkType: iosSdkType,
-      ),
+      architecture: architecture,
+      sdkType: iosSdkType,
+    ),
     _ => null,
   };
-  if (relativePath == null) {
-    return null;
-  }
-  return packageRoot.resolve(relativePath);
+  return relativePath == null ? null : packageRoot.resolve(relativePath);
 }
 
-LinkMode _linkModeForTarget(String targetOs) {
-  return switch (targetOs) {
-    'android' || 'ios' => DynamicLoadingBundled(),
-    _ => throw UnsupportedError('Unsupported native asset target OS: $targetOs'),
-  };
-}
+LinkMode _linkModeForTarget(String targetOs) => switch (targetOs) {
+  'android' || 'ios' => DynamicLoadingBundled(),
+  _ => throw UnsupportedError('Unsupported native asset target OS: $targetOs'),
+};
 
 String _iosPrebuiltAssetPath({
   required String architecture,
@@ -80,14 +78,15 @@ String _iosPrebuiltAssetPath({
 }) {
   final sdk = sdkType ?? 'iphoneos';
   final slice = switch ((sdk, architecture)) {
-    ('iphoneos', 'arm64') =>
-      'iphoneos/libimage_native.dylib',
+    ('iphoneos', 'arm64') => 'iphoneos/libimage_native.dylib',
     ('iphonesimulator', 'arm64') =>
       'iphonesimulator-arm64/libimage_native.dylib',
     ('iphonesimulator', 'x64') =>
       'iphonesimulator-x86_64/libimage_native.dylib',
     _ => throw UnsupportedError(
-        'Unsupported iOS XCFramework target: sdk=$sdk architecture=$architecture'),
+      'Unsupported iOS XCFramework target: '
+      'sdk=$sdk architecture=$architecture',
+    ),
   };
   return 'native/prebuilt/ios/$slice';
 }
@@ -113,7 +112,9 @@ Future<Uri> _copyBundledAsset({
     architecture,
     if (iosSdkType != null) iosSdkType,
   ].join('-');
-  final destinationDir = Directory.fromUri(outputDir.resolve('$variantDirName/'));
+  final destinationDir = Directory.fromUri(
+    outputDir.resolve('$variantDirName/'),
+  );
   await destinationDir.create(recursive: true);
   final destination = outputDir.resolve('$variantDirName/$assetName');
   await sourceFile.copy(destination.toFilePath());

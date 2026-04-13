@@ -3,8 +3,16 @@ import 'collect_api.dart';
 import 'registry.dart';
 
 class Result {
-  Result(this.name, this.status,
-      {this.avgMs, this.runs, this.note, this.kind, this.file, this.resolution});
+  Result(
+    this.name,
+    this.status, {
+    this.avgMs,
+    this.runs,
+    this.note,
+    this.kind,
+    this.file,
+    this.resolution,
+  });
 
   final String name;
   final String status; // ok | skipped
@@ -16,15 +24,15 @@ class Result {
   final String? resolution;
 
   Map<String, Object?> toJson() => {
-        'name': name,
-        'status': status,
-        if (avgMs != null) 'avg_ms': avgMs,
-        if (runs != null) 'runs': runs,
-        if (note != null) 'note': note,
-        if (kind != null) 'kind': kind,
-        if (file != null) 'file': file,
-        if (resolution != null) 'resolution': resolution,
-      };
+    'name': name,
+    'status': status,
+    if (avgMs != null) 'avg_ms': avgMs,
+    if (runs != null) 'runs': runs,
+    if (note != null) 'note': note,
+    if (kind != null) 'kind': kind,
+    if (file != null) 'file': file,
+    if (resolution != null) 'resolution': resolution,
+  };
 }
 
 void main(List<String> args) {
@@ -48,15 +56,29 @@ void main(List<String> args) {
 
   for (final sym in symbols) {
     if (sym.kind != 'function') {
-      results.add(Result(sym.name, 'skipped',
-          note: 'non-function symbol', kind: sym.kind, file: sym.file));
+      results.add(
+        Result(
+          sym.name,
+          'skipped',
+          note: 'non-function symbol',
+          kind: sym.kind,
+          file: sym.file,
+        ),
+      );
       continue;
     }
 
     final list = casesByName[sym.name];
     if (list == null || list.isEmpty) {
-      results.add(Result(sym.name, 'skipped',
-          note: 'no benchmark case', kind: sym.kind, file: sym.file));
+      results.add(
+        Result(
+          sym.name,
+          'skipped',
+          note: 'no benchmark case',
+          kind: sym.kind,
+          file: sym.file,
+        ),
+      );
       continue;
     }
 
@@ -64,20 +86,26 @@ void main(List<String> args) {
       done++;
       final res = c.resolution ?? '';
       final suffix = res.isEmpty ? '' : ' [$res]';
-      print('Progress $done/$totalCases: ${c.name}$suffix');
+      stdout.writeln('Progress $done/$totalCases: ${c.name}$suffix');
       final avg = runCase(c, 100);
-      results.add(Result(c.name, 'ok',
+      results.add(
+        Result(
+          c.name,
+          'ok',
           avgMs: avg,
           runs: 100,
           note: c.note,
           kind: sym.kind,
           file: sym.file,
-          resolution: c.resolution));
+          resolution: c.resolution,
+        ),
+      );
     }
   }
 
-  final out = File('$root/benchmark/results.json');
-  out.writeAsStringSync(_prettyJson(results.map((r) => r.toJson()).toList()));
+  File(
+    '$root/benchmark/results.json',
+  ).writeAsStringSync(_prettyJson(results.map((r) => r.toJson()).toList()));
 }
 
 double runCase(BenchmarkCase c, int runs) {
@@ -105,7 +133,7 @@ void _writeJson(StringBuffer sb, Object? value, int indent) {
   if (value is List) {
     sb.writeln('[');
     for (var i = 0; i < value.length; i++) {
-      sb.write('${pad}  ');
+      sb.write('$pad  ');
       _writeJson(sb, value[i], indent + 1);
       if (i != value.length - 1) sb.write(',');
       sb.writeln();
@@ -116,7 +144,7 @@ void _writeJson(StringBuffer sb, Object? value, int indent) {
     final keys = value.keys.toList();
     for (var i = 0; i < keys.length; i++) {
       final k = keys[i];
-      sb.write('${pad}  "${_escape(k.toString())}": ');
+      sb.write('$pad  "${_escape(k.toString())}": ');
       _writeJson(sb, value[k], indent + 1);
       if (i != keys.length - 1) sb.write(',');
       sb.writeln();

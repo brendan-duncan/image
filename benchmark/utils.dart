@@ -7,13 +7,12 @@ List<File> listBuckPngFiles() {
   if (!dir.existsSync()) {
     return const [];
   }
-  final files = dir
+  return dir
       .listSync()
       .whereType<File>()
       .where((f) => f.path.endsWith('.png') && f.path.contains('buck_'))
-      .toList();
-  files.sort((a, b) => a.path.compareTo(b.path));
-  return files;
+      .toList()
+    ..sort((a, b) => a.path.compareTo(b.path));
 }
 
 Image loadSampleImage() {
@@ -25,11 +24,8 @@ Image loadSampleImage() {
   return img;
 }
 
-Uint8List loadBytes(String relPath) {
-  return File(relPath).readAsBytesSync();
-}
+Uint8List loadBytes(String relPath) => File(relPath).readAsBytesSync();
 
-Image makeSolidImage(int w, int h, {int numChannels = 4, Color? color}) {
-  final c = color ?? ColorRgba8(128, 64, 32, 255);
-  return Image(width: w, height: h, numChannels: numChannels)..clear(c);
-}
+Image makeSolidImage(int w, int h, {int numChannels = 4, Color? color}) =>
+    Image(width: w, height: h, numChannels: numChannels)
+      ..clear(color ?? ColorRgba8(128, 64, 32, 255));

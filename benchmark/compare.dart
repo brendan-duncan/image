@@ -3,7 +3,9 @@ import 'package:image/image.dart';
 
 void main(List<String> args) {
   if (args.length < 2) {
-    stderr.writeln('Usage: dart run benchmark/compare.dart <a.png> <b.png> [tolerance]');
+    stderr.writeln(
+      'Usage: dart run benchmark/compare.dart <a.png> <b.png> [tolerance]',
+    );
     exit(2);
   }
 
@@ -25,7 +27,9 @@ void main(List<String> args) {
 }
 
 bool compareImages(Image a, Image b, int tol) {
-  if (a.width != b.width || a.height != b.height || a.numChannels != b.numChannels) {
+  if (a.width != b.width ||
+      a.height != b.height ||
+      a.numChannels != b.numChannels) {
     stderr.writeln('Image shape mismatch');
     return false;
   }
@@ -34,16 +38,18 @@ bool compareImages(Image a, Image b, int tol) {
     for (var x = 0; x < a.width; x++) {
       final pa = a.getPixel(x, y);
       final pb = b.getPixel(x, y);
-      if ((pa.r - pb.r).abs() > tol ||
+      final channelsDiffer =
+          (pa.r - pb.r).abs() > tol ||
           (pa.g - pb.g).abs() > tol ||
           (pa.b - pb.b).abs() > tol ||
-          (pa.a - pb.a).abs() > tol) {
+          (pa.a - pb.a).abs() > tol;
+      if (channelsDiffer) {
         stderr.writeln('Mismatch at $x,$y');
         return false;
       }
     }
   }
 
-  print('Images match (tolerance=$tol)');
+  stdout.writeln('Images match (tolerance=$tol)');
   return true;
 }
