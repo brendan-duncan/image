@@ -19,7 +19,11 @@ enum PngFilter { none, sub, up, average, paeth }
 class PngEncoder extends Encoder {
   Quantizer? _globalQuantizer;
 
-  PngEncoder({this.filter = PngFilter.paeth, this.level, this.pixelDimensions});
+  PngEncoder(
+      {this.filter = PngFilter.paeth,
+      this.level,
+      this.pixelDimensions,
+      this.cicpData});
 
   int _numChannels(Image image) => image.hasPalette ? 1 : image.numChannels;
 
@@ -41,6 +45,10 @@ class PngEncoder extends Encoder {
 
       if (image.iccProfile != null) {
         _writeICCPChunk(output, image.iccProfile!);
+      }
+
+      if (cicpData != null) {
+        _writeCicpChunk(output!, cicpData!);
       }
 
       if (image.hasPalette) {
@@ -244,6 +252,15 @@ class PngEncoder extends Encoder {
     }
   }
 
+  void _writeCicpChunk(OutputBuffer out, PngCicpData cicp) {
+    final chunk = OutputBuffer(bigEndian: true)
+      ..writeByte(cicp.colourPrimaries)
+      ..writeByte(cicp.transferCharacteristics)
+      ..writeByte(cicp.matrixCoefficients)
+      ..writeByte(cicp.videoFullRangeFlag);
+    _writeChunk(out, 'cICP', chunk.getBytes());
+  }
+
   void _writeICCPChunk(OutputBuffer? out, IccProfile iccp) {
     final chunk = OutputBuffer(bigEndian: true)
 
@@ -419,4 +436,5 @@ class PngEncoder extends Encoder {
   OutputBuffer? output;
   Map<String, String>? textData;
   PngPhysicalPixelDimensions? pixelDimensions;
+  PngCicpData? cicpData;
 }

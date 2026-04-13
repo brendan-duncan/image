@@ -133,6 +133,13 @@ class WebPEncoder extends Encoder {
         for (var ci = candidates.length - 1; ci >= 0; ci--) {
           final c = candidates[ci];
           final dist = j - c;
+
+          // VP8L spec limits max distance to 1048576.
+          // The first 120 values are reserved, so the actual
+          // maximum distance is 1048576 - 120 offset = 1048456
+          // https://developers.google.com/speed/webp/docs/webp_lossless_bitstream_specification#522_lz77_backward_reference
+          if (dist > 1048456) break;
+
           // Extend the match forward.
           var len = 1;
           while (len < maxMatchLen &&

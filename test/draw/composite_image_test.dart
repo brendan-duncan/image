@@ -18,6 +18,20 @@ void main() {
         ..writeAsBytesSync(encodePng(bg));
     });
 
+    test('compositeImage large foreground', () {
+      final i0 = Image(width: 256, height: 256);
+      final i1 = Image(width: 512, height: 512, numChannels: 4);
+      i0.clear(ColorRgba8(255, 0, 0, 255));
+      for (final p in i1) {
+        p
+          ..r = p.x
+          ..g = p.y
+          ..a = p.y;
+      }
+
+      compositeImage(i0, i1, dstX: 50, dstY: 50, blend: BlendMode.direct);
+    });
+
     test('compositeImage', () async {
       final i0 = Image(width: 256, height: 256);
       final i1 = Image(width: 256, height: 256, numChannels: 4);

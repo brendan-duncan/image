@@ -68,6 +68,7 @@ Image histogramEqualization(Image src,
       H[l.round()]++;
       validPixelCounts++;
     }
+    if (validPixelCounts == 0) continue;
 
     final double numPixelPerBin = validPixelCounts / numOutputBin;
     final List<num> Hmap = List<num>.generate(
@@ -162,6 +163,7 @@ Image histogramStretch(Image src,
       H[l.round()]++;
       validPixelCounts++;
     }
+    if (validPixelCounts == 0) continue;
 
     // Find the high & low percentile
     int lowPercentileBin = 0;
@@ -192,7 +194,7 @@ Image histogramStretch(Image src,
           (l - lowPercentileBin) * outputDynamicRange / inputDynamicRange +
               outputRangeMin;
       Hmap[l] =
-          max(outputRangeMin, min(newIntensityLv.round(), outputDynamicRange));
+          max(outputRangeMin, min(newIntensityLv.round(), outputRangeMax));
     }
 
     // produce output
@@ -211,7 +213,13 @@ void _applyHistogramTransform(Image frame, List<num> Hmap,
       continue;
     }
     if (mode == HistogramEqualizeMode.grayscale) {
-      final newl = Hmap[p.luminance.round()];
+      final oriLuminance = p.luminance.clamp(0, maxChannelValue);
+      final baseIndex = min(oriLuminance.floor(), Hmap.length - 1);
+      final frac = oriLuminance - baseIndex;
+
+      final newl = (Hmap[baseIndex] * (1 - frac) +
+              Hmap[min(baseIndex + 1, Hmap.length - 1)] * frac)
+          .round();
 
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
       if (msk == null) {
@@ -228,7 +236,13 @@ void _applyHistogramTransform(Image frame, List<num> Hmap,
     } else {
       // color mode
       final hsl = rgbToHsl(p.r, p.g, p.b);
-      final newl = Hmap[(hsl[2] * maxChannelValue).round()];
+      final oriLuminance = hsl[2].clamp(0, 1) * maxChannelValue;
+      final baseIndex = min(oriLuminance.floor(), Hmap.length - 1);
+      final frac = oriLuminance - baseIndex;
+      final newl = (Hmap[baseIndex] * (1 - frac) +
+              Hmap[min(baseIndex + 1, Hmap.length - 1)] * frac)
+          .round();
+
       final List<int> newRGB = [0, 0, 0];
       hslToRgb(hsl[0], hsl[1], newl / maxChannelValue, newRGB);
 

@@ -260,6 +260,22 @@ class PngDecoder extends Decoder {
           _info.iccpData = profile.toUint8List();
           _input.skip(4); // CRC
           break;
+        case 'cICP':
+          // Coding-independent code points (PNG spec 1.3 / ITU-T H.273).
+          // The chunk is exactly 4 bytes: colour primaries, transfer
+          // characteristics, matrix coefficients, video full range flag.
+          if (chunkSize == 4) {
+            _info.cicpData = PngCicpData(
+              colourPrimaries: _input.readByte(),
+              transferCharacteristics: _input.readByte(),
+              matrixCoefficients: _input.readByte(),
+              videoFullRangeFlag: _input.readByte(),
+            );
+          } else {
+            _input.skip(chunkSize);
+          }
+          _input.skip(4); // CRC
+          break;
         default:
           //print('Skipping $chunkType');
           _input.skip(chunkSize);

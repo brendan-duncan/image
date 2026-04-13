@@ -87,17 +87,25 @@ void _directComposite(
     Image? mask,
     Channel maskChannel) {
   Pixel? p;
+  final dw = dst.width;
+  final dh = dst.height;
   if (mask != null) {
     for (var y = 0; y < dstH; ++y) {
       for (var x = 0; x < dstW; ++x) {
+        final dx = dstX + x;
+        final dy = dstY + y;
+        if (dx >= dw || dy >= dh) {
+          continue;
+        }
+
         final sx = xCache[x];
         final sy = yCache[y];
         p = src.getPixel(sx, sy, p);
         final m = mask.getPixel(sx, sy).getChannelNormalized(maskChannel);
         if (m == 1) {
-          dst.setPixel(dstX + x, dstY + y, p);
+          dst.setPixel(dx, dy, p);
         } else {
-          final dp = dst.getPixel(dstX + x, dstY + y);
+          final dp = dst.getPixel(dx, dy);
           dp
             ..r = mix(dp.r, p.r, m)
             ..g = mix(dp.g, p.g, m)
@@ -109,8 +117,13 @@ void _directComposite(
   } else {
     for (var y = 0; y < dstH; ++y) {
       for (var x = 0; x < dstW; ++x) {
+        final dx = dstX + x;
+        final dy = dstY + y;
+        if (dx >= dw || dy >= dh) {
+          continue;
+        }
         p = src.getPixel(xCache[x], yCache[y], p);
-        dst.setPixel(dstX + x, dstY + y, p);
+        dst.setPixel(dx, dy, p);
       }
     }
   }
