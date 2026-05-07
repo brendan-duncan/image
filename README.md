@@ -11,6 +11,14 @@ in a variety of image file [formats](https://github.com/brendan-duncan/image/blo
 The library can be used with both dart:io and dart:html, for command-line, Flutter, and
 web applications.
 
+## Native Acceleration
+
+The package includes an optional Rust-backed FFI path for selected transform
+operations on supported mobile platforms. Package consumers are expected to use
+precompiled native binaries shipped with the package; a local Rust toolchain is
+not required for normal `pub add image` usage. iOS prebuilts are distributed as
+an XCFramework so device and simulator slices can be shipped together.
+
 NOTE: 4.0 is a major revision from the previous version of the library.
 
 ## [Documentation](https://github.com/brendan-duncan/image/blob/main/doc/README.md)

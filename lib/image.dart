@@ -220,6 +220,7 @@ export 'src/image/pixel_uint32.dart';
 export 'src/image/pixel_uint4.dart';
 export 'src/image/pixel_uint8.dart';
 export 'src/image/pixel_undefined.dart';
+export 'src/native/transform_backend.dart';
 export 'src/transform/bake_orientation.dart';
 export 'src/transform/copy_crop.dart';
 export 'src/transform/copy_crop_circle.dart';

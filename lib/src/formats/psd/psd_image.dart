@@ -20,7 +20,7 @@ enum PsdColorMode {
   cmyk,
   multiChannel,
   duoTone,
-  lab
+  lab,
 }
 
 class PsdImage implements DecodeInfo {
@@ -62,7 +62,8 @@ class PsdImage implements DecodeInfo {
     }
 
     var len = _input!.readUint32();
-    /*_colorData =*/ _input!.readBytes(len);
+    /*_colorData =*/
+    _input!.readBytes(len);
 
     len = _input!.readUint32();
     _imageResourceData = _input!.readBytes(len);
@@ -166,8 +167,19 @@ class PsdImage implements DecodeInfo {
     return mergedImage!;
   }
 
-  void _blend(int ar, int ag, int ab, int aa, int br, int bg, int bb, int ba,
-      int? blendMode, double opacity, Pixel p) {
+  void _blend(
+    int ar,
+    int ag,
+    int ab,
+    int aa,
+    int br,
+    int bg,
+    int bb,
+    int ba,
+    int? blendMode,
+    double opacity,
+    Pixel p,
+  ) {
     var r = br;
     var g = bg;
     var b = bb;
@@ -437,8 +449,11 @@ class PsdImage implements DecodeInfo {
       }
 
       if (blockSignature == resourceBlockSignature) {
-        imageResources[blockId] =
-            PsdImageResource(blockId, blockName, blockData);
+        imageResources[blockId] = PsdImageResource(
+          blockId,
+          blockName,
+          blockData,
+        );
       }
     }
   }
@@ -477,7 +492,8 @@ class PsdImage implements DecodeInfo {
     len = _layerAndMaskData!.readUint32();
     final maskData = _layerAndMaskData!.readBytes(len);
     if (len > 0) {
-      /*int colorSpace =*/ maskData
+      /*int colorSpace =*/
+      maskData
         ..readUint16()
         /*int rc =*/
         ..readUint16()
@@ -509,22 +525,42 @@ class PsdImage implements DecodeInfo {
 
     mergeImageChannels = [];
     for (var i = 0; i < channels; ++i) {
-      mergeImageChannels.add(PsdChannel.read(_imageData!, i == 3 ? -1 : i,
-          width, height, depth, compression, lineLengths, i));
+      mergeImageChannels.add(
+        PsdChannel.read(
+          _imageData!,
+          i == 3 ? -1 : i,
+          width,
+          height,
+          depth,
+          compression,
+          lineLengths,
+          i,
+        ),
+      );
     }
 
     mergedImage = createImageFromChannels(
-        colorMode, depth, width, height, mergeImageChannels);
+      colorMode,
+      depth,
+      width,
+      height,
+      mergeImageChannels,
+    );
   }
 
   static int _ch(List<int>? data, int si, int ns) => data == null
       ? 0
       : ns == 1
-          ? data[si]
-          : ((data[si] << 8) | data[si + 1]) >> 8;
+      ? data[si]
+      : ((data[si] << 8) | data[si + 1]) >> 8;
 
-  static Image createImageFromChannels(PsdColorMode? colorMode, int? bitDepth,
-      int width, int height, List<PsdChannel> channelList) {
+  static Image createImageFromChannels(
+    PsdColorMode? colorMode,
+    int? bitDepth,
+    int width,
+    int height,
+    List<PsdChannel> channelList,
+  ) {
     final channels = <int, PsdChannel>{};
     for (var ch in channelList) {
       channels[ch.id] = ch;
@@ -534,11 +570,14 @@ class PsdImage implements DecodeInfo {
     final ns = (bitDepth == 8)
         ? 1
         : (bitDepth == 16)
-            ? 2
-            : -1;
+        ? 2
+        : -1;
 
-    final output =
-        Image(width: width, height: height, numChannels: numChannels);
+    final output = Image(
+      width: width,
+      height: height,
+      numChannels: numChannels,
+    );
 
     if (ns == -1) {
       throw ImageException('PSD: unsupported bit depth: $bitDepth');
