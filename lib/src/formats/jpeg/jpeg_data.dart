@@ -393,7 +393,7 @@ class JpegData {
       // Comment
       try {
         comment = appData.readStringUtf8();
-      } catch (e, _) {
+      } catch (_) {
         // readString without 0x00 terminator causes exception. Technically
         // bad data, but no reason to abort the rest of the image decoding.
       }
