@@ -288,17 +288,17 @@ class BitmapFont {
       switch (tk[0]) {
         case 'info':
           final attrs = _parseParameters(tk);
-          final info = XmlElement(XmlName('info'), attrs, []);
+          final info = XmlElement(const XmlName.parts('info'), attrs, []);
           children.add(info);
           break;
         case 'common':
           final attrs = _parseParameters(tk);
-          final node = XmlElement(XmlName('common'), attrs, []);
+          final node = XmlElement(const XmlName.parts('common'), attrs, []);
           children.add(node);
           break;
         case 'page':
           final attrs = _parseParameters(tk);
-          final page = XmlElement(XmlName('page'), attrs, []);
+          final page = XmlElement(const XmlName.parts('page'), attrs, []);
           pageList.add(page);
           break;
         case 'chars':
@@ -306,7 +306,7 @@ class BitmapFont {
           break;
         case 'char':
           final attrs = _parseParameters(tk);
-          final node = XmlElement(XmlName('char'), attrs, []);
+          final node = XmlElement(const XmlName.parts('char'), attrs, []);
           charList.add(node);
           break;
         case 'kernings':
@@ -314,28 +314,33 @@ class BitmapFont {
           break;
         case 'kerning':
           final attrs = _parseParameters(tk);
-          final node = XmlElement(XmlName('kerning'), attrs, []);
+          final node = XmlElement(const XmlName.parts('kerning'), attrs, []);
           kerningList.add(node);
           break;
       }
     }
 
     if (charsAttrs != null || charList.isNotEmpty) {
-      final node = XmlElement(XmlName('chars'), charsAttrs!, charList);
+      final node =
+          XmlElement(const XmlName.parts('chars'), charsAttrs!, charList);
       children.add(node);
     }
 
     if (kerningsAttrs != null || kerningList.isNotEmpty) {
-      final node = XmlElement(XmlName('kernings'), kerningsAttrs!, kerningList);
+      final node = XmlElement(
+        const XmlName.parts('kernings'),
+        kerningsAttrs!,
+        kerningList,
+      );
       children.add(node);
     }
 
     if (pageList.isNotEmpty) {
-      final pages = XmlElement(XmlName('pages'), [], pageList);
+      final pages = XmlElement(const XmlName.parts('pages'), [], pageList);
       children.add(pages);
     }
 
-    final xml = XmlElement(XmlName('font'), [], children);
+    final xml = XmlElement(const XmlName.parts('font'), [], children);
     final doc = XmlDocument([xml]);
 
     return doc;
@@ -355,7 +360,7 @@ class BitmapFont {
       // Remove all " characters
       atk[1] = atk[1].replaceAll('"', '');
 
-      final a = XmlAttribute(XmlName(atk[0]), atk[1]);
+      final a = XmlAttribute(XmlName.parts(atk[0]), atk[1]);
       params.add(a);
     }
     return params;

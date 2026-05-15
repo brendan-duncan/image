@@ -48,6 +48,24 @@ void main() {
           ..writeAsBytesSync(encodeJpg(img));
       });
 
+      test('text fnt parses element and attribute names', () {
+        const fnt = '''
+info face="Mini" size=8 bold=0 italic=0 charset="" unicode=0 stretchH=100 smooth=1 antialias=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=10 base=8 scaleW=1 scaleH=1 pages=1 packed=0
+chars count=1
+char id=65 x=0 y=0 width=1 height=1 xoffset=0 yoffset=0 xadvance=7 page=0 chnl=15
+''';
+        final font = readFont(fnt, Image(width: 1, height: 1, numChannels: 4));
+        final char = font.characters[65]!;
+
+        expect(font.face, 'Mini');
+        expect(font.lineHeight, 10);
+        expect(font.pages, 1);
+        expect(char.width, 1);
+        expect(char.height, 1);
+        expect(char.xAdvance, 7);
+      });
+
       test('arial_14', () {
         final img = copyResize(image, width: 400);
         drawString(
