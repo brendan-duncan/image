@@ -384,7 +384,7 @@ Future<Image?> decodePnmFile(String path) async {
   if (bytes == null) {
     return null;
   }
-  return PngDecoder().decode(bytes);
+  return PnmDecoder().decode(bytes);
 }
 
 /// Decode a TGA formatted image.
