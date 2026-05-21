@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -31,6 +32,18 @@ void main() {
           testImageEquals(image2!, image!);
         });
       }
+
+      // Issue #729: a non-BMP file that merely starts with the 'BM' signature
+      // should be rejected rather than misdetected as a BMP and crashing.
+      test('rejects a non-BMP file with a BM signature', () {
+        final notBmp = Uint8List.fromList([
+          0x42, 0x4d, 0x4c, 0x00, 0x00, 0x00, 0x00, 0x00, //
+          0x00, 0x00, 0x1a, 0x00, 0x00, 0x00, 0x0c, 0x00, //
+          0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //
+        ]);
+        expect(decodeBmp(notBmp), isNull);
+        expect(() => decodeImage(notBmp), returnsNormally);
+      });
 
       test('uint1', () async {
         await (Command()

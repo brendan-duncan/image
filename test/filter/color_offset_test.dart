@@ -14,5 +14,17 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });
+
+    test('colorOffset adds a constant to each channel', () {
+      // Mid-range values are chosen so no channel clamps at 0 or 255.
+      final result = colorOffset(solidImage(8, 8, ColorRgb8(100, 100, 100)),
+          red: 50, green: 10, blue: 30);
+      expectSolidColor(result, ColorRgb8(150, 110, 130));
+    });
+
+    test('colorOffset with zero offsets leaves the image unchanged', () {
+      final src = quadrantImage(16, 16);
+      testImageEquals(colorOffset(src.clone()), src);
+    });
   });
 }

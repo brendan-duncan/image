@@ -48,5 +48,57 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0_2));
     });
+
+    // Result dimensions exactly match the requested crop size.
+    test('copyCrop result has the requested dimensions', () {
+      final src = solidImage(64, 64, ColorRgb8(100, 150, 200));
+      final result = copyCrop(src, x: 10, y: 10, width: 30, height: 20);
+      expect(result.width, equals(30));
+      expect(result.height, equals(20));
+    });
+
+    // copyCrop does not mutate the source image.
+    test('copyCrop does not mutate the source', () {
+      final src = horizontalGradient(64, 32);
+      final orig = src.clone();
+      copyCrop(src, x: 0, y: 0, width: 32, height: 16);
+      testImageEquals(src, orig);
+    });
+
+    // Pixel (i,j) of the crop must equal source pixel (x+i, y+j).
+    test('copyCrop pixel values match source at the crop offset', () {
+      // Use a horizontal gradient so every column has a distinct value.
+      final src = horizontalGradient(64, 32);
+      const cropX = 8;
+      const cropY = 4;
+      const cropW = 20;
+      const cropH = 10;
+      final result = copyCrop(
+          src, x: cropX, y: cropY, width: cropW, height: cropH);
+
+      for (var j = 0; j < cropH; j++) {
+        for (var i = 0; i < cropW; i++) {
+          final sp = src.getPixel(cropX + i, cropY + j);
+          final dp = result.getPixel(i, j);
+          expect(dp.r, equals(sp.r),
+              reason: 'pixel ($i,$j) red: crop vs '
+                  'source(${cropX + i},${cropY + j})');
+        }
+      }
+    });
+
+    // Cropping the full image returns an image pixel-equal to the source.
+    test('copyCrop of the full image equals the source', () {
+      final src = quadrantImage(16, 16);
+      final result = copyCrop(src, x: 0, y: 0, width: 16, height: 16);
+      testImageEquals(result, src);
+    });
+
+    // Cropping a solid-color image still yields a solid-color image.
+    test('copyCrop of solid image preserves color', () {
+      final src = solidImage(32, 32, ColorRgb8(255, 128, 0));
+      final result = copyCrop(src, x: 5, y: 5, width: 10, height: 10);
+      expectSolidColor(result, ColorRgb8(255, 128, 0));
+    });
   });
 }

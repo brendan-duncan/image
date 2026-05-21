@@ -19,6 +19,16 @@ void main() {
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
 
+        // CUR header: reserved(0,0), type=2 (LE), image-count=1
+        expect(png[0], equals(0), reason: 'reserved byte 0');
+        expect(png[1], equals(0), reason: 'reserved byte 1');
+        // type field is little-endian uint16 == 2
+        expect(png[2] | (png[3] << 8), equals(2), reason: 'CUR type == 2');
+        // single image in directory
+        expect(png[4] | (png[5] << 8), equals(1), reason: 'image count == 1');
+        // encoded bytes must be non-trivially sized
+        expect(png.length, greaterThan(6));
+
         final image2 = Image(width: 64, height: 64)
           ..clear(ColorRgb8(100, 255, 200));
 
@@ -29,6 +39,15 @@ void main() {
           ..createSync(recursive: true)
           ..writeAsBytesSync(png2);
 
+        // two images in directory
+        expect(
+          png2[4] | (png2[5] << 8),
+          equals(2),
+          reason: 'image count == 2',
+        );
+        // type field still 2
+        expect(png2[2] | (png2[3] << 8), equals(2), reason: 'CUR type == 2');
+
         final image3 = Image(width: 32, height: 64)
           ..clear(ColorRgb8(255, 100, 200));
 
@@ -36,6 +55,13 @@ void main() {
         File('$testOutputPath/cur/encode3.cur')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png3);
+
+        // three images in directory
+        expect(
+          png3[4] | (png3[5] << 8),
+          equals(3),
+          reason: 'image count == 3',
+        );
       });
     });
   });

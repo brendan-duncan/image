@@ -44,5 +44,41 @@ void main() {
       expect(image?.width, equals(256));
       expect(image?.height, equals(256));
     });
+
+    test('drawChar: some pixels change from background after drawing', () {
+      // Draw a known character on a solid background; at least one pixel must
+      // differ from the background, proving the glyph was rendered.
+      final bg = ColorRgb8(0, 0, 0);
+      final img = Image(width: 64, height: 64)..clear(bg);
+      drawChar(img, 'A', font: arial24, x: 5, y: 5,
+          color: ColorRgb8(255, 255, 255));
+
+      var changed = 0;
+      for (final p in img) {
+        if (p.r != bg.r || p.g != bg.g || p.b != bg.b) changed++;
+      }
+      // the glyph must have painted at least one pixel
+      expect(changed, greaterThan(0),
+          reason: 'drawChar must paint at least one pixel');
+    });
+
+    test('drawChar: image dimensions are unchanged', () {
+      final img = Image(width: 64, height: 64);
+      drawChar(img, 'B', font: arial24, x: 10, y: 10);
+      expect(img.width, equals(64));
+      expect(img.height, equals(64));
+    });
+
+    test('drawChar: pixel far from glyph stays background', () {
+      // Draw a character in the top-left; the far corner must be untouched.
+      final bg = ColorRgb8(50, 100, 150);
+      final img = Image(width: 200, height: 200)..clear(bg);
+      drawChar(img, 'X', font: arial24, x: 2, y: 2,
+          color: ColorRgb8(255, 0, 0));
+      final p = img.getPixel(199, 199);
+      expect(p.r, equals(bg.r));
+      expect(p.g, equals(bg.g));
+      expect(p.b, equals(bg.b));
+    });
   });
 }

@@ -143,6 +143,54 @@ void main() {
       }
     });
 
+    test('fromBytes with a row stride smaller than the image stride', () {
+      // Issue #473: a source rowStride smaller than the image's data stride
+      // raised a range error because the row copy length was mismatched.
+      final bytes = Uint8List.fromList([
+        10, 20, 30, 40, 50, 60, // row 0: pixels (0,0) and (1,0)
+        70, 80, 90, 100, 110, 120, // row 1: pixels (0,1) and (1,1)
+      ]);
+      final img = Image.fromBytes(
+        width: 4,
+        height: 2,
+        numChannels: 3,
+        bytes: bytes.buffer,
+        rowStride: 6,
+      );
+      expect(img.width, equals(4));
+      expect(img.height, equals(2));
+
+      void expectRgb(int x, int y, int r, int g, int b) {
+        final p = img.getPixel(x, y);
+        expect([p.r, p.g, p.b], equals([r, g, b]));
+      }
+
+      expectRgb(0, 0, 10, 20, 30);
+      expectRgb(1, 0, 40, 50, 60);
+      // Columns past the provided row stride remain zero.
+      expectRgb(2, 0, 0, 0, 0);
+      expectRgb(0, 1, 70, 80, 90);
+      expectRgb(1, 1, 100, 110, 120);
+    });
+
+    test('convert applies an explicit alpha', () {
+      // Issue #544: convert(alpha:) was ignored when the format and channel
+      // count were unchanged.
+      final img = Image(width: 8, height: 8, numChannels: 4);
+      for (final p in img) {
+        p.setRgba(10, 20, 30, 255);
+      }
+
+      final faded = img.convert(alpha: 128);
+      for (final p in faded) {
+        expect([p.r, p.g, p.b, p.a], equals([10, 20, 30, 128]));
+      }
+
+      // An image without an alpha channel is unaffected.
+      final rgb = Image(width: 4, height: 4)..clear(ColorRgb8(1, 2, 3));
+      expect(rgb.convert(alpha: 128).numChannels, equals(3));
+    });
+
     test('getPixel iterator', () {
       final i0 = Image(width: 10, height: 10);
       final p = i0.getPixel(0, 5);

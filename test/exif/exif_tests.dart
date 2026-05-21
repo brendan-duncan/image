@@ -1,8 +1,22 @@
+import 'dart:typed_data';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('Exif', () {
+    test('read does not crash on a corrupt IFD', () {
+      // Issue #690: an IFD claiming more entries than the buffer can hold
+      // raised a RangeError instead of being skipped.
+      final corrupt = Uint8List.fromList([
+        0x49, 0x49, // 'II' little-endian
+        0x2a, 0x00, // 42
+        0x08, 0x00, 0x00, 0x00, // IFD offset = 8
+        0xff, 0xff, // numEntries = 65535, far more than the buffer holds
+      ]);
+      expect(() => ExifData().read(InputBuffer(corrupt)), returnsNormally);
+    });
+
     test('write/read', () {
       final exif = ExifData();
       exif.imageIfd[0] = IfdValueShort(124);

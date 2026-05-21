@@ -42,5 +42,57 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });
+
+    test('fillPolygon: interior pixel has fill color', () {
+      // A simple axis-aligned square: the centroid must receive the fill color.
+      final img = Image(width: 64, height: 64);
+      final fillColor = ColorRgb8(200, 100, 50);
+      fillPolygon(
+        img,
+        vertices: [
+          Point(10, 10),
+          Point(50, 10),
+          Point(50, 50),
+          Point(10, 50),
+        ],
+        color: fillColor,
+      );
+      // centroid at (30,30) is clearly inside the square
+      final p = img.getPixel(30, 30);
+      expect(p.r, equals(fillColor.r));
+      expect(p.g, equals(fillColor.g));
+      expect(p.b, equals(fillColor.b));
+    });
+
+    test('fillPolygon: pixel clearly outside polygon stays background', () {
+      // Filling the small square must not affect the far corner.
+      final img = Image(width: 64, height: 64);
+      fillPolygon(
+        img,
+        vertices: [
+          Point(10, 10),
+          Point(30, 10),
+          Point(30, 30),
+          Point(10, 30),
+        ],
+        color: ColorRgb8(255, 0, 0),
+      );
+      // pixel at (63,63) is well outside the polygon
+      final far = img.getPixel(63, 63);
+      expect(far.r, equals(0));
+      expect(far.g, equals(0));
+      expect(far.b, equals(0));
+    });
+
+    test('fillPolygon: image dimensions unchanged', () {
+      final img = Image(width: 64, height: 64);
+      fillPolygon(
+        img,
+        vertices: [Point(5, 5), Point(30, 5), Point(30, 30), Point(5, 30)],
+        color: ColorRgb8(0, 128, 0),
+      );
+      expect(img.width, equals(64));
+      expect(img.height, equals(64));
+    });
   });
 }

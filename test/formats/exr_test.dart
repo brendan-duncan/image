@@ -17,6 +17,17 @@ void main() {
         File('$testOutputPath/exr/grid.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
+
+        // grid.exr is 512x512
+        expect(img, isNotNull);
+        expect(img.width, equals(512));
+        expect(img.height, equals(512));
+        // EXR is an HDR float format
+        expect(img.format, equals(Format.float16));
+        // 3-channel (RGB) image
+        expect(img.numChannels, equals(3));
+        // pixel data should be non-trivially non-zero
+        expect(imageMean(img), greaterThan(0.0));
       });
 
       test('ocean', () {
@@ -29,6 +40,17 @@ void main() {
         File('$testOutputPath/exr/ocean.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
+
+        // ocean.exr is 300x209
+        expect(img, isNotNull);
+        expect(img.width, equals(300));
+        expect(img.height, equals(209));
+        // EXR is an HDR float format
+        expect(img.format, equals(Format.float16));
+        // 3-channel (RGB) image
+        expect(img.numChannels, equals(3));
+        // pixel data should be non-trivially non-zero
+        expect(imageMean(img), greaterThan(0.0));
       });
     });
   });

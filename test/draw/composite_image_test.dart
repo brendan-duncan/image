@@ -6,6 +6,57 @@ import '../_test_util.dart';
 
 void main() {
   group('Draw', () {
+    test('compositeImage direct: region becomes source color', () {
+      // Compositing a fully-opaque solid red src onto a blue dst with
+      // BlendMode.direct must set every pixel in the destination rect to red.
+      final dst = solidImage(32, 32, ColorRgb8(0, 0, 255));
+      final src = solidImage(8, 8, ColorRgb8(255, 0, 0));
+      compositeImage(dst, src, dstX: 4, dstY: 4, blend: BlendMode.direct);
+
+      // pixels inside the destination rect are the source color (red)
+      for (var y = 4; y < 12; y++) {
+        for (var x = 4; x < 12; x++) {
+          final p = dst.getPixel(x, y);
+          expect(p.r, equals(255),
+              reason: 'expected red at ($x,$y), got r=${p.r}');
+          expect(p.g, equals(0),
+              reason: 'expected red at ($x,$y), got g=${p.g}');
+          expect(p.b, equals(0),
+              reason: 'expected red at ($x,$y), got b=${p.b}');
+        }
+      }
+
+      // pixels outside the destination rect remain the original blue
+      for (var y = 0; y < 4; y++) {
+        for (var x = 0; x < 32; x++) {
+          final p = dst.getPixel(x, y);
+          expect(p.b, equals(255),
+              reason: 'pixel outside rect ($x,$y) should remain blue');
+          expect(p.r, equals(0),
+              reason: 'pixel outside rect ($x,$y) should have r=0');
+        }
+      }
+    });
+
+    test('compositeImage direct: pixels outside dst rect are unchanged', () {
+      // A solid white background with a small red composite in the centre.
+      final dst = solidImage(20, 20, ColorRgb8(255, 255, 255));
+      final src = solidImage(4, 4, ColorRgb8(0, 0, 0));
+      compositeImage(dst, src, dstX: 8, dstY: 8, blend: BlendMode.direct);
+
+      // corner pixels were not touched
+      final corner = dst.getPixel(0, 0);
+      expect(corner.r, equals(255));
+      expect(corner.g, equals(255));
+      expect(corner.b, equals(255));
+
+      // center pixel was overwritten
+      final center = dst.getPixel(8, 8);
+      expect(center.r, equals(0));
+      expect(center.g, equals(0));
+      expect(center.b, equals(0));
+    });
+
     test('compositeImage2', () async {
       final mask = (await decodePngFile('test/_data/png/logo.png'))!;
       final fg = (await decodePngFile('test/_data/png/colors.png'))!;

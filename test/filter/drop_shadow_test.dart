@@ -20,5 +20,36 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i1));
     });
+
+    test('dropShadow returns a new image (not the source)', () {
+      final src = Image(width: 32, height: 32, numChannels: 4);
+      final result = dropShadow(src, 4, 4, 2);
+      // dropShadow always allocates a fresh destination image
+      expect(identical(result, src), isFalse);
+    });
+
+    test('dropShadow output has 4 channels', () {
+      final src = Image(width: 32, height: 32, numChannels: 4);
+      final result = dropShadow(src, 4, 4, 2);
+      // the internal image is always created with numChannels: 4
+      expect(result.numChannels, equals(4));
+    });
+
+    test('dropShadow with positive offsets enlarges the canvas', () {
+      final src = Image(width: 32, height: 32, numChannels: 4);
+      // hShadow=4, vShadow=4, blur=2 → shadow extends beyond the source
+      // boundary so the result must be wider and taller than the source.
+      final result = dropShadow(src, 4, 4, 2);
+      expect(result.width, greaterThan(src.width));
+      expect(result.height, greaterThan(src.height));
+    });
+
+    test('dropShadow with blur=0 still returns a valid image', () {
+      final src = Image(width: 16, height: 16, numChannels: 4);
+      final result = dropShadow(src, 2, 2, 0);
+      // Zero blur is allowed; clamped internally to 0.
+      expect(result.width, greaterThanOrEqualTo(src.width));
+      expect(result.height, greaterThanOrEqualTo(src.height));
+    });
   });
 }

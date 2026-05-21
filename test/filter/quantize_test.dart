@@ -4,6 +4,16 @@ import 'package:test/test.dart';
 
 import '../_test_util.dart';
 
+// Collect distinct resolved (r,g,b) triples from an image (palette or direct).
+Set<String> _distinctColors(Image img) {
+  final colors = <String>{};
+  for (final p in img) {
+    final rp = img.getPixel(p.x, p.y);
+    colors.add('${rp.r.round()},${rp.g.round()},${rp.b.round()}');
+  }
+  return colors;
+}
+
 void main() {
   group('Filter', () {
     test('quantize', () {
@@ -55,6 +65,53 @@ void main() {
       File('$testOutputPath/filter/quantize_binary.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(q3));
+    });
+
+    test('quantize preserves dimensions', () {
+      final src = quadrantImage(32, 32);
+      final result = quantize(src, numberOfColors: 8);
+      // Quantization must not resize the image.
+      expect(result.width, equals(32));
+      expect(result.height, equals(32));
+    });
+
+    test('quantize octree uses at most numberOfColors distinct colors', () {
+      // The octree result is palette-indexed; at most numberOfColors entries.
+      final src = quadrantImage(32, 32);
+      const n = 4;
+      final result = quantize(
+        src,
+        numberOfColors: n,
+        method: QuantizeMethod.octree,
+      );
+      final colors = _distinctColors(result);
+      expect(colors.length, lessThanOrEqualTo(n),
+          reason: 'octree result has ${colors.length} colors, expected <=$n');
+    });
+
+    test('quantize neural uses at most numberOfColors distinct colors', () {
+      // Neural-net quantizer also limits the palette to numberOfColors.
+      final src = quadrantImage(32, 32);
+      const n = 4;
+      final result = quantize(src, numberOfColors: n);
+      final colors = _distinctColors(result);
+      expect(colors.length, lessThanOrEqualTo(n),
+          reason: 'neural result has ${colors.length} colors, expected <=$n');
+    });
+
+    test('quantize solid-color image stays solid after quantization', () {
+      // A single-color image has only one color; any quantizer must keep it.
+      final color = ColorRgb8(100, 150, 200);
+      final src = solidImage(16, 16, color);
+      final result = quantize(
+        src,
+        numberOfColors: 8,
+        method: QuantizeMethod.octree,
+      );
+      // All resolved pixels must be the same color (within rounding).
+      final colors = _distinctColors(result);
+      expect(colors.length, equals(1),
+          reason: 'solid-color image quantized to ${colors.length} colors');
     });
   });
 }
