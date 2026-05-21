@@ -90,12 +90,13 @@ Future<void> testImageConversions(Image image) async {
         expect(ic.palette, isNull);
       }*/
 
+      // Exercise the reverse conversion and the PNG encoder, but keep it in
+      // memory. This helper is called hundreds of times by the image/* tests;
+      // writing a debug PNG per conversion previously dominated the run time
+      // (and tripped the 30s per-test timeout) whenever testOutputPath pointed
+      // at an antivirus- or file-sync-scanned volume such as a source tree.
       final oc = ic.convert(format: Format.uint8, numChannels: 4);
-      final fnc = image.hasPalette ? 1 : image.numChannels;
-      final dbgName = '$testOutputPath/image/${image.format.name}/'
-          '${image.format.name}_${fnc}_to_${format.name}_$nc.png';
-      //print(dbgName);
-      await encodePngFile(dbgName, oc);
+      expect(encodePng(oc), isNotEmpty);
 
       /*final op = image.getPixel(0, 0);
       for (final np in ic) {
