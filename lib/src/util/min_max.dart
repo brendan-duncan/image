@@ -14,8 +14,8 @@ List<num> minMax(Image image) {
       if (first || c > max) {
         max = c;
       }
+      first = false;
     }
-    first = false;
   }
 
   return [min, max];

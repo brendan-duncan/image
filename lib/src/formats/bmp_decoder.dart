@@ -19,8 +19,15 @@ class BmpDecoder extends Decoder {
 
   /// Is the given file a valid BMP image?
   @override
-  bool isValidFile(Uint8List data) =>
-      BmpFileHeader.isValidFile(InputBuffer(data));
+  bool isValidFile(Uint8List data) {
+    if (!BmpFileHeader.isValidFile(InputBuffer(data)) || data.length < 18) {
+      return false;
+    }
+    // Validate the DIB header size to avoid misdetecting non-BMP files that
+    // merely start with the 'BM' signature.
+    final dibHeaderSize = (InputBuffer(data)..skip(14)).readUint32();
+    return dibHeaderSize >= 12 && dibHeaderSize <= 124;
+  }
 
   @override
   int numFrames() => info != null ? info!.numFrames : 0;

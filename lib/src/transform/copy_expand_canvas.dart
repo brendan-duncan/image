@@ -129,5 +129,10 @@ Image copyExpandCanvas(Image src,
     }
   }
 
+  // Preserve the source image's EXIF metadata.
+  if (src.hasExif) {
+    expandedCanvas.exif = src.exif.clone();
+  }
+
   return expandedCanvas;
 }

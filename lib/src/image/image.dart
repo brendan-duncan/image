@@ -280,7 +280,7 @@ class Image extends Iterable<Pixel> {
     var bOff = 0;
     for (int y = 0; y < height; ++y, bOff += rowStride, dOff += dataStride) {
       final bRow = Uint8List.sublistView(fromBytes, bOff, bOff + stride);
-      toBytes.setRange(dOff, dOff + dataStride, bRow);
+      toBytes.setRange(dOff, dOff + stride, bRow);
     }
 
     if (numChannels == 3 && order == ChannelOrder.bgr) {
@@ -830,6 +830,7 @@ class Image extends Iterable<Pixel> {
       bool noAnimation = false}) {
     format ??= this.format;
     numChannels ??= this.numChannels;
+    final setAlpha = alpha != null;
     alpha ??= formatMaxValue[format];
 
     // Commented out because it causes problems converting a uint8 w/ palette
@@ -850,7 +851,17 @@ class Image extends Iterable<Pixel> {
         ((!withPalette && palette == null) ||
             (withPalette && palette != null))) {
       // Same format and number of channels
-      return Image.from(this);
+      final newImage = Image.from(this);
+      // An explicitly provided alpha still needs to be applied to the
+      // existing alpha channel.
+      if (setAlpha && newImage.hasAlpha) {
+        for (final frame in newImage.frames) {
+          for (final p in frame) {
+            p.a = alpha!;
+          }
+        }
+      }
+      return newImage;
     }
 
     Image? firstFrame;

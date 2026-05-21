@@ -1,3 +1,23 @@
+## 4.8.1
+
+- Fix `minMax` returning incorrect values when the minimum or maximum was in
+  the first pixel of a multi-channel image.
+- Fix `copyResizeCropSquare` ignoring the crop offset when using non-nearest
+  interpolation, which off-centered the resized result.
+- Improve the precision of the RGB/XYZ/CIE-Lab color conversions, and round
+  rather than truncate the final RGB values, making the conversions lossless.
+- Fix `copyResizeCropSquare` throwing a range error when a non-zero radius was
+  used with a non-square image.
+- Fix non-antialiased `drawLine` drawing diagonal lines offset by ~1 pixel.
+- Preserve EXIF metadata when expanding an image with `copyExpandCanvas`.
+- `Image.convert` now applies an explicitly provided `alpha` value even when
+  the format and channel count are unchanged.
+- Fix a range error in `Image.fromBytes` when the source row stride is smaller
+  than the image's row stride.
+- Fix a `RangeError` when decoding images with corrupt EXIF data.
+- Reject non-BMP files that merely start with the `BM` signature instead of
+  crashing the decoder.
+
 ## 4.8.0 - February 17, 2026
 
 - Fix JPEG decoding issue with Adobe RGB color transformations.

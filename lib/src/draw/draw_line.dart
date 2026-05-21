@@ -151,7 +151,7 @@ Image drawLine(Image image,
       }
 
       // Set up line thickness
-      var wstart = (y - wid / 2).toInt();
+      var wstart = y - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
         drawPixel(image, x, w, color,
             blend: blend, mask: mask, maskChannel: maskChannel);
@@ -166,7 +166,7 @@ Image drawLine(Image image,
             y++;
             d += incr2;
           }
-          wstart = (y - wid / 2).toInt();
+          wstart = y - wid ~/ 2;
           for (var w = wstart; w < wstart + wid; w++) {
             drawPixel(image, x, w, color,
                 blend: blend, mask: mask, maskChannel: maskChannel);
@@ -181,7 +181,7 @@ Image drawLine(Image image,
             y--;
             d += incr2;
           }
-          wstart = (y - wid / 2).toInt();
+          wstart = y - wid ~/ 2;
           for (var w = wstart; w < wstart + wid; w++) {
             drawPixel(image, x, w, color,
                 blend: blend, mask: mask, maskChannel: maskChannel);
@@ -220,7 +220,7 @@ Image drawLine(Image image,
       }
 
       // Set up line thickness
-      var wstart = (x - wid / 2).toInt();
+      var wstart = x - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
         drawPixel(image, w, y, color,
             blend: blend, mask: mask, maskChannel: maskChannel);
@@ -235,7 +235,7 @@ Image drawLine(Image image,
             x++;
             d += incr2;
           }
-          wstart = (x - wid / 2).toInt();
+          wstart = x - wid ~/ 2;
           for (var w = wstart; w < wstart + wid; w++) {
             drawPixel(image, w, y, color,
                 blend: blend, mask: mask, maskChannel: maskChannel);
@@ -250,7 +250,7 @@ Image drawLine(Image image,
             x--;
             d += incr2;
           }
-          wstart = (x - wid / 2).toInt();
+          wstart = x - wid ~/ 2;
           for (var w = wstart; w < wstart + wid; w++) {
             drawPixel(image, w, y, color,
                 blend: blend, mask: mask, maskChannel: maskChannel);

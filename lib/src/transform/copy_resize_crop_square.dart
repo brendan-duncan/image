@@ -66,7 +66,7 @@ Image copyResizeCropSquare(Image src,
       final c4x = x1 + rad - 1;
       final c4y = y2 - rad + 1;
 
-      final iter = dst.getRange(x1, y1, width, height);
+      final iter = dst.getRange(x1, y1, size, size);
       while (iter.moveNext()) {
         final p = iter.current;
         final px = p.x;
@@ -104,8 +104,8 @@ Image copyResizeCropSquare(Image src,
           final sp = frame.getPixel(scaleX![p.x], sy);
           p.setRgba(sp.r, sp.g, sp.b, sp.a * a);
         } else {
-          final x = p.x * dx;
-          final y = p.y * dy;
+          final x = (p.x + xOffset) * dx;
+          final y = (p.y + yOffset) * dy;
           final sp =
               frame.getPixelInterpolate(x, y, interpolation: interpolation);
           final spa = sp.a * a;
@@ -125,8 +125,8 @@ Image copyResizeCropSquare(Image src,
       }
     } else {
       for (final p in dst) {
-        final x = p.x * dx;
-        final y = p.y * dy;
+        final x = (p.x + xOffset) * dx;
+        final y = (p.y + yOffset) * dy;
         p.set(frame.getPixelInterpolate(x, y, interpolation: interpolation));
       }
     }

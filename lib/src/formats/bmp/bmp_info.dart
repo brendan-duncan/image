@@ -89,7 +89,7 @@ class BmpInfo implements DecodeInfo {
         _height = p.readInt32(),
         planes = p.readUint16(),
         bitsPerPixel = p.readUint16(),
-        compression = BmpCompression.values[p.readUint32()],
+        compression = _compressionFromValue(p.readUint32()),
         imageSize = p.readUint32(),
         xppm = p.readInt32(),
         yppm = p.readInt32(),
@@ -180,6 +180,13 @@ class BmpInfo implements DecodeInfo {
     if (bitsPerPixel <= 8) {
       readPalette(p);
     }
+  }
+
+  static BmpCompression _compressionFromValue(int value) {
+    if (value < 0 || value >= BmpCompression.values.length) {
+      throw ImageException('Unsupported BMP compression type: $value');
+    }
+    return BmpCompression.values[value];
   }
 
   bool get ignoreAlphaChannel =>
