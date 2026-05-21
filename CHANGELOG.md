@@ -1,4 +1,4 @@
-## 4.8.1
+## 4.9.0
 
 - Fix `minMax` returning incorrect values when the minimum or maximum was in
   the first pixel of a multi-channel image.
