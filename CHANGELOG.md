@@ -17,6 +17,16 @@
 - Fix a `RangeError` when decoding images with corrupt EXIF data.
 - Reject non-BMP files that merely start with the `BM` signature instead of
   crashing the decoder.
+- Fix `noise` with `NoiseType.saltAndPepper` producing colored pixels instead
+  of black/white ones.
+- `colorOffset` now scales its offsets to the bit depth of the image, so the
+  effect is consistent regardless of the image's format.
+- Add `fuzzy` and `padding` options to `trim` and `findTrim`.
+- Add `findEncoderForData`, which returns an `Encoder` for a buffer of image
+  data, complementing `findDecoderForData`.
+- Add a `dispose` option to `GifEncoder` to control the frame disposal method.
+- `PsdImage.layers` no longer throws a `LateInitializationError` when accessed
+  before `decode` has been called.
 
 ## 4.8.0 - February 17, 2026
 

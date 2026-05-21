@@ -19,6 +19,10 @@ class GifEncoder extends Encoder {
   DitherKernel dither;
   bool ditherSerpentine;
 
+  /// The disposal method applied to each frame: 0 = no action,
+  /// 1 = do not dispose, 2 = restore to background, 3 = restore to previous.
+  int dispose;
+
   GifEncoder(
       {this.delay = 80,
       this.repeat = 0,
@@ -26,7 +30,8 @@ class GifEncoder extends Encoder {
       this.quantizerType = QuantizerType.neural,
       this.samplingFactor = 10,
       this.dither = DitherKernel.floydSteinberg,
-      this.ditherSerpentine = false})
+      this.ditherSerpentine = false,
+      this.dispose = 2})
       : _encodedFrames = 0;
 
   /// This adds the frame passed to [image].
@@ -397,7 +402,6 @@ class GifEncoder extends Encoder {
       }
     }
 
-    const dispose = 2; // dispose: 0 = no action, 2 = clear
     final fields = 0 | // 1:3 reserved
         (dispose << 2) | // 4:6 disposal
         0 | // 7   user input - 0 = none

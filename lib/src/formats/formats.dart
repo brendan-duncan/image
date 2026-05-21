@@ -124,6 +124,34 @@ ImageFormat findFormatForData(List<int> data) {
   return decoder.format;
 }
 
+/// Return an [Encoder] that can encode an image to the same format as the
+/// given [data]. Returns null if the data isn't a recognized image format,
+/// or if that format does not have an encoder.
+Encoder? findEncoderForData(List<int> data) {
+  switch (findFormatForData(data)) {
+    case ImageFormat.bmp:
+      return BmpEncoder();
+    case ImageFormat.gif:
+      return GifEncoder();
+    case ImageFormat.ico:
+      return IcoEncoder();
+    case ImageFormat.jpg:
+      return JpegEncoder();
+    case ImageFormat.png:
+      return PngEncoder();
+    case ImageFormat.pvr:
+      return PvrEncoder();
+    case ImageFormat.tga:
+      return TgaEncoder();
+    case ImageFormat.tiff:
+      return TiffEncoder();
+    case ImageFormat.webp:
+      return WebPEncoder();
+    default:
+      return null;
+  }
+}
+
 /// Create a [Decoder] for the given [format] type.
 Decoder? createDecoderForFormat(ImageFormat format) {
   switch (format) {

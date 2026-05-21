@@ -89,12 +89,14 @@ Image noise(Image image, num sigma,
         }
         for (final p in frame) {
           if (random.nextDouble() * 100.0 < nSigma) {
-            final r =
+            // Salt-and-pepper noise sets the whole pixel to the min or max
+            // value; the choice is made once per pixel so the result is not
+            // colored.
+            final v =
                 (random.nextDouble() < 0.5 ? M : m).clamp(0, p.maxChannelValue);
-            final g =
-                (random.nextDouble() < 0.5 ? M : m).clamp(0, p.maxChannelValue);
-            final b =
-                (random.nextDouble() < 0.5 ? M : m).clamp(0, p.maxChannelValue);
+            final r = v;
+            final g = v;
+            final b = v;
             final a = p.a;
             final msk =
                 mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
