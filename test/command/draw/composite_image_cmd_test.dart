@@ -38,8 +38,7 @@ void main() {
       final bg = solidImage(16, 16, ColorRgb8(255, 0, 0));
       final result = await (Command()
             ..image(bg)
-            ..compositeImage(fgCmd,
-                dstX: 6, dstY: 6, blend: BlendMode.direct))
+            ..compositeImage(fgCmd, dstX: 6, dstY: 6, blend: BlendMode.direct))
           .getImage();
 
       expect(result, isNotNull);
@@ -83,8 +82,7 @@ void main() {
       final bg = solidImage(16, 16, ColorRgb8(0, 255, 0));
       final result = await (Command()
             ..image(bg)
-            ..compositeImage(fgCmd,
-                blend: BlendMode.direct, center: true))
+            ..compositeImage(fgCmd, blend: BlendMode.direct, center: true))
           .getImage();
 
       expect(result, isNotNull);

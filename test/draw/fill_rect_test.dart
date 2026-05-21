@@ -136,11 +136,7 @@ void main() {
       final src = solidImage(20, 20, ColorRgb8(100, 100, 100));
       // alphaBlend=true and color.a==0 triggers the early-return in fillRect.
       fillRect(src,
-          x1: 5,
-          y1: 5,
-          x2: 15,
-          y2: 15,
-          color: ColorRgba8(255, 0, 0, 0));
+          x1: 5, y1: 5, x2: 15, y2: 15, color: ColorRgba8(255, 0, 0, 0));
       expectSolidColor(src, ColorRgb8(100, 100, 100),
           reason: 'fillRect with alpha=0 should not change any pixel');
     });

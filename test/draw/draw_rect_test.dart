@@ -60,12 +60,7 @@ void main() {
       const cy = (y1 + y2) ~/ 2; // center y = 30
       final red = ColorRgb8(255, 0, 0);
       drawRect(image,
-          x1: x1,
-          y1: y1,
-          x2: x2,
-          y2: y2,
-          color: red,
-          blend: BlendMode.direct);
+          x1: x1, y1: y1, x2: x2, y2: y2, color: red, blend: BlendMode.direct);
 
       // Top-left corner must be the draw color.
       expect(image.getPixel(x1, y1), equals([255, 0, 0]),

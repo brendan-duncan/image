@@ -35,6 +35,7 @@ class PsdImage implements DecodeInfo {
   late int channels;
   int? depth;
   PsdColorMode? colorMode;
+
   /// The image's layers. Empty until [decode] has been called.
   final List<PsdLayer> layers = [];
   late List<PsdChannel> mergeImageChannels;

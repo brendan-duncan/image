@@ -33,8 +33,7 @@ void main() {
     test('scaleRgba with black scale (0,0,0) produces a black image', () {
       // scale normalized = 0.0 → every channel * 0 = 0.
       final src = horizontalGradient(16, 8);
-      expectSolidColor(
-          scaleRgba(src.clone(), scale: ColorRgb8(0, 0, 0)),
+      expectSolidColor(scaleRgba(src.clone(), scale: ColorRgb8(0, 0, 0)),
           ColorRgb8(0, 0, 0));
     });
 

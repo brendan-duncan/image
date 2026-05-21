@@ -49,12 +49,9 @@ void main() {
       final result = sketch(src.clone());
       final first = result.getPixel(0, 0);
       for (final p in result) {
-        expect(p.r, equals(first.r),
-            reason: 'r differs at ${p.x},${p.y}');
-        expect(p.g, equals(first.g),
-            reason: 'g differs at ${p.x},${p.y}');
-        expect(p.b, equals(first.b),
-            reason: 'b differs at ${p.x},${p.y}');
+        expect(p.r, equals(first.r), reason: 'r differs at ${p.x},${p.y}');
+        expect(p.g, equals(first.g), reason: 'g differs at ${p.x},${p.y}');
+        expect(p.b, equals(first.b), reason: 'b differs at ${p.x},${p.y}');
       }
     });
 

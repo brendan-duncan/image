@@ -50,8 +50,8 @@ void main() {
       // differ from the background, proving the glyph was rendered.
       final bg = ColorRgb8(0, 0, 0);
       final img = Image(width: 64, height: 64)..clear(bg);
-      drawChar(img, 'A', font: arial24, x: 5, y: 5,
-          color: ColorRgb8(255, 255, 255));
+      drawChar(img, 'A',
+          font: arial24, x: 5, y: 5, color: ColorRgb8(255, 255, 255));
 
       var changed = 0;
       for (final p in img) {
@@ -73,8 +73,8 @@ void main() {
       // Draw a character in the top-left; the far corner must be untouched.
       final bg = ColorRgb8(50, 100, 150);
       final img = Image(width: 200, height: 200)..clear(bg);
-      drawChar(img, 'X', font: arial24, x: 2, y: 2,
-          color: ColorRgb8(255, 0, 0));
+      drawChar(img, 'X',
+          font: arial24, x: 2, y: 2, color: ColorRgb8(255, 0, 0));
       final p = img.getPixel(199, 199);
       expect(p.r, equals(bg.r));
       expect(p.g, equals(bg.g));

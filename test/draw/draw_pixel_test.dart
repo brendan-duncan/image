@@ -37,8 +37,8 @@ void main() {
     test('drawPixel returns the image (mutates in place)', () {
       final image = Image(width: 5, height: 5);
       // drawPixel returns the same image object.
-      final result = drawPixel(
-          image, 2, 2, ColorRgb8(10, 20, 30), blend: BlendMode.direct);
+      final result = drawPixel(image, 2, 2, ColorRgb8(10, 20, 30),
+          blend: BlendMode.direct);
       expect(identical(result, image), isTrue,
           reason: 'drawPixel should return the same Image object');
     });

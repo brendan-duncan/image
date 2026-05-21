@@ -73,8 +73,8 @@ void main() {
 
     // createImage produces an image with the requested dimensions and format.
     test('createImage yields correct dimensions', () async {
-      final img = await (Command()..createImage(width: 40, height: 25))
-          .getImage();
+      final img =
+          await (Command()..createImage(width: 40, height: 25)).getImage();
       expect(img, isNotNull);
       expect(img!.width, equals(40));
       expect(img.height, equals(25));
@@ -82,8 +82,8 @@ void main() {
 
     // Default format is uint8 with 3 channels.
     test('createImage default format is uint8 with 3 channels', () async {
-      final img = await (Command()..createImage(width: 8, height: 8))
-          .getImage();
+      final img =
+          await (Command()..createImage(width: 8, height: 8)).getImage();
       expect(img, isNotNull);
       expect(img!.format, equals(Format.uint8));
       expect(img.numChannels, equals(3));

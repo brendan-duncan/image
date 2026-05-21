@@ -31,8 +31,7 @@ void main() {
     });
 
     test('copyImageChannels preserves dimensions', () {
-      final dst = solidImage(16, 16, ColorRgb8(100, 150, 200),
-          numChannels: 4);
+      final dst = solidImage(16, 16, ColorRgb8(100, 150, 200), numChannels: 4);
       final from = solidImage(16, 16, ColorRgb8(10, 20, 30));
       copyImageChannels(dst, from: from, red: Channel.green);
       // Copying a channel must not resize the destination.

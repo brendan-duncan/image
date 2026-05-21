@@ -45,12 +45,9 @@ void main() {
       final out = monochrome(src.clone(), color: ColorRgb8(100, 160, 64));
       final first = out.getPixel(0, 0);
       for (final p in out) {
-        expect(p.r, equals(first.r),
-            reason: 'uniform r at ${p.x},${p.y}');
-        expect(p.g, equals(first.g),
-            reason: 'uniform g at ${p.x},${p.y}');
-        expect(p.b, equals(first.b),
-            reason: 'uniform b at ${p.x},${p.y}');
+        expect(p.r, equals(first.r), reason: 'uniform r at ${p.x},${p.y}');
+        expect(p.g, equals(first.g), reason: 'uniform g at ${p.x},${p.y}');
+        expect(p.b, equals(first.b), reason: 'uniform b at ${p.x},${p.y}');
       }
     });
 

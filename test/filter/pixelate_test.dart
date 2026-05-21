@@ -48,12 +48,9 @@ void main() {
           // Sample two pixels inside the same block.
           final p0 = src.getPixel(bx, by);
           final p1 = src.getPixel(bx + 1, by + 1);
-          expect(p1.r, equals(p0.r),
-              reason: 'block at ($bx,$by): r mismatch');
-          expect(p1.g, equals(p0.g),
-              reason: 'block at ($bx,$by): g mismatch');
-          expect(p1.b, equals(p0.b),
-              reason: 'block at ($bx,$by): b mismatch');
+          expect(p1.r, equals(p0.r), reason: 'block at ($bx,$by): r mismatch');
+          expect(p1.g, equals(p0.g), reason: 'block at ($bx,$by): g mismatch');
+          expect(p1.b, equals(p0.b), reason: 'block at ($bx,$by): b mismatch');
         }
       }
     });

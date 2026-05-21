@@ -73,8 +73,8 @@ void main() {
       const cropY = 4;
       const cropW = 20;
       const cropH = 10;
-      final result = copyCrop(
-          src, x: cropX, y: cropY, width: cropW, height: cropH);
+      final result =
+          copyCrop(src, x: cropX, y: cropY, width: cropW, height: cropH);
 
       for (var j = 0; j < cropH; j++) {
         for (var i = 0; i < cropW; i++) {

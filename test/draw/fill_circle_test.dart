@@ -43,8 +43,7 @@ void main() {
               color: ColorRgba8(0, 255, 0, 0),
               blend: BlendMode.direct,
             )
-            ..writeToFile(
-                '$testOutputPath/draw/'
+            ..writeToFile('$testOutputPath/draw/'
                 'fillCircleWithBlendDirect.png'))
           .execute();
     });

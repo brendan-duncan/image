@@ -36,8 +36,8 @@ void main() {
       // pixel that differs from the background.
       final bg = ColorRgb8(255, 255, 255);
       final img = Image(width: 200, height: 60)..clear(bg);
-      drawString(img, 'Hi', font: arial24, x: 10, y: 10,
-          color: ColorRgb8(0, 0, 0));
+      drawString(img, 'Hi',
+          font: arial24, x: 10, y: 10, color: ColorRgb8(0, 0, 0));
 
       var changed = 0;
       for (final p in img) {
@@ -60,8 +60,8 @@ void main() {
       // must remain the original background color.
       final bg = ColorRgb8(64, 64, 64);
       final img = Image(width: 200, height: 200)..clear(bg);
-      drawString(img, 'A', font: arial24, x: 2, y: 2,
-          color: ColorRgb8(255, 255, 255));
+      drawString(img, 'A',
+          font: arial24, x: 2, y: 2, color: ColorRgb8(255, 255, 255));
       // pixel at the far corner should still be the background
       final p = img.getPixel(199, 199);
       expect(p.r, equals(bg.r));

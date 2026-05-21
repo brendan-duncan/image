@@ -9,9 +9,9 @@ List<Point> _corners(Image img) {
   final w = img.width.toDouble();
   final h = img.height.toDouble();
   return [
-    Point(),               // (0, 0) — top-left
-    Point(w - 1),          // (w-1, 0) — top-right
-    Point()..y = h - 1,    // (0, h-1) — bottom-left
+    Point(), // (0, 0) — top-left
+    Point(w - 1), // (w-1, 0) — top-right
+    Point()..y = h - 1, // (0, h-1) — bottom-left
     Point(w - 1, h - 1),
   ];
 }

@@ -95,3 +95,20 @@ linter:
     - unnecessary_string_interpolations
     - use_string_buffers
     - void_checks
+    # Bug-catching rules (currently 0 violations in the codebase):
+    - always_declare_return_types
+    - avoid_type_to_string
+    - deprecated_member_use_from_same_package
+    - invalid_case_patterns
+    - no_self_assignments
+    - no_wildcard_variable_uses
+    - null_check_on_nullable_type_parameter
+    - unnecessary_null_aware_operator_on_extension_on_nullable
+    - unrelated_type_equality_checks
+    # Candidates deferred because they currently report violations:
+    #   - unawaited_futures               (5: forgotten awaits in tests)
+    #   - discarded_futures               (3: futures dropped in tests)
+    #   - unnecessary_null_checks         (9)
+    #   - unnecessary_async               (13)
+    #   - cast_nullable_to_non_nullable   (29)
+    #   - prefer_final_in_for_each        (68)

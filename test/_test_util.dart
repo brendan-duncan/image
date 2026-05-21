@@ -169,9 +169,7 @@ Image quadrantImage(
   final mx = width ~/ 2;
   final my = height ~/ 2;
   for (final p in image) {
-    final c = p.y < my
-        ? (p.x < mx ? tl : tr)
-        : (p.x < mx ? bl : br);
+    final c = p.y < my ? (p.x < mx ? tl : tr) : (p.x < mx ? bl : br);
     p.setRgb(c.r, c.g, c.b);
   }
   return image;

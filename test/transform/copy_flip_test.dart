@@ -122,10 +122,8 @@ void main() {
       final src = quadrantImage(20, 10);
       for (final dir in FlipDirection.values) {
         final result = copyFlip(src, direction: dir);
-        expect(result.width, equals(src.width),
-            reason: 'width for $dir');
-        expect(result.height, equals(src.height),
-            reason: 'height for $dir');
+        expect(result.width, equals(src.width), reason: 'width for $dir');
+        expect(result.height, equals(src.height), reason: 'height for $dir');
       }
     });
   });

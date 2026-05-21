@@ -123,8 +123,8 @@ void main() {
     // The expanded canvas is larger than the source.
     test('result dimensions are larger than the source', () {
       final src = solidImage(20, 20, ColorRgb8(100, 150, 200));
-      final result = copyExpandCanvas(src, newWidth: 40, newHeight: 50,
-          backgroundColor: ColorRgb8(0, 0, 0));
+      final result = copyExpandCanvas(src,
+          newWidth: 40, newHeight: 50, backgroundColor: ColorRgb8(0, 0, 0));
       expect(result.width, equals(40));
       expect(result.height, equals(50));
     });
@@ -133,8 +133,8 @@ void main() {
     test('padding mode produces correct dimensions', () {
       final src = solidImage(10, 10, ColorRgb8(255, 0, 0));
       const pad = 5;
-      final result = copyExpandCanvas(src, padding: pad,
-          backgroundColor: ColorRgb8(0, 0, 0));
+      final result = copyExpandCanvas(src,
+          padding: pad, backgroundColor: ColorRgb8(0, 0, 0));
       expect(result.width, equals(10 + pad * 2));
       expect(result.height, equals(10 + pad * 2));
     });
@@ -180,8 +180,7 @@ void main() {
     test('copyExpandCanvas does not mutate source', () {
       final src = solidImage(8, 8, ColorRgb8(200, 100, 50));
       final orig = src.clone();
-      copyExpandCanvas(src, padding: 4,
-          backgroundColor: ColorRgb8(0, 0, 0));
+      copyExpandCanvas(src, padding: 4, backgroundColor: ColorRgb8(0, 0, 0));
       testImageEquals(src, orig);
     });
   });
