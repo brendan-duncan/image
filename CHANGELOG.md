@@ -1,3 +1,7 @@
+## 4.9.1
+
+- Remove meta dependency.
+
 ## 4.9.0
 
 - Fix `minMax` returning incorrect values when the minimum or maximum was in
