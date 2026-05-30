@@ -1,3 +1,8 @@
+## 4.9.2
+
+- Remove xml dependency, replacing it with a minimal built-in parser for the
+  bitmap font (.fnt) format.
+
 ## 4.9.1
 
 - Remove meta dependency.
