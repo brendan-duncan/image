@@ -35,15 +35,42 @@ class OctreeQuantizer extends Quantizer {
         ..b = (got.b / c).round();
     }
 
-    final nodes = <_OctreeNode>[];
-    _getNodes(nodes, _root);
-
-    palette = PaletteUint8(nodes.length, 3);
-    final l = nodes.length;
-    for (var i = 0; i < l; ++i) {
-      final n = nodes[i]..paletteIndex = i;
-      palette.setRgb(i, n.r, n.g, n.b);
+    // The palette is the set of nodes remaining in the heap: the surviving
+    // leaves plus any partially-folded internal nodes, which hold the average
+    // of the pixels that were folded into them. A lookup can legitimately
+    // stop at either kind, so both need palette entries.
+    palette = PaletteUint8(heap.n - 1, 3);
+    for (var i = 1; i < heap.n; ++i) {
+      final n = heap.buf[i]!..paletteIndex = i - 1;
+      palette.setRgb(i - 1, n.r, n.g, n.b);
     }
+
+    _fillPaletteIndex(_root);
+  }
+
+  // Lookups of colors not present in the source image (e.g. from dither
+  // error diffusion) can stop at internal nodes that were never folded into
+  // and so have no palette entry of their own. Give every such node the
+  // palette index of its most-populous child so a lookup never falls through
+  // to an arbitrary index.
+  int _fillPaletteIndex(_OctreeNode node) {
+    if (node.childCount > 0) {
+      var bestCount = -1;
+      var bestIndex = -1;
+      for (final child in node.children) {
+        if (child != null) {
+          final childIndex = _fillPaletteIndex(child);
+          if (child.count > bestCount) {
+            bestCount = child.count;
+            bestIndex = childIndex;
+          }
+        }
+      }
+      if (node.paletteIndex < 0) {
+        node.paletteIndex = bestIndex;
+      }
+    }
+    return node.paletteIndex;
   }
 
   @override
@@ -52,53 +79,30 @@ class OctreeQuantizer extends Quantizer {
 
   @override
   int getColorIndexRgb(int r, int g, int b) {
-    _OctreeNode? root = _root;
+    var node = _root;
     for (var bit = 1 << 7; bit != 0; bit >>= 1) {
       final i = ((g & bit) != 0 ? 1 : 0) * 4 +
           ((r & bit) != 0 ? 1 : 0) * 2 +
           ((b & bit) != 0 ? 1 : 0);
-      if (root!.children[i] == null) {
+      final child = node.children[i];
+      if (child == null) {
         break;
       }
-      root = root.children[i];
+      node = child;
     }
-    return root?.paletteIndex ?? 0;
-  }
-
-  void _getNodes(List<_OctreeNode> nodes, _OctreeNode node) {
-    if (node.childCount == 0) {
-      nodes.add(node);
-      return;
-    }
-    for (var node in node.children) {
-      if (node != null) {
-        _getNodes(nodes, node);
-      }
-    }
+    final index = node.paletteIndex;
+    return index < 0 ? 0 : index;
   }
 
   /// Find the index of the closest color to [c] in the colorMap.
   @override
   Color getQuantizedColor(Color c) {
-    var r = c.r as int;
-    var g = c.g as int;
-    var b = c.b as int;
-    _OctreeNode? root = _root;
-
-    for (var bit = 1 << 7; bit != 0; bit >>= 1) {
-      final i = ((g & bit) != 0 ? 1 : 0) * 4 +
-          ((r & bit) != 0 ? 1 : 0) * 2 +
-          ((b & bit) != 0 ? 1 : 0);
-      if (root!.children[i] == null) {
-        break;
-      }
-      root = root.children[i];
+    if (palette.numColors == 0) {
+      return ColorRgb8(0, 0, 0);
     }
-
-    r = root!.r;
-    g = root.g;
-    b = root.b;
-    return ColorRgb8(r, g, b);
+    final i = getColorIndex(c);
+    return ColorRgb8(palette.get(i, 0).toInt(), palette.get(i, 1).toInt(),
+        palette.get(i, 2).toInt());
   }
 
   int _compareNode(_OctreeNode a, _OctreeNode b) {
@@ -232,7 +236,9 @@ class _OctreeNode {
   int b = 0;
   int count = 0;
   int heapIndex = 0;
-  int paletteIndex = 0;
+  // -1 marks a node with no palette entry of its own; _fillPaletteIndex
+  // assigns these the index of a descendant after the palette is built.
+  int paletteIndex = -1;
   List<_OctreeNode?> children = List<_OctreeNode?>.filled(8, null);
   _OctreeNode? parent;
   int childCount = 0;

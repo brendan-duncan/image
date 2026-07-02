@@ -2,6 +2,11 @@
 
 - Remove xml dependency, replacing it with a minimal built-in parser for the
   bitmap font (.fnt) format.
+- Fix `OctreeQuantizer` mapping colors to palette index 0 when their octree
+  path hit a folded-away branch, which turned bright pixels near-black once an
+  image had more distinct colors than the requested palette size. Palettes
+  built from partially-folded internal nodes now include those nodes' entries,
+  so the palette also no longer comes up short of `numberOfColors`.
 
 ## 4.9.1
 

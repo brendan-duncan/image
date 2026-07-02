@@ -63,6 +63,46 @@ void main() {
       expect(idx.height, equals(32));
     });
 
+    test('octreeQuantizer: folded colors map to nearby palette entries', () {
+      // https://github.com/brendan-duncan/image/issues/792
+      // With more distinct colors than palette entries, the octree folds
+      // leaves into internal nodes. Lookups that stop at a partially-folded
+      // internal node used to fall through to palette index 0, turning
+      // bright pixels near-black.
+      final src = Image(width: 256, height: 256);
+      for (var y = 0; y < 256; y++) {
+        for (var x = 0; x < 256; x++) {
+          if (x < 48) {
+            src.setPixelRgb(x, y, x % 40, x % 40, x % 40);
+          } else {
+            src.setPixelRgb(
+                x, y, 100 + (x ~/ 2) % 156, 100 + (y ~/ 2) % 156, 150);
+          }
+        }
+      }
+
+      final q = quantize(src, method: QuantizeMethod.octree);
+      final pal = q.palette!;
+
+      var worst = 0;
+      for (var y = 0; y < 256; y++) {
+        for (var x = 0; x < 256; x++) {
+          final s = src.getPixel(x, y);
+          final i = q.getPixel(x, y).index.toInt();
+          final dr = s.r.toInt() - pal.get(i, 0).toInt();
+          final dg = s.g.toInt() - pal.get(i, 1).toInt();
+          final db = s.b.toInt() - pal.get(i, 2).toInt();
+          final d = dr * dr + dg * dg + db * db;
+          if (d > worst) {
+            worst = d;
+          }
+        }
+      }
+      // Before the fix the worst error was > 200 per pixel (bright colors
+      // assigned to a near-black entry).
+      expect(worst, lessThan(32 * 32));
+    });
+
     test('octreeQuantizer: getColorIndex consistent with getQuantizedColor',
         () {
       // palette.get(idx, ch) must match getQuantizedColor channels.
