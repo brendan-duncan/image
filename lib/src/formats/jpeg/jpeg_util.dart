@@ -79,7 +79,11 @@ class JpegUtil {
       } else {
         _skipBlock(input);
       }
-      exifBlockStartOffset = startOffset;
+      // Remember where the next block begins. Any segments that precede the
+      // EXIF APP1 (e.g. the JFIF APP0 header) must be preserved, so this has
+      // to advance to the current input offset rather than resetting to the
+      // start (which would drop everything between SOI and the EXIF block).
+      exifBlockStartOffset = input.offset;
       marker = _nextMarker(input);
     }
 

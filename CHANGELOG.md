@@ -1,5 +1,7 @@
 ## 4.9.2
 
+- Fix `injectJpgExif` dropping any segment (such as the JFIF APP0 header) that
+  precedes the EXIF APP1 block, and losing the embedded EXIF thumbnail.
 - Remove xml dependency, replacing it with a minimal built-in parser for the
   bitmap font (.fnt) format.
 - Fix `OctreeQuantizer` mapping colors to palette index 0 when their octree

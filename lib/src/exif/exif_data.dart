@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../util/input_buffer.dart';
 import '../util/output_buffer.dart';
 import 'exif_tag.dart';
@@ -7,9 +9,16 @@ import 'ifd_value.dart';
 
 /// Stores EXIF data for an Image.
 class ExifData extends IfdContainer {
+  Uint8List? thumbnailData;
+
   ExifData() : super();
 
-  ExifData.from(ExifData? other) : super.from(other);
+  ExifData.from(ExifData? other) : super.from(other) {
+    final otherThumbnail = other?.thumbnailData;
+    if (otherThumbnail != null) {
+      thumbnailData = Uint8List.fromList(otherThumbnail);
+    }
+  }
 
   ExifData.fromInputBuffer(InputBuffer input) : super() {
     read(input);
@@ -98,6 +107,23 @@ class ExifData extends IfdContainer {
       directories['ifd0'] = IfdDirectory();
     }
 
+    // Normalize the IFD1 thumbnail tags. JPEGInterchangeFormat (0x0201) is an
+    // offset-to-data tag, so it must only be written when we actually have the
+    // thumbnail payload to place at that offset; otherwise the offset/length
+    // tags would be dangling pointers. The offset value is patched in once the
+    // layout is known (below).
+    final thumbnailIfd = directories['ifd1'];
+    final thumbnail = thumbnailData;
+    final hasThumbnail =
+        thumbnail != null && thumbnail.isNotEmpty && thumbnailIfd != null;
+    if (hasThumbnail) {
+      thumbnailIfd[0x0201] = IfdValueLong(0);
+      thumbnailIfd[0x0202] = IfdValueLong(thumbnail.length);
+    } else if (thumbnailIfd != null) {
+      thumbnailIfd.data.remove(0x0201);
+      thumbnailIfd.data.remove(0x0202);
+    }
+
     // Ensure deterministic ordering: IFD0 must be written first. Use an
     // explicit list of directory names so offsets and next-pointer values
     // are calculated consistently regardless of map insertion order.
@@ -159,6 +185,16 @@ class ExifData extends IfdContainer {
       }
     }
 
+    // The thumbnail payload is laid out after all IFD structures and their
+    // data. Record its offset (relative to the TIFF header) and patch it into
+    // the JPEGInterchangeFormat tag so it points at the bytes appended below.
+    var thumbnailOffset = 0;
+    if (hasThumbnail) {
+      thumbnailOffset = dataOffset;
+      thumbnailIfd[0x0201]!.setInt(thumbnailOffset);
+      dataOffset += thumbnail.length;
+    }
+
     final numIfd = dirNames.length;
     for (int i = 0; i < numIfd; ++i) {
       final name = dirNames[i];
@@ -197,6 +233,11 @@ class ExifData extends IfdContainer {
         _writeDirectory(out, subIfd, dataOffset);
         _writeDirectoryLargeValues(out, subIfd);
       }
+    }
+
+    // Append the thumbnail payload at the offset recorded in the 0x0201 tag.
+    if (hasThumbnail) {
+      out.writeBytes(thumbnail);
     }
 
     out.bigEndian = saveEndian;
@@ -347,6 +388,28 @@ class ExifData extends IfdContainer {
             continue;
           }
         }
+      }
+    }
+
+    // Capture the embedded IFD1 thumbnail payload, if present. The
+    // JPEGInterchangeFormat (0x0201) tag holds an offset (relative to the TIFF
+    // header) to the thumbnail JPEG bytes, and JPEGInterchangeFormatLength
+    // (0x0202) holds its length.
+    thumbnailData = null;
+    final thumbnailIfd = directories['ifd1'];
+    if (thumbnailIfd != null &&
+        thumbnailIfd.containsKey(0x0201) &&
+        thumbnailIfd.containsKey(0x0202)) {
+      final thumbnailOffset = thumbnailIfd[0x0201]!.toInt();
+      final thumbnailLength = thumbnailIfd[0x0202]!.toInt();
+      final start = blockOffset + thumbnailOffset;
+      if (thumbnailLength > 0 &&
+          start >= blockOffset &&
+          start + thumbnailLength <= block.end) {
+        final saveOffset = block.offset;
+        block.offset = start;
+        thumbnailData = block.readBytes(thumbnailLength).toUint8List();
+        block.offset = saveOffset;
       }
     }
 
