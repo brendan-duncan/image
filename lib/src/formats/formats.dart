@@ -234,6 +234,15 @@ Decoder? findDecoderForData(List<int> data) {
     return bmp;
   }
 
+  // Probe PNM before TGA. PnmDecoder.isValidFile requires an exact P1-P6 magic
+  // token, while TGA has no magic bytes and its validation only checks the
+  // pixel depth and colormap fields, so a binary PNM header can satisfy it and
+  // the TGA reader then overruns (#744). The strictly identified format wins.
+  final pnm = PnmDecoder();
+  if (pnm.isValidFile(bytes)) {
+    return pnm;
+  }
+
   final tga = TgaDecoder();
   if (tga.isValidFile(bytes)) {
     return tga;
@@ -247,11 +256,6 @@ Decoder? findDecoderForData(List<int> data) {
   final pvr = PvrDecoder();
   if (pvr.isValidFile(bytes)) {
     return pvr;
-  }
-
-  final pnm = PnmDecoder();
-  if (pnm.isValidFile(bytes)) {
-    return pnm;
   }
 
   return null;
