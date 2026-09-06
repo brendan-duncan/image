@@ -20,6 +20,10 @@ class WebPFrame {
   // frame is left and the next frame drawn over it.
   late bool clearFrame;
 
+  // If true, the frame is alpha blended over what is already on the canvas.
+  // If false, it replaces those pixels outright, alpha included
+  late bool blendFrame;
+
   WebPFrame(InputBuffer input, int size)
       : x = input.readUint24() * 2,
         y = input.readUint24() * 2,
@@ -29,6 +33,8 @@ class WebPFrame {
     final b = input.readByte();
     _reserved = (b & 0x7f) >> 7;
     clearFrame = (b & 0x1) != 0;
+    // The bit is set when the frame must not be blended
+    blendFrame = (b & 0x2) == 0;
     _framePosition = input.position;
     _frameSize = size - _animFrameHeaderSize;
   }

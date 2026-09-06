@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../../exif/exif_data.dart';
+import '../../image/icc_profile.dart';
 import '../../image/image.dart';
 import '../../util/_internal.dart';
 import '../../util/color_util.dart';
@@ -73,6 +74,12 @@ class VP8L {
     if (webp.exif.isNotEmpty) {
       final input = InputBuffer(webp.exif.codeUnits);
       image!.exif = ExifData.fromInputBuffer(input);
+    }
+
+    // The ICCP chunk holds the profile uncompressed.
+    final iccp = webp.iccp;
+    if (iccp != null) {
+      image!.iccProfile = IccProfile('', IccProfileCompression.none, iccp);
     }
 
     return image;
@@ -1219,7 +1226,8 @@ class VP8L {
           final blue = htrees[_blue][0].value;
           final alpha = htrees[_alpha][0].value;
           htreeGroup.literalArb = (alpha << 24) | (red << 16) | blue;
-          if (totalSize == 0 && htrees[_green][0].value < _numLengthCodes) {
+          // Trivial means the one green symbol is a literal.
+          if (totalSize == 0 && htrees[_green][0].value < _numLiteralCodes) {
             htreeGroup
               ..isTrivialCode = true
               ..literalArb |= htrees[_green][0].value << 8;

@@ -27,7 +27,7 @@ NOTE: 4.0 is a major revision from the previous version of the library.
 - TGA
 - PVR
 - ICO
-- (Read) WebP / Animated WebP, (Write) Lossless WebP
+- WebP / Animated WebP (lossless and lossy)
 
 **Read Only**
 

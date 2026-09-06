@@ -60,10 +60,10 @@ class WebPAlpha {
     final unfilterFunc = WebPFilters.unfilters[filter];
 
     if (method == _alphaNoCompression) {
+      // setRange takes an end, not a count.
       final offset = row * width;
-      final numPixels = numRows * width;
-
-      output.setRange(offset, numPixels, input.buffer, input.position + offset);
+      final end = offset + numRows * width;
+      output.setRange(offset, end, input.buffer, input.position + offset);
     } else {
       if (!_decodeAlphaImageStream(row + numRows, output)) {
         return false;

@@ -79,7 +79,7 @@ class WebPFilters {
     final startOffset = row * stride;
     final lastRow = row + numRows;
     final s = InputBuffer(src, offset: startOffset);
-    final o = InputBuffer(src, offset: startOffset);
+    final o = InputBuffer(out, offset: startOffset);
     final preds = InputBuffer.from(inverse ? o : s);
 
     if (row == 0) {

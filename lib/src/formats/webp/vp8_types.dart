@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../../util/_internal.dart';
 import 'vp8.dart';
+import 'vp8_tables.dart';
 
 @internal
 class VP8FrameHeader {
@@ -43,8 +44,7 @@ class VP8SegmentHeader {
 class VP8BandProbas {
   List<Uint8List> probas;
   VP8BandProbas()
-      : probas = List<Uint8List>.generate(
-            VP8.numCtx, (_) => Uint8List(VP8.numProbas),
+      : probas = List<Uint8List>.generate(numCtx, (_) => Uint8List(numProbas),
             growable: false);
 }
 
@@ -58,9 +58,9 @@ class VP8Proba {
 
   VP8Proba()
       : bands = List<List<VP8BandProbas>>.generate(
-            VP8.numTypes,
+            numTypes,
             (_) => List<VP8BandProbas>.generate(
-                VP8.numBands, (_) => VP8BandProbas(),
+                numBands, (_) => VP8BandProbas(),
                 growable: false),
             growable: false) {
     segments.fillRange(0, segments.length, 255);

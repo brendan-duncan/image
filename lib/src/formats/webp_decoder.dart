@@ -1,5 +1,8 @@
 import '../color/color_uint8.dart';
+import '../draw/blend_mode.dart';
 import '../draw/composite_image.dart';
+import '../exif/exif_data.dart';
+import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
@@ -141,22 +144,51 @@ class WebPDecoder extends Decoder {
             height: _info!.height,
             numChannels: image.numChannels,
             format: image.format,
-            frameDuration: image.frameDuration);
+            frameDuration: image.frameDuration,
+            // This canvas is built rather than decoded, so the file's own
+            // fields have to be carried onto it or the round trip drops them
+            loopCount: _info!.animLoopCount,
+            backgroundColor: _info!.backgroundColor,
+            exif: _exifOf(_info!),
+            iccp: _iccProfileOf(_info!));
         lastImage = firstImage;
       } else {
         lastImage = Image.from(lastImage);
 
-        if (frame.clearFrame) {
+        // The flag says what to do after its own frame is shown, so it is
+        // the previous frame that decides whether this one starts cleared
+        if (_info!.frames[i - 1].clearFrame) {
           lastImage.clear();
         }
       }
 
-      compositeImage(lastImage, image, dstX: frame.x, dstY: frame.y);
+      // Image.from carries the previous frame's duration over, so take this
+      // frame's from the chunk that actually holds it.
+      lastImage.frameDuration = frame.duration;
+
+      compositeImage(lastImage, image,
+          dstX: frame.x,
+          dstY: frame.y,
+          blend: frame.blendFrame ? BlendMode.alpha : BlendMode.direct);
 
       firstImage.addFrame(lastImage);
     }
 
     return firstImage;
+  }
+
+  /// The chunk parser holds EXIF as a string of byte values, one code unit a
+  /// byte
+  static ExifData? _exifOf(WebPInfo info) => info.exif.isEmpty
+      ? null
+      : ExifData.fromInputBuffer(InputBuffer(info.exif.codeUnits));
+
+  /// The ICCP chunk holds the profile inflated, so nothing to decompress
+  static IccProfile? _iccProfileOf(WebPInfo info) {
+    final iccp = info.iccp;
+    return iccp == null
+        ? null
+        : IccProfile('', IccProfileCompression.none, iccp);
   }
 
   Image? _decodeFrame(InputBuffer input, {int frame = 0}) {
@@ -316,11 +348,12 @@ class WebPDecoder extends Decoder {
 
   bool _getAnimInfo(InputBuffer input, WebPInfo webp) {
     final c = input.readUint32();
-    // Color is stored in blue,green,red,alpha order.
-    final a = c & 0xff;
-    final r = (c >> 8) & 0xff;
-    final g = (c >> 16) & 0xff;
-    final b = (c >> 24) & 0xff;
+    // Blue, green, red, alpha in that byte order, read little endian, so blue
+    // arrives in the low byte.
+    final b = c & 0xff;
+    final g = (c >> 8) & 0xff;
+    final r = (c >> 16) & 0xff;
+    final a = (c >> 24) & 0xff;
     webp
       ..backgroundColor = ColorRgba8(r, g, b, a)
       ..animLoopCount = input.readUint16();

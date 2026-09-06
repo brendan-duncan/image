@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../../util/_internal.dart';
+import 'vp8l_color_hash.dart';
 
 @internal
 class VP8LColorCache {
@@ -12,12 +13,8 @@ class VP8LColorCache {
         hashShift = 32 - hashBits;
 
   void insert(int argb) {
-    final a = (argb * _hashMultiplier) & 0xffffffff;
-    final key = a >> hashShift;
-    colors[key] = argb;
+    colors[colorCacheKey(argb, hashShift)] = argb;
   }
 
   int lookup(int key) => colors[key];
-
-  static const _hashMultiplier = 0x1e35a7bd;
 }

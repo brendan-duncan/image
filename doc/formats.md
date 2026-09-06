@@ -13,9 +13,9 @@ Dart Image Library supports a wide range of image file formats for both decoding
 * TGA
 * ICO
 * PVRTC
+* WebP + Animated WebP
 
 ### Read Only
-* WebP + Animated WebP
 * Photoshop PSD
 * OpenEXR
 * PNM (PBM, PGM, PPM)
@@ -96,12 +96,33 @@ Future<bool> encodeGifFile(String path, Image image, {
     bool ditherSerpentine = false,
     DitherScanOrder? ditherScanOrder });
 ```
-### WebP: decoding only
+### WebP: decoding, encoding
 ```dart
 Image? decodeWebP(Uint8List bytes);
 
 Future<Image?> decodeWebPFile(String path, { int? frame }) async;
+
+Uint8List encodeWebP(Image image, {
+    bool singleFrame = false,
+    bool exact = true,
+    bool lossless = true,
+    int quality = 75,
+    int method = 4,
+    int alphaQuality = 100 });
+
+Future<bool> encodeWebPFile(String path, Image image, {
+    bool singleFrame = false,
+    bool exact = true,
+    bool lossless = true,
+    int quality = 75,
+    int method = 4,
+    int alphaQuality = 100 }) async;
 ```
+Encoding is lossless by default, so `quality`, `method` and `alphaQuality` do nothing until `lossless: false` is passed.
+`exact` keeps the color under fully transparent pixels; clearing it flattens that color into runs, worth 15-20% on an
+image with large transparent areas, which is what `cwebp` does unless given its own `-exact`. An image with more than one
+frame is written as an animation unless `singleFrame` asks for just the first, and every frame has to fit the canvas.
+
 ### BMP: decoding, encoding
 ```dart
 Image? decodeBmp(Uint8List bytes);
