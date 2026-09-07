@@ -1,6 +1,7 @@
 import '../color/color_uint8.dart';
 import '../draw/blend_mode.dart';
 import '../draw/composite_image.dart';
+import '../draw/fill_rect.dart';
 import '../exif/exif_data.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
@@ -17,6 +18,8 @@ import 'webp/webp_info.dart';
 /// lossy+alpha, and animated WebP images.
 class WebPDecoder extends Decoder {
   InternalWebPInfo? _info;
+
+  static final _transparent = ColorRgba8(0, 0, 0, 0);
 
   WebPDecoder([List<int>? bytes]) {
     if (bytes != null) {
@@ -128,6 +131,9 @@ class WebPDecoder extends Decoder {
 
     Image? firstImage;
     Image? lastImage;
+    // Not frames[i - 1]: an undecodable frame is skipped, and must not dispose
+    // in place of the frame that was actually drawn
+    WebPFrame? previous;
     for (var i = 0; i < _info!.numFrames; ++i) {
       _info!.frame = i;
       final frame = _info!.frames[i];
@@ -155,10 +161,20 @@ class WebPDecoder extends Decoder {
       } else {
         lastImage = Image.from(lastImage);
 
-        // The flag says what to do after its own frame is shown, so it is
-        // the previous frame that decides whether this one starts cleared
-        if (_info!.frames[i - 1].clearFrame) {
-          lastImage.clear();
+        // Disposal happens after its own frame is shown, so the previous frame
+        // is the one that decides
+        if (previous != null && previous.clearFrame) {
+          // Clearing the whole canvas instead wipes the background of any
+          // animation built from partial frames
+          fillRect(lastImage,
+              x1: previous.x,
+              y1: previous.y,
+              x2: previous.x + previous.width - 1,
+              y2: previous.y + previous.height - 1,
+              // libwebp clears to transparent, not to the ANIM colour
+              color: _transparent,
+              // blending would turn a zero alpha fill into a no-op
+              alphaBlend: false);
         }
       }
 
@@ -171,7 +187,12 @@ class WebPDecoder extends Decoder {
           dstY: frame.y,
           blend: frame.blendFrame ? BlendMode.alpha : BlendMode.direct);
 
-      firstImage.addFrame(lastImage);
+      // lastImage is firstImage here, already in frames[0]. addFrame declines
+      // to add it twice but still sets frameIndex, numbering frame 0 as 1
+      if (!identical(lastImage, firstImage)) {
+        firstImage.addFrame(lastImage);
+      }
+      previous = frame;
     }
 
     return firstImage;
