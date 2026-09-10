@@ -244,10 +244,11 @@ Image drawPixel(Image image, int x, int y, Color c,
     final lor = pow(overlayR, 2.2);
     final log = pow(overlayG, 2.2);
     final lob = pow(overlayB, 2.2);
-    final r = pow(lor * overlayA + lbr * baseA * invA, 1.0 / 2.2);
-    final g = pow(log * overlayA + lbg * baseA * invA, 1.0 / 2.2);
-    final b = pow(lob * overlayA + lbb * baseA * invA, 1.0 / 2.2);
     final a = overlayA + baseA * invA;
+    final s = a > 0 ? 1 / a : 0;
+    final r = pow((lor * overlayA + lbr * baseA * invA) * s, 1.0 / 2.2);
+    final g = pow((log * overlayA + lbg * baseA * invA) * s, 1.0 / 2.2);
+    final b = pow((lob * overlayA + lbb * baseA * invA) * s, 1.0 / 2.2);
 
     dst
       ..rNormalized = r
@@ -255,10 +256,11 @@ Image drawPixel(Image image, int x, int y, Color c,
       ..bNormalized = b
       ..aNormalized = a;
   } else {
-    final r = overlayR * overlayA + baseR * baseA * invA;
-    final g = overlayG * overlayA + baseG * baseA * invA;
-    final b = overlayB * overlayA + baseB * baseA * invA;
     final a = overlayA + baseA * invA;
+    final s = a > 0 ? 1 / a : 0;
+    final r = (overlayR * overlayA + baseR * baseA * invA) * s;
+    final g = (overlayG * overlayA + baseG * baseA * invA) * s;
+    final b = (overlayB * overlayA + baseB * baseA * invA) * s;
 
     dst
       ..rNormalized = r

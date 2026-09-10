@@ -59,7 +59,8 @@ void main() {
     test('drawPixel with alpha blend composites correctly on black background',
         () {
       // Drawing 50%-opaque white (128/255) on black → result ~= 128 per channel.
-      final image = Image(width: 1, height: 1, numChannels: 4);
+      final image = Image(width: 1, height: 1, numChannels: 4)
+        ..clear(ColorRgba8(0, 0, 0, 255));
       drawPixel(image, 0, 0, ColorRgba8(255, 255, 255, 128));
       final p = image.getPixel(0, 0);
       // The blended red/green/blue should be between 120 and 136.

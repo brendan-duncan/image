@@ -506,6 +506,11 @@ class VP8L {
   }
 
   bool _decodeAlphaData(int width, int height, int lastRow) {
+    // A backward reference at the end of a band can run to the end of the
+    // image, leaving the next band nothing to do
+    if (_lastPixel == width * height) {
+      return true;
+    }
     var row = _lastPixel ~/ width;
     var col = _lastPixel % width;
 
