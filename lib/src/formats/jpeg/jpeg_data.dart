@@ -185,6 +185,13 @@ class JpegData {
 
     marker = _nextMarker();
     while (marker != JpegMarker.eoi && !input.isEOS) {
+      // RSTn and TEM markers are standalone and have no length or payload.
+      if ((marker >= JpegMarker.rst0 && marker <= JpegMarker.rst7) ||
+          marker == JpegMarker.tem) {
+        marker = _nextMarker();
+        continue;
+      }
+
       final block = _readBlock();
       switch (marker) {
         case JpegMarker.app0:

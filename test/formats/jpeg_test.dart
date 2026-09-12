@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -6,6 +8,8 @@ import '../_test_util.dart';
 
 void main() async {
   group('Format', () {
+    
+
     group('jpg', () {
       test('inject new exif', () {
         final fb = File('test/_data/jpg/jpeg444.jpg').readAsBytesSync();
@@ -165,6 +169,30 @@ void main() async {
           expect(image.height, equals(image2.height));
         });
       }
+
+      // https://github.com/brendan-duncan/image/issues/805
+      test('restart marker before EOI', () {
+        final src = Image(width: 32, height: 32)
+          ..clear(ColorRgb8(200, 100, 50));
+        final jpg = JpegEncoder().encode(src);
+        expect(jpg[jpg.length - 2], equals(0xff));
+        expect(jpg[jpg.length - 1], equals(0xd9));
+
+        for (var rst = 0xd0; rst <= 0xd7; ++rst) {
+          final bytes = [
+            ...jpg.sublist(0, jpg.length - 2),
+            0xff, rst, // RSTn
+            0xff, 0xd9, // EOI
+          ];
+          final image = JpegDecoder().decode(Uint8List.fromList(bytes))!;
+          expect(image.width, equals(32));
+          expect(image.height, equals(32));
+          final p = image.getPixel(16, 16);
+          expect(p.r, closeTo(200, 3));
+          expect(p.g, closeTo(100, 3));
+          expect(p.b, closeTo(50, 3));
+        }
+      });
 
       for (var i = 1; i < 9; ++i) {
         test('exif/orientation_$i/landscape', () {
