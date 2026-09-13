@@ -1,3 +1,20 @@
+# 4.10.0
+
+* Add lossy WebP encoding with `encodeWebP(lossless: false)` and the `quality`,
+  `method` and `alphaQuality` options.
+* Improve lossless WebP compression, with file sizes now close to `cwebp`.
+* Add the `exact` and `singleFrame` options to `encodeWebP`.
+* `WebPEncoder.exact` now defaults to `true`, preserving the color under fully
+  transparent pixels at the cost of larger files.
+* Fix WebP encoding of 16-bit and grayscale+alpha images.
+* Read ICC profiles when decoding WebP files.
+* Fix animated WebP frame durations, partial-frame disposal, and the
+  background color byte order.
+* Fix lossless WebP decoding on the web, where the color cache hash lost
+  precision.
+* Fix JPEG decoding failing with "Unknown JPEG marker" when a restart marker
+  precedes the end of the image (#805).
+
 # 4.9.2
 
 * Add the `DitherKernel.burkes` and `DitherKernel.jarvisJudiceNinke`
