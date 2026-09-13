@@ -1,3 +1,13 @@
+# 4.10.1
+
+* Fix alpha blending onto translucent pixels, which darkened translucent
+  animated WebP frames (#804).
+* Fix a WebP alpha decode crash when a backward reference reaches the end of
+  the image (#804).
+* Fix 16-bit grayscale+alpha images encoding to WebP as fully transparent (#804).
+* Pixels of images with no alpha channel now report full alpha in every format.
+* Fix `PixelFloat16.a` setter writing the green value.
+
 # 4.10.0
 
 * Add lossy WebP encoding with `encodeWebP(lossless: false)` and the `quality`,
