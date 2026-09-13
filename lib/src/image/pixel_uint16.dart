@@ -156,42 +156,54 @@ class PixelUint16 extends Iterable<num> implements Pixel {
 
   @override
   num get g => palette == null
-      ? numChannels > 1
-          ? data[_index + 1]
-          : 0
+      ? numChannels == 2
+          ? data[_index]
+          : numChannels > 1
+              ? data[_index + 1]
+              : 0
       : palette!.getGreen(data[_index]);
 
   @override
   set g(num g) {
-    if (image.numChannels > 1) {
+    if (numChannels == 2) {
+      data[_index] = g.toInt();
+    } else if (image.numChannels > 1) {
       data[_index + 1] = g.toInt();
     }
   }
 
   @override
   num get b => palette == null
-      ? numChannels > 2
-          ? data[_index + 2]
-          : 0
+      ? numChannels == 2
+          ? data[_index]
+          : numChannels > 2
+              ? data[_index + 2]
+              : 0
       : palette!.getBlue(data[_index]);
 
   @override
   set b(num b) {
-    if (image.numChannels > 2) {
+    if (numChannels == 2) {
+      data[_index] = b.toInt();
+    } else if (image.numChannels > 2) {
       data[_index + 2] = b.toInt();
     }
   }
 
   @override
   num get a => palette == null
-      ? numChannels > 3
-          ? data[_index + 3]
-          : 0
+      ? numChannels == 2
+          ? data[_index + 1]
+          : numChannels > 3
+              ? data[_index + 3]
+              : 0
       : palette!.getAlpha(data[_index]);
 
   @override
   set a(num a) {
-    if (image.numChannels > 3) {
+    if (numChannels == 2) {
+      data[_index + 1] = a.toInt();
+    } else if (image.numChannels > 3) {
       data[_index + 3] = a.toInt();
     }
   }

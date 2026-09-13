@@ -1697,6 +1697,37 @@ void main() {
             filtering: alphaFilterNone);
         expect(fast.length, lessThanOrEqualTo(none.length));
       });
+
+      for (final size in const [
+        [65, 32],
+        [65, 64],
+        [32, 32],
+        [32, 64],
+      ]) {
+        final w = size[0];
+        final h = size[1];
+        test(
+            'a plane whose last backward reference reaches the end of the '
+            'image decodes, at ${w}x$h', () {
+          // The plane is decoded a band of rows at a time, and a backward
+          // reference at the end of a band can carry the position past the
+          // rows that were asked for. When it lands exactly on the last pixel
+          // there is nothing left for the next band to do.
+          final source = Image(width: w, height: h, numChannels: 4);
+          for (final pixel in source) {
+            pixel.setRgba(128, 128, 128, (pixel.y * w + pixel.x) % 256);
+          }
+
+          final decoded = decodeWebP(
+              encodeWebP(source, lossless: false, quality: 100, method: 6))!;
+          expect(decoded.width, equals(w));
+          expect(decoded.height, equals(h));
+          for (final pixel in source) {
+            expect(decoded.getPixel(pixel.x, pixel.y).a, equals(pixel.a),
+                reason: 'alpha at ${pixel.x},${pixel.y}');
+          }
+        });
+      }
     });
 
     group('bit writer', () {
@@ -1813,6 +1844,40 @@ void main() {
           }
         }
       });
+
+      for (final name in const [
+        'basi4a16.png',
+        'basn4a16.png',
+        'bgai4a16.png',
+        'bggn4a16.png',
+      ]) {
+        test('a sixteen bit two channel image keeps its transparency, $name',
+            () {
+          // Grey plus alpha at eight bits already round trips. At sixteen the
+          // encoder reads the second channel as green and finds no alpha at
+          // all, so the picture is written fully transparent.
+          final source =
+              decodePng(File('test/_data/png/$name').readAsBytesSync())!;
+          expect(source.format, equals(Format.uint16));
+          expect(source.numChannels, equals(2));
+
+          final back = decodeWebP(encodeWebP(source))!;
+          expect(back.width, equals(source.width));
+          expect(back.height, equals(source.height));
+          for (final p in source) {
+            final grey = (p[0] * 255 / 65535).round();
+            final alpha = (p[1] * 255 / 65535).round();
+            final q = back.getPixel(p.x, p.y);
+            expect(q.a, equals(alpha), reason: 'alpha at ${p.x},${p.y}');
+            // Lossless drops the colour of a fully transparent pixel unless
+            // asked to keep it
+            if (alpha != 0) {
+              expect([q.r, q.g, q.b], equals([grey, grey, grey]),
+                  reason: 'grey at ${p.x},${p.y}');
+            }
+          }
+        });
+      }
     });
 
     group('huffman', () {
