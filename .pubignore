@@ -2,5 +2,3 @@ doc/
 test/
 _out/
 web/
-example/*.webp
-example/*.png
