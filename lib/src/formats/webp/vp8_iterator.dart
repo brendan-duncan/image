@@ -135,8 +135,9 @@ class VP8EncIterator {
     // above and below the first row.
     yLeft[0] = uvLeft[uLeftOff - 1] = uvLeft[vLeftOff - 1] = y > 0 ? 129 : 127;
     yLeft.fillRange(yLeftOff, yLeftOff + 16, 129);
-    uvLeft.fillRange(uLeftOff, uLeftOff + 8, 129);
-    uvLeft.fillRange(vLeftOff, vLeftOff + 8, 129);
+    uvLeft
+      ..fillRange(uLeftOff, uLeftOff + 8, 129)
+      ..fillRange(vLeftOff, vLeftOff + 8, 129);
     leftNz[8] = 0;
     if (enc.topDerr != null) {
       leftDerr.fillRange(0, 4, 0);

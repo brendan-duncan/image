@@ -8,8 +8,6 @@ import '../_test_util.dart';
 
 void main() async {
   group('Format', () {
-    
-
     group('jpg', () {
       test('inject new exif', () {
         final fb = File('test/_data/jpg/jpeg444.jpg').readAsBytesSync();

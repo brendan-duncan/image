@@ -652,14 +652,14 @@ class VP8Decimate {
     rd.modeI16 = -1;
     for (var mode = 0; mode < _numPredModes; mode++) {
       final tmpDst = it.yuvOut2;
-      rdCur.modeI16 = mode;
-      rdCur.nz = _reconstructIntra16(rdCur, tmpDst, mode);
-
+      // Each step reads what the ones before it stored.
       rdCur
+        ..modeI16 = mode
+        ..nz = _reconstructIntra16(rdCur, tmpDst, mode)
         ..d = getSSE(it.yuvIn, src, tmpDst, src, 16, 16)
         ..sd = tlambda != 0 ? _mult8b(tlambda, _disto16(tmpDst)) : 0
-        ..h = kFixedCostsI16[mode];
-      rdCur.r = _getCostLuma16(rdCur);
+        ..h = kFixedCostsI16[mode]
+        ..r = _getCostLuma16(rdCur);
       if (isFlatBlock) {
         // The first impression was made on the pixels; now that the levels are
         // known, confirm it.
