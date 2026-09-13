@@ -209,7 +209,8 @@ class PixelUint2 extends Iterable<num> implements Pixel {
   set b(num b) => _setChannel(2, b);
 
   @override
-  num get a => _getChannel(3);
+  num get a =>
+      palette == null && numChannels < 4 ? maxChannelValue : _getChannel(3);
   @override
   set a(num a) => _setChannel(3, a);
 

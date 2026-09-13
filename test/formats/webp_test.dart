@@ -9,6 +9,7 @@ import 'dart:typed_data';
 import 'package:image/image.dart';
 import 'package:image/src/formats/webp/vp8_alpha.dart';
 import 'package:image/src/formats/webp/vp8_config.dart';
+import 'package:image/src/formats/webp/vp8_encoder.dart';
 import 'package:image/src/formats/webp/vp8_rd.dart';
 import 'package:image/src/formats/webp/vp8_sar.dart';
 import 'package:image/src/formats/webp/vp8_state.dart';
@@ -1728,6 +1729,64 @@ void main() {
           }
         });
       }
+
+      test(
+          'a plane without a palette whose last backward reference reaches '
+          'the end of the image decodes', () {
+        // The same end of band case on the full ARGB path, which a plane that
+        // is not a bare palette takes. The encoder here always writes the
+        // alpha plane as a palette, so noise in red keeps it from being one;
+        // only green is read back as alpha. The bottom half repeats the top,
+        // so the plane ends on a long backward reference.
+        const w = 16;
+        const h = 64;
+        final rnd = Random(1);
+        final plane = Uint8List(w * h);
+        final red = Uint8List(w * h);
+        for (var y = 0; y < h; y++) {
+          final sy = y >= h ~/ 2 ? y - h ~/ 2 : y;
+          for (var x = 0; x < w; x++) {
+            plane[y * w + x] = (x + sy) & 0xff;
+            red[y * w + x] = sy == y ? rnd.nextInt(256) : red[sy * w + x];
+          }
+        }
+        // The encoder transforms its input in place
+        final stream = VP8LEncoder(exact: true).encodeStream(
+            Uint8List.fromList(red),
+            Uint8List.fromList(plane),
+            Uint8List(w * h),
+            Uint8List(w * h),
+            w,
+            h,
+            alphaIsUsed: true);
+        // The first transform is not color indexing
+        expect(stream[0] & 7, isNot(equals(7)));
+
+        final opaque = Image(width: w, height: h)
+          ..clear(ColorRgb8(128, 128, 128));
+        final bytes = buildRiff([
+          WebPChunk(
+              'VP8X',
+              vp8xChunkData(
+                  vp8xFlags(
+                      hasIcc: false,
+                      hasAlpha: true,
+                      hasExif: false,
+                      hasXmp: false,
+                      hasAnimation: false),
+                  w,
+                  h)),
+          // Lossless compression, no filter
+          WebPChunk('ALPH', Uint8List.fromList([1, ...stream])),
+          WebPChunk('VP8 ', encodeVP8(opaque, VP8Config()).bitstream),
+        ]);
+
+        final decoded = decodeWebP(bytes)!;
+        for (var i = 0; i < w * h; i++) {
+          expect(decoded.getPixel(i % w, i ~/ w).a, equals(plane[i]),
+              reason: 'alpha at ${i % w},${i ~/ w}');
+        }
+      });
     });
 
     group('bit writer', () {

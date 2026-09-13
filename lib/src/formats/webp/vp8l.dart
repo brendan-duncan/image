@@ -235,12 +235,20 @@ class VP8L {
     var row = _lastPixel ~/ width;
     var col = _lastPixel % width;
 
-    var htreeGroup = _getHtreeGroupForPos(col, row);
-
     var src = _lastPixel;
     var lastCached = src;
     final srcEnd = width * height; // End of data
     final srcLast = width * lastRow; // Last pixel to decode
+
+    // A backward reference at the end of the previous band can run past this
+    // one, as far as the end of the image, where there is no group to look up.
+    // Nothing is left to decode, only the rows it filled in to hand on.
+    if (src >= srcLast) {
+      processFunc?.call(lastRow, false);
+      return true;
+    }
+
+    var htreeGroup = _getHtreeGroupForPos(col, row);
 
     const lenCodeLimit = _numLiteralCodes + _numLengthCodes;
     final colorCacheLimit = lenCodeLimit + _colorCacheSize;
@@ -506,18 +514,22 @@ class VP8L {
   }
 
   bool _decodeAlphaData(int width, int height, int lastRow) {
-    // A backward reference at the end of a band can run to the end of the
-    // image, leaving the next band nothing to do
-    if (_lastPixel == width * height) {
-      return true;
-    }
     var row = _lastPixel ~/ width;
     var col = _lastPixel % width;
 
-    var htreeGroup = _getHtreeGroupForPos(col, row);
     var pos = _lastPixel; // current position
     final end = width * height; // End of data
     final last = width * lastRow; // Last pixel to decode
+
+    // A backward reference at the end of the previous band can run past this
+    // one, as far as the end of the image, where there is no group to look up.
+    // Nothing is left to decode, only the rows it filled in to hand on.
+    if (pos >= last) {
+      _extractPalettedAlphaRows(row);
+      return true;
+    }
+
+    var htreeGroup = _getHtreeGroupForPos(col, row);
     const lenCodeLimit = _numLiteralCodes + _numLengthCodes;
     final mask = _huffmanMask;
 

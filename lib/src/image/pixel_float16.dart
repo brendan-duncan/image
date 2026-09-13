@@ -171,12 +171,14 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num get a => numChannels > 3 ? Float16.float16ToDouble(data[_index + 3]) : 0;
+  num get a => numChannels > 3
+      ? Float16.float16ToDouble(data[_index + 3])
+      : maxChannelValue;
 
   @override
   set a(num a) {
     if (numChannels > 3) {
-      final d = g.toDouble();
+      final d = a.toDouble();
       data[_index + 3] = Float16.doubleToFloat16(d);
     }
   }

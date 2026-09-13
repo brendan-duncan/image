@@ -150,7 +150,7 @@ class PixelFloat64 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num get a => numChannels > 3 ? data[_index + 3] : 0;
+  num get a => numChannels > 3 ? data[_index + 3] : maxChannelValue;
 
   @override
   set a(num a) {

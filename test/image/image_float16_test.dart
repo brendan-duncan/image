@@ -86,5 +86,15 @@ void main() {
 
       await testImageConversions(i4);
     });
+
+    test('float16 alpha setter writes alpha', () {
+      final image =
+          Image(width: 1, height: 1, format: Format.float16, numChannels: 4);
+      final p = image.getPixel(0, 0)
+        ..g = 0.25
+        ..a = 0.75;
+      expect(p.a, equals(0.75));
+      expect(p.g, equals(0.25));
+    });
   });
 }

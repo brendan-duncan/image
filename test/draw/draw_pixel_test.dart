@@ -67,5 +67,37 @@ void main() {
       expect(p.r, greaterThan(100), reason: 'blended red should be ~128');
       expect(p.r, lessThan(150), reason: 'blended red should be ~128');
     });
+
+    for (final format in Format.values) {
+      test(
+          'drawPixel with alpha blend mixes with an opaque three channel '
+          '${format.name} image', () {
+        // An image with no alpha channel is opaque, so the base shows through
+        // half of a half transparent overlay, whatever the format.
+        final image = Image(width: 1, height: 1, format: format);
+        if (image.hasPalette) {
+          return;
+        }
+        image.getPixel(0, 0)
+          ..rNormalized = 0
+          ..gNormalized = 0
+          ..bNormalized = 1;
+        drawPixel(image, 0, 0, ColorRgba8(255, 0, 0, 128));
+        final p = image.getPixel(0, 0);
+        expect(p.aNormalized, equals(1), reason: 'alpha');
+        // A one bit channel cannot hold a half
+        if (format == Format.uint1) {
+          return;
+        }
+        // Two and four bit channels only get near it
+        final tolerance = format == Format.uint2
+            ? 0.17
+            : format == Format.uint4
+                ? 0.04
+                : 0.01;
+        expect(p.rNormalized, closeTo(0.5, tolerance), reason: 'red');
+        expect(p.bNormalized, closeTo(0.5, tolerance), reason: 'blue');
+      });
+    }
   });
 }

@@ -196,7 +196,7 @@ class PixelUint16 extends Iterable<num> implements Pixel {
           ? data[_index + 1]
           : numChannels > 3
               ? data[_index + 3]
-              : 0
+              : maxChannelValue
       : palette!.getAlpha(data[_index]);
 
   @override
@@ -233,10 +233,11 @@ class PixelUint16 extends Iterable<num> implements Pixel {
   set aNormalized(num v) => a = v * maxChannelValue;
 
   @override
-  num get luminance => getLuminance(this);
+  num get luminance => numChannels == 2 ? r : getLuminance(this);
 
   @override
-  num get luminanceNormalized => getLuminanceNormalized(this);
+  num get luminanceNormalized =>
+      numChannels == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
   num getChannel(Channel channel) =>
