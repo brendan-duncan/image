@@ -261,11 +261,30 @@ class PngEncoder extends Encoder {
     _writeChunk(out, 'cICP', chunk.getBytes());
   }
 
+  /// A PNG keyword is 1 to 79 Latin-1 printable bytes with no leading,
+  /// trailing or doubled space; a profile named otherwise gets a default
+  static String _iccpKeyword(String name) {
+    final units = name.codeUnits;
+    var valid = units.isNotEmpty &&
+        units.length <= 79 &&
+        units.first != 0x20 &&
+        units.last != 0x20;
+    for (var i = 0; valid && i < units.length; i++) {
+      final c = units[i];
+      // The doubled space test reads units[i - 1], which at i == 0 would be
+      // out of range. The check above already rejected a leading space, so at
+      // i == 0 the byte is not a space and && stops before the read
+      valid = (c >= 0x20 && c <= 0x7e || c >= 0xa1 && c <= 0xff) &&
+          !(c == 0x20 && units[i - 1] == 0x20);
+    }
+    return valid ? name : 'ICC_PROFILE';
+  }
+
   void _writeICCPChunk(OutputBuffer? out, IccProfile iccp) {
     final chunk = OutputBuffer(bigEndian: true)
 
       // name
-      ..writeBytes(iccp.name.codeUnits)
+      ..writeBytes(_iccpKeyword(iccp.name).codeUnits)
       ..writeByte(0)
 
       // compression

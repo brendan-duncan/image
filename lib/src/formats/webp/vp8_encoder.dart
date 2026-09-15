@@ -75,10 +75,15 @@ VP8Lossy encodeVP8(Image image, VP8Config config) {
 
 @internal
 class VP8Encoder {
-  VP8Encoder(this.config, VP8Yuv pic) : enc = VP8EncState(config, pic);
+  VP8Encoder(this.config, VP8Yuv pic,
+      {this.partition0Limit = _maxPartition0Size})
+      : enc = VP8EncState(config, pic);
 
   final VP8Config config;
   final VP8EncState enc;
+
+  /// Bytes partition #0 must stay under; lowered only by tests
+  final int partition0Limit;
 
   final _tokens = VP8TokenBuffer();
   final _res = VP8Residual();
@@ -97,34 +102,48 @@ class VP8Encoder {
   /// probabilities the coefficients are written with are derived from what the
   /// picture turned out to contain.
   Uint8List _codeMacroblocks() {
-    _setLoopParams(config.quality);
-
-    final it = VP8EncIterator(enc);
-    final decimate = VP8Decimate(enc, it);
-    final rd = VP8ModeScore();
     final rdOpt = config.rdOptLevel;
-
     var maxCount = (enc.mbW * enc.mbH) >> 3;
     if (maxCount < _minRefreshCount) {
       maxCount = _minRefreshCount;
     }
-    var count = maxCount;
+    // libwebp's PARTITION0_SIZE_LIMIT: 2k of headroom over the estimate, in
+    // the 1/256 bit units mode costs are counted in
+    final headerLimit = (partition0Limit - 2048) << 11;
 
-    enc.proba.resetTokenStats();
-    _tokens.clear();
+    while (true) {
+      _setLoopParams(config.quality);
+      final it = VP8EncIterator(enc);
+      final decimate = VP8Decimate(enc, it);
+      final rd = VP8ModeScore();
+      var count = maxCount;
+      var headerBits = enc.segmentSize;
+      enc.proba.resetTokenStats();
+      _tokens.clear();
 
-    do {
-      it.import();
-      if (--count < 0) {
-        enc.proba
-          ..finalizeTokenProbas()
-          ..calculateLevelCosts();
-        count = maxCount;
+      do {
+        it.import();
+        if (--count < 0) {
+          enc.proba
+            ..finalizeTokenProbas()
+            ..calculateLevelCosts();
+          count = maxCount;
+        }
+        decimate.run(rd, rdOpt);
+        headerBits += rd.h;
+        _recordTokens(it, rd);
+        it.saveBoundary();
+      } while (it.next());
+
+      // The modes would overflow partition #0: code the picture again with
+      // half the bits allowed for 4x4 modes, as libwebp's VP8EncTokenLoop does,
+      // until it fits or 4x4 is off altogether
+      if (enc.maxI4HeaderBits > 0 && headerBits > headerLimit) {
+        enc.maxI4HeaderBits >>= 1;
+        continue;
       }
-      decimate.run(rd, rdOpt);
-      _recordTokens(it, rd);
-      it.saveBoundary();
-    } while (it.next());
+      break;
+    }
 
     enc.proba.finalizeTokenProbas();
 
@@ -226,8 +245,11 @@ class VP8Encoder {
 
   Uint8List _assemble(Uint8List tokenPartition) {
     final part0 = _generatePartition0();
-    if (part0.length >= _maxPartition0Size) {
-      throw StateError('VP8 partition #0 overflow');
+    if (part0.length >= partition0Limit) {
+      // Past the retries above the estimate can still fall short; libwebp
+      // gives up here too, with VP8_ENC_ERROR_PARTITION0_OVERFLOW
+      throw ImageException('WebP lossy partition #0 needs ${part0.length} '
+          'bytes, more than the format can address; encode losslessly');
     }
 
     final out = Uint8List(10 + part0.length + tokenPartition.length);

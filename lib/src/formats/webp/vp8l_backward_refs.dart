@@ -61,42 +61,40 @@ class VP8LCover {
 /// is the value tuned over a far wider corpus than anything measured here.
 const _maxChain = 86;
 
+/// Bits of a packed match holding the length, as in libwebp's `offset_length_`
+@internal
+const matchLengthBits = 12;
+
 /// Longest match the tokenizer will emit.
-const _maxMatchLen = 4096;
+@internal
+const maxMatchLength = (1 << matchLengthBits) - 1;
 
-/// The spec caps the distance at 1048576, and the first 120 values are taken by
-/// the near-neighbour plane codes, leaving this as the real maximum.
-const _maxDistance = 1048456;
+/// Distances stop at 1048576, and the first 120 values are taken by the
+/// near-neighbour plane codes, leaving this as the real maximum
+@internal
+const maxMatchDistance = 1048456;
 
-/// The longest match reachable from each position, as parallel arrays.
+/// The longest match reachable from each position
 ///
 /// A parse that considers every way of covering the image needs the answer at
 /// every pixel, so the whole table is built up front.
 @internal
 class VP8LMatches {
-  VP8LMatches(
-      this.length, this.distance, this.cheapLength, this.cheapDistances);
+  VP8LMatches(this.match, this.cheapDistances);
 
-  /// Match length at each pixel position, 0 where nothing matches.
-  final Int32List length;
+  /// Distance above [matchLengthBits], length below; length zero means nothing
+  /// matches and the distance is meaningless
+  final Uint32List match;
 
-  /// Match distance at each pixel position, meaningless where length is 0.
-  final Int32List distance;
+  @pragma('vm:prefer-inline')
+  int lengthAt(int i) => match[i] & maxMatchLength;
 
-  /// How far each of [cheapDistances] repeats from every position.
-  ///
-  /// These are the offsets that land on the near-neighbour plane codes, which
-  /// are the cheapest distances the format has. They are worth keeping even
-  /// when the chain finds something longer, since a shorter match at a
-  /// near-neighbour distance can still cost less. The chain on its own would
-  /// have to walk back a whole row of candidates to reach the one directly
-  /// above, which is past the search limit.
-  /// Lengths never exceed [_maxMatchLen], so sixteen bits are enough, and
-  /// there is one of these per offset per pixel.
-  final List<Uint16List> cheapLength;
+  @pragma('vm:prefer-inline')
+  int distanceAt(int i) => match[i] >> matchLengthBits;
 
-  /// The distance each entry of [cheapLength] corresponds to.
-  final List<int> cheapDistances;
+  /// Offsets landing on the near-neighbour plane codes, the cheapest distances
+  /// the format has, where a shorter match can beat a longer one from the chain
+  final Int32List cheapDistances;
 }
 
 /// Finds the best match at every position.
@@ -121,8 +119,7 @@ VP8LMatches computeMatches(Uint8List r, Uint8List g, Uint8List b, Uint8List a,
   final lz = _Lz77(r, g, b, a, numPixels)..fillChain();
   final px = lz._px;
   final prev = lz._prev;
-  final length = Int32List(numPixels);
-  final distance = Int32List(numPixels);
+  final match = Uint32List(numPixels);
 
   // The offsets reaching the nearest plane codes: the pixel before, the one
   // before that, and the three directly above and to either side.
@@ -131,53 +128,84 @@ VP8LMatches computeMatches(Uint8List r, Uint8List g, Uint8List b, Uint8List a,
   // neighbour, some ninety of them. Carrying the next ring out as well was
   // measured at 0.04 points of the corpus for 19% more encode time, which is
   // the wrong way round while size is inside budget and speed is not.
-  final cheapDistances = <int>[1, 2, width - 1, width, width + 1]
-      .where((d) => d >= 1 && d < numPixels)
-      .toSet()
-      .toList()
-    ..sort();
-  final cheapLength = [
-    for (final _ in cheapDistances) Uint16List(numPixels),
-  ];
-
-  // Taken from the right: if an offset repeats for n pixels starting one to
-  // the right, it repeats for n + 1 here, so each is one comparison.
-  for (var c = 0; c < cheapDistances.length; c++) {
-    final dist = cheapDistances[c];
-    final lengths = cheapLength[c];
-    for (var i = numPixels - 1; i >= dist; i--) {
-      if (px[i] == px[i - dist]) {
-        var n = i + 1 < numPixels ? lengths[i + 1] + 1 : 1;
-        final maxLen = numPixels - i;
-        if (n > maxLen) {
-          n = maxLen;
-        }
-        if (n > _maxMatchLen) {
-          n = _maxMatchLen;
-        }
-        lengths[i] = n;
-      }
-    }
+  final cheapDistances = Int32List.fromList(<int>[
+    1,
+    2,
+    width - 1,
+    width,
+    width + 1
+  ].where((d) => d >= 1 && d < numPixels).toSet().toList()
+    ..sort());
+  final numCheap = cheapDistances.length;
+  if (numCheap > 5) {
+    throw StateError('the near-neighbour walk has five slots, not $numCheap');
   }
+
+  // A run at an offset is the run one to the right plus one, and this walk and
+  // the search below both go right to left, so a counter per offset replaces a
+  // table. An unused slot gets a distance no position reaches, pinning it at 0
+  final slots = Int32List(5)..fillRange(0, 5, numPixels);
+  for (var c = 0; c < numCheap; c++) {
+    slots[c] = cheapDistances[c];
+  }
+  final d0 = slots[0];
+  final d1 = slots[1];
+  final d2 = slots[2];
+  final d3 = slots[3];
+  final d4 = slots[4];
+  var n0 = 0;
+  var n1 = 0;
+  var n2 = 0;
+  var n3 = 0;
+  var n4 = 0;
+  var cheapAt = numPixels;
 
   var i = numPixels - 1;
   while (i > 0) {
+    while (cheapAt > i) {
+      final p = cheapAt - 1;
+      final at = px[p];
+      n0 =
+          p >= d0 && at == px[p - d0] ? (n0 < maxMatchLength ? n0 + 1 : n0) : 0;
+      n1 =
+          p >= d1 && at == px[p - d1] ? (n1 < maxMatchLength ? n1 + 1 : n1) : 0;
+      n2 =
+          p >= d2 && at == px[p - d2] ? (n2 < maxMatchLength ? n2 + 1 : n2) : 0;
+      n3 =
+          p >= d3 && at == px[p - d3] ? (n3 < maxMatchLength ? n3 + 1 : n3) : 0;
+      n4 =
+          p >= d4 && at == px[p - d4] ? (n4 < maxMatchLength ? n4 + 1 : n4) : 0;
+      cheapAt = p;
+    }
     var maxLen = numPixels - i;
-    if (maxLen > _maxMatchLen) {
-      maxLen = _maxMatchLen;
+    if (maxLen > maxMatchLength) {
+      maxLen = maxMatchLength;
     }
     var best = 0;
     var bestDist = 0;
 
-    // Two candidates cost nothing to try and are the cheapest distances the
-    // format has, so they go first: either can leave the chain with nothing to
-    // beat and be skipped entirely.
-    for (var c = 0; c < cheapDistances.length; c++) {
-      final n = cheapLength[c][i];
-      if (n > best) {
-        best = n;
-        bestDist = cheapDistances[c];
-      }
+    // The near-neighbour runs cost nothing to try and are the cheapest
+    // distances the format has, so they go first: any can leave the chain with
+    // nothing to beat and be skipped entirely
+    if (n0 > best) {
+      best = n0;
+      bestDist = d0;
+    }
+    if (n1 > best) {
+      best = n1;
+      bestDist = d1;
+    }
+    if (n2 > best) {
+      best = n2;
+      bestDist = d2;
+    }
+    if (n3 > best) {
+      best = n3;
+      bestDist = d3;
+    }
+    if (n4 > best) {
+      best = n4;
+      bestDist = d4;
     }
 
     if (best < maxLen) {
@@ -189,7 +217,7 @@ VP8LMatches computeMatches(Uint8List r, Uint8List g, Uint8List b, Uint8List a,
       while (c >= 0 && steps < _maxChain) {
         steps++;
         final dist = i - c;
-        if (dist > _maxDistance) {
+        if (dist > maxMatchDistance) {
           break;
         }
         // Only a longer match can win, so the pixel one past the current best
@@ -211,24 +239,22 @@ VP8LMatches computeMatches(Uint8List r, Uint8List g, Uint8List b, Uint8List a,
       }
     }
 
-    length[i] = best;
-    distance[i] = bestDist;
+    match[i] = (bestDist << matchLengthBits) | best;
 
     // Carry the match left for as long as it keeps matching.
     var j = i;
-    while (bestDist > 0 && best < _maxMatchLen) {
+    while (bestDist > 0 && best < maxMatchLength) {
       final k = j - 1;
       if (k <= 0 || k < bestDist || px[k - bestDist] != px[k]) {
         break;
       }
       best++;
-      length[k] = best;
-      distance[k] = bestDist;
+      match[k] = (bestDist << matchLengthBits) | best;
       j = k;
     }
     i = j - 1;
   }
-  return VP8LMatches(length, distance, cheapLength, cheapDistances);
+  return VP8LMatches(match, cheapDistances);
 }
 
 /// Rebuilds the token stream from a parse that says, for each position, how
@@ -410,8 +436,8 @@ class VP8LCostModel {
   /// A parse that weighs every length at every position asks for this millions
   /// of times, and it depends on nothing but the length.
   late final Float64List lengthBits = () {
-    final t = Float64List(_maxMatchLen + 1);
-    for (var len = 1; len <= _maxMatchLen; len++) {
+    final t = Float64List(maxMatchLength + 1);
+    for (var len = 1; len <= maxMatchLength; len++) {
       final (extra, _) = huffman.lengthExtra(len);
       t[len] = _green[huffman.lengthSymbol(len)] + extra;
     }
