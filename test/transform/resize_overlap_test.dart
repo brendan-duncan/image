@@ -1,7 +1,7 @@
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
-Image pattern({bool palette = false, int blue = 40}) {
+Image _pattern({bool palette = false, int blue = 40}) {
   final image = Image(width: 8, height: 8, withPalette: palette);
   for (var y = 0; y < 8; y++) {
     for (var x = 0; x < 8; x++) {
@@ -17,7 +17,7 @@ Image pattern({bool palette = false, int blue = 40}) {
   return image;
 }
 
-void expectNearest(Image image, int width, int height, {int blue = 40}) {
+void _expectNearest(Image image, int width, int height, {int blue = 40}) {
   expect(image.width, width);
   expect(image.height, height);
   for (var y = 0; y < height; y++) {
@@ -37,18 +37,18 @@ void expectNearest(Image image, int width, int height, {int blue = 40}) {
 }
 
 void main() {
-  group('resize mixed axes', () {
+  group('Transform resize overlap', () {
     for (final size in [(16, 4), (4, 16), (16, 3), (3, 16)]) {
       for (final palette in [false, true]) {
         test('${size.$1}x${size.$2}, palette=$palette', () {
-          final src = pattern(palette: palette);
+          final src = _pattern(palette: palette);
           final data = src.data;
           final dst = resize(src, width: size.$1, height: size.$2);
-          expectNearest(dst, size.$1, size.$2);
+          _expectNearest(dst, size.$1, size.$2);
           expect(dst.hasPalette, palette);
           expect(identical(src, dst), !palette);
           if (palette) {
-            expectNearest(src, 8, 8);
+            _expectNearest(src, 8, 8);
           } else {
             expect(identical(dst.data, data), isTrue);
           }
@@ -57,16 +57,16 @@ void main() {
     }
 
     test('preserves every animation frame and its duration', () {
-      final src = pattern()
+      final src = _pattern()
         ..loopCount = 3
         ..frameDuration = 100
-        ..addFrame(pattern(blue: 200)..frameDuration = 300);
+        ..addFrame(_pattern(blue: 200)..frameDuration = 300);
       final dst = resize(src, width: 16, height: 4);
       expect(dst.numFrames, 2);
       expect(dst.loopCount, 3);
       expect(dst.frames.map((f) => f.frameDuration), [100, 300]);
-      expectNearest(dst.frames[0], 16, 4);
-      expectNearest(dst.frames[1], 16, 4, blue: 200);
+      _expectNearest(dst.frames[0], 16, 4);
+      _expectNearest(dst.frames[1], 16, 4, blue: 200);
     });
 
     for (final interpolation in Interpolation.values) {
@@ -126,7 +126,7 @@ void main() {
       for (final src in [
         Image(width: 8, height: 8, numChannels: 2),
         Image(width: 8, height: 8, format: Format.uint16),
-        pattern(palette: true),
+        _pattern(palette: true),
       ]) {
         final expected = copyResize(src, width: 16, height: 4);
         final dst = resize(src, width: 16, height: 4);
@@ -135,22 +135,24 @@ void main() {
         expect([src.width, src.height], [8, 8]);
       }
       for (final aspect in [false, true]) {
-        final src = pattern();
+        final src = _pattern();
         final h = aspect ? 4 : 5;
         final expected =
             copyResize(src, width: 16, height: h, maintainAspect: aspect);
         final dst = resize(src, width: 16, height: h, maintainAspect: aspect);
         expect(identical(dst, src), isFalse);
         expect(dst.getBytes(), orderedEquals(expected.getBytes()));
-        expectNearest(src, 8, 8);
+        _expectNearest(src, 8, 8);
       }
     });
 
     for (final sharedData in [false, true]) {
       for (final kind in ['mixed', 'cubic', 'letterbox']) {
         test('$kind falls back for shared data=$sharedData', () {
-          final src = pattern(), b = pattern(blue: 80), c = pattern(blue: 120);
-          final repeated = sharedData ? (pattern()..data = b.data) : b;
+          final src = _pattern(),
+              b = _pattern(blue: 80),
+              c = _pattern(blue: 120);
+          final repeated = sharedData ? (_pattern()..data = b.data) : b;
           src
             ..addFrame(b)
             ..addFrame(c)
@@ -187,7 +189,7 @@ void main() {
     }
 
     test('cubic aspect without padding reuses the buffer', () {
-      final src = pattern();
+      final src = _pattern();
       final data = src.data;
       final expected = copyResize(src,
           width: 7,
@@ -223,15 +225,15 @@ void main() {
     });
 
     test('same size and pure downscale retain the existing in-place path', () {
-      final src = pattern();
+      final src = _pattern();
       expect(identical(resize(src, width: 8, height: 8), src), isTrue);
       final dst = resize(src, width: 4, height: 4);
       expect(identical(dst, src), isTrue);
-      expectNearest(dst, 4, 4);
+      _expectNearest(dst, 4, 4);
     });
 
     test('cubic downscale reads every sample from the original image', () {
-      final src = pattern();
+      final src = _pattern();
       final originalData = src.data;
       final expected = Image(width: 7, height: 7);
       for (var y = 0; y < 7; y++) {
@@ -281,10 +283,10 @@ void main() {
 
     test('buffered cubic preserves animation and uses one buffer per frame',
         () {
-      final src = pattern()
+      final src = _pattern()
         ..loopCount = 3
         ..frameDuration = 100
-        ..addFrame(pattern(blue: 200)..frameDuration = 300);
+        ..addFrame(_pattern(blue: 200)..frameDuration = 300);
       final expected = copyResize(src,
           width: 7, height: 7, interpolation: Interpolation.cubic);
       final data = src.frames.map((f) => f.data).toList();
@@ -302,7 +304,7 @@ void main() {
 
     test('cubic keeps copy fallback for aspect handling and non-uint8', () {
       for (final src in [
-        pattern(),
+        _pattern(),
         Image(width: 8, height: 8, format: Format.uint16)
           ..clear(ColorUint16.rgb(1000, 2000, 3000))
       ]) {
@@ -326,7 +328,7 @@ void main() {
     for (final size in [(8, 4), (4, 8)]) {
       for (final palette in [false, true]) {
         test('nearest letterbox ${size.$1}x${size.$2}, palette=$palette', () {
-          final src = pattern(palette: palette);
+          final src = _pattern(palette: palette);
           final originalData = src.data;
           final dst = resize(src,
               width: size.$1, height: size.$2, maintainAspect: true);
@@ -342,7 +344,7 @@ void main() {
           expect(dst.hasPalette, palette);
           expect(identical(dst, src), !palette);
           if (palette) {
-            expectNearest(src, 8, 8);
+            _expectNearest(src, 8, 8);
           } else {
             expect(identical(dst.data, originalData), isTrue);
           }
@@ -395,10 +397,10 @@ void main() {
     });
 
     test('nearest letterbox preserves animation and frame buffers', () {
-      final src = pattern()
+      final src = _pattern()
         ..loopCount = 3
         ..frameDuration = 100
-        ..addFrame(pattern(blue: 200)..frameDuration = 300);
+        ..addFrame(_pattern(blue: 200)..frameDuration = 300);
       final expected =
           copyResize(src, width: 8, height: 4, maintainAspect: true);
       final data = src.frames.map((f) => f.data).toList();
@@ -415,7 +417,7 @@ void main() {
 
     test('nearest letterbox keeps background and format fallbacks', () {
       for (final src in [
-        pattern(),
+        _pattern(),
         Image(width: 8, height: 8, numChannels: 2)
           ..clear(ColorRgb8(40, 80, 120)),
         Image(width: 8, height: 8, format: Format.uint16)
@@ -436,7 +438,7 @@ void main() {
 
     for (final interpolation in Interpolation.values) {
       test('mixed axes match copyResize with ${interpolation.name}', () {
-        final src = pattern();
+        final src = _pattern();
         final expected =
             copyResize(src, width: 16, height: 3, interpolation: interpolation);
         final dst =
@@ -444,13 +446,13 @@ void main() {
         expect(dst.getBytes().take(16 * 3 * 3),
             orderedEquals(expected.getBytes()));
         if (interpolation != Interpolation.nearest) {
-          expectNearest(src, 8, 8);
+          _expectNearest(src, 8, 8);
         }
       });
     }
 
     test('mixed axes preserve letterbox content and background', () {
-      final src = pattern();
+      final src = _pattern();
       final dst = resize(src,
           width: 16,
           height: 4,
@@ -466,7 +468,7 @@ void main() {
                   : [3, 5, 7]);
         }
       }
-      expectNearest(src, 8, 8);
+      _expectNearest(src, 8, 8);
     });
   });
 }
