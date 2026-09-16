@@ -74,7 +74,9 @@ Image resize(Image src,
     return src;
   }
 
-  if ((width * height) > (src.width * src.height)) {
+  // Enlarging either axis can overwrite source pixels that are still needed,
+  // even when the destination has the same or a smaller total pixel count.
+  if (width > src.width || height > src.height) {
     return copyResize(src,
         width: width,
         height: height,
