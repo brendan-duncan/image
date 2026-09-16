@@ -42,12 +42,16 @@ void main() {
       for (final palette in [false, true]) {
         test('${size.$1}x${size.$2}, palette=$palette', () {
           final src = pattern(palette: palette);
+          final data = src.data;
           final dst = resize(src, width: size.$1, height: size.$2);
           expectNearest(dst, size.$1, size.$2);
           expect(dst.hasPalette, palette);
-          // As with other enlargements, use the returned image, not src.
-          expect(identical(src, dst), isFalse);
-          expectNearest(src, 8, 8);
+          expect(identical(src, dst), !palette);
+          if (palette) {
+            expectNearest(src, 8, 8);
+          } else {
+            expect(identical(dst.data, data), isTrue);
+          }
         });
       }
     }
@@ -66,8 +70,7 @@ void main() {
     });
 
     for (final interpolation in Interpolation.values) {
-      test('preserves constant color and source with ${interpolation.name}',
-          () {
+      test('preserves constant color with ${interpolation.name}', () {
         final src = Image(width: 8, height: 8)..clear(ColorRgb8(40, 80, 120));
         final dst =
             resize(src, width: 16, height: 3, interpolation: interpolation);
@@ -75,9 +78,149 @@ void main() {
         for (final pixel in dst) {
           expect([pixel.r, pixel.g, pixel.b], [40, 80, 120]);
         }
-        expect([src.width, src.height], [8, 8]);
+        expect([src.width, src.height],
+            interpolation == Interpolation.nearest ? [16, 3] : [8, 8]);
       });
     }
+
+    test('mixed-axis nearest reuses buffers and matches both axis mappings',
+        () {
+      var cases = 0;
+      for (var sw = 2; sw <= 10; sw++) {
+        for (var sh = 2; sh <= 10; sh++) {
+          for (var w = 1; w <= 20; w++) {
+            for (var h = 1; h <= 20; h++) {
+              if ((w <= sw && h <= sh) || w * h > sw * sh) continue;
+              for (final channels in [1, 3, 4]) {
+                final src = Image(width: sw, height: sh, numChannels: channels);
+                for (final p in src) {
+                  p.setRgba(
+                      (p.x * 71 + p.y * 19) % 256,
+                      (p.x * 13 + p.y * 97) % 256,
+                      (p.x * 41 + p.y * 37) % 256,
+                      (p.x * 29 + p.y * 53) % 256);
+                }
+                final expected = copyResize(src, width: w, height: h);
+                final original = src.clone();
+                final data = src.data;
+                final dst = resize(src, width: w, height: h);
+                expect(identical(dst, src), isTrue);
+                expect(identical(dst.data, data), isTrue);
+                expect(dst.getBytes().take(w * h * channels),
+                    orderedEquals(expected.getBytes()),
+                    reason: '$sw x $sh -> $w x $h, channels=$channels');
+                for (final p in dst) {
+                  final q = original.getPixel((p.x * sw) ~/ w, (p.y * sh) ~/ h);
+                  expect([p.r, p.g, p.b, p.a], [q.r, q.g, q.b, q.a]);
+                }
+                cases++;
+              }
+            }
+          }
+        }
+      }
+      expect(cases, greaterThan(1000));
+    });
+
+    test('mixed-axis nearest keeps copy fallback outside buffer scope', () {
+      for (final src in [
+        Image(width: 8, height: 8, numChannels: 2),
+        Image(width: 8, height: 8, format: Format.uint16),
+        pattern(palette: true),
+      ]) {
+        final expected = copyResize(src, width: 16, height: 4);
+        final dst = resize(src, width: 16, height: 4);
+        expect(identical(dst, src), isFalse);
+        expect(dst.getBytes(), orderedEquals(expected.getBytes()));
+        expect([src.width, src.height], [8, 8]);
+      }
+      for (final aspect in [false, true]) {
+        final src = pattern();
+        final h = aspect ? 4 : 5;
+        final expected =
+            copyResize(src, width: 16, height: h, maintainAspect: aspect);
+        final dst = resize(src, width: 16, height: h, maintainAspect: aspect);
+        expect(identical(dst, src), isFalse);
+        expect(dst.getBytes(), orderedEquals(expected.getBytes()));
+        expectNearest(src, 8, 8);
+      }
+    });
+
+    for (final sharedData in [false, true]) {
+      for (final kind in ['mixed', 'cubic', 'letterbox']) {
+        test('$kind falls back for shared data=$sharedData', () {
+          final src = pattern(), b = pattern(blue: 80), c = pattern(blue: 120);
+          final repeated = sharedData ? (pattern()..data = b.data) : b;
+          src
+            ..addFrame(b)
+            ..addFrame(c)
+            ..addFrame(repeated);
+          final width = kind == 'mixed'
+              ? 16
+              : kind == 'cubic'
+                  ? 7
+                  : 8;
+          final height = kind == 'cubic' ? 7 : 4;
+          final interpolation =
+              kind == 'cubic' ? Interpolation.cubic : Interpolation.nearest;
+          final expected = copyResize(src,
+              width: width,
+              height: height,
+              maintainAspect: kind == 'letterbox',
+              interpolation: interpolation);
+          final before = src.clone();
+          final dst = resize(src,
+              width: width,
+              height: height,
+              maintainAspect: kind == 'letterbox',
+              interpolation: interpolation);
+          expect(identical(dst, src), isFalse);
+          for (var i = 0; i < 4; i++) {
+            expect(dst.frames[i].getBytes(),
+                orderedEquals(expected.frames[i].getBytes()));
+            expect(src.frames[i].getBytes(),
+                orderedEquals(before.frames[i].getBytes()));
+            expect([src.frames[i].width, src.frames[i].height], [8, 8]);
+          }
+        });
+      }
+    }
+
+    test('cubic aspect without padding reuses the buffer', () {
+      final src = pattern();
+      final data = src.data;
+      final expected = copyResize(src,
+          width: 7,
+          height: 7,
+          maintainAspect: true,
+          interpolation: Interpolation.cubic);
+      final dst = resize(src,
+          width: 7,
+          height: 7,
+          maintainAspect: true,
+          interpolation: Interpolation.cubic);
+      expect(identical(dst, src), isTrue);
+      expect(identical(dst.data, data), isTrue);
+      expect(
+          dst.getBytes().take(7 * 7 * 3), orderedEquals(expected.getBytes()));
+    });
+
+    test('cubic zero offset still falls back for trailing padding', () {
+      final src = Image(width: 8, height: 7)..clear(ColorRgb8(30, 60, 90));
+      // Content is 7x6 at offset (0, 0); the final row is still padding.
+      final expected = copyResize(src,
+          width: 7,
+          height: 7,
+          maintainAspect: true,
+          interpolation: Interpolation.cubic);
+      final dst = resize(src,
+          width: 7,
+          height: 7,
+          maintainAspect: true,
+          interpolation: Interpolation.cubic);
+      expect(identical(dst, src), isFalse);
+      expect(dst.getBytes(), orderedEquals(expected.getBytes()));
+    });
 
     test('same size and pure downscale retain the existing in-place path', () {
       final src = pattern();
@@ -166,12 +309,12 @@ void main() {
         final aspect = src.format == Format.uint8;
         final expected = copyResize(src,
             width: 7,
-            height: 7,
+            height: 5,
             maintainAspect: aspect,
             interpolation: Interpolation.cubic);
         final dst = resize(src,
             width: 7,
-            height: 7,
+            height: 5,
             maintainAspect: aspect,
             interpolation: Interpolation.cubic);
         expect(identical(dst, src), isFalse);
@@ -223,7 +366,7 @@ void main() {
                   ((w - cw) ~/ 2 == 0 && (h - ch) ~/ 2 == 0)) {
                 continue;
               }
-              for (final channels in [3, 4]) {
+              for (final channels in [1, 3, 4]) {
                 final src = Image(width: sw, height: sh, numChannels: channels);
                 for (final p in src) {
                   p.setRgba(
@@ -273,8 +416,6 @@ void main() {
     test('nearest letterbox keeps background and format fallbacks', () {
       for (final src in [
         pattern(),
-        Image(width: 8, height: 8, numChannels: 1)
-          ..clear(ColorRgb8(40, 80, 120)),
         Image(width: 8, height: 8, numChannels: 2)
           ..clear(ColorRgb8(40, 80, 120)),
         Image(width: 8, height: 8, format: Format.uint16)
@@ -300,8 +441,11 @@ void main() {
             copyResize(src, width: 16, height: 3, interpolation: interpolation);
         final dst =
             resize(src, width: 16, height: 3, interpolation: interpolation);
-        expect(dst.getBytes(), orderedEquals(expected.getBytes()));
-        expectNearest(src, 8, 8);
+        expect(dst.getBytes().take(16 * 3 * 3),
+            orderedEquals(expected.getBytes()));
+        if (interpolation != Interpolation.nearest) {
+          expectNearest(src, 8, 8);
+        }
       });
     }
 

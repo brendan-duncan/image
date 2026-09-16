@@ -9,6 +9,10 @@ import '../util/image_exception.dart';
 import 'bake_orientation.dart';
 import 'copy_resize.dart';
 
+/// Resizes [src], reusing its storage where supported. Always use the returned
+/// image: other formats or options may require a separate image. In-place
+/// resizing mutates [src] and retains the original buffer capacity, so raw
+/// getBytes() may include bytes beyond the resized logical pixel range.
 Image resize(Image src,
     {int? width,
     int? height,
@@ -76,39 +80,56 @@ Image resize(Image src,
     return src;
   }
 
-  final uint8Downscale = width > 0 &&
-      height > 0 &&
-      width <= src.width &&
-      height <= src.height &&
+  // A repeated frame or shared ImageData must not be resized twice.
+  final uniqueData = src.numFrames == 1 ||
+      src.frames.map((f) => f.data).toSet().length == src.numFrames;
+  final uint8Frames = uniqueData &&
       src.frames.every((f) =>
           f.format == Format.uint8 &&
           !f.hasPalette &&
           f.width == src.width &&
           f.height == src.height);
-  final bufferedCubic =
-      interpolation == Interpolation.cubic && !maintainAspect && uint8Downscale;
+  final uint8Downscale = width > 0 &&
+      height > 0 &&
+      width <= src.width &&
+      height <= src.height &&
+      uint8Frames;
+  final bufferedCubic = interpolation == Interpolation.cubic &&
+      uint8Downscale &&
+      (!maintainAspect ||
+          (backgroundColor == null && w == width && h == height));
+  final nearestBytes = interpolation == Interpolation.nearest &&
+      uint8Frames &&
+      src.frames.every((f) =>
+          f.numChannels == 1 || f.numChannels == 3 || f.numChannels == 4);
 
-  if (interpolation == Interpolation.nearest &&
+  if (nearestBytes &&
+      !maintainAspect &&
+      width > 0 &&
+      height > 0 &&
+      (width > src.width || height > src.height) &&
+      width * height <= src.width * src.height) {
+    for (final frame in src.frames) {
+      // Shrink one axis before expanding the other. Each axis is sampled
+      // exactly once, preserving nearest's original coordinate mapping.
+      _resizeNearestBuffer(frame, width < frame.width ? width : frame.width,
+          height < frame.height ? height : frame.height);
+      _resizeNearestBuffer(frame, width, height, reverse: true);
+    }
+    return src;
+  }
+
+  if (nearestBytes &&
       maintainAspect &&
       backgroundColor == null &&
       uint8Downscale &&
-      src.frames.every((f) => f.numChannels == 3 || f.numChannels == 4) &&
       w > 0 &&
       h > 0 &&
       (x1 != 0 || y1 != 0)) {
     for (final frame in src.frames) {
+      _resizeNearestBuffer(frame, w, h);
       final bytes = frame.data!.toUint8List();
       final channels = frame.numChannels;
-      // Compact without offsets first: each write is behind future reads.
-      for (var y = 0; y < h; y++) {
-        final sy = (y * frame.height) ~/ h;
-        for (var x = 0; x < w; x++) {
-          final sx = (x * frame.width) ~/ w;
-          final to = (y * w + x) * channels;
-          bytes.setRange(
-              to, to + channels, bytes, (sy * frame.width + sx) * channels);
-        }
-      }
       // Expand the stride and apply the offset backwards. setRange handles
       // overlap inside a row; descending rows preserve not-yet-moved rows.
       for (var y = h - 1; y >= 0; y--) {
@@ -259,7 +280,30 @@ Image resize(Image src,
   return src;
 }
 
+// Internal callers shrink both axes forwards or expand both backwards,
+// with enough existing buffer capacity for the destination.
+void _resizeNearestBuffer(Image frame, int width, int height,
+    {bool reverse = false}) {
+  final bytes = frame.data!.toUint8List();
+  final channels = frame.numChannels;
+  final step = reverse ? -1 : 1;
+  for (var y = reverse ? height - 1 : 0; y >= 0 && y < height; y += step) {
+    final sy = (y * frame.height) ~/ height;
+    for (var x = reverse ? width - 1 : 0; x >= 0 && x < width; x += step) {
+      final sx = (x * frame.width) ~/ width;
+      final to = (y * width + x) * channels;
+      bytes.setRange(
+          to, to + channels, bytes, (sy * frame.width + sx) * channels);
+    }
+  }
+  frame.data!.width = width;
+  frame.data!.height = height;
+}
+
 // Reuse Image's cubic arithmetic and bounds handling, replacing only reads.
+// This relies on getPixelCubic -> getPixelSafe -> virtual getPixel dispatch.
+// Direct data reads in that chain would bypass the cache and require adapting
+// this sampler; immutable-source comparison tests protect that assumption.
 // During downscaling, output row y ends before source row y + 1. Newly
 // needed future rows are untouched; overlapping neighbours stay in the ring.
 class _CubicRows extends Image {
