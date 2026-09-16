@@ -76,7 +76,12 @@ Image resize(Image src,
 
   // Enlarging either axis can overwrite source pixels that are still needed,
   // even when the destination has the same or a smaller total pixel count.
-  if (width > src.width || height > src.height) {
+  // Cubic also reads previous neighbours, and letterbox offsets can move
+  // nearest-neighbour writes ahead of unread source pixels.
+  if (width > src.width ||
+      height > src.height ||
+      interpolation == Interpolation.cubic ||
+      (interpolation == Interpolation.nearest && (x1 != 0 || y1 != 0))) {
     return copyResize(src,
         width: width,
         height: height,
