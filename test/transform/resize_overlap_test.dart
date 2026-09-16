@@ -89,6 +89,7 @@ void main() {
 
     test('cubic downscale reads every sample from the original image', () {
       final src = pattern();
+      final originalData = src.data;
       final expected = Image(width: 7, height: 7);
       for (var y = 0; y < 7; y++) {
         for (var x = 0; x < 7; x++) {
@@ -97,15 +98,93 @@ void main() {
       }
       final dst =
           resize(src, width: 7, height: 7, interpolation: Interpolation.cubic);
-      expect(dst.getBytes(), orderedEquals(expected.getBytes()));
-      expect(identical(dst, src), isFalse);
-      expectNearest(src, 8, 8);
+      expect(
+          dst.getBytes().take(7 * 7 * 3), orderedEquals(expected.getBytes()));
+      expect(identical(dst, src), isTrue);
+      expect(identical(dst.data, originalData), isTrue);
+      expect([src.width, src.height], [7, 7]);
+    });
+
+    test('buffered cubic matches copyResize across small dimensions', () {
+      for (var sw = 1; sw <= 10; sw++) {
+        for (var sh = 1; sh <= 10; sh++) {
+          for (var w = 1; w <= sw; w++) {
+            for (var h = 1; h <= sh; h++) {
+              for (var channels = 1; channels <= 4; channels++) {
+                final src = Image(width: sw, height: sh, numChannels: channels);
+                for (final p in src) {
+                  p.setRgba(
+                      (p.x * 71 + p.y * 19) % 256,
+                      (p.x * 13 + p.y * 97) % 256,
+                      (p.x * 41 + p.y * 37) % 256,
+                      (p.x * 29 + p.y * 53) % 256);
+                }
+                final expected = copyResize(src,
+                    width: w, height: h, interpolation: Interpolation.cubic);
+                final data = src.data;
+                final dst = resize(src,
+                    width: w, height: h, interpolation: Interpolation.cubic);
+                expect(dst.getBytes().take(w * h * channels),
+                    orderedEquals(expected.getBytes()),
+                    reason: '$sw x $sh -> $w x $h, channels=$channels');
+                expect(identical(dst, src), isTrue);
+                expect(identical(dst.data, data), isTrue);
+              }
+            }
+          }
+        }
+      }
+    });
+
+    test('buffered cubic preserves animation and uses one buffer per frame',
+        () {
+      final src = pattern()
+        ..loopCount = 3
+        ..frameDuration = 100
+        ..addFrame(pattern(blue: 200)..frameDuration = 300);
+      final expected = copyResize(src,
+          width: 7, height: 7, interpolation: Interpolation.cubic);
+      final data = src.frames.map((f) => f.data).toList();
+      final dst =
+          resize(src, width: 7, height: 7, interpolation: Interpolation.cubic);
+      expect(identical(src, dst), isTrue);
+      expect(dst.loopCount, 3);
+      expect(dst.frames.map((f) => f.frameDuration), [100, 300]);
+      for (var i = 0; i < 2; i++) {
+        expect(identical(dst.frames[i].data, data[i]), isTrue);
+        expect(dst.frames[i].getBytes().take(7 * 7 * 3),
+            orderedEquals(expected.frames[i].getBytes()));
+      }
+    });
+
+    test('cubic keeps copy fallback for aspect handling and non-uint8', () {
+      for (final src in [
+        pattern(),
+        Image(width: 8, height: 8, format: Format.uint16)
+          ..clear(ColorUint16.rgb(1000, 2000, 3000))
+      ]) {
+        final aspect = src.format == Format.uint8;
+        final expected = copyResize(src,
+            width: 7,
+            height: 7,
+            maintainAspect: aspect,
+            interpolation: Interpolation.cubic);
+        final dst = resize(src,
+            width: 7,
+            height: 7,
+            maintainAspect: aspect,
+            interpolation: Interpolation.cubic);
+        expect(identical(dst, src), isFalse);
+        expect([src.width, src.height], [8, 8]);
+        expect(dst.getBytes(), orderedEquals(expected.getBytes()));
+      }
     });
 
     for (final size in [(8, 4), (4, 8)]) {
       for (final palette in [false, true]) {
         test('nearest letterbox ${size.$1}x${size.$2}, palette=$palette', () {
           final src = pattern(palette: palette);
+          final originalData = src.data;
           final dst = resize(src,
               width: size.$1, height: size.$2, maintainAspect: true);
           final offsetX = (size.$1 - 4) ~/ 2;
@@ -118,11 +197,101 @@ void main() {
           }
           expect([dst.width, dst.height], [size.$1, size.$2]);
           expect(dst.hasPalette, palette);
-          expect(identical(dst, src), isFalse);
-          expectNearest(src, 8, 8);
+          expect(identical(dst, src), !palette);
+          if (palette) {
+            expectNearest(src, 8, 8);
+          } else {
+            expect(identical(dst.data, originalData), isTrue);
+          }
         });
       }
     }
+
+    test('in-place nearest letterbox matches all pixels including padding', () {
+      var cases = 0;
+      for (var sw = 2; sw <= 12; sw++) {
+        for (var sh = 2; sh <= 12; sh++) {
+          for (var w = 2; w <= sw; w++) {
+            for (var h = 2; h <= sh; h++) {
+              var cw = w, ch = (w * (sh / sw)).toInt();
+              if (ch > h) {
+                ch = h;
+                cw = (h * (sw / sh)).toInt();
+              }
+              if (cw == 0 ||
+                  ch == 0 ||
+                  ((w - cw) ~/ 2 == 0 && (h - ch) ~/ 2 == 0)) {
+                continue;
+              }
+              for (final channels in [3, 4]) {
+                final src = Image(width: sw, height: sh, numChannels: channels);
+                for (final p in src) {
+                  p.setRgba(
+                      (p.x * 71 + p.y * 19) % 256,
+                      (p.x * 13 + p.y * 97) % 256,
+                      (p.x * 41 + p.y * 37) % 256,
+                      (p.x * 29 + p.y * 53) % 256);
+                }
+                final expected =
+                    copyResize(src, width: w, height: h, maintainAspect: true);
+                final data = src.data;
+                final dst =
+                    resize(src, width: w, height: h, maintainAspect: true);
+                expect(dst.getBytes().take(w * h * channels),
+                    orderedEquals(expected.getBytes()),
+                    reason: '$sw x $sh -> $w x $h, channels=$channels');
+                expect(identical(dst, src), isTrue);
+                expect(identical(dst.data, data), isTrue);
+                cases++;
+              }
+            }
+          }
+        }
+      }
+      expect(cases, greaterThan(1000));
+    });
+
+    test('nearest letterbox preserves animation and frame buffers', () {
+      final src = pattern()
+        ..loopCount = 3
+        ..frameDuration = 100
+        ..addFrame(pattern(blue: 200)..frameDuration = 300);
+      final expected =
+          copyResize(src, width: 8, height: 4, maintainAspect: true);
+      final data = src.frames.map((f) => f.data).toList();
+      final dst = resize(src, width: 8, height: 4, maintainAspect: true);
+      expect(identical(src, dst), isTrue);
+      expect(dst.loopCount, 3);
+      expect(dst.frames.map((f) => f.frameDuration), [100, 300]);
+      for (var i = 0; i < 2; i++) {
+        expect(identical(dst.frames[i].data, data[i]), isTrue);
+        expect(dst.frames[i].getBytes().take(8 * 4 * 3),
+            orderedEquals(expected.frames[i].getBytes()));
+      }
+    });
+
+    test('nearest letterbox keeps background and format fallbacks', () {
+      for (final src in [
+        pattern(),
+        Image(width: 8, height: 8, numChannels: 1)
+          ..clear(ColorRgb8(40, 80, 120)),
+        Image(width: 8, height: 8, numChannels: 2)
+          ..clear(ColorRgb8(40, 80, 120)),
+        Image(width: 8, height: 8, format: Format.uint16)
+          ..clear(ColorUint16.rgb(1000, 2000, 3000))
+      ]) {
+        final bg = src.format == Format.uint8 && src.numChannels == 3
+            ? ColorRgb8(3, 5, 7)
+            : null;
+        final expected = copyResize(src,
+            width: 8, height: 4, maintainAspect: true, backgroundColor: bg);
+        final dst = resize(src,
+            width: 8, height: 4, maintainAspect: true, backgroundColor: bg);
+        expect(identical(dst, src), isFalse);
+        expect([src.width, src.height], [8, 8]);
+        expect(dst.getBytes(), orderedEquals(expected.getBytes()));
+      }
+    });
 
     for (final interpolation in Interpolation.values) {
       test('mixed axes match copyResize with ${interpolation.name}', () {
