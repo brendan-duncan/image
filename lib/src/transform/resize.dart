@@ -155,12 +155,13 @@ Image resize(Image src,
 
   // Enlarging either axis can overwrite source pixels that are still needed,
   // even when the destination has the same or a smaller total pixel count.
-  // Cubic also reads previous neighbours, and letterbox offsets can move
-  // nearest-neighbour writes ahead of unread source pixels.
+  // Cubic also reads previous neighbours. Letterbox padding is unsupported
+  // in place: offsets move writes ahead of unread source pixels, and clearing
+  // the background would erase the source before it is sampled.
   if (width > src.width ||
       height > src.height ||
       (interpolation == Interpolation.cubic && !bufferedCubic) ||
-      (interpolation == Interpolation.nearest && (x1 != 0 || y1 != 0))) {
+      (maintainAspect && (x1 != 0 || y1 != 0 || w != width || h != height))) {
     return copyResize(src,
         width: width,
         height: height,

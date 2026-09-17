@@ -470,5 +470,37 @@ void main() {
       }
       _expectNearest(src, 8, 8);
     });
+    // (source width, source height, width, height): leading offsets and
+    // trailing-only padding on each axis.
+    for (final c in [(8, 8, 8, 4), (8, 8, 4, 8), (8, 7, 7, 7), (7, 8, 7, 7)]) {
+      for (final interpolation in Interpolation.values) {
+        for (final background in [null, ColorRgb8(1, 2, 3)]) {
+          test(
+              'letterbox ${c.$1}x${c.$2} -> ${c.$3}x${c.$4} matches copyResize'
+              ' with ${interpolation.name}, background=${background != null}',
+              () {
+            final src = Image(width: c.$1, height: c.$2);
+            for (final p in src) {
+              p.setRgb(10 + p.x * 20, 10 + p.y * 20, 40 + p.x * p.y);
+            }
+            final expected = copyResize(src,
+                width: c.$3,
+                height: c.$4,
+                maintainAspect: true,
+                backgroundColor: background,
+                interpolation: interpolation);
+            final dst = resize(src,
+                width: c.$3,
+                height: c.$4,
+                maintainAspect: true,
+                backgroundColor: background,
+                interpolation: interpolation);
+            expect([dst.width, dst.height], [c.$3, c.$4]);
+            expect(dst.getBytes().take(c.$3 * c.$4 * 3),
+                orderedEquals(expected.getBytes()));
+          });
+        }
+      }
+    }
   });
 }
