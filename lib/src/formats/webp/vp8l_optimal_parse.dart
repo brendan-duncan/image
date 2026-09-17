@@ -42,31 +42,38 @@ void optimalCover(VP8LMatches matches, VP8LCostModel costs, Uint8List r,
   final coverDistance = parse.distance;
 
   // Bounds checks are off here, so the lengths are the contract.
+  final cheapDists = matches.cheapDistances;
+  final numCheap = cheapDists.length;
+  var cheapInRange = numCheap <= 5;
+  for (var c = 0; c < numCheap; c++) {
+    final d = cheapDists[c];
+    cheapInRange = cheapInRange && d >= 1 && d < numPixels;
+  }
   if (r.length < numPixels ||
       g.length < numPixels ||
       b.length < numPixels ||
       a.length < numPixels ||
-      matches.length.length < numPixels ||
-      matches.distance.length < numPixels) {
+      matches.match.length != numPixels ||
+      costs.lengthBits.length <= maxMatchLength ||
+      !cheapInRange) {
     throw ArgumentError('optimalCover needs $numPixels of every array');
   }
 
   // cost[i] is the cheapest way to code the first i pixels; from[i] is how many
-  // pixels the last token of that way covers.
+  // pixels its last token covers and fromWhich[i] the candidate that token was
   final cost = Float64List(numPixels + 1)
     ..fillRange(1, numPixels + 1, double.infinity);
-  final from = Int32List(numPixels + 1);
-  final fromDistance = Int32List(numPixels + 1);
+  final from = Uint16List(numPixels + 1);
+  final fromWhich = Uint8List(numPixels + 1);
   final lengthBits = costs.lengthBits;
-  final matchLen = matches.length;
-  final matchDist = matches.distance;
-  final cheapLen = matches.cheapLength;
-  final cheapDists = matches.cheapDistances;
+  final match = matches.match;
   // Each near-neighbour distance costs the same wherever it is used.
-  final cheapDistBits = [
-    for (final d in cheapDists) costs.distanceBits(d, width),
-  ];
-  final candidates = 1 + cheapDists.length;
+  final cheapDistBits = Float64List(numCheap);
+  for (var c = 0; c < numCheap; c++) {
+    cheapDistBits[c] = costs.distanceBits(cheapDists[c], width);
+  }
+  final cheapEnd = Int32List(numCheap);
+  final candidates = 1 + numCheap;
 
   for (var i = 0; i < numPixels; i++) {
     final here = cost[i];
@@ -91,19 +98,43 @@ void optimalCover(VP8LMatches matches, VP8LCostModel costs, Uint8List r,
       // The length decides whether the candidate is usable at all, so it is
       // read before the distance is priced.
       if (which == 0) {
-        maxLen = matchLen[i];
+        final packed = match[i];
+        maxLen = packed & maxMatchLength;
         if (maxLen < _minMatchLen) {
           continue;
         }
-        dist = matchDist[i];
+        dist = packed >> matchLengthBits;
         distBits = here + costs.distanceBits(dist, width);
       } else {
-        maxLen = cheapLen[which - 1][i];
+        final c = which - 1;
+        final d = cheapDists[c];
+        if (i < d) {
+          continue;
+        }
+        if (cheapEnd[c] <= i) {
+          if (g[i] != g[i - d] ||
+              r[i] != r[i - d] ||
+              b[i] != b[i - d] ||
+              a[i] != a[i - d]) {
+            continue;
+          }
+          var e = i + 1;
+          while (e < numPixels &&
+              g[e] == g[e - d] &&
+              r[e] == r[e - d] &&
+              b[e] == b[e - d] &&
+              a[e] == a[e - d]) {
+            e++;
+          }
+          cheapEnd[c] = e;
+        }
+        final run = cheapEnd[c] - i;
+        maxLen = run > maxMatchLength ? maxMatchLength : run;
         if (maxLen < _minMatchLen) {
           continue;
         }
-        dist = cheapDists[which - 1];
-        distBits = here + cheapDistBits[which - 1];
+        dist = d;
+        distBits = here + cheapDistBits[c];
       }
 
       final weighed = maxLen < _lengthsWeighed ? maxLen : _lengthsWeighed;
@@ -112,7 +143,7 @@ void optimalCover(VP8LMatches matches, VP8LCostModel costs, Uint8List r,
         if (c < cost[i + len]) {
           cost[i + len] = c;
           from[i + len] = len;
-          fromDistance[i + len] = dist;
+          fromWhich[i + len] = which;
         }
       }
       if (maxLen > weighed) {
@@ -120,7 +151,7 @@ void optimalCover(VP8LMatches matches, VP8LCostModel costs, Uint8List r,
         if (c < cost[i + maxLen]) {
           cost[i + maxLen] = c;
           from[i + maxLen] = maxLen;
-          fromDistance[i + maxLen] = dist;
+          fromWhich[i + maxLen] = which;
         }
       }
     }
@@ -131,8 +162,11 @@ void optimalCover(VP8LMatches matches, VP8LCostModel costs, Uint8List r,
   var at = numPixels;
   while (at > 0) {
     final len = from[at];
-    cover[at - len] = len;
-    coverDistance[at - len] = fromDistance[at];
-    at -= len;
+    final start = at - len;
+    cover[start] = len;
+    final w = fromWhich[at];
+    coverDistance[start] =
+        w == 0 ? match[start] >> matchLengthBits : cheapDists[w - 1];
+    at = start;
   }
 }

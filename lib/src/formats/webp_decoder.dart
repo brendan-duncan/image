@@ -209,7 +209,7 @@ class WebPDecoder extends Decoder {
     final iccp = info.iccp;
     return iccp == null
         ? null
-        : IccProfile('', IccProfileCompression.none, iccp);
+        : IccProfile('ICC_PROFILE', IccProfileCompression.none, iccp);
   }
 
   Image? _decodeFrame(InputBuffer input, {int frame = 0}) {

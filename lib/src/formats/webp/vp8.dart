@@ -81,7 +81,8 @@ class VP8 {
     // The ICCP chunk holds the profile uncompressed.
     final iccp = webp.iccp;
     if (iccp != null) {
-      output!.iccProfile = IccProfile('', IccProfileCompression.none, iccp);
+      output!.iccProfile =
+          IccProfile('ICC_PROFILE', IccProfileCompression.none, iccp);
     }
 
     return output;
@@ -462,7 +463,8 @@ class VP8 {
         List<VP8MB>.generate(_mbWidth! + 1, (_) => VP8MB(), growable: false);
     _mbData = List<VP8MBData>.generate(_mbWidth!, (_) => VP8MBData(),
         growable: false);
-    _fInfo = List<VP8FInfo?>.filled(_mbWidth!, null);
+    _fInfo =
+        List<VP8FInfo>.generate(_mbWidth!, (_) => VP8FInfo(), growable: false);
 
     _precomputeFilterStrengths();
 
@@ -711,7 +713,7 @@ class VP8 {
 
   void _doFilter(int mbX, int mbY) {
     final yBps = _cacheYStride;
-    final fInfo = _fInfo[mbX]!;
+    final fInfo = _fInfo[mbX];
     final yDst = InputBuffer.from(_cacheY, offset: mbX * 16);
     final iLevel = fInfo.fInnerLevel;
     final limit = fInfo.fLimit;
@@ -1130,9 +1132,15 @@ class VP8 {
 
     if (_filterType! > 0) {
       // store filter info
-      _fInfo[_mbX] = _fStrengths[_segment][block.isIntra4x4 ? 1 : 0];
-      final finfo = _fInfo[_mbX]!;
-      finfo.fInner = finfo.fInner || !skip;
+      // A copy, as libwebp's struct assignment is: setting fInner on the
+      // shared entry would turn inner filtering on for the segment's other
+      // macroblocks, skipped ones included
+      final src = _fStrengths[_segment][block.isIntra4x4 ? 1 : 0];
+      _fInfo[_mbX]
+        ..fLimit = src.fLimit
+        ..fInnerLevel = src.fInnerLevel
+        ..hevThresh = src.hevThresh
+        ..fInner = src.fInner || !skip;
     }
 
     return true;
@@ -1470,7 +1478,7 @@ class VP8 {
   late List<VP8MB> _mbInfo;
 
   // filter strength info
-  late List<VP8FInfo?> _fInfo;
+  late List<VP8FInfo> _fInfo;
 
   // main block for Y/U/V (size = YUV_SIZE)
   late Uint8List _yuvBlock;

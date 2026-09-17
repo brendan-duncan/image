@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -504,6 +505,45 @@ void main() {
           image2.iccProfile!.data.length,
           equals(image.iccProfile!.data.length),
         );
+      });
+
+      test('iCCP keyword is always one PNG allows', () {
+        // A keyword is 1 to 79 Latin-1 printable bytes with no leading,
+        // trailing or doubled space; a profile named otherwise gets a default
+        String keywordOf(String name) {
+          final image = Image(width: 1, height: 1)
+            ..iccProfile = IccProfile(name, IccProfileCompression.none,
+                Uint8List.fromList(List<int>.generate(32, (i) => i)));
+          final png = PngEncoder().encode(image);
+          var p = 8;
+          while (p + 8 <= png.length) {
+            final size = (png[p] << 24) |
+                (png[p + 1] << 16) |
+                (png[p + 2] << 8) |
+                png[p + 3];
+            if (String.fromCharCodes(png.sublist(p + 4, p + 8)) == 'iCCP') {
+              final end = png.indexOf(0, p + 8);
+              return String.fromCharCodes(png.sublist(p + 8, end));
+            }
+            p += 12 + size;
+          }
+          fail('no iCCP chunk');
+        }
+
+        expect(keywordOf('sRGB IEC61966-2.1'), equals('sRGB IEC61966-2.1'));
+        expect(keywordOf('Café'), equals('Café'));
+        for (final bad in [
+          '',
+          ' lead',
+          'trail ',
+          'dou  ble',
+          'x' * 80,
+          'tab\there',
+          'Ж',
+        ]) {
+          expect(keywordOf(bad), equals('ICC_PROFILE'), reason: '"$bad"');
+        }
+        expect(keywordOf('x' * 79), equals('x' * 79));
       });
 
       final dir = Directory('test/_data/png');

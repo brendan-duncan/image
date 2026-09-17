@@ -79,7 +79,8 @@ class VP8L {
     // The ICCP chunk holds the profile uncompressed.
     final iccp = webp.iccp;
     if (iccp != null) {
-      image!.iccProfile = IccProfile('', IccProfileCompression.none, iccp);
+      image!.iccProfile =
+          IccProfile('ICC_PROFILE', IccProfileCompression.none, iccp);
     }
 
     return image;

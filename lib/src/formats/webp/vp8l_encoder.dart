@@ -661,10 +661,10 @@ class VP8LEncoder {
     final distance = parse.distance;
     var i = 0;
     while (i < numPixels) {
-      final len = matches.length[i];
+      final len = matches.lengthAt(i);
       final take = len >= 3 ? len : 1;
       cover[i] = take;
-      distance[i] = matches.distance[i];
+      distance[i] = matches.distanceAt(i);
       i += take;
     }
   }
