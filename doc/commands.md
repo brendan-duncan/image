@@ -316,7 +316,7 @@ void ditherImage({ Quantizer? quantizer,
   DitherKernel kernel = DitherKernel.floydSteinberg,
   bool serpentine = false,
   DitherScanOrder? scanOrder,
-  double strength = 1.0 });
+  double intensity = 1.0 });
 
 void dotScreen({ num angle = 180, num size = 5.75, int? centerX,
   int? centerY, num amount = 1, Command? mask,
