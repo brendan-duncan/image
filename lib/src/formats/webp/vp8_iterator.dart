@@ -43,6 +43,7 @@ class VP8EncIterator {
 
   /// Every candidate prediction, built once per macroblock.
   final yuvP = Uint8List(predSizeEnc);
+  late final yuvP32 = Uint32List.view(yuvP.buffer, 0, predSizeEnc >> 2);
 
   /// Index of the current macroblock in the per-macroblock arrays.
   int mbPos = 0;

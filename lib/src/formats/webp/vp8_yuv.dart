@@ -8,6 +8,7 @@ import '../../color/channel_order.dart';
 import '../../color/format.dart';
 import '../../image/image.dart';
 import '../../image/image_data_uint8.dart';
+import '../../image/palette_uint8.dart';
 import '../../util/_internal.dart';
 
 /// A picture in the planar form VP8 codes: full-resolution luma, chroma at
@@ -312,9 +313,48 @@ Uint8List _rgbaBytes(Image image) {
         return out;
     }
   }
+  final palette = image.palette;
+  if (image.format == Format.uint8 &&
+      palette is PaletteUint8 &&
+      data is ImageDataUint8 &&
+      data.numChannels == 1 &&
+      (palette.numChannels == 3 || palette.numChannels == 4)) {
+    final rgba = _paletteRgba(data.data, palette);
+    if (rgba != null) {
+      return rgba;
+    }
+  }
   return image
       .convert(format: Format.uint8, numChannels: 4, alpha: 255)
       .getBytes(order: ChannelOrder.rgba);
+}
+
+/// An index past numColors has no colour in [palette], so we return null and
+/// [Image.convert] converts that picture as before
+Uint8List? _paletteRgba(Uint8List indices, PaletteUint8 palette) {
+  final colors = palette.data;
+  final channels = palette.numChannels;
+  final numColors = palette.numColors;
+  final table = Uint8List(256 * 4);
+  for (var c = 0; c < numColors && c < 256; c++) {
+    table[4 * c] = colors[c * channels];
+    table[4 * c + 1] = colors[c * channels + 1];
+    table[4 * c + 2] = colors[c * channels + 2];
+    table[4 * c + 3] = channels == 4 ? colors[c * channels + 3] : 0xff;
+  }
+  final out = Uint8List(indices.length * 4);
+  for (var i = 0, o = 0; i < indices.length; i++, o += 4) {
+    final c = indices[i];
+    if (c >= numColors) {
+      return null;
+    }
+    final t = 4 * c;
+    out[o] = table[t];
+    out[o + 1] = table[t + 1];
+    out[o + 2] = table[t + 2];
+    out[o + 3] = table[t + 3];
+  }
+  return out;
 }
 
 void _rowToY(Uint8List rgba, int src, Uint8List y, int dst, int width) {

@@ -6,8 +6,6 @@
 /// (11.2, 11.4) and the quantizer tables (14.1).
 library;
 
-import 'dart:typed_data';
-
 /// The stride of the macroblock sample cache, in bytes.
 ///
 /// One cache line: prediction, source and reconstruction blocks are all laid
@@ -41,8 +39,7 @@ const numBands = 8;
 const numCtx = 3;
 const numProbas = 11;
 
-final kBands = Uint8List.fromList(
-    const [0, 1, 2, 3, 6, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 0]);
+const kBands = <int>[0, 1, 2, 3, 6, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 0];
 
 const kCat3 = [173, 148, 140];
 
@@ -54,8 +51,7 @@ const kCat6 = [254, 254, 243, 230, 196, 177, 153, 140, 133, 130, 129];
 
 const kCat3456 = [kCat3, kCat4, kCat5, kCat6];
 
-final kZigzag = Uint8List.fromList(
-    const [0, 1, 4, 8, 5, 2, 3, 6, 9, 12, 13, 10, 7, 11, 14, 15]);
+const kZigzag = <int>[0, 1, 4, 8, 5, 2, 3, 6, 9, 12, 13, 10, 7, 11, 14, 15];
 
 const kYModesIntra4 = [
   -bDcPred,
@@ -625,28 +621,27 @@ const i4HU4 = i4HD4 + 4;
 const i4TMP = i4HD4 + 8;
 
 /// Where each 16x16 luma prediction sits, indexed by mode.
-final kI16ModeOffsets =
-    Uint16List.fromList(const [i16DC16, i16TM16, i16VE16, i16HE16]);
+const kI16ModeOffsets = <int>[i16DC16, i16TM16, i16VE16, i16HE16];
 
 /// Where each 8x8 chroma prediction sits, indexed by mode.
-final kUVModeOffsets = Uint16List.fromList(const [c8DC8, c8TM8, c8VE8, c8HE8]);
+const kUVModeOffsets = <int>[c8DC8, c8TM8, c8VE8, c8HE8];
 
 /// Where each 4x4 luma prediction sits, indexed by mode.
-final kI4ModeOffsets = Uint16List.fromList(const [
+const kI4ModeOffsets = <int>[
   i4DC4, i4TM4, i4VE4, i4HE4, i4RD4, //
   i4VR4, i4LD4, i4VL4, i4HD4, i4HU4
-]);
+];
 
 /// Offsets of the sixteen luma 4x4 blocks within a macroblock, in cache units.
-final kScan = Uint16List.fromList(const [
+const kScan = <int>[
   0 + 0 * kBps, 4 + 0 * kBps, 8 + 0 * kBps, 12 + 0 * kBps, //
   0 + 4 * kBps, 4 + 4 * kBps, 8 + 4 * kBps, 12 + 4 * kBps,
   0 + 8 * kBps, 4 + 8 * kBps, 8 + 8 * kBps, 12 + 8 * kBps,
   0 + 12 * kBps, 4 + 12 * kBps, 8 + 12 * kBps, 12 + 12 * kBps,
-]);
+];
 
 /// Offsets of the four U then four V 4x4 blocks, in cache units.
-final kScanUV = Uint16List.fromList(const [
+const kScanUV = <int>[
   0 + 0 * kBps, 4 + 0 * kBps, 0 + 4 * kBps, 4 + 4 * kBps, // U
   8 + 0 * kBps, 12 + 0 * kBps, 8 + 4 * kBps, 12 + 4 * kBps, // V
-]);
+];
