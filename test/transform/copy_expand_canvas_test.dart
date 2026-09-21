@@ -109,6 +109,16 @@ void main() {
         ..writeAsBytesSync(encodePng(expandedCanvas));
     });
 
+    test('copyExpandCanvas preserves source RGBA and transparent padding', () {
+      final src = Image(width: 4, height: 4, numChannels: 4)
+        ..clear(ColorRgba8(255, 0, 0, 128));
+      final result = copyExpandCanvas(src, padding: 2);
+      expect(result.numChannels, equals(4));
+      expect(result.getPixel(0, 0).a, equals(0));
+      final p = result.getPixel(2, 2);
+      expect([p.r, p.g, p.b, p.a], equals([255, 0, 0, 128]));
+    });
+
     // EXIF metadata should survive a canvas expansion.
     test('copyExpandCanvas preserves EXIF metadata', () {
       final img = Image(width: 16, height: 16);
