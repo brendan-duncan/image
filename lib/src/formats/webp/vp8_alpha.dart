@@ -9,6 +9,7 @@ library;
 import 'dart:typed_data';
 
 import '../../util/_internal.dart';
+import 'vp8_dsp.dart';
 import 'vp8l_encoder.dart';
 import 'webp_filters.dart';
 
@@ -253,11 +254,12 @@ int _estimateBestFilter(Uint8List data, int width, int height) {
       final v = data[p + i];
       final gradient = _clip8(
           data[p + i - 1] + data[p + i - width] - data[p + i - width - 1]);
-      bins[WebPFilters.filterNone][(v - mean).abs() >> 4] = 1;
-      bins[WebPFilters.filterHorizontal][(v - data[p + i - 1]).abs() >> 4] = 1;
-      bins[WebPFilters.filterVertical][(v - data[p + i - width]).abs() >> 4] =
-          1;
-      bins[WebPFilters.filterGradient][(v - gradient).abs() >> 4] = 1;
+      bins[WebPFilters.filterNone][absBranchless(v - mean) >> 4] = 1;
+      bins[WebPFilters.filterHorizontal]
+          [absBranchless(v - data[p + i - 1]) >> 4] = 1;
+      bins[WebPFilters.filterVertical]
+          [absBranchless(v - data[p + i - width]) >> 4] = 1;
+      bins[WebPFilters.filterGradient][absBranchless(v - gradient) >> 4] = 1;
       mean = (3 * mean + v + 2) >> 2;
     }
   }

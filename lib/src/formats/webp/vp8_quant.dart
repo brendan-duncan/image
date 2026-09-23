@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import '../../util/_internal.dart';
 import 'vp8_config.dart';
+import 'vp8_dsp.dart';
 import 'vp8_sar.dart';
 import 'vp8_tables.dart';
 
@@ -279,16 +280,14 @@ bool _step(Int16List inp, int at, Int16List out, int to, int sharpen, int q,
     int iq, int bias, int zthresh) {
   assert(at >= 0 && at < inp.length && to >= 0 && to < out.length);
   final v = inp[at];
-  final sign = v < 0;
-  final coeff = (sign ? -v : v) + sharpen;
+  final sign = signOf(v);
+  final coeff = v * sign + sharpen;
   if (coeff > zthresh) {
     var level = (coeff * iq + bias) >> _qFix;
     if (level > maxLevel) {
       level = maxLevel;
     }
-    if (sign) {
-      level = -level;
-    }
+    level *= sign;
     inp[at] = level * q;
     out[to] = level;
     return level != 0;

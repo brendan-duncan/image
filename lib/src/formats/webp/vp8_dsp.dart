@@ -26,11 +26,11 @@ bool _inRange(List<int> list, int off, int rows, [int width = 4]) =>
 
 /// Clips a value to a byte.
 @pragma('vm:prefer-inline')
-int _clip8(int v) => v < 0
-    ? 0
-    : v > 255
-        ? 255
-        : v;
+int _clip8(int v) => v & ~0xff == 0
+    ? v
+    : v < 0
+        ? 0
+        : 255;
 
 @pragma('vm:prefer-inline')
 int _avg3(int a, int b, int c) => (a + 2 * b + c + 2) >> 2;
@@ -237,11 +237,9 @@ bool isFlat(Int16List levels, int off, int numBlocks, int thresh) {
   var score = 0;
   for (var b = 0; b < numBlocks; b++) {
     for (var i = 1; i < 16; i++) {
-      if (levels[off + i] != 0) {
-        score++;
-        if (score > thresh) {
-          return false;
-        }
+      score += nonZero(levels[off + i]);
+      if (score > thresh) {
+        return false;
       }
     }
     off += 16;
@@ -358,61 +356,104 @@ void _fill(Uint8List dst, int dstOff, int value, int size) {
     return;
   }
   for (var j = 0; j < size; j++) {
-    dst.fillRange(dstOff + j * kBps, dstOff + j * kBps + size, value);
+    final o = dstOff + j * kBps;
+    for (var i = 0; i < size; i++) {
+      dst[o + i] = value;
+    }
   }
 }
+
+@pragma('vm:prefer-inline')
+void _fill32(Uint32List dst, int dstOff, int value, int size) {
+  final v = value * 0x01010101;
+  var o = dstOff >> 2;
+  for (var j = 0; j < size; j++) {
+    dst[o] = v;
+    dst[o + 1] = v;
+    if (size == 16) {
+      dst[o + 2] = v;
+      dst[o + 3] = v;
+    }
+    o += kBps >> 2;
+  }
+}
+
+@pragma('vm:prefer-inline')
+int _word(Uint8List b, int o) =>
+    b[o] + b[o + 1] * 0x100 + b[o + 2] * 0x10000 + b[o + 3] * 0x1000000;
 
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
 void _verticalPred(
-    Uint8List dst, int dstOff, Uint8List? top, int topOff, int size) {
+    Uint32List dst, int dstOff, Uint8List? top, int topOff, int size) {
   if (top == null) {
-    _fill(dst, dstOff, 127, size);
+    _fill32(dst, dstOff, 127, size);
     return;
   }
+  final t0 = _word(top, topOff);
+  final t1 = _word(top, topOff + 4);
+  final t2 = size == 16 ? _word(top, topOff + 8) : 0;
+  final t3 = size == 16 ? _word(top, topOff + 12) : 0;
+  var o = dstOff >> 2;
   for (var j = 0; j < size; j++) {
-    dst.setRange(dstOff + j * kBps, dstOff + j * kBps + size, top, topOff);
+    dst[o] = t0;
+    dst[o + 1] = t1;
+    if (size == 16) {
+      dst[o + 2] = t2;
+      dst[o + 3] = t3;
+    }
+    o += kBps >> 2;
   }
 }
 
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
 void _horizontalPred(
-    Uint8List dst, int dstOff, Uint8List? left, int leftOff, int size) {
+    Uint32List dst, int dstOff, Uint8List? left, int leftOff, int size) {
   if (left == null) {
-    _fill(dst, dstOff, 129, size);
+    _fill32(dst, dstOff, 129, size);
     return;
   }
+  var o = dstOff >> 2;
   for (var j = 0; j < size; j++) {
-    dst.fillRange(
-        dstOff + j * kBps, dstOff + j * kBps + size, left[leftOff + j]);
+    final v = left[leftOff + j] * 0x01010101;
+    dst[o] = v;
+    dst[o + 1] = v;
+    if (size == 16) {
+      dst[o + 2] = v;
+      dst[o + 3] = v;
+    }
+    o += kBps >> 2;
   }
 }
 
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
-void _trueMotion(Uint8List dst, int dstOff, Uint8List? left, int leftOff,
-    Uint8List? top, int topOff, int size) {
+void _trueMotion(Uint8List dst, Uint32List dst32, int dstOff, Uint8List? left,
+    int leftOff, Uint8List? top, int topOff, int size) {
   if (left == null) {
     // Without left samples true motion degenerates to copying the top row,
     // and with no top row either to the flat 129 the left would have supplied.
     if (top != null) {
-      _verticalPred(dst, dstOff, top, topOff, size);
+      _verticalPred(dst32, dstOff, top, topOff, size);
     } else {
-      _fill(dst, dstOff, 129, size);
+      _fill32(dst32, dstOff, 129, size);
     }
     return;
   }
   if (top == null) {
-    _horizontalPred(dst, dstOff, left, leftOff, size);
+    _horizontalPred(dst32, dstOff, left, leftOff, size);
     return;
   }
   final clip = _clipTable;
   final base = 255 - left[leftOff - 1];
   for (var y = 0; y < size; y++) {
     final row = base + left[leftOff + y];
-    for (var x = 0; x < size; x++) {
+    for (var x = 0; x < size; x += 4) {
       dst[dstOff + x] = clip[row + top[topOff + x]];
+      dst[dstOff + x + 1] = clip[row + top[topOff + x + 1]];
+      dst[dstOff + x + 2] = clip[row + top[topOff + x + 2]];
+      dst[dstOff + x + 3] = clip[row + top[topOff + x + 3]];
     }
     dstOff += kBps;
   }
@@ -420,7 +461,7 @@ void _trueMotion(Uint8List dst, int dstOff, Uint8List? left, int leftOff,
 
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
-void _dcMode(Uint8List dst, int dstOff, Uint8List? left, int leftOff,
+void _dcMode(Uint32List dst, int dstOff, Uint8List? left, int leftOff,
     Uint8List? top, int topOff, int size, int round, int shift) {
   var dc = 0;
   if (top != null) {
@@ -444,7 +485,7 @@ void _dcMode(Uint8List dst, int dstOff, Uint8List? left, int leftOff,
   } else {
     dc = 0x80;
   }
-  _fill(dst, dstOff, dc, size);
+  _fill32(dst, dstOff, dc, size);
 }
 
 /// Builds the four 16x16 luma predictions into the prediction cache [dst].
@@ -454,30 +495,30 @@ void _dcMode(Uint8List dst, int dstOff, Uint8List? left, int leftOff,
 @internal
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
-void predLuma16(
-    Uint8List dst, Uint8List? left, int leftOff, Uint8List? top, int topOff) {
-  _dcMode(dst, i16DC16, left, leftOff, top, topOff, 16, 16, 5);
-  _verticalPred(dst, i16VE16, top, topOff, 16);
-  _horizontalPred(dst, i16HE16, left, leftOff, 16);
-  _trueMotion(dst, i16TM16, left, leftOff, top, topOff, 16);
+void predLuma16(Uint8List dst, Uint32List dst32, Uint8List? left, int leftOff,
+    Uint8List? top, int topOff) {
+  _dcMode(dst32, i16DC16, left, leftOff, top, topOff, 16, 16, 5);
+  _verticalPred(dst32, i16VE16, top, topOff, 16);
+  _horizontalPred(dst32, i16HE16, left, leftOff, 16);
+  _trueMotion(dst, dst32, i16TM16, left, leftOff, top, topOff, 16);
 }
 
 /// Builds the four 8x8 chroma predictions, U and V side by side, into [dst].
 @internal
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
-void predChroma8(
-    Uint8List dst, Uint8List? left, int leftOff, Uint8List? top, int topOff) {
-  _dcMode(dst, c8DC8, left, leftOff, top, topOff, 8, 8, 4);
-  _verticalPred(dst, c8VE8, top, topOff, 8);
-  _horizontalPred(dst, c8HE8, left, leftOff, 8);
-  _trueMotion(dst, c8TM8, left, leftOff, top, topOff, 8);
+void predChroma8(Uint8List dst, Uint32List dst32, Uint8List? left, int leftOff,
+    Uint8List? top, int topOff) {
+  _dcMode(dst32, c8DC8, left, leftOff, top, topOff, 8, 8, 4);
+  _verticalPred(dst32, c8VE8, top, topOff, 8);
+  _horizontalPred(dst32, c8HE8, left, leftOff, 8);
+  _trueMotion(dst, dst32, c8TM8, left, leftOff, top, topOff, 8);
   // V sits eight columns to the right of U, and takes the second half of the
   // top row and of the left column.
-  _dcMode(dst, c8DC8 + 8, left, leftOff + 16, top, topOff + 8, 8, 8, 4);
-  _verticalPred(dst, c8VE8 + 8, top, topOff + 8, 8);
-  _horizontalPred(dst, c8HE8 + 8, left, leftOff + 16, 8);
-  _trueMotion(dst, c8TM8 + 8, left, leftOff + 16, top, topOff + 8, 8);
+  _dcMode(dst32, c8DC8 + 8, left, leftOff + 16, top, topOff + 8, 8, 8, 4);
+  _verticalPred(dst32, c8VE8 + 8, top, topOff + 8, 8);
+  _horizontalPred(dst32, c8HE8 + 8, left, leftOff + 16, 8);
+  _trueMotion(dst, dst32, c8TM8 + 8, left, leftOff + 16, top, topOff + 8, 8);
 }
 
 /// Builds all ten 4x4 luma predictions into [dst].
@@ -811,13 +852,44 @@ int _tTransformColumn(
   final b1 = a3 + a2;
   final b2 = a3 - a2;
   final b3 = a0 - a1;
-  // Written out rather than calling abs(), which the compiler leaves as a
+  // Uses absBranchless rather than abs(), which the compiler leaves as a
   // call: it showed up as its own entry in the profile.
-  return w0 * (b0 < 0 ? -b0 : b0) +
-      w1 * (b1 < 0 ? -b1 : b1) +
-      w2 * (b2 < 0 ? -b2 : b2) +
-      w3 * (b3 < 0 ? -b3 : b3);
+  return w0 * absBranchless(b0) +
+      w1 * absBranchless(b1) +
+      w2 * absBranchless(b2) +
+      w3 * absBranchless(b3);
 }
+
+/// Dart AOT compiles `v < 0 ? -v : v` to a branch, which mispredicts on
+/// transform coefficients because their sign is close to random. The shift here
+/// and in signOf removes the branch: 87 animation frames encode in 2230 ms, in
+/// 2552 ms without absBranchless and in 2844 ms without both
+@internal
+@pragma('vm:prefer-inline')
+int absBranchless(int v) {
+  if (!_int64) {
+    return v < 0 ? -v : v;
+  }
+  final s = v >> 31;
+  return (v + s) ^ s;
+}
+
+@internal
+@pragma('vm:prefer-inline')
+int signOf(int v) => _int64 ? 2 * (v >> 31) + 1 : (v < 0 ? -1 : 1);
+
+@internal
+@pragma('vm:prefer-inline')
+int nonZero(int v) => _int64 ? (v | -v) >>> 63 : (v != 0 ? 1 : 0);
+
+@internal
+@pragma('vm:prefer-inline')
+int min2(int v) => _int64 ? 2 + ((v - 2) & ((v - 2) >> 63)) : (v >= 2 ? 2 : v);
+
+/// dart2js returns an unsigned 32-bit value for `>>` of a negative int, which
+/// breaks the shifts in absBranchless, signOf, nonZero and min2, so the web
+/// build keeps the branch
+const _int64 = bool.fromEnvironment('dart.library.isolate');
 
 /// The weighted spectrum of one 4x4 block, which [distoFrom] compares.
 ///
@@ -835,7 +907,7 @@ int spectrum4x4(Uint8List src, int off) => _tTransform(src, off);
 @internal
 int distoFrom(int reference, Uint8List b, int bOff) {
   final d = _tTransform(b, bOff) - reference;
-  return (d < 0 ? -d : d) >> 5;
+  return absBranchless(d) >> 5;
 }
 
 /// The sum of each of the four 4x4 blocks of a 16x4 strip, written to [dc]

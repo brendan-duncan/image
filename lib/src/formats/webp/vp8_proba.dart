@@ -73,7 +73,9 @@ class VP8EncProba {
   ///
   /// The bands repeat, so this saves a lookup through [kBands] in the inner
   /// loops that price a block.
-  final costBase = Int32List(numTypes * 16 * numCtx);
+  final costBase = Uint16List(numTypes * 16 * numCtx);
+
+  final levelFixedCosts = Uint16List.fromList(kLevelFixedCosts);
 
   /// Probabilities of the segment tree.
   final segments = Uint8List(3)..fillRange(0, 3, 255);
@@ -94,7 +96,7 @@ class VP8EncProba {
   @pragma('vm:unsafe:no-bounds-checks')
   @pragma('vm:unsafe:no-interrupts')
   int levelCostAt(int base, int level) =>
-      kLevelFixedCosts[level] +
+      levelFixedCosts[level] +
       levelCost[base + (level > maxVariableLevel ? maxVariableLevel : level)];
 
   /// Recomputes [levelCost] from [coeffs].

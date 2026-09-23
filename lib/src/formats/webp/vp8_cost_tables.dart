@@ -4,10 +4,8 @@
 /// against a rate in these units, which are 1/256ths of a bit.
 library;
 
-import 'dart:typed_data';
-
 /// The cost of coding a bit whose probability of being zero is the index.
-final kEntropyCost = Uint16List.fromList(const [
+const kEntropyCost = <int>[
   1792, 1792, 1792, 1536, 1536, 1408, 1366, 1280, 1280, 1216, 1178, 1152, 1110,
   1076, 1061, 1024, //
   1024, 992, 968, 951, 939, 911, 896, 878, 871, 854, 838, 820, 811, 794, 786,
@@ -36,13 +34,13 @@ final kEntropyCost = Uint16List.fromList(const [
   77, 76, 74, 73, 71, 69, 67, 66, 64, 63, 61, 59, 57, 55, 54, 52,
   51, 49, 47, 46, 44, 43, 41, 40, 38, 36, 35, 33, 32, 30, 29, 27,
   25, 24, 22, 21, 19, 18, 16, 15, 13, 12, 10, 9, 7, 6, 4, 3,
-]);
+];
 
 /// The part of a coefficient's cost that does not depend on its context.
 ///
 /// Above level 67 the variable part is constant, so this table carries the
 /// whole remainder for the large levels.
-final kLevelFixedCosts = Uint16List.fromList(const [
+const kLevelFixedCosts = <int>[
   0, 256, 256, 256, 256, 432, 618, 630, 731, 640, 640, 828, 901, 948, 1021,
   1101, //
   1174, 1221, 1294, 1042, 1085, 1115, 1158, 1202, 1245, 1275, 1318, 1337, 1380,
@@ -299,7 +297,7 @@ final kLevelFixedCosts = Uint16List.fromList(const [
   7593, 7599, 7610,
   7616, 7625, 7631, 7656, 7662, 7671, 7677, 7688, 7694, 7703, 7709, 7729, 7735,
   7744, 7750, 7761,
-]);
+];
 
 /// For each level, which contexts code it (first entry) and the bit to send in
 /// each (second entry).

@@ -128,17 +128,18 @@ class _MBAnalyzer {
   @pragma('vm:unsafe:no-bounds-checks')
   @pragma('vm:unsafe:no-interrupts')
   int _alphaOf(int predOffset, int start, int end) {
-    _distribution.fillRange(0, _distribution.length, 0);
+    for (var k = 0; k <= _maxCoeffThresh; k++) {
+      _distribution[k] = 0;
+    }
     for (var j = start; j < end; j++) {
       final off = _dspScan[j];
       final srcBase = j < 16 ? yOffEnc : uOffEnc;
       fTransform(
           it.yuvIn, srcBase + off, it.yuvP, predOffset + off, _coeffs, 0);
       for (var k = 0; k < 16; k++) {
-        // Written out rather than calling abs(), which stays a call and shows
+        // Uses absBranchless rather than abs(), which stays a call and shows
         // up as its own entry in the profile.
-        final c = _coeffs[k];
-        final v = (c < 0 ? -c : c) >> 3;
+        final v = absBranchless(_coeffs[k]) >> 3;
         _distribution[v > _maxCoeffThresh ? _maxCoeffThresh : v]++;
       }
     }
@@ -159,8 +160,8 @@ class _MBAnalyzer {
   }
 
   int _bestIntra16Mode() {
-    predLuma16(it.yuvP, it.x != 0 ? it.yLeft : null, VP8EncIterator.yLeftOff,
-        it.y != 0 ? it.yTop : null, it.yTopPos);
+    predLuma16(it.yuvP, it.yuvP32, it.x != 0 ? it.yLeft : null,
+        VP8EncIterator.yLeftOff, it.y != 0 ? it.yTop : null, it.yTopPos);
     var best = -1;
     var bestMode = 0;
     for (var mode = 0; mode < _maxIntra16Mode; mode++) {
@@ -175,8 +176,8 @@ class _MBAnalyzer {
   }
 
   int _bestUVMode() {
-    predChroma8(it.yuvP, it.x != 0 ? it.uvLeft : null, VP8EncIterator.uLeftOff,
-        it.y != 0 ? it.uvTop : null, it.uvTopPos);
+    predChroma8(it.yuvP, it.yuvP32, it.x != 0 ? it.uvLeft : null,
+        VP8EncIterator.uLeftOff, it.y != 0 ? it.uvTop : null, it.uvTopPos);
     var best = -1;
     var smallest = 0;
     var bestMode = 0;

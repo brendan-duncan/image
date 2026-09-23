@@ -10,6 +10,7 @@ import 'dart:typed_data';
 import '../../util/_internal.dart';
 import 'vp8_bool_encoder.dart';
 import 'vp8_cost_tables.dart';
+import 'vp8_dsp.dart';
 import 'vp8_proba.dart';
 import 'vp8_tables.dart';
 import 'vp8_tokens.dart';
@@ -75,7 +76,7 @@ int getResidualCost(VP8EncProba proba, VP8Residual res, int ctx0) {
   final type = res.coeffType;
   final coeffs = res.coeffs;
   final off = res.coeffsOff;
-  final bands = kBands;
+  const bands = kBands;
   var n = res.first;
   // For n of 0 or 1 the band equals n, so this is the right probability.
   final p0 = proba.coeffs[_probaIdx(type, n, ctx0)];
@@ -89,12 +90,12 @@ int getResidualCost(VP8EncProba proba, VP8Residual res, int ctx0) {
   final base = type * 16 * numCtx;
   for (; n < res.last; n++) {
     final c = coeffs[off + n];
-    final v = c < 0 ? -c : c;
+    final v = absBranchless(c);
     cost += proba.levelCostAt(t, v);
-    t = proba.costBase[base + (n + 1) * numCtx + (v >= 2 ? 2 : v)];
+    t = proba.costBase[base + (n + 1) * numCtx + min2(v)];
   }
   final c = coeffs[off + n];
-  final v = c < 0 ? -c : c;
+  final v = absBranchless(c);
   cost += proba.levelCostAt(t, v);
   if (n < 15) {
     // One more bit says that the block ends here.
@@ -110,7 +111,7 @@ int getResidualCost(VP8EncProba proba, VP8Residual res, int ctx0) {
 @pragma('vm:unsafe:no-interrupts')
 int putCoeffs(VP8BoolEncoder bw, VP8EncProba proba, VP8Residual res, int ctx) {
   final type = res.coeffType;
-  final bands = kBands;
+  const bands = kBands;
   final coeffs = res.coeffs;
   final off = res.coeffsOff;
   final probas = proba.coeffs;
@@ -195,7 +196,7 @@ int putCoeffs(VP8BoolEncoder bw, VP8EncProba proba, VP8Residual res, int ctx) {
 @internal
 int recordCoeffs(VP8EncProba proba, VP8Residual res, int ctx) {
   final type = res.coeffType;
-  final bands = kBands;
+  const bands = kBands;
   final coeffs = res.coeffs;
   final off = res.coeffsOff;
   var n = res.first;
@@ -243,7 +244,7 @@ int recordCoeffs(VP8EncProba proba, VP8Residual res, int ctx) {
 int recordCoeffTokens(
     VP8EncProba proba, VP8Residual res, int ctx, VP8TokenBuffer tokens) {
   final type = res.coeffType;
-  final bands = kBands;
+  const bands = kBands;
   final coeffs = res.coeffs;
   final off = res.coeffsOff;
   final last = res.last;

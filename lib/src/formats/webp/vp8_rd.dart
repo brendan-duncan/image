@@ -224,13 +224,13 @@ class VP8Decimate {
   }
 
   void _makeLuma16Preds() {
-    predLuma16(it.yuvP, it.x != 0 ? it.yLeft : null, VP8EncIterator.yLeftOff,
-        it.y != 0 ? it.yTop : null, it.yTopPos);
+    predLuma16(it.yuvP, it.yuvP32, it.x != 0 ? it.yLeft : null,
+        VP8EncIterator.yLeftOff, it.y != 0 ? it.yTop : null, it.yTopPos);
   }
 
   void _makeChroma8Preds() {
-    predChroma8(it.yuvP, it.x != 0 ? it.uvLeft : null, VP8EncIterator.uLeftOff,
-        it.y != 0 ? it.uvTop : null, it.uvTopPos);
+    predChroma8(it.yuvP, it.yuvP32, it.x != 0 ? it.uvLeft : null,
+        VP8EncIterator.uLeftOff, it.y != 0 ? it.uvTop : null, it.uvTopPos);
   }
 
   void _makeIntra4Preds() {
