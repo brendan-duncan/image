@@ -866,7 +866,7 @@ class PngDecoder extends Decoder {
         p.index = raw[0];
         return;
       case PngColorType.grayscaleAlpha:
-        p.setRgb(raw[0], raw[1], 0);
+        p.setRgba(raw[0], 0, 0, raw[1]);
         return;
       case PngColorType.rgba:
         p.setRgba(raw[0], raw[1], raw[2], raw[3]);

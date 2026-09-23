@@ -94,11 +94,10 @@ class ImageDataUint16 extends ImageData {
   void setPixelRgb(int x, int y, num r, num g, num b) {
     final index = y * width * numChannels + (x * numChannels);
     data[index] = r.toInt();
-    if (numChannels > 1) {
+    // A 2 channel image is grayscale+alpha; setPixelRgb leaves alpha alone.
+    if (numChannels > 2) {
       data[index + 1] = g.toInt();
-      if (numChannels > 2) {
-        data[index + 2] = b.toInt();
-      }
+      data[index + 2] = b.toInt();
     }
   }
 
@@ -106,13 +105,14 @@ class ImageDataUint16 extends ImageData {
   void setPixelRgba(int x, int y, num r, num g, num b, num a) {
     final index = y * width * numChannels + (x * numChannels);
     data[index] = r.toInt();
-    if (numChannels > 1) {
+    if (numChannels == 2) {
+      // A 2 channel image is grayscale+alpha.
+      data[index + 1] = a.toInt();
+    } else if (numChannels > 2) {
       data[index + 1] = g.toInt();
-      if (numChannels > 2) {
-        data[index + 2] = b.toInt();
-        if (numChannels > 3) {
-          data[index + 3] = a.toInt();
-        }
+      data[index + 2] = b.toInt();
+      if (numChannels > 3) {
+        data[index + 3] = a.toInt();
       }
     }
   }

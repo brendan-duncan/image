@@ -90,28 +90,49 @@ class ColorFloat16 extends Iterable<num> implements Color {
   }
 
   @override
-  num get g => data.length > 1 ? Float16.float16ToDouble(data[1]) : 0;
+  num get g => data.length == 2
+      // A 2 channel color is grayscale+alpha.
+      ? Float16.float16ToDouble(data[0])
+      : data.length > 1
+          ? Float16.float16ToDouble(data[1])
+          : 0;
   @override
   set g(num v) {
-    if (data.length > 1) {
+    if (data.length == 2) {
+      data[0] = Float16.doubleToFloat16(v.toDouble());
+    } else if (data.length > 1) {
       data[1] = Float16.doubleToFloat16(v.toDouble());
     }
   }
 
   @override
-  num get b => data.length > 2 ? Float16.float16ToDouble(data[2]) : 0;
+  num get b => data.length == 2
+      // A 2 channel color is grayscale+alpha.
+      ? Float16.float16ToDouble(data[0])
+      : data.length > 2
+          ? Float16.float16ToDouble(data[2])
+          : 0;
   @override
   set b(num v) {
-    if (data.length > 2) {
+    if (data.length == 2) {
+      data[0] = Float16.doubleToFloat16(v.toDouble());
+    } else if (data.length > 2) {
       data[2] = Float16.doubleToFloat16(v.toDouble());
     }
   }
 
   @override
-  num get a => data.length > 3 ? Float16.float16ToDouble(data[3]) : 0;
+  num get a => data.length == 2
+      // A 2 channel color is grayscale+alpha.
+      ? Float16.float16ToDouble(data[1])
+      : data.length > 3
+          ? Float16.float16ToDouble(data[3])
+          : 0;
   @override
   set a(num v) {
-    if (data.length > 3) {
+    if (data.length == 2) {
+      data[1] = Float16.doubleToFloat16(v.toDouble());
+    } else if (data.length > 3) {
       data[3] = Float16.doubleToFloat16(v.toDouble());
     }
   }
@@ -137,16 +158,20 @@ class ColorFloat16 extends Iterable<num> implements Color {
   set aNormalized(num v) => a = v * maxChannelValue;
 
   @override
-  num get luminance => getLuminance(this);
+  num get luminance => data.length == 2 ? r : getLuminance(this);
   @override
-  num get luminanceNormalized => getLuminanceNormalized(this);
+  num get luminanceNormalized =>
+      data.length == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
   num getChannel(Channel channel) => channel == Channel.luminance
       ? luminance
-      : channel.index < data.length
-          ? Float16.float16ToDouble(data[channel.index])
-          : 0;
+      // A 2 channel color is grayscale+alpha.
+      : data.length == 2
+          ? (channel == Channel.alpha ? a : r)
+          : channel.index < data.length
+              ? Float16.float16ToDouble(data[channel.index])
+              : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -164,11 +189,10 @@ class ColorFloat16 extends Iterable<num> implements Color {
   void setRgb(num r, num g, num b) {
     data[0] = Float16.doubleToFloat16(r.toDouble());
     final nc = data.length;
-    if (nc > 1) {
+    // A 2 channel color is grayscale+alpha. setRgb leaves alpha alone.
+    if (nc > 2) {
       data[1] = Float16.doubleToFloat16(g.toDouble());
-      if (nc > 2) {
-        data[2] = Float16.doubleToFloat16(b.toDouble());
-      }
+      data[2] = Float16.doubleToFloat16(b.toDouble());
     }
   }
 
@@ -176,13 +200,14 @@ class ColorFloat16 extends Iterable<num> implements Color {
   void setRgba(num r, num g, num b, num a) {
     data[0] = Float16.doubleToFloat16(r.toDouble());
     final nc = data.length;
-    if (nc > 1) {
+    if (nc == 2) {
+      // A 2 channel color is grayscale+alpha.
+      data[1] = Float16.doubleToFloat16(a.toDouble());
+    } else if (nc > 2) {
       data[1] = Float16.doubleToFloat16(g.toDouble());
-      if (nc > 2) {
-        data[2] = Float16.doubleToFloat16(b.toDouble());
-        if (nc > 3) {
-          data[3] = Float16.doubleToFloat16(a.toDouble());
-        }
+      data[2] = Float16.doubleToFloat16(b.toDouble());
+      if (nc > 3) {
+        data[3] = Float16.doubleToFloat16(a.toDouble());
       }
     }
   }

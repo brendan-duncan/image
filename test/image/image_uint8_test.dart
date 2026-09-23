@@ -42,10 +42,10 @@ void main() {
         expect(i2.height, equals(32));
         expect(i2.numChannels, equals(2));
         i2
-          ..setPixelRgb(0, 0, 32, 64, 0)
-          ..setPixelRgb(1, 0, 64, 32, 0)
-          ..setPixelRgb(0, 1, 128, 52, 0)
-          ..setPixelRgb(1, 1, 255, 84, 0);
+          ..setPixelRgba(0, 0, 32, 0, 0, 64)
+          ..setPixelRgba(1, 0, 64, 0, 0, 32)
+          ..setPixelRgba(0, 1, 128, 0, 0, 52)
+          ..setPixelRgba(1, 1, 255, 0, 0, 84);
         expect(i2.getPixel(0, 0), equals([32, 64]));
         expect(i2.getPixel(1, 0), equals([64, 32]));
         expect(i2.getPixel(0, 1), equals([128, 52]));
@@ -201,9 +201,11 @@ void main() {
         final i1_2 = i1.convert(numChannels: 2);
         expect(i1_2.format, equals(Format.uint8));
         expect(i1_2.numChannels, equals(2));
-        expect(i1_2.getPixel(0, 0), equals([32, 32]));
-        expect(i1_2.getPixel(1, 0), equals([64, 64]));
-        expect(i1_2.getPixel(0, 1), equals([128, 128]));
+        // 2 channels is grayscale+alpha, so the gray is carried over and the
+        // added channel is opaque alpha.
+        expect(i1_2.getPixel(0, 0), equals([32, 255]));
+        expect(i1_2.getPixel(1, 0), equals([64, 255]));
+        expect(i1_2.getPixel(0, 1), equals([128, 255]));
         expect(i1_2.getPixel(1, 1), equals([255, 255]));
 
         final i1_3 = i1.convert(numChannels: 3);

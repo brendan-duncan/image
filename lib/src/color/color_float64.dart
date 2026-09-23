@@ -72,28 +72,49 @@ class ColorFloat64 extends Iterable<num> implements Color {
   set r(num r) => data.isNotEmpty ? data[0] = r.toDouble() : 0;
 
   @override
-  num get g => data.length > 1 ? data[1] : 0;
+  num get g => data.length == 2
+      // A 2 channel color is grayscale+alpha.
+      ? data[0]
+      : data.length > 1
+          ? data[1]
+          : 0;
   @override
   set g(num g) {
-    if (data.length > 1) {
+    if (data.length == 2) {
+      data[0] = g.toDouble();
+    } else if (data.length > 1) {
       data[1] = g.toDouble();
     }
   }
 
   @override
-  num get b => data.length > 2 ? data[2] : 0;
+  num get b => data.length == 2
+      // A 2 channel color is grayscale+alpha.
+      ? data[0]
+      : data.length > 2
+          ? data[2]
+          : 0;
   @override
   set b(num b) {
-    if (data.length > 2) {
+    if (data.length == 2) {
+      data[0] = b.toDouble();
+    } else if (data.length > 2) {
       data[2] = b.toDouble();
     }
   }
 
   @override
-  num get a => data.length > 3 ? data[3] : 1;
+  num get a => data.length == 2
+      // A 2 channel color is grayscale+alpha.
+      ? data[1]
+      : data.length > 3
+          ? data[3]
+          : 1;
   @override
   set a(num a) {
-    if (data.length > 3) {
+    if (data.length == 2) {
+      data[1] = a.toDouble();
+    } else if (data.length > 3) {
       data[3] = a.toDouble();
     }
   }
@@ -119,17 +140,21 @@ class ColorFloat64 extends Iterable<num> implements Color {
   set aNormalized(num v) => a = v * maxChannelValue;
 
   @override
-  num get luminance => getLuminance(this);
+  num get luminance => data.length == 2 ? r : getLuminance(this);
 
   @override
-  num get luminanceNormalized => getLuminanceNormalized(this);
+  num get luminanceNormalized =>
+      data.length == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
   num getChannel(Channel channel) => channel == Channel.luminance
       ? luminance
-      : channel.index < data.length
-          ? data[channel.index]
-          : 0;
+      // A 2 channel color is grayscale+alpha.
+      : data.length == 2
+          ? (channel == Channel.alpha ? a : r)
+          : channel.index < data.length
+              ? data[channel.index]
+              : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -147,11 +172,10 @@ class ColorFloat64 extends Iterable<num> implements Color {
   void setRgb(num r, num g, num b) {
     data[0] = r.toDouble();
     final nc = data.length;
-    if (nc > 1) {
+    // A 2 channel color is grayscale+alpha. setRgb leaves alpha alone.
+    if (nc > 2) {
       data[1] = g.toDouble();
-      if (nc > 2) {
-        data[2] = b.toDouble();
-      }
+      data[2] = b.toDouble();
     }
   }
 
@@ -159,13 +183,14 @@ class ColorFloat64 extends Iterable<num> implements Color {
   void setRgba(num r, num g, num b, num a) {
     data[0] = r.toDouble();
     final nc = data.length;
-    if (nc > 1) {
+    if (nc == 2) {
+      // A 2 channel color is grayscale+alpha.
+      data[1] = a.toDouble();
+    } else if (nc > 2) {
       data[1] = g.toDouble();
-      if (nc > 2) {
-        data[2] = b.toDouble();
-        if (nc > 3) {
-          data[3] = a.toDouble();
-        }
+      data[2] = b.toDouble();
+      if (nc > 3) {
+        data[3] = a.toDouble();
       }
     }
   }

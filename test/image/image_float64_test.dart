@@ -38,10 +38,10 @@ void main() {
       expect(i2.height, equals(2));
       expect(i2.numChannels, equals(2));
       i2
-        ..setPixelRgb(0, 0, 32, 64, 0)
-        ..setPixelRgb(1, 0, 64, 32, 0)
-        ..setPixelRgb(0, 1, -58, 52, 0)
-        ..setPixelRgb(1, 1, 110, 84, 0);
+        ..setPixelRgba(0, 0, 32, 0, 0, 64)
+        ..setPixelRgba(1, 0, 64, 0, 0, 32)
+        ..setPixelRgba(0, 1, -58, 0, 0, 52)
+        ..setPixelRgba(1, 1, 110, 0, 0, 84);
       expect(i2.getPixel(0, 0), equals([32, 64]));
       expect(i2.getPixel(1, 0), equals([64, 32]));
       expect(i2.getPixel(0, 1), equals([-58, 52]));

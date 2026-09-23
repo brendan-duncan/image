@@ -29,6 +29,8 @@ int rgbaToUint32(int r, int g, int b, int a) =>
     (b.clamp(0, 255) << 16) |
     (a.clamp(0, 255) << 24);
 
+const _floatFormats = {Format.float16, Format.float32, Format.float64};
+
 Color _convertColor(Color c, Color c2, num a) {
   final numChannels = c2.length;
   final format = c2.format;
@@ -38,6 +40,16 @@ Color _convertColor(Color c, Color c2, num a) {
     final g = c.length > 2 ? c.luminance : c[0];
     final gi = g.floor();
     c2[0] = convertFormatValue(gi, fromFormat, format);
+  } else if (numChannels == 2) {
+    // A 2 channel image is grayscale+alpha, so a wider color contributes its
+    // luminance and its alpha, not its first two channels.
+    var g = cl > 2 ? c.luminance : c[0];
+    if (!_floatFormats.contains(fromFormat)) {
+      // convertFormatValue casts the value of an integer format to int.
+      g = g.floor();
+    }
+    c2[0] = convertFormatValue(g, fromFormat, format);
+    c2[1] = convertFormatValue(cl == 2 ? c[1] : c.a, fromFormat, format);
   } else if (numChannels <= cl) {
     for (var ci = 0; ci < numChannels; ++ci) {
       c2[ci] = convertFormatValue(c[ci], fromFormat, format);

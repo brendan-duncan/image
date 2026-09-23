@@ -86,11 +86,10 @@ class ImageDataFloat16 extends ImageData {
   void setPixelRgb(int x, int y, num r, num g, num b) {
     final index = y * width * numChannels + (x * numChannels);
     data[index] = Float16.doubleToFloat16(r);
-    if (numChannels > 1) {
+    // A 2 channel image is grayscale+alpha; setPixelRgb leaves alpha alone.
+    if (numChannels > 2) {
       data[index + 1] = Float16.doubleToFloat16(g);
-      if (numChannels > 2) {
-        data[index + 2] = Float16.doubleToFloat16(b);
-      }
+      data[index + 2] = Float16.doubleToFloat16(b);
     }
   }
 
@@ -98,13 +97,14 @@ class ImageDataFloat16 extends ImageData {
   void setPixelRgba(int x, int y, num r, num g, num b, num a) {
     final index = y * width * numChannels + (x * numChannels);
     data[index] = Float16.doubleToFloat16(r);
-    if (numChannels > 1) {
+    if (numChannels == 2) {
+      // A 2 channel image is grayscale+alpha.
+      data[index + 1] = Float16.doubleToFloat16(a);
+    } else if (numChannels > 2) {
       data[index + 1] = Float16.doubleToFloat16(g);
-      if (numChannels > 2) {
-        data[index + 2] = Float16.doubleToFloat16(b);
-        if (numChannels > 3) {
-          data[index + 3] = Float16.doubleToFloat16(a);
-        }
+      data[index + 2] = Float16.doubleToFloat16(b);
+      if (numChannels > 3) {
+        data[index + 3] = Float16.doubleToFloat16(a);
       }
     }
   }

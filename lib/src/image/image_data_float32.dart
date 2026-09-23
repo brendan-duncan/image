@@ -85,11 +85,10 @@ class ImageDataFloat32 extends ImageData {
   void setPixelRgb(int x, int y, num r, num g, num b) {
     final index = y * width * numChannels + (x * numChannels);
     data[index] = r.toDouble();
-    if (numChannels > 1) {
+    // A 2 channel image is grayscale+alpha; setPixelRgb leaves alpha alone.
+    if (numChannels > 2) {
       data[index + 1] = g.toDouble();
-      if (numChannels > 2) {
-        data[index + 2] = b.toDouble();
-      }
+      data[index + 2] = b.toDouble();
     }
   }
 
@@ -97,13 +96,14 @@ class ImageDataFloat32 extends ImageData {
   void setPixelRgba(int x, int y, num r, num g, num b, num a) {
     final index = y * width * numChannels + (x * numChannels);
     data[index] = r.toDouble();
-    if (numChannels > 1) {
+    if (numChannels == 2) {
+      // A 2 channel image is grayscale+alpha.
+      data[index + 1] = a.toDouble();
+    } else if (numChannels > 2) {
       data[index + 1] = g.toDouble();
-      if (numChannels > 2) {
-        data[index + 2] = b.toDouble();
-        if (numChannels > 3) {
-          data[index + 3] = a.toDouble();
-        }
+      data[index + 2] = b.toDouble();
+      if (numChannels > 3) {
+        data[index + 3] = a.toDouble();
       }
     }
   }

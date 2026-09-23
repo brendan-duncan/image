@@ -202,20 +202,23 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   set r(num r) => _setChannel(0, r);
 
   @override
-  num get g => _getChannel(1);
+  num get g => numChannels == 2 ? _getChannel(0) : _getChannel(1);
   @override
-  set g(num g) => _setChannel(1, g);
+  set g(num g) => _setChannel(numChannels == 2 ? 0 : 1, g);
 
   @override
-  num get b => _getChannel(2);
+  num get b => numChannels == 2 ? _getChannel(0) : _getChannel(2);
   @override
-  set b(num b) => _setChannel(2, b);
+  set b(num b) => _setChannel(numChannels == 2 ? 0 : 2, b);
 
   @override
-  num get a =>
-      palette == null && numChannels < 4 ? maxChannelValue : _getChannel(3);
+  num get a => palette == null && numChannels == 2
+      ? _getChannel(1)
+      : palette == null && numChannels < 4
+          ? maxChannelValue
+          : _getChannel(3);
   @override
-  set a(num a) => _setChannel(3, a);
+  set a(num a) => _setChannel(numChannels == 2 ? 1 : 3, a);
 
   @override
   num get rNormalized => r / maxChannelValue;
@@ -238,16 +241,21 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   set aNormalized(num v) => a = v * maxChannelValue;
 
   @override
-  num get luminance => getLuminance(this);
+  num get luminance => numChannels == 2 ? r : getLuminance(this);
   @override
-  num get luminanceNormalized => getLuminanceNormalized(this);
+  num get luminanceNormalized =>
+      numChannels == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
   num getChannel(Channel channel) => channel == Channel.luminance
       ? luminance
-      : channel.index < numChannels
-          ? _getChannel(channel.index)
-          : 0;
+      // A 2 channel image is grayscale+alpha, so the colour channels are
+      // the gray sample and alpha is channel 1.
+      : numChannels == 2
+          ? (channel == Channel.alpha ? a : r)
+          : channel.index < numChannels
+              ? _getChannel(channel.index)
+              : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -266,11 +274,10 @@ class PixelUint4 extends Iterable<num> implements Pixel {
     final nc = image.numChannels;
     if (nc > 0) {
       _setChannel(0, r);
-      if (nc > 1) {
+      // A 2 channel image is grayscale+alpha; setRgb leaves alpha alone.
+      if (nc > 2) {
         _setChannel(1, g);
-        if (nc > 2) {
-          _setChannel(2, b);
-        }
+        _setChannel(2, b);
       }
     }
   }
@@ -280,13 +287,14 @@ class PixelUint4 extends Iterable<num> implements Pixel {
     final nc = image.numChannels;
     if (nc > 0) {
       _setChannel(0, r);
-      if (nc > 1) {
+      if (nc == 2) {
+        // A 2 channel image is grayscale+alpha.
+        _setChannel(1, a);
+      } else if (nc > 2) {
         _setChannel(1, g);
-        if (nc > 2) {
-          _setChannel(2, b);
-          if (nc > 3) {
-            _setChannel(3, a);
-          }
+        _setChannel(2, b);
+        if (nc > 3) {
+          _setChannel(3, a);
         }
       }
     }

@@ -474,7 +474,8 @@ class TiffImage {
             }
 
             if (px < width && py < height) {
-              image.setPixelRgb(px, py, gray, alpha, 0);
+              // A 2 channel image is grayscale+alpha.
+              image.setPixelRgba(px, py, gray, 0, 0, alpha);
             }
           } else if (samplesPerPixel == 3) {
             if (sampleFormat == TiffFormat.float) {

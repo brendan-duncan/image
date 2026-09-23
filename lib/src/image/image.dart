@@ -759,7 +759,10 @@ class Image extends Iterable<Pixel> {
     final c2 = cubic(dy, ip2, ic2, in2, ia2);
     final c3 = cubic(dy, ip3, ic3, in3, ia3);
 
-    return getColor(c0.toInt(), c1.toInt(), c2.toInt(), c3.toInt());
+    // getColor clamps and converts for the image's format, so the samples are
+    // passed through as they are: truncating here would floor a float format
+    // image, whose channels run 0-1, to black.
+    return getColor(c0, c1, c2, c3);
   }
 
   /// Set the color of the pixel at the given coordinates to the color of the

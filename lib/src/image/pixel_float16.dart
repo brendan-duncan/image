@@ -149,36 +149,52 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num get g => numChannels > 1 ? Float16.float16ToDouble(data[_index + 1]) : 0;
+  num get g => numChannels == 2
+      ? Float16.float16ToDouble(data[_index])
+      : numChannels > 1
+          ? Float16.float16ToDouble(data[_index + 1])
+          : 0;
 
   @override
   set g(num g) {
-    if (numChannels > 1) {
-      final d = g.toDouble();
+    final d = g.toDouble();
+    if (numChannels == 2) {
+      data[_index] = Float16.doubleToFloat16(d);
+    } else if (numChannels > 1) {
       data[_index + 1] = Float16.doubleToFloat16(d);
     }
   }
 
   @override
-  num get b => numChannels > 2 ? Float16.float16ToDouble(data[_index + 2]) : 0;
+  num get b => numChannels == 2
+      ? Float16.float16ToDouble(data[_index])
+      : numChannels > 2
+          ? Float16.float16ToDouble(data[_index + 2])
+          : 0;
 
   @override
   set b(num b) {
-    if (numChannels > 2) {
-      final d = b.toDouble();
+    final d = b.toDouble();
+    if (numChannels == 2) {
+      data[_index] = Float16.doubleToFloat16(d);
+    } else if (numChannels > 2) {
       data[_index + 2] = Float16.doubleToFloat16(d);
     }
   }
 
   @override
-  num get a => numChannels > 3
-      ? Float16.float16ToDouble(data[_index + 3])
-      : maxChannelValue;
+  num get a => numChannels == 2
+      ? Float16.float16ToDouble(data[_index + 1])
+      : numChannels > 3
+          ? Float16.float16ToDouble(data[_index + 3])
+          : maxChannelValue;
 
   @override
   set a(num a) {
-    if (numChannels > 3) {
-      final d = a.toDouble();
+    final d = a.toDouble();
+    if (numChannels == 2) {
+      data[_index + 1] = Float16.doubleToFloat16(d);
+    } else if (numChannels > 3) {
       data[_index + 3] = Float16.doubleToFloat16(d);
     }
   }
@@ -204,16 +220,21 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
   set aNormalized(num v) => a = v * maxChannelValue;
 
   @override
-  num get luminance => getLuminance(this);
+  num get luminance => numChannels == 2 ? r : getLuminance(this);
   @override
-  num get luminanceNormalized => getLuminanceNormalized(this);
+  num get luminanceNormalized =>
+      numChannels == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
   num getChannel(Channel channel) => channel == Channel.luminance
       ? luminance
-      : channel.index < numChannels
-          ? Float16.float16ToDouble(data[_index + channel.index])
-          : 0;
+      // A 2 channel image is grayscale+alpha, so the colour channels are
+      // the gray sample and alpha is channel 1.
+      : numChannels == 2
+          ? (channel == Channel.alpha ? a : r)
+          : channel.index < numChannels
+              ? Float16.float16ToDouble(data[_index + channel.index])
+              : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -234,13 +255,12 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
     if (numChannels > 0) {
       final rd = r.toDouble();
       data[_index] = Float16.doubleToFloat16(rd);
-      if (numChannels > 1) {
+      // A 2 channel image is grayscale+alpha; setRgb leaves alpha alone.
+      if (numChannels > 2) {
         final gd = g.toDouble();
         data[_index + 1] = Float16.doubleToFloat16(gd);
-        if (numChannels > 2) {
-          final bd = b.toDouble();
-          data[_index + 2] = Float16.doubleToFloat16(bd);
-        }
+        final bd = b.toDouble();
+        data[_index + 2] = Float16.doubleToFloat16(bd);
       }
     }
   }
@@ -250,16 +270,18 @@ class PixelFloat16 extends Iterable<num> implements Pixel {
     if (numChannels > 0) {
       final rd = r.toDouble();
       data[_index] = Float16.doubleToFloat16(rd);
-      if (numChannels > 1) {
+      if (numChannels == 2) {
+        // A 2 channel image is grayscale+alpha.
+        final ad = a.toDouble();
+        data[_index + 1] = Float16.doubleToFloat16(ad);
+      } else if (numChannels > 2) {
         final gd = g.toDouble();
         data[_index + 1] = Float16.doubleToFloat16(gd);
-        if (numChannels > 2) {
-          final bd = b.toDouble();
-          data[_index + 2] = Float16.doubleToFloat16(bd);
-          if (numChannels > 3) {
-            final ad = a.toDouble();
-            data[_index + 3] = Float16.doubleToFloat16(ad);
-          }
+        final bd = b.toDouble();
+        data[_index + 2] = Float16.doubleToFloat16(bd);
+        if (numChannels > 3) {
+          final ad = a.toDouble();
+          data[_index + 3] = Float16.doubleToFloat16(ad);
         }
       }
     }

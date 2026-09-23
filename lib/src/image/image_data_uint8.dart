@@ -97,11 +97,10 @@ class ImageDataUint8 extends ImageData {
   void setPixelRgb(int x, int y, num r, num g, num b) {
     final index = y * rowStride + (x * numChannels);
     data[index] = r.toInt();
-    if (numChannels > 1) {
+    // A 2 channel image is grayscale+alpha; setPixelRgb leaves alpha alone.
+    if (numChannels > 2) {
       data[index + 1] = g.toInt();
-      if (numChannels > 2) {
-        data[index + 2] = b.toInt();
-      }
+      data[index + 2] = b.toInt();
     }
   }
 
@@ -109,13 +108,14 @@ class ImageDataUint8 extends ImageData {
   void setPixelRgba(int x, int y, num r, num g, num b, num a) {
     final index = y * rowStride + (x * numChannels);
     data[index] = r.toInt();
-    if (numChannels > 1) {
+    if (numChannels == 2) {
+      // A 2 channel image is grayscale+alpha.
+      data[index + 1] = a.toInt();
+    } else if (numChannels > 2) {
       data[index + 1] = g.toInt();
-      if (numChannels > 2) {
-        data[index + 2] = b.toInt();
-        if (numChannels > 3) {
-          data[index + 3] = a.toInt();
-        }
+      data[index + 2] = b.toInt();
+      if (numChannels > 3) {
+        data[index + 3] = a.toInt();
       }
     }
   }
@@ -130,11 +130,12 @@ class ImageDataUint8 extends ImageData {
       final ri = c8 == null ? 0 : (c8.r as int).clamp(0, 255);
       data.fillRange(0, data.length, ri);
     } else if (numChannels == 2) {
+      // A 2 channel image is grayscale+alpha.
       final ri = c8 == null ? 0 : (c8.r as int).clamp(0, 255);
-      final gi = c8 == null ? 0 : (c8.g as int).clamp(0, 255);
-      final rg = (gi << 8) | ri;
+      final ai = c8 == null ? 0 : (c8.a as int).clamp(0, 255);
+      final ra = (ai << 8) | ri;
       final u16 = Uint16List.view(data.buffer);
-      u16.fillRange(0, u16.length, rg);
+      u16.fillRange(0, u16.length, ra);
     } else if (numChannels == 4) {
       final ri = c8 == null ? 0 : (c8.r as int).clamp(0, 255);
       final gi = c8 == null ? 0 : (c8.g as int).clamp(0, 255);

@@ -240,8 +240,13 @@ class PixelUint16 extends Iterable<num> implements Pixel {
       numChannels == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) =>
-      channel == Channel.luminance ? luminance : get(channel.index);
+  num getChannel(Channel channel) => channel == Channel.luminance
+      ? luminance
+      // A 2 channel image is grayscale+alpha, so the colour channels are
+      // the gray sample and alpha is channel 1.
+      : numChannels == 2
+          ? (channel == Channel.alpha ? a : r)
+          : get(channel.index);
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -259,11 +264,10 @@ class PixelUint16 extends Iterable<num> implements Pixel {
   void setRgb(num r, num g, num b) {
     if (numChannels > 0) {
       data[_index] = r.toInt();
-      if (numChannels > 1) {
+      // A 2 channel image is grayscale+alpha; setRgb leaves alpha alone.
+      if (numChannels > 2) {
         data[_index + 1] = g.toInt();
-        if (numChannels > 2) {
-          data[_index + 2] = b.toInt();
-        }
+        data[_index + 2] = b.toInt();
       }
     }
   }
@@ -272,13 +276,14 @@ class PixelUint16 extends Iterable<num> implements Pixel {
   void setRgba(num r, num g, num b, num a) {
     if (numChannels > 0) {
       data[_index] = r.toInt();
-      if (numChannels > 1) {
+      if (numChannels == 2) {
+        // A 2 channel image is grayscale+alpha.
+        data[_index + 1] = a.toInt();
+      } else if (numChannels > 2) {
         data[_index + 1] = g.toInt();
-        if (numChannels > 2) {
-          data[_index + 2] = b.toInt();
-          if (numChannels > 3) {
-            data[_index + 3] = a.toInt();
-          }
+        data[_index + 2] = b.toInt();
+        if (numChannels > 3) {
+          data[_index + 3] = a.toInt();
         }
       }
     }

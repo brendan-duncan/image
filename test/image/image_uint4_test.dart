@@ -50,10 +50,10 @@ void main() {
         expect(i2.numChannels, equals(2));
         expect(i2.format, Format.uint4);
         i2
-          ..setPixelRgb(0, 0, 9, 3, 0)
-          ..setPixelRgb(1, 0, 3, 5, 0)
-          ..setPixelRgb(0, 1, 7, 14, 0)
-          ..setPixelRgb(1, 1, 15, 2, 0);
+          ..setPixelRgba(0, 0, 9, 0, 0, 3)
+          ..setPixelRgba(1, 0, 3, 0, 0, 5)
+          ..setPixelRgba(0, 1, 7, 0, 0, 14)
+          ..setPixelRgba(1, 1, 15, 0, 0, 2);
         expect(i2.getPixel(0, 0), equals([9, 3]));
         expect(i2.getPixel(1, 0), equals([3, 5]));
         expect(i2.getPixel(0, 1), equals([7, 14]));
@@ -65,7 +65,7 @@ void main() {
           final v = p.x & 0xf;
           p
             ..r = v
-            ..g = v;
+            ..a = v;
           expect(p, equals([v, v]));
         }
 

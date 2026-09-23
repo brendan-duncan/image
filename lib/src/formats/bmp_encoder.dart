@@ -76,8 +76,10 @@ class BmpEncoder extends Encoder {
       // => uint8 palette
       image = image.convert(format: Format.uint8, withPalette: true);
     } else if (format == Format.uint8 && nc == 2) {
-      // => uint8,3
-      image.convert(format: Format.uint8, numChannels: 3);
+      // => uint8,4
+      // A 2 channel image is grayscale+alpha, and BMP has no grayscale+alpha
+      // form, so the alpha is kept by widening to RGBA rather than dropped.
+      image = image.convert(format: Format.uint8, numChannels: 4);
     } else if (image.isHdrFormat) {
       // => uint8,[3,4]
       image = image.convert(format: Format.uint8);

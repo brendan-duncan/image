@@ -134,27 +134,51 @@ class PixelInt32 extends Iterable<num> implements Pixel {
   }
 
   @override
-  num get g => numChannels > 1 ? data[_index + 1] : 0;
+  num get g => numChannels == 2
+      ? data[_index]
+      : numChannels > 1
+          ? data[_index + 1]
+          : 0;
 
   @override
   set g(num g) {
-    if (numChannels > 1) data[_index + 1] = g.toInt();
+    if (numChannels == 2) {
+      data[_index] = g.toInt();
+    } else if (numChannels > 1) {
+      data[_index + 1] = g.toInt();
+    }
   }
 
   @override
-  num get b => numChannels > 2 ? data[_index + 2] : 0;
+  num get b => numChannels == 2
+      ? data[_index]
+      : numChannels > 2
+          ? data[_index + 2]
+          : 0;
 
   @override
   set b(num b) {
-    if (numChannels > 2) data[_index + 2] = b.toInt();
+    if (numChannels == 2) {
+      data[_index] = b.toInt();
+    } else if (numChannels > 2) {
+      data[_index + 2] = b.toInt();
+    }
   }
 
   @override
-  num get a => numChannels > 3 ? data[_index + 3] : maxChannelValue;
+  num get a => numChannels == 2
+      ? data[_index + 1]
+      : numChannels > 3
+          ? data[_index + 3]
+          : maxChannelValue;
 
   @override
   set a(num a) {
-    if (numChannels > 3) data[_index + 3] = a.toInt();
+    if (numChannels == 2) {
+      data[_index + 1] = a.toInt();
+    } else if (numChannels > 3) {
+      data[_index + 3] = a.toInt();
+    }
   }
 
   @override
@@ -178,16 +202,21 @@ class PixelInt32 extends Iterable<num> implements Pixel {
   set aNormalized(num v) => a = v * maxChannelValue;
 
   @override
-  num get luminance => getLuminance(this);
+  num get luminance => numChannels == 2 ? r : getLuminance(this);
   @override
-  num get luminanceNormalized => getLuminanceNormalized(this);
+  num get luminanceNormalized =>
+      numChannels == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
   num getChannel(Channel channel) => channel == Channel.luminance
       ? luminance
-      : channel.index < numChannels
-          ? data[_index + channel.index]
-          : 0;
+      // A 2 channel image is grayscale+alpha, so the colour channels are
+      // the gray sample and alpha is channel 1.
+      : numChannels == 2
+          ? (channel == Channel.alpha ? a : r)
+          : channel.index < numChannels
+              ? data[_index + channel.index]
+              : 0;
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -205,11 +234,10 @@ class PixelInt32 extends Iterable<num> implements Pixel {
   void setRgb(num r, num g, num b) {
     if (numChannels > 0) {
       data[_index] = r.toInt();
-      if (numChannels > 1) {
+      // A 2 channel image is grayscale+alpha; setRgb leaves alpha alone.
+      if (numChannels > 2) {
         data[_index + 1] = g.toInt();
-        if (numChannels > 2) {
-          data[_index + 2] = b.toInt();
-        }
+        data[_index + 2] = b.toInt();
       }
     }
   }
@@ -218,13 +246,14 @@ class PixelInt32 extends Iterable<num> implements Pixel {
   void setRgba(num r, num g, num b, num a) {
     if (numChannels > 0) {
       data[_index] = r.toInt();
-      if (numChannels > 1) {
+      if (numChannels == 2) {
+        // A 2 channel image is grayscale+alpha.
+        data[_index + 1] = a.toInt();
+      } else if (numChannels > 2) {
         data[_index + 1] = g.toInt();
-        if (numChannels > 2) {
-          data[_index + 2] = b.toInt();
-          if (numChannels > 3) {
-            data[_index + 3] = a.toInt();
-          }
+        data[_index + 2] = b.toInt();
+        if (numChannels > 3) {
+          data[_index + 3] = a.toInt();
         }
       }
     }

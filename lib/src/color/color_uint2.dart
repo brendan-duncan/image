@@ -89,19 +89,19 @@ class ColorUint2 extends Iterable<num> implements Color {
   set r(num v) => _setChannel(0, v);
 
   @override
-  num get g => _getChannel(1);
+  num get g => _getChannel(length == 2 ? 0 : 1);
   @override
-  set g(num v) => _setChannel(1, v);
+  set g(num v) => _setChannel(length == 2 ? 0 : 1, v);
 
   @override
-  num get b => _getChannel(2);
+  num get b => _getChannel(length == 2 ? 0 : 2);
   @override
-  set b(num v) => _setChannel(2, v);
+  set b(num v) => _setChannel(length == 2 ? 0 : 2, v);
 
   @override
-  num get a => _getChannel(3);
+  num get a => _getChannel(length == 2 ? 1 : 3);
   @override
-  set a(num v) => _setChannel(3, v);
+  set a(num v) => _setChannel(length == 2 ? 1 : 3, v);
 
   @override
   num get rNormalized => r / maxChannelValue;
@@ -124,13 +124,18 @@ class ColorUint2 extends Iterable<num> implements Color {
   set aNormalized(num v) => a = v * maxChannelValue;
 
   @override
-  num get luminance => getLuminance(this);
+  num get luminance => length == 2 ? r : getLuminance(this);
   @override
-  num get luminanceNormalized => getLuminanceNormalized(this);
+  num get luminanceNormalized =>
+      length == 2 ? rNormalized : getLuminanceNormalized(this);
 
   @override
-  num getChannel(Channel channel) =>
-      channel == Channel.luminance ? luminance : _getChannel(channel.index);
+  num getChannel(Channel channel) => channel == Channel.luminance
+      ? luminance
+      // A 2 channel color is grayscale+alpha.
+      : length == 2
+          ? (channel == Channel.alpha ? a : r)
+          : _getChannel(channel.index);
 
   @override
   num getChannelNormalized(Channel channel) =>
@@ -144,16 +149,24 @@ class ColorUint2 extends Iterable<num> implements Color {
   @override
   void setRgb(num r, num g, num b) {
     this.r = r;
-    this.g = g;
-    this.b = b;
+    // A 2 channel color is grayscale+alpha. setRgb leaves alpha alone.
+    if (length > 2) {
+      this.g = g;
+      this.b = b;
+    }
   }
 
   @override
   void setRgba(num r, num g, num b, num a) {
     this.r = r;
-    this.g = g;
-    this.b = b;
-    this.a = a;
+    if (length == 2) {
+      // A 2 channel color is grayscale+alpha.
+      this.a = a;
+    } else if (length > 2) {
+      this.g = g;
+      this.b = b;
+      this.a = a;
+    }
   }
 
   @override
