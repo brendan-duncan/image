@@ -1,4 +1,5 @@
-/// A right shift that means the same thing on every backend.
+/// A right shift that means the same thing on every backend, and the small
+/// sign-mask helpers built on it.
 ///
 /// Only needed where the value being shifted can be negative. Where it cannot,
 /// the plain operator is correct everywhere and is what the code should use.

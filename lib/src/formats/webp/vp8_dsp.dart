@@ -340,26 +340,18 @@ final _clipTable = () {
   return table;
 }();
 
+/// Fills a 4x4 block with [value]. The 8x8 and 16x16 fills go through
+/// [_fill32] a word at a time; this one runs ten times per block and a range
+/// fill costs more in call overhead than the sixteen stores it saves.
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
-void _fill(Uint8List dst, int dstOff, int value, int size) {
-  if (size == 4) {
-    // The 4x4 case runs ten times per block and a range fill costs more in
-    // call overhead than the sixteen stores it saves.
-    for (var j = 0; j < 4; j++) {
-      final o = dstOff + j * kBps;
-      dst[o] = value;
-      dst[o + 1] = value;
-      dst[o + 2] = value;
-      dst[o + 3] = value;
-    }
-    return;
-  }
-  for (var j = 0; j < size; j++) {
+void _fill4(Uint8List dst, int dstOff, int value) {
+  for (var j = 0; j < 4; j++) {
     final o = dstOff + j * kBps;
-    for (var i = 0; i < size; i++) {
-      dst[o + i] = value;
-    }
+    dst[o] = value;
+    dst[o + 1] = value;
+    dst[o + 2] = value;
+    dst[o + 3] = value;
   }
 }
 
@@ -378,9 +370,15 @@ void _fill32(Uint32List dst, int dstOff, int value, int size) {
   }
 }
 
+/// Four bytes of [b] from [o] as the word that, stored through a host-endian
+/// `Uint32List` view, lands them back in the same order. [_verticalPred]
+/// copies the row above through such a view, so the order has to follow the
+/// host rather than assume little-endian. Multiplication rather than `<<`
+/// keeps the result exact under dart2js, whose shifts are 32-bit.
 @pragma('vm:prefer-inline')
-int _word(Uint8List b, int o) =>
-    b[o] + b[o + 1] * 0x100 + b[o + 2] * 0x10000 + b[o + 3] * 0x1000000;
+int _word(Uint8List b, int o) => Endian.host == Endian.little
+    ? b[o] + b[o + 1] * 0x100 + b[o + 2] * 0x10000 + b[o + 3] * 0x1000000
+    : b[o] * 0x1000000 + b[o + 1] * 0x10000 + b[o + 2] * 0x100 + b[o + 3];
 
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
@@ -545,7 +543,7 @@ void predLuma4(Uint8List dst, Uint8List top, int topOff) {
   final h = top[topOff + 7];
 
   // DC
-  _fill(dst, i4DC4, (4 + a + b + c + d + l + k + j + i) >> 3, 4);
+  _fill4(dst, i4DC4, (4 + a + b + c + d + l + k + j + i) >> 3);
 
   // TM
   final clip = _clipTable;
@@ -853,43 +851,13 @@ int _tTransformColumn(
   final b2 = a3 - a2;
   final b3 = a0 - a1;
   // Uses absBranchless rather than abs(), which the compiler leaves as a
-  // call: it showed up as its own entry in the profile.
+  // call: it showed up as its own entry in the profile. See vp8_sar.dart for
+  // why the helper has a backend split.
   return w0 * absBranchless(b0) +
       w1 * absBranchless(b1) +
       w2 * absBranchless(b2) +
       w3 * absBranchless(b3);
 }
-
-/// Dart AOT compiles `v < 0 ? -v : v` to a branch, which mispredicts on
-/// transform coefficients because their sign is close to random. The shift here
-/// and in signOf removes the branch: 87 animation frames encode in 2230 ms, in
-/// 2552 ms without absBranchless and in 2844 ms without both
-@internal
-@pragma('vm:prefer-inline')
-int absBranchless(int v) {
-  if (!_int64) {
-    return v < 0 ? -v : v;
-  }
-  final s = v >> 31;
-  return (v + s) ^ s;
-}
-
-@internal
-@pragma('vm:prefer-inline')
-int signOf(int v) => _int64 ? 2 * (v >> 31) + 1 : (v < 0 ? -1 : 1);
-
-@internal
-@pragma('vm:prefer-inline')
-int nonZero(int v) => _int64 ? (v | -v) >>> 63 : (v != 0 ? 1 : 0);
-
-@internal
-@pragma('vm:prefer-inline')
-int min2(int v) => _int64 ? 2 + ((v - 2) & ((v - 2) >> 63)) : (v >= 2 ? 2 : v);
-
-/// dart2js returns an unsigned 32-bit value for `>>` of a negative int, which
-/// breaks the shifts in absBranchless, signOf, nonZero and min2, so the web
-/// build keeps the branch
-const _int64 = bool.fromEnvironment('dart.library.isolate');
 
 /// The weighted spectrum of one 4x4 block, which [distoFrom] compares.
 ///
