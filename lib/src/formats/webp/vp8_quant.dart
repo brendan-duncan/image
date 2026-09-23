@@ -7,7 +7,6 @@ import 'dart:typed_data';
 
 import '../../util/_internal.dart';
 import 'vp8_config.dart';
-import 'vp8_dsp.dart';
 import 'vp8_sar.dart';
 import 'vp8_tables.dart';
 

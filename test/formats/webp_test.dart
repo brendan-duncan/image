@@ -1142,6 +1142,33 @@ void main() {
                   reason: 'sar($v, $n) must be an arithmetic shift');
             }
           }
+          // The branchless helpers derive a sign mask by shifting, which is
+          // only right if the shift covers the whole integer. The values here
+          // straddle 2^31 so a 32-bit shift on a 64-bit int is caught, and
+          // stay below 2^53 so the web build can represent them too.
+          for (final v in [
+            0,
+            1,
+            -1,
+            2,
+            -2,
+            3,
+            2047,
+            -2048,
+            2147483647,
+            -2147483648,
+            2147483648,
+            -2147483649,
+            4294967296,
+            -4294967297,
+            1099511627776,
+            -1099511627777
+          ]) {
+            expect(absBranchless(v), equals(v.abs()), reason: 'abs($v)');
+            expect(signOf(v), equals(v < 0 ? -1 : 1), reason: 'signOf($v)');
+            expect(nonZero(v), equals(v != 0 ? 1 : 0), reason: 'nonZero($v)');
+            expect(min2(v), equals(v >= 2 ? 2 : v), reason: 'min2($v)');
+          }
         });
 
         test('keeps the alpha channel exactly', () {
@@ -1182,6 +1209,49 @@ void main() {
               () => encodeWebP(Image(width: maxDimension + 1, height: 2),
                   lossless: false),
               throwsA(isA<ImageException>()));
+        });
+
+        test('a paletted image encodes to the same bytes as its RGBA', () {
+          // The lossy path expands a palette through a lookup table instead of
+          // going pixel by pixel through Image.convert. Both must agree,
+          // including on an index the palette has no colour for: convert
+          // gives that pixel black, transparent when the palette carries
+          // alpha and opaque otherwise.
+          for (final channels in [3, 4]) {
+            const width = 37;
+            const height = 21;
+            const numColors = 20;
+            final palette = PaletteUint8(256, channels);
+            for (var c = 0; c < numColors; c++) {
+              palette.setRgba(c, (c * 37) & 0xff, (c * 91 + 7) & 0xff,
+                  (c * 13) & 0xff, (c * 29) & 0xff);
+            }
+            final image = Image(
+                width: width,
+                height: height,
+                numChannels: 1,
+                withPalette: true,
+                palette: palette);
+            expect(image.palette, same(palette));
+            final indices = (image.data! as ImageDataUint8).data;
+            for (var i = 0; i < indices.length; i++) {
+              indices[i] = i % numColors;
+            }
+            // One index past the end of the palette.
+            indices[indices.length - 1] = 200;
+
+            final rgba = image
+                .convert(format: Format.uint8, numChannels: 4, alpha: 255)
+                .getBytes(order: ChannelOrder.rgba);
+            final direct = Image.fromBytes(
+                width: width,
+                height: height,
+                bytes: rgba.buffer,
+                numChannels: 4);
+            expect(encodeWebP(image, lossless: false),
+                equals(encodeWebP(direct, lossless: false)),
+                reason: '$channels-channel palette');
+          }
         });
       });
 

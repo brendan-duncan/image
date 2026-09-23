@@ -15,3 +15,27 @@ import '../../util/_internal.dart';
 @internal
 @pragma('dart2js:tryInline')
 int sar(int value, int shift) => (value >> shift).toSigned(32);
+
+/// |v|.
+///
+/// The VM backend derives a sign mask by shifting to avoid a branch. That
+/// trick relies on `>>` of a negative value staying negative, which is exactly
+/// what dart2js does not do, so the web build keeps the comparison.
+@internal
+@pragma('dart2js:tryInline')
+int absBranchless(int v) => v < 0 ? -v : v;
+
+/// -1 for a negative value, 1 otherwise.
+@internal
+@pragma('dart2js:tryInline')
+int signOf(int v) => v < 0 ? -1 : 1;
+
+/// 1 for a non-zero value, 0 for zero.
+@internal
+@pragma('dart2js:tryInline')
+int nonZero(int v) => v != 0 ? 1 : 0;
+
+/// `min(v, 2)`.
+@internal
+@pragma('dart2js:tryInline')
+int min2(int v) => v >= 2 ? 2 : v;

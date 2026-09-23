@@ -319,24 +319,32 @@ Uint8List _rgbaBytes(Image image) {
       data is ImageDataUint8 &&
       data.numChannels == 1 &&
       (palette.numChannels == 3 || palette.numChannels == 4)) {
-    final rgba = _paletteRgba(data.data, palette);
-    if (rgba != null) {
-      return rgba;
-    }
+    return _paletteRgba(data.data, palette);
   }
   return image
       .convert(format: Format.uint8, numChannels: 4, alpha: 255)
       .getBytes(order: ChannelOrder.rgba);
 }
 
-/// An index past numColors has no colour in [palette], so we return null and
-/// [Image.convert] converts that picture as before
-Uint8List? _paletteRgba(Uint8List indices, PaletteUint8 palette) {
+/// [indices] expanded through [palette] into interleaved RGBA, byte for byte
+/// what [Image.convert] produces for the same picture.
+///
+/// An index past the end of the palette has no colour of its own. The palette
+/// getters answer 0 for every channel there, alpha included, so convert gives
+/// such a pixel transparent black from a four-channel palette and opaque black
+/// from a three-channel one. The table is pre-filled the same way, which keeps
+/// the per-pixel loop free of a range check.
+Uint8List _paletteRgba(Uint8List indices, PaletteUint8 palette) {
   final colors = palette.data;
   final channels = palette.numChannels;
-  final numColors = palette.numColors;
+  final numColors = math.min(colors.length ~/ channels, 256);
   final table = Uint8List(256 * 4);
-  for (var c = 0; c < numColors && c < 256; c++) {
+  if (channels < 4) {
+    for (var c = numColors; c < 256; c++) {
+      table[4 * c + 3] = 0xff;
+    }
+  }
+  for (var c = 0; c < numColors; c++) {
     table[4 * c] = colors[c * channels];
     table[4 * c + 1] = colors[c * channels + 1];
     table[4 * c + 2] = colors[c * channels + 2];
@@ -344,11 +352,7 @@ Uint8List? _paletteRgba(Uint8List indices, PaletteUint8 palette) {
   }
   final out = Uint8List(indices.length * 4);
   for (var i = 0, o = 0; i < indices.length; i++, o += 4) {
-    final c = indices[i];
-    if (c >= numColors) {
-      return null;
-    }
-    final t = 4 * c;
+    final t = 4 * indices[i];
     out[o] = table[t];
     out[o + 1] = table[t + 1];
     out[o + 2] = table[t + 2];

@@ -10,8 +10,8 @@ import 'dart:typed_data';
 import '../../util/_internal.dart';
 import 'vp8_bool_encoder.dart';
 import 'vp8_cost_tables.dart';
-import 'vp8_dsp.dart';
 import 'vp8_proba.dart';
+import 'vp8_sar.dart';
 import 'vp8_tables.dart';
 import 'vp8_tokens.dart';
 
