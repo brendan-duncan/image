@@ -820,14 +820,14 @@ class Command {
     // Use scanOrder: DitherScanOrder.serpentine instead.
     bool serpentine = false,
     DitherScanOrder? scanOrder,
-    double strength = 1.0,
+    double intensity = 1.0,
   }) {
     subCommand = DitherImageCmd(subCommand,
         quantizer: quantizer,
         kernel: kernel,
         scanOrder: scanOrder ??
             (serpentine ? DitherScanOrder.serpentine : DitherScanOrder.raster),
-        strength: strength);
+        intensity: intensity);
   }
 
   void dotScreen(

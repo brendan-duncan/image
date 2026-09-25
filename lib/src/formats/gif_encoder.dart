@@ -27,7 +27,7 @@ class GifEncoder extends Encoder {
 
   /// Scales the dither offset for the Bayer kernels; ignored by the
   /// error-diffusion kernels.
-  double ditherStrength;
+  double ditherIntensity;
 
   /// The disposal method applied to each frame: 0 = no action,
   /// 1 = do not dispose, 2 = restore to background, 3 = restore to previous.
@@ -42,7 +42,7 @@ class GifEncoder extends Encoder {
     this.dither = DitherKernel.floydSteinberg,
     this.ditherSerpentine = false,
     this.ditherScanOrder,
-    this.ditherStrength = 1.0,
+    this.ditherIntensity = 1.0,
     this.dispose = 2,
   }) : _encodedFrames = 0;
 
@@ -71,7 +71,7 @@ class GifEncoder extends Encoder {
             quantizer: _lastColorMap!,
             kernel: dither,
             scanOrder: _scanOrder,
-            strength: ditherStrength);
+            intensity: ditherIntensity);
       } else {
         _lastImage = image;
       }

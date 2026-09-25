@@ -11,7 +11,7 @@ class DitherImageCmd extends Command {
 
   final g.DitherScanOrder? scanOrder;
 
-  final double strength;
+  final double intensity;
 
   DitherImageCmd(
     Command? input, {
@@ -19,7 +19,7 @@ class DitherImageCmd extends Command {
     this.kernel = g.DitherKernel.floydSteinberg,
     this.serpentine = false,
     this.scanOrder,
-    this.strength = 1.0,
+    this.intensity = 1.0,
   }) : super(input);
 
   @override
@@ -33,7 +33,7 @@ class DitherImageCmd extends Command {
             quantizer: quantizer,
             kernel: kernel,
             scanOrder: order,
-            strength: strength)
+            intensity: intensity)
         : null;
   }
 }

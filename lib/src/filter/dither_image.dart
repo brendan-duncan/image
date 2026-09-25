@@ -166,7 +166,7 @@ const _bayerMatrices = <DitherKernel, List<List<double>>>{
 /// the space-filling [DitherScanOrder.hilbert] curve).
 /// It has no effect on the Bayer kernels.
 ///
-/// [strength] scales the dither offset and is only used for the Bayer
+/// [intensity] scales the dither offset and is only used for the Bayer
 /// kernels; it is ignored by the error-diffusion kernels.
 Image ditherImage(
   Image image, {
@@ -175,7 +175,7 @@ Image ditherImage(
   // Use scanOrder: DitherScanOrder.serpentine instead.
   bool serpentine = false,
   DitherScanOrder scanOrder = DitherScanOrder.zigzag,
-  double strength = 1.0,
+  double intensity = 1.0,
 }) {
   quantizer ??= NeuralQuantizer(image);
 
@@ -184,7 +184,7 @@ Image ditherImage(
   }
 
   if (_bayerMatrices.containsKey(kernel)) {
-    return ditherImageBayer(image, quantizer, kernel, strength);
+    return ditherImageBayer(image, quantizer, kernel, intensity);
   }
 
   final order = serpentine ? DitherScanOrder.serpentine : scanOrder;
@@ -319,13 +319,13 @@ Image ditherImage(
 /// [quantizer] is the color reducer used to map each pixel to the palette;
 /// if `null` (the default) a [NeuralQuantizer] is built from [image].
 ///
-/// [strength] scales the dither offset (defaults to 1.0 for the classic
+/// [intensity] scales the dither offset (defaults to 1.0 for the classic
 /// full-range Bayer look; smaller values give subtler banding reduction).
 Image ditherImageBayer(
   Image image, [
   Quantizer? quantizer,
   DitherKernel kernel = DitherKernel.bayer4x4,
-  double strength = 1.0,
+  double intensity = 1.0,
 ]) {
   quantizer ??= NeuralQuantizer(image);
 
@@ -352,7 +352,7 @@ Image ditherImageBayer(
       final pc = image.getPixel(x, y);
       // Centered threshold in the range [-0.5, 0.5).
       final t = row[x % n] - 0.5;
-      final d = t * 255 * strength;
+      final d = t * 255 * intensity;
       final r = _clampChannel(pc[0] + d);
       final g = _clampChannel(pc[1] + d);
       final b = _clampChannel(pc[2] + d);
