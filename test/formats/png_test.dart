@@ -546,6 +546,18 @@ void main() {
         expect(keywordOf('x' * 79), equals('x' * 79));
       });
 
+      // Issue #518: an interlaced image less than 5 pixels wide has empty
+      // passes, and no filter type bytes are present in an empty pass.
+      for (final size in ['01', '02', '03', '04']) {
+        test('interlaced s${size}i3p01 matches s${size}n3p01', () {
+          final interlaced = PngDecoder().decode(
+              File('test/_data/png/s${size}i3p01.png').readAsBytesSync())!;
+          final expected = PngDecoder().decode(
+              File('test/_data/png/s${size}n3p01.png').readAsBytesSync())!;
+          testImageEquals(expected, interlaced);
+        });
+      }
+
       final dir = Directory('test/_data/png');
       final files = dir.listSync();
 

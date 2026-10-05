@@ -585,6 +585,12 @@ class PngDecoder extends Decoder {
   // Process a pass of an interlaced image.
   void _processPass(InputBuffer input, Image image, int xOffset, int yOffset,
       int xStep, int yStep, int passWidth, int passHeight) {
+    // An image less than 5 pixels wide or high has empty passes. No filter
+    // type bytes are present in an empty pass, so there is nothing to read.
+    if (passWidth == 0 || passHeight == 0) {
+      return;
+    }
+
     final channels = (_info.colorType == PngColorType.grayscaleAlpha)
         ? 2
         : (_info.colorType == PngColorType.rgb)
