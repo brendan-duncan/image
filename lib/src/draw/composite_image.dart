@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import '../color/channel.dart';
 import '../image/image.dart';
 import '../image/pixel.dart';
+import '../transform/_pixel_bytes.dart';
 import '../util/math_util.dart';
 import 'blend_mode.dart';
 import 'draw_pixel.dart';
@@ -115,6 +118,31 @@ void _directComposite(
       }
     }
   } else {
+    final k = bytesPerPixel(src);
+    if (k > 0 &&
+        bytesPerPixel(dst) == k &&
+        src.format == dst.format &&
+        src.hasPalette == dst.hasPalette &&
+        dstX >= 0 &&
+        dstY >= 0) {
+      // Copy the bytes of each pixel.
+      final s = src.toUint8List();
+      final d = dst.toUint8List();
+      final srcStride = src.data!.rowStride;
+      final dstStride = dst.data!.rowStride;
+      final w = min(dstW, dw - dstX);
+      for (var y = 0; y < dstH && dstY + y < dh; ++y) {
+        final srcRow = yCache[y] * srcStride;
+        var di = (dstY + y) * dstStride + dstX * k;
+        for (var x = 0; x < w; ++x) {
+          final si = srcRow + xCache[x] * k;
+          for (var c = 0; c < k; ++c) {
+            d[di++] = s[si + c];
+          }
+        }
+      }
+      return;
+    }
     for (var y = 0; y < dstH; ++y) {
       for (var x = 0; x < dstW; ++x) {
         final dx = dstX + x;

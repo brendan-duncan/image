@@ -90,6 +90,8 @@ final benchmarks = <Benchmark>[
       (img) => convolution(_i(img).clone(), filter: _sharpen)),
   Benchmark('sobel', (i) => i.small, (img) => sobel(_i(img).clone())),
   Benchmark('rotate_90', (i) => i.rgb, (img) => copyRotate(_i(img), angle: 90)),
+  Benchmark('crop', (i) => i.rgb,
+      (img) => copyCrop(_i(img), x: 500, y: 400, width: 2000, height: 1500)),
   Benchmark('flip_vertical', (i) => i.rgb, (img) => flipVertical(_i(img))),
   Benchmark('grayscale', (i) => i.rgb, (img) => grayscale(_i(img).clone())),
   Benchmark('gamma', (i) => i.rgb, (img) => gamma(_i(img).clone(), gamma: 2.2)),

@@ -1,5 +1,6 @@
 import '../image/image.dart';
 import '../util/_circle_test.dart';
+import '_pixel_bytes.dart';
 
 /// Returns a cropped copy of [src].
 Image copyCrop(Image src,
@@ -88,8 +89,21 @@ Image copyCrop(Image src,
         }
       }
     } else {
-      for (final p in dst) {
-        p.set(frame.getPixel(x + p.x, y + p.y));
+      final k = bytesPerPixel(frame);
+      if (k > 0 && bytesPerPixel(dst) == k && dst.format == frame.format) {
+        // Copy the bytes of each row of the crop rectangle.
+        final src = frame.toUint8List();
+        final out = dst.toUint8List();
+        final srcStride = frame.data!.rowStride;
+        final rowBytes = width * k;
+        for (var row = 0; row < height; ++row) {
+          final s = (y + row) * srcStride + x * k;
+          out.setRange(row * rowBytes, (row + 1) * rowBytes, src, s);
+        }
+      } else {
+        for (final p in dst) {
+          p.set(frame.getPixel(x + p.x, y + p.y));
+        }
       }
     }
   }
