@@ -1,3 +1,9 @@
+# 4.12.0
+
+Security fixes for decoding untrusted images:
+
+* Fix EXIF data with looping IFDs hanging the decoder.
+
 # 4.11.1
 
 * Fix dependency constraint to archive 4.4.0.

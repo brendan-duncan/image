@@ -291,6 +291,12 @@ class ExifData extends IfdContainer {
     }
   }
 
+  // Limits that protect against malformed data: the number of IFDs read, and
+  // the total size of the entry values read.
+  static const _maxIfds = 64;
+  static const _maxValueBytes = 16 * 1024 * 1024;
+  int _valueBytes = 0;
+
   bool read(InputBuffer block) {
     final saveEndian = block.bigEndian;
     block.bigEndian = true;
@@ -318,10 +324,13 @@ class ExifData extends IfdContainer {
     }
 
     int ifdOffset = block.readUint32();
+    _valueBytes = 0;
 
-    // IFD blocks
+    // IFD blocks. Malformed data can make the chain of IFDs loop, so each
+    // IFD is read once, and the number of them is limited.
     var index = 0;
-    while (ifdOffset > 0) {
+    final visited = <int>{};
+    while (ifdOffset > 0 && index < _maxIfds && visited.add(ifdOffset)) {
       try {
         block.offset = blockOffset + ifdOffset;
         if (block.length < 2) {
@@ -346,12 +355,7 @@ class ExifData extends IfdContainer {
         directories['ifd$index'] = directory;
         index++;
 
-        final nextIfdOffset = block.readUint32();
-        if (nextIfdOffset == ifdOffset) {
-          break;
-        } else {
-          ifdOffset = nextIfdOffset;
-        }
+        ifdOffset = block.readUint32();
       } catch (e) {
         // Malformed IFD; stop reading further directories.
         break;
@@ -432,6 +436,11 @@ class ExifData extends IfdContainer {
     final fsize = ifdValueTypeSize[format];
     final size = count * fsize;
 
+    // Many entries can refer to the same data, so the total read is limited.
+    if (_valueBytes + size > _maxValueBytes) {
+      return entry;
+    }
+
     final endOffset = block.offset + 4;
 
     if (size > 4) {
@@ -444,6 +453,7 @@ class ExifData extends IfdContainer {
     }
 
     final data = block.readBytes(size);
+    _valueBytes += size;
 
     switch (f) {
       case IfdValueType.none:
