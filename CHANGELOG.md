@@ -3,6 +3,7 @@
 Security fixes for decoding untrusted images:
 
 * Fix EXIF data with looping IFDs hanging the decoder.
+* Fix TIFF files with looping IFDs hanging the decoder, also from `decodeImage`.
 
 # 4.11.1
 

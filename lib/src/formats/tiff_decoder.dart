@@ -18,7 +18,8 @@ class TiffDecoder extends Decoder {
 
   /// Is the given file a valid TIFF image?
   @override
-  bool isValidFile(Uint8List data) => _readHeader(InputBuffer(data)) != null;
+  bool isValidFile(Uint8List data) =>
+      _readHeader(InputBuffer(data), firstImageOnly: true) != null;
 
   /// Validate the file is a TIFF image and get information about it.
   /// If the file is not a valid TIFF image, null is returned.
@@ -92,8 +93,11 @@ class TiffDecoder extends Decoder {
   }
 
   // Read the TIFF header and IFD blocks.
-  TiffInfo? _readHeader(InputBuffer p) {
+  TiffInfo? _readHeader(InputBuffer p, {bool firstImageOnly = false}) {
     final info = TiffInfo();
+    if (p.length < 8) {
+      return null;
+    }
     final byteOrder = p.readUint16();
     if (byteOrder != tiffLittleEndian && byteOrder != tiffBigEndian) {
       return null;
@@ -117,7 +121,13 @@ class TiffDecoder extends Decoder {
 
     final p2 = InputBuffer.from(p)..offset = offset;
 
-    while (offset != 0) {
+    // Malformed data can make the chain of IFDs loop, so each IFD is read
+    // once, and the number of them is limited.
+    final visited = <int>{};
+    while (offset != 0 &&
+        offset < p.end &&
+        info.images.length < _maxImages &&
+        visited.add(offset)) {
       TiffImage img;
       try {
         img = TiffImage(p2);
@@ -133,6 +143,9 @@ class TiffDecoder extends Decoder {
           ..width = info.images[0].width
           ..height = info.images[0].height;
       }
+      if (firstImageOnly) {
+        break;
+      }
 
       offset = p2.readUint32();
       if (offset != 0) {
@@ -142,6 +155,8 @@ class TiffDecoder extends Decoder {
 
     return info.images.isNotEmpty ? info : null;
   }
+
+  static const _maxImages = 1024;
 
   static const tiffSignature = 42;
   static const tiffLittleEndian = 0x4949;

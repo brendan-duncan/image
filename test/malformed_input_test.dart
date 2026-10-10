@@ -32,5 +32,22 @@ void main() {
       expect(exif, isNotNull);
       expect(exif!.directories.length, lessThanOrEqualTo(2));
     });
+
+    test('TIFF IFDs that form a cycle', () {
+      final tiff = encodeTiff(Image(width: 2, height: 2));
+      final data = ByteData.sublistView(tiff);
+      final bigEndian = tiff[0] == 0x4d;
+      final endian = bigEndian ? Endian.big : Endian.little;
+      // Point the first IFD's next-IFD offset back at itself.
+      final ifd = data.getUint32(4, endian);
+      final entries = data.getUint16(ifd, endian);
+      data.setUint32(ifd + 2 + entries * 12, ifd, endian);
+
+      expect(TiffDecoder().isValidFile(tiff), isTrue);
+      final image = decodeTiff(tiff);
+      expect(image, isNotNull);
+      expect(image!.numFrames, equals(1));
+      expect(decodeImage(tiff)?.numFrames, equals(1));
+    });
   });
 }
