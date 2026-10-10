@@ -12,6 +12,7 @@
 * Fix 8-bit grayscale BMP encoding writing the wrong grays.
 * Fix TGA encoding of grayscale and grayscale+alpha images.
 * Fix `Image.convert(withPalette: true)` modifying the source image.
+* Fix `ditherImage` crashing on palette images.
 * Fix cubic interpolation sampling outside the image near the top and left
   edges, which brightened or darkened them.
 * Fix `OutputBuffer` growth taking quadratic time; 8-bit BMP encoding is ~5x

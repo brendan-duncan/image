@@ -181,6 +181,10 @@ Image ditherImage(
   DitherScanOrder scanOrder = DitherScanOrder.zigzag,
   double strength = 1.0,
 }) {
+  // The error is diffused through color values, not palette indices.
+  if (image.hasPalette) {
+    image = image.convert(numChannels: image.numChannels);
+  }
   quantizer ??= NeuralQuantizer(image);
 
   if (kernel == DitherKernel.none) {

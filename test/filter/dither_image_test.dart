@@ -99,5 +99,15 @@ void main() {
       expect(colors.length, lessThanOrEqualTo(4),
           reason: 'indexed result has ${colors.length} colors, expected <=4');
     });
+
+    test('dithering a palette image', () {
+      // Error used to be diffused into the palette indices, running past the
+      // end of the palette.
+      final img = decodePng(File('test/_data/png/logo.png').readAsBytesSync())!;
+      expect(img.hasPalette, isTrue);
+      final dithered = ditherImage(img);
+      expect(dithered.width, equals(img.width));
+      expect(dithered.hasPalette, isTrue);
+    });
   });
 }
