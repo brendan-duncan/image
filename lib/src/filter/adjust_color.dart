@@ -1,10 +1,13 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import '../color/channel.dart';
 import '../color/color.dart';
+import '../color/format.dart';
 import '../image/image.dart';
 import '../util/color_util.dart';
 import '../util/math_util.dart';
+import '_rgb_lut.dart';
 
 /// Adjust the color of the [src] image using various color transformations.
 ///
@@ -101,7 +104,49 @@ Image adjustColor(Image src,
 
   final hsv = <num>[0.0, 0.0, 0.0];
 
+  // Without saturation and hue, each channel only depends on itself, so for
+  // RGB(A) uint8 images lookup tables give the same result, computed with the
+  // same steps as the per-pixel code below.
+  Uint8List channelLut(num bl, num wh, num md) {
+    final lut = Uint8List(256);
+    for (var v = 0; v < 256; ++v) {
+      final num o = v / 255;
+      var c = o;
+      if (useBlacksWhitesMids) {
+        c = pow((c + bl) * wh, md);
+      }
+      if (brightness != null && brightness != 1.0) {
+        c *= brightness.clamp(0, 1000);
+      }
+      if (contrast != null) {
+        c = avgLumR * invContrast + c * contrast;
+      }
+      if (gamma != null) {
+        c = pow(c, gamma);
+      }
+      if (exposure != null) {
+        c = c * exposure;
+      }
+      c = mix(o, c, 1 * amount);
+      lut[v] = (c.clamp(0.0, 1.0) * 255).clamp(0, 255).toInt();
+    }
+    return lut;
+  }
+
+  final useLut = mask == null && saturation == null && hue == null;
+
   for (final frame in src.frames) {
+    if (useLut && frame.format == Format.uint8 && frame.numChannels >= 3) {
+      applyRgbLut(
+          frame,
+          channelLut(useBlacksWhitesMids ? br : 0, useBlacksWhitesMids ? wr : 0,
+              useBlacksWhitesMids ? mr : 0),
+          channelLut(useBlacksWhitesMids ? bg : 0, useBlacksWhitesMids ? wg : 0,
+              useBlacksWhitesMids ? mg : 0),
+          channelLut(useBlacksWhitesMids ? bb : 0, useBlacksWhitesMids ? wb : 0,
+              useBlacksWhitesMids ? mb : 0));
+      continue;
+    }
     for (final p in frame) {
       final or = p.rNormalized;
       final og = p.gNormalized;

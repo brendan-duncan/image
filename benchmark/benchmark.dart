@@ -91,6 +91,9 @@ final benchmarks = <Benchmark>[
   Benchmark('rotate_90', (i) => i.rgb, (img) => copyRotate(_i(img), angle: 90)),
   Benchmark('flip_vertical', (i) => i.rgb, (img) => flipVertical(_i(img))),
   Benchmark('grayscale', (i) => i.rgb, (img) => grayscale(_i(img).clone())),
+  Benchmark('gamma', (i) => i.rgb, (img) => gamma(_i(img).clone(), gamma: 2.2)),
+  Benchmark('adjust_color', (i) => i.rgb,
+      (img) => adjustColor(_i(img).clone(), contrast: 1.2, brightness: 1.1)),
 ];
 
 const _sharpen = [0, -1, 0, -1, 5, -1, 0, -1, 0];
