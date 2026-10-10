@@ -170,6 +170,19 @@ Image resize(Image src,
         interpolation: interpolation);
   }
 
+  if (uint8Downscale &&
+      x1 == 0 &&
+      y1 == 0 &&
+      w == width &&
+      h == height &&
+      !(maintainAspect && backgroundColor != null) &&
+      interpolation != Interpolation.cubic) {
+    for (final frame in src.frames) {
+      _resizeDownBytes(frame, width, height, interpolation);
+    }
+    return src;
+  }
+
   final scaleX = Int32List(w);
   final dx = src.width / w;
   for (var x = 0; x < w; ++x) {
@@ -279,6 +292,110 @@ Image resize(Image src,
   }
 
   return src;
+}
+
+// Downscales a uint8 [frame] in place, computing the same values as the
+// per-pixel paths of [resize]. Every source byte read is at or after every
+// destination byte already written, so the source is never overwritten
+// before it's read.
+void _resizeDownBytes(
+    Image frame, int width, int height, Interpolation interpolation) {
+  final bytes = frame.data!.toUint8List();
+  final nc = frame.numChannels;
+  final sw = frame.width;
+  final sh = frame.height;
+  final dy = sh / height;
+  final dx = sw / width;
+  var di = 0;
+  switch (interpolation) {
+    case Interpolation.nearest:
+      final sxs = Int32List(width);
+      for (var x = 0; x < width; ++x) {
+        sxs[x] = (x * dx).toInt() * nc;
+      }
+      for (var y = 0; y < height; ++y) {
+        final row = (y * dy).toInt() * sw * nc;
+        for (var x = 0; x < width; ++x) {
+          final si = row + sxs[x];
+          for (var c = 0; c < nc; ++c) {
+            bytes[di++] = bytes[si + c];
+          }
+        }
+      }
+      break;
+    case Interpolation.average:
+      final sums = Int32List(nc);
+      for (var y = 0; y < height; ++y) {
+        final ay1 = (y * dy).toInt();
+        var ay2 = ((y + 1) * dy).toInt();
+        if (ay2 == ay1) {
+          ay2++;
+        }
+        for (var x = 0; x < width; ++x) {
+          final ax1 = (x * dx).toInt();
+          var ax2 = ((x + 1) * dx).toInt();
+          if (ax2 == ax1) {
+            ax2++;
+          }
+          sums.fillRange(0, nc, 0);
+          for (var sy = ay1; sy < ay2; ++sy) {
+            for (var si = (sy * sw + ax1) * nc, se = (sy * sw + ax2) * nc;
+                si < se;
+                si += nc) {
+              for (var c = 0; c < nc; ++c) {
+                sums[c] += bytes[si + c];
+              }
+            }
+          }
+          final np = (ay2 - ay1) * (ax2 - ax1);
+          for (var c = 0; c < nc; ++c) {
+            // In [0, 255], so getColor's clamp does nothing.
+            bytes[di++] = (sums[c] / np).toInt();
+          }
+        }
+      }
+      break;
+    case Interpolation.linear:
+      // As Image.getPixelLinear: taps past the right or bottom edge use the
+      // center pixel.
+      for (var y = 0; y < height; ++y) {
+        final fy = y * dy;
+        final iy = fy.toInt();
+        final ky = fy - iy;
+        final ny = iy + 1;
+        final r0 = iy * sw;
+        final r1 = ny * sw;
+        for (var x = 0; x < width; ++x) {
+          final fx = x * dx;
+          final ix = fx.toInt();
+          final kx = fx - ix;
+          final nx = ix + 1;
+          final cc = (r0 + ix) * nc;
+          final cn = ny >= sh ? cc : (r1 + ix) * nc;
+          final nc0 = nx >= sw ? cc : (r0 + nx) * nc;
+          final nn = nx >= sw || ny >= sh ? cc : (r1 + nx) * nc;
+          for (var c = 0; c < nc; ++c) {
+            final icc = bytes[cc + c];
+            final inc = bytes[nc0 + c];
+            final icn = bytes[cn + c];
+            final inn = bytes[nn + c];
+            final v = icc +
+                kx * (inc - icc + ky * (icc + inn - icn - inc)) +
+                ky * (icn - icc);
+            bytes[di++] = v < 0
+                ? 0
+                : v > 255
+                    ? 255
+                    : v.toInt();
+          }
+        }
+      }
+      break;
+    case Interpolation.cubic:
+      throw ImageException('cubic is not supported');
+  }
+  frame.data!.width = width;
+  frame.data!.height = height;
 }
 
 // Internal callers shrink both axes forwards or expand both backwards,

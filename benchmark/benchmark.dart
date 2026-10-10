@@ -81,6 +81,11 @@ final benchmarks = <Benchmark>[
       'resize_cubic', (i) => i.rgb, (img) => _resize(img, Interpolation.cubic)),
   Benchmark('resize_average', (i) => i.rgb,
       (img) => _resize(img, Interpolation.average)),
+  // resize works in place, so each run resizes a fresh copy.
+  Benchmark('resize_inplace_linear', (i) => i.rgb,
+      (img) => _resizeInPlace(img, Interpolation.linear)),
+  Benchmark('resize_inplace_average', (i) => i.rgb,
+      (img) => _resizeInPlace(img, Interpolation.average)),
   // A portrait phone photo: copyResize bakes the orientation first.
   Benchmark('resize_portrait', (i) => i.rgb..exif.imageIfd.orientation = 6,
       (img) => _resize(img, Interpolation.linear)),
@@ -103,6 +108,14 @@ const _sharpen = [0, -1, 0, -1, 5, -1, 0, -1, 0];
 
 Uint8List _b(Object o) => o as Uint8List;
 Image _i(Object o) => o as Image;
+Image _resizeInPlace(Object img, Interpolation interpolation) {
+  final src = _i(img).clone();
+  return resize(src,
+      width: src.width ~/ 4,
+      height: src.height ~/ 4,
+      interpolation: interpolation);
+}
+
 Image _resize(Object img, Interpolation interpolation) {
   final src = _i(img);
   return copyResize(src,

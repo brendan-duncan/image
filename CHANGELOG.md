@@ -30,7 +30,7 @@
   without a full-size temporary image.
 * Much faster `flip`, `flipVertical`, `flipHorizontal`, `copyRotate` (90, 180
   and 270 degrees) and `grayscale`.
-* `copyResize` is 4-10x faster.
+* `copyResize` is 4-10x faster, and `resize` up to ~13x.
 * Much faster `copyCrop`, `trim` and direct `compositeImage`.
 * Distortion filters reuse one copy of the frame for animations.
 * `gamma` and `adjustColor` are up to ~50x faster.
