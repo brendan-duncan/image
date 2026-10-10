@@ -658,18 +658,17 @@ class VP8L {
 
     _applyInverseTransforms(_lastRow, numRows, rows);
 
-    //int count = 0;
-    //int di = rows;
-    for (var y = 0, pi = _argbCache, dy = _lastRow; y < numRows; ++y, ++dy) {
+    // Rearrange the ARGB webp colors to the RGBA bytes of the image.
+    final pixels = _pixels!;
+    final out = image!.toUint8List();
+    var di = _lastRow * _ioWidth * 4;
+    for (var y = 0, pi = _argbCache; y < numRows; ++y) {
       for (var x = 0; x < _ioWidth; ++x, ++pi) {
-        final c = _pixels![pi];
-
-        final r = uint32ToRed(c);
-        final g = uint32ToGreen(c);
-        final b = uint32ToBlue(c);
-        final a = uint32ToAlpha(c);
-        // rearrange the ARGB webp color to RGBA image color.
-        image!.setPixelRgba(x, dy, b, g, r, a);
+        final c = pixels[pi];
+        out[di++] = (c >> 16) & 0xff;
+        out[di++] = (c >> 8) & 0xff;
+        out[di++] = c & 0xff;
+        out[di++] = (c >> 24) & 0xff;
       }
     }
 
