@@ -13,12 +13,15 @@ Image separableConvolution(Image src,
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);
   }
-  final tmp = Image.from(src);
-  // Apply the filter horizontally
-  kernel
-    ..apply(src, tmp, mask: mask, maskChannel: maskChannel)
-    // Apply the filter vertically, applying back to the original image.
-    ..apply(tmp, src, horizontal: false, mask: mask, maskChannel: maskChannel);
+  for (final frame in src.frames) {
+    final tmp = Image.from(frame, noAnimation: true);
+    // Apply the filter horizontally
+    kernel
+      ..apply(frame, tmp, mask: mask, maskChannel: maskChannel)
+      // Apply the filter vertically, applying back to the original image.
+      ..apply(tmp, frame,
+          horizontal: false, mask: mask, maskChannel: maskChannel);
+  }
 
   return src;
 }

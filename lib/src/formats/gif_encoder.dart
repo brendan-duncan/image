@@ -103,7 +103,10 @@ class GifEncoder extends Encoder {
       }
 
       _lastImage = ditherImage(image,
-          quantizer: _lastColorMap!, kernel: dither, scanOrder: _scanOrder);
+          quantizer: _lastColorMap!,
+          kernel: dither,
+          scanOrder: _scanOrder,
+          strength: ditherStrength);
     } else {
       _lastImage = image;
     }

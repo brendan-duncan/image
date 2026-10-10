@@ -1,3 +1,10 @@
+# 4.11.0
+
+* Fix `encodeJpg` modifying the pixels of RGBA source images.
+* Fix `gaussianBlur` and `separableConvolution` only blurring the first frame.
+* Fix `trim` copying the first frame into every frame.
+* Fix `GifEncoder.ditherStrength` being ignored after the first frame.
+
 # 4.10.2
 
 * Fix a denial of service where a tiny JPEG declaring huge dimensions made the

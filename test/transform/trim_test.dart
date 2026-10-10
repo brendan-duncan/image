@@ -99,5 +99,22 @@ void main() {
       expect(trimmed.width, equals(6));
       expect(trimmed.height, equals(6));
     });
+
+    test('trim crops each frame from its own pixels', () {
+      final image = Image(width: 10, height: 10)
+        ..clear(ColorRgb8(255, 255, 255));
+      fillRect(image, x1: 3, y1: 3, x2: 6, y2: 6, color: ColorRgb8(0, 0, 0));
+      final frame1 = image.addFrame()..clear(ColorRgb8(255, 255, 255));
+      fillRect(frame1, x1: 3, y1: 3, x2: 6, y2: 6, color: ColorRgb8(255, 0, 0));
+
+      final trimmed = trim(image);
+      expect(trimmed.width, equals(4));
+      expect(trimmed.height, equals(4));
+      expect(trimmed.numFrames, equals(2));
+      final p0 = trimmed.frames[0].getPixel(0, 0);
+      final p1 = trimmed.frames[1].getPixel(0, 0);
+      expect([p0.r, p0.g, p0.b], equals([0, 0, 0]));
+      expect([p1.r, p1.g, p1.b], equals([255, 0, 0]));
+    });
   });
 }

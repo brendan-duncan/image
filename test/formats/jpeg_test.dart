@@ -269,5 +269,13 @@ void main() async {
         });
       }
     });
+
+    test('encodeJpg does not modify an RGBA source image', () {
+      final image = Image(width: 16, height: 16, numChannels: 4)
+        ..clear(ColorRgba8(200, 100, 50, 128));
+      final original = image.clone();
+      encodeJpg(image);
+      testImageEquals(image, original);
+    });
   });
 }

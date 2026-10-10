@@ -165,7 +165,7 @@ Image trim(Image src,
             width: crop[2], height: crop[3], noAnimation: true);
     firstFrame ??= dst;
 
-    compositeImage(dst, src,
+    compositeImage(dst, frame,
         srcX: crop[0],
         srcY: crop[1],
         srcW: crop[2],

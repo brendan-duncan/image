@@ -191,5 +191,22 @@ void main() {
           ..writeAsBytesSync(gif);
       });
     });
+
+    test('ditherStrength applies to every frame', () {
+      final frame = Image(width: 64, height: 16);
+      for (final p in frame) {
+        p
+          ..r = p.x * 4
+          ..g = p.x * 4
+          ..b = p.x * 4;
+      }
+      final anim = frame.clone()..addFrame(frame.clone());
+      final bytes = GifEncoder(
+              numColors: 8, dither: DitherKernel.bayer4x4, ditherStrength: 0)
+          .encode(anim);
+      final decoded = decodeGif(bytes)!;
+      expect(decoded.numFrames, equals(2));
+      testImageEquals(decoded.frames[1], decoded.frames[0]);
+    });
   });
 }

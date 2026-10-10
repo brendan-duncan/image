@@ -44,5 +44,15 @@ void main() {
       // blurring smooths out high-frequency content → lower variance
       expect(imageVariance(blurred), lessThan(imageVariance(src)));
     });
+
+    test('gaussianBlur blurs every frame', () {
+      final src = checkerImage(32, 32, cell: 4)
+        ..addFrame(checkerImage(32, 32, cell: 4));
+      final blurred = gaussianBlur(src.clone(), radius: 3);
+      expect(blurred.numFrames, equals(2));
+      for (final frame in blurred.frames) {
+        expect(imageVariance(frame), lessThan(imageVariance(src)));
+      }
+    });
   });
 }

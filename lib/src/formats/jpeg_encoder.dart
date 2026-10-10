@@ -212,17 +212,18 @@ class JpegEncoder extends Encoder {
       if (p.format != Format.uint8) {
         p = p.convert(format: Format.uint8);
       }
+      var r = p.r.toInt();
+      var g = p.g.toInt();
+      var b = p.b.toInt();
+      // Blend with the background color into locals; p may be a live view of
+      // the source image, which must not be modified.
       if (p.length > 3) {
         final a = p.aNormalized;
         final invA = 1.0 - a;
-        p
-          ..r = (p.r * a + backgroundColor.r * invA).round()
-          ..g = (p.g * a + backgroundColor.g * invA).round()
-          ..b = (p.b * a + backgroundColor.b * invA).round();
+        r = (r * a + backgroundColor.r * invA).round().clamp(0, 255);
+        g = (g * a + backgroundColor.g * invA).round().clamp(0, 255);
+        b = (b * a + backgroundColor.b * invA).round().clamp(0, 255);
       }
-      final r = p.r.toInt();
-      final g = p.g.toInt();
-      final b = p.b.toInt();
 
       // calculate YUV values
       ydu[pos] = ((_rgbYuvTable[r] +
