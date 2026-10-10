@@ -1,33 +1,30 @@
 # Dart Image Library
 
-The Dart Image Library provides the ability to load, save, and manipulate images
-in a variety of image file formats.
+The Dart Image Library loads, saves and manipulates images in many file formats. It's written in pure Dart, so
+it works in command-line apps, servers, Flutter (mobile, desktop and web) and the browser.
 
-The library can be used with both dart:io and dart:html, for command-line, Flutter, and
-web applications.
+## Getting started
 
-## [Tutorial](tutorial.md)
+- [Tutorial](tutorial.md): add the library, decode, inspect, process and encode images, with recipes.
+- [Flutter](flutter.md): use the library in Flutter apps, off the UI thread, and convert to and from `dart:ui` images.
 
-## [Image Formats](formats.md)
+## Guides
 
-## [Image Data](image_data.md)
+- [Image Formats](formats.md): supported file formats, decoders, encoders and their options.
+- [Image Data](image_data.md): the `Image` class, pixel formats, channels, palettes, colors and pixel access.
+- [Commands and Async Execution](commands.md): chain operations and run them on a separate isolate.
+- [Image Processing](filters.md): color adjustment, blur, effects and other filters.
+- [Color Quantization and Dithering](color_quantization.md): reduce an image to a palette, with dithering.
+- [Transform Functions](transform.md): resize, crop, rotate, flip and trim.
+- [Drawing Functions](draw.md): lines, shapes, fills, text and compositing.
+- [Font Rendering](fonts.md): draw text with the built-in or your own bitmap fonts.
+- [EXIF Data](exif.md): read and write EXIF metadata, including orientation.
+- [High Dynamic Range Images](hdr.md): floating point images and tone mapping.
+- [Animated Images](animation.md): decode, create and encode animated GIF, PNG and WebP images.
+- [Performance](performance.md): make decoding and processing faster and use less memory, on phones and desktops.
 
-## [Commands and Async Execution](commands.md)
+## Reference
 
-## [Image Processing](filters.md)
-
-## [Transform Functions (crop, resize)](transform.md)
-
-## [Drawing Functions](draw.md)
-
-## [Flutter](flutter.md)
-
-## [Font Rendering](fonts.md)
-
-## [EXIF Data](exif.md)
-
-## [High Dynamic Range Images](hdr.md)
-
-## [Animated Images](animation.md)
-
-## [API](https://pub.dev/documentation/image/latest)
+- [API reference](https://pub.dev/documentation/image/latest): every class and function.
+- [Changelog](https://github.com/brendan-duncan/image/blob/main/CHANGELOG.md)
+- [Issues](https://github.com/brendan-duncan/image/issues)

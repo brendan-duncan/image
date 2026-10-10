@@ -1,465 +1,400 @@
 # Commands and Async Execution
 
-The Command API allows sequences of image commands to be batched and optionally executed on a separate Isolate
-thread.
+The [Command](https://pub.dev/documentation/image/latest/image/Command-class.html) API records a sequence of
+image operations and runs them later, either on the current isolate or on a separate
+[Isolate](https://dart.dev/language/isolates) so the work doesn't block your app.
 
 ```dart
-final cmd = Command()
-  ..decodePngFile('image.png')
-  ..sepia(amount: 0.5)
-  ..vignette()
-  ..writeToFile('processedImage.png');
-  // Nothing has actually been performed yet;
-  // the commands have recorded the information necessary to execute later. 
+import 'package:image/image.dart';
 
-const useIsolate = true;
-if (useIsolate) {
-  await cmd.executeThread(); // Executes in a separate Isolate thread.
-} else {
-  await cmd.execute(); // Executes in the main thread. It is still an async method because file IO is async.
+Future<void> main() async {
+  final cmd = Command()
+    ..decodeImageFile('photo.jpg')
+    ..copyResize(width: 800)
+    ..sepia(amount: 0.5)
+    ..vignette()
+    ..writeToFile('processed.png');
+  // Nothing has run yet; the commands have only been recorded.
+
+  await cmd.executeThread(); // Run everything on a separate isolate.
 }
 ```
 
-## Executing Commands in Isolate Threads
+Contents:
 
-Loading and manipulating images is expensive in terms of performance. Image files tend to be large, and Dart has limited
-options for high performance execution. One way to help keep the performance issues from affecting your app is to use
-multi-threading. For platforms that support it (not the web), Dart provides Isolates as its solution for
-multi-threading.
+- [Commands or direct functions?](#commands-or-direct-functions)
+- [Building a command](#building-a-command)
+- [Running a command](#running-a-command)
+- [Running in an isolate](#running-in-an-isolate)
+- [Getting results](#getting-results)
+- [Combining images](#combining-images)
+- [Custom operations](#custom-operations)
+- [Running a command again](#running-a-command-again)
+- [Available commands](#available-commands)
 
-The **Command.executeThread()** method will execute the commands in a separate isolate thread, resolving the promise
-when it has finished. 
+## Commands or direct functions?
 
-For platforms that do not support Isolates, executeThread will be the same as execute and run in the main thread.
-
-NOTE: There is some performance overhead to running in an Isolate thread as it has to copy the Image data
-from the Isolate to the main thread, but it has the benefit of not locking up the main thread.
-
-## Chaining Commands
-
-The Command class doesn't do anything itself, but when you call one of its methods, it will chain a sub-command.
+Every command calls one of the library's ordinary functions; `..sepia()` runs `sepia(image)`. So you can always
+write the same thing without commands:
 
 ```dart
-final cmd = Command() // Creates a Command object, which doesn't do anything itself.
-// Add a decodePngFile sub-command to the Command object
-..decodePngFile('image.png')
-// Add a vignette sub-command, which gets its input from the previous sub-command
-..vignette() 
-// Add a writeToFile sub-command, which gets its input from the previous sub-command.
-..writeToFile('processedImage.png'); 
-```
-Commands aren't invoked until the execute or executeThread method is called. executeThread will run the command in
-an Isolate thread on platforms that support Isolates.
-```dart 
-await cmd.execute();
+final image = await decodeImageFile('photo.jpg');
+if (image != null) {
+  final resized = copyResize(image, width: 800);
+  sepia(resized, amount: 0.5);
+  vignette(resized);
+  await encodeImageFile('processed.png', resized);
+}
 ```
 
-Although execute does not run in a separate thread, it is still async because it may have file IO operations. 
+Use **commands** when:
 
-You can get the last image that was processed from the command with
-```dart
-Image? image = await cmd.getImage();
-```
-If the command hadn't been executed yet, getImage will execute the command. You can also use
-```dart
-Image? image = await cmd.getImageThread();
-```
-Which will execute the command in an Isolate thread, if it hadn't already been executed.
+- You want to run a whole pipeline (decode, process, encode, write) off the main isolate with one call,
+  `executeThread()`, without writing isolate code yourself.
+- You want to describe the work in one place and run it later, possibly more than once.
 
-If a command encoded an image to an image format, you can get the bytes from the last encoder command with
-```dart
-Uint8List? bytes = await cmd.getBytes();
-```
-or
-```dart
-Uint8List? bytes = await cmd.getBytesThread();
-```
-to execute the command, if needed, in an Isolate thread and return the bytes from the last encoder command. 
+Use **direct functions** when:
 
-You can chain together multiple image and encoder commands.
+- You need an option or function that has no command, such as `decodeJpg(scale:)`, `resize`, `findTrim`,
+  `histogramEqualization`, `solarize`, or the `chroma` option of `encodeJpg`.
+- You are already on a background isolate (for example inside `Isolate.run`), or the work is small.
+- You want to inspect intermediate results or branch on them.
+
+Both approaches produce the same images. To run direct calls in the background, wrap them in `Isolate.run`; see
+[Performance](performance.md#run-heavy-work-off-the-main-isolate).
+
+## Building a command
+
+`Command()` creates an empty command. Each method call (`..decodePng(bytes)`, `..grayscale()`, ...) appends a
+step whose input is the output of the step before it. Use Dart's cascade operator (`..`) to chain them.
+
+```dart
+final cmd = Command()
+  ..decodePngFile('image.png') // Step 1: decode a file.
+  ..vignette() // Step 2: uses the image from step 1.
+  ..writeToFile('out.png'); // Step 3: uses the image from step 2.
+```
+
+A command chain usually starts with something that produces an image:
+
+| Start with | Source |
+|---|---|
+| `image(Image)` | An Image you already have. |
+| `createImage(width:, height:, ...)` | A new blank image (same parameters as `Image()`). |
+| `decodeImage(bytes)`, `decodeNamedImage(path, bytes)` | Encoded bytes; the format is detected. |
+| `decodeImageFile(path)` | A file (dart:io only); the format is detected. |
+| `decodePng(bytes)`, `decodeJpgFile(path)`, ... | Bytes or a file of a known format. |
+
+A chain can contain several images one after another; each decode or create step starts a new image:
+
 ```dart
 await (Command()
-..decodePngFile('image1.png')
-..sepia()
-..writeToFile('image1_out.png')
-..decodeImageFile('image2.png')
-..sketch()
-..writeToFile('image2_out.png'))
-.execute();
+      ..decodePngFile('image1.png')
+      ..sepia()
+      ..writeToFile('image1_out.png')
+      ..decodeImageFile('image2.png')
+      ..sketch()
+      ..writeToFile('image2_out.png'))
+    .execute();
 ```
 
-## Commands
-Commands are created from methods of the Command class.
+## Running a command
 
-### Image Creation Commands
+| Method | Runs on | Returns |
+|---|---|---|
+| `execute()` | the current isolate | `Future<Command>` |
+| `executeThread()` | a new isolate where supported | `Future<Command>` |
+| `getImage()` | the current isolate | `Future<Image?>`: the final image |
+| `getImageThread()` | a new isolate where supported | `Future<Image?>` |
+| `getBytes()` | the current isolate | `Future<Uint8List?>`: the encoded bytes, if the chain ends with an encode step (optionally followed by `writeToFile`) |
+| `getBytesThread()` | a new isolate where supported | `Future<Uint8List?>` |
+
+`execute()` is `async` because some steps read or write files, but the image processing itself runs on the
+current isolate and blocks it until it's done.
+
+The `get*` methods run the command if it hasn't run yet, then return its result. Calling them on a command that
+has already run just returns the result.
+
+If a step throws (for example a decoder rejecting a corrupt file), the exception is thrown from `execute()`,
+`executeThread()` or the `get*` method. If a decode step can't recognize the data it produces no image, later
+steps do nothing, and `getImage()` returns null.
+
+## Running in an isolate
+
+`executeThread()`, `getImageThread()` and `getBytesThread()` run the command on a newly spawned isolate on
+platforms that support `dart:io` isolates (the Dart VM, and Flutter on mobile and desktop):
+
+- The command, including any `Image` given with `image()` and any byte data, is copied into the new isolate.
+- The result image and bytes are sent back with `Isolate.exit`, which transfers them without another copy.
+- Because the isolate works on a copy, an Image passed with `image()` is not modified.
+- Exceptions thrown in the isolate are rethrown from the `*Thread` method.
+
+On the web there are no isolates of this kind: the `*Thread` methods behave exactly like `execute()`,
+`getImage()` and `getBytes()` and run on the main thread.
+
+Spawning an isolate and copying the input costs a little time, so for very small images `execute()` can be
+faster. The benefit is that your UI or server stays responsive while a large image is processed.
+
 ```dart
-/// Use a specific Image.
-void image(Image image);
-
-/// Create an Image.
-void createImage({ required int width, required int height,
-    Format format = Format.uint8, int numChannels = 3,
-    bool withPalette = false, Format paletteFormat = Format.uint8,
-    Palette? palette, ExifData? exif, IccProfile? iccp, Map<String, String>? textData });
-
-/// Convert an image by changing its format or number of channels.
-void convert({ int? numChannels, Format? format, num? alpha,
-  bool withPalette = false });
-
-/// Create a copy of the current image.
-void copy();
-
-/// Add animation frames to an image.
-/// typedef AddFramesFunction = Image? Function(int frameIndex);
-void addFrames(int count, AddFramesFunction callback);
-
-/// Call a callback function for each frame of an animated image.
-/// typedef FilterFunction = Image Function(Image image);
-void forEachFrame(FilterFunction callback);
+// Decode, resize and encode in the background, returning JPEG bytes.
+Future<Uint8List?> makeThumbnail(Uint8List bytes) => (Command()
+      ..decodeImage(bytes)
+      ..copyResize(width: 200)
+      ..encodeJpg(quality: 85))
+    .getBytesThread();
 ```
 
-### Format Decoding / Encoding Commands
+### Images are modified in place by execute()
+
+Most filters and drawing commands change their input image rather than copying it, just like the functions they
+call. With `execute()` (or `executeThread()` on the web), an Image you pass with `image()` is changed:
+
 ```dart
-void decodeImage(Uint8List data);
-
-void decodeNamedImage(String path, Uint8List data);
-
-void decodeImageFile(String path);
-
-void writeToFile(String path);
-
-void decodeBmp(Uint8List data);
-
-void decodeBmpFile(String path);
-
-void encodeBmp();
-
-void encodeBmpFile(String path);
-
-void encodeCur();
-
-void encodeCurFile(String path);
-
-void decodeExr(Uint8List data);
-
-void decodeExrFile(String path);
-
-void decodeGif(Uint8List data);
-
-void decodeGifFile(String path);
-
-void encodeGif({ int samplingFactor = 10,
-    DitherKernel dither = DitherKernel.floydSteinberg,
-    bool ditherSerpentine = false,
-    DitherScanOrder? ditherScanOrder });
-
-void encodeGifFile(String path, { int samplingFactor = 10,
-    DitherKernel dither = DitherKernel.floydSteinberg,
-    bool ditherSerpentine = false,
-    DitherScanOrder? ditherScanOrder });
-
-void decodeIco(Uint8List data);
-
-void decodeIcoFile(String path);
-
-void encodeIco();
-
-void encodeIcoFile(String path);
-
-void decodeJpg(Uint8List data);
-
-void decodeJpgFile(String path);
-
-void encodeJpg({ int quality = 100 });
-
-void encodeJpgFile(String path, { int quality = 100 });
-
-void decodePng(Uint8List data);
-
-void decodePngFile(String path);
-
-void encodePng({ int level = 6, PngFilter filter = PngFilter.paeth });
-
-void encodePngFile(String path, { int level = 6,
-    PngFilter filter = PngFilter.paeth });
-
-void decodePsd(Uint8List data);
-
-void decodePsdFile(String path);
-
-void decodePvr(Uint8List data);
-
-void decodePvrFile(String path);
-
-void encodePvr();
-
-void encodePvrFile(String path);
-
-void decodeTga(Uint8List data);
-
-void decodeTgaFile(String path);
-
-void encodeTga();
-
-void encodeTgaFile(String path);
-
-void decodeTiff(Uint8List data);
-
-void decodeTiffFile(String path);
-
-void encodeTiff();
-
-void encodeTiffFile(String path);
-
-void decodeWebP(Uint8List data);
-
-void decodeWebPFile(String path);
+final cmd = Command()
+  ..image(original)
+  ..invert();
+await cmd.execute(); // `original` is now inverted.
 ```
 
-### Draw Commands
+Add `..copy()` before the first modifying step if you need to keep the original:
+
 ```dart
-void drawChar(String char, { required BitmapFont font, required int x,
-  required int y, Color? color, Command? mask, Channel maskChannel = Channel.luminance });
-
-void drawCircle({ required int x, required int y, required int radius,
-  required Color color, bool antialias = false, Command? mask, Channel maskChannel = Channel.luminance });
-
-void compositeImage(Command? src, { int? dstX, int? dstY, int? dstW,
-  int? dstH, int? srcX, int? srcY, int? srcW, int? srcH,
-  BlendMode blend = BlendMode.alpha, bool linearBlend = false,
-  bool center = false, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void drawLine({ required int x1, required int y1, required int x2,
-  required int y2, required Color color,
-  bool antialias = false, num thickness = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void drawPixel(int x, int y, Color color, {
-  BlendMode blend = BlendMode.alpha, bool linearBlend = false,
-  Command? mask, Channel maskChannel = Channel.luminance });
-
-void drawPolygon({ required List<Point> vertices, required Color color,
-  Command? mask, Channel maskChannel = Channel.luminance });
-
-void drawRect({ required int x1, required int y1, required int x2,
-  required int y2, required Color color, num thickness = 1, num radius = 0,
-  Command? mask, Channel maskChannel = Channel.luminance });
-
-void drawString(String string, { required BitmapFont font, required int x,
-  required int y, Color? color, bool wrap = false,
-  bool rightJustify = false, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void fill({ required Color color, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void fillCircle({ required int x, required int y, required int radius,
-  required Color color, bool antialias = false, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void fillFlood({ required int x, required int y, required Color color,
-  num threshold = 0.0, bool compareAlpha = false, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void fillPolygon({ required List<Point> vertices, required Color color,
-  Command? mask, Channel maskChannel = Channel.luminance });
-
-void fillRect({ required int x1, required int y1, required int x2,
-  required int y2, required Color color, num radius = 0, Command? mask,
-  Channel maskChannel = Channel.luminance });
+final cmd = Command()
+  ..image(original)
+  ..copy()
+  ..invert();
+final inverted = await cmd.getImage(); // `original` is unchanged.
 ```
 
-### Filtering Commands 
+## Getting results
+
+After a command runs, its results are also available as properties:
 
 ```dart
-void adjustColor({ Color? blacks, Color? whites, Color? mids,
-  num? contrast, num? saturation, num? brightness,
-  num? gamma, num? exposure, num? hue, num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void billboard({ num grid = 10, num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void bleachBypass({ num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void bulgeDistortion({ int? centerX, int? centerY,
-  num? radius, num scale = 0.5,
-  Interpolation interpolation = Interpolation.nearest, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void bumpToNormal({ num strength = 2 });
-
-void chromaticAberration({ int shift = 5, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void colorHalftone({ num amount = 1, int? centerX, int? centerY,
-  num angle = 180, num size = 5, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void colorOffset({ num red = 0, num green = 0, num blue = 0,
-  num alpha = 0, Command? mask, Channel maskChannel = Channel.luminance });
-
-void contrast({ required num contrast, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void convolution({ required List<num> filter, num div = 1.0, num offset = 0,
-  num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void copyImageChannels({ required Command? from, bool scaled = false,
-  Channel? red, Channel? green, Channel? blue, Channel? alpha,
-  Command? mask, Channel maskChannel = Channel.luminance});
-
-void ditherImage({ Quantizer? quantizer,
-  DitherKernel kernel = DitherKernel.floydSteinberg,
-  bool serpentine = false,
-  DitherScanOrder? scanOrder,
-  double strength = 1.0 });
-
-void dotScreen({ num angle = 180, num size = 5.75, int? centerX,
-  int? centerY, num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void dropShadow(int hShadow, int vShadow, int blur, { Color? shadowColor });
-
-void edgeGlow({ num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void emboss({ num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void gamma({ required num gamma, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void gaussianBlur({ required int radius, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void grayscale({ num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void hdrToLdr({ num? exposure });
-
-void hexagonPixelate({ int? centerX, int? centerY, int size = 5,
-  num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void invert({ Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void luminanceThreshold({ num threshold = 0.5, bool outputColor = false,
-  num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void monochrome({ Color? color, num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void noise(num sigma, { NoiseType type = NoiseType.gaussian,
-  Random? random, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void normalize({ required num min, required num max, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void pixelate({ required int size, PixelateMode mode = PixelateMode.upperLeft,
-  Command? mask, Channel maskChannel = Channel.luminance });
-
-void quantize({ int numberOfColors = 256,
-  QuantizeMethod method = QuantizeMethod.neuralNet,
-  DitherKernel dither = DitherKernel.none,
-  bool ditherSerpentine = false,
-  DitherScanOrder? ditherScanOrder });
-
-void reinhardTonemap({ Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void remapColors({ Channel red = Channel.red,
-  Channel green = Channel.green,
-  Channel blue = Channel.blue,
-  Channel alpha = Channel.alpha });
-
-void scaleRgba({ required Color scale, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void separableConvolution({ required SeparableKernel kernel, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void sepia({ num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void sketch({ num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void smooth({ required num weight, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void sobel({ num amount = 1, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void stretchDistortion({ int? centerX, int? centerY,
-  Interpolation interpolation = Interpolation.nearest, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-void vignette({ num start = 0.3, num end = 0.75, Color? color,
-  num amount = 0.8, Command? mask,
-  Channel maskChannel = Channel.luminance });
-
-/// Run an arbitrary function on the image within the Command graph.
-/// A FilterFunction is in the `form Image function(Image)`. A new Image
-/// can be returned, replacing the given Image; or the given Image can be
-/// returned.
-///
-/// @example
-/// final image = Command()
-/// ..createImage(width: 256, height: 256)
-/// ..filter((image) {
-///   for (final pixel in image) {
-///     pixel.r = pixel.x;
-///     pixel.g = pixel.y;
-///   }
-///   return image;
-/// })
-/// ..getImage();
-/// 
-/// typedef FilterFunction = Image Function(Image image);
-void filter(FilterFunction filter);
+final cmd = Command()
+  ..decodeImage(bytes)
+  ..grayscale()
+  ..encodePng();
+await cmd.execute();
+final image = cmd.outputImage; // The final image.
+final png = cmd.outputBytes; // The encoded PNG bytes.
 ```
 
-### Transform Commands
+`writeToFile(path)` writes the bytes from a preceding encode step if there is one; otherwise it encodes the image
+in the format given by the file extension. On the web, where there is no file system, file steps do nothing:
+file decodes produce no image and writes are skipped.
 
 ```dart
-void bakeOrientation();
+final cmd = Command()
+  ..decodeImageFile('input.png')
+  ..encodeJpg(quality: 80) // Encode with a specific quality...
+  ..writeToFile('output.jpg'); // ...and write those bytes.
+```
 
-void copyCropCircle({ int? radius, int? centerX, int? centerY });
+## Combining images
 
-void copyCrop({ required int x, required int y, required int width,
-  required int height, num radius = 0 });
+Some commands take another `Command` as an argument, such as `compositeImage`, the `mask` parameter of filters and
+drawing commands, and `copyImageChannels(from:)`. That command is run first, and its output image is used.
 
-void copyExpandCanvas({ int? newWidth, int? newHeight, int? padding,
-  ExpandCanvasPosition position = ExpandCanvasPosition.center,
-  Color? backgroundColor, 
-  Image? toImage });
+```dart
+final watermark = Command()
+  ..decodePngFile('logo.png')
+  ..copyResize(width: 100);
 
-void copyFlip({ required FlipDirection direction });
+await (Command()
+      ..decodeJpgFile('photo.jpg')
+      ..compositeImage(watermark, dstX: 10, dstY: 10)
+      ..writeToFile('watermarked.jpg'))
+    .executeThread();
+```
 
-void copyRectify({ required Point topLeft,
-  required Point topRight,
-  required Point bottomLeft,
-  required Point bottomRight,
-  Interpolation interpolation = Interpolation.nearest });
+```dart
+// Blur only where the mask image is bright.
+final mask = Command()..decodePngFile('mask.png');
+final blurred = Command()
+  ..decodeJpgFile('photo.jpg')
+  ..gaussianBlur(radius: 8, mask: mask, maskChannel: Channel.luminance);
+```
 
-void copyResize({ int? width, int? height,
-  Interpolation interpolation = Interpolation.nearest });
+## Custom operations
 
-void copyResizeCropSquare({ required int size,
-  Interpolation interpolation = Interpolation.nearest,
-  num radius = 0});
+`filter` runs your own function on the image. The function receives each frame and returns either that frame
+(after modifying it) or a new image to replace it. `forEachFrame` does the same thing; the name makes the intent
+clearer for animations.
 
-void copyRotate({ required num angle,
-  Interpolation interpolation = Interpolation.nearest });
+```dart
+final image = await (Command()
+      ..createImage(width: 256, height: 256)
+      ..filter((image) {
+        for (final pixel in image) {
+          pixel
+            ..r = pixel.x
+            ..g = pixel.y;
+        }
+        return image;
+      }))
+    .getImage();
+```
 
-void flip({ required FlipDirection direction });
+`addFrames(count, callback)` adds frames to the image; the callback is called with each new frame number and
+returns the frame (or null to skip it).
 
-void trim({ TrimMode mode = TrimMode.transparent, Trim sides = Trim.all });
+When a command runs in an isolate, these functions run there too. They can be closures, but anything they
+capture is copied to the isolate, so it must be something that can be sent between isolates (images, numbers,
+strings and lists are fine; open files and sockets are not).
+
+## Running a command again
+
+A command runs its steps once. Calling `execute()` again returns the same results without redoing the work. If
+you change something the command depends on, call `setDirty()` to make the next `execute()` run every step
+again.
+
+## Available commands
+
+The commands have the same names and parameters as the functions documented in
+[Image Processing](filters.md), [Transform Functions](transform.md), [Drawing Functions](draw.md) and
+[Image Formats](formats.md), without the image argument. Where a function takes an `Image` (a source image or a
+`mask`), the command takes a `Command` instead.
+
+### Image commands
+
+| Command | Description |
+|---|---|
+| `image(Image image)` | Use an existing image. |
+| `createImage({required int width, required int height, Format format = Format.uint8, int numChannels = 3, bool withPalette = false, Format paletteFormat = Format.uint8, Palette? palette, ExifData? exif, IccProfile? iccp, Map<String, String>? textData})` | Create a new image. |
+| `convert({int? numChannels, Format? format, num? alpha, bool withPalette = false})` | Convert the format or channels; see [Image Data](image_data.md#converting-images). |
+| `copy()` | Continue with a copy of the image. |
+| `addFrames(int count, AddFramesFunction callback)` | Add animation frames. `AddFramesFunction` is `Image? Function(int frameIndex)`. |
+| `forEachFrame(FilterFunction callback)` | Run a function on each frame. `FilterFunction` is `Image Function(Image image)`. |
+| `filter(FilterFunction filter)` | Run a function on the image (each frame). |
+
+### Decoding and encoding commands
+
+| Command | Description |
+|---|---|
+| `decodeImage(Uint8List data)` | Decode, detecting the format. |
+| `decodeNamedImage(String path, Uint8List data)` | Decode, using the extension of `path` to pick the decoder. |
+| `decodeImageFile(String path)` | Read and decode a file (dart:io only). |
+| `writeToFile(String path)` | Write the encoded bytes, or encode by the file extension (dart:io only). |
+| `decodeBmp(data)`, `decodeBmpFile(path)`, `encodeBmp()`, `encodeBmpFile(path)` | BMP. |
+| `encodeCur()`, `encodeCurFile(path)` | CUR (encode only). |
+| `decodeExr(data)`, `decodeExrFile(path)` | OpenEXR (decode only). |
+| `decodeGif(data)`, `decodeGifFile(path)` | GIF. |
+| `encodeGif({int samplingFactor = 10, DitherKernel dither = DitherKernel.floydSteinberg, DitherScanOrder? ditherScanOrder})`, `encodeGifFile(path, {...})` | GIF. The older `bool ditherSerpentine` is also accepted. |
+| `decodeIco(data)`, `decodeIcoFile(path)`, `encodeIco()`, `encodeIcoFile(path)` | ICO. |
+| `decodeJpg(data)`, `decodeJpgFile(path)` | JPEG, at full size. |
+| `encodeJpg({int quality = 100})`, `encodeJpgFile(path, {int quality = 100})` | JPEG. |
+| `decodePng(data)`, `decodePngFile(path)` | PNG. |
+| `encodePng({int level = 6, PngFilter filter = PngFilter.paeth})`, `encodePngFile(path, {...})` | PNG. |
+| `decodePsd(data)`, `decodePsdFile(path)` | Photoshop PSD (decode only). |
+| `decodePvr(data)`, `decodePvrFile(path)`, `encodePvr()`, `encodePvrFile(path)` | PVR. |
+| `decodeTga(data)`, `decodeTgaFile(path)`, `encodeTga()`, `encodeTgaFile(path)` | TGA. |
+| `decodeTiff(data)`, `decodeTiffFile(path)`, `encodeTiff()`, `encodeTiffFile(path)` | TIFF. |
+| `decodeWebP(data)`, `decodeWebPFile(path)`, `encodeWebP()`, `encodeWebPFile(path)` | WebP. The encode commands use the lossless defaults of `encodeWebP`. |
+
+The format commands use the default options of the functions in [Image Formats](formats.md). For options the
+commands don't have (JPEG `scale` and `chroma`, WebP lossy encoding, `singleFrame`, single-frame decoding with
+`frame:`), call the functions directly or from a `filter` step.
+
+### Drawing commands
+
+See [Drawing Functions](draw.md).
+
+| Command |
+|---|
+| `compositeImage(Command? src, {int? dstX, int? dstY, int? dstW, int? dstH, int? srcX, int? srcY, int? srcW, int? srcH, BlendMode blend = BlendMode.alpha, bool linearBlend = false, bool center = false, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawChar(String char, {required BitmapFont font, required int x, required int y, Color? color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawCircle({required int x, required int y, required int radius, required Color color, bool antialias = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawLine({required int x1, required int y1, required int x2, required int y2, required Color color, bool antialias = false, num thickness = 1, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawPixel(int x, int y, Color color, {BlendMode blend = BlendMode.alpha, bool linearBlend = false, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawPolygon({required List<Point> vertices, required Color color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawRect({required int x1, required int y1, required int x2, required int y2, required Color color, num radius = 0, num thickness = 1, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawString(String string, {required BitmapFont font, int? x, int? y, Color? color, bool wrap = false, bool rightJustify = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `fill({required Color color, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `fillCircle({required int x, required int y, required int radius, required Color color, bool antialias = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `fillFlood({required int x, required int y, required Color color, num threshold = 0.0, bool compareAlpha = false, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `fillPolygon({required List<Point> vertices, required Color color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `fillRect({required int x1, required int y1, required int x2, required int y2, required Color color, num radius = 0, Command? mask, Channel maskChannel = Channel.luminance})` |
+
+### Filter commands
+
+See [Image Processing](filters.md). Every filter with a `mask` parameter also takes
+`Channel maskChannel = Channel.luminance`; it's left out below for brevity.
+
+| Command |
+|---|
+| `adjustColor({Color? blacks, Color? whites, Color? mids, num? contrast, num? saturation, num? brightness, num? gamma, num? exposure, num? hue, num amount = 1, Command? mask})` |
+| `billboard({num grid = 10, num amount = 1, Command? mask})` |
+| `bleachBypass({num amount = 1, Command? mask})` |
+| `bulgeDistortion({int? centerX, int? centerY, num? radius, num scale = 0.5, Interpolation interpolation = Interpolation.nearest, Command? mask})` |
+| `bumpToNormal({num strength = 2})` |
+| `chromaticAberration({int shift = 5, Command? mask})` |
+| `colorHalftone({num amount = 1, int? centerX, int? centerY, num angle = 180, num size = 5, Command? mask})` |
+| `colorOffset({num red = 0, num green = 0, num blue = 0, num alpha = 0, Command? mask})` |
+| `contrast({required num contrast, Command? mask})` |
+| `convolution({required List<num> filter, num div = 1.0, num offset = 0, num amount = 1, Command? mask})` |
+| `copyImageChannels({required Command? from, bool scaled = false, Channel? red, Channel? green, Channel? blue, Channel? alpha, Command? mask})` |
+| `ditherImage({Quantizer? quantizer, DitherKernel kernel = DitherKernel.floydSteinberg, DitherScanOrder? scanOrder, double strength = 1.0})` (the older `bool serpentine` is also accepted) |
+| `dotScreen({num angle = 180, num size = 5.75, int? centerX, int? centerY, num amount = 1, Command? mask})` |
+| `dropShadow(int hShadow, int vShadow, int blur, {Color? shadowColor})` |
+| `edgeGlow({num amount = 1, Command? mask})` |
+| `emboss({num amount = 1, Command? mask})` |
+| `gamma({required num gamma, Command? mask})` |
+| `gaussianBlur({required int radius, Command? mask})` |
+| `grayscale({num amount = 1, Command? mask})` |
+| `hdrToLdr({num? exposure})` |
+| `hexagonPixelate({int? centerX, int? centerY, int size = 5, num amount = 1, Command? mask})` |
+| `invert({Command? mask})` |
+| `luminanceThreshold({num threshold = 0.5, bool outputColor = false, num amount = 1, Command? mask})` |
+| `monochrome({Color? color, num amount = 1, Command? mask})` |
+| `noise(num sigma, {NoiseType type = NoiseType.gaussian, Random? random, Command? mask})` |
+| `normalize({required num min, required num max, Command? mask})` |
+| `pixelate({required int size, PixelateMode mode = PixelateMode.upperLeft, Command? mask})` |
+| `quantize({int numberOfColors = 256, QuantizeMethod method = QuantizeMethod.neuralNet, DitherKernel dither = DitherKernel.none, DitherScanOrder? ditherScanOrder})` (the older `bool ditherSerpentine` is also accepted) |
+| `reinhardTonemap({Command? mask})` |
+| `remapColors({Channel red = Channel.red, Channel green = Channel.green, Channel blue = Channel.blue, Channel alpha = Channel.alpha})` |
+| `scaleRgba({required Color scale, Command? mask})` |
+| `separableConvolution({required SeparableKernel kernel, Command? mask})` |
+| `sepia({num amount = 1, Command? mask})` |
+| `sketch({num amount = 1, Command? mask})` |
+| `smooth({required num weight, Command? mask})` |
+| `sobel({num amount = 1, Command? mask})` |
+| `stretchDistortion({int? centerX, int? centerY, Interpolation interpolation = Interpolation.nearest, Command? mask})` |
+| `vignette({num start = 0.3, num end = 0.75, Color? color, num amount = 0.8, Command? mask})` |
+
+Note that the `vignette` command's defaults (`end: 0.75`, `amount: 0.8`) differ from the `vignette` function's
+(`end: 0.85`, `amount: 0.9`). Pass the values explicitly if you need identical results.
+
+### Transform commands
+
+See [Transform Functions](transform.md).
+
+| Command |
+|---|
+| `bakeOrientation()` |
+| `copyCrop({required int x, required int y, required int width, required int height, num radius = 0, bool antialias = true})` |
+| `copyCropCircle({int? radius, int? centerX, int? centerY, bool antialias = true})` |
+| `copyExpandCanvas({int? newWidth, int? newHeight, int? padding, ExpandCanvasPosition position = ExpandCanvasPosition.center, Color? backgroundColor, Image? toImage})` |
+| `copyFlip({required FlipDirection direction})` |
+| `copyRectify({required Point topLeft, required Point topRight, required Point bottomLeft, required Point bottomRight, Interpolation interpolation = Interpolation.nearest})` |
+| `copyResize({int? width, int? height, bool? maintainAspect, Color? backgroundColor, Interpolation interpolation = Interpolation.nearest})` |
+| `copyResizeCropSquare({required int size, num radius = 0, Interpolation interpolation = Interpolation.nearest, bool antialias = true})` |
+| `copyRotate({required num angle, Interpolation interpolation = Interpolation.nearest})` |
+| `flip({required FlipDirection direction})` |
+| `trim({TrimMode mode = TrimMode.transparent, Trim sides = Trim.all})` |
+
+The `trim` command defaults to `TrimMode.transparent`, while the `trim` function defaults to
+`TrimMode.topLeftColor`.
+
+### Functions without a command
+
+These have no command method; call them directly, or from a `filter` step:
+`resize`, `findTrim`, `flipVertical`, `flipHorizontal`, `flipHorizontalVertical`, `histogramEqualization`,
+`histogramStretch`, `solarize`, and the format options listed above.
+
+```dart
+final cmd = Command()
+  ..decodeImageFile('scan.png')
+  ..filter((image) => histogramEqualization(image))
+  ..writeToFile('scan_equalized.png');
 ```
