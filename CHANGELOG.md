@@ -9,6 +9,8 @@
 * Fix `flip` (both directions) and `bakeOrientation` (orientation 3) not
   flipping the middle row of odd-height images.
 * Fix 16-bit grayscale PNG transparency (tRNS) being ignored.
+* Fix cubic interpolation sampling outside the image near the top and left
+  edges, which brightened or darkened them.
 * Fix `OutputBuffer` growth taking quadratic time; 8-bit BMP encoding is ~5x
   faster.
 * Lower peak memory when encoding BMP and TGA images.
@@ -20,6 +22,7 @@
   without a full-size temporary image.
 * Much faster `flip`, `flipVertical`, `flipHorizontal`, `copyRotate` (90, 180
   and 270 degrees) and `grayscale`.
+* `copyResize` is 4-10x faster.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
 * `PngCicpData.colourPrimaries` is renamed to `colorPrimaries`.
 

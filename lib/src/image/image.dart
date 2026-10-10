@@ -716,7 +716,7 @@ class Image extends Iterable<Pixel> {
     final icc = getPixelSafe(x, y);
 
     final ipp = px < 0 || py < 0 ? icc : getPixelSafe(px, py);
-    final icp = px < 0 ? icc : getPixelSafe(x, py);
+    final icp = py < 0 ? icc : getPixelSafe(x, py);
     final inp = py < 0 || nx >= width ? icc : getPixelSafe(nx, py);
     final iap = ax >= width || py < 0 ? icc : getPixelSafe(ax, py);
 

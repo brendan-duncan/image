@@ -4,6 +4,7 @@ import '../color/color.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../util/image_exception.dart';
+import '_resize_bytes.dart';
 import 'bake_orientation.dart';
 
 double _linear(
@@ -106,6 +107,11 @@ Image copyResize(Image src,
 
     if (maintainAspect && backgroundColor != null) {
       dst.clear(backgroundColor);
+    }
+
+    if (resizeBytes(
+        frame, dst, interpolation, x1, y1, w, h, dx, dy, scaleX, scaleY)) {
+      continue;
     }
 
     if (interpolation == Interpolation.average) {

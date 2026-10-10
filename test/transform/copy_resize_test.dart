@@ -429,5 +429,17 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
     });
+
+    test('cubic upscale of a solid image stays solid', () {
+      // The tap above the center pixel used to read outside the image along
+      // the top edge, darkening the first rows.
+      final src = Image(width: 4, height: 4)..clear(ColorRgb8(200, 100, 50));
+      final dst = copyResize(src,
+          width: 16, height: 16, interpolation: Interpolation.cubic);
+      for (final p in dst) {
+        expect([p.r, p.g, p.b], equals([200, 100, 50]),
+            reason: '${p.x},${p.y}');
+      }
+    });
   });
 }
