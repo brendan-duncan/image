@@ -637,6 +637,8 @@ class JpegData {
     final R = Int32List(64);
     final r = Uint8List(64);
     final lines = List<Uint8List?>.filled(blocksPerColumn * 8, null);
+    final coefficients = component.coefficients;
+    final blocksPerLineForMcu = component.blocksPerLineForMcu;
 
     var l = 0;
     for (var blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
@@ -646,20 +648,18 @@ class JpegData {
       }
 
       for (var blockCol = 0; blockCol < blocksPerLine; blockCol++) {
-        quantizeAndInverse(component.quantizationTable!,
-            component.blocks[blockRow][blockCol], r, R);
+        quantizeAndInverse(component.quantizationTable!, coefficients,
+            (blockRow * blocksPerLineForMcu + blockCol) << 6, r, R);
 
         final sample = blockCol << 3;
         for (var j = 0; j < 8; j++) {
           lines[scanLine + j]?.setRange(sample, sample + 8, r, j << 3);
         }
       }
-
-      // Release the coefficients as they're used, so they're not held in
-      // memory alongside all of the lines.
-      component.blocks[blockRow] = const [];
     }
-    component.blocks = const [];
+
+    // The coefficients are no longer needed once the lines are built.
+    component.coefficients = Int16List(0);
 
     return lines;
   }

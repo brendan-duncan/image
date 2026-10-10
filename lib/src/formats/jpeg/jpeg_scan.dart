@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
@@ -53,7 +55,7 @@ class JpegScan {
   void decode() {
     final componentsLength = components.length;
     JpegComponent? component;
-    void Function(JpegComponent, List<int>) decodeFn;
+    _DecodeFn decodeFn;
 
     if (progressive!) {
       if (spectralStart == 0) {
@@ -196,11 +198,11 @@ class JpegScan {
     return n + (-1 << length) + 1;
   }
 
-  void _decodeBaseline(JpegComponent component, List<int> zz) {
+  void _decodeBaseline(JpegComponent component, Int16List zz, int o) {
     final t = _decodeHuffman(component.huffmanTableDC);
     final diff = t == 0 ? 0 : _receiveAndExtend(t);
     component.pred += diff;
-    zz[0] = component.pred;
+    zz[o] = component.pred;
 
     var k = 1;
     while (k < 64) {
@@ -223,23 +225,23 @@ class JpegScan {
       s = _receiveAndExtend(s);
 
       final z = JpegData.dctZigZag[k];
-      zz[z] = s;
+      zz[o + z] = s;
       k++;
     }
   }
 
-  void _decodeDCFirst(JpegComponent component, List<int> zz) {
+  void _decodeDCFirst(JpegComponent component, Int16List zz, int o) {
     final t = _decodeHuffman(component.huffmanTableDC);
     final diff = (t == 0) ? 0 : (_receiveAndExtend(t) << successive);
     component.pred += diff;
-    zz[0] = component.pred;
+    zz[o] = component.pred;
   }
 
-  void _decodeDCSuccessive(JpegComponent component, List<int> zz) {
-    zz[0] = zz[0] | (_readBit()! << successive);
+  void _decodeDCSuccessive(JpegComponent component, Int16List zz, int o) {
+    zz[o] = zz[o] | (_readBit()! << successive);
   }
 
-  void _decodeACFirst(JpegComponent component, List<int> zz) {
+  void _decodeACFirst(JpegComponent component, Int16List zz, int o) {
     if (eobrun > 0) {
       eobrun--;
       return;
@@ -260,18 +262,18 @@ class JpegScan {
       }
       k += r;
       final z = JpegData.dctZigZag[k];
-      zz[z] = _receiveAndExtend(s) * (1 << successive);
+      zz[o + z] = _receiveAndExtend(s) * (1 << successive);
       k++;
     }
   }
 
-  void _decodeACSuccessive(JpegComponent component, List<int> zz) {
+  void _decodeACSuccessive(JpegComponent component, Int16List zz, int o) {
     var k = spectralStart;
     final e = spectralEnd;
     var s = 0;
     var r = 0;
     while (k <= e) {
-      final z = JpegData.dctZigZag[k];
+      final z = o + JpegData.dctZigZag[k];
       switch (successiveACState) {
         case 0: // initial state
           final rs = _decodeHuffman(component.huffmanTableAC);
@@ -331,7 +333,7 @@ class JpegScan {
 
   void _decodeMcu(
     JpegComponent component,
-    void Function(JpegComponent, List<int>) decodeFn,
+    _DecodeFn decodeFn,
     int mcu,
     int row,
     int col,
@@ -340,23 +342,27 @@ class JpegScan {
     final mcuCol = mcu % mcusPerLine;
     final blockRow = mcuRow * component.vSamples + row;
     final blockCol = mcuCol * component.hSamples + col;
-    if (blockRow >= component.blocks.length) {
+    if (blockRow >= component.blocksPerColumnForMcu ||
+        blockCol >= component.blocksPerLineForMcu) {
       return;
     }
-    final numCols = component.blocks[blockRow].length;
-    if (blockCol >= numCols) {
-      return;
-    }
-    decodeFn(component, component.blocks[blockRow][blockCol]);
+    decodeFn(component, component.coefficients,
+        (blockRow * component.blocksPerLineForMcu + blockCol) << 6);
   }
 
   void _decodeBlock(
     JpegComponent component,
-    void Function(JpegComponent, List<int>) decodeFn,
+    _DecodeFn decodeFn,
     int mcu,
   ) {
     final blockRow = mcu ~/ component.blocksPerLine;
     final blockCol = mcu % component.blocksPerLine;
-    decodeFn(component, component.blocks[blockRow][blockCol]);
+    decodeFn(component, component.coefficients,
+        (blockRow * component.blocksPerLineForMcu + blockCol) << 6);
   }
 }
+
+/// Decodes the coefficients of one block, starting at [offset] in
+/// [coefficients].
+typedef _DecodeFn = void Function(
+    JpegComponent component, Int16List coefficients, int offset);

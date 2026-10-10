@@ -28,8 +28,8 @@ Uint8List _createDctClip() {
 // Christoph Loeffler, Adriaan Ligtenberg, George S. Moschytz,
 // "Practical Fast 1-D DCT Algorithms with 11 Multiplications",
 // IEEE Intl. Conf. on Acoustics, Speech & Signal Processing, 1989, 988-991.
-void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
-    Uint8List dataOut, Int32List dataIn) {
+void quantizeAndInverse(Int16List quantizationTable, Int16List coefficients,
+    int offset, Uint8List dataOut, Int32List dataIn) {
   final p = dataIn;
 
   // IDCT constants (20.12 fixed point format)
@@ -44,7 +44,7 @@ void quantizeAndInverse(Int16List quantizationTable, Int32List coefBlock,
 
   // de-quantize
   for (var i = 0; i < 64; i++) {
-    p[i] = coefBlock[i] * quantizationTable[i];
+    p[i] = coefficients[offset + i] * quantizationTable[i];
   }
 
   // inverse DCT on rows

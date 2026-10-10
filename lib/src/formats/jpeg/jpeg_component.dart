@@ -9,7 +9,16 @@ class JpegComponent {
   int quantizationIndex;
   late int blocksPerLine;
   late int blocksPerColumn;
-  late List<List<Int32List>> blocks;
+
+  /// The number of blocks per line and column of [coefficients], including
+  /// the blocks that pad the component out to whole MCUs.
+  late int blocksPerLineForMcu;
+  late int blocksPerColumnForMcu;
+
+  /// The DCT coefficients, 64 per block, with blocks stored in row-major
+  /// order. The coefficient for block (row, col) starts at
+  /// `(row * blocksPerLineForMcu + col) * 64`.
+  late Int16List coefficients;
   late List<HuffmanNode?> huffmanTableDC;
   late List<HuffmanNode?> huffmanTableAC;
   late int pred;

@@ -38,17 +38,13 @@ class JpegFrame {
       final blocksPerLineForMcu = mcusPerLine * component.hSamples;
       final blocksPerColumnForMcu = mcusPerColumn * component.vSamples;
 
-      final blocks = List.generate(
-          blocksPerColumnForMcu,
-          (_) => List<Int32List>.generate(
-              blocksPerLineForMcu, (_) => Int32List(64),
-              growable: false),
-          growable: false);
-
       component
         ..blocksPerLine = blocksPerLine
         ..blocksPerColumn = blocksPerColumn
-        ..blocks = blocks;
+        ..blocksPerLineForMcu = blocksPerLineForMcu
+        ..blocksPerColumnForMcu = blocksPerColumnForMcu
+        ..coefficients =
+            Int16List(blocksPerLineForMcu * blocksPerColumnForMcu * 64);
     }
   }
 }

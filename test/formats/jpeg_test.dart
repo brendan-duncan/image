@@ -282,7 +282,7 @@ void main() async {
       final bytes = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
       final jpeg = JpegData()..read(bytes);
       for (final component in jpeg.frame!.components.values) {
-        expect(component.blocks, isEmpty);
+        expect(component.coefficients, isEmpty);
       }
       expect(jpeg.getImage().width, equals(jpeg.width));
     });
