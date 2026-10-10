@@ -211,7 +211,7 @@ void transformWHT(Int16List inp, int inOff, Int16List out, int outOff) {
   }
 }
 
-/// Whether a macroblock's source is a single flat colour.
+/// Whether a macroblock's source is a single flat color.
 @internal
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
@@ -489,7 +489,7 @@ void _dcMode(Uint32List dst, int dstOff, Uint8List? left, int leftOff,
 /// Builds the four 16x16 luma predictions into the prediction cache [dst].
 ///
 /// [left] and [top] are null at the picture border, where the standard
-/// prescribes fixed replacement values rather than the missing neighbours.
+/// prescribes fixed replacement values rather than the missing neighbors.
 @internal
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
@@ -786,7 +786,7 @@ int getSSE(Uint8List a, int aOff, Uint8List b, int bOff, int w, int h) {
 /// The weights of the spectral distortion - `{38, 32, 20, 9, 32, 28, 17, 7,
 /// 20, 17, 10, 4, 9, 7, 4, 2}` in libwebp - are written into the columns as
 /// literals rather than read from a table. A top-level table would be a `final`
-/// and so carry a lazy-initialisation check on every one of the sixteen reads,
+/// and so carry a lazy-initialization check on every one of the sixteen reads,
 /// which is more than the multiplications cost.
 @pragma('vm:unsafe:no-bounds-checks')
 @pragma('vm:unsafe:no-interrupts')
@@ -871,7 +871,7 @@ int spectrum4x4(Uint8List src, int off) => _tTransform(src, off);
 ///
 /// Squared error alone rates a blurred block the same as a block whose detail
 /// merely moved; comparing weighted spectra instead is what keeps texture from
-/// being quantised away.
+/// being quantized away.
 @internal
 int distoFrom(int reference, Uint8List b, int bOff) {
   final d = _tTransform(b, bOff) - reference;

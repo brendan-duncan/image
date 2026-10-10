@@ -32,17 +32,17 @@ void main() {
       expect(result.height, equals(64));
     });
 
-    test('vignette darkens corners more than the centre (black vignette)', () {
-      // Use a solid mid-grey image so any darkening is clearly measurable.
+    test('vignette darkens corners more than the center (black vignette)', () {
+      // Use a solid mid-gray image so any darkening is clearly measurable.
       // Default vignette color is black (0,0,0).
       final src = solidImage(100, 100, ColorRgb8(200, 200, 200));
       final result = vignette(src.clone());
-      // Centre pixel is inside the inner radius, so it should be brighter.
-      final centre = result.getPixel(50, 50);
+      // Center pixel is inside the inner radius, so it should be brighter.
+      final center = result.getPixel(50, 50);
       // Corner pixel is at the maximum radial distance, so it should be darker.
       final corner = result.getPixel(0, 0);
-      expect(corner.r, lessThan(centre.r),
-          reason: 'corner should be darker than centre');
+      expect(corner.r, lessThan(center.r),
+          reason: 'corner should be darker than center');
     });
 
     test('vignette with amount 0 leaves image unchanged', () {

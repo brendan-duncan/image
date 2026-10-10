@@ -281,7 +281,7 @@ VP8LClustering? clusterHistograms(List<VP8LHistogram> blocks,
     final block = blocks[i];
     if (block.cost == 0) {
       // A block no token starts in codes nothing either way, so keep it with
-      // its neighbour: a run of equal entries is what the entropy image
+      // its neighbor: a run of equal entries is what the entropy image
       // itself compresses best.
       assignment[i] = i > 0 ? assignment[i - 1] : 0;
     } else {

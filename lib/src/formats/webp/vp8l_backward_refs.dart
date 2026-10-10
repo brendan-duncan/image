@@ -70,7 +70,7 @@ const matchLengthBits = 12;
 const maxMatchLength = (1 << matchLengthBits) - 1;
 
 /// Distances stop at 1048576, and the first 120 values are taken by the
-/// near-neighbour plane codes, leaving this as the real maximum
+/// near-neighbor plane codes, leaving this as the real maximum
 @internal
 const maxMatchDistance = 1048456;
 
@@ -92,7 +92,7 @@ class VP8LMatches {
   @pragma('vm:prefer-inline')
   int distanceAt(int i) => match[i] >> matchLengthBits;
 
-  /// Offsets landing on the near-neighbour plane codes, the cheapest distances
+  /// Offsets landing on the near-neighbor plane codes, the cheapest distances
   /// the format has, where a shorter match can beat a longer one from the chain
   final Int32List cheapDistances;
 }
@@ -100,7 +100,7 @@ class VP8LMatches {
 /// Finds the best match at every position.
 ///
 /// Positions are visited from the end backwards, because a match found at one
-/// position usually answers for its neighbours too: if the same distance still
+/// position usually answers for its neighbors too: if the same distance still
 /// matches one pixel to the left, that pixel's best match is this one grown by
 /// one, and no search is needed for it. On flat or repetitive images a single
 /// search then covers a whole run, which is most of what makes such images
@@ -125,7 +125,7 @@ VP8LMatches computeMatches(Uint8List r, Uint8List g, Uint8List b, Uint8List a,
   // before that, and the three directly above and to either side.
   //
   // libwebp's kLZ77Box strategy tries every offset whose plane code is a near
-  // neighbour, some ninety of them. Carrying the next ring out as well was
+  // neighbor, some ninety of them. Carrying the next ring out as well was
   // measured at 0.04 points of the corpus for 19% more encode time, which is
   // the wrong way round while size is inside budget and speed is not.
   final cheapDistances = Int32List.fromList(<int>[
@@ -138,7 +138,7 @@ VP8LMatches computeMatches(Uint8List r, Uint8List g, Uint8List b, Uint8List a,
     ..sort());
   final numCheap = cheapDistances.length;
   if (numCheap > 5) {
-    throw StateError('the near-neighbour walk has five slots, not $numCheap');
+    throw StateError('the near-neighbor walk has five slots, not $numCheap');
   }
 
   // A run at an offset is the run one to the right plus one, and this walk and
@@ -184,7 +184,7 @@ VP8LMatches computeMatches(Uint8List r, Uint8List g, Uint8List b, Uint8List a,
     var best = 0;
     var bestDist = 0;
 
-    // The near-neighbour runs cost nothing to try and are the cheapest
+    // The near-neighbor runs cost nothing to try and are the cheapest
     // distances the format has, so they go first: any can leave the chain with
     // nothing to beat and be skipped entirely
     if (n0 > best) {
@@ -350,7 +350,7 @@ class _Lz77 {
   /// puts far too many positions in a slot, and no match shorter than three
   /// pixels is ever coded, so keying on two loses nothing.
   ///
-  /// libwebp keys a run of identical pixels on its colour and how much of it
+  /// libwebp keys a run of identical pixels on its color and how much of it
   /// is left, to spread the run across slots. Tried here and reverted: it made
   /// the PNG suite 11% larger and the encode 36% slower. With a pair key, the
   /// most recent entry in a run's slot is the immediately preceding pixel, so

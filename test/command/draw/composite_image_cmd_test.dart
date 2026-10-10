@@ -25,8 +25,8 @@ void main() {
         ..execute();
     });
 
-    // Compositing a solid-colour foreground over a background at a known
-    // offset with BlendMode.direct writes the fg colour into that region.
+    // Compositing a solid-color foreground over a background at a known
+    // offset with BlendMode.direct writes the fg color into that region.
     test('compositeImage writes fg pixels into the destination region',
         () async {
       // 4x4 blue foreground Command.
@@ -72,13 +72,13 @@ void main() {
       expect(result.height, equals(30));
     });
 
-    // Centred composite: the fg is placed at the centre of the background.
+    // Centered composite: the fg is placed at the center of the background.
     test('compositeImage center flag places fg at center', () async {
       final fgCmd = Command()
         ..createImage(width: 4, height: 4)
         ..fill(color: ColorRgb8(255, 0, 255));
 
-      // 16x16 green background; 4x4 fg centred → placed at (6,6)–(9,9).
+      // 16x16 green background; 4x4 fg centered → placed at (6,6)–(9,9).
       final bg = solidImage(16, 16, ColorRgb8(0, 255, 0));
       final result = await (Command()
             ..image(bg)
@@ -86,9 +86,9 @@ void main() {
           .getImage();
 
       expect(result, isNotNull);
-      final centre = result!.getPixel(7, 7);
-      expect(centre.r, equals(255));
-      expect(centre.b, equals(255));
+      final center = result!.getPixel(7, 7);
+      expect(center.r, equals(255));
+      expect(center.b, equals(255));
     });
   });
 }

@@ -90,7 +90,7 @@ class VP8BitReader {
       _value = input.readByte() | (_value << 8);
       _bits += 8;
     } else if (!_eof) {
-      // These are not strictly needed, but it makes the behaviour
+      // These are not strictly needed, but it makes the behavior
       // consistent for both USE_RIGHT_JUSTIFY and !USE_RIGHT_JUSTIFY.
       _value <<= 8;
       _bits += 8;

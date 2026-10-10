@@ -40,7 +40,7 @@ const _yuvHalf = 1 << (_yuvFix - 1);
 
 // Chroma is averaged in a lightly compressed space rather than on the raw
 // bytes: averaging gamma-encoded values darkens edges, and at 4:2:0 that shows
-// up as a colour shift along every hard boundary. libwebp uses an exponent of
+// up as a color shift along every hard boundary. libwebp uses an exponent of
 // 0.80 with a 12-bit linear representation.
 const _gammaFix = 12; // fixed-point precision of a linear value
 const _gammaTabFix = 7; // fractional bits of the table index
@@ -110,7 +110,7 @@ int _clipUV(int uv) {
 /// Converts [image] to the planes VP8 codes.
 ///
 /// Chroma is the average of each 2x2 block, weighted by alpha where the block
-/// is partly transparent so that the colour of invisible pixels cannot bleed
+/// is partly transparent so that the color of invisible pixels cannot bleed
 /// into visible ones.
 @internal
 VP8Yuv importYuv(Image image) {
@@ -179,11 +179,11 @@ const _cleanupBlock = 8;
 
 /// Replaces what sits under transparent pixels with something cheaper to code.
 ///
-/// The colour beneath a fully transparent pixel is invisible, but the encoder
+/// The color beneath a fully transparent pixel is invisible, but the encoder
 /// still pays for every edge in it. Within a block that is partly transparent
 /// the hidden luma is set to the average of the visible luma, which removes
 /// those edges; a run of blocks that are transparent throughout is flattened
-/// to one colour, which removes them entirely.
+/// to one color, which removes them entirely.
 ///
 /// libwebp does the same in `WebPCleanupTransparentArea` unless given
 /// `-exact`.
@@ -276,7 +276,7 @@ void _flatten(Uint8List plane, int off, int value, int stride, int size) {
 
 /// The picture as interleaved RGBA bytes.
 ///
-/// The general path converts pixel by pixel through the colour machinery,
+/// The general path converts pixel by pixel through the color machinery,
 /// which showed up in the profile at several percent of the whole encode. An
 /// 8-bit image is already stored interleaved in the order wanted, so it needs
 /// at most a widening pass, and a four-channel one needs nothing at all.
@@ -329,7 +329,7 @@ Uint8List _rgbaBytes(Image image) {
 /// [indices] expanded through [palette] into interleaved RGBA, byte for byte
 /// what [Image.convert] produces for the same picture.
 ///
-/// An index past the end of the palette has no colour of its own. The palette
+/// An index past the end of the palette has no color of its own. The palette
 /// getters answer 0 for every channel there, alpha included, so convert gives
 /// such a pixel transparent black from a four-channel palette and opaque black
 /// from a three-channel one. The table is pre-filled the same way, which keeps
@@ -414,7 +414,7 @@ void _accumulateRGB(
   }
 }
 
-/// As [_accumulateRGB], but weights each pixel by its alpha, so that the colour
+/// As [_accumulateRGB], but weights each pixel by its alpha, so that the color
 /// stored under a transparent pixel does not pull the visible average.
 void _accumulateRGBA(
     Uint8List rgba, int src, int stride, Int32List dst, int width) {

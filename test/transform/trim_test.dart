@@ -33,7 +33,7 @@ void main() {
     });
 
     // trim removes a uniform border: the result dimensions equal the
-    // inner block that differs from the border colour.
+    // inner block that differs from the border color.
     test('trim removes known solid border', () {
       // Build a 20x20 image filled with white, then paint a 10x10 red block
       // at (5,5).  Trimming by topLeftColor (white) should yield 10x10.
@@ -59,7 +59,7 @@ void main() {
         }
       }
       final trimmed = trim(img);
-      // Every pixel in the result should be the inner colour.
+      // Every pixel in the result should be the inner color.
       expectSolidColor(trimmed, ColorRgb8(0, 200, 100));
     });
 

@@ -98,8 +98,8 @@ void main() {
       expect(img!.numChannels, equals(4));
     });
 
-    // createImage then fill: every pixel has the fill colour.
-    test('createImage then fill produces a solid-colour image', () async {
+    // createImage then fill: every pixel has the fill color.
+    test('createImage then fill produces a solid-color image', () async {
       final img = await (Command()
             ..createImage(width: 10, height: 10)
             ..fill(color: ColorRgb8(100, 150, 200)))

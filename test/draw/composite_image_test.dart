@@ -39,7 +39,7 @@ void main() {
     });
 
     test('compositeImage direct: pixels outside dst rect are unchanged', () {
-      // A solid white background with a small red composite in the centre.
+      // A solid white background with a small red composite in the center.
       final dst = solidImage(20, 20, ColorRgb8(255, 255, 255));
       final src = solidImage(4, 4, ColorRgb8(0, 0, 0));
       compositeImage(dst, src, dstX: 8, dstY: 8, blend: BlendMode.direct);

@@ -31,16 +31,16 @@ void main() {
       ]);
     }
 
-    test('a translucent frame keeps its colour over the empty canvas', () {
-      // Nothing under it to dilute the colour with
+    test('a translucent frame keeps its color over the empty canvas', () {
+      // Nothing under it to dilute the color with
       final decoded =
           decodeWebP(blendedAnimation(ColorRgba8(200, 100, 50, 128)))!;
       final p = decoded.frames[0].getPixel(0, 0);
       expect([p.r, p.g, p.b, p.a], equals([200, 100, 50, 128]));
     });
 
-    test('two translucent frames of one colour keep that colour', () {
-      // 128 over 128 covers 192/255, and the colour cannot move
+    test('two translucent frames of one color keep that color', () {
+      // 128 over 128 covers 192/255, and the color cannot move
       final decoded =
           decodeWebP(blendedAnimation(ColorRgba8(200, 100, 50, 128)))!;
       final p = decoded.frames[1].getPixel(0, 0);

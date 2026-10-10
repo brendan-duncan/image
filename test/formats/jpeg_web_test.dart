@@ -1,4 +1,4 @@
-// JPEG behaviour that has to hold on the web as well as on the VM.
+// JPEG behavior that has to hold on the web as well as on the VM.
 //
 // Kept apart from `jpeg_test.dart` because that one reads files, and so cannot
 // run in a browser. Everything here is synthetic, so this file runs under

@@ -48,20 +48,20 @@ void main() {
     test('corner pixels outside the circle are transparent', () {
       final src = solidImage(32, 32, ColorRgb8(255, 100, 50), numChannels: 4);
       final result = copyCropCircle(src, radius: 16, centerX: 16, centerY: 16);
-      // The very corner (0,0) is outside a circle of radius 16 centred at
+      // The very corner (0,0) is outside a circle of radius 16 centered at
       // (16,16) since distance = 16*sqrt(2) ≈ 22.6 > 16.
       final corner = result.getPixel(0, 0);
       expect(corner.a, equals(0), reason: 'corner pixel should be transparent');
     });
 
-    // A pixel at the exact centre of the circle must not be cleared.
-    test('centre pixel is not transparent', () {
+    // A pixel at the exact center of the circle must not be cleared.
+    test('center pixel is not transparent', () {
       final src = solidImage(32, 32, ColorRgb8(200, 100, 50), numChannels: 4);
       final result = copyCropCircle(src, radius: 16, centerX: 16, centerY: 16);
-      // Centre of the output square = (15, 15) (diameter=32, so index 15).
-      final centre = result.getPixel(15, 15);
-      expect(centre.a, greaterThan(0),
-          reason: 'centre pixel must not be transparent');
+      // Center of the output square = (15, 15) (diameter=32, so index 15).
+      final center = result.getPixel(15, 15);
+      expect(center.a, greaterThan(0),
+          reason: 'center pixel must not be transparent');
     });
   });
 }

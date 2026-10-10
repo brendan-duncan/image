@@ -77,7 +77,7 @@ class VP8ModeScore {
   final modesI4 = Uint8List(16);
   int modeUv = 0;
 
-  /// The three chroma DC errors this coding passes to its neighbours, U then
+  /// The three chroma DC errors this coding passes to its neighbors, U then
   /// V. Only kept when error diffusion is on.
   final derr = Int8List(6);
 
@@ -344,7 +344,7 @@ class VP8Decimate {
   // Chroma DC error diffusion.
   //
   // The four chroma blocks of one channel sit in a 2x2 square. Each takes the
-  // error left over from its neighbours above and to the left before being
+  // error left over from its neighbors above and to the left before being
   // quantized, and passes its own on:
   //
   //           | top[0] | top[1]
@@ -364,7 +364,7 @@ class VP8Decimate {
   static const _dShift = 4;
 
   /// Nudges the four DC coefficients of each chroma channel by the error its
-  /// neighbours left, and records what this macroblock passes on.
+  /// neighbors left, and records what this macroblock passes on.
   @pragma('vm:unsafe:no-bounds-checks')
   void _correctDCValues(VP8ModeScore rd, VP8Matrix mtx) {
     final top = enc.topDerr!;
@@ -395,7 +395,7 @@ class VP8Decimate {
     }
   }
 
-  /// Hands the winning mode's errors to the neighbours still to be coded.
+  /// Hands the winning mode's errors to the neighbors still to be coded.
   @pragma('vm:unsafe:no-bounds-checks')
   void _storeDiffusionErrors(VP8ModeScore rd) {
     final top = enc.topDerr!;
@@ -689,7 +689,7 @@ class VP8Decimate {
     it.setIntra16Mode(rd.modeI16);
 
     // A macroblock where only the DC survived, yet which is still far from the
-    // source, is a candidate for blocking artefacts; remember how large its
+    // source, is a candidate for blocking artifacts; remember how large its
     // steps were so the filter strength can be raised later.
     if ((rd.nz & 0x100ffff) == 0x1000000 && rd.d > dqm.minDisto) {
       _storeMaxDelta(dqm, rd.yDcLevels);
@@ -720,7 +720,7 @@ class VP8Decimate {
     }
   }
 
-  /// The cost table for the current 4x4 block, given its neighbours' modes.
+  /// The cost table for the current 4x4 block, given its neighbors' modes.
   @pragma('vm:unsafe:no-bounds-checks')
   List<int> _getCostModeI4(Uint8List modes) {
     final predsW = enc.predsW;

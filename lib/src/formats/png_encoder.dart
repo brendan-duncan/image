@@ -283,7 +283,7 @@ class PngEncoder extends Encoder {
 
   void _writeCicpChunk(OutputBuffer out, PngCicpData cicp) {
     final chunk = OutputBuffer(bigEndian: true)
-      ..writeByte(cicp.colourPrimaries)
+      ..writeByte(cicp.colorPrimaries)
       ..writeByte(cicp.transferCharacteristics)
       ..writeByte(cicp.matrixCoefficients)
       ..writeByte(cicp.videoFullRangeFlag);

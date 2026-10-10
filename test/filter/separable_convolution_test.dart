@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 import '../_test_util.dart';
 
-/// Build a normalised Gaussian separable kernel with the given [radius].
+/// Build a normalized Gaussian separable kernel with the given [radius].
 SeparableKernel _gaussianKernel(int radius) {
   final kernel = SeparableKernel(radius);
   final num sigma = radius * (2.0 / 3.0);
@@ -21,11 +21,11 @@ SeparableKernel _gaussianKernel(int radius) {
   return kernel;
 }
 
-/// Build a separable identity kernel (single centre coefficient = 1).
+/// Build a separable identity kernel (single center coefficient = 1).
 SeparableKernel _identityKernel() {
   final kernel = SeparableKernel(1); // size 1 → 3 coefficients
   kernel[0] = 0;
-  kernel[1] = 1; // centre weight
+  kernel[1] = 1; // center weight
   kernel[2] = 0;
   return kernel;
 }
@@ -79,7 +79,7 @@ void main() {
     test('separableConvolution Gaussian on solid image leaves it unchanged',
         () {
       final src = solidImage(32, 32, ColorRgb8(60, 120, 180));
-      // A normalised kernel on uniform input is a weighted average of the
+      // A normalized kernel on uniform input is a weighted average of the
       // same constant value.  Two-pass floating-point accumulation may
       // introduce up to ±2 LSB rounding error.
       expectImagesClose(

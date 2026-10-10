@@ -278,7 +278,7 @@ class VP8Encoder {
 
   Uint8List _generatePartition0() {
     final bw = VP8BoolEncoder(enc.mbW * enc.mbH * 7 ~/ 8)
-      ..putBitUniform(0) // colour space
+      ..putBitUniform(0) // color space
       ..putBitUniform(0); // clamping type
     _putSegmentHeader(bw);
     _putFilterHeader(bw);

@@ -36,9 +36,9 @@ class WebPEncoder extends Encoder {
     this.alphaQuality = 100,
   });
 
-  /// Whether to preserve the colour under fully transparent pixels.
+  /// Whether to preserve the color under fully transparent pixels.
   ///
-  /// Clearing it flattens that colour into long runs, worth 15-20% on an image
+  /// Clearing it flattens that color into long runs, worth 15-20% on an image
   /// with large transparent areas, which is what cwebp does unless given its
   /// own `-exact`
   final bool exact;
@@ -62,7 +62,7 @@ class WebPEncoder extends Encoder {
   /// one corpus of screenshots, 90 cost twice the bytes of 75 and 100 cost
   /// four times, for 3 and 4.5 dB. Below 75 the curve is even: every five
   /// points takes off about six per cent, with no natural stopping point, so
-  /// how low to go is a judgement about the material rather than a number to
+  /// how low to go is a judgment about the material rather than a number to
   /// be found.
   final int quality;
 

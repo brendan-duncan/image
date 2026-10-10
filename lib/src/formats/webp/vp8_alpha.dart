@@ -1,7 +1,7 @@
 /// Coding the alpha channel of a lossy WebP.
 ///
 /// VP8 itself has no alpha, so transparency travels in its own chunk: the
-/// plane is optionally predicted from its neighbours and then compressed with
+/// plane is optionally predicted from its neighbors and then compressed with
 /// the lossless coder, which handles a single 8-bit plane well because it is
 /// usually mostly flat.
 library;

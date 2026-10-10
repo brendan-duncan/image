@@ -33,7 +33,7 @@ void main() {
 
     test('convolution identity kernel leaves image unchanged', () {
       final src = checkerImage(32, 32);
-      // The identity 3x3 kernel: only the centre coefficient is 1.
+      // The identity 3x3 kernel: only the center coefficient is 1.
       // div=1, offset=0 → output pixel == input pixel.
       const identity = [0, 0, 0, 0, 1, 0, 0, 0, 0];
       testImageEquals(
@@ -46,7 +46,7 @@ void main() {
         () {
       final src = solidImage(32, 32, ColorRgb8(80, 120, 200));
       // Uniform box-blur: all 9 weights = 1, div = 9.
-      // Every neighbourhood has the same constant values, so output == input.
+      // Every neighborhood has the same constant values, so output == input.
       const box = [1, 1, 1, 1, 1, 1, 1, 1, 1];
       testImageEquals(
         convolution(src.clone(), filter: box, div: 9, offset: 0),

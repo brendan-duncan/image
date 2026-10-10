@@ -67,7 +67,7 @@ void optimalCover(VP8LMatches matches, VP8LCostModel costs, Uint8List r,
   final fromWhich = Uint8List(numPixels + 1);
   final lengthBits = costs.lengthBits;
   final match = matches.match;
-  // Each near-neighbour distance costs the same wherever it is used.
+  // Each near-neighbor distance costs the same wherever it is used.
   final cheapDistBits = Float64List(numCheap);
   for (var c = 0; c < numCheap; c++) {
     cheapDistBits[c] = costs.distanceBits(cheapDists[c], width);
@@ -87,9 +87,9 @@ void optimalCover(VP8LMatches matches, VP8LCostModel costs, Uint8List r,
     }
 
     // Every way of reaching further is weighed: whatever the search settled
-    // on, and each near-neighbour offset. The search already tries those and
+    // on, and each near-neighbor offset. The search already tries those and
     // keeps one only when it is longest, but a shorter match at a
-    // near-neighbour distance can still win here, since those are the cheapest
+    // near-neighbor distance can still win here, since those are the cheapest
     // distances the format codes.
     for (var which = 0; which < candidates; which++) {
       final int maxLen;

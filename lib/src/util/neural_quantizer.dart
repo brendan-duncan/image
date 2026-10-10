@@ -14,7 +14,7 @@ import 'quantizer.dart';
  * Copyright (c) 1994 Anthony Dekker
  *
  * NEUQUANT Neural-Net quantization algorithm by Anthony Dekker, 1994.
- * See "Kohonen neural networks for optimal colour quantization"
+ * See "Kohonen neural networks for optimal color quantization"
  * in "Network: Computation in Neural Systems" Vol. 5 (1994) pp 351-367.
  * for a discussion of the algorithm.
  * See also  http://members.ozemail.com.au/~dekker/NEUQUANT.HTML
@@ -87,14 +87,14 @@ class NeuralQuantizer extends Quantizer {
   }
 
   void _initialize(int numberOfColors) {
-    netSize = max(numberOfColors, 4); // number of colours used
+    netSize = max(numberOfColors, 4); // number of colors used
     cutNetSize = netSize - specials;
     maxNetPos = netSize - 1;
     initRadius = netSize ~/ 8; // for 256 cols, radius starts at 32
     initBiasRadius = initRadius * radiusBias;
     _palette = PaletteUint32(256, 4);
     palette = PaletteUint8(256, 3);
-    specials = 3; // number of reserved colours used
+    specials = 3; // number of reserved colors used
     bgColor = specials - 1;
     _radiusPower = Int32List(netSize >> 3);
 
@@ -110,7 +110,7 @@ class NeuralQuantizer extends Quantizer {
     _network[4] = 255.0;
     _network[5] = 255.0;
 
-    // RESERVED bgColour  // background
+    // RESERVED bgColor  // background
     final f = 1.0 / netSize;
     for (var i = 0; i < specials; ++i) {
       _freq[i] = f;
@@ -135,7 +135,7 @@ class NeuralQuantizer extends Quantizer {
   }
 
   int _inxSearch(int b, int g, int r) {
-    // Search for BGR values 0..255 and return colour index
+    // Search for BGR values 0..255 and return color index
     var bestD = 1000; // biggest possible dist is 256*3
     var best = -1;
     var i = _netIndex[g]; // index on g
@@ -335,7 +335,7 @@ class NeuralQuantizer extends Quantizer {
       final r = red.toDouble();
 
       if (i == 0) {
-        // remember background colour
+        // remember background color
         _network[bgColor * 3] = b;
         _network[bgColor * 3 + 1] = g;
         _network[bgColor * 3 + 2] = r;
@@ -349,7 +349,7 @@ class NeuralQuantizer extends Quantizer {
         final a = (1.0 * alpha) / initAlpha;
         _alterSingle(a, j, b, g, r);
         if (rad > 0) {
-          _alterNeighbors(a, rad, j, b, g, r); // alter neighbours
+          _alterNeighbors(a, rad, j, b, g, r); // alter neighbors
         }
       }
 
@@ -475,9 +475,9 @@ class NeuralQuantizer extends Quantizer {
 
   static const numCycles = 100; // no. of learning cycles
 
-  int netSize = 16; // number of colours used
-  int specials = 3; // number of reserved colours used
-  late int bgColor; // reserved background colour
+  int netSize = 16; // number of colors used
+  int specials = 3; // number of reserved colors used
+  late int bgColor; // reserved background color
   late int cutNetSize;
   int? maxNetPos;
 

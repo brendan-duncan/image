@@ -21,6 +21,7 @@
 * Much faster `flip`, `flipVertical`, `flipHorizontal`, `copyRotate` (90, 180
   and 270 degrees) and `grayscale`.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
+* `PngCicpData.colourPrimaries` is renamed to `colorPrimaries`.
 
 # 4.10.2
 

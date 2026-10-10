@@ -25,7 +25,7 @@ void main() {
 
     test('emboss on a uniform image produces a flat (uniform) output', () {
       // The emboss kernel is [1.5, 0, 0, 0, 0, 0, 0, 0, -1.5] with offset=127.
-      // For a uniform image every neighbourhood is the same constant C, so
+      // For a uniform image every neighborhood is the same constant C, so
       // each pixel becomes (1.5*C - 1.5*C)/1 + 127 = 127, clamped to [0,255].
       final src = solidImage(32, 32, ColorRgb8(100, 100, 100));
       final result = emboss(src.clone());

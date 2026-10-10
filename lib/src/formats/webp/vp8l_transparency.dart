@@ -1,4 +1,4 @@
-/// Clearing the colour hidden under fully transparent pixels.
+/// Clearing the color hidden under fully transparent pixels.
 library;
 
 import 'dart:typed_data';
@@ -8,7 +8,7 @@ import '../../util/_internal.dart';
 /// Replaces every fully transparent pixel of [argb] with zero.
 ///
 /// Such a pixel shows nothing, but sources usually leave the original
-/// background colour under it, which then costs full price to code. Flattening
+/// background color under it, which then costs full price to code. Flattening
 /// them all to one value turns that into runs. Visible pixels and the alpha
 /// channel are untouched.
 ///

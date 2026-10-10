@@ -23,7 +23,7 @@ bool clipLine(List<int> line, List<int> rect) {
   // Compute the bit code for a point (x, y) using the clip rectangle
   // bounded diagonally by (xmin, ymin), and (xmax, ymax)
   int computeOutCode(int x, int y) {
-    var code = inside; // initialised as being inside of clip window
+    var code = inside; // initialized as being inside of clip window
     if (x < xmin) {
       // to the left of clip window
       code |= left;

@@ -37,7 +37,7 @@ void main() {
       // uint8 (0.5*255 = 127.5 rounds, 1.0*255 = 255).
       final src = solidImage(32, 32, ColorRgb8(128, 128, 128));
       final result = bumpToNormal(src);
-      // Every interior pixel must have the same colour.
+      // Every interior pixel must have the same color.
       final first = result.getPixel(0, 0);
       for (final p in result) {
         expect(p.r, equals(first.r), reason: 'r differs at ${p.x},${p.y}');

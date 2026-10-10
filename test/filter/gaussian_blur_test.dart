@@ -31,7 +31,7 @@ void main() {
 
     test('gaussianBlur on a solid-color image leaves it unchanged', () {
       final src = solidImage(32, 32, ColorRgb8(100, 150, 200));
-      // A normalised Gaussian kernel on uniform input is a weighted average of
+      // A normalized Gaussian kernel on uniform input is a weighted average of
       // identical values.  Two-pass floating-point accumulation may introduce
       // up to ±2 LSB rounding error.
       expectImagesClose(gaussianBlur(src.clone(), radius: 5), src,

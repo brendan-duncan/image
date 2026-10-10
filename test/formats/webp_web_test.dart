@@ -1,4 +1,4 @@
-// Encoder behaviour that has to hold on the web as well as on the VM.
+// Encoder behavior that has to hold on the web as well as on the VM.
 //
 // Kept apart from `webp_test.dart` because that one reads files, and so cannot
 // run in a browser. Everything here is synthetic, so this file runs under
@@ -137,7 +137,7 @@ void main() {
       // is a different path from the single-image one.
       //
       // Alpha is binary here on purpose. The decoder composites an animated
-      // frame onto the canvas, which changes the colour of a partly
+      // frame onto the canvas, which changes the color of a partly
       // transparent pixel, so comparing those would measure compositing rather
       // than coding.
       Image animation({required bool alpha}) {
@@ -233,7 +233,7 @@ void main() {
 
   group('color cache', () {
     // The cache is addressed by `argb * 0x1e35a7bd`, a product that reaches
-    // 2^62 and so is rounded on dart2js, landing on the neighbouring slot for
+    // 2^62 and so is rounded on dart2js, landing on the neighboring slot for
     // a few colors in every million. The VM cannot see it, and neither can a
     // round-trip: the decoder hashes the same way, so the package agrees with
     // itself while every conforming reader disagrees.

@@ -66,7 +66,7 @@ class VP8Config {
   /// Whether to compress the alpha plane losslessly rather than store it raw.
   final bool alphaCompression;
 
-  /// Whether to keep the colour hidden under fully transparent pixels.
+  /// Whether to keep the color hidden under fully transparent pixels.
   final bool exact;
 
   /// Whether to aim for the file size libjpeg would produce at this quality.

@@ -2,7 +2,7 @@
 ///
 /// VP8 codes every coefficient through a probability chosen by the type of
 /// block, how far into the block the coefficient sits (its band) and how large
-/// its neighbours were (its context). The encoder starts from the default
+/// its neighbors were (its context). The encoder starts from the default
 /// table, counts what it actually coded, and writes back the probabilities that
 /// pay for themselves.
 library;

@@ -1,5 +1,5 @@
 // Tests for PNG decoding with embedded ICC profile (iCCP chunk) and
-// colour information chunk (cICP), as produced by Apple devices saving
+// color information chunk (cICP), as produced by Apple devices saving
 // Display P3 images.
 //
 // Regression tests for:
@@ -44,7 +44,7 @@ void main() {
           expect(p.a.toInt(), equals(a), reason: 'pixel ($x,$y) alpha channel');
         }
 
-        // Row 0 – fully-opaque colour pixels
+        // Row 0 – fully-opaque color pixels
         checkPixel(0, 0, 255, 0, 0, 255); // red
         checkPixel(1, 0, 0, 255, 0, 255); // green
         checkPixel(2, 0, 0, 0, 255, 255); // blue
@@ -52,11 +52,11 @@ void main() {
 
         // Row 1 – mixed opacity
         checkPixel(0, 1, 0, 0, 0, 255); // black opaque
-        checkPixel(1, 1, 128, 128, 128, 255); // grey
+        checkPixel(1, 1, 128, 128, 128, 255); // gray
         checkPixel(2, 1, 255, 255, 0, 255); // yellow
         checkPixel(3, 1, 0, 0, 0, 0); // fully transparent
 
-        // Row 2 – more colours
+        // Row 2 – more colors
         checkPixel(0, 2, 0, 255, 255, 255); // cyan
         checkPixel(1, 2, 255, 0, 255, 255); // magenta
         checkPixel(2, 2, 255, 128, 0, 255); // orange
@@ -97,8 +97,8 @@ void main() {
         final cicp = decoder.info.cicpData!;
         // Our test PNG has cICP = [12, 13, 0, 1] (Display P3, sRGB transfer,
         // identity matrix, full range).
-        expect(cicp.colourPrimaries, equals(12),
-            reason: '12 = Display P3 colour primaries');
+        expect(cicp.colorPrimaries, equals(12),
+            reason: '12 = Display P3 color primaries');
         expect(cicp.transferCharacteristics, equals(13),
             reason: '13 = sRGB / Display P3 transfer function');
         expect(cicp.matrixCoefficients, equals(0),
@@ -116,7 +116,7 @@ void main() {
 
         // Encode with the cICP metadata
         const expectedCicp = PngCicpData(
-          colourPrimaries: 12,
+          colorPrimaries: 12,
           transferCharacteristics: 13,
           matrixCoefficients: 0,
           videoFullRangeFlag: 1,

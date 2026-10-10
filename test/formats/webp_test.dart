@@ -318,7 +318,7 @@ void main() {
               final dp = decoded.getPixel(x, y);
               final alpha = (x + y * 4) * 16;
               expect(dp.a.toInt(), equals(alpha));
-              // Colour under a fully transparent pixel is not preserved.
+              // Color under a fully transparent pixel is not preserved.
               if (alpha == 0) {
                 continue;
               }
@@ -715,7 +715,7 @@ void main() {
                     if (channels == 4) {
                       expect(a.a, equals(e.a),
                           reason: 'A at ($x,$y) of $label');
-                      // Colour under a fully transparent pixel is cleared.
+                      // Color under a fully transparent pixel is cleared.
                       if (e.a == 0) {
                         continue;
                       }
@@ -768,7 +768,7 @@ void main() {
                 final e = original.getPixel(x, y);
                 final a = decoded!.getPixel(x, y);
                 expect(a.a, equals(e.a), reason: '$name alpha at ($x,$y)');
-                // Colour under a fully transparent pixel is cleared, which is
+                // Color under a fully transparent pixel is cleared, which is
                 // most of why the 'transparent' pattern codes so small.
                 if (e.a == 0) {
                   continue;
@@ -957,7 +957,7 @@ void main() {
                 ..b = (128 - edge + noise).clamp(0, 255);
               if (alpha) {
                 // A hard-edged transparent corner, which is where the alpha
-                // plane and the colour under it are most likely to go wrong.
+                // plane and the color under it are most likely to go wrong.
                 image.getPixel(x, y).a = (x < w ~/ 3 && y < h ~/ 3) ? 0 : 255;
               }
             }
@@ -1030,7 +1030,7 @@ void main() {
         test('diffuses the chroma DC error below quality 98', () {
           // Banding is what this is for: on a smooth ramp every block rounds
           // its chroma DC the same way and the result is a staircase, so the
-          // leftover is spread into the neighbours instead. It is off at the
+          // leftover is spread into the neighbors instead. It is off at the
           // top of the quality range, where there is nothing to spread.
           Image ramp(int w, int h) {
             final image = Image(width: w, height: h);
@@ -1214,7 +1214,7 @@ void main() {
         test('a paletted image encodes to the same bytes as its RGBA', () {
           // The lossy path expands a palette through a lookup table instead of
           // going pixel by pixel through Image.convert. Both must agree,
-          // including on an index the palette has no colour for: convert
+          // including on an index the palette has no color for: convert
           // gives that pixel black, transparent when the palette carries
           // alpha and opaque otherwise.
           for (final channels in [3, 4]) {
@@ -1310,7 +1310,7 @@ void main() {
               reason: 'optimalCover keeps token lengths in a Uint16List');
         });
 
-        test('every near-neighbour offset stays inside the planes', () {
+        test('every near-neighbor offset stays inside the planes', () {
           // They index the planes backwards with bounds checks off, and the
           // width they come from is capped well below the largest distance
           for (final width in const [1, 2, 3, 4, 17, 1024, maxDimension]) {
@@ -1354,7 +1354,7 @@ void main() {
         }
 
         test('a run at distance 1 is clipped to the length field', () {
-          // One colour over 9000 pixels: every position repeats the one
+          // One color over 9000 pixels: every position repeats the one
           // before for the rest of the image, more than one match can say
           const width = 100;
           const n = width * 90;
@@ -1371,7 +1371,7 @@ void main() {
         });
 
         test('a run at distance 2 is clipped to the length field', () {
-          // Two colours alternating, so only even offsets repeat and the
+          // Two colors alternating, so only even offsets repeat and the
           // counter for distance 2 is the one that has to stop at the cap
           const width = 101;
           const n = width * 90;
@@ -1408,7 +1408,7 @@ void main() {
             final a = Uint8List(n);
             final rnd = Random(n);
             for (var i = 0; i < n; i++) {
-              // Rows that repeat, stretches of one colour, and noise
+              // Rows that repeat, stretches of one color, and noise
               final y = i ~/ w;
               final kind = y % 3;
               r[i] = kind == 0 ? (i % w) & 0xff : rnd.nextInt(4);
@@ -1460,7 +1460,7 @@ void main() {
         }, testOn: 'vm');
 
         // Where the run walks can step off the end: runs touching the last
-        // pixel, runs at exactly the near-neighbour offsets, and widths too
+        // pixel, runs at exactly the near-neighbor offsets, and widths too
         // narrow for five distinct offsets
         for (final shape in const [
           [1, 1],
@@ -1491,7 +1491,7 @@ void main() {
                     p.setRgba(rnd.nextInt(256), rnd.nextInt(256),
                         rnd.nextInt(256), rnd.nextInt(256));
                   case 'runs':
-                    // Long stretches of one colour broken by single pixels, so
+                    // Long stretches of one color broken by single pixels, so
                     // a run can end on the last pixel of the image
                     final v = ((p.y * w + p.x) ~/ 97) & 1;
                     p.setRgba(v * 255, v * 255, v * 255, 255);
@@ -1510,7 +1510,7 @@ void main() {
         }
 
         test('a run longer than the length field round-trips', () {
-          // One colour across more pixels than a single match can cover, so the
+          // One color across more pixels than a single match can cover, so the
           // search has to clip and start again rather than wrap the field
           const w = maxMatchLength ~/ 4;
           final src = Image(width: w, height: 9, numChannels: 4)
@@ -1604,7 +1604,7 @@ void main() {
       });
 
       group('transparent pixels', () {
-        Image withHiddenColour() {
+        Image withHiddenColor() {
           final image = Image(width: 40, height: 30, numChannels: 4);
           var seed = 7;
           for (var y = 0; y < 30; y++) {
@@ -1622,7 +1622,7 @@ void main() {
         }
 
         test('are kept by default and cleared only when asked', () {
-          final original = withHiddenColour();
+          final original = withHiddenColor();
 
           final strictImage = decodeWebP(encodeWebP(original))!;
           final looseImage = decodeWebP(encodeWebP(original, exact: false))!;
@@ -1665,7 +1665,7 @@ void main() {
       });
 
       group('transform analysis', () {
-        // Building an image whose pixels favour a particular transform set.
+        // Building an image whose pixels favor a particular transform set.
         Image synth(int w, int h, int Function(int x, int y) argb) {
           final im = Image(width: w, height: h, numChannels: 4);
           for (var y = 0; y < h; y++) {
@@ -1687,9 +1687,9 @@ void main() {
             // Smooth in space and correlated across channels.
             'gradient': synth(70, 50,
                 (x, y) => 0xff000000 | ((x + y) * 0x010101) & 0x00ffffff),
-            // Grey: red and blue vanish under subtract-green, so cross-color
+            // Gray: red and blue vanish under subtract-green, so cross-color
             // has nothing left to do.
-            'grey': synth(70, 50, (x, y) {
+            'gray': synth(70, 50, (x, y) {
               final v = (x * 3 + y * 5) & 0xff;
               return 0xff000000 | (v << 16) | (v << 8) | v;
             }),
@@ -1761,7 +1761,7 @@ void main() {
           final out = Uint32List(numPredictors);
           for (var trial = 0; trial < 2000; trial++) {
             // Cover the clamping edges of predictors 12 and 13, which only
-            // trigger when neighbours sit near 0 or 255.
+            // trigger when neighbors sit near 0 or 255.
             final int Function() pick = switch (trial % 3) {
               0 => () => rnd.nextInt(0x100000000),
               1 => () => rnd.nextBool() ? 0x00000000 : 0xffffffff,
@@ -1881,9 +1881,9 @@ void main() {
     });
 
     group('animation round trip', () {
-      test('a semi transparent frame comes back at its own colour', () {
+      test('a semi transparent frame comes back at its own color', () {
         // Frames are whole pictures drawn on a canvas the previous frame
-        // cleared, and blending one against an empty canvas leaves its colour
+        // cleared, and blending one against an empty canvas leaves its color
         // multiplied by its own alpha
         final frame = _flat(16, 16, 200, 100, 50, channels: 4, alpha: 128);
         frame
@@ -1938,7 +1938,7 @@ void main() {
 
         expect(back.loopCount, equals(7));
         final bg = back.backgroundColor;
-        expect(bg, isNotNull, reason: 'background colour');
+        expect(bg, isNotNull, reason: 'background color');
         expect([bg!.r, bg.g, bg.b, bg.a], equals([255, 0, 0, 255]));
         expect(back.iccProfile?.data.length, equals(64));
         expect(back.exif.imageIfd['Make']?.toString(), equals('roundtrip'));
@@ -2204,7 +2204,7 @@ void main() {
         }
       });
 
-      test('a one channel image is grey, not red', () {
+      test('a one channel image is gray, not red', () {
         // Pixel.g and Pixel.b answer zero for a one channel image, so
         // reading them writes the picture in red, while the lossy path
         // converts to YUV and gets it right
@@ -2228,8 +2228,8 @@ void main() {
         final lossy =
             decodeWebP(encodeWebP(gray, lossless: false, quality: 95))!;
         final p = lossy.getPixel(20, 5);
-        expect(p.g, closeTo(p.r, 2), reason: 'lossy pixel is not grey');
-        expect(p.b, closeTo(p.r, 2), reason: 'lossy pixel is not grey');
+        expect(p.g, closeTo(p.r, 2), reason: 'lossy pixel is not gray');
+        expect(p.b, closeTo(p.r, 2), reason: 'lossy pixel is not gray');
       });
 
       test('a sixteen bit image is scaled down, not clipped', () {
@@ -2273,7 +2273,7 @@ void main() {
       ]) {
         test('a sixteen bit two channel image keeps its transparency, $name',
             () {
-          // Grey plus alpha at eight bits already round trips. At sixteen the
+          // Gray plus alpha at eight bits already round trips. At sixteen the
           // encoder reads the second channel as green and finds no alpha at
           // all, so the picture is written fully transparent.
           final source =
@@ -2285,15 +2285,15 @@ void main() {
           expect(back.width, equals(source.width));
           expect(back.height, equals(source.height));
           for (final p in source) {
-            final grey = (p[0] * 255 / 65535).round();
+            final gray = (p[0] * 255 / 65535).round();
             final alpha = (p[1] * 255 / 65535).round();
             final q = back.getPixel(p.x, p.y);
             expect(q.a, equals(alpha), reason: 'alpha at ${p.x},${p.y}');
-            // Lossless drops the colour of a fully transparent pixel unless
+            // Lossless drops the color of a fully transparent pixel unless
             // asked to keep it
             if (alpha != 0) {
-              expect([q.r, q.g, q.b], equals([grey, grey, grey]),
-                  reason: 'grey at ${p.x},${p.y}');
+              expect([q.r, q.g, q.b], equals([gray, gray, gray]),
+                  reason: 'gray at ${p.x},${p.y}');
             }
           }
         });
@@ -2469,7 +2469,7 @@ const _webpTests = {
   },
 };
 
-/// A single colour image.
+/// A single color image.
 Image _flat(int w, int h, int r, int g, int b,
     {int channels = 3, int alpha = 255}) {
   final im = Image(width: w, height: h, numChannels: channels);

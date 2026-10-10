@@ -32,7 +32,7 @@ const maxDimension = 16383;
 class VP8LEncoder {
   VP8LEncoder({this.exact = false});
 
-  /// Whether the colour hidden under fully transparent pixels must be kept
+  /// Whether the color hidden under fully transparent pixels must be kept
   ///
   /// Clearing it flattens those pixels into long runs, which is what cwebp
   /// does unless given its own `-exact`
@@ -63,7 +63,7 @@ class VP8LEncoder {
     final hasAlpha = image.hasAlpha;
     // Pixel.g and Pixel.b answer zero for a one channel image, so reading
     // them writes the picture in red
-    final grey = image.numChannels == 1;
+    final gray = image.numChannels == 1;
     // WebP carries eight bits a channel, so a deeper image is scaled, not
     // clamped: clamping turns everything above 255 white.
     final maxValue = image.maxChannelValue;
@@ -73,8 +73,8 @@ class VP8LEncoder {
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         final p = image.getPixel(x, y);
-        final pg = grey ? p.r : p.g;
-        final pb = grey ? p.r : p.b;
+        final pg = gray ? p.r : p.g;
+        final pb = gray ? p.r : p.b;
         if (scale == 1.0) {
           g[i] = pg.toInt().clamp(0, 255);
           r[i] = p.r.toInt().clamp(0, 255);
@@ -108,7 +108,7 @@ class VP8LEncoder {
     return out.getBytes();
   }
 
-  /// Encodes four colour planes as a bare VP8L stream, with no image header.
+  /// Encodes four color planes as a bare VP8L stream, with no image header.
   ///
   /// The alpha channel of a lossy file is carried this way: it is a VP8L image
   /// in its own right, but its size is already known from the frame, so the
@@ -135,7 +135,7 @@ class VP8LEncoder {
     }
 
     // Done before the palette is counted, since flattening collapses whatever
-    // colours were hiding under transparent pixels and can bring an image
+    // colors were hiding under transparent pixels and can bring an image
     // under the palette limit.
     if (!exact && alphaIsUsed) {
       clearTransparentPixels(argb);
@@ -538,10 +538,10 @@ class VP8LEncoder {
         return null;
       }
     }
-    // Ascending ARGB. libwebp also offers an order that minimises the
-    // difference between neighbouring entries, since the palette is stored
+    // Ascending ARGB. libwebp also offers an order that minimizes the
+    // difference between neighboring entries, since the palette is stored
     // delta-coded; ported and measured at 360 bytes *worse* over a 587 image
-    // corpus. It optimises the palette's own storage, which is at most a few
+    // corpus. It optimizes the palette's own storage, which is at most a few
     // hundred bytes, while the indices it does not touch are the bulk of the
     // data. Its co-occurrence-based sibling (PaletteSortModifiedZeng) targets
     // the indices instead and would be the one to try, but palette images are

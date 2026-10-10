@@ -1,4 +1,4 @@
-/// Walks the picture macroblock by macroblock, keeping the neighbouring
+/// Walks the picture macroblock by macroblock, keeping the neighboring
 /// samples and contexts each one needs.
 library;
 
@@ -20,7 +20,7 @@ const _topLeftI4 = [
   5, 9, 13, 17
 ];
 
-/// The current macroblock, its neighbours, and the scratch buffers the search
+/// The current macroblock, its neighbors, and the scratch buffers the search
 /// works in.
 @internal
 class VP8EncIterator {
@@ -98,7 +98,7 @@ class VP8EncIterator {
     uvTop = enc.uvTop;
     setRow(0);
     countDown = enc.mbW * enc.mbH;
-    // The picture's top border acts as a row of mid-grey samples.
+    // The picture's top border acts as a row of mid-gray samples.
     enc.yTop.fillRange(0, enc.yTop.length, 127);
     enc.uvTop.fillRange(0, enc.uvTop.length, 127);
     enc.nz.fillRange(0, enc.nz.length, 0);
@@ -108,7 +108,7 @@ class VP8EncIterator {
 
   /// Chroma DC error carried in from the block to the left, two values per
   /// channel. Reset at the start of every macroblock row, since there is no
-  /// left neighbour there.
+  /// left neighbor there.
   final leftDerr = Int8List(4);
 
   void setRow(int row) {
@@ -148,7 +148,7 @@ class VP8EncIterator {
   /// Copies the current macroblock out of the picture, replicating the edge
   /// where the macroblock hangs over the right or bottom border.
   ///
-  /// When [sourceBoundary] is set the neighbouring samples are taken from the
+  /// When [sourceBoundary] is set the neighboring samples are taken from the
   /// source rather than from the reconstruction, which is what the analysis
   /// pass wants: it measures the picture, not the coding so far.
   @pragma('vm:unsafe:no-bounds-checks')
@@ -226,7 +226,7 @@ class VP8EncIterator {
     }
   }
 
-  /// Keeps the reconstructed edges of this macroblock for its neighbours.
+  /// Keeps the reconstructed edges of this macroblock for its neighbors.
   @pragma('vm:unsafe:no-bounds-checks')
   void saveBoundary() {
     const ySrc = yOffEnc;
@@ -280,7 +280,7 @@ class VP8EncIterator {
   //   22 23
   //   24            the luma DC block of an intra 16x16 macroblock
 
-  /// Unpacks the neighbouring patterns into [topNz] and [leftNz].
+  /// Unpacks the neighboring patterns into [topNz] and [leftNz].
   @pragma('vm:unsafe:no-bounds-checks')
   void nzToBytes() {
     final tnz = enc.nz[nzPos];

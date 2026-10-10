@@ -155,7 +155,7 @@ Image resize(Image src,
 
   // Enlarging either axis can overwrite source pixels that are still needed,
   // even when the destination has the same or a smaller total pixel count.
-  // Cubic also reads previous neighbours. Letterbox padding is unsupported
+  // Cubic also reads previous neighbors. Letterbox padding is unsupported
   // in place: offsets move writes ahead of unread source pixels, and clearing
   // the background would erase the source before it is sampled.
   if (width > src.width ||
@@ -306,7 +306,7 @@ void _resizeNearestBuffer(Image frame, int width, int height,
 // Direct data reads in that chain would bypass the cache and require adapting
 // this sampler; immutable-source comparison tests protect that assumption.
 // During downscaling, output row y ends before source row y + 1. Newly
-// needed future rows are untouched; overlapping neighbours stay in the ring.
+// needed future rows are untouched; overlapping neighbors stay in the ring.
 class _CubicRows extends Image {
   final Image _rows;
   final List<int> _tags = List.filled(4, -1);

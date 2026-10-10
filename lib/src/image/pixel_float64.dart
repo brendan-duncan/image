@@ -210,7 +210,7 @@ class PixelFloat64 extends Iterable<num> implements Pixel {
   @override
   num getChannel(Channel channel) => channel == Channel.luminance
       ? luminance
-      // A 2 channel image is grayscale+alpha, so the colour channels are
+      // A 2 channel image is grayscale+alpha, so the color channels are
       // the gray sample and alpha is channel 1.
       : numChannels == 2
           ? (channel == Channel.alpha ? a : r)

@@ -46,7 +46,7 @@ class VP8BoolEncoder {
   VP8BoolEncoder([int expectedSize = 1024])
       : _buf = Uint8List(expectedSize < 1024 ? 1024 : expectedSize);
 
-  // The tables are held per instance: a field load beats the initialisation
+  // The tables are held per instance: a field load beats the initialization
   // guard a top-level `final` carries on every access, and `putBit` is the
   // single hottest call in the encoder.
   final Uint8List _normTable = _norm;

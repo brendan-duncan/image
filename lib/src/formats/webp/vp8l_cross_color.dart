@@ -42,7 +42,7 @@ int colorTransformDelta(int multiplier, int color) =>
 /// Fits the multiplier that best predicts the first [n] of [target] from
 /// [source].
 ///
-/// The least squares estimate lands close, and the handful of neighbours around
+/// The least squares estimate lands close, and the handful of neighbors around
 /// it are then scored on what they actually cost to code, which the closed form
 /// cannot see because of the shift and the wrap to eight bits.
 @pragma('vm:unsafe:no-bounds-checks')

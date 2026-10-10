@@ -64,7 +64,7 @@ void analyzeSegments(VP8EncState enc) {
   final totalMb = enc.mbW * enc.mbH;
 
   do {
-    // The analysis pretends the reconstruction is perfect, so the neighbours
+    // The analysis pretends the reconstruction is perfect, so the neighbors
     // it predicts from are the source samples.
     it.import(sourceBoundary: true);
     analyzer.analyze(alphas);
@@ -202,7 +202,7 @@ class _MBAnalyzer {
   /// sixteen block means against a threshold.
   int _fastAnalyze() {
     final q = enc.config.quality.toInt();
-    // Around the block size, favouring 4x4 at high quality.
+    // Around the block size, favoring 4x4 at high quality.
     final threshold = 8 + (17 - 8) * q ~/ 100;
     final dc = Uint32List(16);
     for (var k = 0; k < 16; k += 4) {
@@ -241,7 +241,7 @@ void _assignSegments(VP8EncState enc, Int32List alphas) {
   maxA = n;
   final rangeA = maxA - minA;
 
-  // Start with the centres spread evenly over the range that is in use.
+  // Start with the centers spread evenly over the range that is in use.
   for (var k = 0, i = 1; k < nb; k++, i += 2) {
     centers[k] = minA + (i * rangeA) ~/ (2 * nb);
   }
@@ -249,7 +249,7 @@ void _assignSegments(VP8EncState enc, Int32List alphas) {
   for (var k = 0; k < _maxItersKMeans; k++) {
     accum.fillRange(0, nb, 0);
     distAccum.fillRange(0, nb, 0);
-    // The centres stay sorted, so the nearest one can be tracked by walking
+    // The centers stay sorted, so the nearest one can be tracked by walking
     // forward with 'a'.
     var c = 0;
     for (var a = minA; a <= maxA; a++) {
@@ -290,7 +290,7 @@ void _assignSegments(VP8EncState enc, Int32List alphas) {
   _setSegmentAlphas(enc, centers, weightedAverage);
 }
 
-/// Turns the cluster centres into the per-segment susceptibilities that drive
+/// Turns the cluster centers into the per-segment susceptibilities that drive
 /// the quantizer and the filter strength.
 void _setSegmentAlphas(VP8EncState enc, Int32List centers, int mid) {
   final nb = enc.numSegments;

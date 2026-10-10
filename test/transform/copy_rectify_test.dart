@@ -98,7 +98,7 @@ void main() {
       );
       // The returned object should be the same target instance.
       expect(identical(result, target), isTrue);
-      // And it should be filled with the source colour.
+      // And it should be filled with the source color.
       expectSolidColor(result, ColorRgb8(255, 0, 0));
     });
   });

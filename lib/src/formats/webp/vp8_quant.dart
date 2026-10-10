@@ -352,7 +352,7 @@ class VP8SegmentInfo {
   /// The segment's quantizer index.
   int quant = 0;
 
-  /// In-loop filtering strength signalled for this segment.
+  /// In-loop filtering strength signaled for this segment.
   int fstrength = 0;
 
   /// Largest edge step seen, used to pick the filter strength.
@@ -458,7 +458,7 @@ class VP8Quantizers {
         (uvAlpha - midAlpha) * (_maxDqUv - _minDqUv) ~/ (maxAlpha - minAlpha);
     dqUvAcValue = dqUvAcValue * config.snsStrength ~/ 100;
     dqUvAc = _clip(dqUvAcValue, _minDqUv, _maxDqUv);
-    // Chroma reacts badly to a coarse DC step - flat blocks of colour appear -
+    // Chroma reacts badly to a coarse DC step - flat blocks of color appear -
     // so its DC is pushed the other way.
     dqUvDc = _clip(-4 * config.snsStrength ~/ 100, -15, 15);
 

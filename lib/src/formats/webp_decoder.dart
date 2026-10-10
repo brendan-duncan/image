@@ -171,7 +171,7 @@ class WebPDecoder extends Decoder {
               y1: previous.y,
               x2: previous.x + previous.width - 1,
               y2: previous.y + previous.height - 1,
-              // libwebp clears to transparent, not to the ANIM colour
+              // libwebp clears to transparent, not to the ANIM color
               color: _transparent,
               // blending would turn a zero alpha fill into a no-op
               alphaBlend: false);

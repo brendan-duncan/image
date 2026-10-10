@@ -51,7 +51,7 @@ void main() {
     });
 
     test('billboard output pixel values are in valid range', () {
-      // The filter mixes colours and applies a posterisation step; all channel
+      // The filter mixes colors and applies a posterization step; all channel
       // values must stay within [0, maxChannelValue].
       final src = checkerImage(64, 64);
       final result = billboard(src.clone());

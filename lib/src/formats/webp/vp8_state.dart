@@ -62,7 +62,7 @@ class VP8EncState {
   late final Uint8List mbAlpha;
 
   /// Intra modes of every 4x4 block, with a border of `B_DC_PRED` around the
-  /// picture so that neighbour lookups need no bounds checks.
+  /// picture so that neighbor lookups need no bounds checks.
   late final Uint8List preds;
 
   /// Index of the picture's top-left 4x4 block within [preds].
@@ -82,7 +82,7 @@ class VP8EncState {
   ///
   /// Null above [errorDiffusionQuality], where the feature is off. Rounding a
   /// flat gradient's DC the same way in every block turns it into visible
-  /// steps; spreading the leftover into the neighbours breaks the steps up,
+  /// steps; spreading the leftover into the neighbors breaks the steps up,
   /// which costs nothing in bits and a good deal of banding.
   late final Int8List? topDerr;
 

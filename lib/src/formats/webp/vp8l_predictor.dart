@@ -20,7 +20,7 @@ import 'vp8l_huffman_encoder.dart' as huffman;
 @internal
 const numPredictors = 14;
 
-/// The prediction on the top-left pixel, where no neighbour exists.
+/// The prediction on the top-left pixel, where no neighbor exists.
 @internal
 const argbBlack = 0xff000000;
 
@@ -78,7 +78,7 @@ int _select(int a, int b, int c) {
   return paMinusPb <= 0 ? a : b;
 }
 
-/// The A,R,G,B predicted by [mode] from the four neighbours, packed.
+/// The A,R,G,B predicted by [mode] from the four neighbors, packed.
 ///
 /// This is the readable statement of the transform. [predictAll] computes the
 /// same values in a form the mode search can afford; a test holds the two to
@@ -162,7 +162,7 @@ int _residualMagnitude(int v, int p) {
   return cost + (d < 128 ? d : 256 - d);
 }
 
-/// Picks a predictor for each block, minimising the summed magnitude of the
+/// Picks a predictor for each block, minimizing the summed magnitude of the
 /// residuals it leaves behind.
 @internal
 @pragma('vm:unsafe:no-bounds-checks')

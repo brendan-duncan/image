@@ -32,7 +32,7 @@ void main() {
     test('smooth reduces variance of a checker image', () {
       final src = checkerImage(64, 64, cell: 4);
       final result = smooth(src.clone(), weight: 0.5);
-      // Smoothing averages neighbouring pixels → lower variance.
+      // Smoothing averages neighboring pixels → lower variance.
       expect(imageVariance(result), lessThan(imageVariance(src)));
     });
 
