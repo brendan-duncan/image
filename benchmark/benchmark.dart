@@ -81,6 +81,9 @@ final benchmarks = <Benchmark>[
       'resize_cubic', (i) => i.rgb, (img) => _resize(img, Interpolation.cubic)),
   Benchmark('resize_average', (i) => i.rgb,
       (img) => _resize(img, Interpolation.average)),
+  // A portrait phone photo: copyResize bakes the orientation first.
+  Benchmark('resize_portrait', (i) => i.rgb..exif.imageIfd.orientation = 6,
+      (img) => _resize(img, Interpolation.linear)),
   Benchmark('gaussian_blur_r5', (i) => i.rgb,
       (img) => gaussianBlur(_i(img).clone(), radius: 5)),
   Benchmark('convolution_sharpen', (i) => i.small,

@@ -8,31 +8,45 @@ import 'flip.dart';
 /// bake the orientation of the image for image formats that don't support exif
 /// data.
 Image bakeOrientation(Image image) {
-  final bakedImage = Image.from(image);
   if (!image.exif.imageIfd.hasOrientation ||
       image.exif.imageIfd.orientation == 1) {
-    return bakedImage;
+    return Image.from(image);
+  }
+
+  // Rotations make a new image, so they read straight from [image]; flips
+  // work in place, on a copy.
+  final orientation = image.exif.imageIfd.orientation;
+  final Image baked;
+  switch (orientation) {
+    case 2:
+      baked = flipHorizontal(Image.from(image));
+      break;
+    case 3:
+      baked = flip(Image.from(image), direction: FlipDirection.both);
+      break;
+    case 4:
+      // Rotating 180 degrees and flipping horizontally is a vertical flip.
+      baked = flipVertical(Image.from(image));
+      break;
+    case 5:
+      baked = flipHorizontal(copyRotate(image, angle: 90));
+      break;
+    case 6:
+      baked = copyRotate(image, angle: 90);
+      break;
+    case 7:
+      baked = flipHorizontal(copyRotate(image, angle: -90));
+      break;
+    case 8:
+      baked = copyRotate(image, angle: -90);
+      break;
+    default:
+      baked = Image.from(image);
+      break;
   }
 
   // Copy all exif data except for orientation
-  bakedImage.exif = ExifData.from(image.exif);
-  bakedImage.exif.imageIfd.orientation = null;
-
-  switch (image.exif.imageIfd.orientation) {
-    case 2:
-      return flipHorizontal(bakedImage);
-    case 3:
-      return flip(bakedImage, direction: FlipDirection.both);
-    case 4:
-      return flipHorizontal(copyRotate(bakedImage, angle: 180));
-    case 5:
-      return flipHorizontal(copyRotate(bakedImage, angle: 90));
-    case 6:
-      return copyRotate(bakedImage, angle: 90);
-    case 7:
-      return flipHorizontal(copyRotate(bakedImage, angle: -90));
-    case 8:
-      return copyRotate(bakedImage, angle: -90);
-  }
-  return bakedImage;
+  baked.exif = ExifData.from(image.exif);
+  baked.exif.imageIfd.orientation = null;
+  return baked;
 }
