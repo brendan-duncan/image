@@ -127,11 +127,13 @@ Image flipHorizontalVertical(Image src) {
     final frame = src.frames[i];
     final w = frame.width;
     final h = frame.height;
-    final h2 = h ~/ 2;
 
     if (frame.hasPalette) {
-      for (var y = 0, y2 = h - 1; y < h2; ++y, --y2) {
-        for (var x = 0, x2 = w - 1; x < w; ++x, --x2) {
+      // When the height is odd, the middle row (y == y2) is reversed in
+      // place, so only its left half is swapped with its right half.
+      for (var y = 0, y2 = h - 1; y <= y2; ++y, --y2) {
+        final xEnd = y == y2 ? w ~/ 2 : w;
+        for (var x = 0, x2 = w - 1; x < xEnd; ++x, --x2) {
           final p1 = frame.getPixel(x, y);
           final p2 = frame.getPixel(x2, y2);
           final t = p1.index;
@@ -140,8 +142,11 @@ Image flipHorizontalVertical(Image src) {
         }
       }
     } else {
-      for (var y = 0, y2 = h - 1; y < h2; ++y, --y2) {
-        for (var x = 0, x2 = w - 1; x < w; ++x, --x2) {
+      // When the height is odd, the middle row (y == y2) is reversed in
+      // place, so only its left half is swapped with its right half.
+      for (var y = 0, y2 = h - 1; y <= y2; ++y, --y2) {
+        final xEnd = y == y2 ? w ~/ 2 : w;
+        for (var x = 0, x2 = w - 1; x < xEnd; ++x, --x2) {
           final p1 = frame.getPixel(x, y);
           final p2 = frame.getPixel(x2, y2);
           var t = p1.r;

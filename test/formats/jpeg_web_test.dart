@@ -46,6 +46,31 @@ void main() {
           expect(maxDiff, lessThan(chroma == JpegChroma.yuv444 ? 8 : 24));
         });
       }
+
+      for (final gray in [false, true]) {
+        test('orientation is baked in${gray ? ' (grayscale)' : ''}', () {
+          var src = _gradient(37, 29);
+          if (gray) {
+            src = src.convert(numChannels: 1);
+          }
+          final upright = decodeJpg(encodeJpg(src))!;
+          for (var orientation = 2; orientation <= 8; ++orientation) {
+            src.exif.imageIfd.orientation = orientation;
+            final decoded = decodeJpg(encodeJpg(src))!;
+            final expected = bakeOrientation(
+                upright.clone()..exif.imageIfd.orientation = orientation);
+            expect(decoded.width, equals(expected.width),
+                reason: 'orientation $orientation');
+            expect(decoded.height, equals(expected.height),
+                reason: 'orientation $orientation');
+            for (final p in expected) {
+              final q = decoded.getPixel(p.x, p.y);
+              expect([q.r, q.g, q.b], equals([p.r, p.g, p.b]),
+                  reason: 'orientation $orientation at ${p.x},${p.y}');
+            }
+          }
+        });
+      }
     });
   });
 }

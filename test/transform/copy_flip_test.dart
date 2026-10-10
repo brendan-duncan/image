@@ -117,6 +117,22 @@ void main() {
       testImageEquals(bothFlip, hvFlip);
     });
 
+    test('both flip equals horizontal then vertical flip, odd size', () {
+      // An odd height has a middle row that must still be reversed.
+      final src = Image(width: 7, height: 5);
+      for (final p in src) {
+        p.setRgb(p.x * 30, p.y * 50, 0);
+      }
+      for (final image in [src, src.convert(withPalette: true)]) {
+        final bothFlip = copyFlip(image, direction: FlipDirection.both);
+        final hvFlip = copyFlip(
+          copyFlip(image, direction: FlipDirection.horizontal),
+          direction: FlipDirection.vertical,
+        );
+        testImageEquals(bothFlip, hvFlip);
+      }
+    });
+
     // Dimensions are preserved for all flip directions.
     test('copyFlip preserves image dimensions', () {
       final src = quadrantImage(20, 10);

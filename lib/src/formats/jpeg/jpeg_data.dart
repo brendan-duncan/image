@@ -8,6 +8,7 @@ import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import '_component_data.dart';
 import '_jpeg_huffman.dart';
+import '_jpeg_image.dart';
 import '_jpeg_quantize_html.dart' if (dart.library.io) '_jpeg_quantize_io.dart';
 import 'jpeg_adobe.dart';
 import 'jpeg_component.dart';

@@ -4,6 +4,8 @@
 * Fix `gaussianBlur` and `separableConvolution` only blurring the first frame.
 * Fix `trim` copying the first frame into every frame.
 * Fix `GifEncoder.ditherStrength` being ignored after the first frame.
+* Fix `flip` (both directions) and `bakeOrientation` (orientation 3) not
+  flipping the middle row of odd-height images.
 * Fix `OutputBuffer` growth taking quadratic time; 8-bit BMP encoding is ~5x
   faster.
 * Lower peak memory when encoding BMP and TGA images.
