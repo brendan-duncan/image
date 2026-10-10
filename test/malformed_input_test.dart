@@ -340,6 +340,20 @@ void main() {
       expect(() => decodePsd(psd), _throwsImageException);
     });
 
+    test('PSD with large planes and no data', () {
+      final psd = Uint8List(26 + 4 + 4 + 12 + 2);
+      ByteData.sublistView(psd)
+        ..setUint32(0, 0x38425053) // 8BPS
+        ..setUint16(4, 1) // version
+        ..setUint16(12, 4) // channels
+        ..setUint32(14, 8000) // height
+        ..setUint32(18, 8000) // width
+        ..setUint16(22, 8) // depth
+        ..setUint16(24, 3) // RGB
+        ..setUint32(34, 8); // empty layer and mask sections
+      expect(() => decodePsd(psd), _throwsImageException);
+    });
+
     test('EXR declaring a huge size', () {
       List<int> int32(int v) =>
           [v & 0xff, v >> 8 & 0xff, v >> 16 & 0xff, v >> 24 & 0xff];

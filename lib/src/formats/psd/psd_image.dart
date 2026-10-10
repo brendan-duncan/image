@@ -48,6 +48,7 @@ class PsdImage implements DecodeInfo {
   static const resourceBlockSignature = 0x3842494d; // '8BIM'
 
   late InputBuffer? _input;
+  final int _fileLength;
 
   //InputBuffer? _colorData;
   InputBuffer? _imageResourceData;
@@ -63,7 +64,8 @@ class PsdImage implements DecodeInfo {
   final int maxPixels;
 
   PsdImage(List<int> bytes, {int? maxPixels})
-      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels {
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels,
+        _fileLength = bytes.length {
     _input = InputBuffer(bytes, bigEndian: true);
 
     _readHeader();
@@ -486,9 +488,19 @@ class PsdImage implements DecodeInfo {
     }
 
     final budget = PixelBudget(maxPixels);
+    // Each channel is a plane of the image, and a PSD's RLE data can't be
+    // much smaller than its planes, so malformed data claiming many large
+    // planes is rejected rather than allocated.
+    final sampleBytes = depth == 16 ? 2 : 1;
+    var planeBytes = width * height * channels * sampleBytes;
     for (final layer in layers) {
       checkPixels(layer.width, layer.height, maxPixels, allowEmpty: true);
       budget.add(layer.width, layer.height);
+      planeBytes +=
+          layer.width * layer.height * layer.channels.length * sampleBytes;
+    }
+    if (planeBytes > max(128 * _fileLength, 1 << 24)) {
+      throw ImageException('PSD data is too small for its size');
     }
     for (var i = 0; i < layers.length; ++i) {
       layers[i].readImageData(layerData, this);
