@@ -3,6 +3,7 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
+import '_frame_copy.dart';
 
 /// Apply sketch filter to the image.
 ///
@@ -15,10 +16,12 @@ Image sketch(Image src,
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);
   }
+  Image? scratch;
   for (final frame in src.frames) {
     final width = frame.width;
     final height = frame.height;
-    final orig = Image.from(frame, noAnimation: true);
+    scratch = copyFrameReusing(frame, scratch);
+    final orig = scratch;
     for (final p in frame) {
       final ny = (p.y - 1).clamp(0, height - 1);
       final py = (p.y + 1).clamp(0, height - 1);

@@ -2,6 +2,7 @@ import '../color/channel.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../util/math_util.dart';
+import '_frame_copy.dart';
 
 Image stretchDistortion(Image src,
     {int? centerX,
@@ -12,8 +13,10 @@ Image stretchDistortion(Image src,
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);
   }
+  Image? scratch;
   for (final frame in src.frames) {
-    final orig = frame.clone(noAnimation: true);
+    scratch = copyFrameReusing(frame, scratch);
+    final orig = scratch;
     final w = frame.width - 1;
     final h = frame.height - 1;
     final cx = centerX ?? frame.width ~/ 2;

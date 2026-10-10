@@ -32,6 +32,7 @@
   and 270 degrees) and `grayscale`.
 * `copyResize` is 4-10x faster.
 * Much faster `copyCrop`, `trim` and direct `compositeImage`.
+* Distortion filters reuse one copy of the frame for animations.
 * `gamma` and `adjustColor` are up to ~50x faster.
 * `convolution` (and filters using it) and `sobel` are 13-35x faster.
 * `bakeOrientation`, and so `copyResize`, use less memory on rotated photos.

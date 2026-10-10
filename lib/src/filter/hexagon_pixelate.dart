@@ -1,6 +1,7 @@
 import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
+import '_frame_copy.dart';
 
 /// Apply the hexagon pixelate filter to the image.
 Image hexagonPixelate(Image src,
@@ -13,12 +14,14 @@ Image hexagonPixelate(Image src,
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);
   }
+  Image? scratch;
   for (final frame in src.frames) {
     final w = frame.width - 1;
     final h = frame.height - 1;
     final cntX = (centerX ?? frame.width ~/ 2) / w;
     final cntY = (centerY ?? frame.height ~/ 2) / h;
-    final orig = frame.clone(noAnimation: true);
+    scratch = copyFrameReusing(frame, scratch);
+    final orig = scratch;
 
     for (final p in frame) {
       //final uvX = p.x / w;

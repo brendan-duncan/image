@@ -3,6 +3,7 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
+import '_frame_copy.dart';
 
 /// Apply the billboard filter to the image.
 Image billboard(Image src,
@@ -16,13 +17,16 @@ Image billboard(Image src,
     src = src.convert(numChannels: src.numChannels);
   }
 
+  Image? scratch;
+
   for (final frame in src.frames) {
     final w = frame.width;
     final h = frame.height;
     final aspect = w / h;
     const stepX = 0.0015625;
     final stepY = 0.0015625 * aspect;
-    final orig = frame.clone(noAnimation: true);
+    scratch = copyFrameReusing(frame, scratch);
+    final orig = scratch;
     for (final p in frame) {
       final uvX = p.x / (w - 1);
       final uvY = p.y / (h - 1);
