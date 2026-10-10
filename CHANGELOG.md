@@ -34,7 +34,7 @@
 * Much faster `copyCrop`, `trim` and direct `compositeImage`.
 * Distortion filters reuse one copy of the frame for animations.
 * `gamma` and `adjustColor` are up to ~50x faster.
-* `convolution` (and filters using it) and `sobel` are 13-35x faster.
+* `convolution` (and filters using it), `sobel` and `edgeGlow` are much faster.
 * `copyResize` applies the EXIF orientation while resizing, without a rotated
   copy: ~4x faster and ~8x less memory for portrait photos.
 * `bakeOrientation` uses less memory on rotated photos.

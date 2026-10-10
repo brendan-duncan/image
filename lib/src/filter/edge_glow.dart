@@ -1,6 +1,8 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import '../color/channel.dart';
+import '../color/format.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
 import '_frame_copy.dart';
@@ -20,6 +22,13 @@ Image edgeGlow(Image src,
     final orig = scratch;
     final width = frame.width;
     final height = frame.height;
+    if (mask == null &&
+        frame.format == Format.uint8 &&
+        frame.numChannels >= 3) {
+      _edgeGlowUint8(orig.toUint8List(), frame.toUint8List(), width, height,
+          frame.numChannels, amount);
+      continue;
+    }
     for (final p in frame) {
       final ny = (p.y - 1).clamp(0, height - 1);
       final py = (p.y + 1).clamp(0, height - 1);
@@ -93,4 +102,50 @@ Image edgeGlow(Image src,
   }
 
   return src;
+}
+
+// The normalized value of each uint8 channel value, as rNormalized gives it.
+final _normalized =
+    Float64List.fromList([for (var v = 0; v < 256; ++v) v / 255]);
+
+// A fast path for RGB(A) uint8 images, computing the same values as the
+// general path from the original pixels in [src].
+void _edgeGlowUint8(
+    Uint8List src, Uint8List out, int width, int height, int nc, num amount) {
+  final n = _normalized;
+  final mx = (1 * amount).toDouble();
+  final invMx = 1 - mx;
+  final stride = width * nc;
+  for (var y = 0; y < height; ++y) {
+    final ny = (y > 0 ? y - 1 : 0) * stride;
+    final cy = y * stride;
+    final py = (y + 1 < height ? y + 1 : height - 1) * stride;
+    for (var x = 0; x < width; ++x) {
+      final nx = (x > 0 ? x - 1 : 0) * nc;
+      final cx = x * nc;
+      final px = (x + 1 < width ? x + 1 : width - 1) * nc;
+      for (var c = 0; c < 3; ++c) {
+        final t1 = n[src[ny + nx + c]];
+        final t2 = n[src[ny + cx + c]];
+        final t3 = n[src[ny + px + c]];
+        final t4 = n[src[cy + nx + c]];
+        final t5 = n[src[cy + cx + c]];
+        final t6 = n[src[cy + px + c]];
+        final t7 = n[src[py + nx + c]];
+        final t8 = n[src[py + cx + c]];
+        final t9 = n[src[py + px + c]];
+        final xx = t1 + 2 * t2 + t3 - t7 - 2 * t8 - t9;
+        final yy = t1 - t3 + 2 * t4 - 2 * t6 + t7 - t9;
+        final rr = sqrt(xx * xx + yy * yy);
+        final v = (rr * 2 * t5) * 255;
+        final i = cy + cx + c;
+        final m = src[i] * invMx + v * mx;
+        out[i] = m < 0
+            ? 0
+            : m > 255
+                ? 255
+                : m.toInt();
+      }
+    }
+  }
 }
