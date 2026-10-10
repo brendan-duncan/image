@@ -27,8 +27,12 @@ class JpegScan {
   int successivePrev;
   int successive;
 
+  // The low [bitsCount] bits of [bitsData] are the next bits of the
+  // entropy-coded data, most significant first. [_atMarker] is set when a
+  // marker or the end of the input is reached; markers are not consumed.
   int bitsData = 0;
   int bitsCount = 0;
+  bool _atMarker = false;
   int eobrun = 0;
   int successiveACState = 0;
   late int successiveACNextValue;
@@ -111,7 +115,9 @@ class JpegScan {
       }
 
       // find marker
+      bitsData = 0;
       bitsCount = 0;
+      _atMarker = false;
 
       // do not advance if the input is exhausted, as this may lead to a
       // RangeError, specifically if the input does not contain the EOI marker,
@@ -130,55 +136,82 @@ class JpegScan {
     }
   }
 
+  /// Reads bytes into [bitsData] until it holds more than 24 bits, or a
+  /// marker or the end of the input is reached. At most 32 bits are held, so
+  /// this is safe with dart2js's 32-bit bitwise operations.
+  void _fillBits() {
+    while (bitsCount <= 24 && !_atMarker) {
+      if (input.isEOS) {
+        _atMarker = true;
+        break;
+      }
+      final b = input[0];
+      if (b == 0xff) {
+        // 0xFF 0x00 is a stuffed 0xFF data byte; anything else is a marker.
+        if (input.length < 2 || input[1] != 0) {
+          _atMarker = true;
+          break;
+        }
+        input.offset += 2;
+      } else {
+        input.offset++;
+      }
+      bitsData = ((bitsData << 8) | b) & 0xffffffff;
+      bitsCount += 8;
+    }
+  }
+
   int? _readBit() {
-    if (bitsCount > 0) {
-      bitsCount--;
-      return (bitsData >> bitsCount) & 1;
-    }
-
-    if (input.isEOS) {
-      return null;
-    }
-
-    bitsData = input.readByte();
-    if (bitsData == 0xff) {
-      final nextByte = input.readByte();
-      if (nextByte != 0) {
-        //final marker = ((bitsData << 8) | nextByte).toRadixString(16);
-        //throw ImageException('unexpected marker: $marker');
+    if (bitsCount == 0) {
+      _fillBits();
+      if (bitsCount == 0) {
         return null;
       }
     }
-
-    bitsCount = 7;
-    return (bitsData >> 7) & 1;
+    bitsCount--;
+    return (bitsData >> bitsCount) & 1;
   }
 
-  int? _decodeHuffman(List<HuffmanNode?> tree) {
-    HuffmanNode? node = HuffmanParent(tree);
-    int? bit;
-    while ((bit = _readBit()) != null) {
-      if (node is HuffmanParent) {
-        node = node.children[bit!];
-      }
-      if (node is HuffmanValue) {
-        return node.value;
+  int? _decodeHuffman(List<HuffmanNode?> tree, Uint16List lookup) {
+    if (bitsCount < huffmanLookupBits) {
+      _fillBits();
+    }
+    if (bitsCount >= huffmanLookupBits) {
+      final entry = lookup[(bitsData >> (bitsCount - huffmanLookupBits)) &
+          ((1 << huffmanLookupBits) - 1)];
+      if (entry != 0) {
+        bitsCount -= entry >> 8;
+        return entry & 0xff;
       }
     }
-    return null;
-  }
-
-  int? _receive(int length) {
-    var n = 0;
-    while (length > 0) {
+    // A code longer than the lookahead, or too few bits left: walk the tree.
+    var children = tree;
+    while (true) {
       final bit = _readBit();
       if (bit == null) {
         return null;
       }
-      n = (n << 1) | bit;
-      length--;
+      final node = children[bit];
+      if (node is HuffmanValue) {
+        return node.value;
+      }
+      if (node is! HuffmanParent) {
+        return null;
+      }
+      children = node.children;
     }
-    return n;
+  }
+
+  int? _receive(int length) {
+    if (bitsCount < length) {
+      _fillBits();
+      if (bitsCount < length) {
+        bitsCount = 0;
+        return null;
+      }
+    }
+    bitsCount -= length;
+    return (bitsData >> bitsCount) & ((1 << length) - 1);
   }
 
   int _receiveAndExtend(int? length) {
@@ -199,14 +232,16 @@ class JpegScan {
   }
 
   void _decodeBaseline(JpegComponent component, Int16List zz, int o) {
-    final t = _decodeHuffman(component.huffmanTableDC);
+    final t =
+        _decodeHuffman(component.huffmanTableDC, component.huffmanLookupDC);
     final diff = t == 0 ? 0 : _receiveAndExtend(t);
     component.pred += diff;
     zz[o] = component.pred;
 
     var k = 1;
     while (k < 64) {
-      final rs = _decodeHuffman(component.huffmanTableAC);
+      final rs =
+          _decodeHuffman(component.huffmanTableAC, component.huffmanLookupAC);
       if (rs == null) {
         break;
       }
@@ -231,7 +266,8 @@ class JpegScan {
   }
 
   void _decodeDCFirst(JpegComponent component, Int16List zz, int o) {
-    final t = _decodeHuffman(component.huffmanTableDC);
+    final t =
+        _decodeHuffman(component.huffmanTableDC, component.huffmanLookupDC);
     final diff = (t == 0) ? 0 : (_receiveAndExtend(t) << successive);
     component.pred += diff;
     zz[o] = component.pred;
@@ -249,7 +285,8 @@ class JpegScan {
     var k = spectralStart;
     final e = spectralEnd;
     while (k <= e) {
-      final rs = _decodeHuffman(component.huffmanTableAC)!;
+      final rs =
+          _decodeHuffman(component.huffmanTableAC, component.huffmanLookupAC)!;
       final s = rs & 15;
       final r = rs >> 4;
       if (s == 0) {
@@ -276,7 +313,8 @@ class JpegScan {
       final z = o + JpegData.dctZigZag[k];
       switch (successiveACState) {
         case 0: // initial state
-          final rs = _decodeHuffman(component.huffmanTableAC);
+          final rs = _decodeHuffman(
+              component.huffmanTableAC, component.huffmanLookupAC);
           if (rs == null) throw ImageException('Invalid progressive encoding');
           s = rs & 15;
           r = rs >> 4;

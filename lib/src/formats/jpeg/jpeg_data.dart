@@ -565,10 +565,16 @@ class JpegData {
       final acTblNo = c & 15;
 
       if (dcTblNo < huffmanTablesDC.length) {
-        component.huffmanTableDC = huffmanTablesDC[dcTblNo]!;
+        final table = huffmanTablesDC[dcTblNo]!;
+        component
+          ..huffmanTableDC = table
+          ..huffmanLookupDC = huffmanLookup(table);
       }
       if (acTblNo < huffmanTablesAC.length) {
-        component.huffmanTableAC = huffmanTablesAC[acTblNo]!;
+        final table = huffmanTablesAC[acTblNo]!;
+        component
+          ..huffmanTableAC = table
+          ..huffmanLookupAC = huffmanLookup(table);
       }
 
       components.add(component);

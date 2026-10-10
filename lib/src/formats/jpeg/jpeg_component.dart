@@ -21,6 +21,10 @@ class JpegComponent {
   late Int16List coefficients;
   late List<HuffmanNode?> huffmanTableDC;
   late List<HuffmanNode?> huffmanTableAC;
+
+  /// Lookahead tables for [huffmanTableDC] and [huffmanTableAC].
+  late Uint16List huffmanLookupDC;
+  late Uint16List huffmanLookupAC;
   late int pred;
 
   JpegComponent(this.hSamples, this.vSamples, this.quantizationTableList,
