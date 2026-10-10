@@ -88,6 +88,7 @@ final benchmarks = <Benchmark>[
       (img) => gaussianBlur(_i(img).clone(), radius: 5)),
   Benchmark('convolution_sharpen', (i) => i.small,
       (img) => convolution(_i(img).clone(), filter: _sharpen)),
+  Benchmark('sobel', (i) => i.small, (img) => sobel(_i(img).clone())),
   Benchmark('rotate_90', (i) => i.rgb, (img) => copyRotate(_i(img), angle: 90)),
   Benchmark('flip_vertical', (i) => i.rgb, (img) => flipVertical(_i(img))),
   Benchmark('grayscale', (i) => i.rgb, (img) => grayscale(_i(img).clone())),

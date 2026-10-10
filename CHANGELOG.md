@@ -32,6 +32,7 @@
   and 270 degrees) and `grayscale`.
 * `copyResize` is 4-10x faster.
 * `gamma` and `adjustColor` are up to ~50x faster.
+* `convolution` (and filters using it) and `sobel` are 13-35x faster.
 * `bakeOrientation`, and so `copyResize`, use less memory on rotated photos.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
 * `PngCicpData.colourPrimaries` is renamed to `colorPrimaries`.
