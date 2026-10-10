@@ -19,6 +19,10 @@ class JpegComponent {
   /// order. The coefficient for block (row, col) starts at
   /// `(row * blocksPerLineForMcu + col) * 64`.
   late Int16List coefficients;
+
+  /// Whether [coefficients] only holds the DC coefficient of each block, at
+  /// `row * blocksPerLineForMcu + col`, for decoding at 1/8 scale.
+  bool dcOnly = false;
   late List<HuffmanNode?> huffmanTableDC;
   late List<HuffmanNode?> huffmanTableAC;
 

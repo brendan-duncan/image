@@ -384,8 +384,8 @@ class JpegScan {
         blockCol >= component.blocksPerLineForMcu) {
       return;
     }
-    decodeFn(component, component.coefficients,
-        (blockRow * component.blocksPerLineForMcu + blockCol) << 6);
+    _decodeInto(component, decodeFn,
+        blockRow * component.blocksPerLineForMcu + blockCol);
   }
 
   void _decodeBlock(
@@ -395,9 +395,27 @@ class JpegScan {
   ) {
     final blockRow = mcu ~/ component.blocksPerLine;
     final blockCol = mcu % component.blocksPerLine;
-    decodeFn(component, component.coefficients,
-        (blockRow * component.blocksPerLineForMcu + blockCol) << 6);
+    _decodeInto(component, decodeFn,
+        blockRow * component.blocksPerLineForMcu + blockCol);
   }
+
+  // Decodes the coefficients of a block. When the component only keeps DC
+  // coefficients, the block is decoded in a scratch block, and only its DC
+  // coefficient is kept; the scratch block's AC coefficients are left over
+  // from other blocks, but are never used.
+  void _decodeInto(JpegComponent component, _DecodeFn decodeFn, int block) {
+    final coefficients = component.coefficients;
+    if (!component.dcOnly) {
+      decodeFn(component, coefficients, block << 6);
+      return;
+    }
+    final scratch = _scratchBlock;
+    scratch[0] = coefficients[block];
+    decodeFn(component, scratch, 0);
+    coefficients[block] = scratch[0];
+  }
+
+  final _scratchBlock = Int16List(64);
 }
 
 /// Decodes the coefficients of one block, starting at [offset] in

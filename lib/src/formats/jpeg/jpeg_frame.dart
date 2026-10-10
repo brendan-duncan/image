@@ -18,7 +18,9 @@ class JpegFrame {
   final components = <int, JpegComponent>{};
   final List<int> componentsOrder = <int>[];
 
-  void prepare() {
+  /// Allocates the coefficients of the components. With [dcOnly], only the
+  /// DC coefficient of each block is kept.
+  void prepare({bool dcOnly = false}) {
     for (var componentId in components.keys) {
       final component = components[componentId]!;
       maxHSamples = max(maxHSamples, component.hSamples);
@@ -43,8 +45,9 @@ class JpegFrame {
         ..blocksPerColumn = blocksPerColumn
         ..blocksPerLineForMcu = blocksPerLineForMcu
         ..blocksPerColumnForMcu = blocksPerColumnForMcu
-        ..coefficients =
-            Int16List(blocksPerLineForMcu * blocksPerColumnForMcu * 64);
+        ..dcOnly = dcOnly
+        ..coefficients = Int16List(
+            blocksPerLineForMcu * blocksPerColumnForMcu * (dcOnly ? 1 : 64));
     }
   }
 }

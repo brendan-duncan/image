@@ -286,5 +286,34 @@ void main() async {
       }
       expect(jpeg.getImage().width, equals(jpeg.width));
     });
+
+    test('1/8 scale decode of progressive and baseline images', () {
+      for (final name in [
+        'jpg-progressive.jpg',
+        'testprog.jpg',
+        'buck_24.jpg'
+      ]) {
+        final bytes = File('test/_data/jpg/$name').readAsBytesSync();
+        final full = decodeJpg(bytes)!;
+        final scaled = decodeJpg(bytes, scale: 8)!;
+        expect(scaled.width, equals((full.width + 7) ~/ 8), reason: name);
+        expect(scaled.height, equals((full.height + 7) ~/ 8), reason: name);
+        // Each pixel is close to the average of its 8x8 block.
+        var total = 0.0;
+        for (final q in scaled) {
+          var sum = 0.0;
+          var n = 0;
+          for (var y = q.y * 8; y < q.y * 8 + 8 && y < full.height; ++y) {
+            for (var x = q.x * 8; x < q.x * 8 + 8 && x < full.width; ++x) {
+              sum += full.getPixel(x, y).luminance;
+              ++n;
+            }
+          }
+          total += (sum / n - q.luminance).abs();
+        }
+        expect(total / (scaled.width * scaled.height), lessThan(8),
+            reason: name);
+      }
+    });
   });
 }

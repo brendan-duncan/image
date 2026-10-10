@@ -489,7 +489,8 @@ class JpegData {
     // declared dimensions must be validated first.
     if (prepare) {
       _validateFrame(f);
-      f.prepare();
+      // At 1/8 scale each block is just its DC coefficient.
+      f.prepare(dcOnly: scale == 8);
     }
     frame = f;
     frames.add(f);
@@ -598,6 +599,13 @@ class JpegData {
     final ah = (successiveApproximation >> 4) & 15;
     final al = successiveApproximation & 15;
 
+    // At 1/8 scale, the AC coefficients aren't used, so progressive AC scans
+    // are skipped: the scan data is passed over when looking for the next
+    // marker.
+    if (f.progressive! && scale == 8 && spectralStart > 0) {
+      return;
+    }
+
     JpegScan(input, f, components, resetInterval, spectralStart, spectralEnd,
             ah, al)
         .decode();
@@ -669,12 +677,13 @@ class JpegData {
       }
 
       for (var blockCol = 0; blockCol < blocksPerLine; blockCol++) {
-        final offset = (blockRow * blocksPerLineForMcu + blockCol) << 6;
+        final block = blockRow * blocksPerLineForMcu + blockCol;
+        final offset = block << 6;
         if (bs == 1) {
           // A block scaled to one pixel is its average, given by the DC
           // coefficient alone.
-          lines[scanLine]![blockCol] =
-              _dcValue(coefficients[offset] * quantizationTable[0]);
+          final dc = coefficients[component.dcOnly ? block : offset];
+          lines[scanLine]![blockCol] = _dcValue(dc * quantizationTable[0]);
           continue;
         }
 
