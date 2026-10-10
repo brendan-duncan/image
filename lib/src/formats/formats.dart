@@ -262,7 +262,12 @@ Decoder? findDecoderForData(List<int> data) {
 }
 
 /// Decode the given image file bytes by first identifying the format of the
-/// file and using that decoder to decode the file into a single frame [Image].
+/// file and using that decoder to decode the file into an [Image].
+///
+/// All of the frames of an animated image are decoded, each the size of the
+/// whole image. To save memory and time when only one frame is needed, pass
+/// its index as [frame].
+///
 /// **WARNING** Since this will check the image data against all known decoders,
 /// it is much slower than using an explicit decoder.
 Image? decodeImage(Uint8List data, {int? frame}) {
@@ -272,6 +277,8 @@ Image? decodeImage(Uint8List data, {int? frame}) {
 
 /// Decodes the given image file bytes, using the filename extension to
 /// determine the decoder.
+///
+/// All of the frames of an animated image are decoded unless [frame] is given.
 Image? decodeNamedImage(String path, Uint8List data, {int? frame}) {
   final decoder = findDecoderForNamedImage(path);
   if (decoder != null) {
