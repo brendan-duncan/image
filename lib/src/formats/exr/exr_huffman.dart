@@ -184,20 +184,11 @@ class ExrHuffman {
               '(invalid code table entry).');
         }
 
+        // Appending, rather than copying the list for each code, keeps
+        // malformed tables with many codes per entry from taking quadratic
+        // time.
         pl.lit++;
-
-        if (pl.p != null) {
-          final p = pl.p;
-          pl.p = List<int>.filled(pl.lit, 0);
-
-          for (var i = 0; i < pl.lit - 1; ++i) {
-            pl.p![i] = p![i];
-          }
-        } else {
-          pl.p = [0];
-        }
-
-        pl.p![pl.lit - 1] = im;
+        (pl.p ??= <int>[]).add(im);
       } else if (l != 0) {
         // Short code: init all primary entries
         var pi = c << (_huffmanDecodingBits - l);
