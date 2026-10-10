@@ -1,3 +1,7 @@
+# 4.11.1
+
+* Fix dependency constraint to archive 4.4.0.
+
 # 4.11.0
 
 * Fix `encodeJpg` modifying the pixels of RGBA source images.
