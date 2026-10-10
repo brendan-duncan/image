@@ -11,6 +11,7 @@ import '../image/palette.dart';
 import '../util/neural_quantizer.dart';
 import '../util/output_buffer.dart';
 import '../util/quantizer.dart';
+import '_check_encode.dart';
 import 'encoder.dart';
 import 'png/_png_deflate.dart' if (dart.library.io) 'png/_png_deflate_io.dart';
 import 'png/png_info.dart';
@@ -171,6 +172,7 @@ class PngEncoder extends Encoder {
   /// Encode [image] to the PNG format.
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
+    checkEncode(image);
     if (!image.hasAnimation || singleFrame) {
       start(1);
       addFrame(image);

@@ -4,6 +4,7 @@ import '../color/format.dart';
 import '../image/image.dart';
 import '../image/pixel.dart';
 import '../util/output_buffer.dart';
+import '_check_encode.dart';
 import 'encoder.dart';
 
 /// Encode a TGA image. This only supports the 24-bit and 32-bit uncompressed
@@ -11,6 +12,7 @@ import 'encoder.dart';
 class TgaEncoder extends Encoder {
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
+    checkEncode(image);
     if (image.format != Format.uint8) {
       image = image.convert(format: Format.uint8);
     }

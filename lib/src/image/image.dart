@@ -361,6 +361,9 @@ class Image extends Iterable<Pixel> {
       Palette? palette,
       ExifData? exif,
       IccProfile? iccp}) {
+    if (width < 0 || height < 0) {
+      throw ArgumentError('Invalid image dimensions ${width}x$height');
+    }
     iccProfile = iccp;
     if (exif != null) {
       _exif = ExifData.from(exif);

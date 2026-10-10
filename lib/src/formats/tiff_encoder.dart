@@ -5,6 +5,7 @@ import '../exif/exif_data.dart';
 import '../exif/ifd_value.dart';
 import '../image/image.dart';
 import '../util/output_buffer.dart';
+import '_check_encode.dart';
 import 'encoder.dart';
 import 'tiff/tiff_image.dart';
 
@@ -12,6 +13,7 @@ import 'tiff/tiff_image.dart';
 class TiffEncoder extends Encoder {
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
+    checkEncode(image);
     // TIFF is really just an EXIF structure (or, really, EXIF is just a TIFF
     // structure).
 

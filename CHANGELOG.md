@@ -11,6 +11,7 @@ Security fixes for decoding untrusted images:
 * Fix `isValidFile` throwing on short data, which made `decodeImage` throw.
 * Fix PVR3 files not being detected or decoded.
 * Decoders throw only `ImageException` for bad data, not `RangeError` or other errors.
+* Encoders throw `ImageException` for empty images, and `Image` rejects negative sizes.
 
 # 4.11.1
 

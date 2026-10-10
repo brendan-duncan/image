@@ -139,6 +139,27 @@ void main() {
     expect(decodeImage(pvr)?.width, equals(8));
   });
 
+  test('encoding an empty image', () {
+    final encoders = <Uint8List Function(Image)>[
+      encodePng,
+      encodeJpg,
+      encodeGif,
+      encodeBmp,
+      encodeTga,
+      encodeTiff,
+      encodeIco,
+      encodeCur,
+      encodePvr,
+      encodeWebP,
+    ];
+    for (final image in [Image.empty(), Image(width: 0, height: 10)]) {
+      for (final encode in encoders) {
+        expect(() => encode(image), _throwsImageException);
+      }
+    }
+    expect(() => Image(width: -1, height: 10), throwsArgumentError);
+  });
+
   group('maxPixels', () {
     final small = Image(width: 64, height: 64);
 

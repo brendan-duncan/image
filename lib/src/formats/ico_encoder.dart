@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../image/image.dart';
 import '../util/output_buffer.dart';
+import '_check_encode.dart';
 import 'encoder.dart';
 import 'png_encoder.dart';
 
@@ -14,6 +15,7 @@ abstract class WinEncoder extends Encoder {
 
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
+    checkEncode(image);
     if (image.hasAnimation && !singleFrame) {
       return encodeImages(image.frames);
     } else {

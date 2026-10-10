@@ -8,6 +8,7 @@ import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/pixel.dart';
 import '../util/output_buffer.dart';
+import '_check_encode.dart';
 import 'encoder.dart';
 import 'jpeg/jpeg_marker.dart';
 
@@ -53,6 +54,7 @@ class JpegEncoder extends Encoder {
     JpegChroma chroma = JpegChroma.yuv444,
     bool singleFrame = false,
   }) {
+    checkEncode(image);
     final fp = OutputBuffer(bigEndian: true);
 
     // Add JPEG headers

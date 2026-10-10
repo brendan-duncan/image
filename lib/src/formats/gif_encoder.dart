@@ -8,6 +8,7 @@ import '../util/neural_quantizer.dart';
 import '../util/octree_quantizer.dart';
 import '../util/output_buffer.dart';
 import '../util/quantizer.dart';
+import '_check_encode.dart';
 import 'encoder.dart';
 
 class GifEncoder extends Encoder {
@@ -149,6 +150,7 @@ class GifEncoder extends Encoder {
   /// Encode a single frame image.
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
+    checkEncode(image);
     if (!image.hasAnimation || singleFrame) {
       addFrame(image);
       return finish()!;

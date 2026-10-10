@@ -5,6 +5,7 @@ import '../image/image.dart';
 import '../image/palette_uint8.dart';
 import '../image/pixel.dart';
 import '../util/output_buffer.dart';
+import '_check_encode.dart';
 import 'bmp/bmp_info.dart';
 import 'encoder.dart';
 
@@ -20,6 +21,7 @@ class BmpEncoder extends Encoder {
 
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
+    checkEncode(image);
     final nc = image.numChannels;
     var palette = image.palette;
     final format = image.format;

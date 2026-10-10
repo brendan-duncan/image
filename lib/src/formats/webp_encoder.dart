@@ -5,6 +5,7 @@ import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/output_buffer.dart';
+import '_check_encode.dart';
 import 'encoder.dart';
 import 'webp/vp8_config.dart';
 import 'webp/vp8_encoder.dart';
@@ -96,6 +97,7 @@ class WebPEncoder extends Encoder {
 
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
+    checkEncode(image);
     final animate = !singleFrame && image.hasAnimation;
     if (animate) {
       _checkFramesFitCanvas(image);

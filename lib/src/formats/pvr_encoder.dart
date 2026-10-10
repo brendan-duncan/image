@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/output_buffer.dart';
+import '_check_encode.dart';
 import 'encoder.dart';
 import 'pvr/pvr_bit_utility.dart';
 import 'pvr/pvr_color.dart';
@@ -20,6 +21,7 @@ class PvrEncoder extends Encoder {
 
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
+    checkEncode(image);
     final output = OutputBuffer();
 
     var format = this.format;
