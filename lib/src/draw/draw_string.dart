@@ -46,19 +46,26 @@ Image drawString(Image image, String string,
   var sy = y ?? (image.height / 2).round() - (stringHeight / 2).round();
 
   if (wrap) {
+    void drawLine(String line) => drawString(image, line,
+        font: font,
+        x: sx,
+        y: sy,
+        color: color,
+        blend: blend,
+        mask: mask,
+        maskChannel: maskChannel,
+        rightJustify: rightJustify);
+
     final sentences = string.split(RegExp(r'\n'));
 
     for (var sentence in sentences) {
       final words = sentence.split(RegExp(r"\s+"));
-      var subString = "";
+      final line = StringBuffer();
       var x2 = sx;
 
-      for (var w in words) {
-        final ws = StringBuffer()
-          ..write(w)
-          ..write(' ');
-        w = ws.toString();
-        final chars = w.codeUnits;
+      for (final w in words) {
+        final word = '$w ';
+        final chars = word.codeUnits;
         var wordWidth = 0;
         for (var c in chars) {
           if (c == 10) break;
@@ -72,40 +79,25 @@ Image drawString(Image image, String string,
         if ((x2 + wordWidth) > image.width) {
           // If there is a word that won't fit the starting x, stop drawing
           if ((sx == x2) || (sx + wordWidth > image.width)) {
+            if (line.isNotEmpty) {
+              drawLine(line.toString());
+            }
             return image;
           }
 
-          drawString(image, subString,
-              font: font,
-              x: sx,
-              y: sy,
-              color: color,
-              blend: blend,
-              mask: mask,
-              maskChannel: maskChannel,
-              rightJustify: rightJustify);
-
-          subString = "";
+          // Each line is drawn once it's full, rather than redrawing it for
+          // each word, which would take quadratic time.
+          drawLine(line.toString());
+          line.clear();
           x2 = sx;
           sy += stringHeight;
-          subString += w;
-          x2 += wordWidth;
-        } else {
-          subString += w;
-          x2 += wordWidth;
         }
+        line.write(word);
+        x2 += wordWidth;
+      }
 
-        if (subString.isNotEmpty) {
-          drawString(image, subString,
-              font: font,
-              x: sx,
-              y: sy,
-              color: color,
-              blend: blend,
-              mask: mask,
-              maskChannel: maskChannel,
-              rightJustify: rightJustify);
-        }
+      if (line.isNotEmpty) {
+        drawLine(line.toString());
       }
 
       sy += stringHeight;

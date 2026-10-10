@@ -30,6 +30,21 @@ bool _inBox(num x, num y, (int, int, int, int) box) {
 
 void main() {
   group('Draw', () {
+    test('drawString wrap draws each line once', () {
+      // Drawing a line more than once would blend its glyphs over themselves.
+      final color = ColorRgba8(255, 255, 255, 128);
+      final wrapped = Image(width: 100, height: 100);
+      drawString(wrapped, 'aaa bbb ccc ddd',
+          font: arial14, x: 0, y: 0, color: color, wrap: true);
+      final (_, lineHeight) = _stringSize(arial14, 'aaa bbb ccc ddd');
+      final lines = Image(width: 100, height: 100);
+      drawString(lines, 'aaa bbb ccc ',
+          font: arial14, x: 0, y: 0, color: color);
+      drawString(lines, 'ddd ',
+          font: arial14, x: 0, y: lineHeight, color: color);
+      expect(wrapped, equals(lines));
+    });
+
     test('drawString', () {
       final i0 = Image(width: 256, height: 256)..clear(ColorRgb8(128, 128, 0));
       drawString(

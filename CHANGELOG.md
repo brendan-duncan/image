@@ -19,6 +19,7 @@ Security fixes for decoding untrusted images:
 * Check TIFF tag counts against the file size before reading them.
 * Fix quadratic time building EXR PIZ Huffman tables.
 * Reject PSD files far too small for their channel data.
+* Fix `drawString` with `wrap` redrawing each line for every word.
 
 # 4.11.1
 
