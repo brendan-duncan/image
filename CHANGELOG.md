@@ -16,6 +16,7 @@ Security fixes for decoding untrusted images:
 * Limit JPEGs to 1000 scans.
 * Fix `executeCommandImageAsync` and `executeCommandBytesAsync` never completing when a command throws.
 * Fix `fillFlood` overflowing the stack on large shapes, filling only part of a shape, and clearing alpha.
+* Check TIFF tag counts against the file size before reading them.
 
 # 4.11.1
 

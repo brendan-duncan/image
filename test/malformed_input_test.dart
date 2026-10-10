@@ -160,6 +160,20 @@ void main() {
     expect(() => Image(width: -1, height: 10), throwsArgumentError);
   });
 
+  test('TIFF tag with a huge count', () {
+    final tiff = encodeTiff(Image(width: 2, height: 2));
+    final endian = tiff[0] == 0x4d ? Endian.big : Endian.little;
+    final data = ByteData.sublistView(tiff);
+    final ifd = data.getUint32(4, endian);
+    for (var i = 0; i < data.getUint16(ifd, endian); ++i) {
+      final entry = ifd + 2 + i * 12;
+      if (data.getUint16(entry, endian) == 273) {
+        data.setUint32(entry + 4, 0x7fffffff, endian); // StripOffsets count
+      }
+    }
+    expect(decodeTiff(tiff), isNull);
+  });
+
   test('commands run in an isolate complete when they throw', () async {
     Command failing() => Command()
       ..createImage(width: 1, height: 1)

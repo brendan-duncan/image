@@ -1,5 +1,6 @@
 import '../../exif/exif_tag.dart';
 import '../../exif/ifd_value.dart';
+import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 
 class TiffEntry {
@@ -32,6 +33,10 @@ class TiffEntry {
       return value;
     }
     p.offset = valueOffset;
+    // The values are allocated by count, so check the data holds them.
+    if (count * typeSize > p.length) {
+      throw ImageException('Invalid TIFF tag $tag count: $count');
+    }
     final data = p.readBytes(count * typeSize);
     switch (type) {
       case IfdValueType.byte:
