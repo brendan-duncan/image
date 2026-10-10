@@ -1,3 +1,15 @@
+# 4.10.2
+
+* Fix a denial of service where a tiny JPEG declaring huge dimensions made the
+  decoder allocate gigabytes of memory and spend minutes decoding. JPEG
+  decoding now throws an `ImageException` for images with more than
+  `JpegDecoder.defaultMaxPixels` pixels (2^28 by default). The limit can be
+  set per call with `decodeJpg(bytes, maxPixels: n)` or
+  `JpegDecoder(maxPixels: n)`, and a value <= 0 disables it.
+* `JpegDecoder.startDecode` no longer allocates the image's pixel data.
+* Reject JPEG frames with zero dimensions, more than 4 components, or invalid
+  sampling factors.
+
 # 4.10.1
 
 * Fix alpha blending onto translucent pixels, which darkened translucent

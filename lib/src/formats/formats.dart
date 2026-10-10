@@ -327,16 +327,20 @@ Future<bool> encodeImageFile(String path, Image image) async {
 }
 
 /// Decode a JPG formatted image.
-Image? decodeJpg(Uint8List bytes) => JpegDecoder().decode(bytes);
+///
+/// Images with more than [maxPixels] pixels (width * height) throw an
+/// ImageException; if null, [JpegDecoder.defaultMaxPixels] is used.
+Image? decodeJpg(Uint8List bytes, {int? maxPixels}) =>
+    JpegDecoder(maxPixels: maxPixels).decode(bytes);
 
 /// Decode a JPG formatted image from a file. If the platform does not support
 /// dart:io, null will be returned.
-Future<Image?> decodeJpgFile(String path) async {
+Future<Image?> decodeJpgFile(String path, {int? maxPixels}) async {
   final bytes = await readFile(path);
   if (bytes == null) {
     return null;
   }
-  return JpegDecoder().decode(bytes);
+  return JpegDecoder(maxPixels: maxPixels).decode(bytes);
 }
 
 /// Encode an [image] to the JPEG format.

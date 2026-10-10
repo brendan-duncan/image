@@ -40,6 +40,11 @@ class JpegData {
   static const maxCompsInScan = 4; // JPEG limit on # of components in one scan
   static const maxSamplingFactor = 4; // JPEG limit on sampling factors
 
+  /// The maximum number of pixels (width * height) [read] will decode. Frames
+  /// declaring more throw an [ImageException] before any pixel data is
+  /// allocated. A value <= 0 disables the limit.
+  int maxPixels = 0;
+
   late InputBuffer input;
   late JpegJfif jfif;
   JpegAdobe? adobe;
@@ -124,7 +129,7 @@ class JpegData {
         case JpegMarker.sof1: // SOF1 (Start of Frame, Extended DCT)
         case JpegMarker.sof2: // SOF2 (Start of Frame, Progressive DCT)
           hasSOF = true;
-          _readFrame(marker, _readBlock());
+          _readFrame(marker, _readBlock(), prepare: false);
           break;
         case JpegMarker.sos: // SOS (Start of Scan)
           hasSOS = true;
@@ -439,7 +444,7 @@ class JpegData {
     }
   }
 
-  void _readFrame(int marker, InputBuffer block) {
+  void _readFrame(int marker, InputBuffer block, {bool prepare = true}) {
     if (frame != null) {
       throw ImageException('Duplicate JPG frame data found.');
     }
@@ -463,9 +468,38 @@ class JpegData {
       f.components[componentId] = JpegComponent(h, v, quantizationTables, qId);
     }
 
-    f.prepare();
+    // prepare allocates the coefficient blocks for the entire frame, so the
+    // declared dimensions must be validated first.
+    if (prepare) {
+      _validateFrame(f);
+      f.prepare();
+    }
     frame = f;
     frames.add(f);
+  }
+
+  void _validateFrame(JpegFrame f) {
+    final width = f.samplesPerLine!;
+    final height = f.scanLines!;
+    if (width == 0 || height == 0) {
+      throw ImageException('Invalid JPEG dimensions ${width}x$height');
+    }
+    if (maxPixels > 0 && width * height > maxPixels) {
+      throw ImageException('JPEG dimensions ${width}x$height exceed the '
+          'maximum of $maxPixels pixels');
+    }
+    if (f.components.isEmpty || f.components.length > maxCompsInScan) {
+      throw ImageException(
+          'Unsupported number of JPEG components: ${f.components.length}');
+    }
+    for (final c in f.components.values) {
+      if (c.hSamples < 1 ||
+          c.hSamples > maxSamplingFactor ||
+          c.vSamples < 1 ||
+          c.vSamples > maxSamplingFactor) {
+        throw ImageException('Invalid JPEG sampling factor');
+      }
+    }
   }
 
   void _readDHT(InputBuffer block) {

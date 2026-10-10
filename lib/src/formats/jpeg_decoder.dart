@@ -11,8 +11,22 @@ import 'jpeg/jpeg_info.dart';
 
 /// Decode a jpeg encoded image.
 class JpegDecoder extends Decoder {
+  /// The [maxPixels] used by decoders created without one, including the
+  /// decoders used by decodeImage and decodeJpg. The default of 2^28
+  /// (16384 x 16384) allows very large photos while preventing a small,
+  /// malicious file from declaring dimensions that would exhaust memory.
+  /// A value <= 0 disables the limit.
+  static int defaultMaxPixels = 1 << 28;
+
+  /// The maximum number of pixels (width * height) this decoder will decode.
+  /// Images declaring more throw an [ImageException] before any pixel data is
+  /// allocated. A value <= 0 disables the limit.
+  final int maxPixels;
+
   JpegInfo? info;
   InputBuffer? input;
+
+  JpegDecoder({int? maxPixels}) : maxPixels = maxPixels ?? defaultMaxPixels;
 
   @override
   ImageFormat get format => ImageFormat.jpg;
@@ -40,7 +54,9 @@ class JpegDecoder extends Decoder {
     if (input == null) {
       return null;
     }
-    final jpeg = JpegData()..read(input!.buffer);
+    final jpeg = JpegData()
+      ..maxPixels = maxPixels
+      ..read(input!.buffer);
     if (jpeg.frames.length != 1) {
       throw ImageException('only single frame JPEGs supported');
     }
@@ -50,7 +66,9 @@ class JpegDecoder extends Decoder {
 
   @override
   Image? decode(Uint8List bytes, {int? frame}) {
-    final jpeg = JpegData()..read(bytes);
+    final jpeg = JpegData()
+      ..maxPixels = maxPixels
+      ..read(bytes);
 
     if (jpeg.frames.length != 1) {
       throw ImageException('only single frame JPEGs supported');

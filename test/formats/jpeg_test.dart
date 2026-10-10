@@ -9,6 +9,63 @@ import '../_test_util.dart';
 void main() async {
   group('Format', () {
     group('jpg', () {
+      // Re-declares the dimensions in the SOF header of a small valid JPEG,
+      // producing a tiny file that claims to be a huge image.
+      Uint8List jpgWithSize(int width, int height, {int components = 3}) {
+        final jpg = encodeJpg(Image(width: 8, height: 8, numChannels: 3));
+        for (var i = 0; i < jpg.length - 9; ++i) {
+          if (jpg[i] == 0xff && jpg[i + 1] == 0xc0) {
+            jpg[i + 5] = height >> 8;
+            jpg[i + 6] = height & 0xff;
+            jpg[i + 7] = width >> 8;
+            jpg[i + 8] = width & 0xff;
+            if (components != 3) {
+              jpg[i + 9] = components;
+            }
+            return jpg;
+          }
+        }
+        throw StateError('SOF0 not found');
+      }
+
+      test('rejects dimensions over maxPixels', () {
+        final jpg = jpgWithSize(65535, 65535);
+        final sw = Stopwatch()..start();
+        expect(() => decodeJpg(jpg), throwsA(isA<ImageException>()));
+        expect(() => decodeImage(jpg), throwsA(isA<ImageException>()));
+        expect(sw.elapsedMilliseconds, lessThan(1000));
+
+        expect(() => decodeJpg(jpgWithSize(101, 100), maxPixels: 10000),
+            throwsA(isA<ImageException>()));
+        final image = decodeJpg(jpgWithSize(100, 100), maxPixels: 10000);
+        expect(image?.width, equals(100));
+        expect(image?.height, equals(100));
+      });
+
+      test('defaultMaxPixels', () {
+        final saved = JpegDecoder.defaultMaxPixels;
+        addTearDown(() => JpegDecoder.defaultMaxPixels = saved);
+        JpegDecoder.defaultMaxPixels = 64 * 64;
+        expect(() => decodeImage(jpgWithSize(65, 64)),
+            throwsA(isA<ImageException>()));
+        expect(decodeImage(jpgWithSize(64, 64))?.width, equals(64));
+      });
+
+      test('startDecode does not allocate for huge dimensions', () {
+        final decoder = JpegDecoder();
+        final info = decoder.startDecode(jpgWithSize(65535, 65535));
+        expect(info?.width, equals(65535));
+        expect(info?.height, equals(65535));
+        expect(() => decoder.decodeFrame(0), throwsA(isA<ImageException>()));
+      });
+
+      test('rejects invalid frame headers', () {
+        expect(
+            () => decodeJpg(jpgWithSize(0, 8)), throwsA(isA<ImageException>()));
+        expect(() => decodeJpg(jpgWithSize(8, 8, components: 0)),
+            throwsA(isA<ImageException>()));
+      });
+
       test('inject new exif', () {
         final fb = File('test/_data/jpg/jpeg444.jpg').readAsBytesSync();
         final exif = ExifData();
