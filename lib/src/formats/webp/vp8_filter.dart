@@ -224,22 +224,23 @@ class VP8Filter {
   final Uint8List _clip1 = clip1;
 
   void transformOne(InputBuffer src, InputBuffer dst) {
-    final t = Int32List(4 * 4);
-    var si = 0;
-    var di = 0;
+    // The coefficients are in an Int16List and the output in a Uint8List;
+    // they're accessed directly.
+    final s = src.buffer as Int16List;
+    final d = dst.buffer as Uint8List;
+    final t = _transformTmp;
+    var si = src.offset;
     var tmp = 0;
     for (var i = 0; i < 4; ++i) {
       // vertical pass
-      final a = src[si] + src[si + 8]; // [-4096, 4094]
-      final b = src[si] - src[si + 8]; // [-4095, 4095]
-      final c =
-          _mul(src[si + 4], kC2) - _mul(src[si + 12], kC1); // [-3783, 3783]
-      final d =
-          _mul(src[si + 4], kC1) + _mul(src[si + 12], kC2); // [-3785, 3781]
-      t[tmp++] = a + d; // [-7881, 7875]
+      final a = s[si] + s[si + 8]; // [-4096, 4094]
+      final b = s[si] - s[si + 8]; // [-4095, 4095]
+      final c = _mul(s[si + 4], kC2) - _mul(s[si + 12], kC1); // [-3783, 3783]
+      final e = _mul(s[si + 4], kC1) + _mul(s[si + 12], kC2); // [-3785, 3781]
+      t[tmp++] = a + e; // [-7881, 7875]
       t[tmp++] = b + c; // [-7878, 7878]
       t[tmp++] = b - c; // [-7878, 7878]
-      t[tmp++] = a - d; // [-7877, 7879]
+      t[tmp++] = a - e; // [-7877, 7879]
       si++;
     }
 
@@ -251,21 +252,24 @@ class VP8Filter {
     // In the worst case scenario, the input to clip_8b() can be as large as
     // [-60713, 60968].
     tmp = 0;
+    var di = dst.offset;
     for (var i = 0; i < 4; ++i) {
       // horizontal pass
       final dc = t[tmp] + 4;
       final a = dc + t[tmp + 8];
       final b = dc - t[tmp + 8];
       final c = _mul(t[tmp + 4], kC2) - _mul(t[tmp + 12], kC1);
-      final d = _mul(t[tmp + 4], kC1) + _mul(t[tmp + 12], kC2);
-      _store(dst, di, 0, 0, a + d);
-      _store(dst, di, 1, 0, b + c);
-      _store(dst, di, 2, 0, b - c);
-      _store(dst, di, 3, 0, a - d);
+      final e = _mul(t[tmp + 4], kC1) + _mul(t[tmp + 12], kC2);
+      _storeAt(d, di, a + e);
+      _storeAt(d, di + 1, b + c);
+      _storeAt(d, di + 2, b - c);
+      _storeAt(d, di + 3, a - e);
       tmp++;
       di += VP8.bps;
     }
   }
+
+  final _transformTmp = Int32List(4 * 4);
 
   void transform(InputBuffer src, InputBuffer dst, bool doTwo) {
     transformOne(src, dst);
@@ -666,14 +670,22 @@ class VP8Filter {
   static const kC1 = 20091 + (1 << 16);
   static const kC2 = 35468;
 
-  static int _mul(int a, int b) {
-    final c = a * b;
-    return shiftR(c, 16);
-  }
+  // (a * b) >> 16. The product is within +-2^30, so it's shifted with a
+  // bias that makes it non-negative: exact, and safe from dart2js's unsigned
+  // shifts without the cost of toSigned.
+  static int _mul(int a, int b) => ((a * b + 0x40000000) >> 16) - 0x4000;
 
   static void _store(InputBuffer dst, int di, int x, int y, int v) {
-    dst[di + x + y * VP8.bps] = _clip8b(dst[di + x + y * VP8.bps] + (v >> 3));
+    final i = di + x + y * VP8.bps;
+    dst[i] = _clip8b(dst[i] + _shift3(v));
   }
+
+  static void _storeAt(Uint8List dst, int i, int v) {
+    dst[i] = _clip8b(dst[i] + _shift3(v));
+  }
+
+  // v >> 3, for v in [-65536, 65535].
+  static int _shift3(int v) => ((v + 65536) >> 3) - 8192;
 
   static void _store2(InputBuffer dst, int y, int dc, int d, int c) {
     _store(dst, 0, 0, y, dc + d);

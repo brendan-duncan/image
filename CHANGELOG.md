@@ -25,7 +25,7 @@
 * GIF encoding and `ditherImage` are ~2x faster, and GIF decoding faster.
 * PNG decoding is 3-4x faster and uses about 40% less peak memory.
 * PNG encoding uses about 80% less peak memory on native platforms.
-* WebP decoding is faster: ~1.9x for lossy images.
+* WebP decoding is faster: ~2.1x for lossy images, and ~1.4x on the web.
 * `gaussianBlur` and `separableConvolution` are ~7x faster for 8-bit images,
   without a full-size temporary image.
 * Much faster `flip`, `flipVertical`, `flipHorizontal`, `copyRotate` (90, 180

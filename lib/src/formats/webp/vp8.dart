@@ -509,9 +509,17 @@ class VP8 {
 
   void _reconstructRow() {
     final mbY = _mbY;
-    final yDst = InputBuffer(_yuvBlock, offset: yOffset);
-    final uDst = InputBuffer(_yuvBlock, offset: uOffset);
-    final vDst = InputBuffer(_yuvBlock, offset: vOffset);
+    // The samples are copied with loops on the byte lists: the copies are
+    // short, and setRange has a high fixed cost on the web.
+    final yuv = _yuvBlock;
+    final yDst = InputBuffer(yuv, offset: yOffset);
+    final uDst = InputBuffer(yuv, offset: uOffset);
+    final vDst = InputBuffer(yuv, offset: vOffset);
+    final cacheY = _cacheY.buffer as Uint8List;
+    final cacheU = _cacheU.buffer as Uint8List;
+    final cacheV = _cacheV.buffer as Uint8List;
+    final cacheYStride = _cacheYStride!;
+    final cacheUVStride = _cacheUVStride!;
 
     for (var mbX = 0; mbX < _mbWidth!; ++mbX) {
       final block = _mbData[mbX];
@@ -520,26 +528,25 @@ class VP8 {
       // pixels at a time for alignment reason, and because of in-loop filter.
       if (mbX > 0) {
         for (var j = -1; j < 16; ++j) {
-          yDst.memcpy(j * bps - 4, 4, yDst, j * bps + 12);
+          _copy(yuv, yOffset + j * bps - 4, yuv, yOffset + j * bps + 12, 4);
         }
-
         for (var j = -1; j < 8; ++j) {
-          uDst.memcpy(j * bps - 4, 4, uDst, j * bps + 4);
-          vDst.memcpy(j * bps - 4, 4, vDst, j * bps + 4);
+          _copy(yuv, uOffset + j * bps - 4, yuv, uOffset + j * bps + 4, 4);
+          _copy(yuv, vOffset + j * bps - 4, yuv, vOffset + j * bps + 4, 4);
         }
       } else {
         for (var j = 0; j < 16; ++j) {
-          yDst[j * bps - 1] = 129;
+          yuv[yOffset + j * bps - 1] = 129;
         }
-
         for (var j = 0; j < 8; ++j) {
-          uDst[j * bps - 1] = 129;
-          vDst[j * bps - 1] = 129;
+          yuv[uOffset + j * bps - 1] = 129;
+          yuv[vOffset + j * bps - 1] = 129;
         }
 
         // Init top-left sample on left column too
         if (mbY > 0) {
-          yDst[-1 - bps] = uDst[-1 - bps] = vDst[-1 - bps] = 129;
+          yuv[yOffset - 1 - bps] =
+              yuv[uOffset - 1 - bps] = yuv[vOffset - 1 - bps] = 129;
         }
       }
 
@@ -549,37 +556,35 @@ class VP8 {
       var bits = block.nonZeroY;
 
       if (mbY > 0) {
-        yDst.memcpy(-bps, 16, topYuv.y);
-        uDst.memcpy(-bps, 8, topYuv.u);
-        vDst.memcpy(-bps, 8, topYuv.v);
+        _copy(yuv, yOffset - bps, topYuv.y, 0, 16);
+        _copy(yuv, uOffset - bps, topYuv.u, 0, 8);
+        _copy(yuv, vOffset - bps, topYuv.v, 0, 8);
       } else if (mbX == 0) {
         // we only need to do this init once at block (0,0).
         // Afterward, it remains valid for the whole topmost row.
-        yDst.memset(-bps - 1, 16 + 4 + 1, 127);
-        uDst.memset(-bps - 1, 8 + 1, 127);
-        vDst.memset(-bps - 1, 8 + 1, 127);
+        yuv
+          ..fillRange(yOffset - bps - 1, yOffset - bps + 16 + 4, 127)
+          ..fillRange(uOffset - bps - 1, uOffset - bps + 8, 127)
+          ..fillRange(vOffset - bps - 1, vOffset - bps + 8, 127);
       }
 
       // predict and add residuals
       if (block.isIntra4x4) {
         // 4x4
-        final topRight = InputBuffer.from(yDst, offset: -bps + 16);
-        final topRight32 = topRight.toUint32List();
-
+        const topRight = yOffset - bps + 16;
         if (mbY > 0) {
           if (mbX >= _mbWidth! - 1) {
             // on rightmost border
-            topRight.memset(0, 4, topYuv.y[15]);
+            yuv.fillRange(topRight, topRight + 4, topYuv.y[15]);
           } else {
-            topRight.memcpy(0, 4, _yuvT[mbX + 1].y);
+            _copy(yuv, topRight, _yuvT[mbX + 1].y, 0, 4);
           }
         }
 
         // replicate the top-right pixels below
-        final p = topRight32[0];
-        topRight32[3 * bps] = p;
-        topRight32[2 * bps] = p;
-        topRight32[bps] = p;
+        _copy(yuv, topRight + 4 * bps, yuv, topRight, 4);
+        _copy(yuv, topRight + 8 * bps, yuv, topRight, 4);
+        _copy(yuv, topRight + 12 * bps, yuv, topRight, 4);
 
         // predict and add residuals for all 4x4 blocks in turn.
         for (var n = 0; n < 16; ++n, bits = (bits << 2) & 0xffffffff) {
@@ -617,28 +622,29 @@ class VP8 {
 
       // stash away top samples for next block
       if (mbY < _mbHeight! - 1) {
-        topYuv.y.setRange(0, 16, yDst.toUint8List(), 15 * bps);
-        topYuv.u.setRange(0, 8, uDst.toUint8List(), 7 * bps);
-        topYuv.v.setRange(0, 8, vDst.toUint8List(), 7 * bps);
+        _copy(topYuv.y, 0, yuv, yOffset + 15 * bps, 16);
+        _copy(topYuv.u, 0, yuv, uOffset + 7 * bps, 8);
+        _copy(topYuv.v, 0, yuv, vOffset + 7 * bps, 8);
       }
 
       // Transfer reconstructed samples from yuv_b_ cache to final destination.
-      final yOut = mbX * 16; // dec->cache_y_ +
-      final uOut = mbX * 8; // dec->cache_u_ +
-      final vOut = mbX * 8; // _dec->cache_v_ +
-
+      final yOut = _cacheY.offset + mbX * 16;
+      final uOut = _cacheU.offset + mbX * 8;
+      final vOut = _cacheV.offset + mbX * 8;
       for (var j = 0; j < 16; ++j) {
-        final start = yOut + j * _cacheYStride!;
-        _cacheY.memcpy(start, 16, yDst, j * bps);
+        _copy(cacheY, yOut + j * cacheYStride, yuv, yOffset + j * bps, 16);
       }
-
       for (var j = 0; j < 8; ++j) {
-        var start = uOut + j * _cacheUVStride!;
-        _cacheU.memcpy(start, 8, uDst, j * bps);
-
-        start = vOut + j * _cacheUVStride!;
-        _cacheV.memcpy(start, 8, vDst, j * bps);
+        _copy(cacheU, uOut + j * cacheUVStride, yuv, uOffset + j * bps, 8);
+        _copy(cacheV, vOut + j * cacheUVStride, yuv, vOffset + j * bps, 8);
       }
+    }
+  }
+
+  // Copies n bytes from src at si to dst at di.
+  static void _copy(Uint8List dst, int di, Uint8List src, int si, int n) {
+    for (var i = 0; i < n; ++i) {
+      dst[di + i] = src[si + i];
     }
   }
 
