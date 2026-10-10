@@ -160,6 +160,22 @@ void main() {
     expect(() => Image(width: -1, height: 10), throwsArgumentError);
   });
 
+  test('JPEG with too many scans', () {
+    final jpeg = encodeJpg(Image(width: 8, height: 8));
+    var sos = 2;
+    while (jpeg[sos] != 0xff || jpeg[sos + 1] != 0xda) {
+      sos++;
+    }
+    // Repeat the scan, up to the EOI marker at the end.
+    final scan = jpeg.sublist(sos, jpeg.length - 2);
+    final bytes = Uint8List.fromList([
+      ...jpeg.sublist(0, sos),
+      for (var i = 0; i < 1001; ++i) ...scan,
+      0xff, 0xd9, //
+    ]);
+    expect(() => decodeJpg(bytes), _throwsImageException);
+  });
+
   group('decompression limits', () {
     test('ICC profile', () {
       final deflated = const ZLibEncoder().encodeBytes(Uint8List(64 << 20));

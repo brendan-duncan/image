@@ -13,6 +13,7 @@ Security fixes for decoding untrusted images:
 * Decoders throw only `ImageException` for bad data, not `RangeError` or other errors.
 * Encoders throw `ImageException` for empty images, and `Image` rejects negative sizes.
 * Limit decompressed sizes for TIFF, EXR, ICC profiles and font zips.
+* Limit JPEGs to 1000 scans.
 
 # 4.11.1
 

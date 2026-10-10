@@ -209,6 +209,7 @@ class JpegData {
   Image getImage() => getImageFromJpeg(this);
 
   void _read() {
+    _numScans = 0;
     var marker = _nextMarker();
     if (marker != JpegMarker.soi) {
       // SOI (Start of Image)
@@ -572,6 +573,11 @@ class JpegData {
   }
 
   void _readSOS(InputBuffer block) {
+    // Each scan is a pass over the image, so malformed data with many scans
+    // would take a very long time to decode.
+    if (++_numScans > _maxScans) {
+      throw ImageException('Too many JPEG scans');
+    }
     final n = block.readByte();
     if (n < 1 || n > maxCompsInScan) {
       throw ImageException('Invalid SOS block');
@@ -848,6 +854,8 @@ class JpegData {
   }
 
   bool _prepared = false;
+  int _numScans = 0;
+  static const _maxScans = 1000;
   bool _allowStreaming = false;
   bool _restartNeeded = false;
   JpegImageWriter? _writer;
