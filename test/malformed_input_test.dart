@@ -160,6 +160,19 @@ void main() {
     expect(() => Image(width: -1, height: 10), throwsArgumentError);
   });
 
+  test('commands run in an isolate complete when they throw', () async {
+    Command failing() => Command()
+      ..createImage(width: 1, height: 1)
+      ..filter((_) => throw ImageException('failed'));
+    const timeout = Duration(seconds: 30);
+    await expectLater(executeCommandImageAsync(failing()).timeout(timeout),
+        _throwsImageException);
+    await expectLater(executeCommandBytesAsync(failing()).timeout(timeout),
+        _throwsImageException);
+    await expectLater(
+        failing().executeThread().timeout(timeout), _throwsImageException);
+  });
+
   test('JPEG with too many scans', () {
     final jpeg = encodeJpg(Image(width: 8, height: 8));
     var sos = 2;

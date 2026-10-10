@@ -14,6 +14,7 @@ Security fixes for decoding untrusted images:
 * Encoders throw `ImageException` for empty images, and `Image` rejects negative sizes.
 * Limit decompressed sizes for TIFF, EXR, ICC profiles and font zips.
 * Limit JPEGs to 1000 scans.
+* Fix `executeCommandImageAsync` and `executeCommandBytesAsync` never completing when a command throws.
 
 # 4.11.1
 
