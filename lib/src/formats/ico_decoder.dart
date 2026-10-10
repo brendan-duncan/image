@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
 import '../util/output_buffer.dart';
+import '_guard_decode.dart';
 import '_max_pixels.dart';
 import 'bmp/bmp_info.dart';
 import 'bmp_decoder.dart';
@@ -42,13 +43,19 @@ class IcoDecoder extends Decoder {
   }
 
   @override
-  DecodeInfo? startDecode(Uint8List bytes) {
+  DecodeInfo? startDecode(Uint8List bytes) =>
+      guardDecode(() => _startDecode(bytes));
+
+  DecodeInfo? _startDecode(Uint8List bytes) {
     _input = InputBuffer(bytes);
     return _icoInfo = IcoInfo.read(_input!);
   }
 
   @override
-  Image? decode(Uint8List bytes, {int? frame}) {
+  Image? decode(Uint8List bytes, {int? frame}) =>
+      guardDecode(() => _decode(bytes, frame: frame));
+
+  Image? _decode(Uint8List bytes, {int? frame}) {
     final info = startDecode(bytes);
     if (info == null) {
       return null;
@@ -77,7 +84,9 @@ class IcoDecoder extends Decoder {
   }
 
   @override
-  Image? decodeFrame(int frame) {
+  Image? decodeFrame(int frame) => guardDecode(() => _decodeFrame(frame));
+
+  Image? _decodeFrame(int frame) {
     if (_input == null || _icoInfo == null || frame >= _icoInfo!.numFrames) {
       return null;
     }
@@ -153,7 +162,10 @@ class IcoDecoder extends Decoder {
   }
 
   /// decodes the largest frame.
-  Image? decodeImageLargest(Uint8List bytes) {
+  Image? decodeImageLargest(Uint8List bytes) =>
+      guardDecode(() => _decodeImageLargest(bytes));
+
+  Image? _decodeImageLargest(Uint8List bytes) {
     final info = startDecode(bytes);
     if (info == null) {
       return null;

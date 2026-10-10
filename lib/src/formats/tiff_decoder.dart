@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../exif/exif_data.dart';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
+import '_guard_decode.dart';
 import '_max_pixels.dart';
 import 'decoder.dart';
 import 'image_format.dart';
@@ -33,7 +34,10 @@ class TiffDecoder extends Decoder {
   /// Validate the file is a TIFF image and get information about it.
   /// If the file is not a valid TIFF image, null is returned.
   @override
-  TiffInfo? startDecode(Uint8List bytes) {
+  TiffInfo? startDecode(Uint8List bytes) =>
+      guardDecode(() => _startDecode(bytes));
+
+  TiffInfo? _startDecode(Uint8List bytes) {
     _input = InputBuffer(bytes);
     info = _readHeader(_input);
     if (info != null) {
@@ -51,7 +55,9 @@ class TiffDecoder extends Decoder {
   /// If [frame] is out of the range of available frames, null is returned.
   /// Non animated image files will only have [frame] 0.
   @override
-  Image? decodeFrame(int frame) {
+  Image? decodeFrame(int frame) => guardDecode(() => _decodeFrame(frame));
+
+  Image? _decodeFrame(int frame) {
     if (info == null) {
       return null;
     }
@@ -70,7 +76,10 @@ class TiffDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
-  Image? decode(Uint8List bytes, {int? frame}) {
+  Image? decode(Uint8List bytes, {int? frame}) =>
+      guardDecode(() => _decode(bytes, frame: frame));
+
+  Image? _decode(Uint8List bytes, {int? frame}) {
     _input = InputBuffer(bytes);
 
     info = _readHeader(_input);

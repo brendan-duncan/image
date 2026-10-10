@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../color/color_uint8.dart';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
+import '_guard_decode.dart';
 import '_max_pixels.dart';
 import 'decoder.dart';
 import 'gif/gif_color_map.dart';
@@ -51,7 +52,10 @@ class GifDecoder extends Decoder {
   /// Validate the file is a Gif image and get information about it.
   /// If the file is not a valid Gif image, null is returned.
   @override
-  GifInfo? startDecode(Uint8List bytes) {
+  GifInfo? startDecode(Uint8List bytes) =>
+      guardDecode(() => _startDecode(bytes));
+
+  GifInfo? _startDecode(Uint8List bytes) {
     _input = InputBuffer(bytes);
 
     info = GifInfo();
@@ -163,7 +167,9 @@ class GifDecoder extends Decoder {
   }
 
   @override
-  Image? decodeFrame(int frame) {
+  Image? decodeFrame(int frame) => guardDecode(() => _decodeFrame(frame));
+
+  Image? _decodeFrame(int frame) {
     if (_input == null || info == null) {
       return null;
     }
@@ -180,7 +186,10 @@ class GifDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, {int? frame}) {
+  Image? decode(Uint8List bytes, {int? frame}) =>
+      guardDecode(() => _decode(bytes, frame: frame));
+
+  Image? _decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }

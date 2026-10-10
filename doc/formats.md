@@ -93,7 +93,8 @@ frames; see [Decoding one frame at a time](animation.md#decoding-one-frame-at-a-
 
 The decode functions return null when the data isn't in the expected format. Corrupt or unsupported files
 may also throw an `ImageException`, for example when a PNG chunk fails its checksum or an image is larger
-than the decoder's [`maxPixels`](#size-limits) limit. Wrap decoding of untrusted files in a `try` block.
+than the decoder's [`maxPixels`](#size-limits) limit. Bad data doesn't throw any other kind of error, so
+wrap decoding of untrusted files in a `try` block that catches `ImageException`.
 
 ### Size limits
 

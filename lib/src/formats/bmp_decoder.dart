@@ -4,6 +4,7 @@ import '../color/format.dart';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
+import '_guard_decode.dart';
 import '_max_pixels.dart';
 import 'bmp/bmp_info.dart';
 import 'decoder.dart';
@@ -40,7 +41,10 @@ class BmpDecoder extends Decoder {
   int numFrames() => info != null ? info!.numFrames : 0;
 
   @override
-  BmpInfo? startDecode(Uint8List bytes) {
+  BmpInfo? startDecode(Uint8List bytes) =>
+      guardDecode(() => _startDecode(bytes));
+
+  BmpInfo? _startDecode(Uint8List bytes) {
     if (!isValidFile(bytes)) {
       return null;
     }
@@ -54,7 +58,9 @@ class BmpDecoder extends Decoder {
   /// is returned, which provides the image, and top-left coordinates of the
   /// image, as animated frames may only occupy a subset of the canvas.
   @override
-  Image decodeFrame(int frame) {
+  Image decodeFrame(int frame) => guardDecode(() => _decodeFrame(frame));
+
+  Image _decodeFrame(int frame) {
     if (info == null) {
       return Image.empty();
     }
@@ -137,7 +143,10 @@ class BmpDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
-  Image? decode(Uint8List data, {int? frame}) {
+  Image? decode(Uint8List data, {int? frame}) =>
+      guardDecode(() => _decode(data, frame: frame));
+
+  Image? _decode(Uint8List data, {int? frame}) {
     final info = startDecode(data);
     if (info == null || info.width < 1 || info.height < 1) {
       return null;

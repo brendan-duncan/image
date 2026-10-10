@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
+import '_guard_decode.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'image_format.dart';
@@ -54,7 +55,10 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  DecodeInfo? startDecode(Uint8List bytes) {
+  DecodeInfo? startDecode(Uint8List bytes) =>
+      guardDecode(() => _startDecode(bytes));
+
+  DecodeInfo? _startDecode(Uint8List bytes) {
     input = InputBuffer(bytes, bigEndian: true);
     return info = JpegData().readInfo(bytes);
   }
@@ -63,7 +67,9 @@ class JpegDecoder extends Decoder {
   int numFrames() => info == null ? 0 : info!.numFrames;
 
   @override
-  Image? decodeFrame(int frame) {
+  Image? decodeFrame(int frame) => guardDecode(() => _decodeFrame(frame));
+
+  Image? _decodeFrame(int frame) {
     if (input == null) {
       return null;
     }
@@ -74,7 +80,10 @@ class JpegDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, {int? frame}) => (JpegData()
+  Image? decode(Uint8List bytes, {int? frame}) =>
+      guardDecode(() => _decode(bytes, frame: frame));
+
+  Image? _decode(Uint8List bytes, {int? frame}) => (JpegData()
         ..maxPixels = maxPixels
         ..scale = scale)
       .decodeImage(bytes);

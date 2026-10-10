@@ -10,6 +10,7 @@ Security fixes for decoding untrusted images:
 * Fix ICO entries encoded as animated PNGs.
 * Fix `isValidFile` throwing on short data, which made `decodeImage` throw.
 * Fix PVR3 files not being detected or decoded.
+* Decoders throw only `ImageException` for bad data, not `RangeError` or other errors.
 
 # 4.11.1
 

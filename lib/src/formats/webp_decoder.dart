@@ -7,6 +7,7 @@ import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
+import '_guard_decode.dart';
 import '_max_pixels.dart';
 import 'decoder.dart';
 import 'image_format.dart';
@@ -59,7 +60,10 @@ class WebPDecoder extends Decoder {
   /// Validate the file is a WebP image and get information about it.
   /// If the file is not a valid WebP image, null is returned.
   @override
-  WebPInfo? startDecode(List<int> bytes) {
+  WebPInfo? startDecode(List<int> bytes) =>
+      guardDecode(() => _startDecode(bytes));
+
+  WebPInfo? _startDecode(List<int> bytes) {
     _input = InputBuffer(bytes);
 
     if (!_getHeader(_input!)) {
@@ -103,7 +107,9 @@ class WebPDecoder extends Decoder {
   }
 
   @override
-  Image? decodeFrame(int frame) {
+  Image? decodeFrame(int frame) => guardDecode(() => _decodeFrameIndex(frame));
+
+  Image? _decodeFrameIndex(int frame) {
     if (_input == null || _info == null) {
       return null;
     }
@@ -133,7 +139,10 @@ class WebPDecoder extends Decoder {
   /// Decode a WebP formatted file stored in [bytes] into an Image.
   /// If it's not a valid webp file, null is returned.
   @override
-  Image? decode(List<int> bytes, {int? frame}) {
+  Image? decode(List<int> bytes, {int? frame}) =>
+      guardDecode(() => _decode(bytes, frame: frame));
+
+  Image? _decode(List<int> bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }

@@ -104,6 +104,35 @@ void main() {
     }
   });
 
+  test('truncated files throw only ImageException', () {
+    final small = Image(width: 8, height: 8, numChannels: 4);
+    final anim = Image(width: 8, height: 8)
+      ..addFrame(Image(width: 8, height: 8));
+    final files = {
+      'png': encodePng(anim),
+      'jpg': encodeJpg(small),
+      'gif': encodeGif(anim),
+      'webp': encodeWebP(anim),
+      'tiff': encodeTiff(small),
+      'bmp': encodeBmp(small),
+      'tga': encodeTga(small),
+      'ico': encodeIco(anim),
+      'pvr': encodePvr(small),
+    };
+    for (final e in files.entries) {
+      final file = e.value;
+      for (var n = 0; n < file.length; n += 1 + n ~/ 16) {
+        final bytes = Uint8List.sublistView(file, 0, n);
+        try {
+          decodeImage(bytes);
+          decodeJpgExif(bytes);
+        } catch (err) {
+          expect(err, isA<ImageException>(), reason: '${e.key} $n bytes');
+        }
+      }
+    }
+  });
+
   test('PVR files are detected', () {
     final pvr = encodePvr(Image(width: 8, height: 8));
     expect(PvrDecoder().isValidFile(pvr), isTrue);

@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../image/image.dart';
 import '../util/input_buffer.dart';
+import '_guard_decode.dart';
 import '_max_pixels.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
@@ -35,7 +36,10 @@ class PvrDecoder extends Decoder {
   }
 
   @override
-  DecodeInfo? startDecode(Uint8List bytes) {
+  DecodeInfo? startDecode(Uint8List bytes) =>
+      guardDecode(() => _startDecode(bytes));
+
+  DecodeInfo? _startDecode(Uint8List bytes) {
     // Use a heuristic to detect potential apple PVRTC formats
     if (_countBits(bytes.length) == 1) {
       // very likely to be apple PVRTC
@@ -214,7 +218,9 @@ class PvrDecoder extends Decoder {
   int numFrames() => 1;
 
   @override
-  Image? decodeFrame(int frame) {
+  Image? decodeFrame(int frame) => guardDecode(() => _decodeFrame(frame));
+
+  Image? _decodeFrame(int frame) {
     if (_info == null || _data == null) {
       return null;
     }
@@ -232,7 +238,10 @@ class PvrDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, {int? frame}) {
+  Image? decode(Uint8List bytes, {int? frame}) =>
+      guardDecode(() => _decode(bytes, frame: frame));
+
+  Image? _decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }

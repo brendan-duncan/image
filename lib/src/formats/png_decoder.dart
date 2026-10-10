@@ -16,6 +16,7 @@ import '../image/palette_uint8.dart';
 import '../image/pixel.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
+import '_guard_decode.dart';
 import '_max_pixels.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
@@ -58,7 +59,10 @@ class PngDecoder extends Decoder {
   /// Start decoding the data as an animation sequence, but don't actually
   /// process the frames until they are requested with decodeFrame.
   @override
-  DecodeInfo? startDecode(Uint8List data) {
+  DecodeInfo? startDecode(Uint8List data) =>
+      guardDecode(() => _startDecode(data));
+
+  DecodeInfo? _startDecode(Uint8List data) {
     _input = InputBuffer(data, bigEndian: true);
 
     final pngHeader = _input.readBytes(8);
@@ -317,7 +321,9 @@ class PngDecoder extends Decoder {
 
   /// Decode the frame (assuming [startDecode] has already been called).
   @override
-  Image? decodeFrame(int frame) {
+  Image? decodeFrame(int frame) => guardDecode(() => _decodeFrame(frame));
+
+  Image? _decodeFrame(int frame) {
     Uint8List imageData;
 
     int? width = _info.width;
@@ -520,7 +526,10 @@ class PngDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, {int? frame}) {
+  Image? decode(Uint8List bytes, {int? frame}) =>
+      guardDecode(() => _decode(bytes, frame: frame));
+
+  Image? _decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }

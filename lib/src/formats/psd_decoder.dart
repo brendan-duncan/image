@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../image/image.dart';
+import '_guard_decode.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'image_format.dart';
@@ -33,7 +34,9 @@ class PsdDecoder extends Decoder {
   }
 
   /// Decode a raw PSD image without rendering it to a flat image.
-  PsdImage? decodePsd(Uint8List bytes) {
+  PsdImage? decodePsd(Uint8List bytes) => guardDecode(() => _decodePsd(bytes));
+
+  PsdImage? _decodePsd(Uint8List bytes) {
     final psd = PsdImage(bytes, maxPixels: maxPixels);
     return psd.decode() ? psd : null;
   }
@@ -42,7 +45,10 @@ class PsdDecoder extends Decoder {
   /// animated, the specified [frame] will be decoded. If there was a problem
   /// decoding the file, null is returned.
   @override
-  Image? decode(Uint8List bytes, {int? frame}) {
+  Image? decode(Uint8List bytes, {int? frame}) =>
+      guardDecode(() => _decode(bytes, frame: frame));
+
+  Image? _decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -73,6 +79,9 @@ class PsdDecoder extends Decoder {
   /// process the frames until they are requested with decodeFrame.
   @override
   DecodeInfo? startDecode(Uint8List bytes) =>
+      guardDecode(() => _startDecode(bytes));
+
+  DecodeInfo? _startDecode(Uint8List bytes) =>
       info = PsdImage(bytes, maxPixels: maxPixels);
 
   /// How many frames are available to be decoded. [startDecode] should have
@@ -84,5 +93,7 @@ class PsdDecoder extends Decoder {
   /// If [frame] is out of the range of available frames, null is returned.
   /// Non animated image files will only have [frame] 0.
   @override
-  Image? decodeFrame(int frame) => info?.decodeImage();
+  Image? decodeFrame(int frame) => guardDecode(() => _decodeFrame(frame));
+
+  Image? _decodeFrame(int frame) => info?.decodeImage();
 }

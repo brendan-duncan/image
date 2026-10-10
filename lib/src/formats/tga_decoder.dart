@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../image/image.dart';
 import '../image/palette.dart';
 import '../util/input_buffer.dart';
+import '_guard_decode.dart';
 import '_max_pixels.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
@@ -36,7 +37,10 @@ class TgaDecoder extends Decoder {
   }
 
   @override
-  Image? decode(Uint8List bytes, {int? frame}) {
+  Image? decode(Uint8List bytes, {int? frame}) =>
+      guardDecode(() => _decode(bytes, frame: frame));
+
+  Image? _decode(Uint8List bytes, {int? frame}) {
     if (startDecode(bytes) == null) {
       return null;
     }
@@ -45,7 +49,10 @@ class TgaDecoder extends Decoder {
   }
 
   @override
-  DecodeInfo? startDecode(Uint8List bytes) {
+  DecodeInfo? startDecode(Uint8List bytes) =>
+      guardDecode(() => _startDecode(bytes));
+
+  DecodeInfo? _startDecode(Uint8List bytes) {
     info = TgaInfo();
     input = InputBuffer(bytes);
 
@@ -72,7 +79,9 @@ class TgaDecoder extends Decoder {
   int numFrames() => info != null ? 1 : 0;
 
   @override
-  Image? decodeFrame(int frame) {
+  Image? decodeFrame(int frame) => guardDecode(() => _decodeFrame(frame));
+
+  Image? _decodeFrame(int frame) {
     if (info == null) {
       return null;
     }
