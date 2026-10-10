@@ -12,7 +12,7 @@ void main() async {
       // Re-declares the dimensions in the SOF header of a small valid JPEG,
       // producing a tiny file that claims to be a huge image.
       Uint8List jpgWithSize(int width, int height, {int components = 3}) {
-        final jpg = encodeJpg(Image(width: 8, height: 8, numChannels: 3));
+        final jpg = encodeJpg(Image(width: 8, height: 8));
         for (var i = 0; i < jpg.length - 9; ++i) {
           if (jpg[i] == 0xff && jpg[i + 1] == 0xc0) {
             jpg[i + 5] = height >> 8;
