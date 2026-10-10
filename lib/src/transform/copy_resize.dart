@@ -31,9 +31,21 @@ Image copyResize(Image src,
     interpolation = Interpolation.nearest;
   }
 
+  // An EXIF orientation is applied while resizing when the byte fast paths
+  // support the image, rather than first baking it into a rotated copy.
+  var orientation = 1;
   if (src.exif.imageIfd.hasOrientation && src.exif.imageIfd.orientation != 1) {
-    src = bakeOrientation(src);
+    final o = src.exif.imageIfd.orientation!;
+    if (o >= 2 &&
+        o <= 8 &&
+        src.frames.every((f) => canResizeBytes(f, interpolation))) {
+      orientation = o;
+    } else {
+      src = bakeOrientation(src);
+    }
   }
+  final srcWidth = orientedWidth(src, orientation);
+  final srcHeight = orientedHeight(src, orientation);
 
   var x1 = 0;
   var y1 = 0;
@@ -44,7 +56,7 @@ Image copyResize(Image src,
   if (width != null && height != null && maintainAspect == true) {
     x1 = 0;
     x2 = width;
-    final srcAspect = src.height / src.width;
+    final srcAspect = srcHeight / srcWidth;
     final h = (width * srcAspect).toInt();
     final dy = (height - h) ~/ 2;
     y1 = dy;
@@ -52,7 +64,7 @@ Image copyResize(Image src,
     if (y1 < 0 || y2 > height) {
       y1 = 0;
       y2 = height;
-      final srcAspect = src.width / src.height;
+      final srcAspect = srcWidth / srcHeight;
       final w = (height * srcAspect).toInt();
       final dx = (width - w) ~/ 2;
       x1 = dx;
@@ -63,10 +75,10 @@ Image copyResize(Image src,
   }
 
   if (height == null || height <= 0) {
-    height = (width! * (src.height / src.width)).round();
+    height = (width! * (srcHeight / srcWidth)).round();
   }
   if (width == null || width <= 0) {
-    width = (height * (src.width / src.height)).round();
+    width = (height * (srcWidth / srcHeight)).round();
   }
 
   final w = maintainAspect! ? x2 - x1 : width;
@@ -79,17 +91,17 @@ Image copyResize(Image src,
     y2 = height;
   }
 
-  if (width == src.width && height == src.height) {
-    return src.clone();
+  if (width == srcWidth && height == srcHeight) {
+    return orientation == 1 ? src.clone() : bakeOrientation(src);
   }
 
   final scaleX = Int32List(w);
   for (var x = 0; x < w; ++x) {
-    scaleX[x] = (x * src.width) ~/ w;
+    scaleX[x] = (x * srcWidth) ~/ w;
   }
   final scaleY = Int32List(h);
   for (var y = 0; y < h; ++y) {
-    scaleY[y] = (y * src.height) ~/ h;
+    scaleY[y] = (y * srcHeight) ~/ h;
   }
 
   Image? firstFrame;
@@ -102,17 +114,20 @@ Image copyResize(Image src,
     firstFrame?.addFrame(dst);
     firstFrame ??= dst;
 
-    final dy = frame.height / h;
-    final dx = frame.width / w;
+    final dy = orientedHeight(frame, orientation) / h;
+    final dx = orientedWidth(frame, orientation) / w;
 
     if (maintainAspect && backgroundColor != null) {
       dst.clear(backgroundColor);
     }
 
     if (resizeBytes(
-        frame, dst, interpolation, x1, y1, w, h, dx, dy, scaleX, scaleY)) {
+        frame, dst, interpolation, x1, y1, w, h, dx, dy, scaleX, scaleY,
+        orientation: orientation)) {
       continue;
     }
+    // Orientation is only folded in when the fast paths support the image.
+    assert(orientation == 1);
 
     if (interpolation == Interpolation.average) {
       final srcPixel = frame.getPixelSafe(0, 0);
@@ -233,6 +248,11 @@ Image copyResize(Image src,
         }
       }
     }
+  }
+
+  if (orientation != 1) {
+    // As bakeOrientation does.
+    firstFrame!.exif.imageIfd.orientation = null;
   }
 
   return firstFrame!;
