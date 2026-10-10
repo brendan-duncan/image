@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../image/image.dart';
 import '../util/input_buffer.dart';
+import '_max_pixels.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'image_format.dart';
@@ -13,6 +14,13 @@ import 'pvr/pvr_packet.dart';
 class PvrDecoder extends Decoder {
   Uint8List? _data;
   DecodeInfo? _info;
+
+  /// The maximum number of pixels (width * height) of the image. Larger
+  /// images throw an ImageException. A value <= 0 disables the limit.
+  final int maxPixels;
+
+  PvrDecoder({int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels;
 
   @override
   ImageFormat get format => ImageFormat.pvr;
@@ -207,6 +215,7 @@ class PvrDecoder extends Decoder {
       return null;
     }
 
+    checkPixels(_info!.width, _info!.height, maxPixels);
     if (_info is PvrAppleInfo) {
       return _decodeRgba4bpp(_info!.width, _info!.height, _data!);
     } else if (_info is Pvr2Info) {

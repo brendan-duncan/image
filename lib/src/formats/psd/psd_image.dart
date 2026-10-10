@@ -7,7 +7,9 @@ import '../../image/pixel.dart';
 import '../../util/color_util.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../_max_pixels.dart';
 import '../decode_info.dart';
+import '../decoder.dart';
 import 'psd_channel.dart';
 import 'psd_image_resource.dart';
 import 'psd_layer.dart';
@@ -55,7 +57,13 @@ class PsdImage implements DecodeInfo {
   @override
   Color? get backgroundColor => null;
 
-  PsdImage(List<int> bytes) {
+  /// The maximum number of pixels (width * height) of the image, and of all
+  /// of its layers. Larger images throw an [ImageException] from [decode].
+  /// A value <= 0 disables the limit.
+  final int maxPixels;
+
+  PsdImage(List<int> bytes, {int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels {
     _input = InputBuffer(bytes, bigEndian: true);
 
     _readHeader();
@@ -86,6 +94,12 @@ class PsdImage implements DecodeInfo {
   bool decode() {
     if (!isValid || _input == null) {
       return false;
+    }
+
+    checkPixels(width, height, maxPixels);
+    // The PSD specification allows 1 to 56 channels.
+    if (channels < 1 || channels > 56) {
+      throw ImageException('Invalid number of PSD channels: $channels');
     }
 
     // Color Mode Data Block:
@@ -471,6 +485,11 @@ class PsdImage implements DecodeInfo {
       }
     }
 
+    final budget = PixelBudget(maxPixels);
+    for (final layer in layers) {
+      checkPixels(layer.width, layer.height, maxPixels, allowEmpty: true);
+      budget.add(layer.width, layer.height);
+    }
     for (var i = 0; i < layers.length; ++i) {
       layers[i].readImageData(layerData, this);
     }

@@ -11,12 +11,10 @@ import 'jpeg/jpeg_info.dart';
 
 /// Decode a jpeg encoded image.
 class JpegDecoder extends Decoder {
-  /// The [maxPixels] used by decoders created without one, including the
-  /// decoders used by decodeImage and decodeJpg. The default of 2^28
-  /// (16384 x 16384) allows very large photos while preventing a small,
-  /// malicious file from declaring dimensions that would exhaust memory.
-  /// A value <= 0 disables the limit.
-  static int defaultMaxPixels = 1 << 28;
+  @Deprecated('Use Decoder.defaultMaxPixels')
+  static int get defaultMaxPixels => Decoder.defaultMaxPixels;
+  @Deprecated('Use Decoder.defaultMaxPixels')
+  static set defaultMaxPixels(int value) => Decoder.defaultMaxPixels = value;
 
   /// The maximum number of pixels (width * height) this decoder will decode.
   /// Images declaring more throw an [ImageException] before any pixel data is
@@ -33,7 +31,7 @@ class JpegDecoder extends Decoder {
   InputBuffer? input;
 
   JpegDecoder({int? maxPixels, this.scale = 1})
-      : maxPixels = maxPixels ?? defaultMaxPixels {
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels {
     if (scale != 1 && scale != 2 && scale != 4 && scale != 8) {
       throw ArgumentError.value(scale, 'scale', 'must be 1, 2, 4 or 8');
     }

@@ -10,6 +10,14 @@ import 'psd/psd_image.dart';
 class PsdDecoder extends Decoder {
   PsdImage? info;
 
+  /// The maximum number of pixels (width * height) of the image, and of all
+  /// of its layers. Larger images throw an ImageException. A value <= 0
+  /// disables the limit.
+  final int maxPixels;
+
+  PsdDecoder({int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels;
+
   @override
   ImageFormat get format => ImageFormat.psd;
 
@@ -20,7 +28,7 @@ class PsdDecoder extends Decoder {
 
   /// Decode a raw PSD image without rendering it to a flat image.
   PsdImage? decodePsd(Uint8List bytes) {
-    final psd = PsdImage(bytes);
+    final psd = PsdImage(bytes, maxPixels: maxPixels);
     return psd.decode() ? psd : null;
   }
 
@@ -58,7 +66,8 @@ class PsdDecoder extends Decoder {
   /// Start decoding the data as an animation sequence, but don't actually
   /// process the frames until they are requested with decodeFrame.
   @override
-  DecodeInfo? startDecode(Uint8List bytes) => info = PsdImage(bytes);
+  DecodeInfo? startDecode(Uint8List bytes) =>
+      info = PsdImage(bytes, maxPixels: maxPixels);
 
   /// How many frames are available to be decoded. [startDecode] should have
   /// been called first. Non animated image files will have a single frame.

@@ -43,9 +43,9 @@ void main() async {
       });
 
       test('defaultMaxPixels', () {
-        final saved = JpegDecoder.defaultMaxPixels;
-        addTearDown(() => JpegDecoder.defaultMaxPixels = saved);
-        JpegDecoder.defaultMaxPixels = 64 * 64;
+        final saved = Decoder.defaultMaxPixels;
+        addTearDown(() => Decoder.defaultMaxPixels = saved);
+        Decoder.defaultMaxPixels = 64 * 64;
         expect(() => decodeImage(jpgWithSize(65, 64)),
             throwsA(isA<ImageException>()));
         expect(decodeImage(jpgWithSize(64, 64))?.width, equals(64));

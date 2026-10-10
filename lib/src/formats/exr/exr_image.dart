@@ -5,7 +5,9 @@ import '../../color/color.dart';
 import '../../util/float16.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../_max_pixels.dart';
 import '../decode_info.dart';
+import '../decoder.dart';
 import 'exr_channel.dart';
 import 'exr_part.dart';
 
@@ -18,7 +20,12 @@ class ExrImage implements DecodeInfo {
   /// An EXR image has one or more parts, each of which contains a framebuffer.
   final List<ExrPart> _parts = [];
 
-  ExrImage(Uint8List bytes) {
+  /// Reads the EXR image in [bytes]. A part with more than [maxPixels]
+  /// pixels (width * height), or parts with more than that together, throw an
+  /// [ImageException]. If null, [Decoder.defaultMaxPixels] is used, and a
+  /// value <= 0 disables the limit.
+  ExrImage(Uint8List bytes, {int? maxPixels}) {
+    maxPixels ??= Decoder.defaultMaxPixels;
     final input = InputBuffer(bytes);
     final magic = input.readUint32();
     if (magic != signature) {
@@ -36,17 +43,21 @@ class ExrImage implements DecodeInfo {
           'contains unrecognized flags.');
     }
 
+    final budget = PixelBudget(maxPixels);
     if (!_isMultiPart) {
-      final ExrPart part = InternalExrPart(_parts.length, _isTiled, input);
+      final ExrPart part =
+          InternalExrPart(_parts.length, _isTiled, input, maxPixels: maxPixels);
       if (part.isValid) {
         _parts.add(part as InternalExrPart);
       }
     } else {
       while (true) {
-        final ExrPart part = InternalExrPart(_parts.length, _isTiled, input);
+        final ExrPart part = InternalExrPart(_parts.length, _isTiled, input,
+            maxPixels: maxPixels);
         if (!part.isValid) {
           break;
         }
+        budget.add(part.width, part.height);
         _parts.add(part as InternalExrPart);
       }
     }

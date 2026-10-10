@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../color/color_uint8.dart';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
+import '_max_pixels.dart';
 import 'decoder.dart';
 import 'gif/gif_color_map.dart';
 import 'gif/gif_image_desc.dart';
@@ -13,6 +14,11 @@ import 'image_format.dart';
 /// animated GIF files, and transparency.
 class GifDecoder extends Decoder {
   GifInfo? info;
+
+  /// The maximum number of pixels (width * height) of the image, and of all
+  /// the frames of a full animation decode. Larger images throw an
+  /// ImageException. A value <= 0 disables the limit.
+  int maxPixels = Decoder.defaultMaxPixels;
 
   GifDecoder([Uint8List? bytes]) {
     if (bytes != null) {
@@ -48,6 +54,7 @@ class GifDecoder extends Decoder {
     if (!_getInfo()) {
       return null;
     }
+    checkPixels(info!.width, info!.height, maxPixels, allowEmpty: true);
 
     try {
       while (!_input!.isEOS) {
@@ -180,12 +187,15 @@ class GifDecoder extends Decoder {
 
     Image? firstImage;
     Image? lastImage;
+    final budget = PixelBudget(maxPixels);
     for (var frameIndex = 0; frameIndex < info!.numFrames; ++frameIndex) {
       final frame = info!.frames[frameIndex];
       final image = decodeFrame(frameIndex);
       if (image == null) {
         return null;
       }
+      budget.add(
+          lastImage?.width ?? image.width, lastImage?.height ?? image.height);
 
       image.frameDuration = frame.duration * 10; // Convert to MS
 

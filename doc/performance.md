@@ -75,12 +75,13 @@ the whole image's coefficients in memory until the last scan, so they use notice
 
 ### Limit the size of images you accept
 
-`decodeJpg(bytes, maxPixels: n)` throws an `ImageException` before allocating anything if the JPEG declares more
-than `n` pixels. The default, `JpegDecoder.defaultMaxPixels`, is 2^28 (16384 x 16384). On a phone, a lower limit
-protects you from images too big to handle:
+Every decoder throws an `ImageException` before allocating the pixels if the image declares more than its
+`maxPixels`, for example `decodeJpg(bytes, maxPixels: n)` or `PngDecoder(maxPixels: n)`. The default,
+`Decoder.defaultMaxPixels`, is 2^28 (16384 x 16384). On a phone, a lower limit protects you from images too big
+to handle:
 
 ```dart
-JpegDecoder.defaultMaxPixels = 50000000; // also applies to decodeImage
+Decoder.defaultMaxPixels = 50000000; // also applies to decodeImage
 ```
 
 ### Decode a single animation frame

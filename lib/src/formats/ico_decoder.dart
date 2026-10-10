@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
 import '../util/output_buffer.dart';
+import '_max_pixels.dart';
 import 'bmp/bmp_info.dart';
 import 'bmp_decoder.dart';
 import 'decode_info.dart';
@@ -17,6 +18,14 @@ import 'png_decoder.dart';
 class IcoDecoder extends Decoder {
   InputBuffer? _input;
   IcoInfo? _icoInfo;
+
+  /// The maximum number of pixels (width * height) of an image, and of all
+  /// the images of a full decode. Larger images throw an ImageException.
+  /// A value <= 0 disables the limit.
+  final int maxPixels;
+
+  IcoDecoder({int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels;
 
   @override
   ImageFormat get format => ImageFormat.ico;
@@ -46,11 +55,13 @@ class IcoDecoder extends Decoder {
     }
 
     Image? firstImage;
+    final budget = PixelBudget(maxPixels);
     for (var i = 0; i < _icoInfo!.images.length; i++) {
       final frame = decodeFrame(i);
       if (frame == null) {
         continue;
       }
+      budget.add(frame.width, frame.height);
       if (firstImage == null) {
         firstImage = frame..frameType = FrameType.sequence;
       } else {
@@ -72,9 +83,9 @@ class IcoDecoder extends Decoder {
         _input!.start + imageInfo.bytesOffset,
         _input!.start + imageInfo.bytesOffset + imageInfo.bytesSize);
 
-    final png = PngDecoder();
+    final png = PngDecoder(maxPixels: maxPixels);
     if (png.isValidFile(imageBuffer as Uint8List)) {
-      return png.decode(imageBuffer);
+      return png.decode(imageBuffer, frame: 0);
     }
 
     // should be bmp.
@@ -104,7 +115,7 @@ class IcoDecoder extends Decoder {
       ..length -= 4
       ..writeUint32(offset);
     final inp = InputBuffer(imageBuffer);
-    final bmp = DibDecoder(inp, bmpInfo, forceRgba: true);
+    final bmp = DibDecoder(inp, bmpInfo, forceRgba: true, maxPixels: maxPixels);
 
     final image = bmp.decodeFrame(0);
 

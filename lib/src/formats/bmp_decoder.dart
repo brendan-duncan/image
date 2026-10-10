@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import '../color/format.dart';
 import '../image/image.dart';
+import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
+import '_max_pixels.dart';
 import 'bmp/bmp_info.dart';
 import 'decoder.dart';
 import 'image_format.dart';
@@ -12,7 +14,12 @@ class BmpDecoder extends Decoder {
   BmpInfo? info;
   bool forceRgba;
 
-  BmpDecoder({this.forceRgba = false});
+  /// The maximum number of pixels (width * height) of the image. Larger
+  /// images throw an [ImageException]. A value <= 0 disables the limit.
+  final int maxPixels;
+
+  BmpDecoder({this.forceRgba = false, int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels;
 
   @override
   ImageFormat get format => ImageFormat.bmp;
@@ -56,8 +63,12 @@ class BmpDecoder extends Decoder {
 
     _input.offset = inf.header.imageOffset;
 
+    checkPixels(inf.width, inf.height, maxPixels);
     final bpp = inf.bitsPerPixel;
     final rowStride = ((inf.width * bpp + 31) ~/ 32) * 4;
+    if (rowStride * inf.height > _input.length) {
+      throw ImageException('Truncated BMP data');
+    }
     final nc = forceRgba
         ? 4
         : bpp == 1 || bpp == 4 || bpp == 8
@@ -127,7 +138,8 @@ class BmpDecoder extends Decoder {
   /// decoding the file, null is returned.
   @override
   Image? decode(Uint8List data, {int? frame}) {
-    if (startDecode(data) == null) {
+    final info = startDecode(data);
+    if (info == null || info.width < 1 || info.height < 1) {
       return null;
     }
     return decodeFrame(frame ?? 0);
@@ -135,8 +147,9 @@ class BmpDecoder extends Decoder {
 }
 
 class DibDecoder extends BmpDecoder {
-  DibDecoder(InputBuffer input, BmpInfo info, {bool forceRgba = false})
-      : super(forceRgba: forceRgba) {
+  DibDecoder(InputBuffer input, BmpInfo info,
+      {bool forceRgba = false, int? maxPixels})
+      : super(forceRgba: forceRgba, maxPixels: maxPixels) {
     _input = input;
     this.info = info;
   }

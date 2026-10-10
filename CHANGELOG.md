@@ -4,6 +4,10 @@ Security fixes for decoding untrusted images:
 
 * Fix EXIF data with looping IFDs hanging the decoder.
 * Fix TIFF files with looping IFDs hanging the decoder, also from `decodeImage`.
+* Add `maxPixels` to every decoder, defaulting to `Decoder.defaultMaxPixels`; it also limits animations.
+* Deprecate `JpegDecoder.defaultMaxPixels` for `Decoder.defaultMaxPixels`.
+* Reject BMP, PNM and EXR data too short for its size, and bound EXR tiles.
+* Fix ICO entries encoded as animated PNGs.
 
 # 4.11.1
 

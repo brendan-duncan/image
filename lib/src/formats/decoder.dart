@@ -20,6 +20,14 @@ import 'image_format.dart';
 /// animation. The terms 'animation' and 'frames' simply refer to 'pages' in
 /// this case.
 abstract class Decoder {
+  /// The maxPixels used by decoders created without one, including the
+  /// decoders used by decodeImage. The default of 2^28 (16384 x 16384) allows
+  /// very large images while preventing a small, malicious file from
+  /// declaring dimensions that would exhaust memory. A full animation decode
+  /// is limited to this many pixels across all of its frames.
+  /// A value <= 0 disables the limit.
+  static int defaultMaxPixels = 1 << 28;
+
   ImageFormat get format => ImageFormat.invalid;
 
   /// A light-weight function to test if the given file is able to be decoded

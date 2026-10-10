@@ -7,6 +7,7 @@ import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
+import '_max_pixels.dart';
 import 'decoder.dart';
 import 'image_format.dart';
 import 'webp/vp8.dart';
@@ -20,6 +21,11 @@ class WebPDecoder extends Decoder {
   InternalWebPInfo? _info;
 
   static final _transparent = ColorRgba8(0, 0, 0, 0);
+
+  /// The maximum number of pixels (width * height) of the image, and of all
+  /// the frames of a full animation decode. Larger images throw an
+  /// [ImageException]. A value <= 0 disables the limit.
+  int maxPixels = Decoder.defaultMaxPixels;
 
   WebPDecoder([List<int>? bytes]) {
     if (bytes != null) {
@@ -66,6 +72,10 @@ class WebPDecoder extends Decoder {
 
     switch (_info!.format) {
       case WebPFormat.animated:
+        checkPixels(_info!.width, _info!.height, maxPixels);
+        for (final f in _info!.frames) {
+          checkPixels(f.width, f.height, maxPixels);
+        }
         _info!.numFrames = _info!.frames.length;
         return _info;
       case WebPFormat.lossless:
@@ -74,6 +84,7 @@ class WebPDecoder extends Decoder {
         if (!vp8l.decodeHeader()) {
           return null;
         }
+        checkPixels(_info!.width, _info!.height, maxPixels);
         _info!.numFrames = _info!.frames.length;
         return _info;
       case WebPFormat.lossy:
@@ -82,6 +93,7 @@ class WebPDecoder extends Decoder {
         if (!vp8.decodeHeader()) {
           return null;
         }
+        checkPixels(_info!.width, _info!.height, maxPixels);
         _info!.numFrames = _info!.frames.length;
         return _info;
       case WebPFormat.undefined:
@@ -134,6 +146,7 @@ class WebPDecoder extends Decoder {
     // Not frames[i - 1]: an undecodable frame is skipped, and must not dispose
     // in place of the frame that was actually drawn
     WebPFrame? previous;
+    final budget = PixelBudget(maxPixels);
     for (var i = 0; i < _info!.numFrames; ++i) {
       _info!.frame = i;
       final frame = _info!.frames[i];
@@ -141,6 +154,7 @@ class WebPDecoder extends Decoder {
       if (image == null) {
         continue;
       }
+      budget.add(_info!.width, _info!.height);
 
       image.frameDuration = frame.duration;
 

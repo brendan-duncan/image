@@ -1,9 +1,12 @@
+import 'dart:collection';
 import 'dart:typed_data';
 
 import '../color/color.dart';
 import '../color/format.dart';
 import '../image/image.dart';
+import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
+import '_max_pixels.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'image_format.dart';
@@ -33,7 +36,14 @@ class PnmInfo extends DecodeInfo {
 class PnmDecoder extends Decoder {
   PnmInfo? info;
   InputBuffer? input;
-  final _tokens = <String>[];
+  final _tokens = Queue<String>();
+
+  /// The maximum number of pixels (width * height) of the image. Larger
+  /// images throw an [ImageException]. A value <= 0 disables the limit.
+  final int maxPixels;
+
+  PnmDecoder({int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels;
 
   @override
   ImageFormat get format => ImageFormat.pnm;
@@ -85,11 +95,12 @@ class PnmDecoder extends Decoder {
     info!.width = _parseNextInt();
     info!.height = _parseNextInt();
 
-    if (info!.width == 0 || info!.height == 0) {
+    if (info!.width < 1 || info!.height < 1) {
       input = null;
       info = null;
       return null;
     }
+    checkPixels(info!.width, info!.height, maxPixels);
 
     return info;
   }
@@ -104,6 +115,7 @@ class PnmDecoder extends Decoder {
     }
 
     if (info!.format == PnmFormat.pbm) {
+      _checkLength(1);
       final image = Image(
           width: info!.width,
           height: info!.height,
@@ -124,6 +136,7 @@ class PnmDecoder extends Decoder {
       if (maxValue == 0) {
         return null;
       }
+      _checkLength(1);
       final image = Image(
           width: info!.width,
           height: info!.height,
@@ -140,6 +153,7 @@ class PnmDecoder extends Decoder {
       if (maxValue == 0) {
         return null;
       }
+      _checkLength(3);
       final image = Image(
           width: info!.width,
           height: info!.height,
@@ -154,6 +168,14 @@ class PnmDecoder extends Decoder {
     }
 
     return null;
+  }
+
+  // Every value takes at least a byte, so less data than values is truncated.
+  void _checkLength(int numChannels) {
+    final values = info!.width * info!.height * numChannels;
+    if (input!.length + _tokens.length < values) {
+      throw ImageException('Truncated PNM data');
+    }
   }
 
   Format formatFromMaxValue(int maxValue) {
@@ -196,7 +218,7 @@ class PnmDecoder extends Decoder {
       return '';
     }
     if (_tokens.isNotEmpty) {
-      return _tokens.removeAt(0);
+      return _tokens.removeFirst();
     }
     var line = input!.readStringLine().trim();
     if (line.isEmpty) {
@@ -216,6 +238,6 @@ class PnmDecoder extends Decoder {
     if (_tokens.isEmpty) {
       return '';
     }
-    return _tokens.removeAt(0);
+    return _tokens.removeFirst();
   }
 }

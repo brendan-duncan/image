@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' show min;
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -15,6 +16,7 @@ import '../image/palette_uint8.dart';
 import '../image/pixel.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
+import '_max_pixels.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'image_format.dart';
@@ -24,6 +26,14 @@ import 'png/png_info.dart';
 /// Decode a PNG encoded image.
 class PngDecoder extends Decoder {
   final _info = InternalPngInfo();
+
+  /// The maximum number of pixels (width * height) of the image, and of all
+  /// the frames of a full animation decode. Larger images throw an
+  /// [ImageException]. A value <= 0 disables the limit.
+  final int maxPixels;
+
+  PngDecoder({int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels;
 
   @override
   ImageFormat get format => ImageFormat.png;
@@ -90,6 +100,7 @@ class PngDecoder extends Decoder {
           final Uint8List hdrBytes = hdr.toUint8List();
           _info.width = hdr.readUint32();
           _info.height = hdr.readUint32();
+          checkPixels(_info.width, _info.height, maxPixels);
           _info.bits = hdr.readByte();
           _info.colorType = hdr.readByte();
           _info.compressionMethod = hdr.readByte();
@@ -342,6 +353,7 @@ class PngDecoder extends Decoder {
       final f = _info.frames[frame] as InternalPngFrame;
       width = f.width;
       height = f.height;
+      checkPixels(width, height, maxPixels);
       var totalSize = 0;
       final dataBlocks = <Uint8List>[];
       for (var i = 0; i < f.fdat.length; ++i) {
@@ -518,12 +530,15 @@ class PngDecoder extends Decoder {
 
     Image? firstImage;
     Image? lastImage;
-    for (var i = 0; i < _info.numFrames; ++i) {
+    final budget = PixelBudget(maxPixels);
+    final numFrames = min(_info.numFrames, _info.frames.length);
+    for (var i = 0; i < numFrames; ++i) {
       final frame = _info.frames[i];
       final image = decodeFrame(i);
       if (image == null) {
         continue;
       }
+      budget.add(_info.width, _info.height);
 
       if (firstImage == null || lastImage == null) {
         firstImage = image.convert(numChannels: image.numChannels);

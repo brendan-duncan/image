@@ -336,7 +336,7 @@ Future<bool> encodeImageFile(String path, Image image) async {
 /// Decode a JPG formatted image.
 ///
 /// Images with more than [maxPixels] pixels (width * height) throw an
-/// ImageException; if null, [JpegDecoder.defaultMaxPixels] is used.
+/// ImageException; if null, [Decoder.defaultMaxPixels] is used.
 ///
 /// [scale] (1, 2, 4 or 8) decodes the image scaled down by that factor, which
 /// is much faster and uses less memory: a quick way to make a thumbnail.

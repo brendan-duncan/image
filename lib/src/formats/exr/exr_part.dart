@@ -3,13 +3,13 @@ import 'dart:typed_data';
 
 import '../../color/format.dart';
 import '../../image/image.dart';
-import '../../image/image_data.dart';
 import '../../image/image_data_float16.dart';
 import '../../image/image_data_float32.dart';
 import '../../image/image_data_uint32.dart';
 import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
+import '../_max_pixels.dart';
 import 'exr_attribute.dart';
 import 'exr_channel.dart';
 import 'exr_compressor.dart';
@@ -44,11 +44,14 @@ class ExrPart {
   double screenWindowWidth = 1.0;
   late Float32List chromaticities;
 
-  ExrPart(this.index, this._tiled, InputBuffer input) {
+  /// Reads the part header from [input], throwing an [ImageException] if its
+  /// data window has more than [maxPixels] pixels (unless [maxPixels] <= 0).
+  ExrPart(this.index, this._tiled, InputBuffer input, {int maxPixels = 0}) {
     //_type = _tiled ? ExrPart._typeTile : ExrPart._typeScanline;
 
     var colorFormat = Format.float16;
-    final extraChannels = <String, ImageData>{};
+    // The extra channels are allocated once the data window is known.
+    final extraChannels = <String, ExrChannelType>{};
 
     while (true) {
       final name = input.readString();
@@ -79,14 +82,7 @@ class ExrPart {
                 colorFormat = Format.uint32;
               }
             } else {
-              final name = channel.name;
-              if (channel.dataType == ExrChannelType.half) {
-                extraChannels[name] = ImageDataFloat16(width, height, 1);
-              } else if (channel.dataType == ExrChannelType.float) {
-                extraChannels[name] = ImageDataFloat32(width, height, 1);
-              } else if (channel.dataType == ExrChannelType.uint) {
-                extraChannels[name] = ImageDataUint32(width, height, 1);
-              }
+              extraChannels[channel.name] = channel.dataType;
             }
             channels.add(channel);
           }
@@ -158,17 +154,34 @@ class ExrPart {
       }
     }
 
+    if (width == 0 && height == 0) {
+      // No data window, so the part isn't valid.
+      return;
+    }
+    checkPixels(width, height, maxPixels);
+
     framebuffer = Image(
         width: width,
         height: height,
         numChannels: numColorChannels,
         format: colorFormat);
 
-    for (var name in extraChannels.keys) {
-      framebuffer!.setExtraChannel(name, extraChannels[name]!);
+    for (final e in extraChannels.entries) {
+      final data = switch (e.value) {
+        ExrChannelType.half => ImageDataFloat16(width, height, 1),
+        ExrChannelType.float => ImageDataFloat32(width, height, 1),
+        ExrChannelType.uint => ImageDataUint32(width, height, 1),
+      };
+      framebuffer!.setExtraChannel(e.key, data);
     }
 
     if (_tiled) {
+      final tileWidth = _tileWidth ?? 0;
+      final tileHeight = _tileHeight ?? 0;
+      if (tileWidth < 1 || tileHeight < 1) {
+        throw ImageException('Invalid EXR tile size');
+      }
+      checkPixels(tileWidth, tileHeight, maxPixels);
       _numXLevels = _calculateNumXLevels(left, right, top, bottom);
       _numYLevels = _calculateNumYLevels(left, right, top, bottom);
       if (_tileLevelMode != _ripmapLevels) {
@@ -187,6 +200,17 @@ class ExrPart {
 
       _compressor = ExrCompressor(
           _compressionType, this, _maxBytesPerTileLine, _tileHeight);
+
+      // Each tile has an 8 byte offset in the file.
+      var numTiles = 0;
+      for (var ly = 0; ly < _numYLevels!; ++ly) {
+        for (var lx = 0; lx < _numXLevels!; ++lx) {
+          numTiles += _numXTiles![lx]! * _numYTiles![ly]!;
+        }
+      }
+      if (numTiles * 8 > input.length) {
+        throw ImageException('Truncated EXR data');
+      }
 
       var lx = 0;
       var ly = 0;
@@ -399,8 +423,8 @@ class ExrPart {
 
 @internal
 class InternalExrPart extends ExrPart {
-  InternalExrPart(int index, bool tiled, InputBuffer input)
-      : super(index, tiled, input);
+  InternalExrPart(int index, bool tiled, InputBuffer input, {int maxPixels = 0})
+      : super(index, tiled, input, maxPixels: maxPixels);
 
   List<Uint32List?>? get offsets => _offsets;
 

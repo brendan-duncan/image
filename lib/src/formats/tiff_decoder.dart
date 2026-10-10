@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../exif/exif_data.dart';
 import '../image/image.dart';
 import '../util/input_buffer.dart';
+import '_max_pixels.dart';
 import 'decoder.dart';
 import 'image_format.dart';
 import 'tiff/tiff_image.dart';
@@ -12,6 +13,14 @@ class TiffDecoder extends Decoder {
   TiffInfo? info;
   ExifData? exif;
   late InputBuffer _input;
+
+  /// The maximum number of pixels (width * height) of an image, and of all
+  /// the pages of a full decode. Larger images throw an ImageException.
+  /// A value <= 0 disables the limit.
+  final int maxPixels;
+
+  TiffDecoder({int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels;
 
   @override
   ImageFormat get format => ImageFormat.tiff;
@@ -47,7 +56,10 @@ class TiffDecoder extends Decoder {
       return null;
     }
 
-    final image = info!.images[frame].decode(_input);
+    final tiff = info!.images[frame];
+    checkPixels(tiff.width, tiff.height, maxPixels);
+    checkPixels(tiff.tileWidth, tiff.tileHeight, maxPixels);
+    final image = tiff.decode(_input);
     if (exif != null) {
       image.exif = exif!;
     }
@@ -74,6 +86,11 @@ class TiffDecoder extends Decoder {
         throw RangeError.range(frame, 0, len - 1);
       }
       return decodeFrame(frame);
+    }
+
+    final budget = PixelBudget(maxPixels);
+    for (final tiff in info!.images) {
+      budget.add(tiff.width, tiff.height);
     }
 
     final image = decodeFrame(0);

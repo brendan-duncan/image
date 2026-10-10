@@ -54,7 +54,7 @@ abstract class WinEncoder extends Encoder {
         ..writeUint16(bitsPerPixelOrYHotSpot(i));
 
       // Use png instead of bmp encoded data, it's supported since Windows Vista
-      final data = PngEncoder().encode(img);
+      final data = PngEncoder().encode(img, singleFrame: true);
 
       out
         ..writeUint32(data.length) // size of the image's data in bytes

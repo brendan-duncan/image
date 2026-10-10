@@ -20,7 +20,13 @@ import 'image_format.dart';
 class ExrDecoder extends Decoder {
   ExrImage? exrImage;
 
-  ExrDecoder();
+  /// The maximum number of pixels (width * height) of the image, and of all
+  /// of its parts. Larger images throw an ImageException. A value <= 0
+  /// disables the limit.
+  final int maxPixels;
+
+  ExrDecoder({int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels;
 
   @override
   ImageFormat get format => ImageFormat.exr;
@@ -29,7 +35,8 @@ class ExrDecoder extends Decoder {
   bool isValidFile(Uint8List bytes) => ExrImage.isValidFile(bytes);
 
   @override
-  DecodeInfo? startDecode(Uint8List bytes) => exrImage = ExrImage(bytes);
+  DecodeInfo? startDecode(Uint8List bytes) =>
+      exrImage = ExrImage(bytes, maxPixels: maxPixels);
 
   @override
   int numFrames() => exrImage != null ? exrImage!.parts.length : 0;

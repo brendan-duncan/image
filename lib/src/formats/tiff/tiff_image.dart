@@ -165,6 +165,10 @@ class TiffImage {
           tileHeight = l;
         }
       }
+      // The last strip holds the rows that remain.
+      if (tileHeight > height) {
+        tileHeight = height;
+      }
 
       tileOffsets = _readTagList(exifTagNameToID['StripOffsets']!);
       tileByteCounts = _readTagList(exifTagNameToID['StripByteCounts']!);

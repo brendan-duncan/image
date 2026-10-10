@@ -92,9 +92,30 @@ frames; see [Decoding one frame at a time](animation.md#decoding-one-frame-at-a-
 ### Errors
 
 The decode functions return null when the data isn't in the expected format. Corrupt or unsupported files
-may also throw an `ImageException`, for example when a PNG chunk fails its checksum or a JPEG is larger than
-the decoder's [`maxPixels`](#jpeg-decoding-encoding) limit. Wrap decoding of untrusted files in a `try`
-block.
+may also throw an `ImageException`, for example when a PNG chunk fails its checksum or an image is larger
+than the decoder's [`maxPixels`](#size-limits) limit. Wrap decoding of untrusted files in a `try` block.
+
+### Size limits
+
+Every decoder has a `maxPixels` limit on the width × height of an image. Larger images throw an
+`ImageException` before their pixels are allocated. A full decode of an animation, multi-page file or
+multi-part file is also limited to `maxPixels` across all of its frames. A value of 0 or less disables the
+limit.
+
+`Decoder.defaultMaxPixels` is a static setting, 2<sup>28</sup> (16384 × 16384) by default. It's used by
+every decoder created without `maxPixels`, including the ones `decodeImage` and `decodeImageFile` use. It
+protects against small, malicious files that declare huge dimensions.
+
+```dart
+// Allow larger images for every decode in the app.
+img.Decoder.defaultMaxPixels = 1 << 30;
+
+// Or limit one decoder.
+final image = img.PngDecoder(maxPixels: 4096 * 4096).decode(bytes);
+```
+
+`GifDecoder` and `WebPDecoder` take the file in their constructor, so their `maxPixels` is a field you set
+before decoding: `img.GifDecoder()..maxPixels = n`.
 
 ## Encoding Images
 
@@ -154,18 +175,11 @@ Decoding options, also available on `JpegDecoder({int? maxPixels, int scale = 1}
 | Option | Default | Description |
 |---|---|---|
 | `scale` | 1 | Decode the image scaled down by 1, 2, 4 or 8. The result is the JPEG's size divided by `scale`, rounded up. Scaled decoding skips most of the work and memory, so it's the fastest way to make a thumbnail. Other values throw an `ArgumentError`. |
-| `maxPixels` | `JpegDecoder.defaultMaxPixels` | The largest width × height (of the full-size image) that will be decoded. Larger images throw an `ImageException` before any pixel memory is allocated. A value of 0 or less disables the limit. |
-
-`JpegDecoder.defaultMaxPixels` is a static setting, 2<sup>28</sup> (16384 × 16384) by default. It's used by
-every JPEG decoder created without `maxPixels`, including the ones `decodeImage` and `decodeImageFile` use.
-It protects against small, malicious files that declare huge dimensions.
+| `maxPixels` | `Decoder.defaultMaxPixels` | The largest width × height (of the full-size image) that will be decoded; see [Size limits](#size-limits). |
 
 ```dart
 // A thumbnail at 1/8 of the size: much faster and smaller than a full decode.
 final thumb = img.decodeJpg(bytes, scale: 8);
-
-// Allow larger images for every JPEG decode in the app.
-img.JpegDecoder.defaultMaxPixels = 1 << 30;
 ```
 
 Other decoding behavior:
@@ -627,7 +641,7 @@ if (image != null) {
   data is decompressed as rows are read, so neither holds a second full copy of the image while decoding.
   Progressive JPEGs need all of their coefficients until the last scan. On `dart:io` platforms the PNG
   encoder also compresses as it goes, using the platform's zlib.
-- **Limit JPEG size.** Use `maxPixels` or `JpegDecoder.defaultMaxPixels` to refuse images too large for
-  your app.
+- **Limit image size.** Use `maxPixels` or `Decoder.defaultMaxPixels` to refuse images too large for your
+  app.
 - **Move work off the main thread.** [Commands](commands.md) can run decoding, processing and encoding in
   an isolate.

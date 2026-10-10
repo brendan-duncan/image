@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../image/image.dart';
 import '../image/palette.dart';
 import '../util/input_buffer.dart';
+import '_max_pixels.dart';
 import 'decode_info.dart';
 import 'decoder.dart';
 import 'image_format.dart';
@@ -13,6 +14,13 @@ import 'tga/tga_info.dart';
 class TgaDecoder extends Decoder {
   TgaInfo? info;
   late InputBuffer input;
+
+  /// The maximum number of pixels (width * height) of the image. Larger
+  /// images throw an ImageException. A value <= 0 disables the limit.
+  final int maxPixels;
+
+  TgaDecoder({int? maxPixels})
+      : maxPixels = maxPixels ?? Decoder.defaultMaxPixels;
 
   @override
   ImageFormat get format => ImageFormat.tga;
@@ -43,7 +51,7 @@ class TgaDecoder extends Decoder {
 
     final header = input.readBytes(18);
     info!.read(header);
-    if (!info!.isValid()) {
+    if (!info!.isValid() || info!.width < 1 || info!.height < 1) {
       return null;
     }
 
@@ -69,6 +77,7 @@ class TgaDecoder extends Decoder {
       return null;
     }
 
+    checkPixels(info!.width, info!.height, maxPixels);
     if (info!.imageType == TgaImageType.rgb) {
       return _decodeRgb();
     } else if (info!.imageType == TgaImageType.rgbRle ||
