@@ -1,6 +1,10 @@
 import 'dart:math';
+import 'dart:typed_data';
+
+import '../color/format.dart';
 
 import '../image/image.dart';
+import '../image/palette_uint8.dart';
 import '../util/neural_quantizer.dart';
 import '../util/quantizer.dart';
 
@@ -202,12 +206,67 @@ Image ditherImage(
     palette: palette,
   );
 
-  final imageCopy = image.clone();
+  // A fast path for RGB(A) uint8 images with a uint8 palette, working on the
+  // bytes. The error is accumulated in a copy of the pixels exactly as the
+  // Pixel setters of the general path do: clamped to [0, 255] and truncated.
+  final fast = image.format == Format.uint8 &&
+      !image.hasPalette &&
+      image.numChannels >= 3 &&
+      palette is PaletteUint8;
+  final nc = image.numChannels;
+  final pixels = fast ? Uint8List.fromList(image.toUint8List()) : null;
+  final indices = indexedImage.toUint8List();
+  final paletteRgb = Int32List(fast ? palette.numColors * 3 : 0);
+  if (fast) {
+    for (var i = 0, j = 0; i < palette.numColors; ++i) {
+      paletteRgb[j++] = palette.get(i, 0).toInt();
+      paletteRgb[j++] = palette.get(i, 1).toInt();
+      paletteRgb[j++] = palette.get(i, 2).toInt();
+    }
+  }
+  final numTaps = ds.length;
+  final tapW = Float64List.fromList([for (final t in ds) t[0].toDouble()]);
+  final tapX = Int32List.fromList([for (final t in ds) t[1].toInt()]);
+  final tapY = Int32List.fromList([for (final t in ds) t[2].toInt()]);
+
+  void diffusePixelFast(int x, int y, int direction) {
+    final c = pixels!;
+    final i = (y * width + x) * nc;
+    final r1 = c[i];
+    final g1 = c[i + 1];
+    final b1 = c[i + 2];
+
+    final idx = q.getColorIndexRgb(r1, g1, b1);
+    indices[y * width + x] = idx;
+
+    final er = r1 - paletteRgb[idx * 3];
+    final eg = g1 - paletteRgb[idx * 3 + 1];
+    final eb = b1 - paletteRgb[idx * 3 + 2];
+    if (er == 0 && eg == 0 && eb == 0) {
+      return;
+    }
+
+    final i0 = direction == 1 ? 0 : numTaps - 1;
+    final i1 = direction == 1 ? numTaps : -1;
+    for (var t = i0; t != i1; t += direction) {
+      final nx = x + tapX[t];
+      final ny = y + tapY[t];
+      if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+        final d = tapW[t];
+        final j = (ny * width + nx) * nc;
+        c[j] = _addError(c[j], er * d);
+        c[j + 1] = _addError(c[j + 1], eg * d);
+        c[j + 2] = _addError(c[j + 2], eb * d);
+      }
+    }
+  }
+
+  final imageCopy = fast ? image : image.clone();
 
   // Quantizes the pixel at [x],[y] and diffuses its error to the neighbors.
   // [direction] is the horizontal scan direction (1 or -1) and controls the
   // order in which the kernel taps are applied.
-  void diffusePixel(int x, int y, int direction) {
+  void diffusePixelGeneral(int x, int y, int direction) {
     // Get original color
     final pc = imageCopy.getPixel(x, y);
     final r1 = pc[0].toInt();
@@ -250,6 +309,8 @@ Image ditherImage(
       }
     }
   }
+
+  final diffusePixel = fast ? diffusePixelFast : diffusePixelGeneral;
 
   if (order == DitherScanOrder.zigzag) {
     // Walk the anti-diagonals x + y == d, alternating their direction.
@@ -389,4 +450,15 @@ void _hilbertDtoXY(int n, int d, List<int> out) {
     out[1] += s * ry;
     t >>= 2;
   }
+}
+
+// Adds an error to a channel value, clamping and truncating as the Pixel
+// setters do.
+int _addError(int v, double e) {
+  final n = v + e;
+  return n < 0
+      ? 0
+      : n > 255
+          ? 255
+          : n.toInt();
 }
