@@ -897,7 +897,6 @@ class Image extends Iterable<Pixel> {
         final usedColors = <int, int>{};
         var numColors = 0;
         final op = frame.getPixel(0, 0);
-        Color? c;
         for (final np in newImage) {
           final nr = (op.rNormalized * 255).floor();
           final ng = (op.gNormalized * 255).floor();
@@ -908,8 +907,10 @@ class Image extends Iterable<Pixel> {
           } else {
             usedColors[h] = numColors;
             np.index = numColors;
-            c = convertColor(op,
-                to: c, format: f, numChannels: numChannels, alpha: alpha);
+            // Not reused: a converted Pixel can still refer to the source
+            // image, which converting into it would then modify.
+            final c = convertColor(op,
+                format: f, numChannels: numChannels, alpha: alpha);
             pal.setRgb(numColors, c.r, c.g, c.b);
             numColors++;
           }

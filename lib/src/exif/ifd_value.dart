@@ -688,6 +688,9 @@ class IfdValueUndefined extends IfdValue {
 
   IfdValueUndefined.list(List<int> value) : value = Uint8List.fromList(value);
 
+  /// Uses [value] without copying it.
+  IfdValueUndefined.view(this.value);
+
   IfdValueUndefined.data(InputBuffer data, int count)
       : value = Uint8List.fromList(data.readBytes(count).toUint8List());
 

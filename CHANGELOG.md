@@ -9,11 +9,14 @@
 * Fix `flip` (both directions) and `bakeOrientation` (orientation 3) not
   flipping the middle row of odd-height images.
 * Fix 16-bit grayscale PNG transparency (tRNS) being ignored.
+* Fix 8-bit grayscale BMP encoding writing the wrong grays.
+* Fix TGA encoding of grayscale and grayscale+alpha images.
+* Fix `Image.convert(withPalette: true)` modifying the source image.
 * Fix cubic interpolation sampling outside the image near the top and left
   edges, which brightened or darkened them.
 * Fix `OutputBuffer` growth taking quadratic time; 8-bit BMP encoding is ~5x
   faster.
-* Lower peak memory when encoding BMP and TGA images.
+* Faster BMP, TGA and TIFF encoding, using less memory.
 * Faster JPEG decoding, using about half the peak memory.
 * Faster JPEG format detection in `decodeImage`.
 * JPEG encoding is ~2.4x faster and uses less memory.
@@ -28,6 +31,7 @@
 * `bakeOrientation`, and so `copyResize`, use less memory on rotated photos.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
 * `PngCicpData.colourPrimaries` is renamed to `colorPrimaries`.
+* Add `IfdValueUndefined.view`, which doesn't copy its data.
 
 # 4.10.2
 

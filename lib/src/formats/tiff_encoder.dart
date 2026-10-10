@@ -46,7 +46,8 @@ class TiffEncoder extends Encoder {
     ifd0['TileWidth'] = image.width;
     ifd0['TileLength'] = image.height;
     ifd0['StripByteCounts'] = image.lengthInBytes;
-    ifd0['StripOffsets'] = IfdValueUndefined.list(image.toUint8List());
+    // The pixel data is written straight from the image, without a copy.
+    ifd0['StripOffsets'] = IfdValueUndefined.view(image.toUint8List());
 
     if (image.hasPalette) {
       final p = image.palette!;

@@ -61,5 +61,22 @@ void main() {
         });
       }
     });
+
+    test('grayscale and grayscale+alpha round trip', () {
+      for (final nc in [1, 2]) {
+        final img = Image(width: 4, height: 2, numChannels: nc);
+        for (final p in img) {
+          p
+            ..r = p.x * 60 + p.y
+            ..a = 255 - p.x * 50;
+        }
+        final back = decodeTga(encodeTga(img))!;
+        for (final p in back) {
+          final v = p.x * 60 + p.y;
+          expect([p.r, p.g, p.b], equals([v, v, v]));
+          expect(p.a, equals(nc == 2 ? 255 - p.x * 50 : 255));
+        }
+      }
+    });
   });
 }

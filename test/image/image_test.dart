@@ -287,5 +287,14 @@ void main() {
       expect(b1[2], equals(64));
       expect(b1[3], equals(128));
     });
+
+    test('convert withPalette leaves the source unchanged', () {
+      final img = Image(width: 4, height: 1, numChannels: 1);
+      for (final p in img) {
+        p.r = p.x * 60;
+      }
+      img.convert(format: Format.uint8, withPalette: true);
+      expect(img.toUint8List(), equals([0, 60, 120, 180]));
+    });
   });
 }

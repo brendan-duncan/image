@@ -79,5 +79,19 @@ void main() {
             .execute();
       });
     });
+
+    test('8-bit grayscale round trip', () {
+      final img = Image(width: 4, height: 2, numChannels: 1);
+      for (final p in img) {
+        p.r = p.x * 60 + p.y;
+      }
+      final original = img.clone();
+      final back = decodeBmp(encodeBmp(img))!;
+      testImageEquals(img, original);
+      for (final p in back) {
+        final v = p.x * 60 + p.y;
+        expect([p.r, p.g, p.b], equals([v, v, v]));
+      }
+    });
   });
 }

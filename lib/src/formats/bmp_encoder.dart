@@ -71,8 +71,8 @@ class BmpEncoder extends Encoder {
       // => uint8,4
       image = image.convert(format: Format.uint8, numChannels: 4);
     } else if (format == Format.uint8 && nc == 1 && palette == null) {
-      // => uint8 palette
-      image = image.convert(format: Format.uint8, withPalette: true);
+      // Written as is: the grayscale values index the gray palette that's
+      // written when there is no palette.
     } else if (format == Format.uint8 && nc == 2) {
       // => uint8,4
       // A 2 channel image is grayscale+alpha, and BMP has no grayscale+alpha
@@ -288,21 +288,44 @@ class BmpEncoder extends Encoder {
         }
       }
     } else {
-      Pixel? p;
-      for (var y = h - 1; y >= 0; --y) {
-        p = image.getPixel(0, y, p);
-        for (var x = 0; x < w; ++x) {
-          out
-            ..writeByte(p.b as int)
-            ..writeByte(p.g as int)
-            ..writeByte(p.r as int);
-          if (hasAlpha) {
-            out.writeByte(p.a as int);
+      // Rows are stored bottom to top, as BGR(A).
+      final bytesPerPixel = hasAlpha ? 4 : 3;
+      final row = Uint8List(w * bytesPerPixel);
+      if (image.format == Format.uint8 && !image.hasPalette) {
+        final data = image.toUint8List();
+        final stride = image.data!.rowStride;
+        final nc = image.numChannels;
+        for (var y = h - 1; y >= 0; --y) {
+          for (var i = 0, s = y * stride; i < row.length; s += nc) {
+            row[i++] = data[s + 2];
+            row[i++] = data[s + 1];
+            row[i++] = data[s];
+            if (hasAlpha) {
+              row[i++] = data[s + 3];
+            }
           }
-          p.moveNext();
+          out.writeBytes(row);
+          if (rowPadding != null) {
+            out.writeBytes(rowPadding);
+          }
         }
-        if (rowPadding != null) {
-          out.writeBytes(rowPadding);
+      } else {
+        Pixel? p;
+        for (var y = h - 1; y >= 0; --y) {
+          p = image.getPixel(0, y, p);
+          for (var x = 0, i = 0; x < w; ++x) {
+            row[i++] = p.b as int;
+            row[i++] = p.g as int;
+            row[i++] = p.r as int;
+            if (hasAlpha) {
+              row[i++] = p.a as int;
+            }
+            p.moveNext();
+          }
+          out.writeBytes(row);
+          if (rowPadding != null) {
+            out.writeBytes(rowPadding);
+          }
         }
       }
     }
