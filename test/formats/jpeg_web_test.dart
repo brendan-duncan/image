@@ -71,6 +71,57 @@ void main() {
           }
         });
       }
+
+      for (final chroma in JpegChroma.values) {
+        test('scaled decode ${chroma.name}', () {
+          final src = _gradient(37, 29);
+          final bytes = encodeJpg(src, chroma: chroma);
+          final full = decodeJpg(bytes)!;
+          for (final scale in [2, 4, 8]) {
+            final scaled = decodeJpg(bytes, scale: scale)!;
+            final w = (37 + scale - 1) ~/ scale;
+            final h = (29 + scale - 1) ~/ scale;
+            expect(scaled.width, equals(w), reason: 'scale $scale');
+            expect(scaled.height, equals(h), reason: 'scale $scale');
+            // Close to the average of each scale x scale block of the full
+            // size decode.
+            var total = 0;
+            for (final q in scaled) {
+              final sum = [0, 0, 0];
+              var n = 0;
+              for (var y = q.y * scale; y < (q.y + 1) * scale && y < 29; ++y) {
+                for (var x = q.x * scale;
+                    x < (q.x + 1) * scale && x < 37;
+                    ++x, ++n) {
+                  final p = full.getPixel(x, y);
+                  sum[0] += p.r.toInt();
+                  sum[1] += p.g.toInt();
+                  sum[2] += p.b.toInt();
+                }
+              }
+              total += (sum[0] / n - q.r).abs().round() +
+                  (sum[1] / n - q.g).abs().round() +
+                  (sum[2] / n - q.b).abs().round();
+            }
+            // Subsampled chroma covers twice the area, so on this steep
+            // gradient it differs more from the full resolution average.
+            expect(total / (w * h * 3),
+                lessThan(chroma == JpegChroma.yuv444 ? 6 : 3 + 3 * scale),
+                reason: 'scale $scale');
+          }
+        });
+      }
+
+      test('scaled decode applies the orientation', () {
+        final src = _gradient(37, 29)..exif.imageIfd.orientation = 6;
+        final scaled = decodeJpg(encodeJpg(src), scale: 4)!;
+        expect(scaled.width, equals(8));
+        expect(scaled.height, equals(10));
+      });
+
+      test('scaled decode rejects other scales', () {
+        expect(() => JpegDecoder(scale: 3), throwsArgumentError);
+      });
     });
   });
 }

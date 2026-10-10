@@ -46,6 +46,11 @@ class JpegData {
   /// allocated. A value <= 0 disables the limit.
   int maxPixels = 0;
 
+  /// The factor the image is scaled down by while decoding: 1, 2, 4 or 8.
+  /// Scaling reduces the work and memory of the inverse DCT output and the
+  /// decoded image, making it a fast way to decode a thumbnail.
+  int scale = 1;
+
   late InputBuffer input;
   late JpegJfif jfif;
   JpegAdobe? adobe;
@@ -184,6 +189,12 @@ class JpegData {
   int? get width => frame!.samplesPerLine;
 
   int? get height => frame!.scanLines;
+
+  /// The width of the decoded image, [width] divided by [scale].
+  int get scaledWidth => (width! + scale - 1) ~/ scale;
+
+  /// The height of the decoded image, [height] divided by [scale].
+  int get scaledHeight => (height! + scale - 1) ~/ scale;
 
   Image getImage() => getImageFromJpeg(this);
 
@@ -640,27 +651,42 @@ class JpegData {
       JpegFrame frame, JpegComponent component) {
     final blocksPerLine = component.blocksPerLine;
     final blocksPerColumn = component.blocksPerColumn;
-    final samplesPerLine = blocksPerLine << 3;
+    // The size of a decoded block.
+    final bs = 8 ~/ scale;
+    final samplesPerLine = blocksPerLine * bs;
     final R = Int32List(64);
     final r = Uint8List(64);
-    final lines = List<Uint8List?>.filled(blocksPerColumn * 8, null);
+    final lines = List<Uint8List?>.filled(blocksPerColumn * bs, null);
     final coefficients = component.coefficients;
     final blocksPerLineForMcu = component.blocksPerLineForMcu;
+    final quantizationTable = component.quantizationTable!;
 
     var l = 0;
     for (var blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
-      final scanLine = blockRow << 3;
-      for (var i = 0; i < 8; i++) {
+      final scanLine = blockRow * bs;
+      for (var i = 0; i < bs; i++) {
         lines[l++] = Uint8List(samplesPerLine);
       }
 
       for (var blockCol = 0; blockCol < blocksPerLine; blockCol++) {
-        quantizeAndInverse(component.quantizationTable!, coefficients,
-            (blockRow * blocksPerLineForMcu + blockCol) << 6, r, R);
+        final offset = (blockRow * blocksPerLineForMcu + blockCol) << 6;
+        if (bs == 1) {
+          // A block scaled to one pixel is its average, given by the DC
+          // coefficient alone.
+          lines[scanLine]![blockCol] =
+              _dcValue(coefficients[offset] * quantizationTable[0]);
+          continue;
+        }
 
-        final sample = blockCol << 3;
-        for (var j = 0; j < 8; j++) {
-          lines[scanLine + j]?.setRange(sample, sample + 8, r, j << 3);
+        quantizeAndInverse(quantizationTable, coefficients, offset, r, R);
+
+        final sample = blockCol * bs;
+        if (bs == 8) {
+          for (var j = 0; j < 8; j++) {
+            lines[scanLine + j]?.setRange(sample, sample + 8, r, j << 3);
+          }
+        } else {
+          _scaleBlock(r, bs, lines, scanLine, sample);
         }
       }
     }
@@ -669,6 +695,42 @@ class JpegData {
     component.coefficients = Int16List(0);
 
     return lines;
+  }
+
+  // The value of each pixel of a block with only the DC coefficient [p0]
+  // (dequantized), as quantizeAndInverse computes it. Floor division of
+  // doubles, which are exact here, is used instead of shifts, which would
+  // overflow 32 bits on the web.
+  static int _dcValue(int p0) {
+    final t = ((5793 * p0 + 512) / 1024).floor();
+    final t2 = ((5793 * t + 8192) / 16384).floor();
+    final v = 128 + ((t2 + 8) / 16).floor();
+    return v < 0
+        ? 0
+        : v > 255
+            ? 255
+            : v;
+  }
+
+  // Averages the 8x8 block [r] down to bs x bs pixels at [sample] of
+  // [lines], starting at [scanLine].
+  static void _scaleBlock(
+      Uint8List r, int bs, List<Uint8List?> lines, int scanLine, int sample) {
+    final n = 8 ~/ bs;
+    final count = n * n;
+    for (var y = 0; y < bs; ++y) {
+      final line = lines[scanLine + y]!;
+      for (var x = 0; x < bs; ++x) {
+        var sum = 0;
+        for (var j = 0; j < n; ++j) {
+          final row = (y * n + j) * 8 + x * n;
+          for (var i = 0; i < n; ++i) {
+            sum += r[row + i];
+          }
+        }
+        line[sample + x] = (sum + (count >> 1)) ~/ count;
+      }
+    }
   }
 
   static int toFix(double val) {

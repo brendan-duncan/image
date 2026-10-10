@@ -39,6 +39,8 @@
   copy: ~4x faster and ~8x less memory for portrait photos.
 * `bakeOrientation` uses less memory on rotated photos.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
+* Add `scale` to `decodeJpg` and `JpegDecoder`, to quickly decode a JPEG at
+  1/2, 1/4 or 1/8 size (~4x faster at 1/8).
 * `PngCicpData.colourPrimaries` is renamed to `colorPrimaries`.
 * Add `IfdValueUndefined.view`, which doesn't copy its data.
 

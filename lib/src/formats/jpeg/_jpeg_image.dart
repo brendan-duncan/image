@@ -19,8 +19,8 @@ Image getImageFromJpeg(JpegData jpeg) {
   final orientation =
       jpeg.exif.imageIfd.hasOrientation ? jpeg.exif.imageIfd.orientation! : 0;
 
-  final w = jpeg.width!;
-  final h = jpeg.height!;
+  final w = jpeg.scaledWidth;
+  final h = jpeg.scaledHeight;
   final flipWidthHeight = orientation >= 5 && orientation <= 8;
   final width = flipWidthHeight ? h : w;
   final height = flipWidthHeight ? w : h;

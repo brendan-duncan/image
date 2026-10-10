@@ -23,10 +23,21 @@ class JpegDecoder extends Decoder {
   /// allocated. A value <= 0 disables the limit.
   final int maxPixels;
 
+  /// The factor the image is scaled down by while decoding: 1, 2, 4 or 8.
+  /// Decoding at a reduced scale is much faster and uses less memory, so it's
+  /// a good way to decode a thumbnail. The decoded image is the size of the
+  /// JPEG divided by [scale], rounded up.
+  final int scale;
+
   JpegInfo? info;
   InputBuffer? input;
 
-  JpegDecoder({int? maxPixels}) : maxPixels = maxPixels ?? defaultMaxPixels;
+  JpegDecoder({int? maxPixels, this.scale = 1})
+      : maxPixels = maxPixels ?? defaultMaxPixels {
+    if (scale != 1 && scale != 2 && scale != 4 && scale != 8) {
+      throw ArgumentError.value(scale, 'scale', 'must be 1, 2, 4 or 8');
+    }
+  }
 
   @override
   ImageFormat get format => ImageFormat.jpg;
@@ -56,6 +67,7 @@ class JpegDecoder extends Decoder {
     }
     final jpeg = JpegData()
       ..maxPixels = maxPixels
+      ..scale = scale
       ..read(input!.buffer);
     if (jpeg.frames.length != 1) {
       throw ImageException('only single frame JPEGs supported');
@@ -68,6 +80,7 @@ class JpegDecoder extends Decoder {
   Image? decode(Uint8List bytes, {int? frame}) {
     final jpeg = JpegData()
       ..maxPixels = maxPixels
+      ..scale = scale
       ..read(bytes);
 
     if (jpeg.frames.length != 1) {

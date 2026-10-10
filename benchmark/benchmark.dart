@@ -47,6 +47,10 @@ class Benchmark {
 final benchmarks = <Benchmark>[
   // Decoding
   Benchmark('decode_jpeg', (i) => i.file('rgb.jpg'), (b) => decodeJpg(_b(b))),
+  Benchmark('decode_jpeg_scale2', (i) => i.file('rgb.jpg'),
+      (b) => decodeJpg(_b(b), scale: 2)),
+  Benchmark('decode_jpeg_scale8', (i) => i.file('rgb.jpg'),
+      (b) => decodeJpg(_b(b), scale: 8)),
   Benchmark(
       'decode_png_rgb', (i) => i.file('rgb.png'), (b) => decodePng(_b(b))),
   Benchmark(
