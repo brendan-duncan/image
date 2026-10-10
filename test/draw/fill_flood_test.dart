@@ -56,6 +56,48 @@ void main() {
       expect(right.b, equals(0));
     });
 
+    test('fillFlood: fills a whole uniform RGBA image', () {
+      final img = Image(width: 64, height: 64, numChannels: 4)
+        ..clear(ColorRgba8(10, 20, 30, 255));
+      final color = ColorRgba8(255, 0, 0, 255);
+      fillFlood(img, x: 0, y: 0, color: color);
+      for (final p in img) {
+        expect(p, equals([255, 0, 0, 255]), reason: '${p.x},${p.y}');
+      }
+      expect(color.a, equals(255), reason: "the caller's color is unchanged");
+    });
+
+    test('maskFlood: leaves the image unchanged', () {
+      final img = Image(width: 8, height: 8, numChannels: 4)
+        ..clear(ColorRgba8(10, 20, 30, 255));
+      final mask = maskFlood(img, 0, 0);
+      expect(mask.every((v) => v == 255), isTrue);
+      expect(img.every((p) => p.a == 255), isTrue);
+    });
+
+    test('fillFlood: a long winding shape', () {
+      // A maze one pixel wide, which a recursive fill would overflow the
+      // stack on.
+      const w = 10000;
+      const h = 4;
+      final img = Image(width: w, height: h);
+      for (var x = 1; x < w; x += 2) {
+        final gap = (x ~/ 2).isEven ? h - 1 : 0;
+        for (var y = 0; y < h; y++) {
+          if (y != gap) {
+            img.setPixelRgb(x, y, 255, 255, 255);
+          }
+        }
+      }
+      for (final threshold in [0, 1]) {
+        final copy = img.clone();
+        fillFlood(copy,
+            x: 0, y: 0, color: ColorRgb8(255, 0, 0), threshold: threshold);
+        expect(copy.getPixel(w - 1, 0), equals([255, 0, 0]),
+            reason: 'threshold $threshold');
+      }
+    });
+
     test('fillFlood: image dimensions unchanged after fill', () {
       final img = Image(width: 30, height: 30);
       fillFlood(img, x: 15, y: 15, color: ColorRgb8(128, 0, 128));
