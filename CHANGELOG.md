@@ -18,6 +18,7 @@
 * Faster JPEG format detection in `decodeImage`.
 * PNG decoding is 3-4x faster and uses about 40% less peak memory.
 * PNG encoding uses about 80% less peak memory on native platforms.
+* Lossy WebP decoding is ~1.9x faster.
 * `gaussianBlur` and `separableConvolution` are ~7x faster for 8-bit images,
   without a full-size temporary image.
 * Much faster `flip`, `flipVertical`, `flipHorizontal`, `copyRotate` (90, 180

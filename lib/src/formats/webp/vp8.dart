@@ -712,10 +712,10 @@ class VP8 {
   static const List<int> kFilterExtraRows = [0, 2, 8];
 
   void _doFilter(int mbX, int mbY) {
-    final yBps = _cacheYStride;
+    final yBps = _cacheYStride!;
     final fInfo = _fInfo[mbX];
-    final yDst = InputBuffer.from(_cacheY, offset: mbX * 16);
-    final iLevel = fInfo.fInnerLevel;
+    final y = _cacheY.buffer as Uint8List;
+    final yo = _cacheY.offset + mbX * 16;
     final limit = fInfo.fLimit;
     if (limit == 0) {
       return;
@@ -724,43 +724,46 @@ class VP8 {
     if (_filterType == 1) {
       // simple
       if (mbX > 0) {
-        _dsp.simpleHFilter16(yDst, yBps!, limit + 4);
+        _dsp.simpleHFilter16(y, yo, yBps, limit + 4);
       }
       if (fInfo.fInner) {
-        _dsp.simpleHFilter16i(yDst, yBps!, limit);
+        _dsp.simpleHFilter16i(y, yo, yBps, limit);
       }
       if (mbY > 0) {
-        _dsp.simpleVFilter16(yDst, yBps!, limit + 4);
+        _dsp.simpleVFilter16(y, yo, yBps, limit + 4);
       }
       if (fInfo.fInner) {
-        _dsp.simpleVFilter16i(yDst, yBps!, limit);
+        _dsp.simpleVFilter16i(y, yo, yBps, limit);
       }
     } else {
       // complex
-      final uvBps = _cacheUVStride;
-      final uDst = InputBuffer.from(_cacheU, offset: mbX * 8);
-      final vDst = InputBuffer.from(_cacheV, offset: mbX * 8);
+      final iLevel = fInfo.fInnerLevel!;
+      final uvBps = _cacheUVStride!;
+      final u = _cacheU.buffer as Uint8List;
+      final uo = _cacheU.offset + mbX * 8;
+      final v = _cacheV.buffer as Uint8List;
+      final vo = _cacheV.offset + mbX * 8;
 
       final hevThresh = fInfo.hevThresh;
       if (mbX > 0) {
         _dsp
-          ..hFilter16(yDst, yBps!, limit + 4, iLevel, hevThresh)
-          ..hFilter8(uDst, vDst, uvBps!, limit + 4, iLevel, hevThresh);
+          ..hFilter16(y, yo, yBps, limit + 4, iLevel, hevThresh)
+          ..hFilter8(u, uo, v, vo, uvBps, limit + 4, iLevel, hevThresh);
       }
       if (fInfo.fInner) {
         _dsp
-          ..hFilter16i(yDst, yBps!, limit, iLevel, hevThresh)
-          ..hFilter8i(uDst, vDst, uvBps!, limit, iLevel!, hevThresh);
+          ..hFilter16i(y, yo, yBps, limit, iLevel, hevThresh)
+          ..hFilter8i(u, uo, v, vo, uvBps, limit, iLevel, hevThresh);
       }
       if (mbY > 0) {
         _dsp
-          ..vFilter16(yDst, yBps!, limit + 4, iLevel, hevThresh)
-          ..vFilter8(uDst, vDst, uvBps!, limit + 4, iLevel, hevThresh);
+          ..vFilter16(y, yo, yBps, limit + 4, iLevel, hevThresh)
+          ..vFilter8(u, uo, v, vo, uvBps, limit + 4, iLevel, hevThresh);
       }
       if (fInfo.fInner) {
         _dsp
-          ..vFilter16i(yDst, yBps!, limit, iLevel, hevThresh)
-          ..vFilter8i(uDst, vDst, uvBps!, limit, iLevel!, hevThresh);
+          ..vFilter16i(y, yo, yBps, limit, iLevel, hevThresh)
+          ..vFilter8i(u, uo, v, vo, uvBps, limit, iLevel, hevThresh);
       }
     }
   }
@@ -895,18 +898,16 @@ class VP8 {
 
   int _yuvToB(int y, int u) => _clip8(kYScale * y + kUToB * u + kBCst);
 
-  void _yuvToRgb(int y, int u, int v, InputBuffer rgb) {
-    rgb[0] = _yuvToR(y, v);
-    rgb[1] = _yuvToG(y, u, v);
-    rgb[2] = _yuvToB(y, u);
-    //print('$y $u $v -> ${rgb[0]} ${rgb[1]} ${rgb[2]}');
+  void _yuvToRgba(int y, int u, int v, Uint8List rgba, int o) {
+    rgba[o] = _yuvToR(y, v);
+    rgba[o + 1] = _yuvToG(y, u, v);
+    rgba[o + 2] = _yuvToB(y, u);
+    rgba[o + 3] = 0xff;
   }
 
-  void _yuvToRgba(int y, int u, int v, InputBuffer rgba) {
-    _yuvToRgb(y, u, v, rgba);
-    rgba[3] = 0xff;
-  }
-
+  // The "fancy" upsampler: interpolates the half resolution U and V planes for
+  // a pair of rows. The buffers all wrap byte lists, so their bytes are
+  // accessed directly.
   void _upSample(
       InputBuffer topY,
       InputBuffer? bottomY,
@@ -917,46 +918,57 @@ class VP8 {
       InputBuffer topDst,
       InputBuffer? bottomDst,
       int len) {
-    int loadUv(int u, int v) => u | (v << 16);
+    final ty = topY.buffer as Uint8List;
+    final tyo = topY.offset;
+    final tu = topU.buffer as Uint8List;
+    final tuo = topU.offset;
+    final tv = topV.buffer as Uint8List;
+    final tvo = topV.offset;
+    final cu = curU.buffer as Uint8List;
+    final cuo = curU.offset;
+    final cv = curV.buffer as Uint8List;
+    final cvo = curV.offset;
+    final td = topDst.buffer as Uint8List;
+    final tdo = topDst.offset;
+    final by = bottomY == null ? null : bottomY.buffer as Uint8List;
+    final byo = bottomY?.offset ?? 0;
+    final bd = bottomDst == null ? null : bottomDst.buffer as Uint8List;
+    final bdo = bottomDst?.offset ?? 0;
 
     final lastPixelPair = (len - 1) >> 1;
-    var tlUv = loadUv(topU[0], topV[0]); // top-left sample
-    var lUv = loadUv(curU[0], curV[0]); // left-sample
+    // U and V are packed as u | (v << 16) so both are interpolated at once.
+    var tlUv = tu[tuo] | (tv[tvo] << 16); // top-left sample
+    var lUv = cu[cuo] | (cv[cvo] << 16); // left-sample
 
-    final uv0 = (3 * tlUv + lUv + 0x00020002) >> 2;
-    _yuvToRgba(topY[0], uv0 & 0xff, uv0 >> 16, topDst);
+    var uv0 = (3 * tlUv + lUv + 0x00020002) >> 2;
+    _yuvToRgba(ty[tyo], uv0 & 0xff, uv0 >> 16, td, tdo);
 
-    if (bottomY != null) {
-      final uv0 = (3 * lUv + tlUv + 0x00020002) >> 2;
-      _yuvToRgba(bottomY[0], uv0 & 0xff, uv0 >> 16, bottomDst!);
+    if (by != null) {
+      uv0 = (3 * lUv + tlUv + 0x00020002) >> 2;
+      _yuvToRgba(by[byo], uv0 & 0xff, uv0 >> 16, bd!, bdo);
     }
 
     for (var x = 1; x <= lastPixelPair; ++x) {
-      final tUv = loadUv(topU[x], topV[x]); // top sample
-      final uv = loadUv(curU[x], curV[x]); // sample
+      final tUv = tu[tuo + x] | (tv[tvo + x] << 16); // top sample
+      final uv = cu[cuo + x] | (cv[cvo + x] << 16); // sample
       // precompute invariant values associated with first and second diagonals
       final avg = tlUv + tUv + lUv + uv + 0x00080008;
       final diag12 = (avg + 2 * (tUv + lUv)) >> 3;
       final diag03 = (avg + 2 * (tlUv + uv)) >> 3;
 
-      var uv0 = (diag12 + tlUv) >> 1;
+      uv0 = (diag12 + tlUv) >> 1;
       var uv1 = (diag03 + tUv) >> 1;
 
-      _yuvToRgba(topY[2 * x - 1], uv0 & 0xff, uv0 >> 16,
-          InputBuffer.from(topDst, offset: (2 * x - 1) * 4));
+      _yuvToRgba(ty[tyo + 2 * x - 1], uv0 & 0xff, uv0 >> 16, td,
+          tdo + (2 * x - 1) * 4);
+      _yuvToRgba(ty[tyo + 2 * x], uv1 & 0xff, uv1 >> 16, td, tdo + 2 * x * 4);
 
-      _yuvToRgba(topY[2 * x - 0], uv1 & 0xff, uv1 >> 16,
-          InputBuffer.from(topDst, offset: (2 * x - 0) * 4));
-
-      if (bottomY != null) {
+      if (by != null) {
         uv0 = (diag03 + lUv) >> 1;
         uv1 = (diag12 + uv) >> 1;
-
-        _yuvToRgba(bottomY[2 * x - 1], uv0 & 0xff, uv0 >> 16,
-            InputBuffer.from(bottomDst!, offset: (2 * x - 1) * 4));
-
-        _yuvToRgba(bottomY[2 * x], uv1 & 0xff, uv1 >> 16,
-            InputBuffer.from(bottomDst, offset: (2 * x + 0) * 4));
+        _yuvToRgba(by[byo + 2 * x - 1], uv0 & 0xff, uv0 >> 16, bd!,
+            bdo + (2 * x - 1) * 4);
+        _yuvToRgba(by[byo + 2 * x], uv1 & 0xff, uv1 >> 16, bd, bdo + 2 * x * 4);
       }
 
       tlUv = tUv;
@@ -964,14 +976,14 @@ class VP8 {
     }
 
     if ((len & 1) == 0) {
-      final uv0 = (3 * tlUv + lUv + 0x00020002) >> 2;
-      _yuvToRgba(topY[len - 1], uv0 & 0xff, uv0 >> 16,
-          InputBuffer.from(topDst, offset: (len - 1) * 4));
+      uv0 = (3 * tlUv + lUv + 0x00020002) >> 2;
+      _yuvToRgba(
+          ty[tyo + len - 1], uv0 & 0xff, uv0 >> 16, td, tdo + (len - 1) * 4);
 
-      if (bottomY != null) {
-        final uv0 = (3 * lUv + tlUv + 0x00020002) >> 2;
-        _yuvToRgba(bottomY[len - 1], uv0 & 0xff, uv0 >> 16,
-            InputBuffer.from(bottomDst!, offset: (len - 1) * 4));
+      if (by != null) {
+        uv0 = (3 * lUv + tlUv + 0x00020002) >> 2;
+        _yuvToRgba(
+            by[byo + len - 1], uv0 & 0xff, uv0 >> 16, bd!, bdo + (len - 1) * 4);
       }
     }
   }
@@ -981,7 +993,8 @@ class VP8 {
       return;
     }
 
-    final alpha = InputBuffer.from(_a!);
+    final alpha = _a!.buffer as Uint8List;
+    var alphaOffset = _a!.offset;
     var startY = mbY;
     var numRows = mbH;
 
@@ -995,23 +1008,24 @@ class VP8 {
       // Fortunately, *alpha data is persistent, so we can go back
       // one row and finish alpha blending, now that the fancy upscaler
       // completed the YUV->RGB interpolation.
-      alpha.offset -= webp.width;
+      alphaOffset -= webp.width;
     }
-
-    //final dst = InputBuffer(output!.getBytes(), offset: startY * stride + 3);
 
     if (_cropTop + mbY + mbH == _cropBottom) {
       // If it's the very last call, we process all the remaining rows!
       numRows = _cropBottom - _cropTop - startY;
     }
 
+    // The output is RGBA, so the alpha of pixel (x, y) is at byte
+    // (y * width + x) * 4 + 3.
+    final out = output!.toUint8List();
+    final outStride = output!.width * 4;
     for (var y = 0; y < numRows; ++y) {
-      for (var x = 0; x < mbW; ++x) {
-        final alphaValue = alpha[x];
-        output!.getPixel(x, y + startY).a = alphaValue;
+      var di = (y + startY) * outStride + 3;
+      for (var x = 0; x < mbW; ++x, di += 4) {
+        out[di] = alpha[alphaOffset + x];
       }
-
-      alpha.offset += webp.width;
+      alphaOffset += webp.width;
     }
   }
 

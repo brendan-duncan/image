@@ -11,216 +11,217 @@ class VP8Filter {
     _initTables();
   }
 
-  void simpleVFilter16(InputBuffer p, int stride, int threshold) {
-    final p2 = InputBuffer.from(p);
+  // The loop filters work on the bytes of [p] around the edge at byte offset
+  // [o]. Shifts of values that can be negative are done on a biased,
+  // non-negative value: (v + k * 2^n) >> n == (v >> n) + k, which is exact and
+  // safe from dart2js's unsigned shifts.
+
+  void simpleVFilter16(Uint8List p, int o, int stride, int threshold) {
     for (var i = 0; i < 16; ++i) {
-      p2.offset = p.offset + i;
-      if (_needsFilter(p2, stride, threshold)) {
-        _doFilter2(p2, stride);
+      if (_needsFilter(p, o + i, stride, threshold)) {
+        _doFilter2(p, o + i, stride);
       }
     }
   }
 
-  void simpleHFilter16(InputBuffer p, int stride, int threshold) {
-    final p2 = InputBuffer.from(p);
+  void simpleHFilter16(Uint8List p, int o, int stride, int threshold) {
     for (var i = 0; i < 16; ++i) {
-      p2.offset = p.offset + i * stride;
-      if (_needsFilter(p2, 1, threshold)) {
-        _doFilter2(p2, 1);
+      final q = o + i * stride;
+      if (_needsFilter(p, q, 1, threshold)) {
+        _doFilter2(p, q, 1);
       }
     }
   }
 
-  void simpleVFilter16i(InputBuffer p, int stride, int threshold) {
-    final p2 = InputBuffer.from(p);
-    for (var k = 3; k > 0; --k) {
-      p2.offset += 4 * stride;
-      simpleVFilter16(p2, stride, threshold);
+  void simpleVFilter16i(Uint8List p, int o, int stride, int threshold) {
+    for (var k = 1; k <= 3; ++k) {
+      simpleVFilter16(p, o + 4 * k * stride, stride, threshold);
     }
   }
 
-  void simpleHFilter16i(InputBuffer p, int stride, int thresh) {
-    final p2 = InputBuffer.from(p);
-    for (var k = 3; k > 0; --k) {
-      p2.offset += 4;
-      simpleHFilter16(p2, stride, thresh);
+  void simpleHFilter16i(Uint8List p, int o, int stride, int threshold) {
+    for (var k = 1; k <= 3; ++k) {
+      simpleHFilter16(p, o + 4 * k, stride, threshold);
     }
   }
 
   // on macroblock edges
-  void vFilter16(InputBuffer p, int stride, int thresh, int? iThreshold,
+  void vFilter16(Uint8List p, int o, int stride, int thresh, int iThreshold,
       int hevThreshold) {
-    _filterLoop26(p, stride, 1, 16, thresh, iThreshold, hevThreshold);
+    _filterLoop26(p, o, stride, 1, 16, thresh, iThreshold, hevThreshold);
   }
 
-  void hFilter16(InputBuffer p, int stride, int thresh, int? iThreshold,
+  void hFilter16(Uint8List p, int o, int stride, int thresh, int iThreshold,
       int hevThreshold) {
-    _filterLoop26(p, 1, stride, 16, thresh, iThreshold, hevThreshold);
+    _filterLoop26(p, o, 1, stride, 16, thresh, iThreshold, hevThreshold);
   }
 
   // on three inner edges
-  void vFilter16i(InputBuffer p, int stride, int thresh, int? iThreshold,
+  void vFilter16i(Uint8List p, int o, int stride, int thresh, int iThreshold,
       int hevThreshold) {
-    final p2 = InputBuffer.from(p);
-    for (var k = 3; k > 0; --k) {
-      p2.offset += 4 * stride;
-      _filterLoop24(p2, stride, 1, 16, thresh, iThreshold!, hevThreshold);
+    for (var k = 1; k <= 3; ++k) {
+      _filterLoop24(p, o + 4 * k * stride, stride, 1, 16, thresh, iThreshold,
+          hevThreshold);
     }
   }
 
-  void hFilter16i(InputBuffer p, int stride, int thresh, int? iThreshold,
+  void hFilter16i(Uint8List p, int o, int stride, int thresh, int iThreshold,
       int hevThreshold) {
-    final p2 = InputBuffer.from(p);
-    for (var k = 3; k > 0; --k) {
-      p2.offset += 4;
-      _filterLoop24(p2, 1, stride, 16, thresh, iThreshold!, hevThreshold);
+    for (var k = 1; k <= 3; ++k) {
+      _filterLoop24(
+          p, o + 4 * k, 1, stride, 16, thresh, iThreshold, hevThreshold);
     }
   }
 
   // 8-pixels wide variant, for chroma filtering
-  void vFilter8(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int? ithresh, int hevThresh) {
-    _filterLoop26(u, stride, 1, 8, thresh, ithresh, hevThresh);
-    _filterLoop26(v, stride, 1, 8, thresh, ithresh, hevThresh);
+  void vFilter8(Uint8List u, int uo, Uint8List v, int vo, int stride,
+      int thresh, int ithresh, int hevThresh) {
+    _filterLoop26(u, uo, stride, 1, 8, thresh, ithresh, hevThresh);
+    _filterLoop26(v, vo, stride, 1, 8, thresh, ithresh, hevThresh);
   }
 
-  void hFilter8(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int? ithresh, int hevThresh) {
-    _filterLoop26(u, 1, stride, 8, thresh, ithresh, hevThresh);
-    _filterLoop26(v, 1, stride, 8, thresh, ithresh, hevThresh);
+  void hFilter8(Uint8List u, int uo, Uint8List v, int vo, int stride,
+      int thresh, int ithresh, int hevThresh) {
+    _filterLoop26(u, uo, 1, stride, 8, thresh, ithresh, hevThresh);
+    _filterLoop26(v, vo, 1, stride, 8, thresh, ithresh, hevThresh);
   }
 
-  void vFilter8i(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int ithresh, int hevThresh) {
-    final u2 = InputBuffer.from(u, offset: 4 * stride);
-    final v2 = InputBuffer.from(v, offset: 4 * stride);
-    _filterLoop24(u2, stride, 1, 8, thresh, ithresh, hevThresh);
-    _filterLoop24(v2, stride, 1, 8, thresh, ithresh, hevThresh);
+  void vFilter8i(Uint8List u, int uo, Uint8List v, int vo, int stride,
+      int thresh, int ithresh, int hevThresh) {
+    _filterLoop24(u, uo + 4 * stride, stride, 1, 8, thresh, ithresh, hevThresh);
+    _filterLoop24(v, vo + 4 * stride, stride, 1, 8, thresh, ithresh, hevThresh);
   }
 
-  void hFilter8i(InputBuffer u, InputBuffer v, int stride, int thresh,
-      int ithresh, int hevThresh) {
-    final u2 = InputBuffer.from(u, offset: 4);
-    final v2 = InputBuffer.from(v, offset: 4);
-    _filterLoop24(u2, 1, stride, 8, thresh, ithresh, hevThresh);
-    _filterLoop24(v2, 1, stride, 8, thresh, ithresh, hevThresh);
+  void hFilter8i(Uint8List u, int uo, Uint8List v, int vo, int stride,
+      int thresh, int ithresh, int hevThresh) {
+    _filterLoop24(u, uo + 4, 1, stride, 8, thresh, ithresh, hevThresh);
+    _filterLoop24(v, vo + 4, 1, stride, 8, thresh, ithresh, hevThresh);
   }
 
-  void _filterLoop26(InputBuffer p, int hstride, int vstride, int size,
-      int thresh, int? ithresh, int hevThresh) {
-    final p2 = InputBuffer.from(p);
-    while (size-- > 0) {
-      if (_needsFilter2(p2, hstride, thresh, ithresh)) {
-        if (_hev(p2, hstride, hevThresh)) {
-          _doFilter2(p2, hstride);
+  void _filterLoop26(Uint8List p, int o, int hstride, int vstride, int size,
+      int thresh, int ithresh, int hevThresh) {
+    for (var i = 0; i < size; ++i, o += vstride) {
+      if (_needsFilter2(p, o, hstride, thresh, ithresh)) {
+        if (_hev(p, o, hstride, hevThresh)) {
+          _doFilter2(p, o, hstride);
         } else {
-          _doFilter6(p2, hstride);
+          _doFilter6(p, o, hstride);
         }
       }
-      p2.offset += vstride;
     }
   }
 
-  void _filterLoop24(InputBuffer p, int hstride, int vstride, int size,
+  void _filterLoop24(Uint8List p, int o, int hstride, int vstride, int size,
       int thresh, int ithresh, int hevThresh) {
-    final p2 = InputBuffer.from(p);
-    while (size-- > 0) {
-      if (_needsFilter2(p2, hstride, thresh, ithresh)) {
-        if (_hev(p2, hstride, hevThresh)) {
-          _doFilter2(p2, hstride);
+    for (var i = 0; i < size; ++i, o += vstride) {
+      if (_needsFilter2(p, o, hstride, thresh, ithresh)) {
+        if (_hev(p, o, hstride, hevThresh)) {
+          _doFilter2(p, o, hstride);
         } else {
-          _doFilter4(p2, hstride);
+          _doFilter4(p, o, hstride);
         }
       }
-      p2.offset += vstride;
     }
   }
 
   // 4 pixels in, 2 pixels out
-  void _doFilter2(InputBuffer p, int step) {
-    final p1 = p[-2 * step];
-    final p0 = p[-step];
-    final q0 = p[0];
-    final q1 = p[step];
-    final a = 3 * (q0 - p0) + sclip1[1020 + p1 - q1];
-    final a1 = sclip2[112 + shiftR(a + 4, 3)];
-    final a2 = sclip2[112 + shiftR(a + 3, 3)];
-    p[-step] = clip1[255 + p0 + a2];
-    p[0] = clip1[255 + q0 - a1];
+  void _doFilter2(Uint8List p, int o, int step) {
+    final p1 = p[o - 2 * step];
+    final p0 = p[o - step];
+    final q0 = p[o];
+    final q1 = p[o + step];
+    // a is in [-893, 892].
+    final a = 3 * (q0 - p0) + _sclip1[1020 + p1 - q1];
+    final a1 = _sclip2[((a + 4 + 1024) >> 3) - 128 + 112];
+    final a2 = _sclip2[((a + 3 + 1024) >> 3) - 128 + 112];
+    p[o - step] = _clip1[255 + p0 + a2];
+    p[o] = _clip1[255 + q0 - a1];
   }
 
   // 4 pixels in, 4 pixels out
-  void _doFilter4(InputBuffer p, int step) {
-    final p1 = p[-2 * step];
-    final p0 = p[-step];
-    final q0 = p[0];
-    final q1 = p[step];
+  void _doFilter4(Uint8List p, int o, int step) {
+    final p1 = p[o - 2 * step];
+    final p0 = p[o - step];
+    final q0 = p[o];
+    final q1 = p[o + step];
+    // a is in [-765, 765], a1 in [-16, 15].
     final a = 3 * (q0 - p0);
-    final a1 = sclip2[112 + shiftR(a + 4, 3)];
-    final a2 = sclip2[112 + shiftR(a + 3, 3)];
-    final a3 = shiftR(a1 + 1, 1);
-    p[-2 * step] = clip1[255 + p1 + a3];
-    p[-step] = clip1[255 + p0 + a2];
-    p[0] = clip1[255 + q0 - a1];
-    p[step] = clip1[255 + q1 - a3];
+    final a1 = _sclip2[((a + 4 + 1024) >> 3) - 128 + 112];
+    final a2 = _sclip2[((a + 3 + 1024) >> 3) - 128 + 112];
+    final a3 = ((a1 + 1 + 16) >> 1) - 8;
+    p[o - 2 * step] = _clip1[255 + p1 + a3];
+    p[o - step] = _clip1[255 + p0 + a2];
+    p[o] = _clip1[255 + q0 - a1];
+    p[o + step] = _clip1[255 + q1 - a3];
   }
 
   // 6 pixels in, 6 pixels out
-  void _doFilter6(InputBuffer p, int step) {
-    final p2 = p[-3 * step];
-    final p1 = p[-2 * step];
-    final p0 = p[-step];
-    final q0 = p[0];
-    final q1 = p[step];
-    final q2 = p[2 * step];
-    final a = sclip1[1020 + 3 * (q0 - p0) + sclip1[1020 + p1 - q1]];
-    final a1 = shiftR(27 * a + 63, 7); // eq. to ((3 * a + 7) * 9) >> 7
-    final a2 = shiftR(18 * a + 63, 7); // eq. to ((2 * a + 7) * 9) >> 7
-    final a3 = shiftR(9 * a + 63, 7); // eq. to ((1 * a + 7) * 9) >> 7
-    p[-3 * step] = clip1[255 + p2 + a3];
-    p[-2 * step] = clip1[255 + p1 + a2];
-    p[-step] = clip1[255 + p0 + a1];
-    p[0] = clip1[255 + q0 - a1];
-    p[step] = clip1[255 + q1 - a2];
-    p[2 * step] = clip1[255 + q2 - a3];
+  void _doFilter6(Uint8List p, int o, int step) {
+    final p2 = p[o - 3 * step];
+    final p1 = p[o - 2 * step];
+    final p0 = p[o - step];
+    final q0 = p[o];
+    final q1 = p[o + step];
+    final q2 = p[o + 2 * step];
+    // a is in [-128, 127].
+    final a = _sclip1[1020 + 3 * (q0 - p0) + _sclip1[1020 + p1 - q1]];
+    // eq. to ((3 * a + 7) * 9) >> 7
+    final a1 = ((27 * a + 63 + 27 * 128) >> 7) - 27;
+    // eq. to ((2 * a + 7) * 9) >> 7
+    final a2 = ((18 * a + 63 + 18 * 128) >> 7) - 18;
+    // eq. to ((1 * a + 7) * 9) >> 7
+    final a3 = ((9 * a + 63 + 9 * 128) >> 7) - 9;
+    p[o - 3 * step] = _clip1[255 + p2 + a3];
+    p[o - 2 * step] = _clip1[255 + p1 + a2];
+    p[o - step] = _clip1[255 + p0 + a1];
+    p[o] = _clip1[255 + q0 - a1];
+    p[o + step] = _clip1[255 + q1 - a2];
+    p[o + 2 * step] = _clip1[255 + q2 - a3];
   }
 
-  bool _hev(InputBuffer p, int step, int thresh) {
-    final p1 = p[-2 * step];
-    final p0 = p[-step];
-    final q0 = p[0];
-    final q1 = p[step];
-    return (abs0[255 + p1 - p0] > thresh) || (abs0[255 + q1 - q0] > thresh);
+  bool _hev(Uint8List p, int o, int step, int thresh) {
+    final p1 = p[o - 2 * step];
+    final p0 = p[o - step];
+    final q0 = p[o];
+    final q1 = p[o + step];
+    return (_abs0[255 + p1 - p0] > thresh) || (_abs0[255 + q1 - q0] > thresh);
   }
 
-  bool _needsFilter(InputBuffer p, int step, int thresh) {
-    final p1 = p[-2 * step];
-    final p0 = p[-step];
-    final q0 = p[0];
-    final q1 = p[step];
-    return (2 * abs0[255 + p0 - q0] + abs1[255 + p1 - q1]) <= thresh;
+  bool _needsFilter(Uint8List p, int o, int step, int thresh) {
+    final p1 = p[o - 2 * step];
+    final p0 = p[o - step];
+    final q0 = p[o];
+    final q1 = p[o + step];
+    return (2 * _abs0[255 + p0 - q0] + _abs1[255 + p1 - q1]) <= thresh;
   }
 
-  bool _needsFilter2(InputBuffer p, int step, int t, int? it) {
-    final p3 = p[-4 * step];
-    final p2 = p[-3 * step];
-    final p1 = p[-2 * step];
-    final p0 = p[-step];
-    final q0 = p[0];
-    final q1 = p[step];
-    final q2 = p[2 * step];
-    final q3 = p[3 * step];
-    if ((2 * abs0[255 + p0 - q0] + abs1[255 + p1 - q1]) > t) {
+  bool _needsFilter2(Uint8List p, int o, int step, int t, int it) {
+    final p3 = p[o - 4 * step];
+    final p2 = p[o - 3 * step];
+    final p1 = p[o - 2 * step];
+    final p0 = p[o - step];
+    final q0 = p[o];
+    final q1 = p[o + step];
+    final q2 = p[o + 2 * step];
+    final q3 = p[o + 3 * step];
+    if ((2 * _abs0[255 + p0 - q0] + _abs1[255 + p1 - q1]) > t) {
       return false;
     }
 
-    return abs0[255 + p3 - p2] <= it! &&
-        abs0[255 + p2 - p1] <= it &&
-        abs0[255 + p1 - p0] <= it &&
-        abs0[255 + q3 - q2] <= it &&
-        abs0[255 + q2 - q1] <= it &&
-        abs0[255 + q1 - q0] <= it;
+    return _abs0[255 + p3 - p2] <= it &&
+        _abs0[255 + p2 - p1] <= it &&
+        _abs0[255 + p1 - p0] <= it &&
+        _abs0[255 + q3 - q2] <= it &&
+        _abs0[255 + q2 - q1] <= it &&
+        _abs0[255 + q1 - q0] <= it;
   }
+
+  // The tables, as fields to avoid the lazy initialization check of statics.
+  final Uint8List _abs0 = abs0;
+  final Uint8List _abs1 = abs1;
+  final Int8List _sclip1 = sclip1;
+  final Int8List _sclip2 = sclip2;
+  final Uint8List _clip1 = clip1;
 
   void transformOne(InputBuffer src, InputBuffer dst) {
     final t = Int32List(4 * 4);
