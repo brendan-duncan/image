@@ -230,7 +230,9 @@ void _resizeAverage(_OrientedSource src, Uint8List out, int dstStride, int x1,
     for (var x = 0; x < w; ++x) {
       final ax1 = ax1s[x];
       final ax2 = ax2s[x];
-      sums.fillRange(0, nc, 0);
+      for (var c = 0; c < nc; ++c) {
+        sums[c] = 0;
+      }
       for (var sy = ay1; sy < ay2; ++sy) {
         _sumRow(src.bytes, src.row(sy) + ax1 * src.colStep, ax2 - ax1,
             src.colStep, nc, sums);

@@ -337,7 +337,9 @@ void _resizeDownBytes(
           if (ax2 == ax1) {
             ax2++;
           }
-          sums.fillRange(0, nc, 0);
+          for (var c = 0; c < nc; ++c) {
+            sums[c] = 0;
+          }
           for (var sy = ay1; sy < ay2; ++sy) {
             for (var si = (sy * sw + ax1) * nc, se = (sy * sw + ax2) * nc;
                 si < se;

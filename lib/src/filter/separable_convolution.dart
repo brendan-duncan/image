@@ -106,8 +106,13 @@ void _padRow(Uint8List src, int srcOffset, Uint8List padded,
 // Filters a padded row horizontally, to the n bytes at dstOffset in dst.
 void _filterRow(Uint8List padded, Uint8List dst, int dstOffset, int n, int nc,
     Float64List k, Float64List acc) {
-  acc.fillRange(0, n, 0.0);
-  for (var j = 0; j < k.length; ++j) {
+  // The first tap assigns rather than adds to zero, which gives the same
+  // values.
+  final c0 = k[0];
+  for (var i = 0; i < n; ++i) {
+    acc[i] = c0 * padded[i];
+  }
+  for (var j = 1; j < k.length; ++j) {
     final c = k[j];
     final o = j * nc;
     for (var i = 0; i < n; ++i) {
@@ -123,8 +128,12 @@ void _filterRow(Uint8List padded, Uint8List dst, int dstOffset, int n, int nc,
 // dstOffset.
 void _filterColumn(Uint8List ring, Int32List rowOffsets, Uint8List dst,
     int dstOffset, int n, Float64List k, Float64List acc) {
-  acc.fillRange(0, n, 0.0);
-  for (var j = 0; j < k.length; ++j) {
+  final c0 = k[0];
+  final o0 = rowOffsets[0];
+  for (var i = 0; i < n; ++i) {
+    acc[i] = c0 * ring[o0 + i];
+  }
+  for (var j = 1; j < k.length; ++j) {
     final c = k[j];
     final o = rowOffsets[j];
     for (var i = 0; i < n; ++i) {
