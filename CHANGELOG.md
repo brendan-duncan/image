@@ -12,7 +12,7 @@
 * Lower peak memory when encoding BMP and TGA images.
 * Faster JPEG decoding, using about half the peak memory.
 * Faster JPEG format detection in `decodeImage`.
-* PNG decoding is 2-2.5x faster.
+* PNG decoding is 3-4x faster and uses about 40% less peak memory.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
 
 # 4.10.2

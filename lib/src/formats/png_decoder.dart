@@ -372,16 +372,9 @@ class PngDecoder extends Decoder {
                     ? 4
                     : 3;
 
-    List<int> uncompressed;
-    try {
-      uncompressed = const ZLibDecoder().decodeBytes(imageData);
-    } catch (error) {
-      //print(error);
-      return null;
-    }
-
-    // input is the decompressed data.
-    final input = InputBuffer(uncompressed, bigEndian: true);
+    // The image data is inflated as the rows are read, so the whole
+    // decompressed image is never held in memory.
+    final input = const ZLibDecoder().decodeLazy(InputMemoryStream(imageData));
     _resetBits();
 
     PaletteUint8? palette;
@@ -474,21 +467,32 @@ class PngDecoder extends Decoder {
     final w = width;
     final h = height;
     _progressY = 0;
-    if (_info.interlaceMethod != 0) {
-      _processPass(input, image, 0, 0, 8, 8, (w + 7) >> 3, (h + 7) >> 3);
-      _processPass(input, image, 4, 0, 8, 8, (w + 3) >> 3, (h + 7) >> 3);
-      _processPass(input, image, 0, 4, 4, 8, (w + 3) >> 2, (h + 3) >> 3);
-      _processPass(input, image, 2, 0, 4, 4, (w + 1) >> 2, (h + 3) >> 2);
-      _processPass(input, image, 0, 2, 2, 4, (w + 1) >> 1, (h + 1) >> 2);
-      _processPass(input, image, 1, 0, 2, 2, w >> 1, (h + 1) >> 1);
-      _processPass(input, image, 0, 1, 1, 2, w, h >> 1);
-    } else {
-      _process(input, image);
+    try {
+      if (_info.interlaceMethod != 0) {
+        _processPass(input, image, 0, 0, 8, 8, (w + 7) >> 3, (h + 7) >> 3);
+        _processPass(input, image, 4, 0, 8, 8, (w + 3) >> 3, (h + 7) >> 3);
+        _processPass(input, image, 0, 4, 4, 8, (w + 3) >> 2, (h + 3) >> 3);
+        _processPass(input, image, 2, 0, 4, 4, (w + 1) >> 2, (h + 3) >> 2);
+        _processPass(input, image, 0, 2, 2, 4, (w + 1) >> 1, (h + 1) >> 2);
+        _processPass(input, image, 1, 0, 2, 2, w >> 1, (h + 1) >> 1);
+        _processPass(input, image, 0, 1, 1, 2, w, h >> 1);
+      } else {
+        _process(input, image);
+      }
+    } on ArchiveException {
+      // Invalid compressed data.
+      return null;
+    } on FormatException {
+      // Invalid compressed data, from the platform's zlib.
+      return null;
+    } on _TruncatedData {
+      return null;
+    } finally {
+      input.closeSync();
+      _info
+        ..width = origW
+        ..height = origH;
     }
-
-    _info
-      ..width = origW
-      ..height = origH;
 
     if (_info.iccpData != null) {
       image.iccProfile = IccProfile(
@@ -509,7 +513,7 @@ class PngDecoder extends Decoder {
     }
 
     if (!_info.isAnimated || frame != null) {
-      return decodeFrame(frame ?? 0)!;
+      return decodeFrame(frame ?? 0);
     }
 
     Image? firstImage;
@@ -593,7 +597,7 @@ class PngDecoder extends Decoder {
               : 1;
 
   // Process a pass of an interlaced image.
-  void _processPass(InputBuffer input, Image image, int xOffset, int yOffset,
+  void _processPass(InputStream input, Image image, int xOffset, int yOffset,
       int xStep, int yStep, int passWidth, int passHeight) {
     // An image less than 5 pixels wide or high has empty passes. No filter
     // type bytes are present in an empty pass, so there is nothing to read.
@@ -615,6 +619,9 @@ class PngDecoder extends Decoder {
         ++srcY, dstY += yStep, _progressY++) {
       final filterType = PngFilterType.values[input.readByte()];
       final row = input.readBytes(rowBytes).toUint8List();
+      if (row.length != rowBytes) {
+        throw const _TruncatedData();
+      }
 
       // Before the image is compressed, it was filtered to improve compression.
       // Reverse the filter now.
@@ -641,7 +648,7 @@ class PngDecoder extends Decoder {
     }
   }
 
-  void _process(InputBuffer input, Image image) {
+  void _process(InputStream input, Image image) {
     final pixelDepth = _pngChannels * _info.bits;
 
     final w = _info.width;
@@ -658,6 +665,9 @@ class PngDecoder extends Decoder {
     for (var y = 0; y < h; ++y) {
       final filterType = PngFilterType.values[input.readByte()];
       final row = input.readBytes(rowBytes).toUint8List();
+      if (row.length != rowBytes) {
+        throw const _TruncatedData();
+      }
 
       // Before the image is compressed, it was filtered to improve compression.
       // Reverse the filter now.
@@ -965,4 +975,9 @@ class PngDecoder extends Decoder {
 
   late InputBuffer _input;
   int _progressY = 0;
+}
+
+// Thrown when the decompressed image data ends before the last row.
+class _TruncatedData implements Exception {
+  const _TruncatedData();
 }
