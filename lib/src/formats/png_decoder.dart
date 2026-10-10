@@ -632,7 +632,8 @@ class PngDecoder extends Decoder {
 
     final pixelDepth = _pngChannels * _info.bits;
     final bpp = (pixelDepth + 7) >> 3;
-    final rowBytes = (pixelDepth * passWidth + 7) >> 3;
+    // Not >>, which is 32-bit on the web.
+    final rowBytes = (pixelDepth * passWidth + 7) ~/ 8;
     final writeRows = _info.bits == 8 || _info.bits == 16;
 
     final pixel = [0, 0, 0, 0];
@@ -679,7 +680,8 @@ class PngDecoder extends Decoder {
     final w = _info.width;
     final h = _info.height;
 
-    final rowBytes = (w * pixelDepth + 7) >> 3;
+    // Not >>, which is 32-bit on the web.
+    final rowBytes = (w * pixelDepth + 7) ~/ 8;
     final bpp = (pixelDepth + 7) >> 3;
     final writeRows = _info.bits == 8 || _info.bits == 16;
 

@@ -20,6 +20,7 @@ Security fixes for decoding untrusted images:
 * Fix quadratic time building EXR PIZ Huffman tables.
 * Reject PSD files far too small for their channel data.
 * Fix `drawString` with `wrap` redrawing each line for every word.
+* Fix PNG row sizes overflowing for very wide images on the web.
 
 # 4.11.1
 
