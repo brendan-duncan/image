@@ -42,10 +42,11 @@ class WebPDecoder extends Decoder {
   @override
   bool isValidFile(List<int> bytes) {
     _input = InputBuffer(bytes);
-    if (!_getHeader(_input!)) {
+    try {
+      return _getHeader(_input!);
+    } catch (_) {
       return false;
     }
-    return true;
   }
 
   /// How many frames are available to decode?

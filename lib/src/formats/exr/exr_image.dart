@@ -83,6 +83,9 @@ class ExrImage implements DecodeInfo {
 
   /// Parse just enough of the file to identify that it's an EXR image.
   static bool isValidFile(List<int> bytes) {
+    if (bytes.length < 8) {
+      return false;
+    }
     final input = InputBuffer(bytes);
 
     final magic = input.readUint32();

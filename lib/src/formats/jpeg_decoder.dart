@@ -46,7 +46,11 @@ class JpegDecoder extends Decoder {
     if (data.length < 2 || data[0] != 0xff || data[1] != 0xd8) {
       return false;
     }
-    return JpegData().validate(data);
+    try {
+      return JpegData().validate(data);
+    } catch (_) {
+      return false;
+    }
   }
 
   @override

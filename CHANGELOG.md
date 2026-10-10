@@ -8,6 +8,8 @@ Security fixes for decoding untrusted images:
 * Deprecate `JpegDecoder.defaultMaxPixels` for `Decoder.defaultMaxPixels`.
 * Reject BMP, PNM and EXR data too short for its size, and bound EXR tiles.
 * Fix ICO entries encoded as animated PNGs.
+* Fix `isValidFile` throwing on short data, which made `decodeImage` throw.
+* Fix PVR3 files not being detected or decoded.
 
 # 4.11.1
 

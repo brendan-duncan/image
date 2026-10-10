@@ -26,7 +26,13 @@ class PvrDecoder extends Decoder {
   ImageFormat get format => ImageFormat.pvr;
 
   @override
-  bool isValidFile(Uint8List bytes) => startDecode(bytes) != null;
+  bool isValidFile(Uint8List bytes) {
+    try {
+      return startDecode(bytes) != null;
+    } catch (_) {
+      return false;
+    }
+  }
 
   @override
   DecodeInfo? startDecode(Uint8List bytes) {
@@ -57,9 +63,7 @@ class PvrDecoder extends Decoder {
 
   DecodeInfo? _decodePvr3Header(Uint8List bytes) {
     final input = InputBuffer(bytes);
-
-    final size = input.readUint32();
-    if (size != _pvrHeaderSize) {
+    if (input.length < _pvrHeaderSize) {
       return null;
     }
 

@@ -33,7 +33,11 @@ class IcoDecoder extends Decoder {
   @override
   bool isValidFile(Uint8List bytes) {
     _input = InputBuffer(bytes);
-    _icoInfo = IcoInfo.read(_input!);
+    try {
+      _icoInfo = IcoInfo.read(_input!);
+    } catch (_) {
+      _icoInfo = null;
+    }
     return _icoInfo != null;
   }
 

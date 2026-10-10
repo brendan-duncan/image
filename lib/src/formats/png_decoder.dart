@@ -41,11 +41,12 @@ class PngDecoder extends Decoder {
   /// Is the given file a valid PNG image?
   @override
   bool isValidFile(Uint8List data) {
-    final input = InputBuffer(data, bigEndian: true);
-    final bytes = input.readBytes(8);
+    if (data.length < 8) {
+      return false;
+    }
     const pngHeader = [137, 80, 78, 71, 13, 10, 26, 10];
     for (var i = 0; i < 8; ++i) {
-      if (bytes[i] != pngHeader[i]) {
+      if (data[i] != pngHeader[i]) {
         return false;
       }
     }

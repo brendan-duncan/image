@@ -34,7 +34,11 @@ class GifDecoder extends Decoder {
   bool isValidFile(Uint8List bytes) {
     _input = InputBuffer(bytes);
     info = GifInfo();
-    return _getInfo();
+    try {
+      return _getInfo();
+    } catch (_) {
+      return false;
+    }
   }
 
   /// How many frames are available to decode?

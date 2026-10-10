@@ -24,7 +24,13 @@ class PsdDecoder extends Decoder {
   /// A light-weight function to test if the given file is able to be decoded
   /// by this Decoder.
   @override
-  bool isValidFile(Uint8List bytes) => PsdImage(bytes).isValid;
+  bool isValidFile(Uint8List bytes) {
+    try {
+      return PsdImage(bytes).isValid;
+    } catch (_) {
+      return false;
+    }
+  }
 
   /// Decode a raw PSD image without rendering it to a flat image.
   PsdImage? decodePsd(Uint8List bytes) {

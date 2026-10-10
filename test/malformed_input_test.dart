@@ -64,6 +64,52 @@ void main() {
     });
   });
 
+  test('isValidFile with truncated data', () {
+    final small = Image(width: 8, height: 8);
+    final files = [
+      encodePng(small),
+      encodeJpg(small),
+      encodeGif(small),
+      encodeWebP(small),
+      encodeTiff(small),
+      encodeBmp(small),
+      encodeTga(small),
+      encodeIco(small),
+      encodePvr(small),
+      Uint8List.fromList([0x76, 0x2f, 0x31, 0x01, 2]),
+      Uint8List.fromList('8BPS'.codeUnits),
+    ];
+    final decoders = <Decoder Function()>[
+      JpegDecoder.new,
+      PngDecoder.new,
+      GifDecoder.new,
+      WebPDecoder.new,
+      TiffDecoder.new,
+      PsdDecoder.new,
+      ExrDecoder.new,
+      BmpDecoder.new,
+      PnmDecoder.new,
+      TgaDecoder.new,
+      IcoDecoder.new,
+      PvrDecoder.new,
+    ];
+    for (final file in files) {
+      for (var n = 0; n < file.length && n < 64; ++n) {
+        final bytes = Uint8List.sublistView(file, 0, n);
+        for (final decoder in decoders) {
+          expect(() => decoder().isValidFile(bytes), returnsNormally);
+        }
+        expect(() => findDecoderForData(bytes), returnsNormally);
+      }
+    }
+  });
+
+  test('PVR files are detected', () {
+    final pvr = encodePvr(Image(width: 8, height: 8));
+    expect(PvrDecoder().isValidFile(pvr), isTrue);
+    expect(decodeImage(pvr)?.width, equals(8));
+  });
+
   group('maxPixels', () {
     final small = Image(width: 64, height: 64);
 
@@ -76,6 +122,7 @@ void main() {
         'bmp': (encodeBmp(small), BmpDecoder(maxPixels: 1000)),
         'tga': (encodeTga(small), TgaDecoder(maxPixels: 1000)),
         'ico': (encodeIco(small), IcoDecoder(maxPixels: 1000)),
+        'pvr': (encodePvr(small), PvrDecoder(maxPixels: 1000)),
         'jpg': (encodeJpg(small), JpegDecoder(maxPixels: 1000)),
       };
       for (final e in files.entries) {
