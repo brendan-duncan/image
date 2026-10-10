@@ -10,6 +10,7 @@ import '../draw/composite_image.dart';
 import '../draw/fill_rect.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
+import '../image/image_data_uint16.dart';
 import '../image/palette_uint8.dart';
 import '../image/pixel.dart';
 import '../util/image_exception.dart';
@@ -582,6 +583,15 @@ class PngDecoder extends Decoder {
     return firstImage;
   }
 
+  // The number of channels in the PNG data.
+  int get _pngChannels => (_info.colorType == PngColorType.grayscaleAlpha)
+      ? 2
+      : (_info.colorType == PngColorType.rgb)
+          ? 3
+          : (_info.colorType == PngColorType.rgba)
+              ? 4
+              : 1;
+
   // Process a pass of an interlaced image.
   void _processPass(InputBuffer input, Image image, int xOffset, int yOffset,
       int xStep, int yStep, int passWidth, int passHeight) {
@@ -591,101 +601,79 @@ class PngDecoder extends Decoder {
       return;
     }
 
-    final channels = (_info.colorType == PngColorType.grayscaleAlpha)
-        ? 2
-        : (_info.colorType == PngColorType.rgb)
-            ? 3
-            : (_info.colorType == PngColorType.rgba)
-                ? 4
-                : 1;
-
-    final pixelDepth = channels * _info.bits;
+    final pixelDepth = _pngChannels * _info.bits;
     final bpp = (pixelDepth + 7) >> 3;
     final rowBytes = (pixelDepth * passWidth + 7) >> 3;
-
-    final inData = <Uint8List?>[null, null];
+    final writeRows = _info.bits == 8 || _info.bits == 16;
 
     final pixel = [0, 0, 0, 0];
+    Pixel? p;
+    Uint8List? prevRow;
 
-    for (var srcY = 0, dstY = yOffset, ri = 0;
+    for (var srcY = 0, dstY = yOffset;
         srcY < passHeight;
-        ++srcY, dstY += yStep, ri = 1 - ri, _progressY++) {
+        ++srcY, dstY += yStep, _progressY++) {
       final filterType = PngFilterType.values[input.readByte()];
-      inData[ri] = input.readBytes(rowBytes).toUint8List();
-
-      final row = inData[ri];
-      final prevRow = inData[1 - ri];
+      final row = input.readBytes(rowBytes).toUint8List();
 
       // Before the image is compressed, it was filtered to improve compression.
       // Reverse the filter now.
-      _unfilter(filterType, bpp, row!, prevRow);
+      _unfilter(filterType, bpp, row, prevRow);
+      prevRow = row;
+
+      if (writeRows) {
+        _writeRow(row, image, dstY, xOffset, xStep, passWidth);
+        continue;
+      }
 
       // Scanlines are always on byte boundaries, so for bit depths < 8,
       // reset the bit stream counter.
       _resetBits();
 
       final rowInput = InputBuffer(row, bigEndian: true);
-
-      final blockHeight = xStep;
-      final blockWidth = xStep - xOffset;
-
       for (var srcX = 0, dstX = xOffset;
           srcX < passWidth;
           ++srcX, dstX += xStep) {
         _readPixel(rowInput, pixel);
-        _setPixel(image.getPixel(dstX, dstY), pixel);
-
-        if (blockWidth > 1 || blockHeight > 1) {
-          for (var i = 0; i < blockHeight; ++i) {
-            for (var j = 0; j < blockWidth; ++j) {
-              _setPixel(image.getPixelSafe(dstX + j, dstY + i), pixel);
-            }
-          }
-        }
+        p = image.getPixel(dstX, dstY, p);
+        _setPixel(p, pixel);
       }
     }
   }
 
   void _process(InputBuffer input, Image image) {
-    final channels = (_info.colorType == PngColorType.grayscaleAlpha)
-        ? 2
-        : (_info.colorType == PngColorType.rgb)
-            ? 3
-            : (_info.colorType == PngColorType.rgba)
-                ? 4
-                : 1;
-
-    final pixelDepth = channels * _info.bits;
+    final pixelDepth = _pngChannels * _info.bits;
 
     final w = _info.width;
     final h = _info.height;
 
     final rowBytes = (w * pixelDepth + 7) >> 3;
     final bpp = (pixelDepth + 7) >> 3;
-
-    final line = List<int>.filled(rowBytes, 0);
-    final inData = [line, line];
+    final writeRows = _info.bits == 8 || _info.bits == 16;
 
     final pixel = [0, 0, 0, 0];
+    Uint8List? prevRow;
 
     final pIter = image.iterator..moveNext();
-    for (var y = 0, ri = 0; y < h; ++y, ri = 1 - ri) {
+    for (var y = 0; y < h; ++y) {
       final filterType = PngFilterType.values[input.readByte()];
-      inData[ri] = input.readBytes(rowBytes).toUint8List();
-
-      final row = inData[ri];
-      final prevRow = inData[1 - ri];
+      final row = input.readBytes(rowBytes).toUint8List();
 
       // Before the image is compressed, it was filtered to improve compression.
       // Reverse the filter now.
       _unfilter(filterType, bpp, row, prevRow);
+      prevRow = row;
+
+      if (writeRows) {
+        _writeRow(row, image, y, 0, 1, w);
+        continue;
+      }
 
       // Scanlines are always on byte boundaries, so for bit depths < 8,
       // reset the bit stream counter.
       _resetBits();
 
-      final rowInput = InputBuffer(inData[ri], bigEndian: true);
-
+      final rowInput = InputBuffer(row, bigEndian: true);
       for (var x = 0; x < w; ++x) {
         _readPixel(rowInput, pixel);
         _setPixel(pIter.current, pixel);
@@ -694,53 +682,146 @@ class PngDecoder extends Decoder {
     }
   }
 
+  // Write the [n] pixels of an unfiltered 8 or 16-bit [row] to [image], at
+  // (x0 + i * xStep, y).
+  void _writeRow(Uint8List row, Image image, int y, int x0, int xStep, int n) {
+    final pc = _pngChannels;
+    // The channels stored in the image data; for a palette image, the index.
+    final ic = image.data!.numChannels;
+    final t = _info.transparency;
+
+    if (_info.bits == 8) {
+      final data = image.data!.toUint8List();
+      var di = y * image.data!.rowStride + x0 * ic;
+      final dStep = xStep * ic;
+      if (ic == pc) {
+        if (xStep == 1) {
+          data.setRange(di, di + n * pc, row);
+          return;
+        }
+        for (var i = 0, si = 0; i < n; ++i, di += dStep) {
+          for (var c = 0; c < pc; ++c) {
+            data[di + c] = row[si++];
+          }
+        }
+        return;
+      }
+      // RGB with a tRNS color, expanded to RGBA.
+      final tr = ((t![0] & 0xff) << 8) | (t[1] & 0xff);
+      final tg = ((t[2] & 0xff) << 8) | (t[3] & 0xff);
+      final tb = ((t[4] & 0xff) << 8) | (t[5] & 0xff);
+      for (var i = 0, si = 0; i < n; ++i, si += 3, di += dStep) {
+        final r = row[si];
+        final g = row[si + 1];
+        final b = row[si + 2];
+        data[di] = r;
+        data[di + 1] = g;
+        data[di + 2] = b;
+        data[di + 3] = r == tr && g == tg && b == tb ? 0 : 255;
+      }
+      return;
+    }
+
+    // 16-bit samples are big-endian.
+    final data = (image.data! as ImageDataUint16).data;
+    var di = (y * image.width + x0) * ic;
+    final dStep = xStep * ic;
+    if (ic == pc) {
+      for (var i = 0, si = 0; i < n; ++i, di += dStep) {
+        for (var c = 0; c < pc; ++c, si += 2) {
+          data[di + c] = (row[si] << 8) | row[si + 1];
+        }
+      }
+    } else if (pc == 3) {
+      // RGB with a tRNS color, expanded to RGBA.
+      final tr = ((t![0] & 0xff) << 8) | (t[1] & 0xff);
+      final tg = ((t[2] & 0xff) << 8) | (t[3] & 0xff);
+      final tb = ((t[4] & 0xff) << 8) | (t[5] & 0xff);
+      for (var i = 0, si = 0; i < n; ++i, si += 6, di += dStep) {
+        final r = (row[si] << 8) | row[si + 1];
+        final g = (row[si + 2] << 8) | row[si + 3];
+        final b = (row[si + 4] << 8) | row[si + 5];
+        data[di] = r;
+        data[di + 1] = g;
+        data[di + 2] = b;
+        data[di + 3] = r == tr && g == tg && b == tb ? 0 : 0xffff;
+      }
+    } else {
+      // Grayscale with a tRNS value, expanded to RGBA.
+      final tg = ((t![0] & 0xff) << 8) | (t[1] & 0xff);
+      for (var i = 0, si = 0; i < n; ++i, si += 2, di += dStep) {
+        final g = (row[si] << 8) | row[si + 1];
+        data[di] = g;
+        data[di + 1] = g;
+        data[di + 2] = g;
+        data[di + 3] = g == tg ? 0 : 0xffff;
+      }
+    }
+  }
+
   void _unfilter(
-      PngFilterType filterType, int bpp, List<int> row, List<int>? prevRow) {
+      PngFilterType filterType, int bpp, Uint8List row, Uint8List? prevRow) {
     final rowBytes = row.length;
+    final n = bpp < rowBytes ? bpp : rowBytes;
 
     switch (filterType) {
       case PngFilterType.none:
         break;
       case PngFilterType.sub:
         for (var x = bpp; x < rowBytes; ++x) {
-          row[x] = (row[x] + row[x - bpp]) & 0xff;
+          row[x] = row[x] + row[x - bpp];
         }
         break;
       case PngFilterType.up:
-        for (var x = 0; x < rowBytes; ++x) {
-          final b = prevRow != null ? prevRow[x] : 0;
-          row[x] = (row[x] + b) & 0xff;
+        if (prevRow != null) {
+          for (var x = 0; x < rowBytes; ++x) {
+            row[x] = row[x] + prevRow[x];
+          }
         }
         break;
       case PngFilterType.average:
-        for (var x = 0; x < rowBytes; ++x) {
-          final a = x < bpp ? 0 : row[x - bpp];
-          final b = prevRow != null ? prevRow[x] : 0;
-          row[x] = (row[x] + ((a + b) >> 1)) & 0xff;
+        if (prevRow == null) {
+          for (var x = bpp; x < rowBytes; ++x) {
+            row[x] = row[x] + (row[x - bpp] >> 1);
+          }
+        } else {
+          for (var x = 0; x < n; ++x) {
+            row[x] = row[x] + (prevRow[x] >> 1);
+          }
+          for (var x = bpp; x < rowBytes; ++x) {
+            row[x] = row[x] + ((row[x - bpp] + prevRow[x]) >> 1);
+          }
         }
         break;
       case PngFilterType.paeth:
-        for (var x = 0; x < rowBytes; ++x) {
-          final a = x < bpp ? 0 : row[x - bpp];
-          final b = prevRow != null ? prevRow[x] : 0;
-          final c = x < bpp || prevRow == null ? 0 : prevRow[x - bpp];
-
-          final p = a + b - c;
-
-          final pa = (p - a).abs();
-          final pb = (p - b).abs();
-          final pc = (p - c).abs();
-
-          var paeth = 0;
-          if (pa <= pb && pa <= pc) {
-            paeth = a;
-          } else if (pb <= pc) {
-            paeth = b;
-          } else {
-            paeth = c;
+        if (prevRow == null) {
+          // With no previous row, the predictor is always the left byte.
+          for (var x = bpp; x < rowBytes; ++x) {
+            row[x] = row[x] + row[x - bpp];
           }
-
-          row[x] = (row[x] + paeth) & 0xff;
+        } else {
+          // With no left byte, the predictor is always the byte above.
+          for (var x = 0; x < n; ++x) {
+            row[x] = row[x] + prevRow[x];
+          }
+          for (var x = bpp; x < rowBytes; ++x) {
+            final a = row[x - bpp];
+            final b = prevRow[x];
+            final c = prevRow[x - bpp];
+            var pa = b - c;
+            var pb = a - c;
+            var pc = pa + pb;
+            if (pa < 0) {
+              pa = -pa;
+            }
+            if (pb < 0) {
+              pb = -pb;
+            }
+            if (pc < 0) {
+              pc = -pc;
+            }
+            row[x] = row[x] + (pa <= pb && pa <= pc ? a : (pb <= pc ? b : c));
+          }
         }
         break;
     }
@@ -843,7 +924,7 @@ class PngDecoder extends Decoder {
       case PngColorType.grayscale:
         if (_info.transparency != null && _info.bits > 8) {
           final t = _info.transparency!;
-          final a = ((t[0] & 0xff) << 24) | (t[1] & 0xff);
+          final a = ((t[0] & 0xff) << 8) | (t[1] & 0xff);
           final g = raw[0];
           p.setRgba(g, g, g, g != a ? p.maxChannelValue : 0);
           return;

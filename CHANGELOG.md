@@ -6,11 +6,13 @@
 * Fix `GifEncoder.ditherStrength` being ignored after the first frame.
 * Fix `flip` (both directions) and `bakeOrientation` (orientation 3) not
   flipping the middle row of odd-height images.
+* Fix 16-bit grayscale PNG transparency (tRNS) being ignored.
 * Fix `OutputBuffer` growth taking quadratic time; 8-bit BMP encoding is ~5x
   faster.
 * Lower peak memory when encoding BMP and TGA images.
 * Faster JPEG decoding, using about half the peak memory.
 * Faster JPEG format detection in `decodeImage`.
+* PNG decoding is 2-2.5x faster.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
 
 # 4.10.2
