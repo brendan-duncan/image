@@ -1,5 +1,6 @@
 import '../color/color.dart';
 import '../color/color_uint8.dart';
+import '../color/format.dart';
 import '../image/image.dart';
 import '../image/palette_uint8.dart';
 import 'quantizer.dart';
@@ -14,11 +15,22 @@ class OctreeQuantizer extends Quantizer {
   OctreeQuantizer(Image image, {int numberOfColors = 256})
       : _root = _OctreeNode(0, 0, null) {
     final heap = _HeapNode();
-    for (final p in image) {
-      final r = p.r as int;
-      final g = p.g as int;
-      final b = p.b as int;
-      _heapAdd(heap, _nodeInsert(_root, r, g, b));
+    if (image.format == Format.uint8 &&
+        !image.hasPalette &&
+        image.numChannels >= 3) {
+      // Read the bytes of RGB(A) uint8 images directly.
+      final data = image.toUint8List();
+      final nc = image.numChannels;
+      for (var i = 0; i < data.length; i += nc) {
+        _heapAdd(heap, _nodeInsert(_root, data[i], data[i + 1], data[i + 2]));
+      }
+    } else {
+      for (final p in image) {
+        final r = p.r as int;
+        final g = p.g as int;
+        final b = p.b as int;
+        _heapAdd(heap, _nodeInsert(_root, r, g, b));
+      }
     }
 
     final nc = numberOfColors + 1;

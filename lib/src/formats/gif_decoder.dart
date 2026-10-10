@@ -218,10 +218,10 @@ class GifDecoder extends Decoder {
       if (frame.disposal == 2) {
         final imageBytes = nextImage.toUint8List();
         if (frame.transparent != -1) {
-          imageBytes.fillRange(0, imageBytes.length - 1, frame.transparent);
+          imageBytes.fillRange(0, imageBytes.length, frame.transparent);
         } else {
           imageBytes.fillRange(
-              0, imageBytes.length - 1, info!.backgroundColor!.r as int);
+              0, imageBytes.length, info!.backgroundColor!.r as int);
         }
       } else if (frame.disposal != 3) {
         if (frame.colorMap != null) {
@@ -248,11 +248,7 @@ class GifDecoder extends Decoder {
 
       nextImage.frameDuration = image.frameDuration;
 
-      for (final p in image) {
-        if (p.a != 0) {
-          nextImage.setPixel(p.x + frame.x, p.y + frame.y, p);
-        }
-      }
+      _compositeFrame(image, nextImage, frame.x, frame.y);
 
       firstImage.addFrame(nextImage);
       lastImage = nextImage;
@@ -347,9 +343,37 @@ class GifDecoder extends Decoder {
 
   void _updateImage(Image image, int y, GifColorMap? colorMap, Uint8List line) {
     if (colorMap != null) {
-      final width = line.length;
-      for (var x = 0; x < width; ++x) {
-        image.setPixelRgb(x, y, line[x], 0, 0);
+      // The frame is a 1 channel image of palette indices.
+      final start = y * image.width;
+      image.toUint8List().setRange(start, start + line.length, line);
+    }
+  }
+
+  // Draws the non-transparent pixels of [frame] onto [canvas] at (fx, fy).
+  // Both are 1 channel palette index images.
+  void _compositeFrame(Image frame, Image canvas, int fx, int fy) {
+    final palette = frame.palette!;
+    final opaque =
+        List<bool>.generate(palette.numColors, (i) => palette.getAlpha(i) != 0);
+    final src = frame.toUint8List();
+    final dst = canvas.toUint8List();
+    final w = frame.width;
+    final cw = canvas.width;
+    final ch = canvas.height;
+    for (var y = 0; y < frame.height; ++y) {
+      final cy = y + fy;
+      if (cy >= ch) {
+        break;
+      }
+      for (var x = 0, si = y * w; x < w; ++x, ++si) {
+        final cx = x + fx;
+        if (cx >= cw) {
+          break;
+        }
+        final i = src[si];
+        if (i < opaque.length && opaque[i]) {
+          dst[cy * cw + cx] = i;
+        }
       }
     }
   }

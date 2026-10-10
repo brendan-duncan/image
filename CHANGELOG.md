@@ -13,6 +13,7 @@
 * Fix TGA encoding of grayscale and grayscale+alpha images.
 * Fix `Image.convert(withPalette: true)` modifying the source image.
 * Fix `ditherImage` crashing on palette images.
+* Fix the last pixel of cleared GIF animation frames.
 * Fix cubic interpolation sampling outside the image near the top and left
   edges, which brightened or darkened them.
 * Fix `OutputBuffer` growth taking quadratic time; 8-bit BMP encoding is ~5x
@@ -21,7 +22,7 @@
 * Faster JPEG decoding, using about half the peak memory.
 * Faster JPEG format detection in `decodeImage`.
 * JPEG encoding is ~2.4x faster and uses less memory.
-* GIF encoding and `ditherImage` are ~2x faster.
+* GIF encoding and `ditherImage` are ~2x faster, and GIF decoding faster.
 * PNG decoding is 3-4x faster and uses about 40% less peak memory.
 * PNG encoding uses about 80% less peak memory on native platforms.
 * Lossy WebP decoding is ~1.9x faster.
