@@ -19,7 +19,8 @@
 * Fix `OutputBuffer` growth taking quadratic time; 8-bit BMP encoding is ~5x
   faster.
 * Faster BMP, TGA and TIFF encoding, using less memory.
-* Faster JPEG decoding, using about half the peak memory.
+* Faster JPEG decoding; baseline images are decoded a band at a time, using
+  ~70% less peak memory.
 * Faster JPEG format detection in `decodeImage`.
 * JPEG encoding is ~2.4x faster and uses less memory.
 * GIF encoding and `ditherImage` are ~2x faster, and GIF decoding faster.

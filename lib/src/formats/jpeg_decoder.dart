@@ -65,28 +65,15 @@ class JpegDecoder extends Decoder {
     if (input == null) {
       return null;
     }
-    final jpeg = JpegData()
-      ..maxPixels = maxPixels
-      ..scale = scale
-      ..read(input!.buffer);
-    if (jpeg.frames.length != 1) {
-      throw ImageException('only single frame JPEGs supported');
-    }
-
-    return jpeg.getImage();
+    return (JpegData()
+          ..maxPixels = maxPixels
+          ..scale = scale)
+        .decodeImage(input!.buffer);
   }
 
   @override
-  Image? decode(Uint8List bytes, {int? frame}) {
-    final jpeg = JpegData()
-      ..maxPixels = maxPixels
-      ..scale = scale
-      ..read(bytes);
-
-    if (jpeg.frames.length != 1) {
-      throw ImageException('only single frame JPEGs supported');
-    }
-
-    return jpeg.getImage();
-  }
+  Image? decode(Uint8List bytes, {int? frame}) => (JpegData()
+        ..maxPixels = maxPixels
+        ..scale = scale)
+      .decodeImage(bytes);
 }

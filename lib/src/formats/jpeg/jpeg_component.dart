@@ -23,6 +23,10 @@ class JpegComponent {
   /// Whether [coefficients] only holds the DC coefficient of each block, at
   /// `row * blocksPerLineForMcu + col`, for decoding at 1/8 scale.
   bool dcOnly = false;
+
+  /// When > 0, [coefficients] only holds this many rows of blocks, the
+  /// current band of the image being decoded.
+  int bandBlockRows = 0;
   late List<HuffmanNode?> huffmanTableDC;
   late List<HuffmanNode?> huffmanTableAC;
 

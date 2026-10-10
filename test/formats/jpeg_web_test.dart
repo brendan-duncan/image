@@ -9,8 +9,12 @@
 // as well as in the normal suite. The web build uses its own IDCT
 // (`_jpeg_quantize_html.dart`) because dart2js shifts are 32-bit.
 
+import 'dart:typed_data';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
+
+import '../_test_util.dart';
 
 Image _gradient(int width, int height) {
   final image = Image(width: width, height: height);
@@ -121,6 +125,33 @@ void main() {
 
       test('scaled decode rejects other scales', () {
         expect(() => JpegDecoder(scale: 3), throwsArgumentError);
+      });
+
+      test('an EXIF block after the scan is still applied', () {
+        // Decoding a band at a time converts rows before the EXIF block is
+        // read, so the image has to be decoded again.
+        final src = _gradient(37, 29);
+        final plain = encodeJpg(src);
+        final oriented = encodeJpg(src.clone()..exif.imageIfd.orientation = 6);
+        // Move the EXIF (APP1) segment of [oriented] to just before the EOI
+        // marker of [plain].
+        var app1 = -1;
+        for (var i = 2; i + 4 < oriented.length; ++i) {
+          if (oriented[i] == 0xff && oriented[i + 1] == 0xe1) {
+            app1 = i;
+            break;
+          }
+        }
+        expect(app1, greaterThan(0));
+        final length = (oriented[app1 + 2] << 8) | oriented[app1 + 3];
+        final segment = oriented.sublist(app1, app1 + 2 + length);
+        final bytes = Uint8List.fromList(
+            [...plain.sublist(0, plain.length - 2), ...segment, 0xff, 0xd9]);
+        final expected = (JpegData()..read(bytes)).getImage();
+        final decoded = decodeJpg(bytes)!;
+        expect(decoded.width, equals(29));
+        expect(decoded.height, equals(37));
+        testImageEquals(decoded, expected);
       });
     });
   });

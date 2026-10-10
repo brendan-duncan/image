@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import '../../exif/exif_data.dart';
@@ -175,6 +176,15 @@ class JpegData {
     }
 
     final f = frame!;
+    if (_writer != null) {
+      // The image was decoded a band at a time.
+      return;
+    }
+    if (!_prepared) {
+      // No scans: the coefficients are all zero.
+      _prepared = true;
+      f.prepare(dcOnly: scale == 8);
+    }
     for (var i = 0; i < f.componentsOrder.length; ++i) {
       final component = f.components[f.componentsOrder[i]]!;
       components.add(ComponentData(
@@ -380,6 +390,13 @@ class JpegData {
   void _readAppData(int marker, InputBuffer block) {
     final appData = block;
 
+    // EXIF orientation and the Adobe color transform are used by bands that
+    // have already been converted.
+    if (_writer != null &&
+        (marker == JpegMarker.app1 || marker == JpegMarker.app14)) {
+      _restartNeeded = true;
+    }
+
     if (marker == JpegMarker.app0) {
       // 'JFIF\0'
       if (appData[0] == 0x4A &&
@@ -485,12 +502,11 @@ class JpegData {
       f.components[componentId] = JpegComponent(h, v, quantizationTables, qId);
     }
 
-    // prepare allocates the coefficient blocks for the entire frame, so the
-    // declared dimensions must be validated first.
+    // The coefficient blocks are allocated by the first scan, once it's known
+    // whether the image can be decoded a band at a time, but the declared
+    // dimensions are validated now.
     if (prepare) {
       _validateFrame(f);
-      // At 1/8 scale each block is just its DC coefficient.
-      f.prepare(dcOnly: scale == 8);
     }
     frame = f;
     frames.add(f);
@@ -606,9 +622,35 @@ class JpegData {
       return;
     }
 
-    JpegScan(input, f, components, resetInterval, spectralStart, spectralEnd,
-            ah, al)
-        .decode();
+    if (_writer != null) {
+      // Another scan would change bands that have already been converted.
+      throw const _RestartDecode();
+    }
+
+    var streaming = false;
+    if (!_prepared) {
+      _prepared = true;
+      // A baseline scan of all of the components holds the whole image, so it
+      // can be decoded a band at a time. (A scan of one component is one
+      // block per MCU, so that's only done for 1x1 sampling.)
+      final first = f.components[f.componentsOrder[0]]!;
+      streaming = _allowStreaming &&
+          !f.progressive! &&
+          components.length == f.components.length &&
+          (components.length > 1 ||
+              (first.hSamples == 1 && first.vSamples == 1));
+      f.prepare(dcOnly: scale == 8, band: streaming);
+      if (streaming) {
+        _startBands(f);
+      }
+    }
+
+    final scan = JpegScan(input, f, components, resetInterval, spectralStart,
+        spectralEnd, ah, al);
+    if (streaming) {
+      scan.onRow = _decodeBand;
+    }
+    scan.decode();
   }
 
   List<HuffmanNode?> _buildHuffmanTable(
@@ -665,39 +707,11 @@ class JpegData {
     final R = Int32List(64);
     final r = Uint8List(64);
     final lines = List<Uint8List?>.filled(blocksPerColumn * bs, null);
-    final coefficients = component.coefficients;
-    final blocksPerLineForMcu = component.blocksPerLineForMcu;
-    final quantizationTable = component.quantizationTable!;
-
-    var l = 0;
     for (var blockRow = 0; blockRow < blocksPerColumn; blockRow++) {
-      final scanLine = blockRow * bs;
       for (var i = 0; i < bs; i++) {
-        lines[l++] = Uint8List(samplesPerLine);
+        lines[blockRow * bs + i] = Uint8List(samplesPerLine);
       }
-
-      for (var blockCol = 0; blockCol < blocksPerLine; blockCol++) {
-        final block = blockRow * blocksPerLineForMcu + blockCol;
-        final offset = block << 6;
-        if (bs == 1) {
-          // A block scaled to one pixel is its average, given by the DC
-          // coefficient alone.
-          final dc = coefficients[component.dcOnly ? block : offset];
-          lines[scanLine]![blockCol] = _dcValue(dc * quantizationTable[0]);
-          continue;
-        }
-
-        quantizeAndInverse(quantizationTable, coefficients, offset, r, R);
-
-        final sample = blockCol * bs;
-        if (bs == 8) {
-          for (var j = 0; j < 8; j++) {
-            lines[scanLine + j]?.setRange(sample, sample + 8, r, j << 3);
-          }
-        } else {
-          _scaleBlock(r, bs, lines, scanLine, sample);
-        }
-      }
+      _buildBlockRow(component, blockRow, lines, blockRow * bs, r, R);
     }
 
     // The coefficients are no longer needed once the lines are built.
@@ -705,6 +719,142 @@ class JpegData {
 
     return lines;
   }
+
+  // Decodes the blocks of row [coeffRow] of [component.coefficients] into the
+  // lines of [lines] starting at [scanLine].
+  void _buildBlockRow(JpegComponent component, int coeffRow,
+      List<Uint8List?> lines, int scanLine, Uint8List r, Int32List R) {
+    final bs = 8 ~/ scale;
+    final coefficients = component.coefficients;
+    final blocksPerLineForMcu = component.blocksPerLineForMcu;
+    final quantizationTable = component.quantizationTable!;
+    for (var blockCol = 0; blockCol < component.blocksPerLine; blockCol++) {
+      final block = coeffRow * blocksPerLineForMcu + blockCol;
+      final offset = block << 6;
+      if (bs == 1) {
+        // A block scaled to one pixel is its average, given by the DC
+        // coefficient alone.
+        final dc = coefficients[component.dcOnly ? block : offset];
+        lines[scanLine]![blockCol] = _dcValue(dc * quantizationTable[0]);
+        continue;
+      }
+
+      quantizeAndInverse(quantizationTable, coefficients, offset, r, R);
+
+      final sample = blockCol * bs;
+      if (bs == 8) {
+        for (var j = 0; j < 8; j++) {
+          lines[scanLine + j]?.setRange(sample, sample + 8, r, j << 3);
+        }
+      } else {
+        _scaleBlock(r, bs, lines, scanLine, sample);
+      }
+    }
+  }
+
+  /// Decodes [bytes] to an [Image]. Baseline images are decoded a band of
+  /// rows at a time when they can be, which needs much less memory than
+  /// [read] followed by [getImage], as the coefficients and lines of the
+  /// whole image aren't kept.
+  Image decodeImage(List<int> bytes) {
+    _allowStreaming = true;
+    try {
+      read(bytes);
+    } on _RestartDecode {
+      return _decodeFully(bytes);
+    }
+    final writer = _writer;
+    if (writer == null) {
+      return getImage();
+    }
+    if (_restartNeeded) {
+      return _decodeFully(bytes);
+    }
+    return writer.image..iccProfile = iccProfile;
+  }
+
+  // Decodes [bytes] with a new JpegData that doesn't decode in bands.
+  Image _decodeFully(List<int> bytes) {
+    final jpeg = JpegData()
+      ..maxPixels = maxPixels
+      ..scale = scale
+      ..read(bytes);
+    return jpeg.getImage();
+  }
+
+  // Sets up decoding the image a band (a row of MCUs) at a time.
+  void _startBands(JpegFrame f) {
+    final bs = 8 ~/ scale;
+    _bandLines.clear();
+    for (final id in f.componentsOrder) {
+      final component = f.components[id]!;
+      components.add(ComponentData(
+          component.hSamples,
+          f.maxHSamples,
+          component.vSamples,
+          f.maxVSamples,
+          List<Uint8List?>.filled(component.blocksPerColumn * bs, null)));
+      _bandLines.add(List<Uint8List>.generate(component.vSamples * bs,
+          (_) => Uint8List(component.blocksPerLine * bs)));
+    }
+    _writer = JpegImageWriter(this);
+  }
+
+  // Decodes band [row] of the image, and converts its rows of pixels.
+  void _decodeBand(int row) {
+    final f = frame!;
+    final bs = 8 ~/ scale;
+    for (var ci = 0; ci < f.componentsOrder.length; ++ci) {
+      final component = f.components[f.componentsOrder[ci]]!;
+      final lines = components[ci].lines;
+      final bandLines = _bandLines[ci];
+      for (var r = 0; r < component.vSamples; ++r) {
+        final blockRow = row * component.vSamples + r;
+        if (blockRow >= component.blocksPerColumn) {
+          break;
+        }
+        for (var j = 0; j < bs; ++j) {
+          lines[blockRow * bs + j] = bandLines[r * bs + j];
+        }
+        _buildBlockRow(component, r, lines, blockRow * bs, _bandR, _bandRInt);
+      }
+      // The next band starts with zero coefficients. (Copying zeros is much
+      // faster than fillRange.)
+      final coefficients = component.coefficients;
+      if (_zeros.length < coefficients.length) {
+        _zeros = Int16List(coefficients.length);
+      }
+      coefficients.setRange(0, coefficients.length, _zeros);
+    }
+
+    final rowsPerBand = f.maxVSamples * bs;
+    final y0 = row * rowsPerBand;
+    final y1 = min(y0 + rowsPerBand, scaledHeight);
+    if (y0 < y1) {
+      _writer!.writeRows(y0, y1);
+    }
+
+    // The band's line buffers are reused by the next band.
+    for (var ci = 0; ci < f.componentsOrder.length; ++ci) {
+      final component = f.components[f.componentsOrder[ci]]!;
+      final lines = components[ci].lines;
+      final first = row * component.vSamples * bs;
+      for (var i = first;
+          i < first + component.vSamples * bs && i < lines.length;
+          ++i) {
+        lines[i] = null;
+      }
+    }
+  }
+
+  bool _prepared = false;
+  bool _allowStreaming = false;
+  bool _restartNeeded = false;
+  JpegImageWriter? _writer;
+  final _bandLines = <List<Uint8List>>[];
+  final _bandR = Uint8List(64);
+  final _bandRInt = Int32List(64);
+  var _zeros = Int16List(0);
 
   // The value of each pixel of a block with only the DC coefficient [p0]
   // (dequantized), as quantizeAndInverse computes it. Floor division of
@@ -752,4 +902,10 @@ class JpegData {
 class _JpegHuffman {
   final children = List<HuffmanNode?>.filled(2, null);
   int index = 0;
+}
+
+// Thrown when an image being decoded a band at a time can't be: it's then
+// decoded fully.
+class _RestartDecode implements Exception {
+  const _RestartDecode();
 }

@@ -30,6 +30,11 @@ class JpegScan {
   // The low [bitsCount] bits of [bitsData] are the next bits of the
   // entropy-coded data, most significant first. [_atMarker] is set when a
   // marker or the end of the input is reached; markers are not consumed.
+  /// Called when each row of MCUs (or of blocks, for a scan of one
+  /// component) has been decoded, for decoding a band at a time.
+  void Function(int row)? onRow;
+  int _rowsDone = 0;
+
   int bitsData = 0;
   int bitsCount = 0;
   bool _atMarker = false;
@@ -97,6 +102,9 @@ class JpegScan {
         for (var n = 0; n < resetInterval!; n++) {
           _decodeBlock(component, decodeFn, mcu);
           mcu++;
+          if (onRow != null && mcu % component.blocksPerLine == 0) {
+            _rowDone(mcu ~/ component.blocksPerLine);
+          }
         }
       } else {
         for (var n = 0; n < resetInterval!; n++) {
@@ -111,6 +119,9 @@ class JpegScan {
             }
           }
           mcu++;
+          if (onRow != null && mcu % mcusPerLine == 0) {
+            _rowDone(mcu ~/ mcusPerLine);
+          }
         }
       }
 
@@ -133,6 +144,21 @@ class JpegScan {
           break;
         }
       }
+    }
+
+    // Finish the rows, also when the data ended early: blocks that weren't
+    // decoded keep zero coefficients, as they do when decoding fully.
+    if (onRow != null) {
+      _rowDone(componentsLength == 1
+          ? components[0].blocksPerColumn
+          : frame.mcusPerColumn);
+    }
+  }
+
+  // Reports the rows before [rows] that haven't been reported yet.
+  void _rowDone(int rows) {
+    while (_rowsDone < rows) {
+      onRow!(_rowsDone++);
     }
   }
 
@@ -384,8 +410,11 @@ class JpegScan {
         blockCol >= component.blocksPerLineForMcu) {
       return;
     }
-    _decodeInto(component, decodeFn,
-        blockRow * component.blocksPerLineForMcu + blockCol);
+    _decodeInto(
+        component,
+        decodeFn,
+        _bandRow(component, blockRow) * component.blocksPerLineForMcu +
+            blockCol);
   }
 
   void _decodeBlock(
@@ -395,9 +424,18 @@ class JpegScan {
   ) {
     final blockRow = mcu ~/ component.blocksPerLine;
     final blockCol = mcu % component.blocksPerLine;
-    _decodeInto(component, decodeFn,
-        blockRow * component.blocksPerLineForMcu + blockCol);
+    _decodeInto(
+        component,
+        decodeFn,
+        _bandRow(component, blockRow) * component.blocksPerLineForMcu +
+            blockCol);
   }
+
+  // The row of [component.coefficients] holding block row [blockRow].
+  static int _bandRow(JpegComponent component, int blockRow) =>
+      component.bandBlockRows > 0
+          ? blockRow % component.bandBlockRows
+          : blockRow;
 
   // Decodes the coefficients of a block. When the component only keeps DC
   // coefficients, the block is decoded in a scratch block, and only its DC
