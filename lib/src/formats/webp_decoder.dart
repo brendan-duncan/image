@@ -156,7 +156,9 @@ class WebPDecoder extends Decoder {
     // Not frames[i - 1]: an undecodable frame is skipped, and must not dispose
     // in place of the frame that was actually drawn
     WebPFrame? previous;
-    final budget = PixelBudget(maxPixels);
+    // Each frame is composited to a full canvas, so check them all before
+    // decoding any.
+    PixelBudget(maxPixels).add(_info!.width * _info!.numFrames, _info!.height);
     for (var i = 0; i < _info!.numFrames; ++i) {
       _info!.frame = i;
       final frame = _info!.frames[i];
@@ -164,7 +166,6 @@ class WebPDecoder extends Decoder {
       if (image == null) {
         continue;
       }
-      budget.add(_info!.width, _info!.height);
 
       image.frameDuration = frame.duration;
 

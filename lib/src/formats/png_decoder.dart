@@ -540,15 +540,16 @@ class PngDecoder extends Decoder {
 
     Image? firstImage;
     Image? lastImage;
-    final budget = PixelBudget(maxPixels);
     final numFrames = min(_info.numFrames, _info.frames.length);
+    // Each frame is composited to a full canvas, so check them all before
+    // decoding any.
+    PixelBudget(maxPixels).add(_info.width * numFrames, _info.height);
     for (var i = 0; i < numFrames; ++i) {
       final frame = _info.frames[i];
       final image = decodeFrame(i);
       if (image == null) {
         continue;
       }
-      budget.add(_info.width, _info.height);
 
       if (firstImage == null || lastImage == null) {
         firstImage = image.convert(numChannels: image.numChannels);

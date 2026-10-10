@@ -200,15 +200,15 @@ class GifDecoder extends Decoder {
 
     Image? firstImage;
     Image? lastImage;
-    final budget = PixelBudget(maxPixels);
+    // Each frame is composited to a full canvas, so check them all before
+    // decoding any.
+    PixelBudget(maxPixels).add(info!.width * info!.numFrames, info!.height);
     for (var frameIndex = 0; frameIndex < info!.numFrames; ++frameIndex) {
       final frame = info!.frames[frameIndex];
       final image = decodeFrame(frameIndex);
       if (image == null) {
         return null;
       }
-      budget.add(
-          lastImage?.width ?? image.width, lastImage?.height ?? image.height);
 
       image.frameDuration = frame.duration * 10; // Convert to MS
 
