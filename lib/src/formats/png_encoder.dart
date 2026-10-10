@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -11,6 +12,7 @@ import '../util/neural_quantizer.dart';
 import '../util/output_buffer.dart';
 import '../util/quantizer.dart';
 import 'encoder.dart';
+import 'png/_png_deflate.dart' if (dart.library.io) 'png/_png_deflate_io.dart';
 import 'png/png_info.dart';
 
 enum PngFilter { none, sub, up, average, paeth }
@@ -24,6 +26,9 @@ class PngEncoder extends Encoder {
       this.level,
       this.pixelDimensions,
       this.cicpData});
+
+  // The most image data stored in each IDAT or fdAT chunk.
+  static const _maxDataChunkSize = 0x10000;
 
   int _numChannels(Image image) => image.hasPalette ? 1 : image.numChannels;
 
@@ -64,18 +69,6 @@ class PngEncoder extends Encoder {
       }
     }
 
-    final nc = _numChannels(image);
-
-    final channelBytes = image.format == Format.uint16 ? 2 : 1;
-
-    // Include room for the filter bytes (1 byte per row).
-    final filteredImage = Uint8List(
-        (image.width * image.height * nc * channelBytes) + image.height);
-
-    _filter(image, filteredImage);
-
-    final compressed = const ZLibEncoder().encode(filteredImage, level: level);
-
     if (image.textData != null) {
       for (var key in image.textData!.keys) {
         _writeTextChunk(key, image.textData![key]!);
@@ -95,16 +88,52 @@ class PngEncoder extends Encoder {
       sequenceNumber++;
     }
 
-    if (sequenceNumber <= 1) {
-      _writeChunk(output!, 'IDAT', compressed);
-    } else {
-      // fdAT chunk
-      final fdat = OutputBuffer(bigEndian: true)
-        ..writeUint32(sequenceNumber)
-        ..writeBytes(compressed);
-      _writeChunk(output!, 'fdAT', fdat.getBytes());
+    // The first frame is stored in IDAT chunks, later animation frames in fdAT
+    // chunks, which start with a sequence number.
+    final isIdat = sequenceNumber <= 1;
+    final dataStart = isIdat ? 0 : 4;
+    final chunk = Uint8List(dataStart + _maxDataChunkSize);
+    var chunkLength = dataStart;
+    var chunksWritten = 0;
 
-      sequenceNumber++;
+    void writeDataChunk() {
+      if (isIdat) {
+        _writeChunk(
+            output!, 'IDAT', Uint8List.view(chunk.buffer, 0, chunkLength));
+      } else {
+        chunk
+          ..[0] = (sequenceNumber >> 24) & 0xff
+          ..[1] = (sequenceNumber >> 16) & 0xff
+          ..[2] = (sequenceNumber >> 8) & 0xff
+          ..[3] = sequenceNumber & 0xff;
+        sequenceNumber++;
+        _writeChunk(
+            output!, 'fdAT', Uint8List.view(chunk.buffer, 0, chunkLength));
+      }
+      chunkLength = dataStart;
+      chunksWritten++;
+    }
+
+    // Compressed data is written out in chunks as it's produced.
+    final rowBytes = image.data!.rowStride;
+    final deflater = PngDeflater(level, (rowBytes + 1) * image.height, (bytes) {
+      var i = 0;
+      while (i < bytes.length) {
+        final n = min(bytes.length - i, chunk.length - chunkLength);
+        chunk.setRange(chunkLength, chunkLength + n, bytes, i);
+        chunkLength += n;
+        i += n;
+        if (chunkLength == chunk.length) {
+          writeDataChunk();
+        }
+      }
+    });
+
+    _filter(image, deflater);
+    deflater.close();
+
+    if (chunkLength > dataStart || chunksWritten == 0) {
+      writeDataChunk();
     }
   }
 
@@ -305,8 +334,9 @@ class PngEncoder extends Encoder {
     out.writeUint32(crc);
   }
 
-  void _filter(Image image, Uint8List out) {
-    var oi = 0;
+  // Filters each row of [image], passing it to [deflater] with its filter
+  // type byte.
+  void _filter(Image image, PngDeflater deflater) {
     final filter = image.hasPalette ? PngFilter.none : this.filter;
     final buffer = image.buffer;
     final rowStride = image.data!.rowStride;
@@ -314,130 +344,112 @@ class PngEncoder extends Encoder {
     final bpp = ((nc * image.bitsPerChannel) + 7) >> 3;
     final bpc = (image.bitsPerChannel + 7) >> 3;
 
+    // Each row is copied into one of two buffers, swapping multi-byte samples
+    // to PNG's big-endian order. Keeping every row in the same kind of list
+    // (not a view) keeps the filter loops fast.
+    final rows = [Uint8List(rowStride), Uint8List(rowStride)];
+    var prevRow = rows[1];
+    final out = Uint8List(rowStride + 1);
+    out[0] = filter.index;
+
     var rowOffset = 0;
-    Uint8List? prevRow;
-    for (var y = 0; y < image.height; ++y) {
-      final rowBytes = Uint8List.view(buffer, rowOffset, rowStride);
-      rowOffset += rowStride;
+    for (var y = 0; y < image.height; ++y, rowOffset += rowStride) {
+      final src = Uint8List.view(buffer, rowOffset, rowStride);
+      final row = rows[y & 1];
+      if (bpc > 1) {
+        for (var x = 0; x < rowStride; x += bpc) {
+          for (var c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
+            row[x + c] = src[x + c2];
+          }
+        }
+      } else {
+        row.setRange(0, rowStride, src);
+      }
 
       switch (filter) {
+        case PngFilter.none:
+          out.setRange(1, rowStride + 1, row);
+          break;
         case PngFilter.sub:
-          oi = _filterSub(rowBytes, bpc, bpp, out, oi);
+          _filterSub(row, bpp, out);
           break;
         case PngFilter.up:
-          oi = _filterUp(rowBytes, prevRow, bpc, out, oi);
+          _filterUp(row, prevRow, out);
           break;
         case PngFilter.average:
-          oi = _filterAverage(rowBytes, prevRow, bpc, bpp, out, oi);
+          _filterAverage(row, prevRow, bpp, out);
           break;
         case PngFilter.paeth:
-          oi = _filterPaeth(rowBytes, prevRow, bpc, bpp, out, oi);
-          break;
-        default:
-          oi = _filterNone(rowBytes, bpc, out, oi);
+          _filterPaeth(row, prevRow, bpp, out);
           break;
       }
-      prevRow = rowBytes;
+
+      deflater.add(out);
+      prevRow = row;
     }
   }
 
-  int _write(int bpc, Uint8List row, int ri, Uint8List out, int oi) {
-    bpc--;
-    while (bpc >= 0) {
-      out[oi++] = row[ri + bpc];
-      bpc--;
+  // Each filter writes the filtered [row] to [out], after its filter type
+  // byte. They're kept as separate small functions, which the compiler
+  // optimizes much better than one large one.
+
+  static void _filterSub(Uint8List row, int bpp, Uint8List out) {
+    final n = row.length;
+    var oi = 1;
+    for (var x = 0; x < bpp && x < n; ++x) {
+      out[oi++] = row[x];
     }
-    return oi;
+    for (var x = bpp; x < n; ++x) {
+      out[oi++] = row[x] - row[x - bpp];
+    }
   }
 
-  int _filterNone(Uint8List rowBytes, int bpc, Uint8List out, int oi) {
-    out[oi++] = PngFilter.none.index;
-    if (bpc == 1) {
-      final l = rowBytes.length;
-      for (int i = 0; i < l; ++i) {
-        out[oi++] = rowBytes[i];
+  static void _filterUp(Uint8List row, Uint8List prevRow, Uint8List out) {
+    final n = row.length;
+    var oi = 1;
+    for (var x = 0; x < n; ++x) {
+      out[oi++] = row[x] - prevRow[x];
+    }
+  }
+
+  static void _filterAverage(
+      Uint8List row, Uint8List prevRow, int bpp, Uint8List out) {
+    final n = row.length;
+    var oi = 1;
+    for (var x = 0; x < bpp && x < n; ++x) {
+      out[oi++] = row[x] - (prevRow[x] >> 1);
+    }
+    for (var x = bpp; x < n; ++x) {
+      out[oi++] = row[x] - ((row[x - bpp] + prevRow[x]) >> 1);
+    }
+  }
+
+  static void _filterPaeth(
+      Uint8List row, Uint8List prevRow, int bpp, Uint8List out) {
+    final n = row.length;
+    var oi = 1;
+    // With no left byte, the predictor is always the byte above.
+    for (var x = 0; x < bpp && x < n; ++x) {
+      out[oi++] = row[x] - prevRow[x];
+    }
+    for (var x = bpp; x < n; ++x) {
+      final a = row[x - bpp];
+      final b = prevRow[x];
+      final c = prevRow[x - bpp];
+      var pa = b - c;
+      var pb = a - c;
+      var pc = pa + pb;
+      if (pa < 0) {
+        pa = -pa;
       }
-    } else {
-      final l = rowBytes.length;
-      for (int i = 0; i < l; i += bpc) {
-        oi = _write(bpc, rowBytes, i, out, oi);
+      if (pb < 0) {
+        pb = -pb;
       }
-    }
-    return oi;
-  }
-
-  int _filterSub(Uint8List row, int bpc, int bpp, Uint8List out, int oi) {
-    out[oi++] = PngFilter.sub.index;
-    for (var x = 0; x < bpp; x += bpc) {
-      oi = _write(bpc, row, x, out, oi);
-    }
-    final l = row.length;
-    for (var x = bpp; x < l; x += bpc) {
-      for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
-        out[oi++] = (row[x + c2] - row[(x + c2) - bpp]) & 0xff;
+      if (pc < 0) {
+        pc = -pc;
       }
+      out[oi++] = row[x] - (pa <= pb && pa <= pc ? a : (pb <= pc ? b : c));
     }
-    return oi;
-  }
-
-  int _filterUp(
-      Uint8List row, Uint8List? prevRow, int bpc, Uint8List out, int oi) {
-    out[oi++] = PngFilter.up.index;
-    final l = row.length;
-    for (var x = 0; x < l; x += bpc) {
-      for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
-        final b = prevRow != null ? prevRow[x + c2] : 0;
-        out[oi++] = (row[x + c2] - b) & 0xff;
-      }
-    }
-    return oi;
-  }
-
-  int _filterAverage(Uint8List row, Uint8List? prevRow, int bpc, int bpp,
-      Uint8List out, int oi) {
-    out[oi++] = PngFilter.average.index;
-    final l = row.length;
-    for (var x = 0; x < l; x += bpc) {
-      for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
-        final x2 = x + c2;
-        final p1 = x2 < bpp ? 0 : row[x2 - bpp];
-        final p2 = prevRow == null ? 0 : prevRow[x2];
-        final p3 = row[x2];
-        out[oi++] = p3 - ((p1 + p2) >> 1);
-      }
-    }
-    return oi;
-  }
-
-  int _paethPredictor(int a, int b, int c) {
-    final p = a + b - c;
-    final pa = (p > a) ? p - a : a - p;
-    final pb = (p > b) ? p - b : b - p;
-    final pc = (p > c) ? p - c : c - p;
-    if (pa <= pb && pa <= pc) {
-      return a;
-    } else if (pb <= pc) {
-      return b;
-    }
-    return c;
-  }
-
-  int _filterPaeth(Uint8List row, Uint8List? prevRow, int bpc, int bpp,
-      Uint8List out, int oi) {
-    out[oi++] = PngFilter.paeth.index;
-    final l = row.length;
-    for (var x = 0; x < l; x += bpc) {
-      for (int c = 0, c2 = bpc - 1; c < bpc; ++c, --c2) {
-        final x2 = x + c2;
-        final p0 = x2 < bpp ? 0 : row[x2 - bpp];
-        final p1 = prevRow == null ? 0 : prevRow[x2];
-        final p2 = x2 < bpp || prevRow == null ? 0 : prevRow[x2 - bpp];
-        final p = row[x2];
-        final pi = _paethPredictor(p0, p1, p2);
-        out[oi++] = (p - pi) & 0xff;
-      }
-    }
-    return oi;
   }
 
   // Return the CRC of the bytes

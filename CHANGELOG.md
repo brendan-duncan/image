@@ -13,6 +13,7 @@
 * Faster JPEG decoding, using about half the peak memory.
 * Faster JPEG format detection in `decodeImage`.
 * PNG decoding is 3-4x faster and uses about 40% less peak memory.
+* PNG encoding uses about 80% less peak memory on native platforms.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
 
 # 4.10.2

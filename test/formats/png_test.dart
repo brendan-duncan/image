@@ -654,5 +654,51 @@ void main() {
       }
       expect(transparent, greaterThan(0));
     });
+
+    test('large frames are split into chunks with consecutive sequence numbers',
+        () {
+      // Noise doesn't compress, so each frame needs several data chunks.
+      var seed = 1;
+      Image noise() {
+        final image = Image(width: 256, height: 256);
+        for (final p in image) {
+          seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+          p.setRgb(seed & 0xff, (seed >> 8) & 0xff, (seed >> 16) & 0xff);
+        }
+        return image;
+      }
+
+      final anim = noise()
+        ..addFrame(noise())
+        ..addFrame(noise());
+      final png = encodePng(anim);
+
+      final bd = ByteData.sublistView(png);
+      final sequence = <int>[];
+      var idatChunks = 0;
+      var fdatChunks = 0;
+      for (var offset = 8; offset < png.length;) {
+        final length = bd.getUint32(offset);
+        final type = String.fromCharCodes(png.sublist(offset + 4, offset + 8));
+        if (type == 'fcTL' || type == 'fdAT') {
+          sequence.add(bd.getUint32(offset + 8));
+        }
+        if (type == 'IDAT') {
+          idatChunks++;
+        } else if (type == 'fdAT') {
+          fdatChunks++;
+        }
+        offset += 12 + length;
+      }
+      expect(idatChunks, greaterThan(1));
+      expect(fdatChunks, greaterThan(2));
+      expect(sequence, equals(List<int>.generate(sequence.length, (i) => i)));
+
+      final decoded = decodePng(png)!;
+      expect(decoded.numFrames, equals(3));
+      for (var i = 0; i < 3; ++i) {
+        testImageEquals(decoded.frames[i], anim.frames[i]);
+      }
+    });
   });
 }
