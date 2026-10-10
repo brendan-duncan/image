@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import '../color/channel.dart';
+import '../color/format.dart';
 import '../image/image.dart';
 import '../util/color_util.dart';
 import '../util/math_util.dart';
@@ -30,6 +33,10 @@ Image grayscale(Image src,
             ..setBlue(i, l);
         }
       }
+    } else if (mask == null &&
+        frame.format == Format.uint8 &&
+        frame.numChannels >= 3) {
+      _grayscaleUint8(frame.toUint8List(), frame.numChannels, amount);
     } else {
       for (final p in frame) {
         final l = getLuminanceRgb(p.r, p.g, p.b);
@@ -51,4 +58,32 @@ Image grayscale(Image src,
   }
 
   return src;
+}
+
+// A fast path for RGB(A) uint8 images, computing the same values as the
+// generic path.
+void _grayscaleUint8(Uint8List data, int nc, num amount) {
+  final a = amount.toDouble();
+  final n = data.length;
+  if (a == 1) {
+    // The weights sum to 1, so l is within [0, 255] and needs no clamping.
+    for (var i = 0; i < n; i += nc) {
+      final l =
+          (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]).toInt();
+      data[i] = l;
+      data[i + 1] = l;
+      data[i + 2] = l;
+    }
+    return;
+  }
+  final ia = 1 - a;
+  for (var i = 0; i < n; i += nc) {
+    final r = data[i];
+    final g = data[i + 1];
+    final b = data[i + 2];
+    final l = 0.299 * r + 0.587 * g + 0.114 * b;
+    data[i] = (r * ia + l * a).clamp(0, 255).toInt();
+    data[i + 1] = (g * ia + l * a).clamp(0, 255).toInt();
+    data[i + 2] = (b * ia + l * a).clamp(0, 255).toInt();
+  }
 }

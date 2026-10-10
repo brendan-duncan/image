@@ -1,7 +1,9 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '_pixel_bytes.dart';
 
 /// Returns a copy of the [src] image, rotated by [angle] degrees.
 Image copyRotate(Image src,
@@ -81,6 +83,18 @@ Image _rotate90(Image src) {
             width: frame.height, height: frame.width, noAnimation: true);
     firstFrame ??= dst;
     final hm1 = frame.height - 1;
+    final k = bytesPerPixel(frame);
+    if (k > 0 && bytesPerPixel(dst) == k) {
+      // dst (x, y) is frame (y, hm1 - x).
+      final rowStep = -frame.width * k;
+      final srcBytes = frame.toUint8List();
+      final dstBytes = dst.toUint8List();
+      for (var y = 0; y < dst.height; ++y) {
+        _copyPixels(srcBytes, (hm1 * frame.width + y) * k, rowStep, dstBytes,
+            y * dst.width * k, dst.width, k);
+      }
+      continue;
+    }
     for (var y = 0; y < dst.height; ++y) {
       for (var x = 0; x < dst.width; ++x) {
         dst.setPixel(x, y, frame.getPixel(y, hm1 - x));
@@ -98,6 +112,14 @@ Image _rotate180(Image src) {
     final dst = firstFrame?.addFrame() ??
         Image.from(frame, noAnimation: true, noPixels: true);
     firstFrame ??= dst;
+    final k = bytesPerPixel(frame);
+    if (k > 0 && bytesPerPixel(dst) == k) {
+      // dst (x, y) is frame (wm1 - x, hm1 - y): the pixels in reverse order.
+      final n = frame.width * frame.height;
+      _copyPixels(
+          frame.toUint8List(), (n - 1) * k, -k, dst.toUint8List(), 0, n, k);
+      continue;
+    }
     for (var y = 0; y < dst.height; ++y) {
       for (var x = 0; x < dst.width; ++x) {
         dst.setPixel(x, y, frame.getPixel(wm1 - x, hm1 - y));
@@ -115,6 +137,18 @@ Image _rotate270(Image src) {
         Image.fromResized(frame,
             width: frame.height, height: frame.width, noAnimation: true);
     firstFrame ??= dst;
+    final k = bytesPerPixel(frame);
+    if (k > 0 && bytesPerPixel(dst) == k && frame.width == src.width) {
+      // dst (x, y) is frame (wm1 - y, x).
+      final rowStep = frame.width * k;
+      final srcBytes = frame.toUint8List();
+      final dstBytes = dst.toUint8List();
+      for (var y = 0; y < dst.height; ++y) {
+        _copyPixels(srcBytes, (wm1 - y) * k, rowStep, dstBytes,
+            y * dst.width * k, dst.width, k);
+      }
+      continue;
+    }
     for (var y = 0; y < dst.height; ++y) {
       for (var x = 0; x < dst.width; ++x) {
         dst.setPixel(x, y, frame.getPixel(wm1 - y, x));
@@ -122,4 +156,15 @@ Image _rotate270(Image src) {
     }
   }
   return firstFrame!;
+}
+
+// Copies n k byte pixels from src, starting at byte offset si and stepping
+// srcStep bytes per pixel, to consecutive pixels of dst starting at di.
+void _copyPixels(
+    Uint8List src, int si, int srcStep, Uint8List dst, int di, int n, int k) {
+  for (var x = 0; x < n; ++x, si += srcStep) {
+    for (var c = 0; c < k; ++c) {
+      dst[di++] = src[si + c];
+    }
+  }
 }

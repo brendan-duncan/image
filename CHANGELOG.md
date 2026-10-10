@@ -18,6 +18,8 @@
 * PNG encoding uses about 80% less peak memory on native platforms.
 * `gaussianBlur` and `separableConvolution` are ~7x faster for 8-bit images,
   without a full-size temporary image.
+* Much faster `flip`, `flipVertical`, `flipHorizontal`, `copyRotate` (90, 180
+  and 270 degrees) and `grayscale`.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
 
 # 4.10.2
