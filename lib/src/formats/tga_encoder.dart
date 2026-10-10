@@ -8,7 +8,10 @@ import 'encoder.dart';
 class TgaEncoder extends Encoder {
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
-    final out = OutputBuffer(bigEndian: true);
+    final nc = image.palette?.numChannels ?? image.numChannels;
+    final out = OutputBuffer(
+        size: 18 + image.width * image.height * (nc == 4 ? 4 : 3),
+        bigEndian: true);
 
     final header = List<int>.filled(18, 0);
     header[2] = 2;
@@ -16,7 +19,6 @@ class TgaEncoder extends Encoder {
     header[13] = (image.width >> 8) & 0xff;
     header[14] = image.height & 0xff;
     header[15] = (image.height >> 8) & 0xff;
-    final nc = image.palette?.numChannels ?? image.numChannels;
     header[16] = nc == 3 ? 24 : 32;
 
     out.writeBytes(header);

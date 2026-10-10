@@ -4,6 +4,9 @@
 * Fix `gaussianBlur` and `separableConvolution` only blurring the first frame.
 * Fix `trim` copying the first frame into every frame.
 * Fix `GifEncoder.ditherStrength` being ignored after the first frame.
+* Fix `OutputBuffer` growth taking quadratic time; 8-bit BMP encoding is ~5x
+  faster.
+* Lower peak memory when encoding BMP and TGA images.
 
 # 4.10.2
 

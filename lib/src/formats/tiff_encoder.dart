@@ -12,8 +12,6 @@ import 'tiff/tiff_image.dart';
 class TiffEncoder extends Encoder {
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
-    final out = OutputBuffer();
-
     // TIFF is really just an EXIF structure (or, really, EXIF is just a TIFF
     // structure).
 
@@ -64,6 +62,8 @@ class TiffEncoder extends Encoder {
       ifd0['ColorMap'] = colorMap;
     }
 
+    // The pixel data plus room for the IFD entries.
+    final out = OutputBuffer(size: image.lengthInBytes + 0x2000);
     exif.write(out);
 
     return out.getBytes();

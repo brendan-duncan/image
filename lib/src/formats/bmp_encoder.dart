@@ -20,8 +20,6 @@ class BmpEncoder extends Encoder {
 
   @override
   Uint8List encode(Image image, {bool singleFrame = false}) {
-    final out = OutputBuffer();
-
     final nc = image.numChannels;
     var palette = image.palette;
     final format = image.format;
@@ -115,7 +113,7 @@ class BmpEncoder extends Encoder {
 
     const sRgb = 0x73524742;
 
-    out
+    final out = OutputBuffer(size: fileSize)
       ..writeUint16(BmpFileHeader.signature)
       ..writeUint32(fileSize)
       ..writeUint32(0) // reserved
