@@ -6,6 +6,7 @@ import '../color/format.dart';
 import '../exif/exif_data.dart';
 import '../image/icc_profile.dart';
 import '../image/image.dart';
+import '../image/pixel.dart';
 import '../util/output_buffer.dart';
 import 'encoder.dart';
 import 'jpeg/jpeg_marker.dart';
@@ -23,7 +24,6 @@ enum JpegChroma {
 class JpegEncoder extends Encoder {
   JpegEncoder({int quality = 100}) {
     _initHuffmanTable();
-    _initCategoryNumber();
     _initRgbYuvTable();
     setQuality(quality);
   }
@@ -168,10 +168,9 @@ class JpegEncoder extends Encoder {
     ////////////////////////////////////////////////////////////////
 
     // Do the bit alignment of the EOI marker
-    if (_bytePos >= 0) {
-      final fillBits = [(1 << (_bytePos + 1)) - 1, _bytePos + 1];
-      _writeBits(fp, fillBits);
-    }
+    // (This pads with a whole byte of 1s when the bits are already aligned.)
+    final fill = 8 - _bitCount;
+    _writeBits(fp, (1 << fill) - 1, fill);
 
     _writeMarker(fp, JpegMarker.eoi);
 
@@ -191,6 +190,25 @@ class JpegEncoder extends Encoder {
     Float32List vdu,
     Color backgroundColor,
   ) {
+    if (image.format == Format.uint8 &&
+        !image.hasPalette &&
+        image.numChannels >= 3) {
+      _calculateYUV8(
+          image.data!.toUint8List(),
+          image.data!.rowStride,
+          image.numChannels,
+          x,
+          y,
+          width,
+          height,
+          ydu,
+          udu,
+          vdu,
+          backgroundColor);
+      return;
+    }
+
+    Pixel? pixel;
     for (var pos = 0; pos < 64; pos++) {
       final row = pos >> 3; // / 8
       final col = pos & 7; // % 8
@@ -208,7 +226,8 @@ class JpegEncoder extends Encoder {
         xx -= (x + col) - width + 1;
       }
 
-      Color p = image.getPixel(xx, yy);
+      pixel = image.getPixel(xx, yy, pixel);
+      Color p = pixel;
       if (p.format != Format.uint8) {
         p = p.convert(format: Format.uint8);
       }
@@ -241,6 +260,54 @@ class JpegEncoder extends Encoder {
                   _rgbYuvTable[(b + 1792)]) >>
               16) -
           128.0;
+    }
+  }
+
+  // A fast path for RGB(A) uint8 images, reading the bytes directly. It
+  // computes the same values as the per-pixel path.
+  void _calculateYUV8(
+    Uint8List data,
+    int stride,
+    int nc,
+    int x,
+    int y,
+    int width,
+    int height,
+    Float32List ydu,
+    Float32List udu,
+    Float32List vdu,
+    Color backgroundColor,
+  ) {
+    final table = _rgbYuvTable;
+    final bgR = backgroundColor.r;
+    final bgG = backgroundColor.g;
+    final bgB = backgroundColor.b;
+    for (var row = 0, pos = 0; row < 8; ++row) {
+      // Rows and columns past the edge repeat the last one.
+      final yy = y + row < height ? y + row : height - 1;
+      final rowOffset = yy * stride;
+      for (var col = 0; col < 8; ++col, ++pos) {
+        final xx = x + col < width ? x + col : width - 1;
+        final i = rowOffset + xx * nc;
+        var r = data[i];
+        var g = data[i + 1];
+        var b = data[i + 2];
+        if (nc > 3) {
+          // Blend with the background color.
+          final a = data[i + 3] / 255;
+          final invA = 1.0 - a;
+          r = (r * a + bgR * invA).round().clamp(0, 255);
+          g = (g * a + bgG * invA).round().clamp(0, 255);
+          b = (b * a + bgB * invA).round().clamp(0, 255);
+        }
+        ydu[pos] = ((table[r] + table[g + 256] + table[b + 512]) >> 16) - 128.0;
+        udu[pos] =
+            ((table[r + 768] + table[g + 1024] + table[b + 1280]) >> 16) -
+                128.0;
+        vdu[pos] =
+            ((table[r + 1280] + table[g + 1536] + table[b + 1792]) >> 16) -
+                128.0;
+      }
     }
   }
 
@@ -448,17 +515,15 @@ class JpegEncoder extends Encoder {
     }
   }
 
-  List<List<int>?> _computeHuffmanTable(List<int> nrCodes, List<int> stdTable) {
+  _HuffmanTable _computeHuffmanTable(List<int> nrCodes, List<int> stdTable) {
     var codeValue = 0;
     var posInTable = 0;
-    final ht = <List<int>?>[<int>[]];
+    final ht = _HuffmanTable();
     for (var k = 1; k <= 16; k++) {
       for (var j = 1; j <= nrCodes[k]; j++) {
         final index = stdTable[posInTable];
-        if (ht.length <= index) {
-          ht.length = index + 1;
-        }
-        ht[index] = [codeValue, k];
+        ht.code[index] = codeValue;
+        ht.length[index] = k;
         posInTable++;
         codeValue++;
       }
@@ -478,25 +543,6 @@ class JpegEncoder extends Encoder {
         _computeHuffmanTable(stdAcChrominanceNrCodes, stdAcChrominanceValues);
   }
 
-  void _initCategoryNumber() {
-    var nrLower = 1;
-    var nrUpper = 2;
-    for (var cat = 1; cat <= 15; cat++) {
-      // Positive numbers
-      for (var nr = nrLower; nr < nrUpper; nr++) {
-        _category[32767 + nr] = cat;
-        _bitCode[32767 + nr] = [nr, cat];
-      }
-      // Negative numbers
-      for (var nrNeg = -(nrUpper - 1); nrNeg <= -nrLower; nrNeg++) {
-        _category[32767 + nrNeg] = cat;
-        _bitCode[32767 + nrNeg] = [nrUpper - 1 + nrNeg, cat];
-      }
-      nrLower <<= 1;
-      nrUpper <<= 1;
-    }
-  }
-
   void _initRgbYuvTable() {
     for (var i = 0; i < 256; i++) {
       _rgbYuvTable[i] = 19595 * i;
@@ -511,7 +557,7 @@ class JpegEncoder extends Encoder {
   }
 
   // DCT & quantization core
-  List<int?> _fDCTQuant(List<double> data, List<double> fdtbl) {
+  Int32List _fDCTQuant(Float32List data, Float32List fdtbl) {
     // Pass 1: process rows.
     var dataOff = 0;
     for (var i = 0; i < 8; ++i) {
@@ -785,110 +831,109 @@ class JpegEncoder extends Encoder {
 
   int _processDU(
     OutputBuffer out,
-    List<double> cdu,
-    List<double> fdtbl,
+    Float32List cdu,
+    Float32List fdtbl,
     int dc,
-    List<List<int>?>? htdc,
-    List<List<int>?> htac,
+    _HuffmanTable htdc,
+    _HuffmanTable htac,
   ) {
-    final eob = htac[0x00];
-    final m16Zeroes = htac[0xf0];
-    int pos;
     final duDct = _fDCTQuant(cdu, fdtbl);
 
     // ZigZag reorder
+    final du = _du;
     for (var j = 0; j < 64; ++j) {
-      _du[_zigzag[j]] = duDct[j];
+      du[_zigzag[j]] = duDct[j];
     }
 
-    final diff = _du[0]! - dc;
-    dc = _du[0]!;
+    final diff = du[0] - dc;
+    dc = du[0];
     // Encode dc
     if (diff == 0) {
-      _writeBits(out, htdc![0]!); // diff might be 0
+      _writeBits(out, htdc.code[0], htdc.length[0]); // diff might be 0
     } else {
-      pos = 32767 + diff;
-      _writeBits(out, htdc![_category[pos]!]!);
-      _writeBits(out, _bitCode[pos]!);
+      final cat = _category(diff);
+      _writeBits(out, htdc.code[cat], htdc.length[cat]);
+      _writeBits(out, _bitCode(diff, cat), cat);
     }
 
     // Encode ACs
     var end0pos = 63;
-    for (; (end0pos > 0) && (_du[end0pos] == 0); end0pos--) {}
+    for (; (end0pos > 0) && (du[end0pos] == 0); end0pos--) {}
     //end0pos = first element in reverse order !=0
     if (end0pos == 0) {
-      _writeBits(out, eob!);
+      _writeBits(out, htac.code[0x00], htac.length[0x00]); // EOB
       return dc;
     }
 
     var i = 1;
-    int lng;
     while (i <= end0pos) {
       final startpos = i;
-      for (; (_du[i] == 0) && (i <= end0pos); ++i) {}
+      for (; (du[i] == 0) && (i <= end0pos); ++i) {}
 
       var nrzeroes = i - startpos;
       if (nrzeroes >= 16) {
-        lng = nrzeroes >> 4;
+        final lng = nrzeroes >> 4;
         for (var nrmarker = 1; nrmarker <= lng; ++nrmarker) {
-          _writeBits(out, m16Zeroes!);
+          // 16 zeroes
+          _writeBits(out, htac.code[0xf0], htac.length[0xf0]);
         }
         nrzeroes = nrzeroes & 0xF;
       }
-      pos = 32767 + _du[i]!;
-      _writeBits(out, htac[(nrzeroes << 4) + _category[pos]!]!);
-      _writeBits(out, _bitCode[pos]!);
+      final v = du[i];
+      final cat = _category(v);
+      final rs = (nrzeroes << 4) + cat;
+      _writeBits(out, htac.code[rs], htac.length[rs]);
+      _writeBits(out, _bitCode(v, cat), cat);
       i++;
     }
 
     if (end0pos != 63) {
-      _writeBits(out, eob!);
+      _writeBits(out, htac.code[0x00], htac.length[0x00]); // EOB
     }
 
     return dc;
   }
 
-  void _writeBits(OutputBuffer out, List<int> bits) {
-    final value = bits[0];
-    var posval = bits[1] - 1;
-    while (posval >= 0) {
-      if ((value & (1 << posval)) != 0) {
-        _byteNew |= 1 << _bytePos;
-      }
-      posval--;
-      _bytePos--;
-      if (_bytePos < 0) {
-        if (_byteNew == 0xff) {
-          out
-            ..writeByte(0xff)
-            ..writeByte(0);
-        } else {
-          out.writeByte(_byteNew);
-        }
-        _bytePos = 7;
-        _byteNew = 0;
+  // The JPEG category of a non-zero coefficient: its bit length.
+  static int _category(int v) => (v < 0 ? -v : v).bitLength;
+
+  // The bits coding a non-zero coefficient of the given category.
+  static int _bitCode(int v, int category) =>
+      v > 0 ? v : v + (1 << category) - 1;
+
+  // Writes the low [length] bits of [code], most significant first, stuffing
+  // a 0 after each 0xff byte. At most 7 + 16 bits are held, so this is safe
+  // with dart2js's 32-bit bitwise operations.
+  void _writeBits(OutputBuffer out, int code, int length) {
+    _bitBuffer = (_bitBuffer << length) | code;
+    _bitCount += length;
+    while (_bitCount >= 8) {
+      _bitCount -= 8;
+      final b = (_bitBuffer >> _bitCount) & 0xff;
+      out.writeByte(b);
+      if (b == 0xff) {
+        out.writeByte(0);
       }
     }
+    _bitBuffer &= (1 << _bitCount) - 1;
   }
 
   void _resetBits() {
-    _byteNew = 0;
-    _bytePos = 7;
+    _bitBuffer = 0;
+    _bitCount = 0;
   }
 
   final _yTable = Uint8List(64);
   final _uvTable = Uint8List(64);
   final _fdtblY = Float32List(64);
   final _fdtblUv = Float32List(64);
-  List<List<int>?>? _ydcHuffman;
-  List<List<int>?>? _uvdcHuffman;
-  late List<List<int>?> _yacHuffman;
-  late List<List<int>?> _uvacHuffman;
+  late _HuffmanTable _ydcHuffman;
+  late _HuffmanTable _uvdcHuffman;
+  late _HuffmanTable _yacHuffman;
+  late _HuffmanTable _uvacHuffman;
 
-  final _bitCode = List<List<int>?>.filled(65535, null);
-  final _category = List<int?>.filled(65535, null);
-  final _outputfDCTQuant = List<int?>.filled(64, null);
-  final _du = List<int?>.filled(64, null);
+  final _outputfDCTQuant = Int32List(64);
+  final _du = Int32List(64);
 
   final Int32List _rgbYuvTable = Int32List(2048);
   int? _currentQuality;
@@ -1400,6 +1445,11 @@ class JpegEncoder extends Encoder {
     0xfa
   ];
 
-  int _byteNew = 0;
-  int _bytePos = 7;
+  int _bitBuffer = 0;
+  int _bitCount = 0;
+}
+
+class _HuffmanTable {
+  final code = Int32List(256);
+  final length = Uint8List(256);
 }

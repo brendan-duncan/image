@@ -16,6 +16,7 @@
 * Lower peak memory when encoding BMP and TGA images.
 * Faster JPEG decoding, using about half the peak memory.
 * Faster JPEG format detection in `decodeImage`.
+* JPEG encoding is ~2.4x faster and uses less memory.
 * PNG decoding is 3-4x faster and uses about 40% less peak memory.
 * PNG encoding uses about 80% less peak memory on native platforms.
 * Lossy WebP decoding is ~1.9x faster.
