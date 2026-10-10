@@ -54,5 +54,14 @@ void main() {
         expect(imageVariance(frame), lessThan(imageVariance(src)));
       }
     });
+
+    test('gaussianBlur with a radius larger than the image', () {
+      for (final format in [Format.uint8, Format.uint16]) {
+        final src = Image(width: 6, height: 4, format: format)
+          ..clear(ColorRgb8(100, 150, 200));
+        final blurred = gaussianBlur(src.clone(), radius: 20);
+        expectImagesClose(blurred, src, tolerance: 2);
+      }
+    });
   });
 }

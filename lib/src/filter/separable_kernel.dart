@@ -1,6 +1,7 @@
 import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/math_util.dart';
+import '_reflect_index.dart';
 
 /// A kernel object to use with separableConvolution filtering.
 class SeparableKernel {
@@ -49,15 +50,7 @@ class SeparableKernel {
     }
   }
 
-  int _reflect(int max, int x) {
-    if (x < 0) {
-      return -x;
-    }
-    if (x >= max) {
-      return max - (x - max) - 1;
-    }
-    return x;
-  }
+  int _reflect(int max, int x) => reflectIndex(max, x);
 
   void _applyCoefficientsLine(Image src, Image dst, int y, int width,
       bool horizontal, Image? mask, Channel maskChannel) {

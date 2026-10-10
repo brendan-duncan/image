@@ -2,6 +2,8 @@
 
 * Fix `encodeJpg` modifying the pixels of RGBA source images.
 * Fix `gaussianBlur` and `separableConvolution` only blurring the first frame.
+* Fix `gaussianBlur` and `separableConvolution` crashing when the radius is
+  larger than the image.
 * Fix `trim` copying the first frame into every frame.
 * Fix `GifEncoder.ditherStrength` being ignored after the first frame.
 * Fix `flip` (both directions) and `bakeOrientation` (orientation 3) not
@@ -14,6 +16,8 @@
 * Faster JPEG format detection in `decodeImage`.
 * PNG decoding is 3-4x faster and uses about 40% less peak memory.
 * PNG encoding uses about 80% less peak memory on native platforms.
+* `gaussianBlur` and `separableConvolution` are ~7x faster for 8-bit images,
+  without a full-size temporary image.
 * `JpegComponent.blocks` is replaced by a flat `coefficients` list.
 
 # 4.10.2
