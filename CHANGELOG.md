@@ -7,6 +7,8 @@
 * Fix `OutputBuffer` growth taking quadratic time; 8-bit BMP encoding is ~5x
   faster.
 * Lower peak memory when encoding BMP and TGA images.
+* Lower peak memory when decoding JPEG images.
+* Faster JPEG format detection in `decodeImage`.
 
 # 4.10.2
 

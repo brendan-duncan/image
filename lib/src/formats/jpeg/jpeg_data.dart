@@ -97,6 +97,11 @@ class JpegData {
           hasSOF = true;
           break;
         case JpegMarker.sos: // SOS (Start of Scan)
+          // The entropy-coded data follows; scanning it to EOI would only
+          // cost a pass over the whole file.
+          if (hasSOF) {
+            return true;
+          }
           hasSOS = true;
           break;
         default:
@@ -649,7 +654,12 @@ class JpegData {
           lines[scanLine + j]?.setRange(sample, sample + 8, r, j << 3);
         }
       }
+
+      // Release the coefficients as they're used, so they're not held in
+      // memory alongside all of the lines.
+      component.blocks[blockRow] = const [];
     }
+    component.blocks = const [];
 
     return lines;
   }

@@ -277,5 +277,14 @@ void main() async {
       encodeJpg(image);
       testImageEquals(image, original);
     });
+
+    test('JpegData.read releases DCT coefficients', () {
+      final bytes = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
+      final jpeg = JpegData()..read(bytes);
+      for (final component in jpeg.frame!.components.values) {
+        expect(component.blocks, isEmpty);
+      }
+      expect(jpeg.getImage().width, equals(jpeg.width));
+    });
   });
 }
