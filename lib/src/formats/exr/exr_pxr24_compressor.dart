@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:archive/archive.dart';
-
+import '../../util/_inflate.dart';
 import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
@@ -36,7 +35,8 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
   @override
   Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
-    final data = _zlib.decodeBytes(input.toUint8List());
+    final data =
+        inflate(input.toUint8List(), _numScanLines * _maxScanLineSize!);
 
     _output ??= OutputBuffer(size: _numScanLines * _maxScanLineSize!);
     _output!.rewind();
@@ -126,7 +126,6 @@ class InternalExrPxr24Compressor extends InternalExrCompressor
     return _output!.getBytes();
   }
 
-  final _zlib = const ZLibDecoder();
   final int? _maxScanLineSize;
   final int _numScanLines;
   OutputBuffer? _output;

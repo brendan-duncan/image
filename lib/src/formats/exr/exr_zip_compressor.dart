@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 
+import '../../util/_inflate.dart';
 import '../../util/_internal.dart';
 import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
@@ -36,7 +37,8 @@ class InternalExrZipCompressor extends InternalExrCompressor
   @override
   Uint8List uncompress(InputBuffer input, int x, int y,
       [int? width, int? height]) {
-    final data = zlib.decodeBytes(input.toUint8List());
+    final data =
+        inflate(input.toUint8List(), (_maxScanLines ?? 0) * _numScanLines);
 
     width ??= header.width;
     height ??= header.linesInBuffer;

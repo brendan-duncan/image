@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
-import '../util/_cast.dart';
+import '../util/_inflate.dart';
 
 enum IccProfileCompression { none, deflate }
 
@@ -30,13 +30,17 @@ class IccProfile {
     return data;
   }
 
+  // The largest decompressed profile, so malformed data can't inflate to an
+  // unbounded size.
+  static const _maxSize = 16 * 1024 * 1024;
+
   /// Returns the uncompressed data of the ICC Profile, decompressing the stored
-  /// data as necessary.
+  /// data as necessary. Profiles larger than 16 MB are truncated.
   Uint8List decompressed() {
     if (compression == IccProfileCompression.none) {
       return data;
     }
-    data = castToUint8List(const ZLibDecoder().decodeBytes(data));
+    data = inflate(data, _maxSize);
     compression = IccProfileCompression.none;
     return data;
   }

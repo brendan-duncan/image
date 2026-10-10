@@ -1,11 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:archive/archive.dart';
-
 import '../../color/format.dart';
 import '../../exif/exif_tag.dart';
 import '../../exif/ifd_value.dart';
 import '../../image/image.dart';
+import '../../util/_inflate.dart';
 import '../../util/bit_utils.dart';
 import '../../util/color_util.dart';
 import '../../util/float16.dart';
@@ -386,14 +385,12 @@ class TiffImage {
       } else if (compression == TiffCompression.packBits) {
         byteData = InputBuffer(Uint8List(bytesInThisTile));
         _decodePackBits(p, bytesInThisTile, byteData.buffer);
-      } else if (compression == TiffCompression.deflate) {
+      } else if (compression == TiffCompression.deflate ||
+          compression == TiffCompression.zip) {
         final data = p.toList(0, byteCount);
-        final outData = const ZLibDecoder().decodeBytes(data);
-        byteData = InputBuffer(outData);
-      } else if (compression == TiffCompression.zip) {
-        final data = p.toList(0, byteCount);
-        final outData = const ZLibDecoder().decodeBytes(data);
-        byteData = InputBuffer(outData);
+        final sampleBytes = bitsPerSample < 8 ? 1 : (bitsPerSample + 7) >> 3;
+        final maxBytes = tileWidth * tileHeight * samplesPerPixel * sampleBytes;
+        byteData = InputBuffer(inflate(data, maxBytes));
       } else if (compression == TiffCompression.oldJpeg ||
           compression == TiffCompression.jpeg) {
         final data = p.toList(0, byteCount);
@@ -761,14 +758,12 @@ class TiffImage {
         TiffFaxDecoder(fillOrder, tileWidth, tileHeight)
             .decodeT6(byteData, p, 0, tileHeight, t6Options!);
       } catch (_) {}
-    } else if (compression == TiffCompression.zip) {
+    } else if (compression == TiffCompression.zip ||
+        compression == TiffCompression.deflate) {
       final data = p.toList(0, byteCount);
-      final outData = const ZLibDecoder().decodeBytes(data);
-      byteData = InputBuffer(outData);
-    } else if (compression == TiffCompression.deflate) {
-      final data = p.toList(0, byteCount);
-      final outData = const ZLibDecoder().decodeBytes(data);
-      byteData = InputBuffer(outData);
+      // The bits are packed 8 pixels to a byte.
+      final maxBytes = ((tileWidth + 7) >> 3) * tileHeight;
+      byteData = InputBuffer(inflate(data, maxBytes));
     } else if (compression == TiffCompression.none) {
       byteData = p;
     } else {

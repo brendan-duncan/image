@@ -18,15 +18,17 @@ void checkPixels(int width, int height, int maxPixels,
 /// [ImageException] once they exceed [maxPixels].
 class PixelBudget {
   final int maxPixels;
+
+  /// What the pixels are of, for the exception message.
+  final String what;
   int _total = 0;
 
-  PixelBudget(this.maxPixels);
+  PixelBudget(this.maxPixels, {this.what = 'Animation frames'});
 
   void add(int width, int height) {
     _total += width * height;
     if (maxPixels > 0 && _total > maxPixels) {
-      throw ImageException('Animation frames exceed the maximum of '
-          '$maxPixels pixels');
+      throw ImageException('$what exceed the maximum of $maxPixels pixels');
     }
   }
 }

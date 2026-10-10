@@ -1,5 +1,6 @@
 import 'package:archive/archive.dart';
 
+import '../formats/_max_pixels.dart';
 import '../formats/png_decoder.dart';
 import '../image/image.dart';
 import '../util/_cast.dart';
@@ -63,6 +64,7 @@ class BitmapFont {
     if (fontFile == null) {
       throw ImageException('Invalid font archive');
     }
+    _checkSize(fontFile);
 
     final fontStr = String.fromCharCodes(fontFile.content as List<int>);
 
@@ -189,6 +191,7 @@ class BitmapFont {
                   '$filename');
             }
 
+            _checkSize(imageFile);
             final image =
                 PngDecoder().decode(castToUint8List(imageFile.content));
 
@@ -209,6 +212,13 @@ class BitmapFont {
       }
     }
 
+    // Glyphs are packed into the pages, so malformed data can't make the
+    // glyph images much larger than the pages.
+    var pagePixels = 0;
+    for (final page in fontPages.values) {
+      pagePixels += page == null ? 0 : page.width * page.height;
+    }
+    final budget = PixelBudget(4 * pagePixels, what: 'Font glyphs');
     for (var c in font.children) {
       final name = c.name;
       if (name == 'chars') {
@@ -229,18 +239,27 @@ class BitmapFont {
           }
 
           final fontImage = fontPages[page];
+          if (fontImage == null) {
+            throw ImageException('Missing page image: $page');
+          }
+          // A glyph can't be larger than its page.
+          final w = width.clamp(0, fontImage.width);
+          final h = height.clamp(0, fontImage.height);
+          budget.add(w, h);
 
           final ch = BitmapFontCharacter(
-              id, width, height, xoffset, yoffset, xadvance, page, chnl);
+              id, w, h, xoffset, yoffset, xadvance, page, chnl);
 
           characters[id] = ch;
 
-          final x2 = x + width;
-          final y2 = y + height;
+          final x1 = x.clamp(0, fontImage.width);
+          final y1 = y.clamp(0, fontImage.height);
+          final x2 = (x + w).clamp(0, fontImage.width);
+          final y2 = (y + h).clamp(0, fontImage.height);
           final image = ch.image;
-          for (var yi = y; yi < y2; ++yi) {
-            for (var xi = x; xi < x2; ++xi) {
-              image.setPixel(xi - x, yi - y, fontImage!.getPixel(xi, yi));
+          for (var yi = y1; yi < y2; ++yi) {
+            for (var xi = x1; xi < x2; ++xi) {
+              image.setPixel(xi - x, yi - y, fontImage.getPixel(xi, yi));
             }
           }
         }
@@ -328,6 +347,16 @@ class BitmapFont {
 
   /// Parse the XML .fnt format into a `font` node tree.
   _FntNode _parseXmlFnt(String content) => _XmlFntParser(content).parse();
+
+  // The largest file read from a font zip, so a small zip can't inflate to an
+  // unbounded size.
+  static const _maxFileSize = 16 * 1024 * 1024;
+
+  static void _checkSize(ArchiveFile file) {
+    if (file.size > _maxFileSize) {
+      throw ImageException('Font zip file ${file.name} is too large');
+    }
+  }
 
   static ArchiveFile? _findFile(Archive arc, String? filename) {
     for (var f in arc.files) {

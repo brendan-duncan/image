@@ -5,7 +5,7 @@
 
 import 'dart:typed_data';
 
-import 'package:archive/archive.dart' show getCrc32;
+import 'package:archive/archive.dart';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -158,6 +158,65 @@ void main() {
       }
     }
     expect(() => Image(width: -1, height: 10), throwsArgumentError);
+  });
+
+  group('decompression limits', () {
+    test('ICC profile', () {
+      final deflated = const ZLibEncoder().encodeBytes(Uint8List(64 << 20));
+      final icc = IccProfile('icc', IccProfileCompression.deflate, deflated);
+      expect(icc.decompressed().length, equals(16 << 20));
+    });
+
+    test('TIFF deflate', () {
+      // A 2x2 TIFF whose strip is replaced with 64 MB of deflated zeros.
+      final tiff = encodeTiff(Image(width: 2, height: 2));
+      final endian = tiff[0] == 0x4d ? Endian.big : Endian.little;
+      final bomb = const ZLibEncoder().encodeBytes(Uint8List(64 << 20));
+      final bytes = Uint8List.fromList([...tiff, ...bomb]);
+      final data = ByteData.sublistView(bytes);
+      final ifd = data.getUint32(4, endian);
+      var patched = 0;
+      for (var i = 0; i < data.getUint16(ifd, endian); ++i) {
+        final entry = ifd + 2 + i * 12;
+        final tag = data.getUint16(entry, endian);
+        patched += tag == 259 || tag == 273 || tag == 279 ? 1 : 0;
+        if (tag == 259) {
+          data.setUint16(entry + 8, 8, endian); // deflate
+        } else if (tag == 273) {
+          data.setUint32(entry + 8, tiff.length, endian);
+        } else if (tag == 279) {
+          data.setUint32(entry + 8, bomb.length, endian);
+        }
+      }
+      expect(patched, equals(3));
+      final image = decodeTiff(bytes);
+      expect(image?.width, equals(2));
+    });
+
+    test('font zip', () {
+      final fnt = Uint8List(32 << 20)..fillRange(0, 32 << 20, 0x20);
+      final zip = ZipEncoder()
+          .encode(Archive()..addFile(ArchiveFile('f.fnt', fnt.length, fnt)));
+      expect(() => readFontZip(zip), _throwsImageException);
+    });
+
+    test('font glyphs larger than the page', () {
+      const fnt = 'common lineHeight=1 base=1 pages=1\n'
+          'char id=65 x=0 y=0 width=100000 height=100000 xoffset=0 '
+          'yoffset=0 xadvance=1 page=0 chnl=0\n';
+      final font = readFont(fnt, Image(width: 4, height: 4, numChannels: 4));
+      expect(font.characters[65]!.image.width, equals(4));
+    });
+
+    test('font glyphs much larger than the pages together', () {
+      final fnt = StringBuffer('common lineHeight=1 base=1 pages=1\n');
+      for (var i = 0; i < 100; ++i) {
+        fnt.write('char id=$i x=0 y=0 width=4 height=4 xoffset=0 '
+            'yoffset=0 xadvance=1 page=0 chnl=0\n');
+      }
+      final page = Image(width: 4, height: 4, numChannels: 4);
+      expect(() => readFont(fnt.toString(), page), _throwsImageException);
+    });
   });
 
   group('maxPixels', () {
