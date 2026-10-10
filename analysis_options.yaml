@@ -13,6 +13,7 @@ analyzer:
   exclude:
     - test/tests/res/**
     - test/tests/out/**
+    - build/**
 
 linter:
   rules:
