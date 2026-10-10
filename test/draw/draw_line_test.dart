@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math' show max;
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 import '../_test_util.dart';
@@ -29,6 +31,24 @@ void main() {
       File('$testOutputPath/draw/drawLine.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      for (var i = 0; i < 256; ++i) {
+        // The thin white diagonal, except where the red line crosses it.
+        if ((i - 128).abs() > 4) {
+          expect(i0.getPixel(i, i), equals([255, 255, 255]),
+              reason: 'white line at $i,$i');
+        }
+        // The thick red anti-diagonal is fully opaque along its center.
+        expect(i0.getPixel(255 - i, i), equals([255, 0, 0]),
+            reason: 'red line at ${255 - i},$i');
+      }
+
+      // Pixels away from both lines are untouched.
+      for (final p in i0) {
+        if ((p.x - p.y).abs() > 1 && (p.x + p.y - 255).abs() > 4) {
+          expect(p, equals([0, 0, 0]), reason: 'background at ${p.x},${p.y}');
+        }
+      }
     });
 
     test('drawLineWu', () {
@@ -61,6 +81,42 @@ void main() {
       File('$testOutputPath/draw/drawLineWu.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      // Each line crosses the middle row near its ideal position, x = 400 at
+      // the top and x2 at the bottom.
+      for (var x2 = 0; x2 <= 800; x2 += 10) {
+        final ideal = (400 + x2) ~/ 2;
+        var peak = 0;
+        for (var x = ideal - 2; x <= ideal + 2; ++x) {
+          final p = i0.getPixel(x, 200);
+          peak = max(peak, (x2 < 400 ? p.g : p.r).toInt());
+        }
+        expect(peak, greaterThan(127), reason: 'line to $x2 at row 200');
+      }
+
+      // The vertical line and the 45 degree line are exact pixel runs.
+      for (var y = 1; y < 399; ++y) {
+        expect(i0.getPixel(400, y), equals([255, 0, 0]), reason: 'x=400 y=$y');
+        expect(i0.getPixel(400 + y, y), equals([255, 0, 0]),
+            reason: 'diagonal y=$y');
+      }
+
+      // Green lines are only on the left, red lines only on the right.
+      for (final p in i0) {
+        if (p.x < 400) {
+          expect(p.r, equals(0), reason: 'red at ${p.x},${p.y}');
+        }
+        if (p.x > 402) {
+          expect(p.g, equals(0), reason: 'green at ${p.x},${p.y}');
+        }
+      }
+
+      // Pixels above the fan and between line ends are untouched.
+      expect(i0.getPixel(0, 0), equals([0, 0, 0]));
+      expect(i0.getPixel(100, 10), equals([0, 0, 0]));
+      expect(i0.getPixel(700, 10), equals([0, 0, 0]));
+      expect(i0.getPixel(387, 399), equals([0, 0, 0]));
+      expect(i0.getPixel(414, 399), equals([0, 0, 0]));
     });
 
     // A non-antialiased line passes exactly through its endpoints.

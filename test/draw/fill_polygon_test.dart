@@ -4,6 +4,23 @@ import 'package:test/test.dart';
 
 import '../_test_util.dart';
 
+/// Expects the [fill] points to be the fill color, the [background] points
+/// untouched and the [outline] points the outline color.
+void _expectPixels(Image img,
+    {required Iterable<(int, int)> fill,
+    required Iterable<(int, int)> background,
+    required Iterable<(int, int)> outline}) {
+  for (final (x, y) in fill) {
+    expect(img.getPixel(x, y), equals([176, 0, 0]), reason: 'fill $x,$y');
+  }
+  for (final (x, y) in background) {
+    expect(img.getPixel(x, y), equals([0, 0, 0]), reason: 'outside $x,$y');
+  }
+  for (final (x, y) in outline) {
+    expect(img.getPixel(x, y), equals([0, 255, 0]), reason: 'outline $x,$y');
+  }
+}
+
 void main() {
   group('Draw', () {
     test('fillPolygon', () async {
@@ -22,6 +39,16 @@ void main() {
       File('$testOutputPath/draw/fillPolygon.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      _expectPixels(
+        i0,
+        // Interior points, including inside both wings of the arrowhead.
+        fill: [(60, 60), (100, 50), (150, 40), (50, 120), (80, 80)],
+        // Outside, including the notch below the reflex vertex (120,70).
+        background: [(10, 10), (250, 250), (110, 100), (150, 70), (40, 30)],
+        // The outline is drawn over the fill at the vertices.
+        outline: vertices.map((p) => (p.xi, p.yi)),
+      );
     });
 
     test('fillPolygon concave', () async {
@@ -41,6 +68,22 @@ void main() {
       File('$testOutputPath/draw/fillPolygon2.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      _expectPixels(
+        i0,
+        // Both arms beside the notch and the body below its tip.
+        fill: [(55, 70), (145, 70), (100, 120), (75, 140), (125, 140)],
+        // The V shaped notch stays unfilled, as does everything outside.
+        background: [(100, 60), (100, 90), (80, 55), (20, 20), (100, 160)],
+        outline: [
+          ...vertices.map((p) => (p.xi, p.yi)),
+          (50, 100),
+          (100, 150),
+          (150, 100),
+          (75, 75),
+          (125, 75),
+        ],
+      );
     });
 
     test('fillPolygon: interior pixel has fill color', () {

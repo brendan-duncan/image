@@ -1,8 +1,20 @@
 import 'dart:io';
+import 'dart:math' show sqrt;
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 import '../_test_util.dart';
+
+/// Distance from ([x],[y]) to the circle center at (50,50).
+double _dist(num x, num y) => sqrt((x - 50) * (x - 50) + (y - 50) * (y - 50));
+
+/// Expects the radius 49 red outline to still be intact.
+void _expectCircleOutline(Image img) {
+  for (final (x, y) in [(1, 50), (99, 50), (50, 1), (50, 99)]) {
+    expect(img.getPixel(x, y), equals([255, 0, 0]), reason: 'outline $x,$y');
+  }
+}
 
 void main() {
   group('Draw', () {
@@ -60,13 +72,25 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(img));
 
+      // The fill covers the inside of the circle, stops at the red outline
+      // and does not leak to the outside.
+      _expectCircleOutline(img);
+      for (final p in img) {
+        final d = _dist(p.x, p.y);
+        if (d < 47.5) {
+          expect(p, equals([0, 255, 0]), reason: 'inside ${p.x},${p.y}');
+        } else if (d > 50.5) {
+          expect(p, equals([0, 0, 0]), reason: 'outside ${p.x},${p.y}');
+        }
+      }
+
       final mask = Command()
         ..createImage(width: 100, height: 100)
         ..fill(color: ColorRgb8(0, 0, 0))
         ..fillCircle(x: 50, y: 50, radius: 25, color: ColorRgb8(255, 255, 255))
         ..gaussianBlur(radius: 5);
 
-      await (Command()
+      final masked = (await (Command()
             ..createImage(width: 100, height: 100)
             ..drawCircle(x: 50, y: 50, radius: 49, color: ColorRgb8(255, 0, 0))
             ..fillFlood(
@@ -77,7 +101,28 @@ void main() {
               mask: mask,
             )
             ..writeToFile('$testOutputPath/draw/fillFlood_mask.png'))
-          .execute();
+          .getImage())!;
+
+      // Inside the outline the fill strength follows the mask: strong in the
+      // middle, fading with the blurred edge and absent where it is black.
+      final maskImage = (await mask.getImage())!;
+      _expectCircleOutline(masked);
+      for (final p in masked) {
+        final d = _dist(p.x, p.y);
+        if (d < 47.5) {
+          final m = maskImage.getPixel(p.x, p.y).luminanceNormalized;
+          expect(p.g, closeTo(255 * m, 1), reason: 'inside ${p.x},${p.y}');
+          expect(p.r, equals(0), reason: 'inside ${p.x},${p.y}');
+          expect(p.b, equals(0), reason: 'inside ${p.x},${p.y}');
+        } else if (d > 50.5) {
+          expect(p, equals([0, 0, 0]), reason: 'outside ${p.x},${p.y}');
+        }
+      }
+      expect(masked.getPixel(50, 50).g, greaterThan(250), reason: 'center');
+      expect(masked.getPixel(50 + 25, 50).g, inExclusiveRange(0, 250),
+          reason: 'blurred mask edge');
+      expect(masked.getPixel(50 + 40, 50), equals([0, 0, 0]),
+          reason: 'masked out');
     });
   });
 }

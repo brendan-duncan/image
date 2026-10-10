@@ -9,10 +9,32 @@ void main() {
     test('chromaticAberration', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       chromaticAberration(i0);
       File('$testOutputPath/filter/chromaticAberration.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      // With the default shift of 5, red is read from 5 pixels to the right,
+      // blue from 5 pixels to the left (clamped at the edges), and green is
+      // untouched.
+      final w = i0.width - 1;
+      var changed = 0;
+      for (final p in i0) {
+        final right = orig.getPixel((p.x + 5).clamp(0, w), p.y);
+        final left = orig.getPixel((p.x - 5).clamp(0, w), p.y);
+        final o = orig.getPixel(p.x, p.y);
+        final at = 'at ${p.x},${p.y}';
+        expect(p.r, equals(right.r), reason: 'r $at');
+        expect(p.g, equals(o.g), reason: 'g $at');
+        expect(p.b, equals(left.b), reason: 'b $at');
+        if (p.r != o.r || p.b != o.b) {
+          changed++;
+        }
+      }
+      expect(changed, greaterThan(i0.width * i0.height ~/ 2));
     });
 
     test('chromaticAberration preserves dimensions', () {

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -9,24 +11,43 @@ void main() {
     test('histogramEqualization_jpg1', () {
       final bytes = File('test/_data/jpg/oblique.jpg').readAsBytesSync();
       final i0 = decodeJpg(bytes)!;
+      final orig = i0.clone();
       histogramEqualization(i0);
       File('$testOutputPath/filter/histogramEqualization_jpg1.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      // Grayscale mode replaces each pixel with its remapped luminance.
+      _expectGray(i0);
+      // The luminance distribution becomes close to uniform.
+      _expectQuartiles(i0, 0, 255);
+      expect(_cdfError(i0, 0, 255), lessThan(_cdfError(orig, 0, 255) / 3));
     });
 
     test('histogramEqualization_minmax', () {
       final bytes = File('test/_data/jpg/progress.jpg').readAsBytesSync();
       final i0 = decodeJpg(bytes)!;
+      final orig = i0.clone();
       histogramEqualization(i0, outputRangeMin: 5, outputRangeMax: 220);
       File('$testOutputPath/filter/histogramEqualization_minmax.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(i0));
+
+      _expectGray(i0);
+      // The output fills exactly [5, 220], evenly.
+      final range = _channelRange(i0);
+      expect(range.$1, equals(5));
+      expect(range.$2, equals(220));
+      _expectQuartiles(i0, 5, 220);
+      expect(_cdfError(i0, 5, 220), lessThan(_cdfError(orig, 5, 220) / 3));
     });
 
     test('histogramEqualization Color', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       histogramEqualization(
         i0,
         mode: HistogramEqualizeMode.color,
@@ -36,6 +57,43 @@ void main() {
       File('$testOutputPath/filter/histogramEqualization_color.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      // The out-of-range limits are clamped to the full range.
+      final range = _channelRange(i0);
+      expect(range.$1, equals(0));
+      expect(range.$2, equals(255));
+
+      // Only HSL lightness is equalized: colors stay colored, and hues of
+      // clearly saturated, unclipped pixels are kept.
+      var gray = 0;
+      var hueChecked = 0;
+      for (final p in i0) {
+        if (p.r == p.g && p.g == p.b) {
+          gray++;
+        }
+        final o = orig.getPixel(p.x, p.y);
+        final h0 = rgbToHsl(o.r, o.g, o.b);
+        final h1 = rgbToHsl(p.r, p.g, p.b);
+        if (h0[1] > 0.3 &&
+            h1[1] > 0.3 &&
+            h0[2] > 0.2 &&
+            h0[2] < 0.8 &&
+            h1[2] > 0.2 &&
+            h1[2] < 0.8) {
+          final d = (h0[0] - h1[0]).abs();
+          expect(min(d, 1 - d), lessThan(0.03),
+              reason: 'hue at ${p.x},${p.y}: $o -> $p');
+          hueChecked++;
+        }
+      }
+      expect(gray, lessThan(i0.width * i0.height * 0.1));
+      expect(hueChecked, greaterThan(1000));
+
+      // The lightness distribution becomes close to uniform.
+      num lightness(Pixel p) => rgbToHsl(p.r, p.g, p.b)[2] * 255;
+      _expectQuartiles(i0, 0, 255, value: lightness, tolerance: 0.02);
+      expect(_cdfError(i0, 0, 255, value: lightness),
+          lessThan(_cdfError(orig, 0, 255, value: lightness) / 3));
     });
 
     test('histogramEqualization synthetic1', () {
@@ -214,23 +272,67 @@ void main() {
     test('histogramEqualization format3', () {
       // Grayscale uint4 single channel image
       final bytes = File('test/_data/png/cten0g04.png').readAsBytesSync();
-      Image i0 = decodePng(bytes)!;
+      final orig = decodePng(bytes)!;
+      expect(orig.format, equals(Format.uint4));
+      expect(orig.numChannels, equals(1));
+      Image i0 = orig.clone();
       i0 = histogramEqualization(i0);
 
       File('$testOutputPath/filter/histogramEqualization_format3.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      // The image is expanded to 3 channels but keeps its bit depth.
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.format, equals(Format.uint4));
+      expect(i0.numChannels, equals(3));
+      _expectGray(i0);
+      final range = _channelRange(i0);
+      expect(range.$1, equals(0));
+      expect(range.$2, equals(15));
+
+      // Each gray level maps to a single, non-decreasing output level, and
+      // the levels are redistributed toward a uniform histogram.
+      final levelMap = <num, num>{};
+      for (final p in i0) {
+        final v = orig.getPixel(p.x, p.y).r;
+        expect(levelMap.putIfAbsent(v, () => p.r), equals(p.r),
+            reason: 'level $v at ${p.x},${p.y}');
+      }
+      final levels = levelMap.keys.toList()..sort();
+      for (var i = 1; i < levels.length; ++i) {
+        expect(levelMap[levels[i]],
+            greaterThanOrEqualTo(levelMap[levels[i - 1]]!));
+      }
+      expect(levels.any((l) => levelMap[l] != l), isTrue);
+      num red(Pixel p) => p.r;
+      expect(_cdfError(i0, 0, 15, value: red),
+          lessThan(_cdfError(orig, 0, 15, value: red)));
     });
 
     test('histogramEqualization format4', () {
       // Color uint8 4 channel image
       final bytes = File('test/_data/tga/buck_32_rle.tga').readAsBytesSync();
-      Image i0 = decodeTga(bytes)!;
+      final orig = decodeTga(bytes)!;
+      expect(orig.numChannels, equals(4));
+      Image i0 = orig.clone();
       i0 = histogramEqualization(i0);
 
       File('$testOutputPath/filter/histogramEqualization_format4.tga')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeTga(i0));
+
+      // The alpha channel is kept as is.
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(4));
+      for (final p in i0) {
+        expect(p.a, equals(orig.getPixel(p.x, p.y).a));
+      }
+      _expectGray(i0);
+      _expectQuartiles(i0, 0, 255);
+      expect(_cdfError(i0, 0, 255), lessThan(_cdfError(orig, 0, 255) / 3));
     });
 
     test('histogramEqualization format5', () {
@@ -303,10 +405,39 @@ void main() {
     test('histogramStretch_jpg1', () {
       final bytes = File('test/_data/jpg/oblique.jpg').readAsBytesSync();
       final i0 = decodeJpg(bytes)!;
+      final orig = i0.clone();
       histogramStretch(i0);
       File('$testOutputPath/filter/histogramStretch_jpg1.jpg')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodeJpg(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      _expectGray(i0);
+      // With the default clip ratio of 1.5%, about that many pixels at each
+      // end are clipped to black and white.
+      final n = i0.width * i0.height;
+      var black = 0;
+      var white = 0;
+      for (final p in i0) {
+        if (p.r == 0) {
+          black++;
+        } else if (p.r == 255) {
+          white++;
+        }
+      }
+      expect(black / n, inInclusiveRange(0.01, 0.04));
+      expect(white / n, inInclusiveRange(0.01, 0.04));
+
+      // The remapping is monotonic: brighter source pixels never end up
+      // darker than dimmer ones.
+      final pairs = [
+        for (final p in i0) (orig.getPixel(p.x, p.y).luminance, p.r),
+      ]..sort((a, b) => a.$1.compareTo(b.$1));
+      for (var i = 1; i < pairs.length; ++i) {
+        expect(pairs[i].$2, greaterThanOrEqualTo(pairs[i - 1].$2),
+            reason: 'luminance ${pairs[i - 1].$1} -> ${pairs[i].$1}');
+      }
     });
 
     test('histogramStretch_minmax', () {
@@ -410,4 +541,58 @@ void main() {
         ..writeAsBytesSync(encodeGif(i0));
     });
   });
+}
+
+/// Expects every pixel of [image] to be gray (r == g == b).
+void _expectGray(Image image) {
+  for (final p in image) {
+    expect(p.g, equals(p.r), reason: 'g at ${p.x},${p.y}');
+    expect(p.b, equals(p.r), reason: 'b at ${p.x},${p.y}');
+  }
+}
+
+/// The smallest and largest r, g or b value in [image].
+(num, num) _channelRange(Image image) {
+  num lo = image.maxChannelValue;
+  num hi = 0;
+  for (final p in image) {
+    for (final v in [p.r, p.g, p.b]) {
+      lo = min(lo, v);
+      hi = max(hi, v);
+    }
+  }
+  return (lo, hi);
+}
+
+num _luminance(Pixel p) => p.luminance;
+
+/// The largest difference between the cumulative distribution of [value]
+/// over [image] and that of a uniform distribution over [lo]..[hi].
+double _cdfError(Image image, num lo, num hi,
+    {num Function(Pixel) value = _luminance}) {
+  final values = [for (final p in image) value(p)];
+  var error = 0.0;
+  for (var i = 1; i < 8; ++i) {
+    final t = lo + (hi - lo) * i / 8;
+    final below = values.where((v) => v < t).length / values.length;
+    error = max(error, (below - i / 8).abs());
+  }
+  return error;
+}
+
+/// Expects a quarter, half and three quarters of the pixels to fall below
+/// the respective quartiles of [lo]..[hi].
+void _expectQuartiles(Image image, num lo, num hi,
+    {num Function(Pixel) value = _luminance, double tolerance = 0.03}) {
+  final n = image.width * image.height;
+  for (final f in [0.25, 0.5, 0.75]) {
+    final t = lo + (hi - lo) * f;
+    var below = 0;
+    for (final p in image) {
+      if (value(p) < t) {
+        below++;
+      }
+    }
+    expect(below / n, closeTo(f, tolerance), reason: 'below $t');
+  }
 }

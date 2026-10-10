@@ -213,6 +213,76 @@ void main() {
             File('$testOutputPath/webp/$name.webp')
               ..createSync(recursive: true)
               ..writeAsBytesSync(webpBytes);
+
+            final decoder = WebPDecoder(bytes);
+            final info = decoder.info!;
+            expect(image.width, equals(info.width));
+            expect(image.height, equals(info.height));
+            expect(image.numChannels, equals(4));
+            // dispose_skipped_frame.webp is damaged on purpose: one of its
+            // frames can't be decoded and is dropped.
+            final dropped = name == 'dispose_skipped_frame.webp' ? 1 : 0;
+            expect(
+              image.numFrames,
+              equals(info.hasAnimation ? decoder.numFrames() - dropped : 1),
+            );
+            // A blank decode would have a single color everywhere.
+            final c = image.getPixel(0, 0).clone();
+            expect(
+                image.any((p) =>
+                    p.r != c.r || p.g != c.g || p.b != c.b || p.a != c.a),
+                isTrue,
+                reason: 'every pixel is $c');
+
+            // encodeWebP is lossless by default, so the decode survives
+            // re-encoding exactly, along with the animation timing.
+            final image2 = WebPDecoder().decode(webpBytes)!;
+            expect(image2.width, equals(image.width));
+            expect(image2.height, equals(image.height));
+            expect(image2.numChannels, equals(image.numChannels));
+            expect(image2.numFrames, equals(image.numFrames));
+            expect(image2.loopCount, equals(image.loopCount));
+            for (var i = 0; i < image.numFrames; ++i) {
+              final f1 = image.frames[i];
+              final f2 = image2.frames[i];
+              expect(f2.frameDuration, equals(f1.frameDuration),
+                  reason: 'frame $i');
+              expect(imagesAreEqual(f1, f2), isTrue, reason: 'frame $i');
+            }
+
+            final stem = name.substring(0, name.length - 5);
+            final png = File('$path/$stem.png');
+            if (png.existsSync()) {
+              final ref = decodePng(png.readAsBytesSync())!;
+              testImageEquals(image, ref.convert(numChannels: 4, alpha: 255));
+            }
+
+            // Lossy files with a lossless counterpart of the same picture.
+            final lossless = _lossyOf[name];
+            if (lossless != null) {
+              final ref = WebPDecoder()
+                  .decode(File('$path/$lossless').readAsBytesSync())!;
+              expect(image.numFrames, equals(ref.numFrames));
+              for (var i = 0; i < ref.numFrames; ++i) {
+                expect(_visibleMeanDiff(ref.frames[i], image.frames[i]),
+                    lessThan(8),
+                    reason: 'frame $i');
+              }
+            }
+
+            if (name == 'buck_24.webp') {
+              final ref = decodePng(
+                File('test/_data/png/buck_24.png').readAsBytesSync(),
+              )!;
+              expect(_visibleMeanDiff(ref, image), lessThan(4));
+            } else if (name == 'red.webp') {
+              for (final p in image) {
+                expect(p.r, greaterThan(245));
+                expect(p.g, lessThan(10));
+                expect(p.b, lessThan(10));
+                expect(p.a, equals(255));
+              }
+            }
           });
         }
       });
@@ -2550,4 +2620,34 @@ String? _pngKeyword(Uint8List bytes, String id) {
     p += 12 + size;
   }
   return null;
+}
+
+// Lossy WebP files and the lossless file holding the same picture.
+const _lossyOf = {
+  '1_webp_a.webp': '1_webp_ll.webp',
+  '2_webp_a.webp': '2_webp_ll.webp',
+  '3_webp_a.webp': '3_webp_ll.webp',
+  '4_webp_a.webp': '4_webp_ll.webp',
+  '5_webp_a.webp': '5_webp_ll.webp',
+  'SteamEngine_lossy.webp': 'SteamEngine.webp',
+};
+
+/// The mean absolute r, g, b difference of [b] from [a] over the pixels that
+/// are at least half opaque in [a]. The alpha channels must match exactly
+/// (lossy WebP codes alpha losslessly by default).
+double _visibleMeanDiff(Image a, Image b) {
+  expect(b.width, equals(a.width));
+  expect(b.height, equals(a.height));
+  var sum = 0.0;
+  var count = 0;
+  for (final p in a) {
+    final q = b.getPixel(p.x, p.y);
+    expect(q.a, equals(p.a), reason: 'alpha at ${p.x},${p.y}');
+    if (p.a >= p.maxChannelValue / 2) {
+      sum += (p.r - q.r).abs() + (p.g - q.g).abs() + (p.b - q.b).abs();
+      count += 3;
+    }
+  }
+  expect(count, greaterThan(0));
+  return sum / count;
 }

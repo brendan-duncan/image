@@ -4,6 +4,27 @@ import 'package:test/test.dart';
 
 import '../_test_util.dart';
 
+/// Expects [result] to be [width]x[height] with [src] copied exactly at
+/// ([x0],[y0]) and every other pixel set to [background].
+void _expectPlaced(Image result, Image src, int x0, int y0, Color background,
+    {required int width, required int height}) {
+  expect(result.width, equals(width), reason: 'width');
+  expect(result.height, equals(height), reason: 'height');
+  var wrong = 0;
+  String? first;
+  for (final p in result) {
+    final sx = p.x - x0;
+    final sy = p.y - y0;
+    final inside = sx >= 0 && sy >= 0 && sx < src.width && sy < src.height;
+    final Color e = inside ? src.getPixel(sx, sy) : background;
+    if (p.r != e.r || p.g != e.g || p.b != e.b) {
+      wrong++;
+      first ??= '${p.x},${p.y} is $p, expected $e';
+    }
+  }
+  expect(wrong, equals(0), reason: 'first mismatch: $first');
+}
+
 void main() {
   group('Transform', () {
     for (ExpandCanvasPosition position in ExpandCanvasPosition.values) {
@@ -23,6 +44,23 @@ void main() {
         File('$testOutputPath/transform/copyExpandCanvas_$position.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(expandedCanvas));
+
+        // The free space is img.width (height) on each axis, split 0, 1/2 or
+        // all of it before the image depending on the position.
+        final (fx, fy) = switch (position) {
+          ExpandCanvasPosition.topLeft => (0, 0),
+          ExpandCanvasPosition.topCenter => (1, 0),
+          ExpandCanvasPosition.topRight => (2, 0),
+          ExpandCanvasPosition.centerLeft => (0, 1),
+          ExpandCanvasPosition.center => (1, 1),
+          ExpandCanvasPosition.centerRight => (2, 1),
+          ExpandCanvasPosition.bottomLeft => (0, 2),
+          ExpandCanvasPosition.bottomCenter => (1, 2),
+          ExpandCanvasPosition.bottomRight => (2, 2),
+        };
+        _expectPlaced(expandedCanvas, img, img.width * fx ~/ 2,
+            img.height * fy ~/ 2, ColorRgb8(255, 255, 255),
+            width: img.width * 2, height: img.height * 2);
       });
     }
 
@@ -41,6 +79,12 @@ void main() {
       File('$testOutputPath/transform/copyExpandCanvas_default.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(expandedCanvas));
+
+      // Centered by default; with no background color the opaque RGB canvas
+      // stays black.
+      _expectPlaced(expandedCanvas, img, img.width ~/ 2, img.height ~/ 2,
+          ColorRgb8(0, 0, 0),
+          width: img.width * 2, height: img.height * 2);
     });
 
     // Test with toImage parameter
@@ -61,6 +105,12 @@ void main() {
       File('$testOutputPath/transform/copyExpandCanvas_toImage.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(expandedCanvas));
+
+      // The result is drawn into toImage rather than a new image.
+      expect(identical(expandedCanvas, toImage), isTrue);
+      _expectPlaced(expandedCanvas, img, img.width ~/ 2, img.height ~/ 2,
+          ColorRgb8(0, 0, 0),
+          width: img.width * 2, height: img.height * 2);
     });
 
     // Test with only padding parameter
@@ -74,6 +124,10 @@ void main() {
       File('$testOutputPath/transform/copyExpandCanvas_padding.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(expandedCanvas));
+
+      // 50 pixels of black padding on every side.
+      _expectPlaced(expandedCanvas, img, 50, 50, ColorRgb8(0, 0, 0),
+          width: img.width + 100, height: img.height + 100);
     });
 
     // Test with both new dimensions and padding parameters
@@ -107,6 +161,35 @@ void main() {
       File('$testOutputPath/transform/copyExpandCanvas_alpha.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(expandedCanvas));
+
+      // The image is centered and alpha blended over the white background,
+      // so transparent pixels show white and the whole canvas is opaque.
+      expect(expandedCanvas.width, equals(img.width * 2));
+      expect(expandedCanvas.height, equals(img.height * 2));
+      final x0 = img.width ~/ 2;
+      final y0 = img.height ~/ 2;
+      var partial = 0;
+      for (final p in expandedCanvas) {
+        final sx = p.x - x0;
+        final sy = p.y - y0;
+        expect(p.a, equals(255), reason: 'alpha at ${p.x},${p.y}');
+        if (sx < 0 || sy < 0 || sx >= img.width || sy >= img.height) {
+          expect(p, equals([255, 255, 255, 255]),
+              reason: 'background at ${p.x},${p.y}');
+          continue;
+        }
+        final s = img.getPixel(sx, sy);
+        final a = s.aNormalized;
+        if (a > 0 && a < 1) {
+          partial++;
+        }
+        for (var c = 0; c < 3; ++c) {
+          expect(p[c], closeTo(s[c] * a + 255 * (1 - a), 1),
+              reason: 'channel $c at ${p.x},${p.y}');
+        }
+      }
+      // The test image does have partially transparent pixels to blend.
+      expect(partial, greaterThan(0));
     });
 
     test('copyExpandCanvas preserves source RGBA and transparent padding', () {

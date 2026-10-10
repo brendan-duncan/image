@@ -148,6 +148,31 @@ void main() {
             expect(image.height, isNot(0));
             expect(image.exif, isNotNull);
 
+            final info = TiffDecoder().startDecode(bytes)!;
+            expect(image.width, equals(info.width));
+            expect(image.height, equals(info.height));
+            expect(image.numFrames, equals(info.images.length));
+            // A blank decode would have a single value everywhere.
+            final first = image.getPixel(0, 0).toList();
+            expect(image.any((p) => !_listEquals(p.toList(), first)), isTrue,
+                reason: 'every pixel is $first');
+
+            final ref = _sameAs[name];
+            if (ref != null) {
+              final refImage = decodeTiff(
+                File('test/_data/tiff/${ref.$1}').readAsBytesSync(),
+              )!;
+              expectImagesClose(refImage, image, tolerance: ref.$2);
+            }
+            if (name == 'cmyk.tif') {
+              // Converted from CMYK without a color profile, so only roughly
+              // equal to the RGB version of the same picture.
+              final rgb = decodeTiff(
+                File('test/_data/tiff/small.tif').readAsBytesSync(),
+              )!;
+              expect(_meanAbsDiff(rgb, image), lessThan(10));
+            }
+
             final i0 = image;
             final i1 = i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
 
@@ -164,6 +189,17 @@ void main() {
             expect(i2, isNotNull);
             expect(i2!.width, equals(image.width));
             expect(i2.height, equals(image.height));
+
+            // The encoder writes only the first frame, uncompressed, and
+            // converts HDR formats to uint8; otherwise it is lossless.
+            if (!_roundTripBroken.contains(name)) {
+              final expected =
+                  i0.isHdrFormat ? i0.convert(format: Format.uint8) : i0;
+              expect(i2.format, equals(expected.format));
+              expect(i2.numChannels, equals(expected.numChannels));
+              expect(i2.hasPalette, equals(expected.hasPalette));
+              expect(imagesAreEqual(i2, expected), isTrue);
+            }
 
             final i3 = i2.isHdrFormat ? i2.convert(format: Format.uint8) : i2;
             File('$testOutputPath/tif/$name-2.png')
@@ -193,6 +229,50 @@ void main() {
       });
     });
   });
+}
+
+// Files holding the same picture as another file in a different encoding,
+// with the per-channel tolerance their decodes must agree within.
+const _sameAs = {
+  'lzw_strips.tif': ('small.tif', 0),
+  // Note: the right-hand partial tiles of lzw_tiled.tif decode wrongly, so
+  // it isn't compared with small.tif; see TiffImage._decodeTile.
+  'bitonal_lzw.tif': ('bitonal_none.tif', 0),
+  'bitonal_zip.tif': ('bitonal_none.tif', 0),
+  'ccittt_t4_1d_nofill.tif': ('ccitt_t6.tif', 0),
+  'ccitt_t4_1d_fill.tif': ('ccitt_t6.tif', 0),
+  'ccitt_t4_2d_fill.tif': ('ccitt_t6.tif', 0),
+  'ccitt_t4_2d_nofill.tif': ('ccitt_t6.tif', 0),
+  'dtm64float.tif': ('dtm32float.tif', 0),
+  'dtm_test.tif': ('dtm32float.tif', 0),
+  'float16.tif': ('float32.tif', 0.001),
+};
+
+// Note: TiffEncoder copies the source's TileOffsets and TileByteCounts tags
+// into its output, so a decoded tiled TIFF doesn't survive re-encoding.
+const _roundTripBroken = {'deflate.tif', 'lzw_tiled.tif'};
+
+bool _listEquals(List<num> a, List<num> b) {
+  if (a.length != b.length) {
+    return false;
+  }
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] != b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+double _meanAbsDiff(Image a, Image b) {
+  expect(b.width, equals(a.width));
+  expect(b.height, equals(a.height));
+  var sum = 0.0;
+  for (final p in a) {
+    final q = b.getPixel(p.x, p.y);
+    sum += (p.r - q.r).abs() + (p.g - q.g).abs() + (p.b - q.b).abs();
+  }
+  return sum / (a.width * a.height * 3);
 }
 
 const _expectedInfo = {

@@ -9,10 +9,35 @@ void main() {
     test('emboss', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       emboss(i0);
       File('$testOutputPath/filter/emboss.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+
+      // Each channel is 127 plus 1.5 times the difference between the
+      // top-left and bottom-right neighbors (edges repeated), clamped.
+      num at(int x, int y, int c) => orig.getPixel(
+          x.clamp(0, orig.width - 1), y.clamp(0, orig.height - 1))[c];
+      var mid = 0;
+      for (final p in i0) {
+        final x = p.x;
+        final y = p.y;
+        for (var c = 0; c < 3; ++c) {
+          final d = at(x - 1, y - 1, c) - at(x + 1, y + 1, c);
+          final v = (1.5 * d + 127).clamp(0, 255).toInt();
+          expect(p[c], equals(v), reason: 'channel $c at $x,$y');
+          if (v == 127) {
+            mid++;
+          }
+        }
+      }
+      // Flat areas are mid-gray, but not the whole image.
+      expect(mid, greaterThan(0));
+      expect(mid, lessThan(i0.width * i0.height * 3));
     });
 
     test('emboss preserves dimensions', () {

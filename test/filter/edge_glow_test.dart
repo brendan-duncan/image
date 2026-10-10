@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -9,10 +11,61 @@ void main() {
     test('edgeGlow', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       edgeGlow(i0);
       File('$testOutputPath/filter/edgeGlow.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+
+      // Each channel is its Sobel gradient magnitude scaled by twice the
+      // pixel's own value, so flat areas go black and edges glow.
+      num at(int x, int y, int c) =>
+          orig.getPixel(
+              x.clamp(0, orig.width - 1), y.clamp(0, orig.height - 1))[c] /
+          255;
+      var flat = 0;
+      for (final p in i0) {
+        final x = p.x;
+        final y = p.y;
+        for (var c = 0; c < 3; ++c) {
+          final gx = at(x - 1, y - 1, c) +
+              2 * at(x, y - 1, c) +
+              at(x + 1, y - 1, c) -
+              at(x - 1, y + 1, c) -
+              2 * at(x, y + 1, c) -
+              at(x + 1, y + 1, c);
+          final gy = at(x - 1, y - 1, c) -
+              at(x + 1, y - 1, c) +
+              2 * at(x - 1, y, c) -
+              2 * at(x + 1, y, c) +
+              at(x - 1, y + 1, c) -
+              at(x + 1, y + 1, c);
+          final v = sqrt(gx * gx + gy * gy) * 2 * at(x, y, c) * 255;
+          expect(p[c], closeTo(v.clamp(0, 255), 1),
+              reason: 'channel $c at $x,$y');
+          if (gx == 0 && gy == 0) {
+            expect(p[c], equals(0), reason: 'flat channel $c at $x,$y');
+            flat++;
+          }
+        }
+      }
+      expect(flat, greaterThan(0));
+      expect(imageMean(i0), lessThan(imageMean(orig)));
+
+      // At a vertical edge between black and gray, only the first gray
+      // column glows (black pixels stay black, being scaled by 0).
+      final edge = Image(width: 16, height: 8);
+      for (final p in edge) {
+        final v = p.x < 8 ? 0 : 200;
+        p.setRgb(v, v, v);
+      }
+      edgeGlow(edge);
+      for (final p in edge) {
+        expect(p.r, equals(p.x == 8 ? 255 : 0), reason: 'at ${p.x},${p.y}');
+      }
     });
 
     test('edgeGlow preserves dimensions', () {

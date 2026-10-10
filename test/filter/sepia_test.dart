@@ -9,10 +9,32 @@ void main() {
     test('sepia', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       sepia(i0);
       File('$testOutputPath/filter/sepia.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+      // Each pixel becomes its luminance shifted by +0.15, +0.07 and -0.12
+      // (normalized) in r, g and b, so r >= g >= b everywhere.
+      for (final p in i0) {
+        final o = orig.getPixel(p.x, p.y);
+        final y = 0.299 * o.rNormalized +
+            0.587 * o.gNormalized +
+            0.114 * o.bNormalized;
+        num expected(num v) => (v * 255).clamp(0, 255);
+        expect(p.r, closeTo(expected(y + 0.15), 1),
+            reason: 'r at ${p.x},${p.y}');
+        expect(p.g, closeTo(expected(y + 0.07), 1),
+            reason: 'g at ${p.x},${p.y}');
+        expect(p.b, closeTo(expected(y - 0.12), 1),
+            reason: 'b at ${p.x},${p.y}');
+        expect(p.r >= p.g && p.g >= p.b, isTrue,
+            reason: 'warm tone at ${p.x},${p.y}: $p');
+      }
     });
 
     test('sepia with amount=0 leaves the image unchanged', () {

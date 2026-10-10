@@ -160,17 +160,40 @@ void main() async {
       test('encode (default 4:4:4 chroma)', () {
         final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
         final image = JpegDecoder().decode(fb)!;
+        final jpg = encodeJpg(image);
         File('$testOutputPath/jpg/encode.png')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(encodeJpg(image));
+          ..writeAsBytesSync(jpg);
+
+        final decoded = JpegDecoder().decode(jpg)!;
+        expect(decoded.width, equals(image.width));
+        expect(decoded.height, equals(image.height));
+        expect(decoded.numChannels, equals(3));
+        // Re-encoding at the default quality loses very little.
+        expect(_meanAbsDiff(image, decoded), lessThan(1.5));
+        expectImagesClose(image, decoded, tolerance: 12);
       });
 
       test('encode (4:2:0 chroma)', () {
         final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
         final image = JpegDecoder().decode(fb)!;
+        final jpg = encodeJpg(image, chroma: JpegChroma.yuv420);
         File('$testOutputPath/jpg/encode.png')
           ..createSync(recursive: true)
-          ..writeAsBytesSync(encodeJpg(image, chroma: JpegChroma.yuv420));
+          ..writeAsBytesSync(jpg);
+
+        final decoded = JpegDecoder().decode(jpg)!;
+        expect(decoded.width, equals(image.width));
+        expect(decoded.height, equals(image.height));
+        expect(decoded.numChannels, equals(3));
+        final diff420 = _meanAbsDiff(image, decoded);
+        expect(diff420, lessThan(4));
+
+        // Subsampled chroma is close to, but measurably worse than, 4:4:4.
+        final decoded444 = JpegDecoder().decode(encodeJpg(image))!;
+        expect(diff420, greaterThan(_meanAbsDiff(image, decoded444)));
+        expect(_meanAbsDiff(decoded444, decoded), greaterThan(0.5));
+        expect(jpg.length, lessThan(encodeJpg(image).length));
       });
 
       test('progressive', () {
@@ -249,6 +272,26 @@ void main() async {
         }
       });
 
+      // Each file stores the same photo under a different EXIF orientation,
+      // with the pixels transformed to match, so every decode is upright.
+      // The _1 files were saved without an ICC profile and are uniformly
+      // brighter (a mean difference of about 15), so they get a looser bound;
+      // a wrongly mirrored or flipped decode differs by 40 or more.
+      void expectUpright(Image image, String kind, int i) {
+        final ref1 = decodeJpg(
+          File('test/_data/jpg/${kind}_1.jpg').readAsBytesSync(),
+        )!;
+        final ref2 = decodeJpg(
+          File('test/_data/jpg/${kind}_2.jpg').readAsBytesSync(),
+        )!;
+        expect(image.width, equals(ref1.width));
+        expect(image.height, equals(ref1.height));
+        expect(_meanAbsDiff(ref1, image), lessThan(20));
+        if (i > 1) {
+          expect(_meanAbsDiff(ref2, image), lessThan(6));
+        }
+      }
+
       for (var i = 1; i < 9; ++i) {
         test('exif/orientation_$i/landscape', () {
           final image = JpegDecoder().decode(
@@ -257,6 +300,9 @@ void main() async {
           File('$testOutputPath/jpg/landscape_$i.jpg')
             ..createSync(recursive: true)
             ..writeAsBytesSync(JpegEncoder().encode(image));
+
+          expect(image.width, greaterThan(image.height));
+          expectUpright(image, 'landscape', i);
         });
 
         test('exif/orientation_$i/portrait', () {
@@ -266,6 +312,9 @@ void main() async {
           File('$testOutputPath/jpg/portrait_$i.jpg')
             ..createSync(recursive: true)
             ..writeAsBytesSync(JpegEncoder().encode(image));
+
+          expect(image.height, greaterThan(image.width));
+          expectUpright(image, 'portrait', i);
         });
       }
     });
@@ -316,4 +365,16 @@ void main() async {
       }
     });
   });
+}
+
+/// The mean absolute difference of the r, g and b channels of [a] and [b].
+double _meanAbsDiff(Image a, Image b) {
+  expect(b.width, equals(a.width));
+  expect(b.height, equals(a.height));
+  var sum = 0.0;
+  for (final p in a) {
+    final q = b.getPixel(p.x, p.y);
+    sum += (p.r - q.r).abs() + (p.g - q.g).abs() + (p.b - q.b).abs();
+  }
+  return sum / (a.width * a.height * 3);
 }

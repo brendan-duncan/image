@@ -9,10 +9,37 @@ void main() {
     test('monochrome', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       monochrome(i0, color: ColorRgb8(100, 160, 64));
       File('$testOutputPath/filter/monochrome.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+      // Each channel is an overlay blend of the tint color with the pixel's
+      // luminance, so the output depends only on the input luminance.
+      num overlay(num y, num n) =>
+          y < 0.5 ? 2 * y * n : 1 - 2 * (1 - y) * (1 - n);
+      var changed = 0;
+      for (final p in i0) {
+        final o = orig.getPixel(p.x, p.y);
+        final y = o.luminanceNormalized;
+        expect(p.r, closeTo(overlay(y, 100 / 255) * 255, 1),
+            reason: 'r at ${p.x},${p.y}');
+        expect(p.g, closeTo(overlay(y, 160 / 255) * 255, 1),
+            reason: 'g at ${p.x},${p.y}');
+        expect(p.b, closeTo(overlay(y, 64 / 255) * 255, 1),
+            reason: 'b at ${p.x},${p.y}');
+        // The tint is greenest, then red, then blue.
+        expect(p.g >= p.r && p.r >= p.b, isTrue,
+            reason: 'tint order at ${p.x},${p.y}: $p');
+        if (p != o) {
+          changed++;
+        }
+      }
+      expect(changed, greaterThan(i0.width * i0.height ~/ 2));
     });
 
     test('monochrome with amount=0 leaves the image unchanged', () {

@@ -9,10 +9,31 @@ void main() {
     test('luminanceThreshold', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       luminanceThreshold(i0);
       File('$testOutputPath/filter/luminanceThreshold.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+      // Each pixel becomes black or white depending on whether its weighted
+      // luminance is below the default threshold of 0.5.
+      var black = 0;
+      var white = 0;
+      for (final p in i0) {
+        final o = orig.getPixel(p.x, p.y);
+        final y =
+            0.3 * o.rNormalized + 0.59 * o.gNormalized + 0.11 * o.bNormalized;
+        final v = y < 0.5 ? 0 : 255;
+        v == 0 ? black++ : white++;
+        expect([p.r, p.g, p.b], equals([v, v, v]),
+            reason: 'pixel ${p.x},${p.y} (luminance $y)');
+      }
+      // The photo has both dark and light areas.
+      expect(black, greaterThan(0));
+      expect(white, greaterThan(0));
     });
 
     test('luminanceThreshold preserves image dimensions and numChannels', () {

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -19,6 +21,54 @@ void main() {
       File('$testOutputPath/filter/dropShadow.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i1));
+
+      expect(id.numChannels, equals(4));
+      // The shadow is cast 5 pixels left and blurred by 3, so the source is
+      // drawn 5 + 3 pixels to the right.
+      // Note: the vertical offset is not checked; the shadow is currently
+      // cast up by the blur radius rather than down by vShadow.
+      const ox = 8;
+      var textMinX = i0.width;
+      for (final p in i0) {
+        if (p.a == 255) {
+          textMinX = min(textMinX, p.x);
+          final q = id.getPixel(p.x + ox, p.y);
+          expect(q, equals(p), reason: 'text at ${p.x},${p.y}');
+        }
+      }
+      expect(textMinX, lessThan(i0.width));
+
+      // Outside the text, the shadow is translucent black, at most the
+      // default shadow alpha of 128, and it reaches left of the text.
+      var shadowMinX = id.width;
+      var shadow = 0;
+      for (final p in id) {
+        final sx = p.x - ox;
+        final covered = sx >= 0 &&
+            sx < i0.width &&
+            p.y < i0.height &&
+            i0.getPixel(sx, p.y).a > 0;
+        if (covered || p.a == 0) {
+          continue;
+        }
+        expect(p.r, equals(0), reason: 'shadow at ${p.x},${p.y}');
+        expect(p.g, equals(0), reason: 'shadow at ${p.x},${p.y}');
+        expect(p.b, equals(0), reason: 'shadow at ${p.x},${p.y}');
+        expect(p.a, lessThanOrEqualTo(128), reason: 'shadow at ${p.x},${p.y}');
+        shadowMinX = min(shadowMinX, p.x);
+        shadow++;
+      }
+      expect(shadow, greaterThan(100));
+      expect(shadowMinX, lessThan(textMinX + ox - 5));
+
+      // Over white, the shadow shows as gray.
+      var gray = 0;
+      for (final p in i1) {
+        if (p.r == p.g && p.g == p.b && p.r >= 127 && p.r < 250) {
+          gray++;
+        }
+      }
+      expect(gray, greaterThan(100));
     });
 
     test('dropShadow returns a new image (not the source)', () {

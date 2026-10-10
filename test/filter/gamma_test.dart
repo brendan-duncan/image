@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -9,10 +11,35 @@ void main() {
     test('gamma', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       gamma(i0, gamma: 2.2);
       File('$testOutputPath/filter/gamma.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+
+      // out = (v / 255)^2.2 * 255, truncated: never brighter, 0 and 255 are
+      // fixed, and mid-tones get noticeably darker.
+      var darkened = 0;
+      for (final p in i0) {
+        final o = orig.getPixel(p.x, p.y);
+        for (var c = 0; c < 3; ++c) {
+          final v = o[c];
+          final expected = (pow(v / 255, 2.2) * 255).toInt();
+          expect(p[c], equals(expected), reason: 'channel $c at ${p.x},${p.y}');
+          expect(p[c], lessThanOrEqualTo(v));
+          if (v == 0 || v == 255) {
+            expect(p[c], equals(v));
+          } else if (v >= 32 && v <= 224) {
+            expect(p[c], lessThan(v - 10));
+            darkened++;
+          }
+        }
+      }
+      expect(darkened, greaterThan(i0.width * i0.height));
     });
 
     test('gamma=1 is a no-op', () {

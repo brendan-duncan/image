@@ -19,6 +19,42 @@ void main() {
       File('$testOutputPath/filter/pixelate_average.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i1));
+
+      final orig = decodePng(bytes)!;
+      for (final img in [i0, i1]) {
+        expect(img.width, equals(orig.width));
+        expect(img.height, equals(orig.height));
+        expect(img.numChannels, equals(orig.numChannels));
+      }
+      // upperLeft: every pixel takes the value of its 10x10 block's
+      // upper-left pixel.
+      for (final p in i0) {
+        final o = orig.getPixel((p.x ~/ 10) * 10, (p.y ~/ 10) * 10);
+        expect(p, equals(o), reason: 'pixel ${p.x},${p.y}');
+      }
+      // average: a block takes the average of its 10x10 pixels. Only each
+      // block's upper-left pixel is checked: the filter recomputes the
+      // average for every pixel from the partially overwritten image, so the
+      // rest of a block drifts (suspected bug). Partial blocks at the bottom
+      // edge are skipped as they are divided by the full block size.
+      for (var by = 0; by + 10 <= orig.height; by += 10) {
+        for (var bx = 0; bx + 10 <= orig.width; bx += 10) {
+          final sum = [0, 0, 0];
+          for (var y = by; y < by + 10; ++y) {
+            for (var x = bx; x < bx + 10; ++x) {
+              final o = orig.getPixel(x, y);
+              for (var c = 0; c < 3; ++c) {
+                sum[c] += o[c].toInt();
+              }
+            }
+          }
+          final p = i1.getPixel(bx, by);
+          for (var c = 0; c < 3; ++c) {
+            expect(p[c], closeTo(sum[c] / 100, 1),
+                reason: 'channel $c at $bx,$by');
+          }
+        }
+      }
     });
 
     test('pixelate preserves dimensions', () {

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math' show max, min;
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -62,11 +64,40 @@ void main() {
       final fg = (await decodePngFile('test/_data/png/colors.png'))!;
       final bg = (await decodePngFile('test/_data/png/buck_24.png'))!;
 
+      final orig = bg.clone();
+
       compositeImage(bg, fg, mask: mask);
 
       File('$testOutputPath/draw/compositeImage2.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(bg));
+
+      // The opaque fg is mixed over bg by the mask luminance, looked up at the
+      // destination position: bg stays where the mask is black or absent, fg
+      // shows where it is white, and fg covers only its own 256 pixel width.
+      // The default destination height is clamped to bg, so the taller fg is
+      // squashed to fit rather than cropped.
+      final fgScaleY = fg.height / bg.height;
+      var shown = 0;
+      var kept = 0;
+      for (final p in bg) {
+        final o = orig.getPixel(p.x, p.y);
+        final m = p.x < fg.width
+            ? mask.getPixelSafe(p.x, p.y).luminanceNormalized
+            : 0;
+        if (m > 0.99) {
+          shown++;
+        } else if (m == 0) {
+          kept++;
+        }
+        final f = fg.getPixelSafe(p.x, (p.y * fgScaleY).toInt());
+        for (var c = 0; c < 3; ++c) {
+          expect(p[c], closeTo(o[c] + (f[c] - o[c]) * m, 1.5),
+              reason: 'channel $c at ${p.x},${p.y}');
+        }
+      }
+      expect(shown, greaterThan(0), reason: 'pixels fully masked in');
+      expect(kept, greaterThan(0), reason: 'pixels masked out');
     });
 
     test('compositeImage large foreground', () {
@@ -102,6 +133,28 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
 
+      // Each composite shrinks i1 to 100x100 at its offset and alpha blends
+      // it (alpha = source row) over what is there; the red elsewhere is
+      // untouched.
+      for (final p in i0) {
+        var r = 255.0;
+        var g = 0.0;
+        for (final d in [50, 100]) {
+          final x = p.x - d;
+          final y = p.y - d;
+          if (x >= 0 && y >= 0 && x < 100 && y < 100) {
+            final sx = (x * (256 / 100)).toInt();
+            final sy = (y * (256 / 100)).toInt();
+            final a = sy / 255;
+            r = sx * a + r * (1 - a);
+            g = sy * a + g * (1 - a);
+          }
+        }
+        expect(p.r, closeTo(r, 2), reason: 'red at ${p.x},${p.y}');
+        expect(p.g, closeTo(g, 2), reason: 'green at ${p.x},${p.y}');
+        expect(p.b, equals(0), reason: 'blue at ${p.x},${p.y}');
+      }
+
       var fg = decodeTga(File('test/_data/tga/globe.tga').readAsBytesSync())!;
       fg = fg.convert(numChannels: 4);
       for (final p in fg) {
@@ -112,12 +165,42 @@ void main() {
 
       final origBg = (await decodePngFile('test/_data/png/buck_24.png'))!;
 
+      // The fg pixel drawn at ([x],[y]) when fg is placed at (50,50) with
+      // the given [size], or null outside of it.
+      Pixel? fgAt(num x, num y, int size) {
+        final fx = x - 50;
+        final fy = y - 50;
+        if (fx < 0 || fy < 0 || fx >= size || fy >= size) {
+          return null;
+        }
+        return fg.getPixel((fx * (fg.width / size)).toInt(),
+            (fy * (fg.height / size)).toInt());
+      }
+
+      // Opaque fg pixels replace bg; transparent ones and the area outside
+      // the fg leave bg unchanged.
+      void expectOver(Image bg, int size) {
+        var covered = 0;
+        for (final p in bg) {
+          final f = fgAt(p.x, p.y, size);
+          final o = origBg.getPixel(p.x, p.y);
+          final e = f != null && f.a != 0 ? f : o;
+          if (f != null && f.a != 0) {
+            covered++;
+          }
+          expect([p.r, p.g, p.b], equals([e.r, e.g, e.b]),
+              reason: 'pixel ${p.x},${p.y}');
+        }
+        expect(covered, greaterThan(0), reason: 'opaque fg pixels drawn');
+      }
+
       {
         final bg = origBg.clone();
         compositeImage(bg, fg, dstX: 50, dstY: 50);
         File('$testOutputPath/draw/compositeImage.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(bg));
+        expectOver(bg, fg.width);
       }
 
       {
@@ -126,7 +209,22 @@ void main() {
         File('$testOutputPath/draw/compositeImage_scaled.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(bg));
+        expectOver(bg, 200);
       }
+
+      // The expected result of blending an opaque fg value over a bg value
+      // for the blend modes with a simple closed form.
+      num? blended(BlendMode blend, num f, num b) => switch (blend) {
+            BlendMode.direct || BlendMode.alpha => f,
+            BlendMode.lighten => max(f, b),
+            BlendMode.darken => min(f, b),
+            BlendMode.multiply => f * b / 255,
+            BlendMode.addition => min(f + b, 255),
+            BlendMode.subtract => max(b - f, 0),
+            BlendMode.difference => (f - b).abs(),
+            BlendMode.screen => 255 - (255 - f) * (255 - b) / 255,
+            _ => null,
+          };
 
       for (var blend in BlendMode.values) {
         final bg = origBg.clone();
@@ -134,6 +232,29 @@ void main() {
         File('$testOutputPath/draw/compositeImage_${blend.name}.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(encodePng(bg));
+
+        var changed = 0;
+        for (final p in bg) {
+          final f = fgAt(p.x, p.y, fg.width);
+          final o = origBg.getPixel(p.x, p.y);
+          if (p.r != o.r || p.g != o.g || p.b != o.b) {
+            changed++;
+          }
+          if (f == null || (f.a == 0 && blend != BlendMode.direct)) {
+            // Outside fg, or a fully transparent fg pixel.
+            expect([p.r, p.g, p.b], equals([o.r, o.g, o.b]),
+                reason: '${blend.name}: bg changed at ${p.x},${p.y}');
+            continue;
+          }
+          for (var c = 0; c < 3; ++c) {
+            final e = blended(blend, f[c], o[c]);
+            if (e != null) {
+              expect(p[c], closeTo(e, 1),
+                  reason: '${blend.name}: channel $c at ${p.x},${p.y}');
+            }
+          }
+        }
+        expect(changed, greaterThan(0), reason: '${blend.name}: no change');
       }
 
       final mask = Command()
@@ -149,12 +270,32 @@ void main() {
 
       final fgCmd = Command()..image(fg);
 
-      await (Command()
+      final masked = (await (Command()
             ..image(origBg)
             ..copy()
             ..compositeImage(fgCmd, dstX: 50, dstY: 50, mask: mask)
             ..writeToFile('$testOutputPath/draw/compositeImage_mask.png'))
-          .execute();
+          .getImage())!;
+
+      // The mask is looked up at destination coordinates, so only the fg
+      // near (128,128) shows, mixed over bg by the blurred circle.
+      final maskImage = (await mask.getImage())!;
+      var shown = 0;
+      for (final p in masked) {
+        final f = fgAt(p.x, p.y, fg.width);
+        final o = origBg.getPixel(p.x, p.y);
+        final m = f == null || f.a == 0
+            ? 0
+            : maskImage.getPixel(p.x, p.y).luminanceNormalized;
+        if (m > 0.9) {
+          shown++;
+        }
+        for (var c = 0; c < 3; ++c) {
+          final e = f == null ? o[c] : o[c] + (f[c] - o[c]) * m;
+          expect(p[c], closeTo(e, 1), reason: 'channel $c at ${p.x},${p.y}');
+        }
+      }
+      expect(shown, greaterThan(0), reason: 'fg shown through the mask');
     });
   });
 }

@@ -9,10 +9,28 @@ void main() {
     test('scaleRgba', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       scaleRgba(i0, scale: ColorRgb8(128, 128, 128));
       File('$testOutputPath/filter/scaleRgba.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+      // Every channel is multiplied by 128/255.
+      for (final p in i0) {
+        final o = orig.getPixel(p.x, p.y);
+        for (var c = 0; c < 3; ++c) {
+          expect(p[c], closeTo(o[c] * 128 / 255, 1),
+              reason: 'channel $c at ${p.x},${p.y}');
+        }
+      }
+
+      // Each channel is scaled by its own factor.
+      final s = scaleRgba(solidImage(4, 4, ColorRgb8(200, 200, 200)),
+          scale: ColorRgb8(255, 128, 51));
+      expectSolidColor(s, ColorRgb8(200, 100, 40));
     });
 
     test('scaleRgba preserves image dimensions and numChannels', () {

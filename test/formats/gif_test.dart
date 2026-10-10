@@ -9,22 +9,66 @@ void main() {
     group('gif', () {
       test('bounce', () async {
         final g1 = await decodeGifFile('test/_data/gif/bounce.gif');
-        await encodeGifFile('$testOutputPath/gif/bounce.gif', g1!);
+        expect(g1, isNotNull);
+        expect(g1!.width, equals(512));
+        expect(g1.height, equals(720));
+        expect(g1.numFrames, equals(60));
+        expect(g1.loopCount, equals(0));
+        expect(g1.hasPalette, isTrue);
+        for (final frame in g1.frames) {
+          expect(frame.frameDuration, equals(30));
+        }
+        // The corner is transparent background and the ball is white.
+        expect(g1.getPixel(0, 0).a, equals(0));
+        expect(g1.getPixel(256, 360), equals([254, 254, 254, 255]));
+        // The ball moves, so the frames must not all be the same.
+        expect(imagesAreEqual(g1.frames[0], g1.frames[30]), isFalse);
+
+        await encodeGifFile('$testOutputPath/gif/bounce.gif', g1);
         for (final frame in g1.frames) {
           File('$testOutputPath/gif/bounce_${frame.frameIndex}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(encodePng(frame, singleFrame: true));
         }
+
+        _expectGifRoundTrip(
+          g1,
+          (await decodeGifFile('$testOutputPath/gif/bounce.gif'))!,
+        );
+        final png = (await decodePngFile('$testOutputPath/gif/bounce_7.png'))!;
+        expect(imagesAreEqual(png, g1.frames[7]), isTrue);
       });
 
       test('animated', () async {
         final g1 = await decodeGifFile('test/_data/gif/animated.gif');
-        await encodeGifFile('$testOutputPath/gif/animated.gif', g1!);
+        expect(g1, isNotNull);
+        expect(g1!.width, equals(76));
+        expect(g1.height, equals(76));
+        expect(g1.numFrames, equals(8));
+        expect(g1.loopCount, equals(0));
+        for (final frame in g1.frames) {
+          expect(frame.frameDuration, equals(40));
+        }
+        // Each frame differs from the one before it.
+        for (var i = 1; i < g1.numFrames; ++i) {
+          expect(imagesAreEqual(g1.frames[i - 1], g1.frames[i]), isFalse,
+              reason: 'frame $i');
+        }
+
+        await encodeGifFile('$testOutputPath/gif/animated.gif', g1);
         for (final frame in g1.frames) {
           File('$testOutputPath/gif/animated_${frame.frameIndex}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(encodePng(frame, singleFrame: true));
         }
+
+        _expectGifRoundTrip(
+          g1,
+          (await decodeGifFile('$testOutputPath/gif/animated.gif'))!,
+        );
+        final png =
+            (await decodePngFile('$testOutputPath/gif/animated_3.png'))!;
+        expect(imagesAreEqual(png, g1.frames[3]), isTrue);
       });
 
       test('anim_palette', () async {
@@ -189,6 +233,18 @@ void main() {
         File('$testOutputPath/gif/encode_small_gif.gif')
           ..createSync(recursive: true)
           ..writeAsBytesSync(gif);
+
+        // The thumbnail keeps the overall tone of the source and real detail.
+        expect(imageMean(resized), closeTo(imageMean(image), 10));
+        final colors = {for (final p in resized) '${p.r},${p.g},${p.b}'};
+        expect(colors.length, greaterThan(32));
+
+        // The resized image is paletted, so the GIF holds it exactly.
+        final decoded = decodeGif(gif)!;
+        expect(decoded.numFrames, equals(1));
+        expect(decoded.width, equals(16));
+        expect(decoded.height, equals(16));
+        expect(imagesAreEqual(decoded, resized), isTrue);
       });
     });
 
@@ -209,4 +265,17 @@ void main() {
       testImageEquals(decoded.frames[1], decoded.frames[0]);
     });
   });
+}
+
+void _expectGifRoundTrip(Image expected, Image actual) {
+  expect(actual.width, equals(expected.width));
+  expect(actual.height, equals(expected.height));
+  expect(actual.numFrames, equals(expected.numFrames));
+  expect(actual.loopCount, equals(expected.loopCount));
+  for (var i = 0; i < expected.numFrames; ++i) {
+    final e = expected.frames[i];
+    final a = actual.frames[i];
+    expect(a.frameDuration, equals(e.frameDuration), reason: 'frame $i');
+    expect(imagesAreEqual(a, e), isTrue, reason: 'frame $i');
+  }
 }

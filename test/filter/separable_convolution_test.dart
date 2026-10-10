@@ -35,6 +35,7 @@ void main() {
     test('separableConvolution', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
 
       const radius = 5;
       final kernel = SeparableKernel(radius);
@@ -56,6 +57,35 @@ void main() {
       File('$testOutputPath/filter/separableConvolution.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+      // Away from the edges each pixel is the 2D weighted sum of its
+      // neighbors, with weights kernel[i] * kernel[j].
+      for (var y = radius; y < orig.height - radius; ++y) {
+        for (var x = radius; x < orig.width - radius; ++x) {
+          final e = [0.0, 0.0, 0.0];
+          for (var j = -radius; j <= radius; ++j) {
+            for (var i = -radius; i <= radius; ++i) {
+              final w = kernel[i + radius] * kernel[j + radius];
+              final o = orig.getPixel(x + i, y + j);
+              for (var c = 0; c < 3; ++c) {
+                e[c] += w * o[c];
+              }
+            }
+          }
+          final p = i0.getPixel(x, y);
+          for (var c = 0; c < 3; ++c) {
+            // Each of the two passes truncates, losing less than 1.
+            expect(p[c], inInclusiveRange(e[c] - 2.001, e[c] + 0.001),
+                reason: 'channel $c at $x,$y');
+          }
+        }
+      }
+      // Blurring lowers the variance but roughly keeps the mean.
+      expect(imageVariance(i0), lessThan(imageVariance(orig)));
+      expect(imageMean(i0), closeTo(imageMean(orig), 2));
     });
 
     test('separableConvolution preserves dimensions', () {

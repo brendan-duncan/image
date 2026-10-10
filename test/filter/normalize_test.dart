@@ -9,10 +9,30 @@ void main() {
     test('normalize', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       normalize(i0, min: 50, max: 150);
       File('$testOutputPath/filter/normalize.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+      // Every channel is linearly mapped from the source [min, max] range to
+      // [50, 150].
+      final mM = minMax(orig);
+      final mn = mM[0];
+      final mx = mM[1];
+      expect(mx, greaterThan(mn));
+      num map(num v) => (v - mn) / (mx - mn) * 100 + 50;
+      for (final p in i0) {
+        final o = orig.getPixel(p.x, p.y);
+        for (var c = 0; c < 3; ++c) {
+          expect(p[c], closeTo(map(o[c]), 1),
+              reason: 'channel $c at ${p.x},${p.y}');
+        }
+      }
+      expect(minMax(i0), equals([50, 150]));
     });
 
     test('normalize preserves image dimensions and numChannels', () {

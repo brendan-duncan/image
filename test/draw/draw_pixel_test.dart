@@ -11,14 +11,23 @@ void main() {
   group('Draw', () {
     test('drawPixel.uint8', () {
       final i0 = Image(width: 256, height: 256);
+      final drawn = <int>{};
       for (var i = 0; i < 10000; ++i) {
         final x = r.nextInt(i0.width - 1);
         final y = r.nextInt(i0.height - 1);
         drawPixel(i0, x, y, ColorRgb8(x, y, 0));
+        drawn.add(y * i0.width + x);
       }
       File('$testOutputPath/draw/drawPixel.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      // Drawn pixels have exactly their color and the rest stay black.
+      for (final p in i0) {
+        final expected =
+            drawn.contains(p.y * i0.width + p.x) ? [p.x, p.y, 0] : [0, 0, 0];
+        expect(p, equals(expected), reason: 'pixel ${p.x},${p.y}');
+      }
     });
 
     test('drawPixel sets the exact pixel to the given color', () {

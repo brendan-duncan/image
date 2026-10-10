@@ -14,6 +14,16 @@ Set<String> _distinctColors(Image img) {
   return colors;
 }
 
+// Mean absolute difference of the r, g and b channels of [a] and [b].
+double _meanAbsError(Image a, Image b) {
+  var sum = 0.0;
+  for (final p in a) {
+    final q = b.getPixel(p.x, p.y);
+    sum += (p.r - q.r).abs() + (p.g - q.g).abs() + (p.b - q.b).abs();
+  }
+  return sum / (a.width * a.height * 3);
+}
+
 void main() {
   group('Filter', () {
     test('quantize', () {
@@ -65,6 +75,56 @@ void main() {
       File('$testOutputPath/filter/quantize_binary.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(q3));
+
+      final orig = decodePng(bytes)!;
+      final gray = grayscale(orig.clone());
+      final david =
+          decodePng(File('test/_data/png/david.png').readAsBytesSync())!;
+      for (final q in [q0, q0_, q1, q2]) {
+        expect(q.width, equals(orig.width));
+        expect(q.height, equals(orig.height));
+      }
+      // The color quantizers use up to, but not more than, 32 colors, and
+      // stay close to the original.
+      for (final q in [q0, q0_, q1]) {
+        expect(_distinctColors(q).length, inInclusiveRange(16, 32));
+      }
+      expect(_meanAbsError(orig, q0), lessThan(15));
+      expect(_meanAbsError(orig, q0_), lessThan(25));
+      expect(_meanAbsError(orig, q1), lessThan(15));
+
+      // Two gray levels, dithered to preserve the overall brightness.
+      final c2 = _distinctColors(q2);
+      expect(c2.length, equals(2));
+      for (final p in q2) {
+        expect(p.r == p.g && p.g == p.b, isTrue,
+            reason: 'gray at ${p.x},${p.y}');
+      }
+      expect(imageMean(q2), closeTo(imageMean(gray), 8));
+
+      expect(q3.width, equals(david.width));
+      expect(q3.height, equals(david.height));
+      // Binary: pure black and white, mostly black where the original is dark
+      // and mostly white where it is bright.
+      expect(_distinctColors(q3), equals({'0,0,0', '255,255,255'}));
+      var dark = 0;
+      var darkWhite = 0;
+      var bright = 0;
+      var brightWhite = 0;
+      for (final p in q3) {
+        final l = david.getPixel(p.x, p.y).luminanceNormalized;
+        if (l < 0.15) {
+          dark++;
+          if (p.r == 255) darkWhite++;
+        } else if (l > 0.85) {
+          bright++;
+          if (p.r == 255) brightWhite++;
+        }
+      }
+      expect(dark, greaterThan(100));
+      expect(bright, greaterThan(100));
+      expect(darkWhite / dark, lessThan(0.25));
+      expect(brightWhite / bright, greaterThan(0.75));
     });
 
     test('quantize preserves dimensions', () {

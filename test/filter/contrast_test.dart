@@ -9,10 +9,41 @@ void main() {
     test('contrast', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       contrast(i0, contrast: 150);
       File('$testOutputPath/filter/contrast.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+
+      // contrast 150 scales the distance from mid-gray by 1.5^2 = 2.25:
+      // out = ((v / 255 - 0.5) * 2.25 + 0.5) * 255, clamped and truncated.
+      int expected(num v) =>
+          (((v / 255 - 0.5) * 2.25 + 0.5) * 255).clamp(0, 255).toInt();
+      var moved = 0;
+      for (final p in i0) {
+        final o = orig.getPixel(p.x, p.y);
+        final at = 'at ${p.x},${p.y}';
+        for (var c = 0; c < 3; ++c) {
+          final v = o[c];
+          final out = p[c];
+          expect(out, equals(expected(v)), reason: 'channel $c $at');
+          // Values move away from the middle, never toward it.
+          if (v < 127) {
+            expect(out, lessThanOrEqualTo(v), reason: 'channel $c $at');
+          } else if (v > 128) {
+            expect(out, greaterThanOrEqualTo(v), reason: 'channel $c $at');
+          }
+          if (out != v) {
+            moved++;
+          }
+        }
+      }
+      expect(moved, greaterThan(i0.width * i0.height * 3 * 0.9));
+      expect(imageVariance(i0), greaterThan(imageVariance(orig) * 1.5));
     });
 
     test('contrast=100 is a no-op', () {

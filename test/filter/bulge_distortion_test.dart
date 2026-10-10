@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -9,10 +11,61 @@ void main() {
     test('bulgeDistortion', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       bulgeDistortion(i0, interpolation: Interpolation.cubic);
       File('$testOutputPath/filter/bulgeDistortion.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+
+      // Outside the default radius every pixel samples itself; inside it,
+      // pixels are pulled from closer to the center.
+      final cx = i0.width ~/ 2;
+      final cy = i0.height ~/ 2;
+      final rad = min(i0.width, i0.height) ~/ 2;
+      var inside = 0;
+      var changed = 0;
+      for (final p in i0) {
+        final dx = p.x - cx;
+        final dy = p.y - cy;
+        final o = orig.getPixel(p.x, p.y);
+        if (dx * dx + dy * dy >= rad * rad) {
+          expect(p, equals(o), reason: 'outside radius at ${p.x},${p.y}');
+        } else {
+          inside++;
+          if (p != o) {
+            changed++;
+          }
+        }
+      }
+      expect(changed, greaterThan(inside ~/ 2));
+      // The center maps onto itself.
+      expect(i0.getPixel(cx, cy), equals(orig.getPixel(cx, cy)));
+
+      // On a horizontal ramp, a pixel inside the radius takes its value from
+      // a column between itself and the center (magnification).
+      final ramp = horizontalGradient(64, 64);
+      final bulged = bulgeDistortion(ramp.clone());
+      var moved = 0;
+      for (final p in bulged) {
+        final dx = p.x - 32;
+        final dy = p.y - 32;
+        final v = ramp.getPixel(p.x, p.y).r;
+        if (dx * dx + dy * dy >= 32 * 32) {
+          expect(p.r, equals(v), reason: 'outside radius at ${p.x},${p.y}');
+          continue;
+        }
+        final c = ramp.getPixel(32, p.y).r;
+        expect(p.r, inInclusiveRange(min(c, v), max(c, v)),
+            reason: 'inside radius at ${p.x},${p.y}');
+        if (p.r != v) {
+          moved++;
+        }
+      }
+      expect(moved, greaterThan(1000));
     });
 
     test('bulgeDistortion preserves dimensions', () {

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -13,6 +15,42 @@ void main() {
       File('$testOutputPath/filter/bumpToNormal.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i1));
+
+      expect(i1.width, equals(i0.width));
+      expect(i1.height, equals(i0.height));
+
+      // The red channel is the height. Where it rises to the right (or
+      // downward) the normal tilts away, below the flat value 0.5; where it
+      // falls the normal tilts above it; where it is level it is exactly flat.
+      // Blue (z) is only at its maximum where both slopes are 0.
+      final flat = i1.maxChannelValue * 0.5;
+      for (final p in i1) {
+        final x = p.x;
+        final y = p.y;
+        final h = i0.getPixel(x, y).r;
+        final hr = i0.getPixel(min(x + 1, i0.width - 1), y).r;
+        final hd = i0.getPixel(x, min(y + 1, i0.height - 1)).r;
+        final at = 'at $x,$y';
+        if (hr > h) {
+          expect(p.r, lessThan(flat - 0.5), reason: 'r $at');
+        } else if (hr < h) {
+          expect(p.r, greaterThan(flat), reason: 'r $at');
+        } else {
+          expect(p.r, inInclusiveRange(flat - 0.5, flat), reason: 'r $at');
+        }
+        if (hd > h) {
+          expect(p.g, lessThan(flat - 0.5), reason: 'g $at');
+        } else if (hd < h) {
+          expect(p.g, greaterThan(flat), reason: 'g $at');
+        } else {
+          expect(p.g, inInclusiveRange(flat - 0.5, flat), reason: 'g $at');
+        }
+        if (hr == h && hd == h) {
+          expect(p.b, equals(i1.maxChannelValue), reason: 'b $at');
+        } else {
+          expect(p.b, lessThan(i1.maxChannelValue), reason: 'b $at');
+        }
+      }
     });
 
     test('bumpToNormal preserves dimensions', () {

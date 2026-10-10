@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -8,6 +10,7 @@ void main() {
   group('Filter', () {
     test('reinhardTonemap', () async {
       final hdr = (await decodeExrFile('test/_data/exr/ocean.exr'))!;
+      final orig = hdr.clone();
 
       reinhardTonemap(hdr);
       final ldr = hdrToLdr(hdr, exposure: -1);
@@ -15,6 +18,32 @@ void main() {
       File('$testOutputPath/filter/reinhardTonemap.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(ldr));
+
+      expect(ldr.width, equals(orig.width));
+      expect(ldr.height, equals(orig.height));
+      expect(hdr.format, equals(orig.format));
+
+      // Each pixel is scaled by (1 + L / Lw^2) / (1 + L), where L is its
+      // luminance and Lw the log-average luminance of the image.
+      num lum(Pixel p) => 0.212671 * p.r + 0.715160 * p.g + 0.072169 * p.b;
+      var logSum = 0.0;
+      for (final p in orig) {
+        final l = lum(p);
+        if (l > 1.0e-4) {
+          logSum += log(l);
+        }
+      }
+      final lw = exp(logSum / (orig.width * orig.height));
+      for (final p in hdr) {
+        final o = orig.getPixel(p.x, p.y);
+        final l = lum(o);
+        final s = (1 + l / (lw * lw)) / (1 + l);
+        for (var c = 0; c < 3; ++c) {
+          final e = o[c] * s;
+          expect(p[c], closeTo(e, e.abs() * 2e-3 + 1e-4),
+              reason: 'channel $c at ${p.x},${p.y}');
+        }
+      }
     });
 
     test('reinhardTonemap maps a uniform HDR image to uniform white', () {

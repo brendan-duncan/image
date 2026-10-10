@@ -51,6 +51,38 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
 
+      expect(i0.width, equals(img.width));
+      expect(i0.height, equals(img.height));
+      // The screen is a gray pattern thresholded from the luminance, so the
+      // result is gray and mostly pure black or white.
+      var saturated = 0;
+      for (final p in i0) {
+        expect(p.g, equals(p.r), reason: 'g at ${p.x},${p.y}');
+        expect(p.b, equals(p.r), reason: 'b at ${p.x},${p.y}');
+        if (p.r == 0 || p.r == 255) {
+          saturated++;
+        }
+      }
+      expect(saturated, greaterThan(i0.width * i0.height * 0.6));
+      // Dark source areas get less white than light ones.
+      var darkSum = 0.0;
+      var darkCount = 0;
+      var lightSum = 0.0;
+      var lightCount = 0;
+      for (final p in i0) {
+        final l = img.getPixel(p.x, p.y).luminance;
+        if (l < 64) {
+          darkSum += p.r;
+          darkCount++;
+        } else if (l > 192) {
+          lightSum += p.r;
+          lightCount++;
+        }
+      }
+      expect(darkCount, greaterThan(0));
+      expect(lightCount, greaterThan(0));
+      expect(darkSum / darkCount + 100, lessThan(lightSum / lightCount));
+
       final mask = Command()
         ..createImage(width: img.width, height: img.height)
         ..fill(color: ColorRgb8(0, 0, 0))
@@ -62,12 +94,41 @@ void main() {
         )
         ..gaussianBlur(radius: 20);
 
-      await (Command()
+      final masked = (await (Command()
             ..image(img)
             ..copy()
             ..dotScreen(mask: mask)
             ..writeToFile('$testOutputPath/filter/dotScreen_mask.png'))
-          .execute();
+          .getImage())!;
+
+      // The mask is white in a circle of radius 80 at the center, softened by
+      // the blur, and black elsewhere: the center gets the full effect and
+      // the area well outside the circle is untouched.
+      final cx = img.width ~/ 2;
+      final cy = img.height ~/ 2;
+      var outside = 0;
+      var center = 0;
+      for (final p in masked) {
+        final dx = p.x - cx;
+        final dy = p.y - cy;
+        final d2 = dx * dx + dy * dy;
+        if (d2 > 110 * 110) {
+          expect(p, equals(img.getPixel(p.x, p.y)),
+              reason: 'outside mask at ${p.x},${p.y}');
+          outside++;
+        } else if (d2 < 50 * 50) {
+          // The blurred mask is nearly, not exactly, 1 here.
+          final full = i0.getPixel(p.x, p.y);
+          for (var c = 0; c < 3; ++c) {
+            expect(p[c], closeTo(full[c], 2),
+                reason: 'inside mask at ${p.x},${p.y}');
+          }
+          center++;
+        }
+      }
+      expect(outside, greaterThan(0));
+      expect(center, greaterThan(0));
+      expect(imagesAreEqual(masked, img), isFalse);
     });
   });
 }

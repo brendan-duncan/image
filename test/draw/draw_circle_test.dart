@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math' show sqrt;
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -29,6 +31,33 @@ void main() {
       File('$testOutputPath/draw/drawCircle.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      // The axis points of both circles have the full circle color.
+      for (final (r, color) in [
+        (50, [255, 0, 0]),
+        (100, [0, 255, 0])
+      ]) {
+        expect(i0.getPixel(128 - r, 128), equals(color), reason: 'left $r');
+        expect(i0.getPixel(128 + r, 128), equals(color), reason: 'right $r');
+        expect(i0.getPixel(128, 128 - r), equals(color), reason: 'top $r');
+        expect(i0.getPixel(128, 128 + r), equals(color), reason: 'bottom $r');
+      }
+
+      // Red only on the radius 50 ring, green only near the radius 100 ring,
+      // and everything else, including the center, is untouched.
+      for (final p in i0) {
+        final d = sqrt((p.x - 128) * (p.x - 128) + (p.y - 128) * (p.y - 128));
+        final near50 = (d - 50).abs() <= 1;
+        final near100 = (d - 100).abs() <= 1.5;
+        if (!near50) {
+          expect(p.r, equals(0), reason: 'red at ${p.x},${p.y}');
+        }
+        if (!near100) {
+          expect(p.g, equals(0), reason: 'green at ${p.x},${p.y}');
+        }
+        expect(p.b, equals(0), reason: 'blue at ${p.x},${p.y}');
+      }
+      expect(i0.getPixel(128, 128), equals([0, 0, 0]), reason: 'center');
     });
 
     test('drawCircle draws only outline: axis points painted, center not', () {

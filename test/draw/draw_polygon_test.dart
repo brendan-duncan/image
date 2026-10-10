@@ -1,8 +1,27 @@
 import 'dart:io';
+import 'dart:math' show max, min, sqrt;
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 import '../_test_util.dart';
+
+/// Distance from ([x],[y]) to the closed outline through [verts].
+double _distToOutline(int x, int y, List<Point> verts) {
+  var best = double.infinity;
+  for (var i = 0; i < verts.length; ++i) {
+    final a = verts[i];
+    final b = verts[(i + 1) % verts.length];
+    final dx = b.x - a.x;
+    final dy = b.y - a.y;
+    final t = (((x - a.x) * dx + (y - a.y) * dy) / (dx * dx + dy * dy))
+        .clamp(0.0, 1.0);
+    final ex = a.x + t * dx - x;
+    final ey = a.y + t * dy - y;
+    best = min(best, sqrt(ex * ex + ey * ey));
+  }
+  return best;
+}
 
 void main() {
   group('Draw', () {
@@ -40,6 +59,51 @@ void main() {
       File('$testOutputPath/draw/drawPolygon.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      // The opaque red outline passes exactly through its vertices and the
+      // midpoints of its edges, including the closing edge.
+      for (var i = 0; i < vertices.length; ++i) {
+        final a = vertices[i];
+        final b = vertices[(i + 1) % vertices.length];
+        expect(i0.getPixel(a.xi, a.yi), equals([255, 0, 0]),
+            reason: 'vertex $i');
+        expect(i0.getPixel((a.xi + b.xi) ~/ 2, (a.yi + b.yi) ~/ 2),
+            equals([255, 0, 0]),
+            reason: 'edge $i midpoint');
+      }
+
+      // Each channel is drawn only along its own polygon's outline.
+      final outlines = [
+        (0, vertices, 1.0),
+        (1, vertices.map((p) => Point(p.x + 20, p.y + 20)).toList(), 2.0),
+        (2, vertices.map((p) => Point(p.x + 40, p.y + 40)).toList(), 2.0),
+      ];
+      for (final (channel, verts, tolerance) in outlines) {
+        // The antialiased outlines are strong near every edge midpoint.
+        if (channel > 0) {
+          for (var i = 0; i < verts.length; ++i) {
+            final a = verts[i];
+            final b = verts[(i + 1) % verts.length];
+            final mx = (a.xi + b.xi) ~/ 2;
+            final my = (a.yi + b.yi) ~/ 2;
+            var peak = 0;
+            for (var y = my - 2; y <= my + 2; ++y) {
+              for (var x = mx - 2; x <= mx + 2; ++x) {
+                peak = max(peak, i0.getPixel(x, y)[channel].toInt());
+              }
+            }
+            expect(peak, greaterThan(127),
+                reason: 'channel $channel edge $i midpoint');
+          }
+        }
+        for (final p in i0) {
+          if (p[channel] != 0) {
+            expect(
+                _distToOutline(p.x, p.y, verts), lessThanOrEqualTo(tolerance),
+                reason: 'channel $channel at ${p.x},${p.y}');
+          }
+        }
+      }
     });
 
     test('drawPolygon: image dimensions unchanged', () {

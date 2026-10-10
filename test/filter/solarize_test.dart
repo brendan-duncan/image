@@ -4,24 +4,59 @@ import 'package:test/test.dart';
 
 import '../_test_util.dart';
 
+// Expects [out] to be [orig] with the pixels whose green value satisfies
+// [invert] inverted, then stretched to the full [0, 255] range.
+void _expectSolarized(Image orig, Image out, bool Function(num g) invert) {
+  expect(out.width, equals(orig.width));
+  expect(out.height, equals(orig.height));
+  expect(out.numChannels, equals(orig.numChannels));
+  final inverted = orig.clone();
+  var count = 0;
+  for (final p in inverted) {
+    if (invert(p.g)) {
+      p.setRgb(255 - p.r, 255 - p.g, 255 - p.b);
+      count++;
+    }
+  }
+  // Both inverted and untouched pixels are present.
+  expect(count, greaterThan(0));
+  expect(count, lessThan(orig.width * orig.height));
+  final mM = minMax(inverted);
+  final mn = mM[0];
+  final mx = mM[1];
+  for (final p in out) {
+    final q = inverted.getPixel(p.x, p.y);
+    for (var c = 0; c < 3; ++c) {
+      expect(p[c], closeTo((q[c] - mn) / (mx - mn) * 255, 1),
+          reason: 'channel $c at ${p.x},${p.y}');
+    }
+  }
+}
+
 void main() {
   group('Filter', () {
     test('solarize highlights', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       solarize(i0, threshold: 100);
       File('$testOutputPath/filter/solarize_highlights.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      _expectSolarized(orig, i0, (g) => g > 100);
     });
 
     test('solarize shadows', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       solarize(i0, threshold: 100, mode: SolarizeMode.shadows);
       File('$testOutputPath/filter/solarize_shadows.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      _expectSolarized(orig, i0, (g) => g < 100);
     });
 
     test('solarize preserves image dimensions and numChannels', () {

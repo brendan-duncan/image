@@ -9,10 +9,52 @@ void main() {
     test('colorHalftone', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       colorHalftone(i0);
       File('$testOutputPath/filter/colorHalftone.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+
+      // Halftoning thresholds each ink into dots, so most channel values end
+      // up fully on or off, unlike the continuous-tone source.
+      int saturated(Image img) {
+        var n = 0;
+        for (final p in img) {
+          for (final v in [p.r, p.g, p.b]) {
+            if (v == 0 || v == 255) {
+              n++;
+            }
+          }
+        }
+        return n;
+      }
+
+      final total = i0.width * i0.height * 3;
+      expect(saturated(i0), greaterThan(total * 0.6));
+      expect(saturated(orig), lessThan(total * 0.1));
+
+      // The dots still follow the tone: dark source areas stay darker than
+      // light ones.
+      var darkSum = 0.0;
+      var darkCount = 0;
+      var lightSum = 0.0;
+      var lightCount = 0;
+      for (final p in i0) {
+        final l = orig.getPixel(p.x, p.y).luminance;
+        if (l < 64) {
+          darkSum += p.luminance;
+          darkCount++;
+        } else if (l > 192) {
+          lightSum += p.luminance;
+          lightCount++;
+        }
+      }
+      expect(darkCount, greaterThan(0));
+      expect(lightCount, greaterThan(0));
+      expect(darkSum / darkCount + 50, lessThan(lightSum / lightCount));
     });
 
     test('colorHalftone preserves dimensions', () {

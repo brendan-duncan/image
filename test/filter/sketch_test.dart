@@ -1,8 +1,24 @@
 import 'dart:io';
+import 'dart:math';
+
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
 import '../_test_util.dart';
+
+// The Sobel gradient magnitude of the normalized luminance of [img] at
+// x, y, clamping neighbors to the image edges.
+double _sobelMagnitude(Image img, int x, int y) {
+  num l(int dx, int dy) => img
+      .getPixel(
+          (x + dx).clamp(0, img.width - 1), (y + dy).clamp(0, img.height - 1))
+      .luminanceNormalized;
+  final h =
+      -l(-1, -1) - 2 * l(0, -1) - l(1, -1) + l(-1, 1) + 2 * l(0, 1) + l(1, 1);
+  final v =
+      -l(-1, 1) - 2 * l(-1, 0) - l(-1, -1) + l(1, 1) + 2 * l(1, 0) + l(1, -1);
+  return sqrt(h * h + v * v);
+}
 
 void main() {
   group('Filter', () {
@@ -15,6 +31,26 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
 
+      expect(i0.width, equals(img.width));
+      expect(i0.height, equals(img.height));
+      expect(i0.numChannels, equals(img.numChannels));
+      // Each pixel is darkened by 1 - the Sobel edge magnitude, so flat areas
+      // keep their color and edges turn dark.
+      var darkened = 0;
+      for (final p in i0) {
+        final o = img.getPixel(p.x, p.y);
+        final mag = 1 - _sobelMagnitude(img, p.x, p.y);
+        for (var c = 0; c < 3; ++c) {
+          expect(p[c], closeTo((o[c] * mag).clamp(0, 255), 1),
+              reason: 'channel $c at ${p.x},${p.y}');
+          expect(p[c], lessThanOrEqualTo(o[c]));
+        }
+        if (o.r - p.r > 64) {
+          darkened++;
+        }
+      }
+      expect(darkened, greaterThan(100));
+
       final mask = Command()
         ..createImage(width: img.width, height: img.height)
         ..fill(color: ColorRgb8(0, 0, 0))
@@ -26,12 +62,29 @@ void main() {
         )
         ..gaussianBlur(radius: 20);
 
-      await (Command()
-            ..image(img)
-            ..copy()
-            ..sketch(mask: mask)
-            ..writeToFile('$testOutputPath/filter/sketch_mask.png'))
-          .execute();
+      final cmd = Command()
+        ..image(img)
+        ..copy()
+        ..sketch(mask: mask)
+        ..writeToFile('$testOutputPath/filter/sketch_mask.png');
+      await cmd.execute();
+
+      // Sketched inside the (blurred) circle, unchanged outside it.
+      final masked = cmd.outputImage!;
+      final cx = img.width ~/ 2;
+      final cy = img.height ~/ 2;
+      for (final p in masked) {
+        final d = sqrt(pow(p.x - cx, 2) + pow(p.y - cy, 2));
+        if (d < 55) {
+          for (var c = 0; c < 3; ++c) {
+            expect(p[c], closeTo(i0.getPixel(p.x, p.y)[c], 2),
+                reason: 'channel $c at ${p.x},${p.y}');
+          }
+        } else if (d > 105) {
+          expect(p, equals(img.getPixel(p.x, p.y)),
+              reason: 'pixel ${p.x},${p.y}');
+        }
+      }
     });
 
     test('sketch preserves dimensions', () {

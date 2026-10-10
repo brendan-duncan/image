@@ -448,20 +448,48 @@ void main() {
         File('$testOutputPath/png/encodeAnimation.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
+
+        final decoder = PngDecoder();
+        final anim2 = decoder.decode(png)!;
+        expect(decoder.info.numFrames, equals(10));
+        expect(decoder.info.repeat, equals(10));
+        // Note: PngDecoder.decode doesn't copy info.repeat to the decoded
+        // Image's loopCount, so anim2.loopCount is 0 here.
+        expect(anim2.width, equals(480));
+        expect(anim2.height, equals(120));
+        expect(anim2.numFrames, equals(10));
+        for (var i = 0; i < 10; ++i) {
+          testImageEquals(anim.frames[i], anim2.frames[i]);
+        }
+        // Each frame draws a different digit.
+        expect(imagesAreEqual(anim2.frames[0], anim2.frames[1]), isFalse);
       });
 
       test('encodeAnimation with mulitple single frame Images', () {
         final encoder = PngEncoder()..start(10);
+        final frames = <Image>[];
         for (var i = 0; i < 10; i++) {
           final frame = Image(width: 480, height: 120)..loopCount = 10;
           drawString(frame, i.toString(), font: arial48, x: 100, y: 60);
           encoder.addFrame(frame);
+          frames.add(frame);
         }
 
         final png = encoder.finish()!;
         File('$testOutputPath/png/encodeAnimation.png')
           ..createSync(recursive: true)
           ..writeAsBytesSync(png);
+
+        final decoder = PngDecoder();
+        final anim = decoder.decode(png)!;
+        expect(decoder.info.numFrames, equals(10));
+        expect(anim.width, equals(480));
+        expect(anim.height, equals(120));
+        expect(anim.numFrames, equals(10));
+        for (var i = 0; i < 10; ++i) {
+          testImageEquals(frames[i], anim.frames[i]);
+        }
+        expect(imagesAreEqual(anim.frames[0], anim.frames[9]), isFalse);
       });
 
       test('textData', () {

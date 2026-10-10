@@ -9,6 +9,7 @@ void main() {
     test('remapColors', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       remapColors(
         i0,
         red: Channel.green,
@@ -18,6 +19,18 @@ void main() {
       File('$testOutputPath/filter/remapColors.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+      // red <- green, green <- luminance, blue <- red.
+      for (final p in i0) {
+        final o = orig.getPixel(p.x, p.y);
+        final l = 0.299 * o.r + 0.587 * o.g + 0.114 * o.b;
+        expect(p.r, equals(o.g), reason: 'r at ${p.x},${p.y}');
+        expect(p.g, closeTo(l, 1), reason: 'g at ${p.x},${p.y}');
+        expect(p.b, equals(o.r), reason: 'b at ${p.x},${p.y}');
+      }
     });
 
     test('remapColors preserves dimensions', () {

@@ -9,10 +9,53 @@ void main() {
     test('gaussianBlur', () {
       final bytes = File('test/_data/png/buck_24.png').readAsBytesSync();
       final i0 = decodePng(bytes)!;
+      final orig = i0.clone();
       gaussianBlur(i0, radius: 10);
       File('$testOutputPath/filter/gaussianBlur.png')
         ..createSync(recursive: true)
         ..writeAsBytesSync(encodePng(i0));
+
+      expect(i0.width, equals(orig.width));
+      expect(i0.height, equals(orig.height));
+      expect(i0.numChannels, equals(orig.numChannels));
+
+      // Blurring keeps the overall brightness, lowers the variance and
+      // removes most of the pixel-to-pixel detail.
+      expect(imageMean(i0), closeTo(imageMean(orig), 2));
+      expect(imageVariance(i0), lessThan(imageVariance(orig)));
+      double detail(Image img) {
+        var sum = 0.0;
+        for (var y = 0; y < img.height; ++y) {
+          for (var x = 1; x < img.width; ++x) {
+            final a = img.getPixel(x - 1, y);
+            final b = img.getPixel(x, y);
+            sum += (a.r - b.r).abs() + (a.g - b.g).abs() + (a.b - b.b).abs();
+          }
+        }
+        return sum;
+      }
+
+      expect(detail(i0), lessThan(detail(orig) / 4));
+
+      // A single bright dot spreads into a symmetric, center-peaked blob.
+      final dot = Image(width: 21, height: 21)..setPixelRgb(10, 10, 255, 0, 0);
+      gaussianBlur(dot, radius: 3);
+      final peak = dot.getPixel(10, 10).r;
+      expect(peak, greaterThan(0));
+      expect(peak, lessThan(255));
+      expect(dot.getPixel(11, 10).r, greaterThan(0));
+      expect(dot.getPixel(11, 10).r, lessThan(peak));
+      expect(dot.getPixel(12, 10).r, lessThan(dot.getPixel(11, 10).r));
+      expect(dot.getPixel(9, 10).r, equals(dot.getPixel(11, 10).r));
+      expect(dot.getPixel(10, 9).r, equals(dot.getPixel(10, 11).r));
+      expect(dot.getPixel(10, 9).r, equals(dot.getPixel(11, 10).r));
+      // Nothing spreads beyond the radius, or into other channels.
+      expect(dot.getPixel(14, 10).r, equals(0));
+      expect(dot.getPixel(10, 6).r, equals(0));
+      for (final p in dot) {
+        expect(p.g, equals(0));
+        expect(p.b, equals(0));
+      }
     });
 
     test('gaussianBlur preserves dimensions', () {
