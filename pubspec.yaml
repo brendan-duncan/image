@@ -10,7 +10,7 @@ environment:
   sdk: ^3.0.0
 
 dependencies:
-  archive: ^4.4.0
+  archive: ^4.5.0
 
 dev_dependencies:
   build_runner: ^2.15.0
