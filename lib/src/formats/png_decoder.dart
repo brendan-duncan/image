@@ -393,7 +393,8 @@ class PngDecoder extends Decoder {
 
     // The image data is inflated as the rows are read, so the whole
     // decompressed image is never held in memory.
-    final input = const ZLibDecoder().decodeLazy(InputMemoryStream(imageData));
+    final input = const ZLibDecoder()
+        .decodeLazy(InputMemoryStream(imageData), verify: true);
     _resetBits();
 
     PaletteUint8? palette;
@@ -498,6 +499,8 @@ class PngDecoder extends Decoder {
       } else {
         _process(input, image);
       }
+      // Adler-32 is checked at stream end, which last row does not reach
+      input.readBytes(1).toUint8List();
     } on ArchiveException {
       // Invalid compressed data.
       return null;
@@ -644,7 +647,7 @@ class PngDecoder extends Decoder {
     for (var srcY = 0, dstY = yOffset;
         srcY < passHeight;
         ++srcY, dstY += yStep, _progressY++) {
-      final filterType = PngFilterType.values[input.readByte()];
+      final filterType = _filterType(input.readByte());
       final row = input.readBytes(rowBytes).toUint8List();
       if (row.length != rowBytes) {
         throw const _TruncatedData();
@@ -691,7 +694,7 @@ class PngDecoder extends Decoder {
 
     final pIter = image.iterator..moveNext();
     for (var y = 0; y < h; ++y) {
-      final filterType = PngFilterType.values[input.readByte()];
+      final filterType = _filterType(input.readByte());
       final row = input.readBytes(rowBytes).toUint8List();
       if (row.length != rowBytes) {
         throw const _TruncatedData();
@@ -1009,3 +1012,7 @@ class PngDecoder extends Decoder {
 class _TruncatedData implements Exception {
   const _TruncatedData();
 }
+
+PngFilterType _filterType(int b) => b < PngFilterType.values.length
+    ? PngFilterType.values[b]
+    : throw const _TruncatedData();
