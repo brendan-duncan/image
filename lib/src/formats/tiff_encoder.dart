@@ -45,8 +45,12 @@ class TiffEncoder extends Encoder {
     ifd0['PhotometricInterpretation'] = type;
     ifd0['RowsPerStrip'] = image.height;
     ifd0['PlanarConfiguration'] = 1;
-    ifd0['TileWidth'] = image.width;
-    ifd0['TileLength'] = image.height;
+    // The encoder writes strips, so copied tile metadata no longer describes
+    // the pixel data. Tile dimensions can also make strip readers reject it.
+    ifd0['TileWidth'] = null;
+    ifd0['TileLength'] = null;
+    ifd0['TileOffsets'] = null;
+    ifd0['TileByteCounts'] = null;
     ifd0['StripByteCounts'] = image.lengthInBytes;
     // The pixel data is written straight from the image, without a copy.
     ifd0['StripOffsets'] = IfdValueUndefined.view(image.toUint8List());
