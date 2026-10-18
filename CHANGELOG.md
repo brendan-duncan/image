@@ -1,3 +1,9 @@
+# 4.12.1
+
+* PNGs with an unknown row filter type decode to null, like other invalid PNG data.
+* Check the zlib checksum of PNG, TIFF, EXR and ICC profile data.
+* `IccProfile.decompressed` throws `ImageException` for invalid data.
+
 # 4.12.0
 
 Security fixes for decoding untrusted images:

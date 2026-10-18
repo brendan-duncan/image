@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:archive/archive.dart';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
 
@@ -727,6 +728,73 @@ void main() {
       for (var i = 0; i < 3; ++i) {
         testImageEquals(decoded.frames[i], anim.frames[i]);
       }
+    });
+
+    group('invalid image data', () {
+      // [png] with the data of its last IDAT chunk replaced by [edit], and
+      // the chunk's CRC updated to match.
+      Uint8List editIdat(
+          Uint8List png, Uint8List Function(Uint8List data) edit) {
+        final bd = ByteData.sublistView(png);
+        var last = -1;
+        for (var offset = 8; offset < png.length;) {
+          if (String.fromCharCodes(png.sublist(offset + 4, offset + 8)) ==
+              'IDAT') {
+            last = offset;
+          }
+          offset += 12 + bd.getUint32(offset);
+        }
+        final offset = last;
+        final length = bd.getUint32(offset);
+        final data = edit(png.sublist(offset + 8, offset + 8 + length));
+        final chunk = Uint8List(12 + data.length);
+        ByteData.sublistView(chunk)
+          ..setUint32(0, data.length)
+          ..setUint32(
+              8 + data.length, getCrc32([...'IDAT'.codeUnits, ...data]));
+        chunk
+          ..setRange(4, 8, 'IDAT'.codeUnits)
+          ..setRange(8, 8 + data.length, data);
+        return Uint8List.fromList([
+          ...png.sublist(0, offset),
+          ...chunk,
+          ...png.sublist(offset + 12 + length),
+        ]);
+      }
+
+      test('unknown filter type', () {
+        // Small enough for a single IDAT chunk.
+        final png = editIdat(encodePng(Image(width: 8, height: 8)), (zlib) {
+          final rows = const ZLibDecoder().decodeBytes(zlib);
+          rows[0] = 5;
+          return const ZLibEncoder().encodeBytes(rows);
+        });
+        expect(decodePng(png), isNull);
+      });
+
+      test('wrong Adler-32', () {
+        // The checksum follows the last row, so decoding the rows alone
+        // doesn't check it.
+        final png = editIdat(
+            File('test/_data/png/buck_24.png').readAsBytesSync(),
+            (data) => data..[data.length - 1] ^= 0xff);
+        expect(decodePng(png), isNull);
+      });
+    });
+
+    group('ICC profile', () {
+      test('invalid compressed data', () {
+        final icc = IccProfile('p', IccProfileCompression.deflate,
+            Uint8List.fromList([0x78, 0x9c, 0xff, 0xff, 0xff, 0xff]));
+        expect(icc.decompressed, throwsA(isA<ImageException>()));
+      });
+
+      test('wrong Adler-32', () {
+        final zlib = const ZLibEncoder().encodeBytes(List.filled(100, 7));
+        zlib[zlib.length - 1] ^= 0xff;
+        final icc = IccProfile('p', IccProfileCompression.deflate, zlib);
+        expect(icc.decompressed, throwsA(isA<ImageException>()));
+      });
     });
   });
 }

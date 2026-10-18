@@ -12,12 +12,13 @@ Uint8List inflate(List<int> data, int maxLength) {
   try {
     final bytes = input.readBytes(maxLength).toUint8List();
     if (bytes.length == maxLength) {
-      // Adler-32 is checked at stream end, which maxLength bytes may not reach
+      // The Adler-32 is checked at the end of the stream, which reading
+      // maxLength bytes may not reach.
       input.readBytes(1).toUint8List();
     }
     return bytes;
   } on FormatException catch (e) {
-    throw ImageException('Invalid compressed data: $e');
+    throw ImageException('Invalid compressed data: ${e.message}');
   } finally {
     input.closeSync();
   }

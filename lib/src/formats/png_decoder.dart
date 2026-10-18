@@ -499,7 +499,8 @@ class PngDecoder extends Decoder {
       } else {
         _process(input, image);
       }
-      // Adler-32 is checked at stream end, which last row does not reach
+      // The Adler-32 is checked at the end of the stream, which reading the
+      // last row doesn't reach.
       input.readBytes(1).toUint8List();
     } on ArchiveException {
       // Invalid compressed data.
@@ -507,7 +508,7 @@ class PngDecoder extends Decoder {
     } on FormatException {
       // Invalid compressed data, from the platform's zlib.
       return null;
-    } on _TruncatedData {
+    } on _InvalidData {
       return null;
     } finally {
       input.closeSync();
@@ -650,7 +651,7 @@ class PngDecoder extends Decoder {
       final filterType = _filterType(input.readByte());
       final row = input.readBytes(rowBytes).toUint8List();
       if (row.length != rowBytes) {
-        throw const _TruncatedData();
+        throw const _InvalidData();
       }
 
       // Before the image is compressed, it was filtered to improve compression.
@@ -697,7 +698,7 @@ class PngDecoder extends Decoder {
       final filterType = _filterType(input.readByte());
       final row = input.readBytes(rowBytes).toUint8List();
       if (row.length != rowBytes) {
-        throw const _TruncatedData();
+        throw const _InvalidData();
       }
 
       // Before the image is compressed, it was filtered to improve compression.
@@ -1008,11 +1009,12 @@ class PngDecoder extends Decoder {
   int _progressY = 0;
 }
 
-// Thrown when the decompressed image data ends before the last row.
-class _TruncatedData implements Exception {
-  const _TruncatedData();
+// Thrown when the decompressed image data ends before the last row, or a row
+// has an unknown filter type.
+class _InvalidData implements Exception {
+  const _InvalidData();
 }
 
-PngFilterType _filterType(int b) => b < PngFilterType.values.length
-    ? PngFilterType.values[b]
-    : throw const _TruncatedData();
+PngFilterType _filterType(int type) => type < PngFilterType.values.length
+    ? PngFilterType.values[type]
+    : throw const _InvalidData();
