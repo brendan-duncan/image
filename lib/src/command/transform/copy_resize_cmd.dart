@@ -9,13 +9,15 @@ class CopyResizeCmd extends Command {
   bool? maintainAspect;
   Color? backgroundColor;
   Interpolation interpolation;
+  bool linearBlend;
 
   CopyResizeCmd(Command? input,
       {this.width,
       this.height,
       this.maintainAspect,
       this.backgroundColor,
-      this.interpolation = Interpolation.nearest})
+      this.interpolation = Interpolation.nearest,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -27,7 +29,8 @@ class CopyResizeCmd extends Command {
             height: height,
             maintainAspect: maintainAspect,
             backgroundColor: backgroundColor,
-            interpolation: interpolation)
+            interpolation: interpolation,
+            linearBlend: linearBlend)
         : null;
   }
 }

@@ -9,13 +9,15 @@ class StretchDistortionCmd extends Command {
   Interpolation interpolation;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   StretchDistortionCmd(Command? input,
       {this.centerX,
       this.centerY,
       this.interpolation = Interpolation.nearest,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -28,7 +30,8 @@ class StretchDistortionCmd extends Command {
             centerY: centerY,
             interpolation: interpolation,
             mask: maskImg,
-            maskChannel: maskChannel)
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

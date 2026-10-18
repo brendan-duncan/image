@@ -112,5 +112,20 @@ class ImageDataFloat32 extends ImageData {
   String toString() => 'ImageDataFloat32($width, $height, $numChannels)';
 
   @override
-  void clear([Color? c]) {}
+  void clear([Color? c]) {
+    if (c == null) {
+      data.fillRange(0, data.length, 0);
+      return;
+    }
+    // A 2 channel image is grayscale+alpha.
+    final values = numChannels == 2
+        ? [c.rNormalized, c.aNormalized]
+        : [c.rNormalized, c.gNormalized, c.bNormalized, c.aNormalized];
+    final n = width * height * numChannels;
+    for (var i = 0; i < n; i += numChannels) {
+      for (var ch = 0; ch < numChannels; ++ch) {
+        data[i + ch] = values[ch].toDouble();
+      }
+    }
+  }
 }

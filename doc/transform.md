@@ -56,7 +56,8 @@ methods for most of these functions.
 
 ```dart
 Image copyResize(Image src, {int? width, int? height, bool? maintainAspect,
-    Color? backgroundColor, Interpolation interpolation = Interpolation.nearest})
+    Color? backgroundColor, Interpolation interpolation = Interpolation.nearest,
+    bool linearBlend = false})
 ```
 
 Returns a resized copy of `src`.
@@ -96,7 +97,8 @@ final thumb = img.copyResize(image,
 
 ```dart
 Image resize(Image src, {int? width, int? height, bool? maintainAspect,
-    Color? backgroundColor, Interpolation interpolation = Interpolation.nearest})
+    Color? backgroundColor, Interpolation interpolation = Interpolation.nearest,
+    bool linearBlend = false})
 ```
 
 Takes the same arguments as `copyResize` and produces the same result, but reuses the memory of
@@ -128,7 +130,7 @@ After an in-place resize the image keeps its original buffer, so the raw bytes f
 ```dart
 Image copyResizeCropSquare(Image src, {required int size,
     Interpolation interpolation = Interpolation.nearest, num radius = 0,
-    bool antialias = false})
+    bool antialias = false, bool linearBlend = false})
 ```
 
 Returns a `size` x `size` square copy: the image is scaled so its shorter side is `size`, and
@@ -162,6 +164,11 @@ pixels are computed from the source pixels.
 
 Images with a palette can't be blended, so they always use `nearest`. Convert them first
 (`image.convert(numChannels: 4)`) if you want smooth results.
+
+The resize, rotate and rectify functions also take `linearBlend` (default `false`). When it's
+`true`, colors are taken as sRGB and averaged as linear light, so shrunk images keep their bright
+details instead of darkening them. Alpha is unchanged. It's slower, especially for resizing, and
+has no effect with `Interpolation.nearest`.
 
 ## Cropping
 
@@ -268,7 +275,7 @@ final cropped = img.copyCrop(image,
 
 ```dart
 Image copyRotate(Image src, {required num angle,
-    Interpolation interpolation = Interpolation.nearest})
+    Interpolation interpolation = Interpolation.nearest, bool linearBlend = false})
 ```
 
 Returns a copy of `src` rotated clockwise by `angle` degrees. Negative angles rotate
@@ -388,7 +395,8 @@ resize it first, or use `copyResize` with `maintainAspect: true`.
 ```dart
 Image copyRectify(Image src, {required Point topLeft, required Point topRight,
     required Point bottomLeft, required Point bottomRight,
-    Interpolation interpolation = Interpolation.nearest, Image? toImage})
+    Interpolation interpolation = Interpolation.nearest, Image? toImage,
+    bool linearBlend = false})
 ```
 
 Maps the four-sided region of `src` with the given corners to a whole rectangular image. This

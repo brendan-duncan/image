@@ -11,6 +11,7 @@ class BulgeDistortionCmd extends Command {
   Interpolation interpolation;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   BulgeDistortionCmd(Command? input,
       {this.centerX,
@@ -19,7 +20,8 @@ class BulgeDistortionCmd extends Command {
       this.scale = 0.5,
       this.interpolation = Interpolation.nearest,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -34,7 +36,8 @@ class BulgeDistortionCmd extends Command {
             scale: scale,
             interpolation: interpolation,
             mask: maskImg,
-            maskChannel: maskChannel)
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

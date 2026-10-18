@@ -5,9 +5,12 @@ import '../command.dart';
 class CopyRotateCmd extends Command {
   num angle;
   Interpolation interpolation;
+  bool linearBlend;
 
   CopyRotateCmd(Command? input,
-      {required this.angle, this.interpolation = Interpolation.nearest})
+      {required this.angle,
+      this.interpolation = Interpolation.nearest,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -15,7 +18,10 @@ class CopyRotateCmd extends Command {
     await input?.execute();
     final img = input?.outputImage;
     outputImage = img != null
-        ? copyRotate(img, angle: angle, interpolation: interpolation)
+        ? copyRotate(img,
+            angle: angle,
+            interpolation: interpolation,
+            linearBlend: linearBlend)
         : null;
   }
 }

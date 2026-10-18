@@ -7,12 +7,14 @@ class PixelateCmd extends Command {
   g.PixelateMode mode;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   PixelateCmd(Command? input,
       {required this.size,
       this.mode = g.PixelateMode.upperLeft,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -21,7 +23,11 @@ class PixelateCmd extends Command {
     final maskImg = await mask?.getImage();
     outputImage = img != null
         ? g.pixelate(img,
-            size: size, mode: mode, mask: maskImg, maskChannel: maskChannel)
+            size: size,
+            mode: mode,
+            mask: maskImg,
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

@@ -7,9 +7,13 @@ class SeparableConvolutionCmd extends Command {
   g.SeparableKernel kernel;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   SeparableConvolutionCmd(Command? input,
-      {required this.kernel, this.mask, this.maskChannel = Channel.luminance})
+      {required this.kernel,
+      this.mask,
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -18,7 +22,10 @@ class SeparableConvolutionCmd extends Command {
     final maskImg = await mask?.getImage();
     outputImage = img != null
         ? g.separableConvolution(img,
-            kernel: kernel, mask: maskImg, maskChannel: maskChannel)
+            kernel: kernel,
+            mask: maskImg,
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

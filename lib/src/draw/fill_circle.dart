@@ -9,6 +9,10 @@ import 'draw_pixel.dart';
 
 /// Draw and fill a circle into the [image] with a center of [x],[y]
 /// and the given [radius] and [color].
+///
+/// If [linearBlend] is true, partly transparent and antialiased pixels are
+/// blended as linear light, the colors taken as sRGB, which is slower but
+/// keeps thin and soft edges from looking too dark.
 Image fillCircle(Image image,
     {required int x,
     required int y,
@@ -16,6 +20,7 @@ Image fillCircle(Image image,
     required Color color,
     bool antialias = false,
     BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   final radiusSqr = radius * radius;
@@ -32,7 +37,11 @@ Image fillCircle(Image image,
       if (a > 0) {
         final alpha = color.aNormalized * a;
         drawPixel(image, p.x, p.y, color,
-            alpha: alpha, blend: blend, mask: mask, maskChannel: maskChannel);
+            alpha: alpha,
+            blend: blend,
+            linearBlend: linearBlend,
+            mask: mask,
+            maskChannel: maskChannel);
       }
     } else {
       final dx = p.x - x;
@@ -40,7 +49,10 @@ Image fillCircle(Image image,
       final d2 = dx * dx + dy * dy;
       if (d2 < radiusSqr) {
         drawPixel(image, p.x, p.y, color,
-            blend: blend, mask: mask, maskChannel: maskChannel);
+            blend: blend,
+            linearBlend: linearBlend,
+            mask: mask,
+            maskChannel: maskChannel);
       }
     }
   }

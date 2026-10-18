@@ -10,8 +10,13 @@ Map<int, SeparableKernel> _gaussianKernelCache = {};
 /// Apply gaussian blur to the [src] image. [radius] determines how many pixels
 /// away from the current pixel should contribute to the blur, where 0 is no
 /// blur and the larger the radius, the stronger the blur.
+///
+/// If [linearBlend] is true, the colors, taken as sRGB, are averaged as linear
+/// light, which is slower but keeps bright details from fading into darker
+/// surroundings.
 Image gaussianBlur(Image src,
     {required int radius,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (radius <= 0) {
@@ -44,5 +49,8 @@ Image gaussianBlur(Image src,
   }
 
   return separableConvolution(src,
-      kernel: kernel, mask: mask, maskChannel: maskChannel);
+      kernel: kernel,
+      linearBlend: linearBlend,
+      mask: mask,
+      maskChannel: maskChannel);
 }

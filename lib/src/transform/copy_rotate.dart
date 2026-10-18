@@ -3,16 +3,33 @@ import 'dart:typed_data';
 
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '../util/_linear_rgb.dart';
 import '_pixel_bytes.dart';
 
 /// Returns a copy of the [src] image, rotated by [angle] degrees.
+///
+/// If [linearBlend] is true, the colors, taken as sRGB, are interpolated as
+/// linear light, which is slower but keeps fine bright details from
+/// darkening. It has no effect with [Interpolation.nearest].
 Image copyRotate(Image src,
-    {required num angle, Interpolation interpolation = Interpolation.nearest}) {
+    {required num angle,
+    Interpolation interpolation = Interpolation.nearest,
+    bool linearBlend = false}) {
   final num nAngle = angle % 360.0;
 
   // You can't interpolate index pixels
   if (src.hasPalette) {
     interpolation = Interpolation.nearest;
+  }
+
+  // Rotations by a multiple of 90 degrees move pixels without blending them.
+  if (linearBlend &&
+      interpolation != Interpolation.nearest &&
+      nAngle % 90.0 != 0.0) {
+    return srgbCopy(
+        copyRotate(linearRgbCopy(src),
+            angle: angle, interpolation: interpolation),
+        src.format);
   }
 
   // Optimized version for orthogonal angles.

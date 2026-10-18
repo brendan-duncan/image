@@ -15,6 +15,7 @@ class DrawRectCmd extends Command {
   BlendMode blend;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   DrawRectCmd(Command? input,
       {required this.x1,
@@ -26,7 +27,8 @@ class DrawRectCmd extends Command {
       this.radius = 0,
       this.blend = BlendMode.alpha,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -44,7 +46,8 @@ class DrawRectCmd extends Command {
             radius: radius,
             blend: blend,
             mask: maskImg,
-            maskChannel: maskChannel)
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

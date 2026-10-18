@@ -7,12 +7,14 @@ class CopyResizeCropSquareCmd extends Command {
   num radius;
   Interpolation interpolation;
   bool antialias;
+  bool linearBlend;
 
   CopyResizeCropSquareCmd(Command? input,
       {required this.size,
       this.radius = 0,
       this.interpolation = Interpolation.nearest,
-      this.antialias = true})
+      this.antialias = true,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -24,7 +26,8 @@ class CopyResizeCropSquareCmd extends Command {
             size: size,
             radius: radius,
             interpolation: interpolation,
-            antialias: antialias)
+            antialias: antialias,
+            linearBlend: linearBlend)
         : null;
   }
 }

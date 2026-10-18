@@ -3,6 +3,7 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
+import '../util/_linear_rgb.dart';
 import '../util/math_util.dart';
 
 num _smoothStep(num edge0, num edge1, num x) {
@@ -22,13 +23,28 @@ num _smoothStep(num edge0, num edge1, num x) {
 /// vignette effect where the [color] is fully applied. The radius values are in
 /// normalized percentage of the image size \[0, 1\].
 /// [amount] controls the blend of the effect with the original image.
+///
+/// If [linearBlend] is true, the colors, taken as sRGB, are blended as linear
+/// light, which is slower but darkens the way a lens does.
 Image vignette(Image src,
     {num start = 0.3,
     num end = 0.85,
     num amount = 0.9,
     Color? color,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (linearBlend) {
+    return filterLinear(
+        src,
+        (linear) => vignette(linear,
+            start: start,
+            end: end,
+            amount: amount,
+            color: linearColor(color),
+            mask: mask,
+            maskChannel: maskChannel));
+  }
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);
   }

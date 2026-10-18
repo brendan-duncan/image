@@ -127,5 +127,32 @@ void main() {
       // Blurring smooths high-frequency content → lower variance.
       expect(imageVariance(blurred), lessThan(imageVariance(src)));
     });
+
+    test('separableConvolution of float32 matches SeparableKernel.apply', () {
+      final kernel = _gaussianKernel(3);
+      final random = Random(1);
+      for (var nc = 1; nc <= 4; ++nc) {
+        final src = Image(
+            width: 23, height: 17, format: Format.float32, numChannels: nc);
+        for (final p in src) {
+          for (var c = 0; c < nc; ++c) {
+            p[c] = random.nextDouble();
+          }
+        }
+        final expected = src.clone();
+        final tmp = Image.from(expected);
+        kernel
+          ..apply(expected, tmp)
+          ..apply(tmp, expected, horizontal: false);
+
+        final result = separableConvolution(src.clone(), kernel: kernel);
+        for (final p in result) {
+          final e = expected.getPixel(p.x, p.y);
+          for (var c = 0; c < nc; ++c) {
+            expect(p[c], equals(e[c]), reason: '$nc channels at ${p.x},${p.y}');
+          }
+        }
+      }
+    });
   });
 }

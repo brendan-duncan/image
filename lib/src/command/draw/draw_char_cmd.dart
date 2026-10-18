@@ -14,6 +14,7 @@ class DrawCharCmd extends Command {
   BlendMode blend;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   DrawCharCmd(Command? input, this.char,
       {required this.font,
@@ -22,7 +23,8 @@ class DrawCharCmd extends Command {
       this.color,
       this.blend = BlendMode.alpha,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -37,7 +39,8 @@ class DrawCharCmd extends Command {
             color: color,
             blend: blend,
             mask: maskImg,
-            maskChannel: maskChannel)
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

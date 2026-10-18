@@ -146,6 +146,25 @@ num getLuminanceNormalized(Color c) =>
 /// Returns the luminance (grayscale) value of the color.
 num getLuminanceRgb(num r, num g, num b) => 0.299 * r + 0.587 * g + 0.114 * b;
 
+/// Converts a normalized sRGB color channel value to linear light, using the
+/// sRGB transfer function. 0.5 becomes about 0.214: the stored value halfway
+/// up is only about a fifth of the light. Values outside \[0, 1\] are
+/// extended, mirrored for negative values.
+double srgbToLinear(num c) {
+  final v = c.abs();
+  final l = v <= 0.04045 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4).toDouble();
+  return c < 0 ? -l : l;
+}
+
+/// Converts a normalized linear light color channel value to sRGB, the
+/// inverse of [srgbToLinear].
+double linearToSrgb(num c) {
+  final v = c.abs();
+  final s =
+      v <= 0.0031308 ? v * 12.92 : 1.055 * pow(v, 1 / 2.4).toDouble() - 0.055;
+  return c < 0 ? -s : s;
+}
+
 /// Convert an HSL color to RGB, where h is specified in normalized degrees
 /// \[0, 1\] (where 1 is 360-degrees); s and l are in the range \[0, 1\].
 /// Returns a list \[r, g, b\] with values in the range \[0, 255\].

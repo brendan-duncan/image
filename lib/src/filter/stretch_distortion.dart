@@ -1,15 +1,30 @@
 import '../color/channel.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '../util/_linear_rgb.dart';
 import '../util/math_util.dart';
 import '_frame_copy.dart';
 
+/// If [linearBlend] is true, the colors, taken as sRGB, are interpolated as
+/// linear light, which is slower but keeps fine bright details from
+/// darkening. It has no effect with [Interpolation.nearest].
 Image stretchDistortion(Image src,
     {int? centerX,
     int? centerY,
     Interpolation interpolation = Interpolation.nearest,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (linearBlend && interpolation != Interpolation.nearest) {
+    return filterLinear(
+        src,
+        (linear) => stretchDistortion(linear,
+            centerX: centerX,
+            centerY: centerY,
+            interpolation: interpolation,
+            mask: mask,
+            maskChannel: maskChannel));
+  }
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);
   }

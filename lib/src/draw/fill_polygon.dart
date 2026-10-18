@@ -9,9 +9,14 @@ import '../util/point.dart';
 import 'blend_mode.dart';
 
 /// Fill a polygon defined by the given [vertices].
+///
+/// If [linearBlend] is true, partly transparent and antialiased pixels are
+/// blended as linear light, the colors taken as sRGB, which is slower but
+/// keeps thin and soft edges from looking too dark.
 Image fillPolygon(Image src,
     {required List<Point> vertices,
     BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     required Color color,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
@@ -27,7 +32,10 @@ Image fillPolygon(Image src,
 
   if (numVertices == 1) {
     return drawPixel(src, vertices[0].xi, vertices[0].yi, color,
-        blend: blend, mask: mask, maskChannel: maskChannel);
+        blend: blend,
+        linearBlend: linearBlend,
+        mask: mask,
+        maskChannel: maskChannel);
   }
 
   if (numVertices == 2) {
@@ -38,6 +46,7 @@ Image fillPolygon(Image src,
         y2: vertices[1].yi,
         color: color,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -87,7 +96,10 @@ Image fillPolygon(Image src,
       // Even number of intersections means inside
       if (intersections & 0x1 == 1) {
         drawPixel(src, xi, yi, color,
-            blend: blend, mask: mask, maskChannel: maskChannel);
+            blend: blend,
+            linearBlend: linearBlend,
+            mask: mask,
+            maskChannel: maskChannel);
       }
     }
   }

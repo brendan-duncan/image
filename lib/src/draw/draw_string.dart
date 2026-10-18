@@ -13,6 +13,10 @@ import 'draw_pixel.dart';
 /// You can load your own font, or use one of the existing ones
 /// such as: arial14, arial24, or arial48.
 ///  Fonts can be create with a tool such as: https://ttf2fnt.com/
+///
+/// If [linearBlend] is true, partly transparent and antialiased pixels are
+/// blended as linear light, the colors taken as sRGB, which is slower but
+/// keeps thin and soft edges from looking too dark.
 Image drawString(Image image, String string,
     {required BitmapFont font,
     int? x,
@@ -21,6 +25,7 @@ Image drawString(Image image, String string,
     bool rightJustify = false,
     bool wrap = false,
     BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (blend == BlendMode.alpha && color?.a == 0) {
@@ -52,6 +57,7 @@ Image drawString(Image image, String string,
         y: sy,
         color: color,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel,
         rightJustify: rightJustify);
@@ -142,6 +148,7 @@ Image drawString(Image image, String string,
           drawPixel(image, xi + ch.xOffset, yi + ch.yOffset, p,
               filter: color,
               blend: blend,
+              linearBlend: linearBlend,
               mask: mask,
               maskChannel: maskChannel);
         }

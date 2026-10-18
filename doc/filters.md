@@ -17,7 +17,7 @@ void main() async {
 
 ## Contents
 
-- [How filters work](#how-filters-work): in-place modification, masks, `amount`, formats and speed
+- [How filters work](#how-filters-work): in-place modification, masks, `amount`, linear blending, formats and speed
 - [Color adjustment](#color-adjustment): [adjustColor](#adjustcolor), [colorOffset](#coloroffset),
   [contrast](#contrast), [gamma](#gamma), [grayscale](#grayscale), [invert](#invert),
   [monochrome](#monochrome), [scaleRgba](#scalergba), [sepia](#sepia), [bleachBypass](#bleachbypass),
@@ -101,6 +101,14 @@ effect. With a mask, the mask value and `amount` are multiplied.
 ```dart
 img.grayscale(image, amount: 0.5); // Half desaturated.
 ```
+
+### Linear blending
+
+`gaussianBlur`, `smooth`, `separableConvolution`, `pixelate`, `vignette`, `bulgeDistortion` and
+`stretchDistortion` take `linearBlend` (default `false`). When it's `true`, colors are taken as sRGB
+and averaged as linear light, so blurred images keep their bright details instead of darkening
+them. Alpha is unchanged. It's slower (roughly 2x for `gaussianBlur`). The distortions use it only
+when interpolating, not with `Interpolation.nearest`.
 
 ### Image formats and speed
 
@@ -459,8 +467,8 @@ img.copyImageChannels(rgba, from: matte, scaled: true, alpha: img.Channel.lumina
 ### [gaussianBlur](https://pub.dev/documentation/image/latest/image/gaussianBlur.html)
 
 ```dart
-Image gaussianBlur(Image src, {required int radius, Image? mask,
-    Channel maskChannel = Channel.luminance})
+Image gaussianBlur(Image src, {required int radius, bool linearBlend = false,
+    Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 ![gaussianBlur](images/filter/gaussianBlur.png)
@@ -477,8 +485,8 @@ img.gaussianBlur(image, radius: 5);
 ### [smooth](https://pub.dev/documentation/image/latest/image/smooth.html)
 
 ```dart
-Image smooth(Image src, {required num weight, Image? mask,
-    Channel maskChannel = Channel.luminance})
+Image smooth(Image src, {required num weight, bool linearBlend = false,
+    Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 ![smooth](images/filter/smooth.png)
@@ -520,7 +528,7 @@ img.convolution(image, filter: [0, 1, 0, 1, -4, 1, 0, 1, 0], offset: 128);
 
 ```dart
 Image separableConvolution(Image src, {required SeparableKernel kernel,
-    Image? mask, Channel maskChannel = Channel.luminance})
+    bool linearBlend = false, Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 ![separableConvolution](images/filter/separableConvolution.png)
@@ -660,7 +668,8 @@ img.dotScreen(image, angle: 45);
 enum PixelateMode { upperLeft, average }
 
 Image pixelate(Image src, {required int size, PixelateMode mode = PixelateMode.upperLeft,
-    num amount = 1, Image? mask, Channel maskChannel = Channel.luminance})
+    num amount = 1, bool linearBlend = false, Image? mask,
+    Channel maskChannel = Channel.luminance})
 ```
 
 ![pixelate](images/filter/pixelate_upperLeft.png)
@@ -709,7 +718,8 @@ img.chromaticAberration(image, shift: 3);
 
 ```dart
 Image vignette(Image src, {num start = 0.3, num end = 0.85, num amount = 0.9,
-    Color? color, Image? mask, Channel maskChannel = Channel.luminance})
+    Color? color, bool linearBlend = false, Image? mask,
+    Channel maskChannel = Channel.luminance})
 ```
 
 ![vignette](images/filter/vignette.png)
@@ -748,7 +758,7 @@ final withShadow = img.dropShadow(logo, 5, 5, 10);
 ```dart
 Image bulgeDistortion(Image src, {int? centerX, int? centerY, num? radius,
     num scale = 0.5, Interpolation interpolation = Interpolation.nearest,
-    Image? mask, Channel maskChannel = Channel.luminance})
+    bool linearBlend = false, Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 ![bulgeDistortion](images/filter/bulgeDistortion.png)
@@ -768,7 +778,7 @@ img.bulgeDistortion(image, scale: 0.8, interpolation: img.Interpolation.linear);
 ```dart
 Image stretchDistortion(Image src, {int? centerX, int? centerY,
     Interpolation interpolation = Interpolation.nearest,
-    Image? mask, Channel maskChannel = Channel.luminance})
+    bool linearBlend = false, Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 ![stretchDistortion](images/filter/stretchDistortion.png)

@@ -3,6 +3,7 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
+import '../util/color_util.dart';
 import '../util/math_util.dart';
 import 'blend_mode.dart';
 
@@ -10,6 +11,10 @@ import 'blend_mode.dart';
 /// If [filter] is provided, the color c will be scaled by the [filter]
 /// color. If [alpha] is provided, it will be used in place of the
 /// color alpha, as a normalized color value \[0, 1\].
+///
+/// If [linearBlend] is true, partly transparent pixels are blended as linear
+/// light, the colors taken as sRGB, which is slower but keeps thin and soft
+/// edges from looking too dark.
 Image drawPixel(Image image, int x, int y, Color c,
     {Color? filter,
     num? alpha,
@@ -238,17 +243,17 @@ Image drawPixel(Image image, int x, int y, Color c,
   final invA = 1.0 - overlayA;
 
   if (linearBlend) {
-    final lbr = pow(baseR, 2.2);
-    final lbg = pow(baseG, 2.2);
-    final lbb = pow(baseB, 2.2);
-    final lor = pow(overlayR, 2.2);
-    final log = pow(overlayG, 2.2);
-    final lob = pow(overlayB, 2.2);
+    final lbr = srgbToLinear(baseR);
+    final lbg = srgbToLinear(baseG);
+    final lbb = srgbToLinear(baseB);
+    final lor = srgbToLinear(overlayR);
+    final log = srgbToLinear(overlayG);
+    final lob = srgbToLinear(overlayB);
     final a = overlayA + baseA * invA;
     final s = a > 0 ? 1 / a : 0;
-    final r = pow((lor * overlayA + lbr * baseA * invA) * s, 1.0 / 2.2);
-    final g = pow((log * overlayA + lbg * baseA * invA) * s, 1.0 / 2.2);
-    final b = pow((lob * overlayA + lbb * baseA * invA) * s, 1.0 / 2.2);
+    final r = linearToSrgb((lor * overlayA + lbr * baseA * invA) * s);
+    final g = linearToSrgb((log * overlayA + lbg * baseA * invA) * s);
+    final b = linearToSrgb((lob * overlayA + lbb * baseA * invA) * s);
 
     dst
       ..rNormalized = r

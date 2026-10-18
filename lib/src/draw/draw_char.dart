@@ -7,12 +7,17 @@ import 'draw_pixel.dart';
 
 /// Draw a single character from [char] horizontally into [image] at position
 /// [x],[y] with the given [color].
+///
+/// If [linearBlend] is true, partly transparent and antialiased pixels are
+/// blended as linear light, the colors taken as sRGB, which is slower but
+/// keeps thin and soft edges from looking too dark.
 Image drawChar(Image image, String char,
     {required BitmapFont font,
     required int x,
     required int y,
     Color? color,
     BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   final c = char.codeUnits[0];
@@ -32,11 +37,15 @@ Image drawChar(Image image, String char,
         drawPixel(image, xi, yi, color,
             alpha: cp.aNormalized,
             blend: blend,
+            linearBlend: linearBlend,
             mask: mask,
             maskChannel: maskChannel);
       } else {
         drawPixel(image, xi, yi, cIter.current,
-            blend: blend, mask: mask, maskChannel: maskChannel);
+            blend: blend,
+            linearBlend: linearBlend,
+            mask: mask,
+            maskChannel: maskChannel);
       }
     }
   }

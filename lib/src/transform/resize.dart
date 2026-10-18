@@ -5,6 +5,7 @@ import '../color/format.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../image/pixel.dart';
+import '../util/_linear_rgb.dart';
 import '../util/image_exception.dart';
 import 'bake_orientation.dart';
 import 'copy_resize.dart';
@@ -13,14 +14,33 @@ import 'copy_resize.dart';
 /// image: other formats or options may require a separate image. In-place
 /// resizing mutates [src] and retains the original buffer capacity, so raw
 /// getBytes() may include bytes beyond the resized logical pixel range.
+///
+/// If [linearBlend] is true, the colors, taken as sRGB, are blended as linear
+/// light, which is slower but keeps fine bright details, such as text or
+/// highlights, from darkening as the image shrinks. It returns a new
+/// image, and has no effect with [Interpolation.nearest].
 Image resize(Image src,
     {int? width,
     int? height,
     bool? maintainAspect,
     Color? backgroundColor,
-    Interpolation interpolation = Interpolation.nearest}) {
+    Interpolation interpolation = Interpolation.nearest,
+    bool linearBlend = false}) {
   if (width == null && height == null) {
     throw ImageException('Invalid size');
+  }
+
+  if (linearBlend &&
+      interpolation != Interpolation.nearest &&
+      !src.hasPalette) {
+    return srgbCopy(
+        resize(linearRgbCopy(src),
+            width: width,
+            height: height,
+            maintainAspect: maintainAspect,
+            backgroundColor: linearColor(backgroundColor),
+            interpolation: interpolation),
+        src.format);
   }
 
   // You can't interpolate index pixels

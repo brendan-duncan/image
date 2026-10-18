@@ -3,6 +3,12 @@
 * PNGs with an unknown row filter type decode to null, like other invalid PNG data.
 * Check the zlib checksum of PNG, TIFF, EXR and ICC profile data.
 * `IccProfile.decompressed` throws `ImageException` for invalid data.
+* Add `srgbToLinear` and `linearToSrgb`.
+* Add optional `linearBlend` to resizing, blurring, rotating, `pixelate`, `vignette`, distortions and drawing, to blend colors as linear light.
+* `linearBlend` in `drawPixel` and `compositeImage` uses the sRGB curve instead of a 2.2 gamma.
+* Faster `gaussianBlur` and `separableConvolution` for float32 images.
+* Fix `clear` ignoring its color for float32 images.
+* Fix `CopyRectifyCmd` ignoring `interpolation`.
 
 # 4.12.0
 

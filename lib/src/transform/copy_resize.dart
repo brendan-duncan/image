@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../color/color.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '../util/_linear_rgb.dart';
 import '../util/image_exception.dart';
 import '_resize_bytes.dart';
 import 'bake_orientation.dart';
@@ -16,14 +17,33 @@ double _linear(
 /// ratio of [src] and [width].
 /// If [width] isn't specified, then it will be determined by the aspect ratio
 /// of [src] and [height].
+///
+/// If [linearBlend] is true, the colors, taken as sRGB, are blended as linear
+/// light, which is slower but keeps fine bright details, such as text or
+/// highlights, from darkening as the image shrinks. It has no effect with
+/// [Interpolation.nearest].
 Image copyResize(Image src,
     {int? width,
     int? height,
     bool? maintainAspect,
     Color? backgroundColor,
-    Interpolation interpolation = Interpolation.nearest}) {
+    Interpolation interpolation = Interpolation.nearest,
+    bool linearBlend = false}) {
   if (width == null && height == null) {
     throw ImageException('Invalid size');
+  }
+
+  if (linearBlend &&
+      interpolation != Interpolation.nearest &&
+      !src.hasPalette) {
+    return srgbCopy(
+        copyResize(linearRgbCopy(src),
+            width: width,
+            height: height,
+            maintainAspect: maintainAspect,
+            backgroundColor: linearColor(backgroundColor),
+            interpolation: interpolation),
+        src.format);
   }
 
   // You can't interpolate index pixels

@@ -52,9 +52,10 @@ Most drawing functions share these named parameters:
 | `mask` | `null` | An image that controls, per pixel, how much of the drawing is applied. See [Masks](#masks). |
 | `maskChannel` | `Channel.luminance` | Which channel of `mask` to use: `red`, `green`, `blue`, `alpha` or `luminance`. |
 
-`drawPixel` and `compositeImage` also take `linearBlend`. When it's `true`, colors are mixed in
-linear space (removing a 2.2 gamma first and reapplying it afterwards), which gives more
-physically accurate blends of bright and dark colors, at some cost in speed.
+`drawPixel`, `compositeImage` and the line, rectangle, circle, polygon and text functions also
+take `linearBlend`. When it's `true`, colors are mixed in linear light (converting from sRGB
+first and back afterwards, with `srgbToLinear` and `linearToSrgb`), which gives more physically
+accurate blends of bright and dark colors, at some cost in speed.
 
 ### Blend modes
 
@@ -144,8 +145,8 @@ img.drawPixel(image, 11, 10, img.ColorRgb8(255, 0, 0), alpha: 0.25);
 ```dart
 Image drawLine(Image image, {required int x1, required int y1, required int x2,
     required int y2, required Color color, bool antialias = false,
-    num thickness = 1, BlendMode blend = BlendMode.alpha, Image? mask,
-    Channel maskChannel = Channel.luminance})
+    num thickness = 1, BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false, Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 Draws a line from (`x1`, `y1`) to (`x2`, `y2`), including both end points. `thickness` is the
@@ -166,8 +167,8 @@ img.drawLine(image, x1: 0, y1: 0, x2: 99, y2: 49,
 ```dart
 Image drawRect(Image dst, {required int x1, required int y1, required int x2,
     required int y2, required Color color, num thickness = 1, num radius = 0,
-    BlendMode blend = BlendMode.alpha, Image? mask,
-    Channel maskChannel = Channel.luminance})
+    BlendMode blend = BlendMode.alpha, bool linearBlend = false,
+    Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 Draws the outline of the rectangle with corners (`x1`, `y1`) and (`x2`, `y2`). The corners can
@@ -213,8 +214,8 @@ img.fillRect(image, x1: 0, y1: 0, x2: 31, y2: 31,
 ```dart
 Image drawCircle(Image image, {required int x, required int y,
     required int radius, required Color color, bool antialias = false,
-    BlendMode blend = BlendMode.alpha, Image? mask,
-    Channel maskChannel = Channel.luminance})
+    BlendMode blend = BlendMode.alpha, bool linearBlend = false,
+    Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 Draws a 1 pixel wide circle outline centered at (`x`, `y`). `antialias` smooths the outline.
@@ -226,8 +227,8 @@ Draws a 1 pixel wide circle outline centered at (`x`, `y`). `antialias` smooths 
 ```dart
 Image fillCircle(Image image, {required int x, required int y,
     required int radius, required Color color, bool antialias = false,
-    BlendMode blend = BlendMode.alpha, Image? mask,
-    Channel maskChannel = Channel.luminance})
+    BlendMode blend = BlendMode.alpha, bool linearBlend = false,
+    Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 Fills a circle centered at (`x`, `y`). `antialias` smooths the edge.
@@ -251,8 +252,8 @@ vertex is joined to the first.
 ```dart
 Image drawPolygon(Image src, {required List<Point> vertices,
     required Color color, bool antialias = false, num thickness = 1,
-    BlendMode blend = BlendMode.alpha, Image? mask,
-    Channel maskChannel = Channel.luminance})
+    BlendMode blend = BlendMode.alpha, bool linearBlend = false,
+    Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 Draws the outline of the polygon, using [drawLine](#drawline) for each edge, with the given
@@ -264,8 +265,8 @@ Draws the outline of the polygon, using [drawLine](#drawline) for each edge, wit
 
 ```dart
 Image fillPolygon(Image src, {required List<Point> vertices,
-    BlendMode blend = BlendMode.alpha, required Color color, Image? mask,
-    Channel maskChannel = Channel.luminance})
+    BlendMode blend = BlendMode.alpha, bool linearBlend = false,
+    required Color color, Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 Fills the polygon. Pixels whose centers are inside the shape are filled, using the even-odd
@@ -351,8 +352,8 @@ img.fill(image, color: img.ColorRgb8(255, 0, 0), mask: maskImage);
 ```dart
 Image drawString(Image image, String string, {required BitmapFont font,
     int? x, int? y, Color? color, bool rightJustify = false, bool wrap = false,
-    BlendMode blend = BlendMode.alpha, Image? mask,
-    Channel maskChannel = Channel.luminance})
+    BlendMode blend = BlendMode.alpha, bool linearBlend = false,
+    Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 Draws text with a bitmap font. Leave out `x` or `y` to center the text horizontally or
@@ -372,8 +373,8 @@ img.drawString(image, 'Centered', font: img.arial48); // centered in the image
 ```dart
 Image drawChar(Image image, String char, {required BitmapFont font,
     required int x, required int y, Color? color,
-    BlendMode blend = BlendMode.alpha, Image? mask,
-    Channel maskChannel = Channel.luminance})
+    BlendMode blend = BlendMode.alpha, bool linearBlend = false,
+    Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
 Draws the first character of `char` with its top-left corner at (`x`, `y`).

@@ -303,17 +303,17 @@ See [Drawing Functions](draw.md).
 | Command |
 |---|
 | `compositeImage(Command? src, {int? dstX, int? dstY, int? dstW, int? dstH, int? srcX, int? srcY, int? srcW, int? srcH, BlendMode blend = BlendMode.alpha, bool linearBlend = false, bool center = false, Command? mask, Channel maskChannel = Channel.luminance})` |
-| `drawChar(String char, {required BitmapFont font, required int x, required int y, Color? color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
-| `drawCircle({required int x, required int y, required int radius, required Color color, bool antialias = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
-| `drawLine({required int x1, required int y1, required int x2, required int y2, required Color color, bool antialias = false, num thickness = 1, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawChar(String char, {required BitmapFont font, required int x, required int y, Color? color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
+| `drawCircle({required int x, required int y, required int radius, required Color color, bool antialias = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
+| `drawLine({required int x1, required int y1, required int x2, required int y2, required Color color, bool antialias = false, num thickness = 1, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `drawPixel(int x, int y, Color color, {BlendMode blend = BlendMode.alpha, bool linearBlend = false, Command? mask, Channel maskChannel = Channel.luminance})` |
-| `drawPolygon({required List<Point> vertices, required Color color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
-| `drawRect({required int x1, required int y1, required int x2, required int y2, required Color color, num radius = 0, num thickness = 1, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
-| `drawString(String string, {required BitmapFont font, int? x, int? y, Color? color, bool wrap = false, bool rightJustify = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawPolygon({required List<Point> vertices, required Color color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
+| `drawRect({required int x1, required int y1, required int x2, required int y2, required Color color, num radius = 0, num thickness = 1, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
+| `drawString(String string, {required BitmapFont font, int? x, int? y, Color? color, bool wrap = false, bool rightJustify = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `fill({required Color color, Command? mask, Channel maskChannel = Channel.luminance})` |
-| `fillCircle({required int x, required int y, required int radius, required Color color, bool antialias = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `fillCircle({required int x, required int y, required int radius, required Color color, bool antialias = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `fillFlood({required int x, required int y, required Color color, num threshold = 0.0, bool compareAlpha = false, Command? mask, Channel maskChannel = Channel.luminance})` |
-| `fillPolygon({required List<Point> vertices, required Color color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `fillPolygon({required List<Point> vertices, required Color color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `fillRect({required int x1, required int y1, required int x2, required int y2, required Color color, num radius = 0, Command? mask, Channel maskChannel = Channel.luminance})` |
 
 ### Filter commands
@@ -326,7 +326,7 @@ See [Image Processing](filters.md). Every filter with a `mask` parameter also ta
 | `adjustColor({Color? blacks, Color? whites, Color? mids, num? contrast, num? saturation, num? brightness, num? gamma, num? exposure, num? hue, num amount = 1, Command? mask})` |
 | `billboard({num grid = 10, num amount = 1, Command? mask})` |
 | `bleachBypass({num amount = 1, Command? mask})` |
-| `bulgeDistortion({int? centerX, int? centerY, num? radius, num scale = 0.5, Interpolation interpolation = Interpolation.nearest, Command? mask})` |
+| `bulgeDistortion({int? centerX, int? centerY, num? radius, num scale = 0.5, Interpolation interpolation = Interpolation.nearest, Command? mask, bool linearBlend = false})` |
 | `bumpToNormal({num strength = 2})` |
 | `chromaticAberration({int shift = 5, Command? mask})` |
 | `colorHalftone({num amount = 1, int? centerX, int? centerY, num angle = 180, num size = 5, Command? mask})` |
@@ -340,7 +340,7 @@ See [Image Processing](filters.md). Every filter with a `mask` parameter also ta
 | `edgeGlow({num amount = 1, Command? mask})` |
 | `emboss({num amount = 1, Command? mask})` |
 | `gamma({required num gamma, Command? mask})` |
-| `gaussianBlur({required int radius, Command? mask})` |
+| `gaussianBlur({required int radius, Command? mask, bool linearBlend = false})` |
 | `grayscale({num amount = 1, Command? mask})` |
 | `hdrToLdr({num? exposure})` |
 | `hexagonPixelate({int? centerX, int? centerY, int size = 5, num amount = 1, Command? mask})` |
@@ -349,18 +349,18 @@ See [Image Processing](filters.md). Every filter with a `mask` parameter also ta
 | `monochrome({Color? color, num amount = 1, Command? mask})` |
 | `noise(num sigma, {NoiseType type = NoiseType.gaussian, Random? random, Command? mask})` |
 | `normalize({required num min, required num max, Command? mask})` |
-| `pixelate({required int size, PixelateMode mode = PixelateMode.upperLeft, Command? mask})` |
+| `pixelate({required int size, PixelateMode mode = PixelateMode.upperLeft, Command? mask, bool linearBlend = false})` |
 | `quantize({int numberOfColors = 256, QuantizeMethod method = QuantizeMethod.neuralNet, DitherKernel dither = DitherKernel.none, DitherScanOrder? ditherScanOrder})` (the older `bool ditherSerpentine` is also accepted) |
 | `reinhardTonemap({Command? mask})` |
 | `remapColors({Channel red = Channel.red, Channel green = Channel.green, Channel blue = Channel.blue, Channel alpha = Channel.alpha})` |
 | `scaleRgba({required Color scale, Command? mask})` |
-| `separableConvolution({required SeparableKernel kernel, Command? mask})` |
+| `separableConvolution({required SeparableKernel kernel, Command? mask, bool linearBlend = false})` |
 | `sepia({num amount = 1, Command? mask})` |
 | `sketch({num amount = 1, Command? mask})` |
-| `smooth({required num weight, Command? mask})` |
+| `smooth({required num weight, Command? mask, bool linearBlend = false})` |
 | `sobel({num amount = 1, Command? mask})` |
-| `stretchDistortion({int? centerX, int? centerY, Interpolation interpolation = Interpolation.nearest, Command? mask})` |
-| `vignette({num start = 0.3, num end = 0.75, Color? color, num amount = 0.8, Command? mask})` |
+| `stretchDistortion({int? centerX, int? centerY, Interpolation interpolation = Interpolation.nearest, Command? mask, bool linearBlend = false})` |
+| `vignette({num start = 0.3, num end = 0.75, Color? color, num amount = 0.8, Command? mask, bool linearBlend = false})` |
 
 Note that the `vignette` command's defaults (`end: 0.75`, `amount: 0.8`) differ from the `vignette` function's
 (`end: 0.85`, `amount: 0.9`). Pass the values explicitly if you need identical results.
@@ -376,10 +376,10 @@ See [Transform Functions](transform.md).
 | `copyCropCircle({int? radius, int? centerX, int? centerY, bool antialias = true})` |
 | `copyExpandCanvas({int? newWidth, int? newHeight, int? padding, ExpandCanvasPosition position = ExpandCanvasPosition.center, Color? backgroundColor, Image? toImage})` |
 | `copyFlip({required FlipDirection direction})` |
-| `copyRectify({required Point topLeft, required Point topRight, required Point bottomLeft, required Point bottomRight, Interpolation interpolation = Interpolation.nearest})` |
-| `copyResize({int? width, int? height, bool? maintainAspect, Color? backgroundColor, Interpolation interpolation = Interpolation.nearest})` |
-| `copyResizeCropSquare({required int size, num radius = 0, Interpolation interpolation = Interpolation.nearest, bool antialias = true})` |
-| `copyRotate({required num angle, Interpolation interpolation = Interpolation.nearest})` |
+| `copyRectify({required Point topLeft, required Point topRight, required Point bottomLeft, required Point bottomRight, Interpolation interpolation = Interpolation.nearest, bool linearBlend = false})` |
+| `copyResize({int? width, int? height, bool? maintainAspect, Color? backgroundColor, Interpolation interpolation = Interpolation.nearest, bool linearBlend = false})` |
+| `copyResizeCropSquare({required int size, num radius = 0, Interpolation interpolation = Interpolation.nearest, bool antialias = true, bool linearBlend = false})` |
+| `copyRotate({required num angle, Interpolation interpolation = Interpolation.nearest, bool linearBlend = false})` |
 | `flip({required FlipDirection direction})` |
 | `trim({TrimMode mode = TrimMode.transparent, Trim sides = Trim.all})` |
 

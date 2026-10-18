@@ -12,6 +12,10 @@ import 'fill_circle.dart';
 ///
 /// If [antialias] is true then the line is drawn with smooth edges.
 /// [thickness] determines how thick the line should be drawn, in pixels.
+///
+/// If [linearBlend] is true, partly transparent and antialiased pixels are
+/// blended as linear light, the colors taken as sRGB, which is slower but
+/// keeps thin and soft edges from looking too dark.
 Image drawLine(Image image,
     {required int x1,
     required int y1,
@@ -21,6 +25,7 @@ Image drawLine(Image image,
     bool antialias = false,
     num thickness = 1,
     BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   final line = [x1, y1, x2, y2];
@@ -42,13 +47,17 @@ Image drawLine(Image image,
   if (dx == 0 && dy == 0) {
     thickness == 1
         ? drawPixel(image, x1, y1, color,
-            blend: blend, mask: mask, maskChannel: maskChannel)
+            blend: blend,
+            linearBlend: linearBlend,
+            mask: mask,
+            maskChannel: maskChannel)
         : fillCircle(image,
             x: x1,
             y: y1,
             radius: radius,
             color: color,
             blend: blend,
+            linearBlend: linearBlend,
             mask: mask,
             maskChannel: maskChannel);
     return image;
@@ -60,11 +69,17 @@ Image drawLine(Image image,
       for (var y = y2; y <= y1; ++y) {
         if (thickness <= 1) {
           drawPixel(image, x1, y, color,
-              blend: blend, mask: mask, maskChannel: maskChannel);
+              blend: blend,
+              linearBlend: linearBlend,
+              mask: mask,
+              maskChannel: maskChannel);
         } else {
           for (var i = 0; i < thickness; i++) {
             drawPixel(image, x1 - radius + i, y, color,
-                blend: blend, mask: mask, maskChannel: maskChannel);
+                blend: blend,
+                linearBlend: linearBlend,
+                mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
@@ -72,11 +87,17 @@ Image drawLine(Image image,
       for (var y = y1; y <= y2; ++y) {
         if (thickness <= 1) {
           drawPixel(image, x1, y, color,
-              blend: blend, mask: mask, maskChannel: maskChannel);
+              blend: blend,
+              linearBlend: linearBlend,
+              mask: mask,
+              maskChannel: maskChannel);
         } else {
           for (var i = 0; i < thickness; i++) {
             drawPixel(image, x1 - radius + i, y, color,
-                blend: blend, mask: mask, maskChannel: maskChannel);
+                blend: blend,
+                linearBlend: linearBlend,
+                mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
@@ -87,11 +108,17 @@ Image drawLine(Image image,
       for (var x = x2; x <= x1; ++x) {
         if (thickness <= 1) {
           drawPixel(image, x, y1, color,
-              blend: blend, mask: mask, maskChannel: maskChannel);
+              blend: blend,
+              linearBlend: linearBlend,
+              mask: mask,
+              maskChannel: maskChannel);
         } else {
           for (var i = 0; i < thickness; i++) {
             drawPixel(image, x, y1 - radius + i, color,
-                blend: blend, mask: mask, maskChannel: maskChannel);
+                blend: blend,
+                linearBlend: linearBlend,
+                mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
@@ -99,11 +126,17 @@ Image drawLine(Image image,
       for (var x = x1; x <= x2; ++x) {
         if (thickness <= 1) {
           drawPixel(image, x, y1, color,
-              blend: blend, mask: mask, maskChannel: maskChannel);
+              blend: blend,
+              linearBlend: linearBlend,
+              mask: mask,
+              maskChannel: maskChannel);
         } else {
           for (var i = 0; i < thickness; i++) {
             drawPixel(image, x, y1 - radius + i, color,
-                blend: blend, mask: mask, maskChannel: maskChannel);
+                blend: blend,
+                linearBlend: linearBlend,
+                mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
@@ -154,7 +187,10 @@ Image drawLine(Image image,
       var wstart = y - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
         drawPixel(image, x, w, color,
-            blend: blend, mask: mask, maskChannel: maskChannel);
+            blend: blend,
+            linearBlend: linearBlend,
+            mask: mask,
+            maskChannel: maskChannel);
       }
 
       if (((y2 - y1) * ydirflag) > 0) {
@@ -169,7 +205,10 @@ Image drawLine(Image image,
           wstart = y - wid ~/ 2;
           for (var w = wstart; w < wstart + wid; w++) {
             drawPixel(image, x, w, color,
-                blend: blend, mask: mask, maskChannel: maskChannel);
+                blend: blend,
+                linearBlend: linearBlend,
+                mask: mask,
+                maskChannel: maskChannel);
           }
         }
       } else {
@@ -184,7 +223,10 @@ Image drawLine(Image image,
           wstart = y - wid ~/ 2;
           for (var w = wstart; w < wstart + wid; w++) {
             drawPixel(image, x, w, color,
-                blend: blend, mask: mask, maskChannel: maskChannel);
+                blend: blend,
+                linearBlend: linearBlend,
+                mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
@@ -223,7 +265,10 @@ Image drawLine(Image image,
       var wstart = x - wid ~/ 2;
       for (var w = wstart; w < wstart + wid; w++) {
         drawPixel(image, w, y, color,
-            blend: blend, mask: mask, maskChannel: maskChannel);
+            blend: blend,
+            linearBlend: linearBlend,
+            mask: mask,
+            maskChannel: maskChannel);
       }
 
       if (((x2 - x1) * xdirflag) > 0) {
@@ -238,7 +283,10 @@ Image drawLine(Image image,
           wstart = x - wid ~/ 2;
           for (var w = wstart; w < wstart + wid; w++) {
             drawPixel(image, w, y, color,
-                blend: blend, mask: mask, maskChannel: maskChannel);
+                blend: blend,
+                linearBlend: linearBlend,
+                mask: mask,
+                maskChannel: maskChannel);
           }
         }
       } else {
@@ -253,7 +301,10 @@ Image drawLine(Image image,
           wstart = x - wid ~/ 2;
           for (var w = wstart; w < wstart + wid; w++) {
             drawPixel(image, w, y, color,
-                blend: blend, mask: mask, maskChannel: maskChannel);
+                blend: blend,
+                linearBlend: linearBlend,
+                mask: mask,
+                maskChannel: maskChannel);
           }
         }
       }
@@ -272,6 +323,7 @@ Image drawLine(Image image,
       y2: y2,
       color: color,
       blend: blend,
+      linearBlend: linearBlend,
     );
   }
 
@@ -309,12 +361,14 @@ Image drawLine(Image image,
         drawPixel(image, x, w, color,
             alpha: ((frac >> 8) & 0xff) / 255,
             blend: blend,
+            linearBlend: linearBlend,
             mask: mask,
             maskChannel: maskChannel);
 
         drawPixel(image, x, w + 1, color,
             alpha: ((xor(frac) >> 8) & 0xff) / 255,
             blend: blend,
+            linearBlend: linearBlend,
             mask: mask,
             maskChannel: maskChannel);
       }
@@ -381,6 +435,7 @@ Image _drawLineWu(Image image,
     required int y2,
     required Color color,
     BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   final bool steep = (y2 - y1).abs() > (x2 - x1).abs();
@@ -417,24 +472,28 @@ Image _drawLineWu(Image image,
     drawPixel(image, ypxl1, xpxl1, color,
         alpha: (1 - (yend - yend.floor())) * xgap,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel);
 
     drawPixel(image, ypxl1 + 1, xpxl1, color,
         alpha: (yend - yend.floor()) * xgap,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel);
   } else {
     drawPixel(image, xpxl1, ypxl1, color,
         alpha: (1 - (yend - yend.floor())) * xgap,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel);
 
     drawPixel(image, xpxl1, ypxl1 + 1, color,
         alpha: (yend - yend.floor()) * xgap,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -452,12 +511,14 @@ Image _drawLineWu(Image image,
     drawPixel(image, ypxl2, xpxl2, color,
         alpha: (1.0 - (yend - yend.floor())) * xgap,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel);
 
     drawPixel(image, ypxl2 + 1, xpxl2, color,
         alpha: (yend - yend.floor()) * xgap,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel);
 
@@ -466,12 +527,14 @@ Image _drawLineWu(Image image,
       drawPixel(image, intery.floor(), x, color,
           alpha: 1.0 - (intery - intery.floor()),
           blend: blend,
+          linearBlend: linearBlend,
           mask: mask,
           maskChannel: maskChannel);
 
       drawPixel(image, intery.floor() + 1, x, color,
           alpha: intery - intery.floor(),
           blend: blend,
+          linearBlend: linearBlend,
           mask: mask,
           maskChannel: maskChannel);
 
@@ -481,12 +544,14 @@ Image _drawLineWu(Image image,
     drawPixel(image, xpxl2, ypxl2, color,
         alpha: (1.0 - (yend - yend.floor())) * xgap,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel);
 
     drawPixel(image, xpxl2, ypxl2 + 1, color,
         alpha: (yend - yend.floor()) * xgap,
         blend: blend,
+        linearBlend: linearBlend,
         mask: mask,
         maskChannel: maskChannel);
 
@@ -495,12 +560,14 @@ Image _drawLineWu(Image image,
       drawPixel(image, x, intery.floor(), color,
           alpha: 1.0 - (intery - intery.floor()),
           blend: blend,
+          linearBlend: linearBlend,
           mask: mask,
           maskChannel: maskChannel);
 
       drawPixel(image, x, intery.floor() + 1, color,
           alpha: intery - intery.floor(),
           blend: blend,
+          linearBlend: linearBlend,
           mask: mask,
           maskChannel: maskChannel);
 

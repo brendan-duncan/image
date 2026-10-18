@@ -6,9 +6,13 @@ class SmoothCmd extends Command {
   num weight;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   SmoothCmd(Command? input,
-      {required this.weight, this.mask, this.maskChannel = Channel.luminance})
+      {required this.weight,
+      this.mask,
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -16,7 +20,11 @@ class SmoothCmd extends Command {
     final img = await input?.getImage();
     final maskImg = await mask?.getImage();
     outputImage = img != null
-        ? g.smooth(img, weight: weight, mask: maskImg, maskChannel: maskChannel)
+        ? g.smooth(img,
+            weight: weight,
+            mask: maskImg,
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

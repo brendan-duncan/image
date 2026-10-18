@@ -10,6 +10,7 @@ class VignetteCmd extends Command {
   Color? color;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   VignetteCmd(Command? input,
       {this.start = 0.3,
@@ -17,7 +18,8 @@ class VignetteCmd extends Command {
       this.color,
       this.amount = 0.8,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -31,7 +33,8 @@ class VignetteCmd extends Command {
             color: color,
             amount: amount,
             mask: maskImg,
-            maskChannel: maskChannel)
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

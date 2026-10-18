@@ -23,31 +23,48 @@ Image drawAntialiasCircle(Image image,
     required Color color,
     int quadrants = allQuadrants,
     BlendMode blend = BlendMode.alpha,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   void drawPixel4(int x, int y, int dx, int dy, num alpha) {
     // bottom right
     if (quadrants & bottomRightQuadrant != 0) {
       drawPixel(image, x + dx, y + dy, color,
-          alpha: alpha, blend: blend, mask: mask, maskChannel: maskChannel);
+          alpha: alpha,
+          blend: blend,
+          linearBlend: linearBlend,
+          mask: mask,
+          maskChannel: maskChannel);
     }
 
     // bottom left
     if (quadrants & bottomLeftQuadrant != 0) {
       drawPixel(image, x - dx, y + dy, color,
-          alpha: alpha, blend: blend, mask: mask, maskChannel: maskChannel);
+          alpha: alpha,
+          blend: blend,
+          linearBlend: linearBlend,
+          mask: mask,
+          maskChannel: maskChannel);
     }
 
     // upper right
     if (quadrants & topRightQuadrant != 0) {
       drawPixel(image, x + dx, y - dy, color,
-          alpha: alpha, blend: blend, mask: mask, maskChannel: maskChannel);
+          alpha: alpha,
+          blend: blend,
+          linearBlend: linearBlend,
+          mask: mask,
+          maskChannel: maskChannel);
     }
 
     // upper left
     if (quadrants & topLeftQuadrant != 0) {
       drawPixel(image, x - dx, y - dy, color,
-          alpha: alpha, blend: blend, mask: mask, maskChannel: maskChannel);
+          alpha: alpha,
+          blend: blend,
+          linearBlend: linearBlend,
+          mask: mask,
+          maskChannel: maskChannel);
     }
   }
 

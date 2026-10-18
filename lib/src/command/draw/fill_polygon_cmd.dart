@@ -11,13 +11,15 @@ class FillPolygonCmd extends Command {
   BlendMode blend;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   FillPolygonCmd(Command? input,
       {required this.vertices,
       required this.color,
       this.blend = BlendMode.alpha,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -30,7 +32,8 @@ class FillPolygonCmd extends Command {
             color: color,
             blend: blend,
             mask: maskImg,
-            maskChannel: maskChannel)
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

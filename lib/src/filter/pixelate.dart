@@ -1,5 +1,6 @@
 import '../color/channel.dart';
 import '../image/image.dart';
+import '../util/_linear_rgb.dart';
 import '../util/math_util.dart';
 
 enum PixelateMode {
@@ -17,14 +18,28 @@ enum PixelateMode {
 /// block will be used for the block color. Otherwise if [mode] is
 /// [PixelateMode.average], the average of all the pixels in the block will be
 /// used for the block color.
+///
+/// If [linearBlend] is true, the colors, taken as sRGB, are averaged and mixed
+/// as linear light, which is slower but keeps the blocks from darkening.
 Image pixelate(Image src,
     {required int size,
     PixelateMode mode = PixelateMode.upperLeft,
     num amount = 1,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (size <= 1) {
     return src;
+  }
+  if (linearBlend) {
+    return filterLinear(
+        src,
+        (linear) => pixelate(linear,
+            size: size,
+            mode: mode,
+            amount: amount,
+            mask: mask,
+            maskChannel: maskChannel));
   }
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);

@@ -3,17 +3,34 @@ import 'dart:math';
 import '../color/channel.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '../util/_linear_rgb.dart';
 import '../util/math_util.dart';
 import '_frame_copy.dart';
 
+/// If [linearBlend] is true, the colors, taken as sRGB, are interpolated as
+/// linear light, which is slower but keeps fine bright details from
+/// darkening. It has no effect with [Interpolation.nearest].
 Image bulgeDistortion(Image src,
     {int? centerX,
     int? centerY,
     num? radius,
     num scale = 0.5,
     Interpolation interpolation = Interpolation.nearest,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (linearBlend && interpolation != Interpolation.nearest) {
+    return filterLinear(
+        src,
+        (linear) => bulgeDistortion(linear,
+            centerX: centerX,
+            centerY: centerY,
+            radius: radius,
+            scale: scale,
+            interpolation: interpolation,
+            mask: mask,
+            maskChannel: maskChannel));
+  }
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);
   }

@@ -22,6 +22,10 @@ import 'draw_pixel.dart';
 /// but if the regions overlap the results will be unpredictable.
 ///
 /// if [center] is true, the [src] will be centered in [dst].
+///
+/// If [linearBlend] is true, partly transparent pixels are blended as linear
+/// light, the colors taken as sRGB, which is slower but keeps thin and soft
+/// edges from looking too dark.
 Image compositeImage(Image dst, Image src,
     {int? dstX,
     int? dstY,

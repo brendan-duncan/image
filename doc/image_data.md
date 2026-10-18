@@ -322,7 +322,8 @@ used by `getChannel`, by the `maskChannel` parameter of filters, and by `remapCo
 | `luminance` | Not stored; the brightness computed from red, green and blue. |
 
 Color utilities such as `rgbToHsl`, `hslToRgb`, `rgbToHsv`, `hsvToRgb`, `rgbToLab`, `labToRgb`, `cmykToRgb`,
-`getLuminanceRgb`, `rgbaToUint32` and `uint32ToRed` are also exported; see the
+`getLuminanceRgb`, `rgbaToUint32` and `uint32ToRed` are also exported, as are `srgbToLinear` and
+`linearToSrgb`, which convert normalized color values between sRGB and linear light; see the
 [API reference](https://pub.dev/documentation/image/latest/image/image-library.html).
 
 ## Pixel access

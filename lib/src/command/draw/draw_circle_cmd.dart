@@ -13,6 +13,7 @@ class DrawCircleCmd extends Command {
   BlendMode blend;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   DrawCircleCmd(Command? input,
       {required this.x,
@@ -22,7 +23,8 @@ class DrawCircleCmd extends Command {
       this.antialias = false,
       this.blend = BlendMode.alpha,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -38,7 +40,8 @@ class DrawCircleCmd extends Command {
             antialias: antialias,
             blend: blend,
             mask: maskImg,
-            maskChannel: maskChannel)
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

@@ -3,16 +3,35 @@ import 'dart:typed_data';
 import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../util/_circle_test.dart';
+import '../util/_linear_rgb.dart';
 import '../util/image_exception.dart';
 
 /// Returns a resized and square cropped copy of the [src] image of [size] size.
+///
+/// If [linearBlend] is true, the colors, taken as sRGB, are blended as linear
+/// light, which is slower but keeps fine bright details, such as text or
+/// highlights, from darkening as the image shrinks. It has no effect with
+/// [Interpolation.nearest].
 Image copyResizeCropSquare(Image src,
     {required int size,
     Interpolation interpolation = Interpolation.nearest,
     num radius = 0,
-    bool antialias = false}) {
+    bool antialias = false,
+    bool linearBlend = false}) {
   if (size <= 0) {
     throw ImageException('Invalid size');
+  }
+
+  if (linearBlend &&
+      interpolation != Interpolation.nearest &&
+      !src.hasPalette) {
+    return srgbCopy(
+        copyResizeCropSquare(linearRgbCopy(src),
+            size: size,
+            interpolation: interpolation,
+            radius: radius,
+            antialias: antialias),
+        src.format);
   }
 
   // You can't interpolate index pixels

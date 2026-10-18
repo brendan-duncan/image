@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import '../color/channel.dart';
 import '../color/format.dart';
 import '../image/image.dart';
+import '../image/image_data_float32.dart';
+import '../util/_linear_rgb.dart';
 import '_reflect_index.dart';
 import 'separable_kernel.dart';
 
@@ -10,15 +12,27 @@ import 'separable_kernel.dart';
 /// given [kernel].
 ///
 /// gaussianBlur is an example of such a filter.
+///
+/// If [linearBlend] is true, the colors, taken as sRGB, are filtered as linear
+/// light, which is slower but keeps bright details from fading into darker
+/// surroundings.
 Image separableConvolution(Image src,
     {required SeparableKernel kernel,
+    bool linearBlend = false,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
+  if (linearBlend) {
+    return filterLinear(
+        src,
+        (linear) => separableConvolution(linear,
+            kernel: kernel, mask: mask, maskChannel: maskChannel));
+  }
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);
   }
   for (final frame in src.frames) {
-    if (mask == null && _convolveUint8(frame, kernel)) {
+    if (mask == null &&
+        (_convolveUint8(frame, kernel) || _convolveFloat32(frame, kernel))) {
       continue;
     }
     final tmp = Image.from(frame, noAnimation: true);
@@ -143,4 +157,86 @@ void _filterColumn(Uint8List ring, Int32List rowOffsets, Uint8List dst,
   for (var i = 0; i < n; ++i) {
     dst[dstOffset + i] = acc[i].toInt();
   }
+}
+
+// The same as _convolveUint8 for float32 images, which also store the
+// horizontal results as float32, so it gives the same values as
+// SeparableKernel.apply.
+bool _convolveFloat32(Image frame, SeparableKernel kernel) {
+  final size = kernel.size;
+  final w = frame.width;
+  final h = frame.height;
+  if (frame.format != Format.float32 || frame.hasPalette || w < 2 || h < 2) {
+    return false;
+  }
+
+  final data = (frame.data! as ImageDataFloat32).data;
+  final nc = frame.numChannels;
+  final stride = w * nc;
+  final taps = 2 * size + 1;
+  final k = Float64List(taps);
+  for (var i = 0; i < taps; ++i) {
+    k[i] = kernel[i].toDouble();
+  }
+
+  final padSource = Int32List(w + 2 * size);
+  for (var x = -size; x < w + size; ++x) {
+    padSource[x + size] = reflectIndex(w, x) * nc;
+  }
+  final padded = Float32List((w + 2 * size) * nc);
+
+  final ring = Float32List(taps * stride);
+  final acc = Float64List(stride);
+  final rowOffsets = Int32List(taps);
+  var nextRow = 0;
+
+  for (var y = 0; y < h; ++y) {
+    final last = y + size < h ? y + size : h - 1;
+    for (; nextRow <= last; ++nextRow) {
+      final s = nextRow * stride;
+      for (var x = 0, i = 0; x < padSource.length; ++x) {
+        final si = s + padSource[x];
+        for (var ch = 0; ch < nc; ++ch) {
+          padded[i++] = data[si + ch];
+        }
+      }
+      final o = (nextRow % taps) * stride;
+      final c0 = k[0];
+      for (var i = 0; i < stride; ++i) {
+        acc[i] = c0 * padded[i];
+      }
+      for (var j = 1; j < taps; ++j) {
+        final c = k[j];
+        final po = j * nc;
+        for (var i = 0; i < stride; ++i) {
+          acc[i] += c * padded[po + i];
+        }
+      }
+      for (var i = 0; i < stride; ++i) {
+        ring[o + i] = acc[i];
+      }
+    }
+
+    for (var j = 0; j < taps; ++j) {
+      rowOffsets[j] = (reflectIndex(h, y + j - size) % taps) * stride;
+    }
+    final c0 = k[0];
+    final o0 = rowOffsets[0];
+    for (var i = 0; i < stride; ++i) {
+      acc[i] = c0 * ring[o0 + i];
+    }
+    for (var j = 1; j < taps; ++j) {
+      final c = k[j];
+      final o = rowOffsets[j];
+      for (var i = 0; i < stride; ++i) {
+        acc[i] += c * ring[o + i];
+      }
+    }
+    final d = y * stride;
+    for (var i = 0; i < stride; ++i) {
+      data[d + i] = acc[i];
+    }
+  }
+
+  return true;
 }

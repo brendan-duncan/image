@@ -16,6 +16,7 @@ class DrawStringCmd extends Command {
   BlendMode blend;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   DrawStringCmd(Command? input, this.string,
       {required this.font,
@@ -26,7 +27,8 @@ class DrawStringCmd extends Command {
       this.rightJustify = false,
       this.blend = BlendMode.alpha,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -43,7 +45,8 @@ class DrawStringCmd extends Command {
             wrap: wrap,
             blend: blend,
             mask: maskImg,
-            maskChannel: maskChannel)
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

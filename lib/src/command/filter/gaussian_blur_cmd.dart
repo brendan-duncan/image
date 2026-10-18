@@ -6,9 +6,13 @@ class GaussianBlurCmd extends Command {
   int radius;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   GaussianBlurCmd(Command? input,
-      {required this.radius, this.mask, this.maskChannel = Channel.luminance})
+      {required this.radius,
+      this.mask,
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -17,7 +21,10 @@ class GaussianBlurCmd extends Command {
     final maskImg = await mask?.getImage();
     outputImage = img != null
         ? g.gaussianBlur(img,
-            radius: radius, mask: maskImg, maskChannel: maskChannel)
+            radius: radius,
+            mask: maskImg,
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }

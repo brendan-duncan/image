@@ -424,7 +424,8 @@ class Command {
       Color? color,
       BlendMode blend = BlendMode.alpha,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = DrawCharCmd(subCommand, char,
         font: font,
         x: x,
@@ -432,7 +433,8 @@ class Command {
         color: color,
         blend: blend,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void drawCircle(
@@ -443,7 +445,8 @@ class Command {
       bool antialias = false,
       BlendMode blend = BlendMode.alpha,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = DrawCircleCmd(subCommand,
         x: x,
         y: y,
@@ -452,7 +455,8 @@ class Command {
         antialias: antialias,
         blend: blend,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void compositeImage(Command? src,
@@ -495,7 +499,8 @@ class Command {
       num thickness = 1,
       BlendMode blend = BlendMode.alpha,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = DrawLineCmd(subCommand,
         x1: x1,
         y1: y1,
@@ -506,7 +511,8 @@ class Command {
         thickness: thickness,
         blend: blend,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void drawPixel(int x, int y, Color color,
@@ -526,13 +532,15 @@ class Command {
       required Color color,
       BlendMode blend = BlendMode.alpha,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = DrawPolygonCmd(subCommand,
         vertices: vertices,
         color: color,
         blend: blend,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void drawRect(
@@ -545,7 +553,8 @@ class Command {
       num thickness = 1,
       BlendMode blend = BlendMode.alpha,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = DrawRectCmd(subCommand,
         x1: x1,
         y1: y1,
@@ -556,7 +565,8 @@ class Command {
         thickness: thickness,
         blend: blend,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void drawString(String string,
@@ -568,7 +578,8 @@ class Command {
       bool rightJustify = false,
       BlendMode blend = BlendMode.alpha,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = DrawStringCmd(subCommand, string,
         font: font,
         x: x,
@@ -578,7 +589,8 @@ class Command {
         rightJustify: rightJustify,
         blend: blend,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void fill(
@@ -597,7 +609,8 @@ class Command {
       bool antialias = false,
       BlendMode blend = BlendMode.alpha,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = FillCircleCmd(subCommand,
         x: x,
         y: y,
@@ -606,7 +619,8 @@ class Command {
         antialias: antialias,
         blend: blend,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void fillFlood(
@@ -632,13 +646,15 @@ class Command {
       required Color color,
       BlendMode blend = BlendMode.alpha,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = FillPolygonCmd(subCommand,
         vertices: vertices,
         color: color,
         blend: blend,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void fillRect(
@@ -715,7 +731,8 @@ class Command {
       num scale = 0.5,
       Interpolation interpolation = Interpolation.nearest,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = BulgeDistortionCmd(subCommand,
         centerX: centerX,
         centerY: centerY,
@@ -723,7 +740,8 @@ class Command {
         scale: scale,
         interpolation: interpolation,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void bumpToNormal({num strength = 2}) {
@@ -880,9 +898,13 @@ class Command {
   void gaussianBlur(
       {required int radius,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = GaussianBlurCmd(subCommand,
-        radius: radius, mask: mask, maskChannel: maskChannel);
+        radius: radius,
+        mask: mask,
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void grayscale(
@@ -962,9 +984,14 @@ class Command {
       {required int size,
       PixelateMode mode = PixelateMode.upperLeft,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = PixelateCmd(subCommand,
-        size: size, mode: mode, mask: mask, maskChannel: maskChannel);
+        size: size,
+        mode: mode,
+        mask: mask,
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void quantize({
@@ -1011,9 +1038,13 @@ class Command {
   void separableConvolution(
       {required SeparableKernel kernel,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = SeparableConvolutionCmd(subCommand,
-        kernel: kernel, mask: mask, maskChannel: maskChannel);
+        kernel: kernel,
+        mask: mask,
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void sepia(
@@ -1035,9 +1066,13 @@ class Command {
   void smooth(
       {required num weight,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = SmoothCmd(subCommand,
-        weight: weight, mask: mask, maskChannel: maskChannel);
+        weight: weight,
+        mask: mask,
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void sobel(
@@ -1053,13 +1088,15 @@ class Command {
       int? centerY,
       Interpolation interpolation = Interpolation.nearest,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = StretchDistortionCmd(subCommand,
         centerX: centerX,
         centerY: centerY,
         interpolation: interpolation,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   void vignette(
@@ -1068,14 +1105,16 @@ class Command {
       Color? color,
       num amount = 0.8,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      bool linearBlend = false}) {
     subCommand = VignetteCmd(subCommand,
         start: start,
         end: end,
         color: color,
         amount: amount,
         mask: mask,
-        maskChannel: maskChannel);
+        maskChannel: maskChannel,
+        linearBlend: linearBlend);
   }
 
   /// Run an arbitrary function on the image within the Command graph.
@@ -1164,13 +1203,15 @@ class Command {
       required Point topRight,
       required Point bottomLeft,
       required Point bottomRight,
-      Interpolation interpolation = Interpolation.nearest}) {
+      Interpolation interpolation = Interpolation.nearest,
+      bool linearBlend = false}) {
     subCommand = CopyRectifyCmd(subCommand,
         topLeft: topLeft,
         topRight: topRight,
         bottomLeft: bottomLeft,
         bottomRight: bottomRight,
-        interpolation: interpolation);
+        interpolation: interpolation,
+        linearBlend: linearBlend);
   }
 
   void copyResize(
@@ -1178,32 +1219,37 @@ class Command {
       int? height,
       bool? maintainAspect,
       Color? backgroundColor,
-      Interpolation interpolation = Interpolation.nearest}) {
+      Interpolation interpolation = Interpolation.nearest,
+      bool linearBlend = false}) {
     subCommand = CopyResizeCmd(subCommand,
         width: width,
         height: height,
         maintainAspect: maintainAspect,
         backgroundColor: backgroundColor,
-        interpolation: interpolation);
+        interpolation: interpolation,
+        linearBlend: linearBlend);
   }
 
   void copyResizeCropSquare(
       {required int size,
       num radius = 0,
       Interpolation interpolation = Interpolation.nearest,
-      bool antialias = true}) {
+      bool antialias = true,
+      bool linearBlend = false}) {
     subCommand = CopyResizeCropSquareCmd(subCommand,
         size: size,
         radius: radius,
         interpolation: interpolation,
-        antialias: antialias);
+        antialias: antialias,
+        linearBlend: linearBlend);
   }
 
   void copyRotate(
       {required num angle,
-      Interpolation interpolation = Interpolation.nearest}) {
-    subCommand =
-        CopyRotateCmd(subCommand, angle: angle, interpolation: interpolation);
+      Interpolation interpolation = Interpolation.nearest,
+      bool linearBlend = false}) {
+    subCommand = CopyRotateCmd(subCommand,
+        angle: angle, interpolation: interpolation, linearBlend: linearBlend);
   }
 
   void flip({required FlipDirection direction}) {

@@ -15,6 +15,7 @@ class DrawLineCmd extends Command {
   BlendMode blend;
   Command? mask;
   Channel maskChannel;
+  bool linearBlend;
 
   DrawLineCmd(Command? input,
       {required this.x1,
@@ -26,7 +27,8 @@ class DrawLineCmd extends Command {
       this.thickness = 1,
       this.blend = BlendMode.alpha,
       this.mask,
-      this.maskChannel = Channel.luminance})
+      this.maskChannel = Channel.luminance,
+      this.linearBlend = false})
       : super(input);
 
   @override
@@ -44,7 +46,8 @@ class DrawLineCmd extends Command {
             thickness: thickness,
             blend: blend,
             mask: maskImg,
-            maskChannel: maskChannel)
+            maskChannel: maskChannel,
+            linearBlend: linearBlend)
         : null;
   }
 }
