@@ -39,8 +39,9 @@ class IcoInfo implements DecodeInfo {
     final images = List<IcoInfoImage>.generate(
         imageCount,
         (e) => IcoInfoImage(
-              width: input.readByte(),
-              height: input.readByte(),
+              // A width or height of 0 means 256.
+              width: _dimension(input.readByte()),
+              height: _dimension(input.readByte()),
               colorPalette: input.readByte(),
               // ignore 1 byte
               colorPlanes: (input..skip(1)).readUint16(),
@@ -51,6 +52,8 @@ class IcoInfo implements DecodeInfo {
 
     return IcoInfo(type: type, numFrames: imageCount, images: images);
   }
+
+  static int _dimension(int value) => value == 0 ? 256 : value;
 }
 
 class IcoInfoImage {

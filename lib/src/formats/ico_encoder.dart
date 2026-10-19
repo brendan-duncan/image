@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../image/image.dart';
+import '../util/image_exception.dart';
 import '../util/output_buffer.dart';
 import '_check_encode.dart';
 import 'encoder.dart';
@@ -43,7 +44,7 @@ abstract class WinEncoder extends Encoder {
     var i = 0;
     for (var img in images) {
       if (img.width > 256 || img.height > 256) {
-        throw Exception('ICO and CUR support only sizes until 256');
+        throw ImageException('ICO and CUR support only sizes until 256');
       }
 
       out

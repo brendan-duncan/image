@@ -104,7 +104,7 @@ Encoder? findEncoderForNamedImage(String name) {
     return IcoEncoder();
   }
   if (n.endsWith('.cur')) {
-    return IcoEncoder();
+    return CurEncoder();
   }
   if (n.endsWith('.pvr')) {
     return PvrEncoder();

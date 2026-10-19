@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import '../color/color_uint8.dart';
 import '../image/image.dart';
+import '../image/palette.dart';
 import '../util/input_buffer.dart';
 import '_guard_decode.dart';
 import '_max_pixels.dart';
@@ -198,86 +199,163 @@ class GifDecoder extends Decoder {
       return decodeFrame(frame ?? 0);
     }
 
-    Image? firstImage;
-    Image? lastImage;
     // Each frame is composited to a full canvas, so check them all before
     // decoding any.
     PixelBudget(maxPixels).add(info!.width * info!.numFrames, info!.height);
+
+    // Each output frame is the logical screen as displayed after drawing the
+    // GIF frame. A frame's disposal method says what happens to the canvas
+    // after it has been displayed, so it is applied when building the canvas
+    // for the frame that follows it.
+    Image? firstImage;
+    // The canvas as displayed for the previous frame.
+    Image? lastImage;
+    GifImageDesc? lastFrame;
+    // The canvas before the previous frame was drawn, for disposal method 3.
+    Image? restoreImage;
     for (var frameIndex = 0; frameIndex < info!.numFrames; ++frameIndex) {
       final frame = info!.frames[frameIndex];
       final image = decodeFrame(frameIndex);
       if (image == null) {
-        return null;
+        // Keep the frames decoded so far.
+        if (firstImage == null) {
+          return null;
+        }
+        break;
       }
 
-      image.frameDuration = frame.duration * 10; // Convert to MS
-
-      if (firstImage == null || lastImage == null) {
-        firstImage = image;
-        lastImage = image;
-        image.loopCount = _repeat;
-        continue;
-      }
-
-      if (image.width == lastImage.width &&
-          image.height == lastImage.height &&
-          frame.x == 0 &&
-          frame.y == 0 &&
-          frame.disposal == 2) {
-        lastImage = image;
-        firstImage.addFrame(lastImage);
-        continue;
-      }
-
-      final colorMap =
-          (frame.colorMap != null) ? frame.colorMap! : info!.globalColorMap!;
-
-      final nextImage = Image(
-          width: lastImage.width,
-          height: lastImage.height,
+      final canvas = Image(
+          width: info!.width,
+          height: info!.height,
           numChannels: 1,
-          palette: colorMap.getPalette());
+          palette: image.palette);
+      final clearIndex = _clearIndex(canvas.palette!);
 
-      if (frame.disposal == 2) {
-        final imageBytes = nextImage.toUint8List();
-        if (frame.transparent != -1) {
-          imageBytes.fillRange(0, imageBytes.length, frame.transparent);
-        } else {
-          imageBytes.fillRange(
-              0, imageBytes.length, info!.backgroundColor!.r as int);
-        }
-      } else if (frame.disposal != 3) {
-        if (frame.colorMap != null) {
-          final lp = lastImage.palette!;
-          final remapColors = <int, int>{};
-          // Map colors from lastImage palette to current frame's colorMap
-          for (var ci = 0; ci < lp.numColors; ++ci) {
-            final nc = colorMap.findColor(lp.getRed(ci), lp.getGreen(ci),
-                lp.getBlue(ci), lp.getAlpha(ci));
-            remapColors[ci] = nc;
-          }
-
-          final nextBytes = nextImage.toUint8List();
-          final lastBytes = lastImage.toUint8List();
-          for (var i = 0, l = nextBytes.length; i < l; ++i) {
-            final lc = lastBytes[i];
-            final nc = remapColors[lc];
-            if (nc != null && nc != -1) {
-              nextBytes[i] = nc;
-            }
-          }
-        }
+      final base = lastFrame == null
+          ? null
+          : lastFrame.disposal == 3
+              ? restoreImage
+              : lastImage;
+      if (base == null) {
+        final bytes = canvas.toUint8List();
+        bytes.fillRange(0, bytes.length, clearIndex);
+      } else {
+        _copyCanvas(base, canvas, clearIndex);
       }
 
-      nextImage.frameDuration = image.frameDuration;
+      if (lastFrame != null && lastFrame.disposal == 2) {
+        // Restore the area of the previous frame to the background.
+        _clearRect(canvas, lastFrame, clearIndex);
+      }
 
-      _compositeFrame(image, nextImage, frame.x, frame.y);
+      restoreImage = frame.disposal == 3 ? canvas.clone() : null;
 
-      firstImage.addFrame(nextImage);
-      lastImage = nextImage;
+      _compositeFrame(image, canvas, frame.x, frame.y);
+
+      canvas.frameDuration = frame.duration * 10; // Convert to MS
+
+      if (firstImage == null) {
+        firstImage = canvas..loopCount = _repeat;
+      } else {
+        firstImage.addFrame(canvas);
+      }
+      lastImage = canvas;
+      lastFrame = frame;
     }
 
     return firstImage;
+  }
+
+  // The palette index used to clear the canvas: the transparent color if the
+  // palette has one, otherwise the background color.
+  int _clearIndex(Palette palette) {
+    final numColors = palette.numColors;
+    for (var i = 0; i < numColors; ++i) {
+      if (palette.getAlpha(i) == 0) {
+        return i;
+      }
+    }
+    final globalColorMap = info!.globalColorMap;
+    final bg = info!.backgroundColor?.r.toInt() ?? 0;
+    if (globalColorMap == null || bg >= globalColorMap.numColors) {
+      return 0;
+    }
+    return _findOpaqueColor(palette, globalColorMap.red(bg),
+        globalColorMap.green(bg), globalColorMap.blue(bg));
+  }
+
+  // The index of the opaque color in [palette] closest to r, g, b.
+  int _findOpaqueColor(Palette palette, num r, num g, num b) {
+    var closestIndex = 0;
+    num closestDistance = -1;
+    final numColors = palette.numColors;
+    for (var i = 0; i < numColors; ++i) {
+      if (palette.getAlpha(i) == 0) {
+        continue;
+      }
+      final dr = r - palette.getRed(i);
+      final dg = g - palette.getGreen(i);
+      final db = b - palette.getBlue(i);
+      final d2 = dr * dr + dg * dg + db * db;
+      if (d2 == 0) {
+        return i;
+      }
+      if (closestDistance == -1 || d2 < closestDistance) {
+        closestIndex = i;
+        closestDistance = d2;
+      }
+    }
+    return closestIndex;
+  }
+
+  // Copies the palette index image [from] to [to], remapping the colors from
+  // the palette of [from] to the palette of [to]. Transparent colors map to
+  // [clearIndex].
+  void _copyCanvas(Image from, Image to, int clearIndex) {
+    final src = from.toUint8List();
+    final dst = to.toUint8List();
+    final fp = from.palette!;
+    final tp = to.palette!;
+    final remap = Uint8List(256);
+    var identity = true;
+    final numColors = fp.numColors < 256 ? fp.numColors : 256;
+    for (var i = 0; i < numColors; ++i) {
+      final r = fp.getRed(i);
+      final g = fp.getGreen(i);
+      final b = fp.getBlue(i);
+      final a = fp.getAlpha(i);
+      if (i < tp.numColors &&
+          tp.getRed(i) == r &&
+          tp.getGreen(i) == g &&
+          tp.getBlue(i) == b &&
+          tp.getAlpha(i) == a) {
+        remap[i] = i;
+        continue;
+      }
+      identity = false;
+      remap[i] = a == 0 ? clearIndex : _findOpaqueColor(tp, r, g, b);
+    }
+    if (identity) {
+      dst.setRange(0, dst.length, src);
+    } else {
+      for (var i = 0, l = dst.length; i < l; ++i) {
+        dst[i] = remap[src[i]];
+      }
+    }
+  }
+
+  // Fills the area of [frame] in [canvas] with [index].
+  void _clearRect(Image canvas, GifImageDesc frame, int index) {
+    final bytes = canvas.toUint8List();
+    final cw = canvas.width;
+    final x0 = frame.x < cw ? frame.x : cw;
+    final x1 = frame.x + frame.width < cw ? frame.x + frame.width : cw;
+    final y1 = frame.y + frame.height < canvas.height
+        ? frame.y + frame.height
+        : canvas.height;
+    for (var y = frame.y; y < y1; ++y) {
+      bytes.fillRange(y * cw + x0, y * cw + x1, index);
+    }
   }
 
   InternalGifImageDesc? _skipImage() {

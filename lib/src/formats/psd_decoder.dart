@@ -81,8 +81,14 @@ class PsdDecoder extends Decoder {
   DecodeInfo? startDecode(Uint8List bytes) =>
       guardDecode(() => _startDecode(bytes));
 
-  DecodeInfo? _startDecode(Uint8List bytes) =>
-      info = PsdImage(bytes, maxPixels: maxPixels);
+  DecodeInfo? _startDecode(Uint8List bytes) {
+    final psd = PsdImage(bytes, maxPixels: maxPixels);
+    if (!psd.isValid) {
+      info = null;
+      return null;
+    }
+    return info = psd;
+  }
 
   /// How many frames are available to be decoded. [startDecode] should have
   /// been called first. Non animated image files will have a single frame.
