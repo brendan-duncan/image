@@ -1,4 +1,4 @@
-# 4.12.1
+# 4.13.0
 
 * PNGs with an unknown row filter type decode to null, like other invalid PNG data.
 * Check the zlib checksum of PNG, TIFF, EXR and ICC profile data.
