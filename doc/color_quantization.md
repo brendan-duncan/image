@@ -28,7 +28,7 @@ Image quantize(Image src, {
   int numberOfColors = 256,
   QuantizeMethod method = QuantizeMethod.neuralNet,
   DitherKernel dither = DitherKernel.none,
-  bool ditherSerpentine = false, // deprecated, use ditherScanOrder
+  bool ditherSerpentine = false, // superseded by ditherScanOrder
   DitherScanOrder? ditherScanOrder,
   double ditherStrength = 1.0,
 })
@@ -63,7 +63,7 @@ The [Command](commands.md) equivalent is `Command.quantize`, which doesn't have 
 Image ditherImage(Image image, {
   Quantizer? quantizer,
   DitherKernel kernel = DitherKernel.floydSteinberg,
-  bool serpentine = false, // deprecated, use scanOrder
+  bool serpentine = false, // superseded by scanOrder
   DitherScanOrder scanOrder = DitherScanOrder.zigzag,
   double strength = 1.0,
 })
@@ -80,7 +80,7 @@ the number of colors, or to share one palette between several images.
 | `quantizer` | Supplies the palette and the closest-color lookup. |
 | `kernel` | The [dither kernel](#dither-kernels). `DitherKernel.none` maps each pixel to its closest color without dithering. The Bayer kernels are handled by [ditherImageBayer](#ditherimagebayer). |
 | `scanOrder` | The [scan order](#scan-orders) for error-diffusion kernels. Defaults to `zigzag`. |
-| `serpentine` | Deprecated. When true, it overrides `scanOrder` with `DitherScanOrder.serpentine`. |
+| `serpentine` | Superseded by `scanOrder`. When true, it overrides `scanOrder` with `DitherScanOrder.serpentine`. |
 | `strength` | Scales the pattern of the Bayer kernels; ignored by error-diffusion kernels. |
 
 ```dart
@@ -150,7 +150,7 @@ order in which the error-diffusion kernels visit the pixels. It has no effect on
   always adjacent. This gives the strongest reduction of directional artifacts of the deterministic
   orders.
 
-The older `serpentine` / `ditherSerpentine` booleans are deprecated in favor of the scan order
+The older `serpentine` / `ditherSerpentine` booleans are superseded by the scan order
 parameters. They are ignored when a scan order is given (for `quantize`, `Command.ditherImage` and the
 GIF encoder) and override `scanOrder` when true (for the `ditherImage` function).
 

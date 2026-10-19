@@ -127,7 +127,7 @@ platforms that support `dart:io` isolates (the Dart VM, and Flutter on mobile an
 - The command, including any `Image` given with `image()` and any byte data, is copied into the new isolate.
 - The result image and bytes are sent back with `Isolate.exit`, which transfers them without another copy.
 - Because the isolate works on a copy, an Image passed with `image()` is not modified.
-- Exceptions thrown in the isolate are rethrown from the `*Thread` method.
+- Anything thrown in the isolate is rethrown from the `*Thread` method.
 
 On the web there are no isolates of this kind: the `*Thread` methods behave exactly like `execute()`,
 `getImage()` and `getBytes()` and run on the main thread.
@@ -236,8 +236,8 @@ final image = await (Command()
     .getImage();
 ```
 
-`addFrames(count, callback)` adds frames to the image; the callback is called with each new frame number and
-returns the frame (or null to skip it).
+`addFrames(count, callback)` adds frames to the image; the callback is called with 0 to `count - 1` and
+returns the frame to add (or null to skip it).
 
 When a command runs in an isolate, these functions run there too. They can be closures, but anything they
 capture is copied to the isolate, so it must be something that can be sent between isolates (images, numbers,
@@ -251,10 +251,12 @@ again.
 
 ## Available commands
 
-The commands have the same names and parameters as the functions documented in
+Most commands have the same names and parameters as the functions documented in
 [Image Processing](filters.md), [Transform Functions](transform.md), [Drawing Functions](draw.md) and
 [Image Formats](formats.md), without the image argument. Where a function takes an `Image` (a source image or a
-`mask`), the command takes a `Command` instead.
+`mask`), the command usually takes a `Command` instead; `copyExpandCanvas`'s `toImage` is still an `Image`.
+
+The `copyRectify` command has no `toImage`.
 
 ### Image commands
 
@@ -282,7 +284,7 @@ The commands have the same names and parameters as the functions documented in
 | `decodeGif(data)`, `decodeGifFile(path)` | GIF. |
 | `encodeGif({int samplingFactor = 10, DitherKernel dither = DitherKernel.floydSteinberg, DitherScanOrder? ditherScanOrder})`, `encodeGifFile(path, {...})` | GIF. The older `bool ditherSerpentine` is also accepted. |
 | `decodeIco(data)`, `decodeIcoFile(path)`, `encodeIco()`, `encodeIcoFile(path)` | ICO. |
-| `decodeJpg(data)`, `decodeJpgFile(path)` | JPEG, at full size. |
+| `decodeJpg(data, {int scale = 1, int? maxPixels})`, `decodeJpgFile(path)` | JPEG. `scale` decodes at 1/2, 1/4 or 1/8 size; `decodeJpgFile` decodes at full size. |
 | `encodeJpg({int quality = 100})`, `encodeJpgFile(path, {int quality = 100})` | JPEG. |
 | `decodePng(data)`, `decodePngFile(path)` | PNG. |
 | `encodePng({int level = 6, PngFilter filter = PngFilter.paeth})`, `encodePngFile(path, {...})` | PNG. |
@@ -293,8 +295,8 @@ The commands have the same names and parameters as the functions documented in
 | `decodeWebP(data)`, `decodeWebPFile(path)`, `encodeWebP()`, `encodeWebPFile(path)` | WebP. The encode commands use the lossless defaults of `encodeWebP`. |
 
 The format commands use the default options of the functions in [Image Formats](formats.md). For options the
-commands don't have (JPEG `scale` and `chroma`, WebP lossy encoding, `singleFrame`, single-frame decoding with
-`frame:`), call the functions directly or from a `filter` step.
+commands don't have (JPEG `chroma`, `scale` and `maxPixels` for `decodeJpgFile`, PNG `cicpData`, GIF `repeat`, WebP lossy
+encoding, `singleFrame`, single-frame decoding with `frame:`), call the functions directly or from a `filter` step.
 
 ### Drawing commands
 
@@ -306,15 +308,15 @@ See [Drawing Functions](draw.md).
 | `drawChar(String char, {required BitmapFont font, required int x, required int y, Color? color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `drawCircle({required int x, required int y, required int radius, required Color color, bool antialias = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `drawLine({required int x1, required int y1, required int x2, required int y2, required Color color, bool antialias = false, num thickness = 1, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
-| `drawPixel(int x, int y, Color color, {BlendMode blend = BlendMode.alpha, bool linearBlend = false, Command? mask, Channel maskChannel = Channel.luminance})` |
-| `drawPolygon({required List<Point> vertices, required Color color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
+| `drawPixel(int x, int y, Color color, {Color? filter, num? alpha, BlendMode blend = BlendMode.alpha, bool linearBlend = false, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `drawPolygon({required List<Point> vertices, required Color color, bool antialias = false, num thickness = 1, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `drawRect({required int x1, required int y1, required int x2, required int y2, required Color color, num radius = 0, num thickness = 1, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `drawString(String string, {required BitmapFont font, int? x, int? y, Color? color, bool wrap = false, bool rightJustify = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `fill({required Color color, Command? mask, Channel maskChannel = Channel.luminance})` |
 | `fillCircle({required int x, required int y, required int radius, required Color color, bool antialias = false, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
 | `fillFlood({required int x, required int y, required Color color, num threshold = 0.0, bool compareAlpha = false, Command? mask, Channel maskChannel = Channel.luminance})` |
 | `fillPolygon({required List<Point> vertices, required Color color, BlendMode blend = BlendMode.alpha, Command? mask, Channel maskChannel = Channel.luminance, bool linearBlend = false})` |
-| `fillRect({required int x1, required int y1, required int x2, required int y2, required Color color, num radius = 0, Command? mask, Channel maskChannel = Channel.luminance})` |
+| `fillRect({required int x1, required int y1, required int x2, required int y2, required Color color, num radius = 0, bool alphaBlend = true, Command? mask, Channel maskChannel = Channel.luminance})` |
 
 ### Filter commands
 
@@ -331,7 +333,7 @@ See [Image Processing](filters.md). Every filter with a `mask` parameter also ta
 | `chromaticAberration({int shift = 5, Command? mask})` |
 | `colorHalftone({num amount = 1, int? centerX, int? centerY, num angle = 180, num size = 5, Command? mask})` |
 | `colorOffset({num red = 0, num green = 0, num blue = 0, num alpha = 0, Command? mask})` |
-| `contrast({required num contrast, Command? mask})` |
+| `contrast({required num contrast, Command? mask, ContrastMode mode = ContrastMode.proportional})` |
 | `convolution({required List<num> filter, num div = 1.0, num offset = 0, num amount = 1, Command? mask})` |
 | `copyImageChannels({required Command? from, bool scaled = false, Channel? red, Channel? green, Channel? blue, Channel? alpha, Command? mask})` |
 | `ditherImage({Quantizer? quantizer, DitherKernel kernel = DitherKernel.floydSteinberg, DitherScanOrder? scanOrder, double strength = 1.0})` (the older `bool serpentine` is also accepted) |
@@ -349,8 +351,8 @@ See [Image Processing](filters.md). Every filter with a `mask` parameter also ta
 | `monochrome({Color? color, num amount = 1, Command? mask})` |
 | `noise(num sigma, {NoiseType type = NoiseType.gaussian, Random? random, Command? mask})` |
 | `normalize({required num min, required num max, Command? mask})` |
-| `pixelate({required int size, PixelateMode mode = PixelateMode.upperLeft, Command? mask, bool linearBlend = false})` |
-| `quantize({int numberOfColors = 256, QuantizeMethod method = QuantizeMethod.neuralNet, DitherKernel dither = DitherKernel.none, DitherScanOrder? ditherScanOrder})` (the older `bool ditherSerpentine` is also accepted) |
+| `pixelate({required int size, PixelateMode mode = PixelateMode.upperLeft, num amount = 1, Command? mask, bool linearBlend = false})` |
+| `quantize({int numberOfColors = 256, QuantizeMethod method = QuantizeMethod.neuralNet, DitherKernel dither = DitherKernel.none, DitherScanOrder? ditherScanOrder, double ditherStrength = 1.0})` (the older `bool ditherSerpentine` is also accepted) |
 | `reinhardTonemap({Command? mask})` |
 | `remapColors({Channel red = Channel.red, Channel green = Channel.green, Channel blue = Channel.blue, Channel alpha = Channel.alpha})` |
 | `scaleRgba({required Color scale, Command? mask})` |
@@ -381,16 +383,18 @@ See [Transform Functions](transform.md).
 | `copyResizeCropSquare({required int size, num radius = 0, Interpolation interpolation = Interpolation.nearest, bool antialias = true, bool linearBlend = false})` |
 | `copyRotate({required num angle, Interpolation interpolation = Interpolation.nearest, bool linearBlend = false})` |
 | `flip({required FlipDirection direction})` |
-| `trim({TrimMode mode = TrimMode.transparent, Trim sides = Trim.all})` |
+| `trim({TrimMode mode = TrimMode.transparent, Trim sides = Trim.all, num fuzzy = 0, int padding = 0})` |
 
 The `trim` command defaults to `TrimMode.transparent`, while the `trim` function defaults to
-`TrimMode.topLeftColor`.
+`TrimMode.topLeftColor`, and the `copyResizeCropSquare` command's `antialias` defaults to `true`, while the
+function's defaults to `false`.
 
 ### Functions without a command
 
 These have no command method; call them directly, or from a `filter` step:
 `resize`, `findTrim`, `flipVertical`, `flipHorizontal`, `flipHorizontalVertical`, `histogramEqualization`,
-`histogramStretch`, `solarize`, and the format options listed above.
+`histogramStretch`, `solarize`, `ditherImageBayer`, `decodePnm`, `decodePnmFile`, and the format options listed
+above.
 
 ```dart
 final cmd = Command()

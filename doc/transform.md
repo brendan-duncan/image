@@ -119,8 +119,10 @@ shrinking. It returns a new image (as `copyResize` would) in these cases:
 * `maintainAspect` letterboxing that leaves padding around the image. The exception is
   `Interpolation.nearest` on an 8-bit image with no `backgroundColor`.
 * The image has an EXIF orientation. It's applied first, which creates a copy.
+* `linearBlend: true` with an interpolation other than `nearest`, on an image without a palette.
 
-If the size doesn't change, `src` is returned unchanged.
+If the size doesn't change, `src` is returned unchanged, unless one of the copies above is made
+first (an EXIF orientation or `linearBlend`).
 
 After an in-place resize the image keeps its original buffer, so the raw bytes from
 `image.getBytes()` or `image.toUint8List()` can be longer than the new width x height requires.
@@ -162,7 +164,8 @@ pixels are computed from the source pixels.
 | `Interpolation.cubic` | Blends the 4x4 nearest pixels (bicubic). | The sharpest enlargements. The slowest option. |
 | `Interpolation.average` | In `copyResize` and `resize`, averages every source pixel covered by an output pixel (a box filter). Elsewhere it's the same as `linear`. | Shrinking by large factors, such as thumbnails. `linear` and `cubic` only sample a few pixels, so large reductions alias. |
 
-Images with a palette can't be blended, so they always use `nearest`. Convert them first
+Images with a palette can't be blended, so they always use `nearest`, except in `copyRectify`,
+which converts them to non-palette images first. Elsewhere, convert them first
 (`image.convert(numChannels: 4)`) if you want smooth results.
 
 The resize, rotate and rectify functions also take `linearBlend` (default `false`). When it's

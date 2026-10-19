@@ -107,7 +107,8 @@ Returns a new 8-bit image with the same number of channels. Without `exposure`, 
 to 0-1 and scaled to 0-255, with no other change. With `exposure`, a value in stops, the image is
 brightened or darkened by that exposure, values above 1.0 roll off smoothly instead of clipping, and a
 display gamma of 2.2 is applied, much like an EXR viewer. `exposure: 0` is a good starting point; raise it
-to brighten the image, lower it to darken. Infinite and NaN values are treated as 0.
+to brighten the image, lower it to darken. Infinite and NaN color values are treated as 0, and infinite
+or NaN alpha as 1 (opaque).
 
 ```dart
 final ldr = img.hdrToLdr(exr, exposure: 0);
@@ -120,14 +121,16 @@ await img.encodePngFile('scene.png', ldr);
 Image reinhardTonemap(Image hdr, {Image? mask, Channel maskChannel = Channel.luminance})
 ```
 
-Applies Reinhard's global tone mapping operator to a float image, **in place**. It compresses bright
-values toward 1.0 based on the average luminance of the image, preserving more detail in highlights than
-clamping does. The result is still a float image, with linear values. Use `mask` to blend the effect, as
-with other [filters](filters.md#masks).
+Applies Reinhard's global tone mapping operator to a float image, **in place**. It scales the image so
+its average (log-average) luminance becomes middle gray (0.18), then compresses bright values so the
+brightest pixel's luminance becomes 1.0, preserving more detail in highlights than clamping does. The
+result is still a float image with linear values. Luminance is in 0-1, but a channel of a saturated color
+can be slightly above 1.0, so follow it with `hdrToLdr` (or clamp) to get 0-1 in every channel. Use `mask` to blend the effect, as with
+other [filters](filters.md#masks).
 
 ```dart
-img.reinhardTonemap(exr); // exr is now in the 0-1 range.
-final ldr8 = img.hdrToLdr(exr); // Convert to 8 bits.
+img.reinhardTonemap(exr); // Luminance is now 0-1.
+final ldr8 = img.hdrToLdr(exr); // Clamp and convert to 8 bits.
 ```
 
 `reinhardTonemap` reads the raw channel values, so use it on float images rather than 16-bit integer
@@ -146,5 +149,8 @@ final asFloat = image8.convert(format: img.Format.float32);
 // Float to 8-bit, clamping (no tone mapping).
 final as8 = asFloat.convert(format: img.Format.uint8);
 ```
+
+`convert` maps values linearly and doesn't apply a transfer function. To convert a channel value between
+linear light (as HDR images usually store) and sRGB, use `srgbToLinear` and `linearToSrgb`.
 
 See [Converting Images](image_data.md#converting-images).

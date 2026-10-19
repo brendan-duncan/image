@@ -18,7 +18,7 @@ an [Image](image_data.md), and encoding turns an `Image` back into file bytes.
 | [PNG](#png-decoding-encoding) | .png | Yes | Yes | All bit depths, palette, 16-bit; animated APNG |
 | [GIF](#gif-decoding-encoding) | .gif | Yes | Yes | Animated GIF |
 | [WebP](#webp-decoding-encoding) | .webp | Yes | Yes | Lossless and lossy; animated WebP |
-| [TIFF](#tiff-decoding-encoding) | .tif, .tiff | Yes | Yes | Multi-page; float and 16-bit decoding; uncompressed 8-bit encoding |
+| [TIFF](#tiff-decoding-encoding) | .tif, .tiff | Yes | Yes | Multi-page; float and 16-bit decoding; uncompressed encoding up to 8 bits |
 | [BMP](#bmp-decoding-encoding) | .bmp | Yes | Yes | |
 | [TGA](#tga-decoding-encoding) | .tga | Yes | Yes | |
 | [ICO](#ico-and-cur-decoding-encoding) | .ico | Yes | Yes | Multiple sizes in one file |
@@ -40,16 +40,16 @@ Image? decodeImage(Uint8List data, {int? frame});
 first one that accepts it. It returns null if no decoder recognizes the data. Testing every decoder makes it
 slower than calling a specific decoder, so use a format-specific function when you know the format.
 
-If you know the file name, the extension picks the decoder. If there's no decoder for the extension,
-`decodeNamedImage` falls back to `decodeImage`.
+If you know the file name, the extension picks the decoder. Only if there's no decoder for the extension
+does `decodeNamedImage` fall back to `decodeImage`.
 
 ```dart
 Image? decodeNamedImage(String path, Uint8List data, {int? frame});
 ```
 
 On platforms with `dart:io`, you can decode straight from a file. `decodeImageFile` uses the extension
-first, and if that decoder fails or the extension is unknown, it tries every decoder. On the web it returns
-null.
+first, and if that decoder returns null or the extension is unknown, it tries every decoder (if the
+decoder throws, the exception is passed on). On the web it returns null; elsewhere a missing file throws.
 
 ```dart
 Future<Image?> decodeImageFile(String path, {int? frame});
@@ -91,10 +91,15 @@ frames; see [Decoding one frame at a time](animation.md#decoding-one-frame-at-a-
 
 ### Errors
 
-The decode functions return null when the data isn't in the expected format. Corrupt or unsupported files
-may also throw an `ImageException`, for example when a PNG chunk fails its checksum or an image is larger
-than the decoder's [`maxPixels`](#size-limits) limit. Bad data doesn't throw any other kind of error, so
-wrap decoding of untrusted files in a `try` block that catches `ImageException`.
+Most decode functions return null when the data isn't in the expected format; `decodeJpg` and `decodeExr`
+throw an `ImageException` instead. Corrupt or unsupported files may also throw an `ImageException`, for
+example when a PNG chunk fails its checksum or an image is larger than the decoder's
+[`maxPixels`](#size-limits) limit. Bad data doesn't throw any other kind of error, so wrap decoding of
+untrusted files in a `try` block that catches `ImageException`.
+
+- A PNG with bad zlib data or an unknown row filter type decodes to null.
+- zlib checksums are verified for PNG, TIFF and EXR image data and for ICC profiles.
+  `image.iccProfile!.decompressed()` throws an `ImageException` for invalid data.
 
 ### Size limits
 
@@ -103,9 +108,13 @@ Every decoder has a `maxPixels` limit on the width × height of an image. Larger
 multi-part file is also limited to `maxPixels` across all of its frames. A value of 0 or less disables the
 limit.
 
+Other limits protect against malicious files: compressed TIFF and EXR data and ICC profiles (and the files
+in a bitmap font zip) are decompressed only up to a size limit, and JPEGs can have at most 1000 scans.
+
 `Decoder.defaultMaxPixels` is a static setting, 2<sup>28</sup> (16384 × 16384) by default. It's used by
 every decoder created without `maxPixels`, including the ones `decodeImage` and `decodeImageFile` use. It
-protects against small, malicious files that declare huge dimensions.
+protects against small, malicious files that declare huge dimensions. The deprecated
+`JpegDecoder.defaultMaxPixels` is the same setting; use `Decoder.defaultMaxPixels`.
 
 ```dart
 // Allow larger images for every decode in the app.
@@ -129,10 +138,13 @@ Uint8List? encodeNamedImage(String path, Image image);
 Future<bool> encodeImageFile(String path, Image image);
 ```
 
-`encodeNamedImage` returns null if no encoder matches the extension. `encodeImageFile` and the
-`encodeXxxFile` functions return false if the file couldn't be written, and always return false on
-platforms without `dart:io` (the web). The extension-based functions use each encoder's default options;
-call the format-specific function or encoder class to pass options.
+`encodeNamedImage` returns null if no encoder matches the extension. `encodeImageFile` returns false if no
+encoder matches the extension, and it and the `encodeXxxFile` functions always return false on platforms
+without `dart:io` (the web). If the file can't be written they throw a `FileSystemException`. The
+extension-based functions use each encoder's default options; call the format-specific function or encoder
+class to pass options.
+
+Every encoder throws an `ImageException` for an empty image (no pixels).
 
 ```dart
 final image = img.Image(width: 256, height: 256);
@@ -314,7 +326,7 @@ The `GifEncoder` class has the full set of options:
 | `numColors` | 256 | The number of palette colors the `neural` and `octree` quantizers produce. |
 | `samplingFactor` | 10 | NeuQuant sampling: 1 is the best quality and slowest, larger values are faster. If your frames have fewer than 256 colors anyway, a large value speeds things up. |
 | `dither` | `DitherKernel.floydSteinberg` | The dither kernel: `none`, `floydSteinberg`, `falseFloydSteinberg`, `jarvisJudiceNinke`, `stucki`, `burkes`, `atkinson`, or the ordered `bayer2x2`, `bayer4x4`, `bayer8x8`. |
-| `ditherScanOrder` | null (raster) | The pixel order of the error-diffusion kernels: `DitherScanOrder.raster`, `serpentine` or `zigzag`. |
+| `ditherScanOrder` | null (raster) | The pixel order of the error-diffusion kernels: `DitherScanOrder.raster`, `serpentine`, `zigzag` or `hilbert`. |
 | `ditherStrength` | 1.0 | Scales the Bayer kernels' dither offset. Ignored by the error-diffusion kernels. |
 | `delay` | 80 | Frame delay in 1/100 seconds, used for frames added without a duration (including a single-frame image). |
 | `repeat` | 0 | Loop count written to the file, 0 for forever. When encoding an animated `Image`, its `loopCount` is used instead. |
@@ -397,9 +409,9 @@ The decoder reads a wide range of TIFF files, including bilevel, palette, 16 and
 and 64-bit float images, which decode to the matching [format](image_data.md#formats). Multi-page TIFFs
 decode to one frame per page, with `frameType` set to `FrameType.page`. The TIFF tags are in `image.exif`.
 
-The encoder writes a single uncompressed page (the first frame) with 8 bits per channel: 16-bit, float and
-signed-integer images are converted to 8 bits first. The image's `exif.imageIfd` tags are copied into the
-file.
+The encoder writes a single uncompressed page (the first frame). 16-bit, float and signed-integer images
+are converted to 8 bits first; 1, 2, 4 and 8-bit and palette images are written at their own bit depth.
+The image's `exif.imageIfd` tags are copied into the file.
 
 ### BMP: decoding, encoding
 
@@ -413,7 +425,7 @@ Uint8List encodeBmp(Image image);
 Future<bool> encodeBmpFile(String path, Image image);
 ```
 
-`BmpDecoder({bool forceRgba = false})` can decode to RGBA even when the file has no alpha. The encoder
+`BmpDecoder({bool forceRgba = false, int? maxPixels})` can decode to RGBA even when the file has no alpha. The encoder
 picks the bit depth from the image's format and channels, from 1-bit palette images up to 32-bit RGBA.
 
 ### TGA: decoding, encoding
@@ -449,7 +461,8 @@ Future<bool> encodeCurFile(String path, Image image, {bool singleFrame = false})
 An ICO file holds the same icon at several sizes. `decodeIco` decodes them all as the frames of the
 returned image (frames may have different sizes); pass `frame` to get one size, or use
 `IcoDecoder().decodeImageLargest(bytes)` to get the biggest. Each frame of the image you encode is
-written as one icon size, PNG compressed. Icons can be at most 256 × 256.
+written as one icon size, PNG compressed. Icons can be at most 256 × 256; larger frames throw an
+`ImageException`.
 
 ```dart
 final source = img.decodePng(bytes)!;
@@ -461,7 +474,12 @@ final ico = img.IcoEncoder().encodeImages(sizes);
 ```
 
 CUR files are icons with a hot spot, the pixel that is the cursor's click point. `encodeCur` writes each
-frame as a cursor image with its hot spot at 0, 0 (the top-left corner).
+frame as a cursor image with its hot spot at 0, 0 (the top-left corner). To set the hot spots, use
+`CurEncoder`, mapping frame indices to points:
+
+```dart
+final cur = img.CurEncoder(hotSpots: {0: img.Point(4, 2)}).encode(cursor);
+```
 
 ### PVR: decoding, encoding
 
@@ -478,7 +496,8 @@ Future<bool> encodePvrFile(String path, Image image, {bool singleFrame = false})
 PowerVR texture files. The decoder reads PVR v2 and v3 files and Apple's PVRTC files, with PVRTC and
 uncompressed pixel formats. The encoder writes PVRTC 4 bits per pixel compressed textures, RGB or RGBA
 depending on the image's channels; `PvrEncoder(format: ...)` takes a
-[`PvrFormat`](https://pub.dev/documentation/image/latest/image/PvrFormat.html). PVRTC images must be
+[`PvrFormat`](https://pub.dev/documentation/image/latest/image/PvrFormat.html). Use `auto`, `rgb4` or
+`rgba4`: the 2 bits per pixel formats aren't supported and don't produce valid files. PVRTC images must be
 square, with a power-of-two size.
 
 ### Photoshop PSD: decoding only
@@ -538,7 +557,7 @@ interface:
 |---|---|
 | `bool isValidFile(Uint8List bytes)` | A quick test of whether the data looks like this format. |
 | `Image? decode(Uint8List bytes, {int? frame})` | Decode the file: all frames, or only `frame`. |
-| `DecodeInfo? startDecode(Uint8List bytes)` | Read the file's header without decoding any pixels. Returns null if the data isn't valid. |
+| `DecodeInfo? startDecode(Uint8List bytes)` | Read the file's header without decoding any pixels. Returns null if the data isn't valid. Exception: `ExrDecoder` decodes the pixels here. |
 | `int numFrames()` | The number of frames, after `startDecode`. |
 | `Image? decodeFrame(int frame)` | Decode one frame, after `startDecode`. |
 | `ImageFormat format` | The format this decoder reads. |
@@ -569,7 +588,7 @@ property after `startDecode` or `decode`:
 | `JpegDecoder` | `info` (`JpegInfo`): `numComponents` |
 | `PngDecoder` | `info` (`PngInfo`): `bits`, `colorType`, `gamma`, `iccpName`, `iccpData`, `textData`, `pixelDimensions`, `cicpData`, `frames`, `repeat` |
 | `GifDecoder` | `info` (`GifInfo`): `globalColorMap`, `frames` (`GifImageDesc`: `x`, `y`, `width`, `height`, `duration` in 1/100 s, `disposal`) |
-| `WebPDecoder` | `info` (`WebPInfo`): `format` (lossy, lossless or animated), `hasAlpha`, `hasAnimation`, `animLoopCount`, `frames` (`WebPFrame`) |
+| `WebPDecoder` | `info` (`WebPInfo`): `format` (lossy, lossless or animated), `hasAlpha`, `hasAnimation`, `animLoopCount`, `frames` (`WebPFrame`: `x`, `y`, `width`, `height`, `duration`, …) |
 | `TiffDecoder` | `info` (`TiffInfo`): `images` (`TiffImage` per page, with `bitsPerSample`, `compression`, …) |
 | `TgaDecoder` | `info` (`TgaInfo`) |
 | `PsdDecoder` | `info` (`PsdImage`): `layers`, `imageResources` |
@@ -587,7 +606,7 @@ final Uint8List fileBytes = encoder.encode(image);
 final bool supportsAnimation = encoder.supportsAnimation;
 ```
 
-`supportsAnimation` is true for `GifEncoder`, `PngEncoder`, `WebPEncoder` and `IcoEncoder`.
+`supportsAnimation` is true for `GifEncoder`, `PngEncoder`, `WebPEncoder`, `IcoEncoder` and `CurEncoder`.
 `GifEncoder` and `PngEncoder` can also encode an animation a frame at a time; see
 [Animated Images](animation.md#encoding-frame-by-frame).
 
@@ -637,7 +656,7 @@ if (image != null) {
   much faster and with a fraction of the memory of decoding the full image and resizing it.
 - **Decode one frame.** Passing `frame: 0` decodes only the first frame of an animation instead of every
   frame at full canvas size.
-- **Get the size without decoding.** `decoder.startDecode(bytes)` reads only the header.
+- **Get the size without decoding.** `decoder.startDecode(bytes)` reads only the header (except for EXR).
 - **Baseline JPEGs and PNGs stream.** Baseline JPEGs are decoded a band of rows at a time, and PNG image
   data is decompressed as rows are read, so neither holds a second full copy of the image while decoding.
   Progressive JPEGs need all of their coefficients until the last scan. On `dart:io` platforms the PNG

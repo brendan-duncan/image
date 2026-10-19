@@ -9,6 +9,30 @@
 * Faster `gaussianBlur` and `separableConvolution` for float32 images.
 * Fix `clear` ignoring its color for float32 images.
 * Fix `CopyRectifyCmd` ignoring `interpolation`.
+* Fix `contrast` with `ContrastMode.scurve` never applying the curve.
+* Fix `luminanceThreshold` with `outputColor` squaring the blue channel.
+* `hexagonPixelate` `centerX` and `centerY` are pixel offsets of the grid; fix a crash on 1 pixel wide images.
+* Fix `copyImageChannels` with a mask on non-float images.
+* Fix `pixelate` average mode reading pixels it already changed; edge blocks average only their own pixels.
+* Fix `BinaryQuantizer` dithering turning almost every color white.
+* `reinhardTonemap` uses the standard Reinhard operator, keeping luminance in 0-1.
+* `Image.convert` to 1 channel keeps fractional luminance for float images.
+* `Image.convert(withPalette: true)` keeps alpha for RGBA images.
+* Fix `fillRect` blending of partly transparent colors and masks.
+* Fix `drawRect` with a radius ignoring the mask on its straight edges.
+* Fix `drawString` centering of multi-line and wrapped text.
+* Fix `BitmapFont.fromFnt` and `readFont` throwing on .fnt files with a page line.
+* Fix `copyResizeCropSquare` with a radius dropping animation frames.
+* Add the missing function parameters to commands: `contrast` `mode`, `pixelate` `amount`, `quantize` `ditherStrength`, `trim` `fuzzy` and `padding`, `drawPolygon` `antialias` and `thickness`, `drawPixel` `filter` and `alpha`, `fillRect` `alphaBlend`, `decodeJpg` `scale` and `maxPixels`.
+* The `ditherImage` command defaults to zigzag scan order, like the function.
+* `executeThread` and the other thread methods rethrow anything thrown, not only errors and exceptions.
+* Fix GIF animation compositing: apply each frame's disposal after it is shown, restore only the frame's area, support restoring the previous canvas, place the first frame on the logical screen, and keep frames decoded before an invalid one.
+* Fix `IcoDecoder.decodeImageLargest` ignoring 256 pixel icons.
+* `encodeNamedImage` and `encodeImageFile` write CUR files for .cur names.
+* `IcoEncoder` and `CurEncoder` throw `ImageException` for images larger than 256.
+* `PsdDecoder.startDecode` returns null for data that isn't a PSD file.
+* Export `CurEncoder`, `Rational` and `WebPFrame`.
+* Expand the documentation, with new guides to color spaces and alpha, decoding untrusted images, and migrating from version 3.
 
 # 4.12.0
 

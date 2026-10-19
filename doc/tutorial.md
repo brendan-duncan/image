@@ -36,9 +36,10 @@ and web), and the browser. Functions that read or write files need `dart:io`; on
 ## Decode an image
 
 Decoding turns encoded file bytes (JPEG, PNG, ...) into an [Image](image_data.md). The decode functions
-return `null` when they can't decode the data, so check the result. Some can also throw, usually an
-`ImageException`: `decodeJpg` throws for data that isn't a JPEG, and corrupt or truncated files can make any
-decoder throw. Catch exceptions when decoding files you don't control.
+return `null` when they can't decode the data, so check the result. They can also throw, and decoders only
+throw `ImageException`: `decodeJpg` and `decodeExr` throw for data that isn't a JPEG or EXR, corrupt or
+truncated files can make any decoder throw, and so can an image larger than the `maxPixels` limit
+(`Decoder.defaultMaxPixels`, 2^28 pixels by default). Catch exceptions when decoding files you don't control.
 
 ```dart
 import 'dart:io';
@@ -46,7 +47,8 @@ import 'package:image/image.dart' as img;
 
 Future<void> main() async {
   // From a file (dart:io only). The format is chosen from the file extension,
-  // falling back to detecting it from the data.
+  // falling back to detecting it from the data if that decoder returns null.
+  // A missing file throws a FileSystemException.
   final image = await img.decodeImageFile('photo.jpg');
   if (image == null) {
     print('Could not decode photo.jpg');
@@ -107,8 +109,11 @@ Functions come in two styles:
 
 - **Copy functions**, whose names mostly start with `copy` (`copyResize`, `copyCrop`, `copyRotate`, ...), return a
   new image and leave the source unchanged. `trim` and `bakeOrientation` also return a new image.
-- **In-place functions**, including all [filters](filters.md) (`grayscale`, `gaussianBlur`, `adjustColor`, ...),
-  [drawing functions](draw.md) and `flip`, modify the image you pass and return that same image.
+- **In-place functions**, including most [filters](filters.md) (`grayscale`, `gaussianBlur`, `adjustColor`, ...),
+  [drawing functions](draw.md) and `flip`, modify the image you pass and return that same image. A few filters
+  (`dropShadow`, `bumpToNormal`, `hdrToLdr`, `quantize`, `ditherImage`) return a new image, and palette images
+  come back as a new converted image, so always use the result; see
+  [Filters modify the image in place](filters.md#filters-modify-the-image-in-place).
 
 ```dart
 // Resize to 800 pixels wide, keeping the aspect ratio. Returns a new image.
@@ -161,8 +166,9 @@ await img.encodeImageFile('out.png', image);
 await img.encodeJpgFile('out.jpg', image, quality: 85);
 ```
 
-`encodeImageFile` and the `encode...File` functions return `false` if the file couldn't be written, including
-on the web where there is no file system.
+`encodeImageFile` and the `encode...File` functions return `false` on the web, where there is no file system,
+and `encodeImageFile` also returns `false` for an extension with no encoder. With `dart:io`, a failed write
+throws a `FileSystemException`.
 
 ## Work with pixels
 

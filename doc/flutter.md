@@ -199,7 +199,7 @@ YUV frames (the Android default) have to be converted to RGB first; the library 
 A decoded image takes `width * height * channels` bytes for 8-bit images: a 12 megapixel RGB photo is about 36 MB,
 no matter how small the JPEG file was. On phones, this adds up quickly.
 
-- Decode JPEGs at the size you need with `img.decodeJpg(bytes, scale: 2 | 4 | 8)`.
+- Decode JPEGs at the size you need with `img.decodeJpg(bytes, scale: 4)` (`scale` can be 2, 4 or 8).
 - For animations, decode one frame with `frame:` (for example `img.decodeGif(bytes, frame: 0)`) when you only need
   a still.
 - Resize early, and drop references to the full-size image so it can be garbage collected.

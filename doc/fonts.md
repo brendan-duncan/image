@@ -37,7 +37,7 @@ decoded the first time you use it.
 ```dart
 Image drawString(Image image, String string, {required BitmapFont font,
     int? x, int? y, Color? color, bool rightJustify = false, bool wrap = false,
-    BlendMode blend = BlendMode.alpha, Image? mask,
+    BlendMode blend = BlendMode.alpha, bool linearBlend = false, Image? mask,
     Channel maskChannel = Channel.luminance})
 ```
 
@@ -46,13 +46,13 @@ Draws `string` into `image` and returns `image`.
 | Parameter | Description |
 |---|---|
 | `font` | The [BitmapFont](#bitmapfont) to draw with. |
-| `x`, `y` | The top-left corner of the text. Leave out `x` to center the text horizontally in the image, or `y` to center it vertically. |
+| `x`, `y` | The top-left corner of the text. Leave out `x` to center the text horizontally in the image, or `y` to center it vertically. Centering uses the widest line and the height of all the lines. |
 | `color` | Tints the text: the glyph colors are multiplied by `color`, and its alpha scales their opacity. White glyphs become exactly `color`. Without it, the glyphs' own colors are used. |
 | `rightJustify` | When `true`, `x` is the right edge of each line instead of the left. |
 | `wrap` | When `true`, breaks lines between words so they fit within the width of the image. Drawing stops at a word that doesn't fit on a line by itself. |
-| `blend`, `mask`, `maskChannel` | The usual [drawing parameters](draw.md#common-parameters). |
+| `blend`, `linearBlend`, `mask`, `maskChannel` | The usual [drawing parameters](draw.md#common-parameters). `linearBlend` blends partly transparent pixels as linear light. |
 
-* `\n` starts a new line. Each line is drawn below the previous one, at a spacing equal to the
+* `\n` starts a new line (as does `\r` when `wrap` is `false`). Each line is drawn below the previous one, at a spacing equal to the
   height of the tallest character in the string.
 * Characters the font doesn't have are skipped, leaving a gap of half the font's `base` height.
 * Text is drawn character by character with each glyph's offsets and advance; kerning pairs are
@@ -85,14 +85,14 @@ img.drawString(image, 'Watermark', font: img.arial24, x: 10, y: 90,
 ```dart
 Image drawChar(Image image, String char, {required BitmapFont font,
     required int x, required int y, Color? color,
-    BlendMode blend = BlendMode.alpha, Image? mask,
+    BlendMode blend = BlendMode.alpha, bool linearBlend = false, Image? mask,
     Channel maskChannel = Channel.luminance})
 ```
 
 Draws the first character of `char` with the top-left corner of its glyph image at (`x`, `y`).
 Unlike `drawString`, it doesn't apply the character's offsets, so it's mostly useful for
 symbols and single characters. If `color` is given, the glyph is drawn in that color using the
-glyph's alpha as its shape; otherwise the glyph's own colors are used. Nothing is drawn if the
+glyph's alpha as its shape (the alpha of `color` is ignored); otherwise the glyph's own colors are used. Nothing is drawn if the
 font doesn't have the character.
 
 ```dart
@@ -113,7 +113,10 @@ There's no measuring function, but you can add up the characters' advances. This
   var height = 0;
   for (final c in text.codeUnits) {
     final ch = font.characters[c];
-    if (ch == null) continue;
+    if (ch == null) {
+      width += font.base ~/ 2; // drawString leaves a gap for missing characters
+      continue;
+    }
     width += ch.xAdvance;
     if (ch.height + ch.yOffset > height) height = ch.height + ch.yOffset;
   }
@@ -144,7 +147,8 @@ pass the bytes of the zip to
 [readFontZip](https://pub.dev/documentation/image/latest/image/readFontZip.html) (or the
 equivalent `BitmapFont.fromZip` constructor). The PNG files are found by the names listed in
 the `.fnt` file. It throws an `ImageException` if the zip has no `.fnt` file or is missing a
-page image.
+page image, if a file in the zip is larger than 16 MiB, or if the glyphs add up to far more
+pixels than the page images hold.
 
 ```dart
 import 'dart:io';

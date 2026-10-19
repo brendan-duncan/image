@@ -52,8 +52,8 @@ Most drawing functions share these named parameters:
 | `mask` | `null` | An image that controls, per pixel, how much of the drawing is applied. See [Masks](#masks). |
 | `maskChannel` | `Channel.luminance` | Which channel of `mask` to use: `red`, `green`, `blue`, `alpha` or `luminance`. |
 
-`drawPixel`, `compositeImage` and the line, rectangle, circle, polygon and text functions also
-take `linearBlend`. When it's `true`, colors are mixed in linear light (converting from sRGB
+`drawPixel`, `compositeImage`, `drawRect` and the line, circle, polygon and text functions also
+take `linearBlend` (`fillRect` doesn't). When it's `true`, colors are mixed in linear light (converting from sRGB
 first and back afterwards, with `srgbToLinear` and `linearToSrgb`), which gives more physically
 accurate blends of bright and dark colors, at some cost in speed.
 
@@ -311,7 +311,7 @@ Image fillFlood(Image src, {required int x, required int y,
 
 The "paint bucket": fills the area connected to (`x`, `y`) whose pixels have the same color as
 that starting pixel. Pixels connect horizontally and vertically, not diagonally. Filled pixels
-are replaced with `color`, not blended.
+are replaced with `color`, not blended. Nothing is filled if `color`'s alpha is 0.
 
 * `threshold` also fills pixels whose color is within that distance of the starting color,
   measured in the CIE L\*a\*b\* color space (where a distance of about 2 is barely noticeable and
@@ -358,7 +358,8 @@ Image drawString(Image image, String string, {required BitmapFont font,
 
 Draws text with a bitmap font. Leave out `x` or `y` to center the text horizontally or
 vertically. `color` tints the font, `\n` starts a new line, `rightJustify` makes `x` the right
-edge of the text, and `wrap` breaks lines at the right edge of the image.
+edge of the text, and `wrap` breaks lines at the right edge of the image. Centering uses the widest
+line and the height of all the lines.
 
 ```dart
 img.drawString(image, 'Hello World', font: img.arial24, x: 10, y: 10,

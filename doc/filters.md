@@ -37,7 +37,7 @@ void main() async {
   [reinhardTonemap](#reinhardtonemap)
 - [Normal maps](#normal-maps): [bumpToNormal](#bumptonormal)
 - [Color reduction and dithering](#color-reduction-and-dithering): [quantize](#quantize),
-  [ditherImage](#ditherimage)
+  [ditherImage](#ditherimage), [ditherImageBayer](#ditherimagebayer)
 - [Color helper functions](#color-helper-functions)
 - [Writing your own filter](#writing-your-own-filter)
 
@@ -59,11 +59,13 @@ To keep the original, filter a copy: `img.sepia(image.clone())`.
 Always use the returned image. A few filters can return a different object:
 
 - Palette images are converted to RGB(A) before filtering (filters work on colors, not palette
-  indices), and the converted image is returned. `histogramEqualization` and `histogramStretch` also
-  convert float and one- or two-channel images.
+  indices), and the converted image is returned (except by `reinhardTonemap`, which is meant for float
+  images and doesn't convert). `histogramEqualization` and `histogramStretch` also convert float and
+  one- or two-channel images.
 - [bumpToNormal](#bumptonormal), [hdrToLdr](#hdrtoldr) and [dropShadow](#dropshadow) always return a
   new image and leave the source unchanged.
-- [quantize](#quantize) and [ditherImage](#ditherimage) return a new palette image.
+- [quantize](#quantize), [ditherImage](#ditherimage) and [ditherImageBayer](#ditherimagebayer) return
+  a new palette image.
 
 Filters process every frame of an [animated image](animation.md), except the functions that create
 a new image (`hdrToLdr`, `dropShadow`, `quantize`, `ditherImage`) and `reinhardTonemap`, which work on
@@ -83,13 +85,15 @@ Using a mask image to blend the [sketch](#sketch) filter:
 ![sketchMask](images/filter/sketch_mask.png)
 
 ```dart
-// Blur the image, fading from sharp on the left to blurred on the right.
+// Sketch the middle of the image, fading out toward the edges.
 final mask = img.Image(width: image.width, height: image.height);
 for (final p in mask) {
-  final v = 255 * p.x ~/ (image.width - 1);
+  final dx = 2 * p.x / mask.width - 1;
+  final dy = 2 * p.y / mask.height - 1;
+  final v = (255 * (1.5 - 1.5 * (dx * dx + dy * dy))).clamp(0, 255);
   p.setRgb(v, v, v);
 }
-img.gaussianBlur(image, radius: 8, mask: mask);
+img.sketch(image, mask: mask);
 ```
 
 ### Amount
@@ -107,7 +111,7 @@ img.grayscale(image, amount: 0.5); // Half desaturated.
 `gaussianBlur`, `smooth`, `separableConvolution`, `pixelate`, `vignette`, `bulgeDistortion` and
 `stretchDistortion` take `linearBlend` (default `false`). When it's `true`, colors are taken as sRGB
 and averaged as linear light, so blurred images keep their bright details instead of darkening
-them. Alpha is unchanged. It's slower (roughly 2x for `gaussianBlur`). The distortions use it only
+them. Alpha isn't converted to linear light, but is still blurred or averaged as without it. It's slower (roughly 2x for `gaussianBlur`). The distortions use it only
 when interpolating, not with `Interpolation.nearest`.
 
 ### Image formats and speed
@@ -124,10 +128,10 @@ generally used only when no `mask` is given.
 
 ### Commands
 
-Every filter except `histogramEqualization`, `histogramStretch` and `solarize` has a
-[Command](commands.md) method with the same name and essentially the same parameters (masks are given
-as `Command`s), so filters can run asynchronously or in an isolate. Any other function, including
-those three, can be run with `Command.filter`:
+Every filter except `histogramEqualization`, `histogramStretch`, `solarize` and `ditherImageBayer`
+has a [Command](commands.md) method with the same name and essentially the same parameters (masks are
+given as `Command`s), so filters can run asynchronously or in an isolate. Any other function,
+including those four, can be run with `Command.filter`:
 
 ```dart
 final cmd = img.Command()
@@ -655,8 +659,8 @@ Image dotScreen(Image src, {num angle = 180, num size = 5.75, int? centerX, int?
 ![dotScreen](images/filter/dotScreen.png)
 
 A black and white halftone dot screen, based on the luminance of the image. `angle` is the screen
-angle in degrees, `size` scales the dot pattern, and `centerX`, `centerY` set its origin (defaults to
-the image center).
+angle in degrees, `size` sets the frequency of the dot pattern (larger values give smaller, denser
+dots), and `centerX`, `centerY` set its origin (defaults to the image center).
 
 ```dart
 img.dotScreen(image, angle: 45);
@@ -816,6 +820,8 @@ Adds random noise to the RGB channels. `sigma` sets the strength, in channel val
 Pass a seeded `Random` (from `dart:math`) for repeatable results.
 
 ```dart
+import 'dart:math';
+
 img.noise(image, 20, random: Random(42));
 img.noise(image, 5, type: img.NoiseType.saltAndPepper);
 ```
@@ -913,6 +919,22 @@ final dithered = img.ditherImage(image,
     kernel: img.DitherKernel.bayer8x8);
 ```
 
+### [ditherImageBayer](https://pub.dev/documentation/image/latest/image/ditherImageBayer.html)
+
+```dart
+Image ditherImageBayer(Image image, [Quantizer? quantizer,
+    DitherKernel kernel = DitherKernel.bayer4x4, double strength = 1.0])
+```
+
+Ordered (Bayer) dithering, which is position-based rather than error-diffusing, so it's fast and
+repeatable. Its parameters are positional, not named. `kernel` must be `bayer2x2`, `bayer4x4` or
+`bayer8x8`, and the default quantizer is a `NeuralQuantizer` built from `image`.
+
+```dart
+final dithered = img.ditherImageBayer(image,
+    img.OctreeQuantizer(image, numberOfColors: 8), img.DitherKernel.bayer8x8);
+```
+
 ## Color helper functions
 
 The library also exports helpers for color math, useful when writing your own filters:
@@ -926,6 +948,7 @@ The library also exports helpers for color math, useful when writing your own fi
 | `rgbToHsv(r, g, b, hsv)` | RGB to `[h, s, v]` with `h` in degrees, written into the `List<num> hsv`; `v` is in the units of the input. |
 | `hsvToRgb(h, s, v, rgb)` | HSV (`h` in degrees, `s` and `v` 0 to 1) to RGB (0 to 1), written into the `List<num> rgb`. |
 | `rgbToXyz`, `xyzToRgb`, `rgbToLab`, `labToRgb`, `xyzToLab`, `labToXyz` | Conversions between 8-bit sRGB, CIE XYZ and CIE L\*a\*b\*. |
+| `srgbToLinear(c)`, `linearToSrgb(c)` | Convert a normalized (0 to 1) channel value between sRGB and linear light. |
 | `cmykToRgb(c, m, y, k, rgb)` | CMYK (each 0 to 255) to RGB (0 to 255), written into the `List<int> rgb`. |
 | `convertColor(c, {to, format, numChannels, alpha})` | Converts a `Color` to another format or number of channels. |
 | `rgbaToUint32`, `uint32ToRed`, `uint32ToGreen`, `uint32ToBlue`, `uint32ToAlpha` | Pack and unpack 8-bit channels in a 32-bit integer (red in the low byte). |

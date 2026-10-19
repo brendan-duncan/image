@@ -20,9 +20,10 @@ if (image != null) {
 }
 ```
 
-`image.exif` creates an empty `ExifData` the first time you read it if the image has none, so use
-`image.hasExif` to check whether an image has EXIF data without adding it. Assigning
-`image.exif = ExifData()` replaces all of it.
+`image.exif` creates an empty `ExifData` the first time you read it if the image has none (functions such
+as `copyResize` read it too), and decoded JPEGs always have one, even if empty. So `image.hasExif` only
+tells you whether an `ExifData` object exists; to test for actual tags, check `image.exif.isEmpty` or look
+for a specific tag. Assigning `image.exif = ExifData()` replaces all of it.
 
 ## How EXIF data is organized
 
@@ -93,13 +94,13 @@ the names they give for GPS and interop tags aren't correct.
 
 ### Named properties
 
-`IfdDirectory` has properties for common tags. Each has a `hasXxx` test, and setting it to null removes the
-tag.
+`IfdDirectory` has properties for common tags. Each has a `hasXxx` test (for the GPS properties,
+`hasGPSLatitude` and so on), and setting it to null removes the tag.
 
 | Property | Tag | Type |
 |---|---|---|
 | `make`, `model`, `software`, `copyright`, `imageDescription` | `Make`, `Model`, `Software`, `Copyright`, `ImageDescription` | `String?` |
-| `userComment` | `UserComment` (exif sub-IFD) | `String?` |
+| `userComment` | `UserComment` (exif sub-IFD) | `String?` (`''` if the tag is missing) |
 | `orientation` | `Orientation` | `int?` |
 | `xResolution`, `yResolution` | `XResolution`, `YResolution` | rational (set with `[numerator, denominator]`) |
 | `resolutionUnit` | `ResolutionUnit` | `int?` (2 = inch, 3 = centimeter) |
@@ -138,12 +139,12 @@ tag the table doesn't know is silently ignored.
 | `IfdValue` class | EXIF type | Constructors |
 |---|---|---|
 | `IfdByteValue` | BYTE (uint8) | `IfdByteValue(int)`, `.list(Uint8List)` |
-| `IfdValueAscii` | ASCII | `IfdValueAscii(String)` |
+| `IfdValueAscii` | ASCII | `IfdValueAscii(String)`, `.string(String)`, `.list(List<int>)` |
 | `IfdValueShort` | SHORT (uint16) | `IfdValueShort(int)`, `.list(List<int>)` |
 | `IfdValueLong` | LONG (uint32) | `IfdValueLong(int)`, `.list(List<int>)` |
 | `IfdValueRational` | RATIONAL | `IfdValueRational(numerator, denominator)`, `.list(...)` |
 | `IfdValueSByte` | SBYTE (int8) | `IfdValueSByte(int)`, `.list(List<int>)` |
-| `IfdValueUndefined` | UNDEFINED (raw bytes) | `IfdValueUndefined.list(List<int>)` |
+| `IfdValueUndefined` | UNDEFINED (raw bytes) | `IfdValueUndefined.list(List<int>)`, `.view(Uint8List)` (no copy) |
 | `IfdValueSShort` | SSHORT (int16) | `IfdValueSShort(int)`, `.list(List<int>)` |
 | `IfdValueSLong` | SLONG (int32) | `IfdValueSLong(int)`, `.list(List<int>)` |
 | `IfdValueSRational` | SRATIONAL | `IfdValueSRational(numerator, denominator)`, `.list(...)` |
@@ -243,7 +244,8 @@ tag:
 | 8 | Needs a 90° counter-clockwise rotation to display |
 
 The JPEG decoder applies the orientation while decoding, so a decoded JPEG is already upright, and its
-`Orientation` tag is removed. For images from other formats, or images where you set the tag yourself,
+`Orientation` tag is removed. `copyResize` and `resize` also apply the orientation and remove the tag.
+For other operations on images from other formats, or images where you set the tag yourself,
 [`bakeOrientation`](transform.md#bakeorientation) returns a copy rotated and flipped to match the tag, with
 the tag removed and the rest of the EXIF data kept:
 

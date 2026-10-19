@@ -1,6 +1,6 @@
 # Animated Images
 
-GIF, PNG (APNG) and WebP files can hold an animation. TIFF and PSD files can hold several pages, and ICO
+GIF, PNG (APNG) and WebP files can hold an animation. TIFF files can hold several pages, and ICO
 files several sizes of an icon. The library stores all of these the same way: as a list of frames on an
 [Image](image_data.md).
 
@@ -36,7 +36,7 @@ every pixel of the picture shown at that point. There are no partial frames, ble
 methods on a decoded `Image`; the decoders apply them while decoding (see
 [Compositing and disposal](#compositing-and-disposal)).
 
-`frameType` is set to `FrameType.page` by the TIFF and PSD decoders. The GIF, PNG and WebP decoders leave
+`frameType` is set to `FrameType.page` by the TIFF decoder. The GIF, PNG and WebP decoders leave
 it at the default, `FrameType.sequence`, so don't rely on it to tell whether a decoded image is an
 animation; use `hasAnimation`. The encoders don't look at `frameType`.
 
@@ -57,9 +57,9 @@ print([gif, apng, webp, any].map((i) => i?.numFrames));
 | Format | What the frames are | Notes |
 |---|---|---|
 | GIF | Animation | Palette images. Delays are stored in 1/100 s and converted to milliseconds. |
-| PNG (APNG) | Animation | Delays converted to milliseconds. The APNG loop count isn't copied to `loopCount`; read it from `PngDecoder().info.repeat`. |
+| PNG (APNG) | Animation | Delays converted to milliseconds. The APNG loop count isn't copied to `loopCount`; read `info.repeat` from the same `PngDecoder` after `decode` or `startDecode`. |
 | WebP | Animation | |
-| TIFF, PSD | Pages | `frameType` is `FrameType.page`. |
+| TIFF | Pages | `frameType` is `FrameType.page`. PSD files decode to a single frame. |
 | ICO | Icon sizes | Frames can have different sizes. |
 
 ### Compositing and disposal
@@ -107,7 +107,7 @@ the position and timing are in the decoder's info:
 
 | Decoder | Frame information |
 |---|---|
-| `GifDecoder` | `info.frames[i]` (`GifImageDesc`): `x`, `y`, `width`, `height`, `duration` (1/100 s), `disposal` |
+| `GifDecoder` | `info!.frames[i]` (`GifImageDesc`): `x`, `y`, `width`, `height`, `duration` (1/100 s), `disposal` |
 | `PngDecoder` | `info.frames[i]` (`PngFrame`): `xOffset`, `yOffset`, `width`, `height`, `delay` (seconds), `dispose`, `blend` |
 | `WebPDecoder` | `info!.frames[i]` (`WebPFrame`): `x`, `y`, `width`, `height`, `duration` (ms), `clearFrame`, `blendFrame` |
 

@@ -36,7 +36,8 @@ using too much memory.
 
 ### Decode JPEGs at a reduced size
 
-`decodeJpg` (and `decodeJpgFile` and `JpegDecoder`) can scale the image down by 2, 4 or 8 while decoding:
+`decodeJpg` (and `decodeJpgFile` and `JpegDecoder`) can scale the image down by 2, 4 or 8 while decoding (other
+`scale` values throw an `ArgumentError`):
 
 ```dart
 // A 4000x3000 photo decodes to 500x375.
@@ -76,9 +77,11 @@ the whole image's coefficients in memory until the last scan, so they use notice
 ### Limit the size of images you accept
 
 Every decoder throws an `ImageException` before allocating the pixels if the image declares more than its
-`maxPixels`, for example `decodeJpg(bytes, maxPixels: n)` or `PngDecoder(maxPixels: n)`. The default,
-`Decoder.defaultMaxPixels`, is 2^28 (16384 x 16384). On a phone, a lower limit protects you from images too big
-to handle:
+`maxPixels`, for example `PngDecoder(maxPixels: n)`. When decoding a whole animation, the limit applies to the
+pixels of all frames together. Of the top-level functions, only `decodeJpg` and `decodeJpgFile` take
+`maxPixels`; `GifDecoder` and `WebPDecoder` have it as a field to set (`GifDecoder()..maxPixels = n`). The
+default, `Decoder.defaultMaxPixels`, is 2^28 (16384 x 16384), and a value <= 0 disables the limit. On a phone, a
+lower limit protects you from images too big to handle:
 
 ```dart
 Decoder.defaultMaxPixels = 50000000; // also applies to decodeImage
@@ -100,8 +103,8 @@ final firstAny = decodeImage(bytes, frame: 0);
 (JPEG, PNG, GIF, WebP, TIFF, PSD, EXR, BMP, PNM, TGA, ICO, then PVR) and uses the first that accepts it. That check
 is cheap for JPEG, which is tried first, but adds work for formats later in the list. It also can't take decoder
 options such as `scale`. When you know the format, call its decoder (`decodeJpg`, `decodePng`, ...) directly.
-`decodeNamedImage` and `decodeImageFile` choose the decoder from the file extension, and only fall back to
-detection if that fails.
+`decodeNamedImage` and `decodeImageFile` choose the decoder from the file extension, and fall back to detection
+only when the extension is unknown (`decodeImageFile` also when the chosen decoder returns null).
 
 To get the size of an image without decoding it, use a decoder's `startDecode`, which reads the header:
 
@@ -117,7 +120,8 @@ resizing, which is fast for most formats), and many filters (including `gaussian
 `edgeGlow`, `grayscale`, `gamma` and `adjustColor`) have fast paths that work directly on the bytes of `uint8`
 images. Other formats (16-bit, float, bit-packed, and often indexed images) go through slower generic code that
 reads and writes each pixel through a `Pixel` object. (`copyCrop`, `flip` and rotation by multiples of 90 degrees
-copy bytes for any format whose pixels are a whole number of bytes.)
+copy bytes for any format whose pixels are a whole number of bytes, and `gaussianBlur` and
+`separableConvolution` also have a fast path for `float32` images.)
 
 Most JPEG and PNG files decode to 8-bit RGB or RGBA already. If you have another kind, such as a 16-bit PNG or an
 indexed GIF, and will run several operations on it, converting once can pay off:
@@ -134,14 +138,20 @@ Only do this when you don't need the extra precision, and note that converting c
 ## Resize efficiently
 
 - `copyResize` returns a new image and keeps the original. If the image has an EXIF orientation (typical for
-  phone photos), it applies the rotation while resizing, instead of first making a rotated full-size copy. Only
+  phone photos), it applies the rotation while resizing, instead of first making a rotated full-size copy, when
+  its byte fast path supports the frames (`uint8` without a palette for `linear`, `cubic` and `average`; any
+  format with whole-byte pixels for `nearest`). Otherwise it bakes the orientation into a copy first. Only
   call `bakeOrientation` yourself if you need the full-size image upright.
-- `resize` resizes **in place** where it can (8-bit images without a palette), reusing the source image's
-  memory instead of allocating a second image. Use it when you no longer need the original:
+- `resize` shrinks **in place**, for any format, reusing the source image's memory instead of allocating a
+  second image. Use it when you no longer need the original:
 
   ```dart
   image = resize(image, width: 1024); // Always use the returned image.
   ```
+
+  Enlarging, letterboxing (`maintainAspect` with padding) and `cubic` (except when shrinking `uint8` images) usually
+  fall back to `copyResize` and return a new image, as does `linearBlend: true`. `resize` also bakes an EXIF
+  orientation into a full-size copy before resizing, so prefer `copyResize` for oriented photos.
 
   The buffer keeps its original capacity, so `image.lengthInBytes` and `image.toUint8List()` can be larger than
   the resized pixels; see [Raw bytes](image_data.md#raw-bytes). If you only need a small copy and want to
@@ -149,14 +159,19 @@ Only do this when you don't need the extra precision, and note that converting c
 - `Interpolation.nearest` (the default) is the fastest. `average` gives the best quality when shrinking a lot;
   `linear` and `cubic` are good for small changes in size.
 - When the source is a JPEG, combine resizing with [decoding at a reduced size](#decode-jpegs-at-a-reduced-size).
+- `linearBlend: true` (on resizing and on filters such as `gaussianBlur`) makes a `float32` linear copy of the
+  image (4 bytes per channel) and converts both ways, which costs memory and time. On a 2000x1500 RGB image,
+  `gaussianBlur` with radius 5 went from 186 to 317 ms, and `copyResize` to 1/4 size with `average` from 9 to
+  70 ms.
 
 ## Avoid unnecessary copies
 
 - Filters and drawing functions modify the image in place. Don't `clone()` before them unless you need the
-  original.
+  original. The exceptions, `quantize`, `ditherImage`, `hdrToLdr`, `dropShadow` and `bumpToNormal`, return a
+  new image.
 - `convert` always returns a new image, even when nothing changes; check `format` and `numChannels` first.
 - `toUint8List()`, `getBytes()` without an `order`, and `buffer` are views of the image's memory, not copies.
-  `getBytes(order: ...)` copies only when the channels have to be rearranged.
+  `getBytes(order: ...)` copies only when the channels have to be rearranged, added or removed.
 - `Image.fromBytes` copies the bytes you give it.
 - Decode one frame instead of a whole animation when you only need one.
 
@@ -207,6 +222,8 @@ Per-pixel code in Dart is where most custom processing time goes.
   much smaller and usually look the same.
 - **WebP**: `encodeWebP` is lossless by default. For photos use `lossless: false`; its `method` option (0-6)
   trades encoding time against size (see the [API docs](https://pub.dev/documentation/image/latest/image/encodeWebP.html)).
+  `exact` defaults to `true`, keeping the color under fully transparent pixels; `exact: false` drops it, which
+  can make files with large transparent areas smaller.
 - **GIF**: GIF encoding quantizes colors, which is relatively slow. See
   [Color Quantization](color_quantization.md) for the options.
 
@@ -228,11 +245,12 @@ Future<Uint8List> processInBackground(Uint8List jpegBytes) =>
 ```
 
 Or use the [Command API](commands.md), which does the same with `executeThread()`, `getImageThread()` or
-`getBytesThread()`, and falls back to the main thread on the web:
+`getBytesThread()`, and falls back to the main thread on the web. `Command.decodeJpg` takes `scale` and
+`maxPixels` too:
 
 ```dart
 Future<Uint8List?> processWithCommands(Uint8List jpegBytes) => (Command()
-      ..decodeJpg(jpegBytes)
+      ..decodeJpg(jpegBytes, scale: 2)
       ..copyResize(width: 1024)
       ..grayscale()
       ..encodeJpg(quality: 85))

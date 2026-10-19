@@ -53,7 +53,7 @@ New images are filled with zeros (black, and fully transparent if there is an al
 
 | Parameter | Default | Meaning |
 |---|---|---|
-| `width`, `height` | required | Size in pixels. |
+| `width`, `height` | required | Size in pixels. Negative values throw an `ArgumentError`. |
 | `format` | `Format.uint8` | The data type of each channel. See [Formats](#formats). |
 | `numChannels` | `3` | Channels per pixel (1-4). With a palette, the number of palette channels. |
 | `withPalette` | `false` | Create a palette. Only used for formats that [support palettes](#palettes). |
@@ -98,14 +98,18 @@ final copy = Image.from(image);
 final copy2 = image.clone();
 // Only the first frame.
 final firstFrame = image.clone(noAnimation: true);
-// Same size, format and metadata, but with zeroed pixels.
+// Same size, format and metadata, but the first frame's pixels are zeroed
+// (other frames are still copied; combine with noAnimation: true if needed).
 final blank = image.clone(noPixels: true);
 // A blank image of a different size, with the format, palette and metadata of image.
+// Pass noAnimation: true to skip the other frames.
 final resizedBlank = Image.fromResized(image, width: 64, height: 64);
 ```
 
 `Image.fromResized` doesn't scale the pixels; it creates empty storage for them. To scale an image use
 [copyResize or resize](transform.md).
+
+Copies get their own `extraChannels` map, but the `ImageData` in it is shared with the original.
 
 `Image.empty()` creates an Image with no pixel data (`isValid` is false). It's mainly useful as a placeholder.
 
@@ -271,8 +275,9 @@ convert it to the image's format.
 | `ColorRgb8`, `ColorRgba8` | shortcuts for 3 and 4 channel `ColorUint8` |
 | `ConstColorRgb8`, `ConstColorRgba8`, `ConstColorRg8`, `ConstColorR8` | `const` 8-bit colors |
 
-Each `Color*` class has the constructors `(numChannels)`, `.rgb(r, g, b)`, `.rgba(r, g, b, a)`, `.fromList(values)`
-and `.from(other)`.
+Each `ColorUint*`, `ColorInt*` and `ColorFloat*` class has the constructors `(numChannels)`, `.rgb(r, g, b)`,
+`.rgba(r, g, b, a)`, `.fromList(values)` and `.from(other)`. `ColorRgb8` and `ColorRgba8` have only `(r, g, b)` or
+`(r, g, b, a)`, and `.from(other)`.
 
 ```dart
 final red = ColorRgb8(255, 0, 0);
@@ -321,6 +326,12 @@ used by `getChannel`, by the `maskChannel` parameter of filters, and by `remapCo
 | `red`, `green`, `blue`, `alpha` | The color channel. |
 | `luminance` | Not stored; the brightness computed from red, green and blue. |
 
+### Alpha
+
+Alpha is stored straight (not premultiplied): the color channels hold the full color whatever the alpha. To add
+an alpha channel to an image use `image.convert(numChannels: 4, alpha: ...)`, which makes it opaque when `alpha`
+isn't given. `Color.convert` sets an added alpha to 0 instead, so pass `alpha` there. See [Color](color.md) for more.
+
 Color utilities such as `rgbToHsl`, `hslToRgb`, `rgbToHsv`, `hsvToRgb`, `rgbToLab`, `labToRgb`, `cmykToRgb`,
 `getLuminanceRgb`, `rgbaToUint32` and `uint32ToRed` are also exported, as are `srgbToLinear` and
 `linearToSrgb`, which convert normalized color values between sRGB and linear light; see the
@@ -354,9 +365,11 @@ image.setPixelR(x, y, 7); // Set only the first channel (the index of indexed im
 image.clear(ColorRgb8(255, 255, 255)); // Set every pixel. With no color, sets all to 0.
 ```
 
-Values are stored in the image's channel type, and channels the image doesn't have are ignored. `uint8` images
-clamp values to 0-255, but other integer formats don't clamp (out-of-range values wrap around), so keep values
-within the range of the format. Float formats store any value.
+Values are stored in the image's channel type, and channels the image doesn't have are ignored. The `uint1`,
+`uint2` and `uint4` formats clamp values to their range. Other integer formats don't clamp in these `Image`
+methods (out-of-range values wrap around, so 256 becomes 0 in a `uint8` image); only the [Pixel](#the-pixel-class)
+channel setters (`pixel.r = ...`, `pixel[i] = ...`) of `uint8` images clamp. Keep values within the range of the
+format. Float formats store any value.
 
 ### The Pixel class
 
@@ -465,7 +478,8 @@ final rgb = indexedImage.convert(numChannels: 3);
 // Convert to grayscale (1 channel).
 final gray = image.convert(numChannels: 1);
 // Convert to an indexed image. Only use this when the image has at most 256
-// distinct colors (it throws otherwise); use quantize() for photos.
+// distinct colors (it throws a RangeError otherwise); use quantize() for photos.
+// An RGBA image gets an RGBA palette, so alpha is kept.
 final indexed = image.convert(withPalette: true);
 // Only convert the first frame.
 final first = image.convert(numChannels: 4, noAnimation: true);
@@ -544,6 +558,7 @@ print(image.textData?['Author']);
 // The ICC color profile, if the file had one.
 final icc = image.iccProfile;
 if (icc != null) {
+  // Throws an ImageException if the compressed data is invalid.
   Uint8List profile = icc.decompressed();
 }
 // The suggested background color of an animation canvas.
