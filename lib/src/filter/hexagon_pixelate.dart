@@ -4,6 +4,10 @@ import '../util/math_util.dart';
 import '_frame_copy.dart';
 
 /// Apply the hexagon pixelate filter to the image.
+///
+/// [centerX] and [centerY] are the pixel position of the hexagon grid's
+/// origin. By default the grid keeps its original placement, about half a
+/// pixel from the image origin.
 Image hexagonPixelate(Image src,
     {int? centerX,
     int? centerY,
@@ -18,8 +22,8 @@ Image hexagonPixelate(Image src,
   for (final frame in src.frames) {
     final w = frame.width - 1;
     final h = frame.height - 1;
-    final cntX = (centerX ?? frame.width ~/ 2) / w;
-    final cntY = (centerY ?? frame.height ~/ 2) / h;
+    final cntX = centerX ?? (w > 0 ? (frame.width ~/ 2) / w : 0);
+    final cntY = centerY ?? (h > 0 ? (frame.height ~/ 2) / h : 0);
     scratch = copyFrameReusing(frame, scratch);
     final orig = scratch;
 
@@ -86,13 +90,9 @@ Image hexagonPixelate(Image src,
 
       choiceX += choiceY * 0.5;
       choiceY *= 0.866025404;
-      choiceX *= size / w;
-      choiceY *= size / h;
 
-      final nx = choiceX + cntX / w;
-      final ny = choiceY + cntY / h;
-      final x = (nx * w).clamp(0, w);
-      final y = (ny * h).clamp(0, h);
+      final x = (choiceX * size + cntX).clamp(0, w);
+      final y = (choiceY * size + cntY).clamp(0, h);
       final newColor = orig.getPixel(x.floor(), y.floor());
 
       final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);

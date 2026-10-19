@@ -32,26 +32,30 @@ void main() {
         final o = orig.getPixel((p.x ~/ 10) * 10, (p.y ~/ 10) * 10);
         expect(p, equals(o), reason: 'pixel ${p.x},${p.y}');
       }
-      // average: a block takes the average of its 10x10 pixels. Only each
-      // block's upper-left pixel is checked: the filter recomputes the
-      // average for every pixel from the partially overwritten image, so the
-      // rest of a block drifts (suspected bug). Partial blocks at the bottom
-      // edge are skipped as they are divided by the full block size.
-      for (var by = 0; by + 10 <= orig.height; by += 10) {
-        for (var bx = 0; bx + 10 <= orig.width; bx += 10) {
+      // average: every pixel of a block takes the average of the block's
+      // original pixels. Partial blocks at the edges are averaged over the
+      // pixels they contain.
+      for (var by = 0; by < orig.height; by += 10) {
+        for (var bx = 0; bx < orig.width; bx += 10) {
           final sum = [0, 0, 0];
-          for (var y = by; y < by + 10; ++y) {
-            for (var x = bx; x < bx + 10; ++x) {
+          var count = 0;
+          for (var y = by; y < by + 10 && y < orig.height; ++y) {
+            for (var x = bx; x < bx + 10 && x < orig.width; ++x) {
               final o = orig.getPixel(x, y);
               for (var c = 0; c < 3; ++c) {
                 sum[c] += o[c].toInt();
               }
+              count++;
             }
           }
-          final p = i1.getPixel(bx, by);
-          for (var c = 0; c < 3; ++c) {
-            expect(p[c], closeTo(sum[c] / 100, 1),
-                reason: 'channel $c at $bx,$by');
+          for (var y = by; y < by + 10 && y < orig.height; ++y) {
+            for (var x = bx; x < bx + 10 && x < orig.width; ++x) {
+              final p = i1.getPixel(x, y);
+              for (var c = 0; c < 3; ++c) {
+                expect(p[c], closeTo(sum[c] / count, 1),
+                    reason: 'channel $c at $x,$y');
+              }
+            }
           }
         }
       }
@@ -92,8 +96,7 @@ void main() {
     });
 
     test('pixelate average: same-block pixels within 1 of each other', () {
-      // With average mode every pixel in a block gets mix(orig, avg, 1).
-      // Integer rounding means adjacent pixels may differ by at most 1.
+      // With average mode every pixel in a block gets the block average.
       const blockSize = 4;
       const w = 32;
       const h = 32;

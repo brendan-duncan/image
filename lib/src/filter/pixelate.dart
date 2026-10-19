@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../color/channel.dart';
 import '../image/image.dart';
 import '../util/_linear_rgb.dart';
@@ -68,46 +70,39 @@ Image pixelate(Image src,
         }
         break;
       case PixelateMode.average:
-        num r = 0;
-        num g = 0;
-        num b = 0;
-        num a = 0;
-        var lx = -1;
-        var ly = -1;
+        // Average each block from the original pixels before any are
+        // overwritten. Partial blocks at the right and bottom edges are
+        // averaged over the pixels they contain.
+        final bw = (w + size - 1) ~/ size;
+        final bh = (h + size - 1) ~/ size;
+        final sums = Float64List(bw * bh * 4);
+        final counts = Int32List(bw * bh);
         for (final p in frame) {
-          final x2 = (p.x ~/ size) * size;
-          final y2 = (p.y ~/ size) * size;
+          final bi = (p.y ~/ size) * bw + (p.x ~/ size);
+          final si = bi * 4;
+          sums[si] += p.r;
+          sums[si + 1] += p.g;
+          sums[si + 2] += p.b;
+          sums[si + 3] += p.a;
+          counts[bi]++;
+        }
+        for (var bi = 0, si = 0; bi < counts.length; ++bi, si += 4) {
+          final total = counts[bi];
+          sums[si] /= total;
+          sums[si + 1] /= total;
+          sums[si + 2] /= total;
+          sums[si + 3] /= total;
+        }
+        for (final p in frame) {
+          final si = ((p.y ~/ size) * bw + (p.x ~/ size)) * 4;
           final msk =
               mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
           final mx = (msk ?? 1) * amount;
-          if (x2 != lx || y2 <= ly) {
-            lx = x2;
-            ly = y2;
-            r = 0;
-            g = 0;
-            b = 0;
-            a = 0;
-            for (var by = 0, by2 = y2; by < size && by2 < h; ++by, ++by2) {
-              for (var bx = 0, bx2 = x2; bx < size && bx2 < w; ++bx, ++bx2) {
-                final p2 = frame.getPixel(bx2, by2);
-                r += p2.r;
-                g += p2.g;
-                b += p2.b;
-                a += p2.a;
-              }
-            }
-            final total = size * size;
-            r /= total;
-            g /= total;
-            b /= total;
-            a /= total;
-          }
-
           p
-            ..r = mix(p.r, r, mx)
-            ..g = mix(p.g, g, mx)
-            ..b = mix(p.b, b, mx)
-            ..a = mix(p.a, a, mx);
+            ..r = mix(p.r, sums[si], mx)
+            ..g = mix(p.g, sums[si + 1], mx)
+            ..b = mix(p.b, sums[si + 2], mx)
+            ..a = mix(p.a, sums[si + 3], mx);
         }
         break;
     }

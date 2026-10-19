@@ -23,21 +23,26 @@ void main() {
       expect(ldr.height, equals(orig.height));
       expect(hdr.format, equals(orig.format));
 
-      // Each pixel is scaled by (1 + L / Lw^2) / (1 + L), where L is its
-      // luminance and Lw the log-average luminance of the image.
+      // Each pixel's luminance L is scaled to Ls = L * 0.18 / La, where La is
+      // the log-average luminance of the image, then mapped to
+      // Ls * (1 + Ls / Lwhite^2) / (1 + Ls), where Lwhite is the largest Ls.
       num lum(Pixel p) => 0.212671 * p.r + 0.715160 * p.g + 0.072169 * p.b;
       var logSum = 0.0;
+      var maxLum = 0.0;
       for (final p in orig) {
         final l = lum(p);
         if (l > 1.0e-4) {
           logSum += log(l);
         }
+        maxLum = max(maxLum, l.toDouble());
       }
-      final lw = exp(logSum / (orig.width * orig.height));
+      final la = exp(logSum / (orig.width * orig.height));
+      final k = 0.18 / la;
+      final white = maxLum * k;
       for (final p in hdr) {
         final o = orig.getPixel(p.x, p.y);
-        final l = lum(o);
-        final s = (1 + l / (lw * lw)) / (1 + l);
+        final l = lum(o) * k;
+        final s = k * (1 + l / (white * white)) / (1 + l);
         for (var c = 0; c < 3; ++c) {
           final e = o[c] * s;
           expect(p[c], closeTo(e, e.abs() * 2e-3 + 1e-4),
@@ -47,8 +52,8 @@ void main() {
     });
 
     test('reinhardTonemap maps a uniform HDR image to uniform white', () {
-      // For a uniform image the per-pixel scale works out to 1/luminance, so
-      // every channel maps exactly to 1.0 (white in HDR terms).
+      // For a uniform image every pixel has the largest luminance, which
+      // maps to white, so every channel maps exactly to 1.0.
       final hdr = Image(width: 8, height: 8, format: Format.float32);
       for (final p in hdr) {
         p.setRgb(0.5, 0.5, 0.5);

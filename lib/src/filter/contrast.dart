@@ -6,6 +6,7 @@ import '../image/image.dart';
 import '../util/math_util.dart';
 
 num? _lastContrast;
+ContrastMode? _lastMode;
 late Uint8List _contrast;
 
 enum ContrastMode { proportional, scurve }
@@ -27,31 +28,25 @@ Image contrast(Image src,
   if (src.hasPalette) {
     src = src.convert(numChannels: src.numChannels);
   }
-  if (mode == ContrastMode.proportional) {
-    if (contrast != _lastContrast) {
-      _lastContrast = contrast;
-
+  if (contrast != _lastContrast || mode != _lastMode) {
+    _lastContrast = contrast;
+    _lastMode = mode;
+    _contrast = Uint8List(256);
+    if (mode == ContrastMode.proportional) {
       contrast = contrast / 100.0;
       contrast = contrast * contrast;
-      _contrast = Uint8List(256);
       for (var i = 0; i < 256; ++i) {
         _contrast[i] = (((((i / 255.0) - 0.5) * contrast) + 0.5) * 255.0)
             .clamp(0, 255)
             .toInt();
       }
     } else {
-      if (contrast != _lastContrast) {
-        _lastContrast = contrast;
-
-        /// 0.12 is an arbitrary adjustment to use 100 as mid point
-        contrast = (contrast / 100.0) - 0.12;
-        _contrast = Uint8List(256);
-        for (var i = 0; i < 256; ++i) {
-          _contrast[i] =
-              (((tan(((i / 128) - 1) * contrast) + 1.0) / 2.0) * 255.0)
-                  .clamp(0, 255)
-                  .toInt();
-        }
+      /// 0.12 is an arbitrary adjustment to use 100 as mid point
+      contrast = (contrast / 100.0) - 0.12;
+      for (var i = 0; i < 256; ++i) {
+        _contrast[i] = (((tan(((i / 128) - 1) * contrast) + 1.0) / 2.0) * 255.0)
+            .clamp(0, 255)
+            .toInt();
       }
     }
   }

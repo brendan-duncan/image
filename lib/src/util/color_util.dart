@@ -37,9 +37,12 @@ Color _convertColor(Color c, Color c2, num a) {
   final fromFormat = c.palette?.format ?? c.format;
   final cl = c.length;
   if (numChannels == 1) {
-    final g = c.length > 2 ? c.luminance : c[0];
-    final gi = g.floor();
-    c2[0] = convertFormatValue(gi, fromFormat, format);
+    var g = c.length > 2 ? c.luminance : c[0];
+    if (!_floatFormats.contains(fromFormat)) {
+      // convertFormatValue casts the value of an integer format to int.
+      g = g.floor();
+    }
+    c2[0] = convertFormatValue(g, fromFormat, format);
   } else if (numChannels == 2) {
     // A 2 channel image is grayscale+alpha, so a wider color contributes its
     // luminance and its alpha, not its first two channels.

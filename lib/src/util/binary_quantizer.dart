@@ -28,5 +28,5 @@ class BinaryQuantizer extends Quantizer {
 
   @override
   int getColorIndexRgb(int r, int g, int b) =>
-      getLuminanceRgb(r, g, b) < threshold ? 0 : 1;
+      getLuminanceRgb(r, g, b) / 255 < threshold ? 0 : 1;
 }

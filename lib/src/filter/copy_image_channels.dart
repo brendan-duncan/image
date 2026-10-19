@@ -45,10 +45,10 @@ Image copyImageChannels(Image src,
           ..aNormalized = a;
       } else {
         p
-          ..rNormalized = mix(p.r, r, msk)
-          ..gNormalized = mix(p.g, g, msk)
-          ..bNormalized = mix(p.b, b, msk)
-          ..aNormalized = mix(p.a, a, msk);
+          ..rNormalized = mix(p.rNormalized, r, msk)
+          ..gNormalized = mix(p.gNormalized, g, msk)
+          ..bNormalized = mix(p.bNormalized, b, msk)
+          ..aNormalized = mix(p.aNormalized, a, msk);
       }
     }
   }

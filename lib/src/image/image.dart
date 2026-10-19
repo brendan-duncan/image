@@ -904,7 +904,8 @@ class Image extends Iterable<Pixel> {
           final nr = (op.rNormalized * 255).floor();
           final ng = (op.gNormalized * 255).floor();
           final nb = (op.bNormalized * 255).floor();
-          final h = rgbaToUint32(nr, ng, nb, 0);
+          final na = pal.numChannels > 3 ? (op.aNormalized * 255).floor() : 0;
+          final h = rgbaToUint32(nr, ng, nb, na);
           if (usedColors.containsKey(h)) {
             np.index = usedColors[h]!;
           } else {
@@ -914,7 +915,11 @@ class Image extends Iterable<Pixel> {
             // image, which converting into it would then modify.
             final c = convertColor(op,
                 format: f, numChannels: numChannels, alpha: alpha);
-            pal.setRgb(numColors, c.r, c.g, c.b);
+            if (pal.numChannels > 3) {
+              pal.setRgba(numColors, c.r, c.g, c.b, c.a);
+            } else {
+              pal.setRgb(numColors, c.r, c.g, c.b);
+            }
             numColors++;
           }
           op.moveNext();

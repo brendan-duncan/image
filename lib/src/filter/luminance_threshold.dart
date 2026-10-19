@@ -26,7 +26,7 @@ Image luminanceThreshold(Image src,
         p
           ..r = mix(p.r, p.r * sl, mx)
           ..g = mix(p.g, p.g * sl, mx)
-          ..b *= mix(p.b, p.b * sl, mx);
+          ..b = mix(p.b, p.b * sl, mx);
       } else {
         final y2 = y < threshold ? 0 : p.maxChannelValue;
         final msk = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel);
