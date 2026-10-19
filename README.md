@@ -31,7 +31,12 @@ Features include:
 
 - [Tutorial](https://github.com/brendan-duncan/image/blob/main/doc/tutorial.md)
 - [Using the library with Flutter](https://github.com/brendan-duncan/image/blob/main/doc/flutter.md)
+- [Image Data](https://github.com/brendan-duncan/image/blob/main/doc/image_data.md)
+- [Image Formats](https://github.com/brendan-duncan/image/blob/main/doc/formats.md)
+- [Color spaces and alpha](https://github.com/brendan-duncan/image/blob/main/doc/color.md)
 - [Performance and memory](https://github.com/brendan-duncan/image/blob/main/doc/performance.md)
+- [Decoding untrusted images](https://github.com/brendan-duncan/image/blob/main/doc/security.md)
+- [Migrating from version 3](https://github.com/brendan-duncan/image/blob/main/doc/migration.md)
 - [API reference](https://pub.dev/documentation/image/latest)
 
 ## [Supported Image Formats](https://github.com/brendan-duncan/image/blob/main/doc/formats.md)

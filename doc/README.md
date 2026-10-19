@@ -7,11 +7,13 @@ it works in command-line apps, servers, Flutter (mobile, desktop and web) and th
 
 - [Tutorial](tutorial.md): add the library, decode, inspect, process and encode images, with recipes.
 - [Flutter](flutter.md): use the library in Flutter apps, off the UI thread, and convert to and from `dart:ui` images.
+- [Migrating from Version 3](migration.md): map the version 3 API to the current one.
 
 ## Guides
 
 - [Image Formats](formats.md): supported file formats, decoders, encoders and their options.
 - [Image Data](image_data.md): the `Image` class, pixel formats, channels, palettes, colors and pixel access.
+- [Color Spaces and Alpha](color.md): sRGB and linear light, color profiles, and transparency.
 - [Commands and Async Execution](commands.md): chain operations and run them on a separate isolate.
 - [Image Processing](filters.md): color adjustment, blur, effects and other filters.
 - [Color Quantization and Dithering](color_quantization.md): reduce an image to a palette, with dithering.
@@ -22,6 +24,7 @@ it works in command-line apps, servers, Flutter (mobile, desktop and web) and th
 - [High Dynamic Range Images](hdr.md): floating point images and tone mapping.
 - [Animated Images](animation.md): decode, create and encode animated GIF, PNG and WebP images.
 - [Performance](performance.md): make decoding and processing faster and use less memory, on phones and desktops.
+- [Decoding Untrusted Images](security.md): safely decode images from users or the internet.
 
 ## Reference
 
