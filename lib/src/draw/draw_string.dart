@@ -32,7 +32,6 @@ Image drawString(Image image, String string,
     return image;
   }
 
-  var stringWidth = 0;
   var stringHeight = 0;
 
   final chars = string.codeUnits;
@@ -41,33 +40,41 @@ Image drawString(Image image, String string,
       continue;
     }
     final ch = font.characters[c]!;
-    stringWidth += ch.xAdvance;
     if (ch.height + ch.yOffset > stringHeight) {
       stringHeight = ch.height + ch.yOffset;
     }
   }
 
-  var sx = x ?? (image.width / 2).round() - (stringWidth / 2).round();
-  var sy = y ?? (image.height / 2).round() - (stringHeight / 2).round();
+  // The width of a line of text, used to center it.
+  int lineWidth(String line) {
+    var w = 0;
+    for (var c in line.codeUnits) {
+      final ch = font.characters[c];
+      if (ch != null) {
+        w += ch.xAdvance;
+      }
+    }
+    return w;
+  }
+
+  // Center a block of [lines] lines, the widest of which is [width] wide.
+  int centerX(int width) => (image.width / 2).round() - (width / 2).round();
+  int centerY(int lines) =>
+      (image.height / 2).round() - ((stringHeight * lines) / 2).round();
 
   if (wrap) {
-    void drawLine(String line) => drawString(image, line,
-        font: font,
-        x: sx,
-        y: sy,
-        color: color,
-        blend: blend,
-        linearBlend: linearBlend,
-        mask: mask,
-        maskChannel: maskChannel,
-        rightJustify: rightJustify);
+    // Break the text into lines first, so the block of lines can be centered
+    // when x or y is not given.
+    final startX = x ?? 0;
+    final lines = <String>[];
+    var stopped = false;
 
     final sentences = string.split(RegExp(r'\n'));
 
     for (var sentence in sentences) {
       final words = sentence.split(RegExp(r"\s+"));
       final line = StringBuffer();
-      var x2 = sx;
+      var x2 = startX;
 
       for (final w in words) {
         final word = '$w ';
@@ -84,36 +91,75 @@ Image drawString(Image image, String string,
         }
         if ((x2 + wordWidth) > image.width) {
           // If there is a word that won't fit the starting x, stop drawing
-          if ((sx == x2) || (sx + wordWidth > image.width)) {
+          if ((startX == x2) || (startX + wordWidth > image.width)) {
             if (line.isNotEmpty) {
-              drawLine(line.toString());
+              lines.add(line.toString());
             }
-            return image;
+            stopped = true;
+            break;
           }
 
-          // Each line is drawn once it's full, rather than redrawing it for
-          // each word, which would take quadratic time.
-          drawLine(line.toString());
+          lines.add(line.toString());
           line.clear();
-          x2 = sx;
-          sy += stringHeight;
+          x2 = startX;
         }
         line.write(word);
         x2 += wordWidth;
       }
 
-      if (line.isNotEmpty) {
-        drawLine(line.toString());
+      if (stopped) {
+        break;
       }
 
+      if (line.isNotEmpty) {
+        lines.add(line.toString());
+      }
+    }
+
+    var widest = 0;
+    for (final line in lines) {
+      final w = lineWidth(line.trimRight());
+      if (w > widest) {
+        widest = w;
+      }
+    }
+
+    final sx = x ?? centerX(widest);
+    var sy = y ?? centerY(lines.length);
+
+    // Each line is drawn once, rather than redrawing it for each word, which
+    // would take quadratic time.
+    for (final line in lines) {
+      drawString(image, line,
+          font: font,
+          x: sx,
+          y: sy,
+          color: color,
+          blend: blend,
+          linearBlend: linearBlend,
+          mask: mask,
+          maskChannel: maskChannel,
+          rightJustify: rightJustify);
       sy += stringHeight;
     }
 
     return image;
   }
 
-  final origX = sx;
   final substrings = string.split(RegExp(r"[\n\r]"));
+
+  var stringWidth = 0;
+  for (final ss in substrings) {
+    final w = lineWidth(ss);
+    if (w > stringWidth) {
+      stringWidth = w;
+    }
+  }
+
+  var sx = x ?? centerX(stringWidth);
+  var sy = y ?? centerY(substrings.length);
+
+  final origX = sx;
 
   // print(substrings);
 

@@ -101,6 +101,10 @@ class BitmapFont {
       throw ImageException('Invalid font XML');
     }
 
+    // The page ids declared by the font, to detect duplicates. [fontPages]
+    // may already hold a page supplied by the caller for a declared id.
+    final pageIds = <int>{};
+
     for (var c in font.children) {
       final name = c.name;
       if (name == 'info') {
@@ -180,7 +184,7 @@ class BitmapFont {
           final id = int.parse(page.getAttribute('id')!);
           final filename = page.getAttribute('file');
 
-          if (fontPages.containsKey(id)) {
+          if (!pageIds.add(id)) {
             throw ImageException('Duplicate font page id found: $id.');
           }
 

@@ -132,7 +132,7 @@ Image copyResizeCropSquare(Image src,
         }
       }
 
-      return dst;
+      continue;
     }
 
     if (interpolation == Interpolation.nearest) {

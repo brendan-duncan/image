@@ -79,7 +79,7 @@ Image fillRect(Image src,
       final pr = mix(p.r, color.r, am);
       final pg = mix(p.g, color.g, am);
       final pb = mix(p.b, color.b, am);
-      final pa = p.a * (1.0 - am) + color.a;
+      final pa = p.a + (p.maxChannelValue - p.a) * am;
 
       p
         ..r = pr
@@ -98,17 +98,17 @@ Image fillRect(Image src,
       iter.current.set(color);
     }
   } else {
-    final a = color.a / color.maxChannelValue;
+    final a = color.aNormalized;
     final iter = src.getRange(xx0, yy0, ww, hh);
     while (iter.moveNext()) {
       final p = iter.current;
       final m = mask?.getPixel(p.x, p.y).getChannelNormalized(maskChannel) ?? 1;
-      final am = color.a * m;
+      final am = a * m;
       p
-        ..r = mix(p.r, color.r, a * m)
-        ..g = mix(p.g, color.g, a * m)
-        ..b = mix(p.b, color.b, a * m)
-        ..a = p.a * (1 - am) + am;
+        ..r = mix(p.r, color.r, am)
+        ..g = mix(p.g, color.g, am)
+        ..b = mix(p.b, color.b, am)
+        ..a = p.a + (p.maxChannelValue - p.a) * am;
     }
   }
 

@@ -41,6 +41,8 @@ Image drawRect(Image dst,
       color: color,
       blend: blend,
       linearBlend: linearBlend,
+      mask: mask,
+      maskChannel: maskChannel,
     );
     drawLine(dst,
         x1: x1,
@@ -49,7 +51,9 @@ Image drawRect(Image dst,
         y2: y1 - rad,
         color: color,
         blend: blend,
-        linearBlend: linearBlend);
+        linearBlend: linearBlend,
+        mask: mask,
+        maskChannel: maskChannel);
     drawLine(dst,
         x1: x0 + rad,
         y1: y1,
@@ -57,7 +61,9 @@ Image drawRect(Image dst,
         y2: y1,
         color: color,
         blend: blend,
-        linearBlend: linearBlend);
+        linearBlend: linearBlend,
+        mask: mask,
+        maskChannel: maskChannel);
     drawLine(dst,
         x1: x0,
         y1: y0 + rad,
@@ -65,7 +71,9 @@ Image drawRect(Image dst,
         y2: y1 - rad,
         color: color,
         blend: blend,
-        linearBlend: linearBlend);
+        linearBlend: linearBlend,
+        mask: mask,
+        maskChannel: maskChannel);
 
     final c1x = x0 + rad;
     final c1y = y0 + rad;
