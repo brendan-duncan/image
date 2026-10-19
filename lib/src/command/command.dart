@@ -6,6 +6,7 @@ import '../color/color.dart';
 import '../color/format.dart';
 import '../draw/blend_mode.dart';
 import '../exif/exif_data.dart';
+import '../filter/contrast.dart' show ContrastMode;
 import '../filter/dither_image.dart';
 import '../filter/noise.dart';
 import '../filter/pixelate.dart';
@@ -303,8 +304,9 @@ class Command {
   }
 
   // Jpeg
-  void decodeJpg(Uint8List data) {
-    subCommand = DecodeJpgCmd(subCommand, data);
+  void decodeJpg(Uint8List data, {int scale = 1, int? maxPixels}) {
+    subCommand =
+        DecodeJpgCmd(subCommand, data, scale: scale, maxPixels: maxPixels);
   }
 
   void decodeJpgFile(String path) {
@@ -516,11 +518,15 @@ class Command {
   }
 
   void drawPixel(int x, int y, Color color,
-      {BlendMode blend = BlendMode.alpha,
+      {Color? filter,
+      num? alpha,
+      BlendMode blend = BlendMode.alpha,
       bool linearBlend = false,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = DrawPixelCmd(subCommand, x, y, color,
+        filter: filter,
+        alpha: alpha?.toDouble(),
         blend: blend,
         linearBlend: linearBlend,
         mask: mask,
@@ -530,6 +536,8 @@ class Command {
   void drawPolygon(
       {required List<Point> vertices,
       required Color color,
+      bool antialias = false,
+      num thickness = 1,
       BlendMode blend = BlendMode.alpha,
       Command? mask,
       Channel maskChannel = Channel.luminance,
@@ -537,6 +545,8 @@ class Command {
     subCommand = DrawPolygonCmd(subCommand,
         vertices: vertices,
         color: color,
+        antialias: antialias,
+        thickness: thickness,
         blend: blend,
         mask: mask,
         maskChannel: maskChannel,
@@ -664,6 +674,7 @@ class Command {
       required int y2,
       required Color color,
       num radius = 0,
+      bool alphaBlend = true,
       Command? mask,
       Channel maskChannel = Channel.luminance}) {
     subCommand = FillRectCmd(subCommand,
@@ -673,6 +684,7 @@ class Command {
         y2: y2,
         color: color,
         radius: radius,
+        alphaBlend: alphaBlend,
         mask: mask,
         maskChannel: maskChannel);
   }
@@ -791,9 +803,10 @@ class Command {
   void contrast(
       {required num contrast,
       Command? mask,
-      Channel maskChannel = Channel.luminance}) {
+      Channel maskChannel = Channel.luminance,
+      ContrastMode mode = ContrastMode.proportional}) {
     subCommand = ContrastCmd(subCommand,
-        contrast: contrast, mask: mask, maskChannel: maskChannel);
+        contrast: contrast, mask: mask, maskChannel: maskChannel, mode: mode);
   }
 
   void convolution(
@@ -843,8 +856,8 @@ class Command {
     subCommand = DitherImageCmd(subCommand,
         quantizer: quantizer,
         kernel: kernel,
-        scanOrder: scanOrder ??
-            (serpentine ? DitherScanOrder.serpentine : DitherScanOrder.raster),
+        serpentine: serpentine,
+        scanOrder: scanOrder,
         strength: strength);
   }
 
@@ -983,12 +996,14 @@ class Command {
   void pixelate(
       {required int size,
       PixelateMode mode = PixelateMode.upperLeft,
+      num amount = 1,
       Command? mask,
       Channel maskChannel = Channel.luminance,
       bool linearBlend = false}) {
     subCommand = PixelateCmd(subCommand,
         size: size,
         mode: mode,
+        amount: amount,
         mask: mask,
         maskChannel: maskChannel,
         linearBlend: linearBlend);
@@ -1001,6 +1016,7 @@ class Command {
     // Use ditherScanOrder: DitherScanOrder.serpentine instead.
     bool ditherSerpentine = false,
     DitherScanOrder? ditherScanOrder,
+    double ditherStrength = 1.0,
   }) {
     subCommand = QuantizeCmd(subCommand,
         numberOfColors: numberOfColors,
@@ -1009,7 +1025,8 @@ class Command {
         ditherScanOrder: ditherScanOrder ??
             (ditherSerpentine
                 ? DitherScanOrder.serpentine
-                : DitherScanOrder.raster));
+                : DitherScanOrder.raster),
+        ditherStrength: ditherStrength);
   }
 
   void reinhardTonemap(
@@ -1256,8 +1273,13 @@ class Command {
     subCommand = FlipCmd(subCommand, direction: direction);
   }
 
-  void trim({TrimMode mode = TrimMode.transparent, Trim sides = Trim.all}) {
-    subCommand = TrimCmd(subCommand, mode: mode, sides: sides);
+  void trim(
+      {TrimMode mode = TrimMode.transparent,
+      Trim sides = Trim.all,
+      num fuzzy = 0,
+      int padding = 0}) {
+    subCommand = TrimCmd(subCommand,
+        mode: mode, sides: sides, fuzzy: fuzzy, padding: padding);
   }
 
   //

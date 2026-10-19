@@ -5,6 +5,7 @@ import '../command.dart';
 class PixelateCmd extends Command {
   int size;
   g.PixelateMode mode;
+  num amount;
   Command? mask;
   Channel maskChannel;
   bool linearBlend;
@@ -12,6 +13,7 @@ class PixelateCmd extends Command {
   PixelateCmd(Command? input,
       {required this.size,
       this.mode = g.PixelateMode.upperLeft,
+      this.amount = 1,
       this.mask,
       this.maskChannel = Channel.luminance,
       this.linearBlend = false})
@@ -25,6 +27,7 @@ class PixelateCmd extends Command {
         ? g.pixelate(img,
             size: size,
             mode: mode,
+            amount: amount,
             mask: maskImg,
             maskChannel: maskChannel,
             linearBlend: linearBlend)

@@ -6,13 +6,16 @@ import '../command.dart';
 // Decode a JPEG Image from byte [data].
 class DecodeJpgCmd extends Command {
   Uint8List data;
+  int scale;
+  int? maxPixels;
 
-  DecodeJpgCmd(Command? input, this.data) : super(input);
+  DecodeJpgCmd(Command? input, this.data, {this.scale = 1, this.maxPixels})
+      : super(input);
 
   @override
   Future<void> executeCommand() async {
     await input?.execute();
-    outputImage = decodeJpg(data);
+    outputImage = decodeJpg(data, maxPixels: maxPixels, scale: scale);
   }
 }
 

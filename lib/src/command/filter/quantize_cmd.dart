@@ -12,6 +12,8 @@ class QuantizeCmd extends Command {
 
   d.DitherScanOrder? ditherScanOrder;
 
+  double ditherStrength;
+
   QuantizeCmd(
     Command? input, {
     this.numberOfColors = 256,
@@ -19,6 +21,7 @@ class QuantizeCmd extends Command {
     this.dither = d.DitherKernel.none,
     this.ditherSerpentine = false,
     this.ditherScanOrder,
+    this.ditherStrength = 1.0,
   }) : super(input);
 
   @override
@@ -35,6 +38,7 @@ class QuantizeCmd extends Command {
             method: method,
             dither: dither,
             ditherScanOrder: order,
+            ditherStrength: ditherStrength,
           )
         : null;
   }

@@ -8,6 +8,8 @@ import '../command.dart';
 class DrawPolygonCmd extends Command {
   List<Point> vertices;
   Color color;
+  bool antialias;
+  num thickness;
   BlendMode blend;
   Command? mask;
   Channel maskChannel;
@@ -16,6 +18,8 @@ class DrawPolygonCmd extends Command {
   DrawPolygonCmd(Command? input,
       {required this.vertices,
       required this.color,
+      this.antialias = false,
+      this.thickness = 1,
       this.blend = BlendMode.alpha,
       this.mask,
       this.maskChannel = Channel.luminance,
@@ -30,6 +34,8 @@ class DrawPolygonCmd extends Command {
         ? drawPolygon(img,
             vertices: vertices,
             color: color,
+            antialias: antialias,
+            thickness: thickness,
             blend: blend,
             mask: maskImg,
             maskChannel: maskChannel,

@@ -26,8 +26,11 @@ class DitherImageCmd extends Command {
   Future<void> executeCommand() async {
     await input?.execute();
     final img = input?.outputImage;
-    final order = scanOrder ??
-        (serpentine ? g.DitherScanOrder.serpentine : g.DitherScanOrder.raster);
+    // Match ditherImage: the deprecated serpentine flag takes precedence,
+    // and the default scan order is zigzag.
+    final order = serpentine
+        ? g.DitherScanOrder.serpentine
+        : (scanOrder ?? g.DitherScanOrder.zigzag);
     outputImage = img != null
         ? g.ditherImage(img,
             quantizer: quantizer,

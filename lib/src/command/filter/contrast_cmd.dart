@@ -22,7 +22,10 @@ class ContrastCmd extends Command {
     final maskImg = await mask?.getImage();
     outputImage = img != null
         ? g.contrast(img,
-            contrast: _contrast, mask: maskImg, maskChannel: maskChannel)
+            contrast: _contrast,
+            mask: maskImg,
+            maskChannel: maskChannel,
+            mode: mode)
         : null;
   }
 }

@@ -28,6 +28,9 @@ Future<ExecuteResult> executeCommandAsync(Command? command) async {
     throw result.exception as Error;
   } else if (result.exception is Exception) {
     throw result.exception as Exception;
+  } else if (result.exception != null) {
+    // Rethrow any other thrown object as-is so the failure isn't silent.
+    Error.throwWithStackTrace(result.exception!, StackTrace.current);
   }
   return result;
 }
