@@ -1,16 +1,15 @@
-import 'dart:math';
 import 'dart:typed_data';
 
 import '../color/color.dart';
 import '../color/const_color_uint8.dart';
 import '../color/format.dart';
 import '../exif/exif_data.dart';
-import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/pixel.dart';
 import '../util/output_buffer.dart';
 import '_check_encode.dart';
 import 'encoder.dart';
+import 'jpeg/_jpeg_icc.dart';
 import 'jpeg/jpeg_marker.dart';
 
 /// JPEG Chroma (sub)sampling format.
@@ -63,7 +62,7 @@ class JpegEncoder extends Encoder {
     _writeAPP0(fp);
     _writeExif(fp, image.exif);
     if (image.iccProfile != null) {
-      _writeICCProfile(fp, image.iccProfile!);
+      writeJpegIccProfile(fp, image.iccProfile!.decompressed());
     }
     _writeDQT(fp);
     _writeSOF0(fp, image.width, image.height, chroma);
@@ -720,39 +719,6 @@ class JpegEncoder extends Encoder {
       ..writeUint32(exifSignature)
       ..writeUint16(0)
       ..writeBytes(exifBytes);
-  }
-
-  // The profile is split into APP2 segments of at most 65519 bytes, each with
-  // its 1-based sequence number and the number of segments (ICC.1 Annex B.4).
-  void _writeICCProfile(OutputBuffer out, IccProfile profile) {
-    const maxChunkSize = 65535 - 2 - 14;
-    final profileData = profile.decompressed();
-    final numChunks = (profileData.length + maxChunkSize - 1) ~/ maxChunkSize;
-    const signature = [
-      0x49,
-      0x43,
-      0x43,
-      0x5F,
-      0x50,
-      0x52,
-      0x4F,
-      0x46,
-      0x49,
-      0x4C,
-      0x45,
-      0x00
-    ];
-    for (var i = 0; i < numChunks; ++i) {
-      final start = i * maxChunkSize;
-      final end = min(start + maxChunkSize, profileData.length);
-      _writeMarker(out, JpegMarker.app2);
-      out
-        ..writeUint16(2 + 14 + end - start)
-        ..writeBytes(signature)
-        ..writeByte(i + 1)
-        ..writeByte(numChunks)
-        ..writeBytes(Uint8List.sublistView(profileData, start, end));
-    }
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height, JpegChroma chroma) {
