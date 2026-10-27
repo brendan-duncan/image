@@ -28,6 +28,23 @@ void main() async {
         throw StateError('SOF0 not found');
       }
 
+      // The data after the 'ICC_PROFILE\0' signature of each APP2 segment.
+      List<Uint8List> iccSegments(Uint8List jpg) {
+        final segments = <Uint8List>[];
+        var offset = 2;
+        while (jpg[offset] == 0xff && jpg[offset + 1] != 0xda) {
+          final length = (jpg[offset + 2] << 8) | jpg[offset + 3];
+          final data =
+              Uint8List.sublistView(jpg, offset + 4, offset + 2 + length);
+          if (jpg[offset + 1] == 0xe2 &&
+              String.fromCharCodes(data, 0, 12) == 'ICC_PROFILE\x00') {
+            segments.add(Uint8List.sublistView(data, 12));
+          }
+          offset += 2 + length;
+        }
+        return segments;
+      }
+
       test('rejects dimensions over maxPixels', () {
         final jpg = jpgWithSize(65535, 65535);
         final sw = Stopwatch()..start();
@@ -117,6 +134,53 @@ void main() async {
         final img = decodeJpg(jpg);
         expect(img, isNotNull);
         encodeJpgFile('$testOutputPath/jpg/icc_profile_data.jpg', img!);
+      });
+
+      test('encode icc_profile with sequence number and count', () {
+        final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
+        final profile = PngDecoder().decode(bytes)!.iccProfile!.decompressed();
+        final jpg = encodeJpg(Image(width: 8, height: 8)
+          ..iccProfile =
+              IccProfile('ICC_PROFILE', IccProfileCompression.none, profile));
+
+        final segments = iccSegments(jpg);
+        expect(segments, hasLength(1));
+        expect(segments[0].sublist(0, 2), equals([1, 1]));
+        expect(segments[0].sublist(2), equals(profile));
+        expect(decodeJpg(jpg)!.iccProfile!.data, equals(profile));
+      });
+
+      test('decode icc_profile without the APP2 sequence number and count', () {
+        final jpg =
+            File('test/_data/jpg/icc_profile_data.jpg').readAsBytesSync();
+        final segment = iccSegments(jpg).single;
+
+        final profile = decodeJpg(jpg)!.iccProfile!.data;
+
+        expect(profile, equals(segment.sublist(2)));
+        expect(ByteData.sublistView(profile).getUint32(0), profile.length);
+      });
+
+      test('split a large icc_profile into APP2 segments', () {
+        final profile = Uint8List(150000);
+        for (var i = 0; i < profile.length; ++i) {
+          profile[i] = i % 251;
+        }
+        final jpg = encodeJpg(Image(width: 8, height: 8)
+          ..iccProfile =
+              IccProfile('ICC_PROFILE', IccProfileCompression.none, profile));
+
+        final segments = iccSegments(jpg);
+        expect(
+            segments.map((s) => s.sublist(0, 2)),
+            equals([
+              [1, 3],
+              [2, 3],
+              [3, 3]
+            ]));
+        expect(
+            segments.map((s) => s.length - 2), equals([65519, 65519, 18962]));
+        expect(decodeJpg(jpg)!.iccProfile!.data, equals(profile));
       });
 
       test('exif', () async {

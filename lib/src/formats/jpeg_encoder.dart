@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import '../color/color.dart';
@@ -721,11 +722,13 @@ class JpegEncoder extends Encoder {
       ..writeBytes(exifBytes);
   }
 
+  // The profile is split into APP2 segments of at most 65519 bytes, each with
+  // its 1-based sequence number and the number of segments (ICC.1 Annex B.4).
   void _writeICCProfile(OutputBuffer out, IccProfile profile) {
-    _writeMarker(out, JpegMarker.app2);
+    const maxChunkSize = 65535 - 2 - 14;
     final profileData = profile.decompressed();
-    final blockSize = 12 + 2 + profileData.length;
-    final signature = [
+    final numChunks = (profileData.length + maxChunkSize - 1) ~/ maxChunkSize;
+    const signature = [
       0x49,
       0x43,
       0x43,
@@ -739,10 +742,17 @@ class JpegEncoder extends Encoder {
       0x45,
       0x00
     ];
-    out
-      ..writeUint16(blockSize)
-      ..writeBytes(signature)
-      ..writeBytes(profileData);
+    for (var i = 0; i < numChunks; ++i) {
+      final start = i * maxChunkSize;
+      final end = min(start + maxChunkSize, profileData.length);
+      _writeMarker(out, JpegMarker.app2);
+      out
+        ..writeUint16(2 + 14 + end - start)
+        ..writeBytes(signature)
+        ..writeByte(i + 1)
+        ..writeByte(numChunks)
+        ..writeBytes(Uint8List.sublistView(profileData, start, end));
+    }
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height, JpegChroma chroma) {
