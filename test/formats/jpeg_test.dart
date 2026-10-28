@@ -28,6 +28,124 @@ void main() async {
         throw StateError('SOF0 not found');
       }
 
+      void expectJpegColor(Image image, JpegChroma chroma, List<int> rgb) {
+        final pixels = Uint8List.fromList(image.toUint8List());
+        final palette = image.palette?.toUint8List().toList();
+        final decoded = decodeJpg(encodeJpg(image, chroma: chroma))!;
+        expect(decoded.width, image.width);
+        expect(decoded.height, image.height);
+        expect(decoded.numChannels, 3);
+        for (final p in decoded) {
+          expect(p.r, closeTo(rgb[0], 3));
+          expect(p.g, closeTo(rgb[1], 3));
+          expect(p.b, closeTo(rgb[2], 3));
+        }
+        expect(image.toUint8List(), orderedEquals(pixels));
+        expect(image.palette?.toUint8List(), palette);
+      }
+
+      // JPEG has no alpha: both gray-alpha and RGBA blend over the image's
+      // background color (white by default). Use PNG-decoded gray images to
+      // cover the channel layouts produced by a real decoder (#815).
+      for (final chroma in JpegChroma.values) {
+        for (final format in [Format.uint8, Format.uint16]) {
+          final scale = format == Format.uint16 ? 257 : 1;
+          test('encodes grayscale PNG $format $chroma', () {
+            final image =
+                Image(width: 13, height: 11, numChannels: 1, format: format);
+            for (final p in image) {
+              p[0] = 255 * scale;
+            }
+            final png = decodePng(encodePng(image))!;
+            expect(png.numChannels, 1);
+            expect(png.format, format);
+            expectJpegColor(png, chroma, [255, 255, 255]);
+          });
+
+          for (final customBackground in [false, true]) {
+            for (final alpha in [0, 128, 255]) {
+              test(
+                  'blends gray-alpha PNG $format $chroma '
+                  'alpha=$alpha customBackground=$customBackground', () {
+                final image = Image(
+                    width: 13, height: 11, numChannels: 2, format: format);
+                for (final p in image) {
+                  p[0] = 128 * scale;
+                  p[1] = alpha * scale;
+                }
+                final png = decodePng(encodePng(image))!;
+                expect(png.numChannels, 2);
+                expect(png.format, format);
+                if (customBackground) {
+                  png.backgroundColor = ColorRgb8(16, 64, 240);
+                }
+                final expected = alpha == 255
+                    ? [128, 128, 128]
+                    : alpha == 0
+                        ? customBackground
+                            ? [16, 64, 240]
+                            : [255, 255, 255]
+                        : customBackground
+                            ? [72, 96, 184]
+                            : [191, 191, 191];
+                expectJpegColor(png, chroma, expected);
+              });
+            }
+          }
+
+          for (final channels in [3, 4]) {
+            test(
+                'preserves RGB and RGBA encoding $format $chroma '
+                'channels=$channels', () {
+              final image = Image(
+                  width: 13, height: 11, numChannels: channels, format: format)
+                ..backgroundColor = ColorRgb8(16, 64, 240);
+              for (final p in image) {
+                p[0] = 40 * scale;
+                p[1] = 120 * scale;
+                p[2] = 200 * scale;
+                if (channels == 4) {
+                  p[3] = 128 * scale;
+                }
+              }
+              expectJpegColor(image, chroma,
+                  channels == 3 ? [40, 120, 200] : [28, 92, 220]);
+            });
+          }
+        }
+
+        for (final channels in [1, 2, 3, 4]) {
+          test('encodes palette channels=$channels $chroma', () {
+            final palette = PaletteUint8(4, channels);
+            final color = channels == 1
+                ? [255]
+                : channels == 2
+                    ? [128, 128]
+                    : channels == 3
+                        ? [40, 120, 200]
+                        : [40, 120, 200, 128];
+            for (var c = 0; c < channels; ++c) {
+              palette.set(3, c, color[c]);
+            }
+            final image = Image(width: 13, height: 11, palette: palette)
+              ..backgroundColor = ColorRgb8(16, 64, 240);
+            for (final p in image) {
+              p.index = 3;
+            }
+            expectJpegColor(
+                image,
+                chroma,
+                channels == 1
+                    ? [255, 255, 255]
+                    : channels == 2
+                        ? [72, 96, 184]
+                        : channels == 3
+                            ? [40, 120, 200]
+                            : [28, 92, 220]);
+          });
+        }
+      }
+
       test('rejects dimensions over maxPixels', () {
         final jpg = jpgWithSize(65535, 65535);
         final sw = Stopwatch()..start();
