@@ -4,12 +4,12 @@ import '../color/color.dart';
 import '../color/const_color_uint8.dart';
 import '../color/format.dart';
 import '../exif/exif_data.dart';
-import '../image/icc_profile.dart';
 import '../image/image.dart';
 import '../image/pixel.dart';
 import '../util/output_buffer.dart';
 import '_check_encode.dart';
 import 'encoder.dart';
+import 'jpeg/_jpeg_icc.dart';
 import 'jpeg/jpeg_marker.dart';
 
 /// JPEG Chroma (sub)sampling format.
@@ -62,7 +62,7 @@ class JpegEncoder extends Encoder {
     _writeAPP0(fp);
     _writeExif(fp, image.exif);
     if (image.iccProfile != null) {
-      _writeICCProfile(fp, image.iccProfile!);
+      writeJpegIccProfile(fp, image.iccProfile!.decompressed());
     }
     _writeDQT(fp);
     _writeSOF0(fp, image.width, image.height, chroma);
@@ -719,30 +719,6 @@ class JpegEncoder extends Encoder {
       ..writeUint32(exifSignature)
       ..writeUint16(0)
       ..writeBytes(exifBytes);
-  }
-
-  void _writeICCProfile(OutputBuffer out, IccProfile profile) {
-    _writeMarker(out, JpegMarker.app2);
-    final profileData = profile.decompressed();
-    final blockSize = 12 + 2 + profileData.length;
-    final signature = [
-      0x49,
-      0x43,
-      0x43,
-      0x5F,
-      0x50,
-      0x52,
-      0x4F,
-      0x46,
-      0x49,
-      0x4C,
-      0x45,
-      0x00
-    ];
-    out
-      ..writeUint16(blockSize)
-      ..writeBytes(signature)
-      ..writeBytes(profileData);
   }
 
   void _writeSOF0(OutputBuffer out, int width, int height, JpegChroma chroma) {
