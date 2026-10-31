@@ -33,7 +33,7 @@
 * `PsdDecoder.startDecode` returns null for data that isn't a PSD file.
 * Export `CurEncoder`, `Rational` and `WebPFrame`.
 * Expand the documentation, with new guides to color spaces and alpha, decoding untrusted images, and migrating from version 3.
-* Fix JPEG ICC profiles: `encodeJpg` writes the APP2 sequence number and count, and splits profiles larger than 65519 bytes; `decodeJpg` removes them and joins the segments.
+* Fix JPEG ICC profiles: write and read the APP2 sequence number and count, and split large profiles.
 
 # 4.12.0
 

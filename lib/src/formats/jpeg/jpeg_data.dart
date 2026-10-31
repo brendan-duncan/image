@@ -307,6 +307,12 @@ class JpegData {
 
       marker = _nextMarker();
     }
+
+    final profile = _iccProfileReader.profile;
+    if (profile != null) {
+      iccProfile =
+          new IccProfile("ICC_PROFILE", IccProfileCompression.none, profile);
+    }
   }
 
   void _skipBlock() {
@@ -346,14 +352,6 @@ class JpegData {
     } while (c == 0 && !input.isEOS);
 
     return c;
-  }
-
-  void _readIccProfile(InputBuffer block) {
-    final data = _iccProfileReader.read(block);
-    if (data != null) {
-      iccProfile =
-          new IccProfile("ICC_PROFILE", IccProfileCompression.none, data);
-    }
   }
 
   void _readExifData(InputBuffer block) {
@@ -402,7 +400,7 @@ class JpegData {
       // 'EXIF\0'
       _readExifData(appData);
     } else if (marker == JpegMarker.app2) {
-      _readIccProfile(appData);
+      _iccProfileReader.read(appData);
     } else if (marker == JpegMarker.app14) {
       // 'Adobe\0'
       if (appData[0] == 0x41 &&
