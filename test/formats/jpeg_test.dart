@@ -28,6 +28,298 @@ void main() async {
         throw StateError('SOF0 not found');
       }
 
+      // The data after the 'ICC_PROFILE\0' signature of each APP2 segment.
+      List<Uint8List> iccSegments(Uint8List jpg) {
+        final segments = <Uint8List>[];
+        var offset = 2;
+        while (jpg[offset] == 0xff && jpg[offset + 1] != 0xda) {
+          final length = (jpg[offset + 2] << 8) | jpg[offset + 3];
+          final data =
+              Uint8List.sublistView(jpg, offset + 4, offset + 2 + length);
+          if (jpg[offset + 1] == 0xe2 &&
+              String.fromCharCodes(data, 0, 12) == 'ICC_PROFILE\x00') {
+            segments.add(Uint8List.sublistView(data, 12));
+          }
+          offset += 2 + length;
+        }
+        return segments;
+      }
+
+      // A JPEG with an APP2 ICC profile segment for each of [segments], the
+      // data after the 'ICC_PROFILE\0' signature.
+      Uint8List jpgWithIccSegments(List<List<int>> segments) {
+        final jpg = encodeJpg(Image(width: 8, height: 8));
+        final out = BytesBuilder()..add(jpg.sublist(0, 2));
+        for (final data in segments) {
+          final length = 14 + data.length;
+          out
+            ..add([0xff, 0xe2, length >> 8, length & 0xff])
+            ..add('ICC_PROFILE\x00'.codeUnits)
+            ..add(data);
+        }
+        return (out..add(jpg.sublist(2))).takeBytes();
+      }
+
+      test('rejects dimensions over maxPixels', () {
+        final jpg = jpgWithSize(65535, 65535);
+        final sw = Stopwatch()..start();
+        expect(() => decodeJpg(jpg), throwsA(isA<ImageException>()));
+        expect(() => decodeImage(jpg), throwsA(isA<ImageException>()));
+        expect(sw.elapsedMilliseconds, lessThan(1000));
+
+        expect(() => decodeJpg(jpgWithSize(101, 100), maxPixels: 10000),
+            throwsA(isA<ImageException>()));
+        final image = decodeJpg(jpgWithSize(100, 100), maxPixels: 10000);
+        expect(image?.width, equals(100));
+        expect(image?.height, equals(100));
+      });
+
+      test('defaultMaxPixels', () {
+        final saved = Decoder.defaultMaxPixels;
+        addTearDown(() => Decoder.defaultMaxPixels = saved);
+        Decoder.defaultMaxPixels = 64 * 64;
+        expect(() => decodeImage(jpgWithSize(65, 64)),
+            throwsA(isA<ImageException>()));
+        expect(decodeImage(jpgWithSize(64, 64))?.width, equals(64));
+      });
+
+      test('startDecode does not allocate for huge dimensions', () {
+        final decoder = JpegDecoder();
+        final info = decoder.startDecode(jpgWithSize(65535, 65535));
+        expect(info?.width, equals(65535));
+        expect(info?.height, equals(65535));
+        expect(() => decoder.decodeFrame(0), throwsA(isA<ImageException>()));
+      });
+
+      test('rejects invalid frame headers', () {
+        expect(
+            () => decodeJpg(jpgWithSize(0, 8)), throwsA(isA<ImageException>()));
+        expect(() => decodeJpg(jpgWithSize(8, 8, components: 0)),
+            throwsA(isA<ImageException>()));
+      });
+
+      test('inject new exif', () {
+        final fb = File('test/_data/jpg/jpeg444.jpg').readAsBytesSync();
+        final exif = ExifData();
+        exif.imageIfd['xResolution'] = [300, 1];
+        exif.imageIfd['yResolution'] = [300, 1];
+        final jpg = injectJpgExif(fb, exif);
+        expect(jpg, isNotNull);
+        final image2 = JpegDecoder().decode(jpg!);
+        expect(image2, isNotNull);
+        expect(
+          exif.imageIfd['XResolution'],
+          equals(image2!.exif.imageIfd['XResolution']),
+        );
+        expect(
+          exif.imageIfd['YResolution'],
+          equals(image2.exif.imageIfd['YResolution']),
+        );
+      });
+
+      test('inject replacement exif', () {
+        final fb = File('test/_data/jpg/big_buck_bunny.jpg').readAsBytesSync();
+        final exif = ExifData();
+        exif.imageIfd['xResolution'] = [300, 1];
+        exif.imageIfd['yResolution'] = [300, 1];
+        final jpg = injectJpgExif(fb, exif);
+        expect(jpg, isNotNull);
+        final image2 = JpegDecoder().decode(jpg!);
+        expect(image2, isNotNull);
+        expect(
+          exif.imageIfd['XResolution'],
+          equals(image2!.exif.imageIfd['XResolution']),
+        );
+        expect(
+          exif.imageIfd['YResolution'],
+          equals(image2.exif.imageIfd['YResolution']),
+        );
+      });
+
+      test('png icc_profile', () async {
+        final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
+        final image = PngDecoder().decode(bytes)!;
+        encodeJpgFile('$testOutputPath/jpg/png_icc_profile_data.jpg', image);
+      });
+
+      test('icc_profile', () async {
+        final jpg = await File(
+          'test/_data/jpg/icc_profile_data.jpg',
+        ).readAsBytes();
+        final img = decodeJpg(jpg);
+        expect(img, isNotNull);
+        encodeJpgFile('$testOutputPath/jpg/icc_profile_data.jpg', img!);
+      });
+
+      test('encode icc_profile with sequence number and count', () {
+        final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
+        final profile = PngDecoder().decode(bytes)!.iccProfile!.decompressed();
+        final jpg = encodeJpg(Image(width: 8, height: 8)
+          ..iccProfile =
+              IccProfile('ICC_PROFILE', IccProfileCompression.none, profile));
+
+        final segments = iccSegments(jpg);
+        expect(segments, hasLength(1));
+        expect(segments[0].sublist(0, 2), equals([1, 1]));
+        expect(segments[0].sublist(2), equals(profile));
+        expect(decodeJpg(jpg)!.iccProfile!.data, equals(profile));
+      });
+
+      test('remove the APP2 sequence number and count from icc_profile', () {
+        final jpg =
+            File('test/_data/jpg/icc_profile_data.jpg').readAsBytesSync();
+        final segment = iccSegments(jpg).single;
+
+        final profile = decodeJpg(jpg)!.iccProfile!.data;
+
+        expect(profile, equals(segment.sublist(2)));
+        expect(ByteData.sublistView(profile).getUint32(0), profile.length);
+      });
+
+      test('decode icc_profile written without sequence number and count', () {
+        final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
+        final profile = PngDecoder().decode(bytes)!.iccProfile!.decompressed();
+
+        final jpg = jpgWithIccSegments([profile]);
+
+        expect(decodeJpg(jpg)!.iccProfile!.data, equals(profile));
+      });
+
+      test('decode an icc_profile split into APP2 segments', () {
+        final jpg = File('test/_data/jpg/cmyk.jpg').readAsBytesSync();
+
+        final profile = decodeJpg(jpg)!.iccProfile!.data;
+
+        expect(profile, hasLength(557168));
+        expect(ByteData.sublistView(profile).getUint32(0), profile.length);
+      });
+
+      test('join icc_profile segments in sequence order', () {
+        final jpg = jpgWithIccSegments([
+          [3, 3, 7, 8],
+          [1, 3, 3, 4],
+          [2, 3, 5, 6]
+        ]);
+
+        expect(decodeJpg(jpg)!.iccProfile!.data, equals([3, 4, 5, 6, 7, 8]));
+      });
+
+      test('ignore an icc_profile with invalid APP2 segments', () {
+        const invalid = {
+          'missing part': [
+            [1, 2, 1]
+          ],
+          'different counts': [
+            [1, 2, 1],
+            [2, 3, 2],
+            [3, 3, 3]
+          ],
+          'repeated part': [
+            [1, 1, 1],
+            [1, 1, 2]
+          ],
+          'stray part after a complete profile': [
+            [1, 3, 1],
+            [2, 3, 2],
+            [3, 3, 3],
+            [1, 2, 4]
+          ],
+          'sequence number 0': [
+            [0, 1, 1]
+          ],
+          'sequence number over the count': [
+            [2, 1, 1]
+          ]
+        };
+        for (final MapEntry(key: name, value: segments) in invalid.entries) {
+          final img = decodeJpg(jpgWithIccSegments(segments));
+          expect(img!.iccProfile, isNull, reason: name);
+        }
+      });
+
+      test('split a large icc_profile into APP2 segments', () {
+        final profile = Uint8List(150000);
+        for (var i = 0; i < profile.length; ++i) {
+          profile[i] = i % 251;
+        }
+        final jpg = encodeJpg(Image(width: 8, height: 8)
+          ..iccProfile =
+              IccProfile('ICC_PROFILE', IccProfileCompression.none, profile));
+
+        final segments = iccSegments(jpg);
+        expect(
+            segments.map((s) => s.sublist(0, 2)),
+            equals([
+              [1, 3],
+              [2, 3],
+              [3, 3]
+            ]));
+        expect(
+            segments.map((s) => s.length - 2), equals([65519, 65519, 18962]));
+        expect(decodeJpg(jpg)!.iccProfile!.data, equals(profile));
+      });
+
+      test('split an icc_profile only when it exceeds a segment', () {
+        for (final (size, numParts) in const [(65519, 1), (65520, 2)]) {
+          final profile = Uint8List(size)..fillRange(0, size, 7);
+          final jpg = encodeJpg(Image(width: 8, height: 8)
+            ..iccProfile =
+                IccProfile('ICC_PROFILE', IccProfileCompression.none, profile));
+
+          expect(iccSegments(jpg), hasLength(numParts));
+          expect(decodeJpg(jpg)!.iccProfile!.data, equals(profile));
+        }
+      });
+
+      test('throw for an icc_profile too large for 255 segments', () {
+        final image = Image(width: 8, height: 8)
+          ..iccProfile = IccProfile('ICC_PROFILE', IccProfileCompression.none,
+              Uint8List(255 * 65519));
+        expect(iccSegments(encodeJpg(image)), hasLength(255));
+
+        image.iccProfile = IccProfile('ICC_PROFILE', IccProfileCompression.none,
+            Uint8List(255 * 65519 + 1));
+        expect(() => encodeJpg(image), throwsA(isA<ImageException>()));
+      });
+
+      test('exif', () async {
+        final jpg = await File('test/_data/jpg/kodak-dc210.jpg').readAsBytes();
+        final img = decodeJpg(jpg);
+        expect(img, isNotNull);
+        expect(img!.hasExif, isTrue);
+      });
+
+      test('decode / inject Exif', () async {
+        final jpg = await File('test/_data/jpg/buck_24.jpg').readAsBytes();
+        final exif = decodeJpgExif(jpg);
+        expect(exif, isNotNull);
+        expect(exif!.imageIfd['Orientation']?.toInt(), equals(1));
+
+        exif.imageIfd['Orientation'] = 4;
+        expect(exif.imageIfd['Orientation']?.toInt(), equals(4));
+
+        final jpg2 = injectJpgExif(jpg, exif);
+        expect(jpg2, isNotNull);
+        File('$testOutputPath/jpg/inject_exif.jpg')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(jpg2!);
+
+        final image = JpegDecoder().decode(jpg2);
+        expect(image, isNotNull);
+        encodeJpgFile('$testOutputPath/jpg/inject_exif2.jpg', image!);
+      });
+
+      test('decode', () {
+        final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
+        final image = JpegDecoder().decode(fb)!;
+        expect(image.width, equals(300));
+        expect(image.height, equals(186));
+        expect(image.numChannels, equals(3));
+        File('$testOutputPath/jpg/decode.png')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(encodePng(image));
+      });
+
       void expectJpegColor(Image image, JpegChroma chroma, List<int> rgb) {
         final pixels = Uint8List.fromList(image.toUint8List());
         final palette = image.palette?.toUint8List().toList();
@@ -145,135 +437,6 @@ void main() async {
           });
         }
       }
-
-      test('rejects dimensions over maxPixels', () {
-        final jpg = jpgWithSize(65535, 65535);
-        final sw = Stopwatch()..start();
-        expect(() => decodeJpg(jpg), throwsA(isA<ImageException>()));
-        expect(() => decodeImage(jpg), throwsA(isA<ImageException>()));
-        expect(sw.elapsedMilliseconds, lessThan(1000));
-
-        expect(() => decodeJpg(jpgWithSize(101, 100), maxPixels: 10000),
-            throwsA(isA<ImageException>()));
-        final image = decodeJpg(jpgWithSize(100, 100), maxPixels: 10000);
-        expect(image?.width, equals(100));
-        expect(image?.height, equals(100));
-      });
-
-      test('defaultMaxPixels', () {
-        final saved = Decoder.defaultMaxPixels;
-        addTearDown(() => Decoder.defaultMaxPixels = saved);
-        Decoder.defaultMaxPixels = 64 * 64;
-        expect(() => decodeImage(jpgWithSize(65, 64)),
-            throwsA(isA<ImageException>()));
-        expect(decodeImage(jpgWithSize(64, 64))?.width, equals(64));
-      });
-
-      test('startDecode does not allocate for huge dimensions', () {
-        final decoder = JpegDecoder();
-        final info = decoder.startDecode(jpgWithSize(65535, 65535));
-        expect(info?.width, equals(65535));
-        expect(info?.height, equals(65535));
-        expect(() => decoder.decodeFrame(0), throwsA(isA<ImageException>()));
-      });
-
-      test('rejects invalid frame headers', () {
-        expect(
-            () => decodeJpg(jpgWithSize(0, 8)), throwsA(isA<ImageException>()));
-        expect(() => decodeJpg(jpgWithSize(8, 8, components: 0)),
-            throwsA(isA<ImageException>()));
-      });
-
-      test('inject new exif', () {
-        final fb = File('test/_data/jpg/jpeg444.jpg').readAsBytesSync();
-        final exif = ExifData();
-        exif.imageIfd['xResolution'] = [300, 1];
-        exif.imageIfd['yResolution'] = [300, 1];
-        final jpg = injectJpgExif(fb, exif);
-        expect(jpg, isNotNull);
-        final image2 = JpegDecoder().decode(jpg!);
-        expect(image2, isNotNull);
-        expect(
-          exif.imageIfd['XResolution'],
-          equals(image2!.exif.imageIfd['XResolution']),
-        );
-        expect(
-          exif.imageIfd['YResolution'],
-          equals(image2.exif.imageIfd['YResolution']),
-        );
-      });
-
-      test('inject replacement exif', () {
-        final fb = File('test/_data/jpg/big_buck_bunny.jpg').readAsBytesSync();
-        final exif = ExifData();
-        exif.imageIfd['xResolution'] = [300, 1];
-        exif.imageIfd['yResolution'] = [300, 1];
-        final jpg = injectJpgExif(fb, exif);
-        expect(jpg, isNotNull);
-        final image2 = JpegDecoder().decode(jpg!);
-        expect(image2, isNotNull);
-        expect(
-          exif.imageIfd['XResolution'],
-          equals(image2!.exif.imageIfd['XResolution']),
-        );
-        expect(
-          exif.imageIfd['YResolution'],
-          equals(image2.exif.imageIfd['YResolution']),
-        );
-      });
-
-      test('png icc_profile', () async {
-        final bytes = File('test/_data/png/iCCP.png').readAsBytesSync();
-        final image = PngDecoder().decode(bytes)!;
-        encodeJpgFile('$testOutputPath/jpg/png_icc_profile_data.jpg', image);
-      });
-
-      test('icc_profile', () async {
-        final jpg = await File(
-          'test/_data/jpg/icc_profile_data.jpg',
-        ).readAsBytes();
-        final img = decodeJpg(jpg);
-        expect(img, isNotNull);
-        encodeJpgFile('$testOutputPath/jpg/icc_profile_data.jpg', img!);
-      });
-
-      test('exif', () async {
-        final jpg = await File('test/_data/jpg/kodak-dc210.jpg').readAsBytes();
-        final img = decodeJpg(jpg);
-        expect(img, isNotNull);
-        expect(img!.hasExif, isTrue);
-      });
-
-      test('decode / inject Exif', () async {
-        final jpg = await File('test/_data/jpg/buck_24.jpg').readAsBytes();
-        final exif = decodeJpgExif(jpg);
-        expect(exif, isNotNull);
-        expect(exif!.imageIfd['Orientation']?.toInt(), equals(1));
-
-        exif.imageIfd['Orientation'] = 4;
-        expect(exif.imageIfd['Orientation']?.toInt(), equals(4));
-
-        final jpg2 = injectJpgExif(jpg, exif);
-        expect(jpg2, isNotNull);
-        File('$testOutputPath/jpg/inject_exif.jpg')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(jpg2!);
-
-        final image = JpegDecoder().decode(jpg2);
-        expect(image, isNotNull);
-        encodeJpgFile('$testOutputPath/jpg/inject_exif2.jpg', image!);
-      });
-
-      test('decode', () {
-        final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();
-        final image = JpegDecoder().decode(fb)!;
-        expect(image.width, equals(300));
-        expect(image.height, equals(186));
-        expect(image.numChannels, equals(3));
-        File('$testOutputPath/jpg/decode.png')
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(encodePng(image));
-      });
 
       test('encode (default 4:4:4 chroma)', () {
         final fb = File('test/_data/jpg/buck_24.jpg').readAsBytesSync();

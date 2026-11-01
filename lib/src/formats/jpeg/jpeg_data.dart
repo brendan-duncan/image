@@ -9,6 +9,7 @@ import '../../util/image_exception.dart';
 import '../../util/input_buffer.dart';
 import '_component_data.dart';
 import '_jpeg_huffman.dart';
+import '_jpeg_icc.dart';
 import '_jpeg_image.dart';
 import '_jpeg_quantize_html.dart' if (dart.library.io) '_jpeg_quantize_io.dart';
 import 'jpeg_adobe.dart';
@@ -306,6 +307,12 @@ class JpegData {
 
       marker = _nextMarker();
     }
+
+    final profile = _iccProfileReader.profile;
+    if (profile != null) {
+      iccProfile =
+          new IccProfile("ICC_PROFILE", IccProfileCompression.none, profile);
+    }
   }
 
   void _skipBlock() {
@@ -345,33 +352,6 @@ class JpegData {
     } while (c == 0 && !input.isEOS);
 
     return c;
-  }
-
-  void _readIccProfile(InputBuffer block) {
-    const iccProfileSignature = [
-      0x49,
-      0x43,
-      0x43,
-      0x5F,
-      0x50,
-      0x52,
-      0x4F,
-      0x46,
-      0x49,
-      0x4C,
-      0x45,
-      0x00
-    ]; // "ICC_PROFILE\0"
-    for (var i = 0; i < iccProfileSignature.length; i++) {
-      final b = block.readByte();
-      if (b != iccProfileSignature[i]) {
-        return;
-      }
-    }
-
-    final data = block.toUint8List();
-    iccProfile =
-        new IccProfile("ICC_PROFILE", IccProfileCompression.none, data);
   }
 
   void _readExifData(InputBuffer block) {
@@ -420,7 +400,7 @@ class JpegData {
       // 'EXIF\0'
       _readExifData(appData);
     } else if (marker == JpegMarker.app2) {
-      _readIccProfile(appData);
+      _iccProfileReader.read(appData);
     } else if (marker == JpegMarker.app14) {
       // 'Adobe\0'
       if (appData[0] == 0x41 &&
@@ -859,6 +839,7 @@ class JpegData {
   bool _allowStreaming = false;
   bool _restartNeeded = false;
   JpegImageWriter? _writer;
+  final _iccProfileReader = JpegIccProfileReader();
   final _bandLines = <List<Uint8List>>[];
   final _bandR = Uint8List(64);
   final _bandRInt = Int32List(64);
