@@ -1,5 +1,6 @@
 # 4.13.0
 
+* Fix JPEG encoding of grayscale and grayscale-alpha images.
 * PNGs with an unknown row filter type decode to null, like other invalid PNG data.
 * Check the zlib checksum of PNG, TIFF, EXR and ICC profile data.
 * `IccProfile.decompressed` throws `ImageException` for invalid data.
