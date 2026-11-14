@@ -14,6 +14,7 @@ import '../image/image.dart';
 import '../image/image_data_uint16.dart';
 import '../image/palette_uint8.dart';
 import '../image/pixel.dart';
+import '../util/_inflate.dart';
 import '../util/image_exception.dart';
 import '../util/input_buffer.dart';
 import '_guard_decode.dart';
@@ -393,8 +394,7 @@ class PngDecoder extends Decoder {
 
     // The image data is inflated as the rows are read, so the whole
     // decompressed image is never held in memory.
-    final input = const ZLibDecoder()
-        .decodeLazy(InputMemoryStream(imageData), verify: true);
+    final input = inflateLazy(imageData);
     _resetBits();
 
     PaletteUint8? palette;

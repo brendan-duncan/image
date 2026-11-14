@@ -780,6 +780,21 @@ void main() {
             (data) => data..[data.length - 1] ^= 0xff);
         expect(decodePng(png), isNull);
       });
+
+      test('IDAT inflating far past the image', () {
+        // Inflated in small steps, so only the rows are inflated, not the
+        // megabytes of zeros after them.
+        final source = Image(width: 100, height: 100, numChannels: 4)
+          ..clear(ColorRgba8(10, 20, 30, 40));
+        final png = editIdat(encodePng(source), (zlib) {
+          final rows = const ZLibDecoder().decodeBytes(zlib);
+          return const ZLibEncoder()
+              .encodeBytes([...rows, ...Uint8List(8 << 20)]);
+        });
+        final image = decodePng(png)!;
+        expect(image.width, 100);
+        expect(image.getPixel(99, 99), ColorRgba8(10, 20, 30, 40));
+      });
     });
 
     group('ICC profile', () {

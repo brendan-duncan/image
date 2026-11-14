@@ -394,7 +394,10 @@ class TiffImage {
       } else if (compression == TiffCompression.oldJpeg ||
           compression == TiffCompression.jpeg) {
         final data = p.toList(0, byteCount);
-        final tile = JpegDecoder().decode(data as Uint8List);
+        // Only tileWidth x tileHeight pixels are used, so a JPEG declaring
+        // more is refused rather than allocated
+        final tile = JpegDecoder(maxPixels: tileWidth * tileHeight)
+            .decode(data as Uint8List);
         if (tile != null) {
           _jpegToImage(tile, image, outX, outY, tileWidth, tileHeight);
         }

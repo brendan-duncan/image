@@ -49,9 +49,10 @@ class VP8 {
       return false;
     }
 
+    // The top 2 bits of each are an upscaling hint, not part of the size
     webp
-      ..width = input.readUint16()
-      ..height = input.readUint16();
+      ..width = input.readUint16() & 0x3fff
+      ..height = input.readUint16() & 0x3fff;
 
     return true;
   }

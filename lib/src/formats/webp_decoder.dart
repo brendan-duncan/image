@@ -122,7 +122,8 @@ class WebPDecoder extends Decoder {
       final f = _info!.frames[frame] as InternalWebPFrame;
       final frameData = _input!.subset(f.frameSize, position: f.framePosition);
 
-      return _decodeFrame(frameData, frame: frame);
+      return _decodeFrame(frameData,
+          frame: frame, width: f.width, height: f.height);
     }
 
     if (_info!.format == WebPFormat.lossless) {
@@ -237,7 +238,11 @@ class WebPDecoder extends Decoder {
         : IccProfile('ICC_PROFILE', IccProfileCompression.none, iccp);
   }
 
-  Image? _decodeFrame(InputBuffer input, {int frame = 0}) {
+  /// Decodes the frame in [input]. An ANMF frame passes its [width] and
+  /// [height], which were checked against maxPixels, and the bitstream inside
+  /// it must match them.
+  Image? _decodeFrame(InputBuffer input,
+      {int frame = 0, int? width, int? height}) {
     final webp = InternalWebPInfo();
     if (!_getInfo(input, webp)) {
       return null;
@@ -258,17 +263,34 @@ class WebPDecoder extends Decoder {
       final f = webp.frames[frame] as InternalWebPFrame;
       final frameData = input.subset(f.frameSize, position: f.framePosition);
 
-      return _decodeFrame(frameData, frame: frame);
+      return _decodeFrame(frameData,
+          frame: frame, width: f.width, height: f.height);
     } else {
-      final data = input.subset(webp.vp8Size, position: webp.vp8Position);
-      if (webp.format == WebPFormat.lossless) {
-        return VP8L(data, webp).decode();
-      } else if (webp.format == WebPFormat.lossy) {
-        return VP8(data, webp).decode();
+      InputBuffer bitstream() =>
+          input.subset(webp.vp8Size, position: webp.vp8Position);
+      final lossless = webp.format == WebPFormat.lossless;
+      if (!lossless && webp.format != WebPFormat.lossy) {
+        return null;
       }
+      if (width != null && height != null) {
+        // The decoders allocate from the bitstream's own size, so read it
+        // first and refuse one that differs from the size that was checked
+        final ok = lossless
+            ? VP8L(bitstream(), webp).decodeHeader()
+            : VP8(bitstream(), webp).decodeHeader();
+        if (!ok) {
+          return null;
+        }
+        if (webp.width != width || webp.height != height) {
+          throw ImageException('WebP frame bitstream size '
+              '${webp.width}x${webp.height} does not match its frame size '
+              '${width}x$height');
+        }
+      }
+      return lossless
+          ? VP8L(bitstream(), webp).decode()
+          : VP8(bitstream(), webp).decode();
     }
-
-    return null;
   }
 
   bool _getHeader(InputBuffer input) {

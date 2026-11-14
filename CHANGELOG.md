@@ -1,5 +1,6 @@
 # 4.13.0
 
+* Apply `maxPixels` to WebP animation frames and TIFF JPEG tiles; bound memory when inflating crafted zlib data.
 * PNGs with an unknown row filter type decode to null, like other invalid PNG data.
 * Check the zlib checksum of PNG, TIFF, EXR and ICC profile data.
 * `IccProfile.decompressed` throws `ImageException` for invalid data.
