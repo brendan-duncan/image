@@ -6,9 +6,13 @@
 ///
 /// The split is by integer width, not by platform: only dart2js gives `int` a
 /// 32-bit view, while the VM and dart2wasm both have real 64-bit integers.
-/// `dart:isolate` draws that line. `dart.library.io` is the more usual
+/// `dart:isolate` draws that line, together with `dart:nativewrappers`: Dart
+/// 3.14 sets `dart.library.isolate` to false on dart2wasm and keeps
+/// `dart.library.nativewrappers` true. `dart.library.io` is the more usual
 /// condition and the wrong one here: it is absent on dart2wasm, which would
 /// then pay for a correction it does not need.
 library;
 
-export '_vp8_sar_html.dart' if (dart.library.isolate) '_vp8_sar_io.dart';
+export '_vp8_sar_html.dart'
+    if (dart.library.isolate) '_vp8_sar_io.dart'
+    if (dart.library.nativewrappers) '_vp8_sar_io.dart';
