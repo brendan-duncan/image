@@ -1,6 +1,7 @@
 import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../util/_linear_rgb.dart';
+import '../util/_without_palette.dart';
 import '../util/point.dart';
 
 /// Returns a copy of the [src] image, where the given rectangle

@@ -25,8 +25,9 @@ double _linear(
 /// [Interpolation.nearest].
 ///
 /// [Interpolation.linear], [Interpolation.cubic] and [Interpolation.average]
-/// weight color by alpha where blended pixels have different alpha, so color
-/// of fully transparent pixels has no effect on visible pixels
+/// weight each pixel's color by its alpha where the blended pixels have
+/// different alpha, so the color of fully transparent pixels has no effect on
+/// visible pixels.
 Image copyResize(Image src,
     {int? width,
     int? height,

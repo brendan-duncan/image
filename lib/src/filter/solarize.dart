@@ -1,4 +1,5 @@
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 import '../util/min_max.dart';
 
 enum SolarizeMode { highlights, shadows }

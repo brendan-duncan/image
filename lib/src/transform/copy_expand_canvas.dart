@@ -1,6 +1,7 @@
 import '../color/color.dart';
 import '../draw/draw_pixel.dart';
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 
 enum ExpandCanvasPosition {
   topLeft,

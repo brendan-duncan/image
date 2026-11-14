@@ -180,7 +180,7 @@ export 'src/formats/webp/webp_info.dart' hide InternalWebPInfo;
 export 'src/formats/webp_decoder.dart';
 export 'src/formats/webp_encoder.dart';
 export 'src/image/icc_profile.dart';
-export 'src/image/image.dart' hide withoutPalette;
+export 'src/image/image.dart';
 export 'src/image/image_data.dart';
 export 'src/image/image_data_float16.dart';
 export 'src/image/image_data_float32.dart';

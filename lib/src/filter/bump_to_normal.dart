@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 
 /// Generate a normal map from a heightfield bump image.
 ///

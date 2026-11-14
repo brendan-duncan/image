@@ -5,6 +5,7 @@ import '../color/format.dart';
 
 import '../image/image.dart';
 import '../image/palette_uint8.dart';
+import '../util/_without_palette.dart';
 import '../util/neural_quantizer.dart';
 import '../util/quantizer.dart';
 

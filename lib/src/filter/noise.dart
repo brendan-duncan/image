@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../color/channel.dart';
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 import '../util/math_util.dart';
 import '../util/min_max.dart';
 import '../util/random.dart';

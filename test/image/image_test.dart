@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:image/image.dart';
 import 'package:test/test.dart';
@@ -514,6 +515,33 @@ void main() {
         expect(indices, byPosition);
       });
     }
+
+    test('float cubic with mixed alpha keeps colors near the taps', () {
+      // Mostly transparent with faint pixels: the cubic's negative lobes can
+      // leave the blended alpha just above 0, and dividing by it reached
+      // colors of 5000 from taps of 0 to 1
+      final random = Random(7);
+      var worst = 0.0;
+      for (var t = 0; t < 300; t++) {
+        final image =
+            Image(width: 4, height: 4, format: Format.float32, numChannels: 4);
+        for (final p in image) {
+          p
+            ..r = random.nextDouble()
+            ..g = random.nextDouble()
+            ..b = random.nextDouble()
+            ..a = random.nextDouble() < 0.7 ? 0 : random.nextDouble() * 0.05;
+        }
+        for (var k = 0; k < 20; k++) {
+          final c = image.getPixelCubic(
+              1 + random.nextDouble(), 1 + random.nextDouble());
+          worst =
+              max(worst, max(c.r.abs(), max(c.g.abs(), c.b.abs()))).toDouble();
+        }
+      }
+      // Cubic overshoot of uniform alpha stays allowed
+      expect(worst, lessThan(1.5));
+    });
   });
 }
 

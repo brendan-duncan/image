@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import '../color/channel.dart';
 import '../color/format.dart';
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 import '../util/math_util.dart';
 
 /// Apply a 3x3 convolution filter to the [src] image. [filter] should be a

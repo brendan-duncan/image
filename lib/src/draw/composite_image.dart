@@ -4,6 +4,7 @@ import '../color/channel.dart';
 import '../image/image.dart';
 import '../image/pixel.dart';
 import '../transform/_pixel_bytes.dart';
+import '../util/_without_palette.dart';
 import '../util/math_util.dart';
 import 'blend_mode.dart';
 import 'draw_pixel.dart';

@@ -1,6 +1,7 @@
 import '../color/channel.dart';
 import '../color/color.dart';
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 import '../util/math_util.dart';
 
 /// [amount] controls the strength of the effect, in the range \[0, 1\].

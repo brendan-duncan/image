@@ -5,6 +5,7 @@ import '../color/format.dart';
 import '../image/image.dart';
 import '../image/image_data_float32.dart';
 import '../util/_linear_rgb.dart';
+import '../util/_without_palette.dart';
 import '_reflect_index.dart';
 import 'separable_kernel.dart';
 

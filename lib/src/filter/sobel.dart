@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import '../color/channel.dart';
 import '../color/format.dart';
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 
 /// Apply Sobel edge detection filtering to the [src] Image.
 Image sobel(Image src,

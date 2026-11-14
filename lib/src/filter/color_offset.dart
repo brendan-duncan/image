@@ -1,5 +1,6 @@
 import '../color/channel.dart';
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 import '../util/math_util.dart';
 
 /// Add the [red], [green], [blue] and [alpha] values to the [src] image

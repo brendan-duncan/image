@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../color/channel.dart';
 import '../color/format.dart';
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 import '../util/color_util.dart';
 import '../util/math_util.dart';
 

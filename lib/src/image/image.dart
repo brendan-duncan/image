@@ -698,16 +698,9 @@ class Image extends Iterable<Pixel> {
     // Image without alpha channel keeps plain blend, also with taps outside
     // image, which have alpha 0
     final isUniform = !hasAlpha ||
-        (centerAlpha is int &&
-                rightAlpha is int &&
-                belowAlpha is int &&
-                diagonalAlpha is int
-            ? centerAlpha == rightAlpha &&
-                centerAlpha == belowAlpha &&
-                centerAlpha == diagonalAlpha
-            : centerAlpha == rightAlpha &&
-                centerAlpha == belowAlpha &&
-                centerAlpha == diagonalAlpha);
+        (centerAlpha == rightAlpha &&
+            centerAlpha == belowAlpha &&
+            centerAlpha == diagonalAlpha);
 
     if (!isUniform && alpha > 0) {
       return _weightedLinearColor(icc, inc, icn, inn, dx, dy, alpha);
@@ -962,7 +955,15 @@ class Image extends Iterable<Pixel> {
 
     var blue = alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha);
     if (!clamps) {
-      return getColor(red, green, blue, alpha);
+      // The negative lobes of the cubic can leave the blended alpha just
+      // above 0, and dividing by it then gives colors far outside the taps'
+      // own. Integer formats are clamped to their range below; float formats
+      // have none, so they are kept to the range of the visible taps.
+      return getColor(
+          _limitToTaps(red, taps, (c) => c.r),
+          _limitToTaps(green, taps, (c) => c.g),
+          _limitToTaps(blue, taps, (c) => c.b),
+          alpha);
     }
 
     final lowestValue = _asDouble(lowest);
@@ -973,6 +974,27 @@ class Image extends Iterable<Pixel> {
 
     return getColor(red, green, blue,
         _limitDouble(blendedAlpha, lowestValue, highestValue));
+  }
+
+  /// [value] limited to the range of [channel] over the [taps] with alpha
+  static double _limitToTaps(
+      double value, List<Color> taps, num Function(Color) channel) {
+    var lowest = double.infinity;
+    var highest = double.negativeInfinity;
+    for (final tap in taps) {
+      if (tap.a > 0) {
+        final c = _asDouble(channel(tap));
+        if (c < lowest) {
+          lowest = c;
+        }
+        if (c > highest) {
+          highest = c;
+        }
+      }
+    }
+    // The weighted path only runs with a positive blended alpha, so at least
+    // one tap is visible
+    return _limitDouble(value, lowest, highest);
   }
 
   @pragma('vm:prefer-inline')
@@ -1279,20 +1301,4 @@ class Image extends Iterable<Pixel> {
         return PaletteFloat64(_numPixelColors(format), numChannels);
     }
   }
-}
-
-/// Converts each palette frame of [src] with channel count of that frame:
-/// convert(numChannels: src.numChannels) gives every frame channel count of
-/// first frame, so GIF frames with 4-channel palette lost alpha
-Image withoutPalette(Image src) {
-  Image? first;
-  for (final frame in src.frames) {
-    final converted = frame.hasPalette
-        ? frame.convert(numChannels: frame.numChannels, noAnimation: true)
-        : Image.from(frame, noAnimation: true);
-    first?.addFrame(converted);
-    first ??= converted;
-  }
-
-  return first!;
 }

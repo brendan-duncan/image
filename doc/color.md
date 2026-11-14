@@ -181,7 +181,8 @@ colors of the fully transparent pixels next to the visible ones. Those colors ar
 is filled with zeros), which leaves a dark fringe around the edges of the visible content. Premultiplied
 alpha would avoid this, but the library doesn't premultiply.
 
-Resizing, rotating and rectifying with `linear`, `cubic` or `average` weight color by alpha where blended pixels have different alpha, so they don't leave this fringe.
+Resizing, rotating and rectifying with `linear`, `cubic` or `average` weight each pixel's color by
+its alpha where the blended pixels have different alpha, so they don't leave this fringe.
 
 To avoid fringes, make sure transparent pixels have a color close to their visible neighbors before you
 blur, for example by filling the image with the edge color (keeping alpha 0) before drawing the

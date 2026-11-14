@@ -1,5 +1,6 @@
 import '../color/channel.dart';
 import '../image/image.dart';
+import '../util/_without_palette.dart';
 import '../util/math_util.dart';
 
 /// Copy channels from the [from] image to the [src] image. If [scaled] is
