@@ -564,6 +564,11 @@ class JpegData {
     }
 
     final f = frame!;
+    // Refused when the image is built, but only after every scan has been
+    // decoded, so refuse it before the first
+    if (f.components.length == 4 && adobe == null) {
+      throw ImageException('Unsupported color mode (4 components)');
+    }
     final components = <JpegComponent>[];
     for (var i = 0; i < n; i++) {
       final id = block.readByte();

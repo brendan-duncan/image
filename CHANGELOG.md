@@ -1,3 +1,8 @@
+# 4.13.1
+
+* Refuse WebP and APNG frames outside the canvas, and WebP frames holding an animation.
+* Fix `maxPixels` overflowing for huge sizes; bound WebP Huffman groups, BMP palettes and 4 component JPEGs.
+
 # 4.13.0
 
 * Apply `maxPixels` to WebP animation frames and TIFF JPEG tiles; bound memory when inflating crafted zlib data.

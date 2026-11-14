@@ -722,16 +722,14 @@ class VP8L {
         }
       }
 
-      // Check the validity of num_htree_groups_max. If it seems too big, use a
-      // smaller value for later. This will prevent big memory allocations to
-      // end up with a bad bitstream anyway.
-      // The value of 1000 is totally arbitrary. We know that numHtreeGroupsMax
-      // is smaller than (1 << 16) and should be smaller than the number of
-      // pixels (though the format allows it to be bigger).
-      if (numHtreeGroupsMax > 1000 || numHtreeGroupsMax > xSize * ySize) {
+      // Only the groups the Huffman image uses get tables. libwebp builds
+      // every group up to 1000, but a group's tables here take far more
+      // memory, so a tiny image naming group 999 would build 1000 of them.
+      if (numHtreeGroupsMax > 1) {
         // Create a mapping from the used indices to the minimal set of used
         // values [0, num_htree_groups)
-        mapping = Int32List(numHtreeGroups)..fillRange(0, numHtreeGroups, 0xff);
+        mapping = Int32List(numHtreeGroupsMax)
+          ..fillRange(0, numHtreeGroupsMax, -1);
         numHtreeGroups = 0;
         for (var i = 0; i < huffmanPixs; ++i) {
           final mappedGroup = huffmanImage[i];

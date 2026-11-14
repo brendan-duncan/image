@@ -8,11 +8,15 @@ void checkPixels(int width, int height, int maxPixels,
   if (allowEmpty ? width < 0 || height < 0 : width < 1 || height < 1) {
     throw ImageException('Invalid image dimensions ${width}x$height');
   }
-  if (maxPixels > 0 && width * height > maxPixels) {
+  if (maxPixels > 0 && _exceeds(width, height, maxPixels)) {
     throw ImageException('Image dimensions ${width}x$height exceed the '
         'maximum of $maxPixels pixels');
   }
 }
+
+/// Whether [a] * [b] > [limit], for non-negative values, without computing
+/// the product, which overflows for sizes read from 32 or 64 bit fields.
+bool _exceeds(int a, int b, int limit) => b != 0 && a > limit ~/ b;
 
 /// Tracks the pixels of the frames decoded for an animation, throwing an
 /// [ImageException] once they exceed [maxPixels].
@@ -25,10 +29,19 @@ class PixelBudget {
 
   PixelBudget(this.maxPixels, {this.what = 'Animation frames'});
 
-  void add(int width, int height) {
-    _total += width * height;
-    if (maxPixels > 0 && _total > maxPixels) {
+  /// Adds [count] frames of [width] x [height].
+  void add(int width, int height, [int count = 1]) {
+    if (width <= 0 || height <= 0 || count <= 0) {
+      return;
+    }
+    if (maxPixels <= 0) {
+      return;
+    }
+    final remaining = maxPixels - _total;
+    if (_exceeds(width, height, remaining) ||
+        _exceeds(width * height, count, remaining)) {
       throw ImageException('$what exceed the maximum of $maxPixels pixels');
     }
+    _total += width * height * count;
   }
 }

@@ -217,6 +217,14 @@ class PngDecoder extends Decoder {
           final delayDen = _input.readUint16();
           final dispose = _input.readByte();
           final blend = _input.readByte();
+          // The budget over all frames counts canvases, so a frame must fit
+          // in one, as the format requires
+          if (xOffset + width > _info.width ||
+              yOffset + height > _info.height) {
+            throw ImageException('APNG frame ${width}x$height at '
+                '$xOffset,$yOffset is outside the '
+                '${_info.width}x${_info.height} canvas');
+          }
           final frame = InternalPngFrame(
               sequenceNumber: sequenceNumber,
               width: width,
@@ -547,7 +555,7 @@ class PngDecoder extends Decoder {
     final numFrames = min(_info.numFrames, _info.frames.length);
     // Each frame is composited to a full canvas, so check them all before
     // decoding any.
-    PixelBudget(maxPixels).add(_info.width * numFrames, _info.height);
+    PixelBudget(maxPixels).add(_info.width, _info.height, numFrames);
     for (var i = 0; i < numFrames; ++i) {
       final frame = _info.frames[i];
       final image = decodeFrame(i);

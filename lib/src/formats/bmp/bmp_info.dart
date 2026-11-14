@@ -208,6 +208,12 @@ class BmpInfo implements DecodeInfo {
 
   void readPalette(InputBuffer input) {
     final numColors = totalColors == 0 ? 1 << bitsPerPixel : totalColors;
+    // 4 bytes a color, so a count from the header can't allocate more than
+    // the file holds
+    if (numColors > input.length ~/ 4) {
+      throw ImageException('BMP palette of $numColors colors is larger than '
+          'the file');
+    }
     const numChannels = 3;
     palette = PaletteUint8(numColors, numChannels);
     for (var i = 0; i < numColors; ++i) {

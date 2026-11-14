@@ -201,7 +201,7 @@ class GifDecoder extends Decoder {
 
     // Each frame is composited to a full canvas, so check them all before
     // decoding any.
-    PixelBudget(maxPixels).add(info!.width * info!.numFrames, info!.height);
+    PixelBudget(maxPixels).add(info!.width, info!.height, info!.numFrames);
 
     // Each output frame is the logical screen as displayed after drawing the
     // GIF frame. A frame's disposal method says what happens to the canvas
