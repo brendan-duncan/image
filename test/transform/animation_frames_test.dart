@@ -105,6 +105,44 @@ void main() {
       }
     }
 
+    for (final operation in <String, Image Function(Image)>{
+      'copyCropCircle': copyCropCircle,
+      'copyResizeCropSquare with radius': (image) =>
+          copyResizeCropSquare(image, size: 16, radius: 4),
+      'copyRotate linear': (image) =>
+          copyRotate(image, angle: 33, interpolation: Interpolation.linear),
+      'copyRectify linear': (image) => copyRectify(image,
+          topLeft: Point(1, 1),
+          topRight: Point(21, 2),
+          bottomLeft: Point(2, 21),
+          bottomRight: Point(20, 20),
+          interpolation: Interpolation.linear),
+    }.entries) {
+      test(
+          '${operation.key} writes colors of palette frame that follows '
+          'frame without palette', () {
+        final source = Image(width: 24, height: 24, numChannels: 4)
+          ..clear(ColorRgba8(40, 80, 120, 255));
+        final indexed = Image(width: 24, height: 24, withPalette: true);
+        for (var index = 0; index < 256; index++) {
+          indexed.palette!.setRgb(index, index, 255 - index, index * 7 % 256);
+        }
+
+        for (final pixel in indexed) {
+          pixel.index = (pixel.x * 9 + pixel.y * 5) % 256;
+        }
+
+        source.addFrame(indexed);
+        final result = operation.value(source);
+        final expected = operation.value(indexed.convert(numChannels: 3));
+
+        expect(
+            differingPixels(
+                Image.from(result.frames[1], noAnimation: true), expected),
+            0);
+      });
+    }
+
     test('copyCropCircle leaves pixels outside image transparent', () {
       final source = Image(width: 20, height: 12, numChannels: 4)
         ..clear(ColorRgba8(200, 100, 50, 255));

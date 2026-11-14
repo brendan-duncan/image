@@ -4,6 +4,7 @@ import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../util/_circle_test.dart';
 import '../util/_linear_rgb.dart';
+import '../util/_without_palette.dart';
 import '../util/image_exception.dart';
 
 /// Returns a resized and square cropped copy of the [src] image of [size] size.
@@ -22,6 +23,7 @@ Image copyResizeCropSquare(Image src,
     throw ImageException('Invalid size');
   }
 
+  src = withoutLaterPalettes(src);
   if (linearBlend &&
       interpolation != Interpolation.nearest &&
       !src.hasPalette) {

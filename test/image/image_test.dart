@@ -542,6 +542,48 @@ void main() {
       // Cubic overshoot of uniform alpha stays allowed
       expect(worst, lessThan(1.5));
     });
+
+    for (final format in [Format.uint8, Format.uint16]) {
+      test(
+          '${format.name} cubic with mixed alpha keeps colors within range '
+          'of visible pixels', () {
+        final random = Random(7);
+        final outside = <String>[];
+        for (var round = 0; round < 300; round++) {
+          final image =
+              Image(width: 4, height: 4, format: format, numChannels: 4);
+          final top = image.maxChannelValue.toInt();
+          final lowest = top ~/ 2;
+          final highest = lowest + top ~/ 8;
+
+          for (final pixel in image) {
+            final isHidden = random.nextDouble() < 0.7;
+            final alpha = isHidden ? 0 : 1 + random.nextInt(top ~/ 20);
+            final color = isHidden
+                ? random.nextInt(top + 1)
+                : lowest + random.nextInt(top ~/ 8 + 1);
+
+            pixel.setRgba(color, color, color, alpha);
+          }
+
+          void verify(Color color) {
+            if (color.a > 0 && (color.r < lowest || color.r > highest)) {
+              outside.add('round $round: ${color.r} with alpha ${color.a}');
+            }
+          }
+
+          for (var index = 0; index < 20; index++) {
+            verify(image.getPixelCubic(
+                1 + random.nextDouble(), 1 + random.nextDouble()));
+          }
+
+          copyResize(image, width: 11, interpolation: Interpolation.cubic)
+              .forEach(verify);
+        }
+
+        expect(outside, isEmpty);
+      });
+    }
   });
 }
 
