@@ -10,7 +10,8 @@
 /// 3.14 sets `dart.library.isolate` to false on dart2wasm and keeps
 /// `dart.library.nativewrappers` true. `dart.library.io` is the more usual
 /// condition and the wrong one here: it is absent on dart2wasm, which would
-/// then pay for a correction it does not need.
+/// then pay for a correction it does not need. `dart.library.ffi` is no
+/// better, as dart2wasm does not report it either.
 library;
 
 export '_vp8_sar_html.dart'
