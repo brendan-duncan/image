@@ -18,6 +18,7 @@ Image copyRectify(Image src,
     Interpolation interpolation = Interpolation.nearest,
     Image? toImage,
     bool linearBlend = false}) {
+  src = withoutLaterPalettes(src);
   if (linearBlend &&
       interpolation != Interpolation.nearest &&
       toImage?.hasPalette != true) {

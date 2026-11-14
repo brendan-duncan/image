@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import '../image/image.dart';
 import '../image/interpolation.dart';
 import '../util/_linear_rgb.dart';
+import '../util/_without_palette.dart';
 import '_pixel_bytes.dart';
 
 /// Returns a copy of the [src] image, rotated by [angle] degrees.
@@ -16,6 +17,7 @@ Image copyRotate(Image src,
     Interpolation interpolation = Interpolation.nearest,
     bool linearBlend = false}) {
   final num nAngle = angle % 360.0;
+  src = withoutLaterPalettes(src);
 
   // You can't interpolate index pixels
   if (src.hasPalette) {

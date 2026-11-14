@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../image/image.dart';
 import '../util/_circle_test.dart';
+import '../util/_without_palette.dart';
 
 /// Returns a circle cropped copy of [src], centered at [centerX] and
 /// [centerY] and with the given [radius]. If [radius] is not provided,
@@ -27,6 +28,7 @@ Image copyCropCircle(Image src,
   final wh = radius * 2;
   final radiusSqr = radius * radius;
 
+  src = withoutLaterPalettes(src);
   if (src.hasPalette) {
     src = src.convert(numChannels: 4);
   }

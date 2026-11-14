@@ -17,3 +17,12 @@ Image withoutPalette(Image src) {
 
   return first!;
 }
+
+/// Returns [src] with palette frames converted when first frame has no
+/// palette: transforms write colors into copy of each frame, and copy of
+/// palette frame of such APNG stored those colors as palette indices
+@internal
+Image withoutLaterPalettes(Image src) =>
+    !src.hasPalette && src.frames.any((frame) => frame.hasPalette)
+        ? withoutPalette(src)
+        : src;

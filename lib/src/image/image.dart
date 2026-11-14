@@ -931,8 +931,13 @@ class Image extends Iterable<Pixel> {
       num alpha, bool clamps, num lowest, num highest) {
     final weights = Float64List(16);
     final colors = Float64List(16);
+    var visible = 0;
     for (var i = 0; i < 16; ++i) {
-      weights[i] = _asDouble(taps[i].a);
+      final tapAlpha = _asDouble(taps[i].a);
+      weights[i] = tapAlpha;
+      if (tapAlpha > 0) {
+        visible |= 1 << i;
+      }
     }
 
     final blendedAlpha = _asDouble(alpha);
@@ -943,47 +948,50 @@ class Image extends Iterable<Pixel> {
       colors[i] = _asDouble(taps[i].r);
     }
 
-    var red = alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha);
+    // The negative lobes of the cubic can leave the blended alpha just
+    // above 0, and dividing by it then gives colors far outside the taps'
+    // own. Clamping integer formats to their range left uint16 colors 70% of
+    // that range away from visible taps, so every format is kept to the
+    // range of the visible taps.
+    final red = _limitToTaps(
+        alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha),
+        colors,
+        visible);
     for (var i = 0; i < 16; ++i) {
       colors[i] = _asDouble(taps[i].g);
     }
 
-    var green = alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha);
+    final green = _limitToTaps(
+        alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha),
+        colors,
+        visible);
     for (var i = 0; i < 16; ++i) {
       colors[i] = _asDouble(taps[i].b);
     }
 
-    var blue = alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha);
+    final blue = _limitToTaps(
+        alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha),
+        colors,
+        visible);
     if (!clamps) {
-      // The negative lobes of the cubic can leave the blended alpha just
-      // above 0, and dividing by it then gives colors far outside the taps'
-      // own. Integer formats are clamped to their range below; float formats
-      // have none, so they are kept to the range of the visible taps.
-      return getColor(
-          _limitToTaps(red, taps, (c) => c.r),
-          _limitToTaps(green, taps, (c) => c.g),
-          _limitToTaps(blue, taps, (c) => c.b),
-          alpha);
+      return getColor(red, green, blue, alpha);
     }
 
     final lowestValue = _asDouble(lowest);
     final highestValue = _asDouble(highest);
-    red = _limitDouble(red, lowestValue, highestValue);
-    green = _limitDouble(green, lowestValue, highestValue);
-    blue = _limitDouble(blue, lowestValue, highestValue);
 
     return getColor(red, green, blue,
         _limitDouble(blendedAlpha, lowestValue, highestValue));
   }
 
-  /// [value] limited to the range of [channel] over the [taps] with alpha
-  static double _limitToTaps(
-      double value, List<Color> taps, num Function(Color) channel) {
+  /// [value] limited to the range of [colors] over the taps with alpha, which
+  /// have their bit set in [visible]
+  static double _limitToTaps(double value, Float64List colors, int visible) {
     var lowest = double.infinity;
     var highest = double.negativeInfinity;
-    for (final tap in taps) {
-      if (tap.a > 0) {
-        final c = _asDouble(channel(tap));
+    for (var i = 0; i < 16; ++i) {
+      if (visible & (1 << i) != 0) {
+        final c = colors[i];
         if (c < lowest) {
           lowest = c;
         }

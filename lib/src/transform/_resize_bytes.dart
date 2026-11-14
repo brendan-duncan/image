@@ -622,6 +622,7 @@ void _resizeCubic(_OrientedSource src, Uint8List out, int dstStride, int x1,
       var alpha = 0.0;
       var isWeighted = false;
       var referenceTap = 5;
+      var visible = 0;
 
       // Plain blend mixes RGB of transparent taps into visible ones, so taps
       // with different alpha are weighted by cubicAlphaWeights
@@ -640,6 +641,12 @@ void _resizeCubic(_OrientedSource src, Uint8List out, int dstStride, int x1,
         }
 
         if (isWeighted) {
+          for (var i = 0; i < 16; ++i) {
+            if (alphas[i] > 0) {
+              visible |= 1 << i;
+            }
+          }
+
           referenceTap = cubicAlphaWeights(alphas, kx, ky);
         }
       }
@@ -648,16 +655,26 @@ void _resizeCubic(_OrientedSource src, Uint8List out, int dstStride, int x1,
       if (isWeighted) {
         for (var c = 0; c < colorChannels; ++c) {
           final reference = s[taps[referenceTap] + c];
+          var lowest = 255;
+          var highest = 0;
           var v = 0.0;
+
           for (var i = 0; i < 16; ++i) {
-            v += alphas[i] * (s[taps[i] + c] - reference);
+            final value = s[taps[i] + c];
+            v += alphas[i] * (value - reference);
+            if (visible & (1 << i) != 0) {
+              lowest = value < lowest ? value : lowest;
+              highest = value > highest ? value : highest;
+            }
           }
 
+          // v / alpha with alpha near 0 gave colors 33% of range away from
+          // visible taps, so v is kept to range of visible taps
           v = reference + v / alpha;
-          out[di++] = v < 0
-              ? 0
-              : v > 255
-                  ? 255
+          out[di++] = v < lowest
+              ? lowest
+              : v > highest
+                  ? highest
                   : v.toInt();
         }
       } else {
