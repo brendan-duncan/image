@@ -844,7 +844,10 @@ class JpegData {
 
   bool _prepared = false;
   int _numScans = 0;
-  static const _maxScans = 1000;
+  // Progressive files have around 10 scans. A scan costs a pass over the
+  // image even when it holds no data, so the limit is what bounds the time a
+  // small file can take.
+  static const _maxScans = 100;
   bool _allowStreaming = false;
   bool _restartNeeded = false;
   JpegImageWriter? _writer;

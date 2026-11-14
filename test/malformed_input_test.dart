@@ -195,12 +195,13 @@ void main() {
     }
     // Repeat the scan, up to the EOI marker at the end.
     final scan = jpeg.sublist(sos, jpeg.length - 2);
-    final bytes = Uint8List.fromList([
-      ...jpeg.sublist(0, sos),
-      for (var i = 0; i < 1001; ++i) ...scan,
-      0xff, 0xd9, //
-    ]);
-    expect(() => decodeJpg(bytes), _throwsImageException);
+    Uint8List withScans(int count) => Uint8List.fromList([
+          ...jpeg.sublist(0, sos),
+          for (var i = 0; i < count; ++i) ...scan,
+          0xff, 0xd9, //
+        ]);
+    expect(() => decodeJpg(withScans(101)), _throwsImageException);
+    expect(decodeJpg(withScans(100))?.width, 8);
   });
 
   group('decompression limits', () {

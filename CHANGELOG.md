@@ -3,6 +3,7 @@
 * Refuse WebP and APNG frames outside the canvas, and WebP frames holding an animation.
 * Fix `maxPixels` overflowing for huge sizes; bound WebP Huffman groups, BMP palettes and 4 component JPEGs.
 * TIFF samples per pixel and EXR channels beyond 4 count against `maxPixels`.
+* JPEGs are limited to 100 scans, down from 1000.
 
 # 4.13.0
 
