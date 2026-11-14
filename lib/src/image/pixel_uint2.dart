@@ -125,8 +125,10 @@ class PixelUint2 extends Iterable<num> implements Pixel {
       _x = 0;
       _y++;
       _bitIndex = 0;
-      _index++;
       _rowOffset += image.rowStride;
+      // _index++ read wrong byte for 3 channels in 20 of 40 widths, and after
+      // in-place resize, where rowStride keeps width of original image
+      _index = _rowOffset;
       return _y < height;
     }
 
@@ -209,11 +211,15 @@ class PixelUint2 extends Iterable<num> implements Pixel {
   set b(num b) => _setChannel(numChannels == 2 ? 0 : 2, b);
 
   @override
-  num get a => palette == null && numChannels == 2
-      ? _getChannel(1)
-      : palette == null && numChannels < 4
-          ? maxChannelValue
-          : _getChannel(3);
+  // palette.get returns 0 for channel 3 of 3-channel palette, and
+  // PixelUint8.a returns 255 for it, so alpha is read with getAlpha
+  num get a => palette != null
+      ? palette!.getAlpha(_get(0))
+      : numChannels == 2
+          ? _getChannel(1)
+          : numChannels < 4
+              ? maxChannelValue
+              : _getChannel(3);
   @override
   set a(num a) => _setChannel(numChannels == 2 ? 1 : 3, a);
 

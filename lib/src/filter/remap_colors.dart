@@ -16,7 +16,7 @@ Image remapColors(Image src,
     Channel blue = Channel.blue,
     Channel alpha = Channel.alpha}) {
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   final List<num> l = [0, 0, 0, 0, 0];
   for (final frame in src.frames) {

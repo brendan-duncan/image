@@ -296,5 +296,247 @@ void main() {
       img.convert(format: Format.uint8, withPalette: true);
       expect(img.toUint8List(), equals([0, 60, 120, 180]));
     });
+
+    test('convert expands uint8 palette to RGB and RGBA', () {
+      final opaque = _paletteImage(3);
+      final translucent = _paletteImage(4);
+
+      expect(opaque.convert(numChannels: 3).toUint8List(),
+          _paletteColors(channels: 3));
+      expect(opaque.convert(numChannels: 4).toUint8List(),
+          _paletteColors(channels: 4, alpha: 255));
+      expect(opaque.convert(numChannels: 4, alpha: 128).toUint8List(),
+          _paletteColors(channels: 4, alpha: 128));
+
+      expect(translucent.convert(numChannels: 3).toUint8List(),
+          _paletteColors(channels: 3));
+      expect(translucent.convert(numChannels: 4).toUint8List(),
+          _paletteColors(channels: 4));
+    });
+
+    test('convert of uint8 palette to 1 and 2 channels matches RGB source', () {
+      for (final paletteChannels in [3, 4]) {
+        final indexed = _paletteImage(paletteChannels);
+        final direct = Image(width: 16, height: 16, numChannels: 4)
+          ..toUint8List().setAll(
+              0,
+              _paletteColors(
+                  channels: 4, alpha: paletteChannels == 3 ? 255 : null));
+        final source =
+            paletteChannels == 3 ? direct.convert(numChannels: 3) : direct;
+
+        for (final channels in [1, 2]) {
+          expect(indexed.convert(numChannels: channels).toUint8List(),
+              source.convert(numChannels: channels).toUint8List(),
+              reason: '$paletteChannels-channel palette to $channels');
+        }
+      }
+    });
+
+    test('convert uses palette of every animation frame', () {
+      final animation = _paletteImage(3)..frameDuration = 80;
+      final second = _paletteImage(3)..frameDuration = 90;
+      for (var index = 0; index < 256; index++) {
+        second.palette!.setRgb(index, 255 - index, index, 7);
+      }
+      animation.addFrame(second);
+
+      final converted = animation.convert(numChannels: 4);
+      final first = converted.frames[0].getPixel(5, 0);
+      final last = converted.frames[1].getPixel(5, 0);
+
+      expect([first.r, first.g, first.b, first.a], [5, 250, 35, 255]);
+      expect([last.r, last.g, last.b, last.a], [250, 5, 7, 255]);
+      expect(converted.frames.map((frame) => frame.frameDuration), [80, 90]);
+    });
+
+    test('convert of 16-color palette reads index 16 as black', () {
+      final palette = PaletteUint8(16, 3);
+      for (var index = 0; index < 16; index++) {
+        palette.setRgb(index, 10 + index, 20 + index, 30 + index);
+      }
+
+      final image = Image(width: 3, height: 1, palette: palette)
+        ..setPixelIndex(0, 0, 3)
+        ..setPixelIndex(1, 0, 15)
+        ..setPixelIndex(2, 0, 16);
+
+      expect(image.convert(numChannels: 3).toUint8List(),
+          [13, 23, 33, 25, 35, 45, 0, 0, 0]);
+    });
+
+    for (final name in [
+      'gif/animated.gif',
+      'gif/anim_palette.gif',
+      'gif/palette_remap.gif',
+      'gif/buck_24.gif',
+      'bmp/buck_8.bmp',
+      'bmp/buck_4.bmp',
+      'bmp/buck_1.bmp',
+      'png/bkgd.png',
+      'png/buck_8.png',
+      'png/basn3p08.png',
+      'png/basn3p02.png',
+      'png/tbbn3p08.png',
+    ]) {
+      test('convert keeps color of every pixel of palette image $name', () {
+        final source = decodeTestImage(name);
+        expect(source.hasPalette, isTrue);
+
+        final opaque = source.convert(format: Format.uint8, numChannels: 3);
+        final translucent =
+            source.convert(format: Format.uint8, numChannels: 4);
+
+        expect(translucent.frames.map((frame) => frame.frameDuration),
+            source.frames.map((frame) => frame.frameDuration));
+        expect(differingPixels(opaque, source, withAlpha: false), 0);
+        expect(differingPixels(translucent, source), 0);
+      });
+    }
+
+    test('convert keeps pixels of palette image after in-place resize', () {
+      final source = decodeTestImage('gif/buck_24.gif');
+      final shrunk = resize(source, width: 100);
+      final converted = shrunk.convert(numChannels: 4);
+
+      expect([converted.width, converted.height], [100, 62]);
+      expect(differingPixels(converted, shrunk), 0);
+    });
+
+    for (final name in [
+      'bmp/buck_1.bmp',
+      'bmp/buck_4.bmp',
+      'png/basn3p02.png'
+    ]) {
+      test('pixel alpha of 3-channel palette image $name is opaque', () {
+        final source = decodeTestImage(name);
+        expect(source.palette!.numChannels, 3);
+
+        for (final pixel in source) {
+          if (pixel.a != 255) {
+            fail('alpha ${pixel.a} at ${pixel.x},${pixel.y}');
+          }
+        }
+      });
+    }
+
+    for (final format in [Format.uint1, Format.uint2, Format.uint4]) {
+      test(
+          'iteration over ${format.name} image matches getPixel after '
+          'in-place resize', () {
+        final mismatches = <String>[];
+        for (var channels = 1; channels <= 4; channels++) {
+          for (var width = 3; width <= 30; width++) {
+            final source = Image(
+                width: width, height: 6, format: format, numChannels: channels);
+            final range = source.maxChannelValue.toInt() + 1;
+            for (var y = 0; y < 6; y++) {
+              for (var x = 0; x < width; x++) {
+                final pixel = source.getPixel(x, y);
+                for (var channel = 0; channel < channels; channel++) {
+                  pixel[channel] = (x * 5 + y * 3 + channel) % range;
+                }
+              }
+            }
+
+            final shrunk = resize(source, width: 1 + width * 2 ~/ 3, height: 4);
+            var isSame = true;
+            for (final pixel in shrunk) {
+              final direct = shrunk.getPixel(pixel.x, pixel.y);
+              for (var channel = 0; channel < channels; channel++) {
+                isSame = isSame && pixel[channel] == direct[channel];
+              }
+            }
+
+            if (!isSame) {
+              mismatches.add('$channels channels, width $width');
+            }
+          }
+        }
+
+        expect(mismatches, isEmpty);
+      });
+    }
+
+    for (final format in [Format.uint1, Format.uint2, Format.uint4]) {
+      test('iteration over ${format.name} image matches getPixel', () {
+        final mismatches = <String>[];
+        for (var channels = 1; channels <= 4; channels++) {
+          for (var width = 1; width <= 40; width++) {
+            final written = Image(
+                width: width, height: 5, format: format, numChannels: channels);
+            final range = written.maxChannelValue.toInt() + 1;
+            for (final pixel in written) {
+              for (var channel = 0; channel < channels; channel++) {
+                pixel[channel] = (pixel.x * 7 + pixel.y * 3 + channel) % range;
+              }
+            }
+
+            var isSame = true;
+            for (final pixel in written) {
+              final direct = written.getPixel(pixel.x, pixel.y);
+              for (var channel = 0; channel < channels; channel++) {
+                final expected = (pixel.x * 7 + pixel.y * 3 + channel) % range;
+                isSame = isSame &&
+                    pixel[channel] == expected &&
+                    direct[channel] == expected;
+              }
+            }
+
+            if (!isSame) {
+              mismatches.add('$channels channels, width $width');
+            }
+          }
+        }
+
+        expect(mismatches, isEmpty);
+      });
+    }
+
+    for (final name in [
+      'bmp/buck_1.bmp',
+      'png/basn3p02.png',
+      'bmp/buck_4.bmp'
+    ]) {
+      test('iteration over $name matches getPixel after in-place resize', () {
+        final source = decodeTestImage(name);
+        final expected = copyResize(source, width: source.width * 2 ~/ 3);
+        final shrunk = resize(source, width: source.width * 2 ~/ 3);
+
+        expect(identical(shrunk, source), isTrue);
+        expect(differingPixels(shrunk, expected), 0);
+
+        final indices = [for (final pixel in shrunk) pixel.index];
+        final byPosition = [
+          for (var y = 0; y < shrunk.height; y++)
+            for (var x = 0; x < shrunk.width; x++) shrunk.getPixelIndex(x, y),
+        ];
+        expect(indices, byPosition);
+      });
+    }
   });
 }
+
+Image _paletteImage(int paletteChannels) {
+  final image = Image(
+      width: 16, height: 16, numChannels: paletteChannels, withPalette: true);
+  for (var index = 0; index < 256; index++) {
+    image.palette!
+        .setRgba(index, index, 255 - index, index * 7 % 256, index * 13 % 256);
+  }
+
+  for (final pixel in image) {
+    pixel.index = pixel.y * 16 + pixel.x;
+  }
+
+  return image;
+}
+
+List<int> _paletteColors({required int channels, int? alpha}) => [
+      for (var index = 0; index < 256; index++) ...[
+        index,
+        255 - index,
+        index * 7 % 256,
+        if (channels == 4) alpha ?? index * 13 % 256,
+      ],
+    ];

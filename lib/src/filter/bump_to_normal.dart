@@ -10,7 +10,7 @@ import '../image/image.dart';
 Image bumpToNormal(Image src, {num strength = 2.0}) {
   Image dest;
   if (src.hasPalette) {
-    dest = src.convert(numChannels: src.numChannels);
+    dest = withoutPalette(src);
   } else {
     dest = Image.from(src);
   }

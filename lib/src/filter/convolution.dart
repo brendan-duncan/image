@@ -19,7 +19,7 @@ Image convolution(Image src,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   if (mask == null &&
       src.format == Format.uint8 &&

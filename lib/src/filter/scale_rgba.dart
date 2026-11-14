@@ -12,7 +12,7 @@ Image scaleRgba(Image src,
   final db = scale.bNormalized;
   final da = scale.aNormalized;
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   for (final frame in src.frames) {
     for (final p in frame) {

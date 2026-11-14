@@ -14,7 +14,7 @@ Image billboard(Image src,
   const rs = 0.2025; // pow(0.45, 2.0);
 
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
 
   Image? scratch;

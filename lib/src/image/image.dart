@@ -6,6 +6,7 @@ import '../color/color.dart';
 import '../color/color_uint8.dart';
 import '../color/format.dart';
 import '../exif/exif_data.dart';
+import '../util/_alpha_weight.dart';
 import '../util/color_util.dart';
 import '../util/image_exception.dart';
 import 'icc_profile.dart';
@@ -687,11 +688,36 @@ class Image extends Iterable<Pixel> {
     final inc = nx >= width ? icc : getPixelSafe(nx, y);
     final inn = nx >= width || ny >= height ? icc : getPixelSafe(nx, ny);
 
+    // Plain blend mixes RGB of transparent taps into visible ones, so taps
+    // with different alpha are weighted by alpha
+    final centerAlpha = icc.a;
+    final rightAlpha = inc.a;
+    final belowAlpha = icn.a;
+    final diagonalAlpha = inn.a;
+    final alpha = linear(centerAlpha, rightAlpha, belowAlpha, diagonalAlpha);
+    // Image without alpha channel keeps plain blend, also with taps outside
+    // image, which have alpha 0
+    final isUniform = !hasAlpha ||
+        (centerAlpha is int &&
+                rightAlpha is int &&
+                belowAlpha is int &&
+                diagonalAlpha is int
+            ? centerAlpha == rightAlpha &&
+                centerAlpha == belowAlpha &&
+                centerAlpha == diagonalAlpha
+            : centerAlpha == rightAlpha &&
+                centerAlpha == belowAlpha &&
+                centerAlpha == diagonalAlpha);
+
+    if (!isUniform && alpha > 0) {
+      return _weightedLinearColor(icc, inc, icn, inn, dx, dy, alpha);
+    }
+
     return getColor(
         linear(icc.r, inc.r, icn.r, inn.r),
         linear(icc.g, inc.g, icn.g, inn.g),
         linear(icc.b, inc.b, icn.b, inn.b),
-        linear(icc.a, inc.a, icn.a, inn.a));
+        alpha);
   }
 
   /// Get the pixel using cubic interpolation for non-integer pixel
@@ -717,56 +743,245 @@ class Image extends Iterable<Pixel> {
                 dx * dx * dx * (-ipp + 3 * icp - 3 * inp + iap));
 
     final icc = getPixelSafe(x, y);
+    final iccAlpha = icc.a;
 
     final ipp = px < 0 || py < 0 ? icc : getPixelSafe(px, py);
     final icp = py < 0 ? icc : getPixelSafe(x, py);
     final inp = py < 0 || nx >= width ? icc : getPixelSafe(nx, py);
     final iap = ax >= width || py < 0 ? icc : getPixelSafe(ax, py);
 
-    final ip0 = cubic(dx, ipp.r, icp.r, inp.r, iap.r);
-    final ip1 = cubic(dx, ipp.g, icp.g, inp.g, iap.g);
-    final ip2 = cubic(dx, ipp.b, icp.b, inp.b, iap.b);
-    final ip3 = cubic(dx, ipp.a, icp.a, inp.a, iap.a);
+    // Reading alpha of 16 taps again to compare them cost 22% on uint16 RGBA,
+    // so each row keeps alpha of its 4 taps in locals
+    final ippAlpha = ipp.a;
+    final icpAlpha = icp.a;
+    final inpAlpha = inp.a;
+    final iapAlpha = iap.a;
+    final ip3 = cubic(dx, ippAlpha, icpAlpha, inpAlpha, iapAlpha);
+
+    final isPreviousRowUniform = identical(ippAlpha, iccAlpha) &&
+        identical(icpAlpha, iccAlpha) &&
+        identical(inpAlpha, iccAlpha) &&
+        identical(iapAlpha, iccAlpha);
 
     final ipc = px < 0 ? icc : getPixelSafe(px, y);
     final inc = nx >= width ? icc : getPixelSafe(nx, y);
     final iac = ax >= width ? icc : getPixelSafe(ax, y);
 
-    final ic0 = cubic(dx, ipc.r, icc.r, inc.r, iac.r);
-    final ic1 = cubic(dx, ipc.g, icc.g, inc.g, iac.g);
-    final ic2 = cubic(dx, ipc.b, icc.b, inc.b, iac.b);
-    final ic3 = cubic(dx, ipc.a, icc.a, inc.a, iac.a);
+    final ipcAlpha = ipc.a;
+    final incAlpha = inc.a;
+    final iacAlpha = iac.a;
+    final ic3 = cubic(dx, ipcAlpha, iccAlpha, incAlpha, iacAlpha);
+
+    final isCurrentRowUniform = identical(ipcAlpha, iccAlpha) &&
+        identical(incAlpha, iccAlpha) &&
+        identical(iacAlpha, iccAlpha);
 
     final ipn = px < 0 || ny >= height ? icc : getPixelSafe(px, ny);
     final icn = ny >= height ? icc : getPixelSafe(x, ny);
     final inn = nx >= width || ny >= height ? icc : getPixelSafe(nx, ny);
     final ian = ax >= width || ny >= height ? icc : getPixelSafe(ax, ny);
 
-    final in0 = cubic(dx, ipn.r, icn.r, inn.r, ian.r);
-    final in1 = cubic(dx, ipn.g, icn.g, inn.g, ian.g);
-    final in2 = cubic(dx, ipn.b, icn.b, inn.b, ian.b);
-    final in3 = cubic(dx, ipn.a, icn.a, inn.a, ian.a);
+    final ipnAlpha = ipn.a;
+    final icnAlpha = icn.a;
+    final innAlpha = inn.a;
+    final ianAlpha = ian.a;
+    final in3 = cubic(dx, ipnAlpha, icnAlpha, innAlpha, ianAlpha);
+
+    final isNextRowUniform = identical(ipnAlpha, iccAlpha) &&
+        identical(icnAlpha, iccAlpha) &&
+        identical(innAlpha, iccAlpha) &&
+        identical(ianAlpha, iccAlpha);
 
     final ipa = px < 0 || ay >= height ? icc : getPixelSafe(px, ay);
     final ica = ay >= height ? icc : getPixelSafe(x, ay);
     final ina = nx >= width || ay >= height ? icc : getPixelSafe(nx, ay);
     final iaa = ax >= width || ay >= height ? icc : getPixelSafe(ax, ay);
 
+    final ipaAlpha = ipa.a;
+    final icaAlpha = ica.a;
+    final inaAlpha = ina.a;
+    final iaaAlpha = iaa.a;
+    final ia3 = cubic(dx, ipaAlpha, icaAlpha, inaAlpha, iaaAlpha);
+
+    final isAfterRowUniform = identical(ipaAlpha, iccAlpha) &&
+        identical(icaAlpha, iccAlpha) &&
+        identical(inaAlpha, iccAlpha) &&
+        identical(iaaAlpha, iccAlpha);
+
+    final c3 = cubic(dy, ip3, ic3, in3, ia3);
+
+    // getColor clamps only uint8: 16 and 32-bit and signed formats store
+    // cubic overshoot modulo format range, so alpha 70120 of uint16 became
+    // 4584
+    final clamps = formatType != FormatType.float;
+    final highest = maxChannelValue;
+    final lowest = formatType == FormatType.int ? -highest - 1 : 0;
+
+    // Image without alpha channel keeps plain blend, also with taps outside
+    // image, which have alpha 0. Comparing 16 alphas cost 3% on uint16 RGB
+    final isUniform = !hasAlpha ||
+        (isPreviousRowUniform &&
+            isCurrentRowUniform &&
+            isNextRowUniform &&
+            isAfterRowUniform);
+
+    // Plain blend mixes RGB of transparent taps into visible ones, so taps
+    // with different alpha are weighted by alpha
+    if (!isUniform && c3 > 0) {
+      final taps = [
+        ipp, icp, inp, iap, ipc, icc, inc, iac, //
+        ipn, icn, inn, ian, ipa, ica, ina, iaa
+      ];
+
+      return _weightedCubicColor(taps, dx, dy, c3, clamps, lowest, highest);
+    }
+
+    // Color rows computed before alpha check were discarded for mixed alpha:
+    // uint16 cubic from 256x256 to 384x384 took 247 ms, and 124 ms after check
+    final ip0 = cubic(dx, ipp.r, icp.r, inp.r, iap.r);
+    final ip1 = cubic(dx, ipp.g, icp.g, inp.g, iap.g);
+    final ip2 = cubic(dx, ipp.b, icp.b, inp.b, iap.b);
+
+    final ic0 = cubic(dx, ipc.r, icc.r, inc.r, iac.r);
+    final ic1 = cubic(dx, ipc.g, icc.g, inc.g, iac.g);
+    final ic2 = cubic(dx, ipc.b, icc.b, inc.b, iac.b);
+
+    final in0 = cubic(dx, ipn.r, icn.r, inn.r, ian.r);
+    final in1 = cubic(dx, ipn.g, icn.g, inn.g, ian.g);
+    final in2 = cubic(dx, ipn.b, icn.b, inn.b, ian.b);
+
     final ia0 = cubic(dx, ipa.r, ica.r, ina.r, iaa.r);
     final ia1 = cubic(dx, ipa.g, ica.g, ina.g, iaa.g);
     final ia2 = cubic(dx, ipa.b, ica.b, ina.b, iaa.b);
-    final ia3 = cubic(dx, ipa.a, ica.a, ina.a, iaa.a);
 
     final c0 = cubic(dy, ip0, ic0, in0, ia0);
     final c1 = cubic(dy, ip1, ic1, in1, ia1);
     final c2 = cubic(dy, ip2, ic2, in2, ia2);
-    final c3 = cubic(dy, ip3, ic3, in3, ia3);
+
+    if (clamps) {
+      final lowestValue = _asDouble(lowest);
+      final highestValue = _asDouble(highest);
+
+      return getColor(
+          _limitDouble(_asDouble(c0), lowestValue, highestValue),
+          _limitDouble(_asDouble(c1), lowestValue, highestValue),
+          _limitDouble(_asDouble(c2), lowestValue, highestValue),
+          _limitDouble(_asDouble(c3), lowestValue, highestValue));
+    }
 
     // getColor clamps and converts for the image's format, so the samples are
     // passed through as they are: truncating here would floor a float format
     // image, whose channels run 0-1, to black.
     return getColor(c0, c1, c2, c3);
   }
+
+  // Closure over locals of getPixelLinear moves them to heap context on every
+  // call, which cost 5% on uint16 without mixed alpha, so weighted blend is
+  // separate method
+  Color _weightedLinearColor(Color center, Color right, Color below,
+      Color diagonal, num fractionX, num fractionY, num alpha) {
+    final centerAlpha = _asDouble(center.a);
+    final rightAlpha = _asDouble(right.a);
+    final belowAlpha = _asDouble(below.a);
+    final diagonalAlpha = _asDouble(diagonal.a);
+    final offsetX = _asDouble(fractionX);
+    final offsetY = _asDouble(fractionY);
+    final blendedAlpha = _asDouble(alpha);
+
+    final red = alphaWeightedLinear(
+        _asDouble(center.r),
+        _asDouble(right.r),
+        _asDouble(below.r),
+        _asDouble(diagonal.r),
+        centerAlpha,
+        rightAlpha,
+        belowAlpha,
+        diagonalAlpha,
+        offsetX,
+        offsetY,
+        blendedAlpha);
+
+    final green = alphaWeightedLinear(
+        _asDouble(center.g),
+        _asDouble(right.g),
+        _asDouble(below.g),
+        _asDouble(diagonal.g),
+        centerAlpha,
+        rightAlpha,
+        belowAlpha,
+        diagonalAlpha,
+        offsetX,
+        offsetY,
+        blendedAlpha);
+
+    final blue = alphaWeightedLinear(
+        _asDouble(center.b),
+        _asDouble(right.b),
+        _asDouble(below.b),
+        _asDouble(diagonal.b),
+        centerAlpha,
+        rightAlpha,
+        belowAlpha,
+        diagonalAlpha,
+        offsetX,
+        offsetY,
+        blendedAlpha);
+
+    return getColor(red, green, blue, alpha);
+  }
+
+  @pragma('vm:prefer-inline')
+  static double _asDouble(num value) =>
+      value is int ? value.toDouble() : value as double;
+
+  Color _weightedCubicColor(List<Color> taps, num fractionX, num fractionY,
+      num alpha, bool clamps, num lowest, num highest) {
+    final weights = Float64List(16);
+    final colors = Float64List(16);
+    for (var i = 0; i < 16; ++i) {
+      weights[i] = _asDouble(taps[i].a);
+    }
+
+    final blendedAlpha = _asDouble(alpha);
+    final referenceTap =
+        cubicAlphaWeights(weights, _asDouble(fractionX), _asDouble(fractionY));
+
+    for (var i = 0; i < 16; ++i) {
+      colors[i] = _asDouble(taps[i].r);
+    }
+
+    var red = alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha);
+    for (var i = 0; i < 16; ++i) {
+      colors[i] = _asDouble(taps[i].g);
+    }
+
+    var green = alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha);
+    for (var i = 0; i < 16; ++i) {
+      colors[i] = _asDouble(taps[i].b);
+    }
+
+    var blue = alphaWeightedCubic(colors, weights, referenceTap, blendedAlpha);
+    if (!clamps) {
+      return getColor(red, green, blue, alpha);
+    }
+
+    final lowestValue = _asDouble(lowest);
+    final highestValue = _asDouble(highest);
+    red = _limitDouble(red, lowestValue, highestValue);
+    green = _limitDouble(green, lowestValue, highestValue);
+    blue = _limitDouble(blue, lowestValue, highestValue);
+
+    return getColor(red, green, blue,
+        _limitDouble(blendedAlpha, lowestValue, highestValue));
+  }
+
+  @pragma('vm:prefer-inline')
+  static double _limitDouble(double value, double lowest, double highest) =>
+      value < lowest
+          ? lowest
+          : value > highest
+              ? highest
+              : value;
 
   /// Set the color of the pixel at the given coordinates to the color of the
   /// given Color [c].
@@ -924,12 +1139,8 @@ class Image extends Iterable<Pixel> {
           }
           op.moveNext();
         }
-      } else {
-        final op = frame.getPixel(0, 0);
-        for (final np in newImage) {
-          convertColor(op, to: np, alpha: alpha);
-          op.moveNext();
-        }
+      } else if (!_expandPalette(frame, newImage, alpha)) {
+        _convertPixels(frame, newImage, alpha);
       }
 
       if (noAnimation) {
@@ -938,6 +1149,84 @@ class Image extends Iterable<Pixel> {
     }
 
     return firstFrame!;
+  }
+
+  static void _convertPixels(Image source, Image target, num? alpha) {
+    final sourcePixel = source.getPixel(0, 0);
+
+    for (final targetPixel in target) {
+      convertColor(sourcePixel, to: targetPixel, alpha: alpha);
+      sourcePixel.moveNext();
+    }
+  }
+
+  /// Expands indices of [source] into [target] with table of converted palette
+  /// colors: per-pixel conversion of 24 uint8 palette frames of 512x512 to
+  /// RGBA takes 242 ms, and 13 ms with table
+  static bool _expandPalette(Image source, Image target, num? alpha) {
+    final indexData = source.data;
+    final targetData = target.data;
+    final palette = source.palette;
+
+    if (indexData is! ImageDataUint8 ||
+        targetData is! ImageDataUint8 ||
+        palette == null ||
+        palette.numColors == 0) {
+      return false;
+    }
+
+    final numColors = palette.numColors < 256 ? palette.numColors : 256;
+    final colors = Image(width: numColors, height: 1, palette: palette);
+    final colorIndices = (colors.data! as ImageDataUint8).data;
+
+    for (var i = 0; i < numColors; ++i) {
+      colorIndices[i] = i;
+    }
+
+    final numChannels = targetData.numChannels;
+    final converted =
+        Image(width: numColors, height: 1, numChannels: numChannels);
+    _convertPixels(colors, converted, alpha);
+
+    final table = (converted.data! as ImageDataUint8).data;
+    final indices = indexData.data;
+    final output = targetData.data;
+    // In-place resize shrinks width and height and keeps old buffer, so
+    // indices.length can exceed pixel count
+    final pixelCount = indexData.width * indexData.height;
+
+    if (numChannels == 4) {
+      for (var i = 0, offset = 0; i < pixelCount; ++i, offset += 4) {
+        final index = indices[i];
+        // Index outside palette is black or RangeError in _convertPixels,
+        // and returning false keeps that result
+        if (index >= numColors) {
+          return false;
+        }
+
+        final entry = index * 4;
+        output[offset] = table[entry];
+        output[offset + 1] = table[entry + 1];
+        output[offset + 2] = table[entry + 2];
+        output[offset + 3] = table[entry + 3];
+      }
+
+      return true;
+    }
+
+    for (var i = 0, offset = 0; i < pixelCount; ++i) {
+      final index = indices[i];
+      if (index >= numColors) {
+        return false;
+      }
+
+      final entry = index * numChannels;
+      for (var k = 0; k < numChannels; ++k) {
+        output[offset++] = table[entry + k];
+      }
+    }
+
+    return true;
   }
 
   /// Add text metadata to the image.
@@ -990,4 +1279,20 @@ class Image extends Iterable<Pixel> {
         return PaletteFloat64(_numPixelColors(format), numChannels);
     }
   }
+}
+
+/// Converts each palette frame of [src] with channel count of that frame:
+/// convert(numChannels: src.numChannels) gives every frame channel count of
+/// first frame, so GIF frames with 4-channel palette lost alpha
+Image withoutPalette(Image src) {
+  Image? first;
+  for (final frame in src.frames) {
+    final converted = frame.hasPalette
+        ? frame.convert(numChannels: frame.numChannels, noAnimation: true)
+        : Image.from(frame, noAnimation: true);
+    first?.addFrame(converted);
+    first ??= converted;
+  }
+
+  return first!;
 }

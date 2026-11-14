@@ -14,7 +14,7 @@ Image colorOffset(Image src,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   for (final frame in src.frames) {
     for (final p in frame) {

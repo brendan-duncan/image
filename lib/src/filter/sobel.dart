@@ -12,7 +12,7 @@ Image sobel(Image src,
     return src;
   }
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   for (final frame in src.frames) {
     if (mask == null &&

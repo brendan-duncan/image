@@ -104,12 +104,13 @@ class PixelUint4 extends Iterable<num> implements Pixel {
     _x = x;
     _y = y;
     final bpp = image.numChannels * 4;
-    final w = image.width;
     final rowStride = image.rowStride;
     _index = bpp == 4
         ? _y * rowStride + (_x >> 1)
+        // _y * width differed from row start of moveNext after in-place
+        // resize, since rowStride keeps width of original image
         : bpp == 8
-            ? _y * w + _x
+            ? _y * rowStride + _x
             : bpp == 16
                 ? _y * rowStride + (_x << 1)
                 : _y * rowStride + ((_x * bpp) >> 3);
@@ -212,11 +213,15 @@ class PixelUint4 extends Iterable<num> implements Pixel {
   set b(num b) => _setChannel(numChannels == 2 ? 0 : 2, b);
 
   @override
-  num get a => palette == null && numChannels == 2
-      ? _getChannel(1)
-      : palette == null && numChannels < 4
-          ? maxChannelValue
-          : _getChannel(3);
+  // palette.get returns 0 for channel 3 of 3-channel palette, and
+  // PixelUint8.a returns 255 for it, so alpha is read with getAlpha
+  num get a => palette != null
+      ? palette!.getAlpha(_get(0))
+      : numChannels == 2
+          ? _getChannel(1)
+          : numChannels < 4
+              ? maxChannelValue
+              : _getChannel(3);
   @override
   set a(num a) => _setChannel(numChannels == 2 ? 1 : 3, a);
 

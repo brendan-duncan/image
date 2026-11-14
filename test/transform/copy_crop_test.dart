@@ -100,5 +100,82 @@ void main() {
       final result = copyCrop(src, x: 5, y: 5, width: 10, height: 10);
       expectSolidColor(result, ColorRgb8(255, 128, 0));
     });
+
+    test('copyCrop keeps duration of every animation frame', () {
+      final animation = Image(width: 8, height: 8, frameDuration: 80)
+        ..addFrame(Image(width: 8, height: 8, frameDuration: 90))
+        ..addFrame(Image(width: 8, height: 8, frameDuration: 70));
+
+      final cropped = copyCrop(animation, x: 2, y: 2, width: 4, height: 4);
+      final rounded =
+          copyCrop(animation, x: 2, y: 2, width: 4, height: 4, radius: 2);
+
+      expect(cropped.frames.map((frame) => frame.frameDuration), [80, 90, 70]);
+      expect(rounded.frames.map((frame) => frame.frameDuration), [80, 90, 70]);
+    });
+
+    test('copyCrop keeps palette of every animation frame', () {
+      final animation = Image(width: 8, height: 8, withPalette: true)
+        ..palette!.setRgb(1, 255, 0, 0)
+        ..addFrame(Image(width: 8, height: 8, withPalette: true)
+          ..palette!.setRgb(1, 0, 0, 255));
+
+      for (final frame in animation.frames) {
+        for (final pixel in frame) {
+          pixel.index = 1;
+        }
+      }
+
+      final cropped = copyCrop(animation, x: 2, y: 2, width: 4, height: 4);
+      final first = cropped.frames[0].getPixel(1, 1);
+      final second = cropped.frames[1].getPixel(1, 1);
+
+      expect([first.r, first.g, first.b], [255, 0, 0]);
+      expect([second.r, second.g, second.b], [0, 0, 255]);
+    });
+
+    for (final name in [
+      'gif/lighthouse.gif',
+      'gif/palette_remap.gif',
+      'gif/anim_palette.gif',
+      'webp/animated_lossy.webp',
+      'png/apng/test_apng1.png',
+    ]) {
+      test('copyCrop keeps duration and pixels of every frame of $name', () {
+        final animation = decodeTestImage(name);
+        final cropped =
+            copyCrop(animation, x: 20, y: 10, width: 60, height: 40);
+
+        expect(cropped.numFrames, animation.numFrames);
+        expect(cropped.frames.map((frame) => frame.frameDuration),
+            animation.frames.map((frame) => frame.frameDuration));
+        expect(
+            differingPixels(cropped, animation, offsetX: 20, offsetY: 10), 0);
+      });
+    }
+
+    for (final name in ['gif/lighthouse.gif', 'gif/anim_palette.gif']) {
+      test('copyCrop with radius keeps every frame of $name', () {
+        final animation = decodeTestImage(name);
+        final cropped =
+            copyCrop(animation, x: 20, y: 10, width: 60, height: 40, radius: 6);
+        final inner = copyCrop(cropped, x: 10, y: 10, width: 40, height: 20);
+
+        expect(cropped.frames.map((frame) => frame.frameDuration),
+            animation.frames.map((frame) => frame.frameDuration));
+        expect(cropped.frames.map((frame) => frame.numChannels),
+            animation.frames.map((frame) => frame.numChannels));
+        expect(differingPixels(inner, animation, offsetX: 30, offsetY: 20), 0);
+      });
+    }
+
+    test('copyCrop keeps durations of gif/lighthouse.gif after encodeGif', () {
+      final animation = decodeTestImage('gif/lighthouse.gif');
+      final cropped = copyCrop(animation, x: 20, y: 10, width: 60, height: 40);
+      final decoded = decodeGif(encodeGif(cropped))!;
+
+      expect(decoded.frames.map((frame) => frame.frameDuration),
+          animation.frames.map((frame) => frame.frameDuration));
+    });
   });
 }

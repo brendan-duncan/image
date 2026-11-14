@@ -7,7 +7,7 @@ import '_frame_copy.dart';
 Image chromaticAberration(Image src,
     {int shift = 5, Image? mask, Channel maskChannel = Channel.luminance}) {
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   Image? scratch;
   for (final frame in src.frames) {

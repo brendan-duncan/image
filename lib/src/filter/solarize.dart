@@ -12,7 +12,7 @@ Image solarize(Image src,
   final max = src.maxChannelValue;
   final thresholdRange = (max * (threshold / 255)).toInt();
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   for (final frame in src.frames) {
     if (src.hasPalette) {

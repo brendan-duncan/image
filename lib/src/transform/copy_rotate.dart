@@ -65,11 +65,12 @@ Image copyRotate(Image src,
   final numFrames = src.numFrames;
   for (var i = 0; i < numFrames; ++i) {
     final frame = src.frames[i];
-    final dst = firstFrame?.addFrame() ??
-        Image.fromResized(src,
-            width: (ux + vx).toInt(),
-            height: (uy + vy).toInt(),
-            noAnimation: true);
+    // addFrame() copied first rotated frame, so later frames had duration
+    // and palette of first frame: 20 of 21 frames of palette_remap.gif had
+    // wrong colors
+    final dst = Image.fromResized(frame,
+        width: (ux + vx).toInt(), height: (uy + vy).toInt(), noAnimation: true);
+    firstFrame?.addFrame(dst);
     firstFrame ??= dst;
     final bg = frame.backgroundColor ?? src.backgroundColor;
     if (bg != null) {
@@ -95,9 +96,9 @@ Image copyRotate(Image src,
 Image _rotate90(Image src) {
   Image? firstFrame;
   for (final frame in src.frames) {
-    final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame,
-            width: frame.height, height: frame.width, noAnimation: true);
+    final dst = Image.fromResized(frame,
+        width: frame.height, height: frame.width, noAnimation: true);
+    firstFrame?.addFrame(dst);
     firstFrame ??= dst;
     final hm1 = frame.height - 1;
     final k = bytesPerPixel(frame);
@@ -126,8 +127,8 @@ Image _rotate180(Image src) {
   for (final frame in src.frames) {
     final wm1 = frame.width - 1;
     final hm1 = frame.height - 1;
-    final dst = firstFrame?.addFrame() ??
-        Image.from(frame, noAnimation: true, noPixels: true);
+    final dst = Image.from(frame, noAnimation: true, noPixels: true);
+    firstFrame?.addFrame(dst);
     firstFrame ??= dst;
     final k = bytesPerPixel(frame);
     if (k > 0 && bytesPerPixel(dst) == k) {
@@ -149,10 +150,10 @@ Image _rotate180(Image src) {
 Image _rotate270(Image src) {
   Image? firstFrame;
   for (final frame in src.frames) {
-    final wm1 = src.width - 1;
-    final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame,
-            width: frame.height, height: frame.width, noAnimation: true);
+    final wm1 = frame.width - 1;
+    final dst = Image.fromResized(frame,
+        width: frame.height, height: frame.width, noAnimation: true);
+    firstFrame?.addFrame(dst);
     firstFrame ??= dst;
     final k = bytesPerPixel(frame);
     if (k > 0 && bytesPerPixel(dst) == k && frame.width == src.width) {

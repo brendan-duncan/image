@@ -39,8 +39,7 @@ Image copyExpandCanvas(Image src,
   }
 
   // Convert the image if it has a palette
-  final Image srcConverted =
-      src.hasPalette ? src.convert(numChannels: src.numChannels) : src;
+  final Image srcConverted = src.hasPalette ? withoutPalette(src) : src;
 
   // Check if new dimensions are larger or equal to the original image
   if (newWidth! < srcConverted.width || newHeight! < srcConverted.height) {
@@ -112,13 +111,33 @@ Image copyExpandCanvas(Image src,
 
   // Copy the original image to the new frames/canvas
   for (var i = 0; i < srcConverted.numFrames; ++i) {
+    final frame = srcConverted.frames[i];
+
     // Ensure the frame exists in the expanded canvas
     if (i >= expandedCanvas.numFrames) {
-      expandedCanvas.addFrame();
+      // addFrame() copied first canvas frame without pixels, so later frames
+      // had no backgroundColor and had channel count of first frame
+      final added = toImage != null
+          ? expandedCanvas.addFrame()
+          : expandedCanvas.addFrame(Image(
+              width: newWidth,
+              height: newHeight,
+              format: frame.format,
+              numChannels: frame.numChannels));
+
+      if (backgroundColor != null) {
+        added.clear(backgroundColor);
+      }
     }
 
-    final frame = srcConverted.frames[i];
     final expandedCanvasFrame = expandedCanvas.frames[i];
+    // New canvas frame has duration 0, so duration of source frame is copied
+    if (toImage == null || i > 0) {
+      expandedCanvasFrame
+        ..frameDuration = frame.frameDuration
+        ..frameType = frame.frameType
+        ..loopCount = frame.loopCount;
+    }
 
     for (final p in frame) {
       // Skip if the pixel position is outside the bounds of the new canvas

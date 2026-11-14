@@ -21,7 +21,7 @@ Image normalize(Image src,
     return src;
   }
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   final fm = mn.toDouble();
   final fM = mx.toDouble();

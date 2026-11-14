@@ -134,8 +134,10 @@ class PixelUint16 extends Iterable<num> implements Pixel {
     }
   }
 
+  // index returned r, which is red of palette color for palette image, so
+  // in-place resize of 16-bit palette TIFF wrote zeros
   @override
-  num get index => r;
+  num get index => data[_index];
 
   @override
   set index(num i) => r = i;

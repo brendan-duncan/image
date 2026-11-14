@@ -33,7 +33,12 @@ Image copyRectify(Image src,
     }
     // The first frame is written into toImage, and the others added to it.
     for (var i = 0; i < linear.numFrames; ++i) {
-      writeSrgbFrame(linear.frames[i], i == 0 ? toImage : toImage.addFrame());
+      final target = i == 0 ? toImage : toImage.addFrame();
+      if (i > 0) {
+        target.frameDuration = linear.frames[i].frameDuration;
+      }
+
+      writeSrgbFrame(linear.frames[i], target);
     }
     return toImage;
   }
@@ -41,14 +46,23 @@ Image copyRectify(Image src,
   // You can't interpolate index pixels, so we need to convert the image
   // to a non-palette image if non-nearest interpolation is used.
   if (interpolation != Interpolation.nearest && src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
 
   Image? firstFrame;
   for (final frame in src.frames) {
-    final dst = firstFrame?.addFrame() ??
-        toImage ??
-        Image.from(frame, noAnimation: true);
+    // addFrame() copied first rectified frame, so later frames had duration
+    // and palette of first frame
+    final dst = firstFrame == null
+        ? toImage ?? Image.from(frame, noAnimation: true)
+        : toImage != null
+            ? Image.from(toImage, noAnimation: true, noPixels: true)
+            : Image.from(frame, noAnimation: true);
+
+    if (firstFrame != null) {
+      dst.frameDuration = frame.frameDuration;
+      firstFrame.addFrame(dst);
+    }
     firstFrame ??= dst;
     for (var y = 0; y < dst.height; ++y) {
       final v = y / (dst.height - 1);
