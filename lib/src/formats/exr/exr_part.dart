@@ -159,6 +159,8 @@ class ExrPart {
       return;
     }
     checkPixels(width, height, maxPixels);
+    // Every channel is a plane of the image, allocated here
+    checkSamples(width, height, channels.length, maxPixels);
 
     framebuffer = Image(
         width: width,
@@ -225,12 +227,20 @@ class ExrPart {
       });
     } else {
       _bytesPerLine = Uint32List(height + 1);
+      // Summed by vertical sampling first, so the lines are visited for each
+      // distinct sampling and not for each channel: a header can name
+      // thousands of channels.
+      final bytesBySampling = <int, int>{};
       for (var ch in channels) {
         final nBytes = ch.dataSize * width ~/ ch.xSampling;
-        for (var y = 0; y < height; ++y) {
-          if ((y + top) % ch.ySampling == 0) {
-            _bytesPerLine[y] += nBytes;
-          }
+        bytesBySampling[ch.ySampling] =
+            (bytesBySampling[ch.ySampling] ?? 0) + nBytes;
+      }
+      for (final MapEntry(key: ySampling, value: nBytes)
+          in bytesBySampling.entries) {
+        // The lines where (y + top) is a multiple of the sampling
+        for (var y = -top % ySampling; y < height; y += ySampling) {
+          _bytesPerLine[y] += nBytes;
         }
       }
 

@@ -65,6 +65,10 @@ class TiffDecoder extends Decoder {
     final tiff = info!.images[frame];
     checkPixels(tiff.width, tiff.height, maxPixels);
     checkPixels(tiff.tileWidth, tiff.tileHeight, maxPixels);
+    // The image and its tile buffers are allocated for every sample
+    checkSamples(tiff.width, tiff.height, tiff.samplesPerPixel, maxPixels);
+    checkSamples(
+        tiff.tileWidth, tiff.tileHeight, tiff.samplesPerPixel, maxPixels);
     final image = tiff.decode(_input);
     if (exif != null) {
       image.exif = exif!;
@@ -97,9 +101,12 @@ class TiffDecoder extends Decoder {
       return decodeFrame(frame);
     }
 
-    final budget = PixelBudget(maxPixels);
-    for (final tiff in info!.images) {
-      budget.add(tiff.width, tiff.height);
+    // A single page is checked when it is decoded
+    if (len > 1) {
+      final budget = PixelBudget(maxPixels, what: 'TIFF pages');
+      for (final tiff in info!.images) {
+        budget.add(tiff.width, tiff.height, pixelPlanes(tiff.samplesPerPixel));
+      }
     }
 
     final image = decodeFrame(0);

@@ -14,6 +14,27 @@ void checkPixels(int width, int height, int maxPixels,
   }
 }
 
+/// How many images of up to 4 samples a pixel an image with [samples] a pixel
+/// counts as. A pixel limit bounds memory only for a bounded pixel size, and
+/// formats with any number of channels would otherwise multiply it.
+int pixelPlanes(int samples) => samples <= 4 ? 1 : (samples + 3) ~/ 4;
+
+/// Throws an [ImageException] if a [width] x [height] image with [samples]
+/// samples a pixel takes the memory of more than [maxPixels] pixels of 4
+/// samples. The dimensions themselves are for [checkPixels].
+void checkSamples(int width, int height, int samples, int maxPixels) {
+  final planes = pixelPlanes(samples);
+  if (maxPixels > 0 &&
+      planes > 1 &&
+      width > 0 &&
+      height > 0 &&
+      (_exceeds(width, height, maxPixels) ||
+          _exceeds(width * height, planes, maxPixels))) {
+    throw ImageException('Image of ${width}x$height with $samples samples a '
+        'pixel exceeds the maximum of $maxPixels pixels');
+  }
+}
+
 /// Whether [a] * [b] > [limit], for non-negative values, without computing
 /// the product, which overflows for sizes read from 32 or 64 bit fields.
 bool _exceeds(int a, int b, int limit) => b != 0 && a > limit ~/ b;

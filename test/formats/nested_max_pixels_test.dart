@@ -220,7 +220,99 @@ void main() {
       expect(() => BmpDecoder().decode(bmp.buffer.asUint8List()),
           refused('larger than the file'));
     });
+
+    test('TIFF samples per pixel count against maxPixels', () {
+      // 100 x 100 is within the limit, but 30 samples a pixel take the
+      // memory of 8 such images
+      final tiff = _lzwTiff(100, 100, samplesPerPixel: 30);
+      expect(() => TiffDecoder(maxPixels: 10000).decode(tiff),
+          refused('30 samples a pixel'));
+      expect(TiffDecoder(maxPixels: 80000).decode(tiff)?.numChannels, 30);
+      expect(
+          TiffDecoder(maxPixels: 10000)
+              .decode(_lzwTiff(100, 100, samplesPerPixel: 4))
+              ?.numChannels,
+          4);
+    });
+
+    test('EXR channels count against maxPixels', () {
+      // Every channel is a plane allocated from the header alone
+      final exr = _exrHeader(64, 64, channels: 40);
+      expect(() => ExrDecoder(maxPixels: 4096).decode(exr),
+          refused('40 samples a pixel'));
+      // With room for them it gets as far as the missing pixel data
+      expect(
+          () => ExrDecoder(maxPixels: 4096 * 10).decode(exr),
+          throwsA(isA<ImageException>().having((e) => e.message, 'message',
+              isNot(contains('samples a pixel')))));
+    });
   });
+}
+
+/// A [width] x [height] LZW TIFF with one strip holding only a clear code.
+Uint8List _lzwTiff(int width, int height, {required int samplesPerPixel}) {
+  const entries = 9;
+  final out = ByteData(12 + 2 + entries * 12 + 4)
+    ..setUint8(0, 0x49)
+    ..setUint8(1, 0x49)
+    ..setUint16(2, 42, Endian.little)
+    ..setUint32(4, 12, Endian.little)
+    ..setUint8(8, 0x80) // LZW clear code
+    ..setUint16(12, entries, Endian.little);
+  var at = 14;
+  for (final (id, type, value) in [
+    (256, 4, width), // ImageWidth
+    (257, 4, height), // ImageLength
+    (258, 3, 8), // BitsPerSample
+    (259, 3, 5), // Compression: LZW
+    (262, 3, 2), // Photometric: RGB
+    (273, 4, 8), // StripOffsets
+    (277, 3, samplesPerPixel),
+    (278, 4, height), // RowsPerStrip
+    (279, 4, 4), // StripByteCounts
+  ]) {
+    out
+      ..setUint16(at, id, Endian.little)
+      ..setUint16(at + 2, type, Endian.little)
+      ..setUint32(at + 4, 1, Endian.little)
+      ..setUint32(at + 8, value, Endian.little);
+    at += 12;
+  }
+  return out.buffer.asUint8List();
+}
+
+/// The header of a ZIP scanline EXR with [channels] half channels and no
+/// pixel data.
+Uint8List _exrHeader(int width, int height, {required int channels}) {
+  final out = BytesBuilder()..add([0x76, 0x2f, 0x31, 0x01, 2, 0, 0, 0]);
+  List<int> int32s(List<int> values) {
+    final data = ByteData(values.length * 4);
+    for (var i = 0; i < values.length; i++) {
+      data.setInt32(i * 4, values[i], Endian.little);
+    }
+    return data.buffer.asUint8List();
+  }
+
+  void attribute(String name, String type, List<int> value) => out
+    ..add([...name.codeUnits, 0, ...type.codeUnits, 0])
+    ..add(int32s([value.length]))
+    ..add(value);
+
+  attribute('channels', 'chlist', [
+    for (var i = 0; i < channels; i++) ...[
+      ...'c$i'.codeUnits, 0,
+      ...int32s([1]), // half
+      0, 0, 0, 0,
+      ...int32s([1, 1]), // sampling
+    ],
+    0,
+  ]);
+  attribute('compression', 'compression', [3]);
+  final window = int32s([0, 0, width - 1, height - 1]);
+  attribute('dataWindow', 'box2i', window);
+  attribute('displayWindow', 'box2i', window);
+  out.addByte(0);
+  return out.toBytes();
 }
 
 /// The offsets of the PNG chunks of [type] in [png].
