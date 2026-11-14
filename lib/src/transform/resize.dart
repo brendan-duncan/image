@@ -7,6 +7,7 @@ import '../image/interpolation.dart';
 import '../image/pixel.dart';
 import '../util/_linear_rgb.dart';
 import '../util/image_exception.dart';
+import '_resize_bytes.dart';
 import 'bake_orientation.dart';
 import 'copy_resize.dart';
 
@@ -203,10 +204,11 @@ Image resize(Image src,
     return src;
   }
 
+  // (x * dx).toInt() gives 14 for row 11 of 30 scaled to 22 where copyResize
+  // reads row (11 * 30) ~/ 22 = 15, so nearest uses copyResize mapping
   final scaleX = Int32List(w);
-  final dx = src.width / w;
   for (var x = 0; x < w; ++x) {
-    scaleX[x] = (x * dx).toInt();
+    scaleX[x] = (x * src.width) ~/ w;
   }
 
   final origWidth = src.width;
@@ -220,11 +222,9 @@ Image resize(Image src,
     final dy = frame.height / h;
     final dx = frame.width / w;
 
-    if (maintainAspect && backgroundColor != null) {
-      dst.clear(backgroundColor);
-    }
-
     if (interpolation == Interpolation.average) {
+      final hasAlpha = frame.hasAlpha;
+      Pixel? sourcePixel;
       for (var y = 0; y < h; ++y) {
         final ay1 = (y * dy).toInt();
         var ay2 = ((y + 1) * dy).toInt();
@@ -244,16 +244,54 @@ Image resize(Image src,
           num b = 0;
           num a = 0;
           var np = 0;
+          num weightedRed = 0;
+          num weightedGreen = 0;
+          num weightedBlue = 0;
+          var firstAlpha = 0.0;
+          var isMixed = false;
+          var hasNegativeAlpha = false;
+
           for (var sy = ay1; sy < ay2; ++sy) {
             for (var sx = ax1; sx < ax2; ++sx, ++np) {
-              final s = frame.getPixel(sx, sy);
+              final s = sourcePixel = frame.getPixel(sx, sy, sourcePixel);
+              final pixelAlpha = s.a;
+
+              if (hasAlpha) {
+                // toDouble on num is dynamic call that cost 13% on uint16
+                final alphaValue = pixelAlpha is int
+                    ? pixelAlpha.toDouble()
+                    : pixelAlpha as double;
+
+                if (isMixed) {
+                  weightedRed += s.r * alphaValue;
+                  weightedGreen += s.g * alphaValue;
+                  weightedBlue += s.b * alphaValue;
+                } else if (np == 0) {
+                  firstAlpha = alphaValue;
+                } else if (alphaValue != firstAlpha) {
+                  isMixed = true;
+                  weightedRed = r * firstAlpha + s.r * alphaValue;
+                  weightedGreen = g * firstAlpha + s.g * alphaValue;
+                  weightedBlue = b * firstAlpha + s.b * alphaValue;
+                }
+
+                hasNegativeAlpha = hasNegativeAlpha || alphaValue < 0;
+              }
+
               r += s.r;
               g += s.g;
               b += s.b;
-              a += s.a;
+              a += pixelAlpha;
             }
           }
-          final c = dst.getColor(r / np, g / np, b / np, a / np);
+
+          // Negative alpha in signed or float format can make alpha sum 0
+          // and color NaN, so only block with non-negative mixed alpha is
+          // weighted as in AlphaBlockSums
+          final c = isMixed && !hasNegativeAlpha
+              ? dst.getColor(
+                  weightedRed / a, weightedGreen / a, weightedBlue / a, a / np)
+              : dst.getColor(r / np, g / np, b / np, a / np);
 
           dst.data!.width = width;
           dst.data!.height = height;
@@ -265,7 +303,7 @@ Image resize(Image src,
     } else if (interpolation == Interpolation.nearest) {
       if (frame.hasPalette) {
         for (var y = 0; y < h; ++y) {
-          final y2 = (y * dy).toInt();
+          final y2 = (y * frame.height) ~/ h;
           for (var x = 0; x < w; ++x) {
             final p = frame.getPixelIndex(scaleX[x], y2);
             dst.data!.width = width;
@@ -277,7 +315,7 @@ Image resize(Image src,
         }
       } else {
         for (var y = 0; y < h; ++y) {
-          final y2 = (y * dy).toInt();
+          final y2 = (y * frame.height) ~/ h;
           for (var x = 0; x < w; ++x) {
             final p = frame.getPixel(scaleX[x], y2);
             dst.data!.width = width;
@@ -327,14 +365,31 @@ void _resizeDownBytes(
   final dy = sh / height;
   final dx = sw / width;
   var di = 0;
+
+  // Alpha test inside loops below cost 11% on linear and 2.5% on average of
+  // RGB, so images with alpha channel use separate loops
+  if (nc.isEven && interpolation == Interpolation.average) {
+    resizeDownAverageAlpha(bytes, sw, nc, width, height, dx, dy);
+    frame.data!.width = width;
+    frame.data!.height = height;
+    return;
+  }
+
+  if (nc.isEven && interpolation == Interpolation.linear) {
+    resizeDownLinearAlpha(bytes, sw, sh, nc, width, height, dx, dy);
+    frame.data!.width = width;
+    frame.data!.height = height;
+    return;
+  }
+
   switch (interpolation) {
     case Interpolation.nearest:
       final sxs = Int32List(width);
       for (var x = 0; x < width; ++x) {
-        sxs[x] = (x * dx).toInt() * nc;
+        sxs[x] = (x * sw) ~/ width * nc;
       }
       for (var y = 0; y < height; ++y) {
-        final row = (y * dy).toInt() * sw * nc;
+        final row = (y * sh) ~/ height * sw * nc;
         for (var x = 0; x < width; ++x) {
           final si = row + sxs[x];
           for (var c = 0; c < nc; ++c) {

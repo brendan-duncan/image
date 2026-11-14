@@ -14,7 +14,7 @@ Image copyImageChannels(Image src,
     Image? mask,
     Channel maskChannel = Channel.luminance}) {
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   final dx = from.width / src.width;
   final dy = from.height / src.height;

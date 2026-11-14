@@ -28,7 +28,7 @@ Image separableConvolution(Image src,
             kernel: kernel, mask: mask, maskChannel: maskChannel));
   }
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   for (final frame in src.frames) {
     if (mask == null &&

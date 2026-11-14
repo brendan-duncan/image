@@ -91,8 +91,10 @@ class PaletteUint16 extends Palette {
 
   @override
   num getAlpha(int index) {
+    // Palette without alpha channel is opaque as in PaletteUint8: when
+    // getAlpha returned 0, pixel.a of 16-bit palette TIFF was 0 of 65535
     if (numChannels < 4) {
-      return 0;
+      return maxChannelValue;
     }
     index *= numChannels;
     return data[index + 3];

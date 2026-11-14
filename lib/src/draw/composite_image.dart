@@ -61,7 +61,7 @@ Image compositeImage(Image dst, Image src,
   }
 
   if (blend != BlendMode.direct && dst.hasPalette) {
-    dst = dst.convert(numChannels: dst.numChannels);
+    dst = withoutPalette(dst);
   }
 
   final dy = srcH / dstH;

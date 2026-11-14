@@ -91,8 +91,10 @@ class PaletteInt32 extends Palette {
 
   @override
   num getAlpha(int index) {
+    // Palette without alpha channel is opaque as in PaletteUint8: when
+    // getAlpha returned 0, pixel.a of image with this palette was 0
     if (numChannels < 4) {
-      return 0;
+      return maxChannelValue;
     }
     index *= numChannels;
     return data[index + 3];

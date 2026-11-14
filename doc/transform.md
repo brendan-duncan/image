@@ -168,6 +168,8 @@ Images with a palette can't be blended, so they always use `nearest`, except in 
 which converts them to non-palette images first. Elsewhere, convert them first
 (`image.convert(numChannels: 4)`) if you want smooth results.
 
+`linear`, `cubic` and `average` weight color by alpha where blended pixels have different alpha, so color of fully transparent pixels has no effect on visible pixels. Where blended pixels have same alpha, result is plain blend. For integer formats `cubic` clamps result to range of image format.
+
 The resize, rotate and rectify functions also take `linearBlend` (default `false`). When it's
 `true`, colors are taken as sRGB and averaged as linear light, so shrunk images keep their bright
 details instead of darkening them. Alpha is unchanged. It's slower, especially for resizing, and

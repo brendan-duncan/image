@@ -62,7 +62,7 @@ Image adjustColor(Image src,
   }
 
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
 
   contrast = contrast?.clamp(0, 2);

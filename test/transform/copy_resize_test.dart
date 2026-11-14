@@ -441,5 +441,364 @@ void main() {
             reason: '${p.x},${p.y}');
       }
     });
+
+    test('copyResize average weights color by alpha in mixed-alpha blocks', () {
+      final source = Image(width: 4, height: 2, numChannels: 4);
+      for (final pixel in source) {
+        if (pixel.x.isEven) {
+          pixel.setRgba(255, 0, 0, 255);
+        } else {
+          pixel.setRgba(255, 255, 0, 0);
+        }
+      }
+
+      final resized =
+          copyResize(source, width: 2, interpolation: Interpolation.average);
+
+      expect(resized.toUint8List(), [255, 0, 0, 127, 255, 0, 0, 127]);
+    });
+
+    test('copyResize average weights gray by alpha in 2-channel image', () {
+      final source = Image(width: 4, height: 2, numChannels: 2);
+      source.toUint8List().setAll(0, [
+        for (var pair = 0; pair < 4; pair++) ...[200, 255, 40, 0],
+      ]);
+
+      final resized =
+          copyResize(source, width: 2, interpolation: Interpolation.average);
+
+      expect(resized.toUint8List(), [200, 127, 200, 127]);
+    });
+
+    test('copyResize average weights color by alpha in uint16 image', () {
+      final source =
+          Image(width: 4, height: 2, format: Format.uint16, numChannels: 4);
+      for (final pixel in source) {
+        if (pixel.x.isEven) {
+          pixel.setRgba(65535, 0, 0, 65535);
+        } else {
+          pixel.setRgba(65535, 65535, 0, 0);
+        }
+      }
+
+      final resized =
+          copyResize(source, width: 2, interpolation: Interpolation.average);
+
+      for (final pixel in resized) {
+        expect([pixel.r, pixel.g, pixel.b, pixel.a], [65535, 0, 0, 32767]);
+      }
+    });
+
+    test('copyResize average weights color by alpha in 40000-pixel blocks', () {
+      final source = Image(width: 400, height: 200, numChannels: 4);
+      for (final pixel in source) {
+        if (pixel.x % 8 == 0) {
+          pixel.setRgba(255, 0, 255, 0);
+        } else {
+          pixel.setRgba(255, 255, 255, 255);
+        }
+      }
+
+      final resized =
+          copyResize(source, width: 2, interpolation: Interpolation.average);
+
+      expect(resized.toUint8List(), [255, 255, 255, 223, 255, 255, 255, 223]);
+    });
+
+    test('copyResize average keeps unweighted mean in blocks of 1 alpha value',
+        () {
+      const alphas = [255, 128, 0, 77];
+      final source = Image(width: 8, height: 2, numChannels: 4);
+      for (final pixel in source) {
+        pixel.setRgba(pixel.x * 31 + pixel.y * 7, 255 - pixel.x * 30,
+            pixel.y * 200 + pixel.x, alphas[pixel.x ~/ 2]);
+      }
+
+      final resized =
+          copyResize(source, width: 4, interpolation: Interpolation.average);
+
+      final sourceBytes = source.toUint8List();
+      final expected = <int>[];
+      for (var block = 0; block < 4; block++) {
+        for (var channel = 0; channel < 4; channel++) {
+          var sum = 0;
+          for (final column in [block * 2, block * 2 + 1]) {
+            sum += sourceBytes[column * 4 + channel];
+            sum += sourceBytes[(8 + column) * 4 + channel];
+          }
+
+          expected.add((sum * (1.0 / 4)).toInt());
+        }
+      }
+
+      expect(resized.toUint8List(), expected);
+    });
+
+    test('copyResize average with EXIF orientation weights color by alpha', () {
+      for (var orientation = 2; orientation <= 8; orientation++) {
+        final source = Image(width: 8, height: 6, numChannels: 4);
+        for (final pixel in source) {
+          pixel.setRgba(pixel.x * 30, pixel.y * 40, 255 - pixel.x * 9,
+              (pixel.x * 7 + pixel.y * 5) % 3 * 100);
+        }
+        source.exif.imageIfd.orientation = orientation;
+
+        final width = orientation < 5 ? 4 : 3;
+        final expected = copyResize(bakeOrientation(source),
+            width: width, interpolation: Interpolation.average);
+        final resized = copyResize(source,
+            width: width, interpolation: Interpolation.average);
+
+        expect(resized.toUint8List(), expected.toUint8List(),
+            reason: 'orientation $orientation');
+      }
+    });
+
+    for (final name in [
+      'gif/animated.gif',
+      'png/alpha_edge.png',
+      'png/apng/test_apng1.png',
+      'png/apng/test_apng3.png',
+      'webp/animated_transparency.webp',
+      'bmp/rgba32.bmp',
+    ]) {
+      test('copyResize average takes color from visible pixels of $name', () {
+        final decoded = decodeTestImage(name);
+        final source =
+            decoded.hasPalette ? decoded.convert(numChannels: 4) : decoded;
+        final resized = copyResize(source,
+            width: 1 + source.width * 37 ~/ 100,
+            interpolation: Interpolation.average);
+
+        expect(hiddenColorPixels(source, resized), 0);
+      });
+    }
+
+    for (final name in [
+      'gif/animated.gif',
+      'png/alpha_edge.png',
+      'png/basi4a08.png',
+      'png/basn6a08.png',
+      'png/basn6a16.png',
+      'png/apng/test_apng1.png',
+      'png/buck_24.png',
+    ]) {
+      test('copyResize average matches alpha-weighted mean of $name', () {
+        final decoded = decodeTestImage(name);
+        final source =
+            decoded.hasPalette ? decoded.convert(numChannels: 4) : decoded;
+
+        for (final percent in [37, 50, 170]) {
+          final width = 1 + source.width * percent ~/ 100;
+          final resized = copyResize(source,
+              width: width, interpolation: Interpolation.average);
+          final expected =
+              alphaWeightedAverage(source, resized.width, resized.height);
+
+          expect(differingPixels(resized, expected), 0, reason: '$percent%');
+        }
+      });
+    }
+
+    for (final format in [Format.uint8, Format.uint16]) {
+      test('copyResize average keeps solid ${format.name} color', () {
+        final changed = <String>[];
+        for (var block = 2; block <= 12; block++) {
+          for (var value = 1; value <= 255; value++) {
+            final source = Image(
+                width: block * 2,
+                height: block * 2,
+                format: format,
+                numChannels: 4);
+            for (final pixel in source) {
+              pixel.setRgba(value, value, value, value);
+            }
+
+            final resized = copyResize(source,
+                width: 2, height: 2, interpolation: Interpolation.average);
+            final pixel = resized.getPixel(1, 1);
+
+            if (pixel.r != value || pixel.a != value) {
+              changed.add('$value in ${block}x$block block');
+            }
+          }
+        }
+
+        expect(changed, isEmpty);
+      });
+    }
+
+    for (final name in [
+      'png/buck_24.png',
+      'png/alpha_edge.png',
+      'png/basn6a16.png',
+      'png/basi4a08.png',
+      'gif/animated.gif',
+    ]) {
+      test('resize average gives same pixels as copyResize for $name', () {
+        final decoded = decodeTestImage(name);
+        final source =
+            decoded.hasPalette ? decoded.convert(numChannels: 4) : decoded;
+
+        for (final percent in [13, 37, 50, 88]) {
+          final width = 1 + source.width * percent ~/ 100;
+          final copied = copyResize(source,
+              width: width, interpolation: Interpolation.average);
+          final inPlace = resize(source.clone(),
+              width: width, interpolation: Interpolation.average);
+
+          expect(differingPixels(inPlace, copied), 0, reason: '$percent%');
+        }
+      });
+    }
+
+    const blending = [
+      Interpolation.linear,
+      Interpolation.cubic,
+      Interpolation.average,
+    ];
+
+    for (final name in [
+      'gif/animated.gif',
+      'png/alpha_edge.png',
+      'png/basn6a16.png',
+      'png/basi4a08.png',
+      'png/apng/test_apng1.png',
+      'bmp/rgba32.bmp',
+    ]) {
+      for (final interpolation in blending) {
+        test(
+            'color of transparent pixels of $name has no effect on '
+            '${interpolation.name} copyResize and resize', () {
+          final decoded = decodeTestImage(name);
+          final source =
+              decoded.hasPalette ? decoded.convert(numChannels: 4) : decoded;
+          final changed = withHiddenColorChanged(source);
+
+          for (final percent in [37, 50, 170]) {
+            final width = 1 + source.width * percent ~/ 100;
+            final copied =
+                copyResize(source, width: width, interpolation: interpolation);
+            final inPlace = resize(source.clone(),
+                width: width, interpolation: interpolation);
+
+            expect(
+                visibleDifferences(
+                    copyResize(changed,
+                        width: width, interpolation: interpolation),
+                    copied),
+                0,
+                reason: 'copyResize $percent%');
+            expect(
+                visibleDifferences(
+                    resize(changed.clone(),
+                        width: width, interpolation: interpolation),
+                    inPlace),
+                0,
+                reason: 'resize $percent%');
+            expect(differingPixels(inPlace, copied), 0,
+                reason: 'resize against copyResize $percent%');
+          }
+        });
+      }
+    }
+
+    for (final format in [Format.uint8, Format.uint16, Format.float32]) {
+      for (final interpolation in blending) {
+        test(
+            '${interpolation.name} copyResize keeps solid ${format.name} '
+            'color with mixed alpha', () {
+          final source =
+              Image(width: 13, height: 9, format: format, numChannels: 4);
+          final opaque = source.maxChannelValue;
+          final color = format == Format.float32 ? 0.25 : opaque ~/ 3;
+          for (final pixel in source) {
+            pixel.setRgba(color, color, color,
+                (pixel.x * 5 + pixel.y * 3) % 4 == 0 ? 0 : opaque);
+          }
+
+          for (final width in [5, 13, 31]) {
+            final resized =
+                copyResize(source, width: width, interpolation: interpolation);
+
+            for (final pixel in resized) {
+              if (pixel.a > 0 && (pixel.r != color || pixel.b != color)) {
+                fail('${pixel.r} at ${pixel.x},${pixel.y} of width $width');
+              }
+            }
+          }
+        });
+      }
+    }
+
+    for (final entry in {
+      Format.uint8: 200,
+      Format.uint16: 40000,
+      Format.float32: 0.5,
+    }.entries) {
+      test(
+          'getPixelLinear and getPixelCubic of ${entry.key.name} image '
+          'without alpha channel blend taps outside image as 0', () {
+        final source = Image(width: 4, height: 4, format: entry.key);
+        for (final pixel in source) {
+          pixel.setRgb(entry.value, entry.value, entry.value);
+        }
+
+        final linear = source.getPixelLinear(-0.5, 1);
+        final cubic = source.getPixelCubic(-0.5, 1);
+
+        expect(linear.r, entry.value / 2);
+        expect(cubic.r, entry.value / 2);
+      });
+    }
+
+    test('linear copyResize gives color of only weighted tap exactly', () {
+      final changed = <String>[];
+      for (var color = 0; color < 256; color += 5) {
+        for (var alpha = 1; alpha < 256; alpha += 7) {
+          final source = Image(width: 2, height: 2, numChannels: 4)
+            ..setPixelRgba(0, 0, 255 - color, 9, 9, 0)
+            ..setPixelRgba(1, 0, 255 - color, 9, 9, 255)
+            ..setPixelRgba(0, 1, color, color, color, alpha)
+            ..setPixelRgba(1, 1, 255 - color, 9, 9, 0);
+
+          for (final height in [3, 5, 7, 9, 13]) {
+            final resized = copyResize(source,
+                width: 2, height: height, interpolation: Interpolation.linear);
+
+            for (var y = 0; y < height; y++) {
+              final pixel = resized.getPixel(0, y);
+              if (pixel.a > 0 && pixel.r != color) {
+                changed.add('$color with alpha $alpha at row $y of $height');
+              }
+            }
+          }
+        }
+      }
+
+      expect(changed, isEmpty);
+    });
+
+    for (final format in [Format.uint16, Format.uint32]) {
+      test('cubic copyResize of ${format.name} does not wrap overshoot', () {
+        final source =
+            Image(width: 4, height: 1, format: format, numChannels: 1);
+        final highest = source.maxChannelValue;
+        source
+          ..setPixelRgb(0, 0, highest, 0, 0)
+          ..setPixelRgb(1, 0, highest, 0, 0);
+
+        final resized = copyResize(source,
+            width: 9, height: 1, interpolation: Interpolation.cubic);
+        final values = [for (final pixel in resized) pixel.r];
+
+        expect(values.first, highest);
+        expect(values.last, 0);
+        for (var i = 1; i < values.length; i++) {
+          expect(values[i], lessThanOrEqualTo(values[i - 1]),
+              reason: '$values');
+        }
+      });
+    }
   });
 }

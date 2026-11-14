@@ -176,11 +176,13 @@ The JPEG encoder does this for you: JPEG has no alpha, so it blends transparent 
 
 ### Dark fringes on transparent edges
 
-Because alpha is straight, resizing, blurring or rotating an image with transparent areas mixes in the
+Because alpha is straight, blurring an image with transparent areas mixes in the
 colors of the fully transparent pixels next to the visible ones. Those colors are often black (a new image
 is filled with zeros), which leaves a dark fringe around the edges of the visible content. Premultiplied
 alpha would avoid this, but the library doesn't premultiply.
 
+Resizing, rotating and rectifying with `linear`, `cubic` or `average` weight color by alpha where blended pixels have different alpha, so they don't leave this fringe.
+
 To avoid fringes, make sure transparent pixels have a color close to their visible neighbors before you
-resize or blur, for example by filling the image with the edge color (keeping alpha 0) before drawing the
+blur, for example by filling the image with the edge color (keeping alpha 0) before drawing the
 content into it.

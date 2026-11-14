@@ -26,7 +26,7 @@ Image contrast(Image src,
     return src;
   }
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   if (contrast != _lastContrast || mode != _lastMode) {
     _lastContrast = contrast;

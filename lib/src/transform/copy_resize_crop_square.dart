@@ -64,8 +64,11 @@ Image copyResizeCropSquare(Image src,
 
   Image? firstFrame;
   for (final frame in src.frames) {
-    final dst = firstFrame?.addFrame() ??
+    // addFrame() copied first cropped frame, so later frames had duration
+    // and palette of first frame
+    final dst =
         Image.fromResized(frame, width: size, height: size, noAnimation: true);
+    firstFrame?.addFrame(dst);
     firstFrame ??= dst;
 
     // Rounded corners

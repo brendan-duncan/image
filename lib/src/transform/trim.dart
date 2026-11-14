@@ -160,9 +160,11 @@ Image trim(Image src,
 
   Image? firstFrame;
   for (var frame in src.frames) {
-    final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame,
-            width: crop[2], height: crop[3], noAnimation: true);
+    // addFrame() copied first trimmed frame, so later frames had duration
+    // and palette of first frame
+    final dst = Image.fromResized(frame,
+        width: crop[2], height: crop[3], noAnimation: true);
+    firstFrame?.addFrame(dst);
     firstFrame ??= dst;
 
     compositeImage(dst, frame,

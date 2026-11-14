@@ -32,7 +32,7 @@ Image bulgeDistortion(Image src,
             maskChannel: maskChannel));
   }
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   Image? scratch;
   for (final frame in src.frames) {

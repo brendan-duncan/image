@@ -20,17 +20,19 @@ Image copyCrop(Image src,
     height = src.height - y;
   }
 
-  if (radius > 0 && src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
-  }
-
   Image? firstFrame;
   final numFrames = src.numFrames;
   for (var i = 0; i < numFrames; ++i) {
-    final frame = src.frames[i];
-    final dst = firstFrame?.addFrame() ??
-        Image.fromResized(frame,
-            width: width, height: height, noAnimation: true);
+    var frame = src.frames[i];
+    // GIF frames can have 3 and 4-channel palettes, and converting all frames
+    // to channels of first frame removed alpha of later frames
+    if (radius > 0 && frame.hasPalette) {
+      frame = frame.convert(numChannels: frame.numChannels, noAnimation: true);
+    }
+
+    final dst = Image.fromResized(frame,
+        width: width, height: height, noAnimation: true);
+    firstFrame?.addFrame(dst);
     firstFrame ??= dst;
 
     if (radius > 0) {

@@ -183,7 +183,7 @@ Image ditherImage(
 }) {
   // The error is diffused through color values, not palette indices.
   if (image.hasPalette) {
-    image = image.convert(numChannels: image.numChannels);
+    image = withoutPalette(image);
   }
   quantizer ??= NeuralQuantizer(image);
 

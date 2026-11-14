@@ -35,8 +35,11 @@ Image copyCropCircle(Image src,
   final numFrames = src.numFrames;
   for (var i = 0; i < numFrames; ++i) {
     final frame = src.frames[i];
-    final dst = firstFrame?.addFrame() ??
+    // addFrame() copied first cropped frame, so later frames had duration of
+    // first frame
+    final dst =
         Image.fromResized(frame, width: wh, height: wh, noAnimation: true);
+    firstFrame?.addFrame(dst);
     firstFrame ??= dst;
 
     final bg = frame.backgroundColor ?? src.backgroundColor;
@@ -48,6 +51,11 @@ Image copyCropCircle(Image src,
     final dw = radius * 2;
     for (var yi = 0, sy = tly; yi < dh; ++yi, ++sy) {
       for (var xi = 0, sx = tlx; xi < dw; ++xi, ++sx) {
+        // getPixel threw RangeError for circle outside image
+        if (sx < 0 || sy < 0 || sx >= frame.width || sy >= frame.height) {
+          continue;
+        }
+
         final p = frame.getPixel(sx, sy);
         final a =
             circleTest(p, centerX, centerY, radiusSqr, antialias: antialias);

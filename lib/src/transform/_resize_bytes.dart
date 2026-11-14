@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import '../color/format.dart';
 import '../image/image.dart';
 import '../image/interpolation.dart';
+import '../util/_alpha_weight.dart';
 import '_pixel_bytes.dart';
 
 /// Whether [resizeBytes] supports resizing [frame] with [interpolation].
@@ -192,6 +193,13 @@ void _linearRow(Uint8List src, int row0, int row1, Uint8List out, int di,
     final i1 = row1 + ixs[x];
     final n1 = row1 + nxs[x];
     final kx = kxs[x];
+
+    if (nc.isEven) {
+      blendLinearAlphaPixel(src, i0, n0, i1, n1, kx, ky, out, di, nc);
+      di += nc;
+      continue;
+    }
+
     for (var c = 0; c < nc; ++c) {
       final icc = src[i0 + c].toDouble();
       final inc = src[n0 + c].toDouble();
@@ -203,6 +211,129 @@ void _linearRow(Uint8List src, int row0, int row1, Uint8List out, int di,
           .toInt();
     }
   }
+}
+
+@pragma('vm:prefer-inline')
+int _blendLinearByte(int center, int right, int below, int diagonal,
+        double fractionX, double fractionY) =>
+    (center +
+            fractionX *
+                (right -
+                    center +
+                    fractionY * (center + diagonal - below - right)) +
+            fractionY * (below - center))
+        .toInt();
+
+/// Blends 1 pixel of 2 or 4 channels from 4 taps: plain blend mixes RGB of
+/// transparent taps into visible ones, so [_blendMixedLinearPixel] weights
+/// taps with different alpha
+@pragma('vm:prefer-inline')
+void blendLinearAlphaPixel(
+    Uint8List bytes,
+    int center,
+    int right,
+    int below,
+    int diagonal,
+    double fractionX,
+    double fractionY,
+    Uint8List out,
+    int outOffset,
+    int channels) {
+  final alphaOffset = channels - 1;
+  final centerAlpha = bytes[center + alphaOffset];
+  final rightAlpha = bytes[right + alphaOffset];
+  final belowAlpha = bytes[below + alphaOffset];
+  final diagonalAlpha = bytes[diagonal + alphaOffset];
+  final isUniform = ((centerAlpha ^ rightAlpha) |
+          (centerAlpha ^ belowAlpha) |
+          (centerAlpha ^ diagonalAlpha)) ==
+      0;
+
+  // _blendMixedLinearPixel is separate so that this function has no loop
+  // and is inlined: with mixed alpha inside, in-place linear of RGBA took
+  // 18.2 ms against 17.0 ms before alpha weighting, and 14.0 ms after split
+  if (!isUniform) {
+    _blendMixedLinearPixel(bytes, center, right, below, diagonal, fractionX,
+        fractionY, out, outOffset, channels);
+    return;
+  }
+
+  out[outOffset] = _blendLinearByte(bytes[center], bytes[right], bytes[below],
+      bytes[diagonal], fractionX, fractionY);
+
+  // Loop over color channels cost 5% against 4-channel loop of resize
+  if (channels == 4) {
+    out[outOffset + 1] = _blendLinearByte(bytes[center + 1], bytes[right + 1],
+        bytes[below + 1], bytes[diagonal + 1], fractionX, fractionY);
+    out[outOffset + 2] = _blendLinearByte(bytes[center + 2], bytes[right + 2],
+        bytes[below + 2], bytes[diagonal + 2], fractionX, fractionY);
+  }
+
+  // Blend of 4 equal alphas is exactly that alpha, so it is written without
+  // blending
+  out[outOffset + alphaOffset] = centerAlpha;
+}
+
+void _blendMixedLinearPixel(
+    Uint8List bytes,
+    int center,
+    int right,
+    int below,
+    int diagonal,
+    double fractionX,
+    double fractionY,
+    Uint8List out,
+    int outOffset,
+    int channels) {
+  final alphaOffset = channels - 1;
+  final centerAlpha = bytes[center + alphaOffset];
+  final rightAlpha = bytes[right + alphaOffset];
+  final belowAlpha = bytes[below + alphaOffset];
+  final diagonalAlpha = bytes[diagonal + alphaOffset];
+  final crossAlpha = centerAlpha + diagonalAlpha - belowAlpha - rightAlpha;
+  final alpha = centerAlpha +
+      fractionX * (rightAlpha - centerAlpha + fractionY * crossAlpha) +
+      fractionY * (belowAlpha - centerAlpha);
+
+  if (alpha <= 0) {
+    for (var i = 0; i < alphaOffset; ++i) {
+      out[outOffset + i] = _blendLinearByte(bytes[center + i], bytes[right + i],
+          bytes[below + i], bytes[diagonal + i], fractionX, fractionY);
+    }
+  } else {
+    // This is alphaWeightedLinear with weights computed before channel loop,
+    // since calling it per channel cost 5x of plain blend
+    final cross = fractionX * fractionY;
+    final centerWeight = (1 - fractionX - fractionY + cross) * centerAlpha;
+    final rightWeight = (fractionX - cross) * rightAlpha;
+    final belowWeight = (fractionY - cross) * belowAlpha;
+    final diagonalWeight = cross * diagonalAlpha;
+    var referenceTap = center;
+    var largest = centerWeight;
+    if (rightWeight > largest) {
+      referenceTap = right;
+      largest = rightWeight;
+    }
+    if (belowWeight > largest) {
+      referenceTap = below;
+      largest = belowWeight;
+    }
+    if (diagonalWeight > largest) {
+      referenceTap = diagonal;
+    }
+
+    for (var i = 0; i < alphaOffset; ++i) {
+      final reference = bytes[referenceTap + i];
+      final offset = centerWeight * (bytes[center + i] - reference) +
+          rightWeight * (bytes[right + i] - reference) +
+          belowWeight * (bytes[below + i] - reference) +
+          diagonalWeight * (bytes[diagonal + i] - reference);
+
+      out[outOffset + i] = (reference + offset / alpha).toInt();
+    }
+  }
+
+  out[outOffset + alphaOffset] = alpha.toInt();
 }
 
 void _resizeAverage(_OrientedSource src, Uint8List out, int dstStride, int x1,
@@ -219,6 +350,11 @@ void _resizeAverage(_OrientedSource src, Uint8List out, int dstStride, int x1,
     ax1s[x] = ax1;
     ax2s[x] = ax2;
   }
+  if (nc.isEven) {
+    _resizeAverageAlpha(src, out, dstStride, x1, y1, w, h, dy, ax1s, ax2s);
+    return;
+  }
+
   final sums = Int32List(nc);
   for (var y = 0; y < h; ++y) {
     final ay1 = (y * dy).toInt();
@@ -238,11 +374,191 @@ void _resizeAverage(_OrientedSource src, Uint8List out, int dstStride, int x1,
             src.colStep, nc, sums);
       }
       // Integer sums are exact in doubles, so this matches summing doubles.
-      final inv = 1.0 / ((ay2 - ay1) * (ax2 - ax1));
+      final count = (ay2 - ay1) * (ax2 - ax1);
       for (var c = 0; c < nc; ++c) {
-        out[di++] = (sums[c] * inv).toInt();
+        out[di++] = sums[c] ~/ count;
       }
     }
+  }
+}
+
+void _resizeAverageAlpha(_OrientedSource source, Uint8List out, int dstStride,
+    int x1, int y1, int w, int h, double dy, Int32List ax1s, Int32List ax2s) {
+  final bytes = source.bytes;
+  final colStep = source.colStep;
+  final channels = source.k;
+  final rowStep = source.rowStep;
+  final hasColor = channels == 4;
+  final sums = AlphaBlockSums();
+
+  for (var y = 0; y < h; ++y) {
+    final ay1 = (y * dy).toInt();
+    var ay2 = ((y + 1) * dy).toInt();
+    if (ay2 == ay1) {
+      ay2++;
+    }
+    var di = (y1 + y) * dstStride + x1 * channels;
+
+    for (var x = 0; x < w; ++x) {
+      final columns = ax2s[x] - ax1s[x];
+      final start = source.row(ay1) + ax1s[x] * colStep;
+      final count = (ay2 - ay1) * columns;
+      sums.sumBlock(
+          bytes, start, colStep, rowStep, columns, ay2 - ay1, channels);
+
+      if (sums.hasMixedAlpha) {
+        out[di++] = sums.weightedRed ~/ sums.alpha;
+        if (hasColor) {
+          out[di++] = sums.weightedGreen ~/ sums.alpha;
+          out[di++] = sums.weightedBlue ~/ sums.alpha;
+        }
+      } else {
+        out[di++] = sums.red ~/ count;
+        if (hasColor) {
+          out[di++] = sums.green ~/ count;
+          out[di++] = sums.blue ~/ count;
+        }
+      }
+
+      out[di++] = sums.alpha ~/ count;
+    }
+  }
+}
+
+/// Downscales [bytes] of 2 or 4 channels by average in place for resize, and
+/// reads every block before writing pixel that overlaps it
+void resizeDownAverageAlpha(Uint8List bytes, int sourceWidth, int channels,
+    int width, int height, double stepX, double stepY) {
+  final sums = AlphaBlockSums();
+  final hasColor = channels == 4;
+  final rowStep = sourceWidth * channels;
+  var outOffset = 0;
+
+  for (var y = 0; y < height; ++y) {
+    final blockTop = (y * stepY).toInt();
+    final blockBottom = ((y + 1) * stepY).toInt();
+    final rows = blockBottom == blockTop ? 1 : blockBottom - blockTop;
+
+    for (var x = 0; x < width; ++x) {
+      final blockLeft = (x * stepX).toInt();
+      final blockRight = ((x + 1) * stepX).toInt();
+      final columns = blockRight == blockLeft ? 1 : blockRight - blockLeft;
+      final count = rows * columns;
+      final start = (blockTop * sourceWidth + blockLeft) * channels;
+      sums.sumBlock(bytes, start, channels, rowStep, columns, rows, channels);
+
+      if (sums.hasMixedAlpha) {
+        bytes[outOffset++] = sums.weightedRed ~/ sums.alpha;
+        if (hasColor) {
+          bytes[outOffset++] = sums.weightedGreen ~/ sums.alpha;
+          bytes[outOffset++] = sums.weightedBlue ~/ sums.alpha;
+        }
+      } else {
+        bytes[outOffset++] = sums.red ~/ count;
+        if (hasColor) {
+          bytes[outOffset++] = sums.green ~/ count;
+          bytes[outOffset++] = sums.blue ~/ count;
+        }
+      }
+
+      bytes[outOffset++] = sums.alpha ~/ count;
+    }
+  }
+}
+
+/// Downscales [bytes] of 2 or 4 channels linearly in place for resize, and
+/// uses center pixel as tap outside right or bottom edge, as
+/// Image.getPixelLinear does
+void resizeDownLinearAlpha(Uint8List bytes, int sourceWidth, int sourceHeight,
+    int channels, int width, int height, double stepX, double stepY) {
+  var outOffset = 0;
+  for (var y = 0; y < height; ++y) {
+    final sourceY = y * stepY;
+    final floorY = sourceY.toInt();
+    final fractionY = sourceY - floorY;
+    final rowStart = floorY * sourceWidth;
+    final nextRowStart = rowStart + sourceWidth;
+    final hasNextRow = floorY + 1 < sourceHeight;
+
+    for (var x = 0; x < width; ++x) {
+      final sourceX = x * stepX;
+      final floorX = sourceX.toInt();
+      final hasNextColumn = floorX + 1 < sourceWidth;
+      final center = (rowStart + floorX) * channels;
+      final right = hasNextColumn ? center + channels : center;
+      final below = hasNextRow ? (nextRowStart + floorX) * channels : center;
+      final diagonal = hasNextColumn && hasNextRow ? below + channels : center;
+
+      blendLinearAlphaPixel(bytes, center, right, below, diagonal,
+          sourceX - floorX, fractionY, bytes, outOffset, channels);
+      outOffset += channels;
+    }
+  }
+}
+
+/// Sums 1 block of uint8 pixels with alpha in last of 2 or 4 channels, plain
+/// and weighted by alpha, since unweighted average mixes RGB of fully
+/// transparent pixels into edge pixels of [hasMixedAlpha] blocks
+class AlphaBlockSums {
+  int red = 0;
+  int green = 0;
+  int blue = 0;
+  int alpha = 0;
+
+  int weightedRed = 0;
+  int weightedGreen = 0;
+  int weightedBlue = 0;
+  bool hasMixedAlpha = false;
+
+  @pragma('vm:prefer-inline')
+  void sumBlock(Uint8List bytes, int start, int colStep, int rowStep,
+      int columns, int rows, int channels) {
+    final alphaChannel = channels - 1;
+    final hasColor = channels == 4;
+    var redSum = 0;
+    var greenSum = 0;
+    var blueSum = 0;
+    var alphaSum = 0;
+
+    var redWeighted = 0;
+    var greenWeighted = 0;
+    var blueWeighted = 0;
+    var alphaOr = 0;
+    var alphaAnd = 0xff;
+
+    for (var row = 0, rowStart = start; row < rows; ++row) {
+      var offset = rowStart;
+      rowStart += rowStep;
+
+      for (var i = 0; i < columns; ++i, offset += colStep) {
+        final pixelAlpha = bytes[offset + alphaChannel];
+        final pixelRed = bytes[offset];
+        alphaSum += pixelAlpha;
+        alphaOr |= pixelAlpha;
+        alphaAnd &= pixelAlpha;
+        redSum += pixelRed;
+        redWeighted += pixelRed * pixelAlpha;
+
+        if (hasColor) {
+          final pixelGreen = bytes[offset + 1];
+          final pixelBlue = bytes[offset + 2];
+          greenSum += pixelGreen;
+          blueSum += pixelBlue;
+          greenWeighted += pixelGreen * pixelAlpha;
+          blueWeighted += pixelBlue * pixelAlpha;
+        }
+      }
+    }
+
+    red = redSum;
+    green = greenSum;
+    blue = blueSum;
+    alpha = alphaSum;
+
+    weightedRed = redWeighted;
+    weightedGreen = greenWeighted;
+    weightedBlue = blueWeighted;
+    hasMixedAlpha = alphaOr != alphaAnd;
   }
 }
 
@@ -279,6 +595,9 @@ void _resizeCubic(_OrientedSource src, Uint8List out, int dstStride, int x1,
   final rowInside = Uint8List(4);
   final taps = Int32List(16);
   final p = Float64List(4);
+  final alphas = Float64List(16);
+  final hasAlpha = nc.isEven;
+  final alphaOffset = nc - 1;
   for (var y = 0; y < h; ++y) {
     final fy = y * dy;
     final iy = fy.toInt();
@@ -299,25 +618,91 @@ void _resizeCubic(_OrientedSource src, Uint8List out, int dstStride, int x1,
         }
       }
       final kx = fxs[x];
-      for (var c = 0; c < nc; ++c) {
-        for (var r = 0; r < 4; ++r) {
-          final o = r * 4;
-          p[r] = _cubic(
-              kx,
-              s[taps[o] + c].toDouble(),
-              s[taps[o + 1] + c].toDouble(),
-              s[taps[o + 2] + c].toDouble(),
-              s[taps[o + 3] + c].toDouble());
+      var colorChannels = nc;
+      var alpha = 0.0;
+      var isWeighted = false;
+      var referenceTap = 5;
+
+      // Plain blend mixes RGB of transparent taps into visible ones, so taps
+      // with different alpha are weighted by cubicAlphaWeights
+      if (hasAlpha) {
+        colorChannels = alphaOffset;
+        final centerAlpha = s[center + alphaOffset];
+        var isUniform = true;
+        for (var i = 0; i < 16; ++i) {
+          isUniform = isUniform && s[taps[i] + alphaOffset] == centerAlpha;
         }
-        final v = _cubic(ky, p[0], p[1], p[2], p[3]);
-        out[di++] = v < 0
+
+        alpha = centerAlpha.toDouble();
+        if (!isUniform) {
+          alpha = _cubicAlpha(s, taps, alphaOffset, kx, ky, alphas);
+          isWeighted = alpha > 0;
+        }
+
+        if (isWeighted) {
+          referenceTap = cubicAlphaWeights(alphas, kx, ky);
+        }
+      }
+
+      // Test of isWeighted inside channel loop cost 2.4% on cubic of uint8 RGB
+      if (isWeighted) {
+        for (var c = 0; c < colorChannels; ++c) {
+          final reference = s[taps[referenceTap] + c];
+          var v = 0.0;
+          for (var i = 0; i < 16; ++i) {
+            v += alphas[i] * (s[taps[i] + c] - reference);
+          }
+
+          v = reference + v / alpha;
+          out[di++] = v < 0
+              ? 0
+              : v > 255
+                  ? 255
+                  : v.toInt();
+        }
+      } else {
+        for (var c = 0; c < colorChannels; ++c) {
+          for (var r = 0; r < 4; ++r) {
+            final o = r * 4;
+            p[r] = _cubic(
+                kx,
+                s[taps[o] + c].toDouble(),
+                s[taps[o + 1] + c].toDouble(),
+                s[taps[o + 2] + c].toDouble(),
+                s[taps[o + 3] + c].toDouble());
+          }
+          final v = _cubic(ky, p[0], p[1], p[2], p[3]);
+          out[di++] = v < 0
+              ? 0
+              : v > 255
+                  ? 255
+                  : v.toInt();
+        }
+      }
+
+      if (hasAlpha) {
+        out[di++] = alpha < 0
             ? 0
-            : v > 255
+            : alpha > 255
                 ? 255
-                : v.toInt();
+                : alpha.toInt();
       }
     }
   }
+}
+
+double _cubicAlpha(Uint8List bytes, Int32List taps, int alphaOffset,
+    double fractionX, double fractionY, Float64List alphas) {
+  for (var i = 0; i < 16; ++i) {
+    alphas[i] = bytes[taps[i] + alphaOffset].toDouble();
+  }
+
+  return _cubic(
+      fractionY,
+      _cubic(fractionX, alphas[0], alphas[1], alphas[2], alphas[3]),
+      _cubic(fractionX, alphas[4], alphas[5], alphas[6], alphas[7]),
+      _cubic(fractionX, alphas[8], alphas[9], alphas[10], alphas[11]),
+      _cubic(fractionX, alphas[12], alphas[13], alphas[14], alphas[15]));
 }
 
 double _cubic(double dx, double ipp, double icp, double inp, double iap) =>

@@ -46,7 +46,7 @@ Image vignette(Image src,
             maskChannel: maskChannel));
   }
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   final h = src.height - 1;
   final w = src.width - 1;

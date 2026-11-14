@@ -13,7 +13,7 @@ Image monochrome(Image src,
     return src;
   }
   if (src.hasPalette) {
-    src = src.convert(numChannels: src.numChannels);
+    src = withoutPalette(src);
   }
   final nr = color?.rNormalized ?? 0.45;
   final ng = color?.gNormalized ?? 0.6;
