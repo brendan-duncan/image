@@ -668,8 +668,8 @@ void _resizeCubic(_OrientedSource src, Uint8List out, int dstStride, int x1,
             }
           }
 
-          // v / alpha with alpha near 0 gave colors 33% of range away from
-          // visible taps, so v is kept to range of visible taps
+          // v / alpha with alpha near 0 gave colors 33% of the range away
+          // from the visible taps, so v is kept to the range of those taps
           v = reference + v / alpha;
           out[di++] = v < lowest
               ? lowest

@@ -935,7 +935,10 @@ class Image extends Iterable<Pixel> {
     for (var i = 0; i < 16; ++i) {
       final tapAlpha = _asDouble(taps[i].a);
       weights[i] = tapAlpha;
-      if (tapAlpha > 0) {
+      // Not > 0: signed and float alpha can be negative, and the negative
+      // lobes then give a positive blended alpha with no positive tap, which
+      // left no taps to limit to and an infinite color
+      if (tapAlpha != 0) {
         visible |= 1 << i;
       }
     }
@@ -984,8 +987,8 @@ class Image extends Iterable<Pixel> {
         _limitDouble(blendedAlpha, lowestValue, highestValue));
   }
 
-  /// [value] limited to the range of [colors] over the taps with alpha, which
-  /// have their bit set in [visible]
+  /// [value] limited to the range of [colors] over the taps with non-zero
+  /// alpha, which have their bit set in [visible]
   static double _limitToTaps(double value, Float64List colors, int visible) {
     var lowest = double.infinity;
     var highest = double.negativeInfinity;
@@ -1001,7 +1004,7 @@ class Image extends Iterable<Pixel> {
       }
     }
     // The weighted path only runs with a positive blended alpha, so at least
-    // one tap is visible
+    // one tap has non-zero alpha
     return _limitDouble(value, lowest, highest);
   }
 

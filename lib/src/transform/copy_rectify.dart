@@ -18,7 +18,12 @@ Image copyRectify(Image src,
     Interpolation interpolation = Interpolation.nearest,
     Image? toImage,
     bool linearBlend = false}) {
-  src = withoutLaterPalettes(src);
+  // You can't interpolate index pixels, so palette frames are converted for
+  // non-nearest interpolation. Nearest copies indices, but a palette frame
+  // after a first frame without one still has to be converted.
+  src = interpolation == Interpolation.nearest
+      ? withoutLaterPalettes(src)
+      : withoutPalettes(src);
   if (linearBlend &&
       interpolation != Interpolation.nearest &&
       toImage?.hasPalette != true) {
@@ -43,12 +48,6 @@ Image copyRectify(Image src,
       writeSrgbFrame(linear.frames[i], target);
     }
     return toImage;
-  }
-
-  // You can't interpolate index pixels, so we need to convert the image
-  // to a non-palette image if non-nearest interpolation is used.
-  if (interpolation != Interpolation.nearest && src.hasPalette) {
-    src = withoutPalette(src);
   }
 
   Image? firstFrame;

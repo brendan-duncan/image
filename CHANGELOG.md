@@ -1,9 +1,9 @@
 # 4.13.2
 
 * `linear`, `cubic` and `average` resizing, rotating and rectifying weight color by alpha, so transparent pixels no longer leave a colored fringe.
-* `cubic` clamps 16 bit, 32 bit and signed images to their range instead of wrapping.
+* `cubic` with mixed alpha keeps colors within the range of the visible pixels; 16 bit, 32 bit and signed images no longer wrap.
 * `Palette.getAlpha` returns the maximum value for palettes without alpha, as `PaletteUint8` does; it returned 0 for other formats.
-* Fix animation frames losing duration and palette in crop, trim, rotate, rectify and `copyExpandCanvas`.
+* Fix animation frames losing duration and palette in crop, trim, rotate, rectify and `copyExpandCanvas`, and palette frames after a first frame without one getting wrong colors.
 * Fix 1, 2 and 4 bit pixel iteration, `PixelUint16.index`, and `resize` with `backgroundColor` erasing the image.
 * Faster palette `convert`, linear and average resizing, and palette `copyCrop`.
 

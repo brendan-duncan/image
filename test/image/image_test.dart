@@ -584,6 +584,26 @@ void main() {
         expect(outside, isEmpty);
       });
     }
+
+    for (final format in [Format.int8, Format.float32]) {
+      test('${format.name} cubic with negative alpha keeps colors finite', () {
+        final image =
+            Image(width: 4, height: 4, format: format, numChannels: 4);
+        for (final pixel in image) {
+          pixel.setRgba(10, 10, 10, 0);
+        }
+
+        // Only taps in the negative lobes have alpha, so the blended alpha
+        // is positive without any tap having positive alpha
+        final alpha = format == Format.int8 ? -100 : -0.5;
+        image.getPixel(0, 1).a = alpha;
+        image.getPixel(0, 2).a = alpha;
+
+        final color = image.getPixelCubic(1.5, 1.5);
+        expect(color.a, greaterThan(0));
+        expect(color.r, 10);
+      });
+    }
   });
 }
 
