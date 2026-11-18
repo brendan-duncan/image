@@ -330,6 +330,16 @@ class JpegScan {
     }
   }
 
+  // Reads the correction bit of a nonzero AC coefficient and, when it is
+  // set, adds it to the magnitude: away from zero, so a negative coefficient
+  // becomes more negative (ITU T.81 G.1.2.3, libjpeg's decode_mcu_AC_refine).
+  void _refineAC(Int16List zz, int z) {
+    final p1 = 1 << successive;
+    if (_readBit()! != 0 && (zz[z] & p1) == 0) {
+      zz[z] += zz[z] >= 0 ? p1 : -p1;
+    }
+  }
+
   void _decodeACSuccessive(JpegComponent component, Int16List zz, int o) {
     var k = spectralStart;
     final e = spectralEnd;
@@ -363,7 +373,7 @@ class JpegScan {
         case 1: // skipping r zero items
         case 2:
           if (zz[z] != 0) {
-            zz[z] += _readBit()! << successive;
+            _refineAC(zz, z);
           } else {
             r--;
             if (r == 0) {
@@ -373,7 +383,7 @@ class JpegScan {
           break;
         case 3: // set value for a zero item
           if (zz[z] != 0) {
-            zz[z] += _readBit()! << successive;
+            _refineAC(zz, z);
           } else {
             zz[z] = successiveACNextValue << successive;
             successiveACState = 0;
@@ -381,7 +391,7 @@ class JpegScan {
           break;
         case 4: // eob
           if (zz[z] != 0) {
-            zz[z] += _readBit()! << successive;
+            _refineAC(zz, z);
           }
           break;
       }
