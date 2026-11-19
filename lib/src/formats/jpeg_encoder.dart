@@ -234,12 +234,14 @@ class JpegEncoder extends Encoder {
         p = p.convert(format: Format.uint8);
       }
       var r = p.r.toInt();
-      var g = p.g.toInt();
-      var b = p.b.toInt();
+      // One- and two-channel colors store luminance instead of RGB.
+      var g = p.length < 3 ? r : p.g.toInt();
+      var b = p.length < 3 ? r : p.b.toInt();
       // Blend with the background color into locals; p may be a live view of
       // the source image, which must not be modified.
-      if (p.length > 3) {
-        final a = p.aNormalized;
+      if (p.length == 2 || p.length > 3) {
+        // Read gray-alpha directly, including two-channel palette colors.
+        final a = p.length == 2 ? p[1] / p.maxChannelValue : p.aNormalized;
         final invA = 1.0 - a;
         r = (r * a + backgroundColor.r * invA).round().clamp(0, 255);
         g = (g * a + backgroundColor.g * invA).round().clamp(0, 255);

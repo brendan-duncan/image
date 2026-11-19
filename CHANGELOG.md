@@ -1,5 +1,6 @@
 # 4.13.2
 
+* Fix JPEG encoding of grayscale and grayscale-alpha images.
 * `linear`, `cubic` and `average` resizing, rotating and rectifying weight color by alpha, so transparent pixels no longer leave a colored fringe.
 * `cubic` with mixed alpha keeps colors within the range of the visible pixels; 16 bit, 32 bit and signed images no longer wrap.
 * `Palette.getAlpha` returns the maximum value for palettes without alpha, as `PaletteUint8` does; it returned 0 for other formats.
