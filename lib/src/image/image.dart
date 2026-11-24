@@ -186,8 +186,9 @@ class Image extends Iterable<Pixel> {
   /// [bytesOffset] can be specified to start reading the [bytes] data starting
   /// from that value.
   ///
-  /// [numChannels] can be used to specify the number of pixel channels in the
-  /// [bytes] data, defaulting to 3.
+  /// [numChannels] specifies the number of channels per pixel in [bytes].
+  /// If omitted, the count is inferred from [order]. If both are omitted,
+  /// the count defaults to 3.
   ///
   /// [order] can be used if the source [bytes] has a different channel order
   /// than RGBA. [ChannelOrder].bgra will rearrange the color channels from
