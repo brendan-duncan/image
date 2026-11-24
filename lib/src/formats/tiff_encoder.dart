@@ -45,8 +45,15 @@ class TiffEncoder extends Encoder {
     ifd0['PhotometricInterpretation'] = type;
     ifd0['RowsPerStrip'] = image.height;
     ifd0['PlanarConfiguration'] = 1;
-    ifd0['TileWidth'] = image.width;
-    ifd0['TileLength'] = image.height;
+    // Layout and codec tags copied from the source EXIF no longer describe the
+    // uncompressed strip data written here, and strict readers reject them.
+    for (final tag in _staleLayoutTags) {
+      ifd0[tag] = null;
+    }
+    if (!image.hasPalette && (nc == 2 || nc == 4)) {
+      // The last channel is unassociated alpha.
+      ifd0['ExtraSamples'] = 2;
+    }
     ifd0['StripByteCounts'] = image.lengthInBytes;
     // The pixel data is written straight from the image, without a copy.
     ifd0['StripOffsets'] = IfdValueUndefined.view(image.toUint8List());
@@ -71,6 +78,27 @@ class TiffEncoder extends Encoder {
 
     return out.getBytes();
   }
+
+  static const _staleLayoutTags = <Object>[
+    'TileWidth',
+    'TileLength',
+    'TileOffsets',
+    'TileByteCounts',
+    'ExtraSamples',
+    'ColorMap',
+    'Predictor',
+    'FillOrder',
+    'T4Options',
+    'T6Options',
+    'YCbCrCoefficients',
+    'YCbCrSubSampling',
+    'YCbCrPositioning',
+    'JPEGProc',
+    'JPEGInterchangeFormat',
+    'JPEGInterchangeFormatLength',
+    0x014A, // SubIFDs
+    0x015B, // JPEGTables
+  ];
 
   TiffFormat _getSampleFormat(Image image) {
     switch (image.formatType) {
