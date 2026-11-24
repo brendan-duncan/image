@@ -369,6 +369,22 @@ void main() async {
           ..writeAsBytesSync(encodePng(image));
       });
 
+      test('progressive refinement matches baseline', () {
+        // jpegtran -progressive transcodes losslessly, with AC refinement
+        // scans, so both files hold the same DCT coefficients.
+        final baseline =
+            decodeJpg(File('test/_data/jpg/buck_24.jpg').readAsBytesSync())!;
+        final progressive = decodeJpg(
+            File('test/_data/jpg/buck_24_progressive.jpg').readAsBytesSync())!;
+        expect(progressive.width, baseline.width);
+        expect(progressive.height, baseline.height);
+        for (final p in baseline) {
+          final q = progressive.getPixel(p.x, p.y);
+          expect([q.r, q.g, q.b], [p.r, p.g, p.b],
+              reason: 'pixel ${p.x},${p.y}');
+        }
+      });
+
       test('exif', () {
         final fb = File('test/_data/jpg/big_buck_bunny.jpg').readAsBytesSync();
         final image = JpegDecoder().decode(fb)!;
