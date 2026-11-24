@@ -53,6 +53,35 @@ void main() {
       expect(imagesAreEqual(image, decodeTiff(bytes)!), isTrue);
     });
 
+    test('writes every frame as a page', () {
+      final image = _image(17, 19)..exif.imageIfd['PageNumber'] = [0, 1];
+      image.exif.exifIfd['DateTimeOriginal'] = '2026:11:23 12:00:00';
+      image.addFrame(_image(5, 7, numChannels: 4)..exif = image.exif);
+      image.addFrame(_image(9, 3)..exif = image.exif);
+
+      final bytes = encodeTiff(image);
+      final exif = ExifData.fromInputBuffer(InputBuffer(bytes));
+      for (var i = 0; i < 3; ++i) {
+        final ifd = exif['ifd$i'];
+        expect(ifd['SubfileType']!.toInt(), 2);
+        expect(ifd['PageNumber']!.toInt(), i);
+        expect(ifd['PageNumber']!.toInt(1), 3);
+        expect(ifd.sub['exif']['DateTimeOriginal'].toString(),
+            '2026:11:23 12:00:00');
+      }
+
+      final decoded = decodeTiff(bytes)!;
+      expect(decoded.numFrames, 3);
+      for (var i = 0; i < 3; ++i) {
+        expect(imagesAreEqual(image.frames[i], decoded.frames[i]), isTrue);
+      }
+
+      final single = decodeTiff(encodeTiff(image, singleFrame: true))!;
+      expect(single.numFrames, 1);
+      expect(single.exif.imageIfd['PageNumber'], isNull);
+      expect(imagesAreEqual(image, single), isTrue);
+    });
+
     test('writes ExtraSamples for alpha channels', () {
       final image = _image(5, 7, numChannels: 4);
       final bytes = encodeTiff(image);

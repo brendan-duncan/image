@@ -173,7 +173,7 @@ class ExifData extends IfdContainer {
       // storage for sub-ifd blocks
       for (final subName in ifd.sub.keys) {
         final subIfd = ifd.sub[subName];
-        offsets[subName] = dataOffset;
+        offsets['$name.$subName'] = dataOffset;
         int subSize = 2 + (12 * subIfd.values.length);
         for (final value in subIfd.values) {
           final dataSize = value.dataSize;
@@ -201,15 +201,15 @@ class ExifData extends IfdContainer {
       final ifd = directories[name]!;
 
       if (ifd.sub.containsKey('exif')) {
-        ifd[0x8769]!.setInt(offsets['exif']!);
+        ifd[0x8769]!.setInt(offsets['$name.exif']!);
       }
 
       if (ifd.sub.containsKey('interop')) {
-        ifd[0xA005]!.setInt(offsets['interop']!);
+        ifd[0xA005]!.setInt(offsets['$name.interop']!);
       }
 
       if (ifd.sub.containsKey('gps')) {
-        ifd[0x8825]!.setInt(offsets['gps']!);
+        ifd[0x8825]!.setInt(offsets['$name.gps']!);
       }
 
       final ifdOffset = offsets[name]!;
@@ -228,7 +228,7 @@ class ExifData extends IfdContainer {
 
       for (final subName in ifd.sub.keys) {
         final subIfd = ifd.sub[subName];
-        final subOffset = offsets[subName]!;
+        final subOffset = offsets['$name.$subName']!;
         final dataOffset = subOffset + 2 + (12 * subIfd.values.length);
         _writeDirectory(out, subIfd, dataOffset);
         _writeDirectoryLargeValues(out, subIfd);
