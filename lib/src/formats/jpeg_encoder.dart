@@ -230,7 +230,9 @@ class JpegEncoder extends Encoder {
 
       pixel = image.getPixel(xx, yy, pixel);
       Color p = pixel;
-      if (p.format != Format.uint8) {
+      // A palette pixel reports the index format; its colors use the
+      // palette's format.
+      if ((p.palette?.format ?? p.format) != Format.uint8) {
         p = p.convert(format: Format.uint8);
       }
       var r = p.r.toInt();

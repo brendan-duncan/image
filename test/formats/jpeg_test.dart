@@ -436,6 +436,21 @@ void main() async {
                             : [28, 92, 220]);
           });
         }
+
+        for (final format in [Format.uint16, Format.float32]) {
+          test('encodes palette format=$format $chroma', () {
+            final palette = format == Format.uint16
+                ? PaletteUint16(4, 3)
+                : PaletteFloat32(4, 3);
+            final max = palette.maxChannelValue;
+            palette.setRgb(3, 40 / 255 * max, 120 / 255 * max, 200 / 255 * max);
+            final image = Image(width: 13, height: 11, palette: palette);
+            for (final p in image) {
+              p.index = 3;
+            }
+            expectJpegColor(image, chroma, [40, 120, 200]);
+          });
+        }
       }
 
       test('encode (default 4:4:4 chroma)', () {
